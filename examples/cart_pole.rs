@@ -3,7 +3,7 @@
 //! Run: `cargo run --example cart_pole`
 
 use iris::envs::cart_pole::CartPole;
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 fn main() {
@@ -13,9 +13,8 @@ fn main() {
     println!("==============");
 
     let mut env = CartPole::new();
+    let adapter = Box::new(GenericAdapter::discrete(1, 4, 2));
     let config = AgentConfig {
-        obs_dim: 4,
-        action_dim: 2,
         latent_dim: 8,
         hidden_dim: 32,
         history_len: 16,
@@ -27,7 +26,7 @@ fn main() {
     };
 
     println!("building agent (compiling graphs)...");
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     println!("agent ready");
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);

@@ -6,7 +6,7 @@
 
 use iris::envs::grid_world::{GridWorld, NUM_ACTIONS, OBS_DIM};
 use iris::envs::random_walk::RandomWalk;
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 /// Short stability check on GridWorld with all Phase 4 mechanisms enabled.
@@ -22,9 +22,8 @@ use rand::SeedableRng;
 #[ignore] // requires GPU
 fn stability_grid_world() {
     let mut env = GridWorld::new();
+    let adapter = Box::new(GenericAdapter::discrete(0, OBS_DIM, NUM_ACTIONS));
     let config = AgentConfig {
-        obs_dim: OBS_DIM,
-        action_dim: NUM_ACTIONS,
         latent_dim: 8,
         hidden_dim: 16,
         history_len: 8,
@@ -34,7 +33,7 @@ fn stability_grid_world() {
         drift_interval: 500,
         ..AgentConfig::default()
     };
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
 
     // Step count chosen to fit within ~2 minutes on lavapipe (CPU Vulkan).
@@ -91,9 +90,8 @@ fn stability_grid_world() {
 fn stability_random_walk_convergence() {
     let size = 10;
     let mut env = RandomWalk::new(size);
+    let adapter = Box::new(GenericAdapter::discrete(1, size, 2));
     let config = AgentConfig {
-        obs_dim: size,
-        action_dim: 2,
         latent_dim: 8,
         hidden_dim: 16,
         history_len: 8,
@@ -102,7 +100,7 @@ fn stability_random_walk_convergence() {
         learning_rate: 1e-3,
         ..AgentConfig::default()
     };
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     let mut rng = rand::rngs::StdRng::seed_from_u64(7);
 
     for _ in 0..500 {

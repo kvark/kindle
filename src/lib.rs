@@ -19,6 +19,7 @@
 //! and derives reward from three frozen primitives: surprise, novelty, and
 //! homeostatic balance.
 
+pub mod adapter;
 pub mod agent;
 pub mod buffer;
 pub mod credit;
@@ -29,9 +30,10 @@ pub mod policy;
 pub mod reward;
 pub mod world_model;
 
+pub use adapter::{EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
 pub use agent::{Agent, AgentConfig};
 pub use buffer::ExperienceBuffer;
-pub use env::{Action, Environment, HomeostaticProvider, Observation};
+pub use env::{Action, ActionKind, Environment, HomeostaticProvider, Observation};
 pub use reward::RewardCircuit;
 
 /// Controls whether meganeura's e-graph optimizer is used.

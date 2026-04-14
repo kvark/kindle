@@ -92,6 +92,12 @@ pub struct Transition {
     pub reward: f32,
     pub credit: f32,
     pub pred_error: f32,
+    /// Environment id (from the adapter active when this step was recorded).
+    /// Used to stratify sampling and mark env-boundary resets.
+    pub env_id: u32,
+    /// Boundary flag: true on the first transition after `switch_env`, so
+    /// the credit assigner and world model skip cross-env attribution.
+    pub env_boundary: bool,
 }
 
 /// Key for the novelty visit-count map.
@@ -239,6 +245,13 @@ impl ExperienceBuffer {
 
             let ti = self.get(i);
             let tj = self.get(j);
+
+            // Stratify by env_id: contrastive pairs must come from the
+            // same environment, otherwise the signal "rewards differ" is
+            // meaningless (different envs have different reward scales).
+            if ti.env_id != tj.env_id {
+                continue;
+            }
 
             // Latent similarity (lower = more similar)
             let latent_dist: f32 = ti

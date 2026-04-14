@@ -3,7 +3,7 @@
 //! Run: `cargo run --example acrobot`
 
 use iris::envs::acrobot::Acrobot;
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 fn main() {
@@ -13,23 +13,22 @@ fn main() {
     println!("=============");
 
     let mut env = Acrobot::new();
+    let adapter = Box::new(GenericAdapter::discrete(3, 6, 3));
     let config = AgentConfig {
-        obs_dim: 6,
-        action_dim: 3,
         latent_dim: 8,
         hidden_dim: 32,
         history_len: 16,
         buffer_capacity: 5000,
         batch_size: 1,
         learning_rate: 1e-4,
-        lr_credit: 3e-5, // 0.3× base
-        lr_policy: 5e-5, // 0.5× base
+        lr_credit: 3e-5,
+        lr_policy: 5e-5,
         warmup_steps: 200,
         ..AgentConfig::default()
     };
 
     println!("building agent (compiling graphs)...");
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     println!("agent ready");
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);

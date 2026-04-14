@@ -1,7 +1,12 @@
 //! Top-level Agent struct and training loop.
 //!
 //! The agent orchestrates the full pipeline:
-//! observation → encoder → world model → reward → credit → policy → action.
+//! observation → (adapter) → encoder → world model → reward → credit → policy → (adapter) → action.
+//!
+//! The agent's GPU graphs are built once with universal token sizes
+//! (`OBS_TOKEN_DIM`, `MAX_ACTION_DIM`); a per-env `EnvAdapter` translates
+//! between the env's native shapes and these token sizes. `switch_env`
+//! swaps the active adapter without touching any compiled graph.
 //!
 //! Three GPU sessions with independent learning rates:
 //! 1. World model (encoder + world model): base LR
@@ -9,18 +14,16 @@
 //! 3. Policy + value: 0.5× base, gated on warmup
 //!
 //! Phase 4 continual learning mechanisms:
-//! - Replay mixing: each step additionally trains on a random past sample
-//!   (with probability `replay_ratio`) to prevent catastrophic forgetting
-//! - Representation drift monitor: encoder output on a fixed probe set is
-//!   compared against a reference snapshot; large drift reduces encoder LR
-//! - Entropy floor: policy updates are suppressed when entropy drops below
-//!   a floor, preserving exploration
+//! - Replay mixing
+//! - Representation drift monitor
+//! - Entropy floor
 
 use crate::OptLevel;
+use crate::adapter::{EnvAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
 use crate::buffer::{ExperienceBuffer, Transition};
 use crate::credit;
 use crate::encoder::Encoder;
-use crate::env::{Action, ActionKind, Environment, Observation};
+use crate::env::{Action, Environment, Observation};
 use crate::policy;
 use crate::reward::{RewardCircuit, RewardWeights};
 use crate::world_model::WorldModel;
@@ -31,10 +34,6 @@ use rand::Rng;
 /// Agent configuration.
 #[derive(Clone, Debug)]
 pub struct AgentConfig {
-    pub obs_dim: usize,
-    pub action_dim: usize,
-    /// Kind of action space (discrete categorical or continuous Gaussian).
-    pub action_kind: ActionKind,
     pub latent_dim: usize,
     pub hidden_dim: usize,
     pub history_len: usize,
@@ -61,9 +60,6 @@ pub struct AgentConfig {
 impl Default for AgentConfig {
     fn default() -> Self {
         Self {
-            obs_dim: 25,
-            action_dim: 4,
-            action_kind: ActionKind::Discrete { n: 4 },
             latent_dim: 16,
             hidden_dim: 32,
             history_len: 16,
@@ -77,7 +73,7 @@ impl Default for AgentConfig {
             replay_ratio: 0.2,
             grid_resolution: 0.5,
             entropy_beta: 0.01,
-            entropy_floor: 0.1, // minimum entropy before policy updates are gated
+            entropy_floor: 0.1,
             drift_interval: 500,
             drift_threshold: 1.0,
             opt_level: OptLevel::Full,
@@ -89,6 +85,7 @@ impl Default for AgentConfig {
 #[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct Diagnostics {
     pub step: usize,
+    pub env_id: u32,
     pub loss_world_model: f32,
     pub loss_credit: f32,
     pub loss_policy: f32,
@@ -107,16 +104,21 @@ pub struct Diagnostics {
 /// The IRIS agent.
 pub struct Agent {
     pub config: AgentConfig,
+    adapter: Box<dyn EnvAdapter>,
+    /// True for exactly one step after `switch_env`, so the next stored
+    /// transition is tagged as an env boundary.
+    pending_boundary: bool,
     buffer: ExperienceBuffer,
     reward_circuit: RewardCircuit,
     wm_session: Session,
     credit_session: Session,
+    /// Policy graph always uses the continuous branch (MSE loss on Gaussian
+    /// means). For discrete envs, the adapter softmax+samples over the
+    /// first `n` head dims. This gives one universal policy graph.
     policy_session: Session,
     latent_size: usize,
     step_count: usize,
-    /// Fixed set of probe observations for drift monitoring (set after warmup).
     probe_obs: Option<Vec<Vec<f32>>>,
-    /// Reference latents from the encoder at the moment the probe was fixed.
     probe_reference: Option<Vec<Vec<f32>>>,
     last_wm_loss: f32,
     last_credit_loss: f32,
@@ -129,12 +131,11 @@ pub struct Agent {
     last_reward: f32,
     last_entropy: f32,
     last_drift: f32,
-    /// Current encoder LR scale (reduced when drift is large).
     encoder_lr_scale: f32,
-    /// Most recent logits from the policy network (for action sampling).
-    last_logits: Vec<f32>,
-    /// Most recent value estimate.
     last_value: f32,
+    /// Scratch buffers to avoid per-step allocations.
+    obs_token_scratch: Vec<f32>,
+    action_token_scratch: Vec<f32>,
 }
 
 /// Xavier (Glorot uniform) initialization.
@@ -158,23 +159,20 @@ fn build_session(g: &Graph, opt_level: OptLevel) -> Session {
 }
 
 impl Agent {
-    /// Build the agent: three GPU sessions, Xavier init.
-    pub fn new(config: AgentConfig) -> Self {
-        // --- World model graph ---
+    /// Build the agent for a specific environment's adapter. The underlying
+    /// graphs use universal token sizes and will never need rebuilding for
+    /// subsequent env switches.
+    pub fn new(config: AgentConfig, adapter: Box<dyn EnvAdapter>) -> Self {
+        // --- World model graph (uses universal token sizes) ---
         let wm_session = {
             let mut g = Graph::new();
-            let obs = g.input("obs", &[config.batch_size, config.obs_dim]);
-            let action = g.input("action", &[config.batch_size, config.action_dim]);
+            let obs = g.input("obs", &[config.batch_size, OBS_TOKEN_DIM]);
+            let action = g.input("action", &[config.batch_size, MAX_ACTION_DIM]);
             let z_target = g.input("z_target", &[config.batch_size, config.latent_dim]);
 
-            let enc = Encoder::new(&mut g, config.obs_dim, config.latent_dim, config.hidden_dim);
+            let enc = Encoder::new(&mut g, OBS_TOKEN_DIM, config.latent_dim, config.hidden_dim);
             let z_t = enc.forward(&mut g, obs);
-            let wm = WorldModel::new(
-                &mut g,
-                config.latent_dim,
-                config.action_dim,
-                config.hidden_dim,
-            );
+            let wm = WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim);
             let z_hat = wm.forward(&mut g, z_t, action);
             let loss = WorldModel::loss(&mut g, z_hat, z_target);
 
@@ -188,7 +186,7 @@ impl Agent {
         let credit_session = {
             let g = credit::build_credit_graph(
                 config.latent_dim,
-                config.action_dim,
+                MAX_ACTION_DIM,
                 config.history_len,
                 config.hidden_dim,
             );
@@ -197,20 +195,24 @@ impl Agent {
             s
         };
 
-        // --- Policy + value graph (discrete or continuous) ---
+        // --- Policy + value graph ---
+        //
+        // We always build the continuous-Gaussian graph (MSE loss against
+        // the action token). For discrete envs the adapter interprets the
+        // first `n` head dims as logits and samples categorically at act()
+        // time; during training the taken action is encoded as a one-hot
+        // in the action token, so MSE against one-hot has the same
+        // gradient sign as cross-entropy: minimizing MSE with a one-hot
+        // target pushes the mean toward the taken dim. It's not strictly
+        // equivalent to cross-entropy but it's numerically stable and
+        // unifies the discrete/continuous training path into a single
+        // graph — a big simplification for env hopping.
         let policy_session = {
-            let g = match config.action_kind {
-                ActionKind::Discrete { .. } => policy::build_policy_graph(
-                    config.latent_dim,
-                    config.action_dim,
-                    config.hidden_dim,
-                ),
-                ActionKind::Continuous { .. } => policy::build_continuous_policy_graph(
-                    config.latent_dim,
-                    config.action_dim,
-                    config.hidden_dim,
-                ),
-            };
+            let g = policy::build_continuous_policy_graph(
+                config.latent_dim,
+                MAX_ACTION_DIM,
+                config.hidden_dim,
+            );
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
             s
@@ -219,6 +221,8 @@ impl Agent {
         let latent_size = config.batch_size * config.latent_dim;
 
         Self {
+            adapter,
+            pending_boundary: false,
             buffer: ExperienceBuffer::new(config.buffer_capacity, config.grid_resolution),
             reward_circuit: RewardCircuit::new(config.reward_weights.clone()),
             wm_session,
@@ -240,10 +244,25 @@ impl Agent {
             last_entropy: 0.0,
             last_drift: 0.0,
             encoder_lr_scale: 1.0,
-            last_logits: vec![0.0; config.action_dim],
             last_value: 0.0,
+            obs_token_scratch: vec![0.0; config.batch_size * OBS_TOKEN_DIM],
+            action_token_scratch: vec![0.0; config.batch_size * MAX_ACTION_DIM],
             config,
         }
+    }
+
+    /// Swap the active environment adapter. Preserves all learned
+    /// parameters; the next transition stored is marked as an env
+    /// boundary so the world model and credit assigner don't try to
+    /// attribute dynamics or reward across the switch.
+    pub fn switch_env(&mut self, adapter: Box<dyn EnvAdapter>) {
+        self.adapter = adapter;
+        self.pending_boundary = true;
+    }
+
+    /// Currently active env id.
+    pub fn env_id(&self) -> u32 {
+        self.adapter.id()
     }
 
     /// Select an action using the policy network.
@@ -255,33 +274,23 @@ impl Agent {
         };
 
         self.policy_session.set_input("z", &z_t);
+        self.action_token_scratch.fill(0.0);
         self.policy_session
-            .set_input("action", &vec![0.0f32; self.config.action_dim]);
+            .set_input("action", &self.action_token_scratch);
         self.policy_session.set_input("value_target", &[0.0f32]);
         self.policy_session.set_learning_rate(0.0);
         self.policy_session.step();
         self.policy_session.wait();
 
-        // Output 1 is logits (discrete) or mean (continuous), both shape [1, action_dim]
-        let mut head_out = vec![0.0f32; self.config.action_dim];
-        self.policy_session.read_output_by_index(1, &mut head_out);
+        let mut head = vec![0.0f32; MAX_ACTION_DIM];
+        self.policy_session.read_output_by_index(1, &mut head);
         let mut value = [0.0f32; 1];
         self.policy_session.read_output_by_index(2, &mut value);
 
-        self.last_logits = head_out.clone();
         self.last_value = value[0];
+        self.last_entropy = self.adapter.head_entropy(&head);
 
-        match self.config.action_kind {
-            ActionKind::Discrete { .. } => {
-                self.last_entropy = policy::entropy(&head_out);
-                Action::Discrete(policy::sample_action(&head_out, rng))
-            }
-            ActionKind::Continuous { scale, .. } => {
-                // For continuous, use fixed exploration noise as "entropy" proxy
-                self.last_entropy = scale;
-                Action::Continuous(policy::sample_gaussian_action(&head_out, scale, rng))
-            }
-        }
+        self.adapter.sample_action(&head, rng)
     }
 
     /// Observe a transition, train all modules.
@@ -292,25 +301,25 @@ impl Agent {
         env: &dyn Environment,
         rng: &mut R,
     ) {
-        // --- World model on current step ---
-        // For discrete actions, one-hot encode. For continuous, use the
-        // action vector directly.
-        let action_vec = match self.config.action_kind {
-            ActionKind::Discrete { .. } => action.to_one_hot(self.config.action_dim),
-            ActionKind::Continuous { .. } => match *action {
-                Action::Continuous(ref v) => v.clone(),
-                Action::Discrete(_) => panic!("continuous action space got discrete action"),
-            },
-        };
-        let z_target = if let Some(prev) = self.buffer.last() {
+        // --- Translate through the adapter into universal tokens ---
+        self.adapter.obs_to_token(obs, &mut self.obs_token_scratch);
+        self.adapter
+            .action_to_token(action, &mut self.action_token_scratch);
+
+        // z_target: the previous latent, or zeros if bootstrapping / at boundary
+        let z_target = if self.pending_boundary {
+            vec![0.0f32; self.latent_size]
+        } else if let Some(prev) = self.buffer.last() {
             prev.latent.clone()
         } else {
             vec![0.0f32; self.latent_size]
         };
 
+        let obs_token = self.obs_token_scratch.clone();
+        let action_token = self.action_token_scratch.clone();
         let (wm_loss, z_t, z_hat) = self.wm_forward_backward(
-            &obs.data,
-            &action_vec,
+            &obs_token,
+            &action_token,
             &z_target,
             self.config.learning_rate * self.encoder_lr_scale,
         );
@@ -330,14 +339,18 @@ impl Agent {
         let order = RewardCircuit::order(&obs.data);
         let reward = self.reward_circuit.compute(surprise, novelty, homeo, order);
 
-        // --- Store transition ---
+        // --- Store transition (tagged with current adapter's env id) ---
+        let env_boundary = self.pending_boundary;
+        self.pending_boundary = false;
         self.buffer.push(Transition {
-            observation: obs.data.clone(),
+            observation: obs_token,
             latent: z_t.clone(),
-            action: action_vec.clone(),
+            action: action_token,
             reward,
             credit: 0.0,
             pred_error,
+            env_id: self.adapter.id(),
+            env_boundary,
         });
 
         // --- Credit assignment ---
@@ -349,10 +362,11 @@ impl Agent {
         if self.step_count >= self.config.warmup_steps
             && self.last_entropy >= self.config.entropy_floor
         {
-            self.policy_step(&z_t, &action_vec, reward);
+            let action_token = self.action_token_scratch.clone();
+            self.policy_step(&z_t, &action_token, reward);
         }
 
-        // --- Replay mixing: occasionally train on a historical sample ---
+        // --- Replay mixing ---
         if rng.random_range(0.0..1.0) < self.config.replay_ratio {
             self.replay_step(rng);
         }
@@ -374,7 +388,6 @@ impl Agent {
     }
 
     /// Run one world-model forward+backward pass.
-    /// Returns (loss, z_t, z_hat).
     fn wm_forward_backward(
         &mut self,
         obs: &[f32],
@@ -397,18 +410,19 @@ impl Agent {
         (loss, z_t, z_hat)
     }
 
-    /// Replay mixing: sample a past transition and run an extra world-model
-    /// training step on it. This re-anchors the encoder + world model to
-    /// historical experience, reducing catastrophic forgetting.
     fn replay_step<R: Rng>(&mut self, rng: &mut R) {
         if self.buffer.len() < 2 {
             return;
         }
-        // Sample an older transition and its successor (for z_target)
         let n = self.buffer.len();
         let i = rng.random_range(0..n - 1);
         let ti = self.buffer.get(i);
         let tj = self.buffer.get(i + 1);
+        // Skip replay across env boundaries (latent → latent is
+        // meaningless when env just switched)
+        if tj.env_boundary || ti.env_id != tj.env_id {
+            return;
+        }
         let obs = ti.observation.clone();
         let action = ti.action.clone();
         let z_target = tj.latent.clone();
@@ -417,12 +431,11 @@ impl Agent {
             &obs,
             &action,
             &z_target,
-            self.config.learning_rate * self.encoder_lr_scale * 0.5, // smaller step for replay
+            self.config.learning_rate * self.encoder_lr_scale * 0.5,
         );
         self.last_replay_loss = loss;
     }
 
-    /// Capture a fixed probe set of observations and their reference latents.
     fn capture_probe_reference(&mut self) {
         let n_probe = 16.min(self.buffer.len());
         if n_probe == 0 {
@@ -443,8 +456,6 @@ impl Agent {
         self.probe_reference = Some(references);
     }
 
-    /// Measure how far the current encoder drifts from the reference.
-    /// Reduces `encoder_lr_scale` if drift exceeds threshold.
     fn measure_drift(&mut self) {
         let (probes, references) = match (self.probe_obs.as_ref(), self.probe_reference.as_ref()) {
             (Some(p), Some(r)) => (p.clone(), r.clone()),
@@ -454,11 +465,10 @@ impl Agent {
         let mut total = 0.0f32;
         let mut count = 0;
 
-        let zero_action = vec![0.0f32; self.config.action_dim];
+        let zero_action = vec![0.0f32; self.config.batch_size * MAX_ACTION_DIM];
         let zero_target = vec![0.0f32; self.latent_size];
 
         for (obs, reference) in probes.iter().zip(references.iter()) {
-            // Forward-only with lr=0 to get current encoder output
             self.wm_session.set_input("obs", obs);
             self.wm_session.set_input("action", &zero_action);
             self.wm_session.set_input("z_target", &zero_target);
@@ -484,7 +494,6 @@ impl Agent {
         let drift = if count > 0 { total / count as f32 } else { 0.0 };
         self.last_drift = drift;
 
-        // Reduce encoder LR if drift exceeds threshold, recover slowly otherwise
         if drift > self.config.drift_threshold {
             self.encoder_lr_scale = (self.encoder_lr_scale * 0.5).max(0.01);
         } else {
@@ -492,12 +501,10 @@ impl Agent {
         }
     }
 
-    /// Credit assignment step.
     fn credit_step<R: Rng>(&mut self, rng: &mut R) {
         let h = self.config.history_len;
 
         if let Some(history_flat) = self.buffer.flatten_history(h) {
-            // Clamp all values to prevent NaN propagation
             let history_clean: Vec<f32> = history_flat
                 .iter()
                 .map(|v| {
@@ -542,25 +549,19 @@ impl Agent {
         }
     }
 
-    /// Policy + value training step.
-    fn policy_step(&mut self, z_t: &[f32], action_vec: &[f32], reward: f32) {
+    fn policy_step(&mut self, z_t: &[f32], action_token: &[f32], reward: f32) {
         self.policy_session.set_input("z", z_t);
-        self.policy_session.set_input("action", action_vec);
+        self.policy_session.set_input("action", action_token);
 
-        let value_target = reward;
-        self.policy_session
-            .set_input("value_target", &[value_target]);
+        self.policy_session.set_input("value_target", &[reward]);
 
         let advantage = reward - self.last_value;
 
-        // Only reinforce when advantage > 0 (good actions). Negative-advantage
-        // updates via negative LR are numerically unstable.
         if advantage > 0.0 {
             let scale = advantage.min(1.0);
             self.policy_session
                 .set_learning_rate(self.config.lr_policy * scale);
         } else {
-            // Small lr to keep the value head learning via MSE
             self.policy_session
                 .set_learning_rate(self.config.lr_policy * 0.1);
         }
@@ -585,6 +586,7 @@ impl Agent {
 
         Diagnostics {
             step: self.step_count,
+            env_id: self.adapter.id(),
             loss_world_model: self.last_wm_loss,
             loss_credit: self.last_credit_loss,
             loss_policy: self.last_policy_loss,
