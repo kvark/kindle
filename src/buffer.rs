@@ -162,7 +162,7 @@ impl ExperienceBuffer {
         batch_size: usize,
         replay_ratio: f32,
     ) -> Vec<&Transition> {
-        if self.len() == 0 {
+        if self.is_empty() {
             return Vec::new();
         }
 

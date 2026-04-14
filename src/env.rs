@@ -39,20 +39,20 @@ pub enum Action {
 impl Action {
     /// One-hot encode a discrete action into a vector of length `num_actions`.
     pub fn to_one_hot(&self, num_actions: usize) -> Vec<f32> {
-        match self {
+        match *self {
             Action::Discrete(i) => {
                 let mut v = vec![0.0; num_actions];
-                v[*i] = 1.0;
+                v[i] = 1.0;
                 v
             }
-            Action::Continuous(v) => v.clone(),
+            Action::Continuous(ref v) => v.clone(),
         }
     }
 
     pub fn dim(&self, num_actions: usize) -> usize {
-        match self {
+        match *self {
             Action::Discrete(_) => num_actions,
-            Action::Continuous(v) => v.len(),
+            Action::Continuous(ref v) => v.len(),
         }
     }
 }
