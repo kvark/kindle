@@ -2,7 +2,7 @@
 
 ## Goal
 
-Lift IRIS from "one agent per env, one env per agent" to a configuration that
+Lift kindle from "one agent per env, one env per agent" to a configuration that
 can:
 
 1. Hop between environments at runtime, signalled by a reset.

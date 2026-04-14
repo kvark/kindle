@@ -1,0 +1,18 @@
+[package]
+name = "kindle"
+version = "0.2.0"
+authors = ["Dzmitry Malyshau"]
+repository = "https://github.com/kvark/kindle"
+edition = "2024"
+rust-version = "1.88"
+description = "A continually self-training RL agent that starts from a cold network and kindles its own intelligence from environment-agnostic primitives."
+license = "MIT"
+
+[dependencies]
+meganeura = "0.2"
+rand = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hashbrown = "0.17"
+log = "0.4"
+env_logger = "0.11"
