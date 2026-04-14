@@ -1,8 +1,13 @@
-# IRIS
+# Kindle
 
-A continually self-training RL agent built on [meganeura](https://github.com/kvark/meganeura) — a cross-platform Rust neural network library using GPU-accelerated training and inference via [blade-graphics](https://github.com/kvark/blade).
+> To kindle is to start a fire from nothing. This agent does the same with intelligence — a cold network that bootstraps its own understanding from environment-agnostic primitives, with no pretraining and no handed-down reward.
 
-The agent starts from a cold network (no pretrained policy), trains perpetually from experience, and is designed to recognize and attribute its own reward signals without external supervision beyond a frozen reward circuit grounded in three primitives: **surprise**, **novelty**, and **homeostatic balance**.
+[![CI](https://github.com/kvark/kindle/actions/workflows/ci.yml/badge.svg)](https://github.com/kvark/kindle/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/kindle.svg)](https://crates.io/crates/kindle)
+[![docs.rs](https://img.shields.io/docsrs/kindle)](https://docs.rs/kindle)
+[![license](https://img.shields.io/crates/l/kindle.svg)](LICENSE)
+
+Built on [meganeura](https://github.com/kvark/meganeura) — a cross-platform Rust neural network library with GPU-accelerated training and inference via [blade-graphics](https://github.com/kvark/blade).
 
 -----
 
@@ -11,31 +16,30 @@ The agent starts from a cold network (no pretrained policy), trains perpetually 
 - [Vision](#vision)
 - [Architecture Overview](#architecture-overview)
 - [Modules](#modules)
-  - [Encoder](#encoder)
-  - [World Model](#world-model)
-  - [Reward Circuit (Frozen)](#reward-circuit-frozen)
-  - [Credit Assigner](#credit-assigner)
-  - [Value Head](#value-head)
-  - [Policy](#policy)
+- [Reward Circuit (Frozen)](#reward-circuit-frozen)
 - [Temporal Buffer](#temporal-buffer)
 - [Tri-Level Learning Loop](#tri-level-learning-loop)
 - [Continual Learning Strategy](#continual-learning-strategy)
 - [Meganeura Confidence Plan](#meganeura-confidence-plan)
-- [Implementation Phases](#implementation-phases)
+- [Milestones](#milestones)
 - [Diagnostics and Observability](#diagnostics-and-observability)
-- [Known Hard Problems](#known-hard-problems)
-- [Open Questions](#open-questions)
+- [Python Bindings](#python-bindings)
 - [Repository Structure](#repository-structure)
+- [Dependencies](#dependencies)
 
 -----
 
 ## Vision
 
-Most RL agents are trained in bounded episodes with hand-crafted reward functions and fixed environment contracts. This project explores a different shape: an agent that **trains continuously from first contact**, where reward is not handed down but derived from the agent’s own internal experience of the world.
+Three beats.
 
-The core claim is that three grounded, environment-agnostic reward signals — surprise, novelty, and homeostatic balance — are sufficient to bootstrap meaningful learning behavior, and that a learned temporal credit assigner can replace hand-tuned discount schedules as the agent matures.
+**Cold start.** The network is initialised Xavier-uniform and sees its first observation with no prior. There is no pretraining, no offline dataset, no demonstration corpus. Intelligence has to ignite from contact with the environment.
 
-This is a research and engineering project. Stability and correctness are pursued in that order.
+**Self-grounded reward.** Reward is not handed down. It is derived from four primitives the agent can evaluate without external supervision: *surprise* (did the world do what I expected?), *novelty* (have I been here before?), *homeostatic balance* (am I in a healthy range?), and *order* (am I making structure?). The circuit that combines these is **frozen** — its definition of "good" does not drift with the policy.
+
+**Emergent order.** Exploration and consolidation are duals. Novelty rewards the agent for venturing into unseen phase space; order rewards it for concentrating its recent trajectory into a smaller subset of the digested observation space than its historical average. A healthy agent oscillates between them on its own.
+
+Stability and correctness come first, performance second. This is a research and engineering project.
 
 -----
 
@@ -44,44 +48,48 @@ This is a research and engineering project. Stability and correctness are pursue
 ```
  Raw Observation (o_t)
         │
-   ┌────▼──────────┐
-   │   Encoder E   │──────────────────────────────────┐
-   └───────────────┘                                   │
-        │  latent z_t                                  │
-        │                                              │
-   ┌────▼──────────────────────────────────────────┐   │
-   │  World Model  W(z_t, a_t) → ẑ_{t+1}          │   │
-   │  Loss: || ẑ_{t+1} − stop_grad(z_{t+1}) ||    │   │
-   └───────────────────────────────────────────────┘   │
-        │                                              │
-   ┌────▼──────────────────────────────────────────┐   │
-   │  Reward Circuit  (FROZEN)                     │   │
-   │  R(z_t, z_{t-1}, action_history) → r_t        │   │
-   │  Hardcoded primitives:                        │   │
-   │    · Surprise   (world model prediction err)  │   │
-   │    · Novelty    (density / count-based)       │   │
-   │    · Homeostatic (env-defined signals)        │   │
-   └───────────────────────────────────────────────┘   │
-        │  r_t                                         │
-   ┌────▼──────────────────────────────────────────┐   │
-   │  Credit Assigner  C(r_t, history[t-H:t])      │   │
-   │  Causal attention → α_i per past timestep     │   │
-   │  credit_i = r_t × α_i                         │   │
-   │  Scope H_eff = Σ_i (i × α_i)  (diagnostic)   │   │
-   └───────────────────────────────────────────────┘   │
-        │  credit[t-H:t]                               │
-   ┌────▼──────────────────────────────────────────┐   │
-   │  Value Head  V(z_t) → V̂                      │◄──┘
-   │  TD bootstrap for variance reduction          │
-   └───────────────────────────────────────────────┘
+   ┌────▼────────────────┐
+   │   Env Adapter       │   obs_dim → OBS_TOKEN_DIM (universal)
+   └────┬────────────────┘
+        │  obs_token
+   ┌────▼────────────────┐
+   │   Encoder E         │──────────────────────────────────┐
+   └────┬────────────────┘                                   │
+        │  latent z_t                                        │
+   ┌────▼─────────────────────────────────────────────┐      │
+   │  World Model  W(z_t, a_t) → ẑ_{t+1}             │      │
+   │  Loss: || ẑ_{t+1} − stop_grad(z_{t+1}) ||       │      │
+   └────┬─────────────────────────────────────────────┘      │
+        │                                                    │
+   ┌────▼─────────────────────────────────────────────┐      │
+   │  Reward Circuit  (FROZEN)                        │      │
+   │  Four primitives → r_t                           │      │
+   │    · surprise  (world model prediction err)      │      │
+   │    · novelty   (inverse-sqrt visit count)        │      │
+   │    · homeostatic (env-defined signals)           │      │
+   │    · order     (causal entropy reduction)        │      │
+   └────┬─────────────────────────────────────────────┘      │
+        │  r_t                                               │
+   ┌────▼─────────────────────────────────────────────┐      │
+   │  Credit Assigner  C(r_t, history[t-H:t])         │      │
+   │  Causal attention → α_i per past timestep        │      │
+   │  credit_i = r_t × α_i                            │      │
+   └────┬─────────────────────────────────────────────┘      │
+        │  credit[t-H:t]                                     │
+   ┌────▼─────────────────────────────────────────────┐      │
+   │  Value Head  V(z_t) → V̂                         │◄─────┘
+   └────┬─────────────────────────────────────────────┘
         │
-   ┌────▼──────────────────────────────────────────┐
-   │  Policy  π(z_t) → action distribution        │
-   │  Updated by credit-weighted policy gradient   │
-   └───────────────────────────────────────────────┘
+   ┌────▼─────────────────────────────────────────────┐
+   │  Policy  π(z_t) → action distribution            │
+   └────┬─────────────────────────────────────────────┘
+        │
+   ┌────▼─────────────────────────────────────────────┐
+   │   Env Adapter       │   MAX_ACTION_DIM → env-native action
+   └──────────────────────┘
 ```
 
-All modules except the Reward Circuit are trained continuously through experience.
+All modules except the reward circuit train continuously through experience. The adapter layer keeps the core graph's tensor shapes universal (`OBS_TOKEN_DIM`, `MAX_ACTION_DIM`) so the agent can hop between environments at runtime without recompiling any GPU graph. See [docs/universal-actions.md](docs/universal-actions.md) for the cross-environment design.
 
 -----
 
@@ -89,434 +97,257 @@ All modules except the Reward Circuit are trained continuously through experienc
 
 ### Encoder
 
-Converts raw observations into a compact latent representation `z_t`. Architecture is environment-dependent and defined at agent construction time:
-
-- **Perceptual environments** (pixels): convolutional backbone → flatten → linear projection
-- **Structured environments** (feature vectors): MLP with layer norm
-
-The encoder is the shared backbone. All other modules consume `z_t`, not raw observations. This is intentional — the encoder is forced to learn representations that are simultaneously useful for world modeling, credit attribution, and policy generation.
-
-Training signals flowing back into the encoder:
-
-- World model prediction loss (primary)
-- Policy gradient (secondary, scaled down)
-- Value head TD error (secondary)
+Converts observation tokens into a compact latent `z_t`. Shared backbone — all other modules consume `z_t`, not raw observations. The encoder is forced to learn representations that are simultaneously useful for world modelling, credit attribution, and policy generation. Gradient flow: world model loss (primary), policy gradient (secondary), value TD error (secondary).
 
 ### World Model
 
-A forward dynamics model that predicts the next latent state given the current latent state and action:
-
-```
-W : (z_t, a_t) → ẑ_{t+1}
-Loss = MSE(ẑ_{t+1}, stop_grad(z_{t+1}))
-```
-
-The stop-gradient on the target prevents the encoder from collapsing (encoding everything to zero minimizes prediction error trivially). This is the same technique used in BYOL and Dreamer v3.
-
-The world model serves two roles:
-
-1. A self-supervised training signal that shapes `z` to be predictively meaningful
-1. The **surprise component** of the reward circuit — high prediction error = high surprise
-
-### Reward Circuit (Frozen)
-
-The reward circuit is intentionally frozen during the early and mid phases of development. It will not receive gradient updates. Its weights are fixed at initialization.
-
-This is a deliberate simplification. A learnable reward recognizer introduces a feedback loop (reward shapes policy, policy shapes observations, observations shape reward) that is destabilizing before the rest of the system is well-characterized. Revisiting this is explicitly scoped to a later phase.
-
-The circuit computes `r_t` as a weighted sum of three primitive signals:
-
-**1. Surprise** `r_surprise`
-
-```
-r_surprise = || W(z_{t-1}, a_{t-1}) − z_t ||₂
-```
-
-The L2 norm of the world model’s prediction error at the current timestep. High surprise → the agent transitioned to a state it did not expect. This signal is already computed by the world model training pass; the reward circuit reads it at zero additional cost.
-
-**2. Novelty** `r_novelty`
-
-A count-based approximation of state novelty. The latent space is partitioned into a grid (or a learned cluster set); each region maintains a visit count `N(z)`. Novelty reward is:
-
-```
-r_novelty = 1 / sqrt(N(z_t))
-```
-
-As a region is visited more, its novelty reward decays toward zero. This encourages exploration of unfamiliar state regions early in training, naturally fading as the agent becomes experienced.
-
-Implementation note: exact counts over a continuous latent space require a density estimator. The initial implementation will use a fixed-resolution grid hash over a normalized latent space. A learned density model (e.g. a small flow network) is a later-phase upgrade.
-
-**3. Homeostatic Balance** `r_homeo`
-
-This signal is **environment-defined** and treated as an input to the agent, not computed by it. The environment exposes a vector of homeostatic variables (e.g. energy level, damage state, resource depletion) and a target range for each. The reward is:
-
-```
-r_homeo = −Σ_i max(0, |h_i − target_i| − tolerance_i)
-```
-
-Negative when any variable drifts outside its tolerance band; zero when all variables are in range. This signal is orthogonal to the agent’s internals — the agent doesn’t know what the homeostatic variables mean, only that deviating from target is costly.
-
-The environment must implement the `HomeostaticProvider` trait (see `src/env.rs`).
-
-**Combined Reward**
-
-```
-r_t = w_s · r_surprise + w_n · r_novelty + w_h · r_homeo
-```
-
-Weights `w_s`, `w_n`, `w_h` are hyperparameters set at agent construction. They are not learned. Surprise and novelty weights are expected to decay over training as the value head and policy mature; a configurable annealing schedule is provided.
+Forward dynamics predictor `W(z_t, a_t) → ẑ_{t+1}` with MSE loss against `stop_grad(z_{t+1})`. The stop-gradient prevents encoder collapse (BYOL / Dreamer v3 trick). Serves two roles: self-supervised training signal, and surprise-component input to the reward circuit.
 
 ### Credit Assigner
 
-The credit assigner answers the question: *which past actions caused the reward I just received?*
-
-Rather than using a fixed exponential decay (TD-λ with fixed λ), we use a causal self-attention network over the recent history buffer:
+Answers *which past actions caused this reward?* via causal self-attention over the recent history buffer:
 
 ```
-CreditNet(r_t, [(z_{t-H}, a_{t-H}), ..., (z_t, a_t)]) → α ∈ R^H
-credit_i = r_t × α_i         (α normalized via softmax)
+CreditNet(r_t, [(z_{t-H}, a_{t-H}), …, (z_t, a_t)]) → α ∈ R^H
+credit_i = r_t × α_i   (α softmaxed; attention is strictly causal)
 ```
 
-The attention is **causal** — position t only attends to positions t-H through t, never future positions.
+Trained contrastively: when similar latent states at different times receive different rewards, CreditNet should attribute the difference to the diverging action sequences. The diagnostic `H_eff = Σ_i (i × α_i)` tracks effective temporal scope — growing `H_eff` means the agent is learning longer-horizon consequences.
 
-**Training signal for CreditNet**
+### Value Head + Policy
 
-CreditNet is trained via a contrastive objective. When the agent visits similar latent states at different times and receives different rewards, the credit assigner should learn to attribute the difference to the diverging action sequences, not the shared context. Concretely:
+Small MLP `V̂(z_t)` (actor-critic baseline) and stochastic policy `π(z_t)`. Both branches use the same universal continuous-Gaussian graph — for discrete envs the adapter interprets the first `n` head dims as logits and samples categorically. Updated by credit-weighted policy gradient with an entropy bonus that never anneals below a floor (preserving exploration forever).
 
-- Sample pairs of timesteps (t, t’) where `||z_t - z_{t'}||` is small but rewards diverge
-- The credit assigner should assign high attention to the steps where the action sequences diverged
-- Implemented as a contrastive loss over pairs sampled from the experience buffer
+-----
 
-This is bootstrapping from noise in the first phase. Expect poor credit attribution early. Track `H_eff` as the primary diagnostic.
+## Reward Circuit (Frozen)
 
-**Effective temporal scope**
+Four primitives, one frozen weighted sum:
 
 ```
-H_eff(t) = Σ_i (i × α_i)
+r_t = w_s·r_surprise + w_n·r_novelty + w_h·r_homeo + w_o·r_order
 ```
 
-This is a weighted average of how many steps back the credit assigner is looking. Track this over training:
+The circuit receives no gradient updates. Freezing it is a stability claim: because *what is good* doesn't drift with the policy, the whole tri-level system is less prone to runaway feedback during early training. Unfreezing is explicitly scoped to a post-stability milestone.
 
-- `H_eff` growing → the agent is learning that actions have longer consequences (healthy)
-- `H_eff` shrinking → the agent is becoming myopic (investigate)
-- `H_eff` oscillating → credit assigner is unstable (reduce learning rate)
+### Exploration vs consolidation — novelty and order as duals
 
-### Value Head
+| Primitive | Rewards | Decays when | Role |
+|---|---|---|---|
+| **surprise** `‖ẑ−z‖` | world behaves unexpectedly | world model converges | shapes z to be predictable |
+| **novelty** `1/√N(z)` | unvisited latent regions | region is revisited | exploration pressure |
+| **homeostatic** `−Σ deviations` | staying in env-defined targets | agent is alive and happy | survival pressure |
+| **order** `H_ref − H_recent` | concentrating recent trajectory vs historical baseline | recent converges to reference | consolidation pressure |
 
-A small MLP mapping `z_t → V̂(z_t)`, an estimate of future cumulative reward from the current state. Trained via TD(n) using the credit-adjusted reward signal.
+Novelty and order are the two ends of the exploration/consolidation axis. Novelty rewards entropy in the *visited-state* distribution (go somewhere new); order rewards negentropy in the *recent-observation* distribution (make the place you're in legible). A healthy agent trades off between them, and the weights anneal accordingly: `w_n` decays as phase space is covered; `w_o` can remain on indefinitely because its baseline moves with the agent.
 
-The value head serves two purposes:
+### The order primitive
 
-1. Variance reduction for policy gradient updates (standard actor-critic)
-1. A secondary consistency signal — when the value head’s prediction diverges from realized credit, the discrepancy is diagnostic of either credit assignment error or world model error
+At agent construction the circuit samples a frozen random linear digest `φ: R^{OBS_TOKEN_DIM} → R^{d}` (small matrix, `d = 4`) and fixed per-dim bucket edges. φ never trains. Each step:
 
-### Policy
+1. `bucket_id = quantize(tanh(φ · obs_token_t))`
+2. Push onto two ring buffers — `recent` (W = 64) and `reference` (W_ref = 512).
+3. `H_recent`, `H_reference` = Shannon entropies of the bucket histograms.
+4. `r_order = H_reference − H_recent` (zero during reference warmup).
 
-A standard stochastic policy network `π(z_t) → distribution over actions`. For discrete action spaces: categorical. For continuous: diagonal Gaussian.
+Why this formulation:
 
-Updated by the credit-weighted policy gradient:
+- **Grounded.** φ and the bucket grid are fixed at init, preserving the frozen-circuit invariant.
+- **Causal.** The reference is the agent's *own past* — every step's signal depends only on the agent's recent actions vs its own longer-term behaviour.
+- **Environment-agnostic.** Operates on adapter-normalized obs tokens, not env-specific feature shapes.
+- **Ungameable by latent collapse.** The digest reads the observation token, not the encoder latent, so the encoder cannot cheaply maximise order by shrinking its representation.
 
-```
-∇L_policy = -Σ_i credit_i · ∇ log π(a_i | z_i)
-```
-
-With an entropy bonus to prevent premature collapse:
-
-```
-L_entropy = −β · H[π(· | z_t)]
-```
-
-β is annealed over training.
+The old `−H(|o_i| / Σ|o_j|)` definition is gone — it was trivially maxed by any one-hot observation and mostly measured the env's encoding scheme, not the agent's behaviour.
 
 -----
 
 ## Temporal Buffer
 
-All modules draw from and write to a shared circular buffer:
+A single shared circular buffer is the agent's sole persistent memory:
 
 ```rust
 pub struct ExperienceBuffer {
-    capacity: usize,
-    observations: RingBuffer<Tensor>,  // raw o_t, for re-encoding
-    latents:      RingBuffer<Tensor>,  // z_t
-    actions:      RingBuffer<Action>,
-    rewards:      RingBuffer<f32>,     // r_t from reward circuit
-    credits:      RingBuffer<f32>,     // credit_i from credit assigner
-    pred_errors:  RingBuffer<f32>,     // world model error (= surprise)
-    visit_counts: HashMap<StateKey, u32>,  // for novelty
+    observations: RingBuffer<Vec<f32>>,   // obs_token
+    latents:      RingBuffer<Vec<f32>>,   // z_t
+    actions:      RingBuffer<Vec<f32>>,   // action_token
+    rewards:      RingBuffer<f32>,
+    credits:      RingBuffer<f32>,
+    pred_errors:  RingBuffer<f32>,
+    env_ids:      RingBuffer<u32>,        // which env produced this transition
+    env_boundary: RingBuffer<bool>,       // true on the first step after switch_env
+    visit_counts: HashMap<StateKey, u32>, // for novelty
 }
 ```
 
-The buffer is the agent’s sole persistent memory. There is no episodic boundary — experience accumulates continuously.
-
-**Replay mixing**: 20% of each gradient batch is sampled randomly from earlier in the buffer. This provides a re-anchoring signal that reduces catastrophic forgetting without requiring explicit EWC machinery in the early phases.
+No episodic boundary — experience accumulates continuously. Cross-env hops are tagged so the credit assigner and world-model replay don't try to attribute dynamics or reward across a switch. **Replay mixing**: ~20% of steps are shadowed by a gradient update on a random historical sample, which re-anchors the encoder against catastrophic forgetting without needing EWC machinery.
 
 -----
 
 ## Tri-Level Learning Loop
 
-Three learning processes run in parallel but at different learning rates:
+| Module                | LR                     | Frequency    | Notes                                     |
+|-----------------------|------------------------|--------------|-------------------------------------------|
+| Encoder + World Model | `lr_wm` (base)         | every step   | self-supervised; most stable               |
+| Credit Assigner       | `lr_credit` (0.3× base)| every step   | slower; contrastive signal is noisy early  |
+| Policy + Value        | `lr_policy` (0.5× base)| every step   | gated on warmup + entropy floor            |
 
-|Module               |Learning Rate          |Update Frequency|Notes                                    |
-|---------------------|-----------------------|----------------|-----------------------------------------|
-|Encoder + World Model|`lr_wm` (base)         |Every step      |Self-supervised, most stable             |
-|Credit Assigner      |`lr_credit` (0.3× base)|Every step      |Slower; contrastive signal is noisy early|
-|Policy + Value       |`lr_policy` (0.5× base)|Every step      |Gated on value head warmup               |
-
-The policy update is gated: it is suppressed for the first `N_warmup` steps until the value head has seen enough data to produce stable estimates. This prevents the policy from chasing noise before the value baseline is meaningful.
+Policy updates are suppressed for the first `N_warmup` steps (so the value baseline can stabilise) and whenever policy entropy falls below a floor (so the agent can always explore).
 
 -----
 
 ## Continual Learning Strategy
 
-“Always trains” means catastrophic forgetting is a first-class concern, not an afterthought.
-
-**Experience replay mixing** (implemented from day one): every gradient batch includes 20% samples from the full buffer history, not just the recent window. This re-anchors all modules to past experience.
-
-**Representation drift monitoring**: a small held-out probe set of (observation, expected-latent-cluster) pairs is fixed at initialization. Every K steps, the encoder’s output on this probe set is checked for drift. Excessive drift triggers a reduced learning rate on the encoder.
-
-**Entropy floor on policy**: the entropy bonus `β` is never annealed below a floor value. The agent is never allowed to become fully deterministic, preserving the ability to explore previously-good regions that were subsequently abandoned.
-
-**Frozen reward circuit as stability anchor**: because the reward circuit is frozen, the definition of “what is good” does not drift with the policy. This is a significant stability property that would be lost if the reward circuit were live-trained.
+- **Replay mixing** — 20% shadow gradient steps on random historical samples, active from day one.
+- **Representation drift monitor** — a held-out probe set of observations is captured at warmup completion; every `drift_interval` steps the encoder's output on the probe is compared against the stored reference. Excessive drift auto-scales the encoder LR down; low drift lets it recover.
+- **Entropy floor** — the policy entropy bonus is never annealed below a floor. The agent never becomes fully deterministic.
+- **Frozen reward circuit** — the definition of *good* does not drift.
 
 -----
 
 ## Meganeura Confidence Plan
 
-meganeura is a young library (as of this writing, ~42 commits, competitive benchmark on SmolVLA inference). Using it as the training backbone — not just inference — for a complex multi-module system requires building active confidence in its correctness. This is **part of the project**, not a precondition.
-
-The goal is to develop confidence in Rust, without maintaining a PyTorch twin. Numerical cross-checking against PyTorch is a one-time verification tool, not an ongoing maintenance burden.
+Meganeura is young. Using it as the training backbone for a complex multi-module system requires building active confidence in its correctness. This is part of the project, not a precondition.
 
 ### Tier 1 — Unit-level gradient verification
 
-For each graph primitive used (linear layers, attention, convolution, layer norm, softmax):
-
-- Implement a finite-difference gradient checker in Rust
-- Compare analytical gradients (backprop) to numerical gradients (perturb → forward → diff)
-- Tolerance: relative error < 1e-4 for f32
-- These tests live in `tests/grad_check.rs` and run in CI
-
-This catches incorrect backprop implementations before they silently corrupt training.
+Finite-difference gradient checks on every graph primitive used (linear, attention, layer norm, softmax). Tolerance: relative error < 1e-4 for f32. Lives in `kindle/tests/grad_check.rs` (planned) — currently covered indirectly by the convergence canaries.
 
 ### Tier 2 — E-graph optimization parity
 
-meganeura uses e-graph search to optimize computation graphs before generating GPU kernels. This is clever but opaque — the optimized kernel may not be numerically identical to the unoptimized version.
-
-**Approach**: implement an `OptLevel` flag:
-
-```rust
-pub enum OptLevel {
-    None,    // pure forward translation, no e-graph passes
-    Full,    // default meganeura e-graph optimization
-}
-```
-
-For every module, run both opt levels on the same inputs and compare outputs:
-
-```
-assert_tensors_close(output_none, output_full, atol=1e-5, rtol=1e-4)
-```
-
-If outputs diverge beyond tolerance, it is a meganeura bug to be reported and worked around. This test suite lives in `tests/opt_parity.rs`.
-
-The `OptLevel::None` path also serves as a **debugging escape hatch** during development — when a training run produces unexpected behavior, disabling e-graph optimization isolates whether the graph transformation is the cause.
+`OptLevel::{None, Full}` flag isolates meganeura's e-graph search. Every module is tested with both levels and outputs compared within tight tolerance. Tests in `kindle/tests/opt_parity.rs`. The `None` path also serves as a debugging escape hatch during training-time anomalies.
 
 ### Tier 3 — Training convergence canaries
 
-Three small, well-understood problems with known convergence behavior are maintained as integration tests:
+| Canary                              | Expected                                    | Failure signal                          |
+|-------------------------------------|---------------------------------------------|-----------------------------------------|
+| XOR classification (MLP, 4 samples) | Loss → 0 in < 500 steps                     | Broken optimizer or backprop            |
+| Next-step prediction on random walk | Prediction error < 0.01 within 10k steps    | Broken world model training             |
+| Full kindle encoder + world model   | Loss decreases by ≥ 2× on deterministic env | Broken graph fusion or encoder gradient |
 
-|Canary                             |Expected behavior                         |Failure signal                       |
-|-----------------------------------|------------------------------------------|-------------------------------------|
-|XOR classification (MLP, 4 samples)|Loss → 0 in < 500 steps                   |Broken optimizer or backprop         |
-|CartPole balance (policy gradient) |Mean episode reward > 195 within 50k steps|Broken policy gradient or reward flow|
-|Next-step prediction on random walk|Prediction error < 0.01 within 10k steps  |Broken world model training          |
+These live in `kindle/tests/canaries.rs`. GPU-gated tests run via `cargo test -- --ignored`.
 
-These run on CPU (no GPU required) and are fast enough for CI. They are the smoke test for the full training pipeline.
+### Tier 4 — PyTorch cross-check (archived)
 
-### Tier 4 — One-time numerical cross-check against PyTorch
+A one-time numerical cross-check of the causal-attention credit assigner against a PyTorch reference was performed during Phase 2 and archived. The PyTorch code is not maintained; it was a verification artifact, not a development dependency.
 
-For the most complex module (likely the causal attention in the Credit Assigner), a one-time cross-check against a reference PyTorch implementation will be performed:
+### Tier 5 — Long-run stability
 
-- Implement the same attention mechanism in Python/PyTorch with identical weight initialization
-- Run one forward + backward pass on identical inputs
-- Compare: activations at each layer, gradients at each parameter
-- Document the comparison in `docs/pytorch_crosscheck.md`
-- **The PyTorch code is then archived and not maintained**
-
-This is a verification artifact, not a development dependency.
-
-### Tier 5 — Long-run stability test
-
-A 1M-step training run on a simple procedurally generated environment, logging:
-
-- Loss curves for all modules
-- Gradient norms (watch for explosion or vanishing)
-- `H_eff` evolution
-- Representation drift on probe set
-- GPU memory and throughput
-
-This is run manually at major milestones, not in CI. Results are committed to `docs/stability_runs/`.
+A long training run (target: 1M steps on a single env, multi-env variant to follow) logs loss curves, gradient norms, `H_eff`, drift, throughput. Re-run at each milestone; results committed to `docs/stability_runs/`.
 
 -----
 
-## Implementation Phases
+## Milestones
 
-### Phase 0 — Foundation (Weeks 1–2)
+Outcome gates, not calendar weeks. Each gate has a measurable exit condition; we move on when the gate closes.
 
-Goal: a compiling, runnable skeleton with the full data flow wired but untrained modules.
-
-- [ ] Audit meganeura’s existing graph API — identify gaps for causal Transformer
-- [ ] Implement `ExperienceBuffer` with ring buffer semantics (`src/buffer.rs`)
-- [ ] Define environment trait: `Observation`, `Action`, `HomeostaticProvider`
-- [ ] Scaffold all six module structs with placeholder forward passes
-- [ ] Implement `OptLevel` flag in meganeura (fork + PR upstream if accepted)
-- [ ] Write Tier 1 gradient checkers for all primitives used
-- [ ] Implement toy environment: deterministic grid world with homeostatic energy variable
-
-### Phase 1 — World Model & Reward Circuit (Weeks 3–4)
-
-Goal: the agent perceives the world meaningfully and receives coherent reward signals.
-
-- [ ] Implement Encoder (MLP for structured obs; CNN variant behind feature flag)
-- [ ] Implement World Model forward + loss
-- [ ] Implement Surprise component (reads world model prediction error)
-- [ ] Implement Novelty component (grid-hash count-based)
-- [ ] Implement Homeostatic component (reads from environment trait)
-- [ ] Wire combined reward `r_t` into experience buffer
-- [ ] Verify: reward signal is non-zero and varies meaningfully across states
-- [ ] Run Canary 3 (next-step prediction)
-
-### Phase 2 — Credit Assigner (Weeks 5–6)
-
-Goal: the agent can attribute reward to past actions, however noisily.
-
-- [ ] Implement causal Transformer (or LSTM fallback) as meganeura graph primitive
-- [ ] Implement CreditNet forward pass
-- [ ] Implement contrastive training loss
-- [ ] Wire credit scores back into experience buffer
-- [ ] Track `H_eff` as logged diagnostic
-- [ ] Tier 4 one-time cross-check against PyTorch attention reference
-
-### Phase 3 — Policy & Full Loop (Weeks 7–8)
-
-Goal: the agent acts, receives credit-weighted gradients, and improves.
-
-- [ ] Implement Policy network (categorical and Gaussian variants)
-- [ ] Implement Value Head + TD(n) loss
-- [ ] Implement policy gradient update with entropy bonus
-- [ ] Implement value head warmup gate
-- [ ] Run Canary 2 (CartPole)
-- [ ] Run Tier 2 e-graph parity tests across all modules
-
-### Phase 4 — Continual Learning & Stress Testing (Weeks 9–10)
-
-Goal: the agent runs stably for long periods without forgetting or diverging.
-
-- [ ] Implement replay mixing (20% historical samples per batch)
-- [ ] Implement representation drift monitor
-- [ ] Implement entropy floor enforcement
-- [ ] Run 1M-step stability test (Tier 5)
-- [ ] Document findings in `docs/stability_runs/run_001.md`
-- [ ] Identify and file issues against meganeura for any gaps found
-
-### Phase 5 — Learnable Reward Circuit (Future)
-
-The frozen reward circuit is revisited here. Prerequisites before unfreezing:
-
-- Credit assigner has demonstrated stable `H_eff` growth over 500k+ steps
-- Policy has achieved non-trivial performance on at least one benchmark environment
-- Representation drift is < threshold on held-out probe set
-
-Only once these conditions are met is it safe to introduce reward circuit gradient updates without risking destabilizing the entire tri-level system.
+- **M1 — World model ignites.** `loss_world_model` decreases monotonically on random-walk and GridWorld; reaches < 0.01 prediction error within 10k steps. **Status: closed.**
+- **M2 — Reward signal carries information.** All four primitives produce non-zero, finite values that vary across states; `reward_mean` separates trajectories that lead to homeostatic violations from those that don't. **Status: closed.**
+- **M3 — Policy learns on its own signal.** Kindle agent solves CartPole from a cold start using intrinsic reward only (mean episode length > 195 within 50k steps). **Status: open.**
+- **M4 — Cross-env generalisation.** Agent hops GridWorld → CartPole → MountainCar → Taxi → Acrobot → Pendulum without divergence; encoder representations remain meaningful after switches (drift < threshold). **Status: partial — no divergence, generalisation TBD.**
+- **M5 — Long-run stability.** 1M-step run on real GPU hardware with no NaN, no gradient explosion, `H_eff` trending upward, entropy above floor. **Status: open.**
+- **M6 — Learnable reward circuit (unfreeze).** Only attempted once M3–M5 are closed. Adds gradient updates to the reward weights under tight constraints documented at the time.
 
 -----
 
 ## Diagnostics and Observability
 
-The following metrics are logged every K steps to a structured JSON log file (no external dependency required):
+Structured JSON diagnostics every step (no external dependency required):
 
-|Metric              |Description                    |Healthy range                  |
-|--------------------|-------------------------------|-------------------------------|
-|`loss_world_model`  |World model prediction MSE     |Decreasing over time           |
-|`loss_policy`       |Policy gradient loss           |Noisy; trending down           |
-|`loss_value`        |Value TD error                 |Decreasing over time           |
-|`loss_credit`       |Credit contrastive loss        |Decreasing, slowly             |
-|`reward_mean`       |Mean r_t over window           |Increasing over time           |
-|`reward_surprise`   |Surprise component of r_t      |Decreasing as world is learned |
-|`reward_novelty`    |Novelty component of r_t       |Decreasing as space is explored|
-|`reward_homeo`      |Homeostatic component of r_t   |Near zero when agent is healthy|
-|`H_eff`             |Effective credit scope (steps) |Increasing over training       |
-|`policy_entropy`    |Policy distribution entropy    |Above floor; not collapsing    |
-|`grad_norm_encoder` |Gradient norm on encoder       |Stable; not exploding          |
-|`repr_drift`        |Encoder drift on probe set     |Below threshold                |
-|`opt_parity_max_err`|Max abs diff between opt levels|< 1e-5                         |
-
-A minimal terminal renderer for these metrics is provided in `tools/monitor.rs`.
+| Metric              | What                                      | Healthy range                     |
+|---------------------|-------------------------------------------|-----------------------------------|
+| `loss_world_model`  | World model prediction MSE                | Decreasing over time              |
+| `loss_policy`       | Policy gradient loss                      | Noisy; trending down              |
+| `loss_credit`       | Credit contrastive loss                   | Slowly decreasing                 |
+| `loss_replay`       | MSE on replay batches                     | Within an order of `loss_wm`      |
+| `reward_mean`       | Mean r_t over window                      | Increasing over time              |
+| `reward_surprise`   | Surprise component                        | Decreasing as world is learned    |
+| `reward_novelty`    | Novelty component                         | Decreasing as space is explored   |
+| `reward_homeo`      | Homeostatic component                     | Near zero when agent is healthy   |
+| `reward_order`      | Order component (`H_ref − H_recent`)      | Positive when concentrating       |
+| `h_eff`             | Effective credit scope (steps)            | Increasing over training          |
+| `policy_entropy`    | Policy distribution entropy               | Above floor; not collapsing       |
+| `repr_drift`        | Encoder drift on probe set                | Below threshold                   |
+| `buffer_len`        | Experience buffer length                  | Up to `buffer_capacity`           |
 
 -----
 
-## Known Hard Problems
+## Python Bindings
 
-These are not bugs — they are fundamental difficulties that are acknowledged and tracked.
+Kindle ships an optional pyo3 extension under `python/`, built via [maturin](https://www.maturin.rs/):
 
-**Circular bootstrapping in credit assignment**: The contrastive training signal for CreditNet assumes the agent has visited similar states with different outcomes. Early in training, before the policy has explored meaningfully, such pairs are rare. Credit assignment is therefore noisy for the first phase of training. This is expected and does not prevent learning — it just slows it.
+```bash
+pip install maturin
+cd python && maturin develop --release
+```
 
-**The encoder serves too many masters**: Gradients from the world model, policy, and value head all flow into the encoder simultaneously. These objectives can conflict, causing the representation to compromise rather than excel at any one task. A stop-gradient schedule (gradually reducing the policy gradient’s share of encoder gradient) may be needed. This is flagged for Phase 4 tuning.
+Then in Python:
 
-**Novelty as a long-term strategy**: Count-based novelty rewards decay to near-zero for frequently visited states. In environments where the optimal policy requires repeatedly visiting the same states, the novelty signal actively penalizes good behavior after sufficient exploration. The weight `w_n` should be annealed aggressively once the environment is well-explored. Consider tying the annealing to `H_eff` growth rather than a fixed schedule.
+```python
+import gymnasium as gym
+import kindle
 
-**meganeura e-graph optimization is opaque**: If the e-graph optimizer produces an incorrect but fast kernel, the error may be numerically small per step but compound over millions of training steps into a significant bias. The Tier 2 parity tests catch obvious cases; subtle numerical drift may not be caught until the Tier 5 stability run.
+env = gym.make("CartPole-v1")
+agent = kindle.Agent(obs_dim=4, num_actions=2, env_id=0, seed=0)
 
------
+# A tiny adapter that returns obs as a plain list of floats.
+class Wrapped:
+    def __init__(self, env): self.env = env
+    def reset(self):
+        obs, _ = self.env.reset()
+        return [float(x) for x in obs]
+    def step(self, action):
+        obs, r, term, trunc, info = self.env.step(int(action) % 2)
+        if term or trunc:
+            obs, _ = self.env.reset()
+        return [float(x) for x in obs], float(r), bool(term), bool(trunc), info
 
-## Open Questions
+agent.train(Wrapped(env), steps=10_000)
+print(agent.diagnostics())
+```
 
-- Should the causal Transformer in CreditNet use learned positional encodings or fixed sinusoidal? Learned is more flexible; fixed is more stable early in training when the attention weights are noisy.
-- What is the right initial weight ratio `w_s : w_n : w_h`? Starting hypothesis: `1.0 : 0.5 : 2.0` (homeostatic signal is the most grounded and should dominate initially).
-- Should `H_eff` growth be used as a gating condition for anything, or just monitored? Candidate use: gate policy learning rate increase on `H_eff > threshold`.
-- How should the agent handle environments that have no homeostatic signals? Fallback: `r_homeo = 0`, `w_h = 0`. The agent survives on surprise and novelty alone.
+The Python extension is a thin wrapper — training still runs on GPU through meganeura. Python is for scripting and for dropping kindle into a gymnasium loop; it is not a second implementation.
 
 -----
 
 ## Repository Structure
 
+This is a Cargo workspace.
+
 ```
-IRIS/
-├── src/
-│   ├── lib.rs              # Public API surface
-│   ├── agent.rs            # Top-level Agent struct and training loop
-│   ├── buffer.rs           # ExperienceBuffer, RingBuffer
-│   ├── encoder.rs          # Encoder graph definition
-│   ├── world_model.rs      # World Model graph + loss
-│   ├── reward.rs           # Frozen Reward Circuit (surprise, novelty, homeo)
-│   ├── credit.rs           # CreditNet + contrastive loss
-│   ├── policy.rs           # Policy + Value Head
-│   └── env.rs              # Environment traits (Observation, Action, HomeostaticProvider)
-├── tests/
-│   ├── grad_check.rs       # Tier 1: finite-difference gradient verification
-│   ├── opt_parity.rs       # Tier 2: e-graph optimization parity tests
-│   └── canaries.rs         # Tier 3: XOR, CartPole, random-walk convergence
-├── examples/
-│   └── grid_world.rs       # Toy environment for early development
-├── tools/
-│   └── monitor.rs          # Terminal diagnostic renderer
+kindle/
+├── Cargo.toml                 # [workspace]
+├── kindle/                    # core library crate (publishable)
+│   ├── Cargo.toml
+│   ├── src/                   # agent, encoder, world_model, reward, credit, policy, …
+│   └── tests/                 # canaries, opt_parity, reward_signal
+├── kindle-gym/                # Rust mini-gym + runnable examples
+│   ├── Cargo.toml
+│   ├── src/                   # grid_world, cart_pole, acrobot, …
+│   ├── examples/              # cargo run -p kindle-gym --example cart_pole
+│   └── tests/                 # stability (GPU-gated)
+├── python/                    # pyo3 cdylib (maturin; excluded from workspace)
+│   ├── Cargo.toml
+│   ├── pyproject.toml
+│   ├── src/lib.rs
+│   ├── kindle/__init__.py
+│   └── tests/
 ├── docs/
-│   ├── pytorch_crosscheck.md   # Tier 4: one-time attention cross-check record
-│   └── stability_runs/         # Tier 5: long-run training logs
-├── Cargo.toml
-└── README.md
+│   ├── universal-actions.md
+│   └── stability_runs/
+└── .github/workflows/ci.yml
 ```
 
 -----
 
 ## Dependencies
 
-|Crate                 |Role                                  |
-|----------------------|--------------------------------------|
-|`meganeura`           |Neural network training and inference |
-|`blade-graphics`      |GPU backend (Vulkan / Metal)          |
-|`rand`                |Sampling, exploration noise           |
-|`serde` / `serde_json`|Diagnostic logging                    |
-|`hashbrown`           |Fast hash map for novelty visit counts|
+| Crate                  | Role                                        |
+|------------------------|---------------------------------------------|
+| `meganeura`            | Neural network training and inference       |
+| `blade-graphics`       | GPU backend (Vulkan / Metal)                |
+| `rand`                 | Sampling, exploration noise                 |
+| `serde` / `serde_json` | Diagnostic logging                          |
+| `hashbrown`            | Fast hash map for novelty visit counts      |
+| `pyo3` *(python only)* | Optional Python bindings                    |
 
-No Python. No PyTorch. No runtime dependencies outside the Rust ecosystem.
+The core Rust crate has no Python dependency. The `python/` crate is an optional extension module.

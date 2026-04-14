@@ -36,17 +36,49 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Format
-        run: cargo fmt -- --check
+        run: cargo fmt --all -- --check
 
       - name: Clippy
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
       - name: Unit tests
-        run: cargo test --lib
+        run: cargo test --workspace --lib
 
       - name: Reward signal tests
-        run: cargo test --test reward_signal
+        run: cargo test -p kindle --test reward_signal
 
       - name: GPU tests (opt parity + canaries + stability)
-        run: cargo test --test opt_parity --test canaries --test stability -- --ignored
+        run: |
+          cargo test -p kindle --test opt_parity --test canaries -- --ignored
+          cargo test -p kindle-gym --test stability -- --ignored
         continue-on-error: true
+
+  python:
+    name: Python bindings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install lavapipe and Vulkan
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mesa-vulkan-drivers vulkan-tools libvulkan-dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install maturin and test deps
+        run: pip install maturin pytest gymnasium
+
+      - name: Build extension
+        working-directory: python
+        run: maturin develop --release
+
+      - name: Pytest
+        run: pytest python/tests -q
