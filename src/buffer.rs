@@ -48,11 +48,7 @@ impl<T: Clone + Default> RingBuffer<T> {
     pub fn get(&self, index: usize) -> &T {
         assert!(index < self.len, "index out of bounds");
         let cap = self.data.len();
-        let start = if self.len < cap {
-            0
-        } else {
-            self.head
-        };
+        let start = if self.len < cap { 0 } else { self.head };
         &self.data[(start + index) % cap]
     }
 
@@ -83,7 +79,7 @@ impl<T: Clone + Default> RingBuffer<T> {
 
     /// Sample `n` random indices (with replacement) from the buffer.
     pub fn sample_indices<R: Rng>(&self, rng: &mut R, n: usize) -> Vec<usize> {
-        (0..n).map(|_| rng.gen_range(0..self.len)).collect()
+        (0..n).map(|_| rng.random_range(0..self.len)).collect()
     }
 }
 
@@ -106,7 +102,12 @@ pub struct StateKey(Vec<i32>);
 impl StateKey {
     /// Quantize a latent vector into grid cells with the given resolution.
     pub fn from_latent(latent: &[f32], resolution: f32) -> Self {
-        Self(latent.iter().map(|&x| (x / resolution).round() as i32).collect())
+        Self(
+            latent
+                .iter()
+                .map(|&x| (x / resolution).round() as i32)
+                .collect(),
+        )
     }
 }
 
@@ -221,8 +222,8 @@ impl ExperienceBuffer {
         let mut best_score = 0.0f32;
 
         for _ in 0..num_candidates {
-            let i = rng.gen_range(search_range.clone());
-            let j = rng.gen_range(search_range.clone());
+            let i = rng.random_range(search_range.clone());
+            let j = rng.random_range(search_range.clone());
             if i == j {
                 continue;
             }
@@ -293,7 +294,9 @@ impl ExperienceBuffer {
         let max = divergence.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
         let exp_sum: f32 = divergence.iter().map(|&d| (d - max).exp()).sum();
         if exp_sum > 0.0 {
-            divergence.iter_mut().for_each(|d| *d = (*d - max).exp() / exp_sum);
+            divergence
+                .iter_mut()
+                .for_each(|d| *d = (*d - max).exp() / exp_sum);
         }
         divergence
     }
@@ -326,7 +329,7 @@ impl ExperienceBuffer {
 
         // Replay samples from full buffer history
         for _ in 0..replay_count.min(self.len()) {
-            let idx = rng.gen_range(0..self.len());
+            let idx = rng.random_range(0..self.len());
             batch.push(self.transitions.get(idx));
         }
 
@@ -335,7 +338,7 @@ impl ExperienceBuffer {
         let recent_range = recent_start..self.len();
         if !recent_range.is_empty() {
             for _ in 0..recent_count {
-                let idx = rng.gen_range(recent_range.clone());
+                let idx = rng.random_range(recent_range.clone());
                 batch.push(self.transitions.get(idx));
             }
         }
@@ -409,7 +412,7 @@ mod tests {
             });
         }
 
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let batch = buf.sample_batch(&mut rng, 10, 0.2);
         assert_eq!(batch.len(), 10);
     }

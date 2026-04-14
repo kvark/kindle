@@ -67,11 +67,7 @@ impl ValueHead {
 /// The policy loss is `cross_entropy(logits, action_onehot)`. Advantage
 /// weighting is applied by scaling the learning rate on the CPU side:
 /// `lr_effective = lr_policy * advantage`.
-pub fn build_policy_graph(
-    latent_dim: usize,
-    action_dim: usize,
-    hidden_dim: usize,
-) -> Graph {
+pub fn build_policy_graph(latent_dim: usize, action_dim: usize, hidden_dim: usize) -> Graph {
     let mut g = Graph::new();
     let z = g.input("z", &[1, latent_dim]);
     let action = g.input("action", &[1, action_dim]);
@@ -107,7 +103,7 @@ pub fn softmax_probs(logits: &[f32]) -> Vec<f32> {
 /// Sample an action from logits using the Gumbel-max trick.
 pub fn sample_action<R: rand::Rng>(logits: &[f32], rng: &mut R) -> usize {
     let probs = softmax_probs(logits);
-    let u: f32 = rng.gen_range(0.0..1.0);
+    let u: f32 = rng.random_range(0.0..1.0);
     let mut cumulative = 0.0;
     for (i, &p) in probs.iter().enumerate() {
         cumulative += p;

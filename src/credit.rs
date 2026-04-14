@@ -72,8 +72,7 @@ impl CreditAssigner {
         let k = self.k_proj.forward(g, h);
         let v = self.v_proj.forward(g, h);
 
-        let attn_out =
-            g.causal_attention(q, k, v, self.num_heads, self.num_heads, self.head_dim);
+        let attn_out = g.causal_attention(q, k, v, self.num_heads, self.num_heads, self.head_dim);
 
         self.output_proj.forward(g, attn_out)
     }
@@ -121,7 +120,10 @@ pub fn build_credit_graph(
 ///
 /// `H_eff = sum_i (i * alpha_i)` where alpha is softmax-normalized.
 pub fn effective_scope(credit_weights: &[f32]) -> f32 {
-    let max = credit_weights.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
+    let max = credit_weights
+        .iter()
+        .cloned()
+        .fold(f32::NEG_INFINITY, f32::max);
     let exp_sum: f32 = credit_weights.iter().map(|&w| (w - max).exp()).sum();
 
     credit_weights

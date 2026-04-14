@@ -55,10 +55,7 @@ fn novelty_decays_with_visits() {
     }
 
     let n10 = RewardCircuit::novelty(buf.visit_count(&latent));
-    assert!(
-        n10 < n0,
-        "novelty should decay: n0={n0}, n10={n10}"
-    );
+    assert!(n10 < n0, "novelty should decay: n0={n0}, n10={n10}");
     // 1/sqrt(10) ≈ 0.316
     assert!(
         (n10 - 1.0 / (10.0f32).sqrt()).abs() < 1e-5,

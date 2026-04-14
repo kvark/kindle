@@ -8,6 +8,7 @@
 //! 2. Credit assigner: 0.3× base
 //! 3. Policy + value: 0.5× base, gated on warmup
 
+use crate::OptLevel;
 use crate::buffer::{ExperienceBuffer, Transition};
 use crate::credit;
 use crate::encoder::Encoder;
@@ -15,9 +16,8 @@ use crate::env::{Action, Environment, Observation};
 use crate::policy;
 use crate::reward::{RewardCircuit, RewardWeights};
 use crate::world_model::WorldModel;
-use crate::OptLevel;
-use meganeura::graph::Graph;
 use meganeura::Session;
+use meganeura::graph::Graph;
 use rand::Rng;
 
 /// Agent configuration.
@@ -52,8 +52,8 @@ impl Default for AgentConfig {
             buffer_capacity: 10_000,
             batch_size: 1,
             learning_rate: 1e-3,
-            lr_credit: 3e-4,  // 0.3× base
-            lr_policy: 5e-4,  // 0.5× base
+            lr_credit: 3e-4, // 0.3× base
+            lr_policy: 5e-4, // 0.5× base
             reward_weights: RewardWeights::default(),
             warmup_steps: 100,
             replay_ratio: 0.2,
@@ -136,7 +136,12 @@ impl Agent {
 
             let enc = Encoder::new(&mut g, config.obs_dim, config.latent_dim, config.hidden_dim);
             let z_t = enc.forward(&mut g, obs);
-            let wm = WorldModel::new(&mut g, config.latent_dim, config.action_dim, config.hidden_dim);
+            let wm = WorldModel::new(
+                &mut g,
+                config.latent_dim,
+                config.action_dim,
+                config.hidden_dim,
+            );
             let z_hat = wm.forward(&mut g, z_t, action);
             let loss = WorldModel::loss(&mut g, z_hat, z_target);
 
@@ -149,7 +154,10 @@ impl Agent {
         // --- Credit assigner graph ---
         let credit_session = {
             let g = credit::build_credit_graph(
-                config.latent_dim, config.action_dim, config.history_len, config.hidden_dim,
+                config.latent_dim,
+                config.action_dim,
+                config.history_len,
+                config.hidden_dim,
             );
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
@@ -158,9 +166,8 @@ impl Agent {
 
         // --- Policy + value graph ---
         let policy_session = {
-            let g = policy::build_policy_graph(
-                config.latent_dim, config.action_dim, config.hidden_dim,
-            );
+            let g =
+                policy::build_policy_graph(config.latent_dim, config.action_dim, config.hidden_dim);
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
             s
@@ -204,12 +211,9 @@ impl Agent {
 
         // Run policy forward (lr=0 → no parameter update, just inference)
         self.policy_session.set_input("z", &z_t);
-        self.policy_session.set_input(
-            "action",
-            &vec![0.0f32; self.config.action_dim],
-        );
         self.policy_session
-            .set_input("value_target", &[0.0f32]);
+            .set_input("action", &vec![0.0f32; self.config.action_dim]);
+        self.policy_session.set_input("value_target", &[0.0f32]);
         self.policy_session.set_learning_rate(0.0);
         self.policy_session.step();
         self.policy_session.wait();
@@ -259,8 +263,12 @@ impl Agent {
         self.wm_session.read_output_by_index(2, &mut z_hat);
 
         // --- Reward ---
-        let pred_error: f32 = z_t.iter().zip(z_hat.iter())
-            .map(|(a, b)| (a - b).powi(2)).sum::<f32>().sqrt();
+        let pred_error: f32 = z_t
+            .iter()
+            .zip(z_hat.iter())
+            .map(|(a, b)| (a - b).powi(2))
+            .sum::<f32>()
+            .sqrt();
         let surprise = RewardCircuit::surprise(pred_error);
         let visit_count = self.buffer.visit_count(&z_t);
         let novelty = RewardCircuit::novelty(visit_count);
@@ -302,7 +310,8 @@ impl Agent {
             self.credit_session.set_input("history", &history_flat);
 
             let target = if let Some((hi, lo)) =
-                self.buffer.find_contrastive_pair(rng, h, self.config.latent_dim)
+                self.buffer
+                    .find_contrastive_pair(rng, h, self.config.latent_dim)
             {
                 self.buffer.contrastive_target(hi, lo, h)
             } else {
@@ -317,7 +326,8 @@ impl Agent {
             self.last_credit_loss = self.credit_session.read_loss();
 
             let mut credit_logits = vec![0.0f32; h];
-            self.credit_session.read_output_by_index(1, &mut credit_logits);
+            self.credit_session
+                .read_output_by_index(1, &mut credit_logits);
 
             let alpha = credit::softmax(&credit_logits);
             let r_t = self.last_reward;
@@ -339,7 +349,8 @@ impl Agent {
         // Value target: use the current reward + credit as a simple TD(0) target.
         // More sophisticated TD(n) would look further into the buffer.
         let value_target = reward;
-        self.policy_session.set_input("value_target", &[value_target]);
+        self.policy_session
+            .set_input("value_target", &[value_target]);
 
         // Advantage = reward - value_estimate (from last forward pass).
         // Clamped to [-1, 1] to prevent gradient explosion.

@@ -97,8 +97,8 @@ impl Environment for CartPole {
         let sin_theta = self.theta.sin();
 
         // Physics from Barto, Sutton & Anderson (1983)
-        let temp = (force + POLE_MASS * POLE_HALF_LEN * self.theta_dot.powi(2) * sin_theta)
-            / TOTAL_MASS;
+        let temp =
+            (force + POLE_MASS * POLE_HALF_LEN * self.theta_dot.powi(2) * sin_theta) / TOTAL_MASS;
         let theta_acc = (GRAVITY * sin_theta - cos_theta * temp)
             / (POLE_HALF_LEN * (4.0 / 3.0 - POLE_MASS * cos_theta.powi(2) / TOTAL_MASS));
         let x_acc = temp - POLE_MASS * POLE_HALF_LEN * theta_acc * cos_theta / TOTAL_MASS;

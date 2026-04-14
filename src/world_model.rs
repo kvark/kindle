@@ -28,12 +28,7 @@ pub struct WorldModel {
 
 impl WorldModel {
     /// Build the world model parameters.
-    pub fn new(
-        g: &mut Graph,
-        latent_dim: usize,
-        action_dim: usize,
-        hidden_dim: usize,
-    ) -> Self {
+    pub fn new(g: &mut Graph, latent_dim: usize, action_dim: usize, hidden_dim: usize) -> Self {
         Self {
             z_proj: nn::Linear::new(g, "world_model.z_proj", latent_dim, hidden_dim),
             a_proj: nn::Linear::no_bias(g, "world_model.a_proj", action_dim, hidden_dim),

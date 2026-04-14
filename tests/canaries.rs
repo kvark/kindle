@@ -17,8 +17,8 @@
 #[test]
 #[ignore] // requires GPU
 fn canary_next_step_prediction() {
-    use meganeura::{Graph, build_session};
     use meganeura::nn;
+    use meganeura::{Graph, build_session};
 
     let batch = 1;
     let dim = 4;
@@ -90,10 +90,10 @@ fn canary_next_step_prediction() {
 #[test]
 #[ignore] // requires GPU
 fn canary_iris_world_model() {
-    use iris::{Agent, AgentConfig};
     use iris::env::{
         Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
     };
+    use iris::{Agent, AgentConfig};
 
     struct ConstantEnv {
         state: usize,
@@ -122,8 +122,12 @@ fn canary_iris_world_model() {
     }
 
     impl Environment for ConstantEnv {
-        fn observation_dim(&self) -> usize { 4 }
-        fn num_actions(&self) -> usize { 2 }
+        fn observation_dim(&self) -> usize {
+            4
+        }
+        fn num_actions(&self) -> usize {
+            2
+        }
         fn observe(&self) -> Observation {
             Observation::new(self.patterns[self.state].clone())
         }
@@ -134,7 +138,9 @@ fn canary_iris_world_model() {
                 homeostatic: vec![],
             }
         }
-        fn reset(&mut self) { self.state = 0; }
+        fn reset(&mut self) {
+            self.state = 0;
+        }
     }
 
     let mut env = ConstantEnv::new();
@@ -150,7 +156,7 @@ fn canary_iris_world_model() {
     };
 
     let mut agent = Agent::new(config);
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     // Collect early loss
     let warmup = 50;

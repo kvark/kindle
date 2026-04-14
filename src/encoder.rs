@@ -67,7 +67,17 @@ impl CnnEncoder {
         let h1 = (height - 3 + 2) / 2 + 1; // stride-2 conv output
         let w1 = (width - 3 + 2) / 2 + 1;
 
-        let conv1 = nn::Conv2d::new(g, "encoder.conv1", channels, out_ch1, 3, height, width, 2, 1);
+        let conv1 = nn::Conv2d::new(
+            g,
+            "encoder.conv1",
+            channels,
+            out_ch1,
+            3,
+            height,
+            width,
+            2,
+            1,
+        );
         let conv2 = nn::Conv2d::new(g, "encoder.conv2", out_ch1, out_ch2, 3, h1, w1, 2, 1);
 
         let fc = nn::Linear::no_bias(g, "encoder.fc", out_ch2 as usize, latent_dim);
