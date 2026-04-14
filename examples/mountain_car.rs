@@ -3,7 +3,7 @@
 //! Run: `cargo run --example mountain_car`
 
 use iris::envs::mountain_car::MountainCar;
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 fn main() {
@@ -13,9 +13,8 @@ fn main() {
     println!("=================");
 
     let mut env = MountainCar::new();
+    let adapter = Box::new(GenericAdapter::discrete(2, 2, 3));
     let config = AgentConfig {
-        obs_dim: 2,
-        action_dim: 3,
         latent_dim: 8,
         hidden_dim: 32,
         history_len: 16,
@@ -27,7 +26,7 @@ fn main() {
     };
 
     println!("building agent (compiling graphs)...");
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     println!("agent ready");
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);

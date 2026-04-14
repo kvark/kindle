@@ -3,7 +3,7 @@
 //! Run: `cargo run --example grid_world`
 
 use iris::envs::grid_world::{GridWorld, NUM_ACTIONS, OBS_DIM};
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 fn main() {
@@ -13,9 +13,8 @@ fn main() {
     println!("================");
 
     let mut env = GridWorld::new();
+    let adapter = Box::new(GenericAdapter::discrete(0, OBS_DIM, NUM_ACTIONS));
     let config = AgentConfig {
-        obs_dim: OBS_DIM,
-        action_dim: NUM_ACTIONS,
         latent_dim: 8,
         hidden_dim: 16,
         history_len: 8,
@@ -26,7 +25,7 @@ fn main() {
     };
 
     println!("building agent (compiling graphs)...");
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     println!("agent ready");
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);

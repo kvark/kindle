@@ -2,9 +2,8 @@
 //!
 //! Run: `cargo run --example pendulum`
 
-use iris::env::ActionKind;
 use iris::envs::pendulum::Pendulum;
-use iris::{Agent, AgentConfig, Environment};
+use iris::{Agent, AgentConfig, Environment, GenericAdapter};
 use rand::SeedableRng;
 
 fn main() {
@@ -14,14 +13,8 @@ fn main() {
     println!("===========================");
 
     let mut env = Pendulum::new();
-    let action_dim = 1;
+    let adapter = Box::new(GenericAdapter::continuous(5, 3, 1, 0.5));
     let config = AgentConfig {
-        obs_dim: 3,
-        action_dim,
-        action_kind: ActionKind::Continuous {
-            dim: action_dim,
-            scale: 0.5, // exploration noise std
-        },
         latent_dim: 8,
         hidden_dim: 32,
         history_len: 16,
@@ -35,7 +28,7 @@ fn main() {
     };
 
     println!("building agent (compiling graphs)...");
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     println!("agent ready");
 
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);

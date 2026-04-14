@@ -144,9 +144,8 @@ fn canary_iris_world_model() {
     }
 
     let mut env = ConstantEnv::new();
+    let adapter = Box::new(iris::GenericAdapter::discrete(0, 4, 2));
     let config = AgentConfig {
-        obs_dim: 4,
-        action_dim: 2,
         latent_dim: 4,
         hidden_dim: 16,
         buffer_capacity: 500,
@@ -155,7 +154,7 @@ fn canary_iris_world_model() {
         ..AgentConfig::default()
     };
 
-    let mut agent = Agent::new(config);
+    let mut agent = Agent::new(config, adapter);
     let mut rng = rand::rng();
 
     // Collect early loss
