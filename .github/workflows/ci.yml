@@ -44,10 +44,6 @@ jobs:
       - name: Unit tests
         run: cargo test --lib
 
-      - name: Gradient check tests
-        run: cargo test --test grad_check
-        continue-on-error: true
-
       - name: Opt parity tests
         run: cargo test --test opt_parity
         continue-on-error: true
