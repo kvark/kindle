@@ -292,6 +292,15 @@ impl Agent {
         }
     }
 
+    /// Mark the next observed transition as the start of a new episode
+    /// within the same env. The world model will zero its `z_target`
+    /// for that step and the stored transition will be tagged
+    /// `env_boundary = true`, so the credit assigner and world model
+    /// skip attribution across the reset.
+    pub fn mark_boundary(&mut self) {
+        self.pending_boundary = true;
+    }
+
     /// Swap the active environment adapter. Preserves all learned
     /// parameters; the next transition stored is marked as an env
     /// boundary so the world model and credit assigner don't try to
