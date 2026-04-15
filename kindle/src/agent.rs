@@ -69,6 +69,13 @@ pub struct AgentConfig {
     pub drift_interval: usize,
     /// Drift threshold beyond which encoder LR is reduced.
     pub drift_threshold: f32,
+    /// Action persistence: the sampled action is held for this many
+    /// consecutive `act()` calls per lane before the policy is resampled.
+    /// `1` (default) is the classic per-step reactive policy. `K > 1`
+    /// stretches the effective credit-assigner horizon by K× with no
+    /// graph change — a cheap precursor to the Phase G option layer.
+    /// See `docs/phase-g-l1-options.md`.
+    pub action_repeat: usize,
     pub opt_level: OptLevel,
 }
 
@@ -91,6 +98,7 @@ impl Default for AgentConfig {
             entropy_floor: 0.1,
             drift_interval: 500,
             drift_threshold: 1.0,
+            action_repeat: 1,
             opt_level: OptLevel::Full,
         }
     }
@@ -135,6 +143,13 @@ struct Lane {
     buffer: ExperienceBuffer,
     reward_circuit: RewardCircuit,
     pending_boundary: bool,
+
+    // Action-persistence state (AgentConfig::action_repeat). When `repeats_left`
+    // is > 0 we hand back `cached_action` instead of resampling, but the batched
+    // policy forward still runs every step so the other lanes' fresh samples
+    // come through in the same dispatch.
+    cached_action: Option<Action>,
+    repeats_left: usize,
 
     // Cached last-step values for diagnostics & policy advantage.
     last_value: f32,
@@ -345,6 +360,8 @@ impl Agent {
                     0xA11CE ^ i as u64,
                 ),
                 pending_boundary: false,
+                cached_action: None,
+                repeats_left: 0,
                 last_value: 0.0,
                 last_entropy: 0.0,
                 last_surprise: 0.0,
@@ -392,7 +409,13 @@ impl Agent {
     /// transition will be tagged `env_boundary = true`, so the credit
     /// assigner and world model skip attribution across the reset.
     pub fn mark_boundary(&mut self, lane_idx: usize) {
-        self.lanes[lane_idx].pending_boundary = true;
+        let lane = &mut self.lanes[lane_idx];
+        lane.pending_boundary = true;
+        // An episode reset ends any in-flight action repeat: the post-reset
+        // state is drawn from a fresh env distribution, so the cached action
+        // is semantically stale.
+        lane.cached_action = None;
+        lane.repeats_left = 0;
     }
 
     /// Swap the active adapter on one lane. Preserves all learned
@@ -413,6 +436,8 @@ impl Agent {
         let lane = &mut self.lanes[lane_idx];
         lane.adapter = adapter;
         lane.pending_boundary = true;
+        lane.cached_action = None;
+        lane.repeats_left = 0;
     }
 
     /// Env id of the adapter currently bound to `lane_idx`.
@@ -464,12 +489,30 @@ impl Agent {
         self.policy_session
             .read_output_by_index(2, &mut value_stack);
 
+        // Per-lane sampling with optional action persistence. The batched
+        // policy forward ran for every lane above (so `head`/`value` rows
+        // are always fresh); a lane in mid-repeat just ignores its row
+        // this step and re-uses the cached action.
+        let action_repeat = self.config.action_repeat.max(1);
         let mut actions = Vec::with_capacity(n);
         for (i, lane) in self.lanes.iter_mut().enumerate() {
             let head = &head_stack[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
             lane.last_value = value_stack[i];
             lane.last_entropy = lane.adapter.head_entropy(head);
-            actions.push(lane.adapter.sample_action(head, rng));
+
+            let resample = lane.repeats_left == 0 || lane.cached_action.is_none();
+            let action = if resample {
+                let a = lane.adapter.sample_action(head, rng);
+                lane.cached_action = Some(a.clone());
+                lane.repeats_left = action_repeat - 1;
+                a
+            } else {
+                lane.repeats_left -= 1;
+                lane.cached_action
+                    .clone()
+                    .expect("cached_action is Some by branch condition")
+            };
+            actions.push(action);
         }
         actions
     }
