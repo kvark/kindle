@@ -404,6 +404,7 @@ impl PyBatchAgent {
         warmup_steps = None,
         latent_dim = None,
         hidden_dim = None,
+        action_repeat = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -416,6 +417,7 @@ impl PyBatchAgent {
         warmup_steps: Option<usize>,
         latent_dim: Option<usize>,
         hidden_dim: Option<usize>,
+        action_repeat: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -462,6 +464,12 @@ impl PyBatchAgent {
         }
         if let Some(hd) = hidden_dim {
             config.hidden_dim = hd;
+        }
+        if let Some(k) = action_repeat {
+            if k == 0 {
+                return Err(PyValueError::new_err("action_repeat must be >= 1"));
+            }
+            config.action_repeat = k;
         }
         let agent = Agent::new(config, adapters);
         Ok(Self {

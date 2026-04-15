@@ -121,6 +121,14 @@ def main() -> int:
     parser.add_argument("--warmup", type=int, default=200)
     parser.add_argument("--latent-dim", type=int, default=16)
     parser.add_argument("--hidden-dim", type=int, default=32)
+    parser.add_argument(
+        "--action-repeat",
+        type=int,
+        default=1,
+        help="hold each sampled action for K env steps per lane (Phase E.v3 "
+        "action-persistence; K=1 is classic reactive L0, K>1 stretches the "
+        "effective credit horizon by K× with no graph change)",
+    )
     args = parser.parse_args()
 
     # One env per lane, each with a distinct seed so the lanes diverge.
@@ -137,7 +145,8 @@ def main() -> int:
 
     print(
         f"env={args.env} lanes={args.lanes} obs_dim={obs_dim} num_actions={num_actions} "
-        f"steps={args.steps} seed={args.seed} lr={args.lr}"
+        f"steps={args.steps} seed={args.seed} lr={args.lr} "
+        f"action_repeat={args.action_repeat}"
     )
 
     # Distinct env_ids per lane so the agent builds per-lane task embeddings
@@ -153,6 +162,7 @@ def main() -> int:
         warmup_steps=args.warmup,
         latent_dim=args.latent_dim,
         hidden_dim=args.hidden_dim,
+        action_repeat=args.action_repeat,
     )
     print("agent ready (compiled graphs once, N lanes)")
 
