@@ -1,0 +1,210 @@
+"""Batched LunarLander exploration with a Phase-E multi-lane kindle agent.
+
+Spins up N concurrent LunarLander envs, feeds them through a single
+`kindle.BatchAgent` with `batch_size=N`, and prints per-lane learning
+diagnostics alongside rolling-mean extrinsic return. Extrinsic reward
+is for monitoring only — training is purely intrinsic (homeostatic +
+surprise + novelty + order).
+
+Usage:
+    python python/examples/lunar_lander_batch.py --lanes 4 --steps 2000
+"""
+
+from __future__ import annotations
+
+import argparse
+import math
+import sys
+import time
+
+
+def lunar_lander_homeo(obs):
+    """Same homeostatic-target shape as the single-lane example.
+
+    Note: `obs` here is the *raw* gymnasium observation, not the
+    normalized vector we feed the agent. The physical interpretation
+    (altitude, vy, speed) lives in raw-space.
+    """
+    altitude = float(obs[1])
+    vy = float(obs[3])
+    speed = math.sqrt(obs[2] * obs[2] + obs[3] * obs[3])
+    descent = max(0.0, -vy)
+    proximity = math.exp(-max(0.0, altitude) * 2.0)
+    crash_risk = descent * proximity
+    return [
+        {"value": crash_risk * 10.0, "target": 0.0, "tolerance": 0.0},
+        {"value": float(obs[4]), "target": 0.0, "tolerance": 0.1},
+        {"value": altitude, "target": 0.0, "tolerance": 0.2},
+        {"value": float(speed), "target": 0.0, "tolerance": 0.3},
+    ]
+
+
+# Per-component LunarLander obs scales (x, y, vx, vy, angle, ang_vel, leg1, leg2).
+# Divide by these to keep every input roughly in [-2, 2] so the world-model
+# optimizer doesn't see gradients dominated by velocity magnitudes.
+_LL_SCALE = [1.5, 1.5, 5.0, 5.0, 3.14, 5.0, 1.0, 1.0]
+
+
+def normalize_obs(obs):
+    return [float(x) / s for x, s in zip(obs, _LL_SCALE)]
+
+
+def main() -> int:
+    try:
+        import gymnasium as gym
+    except ImportError:
+        print("gymnasium isn't installed. Try: pip install 'gymnasium[box2d]'", file=sys.stderr)
+        return 1
+
+    import kindle
+
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--env", default="LunarLander-v3")
+    parser.add_argument("--lanes", type=int, default=4, help="concurrent LunarLander envs (N)")
+    parser.add_argument("--steps", type=int, default=2_000, help="synchronous steps (per lane)")
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--log-every", type=int, default=200)
+    parser.add_argument("--lr", type=float, default=1e-4,
+                        help="world-model learning rate (default 1e-4 — LunarLander is harsh)")
+    parser.add_argument("--warmup", type=int, default=200)
+    parser.add_argument("--latent-dim", type=int, default=16)
+    parser.add_argument("--hidden-dim", type=int, default=32)
+    args = parser.parse_args()
+
+    # One env per lane, each with a distinct seed so the lanes diverge.
+    envs = [gym.make(args.env) for _ in range(args.lanes)]
+    raw_obs_per_lane: list[list[float]] = []
+    obs_lists: list[list[float]] = []
+    for i, env in enumerate(envs):
+        obs, _info = env.reset(seed=args.seed + i)
+        raw = [float(x) for x in obs]
+        raw_obs_per_lane.append(raw)
+        obs_lists.append(normalize_obs(raw))
+    obs_dim = len(obs_lists[0])
+    num_actions = int(envs[0].action_space.n)
+
+    print(
+        f"env={args.env} lanes={args.lanes} obs_dim={obs_dim} num_actions={num_actions} "
+        f"steps={args.steps} seed={args.seed} lr={args.lr}"
+    )
+
+    # Distinct env_ids per lane so the agent builds per-lane task embeddings
+    # (still shares the encoder — same universal obs/action tokens).
+    env_ids = [1 + i for i in range(args.lanes)]
+    agent = kindle.BatchAgent(
+        obs_dim=obs_dim,
+        num_actions=num_actions,
+        batch_size=args.lanes,
+        env_ids=env_ids,
+        seed=args.seed,
+        learning_rate=args.lr,
+        warmup_steps=args.warmup,
+        latent_dim=args.latent_dim,
+        hidden_dim=args.hidden_dim,
+    )
+    print("agent ready (compiled graphs once, N lanes)")
+
+    ep_returns: list[list[float]] = [[] for _ in range(args.lanes)]
+    cur_returns: list[float] = [0.0 for _ in range(args.lanes)]
+    total_episodes = 0
+    t0 = time.time()
+
+    for step in range(args.steps):
+        actions = agent.act(obs_lists)
+
+        # Step each env with its own action.
+        raw_next: list[list[float]] = []
+        next_lists: list[list[float]] = []
+        dones: list[bool] = []
+        for i, env in enumerate(envs):
+            next_obs, reward, terminated, truncated, _ = env.step(int(actions[i]))
+            raw = [float(x) for x in next_obs]
+            cur_returns[i] += float(reward)
+            done = bool(terminated or truncated)
+            raw_next.append(raw)
+            next_lists.append(normalize_obs(raw))
+            dones.append(done)
+
+        # Homeostatic signals use raw-space interpretations (altitude, vy, ...).
+        homeos = [lunar_lander_homeo(raw) for raw in raw_next]
+        agent.observe(next_lists, actions, homeostatic=homeos)
+
+        # Per-lane episode reset + boundary marking.
+        for i, done in enumerate(dones):
+            if done:
+                ep_returns[i].append(cur_returns[i])
+                total_episodes += 1
+                cur_returns[i] = 0.0
+                obs, _info = envs[i].reset()
+                raw = [float(x) for x in obs]
+                raw_next[i] = raw
+                next_lists[i] = normalize_obs(raw)
+                agent.mark_boundary(i)
+
+        obs_lists = next_lists
+
+        if args.log_every and step > 0 and step % args.log_every == 0:
+            diags = agent.diagnostics()
+            # Aggregate recent returns across lanes.
+            all_recent: list[float] = []
+            for lane in ep_returns:
+                all_recent.extend(lane[-5:])
+            avg_return = sum(all_recent) / max(1, len(all_recent))
+
+            def _safe(x, default=float("nan")):
+                # serde_json serializes NaN/Inf as null — tolerate that in logs.
+                return float(x) if x is not None else default
+
+            def _mean(key):
+                return sum(_safe(d[key]) for d in diags) / args.lanes
+
+            wm = _safe(diags[0]["loss_world_model"])
+            pi = _safe(diags[0]["loss_policy"])
+            rew = _mean("reward_mean")
+            sup = _mean("reward_surprise")
+            hom = _mean("reward_homeo")
+            ent = _mean("policy_entropy")
+            elapsed = time.time() - t0
+            sps = (step * args.lanes) / max(1e-3, elapsed)
+            print(
+                f"step={step:>5} eps={total_episodes:>3} "
+                f"avg_ret={avg_return:+7.1f} | "
+                f"wm={wm:.3f} pi={pi:.3f} "
+                f"r={rew:+6.3f} surp={sup:+5.2f} homeo={hom:+6.2f} "
+                f"ent={ent:.2f} | {sps:5.1f} env-steps/s"
+            )
+
+    for env in envs:
+        env.close()
+
+    # Final per-lane summary.
+    print("\n--- per-lane episode returns ---")
+    for i, lane in enumerate(ep_returns):
+        if lane:
+            print(
+                f"  lane {i}: episodes={len(lane):>3} "
+                f"mean={sum(lane) / len(lane):+7.1f} "
+                f"best={max(lane):+7.1f} worst={min(lane):+7.1f}"
+            )
+        else:
+            print(f"  lane {i}: no completed episodes")
+
+    diags = agent.diagnostics()
+    print("\n--- final diagnostics ---")
+    for i, d in enumerate(diags):
+        print(
+            f"  lane {i}: wm={d['loss_world_model']:.3f} "
+            f"pi={d['loss_policy']:.3f} "
+            f"r={d['reward_mean']:+6.3f} "
+            f"surp={d['reward_surprise']:+5.2f} "
+            f"novelty={d['reward_novelty']:+5.2f} "
+            f"homeo={d['reward_homeo']:+6.2f} "
+            f"order={d['reward_order']:+5.2f} "
+            f"ent={d['policy_entropy']:.2f} "
+            f"buf={d['buffer_len']}"
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

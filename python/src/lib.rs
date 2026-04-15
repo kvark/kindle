@@ -367,6 +367,245 @@ fn unpack_step(obj: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, f32, bool, bool)> 
 #[pymodule]
 fn _native(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAgent>()?;
+    m.add_class::<PyBatchAgent>()?;
     m.add("OBS_TOKEN_DIM", OBS_TOKEN_DIM)?;
     Ok(())
+}
+
+/// Multi-lane ("batched") kindle agent — N concurrent envs share a single
+/// set of compiled GPU graphs.
+///
+/// Construction:
+///     BatchAgent(obs_dim, num_actions, batch_size, env_ids=None, seed=0)
+///
+/// Each step drives N envs synchronously: `act(list_of_obs)` returns a
+/// list of N action indices; `observe(list_of_next_obs, list_of_actions,
+/// homeostatic=list_of_lists)` trains across all lanes with one batched
+/// world-model and policy dispatch. `diagnostics()` returns a list of per-lane
+/// dicts; `mark_boundary(lane_idx)` marks a single-lane episode reset.
+#[pyclass(name = "BatchAgent", module = "kindle", unsendable)]
+pub struct PyBatchAgent {
+    agent: Agent,
+    rng: StdRng,
+    num_actions: usize,
+    batch_size: usize,
+}
+
+#[pymethods]
+impl PyBatchAgent {
+    #[new]
+    #[pyo3(signature = (
+        obs_dim,
+        num_actions,
+        batch_size,
+        env_ids = None,
+        seed = 0,
+        learning_rate = None,
+        warmup_steps = None,
+        latent_dim = None,
+        hidden_dim = None,
+    ))]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        obs_dim: usize,
+        num_actions: usize,
+        batch_size: usize,
+        env_ids: Option<Vec<u32>>,
+        seed: u64,
+        learning_rate: Option<f32>,
+        warmup_steps: Option<usize>,
+        latent_dim: Option<usize>,
+        hidden_dim: Option<usize>,
+    ) -> PyResult<Self> {
+        if obs_dim > OBS_TOKEN_DIM {
+            return Err(PyValueError::new_err(format!(
+                "obs_dim {obs_dim} exceeds kindle OBS_TOKEN_DIM {OBS_TOKEN_DIM}"
+            )));
+        }
+        if batch_size == 0 {
+            return Err(PyValueError::new_err("batch_size must be >= 1"));
+        }
+        let ids: Vec<u32> = match env_ids {
+            Some(v) => {
+                if v.len() != batch_size {
+                    return Err(PyValueError::new_err(format!(
+                        "env_ids length {} does not match batch_size {}",
+                        v.len(),
+                        batch_size
+                    )));
+                }
+                v
+            }
+            None => (0..batch_size as u32).collect(),
+        };
+        let adapters: Vec<Box<dyn kindle::EnvAdapter>> = ids
+            .into_iter()
+            .map(|id| {
+                Box::new(GenericAdapter::discrete(id, obs_dim, num_actions))
+                    as Box<dyn kindle::EnvAdapter>
+            })
+            .collect();
+        let mut config = AgentConfig::default();
+        config.batch_size = batch_size;
+        if let Some(lr) = learning_rate {
+            config.learning_rate = lr;
+            // Scale dependent LRs proportionally to preserve the 0.3×/0.5×
+            // ratios documented in the agent module.
+            config.lr_credit = lr * 0.3;
+            config.lr_policy = lr * 0.5;
+        }
+        if let Some(w) = warmup_steps {
+            config.warmup_steps = w;
+        }
+        if let Some(ld) = latent_dim {
+            config.latent_dim = ld;
+        }
+        if let Some(hd) = hidden_dim {
+            config.hidden_dim = hd;
+        }
+        let agent = Agent::new(config, adapters);
+        Ok(Self {
+            agent,
+            rng: StdRng::seed_from_u64(seed),
+            num_actions,
+            batch_size,
+        })
+    }
+
+    /// Sample one discrete action per lane. `obs_list` must be a sequence
+    /// of length `batch_size` where each entry is a 1-D sequence of floats.
+    /// Returns a list of integer action indices, length `batch_size`.
+    fn act(&mut self, obs_list: &Bound<'_, PyAny>) -> PyResult<Vec<usize>> {
+        let obs_vecs = parse_obs_list(obs_list, self.batch_size)?;
+        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
+        let actions = self.agent.act(&observations, &mut self.rng);
+        actions
+            .into_iter()
+            .map(|a| match a {
+                Action::Discrete(i) => Ok(i),
+                Action::Continuous(_) => Err(PyRuntimeError::new_err(
+                    "agent produced a continuous action; BatchAgent expects discrete actions",
+                )),
+            })
+            .collect()
+    }
+
+    /// Observe one synchronous step across all lanes.
+    ///
+    /// `next_obs_list` and `actions_list` must have length `batch_size`.
+    /// `homeostatic` is an optional list-of-lists (one list per lane) — each
+    /// inner list is a sequence of `{"value", "target", "tolerance"}` dicts
+    /// (or 3-tuples).
+    #[pyo3(signature = (next_obs_list, actions_list, homeostatic = None))]
+    fn observe(
+        &mut self,
+        next_obs_list: &Bound<'_, PyAny>,
+        actions_list: &Bound<'_, PyAny>,
+        homeostatic: Option<&Bound<'_, PyAny>>,
+    ) -> PyResult<()> {
+        let obs_vecs = parse_obs_list(next_obs_list, self.batch_size)?;
+        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
+
+        // Parse actions list.
+        let actions_outer: Vec<Bound<'_, PyAny>> = {
+            let mut v = Vec::with_capacity(self.batch_size);
+            for item in actions_list.iter()? {
+                v.push(item?);
+            }
+            v
+        };
+        if actions_outer.len() != self.batch_size {
+            return Err(PyValueError::new_err(format!(
+                "actions_list length {} must equal batch_size {}",
+                actions_outer.len(),
+                self.batch_size
+            )));
+        }
+        let mut actions = Vec::with_capacity(self.batch_size);
+        for (i, item) in actions_outer.into_iter().enumerate() {
+            let a: usize = item.extract()?;
+            if a >= self.num_actions {
+                return Err(PyValueError::new_err(format!(
+                    "action {a} at lane {i} out of range for num_actions={}",
+                    self.num_actions
+                )));
+            }
+            actions.push(Action::Discrete(a));
+        }
+
+        // Parse optional per-lane homeostatic lists.
+        let homeos: Vec<Vec<HomeostaticVariable>> = match homeostatic {
+            None => (0..self.batch_size).map(|_| Vec::new()).collect(),
+            Some(outer) => {
+                let mut out: Vec<Vec<HomeostaticVariable>> = Vec::with_capacity(self.batch_size);
+                for (i, inner) in outer.iter()?.enumerate() {
+                    if i >= self.batch_size {
+                        return Err(PyValueError::new_err(
+                            "homeostatic list longer than batch_size",
+                        ));
+                    }
+                    let inner: Bound<'_, PyAny> = inner?;
+                    out.push(parse_homeo(&inner)?);
+                }
+                while out.len() < self.batch_size {
+                    out.push(Vec::new());
+                }
+                out
+            }
+        };
+
+        // Build proxy envs (hold the observations + homeostats for this step).
+        let proxies: Vec<ProxyEnv> = observations
+            .iter()
+            .zip(homeos.into_iter())
+            .map(|(obs, homeo)| ProxyEnv { obs, homeo })
+            .collect();
+        let env_refs: Vec<&dyn Environment> =
+            proxies.iter().map(|p| p as &dyn Environment).collect();
+
+        self.agent
+            .observe(&observations, &actions, &env_refs, &mut self.rng);
+        Ok(())
+    }
+
+    /// Mark lane `lane_idx` as starting a new episode on the next observe.
+    fn mark_boundary(&mut self, lane_idx: usize) {
+        self.agent.mark_boundary(lane_idx);
+    }
+
+    /// Current agent step count.
+    fn step_count(&self) -> usize {
+        self.agent.step_count()
+    }
+
+    /// Number of lanes.
+    fn num_lanes(&self) -> usize {
+        self.agent.num_lanes()
+    }
+
+    /// Per-lane diagnostics as a list of plain Python dicts.
+    fn diagnostics<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let diags = self.agent.diagnostics();
+        let json =
+            serde_json::to_string(&diags).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        let json_mod = py.import_bound("json")?;
+        json_mod.call_method1("loads", (json,))
+    }
+}
+
+/// Parse an outer sequence of length `expected` whose entries are each a
+/// 1-D obs vector (list/tuple/ndarray of floats).
+fn parse_obs_list(obj: &Bound<'_, PyAny>, expected: usize) -> PyResult<Vec<Vec<f32>>> {
+    let mut out = Vec::with_capacity(expected);
+    for item in obj.iter()? {
+        let item: Bound<'_, PyAny> = item?;
+        out.push(parse_obs(&item)?);
+    }
+    if out.len() != expected {
+        return Err(PyValueError::new_err(format!(
+            "expected outer sequence of length {expected}, got {}",
+            out.len()
+        )));
+    }
+    Ok(out)
 }
