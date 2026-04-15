@@ -169,11 +169,6 @@ pub struct Agent {
     z_target_scratch: Vec<f32>,
     task_scratch: Vec<f32>,
     value_target_scratch: Vec<f32>,
-    /// Runtime ones-inputs fed to the policy graph's `mean_tee_ones` /
-    /// `value_tee_ones` ports. See the comment in
-    /// `policy::build_continuous_policy_graph` for why we need these.
-    policy_mean_tee_ones: Vec<f32>,
-    policy_value_tee_ones: Vec<f32>,
 }
 
 /// Xavier (Glorot uniform) initialization.
@@ -352,8 +347,6 @@ impl Agent {
             z_target_scratch: vec![0.0; n * config.latent_dim],
             task_scratch: vec![0.0; n * TASK_DIM],
             value_target_scratch: vec![0.0; n],
-            policy_mean_tee_ones: vec![1.0; n * MAX_ACTION_DIM],
-            policy_value_tee_ones: vec![1.0; n],
             config,
         }
     }
@@ -430,10 +423,6 @@ impl Agent {
         self.value_target_scratch.fill(0.0);
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
-        self.policy_session
-            .set_input("mean_tee_ones", &self.policy_mean_tee_ones);
-        self.policy_session
-            .set_input("value_tee_ones", &self.policy_value_tee_ones);
         self.policy_session.set_learning_rate(0.0);
         self.policy_session.step();
         self.policy_session.wait();
@@ -854,10 +843,6 @@ impl Agent {
             .set_input("action", &self.action_token_scratch);
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
-        self.policy_session
-            .set_input("mean_tee_ones", &self.policy_mean_tee_ones);
-        self.policy_session
-            .set_input("value_tee_ones", &self.policy_value_tee_ones);
         self.policy_session
             .set_learning_rate(self.config.lr_policy * lr_scale);
         self.policy_session.step();
