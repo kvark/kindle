@@ -1,4 +1,6 @@
-## v0.1 (TBD)
+## v0.2 (TBD)
+
+## v0.1 (14 Apr 2026)
 
 - Cold-start continually-self-training RL agent on meganeura: encoder,
   world model, credit assigner, policy+value head, all trained from first

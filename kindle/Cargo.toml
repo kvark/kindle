@@ -1,6 +1,6 @@
 [package]
 name = "kindle"
-version = "0.2.0"
+version = "0.1.0"
 authors = ["Dzmitry Malyshau"]
 repository = "https://github.com/kvark/kindle"
 edition = "2024"
