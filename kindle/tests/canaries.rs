@@ -161,9 +161,7 @@ fn canary_kindle_world_model() {
     let warmup = 50;
     for _ in 0..warmup {
         let obs = env.observe();
-        let action = agent
-            .act(std::slice::from_ref(&obs), &mut rng)
-            .remove(0);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
         let env_ref: &dyn Environment = &env;
         agent.observe(
@@ -178,9 +176,7 @@ fn canary_kindle_world_model() {
     // Train more
     for _ in warmup..500 {
         let obs = env.observe();
-        let action = agent
-            .act(std::slice::from_ref(&obs), &mut rng)
-            .remove(0);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
         let env_ref: &dyn Environment = &env;
         agent.observe(
