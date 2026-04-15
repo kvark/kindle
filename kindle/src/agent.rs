@@ -210,6 +210,21 @@ impl Agent {
             adapters.len(),
             config.batch_size
         );
+        if config.batch_size > 1 {
+            // See the `set_outputs` site in the WM graph for the full
+            // explanation. Short version: the encoder's RmsNorm backward
+            // aliases with the `z_t` output buffer, so lanes 1..N read
+            // back NaN in `z_t`, which poisons `z_target` next step. The
+            // API is fully wired; training at N > 1 is blocked on an
+            // upstream meganeura fix.
+            log::warn!(
+                "Agent::new: batch_size={} but multi-lane training is \
+                 currently blocked by a meganeura output-aliasing issue. \
+                 Lanes ≥ 1 will produce NaN z_t. Running at N = 1 is the \
+                 validated path.",
+                config.batch_size
+            );
+        }
         // --- World model graph (uses universal token sizes + task) ---
         //
         // The task embedding is fed as a graph **input** named "task".
@@ -250,6 +265,18 @@ impl Agent {
             // back garbage on read. We only need z_t (for the buffer's
             // latent column); surprise is recovered from `sqrt(wm_loss
             // * latent_dim)` instead of `||z_t - z_hat||`.
+            //
+            // KNOWN ISSUE (Phase E.v1): The same meganeura aliasing
+            // happens to rows ≥ 1 of `z_t` when `batch_size > 1` — the
+            // encoder's RmsNorm backward scratch overwrites rows of the
+            // `z_t` output buffer. At N = 1 only row 0 exists and the
+            // luck holds. At N > 1 lanes 1..N receive NaN in `z_t`,
+            // which poisons z_target on the next step. Fix requires
+            // either an upstream meganeura buffer-alloc fix or a
+            // kindle-side graph change (swap RmsNorm for LayerNorm, or
+            // add a dedicated encoder-only inference session with
+            // shared params). Tracked separately; Phase E ships with
+            // the API wired end-to-end and N = 1 as the validated path.
             g.set_outputs(vec![loss, z_t]);
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
