@@ -47,9 +47,7 @@ fn stability_grid_world() {
 
     for step in 0..total_steps {
         let obs = env.observe();
-        let action = agent
-            .act(std::slice::from_ref(&obs), &mut rng)
-            .remove(0);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
         let env_ref: &dyn Environment = &env;
         agent.observe(
@@ -114,9 +112,7 @@ fn stability_random_walk_convergence() {
 
     for _ in 0..500 {
         let obs = env.observe();
-        let action = agent
-            .act(std::slice::from_ref(&obs), &mut rng)
-            .remove(0);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
         let env_ref: &dyn Environment = &env;
         agent.observe(

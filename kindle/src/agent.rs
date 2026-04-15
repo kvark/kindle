@@ -488,9 +488,8 @@ impl Agent {
         }
 
         // --- One batched WM forward+backward ---
-        let wm_loss = self.wm_forward_backward_stacked(
-            self.config.learning_rate * self.encoder_lr_scale,
-        );
+        let wm_loss =
+            self.wm_forward_backward_stacked(self.config.learning_rate * self.encoder_lr_scale);
         self.last_wm_loss = wm_loss;
 
         // Read stacked z_t output [N, latent_dim].
@@ -613,8 +612,7 @@ impl Agent {
             if tj.env_boundary || ti.env_id != tj.env_id {
                 continue;
             }
-            let obs_row =
-                &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
+            let obs_row = &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
             obs_row.copy_from_slice(&ti.observation);
             let act_row =
                 &mut self.action_token_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
@@ -630,9 +628,8 @@ impl Agent {
             }
         }
 
-        let loss = self.wm_forward_backward_stacked(
-            self.config.learning_rate * self.encoder_lr_scale * 0.5,
-        );
+        let loss = self
+            .wm_forward_backward_stacked(self.config.learning_rate * self.encoder_lr_scale * 0.5);
         self.last_replay_loss = loss;
     }
 
@@ -766,13 +763,12 @@ impl Agent {
                     }
                 })
                 .collect();
-            let target = if let Some((hi, lo)) =
-                lane.buffer.find_contrastive_pair(rng, h, latent_dim)
-            {
-                lane.buffer.contrastive_target(hi, lo, h)
-            } else {
-                vec![1.0 / h as f32; h]
-            };
+            let target =
+                if let Some((hi, lo)) = lane.buffer.find_contrastive_pair(rng, h, latent_dim) {
+                    lane.buffer.contrastive_target(hi, lo, h)
+                } else {
+                    vec![1.0 / h as f32; h]
+                };
             let target_clean: Vec<f32> = target
                 .iter()
                 .map(|v| if v.is_finite() { *v } else { 1.0 / h as f32 })

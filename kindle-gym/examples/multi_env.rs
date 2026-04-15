@@ -135,9 +135,7 @@ fn main() {
         }
 
         let obs = envs.observe(which);
-        let action = agent
-            .act(std::slice::from_ref(&obs), &mut rng)
-            .remove(0);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         envs.step(which, &action);
         let env_ref: &dyn Environment = envs.env(which);
         agent.observe(
