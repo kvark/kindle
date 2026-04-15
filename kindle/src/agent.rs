@@ -169,6 +169,11 @@ pub struct Agent {
     z_target_scratch: Vec<f32>,
     task_scratch: Vec<f32>,
     value_target_scratch: Vec<f32>,
+    /// Runtime ones-inputs fed to the policy graph's `mean_tee_ones` /
+    /// `value_tee_ones` ports. See the comment in
+    /// `policy::build_continuous_policy_graph` for why we need these.
+    policy_mean_tee_ones: Vec<f32>,
+    policy_value_tee_ones: Vec<f32>,
 }
 
 /// Xavier (Glorot uniform) initialization.
@@ -210,21 +215,6 @@ impl Agent {
             adapters.len(),
             config.batch_size
         );
-        if config.batch_size > 1 {
-            // See the `set_outputs` site in the WM graph for the full
-            // explanation. Short version: the encoder's RmsNorm backward
-            // aliases with the `z_t` output buffer, so lanes 1..N read
-            // back NaN in `z_t`, which poisons `z_target` next step. The
-            // API is fully wired; training at N > 1 is blocked on an
-            // upstream meganeura fix.
-            log::warn!(
-                "Agent::new: batch_size={} but multi-lane training is \
-                 currently blocked by a meganeura output-aliasing issue. \
-                 Lanes ≥ 1 will produce NaN z_t. Running at N = 1 is the \
-                 validated path.",
-                config.batch_size
-            );
-        }
         // --- World model graph (uses universal token sizes + task) ---
         //
         // The task embedding is fed as a graph **input** named "task".
@@ -258,25 +248,12 @@ impl Agent {
             let z_hat = wm.forward(&mut g, z_t, action);
             let loss = WorldModel::loss(&mut g, z_hat, z_target);
 
-            // Note: we only expose `loss` and `z_t` as outputs.
-            // `z_hat` is intentionally NOT an output — meganeura reuses
-            // the intermediate buffer of any internal node that's also
-            // exposed as an output for backward-pass scratch, which gives
-            // back garbage on read. We only need z_t (for the buffer's
-            // latent column); surprise is recovered from `sqrt(wm_loss
-            // * latent_dim)` instead of `||z_t - z_hat||`.
-            //
-            // KNOWN ISSUE (Phase E.v1): The same meganeura aliasing
-            // happens to rows ≥ 1 of `z_t` when `batch_size > 1` — the
-            // encoder's RmsNorm backward scratch overwrites rows of the
-            // `z_t` output buffer. At N = 1 only row 0 exists and the
-            // luck holds. At N > 1 lanes 1..N receive NaN in `z_t`,
-            // which poisons z_target on the next step. Fix requires
-            // either an upstream meganeura buffer-alloc fix or a
-            // kindle-side graph change (swap RmsNorm for LayerNorm, or
-            // add a dedicated encoder-only inference session with
-            // shared params). Tracked separately; Phase E ships with
-            // the API wired end-to-end and N = 1 as the validated path.
+            // We expose `loss` and `z_t` as outputs; `z_hat` stays
+            // internal because surprise is recovered on the CPU as
+            // `sqrt(latent_dim · wm_loss)`, so we don't need to read
+            // it back. `z_t` is the encoder output that feeds every
+            // downstream CPU primitive (novelty grid, policy `z` input,
+            // credit history, drift probe).
             g.set_outputs(vec![loss, z_t]);
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
@@ -375,6 +352,8 @@ impl Agent {
             z_target_scratch: vec![0.0; n * config.latent_dim],
             task_scratch: vec![0.0; n * TASK_DIM],
             value_target_scratch: vec![0.0; n],
+            policy_mean_tee_ones: vec![1.0; n * MAX_ACTION_DIM],
+            policy_value_tee_ones: vec![1.0; n],
             config,
         }
     }
@@ -451,6 +430,10 @@ impl Agent {
         self.value_target_scratch.fill(0.0);
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
+        self.policy_session
+            .set_input("mean_tee_ones", &self.policy_mean_tee_ones);
+        self.policy_session
+            .set_input("value_tee_ones", &self.policy_value_tee_ones);
         self.policy_session.set_learning_rate(0.0);
         self.policy_session.step();
         self.policy_session.wait();
@@ -871,6 +854,10 @@ impl Agent {
             .set_input("action", &self.action_token_scratch);
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
+        self.policy_session
+            .set_input("mean_tee_ones", &self.policy_mean_tee_ones);
+        self.policy_session
+            .set_input("value_tee_ones", &self.policy_value_tee_ones);
         self.policy_session
             .set_learning_rate(self.config.lr_policy * lr_scale);
         self.policy_session.step();
