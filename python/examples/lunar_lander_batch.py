@@ -18,24 +18,61 @@ import sys
 import time
 
 
-def lunar_lander_homeo(obs):
-    """Same homeostatic-target shape as the single-lane example.
+# Fuel cost per gymnasium action:
+#   0 = noop, 1 = left thruster, 2 = main engine, 3 = right thruster
+# Values mirror the rough gymnasium internal shaping: main engine burns
+# ~10× more propellant than the side thrusters.
+_FUEL_COST = {0: 0.0, 1: 0.03, 2: 0.3, 3: 0.03}
 
-    Note: `obs` here is the *raw* gymnasium observation, not the
-    normalized vector we feed the agent. The physical interpretation
-    (altitude, vy, speed) lives in raw-space.
+
+def lunar_lander_homeo(obs, action):
+    """Homeostatic targets for "land safely, anywhere".
+
+    We deliberately *don't* reward reaching the landing pad — no
+    target on `x` position, no target on altitude going to zero in
+    isolation. The agent is pushed to:
+
+      * not crash (severe penalty for falling fast near the ground),
+      * not tilt at touchdown,
+      * not slam sideways at touchdown,
+      * conserve fuel,
+      * eventually get at least one leg on the ground and stay there.
+
+    Together those should incentivize the policy to decelerate and
+    settle onto any terrain rather than fuel-up toward the pad.
+
+    `obs` is the raw gymnasium observation (not normalized). `action`
+    is the discrete gymnasium action index (so we can charge fuel).
     """
     altitude = float(obs[1])
+    vx = float(obs[2])
     vy = float(obs[3])
-    speed = math.sqrt(obs[2] * obs[2] + obs[3] * obs[3])
-    descent = max(0.0, -vy)
+    angle = float(obs[4])
+    speed = math.sqrt(vx * vx + vy * vy)
+    leg1 = float(obs[6])
+    leg2 = float(obs[7])
+
+    # Smooth proximity-to-ground weight: ~1 at the surface, decays aloft.
     proximity = math.exp(-max(0.0, altitude) * 2.0)
+    # Downward speed only — upward motion isn't a crash risk.
+    descent = max(0.0, -vy)
     crash_risk = descent * proximity
+
+    fuel = _FUEL_COST.get(int(action), 0.0)
+    not_landed = 1.0 - max(leg1, leg2)  # 1 airborne, 0 when a leg touches
+
     return [
+        # Severe: any crash risk triggers a large penalty immediately.
         {"value": crash_risk * 10.0, "target": 0.0, "tolerance": 0.0},
-        {"value": float(obs[4]), "target": 0.0, "tolerance": 0.1},
-        {"value": altitude, "target": 0.0, "tolerance": 0.2},
-        {"value": float(speed), "target": 0.0, "tolerance": 0.3},
+        # Don't tilt when close to the ground.
+        {"value": abs(angle) * proximity, "target": 0.0, "tolerance": 0.05},
+        # Don't arrive fast when close to the ground.
+        {"value": speed * proximity, "target": 0.0, "tolerance": 0.1},
+        # Each engine firing costs fuel.
+        {"value": fuel, "target": 0.0, "tolerance": 0.0},
+        # Airborne → penalty; feet-on-ground → zero. Encourages landing
+        # but is location-agnostic (any terrain counts).
+        {"value": not_landed, "target": 0.0, "tolerance": 0.5},
     ]
 
 
@@ -106,6 +143,12 @@ def main() -> int:
 
     ep_returns: list[list[float]] = [[] for _ in range(args.lanes)]
     cur_returns: list[float] = [0.0 for _ in range(args.lanes)]
+    # Per-episode outcome tagged from the final transition:
+    #   "soft"  — both legs touching and low speed at termination (safe
+    #             landing, anywhere on the terrain)
+    #   "crash" — terminated with high speed or no legs down
+    #   "timeout" — truncated without landing
+    ep_outcomes: list[list[str]] = [[] for _ in range(args.lanes)]
     total_episodes = 0
     t0 = time.time()
 
@@ -116,6 +159,7 @@ def main() -> int:
         raw_next: list[list[float]] = []
         next_lists: list[list[float]] = []
         dones: list[bool] = []
+        terms: list[bool] = []
         for i, env in enumerate(envs):
             next_obs, reward, terminated, truncated, _ = env.step(int(actions[i]))
             raw = [float(x) for x in next_obs]
@@ -124,14 +168,29 @@ def main() -> int:
             raw_next.append(raw)
             next_lists.append(normalize_obs(raw))
             dones.append(done)
+            terms.append(bool(terminated))
 
         # Homeostatic signals use raw-space interpretations (altitude, vy, ...).
-        homeos = [lunar_lander_homeo(raw) for raw in raw_next]
+        # Pass the action so the fuel-cost term can charge the right amount.
+        homeos = [
+            lunar_lander_homeo(raw_next[i], actions[i]) for i in range(args.lanes)
+        ]
         agent.observe(next_lists, actions, homeostatic=homeos)
 
         # Per-lane episode reset + boundary marking.
         for i, done in enumerate(dones):
             if done:
+                # Classify terminal state from the final observation.
+                leg1, leg2 = raw_next[i][6], raw_next[i][7]
+                vx, vy = raw_next[i][2], raw_next[i][3]
+                term_speed = math.sqrt(vx * vx + vy * vy)
+                if terms[i] and leg1 > 0 and leg2 > 0 and term_speed < 0.25:
+                    outcome = "soft"
+                elif terms[i]:
+                    outcome = "crash"
+                else:
+                    outcome = "timeout"
+                ep_outcomes[i].append(outcome)
                 ep_returns[i].append(cur_returns[i])
                 total_episodes += 1
                 cur_returns[i] = 0.0
@@ -177,17 +236,33 @@ def main() -> int:
     for env in envs:
         env.close()
 
-    # Final per-lane summary.
+    # Final per-lane summary. The metric that matters for "land safely,
+    # anywhere" is `soft`: episodes that terminated with both legs touching
+    # and low terminal speed. Crash = terminated fast / with no legs;
+    # timeout = episode ran out of steps without resolving either way.
     print("\n--- per-lane episode returns ---")
+    total_soft = 0
+    total_crash = 0
     for i, lane in enumerate(ep_returns):
         if lane:
+            outcomes = ep_outcomes[i]
+            soft = outcomes.count("soft")
+            crash = outcomes.count("crash")
+            timeout = outcomes.count("timeout")
+            total_soft += soft
+            total_crash += crash
             print(
                 f"  lane {i}: episodes={len(lane):>3} "
-                f"mean={sum(lane) / len(lane):+7.1f} "
-                f"best={max(lane):+7.1f} worst={min(lane):+7.1f}"
+                f"soft={soft:>2} crash={crash:>2} timeout={timeout:>2} | "
+                f"mean_ret={sum(lane) / len(lane):+7.1f} "
+                f"best={max(lane):+7.1f}"
             )
         else:
             print(f"  lane {i}: no completed episodes")
+    print(
+        f"\nTotals: {total_soft} soft landings (anywhere), "
+        f"{total_crash} crashes, {total_episodes} episodes"
+    )
 
     diags = agent.diagnostics()
     print("\n--- final diagnostics ---")

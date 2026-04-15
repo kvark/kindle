@@ -130,24 +130,7 @@ pub fn build_continuous_policy_graph(
     let value_loss = g.mse_loss(value, value_target);
     let total_loss = g.add(policy_loss, value_loss);
 
-    // Tee both heads through a runtime-fed ones-input (`mean_tee_ones`,
-    // `value_tee_ones`) before exposing them as outputs.
-    //
-    // WHY: meganeura's forward-optimize pass fuses
-    // `mse_loss(matmul(h, W), target)` into a single `FusedMatMulMSE` node
-    // and Nops the original matmul. That matmul *is* `mean` (and likewise
-    // `value`), so without the tee both heads disappear from the graph
-    // outputs during toposort — `num_outputs()` drops from 3 to 1 and
-    // `act()` can't read them back. Giving each head a second consumer
-    // that can't be folded (an opaque runtime `Input`, not a constant
-    // ones tensor) forces the optimizer to preserve the node. Fed
-    // `1.0`s every step by the agent.
-    let mean_tee_ones = g.input("mean_tee_ones", &[batch_size, action_dim]);
-    let mean_out = g.mul(mean, mean_tee_ones);
-    let value_tee_ones = g.input("value_tee_ones", &[batch_size, 1]);
-    let value_out = g.mul(value, value_tee_ones);
-
-    g.set_outputs(vec![total_loss, mean_out, value_out]);
+    g.set_outputs(vec![total_loss, mean, value]);
     g
 }
 
