@@ -9,7 +9,7 @@ description = "A continually self-training RL agent that starts from a cold netw
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "321230972785c58e02b2090c4c85e6b2b9c66531" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "7c3bdcfbddb9925785e7feb0bbd41aae393fecda" }
 rand = "0.9"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
