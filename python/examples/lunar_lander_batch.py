@@ -288,12 +288,23 @@ def main() -> int:
             ent = _mean("policy_entropy")
             elapsed = time.time() - t0
             sps = (step * args.lanes) / max(1e-3, elapsed)
+            # L1 diagnostics: option distribution + goal distance.
+            opt_counts: dict[int, int] = {}
+            gdist = 0.0
+            for d in diags:
+                o = int(_safe(d.get("current_option", 0), 0))
+                opt_counts[o] = opt_counts.get(o, 0) + 1
+                gdist += _safe(d.get("goal_distance", 0.0), 0.0)
+            gdist /= max(1, args.lanes)
+            opt_str = "/".join(str(opt_counts.get(i, 0)) for i in range(max(opt_counts.keys()) + 1)) if opt_counts else "-"
+
             print(
                 f"step={step:>5} eps={total_episodes:>3} "
                 f"avg_ret={avg_return:+7.1f} | "
                 f"wm={wm:.3f} pi={pi:.3f} "
                 f"r={rew:+6.3f} surp={sup:+5.2f} homeo={hom:+6.2f} "
-                f"ent={ent:.2f} | {sps:5.1f} env-steps/s"
+                f"ent={ent:.2f} opts={opt_str} gdist={gdist:.2f} "
+                f"| {sps:5.1f} env-steps/s"
             )
 
     for env in envs:

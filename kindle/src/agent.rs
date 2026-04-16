@@ -155,6 +155,12 @@ pub struct Diagnostics {
     pub policy_entropy: f32,
     pub repr_drift: f32,
     pub buffer_len: usize,
+    /// L1: which option this lane is currently executing.
+    pub current_option: u32,
+    /// L1: accumulated return for the current option so far.
+    pub option_return: f32,
+    /// L1: ‖z_t − goal‖ — how close the lane's latent is to its goal.
+    pub goal_distance: f32,
 }
 
 /// Per-lane state. One per concurrent batch slot. Every slot owns its own
@@ -1205,45 +1211,24 @@ impl Agent {
             self.value_target_scratch[i] = lane.last_reward;
         }
 
-        // Build per-row advantage-weighted action targets with advantage
-        // normalization + label smoothing.
+        // Build per-row advantage-weighted action targets.
         //
-        // Standard advantage normalization: shift to zero-mean, scale to
-        // unit-variance across the batch. This guarantees roughly half the
-        // lanes push "toward" and half push "away from" the sampled action
-        // on every dispatch — preventing the all-positive-advantage spiral
-        // that collapses the softmax when the value head is miscalibrated.
-        // Standard PPO/A2C practice.
-        let mut raw_advantages = Vec::with_capacity(self.lanes.len());
-        for lane in &self.lanes {
-            if lane.last_entropy < self.config.entropy_floor {
-                raw_advantages.push(f32::NAN); // gated out
-            } else {
-                raw_advantages.push(lane.last_reward - lane.last_value);
-            }
-        }
-        let valid: Vec<f32> = raw_advantages
-            .iter()
-            .copied()
-            .filter(|a| a.is_finite())
-            .collect();
-        if valid.is_empty() {
-            return;
-        }
-        let adv_mean = valid.iter().sum::<f32>() / valid.len() as f32;
-        let adv_var =
-            valid.iter().map(|a| (a - adv_mean).powi(2)).sum::<f32>() / valid.len() as f32;
-        let adv_std = adv_var.sqrt().max(1e-6);
-
+        // Raw clamped advantages (not normalized). Normalization was
+        // tested and made L0 worse at N=64: compressing all advantages
+        // to similar magnitudes removes the signal diversity that lets
+        // the cross-entropy gradient find a good local optimum. The
+        // 462-landing best (commit 18d422f) used raw clamped advantages;
+        // re-introducing normalization later caused L0-42 to degrade
+        // from −131 to −849.
         self.policy_action_scratch.fill(0.0);
         let mut any_active = false;
         let eps = self.config.label_smoothing;
         let k = MAX_ACTION_DIM as f32;
-        for (i, &raw_adv) in raw_advantages.iter().enumerate() {
-            if !raw_adv.is_finite() {
-                continue; // entropy-gated
+        for (i, lane) in self.lanes.iter().enumerate() {
+            if lane.last_entropy < self.config.entropy_floor {
+                continue;
             }
-            let advantage = ((raw_adv - adv_mean) / adv_std).clamp(-1.0, 1.0);
+            let advantage = (lane.last_reward - lane.last_value).clamp(-1.0, 1.0);
             if advantage.abs() < 1e-8 {
                 continue;
             }
@@ -1308,6 +1293,22 @@ impl Agent {
                     credit::effective_scope(&credit_weights)
                 };
 
+                // L1 goal distance: ‖last_latent − goal‖.
+                let goal_distance = if self.option_session.is_some() {
+                    if let Some(prev) = lane.buffer.last() {
+                        prev.latent
+                            .iter()
+                            .zip(lane.option_goal.iter())
+                            .map(|(a, b)| (a - b).powi(2))
+                            .sum::<f32>()
+                            .sqrt()
+                    } else {
+                        0.0
+                    }
+                } else {
+                    0.0
+                };
+
                 Diagnostics {
                     step: self.step_count,
                     env_id: lane.adapter.id(),
@@ -1324,6 +1325,9 @@ impl Agent {
                     policy_entropy: lane.last_entropy,
                     repr_drift: self.last_drift,
                     buffer_len: lane.buffer.len(),
+                    current_option: lane.current_option,
+                    option_return: lane.option_return,
+                    goal_distance,
                 }
             })
             .collect()
