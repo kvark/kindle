@@ -138,7 +138,7 @@ impl Default for AgentConfig {
             option_horizon: 10,
             lr_option: 2.5e-4,
             goal_bonus_alpha: 0.1,
-            gamma: 0.95,
+            gamma: 0.0,
             opt_level: OptLevel::Full,
         }
     }

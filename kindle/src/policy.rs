@@ -97,8 +97,11 @@ pub fn build_policy_graph(
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let value = value_head.forward(&mut g, z);
 
-    // Policy loss: cross-entropy with one-hot action selects -log π(a|s)
-    let policy_loss = g.cross_entropy_loss(logits, action);
+    // Policy loss: cross-entropy with one-hot action selects -log π(a|s).
+    // meganeura's cross_entropy_loss returns per-row losses [batch]; reduce
+    // to scalar so it's compatible with the scalar value MSE loss.
+    let policy_loss_raw = g.cross_entropy_loss(logits, action);
+    let policy_loss = g.mean_all(policy_loss_raw);
     let value_loss = g.mse_loss(value, value_target);
     let base_loss = g.add(policy_loss, value_loss);
 
