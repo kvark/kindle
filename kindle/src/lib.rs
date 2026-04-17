@@ -5,7 +5,8 @@
     clippy::new_without_default,
     clippy::single_match,
     clippy::too_many_arguments,
-    clippy::collapsible_if
+    clippy::collapsible_if,
+    clippy::collapsible_match
 )]
 #![warn(
     trivial_numeric_casts,
