@@ -265,6 +265,10 @@ pub struct Agent {
     /// L1 scratch buffers.
     option_taken_scratch: Vec<f32>,
     option_return_scratch: Vec<f32>,
+    /// Fixed goal lookup table [num_options × option_dim]. Each option
+    /// maps to a pre-set orthogonal direction in latent space. L1 learns
+    /// which option to pick; the goal vectors themselves are constants.
+    goal_table: Vec<f32>,
 }
 
 /// Xavier (Glorot uniform) initialization.
@@ -451,28 +455,11 @@ impl Agent {
             let g = option::build_option_graph(
                 config.latent_dim,
                 config.num_options,
-                option_dim,
                 config.hidden_dim,
                 config.batch_size,
             );
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
-            // Override the goal decoder weights so each option starts with
-            // an orthogonal goal-latent. Without this, all options decode
-            // to similar random vectors and L0 can't distinguish them.
-            // We set option_i's goal to a one-hot-like pattern in the first
-            // min(num_options, option_dim) dims, scaled by 0.5.
-            let goal_size = config.num_options * option_dim;
-            let mut goal_weights = vec![0.0f32; config.hidden_dim * goal_size];
-            for o in 0..config.num_options.min(option_dim) {
-                // For the first hidden unit, set the weight to option_o's
-                // o-th goal dim. This is a crude init — the output of
-                // Linear(hidden, goal_size) after relu'd hidden will be
-                // biased toward orthogonal goals.
-                let col = o * option_dim + o; // goal_flat index for option o, dim o
-                goal_weights[col] = 0.5; // row 0 of the weight matrix
-            }
-            s.set_parameter("option.goal_dec.weight", &goal_weights);
             Some(s)
         } else {
             None
@@ -547,6 +534,7 @@ impl Agent {
             z_concat_scratch: vec![0.0; n * z_dim],
             option_taken_scratch: vec![0.0; n * config.num_options],
             option_return_scratch: vec![0.0; n],
+            goal_table: option::build_goal_table(config.num_options, option_dim),
             config,
         }
     }
@@ -677,21 +665,17 @@ impl Agent {
                 opt_sess.step();
                 opt_sess.wait();
 
-                // Read logits + value + goal latents.
+                // Read logits + value (goals come from the fixed table).
                 let mut logits = vec![0.0f32; n * num_options];
                 opt_sess.read_output_by_index(1, &mut logits);
                 let mut values = vec![0.0f32; n];
                 opt_sess.read_output_by_index(2, &mut values);
-                let goal_total = n * num_options * od;
-                let mut goals_flat = vec![0.0f32; goal_total];
-                opt_sess.read_output_by_index(3, &mut goals_flat);
 
-                // For each lane needing a new option: sample + decode goal.
+                // For each lane needing a new option: sample + look up goal.
                 for (i, lane) in self.lanes.iter_mut().enumerate() {
                     if lane.option_steps_left != 0 {
                         continue;
                     }
-                    // Categorical sample from option logits.
                     let row = &logits[i * num_options..(i + 1) * num_options];
                     let opt_idx = crate::adapter::sample_discrete_from_logits(row, rng);
                     lane.current_option = opt_idx as u32;
@@ -699,10 +683,10 @@ impl Agent {
                     lane.option_steps_left = horizon;
                     lane.option_return = 0.0;
 
-                    // Decode goal-latent for the selected option.
-                    let base = i * num_options * od + opt_idx * od;
+                    // Fixed goal from the lookup table.
+                    let base = opt_idx * od;
                     lane.option_goal
-                        .copy_from_slice(&goals_flat[base..base + od]);
+                        .copy_from_slice(&self.goal_table[base..base + od]);
                 }
             }
 
