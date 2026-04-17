@@ -103,6 +103,12 @@ pub struct AgentConfig {
     /// self-supervised signal to drive the latent toward the option's goal
     /// regardless of the frozen reward circuit's output. `α = 0` disables.
     pub goal_bonus_alpha: f32,
+    /// Discount factor for TD(0) bootstrapping. The value head target
+    /// becomes `r_t + γ · V(s')` instead of just `r_t`, and the policy
+    /// advantage becomes `r_t + γ · V(s') − V(s)`. This lets the agent
+    /// credit actions for consequences that arrive steps later.
+    /// `0.0` reverts to the pre-TD immediate-reward baseline.
+    pub gamma: f32,
     pub opt_level: OptLevel,
 }
 
@@ -132,6 +138,7 @@ impl Default for AgentConfig {
             option_horizon: 10,
             lr_option: 2.5e-4,
             goal_bonus_alpha: 0.1,
+            gamma: 0.95,
             opt_level: OptLevel::Full,
         }
     }
@@ -265,6 +272,8 @@ pub struct Agent {
     /// L1 scratch buffers.
     option_taken_scratch: Vec<f32>,
     option_return_scratch: Vec<f32>,
+    /// Scratch for TD(0) bootstrap values, length N.
+    v_bootstrap_scratch: Vec<f32>,
     /// Fixed goal lookup table [num_options × option_dim]. Each option
     /// maps to a pre-set orthogonal direction in latent space. L1 learns
     /// which option to pick; the goal vectors themselves are constants.
@@ -532,6 +541,7 @@ impl Agent {
             policy_action_scratch: vec![0.0; n * MAX_ACTION_DIM],
             option_dim,
             z_concat_scratch: vec![0.0; n * z_dim],
+            v_bootstrap_scratch: vec![0.0; n],
             option_taken_scratch: vec![0.0; n * config.num_options],
             option_return_scratch: vec![0.0; n],
             goal_table: option::build_goal_table(config.num_options, option_dim),
@@ -1190,20 +1200,66 @@ impl Agent {
     /// and the continuous MSE graph uniformly (both use `"action"` as
     /// their target).
     fn policy_step_batched(&mut self, z_stack: &[f32]) {
-        // Build stacked value targets (the rewards computed this step).
-        for (i, lane) in self.lanes.iter().enumerate() {
-            self.value_target_scratch[i] = lane.last_reward;
+        let n = self.lanes.len();
+        let gamma = self.config.gamma;
+
+        // --- Stage z input (shared by both passes) ---
+        if self.option_session.is_some() {
+            let ld = self.latent_dim;
+            let od = self.option_dim;
+            for (i, lane) in self.lanes.iter().enumerate() {
+                let row = &mut self.z_concat_scratch[i * (ld + od)..(i + 1) * (ld + od)];
+                row[..ld].copy_from_slice(&z_stack[i * ld..(i + 1) * ld]);
+                row[ld..].copy_from_slice(&lane.option_goal);
+            }
+            self.policy_session.set_input("z", &self.z_concat_scratch);
+        } else {
+            self.policy_session.set_input("z", z_stack);
         }
 
-        // Build per-row advantage-weighted action targets.
+        // --- TD(0) bootstrap: forward-only pass to get V(s') ---
         //
-        // Raw clamped advantages (not normalized). Normalization was
-        // tested and made L0 worse at N=64: compressing all advantages
-        // to similar magnitudes removes the signal diversity that lets
-        // the cross-entropy gradient find a good local optimum. The
-        // 462-landing best (commit 18d422f) used raw clamped advantages;
-        // re-introducing normalization later caused L0-42 to degrade
-        // from −131 to −849.
+        // z_stack contains the NEW latent z_t (produced by the WM this
+        // step). V(z_t) is the bootstrap value for the TD target:
+        //   value_target = r_t + γ · V(z_t)
+        //   advantage    = value_target − V(z_{t−1})
+        // where V(z_{t−1}) = lane.last_value was cached by the most
+        // recent act() call.
+        //
+        // The forward pass uses lr=0 so weights are untouched; we only
+        // need the value head output. Semi-gradient: V(z_t) is treated
+        // as a constant target (no gradient flows through it).
+        if gamma > 0.0 {
+            self.policy_action_scratch.fill(0.0);
+            self.policy_session
+                .set_input("action", &self.policy_action_scratch);
+            self.value_target_scratch.fill(0.0);
+            self.policy_session
+                .set_input("value_target", &self.value_target_scratch);
+            self.policy_session.set_learning_rate(0.0);
+            self.policy_session.step();
+            self.policy_session.wait();
+            self.policy_session
+                .read_output_by_index(2, &mut self.v_bootstrap_scratch[..n]);
+        } else {
+            self.v_bootstrap_scratch[..n].fill(0.0);
+        }
+
+        // --- Build TD value targets ---
+        for (i, lane) in self.lanes.iter().enumerate() {
+            let v_next = if self.v_bootstrap_scratch[i].is_finite() {
+                self.v_bootstrap_scratch[i]
+            } else {
+                0.0
+            };
+            let td_target = lane.last_reward + gamma * v_next;
+            self.value_target_scratch[i] = td_target;
+        }
+
+        // --- Build per-row advantage-weighted action targets ---
+        //
+        // TD advantage: r_t + γ·V(s') − V(s). Raw clamped (not
+        // normalized — normalization was tested and hurt at N=64).
         self.policy_action_scratch.fill(0.0);
         let mut any_active = false;
         let eps = self.config.label_smoothing;
@@ -1212,7 +1268,7 @@ impl Agent {
             if lane.last_entropy < self.config.entropy_floor {
                 continue;
             }
-            let advantage = (lane.last_reward - lane.last_value).clamp(-1.0, 1.0);
+            let advantage = (self.value_target_scratch[i] - lane.last_value).clamp(-1.0, 1.0);
             if advantage.abs() < 1e-8 {
                 continue;
             }
@@ -1229,20 +1285,7 @@ impl Agent {
             return;
         }
 
-        // When L1 is active, feed z_concat = [z, goal] to the widened
-        // policy graph. Otherwise feed z directly.
-        if self.option_session.is_some() {
-            let ld = self.latent_dim;
-            let od = self.option_dim;
-            for (i, lane) in self.lanes.iter().enumerate() {
-                let row = &mut self.z_concat_scratch[i * (ld + od)..(i + 1) * (ld + od)];
-                row[..ld].copy_from_slice(&z_stack[i * ld..(i + 1) * ld]);
-                row[ld..].copy_from_slice(&lane.option_goal);
-            }
-            self.policy_session.set_input("z", &self.z_concat_scratch);
-        } else {
-            self.policy_session.set_input("z", z_stack);
-        }
+        // --- Training pass ---
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
         self.policy_session
