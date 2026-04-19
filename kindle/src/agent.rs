@@ -48,6 +48,24 @@ use meganeura::Session;
 use meganeura::graph::Graph;
 use rand::Rng;
 
+/// What target the M6 outcome-value head trains against at
+/// episode completion. See `AgentConfig::outcome_target`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OutcomeTarget {
+    /// Train `R̂` against the centered *sum* of per-step `r_base`
+    /// over the just-ended episode. The original design; empirically
+    /// converges on an episode-length correlate in the LunarLander
+    /// regime because soft/crash returns are near-identical.
+    EpisodeSum,
+    /// Train `R̂` against the *last step's* `r_base` before episode
+    /// boundary. Gives the head a target that depends on terminal
+    /// state quality (e.g. a soft-landing terminal has
+    /// near-zero homeo; a crash terminal has a large negative
+    /// homeo spike), provided the reward circuit's terminal profile
+    /// differentiates between outcomes.
+    TerminalReward,
+}
+
 /// Agent configuration.
 #[derive(Clone, Debug)]
 pub struct AgentConfig {
@@ -167,6 +185,18 @@ pub struct AgentConfig {
     /// baseline, higher variance reduction but slower drift. Default
     /// `0.05`.
     pub outcome_baseline_ema: f32,
+    /// M6: what target the outcome head trains against on episode
+    /// completion. The M6 mechanism check (2026-04-19) showed that
+    /// `EpisodeSum` — the original design — inherits the silence of
+    /// kindle's four primitives on event-ordering: soft and crash
+    /// LunarLander episodes produce nearly-identical cumulative
+    /// returns, so the head learns an episode-length correlate
+    /// instead of a quality signal. `TerminalReward` trains R̂ on
+    /// just the *last* step's `r_base` instead, a different self-
+    /// observable that can (and does, for v5 shaping) differ
+    /// strongly between soft and crash if the reward circuit's
+    /// terminal homeo profile already differs.
+    pub outcome_target: OutcomeTarget,
     /// M6: symmetric clamp applied to the raw outcome-head output
     /// before multiplication by `α`. Caps the worst-case per-step
     /// bonus at `α · outcome_clamp`. Default `5.0`; raise alongside
@@ -231,6 +261,7 @@ impl Default for AgentConfig {
             outcome_reward_alpha: 0.0,
             lr_outcome: None,
             outcome_baseline_ema: 0.05,
+            outcome_target: OutcomeTarget::EpisodeSum,
             outcome_clamp: 5.0,
             outcome_max_episode_len: 256,
             goal_ema_rate: 0.02,
@@ -506,6 +537,11 @@ struct Lane {
     outcome_ep_trajectory: Vec<Vec<f32>>,
     /// Running sum of `r_base` over the current episode.
     outcome_ep_return: f32,
+    /// Single-step `r_base` of the just-finished step. Becomes the
+    /// previous episode's terminal reward when the *next* step
+    /// carries `env_boundary=true`. Used by
+    /// `OutcomeTarget::TerminalReward`.
+    outcome_last_step_reward: f32,
     /// EMA of completed-episode returns for variance reduction.
     outcome_baseline: f32,
     /// Last `R̂(z_t)` forward read; used for the per-step reward bonus
@@ -890,6 +926,7 @@ impl Agent {
                 last_base_reward: 0.0,
                 outcome_ep_trajectory: Vec::new(),
                 outcome_ep_return: 0.0,
+                outcome_last_step_reward: 0.0,
                 outcome_baseline: 0.0,
                 last_r_hat: 0.0,
                 outcome_baseline_seeded: false,
@@ -1348,6 +1385,7 @@ impl Agent {
         let m6_ema = self.config.outcome_baseline_ema;
         let m6_clamp = self.config.outcome_clamp.max(0.0);
         let m6_max_ep = self.config.outcome_max_episode_len;
+        let m6_target = self.config.outcome_target;
         let mut m6_head = self.outcome_head.take();
         let mut m6_baseline_diag = self.last_outcome_baseline;
         for (i, lane) in self.lanes.iter_mut().enumerate() {
@@ -1387,25 +1425,30 @@ impl Agent {
             lane.pending_boundary = false;
 
             // M6 episode-boundary training: when this step is the first
-            // after a reset, the PREVIOUS episode's trajectory + return
-            // are complete and ready to train the outcome head on. We do
-            // this BEFORE the per-step M6 forward so the bonus uses the
-            // just-updated head (marginally better signal).
+            // after a reset, the PREVIOUS episode's trajectory and
+            // summary stats are complete and ready to train the outcome
+            // head. We do this BEFORE the per-step M6 forward so the
+            // bonus uses the just-updated head (marginally better
+            // signal).
             if env_boundary {
                 if let Some(head) = m6_head.as_mut() {
                     if !lane.outcome_ep_trajectory.is_empty() {
-                        let r_ep = lane.outcome_ep_return;
+                        let target_raw = match m6_target {
+                            OutcomeTarget::EpisodeSum => lane.outcome_ep_return,
+                            OutcomeTarget::TerminalReward => lane.outcome_last_step_reward,
+                        };
                         // First episode: seed the baseline rather than
                         // centering against 0 (which would overshoot).
                         if !lane.outcome_baseline_seeded {
-                            lane.outcome_baseline = r_ep;
+                            lane.outcome_baseline = target_raw;
                             lane.outcome_baseline_seeded = true;
                         }
-                        let centered = r_ep - lane.outcome_baseline;
+                        let centered = target_raw - lane.outcome_baseline;
                         head.train_batch(&lane.outcome_ep_trajectory, centered);
-                        // EMA-update the baseline with this episode's return.
+                        // EMA-update the baseline with this episode's
+                        // raw target for the *next* centering.
                         lane.outcome_baseline =
-                            (1.0 - m6_ema) * lane.outcome_baseline + m6_ema * r_ep;
+                            (1.0 - m6_ema) * lane.outcome_baseline + m6_ema * target_raw;
                         m6_baseline_diag = lane.outcome_baseline;
                     }
                 }
@@ -1433,9 +1476,12 @@ impl Agent {
                 lane.outcome_ep_trajectory.push(z_row.to_vec());
             }
             // Accumulate pre-M6 reward into the episode return — the
-            // outcome head trains on this so it can't chase its own
-            // output (stability guarantee from the design doc).
+            // outcome head trains on this (or on the single-step value
+            // when `outcome_target == TerminalReward`, read from
+            // `outcome_last_step_reward` below) so it can't chase its
+            // own output (stability guarantee from the design doc).
             lane.outcome_ep_return += reward_pre_m6;
+            lane.outcome_last_step_reward = reward_pre_m6;
 
             let reward = reward_pre_m6 + m6_bonus;
 

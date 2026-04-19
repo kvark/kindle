@@ -16,7 +16,7 @@ use kindle::adapter::{GenericAdapter, OBS_TOKEN_DIM};
 use kindle::env::{
     Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
 };
-use kindle::{Agent, AgentConfig};
+use kindle::{Agent, AgentConfig, agent::OutcomeTarget};
 use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyTuple};
@@ -417,6 +417,7 @@ impl PyBatchAgent {
         lr_outcome = None,
         outcome_baseline_ema = None,
         outcome_clamp = None,
+        outcome_target = None,
         outcome_max_episode_len = None,
     ))]
     #[allow(clippy::too_many_arguments)]
@@ -444,6 +445,7 @@ impl PyBatchAgent {
         lr_outcome: Option<f32>,
         outcome_baseline_ema: Option<f32>,
         outcome_clamp: Option<f32>,
+        outcome_target: Option<String>,
         outcome_max_episode_len: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
@@ -542,6 +544,19 @@ impl PyBatchAgent {
         }
         if let Some(c) = outcome_clamp {
             config.outcome_clamp = c;
+        }
+        if let Some(t) = outcome_target {
+            config.outcome_target = match t.as_str() {
+                "episode_sum" | "episode-sum" => OutcomeTarget::EpisodeSum,
+                "terminal_reward" | "terminal-reward" | "terminal" => {
+                    OutcomeTarget::TerminalReward
+                }
+                other => {
+                    return Err(PyValueError::new_err(format!(
+                        "outcome_target must be 'episode_sum' or 'terminal_reward', got {other:?}"
+                    )));
+                }
+            };
         }
         if let Some(l) = outcome_max_episode_len {
             config.outcome_max_episode_len = l;

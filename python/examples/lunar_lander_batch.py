@@ -157,11 +157,54 @@ def lunar_lander_homeo(obs, action):
     return lunar_lander_homeo_v1(obs, action)
 
 
+def lunar_lander_homeo_v5(obs, action):
+    """v5 shaping: v3 with the `not_safely_landed` term amplified 50×.
+
+    v3's `not_safely_landed * 1.0` (at homeo weight 2.0 → effective
+    ±2 reward) is a +1-reward blip at the single terminal step,
+    rounding-error against the cumulative −400 to −1000 homeo over
+    a 90-step episode. The M6 mechanism check (2026-04-19) showed
+    that this makes R̂ trained on episode-sum returns unable to
+    distinguish soft from crash.
+
+    v5 boosts the multiplier to 50 so a soft landing produces a
+    ~+50 terminal delta relative to a crash — visible against the
+    cumulative episode integral. A direct experimental test of
+    "does M6 work once the reward target carries the signal?".
+    """
+    altitude = float(obs[1])
+    vx = float(obs[2])
+    vy = float(obs[3])
+    angle = float(obs[4])
+    speed = math.sqrt(vx * vx + vy * vy)
+    leg1 = float(obs[6])
+    leg2 = float(obs[7])
+    proximity = math.exp(-max(0.0, altitude) * 2.0)
+    descent = max(0.0, -vy)
+    crash_risk = descent * proximity
+    fuel = _FUEL_COST.get(int(action), 0.0)
+    both_legs = 1.0 if (leg1 > 0 and leg2 > 0) else 0.0
+    stopped = 1.0 if speed < 0.1 else 0.0
+    not_safely_landed = 1.0 - both_legs * stopped
+    return [
+        {"value": crash_risk * 10.0, "target": 0.0, "tolerance": 0.0},
+        {"value": abs(angle) * proximity, "target": 0.0, "tolerance": 0.05},
+        {"value": speed * proximity, "target": 0.0, "tolerance": 0.1},
+        {"value": fuel, "target": 0.0, "tolerance": 0.0},
+        {"value": max(0.0, altitude), "target": 0.0, "tolerance": 0.1},
+        {"value": vy, "target": -0.25, "tolerance": 0.25},
+        # 50× the v3 multiplier — the amplified terminal signal that
+        # makes episode-sum returns differentiable between soft/crash.
+        {"value": not_safely_landed * 50.0, "target": 0.0, "tolerance": 0.0},
+    ]
+
+
 _SHAPING_VARIANTS = {
     "v1": lunar_lander_homeo_v1,
     "v2": lunar_lander_homeo_v2,
     "v3": lunar_lander_homeo_v3,
     "v4": lunar_lander_homeo_v4,
+    "v5": lunar_lander_homeo_v5,
 }
 
 
@@ -242,6 +285,12 @@ def main() -> int:
     parser.add_argument("--outcome-clamp", type=float, default=None,
                         help="Symmetric cap on R̂ before the α multiply. Default 5.0. "
                         "Raise alongside α when probing whether M6 is correct-but-quiet.")
+    parser.add_argument("--outcome-target", choices=["episode_sum", "terminal_reward"],
+                        default=None,
+                        help="What the outcome head trains on. 'episode_sum' (default) = "
+                        "centered Σ r_base over the episode. 'terminal_reward' = just the "
+                        "last step's r_base; tests whether the terminal homeo profile "
+                        "carries landing-quality signal that the sum washes out.")
     parser.add_argument(
         "--shaping",
         choices=list(_SHAPING_VARIANTS.keys()),
@@ -304,6 +353,7 @@ def main() -> int:
         outcome_reward_alpha=args.outcome_alpha,
         lr_outcome=args.outcome_lr,
         outcome_clamp=args.outcome_clamp,
+        outcome_target=args.outcome_target,
         outcome_max_episode_len=args.outcome_ep_len,
     )
     print("agent ready (compiled graphs once, N lanes)")
