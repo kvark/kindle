@@ -239,6 +239,9 @@ def main() -> int:
                         help="LR for the outcome-value head. Defaults to learning_rate × 0.3.")
     parser.add_argument("--outcome-ep-len", type=int, default=None,
                         help="Per-episode trajectory cap for the outcome head. Default 256.")
+    parser.add_argument("--outcome-clamp", type=float, default=None,
+                        help="Symmetric cap on R̂ before the α multiply. Default 5.0. "
+                        "Raise alongside α when probing whether M6 is correct-but-quiet.")
     parser.add_argument(
         "--shaping",
         choices=list(_SHAPING_VARIANTS.keys()),
@@ -300,6 +303,7 @@ def main() -> int:
         n_step=args.n_step,
         outcome_reward_alpha=args.outcome_alpha,
         lr_outcome=args.outcome_lr,
+        outcome_clamp=args.outcome_clamp,
         outcome_max_episode_len=args.outcome_ep_len,
     )
     print("agent ready (compiled graphs once, N lanes)")
@@ -320,6 +324,18 @@ def main() -> int:
     window_log: list[tuple[int, int, int]] = []  # (step, soft_count, window_size)
     total_episodes = 0
     t0 = time.time()
+
+    # M6 mechanism instrumentation: per-step r_hat per lane, tagged
+    # with the episode's eventual outcome once it completes. Enables
+    # the post-run discrimination check that verifies R̂ actually
+    # encodes trajectory quality rather than some orthogonal confound.
+    #   per_lane_cur_rhats[i] : list of r_hat over the current episode
+    #   outcome_rhats[outcome] : list of (ep_len, mean, early_mean,
+    #                              mid_mean, late_mean) tuples
+    per_lane_cur_rhats: list[list[float]] = [[] for _ in range(args.lanes)]
+    outcome_rhats: dict[str, list[tuple[int, float, float, float, float]]] = {
+        "soft": [], "crash": [], "timeout": [],
+    }
 
     for step in range(args.steps):
         actions = agent.act(obs_lists)
@@ -346,6 +362,13 @@ def main() -> int:
         ]
         agent.observe(next_lists, actions, homeostatic=homeos)
 
+        # M6 instrumentation: record per-step r_hat per lane (only
+        # meaningful when M6 is active; we still accumulate but the
+        # post-run summary is trivial if everything is zero).
+        step_rhats = agent.r_hats()
+        for i in range(args.lanes):
+            per_lane_cur_rhats[i].append(float(step_rhats[i]))
+
         # Per-lane episode reset + boundary marking.
         for i, done in enumerate(dones):
             if done:
@@ -364,6 +387,20 @@ def main() -> int:
                 recent_outcomes.append(outcome)
                 total_episodes += 1
                 cur_returns[i] = 0.0
+                # Snapshot this lane's per-step r_hat history and tag it
+                # with the outcome. Compute three-phase means so we can
+                # see whether R̂ discriminates early (while the state is
+                # still far from terminal), late, or throughout.
+                rhats = per_lane_cur_rhats[i]
+                ep_len = len(rhats)
+                if ep_len >= 3 and args.outcome_alpha and args.outcome_alpha > 0.0:
+                    mean = sum(rhats) / ep_len
+                    third = max(1, ep_len // 3)
+                    early = sum(rhats[:third]) / third
+                    mid = sum(rhats[third : 2 * third]) / third
+                    late = sum(rhats[2 * third :]) / max(1, ep_len - 2 * third)
+                    outcome_rhats[outcome].append((ep_len, mean, early, mid, late))
+                per_lane_cur_rhats[i] = []
                 obs, _info = envs[i].reset()
                 raw = [float(x) for x in obs]
                 raw_next[i] = raw
@@ -457,6 +494,48 @@ def main() -> int:
         f"\nTotals: {total_soft} soft landings (anywhere), "
         f"{total_crash} crashes, {total_episodes} episodes"
     )
+
+    # M6 mechanism check: did R̂ actually discriminate between
+    # soft-landing and crash trajectories? This is what the principle
+    # predicts — if it's silent here, the head isn't capturing what
+    # we hoped it would, regardless of the cumulative-soft number.
+    if args.outcome_alpha and args.outcome_alpha > 0.0:
+        any_records = any(len(v) for v in outcome_rhats.values())
+        if any_records:
+            print("\n--- M6 R̂ discrimination (mean r_hat by outcome) ---")
+            print(
+                f"{'outcome':<8} {'episodes':>8} {'ep_len':>7} {'mean':>7} "
+                f"{'early':>7} {'mid':>7} {'late':>7}"
+            )
+            summary = {}
+            for outcome, records in outcome_rhats.items():
+                if not records:
+                    continue
+                n = len(records)
+                ep_len_m = sum(r[0] for r in records) / n
+                m = sum(r[1] for r in records) / n
+                e = sum(r[2] for r in records) / n
+                mi = sum(r[3] for r in records) / n
+                la = sum(r[4] for r in records) / n
+                summary[outcome] = (n, ep_len_m, m, e, mi, la)
+                print(
+                    f"{outcome:<8} {n:>8d} {ep_len_m:>7.1f} {m:>+7.2f} "
+                    f"{e:>+7.2f} {mi:>+7.2f} {la:>+7.2f}"
+                )
+            if "soft" in summary and "crash" in summary:
+                s_mean = summary["soft"][2]
+                c_mean = summary["crash"][2]
+                print(
+                    f"\n  soft − crash gap: mean={s_mean - c_mean:+.3f}  "
+                    f"early={summary['soft'][3] - summary['crash'][3]:+.3f}  "
+                    f"late={summary['soft'][5] - summary['crash'][5]:+.3f}"
+                )
+                verdict = (
+                    "discriminating — M6 head encodes trajectory quality"
+                    if s_mean > c_mean + 0.2
+                    else "silent or inverted — head not capturing quality"
+                )
+                print(f"  verdict: {verdict}")
 
     diags = agent.diagnostics()
     print("\n--- final diagnostics ---")

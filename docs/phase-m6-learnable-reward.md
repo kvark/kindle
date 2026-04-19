@@ -253,46 +253,92 @@ there's no parameter path back through the encoder at all.
 | config | cumulative soft | peak window |
 |---|---|---|
 | pre-M6 baseline | 5.38% | 9.5% |
-| `α=0.1` | 5.53% | **10.0%** |
-| `α=0.5` | 5.73% | 8.5% |
+| `α=0.1` clamp=5 | 5.53% | 10.0% |
+| `α=0.5` clamp=5 | 5.73% | 8.5% |
+| `α=5.0` clamp=20 | 4.90% | 8.5% |
 
-M6 moves the peak window up by ~0.5pp at `α=0.1` but doesn't
-crack the 15% bar the design doc set. The head demonstrably
-learns (MSE loss drops from ~20k → ~300 over 100k; `r_hat` drifts
-signed across ±3). The bonus is ~6–30× smaller than the
-per-step homeo penalty in absolute terms (`α · clamp(r_hat) ≤
-±0.5` vs. homeo `≈ −3 to −15`), which likely explains why it
-can't dominate policy learning.
+The head demonstrably trains (MSE loss drops from ~20k → ~300;
+`r_hat` drifts signed across ±3). Pushing α × clamp up 100× does
+*not* help — it mildly hurts. That's the first clue.
 
-### Interpretation
+### Mechanism check (2026-04-19, 30k steps instrumented)
 
-M6 as designed (additive bonus on instantaneous state, trained
-on episode-MC return) is **necessary but not sufficient** for
-LunarLander. The head learns the distribution of returns, but
-the signal it emits is structurally still *state-instantaneous* —
-R̂(z_t) is a function of a single latent. The missing ingredient
-isn't "a learnable primitive" in the abstract; it's specifically
-**event-ordering awareness**: the primitive needs the trajectory
-as input, not just one frame.
+Mean `R̂(z_t)` bucketed by the episode's eventual outcome:
 
-### What would unlock LunarLander honestly
+```
+outcome   episodes   ep_len   mean r_hat   early    mid     late
+soft           80     87.2    +0.86        +0.60   +0.82   +1.14
+crash        1219     91.7    +0.96        +0.76   +0.90   +1.20
+timeout         1   1000.0    −1.10        −1.34   −1.06   −0.89
 
-Three directions, ordered by scope:
+soft − crash gap: mean = −0.098  (inverted)
+```
 
-1. **Reweight M6 relative to homeo.** Raise the per-step homeo-
-   penalty clamp or drop its weight when M6 is active, so the
-   learned signal isn't drowned. Low effort, narrow gain.
-2. **Trajectory-conditioned M6.** Replace `R̂(z_t)` with
-   `R̂(z_{t−k:t})` — a small causal-attention head over recent
-   latents, predicting episode return from a window. This
-   genuinely adds event-ordering expressiveness. Medium scope
-   (needs a small attention graph, likely back to a GPU session).
-3. **Accept the ceiling.** Per the Tier-3 verdict: pivot the
-   success bar to the 6 envs where kindle is already
-   demonstrating option differentiation and transfer.
+At `α=5.0, clamp=20` the inversion widens (soft−crash = −0.191)
+rather than resolving.
 
-Tier-3 and M6 together null out the "single-variable fix"
-hypothesis class. The remaining hypotheses are architectural
-(trajectory-conditioned reward, option-hierarchy credit) or
-philosophical (accept the ceiling). The M6 code stays in — it's
-a clean building block for (2) if we pursue it.
+**The head learns "later-in-episode = higher r_hat"**, not
+"soft-trajectory = higher r_hat". Crashes and soft landings are
+statistically indistinguishable to it. Loud M6 amplifies the
+slight inversion and mildly hurts the cumulative soft-rate.
+
+### What the mechanism check actually showed
+
+The reward circuit's **episode-return signal does not distinguish
+soft from crash** in kindle's intrinsic regime:
+
+- Soft / crash episode lengths are near-identical (~87 vs. ~92 steps).
+- Per-step homeo is −3 to −15, dominating a cumulative −400 to
+  −1000 per episode.
+- v3 shaping's `not_safely_landed * 1.0` term produces a +1
+  bonus at one step of one episode — invisible against the
+  cumulative magnitude.
+
+So the Monte-Carlo target that M6 trains against — the sum of
+existing reward-circuit outputs over an episode — contains no
+soft-vs-crash gradient. M6 inherits the silence. It isn't a case
+of "the primitive shape is wrong" or "the bonus is too quiet";
+**there is nothing landing-related in the training target itself**.
+
+### Revised understanding
+
+The earlier write-up's conclusion ("M6 is state-instantaneous,
+therefore can't express event-ordering") was the wrong
+diagnosis. Episode-MC training *does* bake the terminal into every
+per-state target — that part works. The real problem is that the
+*content* of that target (cumulative intrinsic reward) has
+almost no correlation with landing quality. Kindle's four
+primitives emit virtually the same integral on a 90-step soft
+landing and a 90-step crash; the terminal event is a rounding
+error, not a gradient.
+
+### What would actually unlock LunarLander
+
+Ordered by scope:
+
+1. **Amplify the terminal signal in the reward input.** Raise
+   `not_safely_landed` shaping from `* 1.0` to `* 50.0` (or add
+   a dedicated big terminal bonus) so that the episode-return
+   target M6 trains on *does* differentiate soft from crash.
+   This is reshaping the v3 shaping function, not kindle's core —
+   kindle-philosophically clean if the shaping's homeo semantics
+   are preserved. Direct test of the M6 principle with a target
+   that carries the signal.
+2. **Train M6 on a different self-observable target.** Instead
+   of episode-return, train R̂ to predict the terminal state's
+   leg-contact status (a boolean extracted from the obs token at
+   `env_boundary`). This puts outcome-classification, not
+   reward-sum, into the learned reward's training signal. More
+   invasive — changes what M6 *trains on* rather than what it
+   *adds to*.
+3. **Accept the ceiling as reward-structural, not architectural.**
+   Document that kindle's intrinsic reward at LunarLander's time
+   scales cannot express landing-ordering at episode-sum
+   granularity, and pivot the project's success bar to the envs
+   where it already works.
+
+The M6 code stays in either way — it's a clean building block
+for (1) and (2), and it's verifiably correct at its stated job
+(MSE-fit of episode-MC returns with stop-grad into encoder).
+What's now testable is whether a reward target that *does*
+contain the signal lets M6 turn it into policy improvement.

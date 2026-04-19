@@ -167,6 +167,12 @@ pub struct AgentConfig {
     /// baseline, higher variance reduction but slower drift. Default
     /// `0.05`.
     pub outcome_baseline_ema: f32,
+    /// M6: symmetric clamp applied to the raw outcome-head output
+    /// before multiplication by `α`. Caps the worst-case per-step
+    /// bonus at `α · outcome_clamp`. Default `5.0`; raise alongside
+    /// `α` when probing whether the learned signal is correct-but-
+    /// too-quiet relative to the ~3–15/step homeostatic penalty.
+    pub outcome_clamp: f32,
     /// M6: hard cap on the number of trajectory latents kept per
     /// episode for the batched end-of-episode backward pass. Must be
     /// large enough to contain a typical episode for the target env;
@@ -225,6 +231,7 @@ impl Default for AgentConfig {
             outcome_reward_alpha: 0.0,
             lr_outcome: None,
             outcome_baseline_ema: 0.05,
+            outcome_clamp: 5.0,
             outcome_max_episode_len: 256,
             goal_ema_rate: 0.02,
             opt_level: OptLevel::Full,
@@ -1339,6 +1346,7 @@ impl Agent {
         // step) without fighting the borrow checker against `self.lanes`.
         let m6_alpha = self.config.outcome_reward_alpha;
         let m6_ema = self.config.outcome_baseline_ema;
+        let m6_clamp = self.config.outcome_clamp.max(0.0);
         let m6_max_ep = self.config.outcome_max_episode_len;
         let mut m6_head = self.outcome_head.take();
         let mut m6_baseline_diag = self.last_outcome_baseline;
@@ -1409,7 +1417,7 @@ impl Agent {
             let r_hat = if let Some(head) = m6_head.as_ref() {
                 let raw = head.forward(z_row);
                 if raw.is_finite() {
-                    raw.clamp(-5.0, 5.0)
+                    raw.clamp(-m6_clamp, m6_clamp)
                 } else {
                     0.0
                 }
@@ -2168,6 +2176,13 @@ impl Agent {
 
     pub fn step_count(&self) -> usize {
         self.step_count
+    }
+
+    /// Cheap per-lane read of `last_r_hat` without building the full
+    /// Diagnostics (used by M6 instrumentation harnesses that log this
+    /// every step).
+    pub fn r_hats(&self) -> Vec<f32> {
+        self.lanes.iter().map(|l| l.last_r_hat).collect()
     }
 
     /// Per-lane diagnostics, one entry per lane in lane order.
