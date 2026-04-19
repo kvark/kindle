@@ -312,33 +312,87 @@ primitives emit virtually the same integral on a 90-step soft
 landing and a 90-step crash; the terminal event is a rounding
 error, not a gradient.
 
-### What would actually unlock LunarLander
+### Follow-up experiments (2026-04-19): (1) amplified shaping,
+### (2) different target
 
-Ordered by scope:
+Tested both directions I proposed. Both are now infrastructure
+(v5 shaping in `lunar_lander_batch.py`; `OutcomeTarget` enum
+with `EpisodeSum` and `TerminalReward` variants in agent.rs).
 
-1. **Amplify the terminal signal in the reward input.** Raise
-   `not_safely_landed` shaping from `* 1.0` to `* 50.0` (or add
-   a dedicated big terminal bonus) so that the episode-return
-   target M6 trains on *does* differentiate soft from crash.
-   This is reshaping the v3 shaping function, not kindle's core —
-   kindle-philosophically clean if the shaping's homeo semantics
-   are preserved. Direct test of the M6 principle with a target
-   that carries the signal.
-2. **Train M6 on a different self-observable target.** Instead
-   of episode-return, train R̂ to predict the terminal state's
-   leg-contact status (a boolean extracted from the obs token at
-   `env_boundary`). This puts outcome-classification, not
-   reward-sum, into the learned reward's training signal. More
-   invasive — changes what M6 *trains on* rather than what it
-   *adds to*.
-3. **Accept the ceiling as reward-structural, not architectural.**
-   Document that kindle's intrinsic reward at LunarLander's time
-   scales cannot express landing-ordering at episode-sum
-   granularity, and pivot the project's success bar to the envs
-   where it already works.
+```
+config                              cum soft    gap      loss
+v3 + EpisodeSum     (prior)          5.53%     −0.098    12k
+v5 + EpisodeSum     — (1)            4.78%     +0.032   300k
+v3 + TerminalReward — (2)            5.00%     +0.011    15
+v5 + TerminalReward — (1)+(2)        5.18%     −0.002    60
+```
 
-The M6 code stays in either way — it's a clean building block
-for (1) and (2), and it's verifiably correct at its stated job
-(MSE-fit of episode-MC returns with stop-grad into encoder).
-What's now testable is whether a reward target that *does*
-contain the signal lets M6 turn it into policy improvement.
+All three end up with a near-zero discrimination gap. v5 +
+EpisodeSum nudged the gap positive (+0.032), the first
+non-inverted result — but the cumulative soft-rate dropped
+slightly. The head is fitting its target well (loss is 60 for
+TerminalReward), but what it's fitting turns out not to be
+useful per-state information.
+
+### Revised revised diagnosis
+
+Even with a target that carries quality signal (v5's terminal
+homeo is distinctly worse for crashes; v3's terminal reward
+differs by several reward units), the per-state R̂(z_t) still
+can't discriminate. Why?
+
+**Mid-flight z_t doesn't contain forward-trajectory information.**
+Two identical mid-flight states can end soft or crash depending
+on future policy decisions. A per-state predictor fit to
+outcome labels converges on the expected value *averaged over
+all possible futures from this state* — which for a
+mostly-exploratory policy is nearly uniform across states.
+
+This is **a pure information-theoretic limit of the input**, not
+a shape problem or a target problem. No amount of target
+engineering fixes it, because the information R̂ is asked to
+provide simply isn't in its input.
+
+Confirms the deeper shape of the issue I kept circling around:
+
+- ❌ "M6 is state-instantaneous, can't express event-ordering"
+    — wrong; training bakes trajectory into per-state targets.
+- ❌ "M6's target doesn't differ between soft and crash"
+    — we fixed this with v5 and TerminalReward; gap still zero.
+- ✅ "The *input* z_t doesn't carry forward-trajectory info,
+      so per-state R̂ always reduces to a state-average
+      prediction."
+
+### What M6 v2 would have to look like
+
+Three real architectural directions to give R̂ the input it
+needs, in order of scope:
+
+A. **Action-conditioned R̂(z_t, a_t)** — adds "what the agent is
+   doing" to the input. Becomes a Q-function. Large overlap with
+   the existing policy/value path; arguable duplication.
+B. **Trajectory-conditioned R̂(z_{t−k:t})** — small causal
+   attention / recurrent head over recent latents. Captures
+   momentum ("this trajectory is slow + upright → likely soft").
+   Distinct from the policy path. Natural kindle fit; requires
+   a GPU graph.
+C. **Outcome-supervised encoder** — unfreeze the encoder under
+   a gradient from M6's outcome loss. The encoder then learns
+   representations where z_t itself carries outcome-relevant
+   features, even from a single frame. Biggest departure from
+   kindle's M1 ignition invariant.
+
+Given the 2026-04-19 evidence, (B) is the honest next step if
+LunarLander remains the target env — it's the minimal change
+that addresses the actual information deficit. (A) collides with
+the policy's job. (C) is a broader rewrite of the kindle design
+and should wait until (B) has been tried and learned from.
+
+### LunarLander status
+
+Tier 3 + M6 (including v5 shaping and TerminalReward target)
+have now exhaustively tested the "fix the reward signal" class
+of hypotheses. All null. The remaining classes are
+trajectory-conditioned-input, encoder-unfreeze, or accept. M6
+code stays in — verifiably correct at its stated job — and (B)
+can build on it directly.
