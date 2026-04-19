@@ -133,6 +133,18 @@ pub struct AgentConfig {
     /// Default `true` — the additive-bias-only behaviour (Phase G v2
     /// through Tier-1) is kept as the `false` path for A/B.
     pub per_option_heads: bool,
+    /// Phase G Tier-3: EMA rate for the continuous goal-latent
+    /// update. At every option termination, the terminated option's
+    /// goal vector is pulled toward the observed end-state latent:
+    ///   `goal[o] ← (1 − β) · goal[o] + β · z_end`.
+    /// This turns the fixed-table orthogonal anchors (from
+    /// `option::build_goal_table`) into learned prototypes that
+    /// track where L0 actually ends up under each option, making the
+    /// goal-alignment bonus a self-consistency signal rather than an
+    /// arbitrary pull toward a latent axis. `0.0` (the default here
+    /// is `0.02`) disables the update, giving back the pre-Tier-3
+    /// fixed-table behaviour.
+    pub goal_ema_rate: f32,
     pub opt_level: OptLevel,
 }
 
@@ -166,6 +178,7 @@ impl Default for AgentConfig {
             goal_bonus_alpha: 0.1,
             learned_termination: false,
             per_option_heads: true,
+            goal_ema_rate: 0.02,
             opt_level: OptLevel::Full,
         }
     }
@@ -201,6 +214,12 @@ pub struct Diagnostics {
     /// means option credit is being attributed to older options — the
     /// agent is learning longer-horizon option structure.
     pub h_eff_l1: f32,
+    /// L1 continuous goal prototypes: mean pairwise Euclidean distance
+    /// across the `num_options` goal vectors. Zero until the table
+    /// diverges from init; drops toward zero if prototypes collapse to
+    /// a single point (mode collapse — a sign the EMA rate is too
+    /// aggressive relative to L0's per-option differentiation).
+    pub goal_diversity: f32,
 }
 
 /// Per-lane state. One per concurrent batch slot. Every slot owns its own
@@ -977,6 +996,7 @@ impl Agent {
                 // option's `z_start` was captured at its last
                 // resample; `option_elapsed` tracks the realized
                 // length even when learned-termination fires early.
+                let ema_rate = self.config.goal_ema_rate;
                 for &i in &lanes_to_terminate {
                     let lane = &mut self.lanes[i];
                     if lane.option_elapsed > 0 {
@@ -987,6 +1007,22 @@ impl Agent {
                             option_length: lane.option_elapsed,
                         };
                         lane.option_history.push(entry);
+
+                        // Tier-3 continuous goal prototype: pull the
+                        // just-terminated option's goal toward the
+                        // observed end-state latent. Uses the first
+                        // `copy_dim` dims of z (the goal vector lives
+                        // in R^{option_dim}, which may be ≤ latent_dim).
+                        if ema_rate > 0.0 {
+                            let old_opt = lane.current_option as usize;
+                            let z_end = &z_stack[i * ld..(i + 1) * ld];
+                            let base = old_opt * od;
+                            let copy_dim = od.min(ld);
+                            let goal = &mut self.goal_table[base..base + od];
+                            for k in 0..copy_dim {
+                                goal[k] += ema_rate * (z_end[k] - goal[k]);
+                            }
+                        }
                     }
                 }
                 self.option_credit_step(rng, &lanes_to_terminate);
@@ -1813,6 +1849,31 @@ impl Agent {
                     credit::effective_scope(&credit_weights)
                 };
 
+                let goal_diversity = if self.option_session.is_some()
+                    && self.config.num_options >= 2
+                {
+                    let n_opt = self.config.num_options;
+                    let od = self.goal_table.len() / n_opt.max(1);
+                    let mut sum = 0.0f32;
+                    let mut pairs = 0usize;
+                    for a in 0..n_opt {
+                        for b in (a + 1)..n_opt {
+                            let ga = &self.goal_table[a * od..(a + 1) * od];
+                            let gb = &self.goal_table[b * od..(b + 1) * od];
+                            let d2: f32 = ga
+                                .iter()
+                                .zip(gb.iter())
+                                .map(|(x, y)| (x - y).powi(2))
+                                .sum();
+                            sum += d2.sqrt();
+                            pairs += 1;
+                        }
+                    }
+                    if pairs == 0 { 0.0 } else { sum / pairs as f32 }
+                } else {
+                    0.0
+                };
+
                 // L1 goal distance: ‖last_latent − goal‖.
                 let goal_distance = if self.option_session.is_some() {
                     if let Some(prev) = lane.buffer.last() {
@@ -1849,6 +1910,7 @@ impl Agent {
                     option_return: lane.option_return,
                     goal_distance,
                     h_eff_l1: self.last_h_eff_l1,
+                    goal_diversity,
                 }
             })
             .collect()
