@@ -416,6 +416,7 @@ impl PyBatchAgent {
         outcome_reward_alpha = None,
         lr_outcome = None,
         outcome_baseline_ema = None,
+        outcome_clamp = None,
         outcome_max_episode_len = None,
     ))]
     #[allow(clippy::too_many_arguments)]
@@ -442,6 +443,7 @@ impl PyBatchAgent {
         outcome_reward_alpha: Option<f32>,
         lr_outcome: Option<f32>,
         outcome_baseline_ema: Option<f32>,
+        outcome_clamp: Option<f32>,
         outcome_max_episode_len: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
@@ -537,6 +539,9 @@ impl PyBatchAgent {
         }
         if let Some(ema) = outcome_baseline_ema {
             config.outcome_baseline_ema = ema;
+        }
+        if let Some(c) = outcome_clamp {
+            config.outcome_clamp = c;
         }
         if let Some(l) = outcome_max_episode_len {
             config.outcome_max_episode_len = l;
@@ -668,6 +673,14 @@ impl PyBatchAgent {
             serde_json::to_string(&diags).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
         let json_mod = py.import_bound("json")?;
         json_mod.call_method1("loads", (json,))
+    }
+
+    /// Cheap per-step getter: list of `R̂(z_t)` values, one per lane.
+    /// Avoids the JSON round-trip of `diagnostics()` so per-step
+    /// M6 instrumentation in a Python harness stays in the noise
+    /// budget. Returns zeros when M6 is disabled.
+    fn r_hats(&self) -> Vec<f32> {
+        self.agent.r_hats()
     }
 }
 
