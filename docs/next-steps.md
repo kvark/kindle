@@ -52,22 +52,49 @@ mega-plays tree for that work.
 ## Tier 3 — architectural investigations
 
 1. **Phase H design doc (L2 hierarchy)**. Write-before-implement.
-2. **Continuous goal-latent instead of fixed option table**. *Active.*
+2. **~~Continuous goal-latent~~ via EMA prototypes.** Done 2026-04-19
+   under `AgentConfig::goal_ema_rate` (default `0.02`). At option
+   termination, `goal_table[o] ← (1−β)·goal[o] + β·z_end`, replacing
+   the fixed orthogonal anchors from `option::build_goal_table` with
+   prototypes that track where L0 actually ends up under each
+   option. The alignment bonus `−α·‖z − goal‖` then reinforces
+   self-consistency instead of pulling toward arbitrary latent axes.
+   Added `Diagnostics::goal_diversity` (mean pairwise goal distance)
+   to monitor mode collapse — stable at 5–8 across 100k steps, no
+   collapse observed. Result on LunarLander at 100k steps / 4 lanes
+   / seed 42: **5.57% cumulative soft-rate, 8.0% peak window**, also
+   indistinguishable from baseline (5.38% / 9.5%).
 3. **Why Taxi prefers L0** over L1+credit — one-page investigation.
 4. **~~Replace shared L0 policy~~ with per-option MLP heads.** Done
-   2026-04-19 under feature flag `AgentConfig::per_option_heads`
-   (default `true`). Each option now has its own
-   `[hidden_dim → action_dim]` fc2 head, selected per-lane via an
-   `option_onehot`-gated sum — only the active option's head receives
-   gradient. Result on LunarLander at 100k steps / 4 lanes / seed 42:
-   **5.25% cumulative soft-rate, 9.0% peak window**, statistically
-   indistinguishable from the pre-heads baseline (5.38% / 9.5%). The
-   plateau is robust to L0 policy capacity expansion — consistent
-   with the "credit horizon, not capacity" hypothesis. Kept on by
-   default because the extra head capacity is cheap and leaves the
-   Taxi option-differentiation result unchanged. #2 (continuous
-   goal-latent) is now the next lever to try.
+   2026-04-19 under `AgentConfig::per_option_heads` (default `true`).
+   Each option now has its own `[hidden_dim → action_dim]` fc2 head,
+   selected per-lane via an `option_onehot`-gated sum — only the
+   active option's head receives gradient. Result on LunarLander at
+   100k steps / 4 lanes / seed 42: **5.25% cumulative soft-rate,
+   9.0% peak window**, statistically indistinguishable from baseline
+   (5.38% / 9.5%).
 5. **Why GridWorld stays uniform** across 1M steps — bug hunt.
+
+### Tier 3 verdict on LunarLander
+
+Both "capacity" levers (#4) and "goal anchoring" (#2) land cleanly
+architecturally but neither moves the needle on the ~5% soft-rate.
+The ceiling is deeper than L0 capacity or goal representation —
+consistent with the remaining Tier 1 hypothesis: **credit-horizon
+insufficiency**. The per-step advantage still can't reward the
+specific multi-step sequence that makes a landing succeed.
+
+The remaining Tier 3 items (#1 L2 hierarchy, #3 Taxi, #5 GridWorld)
+are either not LunarLander-targeted (#3, #5) or a much larger
+architectural investment (#1). The honest next step is to either:
+
+- Pursue **sequence-level credit** (GAE / n-step returns over a
+  wider window, or a learned-discount eligibility trace) — a
+  targeted attack on the credit-horizon hypothesis, smaller scope
+  than full L2.
+- Commit to **Phase H L2 hierarchy** as the architectural solution.
+- Accept the ceiling and move to CartPole / Taxi / multi-env
+  competence as the primary milestone instead of LunarLander.
 
 ## Tier 4 — the user-excluded track
 
