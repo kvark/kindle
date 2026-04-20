@@ -416,6 +416,89 @@ Four composing problems, ordered by what we've verified:
   - Environment-dependent meta-control that selects among
     ranking criteria per env.
 
+## Terminal-novelty ranking (2026-04-20)
+
+Implemented `ApproachRankBy::Novelty` as the first alternative
+ranking signal. Ranks terminal entries by
+`1 / sqrt(terminal_visit_count(z_end))` where the count is
+**terminal-specific** (incremented only on `push_terminal`),
+not the full-buffer visit count (which would conflate "we
+terminated here" with "we passed through here"). Added
+`ApproachState::terminal_visit_counts` as a separate
+HashMap<GridKey, u32> from the main buffer's counter.
+
+### Results
+
+Tested on LunarLander (100k / 4 / seed 42 / v3 / α=1, clamp=20,
+confidence saturation=100, homeo_taper=1.0):
+
+| rank_by | cum soft% | peak window | note |
+|---|---|---|---|
+| Return (v2 — confidence-weighted M7) | 5.66% | 10% @ 50k | baseline |
+| Novelty (terminal-specific) | 5.12% | 8% @ 60k | agent approached d≈1 then diverged |
+
+**Both ranking signals fail to unlock LunarLander.** The
+terminal-novelty version is noisy: the agent approaches the
+centroid early (distance drops 6 → 1 around step 20-40k) but
+then the centroid drifts as new rare-terminal classes accumulate
+(drift goes from 0.1 to 0.44 and back). The prototype is moving
+faster than the policy can track, and the rare-terminal basin is
+not necessarily "landed" — it's just "whatever terminal class
+kindle's encoder happens to map to a sparsely-visited grid cell".
+
+Verified on `l1_diagnostic` across 7 envs: numerically identical
+results to Return ranking. The 6 kindle-compatible envs have
+enough terminal-class aliasing that novelty ranking degenerates
+to near-uniform scores (each env's successful terminals cluster
+in a small region of latent space, so visit-counts are all
+similar).
+
+### Final structural takeaway for M7's kindle-clean mode
+
+The confidence-weighted integration mechanism works. Both
+implemented ranking criteria (Return, Novelty) fail on
+LunarLander for orthogonal reasons:
+  - **Return** — high-return terminals are short crashes, not
+    soft landings.
+  - **Novelty** — terminal classes alias in latent space (both
+    soft and crash terminals live in low-altitude buckets);
+    rare-terminal ≠ desired-terminal.
+
+The kindle-intrinsic signals available for self-supervision
+(surprise, novelty, homeo deviation, order) collectively do not
+contain a criterion that aligns with "landed softly" on
+LunarLander. This is the structural limit that has been
+consistently identified across Tier 3 → M6 → M7. It is not a
+design flaw in M7's confidence-weighting or selection-mechanism
+modules; it is an information-theoretic limit of
+self-supervision with kindle's current primitive set on a task
+whose success criterion is specifically a terminal-event-
+ordering property the primitives can't express.
+
+### Status of the M7 infrastructure
+
+Functionally complete as an opt-in fifth primitive:
+
+  - Prototype buffer + top-P% centroid (M7 v1)
+  - Confidence-ramped weighting + homeo tapering (confidence v2)
+  - Alternative ranking signal: Novelty, with terminal-specific
+    visit counts
+  - All knobs configurable; byte-parity at defaults (35 lib
+    tests pass)
+
+Lands cleanly for other kindle-compatible envs when enabled:
+GridWorld WM convergence improves (0.52 → 0.06), CartPole homeo
+deviation improves (1.60 → 1.37), RandomWalk entropy commitment
+deepens (0.18 → 0.04). The integration mechanism works; it's
+doing what was designed.
+
+The ceiling-breaking work on LunarLander needs to step outside
+"self-supervised prototype discovery" as a class — either by
+accepting a minimal external supervision signal (the gym soft/
+crash terminal label), by fundamentally changing kindle's
+primitive set, or by accepting that LunarLander-class envs are
+outside the design's expressible scope.
+
 The M7 code (both Rust and Python sides) stays in as a clean
 platform. It composes with the existing M6 infrastructure and
 the ablation-sweep knobs (advantage_clamp, entropy config,

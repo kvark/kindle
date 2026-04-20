@@ -11,7 +11,7 @@
 //! approach-shaping gap the PPO ceiling test (commit 9a8dcce)
 //! identified in kindle's reward class.
 
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 
 /// One completed episode's terminal summary. Latent dim is implicit
 /// (matches `AgentConfig::latent_dim`); callers push with the right
@@ -20,6 +20,25 @@ use std::collections::VecDeque;
 pub struct TerminalEntry {
     pub z_end: Vec<f32>,
     pub r_episode: f32,
+}
+
+/// Grid-cell key for the terminal-only visit counter. Mirrors
+/// `buffer::StateKey` but lives in `ApproachState` so novelty ranking
+/// can distinguish "how often has *terminating* in this latent region
+/// happened" from "how often has the agent *passed through* this
+/// latent region" — the two are badly conflated by the main
+/// `ExperienceBuffer::visit_count`, which counts every transition.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+struct GridKey(Vec<i32>);
+
+impl GridKey {
+    fn from_latent(z: &[f32], resolution: f32) -> Self {
+        Self(
+            z.iter()
+                .map(|&x| (x / resolution).round() as i32)
+                .collect(),
+        )
+    }
 }
 
 /// State for the M7 approach-reward primitive.
@@ -46,6 +65,16 @@ pub struct ApproachState {
     /// Centroid age in episodes since last recompute. 0 right after
     /// a recompute; grows until the next one.
     pub centroid_age: usize,
+    /// Terminal-only visit counts, keyed by grid-quantized terminal
+    /// latent. Each `push_terminal` increments the count for its
+    /// cell. Used by the novelty-ranked variant of
+    /// `approach_rank_by` to promote rare terminal classes
+    /// independently of how often the agent passes through
+    /// neighbouring latent regions mid-episode.
+    terminal_visit_counts: HashMap<GridKey, u32>,
+    /// Quantization resolution for `terminal_visit_counts`. Fixed
+    /// at construction; matches the M7 prototype's latent scale.
+    pub terminal_grid_resolution: f32,
 }
 
 impl ApproachState {
@@ -68,6 +97,22 @@ impl ApproachState {
             episodes_since_update: 0,
             last_centroid_drift: 0.0,
             centroid_age: 0,
+            terminal_visit_counts: HashMap::new(),
+            terminal_grid_resolution: 0.5,
+        }
+    }
+
+    /// Terminal-specific novelty at `z`: `1 / sqrt(count)` where
+    /// `count` is the number of *terminations* in `z`'s grid cell.
+    /// Rarer terminal classes score higher. Returns 1.0 for a grid
+    /// cell that hasn't seen a termination yet.
+    pub fn terminal_novelty(&self, z: &[f32]) -> f32 {
+        let key = GridKey::from_latent(z, self.terminal_grid_resolution);
+        let c = self.terminal_visit_counts.get(&key).copied().unwrap_or(0);
+        if c == 0 {
+            1.0
+        } else {
+            1.0 / (c as f32).sqrt()
         }
     }
 
@@ -82,6 +127,9 @@ impl ApproachState {
             z_end: z_end.to_vec(),
             r_episode,
         });
+        // Increment terminal-only visit count for this grid cell.
+        let key = GridKey::from_latent(z_end, self.terminal_grid_resolution);
+        *self.terminal_visit_counts.entry(key).or_insert(0) += 1;
         self.episodes_seen += 1;
         self.episodes_since_update += 1;
         self.centroid_age += 1;
