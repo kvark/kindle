@@ -407,6 +407,9 @@ impl PyBatchAgent {
         lr_policy = None,
         lr_credit = None,
         entropy_beta = None,
+        entropy_floor = None,
+        advantage_clamp = None,
+        policy_loss_watchdog_threshold = None,
         label_smoothing = None,
         num_options = None,
         option_horizon = None,
@@ -437,6 +440,9 @@ impl PyBatchAgent {
         lr_policy: Option<f32>,
         lr_credit: Option<f32>,
         entropy_beta: Option<f32>,
+        entropy_floor: Option<f32>,
+        advantage_clamp: Option<f32>,
+        policy_loss_watchdog_threshold: Option<f32>,
         label_smoothing: Option<f32>,
         num_options: Option<usize>,
         option_horizon: Option<usize>,
@@ -515,6 +521,15 @@ impl PyBatchAgent {
         }
         if let Some(lrc) = lr_credit {
             config.lr_credit = lrc;
+        }
+        if let Some(ef) = entropy_floor {
+            config.entropy_floor = ef;
+        }
+        if let Some(ac) = advantage_clamp {
+            config.advantage_clamp = ac;
+        }
+        if let Some(wd) = policy_loss_watchdog_threshold {
+            config.policy_loss_watchdog_threshold = wd;
         }
         if let Some(eb) = entropy_beta {
             config.entropy_beta = eb;

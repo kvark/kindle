@@ -302,6 +302,19 @@ def main() -> int:
                         "single-frame R̂(z_t) — M6 v1. k >= 2 concatenates the last k "
                         "latents [z_{t-k+1}, ..., z_t] so the head sees trajectory "
                         "momentum, not just present state.")
+    parser.add_argument("--entropy-floor", type=float, default=None,
+                        help="Entropy floor below which label-smoothing amplifies and "
+                        "recovery advantages synthesize. Default 0.1. Set to 0 to "
+                        "disable recovery-driven push toward uniform.")
+    parser.add_argument("--advantage-clamp", type=float, default=None,
+                        help="Symmetric clamp on per-step advantage (reward − value) "
+                        "before it scales the action target. Default 1.0 — raise to "
+                        "let larger advantages through when diagnosing a policy that "
+                        "won't commit.")
+    parser.add_argument("--watchdog-threshold", type=float, default=None,
+                        help="Magnitude threshold for the policy-loss watchdog that "
+                        "re-inits params when CE explodes. Default 1000. Set very "
+                        "high (e.g. 1e9) to effectively disable.")
     parser.add_argument(
         "--shaping",
         choices=list(_SHAPING_VARIANTS.keys()),
@@ -355,6 +368,9 @@ def main() -> int:
         action_repeat=args.action_repeat,
         lr_policy=args.lr_policy,
         entropy_beta=args.entropy_beta,
+        entropy_floor=args.entropy_floor,
+        advantage_clamp=args.advantage_clamp,
+        policy_loss_watchdog_threshold=args.watchdog_threshold,
         label_smoothing=args.label_smoothing,
         num_options=args.num_options,
         option_horizon=args.option_horizon,
@@ -399,6 +415,12 @@ def main() -> int:
     outcome_rhats: dict[str, list[tuple[int, float, float, float, float]]] = {
         "soft": [], "crash": [], "timeout": [],
     }
+
+    # Ablation-sweep trajectory logs: sample (step, mean_entropy_across_lanes)
+    # at each `log-every` boundary. Summarized at end-of-run — the primary
+    # signal for "did the policy commit on this config?". A policy that stays
+    # near ln(num_actions) = 1.386 (4 actions) never commits.
+    entropy_trajectory: list[tuple[int, float]] = []
 
     for step in range(args.steps):
         actions = agent.act(obs_lists)
@@ -517,6 +539,7 @@ def main() -> int:
             r_hat_mean = sum(_safe(d.get("r_hat", 0.0), 0.0) for d in diags) / args.lanes
             outcome_base = _safe(diags[0].get("outcome_baseline", 0.0), 0.0)
             outcome_loss = _safe(diags[0].get("outcome_loss", 0.0), 0.0)
+            entropy_trajectory.append((step, ent))
             print(
                 f"step={step:>5} eps={total_episodes:>3} "
                 f"avg_ret={avg_return:+7.1f} soft%(last{window_size})={soft_pct_window:4.1f} | "
@@ -557,6 +580,33 @@ def main() -> int:
         f"\nTotals: {total_soft} soft landings (anywhere), "
         f"{total_crash} crashes, {total_episodes} episodes"
     )
+
+    # Ablation-signal summary: entropy trajectory + soft-rate at five
+    # checkpoints, plus final commitment vs theoretical max entropy.
+    if entropy_trajectory:
+        max_ent = math.log(num_actions)
+        # Sample at 0%, 25%, 50%, 75%, 100% of training.
+        samples = 5
+        n_log = len(entropy_trajectory)
+        checkpoints = [
+            entropy_trajectory[min(n_log - 1, i * (n_log - 1) // (samples - 1))]
+            for i in range(samples)
+        ]
+        print(f"\n--- entropy trajectory (max={max_ent:.3f} = ln({num_actions})) ---")
+        print(f"{'step':>8} {'entropy':>8} {'commit%':>8}")
+        for step, ent_v in checkpoints:
+            # "commit%" = how far from max toward 0; 0% = uniform, 100% = deterministic.
+            commit_pct = 100.0 * (1.0 - ent_v / max_ent) if max_ent > 0 else 0.0
+            print(f"{step:>8d} {ent_v:>8.3f} {commit_pct:>7.1f}%")
+        first_ent = entropy_trajectory[0][1]
+        last_ent = entropy_trajectory[-1][1]
+        ent_drop = first_ent - last_ent
+        verdict = (
+            "NO COMMITMENT" if last_ent > 0.95 * max_ent
+            else "WEAK COMMITMENT" if last_ent > 0.75 * max_ent
+            else "COMMITTING"
+        )
+        print(f"  Δentropy first→last: {ent_drop:+.3f}   verdict: {verdict}")
 
     # M6 mechanism check: did R̂ actually discriminate between
     # soft-landing and crash trajectories? This is what the principle
