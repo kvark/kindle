@@ -545,20 +545,117 @@ M6 v3 (RTG × PotentialDelta) is the architectural end of the
 correct, the mechanism is validated, and it's a clean platform
 for future work. But the LunarLander soft-rate does not move.
 
-The remaining hypothesis classes that could explain the plateau
-are **outside the reward circuit**:
+## Ablation sweep (2026-04-19): the non-M6 cause of the plateau
 
-- **Policy optimization.** Maybe the policy-gradient + credit
-  assigner can't convert small per-step advantages into large
-  behavior changes at this budget.
-- **Action space coverage.** Maybe the policy at any moment has
-  ≤5% chance of the sequence that lands, regardless of reward
-  signal.
-- **Encoder representation bottleneck.** Maybe z_t can't support
-  a reliable landing-controller policy because the encoder's WM
-  loss doesn't carry the right representation.
+After an exhausted reward-circuit hypothesis class and a user
+challenge of "wait — homeo points at landing; why doesn't
+tuning fix it?", ran a commitment-suppression ablation against
+the policy optimizer stack instead of the reward. Key observation
+that motivated it: **policy entropy stays at ln(num_actions) ≈
+1.386 throughout all M6 runs on LunarLander** — the policy never
+commits. On all 6 other gym envs kindle handles, entropy drops
+cleanly (CartPole 0.59, MountainCar 1.08, Acrobot 1.05, etc.),
+so the commitment failure is LunarLander-specific.
 
-None of these are M6-shaped problems. If the user wants to keep
-pushing LunarLander, the next track is **outside reward**.
-Otherwise, pivoting the success bar to the other 6 envs is the
-right call.
+100k / 4 lanes / seed 42 / v3 shaping / no M6:
+
+| # | ablation | entropy behavior | cum soft% |
+|---|---|---|---|
+| 0 | defaults | **pinned at 1.386 (no commit)** | 5.57% |
+| 1 | `entropy_beta=0, floor=0` | pinned | 5.45% |
+| 2 | `advantage_clamp=20` (was 1) | **drops to 0.82**, oscillates | 4.27% |
+| 3 | watchdog threshold → 1e9 | pinned | 5.48% |
+| 4 | all three off | drops to 0.80, unstable | 4.40% |
+| 5 | all three + history_len=64 | initial drop, pi→-2M | 4.71% |
+
+### Findings
+
+1. **The advantage clamp is the primary commitment suppressor.**
+   Default `clamp(r−V, ±1)` destroys policy-gradient magnitude on
+   states where the reward actually differentiates actions (v3
+   mid-flight r−V can be ±2–5 routinely). With the clamp widened
+   to ±20, entropy drops from 1.386 to 0.82 — policy finally
+   commits. (2) and (4) both show this clearly.
+2. **Entropy regularization is NOT the cause.** Removing
+   `entropy_beta` and `entropy_floor` (ablation 1) leaves entropy
+   pinned. The policy isn't being held at uniform by
+   regularization — it's being held by the *absence of a
+   gradient signal large enough to move it off uniform*.
+3. **The magnitude watchdog is NOT the cause in isolation.**
+   Disabling it alone (ablation 3) also leaves entropy pinned. It
+   plays a role only when interactions get unstable (ablation 5
+   shows `pi → −2M` when watchdog is off with wide clamp +
+   history; instability follows).
+4. **Commitment ≠ better landing.** When the policy does commit
+   (ablations 2, 4, 5), cumulative soft-rate *drops* to 4.3–4.7%
+   — BELOW the random-action accident rate of 5.57%. The policy
+   converges on something strictly worse at landing than random.
+
+### What the ablations prove about the plateau
+
+The 5.57% baseline is exactly the random-action accident rate —
+kindle's default stack wasn't learning *anything* on LunarLander,
+it was sampling uniformly and receiving the physics-determined
+probability of leg+stopped terminal geometry. This explains why
+20+ configurations across Tier 3 + M6 v1/v2/v3 all hit the same
+number: they were all measuring random-policy physics.
+
+When we remove the clamp that was blocking policy-gradient
+signal, kindle *does* learn — but what it learns is a
+**crash-fast policy** that's worse at landing than random.
+Whether this is (a) a reward-specification issue where the
+*global* optimum is still soft-land but policy gradient falls
+into a local crash-fast basin, or (b) a reward-specification
+issue where the local AND global optima are both crash-fast, is
+not distinguishable from our data alone — but in either case the
+answer to the user's original question is:
+
+**Under v3 shaping's reward landscape, the policy gradient from
+random initialization has the crash-fast basin as its nearest
+local minimum. Not the soft-land one.** Back-of-envelope math
+suggesting slow-land has better cumulative return than fast-crash
+may still be correct (slow-land as a global optimum), but it's
+not *reachable* by local search from kindle's initial policy.
+
+### Revised plateau root-cause
+
+Not one cause, but two, layered:
+
+1. **Optimization-stack layer (blocker):** `advantage_clamp=±1`
+   keeps the policy pinned at uniform by suppressing the
+   per-step policy-gradient signal. Removes kindle's chance to
+   learn anything on LunarLander.
+2. **Reward-landscape layer (genuine problem):** even with the
+   clamp widened so gradients flow, policy gradient from random
+   init finds a local optimum that's worse at landing than
+   random. Either the reward's local optimum genuinely prefers
+   crash-fast, or the soft-land basin is unreachable from uniform
+   policy without curriculum / demonstration / structured
+   exploration that kindle doesn't have.
+
+Fixing (1) alone doesn't help; committing faster to the wrong
+thing isn't progress. Fixing (2) requires either (a) a reward
+whose nearest local optimum from uniform IS soft-land — this is
+the reward-tuning hypothesis the user originally raised, and
+remains untested but is plausibly narrow — or (b) an exploration
+mechanism beyond per-step entropy regularization that helps
+escape the fast-crash basin.
+
+### The six-env pivot is no longer about "LunarLander is
+### structurally outside kindle's class"
+
+It's a pragmatic pivot. LunarLander is solvable by kindle *in
+principle* given the right reward landscape + an escape mechanism
+from the fast-crash basin, but both are real project-scope
+interventions that don't fit within M6. The six working envs
+(CartPole, MountainCar, Acrobot, Pendulum, Taxi, GridWorld) all
+have reward landscapes where the fast-termination / do-nothing
+option *is* locally optimal for homeostasis, so kindle's default
+stack (including the advantage clamp) converges cleanly even
+when commitment is weak. They are where kindle's design is
+working as intended.
+
+The default `advantage_clamp=1.0` is still a reasonable value for
+those envs — raising it uniformly would destabilize training
+elsewhere. Keeping the knob configurable lets LunarLander-like
+envs ablate it without affecting anything else.

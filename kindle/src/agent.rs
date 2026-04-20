@@ -223,6 +223,22 @@ pub struct AgentConfig {
     /// `OutcomeBonus`. `Raw` is the default; `PotentialDelta` is
     /// the Ng-et-al potential-based-shaping variant.
     pub outcome_bonus: OutcomeBonus,
+    /// Symmetric clamp applied to the per-row policy advantage
+    /// `(reward − value)` before it scales the action target. The
+    /// historical default `1.0` bounds the cross-entropy gradient
+    /// but also *destroys* advantage magnitude on steps where the
+    /// reward actually differentiates actions (typical LunarLander
+    /// mid-flight decisions, where r−V can be ±5 but gets clipped
+    /// to ±1). Raise this when diagnosing a policy that fails to
+    /// commit under default-regularized kindle.
+    pub advantage_clamp: f32,
+    /// Magnitude threshold above which the policy-loss watchdog
+    /// re-initializes policy parameters (alongside the non-finite
+    /// check). Default `1000.0` catches the "finite but runaway"
+    /// regime that can follow a brief performance peak. Raise this
+    /// to a very large value to effectively disable the watchdog
+    /// when ablating whether its resets are preventing convergence.
+    pub policy_loss_watchdog_threshold: f32,
     /// M6 v2: window size for the outcome head's input. `1`
     /// (default) reduces to single-frame `R̂(z_t)` — the back-compat
     /// M6 v1 path. `k ≥ 2` concatenates the last `k` encoder
@@ -299,6 +315,8 @@ impl Default for AgentConfig {
             outcome_baseline_ema: 0.05,
             outcome_target: OutcomeTarget::EpisodeSum,
             outcome_bonus: OutcomeBonus::Raw,
+            advantage_clamp: 1.0,
+            policy_loss_watchdog_threshold: 1000.0,
             outcome_window: 1,
             outcome_clamp: 5.0,
             outcome_max_episode_len: 256,
@@ -2120,7 +2138,8 @@ impl Agent {
         let floor = self.config.entropy_floor;
         let k = MAX_ACTION_DIM as f32;
         for (i, lane) in self.lanes.iter().enumerate() {
-            let advantage = (lane.last_reward - lane.last_value).clamp(-1.0, 1.0);
+            let adv_clamp = self.config.advantage_clamp.max(0.0);
+            let advantage = (lane.last_reward - lane.last_value).clamp(-adv_clamp, adv_clamp);
             let entropy_deficit = if floor > 0.0 {
                 ((floor - lane.last_entropy) / floor).clamp(0.0, 1.0)
             } else {
@@ -2183,15 +2202,14 @@ impl Agent {
         self.policy_session.wait();
 
         let loss = self.policy_session.read_loss();
-        // Watchdog: reset on non-finite OR absolute magnitude > 1000.
-        // The latter catches the "finite but runaway" regime observed
-        // on LunarLander after a brief performance peak — the
-        // cross-entropy loss can plunge into the thousands of
-        // magnitude when `log_softmax` produces values of order -1000
-        // from extreme logit spreads, even though every individual
-        // number is technically finite. Reset restores uniform-ish
-        // softmax and lets the agent re-climb.
-        if !loss.is_finite() || loss.abs() > 1000.0 {
+        // Watchdog: reset on non-finite OR absolute magnitude above
+        // `policy_loss_watchdog_threshold`. The latter catches the
+        // "finite but runaway" regime observed on LunarLander after
+        // a brief performance peak. Setting the threshold very high
+        // effectively disables the magnitude branch (NaN branch
+        // remains active).
+        let wd = self.config.policy_loss_watchdog_threshold;
+        if !loss.is_finite() || loss.abs() > wd {
             init_parameters(&mut self.policy_session);
             log::warn!(
                 "policy loss {:.1} unstable at step {}, re-initialized policy params",
@@ -2274,7 +2292,8 @@ impl Agent {
                 gk *= gamma;
             }
             let r_mean = ret / horizon_norm;
-            let advantage = (r_mean - ripe.value).clamp(-1.0, 1.0);
+            let adv_clamp = self.config.advantage_clamp.max(0.0);
+            let advantage = (r_mean - ripe.value).clamp(-adv_clamp, adv_clamp);
 
             // Value-head target tracks the *old* single-step reward at
             // s_old, clamped. Keeps the value head on its stable
@@ -2340,7 +2359,8 @@ impl Agent {
         self.policy_session.wait();
 
         let loss = self.policy_session.read_loss();
-        if !loss.is_finite() || loss.abs() > 1000.0 {
+        let wd = self.config.policy_loss_watchdog_threshold;
+        if !loss.is_finite() || loss.abs() > wd {
             init_parameters(&mut self.policy_session);
             log::warn!(
                 "policy loss {:.1} unstable at step {} (n-step), re-initialized policy params",
