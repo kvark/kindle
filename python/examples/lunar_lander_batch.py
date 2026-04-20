@@ -338,6 +338,13 @@ def main() -> int:
                         help="Fraction of the homeo reward to remove at M7 full "
                         "confidence. homeo_eff = homeo · (1 − τ · c). 0 (default) = no "
                         "taper; 0.5 = half homeo at full M7 confidence; 1.0 = homeo off.")
+    parser.add_argument("--approach-rank-by", choices=["return", "novelty"],
+                        default=None,
+                        help="M7 prototype-selection criterion. 'return' (default) ranks "
+                        "terminals by cumulative kindle return. 'novelty' ranks by "
+                        "1/sqrt(visit_count at terminal) — promotes rare terminals. Use "
+                        "novelty on rare-success envs (LunarLander); return on "
+                        "common-success envs (CartPole timeouts).")
     parser.add_argument(
         "--shaping",
         choices=list(_SHAPING_VARIANTS.keys()),
@@ -414,6 +421,7 @@ def main() -> int:
         approach_distance_clamp=args.approach_distance_clamp,
         approach_confidence_saturation=args.approach_confidence_saturation,
         homeo_confidence_taper=args.homeo_taper,
+        approach_rank_by=args.approach_rank_by,
     )
     print("agent ready (compiled graphs once, N lanes)")
 

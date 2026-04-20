@@ -49,6 +49,28 @@ use meganeura::graph::Graph;
 use meganeura::Session;
 use rand::Rng;
 
+/// Criterion for ranking terminal entries into the M7 prototype
+/// buffer's top-P% fraction. See `AgentConfig::approach_rank_by`.
+///
+/// The M7 confidence-weighting run (commit ac27d5c) showed that
+/// ranking by `Return` converges on the wrong prototype on
+/// LunarLander, because the highest-return episodes under v3
+/// homeo are the shortest crashes. `Novelty` ranks by terminal
+/// rarity instead, which on LunarLander promotes the rare
+/// soft-landing terminal basin. Trade-off: on envs where success
+/// is a *common* terminal state (e.g. CartPole timeouts), `Novelty`
+/// promotes rare-crash terminals and is counter-productive;
+/// `Return` is the right choice there.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ApproachRankBy {
+    /// Cumulative intrinsic episode return (default; M7 v1 behaviour).
+    Return,
+    /// `1 / sqrt(visit_count(z_end))` — standard kindle novelty at
+    /// the terminal latent, computed on the lane's grid-discretized
+    /// experience buffer. Rare terminals rank high.
+    Novelty,
+}
+
 /// What target the M6 outcome-value head trains against at
 /// episode completion. See `AgentConfig::outcome_target`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -284,6 +306,17 @@ pub struct AgentConfig {
     /// homeo off entirely at full confidence — M7 becomes the sole
     /// reward signal.
     pub homeo_confidence_taper: f32,
+    /// M7 prototype-selection criterion. `Return` (default) ranks
+    /// terminal entries by cumulative kindle intrinsic reward —
+    /// fine when the env's high-return terminals are also task-
+    /// success terminals (the 6 kindle-friendly envs, to varying
+    /// strengths). `Novelty` ranks by `1 / sqrt(visit_count)` at
+    /// the terminal latent, promoting rare terminals over common
+    /// ones. On LunarLander this is expected to help (soft
+    /// landings are rare, crashes are common); on CartPole etc.
+    /// it would hurt (timeout-success is common, so novelty
+    /// demotes it).
+    pub approach_rank_by: ApproachRankBy,
     /// M6 v2: window size for the outcome head's input. `1`
     /// (default) reduces to single-frame `R̂(z_t)` — the back-compat
     /// M6 v1 path. `k ≥ 2` concatenates the last `k` encoder
@@ -370,6 +403,7 @@ impl Default for AgentConfig {
             approach_distance_clamp: 10.0,
             approach_confidence_saturation: 0,
             homeo_confidence_taper: 0.0,
+            approach_rank_by: ApproachRankBy::Return,
             outcome_window: 1,
             outcome_clamp: 5.0,
             outcome_max_episode_len: 256,
@@ -1551,6 +1585,7 @@ impl Agent {
         let m6_target = self.config.outcome_target;
         let m6_bonus_mode = self.config.outcome_bonus;
         let m7_alpha = self.config.approach_reward_alpha;
+        let m7_rank_by = self.config.approach_rank_by;
         let m7_clamp = self.config.approach_distance_clamp;
         let m7_saturation = self.config.approach_confidence_saturation;
         let m7_warmup = self.config.approach_warmup_episodes;
@@ -1627,8 +1662,24 @@ impl Agent {
             if env_boundary {
                 if let Some(state) = m7_state.as_mut() {
                     if let Some(prev) = lane.buffer.last() {
-                        let r_ep = self.approach_ep_returns[i];
-                        state.push_terminal(&prev.latent, r_ep);
+                        let rank_score = match m7_rank_by {
+                            ApproachRankBy::Return => self.approach_ep_returns[i],
+                            ApproachRankBy::Novelty => {
+                                // Terminal-specific rarity — reads
+                                // from the M7 state's own
+                                // `terminal_visit_counts`, NOT the
+                                // full buffer's visit_count (which
+                                // would conflate "terminated here"
+                                // with "passed through here"). Note:
+                                // this lookup happens BEFORE the
+                                // subsequent `push_terminal` call
+                                // increments the count, so the rank
+                                // reflects historical rarity, not
+                                // including self.
+                                state.terminal_novelty(&prev.latent)
+                            }
+                        };
+                        state.push_terminal(&prev.latent, rank_score);
                     }
                 }
                 self.approach_ep_returns[i] = 0.0;

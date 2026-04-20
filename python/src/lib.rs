@@ -16,7 +16,7 @@ use kindle::adapter::{GenericAdapter, OBS_TOKEN_DIM};
 use kindle::env::{
     Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
 };
-use kindle::{Agent, AgentConfig, agent::{OutcomeBonus, OutcomeTarget}};
+use kindle::{Agent, AgentConfig, agent::{ApproachRankBy, OutcomeBonus, OutcomeTarget}};
 use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyTuple};
@@ -432,6 +432,7 @@ impl PyBatchAgent {
         approach_distance_clamp = None,
         approach_confidence_saturation = None,
         homeo_confidence_taper = None,
+        approach_rank_by = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -473,6 +474,7 @@ impl PyBatchAgent {
         approach_distance_clamp: Option<f32>,
         approach_confidence_saturation: Option<usize>,
         homeo_confidence_taper: Option<f32>,
+        approach_rank_by: Option<String>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -635,6 +637,17 @@ impl PyBatchAgent {
         }
         if let Some(ht) = homeo_confidence_taper {
             config.homeo_confidence_taper = ht;
+        }
+        if let Some(rb) = approach_rank_by {
+            config.approach_rank_by = match rb.as_str() {
+                "return" => ApproachRankBy::Return,
+                "novelty" => ApproachRankBy::Novelty,
+                other => {
+                    return Err(PyValueError::new_err(format!(
+                        "approach_rank_by must be 'return' or 'novelty', got {other:?}"
+                    )));
+                }
+            };
         }
         let agent = Agent::new(config, adapters);
         Ok(Self {

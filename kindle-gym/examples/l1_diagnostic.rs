@@ -166,6 +166,11 @@ fn agent_config(num_options: usize) -> AgentConfig {
         .ok()
         .and_then(|s| s.parse::<f32>().ok())
         .unwrap_or(1.0);
+    let m7_rank = std::env::var("KINDLE_M7_RANK_BY").unwrap_or_default();
+    let rank_by = match m7_rank.as_str() {
+        "novelty" => kindle::agent::ApproachRankBy::Novelty,
+        _ => kindle::agent::ApproachRankBy::Return,
+    };
     AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
@@ -179,6 +184,7 @@ fn agent_config(num_options: usize) -> AgentConfig {
         approach_reward_alpha: m7_alpha,
         approach_confidence_saturation: m7_saturation,
         homeo_confidence_taper: m7_taper,
+        approach_rank_by: rank_by,
         approach_distance_clamp: 20.0,
         advantage_clamp: adv_clamp,
         ..AgentConfig::default()
