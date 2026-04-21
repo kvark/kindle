@@ -42,6 +42,7 @@ use crate::option;
 use crate::outcome;
 use crate::policy;
 use crate::reward::{RewardCircuit, RewardWeights};
+use crate::rnd;
 use crate::world_model::WorldModel;
 use crate::OptLevel;
 use hashbrown::HashMap;
@@ -356,6 +357,25 @@ pub struct AgentConfig {
     /// it would hurt (timeout-success is common, so novelty
     /// demotes it).
     pub approach_rank_by: ApproachRankBy,
+    /// RND curiosity weight. When `> 0`, kindle builds a
+    /// Random-Network-Distillation pair (frozen random target +
+    /// trainable predictor, both MLPs on the agent's latent
+    /// `z`) and adds `α · mse(predictor(z), target(z))` to the
+    /// per-step reward. Zero (default) disables RND and skips
+    /// both net construction and per-step training overhead.
+    /// Unlike the surprise primitive, RND's prediction error
+    /// doesn't decay as the world model converges, so it remains
+    /// a live exploration signal throughout training — designed
+    /// for the curiosity-death failure mode the ARC-AGI-3 sweep
+    /// exposed (see commit 780c9a2).
+    pub rnd_reward_alpha: f32,
+    /// RND feature dim (target + predictor output size). Default 16.
+    pub rnd_feature_dim: usize,
+    /// RND hidden-layer width. Default 64.
+    pub rnd_hidden_dim: usize,
+    /// RND predictor learning rate. `None` → `learning_rate × 0.3`,
+    /// matching the credit / outcome-head scale.
+    pub rnd_lr: Option<f32>,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -448,6 +468,10 @@ impl Default for AgentConfig {
             approach_confidence_saturation: 0,
             homeo_confidence_taper: 0.0,
             approach_rank_by: ApproachRankBy::Return,
+            rnd_reward_alpha: 0.0,
+            rnd_feature_dim: 16,
+            rnd_hidden_dim: 64,
+            rnd_lr: None,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -528,6 +552,13 @@ pub struct Diagnostics {
     /// met. Used to scale the approach bonus and (optionally)
     /// taper the homeo reward. Always 0 when M7 is disabled.
     pub approach_confidence: f32,
+    /// RND predictor MSE averaged across lanes on the most recent
+    /// step. Proportional to the per-step curiosity reward
+    /// (ignoring the α weight). Tracks how unfamiliar the current
+    /// latent cluster is to the predictor; should be positive when
+    /// curiosity is driving exploration, and drift toward zero on
+    /// over-visited state regions. Always 0 when RND is disabled.
+    pub rnd_mse: f32,
 }
 
 /// Per-lane state. One per concurrent batch slot. Every slot owns its own
@@ -863,6 +894,12 @@ pub struct Agent {
     /// M7 approach-reward state. `None` when
     /// `approach_reward_alpha == 0.0` (default) — zero CPU cost.
     approach_state: Option<approach::ApproachState>,
+    /// RND curiosity state. `None` when `rnd_reward_alpha == 0.0`
+    /// (default) — zero compute cost.
+    rnd_state: Option<rnd::RndState>,
+    /// Most recent RND per-step MSE across lanes, averaged.
+    /// Diagnostic only.
+    last_rnd_mse: f32,
     /// M7 per-lane episode-return accumulator (in kindle's
     /// intrinsic reward). Used so the prototype-updater sees the
     /// same `r_ep` that trained the policy, not a separate
@@ -1126,6 +1163,24 @@ impl Agent {
 
         // M7 approach-reward state. Constructed only when
         // `approach_reward_alpha > 0`. Cheap CPU data structure.
+        // RND curiosity state. Constructed only when
+        // `rnd_reward_alpha > 0` so the default agent pays no
+        // per-step overhead. RND operates on the obs TOKEN
+        // (64-dim, pre-encoder) — see the docstring on
+        // `rnd_reward_alpha` for the rationale.
+        let rnd_state = if config.rnd_reward_alpha > 0.0 {
+            let lr = config.rnd_lr.unwrap_or(config.learning_rate * 0.3);
+            Some(rnd::RndState::new(
+                OBS_TOKEN_DIM,
+                config.rnd_feature_dim,
+                config.rnd_hidden_dim,
+                lr,
+                0x42_BEEF_D15E_A53Eu64 ^ (config.batch_size as u64).wrapping_mul(0x9E37_79B9),
+            ))
+        } else {
+            None
+        };
+
         let approach_state = if config.approach_reward_alpha > 0.0 {
             Some(approach::ApproachState::new(
                 config.latent_dim,
@@ -1261,6 +1316,8 @@ impl Agent {
             approach_state,
             approach_ep_returns: vec![0.0; n],
             approach_distances: vec![0.0; n],
+            rnd_state,
+            last_rnd_mse: 0.0,
             config,
         }
     }
@@ -1678,6 +1735,10 @@ impl Agent {
         let m7_rank_by = self.config.approach_rank_by;
         let m7_clamp = self.config.approach_distance_clamp;
         let m7_saturation = self.config.approach_confidence_saturation;
+        let rnd_alpha = self.config.rnd_reward_alpha;
+        let mut rnd_state = self.rnd_state.take();
+        let mut rnd_mse_sum = 0.0f32;
+        let mut rnd_mse_count = 0usize;
         let m7_warmup = self.config.approach_warmup_episodes;
         let m7_homeo_taper = self.config.homeo_confidence_taper.clamp(0.0, 1.0);
         let mut m7_state = self.approach_state.take();
@@ -1930,7 +1991,29 @@ impl Agent {
             // from being built out of the M7 bonus's own echo.
             self.approach_ep_returns[i] += reward_pre_m6;
 
-            let reward = reward_pre_m6 + m6_bonus + m7_reward;
+            // RND curiosity: train predictor on current z, emit
+            // MSE as intrinsic reward. Unlike kindle's surprise
+            // (which decays as the WM converges), RND's target is
+            // a frozen random net so the curiosity signal stays
+            // alive as long as there are states the predictor
+            // hasn't been fit against.
+            // RND reads the obs TOKEN (pre-encoder, 64-dim) rather
+            // than the post-encoder latent. An encoder that has
+            // converged tightly clusters latents into a narrow
+            // region where the predictor can match the target
+            // quickly on any z — killing RND's signal. The obs
+            // token carries more raw variation across frames, so
+            // MSE stays informative longer.
+            let rnd_reward = if let Some(state) = rnd_state.as_mut() {
+                let mse = state.step(obs_row);
+                rnd_mse_sum += mse;
+                rnd_mse_count += 1;
+                rnd_alpha * mse
+            } else {
+                0.0
+            };
+
+            let reward = reward_pre_m6 + m6_bonus + m7_reward + rnd_reward;
 
             lane.buffer.push(Transition {
                 observation: obs_row.to_vec(),
@@ -1964,6 +2047,12 @@ impl Agent {
         self.last_outcome_baseline = m6_baseline_diag;
         // Restore the M7 state.
         self.approach_state = m7_state;
+        self.rnd_state = rnd_state;
+        self.last_rnd_mse = if rnd_mse_count > 0 {
+            rnd_mse_sum / rnd_mse_count as f32
+        } else {
+            0.0
+        };
 
         // --- Credit assignment (per-lane, sequential CPU-light dispatches) ---
         for i in 0..n {
@@ -2853,6 +2942,7 @@ impl Agent {
                         .map(|s| s.centroid_age)
                         .unwrap_or(0),
                     approach_confidence: self.approach_confidence(),
+                    rnd_mse: self.last_rnd_mse,
                 }
             })
             .collect()

@@ -445,6 +445,10 @@ impl PyBatchAgent {
         reward_homeostatic = None,
         reward_order = None,
         grid_resolution = None,
+        rnd_reward_alpha = None,
+        rnd_feature_dim = None,
+        rnd_hidden_dim = None,
+        rnd_lr = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -496,6 +500,10 @@ impl PyBatchAgent {
         reward_homeostatic: Option<f32>,
         reward_order: Option<f32>,
         grid_resolution: Option<f32>,
+        rnd_reward_alpha: Option<f32>,
+        rnd_feature_dim: Option<usize>,
+        rnd_hidden_dim: Option<usize>,
+        rnd_lr: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -684,6 +692,18 @@ impl PyBatchAgent {
         }
         if let Some(gr) = grid_resolution {
             config.grid_resolution = gr;
+        }
+        if let Some(v) = rnd_reward_alpha {
+            config.rnd_reward_alpha = v;
+        }
+        if let Some(v) = rnd_feature_dim {
+            config.rnd_feature_dim = v;
+        }
+        if let Some(v) = rnd_hidden_dim {
+            config.rnd_hidden_dim = v;
+        }
+        if let Some(v) = rnd_lr {
+            config.rnd_lr = Some(v);
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
