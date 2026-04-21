@@ -417,6 +417,16 @@ pub struct AgentConfig {
     /// M8 symmetric distance clamp (pre-α) to bound worst-case
     /// per-step reward magnitude.
     pub delta_goal_distance_clamp: f32,
+    /// M8 v2: minimum world-model prediction error required to
+    /// consider recording a new goal. Only transitions where
+    /// `pred_error >= delta_goal_surprise_threshold` AND
+    /// `‖Δobs‖ >= delta_goal_threshold` enter the bank. Banking on
+    /// raw obs-deltas alone (v1) collects the agent's routine
+    /// trajectory — no gradient toward new behaviour. Gating on
+    /// WM surprise biases the bank toward transitions the WM
+    /// didn't predict, i.e. genuinely unexpected events. `0.0`
+    /// (treat as "no surprise gate") preserves v1 semantics.
+    pub delta_goal_surprise_threshold: f32,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -522,6 +532,7 @@ impl Default for AgentConfig {
             delta_goal_merge_radius: 0.1,
             delta_goal_bank_size: 64,
             delta_goal_distance_clamp: 5.0,
+            delta_goal_surprise_threshold: 0.5,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -1852,6 +1863,7 @@ impl Agent {
         let mut rnd_mse_count = 0usize;
         let dg_alpha = self.config.delta_goal_alpha;
         let dg_clamp = self.config.delta_goal_distance_clamp;
+        let dg_surprise_gate = self.config.delta_goal_surprise_threshold;
         let mut dg_bank = self.delta_goal_bank.take();
         let mut dg_events_this_step: usize = 0;
         let m7_warmup = self.config.approach_warmup_episodes;
@@ -2129,19 +2141,26 @@ impl Agent {
             };
 
             // M8 delta-goal reward. First, consider recording a new
-            // goal from the (prev, cur) OBS pair; then score the
-            // current obs against the (possibly just-updated) bank.
-            // `prev_obs` is cleared on episode boundaries below so
-            // cross-episode jumps never register. See bank
-            // construction for the rationale for obs over latent.
+            // goal from the (prev, cur) OBS pair — gated by
+            // `pred_error >= surprise_threshold` so only
+            // WM-surprising transitions populate the bank. Then
+            // score the current obs against the (possibly
+            // just-updated) bank. `prev_obs` is cleared on episode
+            // boundaries so cross-episode jumps never register.
             let dg_reward = if let Some(bank) = dg_bank.as_mut() {
                 if env_boundary {
                     self.delta_goal_prev_latent[i] = None;
                 }
-                let prev = self.delta_goal_prev_latent[i].as_deref();
-                if bank.observe_delta(prev, obs_row) {
-                    dg_events_this_step += 1;
+                if pred_error >= dg_surprise_gate {
+                    let prev = self.delta_goal_prev_latent[i].as_deref();
+                    if bank.observe_delta(prev, obs_row) {
+                        dg_events_this_step += 1;
+                    }
                 }
+                // Always update prev_obs, even when the surprise
+                // gate blocks recording, so the next step's delta
+                // is measured against this step rather than against
+                // a stale pre-gate observation.
                 self.delta_goal_prev_latent[i] = Some(obs_row.to_vec());
                 bank.reward(obs_row, dg_alpha, dg_clamp)
             } else {

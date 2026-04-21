@@ -458,6 +458,7 @@ impl PyBatchAgent {
         delta_goal_merge_radius = None,
         delta_goal_bank_size = None,
         delta_goal_distance_clamp = None,
+        delta_goal_surprise_threshold = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -522,6 +523,7 @@ impl PyBatchAgent {
         delta_goal_merge_radius: Option<f32>,
         delta_goal_bank_size: Option<usize>,
         delta_goal_distance_clamp: Option<f32>,
+        delta_goal_surprise_threshold: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -747,6 +749,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = delta_goal_distance_clamp {
             config.delta_goal_distance_clamp = v;
+        }
+        if let Some(v) = delta_goal_surprise_threshold {
+            config.delta_goal_surprise_threshold = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
