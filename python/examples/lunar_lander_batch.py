@@ -199,12 +199,56 @@ def lunar_lander_homeo_v5(obs, action):
     ]
 
 
+def lunar_lander_homeo_v6(obs, action):
+    """v6 shaping: 3-axis decomposition.
+
+    Splits the implicit "don't crash" signal into independent control
+    axes, each a single homeo variable with its own target + tolerance.
+    Unlike v1–v5 which mix concerns via compound terms (crash_risk =
+    descent × proximity, angle × proximity, etc.), v6 gives each axis a
+    gradient that's active throughout the flight — the policy sees
+    concurrent independent signals for "descend", "slow down", and
+    "fly straight", rather than a single crash-basin attractor.
+
+    - Altitude: `max(0, altitude) → 0`. Continuous downward pull
+      regardless of phase.
+    - Vertical velocity: `vy → −0.25`. Target a gentle controlled
+      descent.
+    - Horizontal velocity: `vx → 0`. Explicitly separate from vy.
+    - Angle: `angle → 0`. Active throughout (v1–v5 gated this on
+      proximity, so tilt in the upper atmosphere was free).
+    - Angular velocity: `ang_vel → 0`. Damping signal.
+    - Legs: `−(leg1 + leg2) → −2`. Positive pull toward both-legs-down.
+
+    No fuel cost (kindle's advantage_clamp already caps per-step
+    penalty magnitude, so adding an action-dependent negative term
+    just fights the other gradients). No `not_safely_landed` flat
+    offset (v1's crash-basin failure mode).
+    """
+    altitude = float(obs[1])
+    vx = float(obs[2])
+    vy = float(obs[3])
+    angle = float(obs[4])
+    angular_vel = float(obs[5])
+    leg1 = float(obs[6])
+    leg2 = float(obs[7])
+    return [
+        {"value": max(0.0, altitude), "target": 0.0, "tolerance": 0.1},
+        {"value": vy, "target": -0.25, "tolerance": 0.2},
+        {"value": vx, "target": 0.0, "tolerance": 0.1},
+        {"value": angle, "target": 0.0, "tolerance": 0.1},
+        {"value": angular_vel, "target": 0.0, "tolerance": 0.15},
+        {"value": -(leg1 + leg2), "target": -2.0, "tolerance": 0.1},
+    ]
+
+
 _SHAPING_VARIANTS = {
     "v1": lunar_lander_homeo_v1,
     "v2": lunar_lander_homeo_v2,
     "v3": lunar_lander_homeo_v3,
     "v4": lunar_lander_homeo_v4,
     "v5": lunar_lander_homeo_v5,
+    "v6": lunar_lander_homeo_v6,
 }
 
 
