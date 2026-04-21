@@ -369,3 +369,98 @@ action coord specifics that random can't find).
   ❌ Multi-game generalization: only cd82 shows level events.
      Most ARC-AGI-3 games still require specific action
      sequences that kindle's exploration doesn't find.
+
+## 2026-04-20 update (2): RND reset + coord action head
+
+Two more primitives added, matching the "continue" discussion:
+
+1. **`Agent::reset_rnd_predictor()`** — re-initializes the RND
+   predictor weights, keeping the target frozen. Re-activates
+   curiosity when the state distribution shifts (e.g. on
+   level-up). Exposed to Python as
+   `BatchAgent.reset_rnd_predictor()`; ARC harness calls it
+   automatically with `--rnd-reset-on-level` whenever
+   `delta_levels > 0`. Unit test verifies: reset spikes MSE on
+   a previously-familiar state, target weights stay identical.
+
+2. **`coord` module + `CoordHead`** — CPU MLP
+   `z → (μ_x, μ_y) ∈ [−1, 1]`, Gaussian-REINFORCE-trained. New
+   `Agent::sample_coords(&mut rng)` returns per-lane `(x, y)`
+   samples; `Agent::train_coord_head()` runs the REINFORCE
+   update using the last step's reward (EMA baseline-centered,
+   `α = coord_action_alpha`). ARC harness samples coords
+   before `env.step`, scales `[-1, 1]` → `[0, 63]`, attaches
+   via `GameAction.set_data()`. Now kindle controls both the
+   discrete action ID and the `(x, y)` clickpoint — instead of
+   random noise as before. 4 unit tests (forward-range,
+   per-lane sample caching, positive-advantage-pulls-toward-
+   sample, zero-advantage-noop) all pass.
+
+### Results on cd82 (30k steps each, CNN + all primitives):
+
+  config                                  events   L1 reach rate
+  prior M7+RND+homeo-fix                     1      90%
+  + RND reset on L1                          1      (unchanged)
+  + coord head (α=1)                         1      **100%**
+
+With all three enabled — RND, RND-reset-on-level, coord head,
+fixed homeo — **kindle reaches L1 on every completed episode**
+(100% reliability, up from 90% with RND alone). The stack is
+stable and the L1-reaching policy is fully learned.
+
+But **no L2 events**. Observed mechanism: RND-reset fires on
+L1, MSE spikes 0.01 → 0.12, pi_loss jumps +11.55 (policy
+disrupted). MSE decays to 0.01 within ~5000 steps as the
+predictor re-fits the post-L1 state distribution. The agent
+then stabilizes on "reach L1 and stop" because that's the
+nearest local optimum in the current reward landscape. L2
+requires an 8-action specific sequence FROM L1; random +
+coord-policy exploration in the 300–400 step window after L1
+doesn't find it.
+
+### sb26 (coord-controlled clickpoints):
+
+Entropy drops to 1.09 (near max for 3 actions = ln(3)=1.099),
+policy commits slightly, coord head trains every step. But 0
+level events in 20k steps. Without any level events to
+bootstrap from, the coord head's REINFORCE advantage signal is
+~uniform (all rewards comparable, baseline tracks), so the
+coord policy wanders randomly. Consistent with the
+"exploration without ground truth" failure mode.
+
+### Updated infrastructure checklist
+
+  ✅ Vision encoder (commit 241cbec)
+  ✅ RND curiosity (commit f24996b)
+  ✅ Complex action plumbing (commit 019f3df)
+  ✅ Fixed homeo signal
+  ✅ First level event on cd82
+  ✅ RND predictor reset
+  ✅ Coord action head (kindle-controlled clicks)
+  ✅ 100% L1 reliability on cd82
+  ⚠ Multi-level progression: still gated on per-game dynamics
+    and requires finding level-completion sequences that our
+    current exploration doesn't discover (cd82 never sees L2,
+    sb26 never sees L1).
+
+### Remaining honest options for ARC-AGI-3 progression
+
+Each is genuine research-scale work:
+
+  - **Staged curriculum**: train on 2-3 adjacent level
+    transitions explicitly. Breaks the "local-optimum at L1"
+    problem by giving the agent L2-adjacent initial states
+    via save-state replay.
+  - **Learned go-explore**: archive novel states, periodically
+    reset the agent to archive states for deeper exploration.
+    Known technique for sparse-reward envs (Ecoffet et al.
+    2019).
+  - **Self-supervised sub-goal discovery**: explicitly identify
+    state transitions that are POTENTIALLY level-boundaries
+    (e.g. cluster "mode shifts" in the CNN latent) and give
+    the agent sub-rewards for triggering them. Kindle-flavored
+    variant of option discovery.
+
+The current infrastructure supports any of these — we have
+clean slots for additional primitives, a working vision
+encoder, and a functional RND+coord stack to build on.

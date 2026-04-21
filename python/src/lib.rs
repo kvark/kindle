@@ -449,6 +449,10 @@ impl PyBatchAgent {
         rnd_feature_dim = None,
         rnd_hidden_dim = None,
         rnd_lr = None,
+        coord_action_alpha = None,
+        coord_hidden_dim = None,
+        coord_sigma = None,
+        coord_lr = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -504,6 +508,10 @@ impl PyBatchAgent {
         rnd_feature_dim: Option<usize>,
         rnd_hidden_dim: Option<usize>,
         rnd_lr: Option<f32>,
+        coord_action_alpha: Option<f32>,
+        coord_hidden_dim: Option<usize>,
+        coord_sigma: Option<f32>,
+        coord_lr: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -705,6 +713,18 @@ impl PyBatchAgent {
         if let Some(v) = rnd_lr {
             config.rnd_lr = Some(v);
         }
+        if let Some(v) = coord_action_alpha {
+            config.coord_action_alpha = v;
+        }
+        if let Some(v) = coord_hidden_dim {
+            config.coord_hidden_dim = v;
+        }
+        if let Some(v) = coord_sigma {
+            config.coord_sigma = v;
+        }
+        if let Some(v) = coord_lr {
+            config.coord_lr = Some(v);
+        }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
                 "mlp" => EncoderKind::Mlp,
@@ -881,6 +901,32 @@ impl PyBatchAgent {
     /// agents.
     fn set_visual_obs(&mut self, visual: Vec<f32>) {
         self.agent.set_visual_obs(&visual);
+    }
+
+    /// Re-initialize the RND predictor. Used to re-activate
+    /// curiosity when the agent enters a new state distribution
+    /// (e.g. on level-up in ARC-AGI-3). No-op when RND is
+    /// disabled.
+    fn reset_rnd_predictor(&mut self) {
+        self.agent.reset_rnd_predictor();
+    }
+
+    /// Sample per-lane `(x, y)` from the coord head, each in
+    /// `[−1, 1]`. Harness rescales to the target env's coord
+    /// range. Returns zeros per lane when the coord head is
+    /// disabled. Call before the env step; kindle caches sample
+    /// state so `train_coord_head` can apply the REINFORCE
+    /// update once the resulting reward is known.
+    fn sample_coords(&mut self) -> Vec<(f32, f32)> {
+        self.agent.sample_coords(&mut self.rng)
+    }
+
+    /// Train the coord head on the per-step rewards cached during
+    /// the last `observe()`. Uses an EMA reward baseline inside
+    /// the agent so the harness doesn't need to supply
+    /// advantages. No-op when the coord head is disabled.
+    fn train_coord_head(&mut self) {
+        self.agent.train_coord_head();
     }
 }
 
