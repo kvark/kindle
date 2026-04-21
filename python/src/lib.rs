@@ -17,8 +17,8 @@ use kindle::env::{
     Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
 };
 use kindle::{
-    Agent, AgentConfig,
     agent::{ApproachRankBy, EncoderKind, OutcomeBonus, OutcomeTarget},
+    Agent, AgentConfig,
 };
 use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
@@ -622,9 +622,7 @@ impl PyBatchAgent {
         if let Some(t) = outcome_target {
             config.outcome_target = match t.as_str() {
                 "episode_sum" | "episode-sum" => OutcomeTarget::EpisodeSum,
-                "terminal_reward" | "terminal-reward" | "terminal" => {
-                    OutcomeTarget::TerminalReward
-                }
+                "terminal_reward" | "terminal-reward" | "terminal" => OutcomeTarget::TerminalReward,
                 "reward_to_go" | "reward-to-go" | "rtg" => OutcomeTarget::RewardToGo,
                 other => {
                     return Err(PyValueError::new_err(format!(
@@ -730,19 +728,13 @@ impl PyBatchAgent {
                 "mlp" => EncoderKind::Mlp,
                 "cnn" => {
                     let channels = encoder_channels.ok_or_else(|| {
-                        PyValueError::new_err(
-                            "encoder_kind='cnn' requires encoder_channels",
-                        )
+                        PyValueError::new_err("encoder_kind='cnn' requires encoder_channels")
                     })?;
                     let height = encoder_height.ok_or_else(|| {
-                        PyValueError::new_err(
-                            "encoder_kind='cnn' requires encoder_height",
-                        )
+                        PyValueError::new_err("encoder_kind='cnn' requires encoder_height")
                     })?;
                     let width = encoder_width.ok_or_else(|| {
-                        PyValueError::new_err(
-                            "encoder_kind='cnn' requires encoder_width",
-                        )
+                        PyValueError::new_err("encoder_kind='cnn' requires encoder_width")
                     })?;
                     EncoderKind::Cnn {
                         channels,

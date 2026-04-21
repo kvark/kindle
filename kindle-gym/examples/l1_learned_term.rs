@@ -41,11 +41,7 @@ struct RunOut {
     wm_late: f32,
 }
 
-fn run(
-    env: Box<dyn Environment>,
-    adapter: Box<dyn kindle::EnvAdapter>,
-    learned: bool,
-) -> RunOut {
+fn run(env: Box<dyn Environment>, adapter: Box<dyn kindle::EnvAdapter>, learned: bool) -> RunOut {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
@@ -63,8 +59,7 @@ fn run(
     let mut env = env;
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
 
-    let mut per_option_tail: Vec<Vec<u32>> =
-        (0..NUM_OPTIONS).map(|_| vec![0u32; 6]).collect();
+    let mut per_option_tail: Vec<Vec<u32>> = (0..NUM_OPTIONS).map(|_| vec![0u32; 6]).collect();
     let mut last_option: i32 = -1;
     let mut current_length: u32 = 0;
     let mut option_lengths: Vec<u32> = Vec::new();
@@ -93,7 +88,13 @@ fn run(
 
         let a_idx = match &action {
             Action::Discrete(i) => *i,
-            Action::Continuous(v) if !v.is_empty() => if v[0] > 0.0 { 0 } else { 1 },
+            Action::Continuous(v) if !v.is_empty() => {
+                if v[0] > 0.0 {
+                    0
+                } else {
+                    1
+                }
+            }
             _ => 0,
         };
         if step >= STEPS - 1000 && (opt as usize) < NUM_OPTIONS && a_idx < 6 {
@@ -124,7 +125,9 @@ fn run(
     let mut distinct = std::collections::HashSet::new();
     for row in &per_option_tail {
         let total: u32 = row.iter().sum();
-        if total == 0 { continue; }
+        if total == 0 {
+            continue;
+        }
         let (best_a, _) = row.iter().enumerate().max_by_key(|&(_, c)| *c).unwrap();
         distinct.insert(best_a);
     }
@@ -161,31 +164,77 @@ fn main() {
     type Factory = Box<dyn Fn() -> (Box<dyn Environment>, Box<dyn kindle::EnvAdapter>)>;
     use kindle_gym::*;
     let envs: Vec<(&'static str, Factory)> = vec![
-        ("GridWorld", Box::new(|| (
-            Box::new(GridWorld::new()) as Box<dyn Environment>,
-            Box::new(GenericAdapter::discrete(0, grid_world::OBS_DIM, grid_world::NUM_ACTIONS))
-                as Box<dyn kindle::EnvAdapter>,
-        ))),
-        ("CartPole", Box::new(|| (
-            Box::new(CartPole::new()), Box::new(GenericAdapter::discrete(1, 4, 2)),
-        ))),
-        ("MountainCar", Box::new(|| (
-            Box::new(MountainCar::new()), Box::new(GenericAdapter::discrete(2, 2, 3)),
-        ))),
-        ("Acrobot", Box::new(|| (
-            Box::new(Acrobot::new()), Box::new(GenericAdapter::discrete(3, 6, 3)),
-        ))),
-        ("Taxi", Box::new(|| (
-            Box::new(Taxi::new()),
-            Box::new(GenericAdapter::discrete(4, taxi::OBS_DIM, taxi::NUM_ACTIONS)),
-        ))),
-        ("RandomWalk", Box::new(|| (
-            Box::new(RandomWalk::new(10)), Box::new(GenericAdapter::discrete(5, 10, 2)),
-        ))),
-        ("Pendulum", Box::new(|| (
-            Box::new(Pendulum::new()),
-            Box::new(GenericAdapter::continuous(6, 3, 1, 0.5)),
-        ))),
+        (
+            "GridWorld",
+            Box::new(|| {
+                (
+                    Box::new(GridWorld::new()) as Box<dyn Environment>,
+                    Box::new(GenericAdapter::discrete(
+                        0,
+                        grid_world::OBS_DIM,
+                        grid_world::NUM_ACTIONS,
+                    )) as Box<dyn kindle::EnvAdapter>,
+                )
+            }),
+        ),
+        (
+            "CartPole",
+            Box::new(|| {
+                (
+                    Box::new(CartPole::new()),
+                    Box::new(GenericAdapter::discrete(1, 4, 2)),
+                )
+            }),
+        ),
+        (
+            "MountainCar",
+            Box::new(|| {
+                (
+                    Box::new(MountainCar::new()),
+                    Box::new(GenericAdapter::discrete(2, 2, 3)),
+                )
+            }),
+        ),
+        (
+            "Acrobot",
+            Box::new(|| {
+                (
+                    Box::new(Acrobot::new()),
+                    Box::new(GenericAdapter::discrete(3, 6, 3)),
+                )
+            }),
+        ),
+        (
+            "Taxi",
+            Box::new(|| {
+                (
+                    Box::new(Taxi::new()),
+                    Box::new(GenericAdapter::discrete(
+                        4,
+                        taxi::OBS_DIM,
+                        taxi::NUM_ACTIONS,
+                    )),
+                )
+            }),
+        ),
+        (
+            "RandomWalk",
+            Box::new(|| {
+                (
+                    Box::new(RandomWalk::new(10)),
+                    Box::new(GenericAdapter::discrete(5, 10, 2)),
+                )
+            }),
+        ),
+        (
+            "Pendulum",
+            Box::new(|| {
+                (
+                    Box::new(Pendulum::new()),
+                    Box::new(GenericAdapter::continuous(6, 3, 1, 0.5)),
+                )
+            }),
+        ),
     ];
 
     for (name, factory) in &envs {
@@ -196,8 +245,12 @@ fn main() {
         println!(
             "{:>12} | {:>6} {:>7.2} {:>+9.2} | {:>6} {:>7.2} {:>+9.2}",
             name,
-            fixed.distinct, fixed.mean_option_length, fixed.homeo_drop,
-            learned.distinct, learned.mean_option_length, learned.homeo_drop,
+            fixed.distinct,
+            fixed.mean_option_length,
+            fixed.homeo_drop,
+            learned.distinct,
+            learned.mean_option_length,
+            learned.homeo_drop,
         );
     }
 }

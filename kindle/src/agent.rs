@@ -32,6 +32,7 @@
 //! - Representation drift monitor
 //! - Entropy floor
 
+use crate::OptLevel;
 use crate::adapter::{EnvAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, TASK_DIM};
 use crate::approach;
 use crate::buffer::{ExperienceBuffer, Transition};
@@ -45,11 +46,10 @@ use crate::policy;
 use crate::reward::{RewardCircuit, RewardWeights};
 use crate::rnd;
 use crate::world_model::WorldModel;
-use crate::OptLevel;
 use hashbrown::HashMap;
+use meganeura::Session;
 use meganeura::graph::Graph;
 use meganeura::nn;
-use meganeura::Session;
 use rand::Rng;
 
 /// What encoder kindle builds as the WM graph's backbone.
@@ -1206,8 +1206,7 @@ impl Agent {
                 config.batch_size,
                 lr,
                 config.coord_sigma,
-                0xC001_0D25_DECA_FBADu64
-                    ^ (config.batch_size as u64).wrapping_mul(0x9E37_79B9),
+                0xC001_0D25_DECA_FBADu64 ^ (config.batch_size as u64).wrapping_mul(0x9E37_79B9),
             ))
         } else {
             None
@@ -2926,8 +2925,7 @@ impl Agent {
         let mean_r: f32 = self.coord_last_reward.iter().copied().sum::<f32>()
             / self.coord_last_reward.len().max(1) as f32;
         let ema = 0.02f32;
-        self.coord_reward_baseline =
-            (1.0 - ema) * self.coord_reward_baseline + ema * mean_r;
+        self.coord_reward_baseline = (1.0 - ema) * self.coord_reward_baseline + ema * mean_r;
         for (i, lane) in self.lanes.iter().enumerate() {
             let z = match lane.buffer.last() {
                 Some(t) => t.latent.clone(),
@@ -2999,11 +2997,7 @@ impl Agent {
                                 pairs += 1;
                             }
                         }
-                        if pairs == 0 {
-                            0.0
-                        } else {
-                            sum / pairs as f32
-                        }
+                        if pairs == 0 { 0.0 } else { sum / pairs as f32 }
                     } else {
                         0.0
                     };

@@ -300,7 +300,10 @@ mod tests {
             final_mse < initial * 0.1,
             "predictor should fit target on repeated z: {initial} → {final_mse}"
         );
-        assert!(final_mse < 1e-2, "final MSE should be near zero: {final_mse}");
+        assert!(
+            final_mse < 1e-2,
+            "final MSE should be near zero: {final_mse}"
+        );
     }
 
     #[test]
@@ -313,7 +316,9 @@ mod tests {
             s.step(&z_familiar);
         }
         let r_familiar = s.reward(&z_familiar);
-        let z_novel: Vec<f32> = (0..8).map(|i| if i % 2 == 0 { -1.0 } else { 1.0 }).collect();
+        let z_novel: Vec<f32> = (0..8)
+            .map(|i| if i % 2 == 0 { -1.0 } else { 1.0 })
+            .collect();
         let r_novel = s.reward(&z_novel);
         assert!(
             r_novel > r_familiar * 3.0,
@@ -336,7 +341,10 @@ mod tests {
         let target_before = s.target.w1.clone();
         s.reset_predictor();
         let r_after_reset = s.reward(&z);
-        assert_eq!(s.target.w1, target_before, "target must stay frozen on reset");
+        assert_eq!(
+            s.target.w1, target_before,
+            "target must stay frozen on reset"
+        );
         assert!(
             r_after_reset > r_before_reset * 10.0,
             "reset should re-activate curiosity: before={r_before_reset}, after={r_after_reset}"

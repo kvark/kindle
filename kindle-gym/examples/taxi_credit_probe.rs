@@ -10,7 +10,7 @@
 //! Run: `cargo run --release --example taxi_credit_probe`
 
 use kindle::{Action, Agent, AgentConfig, Environment, GenericAdapter};
-use kindle_gym::taxi::{Taxi, NUM_ACTIONS, OBS_DIM};
+use kindle_gym::taxi::{NUM_ACTIONS, OBS_DIM, Taxi};
 use rand::SeedableRng;
 
 const STEPS: usize = 3000;
@@ -47,9 +47,8 @@ fn run(label: &str, num_options: usize, option_history_len: usize, learned_term:
     let mut env = Taxi::new();
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
 
-    let mut per_option_tail: Vec<Vec<u32>> = (0..num_options.max(1))
-        .map(|_| vec![0u32; 6])
-        .collect();
+    let mut per_option_tail: Vec<Vec<u32>> =
+        (0..num_options.max(1)).map(|_| vec![0u32; 6]).collect();
     let mut homeo_sum_early = 0.0f32;
     let mut homeo_sum_late = 0.0f32;
     let mut wm_late = 0.0f32;

@@ -152,7 +152,13 @@ pub fn build_option_credit_graph(
     let history = g.input("history", &[option_history_len, input_dim]);
     let credit_target = g.input("credit_target", &[option_history_len, 1]);
 
-    let ca = CreditAssigner::new(&mut g, latent_dim, extra_dim, option_history_len, hidden_dim);
+    let ca = CreditAssigner::new(
+        &mut g,
+        latent_dim,
+        extra_dim,
+        option_history_len,
+        hidden_dim,
+    );
     let credit_pred = ca.forward(&mut g, history);
     let loss = CreditAssigner::loss(&mut g, credit_pred, credit_target);
 
