@@ -35,6 +35,7 @@
 use crate::adapter::{EnvAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, TASK_DIM};
 use crate::approach;
 use crate::buffer::{ExperienceBuffer, Transition};
+use crate::coord;
 use crate::credit;
 use crate::encoder::{CnnEncoder, Encoder};
 use crate::env::{Action, ActionKind, Environment, Observation};
@@ -376,6 +377,24 @@ pub struct AgentConfig {
     /// RND predictor learning rate. `None` → `learning_rate × 0.3`,
     /// matching the credit / outcome-head scale.
     pub rnd_lr: Option<f32>,
+    /// Continuous coordinate-action head. `0.0` (default)
+    /// disables it — kindle doesn't build the head and
+    /// `sample_coords()` returns zeros. `α > 0` constructs a
+    /// CPU MLP `z → (μ_x, μ_y) ∈ [−1, 1]` that the harness can
+    /// sample from to pick spatial-click coordinates on envs
+    /// that support them (ARC-AGI-3 complex actions). The head
+    /// trains via REINFORCE on a per-step advantage supplied by
+    /// the harness; `α` scales the reinforcement magnitude.
+    pub coord_action_alpha: f32,
+    /// Hidden width for the coord head. Default 32.
+    pub coord_hidden_dim: usize,
+    /// Gaussian exploration noise stddev in the `[−1, 1]` action
+    /// space. Default 0.3 — enough diversity to cover the coord
+    /// space, narrow enough to leave signal in the mean.
+    pub coord_sigma: f32,
+    /// LR for the coord head's REINFORCE update. `None` →
+    /// `learning_rate × 0.3`.
+    pub coord_lr: Option<f32>,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -472,6 +491,10 @@ impl Default for AgentConfig {
             rnd_feature_dim: 16,
             rnd_hidden_dim: 64,
             rnd_lr: None,
+            coord_action_alpha: 0.0,
+            coord_hidden_dim: 32,
+            coord_sigma: 0.3,
+            coord_lr: None,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -900,6 +923,16 @@ pub struct Agent {
     /// Most recent RND per-step MSE across lanes, averaged.
     /// Diagnostic only.
     last_rnd_mse: f32,
+    /// Continuous coord-action head. `None` when
+    /// `coord_action_alpha == 0.0`.
+    coord_head: Option<coord::CoordHead>,
+    /// Per-lane last reward, cached so the coord head's
+    /// REINFORCE update at the NEXT step can use the advantage
+    /// `reward − running_baseline`. We recompute on observe.
+    coord_last_reward: Vec<f32>,
+    /// EMA baseline of per-step reward for coord-head advantage
+    /// centering.
+    coord_reward_baseline: f32,
     /// M7 per-lane episode-return accumulator (in kindle's
     /// intrinsic reward). Used so the prototype-updater sees the
     /// same `r_ep` that trained the policy, not a separate
@@ -1163,6 +1196,23 @@ impl Agent {
 
         // M7 approach-reward state. Constructed only when
         // `approach_reward_alpha > 0`. Cheap CPU data structure.
+        // Coord-action head. Constructed only when
+        // `coord_action_alpha > 0`. Cheap CPU MLP.
+        let coord_head = if config.coord_action_alpha > 0.0 {
+            let lr = config.coord_lr.unwrap_or(config.learning_rate * 0.3);
+            Some(coord::CoordHead::new(
+                config.latent_dim,
+                config.coord_hidden_dim,
+                config.batch_size,
+                lr,
+                config.coord_sigma,
+                0xC001_0D25_DECA_FBADu64
+                    ^ (config.batch_size as u64).wrapping_mul(0x9E37_79B9),
+            ))
+        } else {
+            None
+        };
+
         // RND curiosity state. Constructed only when
         // `rnd_reward_alpha > 0` so the default agent pays no
         // per-step overhead. RND operates on the obs TOKEN
@@ -1318,6 +1368,9 @@ impl Agent {
             approach_distances: vec![0.0; n],
             rnd_state,
             last_rnd_mse: 0.0,
+            coord_head,
+            coord_last_reward: vec![0.0; n],
+            coord_reward_baseline: 0.0,
             config,
         }
     }
@@ -2014,6 +2067,15 @@ impl Agent {
             };
 
             let reward = reward_pre_m6 + m6_bonus + m7_reward + rnd_reward;
+
+            // Cache per-lane reward for the coord head's next
+            // REINFORCE update; the head uses this step's reward
+            // as the advantage signal for the coordinates it
+            // sampled PRE-step. The head's `sample` call caches μ
+            // and sample; `train_coord_head` (called by the
+            // harness after this `observe` returns) runs
+            // train_step using that cached state + this reward.
+            self.coord_last_reward[i] = reward;
 
             lane.buffer.push(Transition {
                 observation: obs_row.to_vec(),
@@ -2817,6 +2879,75 @@ impl Agent {
     /// ramps linearly to 1 over `approach_confidence_saturation`
     /// episodes. 1 once warmup is met if saturation = 0. Always 0
     /// when M7 is disabled.
+    /// Sample per-lane `(x, y)` coordinates from the coord head's
+    /// current policy. Returns a `[(x, y); N]` vector in `[−1, 1]`
+    /// space; callers rescale to the target env's coord range.
+    /// Returns zeros when the coord head is disabled.
+    ///
+    /// After the next `observe()` completes, call
+    /// `train_coord_head()` to update the head via REINFORCE on
+    /// whatever advantage signal the harness chooses (typically
+    /// the last per-step reward minus a baseline).
+    pub fn sample_coords<R: Rng>(&mut self, rng: &mut R) -> Vec<(f32, f32)> {
+        let n = self.lanes.len();
+        let Some(head) = self.coord_head.as_mut() else {
+            return vec![(0.0, 0.0); n];
+        };
+        let mut out = Vec::with_capacity(n);
+        for (i, lane) in self.lanes.iter().enumerate() {
+            let z = match lane.buffer.last() {
+                Some(t) => t.latent.clone(),
+                None => vec![0.0; self.latent_dim],
+            };
+            let [sx, sy] = head.sample(i, &z, || {
+                // Box-Muller from a pair of uniforms.
+                let u1: f32 = rng.random_range(1e-7..1.0);
+                let u2: f32 = rng.random_range(0.0..1.0);
+                let r = (-2.0 * u1.ln()).sqrt();
+                let theta = 2.0 * std::f32::consts::PI * u2;
+                (r * theta.cos(), r * theta.sin())
+            });
+            out.push((sx, sy));
+        }
+        out
+    }
+
+    /// Train the coord head on the most recent step's rewards via
+    /// REINFORCE. `advantage = per_lane_reward − running_baseline`;
+    /// the running baseline is an EMA updated inside the agent.
+    /// No-op when the coord head is disabled.
+    pub fn train_coord_head(&mut self) {
+        let Some(head) = self.coord_head.as_mut() else {
+            return;
+        };
+        let alpha = self.config.coord_action_alpha;
+        // Per-step reward baseline (shared across lanes — simple
+        // rolling average is enough).
+        let mean_r: f32 = self.coord_last_reward.iter().copied().sum::<f32>()
+            / self.coord_last_reward.len().max(1) as f32;
+        let ema = 0.02f32;
+        self.coord_reward_baseline =
+            (1.0 - ema) * self.coord_reward_baseline + ema * mean_r;
+        for (i, lane) in self.lanes.iter().enumerate() {
+            let z = match lane.buffer.last() {
+                Some(t) => t.latent.clone(),
+                None => continue,
+            };
+            let adv = (self.coord_last_reward[i] - self.coord_reward_baseline) * alpha;
+            head.train_step(i, &z, adv);
+        }
+    }
+
+    /// Re-initialize the RND predictor (keeps target frozen). Used
+    /// by the harness to re-activate curiosity when the agent
+    /// enters a qualitatively new state distribution (e.g. on
+    /// level-up in ARC-AGI-3). No-op when RND is disabled.
+    pub fn reset_rnd_predictor(&mut self) {
+        if let Some(state) = self.rnd_state.as_mut() {
+            state.reset_predictor();
+        }
+    }
+
     pub fn approach_confidence(&self) -> f32 {
         let Some(state) = self.approach_state.as_ref() else {
             return 0.0;

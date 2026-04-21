@@ -53,6 +53,7 @@ impl TwoLayerMlp {
     }
 
     /// Forward. Returns the `out_dim`-long feature vector.
+    #[allow(clippy::needless_range_loop)]
     fn forward(&self, z: &[f32]) -> Vec<f32> {
         debug_assert_eq!(z.len(), self.in_dim);
         let mut h = vec![0.0f32; self.hidden_dim];
@@ -148,6 +149,10 @@ pub struct RndState {
     pub hidden_dim: usize,
     pub lr: f32,
     pub last_mse: f32,
+    /// Number of times `reset_predictor` has been called. Seeds
+    /// each re-init differently so the predictor doesn't land on
+    /// the same random start.
+    pub reset_count: u64,
     target: TwoLayerMlp,
     predictor: TwoLayerMlp,
 }
@@ -169,6 +174,7 @@ impl RndState {
             hidden_dim,
             lr,
             last_mse: 0.0,
+            reset_count: 0,
             target: TwoLayerMlp::new(
                 latent_dim,
                 hidden_dim,
@@ -197,6 +203,28 @@ impl RndState {
         let mse = self.predictor.train_step(z, &target_out, self.lr);
         self.last_mse = mse;
         mse
+    }
+
+    /// Re-initialize the predictor to a fresh random starting
+    /// point, keeping the target frozen. Used when the agent
+    /// transitions into a qualitatively new state distribution
+    /// (e.g. completes a level on ARC-AGI-3): the old predictor
+    /// has fit the pre-transition state space, so its curiosity
+    /// signal is spent. A fresh predictor re-activates curiosity
+    /// on the new distribution without touching the target.
+    ///
+    /// Seed is derived from `reset_count` to keep successive
+    /// resets diverging. The target never changes, so the learned
+    /// signal shape (features the target extracts) is preserved.
+    pub fn reset_predictor(&mut self) {
+        self.reset_count = self.reset_count.wrapping_add(1);
+        let seed = 0xCAFE_F00D_CAFE_F00Du64
+            .wrapping_add(self.reset_count.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+        let in_dim = self.target.in_dim;
+        let hidden_dim = self.target.hidden_dim;
+        let out_dim = self.target.out_dim;
+        self.predictor = TwoLayerMlp::new(in_dim, hidden_dim, out_dim, seed);
+        self.last_mse = 0.0;
     }
 
     /// Pure forward-only reward read; does not train the predictor.
@@ -291,6 +319,29 @@ mod tests {
             r_novel > r_familiar * 3.0,
             "novel z should yield higher RND reward than familiar z: familiar={r_familiar}, novel={r_novel}"
         );
+    }
+
+    #[test]
+    fn rnd_reset_restores_curiosity_on_familiar_state() {
+        // After training the predictor on `z_familiar` heavily,
+        // reward drops. A reset should bring it back up without
+        // touching the target (verified via forward-only read on
+        // the same state).
+        let mut s = RndState::new(8, 16, 32, 3e-2, 21);
+        let z = vec![0.3f32; 8];
+        for _ in 0..1500 {
+            s.step(&z);
+        }
+        let r_before_reset = s.reward(&z);
+        let target_before = s.target.w1.clone();
+        s.reset_predictor();
+        let r_after_reset = s.reward(&z);
+        assert_eq!(s.target.w1, target_before, "target must stay frozen on reset");
+        assert!(
+            r_after_reset > r_before_reset * 10.0,
+            "reset should re-activate curiosity: before={r_before_reset}, after={r_after_reset}"
+        );
+        assert_eq!(s.reset_count, 1);
     }
 
     #[test]

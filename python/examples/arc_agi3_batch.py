@@ -95,6 +95,18 @@ def main() -> int:
                         help="RND MLP hidden-layer width. Default 64.")
     parser.add_argument("--rnd-lr", type=float, default=None,
                         help="RND predictor LR. Default = learning_rate × 0.3.")
+    parser.add_argument("--rnd-reset-on-level", action="store_true",
+                        help="Reset the RND predictor each time levels_completed "
+                        "increases. Re-activates curiosity when the agent reaches a new "
+                        "level whose state distribution the old predictor has already fit.")
+    parser.add_argument("--coord-alpha", type=float, default=None,
+                        help="Coord action head weight (REINFORCE scale). 0 (default) "
+                        "disables and the harness falls back to random coords for "
+                        "complex actions. >0 lets kindle learn the spatial policy.")
+    parser.add_argument("--coord-sigma", type=float, default=None,
+                        help="Gaussian exploration noise for coord head. Default 0.3.")
+    parser.add_argument("--coord-lr", type=float, default=None,
+                        help="Coord head LR. Default = learning_rate × 0.3.")
     args = parser.parse_args()
 
     # --- Set up the local ARC-AGI-3 env ---
@@ -147,13 +159,18 @@ def main() -> int:
     # on this enum type in the installed arcengine build.
     action_by_value = {int(a.value): a for a in GameAction}
 
-    def action_to_game(kindle_action_idx: int) -> GameAction:
+    def action_to_game(
+        kindle_action_idx: int,
+        kindle_xy: tuple[float, float] | None = None,
+    ) -> GameAction:
         """Map kindle's 0-indexed discrete output to the current
         frame's `available_actions`. For complex actions
-        (currently ACTION6), attach random (x, y) coordinates in
-        [0, 63] — kindle's policy doesn't control coords yet, so
-        random baseline exploration of the coord space.
-        Simple actions ignore the coordinate payload.
+        (currently ACTION6), attach `(x, y)` coordinates.
+
+        If `kindle_xy` is supplied (values in `[-1, 1]` from the
+        coord head), rescale to `[0, 63]`; otherwise fall back to
+        uniform random coords in `[0, 63]`. Simple actions
+        ignore the coordinate payload.
         """
         aa = available_actions
         if not aa:
@@ -162,10 +179,17 @@ def main() -> int:
         action_num = int(aa[idx])
         a = action_by_value[action_num]
         if a.is_complex():
-            a.set_data({
-                "x": rng.randrange(64),
-                "y": rng.randrange(64),
-            })
+            if kindle_xy is not None:
+                # [-1, 1] → [0, 63].
+                sx, sy = kindle_xy
+                x = int(round((sx + 1.0) * 0.5 * 63.0))
+                y = int(round((sy + 1.0) * 0.5 * 63.0))
+                x = max(0, min(63, x))
+                y = max(0, min(63, y))
+            else:
+                x = rng.randrange(64)
+                y = rng.randrange(64)
+            a.set_data({"x": x, "y": y})
         return a
 
     # --- Kindle agent (one lane) ---
@@ -209,6 +233,12 @@ def main() -> int:
             agent_kwargs["rnd_hidden_dim"] = args.rnd_hidden_dim
         if args.rnd_lr is not None:
             agent_kwargs["rnd_lr"] = args.rnd_lr
+        if args.coord_alpha is not None:
+            agent_kwargs["coord_action_alpha"] = args.coord_alpha
+        if args.coord_sigma is not None:
+            agent_kwargs["coord_sigma"] = args.coord_sigma
+        if args.coord_lr is not None:
+            agent_kwargs["coord_lr"] = args.coord_lr
         agent = kindle.BatchAgent(**agent_kwargs)
     else:
         agent = None  # random baseline
@@ -285,11 +315,17 @@ def main() -> int:
         if agent is not None:
             if args.encoder == "cnn":
                 agent.set_visual_obs(preprocess_visual(frame))
+            # Sample coords BEFORE act so kindle can cache the
+            # sample state; train happens post-observe.
+            kindle_xy = None
+            if args.coord_alpha is not None and args.coord_alpha > 0:
+                kindle_xy = tuple(agent.sample_coords()[0])
             actions = agent.act([current_obs])
             kindle_action = int(actions[0])
         else:
             kindle_action = rng.randrange(num_actions)
-        game_action = action_to_game(kindle_action)
+            kindle_xy = None
+        game_action = action_to_game(kindle_action, kindle_xy)
 
         # Step env
         obs_raw = env.step(game_action)
@@ -310,6 +346,13 @@ def main() -> int:
                 agent.set_visual_obs(preprocess_visual(frame))
             homeos = [homeo_for(frame, new_levels, int(obs_raw.win_levels))]
             agent.observe([new_obs], [kindle_action], homeostatic=homeos)
+            # Coord-head REINFORCE step using this step's reward.
+            if args.coord_alpha is not None and args.coord_alpha > 0:
+                agent.train_coord_head()
+            # Reset RND predictor on level transitions to
+            # re-activate curiosity on the new state distribution.
+            if args.rnd_reset_on_level and delta_levels > 0:
+                agent.reset_rnd_predictor()
 
         current_obs = new_obs
         ep_step += 1
