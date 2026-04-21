@@ -116,10 +116,7 @@ fn main() {
                 ("repr_drift", d.repr_drift),
                 ("entropy", d.policy_entropy),
             ] {
-                assert!(
-                    v.is_finite(),
-                    "non-finite {name} = {v} at step {step}"
-                );
+                assert!(v.is_finite(), "non-finite {name} = {v} at step {step}");
             }
             assert!(
                 d.loss_world_model < wm_explosion_threshold,
@@ -168,10 +165,9 @@ fn main() {
     // --- Trend checks ---
     if h_eff_samples.len() >= 4 {
         let mid = h_eff_samples.len() / 2;
-        let early: f32 =
-            h_eff_samples[..mid].iter().sum::<f32>() / mid as f32;
-        let late: f32 = h_eff_samples[mid..].iter().sum::<f32>()
-            / (h_eff_samples.len() - mid) as f32;
+        let early: f32 = h_eff_samples[..mid].iter().sum::<f32>() / mid as f32;
+        let late: f32 =
+            h_eff_samples[mid..].iter().sum::<f32>() / (h_eff_samples.len() - mid) as f32;
         println!(
             "h_eff trend: early-mean={:.2}, late-mean={:.2} (Δ={:+.2})",
             early,

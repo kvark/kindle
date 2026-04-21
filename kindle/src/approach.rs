@@ -33,11 +33,7 @@ struct GridKey(Vec<i32>);
 
 impl GridKey {
     fn from_latent(z: &[f32], resolution: f32) -> Self {
-        Self(
-            z.iter()
-                .map(|&x| (x / resolution).round() as i32)
-                .collect(),
-        )
+        Self(z.iter().map(|&x| (x / resolution).round() as i32).collect())
     }
 }
 
@@ -109,11 +105,7 @@ impl ApproachState {
     pub fn terminal_novelty(&self, z: &[f32]) -> f32 {
         let key = GridKey::from_latent(z, self.terminal_grid_resolution);
         let c = self.terminal_visit_counts.get(&key).copied().unwrap_or(0);
-        if c == 0 {
-            1.0
-        } else {
-            1.0 / (c as f32).sqrt()
-        }
+        if c == 0 { 1.0 } else { 1.0 / (c as f32).sqrt() }
     }
 
     /// Record one episode's terminal. Returns `true` if this call

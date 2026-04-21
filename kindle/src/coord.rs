@@ -234,8 +234,8 @@ mod tests {
         let h = CoordHead::new(4, 8, 1, 1e-2, 0.2, 42);
         let z = vec![0.5f32; 4];
         let [mx, my] = h.forward(&z);
-        assert!(mx >= -1.0 && mx <= 1.0, "mu_x: {mx}");
-        assert!(my >= -1.0 && my <= 1.0, "mu_y: {my}");
+        assert!((-1.0..=1.0).contains(&mx), "mu_x: {mx}");
+        assert!((-1.0..=1.0).contains(&my), "mu_y: {my}");
     }
 
     #[test]

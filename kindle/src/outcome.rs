@@ -174,7 +174,11 @@ impl OutcomeHead {
         let start_desired = end as i32 - self.window as i32 + 1;
         for j in 0..self.window {
             let idx_signed = start_desired + j as i32;
-            let idx = if idx_signed < 0 { 0 } else { idx_signed as usize };
+            let idx = if idx_signed < 0 {
+                0
+            } else {
+                idx_signed as usize
+            };
             let frame = &trajectory[idx];
             debug_assert_eq!(frame.len(), self.latent_dim);
             out.extend_from_slice(frame);
@@ -189,8 +193,7 @@ fn xavier(rows: usize, cols: usize, seed: u64) -> Vec<f32> {
     let n = rows * cols;
     (0..n)
         .map(|i| {
-            let h =
-                ((seed as f64 + i as f64 * 1.234_567) * 0.618_033_988_749_895).fract() as f32;
+            let h = ((seed as f64 + i as f64 * 1.234_567) * 0.618_033_988_749_895).fract() as f32;
             (h * PI * 2.0).sin() * scale
         })
         .collect()
@@ -263,8 +266,8 @@ mod tests {
         let window_a = vec![1.0, 0.0, 1.0, 0.0, 1.0, 0.0]; // "steady"
         let window_b = vec![0.0, 1.0, -0.5, 0.5, -1.0, 1.0]; // "swinging"
         for _ in 0..500 {
-            head.train_batch(&[window_a.clone()], 1.0);
-            head.train_batch(&[window_b.clone()], -1.0);
+            head.train_batch(std::slice::from_ref(&window_a), 1.0);
+            head.train_batch(std::slice::from_ref(&window_b), -1.0);
         }
         let pa = head.forward(&window_a);
         let pb = head.forward(&window_b);
