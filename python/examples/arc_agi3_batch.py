@@ -86,6 +86,15 @@ def main() -> int:
                         help="Latent-grid bucket size for the novelty visit counter. "
                         "Default 0.5. Lower = finer buckets = novelty stays high longer "
                         "but fewer rare-state matches.")
+    parser.add_argument("--rnd-alpha", type=float, default=None,
+                        help="RND curiosity weight. 0 (default) disables. Try 0.5-5.0 on "
+                        "visual envs where kindle's surprise/novelty primitives saturate.")
+    parser.add_argument("--rnd-feature-dim", type=int, default=None,
+                        help="RND target/predictor output size. Default 16.")
+    parser.add_argument("--rnd-hidden-dim", type=int, default=None,
+                        help="RND MLP hidden-layer width. Default 64.")
+    parser.add_argument("--rnd-lr", type=float, default=None,
+                        help="RND predictor LR. Default = learning_rate × 0.3.")
     args = parser.parse_args()
 
     # --- Set up the local ARC-AGI-3 env ---
@@ -186,6 +195,14 @@ def main() -> int:
             agent_kwargs["reward_order"] = args.reward_order
         if args.grid_resolution is not None:
             agent_kwargs["grid_resolution"] = args.grid_resolution
+        if args.rnd_alpha is not None:
+            agent_kwargs["rnd_reward_alpha"] = args.rnd_alpha
+        if args.rnd_feature_dim is not None:
+            agent_kwargs["rnd_feature_dim"] = args.rnd_feature_dim
+        if args.rnd_hidden_dim is not None:
+            agent_kwargs["rnd_hidden_dim"] = args.rnd_hidden_dim
+        if args.rnd_lr is not None:
+            agent_kwargs["rnd_lr"] = args.rnd_lr
         agent = kindle.BatchAgent(**agent_kwargs)
     else:
         agent = None  # random baseline
@@ -291,7 +308,8 @@ def main() -> int:
                     f"surp={float(d['reward_surprise']):+5.2f} "
                     f"nov={float(d['reward_novelty']):+4.2f} "
                     f"hom={float(d['reward_homeo']):+5.2f} "
-                    f"ord={float(d['reward_order']):+4.2f}"
+                    f"ord={float(d['reward_order']):+4.2f} "
+                    f"rnd={float(d.get('rnd_mse', 0.0)):+5.2f}"
                 )
             print(
                 f"step={step:>5} eps={ep_count:>3} lvl_events={levels_events:>3} "

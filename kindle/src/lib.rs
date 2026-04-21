@@ -32,6 +32,7 @@ pub mod option;
 pub mod outcome;
 pub mod policy;
 pub mod reward;
+pub mod rnd;
 pub mod world_model;
 
 pub use adapter::{EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};

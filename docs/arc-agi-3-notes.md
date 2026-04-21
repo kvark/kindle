@@ -227,3 +227,71 @@ completion is still outside the primitive class. But any of (a)
 or (b) would give kindle exploration strong enough to at least
 probe the game's reachable state space, which random and
 current-curiosity policies don't.
+
+## 2026-04-20 update: Random Network Distillation landed
+
+Added `AgentConfig::rnd_reward_alpha` + supporting knobs
+(`rnd_feature_dim`, `rnd_hidden_dim`, `rnd_lr`) and a new CPU
+module `kindle/src/rnd.rs` implementing a minimal RND primitive:
+2-layer frozen random target MLP + trainable predictor MLP, both
+operating on the obs TOKEN (pre-encoder, 64-dim). Predictor
+trains every step by MSE against the target; intrinsic reward is
+the predictor's current squared error. Unlike kindle's surprise
+primitive, RND's target is independent of the WM so the signal
+doesn't decay when the WM converges.
+
+4 unit tests verify: positive MSE at init, predictor converges
+to target on repeated input, novel states yield higher reward
+than familiar ones, target network frozen (never drifts).
+
+Critical design choice: RND reads the **obs token**, not the
+encoder latent. An early experiment using `z_row` directly
+produced MSE ≈ 0.01 within 1000 steps — the CNN encoder
+clusters all game states into a tight latent region where the
+predictor can fit the target quickly on any input. Switching to
+the pre-encoder 64-dim obs token gave MSE ≈ 0.06 → 0.02 decay
+over 4000 steps, matching the classical RND signal shape.
+
+### Result on ls20 (5000 steps, CNN + α=50 + homeo=0.1):
+
+  step  wm    pi      entropy  rnd_mse  level_events
+  1000  0.011 +4.95   1.37     0.06     0
+  3000  0.007 +1.60   1.35     0.02     0
+  4000  0.007 +0.86   1.35     0.01     0
+
+**This is the first configuration where kindle's policy commits
+on an ARC-AGI-3 game.** Entropy drops from 1.39 (max for 4
+actions = ln(4) = 1.386) down to 1.35 — small but real
+departure from uniform. Policy loss trajectory (+4.95 → +0.86)
+shows meaningful learning. No level events yet; the specific
+22-action expert sequence on ls20 isn't in the direction RND
+randomly pushes the policy toward.
+
+### What RND actually delivered
+
+Mechanism: ✅ RND signal behaves as designed (initial high
+MSE, decay as predictor fits, meaningful per-step magnitude
+when scaled by α ≈ 50). Entropy drops. Policy committed.
+
+Result: entropy-floor-breaking on kindle-with-curiosity was
+previously uncrossable; now crossed. But commitment direction
+is RND-arbitrary, not task-aligned. Without a reward signal
+pointing at level-completion (which kindle's primitives still
+don't provide), committing to arbitrary directions doesn't
+solve 22-action puzzle games.
+
+### Updated honest list of what kindle needs for ARC-AGI-3
+
+  ✅ Vision encoder (commit 241cbec): WM models grids 7-8×
+     better than MLP-on-mean-pool.
+  ✅ RND curiosity: breaks entropy-at-max failure mode.
+  ❌ Reward signal aligned with level-completion: still missing.
+     Structural. Would require external supervision or
+     self-supervised milestone discovery beyond M7's prototype
+     ranking.
+  ❌ Coordinate action head: needed for games with ACTION5/6/7
+     (x, y). Most of the 25 shipped envs need these.
+
+RND removes a real blocker, but the remaining blockers
+(reward-class, coord actions) are each real additional
+research/engineering items.
