@@ -123,6 +123,10 @@ def main() -> int:
     parser.add_argument("--delta-goal-distance-clamp", type=float, default=None,
                         help="M8 symmetric distance clamp to bound per-step bonus "
                         "magnitude (pre-alpha). Default 5.0.")
+    parser.add_argument("--delta-goal-surprise-threshold", type=float, default=None,
+                        help="M8 v2: min WM pred_error to enable goal recording "
+                        "this step. Default 0.5. Banks surprising transitions "
+                        "(WM didn't predict them) rather than routine ones.")
     args = parser.parse_args()
 
     # --- Set up the local ARC-AGI-3 env ---
@@ -265,6 +269,8 @@ def main() -> int:
             agent_kwargs["delta_goal_bank_size"] = args.delta_goal_bank_size
         if args.delta_goal_distance_clamp is not None:
             agent_kwargs["delta_goal_distance_clamp"] = args.delta_goal_distance_clamp
+        if args.delta_goal_surprise_threshold is not None:
+            agent_kwargs["delta_goal_surprise_threshold"] = args.delta_goal_surprise_threshold
         agent = kindle.BatchAgent(**agent_kwargs)
     else:
         agent = None  # random baseline

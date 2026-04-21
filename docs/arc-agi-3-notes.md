@@ -500,3 +500,50 @@ prediction error, not raw obs-delta. "Record `obs_cur` as a goal
 only when the WM failed to predict the transition that led here."
 This banks surprising transitions, not routine ones. Still
 self-supervised — no task-specific priors.
+
+### M8 v2 — surprise-gated recording, 2026-04-20
+
+Added `delta_goal_surprise_threshold`: a step's goal-candidate is
+only banked when `pred_error >= threshold` AND `|Δobs| >= delta`.
+`prev_obs` is updated regardless of the gate so the next step's
+delta is measured against the immediate previous obs.
+
+**cd82 (10k steps, full CNN+RND+coord stack, A/B/C):**
+
+| config         | dg bank | eps | levels end | lvl_events |
+| -------------- | ------- | --- | ---------- | ---------- |
+| no M8          | 0       | 99  | 0.99 / 1   | 1          |
+| v1 (no gate)   | 64      | 99  | 0.99 / 1   | 1          |
+| v2 surp th=0.5 | 62      | 99  | 0.99 / 1   | 1          |
+| v2 surp th=1.0 | 0       | 99  | 0.99 / 1   | 1          |
+
+**sb26 (10k, same stack):**
+
+| config         | dg bank | eps | levels end | lvl_events |
+| -------------- | ------- | --- | ---------- | ---------- |
+| no M8          | 0       | 45  | 0.00 / 0   | 0          |
+| v2 surp th=0.5 | 1       | 45  | 0.00 / 0   | 0          |
+
+**All four configs produce identical task-level outcomes across
+both games.** The surprise gate correctly filters routine steps
+(62 vs 64 on cd82 at th=0.5, 1 vs 64 on sb26) but the resulting
+bank still doesn't alter policy progression. At th=1.0 the gate
+blocks everything (pred_error ∈ [0.27, 0.56] post-convergence, never
+crosses 1.0) — equivalent to M8 off, still identical outcome.
+
+**Interpretation.** The M8 primitive (both variants) is empirically
+null on ARC-AGI-3 with the current CNN encoder and 10k-step
+budgets. The cd82 L1 and sb26 L0 policies are both nearest
+local optima under existing reward primitives; an additional
+distance-to-bank reward doesn't change that. This is consistent
+with the `project_kindle_structural_cap.md` evidence: the
+bottleneck is finding the specific multi-step sequences that
+trigger level events, not the reward primitive class.
+
+**Next lever**: cross-episode memory (ARC 2 in the reward-class
+roadmap). Each ARC episode currently restarts fresh; if the agent
+could retain "I tried action-sequence X → result Y" across attempts
+within a game, systematic exploration of untried sequences becomes
+possible. This is where "reach L1 every episode but never try
+what's past L1" would become "reach L1 AND carry the memory that
+nothing worked there last time, so try something different now".
