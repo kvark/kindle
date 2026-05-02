@@ -979,20 +979,34 @@ impl PyBatchAgent {
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
                 "mlp" => EncoderKind::Mlp,
-                "cnn" => {
+                "cnn" | "cnn_dqn" => {
                     let channels = encoder_channels.ok_or_else(|| {
-                        PyValueError::new_err("encoder_kind='cnn' requires encoder_channels")
+                        PyValueError::new_err(format!(
+                            "encoder_kind='{ek}' requires encoder_channels"
+                        ))
                     })?;
                     let height = encoder_height.ok_or_else(|| {
-                        PyValueError::new_err("encoder_kind='cnn' requires encoder_height")
+                        PyValueError::new_err(format!(
+                            "encoder_kind='{ek}' requires encoder_height"
+                        ))
                     })?;
                     let width = encoder_width.ok_or_else(|| {
-                        PyValueError::new_err("encoder_kind='cnn' requires encoder_width")
+                        PyValueError::new_err(format!(
+                            "encoder_kind='{ek}' requires encoder_width"
+                        ))
                     })?;
-                    EncoderKind::Cnn {
-                        channels,
-                        height,
-                        width,
+                    if ek.as_str() == "cnn" {
+                        EncoderKind::Cnn {
+                            channels,
+                            height,
+                            width,
+                        }
+                    } else {
+                        EncoderKind::CnnDqn {
+                            channels,
+                            height,
+                            width,
+                        }
                     }
                 }
                 "efficientnet_v2s" => {
@@ -1007,7 +1021,7 @@ impl PyBatchAgent {
                 }
                 other => {
                     return Err(PyValueError::new_err(format!(
-                        "encoder_kind must be 'mlp', 'cnn', or 'efficientnet_v2s', got {other:?}"
+                        "encoder_kind must be 'mlp', 'cnn', 'cnn_dqn', or 'efficientnet_v2s', got {other:?}"
                     )));
                 }
             };
