@@ -481,6 +481,7 @@ impl PyBatchAgent {
         use_ppo = None,
         ppo_clip_eps = None,
         use_adam = None,
+        adam_eps = None,
         use_grpo = None,
         use_grpo_episode = None,
         use_sil = None,
@@ -592,6 +593,7 @@ impl PyBatchAgent {
         use_ppo: Option<bool>,
         ppo_clip_eps: Option<f32>,
         use_adam: Option<bool>,
+        adam_eps: Option<f32>,
         use_grpo: Option<bool>,
         use_grpo_episode: Option<bool>,
         use_sil: Option<bool>,
@@ -905,6 +907,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = use_adam {
             config.use_adam = v;
+        }
+        if let Some(v) = adam_eps {
+            config.adam_eps = v;
         }
         if let Some(v) = use_grpo {
             config.use_grpo = v;
