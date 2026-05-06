@@ -285,6 +285,7 @@ pub fn build_ppo_policy_graph(
     entropy_beta: f32,
     value_clip_scale: f32,
     z_layer_norm: bool,
+    z_layer_norm_scale: f32,
 ) -> Graph {
     let mut g = Graph::new();
     let z_raw = g.input("z", &[batch_size, latent_dim]);
@@ -301,9 +302,27 @@ pub fn build_ppo_policy_graph(
     // and unit-stds each row, equalizing per-dim amplitudes so
     // within-game state info competes with between-game offset on
     // even footing. (Diagnosed 2026-05-05.)
+    //
+    // Vanilla LayerNorm shrank z magnitude from ~40 to ~1, which
+    // killed the policy's ability to produce committed logits under
+    // PPO clip + entropy_beta (verified 2026-05-06). The
+    // `z_layer_norm_scale` constant scales the LN output to recover
+    // signal magnitude while preserving per-dim equalization;
+    // applied as a constant multiplier (not learnable) so the scale
+    // stays predictable across training.
     let z = if z_layer_norm {
         let ln = nn::LayerNorm::new(&mut g, "policy.z_ln", latent_dim, 1e-5);
-        ln.forward(&mut g, z_raw)
+        let z_normed = ln.forward(&mut g, z_raw);
+        if (z_layer_norm_scale - 1.0).abs() < 1e-6 {
+            z_normed
+        } else {
+            // scalar broadcast: same-shape constant tensor, element-wise mul.
+            let s = g.constant(
+                vec![z_layer_norm_scale; batch_size * latent_dim],
+                &[batch_size, latent_dim],
+            );
+            g.mul(z_normed, s)
+        }
     } else {
         z_raw
     };

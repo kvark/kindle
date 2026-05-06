@@ -52,7 +52,7 @@ use crate::world_model::WorldModel;
 use crate::xeps_memory;
 use hashbrown::HashMap;
 use meganeura::Session;
-use meganeura::graph::Graph;
+use meganeura::graph::{Graph, NodeId};
 use meganeura::nn;
 use rand::Rng;
 
@@ -706,6 +706,17 @@ pub struct AgentConfig {
     /// that an inverse exists — the classical auto-encoder anti-
     /// collapse term. Default 0.0.
     pub recon_loss_coef: f32,
+    /// When true (and the encoder is CNN/CnnDqn), the WM-session recon
+    /// branch targets the raw `visual_obs` (reshaped to
+    /// `[batch, c·h·w]`) instead of the OBS_TOKEN_DIM pooled `obs`.
+    /// The pooled obs is rank ~8 globally / 1–2 per-game on static
+    /// ARC frames — too low-rank to force higher-rank z. The raw
+    /// frame is rank ~30+ globally, providing real anti-collapse
+    /// pressure. Cost: decoder grows from `latent_dim → hidden_dim
+    /// → OBS_TOKEN_DIM (64)` to `latent_dim → hidden_dim → c·h·w
+    /// (4096 at 64×64×1)` — roughly +1M params at typical sizes.
+    /// Ignored for MLP encoders. Default false.
+    pub recon_visual_target: bool,
     /// When true, apply LayerNorm to z immediately before the policy
     /// (and value) head's first layer. Amplifies within-game state
     /// variation relative to between-game centroid offset — the
@@ -715,6 +726,16 @@ pub struct AgentConfig {
     /// false. Currently wired in `build_ppo_policy_graph` only;
     /// other builders ignore the flag.
     pub policy_z_layer_norm: bool,
+    /// Constant multiplier applied AFTER the policy-z LayerNorm,
+    /// when `policy_z_layer_norm = true`. Default 1.0 leaves the
+    /// raw normalized output (mean 0, std 1 per row). LayerNorm
+    /// alone shrank z magnitude from ~40 to ~1, killing the
+    /// policy's ability to produce committed logits under
+    /// PPO clip + entropy_beta (verified 2026-05-06). Setting
+    /// this to e.g. 10–40 recovers signal magnitude while keeping
+    /// the per-dim equalization. Ignored when
+    /// `policy_z_layer_norm = false`.
+    pub policy_z_layer_norm_scale: f32,
     /// Reward-prediction-from-z anti-collapse loss coefficient. When
     /// non-zero (e2e only), the policy graph builds a head `z → r̂`
     /// and adds MSE(r̂, stop_grad(reward)) to the total loss. Adds
@@ -1080,7 +1101,9 @@ impl Default for AgentConfig {
             terminal_proximity_bonus: 0.0,
             terminal_proximity_threshold: 0.0,
             recon_loss_coef: 0.0,
+            recon_visual_target: false,
             policy_z_layer_norm: false,
+            policy_z_layer_norm_scale: 1.0,
             reward_pred_loss_coef: 0.0,
             policy_update_interval: 1,
             advantage_normalize: false,
@@ -1966,6 +1989,14 @@ impl Agent {
             // `wm_forward_backward_stacked` so the recon target is fresh.
             let obs = g.input("obs", &[config.batch_size, OBS_TOKEN_DIM]);
 
+            // Captured here so the recon branch below can target the
+            // raw frame (rank ~30 globally, ~57 mean per-game) instead
+            // of the 8×8 pooled obs token (rank ~8 globally, often 1-2
+            // per-game). The pooled obs is too low-rank to force
+            // higher-rank z; the raw frame isn't.
+            let mut visual_node_2d: Option<NodeId> = None;
+            let mut visual_recon_dim: usize = 0;
+
             // Encoder backbone: default MLP on an obs-token vector, or
             // a small CNN on raw visual input when configured.
             let z_t = match config.encoder_kind {
@@ -1985,11 +2016,11 @@ impl Agent {
                     width,
                 } => {
                     // Flat NCHW visual input.
-                    let flat_dim = (channels as usize)
-                        * (height as usize)
-                        * (width as usize)
-                        * config.batch_size;
+                    let per_sample = (channels as usize) * (height as usize) * (width as usize);
+                    let flat_dim = per_sample * config.batch_size;
                     let visual = g.input("visual_obs", &[flat_dim]);
+                    visual_node_2d = Some(g.reshape(visual, &[config.batch_size, per_sample]));
+                    visual_recon_dim = per_sample;
                     let cnn = CnnEncoder::new(
                         &mut g,
                         channels,
@@ -2019,11 +2050,11 @@ impl Agent {
                 } => {
                     // Same wiring as Cnn but uses CnnEncoderDqn
                     // (Nature-DQN-scale, ~1.7M params, no global pool).
-                    let flat_dim = (channels as usize)
-                        * (height as usize)
-                        * (width as usize)
-                        * config.batch_size;
+                    let per_sample = (channels as usize) * (height as usize) * (width as usize);
+                    let flat_dim = per_sample * config.batch_size;
                     let visual = g.input("visual_obs", &[flat_dim]);
+                    visual_node_2d = Some(g.reshape(visual, &[config.batch_size, per_sample]));
+                    visual_recon_dim = per_sample;
                     let cnn = crate::encoder::CnnEncoderDqn::new(
                         &mut g,
                         channels,
@@ -2052,28 +2083,44 @@ impl Agent {
             // loss admits a trivial low-rank z (verified 2026-05-05:
             // 25-game multi-training collapsed encoder to effective
             // rank 2 of 256 dims). Forcing z to retain enough info to
-            // reconstruct the obs token forces higher-rank features.
+            // reconstruct the encoder's input forces higher-rank
+            // features.
             //
-            // The decoder is `wm.recon.fc1 (latent_dim → hidden_dim) →
-            // ReLU → wm.recon.fc2 (hidden_dim → OBS_TOKEN_DIM)`; loss
-            // is `MSE(recon, stop_gradient(obs))`.
+            // Target selection (verified 2026-05-06):
+            //   * MLP encoder → target the OBS_TOKEN_DIM pooled `obs`
+            //     (it's the encoder's only input).
+            //   * CNN/CNN-DQN encoder + `recon_visual_target = false`
+            //     → target the OBS_TOKEN_DIM pooled `obs`. Cheap
+            //     decoder, but the pooled view is rank ~8 globally and
+            //     1–2 per-game on static games — too low-rank to force
+            //     the encoder past the rank-2 collapse on its own.
+            //   * CNN/CNN-DQN encoder + `recon_visual_target = true`
+            //     → target the reshaped raw `visual_obs` (rank ~30
+            //     globally, mean ~57 per-game). The decoder must
+            //     reproduce frame-level structure, which a rank-2 z
+            //     cannot. Decoder size: ~1M params at 64×64×1.
             //
             // Distinct from the `recon.*` decoder built by
             // `policy::build_policy_graph_e2e` — that one only fires
-            // in e2e mode and operates on the policy session's separate
-            // encoder. This branch operates on the WM session's encoder
-            // (which is what produces the latents stored in lane buffers
-            // and used for novelty / surprise / option goals).
+            // in e2e mode and operates on the policy session's
+            // separate encoder. This branch operates on the WM
+            // session's encoder (which produces the latents stored
+            // in lane buffers and used for novelty / surprise / option
+            // goals).
             let loss = if config.recon_loss_coef > 0.0 {
+                let (target_node, target_dim) = match (config.recon_visual_target, visual_node_2d) {
+                    (true, Some(v2d)) => (v2d, visual_recon_dim),
+                    _ => (obs, OBS_TOKEN_DIM),
+                };
                 let dec_fc1 =
                     nn::Linear::new(&mut g, "wm.recon.fc1", config.latent_dim, config.hidden_dim);
                 let dec_fc2 =
-                    nn::Linear::no_bias(&mut g, "wm.recon.fc2", config.hidden_dim, OBS_TOKEN_DIM);
+                    nn::Linear::no_bias(&mut g, "wm.recon.fc2", config.hidden_dim, target_dim);
                 let dh = dec_fc1.forward(&mut g, z_t);
                 let dh = g.relu(dh);
                 let recon = dec_fc2.forward(&mut g, dh);
-                let obs_target = g.stop_gradient(obs);
-                let recon_loss_raw = g.mse_loss(recon, obs_target);
+                let target_det = g.stop_gradient(target_node);
+                let recon_loss_raw = g.mse_loss(recon, target_det);
                 let recon_coef = g.scalar(config.recon_loss_coef);
                 let recon_loss = g.mul(recon_loss_raw, recon_coef);
                 g.add(wm_loss, recon_loss)
@@ -2281,6 +2328,7 @@ impl Agent {
                     config.entropy_beta,
                     config.value_clip_scale,
                     config.policy_z_layer_norm,
+                    config.policy_z_layer_norm_scale,
                 )
             } else if is_discrete {
                 policy::build_policy_graph(

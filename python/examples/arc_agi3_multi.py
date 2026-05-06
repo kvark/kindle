@@ -77,11 +77,21 @@ def main() -> int:
                         help="Weight on the WM-session obs reconstruction loss. >0 "
                         "forces encoder to retain enough info to reconstruct the "
                         "obs token. Standard anti-collapse pressure. Try 1.0.")
+    parser.add_argument("--recon-visual-target", type=int, default=0,
+                        help="When 1 (and recon_loss_coef > 0 and CNN encoder), "
+                        "target the raw 64×64 visual_obs (4096-d, rank ~30 globally) "
+                        "instead of the 8×8 pooled obs (rank ~8). Higher rank target "
+                        "forces higher-rank z. Adds ~1M decoder params.")
     parser.add_argument("--policy-z-layer-norm", type=int, default=0,
                         help="Apply LayerNorm to z before the policy head (1) or not "
                         "(0). Equalizes per-dim amplitudes so within-game state "
                         "variation can compete with the much-larger between-game "
                         "centroid offset in the policy gradient.")
+    parser.add_argument("--policy-z-layer-norm-scale", type=float, default=1.0,
+                        help="Constant multiplier after the policy-z LayerNorm. "
+                        "Default 1.0 leaves z at unit-std (which empirically killed "
+                        "policy commitment). Try 10–40 to recover signal magnitude "
+                        "while keeping per-dim equalization.")
     parser.add_argument("--game-prefixes", default=None,
                         help="Comma-separated game-id prefixes to include (e.g. "
                         "'cd82,sp80,r11l'). Default: all 25 games from the corpus.")
@@ -161,7 +171,9 @@ def main() -> int:
         use_sil=bool(args.use_sil),
         sil_loss_coef=args.sil_loss_coef,
         recon_loss_coef=args.recon_loss_coef,
+        recon_visual_target=bool(args.recon_visual_target),
         policy_z_layer_norm=bool(args.policy_z_layer_norm),
+        policy_z_layer_norm_scale=args.policy_z_layer_norm_scale,
     )
     if args.encoder == "cnn":
         agent_kwargs.update(
