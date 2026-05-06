@@ -275,6 +275,7 @@ pub fn build_policy_graph(
 ///
 /// `entropy_beta` and `value_loss_coef` behave identically to the
 /// non-PPO variant.
+#[allow(clippy::too_many_arguments)]
 pub fn build_ppo_policy_graph(
     latent_dim: usize,
     action_dim: usize,
@@ -286,6 +287,8 @@ pub fn build_ppo_policy_graph(
     value_clip_scale: f32,
     z_layer_norm: bool,
     z_layer_norm_scale: f32,
+    num_options: usize,
+    per_option_heads: bool,
 ) -> Graph {
     let mut g = Graph::new();
     let z_raw = g.input("z", &[batch_size, latent_dim]);
@@ -327,8 +330,37 @@ pub fn build_ppo_policy_graph(
         z_raw
     };
 
-    let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-    let logits = policy.forward(&mut g, z);
+    // Option-conditional policy when num_options > 1; flat policy
+    // otherwise. Same routing as `build_policy_graph` so PPO can
+    // compose with L1 options. The `option_onehot` input is the
+    // option chosen at collection time — both old and new policies
+    // see the same option, which is what makes the PPO ratio
+    // π_new(a | z, opt) / π_old(a | z, opt) well-defined.
+    let logits = if num_options > 1 && per_option_heads {
+        let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
+        let fc1 = nn::Linear::new(&mut g, "policy.fc1", latent_dim, hidden_dim);
+        let h = fc1.forward(&mut g, z);
+        let h = g.relu(h);
+        per_option_fc2(
+            &mut g,
+            h,
+            option_onehot,
+            num_options,
+            hidden_dim,
+            action_dim,
+        )
+    } else if num_options > 1 {
+        let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
+        let trunk_logits = policy.forward(&mut g, z);
+        let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
+        let option_bias =
+            nn::Linear::no_bias(&mut g, "policy.option_bias", num_options, action_dim);
+        let bias_out = option_bias.forward(&mut g, option_onehot);
+        g.add(trunk_logits, bias_out)
+    } else {
+        let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
+        policy.forward(&mut g, z)
+    };
 
     // π_new(a | s) — probability of the taken action under the current
     // policy. Built from `softmax(logits) * one_hot` followed by a

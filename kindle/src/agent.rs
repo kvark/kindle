@@ -2311,13 +2311,14 @@ impl Agent {
                     config.reward_pred_loss_coef,
                 )
             } else if is_discrete && config.use_ppo {
-                // PPO mode does not support L1 options yet — options are
-                // an orthogonal feature; the PPO graph assumes a flat
-                // policy without per-option bias heads.
-                assert!(
-                    config.num_options <= 1,
-                    "use_ppo is not compatible with num_options > 1 (L1 options)"
-                );
+                // PPO with optional L1 options (added 2026-05-06).
+                // When num_options > 1, the PPO graph routes
+                // option_onehot through the same option-conditional
+                // logits structure as build_policy_graph. Both old
+                // and new policies see the same option (the one
+                // chosen at collection time), so the PPO ratio
+                // π_new(a | z, opt) / π_old(a | z, opt) is well
+                // defined.
                 policy::build_ppo_policy_graph(
                     config.latent_dim,
                     MAX_ACTION_DIM,
@@ -2329,6 +2330,8 @@ impl Agent {
                     config.value_clip_scale,
                     config.policy_z_layer_norm,
                     config.policy_z_layer_norm_scale,
+                    config.num_options,
+                    config.per_option_heads,
                 )
             } else if is_discrete {
                 policy::build_policy_graph(

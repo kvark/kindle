@@ -92,6 +92,17 @@ def main() -> int:
                         "Default 1.0 leaves z at unit-std (which empirically killed "
                         "policy commitment). Try 10–40 to recover signal magnitude "
                         "while keeping per-dim equalization.")
+    parser.add_argument("--num-options", type=int, default=0,
+                        help="DIAYN-style L1 options. >=2 enables option-conditional "
+                        "policy heads (per_option_fc2 if --per-option-heads else "
+                        "shared trunk + per-option bias). The agent picks options via "
+                        "the option session and the policy is conditioned on the "
+                        "selected option. Now compatible with PPO (added 2026-05-06). "
+                        "0 disables.")
+    parser.add_argument("--per-option-heads", type=int, default=0,
+                        help="When num_options>=2: 1 = per-option fc2 (each option "
+                        "gets its own [hidden,action] matrix), 0 = shared trunk + "
+                        "per-option bias.")
     parser.add_argument("--goal-bonus", type=float, default=0.0,
                         help="Extrinsic reward pulse applied on each positive "
                         "level_completed delta. Routed via kindle's "
@@ -214,6 +225,9 @@ def main() -> int:
         policy_z_layer_norm_scale=args.policy_z_layer_norm_scale,
         extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
     )
+    if args.num_options >= 2:
+        agent_kwargs["num_options"] = args.num_options
+        agent_kwargs["per_option_heads"] = bool(args.per_option_heads)
     if args.encoder == "cnn":
         agent_kwargs.update(
             encoder_kind="cnn",

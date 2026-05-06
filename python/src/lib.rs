@@ -1023,9 +1023,7 @@ impl PyBatchAgent {
                         ))
                     })?;
                     let width = encoder_width.ok_or_else(|| {
-                        PyValueError::new_err(format!(
-                            "encoder_kind='{ek}' requires encoder_width"
-                        ))
+                        PyValueError::new_err(format!("encoder_kind='{ek}' requires encoder_width"))
                     })?;
                     if ek.as_str() == "cnn" {
                         EncoderKind::Cnn {
