@@ -1230,6 +1230,26 @@ impl PyBatchAgent {
         self.agent.latents()
     }
 
+    /// Save trainable state to a directory. Writes one safetensors
+    /// file per session (wm, policy, credit, optional option + option_credit).
+    /// Use with `load_state` on a freshly constructed agent of the
+    /// same architecture for clean train/val splits.
+    fn save_state(&mut self, dir: &str) -> PyResult<()> {
+        self.agent
+            .save_state(std::path::Path::new(dir))
+            .map_err(|e| PyValueError::new_err(format!("save_state: {e}")))
+    }
+
+    /// Load trainable state from a directory previously written by
+    /// `save_state`. The agent must have been constructed with the
+    /// same graph topology (latent_dim, hidden_dim, encoder kind,
+    /// num_options, recon flags, layer-norm flags).
+    fn load_state(&mut self, dir: &str) -> PyResult<()> {
+        self.agent
+            .load_state(std::path::Path::new(dir))
+            .map_err(|e| PyValueError::new_err(format!("load_state: {e}")))
+    }
+
     /// Visual-encoder input setter for `encoder_kind='cnn'` agents.
     /// Accepts a 1-D sequence of length `batch_size · channels · height · width`
     /// laid out as flat NCHW. Must be called before each

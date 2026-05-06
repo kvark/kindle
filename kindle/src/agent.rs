@@ -5872,6 +5872,56 @@ impl Agent {
         self.step_count
     }
 
+    /// Save trainable state to a directory: one safetensors file per
+    /// neural-network session (wm, policy, credit, optional option +
+    /// option_credit). Lane state, step count, and harness scratch
+    /// buffers are NOT saved — load expects a freshly-instantiated
+    /// agent with the same architecture (latent_dim, hidden_dim,
+    /// encoder kind, etc.).
+    pub fn save_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
+        std::fs::create_dir_all(dir)?;
+        self.wm_session
+            .save_checkpoint(&dir.join("wm.safetensors"))?;
+        self.policy_session
+            .save_checkpoint(&dir.join("policy.safetensors"))?;
+        self.credit_session
+            .save_checkpoint(&dir.join("credit.safetensors"))?;
+        if let Some(ref mut s) = self.option_session {
+            s.save_checkpoint(&dir.join("option.safetensors"))?;
+        }
+        if let Some(ref mut s) = self.option_credit_session {
+            s.save_checkpoint(&dir.join("option_credit.safetensors"))?;
+        }
+        Ok(())
+    }
+
+    /// Load trainable state from a directory previously written by
+    /// `save_state`. The agent must already be constructed with the
+    /// same graph topology (same latent_dim, hidden_dim, encoder
+    /// kind, num_options, recon flags, layer-norm flags). Returns
+    /// an error if any session's file is missing or shape-mismatched.
+    pub fn load_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
+        self.wm_session
+            .load_checkpoint(&dir.join("wm.safetensors"))?;
+        self.policy_session
+            .load_checkpoint(&dir.join("policy.safetensors"))?;
+        self.credit_session
+            .load_checkpoint(&dir.join("credit.safetensors"))?;
+        if let Some(ref mut s) = self.option_session {
+            let p = dir.join("option.safetensors");
+            if p.exists() {
+                s.load_checkpoint(&p)?;
+            }
+        }
+        if let Some(ref mut s) = self.option_credit_session {
+            let p = dir.join("option_credit.safetensors");
+            if p.exists() {
+                s.load_checkpoint(&p)?;
+            }
+        }
+        Ok(())
+    }
+
     /// Cheap per-lane read of `last_r_hat` without building the full
     /// Diagnostics (used by M6 instrumentation harnesses that log this
     /// every step).
