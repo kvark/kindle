@@ -706,6 +706,15 @@ pub struct AgentConfig {
     /// that an inverse exists — the classical auto-encoder anti-
     /// collapse term. Default 0.0.
     pub recon_loss_coef: f32,
+    /// When true, apply LayerNorm to z immediately before the policy
+    /// (and value) head's first layer. Amplifies within-game state
+    /// variation relative to between-game centroid offset — the
+    /// failure mode diagnosed under 25-game multi-training where the
+    /// encoder's between-game variance was 15× the within-game
+    /// variance, drowning state info in the policy gradient. Default
+    /// false. Currently wired in `build_ppo_policy_graph` only;
+    /// other builders ignore the flag.
+    pub policy_z_layer_norm: bool,
     /// Reward-prediction-from-z anti-collapse loss coefficient. When
     /// non-zero (e2e only), the policy graph builds a head `z → r̂`
     /// and adds MSE(r̂, stop_grad(reward)) to the total loss. Adds
@@ -1071,6 +1080,7 @@ impl Default for AgentConfig {
             terminal_proximity_bonus: 0.0,
             terminal_proximity_threshold: 0.0,
             recon_loss_coef: 0.0,
+            policy_z_layer_norm: false,
             reward_pred_loss_coef: 0.0,
             policy_update_interval: 1,
             advantage_normalize: false,
@@ -1948,11 +1958,18 @@ impl Agent {
             // env-specific latents.
             let task = g.input("task", &[config.batch_size, TASK_DIM]);
 
+            // `obs` (the OBS_TOKEN_DIM-wide pooled-token view) is declared
+            // unconditionally so the optional WM-side recon branch below
+            // can target it. The MLP encoder uses `obs` as its primary
+            // input; CNN encoders ignore it for forward (they consume
+            // `visual_obs`), but `obs` is still set every step by
+            // `wm_forward_backward_stacked` so the recon target is fresh.
+            let obs = g.input("obs", &[config.batch_size, OBS_TOKEN_DIM]);
+
             // Encoder backbone: default MLP on an obs-token vector, or
             // a small CNN on raw visual input when configured.
             let z_t = match config.encoder_kind {
                 EncoderKind::Mlp => {
-                    let obs = g.input("obs", &[config.batch_size, OBS_TOKEN_DIM]);
                     let enc = Encoder::new(
                         &mut g,
                         OBS_TOKEN_DIM,
@@ -2028,7 +2045,41 @@ impl Agent {
             };
             let wm = WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim);
             let z_hat = wm.forward(&mut g, z_t, action);
-            let loss = WorldModel::loss(&mut g, z_hat, z_target);
+            let wm_loss = WorldModel::loss(&mut g, z_hat, z_target);
+
+            // Optional obs-reconstruction loss INSIDE the WM session
+            // (anti-collapse). Without this, the WM forward-prediction
+            // loss admits a trivial low-rank z (verified 2026-05-05:
+            // 25-game multi-training collapsed encoder to effective
+            // rank 2 of 256 dims). Forcing z to retain enough info to
+            // reconstruct the obs token forces higher-rank features.
+            //
+            // The decoder is `wm.recon.fc1 (latent_dim → hidden_dim) →
+            // ReLU → wm.recon.fc2 (hidden_dim → OBS_TOKEN_DIM)`; loss
+            // is `MSE(recon, stop_gradient(obs))`.
+            //
+            // Distinct from the `recon.*` decoder built by
+            // `policy::build_policy_graph_e2e` — that one only fires
+            // in e2e mode and operates on the policy session's separate
+            // encoder. This branch operates on the WM session's encoder
+            // (which is what produces the latents stored in lane buffers
+            // and used for novelty / surprise / option goals).
+            let loss = if config.recon_loss_coef > 0.0 {
+                let dec_fc1 =
+                    nn::Linear::new(&mut g, "wm.recon.fc1", config.latent_dim, config.hidden_dim);
+                let dec_fc2 =
+                    nn::Linear::no_bias(&mut g, "wm.recon.fc2", config.hidden_dim, OBS_TOKEN_DIM);
+                let dh = dec_fc1.forward(&mut g, z_t);
+                let dh = g.relu(dh);
+                let recon = dec_fc2.forward(&mut g, dh);
+                let obs_target = g.stop_gradient(obs);
+                let recon_loss_raw = g.mse_loss(recon, obs_target);
+                let recon_coef = g.scalar(config.recon_loss_coef);
+                let recon_loss = g.mul(recon_loss_raw, recon_coef);
+                g.add(wm_loss, recon_loss)
+            } else {
+                wm_loss
+            };
 
             // Per-lane squared-error output. Exposing `(z_hat − z_target)²`
             // as `[N, latent_dim]` lets us compute per-lane prediction error
@@ -2229,6 +2280,7 @@ impl Agent {
                     config.value_loss_coef,
                     config.entropy_beta,
                     config.value_clip_scale,
+                    config.policy_z_layer_norm,
                 )
             } else if is_discrete {
                 policy::build_policy_graph(
@@ -2957,7 +3009,12 @@ impl Agent {
             .set_input("value_target", &self.value_target_scratch);
         self.feed_entropy_beta_input();
         self.feed_kl_beta_input();
-        apply_lr(&mut self.policy_session, 0.0, self.config.use_adam, self.config.adam_eps);
+        apply_lr(
+            &mut self.policy_session,
+            0.0,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
         self.policy_session.step();
         self.policy_session.wait();
 
@@ -3751,31 +3808,23 @@ impl Agent {
     /// `obs_token_scratch` / `action_token_scratch` / `z_target_scratch` /
     /// `task_scratch` inputs. Returns the scalar batch-mean loss.
     fn wm_forward_backward_stacked(&mut self, lr: f32) -> f32 {
-        // Encoder-dependent: MLP uses the obs-token buffer; CNN uses
-        // the raw visual_obs buffer (populated by `set_visual_obs`
-        // before this method runs).
-        match self.config.encoder_kind {
-            EncoderKind::Mlp => {
-                self.wm_session.set_input("obs", &self.obs_token_scratch);
-            }
-            EncoderKind::Cnn { .. } | EncoderKind::CnnDqn { .. } => {
-                // The `visual_obs` graph buffer is allocated by
-                // meganeura as `Memory::Shared` (device-local +
-                // host-visible + host-coherent). The harness writes
-                // preprocessed frames directly into the mapped
-                // pointer via `set_visual_obs` or
-                // `visual_obs_host_ptr`, so there's no CPU-side
-                // scratch to upload here — the data is already in
-                // the GPU buffer. Queue submit's implicit host-
-                // domain barrier makes the writes visible.
-            }
-        }
+        // `obs` is always set: in MLP mode it feeds the encoder, and in
+        // CNN modes the WM session's optional recon branch (when
+        // recon_loss_coef > 0) targets it as the reconstruction label.
+        // The CNN encoders themselves consume `visual_obs` (already
+        // memory-mapped via `set_visual_obs`).
+        self.wm_session.set_input("obs", &self.obs_token_scratch);
         self.wm_session
             .set_input("action", &self.action_token_scratch);
         self.wm_session
             .set_input("z_target", &self.z_target_scratch);
         self.wm_session.set_input("task", &self.task_scratch);
-        apply_lr(&mut self.wm_session, lr, self.config.use_adam, self.config.adam_eps);
+        apply_lr(
+            &mut self.wm_session,
+            lr,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
         self.wm_session.step();
         self.wm_session.wait();
         self.wm_session.read_loss()
@@ -4194,7 +4243,12 @@ impl Agent {
             self.wm_session
                 .set_input("z_target", &self.z_target_scratch);
             self.wm_session.set_input("task", &self.task_scratch);
-            apply_lr(&mut self.wm_session, 0.0, self.config.use_adam, self.config.adam_eps);
+            apply_lr(
+                &mut self.wm_session,
+                0.0,
+                self.config.use_adam,
+                self.config.adam_eps,
+            );
             self.wm_session.step();
             self.wm_session.wait();
 
@@ -4273,7 +4327,12 @@ impl Agent {
         self.credit_session.set_input("history", &history_clean);
         self.credit_session
             .set_input("credit_target", &target_clean);
-        apply_lr(&mut self.credit_session, lr_credit, self.config.use_adam, self.config.adam_eps);
+        apply_lr(
+            &mut self.credit_session,
+            lr_credit,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
         self.credit_session.step();
         self.credit_session.wait();
 
@@ -4789,7 +4848,12 @@ impl Agent {
             }
             self.feed_entropy_beta_input();
             self.feed_kl_beta_input();
-            apply_lr(&mut self.policy_session, 0.0, self.config.use_adam, self.config.adam_eps);
+            apply_lr(
+                &mut self.policy_session,
+                0.0,
+                self.config.use_adam,
+                self.config.adam_eps,
+            );
             self.policy_session.step();
             self.policy_session.wait();
             // value output is at index 2 in the combined graph.
@@ -5343,7 +5407,12 @@ impl Agent {
             }
             self.feed_entropy_beta_input();
             self.feed_kl_beta_input();
-            apply_lr(&mut self.policy_session, 0.0, self.config.use_adam, self.config.adam_eps);
+            apply_lr(
+                &mut self.policy_session,
+                0.0,
+                self.config.use_adam,
+                self.config.adam_eps,
+            );
             self.policy_session.step();
             self.policy_session.wait();
             let mut v_fresh = vec![0.0f32; policy_batch];
@@ -5580,7 +5649,12 @@ impl Agent {
         } else {
             self.config.lr_policy * self.batch_lr_scale * lr_scale
         };
-        apply_lr(&mut self.policy_session, effective_lr, self.config.use_adam, self.config.adam_eps);
+        apply_lr(
+            &mut self.policy_session,
+            effective_lr,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
         self.policy_session.step();
         self.policy_session.wait();
 
@@ -5725,7 +5799,12 @@ impl Agent {
         self.feed_entropy_beta_input();
         // Use the same effective LR as a regular update.
         let lr = self.config.lr_policy * self.batch_lr_scale;
-        apply_lr(&mut self.policy_session, lr, self.config.use_adam, self.config.adam_eps);
+        apply_lr(
+            &mut self.policy_session,
+            lr,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
         self.policy_session.step();
         self.policy_session.wait();
 
@@ -5762,6 +5841,23 @@ impl Agent {
     /// Per-lane policy entropy from the most recent act().
     pub fn entropies(&self) -> Vec<f32> {
         self.lanes.iter().map(|l| l.last_entropy).collect()
+    }
+
+    /// Per-lane current latent z (the encoder output that feeds the
+    /// policy / WM / decoder). Returns one Vec<f32> of length
+    /// `latent_dim` per lane. Empty Vec if the lane has no transitions
+    /// yet (pre-first-observe). Used for diagnosing whether the encoder
+    /// produces game-distinguishing latents under multi-env training.
+    pub fn latents(&self) -> Vec<Vec<f32>> {
+        self.lanes
+            .iter()
+            .map(|l| {
+                l.buffer
+                    .last()
+                    .map(|t| t.latent.clone())
+                    .unwrap_or_default()
+            })
+            .collect()
     }
 
     /// Current M7 confidence ∈ [0, 1]. Zero until warmup is met;

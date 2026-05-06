@@ -503,6 +503,7 @@ impl PyBatchAgent {
         terminal_proximity_bonus = None,
         terminal_proximity_threshold = None,
         recon_loss_coef = None,
+        policy_z_layer_norm = None,
         reward_pred_loss_coef = None,
         planner_horizon = None,
         planner_samples = None,
@@ -616,6 +617,7 @@ impl PyBatchAgent {
         terminal_proximity_bonus: Option<f32>,
         terminal_proximity_threshold: Option<f32>,
         recon_loss_coef: Option<f32>,
+        policy_z_layer_norm: Option<bool>,
         reward_pred_loss_coef: Option<f32>,
         planner_horizon: Option<usize>,
         planner_samples: Option<usize>,
@@ -981,6 +983,9 @@ impl PyBatchAgent {
         if let Some(v) = recon_loss_coef {
             config.recon_loss_coef = v;
         }
+        if let Some(v) = policy_z_layer_norm {
+            config.policy_z_layer_norm = v;
+        }
         if let Some(v) = reward_pred_loss_coef {
             config.reward_pred_loss_coef = v;
         }
@@ -1205,6 +1210,14 @@ impl PyBatchAgent {
     /// Per-lane policy entropy from the most recent act().
     fn entropies(&self) -> Vec<f32> {
         self.agent.entropies()
+    }
+
+    /// Per-lane current latent z (encoder output). Returns a list of
+    /// `batch_size` lists of length `latent_dim`. Empty inner list if a
+    /// lane has no transitions yet. Diagnostic for whether the encoder
+    /// produces game-distinguishing latents under multi-env training.
+    fn latents(&self) -> Vec<Vec<f32>> {
+        self.agent.latents()
     }
 
     /// Visual-encoder input setter for `encoder_kind='cnn'` agents.

@@ -284,13 +284,29 @@ pub fn build_ppo_policy_graph(
     value_loss_coef: f32,
     entropy_beta: f32,
     value_clip_scale: f32,
+    z_layer_norm: bool,
 ) -> Graph {
     let mut g = Graph::new();
-    let z = g.input("z", &[batch_size, latent_dim]);
+    let z_raw = g.input("z", &[batch_size, latent_dim]);
     let action = g.input("action", &[batch_size, action_dim]);
     let advantage = g.input("advantage", &[batch_size, 1]);
     let old_prob_taken = g.input("old_prob_taken", &[batch_size, 1]);
     let value_target = g.input("value_target", &[batch_size, 1]);
+
+    // Optional LayerNorm on z before policy/value heads. The encoder
+    // under multi-game training places per-game centroids ~15× farther
+    // apart than within-game state variation; without normalization the
+    // policy gradient is dominated by the between-game offset and
+    // can't learn state-conditioned behavior. LayerNorm zero-means
+    // and unit-stds each row, equalizing per-dim amplitudes so
+    // within-game state info competes with between-game offset on
+    // even footing. (Diagnosed 2026-05-05.)
+    let z = if z_layer_norm {
+        let ln = nn::LayerNorm::new(&mut g, "policy.z_ln", latent_dim, 1e-5);
+        ln.forward(&mut g, z_raw)
+    } else {
+        z_raw
+    };
 
     let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
     let logits = policy.forward(&mut g, z);
