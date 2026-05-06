@@ -92,9 +92,32 @@ def main() -> int:
                         "Default 1.0 leaves z at unit-std (which empirically killed "
                         "policy commitment). Try 10–40 to recover signal magnitude "
                         "while keeping per-dim equalization.")
+    parser.add_argument("--goal-bonus", type=float, default=0.0,
+                        help="Extrinsic reward pulse applied on each positive "
+                        "level_completed delta. Routed via kindle's "
+                        "set_extrinsic_reward + extrinsic_reward_alpha — adds a "
+                        "one-shot reward bump on top of the sustained homeo "
+                        "level-distance signal. The kindle reward circuit can't "
+                        "currently express 'I solved a puzzle' beyond the homeo "
+                        "term; this pulse is the simplest way to amplify the rare "
+                        "level-completion event.")
     parser.add_argument("--game-prefixes", default=None,
                         help="Comma-separated game-id prefixes to include (e.g. "
                         "'cd82,sp80,r11l'). Default: all 25 games from the corpus.")
+    parser.add_argument("--val-prefixes", default=None,
+                        help="Comma-separated game-id prefixes held out for "
+                        "post-training validation. After --steps training on the "
+                        "non-val games, the agent is checkpointed, a fresh val "
+                        "agent is instantiated with the held-out games, the "
+                        "checkpoint is loaded into it, and the val agent runs "
+                        "--val-steps env steps with lr=0 (no training) to measure "
+                        "transfer.")
+    parser.add_argument("--val-steps", type=int, default=10000,
+                        help="Steps to run on val games (lr=0, no training). Default 10k.")
+    parser.add_argument("--checkpoint-dir", default=None,
+                        help="Optional directory to save the trained agent state "
+                        "to (after training, before any val pass). Useful for "
+                        "post-hoc analysis.")
     args = parser.parse_args()
 
     # --- Discover all games ---
@@ -113,6 +136,21 @@ def main() -> int:
                 continue
             seen.add(key)
             env_infos.append(e)
+
+    # Train/val split. If --val-prefixes is set, those games are pulled
+    # OUT of the training set and saved for a post-training val pass.
+    val_set = set()
+    if args.val_prefixes:
+        val_set = {p.strip() for p in args.val_prefixes.split(",") if p.strip()}
+        val_env_infos = [e for e in env_infos if any(e.game_id.startswith(p) for p in val_set)]
+        env_infos = [e for e in env_infos if not any(e.game_id.startswith(p) for p in val_set)]
+        if not val_env_infos:
+            print(f"warning: --val-prefixes matched no games", file=sys.stderr)
+        else:
+            print(f"train/val split: {len(env_infos)} train games, {len(val_env_infos)} val games")
+            print(f"  val games: {[e.game_id[:4] for e in val_env_infos]}")
+    else:
+        val_env_infos = []
 
     n_games = len(env_infos)
     if n_games == 0:
@@ -174,6 +212,7 @@ def main() -> int:
         recon_visual_target=bool(args.recon_visual_target),
         policy_z_layer_norm=bool(args.policy_z_layer_norm),
         policy_z_layer_norm_scale=args.policy_z_layer_norm_scale,
+        extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
     )
     if args.encoder == "cnn":
         agent_kwargs.update(
@@ -295,6 +334,7 @@ def main() -> int:
         new_obs_list = []
         homeo_list = []
         new_pooled_batch = []
+        level_deltas = [0] * n_games
         for i in range(n_games):
             game_action, action_data = map_action(int(actions[i]), i, rng)
             try:
@@ -312,12 +352,20 @@ def main() -> int:
                 avail_actions[i] = list(obs_new.available_actions)
             new_levels = int(obs_new.levels_completed)
             delta = new_levels - last_levels[i]
+            level_deltas[i] = delta
             if delta > 0:
                 levels_events[i] += delta
             last_levels[i] = new_levels
             new_pooled_batch.append(preprocess_pooled(frame))
             homeo_list.append(homeo_for(frame, new_levels, win_levels_per[i]))
             ep_step[i] += 1
+
+        # Goal-completion extrinsic bonus: per-lane 1.0 on positive level
+        # transitions, 0 otherwise. Applied via kindle's extrinsic-reward
+        # path (multiplied by extrinsic_reward_alpha at observe-time).
+        if args.goal_bonus > 0:
+            ext = [1.0 if d > 0 else 0.0 for d in level_deltas]
+            agent.set_extrinsic_reward(ext)
 
         # Observe (single batched call — this is where training happens).
         agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
@@ -369,6 +417,133 @@ def main() -> int:
     print(f"games with ≥1 level event: {games_with_events}/{n_games}")
     print(f"total level events: {total_evt}")
     print(f"throughput: {sps:.1f} step/s ({sps * n_games:.0f} env/s; {elapsed:.0f}s total)")
+
+    # --- Save checkpoint (always when val pass is requested, optional otherwise) ---
+    ckpt_dir = args.checkpoint_dir
+    if val_env_infos and ckpt_dir is None:
+        import tempfile
+        ckpt_dir = tempfile.mkdtemp(prefix="kindle_ckpt_")
+    if ckpt_dir is not None:
+        agent.save_state(ckpt_dir)
+        print(f"\nsaved trained agent to {ckpt_dir}")
+
+    # --- Validation pass on held-out games ---
+    if val_env_infos:
+        n_val = len(val_env_infos)
+        print()
+        print(f"=== validation pass ({n_val} held-out games, {args.val_steps} steps, lr=0) ===")
+
+        # Build val envs.
+        val_envs = []
+        val_obs_list = []
+        val_avail_actions: list[list[int]] = []
+        val_win_levels_per: list[int] = []
+        for e in val_env_infos:
+            env = arcade.make(e.game_id)
+            obs = env.reset()
+            val_envs.append(env)
+            val_obs_list.append(obs)
+            val_avail_actions.append(list(obs.available_actions) or [1])
+            val_win_levels_per.append(int(obs.win_levels))
+
+        # Fresh agent with the same architecture but val-game count.
+        val_kwargs = dict(agent_kwargs)
+        val_kwargs["batch_size"] = n_val
+        val_kwargs["env_ids"] = list(range(n_val))
+        val_agent = kindle.BatchAgent(**val_kwargs)
+        val_agent.load_state(ckpt_dir)
+        val_agent.set_all_learning_rates(0.0)
+        print(f"loaded trained weights into val agent ({n_val} lanes), lr=0")
+
+        if args.encoder in ("cnn", "cnn_dqn"):
+            val_frame_mv = val_agent.visual_obs_memoryview()
+            val_frame_buf = np.frombuffer(val_frame_mv, dtype=np.float32).reshape(
+                n_val, 1, 64, 64
+            )
+        else:
+            val_frame_buf = None
+
+        val_last_levels = [int(o.levels_completed) for o in val_obs_list]
+        val_levels_events = [0] * n_val
+        val_ep_step = [0] * n_val
+        val_ep_count = [0] * n_val
+
+        def val_map_action(idx, lane):
+            target = idx + 1
+            aa = val_avail_actions[lane]
+            if target not in aa:
+                target = aa[0]
+            a = action_by_value[target]
+            if a.is_complex():
+                x = rng.randrange(64)
+                y = rng.randrange(64)
+                a.set_data({"x": x, "y": y})
+                return a, {"x": x, "y": y}
+            return a, None
+
+        t0v = time.time()
+        for vstep in range(args.val_steps):
+            for i in range(n_val):
+                obs = val_obs_list[i]
+                state = obs.state
+                if (state in (GameState.NOT_PLAYED, GameState.GAME_OVER)
+                        or state is GameState.WIN
+                        or val_ep_step[i] >= args.max_episode_steps):
+                    if val_ep_step[i] > 0:
+                        val_ep_count[i] += 1
+                    val_obs_list[i] = val_envs[i].reset()
+                    val_avail_actions[i] = list(val_obs_list[i].available_actions) or val_avail_actions[i]
+                    val_last_levels[i] = int(val_obs_list[i].levels_completed)
+                    val_ep_step[i] = 0
+                    val_agent.mark_boundary(i)
+
+            pooled_batch = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32)) for o in val_obs_list]
+            if val_frame_buf is not None:
+                for i, o in enumerate(val_obs_list):
+                    val_frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+
+            actions = val_agent.act(pooled_batch)
+
+            new_obs_list = []
+            homeo_list = []
+            new_pooled_batch = []
+            for i in range(n_val):
+                ga, ad = val_map_action(int(actions[i]), i)
+                try:
+                    obs_new = val_envs[i].step(ga, data=ad)
+                except Exception:
+                    obs_new = val_envs[i].reset()
+                    val_avail_actions[i] = list(obs_new.available_actions) or val_avail_actions[i]
+                    val_agent.mark_boundary(i)
+                new_obs_list.append(obs_new)
+                if list(obs_new.available_actions):
+                    val_avail_actions[i] = list(obs_new.available_actions)
+                new_levels = int(obs_new.levels_completed)
+                delta = new_levels - val_last_levels[i]
+                if delta > 0:
+                    val_levels_events[i] += delta
+                val_last_levels[i] = new_levels
+                frame = np.asarray(obs_new.frame[0], dtype=np.float32)
+                new_pooled_batch.append(preprocess_pooled(frame))
+                homeo_list.append(homeo_for(frame, new_levels, val_win_levels_per[i]))
+                val_ep_step[i] += 1
+
+            val_agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
+            val_obs_list = new_obs_list
+
+        velapsed = time.time() - t0v
+        print(f"\n--- Val per-game summary ({args.val_steps} steps, lr=0) ---")
+        print(f"{'game':<6} {'eps':>4} {'evt':>4} {'win':>4}")
+        for i, e in enumerate(val_env_infos):
+            print(f"{e.game_id[:4]:<6} {val_ep_count[i]:>4} {val_levels_events[i]:>4} "
+                  f"{val_win_levels_per[i]:>4d}")
+        val_total = sum(val_levels_events)
+        val_breadth = sum(1 for x in val_levels_events if x > 0)
+        print(f"\nval games with ≥1 event: {val_breadth}/{n_val}")
+        print(f"val total level events: {val_total}")
+        print(f"val throughput: {args.val_steps / max(1e-3, velapsed):.1f} step/s "
+              f"({velapsed:.0f}s total)")
+
     return 0
 
 
