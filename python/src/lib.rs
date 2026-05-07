@@ -488,6 +488,7 @@ impl PyBatchAgent {
         use_grpo_episode = None,
         use_sil = None,
         sil_loss_coef = None,
+        sil_event_filter = None,
         sil_buffer_capacity = None,
         sil_baseline_decay = None,
         use_kl_ppo = None,
@@ -605,6 +606,7 @@ impl PyBatchAgent {
         use_grpo_episode: Option<bool>,
         use_sil: Option<bool>,
         sil_loss_coef: Option<f32>,
+        sil_event_filter: Option<bool>,
         sil_buffer_capacity: Option<usize>,
         sil_baseline_decay: Option<f32>,
         use_kl_ppo: Option<bool>,
@@ -938,6 +940,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = sil_loss_coef {
             config.sil_loss_coef = v;
+        }
+        if let Some(v) = sil_event_filter {
+            config.sil_event_filter = v;
         }
         if let Some(v) = sil_buffer_capacity {
             config.sil_buffer_capacity = v;

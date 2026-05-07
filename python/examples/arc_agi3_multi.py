@@ -73,6 +73,11 @@ def main() -> int:
                         "reward setting where each game produces only 1 success in 50k "
                         "steps — single events become persistent training signal.")
     parser.add_argument("--sil-loss-coef", type=float, default=0.5)
+    parser.add_argument("--sil-event-filter", type=int, default=0,
+                        help="When 1 (and use_sil=1 and goal_bonus>0), restrict "
+                        "SIL pushes to episodes that contained ≥1 extrinsic "
+                        "reward event (i.e., a level transition fired). Turns "
+                        "the SIL buffer into a 'winning trajectories' replay.")
     parser.add_argument("--recon-loss-coef", type=float, default=0.0,
                         help="Weight on the WM-session obs reconstruction loss. >0 "
                         "forces encoder to retain enough info to reconstruct the "
@@ -227,6 +232,7 @@ def main() -> int:
         ppo_clip_eps=args.ppo_clip_eps,
         use_sil=bool(args.use_sil),
         sil_loss_coef=args.sil_loss_coef,
+        sil_event_filter=bool(args.sil_event_filter),
         recon_loss_coef=args.recon_loss_coef,
         recon_visual_target=bool(args.recon_visual_target),
         policy_z_layer_norm=bool(args.policy_z_layer_norm),
