@@ -872,6 +872,15 @@ pub struct AgentConfig {
     /// magnitude of a unit-advantage on-policy update. Larger values
     /// pull the policy more aggressively toward past successes.
     pub sil_loss_coef: f32,
+    /// When true, the SIL push gate is restricted to episodes that
+    /// contained at least one extrinsic-reward event (i.e., the
+    /// harness's `set_extrinsic_reward` fired > 0 at least once).
+    /// Combined with `extrinsic_reward_alpha > 0` this turns the
+    /// SIL buffer into a "winning trajectories" replay rather than
+    /// a generic above-baseline-return replay. Default false (the
+    /// existing behavior — push when episode return exceeds the
+    /// baseline EMA).
+    pub sil_event_filter: bool,
     /// Capacity of the SIL replay buffer. Older samples are evicted
     /// FIFO when full. Default 10000.
     pub sil_buffer_capacity: usize,
@@ -1113,6 +1122,7 @@ impl Default for AgentConfig {
             use_grpo_episode: false,
             use_sil: false,
             sil_loss_coef: 0.5,
+            sil_event_filter: false,
             sil_buffer_capacity: 10_000,
             sil_baseline_decay: 0.99,
             use_kl_ppo: false,
@@ -1453,6 +1463,14 @@ struct Lane {
     /// intrinsics (surprise=0, novelty=0) would have outcome_ep_return
     /// stuck at 0 and SIL would never push.
     sil_ep_return: f32,
+    /// Number of times this episode's per-step extrinsic reward was
+    /// > 0 (i.e., a goal-completion / level-transition pulse fired).
+    /// Used by SIL's optional event-filter mode (`sil_event_filter`)
+    /// to push ONLY trajectories that contained at least one
+    /// extrinsic-reward event — turning the SIL buffer into a
+    /// "winning trajectories" replay rather than a generic
+    /// above-baseline-return replay.
+    sil_ep_event_count: u32,
     /// Single-step `r_base` of the just-finished step. Becomes the
     /// previous episode's terminal reward when the *next* step
     /// carries `env_boundary=true`. Used by
@@ -2592,6 +2610,7 @@ impl Agent {
                 outcome_ep_return: 0.0,
                 last_episode_return: 0.0,
                 sil_ep_return: 0.0,
+                sil_ep_event_count: 0,
                 outcome_last_step_reward: 0.0,
                 outcome_ep_step_rewards: Vec::new(),
                 prev_r_hat: 0.0,
@@ -3468,7 +3487,7 @@ impl Agent {
                 // outcome_ep_return (only intrinsic) — see Lane field doc.
                 if self.config.use_sil {
                     let ep_ret = lane.sil_ep_return;
-                    let push = if !self.sil_baseline_initialized {
+                    let baseline_pass = if !self.sil_baseline_initialized {
                         // First episode: initialize baseline, don't push
                         self.sil_baseline = ep_ret;
                         self.sil_baseline_initialized = true;
@@ -3476,6 +3495,9 @@ impl Agent {
                     } else {
                         ep_ret > self.sil_baseline
                     };
+                    let event_pass = !self.config.sil_event_filter
+                        || lane.sil_ep_event_count > 0;
+                    let push = baseline_pass && event_pass;
                     if push {
                         let blen = lane.buffer.len();
                         if blen > 0 {
@@ -3552,6 +3574,7 @@ impl Agent {
                 }
                 lane.outcome_ep_return = 0.0;
                 lane.sil_ep_return = 0.0;
+                lane.sil_ep_event_count = 0;
                 lane.outcome_ep_step_rewards.clear();
                 lane.prev_r_hat = 0.0;
             }
@@ -3755,6 +3778,16 @@ impl Agent {
             // — SIL needs the actual gym/env signal to gate "successful
             // episode" pushes.
             lane.sil_ep_return += reward;
+            // Count extrinsic-reward events this episode for the
+            // optional `sil_event_filter` SIL push gate. We use the
+            // pre-alpha `self.extrinsic_reward[i]` value... but it was
+            // already zeroed above. Use `ext_reward > 0` as the proxy:
+            // since alpha is positive (gated by `ext_alpha > 0`
+            // logically), ext_reward > 0 iff the harness set a
+            // positive extrinsic this step.
+            if ext_reward > 0.0 {
+                lane.sil_ep_event_count += 1;
+            }
 
             // Cache per-lane reward for the coord head's next
             // REINFORCE update; the head uses this step's reward
