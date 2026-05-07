@@ -129,6 +129,14 @@ def main() -> int:
                         help="Optional directory to save the trained agent state "
                         "to (after training, before any val pass). Useful for "
                         "post-hoc analysis.")
+    parser.add_argument("--load-state", default=None,
+                        help="Optional directory to load a previously-saved agent "
+                        "state from BEFORE training begins. Used for curriculum / "
+                        "transfer experiments: train subset → save → load into "
+                        "full-corpus agent → continue training. The graph "
+                        "topology (latent_dim, hidden_dim, encoder kind, "
+                        "num_options, recon flags, layer-norm flags) MUST match "
+                        "what was saved.")
     args = parser.parse_args()
 
     # --- Discover all games ---
@@ -243,6 +251,9 @@ def main() -> int:
             encoder_width=64,
         )
     agent = kindle.BatchAgent(**agent_kwargs)
+    if args.load_state:
+        agent.load_state(args.load_state)
+        print(f"loaded prior state from {args.load_state}")
     print(
         f"agent: {NUM_ACTIONS} actions, latent={args.latent_dim}, "
         f"hidden={args.hidden_dim}, encoder={args.encoder}, lr={args.lr}, "
