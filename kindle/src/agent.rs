@@ -69,6 +69,16 @@ use rand::Rng;
 /// be called every step before `observe` with a flat
 /// `[batch_size · channels · height · width]` input; the obs
 /// token path still flows to the reward circuit in parallel.
+///
+/// `EfficientNetV2S` runs a frozen, ImageNet-pretrained
+/// EfficientNetV2-S features[0:6] (via meganeura) on raw RGB
+/// `[batch · 3 · 192 · 192]` input as a sibling session, then
+/// feeds its `(160, 12, 12)` feature map into the same internal
+/// CNN encoder as `Cnn`. The harness writes raw RGB into
+/// `Agent::image_input_host_ptr` each step; kindle does the V2-S
+/// forward + feature upload internally during `observe`. The V2-S
+/// weights file path is supplied via
+/// `AgentConfig::efficientnet_weights_path`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EncoderKind {
     Mlp,
@@ -77,11 +87,23 @@ pub enum EncoderKind {
         height: u32,
         width: u32,
     },
+    EfficientNetV2S,
 }
 
+/// Output channel count of EfficientNetV2-S features[0:6].
+pub const EFFICIENTNET_V2S_OUT_CHANNELS: u32 = 160;
+/// Output spatial side length (12 × 12) of V2-S features[0:6].
+pub const EFFICIENTNET_V2S_OUT_HW: u32 = 12;
+/// Input spatial side length (192 × 192) accepted by V2-S.
+pub const EFFICIENTNET_V2S_IN_HW: u32 = 192;
+/// RGB channel count.
+pub const EFFICIENTNET_V2S_IN_CHANNELS: u32 = 3;
+
 impl EncoderKind {
-    /// Flat element count for visual obs: `0` for Mlp,
-    /// `channels · height · width` for Cnn.
+    /// Flat element count for the visual_obs slot: `0` for Mlp,
+    /// `channels · height · width` for Cnn, `160 · 12 · 12` for V2-S
+    /// (the V2-S feature map dim — V2-S's raw image input lives in
+    /// a separate buffer reached via `Agent::image_input_host_ptr`).
     pub fn visual_dim(&self) -> usize {
         match *self {
             EncoderKind::Mlp => 0,
@@ -90,6 +112,31 @@ impl EncoderKind {
                 height,
                 width,
             } => (channels as usize) * (height as usize) * (width as usize),
+            EncoderKind::EfficientNetV2S => {
+                (EFFICIENTNET_V2S_OUT_CHANNELS as usize)
+                    * (EFFICIENTNET_V2S_OUT_HW as usize)
+                    * (EFFICIENTNET_V2S_OUT_HW as usize)
+            }
+        }
+    }
+
+    /// Internal CNN encoder shape (channels, height, width) used
+    /// to build the latent encoder. For `Cnn` this is the user-
+    /// supplied shape; for `V2-S` it's the fixed (160, 12, 12)
+    /// V2-S feature shape.
+    pub fn cnn_shape(&self) -> Option<(u32, u32, u32)> {
+        match *self {
+            EncoderKind::Mlp => None,
+            EncoderKind::Cnn {
+                channels,
+                height,
+                width,
+            } => Some((channels, height, width)),
+            EncoderKind::EfficientNetV2S => Some((
+                EFFICIENTNET_V2S_OUT_CHANNELS,
+                EFFICIENTNET_V2S_OUT_HW,
+                EFFICIENTNET_V2S_OUT_HW,
+            )),
         }
     }
 }
@@ -901,9 +948,15 @@ pub struct AgentConfig {
     pub planner_refresh_interval: usize,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
-    /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
+    /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.);
+    /// `EfficientNetV2S` = frozen ImageNet-pretrained V2-S features
+    /// followed by the same internal CNN encoder.
     /// See `EncoderKind` doc for the protocol.
     pub encoder_kind: EncoderKind,
+    /// Required when `encoder_kind == EfficientNetV2S`. Path to the
+    /// BN-folded V2-S safetensors produced by meganeura's
+    /// `bench/dump_efficientnet_v2_reference.py`. Ignored otherwise.
+    pub efficientnet_weights_path: Option<std::path::PathBuf>,
     /// M6 v2: window size for the outcome head's input. `1`
     /// (default) reduces to single-frame `R̂(z_t)` — the back-compat
     /// M6 v1 path. `k ≥ 2` concatenates the last `k` encoder
@@ -1048,6 +1101,7 @@ impl Default for AgentConfig {
             planner_samples: 32,
             planner_refresh_interval: 200,
             encoder_kind: EncoderKind::Mlp,
+            efficientnet_weights_path: None,
             outcome_window: 1,
             outcome_clamp: 5.0,
             outcome_max_episode_len: 256,
@@ -1413,6 +1467,19 @@ pub struct Agent {
     /// env_embedding) into per-env latents).
     task_embeddings: HashMap<u32, Vec<f32>>,
     wm_session: Session,
+    /// Optional sibling session running EfficientNetV2-S features[0:6]
+    /// when `encoder_kind == EfficientNetV2S`. Inputs raw RGB
+    /// `[batch · 3 · 192 · 192]` via the `image` input slot; outputs
+    /// `[batch · 160 · 12 · 12]` features that we copy into
+    /// `wm_session`'s `visual_obs` input each step.
+    efficientnet_session: Option<Session>,
+    /// Byte size of the V2-S session's `image` input buffer. Zero when
+    /// V2-S is not in use. Reported by `image_input_host_size`.
+    efficientnet_input_size_bytes: usize,
+    /// Reusable scratch for the V2-S forward output before it gets
+    /// uploaded into `wm_session`'s `visual_obs`. Sized
+    /// `[batch · 160 · 12 · 12]`. Empty when V2-S isn't in use.
+    efficientnet_output_buf: Vec<f32>,
     credit_session: Session,
     /// Policy graph always uses the continuous branch (MSE loss on Gaussian
     /// means). For discrete envs, the adapter softmax+samples over the
@@ -1899,12 +1966,17 @@ impl Agent {
                     );
                     enc.forward(&mut g, obs, task)
                 }
-                EncoderKind::Cnn {
-                    channels,
-                    height,
-                    width,
-                } => {
-                    // Flat NCHW visual input.
+                EncoderKind::Cnn { .. } | EncoderKind::EfficientNetV2S => {
+                    // Both variants drive the internal CNN encoder. For
+                    // `Cnn` the (channels, height, width) come from the
+                    // config; for `EfficientNetV2S` they're the fixed
+                    // (160, 12, 12) V2-S feature shape (V2-S itself runs
+                    // in a sibling session and uploads features into
+                    // visual_obs via host copy before each WM step).
+                    let (channels, height, width) = config
+                        .encoder_kind
+                        .cnn_shape()
+                        .expect("Cnn / EfficientNetV2S have a CNN shape");
                     let flat_dim = (channels as usize)
                         * (height as usize)
                         * (width as usize)
@@ -1958,6 +2030,54 @@ impl Agent {
             init_parameters(&mut s);
             s
         };
+
+        // --- EfficientNetV2-S session (sibling, runs before WM each step) ---
+        let (efficientnet_session, efficientnet_input_size_bytes, efficientnet_output_buf) =
+            match config.encoder_kind {
+                EncoderKind::EfficientNetV2S => {
+                    let weights_path = config
+                        .efficientnet_weights_path
+                        .as_ref()
+                        .expect(
+                            "AgentConfig::efficientnet_weights_path must be set when \
+                             encoder_kind = EfficientNetV2S",
+                        )
+                        .clone();
+                    let mut g = Graph::new();
+                    let out = meganeura::models::efficientnet::build_graph(
+                        &mut g,
+                        config.batch_size as u32,
+                    );
+                    g.set_outputs(vec![out]);
+                    let mut s = meganeura::build_inference_session(&g);
+                    let weights = meganeura::data::safetensors::SafeTensorsModel::load(
+                        weights_path.clone(),
+                    )
+                    .unwrap_or_else(|e| {
+                        panic!(
+                            "EfficientNetV2-S: loading weights from {:?}: {}",
+                            weights_path, e
+                        )
+                    });
+                    for name in meganeura::models::efficientnet::weight_names() {
+                        let data = weights.tensor_f32(&name).unwrap_or_else(|e| {
+                            panic!("EfficientNetV2-S: parameter '{name}': {e}")
+                        });
+                        s.set_parameter(&name, &data);
+                    }
+                    let input_size_bytes = (config.batch_size
+                        * (EFFICIENTNET_V2S_IN_CHANNELS as usize)
+                        * (EFFICIENTNET_V2S_IN_HW as usize)
+                        * (EFFICIENTNET_V2S_IN_HW as usize))
+                        * std::mem::size_of::<f32>();
+                    let output_size = config.batch_size
+                        * (EFFICIENTNET_V2S_OUT_CHANNELS as usize)
+                        * (EFFICIENTNET_V2S_OUT_HW as usize)
+                        * (EFFICIENTNET_V2S_OUT_HW as usize);
+                    (Some(s), input_size_bytes, vec![0.0f32; output_size])
+                }
+                _ => (None, 0, Vec::new()),
+            };
 
         // --- Credit assigner graph ---
         let credit_session = {
@@ -2386,6 +2506,9 @@ impl Agent {
             lanes,
             task_embeddings,
             wm_session,
+            efficientnet_session,
+            efficientnet_input_size_bytes,
+            efficientnet_output_buf,
             credit_session,
             policy_session,
             option_session,
@@ -3625,17 +3748,21 @@ impl Agent {
             EncoderKind::Mlp => {
                 self.wm_session.set_input("obs", &self.obs_token_scratch);
             }
-            EncoderKind::Cnn { .. } => {
+            EncoderKind::Cnn { .. } | EncoderKind::EfficientNetV2S => {
                 // The `visual_obs` graph buffer is allocated by
                 // meganeura as `Memory::Shared` (device-local +
-                // host-visible + host-coherent). The harness writes
-                // preprocessed frames directly into the mapped
-                // pointer via `set_visual_obs` or
-                // `visual_obs_host_ptr`, so there's no CPU-side
-                // scratch to upload here — the data is already in
-                // the GPU buffer. Queue submit's implicit host-
-                // domain barrier makes the writes visible.
+                // host-visible + host-coherent). For `Cnn` the harness
+                // writes preprocessed features directly via
+                // `set_visual_obs` / `visual_obs_host_ptr`. For
+                // `EfficientNetV2S` the harness writes raw RGB into
+                // the V2-S session's `image` input
+                // (`image_input_host_ptr`); kindle runs V2-S inside
+                // `run_efficientnet_v2s` (called below) and uploads
+                // its output into `visual_obs`.
             }
+        }
+        if matches!(self.config.encoder_kind, EncoderKind::EfficientNetV2S) {
+            self.run_efficientnet_v2s();
         }
         self.wm_session
             .set_input("action", &self.action_token_scratch);
@@ -3880,6 +4007,58 @@ impl Agent {
         self.visual_obs_size_bytes
     }
 
+    /// Writable host-mapped pointer + byte size of the V2-S session's
+    /// `image` input buffer. `Some` only when
+    /// `encoder_kind == EfficientNetV2S`. The harness writes raw
+    /// `[batch · 3 · 192 · 192]` f32 NCHW pixels (in [0, 1] range) here
+    /// each step before calling `observe`; kindle's V2-S forward picks
+    /// up the writes via the implicit host-domain barrier on the next
+    /// queue submit.
+    pub fn image_input_host_ptr(&self) -> Option<(*mut u8, usize)> {
+        self.efficientnet_session
+            .as_ref()
+            .and_then(|s| s.input_host_ptr("image"))
+    }
+
+    /// Byte size of the V2-S session's `image` input buffer, or 0
+    /// when V2-S is not in use.
+    pub fn image_input_host_size(&self) -> usize {
+        self.efficientnet_input_size_bytes
+    }
+
+    /// Run the V2-S forward on whatever raw RGB the harness wrote into
+    /// `image_input_host_ptr`, then upload the output features into
+    /// the WM session's `visual_obs` input so the WM step can consume
+    /// them. Called automatically by the WM step path when
+    /// `encoder_kind == EfficientNetV2S`; not a public API.
+    fn run_efficientnet_v2s(&mut self) {
+        let session = self
+            .efficientnet_session
+            .as_mut()
+            .expect("EfficientNetV2S branch entered without session");
+        session.step();
+        session.wait();
+        let n = self.efficientnet_output_buf.len();
+        session.read_output_by_index(0, &mut self.efficientnet_output_buf);
+        // Copy features into wm_session's visual_obs buffer (host-mapped).
+        let (dst, dst_size) = self
+            .wm_session
+            .input_host_ptr("visual_obs")
+            .expect("visual_obs slot present under EfficientNetV2S");
+        let need = n * std::mem::size_of::<f32>();
+        debug_assert!(
+            need <= dst_size,
+            "V2-S output {need} bytes > visual_obs slot {dst_size} bytes"
+        );
+        unsafe {
+            std::ptr::copy_nonoverlapping(
+                self.efficientnet_output_buf.as_ptr() as *const u8,
+                dst,
+                need,
+            );
+        }
+    }
+
     /// Sample one replay transition per lane and run a single batched WM
     /// forward+backward over the stacked rows. Each lane retries up to 8
     /// random indices to find a non-boundary pair in its own buffer; if
@@ -3891,7 +4070,7 @@ impl Agent {
         // stored per-transition, which they aren't (buffer holds
         // the 64-dim token). Skip replay in that case; the online
         // WM gradient still flows every step.
-        if matches!(self.config.encoder_kind, EncoderKind::Cnn { .. }) {
+        if matches!(self.config.encoder_kind, EncoderKind::Cnn { .. } | EncoderKind::EfficientNetV2S) {
             return;
         }
         let ld = self.latent_dim;
@@ -4007,7 +4186,7 @@ impl Agent {
         // Drift probes are 64-dim obs tokens captured at warmup;
         // they're not visual frames, so a CNN encoder can't consume
         // them. Leave `last_drift = 0` for CNN-mode agents.
-        if matches!(self.config.encoder_kind, EncoderKind::Cnn { .. }) {
+        if matches!(self.config.encoder_kind, EncoderKind::Cnn { .. } | EncoderKind::EfficientNetV2S) {
             return;
         }
         let (probes, references) = match (self.probe_obs.as_ref(), self.probe_reference.as_ref()) {

@@ -447,6 +447,7 @@ impl PyBatchAgent {
         encoder_channels = None,
         encoder_height = None,
         encoder_width = None,
+        efficientnet_weights = None,
         reward_surprise = None,
         reward_novelty = None,
         reward_homeostatic = None,
@@ -556,6 +557,7 @@ impl PyBatchAgent {
         encoder_channels: Option<u32>,
         encoder_height: Option<u32>,
         encoder_width: Option<u32>,
+        efficientnet_weights: Option<String>,
         reward_surprise: Option<f32>,
         reward_novelty: Option<f32>,
         reward_homeostatic: Option<f32>,
@@ -993,9 +995,19 @@ impl PyBatchAgent {
                         width,
                     }
                 }
+                "efficientnet_v2s" => {
+                    let path = efficientnet_weights.as_ref().ok_or_else(|| {
+                        PyValueError::new_err(
+                            "encoder_kind='efficientnet_v2s' requires efficientnet_weights",
+                        )
+                    })?;
+                    config.efficientnet_weights_path =
+                        Some(std::path::PathBuf::from(path));
+                    EncoderKind::EfficientNetV2S
+                }
                 other => {
                     return Err(PyValueError::new_err(format!(
-                        "encoder_kind must be 'mlp' or 'cnn', got {other:?}"
+                        "encoder_kind must be 'mlp', 'cnn', or 'efficientnet_v2s', got {other:?}"
                     )));
                 }
             };
@@ -1361,6 +1373,39 @@ impl PyBatchAgent {
     /// Zero when the encoder is MLP.
     fn visual_obs_host_size(&self) -> usize {
         self.agent.visual_obs_host_size()
+    }
+
+    /// Writable `memoryview` over the V2-S session's `image` input
+    /// buffer. Returns an error when the encoder isn't
+    /// `efficientnet_v2s`. Layout is `[batch, 3, 192, 192]` NCHW
+    /// f32, raw [0, 1] pixel range — no ImageNet normalization.
+    /// Same `Memory::Shared` host-coherent buffer trick as
+    /// `visual_obs_memoryview`: writes through the view land
+    /// directly in GPU-mapped memory.
+    fn image_input_memoryview<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let (ptr, size) = self.agent.image_input_host_ptr().ok_or_else(|| {
+            PyRuntimeError::new_err(
+                "image_input_memoryview: only available with encoder_kind='efficientnet_v2s'",
+            )
+        })?;
+        let mv = unsafe {
+            let ffi_mv = pyo3::ffi::PyMemoryView_FromMemory(
+                ptr as *mut std::os::raw::c_char,
+                size as pyo3::ffi::Py_ssize_t,
+                pyo3::ffi::PyBUF_WRITE,
+            );
+            if ffi_mv.is_null() {
+                return Err(PyErr::fetch(py));
+            }
+            Bound::from_owned_ptr(py, ffi_mv)
+        };
+        Ok(mv)
+    }
+
+    /// Byte size of the V2-S `image` input buffer. Zero when
+    /// V2-S isn't in use.
+    fn image_input_host_size(&self) -> usize {
+        self.agent.image_input_host_size()
     }
 
     /// Re-initialize the RND predictor. Used to re-activate
