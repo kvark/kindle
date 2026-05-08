@@ -370,6 +370,7 @@ fn unpack_step(obj: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, f32, bool, bool)> 
 fn _native(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAgent>()?;
     m.add_class::<PyBatchAgent>()?;
+    m.add_class::<PyEfficientNet>()?;
     m.add("OBS_TOKEN_DIM", OBS_TOKEN_DIM)?;
     Ok(())
 }
@@ -1456,6 +1457,129 @@ impl PyBatchAgent {
             out.append(d)?;
         }
         Ok(out)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// EfficientNetV2-S inference (frozen ImageNet-pretrained features[0:6]).
+//
+// Used by the host as the visual frontend for KindleVisualActor — replaces
+// the PyTorch-based EfficientNet-B0 path with an end-to-end-on-GPU meganeura
+// session that matches torchvision V2-S to ~1e-4 abs error (see meganeura's
+// `tests/efficientnet_correctness.rs`).
+//
+// Construction:
+//   PyEfficientNet(safetensors_path) — load `efficientnet_v2s.safetensors`
+//   produced by `meganeura/bench/dump_efficientnet_v2_reference.py`.
+//
+// Step:
+//   1. Write a `[3, 192, 192]` f32 NCHW image into `input_memoryview()`.
+//   2. Call `forward()` → returns flat `[160 * 12 * 12]` f32 features.
+// ---------------------------------------------------------------------------
+
+const EFFICIENTNET_INPUT_C: usize = 3;
+const EFFICIENTNET_INPUT_HW: usize = 192;
+const EFFICIENTNET_OUTPUT_C: usize = 160;
+const EFFICIENTNET_OUTPUT_HW: usize = 12;
+const EFFICIENTNET_INPUT_SIZE: usize =
+    EFFICIENTNET_INPUT_C * EFFICIENTNET_INPUT_HW * EFFICIENTNET_INPUT_HW;
+const EFFICIENTNET_OUTPUT_SIZE: usize =
+    EFFICIENTNET_OUTPUT_C * EFFICIENTNET_OUTPUT_HW * EFFICIENTNET_OUTPUT_HW;
+
+/// Frozen EfficientNetV2-S features[0:6] inference, end-to-end on the
+/// meganeura GPU session. Outputs `[160, 12, 12]` features for a
+/// `[3, 192, 192]` RGB input (raw [0,1] pixel range — no ImageNet
+/// normalization, matching the torchvision parity test).
+#[pyclass(name = "EfficientNet", module = "kindle", unsendable)]
+pub struct PyEfficientNet {
+    session: meganeura::Session,
+}
+
+#[pymethods]
+impl PyEfficientNet {
+    /// Build the V2-S graph, load the BN-folded safetensors weights,
+    /// and return a ready-to-step session.
+    #[new]
+    fn new(safetensors_path: &str) -> PyResult<Self> {
+        let mut g = meganeura::Graph::new();
+        let out = meganeura::models::efficientnet::build_graph(&mut g, /*batch=*/ 1);
+        g.set_outputs(vec![out]);
+        let mut session = meganeura::build_inference_session(&g);
+
+        let weights =
+            meganeura::data::safetensors::SafeTensorsModel::load(safetensors_path.into())
+                .map_err(|e| {
+                    PyRuntimeError::new_err(format!(
+                        "EfficientNet: loading '{safetensors_path}': {e}"
+                    ))
+                })?;
+        for name in meganeura::models::efficientnet::weight_names() {
+            let data = weights.tensor_f32(&name).map_err(|e| {
+                PyRuntimeError::new_err(format!("EfficientNet: parameter '{name}': {e}"))
+            })?;
+            session.set_parameter(&name, &data);
+        }
+        Ok(Self { session })
+    }
+
+    /// Writable `memoryview` over the GPU-side `image` input buffer
+    /// (`Memory::Shared` — host-coherent). Layout is `[3, 192, 192]`
+    /// NCHW f32. Caller is responsible for dividing by 255 and writing
+    /// before each `forward()` call.
+    fn input_memoryview<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let (ptr, size) = self.session.input_host_ptr("image").ok_or_else(|| {
+            PyRuntimeError::new_err("EfficientNet: input 'image' has no host-mapped buffer")
+        })?;
+        let mv = unsafe {
+            let ffi_mv = pyo3::ffi::PyMemoryView_FromMemory(
+                ptr as *mut std::os::raw::c_char,
+                size as pyo3::ffi::Py_ssize_t,
+                pyo3::ffi::PyBUF_WRITE,
+            );
+            if ffi_mv.is_null() {
+                return Err(PyErr::fetch(py));
+            }
+            Bound::from_owned_ptr(py, ffi_mv)
+        };
+        Ok(mv)
+    }
+
+    /// Run a single forward pass on the contents of `input_memoryview`.
+    /// Returns a flat `[160 * 12 * 12]` f32 list (NCHW row-major).
+    fn forward(&mut self) -> Vec<f32> {
+        self.session.step();
+        self.session.wait();
+        self.session.read_output(EFFICIENTNET_OUTPUT_SIZE)
+    }
+
+    /// Element count of the input tensor (3 × 192 × 192 = 110592).
+    #[staticmethod]
+    fn input_size() -> usize {
+        EFFICIENTNET_INPUT_SIZE
+    }
+
+    /// Element count of the output tensor (160 × 12 × 12 = 23040).
+    #[staticmethod]
+    fn output_size() -> usize {
+        EFFICIENTNET_OUTPUT_SIZE
+    }
+
+    /// Output channel count (160).
+    #[staticmethod]
+    fn output_channels() -> usize {
+        EFFICIENTNET_OUTPUT_C
+    }
+
+    /// Output spatial side length (12).
+    #[staticmethod]
+    fn output_spatial() -> usize {
+        EFFICIENTNET_OUTPUT_HW
+    }
+
+    /// Input spatial side length (192).
+    #[staticmethod]
+    fn input_spatial() -> usize {
+        EFFICIENTNET_INPUT_HW
     }
 }
 
