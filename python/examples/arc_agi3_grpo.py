@@ -87,6 +87,13 @@ def main() -> int:
                         "normalization. Pairs naturally with state-locked "
                         "K-fork rollouts because forks from the same state "
                         "give clean within-batch comparison.")
+    parser.add_argument("--visit-counts-max", type=int, default=10000,
+                        help="Cap on the per-lane visit-counts HashMap "
+                        "(novelty-bonus working memory). 0 = unbounded "
+                        "(legacy). At latent_dim=256 the latent grid is "
+                        "effectively unbounded, so the unbounded HashMap "
+                        "grows ~1 KB/step/lane indefinitely. Recommended "
+                        "10000 (10 MB/lane) for joint runs. Default 10000.")
     parser.add_argument("--game-prefixes", default=None,
                         help="Comma-separated game-id prefixes to include. "
                         "Default: all 25 games.")
@@ -165,6 +172,7 @@ def main() -> int:
         extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
         use_grpo=bool(args.use_grpo),
         advantage_normalize=bool(args.use_grpo),  # required by use_grpo
+        visit_counts_max=args.visit_counts_max,
     )
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(

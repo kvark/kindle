@@ -158,14 +158,30 @@ pub struct ExperienceBuffer {
     transitions: RingBuffer<Transition>,
     pub visit_counts: HashMap<StateKey, u32>,
     grid_resolution: f32,
+    /// When `visit_counts.len()` would exceed this on insert, the entire
+    /// HashMap is cleared. 0 = unbounded (legacy behavior). Keeps the
+    /// novelty-bonus working memory bounded under long runs / large
+    /// batch_size where the latent grid space is effectively unbounded
+    /// (rank-256 latents at grid_resolution 0.5 → every step is a new
+    /// key, HashMap grows ~1 KB/step × n_lanes indefinitely).
+    visit_counts_max: usize,
 }
 
 impl ExperienceBuffer {
     pub fn new(capacity: usize, grid_resolution: f32) -> Self {
+        Self::with_visit_counts_max(capacity, grid_resolution, 0)
+    }
+
+    pub fn with_visit_counts_max(
+        capacity: usize,
+        grid_resolution: f32,
+        visit_counts_max: usize,
+    ) -> Self {
         Self {
             transitions: RingBuffer::new(capacity),
             visit_counts: HashMap::new(),
             grid_resolution,
+            visit_counts_max,
         }
     }
 
@@ -180,6 +196,17 @@ impl ExperienceBuffer {
     /// Record a new transition and update the novelty visit count.
     pub fn push(&mut self, transition: Transition) {
         let key = StateKey::from_latent(&transition.latent, self.grid_resolution);
+        // Cap memory: clear before inserting if the bound is set and
+        // adding a NEW key would exceed it. Existing-key updates always
+        // proceed (just an integer ++). The full-clear strategy is
+        // simpler than LRU/random eviction and adequate for
+        // novelty-bonus, which is most useful on recently-seen states.
+        if self.visit_counts_max > 0
+            && !self.visit_counts.contains_key(&key)
+            && self.visit_counts.len() >= self.visit_counts_max
+        {
+            self.visit_counts.clear();
+        }
         *self.visit_counts.entry(key).or_insert(0) += 1;
         self.transitions.push(transition);
     }

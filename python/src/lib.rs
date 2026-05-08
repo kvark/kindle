@@ -453,6 +453,7 @@ impl PyBatchAgent {
         reward_homeostatic = None,
         reward_order = None,
         grid_resolution = None,
+        visit_counts_max = None,
         rnd_reward_alpha = None,
         rnd_feature_dim = None,
         rnd_hidden_dim = None,
@@ -571,6 +572,7 @@ impl PyBatchAgent {
         reward_homeostatic: Option<f32>,
         reward_order: Option<f32>,
         grid_resolution: Option<f32>,
+        visit_counts_max: Option<usize>,
         rnd_reward_alpha: Option<f32>,
         rnd_feature_dim: Option<usize>,
         rnd_hidden_dim: Option<usize>,
@@ -835,6 +837,9 @@ impl PyBatchAgent {
         }
         if let Some(gr) = grid_resolution {
             config.grid_resolution = gr;
+        }
+        if let Some(v) = visit_counts_max {
+            config.visit_counts_max = v;
         }
         if let Some(v) = rnd_reward_alpha {
             config.rnd_reward_alpha = v;
