@@ -214,6 +214,15 @@ pub struct AgentConfig {
     /// Probability of running an additional replay training step per observe().
     pub replay_ratio: f32,
     pub grid_resolution: f32,
+    /// Maximum size of the per-lane `visit_counts` HashMap that backs
+    /// the `1/sqrt(visit_count)` novelty bonus. When inserting a new
+    /// key would exceed this, the whole HashMap is cleared. 0 =
+    /// unbounded (legacy behavior). At `latent_dim=256` and
+    /// `grid_resolution=0.5` the grid is effectively unbounded — most
+    /// steps produce a unique key, so memory grows ~1 KB/step ×
+    /// n_lanes indefinitely. Cap suggested for joint multi-game runs:
+    /// 10000–100000 (10 MB–100 MB per lane).
+    pub visit_counts_max: usize,
     pub entropy_beta: f32,
     /// Floor for policy entropy — updates suppressed when entropy falls below this.
     pub entropy_floor: f32,
@@ -1039,6 +1048,7 @@ impl Default for AgentConfig {
             warmup_steps: 100,
             replay_ratio: 0.2,
             grid_resolution: 0.5,
+            visit_counts_max: 0,
             entropy_beta: 0.01,
             entropy_floor: 0.1,
             drift_interval: 500,
@@ -2580,7 +2590,11 @@ impl Agent {
             .enumerate()
             .map(|(i, adapter)| Lane {
                 adapter,
-                buffer: ExperienceBuffer::new(config.buffer_capacity, config.grid_resolution),
+                buffer: ExperienceBuffer::with_visit_counts_max(
+                    config.buffer_capacity,
+                    config.grid_resolution,
+                    config.visit_counts_max,
+                ),
                 reward_circuit: RewardCircuit::with_seed(
                     config.reward_weights.clone(),
                     0xA11CE ^ i as u64,
