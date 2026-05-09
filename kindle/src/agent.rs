@@ -54,6 +54,31 @@ use hashbrown::HashMap;
 use meganeura::Session;
 use meganeura::graph::Graph;
 use meganeura::nn;
+use std::sync::Arc;
+
+/// Error returned by [`Agent::bind_v2s_image_external`].
+#[derive(Debug)]
+pub enum BindV2sImageError {
+    /// `Agent` was constructed without `encoder_kind == EfficientNetV2S`,
+    /// so there is no V2-S session whose `image` input we can rebind.
+    NoV2sSession,
+    /// meganeura rejected the bind — see [`meganeura::ExternalBindError`].
+    BindFailed(meganeura::ExternalBindError),
+}
+
+impl std::fmt::Display for BindV2sImageError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NoV2sSession => write!(
+                f,
+                "bind_v2s_image_external requires encoder_kind=EfficientNetV2S"
+            ),
+            Self::BindFailed(e) => write!(f, "bind_external_buffer failed: {e:?}"),
+        }
+    }
+}
+
+impl std::error::Error for BindV2sImageError {}
 use rand::Rng;
 
 /// What encoder kindle builds as the WM graph's backbone.
@@ -1458,6 +1483,13 @@ struct Lane {
 /// The kindle agent.
 pub struct Agent {
     pub config: AgentConfig,
+    /// Shared blade GPU context: every meganeura `Session` this agent
+    /// owns is built via `Session::with_context` against this same
+    /// instance, and any sibling compute pipeline (e.g. the V2-S
+    /// preprocess pass added in Track B.2) is constructed against it
+    /// too.  Held as `Arc` so `Session`s and the preprocess can each
+    /// keep their own clones without ownership conflicts.
+    gpu: Arc<blade_graphics::Context>,
     /// N lanes, N = config.batch_size. Fixed at construction.
     lanes: Vec<Lane>,
     /// Per-env task embedding (key = env_id, value length = TASK_DIM). Each
@@ -1480,6 +1512,12 @@ pub struct Agent {
     /// uploaded into `wm_session`'s `visual_obs`. Sized
     /// `[batch · 160 · 12 · 12]`. Empty when V2-S isn't in use.
     efficientnet_output_buf: Vec<f32>,
+    /// GPU-side preprocess pipeline that pulls per-lane Dullahan-imported
+    /// frames through bilinear resize + BGRA→RGB + uint8→f32 directly
+    /// into `efficientnet_session`'s `image` input buffer.  `None` when
+    /// V2-S isn't in use, in which case callers stage frames via the
+    /// legacy host-pointer path (`image_input_host_ptr`) instead.
+    v2s_preprocess: Option<crate::v2s_preprocess::PreprocessPipeline>,
     credit_session: Session,
     /// Policy graph always uses the continuous branch (MSE loss on Gaussian
     /// means). For discrete envs, the adapter softmax+samples over the
@@ -1906,11 +1944,39 @@ fn xavier_init(fan_in: usize, fan_out: usize, seed: u64) -> Vec<f32> {
         .collect()
 }
 
-fn build_session(g: &Graph, opt_level: OptLevel) -> Session {
-    match opt_level {
-        OptLevel::Full => meganeura::build_session(g),
-        OptLevel::None => meganeura::build_session_unoptimized(g),
-    }
+/// Build a meganeura training session sharing the agent's blade context.
+///
+/// Threading one `Arc<blade_graphics::Context>` through every `Session`
+/// the `Agent` owns lets a sibling compute pipeline (the V2-S preprocess
+/// in Track B.2) write directly into a meganeura input slot's underlying
+/// blade buffer — no fd/dmabuf interop needed.  Without this all sessions
+/// would each spin up an independent context and we'd be back to
+/// cross-context fd marshaling.
+fn build_session(
+    g: &Graph,
+    opt_level: OptLevel,
+    gpu: &Arc<blade_graphics::Context>,
+) -> Session {
+    let cfg = meganeura::SessionConfig {
+        gpu: Some(Arc::clone(gpu)),
+        skip_full_optimize: matches!(opt_level, OptLevel::None),
+        ..meganeura::SessionConfig::default()
+    };
+    meganeura::build(g, cfg).0
+}
+
+/// Build a meganeura inference-only session sharing the agent's blade
+/// context.  Used for the V2-S sibling session.
+fn build_inference_session(
+    g: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+) -> Session {
+    let cfg = meganeura::SessionConfig {
+        mode: meganeura::Mode::Inference,
+        gpu: Some(Arc::clone(gpu)),
+        ..meganeura::SessionConfig::default()
+    };
+    meganeura::build(g, cfg).0
 }
 
 impl Agent {
@@ -1932,6 +1998,19 @@ impl Agent {
             adapters.len(),
             config.batch_size
         );
+
+        // --- Shared blade GPU context ---
+        //
+        // One context for *every* meganeura session this Agent owns
+        // (and any sibling compute pipeline added later — see Track B.2
+        // V2-S preprocess).  Without sharing, each `build_session` call
+        // would `Context::init` a fresh instance and we'd lose the
+        // ability to write between sessions without fd/dmabuf interop.
+        let gpu: Arc<blade_graphics::Context> = Arc::new(
+            meganeura::init_gpu_context()
+                .expect("failed to initialize blade GPU context for Agent"),
+        );
+
         // --- World model graph (uses universal token sizes + task) ---
         //
         // The task embedding is fed as a graph **input** named "task".
@@ -2026,7 +2105,7 @@ impl Agent {
             let diff = g.add(z_target, neg_zhat);
             let sq = g.mul(diff, diff);
             g.set_outputs(vec![loss, z_t, sq]);
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             s
         };
@@ -2049,7 +2128,7 @@ impl Agent {
                         config.batch_size as u32,
                     );
                     g.set_outputs(vec![out]);
-                    let mut s = meganeura::build_inference_session(&g);
+                    let mut s = build_inference_session(&g, &gpu);
                     let weights = meganeura::data::safetensors::SafeTensorsModel::load(
                         weights_path.clone(),
                     )
@@ -2079,6 +2158,26 @@ impl Agent {
                 _ => (None, 0, Vec::new()),
             };
 
+        // --- V2-S preprocess pipeline (shared blade context) ---
+        //
+        // Built eagerly when V2-S is in use so callers can `register_lane`
+        // / `v2s_preprocess_step` without a follow-up "is the pipeline
+        // ready?" branch.  When the user picks a non-V2-S encoder the
+        // pipeline stays `None` and the legacy `image_input_host_ptr`
+        // path remains available.  See `src/v2s_preprocess.rs` and
+        // `src/shaders/v2s_preprocess.wgsl` for the GPU side.
+        let v2s_preprocess: Option<crate::v2s_preprocess::PreprocessPipeline> =
+            efficientnet_session.as_ref().map(|sess| {
+                let dst_image = sess
+                    .input_buffer("image")
+                    .expect("V2-S session must have an `image` input slot");
+                crate::v2s_preprocess::PreprocessPipeline::new(
+                    Arc::clone(&gpu),
+                    dst_image,
+                    config.batch_size,
+                )
+            });
+
         // --- Credit assigner graph ---
         let credit_session = {
             let g = credit::build_credit_graph(
@@ -2087,7 +2186,7 @@ impl Agent {
                 config.history_len,
                 config.hidden_dim,
             );
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             s
         };
@@ -2281,7 +2380,7 @@ impl Agent {
                     config.value_clip_scale,
                 )
             };
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             s
         };
@@ -2295,7 +2394,7 @@ impl Agent {
                 config.option_history_len,
                 config.hidden_dim,
             );
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             Some(s)
         } else {
@@ -2438,7 +2537,7 @@ impl Agent {
                 config.batch_size,
                 config.option_entropy_beta,
             );
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             Some(s)
         } else {
@@ -2503,12 +2602,14 @@ impl Agent {
             .collect();
 
         Self {
+            gpu,
             lanes,
             task_embeddings,
             wm_session,
             efficientnet_session,
             efficientnet_input_size_bytes,
             efficientnet_output_buf,
+            v2s_preprocess,
             credit_session,
             policy_session,
             option_session,
@@ -4024,6 +4125,120 @@ impl Agent {
     /// when V2-S is not in use.
     pub fn image_input_host_size(&self) -> usize {
         self.efficientnet_input_size_bytes
+    }
+
+    /// Replace the V2-S session's `image` input slot with an
+    /// externally-allocated buffer (Vulkan opaque FD, DMA-BUF,
+    /// Win32 HANDLE, or host pointer).
+    ///
+    /// Used to plumb a producer's GPU-resident frame buffer (Dullahan
+    /// capture VkImage exported via VK_KHR_external_memory_fd) into
+    /// V2-S without a host roundtrip.  The caller is responsible for
+    /// ensuring the external buffer's *contents* match V2-S's
+    /// expected `[batch · 3 · 192 · 192] f32` layout — this is
+    /// downstream of any preprocess (BGRA8→RGB, resize, normalize)
+    /// the producer must run before V2-S samples it.  See Track B.2
+    /// in `docs/kindle_rl_pipeline_design.md`.
+    ///
+    /// On Linux only `Fd(Some(_))` and `Dma(Some(_))` are useful for
+    /// fd-based interop; `HostAllocation(_)` is also accepted for
+    /// page-aligned host pointers shared between two contexts.  The
+    /// previously-bound host-visible buffer (the one
+    /// `image_input_host_ptr` returns) is released by meganeura
+    /// when this rebind succeeds.
+    ///
+    /// Errors:
+    /// * Returns `Err(...)` if `encoder_kind != EfficientNetV2S`
+    ///   (the V2-S session is `None`) or if `size` is below the
+    ///   slot's required byte count.
+    /// The shared blade GPU context every meganeura `Session` in this
+    /// agent was built with.  Hand a clone to a sibling compute pipeline
+    /// (e.g. the V2-S preprocess pass) to issue dispatches on the same
+    /// device + queue without a fresh context init.  Returns a clone of
+    /// the agent's `Arc`; the underlying context lives until both the
+    /// agent and the pipeline drop their handles.
+    pub fn gpu_context(&self) -> Arc<blade_graphics::Context> {
+        Arc::clone(&self.gpu)
+    }
+
+    /// Register (or replace) the per-lane Dullahan source buffer that
+    /// the V2-S preprocess pipeline samples each step.  Calls through
+    /// to [`crate::v2s_preprocess::PreprocessPipeline::register_lane`]
+    /// — see that doc for the field semantics.  No-op when the agent
+    /// was built with a non-V2-S encoder.
+    #[allow(clippy::too_many_arguments)]
+    pub fn register_v2s_source(
+        &mut self,
+        lane: usize,
+        fd: i32,
+        allocation_size_bytes: u64,
+        frame_data_offset_bytes: u64,
+        bytes_per_frame: u64,
+        src_w: u32,
+        src_h: u32,
+        is_rgba: bool,
+    ) -> Result<(), String> {
+        match self.v2s_preprocess.as_mut() {
+            Some(pp) => pp.register_lane(
+                lane,
+                fd,
+                allocation_size_bytes,
+                frame_data_offset_bytes,
+                bytes_per_frame,
+                src_w,
+                src_h,
+                is_rgba,
+            ),
+            None => Err("agent has no V2-S preprocess pipeline (encoder is not EfficientNetV2S)".to_string()),
+        }
+    }
+
+    /// Drop the per-lane source for `lane` (e.g. before re-registering
+    /// with a fresh fd after `reset_lane`).  No-op when the agent isn't
+    /// using V2-S or `lane` is out of range.
+    pub fn release_v2s_source(&mut self, lane: usize) {
+        if let Some(pp) = self.v2s_preprocess.as_mut() {
+            pp.release_lane(lane);
+        }
+    }
+
+    /// Configure HUD-mask rects (in V2-S 192² input space) that the
+    /// preprocess shader zeros after sampling.  See
+    /// [`crate::v2s_preprocess::PreprocessPipeline::set_hud_masks`].
+    /// No-op when the agent has no V2-S preprocess pipeline.
+    pub fn set_v2s_hud_masks(&mut self, rects: &[(u32, u32, u32, u32)]) {
+        if let Some(pp) = self.v2s_preprocess.as_mut() {
+            pp.set_hud_masks(rects);
+        }
+    }
+
+    /// Run one preprocess dispatch per registered lane: each lane's
+    /// most-recently-presented Dullahan frame slot is read, resized,
+    /// channel-swizzled, and written into V2-S's `image` input buffer
+    /// at `[lane, :, :, :]`.  `slot_indices[lane]` matches what
+    /// `VectorRustGameEnv::step_no_copy` returns; lanes whose source
+    /// isn't registered or whose slot is `None` are skipped.
+    ///
+    /// Submits and waits — `observe()` can be called immediately after.
+    /// No-op when the agent was built with a non-V2-S encoder.
+    pub fn v2s_preprocess_step(&mut self, slot_indices: &[Option<u32>]) {
+        if let Some(pp) = self.v2s_preprocess.as_mut() {
+            pp.dispatch_step(slot_indices);
+        }
+    }
+
+    pub fn bind_v2s_image_external(
+        &mut self,
+        source: blade_graphics::ExternalMemorySource,
+        size: u64,
+    ) -> Result<(), BindV2sImageError> {
+        let session = self
+            .efficientnet_session
+            .as_mut()
+            .ok_or(BindV2sImageError::NoV2sSession)?;
+        session
+            .bind_external_buffer(meganeura::ExternalSlot::Input("image"), source, size)
+            .map_err(BindV2sImageError::BindFailed)
     }
 
     /// Run the V2-S forward on whatever raw RGB the harness wrote into

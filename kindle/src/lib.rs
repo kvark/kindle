@@ -44,11 +44,17 @@ pub mod planner;
 pub mod policy;
 pub mod reward;
 pub mod rnd;
+pub mod v2s_preprocess;
 pub mod world_model;
 pub mod xeps_memory;
 
 pub use adapter::{EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
-pub use agent::{Agent, AgentConfig};
+pub use agent::{Agent, AgentConfig, BindV2sImageError};
+// Re-export blade-graphics' ExternalMemorySource so kindle-py and
+// other consumers don't need a direct blade-graphics dep just to
+// construct an `Fd(Some(_))` / `Dma(Some(_))` / `HostAllocation(_)`
+// argument for `Agent::bind_v2s_image_external`.
+pub use blade_graphics::ExternalMemorySource;
 pub use buffer::ExperienceBuffer;
 pub use env::{Action, ActionKind, Environment, HomeostaticProvider, Observation};
 pub use reward::RewardCircuit;

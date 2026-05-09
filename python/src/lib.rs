@@ -1408,6 +1408,140 @@ impl PyBatchAgent {
         self.agent.image_input_host_size()
     }
 
+    /// Replace the V2-S `image` input slot with an externally-imported
+    /// Vulkan opaque-fd buffer.
+    ///
+    /// `fd` must be a Linux file descriptor returned by
+    /// `mind_games_rs.connect_dullahan_gpu(...)["fd"]` (or any other
+    /// `vkGetMemoryFdKHR`-style export). On a successful import the
+    /// driver takes ownership of the fd and the caller MUST NOT close
+    /// it. On failure the fd is left untouched and may still be closed
+    /// by the caller.
+    ///
+    /// `size` is the byte length of the imported allocation. It must
+    /// be at least the V2-S `image` slot's required size (typically
+    /// `batch * 3 * 192 * 192 * sizeof::<f32>()`); the producer is
+    /// responsible for either making the import exactly that size or
+    /// running a preprocess pass that fills the first N bytes with
+    /// the right NCHW f32 layout. See Track B.2 in
+    /// `docs/kindle_rl_pipeline_design.md`.
+    ///
+    /// Errors:
+    /// * `RuntimeError` if `encoder_kind != "efficientnet_v2s"`.
+    /// * `RuntimeError` if `size` is below the V2-S slot's needed
+    ///   byte count.
+    fn bind_v2s_image_external_fd(&mut self, fd: i32, size: u64) -> PyResult<()> {
+        let source = kindle::ExternalMemorySource::Fd(Some(fd));
+        self.agent
+            .bind_v2s_image_external(source, size)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Same as [`bind_v2s_image_external_fd`] but treats `fd` as a
+    /// DMA-BUF (the usual export path on Linux/Mesa for sharing with
+    /// GStreamer / V4L2 / EGL / Wayland — and what Dullahan's
+    /// `VK_KHR_external_memory_fd` path actually emits).
+    fn bind_v2s_image_external_dmabuf(&mut self, fd: i32, size: u64) -> PyResult<()> {
+        let source = kindle::ExternalMemorySource::Dma(Some(fd));
+        self.agent
+            .bind_v2s_image_external(source, size)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Replace the V2-S `image` input slot with an externally-imported
+    /// host pointer (e.g. a page-aligned Python `bytearray` mapped
+    /// from `mmap.mmap`). The pointer must remain valid for the
+    /// lifetime of the BatchAgent.
+    ///
+    /// `ptr` is the integer-cast address (cast a `bytearray` /
+    /// `numpy.ndarray.ctypes.data` to int). `size` is the buffer's
+    /// byte length and must be ≥ the V2-S slot's required size.
+    /// Useful when the producer is CPU-resident (e.g. a torch tensor
+    /// `.numpy().ctypes.data`); avoids the host-roundtrip that
+    /// `image_input_memoryview()` requires.
+    fn bind_v2s_image_external_host(&mut self, ptr: usize, size: u64) -> PyResult<()> {
+        let source = kindle::ExternalMemorySource::HostAllocation(ptr);
+        self.agent
+            .bind_v2s_image_external(source, size)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
+    /// Register (or replace) the per-lane Dullahan source buffer that
+    /// the V2-S preprocess pipeline samples each step.  The pipeline
+    /// imports `fd` into the agent's blade context as
+    /// `Memory::External(Fd(_))` and remembers the SHM frame layout so
+    /// `v2s_preprocess_step` can compute slot offsets per call.
+    ///
+    /// Args:
+    ///     lane (int): lane index (0..batch_size).
+    ///     fd (int): Dullahan-exported OPAQUE_FD.  Blade takes
+    ///         ownership — closes it when the buffer is destroyed.
+    ///     allocation_size (int): total bytes of the imported allocation.
+    ///     frame_data_offset (int): bytes from start-of-allocation to
+    ///         the first frame ring slot (= SHM `data_offset`).
+    ///     bytes_per_frame (int): bytes per frame slot
+    ///         (= `width * height * 4`).
+    ///     src_w (int), src_h (int): source frame dimensions in pixels.
+    ///     is_rgba (bool): True for `VK_FORMAT_R8G8B8A8_UNORM`,
+    ///         False for the BGRA default (`B8G8R8A8`).
+    ///
+    /// Errors: `RuntimeError` if the agent has no V2-S preprocess
+    /// pipeline or the lane index is out of range.
+    #[allow(clippy::too_many_arguments)]
+    fn register_v2s_source(
+        &mut self,
+        lane: usize,
+        fd: i32,
+        allocation_size: u64,
+        frame_data_offset: u64,
+        bytes_per_frame: u64,
+        src_w: u32,
+        src_h: u32,
+        is_rgba: bool,
+    ) -> PyResult<()> {
+        self.agent
+            .register_v2s_source(
+                lane,
+                fd,
+                allocation_size,
+                frame_data_offset,
+                bytes_per_frame,
+                src_w,
+                src_h,
+                is_rgba,
+            )
+            .map_err(PyRuntimeError::new_err)
+    }
+
+    /// Drop the per-lane source for `lane`.  Use before re-registering
+    /// with a fresh fd after `VectorRustGameEnv::reset_lane`.
+    fn release_v2s_source(&mut self, lane: usize) {
+        self.agent.release_v2s_source(lane);
+    }
+
+    /// Configure the HUD-mask rects the preprocess shader zeros after
+    /// sampling.  Each rect is `(x0, y0, x1, y1)` in V2-S 192² input
+    /// pixel space (NOT game-frame coords — the trainer must rescale
+    /// from game resolution before calling).  Up to 4 rects supported;
+    /// pass an empty list to disable masking.  Settings persist across
+    /// `v2s_preprocess_step` calls.  No-op when the agent has no V2-S
+    /// preprocess pipeline.
+    fn set_v2s_hud_masks(&mut self, rects: Vec<(u32, u32, u32, u32)>) {
+        self.agent.set_v2s_hud_masks(&rects);
+    }
+
+    /// Run one preprocess dispatch per registered lane.  `slot_indices`
+    /// is one entry per lane: `Some(slot)` for lanes where the
+    /// producer just wrote frame slot `slot`, `None` to skip.
+    ///
+    /// The dispatch resamples the source frame to 192×192, swizzles
+    /// BGRA→RGB, normalises uint8→f32 / 255, and writes the result
+    /// directly into V2-S's `image` input buffer at `[lane, :, :, :]`.
+    /// Submits and waits — the next `observe()` call reads the result.
+    fn v2s_preprocess_step(&mut self, slot_indices: Vec<Option<u32>>) {
+        self.agent.v2s_preprocess_step(&slot_indices);
+    }
+
     /// Re-initialize the RND predictor. Used to re-activate
     /// curiosity when the agent enters a new state distribution
     /// (e.g. on level-up in ARC-AGI-3). No-op when RND is

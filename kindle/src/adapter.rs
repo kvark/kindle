@@ -10,7 +10,14 @@ use rand::{Rng, RngCore};
 
 /// Maximum action dimension across all supported environments.
 /// Discrete envs use the first `n` dims; continuous envs use the first `dim`.
-pub const MAX_ACTION_DIM: usize = 6;
+///
+/// Bumped from 6 → 16 to accommodate the extended PW macro vocabulary
+/// (12: idle + WASD + strafe + jump + shoot + use + next-weapon) and
+/// Gungeon (14: 8 directions × {move, move+shoot} + dodge + reload +
+/// item + interact + blank).  Small-action games (LunarLander n=4,
+/// platformer n=6) zero-pad the unused tail; the cost is a wider
+/// policy-head logits vector, not a separate network.
+pub const MAX_ACTION_DIM: usize = 16;
 
 /// Observation token dimension. Raw observations of any size are projected
 /// (padded with zeros initially) to this size.

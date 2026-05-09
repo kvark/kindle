@@ -9,7 +9,17 @@ description = "A continually self-training RL agent that starts from a cold netw
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "67c1669" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "afe01cd" }
+# Pinned to the same blade rev meganeura uses (rev `72c30c1`) so cargo
+# unifies and `blade_graphics::ExternalMemorySource` round-trips
+# cleanly between kindle's bind API and meganeura's
+# `Session::bind_external_buffer`. No new transitive dependencies — it
+# already pulls in via meganeura.
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "72c30c1" }
+# `#[derive(ShaderData)]` for the V2-S preprocess compute pipeline's
+# bindings struct — same blade rev so derive ↔ trait stay in sync.
+blade-macros = { git = "https://github.com/kvark/blade", rev = "72c30c1" }
+bytemuck = { version = "1", features = ["derive"] }
 rand = "0.9"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
