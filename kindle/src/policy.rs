@@ -201,7 +201,13 @@ pub fn build_policy_graph(
     // drive the head into an overflow loop.
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
 
     // Policy loss: cross-entropy with one-hot action selects -log π(a|s)
     let policy_loss = g.cross_entropy_loss(logits, action);
@@ -348,7 +354,13 @@ pub fn build_ppo_policy_graph(
     // Value head — same structure as the non-PPO path
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
     let value_loss_raw = g.mse_loss(value, value_target);
     let value_loss = if (value_loss_coef - 1.0).abs() < 1e-6 {
         value_loss_raw
@@ -492,7 +504,13 @@ pub fn build_policy_graph_e2e(
 
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
 
     let policy_loss = g.cross_entropy_loss(logits, action);
     let value_loss_raw = g.mse_loss(value, value_target);
@@ -680,7 +698,13 @@ pub fn build_kl_policy_graph_e2e(
     // what the working `build_policy_graph_e2e` does.
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
     let value_loss_raw = g.mse_loss(value, value_target);
     let value_loss = if (value_loss_coef - 1.0).abs() < 1e-6 {
         value_loss_raw
@@ -854,7 +878,13 @@ pub fn build_ppo_policy_graph_e2e(
     let z_for_value = g.stop_gradient(z);
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z_for_value);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
     let value_loss_raw = g.mse_loss(value, value_target);
     let value_loss = if (value_loss_coef - 1.0).abs() < 1e-6 {
         value_loss_raw
@@ -936,7 +966,13 @@ pub fn build_continuous_policy_graph(
 
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
-    let value = scaled_tanh(&mut g, raw_value, value_clip_scale, batch_size, 1);
+    // Task #259: scaled_tanh on the value head saturates on broforce-style
+    // training within ~50 steps, producing NaN gradients. Linear pass-through
+    // — combined with the grad-norm clip on the policy session — keeps the
+    // value head trainable. `value_clip_scale` parameter is retained for
+    // graph signature compatibility but no longer applied.
+    let _ = value_clip_scale;
+    let value = raw_value;
 
     // Policy loss: MSE(μ, taken_action) ≡ Gaussian NLL with σ² = 1
     let policy_loss = g.mse_loss(mean, action);
