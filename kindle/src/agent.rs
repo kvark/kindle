@@ -2382,6 +2382,15 @@ impl Agent {
             };
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
+            // Task #259: enable gradient norm clipping on the policy session
+            // to prevent the value head from saturating into NaN. The MSE
+            // gradient on a saturated scaled_tanh keeps the pre-tanh logit
+            // growing unboundedly until activations overflow; clipping the
+            // total grad norm caps each per-step update so the logit stays
+            // in the linear regime. 10.0 lets policy_step_batched make
+            // meaningful progress while still bounding the worst-case
+            // value-head excursion.
+            s.set_grad_clip_norm(10.0);
             s
         };
 
@@ -4901,12 +4910,13 @@ impl Agent {
         // effectively disables the magnitude branch (NaN branch
         // remains active).
         let wd = self.config.policy_loss_watchdog_threshold;
-        if !loss.is_finite() || loss.abs() > wd {
+        if !loss.is_finite() {
             init_parameters(&mut self.policy_session);
             log::warn!(
-                "policy loss {:.1} unstable at step {}, re-initialized policy params",
+                "policy loss {:.1} non-finite at step {} (NaN/Inf), re-initialized policy params (wd={} ignored)",
                 loss,
-                self.step_count
+                self.step_count,
+                wd,
             );
             self.last_policy_loss = 0.0;
         } else {
@@ -5310,12 +5320,13 @@ impl Agent {
 
         let loss = self.policy_session.read_loss();
         let wd = self.config.policy_loss_watchdog_threshold;
-        if !loss.is_finite() || loss.abs() > wd {
+        if !loss.is_finite() {
             init_parameters(&mut self.policy_session);
             log::warn!(
-                "policy loss {:.1} unstable at step {} (n-step), re-initialized policy params",
+                "policy loss {:.1} non-finite at step {} (n-step, NaN/Inf), re-initialized policy params (wd={} ignored)",
                 loss,
-                self.step_count
+                self.step_count,
+                wd,
             );
             self.last_policy_loss = 0.0;
         } else {
@@ -5843,12 +5854,13 @@ impl Agent {
             self.last_kl = kl_buf[0];
         }
         let wd = self.config.policy_loss_watchdog_threshold;
-        if !loss.is_finite() || loss.abs() > wd {
+        if !loss.is_finite() {
             init_parameters(&mut self.policy_session);
             log::warn!(
-                "policy loss {:.1} unstable at step {} (rollout), re-initialized policy params",
+                "policy loss {:.1} non-finite at step {} (rollout, NaN/Inf), re-initialized policy params (wd={} ignored)",
                 loss,
-                self.step_count
+                self.step_count,
+                wd,
             );
             self.last_policy_loss = 0.0;
         } else {
