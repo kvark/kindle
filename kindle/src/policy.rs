@@ -296,6 +296,12 @@ pub fn build_ppo_policy_graph(
     let advantage = g.input("advantage", &[batch_size, 1]);
     let old_prob_taken = g.input("old_prob_taken", &[batch_size, 1]);
     let value_target = g.input("value_target", &[batch_size, 1]);
+    // Per-row, per-action availability mask. 1.0 = valid, 0.0 = invalid.
+    // Applied additively to logits before softmax so invalid actions get
+    // ~0 probability under both π_new (graph computation) and the entropy
+    // regularizer. Default-initialized to all-1.0 in the agent so behavior
+    // matches pre-mask runs unless `set_action_masks` is called.
+    let action_mask = g.input("action_mask", &[batch_size, action_dim]);
 
     // Optional LayerNorm on z before policy/value heads. The encoder
     // under multi-game training places per-game centroids ~15× farther
@@ -361,6 +367,30 @@ pub fn build_ppo_policy_graph(
         let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
         policy.forward(&mut g, z)
     };
+
+    // Apply availability mask: masked_logits = logits + (mask - 1) * 60.
+    // (mask - 1) is 0 for valid actions and -1 for invalid; multiplied by
+    // 60 it adds 0 (unchanged) or -60 (effectively -inf for softmax —
+    // exp(-60) ≈ 1e-26 ≪ f32 precision) to each logit. We use 60 not
+    // 1e9: the upstream `scaled_tanh` on the policy head already clamps
+    // logits to ±50, so 60 is just outside that clamp and definitely
+    // dominates softmax. Larger magnitudes (we tried 1e9) produce
+    // numerical issues that zero out the policy loss — likely a tiny
+    // `mask*1e9` gradient flowing back through autodiff overflows
+    // somewhere downstream. With all-1.0 mask this is a no-op for
+    // backward compat.
+    let ones_full = g.constant(
+        vec![1.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let neg_ones_full = g.neg(ones_full);
+    let mask_minus_one = g.add(action_mask, neg_ones_full);
+    let big_const = g.constant(
+        vec![60.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let mask_offset = g.mul(mask_minus_one, big_const);
+    let logits = g.add(logits, mask_offset);
 
     // π_new(a | s) — probability of the taken action under the current
     // policy. Built from `softmax(logits) * one_hot` followed by a
@@ -875,12 +905,28 @@ pub fn build_ppo_policy_graph_e2e(
     let advantage = g.input("advantage", &[batch_size, 1]);
     let old_prob_taken = g.input("old_prob_taken", &[batch_size, 1]);
     let value_target = g.input("value_target", &[batch_size, 1]);
+    // Per-row, per-action availability mask (see non-e2e variant).
+    let action_mask = g.input("action_mask", &[batch_size, action_dim]);
 
     let encoder = build_named_encoder(&mut g, obs_dim, task_dim, latent_dim, hidden_dim);
     let z = encoder_forward(&mut g, &encoder, obs, task);
 
     let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
     let logits = policy.forward(&mut g, z);
+
+    // Apply availability mask: invalid logits → -1e9.
+    let ones_full = g.constant(
+        vec![1.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let neg_ones_full = g.neg(ones_full);
+    let mask_minus_one = g.add(action_mask, neg_ones_full);
+    let big_const = g.constant(
+        vec![60.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let mask_offset = g.mul(mask_minus_one, big_const);
+    let logits = g.add(logits, mask_offset);
 
     let sm_new = g.softmax(logits);
     let p_per_class = g.mul(sm_new, action);
@@ -935,7 +981,22 @@ pub fn build_ppo_policy_graph_e2e(
         base_loss
     } else {
         let z_det = g.stop_gradient(z);
-        let logits_for_ent = policy.forward(&mut g, z_det);
+        let logits_for_ent_raw = policy.forward(&mut g, z_det);
+        // Apply same mask to entropy logits so the regularizer sees the
+        // post-mask distribution (entropy spreads only over valid actions).
+        let ones_full2 = g.constant(
+            vec![1.0; batch_size * action_dim],
+            &[batch_size, action_dim],
+        );
+        let neg_ones_full2 = g.neg(ones_full2);
+        let mask_minus_one2 = g.add(action_mask, neg_ones_full2);
+        let big_const2 = g.constant(
+            vec![60.0; batch_size * action_dim],
+            &[batch_size, action_dim],
+        );
+        let mask_offset2 = g.mul(mask_minus_one2, big_const2);
+        let logits_for_ent = g.add(logits_for_ent_raw, mask_offset2);
+
         let sm = g.softmax(logits_for_ent);
         let lsm = g.log_softmax(logits_for_ent);
         let p_log_p = g.mul(sm, lsm);

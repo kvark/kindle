@@ -97,6 +97,30 @@ def main() -> int:
     parser.add_argument("--game-prefixes", default=None,
                         help="Comma-separated game-id prefixes to include. "
                         "Default: all 25 games.")
+    parser.add_argument("--novelty-bonus-scale", type=float, default=0.0,
+                        help="Script-level frame-hash novelty bonus: each "
+                        "step the agent receives bonus = scale / sqrt(count) "
+                        "where count is the per-lane visit count of the "
+                        "post-step frame. Fed via set_extrinsic_reward, "
+                        "stacked with the level-completion goal_bonus. "
+                        "0 disables (default). Try 0.5–2.0 for sparse-reward "
+                        "puzzle games where the policy can't find first events.")
+    parser.add_argument("--novelty-cap", type=int, default=50000,
+                        help="Max distinct frame hashes per lane tracked for "
+                        "the novelty bonus. Beyond this, the bonus stays at "
+                        "scale/sqrt(novelty_cap+1) — small but not zero.")
+    parser.add_argument("--planner-horizon", type=int, default=0,
+                        help="Enable kindle's model-based planner. The "
+                        "trained world model rolls forward K=planner-horizon "
+                        "steps for each of `planner-samples` random action "
+                        "sequences (per lane), picks the trajectory with "
+                        "highest latent-visit-count novelty score, and "
+                        "queues the actions to override the policy. 0 = off. "
+                        "Try 5-10 for sparse-reward puzzle games where the "
+                        "policy gradient can't find first events.")
+    parser.add_argument("--planner-samples", type=int, default=32,
+                        help="Number of random action sequences sampled per "
+                        "planning call (per lane). Default 32.")
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
     args = parser.parse_args()
@@ -169,10 +193,13 @@ def main() -> int:
         sil_event_filter=bool(args.sil_event_filter),
         recon_loss_coef=args.recon_loss_coef,
         recon_visual_target=bool(args.recon_visual_target),
-        extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
+        extrinsic_reward_alpha=(args.goal_bonus if args.goal_bonus > 0
+                                else (1.0 if args.novelty_bonus_scale > 0 else 0.0)),
         use_grpo=bool(args.use_grpo),
         advantage_normalize=bool(args.use_grpo),  # required by use_grpo
         visit_counts_max=args.visit_counts_max,
+        planner_horizon=args.planner_horizon,
+        planner_samples=args.planner_samples,
     )
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(
@@ -203,11 +230,37 @@ def main() -> int:
              "target": 0.0, "tolerance": 0.1},
         ]
 
+    # MAX_ACTION_DIM in kindle's adapter — kindle's policy emits 18-wide
+    # logits regardless of the 7 ARC-AGI-3 game actions; we'll mask the
+    # unused slots to -inf so the policy never samples them.
+    MAX_ACTION_DIM = 18
+    mask_buf = np.ones((n_lanes, MAX_ACTION_DIM), dtype=np.float32)
+
+    def update_action_mask():
+        """Rebuild per-lane action masks from current avail_actions and push
+        them to kindle. Slots whose ARC GameAction.value (idx+1) is in
+        avail_actions[lane] stay at 1.0; everything else (including the
+        slots beyond NUM_ACTIONS) is forced to 0.0."""
+        mask_buf.fill(0.0)
+        for lane_i in range(n_lanes):
+            for v in avail_actions[lane_i]:
+                idx = int(v) - 1
+                if 0 <= idx < MAX_ACTION_DIM:
+                    mask_buf[lane_i, idx] = 1.0
+        agent.set_action_masks(mask_buf.reshape(-1))
+
     def map_action(idx, lane):
+        # Kindle now masks invalid actions before sampling, so `idx`
+        # should always map to an action in `avail_actions[lane]`.
+        # Assert defensively; if this fires, something else broke
+        # (mask not propagated, or the mask was empty).
         target = idx + 1
         aa = avail_actions[lane]
-        if target not in aa:
-            target = aa[0]
+        assert target in aa, (
+            f"action mask escape: lane {lane} sampled idx={idx} "
+            f"(target={target}) not in avail_actions={aa}; "
+            f"masking via agent.set_action_masks must be in sync"
+        )
         a = action_by_value[target]
         if a.is_complex():
             x = rng.randrange(64)
@@ -218,6 +271,19 @@ def main() -> int:
 
     import random
     rng = random.Random(args.seed)
+
+    # Per-lane frame-hash visit counts for the novelty bonus. Each lane
+    # has its OWN dict — we don't share across lanes because the same
+    # visual frame in different games means different things, and at
+    # focused-single-game runs the lanes are different forks of the same
+    # game that should each get credit for their own discoveries.
+    import hashlib
+    novelty_counts = [dict() for _ in range(n_lanes)]
+
+    def frame_hash(frame_arr):
+        # 8-byte blake2b of the raw uint8 pixel grid is plenty of bits.
+        return hashlib.blake2b(frame_arr.astype(np.uint8).tobytes(),
+                               digest_size=8).digest()
 
     # CNN visual buffer.
     if args.encoder in ("cnn", "cnn_dqn"):
@@ -272,6 +338,19 @@ def main() -> int:
                 for i, o in enumerate(obs_list):
                     frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
 
+            # Push current per-lane action masks to kindle BEFORE act();
+            # avail_actions can change after each env.step() so we
+            # refresh every micro-step.
+            update_action_mask()
+            # Run the model-based planner. No-op when planner_horizon == 0
+            # OR when every lane's queue still has actions to play. When
+            # the queue is empty, the planner samples planner_samples
+            # random valid-action sequences of length planner_horizon,
+            # rolls them through the WM, scores each by latent-visit-
+            # count novelty, and queues the best one. act() then plays
+            # the queued action instead of sampling from the policy.
+            if args.planner_horizon > 0:
+                agent.plan_and_queue(NUM_ACTIONS)
             actions = agent.act(pooled)
 
             new_obs_list = []
@@ -301,9 +380,37 @@ def main() -> int:
                 homeo_list.append(homeo_for(frame, new_levels, win_levels_per[i]))
                 ep_step[i] += 1
 
-            if args.goal_bonus > 0:
-                ext = [1.0 if d > 0 else 0.0 for d in level_deltas]
-                agent.set_extrinsic_reward(ext)
+            # Build extrinsic-reward vector: level-completion goal_bonus
+            # (binary 0/1) plus the frame-hash novelty bonus. Both are
+            # scaled by `extrinsic_reward_alpha` inside the agent, so
+            # picking comparable magnitudes here matters. With
+            # goal_bonus=20 and novelty_bonus_scale=0.5, a new frame
+            # gives 0.5 * 20 = 10 (half of a level event). After visit
+            # count 100, bonus drops to ~1.0 (5% of a level event).
+            ext_vec = [0.0] * n_lanes
+            level_event = args.goal_bonus > 0
+            novel_event = args.novelty_bonus_scale > 0.0
+            if level_event or novel_event:
+                for i in range(n_lanes):
+                    r = 0.0
+                    if level_event and level_deltas[i] > 0:
+                        r += 1.0  # goal-bonus per level event
+                    if novel_event:
+                        # Hash the post-step frame; increment count;
+                        # apply 1/sqrt(count) bonus. Cap dict size per
+                        # lane to bound memory.
+                        h = frame_hash(np.asarray(new_obs_list[i].frame[0]))
+                        lane_counts = novelty_counts[i]
+                        c = lane_counts.get(h, 0) + 1
+                        if c == 1 and len(lane_counts) < args.novelty_cap:
+                            lane_counts[h] = 1
+                        elif h in lane_counts:
+                            lane_counts[h] = c
+                        # bonus is shaped to be larger for unique states
+                        # (1/sqrt(1) = 1) and decay smoothly with revisits
+                        r += args.novelty_bonus_scale / (c ** 0.5)
+                    ext_vec[i] = r
+                agent.set_extrinsic_reward(ext_vec)
 
             agent.observe(new_pooled, list(actions), homeostatic=homeo_list)
             obs_list = new_obs_list

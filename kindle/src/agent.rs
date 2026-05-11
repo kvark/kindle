@@ -1583,6 +1583,12 @@ pub struct Agent {
     /// either the cross-entropy or MSE loss path without needing a
     /// per-row loss weighting input on the graph side.
     policy_action_scratch: Vec<f32>,
+    /// Mask scratch buffer fed to the policy graph's `action_mask`
+    /// input each policy_step. Same `[policy_batch × MAX_ACTION_DIM]`
+    /// layout as `policy_action_scratch`. Populated from
+    /// `self.action_masks` (lane × MAX_ACTION_DIM). Default 1.0 means
+    /// no masking (graph behaves as before).
+    policy_action_mask_scratch: Vec<f32>,
     /// Pre-allocated `[policy_batch × latent_dim]` buffer for the
     /// policy session's `z` input. At rollout_length=1 this is the
     /// same size as the encoder's per-lane z output; at >1 the
@@ -1705,6 +1711,26 @@ pub struct Agent {
     /// `planner_horizon == 0`. Weights are refreshed every
     /// `planner_refresh_interval` calls to `plan_and_queue()`.
     planner: Option<planner::WmRollout>,
+    /// GPU-side WM rollout session, batch_size = `n_lanes × planner_samples`.
+    /// Used by the model-based planner to roll forward all candidate
+    /// sequences in batched GPU dispatches instead of the per-sample
+    /// CPU `WmRollout` matmul loop. Weights are synced from `wm_session`
+    /// at the same cadence as `planner.refresh_from_session`.
+    wm_planner_session: Option<Session>,
+    /// `planner_samples` cached for the GPU planner; mirrors
+    /// `config.planner_samples` so the runtime path can avoid borrowing
+    /// the config when computing batch offsets.
+    planner_samples_cached: usize,
+    /// Scratch buffers for the GPU planner. Sized once at construction
+    /// to `planner_batch * MAX_ACTION_DIM` / latent_dim respectively.
+    /// All three are `Vec<f32>` so the planner can avoid per-call
+    /// allocation in the hot path.
+    planner_z_scratch: Vec<f32>,
+    planner_action_scratch: Vec<f32>,
+    planner_traj_scratch: Vec<f32>,
+    /// Pre-allocated planner WM params buffer (sized once for the
+    /// largest WM tensor) for the periodic weight refresh.
+    planner_param_buf: Vec<f32>,
     /// Per-lane action queue populated by the planner. `act()`
     /// pops from the front of this queue before policy sampling,
     /// so a queued sequence commits the next-K actions.
@@ -1720,6 +1746,17 @@ pub struct Agent {
     /// previous step's value. Only consumed when
     /// `extrinsic_reward_alpha > 0`.
     extrinsic_reward: Vec<f32>,
+    /// Per-lane action availability mask for `act()` sampling. Flat
+    /// `[batch_size × MAX_ACTION_DIM]` layout; 1.0 = valid, 0.0 = invalid.
+    /// Default (all 1.0) preserves prior behaviour. Set via
+    /// `Agent::set_action_masks`. Persists across `act()` calls until
+    /// re-set (unlike `extrinsic_reward`, which auto-clears) — masks
+    /// usually stay stable for many steps within an episode.
+    /// Invalid logits are forced to large-negative before sampling so
+    /// the categorical never picks them; `last_prob_taken` is computed
+    /// from the masked softmax so PPO's π_old denominator matches the
+    /// distribution actually sampled from.
+    action_masks: Vec<f32>,
     /// SIL replay buffer: (obs, action_idx, value_target, env_id)
     /// from successful episodes. See `AgentConfig::use_sil`.
     sil_buffer: std::collections::VecDeque<SilSample>,
@@ -1968,6 +2005,30 @@ fn build_session(g: &Graph, opt_level: OptLevel) -> Session {
         OptLevel::Full => meganeura::build_session(g),
         OptLevel::None => meganeura::build_session_unoptimized(g),
     }
+}
+
+/// Build a forward-only WM rollout graph: `(z, action) -> z_next`.
+/// Used by the GPU-side model-based planner. `batch_size` here equals
+/// `n_lanes × planner_samples` so the planner can score `planner_samples`
+/// candidate sequences per lane in a single batched forward.
+fn build_wm_planner_graph(
+    batch_size: usize,
+    latent_dim: usize,
+    hidden_dim: usize,
+) -> Graph {
+    let mut g = Graph::new();
+    let z_raw = g.input("z", &[batch_size, latent_dim]);
+    let action_raw = g.input("action", &[batch_size, MAX_ACTION_DIM]);
+    // Stop gradients on both inputs so set_outputs([z_next]) at the end
+    // doesn't drive backward through the WM params — the planner is
+    // forward-only.
+    let z = g.stop_gradient(z_raw);
+    let action = g.stop_gradient(action_raw);
+    let wm = WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+    let z_next = wm.forward(&mut g, z, action);
+    let z_next = g.stop_gradient(z_next);
+    g.set_outputs(vec![z_next]);
+    g
 }
 
 impl Agent {
@@ -2516,6 +2577,32 @@ impl Agent {
         } else {
             None
         };
+        let planner_samples_cached = config.planner_samples.max(1);
+        let planner_batch = if config.planner_horizon > 0 {
+            config.batch_size * planner_samples_cached
+        } else {
+            0
+        };
+        let wm_planner_session = if config.planner_horizon > 0 {
+            let g = build_wm_planner_graph(
+                planner_batch,
+                config.latent_dim,
+                config.hidden_dim,
+            );
+            let mut s = build_session(&g, config.opt_level);
+            init_parameters(&mut s);
+            Some(s)
+        } else {
+            None
+        };
+        let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
+        let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
+        let planner_traj_scratch = vec![
+            0.0f32;
+            planner_batch * config.planner_horizon.max(1) * config.latent_dim
+        ];
+        // Largest WM param is fc2.weight at hidden_dim*hidden_dim.
+        let planner_param_buf = vec![0.0f32; config.hidden_dim * config.hidden_dim];
 
         // M6 outcome-value head (CPU MLP). Constructed only when the
         // user has asked for a non-zero bonus weight. Its LR derives
@@ -2677,6 +2764,7 @@ impl Agent {
             // window.
             value_target_scratch: vec![0.0; policy_batch],
             policy_action_scratch: vec![0.0; policy_batch * MAX_ACTION_DIM],
+            policy_action_mask_scratch: vec![1.0; policy_batch * MAX_ACTION_DIM],
             policy_z_scratch: vec![0.0; policy_batch * config.latent_dim],
             ppo_advantage_scratch: vec![0.0; policy_batch],
             ppo_old_prob_scratch: vec![1.0; policy_batch],
@@ -2733,9 +2821,16 @@ impl Agent {
             xeps_memory,
             xeps_prev_action: vec![None; n],
             planner,
+            wm_planner_session,
+            planner_samples_cached,
+            planner_z_scratch,
+            planner_action_scratch,
+            planner_traj_scratch,
+            planner_param_buf,
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
             planner_calls_since_refresh: 0,
             extrinsic_reward: vec![0.0; n],
+            action_masks: vec![1.0; n * MAX_ACTION_DIM],
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
             sil_baseline: 0.0,
             sil_baseline_initialized: false,
@@ -3059,6 +3154,16 @@ impl Agent {
         self.action_token_scratch.fill(0.0);
         self.policy_session
             .set_input("action", &self.action_token_scratch);
+        // Feed the current per-lane action mask so the policy graph's
+        // masked-logits subgraph (PPO) sees the right availability.
+        // The forward at act-time discards the loss output, so any
+        // mismatch here is harmless beyond the per-lane sampling — but
+        // keeping it consistent avoids surprises when the same graph
+        // is reused for training in `policy_step_batched`.
+        if self.config.use_ppo {
+            self.policy_session
+                .set_input("action_mask", &self.action_masks);
+        }
         // KL-PPO graph requires `old_logits` input to compute the loss.
         // act() doesn't read the loss output, but the input must exist
         // for the forward pass to run. Zero out — KL contribution is
@@ -3136,8 +3241,31 @@ impl Agent {
         // this step and re-uses the cached action.
         let action_repeat = self.config.action_repeat.max(1);
         let mut actions = Vec::with_capacity(n);
+        // Reusable per-lane masked-logits buffer to avoid per-step
+        // allocation in the hot loop.
+        let mut head_masked = vec![0.0f32; MAX_ACTION_DIM];
         for (i, lane) in self.lanes.iter_mut().enumerate() {
-            let head = &head_stack[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+            let head_raw = &head_stack[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+            let mask_row = &self.action_masks[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+
+            // Apply action mask: invalid logits → large negative so
+            // softmax assigns them ~0 probability. If ALL entries are
+            // masked off, fall back to the unmasked logits to avoid a
+            // NaN softmax (no valid action to sample).
+            let any_valid = mask_row.iter().any(|&m| m >= 0.5);
+            if any_valid {
+                for j in 0..MAX_ACTION_DIM {
+                    head_masked[j] = if mask_row[j] >= 0.5 {
+                        head_raw[j]
+                    } else {
+                        -1e9
+                    };
+                }
+            } else {
+                head_masked.copy_from_slice(head_raw);
+            }
+            let head: &[f32] = &head_masked;
+
             lane.last_value = value_stack[i];
             lane.last_entropy = lane.adapter.head_entropy(head);
 
@@ -3175,11 +3303,12 @@ impl Agent {
             // Also cache the full logits for the KL-PPO path (when
             // use_kl_ppo is on, the rollout-batch training feeds these
             // as `old_logits` graph input to compute KL(π_new ‖ π_old)
-            // exactly).
+            // exactly). We store the MASKED logits so the recorded
+            // π_old distribution matches what we actually sampled from.
             if self.config.use_kl_ppo {
-                let n = head.len().min(lane.last_logits.len());
-                lane.last_logits[..n].copy_from_slice(&head[..n]);
-                for v in &mut lane.last_logits[n..] {
+                let nlog = head.len().min(lane.last_logits.len());
+                lane.last_logits[..nlog].copy_from_slice(&head[..nlog]);
+                for v in &mut lane.last_logits[nlog..] {
                     *v = 0.0;
                 }
             }
@@ -3935,6 +4064,60 @@ impl Agent {
     /// `extrinsic_reward_alpha == 0.0`.
     ///
     /// Call between env step and `observe` — the harness is the only
+    /// Set per-lane action availability masks for the NEXT and subsequent
+    /// `act()` calls. Flat layout `[batch_size × MAX_ACTION_DIM]`; entries
+    /// >= 0.5 are treated as valid, < 0.5 as invalid. Invalid actions get
+    /// their logits forced to a large-negative value before the categorical
+    /// sample, so the policy never picks them. The masked distribution is
+    /// also used for `last_prob_taken` (PPO's π_old denominator) and for
+    /// the cached `last_logits` (KL-PPO's old-policy reference), keeping
+    /// the importance ratio's denominator consistent with the sampling
+    /// distribution.
+    ///
+    /// Persists across calls until re-set; pass an all-1.0 buffer to
+    /// disable masking. There is no auto-clear (unlike `extrinsic_reward`)
+    /// because masks typically stay stable over many env steps.
+    ///
+    /// Panics if `masks.len() != batch_size * MAX_ACTION_DIM`. A no-op
+    /// when at least one entry per lane row is < 0.5; if all entries in a
+    /// row are masked off, the row is treated as un-masked to avoid
+    /// producing NaN softmax (no valid action to sample).
+    pub fn set_action_masks(&mut self, masks: &[f32]) {
+        assert_eq!(
+            masks.len(),
+            self.action_masks.len(),
+            "set_action_masks: expected {} entries (batch_size {} × MAX_ACTION_DIM {}), got {}",
+            self.action_masks.len(),
+            self.lanes.len(),
+            MAX_ACTION_DIM,
+            masks.len()
+        );
+        self.action_masks.copy_from_slice(masks);
+    }
+
+    /// Reset all action masks to the all-valid default (1.0 everywhere).
+    /// Equivalent to `set_action_masks(&vec![1.0; batch_size * MAX_ACTION_DIM])`.
+    pub fn clear_action_masks(&mut self) {
+        self.action_masks.fill(1.0);
+    }
+
+    /// Populate `policy_action_mask_scratch` from current per-lane
+    /// `action_masks`. For `policy_batch == n_lanes` (rollout_length=1)
+    /// this is a direct copy. For larger `policy_batch`, the first
+    /// `n_lanes` rows get the current masks; remaining rows are
+    /// filled with all-1.0 (no masking), since per-rollout-step
+    /// masks aren't currently tracked in the buffer. Rollout paths
+    /// (n_step >= 2 or rollout_length > 1) thus mask only the most
+    /// recent step accurately — this is a current limitation.
+    fn populate_policy_action_mask_scratch(&mut self) {
+        self.policy_action_mask_scratch.fill(1.0);
+        let n = self.lanes.len();
+        let cap = self.policy_action_mask_scratch.len();
+        let copy_len = (n * MAX_ACTION_DIM).min(cap).min(self.action_masks.len());
+        self.policy_action_mask_scratch[..copy_len]
+            .copy_from_slice(&self.action_masks[..copy_len]);
+    }
+
     /// party that knows the env's native reward. Kindle zeroes the
     /// per-lane value inside `observe` after consuming it, so a
     /// missed call doesn't silently replay the previous step.
@@ -4786,6 +4969,11 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
+        if self.config.use_ppo {
+            self.populate_policy_action_mask_scratch();
+            self.policy_session
+                .set_input("action_mask", &self.policy_action_mask_scratch);
+        }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
         self.feed_entropy_beta_input();
@@ -4927,6 +5115,11 @@ impl Agent {
             self.policy_action_scratch.fill(0.0);
             self.policy_session
                 .set_input("action", &self.policy_action_scratch);
+            if self.config.use_ppo {
+                self.populate_policy_action_mask_scratch();
+                self.policy_session
+                    .set_input("action_mask", &self.policy_action_mask_scratch);
+            }
             self.value_target_scratch.fill(0.0);
             self.policy_session
                 .set_input("value_target", &self.value_target_scratch);
@@ -5204,6 +5397,11 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
+        if self.config.use_ppo {
+            self.populate_policy_action_mask_scratch();
+            self.policy_session
+                .set_input("action_mask", &self.policy_action_mask_scratch);
+        }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
         if use_ppo {
@@ -5484,6 +5682,11 @@ impl Agent {
             // target / PPO inputs already filled with zeros above.
             self.policy_session
                 .set_input("action", &self.policy_action_scratch);
+            if self.config.use_ppo {
+                self.populate_policy_action_mask_scratch();
+                self.policy_session
+                    .set_input("action_mask", &self.policy_action_mask_scratch);
+            }
             self.policy_session
                 .set_input("value_target", &self.value_target_scratch);
             if use_ppo {
@@ -5718,6 +5921,11 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
+        if self.config.use_ppo {
+            self.populate_policy_action_mask_scratch();
+            self.policy_session
+                .set_input("action_mask", &self.policy_action_mask_scratch);
+        }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
         if use_ppo {
@@ -5892,6 +6100,11 @@ impl Agent {
         self.policy_session.set_input("task", &self.task_scratch);
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
+        if self.config.use_ppo {
+            self.populate_policy_action_mask_scratch();
+            self.policy_session
+                .set_input("action_mask", &self.policy_action_mask_scratch);
+        }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
         self.feed_entropy_beta_input();
@@ -6114,16 +6327,23 @@ impl Agent {
     /// prior observation (first step of the agent's life).
     /// `num_actions` is clamped to the WM's compiled action width.
     pub fn plan_and_queue<R: Rng>(&mut self, num_actions: usize, rng: &mut R) {
-        let Some(planner) = self.planner.as_mut() else {
-            return;
-        };
         let k = self.config.planner_horizon;
         let m = self.config.planner_samples;
         if k == 0 || m == 0 {
             return;
         }
-        // Refresh WM weights into the CPU cache at the configured
-        // cadence. First call always triggers a refresh.
+
+        // GPU path when wm_planner_session is constructed.
+        if self.wm_planner_session.is_some() {
+            self.plan_and_queue_gpu(num_actions, rng);
+            return;
+        }
+
+        // CPU fallback (legacy path; kept for completeness when the
+        // GPU planner session can't be built).
+        let Some(planner) = self.planner.as_mut() else {
+            return;
+        };
         if self.planner_calls_since_refresh == 0
             || self.planner_calls_since_refresh >= self.config.planner_refresh_interval
         {
@@ -6144,12 +6364,23 @@ impl Agent {
                 Some(t) => t.latent.clone(),
                 None => continue,
             };
+            let mask_row = &self.action_masks
+                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let valid: Vec<u32> = (0..num_actions_eff)
+                .filter(|&j| mask_row[j] >= 0.5)
+                .map(|j| j as u32)
+                .collect();
+            let valid: Vec<u32> = if valid.is_empty() {
+                (0..num_actions_eff).map(|j| j as u32).collect()
+            } else {
+                valid
+            };
 
             let mut best_score = f32::NEG_INFINITY;
             let mut best_actions: Vec<u32> = Vec::new();
             for _ in 0..m {
                 let actions: Vec<u32> = (0..k)
-                    .map(|_| rng.random_range(0..num_actions_eff) as u32)
+                    .map(|_| valid[rng.random_range(0..valid.len())])
                     .collect();
                 planner.rollout(&z0, &actions, &mut one_hot, &mut traj);
 
@@ -6167,6 +6398,177 @@ impl Agent {
             for a in best_actions {
                 self.planner_queue[lane_idx].push_back(a);
             }
+        }
+    }
+
+    /// GPU-side WM rollout planner. For each lane with an empty queue,
+    /// samples `planner_samples` random valid-action sequences of length
+    /// `planner_horizon`, batches them through a forward-only WM session
+    /// in `planner_horizon` GPU dispatches (instead of `samples * horizon`
+    /// CPU matmul loops), scores by latent-visit-count novelty, and
+    /// queues the best sequence's actions.
+    fn plan_and_queue_gpu<R: Rng>(&mut self, num_actions: usize, rng: &mut R) {
+        let k = self.config.planner_horizon;
+        let m = self.planner_samples_cached;
+        let n = self.lanes.len();
+        let ld = self.config.latent_dim;
+        let batch = n * m;
+        let num_actions_eff = num_actions.min(MAX_ACTION_DIM).max(1);
+
+        // Periodic WM-weight sync: read from wm_session, write to
+        // wm_planner_session. First call always syncs.
+        if self.planner_calls_since_refresh == 0
+            || self.planner_calls_since_refresh >= self.config.planner_refresh_interval
+        {
+            self.refresh_wm_planner_weights();
+            self.planner_calls_since_refresh = 0;
+        }
+        self.planner_calls_since_refresh += 1;
+
+        // Which lanes need planning this call (queue empty + buffer has data).
+        // Lanes without buffer data fill their batch rows with z0=0 — the
+        // trajectory will be noise we ignore at scoring time.
+        let mut lane_active = vec![false; n];
+        for (lane_idx, lane) in self.lanes.iter().enumerate() {
+            if !self.planner_queue[lane_idx].is_empty() {
+                continue;
+            }
+            if lane.buffer.last().is_some() {
+                lane_active[lane_idx] = true;
+            }
+        }
+        if !lane_active.iter().any(|&b| b) {
+            return;
+        }
+
+        // Build per-lane valid-action lists from the mask.
+        let mut valid_per_lane: Vec<Vec<u32>> = Vec::with_capacity(n);
+        for lane_idx in 0..n {
+            let mask_row = &self.action_masks
+                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let valid: Vec<u32> = (0..num_actions_eff)
+                .filter(|&j| mask_row[j] >= 0.5)
+                .map(|j| j as u32)
+                .collect();
+            if valid.is_empty() {
+                valid_per_lane.push((0..num_actions_eff as u32).collect());
+            } else {
+                valid_per_lane.push(valid);
+            }
+        }
+
+        // Pre-roll all action sequences as a (batch, k) flat array of
+        // u32 indices. Row layout: lane0_sample0[..k], lane0_sample1[..k], …
+        let mut all_actions = vec![0u32; batch * k];
+        for lane_idx in 0..n {
+            if !lane_active[lane_idx] {
+                continue;
+            }
+            let valid = &valid_per_lane[lane_idx];
+            for s in 0..m {
+                let row = lane_idx * m + s;
+                for t in 0..k {
+                    all_actions[row * k + t] = valid[rng.random_range(0..valid.len())];
+                }
+            }
+        }
+
+        // Seed z input: replicate each lane's z0 m times.
+        self.planner_z_scratch.fill(0.0);
+        for lane_idx in 0..n {
+            if !lane_active[lane_idx] {
+                continue;
+            }
+            let z0 = self.lanes[lane_idx].buffer.last().unwrap().latent.clone();
+            for s in 0..m {
+                let row = lane_idx * m + s;
+                self.planner_z_scratch[row * ld..(row + 1) * ld].copy_from_slice(&z0);
+            }
+        }
+
+        // Per-step rollout. After each step, the output z becomes the
+        // input z for the next step. We also accumulate trajectories
+        // into planner_traj_scratch shape (batch, k, latent_dim).
+        let planner_session = self.wm_planner_session.as_mut().unwrap();
+        for t in 0..k {
+            // Build action one-hot for step t.
+            self.planner_action_scratch.fill(0.0);
+            for row in 0..batch {
+                let a = all_actions[row * k + t] as usize;
+                if a < MAX_ACTION_DIM {
+                    self.planner_action_scratch[row * MAX_ACTION_DIM + a] = 1.0;
+                }
+            }
+            planner_session.set_input("z", &self.planner_z_scratch);
+            planner_session.set_input("action", &self.planner_action_scratch);
+            planner_session.step();
+            planner_session.wait();
+            // Read z_next out into the trajectory slice and into the
+            // z_scratch buffer for the next iteration.
+            let traj_offset = t * batch * ld;
+            planner_session.read_output_by_index(
+                0,
+                &mut self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
+            );
+            self.planner_z_scratch.copy_from_slice(
+                &self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
+            );
+        }
+
+        // Score each row by sum-of-novelty over its trajectory.
+        // Pick best row per lane and queue its actions.
+        for lane_idx in 0..n {
+            if !lane_active[lane_idx] {
+                continue;
+            }
+            let lane = &self.lanes[lane_idx];
+            let mut best_score = f32::NEG_INFINITY;
+            let mut best_row = lane_idx * m;
+            for s in 0..m {
+                let row = lane_idx * m + s;
+                let mut score = 0.0f32;
+                for t in 0..k {
+                    let off = t * batch * ld + row * ld;
+                    let z_step = &self.planner_traj_scratch[off..off + ld];
+                    let c = lane.buffer.visit_count(z_step);
+                    score += 1.0 / ((c as f32 + 1.0).sqrt());
+                }
+                if score > best_score {
+                    best_score = score;
+                    best_row = row;
+                }
+            }
+            for t in 0..k {
+                self.planner_queue[lane_idx].push_back(all_actions[best_row * k + t]);
+            }
+        }
+    }
+
+    /// Copy the six WorldModel parameters from `wm_session` to
+    /// `wm_planner_session`. Cheap relative to a planning call —
+    /// only happens at `planner_refresh_interval` cadence.
+    fn refresh_wm_planner_weights(&mut self) {
+        if self.wm_planner_session.is_none() {
+            return;
+        }
+        let ld = self.config.latent_dim;
+        let hd = self.config.hidden_dim;
+        // (param_name, num_elements)
+        let params: [(&str, usize); 6] = [
+            ("world_model.z_proj.weight", ld * hd),
+            ("world_model.z_proj.bias", hd),
+            ("world_model.a_proj.weight", MAX_ACTION_DIM * hd),
+            ("world_model.fc2.weight", hd * hd),
+            ("world_model.fc2.bias", hd),
+            ("world_model.fc_out.weight", hd * ld),
+        ];
+        for (name, n_elem) in params.iter() {
+            let buf = &mut self.planner_param_buf[..*n_elem];
+            self.wm_session.read_param(name, buf);
+            self.wm_planner_session
+                .as_mut()
+                .unwrap()
+                .set_parameter(name, buf);
         }
     }
 

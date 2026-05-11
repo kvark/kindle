@@ -1288,6 +1288,41 @@ impl PyBatchAgent {
         Ok(())
     }
 
+    /// Set per-lane action availability masks for the next and subsequent
+    /// `act()` calls. `masks` is a flat `[batch_size × MAX_ACTION_DIM]`
+    /// (=18) buffer of float values; entries >= 0.5 are treated as valid,
+    /// < 0.5 as invalid. Invalid actions get -inf logits before sampling
+    /// so the policy never picks them; the masked distribution feeds
+    /// `last_prob_taken` (PPO π_old) and `last_logits` (KL-PPO old policy)
+    /// so the importance ratio's denominator matches the sampling dist.
+    ///
+    /// Persists across `act()` calls until re-set; pass an all-1.0 buffer
+    /// or call `clear_action_masks` to disable. If all entries in a lane
+    /// row are < 0.5 (no valid action), that row falls back to unmasked
+    /// to avoid a NaN softmax.
+    ///
+    /// Accepts numpy arrays (zero-copy) or any iterable of floats.
+    fn set_action_masks(&mut self, masks: &Bound<'_, PyAny>) -> PyResult<()> {
+        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(masks) {
+            let py = masks.py();
+            if let Some(slice) = buf.as_slice(py) {
+                let ptr = slice.as_ptr() as *const f32;
+                let len = slice.len();
+                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+                self.agent.set_action_masks(slice);
+                return Ok(());
+            }
+        }
+        let v: Vec<f32> = masks.extract()?;
+        self.agent.set_action_masks(&v);
+        Ok(())
+    }
+
+    /// Reset all action masks to the all-valid default.
+    fn clear_action_masks(&mut self) {
+        self.agent.clear_action_masks();
+    }
+
     /// Set per-lane extrinsic (env) reward for the next `observe()`
     /// call. `rewards` is a length-`batch_size` buffer (numpy array
     /// preferred for zero-copy; any iterable also accepted). No-op
