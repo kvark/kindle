@@ -4032,6 +4032,48 @@ impl Agent {
         self.policy_session.read_all_param_norms()
     }
 
+    /// Dump all policy-session parameters as `(name, values)` pairs.
+    /// Values are flattened f32 vectors in the parameter's natural layout
+    /// (compile-order, stable across runs of the same graph). Use
+    /// `load_policy_params` to restore the same structure.
+    pub fn dump_policy_params(&self) -> Vec<(String, Vec<f32>)> {
+        let names: Vec<String> = self
+            .policy_session
+            .param_names()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect();
+        let mut out = Vec::with_capacity(names.len());
+        for name in names {
+            let n = self
+                .policy_session
+                .param_size(&name)
+                .expect("param size known");
+            let mut buf = vec![0.0f32; n];
+            self.policy_session.read_param(&name, &mut buf);
+            out.push((name, buf));
+        }
+        out
+    }
+
+    /// Upload all policy-session parameters from `(name, values)` pairs.
+    /// Names and sizes must match the current graph. Missing or
+    /// extra names are silently ignored — callers should validate.
+    /// Returns the number of params successfully uploaded.
+    pub fn load_policy_params(&self, params: &[(String, Vec<f32>)]) -> usize {
+        let mut loaded = 0;
+        for (name, data) in params {
+            match self.policy_session.param_size(name) {
+                Some(n) if n == data.len() => {
+                    self.policy_session.upload_param(name, data);
+                    loaded += 1;
+                }
+                _ => {}
+            }
+        }
+        loaded
+    }
+
     /// Set a per-parameter LR multiplier on the policy session, by
     /// name prefix. Effective LR for params matching the prefix is
     /// `lr_policy * batch_lr_scale * lr_scale * mul`. Longest-prefix-

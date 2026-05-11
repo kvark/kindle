@@ -1304,6 +1304,19 @@ impl PyBatchAgent {
         self.agent.policy_weight_norms()
     }
 
+    /// Dump all policy-session parameters as `[(name, values), ...]`.
+    /// Values are Python lists of f32. Use `load_policy_params` to
+    /// restore. For full checkpoint save in train_kindle_vec.py.
+    fn dump_policy_params(&self) -> Vec<(String, Vec<f32>)> {
+        self.agent.dump_policy_params()
+    }
+
+    /// Upload all policy-session parameters from `[(name, values), ...]`.
+    /// Returns the number of params successfully uploaded.
+    fn load_policy_params(&self, params: Vec<(String, Vec<f32>)>) -> usize {
+        self.agent.load_policy_params(&params)
+    }
+
     /// Set a per-parameter LR multiplier on the policy session by
     /// name prefix. Use to rebalance asymmetric gradient flow between
     /// encoder and policy head — see Agent::set_policy_lr_multiplier
