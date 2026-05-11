@@ -121,6 +121,18 @@ def main() -> int:
     parser.add_argument("--planner-samples", type=int, default=32,
                         help="Number of random action sequences sampled per "
                         "planning call (per lane). Default 32.")
+    parser.add_argument("--planner-policy-mix", type=float, default=0.0,
+                        help="Policy-guidance mix for the planner's per-step "
+                        "action sampling. 0.0 = pure uniform random shooting "
+                        "(default; best for cold-start rare-event discovery). "
+                        "1.0 = pure policy-guided (better for fine-tuning a "
+                        "converged policy). Mix in between trades exploration "
+                        "for policy-consistency.")
+    parser.add_argument("--planner-policy-temperature", type=float, default=1.0,
+                        help="Temperature for the policy-guided sampler when "
+                        "planner_policy_mix > 0. T>1 flattens (more "
+                        "exploration); T<1 sharpens. Useful counterweight to "
+                        "a peaked policy. Default 1.0.")
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
     args = parser.parse_args()
@@ -200,6 +212,8 @@ def main() -> int:
         visit_counts_max=args.visit_counts_max,
         planner_horizon=args.planner_horizon,
         planner_samples=args.planner_samples,
+        planner_policy_mix=args.planner_policy_mix,
+        planner_policy_temperature=args.planner_policy_temperature,
     )
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(

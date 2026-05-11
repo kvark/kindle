@@ -989,6 +989,27 @@ pub struct AgentConfig {
     /// cache. Too frequent wastes cycles; too infrequent uses
     /// stale weights. Default 200.
     pub planner_refresh_interval: usize,
+    /// Mix coefficient for the planner's action sampling. 0.0 = pure
+    /// uniform-random (the default and what plain shooting MPC uses).
+    /// 1.0 = pure policy-guided (sample sequences from the current
+    /// policy's logits at each rollout step). Values in between mix:
+    /// the planner samples uniformly with probability `1 - x` and from
+    /// policy with probability `x`, per rollout step.
+    ///
+    /// Pure policy-guided (1.0) concentrates exploration on what the
+    /// policy already prefers — better for fine-tuning a converged
+    /// policy, worse for cold-start rare-event discovery (kindle's
+    /// puzzle-game regime). Pure random (0.0) is better when the
+    /// policy hasn't yet found any events. Mixing in the middle gives
+    /// a smooth transition. Default 0.0 = pure random shooting.
+    pub planner_policy_mix: f32,
+    /// Temperature applied to policy logits in the planner's
+    /// per-step sampling when `planner_policy_mix > 0`. T = 1.0 (default)
+    /// samples from the policy's native distribution. T > 1 flattens
+    /// (more exploratory); T < 1 sharpens. Useful counterweight to a
+    /// peaked policy: T = 2-3 keeps planner exploration broad even
+    /// when the policy has committed.
+    pub planner_policy_temperature: f32,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -1146,6 +1167,8 @@ impl Default for AgentConfig {
             planner_horizon: 0,
             planner_samples: 32,
             planner_refresh_interval: 200,
+            planner_policy_mix: 0.0,
+            planner_policy_temperature: 1.0,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -1717,6 +1740,14 @@ pub struct Agent {
     /// CPU `WmRollout` matmul loop. Weights are synced from `wm_session`
     /// at the same cadence as `planner.refresh_from_session`.
     wm_planner_session: Option<Session>,
+    /// Forward-only policy session at the same batch_size as
+    /// `wm_planner_session`. When `planner_policy_guided > 0` is on
+    /// (currently always on when `planner_horizon > 0`), the planner
+    /// samples action sequences from this policy's logits (per-row,
+    /// masked) instead of from uniform random. Weights synced from
+    /// the main `policy_session` at `planner_refresh_interval` cadence.
+    /// `None` when policy-guided planning is off.
+    policy_planner_session: Option<Session>,
     /// `planner_samples` cached for the GPU planner; mirrors
     /// `config.planner_samples` so the runtime path can avoid borrowing
     /// the config when computing batch offsets.
@@ -2028,6 +2059,32 @@ fn build_wm_planner_graph(
     let z_next = wm.forward(&mut g, z, action);
     let z_next = g.stop_gradient(z_next);
     g.set_outputs(vec![z_next]);
+    g
+}
+
+/// Build a forward-only policy rollout graph: `z -> logits`.
+/// Used alongside `wm_planner_session` for policy-guided planning —
+/// at each WM rollout step the planner samples actions from this
+/// policy's logits (per-lane, masked, optionally temperature-scaled)
+/// instead of from uniform random. The trajectories still get
+/// scored by latent-visit-count novelty as before; combining
+/// "imagine policy executing" with novelty endpoint scoring is the
+/// Dreamer-style approach to driving exploration toward novel
+/// regions the policy can actually reach. Builds only the
+/// `Policy` MLP (fc1+relu+fc2); no encoder, no value head, no
+/// option machinery — those don't matter for k-step latent rollout.
+fn build_policy_planner_graph(
+    batch_size: usize,
+    latent_dim: usize,
+    hidden_dim: usize,
+) -> Graph {
+    let mut g = Graph::new();
+    let z_raw = g.input("z", &[batch_size, latent_dim]);
+    let z = g.stop_gradient(z_raw);
+    let policy = policy::Policy::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+    let logits = policy.forward(&mut g, z);
+    let logits = g.stop_gradient(logits);
+    g.set_outputs(vec![logits]);
     g
 }
 
@@ -2595,6 +2652,22 @@ impl Agent {
         } else {
             None
         };
+        // Policy-guided planner is always on when the planner is on.
+        // Cheap to build (just a 2-layer MLP) and dramatically
+        // changes the planner's effective behavior — trajectories
+        // follow the current policy instead of pure random.
+        let policy_planner_session = if config.planner_horizon > 0 {
+            let g = build_policy_planner_graph(
+                planner_batch,
+                config.latent_dim,
+                config.hidden_dim,
+            );
+            let mut s = build_session(&g, config.opt_level);
+            init_parameters(&mut s);
+            Some(s)
+        } else {
+            None
+        };
         let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
         let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
         let planner_traj_scratch = vec![
@@ -2822,6 +2895,7 @@ impl Agent {
             xeps_prev_action: vec![None; n],
             planner,
             wm_planner_session,
+            policy_planner_session,
             planner_samples_cached,
             planner_z_scratch,
             planner_action_scratch,
@@ -6457,21 +6531,9 @@ impl Agent {
             }
         }
 
-        // Pre-roll all action sequences as a (batch, k) flat array of
-        // u32 indices. Row layout: lane0_sample0[..k], lane0_sample1[..k], …
+        // We'll fill `all_actions` step-by-step as we sample from the
+        // policy at each WM rollout time. Layout: row-major (batch, k).
         let mut all_actions = vec![0u32; batch * k];
-        for lane_idx in 0..n {
-            if !lane_active[lane_idx] {
-                continue;
-            }
-            let valid = &valid_per_lane[lane_idx];
-            for s in 0..m {
-                let row = lane_idx * m + s;
-                for t in 0..k {
-                    all_actions[row * k + t] = valid[rng.random_range(0..valid.len())];
-                }
-            }
-        }
 
         // Seed z input: replicate each lane's z0 m times.
         self.planner_z_scratch.fill(0.0);
@@ -6486,27 +6548,100 @@ impl Agent {
             }
         }
 
-        // Per-step rollout. After each step, the output z becomes the
-        // input z for the next step. We also accumulate trajectories
-        // into planner_traj_scratch shape (batch, k, latent_dim).
-        let planner_session = self.wm_planner_session.as_mut().unwrap();
+        // Scratch for one-step policy logits read [batch, MAX_ACTION_DIM].
+        let mut policy_logits = vec![0.0f32; batch * MAX_ACTION_DIM];
+
+        let policy_mix = self.config.planner_policy_mix.clamp(0.0, 1.0);
+        let policy_temp = self.config.planner_policy_temperature.max(0.01);
+        let need_policy = policy_mix > 0.0 && self.policy_planner_session.is_some();
+
+        // Per-step rollout. The order each step is:
+        //   1. (if policy-guided) Policy forward at current z → logits
+        //   2. Per-row sample: uniform with prob (1 - policy_mix),
+        //      else from temperature-scaled masked policy softmax
+        //   3. WM forward at (z, action_one_hot) → z_next
+        //   4. z := z_next for next iteration; store trajectory + action
         for t in 0..k {
-            // Build action one-hot for step t.
+            // --- 1. Policy forward (only if we'll use it this step) ---
+            if need_policy {
+                let policy_planner = self.policy_planner_session.as_mut().unwrap();
+                policy_planner.set_input("z", &self.planner_z_scratch);
+                policy_planner.step();
+                policy_planner.wait();
+                policy_planner.read_output_by_index(0, &mut policy_logits);
+            }
+
+            // --- 2. Sample actions per row ---
             self.planner_action_scratch.fill(0.0);
-            for row in 0..batch {
-                let a = all_actions[row * k + t] as usize;
-                if a < MAX_ACTION_DIM {
-                    self.planner_action_scratch[row * MAX_ACTION_DIM + a] = 1.0;
+            for lane_idx in 0..n {
+                if !lane_active[lane_idx] {
+                    continue;
+                }
+                let valid = &valid_per_lane[lane_idx];
+                for s in 0..m {
+                    let row = lane_idx * m + s;
+                    // Choose sampler: with prob (1 - mix) use uniform;
+                    // else policy-guided.
+                    let use_policy = need_policy
+                        && rng.random_range(0.0..1.0_f32) < policy_mix;
+                    let action_idx: u32 = if !use_policy {
+                        valid[rng.random_range(0..valid.len())]
+                    } else {
+                        let lrow = &policy_logits
+                            [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                        // Temperature scale + numerical stability.
+                        let mut max_l = f32::NEG_INFINITY;
+                        for &v in valid {
+                            let l = lrow[v as usize] / policy_temp;
+                            if l.is_finite() && l > max_l {
+                                max_l = l;
+                            }
+                        }
+                        if !max_l.is_finite() {
+                            max_l = 0.0;
+                        }
+                        let mut sum = 0.0f32;
+                        let probs: Vec<f32> = valid
+                            .iter()
+                            .map(|&v| {
+                                let p =
+                                    (lrow[v as usize] / policy_temp - max_l).exp();
+                                sum += p;
+                                p
+                            })
+                            .collect();
+                        if sum <= 0.0 || !sum.is_finite() {
+                            valid[rng.random_range(0..valid.len())]
+                        } else {
+                            let u: f32 = rng.random_range(0.0..1.0) * sum;
+                            let mut cum = 0.0;
+                            let mut chosen = 0;
+                            for (i, &p) in probs.iter().enumerate() {
+                                cum += p;
+                                if u <= cum {
+                                    chosen = i;
+                                    break;
+                                }
+                            }
+                            valid[chosen]
+                        }
+                    };
+                    all_actions[row * k + t] = action_idx;
+                    if (action_idx as usize) < MAX_ACTION_DIM {
+                        self.planner_action_scratch
+                            [row * MAX_ACTION_DIM + action_idx as usize] = 1.0;
+                    }
                 }
             }
-            planner_session.set_input("z", &self.planner_z_scratch);
-            planner_session.set_input("action", &self.planner_action_scratch);
-            planner_session.step();
-            planner_session.wait();
-            // Read z_next out into the trajectory slice and into the
-            // z_scratch buffer for the next iteration.
+
+            // --- 3. WM forward ---
+            let wm_planner = self.wm_planner_session.as_mut().unwrap();
+            wm_planner.set_input("z", &self.planner_z_scratch);
+            wm_planner.set_input("action", &self.planner_action_scratch);
+            wm_planner.step();
+            wm_planner.wait();
             let traj_offset = t * batch * ld;
-            planner_session.read_output_by_index(
+            wm_planner.read_output_by_index(
                 0,
                 &mut self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
             );
@@ -6544,17 +6679,19 @@ impl Agent {
         }
     }
 
-    /// Copy the six WorldModel parameters from `wm_session` to
-    /// `wm_planner_session`. Cheap relative to a planning call —
-    /// only happens at `planner_refresh_interval` cadence.
+    /// Copy WM + policy parameters from the live training sessions to
+    /// the planner's forward-only sessions. Cheap relative to a
+    /// planning call — only happens at `planner_refresh_interval`
+    /// cadence. Six WM params + three policy params = nine read+write
+    /// pairs.
     fn refresh_wm_planner_weights(&mut self) {
         if self.wm_planner_session.is_none() {
             return;
         }
         let ld = self.config.latent_dim;
         let hd = self.config.hidden_dim;
-        // (param_name, num_elements)
-        let params: [(&str, usize); 6] = [
+        // WM params (graph: world_model.*).
+        let wm_params: [(&str, usize); 6] = [
             ("world_model.z_proj.weight", ld * hd),
             ("world_model.z_proj.bias", hd),
             ("world_model.a_proj.weight", MAX_ACTION_DIM * hd),
@@ -6562,13 +6699,27 @@ impl Agent {
             ("world_model.fc2.bias", hd),
             ("world_model.fc_out.weight", hd * ld),
         ];
-        for (name, n_elem) in params.iter() {
+        for (name, n_elem) in wm_params.iter() {
             let buf = &mut self.planner_param_buf[..*n_elem];
             self.wm_session.read_param(name, buf);
             self.wm_planner_session
                 .as_mut()
                 .unwrap()
                 .set_parameter(name, buf);
+        }
+        // Policy params (graph: policy.fc1.weight/bias, policy.fc2.weight).
+        // policy.fc2 has no bias.
+        if let Some(ref mut policy_planner) = self.policy_planner_session {
+            let policy_params: [(&str, usize); 3] = [
+                ("policy.fc1.weight", ld * hd),
+                ("policy.fc1.bias", hd),
+                ("policy.fc2.weight", hd * MAX_ACTION_DIM),
+            ];
+            for (name, n_elem) in policy_params.iter() {
+                let buf = &mut self.planner_param_buf[..*n_elem];
+                self.policy_session.read_param(name, buf);
+                policy_planner.set_parameter(name, buf);
+            }
         }
     }
 
