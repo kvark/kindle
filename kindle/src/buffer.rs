@@ -165,6 +165,24 @@ pub struct ExperienceBuffer {
     /// (rank-256 latents at grid_resolution 0.5 → every step is a new
     /// key, HashMap grows ~1 KB/step × n_lanes indefinitely).
     visit_counts_max: usize,
+    /// When > 0, only the first `visit_count_dims` of each latent are
+    /// quantized into the visit-count `StateKey`. The remaining dims
+    /// are ignored. 0 = use all dims (legacy behavior).
+    ///
+    /// Motivation: at `latent_dim = 256` and `grid_resolution = 0.5`,
+    /// the StateKey grid has ~3^256 cells — astronomically unbounded.
+    /// Every observation maps to a unique cell, so `visit_count` is
+    /// effectively constant 1 for any state the policy/planner ever
+    /// reaches. The "novelty bonus" `1/sqrt(visit_count + 1)` is then
+    /// uniform across candidate trajectories and the planner's
+    /// trajectory-scoring degenerates to "pick a random one."
+    ///
+    /// Truncating to e.g. 8 dims makes the grid manageable (~3^8 = 6.6k
+    /// cells), so revisits are common and the count is informative.
+    /// This is a coarse trick — proper fix is contrastive or
+    /// random-projection encoding — but it makes the existing
+    /// novelty signal usable.
+    visit_count_dims: usize,
 }
 
 impl ExperienceBuffer {
@@ -177,11 +195,32 @@ impl ExperienceBuffer {
         grid_resolution: f32,
         visit_counts_max: usize,
     ) -> Self {
+        Self::with_visit_count_dims(capacity, grid_resolution, visit_counts_max, 0)
+    }
+
+    pub fn with_visit_count_dims(
+        capacity: usize,
+        grid_resolution: f32,
+        visit_counts_max: usize,
+        visit_count_dims: usize,
+    ) -> Self {
         Self {
             transitions: RingBuffer::new(capacity),
             visit_counts: HashMap::new(),
             grid_resolution,
             visit_counts_max,
+            visit_count_dims,
+        }
+    }
+
+    /// Slice the latent down to the dims used for visit counting.
+    /// If `visit_count_dims == 0` or longer than the latent, return
+    /// the whole thing.
+    fn count_latent<'a>(&self, latent: &'a [f32]) -> &'a [f32] {
+        if self.visit_count_dims == 0 || self.visit_count_dims >= latent.len() {
+            latent
+        } else {
+            &latent[..self.visit_count_dims]
         }
     }
 
@@ -195,7 +234,10 @@ impl ExperienceBuffer {
 
     /// Record a new transition and update the novelty visit count.
     pub fn push(&mut self, transition: Transition) {
-        let key = StateKey::from_latent(&transition.latent, self.grid_resolution);
+        let key = StateKey::from_latent(
+            self.count_latent(&transition.latent),
+            self.grid_resolution,
+        );
         // Cap memory: clear before inserting if the bound is set and
         // adding a NEW key would exceed it. Existing-key updates always
         // proceed (just an integer ++). The full-clear strategy is
@@ -228,7 +270,7 @@ impl ExperienceBuffer {
 
     /// Look up the visit count for a latent vector.
     pub fn visit_count(&self, latent: &[f32]) -> u32 {
-        let key = StateKey::from_latent(latent, self.grid_resolution);
+        let key = StateKey::from_latent(self.count_latent(latent), self.grid_resolution);
         self.visit_counts.get(&key).copied().unwrap_or(0)
     }
 

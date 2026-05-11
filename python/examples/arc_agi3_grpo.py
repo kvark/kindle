@@ -133,6 +133,15 @@ def main() -> int:
                         "planner_policy_mix > 0. T>1 flattens (more "
                         "exploration); T<1 sharpens. Useful counterweight to "
                         "a peaked policy. Default 1.0.")
+    parser.add_argument("--visit-count-dims", type=int, default=0,
+                        help="Latent-dim truncation for the visit-count "
+                        "novelty hash. 0 = use all dims (default). At "
+                        "latent_dim=256 the unbounded grid makes "
+                        "visit_count ≈ 1 always — uniform novelty score "
+                        "across planner candidates. Setting to 8 truncates "
+                        "to first 8 dims, giving ~3^8=6.6k cells so "
+                        "revisits are common and the novelty signal becomes "
+                        "informative.")
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
     args = parser.parse_args()
@@ -214,6 +223,7 @@ def main() -> int:
         planner_samples=args.planner_samples,
         planner_policy_mix=args.planner_policy_mix,
         planner_policy_temperature=args.planner_policy_temperature,
+        visit_count_dims=args.visit_count_dims,
     )
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(

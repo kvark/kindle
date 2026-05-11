@@ -223,6 +223,14 @@ pub struct AgentConfig {
     /// n_lanes indefinitely. Cap suggested for joint multi-game runs:
     /// 10000–100000 (10 MB–100 MB per lane).
     pub visit_counts_max: usize,
+    /// Number of latent dimensions used for visit-count quantization.
+    /// 0 = all dims (legacy). For `latent_dim=256`, all dims gives an
+    /// astronomically sparse grid → `visit_count` ≈ 1 always, making
+    /// the novelty bonus uninformative for the planner's trajectory
+    /// scoring. Setting `visit_count_dims=8` truncates to the first 8
+    /// dims (~3^8 ≈ 6.6k cells) so revisits are common and the count
+    /// genuinely measures novelty. Default 0 = unchanged behavior.
+    pub visit_count_dims: usize,
     pub entropy_beta: f32,
     /// Floor for policy entropy — updates suppressed when entropy falls below this.
     pub entropy_floor: f32,
@@ -1070,6 +1078,7 @@ impl Default for AgentConfig {
             replay_ratio: 0.2,
             grid_resolution: 0.5,
             visit_counts_max: 0,
+            visit_count_dims: 0,
             entropy_beta: 0.01,
             entropy_floor: 0.1,
             drift_interval: 500,
@@ -2750,10 +2759,11 @@ impl Agent {
             .enumerate()
             .map(|(i, adapter)| Lane {
                 adapter,
-                buffer: ExperienceBuffer::with_visit_counts_max(
+                buffer: ExperienceBuffer::with_visit_count_dims(
                     config.buffer_capacity,
                     config.grid_resolution,
                     config.visit_counts_max,
+                    config.visit_count_dims,
                 ),
                 reward_circuit: RewardCircuit::with_seed(
                     config.reward_weights.clone(),

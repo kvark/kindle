@@ -514,6 +514,7 @@ impl PyBatchAgent {
         planner_refresh_interval = None,
         planner_policy_mix = None,
         planner_policy_temperature = None,
+        visit_count_dims = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -634,6 +635,7 @@ impl PyBatchAgent {
         planner_refresh_interval: Option<usize>,
         planner_policy_mix: Option<f32>,
         planner_policy_temperature: Option<f32>,
+        visit_count_dims: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1027,6 +1029,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = planner_policy_temperature {
             config.planner_policy_temperature = v;
+        }
+        if let Some(v) = visit_count_dims {
+            config.visit_count_dims = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
