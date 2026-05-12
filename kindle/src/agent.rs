@@ -2466,55 +2466,6 @@ impl Agent {
             let z_hat = wm.forward(&mut g, z_t, action);
             let wm_loss = WorldModel::loss(&mut g, z_hat, z_target);
 
-            // Value head atop the encoder output. The wm_session graph
-            // always builds the value-head params so the planner can
-            // mirror them — training is opt-in via
-            // `value_head_train_coef` (when 0, the value branch
-            // contributes zero gradient because its coef scalar is 0).
-            //
-            // Why inside wm_session and not a side session: this
-            // shares the encoder. When `value_replay_step` runs with
-            // `wm_gate=0, value_gate=1`, the gradient from
-            // `mse(V(z_t), R_to_go)` backprops through the encoder.
-            // The encoder thus learns a representation that's
-            // value-predictive — the "high-level direction in mind"
-            // the planner consumes. With a side session the encoder
-            // copies would diverge.
-            let vh_hidden = if config.value_head_hidden_dim == 0 {
-                config.hidden_dim
-            } else {
-                config.value_head_hidden_dim
-            };
-            let value_target_in =
-                g.input("value_target", &[config.batch_size, 1]);
-            let wm_gate_in = g.input("wm_gate", &[1]);
-            let value_gate_in = g.input("value_gate", &[1]);
-            let wm_gate = g.stop_gradient(wm_gate_in);
-            let value_gate = g.stop_gradient(value_gate_in);
-            let vh_module =
-                crate::value_head::ValueHead::new(&mut g, config.latent_dim, vh_hidden);
-            // stop_gradient on z_t in the value branch by default: the
-            // value head trains atop a frozen-relative-to-V encoder.
-            // Empirically (2026-05-12 stage-2 sweep), letting V's
-            // gradient backprop through the encoder destabilizes the
-            // representation: V is trained mostly on R_to_go ≈ 0 (loss
-            // episodes dominate), so the encoder gets pulled toward
-            // producing latents whose V output is ~0, collapsing the
-            // representation. Detaching keeps the value head useful
-            // for the planner without touching encoder geometry.
-            // When `value_head_grad_to_encoder = true`, the detach is
-            // skipped — opt-in encoder shaping for future experiments.
-            let z_for_value = if config.value_head_grad_to_encoder {
-                z_t
-            } else {
-                g.stop_gradient(z_t)
-            };
-            let v_pred = vh_module.forward(&mut g, z_for_value);
-            let v_target_det = g.stop_gradient(value_target_in);
-            let value_loss_raw = g.mse_loss(v_pred, v_target_det);
-            let value_coef_scalar = g.scalar(config.value_head_train_coef);
-            let value_loss = g.mul(value_loss_raw, value_coef_scalar);
-
             // Optional obs-reconstruction loss INSIDE the WM session
             // (anti-collapse). Without this, the WM forward-prediction
             // loss admits a trivial low-rank z (verified 2026-05-05:
@@ -2564,16 +2515,53 @@ impl Agent {
             } else {
                 wm_loss
             };
-            // Gated combination: `wm_gate * (wm + recon) + value_gate * value_loss`.
-            // CPU sets gates per dispatch: normal forward = (1, 0); value
-            // replay = (0, 1). Both gates can be (1, 1) to train all at
-            // once but the value target then has to align with the
-            // current step's z_t — which it usually doesn't (R_to_go is
-            // only known at episode end), so we keep them mutually
-            // exclusive in practice.
-            let wm_gated = g.mul(wm_recon_loss, wm_gate);
-            let value_gated = g.mul(value_loss, value_gate);
-            let loss = g.add(wm_gated, value_gated);
+
+            // Value head atop the encoder output. Built only when the
+            // value mechanism is on — `value_head_train_coef > 0`
+            // (training) OR `planner_value_alpha > 0` (planner
+            // consumption). When OFF, the wm_session graph is
+            // byte-identical to the pre-value-head version, so the
+            // baseline path is unaffected (same param init randomness,
+            // same e-graph optimization, same numerical trajectory).
+            //
+            // stop_gradient on z_t in the value branch by default: V
+            // trains atop a frozen-relative-to-V encoder. Empirically
+            // (2026-05-12) letting V's gradient backprop through the
+            // encoder destabilized the representation because R_to_go
+            // ≈ 0 dominates (loss episodes), collapsing encoder
+            // geometry. Opt-in via `value_head_grad_to_encoder`.
+            let value_branch_on =
+                config.value_head_train_coef > 0.0 || config.planner_value_alpha > 0.0;
+            let loss = if value_branch_on {
+                let vh_hidden = if config.value_head_hidden_dim == 0 {
+                    config.hidden_dim
+                } else {
+                    config.value_head_hidden_dim
+                };
+                let value_target_in =
+                    g.input("value_target", &[config.batch_size, 1]);
+                let wm_gate_in = g.input("wm_gate", &[1]);
+                let value_gate_in = g.input("value_gate", &[1]);
+                let wm_gate = g.stop_gradient(wm_gate_in);
+                let value_gate = g.stop_gradient(value_gate_in);
+                let vh_module =
+                    crate::value_head::ValueHead::new(&mut g, config.latent_dim, vh_hidden);
+                let z_for_value = if config.value_head_grad_to_encoder {
+                    z_t
+                } else {
+                    g.stop_gradient(z_t)
+                };
+                let v_pred = vh_module.forward(&mut g, z_for_value);
+                let v_target_det = g.stop_gradient(value_target_in);
+                let value_loss_raw = g.mse_loss(v_pred, v_target_det);
+                let value_coef_scalar = g.scalar(config.value_head_train_coef);
+                let value_loss = g.mul(value_loss_raw, value_coef_scalar);
+                let wm_gated = g.mul(wm_recon_loss, wm_gate);
+                let value_gated = g.mul(value_loss, value_gate);
+                g.add(wm_gated, value_gated)
+            } else {
+                wm_recon_loss
+            };
 
             // Per-lane squared-error output. Exposing `(z_hat − z_target)²`
             // as `[N, latent_dim]` lets us compute per-lane prediction error
@@ -4664,19 +4652,19 @@ impl Agent {
         self.wm_session
             .set_input("z_target", &self.z_target_scratch);
         self.wm_session.set_input("task", &self.task_scratch);
-        // Value-target / gate inputs: in normal WM-forward mode the
-        // gates are (wm=1, value=0) so the value branch contributes no
-        // gradient and the per-row target is a don't-care. The scratch
-        // is left zero-filled at init; we only need to feed the inputs
-        // so the graph contract is satisfied.
-        self.value_target_scratch_vh.fill(0.0);
-        self.wm_gate_scalar[0] = 1.0;
-        self.value_gate_scalar[0] = 0.0;
-        self.wm_session
-            .set_input("value_target", &self.value_target_scratch_vh);
-        self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
-        self.wm_session
-            .set_input("value_gate", &self.value_gate_scalar);
+        // Value-target / gate inputs only exist when the value branch
+        // was built into the graph. When off, skip them entirely — the
+        // graph contract has no such inputs and set_input would error.
+        if self.value_branch_on() {
+            self.value_target_scratch_vh.fill(0.0);
+            self.wm_gate_scalar[0] = 1.0;
+            self.value_gate_scalar[0] = 0.0;
+            self.wm_session
+                .set_input("value_target", &self.value_target_scratch_vh);
+            self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+            self.wm_session
+                .set_input("value_gate", &self.value_gate_scalar);
+        }
         apply_lr(
             &mut self.wm_session,
             lr,
@@ -4686,6 +4674,14 @@ impl Agent {
         self.wm_session.step();
         self.wm_session.wait();
         self.wm_session.read_loss()
+    }
+
+    /// True iff the wm_session graph was built with the value-head
+    /// branch (and the `value_target`, `wm_gate`, `value_gate` inputs).
+    /// Mirrors the condition in `Agent::new`: training ON or planner
+    /// consumption ON.
+    fn value_branch_on(&self) -> bool {
+        self.config.value_head_train_coef > 0.0 || self.config.planner_value_alpha > 0.0
     }
 
     /// Populate the visual-obs buffer for the next `observe()`.
@@ -5155,14 +5151,16 @@ impl Agent {
             self.wm_session
                 .set_input("z_target", &self.z_target_scratch);
             self.wm_session.set_input("task", &self.task_scratch);
-            self.value_target_scratch_vh.fill(0.0);
-            self.wm_gate_scalar[0] = 0.0;
-            self.value_gate_scalar[0] = 0.0;
-            self.wm_session
-                .set_input("value_target", &self.value_target_scratch_vh);
-            self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
-            self.wm_session
-                .set_input("value_gate", &self.value_gate_scalar);
+            if self.value_branch_on() {
+                self.value_target_scratch_vh.fill(0.0);
+                self.wm_gate_scalar[0] = 0.0;
+                self.value_gate_scalar[0] = 0.0;
+                self.wm_session
+                    .set_input("value_target", &self.value_target_scratch_vh);
+                self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+                self.wm_session
+                    .set_input("value_gate", &self.value_gate_scalar);
+            }
             apply_lr(
                 &mut self.wm_session,
                 0.0,
