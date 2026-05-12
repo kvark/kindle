@@ -185,6 +185,26 @@ def main() -> int:
     parser.add_argument("--goal-states-cap", type=int, default=100,
                         help="Per-env capacity of the goal-state archive. "
                         "FIFO eviction when full. Default 100.")
+    parser.add_argument("--value-head-train-coef", type=float, default=0.0,
+                        help="Enable value-head training (>0). Trains a "
+                        "separate MLP V(z) on Monte-Carlo discounted "
+                        "return-to-go from every completed episode. "
+                        "Losses contribute baseline shape, wins contribute "
+                        "peaks — the smooth interpolation gives the planner "
+                        "a goal gradient across latent space, not just at "
+                        "exact past win-state points. 0 = off.")
+    parser.add_argument("--planner-value-alpha", type=float, default=0.0,
+                        help="Blend factor for V(z_step) in planner score. "
+                        "Per-step `alpha * V` added to each candidate "
+                        "trajectory. Independent of --value-head-train-coef: "
+                        "can train V without using it (cold-start), use a "
+                        "pre-trained V without re-training, or both. 0 = off.")
+    parser.add_argument("--value-head-gamma", type=float, default=0.99,
+                        help="Discount factor for value-head return-to-go.")
+    parser.add_argument("--value-head-buffer-capacity", type=int, default=10000,
+                        help="Replay buffer cap for (latent, R_to_go) samples.")
+    parser.add_argument("--value-head-train-batch", type=int, default=32,
+                        help="Per-step value-head training batch size.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -287,6 +307,11 @@ def main() -> int:
         planner_rnd_alpha=args.planner_rnd_alpha,
         planner_goal_alpha=args.planner_goal_alpha,
         goal_states_cap=args.goal_states_cap,
+        value_head_train_coef=args.value_head_train_coef,
+        planner_value_alpha=args.planner_value_alpha,
+        value_head_gamma=args.value_head_gamma,
+        value_head_buffer_capacity=args.value_head_buffer_capacity,
+        value_head_train_batch=args.value_head_train_batch,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )

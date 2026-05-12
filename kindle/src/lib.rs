@@ -45,6 +45,7 @@ pub mod planner;
 pub mod policy;
 pub mod reward;
 pub mod rnd;
+pub mod value_head;
 pub mod world_model;
 pub mod xeps_memory;
 

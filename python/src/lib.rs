@@ -522,6 +522,13 @@ impl PyBatchAgent {
         goal_states_cap = None,
         visit_count_dims = None,
         visit_count_proj_dim = None,
+        value_head_train_coef = None,
+        planner_value_alpha = None,
+        value_head_gamma = None,
+        value_head_buffer_capacity = None,
+        value_head_train_batch = None,
+        value_head_hidden_dim = None,
+        value_head_lr_scale = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -650,6 +657,13 @@ impl PyBatchAgent {
         goal_states_cap: Option<usize>,
         visit_count_dims: Option<usize>,
         visit_count_proj_dim: Option<usize>,
+        value_head_train_coef: Option<f32>,
+        planner_value_alpha: Option<f32>,
+        value_head_gamma: Option<f32>,
+        value_head_buffer_capacity: Option<usize>,
+        value_head_train_batch: Option<usize>,
+        value_head_hidden_dim: Option<usize>,
+        value_head_lr_scale: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1067,6 +1081,27 @@ impl PyBatchAgent {
         }
         if let Some(v) = visit_count_proj_dim {
             config.visit_count_proj_dim = v;
+        }
+        if let Some(v) = value_head_train_coef {
+            config.value_head_train_coef = v;
+        }
+        if let Some(v) = planner_value_alpha {
+            config.planner_value_alpha = v;
+        }
+        if let Some(v) = value_head_gamma {
+            config.value_head_gamma = v;
+        }
+        if let Some(v) = value_head_buffer_capacity {
+            config.value_head_buffer_capacity = v;
+        }
+        if let Some(v) = value_head_train_batch {
+            config.value_head_train_batch = v;
+        }
+        if let Some(v) = value_head_hidden_dim {
+            config.value_head_hidden_dim = v;
+        }
+        if let Some(v) = value_head_lr_scale {
+            config.value_head_lr_scale = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
