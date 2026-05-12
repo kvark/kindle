@@ -518,6 +518,8 @@ impl PyBatchAgent {
         mcts_simulations = None,
         mcts_c_puct = None,
         planner_rnd_alpha = None,
+        planner_goal_alpha = None,
+        goal_states_cap = None,
         visit_count_dims = None,
         visit_count_proj_dim = None,
     ))]
@@ -644,6 +646,8 @@ impl PyBatchAgent {
         mcts_simulations: Option<usize>,
         mcts_c_puct: Option<f32>,
         planner_rnd_alpha: Option<f32>,
+        planner_goal_alpha: Option<f32>,
+        goal_states_cap: Option<usize>,
         visit_count_dims: Option<usize>,
         visit_count_proj_dim: Option<usize>,
     ) -> PyResult<Self> {
@@ -1051,6 +1055,12 @@ impl PyBatchAgent {
         }
         if let Some(v) = planner_rnd_alpha {
             config.planner_rnd_alpha = v;
+        }
+        if let Some(v) = planner_goal_alpha {
+            config.planner_goal_alpha = v;
+        }
+        if let Some(v) = goal_states_cap {
+            config.goal_states_cap = v;
         }
         if let Some(v) = visit_count_dims {
             config.visit_count_dims = v;

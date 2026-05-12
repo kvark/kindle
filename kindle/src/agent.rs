@@ -1069,6 +1069,29 @@ pub struct AgentConfig {
     ///
     /// Only effective when `rnd_reward_alpha > 0` (i.e., RND is on).
     pub planner_rnd_alpha: f32,
+    /// Goal-conditioned planning. When > 0, the planner adds a goal-
+    /// similarity term to its trajectory scoring:
+    ///
+    ///   score(z̃) = novelty(z̃) + α · max_k cos_sim(z̃, win_state_k)
+    ///
+    /// where `win_state_k` are the latent states the agent visited at
+    /// extrinsic-reward events (level completions). The agent emergently
+    /// discovers its own goal region in latent space from successful
+    /// experience, and the planner navigates toward it using WM rollouts.
+    ///
+    /// Without this term, kindle's planner only seeks novelty — it has no
+    /// concept of "the goal." Adding it turns the planner into something
+    /// closer to what humans do: build a mental model of where the goal
+    /// is, then plan paths there using the world model.
+    ///
+    /// 0 (default) = pure novelty (previous behavior). 1.0 puts goal
+    /// similarity on roughly equal footing with novelty. Higher values
+    /// commit more aggressively to the goal region.
+    pub planner_goal_alpha: f32,
+    /// Per-env capacity of the win-state archive used for goal similarity.
+    /// When full, FIFO eviction. Default 100 (small footprint: 100 × 256
+    /// f32 ≈ 100 KB per env).
+    pub goal_states_cap: usize,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -1235,6 +1258,8 @@ impl Default for AgentConfig {
             mcts_simulations: 64,
             mcts_c_puct: 1.4142,
             planner_rnd_alpha: 0.0,
+            planner_goal_alpha: 0.0,
+            goal_states_cap: 100,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -1849,6 +1874,17 @@ pub struct Agent {
     /// previous step's value. Only consumed when
     /// `extrinsic_reward_alpha > 0`.
     extrinsic_reward: Vec<f32>,
+    /// Per-env win-state archive. Each entry is the lane's latent at the
+    /// moment an extrinsic-reward event fired (level completion). FIFO
+    /// bounded by `config.goal_states_cap`. Consumed by `plan_and_queue_*`
+    /// when `config.planner_goal_alpha > 0` to bias trajectory scoring
+    /// toward predicted-similarity to past win-states. The agent thus
+    /// emergently discovers its own goal region in latent space.
+    ///
+    /// Keyed by env_id (`lane.adapter.id()`) so each game has its own
+    /// goal archive — winning level 1 of tu93 doesn't bias planning in
+    /// g50t. Empty for envs that haven't yet had any extrinsic event.
+    goal_states: hashbrown::HashMap<u32, std::collections::VecDeque<Vec<f32>>>,
     /// Per-lane action availability mask for `act()` sampling. Flat
     /// `[batch_size × MAX_ACTION_DIM]` layout; 1.0 = valid, 0.0 = invalid.
     /// Default (all 1.0) preserves prior behaviour. Set via
@@ -2108,6 +2144,39 @@ fn build_session(g: &Graph, opt_level: OptLevel) -> Session {
         OptLevel::Full => meganeura::build_session(g),
         OptLevel::None => meganeura::build_session_unoptimized(g),
     }
+}
+
+/// Cosine similarity between two equal-length f32 vectors. Returns 0
+/// when either has zero norm (degenerate / zero-init case). Used by
+/// the goal-conditioned planner scoring path.
+fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
+    debug_assert_eq!(a.len(), b.len());
+    let mut dot = 0.0f32;
+    let mut na = 0.0f32;
+    let mut nb = 0.0f32;
+    for (&x, &y) in a.iter().zip(b.iter()) {
+        dot += x * y;
+        na += x * x;
+        nb += y * y;
+    }
+    let denom = (na.sqrt() * nb.sqrt()).max(1e-8);
+    dot / denom
+}
+
+/// Maximum cosine similarity between `z` and any of the saved goal
+/// latents for this env. Returns 0.0 when the goal queue is empty
+/// (no wins yet for this env). The planner scoring loop calls this
+/// per (rollout step × candidate) — kept tight because at K=4 lanes,
+/// 32 samples, 5 steps, 100 goals it's 64k cos-sims per planning call.
+fn max_goal_similarity(z: &[f32], goals: &std::collections::VecDeque<Vec<f32>>) -> f32 {
+    let mut best = 0.0f32;
+    for g in goals.iter() {
+        let s = cosine_similarity(z, g);
+        if s > best {
+            best = s;
+        }
+    }
+    best
 }
 
 /// Build a forward-only WM rollout graph: `(z, action) -> z_next`.
@@ -2994,6 +3063,7 @@ impl Agent {
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
             planner_calls_since_refresh: 0,
             extrinsic_reward: vec![0.0; n],
+            goal_states: hashbrown::HashMap::new(),
             action_masks: vec![1.0; n * MAX_ACTION_DIM],
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
             sil_baseline: 0.0,
@@ -4094,6 +4164,26 @@ impl Agent {
             // positive extrinsic this step.
             if ext_reward > 0.0 {
                 lane.sil_ep_event_count += 1;
+                // Emergent goal discovery: snapshot the latent at this
+                // win-event into the per-env goal archive. The planner
+                // uses these as attractors via cosine similarity (when
+                // `planner_goal_alpha > 0`). FIFO bounded by
+                // `goal_states_cap`. Skipped entirely when the goal
+                // mechanism is off.
+                if self.config.planner_goal_alpha > 0.0
+                    && self.config.goal_states_cap > 0
+                {
+                    let env_id = lane.adapter.id();
+                    let cap = self.config.goal_states_cap;
+                    let q = self
+                        .goal_states
+                        .entry(env_id)
+                        .or_insert_with(std::collections::VecDeque::new);
+                    if q.len() >= cap {
+                        q.pop_front();
+                    }
+                    q.push_back(z_row.to_vec());
+                }
             }
 
             // Cache per-lane reward for the coord head's next
@@ -6748,12 +6838,18 @@ impl Agent {
         // Score each row by sum-of-novelty over its trajectory.
         // Pick best row per lane and queue its actions.
         let rnd_alpha = self.config.planner_rnd_alpha;
+        let goal_alpha = self.config.planner_goal_alpha;
         let rnd_ref = self.rnd_state.as_ref();
         for lane_idx in 0..n {
             if !lane_active[lane_idx] {
                 continue;
             }
             let lane = &self.lanes[lane_idx];
+            let goals = if goal_alpha > 0.0 {
+                self.goal_states.get(&lane.adapter.id())
+            } else {
+                None
+            };
             let mut best_score = f32::NEG_INFINITY;
             let mut best_row = lane_idx * m;
             for s in 0..m {
@@ -6767,6 +6863,11 @@ impl Agent {
                     if rnd_alpha > 0.0 {
                         if let Some(rnd) = rnd_ref {
                             score += rnd_alpha * rnd.reward(z_step);
+                        }
+                    }
+                    if let Some(gq) = goals {
+                        if !gq.is_empty() {
+                            score += goal_alpha * max_goal_similarity(z_step, gq);
                         }
                     }
                 }
@@ -6892,6 +6993,7 @@ impl Agent {
 
             // 4) Per-lane: add child node, compute novelty score, backup.
             let rnd_alpha = self.config.planner_rnd_alpha;
+            let goal_alpha = self.config.planner_goal_alpha;
             let rnd_ref = self.rnd_state.as_ref();
             for lane_idx in 0..n {
                 if let Some((path, action)) = leaves[lane_idx].take() {
@@ -6901,6 +7003,16 @@ impl Agent {
                     if rnd_alpha > 0.0 {
                         if let Some(rnd) = rnd_ref {
                             value += rnd_alpha * rnd.reward(&child_z);
+                        }
+                    }
+                    if goal_alpha > 0.0 {
+                        if let Some(gq) = self
+                            .goal_states
+                            .get(&self.lanes[lane_idx].adapter.id())
+                        {
+                            if !gq.is_empty() {
+                                value += goal_alpha * max_goal_similarity(&child_z, gq);
+                            }
                         }
                     }
                     let parent_idx = *path.last().unwrap();

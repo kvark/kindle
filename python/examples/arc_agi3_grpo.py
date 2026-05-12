@@ -173,6 +173,18 @@ def main() -> int:
                         "space (unlike visit_count which is mostly ≈1 at "
                         "256-dim), so even small alpha makes the score "
                         "discriminating. Try 1.0-10.0 with rnd_alpha=2.0 on.")
+    parser.add_argument("--planner-goal-alpha", type=float, default=0.0,
+                        help="Goal-conditioned planner: blend factor for "
+                        "max cos-sim to past win-state latents. Agent "
+                        "saves the latent at every level-event into a per-"
+                        "env goal archive (FIFO, cap --goal-states-cap). "
+                        "Planner adds alpha * max-cos-sim(predicted_z, "
+                        "goal_archive) to trajectory score. Emergent goal-"
+                        "directed planning: navigate WM rollouts toward "
+                        "discovered win regions. Try 1.0-5.0; 0 = off.")
+    parser.add_argument("--goal-states-cap", type=int, default=100,
+                        help="Per-env capacity of the goal-state archive. "
+                        "FIFO eviction when full. Default 100.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -273,6 +285,8 @@ def main() -> int:
         mcts_simulations=args.mcts_simulations,
         mcts_c_puct=args.mcts_c_puct,
         planner_rnd_alpha=args.planner_rnd_alpha,
+        planner_goal_alpha=args.planner_goal_alpha,
+        goal_states_cap=args.goal_states_cap,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )
