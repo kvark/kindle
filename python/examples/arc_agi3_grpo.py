@@ -143,6 +143,13 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--planner-rnd-alpha", type=float, default=0.0,
+                        help="Blend factor for RND novelty in the planner's "
+                        "trajectory score. score = visit_count_score + alpha * "
+                        "rnd_reward(z). RND varies continuously across latent "
+                        "space (unlike visit_count which is mostly ≈1 at "
+                        "256-dim), so even small alpha makes the score "
+                        "discriminating. Try 1.0-10.0 with rnd_alpha=2.0 on.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -242,6 +249,7 @@ def main() -> int:
         planner_use_mcts=bool(args.planner_use_mcts),
         mcts_simulations=args.mcts_simulations,
         mcts_c_puct=args.mcts_c_puct,
+        planner_rnd_alpha=args.planner_rnd_alpha,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )

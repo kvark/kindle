@@ -1052,6 +1052,23 @@ pub struct AgentConfig {
     /// UCB1 exploration constant. `Q + c*sqrt(ln N_parent / n_child)`.
     /// Default sqrt(2) ≈ 1.414 (textbook).
     pub mcts_c_puct: f32,
+    /// Blend factor for adding RND-based novelty to the planner's
+    /// trajectory score. When > 0, the planner scores each latent in
+    /// its predicted trajectory as:
+    ///   visit_count_score + planner_rnd_alpha * rnd_state.reward(z)
+    /// where the visit_count score is the existing `1/sqrt(count+1)`.
+    /// 0 (default) = visit_count only (legacy behavior).
+    ///
+    /// RND's `reward(z)` is the per-state predictor-target MSE — a
+    /// learned novelty signal that scales with how unfamiliar z is to
+    /// the predictor specifically. Unlike visit_count, RND varies
+    /// continuously across the latent space and is informative even
+    /// at 256-dim where visit_count is mostly ≈1. The planner can
+    /// then prefer trajectories landing in genuinely-novel latent
+    /// regions, not just "unique-hash" regions.
+    ///
+    /// Only effective when `rnd_reward_alpha > 0` (i.e., RND is on).
+    pub planner_rnd_alpha: f32,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -1217,6 +1234,7 @@ impl Default for AgentConfig {
             planner_use_mcts: false,
             mcts_simulations: 64,
             mcts_c_puct: 1.4142,
+            planner_rnd_alpha: 0.0,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -6729,6 +6747,8 @@ impl Agent {
 
         // Score each row by sum-of-novelty over its trajectory.
         // Pick best row per lane and queue its actions.
+        let rnd_alpha = self.config.planner_rnd_alpha;
+        let rnd_ref = self.rnd_state.as_ref();
         for lane_idx in 0..n {
             if !lane_active[lane_idx] {
                 continue;
@@ -6744,6 +6764,11 @@ impl Agent {
                     let z_step = &self.planner_traj_scratch[off..off + ld];
                     let c = lane.buffer.visit_count(z_step);
                     score += 1.0 / ((c as f32 + 1.0).sqrt());
+                    if rnd_alpha > 0.0 {
+                        if let Some(rnd) = rnd_ref {
+                            score += rnd_alpha * rnd.reward(z_step);
+                        }
+                    }
                 }
                 if score > best_score {
                     best_score = score;
@@ -6866,12 +6891,18 @@ impl Agent {
             wm_mcts.read_output_by_index(0, &mut z_out);
 
             // 4) Per-lane: add child node, compute novelty score, backup.
+            let rnd_alpha = self.config.planner_rnd_alpha;
+            let rnd_ref = self.rnd_state.as_ref();
             for lane_idx in 0..n {
                 if let Some((path, action)) = leaves[lane_idx].take() {
                     let child_z = z_out[lane_idx * ld..(lane_idx + 1) * ld].to_vec();
-                    // Score by latent-visit-count novelty (same as random planner).
                     let count = self.lanes[lane_idx].buffer.visit_count(&child_z);
-                    let value = 1.0 / ((count as f32 + 1.0).sqrt());
+                    let mut value = 1.0 / ((count as f32 + 1.0).sqrt());
+                    if rnd_alpha > 0.0 {
+                        if let Some(rnd) = rnd_ref {
+                            value += rnd_alpha * rnd.reward(&child_z);
+                        }
+                    }
                     let parent_idx = *path.last().unwrap();
                     let tree = trees[lane_idx].as_mut().unwrap();
                     let child_valid = lane_valid[lane_idx].clone();
