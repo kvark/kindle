@@ -118,6 +118,20 @@ def main() -> int:
                         "Explore-style frontier expansion: forks become "
                         "parallel branches at the highest-novelty waypoint "
                         "discovered so far. Default 0 = disabled.")
+    parser.add_argument("--archive-cap", type=int, default=0,
+                        help="Per-game persistent frontier archive size. "
+                        "When > 0, the macro sync saves the highest-novelty "
+                        "fork's full game state (copy.deepcopy of _game) into "
+                        "a per-game ring of capped size. On episode reset, "
+                        "with probability --archive-reset-prob the lane "
+                        "restores from a random archive entry instead of "
+                        "env.reset() — the real Ecoffet Go-Explore mechanism. "
+                        "0 = disabled (default).")
+    parser.add_argument("--archive-reset-prob", type=float, default=0.5,
+                        help="Probability of resetting an ended episode to a "
+                        "random archived state instead of true env.reset(). "
+                        "Only fires when --archive-cap>0 and the per-game "
+                        "archive is non-empty. Default 0.5.")
     parser.add_argument("--planner-horizon", type=int, default=0,
                         help="Enable kindle's model-based planner. The "
                         "trained world model rolls forward K=planner-horizon "
@@ -377,6 +391,14 @@ def main() -> int:
     # --explore-sync-novelty is on.
     macro_novelty = [0.0] * n_lanes
 
+    # Per-game persistent frontier archive (real Go-Explore). Each
+    # entry: {'game': deepcopy(env._game), 'obs': obs_after_save,
+    # 'novelty': macro_novelty_at_save, 'levels': levels_completed}.
+    # Bounded by --archive-cap; evicts lowest-novelty when full.
+    archive = [[] for _ in range(n_games)]
+    archive_uses = 0  # diagnostic: how many times we restored from archive
+    archive_adds = 0  # diagnostic: how many entries added
+
     t0 = time.time()
     last_log_t = t0
     syncs = 0
@@ -401,10 +423,32 @@ def main() -> int:
                 if need_reset:
                     if ep_step[i] > 0:
                         ep_count[i] += 1
-                    obs_list[i] = envs[i].reset()
-                    avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
-                    last_levels[i] = int(obs_list[i].levels_completed)
-                    ep_step[i] = 0
+                    # Archive-reset: with prob, restore from a random
+                    # archived frontier state instead of a fresh env
+                    # reset. Real Ecoffet Go-Explore: "return then
+                    # explore" — start episodes from interesting
+                    # discovered waypoints, not always from level-0.
+                    g_idx = i // K
+                    used_archive = False
+                    if (args.archive_cap > 0
+                            and archive[g_idx]
+                            and rng.random() < args.archive_reset_prob):
+                        # Replace the lane's env with a fresh deepcopy
+                        # of the archived wrapper. Restores all
+                        # wrapper-internal state along with _game.
+                        entry = archive[g_idx][rng.randrange(len(archive[g_idx]))]
+                        envs[i] = copy.deepcopy(entry["env"])
+                        obs_list[i] = entry["obs"]
+                        last_levels[i] = entry["levels"]
+                        avail_actions[i] = list(entry["avail_actions"])
+                        ep_step[i] = entry["ep_step"]
+                        archive_uses += 1
+                        used_archive = True
+                    if not used_archive:
+                        obs_list[i] = envs[i].reset()
+                        avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
+                        last_levels[i] = int(obs_list[i].levels_completed)
+                        ep_step[i] = 0
                     agent.mark_boundary(i)
 
             pooled = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32))
@@ -450,6 +494,22 @@ def main() -> int:
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
                 last_levels[i] = new_levels
+                if not obs_new.frame:
+                    # Defensive fallback for empty-frame Observations
+                    # (rare; primarily seen when restoring archive
+                    # entries from terminal states — now prevented at
+                    # archive-add time). Skip frame handling for this
+                    # micro-step but still advance ep_step.
+                    new_pooled.append([0.0] * 64)
+                    homeo_list.append(
+                        homeo_for(
+                            np.zeros((64, 64), dtype=np.float32),
+                            new_levels,
+                            win_levels_per[i],
+                        )
+                    )
+                    ep_step[i] += 1
+                    continue
                 frame = np.asarray(obs_new.frame[0], dtype=np.float32)
                 new_pooled.append(preprocess_pooled(frame))
                 homeo_list.append(homeo_for(frame, new_levels, win_levels_per[i]))
@@ -543,6 +603,41 @@ def main() -> int:
                 ep_step[base + k] = ep_step[base + best_k]
                 agent.mark_boundary(base + k)
             syncs += 1
+            # Archive-add: only save non-terminal env states. Terminal
+            # states (GAME_OVER / WIN) can't be stepped from — restoring
+            # to one yields empty-frame Observations. Also skip if
+            # ep_step is too close to max (would immediately retrigger
+            # forced reset, wasting a slot).
+            if args.archive_cap > 0 and sync_reason is not None:
+                best_obs = obs_list[base + best_k]
+                best_state_name = (
+                    best_obs.state.name
+                    if hasattr(best_obs.state, "name")
+                    else str(best_obs.state)
+                )
+                is_terminal = best_state_name in ("GAME_OVER", "WIN", "NOT_PLAYED")
+                near_terminal = (
+                    ep_step[base + best_k] >= args.max_episode_steps - 5
+                )
+                if not is_terminal and not near_terminal:
+                    score = macro_novelty[base + best_k] + 1000.0 * macro_return[base + best_k]
+                    entry = {
+                        "env": copy.deepcopy(envs[base + best_k]),
+                        "obs": obs_list[base + best_k],
+                        "novelty": float(score),
+                        "levels": int(last_levels[base + best_k]),
+                        "ep_step": int(ep_step[base + best_k]),
+                        "avail_actions": list(avail_actions[base + best_k]),
+                    }
+                    gar = archive[g_idx]
+                    if len(gar) < args.archive_cap:
+                        gar.append(entry)
+                        archive_adds += 1
+                    else:
+                        worst_idx = min(range(len(gar)), key=lambda j: gar[j]["novelty"])
+                        if score > gar[worst_idx]["novelty"]:
+                            gar[worst_idx] = entry
+                            archive_adds += 1
 
         if args.log_every_macro and macro_step > 0 and macro_step % args.log_every_macro == 0:
             now = time.time()
@@ -561,10 +656,17 @@ def main() -> int:
                     per_game_evt.append(f"{e.game_id[:4]}:{total}")
             evt_str = ",".join(per_game_evt) or "(none)"
             d0 = agent.diagnostics()[0]
+            archive_info = ""
+            if args.archive_cap > 0:
+                total_archive = sum(len(a) for a in archive)
+                archive_info = (
+                    f" arc={total_archive}/{args.archive_cap * n_games}"
+                    f"({archive_uses}u,{archive_adds}a)"
+                )
             print(
                 f"macro={macro_step:>5} micro_total={macro_step * M:>6} "
                 f"eps={eps_sum:>4} evt={total_evt:>3} "
-                f"({evt_str}) syncs={syncs:>4} | "
+                f"({evt_str}) syncs={syncs:>4}{archive_info} | "
                 f"wm={float(d0['loss_world_model']):.2f} "
                 f"pi={float(d0['loss_policy']):.1f} "
                 f"ent={float(d0['policy_entropy']):.2f} | "
