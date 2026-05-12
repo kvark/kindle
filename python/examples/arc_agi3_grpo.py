@@ -209,9 +209,16 @@ def main() -> int:
                         help="HER relabel probability: on each failed "
                         "episode end (zero extrinsic events), push the "
                         "terminal latent into goal_states queue with "
-                        "this probability. Gives the planner cos-sim "
-                        "scorer structure before any real win exists; "
-                        "real wins evict synthetics over time. 0 = off.")
+                        "this probability. NOTE: pushes terminal "
+                        "(GAME_OVER) latents which mislead the win-"
+                        "region cos-sim scorer. Default-off; needs a "
+                        "separate non-win-region consumer to be useful.")
+    parser.add_argument("--value-head-grad-to-encoder", type=int, default=0,
+                        help="Allow V loss to backprop through encoder. "
+                        "Default 0: V trains atop frozen-relative-to-V "
+                        "encoder (R_to_go ≈ 0 dominates and would "
+                        "collapse representations otherwise). Set 1 to "
+                        "experiment with encoder shaping.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -320,6 +327,7 @@ def main() -> int:
         value_head_buffer_capacity=args.value_head_buffer_capacity,
         value_head_train_batch=args.value_head_train_batch,
         goal_states_her_prob=args.goal_states_her_prob,
+        value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )

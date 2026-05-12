@@ -1130,6 +1130,14 @@ pub struct AgentConfig {
     /// the agent's base `learning_rate`. 1.0 = same; lower stabilizes
     /// V early in training when targets are noisy.
     pub value_head_lr_scale: f32,
+    /// When true, the value-head loss is allowed to backprop through
+    /// the encoder (`z_t` is NOT stop-gradient'd). When false
+    /// (default), the encoder is shielded from value gradients — V
+    /// trains atop a frozen-relative-to-V encoder. Empirically the
+    /// encoder-shaping path destabilizes the representation when
+    /// R_to_go targets are dominated by zero (loss episodes), so we
+    /// default-detach. Opt-in for future experiments.
+    pub value_head_grad_to_encoder: bool,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -1306,6 +1314,7 @@ impl Default for AgentConfig {
             value_head_train_batch: 32,
             value_head_hidden_dim: 0,
             value_head_lr_scale: 1.0,
+            value_head_grad_to_encoder: false,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -2484,7 +2493,23 @@ impl Agent {
             let value_gate = g.stop_gradient(value_gate_in);
             let vh_module =
                 crate::value_head::ValueHead::new(&mut g, config.latent_dim, vh_hidden);
-            let v_pred = vh_module.forward(&mut g, z_t);
+            // stop_gradient on z_t in the value branch by default: the
+            // value head trains atop a frozen-relative-to-V encoder.
+            // Empirically (2026-05-12 stage-2 sweep), letting V's
+            // gradient backprop through the encoder destabilizes the
+            // representation: V is trained mostly on R_to_go ≈ 0 (loss
+            // episodes dominate), so the encoder gets pulled toward
+            // producing latents whose V output is ~0, collapsing the
+            // representation. Detaching keeps the value head useful
+            // for the planner without touching encoder geometry.
+            // When `value_head_grad_to_encoder = true`, the detach is
+            // skipped — opt-in encoder shaping for future experiments.
+            let z_for_value = if config.value_head_grad_to_encoder {
+                z_t
+            } else {
+                g.stop_gradient(z_t)
+            };
+            let v_pred = vh_module.forward(&mut g, z_for_value);
             let v_target_det = g.stop_gradient(value_target_in);
             let value_loss_raw = g.mse_loss(v_pred, v_target_det);
             let value_coef_scalar = g.scalar(config.value_head_train_coef);
