@@ -109,6 +109,15 @@ def main() -> int:
                         help="Max distinct frame hashes per lane tracked for "
                         "the novelty bonus. Beyond this, the bonus stays at "
                         "scale/sqrt(novelty_cap+1) — small but not zero.")
+    parser.add_argument("--explore-sync-novelty", type=int, default=0,
+                        help="Extend the K-fork BACK sync to fall back on "
+                        "frame-hash novelty when no fork hit an extrinsic "
+                        "event in the macro window. Forks sync to the most-"
+                        "novel fork's game state instead of letting them "
+                        "diverge freely. Turns the GRPO sync into a Go-"
+                        "Explore-style frontier expansion: forks become "
+                        "parallel branches at the highest-novelty waypoint "
+                        "discovered so far. Default 0 = disabled.")
     parser.add_argument("--planner-horizon", type=int, default=0,
                         help="Enable kindle's model-based planner. The "
                         "trained world model rolls forward K=planner-horizon "
@@ -332,6 +341,14 @@ def main() -> int:
     import hashlib
     novelty_counts = [dict() for _ in range(n_lanes)]
 
+    # Per-GAME shared frame-hash counts for the Go-Explore-style fork
+    # sync selector. All forks of the same game contribute to one
+    # shared dict, so the "most-novel fork in this macro" is judged
+    # against the agent's GLOBAL exploration history across all forks
+    # of that game. Always tracked (cheap); only consumed by the sync
+    # when --explore-sync-novelty is on.
+    explore_counts = [dict() for _ in range(n_games)]
+
     def frame_hash(frame_arr):
         # 8-byte blake2b of the raw uint8 pixel grid is plenty of bits.
         return hashlib.blake2b(frame_arr.astype(np.uint8).tobytes(),
@@ -354,15 +371,21 @@ def main() -> int:
     # Per-fork macro-window cumulative reward (used for best-fork
     # selection at sync time).
     macro_return = [0.0] * n_lanes
+    # Per-fork macro-window cumulative novelty score (sum of
+    # 1/sqrt(explore_counts[hash]+1) per step). Used as a fallback
+    # sync selector when no fork hit an extrinsic event AND
+    # --explore-sync-novelty is on.
+    macro_novelty = [0.0] * n_lanes
 
     t0 = time.time()
     last_log_t = t0
     syncs = 0
 
     for macro_step in range(args.steps):
-        # Reset macro-return buffer at start of macro window.
+        # Reset macro-window accumulators at start of macro window.
         for i in range(n_lanes):
             macro_return[i] = 0.0
+            macro_novelty[i] = 0.0
 
         # Run M micro-steps.
         for micro_step in range(M):
@@ -432,80 +455,94 @@ def main() -> int:
                 homeo_list.append(homeo_for(frame, new_levels, win_levels_per[i]))
                 ep_step[i] += 1
 
-            # Build extrinsic-reward vector: level-completion goal_bonus
-            # (binary 0/1) plus the frame-hash novelty bonus. Both are
-            # scaled by `extrinsic_reward_alpha` inside the agent, so
-            # picking comparable magnitudes here matters. With
-            # goal_bonus=20 and novelty_bonus_scale=0.5, a new frame
-            # gives 0.5 * 20 = 10 (half of a level event). After visit
-            # count 100, bonus drops to ~1.0 (5% of a level event).
-            ext_vec = [0.0] * n_lanes
+            # Always update per-game-shared explore_counts for the
+            # Go-Explore sync selector, AND accumulate macro_novelty
+            # per fork. Cheap; runs regardless of novelty_bonus_scale.
+            do_explore_sync = bool(args.explore_sync_novelty)
             level_event = args.goal_bonus > 0
             novel_event = args.novelty_bonus_scale > 0.0
+            ext_vec = [0.0] * n_lanes
+            for i in range(n_lanes):
+                g_idx = i // K
+                h = frame_hash(np.asarray(new_obs_list[i].frame[0]))
+                # Per-game shared count for the Go-Explore selector.
+                gcounts = explore_counts[g_idx]
+                gc = gcounts.get(h, 0) + 1
+                if gc == 1 and len(gcounts) < args.novelty_cap:
+                    gcounts[h] = 1
+                elif h in gcounts:
+                    gcounts[h] = gc
+                macro_novelty[i] += 1.0 / (gc ** 0.5)
+                # Build the per-step extrinsic-reward signal. Goal-bonus
+                # fires on level events (binary 0/1). novelty bonus
+                # fires per-step using the per-lane (legacy) count
+                # so existing-bonus behavior is preserved bit-for-bit
+                # when --explore-sync-novelty is off.
+                r = 0.0
+                if level_event and level_deltas[i] > 0:
+                    r += 1.0
+                if novel_event:
+                    lane_counts = novelty_counts[i]
+                    lc = lane_counts.get(h, 0) + 1
+                    if lc == 1 and len(lane_counts) < args.novelty_cap:
+                        lane_counts[h] = 1
+                    elif h in lane_counts:
+                        lane_counts[h] = lc
+                    r += args.novelty_bonus_scale / (lc ** 0.5)
+                ext_vec[i] = r
             if level_event or novel_event:
-                for i in range(n_lanes):
-                    r = 0.0
-                    if level_event and level_deltas[i] > 0:
-                        r += 1.0  # goal-bonus per level event
-                    if novel_event:
-                        # Hash the post-step frame; increment count;
-                        # apply 1/sqrt(count) bonus. Cap dict size per
-                        # lane to bound memory.
-                        h = frame_hash(np.asarray(new_obs_list[i].frame[0]))
-                        lane_counts = novelty_counts[i]
-                        c = lane_counts.get(h, 0) + 1
-                        if c == 1 and len(lane_counts) < args.novelty_cap:
-                            lane_counts[h] = 1
-                        elif h in lane_counts:
-                            lane_counts[h] = c
-                        # bonus is shaped to be larger for unique states
-                        # (1/sqrt(1) = 1) and decay smoothly with revisits
-                        r += args.novelty_bonus_scale / (c ** 0.5)
-                    ext_vec[i] = r
                 agent.set_extrinsic_reward(ext_vec)
 
             agent.observe(new_pooled, list(actions), homeostatic=homeo_list)
             obs_list = new_obs_list
 
         # END OF MACRO WINDOW: synchronize forks per game.
-        # For each game g, find the fork with highest macro_return and
-        # copy its underlying game state to all K forks of g. This is
-        # the BACK / state-restore step.
+        # Primary criterion: highest macro_return (extrinsic events).
+        # When no fork hit an event AND --explore-sync-novelty is on,
+        # fall back to highest macro_novelty (Go-Explore-style frontier
+        # expansion). All forks then BRANCH from the same "interesting"
+        # state next macro.
         for g_idx in range(n_games):
             base = g_idx * K
+            # 1. Look for an event-bearing fork (return-based sync).
             best_k = 0
             best_r = macro_return[base]
             for k in range(1, K):
                 if macro_return[base + k] > best_r:
                     best_r = macro_return[base + k]
                     best_k = k
-            if best_r > 0:
-                # Only sync when we have a positive signal; otherwise
-                # let forks continue diverging (more exploration).
-                best_state = copy.deepcopy(envs[base + best_k]._game)
-                for k in range(K):
-                    if k == best_k:
-                        continue
-                    envs[base + k]._game = copy.deepcopy(best_state)
-                    # Snapshot the new last_obs by stepping a "no-op"?
-                    # The game's state is now the best fork's; obs_list
-                    # entry for this lane is stale (still points to the
-                    # last obs before sync). The next iteration's
-                    # ep-state-check will see no terminal and use stale
-                    # obs to act — that's mostly OK because the visual
-                    # frame we feed comes from obs_list. We need to
-                    # refresh it. Cheapest: do a lightweight no-op step.
-                    # But ARC has no no-op. We'll let the next
-                    # iteration step normally — the agent will act
-                    # based on stale obs but next obs will be fresh.
-                    # Mark lane as a "boundary" so the agent treats
-                    # the upcoming transition cleanly.
-                    obs_list[base + k] = obs_list[base + best_k]
-                    last_levels[base + k] = last_levels[base + best_k]
-                    avail_actions[base + k] = list(avail_actions[base + best_k])
-                    ep_step[base + k] = ep_step[base + best_k]
-                    agent.mark_boundary(base + k)
-                syncs += 1
+            sync_reason = "return" if best_r > 0 else None
+            # 2. Fallback: novelty-based sync when no event.
+            if sync_reason is None and bool(args.explore_sync_novelty):
+                best_n_k = 0
+                best_n = macro_novelty[base]
+                for k in range(1, K):
+                    if macro_novelty[base + k] > best_n:
+                        best_n = macro_novelty[base + k]
+                        best_n_k = k
+                # Sync if at least one fork has positive novelty AND
+                # there's spread across forks (avoid syncing when all
+                # forks are equivalently novel — would just flicker).
+                if best_n > 0:
+                    spread = best_n - min(
+                        macro_novelty[base + k] for k in range(K)
+                    )
+                    if spread > 1e-6:
+                        best_k = best_n_k
+                        sync_reason = "novelty"
+            if sync_reason is None:
+                continue
+            best_state = copy.deepcopy(envs[base + best_k]._game)
+            for k in range(K):
+                if k == best_k:
+                    continue
+                envs[base + k]._game = copy.deepcopy(best_state)
+                obs_list[base + k] = obs_list[base + best_k]
+                last_levels[base + k] = last_levels[base + best_k]
+                avail_actions[base + k] = list(avail_actions[base + best_k])
+                ep_step[base + k] = ep_step[base + best_k]
+                agent.mark_boundary(base + k)
+            syncs += 1
 
         if args.log_every_macro and macro_step > 0 and macro_step % args.log_every_macro == 0:
             now = time.time()
