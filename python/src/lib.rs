@@ -514,6 +514,9 @@ impl PyBatchAgent {
         planner_refresh_interval = None,
         planner_policy_mix = None,
         planner_policy_temperature = None,
+        planner_use_mcts = None,
+        mcts_simulations = None,
+        mcts_c_puct = None,
         visit_count_dims = None,
     ))]
     #[allow(clippy::too_many_arguments)]
@@ -635,6 +638,9 @@ impl PyBatchAgent {
         planner_refresh_interval: Option<usize>,
         planner_policy_mix: Option<f32>,
         planner_policy_temperature: Option<f32>,
+        planner_use_mcts: Option<bool>,
+        mcts_simulations: Option<usize>,
+        mcts_c_puct: Option<f32>,
         visit_count_dims: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
@@ -1029,6 +1035,15 @@ impl PyBatchAgent {
         }
         if let Some(v) = planner_policy_temperature {
             config.planner_policy_temperature = v;
+        }
+        if let Some(v) = planner_use_mcts {
+            config.planner_use_mcts = v;
+        }
+        if let Some(v) = mcts_simulations {
+            config.mcts_simulations = v;
+        }
+        if let Some(v) = mcts_c_puct {
+            config.mcts_c_puct = v;
         }
         if let Some(v) = visit_count_dims {
             config.visit_count_dims = v;

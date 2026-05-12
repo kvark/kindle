@@ -133,6 +133,16 @@ def main() -> int:
                         "planner_policy_mix > 0. T>1 flattens (more "
                         "exploration); T<1 sharpens. Useful counterweight to "
                         "a peaked policy. Default 1.0.")
+    parser.add_argument("--planner-use-mcts", type=int, default=0,
+                        help="Replace random-shooting CEM planner with MCTS "
+                        "tree search. Uses kindle's wm_mcts_session for "
+                        "expansion + latent-visit-count novelty for leaf "
+                        "scoring + UCB1 for selection. Output: most-visited "
+                        "root path (depth planner_horizon).")
+    parser.add_argument("--mcts-simulations", type=int, default=64,
+                        help="MCTS simulations per planning call (per lane).")
+    parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
+                        help="UCB1 exploration constant. Default sqrt(2).")
     parser.add_argument("--visit-count-dims", type=int, default=0,
                         help="Latent-dim truncation for the visit-count "
                         "novelty hash. 0 = use all dims (default). At "
@@ -223,6 +233,9 @@ def main() -> int:
         planner_samples=args.planner_samples,
         planner_policy_mix=args.planner_policy_mix,
         planner_policy_temperature=args.planner_policy_temperature,
+        planner_use_mcts=bool(args.planner_use_mcts),
+        mcts_simulations=args.mcts_simulations,
+        mcts_c_puct=args.mcts_c_puct,
         visit_count_dims=args.visit_count_dims,
     )
     if args.encoder == "cnn_dqn":

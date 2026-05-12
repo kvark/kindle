@@ -38,6 +38,7 @@ pub mod delta_goals;
 pub mod diayn;
 pub mod encoder;
 pub mod env;
+pub mod mcts;
 pub mod option;
 pub mod outcome;
 pub mod planner;

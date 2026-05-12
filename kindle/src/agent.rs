@@ -1018,6 +1018,29 @@ pub struct AgentConfig {
     /// peaked policy: T = 2-3 keeps planner exploration broad even
     /// when the policy has committed.
     pub planner_policy_temperature: f32,
+    /// Use MCTS tree search instead of CEM/random-shooting MPC for the
+    /// planner. When `true`, `plan_and_queue` builds a per-lane Monte
+    /// Carlo tree, running `mcts_simulations` expansions before reading
+    /// off the most-visited action sequence from the root.
+    ///
+    /// Tradeoff vs random shooting: MCTS shares ancestor paths across
+    /// rollouts and uses UCB1 to focus on promising subtrees. Better
+    /// for cases where SOME signal can be propagated up the tree (i.e.,
+    /// when the WM and novelty score actually discriminate trajectories).
+    /// In the kindle setting where `visit_count ≈ 1` makes novelty
+    /// near-uniform, MCTS degenerates to depth-first exploration —
+    /// similar to random shooting in expectation but with lower
+    /// effective branching.
+    pub planner_use_mcts: bool,
+    /// Number of MCTS simulations per planning call (per lane). Each
+    /// simulation walks the tree from root to a leaf, expands one new
+    /// child via WM forward, scores by novelty, and backs up. Cost
+    /// scales O(mcts_simulations × n_lanes × hidden²) so keep it
+    /// modest (default 64).
+    pub mcts_simulations: usize,
+    /// UCB1 exploration constant. `Q + c*sqrt(ln N_parent / n_child)`.
+    /// Default sqrt(2) ≈ 1.414 (textbook).
+    pub mcts_c_puct: f32,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.).
@@ -1178,6 +1201,9 @@ impl Default for AgentConfig {
             planner_refresh_interval: 200,
             planner_policy_mix: 0.0,
             planner_policy_temperature: 1.0,
+            planner_use_mcts: false,
+            mcts_simulations: 64,
+            mcts_c_puct: 1.4142,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -1757,6 +1783,12 @@ pub struct Agent {
     /// the main `policy_session` at `planner_refresh_interval` cadence.
     /// `None` when policy-guided planning is off.
     policy_planner_session: Option<Session>,
+    /// Dedicated WM forward session sized at batch=n_lanes for MCTS
+    /// expansion (one row per lane per simulation step). Smaller batch
+    /// than `wm_planner_session` so each MCTS dispatch isn't wasting
+    /// 31/32 of the parallel slots. Built only when
+    /// `planner_use_mcts = true`.
+    wm_mcts_session: Option<Session>,
     /// `planner_samples` cached for the GPU planner; mirrors
     /// `config.planner_samples` so the runtime path can avoid borrowing
     /// the config when computing batch offsets.
@@ -2677,6 +2709,20 @@ impl Agent {
         } else {
             None
         };
+        // MCTS uses a smaller batch (n_lanes, one row per lane per
+        // simulation step). Only build when MCTS is enabled.
+        let wm_mcts_session = if config.planner_horizon > 0 && config.planner_use_mcts {
+            let g = build_wm_planner_graph(
+                config.batch_size,
+                config.latent_dim,
+                config.hidden_dim,
+            );
+            let mut s = build_session(&g, config.opt_level);
+            init_parameters(&mut s);
+            Some(s)
+        } else {
+            None
+        };
         let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
         let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
         let planner_traj_scratch = vec![
@@ -2906,6 +2952,7 @@ impl Agent {
             planner,
             wm_planner_session,
             policy_planner_session,
+            wm_mcts_session,
             planner_samples_cached,
             planner_z_scratch,
             planner_action_scratch,
@@ -6417,6 +6464,11 @@ impl Agent {
             return;
         }
 
+        // MCTS path (takes priority when enabled).
+        if self.config.planner_use_mcts && self.wm_mcts_session.is_some() {
+            self.plan_and_queue_mcts(num_actions, rng);
+            return;
+        }
         // GPU path when wm_planner_session is constructed.
         if self.wm_planner_session.is_some() {
             self.plan_and_queue_gpu(num_actions, rng);
@@ -6689,6 +6741,167 @@ impl Agent {
         }
     }
 
+    /// MCTS planner — replaces random-shooting at `plan_and_queue` time
+    /// when `planner_use_mcts = true`. Per-lane tree built fresh each
+    /// call; runs `mcts_simulations` expansions; queues the most-visited
+    /// root path (depth `planner_horizon`).
+    fn plan_and_queue_mcts<R: Rng>(&mut self, num_actions: usize, _rng: &mut R) {
+        use crate::mcts::McTree;
+
+        let n = self.lanes.len();
+        let n_sim = self.config.mcts_simulations.max(1);
+        let c_puct = self.config.mcts_c_puct;
+        let horizon = self.config.planner_horizon.max(1);
+        let ld = self.config.latent_dim;
+        let num_actions_eff = num_actions.min(MAX_ACTION_DIM).max(1);
+
+        // Periodic WM-weight sync (shared cadence with random planner).
+        if self.planner_calls_since_refresh == 0
+            || self.planner_calls_since_refresh >= self.config.planner_refresh_interval
+        {
+            self.refresh_wm_planner_weights();
+            self.planner_calls_since_refresh = 0;
+        }
+        self.planner_calls_since_refresh += 1;
+
+        // Identify active lanes (queue empty + has buffer data).
+        let mut lane_active = vec![false; n];
+        let mut lane_valid: Vec<Vec<u8>> = vec![Vec::new(); n];
+        for (lane_idx, lane) in self.lanes.iter().enumerate() {
+            if !self.planner_queue[lane_idx].is_empty() {
+                continue;
+            }
+            if lane.buffer.last().is_none() {
+                continue;
+            }
+            lane_active[lane_idx] = true;
+            let mask_row = &self.action_masks
+                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let valid: Vec<u8> = (0..num_actions_eff)
+                .filter(|&j| mask_row[j] >= 0.5)
+                .map(|j| j as u8)
+                .collect();
+            lane_valid[lane_idx] = if valid.is_empty() {
+                (0..num_actions_eff as u8).collect()
+            } else {
+                valid
+            };
+        }
+        if !lane_active.iter().any(|&b| b) {
+            return;
+        }
+
+        // Build per-lane trees seeded with the current latent.
+        let mut trees: Vec<Option<McTree>> = (0..n)
+            .map(|lane_idx| {
+                if lane_active[lane_idx] {
+                    let z0 = self.lanes[lane_idx].buffer.last().unwrap().latent.clone();
+                    Some(McTree::new(z0, lane_valid[lane_idx].clone()))
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        // Scratch for the n_lanes-sized WM dispatch (z in, action in,
+        // z_next out). Sized once per call.
+        let mut z_in = vec![0.0f32; n * ld];
+        let mut a_in = vec![0.0f32; n * MAX_ACTION_DIM];
+        let mut z_out = vec![0.0f32; n * ld];
+
+        for _sim in 0..n_sim {
+            // 1) Select per lane: descend tree to find a node with an
+            //    unexpanded valid action. Skip lanes that have no
+            //    expansion to do (fully expanded subtree at depth bound).
+            let mut leaves: Vec<Option<(Vec<usize>, u8)>> = vec![None; n];
+            for lane_idx in 0..n {
+                if let Some(ref tree) = trees[lane_idx] {
+                    let (path, action_opt) = tree.select(c_puct);
+                    if let Some(action) = action_opt {
+                        leaves[lane_idx] = Some((path, action));
+                    }
+                }
+            }
+            let any_active = leaves.iter().any(|x| x.is_some());
+            if !any_active {
+                break;
+            }
+
+            // 2) Build batched WM input (one row per active lane;
+            //    inactive lane rows are zeros — output ignored).
+            z_in.fill(0.0);
+            a_in.fill(0.0);
+            for lane_idx in 0..n {
+                if let Some((ref path, action)) = leaves[lane_idx] {
+                    let tree = trees[lane_idx].as_ref().unwrap();
+                    let parent_idx = *path.last().unwrap();
+                    let parent_z = &tree.nodes[parent_idx].z;
+                    z_in[lane_idx * ld..(lane_idx + 1) * ld].copy_from_slice(parent_z);
+                    if (action as usize) < MAX_ACTION_DIM {
+                        a_in[lane_idx * MAX_ACTION_DIM + action as usize] = 1.0;
+                    }
+                }
+            }
+            // 3) WM forward
+            let wm_mcts = self.wm_mcts_session.as_mut().unwrap();
+            wm_mcts.set_input("z", &z_in);
+            wm_mcts.set_input("action", &a_in);
+            wm_mcts.step();
+            wm_mcts.wait();
+            wm_mcts.read_output_by_index(0, &mut z_out);
+
+            // 4) Per-lane: add child node, compute novelty score, backup.
+            for lane_idx in 0..n {
+                if let Some((path, action)) = leaves[lane_idx].take() {
+                    let child_z = z_out[lane_idx * ld..(lane_idx + 1) * ld].to_vec();
+                    // Score by latent-visit-count novelty (same as random planner).
+                    let count = self.lanes[lane_idx].buffer.visit_count(&child_z);
+                    let value = 1.0 / ((count as f32 + 1.0).sqrt());
+                    let parent_idx = *path.last().unwrap();
+                    let tree = trees[lane_idx].as_mut().unwrap();
+                    let child_valid = lane_valid[lane_idx].clone();
+                    let child_idx =
+                        tree.add_child(parent_idx, action, child_z, child_valid);
+                    let mut full_path = path;
+                    full_path.push(child_idx);
+                    tree.backup(&full_path, value);
+                }
+            }
+        }
+
+        // 5) Extract the most-visited path from each tree (up to `horizon`
+        //    actions). Queue them so the policy plays them like the
+        //    random-shooting planner's output.
+        for lane_idx in 0..n {
+            if let Some(ref tree) = trees[lane_idx] {
+                let mut cur = 0usize;
+                for _ in 0..horizon {
+                    let node = &tree.nodes[cur];
+                    let mut best_a: Option<u8> = None;
+                    let mut best_n: u32 = 0;
+                    for &a in &node.valid {
+                        let ci = node.children[a as usize];
+                        if ci == usize::MAX {
+                            continue;
+                        }
+                        let cn = tree.nodes[ci].n;
+                        if cn > best_n {
+                            best_n = cn;
+                            best_a = Some(a);
+                        }
+                    }
+                    match best_a {
+                        Some(a) => {
+                            self.planner_queue[lane_idx].push_back(a as u32);
+                            cur = node.children[a as usize];
+                        }
+                        None => break,
+                    }
+                }
+            }
+        }
+    }
+
     /// Copy WM + policy parameters from the live training sessions to
     /// the planner's forward-only sessions. Cheap relative to a
     /// planning call — only happens at `planner_refresh_interval`
@@ -6716,6 +6929,10 @@ impl Agent {
                 .as_mut()
                 .unwrap()
                 .set_parameter(name, buf);
+            // Mirror to the MCTS session if present (same param names).
+            if let Some(ref mut mcts_sess) = self.wm_mcts_session {
+                mcts_sess.set_parameter(name, buf);
+            }
         }
         // Policy params (graph: policy.fc1.weight/bias, policy.fc2.weight).
         // policy.fc2 has no bias.
