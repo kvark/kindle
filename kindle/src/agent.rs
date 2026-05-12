@@ -1092,6 +1092,13 @@ pub struct AgentConfig {
     /// When full, FIFO eviction. Default 100 (small footprint: 100 × 256
     /// f32 ≈ 100 KB per env).
     pub goal_states_cap: usize,
+    /// HER-style relabeling probability: when an episode ends with zero
+    /// extrinsic events (a "loss"), push its terminal latent into the
+    /// env's `goal_states` queue with this probability. 0 (default) =
+    /// disabled. Useful early in training when no real wins exist yet
+    /// — the planner gets a structural prior toward "places we've
+    /// reached." Real wins evict synthetics from the FIFO over time.
+    pub goal_states_her_prob: f32,
     /// Value head training: scales the value-head MSE loss. When > 0,
     /// kindle builds a separate `value_session` that learns `V(z) →
     /// expected discounted return-to-go`, trained on every completed
@@ -1291,6 +1298,7 @@ impl Default for AgentConfig {
             planner_rnd_alpha: 0.0,
             planner_goal_alpha: 0.0,
             goal_states_cap: 100,
+            goal_states_her_prob: 0.0,
             value_head_train_coef: 0.0,
             planner_value_alpha: 0.0,
             value_head_gamma: 0.99,
@@ -1956,33 +1964,29 @@ pub struct Agent {
     /// most recent SIL update. >0 means SIL is moving params; ≈0 means
     /// SIL fired but had no effect on params.
     sil_last_param_change: f32,
-    /// Value head: separate forward+backward session that learns
-    /// `V(z) → discounted return-to-go`. Built only when
-    /// `value_head_train_coef > 0`. Trained on (latent, R_to_go)
-    /// samples from completed episodes (every episode, not just
-    /// successful ones — that's the point: V learns the geometry
-    /// across many losses and few wins).
-    ///
-    /// When the planner is also active with `planner_value_alpha > 0`,
-    /// the same `value_head.*` params are mirrored into the planner's
-    /// WM rollout graph so V(z_step) can be read out alongside z_step
-    /// per planner k-step. Mirroring happens in
-    /// `refresh_wm_planner_weights`.
-    value_session: Option<Session>,
     /// True iff `wm_planner_session` was built with the value-head
     /// branch (output index 1 = V_next per row). When false the
     /// planner only reads z_next (output index 0). Mirrors
     /// `planner_value_alpha > 0 && planner_horizon > 0`.
     wm_planner_has_value_head: bool,
-    /// Replay buffer for value-head training: (latent, R_to_go).
-    /// Populated on every episode boundary by walking the buffer
-    /// back and accumulating γ-discounted returns. FIFO bounded by
-    /// `value_head_buffer_capacity`.
-    value_buffer: std::collections::VecDeque<(Vec<f32>, f32)>,
-    /// Scratch for the value session's z input `[train_batch, latent_dim]`.
-    value_z_scratch: Vec<f32>,
-    /// Scratch for the value session's target input `[train_batch, 1]`.
-    value_r_scratch: Vec<f32>,
+    /// Replay buffer for value-head training: `(obs_token, env_id,
+    /// R_to_go)`. Populated on every episode boundary by walking the
+    /// lane buffer back and accumulating γ-discounted returns. FIFO
+    /// bounded by `value_head_buffer_capacity`.
+    ///
+    /// `obs_token` (not latent) is stored so the value-replay path can
+    /// run wm_session's encoder forward — that's how the encoder gets
+    /// gradient from the value loss. With latent we'd skip encoder.
+    value_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
+    /// Scratch for wm_session's `value_target` input `[batch_size, 1]`.
+    /// Set to R_to_go for value-replay calls, zeros otherwise (gated
+    /// off by `value_gate=0`).
+    value_target_scratch_vh: Vec<f32>,
+    /// Scratch buffers for wm_session's loss-gate inputs (each size 1).
+    /// `wm_gate=1, value_gate=0` for normal WM forward;
+    /// `wm_gate=0, value_gate=1` for value-replay forward.
+    wm_gate_scalar: Vec<f32>,
+    value_gate_scalar: Vec<f32>,
     /// Most recent value-head training loss, exposed as a diagnostic.
     last_value_head_loss: f32,
     /// Number of value-head update calls fired so far (diagnostic).
@@ -2453,6 +2457,39 @@ impl Agent {
             let z_hat = wm.forward(&mut g, z_t, action);
             let wm_loss = WorldModel::loss(&mut g, z_hat, z_target);
 
+            // Value head atop the encoder output. The wm_session graph
+            // always builds the value-head params so the planner can
+            // mirror them — training is opt-in via
+            // `value_head_train_coef` (when 0, the value branch
+            // contributes zero gradient because its coef scalar is 0).
+            //
+            // Why inside wm_session and not a side session: this
+            // shares the encoder. When `value_replay_step` runs with
+            // `wm_gate=0, value_gate=1`, the gradient from
+            // `mse(V(z_t), R_to_go)` backprops through the encoder.
+            // The encoder thus learns a representation that's
+            // value-predictive — the "high-level direction in mind"
+            // the planner consumes. With a side session the encoder
+            // copies would diverge.
+            let vh_hidden = if config.value_head_hidden_dim == 0 {
+                config.hidden_dim
+            } else {
+                config.value_head_hidden_dim
+            };
+            let value_target_in =
+                g.input("value_target", &[config.batch_size, 1]);
+            let wm_gate_in = g.input("wm_gate", &[1]);
+            let value_gate_in = g.input("value_gate", &[1]);
+            let wm_gate = g.stop_gradient(wm_gate_in);
+            let value_gate = g.stop_gradient(value_gate_in);
+            let vh_module =
+                crate::value_head::ValueHead::new(&mut g, config.latent_dim, vh_hidden);
+            let v_pred = vh_module.forward(&mut g, z_t);
+            let v_target_det = g.stop_gradient(value_target_in);
+            let value_loss_raw = g.mse_loss(v_pred, v_target_det);
+            let value_coef_scalar = g.scalar(config.value_head_train_coef);
+            let value_loss = g.mul(value_loss_raw, value_coef_scalar);
+
             // Optional obs-reconstruction loss INSIDE the WM session
             // (anti-collapse). Without this, the WM forward-prediction
             // loss admits a trivial low-rank z (verified 2026-05-05:
@@ -2482,7 +2519,7 @@ impl Agent {
             // session's encoder (which produces the latents stored
             // in lane buffers and used for novelty / surprise / option
             // goals).
-            let loss = if config.recon_loss_coef > 0.0 {
+            let wm_recon_loss = if config.recon_loss_coef > 0.0 {
                 let (target_node, target_dim) = match (config.recon_visual_target, visual_node_2d) {
                     (true, Some(v2d)) => (v2d, visual_recon_dim),
                     _ => (obs, OBS_TOKEN_DIM),
@@ -2502,6 +2539,16 @@ impl Agent {
             } else {
                 wm_loss
             };
+            // Gated combination: `wm_gate * (wm + recon) + value_gate * value_loss`.
+            // CPU sets gates per dispatch: normal forward = (1, 0); value
+            // replay = (0, 1). Both gates can be (1, 1) to train all at
+            // once but the value target then has to align with the
+            // current step's z_t — which it usually doesn't (R_to_go is
+            // only known at episode end), so we keep them mutually
+            // exclusive in practice.
+            let wm_gated = g.mul(wm_recon_loss, wm_gate);
+            let value_gated = g.mul(value_loss, value_gate);
+            let loss = g.add(wm_gated, value_gated);
 
             // Per-lane squared-error output. Exposing `(z_hat − z_target)²`
             // as `[N, latent_dim]` lets us compute per-lane prediction error
@@ -2940,37 +2987,14 @@ impl Agent {
             Vec::new()
         };
 
-        // Value-head training session. A small MLP `z → V(z)` with
-        // MSE loss against R_to_go targets fed CPU-side. Built only
-        // when training is on; the planner's value branch (built
-        // into wm_planner_session above) reads V via mirrored params
-        // when `planner_value_alpha > 0`.
-        let value_train_batch = config.value_head_train_batch.max(1);
-        let value_session = if config.value_head_train_coef > 0.0 {
-            let mut g = Graph::new();
-            let z_in = g.input("z", &[value_train_batch, config.latent_dim]);
-            let r_in = g.input("r_target", &[value_train_batch, 1]);
-            let vh = crate::value_head::ValueHead::new(
-                &mut g,
-                config.latent_dim,
-                vh_hidden_dim_resolved,
-            );
-            let v = vh.forward(&mut g, z_in);
-            let r_det = g.stop_gradient(r_in);
-            let loss = g.mse_loss(v, r_det);
-            g.set_outputs(vec![loss, v]);
-            let mut s = build_session(&g, config.opt_level);
-            init_parameters(&mut s);
-            if config.grad_clip_norm > 0.0 {
-                s.set_grad_clip_norm(config.grad_clip_norm);
-                s.set_grad_clip_every(config.grad_clip_every.max(1));
-            }
-            Some(s)
-        } else {
-            None
-        };
-        let value_z_scratch = vec![0.0f32; value_train_batch * config.latent_dim];
-        let value_r_scratch = vec![0.0f32; value_train_batch];
+        // Value-head training lives inside `wm_session` (encoder
+        // shared). `value_replay_step` runs wm_session in
+        // "value gate" mode using (obs, env_id, R_to_go) samples
+        // drawn from `value_buffer`. The standalone z-input value
+        // session was removed in favour of this end-to-end path.
+        let value_target_scratch_vh = vec![0.0f32; config.batch_size];
+        let wm_gate_scalar = vec![1.0f32];
+        let value_gate_scalar = vec![0.0f32];
         // Largest WM param is fc2.weight at hidden_dim*hidden_dim.
         let planner_param_buf = vec![0.0f32; config.hidden_dim * config.hidden_dim];
 
@@ -3215,13 +3239,13 @@ impl Agent {
             sil_updates_fired: 0,
             sil_last_active_rows: 0,
             sil_last_param_change: 0.0,
-            value_session,
             wm_planner_has_value_head,
             value_buffer: std::collections::VecDeque::with_capacity(
                 config.value_head_buffer_capacity.max(1),
             ),
-            value_z_scratch,
-            value_r_scratch,
+            value_target_scratch_vh,
+            wm_gate_scalar,
+            value_gate_scalar,
             last_value_head_loss: 0.0,
             value_head_updates: 0,
             config,
@@ -4104,13 +4128,15 @@ impl Agent {
                 // Value-head training: on EVERY completed episode (win
                 // or loss), walk the lane buffer back from the terminal
                 // step to the most recent boundary, accumulating
-                // γ-discounted return-to-go. Push (latent, R_to_go) into
-                // value_buffer. Losses contribute mostly-zero targets
-                // (intrinsic-only reward, near zero in this regime),
-                // shaping the baseline; wins contribute large peaks near
-                // the terminal. The value head learns the geometric
-                // gradient between the two — the "high-level direction
-                // in mind" the planner consumes via planner_value_alpha.
+                // γ-discounted return-to-go. Push (obs, env_id, R_to_go)
+                // into value_buffer. Losses contribute mostly-zero
+                // targets, shaping the baseline; wins contribute large
+                // peaks near the terminal. The value head learns the
+                // geometric gradient between the two — and because
+                // training runs through wm_session's encoder, the
+                // encoder itself becomes value-aware (the "high-level
+                // direction in mind" the planner consumes via
+                // planner_value_alpha).
                 if self.config.value_head_train_coef > 0.0 {
                     let blen = lane.buffer.len();
                     let cap = self.config.value_head_buffer_capacity.max(1);
@@ -4120,22 +4146,17 @@ impl Agent {
                         let mut idx = blen - 1;
                         loop {
                             let tr = lane.buffer.get(idx);
-                            // Use only the extrinsic component of reward
-                            // — `tr.reward` is the post-intrinsic mixed
-                            // reward; we approximate "extrinsic
-                            // contribution" as the per-step reward
-                            // itself. Intrinsic reward variations create
-                            // mild noise but on ARC-AGI-3 the extrinsic
-                            // event (≥ 1.0) is orders of magnitude
-                            // larger than intrinsic per-step bonuses.
                             if tr.reward.is_finite() {
                                 r_acc = tr.reward + gamma * r_acc;
                             }
                             if self.value_buffer.len() >= cap {
                                 self.value_buffer.pop_front();
                             }
-                            self.value_buffer
-                                .push_back((tr.latent.clone(), r_acc));
+                            self.value_buffer.push_back((
+                                tr.observation.clone(),
+                                tr.env_id,
+                                r_acc,
+                            ));
                             if tr.env_boundary {
                                 break;
                             }
@@ -4143,6 +4164,35 @@ impl Agent {
                                 break;
                             }
                             idx -= 1;
+                        }
+                    }
+                }
+                // HER-style relabeling: when a failed episode (zero
+                // extrinsic events) ends, push its TERMINAL latent into
+                // the env's `goal_states` queue with a per-config
+                // probability. The planner's cos-sim scorer can then
+                // bias rollouts toward "states the agent has actually
+                // reached," giving structure to the latent space even
+                // before any real win. On envs that DO produce wins,
+                // real win-states dominate the FIFO queue over time;
+                // HER synthetic goals get evicted.
+                let her_prob = self.config.goal_states_her_prob;
+                if her_prob > 0.0
+                    && lane.sil_ep_event_count == 0
+                    && self.config.goal_states_cap > 0
+                {
+                    if rng.random_range(0.0..1.0_f32) < her_prob {
+                        if let Some(prev) = lane.buffer.last() {
+                            let env_id = lane.adapter.id();
+                            let cap = self.config.goal_states_cap;
+                            let q = self
+                                .goal_states
+                                .entry(env_id)
+                                .or_insert_with(std::collections::VecDeque::new);
+                            if q.len() >= cap {
+                                q.pop_front();
+                            }
+                            q.push_back(prev.latent.clone());
                         }
                     }
                 }
@@ -4471,15 +4521,17 @@ impl Agent {
             self.replay_step(rng);
         }
 
-        // --- Value-head training: one batched MSE step per call once
-        // the replay buffer has enough samples. Uses uniform sampling
-        // across all stored (latent, R_to_go) pairs — the encoder is
-        // already shared via the latent so V learns a global function
-        // of z. Driven independently from policy / WM cadence.
-        if self.value_session.is_some()
-            && self.value_buffer.len() >= self.config.value_head_train_batch
+        // --- Value-replay training step: when value-head training is
+        // on and we have enough (obs, env_id, R_to_go) samples,
+        // dispatch one wm_session forward+backward in
+        // "value-gate" mode (wm/recon off, value on). The encoder
+        // forward runs on replay obs, so the value loss backprops
+        // through encoder + value head — encoder learns value-
+        // predictive features.
+        if self.config.value_head_train_coef > 0.0
+            && self.value_buffer.len() >= self.lanes.len()
         {
-            self.value_head_step(rng);
+            self.value_replay_step(rng);
         }
 
         // --- Representation drift monitor (shared probe set, WM session) ---
@@ -4493,66 +4545,113 @@ impl Agent {
         self.step_count += 1;
     }
 
-    /// Run one value-head training step: sample
-    /// `config.value_head_train_batch` (z, R_to_go) pairs uniformly
-    /// from `value_buffer`, stage them into the value session's input
-    /// slots, and run a single MSE backward+optimizer step.
-    fn value_head_step<R: Rng>(&mut self, rng: &mut R) {
-        let Some(ref mut s) = self.value_session else {
-            return;
-        };
-        let b = self.config.value_head_train_batch.max(1);
-        let ld = self.config.latent_dim;
+    /// Run one value-replay training step: sample
+    /// `config.value_head_train_batch` (obs, env_id, R_to_go) tuples
+    /// uniformly from `value_buffer`, stage them into wm_session's
+    /// inputs (obs, task, value_target), flip the gates to
+    /// `(wm_gate=0, value_gate=1)`, dispatch, and read the per-call
+    /// loss. The encoder gets gradient from the value loss this way —
+    /// the encoder learns a value-predictive representation.
+    ///
+    /// Batch size is clamped to `config.batch_size` because
+    /// wm_session's graph is built with that fixed batch. If
+    /// `train_batch` is larger we cycle the dispatch multiple times.
+    fn value_replay_step<R: Rng>(&mut self, rng: &mut R) {
         let buf_len = self.value_buffer.len();
-        if buf_len < b {
+        let n = self.lanes.len();
+        if buf_len < n {
             return;
         }
-        // Uniform random sample (with replacement — much simpler than
-        // shuffling indices, and over-representing a few samples per
-        // batch costs nothing at this scale).
-        for row in 0..b {
+        // Stage a value-replay batch into the wm_session scratches.
+        // The session's batch_size is `n` (config.batch_size), so we
+        // fill exactly n rows per dispatch.
+        for row in 0..n {
             let idx = rng.random_range(0..buf_len);
-            let (z, r) = &self.value_buffer[idx];
-            let dst = &mut self.value_z_scratch[row * ld..(row + 1) * ld];
-            // z stored in buffer may have a different latent_dim if
-            // config changed mid-run; clamp.
-            let copy_len = z.len().min(ld);
-            dst[..copy_len].copy_from_slice(&z[..copy_len]);
-            if copy_len < ld {
-                dst[copy_len..].fill(0.0);
+            let (obs, env_id, r_to_go) = &self.value_buffer[idx];
+            let obs_dst =
+                &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
+            let copy_len = obs.len().min(OBS_TOKEN_DIM);
+            obs_dst[..copy_len].copy_from_slice(&obs[..copy_len]);
+            if copy_len < OBS_TOKEN_DIM {
+                obs_dst[copy_len..].fill(0.0);
             }
-            self.value_r_scratch[row] = *r;
+            let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
+            match self.task_embeddings.get(env_id) {
+                Some(emb) => task_dst.copy_from_slice(emb),
+                None => task_dst.fill(0.0),
+            }
+            self.value_target_scratch_vh[row] = *r_to_go;
         }
-        s.set_input("z", &self.value_z_scratch);
-        s.set_input("r_target", &self.value_r_scratch);
-        let lr = self.config.learning_rate
-            * self.config.value_head_lr_scale
-            * self.batch_lr_scale;
-        apply_lr(s, lr, self.config.use_adam, self.config.adam_eps);
-        s.step();
-        s.wait();
-        let l = s.read_loss();
-        if l.is_finite() {
-            self.last_value_head_loss = l;
-        }
-        self.value_head_updates += 1;
-    }
+        // Action and z_target are unused in value-replay mode (their
+        // loss branch is gated off by wm_gate=0) but the graph inputs
+        // still need to be present — zero them out so they don't
+        // pollute the device buffers with stale per-step values.
+        self.action_token_scratch.fill(0.0);
+        self.z_target_scratch.fill(0.0);
 
-    /// Run one world-model forward+backward pass on the currently staged
-    /// `obs_token_scratch` / `action_token_scratch` / `z_target_scratch` /
-    /// `task_scratch` inputs. Returns the scalar batch-mean loss.
-    fn wm_forward_backward_stacked(&mut self, lr: f32) -> f32 {
-        // `obs` is always set: in MLP mode it feeds the encoder, and in
-        // CNN modes the WM session's optional recon branch (when
-        // recon_loss_coef > 0) targets it as the reconstruction label.
-        // The CNN encoders themselves consume `visual_obs` (already
-        // memory-mapped via `set_visual_obs`).
+        // Flip the gates.
+        self.wm_gate_scalar[0] = 0.0;
+        self.value_gate_scalar[0] = 1.0;
+
         self.wm_session.set_input("obs", &self.obs_token_scratch);
         self.wm_session
             .set_input("action", &self.action_token_scratch);
         self.wm_session
             .set_input("z_target", &self.z_target_scratch);
         self.wm_session.set_input("task", &self.task_scratch);
+        self.wm_session
+            .set_input("value_target", &self.value_target_scratch_vh);
+        self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+        self.wm_session
+            .set_input("value_gate", &self.value_gate_scalar);
+        let lr = self.config.learning_rate
+            * self.config.value_head_lr_scale
+            * self.encoder_lr_scale
+            * self.batch_lr_scale;
+        apply_lr(
+            &mut self.wm_session,
+            lr,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
+        self.wm_session.step();
+        self.wm_session.wait();
+        let l = self.wm_session.read_loss();
+        if l.is_finite() {
+            self.last_value_head_loss = l;
+        }
+        self.value_head_updates += 1;
+
+        // Restore default gates so subsequent wm_session calls (the
+        // next observe() step) run normal WM forward without needing
+        // to re-set the inputs every time.
+        self.wm_gate_scalar[0] = 1.0;
+        self.value_gate_scalar[0] = 0.0;
+    }
+
+    /// Run one world-model forward+backward pass on the currently staged
+    /// `obs_token_scratch` / `action_token_scratch` / `z_target_scratch` /
+    /// `task_scratch` inputs. Returns the scalar batch-mean loss.
+    fn wm_forward_backward_stacked(&mut self, lr: f32) -> f32 {
+        self.wm_session.set_input("obs", &self.obs_token_scratch);
+        self.wm_session
+            .set_input("action", &self.action_token_scratch);
+        self.wm_session
+            .set_input("z_target", &self.z_target_scratch);
+        self.wm_session.set_input("task", &self.task_scratch);
+        // Value-target / gate inputs: in normal WM-forward mode the
+        // gates are (wm=1, value=0) so the value branch contributes no
+        // gradient and the per-row target is a don't-care. The scratch
+        // is left zero-filled at init; we only need to feed the inputs
+        // so the graph contract is satisfied.
+        self.value_target_scratch_vh.fill(0.0);
+        self.wm_gate_scalar[0] = 1.0;
+        self.value_gate_scalar[0] = 0.0;
+        self.wm_session
+            .set_input("value_target", &self.value_target_scratch_vh);
+        self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+        self.wm_session
+            .set_input("value_gate", &self.value_gate_scalar);
         apply_lr(
             &mut self.wm_session,
             lr,
@@ -5031,6 +5130,14 @@ impl Agent {
             self.wm_session
                 .set_input("z_target", &self.z_target_scratch);
             self.wm_session.set_input("task", &self.task_scratch);
+            self.value_target_scratch_vh.fill(0.0);
+            self.wm_gate_scalar[0] = 0.0;
+            self.value_gate_scalar[0] = 0.0;
+            self.wm_session
+                .set_input("value_target", &self.value_target_scratch_vh);
+            self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+            self.wm_session
+                .set_input("value_gate", &self.value_gate_scalar);
             apply_lr(
                 &mut self.wm_session,
                 0.0,
@@ -5039,6 +5146,7 @@ impl Agent {
             );
             self.wm_session.step();
             self.wm_session.wait();
+            self.wm_gate_scalar[0] = 1.0;
 
             let mut z_stack = vec![0.0f32; n * ld];
             self.wm_session.read_output_by_index(1, &mut z_stack);
@@ -7383,9 +7491,11 @@ impl Agent {
             }
         }
         // Value-head params (when wm_planner has a value branch).
-        // Both fc1 and fc2 names ("value_head.fc1.*", "value_head.fc2.weight")
-        // exist identically in `value_session` and the planner graph.
-        if self.wm_planner_has_value_head && self.value_session.is_some() {
+        // Source: `wm_session` (the value head lives inside the WM
+        // graph, sharing the encoder). Sink: wm_planner_session /
+        // wm_mcts_session, where the value head computes V(z_next)
+        // for each rolled-out step.
+        if self.wm_planner_has_value_head {
             let vh = if self.config.value_head_hidden_dim == 0 {
                 hd
             } else {
@@ -7398,10 +7508,7 @@ impl Agent {
             ];
             for (name, n_elem) in vh_params.iter() {
                 let buf = &mut self.planner_param_buf[..*n_elem];
-                self.value_session
-                    .as_mut()
-                    .unwrap()
-                    .read_param(name, buf);
+                self.wm_session.read_param(name, buf);
                 if let Some(ref mut wm_p) = self.wm_planner_session {
                     wm_p.set_parameter(name, buf);
                 }

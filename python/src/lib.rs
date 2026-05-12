@@ -529,6 +529,7 @@ impl PyBatchAgent {
         value_head_train_batch = None,
         value_head_hidden_dim = None,
         value_head_lr_scale = None,
+        goal_states_her_prob = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -664,6 +665,7 @@ impl PyBatchAgent {
         value_head_train_batch: Option<usize>,
         value_head_hidden_dim: Option<usize>,
         value_head_lr_scale: Option<f32>,
+        goal_states_her_prob: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1102,6 +1104,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = value_head_lr_scale {
             config.value_head_lr_scale = v;
+        }
+        if let Some(v) = goal_states_her_prob {
+            config.goal_states_her_prob = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
