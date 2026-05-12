@@ -231,6 +231,17 @@ pub struct AgentConfig {
     /// dims (~3^8 ≈ 6.6k cells) so revisits are common and the count
     /// genuinely measures novelty. Default 0 = unchanged behavior.
     pub visit_count_dims: usize,
+    /// Optional random-projection dim for visit-count hashing. When >0,
+    /// projects the latent through a fixed (deterministically seeded)
+    /// random matrix of shape `[latent_dim, visit_count_proj_dim]`
+    /// before quantizing. Approximately preserves L2 distance across
+    /// the full latent (Johnson-Lindenstrauss); strictly more
+    /// informative than `visit_count_dims` truncation which only sees
+    /// the first N dims. Default 0 = use truncation or full latent.
+    pub visit_count_proj_dim: usize,
+    /// Seed for the random-projection matrix. Default 0x9E37_79B9... so
+    /// behavior reproduces across runs of the same agent config.
+    pub visit_count_proj_seed: u64,
     pub entropy_beta: f32,
     /// Floor for policy entropy — updates suppressed when entropy falls below this.
     pub entropy_floor: f32,
@@ -1102,6 +1113,8 @@ impl Default for AgentConfig {
             grid_resolution: 0.5,
             visit_counts_max: 0,
             visit_count_dims: 0,
+            visit_count_proj_dim: 0,
+            visit_count_proj_seed: 0x9E37_79B9_7F4A_7C15,
             entropy_beta: 0.01,
             entropy_floor: 0.1,
             drift_interval: 500,
@@ -2805,11 +2818,13 @@ impl Agent {
             .enumerate()
             .map(|(i, adapter)| Lane {
                 adapter,
-                buffer: ExperienceBuffer::with_visit_count_dims(
+                buffer: ExperienceBuffer::with_visit_count_config(
                     config.buffer_capacity,
                     config.grid_resolution,
                     config.visit_counts_max,
                     config.visit_count_dims,
+                    config.visit_count_proj_dim,
+                    config.visit_count_proj_seed,
                 ),
                 reward_circuit: RewardCircuit::with_seed(
                     config.reward_weights.clone(),

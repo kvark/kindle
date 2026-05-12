@@ -182,7 +182,24 @@ pub struct ExperienceBuffer {
     /// This is a coarse trick — proper fix is contrastive or
     /// random-projection encoding — but it makes the existing
     /// novelty signal usable.
+    ///
+    /// Mutually exclusive with `visit_count_proj_dim` (when both are >0,
+    /// projection takes priority since it's strictly more general).
     visit_count_dims: usize,
+    /// When > 0, project the latent through a fixed random matrix
+    /// before quantizing. Output dim = this value. Compared to
+    /// `visit_count_dims` truncation, random projection preserves L2
+    /// distance approximately (Johnson-Lindenstrauss) across the FULL
+    /// 256-dim latent, so nearby latents in any subspace get nearby
+    /// projections — not just nearby latents whose differences fall
+    /// in the first N dims. Default 0 = disabled.
+    visit_count_proj_dim: usize,
+    /// Random projection matrix, shape `[latent_dim_observed, proj_dim]`,
+    /// lazily initialized on first `push` once we know the latent_dim.
+    /// Seeded deterministically (proj_seed) so behavior reproduces
+    /// across runs of the same agent config.
+    visit_count_proj_matrix: Option<Vec<f32>>,
+    visit_count_proj_seed: u64,
 }
 
 impl ExperienceBuffer {
@@ -204,23 +221,104 @@ impl ExperienceBuffer {
         visit_counts_max: usize,
         visit_count_dims: usize,
     ) -> Self {
+        Self::with_visit_count_config(
+            capacity,
+            grid_resolution,
+            visit_counts_max,
+            visit_count_dims,
+            0,
+            0x9E37_79B9_7F4A_7C15,
+        )
+    }
+
+    /// Full constructor with random-projection config. `proj_dim = 0` =
+    /// disabled (use truncation or full latent based on `visit_count_dims`).
+    pub fn with_visit_count_config(
+        capacity: usize,
+        grid_resolution: f32,
+        visit_counts_max: usize,
+        visit_count_dims: usize,
+        visit_count_proj_dim: usize,
+        visit_count_proj_seed: u64,
+    ) -> Self {
         Self {
             transitions: RingBuffer::new(capacity),
             visit_counts: HashMap::new(),
             grid_resolution,
             visit_counts_max,
             visit_count_dims,
+            visit_count_proj_dim,
+            visit_count_proj_matrix: None,
+            visit_count_proj_seed,
         }
     }
 
-    /// Slice the latent down to the dims used for visit counting.
-    /// If `visit_count_dims == 0` or longer than the latent, return
-    /// the whole thing.
-    fn count_latent<'a>(&self, latent: &'a [f32]) -> &'a [f32] {
-        if self.visit_count_dims == 0 || self.visit_count_dims >= latent.len() {
-            latent
+    /// Lazy-initialize the random projection matrix on first use. Uses
+    /// a deterministic seed + a Box-Muller-style normal sample so the
+    /// matrix is reproducible across runs of the same agent config.
+    fn ensure_proj_matrix(&mut self, latent_dim: usize) {
+        if self.visit_count_proj_matrix.is_some() {
+            return;
+        }
+        let proj_dim = self.visit_count_proj_dim;
+        if proj_dim == 0 {
+            return;
+        }
+        // Standard random projection: each entry ~ N(0, 1) / sqrt(latent_dim).
+        // The 1/sqrt(d) scaling preserves expected L2 distance.
+        let scale = 1.0 / (latent_dim as f32).sqrt();
+        let mut state = self.visit_count_proj_seed.max(1);
+        // Simple xorshift64 generator for determinism. Box-Muller pair.
+        let mut next_u64 = || {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state
+        };
+        let mut next_normal = || {
+            let u1 = (next_u64() & 0x7FFFFFFF) as f32 / (i32::MAX as f32);
+            let u2 = (next_u64() & 0x7FFFFFFF) as f32 / (i32::MAX as f32);
+            // Box-Muller: r * cos(theta)
+            let r = (-2.0 * (u1.max(1e-20)).ln()).sqrt();
+            let theta = 2.0 * std::f32::consts::PI * u2;
+            r * theta.cos()
+        };
+        let mut mat = vec![0.0f32; latent_dim * proj_dim];
+        for entry in mat.iter_mut() {
+            *entry = next_normal() * scale;
+        }
+        self.visit_count_proj_matrix = Some(mat);
+    }
+
+    /// Compute the projection-or-truncation reduction of a latent into
+    /// the buffer used for `StateKey` hashing.
+    ///
+    /// Priority: projection > truncation > pass-through. If
+    /// `visit_count_proj_dim > 0`, runs latent @ proj_matrix (`proj_dim`
+    /// outputs). Else if `visit_count_dims > 0`, truncates to first
+    /// `visit_count_dims` dims. Else returns the latent as-is.
+    fn count_latent_owned(&self, latent: &[f32]) -> Vec<f32> {
+        if self.visit_count_proj_dim > 0 {
+            // Project: out[j] = sum_i latent[i] * proj[i*proj_dim + j].
+            let proj = self
+                .visit_count_proj_matrix
+                .as_ref()
+                .expect("proj matrix must be initialized before count_latent_owned");
+            let pd = self.visit_count_proj_dim;
+            let ld = latent.len();
+            let mut out = vec![0.0f32; pd];
+            for j in 0..pd {
+                let mut acc = 0.0f32;
+                for i in 0..ld {
+                    acc += latent[i] * proj[i * pd + j];
+                }
+                out[j] = acc;
+            }
+            out
+        } else if self.visit_count_dims > 0 && self.visit_count_dims < latent.len() {
+            latent[..self.visit_count_dims].to_vec()
         } else {
-            &latent[..self.visit_count_dims]
+            latent.to_vec()
         }
     }
 
@@ -234,10 +332,12 @@ impl ExperienceBuffer {
 
     /// Record a new transition and update the novelty visit count.
     pub fn push(&mut self, transition: Transition) {
-        let key = StateKey::from_latent(
-            self.count_latent(&transition.latent),
-            self.grid_resolution,
-        );
+        // Lazy-init the projection matrix once we know latent_dim.
+        if self.visit_count_proj_dim > 0 && self.visit_count_proj_matrix.is_none() {
+            self.ensure_proj_matrix(transition.latent.len());
+        }
+        let reduced = self.count_latent_owned(&transition.latent);
+        let key = StateKey::from_latent(&reduced, self.grid_resolution);
         // Cap memory: clear before inserting if the bound is set and
         // adding a NEW key would exceed it. Existing-key updates always
         // proceed (just an integer ++). The full-clear strategy is
@@ -270,7 +370,14 @@ impl ExperienceBuffer {
 
     /// Look up the visit count for a latent vector.
     pub fn visit_count(&self, latent: &[f32]) -> u32 {
-        let key = StateKey::from_latent(self.count_latent(latent), self.grid_resolution);
+        if self.visit_count_proj_dim > 0 && self.visit_count_proj_matrix.is_none() {
+            // Matrix not yet initialized (no push() yet). Treat as
+            // unvisited; the first push() will initialize and start
+            // accumulating counts.
+            return 0;
+        }
+        let reduced = self.count_latent_owned(latent);
+        let key = StateKey::from_latent(&reduced, self.grid_resolution);
         self.visit_counts.get(&key).copied().unwrap_or(0)
     }
 

@@ -143,6 +143,12 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--visit-count-proj-dim", type=int, default=0,
+                        help="Random-projection dim for visit-count hashing. "
+                        "When >0, projects the latent through a fixed random "
+                        "matrix instead of truncating. Preserves L2 distance "
+                        "across the full latent (Johnson-Lindenstrauss). "
+                        "Strictly more informative than --visit-count-dims.")
     parser.add_argument("--visit-count-dims", type=int, default=0,
                         help="Latent-dim truncation for the visit-count "
                         "novelty hash. 0 = use all dims (default). At "
@@ -237,6 +243,7 @@ def main() -> int:
         mcts_simulations=args.mcts_simulations,
         mcts_c_puct=args.mcts_c_puct,
         visit_count_dims=args.visit_count_dims,
+        visit_count_proj_dim=args.visit_count_proj_dim,
     )
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(

@@ -518,6 +518,7 @@ impl PyBatchAgent {
         mcts_simulations = None,
         mcts_c_puct = None,
         visit_count_dims = None,
+        visit_count_proj_dim = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -642,6 +643,7 @@ impl PyBatchAgent {
         mcts_simulations: Option<usize>,
         mcts_c_puct: Option<f32>,
         visit_count_dims: Option<usize>,
+        visit_count_proj_dim: Option<usize>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1047,6 +1049,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = visit_count_dims {
             config.visit_count_dims = v;
+        }
+        if let Some(v) = visit_count_proj_dim {
+            config.visit_count_proj_dim = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
