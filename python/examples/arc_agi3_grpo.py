@@ -205,6 +205,13 @@ def main() -> int:
                         help="Replay buffer cap for (latent, R_to_go) samples.")
     parser.add_argument("--value-head-train-batch", type=int, default=32,
                         help="Per-step value-head training batch size.")
+    parser.add_argument("--goal-states-her-prob", type=float, default=0.0,
+                        help="HER relabel probability: on each failed "
+                        "episode end (zero extrinsic events), push the "
+                        "terminal latent into goal_states queue with "
+                        "this probability. Gives the planner cos-sim "
+                        "scorer structure before any real win exists; "
+                        "real wins evict synthetics over time. 0 = off.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -312,6 +319,7 @@ def main() -> int:
         value_head_gamma=args.value_head_gamma,
         value_head_buffer_capacity=args.value_head_buffer_capacity,
         value_head_train_batch=args.value_head_train_batch,
+        goal_states_her_prob=args.goal_states_her_prob,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )
