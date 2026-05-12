@@ -46,6 +46,7 @@ pub mod policy;
 pub mod reward;
 pub mod rnd;
 pub mod v2s_preprocess;
+pub mod value_head;
 pub mod world_model;
 pub mod xeps_memory;
 
