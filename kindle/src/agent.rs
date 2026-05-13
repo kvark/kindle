@@ -1099,6 +1099,16 @@ pub struct AgentConfig {
     /// — the planner gets a structural prior toward "places we've
     /// reached." Real wins evict synthetics from the FIFO over time.
     pub goal_states_her_prob: f32,
+    /// BC-from-planner: synthetic R_to_go pushed into `sil_buffer` for
+    /// each planner-committed first action. When > 0, the policy is
+    /// pulled toward cloning the planner's choices via SIL's existing
+    /// update mechanism. Closes the policy-planner gap so the agent
+    /// can execute discovered paths without re-planning each time.
+    ///
+    /// Reasonable values: 0.3-1.0. Higher = stronger imitation. 0
+    /// (default) = disabled. Pushes obs from `lane.buffer.last()` so
+    /// the (s, a) pair is consistent with what the planner saw.
+    pub bc_planner_synthetic_r: f32,
     /// Value head training: scales the value-head MSE loss. When > 0,
     /// kindle builds a separate `value_session` that learns `V(z) →
     /// expected discounted return-to-go`, trained on every completed
@@ -1309,6 +1319,7 @@ impl Default for AgentConfig {
             planner_goal_alpha: 0.0,
             goal_states_cap: 100,
             goal_states_her_prob: 0.0,
+            bc_planner_synthetic_r: 0.0,
             value_head_train_coef: 0.0,
             planner_value_alpha: 0.0,
             value_head_gamma: 0.99,
@@ -7320,6 +7331,31 @@ impl Agent {
             }
             for t in 0..k {
                 self.planner_queue[lane_idx].push_back(all_actions[best_row * k + t]);
+            }
+            // BC-from-planner: push the (s, planner-chosen a) pair into
+            // sil_buffer so the policy can learn to imitate the planner.
+            // s is the lane's current latent's observation; a is the
+            // first action of the committed trajectory. SIL's existing
+            // CE update mechanism then trains the policy toward this
+            // (s, a) with synthetic positive R, closing the policy-
+            // planner gap.
+            if self.config.bc_planner_synthetic_r > 0.0 && self.config.use_sil {
+                let lane = &self.lanes[lane_idx];
+                if let Some(last) = lane.buffer.last() {
+                    let action_idx = all_actions[best_row * k] as usize;
+                    let r = self.config.bc_planner_synthetic_r;
+                    let cap = self.config.sil_buffer_capacity;
+                    if self.sil_buffer.len() >= cap {
+                        self.sil_buffer.pop_front();
+                    }
+                    self.sil_buffer.push_back(SilSample {
+                        obs: last.observation.clone(),
+                        action_idx,
+                        r_to_go: r,
+                        v_at_collect: 0.0,
+                        env_id: lane.adapter.id(),
+                    });
+                }
             }
         }
     }
