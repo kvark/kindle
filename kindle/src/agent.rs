@@ -1130,13 +1130,15 @@ pub struct AgentConfig {
     /// the agent's base `learning_rate`. 1.0 = same; lower stabilizes
     /// V early in training when targets are noisy.
     pub value_head_lr_scale: f32,
-    /// When true, the value-head loss is allowed to backprop through
-    /// the encoder (`z_t` is NOT stop-gradient'd). When false
-    /// (default), the encoder is shielded from value gradients — V
-    /// trains atop a frozen-relative-to-V encoder. Empirically the
-    /// encoder-shaping path destabilizes the representation when
-    /// R_to_go targets are dominated by zero (loss episodes), so we
-    /// default-detach. Opt-in for future experiments.
+    /// When true (default), the win-classifier BCE loss backprops
+    /// through the encoder, shaping it to distinguish win-trajectory
+    /// from loss-trajectory latents. This is the mechanism that gives
+    /// the planner a "high-level direction in latent space."
+    ///
+    /// Safe to leave on with the classifier (unlike the prior
+    /// regression formulation) because BCE has bounded, non-vanishing
+    /// gradient on confident negatives: loss-latents get pushed to
+    /// P=0, win-latents to P=1, creating a separating axis.
     pub value_head_grad_to_encoder: bool,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
@@ -1314,7 +1316,7 @@ impl Default for AgentConfig {
             value_head_train_batch: 32,
             value_head_hidden_dim: 0,
             value_head_lr_scale: 1.0,
-            value_head_grad_to_encoder: false,
+            value_head_grad_to_encoder: true,
             encoder_kind: EncoderKind::Mlp,
             outcome_window: 1,
             outcome_clamp: 5.0,
@@ -1978,15 +1980,18 @@ pub struct Agent {
     /// planner only reads z_next (output index 0). Mirrors
     /// `planner_value_alpha > 0 && planner_horizon > 0`.
     wm_planner_has_value_head: bool,
-    /// Replay buffer for value-head training: `(obs_token, env_id,
-    /// R_to_go)`. Populated on every episode boundary by walking the
-    /// lane buffer back and accumulating γ-discounted returns. FIFO
-    /// bounded by `value_head_buffer_capacity`.
-    ///
-    /// `obs_token` (not latent) is stored so the value-replay path can
-    /// run wm_session's encoder forward — that's how the encoder gets
-    /// gradient from the value loss. With latent we'd skip encoder.
-    value_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
+    /// Win-trajectory replay buffer: `(obs_token, env_id, label)`,
+    /// where label = γ^(T-t) — closer-to-terminal-of-winning-episode
+    /// → label closer to 1. Populated at every win-episode boundary.
+    /// FIFO bounded by `value_head_buffer_capacity` (each buffer is
+    /// half of that cap, so balanced sampling sees equal totals).
+    win_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
+    /// Loss-trajectory replay buffer. All transitions from
+    /// zero-event-episodes go here with label = 0. Balanced against
+    /// `win_buffer` at replay time so the classifier doesn't degenerate
+    /// to "always predict 0" under the natural class imbalance (~99%
+    /// of episodes are losses).
+    loss_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
     /// Scratch for wm_session's `value_target` input `[batch_size, 1]`.
     /// Set to R_to_go for value-replay calls, zeros otherwise (gated
     /// off by `value_gate=0`).
@@ -2286,16 +2291,18 @@ fn build_wm_planner_graph(
     let wm = WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
     let z_next = wm.forward(&mut g, z, action);
     let z_next = g.stop_gradient(z_next);
-    // Optional value head attached to the rolled-out z_next. Params
-    // are synced from the standalone `value_session` at the same
-    // cadence as WM weights. The planner reads V_next alongside z_next
-    // and adds `planner_value_alpha * V` to the trajectory score.
+    // Optional win-classifier head attached to the rolled-out z_next.
+    // Params mirror from wm_session (where the head is trained via
+    // BCE on win/loss labels). Output is P(win | z_next) — sigmoid'd
+    // probability in [0, 1]. The planner adds
+    // `planner_value_alpha * P` to each k-step trajectory score.
     match value_hidden_dim {
         Some(vh) => {
             let vh_module = crate::value_head::ValueHead::new(&mut g, latent_dim, vh);
-            let v_next = vh_module.forward(&mut g, z_next);
-            let v_next = g.stop_gradient(v_next);
-            g.set_outputs(vec![z_next, v_next]);
+            let logit = vh_module.forward(&mut g, z_next);
+            let prob = g.sigmoid(logit);
+            let prob = g.stop_gradient(prob);
+            g.set_outputs(vec![z_next, prob]);
         }
         None => {
             g.set_outputs(vec![z_next]);
@@ -2516,20 +2523,27 @@ impl Agent {
                 wm_loss
             };
 
-            // Value head atop the encoder output. Built only when the
-            // value mechanism is on — `value_head_train_coef > 0`
-            // (training) OR `planner_value_alpha > 0` (planner
-            // consumption). When OFF, the wm_session graph is
-            // byte-identical to the pre-value-head version, so the
-            // baseline path is unaffected (same param init randomness,
-            // same e-graph optimization, same numerical trajectory).
+            // Win-classifier head atop the encoder output. Built when
+            // training (`value_head_train_coef > 0`) or planner
+            // consumption (`planner_value_alpha > 0`) is on. When OFF,
+            // the graph is byte-identical to the pre-classifier
+            // version so baseline behaviour is unaffected.
             //
-            // stop_gradient on z_t in the value branch by default: V
-            // trains atop a frozen-relative-to-V encoder. Empirically
-            // (2026-05-12) letting V's gradient backprop through the
-            // encoder destabilized the representation because R_to_go
-            // ≈ 0 dominates (loss episodes), collapsing encoder
-            // geometry. Opt-in via `value_head_grad_to_encoder`.
+            // Mechanism: V(z) → logit, sigmoid → P(win-trajectory | z),
+            // BCE loss vs label γ^(T-t) for win-trajectory transitions,
+            // 0 for loss-trajectory transitions. The encoder is shaped
+            // by this loss BY DEFAULT (we WANT it to learn a separating
+            // axis between win and loss latents — that's what gives
+            // the planner "high-level direction in mind"). Opt-out via
+            // `value_head_grad_to_encoder=false`.
+            //
+            // Why BCE not MSE on R_to_go: an earlier regression
+            // formulation (2026-05-12) collapsed the encoder because
+            // R_to_go ≈ 0 dominates (loss episodes) and MSE pulled all
+            // latents toward "predict zero". BCE's gradient does NOT
+            // vanish for confident negatives — losing latents are
+            // actively pushed to "P=0" while winning latents are
+            // pushed to "P=1", forcing the encoder to distinguish.
             let value_branch_on =
                 config.value_head_train_coef > 0.0 || config.planner_value_alpha > 0.0;
             let loss = if value_branch_on {
@@ -2551,9 +2565,10 @@ impl Agent {
                 } else {
                     g.stop_gradient(z_t)
                 };
-                let v_pred = vh_module.forward(&mut g, z_for_value);
+                let logit = vh_module.forward(&mut g, z_for_value);
+                let prob = g.sigmoid(logit);
                 let v_target_det = g.stop_gradient(value_target_in);
-                let value_loss_raw = g.mse_loss(v_pred, v_target_det);
+                let value_loss_raw = g.bce_loss(prob, v_target_det);
                 let value_coef_scalar = g.scalar(config.value_head_train_coef);
                 let value_loss = g.mul(value_loss_raw, value_coef_scalar);
                 let wm_gated = g.mul(wm_recon_loss, wm_gate);
@@ -3253,8 +3268,11 @@ impl Agent {
             sil_last_active_rows: 0,
             sil_last_param_change: 0.0,
             wm_planner_has_value_head,
-            value_buffer: std::collections::VecDeque::with_capacity(
-                config.value_head_buffer_capacity.max(1),
+            win_buffer: std::collections::VecDeque::with_capacity(
+                (config.value_head_buffer_capacity / 2).max(1),
+            ),
+            loss_buffer: std::collections::VecDeque::with_capacity(
+                (config.value_head_buffer_capacity / 2).max(1),
             ),
             value_target_scratch_vh,
             wm_gate_scalar,
@@ -4138,38 +4156,43 @@ impl Agent {
                         }
                     }
                 }
-                // Value-head training: on EVERY completed episode (win
-                // or loss), walk the lane buffer back from the terminal
-                // step to the most recent boundary, accumulating
-                // γ-discounted return-to-go. Push (obs, env_id, R_to_go)
-                // into value_buffer. Losses contribute mostly-zero
-                // targets, shaping the baseline; wins contribute large
-                // peaks near the terminal. The value head learns the
-                // geometric gradient between the two — and because
-                // training runs through wm_session's encoder, the
-                // encoder itself becomes value-aware (the "high-level
-                // direction in mind" the planner consumes via
-                // planner_value_alpha).
+                // Win-classifier training: on every completed episode,
+                // walk the lane buffer back from the terminal step
+                // to the most recent boundary. If the episode had any
+                // extrinsic event (`sil_ep_event_count > 0`), push each
+                // transition's observation into `win_buffer` with label
+                // = γ^(T-t) — terminal=1.0, decaying backwards. If the
+                // episode had no events, push to `loss_buffer` with
+                // label = 0. Balanced sampling at replay time
+                // (`value_replay_step`) feeds an equal mix of both into
+                // the BCE training, so the encoder learns a separating
+                // axis instead of collapsing to "predict 0 always."
                 if self.config.value_head_train_coef > 0.0 {
                     let blen = lane.buffer.len();
-                    let cap = self.config.value_head_buffer_capacity.max(1);
+                    let per_class_cap =
+                        (self.config.value_head_buffer_capacity / 2).max(1);
                     let gamma = self.config.value_head_gamma.clamp(0.0, 0.999);
+                    let is_win = lane.sil_ep_event_count > 0;
                     if blen > 0 {
-                        let mut r_acc = 0.0f32;
+                        let mut decay = 1.0f32;
                         let mut idx = blen - 1;
                         loop {
                             let tr = lane.buffer.get(idx);
-                            if tr.reward.is_finite() {
-                                r_acc = tr.reward + gamma * r_acc;
+                            let label = if is_win { decay } else { 0.0 };
+                            let buf = if is_win {
+                                &mut self.win_buffer
+                            } else {
+                                &mut self.loss_buffer
+                            };
+                            if buf.len() >= per_class_cap {
+                                buf.pop_front();
                             }
-                            if self.value_buffer.len() >= cap {
-                                self.value_buffer.pop_front();
-                            }
-                            self.value_buffer.push_back((
+                            buf.push_back((
                                 tr.observation.clone(),
                                 tr.env_id,
-                                r_acc,
+                                label,
                             ));
+                            decay *= gamma;
                             if tr.env_boundary {
                                 break;
                             }
@@ -4534,15 +4557,16 @@ impl Agent {
             self.replay_step(rng);
         }
 
-        // --- Value-replay training step: when value-head training is
-        // on and we have enough (obs, env_id, R_to_go) samples,
-        // dispatch one wm_session forward+backward in
-        // "value-gate" mode (wm/recon off, value on). The encoder
-        // forward runs on replay obs, so the value loss backprops
-        // through encoder + value head — encoder learns value-
-        // predictive features.
+        // --- Win-classifier replay step: dispatch one wm_session
+        // forward+backward in "value-gate" mode on a BALANCED batch
+        // from win_buffer + loss_buffer. The BCE loss backprops
+        // through encoder + classifier head — encoder learns to
+        // separate win-trajectory and loss-trajectory latents (the
+        // "high-level direction in latent space"). Skipped until
+        // both buffers have data.
         if self.config.value_head_train_coef > 0.0
-            && self.value_buffer.len() >= self.lanes.len()
+            && !self.win_buffer.is_empty()
+            && !self.loss_buffer.is_empty()
         {
             self.value_replay_step(rng);
         }
@@ -4558,29 +4582,39 @@ impl Agent {
         self.step_count += 1;
     }
 
-    /// Run one value-replay training step: sample
-    /// `config.value_head_train_batch` (obs, env_id, R_to_go) tuples
-    /// uniformly from `value_buffer`, stage them into wm_session's
-    /// inputs (obs, task, value_target), flip the gates to
-    /// `(wm_gate=0, value_gate=1)`, dispatch, and read the per-call
-    /// loss. The encoder gets gradient from the value loss this way —
-    /// the encoder learns a value-predictive representation.
+    /// Run one win-classifier training step: sample a balanced batch
+    /// from `win_buffer` and `loss_buffer` (half from each), stage
+    /// them into wm_session's inputs (obs, task, value_target=label),
+    /// flip the gates to `(wm_gate=0, value_gate=1)`, dispatch, and
+    /// read the per-call BCE loss.
     ///
-    /// Batch size is clamped to `config.batch_size` because
-    /// wm_session's graph is built with that fixed batch. If
-    /// `train_batch` is larger we cycle the dispatch multiple times.
+    /// The encoder gets gradient from the BCE loss by default (the
+    /// whole point of the classifier — encoder learns to distinguish
+    /// win-trajectory latents from loss-trajectory latents). Set
+    /// `value_head_grad_to_encoder=false` to detach for ablation.
     fn value_replay_step<R: Rng>(&mut self, rng: &mut R) {
-        let buf_len = self.value_buffer.len();
         let n = self.lanes.len();
-        if buf_len < n {
+        let wlen = self.win_buffer.len();
+        let llen = self.loss_buffer.len();
+        // Need at least 1 of each class for a balanced sample. Until
+        // the first win lands, the classifier can't train.
+        if wlen == 0 || llen == 0 || (wlen + llen) < n {
             return;
         }
-        // Stage a value-replay batch into the wm_session scratches.
-        // The session's batch_size is `n` (config.batch_size), so we
-        // fill exactly n rows per dispatch.
+        // Balanced batch: half win, half loss. With n=14 → 7 win + 7 loss.
+        let n_win = n / 2;
+        let n_loss = n - n_win;
         for row in 0..n {
-            let idx = rng.random_range(0..buf_len);
-            let (obs, env_id, r_to_go) = &self.value_buffer[idx];
+            let from_win = row < n_win;
+            let (obs, env_id, label) = if from_win {
+                let i = rng.random_range(0..wlen);
+                let (o, e, l) = &self.win_buffer[i];
+                (o, e, l)
+            } else {
+                let i = rng.random_range(0..llen);
+                let (o, e, l) = &self.loss_buffer[i];
+                (o, e, l)
+            };
             let obs_dst =
                 &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
             let copy_len = obs.len().min(OBS_TOKEN_DIM);
@@ -4593,8 +4627,9 @@ impl Agent {
                 Some(emb) => task_dst.copy_from_slice(emb),
                 None => task_dst.fill(0.0),
             }
-            self.value_target_scratch_vh[row] = *r_to_go;
+            self.value_target_scratch_vh[row] = *label;
         }
+        let _ = n_loss; // silence unused-warning in debug builds
         // Action and z_target are unused in value-replay mode (their
         // loss branch is gated off by wm_gate=0) but the graph inputs
         // still need to be present — zero them out so they don't
