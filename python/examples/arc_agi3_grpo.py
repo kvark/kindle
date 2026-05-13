@@ -28,6 +28,7 @@ Defaults: K=4 forks/game, M=20 micro-steps/macro-step, total lanes
 from __future__ import annotations
 
 import argparse
+import collections
 import copy
 import sys
 import time
@@ -219,6 +220,22 @@ def main() -> int:
                         "encoder (R_to_go ≈ 0 dominates and would "
                         "collapse representations otherwise). Set 1 to "
                         "experiment with encoder shaping.")
+    parser.add_argument("--bc-planner-synthetic-r", type=float, default=0.0,
+                        help="BC-from-planner: synthetic R_to_go pushed "
+                        "into sil_buffer for each planner-chosen first "
+                        "action. Policy learns to clone planner. Closes "
+                        "policy-planner gap so the executor matches the "
+                        "discoverer. 0.3-1.0 recommended. 0 = off.")
+    parser.add_argument("--win-trail-cap", type=int, default=0,
+                        help="Full-trajectory archive: per-lane env-state "
+                        "snapshot trail size. On extrinsic-event step, "
+                        "the trail is flushed to the archive — every "
+                        "state along the winning trajectory becomes a "
+                        "restorable frontier. 0 = off (default).")
+    parser.add_argument("--win-trail-stride", type=int, default=5,
+                        help="Micro-step interval between trail "
+                        "snapshots. Smaller = denser trail (more env "
+                        "deepcopies, more memory). Default 5.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -328,6 +345,7 @@ def main() -> int:
         value_head_train_batch=args.value_head_train_batch,
         goal_states_her_prob=args.goal_states_her_prob,
         value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
+        bc_planner_synthetic_r=args.bc_planner_synthetic_r,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )
@@ -454,6 +472,20 @@ def main() -> int:
     archive_uses = 0  # diagnostic: how many times we restored from archive
     archive_adds = 0  # diagnostic: how many entries added
 
+    # #2 Full-trajectory archive: per-lane rolling trail of env snapshots
+    # captured at micro-step granularity. When an extrinsic event (level
+    # event) fires, the whole trail flushes into the per-game archive —
+    # so EVERY state along the winning trajectory becomes a restorable
+    # frontier, not just the macro-sync snapshot. Trail is cleared on
+    # episode boundary (without an event). Disabled when --win-trail-cap=0.
+    win_trail_on = args.win_trail_cap > 0
+    win_trails = (
+        [collections.deque(maxlen=args.win_trail_cap) for _ in range(n_lanes)]
+        if win_trail_on else None
+    )
+    trail_step_counter = [0] * n_lanes
+    trail_archive_adds = 0  # diagnostic
+
     t0 = time.time()
     last_log_t = t0
     syncs = 0
@@ -505,6 +537,8 @@ def main() -> int:
                         last_levels[i] = int(obs_list[i].levels_completed)
                         ep_step[i] = 0
                     agent.mark_boundary(i)
+                    if win_trail_on:
+                        win_trails[i].clear()
 
             pooled = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32))
                       for o in obs_list]
@@ -532,6 +566,22 @@ def main() -> int:
             new_pooled = []
             level_deltas = [0] * n_lanes
             for i in range(n_lanes):
+                # #2 Trail snapshot: capture state BEFORE the step. If
+                # this step turns out to be a winning one, the trail
+                # holds the lead-up states for archive flush below.
+                if win_trail_on and trail_step_counter[i] % args.win_trail_stride == 0:
+                    pre_obs = obs_list[i]
+                    pre_state = pre_obs.state.name if hasattr(pre_obs.state, "name") else str(pre_obs.state)
+                    if pre_state not in ("GAME_OVER", "WIN", "NOT_PLAYED"):
+                        win_trails[i].append({
+                            "env": copy.deepcopy(envs[i]),
+                            "obs": pre_obs,
+                            "levels": last_levels[i],
+                            "ep_step": ep_step[i],
+                            "avail_actions": list(avail_actions[i]),
+                        })
+                trail_step_counter[i] += 1
+
                 ga, ad = map_action(int(actions[i]), i)
                 try:
                     obs_new = envs[i].step(ga, data=ad)
@@ -539,6 +589,8 @@ def main() -> int:
                     obs_new = envs[i].reset()
                     avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
                     agent.mark_boundary(i)
+                    if win_trail_on:
+                        win_trails[i].clear()
                 new_obs_list.append(obs_new)
                 if list(obs_new.available_actions):
                     avail_actions[i] = list(obs_new.available_actions)
@@ -548,6 +600,32 @@ def main() -> int:
                 if d > 0:
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
+                    # #2 Trail flush: a winning step just happened.
+                    # Push the entire trail into the per-game archive
+                    # with a strong novelty score (1500 + macro_return)
+                    # so these entries rank above ordinary frontier
+                    # snapshots and survive eviction longer.
+                    if win_trail_on and args.archive_cap > 0:
+                        g_idx = i // K
+                        gar = archive[g_idx]
+                        flush_score = 1500.0 + float(d) * 1000.0
+                        for entry in win_trails[i]:
+                            e = dict(entry)
+                            e["novelty"] = flush_score
+                            if len(gar) < args.archive_cap:
+                                gar.append(e)
+                                archive_adds += 1
+                                trail_archive_adds += 1
+                            else:
+                                worst_idx = min(
+                                    range(len(gar)),
+                                    key=lambda j: gar[j]["novelty"],
+                                )
+                                if e["novelty"] > gar[worst_idx]["novelty"]:
+                                    gar[worst_idx] = e
+                                    archive_adds += 1
+                                    trail_archive_adds += 1
+                        win_trails[i].clear()
                 last_levels[i] = new_levels
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
@@ -714,9 +792,10 @@ def main() -> int:
             archive_info = ""
             if args.archive_cap > 0:
                 total_archive = sum(len(a) for a in archive)
+                trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
                 archive_info = (
                     f" arc={total_archive}/{args.archive_cap * n_games}"
-                    f"({archive_uses}u,{archive_adds}a)"
+                    f"({archive_uses}u,{archive_adds}a{trail_tag})"
                 )
             print(
                 f"macro={macro_step:>5} micro_total={macro_step * M:>6} "
