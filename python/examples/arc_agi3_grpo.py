@@ -236,6 +236,24 @@ def main() -> int:
                         help="Micro-step interval between trail "
                         "snapshots. Smaller = denser trail (more env "
                         "deepcopies, more memory). Default 5.")
+    parser.add_argument("--eval-mode", type=int, default=0,
+                        help="When 1, configure for inference: heavy "
+                        "archive use, near-deterministic planner "
+                        "policy, disable all auxiliary training "
+                        "(SIL, BC pushes, value-head training, win-"
+                        "trail snapshots, classifier replay). Keeps "
+                        "planner + value-head consumption + encoder "
+                        "forward, so the agent still acts via the "
+                        "trained policy & planner. Pair with --load-"
+                        "state to evaluate a trained checkpoint.")
+    parser.add_argument("--eval-archive-reset-prob", type=float, default=0.95,
+                        help="Eval-mode archive_reset_prob override. "
+                        "0.95 = almost always start from a known "
+                        "frontier (winning route). Default 0.95.")
+    parser.add_argument("--eval-policy-temperature", type=float, default=0.05,
+                        help="Eval-mode planner_policy_temperature "
+                        "override. Lower = closer to argmax. Default "
+                        "0.05.")
     parser.add_argument("--visit-count-proj-dim", type=int, default=0,
                         help="Random-projection dim for visit-count hashing. "
                         "When >0, projects the latent through a fixed random "
@@ -254,6 +272,24 @@ def main() -> int:
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
     args = parser.parse_args()
+
+    if args.eval_mode:
+        # Eval-mode overrides: heavy archive use, near-deterministic
+        # policy, all auxiliary training off. The agent keeps its
+        # trained policy + planner + value-head consumption but does
+        # no more SIL / BC / classifier / trail updates.
+        args.archive_reset_prob = args.eval_archive_reset_prob
+        args.planner_policy_temperature = args.eval_policy_temperature
+        args.use_sil = 0
+        args.bc_planner_synthetic_r = 0.0
+        args.win_trail_cap = 0
+        args.value_head_train_coef = 0.0
+        args.goal_states_her_prob = 0.0
+        print(
+            f"[eval-mode] archive_reset_prob={args.archive_reset_prob} "
+            f"planner_policy_temperature={args.planner_policy_temperature} "
+            f"use_sil=0 bc=0 win_trail=0 value_train=0"
+        )
 
     arcade = Arcade()
     all_envs = arcade.get_environments()
