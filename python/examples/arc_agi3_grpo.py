@@ -622,6 +622,12 @@ def main() -> int:
                 try:
                     obs_new = envs[i].step(ga, data=ad)
                 except Exception:
+                    obs_new = None
+                # local_wrapper.step() may catch internal IndexError /
+                # AttributeError from the game module and return None
+                # (or some games return None to signal an unrecoverable
+                # internal state). Treat that as a forced reset.
+                if obs_new is None:
                     obs_new = envs[i].reset()
                     avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
                     agent.mark_boundary(i)
