@@ -9,15 +9,18 @@
 #   scripts/cgrun.sh /tmp/sweep_foo/run.sh
 #   CGRUN_MEMORY_MAX=10G scripts/cgrun.sh /tmp/sweep_bar/run.sh
 #
-# Defaults: MemoryMax=8G, MemoryHigh=7G, no swap. Leaves ~4GB
-# headroom for the system on a 12GB box. Adjust via env vars.
+# Defaults: MemoryMax=10G, swap allowed up to 2G. No soft throttle
+# (MemoryHigh) — soft throttle causes the process to stall in reclaim
+# for hours before finally hitting MemoryMax. With just MemoryMax it
+# either runs fine or OOMs immediately. Verified failure mode
+# (2026-05-14 retry): MemoryHigh=7G stalled COLDNEW python for 3h
+# until OOM-kill, log never wrote past init.
 #
 # Requires systemd user manager (default on most Linux distros).
 set -u
-MAX="${CGRUN_MEMORY_MAX:-8G}"
-HIGH="${CGRUN_MEMORY_HIGH:-7G}"
+MAX="${CGRUN_MEMORY_MAX:-10G}"
+SWAP="${CGRUN_MEMORY_SWAP_MAX:-2G}"
 exec systemd-run --user --scope \
     -p "MemoryMax=$MAX" \
-    -p "MemoryHigh=$HIGH" \
-    -p "MemorySwapMax=0" \
+    -p "MemorySwapMax=$SWAP" \
     bash "$@"
