@@ -2012,18 +2012,20 @@ pub struct Agent {
     /// planner only reads z_next (output index 0). Mirrors
     /// `planner_value_alpha > 0 && planner_horizon > 0`.
     wm_planner_has_value_head: bool,
-    /// Win-trajectory replay buffer: `(obs_token, env_id, label)`,
-    /// where label = γ^(T-t) — closer-to-terminal-of-winning-episode
-    /// → label closer to 1. Populated at every win-episode boundary.
-    /// FIFO bounded by `value_head_buffer_capacity` (each buffer is
-    /// half of that cap, so balanced sampling sees equal totals).
-    win_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
-    /// Loss-trajectory replay buffer. All transitions from
-    /// zero-event-episodes go here with label = 0. Balanced against
-    /// `win_buffer` at replay time so the classifier doesn't degenerate
-    /// to "always predict 0" under the natural class imbalance (~99%
-    /// of episodes are losses).
-    loss_buffer: std::collections::VecDeque<(Vec<f32>, u32, f32)>,
+    /// Win-trajectory replay buffer, GAME-STRATIFIED by env_id.
+    /// Per-env_id queue. `(obs_token, env_id, label)`, label =
+    /// γ^(T-t) from terminal. Per-env cap is
+    /// `value_head_buffer_capacity / 2` (each env can hold up to
+    /// half the total class budget — keeps individual fast games
+    /// from monopolizing the buffer in joint training).
+    ///
+    /// Sampled by round-robin across env_ids in `value_replay_step`
+    /// so each game contributes equally to the classifier's
+    /// gradient, regardless of which game produces most wins.
+    win_buffer: hashbrown::HashMap<u32, std::collections::VecDeque<(Vec<f32>, u32, f32)>>,
+    /// Loss-trajectory replay buffer, GAME-STRATIFIED by env_id.
+    /// Same structure as `win_buffer`; label always 0.
+    loss_buffer: hashbrown::HashMap<u32, std::collections::VecDeque<(Vec<f32>, u32, f32)>>,
     /// Scratch for wm_session's `value_target` input `[batch_size, 1]`.
     /// Set to R_to_go for value-replay calls, zeros otherwise (gated
     /// off by `value_gate=0`).
@@ -3302,12 +3304,8 @@ impl Agent {
             sil_last_active_rows: 0,
             sil_last_param_change: 0.0,
             wm_planner_has_value_head,
-            win_buffer: std::collections::VecDeque::with_capacity(
-                (config.value_head_buffer_capacity / 2).max(1),
-            ),
-            loss_buffer: std::collections::VecDeque::with_capacity(
-                (config.value_head_buffer_capacity / 2).max(1),
-            ),
+            win_buffer: hashbrown::HashMap::new(),
+            loss_buffer: hashbrown::HashMap::new(),
             value_target_scratch_vh,
             wm_gate_scalar,
             value_gate_scalar,
@@ -4203,10 +4201,13 @@ impl Agent {
                 // axis instead of collapsing to "predict 0 always."
                 if self.config.value_head_train_coef > 0.0 {
                     let blen = lane.buffer.len();
-                    let per_class_cap =
+                    // Per-env cap: half of total budget. Each env gets
+                    // its own queue under that cap.
+                    let per_env_cap =
                         (self.config.value_head_buffer_capacity / 2).max(1);
                     let gamma = self.config.value_head_gamma.clamp(0.0, 0.999);
                     let is_win = lane.sil_ep_event_count > 0;
+                    let env_id = lane.adapter.id();
                     if blen > 0 {
                         let mut decay = 1.0f32;
                         let mut idx = blen - 1;
@@ -4214,16 +4215,20 @@ impl Agent {
                             let tr = lane.buffer.get(idx);
                             let label = if is_win { decay } else { 0.0 };
                             let buf = if is_win {
-                                &mut self.win_buffer
+                                self.win_buffer
+                                    .entry(env_id)
+                                    .or_insert_with(std::collections::VecDeque::new)
                             } else {
-                                &mut self.loss_buffer
+                                self.loss_buffer
+                                    .entry(env_id)
+                                    .or_insert_with(std::collections::VecDeque::new)
                             };
-                            if buf.len() >= per_class_cap {
+                            if buf.len() >= per_env_cap {
                                 buf.pop_front();
                             }
                             buf.push_back((
                                 tr.observation.clone(),
-                                tr.env_id,
+                                env_id,
                                 label,
                             ));
                             decay *= gamma;
@@ -4617,8 +4622,8 @@ impl Agent {
         // "high-level direction in latent space"). Skipped until
         // both buffers have data.
         if self.config.value_head_train_coef > 0.0
-            && !self.win_buffer.is_empty()
-            && !self.loss_buffer.is_empty()
+            && self.win_buffer.values().any(|q| !q.is_empty())
+            && self.loss_buffer.values().any(|q| !q.is_empty())
         {
             self.value_replay_step(rng);
         }
@@ -4646,42 +4651,58 @@ impl Agent {
     /// `value_head_grad_to_encoder=false` to detach for ablation.
     fn value_replay_step<R: Rng>(&mut self, rng: &mut R) {
         let n = self.lanes.len();
-        let wlen = self.win_buffer.len();
-        let llen = self.loss_buffer.len();
-        // Need at least 1 of each class for a balanced sample. Until
-        // the first win lands, the classifier can't train.
-        if wlen == 0 || llen == 0 || (wlen + llen) < n {
+        // Collect env_ids with non-empty win and loss queues. Need
+        // at least one of each to train balanced batches.
+        let win_keys: Vec<u32> = self
+            .win_buffer
+            .iter()
+            .filter(|(_, q)| !q.is_empty())
+            .map(|(k, _)| *k)
+            .collect();
+        let loss_keys: Vec<u32> = self
+            .loss_buffer
+            .iter()
+            .filter(|(_, q)| !q.is_empty())
+            .map(|(k, _)| *k)
+            .collect();
+        if win_keys.is_empty() || loss_keys.is_empty() {
             return;
         }
-        // Balanced batch: half win, half loss. With n=14 → 7 win + 7 loss.
+        // Balanced batch: half win, half loss. Round-robin across
+        // env_ids within each class so games contribute equally
+        // regardless of how many of total wins they own. Cross-game
+        // classifier bias (2026-05-15 finding) is what this fixes.
         let n_win = n / 2;
-        let n_loss = n - n_win;
         for row in 0..n {
             let from_win = row < n_win;
-            let (obs, env_id, label) = if from_win {
-                let i = rng.random_range(0..wlen);
-                let (o, e, l) = &self.win_buffer[i];
-                (o, e, l)
+            let (env_id, copy_obs, copy_label) = if from_win {
+                let env_id = win_keys[row % win_keys.len()];
+                let q = &self.win_buffer[&env_id];
+                let i = rng.random_range(0..q.len());
+                let entry = &q[i];
+                (env_id, entry.0.clone(), entry.2)
             } else {
-                let i = rng.random_range(0..llen);
-                let (o, e, l) = &self.loss_buffer[i];
-                (o, e, l)
+                let lossi = row - n_win;
+                let env_id = loss_keys[lossi % loss_keys.len()];
+                let q = &self.loss_buffer[&env_id];
+                let i = rng.random_range(0..q.len());
+                let entry = &q[i];
+                (env_id, entry.0.clone(), entry.2)
             };
             let obs_dst =
                 &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
-            let copy_len = obs.len().min(OBS_TOKEN_DIM);
-            obs_dst[..copy_len].copy_from_slice(&obs[..copy_len]);
+            let copy_len = copy_obs.len().min(OBS_TOKEN_DIM);
+            obs_dst[..copy_len].copy_from_slice(&copy_obs[..copy_len]);
             if copy_len < OBS_TOKEN_DIM {
                 obs_dst[copy_len..].fill(0.0);
             }
             let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
-            match self.task_embeddings.get(env_id) {
+            match self.task_embeddings.get(&env_id) {
                 Some(emb) => task_dst.copy_from_slice(emb),
                 None => task_dst.fill(0.0),
             }
-            self.value_target_scratch_vh[row] = *label;
+            self.value_target_scratch_vh[row] = copy_label;
         }
-        let _ = n_loss; // silence unused-warning in debug builds
         // Action and z_target are unused in value-replay mode (their
         // loss branch is gated off by wm_gate=0) but the graph inputs
         // still need to be present — zero them out so they don't
