@@ -518,6 +518,7 @@ def main() -> int:
     # Per-lane state.
     last_levels = [int(o.levels_completed) for o in obs_list]
     levels_events = [0] * n_lanes
+    max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
     ep_step = [0] * n_lanes
     ep_count = [0] * n_lanes
 
@@ -562,6 +563,13 @@ def main() -> int:
                    or args.progress_diversity_coef > 0.0
                    or args.progress_empowerment_coef > 0.0)
     last_empowerment = [0.0] * n_lanes
+    # Per-env (game) running mean of empowerment so values are normalized
+    # WITHIN each game before being used as reward. Without this,
+    # responsive games (sp80) hog empowerment magnitude and slower
+    # games (tu93) get effectively zero reward — see 2026-05-15
+    # cross-game encoder bias finding.
+    emp_per_game_mean = {}  # env_id -> running mean
+    emp_per_game_ema = 0.05  # EMA factor
     pwin = max(1, args.progress_persistence_window)
     pgs = max(2, args.progress_grid_size)  # coarse grid side
     ep_start_cells = [None] * n_lanes      # 2D coarse grids
@@ -667,9 +675,26 @@ def main() -> int:
             if args.planner_horizon > 0:
                 agent.plan_and_queue(NUM_ACTIONS)
                 if progress_on and args.progress_empowerment_coef > 0.0:
-                    # Refresh per-lane empowerment. Already clamped to
-                    # [0, 1] kindle-side; use directly with small coef.
-                    last_empowerment = agent.empowerment()
+                    raw_emp = agent.empowerment()
+                    # Per-game normalization: divide each lane's
+                    # empowerment by the EMA of its game's recent
+                    # values. Ratio 1.0 = "average for this game".
+                    # Result is comparable across games regardless of
+                    # the game's intrinsic action-effect magnitude.
+                    last_empowerment = [0.0] * n_lanes
+                    for i, e in enumerate(raw_emp):
+                        if e <= 0:
+                            continue
+                        env_id = env_infos[i // K].game_id
+                        prev = emp_per_game_mean.get(env_id, e)
+                        new_mean = (1.0 - emp_per_game_ema) * prev + emp_per_game_ema * e
+                        emp_per_game_mean[env_id] = new_mean
+                        # Normalize, clip ratio to [0, 3] so a single
+                        # outlier can't dominate.
+                        if new_mean > 1e-8:
+                            last_empowerment[i] = min(e / new_mean, 3.0)
+                        else:
+                            last_empowerment[i] = 0.0
             actions = agent.act(pooled)
 
             new_obs_list = []
@@ -717,6 +742,8 @@ def main() -> int:
                 if d > 0:
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
+                    if new_levels > max_levels_seen[i]:
+                        max_levels_seen[i] = new_levels
                     # #2 Trail flush: a winning step just happened.
                     # Push the entire trail into the per-game archive
                     # with a strong novelty score (1500 + macro_return)
@@ -976,11 +1003,11 @@ def main() -> int:
     for g_idx, e in enumerate(env_infos):
         ev = sum(levels_events[g_idx * K + k] for k in range(K))
         eps = sum(ep_count[g_idx * K + k] for k in range(K))
-        # We don't track max_lvl per game in this harness; could.
+        max_lvl = max(max_levels_seen[g_idx * K + k] for k in range(K))
         if ev > 0:
             games_with_evt += 1
         grand_evt += ev
-        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {'?':>7} {win_levels_per[g_idx * K]:>4}")
+        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {max_lvl:>7} {win_levels_per[g_idx * K]:>4}")
     print()
     print(f"games with ≥1 event: {games_with_evt}/{n_games}")
     print(f"total events (across all forks): {grand_evt}")
