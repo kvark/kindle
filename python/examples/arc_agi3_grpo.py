@@ -236,6 +236,28 @@ def main() -> int:
                         help="Micro-step interval between trail "
                         "snapshots. Smaller = denser trail (more env "
                         "deepcopies, more memory). Default 5.")
+    parser.add_argument("--progress-change-coef", type=float, default=0.0,
+                        help="Term 1: persistent configurational delta "
+                        "coefficient. Per-step reward = coef * (number "
+                        "of coarse cells that have stably differed from "
+                        "ep-start across recent persistence window). "
+                        "Dense gradient for 'I caused real change.' "
+                        "0 (default) = off. Typical 0.001-0.01.")
+    parser.add_argument("--progress-diversity-coef", type=float, default=0.0,
+                        help="Term 2: per-episode entropy growth "
+                        "coefficient. Per-step reward = coef when the "
+                        "current coarse-grid hash is new to this "
+                        "episode, else 0. Rewards trajectory diversity "
+                        "without lifetime saturation. 0 = off. "
+                        "Typical 0.01-0.05.")
+    parser.add_argument("--progress-persistence-window", type=int, default=5,
+                        help="How many recent steps a cell must "
+                        "persistently differ to count for Term 1. "
+                        "Default 5. Filters transient UI animation.")
+    parser.add_argument("--progress-grid-size", type=int, default=8,
+                        help="Coarse-grid side length for progress "
+                        "signals (8 = 64×64 frame → 8×8 cells). "
+                        "Cell-level diffs filter pixel noise.")
     parser.add_argument("--eval-mode", type=int, default=0,
                         help="When 1, configure for inference: heavy "
                         "archive use, near-deterministic planner "
@@ -522,6 +544,32 @@ def main() -> int:
     trail_step_counter = [0] * n_lanes
     trail_archive_adds = 0  # diagnostic
 
+    # Intrinsic progress signals (Term 1 + Term 2 of the cell-level
+    # "human-style progress" framework). Term 1: persistent
+    # configurational delta from episode-start. Term 2: per-episode
+    # coarse-state entropy growth. Both reset on episode boundary.
+    progress_on = (args.progress_change_coef > 0.0
+                   or args.progress_diversity_coef > 0.0)
+    pwin = max(1, args.progress_persistence_window)
+    pgs = max(2, args.progress_grid_size)  # coarse grid side
+    ep_start_cells = [None] * n_lanes      # 2D coarse grids
+    recent_cells = [collections.deque(maxlen=pwin) for _ in range(n_lanes)]
+    ep_unique_cells = [set() for _ in range(n_lanes)]
+    progress_total = 0.0  # diagnostic: cumulative progress reward
+
+    def coarse_grid_from_frame(frame_2d, side):
+        # frame_2d: (H, W) numpy array (typically 64×64).
+        # Average-pool into (side, side) then round to int.
+        H, W = frame_2d.shape
+        bh, bw = H // side, W // side
+        if bh == 0 or bw == 0:
+            return None
+        h_used = bh * side
+        w_used = bw * side
+        view = frame_2d[:h_used, :w_used].reshape(side, bh, side, bw)
+        cells = view.mean(axis=(1, 3))
+        return np.round(cells).astype(np.int32)
+
     t0 = time.time()
     last_log_t = t0
     syncs = 0
@@ -575,6 +623,17 @@ def main() -> int:
                     agent.mark_boundary(i)
                     if win_trail_on:
                         win_trails[i].clear()
+                    if progress_on:
+                        if obs_list[i].frame:
+                            frm = np.asarray(obs_list[i].frame[0], dtype=np.float32)
+                            ep_start_cells[i] = coarse_grid_from_frame(frm, pgs)
+                            ep_unique_cells[i] = set()
+                            if ep_start_cells[i] is not None:
+                                ep_unique_cells[i].add(ep_start_cells[i].tobytes())
+                        else:
+                            ep_start_cells[i] = None
+                            ep_unique_cells[i] = set()
+                        recent_cells[i].clear()
 
             pooled = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32))
                       for o in obs_list]
@@ -728,6 +787,45 @@ def main() -> int:
             if level_event or novel_event:
                 agent.set_extrinsic_reward(ext_vec)
 
+            # Intrinsic progress signals (Term 1 + Term 2).
+            if progress_on:
+                prog_vec = [0.0] * n_lanes
+                for i in range(n_lanes):
+                    if not new_obs_list[i].frame:
+                        continue
+                    if ep_start_cells[i] is None:
+                        # Lazy initialize from first observed frame.
+                        frm = np.asarray(new_obs_list[i].frame[0], dtype=np.float32)
+                        ep_start_cells[i] = coarse_grid_from_frame(frm, pgs)
+                        if ep_start_cells[i] is not None:
+                            ep_unique_cells[i].add(ep_start_cells[i].tobytes())
+                        continue
+                    frm = np.asarray(new_obs_list[i].frame[0], dtype=np.float32)
+                    g = coarse_grid_from_frame(frm, pgs)
+                    if g is None:
+                        continue
+                    # Term 2: per-episode entropy growth — reward
+                    # whenever the current coarse-hash is new in this
+                    # episode.
+                    if args.progress_diversity_coef > 0.0:
+                        gh = g.tobytes()
+                        if gh not in ep_unique_cells[i]:
+                            ep_unique_cells[i].add(gh)
+                            prog_vec[i] += args.progress_diversity_coef
+                    # Term 1: persistent configurational delta.
+                    # A cell counts if it has been different from
+                    # ep_start across the entire recent window.
+                    if args.progress_change_coef > 0.0:
+                        recent_cells[i].append(g)
+                        if len(recent_cells[i]) == pwin and ep_start_cells[i] is not None:
+                            persistent = np.ones_like(ep_start_cells[i], dtype=bool)
+                            for rc in recent_cells[i]:
+                                persistent &= (rc != ep_start_cells[i])
+                            cnt = int(persistent.sum())
+                            prog_vec[i] += args.progress_change_coef * cnt
+                    progress_total += prog_vec[i]
+                agent.set_intrinsic_progress(prog_vec)
+
             agent.observe(new_pooled, list(actions), homeostatic=homeo_list)
             obs_list = new_obs_list
 
@@ -835,9 +933,10 @@ def main() -> int:
             if args.archive_cap > 0:
                 total_archive = sum(len(a) for a in archive)
                 trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
+                prog_tag = f" prog={progress_total:.1f}" if progress_on else ""
                 archive_info = (
                     f" arc={total_archive}/{args.archive_cap * n_games}"
-                    f"({archive_uses}u,{archive_adds}a{trail_tag})"
+                    f"({archive_uses}u,{archive_adds}a{trail_tag}){prog_tag}"
                 )
             print(
                 f"macro={macro_step:>5} micro_total={macro_step * M:>6} "

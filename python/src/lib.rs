@@ -1443,6 +1443,27 @@ impl PyBatchAgent {
         Ok(())
     }
 
+    /// Set per-lane intrinsic progress reward (e.g. configurational
+    /// delta + per-episode entropy). Same shape contract as
+    /// `set_extrinsic_reward` but does NOT count toward
+    /// `sil_ep_event_count` — kept separate so the win-classifier's
+    /// is_win label stays anchored on real extrinsic events.
+    fn set_intrinsic_progress(&mut self, rewards: &Bound<'_, PyAny>) -> PyResult<()> {
+        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(rewards) {
+            let py = rewards.py();
+            if let Some(slice) = buf.as_slice(py) {
+                let ptr = slice.as_ptr() as *const f32;
+                let len = slice.len();
+                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+                self.agent.set_intrinsic_progress(slice);
+                return Ok(());
+            }
+        }
+        let v: Vec<f32> = rewards.extract()?;
+        self.agent.set_intrinsic_progress(&v);
+        Ok(())
+    }
+
     /// Update the base learning rate at runtime. Picked up by every
     /// per-step `set_learning_rate` across all sessions on the next
     /// `observe()`. Use case: drop LR after sustained-solve detected,

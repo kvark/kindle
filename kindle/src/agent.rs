@@ -1946,6 +1946,16 @@ pub struct Agent {
     /// previous step's value. Only consumed when
     /// `extrinsic_reward_alpha > 0`.
     extrinsic_reward: Vec<f32>,
+    /// Per-lane intrinsic progress reward, set via
+    /// `set_intrinsic_progress`. Adds to the per-step reward sum
+    /// but does NOT increment `sil_ep_event_count` — the
+    /// win-classifier's is_win label still requires a real
+    /// extrinsic event. Designed for dense progress signals like
+    /// "persistent configurational change" and "per-episode
+    /// coarse-state entropy growth." Scaled by
+    /// `extrinsic_reward_alpha` so harness can use [0, 1]
+    /// magnitudes. Cleared each observe.
+    intrinsic_progress_reward: Vec<f32>,
     /// Per-env win-state archive. Each entry is the lane's latent at the
     /// moment an extrinsic-reward event fired (level completion). FIFO
     /// bounded by `config.goal_states_cap`. Consumed by `plan_and_queue_*`
@@ -3269,6 +3279,7 @@ impl Agent {
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
             planner_calls_since_refresh: 0,
             extrinsic_reward: vec![0.0; n],
+            intrinsic_progress_reward: vec![0.0; n],
             goal_states: hashbrown::HashMap::new(),
             action_masks: vec![1.0; n * MAX_ACTION_DIM],
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
@@ -4435,6 +4446,23 @@ impl Agent {
             let ext_reward = ext_alpha * self.extrinsic_reward[i];
             self.extrinsic_reward[i] = 0.0;
 
+            // Intrinsic progress reward. Pre-alpha value fed by the
+            // harness via `set_intrinsic_progress`. Adds to the
+            // per-step reward sum (consumed by SIL accumulator and
+            // policy training) BUT does NOT increment
+            // `sil_ep_event_count` — that's reserved for real
+            // extrinsic events. This keeps the win-classifier's
+            // is_win label clean: a "win episode" still means an
+            // episode with a real event, not just one with high
+            // intermediate progress.
+            //
+            // Scaled by `ext_alpha` so the harness can set values in
+            // [0, 1] just like extrinsic. Typical use: dense
+            // configurational-progress signal from cell-level diffs
+            // and per-episode entropy, magnitudes ~0.001-0.01.
+            let progress_reward = ext_alpha * self.intrinsic_progress_reward[i];
+            self.intrinsic_progress_reward[i] = 0.0;
+
             let reward = reward_pre_m6
                 + m6_bonus
                 + m7_reward
@@ -4442,7 +4470,8 @@ impl Agent {
                 + diayn_reward
                 + dg_reward
                 + xeps_reward
-                + ext_reward;
+                + ext_reward
+                + progress_reward;
 
             // Accumulate the FULL per-step reward into the SIL episode
             // tracker. Distinct from outcome_ep_return (intrinsic only)
@@ -4806,6 +4835,30 @@ impl Agent {
             rewards.len()
         );
         self.extrinsic_reward.copy_from_slice(rewards);
+    }
+
+    /// Per-lane intrinsic progress reward for the NEXT `observe()`.
+    /// Adds to per-step reward sum like extrinsic, but does NOT
+    /// increment `sil_ep_event_count` — the win-classifier's is_win
+    /// label stays gated on real extrinsic events. Use for dense
+    /// progress signals (persistent configurational change, per-
+    /// episode entropy growth, empowerment) that should bias
+    /// exploration without polluting "did this episode win?".
+    /// Scaled by `extrinsic_reward_alpha` so values in [0, 1]
+    /// give comparable per-step magnitudes to extrinsic. Cleared
+    /// inside observe after consumption.
+    pub fn set_intrinsic_progress(&mut self, rewards: &[f32]) {
+        if self.config.extrinsic_reward_alpha == 0.0 {
+            return;
+        }
+        assert_eq!(
+            rewards.len(),
+            self.intrinsic_progress_reward.len(),
+            "set_intrinsic_progress: expected {} rewards, got {}",
+            self.intrinsic_progress_reward.len(),
+            rewards.len()
+        );
+        self.intrinsic_progress_reward.copy_from_slice(rewards);
     }
 
     /// Mutate the base learning rate at runtime. Picked up by every
