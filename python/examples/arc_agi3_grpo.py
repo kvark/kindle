@@ -258,6 +258,14 @@ def main() -> int:
                         help="Coarse-grid side length for progress "
                         "signals (8 = 64×64 frame → 8×8 cells). "
                         "Cell-level diffs filter pixel noise.")
+    parser.add_argument("--progress-empowerment-coef", type=float, default=0.0,
+                        help="Term 3: per-lane empowerment from "
+                        "planner rollouts (cross-sample variance of "
+                        "step-0 z_next). High = different first "
+                        "actions diverge state. Updated at planner "
+                        "cadence; spread across following N micro "
+                        "until next planner call. Normalized to "
+                        "median-of-batch before scaling. 0 = off.")
     parser.add_argument("--eval-mode", type=int, default=0,
                         help="When 1, configure for inference: heavy "
                         "archive use, near-deterministic planner "
@@ -544,12 +552,16 @@ def main() -> int:
     trail_step_counter = [0] * n_lanes
     trail_archive_adds = 0  # diagnostic
 
-    # Intrinsic progress signals (Term 1 + Term 2 of the cell-level
-    # "human-style progress" framework). Term 1: persistent
-    # configurational delta from episode-start. Term 2: per-episode
-    # coarse-state entropy growth. Both reset on episode boundary.
+    # Intrinsic progress signals (Term 1 + Term 2 + Term 3).
+    # Term 1: persistent configurational delta from episode-start.
+    # Term 2: per-episode coarse-state entropy growth.
+    # Term 3: planner-rollout empowerment.
+    # All reset on episode boundary except empowerment (updated each
+    # planner call, lives until the next).
     progress_on = (args.progress_change_coef > 0.0
-                   or args.progress_diversity_coef > 0.0)
+                   or args.progress_diversity_coef > 0.0
+                   or args.progress_empowerment_coef > 0.0)
+    last_empowerment = [0.0] * n_lanes
     pwin = max(1, args.progress_persistence_window)
     pgs = max(2, args.progress_grid_size)  # coarse grid side
     ep_start_cells = [None] * n_lanes      # 2D coarse grids
@@ -654,6 +666,14 @@ def main() -> int:
             # the queued action instead of sampling from the policy.
             if args.planner_horizon > 0:
                 agent.plan_and_queue(NUM_ACTIONS)
+                if progress_on and args.progress_empowerment_coef > 0.0:
+                    # Refresh per-lane empowerment estimate. Values are
+                    # variance-of-z_next; normalize by batch median so
+                    # the coefficient is scale-invariant across games.
+                    emp = agent.empowerment()
+                    if emp:
+                        med = float(np.median([e for e in emp if e > 0]) or 1e-6)
+                        last_empowerment = [e / med for e in emp]
             actions = agent.act(pooled)
 
             new_obs_list = []
@@ -823,6 +843,9 @@ def main() -> int:
                                 persistent &= (rc != ep_start_cells[i])
                             cnt = int(persistent.sum())
                             prog_vec[i] += args.progress_change_coef * cnt
+                    # Term 3: empowerment (refreshed each planner call).
+                    if args.progress_empowerment_coef > 0.0:
+                        prog_vec[i] += args.progress_empowerment_coef * last_empowerment[i]
                     progress_total += prog_vec[i]
                 agent.set_intrinsic_progress(prog_vec)
 
