@@ -7379,10 +7379,18 @@ impl Agent {
                 let off = row * ld;
                 for d in 0..ld {
                     let v = self.planner_traj_scratch[off + d] - mean[d];
-                    var += v * v;
+                    if v.is_finite() {
+                        var += v * v;
+                    }
                 }
             }
-            self.last_empowerment[lane_idx] = var / m_f / (ld as f32);
+            let raw = var / m_f / (ld as f32);
+            // Clamp to [0, 1] — wm_planner_session is forward-only
+            // and doesn't have the wm_session's latent clamp, so a
+            // misbehaving WM can produce inf/large variance. Cap so
+            // the harness doesn't see infinities.
+            self.last_empowerment[lane_idx] =
+                if raw.is_finite() { raw.clamp(0.0, 1.0) } else { 0.0 };
         }
 
         // Score each row by sum-of-novelty over its trajectory.
