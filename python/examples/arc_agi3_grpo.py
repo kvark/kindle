@@ -667,13 +667,9 @@ def main() -> int:
             if args.planner_horizon > 0:
                 agent.plan_and_queue(NUM_ACTIONS)
                 if progress_on and args.progress_empowerment_coef > 0.0:
-                    # Refresh per-lane empowerment estimate. Values are
-                    # variance-of-z_next; normalize by batch median so
-                    # the coefficient is scale-invariant across games.
-                    emp = agent.empowerment()
-                    if emp:
-                        med = float(np.median([e for e in emp if e > 0]) or 1e-6)
-                        last_empowerment = [e / med for e in emp]
+                    # Refresh per-lane empowerment. Already clamped to
+                    # [0, 1] kindle-side; use directly with small coef.
+                    last_empowerment = agent.empowerment()
             actions = agent.act(pooled)
 
             new_obs_list = []
