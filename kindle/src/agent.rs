@@ -1956,6 +1956,17 @@ pub struct Agent {
     /// `extrinsic_reward_alpha` so harness can use [0, 1]
     /// magnitudes. Cleared each observe.
     intrinsic_progress_reward: Vec<f32>,
+    /// Per-lane empowerment estimate from the most recent
+    /// `plan_and_queue_gpu` call. Defined as the mean across latent
+    /// dims of the cross-sample variance of `z_next` at step 0 of
+    /// the planner rollout: if different first actions lead to
+    /// widely different latents, the current state has high
+    /// optionality. Stuck states (every action ends up in the same
+    /// place) have ~0 empowerment.
+    /// Updated at planner cadence (every macro), not every step.
+    /// Exposed via `empowerment()` for the harness to fold into
+    /// the intrinsic-progress reward.
+    last_empowerment: Vec<f32>,
     /// Per-env win-state archive. Each entry is the lane's latent at the
     /// moment an extrinsic-reward event fired (level completion). FIFO
     /// bounded by `config.goal_states_cap`. Consumed by `plan_and_queue_*`
@@ -3280,6 +3291,7 @@ impl Agent {
             planner_calls_since_refresh: 0,
             extrinsic_reward: vec![0.0; n],
             intrinsic_progress_reward: vec![0.0; n],
+            last_empowerment: vec![0.0; n],
             goal_states: hashbrown::HashMap::new(),
             action_masks: vec![1.0; n * MAX_ACTION_DIM],
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
@@ -4835,6 +4847,17 @@ impl Agent {
             rewards.len()
         );
         self.extrinsic_reward.copy_from_slice(rewards);
+    }
+
+    /// Per-lane empowerment estimate from the most recent
+    /// `plan_and_queue` call (updated at planner cadence, not
+    /// every step). Mean-of-per-dim cross-sample variance of
+    /// step-0 `z_next` across the m planner samples; rises when
+    /// different first actions diverge state, falls when stuck.
+    /// Returns zeros for lanes that weren't planned this call,
+    /// and an empty vec when the planner is off.
+    pub fn empowerment(&self) -> Vec<f32> {
+        self.last_empowerment.clone()
     }
 
     /// Per-lane intrinsic progress reward for the NEXT `observe()`.
@@ -7327,6 +7350,39 @@ impl Agent {
             self.planner_z_scratch.copy_from_slice(
                 &self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
             );
+        }
+
+        // Empowerment estimate: per-lane variance of step-0 z_next
+        // across the m samples. High variance = different first
+        // actions lead to different futures = state has options.
+        // Stored for harness consumption via `empowerment()`.
+        for lane_idx in 0..n {
+            if !lane_active[lane_idx] {
+                self.last_empowerment[lane_idx] = 0.0;
+                continue;
+            }
+            let mut mean = vec![0.0f32; ld];
+            for s in 0..m {
+                let row = lane_idx * m + s;
+                let off = row * ld;  // t=0 starts at offset 0
+                for d in 0..ld {
+                    mean[d] += self.planner_traj_scratch[off + d];
+                }
+            }
+            let m_f = m as f32;
+            for d in 0..ld {
+                mean[d] /= m_f;
+            }
+            let mut var = 0.0f32;
+            for s in 0..m {
+                let row = lane_idx * m + s;
+                let off = row * ld;
+                for d in 0..ld {
+                    let v = self.planner_traj_scratch[off + d] - mean[d];
+                    var += v * v;
+                }
+            }
+            self.last_empowerment[lane_idx] = var / m_f / (ld as f32);
         }
 
         // Score each row by sum-of-novelty over its trajectory.

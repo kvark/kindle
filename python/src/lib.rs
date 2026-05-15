@@ -1443,6 +1443,14 @@ impl PyBatchAgent {
         Ok(())
     }
 
+    /// Per-lane empowerment estimate from the most recent
+    /// plan_and_queue call. Mean-of-per-dim cross-sample variance of
+    /// step-0 z_next. High = options diverge; low = stuck. Returns
+    /// `[]` when the planner is off.
+    fn empowerment(&self) -> Vec<f32> {
+        self.agent.empowerment()
+    }
+
     /// Set per-lane intrinsic progress reward (e.g. configurational
     /// delta + per-episode entropy). Same shape contract as
     /// `set_extrinsic_reward` but does NOT count toward
