@@ -258,6 +258,13 @@ def main() -> int:
                         help="Coarse-grid side length for progress "
                         "signals (8 = 64×64 frame → 8×8 cells). "
                         "Cell-level diffs filter pixel noise.")
+    parser.add_argument("--level-reward-scale", type=float, default=0.0,
+                        help="Scale level rewards by level reached: "
+                        "reward = delta * (1 + scale * (level - 1)). "
+                        "L0→L1: 1.0; L1→L2 at scale=0.5: 1.5; L2→L3: "
+                        "2.0. Pushes the planner & classifier toward "
+                        "higher levels in already-unlocked games. 0 "
+                        "(default) = flat binary reward.")
     parser.add_argument("--progress-empowerment-coef", type=float, default=0.0,
                         help="Term 3: per-lane empowerment from "
                         "planner rollouts (cross-sample variance of "
@@ -817,7 +824,18 @@ def main() -> int:
                 # when --explore-sync-novelty is off.
                 r = 0.0
                 if level_event and level_deltas[i] > 0:
-                    r += 1.0
+                    # Reward proportional to the NEW level achieved,
+                    # not just binary "any level event." This biases
+                    # the planner and classifier toward pushing higher
+                    # levels in already-unlocked games, not just
+                    # repeatedly winning level 1.
+                    new_total = last_levels[i]  # this is the post-update value
+                    if args.level_reward_scale > 0:
+                        r += float(level_deltas[i]) * (
+                            1.0 + args.level_reward_scale * float(new_total - 1)
+                        )
+                    else:
+                        r += float(level_deltas[i])
                 if novel_event:
                     lane_counts = novelty_counts[i]
                     lc = lane_counts.get(h, 0) + 1
