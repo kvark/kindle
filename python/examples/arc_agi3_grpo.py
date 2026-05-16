@@ -258,6 +258,14 @@ def main() -> int:
                         help="Coarse-grid side length for progress "
                         "signals (8 = 64×64 frame → 8×8 cells). "
                         "Cell-level diffs filter pixel noise.")
+    parser.add_argument("--object-token", type=int, default=0,
+                        help="Use object-level features as obs token "
+                        "instead of 8x8 pixel pool. Top 8 objects "
+                        "(color, position, size, area, holes) + 8 "
+                        "global stats = 64-dim token. Object features "
+                        "are invariant to layout, so the encoder can "
+                        "learn cross-level transferable representations. "
+                        "0 (default) = pixel pool.")
     parser.add_argument("--level-reward-scale", type=float, default=0.0,
                         help="Scale level rewards by level reached: "
                         "reward = delta * (1 + scale * (level - 1)). "
@@ -438,7 +446,18 @@ def main() -> int:
         print(f"loaded prior state from {args.load_state}")
 
     # Helpers ---
+    if args.object_token:
+        try:
+            from object_features import object_token as _obj_tok
+        except ImportError:
+            import sys, os
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from object_features import object_token as _obj_tok
+        print("[obs] using OBJECT-LEVEL token (8 objects + globals = 64 dims)")
+
     def preprocess_pooled(frame_arr):
+        if args.object_token:
+            return _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
         arr = frame_arr.astype(np.float32) / 15.0
         return arr.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten().tolist()
 
