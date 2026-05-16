@@ -545,6 +545,11 @@ def main() -> int:
     last_levels = [int(o.levels_completed) for o in obs_list]
     levels_events = [0] * n_lanes
     max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
+    # Per-lane per-level event counter: events_by_level[lane][level]
+    # = number of times this lane transitioned INTO this level.
+    # E.g. events_by_level[i][1] = times reached L1, [i][2] = times
+    # reached L2. Lets us see depth distribution, not just max.
+    events_by_level = [collections.defaultdict(int) for _ in range(n_lanes)]
     ep_step = [0] * n_lanes
     ep_count = [0] * n_lanes
 
@@ -778,6 +783,11 @@ def main() -> int:
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
                     if new_levels > max_levels_seen[i]:
                         max_levels_seen[i] = new_levels
+                    # Tally per-level. The delta is usually 1; for
+                    # delta>1 (rare multi-level jump) credit each
+                    # transitioned level once.
+                    for lvl_into in range(last_levels[i] + 1, new_levels + 1):
+                        events_by_level[i][lvl_into] += 1
                     # #2 Trail flush: a winning step just happened.
                     # Push the entire trail into the per-game archive
                     # with a strong novelty score (1500 + macro_return)
@@ -1058,7 +1068,15 @@ def main() -> int:
         if ev > 0:
             games_with_evt += 1
         grand_evt += ev
-        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {max_lvl:>7} {win_levels_per[g_idx * K]:>4}")
+        # Aggregate per-level counts across forks
+        by_lvl = collections.defaultdict(int)
+        for k in range(K):
+            for lvl, cnt in events_by_level[g_idx * K + k].items():
+                by_lvl[lvl] += cnt
+        per_lvl_str = " ".join(
+            f"L{lvl}:{by_lvl[lvl]}" for lvl in sorted(by_lvl) if by_lvl[lvl] > 0
+        )
+        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {max_lvl:>7} {win_levels_per[g_idx * K]:>4}  {per_lvl_str}")
     print()
     print(f"games with ≥1 event: {games_with_evt}/{n_games}")
     print(f"total events (across all forks): {grand_evt}")
