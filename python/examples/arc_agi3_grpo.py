@@ -538,11 +538,14 @@ def main() -> int:
     # --explore-sync-novelty is on.
     macro_novelty = [0.0] * n_lanes
 
-    # Per-game persistent frontier archive (real Go-Explore). Each
-    # entry: {'game': deepcopy(env._game), 'obs': obs_after_save,
-    # 'novelty': macro_novelty_at_save, 'levels': levels_completed}.
-    # Bounded by --archive-cap; evicts lowest-novelty when full.
-    archive = [[] for _ in range(n_games)]
+    # Per-game-per-LEVEL persistent frontier archive (Go-Explore +
+    # level-stratified). archive[g_idx] is a dict {level: [entries]}.
+    # Each level keeps its own queue capped at --archive-cap. On
+    # restore, we pick a level uniformly from those with entries,
+    # then a random entry. Once a higher level is reached even once,
+    # subsequent restores have a real chance of starting there —
+    # bootstrapping per-level memorization independently.
+    archive = [{} for _ in range(n_games)]
     archive_uses = 0  # diagnostic: how many times we restored from archive
     archive_adds = 0  # diagnostic: how many entries added
 
@@ -628,13 +631,18 @@ def main() -> int:
                     # discovered waypoints, not always from level-0.
                     g_idx = i // K
                     used_archive = False
+                    # Pick a level uniformly from those with entries —
+                    # higher levels (rarely reached) get equal weight
+                    # to L1, accelerating bootstrap once they're hit.
+                    levels_with = [
+                        lvl for lvl, lst in archive[g_idx].items() if lst
+                    ]
                     if (args.archive_cap > 0
-                            and archive[g_idx]
+                            and levels_with
                             and rng.random() < args.archive_reset_prob):
-                        # Replace the lane's env with a fresh deepcopy
-                        # of the archived wrapper. Restores all
-                        # wrapper-internal state along with _game.
-                        entry = archive[g_idx][rng.randrange(len(archive[g_idx]))]
+                        chosen_lvl = rng.choice(levels_with)
+                        gar = archive[g_idx][chosen_lvl]
+                        entry = gar[rng.randrange(len(gar))]
                         envs[i] = copy.deepcopy(entry["env"])
                         obs_list[i] = entry["obs"]
                         last_levels[i] = entry["levels"]
@@ -758,11 +766,14 @@ def main() -> int:
                     # snapshots and survive eviction longer.
                     if win_trail_on and args.archive_cap > 0:
                         g_idx = i // K
-                        gar = archive[g_idx]
                         flush_score = 1500.0 + float(d) * 1000.0
                         for entry in win_trails[i]:
                             e = dict(entry)
                             e["novelty"] = flush_score
+                            # Bucket by the LEVEL THIS ENTRY WAS AT (so
+                            # restoring this entry resumes that level).
+                            entry_lvl = e.get("levels", 0)
+                            gar = archive[g_idx].setdefault(entry_lvl, [])
                             if len(gar) < args.archive_cap:
                                 gar.append(e)
                                 archive_adds += 1
@@ -958,15 +969,16 @@ def main() -> int:
                 )
                 if not is_terminal and not near_terminal:
                     score = macro_novelty[base + best_k] + 1000.0 * macro_return[base + best_k]
+                    entry_lvl = int(last_levels[base + best_k])
                     entry = {
                         "env": copy.deepcopy(envs[base + best_k]),
                         "obs": obs_list[base + best_k],
                         "novelty": float(score),
-                        "levels": int(last_levels[base + best_k]),
+                        "levels": entry_lvl,
                         "ep_step": int(ep_step[base + best_k]),
                         "avail_actions": list(avail_actions[base + best_k]),
                     }
-                    gar = archive[g_idx]
+                    gar = archive[g_idx].setdefault(entry_lvl, [])
                     if len(gar) < args.archive_cap:
                         gar.append(entry)
                         archive_adds += 1
@@ -995,7 +1007,9 @@ def main() -> int:
             d0 = agent.diagnostics()[0]
             archive_info = ""
             if args.archive_cap > 0:
-                total_archive = sum(len(a) for a in archive)
+                total_archive = sum(
+                    len(lst) for ag in archive for lst in ag.values()
+                )
                 trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
                 prog_tag = f" prog={progress_total:.1f}" if progress_on else ""
                 archive_info = (
