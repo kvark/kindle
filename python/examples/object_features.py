@@ -122,6 +122,86 @@ _FEATURES_PER_OBJECT = 7
 _GLOBAL_FEATURES = 8
 
 
+def hybrid_token(frame: np.ndarray, pixel_grid: int = 4, k_objects: int = 6,
+                 max_color: int = 16) -> np.ndarray:
+    """V2 hybrid encoding: coarse pixel pool + object features.
+
+    Pixel pool preserves spatial precision (still useful for navigation/
+    clicking puzzles where exact position matters). Object features add
+    layout-invariant structure for cross-level transfer.
+
+    Default layout (fits OBS_TOKEN_DIM=64):
+      - 4x4 = 16-dim pixel pool (coarser than 8x8 but keeps spatial)
+      - 6 objects × 7 feat = 42 dims
+      - 6 globals = 6 dims
+      - Total = 64 dims
+
+    Args:
+        frame: 2D int grid (typically 64×64)
+        pixel_grid: pool side (4 = 4x4 = 16 dims)
+        k_objects: top-k objects by area
+        max_color: color count for normalization
+    """
+    h, w = frame.shape
+    bh, bw = h // pixel_grid, w // pixel_grid
+    h_used = bh * pixel_grid
+    w_used = bw * pixel_grid
+    pixel_pool = (
+        frame[:h_used, :w_used].astype(np.float32).reshape(
+            pixel_grid, bh, pixel_grid, bw
+        ).mean(axis=(1, 3)) / float(max_color)
+    ).flatten()
+    pdim = pixel_grid * pixel_grid
+
+    objs = _connected_components(frame)
+    objs.sort(key=lambda o: -o["area"])
+    objs = objs[:k_objects]
+
+    obj_dim = k_objects * _FEATURES_PER_OBJECT
+    obj_part = np.zeros(obj_dim, dtype=np.float32)
+    for i, o in enumerate(objs):
+        y0, x0, y1, x1 = o["bbox"]
+        cy = (y0 + y1) / 2.0 / max(1.0, h - 1)
+        cx = (x0 + x1) / 2.0 / max(1.0, w - 1)
+        oh = (y1 - y0 + 1) / float(h)
+        ow = (x1 - x0 + 1) / float(w)
+        area = o["area"] / float(h * w)
+        holes = _count_holes(o, (h, w)) / 8.0
+        base = i * _FEATURES_PER_OBJECT
+        obj_part[base + 0] = o["color"] / float(max_color)
+        obj_part[base + 1] = cy
+        obj_part[base + 2] = cx
+        obj_part[base + 3] = oh
+        obj_part[base + 4] = ow
+        obj_part[base + 5] = area
+        obj_part[base + 6] = min(holes, 1.0)
+
+    # 6-dim globals (matches remaining 64 - pdim - obj_dim)
+    n_globals = 64 - pdim - obj_dim
+    globals_part = np.zeros(n_globals, dtype=np.float32)
+    if n_globals > 0:
+        globals_part[0] = min(len(objs) / float(k_objects), 1.0)
+        if n_globals > 1:
+            globals_part[1] = sum(o["area"] for o in objs) / float(h * w)
+        if n_globals > 2:
+            distinct = len(set(o["color"] for o in objs))
+            globals_part[2] = distinct / float(max_color)
+        if n_globals > 3 and objs:
+            globals_part[3] = (sum(o["area"] for o in objs) / len(objs)) / float(h * w)
+        if n_globals > 4 and objs:
+            from collections import Counter
+            c = Counter()
+            for o in objs:
+                c[o["color"]] += o["area"]
+            globals_part[4] = max(c.values()) / float(h * w)
+        if n_globals > 5:
+            globals_part[5] = float(np.unique(frame).size) / float(max_color)
+
+    out = np.concatenate([pixel_pool, obj_part, globals_part]).astype(np.float32)
+    assert out.shape[0] == 64, f"hybrid_token size {out.shape[0]} != 64"
+    return out
+
+
 def object_token(frame: np.ndarray, k: int = 8, max_color: int = 16) -> np.ndarray:
     """Extract a fixed-size object-level token.
 

@@ -262,10 +262,15 @@ def main() -> int:
                         help="Use object-level features as obs token "
                         "instead of 8x8 pixel pool. Top 8 objects "
                         "(color, position, size, area, holes) + 8 "
-                        "global stats = 64-dim token. Object features "
-                        "are invariant to layout, so the encoder can "
-                        "learn cross-level transferable representations. "
-                        "0 (default) = pixel pool.")
+                        "global stats = 64-dim token. NEGATIVE result "
+                        "on tu93 (2026-05-16): loses spatial precision "
+                        "needed for navigation. Prefer --hybrid-token.")
+    parser.add_argument("--hybrid-token", type=int, default=0,
+                        help="Hybrid v2: 4x4 pixel pool (16) + 6 "
+                        "objects×7 features (42) + 6 globals = 64 "
+                        "dims. Keeps spatial precision while adding "
+                        "layout-invariant object structure. Default 0 "
+                        "= flat 8x8 pixel pool.")
     parser.add_argument("--level-reward-scale", type=float, default=0.0,
                         help="Scale level rewards by level reached: "
                         "reward = delta * (1 + scale * (level - 1)). "
@@ -446,16 +451,20 @@ def main() -> int:
         print(f"loaded prior state from {args.load_state}")
 
     # Helpers ---
-    if args.object_token:
-        try:
-            from object_features import object_token as _obj_tok
-        except ImportError:
-            import sys, os
-            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-            from object_features import object_token as _obj_tok
-        print("[obs] using OBJECT-LEVEL token (8 objects + globals = 64 dims)")
+    _obj_tok = None
+    _hybrid_tok = None
+    if args.object_token or args.hybrid_token:
+        import sys, os
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from object_features import object_token as _obj_tok, hybrid_token as _hybrid_tok
+        if args.hybrid_token:
+            print("[obs] using HYBRID token: 4x4 pixel pool (16) + 6 objects×7 (42) + 6 globals = 64 dims")
+        elif args.object_token:
+            print("[obs] using OBJECT-LEVEL token (8 objects + 8 globals = 64 dims)")
 
     def preprocess_pooled(frame_arr):
+        if args.hybrid_token:
+            return _hybrid_tok(frame_arr.astype(np.int32)).tolist()
         if args.object_token:
             return _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
         arr = frame_arr.astype(np.float32) / 15.0
