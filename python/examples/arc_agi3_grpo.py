@@ -826,6 +826,51 @@ def main() -> int:
                                     archive_adds += 1
                                     trail_archive_adds += 1
                         win_trails[i].clear()
+                    # NEW (2026-05-17): snapshot env state AFTER the
+                    # level-up step → push to archive[g][new_level].
+                    # This IS the new level's starting state. Without
+                    # this, the new-level archive is empty until the
+                    # new level is itself beaten — chicken/egg that
+                    # blocked tu93 from progressing past L2 despite
+                    # 1374 L2 wins in LONG2. Now every L2 win seeds
+                    # an L3-start state.
+                    if args.archive_cap > 0:
+                        g_idx_lu = i // K
+                        try:
+                            entry_obs = obs_new  # the freshly observed level state
+                            state_name_lu = (
+                                entry_obs.state.name
+                                if hasattr(entry_obs.state, "name")
+                                else str(entry_obs.state)
+                            )
+                            if state_name_lu not in ("GAME_OVER", "WIN", "NOT_PLAYED"):
+                                lu_entry = {
+                                    "env": copy.deepcopy(envs[i]),
+                                    "obs": entry_obs,
+                                    "novelty": 2500.0 + 500.0 * float(new_levels),
+                                    "levels": int(new_levels),
+                                    "ep_step": int(ep_step[i] + 1),
+                                    "avail_actions": (
+                                        list(entry_obs.available_actions)
+                                        if hasattr(entry_obs, "available_actions") and entry_obs.available_actions
+                                        else list(avail_actions[i])
+                                    ),
+                                }
+                                gar_lu = archive[g_idx_lu].setdefault(int(new_levels), [])
+                                if len(gar_lu) < args.archive_cap:
+                                    gar_lu.append(lu_entry)
+                                    archive_adds += 1
+                                else:
+                                    # Highest priority: replace worst
+                                    worst_idx = min(
+                                        range(len(gar_lu)),
+                                        key=lambda j: gar_lu[j]["novelty"],
+                                    )
+                                    if lu_entry["novelty"] > gar_lu[worst_idx]["novelty"]:
+                                        gar_lu[worst_idx] = lu_entry
+                                        archive_adds += 1
+                        except Exception:
+                            pass  # archive seeding is best-effort
                 last_levels[i] = new_levels
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
