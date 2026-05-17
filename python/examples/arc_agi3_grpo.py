@@ -664,16 +664,21 @@ def main() -> int:
                     # discovered waypoints, not always from level-0.
                     g_idx = i // K
                     used_archive = False
-                    # Pick a level uniformly from those with entries —
-                    # higher levels (rarely reached) get equal weight
-                    # to L1, accelerating bootstrap once they're hit.
+                    # Pick a level from those with entries. Weighted by
+                    # `level_num + 1` so higher levels are favored —
+                    # restoring at L3 is what we want, since L3 attempts
+                    # are precious (each one is a chance to actually
+                    # break into L4). Uniform weighting (the previous
+                    # behaviour) wasted episode budget on L1/L2 returns
+                    # when those levels were already saturated.
                     levels_with = [
                         lvl for lvl, lst in archive[g_idx].items() if lst
                     ]
                     if (args.archive_cap > 0
                             and levels_with
                             and rng.random() < args.archive_reset_prob):
-                        chosen_lvl = rng.choice(levels_with)
+                        weights = [float(lvl + 1) for lvl in levels_with]
+                        chosen_lvl = rng.choices(levels_with, weights=weights, k=1)[0]
                         gar = archive[g_idx][chosen_lvl]
                         entry = gar[rng.randrange(len(gar))]
                         envs[i] = copy.deepcopy(entry["env"])
