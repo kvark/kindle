@@ -58,4 +58,19 @@ impl WorldModel {
     pub fn loss(g: &mut Graph, z_pred: NodeId, z_target: NodeId) -> NodeId {
         g.mse_loss(z_pred, z_target)
     }
+
+    /// k-step rollout: apply WM k times iteratively given a sequence
+    /// of actions. Returns z_hat_k.
+    ///
+    /// `z_t`: [batch, latent_dim] — starting latent (graph input)
+    /// `actions`: slice of k NodeIds, each [batch, action_dim]
+    ///
+    /// All NodeIds in `actions` must be stop_gradient'd inputs.
+    pub fn rollout_k(&self, g: &mut Graph, z_t: NodeId, actions: &[NodeId]) -> NodeId {
+        let mut z = z_t;
+        for &a in actions {
+            z = self.forward(g, z, a);
+        }
+        z
+    }
 }

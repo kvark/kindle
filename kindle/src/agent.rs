@@ -1089,6 +1089,20 @@ pub struct AgentConfig {
     /// puzzles often require repeated moves (up-up-up-...), so this
     /// is a cheap reach multiplier.
     pub planner_action_repeat: usize,
+    /// k-step WM training: when > 1, builds a separate
+    /// `wm_kstep_session` that samples (t, t+k) tuples from the lane
+    /// buffer, applies WM k times iteratively, and trains MSE against
+    /// the actual z_{t+k}. Forces WM accuracy at depth k, not just
+    /// 1-step. Direct fix for planner-rollout compounding error.
+    /// Default 1 (disabled, only 1-step training as before).
+    pub wm_kstep_k: usize,
+    /// k-step batch size per training step. Default 32.
+    pub wm_kstep_batch: usize,
+    /// k-step training rate: probability per observe() of running a
+    /// k-step training step. 0.0 disables; 1.0 = every observe.
+    pub wm_kstep_train_prob: f32,
+    /// Loss coefficient for the k-step WM loss in wm_kstep_session.
+    pub wm_kstep_loss_coef: f32,
     /// Steps between WM-weight refreshes into the planner's CPU
     /// cache. Too frequent wastes cycles; too infrequent uses
     /// stale weights. Default 200.
@@ -1401,6 +1415,10 @@ impl Default for AgentConfig {
             planner_horizon: 0,
             planner_samples: 32,
             planner_action_repeat: 1,
+            wm_kstep_k: 1,
+            wm_kstep_batch: 32,
+            wm_kstep_train_prob: 0.0,
+            wm_kstep_loss_coef: 1.0,
             planner_refresh_interval: 200,
             planner_policy_mix: 0.0,
             planner_policy_temperature: 1.0,
@@ -2026,6 +2044,22 @@ pub struct Agent {
     /// the main `policy_session` at `planner_refresh_interval` cadence.
     /// `None` when policy-guided planning is off.
     policy_planner_session: Option<Session>,
+    /// k-step WM training session. Built when `wm_kstep_k > 1`. Applies
+    /// WM k times iteratively on sampled (t, t+k) tuples from the lane
+    /// buffer and computes MSE against the actual z_{t+k}. WM params
+    /// are synced back to `wm_session` after each step so the canonical
+    /// WM benefits from the deeper accuracy training. Direct fix for
+    /// the rollout-depth compounding error that blocked L3.
+    wm_kstep_session: Option<Session>,
+    /// Scratch buffers for wm_kstep_session inputs.
+    /// - kstep_z_scratch: [N, ld]
+    /// - kstep_z_target_scratch: [N, ld]
+    /// - kstep_action_scratch_per_step: Vec<Vec<f32>>, k entries each [N, MAX_ACTION_DIM]
+    kstep_z_scratch: Vec<f32>,
+    kstep_z_target_scratch: Vec<f32>,
+    kstep_action_scratch_per_step: Vec<Vec<f32>>,
+    /// Most recent k-step WM loss (diagnostic).
+    last_wm_kstep_loss: f32,
     /// Forward-only option-policy session. Built when `planner_horizon
     /// > 0` AND `num_options >= 2`. Phase 2 of option-aware planning:
     /// at each planner outer step, this maps z → option_logits per
@@ -2468,6 +2502,41 @@ fn max_goal_similarity(z: &[f32], goals: &std::collections::VecDeque<Vec<f32>>) 
 /// Used by the GPU-side model-based planner. `batch_size` here equals
 /// `n_lanes × planner_samples` so the planner can score `planner_samples`
 /// candidate sequences per lane in a single batched forward.
+/// k-step WM training graph. Standalone session that does:
+///   z_input → WM(z, a_0) → WM(z_1, a_1) → ... → z_hat_k
+///   MSE(z_hat_k, z_target_k) → loss
+/// Trains the WM params to be accurate at depth k. Synced to
+/// wm_session after each step so the canonical wm_session WM
+/// benefits from the deeper training signal.
+fn build_wm_kstep_graph(
+    batch_size: usize,
+    latent_dim: usize,
+    hidden_dim: usize,
+    k: usize,
+) -> Graph {
+    assert!(k >= 1, "wm_kstep k must be >= 1");
+    let mut g = Graph::new();
+    let z_input = g.input("z_input", &[batch_size, latent_dim]);
+    let z_target = g.input("z_target_kstep", &[batch_size, latent_dim]);
+    let z = g.stop_gradient(z_input);
+    let z_target = g.stop_gradient(z_target);
+
+    // k action inputs.
+    let mut action_nodes = Vec::with_capacity(k);
+    for i in 0..k {
+        let name = format!("action_step_{}", i);
+        let a = g.input(&name, &[batch_size, MAX_ACTION_DIM]);
+        let a = g.stop_gradient(a);
+        action_nodes.push(a);
+    }
+
+    let wm = WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+    let z_hat_k = wm.rollout_k(&mut g, z, &action_nodes);
+    let loss = g.mse_loss(z_hat_k, z_target);
+    g.set_outputs(vec![loss, z_hat_k]);
+    g
+}
+
 fn build_wm_planner_graph(
     batch_size: usize,
     latent_dim: usize,
@@ -3354,6 +3423,34 @@ impl Agent {
         } else {
             None
         };
+        // k-step WM training session. Built when wm_kstep_k > 1.
+        let wm_kstep_session = if config.wm_kstep_k > 1 {
+            let k = config.wm_kstep_k;
+            let batch = config.wm_kstep_batch.max(1);
+            let g = build_wm_kstep_graph(batch, config.latent_dim, config.hidden_dim, k);
+            let mut s = build_session(&g, config.opt_level);
+            init_parameters(&mut s);
+            if config.grad_clip_norm > 0.0 {
+                s.set_grad_clip_norm(config.grad_clip_norm);
+                s.set_grad_clip_every(config.grad_clip_every.max(1));
+            }
+            Some(s)
+        } else {
+            None
+        };
+        let kstep_z_scratch = if config.wm_kstep_k > 1 {
+            vec![0.0f32; config.wm_kstep_batch.max(1) * config.latent_dim]
+        } else {
+            Vec::new()
+        };
+        let kstep_z_target_scratch = kstep_z_scratch.clone();
+        let kstep_action_scratch_per_step = if config.wm_kstep_k > 1 {
+            (0..config.wm_kstep_k)
+                .map(|_| vec![0.0f32; config.wm_kstep_batch.max(1) * MAX_ACTION_DIM])
+                .collect()
+        } else {
+            Vec::new()
+        };
         // Option-policy forward-only session for option-aware planning.
         // Built when planner is on AND L1 options are active.
         let option_planner_session = if config.planner_horizon > 0 && config.num_options >= 2 {
@@ -3644,6 +3741,11 @@ impl Agent {
             wm_planner_session,
             policy_planner_session,
             option_planner_session,
+            wm_kstep_session,
+            kstep_z_scratch,
+            kstep_z_target_scratch,
+            kstep_action_scratch_per_step,
+            last_wm_kstep_loss: 0.0,
             wm_mcts_session,
             planner_samples_cached,
             planner_z_scratch,
@@ -4991,6 +5093,17 @@ impl Agent {
             self.value_replay_step(rng);
         }
 
+        // k-step WM training: with configured probability, sample
+        // (t, t+k) tuples from lane buffers and train WM iteratively.
+        // Forces depth-accuracy; combats compounding error at planner
+        // rollout depth >5. Synced back to wm_session each step.
+        if self.wm_kstep_session.is_some()
+            && self.config.wm_kstep_train_prob > 0.0
+            && rng.random_range(0.0..1.0_f32) < self.config.wm_kstep_train_prob
+        {
+            self.wm_kstep_step(rng);
+        }
+
         // --- Representation drift monitor (shared probe set, WM session) ---
         if self.step_count == self.config.warmup_steps && self.probe_obs.is_none() {
             self.capture_probe_reference();
@@ -5012,6 +5125,95 @@ impl Agent {
     /// whole point of the classifier — encoder learns to distinguish
     /// win-trajectory latents from loss-trajectory latents). Set
     /// `value_head_grad_to_encoder=false` to detach for ablation.
+    fn wm_kstep_step<R: Rng>(&mut self, rng: &mut R) {
+        let Some(ref mut sess) = self.wm_kstep_session else {
+            return;
+        };
+        let k = self.config.wm_kstep_k;
+        let batch = self.config.wm_kstep_batch.max(1);
+        let ld = self.config.latent_dim;
+
+        let mut staged = 0usize;
+        for row in 0..batch {
+            let mut found = false;
+            for _attempt in 0..8 {
+                let lane_idx = rng.random_range(0..self.lanes.len());
+                let lane = &self.lanes[lane_idx];
+                let blen = lane.buffer.len();
+                if blen < k + 1 {
+                    continue;
+                }
+                let t = rng.random_range(0..blen - k);
+                let z_start = &lane.buffer.get(t).latent;
+                let z_end = &lane.buffer.get(t + k).latent;
+                let dst_z = &mut self.kstep_z_scratch[row * ld..(row + 1) * ld];
+                let copy_len = z_start.len().min(ld);
+                dst_z[..copy_len].copy_from_slice(&z_start[..copy_len]);
+                if copy_len < ld { dst_z[copy_len..].fill(0.0); }
+                let dst_zt = &mut self.kstep_z_target_scratch[row * ld..(row + 1) * ld];
+                let tlen = z_end.len().min(ld);
+                dst_zt[..tlen].copy_from_slice(&z_end[..tlen]);
+                if tlen < ld { dst_zt[tlen..].fill(0.0); }
+                for i in 0..k {
+                    let act = &lane.buffer.get(t + i).action;
+                    let dst_a = &mut self.kstep_action_scratch_per_step[i]
+                        [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                    let alen = act.len().min(MAX_ACTION_DIM);
+                    dst_a[..alen].copy_from_slice(&act[..alen]);
+                    if alen < MAX_ACTION_DIM { dst_a[alen..].fill(0.0); }
+                }
+                found = true;
+                staged += 1;
+                break;
+            }
+            if !found {
+                let dst_z = &mut self.kstep_z_scratch[row * ld..(row + 1) * ld];
+                dst_z.fill(0.0);
+                let dst_zt = &mut self.kstep_z_target_scratch[row * ld..(row + 1) * ld];
+                dst_zt.fill(0.0);
+                for i in 0..k {
+                    let dst_a = &mut self.kstep_action_scratch_per_step[i]
+                        [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                    dst_a.fill(0.0);
+                }
+            }
+        }
+        if staged == 0 { return; }
+
+        sess.set_input("z_input", &self.kstep_z_scratch);
+        sess.set_input("z_target_kstep", &self.kstep_z_target_scratch);
+        for i in 0..k {
+            let name = format!("action_step_{}", i);
+            sess.set_input(&name, &self.kstep_action_scratch_per_step[i]);
+        }
+        let lr = self.config.learning_rate
+            * self.config.wm_kstep_loss_coef
+            * self.batch_lr_scale;
+        apply_lr(sess, lr, self.config.use_adam, self.config.adam_eps);
+        sess.step();
+        sess.wait();
+        let l = sess.read_loss();
+        if l.is_finite() { self.last_wm_kstep_loss = l; }
+
+        // Sync WM params from wm_kstep → wm_session so the canonical
+        // WM (used by encoder→z prediction and wm_planner) benefits.
+        let hd_ = self.config.hidden_dim;
+        let ld_ = self.config.latent_dim;
+        let wm_params: [(&str, usize); 6] = [
+            ("world_model.z_proj.weight", ld_ * hd_),
+            ("world_model.z_proj.bias", hd_),
+            ("world_model.a_proj.weight", MAX_ACTION_DIM * hd_),
+            ("world_model.fc2.weight", hd_ * hd_),
+            ("world_model.fc2.bias", hd_),
+            ("world_model.fc_out.weight", hd_ * ld_),
+        ];
+        for (name, n_elem) in wm_params.iter() {
+            let buf = &mut self.planner_param_buf[..*n_elem];
+            sess.read_param(name, buf);
+            self.wm_session.set_parameter(name, buf);
+        }
+    }
+
     fn value_replay_step<R: Rng>(&mut self, rng: &mut R) {
         let n = self.lanes.len();
         // Collect env_ids with non-empty win and loss queues. Need
