@@ -514,6 +514,10 @@ impl PyBatchAgent {
         planner_horizon = None,
         planner_samples = None,
         planner_action_repeat = None,
+        wm_kstep_k = None,
+        wm_kstep_batch = None,
+        wm_kstep_train_prob = None,
+        wm_kstep_loss_coef = None,
         planner_refresh_interval = None,
         planner_policy_mix = None,
         planner_policy_temperature = None,
@@ -654,6 +658,10 @@ impl PyBatchAgent {
         planner_horizon: Option<usize>,
         planner_samples: Option<usize>,
         planner_action_repeat: Option<usize>,
+        wm_kstep_k: Option<usize>,
+        wm_kstep_batch: Option<usize>,
+        wm_kstep_train_prob: Option<f32>,
+        wm_kstep_loss_coef: Option<f32>,
         planner_refresh_interval: Option<usize>,
         planner_policy_mix: Option<f32>,
         planner_policy_temperature: Option<f32>,
@@ -1062,6 +1070,18 @@ impl PyBatchAgent {
         }
         if let Some(v) = planner_action_repeat {
             config.planner_action_repeat = v;
+        }
+        if let Some(v) = wm_kstep_k {
+            config.wm_kstep_k = v;
+        }
+        if let Some(v) = wm_kstep_batch {
+            config.wm_kstep_batch = v;
+        }
+        if let Some(v) = wm_kstep_train_prob {
+            config.wm_kstep_train_prob = v;
+        }
+        if let Some(v) = wm_kstep_loss_coef {
+            config.wm_kstep_loss_coef = v;
         }
         if let Some(v) = planner_refresh_interval {
             config.planner_refresh_interval = v;

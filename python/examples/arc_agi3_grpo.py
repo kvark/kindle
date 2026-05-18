@@ -271,6 +271,20 @@ def main() -> int:
                         "dims. Keeps spatial precision while adding "
                         "layout-invariant object structure. Default 0 "
                         "= flat 8x8 pixel pool.")
+    parser.add_argument("--wm-kstep-k", type=int, default=1,
+                        help="WM k-step training: when >1, build "
+                        "wm_kstep_session that trains WM to be accurate "
+                        "at depth k. Forces WM accuracy at planner-"
+                        "rollout depth, fixing compounding error. "
+                        "Recommended 5-10. Default 1 (off).")
+    parser.add_argument("--wm-kstep-batch", type=int, default=32,
+                        help="k-step training batch size.")
+    parser.add_argument("--wm-kstep-train-prob", type=float, default=0.0,
+                        help="Per-observe probability of running a "
+                        "k-step training step. 0.5-1.0 recommended.")
+    parser.add_argument("--wm-kstep-loss-coef", type=float, default=1.0,
+                        help="LR scale for k-step training relative to "
+                        "base learning_rate. Default 1.0.")
     parser.add_argument("--planner-action-repeat", type=int, default=1,
                         help="Each planner step's action is repeated "
                         "this many times in the WM rollout AND committed "
@@ -480,6 +494,10 @@ def main() -> int:
         value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
         planner_action_repeat=args.planner_action_repeat,
+        wm_kstep_k=args.wm_kstep_k,
+        wm_kstep_batch=args.wm_kstep_batch,
+        wm_kstep_train_prob=args.wm_kstep_train_prob,
+        wm_kstep_loss_coef=args.wm_kstep_loss_coef,
         num_options=args.num_options,
         option_horizon=args.option_horizon,
         per_option_heads=bool(args.per_option_heads),
