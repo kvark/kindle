@@ -9,7 +9,7 @@ description = "A continually self-training RL agent that starts from a cold netw
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "afe01cd" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "331edb8" }
 # Pinned to the same blade rev meganeura uses (rev `72c30c1`) so cargo
 # unifies and `blade_graphics::ExternalMemorySource` round-trips
 # cleanly between kindle's bind API and meganeura's

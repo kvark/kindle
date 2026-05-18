@@ -19,7 +19,7 @@ crate-type = ["cdylib"]
 kindle = { path = "../kindle", version = "0.1" }
 # Same git rev as kindle/Cargo.toml so cargo unifies the meganeura
 # crate version. Drift would split the workspace and double-compile.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "afe01cd" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "331edb8" }
 pyo3 = { version = "0.28", features = ["extension-module"] }
 rand = "0.9"
 serde_json = "1"
