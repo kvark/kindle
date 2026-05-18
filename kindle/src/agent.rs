@@ -7828,8 +7828,20 @@ impl Agent {
         }
 
         // We'll fill `all_actions` step-by-step as we sample from the
-        // policy at each WM rollout time. Layout: row-major (batch, k).
-        let mut all_actions = vec![0u32; batch * k];
+        // policy at each WM rollout time. Layout: row-major
+        // `[batch, k, inner_iters_max]`. In non-option mode, inner_iters
+        // = planner_action_repeat (action just repeats). In option-aware
+        // mode, inner_iters = option_horizon (each inner step re-samples
+        // option-conditional action). Storage is allocated for the max
+        // path; non-option mode just writes the same action across inner.
+        let no = self.config.num_options;
+        let use_options = no >= 2 && !self.planner_option_onehot_scratch.is_empty();
+        let inner_iters = if use_options {
+            self.config.option_horizon.max(1)
+        } else {
+            self.config.planner_action_repeat.max(1)
+        };
+        let mut all_actions = vec![0u32; batch * k * inner_iters];
 
         // Seed z input: replicate each lane's z0 m times.
         self.planner_z_scratch.fill(0.0);
@@ -7849,28 +7861,23 @@ impl Agent {
 
         let policy_mix = self.config.planner_policy_mix.clamp(0.0, 1.0);
         let policy_temp = self.config.planner_policy_temperature.max(0.01);
-        let no = self.config.num_options;
-        // Option-aware planning: when num_options >= 2, each row gets an
-        // option assigned uniformly at random per outer step; policy_planner
-        // is then queried with option_onehot to produce option-conditional
-        // action logits. Different options → different action distributions
-        // → planner samples cover the option × action space. Forces
-        // policy-guided sampling (use_policy=true) so options matter.
-        let use_options = no >= 2 && !self.planner_option_onehot_scratch.is_empty();
         let need_policy = (policy_mix > 0.0 || use_options) && self.policy_planner_session.is_some();
         let policy_mix_eff = if use_options { 1.0 } else { policy_mix };
 
-        // Per-step rollout. The order each step is:
-        //   1. (if policy-guided) Policy forward at current z → logits
-        //   2. Per-row sample: uniform with prob (1 - policy_mix),
-        //      else from temperature-scaled masked policy softmax
-        //   3. WM forward at (z, action_one_hot) → z_next
-        //   4. z := z_next for next iteration; store trajectory + action
+        // Per-step rollout. For each outer step `t`:
+        //   - If option-aware, pick a per-row option (held constant for
+        //     all `inner_iters` inner WM steps).
+        //   - For each inner step `i`:
+        //     - Policy forward (option-conditional if use_options): z → logits
+        //     - Sample action per row from logits (or uniform with prob 1−mix)
+        //     - WM forward (z, action_one_hot) → z_next
+        //     - z := z_next; record action into all_actions[row, t, i]
+        //
+        // Effective atomic-action reach per planner call = k × inner_iters.
+        // Trajectory endpoint stored per outer step in planner_traj_scratch[t]
+        // is the z AFTER inner_iters atomic steps.
         for t in 0..k {
-            // --- 1a. Option choice (when options on): one option per
-            // row, uniform-random. Could optionally use option_planner
-            // for guided sampling, but uniform gives broader coverage
-            // and is what we want for L3 discovery.
+            // Option choice (constant across inner loop within this t)
             if use_options {
                 self.planner_option_onehot_scratch.fill(0.0);
                 for row in 0..batch {
@@ -7878,89 +7885,83 @@ impl Agent {
                     self.planner_option_onehot_scratch[row * no + opt] = 1.0;
                 }
             }
-            // --- 1. Policy forward (only if we'll use it this step) ---
-            if need_policy {
-                let policy_planner = self.policy_planner_session.as_mut().unwrap();
-                policy_planner.set_input("z", &self.planner_z_scratch);
-                if use_options {
-                    policy_planner.set_input("option_onehot", &self.planner_option_onehot_scratch);
+            let wm_planner_ptr: *mut Session = self.wm_planner_session.as_mut().unwrap();
+            for inner_idx in 0..inner_iters {
+                // Policy forward (option-conditional when use_options)
+                if need_policy {
+                    let policy_planner = self.policy_planner_session.as_mut().unwrap();
+                    policy_planner.set_input("z", &self.planner_z_scratch);
+                    if use_options {
+                        policy_planner.set_input("option_onehot", &self.planner_option_onehot_scratch);
+                    }
+                    policy_planner.step();
+                    policy_planner.wait();
+                    policy_planner.read_output_by_index(0, &mut policy_logits);
                 }
-                policy_planner.step();
-                policy_planner.wait();
-                policy_planner.read_output_by_index(0, &mut policy_logits);
-            }
 
-            // --- 2. Sample actions per row ---
-            self.planner_action_scratch.fill(0.0);
-            for lane_idx in 0..n {
-                if !lane_active[lane_idx] {
-                    continue;
-                }
-                let valid = &valid_per_lane[lane_idx];
-                for s in 0..m {
-                    let row = lane_idx * m + s;
-                    // Choose sampler: with prob (1 - mix) use uniform;
-                    // else policy-guided.
-                    let use_policy = need_policy
-                        && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
-                    let action_idx: u32 = if !use_policy {
-                        valid[rng.random_range(0..valid.len())]
-                    } else {
-                        let lrow = &policy_logits
-                            [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
-                        // Temperature scale + numerical stability.
-                        let mut max_l = f32::NEG_INFINITY;
-                        for &v in valid {
-                            let l = lrow[v as usize] / policy_temp;
-                            if l.is_finite() && l > max_l {
-                                max_l = l;
-                            }
-                        }
-                        if !max_l.is_finite() {
-                            max_l = 0.0;
-                        }
-                        let mut sum = 0.0f32;
-                        let probs: Vec<f32> = valid
-                            .iter()
-                            .map(|&v| {
-                                let p =
-                                    (lrow[v as usize] / policy_temp - max_l).exp();
-                                sum += p;
-                                p
-                            })
-                            .collect();
-                        if sum <= 0.0 || !sum.is_finite() {
+                // Sample actions per row
+                self.planner_action_scratch.fill(0.0);
+                for lane_idx in 0..n {
+                    if !lane_active[lane_idx] {
+                        continue;
+                    }
+                    let valid = &valid_per_lane[lane_idx];
+                    for s in 0..m {
+                        let row = lane_idx * m + s;
+                        let use_policy = need_policy
+                            && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
+                        let action_idx: u32 = if !use_policy {
                             valid[rng.random_range(0..valid.len())]
                         } else {
-                            let u: f32 = rng.random_range(0.0..1.0) * sum;
-                            let mut cum = 0.0;
-                            let mut chosen = 0;
-                            for (i, &p) in probs.iter().enumerate() {
-                                cum += p;
-                                if u <= cum {
-                                    chosen = i;
-                                    break;
+                            let lrow = &policy_logits
+                                [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                            let mut max_l = f32::NEG_INFINITY;
+                            for &v in valid {
+                                let l = lrow[v as usize] / policy_temp;
+                                if l.is_finite() && l > max_l {
+                                    max_l = l;
                                 }
                             }
-                            valid[chosen]
+                            if !max_l.is_finite() {
+                                max_l = 0.0;
+                            }
+                            let mut sum = 0.0f32;
+                            let probs: Vec<f32> = valid
+                                .iter()
+                                .map(|&v| {
+                                    let p =
+                                        (lrow[v as usize] / policy_temp - max_l).exp();
+                                    sum += p;
+                                    p
+                                })
+                                .collect();
+                            if sum <= 0.0 || !sum.is_finite() {
+                                valid[rng.random_range(0..valid.len())]
+                            } else {
+                                let u: f32 = rng.random_range(0.0..1.0) * sum;
+                                let mut cum = 0.0;
+                                let mut chosen = 0;
+                                for (i, &p) in probs.iter().enumerate() {
+                                    cum += p;
+                                    if u <= cum {
+                                        chosen = i;
+                                        break;
+                                    }
+                                }
+                                valid[chosen]
+                            }
+                        };
+                        // Store in (row, t, inner_idx) layout
+                        all_actions[row * k * inner_iters + t * inner_iters + inner_idx] = action_idx;
+                        if (action_idx as usize) < MAX_ACTION_DIM {
+                            self.planner_action_scratch
+                                [row * MAX_ACTION_DIM + action_idx as usize] = 1.0;
                         }
-                    };
-                    all_actions[row * k + t] = action_idx;
-                    if (action_idx as usize) < MAX_ACTION_DIM {
-                        self.planner_action_scratch
-                            [row * MAX_ACTION_DIM + action_idx as usize] = 1.0;
                     }
                 }
-            }
 
-            // --- 3. WM forward (with optional action-repeat) ---
-            // The sampled action_t is repeated `repeat` times in the
-            // WM rollout (and committed `repeat` times to the planner
-            // queue at the end). Effective atomic-action reach per
-            // planner call = horizon × repeat.
-            let repeat = self.config.planner_action_repeat.max(1);
-            let wm_planner = self.wm_planner_session.as_mut().unwrap();
-            for _ in 0..repeat {
+                // WM forward
+                let wm_planner = unsafe { &mut *wm_planner_ptr };
                 wm_planner.set_input("z", &self.planner_z_scratch);
                 wm_planner.set_input("action", &self.planner_action_scratch);
                 wm_planner.step();
@@ -7977,20 +7978,18 @@ impl Agent {
                     &self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
                 );
             }
-            let traj_offset = t * batch * ld;
             // Value-head branch (output index 1) reads per-row scalar V
-            // for this k-step's z_next. Stored row-major
+            // for the t-th step's final z_next. Stored row-major
             // `[t * batch + row]` so the scorer below can fetch it
             // without re-running the session.
             if self.wm_planner_has_value_head {
                 let v_off = t * batch;
+                let wm_planner = unsafe { &mut *wm_planner_ptr };
                 wm_planner.read_output_by_index(
                     1,
                     &mut self.planner_v_traj_scratch[v_off..v_off + batch],
                 );
             }
-            // z_scratch is already at the post-repeat z_next (copied
-            // inside the inner repeat loop). No additional copy needed.
         }
 
         // Empowerment estimate: per-lane variance of step-0 z_next
@@ -8087,10 +8086,9 @@ impl Agent {
                     best_row = row;
                 }
             }
-            let repeat = self.config.planner_action_repeat.max(1);
             for t in 0..k {
-                let act = all_actions[best_row * k + t];
-                for _ in 0..repeat {
+                for inner_idx in 0..inner_iters {
+                    let act = all_actions[best_row * k * inner_iters + t * inner_iters + inner_idx];
                     self.planner_queue[lane_idx].push_back(act);
                 }
             }
