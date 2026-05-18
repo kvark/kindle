@@ -1081,6 +1081,14 @@ pub struct AgentConfig {
     /// Number of random action sequences sampled per plan call.
     /// Cost scales O(samples × horizon × hidden²). Default 32.
     pub planner_samples: usize,
+    /// Phase-1 option-aware planner: at each of the `planner_horizon`
+    /// outer steps, the sampled action is REPEATED this many times in
+    /// the WM rollout (and committed `repeat` times to planner_queue).
+    /// Effective atomic-action reach per planner call = horizon ×
+    /// repeat. Default 1 (no repeat, original behavior). ARC-AGI-3
+    /// puzzles often require repeated moves (up-up-up-...), so this
+    /// is a cheap reach multiplier.
+    pub planner_action_repeat: usize,
     /// Steps between WM-weight refreshes into the planner's CPU
     /// cache. Too frequent wastes cycles; too infrequent uses
     /// stale weights. Default 200.
@@ -1392,6 +1400,7 @@ impl Default for AgentConfig {
             rollout_length: 1,
             planner_horizon: 0,
             planner_samples: 32,
+            planner_action_repeat: 1,
             planner_refresh_interval: 200,
             planner_policy_mix: 0.0,
             planner_policy_temperature: 1.0,
@@ -7832,17 +7841,31 @@ impl Agent {
                 }
             }
 
-            // --- 3. WM forward ---
+            // --- 3. WM forward (with optional action-repeat) ---
+            // The sampled action_t is repeated `repeat` times in the
+            // WM rollout (and committed `repeat` times to the planner
+            // queue at the end). Effective atomic-action reach per
+            // planner call = horizon × repeat.
+            let repeat = self.config.planner_action_repeat.max(1);
             let wm_planner = self.wm_planner_session.as_mut().unwrap();
-            wm_planner.set_input("z", &self.planner_z_scratch);
-            wm_planner.set_input("action", &self.planner_action_scratch);
-            wm_planner.step();
-            wm_planner.wait();
+            for _ in 0..repeat {
+                wm_planner.set_input("z", &self.planner_z_scratch);
+                wm_planner.set_input("action", &self.planner_action_scratch);
+                wm_planner.step();
+                wm_planner.wait();
+                // We only need to keep the LATEST z_next for the next
+                // outer step's input; final intermediate value gets
+                // stored as the per-step trajectory endpoint below.
+                let traj_offset_inner = t * batch * ld;
+                wm_planner.read_output_by_index(
+                    0,
+                    &mut self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
+                );
+                self.planner_z_scratch.copy_from_slice(
+                    &self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
+                );
+            }
             let traj_offset = t * batch * ld;
-            wm_planner.read_output_by_index(
-                0,
-                &mut self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
-            );
             // Value-head branch (output index 1) reads per-row scalar V
             // for this k-step's z_next. Stored row-major
             // `[t * batch + row]` so the scorer below can fetch it
@@ -7854,9 +7877,8 @@ impl Agent {
                     &mut self.planner_v_traj_scratch[v_off..v_off + batch],
                 );
             }
-            self.planner_z_scratch.copy_from_slice(
-                &self.planner_traj_scratch[traj_offset..traj_offset + batch * ld],
-            );
+            // z_scratch is already at the post-repeat z_next (copied
+            // inside the inner repeat loop). No additional copy needed.
         }
 
         // Empowerment estimate: per-lane variance of step-0 z_next
@@ -7953,8 +7975,12 @@ impl Agent {
                     best_row = row;
                 }
             }
+            let repeat = self.config.planner_action_repeat.max(1);
             for t in 0..k {
-                self.planner_queue[lane_idx].push_back(all_actions[best_row * k + t]);
+                let act = all_actions[best_row * k + t];
+                for _ in 0..repeat {
+                    self.planner_queue[lane_idx].push_back(act);
+                }
             }
             // BC-from-planner: push the (s, planner-chosen a) pair into
             // sil_buffer so the policy can learn to imitate the planner.
