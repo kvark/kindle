@@ -1865,6 +1865,13 @@ impl PyBatchAgent {
         self.agent.planner_queue_len()
     }
 
+    /// Append a sequence of action indices to a specific lane's
+    /// planner queue. Used by the harness to inject learned skills
+    /// without going through `plan_and_queue`.
+    fn queue_actions(&mut self, lane: usize, actions: Vec<u32>) {
+        self.agent.queue_actions(lane, &actions);
+    }
+
     /// Snapshot the most recent `n` transitions of `lane_idx`, oldest
     /// first, as a list of dicts. Each dict contains:
     ///   observation (list[float]), latent (list[float]),
