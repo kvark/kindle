@@ -2026,6 +2026,13 @@ pub struct Agent {
     /// the main `policy_session` at `planner_refresh_interval` cadence.
     /// `None` when policy-guided planning is off.
     policy_planner_session: Option<Session>,
+    /// Forward-only option-policy session. Built when `planner_horizon
+    /// > 0` AND `num_options >= 2`. Phase 2 of option-aware planning:
+    /// at each planner outer step, this maps z → option_logits per
+    /// row; the planner samples an option and then uses
+    /// `policy_planner_session` (which now also takes option_onehot)
+    /// to generate atomic actions for the option's window.
+    option_planner_session: Option<Session>,
     /// Dedicated WM forward session sized at batch=n_lanes for MCTS
     /// expansion (one row per lane per simulation step). Smaller batch
     /// than `wm_planner_session` so each MCTS dispatch isn't wasting
@@ -2042,6 +2049,12 @@ pub struct Agent {
     /// allocation in the hot path.
     planner_z_scratch: Vec<f32>,
     planner_action_scratch: Vec<f32>,
+    /// Per-row option_onehot for option-aware planning. Sized
+    /// `planner_batch * num_options`. Empty when `num_options < 2`.
+    /// Each outer planner step assigns each row an option (currently
+    /// uniform-random) and writes the one-hot here; policy_planner_session
+    /// then produces option-conditional action logits.
+    planner_option_onehot_scratch: Vec<f32>,
     planner_traj_scratch: Vec<f32>,
     /// Per-step value predictions from the planner's value-head branch.
     /// Layout: `[planner_horizon × planner_batch]`. Only populated when
@@ -2507,12 +2520,54 @@ fn build_policy_planner_graph(
     batch_size: usize,
     latent_dim: usize,
     hidden_dim: usize,
+    num_options: usize,
 ) -> Graph {
     let mut g = Graph::new();
     let z_raw = g.input("z", &[batch_size, latent_dim]);
     let z = g.stop_gradient(z_raw);
-    let policy = policy::Policy::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
-    let logits = policy.forward(&mut g, z);
+    // Mirror the training policy graph: when num_options > 1, the
+    // logits are shared-trunk + per-option additive bias. This is the
+    // "simple" option path (matching build_policy_graph's else-branch
+    // when per_option_heads=false). Required for option-aware planner
+    // rollouts where each option produces distinct action distributions.
+    let logits = if num_options > 1 {
+        let policy = policy::Policy::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+        let trunk_logits = policy.forward(&mut g, z);
+        let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
+        let option_onehot = g.stop_gradient(option_onehot);
+        let option_bias =
+            nn::Linear::no_bias(&mut g, "policy.option_bias", num_options, MAX_ACTION_DIM);
+        let bias_out = option_bias.forward(&mut g, option_onehot);
+        g.add(trunk_logits, bias_out)
+    } else {
+        let policy = policy::Policy::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+        policy.forward(&mut g, z)
+    };
+    let logits = g.stop_gradient(logits);
+    g.set_outputs(vec![logits]);
+    g
+}
+
+/// Forward-only option-policy graph: `z -> option_logits`.
+/// Companion to `build_policy_planner_graph` when num_options > 1.
+/// Mirrors the relevant subgraph of `option::build_option_graph`
+/// (option.trunk → relu → option.head) so the planner can sample
+/// L1 options at each outer step.
+fn build_option_planner_graph(
+    batch_size: usize,
+    latent_dim: usize,
+    hidden_dim: usize,
+    num_options: usize,
+) -> Graph {
+    let mut g = Graph::new();
+    let z_raw = g.input("z", &[batch_size, latent_dim]);
+    let z = g.stop_gradient(z_raw);
+    let trunk = nn::Linear::new(&mut g, "option.trunk", latent_dim, hidden_dim);
+    let h = trunk.forward(&mut g, z);
+    let h = g.relu(h);
+    let option_head =
+        nn::Linear::no_bias(&mut g, "option.head", hidden_dim, num_options);
+    let logits = option_head.forward(&mut g, h);
     let logits = g.stop_gradient(logits);
     g.set_outputs(vec![logits]);
     g
@@ -2525,7 +2580,7 @@ impl Agent {
     ///
     /// The underlying graphs use universal token sizes and will never need
     /// rebuilding for subsequent lane-adapter swaps (`switch_lane`).
-    pub fn new(config: AgentConfig, adapters: Vec<Box<dyn EnvAdapter>>) -> Self {
+    pub fn new(mut config: AgentConfig, adapters: Vec<Box<dyn EnvAdapter>>) -> Self {
         assert!(
             !adapters.is_empty(),
             "Agent::new requires at least one adapter (one lane)"
@@ -2953,6 +3008,17 @@ impl Agent {
             config.option_dim
         };
         let l1_active = config.num_options >= 2;
+        // The option-aware planner (build_policy_planner_graph) uses
+        // the shared-trunk + option_bias path. If per_option_heads is
+        // true, policy_session uses per_option_fc2 (no shared fc2)
+        // and param sync to policy_planner fails. Force false here.
+        if l1_active && config.planner_horizon > 0 && config.per_option_heads {
+            log::warn!(
+                "Forcing per_option_heads=false: option-aware planner only \
+                supports the shared-trunk + option_bias policy graph"
+            );
+            config.per_option_heads = false;
+        }
 
         // L0 policy graph — `z` is just the encoder latent. When L1 is
         // active, the graph also takes a one-hot `option_onehot` input
@@ -3280,6 +3346,22 @@ impl Agent {
                 planner_batch,
                 config.latent_dim,
                 config.hidden_dim,
+                config.num_options,
+            );
+            let mut s = build_session(&g, config.opt_level);
+            init_parameters(&mut s);
+            Some(s)
+        } else {
+            None
+        };
+        // Option-policy forward-only session for option-aware planning.
+        // Built when planner is on AND L1 options are active.
+        let option_planner_session = if config.planner_horizon > 0 && config.num_options >= 2 {
+            let g = build_option_planner_graph(
+                planner_batch,
+                config.latent_dim,
+                config.hidden_dim,
+                config.num_options,
             );
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
@@ -3308,6 +3390,11 @@ impl Agent {
         };
         let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
         let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
+        let planner_option_onehot_scratch = if config.num_options >= 2 && config.planner_horizon > 0 {
+            vec![0.0f32; planner_batch * config.num_options]
+        } else {
+            Vec::new()
+        };
         let planner_traj_scratch = vec![
             0.0f32;
             planner_batch * config.planner_horizon.max(1) * config.latent_dim
@@ -3556,10 +3643,12 @@ impl Agent {
             planner,
             wm_planner_session,
             policy_planner_session,
+            option_planner_session,
             wm_mcts_session,
             planner_samples_cached,
             planner_z_scratch,
             planner_action_scratch,
+            planner_option_onehot_scratch,
             planner_traj_scratch,
             planner_v_traj_scratch,
             planner_param_buf,
@@ -7760,7 +7849,16 @@ impl Agent {
 
         let policy_mix = self.config.planner_policy_mix.clamp(0.0, 1.0);
         let policy_temp = self.config.planner_policy_temperature.max(0.01);
-        let need_policy = policy_mix > 0.0 && self.policy_planner_session.is_some();
+        let no = self.config.num_options;
+        // Option-aware planning: when num_options >= 2, each row gets an
+        // option assigned uniformly at random per outer step; policy_planner
+        // is then queried with option_onehot to produce option-conditional
+        // action logits. Different options → different action distributions
+        // → planner samples cover the option × action space. Forces
+        // policy-guided sampling (use_policy=true) so options matter.
+        let use_options = no >= 2 && !self.planner_option_onehot_scratch.is_empty();
+        let need_policy = (policy_mix > 0.0 || use_options) && self.policy_planner_session.is_some();
+        let policy_mix_eff = if use_options { 1.0 } else { policy_mix };
 
         // Per-step rollout. The order each step is:
         //   1. (if policy-guided) Policy forward at current z → logits
@@ -7769,10 +7867,24 @@ impl Agent {
         //   3. WM forward at (z, action_one_hot) → z_next
         //   4. z := z_next for next iteration; store trajectory + action
         for t in 0..k {
+            // --- 1a. Option choice (when options on): one option per
+            // row, uniform-random. Could optionally use option_planner
+            // for guided sampling, but uniform gives broader coverage
+            // and is what we want for L3 discovery.
+            if use_options {
+                self.planner_option_onehot_scratch.fill(0.0);
+                for row in 0..batch {
+                    let opt = rng.random_range(0..no);
+                    self.planner_option_onehot_scratch[row * no + opt] = 1.0;
+                }
+            }
             // --- 1. Policy forward (only if we'll use it this step) ---
             if need_policy {
                 let policy_planner = self.policy_planner_session.as_mut().unwrap();
                 policy_planner.set_input("z", &self.planner_z_scratch);
+                if use_options {
+                    policy_planner.set_input("option_onehot", &self.planner_option_onehot_scratch);
+                }
                 policy_planner.step();
                 policy_planner.wait();
                 policy_planner.read_output_by_index(0, &mut policy_logits);
@@ -7790,7 +7902,7 @@ impl Agent {
                     // Choose sampler: with prob (1 - mix) use uniform;
                     // else policy-guided.
                     let use_policy = need_policy
-                        && rng.random_range(0.0..1.0_f32) < policy_mix;
+                        && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
                     let action_idx: u32 = if !use_policy {
                         valid[rng.random_range(0..valid.len())]
                     } else {
@@ -8232,6 +8344,31 @@ impl Agent {
                 let buf = &mut self.planner_param_buf[..*n_elem];
                 self.policy_session.read_param(name, buf);
                 policy_planner.set_parameter(name, buf);
+            }
+            // Option bias for option-conditional policy planner
+            // (only present when num_options > 1; it adds an additive
+            // bias selected by option_onehot).
+            if self.config.num_options >= 2 {
+                let n_elem = self.config.num_options * MAX_ACTION_DIM;
+                let buf = &mut self.planner_param_buf[..n_elem];
+                self.policy_session.read_param("policy.option_bias.weight", buf);
+                policy_planner.set_parameter("policy.option_bias.weight", buf);
+            }
+        }
+        // Option-policy params (when option_planner exists).
+        if let Some(ref mut option_planner) = self.option_planner_session {
+            if let Some(ref mut option_sess) = self.option_session {
+                let no = self.config.num_options;
+                let opt_params: [(&str, usize); 3] = [
+                    ("option.trunk.weight", ld * hd),
+                    ("option.trunk.bias", hd),
+                    ("option.head.weight", hd * no),
+                ];
+                for (name, n_elem) in opt_params.iter() {
+                    let buf = &mut self.planner_param_buf[..*n_elem];
+                    option_sess.read_param(name, buf);
+                    option_planner.set_parameter(name, buf);
+                }
             }
         }
         // Value-head params (when wm_planner has a value branch).
