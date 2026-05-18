@@ -271,6 +271,12 @@ def main() -> int:
                         "dims. Keeps spatial precision while adding "
                         "layout-invariant object structure. Default 0 "
                         "= flat 8x8 pixel pool.")
+    parser.add_argument("--archive-level-weight-base", type=float, default=1.0,
+                        help="Exponential base for level-weighted "
+                        "archive restore. 1.0 = uniform (default). "
+                        "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
+                        "restores when L1/L2/L3 all populated. Push "
+                        "for higher-level attempts.")
     parser.add_argument("--level-reward-scale", type=float, default=0.0,
                         help="Scale level rewards by level reached: "
                         "reward = delta * (1 + scale * (level - 1)). "
@@ -677,7 +683,12 @@ def main() -> int:
                     if (args.archive_cap > 0
                             and levels_with
                             and rng.random() < args.archive_reset_prob):
-                        weights = [float(lvl + 1) for lvl in levels_with]
+                        # Exponential weighting by level — higher levels
+                        # get exponentially more restores. Default base
+                        # 2: L1=2, L2=4, L3=8, L4=16. With L1,L2,L3
+                        # populated → L3 gets 8/14 ≈ 57% of restores.
+                        base = args.archive_level_weight_base
+                        weights = [base ** float(lvl) for lvl in levels_with]
                         chosen_lvl = rng.choices(levels_with, weights=weights, k=1)[0]
                         gar = archive[g_idx][chosen_lvl]
                         entry = gar[rng.randrange(len(gar))]
