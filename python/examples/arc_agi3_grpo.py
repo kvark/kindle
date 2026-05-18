@@ -271,6 +271,19 @@ def main() -> int:
                         "dims. Keeps spatial precision while adding "
                         "layout-invariant object structure. Default 0 "
                         "= flat 8x8 pixel pool.")
+    parser.add_argument("--skill-replay-prob", type=float, default=0.0,
+                        help="At plan_and_queue time, with this prob, "
+                        "prefix planner_queue with a random captured "
+                        "action sequence from a prior winning level "
+                        "transition. Learned macros / options. 0 (def) "
+                        "= disabled. 0.2-0.5 recommended.")
+    parser.add_argument("--skill-capture-len", type=int, default=20,
+                        help="How many recent actions to keep per "
+                        "lane (rolling). On level-up, the last N "
+                        "of these are appended to the game's skill "
+                        "bank. Should be ≥ typical level-demo length.")
+    parser.add_argument("--skill-bank-cap", type=int, default=100,
+                        help="Max captured action sequences per game.")
     parser.add_argument("--archive-level-weight-base", type=float, default=1.0,
                         help="Exponential base for level-weighted "
                         "archive restore. 1.0 = uniform (default). "
@@ -602,6 +615,18 @@ def main() -> int:
     trail_step_counter = [0] * n_lanes
     trail_archive_adds = 0  # diagnostic
 
+    # Action-skill bank (per game): action sequences captured from
+    # winning level transitions. Recent action history is kept in a
+    # deque per lane and snapshotted on level-events. At planner time
+    # with probability --skill-replay-prob a random captured sequence
+    # is pushed onto the planner_queue, prefixing the planner-chosen
+    # actions. Acts as a learned macro / option mechanism — compresses
+    # action sequences into reusable templates the agent can recombine.
+    skills_on = args.skill_replay_prob > 0.0
+    skill_bank = [collections.deque(maxlen=args.skill_bank_cap) for _ in range(n_games)]
+    recent_actions = [collections.deque(maxlen=args.skill_capture_len) for _ in range(n_lanes)]
+    skill_replays = 0  # diagnostic
+
     # Intrinsic progress signals (Term 1 + Term 2 + Term 3).
     # Term 1: persistent configurational delta from episode-start.
     # Term 2: per-episode coarse-state entropy growth.
@@ -759,7 +784,26 @@ def main() -> int:
                             last_empowerment[i] = min(e / new_mean, 3.0)
                         else:
                             last_empowerment[i] = 0.0
+            # Skill replay: prefix planner_queue with a random captured
+            # action sequence per lane, with given probability. The agent
+            # then COMMITS to that sequence before any new planning.
+            if skills_on and args.planner_horizon > 0:
+                for i in range(n_lanes):
+                    if rng.random() >= args.skill_replay_prob:
+                        continue
+                    g_idx = i // K
+                    if not skill_bank[g_idx]:
+                        continue
+                    seq = rng.choice(list(skill_bank[g_idx]))
+                    agent.queue_actions(i, list(seq))
+                    skill_replays += 1
             actions = agent.act(pooled)
+
+            # Record action history per lane for skill capture on
+            # level-up below.
+            if skills_on:
+                for i in range(n_lanes):
+                    recent_actions[i].append(int(actions[i]))
 
             new_obs_list = []
             homeo_list = []
@@ -842,6 +886,14 @@ def main() -> int:
                                     archive_adds += 1
                                     trail_archive_adds += 1
                         win_trails[i].clear()
+                    # Skill capture: snapshot the recent action
+                    # sequence to the game's skill bank — these are
+                    # actions that led to a level-event so they're
+                    # candidate macros for similar future situations.
+                    if skills_on and recent_actions[i]:
+                        g_idx_sk = i // K
+                        seq = tuple(recent_actions[i])
+                        skill_bank[g_idx_sk].append(seq)
                     # NEW (2026-05-17): snapshot env state AFTER the
                     # level-up step → push to archive[g][new_level].
                     # This IS the new level's starting state. Without

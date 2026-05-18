@@ -8243,6 +8243,19 @@ impl Agent {
         self.planner_queue.iter().map(|q| q.len()).sum()
     }
 
+    /// External-API push: append a sequence of action indices to a
+    /// specific lane's planner queue. Lets the harness inject learned
+    /// skills/macros that the agent commits to instead of running a
+    /// fresh plan_and_queue. Invalid `lane` is silently ignored.
+    pub fn queue_actions(&mut self, lane: usize, actions: &[u32]) {
+        if lane >= self.planner_queue.len() {
+            return;
+        }
+        for &a in actions {
+            self.planner_queue[lane].push_back(a);
+        }
+    }
+
     pub fn approach_confidence(&self) -> f32 {
         let Some(state) = self.approach_state.as_ref() else {
             return 0.0;
