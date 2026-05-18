@@ -271,6 +271,12 @@ def main() -> int:
                         "dims. Keeps spatial precision while adding "
                         "layout-invariant object structure. Default 0 "
                         "= flat 8x8 pixel pool.")
+    parser.add_argument("--planner-action-repeat", type=int, default=1,
+                        help="Each planner step's action is repeated "
+                        "this many times in the WM rollout AND committed "
+                        "to the planner queue. Effective atomic reach "
+                        "per planner call = planner_horizon × repeat. "
+                        "Default 1 (no repeat). Try 3-5 for L3+ pushes.")
     parser.add_argument("--num-options", type=int, default=1,
                         help="L1 hierarchical options: number of "
                         "discrete options (skills). 1 (default) = "
@@ -473,6 +479,7 @@ def main() -> int:
         goal_states_her_prob=args.goal_states_her_prob,
         value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
+        planner_action_repeat=args.planner_action_repeat,
         num_options=args.num_options,
         option_horizon=args.option_horizon,
         per_option_heads=bool(args.per_option_heads),

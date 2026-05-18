@@ -513,6 +513,7 @@ impl PyBatchAgent {
         reward_pred_loss_coef = None,
         planner_horizon = None,
         planner_samples = None,
+        planner_action_repeat = None,
         planner_refresh_interval = None,
         planner_policy_mix = None,
         planner_policy_temperature = None,
@@ -652,6 +653,7 @@ impl PyBatchAgent {
         reward_pred_loss_coef: Option<f32>,
         planner_horizon: Option<usize>,
         planner_samples: Option<usize>,
+        planner_action_repeat: Option<usize>,
         planner_refresh_interval: Option<usize>,
         planner_policy_mix: Option<f32>,
         planner_policy_temperature: Option<f32>,
@@ -1057,6 +1059,9 @@ impl PyBatchAgent {
         }
         if let Some(v) = planner_samples {
             config.planner_samples = v;
+        }
+        if let Some(v) = planner_action_repeat {
+            config.planner_action_repeat = v;
         }
         if let Some(v) = planner_refresh_interval {
             config.planner_refresh_interval = v;
