@@ -271,6 +271,28 @@ def main() -> int:
                         "dims. Keeps spatial precision while adding "
                         "layout-invariant object structure. Default 0 "
                         "= flat 8x8 pixel pool.")
+    parser.add_argument("--num-options", type=int, default=1,
+                        help="L1 hierarchical options: number of "
+                        "discrete options (skills). 1 (default) = "
+                        "L0-only, no options. ≥2 activates kindle's "
+                        "option-policy session, per-lane goal table, "
+                        "DIAYN-style option distinguishability bonus. "
+                        "Options last `--option-horizon` steps each. "
+                        "Effective planner reach = horizon × option-"
+                        "horizon. 4-8 recommended.")
+    parser.add_argument("--option-horizon", type=int, default=5,
+                        help="How many env steps each option lasts "
+                        "before re-selection. Default 5. With "
+                        "num_options=8 and option_horizon=5, agent "
+                        "picks one of 8 macros that each run for 5 "
+                        "atomic actions.")
+    parser.add_argument("--per-option-heads", type=int, default=0,
+                        help="When 1, each option gets its own "
+                        "policy-head MLP. Otherwise options share "
+                        "a single trunk + per-option bias.")
+    parser.add_argument("--option-entropy-beta", type=float, default=0.01,
+                        help="Entropy bonus on option-choice policy. "
+                        "Encourages distinct option usage.")
     parser.add_argument("--skill-replay-prob", type=float, default=0.0,
                         help="At plan_and_queue time, with this prob, "
                         "prefix planner_queue with a random captured "
@@ -451,6 +473,10 @@ def main() -> int:
         goal_states_her_prob=args.goal_states_her_prob,
         value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
+        num_options=args.num_options,
+        option_horizon=args.option_horizon,
+        per_option_heads=bool(args.per_option_heads),
+        option_entropy_beta=args.option_entropy_beta,
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )
