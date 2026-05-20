@@ -1222,6 +1222,24 @@ pub struct AgentConfig {
     /// `value_head_train_coef` (you can train V without consuming it,
     /// or skip training and use a pre-loaded V). 0 (default) = disabled.
     pub planner_value_alpha: f32,
+    /// Affordance / state-change planner bonus: when > 0, each trajectory
+    /// step contributes `α · ||z_step − z_prev||` (L2 norm of predicted
+    /// state change). Prefers planner sequences whose WM rollouts cause
+    /// LARGE per-step latent change.
+    ///
+    /// Rationale (vertical/horizontal transfer): the WM is trained on
+    /// transitions from ALL games and ALL levels, so its prediction of
+    /// "what change does this action cause from this z" implicitly encodes
+    /// affordances that are SHARED across levels and games. At a novel
+    /// level (e.g. tu93 L3) where state-specific signals (visit count,
+    /// goal cos-sim, win classifier) have no data, the affordance signal
+    /// still picks out actions that DO SOMETHING — driving exploration
+    /// toward mechanically-active regions instead of staring at walls.
+    ///
+    /// 0 (default) = disabled. Reasonable values: 0.1–1.0. Computed
+    /// per-step in `plan_and_queue_gpu` using the existing planner
+    /// trajectory; no new graph or buffer required.
+    pub planner_change_alpha: f32,
     /// Discount factor for value-head return-to-go targets. 0.99 default.
     /// Lower (0.95) makes V more local; higher (0.995) propagates win
     /// signal farther backward along the trajectory.
@@ -1249,6 +1267,24 @@ pub struct AgentConfig {
     /// gradient on confident negatives: loss-latents get pushed to
     /// P=0, win-latents to P=1, creating a separating axis.
     pub value_head_grad_to_encoder: bool,
+    /// Cross-game value classifier mode. When `false` (default),
+    /// `value_replay_step` samples round-robin across env_id buckets
+    /// (game-stratified) — each game contributes equally regardless
+    /// of how many wins it produced. Prevents the "sp80 monopolizes
+    /// the gradient" failure mode from joint training (2026-05-15).
+    ///
+    /// When `true`, the sampler ignores the per-env stratification:
+    /// every push pools into env_id 0 buckets and sampling draws
+    /// uniformly from the pooled queue. The classifier is trained
+    /// on the UNION of all games' wins/losses → learns features that
+    /// are common to "winning" across games. Useful for horizontal
+    /// transfer (game→game): a never-seen game still gets a non-zero
+    /// classifier signal from latents that look like generic wins.
+    ///
+    /// Trade-off: cross-game mode forgoes the bias fix. Best paired
+    /// with games that produce roughly comparable win rates, OR with
+    /// a fresh game where stratified mode would have zero data.
+    pub value_buffer_cross_game: bool,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.);
@@ -1432,12 +1468,14 @@ impl Default for AgentConfig {
             bc_planner_synthetic_r: 0.0,
             value_head_train_coef: 0.0,
             planner_value_alpha: 0.0,
+            planner_change_alpha: 0.0,
             value_head_gamma: 0.99,
             value_head_buffer_capacity: 10_000,
             value_head_train_batch: 32,
             value_head_hidden_dim: 0,
             value_head_lr_scale: 1.0,
             value_head_grad_to_encoder: true,
+            value_buffer_cross_game: false,
             encoder_kind: EncoderKind::Mlp,
             efficientnet_weights_path: None,
             outcome_window: 1,
@@ -4667,12 +4705,25 @@ impl Agent {
                 if self.config.value_head_train_coef > 0.0 {
                     let blen = lane.buffer.len();
                     // Per-env cap: half of total budget. Each env gets
-                    // its own queue under that cap.
-                    let per_env_cap =
-                        (self.config.value_head_buffer_capacity / 2).max(1);
+                    // its own queue under that cap. In cross-game mode
+                    // there is only one key, so use the full budget as
+                    // the cap.
+                    let per_env_cap = if self.config.value_buffer_cross_game {
+                        self.config.value_head_buffer_capacity.max(1)
+                    } else {
+                        (self.config.value_head_buffer_capacity / 2).max(1)
+                    };
                     let gamma = self.config.value_head_gamma.clamp(0.0, 0.999);
                     let is_win = lane.sil_ep_event_count > 0;
                     let env_id = lane.adapter.id();
+                    // Cross-game mode: pool all samples under env_id 0
+                    // so the sampler draws uniformly without per-game
+                    // stratification.
+                    let buf_key = if self.config.value_buffer_cross_game {
+                        0u32
+                    } else {
+                        env_id
+                    };
                     if blen > 0 {
                         let mut decay = 1.0f32;
                         let mut idx = blen - 1;
@@ -4681,11 +4732,11 @@ impl Agent {
                             let label = if is_win { decay } else { 0.0 };
                             let buf = if is_win {
                                 self.win_buffer
-                                    .entry(env_id)
+                                    .entry(buf_key)
                                     .or_insert_with(std::collections::VecDeque::new)
                             } else {
                                 self.loss_buffer
-                                    .entry(env_id)
+                                    .entry(buf_key)
                                     .or_insert_with(std::collections::VecDeque::new)
                             };
                             if buf.len() >= per_env_cap {
@@ -8240,6 +8291,7 @@ impl Agent {
         let rnd_alpha = self.config.planner_rnd_alpha;
         let goal_alpha = self.config.planner_goal_alpha;
         let value_alpha = self.config.planner_value_alpha;
+        let change_alpha = self.config.planner_change_alpha;
         let has_value = self.wm_planner_has_value_head;
         let rnd_ref = self.rnd_state.as_ref();
         for lane_idx in 0..n {
@@ -8249,6 +8301,12 @@ impl Agent {
             let lane = &self.lanes[lane_idx];
             let goals = if goal_alpha > 0.0 {
                 self.goal_states.get(&lane.adapter.id())
+            } else {
+                None
+            };
+            // Initial z for change-alpha: the lane's current latent (z0).
+            let z0_for_change: Option<Vec<f32>> = if change_alpha > 0.0 {
+                lane.buffer.last().map(|t| t.latent.clone())
             } else {
                 None
             };
@@ -8280,6 +8338,31 @@ impl Agent {
                         let v = self.planner_v_traj_scratch[t * batch + row];
                         if v.is_finite() {
                             score += value_alpha * v;
+                        }
+                    }
+                    // Affordance / state-change signal: ||z_step − z_prev||.
+                    // z_prev = z0 at t=0, otherwise the previous step's
+                    // predicted latent (same sample row).
+                    if change_alpha > 0.0 {
+                        let z_prev: &[f32] = if t == 0 {
+                            match z0_for_change.as_deref() {
+                                Some(z) => z,
+                                None => continue,
+                            }
+                        } else {
+                            let prev_off = (t - 1) * batch * ld + row * ld;
+                            &self.planner_traj_scratch[prev_off..prev_off + ld]
+                        };
+                        let mut sq = 0.0f32;
+                        for d in 0..ld {
+                            let dv = z_step[d] - z_prev[d];
+                            if dv.is_finite() {
+                                sq += dv * dv;
+                            }
+                        }
+                        let mag = sq.sqrt();
+                        if mag.is_finite() {
+                            score += change_alpha * mag;
                         }
                     }
                 }

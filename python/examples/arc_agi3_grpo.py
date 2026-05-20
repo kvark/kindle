@@ -226,6 +226,24 @@ def main() -> int:
                         "action. Policy learns to clone planner. Closes "
                         "policy-planner gap so the executor matches the "
                         "discoverer. 0.3-1.0 recommended. 0 = off.")
+    parser.add_argument("--planner-change-alpha", type=float, default=0.0,
+                        help="Affordance bonus: planner step score gets "
+                        "+alpha * ||z_step - z_prev|| (predicted latent "
+                        "change magnitude). Drives planner toward actions "
+                        "that DO SOMETHING. WM is trained cross-game/level "
+                        "so this signal transfers to novel levels where "
+                        "state-specific signals (value head, goal cos-sim) "
+                        "have no data. 0.1-1.0 recommended. 0 = off.")
+    parser.add_argument("--value-buffer-cross-game", type=int, default=0,
+                        help="Pool win/loss buffers across all games "
+                        "(env_ids) into a single shared queue. "
+                        "Classifier learns generic 'winning' features "
+                        "across games. Trade-off: forgoes the per-game "
+                        "stratification bias-fix. Useful for horizontal "
+                        "transfer (game->game): a novel game still gets "
+                        "classifier signal from latents that look like "
+                        "generic wins. 0 = off (default, per-game). "
+                        "1 = on (cross-game).")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "
@@ -493,6 +511,8 @@ def main() -> int:
         goal_states_her_prob=args.goal_states_her_prob,
         value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
+        planner_change_alpha=args.planner_change_alpha,
+        value_buffer_cross_game=bool(args.value_buffer_cross_game),
         planner_action_repeat=args.planner_action_repeat,
         wm_kstep_k=args.wm_kstep_k,
         wm_kstep_batch=args.wm_kstep_batch,
