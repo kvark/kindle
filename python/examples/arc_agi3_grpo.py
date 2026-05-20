@@ -244,6 +244,11 @@ def main() -> int:
                         "classifier signal from latents that look like "
                         "generic wins. 0 = off (default, per-game). "
                         "1 = on (cross-game).")
+    parser.add_argument("--goal-states-cross-game", type=int, default=0,
+                        help="Pool goal_states (win-latents) across all "
+                        "games. Planner's cos-sim to wins draws from "
+                        "shared pool. 0 = per-game (default). 1 = "
+                        "cross-game. Pairs with --value-buffer-cross-game.")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "
@@ -513,6 +518,7 @@ def main() -> int:
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
         planner_change_alpha=args.planner_change_alpha,
         value_buffer_cross_game=bool(args.value_buffer_cross_game),
+        goal_states_cross_game=bool(args.goal_states_cross_game),
         planner_action_repeat=args.planner_action_repeat,
         wm_kstep_k=args.wm_kstep_k,
         wm_kstep_batch=args.wm_kstep_batch,
