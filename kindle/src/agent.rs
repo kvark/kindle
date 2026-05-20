@@ -1297,6 +1297,32 @@ pub struct AgentConfig {
     /// Pairs with `value_buffer_cross_game`: same idea, applied to
     /// the planner_goal_alpha cos-sim instead of the classifier.
     pub goal_states_cross_game: bool,
+    /// Sub-goal centroid count for online k-means clustering of the
+    /// `goal_states` queue. 0 (default) = disabled. When > 0, the
+    /// agent maintains K centroid vectors per env (or pooled when
+    /// `goal_states_cross_game=true`); each new win latent is pulled
+    /// toward its nearest centroid by `subgoal_lr`.
+    ///
+    /// Used by the planner via `planner_subgoal_alpha`. The centroids
+    /// are an ABSTRACTION over raw win states — they represent
+    /// regions ("a-winning-state-looks-like-this") rather than
+    /// specific past wins. Better vertical transfer (L1→L2 within a
+    /// game) and horizontal transfer (game→game) because the
+    /// abstraction averages out instance-specific details.
+    pub subgoal_k: usize,
+    /// Online k-means learning rate for sub-goal centroids. Each new
+    /// win latent: centroid = (1-lr) * centroid + lr * z. Default
+    /// 0.05 (slow) — high lr causes centroids to chase the most
+    /// recent wins; low lr averages over many.
+    pub subgoal_lr: f32,
+    /// Planner integration for sub-goal centroids: when > 0, the
+    /// planner adds `α · max_k cos_sim(z_step, centroid_k)` to its
+    /// trajectory score. 0 (default) = disabled.
+    ///
+    /// Use ALONGSIDE `planner_goal_alpha` (which uses raw win
+    /// states), not as a replacement: centroids are abstract but
+    /// noisy; raw points are specific. Both signals add.
+    pub planner_subgoal_alpha: f32,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.);
@@ -1489,6 +1515,9 @@ impl Default for AgentConfig {
             value_head_grad_to_encoder: true,
             value_buffer_cross_game: false,
             goal_states_cross_game: false,
+            subgoal_k: 0,
+            subgoal_lr: 0.05,
+            planner_subgoal_alpha: 0.0,
             encoder_kind: EncoderKind::Mlp,
             efficientnet_weights_path: None,
             outcome_window: 1,
@@ -2195,6 +2224,21 @@ pub struct Agent {
     /// goal archive — winning level 1 of tu93 doesn't bias planning in
     /// g50t. Empty for envs that haven't yet had any extrinsic event.
     goal_states: hashbrown::HashMap<u32, std::collections::VecDeque<Vec<f32>>>,
+    /// Per-env (or pooled when `goal_states_cross_game`) sub-goal
+    /// centroids learned via online k-means over the `goal_states`
+    /// queue. Capacity = `subgoal_k`. Centroids are pulled toward
+    /// every newly pushed win latent. The planner adds
+    /// `subgoal_alpha * max cos_sim(z_step, centroid)` to its
+    /// trajectory score when `subgoal_k > 0`.
+    ///
+    /// Centroids are an ABSTRACTION over raw goal_states — they
+    /// generalize "regions of winning states" instead of pointing
+    /// at specific past wins. This is the cleanest knob we have
+    /// for vertical transfer: L1 wins create centroids; the
+    /// planner navigates toward centroid regions at L2 even with
+    /// no L2 wins yet, because the centroid captures the COMMON
+    /// shape of winning states in the encoder's latent space.
+    subgoal_centroids: hashbrown::HashMap<u32, Vec<Vec<f32>>>,
     /// Per-lane action availability mask for `act()` sampling. Flat
     /// `[batch_size × MAX_ACTION_DIM]` layout; 1.0 = valid, 0.0 = invalid.
     /// Default (all 1.0) preserves prior behaviour. Set via
@@ -2547,6 +2591,47 @@ fn max_goal_similarity(z: &[f32], goals: &std::collections::VecDeque<Vec<f32>>) 
         }
     }
     best
+}
+
+/// Max cos-sim between `z` and any centroid in `centroids`.
+/// Returns 0 if list is empty.
+fn max_centroid_similarity(z: &[f32], centroids: &[Vec<f32>]) -> f32 {
+    let mut best = 0.0f32;
+    for c in centroids {
+        let s = cosine_similarity(z, c);
+        if s > best {
+            best = s;
+        }
+    }
+    best
+}
+
+/// Online k-means update: nudge nearest centroid toward `z`. If the
+/// list has fewer than `k` entries, push `z` as a new centroid.
+/// `lr` is the convex-combination weight (high = chase recent wins).
+fn online_kmeans_update(centroids: &mut Vec<Vec<f32>>, z: &[f32], k: usize, lr: f32) {
+    if k == 0 {
+        return;
+    }
+    if centroids.len() < k {
+        centroids.push(z.to_vec());
+        return;
+    }
+    // Find nearest by cos-sim.
+    let mut best_i = 0usize;
+    let mut best_s = f32::NEG_INFINITY;
+    for (i, c) in centroids.iter().enumerate() {
+        let s = cosine_similarity(z, c);
+        if s > best_s {
+            best_s = s;
+            best_i = i;
+        }
+    }
+    // Pull centroid toward z.
+    let c = &mut centroids[best_i];
+    for d in 0..c.len().min(z.len()) {
+        c[d] = (1.0 - lr) * c[d] + lr * z[d];
+    }
 }
 
 /// Build a forward-only WM rollout graph: `(z, action) -> z_next`.
@@ -3811,6 +3896,7 @@ impl Agent {
             intrinsic_progress_reward: vec![0.0; n],
             last_empowerment: vec![0.0; n],
             goal_states: hashbrown::HashMap::new(),
+            subgoal_centroids: hashbrown::HashMap::new(),
             action_masks: vec![1.0; n * MAX_ACTION_DIM],
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
             sil_baseline: 0.0,
@@ -4802,6 +4888,20 @@ impl Agent {
                                 q.pop_front();
                             }
                             q.push_back(prev.latent.clone());
+                            // Centroid update for HER pushes too.
+                            if self.config.subgoal_k > 0 {
+                                let centroids = self
+                                    .subgoal_centroids
+                                    .entry(key)
+                                    .or_insert_with(Vec::new);
+                                let z = prev.latent.clone();
+                                online_kmeans_update(
+                                    centroids,
+                                    &z,
+                                    self.config.subgoal_k,
+                                    self.config.subgoal_lr,
+                                );
+                            }
                         }
                     }
                 }
@@ -5062,6 +5162,21 @@ impl Agent {
                         q.pop_front();
                     }
                     q.push_back(z_row.to_vec());
+                    // Sub-goal centroids: online k-means update over the
+                    // same pool. Centroids share the same key (per-env
+                    // or pooled, matching goal_states_cross_game).
+                    if self.config.subgoal_k > 0 {
+                        let centroids = self
+                            .subgoal_centroids
+                            .entry(key)
+                            .or_insert_with(Vec::new);
+                        online_kmeans_update(
+                            centroids,
+                            z_row,
+                            self.config.subgoal_k,
+                            self.config.subgoal_lr,
+                        );
+                    }
                 }
             }
 
@@ -8315,6 +8430,7 @@ impl Agent {
         let goal_alpha = self.config.planner_goal_alpha;
         let value_alpha = self.config.planner_value_alpha;
         let change_alpha = self.config.planner_change_alpha;
+        let subgoal_alpha = self.config.planner_subgoal_alpha;
         let has_value = self.wm_planner_has_value_head;
         let rnd_ref = self.rnd_state.as_ref();
         for lane_idx in 0..n {
@@ -8329,6 +8445,11 @@ impl Agent {
             };
             let goals = if goal_alpha > 0.0 {
                 self.goal_states.get(&goal_key)
+            } else {
+                None
+            };
+            let centroids = if subgoal_alpha > 0.0 {
+                self.subgoal_centroids.get(&goal_key)
             } else {
                 None
             };
@@ -8356,6 +8477,11 @@ impl Agent {
                     if let Some(gq) = goals {
                         if !gq.is_empty() {
                             score += goal_alpha * max_goal_similarity(z_step, gq);
+                        }
+                    }
+                    if let Some(cl) = centroids {
+                        if !cl.is_empty() {
+                            score += subgoal_alpha * max_centroid_similarity(z_step, cl);
                         }
                     }
                     // Value-head signal: V(z_step) ≈ expected discounted
@@ -8556,15 +8682,25 @@ impl Agent {
                             value += rnd_alpha * rnd.reward(&child_z);
                         }
                     }
-                    if goal_alpha > 0.0 {
+                    if goal_alpha > 0.0 || self.config.planner_subgoal_alpha > 0.0 {
                         let goal_key = if self.config.goal_states_cross_game {
                             0u32
                         } else {
                             self.lanes[lane_idx].adapter.id()
                         };
-                        if let Some(gq) = self.goal_states.get(&goal_key) {
-                            if !gq.is_empty() {
-                                value += goal_alpha * max_goal_similarity(&child_z, gq);
+                        if goal_alpha > 0.0 {
+                            if let Some(gq) = self.goal_states.get(&goal_key) {
+                                if !gq.is_empty() {
+                                    value += goal_alpha * max_goal_similarity(&child_z, gq);
+                                }
+                            }
+                        }
+                        if self.config.planner_subgoal_alpha > 0.0 {
+                            if let Some(cl) = self.subgoal_centroids.get(&goal_key) {
+                                if !cl.is_empty() {
+                                    value += self.config.planner_subgoal_alpha
+                                        * max_centroid_similarity(&child_z, cl);
+                                }
                             }
                         }
                     }

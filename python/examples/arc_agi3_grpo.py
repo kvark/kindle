@@ -249,6 +249,24 @@ def main() -> int:
                         "games. Planner's cos-sim to wins draws from "
                         "shared pool. 0 = per-game (default). 1 = "
                         "cross-game. Pairs with --value-buffer-cross-game.")
+    parser.add_argument("--subgoal-k", type=int, default=0,
+                        help="Online k-means centroid count over the "
+                        "goal_states pool. 0 (default) = disabled. "
+                        "Centroids are abstractions over raw wins "
+                        "(region-of-winning vs specific past wins); "
+                        "designed for vertical (L1->L2) and horizontal "
+                        "(game->game) transfer because they average out "
+                        "instance-specific details. 4-16 reasonable.")
+    parser.add_argument("--subgoal-lr", type=float, default=0.05,
+                        help="Online k-means update rate. Centroid is "
+                        "pulled toward new win sample by lr. 0.05 = "
+                        "slow average; 0.5 = chases recent wins. Higher "
+                        "values favor specificity; lower favor generality.")
+    parser.add_argument("--planner-subgoal-alpha", type=float, default=0.0,
+                        help="Planner score += alpha * max cos_sim(z_step, "
+                        "centroid). Use ALONGSIDE planner_goal_alpha (raw "
+                        "win cos-sim) — both signals add. 0 = off. Try "
+                        "1.0-3.0 alongside goal_alpha=1.0-2.0.")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "
@@ -519,6 +537,9 @@ def main() -> int:
         planner_change_alpha=args.planner_change_alpha,
         value_buffer_cross_game=bool(args.value_buffer_cross_game),
         goal_states_cross_game=bool(args.goal_states_cross_game),
+        subgoal_k=args.subgoal_k,
+        subgoal_lr=args.subgoal_lr,
+        planner_subgoal_alpha=args.planner_subgoal_alpha,
         planner_action_repeat=args.planner_action_repeat,
         wm_kstep_k=args.wm_kstep_k,
         wm_kstep_batch=args.wm_kstep_batch,
