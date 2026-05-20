@@ -539,6 +539,8 @@ impl PyBatchAgent {
         goal_states_her_prob = None,
         value_head_grad_to_encoder = None,
         bc_planner_synthetic_r = None,
+        planner_change_alpha = None,
+        value_buffer_cross_game = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -683,6 +685,8 @@ impl PyBatchAgent {
         goal_states_her_prob: Option<f32>,
         value_head_grad_to_encoder: Option<bool>,
         bc_planner_synthetic_r: Option<f32>,
+        planner_change_alpha: Option<f32>,
+        value_buffer_cross_game: Option<bool>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1145,6 +1149,12 @@ impl PyBatchAgent {
         }
         if let Some(v) = bc_planner_synthetic_r {
             config.bc_planner_synthetic_r = v;
+        }
+        if let Some(v) = planner_change_alpha {
+            config.planner_change_alpha = v;
+        }
+        if let Some(v) = value_buffer_cross_game {
+            config.value_buffer_cross_game = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
