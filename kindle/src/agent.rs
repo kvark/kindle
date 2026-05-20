@@ -1285,6 +1285,18 @@ pub struct AgentConfig {
     /// with games that produce roughly comparable win rates, OR with
     /// a fresh game where stratified mode would have zero data.
     pub value_buffer_cross_game: bool,
+    /// Cross-game goal-state pool. When `false` (default), each env_id
+    /// has its own goal_states queue and the planner only matches
+    /// trajectories against its OWN env_id's wins. When `true`, all
+    /// wins from all envs pool into a single shared queue (key=0) and
+    /// every lane's planner matches against the shared pool. Lets a
+    /// novel game get planner-goal pull from other games' wins —
+    /// useful when shared encoder produces analogous latents for
+    /// analogous winning configurations across games.
+    ///
+    /// Pairs with `value_buffer_cross_game`: same idea, applied to
+    /// the planner_goal_alpha cos-sim instead of the classifier.
+    pub goal_states_cross_game: bool,
     /// WM encoder backbone. `Mlp` (default) = kindle's original
     /// obs-token encoder; `Cnn { channels, height, width }` =
     /// conv-net encoder for visual/grid inputs (ARC-AGI-3 etc.);
@@ -1476,6 +1488,7 @@ impl Default for AgentConfig {
             value_head_lr_scale: 1.0,
             value_head_grad_to_encoder: true,
             value_buffer_cross_game: false,
+            goal_states_cross_game: false,
             encoder_kind: EncoderKind::Mlp,
             efficientnet_weights_path: None,
             outcome_window: 1,
@@ -4775,10 +4788,15 @@ impl Agent {
                     if rng.random_range(0.0..1.0_f32) < her_prob {
                         if let Some(prev) = lane.buffer.last() {
                             let env_id = lane.adapter.id();
+                            let key = if self.config.goal_states_cross_game {
+                                0u32
+                            } else {
+                                env_id
+                            };
                             let cap = self.config.goal_states_cap;
                             let q = self
                                 .goal_states
-                                .entry(env_id)
+                                .entry(key)
                                 .or_insert_with(std::collections::VecDeque::new);
                             if q.len() >= cap {
                                 q.pop_front();
@@ -5030,10 +5048,15 @@ impl Agent {
                     && self.config.goal_states_cap > 0
                 {
                     let env_id = lane.adapter.id();
+                    let key = if self.config.goal_states_cross_game {
+                        0u32
+                    } else {
+                        env_id
+                    };
                     let cap = self.config.goal_states_cap;
                     let q = self
                         .goal_states
-                        .entry(env_id)
+                        .entry(key)
                         .or_insert_with(std::collections::VecDeque::new);
                     if q.len() >= cap {
                         q.pop_front();
@@ -8299,8 +8322,13 @@ impl Agent {
                 continue;
             }
             let lane = &self.lanes[lane_idx];
+            let goal_key = if self.config.goal_states_cross_game {
+                0u32
+            } else {
+                lane.adapter.id()
+            };
             let goals = if goal_alpha > 0.0 {
-                self.goal_states.get(&lane.adapter.id())
+                self.goal_states.get(&goal_key)
             } else {
                 None
             };
@@ -8529,10 +8557,12 @@ impl Agent {
                         }
                     }
                     if goal_alpha > 0.0 {
-                        if let Some(gq) = self
-                            .goal_states
-                            .get(&self.lanes[lane_idx].adapter.id())
-                        {
+                        let goal_key = if self.config.goal_states_cross_game {
+                            0u32
+                        } else {
+                            self.lanes[lane_idx].adapter.id()
+                        };
+                        if let Some(gq) = self.goal_states.get(&goal_key) {
                             if !gq.is_empty() {
                                 value += goal_alpha * max_goal_similarity(&child_z, gq);
                             }
