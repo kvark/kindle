@@ -98,6 +98,12 @@ def main() -> int:
     parser.add_argument("--game-prefixes", default=None,
                         help="Comma-separated game-id prefixes to include. "
                         "Default: all 25 games.")
+    parser.add_argument("--exclude-prefixes", default=None,
+                        help="Comma-separated game-id prefixes to EXCLUDE. "
+                        "Applied after --game-prefixes. Useful for "
+                        "leave-K-out cross-game pretraining: pretrain "
+                        "with --exclude-prefixes a,b,c,d,e then resume "
+                        "with --game-prefixes a,b,c,d,e to test transfer.")
     parser.add_argument("--novelty-bonus-scale", type=float, default=0.0,
                         help="Script-level frame-hash novelty bonus: each "
                         "step the agent receives bonus = scale / sqrt(count) "
@@ -457,6 +463,10 @@ def main() -> int:
                 continue
             seen.add(key)
             env_infos.append(e)
+    if args.exclude_prefixes:
+        ex = [p.strip() for p in args.exclude_prefixes.split(",") if p.strip()]
+        env_infos = [e for e in env_infos
+                     if not any(e.game_id.startswith(p) for p in ex)]
     n_games = len(env_infos)
     K = args.forks_per_game
     M = args.macro_len
