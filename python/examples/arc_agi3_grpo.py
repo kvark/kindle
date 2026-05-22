@@ -285,11 +285,13 @@ def main() -> int:
                         "(sil_ep_event_count incrementing).")
     parser.add_argument("--confidence-novelty-drop-rate", type=float,
                         default=0.005,
-                        help="C -= rate * excess_surprise (capped) when WM "
-                        "surprise > threshold.")
-    parser.add_argument("--confidence-novelty-threshold", type=float, default=1.0,
-                        help="WM surprise above this counts as 'novel' for "
-                        "confidence drop. Tune to typical surprise magnitude.")
+                        help="C -= rate * (visit_novelty - threshold) when "
+                        "visit-count novelty > threshold.")
+    parser.add_argument("--confidence-novelty-threshold", type=float, default=0.3,
+                        help="Visit-count novelty (1/sqrt(visit+1)) above this "
+                        "counts as 'novel'. 0.3 ~= visit_count<10. Bounded in "
+                        "[0,1]; visit-count chosen over surprise because "
+                        "surprise magnitude depends on latent_dim.")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "

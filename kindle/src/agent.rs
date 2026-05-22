@@ -1322,13 +1322,16 @@ pub struct AgentConfig {
     /// Per-event confidence increment. Default 0.02 (50 events to
     /// reach saturation from 0).
     pub confidence_win_increment: f32,
-    /// Per-step confidence drop rate when surprise > threshold.
-    /// Default 0.005 (~200 surprising steps to drop from 1 to 0).
+    /// Per-step confidence drop rate when visit-count novelty
+    /// exceeds threshold. Default 0.005. Drop is multiplied by
+    /// (novelty - threshold), so a barely-novel step drops C
+    /// very little; a fresh state drops by drop_rate * (1-threshold).
     pub confidence_novelty_drop_rate: f32,
-    /// WM surprise threshold above which a step counts as "novel".
-    /// Surprise = MSE between predicted and actual next-latent
-    /// (already computed as `last_surprise`). Default 1.0; tune
-    /// based on the typical surprise magnitude for your task.
+    /// Visit-count novelty threshold above which a step counts as
+    /// "novel" for confidence drop. Visit-novelty = 1/sqrt(visit_count+1),
+    /// bounded in [0, 1]. Default 0.3 (visit_count < ~10 = novel).
+    /// Set near 0 to make almost any step novel; set near 1 to make
+    /// only first-ever-visited states novel.
     pub confidence_novelty_threshold: f32,
     /// Sub-goal centroid count for online k-means clustering of the
     /// `goal_states` queue. 0 (default) = disabled. When > 0, the
@@ -1551,7 +1554,7 @@ impl Default for AgentConfig {
             confidence_mode: false,
             confidence_win_increment: 0.02,
             confidence_novelty_drop_rate: 0.005,
-            confidence_novelty_threshold: 1.0,
+            confidence_novelty_threshold: 0.3,
             subgoal_k: 0,
             subgoal_lr: 0.05,
             planner_subgoal_alpha: 0.0,
@@ -5274,14 +5277,20 @@ impl Agent {
             lane.last_reward = reward;
             lane.last_base_reward = base_reward;
 
-            // Confidence: WM surprise above threshold drops C. The
-            // drop is proportional to how far above threshold the
-            // surprise is, clamped so a single huge surprise doesn't
-            // crater confidence. Floor at 0.
+            // Confidence: visit-count novelty above threshold drops C.
+            // `novelty` here is 1/sqrt(visit_count+1), bounded in [0, 1].
+            // threshold=0.3 means visit_count < ~10 → novel. The drop is
+            // proportional to (novelty - threshold), clamped so a single
+            // very-novel step doesn't crater C. Floor at 0.
+            //
+            // Visit-count chosen over raw WM-surprise because surprise
+            // magnitude depends on latent_dim (||z_pred - z_actual|| in
+            // latent_dim=256 is typically 3-5, not [0,1]). Visit-novelty
+            // is bounded and stable.
             if self.config.confidence_mode {
                 let thr = self.config.confidence_novelty_threshold;
-                if surprise > thr {
-                    let excess = ((surprise - thr) / thr).min(2.0);
+                if novelty > thr {
+                    let excess = (novelty - thr).min(1.0);
                     let drop = self.config.confidence_novelty_drop_rate * excess;
                     lane.confidence = (lane.confidence - drop).max(0.0);
                 }
