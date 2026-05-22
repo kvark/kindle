@@ -1297,6 +1297,39 @@ pub struct AgentConfig {
     /// Pairs with `value_buffer_cross_game`: same idea, applied to
     /// the planner_goal_alpha cos-sim instead of the classifier.
     pub goal_states_cross_game: bool,
+    /// Confidence-weighted planner mode. When `true`, the planner
+    /// scoring loop weights exploit terms (goal_alpha, value_alpha)
+    /// by per-lane confidence C, and explore terms (change_alpha,
+    /// rnd_alpha) by (1 − C). visit_count remains as an always-on
+    /// base novelty signal.
+    ///
+    /// C is per-lane, starts at 0.5, and updates each observe() step:
+    /// - rises by `confidence_win_increment` on each extrinsic event
+    ///   (sil_ep_event_count incrementing by 1)
+    /// - falls by `confidence_novelty_drop_rate * surprise_signal`
+    ///   when WM surprise on the current step is above
+    ///   `confidence_novelty_threshold`
+    ///
+    /// The asymmetry ("rises only on winning") keeps the planner
+    /// in explore-mode at frontier states (newly reached levels)
+    /// where the WM/value head haven't validated their predictions
+    /// with real wins. This is the proposed unlock for L2→L3:
+    /// when restored to L2 archive states, encountering novel L2
+    /// dynamics drops C → planner shifts to exploration → may
+    /// stumble on L3 transition (the same mechanism that found L2
+    /// from L1 via vanilla change_alpha).
+    pub confidence_mode: bool,
+    /// Per-event confidence increment. Default 0.02 (50 events to
+    /// reach saturation from 0).
+    pub confidence_win_increment: f32,
+    /// Per-step confidence drop rate when surprise > threshold.
+    /// Default 0.005 (~200 surprising steps to drop from 1 to 0).
+    pub confidence_novelty_drop_rate: f32,
+    /// WM surprise threshold above which a step counts as "novel".
+    /// Surprise = MSE between predicted and actual next-latent
+    /// (already computed as `last_surprise`). Default 1.0; tune
+    /// based on the typical surprise magnitude for your task.
+    pub confidence_novelty_threshold: f32,
     /// Sub-goal centroid count for online k-means clustering of the
     /// `goal_states` queue. 0 (default) = disabled. When > 0, the
     /// agent maintains K centroid vectors per env (or pooled when
@@ -1515,6 +1548,10 @@ impl Default for AgentConfig {
             value_head_grad_to_encoder: true,
             value_buffer_cross_game: false,
             goal_states_cross_game: false,
+            confidence_mode: false,
+            confidence_win_increment: 0.02,
+            confidence_novelty_drop_rate: 0.005,
+            confidence_novelty_threshold: 1.0,
             subgoal_k: 0,
             subgoal_lr: 0.05,
             planner_subgoal_alpha: 0.0,
@@ -1814,6 +1851,18 @@ struct Lane {
     last_entropy: f32,
     last_surprise: f32,
     last_novelty: f32,
+    /// Per-lane confidence in [0, 1]. Rises ONLY on extrinsic events;
+    /// falls when per-step novelty (visit_count or WM surprise) is
+    /// high. Used by the confidence-weighted planner to dynamically
+    /// balance exploit vs explore: high C → emphasize value/goal;
+    /// low C → emphasize change/RND/novelty. Default 0.5 at start.
+    ///
+    /// The design is intentionally asymmetric: exploration must
+    /// PROVE itself with extrinsic events before C increases. This
+    /// keeps the planner conservative about exploitation at frontier
+    /// states (newly reached levels) where WM and value-head haven't
+    /// validated their predictions with actual wins.
+    confidence: f32,
     last_homeo: f32,
     last_order: f32,
     last_reward: f32,
@@ -3750,6 +3799,7 @@ impl Agent {
                 last_logits: vec![0.0; MAX_ACTION_DIM],
                 last_entropy: 0.0,
                 last_surprise: 0.0,
+                confidence: 0.5,
                 last_novelty: 0.0,
                 last_homeo: 0.0,
                 last_order: 0.0,
@@ -5138,6 +5188,13 @@ impl Agent {
             // positive extrinsic this step.
             if ext_reward > 0.0 {
                 lane.sil_ep_event_count += 1;
+                // Confidence: a validated extrinsic event raises C.
+                // This is the ONLY signal that increases confidence.
+                if self.config.confidence_mode {
+                    lane.confidence = (lane.confidence
+                        + self.config.confidence_win_increment)
+                        .min(1.0);
+                }
                 // Emergent goal discovery: snapshot the latent at this
                 // win-event into the per-env goal archive. The planner
                 // uses these as attractors via cosine similarity (when
@@ -5216,6 +5273,19 @@ impl Agent {
             lane.last_order = order;
             lane.last_reward = reward;
             lane.last_base_reward = base_reward;
+
+            // Confidence: WM surprise above threshold drops C. The
+            // drop is proportional to how far above threshold the
+            // surprise is, clamped so a single huge surprise doesn't
+            // crater confidence. Floor at 0.
+            if self.config.confidence_mode {
+                let thr = self.config.confidence_novelty_threshold;
+                if surprise > thr {
+                    let excess = ((surprise - thr) / thr).min(2.0);
+                    let drop = self.config.confidence_novelty_drop_rate * excess;
+                    lane.confidence = (lane.confidence - drop).max(0.0);
+                }
+            }
 
             // L1: accumulate reward into the current option's return and
             // count down. The next act() call will detect steps_left == 0
@@ -7948,6 +8018,12 @@ impl Agent {
         self.lanes.iter().map(|l| l.last_r_hat).collect()
     }
 
+    /// Per-lane confidence C ∈ [0, 1] used by the confidence-weighted
+    /// planner. Constant 0.5 when `confidence_mode=false`.
+    pub fn confidence(&self) -> Vec<f32> {
+        self.lanes.iter().map(|l| l.confidence).collect()
+    }
+
     /// Per-lane value baseline V(s_t) cached from the most recent act().
     /// Used for diagnosing whether the value head is discriminating
     /// across states or just predicting the mean return everywhere.
@@ -8459,6 +8535,14 @@ impl Agent {
             } else {
                 None
             };
+            // Confidence weighting: scale exploit terms (goal/value/
+            // centroid) by C, explore terms (change/rnd) by (1-C).
+            // visit_count stays as always-on base novelty.
+            let (w_exploit, w_explore) = if self.config.confidence_mode {
+                (lane.confidence, 1.0 - lane.confidence)
+            } else {
+                (1.0, 1.0)
+            };
             let mut best_score = f32::NEG_INFINITY;
             let mut best_row = lane_idx * m;
             for s in 0..m {
@@ -8471,17 +8555,19 @@ impl Agent {
                     score += 1.0 / ((c as f32 + 1.0).sqrt());
                     if rnd_alpha > 0.0 {
                         if let Some(rnd) = rnd_ref {
-                            score += rnd_alpha * rnd.reward(z_step);
+                            score += w_explore * rnd_alpha * rnd.reward(z_step);
                         }
                     }
                     if let Some(gq) = goals {
                         if !gq.is_empty() {
-                            score += goal_alpha * max_goal_similarity(z_step, gq);
+                            score += w_exploit * goal_alpha
+                                * max_goal_similarity(z_step, gq);
                         }
                     }
                     if let Some(cl) = centroids {
                         if !cl.is_empty() {
-                            score += subgoal_alpha * max_centroid_similarity(z_step, cl);
+                            score += w_exploit * subgoal_alpha
+                                * max_centroid_similarity(z_step, cl);
                         }
                     }
                     // Value-head signal: V(z_step) ≈ expected discounted
@@ -8491,7 +8577,7 @@ impl Agent {
                     if has_value && value_alpha > 0.0 {
                         let v = self.planner_v_traj_scratch[t * batch + row];
                         if v.is_finite() {
-                            score += value_alpha * v;
+                            score += w_exploit * value_alpha * v;
                         }
                     }
                     // Affordance / state-change signal: ||z_step − z_prev||.
@@ -8516,7 +8602,7 @@ impl Agent {
                         }
                         let mag = sq.sqrt();
                         if mag.is_finite() {
-                            score += change_alpha * mag;
+                            score += w_explore * change_alpha * mag;
                         }
                     }
                 }
