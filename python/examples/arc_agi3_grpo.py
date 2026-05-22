@@ -398,6 +398,20 @@ def main() -> int:
                         "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
+    parser.add_argument("--max-lvl-bump-bonus", type=float, default=0.0,
+                        help="One-shot bonus added to ext_reward the FIRST "
+                        "time a lane's max_levels_seen advances (per delta). "
+                        "Multiplied by goal_bonus inside agent. Makes "
+                        "*reaching a new level* much more attractive than "
+                        "accumulating intermediate progress rewards. "
+                        "Recommended 100-1000 (vs typical level reward ~5). "
+                        "0 = off (default).")
+    parser.add_argument("--episode-steps-per-level", type=int, default=0,
+                        help="Per-lane max_episode_steps = base + this * "
+                        "max_levels_seen[lane]. Higher levels get more "
+                        "exploration budget per episode, since L2/L3 "
+                        "completion likely requires longer trajectories "
+                        "than L1. 0 = uniform budget (default).")
     parser.add_argument("--level-reward-scale", type=float, default=0.0,
                         help="Scale level rewards by level reached: "
                         "reward = delta * (1 + scale * (level - 1)). "
@@ -702,6 +716,7 @@ def main() -> int:
 
     # Per-lane state.
     last_levels = [int(o.levels_completed) for o in obs_list]
+    new_max_lvl_bump = [0] * len(obs_list)  # per-lane delta when max_lvl advances
     levels_events = [0] * n_lanes
     max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
     # Per-lane per-level event counter: events_by_level[lane][level]
@@ -811,10 +826,17 @@ def main() -> int:
             for i in range(n_lanes):
                 obs = obs_list[i]
                 state = obs.state
+                # (4) Per-lane episode budget scales with max_lvl reached.
+                # Lanes that have progressed further get more steps per
+                # episode to find completion-length action sequences.
+                lane_budget = (
+                    args.max_episode_steps
+                    + args.episode_steps_per_level * int(max_levels_seen[i])
+                )
                 need_reset = (
                     state in (GameState.NOT_PLAYED, GameState.GAME_OVER)
                     or state is GameState.WIN
-                    or ep_step[i] >= args.max_episode_steps
+                    or ep_step[i] >= lane_budget
                 )
                 if need_reset:
                     if ep_step[i] > 0:
@@ -981,7 +1003,16 @@ def main() -> int:
                 if d > 0:
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
+                    # (1) One-shot max_lvl-bump bonus: when this event
+                    # advances max_levels_seen for this lane, mark it for
+                    # an extra reward injection below. This makes the
+                    # FIRST L2 win, FIRST L3 win, etc. much more
+                    # attractive than intermediate progress rewards —
+                    # the agent learns to *pursue level transitions*
+                    # rather than saturate at partial progress.
+                    new_max_lvl_bump[i] = 0
                     if new_levels > max_levels_seen[i]:
+                        new_max_lvl_bump[i] = new_levels - max_levels_seen[i]
                         max_levels_seen[i] = new_levels
                     # Tally per-level. The delta is usually 1; for
                     # delta>1 (rare multi-level jump) credit each
@@ -1129,6 +1160,10 @@ def main() -> int:
                         )
                     else:
                         r += float(level_deltas[i])
+                    # (1) One-shot max_lvl-bump bonus.
+                    if new_max_lvl_bump[i] > 0 and args.max_lvl_bump_bonus > 0:
+                        r += args.max_lvl_bump_bonus * float(new_max_lvl_bump[i])
+                        new_max_lvl_bump[i] = 0
                 if novel_event:
                     lane_counts = novelty_counts[i]
                     lc = lane_counts.get(h, 0) + 1
