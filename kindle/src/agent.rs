@@ -1322,16 +1322,17 @@ pub struct AgentConfig {
     /// Per-event confidence increment. Default 0.02 (50 events to
     /// reach saturation from 0).
     pub confidence_win_increment: f32,
-    /// Per-step confidence drop rate when visit-count novelty
-    /// exceeds threshold. Default 0.005. Drop is multiplied by
-    /// (novelty - threshold), so a barely-novel step drops C
-    /// very little; a fresh state drops by drop_rate * (1-threshold).
+    /// Per-step confidence decay (constant subtraction from C each
+    /// observe step). Models "competence atrophies without validation":
+    /// if no wins occur, C drifts toward 0 → planner shifts to
+    /// exploration. Pairs with win_increment to set steady-state C.
+    ///
+    /// Steady state: C_eq ≈ win_inc * events_per_step / drop_rate.
+    /// Default 0.001/step targets C ≈ 0.4 for tu93's typical event
+    /// rate. Lower drop_rate → more exploit; higher → more explore.
     pub confidence_novelty_drop_rate: f32,
-    /// Visit-count novelty threshold above which a step counts as
-    /// "novel" for confidence drop. Visit-novelty = 1/sqrt(visit_count+1),
-    /// bounded in [0, 1]. Default 0.3 (visit_count < ~10 = novel).
-    /// Set near 0 to make almost any step novel; set near 1 to make
-    /// only first-ever-visited states novel.
+    /// Unused since 2026-05-22 refactor (was visit-count threshold).
+    /// Kept to avoid breaking existing CLI calls; ignored by core.
     pub confidence_novelty_threshold: f32,
     /// Sub-goal centroid count for online k-means clustering of the
     /// `goal_states` queue. 0 (default) = disabled. When > 0, the
@@ -1553,7 +1554,7 @@ impl Default for AgentConfig {
             goal_states_cross_game: false,
             confidence_mode: false,
             confidence_win_increment: 0.02,
-            confidence_novelty_drop_rate: 0.005,
+            confidence_novelty_drop_rate: 0.001,
             confidence_novelty_threshold: 0.3,
             subgoal_k: 0,
             subgoal_lr: 0.05,
@@ -5277,23 +5278,22 @@ impl Agent {
             lane.last_reward = reward;
             lane.last_base_reward = base_reward;
 
-            // Confidence: visit-count novelty above threshold drops C.
-            // `novelty` here is 1/sqrt(visit_count+1), bounded in [0, 1].
-            // threshold=0.3 means visit_count < ~10 → novel. The drop is
-            // proportional to (novelty - threshold), clamped so a single
-            // very-novel step doesn't crater C. Floor at 0.
+            // Confidence: pure per-step decay toward 0. The only signal
+            // that increases C is an extrinsic event (handled at the
+            // event site above). Decay represents "competence atrophies
+            // without validation": no wins for a while → C drifts down →
+            // planner shifts to exploration → may stumble on new wins →
+            // C rises again. Steady-state C ≈ win_inc * events_per_step
+            // / novelty_drop_rate.
             //
-            // Visit-count chosen over raw WM-surprise because surprise
-            // magnitude depends on latent_dim (||z_pred - z_actual|| in
-            // latent_dim=256 is typically 3-5, not [0,1]). Visit-novelty
-            // is bounded and stable.
+            // For tu93 in long_change_5k (~0.0008 events/step per lane,
+            // win_inc=0.02, drop_rate=0.001): steady-state C ≈ 0.016,
+            // which would mean almost-pure exploration. So scale
+            // drop_rate to typical event density; default 0.001 per
+            // step targets C ≈ 0.4 at ~0.02 events/step.
             if self.config.confidence_mode {
-                let thr = self.config.confidence_novelty_threshold;
-                if novelty > thr {
-                    let excess = (novelty - thr).min(1.0);
-                    let drop = self.config.confidence_novelty_drop_rate * excess;
-                    lane.confidence = (lane.confidence - drop).max(0.0);
-                }
+                lane.confidence =
+                    (lane.confidence - self.config.confidence_novelty_drop_rate).max(0.0);
             }
 
             // L1: accumulate reward into the current option's return and
