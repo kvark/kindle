@@ -398,6 +398,14 @@ def main() -> int:
                         "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
+    parser.add_argument("--frontier-archive-on", type=int, default=0,
+                        help="(2) Go-Explore L2 frontier archive: track "
+                        "each lane's deepest-progress state in the current "
+                        "episode (snapshotted on every level event). On "
+                        "episode reset, push to the per-level archive under "
+                        "the achieved level. Future episodes can restore "
+                        "from these high-water marks instead of fresh L1 "
+                        "starts. Targets L2-completion bootstrap. 0 = off.")
     parser.add_argument("--max-lvl-bump-bonus", type=float, default=0.0,
                         help="One-shot bonus added to ext_reward the FIRST "
                         "time a lane's max_levels_seen advances (per delta). "
@@ -717,6 +725,19 @@ def main() -> int:
     # Per-lane state.
     last_levels = [int(o.levels_completed) for o in obs_list]
     new_max_lvl_bump = [0] * len(obs_list)  # per-lane delta when max_lvl advances
+    # Go-Explore L2 frontier: per-lane "deepest state in current episode".
+    # Updated on every extrinsic event during an episode. Captures the
+    # FURTHEST progress reached so far in this episode. On episode reset,
+    # pushed to the per-level archive (under the entry's level), giving
+    # future episodes the option to restore from the agent's high-water
+    # marks rather than just L1-completion states.
+    #
+    # Each entry: {"env": deepcopy, "obs": ..., "score": cumulative_reward,
+    #              "levels": current_level, "ep_step": ...,
+    #              "avail_actions": ...}
+    deepest_state = [None] * len(obs_list)
+    deepest_score = [0.0] * len(obs_list)
+    frontier_archive_adds = 0  # diagnostic
     levels_events = [0] * n_lanes
     max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
     # Per-lane per-level event counter: events_by_level[lane][level]
@@ -841,6 +862,32 @@ def main() -> int:
                 if need_reset:
                     if ep_step[i] > 0:
                         ep_count[i] += 1
+                    # (2) Go-Explore frontier flush: if this episode
+                    # reached a high-progress state, push it to the
+                    # per-level archive under its level. Restoring
+                    # from these high-water marks lets future episodes
+                    # CONTINUE exploration from L2's interior rather
+                    # than always starting fresh at L1.
+                    if args.frontier_archive_on and deepest_state[i] is not None:
+                        g_idx_d = i // K
+                        ent = deepest_state[i]
+                        ent_lvl = int(ent["levels"])
+                        gar = archive[g_idx_d].setdefault(ent_lvl, [])
+                        cap = args.archive_cap
+                        if cap > 0:
+                            if len(gar) < cap:
+                                gar.append(ent)
+                                frontier_archive_adds += 1
+                            else:
+                                worst_idx = min(
+                                    range(len(gar)),
+                                    key=lambda j: gar[j]["novelty"],
+                                )
+                                if ent["novelty"] > gar[worst_idx]["novelty"]:
+                                    gar[worst_idx] = ent
+                                    frontier_archive_adds += 1
+                        deepest_state[i] = None
+                        deepest_score[i] = 0.0
                     # Archive-reset: with prob, restore from a random
                     # archived frontier state instead of a fresh env
                     # reset. Real Ecoffet Go-Explore: "return then
@@ -1014,6 +1061,22 @@ def main() -> int:
                     if new_levels > max_levels_seen[i]:
                         new_max_lvl_bump[i] = new_levels - max_levels_seen[i]
                         max_levels_seen[i] = new_levels
+                    # (2) Go-Explore frontier: this is a high-progress
+                    # moment in the current episode. Snapshot the state.
+                    # Score = cumulative_reward proxy (current level).
+                    # On episode reset this snapshot will be added to
+                    # the archive so future episodes can restore from
+                    # the FURTHEST point this lane has reached.
+                    if args.frontier_archive_on:
+                        deepest_score[i] = float(new_levels)
+                        deepest_state[i] = {
+                            "env": copy.deepcopy(envs[i]),
+                            "obs": obs_new,
+                            "novelty": 500.0 + 100.0 * float(new_levels),
+                            "levels": int(new_levels),
+                            "ep_step": int(ep_step[i] + 1),
+                            "avail_actions": list(obs_new.available_actions or [1]),
+                        }
                     # Tally per-level. The delta is usually 1; for
                     # delta>1 (rare multi-level jump) credit each
                     # transitioned level once.
@@ -1328,6 +1391,8 @@ def main() -> int:
                     len(lst) for ag in archive for lst in ag.values()
                 )
                 trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
+                if args.frontier_archive_on:
+                    trail_tag += f",f{frontier_archive_adds}"
                 prog_tag = f" prog={progress_total:.1f}" if progress_on else ""
                 archive_info = (
                     f" arc={total_archive}/{args.archive_cap * n_games}"
