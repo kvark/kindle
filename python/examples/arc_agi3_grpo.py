@@ -273,6 +273,23 @@ def main() -> int:
                         "centroid). Use ALONGSIDE planner_goal_alpha (raw "
                         "win cos-sim) — both signals add. 0 = off. Try "
                         "1.0-3.0 alongside goal_alpha=1.0-2.0.")
+    parser.add_argument("--confidence-mode", type=int, default=0,
+                        help="Confidence-weighted planner scoring. C rises "
+                        "on extrinsic events, falls on WM surprise above "
+                        "threshold. Exploit terms (value, goal, subgoal) "
+                        "scaled by C; explore terms (change, rnd) scaled by "
+                        "(1-C); visit_count always on. 0 = off (static "
+                        "weights, default). 1 = on.")
+    parser.add_argument("--confidence-win-increment", type=float, default=0.02,
+                        help="C += this on every extrinsic event "
+                        "(sil_ep_event_count incrementing).")
+    parser.add_argument("--confidence-novelty-drop-rate", type=float,
+                        default=0.005,
+                        help="C -= rate * excess_surprise (capped) when WM "
+                        "surprise > threshold.")
+    parser.add_argument("--confidence-novelty-threshold", type=float, default=1.0,
+                        help="WM surprise above this counts as 'novel' for "
+                        "confidence drop. Tune to typical surprise magnitude.")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "
@@ -550,6 +567,10 @@ def main() -> int:
         subgoal_k=args.subgoal_k,
         subgoal_lr=args.subgoal_lr,
         planner_subgoal_alpha=args.planner_subgoal_alpha,
+        confidence_mode=bool(args.confidence_mode),
+        confidence_win_increment=args.confidence_win_increment,
+        confidence_novelty_drop_rate=args.confidence_novelty_drop_rate,
+        confidence_novelty_threshold=args.confidence_novelty_threshold,
         planner_action_repeat=args.planner_action_repeat,
         wm_kstep_k=args.wm_kstep_k,
         wm_kstep_batch=args.wm_kstep_batch,
@@ -1275,13 +1296,23 @@ def main() -> int:
                     f" arc={total_archive}/{args.archive_cap * n_games}"
                     f"({archive_uses}u,{archive_adds}a{trail_tag}){prog_tag}"
                 )
+            conf_tag = ""
+            if args.confidence_mode:
+                try:
+                    confs = agent.confidence()
+                    conf_min = min(confs) if confs else 0.0
+                    conf_max = max(confs) if confs else 0.0
+                    conf_mean = sum(confs) / len(confs) if confs else 0.0
+                    conf_tag = f" C={conf_mean:.2f}[{conf_min:.2f}-{conf_max:.2f}]"
+                except Exception:
+                    pass
             print(
                 f"macro={macro_step:>5} micro_total={macro_step * M:>6} "
                 f"eps={eps_sum:>4} evt={total_evt:>3} "
                 f"({evt_str}) syncs={syncs:>4}{archive_info} | "
                 f"wm={float(d0['loss_world_model']):.2f} "
                 f"pi={float(d0['loss_policy']):.1f} "
-                f"ent={float(d0['policy_entropy']):.2f} | "
+                f"ent={float(d0['policy_entropy']):.2f}{conf_tag} | "
                 f"{sps_macro:5.1f} macro/s × {M} × {n_lanes} = {env_sps:6.0f} env/s"
             )
 

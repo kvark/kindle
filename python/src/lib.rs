@@ -545,6 +545,10 @@ impl PyBatchAgent {
         subgoal_k = None,
         subgoal_lr = None,
         planner_subgoal_alpha = None,
+        confidence_mode = None,
+        confidence_win_increment = None,
+        confidence_novelty_drop_rate = None,
+        confidence_novelty_threshold = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -695,6 +699,10 @@ impl PyBatchAgent {
         subgoal_k: Option<usize>,
         subgoal_lr: Option<f32>,
         planner_subgoal_alpha: Option<f32>,
+        confidence_mode: Option<bool>,
+        confidence_win_increment: Option<f32>,
+        confidence_novelty_drop_rate: Option<f32>,
+        confidence_novelty_threshold: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -1176,6 +1184,18 @@ impl PyBatchAgent {
         if let Some(v) = planner_subgoal_alpha {
             config.planner_subgoal_alpha = v;
         }
+        if let Some(v) = confidence_mode {
+            config.confidence_mode = v;
+        }
+        if let Some(v) = confidence_win_increment {
+            config.confidence_win_increment = v;
+        }
+        if let Some(v) = confidence_novelty_drop_rate {
+            config.confidence_novelty_drop_rate = v;
+        }
+        if let Some(v) = confidence_novelty_threshold {
+            config.confidence_novelty_threshold = v;
+        }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
                 "mlp" => EncoderKind::Mlp,
@@ -1383,6 +1403,12 @@ impl PyBatchAgent {
     /// budget. Returns zeros when M6 is disabled.
     fn r_hats(&self) -> Vec<f32> {
         self.agent.r_hats()
+    }
+
+    /// Per-lane confidence C ∈ [0, 1]. Constant 0.5 when
+    /// `confidence_mode=False`.
+    fn confidence(&self) -> Vec<f32> {
+        self.agent.confidence()
     }
 
     /// Per-lane value baseline V(s_t) from the most recent act().
