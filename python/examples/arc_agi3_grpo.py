@@ -1026,7 +1026,9 @@ def main() -> int:
                 for li in range(n_lanes):
                     if frontier_random_left[li] > 0:
                         avail = avail_actions[li]
-                        actions[li] = avail[rng.randrange(len(avail))]
+                        # avail holds 1-based action values; the agent's
+                        # action index is value-1 (see map_action).
+                        actions[li] = avail[rng.randrange(len(avail))] - 1
                         frontier_random_left[li] -= 1
 
             # Record action history per lane for skill capture on
