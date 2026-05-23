@@ -398,12 +398,24 @@ def main() -> int:
                         "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
+    parser.add_argument("--trace-lane", type=int, default=-1,
+                        help="(4) Per-step trace of one lane to "
+                        "/tmp/aff_runs/trace_lane_{N}.csv with columns "
+                        "macro,micro,ep_step,action,levels,ext_reward."
+                        " -1 = off (default).")
     parser.add_argument("--frontier-random-steps", type=int, default=0,
                         help="(3) After restoring from a high-score "
                         "archive entry at level >= 2, force pure random "
                         "actions for this many steps. Bypasses planner/"
                         "policy which haven't trained on this region. "
                         "Recommended 30-100. 0 = off.")
+    parser.add_argument("--stagnation-random-after", type=int, default=0,
+                        help="(7) Adaptive random escape: if a lane has "
+                        "had no extrinsic event for this many steps "
+                        "WITHIN current episode, force fully-random "
+                        "actions for the rest of the episode. Prevents "
+                        "lanes from idling at L2 frontier when planner "
+                        "exploits dead-end regions. 0 = off.")
     parser.add_argument("--frontier-archive-on", type=int, default=0,
                         help="(2) Go-Explore L2 frontier archive: track "
                         "each lane's deepest-progress state in the current "
@@ -747,6 +759,22 @@ def main() -> int:
     # (3) Frontier-restore random burst: per-lane counter of remaining
     # forced-random steps after restoring from a deep archive entry.
     frontier_random_left = [0] * len(obs_list)
+    # (7) Adaptive stagnation random: per-lane "steps since last event".
+    # Resets on extrinsic event or episode boundary.
+    stagnation_steps = [0] * len(obs_list)
+    # (5) Per-episode max-level reached. Reset on episode boundary,
+    # tracks the highest level any fork reached within current episode.
+    # Aggregated to a histogram for diagnostic on log macros.
+    ep_max_lvl = [0] * len(obs_list)
+    # Histogram of completed-episode max-levels. Bin index = level.
+    completed_ep_max_lvl_hist = [0] * 10
+    # (4) Per-step lane trace file handle.
+    trace_fp = None
+    if args.trace_lane >= 0 and args.trace_lane < n_lanes:
+        trace_path = f"/tmp/aff_runs/trace_lane_{args.trace_lane}.csv"
+        trace_fp = open(trace_path, "w")
+        trace_fp.write("macro,micro,ep_step,action,levels,ext_reward,frontier_rand_left\n")
+        print(f"[trace] writing per-step trace of lane {args.trace_lane} to {trace_path}")
     levels_events = [0] * n_lanes
     max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
     # Per-lane per-level event counter: events_by_level[lane][level]
@@ -871,6 +899,12 @@ def main() -> int:
                 if need_reset:
                     if ep_step[i] > 0:
                         ep_count[i] += 1
+                        # (5) Record completed-episode max-level.
+                        lvl_bin = min(ep_max_lvl[i], len(completed_ep_max_lvl_hist) - 1)
+                        completed_ep_max_lvl_hist[lvl_bin] += 1
+                        ep_max_lvl[i] = 0
+                    # (7) Reset stagnation counter on episode reset.
+                    stagnation_steps[i] = 0
                     # (2) Go-Explore frontier flush: if this episode
                     # reached a high-progress state, push it to the
                     # per-level archive under its level. Restoring
@@ -1021,15 +1055,21 @@ def main() -> int:
             # (the value/goal/change signals point at L1-known territory),
             # so the planner exploits backward. A random burst forces
             # exploration of the L2 frontier neighborhood.
-            if args.frontier_random_steps > 0:
+            if args.frontier_random_steps > 0 or args.stagnation_random_after > 0:
                 actions = list(actions)
                 for li in range(n_lanes):
+                    use_random = False
                     if frontier_random_left[li] > 0:
+                        use_random = True
+                        frontier_random_left[li] -= 1
+                    elif (args.stagnation_random_after > 0
+                          and stagnation_steps[li] >= args.stagnation_random_after):
+                        use_random = True
+                    if use_random:
                         avail = avail_actions[li]
                         # avail holds 1-based action values; the agent's
                         # action index is value-1 (see map_action).
                         actions[li] = avail[rng.randrange(len(avail))] - 1
-                        frontier_random_left[li] -= 1
 
             # Record action history per lane for skill capture on
             # level-up below.
@@ -1082,6 +1122,13 @@ def main() -> int:
                 if d > 0:
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
+                    # (7) Reset stagnation counter on any extrinsic event.
+                    stagnation_steps[i] = 0
+                    # (5) Track per-episode max level reached.
+                    if new_levels > ep_max_lvl[i]:
+                        ep_max_lvl[i] = new_levels
+                else:
+                    stagnation_steps[i] += 1
                     # (1) One-shot max_lvl-bump bonus: when this event
                     # advances max_levels_seen for this lane, mark it for
                     # an extra reward injection below. This makes the
@@ -1281,6 +1328,14 @@ def main() -> int:
                 ext_vec[i] = r
             if level_event or novel_event:
                 agent.set_extrinsic_reward(ext_vec)
+            # (4) Per-lane trace write.
+            if trace_fp is not None:
+                li = args.trace_lane
+                trace_fp.write(
+                    f"{macro_step},{micro_step},{ep_step[li]},"
+                    f"{int(actions[li])},{last_levels[li]},"
+                    f"{ext_vec[li]:.3f},{frontier_random_left[li]}\n"
+                )
 
             # Intrinsic progress signals (Term 1 + Term 2).
             if progress_on:
@@ -1436,6 +1491,18 @@ def main() -> int:
                 trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
                 if args.frontier_archive_on:
                     trail_tag += f",f{frontier_archive_adds}"
+                # (5) Episode max-level histogram: counts of completed
+                # episodes per max-level. Helps see if any episodes are
+                # reaching deeper levels even when total events flat.
+                ep_hist_nonzero = [
+                    (lvl, n)
+                    for lvl, n in enumerate(completed_ep_max_lvl_hist)
+                    if n > 0
+                ]
+                if ep_hist_nonzero:
+                    trail_tag += " maxL=" + ",".join(
+                        f"{lvl}:{n}" for lvl, n in ep_hist_nonzero
+                    )
                 prog_tag = f" prog={progress_total:.1f}" if progress_on else ""
                 archive_info = (
                     f" arc={total_archive}/{args.archive_cap * n_games}"
@@ -1493,6 +1560,8 @@ def main() -> int:
     if args.checkpoint_dir:
         agent.save_state(args.checkpoint_dir)
         print(f"saved trained agent to {args.checkpoint_dir}")
+    if trace_fp is not None:
+        trace_fp.close()
     return 0
 
 
