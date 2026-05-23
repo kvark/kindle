@@ -488,6 +488,15 @@ def main() -> int:
                         "informative.")
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
+    parser.add_argument("--save-archive", default=None,
+                        help="(6) Pickle per-game per-level archive to "
+                        "this path on exit. Use with --load-archive to "
+                        "curriculum-resume a new agent at high-level "
+                        "states the previous agent reached.")
+    parser.add_argument("--load-archive", default=None,
+                        help="(6) Load pickled archive at start. Lets a "
+                        "fresh agent skip L1 search and start training "
+                        "directly at L2 states reached by a prior agent.")
     args = parser.parse_args()
 
     if args.eval_mode:
@@ -804,6 +813,20 @@ def main() -> int:
     archive = [{} for _ in range(n_games)]
     archive_uses = 0  # diagnostic: how many times we restored from archive
     archive_adds = 0  # diagnostic: how many entries added
+    if args.load_archive:
+        try:
+            import pickle as _pkl
+            with open(args.load_archive, "rb") as _f:
+                loaded = _pkl.load(_f)
+            # Only restore entries for games we have envs for.
+            if isinstance(loaded, list) and len(loaded) >= n_games:
+                for g in range(n_games):
+                    if isinstance(loaded[g], dict):
+                        archive[g] = loaded[g]
+                total = sum(len(lst) for ag in archive for lst in ag.values())
+                print(f"[archive] loaded {total} entries from {args.load_archive}")
+        except Exception as _exc:
+            print(f"[archive] load failed: {_exc}; starting empty")
 
     # #2 Full-trajectory archive: per-lane rolling trail of env snapshots
     # captured at micro-step granularity. When an extrinsic event (level
@@ -1560,6 +1583,15 @@ def main() -> int:
     if args.checkpoint_dir:
         agent.save_state(args.checkpoint_dir)
         print(f"saved trained agent to {args.checkpoint_dir}")
+    if args.save_archive:
+        try:
+            import pickle as _pkl
+            with open(args.save_archive, "wb") as _f:
+                _pkl.dump(archive, _f, protocol=_pkl.HIGHEST_PROTOCOL)
+            total = sum(len(lst) for ag in archive for lst in ag.values())
+            print(f"[archive] saved {total} entries to {args.save_archive}")
+        except Exception as _exc:
+            print(f"[archive] save failed: {_exc}")
     if trace_fp is not None:
         trace_fp.close()
     return 0
