@@ -398,6 +398,12 @@ def main() -> int:
                         "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
+    parser.add_argument("--frame-diff", type=int, default=0,
+                        help="(8) Encoder gets 2 channels: current frame + "
+                        "(current - prev) frame. Highlights what changed "
+                        "last step. May help WM predict action effects. "
+                        "0 = single channel (default). 1 = on. Doubles "
+                        "first conv layer cost.")
     parser.add_argument("--trace-lane", type=int, default=-1,
                         help="(4) Per-step trace of one lane to "
                         "/tmp/aff_runs/trace_lane_{N}.csv with columns "
@@ -634,14 +640,15 @@ def main() -> int:
         visit_count_dims=args.visit_count_dims,
         visit_count_proj_dim=args.visit_count_proj_dim,
     )
+    n_channels = 2 if args.frame_diff else 1
     if args.encoder == "cnn_dqn":
         agent_kwargs.update(
-            encoder_kind="cnn_dqn", encoder_channels=1,
+            encoder_kind="cnn_dqn", encoder_channels=n_channels,
             encoder_height=64, encoder_width=64,
         )
     elif args.encoder == "cnn":
         agent_kwargs.update(
-            encoder_kind="cnn", encoder_channels=1,
+            encoder_kind="cnn", encoder_channels=n_channels,
             encoder_height=64, encoder_width=64,
         )
     agent = kindle.BatchAgent(**agent_kwargs)
@@ -745,9 +752,14 @@ def main() -> int:
     if args.encoder in ("cnn", "cnn_dqn"):
         frame_mv = agent.visual_obs_memoryview()
         frame_buf = np.frombuffer(frame_mv, dtype=np.float32).reshape(
-            n_lanes, 1, 64, 64)
+            n_lanes, n_channels, 64, 64)
     else:
         frame_buf = None
+    # (8) Frame-diff: keep prev frame per lane to compute delta.
+    prev_frame = (
+        np.zeros((n_lanes, 64, 64), dtype=np.float32)
+        if args.frame_diff else None
+    )
 
     # Per-lane state.
     last_levels = [int(o.levels_completed) for o in obs_list]
@@ -1020,7 +1032,13 @@ def main() -> int:
                       for o in obs_list]
             if frame_buf is not None:
                 for i, o in enumerate(obs_list):
-                    frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+                    cur = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+                    frame_buf[i, 0] = cur
+                    if args.frame_diff:
+                        # Channel 1 = signed delta. Centered at 0 so
+                        # encoder sees +/- changes symmetrically.
+                        frame_buf[i, 1] = cur - prev_frame[i]
+                        prev_frame[i] = cur
 
             # Push current per-lane action masks to kindle BEFORE act();
             # avail_actions can change after each env.step() so we
