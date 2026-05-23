@@ -398,6 +398,12 @@ def main() -> int:
                         "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
+    parser.add_argument("--frontier-random-steps", type=int, default=0,
+                        help="(3) After restoring from a high-score "
+                        "archive entry at level >= 2, force pure random "
+                        "actions for this many steps. Bypasses planner/"
+                        "policy which haven't trained on this region. "
+                        "Recommended 30-100. 0 = off.")
     parser.add_argument("--frontier-archive-on", type=int, default=0,
                         help="(2) Go-Explore L2 frontier archive: track "
                         "each lane's deepest-progress state in the current "
@@ -738,6 +744,9 @@ def main() -> int:
     deepest_state = [None] * len(obs_list)
     deepest_score = [0.0] * len(obs_list)
     frontier_archive_adds = 0  # diagnostic
+    # (3) Frontier-restore random burst: per-lane counter of remaining
+    # forced-random steps after restoring from a deep archive entry.
+    frontier_random_left = [0] * len(obs_list)
     levels_events = [0] * n_lanes
     max_levels_seen = [int(o.levels_completed) for o in obs_list]  # lifetime max per lane
     # Per-lane per-level event counter: events_by_level[lane][level]
@@ -924,6 +933,12 @@ def main() -> int:
                         ep_step[i] = entry["ep_step"]
                         archive_uses += 1
                         used_archive = True
+                        # (3) Trigger frontier-restore random burst when
+                        # restoring at a level >= 2 (skip L1 restores).
+                        # We want exploration at the unknown frontier.
+                        if (args.frontier_random_steps > 0
+                                and entry["levels"] >= 2):
+                            frontier_random_left[i] = args.frontier_random_steps
                     if not used_archive:
                         obs_list[i] = envs[i].reset()
                         avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
@@ -999,6 +1014,21 @@ def main() -> int:
                     skill_replays += 1
             actions = agent.act(pooled)
 
+            # (3) Frontier-restore random override. When a lane was just
+            # restored from a high-score archive entry, force pure random
+            # actions for the next N steps. Reasoning: at deep L2 frontier
+            # states the planner/policy have NEVER trained on this region
+            # (the value/goal/change signals point at L1-known territory),
+            # so the planner exploits backward. A random burst forces
+            # exploration of the L2 frontier neighborhood.
+            if args.frontier_random_steps > 0:
+                actions = list(actions)
+                for li in range(n_lanes):
+                    if frontier_random_left[li] > 0:
+                        avail = avail_actions[li]
+                        actions[li] = avail[rng.randrange(len(avail))]
+                        frontier_random_left[li] -= 1
+
             # Record action history per lane for skill capture on
             # level-up below.
             if skills_on:
@@ -1068,15 +1098,26 @@ def main() -> int:
                     # the archive so future episodes can restore from
                     # the FURTHEST point this lane has reached.
                     if args.frontier_archive_on:
-                        deepest_score[i] = float(new_levels)
-                        deepest_state[i] = {
-                            "env": copy.deepcopy(envs[i]),
-                            "obs": obs_new,
-                            "novelty": 500.0 + 100.0 * float(new_levels),
-                            "levels": int(new_levels),
-                            "ep_step": int(ep_step[i] + 1),
-                            "avail_actions": list(obs_new.available_actions or [1]),
-                        }
+                        # Score = base + level + ep_step. Including ep_step
+                        # means DEEPER moments in an L2 episode displace
+                        # SHALLOWER ones — the archive grows toward
+                        # L2-completion-vicinity rather than saturating
+                        # at L2-start replays.
+                        score_now = (
+                            500.0
+                            + 100.0 * float(new_levels)
+                            + float(ep_step[i] + 1)
+                        )
+                        if score_now > deepest_score[i]:
+                            deepest_score[i] = score_now
+                            deepest_state[i] = {
+                                "env": copy.deepcopy(envs[i]),
+                                "obs": obs_new,
+                                "novelty": score_now,
+                                "levels": int(new_levels),
+                                "ep_step": int(ep_step[i] + 1),
+                                "avail_actions": list(obs_new.available_actions or [1]),
+                            }
                     # Tally per-level. The delta is usually 1; for
                     # delta>1 (rare multi-level jump) credit each
                     # transitioned level once.
