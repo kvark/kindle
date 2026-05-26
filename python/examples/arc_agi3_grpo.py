@@ -494,6 +494,12 @@ def main() -> int:
                         "informative.")
     parser.add_argument("--checkpoint-dir", default=None)
     parser.add_argument("--load-state", default=None)
+    parser.add_argument("--pretrained-cnn", default=None,
+                        help="Path to a wm.safetensors-format file with "
+                        "pretrained encoder.conv{1,2,3} + encoder.fc1 "
+                        "weights. Injected into wm_session AFTER load-state "
+                        "(so pretrained CNN overrides any random init). "
+                        "Use pretrain/train_dae.py to produce.")
     parser.add_argument("--save-archive", default=None,
                         help="(6) Pickle per-game per-level archive to "
                         "this path on exit. Use with --load-archive to "
@@ -655,6 +661,9 @@ def main() -> int:
     if args.load_state:
         agent.load_state(args.load_state)
         print(f"loaded prior state from {args.load_state}")
+    if args.pretrained_cnn:
+        agent.load_wm_checkpoint(args.pretrained_cnn)
+        print(f"loaded pretrained CNN from {args.pretrained_cnn}")
 
     # Helpers ---
     _obj_tok = None

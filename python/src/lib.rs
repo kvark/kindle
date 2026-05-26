@@ -1452,6 +1452,16 @@ impl PyBatchAgent {
             .map_err(|e| PyValueError::new_err(format!("load_state: {e}")))
     }
 
+    /// Partial-loader: read a single safetensors file into the
+    /// wm_session only. Missing parameters are tolerated (meganeura's
+    /// load_checkpoint logs a warning and skips them). Used to inject
+    /// a pretrained CNN encoder without touching policy/credit.
+    fn load_wm_checkpoint(&mut self, path: &str) -> PyResult<()> {
+        self.agent
+            .load_wm_checkpoint(std::path::Path::new(path))
+            .map_err(|e| PyValueError::new_err(format!("load_wm_checkpoint: {e}")))
+    }
+
     /// Visual-encoder input setter for `encoder_kind='cnn'` agents.
     /// Accepts a 1-D sequence of length `batch_size · channels · height · width`
     /// laid out as flat NCHW. Must be called before each
