@@ -92,14 +92,28 @@ def export_partial_safetensors(encoder: Encoder, out_path: Path,
     # PyTorch (out, in, kH, kW) flattened row-major.
     # Conv weights: meganeura Conv2d stores flat (out * in * kH * kW),
     # which matches PyTorch (out, in, kH, kW) flattened row-major.
-    out["encoder.conv1.weight"] = encoder.conv1.weight.detach().flatten().contiguous()
-    out["encoder.conv2.weight"] = encoder.conv2.weight.detach().flatten().contiguous()
-    out["encoder.conv3.weight"] = encoder.conv3.weight.detach().flatten().contiguous()
+    #
+    # Kindle's xavier init scales each parameter to std ≈ sqrt(3 / sqrt(N))
+    # where N = total elements. PyTorch default conv init is ~3-4× smaller
+    # std for the same shape. We RESCALE each layer to kindle's expected
+    # magnitude so downstream networks (WM/value head) — which expect
+    # those activation scales — don't see vanishingly small inputs.
+    def rescale_to_kindle(t):
+        import math
+        n = t.numel()
+        fan = max(1, int(math.sqrt(n)))
+        kindle_std = math.sqrt(3.0 / fan)
+        cur_std = float(t.std()) or 1.0
+        return (t.detach() * (kindle_std / cur_std)).flatten().contiguous()
+
+    out["encoder.conv1.weight"] = rescale_to_kindle(encoder.conv1.weight)
+    out["encoder.conv2.weight"] = rescale_to_kindle(encoder.conv2.weight)
+    out["encoder.conv3.weight"] = rescale_to_kindle(encoder.conv3.weight)
     # fc weights: meganeura nn::Linear is (in_features, out_features); PyTorch
     # nn.Linear.weight is (out, in). Transpose before flatten.
-    out["encoder.fc1.weight"] = encoder.fc1.weight.detach().t().contiguous().flatten()
+    out["encoder.fc1.weight"] = rescale_to_kindle(encoder.fc1.weight.t().contiguous())
     out["encoder.fc1.bias"] = encoder.fc1.bias.detach().flatten().contiguous()
-    out["encoder.fc2.weight"] = encoder.fc2.weight.detach().t().contiguous().flatten()
+    out["encoder.fc2.weight"] = rescale_to_kindle(encoder.fc2.weight.t().contiguous())
     out_path.parent.mkdir(parents=True, exist_ok=True)
     st_torch.save_file(out, str(out_path))
     print(f"wrote partial encoder weights → {out_path}")
