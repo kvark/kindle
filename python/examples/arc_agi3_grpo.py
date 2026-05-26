@@ -1177,8 +1177,6 @@ def main() -> int:
                     # (5) Track per-episode max level reached.
                     if new_levels > ep_max_lvl[i]:
                         ep_max_lvl[i] = new_levels
-                else:
-                    stagnation_steps[i] += 1
                     # (1) One-shot max_lvl-bump bonus: when this event
                     # advances max_levels_seen for this lane, mark it for
                     # an extra reward injection below. This makes the
@@ -1304,6 +1302,9 @@ def main() -> int:
                                         archive_adds += 1
                         except Exception:
                             pass  # archive seeding is best-effort
+                else:
+                    # (7) No level event this step → stagnation grows.
+                    stagnation_steps[i] += 1
                 last_levels[i] = new_levels
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
