@@ -1554,7 +1554,7 @@ impl Default for AgentConfig {
             goal_states_cross_game: false,
             confidence_mode: false,
             confidence_win_increment: 0.02,
-            confidence_novelty_drop_rate: 0.001,
+            confidence_novelty_drop_rate: 0.0001,
             confidence_novelty_threshold: 0.3,
             subgoal_k: 0,
             subgoal_lr: 0.05,
@@ -7998,6 +7998,17 @@ impl Agent {
     /// same graph topology (same latent_dim, hidden_dim, encoder
     /// kind, num_options, recon flags, layer-norm flags). Returns
     /// an error if any session's file is missing or shape-mismatched.
+    /// Load ONLY the wm_session checkpoint from a single safetensors
+    /// file. Used for partial pretrained-encoder injection: the file
+    /// can contain just `encoder.conv*.weight` etc; missing entries
+    /// are tolerated by meganeura's load_checkpoint (the matching
+    /// param keeps its xavier init). Policy + credit sessions are
+    /// untouched.
+    pub fn load_wm_checkpoint(&mut self, path: &std::path::Path) -> std::io::Result<()> {
+        self.wm_session.load_checkpoint(path)?;
+        Ok(())
+    }
+
     pub fn load_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
         self.wm_session
             .load_checkpoint(&dir.join("wm.safetensors"))?;
