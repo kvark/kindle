@@ -90,17 +90,16 @@ def export_partial_safetensors(encoder: Encoder, out_path: Path,
     out = {}
     # Conv weights: meganeura stores flat (out * in * kH * kW), same as
     # PyTorch (out, in, kH, kW) flattened row-major.
+    # Conv weights: meganeura Conv2d stores flat (out * in * kH * kW),
+    # which matches PyTorch (out, in, kH, kW) flattened row-major.
     out["encoder.conv1.weight"] = encoder.conv1.weight.detach().flatten().contiguous()
     out["encoder.conv2.weight"] = encoder.conv2.weight.detach().flatten().contiguous()
     out["encoder.conv3.weight"] = encoder.conv3.weight.detach().flatten().contiguous()
-    # fc1: meganeura nn::Linear weight is (in * out) flat? Or (out * in)?
-    # PyTorch nn.Linear.weight is (out, in). Check by sizes:
-    # fc1.weight shape in safetensors is (524288,) = 1024 * 512 ✓ either way.
-    # Use PyTorch's layout flattened directly; meganeura's matmul expects
-    # the same memory order if we used the same convention.
-    out["encoder.fc1.weight"] = encoder.fc1.weight.detach().flatten().contiguous()
+    # fc weights: meganeura nn::Linear is (in_features, out_features); PyTorch
+    # nn.Linear.weight is (out, in). Transpose before flatten.
+    out["encoder.fc1.weight"] = encoder.fc1.weight.detach().t().contiguous().flatten()
     out["encoder.fc1.bias"] = encoder.fc1.bias.detach().flatten().contiguous()
-    out["encoder.fc2.weight"] = encoder.fc2.weight.detach().flatten().contiguous()
+    out["encoder.fc2.weight"] = encoder.fc2.weight.detach().t().contiguous().flatten()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     st_torch.save_file(out, str(out_path))
     print(f"wrote partial encoder weights → {out_path}")
