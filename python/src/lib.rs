@@ -1462,6 +1462,14 @@ impl PyBatchAgent {
             .map_err(|e| PyValueError::new_err(format!("load_wm_checkpoint: {e}")))
     }
 
+    /// Per-parameter LR multiplier on the wm_session. Used to freeze
+    /// (mul=0.0) or down-weight specific layers — e.g.,
+    /// `set_wm_lr_multiplier("encoder.", 0.0)` freezes a pretrained
+    /// encoder while WM/value/policy adapt to its latents.
+    fn set_wm_lr_multiplier(&mut self, prefix: &str, mul: f32) {
+        self.agent.set_wm_lr_multiplier(prefix, mul);
+    }
+
     /// Visual-encoder input setter for `encoder_kind='cnn'` agents.
     /// Accepts a 1-D sequence of length `batch_size · channels · height · width`
     /// laid out as flat NCHW. Must be called before each
