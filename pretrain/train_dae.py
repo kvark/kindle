@@ -56,13 +56,12 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
+    """Default conv-transpose decoder (rich, doesn't match kindle)."""
     def __init__(self, latent_dim: int = 256, out_channels: int = 1):
         super().__init__()
         self.fc = nn.Linear(latent_dim, 1024)
-        # Mirror: 1024 → (64, 4, 4) → upsample to 64x64
         self.deconv3 = nn.ConvTranspose2d(64, 64, kernel_size=3, stride=1, padding=0)
         self.deconv2 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=0)
-        # k=12 stride=4 gets us back to 64x64: (14-1)*4 + 12 = 64.
         self.deconv1 = nn.ConvTranspose2d(32, out_channels, kernel_size=12, stride=4, padding=0)
 
     def forward(self, z):
@@ -70,8 +69,30 @@ class Decoder(nn.Module):
         h = h.view(-1, 64, 4, 4)
         h = F.relu(self.deconv3(h))
         h = F.relu(self.deconv2(h))
-        x = self.deconv1(h)  # → (B, C, 64, 64)
+        x = self.deconv1(h)
         return x
+
+
+class KindleReconDecoder(nn.Module):
+    """Decoder matching kindle's wm.recon topology exactly:
+        z → fc1 (latent, hidden) → relu → fc2_no_bias (hidden, C*H*W).
+    When saved, the fc1/fc2 weights drop directly into kindle's
+    wm.recon.fc1 / wm.recon.fc2 parameters.
+    """
+    def __init__(self, latent_dim: int = 256, hidden_dim: int = 256,
+                 out_channels: int = 1, out_h: int = 64, out_w: int = 64):
+        super().__init__()
+        self.out_channels = out_channels
+        self.out_h = out_h
+        self.out_w = out_w
+        self.target_dim = out_channels * out_h * out_w
+        self.fc1 = nn.Linear(latent_dim, hidden_dim, bias=True)
+        self.fc2 = nn.Linear(hidden_dim, self.target_dim, bias=False)
+
+    def forward(self, z):
+        h = F.relu(self.fc1(z))
+        flat = self.fc2(h)
+        return flat.view(-1, self.out_channels, self.out_h, self.out_w)
 
 
 def add_noise(x: torch.Tensor, p: float = 0.2) -> torch.Tensor:
@@ -132,6 +153,13 @@ def main() -> None:
     p.add_argument("--in-channels", type=int, default=1)
     p.add_argument("--noise-p", type=float, default=0.2)
     p.add_argument("--device", default="cpu")
+    p.add_argument("--kindle-decoder", type=int, default=0,
+                   help="Use kindle's recon-decoder topology so weights "
+                   "transfer to wm.recon.fc1 / wm.recon.fc2 (avoids "
+                   "kindle's randomly-init recon decoder fighting the "
+                   "pretrained encoder).")
+    p.add_argument("--hidden-dim", type=int, default=256,
+                   help="Hidden dim for kindle-decoder; ignored otherwise.")
     a = p.parse_args()
 
     print(f"loading {a.data}")
@@ -153,7 +181,11 @@ def main() -> None:
 
     device = torch.device(a.device)
     enc = Encoder(in_channels=a.in_channels, latent_dim=a.latent_dim).to(device)
-    dec = Decoder(latent_dim=a.latent_dim, out_channels=a.in_channels).to(device)
+    if a.kindle_decoder:
+        dec = KindleReconDecoder(latent_dim=a.latent_dim, hidden_dim=a.hidden_dim,
+                                  out_channels=a.in_channels, out_h=64, out_w=64).to(device)
+    else:
+        dec = Decoder(latent_dim=a.latent_dim, out_channels=a.in_channels).to(device)
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=a.lr)
 
     print(f"training {a.epochs} epochs on {len(ds)} samples")
@@ -176,6 +208,29 @@ def main() -> None:
         print(f"epoch {ep+1}/{a.epochs} mse={np.mean(losses):.4f}")
 
     export_partial_safetensors(enc, Path(a.out), in_channels=a.in_channels)
+    if a.kindle_decoder:
+        # Also write decoder weights into the same wm.safetensors so
+        # kindle's load_wm_checkpoint picks them up.
+        import math, safetensors.torch as st_torch
+        existing = {}
+        from safetensors import safe_open
+        with safe_open(str(a.out), framework="pt") as f:
+            for k in f.keys():
+                existing[k] = f.get_tensor(k)
+        def rescale_to_kindle(t):
+            n = t.numel()
+            fan = max(1, int(math.sqrt(n)))
+            kindle_std = math.sqrt(3.0 / fan)
+            cur_std = float(t.std()) or 1.0
+            return (t.detach() * (kindle_std / cur_std)).flatten().contiguous()
+        # Transpose fc weights for meganeura's (in, out) layout.
+        existing["wm.recon.fc1.weight"] = rescale_to_kindle(dec.fc1.weight.t().contiguous())
+        existing["wm.recon.fc1.bias"] = dec.fc1.bias.detach().flatten().contiguous()
+        existing["wm.recon.fc2.weight"] = rescale_to_kindle(dec.fc2.weight.t().contiguous())
+        st_torch.save_file(existing, str(a.out))
+        print("decoder weights appended:")
+        for k in ("wm.recon.fc1.weight", "wm.recon.fc1.bias", "wm.recon.fc2.weight"):
+            print(f"  {k}: shape={existing[k].shape} std={existing[k].std():.4f}")
 
 
 if __name__ == "__main__":
