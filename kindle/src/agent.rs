@@ -8009,6 +8009,13 @@ impl Agent {
         Ok(())
     }
 
+    /// Set per-prefix LR multiplier on wm_session. mul=0.0 freezes
+    /// matching parameters. Used to keep a pretrained encoder fixed
+    /// while WM/value/policy adapt.
+    pub fn set_wm_lr_multiplier(&mut self, prefix: &str, mul: f32) {
+        self.wm_session.set_lr_multiplier(prefix, mul);
+    }
+
     pub fn load_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
         self.wm_session
             .load_checkpoint(&dir.join("wm.safetensors"))?;

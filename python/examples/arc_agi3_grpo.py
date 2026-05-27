@@ -500,6 +500,13 @@ def main() -> int:
                         "weights. Injected into wm_session AFTER load-state "
                         "(so pretrained CNN overrides any random init). "
                         "Use pretrain/train_dae.py to produce.")
+    parser.add_argument("--encoder-lr-mult", type=float, default=1.0,
+                        help="LR multiplier on the encoder.* parameters "
+                        "of wm_session. 1.0 = normal (default). 0.0 = "
+                        "freeze (useful with --pretrained-cnn so the "
+                        "recon/WM loss doesn't drift the encoder away "
+                        "from the pretrained init). Try 0.1 for "
+                        "soft freeze.")
     parser.add_argument("--save-archive", default=None,
                         help="(6) Pickle per-game per-level archive to "
                         "this path on exit. Use with --load-archive to "
@@ -664,6 +671,9 @@ def main() -> int:
     if args.pretrained_cnn:
         agent.load_wm_checkpoint(args.pretrained_cnn)
         print(f"loaded pretrained CNN from {args.pretrained_cnn}")
+    if args.encoder_lr_mult != 1.0:
+        agent.set_wm_lr_multiplier("encoder.", args.encoder_lr_mult)
+        print(f"set encoder LR multiplier = {args.encoder_lr_mult}")
 
     # Helpers ---
     _obj_tok = None
