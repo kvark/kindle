@@ -20,6 +20,22 @@ from pathlib import Path
 
 import numpy as np
 
+# PyO3 GameAction doesn't implement value-based lookup, breaking pickle
+# round-trip. Patch _missing_ before any unpickle attempt.
+try:
+    from arcengine import GameAction as _GameAction
+    if not hasattr(_GameAction, "_pickle_missing_patched"):
+        @classmethod
+        def _missing_(cls, value):
+            for m in cls:
+                if m.value == value:
+                    return m
+            return None
+        _GameAction._missing_ = _missing_
+        _GameAction._pickle_missing_patched = True
+except ImportError:
+    pass
+
 
 def evaluate_sequence(env_snapshot, obs, action_by_value, avail_actions,
                        sequence, max_steps=None):
@@ -132,8 +148,12 @@ def main() -> int:
     action_by_value = {int(act.value): act for act in GameAction}
 
     print(f"loading archive: {a.archive}")
+    try:
+        import cloudpickle as _pkl
+    except ImportError:
+        _pkl = pickle
     with open(a.archive, "rb") as f:
-        archive = pickle.load(f)
+        archive = _pkl.load(f)
 
     # archive is list of per-game dicts: archive[g][level] = [entries]
     n_games = len(archive)
