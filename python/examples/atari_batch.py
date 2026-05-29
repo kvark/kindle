@@ -437,6 +437,17 @@ def main() -> int:
         )
 
     for step in range(args.steps):
+        # 0) Periodic planner invocation (queues actions for the next K
+        # act() calls). Triggered by `--planner-every` (set by the
+        # `planner` block to 20).
+        if (
+            args.planner_horizon > 0
+            and args.planner_every > 0
+            and step > 0
+            and step % args.planner_every == 0
+        ):
+            agent.plan_and_queue(num_actions)
+
         # 1) Hand the current frame to kindle (one path-dependent copy).
         t = time.time()
         push_frame(obs_batch)
