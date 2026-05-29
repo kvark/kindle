@@ -487,6 +487,16 @@ def main() -> int:
                         help="Planner samples per call. Default 32.")
     parser.add_argument("--planner-every", type=int, default=0,
                         help="Harness planner trigger cadence. 0 disables.")
+    parser.add_argument("--planner-noise-sigma", type=float, default=0.0,
+                        help="GRAM-style stochastic WM: per-element N(0,σ²) "
+                        "Gaussian noise added to each planner WM rollout "
+                        "step's z_next. 0 = deterministic (default).")
+    parser.add_argument("--wm-stochastic", type=int, default=0,
+                        help="Enable learned per-state σ head; planner noise "
+                        "becomes σ_learned(z,a) × planner_noise_sigma × ε.")
+    parser.add_argument("--wm-sigma-loss-coef", type=float, default=0.5,
+                        help="σ-head regression coef (only effective when "
+                        "--wm-stochastic=1).")
     args = parser.parse_args()
     active_blocks = _apply_blocks(args, sys.argv[1:])
     if active_blocks:
@@ -556,6 +566,9 @@ def main() -> int:
         approach_rank_by=args.approach_rank_by,
         planner_horizon=args.planner_horizon if args.planner_horizon > 0 else None,
         planner_samples=args.planner_samples,
+        planner_noise_sigma=(args.planner_noise_sigma if args.planner_noise_sigma > 0.0 else None),
+        wm_stochastic=(bool(args.wm_stochastic) if args.wm_stochastic else None),
+        wm_sigma_loss_coef=(args.wm_sigma_loss_coef if args.wm_stochastic else None),
     )
     print("agent ready (compiled graphs once, N lanes)")
 

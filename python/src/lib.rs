@@ -524,6 +524,9 @@ impl PyBatchAgent {
         planner_use_mcts = None,
         mcts_simulations = None,
         mcts_c_puct = None,
+        planner_noise_sigma = None,
+        wm_stochastic = None,
+        wm_sigma_loss_coef = None,
         planner_rnd_alpha = None,
         planner_goal_alpha = None,
         goal_states_cap = None,
@@ -678,6 +681,9 @@ impl PyBatchAgent {
         planner_use_mcts: Option<bool>,
         mcts_simulations: Option<usize>,
         mcts_c_puct: Option<f32>,
+        planner_noise_sigma: Option<f32>,
+        wm_stochastic: Option<bool>,
+        wm_sigma_loss_coef: Option<f32>,
         planner_rnd_alpha: Option<f32>,
         planner_goal_alpha: Option<f32>,
         goal_states_cap: Option<usize>,
@@ -1120,6 +1126,15 @@ impl PyBatchAgent {
         }
         if let Some(v) = mcts_c_puct {
             config.mcts_c_puct = v;
+        }
+        if let Some(v) = planner_noise_sigma {
+            config.planner_noise_sigma = v;
+        }
+        if let Some(v) = wm_stochastic {
+            config.wm_stochastic = v;
+        }
+        if let Some(v) = wm_sigma_loss_coef {
+            config.wm_sigma_loss_coef = v;
         }
         if let Some(v) = planner_rnd_alpha {
             config.planner_rnd_alpha = v;
