@@ -1151,6 +1151,32 @@ pub struct AgentConfig {
     /// UCB1 exploration constant. `Q + c*sqrt(ln N_parent / n_child)`.
     /// Default sqrt(2) ≈ 1.414 (textbook).
     pub mcts_c_puct: f32,
+    /// GRAM-style stochastic WM rollout: σ for Gaussian noise added to
+    /// every `wm_planner` step's `z_next` output. Tests the GRAM
+    /// (Generative Recursive Reasoning Models, 2026-05) hypothesis that
+    /// multi-trajectory rollouts find narrow win paths a deterministic
+    /// rollout misses. Each of the `planner_samples` rollouts per lane
+    /// gets independent N(0, σ²I) noise per step, so trajectories
+    /// diverge by both action choice AND latent perturbation. Default
+    /// 0.0 (deterministic, byte-parity with pre-GRAM behavior).
+    /// Reasonable range: 0.01–0.2 in z-space. Higher σ = more
+    /// exploration; very high σ degenerates to random trajectories.
+    /// When combined with `wm_stochastic`, this acts as a multiplier
+    /// on the learned per-state σ: noise = planner_noise_sigma ×
+    /// σ_learned × ε.
+    pub planner_noise_sigma: f32,
+    /// GRAM-style heteroscedastic WM: when true, the WM additionally
+    /// learns a per-state per-dim σ head (`world_model.sigma_proj`)
+    /// trained to predict `|z_target − z_hat|`. The planner reads σ at
+    /// rollout time and scales the noise per element (high-σ states get
+    /// more exploration; well-modeled states stay near-deterministic).
+    /// Requires `planner_noise_sigma > 0` to have any planner-side
+    /// effect (the σ head is still trained but unused). Default false
+    /// (v1 fixed-σ behavior). 2026-05-29.
+    pub wm_stochastic: bool,
+    /// Loss coefficient on the σ-regression term added to the WM loss.
+    /// Only applied when `wm_stochastic = true`. Default 0.5.
+    pub wm_sigma_loss_coef: f32,
     /// Blend factor for adding RND-based novelty to the planner's
     /// trajectory score. When > 0, the planner scores each latent in
     /// its predicted trajectory as:
@@ -1536,6 +1562,9 @@ impl Default for AgentConfig {
             planner_use_mcts: false,
             mcts_simulations: 64,
             mcts_c_puct: 1.4142,
+            planner_noise_sigma: 0.0,
+            wm_stochastic: false,
+            wm_sigma_loss_coef: 0.5,
             planner_rnd_alpha: 0.0,
             planner_goal_alpha: 0.0,
             goal_states_cap: 100,
@@ -2223,6 +2252,11 @@ pub struct Agent {
     /// then produces option-conditional action logits.
     planner_option_onehot_scratch: Vec<f32>,
     planner_traj_scratch: Vec<f32>,
+    /// Per-step learned-σ buffer from the planner's σ-head output (only
+    /// populated when `wm_stochastic` is enabled). Layout matches
+    /// `planner_traj_scratch` per outer step: `[planner_batch × latent_dim]`.
+    /// Lazily resized in the rollout loop (allocated on first use).
+    planner_sigma_scratch: Vec<f32>,
     /// Per-step value predictions from the planner's value-head branch.
     /// Layout: `[planner_horizon × planner_batch]`. Only populated when
     /// `wm_planner_has_value_head` is true.
@@ -2702,6 +2736,7 @@ fn build_wm_kstep_graph(
     latent_dim: usize,
     hidden_dim: usize,
     k: usize,
+    wm_stochastic: bool,
 ) -> Graph {
     assert!(k >= 1, "wm_kstep k must be >= 1");
     let mut g = Graph::new();
@@ -2719,7 +2754,16 @@ fn build_wm_kstep_graph(
         action_nodes.push(a);
     }
 
-    let wm = WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
+    // k-step graph mirrors the main WM struct layout (including
+    // sigma_proj when wm_stochastic is on) so parameter sync between
+    // sessions stays valid. The k-step loss itself is still MSE on
+    // the rolled-out μ — σ training only happens in the main
+    // wm_session (single-step heteroscedastic regression).
+    let wm = if wm_stochastic {
+        WorldModel::new_stochastic(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+    } else {
+        WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+    };
     let z_hat_k = wm.rollout_k(&mut g, z, &action_nodes);
     let loss = g.mse_loss(z_hat_k, z_target);
     g.set_outputs(vec![loss, z_hat_k]);
@@ -2731,6 +2775,7 @@ fn build_wm_planner_graph(
     latent_dim: usize,
     hidden_dim: usize,
     value_hidden_dim: Option<usize>,
+    wm_stochastic: bool,
 ) -> Graph {
     let mut g = Graph::new();
     let z_raw = g.input("z", &[batch_size, latent_dim]);
@@ -2740,26 +2785,30 @@ fn build_wm_planner_graph(
     // forward-only.
     let z = g.stop_gradient(z_raw);
     let action = g.stop_gradient(action_raw);
-    let wm = WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim);
-    let z_next = wm.forward(&mut g, z, action);
+    let wm = if wm_stochastic {
+        WorldModel::new_stochastic(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+    } else {
+        WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+    };
+    let (z_next, sigma_opt) = wm.forward_with_sigma(&mut g, z, action);
     let z_next = g.stop_gradient(z_next);
-    // Optional win-classifier head attached to the rolled-out z_next.
-    // Params mirror from wm_session (where the head is trained via
-    // BCE on win/loss labels). Output is P(win | z_next) — sigmoid'd
-    // probability in [0, 1]. The planner adds
-    // `planner_value_alpha * P` to each k-step trajectory score.
-    match value_hidden_dim {
-        Some(vh) => {
-            let vh_module = crate::value_head::ValueHead::new(&mut g, latent_dim, vh);
-            let logit = vh_module.forward(&mut g, z_next);
-            let prob = g.sigmoid(logit);
-            let prob = g.stop_gradient(prob);
-            g.set_outputs(vec![z_next, prob]);
-        }
-        None => {
-            g.set_outputs(vec![z_next]);
-        }
+    // Output order: [z_next, optional sigma, optional value]
+    // - z_next  always at index 0
+    // - σ      at index 1 when wm_stochastic
+    // - value  at the next index when value_hidden_dim is Some
+    let mut outputs = vec![z_next];
+    if let Some(sigma) = sigma_opt {
+        let sigma_det = g.stop_gradient(sigma);
+        outputs.push(sigma_det);
     }
+    if let Some(vh) = value_hidden_dim {
+        let vh_module = crate::value_head::ValueHead::new(&mut g, latent_dim, vh);
+        let logit = vh_module.forward(&mut g, z_next);
+        let prob = g.sigmoid(logit);
+        let prob = g.stop_gradient(prob);
+        outputs.push(prob);
+    }
+    g.set_outputs(outputs);
     g
 }
 
@@ -3008,9 +3057,25 @@ impl Agent {
                     g.add(z_cnn, task_h)
                 }
             };
-            let wm = WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim);
-            let z_hat = wm.forward(&mut g, z_t, action);
-            let wm_loss = WorldModel::loss(&mut g, z_hat, z_target);
+            let wm = if config.wm_stochastic {
+                WorldModel::new_stochastic(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
+            } else {
+                WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
+            };
+            let (z_hat, sigma_opt) = wm.forward_with_sigma(&mut g, z_t, action);
+            let mu_loss = WorldModel::loss(&mut g, z_hat, z_target);
+            let wm_loss = match sigma_opt {
+                Some(sigma) => {
+                    // Heteroscedastic σ-head regression loss. Trained
+                    // against |z_target − z_hat| with stop-grad on the
+                    // residual so the σ training does not bias μ.
+                    let sigma_loss = WorldModel::sigma_loss(&mut g, z_hat, sigma, z_target);
+                    let coef = g.scalar(config.wm_sigma_loss_coef);
+                    let sigma_loss_scaled = g.mul(sigma_loss, coef);
+                    g.add(mu_loss, sigma_loss_scaled)
+                }
+                None => mu_loss,
+            };
 
             // Optional obs-reconstruction loss INSIDE the WM session
             // (anti-collapse). Without this, the WM forward-prediction
@@ -3588,6 +3653,7 @@ impl Agent {
                 } else {
                     None
                 },
+                config.wm_stochastic,
             );
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
@@ -3616,7 +3682,7 @@ impl Agent {
         let wm_kstep_session = if config.wm_kstep_k > 1 {
             let k = config.wm_kstep_k;
             let batch = config.wm_kstep_batch.max(1);
-            let g = build_wm_kstep_graph(batch, config.latent_dim, config.hidden_dim, k);
+            let g = build_wm_kstep_graph(batch, config.latent_dim, config.hidden_dim, k, config.wm_stochastic);
             let mut s = build_session(&g, config.opt_level);
             init_parameters(&mut s);
             if config.grad_clip_norm > 0.0 {
@@ -3667,6 +3733,7 @@ impl Agent {
                 } else {
                     None
                 },
+                config.wm_stochastic,
             );
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
@@ -3942,6 +4009,7 @@ impl Agent {
             planner_action_scratch,
             planner_option_onehot_scratch,
             planner_traj_scratch,
+            planner_sigma_scratch: Vec::new(),
             planner_v_traj_scratch,
             planner_param_buf,
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
@@ -5467,6 +5535,12 @@ impl Agent {
         // WM (used by encoder→z prediction and wm_planner) benefits.
         let hd_ = self.config.hidden_dim;
         let ld_ = self.config.latent_dim;
+        // kstep → wm_session: only sync the mean-prediction params.
+        // sigma_proj is trained ONLY in wm_session (via single-step
+        // residual regression); kstep's sigma_proj never receives
+        // gradients and copying its random init back into wm_session
+        // would trash σ-head learning. Mean params are fine to sync
+        // because kstep's deeper k-step loss does train them.
         let wm_params: [(&str, usize); 6] = [
             ("world_model.z_proj.weight", ld_ * hd_),
             ("world_model.z_proj.bias", hd_),
@@ -8468,19 +8542,72 @@ impl Agent {
                     0,
                     &mut self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
                 );
+                // GRAM-style stochastic perturbation: add Gaussian noise
+                // per element. σ is either fixed (planner_noise_sigma
+                // alone) or the product of planner_noise_sigma and the
+                // WM's learned per-state σ_φ(z, a) when wm_stochastic
+                // is enabled. Each of the m parallel rollouts per lane
+                // gets independent N(0, 1) draws, scaled in place.
+                let scale = self.config.planner_noise_sigma;
+                if scale > 0.0 {
+                    // Read learned σ if the WM has the head wired up.
+                    // Layout matches z_next: [batch * ld].
+                    if self.config.wm_stochastic {
+                        if self.planner_sigma_scratch.len() < batch * ld {
+                            self.planner_sigma_scratch
+                                .resize(batch * ld, 0.0f32);
+                        }
+                        wm_planner.read_output_by_index(
+                            1,
+                            &mut self.planner_sigma_scratch[..batch * ld],
+                        );
+                    }
+                    let slice = &mut self.planner_traj_scratch
+                        [traj_offset_inner..traj_offset_inner + batch * ld];
+                    let sigma_buf = if self.config.wm_stochastic {
+                        Some(&self.planner_sigma_scratch[..batch * ld])
+                    } else {
+                        None
+                    };
+                    let mut i = 0;
+                    while i + 1 < slice.len() {
+                        // Box-Muller: two uniforms → two N(0,1) samples.
+                        let u1: f32 = rng.random_range(1e-7..1.0);
+                        let u2: f32 = rng.random_range(0.0..1.0);
+                        let mag = (-2.0 * u1.ln()).sqrt();
+                        let n0 = mag * (2.0 * std::f32::consts::PI * u2).cos();
+                        let n1 = mag * (2.0 * std::f32::consts::PI * u2).sin();
+                        let s0 = sigma_buf.map(|b| b[i]).unwrap_or(1.0);
+                        let s1 = sigma_buf.map(|b| b[i + 1]).unwrap_or(1.0);
+                        slice[i] += scale * s0 * n0;
+                        slice[i + 1] += scale * s1 * n1;
+                        i += 2;
+                    }
+                    if i < slice.len() {
+                        let u1: f32 = rng.random_range(1e-7..1.0);
+                        let u2: f32 = rng.random_range(0.0..1.0);
+                        let mag = (-2.0 * u1.ln()).sqrt();
+                        let s_last = sigma_buf.map(|b| b[i]).unwrap_or(1.0);
+                        slice[i] += scale * s_last
+                            * mag
+                            * (2.0 * std::f32::consts::PI * u2).cos();
+                    }
+                }
                 self.planner_z_scratch.copy_from_slice(
                     &self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
                 );
             }
-            // Value-head branch (output index 1) reads per-row scalar V
-            // for the t-th step's final z_next. Stored row-major
-            // `[t * batch + row]` so the scorer below can fetch it
-            // without re-running the session.
+            // Value-head branch reads per-row scalar V for the t-th
+            // step's final z_next. Stored row-major `[t * batch + row]`
+            // so the scorer below can fetch it without re-running the
+            // session. Output index depends on whether σ also occupies
+            // an output slot: [z_next, optional sigma, optional value].
             if self.wm_planner_has_value_head {
                 let v_off = t * batch;
                 let wm_planner = unsafe { &mut *wm_planner_ptr };
+                let v_idx = if self.config.wm_stochastic { 2 } else { 1 };
                 wm_planner.read_output_by_index(
-                    1,
+                    v_idx,
                     &mut self.planner_v_traj_scratch[v_off..v_off + batch],
                 );
             }
@@ -8873,8 +9000,9 @@ impl Agent {
         }
         let ld = self.config.latent_dim;
         let hd = self.config.hidden_dim;
-        // WM params (graph: world_model.*).
-        let wm_params: [(&str, usize); 6] = [
+        // WM params (graph: world_model.*). When wm_stochastic is on,
+        // the sigma_proj is appended (one more no-bias linear).
+        let mut wm_params: Vec<(&str, usize)> = vec![
             ("world_model.z_proj.weight", ld * hd),
             ("world_model.z_proj.bias", hd),
             ("world_model.a_proj.weight", MAX_ACTION_DIM * hd),
@@ -8882,6 +9010,9 @@ impl Agent {
             ("world_model.fc2.bias", hd),
             ("world_model.fc_out.weight", hd * ld),
         ];
+        if self.config.wm_stochastic {
+            wm_params.push(("world_model.sigma_proj.weight", hd * ld));
+        }
         for (name, n_elem) in wm_params.iter() {
             let buf = &mut self.planner_param_buf[..*n_elem];
             self.wm_session.read_param(name, buf);

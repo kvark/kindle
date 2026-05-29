@@ -283,6 +283,11 @@ def main() -> int:
     parser.add_argument("--planner-refresh-interval", type=int, default=None,
                         help="Planner: steps between WM-weight refreshes into "
                         "the CPU cache. Default 200.")
+    parser.add_argument("--planner-noise-sigma", type=float, default=0.0,
+                        help="GRAM-style stochastic WM: per-element N(0,σ²) "
+                        "noise added to each WM rollout step's z_next inside "
+                        "the planner. 0 (default) = deterministic. "
+                        "Try 0.01–0.2 for multi-trajectory exploration.")
     parser.add_argument("--planner-every", type=int, default=0,
                         help="Harness trigger: call plan_and_queue every N env "
                         "steps. 0 disables harness-side planning invocation.")

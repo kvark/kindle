@@ -307,6 +307,14 @@ def main() -> int:
     parser.add_argument("--planner-horizon", type=int, default=0)
     parser.add_argument("--planner-samples", type=int, default=None)
     parser.add_argument("--planner-every", type=int, default=0)
+    parser.add_argument("--planner-noise-sigma", type=float, default=0.0,
+                        help="GRAM stochastic WM: per-element N(0,σ²) noise "
+                        "added to each planner WM rollout step. Default 0 = "
+                        "deterministic. Try 0.05–0.2 for Atari latents.")
+    parser.add_argument("--wm-stochastic", type=int, default=0,
+                        help="Enable learned per-state σ-head; planner noise "
+                        "scales by σ_learned(z,a) × planner_noise_sigma.")
+    parser.add_argument("--wm-sigma-loss-coef", type=float, default=0.5)
     args = parser.parse_args()
     active_blocks = _apply_blocks(args, sys.argv[1:])
     if active_blocks:
@@ -370,6 +378,11 @@ def main() -> int:
             ] = v
     if args.planner_horizon > 0:
         agent_kwargs["planner_horizon"] = args.planner_horizon
+    if args.planner_noise_sigma > 0.0:
+        agent_kwargs["planner_noise_sigma"] = args.planner_noise_sigma
+    if args.wm_stochastic:
+        agent_kwargs["wm_stochastic"] = True
+        agent_kwargs["wm_sigma_loss_coef"] = args.wm_sigma_loss_coef
     if args.value_bootstrap:
         agent_kwargs["value_bootstrap"] = True
     if args.gae_lambda > 0:

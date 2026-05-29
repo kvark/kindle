@@ -173,6 +173,22 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--planner-noise-sigma", type=float, default=0.0,
+                        help="GRAM-style stochastic WM rollout: per-element "
+                        "N(0,σ²) noise added to each WM step's z_next inside "
+                        "the planner. Each of the `planner-samples` rollouts "
+                        "diverges by both action choice AND latent "
+                        "perturbation. 0 (default) = deterministic. Try "
+                        "0.01–0.2 for multi-trajectory exploration. With "
+                        "--wm-stochastic, acts as scale × learned σ.")
+    parser.add_argument("--wm-stochastic", type=int, default=0,
+                        help="Enable the heteroscedastic σ-head in the WM. "
+                        "σ is trained to predict |z_target − z_hat| and "
+                        "used by the planner to scale per-element noise "
+                        "(requires --planner-noise-sigma > 0).")
+    parser.add_argument("--wm-sigma-loss-coef", type=float, default=0.5,
+                        help="Coefficient on the σ-head regression loss in "
+                        "the main WM loss. Default 0.5.")
     parser.add_argument("--planner-rnd-alpha", type=float, default=0.0,
                         help="Blend factor for RND novelty in the planner's "
                         "trajectory score. score = visit_count_score + alpha * "
@@ -620,6 +636,9 @@ def main() -> int:
         planner_use_mcts=bool(args.planner_use_mcts),
         mcts_simulations=args.mcts_simulations,
         mcts_c_puct=args.mcts_c_puct,
+        planner_noise_sigma=args.planner_noise_sigma,
+        wm_stochastic=bool(args.wm_stochastic),
+        wm_sigma_loss_coef=args.wm_sigma_loss_coef,
         planner_rnd_alpha=args.planner_rnd_alpha,
         planner_goal_alpha=args.planner_goal_alpha,
         goal_states_cap=args.goal_states_cap,
@@ -846,7 +865,10 @@ def main() -> int:
     archive_adds = 0  # diagnostic: how many entries added
     if args.load_archive:
         try:
-            import pickle as _pkl
+            try:
+                import cloudpickle as _pkl
+            except ImportError:
+                import pickle as _pkl
             with open(args.load_archive, "rb") as _f:
                 loaded = _pkl.load(_f)
             # Only restore entries for games we have envs for.
@@ -1623,9 +1645,15 @@ def main() -> int:
         print(f"saved trained agent to {args.checkpoint_dir}")
     if args.save_archive:
         try:
-            import pickle as _pkl
+            # cloudpickle handles unusual module names (e.g.
+            # arc_agi_3.tu93-0768757b which has a hyphen and breaks
+            # standard pickle's importable-module assumption).
+            try:
+                import cloudpickle as _pkl
+            except ImportError:
+                import pickle as _pkl
             with open(args.save_archive, "wb") as _f:
-                _pkl.dump(archive, _f, protocol=_pkl.HIGHEST_PROTOCOL)
+                _pkl.dump(archive, _f, protocol=_pkl.DEFAULT_PROTOCOL if hasattr(_pkl, 'DEFAULT_PROTOCOL') else 4)
             total = sum(len(lst) for ag in archive for lst in ag.values())
             print(f"[archive] saved {total} entries to {args.save_archive}")
         except Exception as _exc:
