@@ -173,6 +173,20 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--planner-sigma-alpha", type=float, default=0.0,
+                        help="(P3) Information-seeking planner bonus: "
+                        "add alpha * mean learned sigma per rollout step "
+                        "to the trajectory score — steer toward "
+                        "transitions the WM cannot yet predict (the new "
+                        "elements at an unsolved level). Requires "
+                        "--wm-stochastic 1. 0 = off.")
+    parser.add_argument("--planner-sigma-horizon", type=float, default=0.0,
+                        help="(P3) Sigma-budgeted adaptive horizon: stop "
+                        "trusting a rollout once cumulative mean sigma "
+                        "exceeds this budget; queue only the trusted "
+                        "prefix. sigma is sigmoid-bounded so each step "
+                        "adds (0,1); try 2-3. Requires --wm-stochastic 1. "
+                        "0 = off.")
     parser.add_argument("--replan-surprise-mult", type=float, default=0.0,
                         help="(P4) Clear a lane's queued planner actions "
                         "when its per-step WM prediction error exceeds "
@@ -663,6 +677,8 @@ def main() -> int:
         mcts_c_puct=args.mcts_c_puct,
         planner_noise_sigma=args.planner_noise_sigma,
         replan_surprise_mult=args.replan_surprise_mult,
+        planner_sigma_alpha=args.planner_sigma_alpha,
+        planner_sigma_horizon=args.planner_sigma_horizon,
         wm_stochastic=bool(args.wm_stochastic),
         wm_sigma_loss_coef=args.wm_sigma_loss_coef,
         planner_rnd_alpha=args.planner_rnd_alpha,
