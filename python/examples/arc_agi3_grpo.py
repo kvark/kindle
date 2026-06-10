@@ -173,6 +173,17 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--surprise-ring-capacity", type=int, default=0,
+                        help="(P2) Surprise frame-replay ring size (CNN "
+                        "modes). Rows whose WM error spikes above "
+                        "--surprise-replay-mult x lane EMA are stored "
+                        "(frame+action+latent, ~33KB each) and replayed "
+                        "with priority sampling at replay_ratio cadence "
+                        "— extra encoder/WM gradient on novel elements "
+                        "the moment they appear. 0 = off. Try 1024.")
+    parser.add_argument("--surprise-replay-mult", type=float, default=1.5,
+                        help="(P2) Ring admission threshold multiple "
+                        "over the lane's WM-error EMA. Default 1.5.")
     parser.add_argument("--planner-sigma-alpha", type=float, default=0.0,
                         help="(P3) Information-seeking planner bonus: "
                         "add alpha * mean learned sigma per rollout step "
@@ -677,6 +688,8 @@ def main() -> int:
         mcts_c_puct=args.mcts_c_puct,
         planner_noise_sigma=args.planner_noise_sigma,
         replan_surprise_mult=args.replan_surprise_mult,
+        surprise_ring_capacity=args.surprise_ring_capacity,
+        surprise_replay_mult=args.surprise_replay_mult,
         planner_sigma_alpha=args.planner_sigma_alpha,
         planner_sigma_horizon=args.planner_sigma_horizon,
         wm_stochastic=bool(args.wm_stochastic),
