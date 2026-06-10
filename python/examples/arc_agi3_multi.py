@@ -352,11 +352,10 @@ def main() -> int:
                 ep_step[i] = 0
                 agent.mark_boundary(i)
 
-        # Build observation batch.
+        # Build observation batch. (Frames are written to the visual
+        # slot just before agent.observe() below — post-action
+        # convention, see Agent::observe docs.)
         pooled_batch = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32)) for o in obs_list]
-        if frame_buf is not None:
-            for i, o in enumerate(obs_list):
-                frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
 
         # Act.
         actions = agent.act(pooled_batch)
@@ -399,6 +398,9 @@ def main() -> int:
             agent.set_extrinsic_reward(ext)
 
         # Observe (single batched call — this is where training happens).
+        if frame_buf is not None:
+            for i, o in enumerate(new_obs_list):
+                frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
         agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
         obs_list = new_obs_list
 
@@ -529,9 +531,6 @@ def main() -> int:
                     val_agent.mark_boundary(i)
 
             pooled_batch = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32)) for o in val_obs_list]
-            if val_frame_buf is not None:
-                for i, o in enumerate(val_obs_list):
-                    val_frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
 
             actions = val_agent.act(pooled_batch)
 
@@ -559,6 +558,9 @@ def main() -> int:
                 homeo_list.append(homeo_for(frame, new_levels, val_win_levels_per[i]))
                 val_ep_step[i] += 1
 
+            if val_frame_buf is not None:
+                for i, o in enumerate(new_obs_list):
+                    val_frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
             val_agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
             val_obs_list = new_obs_list
 
