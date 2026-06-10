@@ -1588,6 +1588,21 @@ def main() -> int:
                     stagnation_steps[i] += 1
                 last_levels[i] = new_levels
                 steps_at_level[i // K][new_levels] += 1
+                # Rule-goal: a level event means obs_list[i] (pre-step)
+                # was a WIN state for the level anchored at
+                # ep_start_objset. Record the (start, win) pair and
+                # re-anchor at the new level's first frame.
+                if (rule_goal_on and d > 0
+                        and obs_list[i].frame and obs_new.frame):
+                    g_idx_r = i // K
+                    if ep_start_objset[i] is not None:
+                        pre_frm = np.asarray(obs_list[i].frame[0])
+                        rule_pairs[g_idx_r][new_levels - d].append(
+                            (ep_start_objset[i], lane_objset(i, pre_frm))
+                        )
+                        rules_dirty[g_idx_r] = True
+                        rule_pairs_count += 1
+                    reset_rule_anchor(i, np.asarray(obs_new.frame[0]))
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
                     # (rare; primarily seen when restoring archive
