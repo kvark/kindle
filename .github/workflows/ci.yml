@@ -49,7 +49,7 @@ jobs:
 
       - name: GPU tests (opt parity + canaries + stability)
         run: |
-          cargo test -p kindle --test opt_parity --test canaries -- --ignored
+          cargo test -p kindle --test opt_parity --test canaries --test wm_direction -- --ignored
           cargo test -p kindle-gym --test stability -- --ignored
         continue-on-error: true
 
