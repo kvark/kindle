@@ -12,6 +12,7 @@ use meganeura::nn;
 /// smoothly to ±scale. Implemented via full-shape constant tensors
 /// because meganeura's `Op::Mul` requires matching shapes (no scalar
 /// broadcast).
+#[allow(dead_code)] // kept for the optional scaled-tanh value head path; CI -D warnings would reject it otherwise
 fn scaled_tanh(g: &mut Graph, x: NodeId, scale: f32, batch_size: usize, last_dim: usize) -> NodeId {
     let n = batch_size * last_dim;
     let scale_full = g.constant(vec![scale; n], &[batch_size, last_dim]);
