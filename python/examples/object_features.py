@@ -65,6 +65,21 @@ def _connected_components(grid: np.ndarray, ignore_color: int = 0) -> list[dict]
     return objects
 
 
+def object_centroids(grid: np.ndarray, max_n: int = 8) -> list[tuple[int, int]]:
+    """Top-`max_n` object centroids, largest area first (ties broken by
+    bbox position for determinism). Returns [(y, x)] ints. Generic
+    connected-component salience — no game-specific knowledge. Used by
+    the object-click action slots: the policy picks WHICH object to
+    click; this provides WHERE that object is."""
+    objs = _connected_components(grid)
+    objs.sort(key=lambda o: (-o["area"], o["bbox"][0], o["bbox"][1]))
+    out = []
+    for o in objs[:max_n]:
+        y0, x0, y1, x1 = o["bbox"]
+        out.append(((y0 + y1) // 2, (x0 + x1) // 2))
+    return out
+
+
 def _count_holes(obj: dict, grid_shape: tuple[int, int]) -> int:
     """Rough complexity: count enclosed background regions inside bbox.
     Uses the sub_mask stored on the object dict by _connected_components."""

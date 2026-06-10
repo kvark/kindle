@@ -173,6 +173,16 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--object-click-slots", type=int, default=0,
+                        help="Extend the action space with N extra "
+                        "discrete slots meaning 'ACTION6-click the i-th "
+                        "largest object on screen' (connected-component "
+                        "centroids — generic visual salience, no game "
+                        "knowledge). Replaces the uniform-random click "
+                        "coordinate lottery (1/4096 per click) with a "
+                        "learnable object choice. Slots are masked when "
+                        "ACTION6 is unavailable or fewer objects exist. "
+                        "0 = off. Max 11 (MAX_ACTION_DIM headroom).")
     parser.add_argument("--plasticity-interval", type=int, default=0,
                         help="(P5) Shrink-and-perturb the encoder/WM/"
                         "recon params every N steps (p <- 0.999p + "
@@ -657,10 +667,18 @@ def main() -> int:
 
     NUM_ACTIONS = 7
     action_by_value = {int(a.value): a for a in GameAction}
+    # Object-click slots extend the discrete action space: slot
+    # NUM_ACTIONS + i = "ACTION6 at the centroid of the i-th largest
+    # object". The policy/planner treat them as ordinary actions; the
+    # mask gates them on ACTION6 availability + object existence.
+    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS))
+    total_actions = NUM_ACTIONS + click_slots
+    if click_slots:
+        from object_features import object_centroids as _obj_centroids
 
     agent_kwargs = dict(
         obs_dim=64,
-        num_actions=NUM_ACTIONS,
+        num_actions=total_actions,
         batch_size=n_lanes,
         env_ids=list(range(n_lanes)),
         seed=args.seed,
@@ -795,20 +813,65 @@ def main() -> int:
     MAX_ACTION_DIM = 18
     mask_buf = np.ones((n_lanes, MAX_ACTION_DIM), dtype=np.float32)
 
+    # Per-lane object-centroid cache for the click slots. Recomputed
+    # only when the frame hash changes (ARC frames are mostly static,
+    # so this is nearly free despite scipy label calls).
+    lane_centroids = [[] for _ in range(n_lanes)]
+    lane_centroid_hash = [None] * n_lanes
+
+    def refresh_lane_objects():
+        for lane_i in range(n_lanes):
+            o = obs_list[lane_i]
+            if not o.frame:
+                continue
+            frm = np.asarray(o.frame[0])
+            h = frame_hash(frm)
+            if h == lane_centroid_hash[lane_i]:
+                continue
+            lane_centroid_hash[lane_i] = h
+            lane_centroids[lane_i] = _obj_centroids(
+                frm.astype(np.int32), click_slots
+            )
+
     def update_action_mask():
         """Rebuild per-lane action masks from current avail_actions and push
         them to kindle. Slots whose ARC GameAction.value (idx+1) is in
-        avail_actions[lane] stay at 1.0; everything else (including the
-        slots beyond NUM_ACTIONS) is forced to 0.0."""
+        avail_actions[lane] stay at 1.0; object-click slots (NUM_ACTIONS+i)
+        stay at 1.0 when ACTION6 is available AND object i exists;
+        everything else is forced to 0.0."""
+        if click_slots:
+            refresh_lane_objects()
         mask_buf.fill(0.0)
         for lane_i in range(n_lanes):
             for v in avail_actions[lane_i]:
                 idx = int(v) - 1
                 if 0 <= idx < MAX_ACTION_DIM:
                     mask_buf[lane_i, idx] = 1.0
+            if click_slots and 6 in avail_actions[lane_i]:
+                for i in range(min(click_slots, len(lane_centroids[lane_i]))):
+                    mask_buf[lane_i, NUM_ACTIONS + i] = 1.0
         agent.set_action_masks(mask_buf.reshape(-1))
 
     def map_action(idx, lane):
+        # Object-click slot: ACTION6 aimed at the i-th largest object's
+        # centroid. The mask guarantees ACTION6 availability and object
+        # existence at mask-build time; if the frame changed since, fall
+        # back to the last known centroid (still a salient point).
+        if idx >= NUM_ACTIONS:
+            i = idx - NUM_ACTIONS
+            cents = lane_centroids[lane]
+            aa = avail_actions[lane]
+            assert 6 in aa, (
+                f"click-slot escape: lane {lane} sampled click slot {i} "
+                f"but ACTION6 not in avail_actions={aa}"
+            )
+            if i < len(cents):
+                y, x = cents[i]
+            else:
+                y, x = rng.randrange(64), rng.randrange(64)
+            a = action_by_value[6]
+            a.set_data({"x": int(x), "y": int(y)})
+            return a, {"x": int(x), "y": int(y)}
         # Kindle now masks invalid actions before sampling, so `idx`
         # should always map to an action in `avail_actions[lane]`.
         # Assert defensively; if this fires, something else broke
@@ -1174,7 +1237,7 @@ def main() -> int:
             # count novelty, and queues the best one. act() then plays
             # the queued action instead of sampling from the policy.
             if args.planner_horizon > 0:
-                agent.plan_and_queue(NUM_ACTIONS)
+                agent.plan_and_queue(total_actions)
                 if progress_on and args.progress_empowerment_coef > 0.0:
                     raw_emp = agent.empowerment()
                     # Per-game normalization: divide each lane's
