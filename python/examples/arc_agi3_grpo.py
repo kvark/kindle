@@ -173,6 +173,14 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--plasticity-interval", type=int, default=0,
+                        help="(P5) Shrink-and-perturb the encoder/WM/"
+                        "recon params every N steps (p <- 0.999p + "
+                        "0.01*std*noise by default): plasticity "
+                        "maintenance for late-arriving novelty. 0 = off. "
+                        "Try 25000-100000.")
+    parser.add_argument("--plasticity-shrink", type=float, default=0.999)
+    parser.add_argument("--plasticity-noise", type=float, default=0.01)
     parser.add_argument("--surprise-ring-capacity", type=int, default=0,
                         help="(P2) Surprise frame-replay ring size (CNN "
                         "modes). Rows whose WM error spikes above "
@@ -689,6 +697,9 @@ def main() -> int:
         planner_noise_sigma=args.planner_noise_sigma,
         replan_surprise_mult=args.replan_surprise_mult,
         surprise_ring_capacity=args.surprise_ring_capacity,
+        plasticity_interval=args.plasticity_interval,
+        plasticity_shrink=args.plasticity_shrink,
+        plasticity_noise=args.plasticity_noise,
         surprise_replay_mult=args.surprise_replay_mult,
         planner_sigma_alpha=args.planner_sigma_alpha,
         planner_sigma_horizon=args.planner_sigma_horizon,
