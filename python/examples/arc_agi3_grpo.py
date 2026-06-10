@@ -173,6 +173,12 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--replan-surprise-mult", type=float, default=0.0,
+                        help="(P4) Clear a lane's queued planner actions "
+                        "when its per-step WM prediction error exceeds "
+                        "this multiple of the lane's running EMA — the "
+                        "world diverged from what the plan assumed, so "
+                        "stop executing it blind. 0 = off. Try 2.0-3.0.")
     parser.add_argument("--planner-noise-sigma", type=float, default=0.0,
                         help="GRAM-style stochastic WM rollout: per-element "
                         "N(0,σ²) noise added to each WM step's z_next inside "
@@ -656,6 +662,7 @@ def main() -> int:
         mcts_simulations=args.mcts_simulations,
         mcts_c_puct=args.mcts_c_puct,
         planner_noise_sigma=args.planner_noise_sigma,
+        replan_surprise_mult=args.replan_surprise_mult,
         wm_stochastic=bool(args.wm_stochastic),
         wm_sigma_loss_coef=args.wm_sigma_loss_coef,
         planner_rnd_alpha=args.planner_rnd_alpha,
@@ -860,6 +867,11 @@ def main() -> int:
     # E.g. events_by_level[i][1] = times reached L1, [i][2] = times
     # reached L2. Lets us see depth distribution, not just max.
     events_by_level = [collections.defaultdict(int) for _ in range(n_lanes)]
+    # (L3 metrics) Per-GAME count of micro-steps spent playing each
+    # level (= levels_completed while stepping). Leading indicator for
+    # frontier work: events at the frontier level lag; dwell time
+    # leads.
+    steps_at_level = [collections.defaultdict(int) for _ in range(n_games)]
     ep_step = [0] * n_lanes
     ep_count = [0] * n_lanes
 
@@ -1367,6 +1379,7 @@ def main() -> int:
                     # (7) No level event this step → stagnation grows.
                     stagnation_steps[i] += 1
                 last_levels[i] = new_levels
+                steps_at_level[i // K][new_levels] += 1
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
                     # (rare; primarily seen when restoring archive
@@ -1397,6 +1410,11 @@ def main() -> int:
             ext_vec = [0.0] * n_lanes
             for i in range(n_lanes):
                 g_idx = i // K
+                # Some envs transiently return a frameless obs (e.g.
+                # right after an internal error); skip novelty
+                # accounting for those steps.
+                if not new_obs_list[i].frame:
+                    continue
                 h = frame_hash(np.asarray(new_obs_list[i].frame[0]))
                 # Per-game shared count for the Go-Explore selector.
                 gcounts = explore_counts[g_idx]
@@ -1551,6 +1569,10 @@ def main() -> int:
 
             if frame_buf is not None:
                 for i, o in enumerate(new_obs_list):
+                    if not o.frame:
+                        # Frameless obs (transient env hiccup): keep the
+                        # previous frame in the slot for this lane.
+                        continue
                     cur = np.asarray(o.frame[0], dtype=np.float32) / 15.0
                     frame_buf[i, 0] = cur
                     if args.frame_diff:
@@ -1694,6 +1716,13 @@ def main() -> int:
                         f"{lvl}:{n}" for lvl, n in ep_hist_nonzero
                     )
                 prog_tag = f" prog={progress_total:.1f}" if progress_on else ""
+                # (L3 metrics) dwell-time-per-level for game 0.
+                tl = ",".join(
+                    f"{lvl}:{n}"
+                    for lvl, n in sorted(steps_at_level[0].items())
+                )
+                if tl:
+                    prog_tag += f" tL=[{tl}]"
                 archive_info = (
                     f" arc={total_archive}/{args.archive_cap * n_games}"
                     f"({archive_uses}u,{archive_adds}a{trail_tag}){prog_tag}"
@@ -1739,7 +1768,11 @@ def main() -> int:
         per_lvl_str = " ".join(
             f"L{lvl}:{by_lvl[lvl]}" for lvl in sorted(by_lvl) if by_lvl[lvl] > 0
         )
-        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {max_lvl:>7} {win_levels_per[g_idx * K]:>4}  {per_lvl_str}")
+        # (L3 metrics) dwell time per level for this game.
+        dwell_str = " ".join(
+            f"t{lvl}:{n}" for lvl, n in sorted(steps_at_level[g_idx].items())
+        )
+        print(f"{e.game_id[:4]:<6} {eps:>5} {ev:>4} {max_lvl:>7} {win_levels_per[g_idx * K]:>4}  {per_lvl_str}  {dwell_str}")
     print()
     print(f"games with ≥1 event: {games_with_evt}/{n_games}")
     print(f"total events (across all forks): {grand_evt}")
