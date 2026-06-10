@@ -1165,6 +1165,13 @@ pub struct AgentConfig {
     /// on the learned per-state σ: noise = planner_noise_sigma ×
     /// σ_learned × ε.
     pub planner_noise_sigma: f32,
+    /// Surprise-triggered replanning (P4, 2026-06-10): when > 0 and a
+    /// lane has queued planner actions, a step whose WM prediction
+    /// error exceeds `replan_surprise_mult x` the lane's running EMA
+    /// clears the lane's planner queue — the world diverged from the
+    /// plan's assumptions, so stop executing it blind and replan at
+    /// the next planner tick. 0 disables (default). Typical 2.0-3.0.
+    pub replan_surprise_mult: f32,
     /// GRAM-style heteroscedastic WM: when true, the WM additionally
     /// learns a per-state per-dim σ head (`world_model.sigma_proj`)
     /// trained to predict `|z_target − z_hat|`. The planner reads σ at
@@ -1561,6 +1568,7 @@ impl Default for AgentConfig {
             mcts_simulations: 64,
             mcts_c_puct: std::f32::consts::SQRT_2,
             planner_noise_sigma: 0.0,
+            replan_surprise_mult: 0.0,
             wm_stochastic: false,
             wm_sigma_loss_coef: 0.5,
             planner_rnd_alpha: 0.0,
@@ -1874,6 +1882,10 @@ struct Lane {
     /// compute importance ratios. In (0, 1]; default 1.0 before first
     /// `act()`.
     last_prob_taken: f32,
+    /// EMA of this lane's per-step WM prediction error. Lazily seeded
+    /// with the first observed value; decay 0.99. Drives the
+    /// surprise-triggered replanning gate (`replan_surprise_mult`).
+    pred_error_ema: f32,
     /// Full logits (pre-softmax, length MAX_ACTION_DIM) at action time —
     /// used by the KL-penalty PPO path to compute KL(π_new ‖ π_old)
     /// exactly. Stored in `Transition.logits_at_action` on observe.
@@ -2349,6 +2361,8 @@ pub struct Agent {
     /// Counts of SIL update outcomes for diagnostics.
     sil_updates_attempted: u64,
     sil_updates_fired: u64,
+    /// (P4) Total planner-queue clears triggered by surprise spikes.
+    replan_clears: u64,
     sil_last_active_rows: u32,
     /// L1 change in policy.fc1.weight (first 32 values) caused by the
     /// most recent SIL update. >0 means SIL is moving params; ≈0 means
@@ -3916,6 +3930,7 @@ impl Agent {
                 option_history: OptionHistory::new(config.option_history_len.max(1)),
                 last_value: 0.0,
                 last_prob_taken: 1.0,
+                pred_error_ema: 0.0,
                 last_logits: vec![0.0; MAX_ACTION_DIM],
                 last_entropy: 0.0,
                 last_surprise: 0.0,
@@ -4074,6 +4089,7 @@ impl Agent {
             sil_baseline_initialized: false,
             sil_updates_attempted: 0,
             sil_updates_fired: 0,
+            replan_clears: 0,
             sil_last_active_rows: 0,
             sil_last_param_change: 0.0,
             wm_planner_has_value_head,
@@ -4735,6 +4751,11 @@ impl Agent {
         };
         let mut m6_head = self.outcome_head.take();
         let mut m6_baseline_diag = self.last_outcome_baseline;
+        // (P4) Lanes whose realized surprise this step invalidates
+        // their queued plan; queues cleared after the loop (the lane
+        // iterator holds a mutable borrow over self.lanes only).
+        let replan_mult = self.config.replan_surprise_mult;
+        let mut replan_lanes: Vec<usize> = Vec::new();
         for (i, lane) in self.lanes.iter_mut().enumerate() {
             let z_row = &z_stack[i * ld..(i + 1) * ld];
             let obs_row = &self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
@@ -4747,6 +4768,24 @@ impl Agent {
                 .sum();
             let pred_error = row_sum.max(0.0).sqrt();
             let surprise = RewardCircuit::surprise(pred_error);
+
+            // (P4) Surprise-triggered replanning: track a per-lane EMA
+            // of the WM error and mark the lane for a planner-queue
+            // clear when this step's error spikes far above it — the
+            // world just did something the plan's WM rollout did not
+            // anticipate, so the remaining queued actions are built on
+            // a stale premise. Lazy-seed the EMA with the first value.
+            if lane.pred_error_ema == 0.0 {
+                lane.pred_error_ema = pred_error;
+            } else {
+                lane.pred_error_ema = 0.99 * lane.pred_error_ema + 0.01 * pred_error;
+            }
+            if replan_mult > 0.0
+                && lane.pred_error_ema > 1e-6
+                && pred_error > replan_mult * lane.pred_error_ema
+            {
+                replan_lanes.push(i);
+            }
 
             let visit_count = lane.buffer.visit_count(z_row);
             let novelty = RewardCircuit::novelty(visit_count);
@@ -5430,6 +5469,16 @@ impl Agent {
             lane.option_steps_left = lane.option_steps_left.saturating_sub(1);
             lane.option_elapsed = lane.option_elapsed.saturating_add(1);
         }
+        // (P4) Apply surprise-triggered replans: drop the queued plan
+        // for lanes whose realized dynamics diverged. The next
+        // plan_and_queue call replans from the fresh latent.
+        if !replan_lanes.is_empty() {
+            self.replan_clears += replan_lanes.len() as u64;
+        }
+        for i in replan_lanes {
+            self.planner_queue[i].clear();
+        }
+
         // Restore the outcome head after the loop finishes.
         self.outcome_head = m6_head;
         self.last_outcome_baseline = m6_baseline_diag;
@@ -9377,6 +9426,12 @@ impl Agent {
 
     /// Number of SIL updates fired (passed all guards including the
     /// positive-advantage check producing at least one active row).
+    /// (P4) Number of planner-queue clears triggered by surprise
+    /// spikes (replan_surprise_mult). Diagnostic.
+    pub fn replan_clears_count(&self) -> u64 {
+        self.replan_clears
+    }
+
     pub fn sil_updates_fired_count(&self) -> u64 {
         self.sil_updates_fired
     }
