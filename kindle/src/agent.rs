@@ -1192,6 +1192,21 @@ pub struct AgentConfig {
     /// that concentrates representation learning on novel elements
     /// the moment they appear. ~33 KB per entry at 2x64x64. 0
     /// disables (default).
+    /// (P5) Plasticity maintenance interval (steps). Every interval,
+    /// the encoder / world-model / recon parameters of the wm session
+    /// get a shrink-and-perturb update: p <- shrink·p + noise·std(p)·ε.
+    /// Counters the loss of plasticity that hits long-running nets
+    /// right when novelty arrives late in training (new elements at a
+    /// fresh level) — see the 2026-05-05 rank-collapse episode. The
+    /// perturbation is scale-aware (per-tensor std) so it nudges
+    /// without erasing. 0 disables (default). Typical 25_000-100_000.
+    pub plasticity_interval: usize,
+    /// (P5) Multiplicative shrink applied at each plasticity event.
+    /// Default 0.999 (gentle).
+    pub plasticity_shrink: f32,
+    /// (P5) Noise scale as a fraction of each tensor's std.
+    /// Default 0.01.
+    pub plasticity_noise: f32,
     pub surprise_ring_capacity: usize,
     /// (P2) Admission threshold: a row enters the surprise ring when
     /// its pred_error > mult x lane EMA. 1.0 admits anything above
@@ -1606,6 +1621,9 @@ impl Default for AgentConfig {
             mcts_c_puct: std::f32::consts::SQRT_2,
             planner_noise_sigma: 0.0,
             replan_surprise_mult: 0.0,
+            plasticity_interval: 0,
+            plasticity_shrink: 0.999,
+            plasticity_noise: 0.01,
             surprise_ring_capacity: 0,
             surprise_replay_mult: 1.5,
             planner_sigma_alpha: 0.0,
@@ -5710,6 +5728,17 @@ impl Agent {
             self.measure_drift();
         }
 
+        // (P5) Plasticity maintenance: gentle shrink-and-perturb on the
+        // representation + dynamics stack.
+        if self.config.plasticity_interval > 0
+            && self.step_count > 0
+            && self
+                .step_count
+                .is_multiple_of(self.config.plasticity_interval)
+        {
+            self.plasticity_perturb(rng);
+        }
+
         self.step_count += 1;
     }
 
@@ -6554,6 +6583,53 @@ impl Agent {
     /// that fails (buffer < 2, or deeply fragmented by env switches), we
     /// fall back to the most recent valid donor lane's sample so every
     /// batch row carries signal instead of zeros.
+    /// (P5) Shrink-and-perturb plasticity maintenance over the wm
+    /// session's encoder / world-model / recon parameters:
+    /// p <- shrink·p + noise·std(p)·ε, ε ~ N(0, 1). Scale-aware (the
+    /// noise rides each tensor's own std), so converged structure is
+    /// nudged, not erased, while dormant directions get fresh signal
+    /// to grab onto. Value head and task projections excluded — they
+    /// are small and label-anchored.
+    fn plasticity_perturb<R: Rng>(&mut self, rng: &mut R) {
+        use std::f32::consts::TAU;
+        let shrink = self.config.plasticity_shrink.clamp(0.5, 1.0);
+        let noise = self.config.plasticity_noise.max(0.0);
+        let names: Vec<String> = self
+            .wm_session
+            .param_names()
+            .iter()
+            .filter(|n| {
+                n.starts_with("encoder.")
+                    || n.starts_with("world_model.")
+                    || n.starts_with("wm.recon.")
+            })
+            .map(|n| n.to_string())
+            .collect();
+        for name in names {
+            let Some(len) = self.wm_session.param_size(&name) else {
+                continue;
+            };
+            let mut buf = vec![0.0f32; len];
+            self.wm_session.read_param(&name, &mut buf);
+            let mean = buf.iter().sum::<f32>() / len.max(1) as f32;
+            let var = buf.iter().map(|v| (v - mean) * (v - mean)).sum::<f32>() / len.max(1) as f32;
+            let std = var.max(0.0).sqrt();
+            let amp = noise * std;
+            let mut i = 0;
+            while i < len {
+                let u1: f32 = rng.random_range(1e-7..1.0);
+                let u2: f32 = rng.random_range(0.0..1.0);
+                let mag = (-2.0 * u1.ln()).sqrt();
+                buf[i] = shrink * buf[i] + amp * mag * (TAU * u2).cos();
+                if i + 1 < len {
+                    buf[i + 1] = shrink * buf[i + 1] + amp * mag * (TAU * u2).sin();
+                }
+                i += 2;
+            }
+            self.wm_session.set_parameter(&name, &buf);
+        }
+    }
+
     /// (P2) One surprise-replay dispatch: priority-sample a full batch
     /// of stored surprising transitions (post-action frame, action,
     /// acted-from latent) from the ring and run one encoder+WM

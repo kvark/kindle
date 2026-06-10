@@ -527,6 +527,9 @@ impl PyBatchAgent {
         planner_noise_sigma = None,
         replan_surprise_mult = None,
         surprise_ring_capacity = None,
+        plasticity_interval = None,
+        plasticity_shrink = None,
+        plasticity_noise = None,
         surprise_replay_mult = None,
         planner_sigma_alpha = None,
         planner_sigma_horizon = None,
@@ -689,6 +692,9 @@ impl PyBatchAgent {
         planner_noise_sigma: Option<f32>,
         replan_surprise_mult: Option<f32>,
         surprise_ring_capacity: Option<usize>,
+        plasticity_interval: Option<usize>,
+        plasticity_shrink: Option<f32>,
+        plasticity_noise: Option<f32>,
         surprise_replay_mult: Option<f32>,
         planner_sigma_alpha: Option<f32>,
         planner_sigma_horizon: Option<f32>,
@@ -1142,6 +1148,15 @@ impl PyBatchAgent {
         }
         if let Some(v) = surprise_ring_capacity {
             config.surprise_ring_capacity = v;
+        }
+        if let Some(v) = plasticity_interval {
+            config.plasticity_interval = v;
+        }
+        if let Some(v) = plasticity_shrink {
+            config.plasticity_shrink = v;
+        }
+        if let Some(v) = plasticity_noise {
+            config.plasticity_noise = v;
         }
         if let Some(v) = surprise_replay_mult {
             config.surprise_replay_mult = v;
