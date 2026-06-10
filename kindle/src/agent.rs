@@ -3672,7 +3672,7 @@ impl Agent {
                 config.hidden_dim,
                 config.num_options,
             );
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             Some(s)
         } else {
@@ -3683,7 +3683,7 @@ impl Agent {
             let k = config.wm_kstep_k;
             let batch = config.wm_kstep_batch.max(1);
             let g = build_wm_kstep_graph(batch, config.latent_dim, config.hidden_dim, k, config.wm_stochastic);
-            let mut s = build_session(&g, config.opt_level);
+            let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             if config.grad_clip_norm > 0.0 {
                 s.set_grad_clip_norm(config.grad_clip_norm);
