@@ -446,6 +446,25 @@ def main() -> int:
                         "the achieved level. Future episodes can restore "
                         "from these high-water marks instead of fresh L1 "
                         "starts. Targets L2-completion bootstrap. 0 = off.")
+    parser.add_argument("--cell-archive", type=int, default=0,
+                        help="(P1) Novelty-cell archive admission: within "
+                        "a game's FRONTIER level (deepest level reached), "
+                        "snapshot the env whenever a never-before-seen "
+                        "coarse-grid cell configuration appears, and add "
+                        "it to the per-level archive. Gives Go-Explore "
+                        "stepping stones INSIDE unsolved levels — the "
+                        "win-trail/level-event paths only seed levels "
+                        "that have already been completed. Scores rank "
+                        "below win trails so wins displace stepping "
+                        "stones once a level is solved. 0 = off.")
+    parser.add_argument("--cell-archive-min-interval", type=int, default=10,
+                        help="Min micro-steps between cell-archive "
+                        "admissions per lane (deepcopy throttle). "
+                        "Default 10.")
+    parser.add_argument("--cell-seen-cap", type=int, default=100000,
+                        help="Max tracked cell hashes per (game, level). "
+                        "When full, no further novel-cell admissions for "
+                        "that level. Default 100000.")
     parser.add_argument("--max-lvl-bump-bonus", type=float, default=0.0,
                         help="One-shot bonus added to ext_reward the FIRST "
                         "time a lane's max_levels_seen advances (per delta). "
@@ -863,6 +882,17 @@ def main() -> int:
     archive = [{} for _ in range(n_games)]
     archive_uses = 0  # diagnostic: how many times we restored from archive
     archive_adds = 0  # diagnostic: how many entries added
+
+    # (P1) Novelty-cell admission state. cell_seen[g_idx][level] is the
+    # set of coarse-grid hashes ever observed at that game-level; a
+    # hash NOT in the set marks a state worth archiving as a stepping
+    # stone (only at the game's frontier level — completed levels are
+    # already seeded by win trails). cell_last_add throttles deepcopy
+    # frequency per lane in absolute micro-steps.
+    cell_archive_on = args.cell_archive != 0 and args.archive_cap > 0
+    cell_seen = [dict() for _ in range(n_games)]  # level -> set(bytes)
+    cell_last_add = [-(10 ** 9)] * n_lanes
+    cell_archive_adds = 0  # diagnostic
     if args.load_archive:
         try:
             try:
@@ -1071,15 +1101,14 @@ def main() -> int:
 
             pooled = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32))
                       for o in obs_list]
-            if frame_buf is not None:
-                for i, o in enumerate(obs_list):
-                    cur = np.asarray(o.frame[0], dtype=np.float32) / 15.0
-                    frame_buf[i, 0] = cur
-                    if args.frame_diff:
-                        # Channel 1 = signed delta. Centered at 0 so
-                        # encoder sees +/- changes symmetrically.
-                        frame_buf[i, 1] = cur - prev_frame[i]
-                        prev_frame[i] = cur
+            # NOTE (2026-06-10): frames are now written to the visual
+            # slot just before agent.observe() below, from new_obs_list
+            # (the POST-action frames), matching Agent::observe's
+            # post-action convention. Writing the PRE-action frames
+            # here (the old behaviour) made the encoder lag the world
+            # by one step: act() and the planner ran on the previous
+            # frame's latent, and the WM trained on misaligned
+            # (frame, action) pairs.
 
             # Push current per-lane action masks to kindle BEFORE act();
             # avail_actions can change after each env.step() so we
@@ -1462,6 +1491,73 @@ def main() -> int:
                     progress_total += prog_vec[i]
                 agent.set_intrinsic_progress(prog_vec)
 
+            # (P1) Novelty-cell archive admission: whenever a lane at
+            # its game's FRONTIER level (deepest reached — i.e. the
+            # unsolved one) shows a coarse-cell configuration never
+            # seen at that game-level, snapshot the env into the
+            # per-level archive. Win trails and level-event snapshots
+            # only seed levels that have been completed at least once;
+            # this is the within-level stepping-stone path that lets
+            # restore-from-archive decompose a 70+-action level into
+            # planner-sized hops. Scores rank below level-event
+            # snapshots (500+) and win trails (1500+), so real wins
+            # displace stepping stones once the level is solved.
+            if cell_archive_on:
+                abs_micro = macro_step * M + micro_step
+                for i in range(n_lanes):
+                    obs_i = new_obs_list[i]
+                    if not obs_i.frame:
+                        continue
+                    if (abs_micro - cell_last_add[i]
+                            < args.cell_archive_min_interval):
+                        continue
+                    g_idx = i // K
+                    lvl = last_levels[i]
+                    frontier = max(max_levels_seen[g_idx * K:(g_idx + 1) * K])
+                    if lvl < frontier:
+                        continue
+                    frm = np.asarray(obs_i.frame[0], dtype=np.float32)
+                    cg = coarse_grid_from_frame(frm, pgs)
+                    if cg is None:
+                        continue
+                    seen = cell_seen[g_idx].setdefault(lvl, set())
+                    ch = cg.tobytes()
+                    if ch in seen or len(seen) >= args.cell_seen_cap:
+                        continue
+                    seen.add(ch)
+                    score = 100.0 * float(lvl) + float(ep_step[i] + 1)
+                    ent = {
+                        "env": copy.deepcopy(envs[i]),
+                        "obs": obs_i,
+                        "novelty": score,
+                        "levels": int(lvl),
+                        "ep_step": int(ep_step[i] + 1),
+                        "avail_actions": list(obs_i.available_actions or [1]),
+                    }
+                    gar = archive[g_idx].setdefault(lvl, [])
+                    if len(gar) < args.archive_cap:
+                        gar.append(ent)
+                        cell_archive_adds += 1
+                        cell_last_add[i] = abs_micro
+                    else:
+                        worst_idx = min(
+                            range(len(gar)),
+                            key=lambda j: gar[j]["novelty"],
+                        )
+                        if score > gar[worst_idx]["novelty"]:
+                            gar[worst_idx] = ent
+                            cell_archive_adds += 1
+                            cell_last_add[i] = abs_micro
+
+            if frame_buf is not None:
+                for i, o in enumerate(new_obs_list):
+                    cur = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+                    frame_buf[i, 0] = cur
+                    if args.frame_diff:
+                        # Channel 1 = signed delta. Centered at 0 so
+                        # encoder sees +/- changes symmetrically.
+                        frame_buf[i, 1] = cur - prev_frame[i]
+                        prev_frame[i] = cur
             agent.observe(new_pooled, list(actions), homeostatic=homeo_list)
             obs_list = new_obs_list
 
@@ -1574,6 +1670,17 @@ def main() -> int:
                 trail_tag = f",t{trail_archive_adds}" if win_trail_on else ""
                 if args.frontier_archive_on:
                     trail_tag += f",f{frontier_archive_adds}"
+                if cell_archive_on:
+                    trail_tag += f",c{cell_archive_adds}"
+                    # Per-level archive occupancy of game 0 — at a
+                    # glance: are stepping stones accumulating at the
+                    # frontier level?
+                    lvl_occ = ",".join(
+                        f"L{lvl}:{len(lst)}"
+                        for lvl, lst in sorted(archive[0].items())
+                    )
+                    if lvl_occ:
+                        trail_tag += f" arc0=[{lvl_occ}]"
                 # (5) Episode max-level histogram: counts of completed
                 # episodes per max-level. Helps see if any episodes are
                 # reaching deeper levels even when total events flat.
