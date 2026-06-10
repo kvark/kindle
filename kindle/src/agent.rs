@@ -1283,15 +1283,13 @@ pub struct AgentConfig {
     /// the agent's base `learning_rate`. 1.0 = same; lower stabilizes
     /// V early in training when targets are noisy.
     pub value_head_lr_scale: f32,
-    /// When true (default), the win-classifier BCE loss backprops
-    /// through the encoder, shaping it to distinguish win-trajectory
-    /// from loss-trajectory latents. This is the mechanism that gives
-    /// the planner a "high-level direction in latent space."
-    ///
-    /// Safe to leave on with the classifier (unlike the prior
-    /// regression formulation) because BCE has bounded, non-vanishing
-    /// gradient on confident negatives: loss-latents get pushed to
-    /// P=0, win-latents to P=1, creating a separating axis.
+    /// OBSOLETE (2026-06-10, kept for API compatibility): the win
+    /// classifier now trains on STORED latents via the `value_z`
+    /// graph input and never touches the encoder. The old
+    /// encoder-shaping path read enc(current visual/obs) during
+    /// value replay, which in CNN modes paired archived labels with
+    /// whatever frames were still in the visual slot — noise. See
+    /// the value-branch comment in the wm graph construction.
     pub value_head_grad_to_encoder: bool,
     /// Cross-game value classifier mode. When `false` (default),
     /// `value_replay_step` samples round-robin across env_id buckets
@@ -2371,6 +2369,9 @@ pub struct Agent {
     /// Sampled by round-robin across env_ids in `value_replay_step`
     /// so each game contributes equally to the classifier's
     /// gradient, regardless of which game produces most wins.
+    /// Entries are `(latent, env_id, label)` — the stored LATENT of
+    /// the state (fed to the value head via the `value_z` graph
+    /// input), not the obs token (pre-2026-06-10 layout).
     win_buffer: hashbrown::HashMap<u32, std::collections::VecDeque<(Vec<f32>, u32, f32)>>,
     /// Loss-trajectory replay buffer, GAME-STRATIFIED by env_id.
     /// Same structure as `win_buffer`; label always 0.
@@ -2379,6 +2380,9 @@ pub struct Agent {
     /// Set to R_to_go for value-replay calls, zeros otherwise (gated
     /// off by `value_gate=0`).
     value_target_scratch_vh: Vec<f32>,
+    /// Scratch for wm_session's `value_z` input `[batch_size, latent_dim]`
+    /// — the stored win/loss-sample latents fed to the value head.
+    value_z_scratch: Vec<f32>,
     /// Scratch buffers for wm_session's loss-gate inputs (each size 1).
     /// `wm_gate=1, value_gate=0` for normal WM forward;
     /// `wm_gate=0, value_gate=1` for value-replay forward.
@@ -3162,19 +3166,31 @@ impl Agent {
             //
             // Mechanism: V(z) → logit, sigmoid → P(win-trajectory | z),
             // BCE loss vs label γ^(T-t) for win-trajectory transitions,
-            // 0 for loss-trajectory transitions. The encoder is shaped
-            // by this loss BY DEFAULT (we WANT it to learn a separating
-            // axis between win and loss latents — that's what gives
-            // the planner "high-level direction in mind"). Opt-out via
-            // `value_head_grad_to_encoder=false`.
+            // 0 for loss-trajectory transitions.
+            //
+            // Input routing (2026-06-10): the head reads a dedicated
+            // `value_z` input — the STORED latent of the buffered
+            // win/loss sample — not the encoder output. The previous
+            // wiring read enc(current visual/obs), but value-replay
+            // batches stage archived samples whose frames are NOT in
+            // the visual slot: in CNN modes the classifier was being
+            // trained on stale online frames against unrelated
+            // archived labels, so it could only learn a per-game win
+            // prior through the task channel (the 2026-05-15
+            // cross-game-bias finding, explained). Training on stored
+            // latents is exact, encoder-mode-independent, and the
+            // planner consumption (V over rollout latents via pulled
+            // value_head.* weights) is unchanged — the in-graph V has
+            // no other online consumer. Trade-off given up: BCE
+            // encoder shaping (`value_head_grad_to_encoder` is now a
+            // no-op); the only mode where that shaping ever paired
+            // labels with the right states was MLP.
             //
             // Why BCE not MSE on R_to_go: an earlier regression
             // formulation (2026-05-12) collapsed the encoder because
             // R_to_go ≈ 0 dominates (loss episodes) and MSE pulled all
             // latents toward "predict zero". BCE's gradient does NOT
-            // vanish for confident negatives — losing latents are
-            // actively pushed to "P=0" while winning latents are
-            // pushed to "P=1", forcing the encoder to distinguish.
+            // vanish for confident negatives.
             let value_branch_on =
                 config.value_head_train_coef > 0.0 || config.planner_value_alpha > 0.0;
             let loss = if value_branch_on {
@@ -3184,18 +3200,14 @@ impl Agent {
                     config.value_head_hidden_dim
                 };
                 let value_target_in = g.input("value_target", &[config.batch_size, 1]);
+                let value_z_in = g.input("value_z", &[config.batch_size, config.latent_dim]);
                 let wm_gate_in = g.input("wm_gate", &[1]);
                 let value_gate_in = g.input("value_gate", &[1]);
                 let wm_gate = g.stop_gradient(wm_gate_in);
                 let value_gate = g.stop_gradient(value_gate_in);
                 let vh_module =
                     crate::value_head::ValueHead::new(&mut g, config.latent_dim, vh_hidden);
-                let z_for_value = if config.value_head_grad_to_encoder {
-                    z_t
-                } else {
-                    g.stop_gradient(z_t)
-                };
-                let logit = vh_module.forward(&mut g, z_for_value);
+                let logit = vh_module.forward(&mut g, value_z_in);
                 let prob = g.sigmoid(logit);
                 let v_target_det = g.stop_gradient(value_target_in);
                 let value_loss_raw = g.bce_loss(prob, v_target_det);
@@ -3800,6 +3812,7 @@ impl Agent {
         // drawn from `value_buffer`. The standalone z-input value
         // session was removed in favour of this end-to-end path.
         let value_target_scratch_vh = vec![0.0f32; config.batch_size];
+        let value_z_scratch = vec![0.0f32; config.batch_size * config.latent_dim];
         let wm_gate_scalar = vec![1.0f32];
         let value_gate_scalar = vec![0.0f32];
         // Largest WM param is fc2.weight at hidden_dim*hidden_dim.
@@ -4067,6 +4080,7 @@ impl Agent {
             win_buffer: hashbrown::HashMap::new(),
             loss_buffer: hashbrown::HashMap::new(),
             value_target_scratch_vh,
+            value_z_scratch,
             wm_gate_scalar,
             value_gate_scalar,
             last_value_head_loss: 0.0,
@@ -5022,7 +5036,7 @@ impl Agent {
                             if buf.len() >= per_env_cap {
                                 buf.pop_front();
                             }
-                            buf.push_back((tr.observation.clone(), env_id, label));
+                            buf.push_back((tr.latent.clone(), env_id, label));
                             decay *= gamma;
                             if tr.env_boundary {
                                 break;
@@ -5649,7 +5663,7 @@ impl Agent {
         let n_win = n / 2;
         for row in 0..n {
             let from_win = row < n_win;
-            let (env_id, copy_obs, copy_label) = if from_win {
+            let (env_id, copy_z, copy_label) = if from_win {
                 let env_id = win_keys[row % win_keys.len()];
                 let q = &self.win_buffer[&env_id];
                 let i = rng.random_range(0..q.len());
@@ -5663,24 +5677,23 @@ impl Agent {
                 let entry = &q[i];
                 (env_id, entry.0.clone(), entry.2)
             };
-            let obs_dst =
-                &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
-            let copy_len = copy_obs.len().min(OBS_TOKEN_DIM);
-            obs_dst[..copy_len].copy_from_slice(&copy_obs[..copy_len]);
-            if copy_len < OBS_TOKEN_DIM {
-                obs_dst[copy_len..].fill(0.0);
-            }
-            let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
-            match self.task_embeddings.get(&env_id) {
-                Some(emb) => task_dst.copy_from_slice(emb),
-                None => task_dst.fill(0.0),
+            let _ = env_id;
+            let ld = self.config.latent_dim;
+            let z_dst = &mut self.value_z_scratch[row * ld..(row + 1) * ld];
+            let copy_len = copy_z.len().min(ld);
+            z_dst[..copy_len].copy_from_slice(&copy_z[..copy_len]);
+            if copy_len < ld {
+                z_dst[copy_len..].fill(0.0);
             }
             self.value_target_scratch_vh[row] = copy_label;
         }
-        // Action and z_target are unused in value-replay mode (their
-        // loss branch is gated off by wm_gate=0) but the graph inputs
-        // still need to be present — zero them out so they don't
-        // pollute the device buffers with stale per-step values.
+        // Encoder inputs (obs/task) and the WM inputs (action/z_target)
+        // are unused in value-replay mode — the value head reads the
+        // staged `value_z` latents directly and the WM branch is gated
+        // off by wm_gate=0. Zero them so stale per-step values don't
+        // linger in the device buffers.
+        self.obs_token_scratch.fill(0.0);
+        self.task_scratch.fill(0.0);
         self.action_token_scratch.fill(0.0);
         self.z_target_scratch.fill(0.0);
 
@@ -6137,10 +6150,12 @@ impl Agent {
         self.wm_session.set_input("task", &vec![0.0; n * TASK_DIM]);
         if self.value_branch_on() {
             self.value_target_scratch_vh.fill(0.0);
+            self.value_z_scratch.fill(0.0);
             self.wm_gate_scalar[0] = 1.0;
             self.value_gate_scalar[0] = 0.0;
             self.wm_session
                 .set_input("value_target", &self.value_target_scratch_vh);
+            self.wm_session.set_input("value_z", &self.value_z_scratch);
             self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
             self.wm_session
                 .set_input("value_gate", &self.value_gate_scalar);
