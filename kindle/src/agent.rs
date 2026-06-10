@@ -2620,11 +2620,7 @@ fn xavier_init(fan_in: usize, fan_out: usize, seed: u64) -> Vec<f32> {
 /// blade buffer — no fd/dmabuf interop needed.  Without this all sessions
 /// would each spin up an independent context and we'd be back to
 /// cross-context fd marshaling.
-fn build_session(
-    g: &Graph,
-    opt_level: OptLevel,
-    gpu: &Arc<blade_graphics::Context>,
-) -> Session {
+fn build_session(g: &Graph, opt_level: OptLevel, gpu: &Arc<blade_graphics::Context>) -> Session {
     let cfg = meganeura::SessionConfig {
         gpu: Some(Arc::clone(gpu)),
         skip_full_optimize: matches!(opt_level, OptLevel::None),
@@ -2635,10 +2631,7 @@ fn build_session(
 
 /// Build a meganeura inference-only session sharing the agent's blade
 /// context.  Used for the V2-S sibling session.
-fn build_inference_session(
-    g: &Graph,
-    gpu: &Arc<blade_graphics::Context>,
-) -> Session {
+fn build_inference_session(g: &Graph, gpu: &Arc<blade_graphics::Context>) -> Session {
     let cfg = meganeura::SessionConfig {
         mode: meganeura::Mode::Inference,
         gpu: Some(Arc::clone(gpu)),
@@ -2872,8 +2865,7 @@ fn build_option_planner_graph(
     let trunk = nn::Linear::new(&mut g, "option.trunk", latent_dim, hidden_dim);
     let h = trunk.forward(&mut g, z);
     let h = g.relu(h);
-    let option_head =
-        nn::Linear::no_bias(&mut g, "option.head", hidden_dim, num_options);
+    let option_head = nn::Linear::no_bias(&mut g, "option.head", hidden_dim, num_options);
     let logits = option_head.forward(&mut g, h);
     let logits = g.stop_gradient(logits);
     g.set_outputs(vec![logits]);
@@ -3058,7 +3050,12 @@ impl Agent {
                 }
             };
             let wm = if config.wm_stochastic {
-                WorldModel::new_stochastic(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
+                WorldModel::new_stochastic(
+                    &mut g,
+                    config.latent_dim,
+                    MAX_ACTION_DIM,
+                    config.hidden_dim,
+                )
             } else {
                 WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
             };
@@ -3156,8 +3153,7 @@ impl Agent {
                 } else {
                     config.value_head_hidden_dim
                 };
-                let value_target_in =
-                    g.input("value_target", &[config.batch_size, 1]);
+                let value_target_in = g.input("value_target", &[config.batch_size, 1]);
                 let wm_gate_in = g.input("wm_gate", &[1]);
                 let value_gate_in = g.input("value_gate", &[1]);
                 let wm_gate = g.stop_gradient(wm_gate_in);
@@ -3223,15 +3219,14 @@ impl Agent {
                     );
                     g.set_outputs(vec![out]);
                     let mut s = build_inference_session(&g, &gpu);
-                    let weights = meganeura::data::safetensors::SafeTensorsModel::load(
-                        weights_path.clone(),
-                    )
-                    .unwrap_or_else(|e| {
-                        panic!(
-                            "EfficientNetV2-S: loading weights from {:?}: {}",
-                            weights_path, e
-                        )
-                    });
+                    let weights =
+                        meganeura::data::safetensors::SafeTensorsModel::load(weights_path.clone())
+                            .unwrap_or_else(|e| {
+                                panic!(
+                                    "EfficientNetV2-S: loading weights from {:?}: {}",
+                                    weights_path, e
+                                )
+                            });
                     for name in meganeura::models::efficientnet::weight_names() {
                         let data = weights.tensor_f32(&name).unwrap_or_else(|e| {
                             panic!("EfficientNetV2-S: parameter '{name}': {e}")
@@ -3682,7 +3677,13 @@ impl Agent {
         let wm_kstep_session = if config.wm_kstep_k > 1 {
             let k = config.wm_kstep_k;
             let batch = config.wm_kstep_batch.max(1);
-            let g = build_wm_kstep_graph(batch, config.latent_dim, config.hidden_dim, k, config.wm_stochastic);
+            let g = build_wm_kstep_graph(
+                batch,
+                config.latent_dim,
+                config.hidden_dim,
+                k,
+                config.wm_stochastic,
+            );
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             if config.grad_clip_norm > 0.0 {
@@ -3743,15 +3744,14 @@ impl Agent {
         };
         let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
         let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
-        let planner_option_onehot_scratch = if config.num_options >= 2 && config.planner_horizon > 0 {
+        let planner_option_onehot_scratch = if config.num_options >= 2 && config.planner_horizon > 0
+        {
             vec![0.0f32; planner_batch * config.num_options]
         } else {
             Vec::new()
         };
-        let planner_traj_scratch = vec![
-            0.0f32;
-            planner_batch * config.planner_horizon.max(1) * config.latent_dim
-        ];
+        let planner_traj_scratch =
+            vec![0.0f32; planner_batch * config.planner_horizon.max(1) * config.latent_dim];
         let planner_v_traj_scratch = if wm_planner_has_value_head {
             vec![0.0f32; planner_batch * config.planner_horizon.max(1)]
         } else {
@@ -4835,8 +4835,7 @@ impl Agent {
                     } else {
                         ep_ret > self.sil_baseline
                     };
-                    let event_pass = !self.config.sil_event_filter
-                        || lane.sil_ep_event_count > 0;
+                    let event_pass = !self.config.sil_event_filter || lane.sil_ep_event_count > 0;
                     let push = baseline_pass && event_pass;
                     if push {
                         let blen = lane.buffer.len();
@@ -4963,11 +4962,7 @@ impl Agent {
                             if buf.len() >= per_env_cap {
                                 buf.pop_front();
                             }
-                            buf.push_back((
-                                tr.observation.clone(),
-                                env_id,
-                                label,
-                            ));
+                            buf.push_back((tr.observation.clone(), env_id, label));
                             decay *= gamma;
                             if tr.env_boundary {
                                 break;
@@ -4989,9 +4984,7 @@ impl Agent {
                 // real win-states dominate the FIFO queue over time;
                 // HER synthetic goals get evicted.
                 let her_prob = self.config.goal_states_her_prob;
-                if her_prob > 0.0
-                    && lane.sil_ep_event_count == 0
-                    && self.config.goal_states_cap > 0
+                if her_prob > 0.0 && lane.sil_ep_event_count == 0 && self.config.goal_states_cap > 0
                 {
                     if rng.random_range(0.0..1.0_f32) < her_prob {
                         if let Some(prev) = lane.buffer.last() {
@@ -5012,10 +5005,8 @@ impl Agent {
                             q.push_back(prev.latent.clone());
                             // Centroid update for HER pushes too.
                             if self.config.subgoal_k > 0 {
-                                let centroids = self
-                                    .subgoal_centroids
-                                    .entry(key)
-                                    .or_insert_with(Vec::new);
+                                let centroids =
+                                    self.subgoal_centroids.entry(key).or_insert_with(Vec::new);
                                 let z = prev.latent.clone();
                                 online_kmeans_update(
                                     centroids,
@@ -5263,9 +5254,8 @@ impl Agent {
                 // Confidence: a validated extrinsic event raises C.
                 // This is the ONLY signal that increases confidence.
                 if self.config.confidence_mode {
-                    lane.confidence = (lane.confidence
-                        + self.config.confidence_win_increment)
-                        .min(1.0);
+                    lane.confidence =
+                        (lane.confidence + self.config.confidence_win_increment).min(1.0);
                 }
                 // Emergent goal discovery: snapshot the latent at this
                 // win-event into the per-env goal archive. The planner
@@ -5273,9 +5263,7 @@ impl Agent {
                 // `planner_goal_alpha > 0`). FIFO bounded by
                 // `goal_states_cap`. Skipped entirely when the goal
                 // mechanism is off.
-                if self.config.planner_goal_alpha > 0.0
-                    && self.config.goal_states_cap > 0
-                {
+                if self.config.planner_goal_alpha > 0.0 && self.config.goal_states_cap > 0 {
                     let env_id = lane.adapter.id();
                     let key = if self.config.goal_states_cross_game {
                         0u32
@@ -5295,10 +5283,7 @@ impl Agent {
                     // same pool. Centroids share the same key (per-env
                     // or pooled, matching goal_states_cross_game).
                     if self.config.subgoal_k > 0 {
-                        let centroids = self
-                            .subgoal_centroids
-                            .entry(key)
-                            .or_insert_with(Vec::new);
+                        let centroids = self.subgoal_centroids.entry(key).or_insert_with(Vec::new);
                         online_kmeans_update(
                             centroids,
                             z_row,
@@ -5485,18 +5470,24 @@ impl Agent {
                 let dst_z = &mut self.kstep_z_scratch[row * ld..(row + 1) * ld];
                 let copy_len = z_start.len().min(ld);
                 dst_z[..copy_len].copy_from_slice(&z_start[..copy_len]);
-                if copy_len < ld { dst_z[copy_len..].fill(0.0); }
+                if copy_len < ld {
+                    dst_z[copy_len..].fill(0.0);
+                }
                 let dst_zt = &mut self.kstep_z_target_scratch[row * ld..(row + 1) * ld];
                 let tlen = z_end.len().min(ld);
                 dst_zt[..tlen].copy_from_slice(&z_end[..tlen]);
-                if tlen < ld { dst_zt[tlen..].fill(0.0); }
+                if tlen < ld {
+                    dst_zt[tlen..].fill(0.0);
+                }
                 for i in 0..k {
                     let act = &lane.buffer.get(t + i).action;
                     let dst_a = &mut self.kstep_action_scratch_per_step[i]
                         [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
                     let alen = act.len().min(MAX_ACTION_DIM);
                     dst_a[..alen].copy_from_slice(&act[..alen]);
-                    if alen < MAX_ACTION_DIM { dst_a[alen..].fill(0.0); }
+                    if alen < MAX_ACTION_DIM {
+                        dst_a[alen..].fill(0.0);
+                    }
                 }
                 found = true;
                 staged += 1;
@@ -5514,7 +5505,9 @@ impl Agent {
                 }
             }
         }
-        if staged == 0 { return; }
+        if staged == 0 {
+            return;
+        }
 
         sess.set_input("z_input", &self.kstep_z_scratch);
         sess.set_input("z_target_kstep", &self.kstep_z_target_scratch);
@@ -5522,14 +5515,14 @@ impl Agent {
             let name = format!("action_step_{}", i);
             sess.set_input(&name, &self.kstep_action_scratch_per_step[i]);
         }
-        let lr = self.config.learning_rate
-            * self.config.wm_kstep_loss_coef
-            * self.batch_lr_scale;
+        let lr = self.config.learning_rate * self.config.wm_kstep_loss_coef * self.batch_lr_scale;
         apply_lr(sess, lr, self.config.use_adam, self.config.adam_eps);
         sess.step();
         sess.wait();
         let l = sess.read_loss();
-        if l.is_finite() { self.last_wm_kstep_loss = l; }
+        if l.is_finite() {
+            self.last_wm_kstep_loss = l;
+        }
 
         // Sync WM params from wm_kstep → wm_session so the canonical
         // WM (used by encoder→z prediction and wm_planner) benefits.
@@ -5762,8 +5755,7 @@ impl Agent {
         let n = self.lanes.len();
         let cap = self.policy_action_mask_scratch.len();
         let copy_len = (n * MAX_ACTION_DIM).min(cap).min(self.action_masks.len());
-        self.policy_action_mask_scratch[..copy_len]
-            .copy_from_slice(&self.action_masks[..copy_len]);
+        self.policy_action_mask_scratch[..copy_len].copy_from_slice(&self.action_masks[..copy_len]);
     }
 
     /// party that knows the env's native reward. Kindle zeroes the
@@ -6149,7 +6141,10 @@ impl Agent {
                 src_h,
                 is_rgba,
             ),
-            None => Err("agent has no V2-S preprocess pipeline (encoder is not EfficientNetV2S)".to_string()),
+            None => Err(
+                "agent has no V2-S preprocess pipeline (encoder is not EfficientNetV2S)"
+                    .to_string(),
+            ),
         }
     }
 
@@ -6247,9 +6242,7 @@ impl Agent {
         // WM gradient still flows every step.
         if matches!(
             self.config.encoder_kind,
-            EncoderKind::Cnn { .. }
-                | EncoderKind::CnnDqn { .. }
-                | EncoderKind::EfficientNetV2S
+            EncoderKind::Cnn { .. } | EncoderKind::CnnDqn { .. } | EncoderKind::EfficientNetV2S
         ) {
             return;
         }
@@ -6368,9 +6361,7 @@ impl Agent {
         // them. Leave `last_drift = 0` for CNN-mode agents.
         if matches!(
             self.config.encoder_kind,
-            EncoderKind::Cnn { .. }
-                | EncoderKind::CnnDqn { .. }
-                | EncoderKind::EfficientNetV2S
+            EncoderKind::Cnn { .. } | EncoderKind::CnnDqn { .. } | EncoderKind::EfficientNetV2S
         ) {
             return;
         }
@@ -8302,8 +8293,8 @@ impl Agent {
                 Some(t) => t.latent.clone(),
                 None => continue,
             };
-            let mask_row = &self.action_masks
-                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let mask_row =
+                &self.action_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
             let valid: Vec<u32> = (0..num_actions_eff)
                 .filter(|&j| mask_row[j] >= 0.5)
                 .map(|j| j as u32)
@@ -8382,8 +8373,8 @@ impl Agent {
         // Build per-lane valid-action lists from the mask.
         let mut valid_per_lane: Vec<Vec<u32>> = Vec::with_capacity(n);
         for lane_idx in 0..n {
-            let mask_row = &self.action_masks
-                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let mask_row =
+                &self.action_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
             let valid: Vec<u32> = (0..num_actions_eff)
                 .filter(|&j| mask_row[j] >= 0.5)
                 .map(|j| j as u32)
@@ -8429,7 +8420,8 @@ impl Agent {
 
         let policy_mix = self.config.planner_policy_mix.clamp(0.0, 1.0);
         let policy_temp = self.config.planner_policy_temperature.max(0.01);
-        let need_policy = (policy_mix > 0.0 || use_options) && self.policy_planner_session.is_some();
+        let need_policy =
+            (policy_mix > 0.0 || use_options) && self.policy_planner_session.is_some();
         let policy_mix_eff = if use_options { 1.0 } else { policy_mix };
 
         // Per-step rollout. For each outer step `t`:
@@ -8460,7 +8452,8 @@ impl Agent {
                     let policy_planner = self.policy_planner_session.as_mut().unwrap();
                     policy_planner.set_input("z", &self.planner_z_scratch);
                     if use_options {
-                        policy_planner.set_input("option_onehot", &self.planner_option_onehot_scratch);
+                        policy_planner
+                            .set_input("option_onehot", &self.planner_option_onehot_scratch);
                     }
                     policy_planner.step();
                     policy_planner.wait();
@@ -8476,13 +8469,13 @@ impl Agent {
                     let valid = &valid_per_lane[lane_idx];
                     for s in 0..m {
                         let row = lane_idx * m + s;
-                        let use_policy = need_policy
-                            && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
+                        let use_policy =
+                            need_policy && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
                         let action_idx: u32 = if !use_policy {
                             valid[rng.random_range(0..valid.len())]
                         } else {
-                            let lrow = &policy_logits
-                                [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                            let lrow =
+                                &policy_logits[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
                             let mut max_l = f32::NEG_INFINITY;
                             for &v in valid {
                                 let l = lrow[v as usize] / policy_temp;
@@ -8497,8 +8490,7 @@ impl Agent {
                             let probs: Vec<f32> = valid
                                 .iter()
                                 .map(|&v| {
-                                    let p =
-                                        (lrow[v as usize] / policy_temp - max_l).exp();
+                                    let p = (lrow[v as usize] / policy_temp - max_l).exp();
                                     sum += p;
                                     p
                                 })
@@ -8520,7 +8512,8 @@ impl Agent {
                             }
                         };
                         // Store in (row, t, inner_idx) layout
-                        all_actions[row * k * inner_iters + t * inner_iters + inner_idx] = action_idx;
+                        all_actions[row * k * inner_iters + t * inner_iters + inner_idx] =
+                            action_idx;
                         if (action_idx as usize) < MAX_ACTION_DIM {
                             self.planner_action_scratch
                                 [row * MAX_ACTION_DIM + action_idx as usize] = 1.0;
@@ -8540,7 +8533,8 @@ impl Agent {
                 let traj_offset_inner = t * batch * ld;
                 wm_planner.read_output_by_index(
                     0,
-                    &mut self.planner_traj_scratch[traj_offset_inner..traj_offset_inner + batch * ld],
+                    &mut self.planner_traj_scratch
+                        [traj_offset_inner..traj_offset_inner + batch * ld],
                 );
                 // GRAM-style stochastic perturbation: add Gaussian noise
                 // per element. σ is either fixed (planner_noise_sigma
@@ -8554,13 +8548,10 @@ impl Agent {
                     // Layout matches z_next: [batch * ld].
                     if self.config.wm_stochastic {
                         if self.planner_sigma_scratch.len() < batch * ld {
-                            self.planner_sigma_scratch
-                                .resize(batch * ld, 0.0f32);
+                            self.planner_sigma_scratch.resize(batch * ld, 0.0f32);
                         }
-                        wm_planner.read_output_by_index(
-                            1,
-                            &mut self.planner_sigma_scratch[..batch * ld],
-                        );
+                        wm_planner
+                            .read_output_by_index(1, &mut self.planner_sigma_scratch[..batch * ld]);
                     }
                     let slice = &mut self.planner_traj_scratch
                         [traj_offset_inner..traj_offset_inner + batch * ld];
@@ -8588,9 +8579,7 @@ impl Agent {
                         let u2: f32 = rng.random_range(0.0..1.0);
                         let mag = (-2.0 * u1.ln()).sqrt();
                         let s_last = sigma_buf.map(|b| b[i]).unwrap_or(1.0);
-                        slice[i] += scale * s_last
-                            * mag
-                            * (2.0 * std::f32::consts::PI * u2).cos();
+                        slice[i] += scale * s_last * mag * (2.0 * std::f32::consts::PI * u2).cos();
                     }
                 }
                 self.planner_z_scratch.copy_from_slice(
@@ -8625,7 +8614,7 @@ impl Agent {
             let mut mean = vec![0.0f32; ld];
             for s in 0..m {
                 let row = lane_idx * m + s;
-                let off = row * ld;  // t=0 starts at offset 0
+                let off = row * ld; // t=0 starts at offset 0
                 for d in 0..ld {
                     mean[d] += self.planner_traj_scratch[off + d];
                 }
@@ -8650,8 +8639,11 @@ impl Agent {
             // and doesn't have the wm_session's latent clamp, so a
             // misbehaving WM can produce inf/large variance. Cap so
             // the harness doesn't see infinities.
-            self.last_empowerment[lane_idx] =
-                if raw.is_finite() { raw.clamp(0.0, 1.0) } else { 0.0 };
+            self.last_empowerment[lane_idx] = if raw.is_finite() {
+                raw.clamp(0.0, 1.0)
+            } else {
+                0.0
+            };
         }
 
         // Score each row by sum-of-novelty over its trajectory.
@@ -8714,14 +8706,13 @@ impl Agent {
                     }
                     if let Some(gq) = goals {
                         if !gq.is_empty() {
-                            score += w_exploit * goal_alpha
-                                * max_goal_similarity(z_step, gq);
+                            score += w_exploit * goal_alpha * max_goal_similarity(z_step, gq);
                         }
                     }
                     if let Some(cl) = centroids {
                         if !cl.is_empty() {
-                            score += w_exploit * subgoal_alpha
-                                * max_centroid_similarity(z_step, cl);
+                            score +=
+                                w_exploit * subgoal_alpha * max_centroid_similarity(z_step, cl);
                         }
                     }
                     // Value-head signal: V(z_step) ≈ expected discounted
@@ -8833,8 +8824,8 @@ impl Agent {
                 continue;
             }
             lane_active[lane_idx] = true;
-            let mask_row = &self.action_masks
-                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let mask_row =
+                &self.action_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
             let valid: Vec<u8> = (0..num_actions_eff)
                 .filter(|&j| mask_row[j] >= 0.5)
                 .map(|j| j as u8)
@@ -8947,8 +8938,7 @@ impl Agent {
                     let parent_idx = *path.last().unwrap();
                     let tree = trees[lane_idx].as_mut().unwrap();
                     let child_valid = lane_valid[lane_idx].clone();
-                    let child_idx =
-                        tree.add_child(parent_idx, action, child_z, child_valid);
+                    let child_idx = tree.add_child(parent_idx, action, child_z, child_valid);
                     let mut full_path = path;
                     full_path.push(child_idx);
                     tree.backup(&full_path, value);
@@ -9044,7 +9034,8 @@ impl Agent {
             if self.config.num_options >= 2 {
                 let n_elem = self.config.num_options * MAX_ACTION_DIM;
                 let buf = &mut self.planner_param_buf[..n_elem];
-                self.policy_session.read_param("policy.option_bias.weight", buf);
+                self.policy_session
+                    .read_param("policy.option_bias.weight", buf);
                 policy_planner.set_parameter("policy.option_bias.weight", buf);
             }
         }

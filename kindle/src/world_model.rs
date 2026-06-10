@@ -43,7 +43,12 @@ impl WorldModel {
     /// Build with σ head wired up for GRAM-style stochastic rollouts.
     /// Adds one Linear `world_model.sigma_proj` of shape
     /// `[hidden_dim → latent_dim]` (~latent×hidden params).
-    pub fn new_stochastic(g: &mut Graph, latent_dim: usize, action_dim: usize, hidden_dim: usize) -> Self {
+    pub fn new_stochastic(
+        g: &mut Graph,
+        latent_dim: usize,
+        action_dim: usize,
+        hidden_dim: usize,
+    ) -> Self {
         Self::new_inner(g, latent_dim, action_dim, hidden_dim, true)
     }
 
@@ -141,12 +146,7 @@ impl WorldModel {
     /// σ-training signal does not perturb the mean head's optimum.
     /// Returns the σ regression term (already a scalar). Callers should
     /// scale + add to the main WM loss.
-    pub fn sigma_loss(
-        g: &mut Graph,
-        mu: NodeId,
-        sigma: NodeId,
-        z_target: NodeId,
-    ) -> NodeId {
+    pub fn sigma_loss(g: &mut Graph, mu: NodeId, sigma: NodeId, z_target: NodeId) -> NodeId {
         let neg_mu = g.neg(mu);
         let resid = g.add(z_target, neg_mu);
         let abs_resid = g.abs(resid);
