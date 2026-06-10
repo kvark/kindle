@@ -1561,7 +1561,7 @@ impl Default for AgentConfig {
             planner_policy_temperature: 1.0,
             planner_use_mcts: false,
             mcts_simulations: 64,
-            mcts_c_puct: 1.4142,
+            mcts_c_puct: std::f32::consts::SQRT_2,
             planner_noise_sigma: 0.0,
             wm_stochastic: false,
             wm_sigma_loss_coef: 0.5,
@@ -1929,7 +1929,7 @@ struct Lane {
     /// stuck at 0 and SIL would never push.
     sil_ep_return: f32,
     /// Number of times this episode's per-step extrinsic reward was
-    /// > 0 (i.e., a goal-completion / level-transition pulse fired).
+    /// strictly positive (i.e., a goal-completion / level-transition pulse fired).
     /// Used by SIL's optional event-filter mode (`sil_event_filter`)
     /// to push ONLY trajectories that contained at least one
     /// extrinsic-reward event — turning the SIL buffer into a
@@ -2222,8 +2222,9 @@ pub struct Agent {
     kstep_action_scratch_per_step: Vec<Vec<f32>>,
     /// Most recent k-step WM loss (diagnostic).
     last_wm_kstep_loss: f32,
-    /// Forward-only option-policy session. Built when `planner_horizon
-    /// > 0` AND `num_options >= 2`. Phase 2 of option-aware planning:
+    /// Forward-only option-policy session. Built when
+    /// `planner_horizon > 0` AND `num_options >= 2`. Phase 2 of
+    /// option-aware planning:
     /// at each planner outer step, this maps z → option_logits per
     /// row; the planner samples an option and then uses
     /// `policy_planner_session` (which now also takes option_onehot)
@@ -5707,7 +5708,7 @@ impl Agent {
     /// Call between env step and `observe` — the harness is the only
     /// Set per-lane action availability masks for the NEXT and subsequent
     /// `act()` calls. Flat layout `[batch_size × MAX_ACTION_DIM]`; entries
-    /// >= 0.5 are treated as valid, < 0.5 as invalid. Invalid actions get
+    /// `>= 0.5` are treated as valid, `< 0.5` as invalid. Invalid actions get
     /// their logits forced to a large-negative value before the categorical
     /// sample, so the policy never picks them. The masked distribution is
     /// also used for `last_prob_taken` (PPO's π_old denominator) and for
@@ -6079,30 +6080,6 @@ impl Agent {
         self.efficientnet_input_size_bytes
     }
 
-    /// Replace the V2-S session's `image` input slot with an
-    /// externally-allocated buffer (Vulkan opaque FD, DMA-BUF,
-    /// Win32 HANDLE, or host pointer).
-    ///
-    /// Used to plumb a producer's GPU-resident frame buffer (Dullahan
-    /// capture VkImage exported via VK_KHR_external_memory_fd) into
-    /// V2-S without a host roundtrip.  The caller is responsible for
-    /// ensuring the external buffer's *contents* match V2-S's
-    /// expected `[batch · 3 · 192 · 192] f32` layout — this is
-    /// downstream of any preprocess (BGRA8→RGB, resize, normalize)
-    /// the producer must run before V2-S samples it.  See Track B.2
-    /// in `docs/kindle_rl_pipeline_design.md`.
-    ///
-    /// On Linux only `Fd(Some(_))` and `Dma(Some(_))` are useful for
-    /// fd-based interop; `HostAllocation(_)` is also accepted for
-    /// page-aligned host pointers shared between two contexts.  The
-    /// previously-bound host-visible buffer (the one
-    /// `image_input_host_ptr` returns) is released by meganeura
-    /// when this rebind succeeds.
-    ///
-    /// Errors:
-    /// * Returns `Err(...)` if `encoder_kind != EfficientNetV2S`
-    ///   (the V2-S session is `None`) or if `size` is below the
-    ///   slot's required byte count.
     /// The shared blade GPU context every meganeura `Session` in this
     /// agent was built with.  Hand a clone to a sibling compute pipeline
     /// (e.g. the V2-S preprocess pass) to issue dispatches on the same
@@ -8342,7 +8319,7 @@ impl Agent {
         let n = self.lanes.len();
         let ld = self.config.latent_dim;
         let batch = n * m;
-        let num_actions_eff = num_actions.min(MAX_ACTION_DIM).max(1);
+        let num_actions_eff = num_actions.clamp(1, MAX_ACTION_DIM);
 
         // Periodic WM-weight sync: read from wm_session, write to
         // wm_planner_session. First call always syncs.
@@ -8802,7 +8779,7 @@ impl Agent {
         let c_puct = self.config.mcts_c_puct;
         let horizon = self.config.planner_horizon.max(1);
         let ld = self.config.latent_dim;
-        let num_actions_eff = num_actions.min(MAX_ACTION_DIM).max(1);
+        let num_actions_eff = num_actions.clamp(1, MAX_ACTION_DIM);
 
         // Periodic WM-weight sync (shared cadence with random planner).
         if self.planner_calls_since_refresh == 0
@@ -9069,7 +9046,7 @@ impl Agent {
             let vh_params: [(&str, usize); 3] = [
                 ("value_head.fc1.weight", ld * vh),
                 ("value_head.fc1.bias", vh),
-                ("value_head.fc2.weight", vh * 1),
+                ("value_head.fc2.weight", vh),
             ];
             for (name, n_elem) in vh_params.iter() {
                 let buf = &mut self.planner_param_buf[..*n_elem];
