@@ -113,11 +113,7 @@ impl PreprocessPipeline {
     /// slots.  `dst_image` is the `BufferPiece` returned by
     /// `meganeura::Session::input_buffer("image")` on the V2-S session;
     /// `n_lanes` is the agent's batch size.
-    pub fn new(
-        gpu: Arc<bg::Context>,
-        dst_image: bg::BufferPiece,
-        n_lanes: usize,
-    ) -> Self {
+    pub fn new(gpu: Arc<bg::Context>, dst_image: bg::BufferPiece, n_lanes: usize) -> Self {
         let shader_source = include_str!("shaders/v2s_preprocess.wgsl");
         let shader = gpu.create_shader(bg::ShaderDesc {
             source: shader_source,
