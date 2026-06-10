@@ -173,6 +173,21 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--rule-goal-coef", type=float, default=0.0,
+                        help="Rule-inference goal shaping: learn the "
+                        "start->win object transformation per color from "
+                        "the agent's OWN level completions, transfer the "
+                        "averaged rule to the frontier level as a "
+                        "predicted win configuration, and add potential-"
+                        "based reward coef*(phi_prev - phi_cur) where phi "
+                        "= object-config distance to the prediction. "
+                        "Active only at the game's frontier level. "
+                        "0 = off. Try 0.5-2.0.")
+    parser.add_argument("--rule-goal-restore", type=int, default=0,
+                        help="Rank frontier-level archive restores by "
+                        "rule-goal proximity instead of uniform choice "
+                        "(samples 12 candidates, picks the closest to "
+                        "the predicted win configuration). 0 = off.")
     parser.add_argument("--object-click-slots", type=int, default=0,
                         help="Extend the action space with N extra "
                         "discrete slots meaning 'ACTION6-click the i-th "
@@ -676,6 +691,17 @@ def main() -> int:
     if click_slots:
         from object_features import object_centroids as _obj_centroids
 
+    # Rule-inference goal shaping (see --rule-goal-coef). All state is
+    # per-game; rules recompute lazily when new win pairs land.
+    rule_goal_on = args.rule_goal_coef > 0.0 or args.rule_goal_restore
+    if rule_goal_on:
+        from object_features import (
+            object_set as _objset,
+            extract_color_rules as _extract_rules,
+            predict_win_stats as _predict_win,
+            config_distance as _config_dist,
+        )
+
     agent_kwargs = dict(
         obs_dim=64,
         num_actions=total_actions,
@@ -1008,6 +1034,54 @@ def main() -> int:
     cell_seen = [dict() for _ in range(n_games)]  # level -> set(bytes)
     cell_last_add = [-(10 ** 9)] * n_lanes
     cell_archive_adds = 0  # diagnostic
+
+    # Rule-goal state. rule_pairs[g][lvl] = recent (start_objset,
+    # win_objset) pairs for completed levels; game_rules[g] = cached
+    # per-color rules aggregated across levels (None until >= 2 pairs).
+    # ep_start_objset anchors the prediction at the CURRENT level's
+    # start (reset on episode boundary AND on each level event).
+    # lane_phi = previous potential for the shaping difference.
+    rule_pairs = [collections.defaultdict(
+        lambda: collections.deque(maxlen=50)) for _ in range(n_games)]
+    game_rules = [None] * n_games
+    rules_dirty = [False] * n_games
+    ep_start_objset = [None] * n_lanes
+    lane_pred = [None] * n_lanes      # predicted win stats for this episode
+    lane_phi = [None] * n_lanes
+    lane_objset_hash = [None] * n_lanes
+    lane_objset_cache = [None] * n_lanes
+    rule_shaping_total = 0.0  # diagnostic
+    rule_pairs_count = 0      # diagnostic
+
+    def lane_objset(i, frm):
+        h = frame_hash(frm)
+        if h != lane_objset_hash[i]:
+            lane_objset_hash[i] = h
+            lane_objset_cache[i] = _objset(frm.astype(np.int32))
+        return lane_objset_cache[i]
+
+    def refresh_rules(g_idx):
+        all_pairs = []
+        for lvl_pairs in rule_pairs[g_idx].values():
+            all_pairs.extend(lvl_pairs)
+        game_rules[g_idx] = (
+            _extract_rules(all_pairs) if len(all_pairs) >= 2 else None
+        )
+        rules_dirty[g_idx] = False
+
+    def reset_rule_anchor(i, frm):
+        """Anchor the rule prediction at a fresh level start for lane
+        i. Called on episode boundary and after each level event."""
+        g_idx = i // K
+        if rules_dirty[g_idx]:
+            refresh_rules(g_idx)
+        ep_start_objset[i] = lane_objset(i, frm)
+        lane_phi[i] = None
+        rules = game_rules[g_idx]
+        if rules:
+            lane_pred[i] = _predict_win(ep_start_objset[i], rules)
+        else:
+            lane_pred[i] = None
     if args.load_archive:
         try:
             try:
@@ -1181,6 +1255,31 @@ def main() -> int:
                         chosen_lvl = rng.choices(levels_with, weights=weights, k=1)[0]
                         gar = archive[g_idx][chosen_lvl]
                         entry = gar[rng.randrange(len(gar))]
+                        # Rule-goal restore ranking: at the frontier
+                        # level with rules available, sample a few
+                        # candidates and restore the one closest to
+                        # the predicted win configuration (predictions
+                        # anchored at each entry's own frame — exact
+                        # for absolute-target rules, neutral for
+                        # relative ones).
+                        if (args.rule_goal_restore and rule_goal_on
+                                and game_rules[g_idx]
+                                and chosen_lvl == max(
+                                    max_levels_seen[g_idx * K:(g_idx + 1) * K])):
+                            best_d, best_e = None, entry
+                            for _cand in range(min(12, len(gar))):
+                                e2 = gar[rng.randrange(len(gar))]
+                                if not e2["obs"].frame:
+                                    continue
+                                fr2 = np.asarray(e2["obs"].frame[0])
+                                os2 = _objset(fr2.astype(np.int32))
+                                d2 = _config_dist(
+                                    os2,
+                                    _predict_win(os2, game_rules[g_idx]),
+                                )
+                                if best_d is None or d2 < best_d:
+                                    best_d, best_e = d2, e2
+                            entry = best_e
                         envs[i] = copy.deepcopy(entry["env"])
                         obs_list[i] = entry["obs"]
                         last_levels[i] = entry["levels"]
@@ -1200,6 +1299,10 @@ def main() -> int:
                         last_levels[i] = int(obs_list[i].levels_completed)
                         ep_step[i] = 0
                     agent.mark_boundary(i)
+                    if rule_goal_on and obs_list[i].frame:
+                        reset_rule_anchor(
+                            i, np.asarray(obs_list[i].frame[0])
+                        )
                     if win_trail_on:
                         win_trails[i].clear()
                     if progress_on:
@@ -1337,6 +1440,8 @@ def main() -> int:
                     obs_new = envs[i].reset()
                     avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
                     agent.mark_boundary(i)
+                    if rule_goal_on and obs_new.frame:
+                        reset_rule_anchor(i, np.asarray(obs_new.frame[0]))
                     if win_trail_on:
                         win_trails[i].clear()
                 new_obs_list.append(obs_new)
@@ -1570,6 +1675,35 @@ def main() -> int:
                     f"{ext_vec[li]:.3f},{frontier_random_left[li]}\n"
                 )
 
+            # Rule-goal potential shaping (Term 4): at the frontier
+            # level, reward movement toward the rule-predicted win
+            # configuration. Potential-based (phi difference), so it
+            # cannot create reward loops.
+            rg_vec = None
+            if rule_goal_on and args.rule_goal_coef > 0.0:
+                rg_vec = [0.0] * n_lanes
+                for i in range(n_lanes):
+                    if lane_pred[i] is None or not new_obs_list[i].frame:
+                        continue
+                    g_idx_r = i // K
+                    frontier_r = max(
+                        max_levels_seen[g_idx_r * K:(g_idx_r + 1) * K]
+                    )
+                    if last_levels[i] < frontier_r:
+                        # Below the frontier the real wins teach
+                        # directly; shaping is for the unsolved level.
+                        lane_phi[i] = None
+                        continue
+                    frm = np.asarray(new_obs_list[i].frame[0])
+                    phi = _config_dist(lane_objset(i, frm), lane_pred[i])
+                    if lane_phi[i] is not None:
+                        r = args.rule_goal_coef * (lane_phi[i] - phi)
+                        rg_vec[i] = r
+                        rule_shaping_total += abs(r)
+                    lane_phi[i] = phi
+                if not progress_on:
+                    agent.set_intrinsic_progress(rg_vec)
+
             # Intrinsic progress signals (Term 1 + Term 2).
             if progress_on:
                 prog_vec = [0.0] * n_lanes
@@ -1609,6 +1743,9 @@ def main() -> int:
                     # Term 3: empowerment (refreshed each planner call).
                     if args.progress_empowerment_coef > 0.0:
                         prog_vec[i] += args.progress_empowerment_coef * last_empowerment[i]
+                    # Term 4: rule-goal potential shaping.
+                    if rg_vec is not None:
+                        prog_vec[i] += rg_vec[i]
                     progress_total += prog_vec[i]
                 agent.set_intrinsic_progress(prog_vec)
 
@@ -1797,6 +1934,10 @@ def main() -> int:
                     trail_tag += f",f{frontier_archive_adds}"
                 if cell_archive_on:
                     trail_tag += f",c{cell_archive_adds}"
+                if rule_goal_on:
+                    trail_tag += (
+                        f" rg={rule_pairs_count}p/{rule_shaping_total:.0f}"
+                    )
                     # Per-level archive occupancy of game 0 — at a
                     # glance: are stepping stones accumulating at the
                     # frontier level?
