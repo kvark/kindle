@@ -1180,6 +1180,23 @@ pub struct AgentConfig {
     /// them is directed epistemic exploration ("go poke the thing
     /// you don't understand"). 0 disables (default). Requires
     /// `wm_stochastic`.
+    /// (P2) Surprise frame-replay ring capacity for CNN encoder modes.
+    /// Each observe() admits rows whose WM prediction error exceeds
+    /// `surprise_replay_mult x` the lane's error EMA, storing the
+    /// post-action FRAME (visual slot row), the action, the acted-from
+    /// latent, the obs token, and the env id. A replay dispatch then
+    /// re-trains encoder+WM on a priority-sampled batch of these
+    /// surprising moments with probability `replay_ratio` per step —
+    /// the CNN-mode counterpart of `replay_step` (which skips CNN
+    /// because transitions don't store frames), and the mechanism
+    /// that concentrates representation learning on novel elements
+    /// the moment they appear. ~33 KB per entry at 2x64x64. 0
+    /// disables (default).
+    pub surprise_ring_capacity: usize,
+    /// (P2) Admission threshold: a row enters the surprise ring when
+    /// its pred_error > mult x lane EMA. 1.0 admits anything above
+    /// average; 2.0 only clear spikes. Default 1.5.
+    pub surprise_replay_mult: f32,
     pub planner_sigma_alpha: f32,
     /// (P3) σ-budgeted adaptive horizon: per rollout, accumulate the
     /// per-step mean σ; once the running sum exceeds this budget,
@@ -1589,6 +1606,8 @@ impl Default for AgentConfig {
             mcts_c_puct: std::f32::consts::SQRT_2,
             planner_noise_sigma: 0.0,
             replan_surprise_mult: 0.0,
+            surprise_ring_capacity: 0,
+            surprise_replay_mult: 1.5,
             planner_sigma_alpha: 0.0,
             planner_sigma_horizon: 0.0,
             wm_stochastic: false,
@@ -2290,6 +2309,16 @@ pub struct Agent {
     /// `planner_traj_scratch` per outer step: `[planner_batch × latent_dim]`.
     /// Lazily resized in the rollout loop (allocated on first use).
     planner_sigma_scratch: Vec<f32>,
+    /// (P2) Surprise frame-replay ring (CNN modes). Parallel arrays,
+    /// FIFO by `surprise_ring_next`; `surprise_ring_prio` drives
+    /// priority-proportional sampling at replay time.
+    surprise_ring_frames: Vec<Vec<f32>>,
+    surprise_ring_actions: Vec<Vec<f32>>,
+    surprise_ring_zprev: Vec<Vec<f32>>,
+    surprise_ring_obs: Vec<Vec<f32>>,
+    surprise_ring_env: Vec<u32>,
+    surprise_ring_prio: Vec<f32>,
+    surprise_ring_next: usize,
     /// (P3) Per-(outer-step, row) mean learned σ along each rollout:
     /// `[k * batch]`, row-major by step. Feeds the information-seeking
     /// score bonus and the σ-budgeted adaptive horizon.
@@ -2389,6 +2418,8 @@ pub struct Agent {
     sil_updates_fired: u64,
     /// (P4) Total planner-queue clears triggered by surprise spikes.
     replan_clears: u64,
+    /// (P2) Total surprise-replay dispatches fired.
+    surprise_replays: u64,
     sil_last_active_rows: u32,
     /// L1 change in policy.fc1.weight (first 32 values) caused by the
     /// most recent SIL update. >0 means SIL is moving params; ≈0 means
@@ -4100,6 +4131,13 @@ impl Agent {
             planner_option_onehot_scratch,
             planner_traj_scratch,
             planner_sigma_scratch: Vec::new(),
+            surprise_ring_frames: Vec::new(),
+            surprise_ring_actions: Vec::new(),
+            surprise_ring_zprev: Vec::new(),
+            surprise_ring_obs: Vec::new(),
+            surprise_ring_env: Vec::new(),
+            surprise_ring_prio: Vec::new(),
+            surprise_ring_next: 0,
             planner_sigma_traj_scratch: Vec::new(),
             planner_v_traj_scratch,
             planner_param_buf,
@@ -4117,6 +4155,7 @@ impl Agent {
             sil_updates_attempted: 0,
             sil_updates_fired: 0,
             replan_clears: 0,
+            surprise_replays: 0,
             sil_last_active_rows: 0,
             sil_last_param_change: 0.0,
             wm_planner_has_value_head,
@@ -4783,6 +4822,28 @@ impl Agent {
         // iterator holds a mutable borrow over self.lanes only).
         let replan_mult = self.config.replan_surprise_mult;
         let mut replan_lanes: Vec<usize> = Vec::new();
+        // (P2) Surprise-ring admission candidates: (lane, priority).
+        // Frame copies happen after the loop (the visual slot content
+        // is stable until the next harness write).
+        let ring_cap = if matches!(
+            self.config.encoder_kind,
+            EncoderKind::Cnn { .. } | EncoderKind::CnnDqn { .. }
+        ) {
+            self.config.surprise_ring_capacity
+        } else {
+            // Mlp has no visual slot (replay_step covers it);
+            // EfficientNetV2S recomputes the slot from the Dullahan
+            // frame inside every dispatch, which would clobber staged
+            // replay frames.
+            0
+        };
+        let ring_per_sample = if n > 0 {
+            self.visual_obs_size_bytes / std::mem::size_of::<f32>() / n
+        } else {
+            0
+        };
+        let ring_mult = self.config.surprise_replay_mult.max(1.0);
+        let mut ring_admits: Vec<(usize, f32)> = Vec::new();
         for (i, lane) in self.lanes.iter_mut().enumerate() {
             let z_row = &z_stack[i * ld..(i + 1) * ld];
             let obs_row = &self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
@@ -4812,6 +4873,17 @@ impl Agent {
                 && pred_error > replan_mult * lane.pred_error_ema
             {
                 replan_lanes.push(i);
+            }
+            // (P2) Surprising transition → candidate for the frame
+            // replay ring. Boundary rows are skipped: their z_prev is
+            // the null state, so their "surprise" is an artifact.
+            if ring_cap > 0
+                && ring_per_sample > 0
+                && !lane.pending_boundary
+                && lane.pred_error_ema > 1e-6
+                && pred_error > ring_mult * lane.pred_error_ema
+            {
+                ring_admits.push((i, pred_error));
             }
 
             let visit_count = lane.buffer.visit_count(z_row);
@@ -5506,6 +5578,53 @@ impl Agent {
             self.planner_queue[i].clear();
         }
 
+        // (P2) Write admitted surprise-ring entries. The visual slot
+        // still holds this step's post-action frames; the scratches
+        // still hold this step's action / acted-from-latent / obs
+        // rows. FIFO overwrite once at capacity; priorities drive the
+        // sampling in surprise_replay_step.
+        if !ring_admits.is_empty() {
+            if let Some((vis_ptr, _)) = self.wm_session.input_host_ptr("visual_obs") {
+                let ld_ = self.latent_dim;
+                for (i, prio) in ring_admits {
+                    // Safety: the slot is host-visible and the GPU read
+                    // of this step completed inside the WM dispatch's
+                    // wait(); rows are within visual_obs_size_bytes.
+                    let frame = unsafe {
+                        std::slice::from_raw_parts(
+                            (vis_ptr as *const f32).add(i * ring_per_sample),
+                            ring_per_sample,
+                        )
+                    }
+                    .to_vec();
+                    let action = self.action_token_scratch
+                        [i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM]
+                        .to_vec();
+                    let z_prev = self.z_target_scratch[i * ld_..(i + 1) * ld_].to_vec();
+                    let obs =
+                        self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM].to_vec();
+                    let env_id = self.lanes[i].adapter.id();
+                    if self.surprise_ring_frames.len() < ring_cap {
+                        self.surprise_ring_frames.push(frame);
+                        self.surprise_ring_actions.push(action);
+                        self.surprise_ring_zprev.push(z_prev);
+                        self.surprise_ring_obs.push(obs);
+                        self.surprise_ring_env.push(env_id);
+                        self.surprise_ring_prio.push(prio);
+                    } else {
+                        let at = self.surprise_ring_next % ring_cap;
+                        self.surprise_ring_frames[at] = frame;
+                        self.surprise_ring_actions[at] = action;
+                        self.surprise_ring_zprev[at] = z_prev;
+                        self.surprise_ring_obs[at] = obs;
+                        self.surprise_ring_env[at] = env_id;
+                        self.surprise_ring_prio[at] = prio;
+                        self.surprise_ring_next = (self.surprise_ring_next + 1) % ring_cap;
+                    }
+                }
+            }
+        }
+
         // Restore the outcome head after the loop finishes.
         self.outcome_head = m6_head;
         self.last_outcome_baseline = m6_baseline_diag;
@@ -5548,6 +5667,14 @@ impl Agent {
         // sampled per lane (no zero-row dilution).
         if rng.random_range(0.0..1.0) < self.config.replay_ratio {
             self.replay_step(rng);
+        }
+
+        // (P2) Surprise frame-replay: same cadence knob as replay
+        // mixing, CNN modes only (replay_step early-returns there).
+        if self.config.surprise_ring_capacity > 0
+            && rng.random_range(0.0..1.0_f32) < self.config.replay_ratio
+        {
+            self.surprise_replay_step(rng);
         }
 
         // --- Win-classifier replay step: dispatch one wm_session
@@ -6427,6 +6554,73 @@ impl Agent {
     /// that fails (buffer < 2, or deeply fragmented by env switches), we
     /// fall back to the most recent valid donor lane's sample so every
     /// batch row carries signal instead of zeros.
+    /// (P2) One surprise-replay dispatch: priority-sample a full batch
+    /// of stored surprising transitions (post-action frame, action,
+    /// acted-from latent) from the ring and run one encoder+WM
+    /// forward/backward over them. This is the CNN-mode counterpart
+    /// of `replay_step`, and the mechanism that concentrates encoder
+    /// and WM gradient on novel elements the moment they appear —
+    /// instead of waiting for the online stream to revisit them.
+    ///
+    /// Clobbers the visual slot; safe because the harness rewrites
+    /// post-action frames before every observe() and nothing else
+    /// reads the slot between observes (act() uses cached latents).
+    fn surprise_replay_step<R: Rng>(&mut self, rng: &mut R) {
+        let n = self.lanes.len();
+        let len = self.surprise_ring_frames.len();
+        if len < n.max(8) {
+            return;
+        }
+        let per_sample = self.visual_obs_size_bytes / std::mem::size_of::<f32>() / n.max(1);
+        if per_sample == 0 {
+            return;
+        }
+        let ld = self.latent_dim;
+        let total: f32 = self.surprise_ring_prio.iter().map(|p| p.max(1e-6)).sum();
+        let mut visual = vec![0.0f32; n * per_sample];
+        for row in 0..n {
+            // Inverse-CDF priority-proportional sample (with
+            // replacement across rows).
+            let mut u = rng.random_range(0.0..total.max(1e-6));
+            let mut idx = len - 1;
+            for (j, p) in self.surprise_ring_prio.iter().enumerate() {
+                let p = p.max(1e-6);
+                if u <= p {
+                    idx = j;
+                    break;
+                }
+                u -= p;
+            }
+            visual[row * per_sample..(row + 1) * per_sample]
+                .copy_from_slice(&self.surprise_ring_frames[idx]);
+            self.action_token_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM]
+                .copy_from_slice(&self.surprise_ring_actions[idx]);
+            self.z_target_scratch[row * ld..(row + 1) * ld]
+                .copy_from_slice(&self.surprise_ring_zprev[idx]);
+            self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM]
+                .copy_from_slice(&self.surprise_ring_obs[idx]);
+            let task_row = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
+            match self.task_embeddings.get(&self.surprise_ring_env[idx]) {
+                Some(emb) => task_row.copy_from_slice(emb),
+                None => task_row.fill(0.0),
+            }
+        }
+        self.set_visual_obs(&visual);
+        let loss = self.wm_forward_backward_stacked(
+            self.config.learning_rate * self.encoder_lr_scale * self.batch_lr_scale * 0.5,
+        );
+        if loss.is_finite() {
+            self.last_replay_loss = loss;
+            self.surprise_replays += 1;
+        } else {
+            log::warn!(
+                "surprise replay loss went non-finite at step {}, re-initialized WM params",
+                self.step_count
+            );
+            init_parameters(&mut self.wm_session);
+        }
+    }
+
     fn replay_step<R: Rng>(&mut self, rng: &mut R) {
         // Replay in CNN-encoder mode would need visual frames
         // stored per-transition, which they aren't (buffer holds
@@ -9516,6 +9710,12 @@ impl Agent {
     /// spikes (replan_surprise_mult). Diagnostic.
     pub fn replan_clears_count(&self) -> u64 {
         self.replan_clears
+    }
+
+    /// (P2) Number of surprise-replay dispatches fired, and the
+    /// current ring occupancy. Diagnostic.
+    pub fn surprise_replay_stats(&self) -> (u64, usize) {
+        (self.surprise_replays, self.surprise_ring_frames.len())
     }
 
     pub fn sil_updates_fired_count(&self) -> u64 {
