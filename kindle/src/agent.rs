@@ -4855,11 +4855,9 @@ impl Agent {
             // replay frames.
             0
         };
-        let ring_per_sample = if n > 0 {
-            self.visual_obs_size_bytes / std::mem::size_of::<f32>() / n
-        } else {
-            0
-        };
+        let ring_per_sample = (self.visual_obs_size_bytes / std::mem::size_of::<f32>())
+            .checked_div(n)
+            .unwrap_or(0);
         let ring_mult = self.config.surprise_replay_mult.max(1.0);
         let mut ring_admits: Vec<(usize, f32)> = Vec::new();
         for (i, lane) in self.lanes.iter_mut().enumerate() {
