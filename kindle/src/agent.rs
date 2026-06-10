@@ -2402,6 +2402,10 @@ pub struct Agent {
 #[derive(Clone)]
 pub struct SilSample {
     pub obs: Vec<f32>,
+    /// Latent of the state the action was taken FROM (the previous
+    /// record's latent at collection time). Used as the policy input
+    /// by the non-e2e SIL path; e2e re-encodes `obs` instead.
+    pub z: Vec<f32>,
     pub action_idx: usize,
     /// Undiscounted return-to-go from this step to episode end.
     pub r_to_go: f32,
@@ -2914,7 +2918,23 @@ impl Agent {
         let mut wm_session = {
             let mut g = Graph::new();
             let action = g.input("action", &[config.batch_size, MAX_ACTION_DIM]);
-            let z_target = g.input("z_target", &[config.batch_size, config.latent_dim]);
+            // Previous step's latent — the state the action was taken
+            // FROM. Kept under the historical input name "z_target"
+            // (set_input call sites and the python extension know it
+            // by that name) but it is the WM's INPUT, not its loss
+            // target: the WM rolls z_prev forward through `action`
+            // and is trained against the FRESH encoder latent below.
+            //
+            // History: until 2026-06-10 the roles were swapped — the
+            // WM consumed the fresh encoder latent and was trained to
+            // predict this previous latent, i.e. a BACKWARD model
+            // (z_{t+1}, a_t) → z_t, while every consumer (CPU/GPU
+            // planner rollouts, MCTS, wm_kstep) assumed forward
+            // dynamics. Planner action-conditioning was therefore
+            // noise, which is consistent with the 2026-05-11 finding
+            // that the policy never captured planner-driven paths and
+            // the 2026-05-18 L3 wall ("WM accuracy at depth > 10").
+            let z_prev = g.input("z_target", &[config.batch_size, config.latent_dim]);
             // Task embedding is fed as a graph **input**, not a parameter.
             // The encoder sees per-env conditioning and can specialize its
             // representations, but we don't backprop into the embedding
@@ -3060,14 +3080,23 @@ impl Agent {
             } else {
                 WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
             };
-            let (z_hat, sigma_opt) = wm.forward_with_sigma(&mut g, z_t, action);
-            let mu_loss = WorldModel::loss(&mut g, z_hat, z_target);
+            // Forward dynamics: ẑ_{t+1} = WM(z_t, a_t), trained against
+            // the fresh encoder latent of the post-action observation.
+            // stop_grad on the target keeps the WM loss off the encoder
+            // (Dreamer-style: the representation is shaped by the recon
+            // branch + value head, the dynamics model chases it). Rows
+            // at an episode boundary stage z_prev = 0, so the WM learns
+            // a "from the null state, actions lead to episode-start
+            // states" manifold instead of polluting real transitions.
+            let (z_hat, sigma_opt) = wm.forward_with_sigma(&mut g, z_prev, action);
+            let z_next_target = g.stop_gradient(z_t);
+            let mu_loss = WorldModel::loss(&mut g, z_hat, z_next_target);
             let wm_loss = match sigma_opt {
                 Some(sigma) => {
                     // Heteroscedastic σ-head regression loss. Trained
-                    // against |z_target − z_hat| with stop-grad on the
+                    // against |z_next − ẑ| with stop-grad on the
                     // residual so the σ training does not bias μ.
-                    let sigma_loss = WorldModel::sigma_loss(&mut g, z_hat, sigma, z_target);
+                    let sigma_loss = WorldModel::sigma_loss(&mut g, z_hat, sigma, z_next_target);
                     let coef = g.scalar(config.wm_sigma_loss_coef);
                     let sigma_loss_scaled = g.mul(sigma_loss, coef);
                     g.add(mu_loss, sigma_loss_scaled)
@@ -3187,15 +3216,21 @@ impl Agent {
             // flagged as the thing to build when the shared mean-loss
             // surrogate starts hurting at large N.
             //
-            // We use `z_target − z_hat` (i.e. `add(z_target, neg(z_hat))`)
+            // We use `z_next − z_hat` (i.e. `add(z_next, neg(z_hat))`)
             // instead of the reverse to keep `z_hat`'s primary consumer the
             // mse_loss node — meganeura's forward-optimize can still fuse
             // the loss path cleanly without fighting for the `z_hat`
-            // buffer.
+            // buffer. Per-lane surprise is therefore the error of the
+            // FORWARD prediction: "how wrong was the WM about where
+            // this action would lead."
             let neg_zhat = g.neg(z_hat);
-            let diff = g.add(z_target, neg_zhat);
+            let diff = g.add(z_next_target, neg_zhat);
             let sq = g.mul(diff, diff);
-            g.set_outputs(vec![loss, z_t, sq]);
+            // Output 3 (z_hat) backs `Agent::wm_predict` — a forward-
+            // only probe of the dynamics model used by tests and
+            // harness diagnostics. Appending keeps indices 1 (z_t)
+            // and 2 (sq) stable for the observe() readbacks.
+            g.set_outputs(vec![loss, z_t, sq, z_hat]);
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             s
@@ -4532,6 +4567,17 @@ impl Agent {
 
     /// Observe one synchronous step across all lanes. All input slices must
     /// have length `N = config.batch_size`.
+    ///
+    /// # Calling convention (post-action)
+    ///
+    /// `observations[i]` must be the observation that RESULTED from
+    /// `actions[i]` — i.e. call order is `act() → env.step(a) →
+    /// observe(o_next, a)`. The WM trains forward dynamics
+    /// `WM(z_prev, a) → enc(o_next)` and the policy pairs `a` with the
+    /// previous step's latent, both of which assume this ordering.
+    /// (In CNN modes the same applies to the frames staged via
+    /// `visual_obs`: write the POST-step frames before calling
+    /// observe.)
     pub fn observe<R: Rng>(
         &mut self,
         observations: &[Observation],
@@ -4555,7 +4601,10 @@ impl Agent {
                 &mut self.action_token_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
             lane.adapter.action_to_token(&actions[i], act_row);
 
-            // z_target row: previous latent, zeros at boundary or bootstrap.
+            // "z_target" row (historical name): the WM's INPUT — the
+            // previous step's latent, i.e. the state the action was
+            // taken from. Zeros at boundary or bootstrap (the WM
+            // learns the episode-start manifold from the null state).
             let z_row = &mut self.z_target_scratch[i * ld..(i + 1) * ld];
             if lane.pending_boundary {
                 z_row.fill(0.0);
@@ -4853,18 +4902,28 @@ impl Agent {
                                 }
                                 let action_idx =
                                     tr.action.iter().position(|&v| v > 0.5).unwrap_or(0);
-                                if self.sil_buffer.len() >= self.config.sil_buffer_capacity {
-                                    self.sil_buffer.pop_front();
-                                }
                                 let v_at_collect =
                                     if tr.value.is_finite() { tr.value } else { 0.0 };
-                                self.sil_buffer.push_back(SilSample {
-                                    obs: tr.observation.clone(),
-                                    action_idx,
-                                    r_to_go: r_acc.clamp(-vtc, vtc),
-                                    v_at_collect,
-                                    env_id: tr.env_id,
-                                });
+                                // The state the action was taken FROM is
+                                // the previous record. The episode's
+                                // first record (env_boundary, or buffer
+                                // start) has no in-episode predecessor —
+                                // accumulate its reward into r_to_go but
+                                // don't push a sample for it.
+                                if !tr.env_boundary && idx > 0 {
+                                    if self.sil_buffer.len() >= self.config.sil_buffer_capacity {
+                                        self.sil_buffer.pop_front();
+                                    }
+                                    let from = lane.buffer.get(idx - 1);
+                                    self.sil_buffer.push_back(SilSample {
+                                        obs: from.observation.clone(),
+                                        z: from.latent.clone(),
+                                        action_idx,
+                                        r_to_go: r_acc.clamp(-vtc, vtc),
+                                        v_at_collect,
+                                        env_id: tr.env_id,
+                                    });
+                                }
                                 if tr.env_boundary {
                                     break;
                                 }
@@ -5392,7 +5451,7 @@ impl Agent {
         // contribute a zero gradient signal (LR scale 0) but share the
         // single graph dispatch.
         if self.step_count >= self.config.warmup_steps {
-            self.policy_step_batched(&z_stack);
+            self.policy_step_batched();
         }
 
         // --- Replay mixing: one batched replay per call, one transition
@@ -5466,6 +5525,13 @@ impl Agent {
                     continue;
                 }
                 let t = rng.random_range(0..blen - k);
+                // Window validity: transitions t+1..=t+k must not cross
+                // an env/episode boundary — a k-step rollout spanning a
+                // reset trains the WM on a teleport.
+                let crosses_boundary = (t + 1..=t + k).any(|j| lane.buffer.get(j).env_boundary);
+                if crosses_boundary {
+                    continue;
+                }
                 let z_start = &lane.buffer.get(t).latent;
                 let z_end = &lane.buffer.get(t + k).latent;
                 let dst_z = &mut self.kstep_z_scratch[row * ld..(row + 1) * ld];
@@ -5481,7 +5547,14 @@ impl Agent {
                     dst_zt[tlen..].fill(0.0);
                 }
                 for i in 0..k {
-                    let act = &lane.buffer.get(t + i).action;
+                    // Transition records store {latent: z_after_action,
+                    // action: the action that PRODUCED that latent}. So
+                    // rolling forward from tr[t].latent, the first action
+                    // applied is tr[t+1].action — the i-th rollout step
+                    // uses tr[t+1+i].action (previously `t + i`: every
+                    // kstep window was trained with the action sequence
+                    // shifted one step into the past).
+                    let act = &lane.buffer.get(t + 1 + i).action;
                     let dst_a = &mut self.kstep_action_scratch_per_step[i]
                         [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
                     let alen = act.len().min(MAX_ACTION_DIM);
@@ -6034,6 +6107,57 @@ impl Agent {
         }
     }
 
+    /// Forward-only probe of the dynamics model: ẑ_next = WM(z, a)
+    /// for a full batch of rows. `z_rows` is `[N · latent_dim]`,
+    /// `action_rows` is `[N · MAX_ACTION_DIM]`; returns
+    /// `[N · latent_dim]` predictions.
+    ///
+    /// Runs the wm_session at LR = 0 (no parameter change). The
+    /// encoder branch runs on whatever obs/visual content is staged —
+    /// its output only feeds the (ignored) loss, never ẑ. Intended
+    /// for tests and harness diagnostics (e.g. verifying the model
+    /// rolls forward in time); costs one GPU dispatch.
+    pub fn wm_predict(&mut self, z_rows: &[f32], action_rows: &[f32]) -> Vec<f32> {
+        let n = self.lanes.len();
+        let ld = self.latent_dim;
+        assert_eq!(
+            z_rows.len(),
+            n * ld,
+            "wm_predict: z_rows must be N·latent_dim"
+        );
+        assert_eq!(
+            action_rows.len(),
+            n * MAX_ACTION_DIM,
+            "wm_predict: action_rows must be N·MAX_ACTION_DIM"
+        );
+        self.wm_session
+            .set_input("obs", &vec![0.0; n * OBS_TOKEN_DIM]);
+        self.wm_session.set_input("action", action_rows);
+        self.wm_session.set_input("z_target", z_rows);
+        self.wm_session.set_input("task", &vec![0.0; n * TASK_DIM]);
+        if self.value_branch_on() {
+            self.value_target_scratch_vh.fill(0.0);
+            self.wm_gate_scalar[0] = 1.0;
+            self.value_gate_scalar[0] = 0.0;
+            self.wm_session
+                .set_input("value_target", &self.value_target_scratch_vh);
+            self.wm_session.set_input("wm_gate", &self.wm_gate_scalar);
+            self.wm_session
+                .set_input("value_gate", &self.value_gate_scalar);
+        }
+        apply_lr(
+            &mut self.wm_session,
+            0.0,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
+        self.wm_session.step();
+        self.wm_session.wait();
+        let mut out = vec![0.0f32; n * ld];
+        self.wm_session.read_output_by_index(3, &mut out);
+        out
+    }
+
     /// Raw host pointer + byte size of the WM session's
     /// `visual_obs` input buffer. `None` when the encoder is
     /// `Mlp` (no visual input slot).
@@ -6245,10 +6369,19 @@ impl Agent {
                 if tj.env_boundary || ti.env_id != tj.env_id {
                     continue;
                 }
+                // Replay row contract mirrors the online step: the
+                // staged "z_target" slot is the WM's INPUT (state acted
+                // from = ti.latent); the staged obs is the post-action
+                // observation whose fresh encoding is the loss target
+                // (tj.observation); the action is the one that produced
+                // tj (tj.action). Pre-2026-06-10 this staged
+                // (ti.observation, ti.action, tj.latent), which under
+                // the old backward graph trained forward-with-wrong-
+                // action — a third, conflicting direction signal.
                 found = Some(ReplaySample {
-                    obs: ti.observation.clone(),
-                    action: ti.action.clone(),
-                    z_target: tj.latent.clone(),
+                    obs: tj.observation.clone(),
+                    action: tj.action.clone(),
+                    z_target: ti.latent.clone(),
                     env_id: ti.env_id,
                 });
                 break;
@@ -6605,7 +6738,7 @@ impl Agent {
     /// weighting input. It works for the discrete cross-entropy graph
     /// and the continuous MSE graph uniformly (both use `"action"` as
     /// their target).
-    fn policy_step_batched(&mut self, z_stack: &[f32]) {
+    fn policy_step_batched(&mut self) {
         let n_step = self.config.n_step.max(1);
         // When the user opts into n-step lookahead, defer to the
         // dedicated path that trains on old (z, action, value) with
@@ -6765,6 +6898,13 @@ impl Agent {
         let floor = self.config.entropy_floor;
         let k = MAX_ACTION_DIM as f32;
         for (i, lane) in self.lanes.iter().enumerate() {
+            // The policy input below is the acted-from latent (the
+            // z_target_scratch staged this step). Boundary lanes have
+            // no in-episode acted-from state (their row is zeros) —
+            // skip them rather than train π(a | null state).
+            if lane.buffer.last().is_none_or(|t| t.env_boundary) {
+                continue;
+            }
             let adv_clamp = self.config.advantage_clamp.max(0.0);
             let advantage = (lane.last_reward - lane.last_value).clamp(-adv_clamp, adv_clamp);
             let entropy_deficit = if floor > 0.0 {
@@ -6827,10 +6967,19 @@ impl Agent {
             1.0
         };
 
-        // Feed the pure latent `z` plus, when L1 is active, the per-lane
-        // one-hot `option_onehot` so the policy graph's option bias head
+        // Feed the latent of the state each action was taken FROM —
+        // that's the previous step's latent, which observe() staged
+        // into `z_target_scratch` for the WM dispatch and which is
+        // untouched since. (`z_stack` holds the POST-action latents;
+        // training π(a_t | z_{t+1}) — the pre-2026-06-10 behaviour —
+        // pairs every action with the state it produced instead of
+        // the state it was chosen in.) The stored `last_value`
+        // baseline was computed at act() time on this same acted-from
+        // latent, so the advantage is consistent with the input.
+        // Plus, when L1 is active, the per-lane one-hot
+        // `option_onehot` so the policy graph's option bias head
         // receives the current option identity for training.
-        self.policy_session.set_input("z", z_stack);
+        self.policy_session.set_input("z", &self.z_target_scratch);
         if self.option_session.is_some() {
             let num_options = self.config.num_options;
             self.option_onehot_scratch.fill(0.0);
@@ -6982,7 +7131,15 @@ impl Agent {
                 }
                 let ripe_idx = buf_len - n_step - bootstrap_headroom - ripe_back_offset;
                 let ripe = lane.buffer.get(ripe_idx);
-                z_pre[i * ld..(i + 1) * ld].copy_from_slice(&ripe.latent);
+                // V must be recomputed on the state the action was
+                // taken FROM (previous record); boundary rows are
+                // skipped by the main loop, so the saturating read
+                // below never reaches the trained batch.
+                if ripe_idx == 0 || ripe.env_boundary {
+                    continue;
+                }
+                let acted_from = lane.buffer.get(ripe_idx - 1);
+                z_pre[i * ld..(i + 1) * ld].copy_from_slice(&acted_from.latent);
             }
             // Forward-only pass at LR=0. Need to seed all session
             // inputs with valid-shaped zeros; the gradient won't flow.
@@ -7155,6 +7312,14 @@ impl Agent {
             let buf_len = lane.buffer.len();
             let ripe_idx = buf_len - n_step - bootstrap_headroom - ripe_back_offset;
             let ripe = lane.buffer.get(ripe_idx);
+            // Pair the action with the state it was taken FROM — the
+            // previous record. Boundary rows have no in-episode
+            // predecessor; skip them. (See policy_step_rollout_batch
+            // for the full pairing rationale.)
+            if ripe_idx == 0 || ripe.env_boundary {
+                continue;
+            }
+            let acted_from = lane.buffer.get(ripe_idx - 1);
             let advantage = if self.step_count < self.config.policy_warmup_steps {
                 0.0
             } else {
@@ -7172,15 +7337,16 @@ impl Agent {
             }
             any_active = true;
 
-            old_z_stack[i * ld..(i + 1) * ld].copy_from_slice(&ripe.latent);
+            old_z_stack[i * ld..(i + 1) * ld].copy_from_slice(&acted_from.latent);
 
-            // E2E mode: also fill obs + task scratch from ripe.
+            // E2E mode: also fill obs + task scratch from the acted-
+            // from record.
             if self.config.end_to_end_encoder {
                 let obs_dst =
                     &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
                 // Pad short observations with zeros, copy what we have.
-                let copy_n = ripe.observation.len().min(OBS_TOKEN_DIM);
-                obs_dst[..copy_n].copy_from_slice(&ripe.observation[..copy_n]);
+                let copy_n = acted_from.observation.len().min(OBS_TOKEN_DIM);
+                obs_dst[..copy_n].copy_from_slice(&acted_from.observation[..copy_n]);
                 for v in obs_dst[copy_n..].iter_mut() {
                     *v = 0.0;
                 }
@@ -7424,6 +7590,18 @@ impl Agent {
                 }
                 let ripe_idx = buf_len - n_step - bootstrap_headroom - offset;
                 let ripe = lane.buffer.get(ripe_idx);
+                // Transitions record {latent: state AFTER the action,
+                // action: the action that produced it}. The policy must
+                // be trained on the state the action was taken FROM —
+                // the previous record's latent. Boundary rows (first
+                // record after a reset) have no in-episode predecessor:
+                // skip them (the pre-reset latent belongs to another
+                // episode). Pre-2026-06-10 this path paired tr.action
+                // with tr.latent, training π(a_t | z_{t+1}) throughout.
+                if ripe_idx == 0 || ripe.env_boundary {
+                    continue;
+                }
+                let acted_from = lane.buffer.get(ripe_idx - 1);
                 let (ret, _, _) = compute_td_n_step_return(
                     &lane.buffer,
                     ripe_idx,
@@ -7474,7 +7652,7 @@ impl Agent {
                 } else {
                     0.0
                 };
-                ripe_latent[row].copy_from_slice(&ripe.latent);
+                ripe_latent[row].copy_from_slice(&acted_from.latent);
                 ripe_action[row].copy_from_slice(&ripe.action);
                 ripe_option[row] = ripe.option_idx;
                 ripe_prob_taken[row] = ripe.prob_taken.max(1e-8);
@@ -7532,10 +7710,15 @@ impl Agent {
                     }
                     let ripe_idx = buf_len - n_step - bootstrap_headroom - offset;
                     let ripe = self.lanes[lane_i].buffer.get(ripe_idx);
+                    // State acted FROM = previous record's observation
+                    // (rows with ripe_idx == 0 or env_boundary are
+                    // inactive — collection skipped them — so the
+                    // saturating read below is never trained on).
+                    let from = self.lanes[lane_i].buffer.get(ripe_idx.saturating_sub(1));
                     let obs_dst =
                         &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
-                    let copy_n = ripe.observation.len().min(OBS_TOKEN_DIM);
-                    obs_dst[..copy_n].copy_from_slice(&ripe.observation[..copy_n]);
+                    let copy_n = from.observation.len().min(OBS_TOKEN_DIM);
+                    obs_dst[..copy_n].copy_from_slice(&from.observation[..copy_n]);
                     let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
                     if let Some(emb) = self.task_embeddings.get(&ripe.env_id) {
                         task_dst.copy_from_slice(emb);
@@ -7685,10 +7868,14 @@ impl Agent {
                 if buf_len >= n_step + bootstrap_headroom + offset {
                     let ripe_idx = buf_len - n_step - bootstrap_headroom - offset;
                     let ripe = self.lanes[lane_i].buffer.get(ripe_idx);
+                    // State acted FROM = previous record's observation;
+                    // inactive rows (ripe_idx == 0 / boundary) carry no
+                    // gradient so the saturating read is harmless.
+                    let from = self.lanes[lane_i].buffer.get(ripe_idx.saturating_sub(1));
                     let obs_dst =
                         &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
-                    let copy_n = ripe.observation.len().min(OBS_TOKEN_DIM);
-                    obs_dst[..copy_n].copy_from_slice(&ripe.observation[..copy_n]);
+                    let copy_n = from.observation.len().min(OBS_TOKEN_DIM);
+                    obs_dst[..copy_n].copy_from_slice(&from.observation[..copy_n]);
                     let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
                     if let Some(emb) = self.task_embeddings.get(&ripe.env_id) {
                         task_dst.copy_from_slice(emb);
@@ -7869,33 +8056,38 @@ impl Agent {
         self.maybe_run_sil_update();
     }
 
-    /// Self-Imitation Learning step: run one supervised CE update on
-    /// a sampled batch of (obs, action) from the SIL buffer of past
-    /// successful episodes. No-op when use_sil is off, when buffer
-    /// has fewer than policy_batch samples, or when the policy graph
-    /// requires inputs we don't have for SIL (e.g. PPO's old_prob).
+    /// Self-Imitation Learning step: run one supervised update on
+    /// a sampled batch of (state, action) from the SIL buffer of past
+    /// successful episodes. No-op when use_sil is off or the buffer
+    /// has fewer than policy_batch samples.
     ///
-    /// The graph is reused (no separate session). For the plain-PG
-    /// e2e graph, `action = sil_loss_coef * one_hot(taken)` makes the
-    /// CE term `-sil_loss_coef * log_pi(taken)` — pure positive-example
-    /// imitation. value_target is set to the stored episode return so
-    /// V also learns from these samples.
+    /// The policy graph is reused (no separate session), with the
+    /// staging matched to the graph variant:
+    ///   * e2e: obs + task inputs, `action = weight · one_hot(taken)`
+    ///     makes the CE term `-weight · log π(taken)`.
+    ///   * non-e2e plain-PG: `z` input from the stored acted-from
+    ///     latent, same weighted-CE labels.
+    ///   * non-e2e PPO: `z` input, plain one-hot action, advantage =
+    ///     weight, old_prob = 1. The ratio r = π(a)/1 ≤ 1 stays below
+    ///     the 1+ε clip for positive advantage, so the surrogate
+    ///     reduces to weight-scaled vanilla PG toward the stored
+    ///     action — exactly the BC pull we want.
+    ///
+    /// KL-PPO is skipped (its graph wants old_logits we don't track
+    /// for SIL samples). Pre-2026-06-10 this function ALSO returned
+    /// early for `use_ppo` and for every non-e2e config — meaning SIL
+    /// and BC-from-planner pushed samples that were never trained on
+    /// in any ARC run (all of which are non-e2e + PPO).
     fn maybe_run_sil_update(&mut self) {
         if !self.config.use_sil {
             return;
         }
         self.sil_updates_attempted += 1;
-        // PPO+e2e graph reads `advantage` and `old_prob_taken` inputs
-        // that we don't fill for SIL — skip to avoid feeding stale
-        // values that would scramble the gradient. KL-PPO is fine
-        // (it uses old_logits which we DO have, but conservatively
-        // skip there too for now).
-        if self.config.use_ppo || self.config.use_kl_ppo {
+        if self.config.use_kl_ppo {
             return;
         }
-        if !self.config.end_to_end_encoder {
-            return;
-        }
+        let e2e = self.config.end_to_end_encoder;
+        let use_ppo = self.config.use_ppo;
         let policy_batch = self.config.batch_size * self.config.rollout_length;
         if self.sil_buffer.len() < policy_batch {
             return;
@@ -7908,10 +8100,18 @@ impl Agent {
         let sampled_idx: Vec<usize> = (0..policy_batch).map(|_| rng.random_range(0..n)).collect();
 
         // Fill scratch buffers from the sampled SIL transitions.
+        let ld = self.latent_dim;
         self.obs_token_scratch.fill(0.0);
         self.task_scratch.fill(0.0);
         self.policy_action_scratch.fill(0.0);
         self.value_target_scratch.fill(0.0);
+        if !e2e {
+            self.policy_z_scratch.fill(0.0);
+        }
+        if use_ppo {
+            self.ppo_advantage_scratch.fill(0.0);
+            self.ppo_old_prob_scratch.fill(1.0);
+        }
 
         let coef = self.config.sil_loss_coef;
         // Clamp the SIL per-sample advantage to the same scale as the
@@ -7935,22 +8135,38 @@ impl Agent {
             let raw_adv = (sample.r_to_go - sample.v_at_collect).max(0.0);
             let adv = raw_adv.min(adv_cap);
             let weight = coef * adv;
-            // obs
-            let obs_dst =
-                &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
-            let copy_n = sample.obs.len().min(OBS_TOKEN_DIM);
-            obs_dst[..copy_n].copy_from_slice(&sample.obs[..copy_n]);
-            // task
-            let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
-            if let Some(emb) = self.task_embeddings.get(&sample.env_id) {
-                task_dst.copy_from_slice(emb);
+            if e2e {
+                // obs
+                let obs_dst =
+                    &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
+                let copy_n = sample.obs.len().min(OBS_TOKEN_DIM);
+                obs_dst[..copy_n].copy_from_slice(&sample.obs[..copy_n]);
+                // task
+                let task_dst = &mut self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM];
+                if let Some(emb) = self.task_embeddings.get(&sample.env_id) {
+                    task_dst.copy_from_slice(emb);
+                }
+            } else {
+                // Non-e2e: stage the stored acted-from latent.
+                let z_dst = &mut self.policy_z_scratch[row * ld..(row + 1) * ld];
+                let copy_n = sample.z.len().min(ld);
+                z_dst[..copy_n].copy_from_slice(&sample.z[..copy_n]);
             }
-            // action: weight * one_hot(taken). When weight = 0 the
-            // CE contribution from this row is zero (no gradient).
             let act_dst =
                 &mut self.policy_action_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
-            if sample.action_idx < MAX_ACTION_DIM {
-                act_dst[sample.action_idx] = weight;
+            if use_ppo {
+                // Plain one-hot; the weight rides in `advantage`.
+                if sample.action_idx < MAX_ACTION_DIM && weight > 0.0 {
+                    act_dst[sample.action_idx] = 1.0;
+                }
+                self.ppo_advantage_scratch[row] = weight;
+                self.ppo_old_prob_scratch[row] = 1.0;
+            } else {
+                // action: weight * one_hot(taken). When weight = 0 the
+                // CE contribution from this row is zero (no gradient).
+                if sample.action_idx < MAX_ACTION_DIM {
+                    act_dst[sample.action_idx] = weight;
+                }
             }
             // value target: train V toward R_to_go (helps V learn
             // to predict actual outcomes from successful states,
@@ -7972,15 +8188,32 @@ impl Agent {
         self.policy_session
             .read_param("policy.fc1.weight", &mut p_before);
 
-        self.policy_session
-            .set_input("obs", &self.obs_token_scratch);
-        self.policy_session.set_input("task", &self.task_scratch);
+        if e2e {
+            self.policy_session
+                .set_input("obs", &self.obs_token_scratch);
+            self.policy_session.set_input("task", &self.task_scratch);
+        } else {
+            self.policy_session.set_input("z", &self.policy_z_scratch);
+            if self.option_session.is_some() {
+                // SIL samples carry no option identity; zero the
+                // one-hot so the option bias head contributes nothing
+                // (stale rows from the last regular update otherwise
+                // persist in the device buffer).
+                self.option_onehot_scratch.fill(0.0);
+                self.policy_session
+                    .set_input("option_onehot", &self.option_onehot_scratch);
+            }
+        }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
-        if self.config.use_ppo {
+        if use_ppo {
             self.populate_policy_action_mask_scratch();
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
+            self.policy_session
+                .set_input("advantage", &self.ppo_advantage_scratch);
+            self.policy_session
+                .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
         }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
@@ -8755,8 +8988,12 @@ impl Agent {
                     if self.sil_buffer.len() >= cap {
                         self.sil_buffer.pop_front();
                     }
+                    // Pairing note: `last` is the most recent record,
+                    // whose latent IS the state the planner just
+                    // planned from — the (s, a) pair is correct as-is.
                     self.sil_buffer.push_back(SilSample {
                         obs: last.observation.clone(),
+                        z: last.latent.clone(),
                         action_idx,
                         r_to_go: r,
                         v_at_collect: 0.0,

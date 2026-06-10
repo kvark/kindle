@@ -30,6 +30,9 @@ fn stability_grid_world() {
         buffer_capacity: 2000,
         batch_size: 1,
         learning_rate: 1e-3,
+        // Anti-collapse recon (see canaries.rs note on the 2026-06-10
+        // forward-dynamics fix).
+        recon_loss_coef: 1.0,
         drift_interval: 500,
         ..AgentConfig::default()
     };
@@ -49,9 +52,12 @@ fn stability_grid_world() {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -105,6 +111,9 @@ fn stability_random_walk_convergence() {
         buffer_capacity: 2000,
         batch_size: 1,
         learning_rate: 1e-3,
+        // Anti-collapse recon (see canaries.rs note on the 2026-06-10
+        // forward-dynamics fix).
+        recon_loss_coef: 1.0,
         ..AgentConfig::default()
     };
     let mut agent = Agent::new(config, vec![adapter]);
@@ -114,9 +123,12 @@ fn stability_random_walk_convergence() {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
