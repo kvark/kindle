@@ -1172,6 +1172,26 @@ pub struct AgentConfig {
     /// plan's assumptions, so stop executing it blind and replan at
     /// the next planner tick. 0 disables (default). Typical 2.0-3.0.
     pub replan_surprise_mult: f32,
+    /// (P3) Information-seeking planner bonus: add `alpha · mean σ(z, a)`
+    /// per rollout step to the trajectory score. With the learned
+    /// heteroscedastic σ head (`wm_stochastic`), high σ marks
+    /// transitions the WM cannot yet predict — typically the NEW
+    /// game elements at an unsolved level. Steering rollouts toward
+    /// them is directed epistemic exploration ("go poke the thing
+    /// you don't understand"). 0 disables (default). Requires
+    /// `wm_stochastic`.
+    pub planner_sigma_alpha: f32,
+    /// (P3) σ-budgeted adaptive horizon: per rollout, accumulate the
+    /// per-step mean σ; once the running sum exceeds this budget,
+    /// stop trusting (scoring) the remainder of the trajectory and
+    /// queue only the trusted prefix. Converts the fixed-horizon
+    /// commitment problem (L3 wall: WM accuracy at depth > 10) into
+    /// an uncertainty-adaptive one: confident rollouts commit deep,
+    /// uncertain ones replan early. 0 disables (default). σ is the
+    /// sigmoid-bounded head output, so each step contributes (0, 1);
+    /// a budget of ~2-3 trusts a handful of uncertain steps or many
+    /// confident ones. Requires `wm_stochastic`.
+    pub planner_sigma_horizon: f32,
     /// GRAM-style heteroscedastic WM: when true, the WM additionally
     /// learns a per-state per-dim σ head (`world_model.sigma_proj`)
     /// trained to predict `|z_target − z_hat|`. The planner reads σ at
@@ -1569,6 +1589,8 @@ impl Default for AgentConfig {
             mcts_c_puct: std::f32::consts::SQRT_2,
             planner_noise_sigma: 0.0,
             replan_surprise_mult: 0.0,
+            planner_sigma_alpha: 0.0,
+            planner_sigma_horizon: 0.0,
             wm_stochastic: false,
             wm_sigma_loss_coef: 0.5,
             planner_rnd_alpha: 0.0,
@@ -2268,6 +2290,10 @@ pub struct Agent {
     /// `planner_traj_scratch` per outer step: `[planner_batch × latent_dim]`.
     /// Lazily resized in the rollout loop (allocated on first use).
     planner_sigma_scratch: Vec<f32>,
+    /// (P3) Per-(outer-step, row) mean learned σ along each rollout:
+    /// `[k * batch]`, row-major by step. Feeds the information-seeking
+    /// score bonus and the σ-budgeted adaptive horizon.
+    planner_sigma_traj_scratch: Vec<f32>,
     /// Per-step value predictions from the planner's value-head branch.
     /// Layout: `[planner_horizon × planner_batch]`. Only populated when
     /// `wm_planner_has_value_head` is true.
@@ -4074,6 +4100,7 @@ impl Agent {
             planner_option_onehot_scratch,
             planner_traj_scratch,
             planner_sigma_scratch: Vec::new(),
+            planner_sigma_traj_scratch: Vec::new(),
             planner_v_traj_scratch,
             planner_param_buf,
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
@@ -8865,6 +8892,32 @@ impl Agent {
             // so the scorer below can fetch it without re-running the
             // session. Output index depends on whether σ also occupies
             // an output slot: [z_next, optional sigma, optional value].
+            // (P3) Capture per-row mean σ at this outer step's endpoint
+            // (σ of the final inner transition) for the information-
+            // seeking score bonus and the σ-budgeted horizon.
+            let need_sigma_traj = self.config.wm_stochastic
+                && (self.config.planner_sigma_alpha > 0.0
+                    || self.config.planner_sigma_horizon > 0.0);
+            if need_sigma_traj {
+                if self.planner_sigma_scratch.len() < batch * ld {
+                    self.planner_sigma_scratch.resize(batch * ld, 0.0f32);
+                }
+                if self.planner_sigma_traj_scratch.len() < k * batch {
+                    self.planner_sigma_traj_scratch.resize(k * batch, 0.0f32);
+                }
+                let wm_planner = unsafe { &mut *wm_planner_ptr };
+                wm_planner.read_output_by_index(1, &mut self.planner_sigma_scratch[..batch * ld]);
+                for row in 0..batch {
+                    let mut sum = 0.0f32;
+                    for d in 0..ld {
+                        let v = self.planner_sigma_scratch[row * ld + d];
+                        if v.is_finite() {
+                            sum += v;
+                        }
+                    }
+                    self.planner_sigma_traj_scratch[t * batch + row] = sum / ld as f32;
+                }
+            }
             if self.wm_planner_has_value_head {
                 let v_off = t * batch;
                 let wm_planner = unsafe { &mut *wm_planner_ptr };
@@ -8923,6 +8976,11 @@ impl Agent {
         // Score each row by sum-of-novelty over its trajectory.
         // Pick best row per lane and queue its actions.
         let rnd_alpha = self.config.planner_rnd_alpha;
+        let sigma_alpha = self.config.planner_sigma_alpha;
+        let sigma_budget = self.config.planner_sigma_horizon;
+        let have_sigma_traj = self.config.wm_stochastic
+            && (sigma_alpha > 0.0 || sigma_budget > 0.0)
+            && self.planner_sigma_traj_scratch.len() >= k * batch;
         let goal_alpha = self.config.planner_goal_alpha;
         let value_alpha = self.config.planner_value_alpha;
         let change_alpha = self.config.planner_change_alpha;
@@ -8965,10 +9023,30 @@ impl Agent {
             };
             let mut best_score = f32::NEG_INFINITY;
             let mut best_row = lane_idx * m;
+            let mut best_trusted_k = k;
             for s in 0..m {
                 let row = lane_idx * m + s;
                 let mut score = 0.0f32;
+                // (P3) σ-budgeted horizon: stop scoring (trusting) the
+                // trajectory once cumulative mean-σ exceeds the budget.
+                let mut cum_sigma = 0.0f32;
+                let mut trusted_k = k;
                 for t in 0..k {
+                    if have_sigma_traj {
+                        let sg = self.planner_sigma_traj_scratch[t * batch + row];
+                        if sigma_alpha > 0.0 && sg.is_finite() {
+                            // Information-seeking: reward trajectories
+                            // that pass through transitions the WM is
+                            // still uncertain about.
+                            score += w_explore * sigma_alpha * sg;
+                        }
+                        if sigma_budget > 0.0 && sg.is_finite() {
+                            cum_sigma += sg;
+                            if cum_sigma > sigma_budget {
+                                trusted_k = t + 1;
+                            }
+                        }
+                    }
                     let off = t * batch * ld + row * ld;
                     let z_step = &self.planner_traj_scratch[off..off + ld];
                     let c = lane.buffer.visit_count(z_step);
@@ -9024,13 +9102,21 @@ impl Agent {
                             score += w_explore * change_alpha * mag;
                         }
                     }
+                    if trusted_k != k && t + 1 >= trusted_k {
+                        // Budget exhausted at this step — the rest of
+                        // the rollout is noise; don't score it.
+                        break;
+                    }
                 }
                 if score > best_score {
                     best_score = score;
                     best_row = row;
+                    best_trusted_k = trusted_k;
                 }
             }
-            for t in 0..k {
+            // Queue only the trusted prefix: confident rollouts commit
+            // deep, uncertain ones come back to the planner early.
+            for t in 0..best_trusted_k {
                 for inner_idx in 0..inner_iters {
                     let act = all_actions[best_row * k * inner_iters + t * inner_iters + inner_idx];
                     self.planner_queue[lane_idx].push_back(act);
