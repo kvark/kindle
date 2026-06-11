@@ -816,13 +816,33 @@ def main() -> int:
         elif args.object_token:
             print("[obs] using OBJECT-LEVEL token (8 objects + 8 globals = 64 dims)")
 
+    # Token cache keyed by frame hash: ARC frames are mostly static
+    # and K forks of a game often share frames, so the expensive
+    # object/hybrid token extraction (scipy connected components per
+    # call) hits the cache the vast majority of steps. Pixel-pool mode
+    # is cheap but caches too (free win). Shared across lanes on
+    # purpose; bounded by a hard clear at 60k entries (~15 MB).
+    _token_cache: dict = {}
+
     def preprocess_pooled(frame_arr):
+        import hashlib as _hl
+        key = _hl.blake2b(
+            frame_arr.astype(np.uint8).tobytes(), digest_size=8
+        ).digest()
+        tok = _token_cache.get(key)
+        if tok is not None:
+            return tok
         if args.hybrid_token:
-            return _hybrid_tok(frame_arr.astype(np.int32)).tolist()
-        if args.object_token:
-            return _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
-        arr = frame_arr.astype(np.float32) / 15.0
-        return arr.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten().tolist()
+            tok = _hybrid_tok(frame_arr.astype(np.int32)).tolist()
+        elif args.object_token:
+            tok = _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
+        else:
+            arr = frame_arr.astype(np.float32) / 15.0
+            tok = arr.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten().tolist()
+        if len(_token_cache) > 60000:
+            _token_cache.clear()
+        _token_cache[key] = tok
+        return tok
 
     def homeo_for(frame_arr, new_levels, win_levels):
         remaining = max(0, win_levels - new_levels)
