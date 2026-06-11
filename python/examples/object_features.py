@@ -428,3 +428,58 @@ def config_distance(objset: list[dict], pred_stats: dict) -> float:
         total += min(1.0, (dy * dy + dx * dx) ** 0.5 * 2.0)
         total += min(1.0, abs(s["area"] - p["area"]) * 8.0)
     return total / len(colors)
+
+
+def extract_relation_rules(
+    pairs: list[tuple[list[dict], list[dict]]],
+    var_threshold: float = 0.02,
+) -> dict:
+    """Pairwise-relational win constraints (rule-inference v2).
+
+    For every color pair (c1, c2) present together in win states,
+    collect the relative offset between their mean positions across
+    wins. Pairs whose win-state offsets cluster tightly (variance
+    below threshold) are treated as part of the win condition —
+    "c1 ends up at offset (dy, dx) from c2" — regardless of where
+    either started. This captures arrangement rules (adjacency,
+    alignment, containment-by-position) that per-color motion rules
+    (v1) cannot express. Returns {(c1, c2): (dy, dx)} with c1 < c2.
+    """
+    rels: dict = {}
+    for _start, win in pairs:
+        ws = _color_stats(win)
+        colors = sorted(ws)
+        for i, c1 in enumerate(colors):
+            for c2 in colors[i + 1:]:
+                rels.setdefault((c1, c2), []).append(
+                    (ws[c1]["cy"] - ws[c2]["cy"],
+                     ws[c1]["cx"] - ws[c2]["cx"])
+                )
+    rules = {}
+    for key, offsets in rels.items():
+        if len(offsets) < 2:
+            continue
+        a = np.asarray(offsets, dtype=np.float32)
+        if float(a.var(axis=0).sum()) < var_threshold:
+            rules[key] = (float(a[:, 0].mean()), float(a[:, 1].mean()))
+    return rules
+
+
+def relation_distance(objset: list[dict], rel_rules: dict) -> float:
+    """Mean violation of the relational win constraints by the current
+    configuration, in [0, 1]. Pairs with a missing color contribute a
+    full violation (the arrangement cannot be satisfied without both
+    parties present). 0.0 when no rules exist."""
+    if not rel_rules:
+        return 0.0
+    cur = _color_stats(objset)
+    total = 0.0
+    for (c1, c2), (ty, tx) in rel_rules.items():
+        s1, s2 = cur.get(c1), cur.get(c2)
+        if s1 is None or s2 is None:
+            total += 1.0
+            continue
+        dy = (s1["cy"] - s2["cy"]) - ty
+        dx = (s1["cx"] - s2["cx"]) - tx
+        total += min(1.0, (dy * dy + dx * dx) ** 0.5 * 2.0)
+    return total / len(rel_rules)

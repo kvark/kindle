@@ -700,6 +700,8 @@ def main() -> int:
             extract_color_rules as _extract_rules,
             predict_win_stats as _predict_win,
             config_distance as _config_dist,
+            extract_relation_rules as _extract_rel,
+            relation_distance as _rel_dist,
         )
 
     agent_kwargs = dict(
@@ -1084,9 +1086,16 @@ def main() -> int:
         all_pairs = []
         for lvl_pairs in rule_pairs[g_idx].values():
             all_pairs.extend(lvl_pairs)
-        game_rules[g_idx] = (
-            _extract_rules(all_pairs) if len(all_pairs) >= 2 else None
-        )
+        if len(all_pairs) >= 2:
+            game_rules[g_idx] = {
+                "color": _extract_rules(all_pairs),
+                # v2: pairwise-relational win constraints — arrangement
+                # rules ("c1 ends at offset (dy,dx) from c2") that hold
+                # across wins regardless of starting layout.
+                "rel": _extract_rel(all_pairs),
+            }
+        else:
+            game_rules[g_idx] = None
         rules_dirty[g_idx] = False
 
     def reset_rule_anchor(i, frm):
@@ -1099,7 +1108,10 @@ def main() -> int:
         lane_phi[i] = None
         rules = game_rules[g_idx]
         if rules:
-            lane_pred[i] = _predict_win(ep_start_objset[i], rules)
+            lane_pred[i] = {
+                "pred": _predict_win(ep_start_objset[i], rules["color"]),
+                "rel": rules["rel"],
+            }
         else:
             lane_pred[i] = None
     if args.load_archive:
@@ -1293,10 +1305,15 @@ def main() -> int:
                                     continue
                                 fr2 = np.asarray(e2["obs"].frame[0])
                                 os2 = _objset(fr2.astype(np.int32))
+                                gr = game_rules[g_idx]
                                 d2 = _config_dist(
                                     os2,
-                                    _predict_win(os2, game_rules[g_idx]),
+                                    _predict_win(os2, gr["color"]),
                                 )
+                                if gr["rel"]:
+                                    d2 = 0.5 * d2 + 0.5 * _rel_dist(
+                                        os2, gr["rel"]
+                                    )
                                 if best_d is None or d2 < best_d:
                                     best_d, best_e = d2, e2
                             entry = best_e
@@ -1730,7 +1747,19 @@ def main() -> int:
                         lane_phi[i] = None
                         continue
                     frm = np.asarray(new_obs_list[i].frame[0])
-                    phi = _config_dist(lane_objset(i, frm), lane_pred[i])
+                    cur_os = lane_objset(i, frm)
+                    lp = lane_pred[i]
+                    # Combined potential: v1 per-color prediction +
+                    # v2 relational-arrangement violation, averaged
+                    # over whichever components exist.
+                    parts = []
+                    if lp["pred"]:
+                        parts.append(_config_dist(cur_os, lp["pred"]))
+                    if lp["rel"]:
+                        parts.append(_rel_dist(cur_os, lp["rel"]))
+                    if not parts:
+                        continue
+                    phi = sum(parts) / len(parts)
                     if lane_phi[i] is not None:
                         r = args.rule_goal_coef * (lane_phi[i] - phi)
                         rg_vec[i] = r
