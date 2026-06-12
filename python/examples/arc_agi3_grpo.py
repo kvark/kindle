@@ -922,7 +922,8 @@ def main() -> int:
             if click_slots and 6 in avail_actions[lane_i]:
                 for i in range(min(click_slots, len(lane_centroids[lane_i]))):
                     mask_buf[lane_i, NUM_ACTIONS + i] = 1.0
-            if reset_slot is not None and ep_step[lane_i] >= args.reset_action_min_step:
+            if (reset_slot is not None
+                    and level_step[lane_i] >= args.reset_action_min_step):
                 mask_buf[lane_i, reset_slot] = 1.0
         agent.set_action_masks(mask_buf.reshape(-1))
 
@@ -1099,6 +1100,11 @@ def main() -> int:
         lambda: collections.deque(maxlen=50)) for _ in range(n_games)]
     game_rules = [None] * n_games
     rules_dirty = [False] * n_games
+    # Steps since the lane's CURRENT level started (reset on level
+    # event, episode reset, and RESET presses). Gates the RESET slot:
+    # a restart only makes sense after a meaningful fraction of the
+    # attempt has been spent.
+    level_step = [0] * n_lanes
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -1383,6 +1389,7 @@ def main() -> int:
                         avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
                         last_levels[i] = int(obs_list[i].levels_completed)
                         ep_step[i] = 0
+                    level_step[i] = 0
                     agent.mark_boundary(i)
                     if rule_goal_on and obs_list[i].frame:
                         reset_rule_anchor(
@@ -1676,6 +1683,10 @@ def main() -> int:
                     stagnation_steps[i] += 1
                 last_levels[i] = new_levels
                 steps_at_level[i // K][new_levels] += 1
+                level_step[i] = 0 if d > 0 else level_step[i] + 1
+                if (reset_slot is not None
+                        and int(actions[i]) == reset_slot):
+                    level_step[i] = 0
                 # Rule-goal: a level event means obs_list[i] (pre-step)
                 # was a WIN state for the level anchored at
                 # ep_start_objset. Record the (start, win) pair and
