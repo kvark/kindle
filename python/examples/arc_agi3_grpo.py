@@ -1332,10 +1332,21 @@ def main() -> int:
                         # anchored at each entry's own frame — exact
                         # for absolute-target rules, neutral for
                         # relative ones).
+                        game_events = sum(
+                            levels_events[g_idx * K + kk] for kk in range(K)
+                        )
                         if (args.restore_value_rank
+                                and game_events >= 20
+                                and rng.random() < 0.5
                                 and chosen_lvl == max(
                                     max_levels_seen[g_idx * K:(g_idx + 1) * K])
                                 and len(gar) > 1):
+                            # V-rank only once the classifier has real
+                            # win labels (>= 20 events) — before that
+                            # stored V is noise and max-of-12 selection
+                            # concentrates restores on garbage entries
+                            # (verified: 12x slower bootstrap). 50/50
+                            # mix with uniform keeps frontier diversity.
                             # Prefer restoring states the win classifier
                             # scored as winning-trajectory-like at
                             # admission. With depth-biased admission the
