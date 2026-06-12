@@ -1121,6 +1121,11 @@ def main() -> int:
     # boundaries, and fired RESETs.
     stale_steps = [0] * n_lanes
     stagnation_resets = 0  # diagnostic
+    # Best (lowest) rule-goal potential reached this level per lane:
+    # improving toward the predicted win clears the staleness clock —
+    # retracing KNOWN ground toward a goal is not stagnation. Reset
+    # at rule anchors (level start).
+    lane_best_phi = [None] * n_lanes
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -1160,6 +1165,7 @@ def main() -> int:
             refresh_rules(g_idx)
         ep_start_objset[i] = lane_objset(i, frm)
         lane_phi[i] = None
+        lane_best_phi[i] = None
         rules = game_rules[g_idx]
         if rules:
             lane_pred[i] = {
@@ -1739,6 +1745,8 @@ def main() -> int:
                 last_levels[i] = new_levels
                 steps_at_level[i // K][new_levels] += 1
                 level_step[i] = 0 if d > 0 else level_step[i] + 1
+                if d > 0:
+                    stale_steps[i] = 0
                 if (reset_slot is not None
                         and int(actions[i]) == reset_slot):
                     level_step[i] = 0
@@ -1880,6 +1888,9 @@ def main() -> int:
                     if not parts:
                         continue
                     phi = sum(parts) / len(parts)
+                    if lane_best_phi[i] is None or phi < lane_best_phi[i] - 0.01:
+                        lane_best_phi[i] = phi
+                        stale_steps[i] = 0
                     if lane_phi[i] is not None:
                         r = args.rule_goal_coef * (lane_phi[i] - phi)
                         rg_vec[i] = r
