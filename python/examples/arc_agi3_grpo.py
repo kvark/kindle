@@ -173,6 +173,17 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--stagnation-reset", type=int, default=0,
+                        help="Press GameAction RESET (in-game level "
+                        "restart, levels_completed preserved) on a lane "
+                        "after N consecutive steps without a NOVEL frame "
+                        "(per-lane frame-hash). No novelty for that long "
+                        "is the signature of a doomed state (e.g. a "
+                        "depleted step budget where nothing new can "
+                        "happen) — the situation where human players "
+                        "press RESET (~20x/run in the tu93 demos). "
+                        "Harness-level: does not dilute the action "
+                        "space or planner rollouts. 0 = off. Try 30-60.")
     parser.add_argument("--reset-action", type=int, default=0,
                         help="Expose GameAction RESET (id 0) as a "
                         "learnable discrete action slot. RESET restarts "
@@ -1105,6 +1116,11 @@ def main() -> int:
     # a restart only makes sense after a meaningful fraction of the
     # attempt has been spent.
     level_step = [0] * n_lanes
+    # (stagnation-reset) per-lane counter of consecutive steps without
+    # a novel frame-hash; cleared on novelty, level events, episode
+    # boundaries, and fired RESETs.
+    stale_steps = [0] * n_lanes
+    stagnation_resets = 0  # diagnostic
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -1261,6 +1277,34 @@ def main() -> int:
                     or state is GameState.WIN
                     or ep_step[i] >= lane_budget
                 )
+                if (args.stagnation_reset > 0
+                        and stale_steps[i] >= args.stagnation_reset
+                        and state not in (GameState.NOT_PLAYED,
+                                          GameState.GAME_OVER,
+                                          GameState.WIN)):
+                    # In-game level restart: the lane produced nothing
+                    # novel for N steps — the doomed-state signature
+                    # (e.g. depleted budget). Restart the LEVEL
+                    # (levels_completed preserved), keep the episode.
+                    try:
+                        obs_r = envs[i].step(action_by_value[0])
+                    except Exception:
+                        obs_r = None
+                    if obs_r is not None and obs_r.frame:
+                        obs_list[i] = obs_r
+                        if list(obs_r.available_actions):
+                            avail_actions[i] = list(obs_r.available_actions)
+                        last_levels[i] = int(obs_r.levels_completed)
+                        agent.mark_boundary(i)
+                        level_step[i] = 0
+                        stale_steps[i] = 0
+                        stagnation_resets += 1
+                        if rule_goal_on and obs_list[i].frame:
+                            reset_rule_anchor(
+                                i, np.asarray(obs_list[i].frame[0])
+                            )
+                        if win_trail_on:
+                            win_trails[i].clear()
                 if need_reset:
                     if ep_step[i] > 0:
                         ep_count[i] += 1
@@ -1756,6 +1800,9 @@ def main() -> int:
                     gcounts[h] = 1
                 elif h in gcounts:
                     gcounts[h] = gc
+                # (stagnation-reset) novel frame for this game clears
+                # the lane's staleness clock.
+                stale_steps[i] = 0 if gc == 1 else stale_steps[i] + 1
                 macro_novelty[i] += 1.0 / (gc ** 0.5)
                 # Build the per-step extrinsic-reward signal. Goal-bonus
                 # fires on level events (binary 0/1). novelty bonus
@@ -2076,6 +2123,8 @@ def main() -> int:
                     trail_tag += (
                         f" rg={rule_pairs_count}p/{rule_shaping_total:.0f}"
                     )
+                if args.stagnation_reset > 0:
+                    trail_tag += f" sr={stagnation_resets}"
                     # Per-level archive occupancy of game 0 — at a
                     # glance: are stepping stones accumulating at the
                     # frontier level?
