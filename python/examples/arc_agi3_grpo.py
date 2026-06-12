@@ -1283,8 +1283,13 @@ def main() -> int:
                     or state is GameState.WIN
                     or ep_step[i] >= lane_budget
                 )
+                _g_sr = i // K
+                _frontier_sr = max(
+                    max_levels_seen[_g_sr * K:(_g_sr + 1) * K]
+                )
                 if (args.stagnation_reset > 0
                         and stale_steps[i] >= args.stagnation_reset
+                        and last_levels[i] >= _frontier_sr
                         and state not in (GameState.NOT_PLAYED,
                                           GameState.GAME_OVER,
                                           GameState.WIN)):
