@@ -173,6 +173,27 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--reset-action", type=int, default=0,
+                        help="Expose GameAction RESET (id 0) as a "
+                        "learnable discrete action slot. RESET restarts "
+                        "the CURRENT level (levels_completed preserved) "
+                        "and is legal in every ARC game but never "
+                        "advertised in available_actions — without it "
+                        "the agent cannot escape doomed in-level states "
+                        "(e.g. depleted step budgets). Human recordings "
+                        "use it ~20x per run. 0 = off.")
+    parser.add_argument("--reset-action-min-step", type=int, default=0,
+                        help="Mask the RESET slot until ep_step >= N "
+                        "(safety knob against early-exploration reset "
+                        "spam). Default 0 (always available).")
+    parser.add_argument("--restore-value-rank", type=int, default=0,
+                        help="Rank frontier-level archive restores by "
+                        "the win-classifier value V recorded at "
+                        "admission time: prefer restoring states that "
+                        "look like winning trajectories instead of "
+                        "uniform choice (which, with depth-biased "
+                        "admission, prefers doomed late-budget states). "
+                        "Samples 12 candidates, picks max V. 0 = off.")
     parser.add_argument("--rule-goal-coef", type=float, default=0.0,
                         help="Rule-inference goal shaping: learn the "
                         "start->win object transformation per color from "
@@ -686,8 +707,11 @@ def main() -> int:
     # NUM_ACTIONS + i = "ACTION6 at the centroid of the i-th largest
     # object". The policy/planner treat them as ordinary actions; the
     # mask gates them on ACTION6 availability + object existence.
-    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS))
+    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS - (1 if args.reset_action else 0)))
     total_actions = NUM_ACTIONS + click_slots
+    reset_slot = total_actions if args.reset_action else None
+    if reset_slot is not None:
+        total_actions += 1
     if click_slots:
         from object_features import object_centroids as _obj_centroids
 
@@ -898,9 +922,17 @@ def main() -> int:
             if click_slots and 6 in avail_actions[lane_i]:
                 for i in range(min(click_slots, len(lane_centroids[lane_i]))):
                     mask_buf[lane_i, NUM_ACTIONS + i] = 1.0
+            if reset_slot is not None and ep_step[lane_i] >= args.reset_action_min_step:
+                mask_buf[lane_i, reset_slot] = 1.0
         agent.set_action_masks(mask_buf.reshape(-1))
 
     def map_action(idx, lane):
+        # RESET slot: restart the current level (lc preserved). An
+        # in-game action — no episode boundary, so the WM learns the
+        # (deterministic) reset dynamics and the planner can plan
+        # through restarts.
+        if reset_slot is not None and idx == reset_slot:
+            return action_by_value[0], None
         # Object-click slot: ACTION6 aimed at the i-th largest object's
         # centroid. The mask guarantees ACTION6 availability and object
         # existence at mask-build time; if the frame changed since, fall
@@ -1294,6 +1326,22 @@ def main() -> int:
                         # anchored at each entry's own frame — exact
                         # for absolute-target rules, neutral for
                         # relative ones).
+                        if (args.restore_value_rank
+                                and chosen_lvl == max(
+                                    max_levels_seen[g_idx * K:(g_idx + 1) * K])
+                                and len(gar) > 1):
+                            # Prefer restoring states the win classifier
+                            # scored as winning-trajectory-like at
+                            # admission. With depth-biased admission the
+                            # uniform choice prefers doomed late-budget
+                            # states; V is the learned antidote.
+                            best_v, best_e = None, entry
+                            for _cand in range(min(12, len(gar))):
+                                e2 = gar[rng.randrange(len(gar))]
+                                v2 = e2.get("v", 0.0)
+                                if best_v is None or v2 > best_v:
+                                    best_v, best_e = v2, e2
+                            entry = best_e
                         if (args.rule_goal_restore and rule_goal_on
                                 and game_rules[g_idx]
                                 and chosen_lvl == max(
@@ -1447,6 +1495,7 @@ def main() -> int:
             homeo_list = []
             new_pooled = []
             level_deltas = [0] * n_lanes
+            lane_values = agent.values()
             for i in range(n_lanes):
                 # #2 Trail snapshot: capture state BEFORE the step. If
                 # this step turns out to be a winning one, the trail
@@ -1461,6 +1510,7 @@ def main() -> int:
                             "levels": last_levels[i],
                             "ep_step": ep_step[i],
                             "avail_actions": list(avail_actions[i]),
+                            "v": float(lane_values[i]),
                         })
                 trail_step_counter[i] += 1
 
@@ -1532,6 +1582,7 @@ def main() -> int:
                                 "levels": int(new_levels),
                                 "ep_step": int(ep_step[i] + 1),
                                 "avail_actions": list(obs_new.available_actions or [1]),
+                                "v": float(lane_values[i]),
                             }
                     # Tally per-level. The delta is usually 1; for
                     # delta>1 (rare multi-level jump) credit each
@@ -1855,6 +1906,7 @@ def main() -> int:
                         "levels": int(lvl),
                         "ep_step": int(ep_step[i] + 1),
                         "avail_actions": list(obs_i.available_actions or [1]),
+                        "v": float(agent.values()[i]),
                     }
                     gar = archive[g_idx].setdefault(lvl, [])
                     if len(gar) < args.archive_cap:
