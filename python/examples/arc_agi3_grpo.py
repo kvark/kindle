@@ -1306,7 +1306,11 @@ def main() -> int:
                 _frontier_sr = max(
                     max_levels_seen[_g_sr * K:(_g_sr + 1) * K]
                 )
+                _g_events_sr = sum(
+                    levels_events[_g_sr * K + kk] for kk in range(K)
+                )
                 if (args.stagnation_reset > 0
+                        and _g_events_sr >= 20
                         and stale_steps[i] >= args.stagnation_reset
                         and last_levels[i] >= _frontier_sr
                         and state not in (GameState.NOT_PLAYED,
