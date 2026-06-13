@@ -738,6 +738,7 @@ def main() -> int:
             extract_relation_rules as _extract_rel,
             relation_distance as _rel_dist,
             nearest_target_distance as _waypoint_dist,
+            bfs_target_distance as _bfs_dist,
             color_stats as _cstats,
         )
 
@@ -1935,11 +1936,18 @@ def main() -> int:
                             c for c, r in (gr_r["color"] or {}).items()
                             if not r["survives"] and c != av_c
                         }
-                        wd = _waypoint_dist(
-                            cur_os, av_c, tgt, gr_r["rel"] or None
-                        )
-                        if wd is not None:
-                            phi = wd
+                        # v3.1: wall-aware path distance is the correct
+                        # maze potential; straight-line is the fallback
+                        # when no target is reachable by BFS (or none
+                        # remain — exit leg via the relational form).
+                        if tgt:
+                            phi = _bfs_dist(frm, av_c, tgt)
+                        if phi is None:
+                            wd = _waypoint_dist(
+                                cur_os, av_c, tgt, gr_r["rel"] or None
+                            )
+                            if wd is not None:
+                                phi = wd
                     if phi is None:
                         parts = []
                         if lp["pred"]:

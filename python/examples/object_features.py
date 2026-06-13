@@ -538,3 +538,58 @@ def nearest_target_distance(
 
 # Public alias for harness-side per-color aggregation (rule v3).
 color_stats = _color_stats
+
+
+def bfs_target_distance(
+    frame: np.ndarray,
+    avatar_color: int,
+    target_colors: set,
+    background_color: int | None = None,
+):
+    """Rule v3.1: wall-aware PATH distance from the avatar to the
+    nearest reachable target, by BFS over passable cells. Straight-line
+    distance points through walls in a maze — the gradient is wrong
+    wherever a wall sits between avatar and goal; path distance is the
+    correct potential. Passable = background (modal) color, target
+    colors, or avatar color; everything else is a wall ("you can't
+    walk through things" — no game knowledge). +1 per remaining target
+    keeps phi monotone across pickups. Returns normalized distance, or
+    None when the avatar is absent or no target is reachable (caller
+    falls back to the straight-line / relational forms).
+    """
+    from collections import deque
+    a = np.asarray(frame)
+    if background_color is None:
+        vals, counts = np.unique(a, return_counts=True)
+        background_color = int(vals[counts.argmax()])
+    av = np.argwhere(a == avatar_color)
+    if av.size == 0:
+        return None
+    tgt_mask = np.isin(a, list(target_colors)) if target_colors else None
+    n_targets = int(tgt_mask.sum() and len(np.unique(a[tgt_mask]))) if target_colors else 0
+    # passable: background OR target OR avatar
+    passable = (a == background_color) | (a == avatar_color)
+    if target_colors:
+        passable |= np.isin(a, list(target_colors))
+    H, W = a.shape
+    ay, ax = av.mean(axis=0).astype(int)
+    # snap the start to the nearest passable cell (avatar block edges)
+    if not passable[ay, ax]:
+        cand = av[0]
+        ay, ax = int(cand[0]), int(cand[1])
+    seen = np.zeros((H, W), dtype=bool)
+    q = deque([(ay, ax, 0)])
+    seen[ay, ax] = True
+    while q:
+        y, x, dist = q.popleft()
+        if target_colors and tgt_mask[y, x] and not (a[y, x] == avatar_color):
+            # reached a target cell
+            norm = dist / float(H + W)
+            n_left = len(np.unique(a[tgt_mask])) if tgt_mask.any() else 0
+            return min(1.0, norm) + float(n_left)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < H and 0 <= nx < W and not seen[ny, nx] and passable[ny, nx]:
+                seen[ny, nx] = True
+                q.append((ny, nx, dist + 1))
+    return None
