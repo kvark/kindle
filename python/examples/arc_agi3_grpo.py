@@ -737,6 +737,8 @@ def main() -> int:
             config_distance as _config_dist,
             extract_relation_rules as _extract_rel,
             relation_distance as _rel_dist,
+            nearest_target_distance as _waypoint_dist,
+            color_stats as _cstats,
         )
 
     agent_kwargs = dict(
@@ -1126,6 +1128,23 @@ def main() -> int:
     # retracing KNOWN ground toward a goal is not stagnation. Reset
     # at rule anchors (level start).
     lane_best_phi = [None] * n_lanes
+    # (rule v3) Controllability detection: per-game counts of how often
+    # each color's mean position moved between consecutive frames. The
+    # dominant mover is the avatar — the object the actions control.
+    # Purely statistical, no game knowledge.
+    color_moves = [collections.Counter() for _ in range(n_games)]
+    lane_prev_cstats = [None] * n_lanes
+
+    def avatar_color_of(g_idx):
+        mc = color_moves[g_idx]
+        if not mc:
+            return None
+        top = mc.most_common(2)
+        if top[0][1] < 100:
+            return None
+        if len(top) > 1 and top[0][1] < 2 * top[1][1]:
+            return None  # no dominant mover yet
+        return top[0][0]
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -1868,9 +1887,25 @@ def main() -> int:
             if rule_goal_on and args.rule_goal_coef > 0.0:
                 rg_vec = [0.0] * n_lanes
                 for i in range(n_lanes):
-                    if lane_pred[i] is None or not new_obs_list[i].frame:
+                    if not new_obs_list[i].frame:
                         continue
                     g_idx_r = i // K
+                    frm = np.asarray(new_obs_list[i].frame[0])
+                    cur_os = lane_objset(i, frm)
+                    # (v3) Controllability statistics: which color moved?
+                    cs_now = _cstats(cur_os)
+                    cs_prev = lane_prev_cstats[i]
+                    if cs_prev is not None:
+                        for c, st in cs_now.items():
+                            pv = cs_prev.get(c)
+                            if pv is None:
+                                continue
+                            if (abs(st["cy"] - pv["cy"])
+                                    + abs(st["cx"] - pv["cx"])) > 0.005:
+                                color_moves[g_idx_r][c] += 1
+                    lane_prev_cstats[i] = cs_now
+                    if lane_pred[i] is None:
+                        continue
                     frontier_r = max(
                         max_levels_seen[g_idx_r * K:(g_idx_r + 1) * K]
                     )
@@ -1879,20 +1914,37 @@ def main() -> int:
                         # directly; shaping is for the unsolved level.
                         lane_phi[i] = None
                         continue
-                    frm = np.asarray(new_obs_list[i].frame[0])
-                    cur_os = lane_objset(i, frm)
                     lp = lane_pred[i]
                     # Combined potential: v1 per-color prediction +
                     # v2 relational-arrangement violation, averaged
                     # over whichever components exist.
-                    parts = []
-                    if lp["pred"]:
-                        parts.append(_config_dist(cur_os, lp["pred"]))
-                    if lp["rel"]:
-                        parts.append(_rel_dist(cur_os, lp["rel"]))
-                    if not parts:
-                        continue
-                    phi = sum(parts) / len(parts)
+                    # (v3) Waypoint potential: with a detected avatar
+                    # and must-disappear target colors, phi becomes the
+                    # sequential-leg distance (nearest remaining target,
+                    # then the exit relation) — a monotone navigation
+                    # gradient the color-mean forms cannot give.
+                    phi = None
+                    av_c = avatar_color_of(g_idx_r)
+                    gr_r = game_rules[g_idx_r]
+                    if av_c is not None and gr_r:
+                        tgt = {
+                            c for c, r in (gr_r["color"] or {}).items()
+                            if not r["survives"] and c != av_c
+                        }
+                        wd = _waypoint_dist(
+                            cur_os, av_c, tgt, gr_r["rel"] or None
+                        )
+                        if wd is not None:
+                            phi = wd
+                    if phi is None:
+                        parts = []
+                        if lp["pred"]:
+                            parts.append(_config_dist(cur_os, lp["pred"]))
+                        if lp["rel"]:
+                            parts.append(_rel_dist(cur_os, lp["rel"]))
+                        if not parts:
+                            continue
+                        phi = sum(parts) / len(parts)
                     if lane_best_phi[i] is None or phi < lane_best_phi[i] - 0.01:
                         lane_best_phi[i] = phi
                         stale_steps[i] = 0

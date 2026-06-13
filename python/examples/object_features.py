@@ -483,3 +483,58 @@ def relation_distance(objset: list[dict], rel_rules: dict) -> float:
         dx = (s1["cx"] - s2["cx"]) - tx
         total += min(1.0, (dy * dy + dx * dx) ** 0.5 * 2.0)
     return total / len(rel_rules)
+
+
+def nearest_target_distance(
+    objset: list[dict],
+    avatar_color: int,
+    target_colors: set,
+    fallback_rel: dict | None = None,
+) -> float | None:
+    """Rule v3 waypoint potential: distance from the controllable
+    (avatar) object to the NEAREST remaining object of a color the
+    learned rule says must disappear. When none remain, falls back to
+    the v2 relational target for the avatar's color pair (the exit
+    leg). Returns None when the avatar color is absent (no gradient
+    available). Distances are normalized grid units; the per-leg form
+    gives a monotone approach gradient that color-MEAN distances
+    cannot (collecting one of three pickups makes the mean jump).
+    """
+    avatars = [o for o in objset if o["color"] == avatar_color]
+    if not avatars:
+        return None
+    av = max(avatars, key=lambda o: o["area"])
+    targets = [o for o in objset if o["color"] in target_colors]
+    if targets:
+        best = min(
+            ((o["cy"] - av["cy"]) ** 2 + (o["cx"] - av["cx"]) ** 2) ** 0.5
+            for o in targets
+        )
+        # +1 per remaining target keeps the potential monotone across
+        # pickups: collecting one strictly lowers phi even if the next
+        # target is farther than the previous one was.
+        return min(1.0, best * 2.0) + float(len(targets))
+    if fallback_rel:
+        # Exit leg: satisfy the tightest relational constraint that
+        # involves the avatar color.
+        cur = _color_stats(objset)
+        best = None
+        for (c1, c2), (ty, tx) in fallback_rel.items():
+            if avatar_color not in (c1, c2):
+                continue
+            other = c2 if c1 == avatar_color else c1
+            if other not in cur:
+                continue
+            sign = 1.0 if c1 == avatar_color else -1.0
+            dy = (av["cy"] - cur[other]["cy"]) - sign * ty
+            dx = (av["cx"] - cur[other]["cx"]) - sign * tx
+            d = (dy * dy + dx * dx) ** 0.5
+            if best is None or d < best:
+                best = d
+        if best is not None:
+            return min(1.0, best * 2.0)
+    return 0.0
+
+
+# Public alias for harness-side per-color aggregation (rule v3).
+color_stats = _color_stats
