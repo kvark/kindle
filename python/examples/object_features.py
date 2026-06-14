@@ -593,3 +593,54 @@ def bfs_target_distance(
                 seen[ny, nx] = True
                 q.append((ny, nx, dist + 1))
     return None
+
+
+def bfs_first_step(
+    frame: np.ndarray,
+    avatar_color: int,
+    target_colors: set,
+    background_color: int | None = None,
+):
+    """Rule v3.2: the FIRST MOVE of the optimal path from the avatar to
+    the nearest reachable target, as a (dy, dx) unit direction in
+    {(-1,0),(1,0),(0,-1),(0,1)}. BFS over passable cells (background +
+    targets + avatar; everything else is a wall). Returns None if no
+    target is reachable. This turns the maze-navigation MOTOR problem
+    — which a pooled observation cannot solve — into a single learned
+    primitive: the policy only has to decide WHEN to navigate; the
+    route is computed. Fully generic (no game knowledge): avatar and
+    targets are learned, walls are 'non-background structure'.
+    """
+    from collections import deque
+    a = np.asarray(frame)
+    if background_color is None:
+        vals, counts = np.unique(a, return_counts=True)
+        background_color = int(vals[counts.argmax()])
+    av = np.argwhere(a == avatar_color)
+    if av.size == 0 or not target_colors:
+        return None
+    ay, ax = av.mean(axis=0).astype(int)
+    passable = (a == background_color) | (a == avatar_color) | np.isin(a, list(target_colors))
+    H, W = a.shape
+    if not passable[ay, ax]:
+        ay, ax = int(av[0][0]), int(av[0][1])
+    tgt = np.isin(a, list(target_colors))
+    # BFS storing the first-step direction taken from the avatar cell.
+    seen = np.zeros((H, W), dtype=bool)
+    q = deque()
+    seen[ay, ax] = True
+    for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+        ny, nx = ay + dy, ax + dx
+        if 0 <= ny < H and 0 <= nx < W and passable[ny, nx]:
+            seen[ny, nx] = True
+            q.append((ny, nx, (dy, dx)))
+    while q:
+        y, x, first = q.popleft()
+        if tgt[y, x]:
+            return first
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < H and 0 <= nx < W and not seen[ny, nx] and passable[ny, nx]:
+                seen[ny, nx] = True
+                q.append((ny, nx, first))
+    return None

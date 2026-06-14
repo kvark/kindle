@@ -184,6 +184,19 @@ def main() -> int:
                         "press RESET (~20x/run in the tu93 demos). "
                         "Harness-level: does not dilute the action "
                         "space or planner rollouts. 0 = off. Try 30-60.")
+    parser.add_argument("--nav-action", type=int, default=0,
+                        help="Add a learned NAVIGATION action slot: it "
+                        "executes the action whose learned avatar-"
+                        "displacement best matches the first BFS step "
+                        "from the avatar to the nearest must-disappear "
+                        "target (pickup), else toward the avatar's "
+                        "relational exit-partner. Turns maze motor-"
+                        "control (unsolvable from a pooled obs) into one "
+                        "primitive the policy chooses WHEN to use; route "
+                        "+ avatar + targets + action effects are all "
+                        "learned from the agent's own experience. "
+                        "Requires --rule-goal-coef>0 for target rules. "
+                        "0 = off.")
     parser.add_argument("--reset-action", type=int, default=0,
                         help="Expose GameAction RESET (id 0) as a "
                         "learnable discrete action slot. RESET restarts "
@@ -718,8 +731,13 @@ def main() -> int:
     # NUM_ACTIONS + i = "ACTION6 at the centroid of the i-th largest
     # object". The policy/planner treat them as ordinary actions; the
     # mask gates them on ACTION6 availability + object existence.
-    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS - (1 if args.reset_action else 0)))
+    _reserved = (1 if args.reset_action else 0) + (1 if args.nav_action else 0)
+    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS - _reserved))
     total_actions = NUM_ACTIONS + click_slots
+    nav_slot = None
+    if args.nav_action:
+        nav_slot = total_actions
+        total_actions += 1
     reset_slot = total_actions if args.reset_action else None
     if reset_slot is not None:
         total_actions += 1
@@ -739,6 +757,7 @@ def main() -> int:
             relation_distance as _rel_dist,
             nearest_target_distance as _waypoint_dist,
             bfs_target_distance as _bfs_dist,
+            bfs_first_step as _bfs_first,
             color_stats as _cstats,
         )
 
@@ -904,6 +923,9 @@ def main() -> int:
     # so this is nearly free despite scipy label calls).
     lane_centroids = [[] for _ in range(n_lanes)]
     lane_centroid_hash = [None] * n_lanes
+    # (nav-action) resolved base game-action per lane for this micro-
+    # step (computed in update_action_mask, consumed by map_action).
+    lane_nav_action = [None] * n_lanes
 
     def refresh_lane_objects():
         for lane_i in range(n_lanes):
@@ -939,6 +961,28 @@ def main() -> int:
             if (reset_slot is not None
                     and level_step[lane_i] >= args.reset_action_min_step):
                 mask_buf[lane_i, reset_slot] = 1.0
+            # (nav-action) resolve + gate the nav slot for this lane.
+            if nav_slot is not None:
+                lane_nav_action[lane_i] = None
+                o = obs_list[lane_i]
+                g_idx = lane_i // K
+                gr = game_rules[g_idx]
+                avc = avatar_color_of(g_idx)
+                if o.frame and gr and avc is not None:
+                    frm = np.asarray(o.frame[0])
+                    tgt = {c for c, r in (gr["color"] or {}).items()
+                           if not r["survives"] and c != avc}
+                    if not tgt and gr["rel"]:
+                        # exit leg: target the avatar's relational
+                        # partner color (where it must end up).
+                        for (c1, c2) in gr["rel"]:
+                            if avc in (c1, c2):
+                                tgt = {c2 if c1 == avc else c1}
+                                break
+                    nav_a = nav_action_for(g_idx, frm, avc, tgt)
+                    if nav_a is not None and nav_a in avail_actions[lane_i]:
+                        lane_nav_action[lane_i] = nav_a
+                        mask_buf[lane_i, nav_slot] = 1.0
         agent.set_action_masks(mask_buf.reshape(-1))
 
     def map_action(idx, lane):
@@ -948,6 +992,18 @@ def main() -> int:
         # through restarts.
         if reset_slot is not None and idx == reset_slot:
             return action_by_value[0], None
+        # NAV slot: the learned base action routing the avatar one BFS
+        # step toward the nearest target. Resolved in update_action_mask
+        # (and only unmasked when resolvable); fall back to a valid
+        # action if the frame moved since.
+        if nav_slot is not None and idx == nav_slot:
+            nonlocal nav_uses
+            na = lane_nav_action[lane]
+            if na is not None and na in avail_actions[lane]:
+                nav_uses += 1
+                return action_by_value[na], None
+            aa = avail_actions[lane]
+            return action_by_value[aa[0] if aa else 1], None
         # Object-click slot: ACTION6 aimed at the i-th largest object's
         # centroid. The mask guarantees ACTION6 availability and object
         # existence at mask-build time; if the frame changed since, fall
@@ -1135,6 +1191,43 @@ def main() -> int:
     # Purely statistical, no game knowledge.
     color_moves = [collections.Counter() for _ in range(n_games)]
     lane_prev_cstats = [None] * n_lanes
+    # (nav-action) Learned inverse dynamics: per-game EMA of the avatar
+    # displacement (dy, dx) produced by each base action 1..NUM_ACTIONS.
+    # Updated when a SINGLE base action was taken between two frames and
+    # the avatar moved. Lets the nav slot pick the action whose effect
+    # matches the BFS-desired direction — no game knowledge.
+    action_effect = [dict() for _ in range(n_games)]   # a -> [dy, dx]
+    action_effect_n = [collections.Counter() for _ in range(n_games)]
+    nav_uses = 0  # diagnostic
+
+    def action_effects_ready(g_idx):
+        ae = action_effect_n[g_idx]
+        # need a calibrated effect for >= 3 distinct base moves
+        return sum(1 for a in ae if ae[a] >= 8) >= 3
+
+    def nav_action_for(g_idx, frm, av_c, targets):
+        """Base action (1..NUM_ACTIONS) whose learned displacement best
+        matches the BFS first step toward the nearest target. None when
+        no reachable target / effects uncalibrated."""
+        if av_c is None or not targets or not action_effects_ready(g_idx):
+            return None
+        step = _bfs_first(frm.astype(np.int32), av_c, set(targets))
+        if step is None:
+            return None
+        sy, sx = step
+        best_a, best_dot = None, -1e9
+        for a, n in action_effect_n[g_idx].items():
+            if n < 8:
+                continue
+            ey, ex = action_effect[g_idx][a]
+            mag = (ey * ey + ex * ex) ** 0.5
+            if mag < 1e-6:
+                continue
+            dot = (sy * ey + sx * ex) / mag  # cosine-ish (step is unit)
+            if dot > best_dot:
+                best_dot, best_a = dot, a
+        # require the best action to actually point the right way
+        return best_a if best_dot > 0.3 else None
 
     def avatar_color_of(g_idx):
         mc = color_moves[g_idx]
@@ -1908,6 +2001,26 @@ def main() -> int:
                             if (abs(st["cy"] - pv["cy"])
                                     + abs(st["cx"] - pv["cx"])) > 0.005:
                                 color_moves[g_idx_r][c] += 1
+                        # (nav-action) Learn this base action's effect on
+                        # the avatar. Only when a BASE move (idx <
+                        # NUM_ACTIONS) was taken and the avatar exists in
+                        # both frames; EMA the displacement.
+                        av_now = avatar_color_of(g_idx_r)
+                        a_taken = int(actions[i])
+                        if (nav_slot is not None and av_now is not None
+                                and a_taken < NUM_ACTIONS
+                                and av_now in cs_now and av_now in cs_prev):
+                            dy = cs_now[av_now]["cy"] - cs_prev[av_now]["cy"]
+                            dx = cs_now[av_now]["cx"] - cs_prev[av_now]["cx"]
+                            if abs(dy) + abs(dx) > 0.003:
+                                ga_id = a_taken + 1
+                                cur = action_effect[g_idx_r].get(ga_id)
+                                if cur is None:
+                                    action_effect[g_idx_r][ga_id] = [dy, dx]
+                                else:
+                                    cur[0] = 0.8 * cur[0] + 0.2 * dy
+                                    cur[1] = 0.8 * cur[1] + 0.2 * dx
+                                action_effect_n[g_idx_r][ga_id] += 1
                     lane_prev_cstats[i] = cs_now
                     if lane_pred[i] is None:
                         continue
@@ -2205,6 +2318,8 @@ def main() -> int:
                     )
                 if args.stagnation_reset > 0:
                     trail_tag += f" sr={stagnation_resets}"
+                if nav_slot is not None:
+                    trail_tag += f" nav={nav_uses}"
                     # Per-level archive occupancy of game 0 — at a
                     # glance: are stepping stones accumulating at the
                     # frontier level?
