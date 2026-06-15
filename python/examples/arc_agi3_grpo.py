@@ -1013,18 +1013,26 @@ def main() -> int:
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
                             and len(_nav_dump) < 80):
                         _nav_dump_calls[0] += 1
-                        # sample every 11th L3 decision to SPREAD across
-                        # many episodes/visits, not one trajectory.
-                        if _nav_dump_calls[0] % 11 == 0:
+                        # sample every 3rd L3 decision: dense enough to see
+                        # within-episode avatar movement + pickup collection.
+                        if _nav_dump_calls[0] % 3 == 0:
                             all_md = sorted(
                                 int(c) for c, r in (gr["color"] or {}).items()
                                 if not r["survives"] and c != avc)
                             present_md = [c for c in all_md if c in frm_colors]
+                            fi2 = frm.astype(np.int32)
+                            md_cells = {int(c): int(np.sum(fi2 == c))
+                                        for c in all_md}
+                            ay, ax = np.argwhere(fi2 == avc).mean(axis=0) \
+                                if (fi2 == avc).any() else (-1, -1)
                             _nav_dump.append({
                                 "lvl": int(last_levels[lane_i]),
                                 "ep_step": int(ep_step[lane_i]),
+                                "lane": int(lane_i),
                                 "all_md": all_md,
                                 "present_md": present_md,
+                                "md_cells": md_cells,
+                                "av_pos": [int(ay), int(ax)],
                                 "exit_leg": len(present_md) == 0,
                                 "tgt": sorted(int(t) for t in tgt),
                                 "bfs_ok": nav_a is not None,
