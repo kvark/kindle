@@ -1318,9 +1318,20 @@ def main() -> int:
     # the nav slot routes with — no game knowledge anywhere.
     lane_prev_cstats = [None] * n_lanes
     # color_act_eff[g][c][gid] = [dy, dx] EMA ; _n[g][c][gid] = count
+    # (used for AVATAR DETECTION via per-action distinctness).
     color_act_eff = [collections.defaultdict(dict) for _ in range(n_games)]
     color_act_eff_n = [collections.defaultdict(collections.Counter)
                        for _ in range(n_games)]
+    # sprite_act_eff[g][gid] = [dy, dx] EMA of the SPRITE-MASK centroid
+    # (all avatar colors). Used for NAV ROUTING: the single-cell core
+    # jitters within the re-orienting sprite (same action -> +dy then
+    # -dy), so its per-component EMA cancels to ~0 and nav can't route;
+    # the full-sprite centroid is stable. (Detection still uses the
+    # per-color table; this needs the sprite known, which detection
+    # supplies.)
+    sprite_act_eff = [dict() for _ in range(n_games)]
+    sprite_act_eff_n = [collections.Counter() for _ in range(n_games)]
+    lane_prev_sprite_cen = [None] * n_lanes
     nav_uses = 0  # diagnostic
     nav_gate = collections.Counter()  # diagnostic: why nav didn't fire
     import os as _os
@@ -1401,6 +1412,13 @@ def main() -> int:
         av = avatar_color_of(g_idx)
         if av is None:
             return None
+        # Prefer the STABLE sprite-centroid inverse-dynamics once it has
+        # >= 3 calibrated actions; the per-color core table jitters and
+        # cancels to ~0 (see sprite_act_eff comment). Fall back to the
+        # core table while the sprite table is still warming up.
+        sn = sprite_act_eff_n[g_idx]
+        if sum(1 for a in sn if sn[a] >= 8) >= 3:
+            return sprite_act_eff[g_idx], sprite_act_eff_n[g_idx]
         return color_act_eff[g_idx][av], color_act_eff_n[g_idx][av]
 
     def action_effects_ready(g_idx):
@@ -2227,6 +2245,16 @@ def main() -> int:
                     cs_now = _cstats(cur_os)
                     cs_prev = lane_prev_cstats[i]
                     a_taken = int(actions[i])
+                    # (nav) STABLE sprite-mask centroid for routing effects.
+                    spr_cen = None
+                    _spr_now = avatar_set_of(g_idx_r)
+                    if _spr_now:
+                        _m = np.isin(frm.astype(np.int32), list(_spr_now))
+                        if _m.any():
+                            _ys, _xs = _m.nonzero()
+                            spr_cen = (float(_ys.mean()) / 63.0,
+                                       float(_xs.mean()) / 63.0)
+                    spr_prev = lane_prev_sprite_cen[i]
                     if (cs_prev is not None and nav_slot is not None
                             and a_taken < NUM_ACTIONS):
                         # (nav-action) Learn per-color, per-action inverse
@@ -2265,6 +2293,20 @@ def main() -> int:
                                     cur[0] = 0.8 * cur[0] + 0.2 * dy
                                     cur[1] = 0.8 * cur[1] + 0.2 * dx
                                 color_act_eff_n[g_idx_r][c][ga_id] += 1
+                        # sprite-centroid effect (stable; primary for nav)
+                        if spr_cen is not None and spr_prev is not None:
+                            sdy = spr_cen[0] - spr_prev[0]
+                            sdx = spr_cen[1] - spr_prev[1]
+                            sd = abs(sdy) + abs(sdx)
+                            if 0.003 < sd < 0.15:
+                                scur = sprite_act_eff[g_idx_r].get(ga_id)
+                                if scur is None:
+                                    sprite_act_eff[g_idx_r][ga_id] = [sdy, sdx]
+                                else:
+                                    scur[0] = 0.8 * scur[0] + 0.2 * sdy
+                                    scur[1] = 0.8 * scur[1] + 0.2 * sdx
+                                sprite_act_eff_n[g_idx_r][ga_id] += 1
+                    lane_prev_sprite_cen[i] = spr_cen
                     lane_prev_cstats[i] = cs_now
                     if lane_pred[i] is None:
                         continue
