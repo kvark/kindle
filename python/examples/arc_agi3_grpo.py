@@ -1193,50 +1193,104 @@ def main() -> int:
     # retracing KNOWN ground toward a goal is not stagnation. Reset
     # at rule anchors (level start).
     lane_best_phi = [None] * n_lanes
-    # (rule v3) Controllability detection: per-game counts of how often
-    # each color's mean position moved between consecutive frames. The
-    # dominant mover is the avatar — the object the actions control.
-    # Purely statistical, no game knowledge.
-    color_moves = [collections.Counter() for _ in range(n_games)]
+    # (rule v3 / nav-action) Controllability detection via ACTION
+    # CORRELATION. For each color that is a single connected blob (n==1)
+    # in both frames, EMA the centroid displacement (dy,dx) produced by
+    # each base action 1..NUM_ACTIONS. The avatar is the color whose
+    # per-action directions are most DISTINCT (cardinal spread) — its
+    # motion depends on which action was pressed. This rejects
+    # deterministic drifters (e.g. tu93's budget bar shrinks left every
+    # step regardless of action: high move-count but zero distinctness)
+    # that a naive "most-moving color" heuristic mistakes for the avatar.
+    # The chosen avatar's per-action EMA IS the inverse-dynamics table
+    # the nav slot routes with — no game knowledge anywhere.
     lane_prev_cstats = [None] * n_lanes
-    # (nav-action) Learned inverse dynamics: per-game EMA of the avatar
-    # displacement (dy, dx) produced by each base action 1..NUM_ACTIONS.
-    # Updated when a SINGLE base action was taken between two frames and
-    # the avatar moved. Lets the nav slot pick the action whose effect
-    # matches the BFS-desired direction — no game knowledge.
-    action_effect = [dict() for _ in range(n_games)]   # a -> [dy, dx]
-    action_effect_n = [collections.Counter() for _ in range(n_games)]
+    # color_act_eff[g][c][gid] = [dy, dx] EMA ; _n[g][c][gid] = count
+    color_act_eff = [collections.defaultdict(dict) for _ in range(n_games)]
+    color_act_eff_n = [collections.defaultdict(collections.Counter)
+                       for _ in range(n_games)]
     nav_uses = 0  # diagnostic
     nav_gate = collections.Counter()  # diagnostic: why nav didn't fire
+    _avatar_cache = [None] * n_games   # (color_or_None, stamp)
+    _avatar_calls = [0] * n_games
+
+    def _distinctness(effs, effs_n):
+        """Mean pairwise distance between the per-action unit directions
+        of a color (only actions with >= 8 samples). High => the color
+        moves a different way per action (avatar-like)."""
+        units = []
+        for gid, n in effs_n.items():
+            if n < 8:
+                continue
+            ey, ex = effs[gid]
+            mag = (ey * ey + ex * ex) ** 0.5
+            if mag < 1e-9:
+                continue
+            units.append((ey / mag, ex / mag))
+        if len(units) < 3:
+            return 0.0, len(units)
+        s, npair = 0.0, 0
+        for i in range(len(units)):
+            for j in range(i + 1, len(units)):
+                dy = units[i][0] - units[j][0]
+                dx = units[i][1] - units[j][1]
+                s += (dy * dy + dx * dx) ** 0.5
+                npair += 1
+        return s / npair, len(units)
+
+    def avatar_color_of(g_idx):
+        # memoize: recompute at most every 64 calls (per-lane-per-step).
+        _avatar_calls[g_idx] += 1
+        cached = _avatar_cache[g_idx]
+        if cached is not None and (_avatar_calls[g_idx] - cached[1]) < 64:
+            return cached[0]
+        best_c, best_score = None, 0.0
+        for c, effs in color_act_eff[g_idx].items():
+            score, nready = _distinctness(effs, color_act_eff_n[g_idx][c])
+            if nready >= 3 and score > best_score:
+                best_score, best_c = score, c
+        # require genuine action-correlation (drifters score ~0; clean
+        # cardinal avatars score ~1.5). Threshold well clear of noise.
+        avatar = best_c if best_score > 0.9 else None
+        _avatar_cache[g_idx] = (avatar, _avatar_calls[g_idx])
+        return avatar
+
+    def avatar_effects(g_idx):
+        av = avatar_color_of(g_idx)
+        if av is None:
+            return None
+        return color_act_eff[g_idx][av], color_act_eff_n[g_idx][av]
 
     def action_effects_ready(g_idx):
-        ae = action_effect_n[g_idx]
-        # need a calibrated effect for >= 3 distinct base moves
-        return sum(1 for a in ae if ae[a] >= 8) >= 3
+        # The avatar is only selected once its per-action effects are
+        # calibrated, so a non-None avatar IS ready by construction.
+        return avatar_color_of(g_idx) is not None
 
     def nav_action_for(g_idx, frm, av_c, targets):
-        """Base action (1..NUM_ACTIONS) whose learned displacement best
-        matches the BFS first step toward the nearest target. None when
-        no reachable target / effects uncalibrated."""
+        """Base action (GameAction value) whose learned avatar
+        displacement best matches the BFS first step toward the nearest
+        target. None when no reachable target / effects uncalibrated."""
         if av_c is None:
             nav_gate["no_avc"] += 1
             return None
         if not targets:
             nav_gate["no_tgt"] += 1
             return None
-        if not action_effects_ready(g_idx):
+        eff = avatar_effects(g_idx)
+        if eff is None:
             nav_gate["ae_notready"] += 1
             return None
+        effs, effs_n = eff
         step = _bfs_first(frm.astype(np.int32), av_c, set(targets))
         if step is None:
             nav_gate["no_bfs"] += 1
             return None
         sy, sx = step
         best_a, best_dot = None, -1e9
-        for a, n in action_effect_n[g_idx].items():
+        for a, n in effs_n.items():
             if n < 8:
                 continue
-            ey, ex = action_effect[g_idx][a]
+            ey, ex = effs[a]
             mag = (ey * ey + ex * ex) ** 0.5
             if mag < 1e-6:
                 continue
@@ -1249,17 +1303,6 @@ def main() -> int:
             return best_a
         nav_gate["low_cos"] += 1
         return None
-
-    def avatar_color_of(g_idx):
-        mc = color_moves[g_idx]
-        if not mc:
-            return None
-        top = mc.most_common(2)
-        if top[0][1] < 100:
-            return None
-        if len(top) > 1 and top[0][1] < 2 * top[1][1]:
-            return None  # no dominant mover yet
-        return top[0][0]
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -1272,7 +1315,12 @@ def main() -> int:
         h = frame_hash(frm)
         if h != lane_objset_hash[i]:
             lane_objset_hash[i] = h
-            lane_objset_cache[i] = _objset(frm.astype(np.int32))
+            # cap 64 (not the library default 16): tu93 has ~32 wall
+            # segments + floor + budget bar that crowd out the small
+            # (1-cell) avatar under a 16-object area cap, making it
+            # invisible to avatar detection and rule inference alike.
+            lane_objset_cache[i] = _objset(frm.astype(np.int32),
+                                           max_objects=64)
         return lane_objset_cache[i]
 
     def refresh_rules(g_idx):
@@ -2014,44 +2062,33 @@ def main() -> int:
                     # (v3) Controllability statistics: which color moved?
                     cs_now = _cstats(cur_os)
                     cs_prev = lane_prev_cstats[i]
-                    if cs_prev is not None:
+                    a_taken = int(actions[i])
+                    if (cs_prev is not None and nav_slot is not None
+                            and a_taken < NUM_ACTIONS):
+                        # (nav-action) Learn per-color, per-action inverse
+                        # dynamics: for every single-blob (n==1) color that
+                        # exists in both frames, EMA the centroid
+                        # displacement this base action produced. The
+                        # avatar is later picked as the color whose
+                        # per-action directions are most distinct
+                        # (avatar_color_of) — so we DON'T need to know the
+                        # avatar first (no chicken-and-egg). n==1 excludes
+                        # the maze, floor, and segmented UI.
+                        ga_id = a_taken + 1
                         for c, st in cs_now.items():
                             pv = cs_prev.get(c)
-                            if pv is None:
+                            if pv is None or st["n"] != 1 or pv["n"] != 1:
                                 continue
-                            # Avatar = a SINGLE connected blob that
-                            # translates rigidly. Restricting the mover
-                            # tally to n==1 colors excludes segmented UI
-                            # (tu93's 13-segment budget bar), pickup sets,
-                            # and the static maze — all multi-object — so
-                            # the controllable character wins the
-                            # dominance test cleanly. Generic: the
-                            # controllable char is one blob in ~every game.
-                            if st["n"] != 1 or pv["n"] != 1:
-                                continue
-                            if (abs(st["cy"] - pv["cy"])
-                                    + abs(st["cx"] - pv["cx"])) > 0.005:
-                                color_moves[g_idx_r][c] += 1
-                        # (nav-action) Learn this base action's effect on
-                        # the avatar. Only when a BASE move (idx <
-                        # NUM_ACTIONS) was taken and the avatar exists in
-                        # both frames; EMA the displacement.
-                        av_now = avatar_color_of(g_idx_r)
-                        a_taken = int(actions[i])
-                        if (nav_slot is not None and av_now is not None
-                                and a_taken < NUM_ACTIONS
-                                and av_now in cs_now and av_now in cs_prev):
-                            dy = cs_now[av_now]["cy"] - cs_prev[av_now]["cy"]
-                            dx = cs_now[av_now]["cx"] - cs_prev[av_now]["cx"]
+                            dy = st["cy"] - pv["cy"]
+                            dx = st["cx"] - pv["cx"]
                             if abs(dy) + abs(dx) > 0.003:
-                                ga_id = a_taken + 1
-                                cur = action_effect[g_idx_r].get(ga_id)
+                                cur = color_act_eff[g_idx_r][c].get(ga_id)
                                 if cur is None:
-                                    action_effect[g_idx_r][ga_id] = [dy, dx]
+                                    color_act_eff[g_idx_r][c][ga_id] = [dy, dx]
                                 else:
                                     cur[0] = 0.8 * cur[0] + 0.2 * dy
                                     cur[1] = 0.8 * cur[1] + 0.2 * dx
-                                action_effect_n[g_idx_r][ga_id] += 1
+                                color_act_eff_n[g_idx_r][c][ga_id] += 1
                     lane_prev_cstats[i] = cs_now
                     if lane_pred[i] is None:
                         continue
