@@ -987,15 +987,28 @@ def main() -> int:
                     nav_gate["no_avc"] += 1
                 else:
                     frm = np.asarray(o.frame[0])
+                    frm_colors = set(np.unique(frm).tolist())
+                    # Must-disappear targets (pickups) that are STILL
+                    # PRESENT this frame. Using the rule set unfiltered
+                    # would keep targeting already-collected colors (absent
+                    # from the frame) — BFS then finds no path AND the
+                    # exit-leg never fires, so the agent strands itself
+                    # after the last pickup. Multi-leg routing falls out of
+                    # this naturally: each collected pickup drops from the
+                    # present set, so nav retargets the next nearest one,
+                    # then the exit once none remain.
                     tgt = {c for c, r in (gr["color"] or {}).items()
-                           if not r["survives"] and c != avc}
+                           if not r["survives"] and c != avc
+                           and c in frm_colors}
                     if not tgt and gr["rel"]:
                         # exit leg: target the avatar's relational
                         # partner color (where it must end up).
                         for (c1, c2) in gr["rel"]:
                             if avc in (c1, c2):
-                                tgt = {c2 if c1 == avc else c1}
-                                break
+                                partner = c2 if c1 == avc else c1
+                                if partner in frm_colors:
+                                    tgt = {partner}
+                                    break
                     nav_a = nav_action_for(g_idx, frm, avc, tgt)
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
                             and len(_nav_dump) < 40):
