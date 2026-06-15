@@ -1998,6 +1998,16 @@ def main() -> int:
                             pv = cs_prev.get(c)
                             if pv is None:
                                 continue
+                            # Avatar = a SINGLE connected blob that
+                            # translates rigidly. Restricting the mover
+                            # tally to n==1 colors excludes segmented UI
+                            # (tu93's 13-segment budget bar), pickup sets,
+                            # and the static maze — all multi-object — so
+                            # the controllable character wins the
+                            # dominance test cleanly. Generic: the
+                            # controllable char is one blob in ~every game.
+                            if st["n"] != 1 or pv["n"] != 1:
+                                continue
                             if (abs(st["cy"] - pv["cy"])
                                     + abs(st["cx"] - pv["cx"])) > 0.005:
                                 color_moves[g_idx_r][c] += 1
