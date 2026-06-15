@@ -1011,26 +1011,30 @@ def main() -> int:
                                     break
                     nav_a = nav_action_for(g_idx, frm, avc, tgt)
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
-                            and len(_nav_dump) < 40):
-                        fi = frm.astype(np.int32)
-                        av_cells = int(np.sum(fi == avc))
-                        _as = avatar_set_of(g_idx) or {avc}
-                        step = _bfs_first(fi, _as, set(tgt)) if tgt else None
-                        _nav_dump.append({
-                            "frame": fi.copy(), "avc": int(avc),
-                            "tgt": sorted(int(t) for t in tgt),
-                            "nav_a": (int(nav_a) if nav_a is not None
-                                      else -1),
-                            "bfs": (list(step) if step else []),
-                            "av_cells": av_cells,
-                            "lvl": int(last_levels[lane_i]),
-                        })
-                        if len(_nav_dump) == 40:
-                            import pickle as _pk
-                            with open("/tmp/l3runs/nav_l3_dump.pkl",
-                                      "wb") as _df:
-                                _pk.dump(_nav_dump, _df)
-                            print("[nav-dump] wrote 40 L3 nav records")
+                            and len(_nav_dump) < 80):
+                        _nav_dump_calls[0] += 1
+                        # sample every 11th L3 decision to SPREAD across
+                        # many episodes/visits, not one trajectory.
+                        if _nav_dump_calls[0] % 11 == 0:
+                            all_md = sorted(
+                                int(c) for c, r in (gr["color"] or {}).items()
+                                if not r["survives"] and c != avc)
+                            present_md = [c for c in all_md if c in frm_colors]
+                            _nav_dump.append({
+                                "lvl": int(last_levels[lane_i]),
+                                "ep_step": int(ep_step[lane_i]),
+                                "all_md": all_md,
+                                "present_md": present_md,
+                                "exit_leg": len(present_md) == 0,
+                                "tgt": sorted(int(t) for t in tgt),
+                                "bfs_ok": nav_a is not None,
+                            })
+                            if len(_nav_dump) == 80:
+                                import pickle as _pk
+                                with open("/tmp/l3runs/nav_l3_dump.pkl",
+                                          "wb") as _df:
+                                    _pk.dump(_nav_dump, _df)
+                                print("[nav-dump] wrote 80 L3 records")
                     if nav_a is not None and nav_a in avail_actions[lane_i]:
                         lane_nav_action[lane_i] = nav_a
                         mask_buf[lane_i, nav_slot] = 1.0
@@ -1259,6 +1263,7 @@ def main() -> int:
     import os as _os
     _NAV_DUMP = bool(_os.environ.get("NAV_DUMP"))
     _nav_dump = []  # captured L3 nav-decision records when NAV_DUMP set
+    _nav_dump_calls = [0]
     _avatar_cache = [None] * n_games   # (color_or_None, set, stamp)
     _avatar_calls = [0] * n_games
 
