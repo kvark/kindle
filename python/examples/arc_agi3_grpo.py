@@ -1013,30 +1013,30 @@ def main() -> int:
                         fi3 = frm.astype(np.int32)
                         npix = fi3.size
                         bg3 = int(np.bincount(fi3.flatten()).argmax())
-                        # Exclude the avatar's OWN sprite colors: the
-                        # relation rule trivially pairs the avatar core
-                        # (color 4) with its always-adjacent body (color 9)
-                        # -> exit-leg "routes to itself" and never moves
-                        # (observed: stuck at one cell, tgt=9). The exit is
-                        # a DIFFERENT object.
+                        # Always exclude the avatar's OWN sprite colors (the
+                        # relation rule trivially pairs the core with its
+                        # adjacent body -> "routes to itself", never moves).
                         sprite = avatar_set_of(g_idx) or {avc}
+                        # Score each present relational partner. PREFER a
+                        # small, distinctive object (the exit/goal), but
+                        # NEVER strand: rank by (is-structural, is-bg, cells)
+                        # and always pick the best available. Over-filtering
+                        # to "decline" broke L2 completion (the agent could
+                        # no longer reach the exit after the pickup).
                         cand = []
                         for (c1, c2) in gr["rel"]:
                             if avc not in (c1, c2):
                                 continue
                             partner = c2 if c1 == avc else c1
-                            if partner not in frm_colors or partner == bg3:
-                                continue
-                            if partner in sprite:
+                            if partner not in frm_colors or partner in sprite:
                                 continue
                             cells = int(np.sum(fi3 == partner))
-                            # skip structural colors (>3% of frame)
-                            if cells > 0.03 * npix:
-                                continue
-                            cand.append((cells, partner))
+                            structural = 1 if cells > 0.03 * npix else 0
+                            is_bg = 1 if partner == bg3 else 0
+                            cand.append((is_bg, structural, cells, partner))
                         if cand:
                             cand.sort()
-                            tgt = {cand[0][1]}
+                            tgt = {cand[0][3]}
                     nav_a = nav_action_for(g_idx, frm, avc, tgt)
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
                             and len(_nav_dump) < 80):
