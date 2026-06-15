@@ -1062,6 +1062,16 @@ def main() -> int:
                                 if cc.size:
                                     ppos[int(c)] = [int(cc.mean(0)[0]),
                                                     int(cc.mean(0)[1])]
+                            _eff = avatar_effects(g_idx)
+                            eff_tbl = {}
+                            if _eff is not None:
+                                _e, _en = _eff
+                                eff_tbl = {int(a): [round(_e[a][0], 4),
+                                                    round(_e[a][1], 4),
+                                                    int(_en[a])]
+                                           for a in _e}
+                            _stp = _bfs_first(fi2, _spr, set(tgt)) \
+                                if tgt else None
                             _nav_dump.append({
                                 "lvl": int(last_levels[lane_i]),
                                 "ep_step": int(ep_step[lane_i]),
@@ -1076,6 +1086,10 @@ def main() -> int:
                                 "frame": fi2.copy(),
                                 "exit_leg": len(present_md) == 0,
                                 "tgt": sorted(int(t) for t in tgt),
+                                "bfs_step": (list(_stp) if _stp else []),
+                                "nav_a": (int(nav_a) if nav_a is not None
+                                          else -1),
+                                "eff": eff_tbl,
                                 "bfs_ok": nav_a is not None,
                             })
                             if len(_nav_dump) == 24:
