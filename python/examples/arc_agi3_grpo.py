@@ -197,6 +197,17 @@ def main() -> int:
                         "learned from the agent's own experience. "
                         "Requires --rule-goal-coef>0 for target rules. "
                         "0 = off.")
+    parser.add_argument("--nav-force-frontier", type=float, default=0.0,
+                        help="Probability of FORCING the nav action on a "
+                        "lane currently at the frontier (deepest-seen) "
+                        "level whenever nav resolves there. The frontier "
+                        "level has no reward signal yet (never won), so "
+                        "the policy chooses nav only at its prior (~6%); "
+                        "without commitment it cannot complete a multi-leg "
+                        "pickup->...->exit route under the step budget. "
+                        "Generic exploration assist (route is computed "
+                        "generically), analogous to --frontier-random-"
+                        "steps but goal-directed. 0 = off.")
     parser.add_argument("--reset-action", type=int, default=0,
                         help="Expose GameAction RESET (id 0) as a "
                         "learnable discrete action slot. RESET restarts "
@@ -1245,13 +1256,25 @@ def main() -> int:
         if cached is not None and (_avatar_calls[g_idx] - cached[1]) < 64:
             return cached[0]
         best_c, best_score = None, 0.0
+        scores = {}
         for c, effs in color_act_eff[g_idx].items():
             score, nready = _distinctness(effs, color_act_eff_n[g_idx][c])
-            if nready >= 3 and score > best_score:
-                best_score, best_c = score, c
+            if nready >= 3:
+                scores[c] = score
+                if score > best_score:
+                    best_score, best_c = score, c
         # require genuine action-correlation (drifters score ~0; clean
         # cardinal avatars score ~1.5). Threshold well clear of noise.
         avatar = best_c if best_score > 0.9 else None
+        # Hysteresis: tu93's avatar sprite spans a few co-moving colors
+        # (4/9/14) with near-equal distinctness, so the argmax flickers
+        # between them frame-to-frame, churning the effect table and BFS
+        # start cell. Keep the previous avatar if it still scores within
+        # 85% of the new best — only switch on a clear improvement.
+        prev = cached[0] if cached is not None else None
+        if (prev is not None and prev in scores and scores[prev] > 0.9
+                and scores[prev] >= 0.85 * best_score):
+            avatar = prev
         _avatar_cache[g_idx] = (avatar, _avatar_calls[g_idx])
         return avatar
 
@@ -1743,6 +1766,25 @@ def main() -> int:
                         # avail holds 1-based action values; the agent's
                         # action index is value-1 (see map_action).
                         actions[li] = avail[rng.randrange(len(avail))] - 1
+
+            # (nav) Frontier-nav commitment. On a lane at the deepest-seen
+            # level (the unsolved frontier, e.g. L3) where nav resolved
+            # this step, force the nav action with prob p. The frontier
+            # has no reward gradient yet, so the policy under-uses nav
+            # there; committing to the computed route is what completes a
+            # multi-leg pickup->exit run within budget. Generic assist.
+            if (nav_slot is not None and args.nav_force_frontier > 0.0):
+                actions = list(actions)
+                for li in range(n_lanes):
+                    if lane_nav_action[li] is None:
+                        continue
+                    g_idx_f = li // K
+                    frontier_f = max(
+                        max_levels_seen[g_idx_f * K:(g_idx_f + 1) * K]
+                    )
+                    if (last_levels[li] >= frontier_f
+                            and rng.random() < args.nav_force_frontier):
+                        actions[li] = nav_slot
 
             # Record action history per lane for skill capture on
             # level-up below.
