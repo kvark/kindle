@@ -1092,12 +1092,13 @@ def main() -> int:
                                 "eff": eff_tbl,
                                 "bfs_ok": nav_a is not None,
                             })
-                            if len(_nav_dump) == 24:
+                            if len(_nav_dump) >= 24:
                                 import pickle as _pk
                                 with open("/tmp/l3runs/nav_l3_dump.pkl",
                                           "wb") as _df:
                                     _pk.dump(_nav_dump, _df)
                                 print("[nav-dump] wrote 24 L3 records")
+                                _nav_dump.clear()  # rolling: latest 24
                     if nav_a is not None and nav_a in avail_actions[lane_i]:
                         lane_nav_action[lane_i] = nav_a
                         mask_buf[lane_i, nav_slot] = 1.0

@@ -629,21 +629,25 @@ def bfs_first_step(
     av = np.argwhere(av_mask)
     if av.size == 0 or not target_colors:
         return None
-    ay, ax = av.mean(axis=0).astype(int)
     passable = (a == background_color) | av_mask | np.isin(a, list(target_colors))
     H, W = a.shape
-    if not passable[ay, ax]:
-        ay, ax = int(av[0][0]), int(av[0][1])
     tgt = np.isin(a, list(target_colors))
-    # BFS storing the first-step direction taken from the avatar cell.
-    seen = np.zeros((H, W), dtype=bool)
+    # MULTI-SOURCE BFS seeded from the WHOLE sprite. The avatar moves as
+    # a 3x3 blob; seeding from the sprite centroid made the "first step"
+    # a move WITHIN the sprite (e.g. centroid -> body cell), which the
+    # agent can't act on and which stalls it at junctions. Instead, seed
+    # every sprite cell at distance 0 and record, for each cell the BFS
+    # leaves the sprite into, the DIRECTION of that exit move. That
+    # direction is a real avatar move (out of the blob toward the goal).
+    seen = av_mask.copy()
     q = deque()
-    seen[ay, ax] = True
-    for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-        ny, nx = ay + dy, ax + dx
-        if 0 <= ny < H and 0 <= nx < W and passable[ny, nx]:
-            seen[ny, nx] = True
-            q.append((ny, nx, (dy, dx)))
+    for (sy, sx) in av:
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = sy + dy, sx + dx
+            if (0 <= ny < H and 0 <= nx < W and passable[ny, nx]
+                    and not seen[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, (dy, dx)))
     while q:
         y, x, first = q.popleft()
         if tgt[y, x]:
