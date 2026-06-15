@@ -1013,12 +1013,21 @@ def main() -> int:
                         fi3 = frm.astype(np.int32)
                         npix = fi3.size
                         bg3 = int(np.bincount(fi3.flatten()).argmax())
+                        # Exclude the avatar's OWN sprite colors: the
+                        # relation rule trivially pairs the avatar core
+                        # (color 4) with its always-adjacent body (color 9)
+                        # -> exit-leg "routes to itself" and never moves
+                        # (observed: stuck at one cell, tgt=9). The exit is
+                        # a DIFFERENT object.
+                        sprite = avatar_set_of(g_idx) or {avc}
                         cand = []
                         for (c1, c2) in gr["rel"]:
                             if avc not in (c1, c2):
                                 continue
                             partner = c2 if c1 == avc else c1
                             if partner not in frm_colors or partner == bg3:
+                                continue
+                            if partner in sprite:
                                 continue
                             cells = int(np.sum(fi3 == partner))
                             # skip structural colors (>3% of frame)
