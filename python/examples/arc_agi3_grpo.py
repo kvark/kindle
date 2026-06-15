@@ -968,7 +968,13 @@ def main() -> int:
                 g_idx = lane_i // K
                 gr = game_rules[g_idx]
                 avc = avatar_color_of(g_idx)
-                if o.frame and gr and avc is not None:
+                if not (o.frame):
+                    nav_gate["no_frame"] += 1
+                elif gr is None:
+                    nav_gate["no_gr"] += 1
+                elif avc is None:
+                    nav_gate["no_avc"] += 1
+                else:
                     frm = np.asarray(o.frame[0])
                     tgt = {c for c, r in (gr["color"] or {}).items()
                            if not r["survives"] and c != avc}
@@ -983,6 +989,8 @@ def main() -> int:
                     if nav_a is not None and nav_a in avail_actions[lane_i]:
                         lane_nav_action[lane_i] = nav_a
                         mask_buf[lane_i, nav_slot] = 1.0
+                    elif nav_a is not None:
+                        nav_gate["not_avail"] += 1
         agent.set_action_masks(mask_buf.reshape(-1))
 
     def map_action(idx, lane):
@@ -1199,6 +1207,7 @@ def main() -> int:
     action_effect = [dict() for _ in range(n_games)]   # a -> [dy, dx]
     action_effect_n = [collections.Counter() for _ in range(n_games)]
     nav_uses = 0  # diagnostic
+    nav_gate = collections.Counter()  # diagnostic: why nav didn't fire
 
     def action_effects_ready(g_idx):
         ae = action_effect_n[g_idx]
@@ -1209,10 +1218,18 @@ def main() -> int:
         """Base action (1..NUM_ACTIONS) whose learned displacement best
         matches the BFS first step toward the nearest target. None when
         no reachable target / effects uncalibrated."""
-        if av_c is None or not targets or not action_effects_ready(g_idx):
+        if av_c is None:
+            nav_gate["no_avc"] += 1
+            return None
+        if not targets:
+            nav_gate["no_tgt"] += 1
+            return None
+        if not action_effects_ready(g_idx):
+            nav_gate["ae_notready"] += 1
             return None
         step = _bfs_first(frm.astype(np.int32), av_c, set(targets))
         if step is None:
+            nav_gate["no_bfs"] += 1
             return None
         sy, sx = step
         best_a, best_dot = None, -1e9
@@ -1227,7 +1244,11 @@ def main() -> int:
             if dot > best_dot:
                 best_dot, best_a = dot, a
         # require the best action to actually point the right way
-        return best_a if best_dot > 0.3 else None
+        if best_dot > 0.3:
+            nav_gate["resolved"] += 1
+            return best_a
+        nav_gate["low_cos"] += 1
+        return None
 
     def avatar_color_of(g_idx):
         mc = color_moves[g_idx]
@@ -2330,6 +2351,14 @@ def main() -> int:
                     trail_tag += f" sr={stagnation_resets}"
                 if nav_slot is not None:
                     trail_tag += f" nav={nav_uses}"
+                    if nav_gate:
+                        g0 = game_rules[0] if 0 < len(game_rules) else None
+                        av0 = avatar_color_of(0)
+                        ar0 = action_effects_ready(0)
+                        top_g = nav_gate.most_common(3)
+                        trail_tag += (" navg[" + ",".join(
+                            f"{k}:{v}" for k, v in top_g)
+                            + f"|av0={av0} ready0={ar0}]")
                     # Per-level archive occupancy of game 0 — at a
                     # glance: are stepping stones accumulating at the
                     # frontier level?
