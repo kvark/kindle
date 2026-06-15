@@ -1001,14 +1001,33 @@ def main() -> int:
                            if not r["survives"] and c != avc
                            and c in frm_colors}
                     if not tgt and gr["rel"]:
-                        # exit leg: target the avatar's relational
-                        # partner color (where it must end up).
+                        # exit leg: target the avatar's relational partner
+                        # color (where it must end up). Prefer a SMALL,
+                        # distinctive partner — the exit/goal is a compact
+                        # object, whereas the maze walls (color 2 in tu93,
+                        # ~thousands of cells across dozens of components)
+                        # are a structural color the relation rule
+                        # spuriously pairs with the ever-present avatar.
+                        # Routing to walls strands the avatar adjacent to
+                        # them (observed: stuck at one cell for 27 steps).
+                        fi3 = frm.astype(np.int32)
+                        npix = fi3.size
+                        bg3 = int(np.bincount(fi3.flatten()).argmax())
+                        cand = []
                         for (c1, c2) in gr["rel"]:
-                            if avc in (c1, c2):
-                                partner = c2 if c1 == avc else c1
-                                if partner in frm_colors:
-                                    tgt = {partner}
-                                    break
+                            if avc not in (c1, c2):
+                                continue
+                            partner = c2 if c1 == avc else c1
+                            if partner not in frm_colors or partner == bg3:
+                                continue
+                            cells = int(np.sum(fi3 == partner))
+                            # skip structural colors (>3% of frame)
+                            if cells > 0.03 * npix:
+                                continue
+                            cand.append((cells, partner))
+                        if cand:
+                            cand.sort()
+                            tgt = {cand[0][1]}
                     nav_a = nav_action_for(g_idx, frm, avc, tgt)
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
                             and len(_nav_dump) < 80):
