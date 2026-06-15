@@ -2164,7 +2164,19 @@ def main() -> int:
                                 continue
                             dy = st["cy"] - pv["cy"]
                             dx = st["cx"] - pv["cx"]
-                            if abs(dy) + abs(dx) > 0.003:
+                            # Reject TELEPORTS: a single grid move is small
+                            # (~0.02-0.05 normalized); level transitions,
+                            # episode resets and archive RESTORES jump the
+                            # avatar across the frame (>0.15). Those huge
+                            # deltas poison the EMA (alpha=0.2 can't shrug a
+                            # 0.5 jump), collapsing the per-action
+                            # directions to one diagonal and destroying the
+                            # cardinal signal avatar detection relies on.
+                            # The live run restores constantly, so this cap
+                            # is essential (a low-restore standalone barely
+                            # shows the corruption).
+                            d = abs(dy) + abs(dx)
+                            if 0.003 < d < 0.15:
                                 cur = color_act_eff[g_idx_r][c].get(ga_id)
                                 if cur is None:
                                     color_act_eff[g_idx_r][c][ga_id] = [dy, dx]
