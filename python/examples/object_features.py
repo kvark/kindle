@@ -616,11 +616,21 @@ def bfs_first_step(
     if background_color is None:
         vals, counts = np.unique(a, return_counts=True)
         background_color = int(vals[counts.argmax()])
-    av = np.argwhere(a == avatar_color)
+    # avatar_color may be a single color or a SET of co-moving sprite
+    # colors. A multi-color sprite (e.g. tu93's core + body + facing
+    # marker) would otherwise trap BFS: the detected core cell is walled
+    # in by its own body colors. Treat the whole sprite as passable and
+    # start from its centroid.
+    if isinstance(avatar_color, (set, frozenset, list, tuple)):
+        av_colors = list(avatar_color)
+    else:
+        av_colors = [avatar_color]
+    av_mask = np.isin(a, av_colors)
+    av = np.argwhere(av_mask)
     if av.size == 0 or not target_colors:
         return None
     ay, ax = av.mean(axis=0).astype(int)
-    passable = (a == background_color) | (a == avatar_color) | np.isin(a, list(target_colors))
+    passable = (a == background_color) | av_mask | np.isin(a, list(target_colors))
     H, W = a.shape
     if not passable[ay, ax]:
         ay, ax = int(av[0][0]), int(av[0][1])

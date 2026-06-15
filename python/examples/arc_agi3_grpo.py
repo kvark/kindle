@@ -1001,7 +1001,8 @@ def main() -> int:
                             and len(_nav_dump) < 40):
                         fi = frm.astype(np.int32)
                         av_cells = int(np.sum(fi == avc))
-                        step = _bfs_first(fi, avc, set(tgt)) if tgt else None
+                        _as = avatar_set_of(g_idx) or {avc}
+                        step = _bfs_first(fi, _as, set(tgt)) if tgt else None
                         _nav_dump.append({
                             "frame": fi.copy(), "avc": int(avc),
                             "tgt": sorted(int(t) for t in tgt),
@@ -1245,7 +1246,7 @@ def main() -> int:
     import os as _os
     _NAV_DUMP = bool(_os.environ.get("NAV_DUMP"))
     _nav_dump = []  # captured L3 nav-decision records when NAV_DUMP set
-    _avatar_cache = [None] * n_games   # (color_or_None, stamp)
+    _avatar_cache = [None] * n_games   # (color_or_None, set, stamp)
     _avatar_calls = [0] * n_games
 
     def _distinctness(effs, effs_n):
@@ -1272,12 +1273,11 @@ def main() -> int:
                 npair += 1
         return s / npair, len(units)
 
-    def avatar_color_of(g_idx):
-        # memoize: recompute at most every 64 calls (per-lane-per-step).
+    def _recompute_avatar(g_idx):
         _avatar_calls[g_idx] += 1
         cached = _avatar_cache[g_idx]
-        if cached is not None and (_avatar_calls[g_idx] - cached[1]) < 64:
-            return cached[0]
+        if cached is not None and (_avatar_calls[g_idx] - cached[2]) < 64:
+            return cached
         best_c, best_score = None, 0.0
         scores = {}
         for c, effs in color_act_eff[g_idx].items():
@@ -1298,8 +1298,23 @@ def main() -> int:
         if (prev is not None and prev in scores and scores[prev] > 0.9
                 and scores[prev] >= 0.85 * best_score):
             avatar = prev
-        _avatar_cache[g_idx] = (avatar, _avatar_calls[g_idx])
-        return avatar
+        # The avatar SPRITE = ALL co-moving action-correlated colors
+        # (distinctness > 0.9). The primary avatar (cleanest cardinal,
+        # for the effect table + BFS start) is one cell of it, but the
+        # sprite's other colors box it in — BFS must treat the whole
+        # sprite as passable or it can never leave the start cell.
+        av_set = {c for c, s in scores.items() if s > 0.9}
+        if avatar is not None:
+            av_set.add(avatar)
+        result = (avatar, av_set, _avatar_calls[g_idx])
+        _avatar_cache[g_idx] = result
+        return result
+
+    def avatar_color_of(g_idx):
+        return _recompute_avatar(g_idx)[0]
+
+    def avatar_set_of(g_idx):
+        return _recompute_avatar(g_idx)[1]
 
     def avatar_effects(g_idx):
         av = avatar_color_of(g_idx)
@@ -1327,7 +1342,10 @@ def main() -> int:
             nav_gate["ae_notready"] += 1
             return None
         effs, effs_n = eff
-        step = _bfs_first(frm.astype(np.int32), av_c, set(targets))
+        # Pass the whole avatar sprite as passable (the core color is
+        # boxed in by its own body colors otherwise — see analyze_dump).
+        av_set = avatar_set_of(g_idx) or {av_c}
+        step = _bfs_first(frm.astype(np.int32), av_set, set(targets))
         if step is None:
             nav_gate["no_bfs"] += 1
             return None
