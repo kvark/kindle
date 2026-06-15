@@ -1039,7 +1039,7 @@ def main() -> int:
                             tgt = {cand[0][3]}
                     nav_a = nav_action_for(g_idx, frm, avc, tgt)
                     if (_NAV_DUMP and last_levels[lane_i] >= 2
-                            and len(_nav_dump) < 80):
+                            and len(_nav_dump) < 24):
                         _nav_dump_calls[0] += 1
                         # sample every 3rd L3 decision: dense enough to see
                         # within-episode avatar movement + pickup collection.
@@ -1071,18 +1071,19 @@ def main() -> int:
                                 "md_cells": md_cells,
                                 "av_pos": [int(ay), int(ax)],
                                 "pickup_pos": ppos,
-                                "bfs_dist": (round(float(pdist), 4)
-                                             if pdist is not None else -1),
+                                "sprite": sorted(int(c) for c in _spr),
+                                "bg": int(np.bincount(fi2.flatten()).argmax()),
+                                "frame": fi2.copy(),
                                 "exit_leg": len(present_md) == 0,
                                 "tgt": sorted(int(t) for t in tgt),
                                 "bfs_ok": nav_a is not None,
                             })
-                            if len(_nav_dump) == 80:
+                            if len(_nav_dump) == 24:
                                 import pickle as _pk
                                 with open("/tmp/l3runs/nav_l3_dump.pkl",
                                           "wb") as _df:
                                     _pk.dump(_nav_dump, _df)
-                                print("[nav-dump] wrote 80 L3 records")
+                                print("[nav-dump] wrote 24 L3 records")
                     if nav_a is not None and nav_a in avail_actions[lane_i]:
                         lane_nav_action[lane_i] = nav_a
                         mask_buf[lane_i, nav_slot] = 1.0
