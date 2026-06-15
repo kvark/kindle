@@ -1053,6 +1053,15 @@ def main() -> int:
                                         for c in all_md}
                             ay, ax = np.argwhere(fi2 == avc).mean(axis=0) \
                                 if (fi2 == avc).any() else (-1, -1)
+                            _spr = avatar_set_of(g_idx) or {avc}
+                            pdist = _bfs_dist(fi2, avc, set(tgt)) if tgt \
+                                else None
+                            ppos = {}
+                            for c in present_md:
+                                cc = np.argwhere(fi2 == c)
+                                if cc.size:
+                                    ppos[int(c)] = [int(cc.mean(0)[0]),
+                                                    int(cc.mean(0)[1])]
                             _nav_dump.append({
                                 "lvl": int(last_levels[lane_i]),
                                 "ep_step": int(ep_step[lane_i]),
@@ -1061,6 +1070,9 @@ def main() -> int:
                                 "present_md": present_md,
                                 "md_cells": md_cells,
                                 "av_pos": [int(ay), int(ax)],
+                                "pickup_pos": ppos,
+                                "bfs_dist": (round(float(pdist), 4)
+                                             if pdist is not None else -1),
                                 "exit_leg": len(present_md) == 0,
                                 "tgt": sorted(int(t) for t in tgt),
                                 "bfs_ok": nav_a is not None,
