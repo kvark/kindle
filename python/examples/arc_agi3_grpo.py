@@ -197,6 +197,15 @@ def main() -> int:
                         "learned from the agent's own experience. "
                         "Requires --rule-goal-coef>0 for target rules. "
                         "0 = off.")
+    parser.add_argument("--fog-nav", type=int, default=0,
+                        help="Fog-of-war navigation: accumulate a "
+                        "persistent per-episode map (revealed walls + "
+                        "explored mask) and route on it — to the exit "
+                        "color when visible/remembered, else to the "
+                        "nearest unexplored FRONTIER to reveal more maze. "
+                        "Replaces single-frame BFS (which plans through "
+                        "fog that turns to walls). Requires --nav-action. "
+                        "0 = off.")
     parser.add_argument("--nav-force-frontier", type=float, default=0.0,
                         help="Probability of FORCING the nav action on a "
                         "lane currently at the frontier (deepest-seen) "
@@ -769,6 +778,7 @@ def main() -> int:
             nearest_target_distance as _waypoint_dist,
             bfs_target_distance as _bfs_dist,
             bfs_first_step as _bfs_first,
+            fog_nav_step as _fog_nav,
             color_stats as _cstats,
         )
 
@@ -979,7 +989,20 @@ def main() -> int:
                 g_idx = lane_i // K
                 gr = game_rules[g_idx]
                 avc = avatar_color_of(g_idx)
-                if not (o.frame):
+                if args.fog_nav and o.frame and avc is not None:
+                    # Fog-of-war path: explore the maze (building a map)
+                    # until the exit is revealed, then route to it. Works
+                    # even before rules exist (exploration needs only the
+                    # avatar); the exit target comes from rules when ready.
+                    nav_a = fog_nav_resolve(
+                        g_idx, lane_i, np.asarray(o.frame[0]).astype(np.int32),
+                        avc)
+                    if nav_a is not None and nav_a in avail_actions[lane_i]:
+                        lane_nav_action[lane_i] = nav_a
+                        mask_buf[lane_i, nav_slot] = 1.0
+                    elif nav_a is not None:
+                        nav_gate["not_avail"] += 1
+                elif not (o.frame):
                     nav_gate["no_frame"] += 1
                 elif gr is None:
                     nav_gate["no_gr"] += 1
@@ -1467,6 +1490,99 @@ def main() -> int:
             return best_a
         nav_gate["low_cos"] += 1
         return None
+
+    def action_for_step(g_idx, step):
+        """Pick the base action whose learned (sprite-centroid) effect
+        best matches a desired (dy,dx) step. Shared by BFS and fog-nav."""
+        if step is None:
+            return None
+        eff = avatar_effects(g_idx)
+        if eff is None:
+            return None
+        effs, effs_n = eff
+        sy, sx = step
+        best_a, best_dot = None, -1e9
+        for a, n in effs_n.items():
+            if n < 8:
+                continue
+            ey, ex = effs[a]
+            mag = (ey * ey + ex * ex) ** 0.5
+            if mag < 1e-6:
+                continue
+            dot = (sy * ey + sx * ex) / mag
+            if dot > best_dot:
+                best_dot, best_a = dot, a
+        return best_a if best_dot > 0.3 else None
+
+    # --- Fog-of-war map state (per lane), reset on level/episode change.
+    # tu93 only ever shows ~15% of the maze; unexplored fog reads as the
+    # SAME color as floor and walls reveal on approach, so single-frame
+    # BFS plans through fog. We accumulate a persistent map and route on
+    # it: explore frontiers until the exit is revealed, then go to it.
+    lane_wall_map = [None] * n_lanes
+    lane_expl_map = [None] * n_lanes
+    lane_goal_pos = [None] * n_lanes      # remembered exit centroid
+    lane_map_level = [-1] * n_lanes       # level the maps were built for
+    lane_map_epstep = [0] * n_lanes       # ep_step when maps last reset
+    fog_uses = 0  # diagnostic
+
+    def fog_nav_resolve(g_idx, lane_i, frm, avc):
+        """Accumulate the persistent map from this frame and return the
+        base action toward the exit (if visible/remembered) else toward
+        the nearest unexplored frontier. frm is int32 64x64."""
+        nonlocal fog_uses
+        H, W = frm.shape
+        # (re)init maps on level change OR episode/restore boundary
+        # (ep_step going backward = reset/Go-Explore restore -> the maze
+        # layout may have swapped, so the accumulated map is stale).
+        if (lane_map_level[lane_i] != last_levels[lane_i]
+                or ep_step[lane_i] < lane_map_epstep[lane_i]
+                or lane_wall_map[lane_i] is None):
+            lane_wall_map[lane_i] = np.zeros((H, W), dtype=bool)
+            lane_expl_map[lane_i] = np.zeros((H, W), dtype=bool)
+            lane_goal_pos[lane_i] = None
+            lane_map_level[lane_i] = last_levels[lane_i]
+        lane_map_epstep[lane_i] = ep_step[lane_i]
+        wmap = lane_wall_map[lane_i]
+        emap = lane_expl_map[lane_i]
+        gr = game_rules[g_idx]
+        sprite = avatar_set_of(g_idx) or {avc}
+        bg = int(np.bincount(frm.flatten()).argmax())
+        tgtcolors = set()
+        if gr:
+            tgtcolors = {int(c) for c, r in (gr["color"] or {}).items()
+                         if not r["survives"] and c != avc}
+        # walls = everything not floor/avatar/target (UI bars included,
+        # harmless at the frame edge). Fog (floor-color) is NOT a wall.
+        keep = list(sprite | tgtcolors | {bg})
+        wmap |= ~np.isin(frm, keep)
+        emap |= (frm != bg)                       # non-floor = revealed
+        avm = np.isin(frm, list(sprite))
+        for (y, x) in np.argwhere(avm):           # reveal radius around avatar
+            emap[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+        # exit: visible target this frame, else remembered location
+        tmask = (np.isin(frm, list(tgtcolors))
+                 if tgtcolors else np.zeros((H, W), dtype=bool))
+        if tmask.any():
+            cc = np.argwhere(tmask)
+            lane_goal_pos[lane_i] = (int(cc[:, 0].mean()),
+                                     int(cc[:, 1].mean()))
+        elif lane_goal_pos[lane_i] is not None:
+            gy, gx = lane_goal_pos[lane_i]
+            tmask = np.zeros((H, W), dtype=bool)
+            tmask[gy, gx] = True
+        step = _fog_nav(wmap, emap, avm,
+                        tmask if tmask.any() else None)
+        if step is None:
+            nav_gate["fog_nostep"] += 1
+            return None
+        a = action_for_step(g_idx, step)
+        if a is None:
+            nav_gate["fog_lowcos"] += 1
+            return None
+        nav_gate["fog_resolved"] += 1
+        fog_uses += 1
+        return a
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
     lane_phi = [None] * n_lanes
@@ -2607,6 +2723,8 @@ def main() -> int:
                     trail_tag += f" sr={stagnation_resets}"
                 if nav_slot is not None:
                     trail_tag += f" nav={nav_uses}"
+                    if args.fog_nav:
+                        trail_tag += f" fog={fog_uses}"
                     if nav_gate:
                         g0 = game_rules[0] if 0 < len(game_rules) else None
                         av0 = avatar_color_of(0)

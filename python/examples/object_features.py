@@ -658,3 +658,71 @@ def bfs_first_step(
                 seen[ny, nx] = True
                 q.append((ny, nx, first))
     return None
+
+
+def fog_nav_step(wall_map, explored_map, avatar_mask, target_mask=None):
+    """FOG-OF-WAR navigation. The frame only ever shows ~15% of the maze;
+    unexplored cells read as the SAME color as floor, and walls are
+    revealed only as the avatar approaches. So single-frame BFS plans
+    straight through fog that turns into walls — it never works.
+
+    This routes over a PERSISTENT, accumulated map instead:
+      - wall_map[y,x]:     cells ever observed as a wall (walls persist).
+      - explored_map[y,x]: cells whose content is known (within the
+                           avatar's reveal radius at some past step).
+      - avatar_mask:       current avatar (sprite) cells.
+      - target_mask:       currently-visible goal cells, or None.
+
+    Two modes (multi-source BFS from the avatar, never entering walls):
+      1. EXPLOIT — if the goal is visible, return the first step toward
+         the nearest goal cell.
+      2. EXPLORE — otherwise head to the nearest FRONTIER: an explored,
+         non-wall cell adjacent to an UNEXPLORED cell. Reaching frontiers
+         reveals new maze and, eventually, the goal.
+    Returns a (dy,dx) unit step that LEAVES the avatar blob, or None.
+    """
+    from collections import deque
+    a = np.asarray
+    wall = a(wall_map)
+    expl = a(explored_map)
+    av = a(avatar_mask)
+    H, W = wall.shape
+    src = np.argwhere(av)
+    if src.size == 0:
+        return None
+    passable = ~wall                       # fog is optimistically passable
+    if target_mask is not None and a(target_mask).any():
+        goal = a(target_mask) & passable
+        goal_is_frontier = False
+    else:
+        # frontier = explored, non-wall, adjacent to an unexplored cell
+        unexpl = ~expl
+        adj = np.zeros((H, W), dtype=bool)
+        adj[:-1, :] |= unexpl[1:, :]
+        adj[1:, :] |= unexpl[:-1, :]
+        adj[:, :-1] |= unexpl[:, 1:]
+        adj[:, 1:] |= unexpl[:, :-1]
+        goal = expl & passable & adj
+        goal_is_frontier = True
+    if not goal.any():
+        return None
+    seen = av.copy()
+    q = deque()
+    for (sy, sx) in src:
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = sy + dy, sx + dx
+            if (0 <= ny < H and 0 <= nx < W and passable[ny, nx]
+                    and not seen[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, (dy, dx)))
+    while q:
+        y, x, first = q.popleft()
+        if goal[y, x]:
+            return first
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = y + dy, x + dx
+            if (0 <= ny < H and 0 <= nx < W and not seen[ny, nx]
+                    and passable[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, first))
+    return None
