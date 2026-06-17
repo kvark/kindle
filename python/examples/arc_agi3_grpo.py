@@ -1540,6 +1540,13 @@ def main() -> int:
     gl_wall = {}                          # (g_idx, lvl) -> bool 64x64
     gl_expl = {}                          # (g_idx, lvl) -> bool 64x64
     gl_goal = {}                          # (g_idx, lvl) -> exit centroid
+    # Bump-walls are UNCERTAIN (a stall could be a policy step or a
+    # movement glitch, not a real wall) so they must NOT persist — a few
+    # false walls per attempt compound across the persistent map and box
+    # the avatar in (observed: fog_nostep explodes, fog stops). Keep them
+    # in a TRANSIENT per-lane overlay, reset each episode.
+    lane_bump = [None] * n_lanes          # transient bump-wall overlay
+    lane_bump_ep = [0] * n_lanes          # ep_step when overlay last reset
     lane_prev_av = [None] * n_lanes       # prev avatar centroid (fog-nav)
     lane_prev_step = [None] * n_lanes     # prev fog-nav (dy,dx) issued
     lane_stuck = [0] * n_lanes            # consecutive no-move count
@@ -1558,6 +1565,12 @@ def main() -> int:
             gl_expl[key] = np.zeros((H, W), dtype=bool)
         wmap = gl_wall[key]
         emap = gl_expl[key]
+        # transient bump overlay, reset on episode/restore boundary
+        if (lane_bump[lane_i] is None
+                or ep_step[lane_i] < lane_bump_ep[lane_i]):
+            lane_bump[lane_i] = np.zeros((H, W), dtype=bool)
+        lane_bump_ep[lane_i] = ep_step[lane_i]
+        bumpmap = lane_bump[lane_i]
         gr = game_rules[g_idx]
         sprite = avatar_set_of(g_idx) or {avc}
         bg = int(np.bincount(frm.flatten()).argmax())
@@ -1605,7 +1618,9 @@ def main() -> int:
                 if lane_stuck[lane_i] >= 2:
                     dy, dx = ps
                     by, bx = ay + dy * 5, ax + dx * 5  # one cell-step beyond
-                    wmap[max(0, by - 1):by + 2, max(0, bx - 1):bx + 2] = True
+                    # write to the TRANSIENT overlay, not the persistent map
+                    bumpmap[max(0, by - 1):by + 2,
+                            max(0, bx - 1):bx + 2] = True
         else:
             ay = ax = -1
         # TARGET (exit): the rule-known must-disappear color when known;
@@ -1624,7 +1639,7 @@ def main() -> int:
             tmask = np.zeros((H, W), dtype=bool)
             tmask[gy, gx] = True
         lane_prev_av[lane_i] = (ay, ax) if ay >= 0 else None
-        step = _fog_nav(wmap, emap, avm,
+        step = _fog_nav(wmap | bumpmap, emap, avm,
                         tmask if tmask.any() else None)
         lane_prev_step[lane_i] = step
         if step is None:
