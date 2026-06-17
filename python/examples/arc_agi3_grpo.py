@@ -1536,6 +1536,10 @@ def main() -> int:
         for dot, a in ranked:
             if a not in blocked:
                 return a
+        # 3) EVERYTHING blocked -> never freeze: take the goal-ward best
+        #    anyway (caller clears the blocked set so escape can restart).
+        if ranked and ranked[0][0] > 0.3:
+            return ranked[0][1]
         return None
 
     # --- Fog-of-war map state (per lane), reset on level/episode change.
@@ -1634,6 +1638,11 @@ def main() -> int:
                 lane_blocked[lane_i].clear()
             elif lane_prev_action[lane_i] is not None:
                 lane_blocked[lane_i].add(lane_prev_action[lane_i])
+                # all 4 cardinal move-dirs blocked & still no movement ->
+                # truly stuck this frame; clear so escape restarts (rely on
+                # bump + BFS reroute) rather than freezing fog forever.
+                if len(lane_blocked[lane_i]) >= 4:
+                    lane_blocked[lane_i].clear()
             if moved:
                 lane_stuck[lane_i] = 0
             elif ps is not None:
