@@ -1371,6 +1371,9 @@ def main() -> int:
     _NAV_DUMP = bool(_os.environ.get("NAV_DUMP"))
     _nav_dump = []  # captured L3 nav-decision records when NAV_DUMP set
     _nav_dump_calls = [0]
+    _FOG_DUMP = bool(_os.environ.get("FOG_DUMP"))
+    _fog_dump = []
+    _fog_dump_calls = [0]
     _avatar_cache = [None] * n_games   # (color_or_None, set, stamp)
     _avatar_calls = [0] * n_games
 
@@ -1605,6 +1608,27 @@ def main() -> int:
             return None
         nav_gate["fog_resolved"] += 1
         fog_uses += 1
+        if _FOG_DUMP:
+            _fog_dump_calls[0] += 1
+            if _fog_dump_calls[0] % 5 == 0 and len(_fog_dump) < 200:
+                exit_seen = bool(tgtcolors) and \
+                    bool(np.isin(frm, list(tgtcolors)).any())
+                avc2 = np.argwhere(avm)
+                _fog_dump.append({
+                    "lane": int(lane_i), "ep_step": int(ep_step[lane_i]),
+                    "av": [int(avc2[:, 0].mean()), int(avc2[:, 1].mean())]
+                    if len(avc2) else [-1, -1],
+                    "explored": int(emap.sum()), "wall": int(wmap.sum()),
+                    "mode": "exploit" if tmask.any() else "explore",
+                    "exit_seen": exit_seen,
+                    "goal": list(lane_goal_pos[lane_i])
+                    if lane_goal_pos[lane_i] else None,
+                })
+                if len(_fog_dump) >= 200:
+                    import pickle as _pk
+                    with open("/tmp/l3runs/fog_dump.pkl", "wb") as _df:
+                        _pk.dump(_fog_dump, _df)
+                    print("[fog-dump] wrote 200 L3 fog records")
         return a
     ep_start_objset = [None] * n_lanes
     lane_pred = [None] * n_lanes      # predicted win stats for this episode
