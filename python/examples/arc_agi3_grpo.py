@@ -206,6 +206,12 @@ def main() -> int:
                         "Replaces single-frame BFS (which plans through "
                         "fog that turns to walls). Requires --nav-action. "
                         "0 = off.")
+    parser.add_argument("--nav-force-min-level", type=int, default=2,
+                        help="Only force fog/nav on the frontier when the "
+                        "frontier level (levels_completed) is >= this. "
+                        "Keeps L1/L2 bootstrapping via random+archive (which "
+                        "form the rules fog-nav needs); force only at the "
+                        "deep frontier where navigation is the bottleneck.")
     parser.add_argument("--nav-force-frontier", type=float, default=0.0,
                         help="Probability of FORCING the nav action on a "
                         "lane currently at the frontier (deepest-seen) "
@@ -1552,17 +1558,31 @@ def main() -> int:
         if gr:
             tgtcolors = {int(c) for c, r in (gr["color"] or {}).items()
                          if not r["survives"] and c != avc}
-        # walls = everything not floor/avatar/target (UI bars included,
-        # harmless at the frame edge). Fog (floor-color) is NOT a wall.
-        keep = list(sprite | tgtcolors | {bg})
-        wmap |= ~np.isin(frm, keep)
+        # WALLS = LARGE structural colors only. A color is a wall if it
+        # is non-floor, non-avatar, non-target AND covers many cells
+        # (>16). Small/rare non-floor colors (the exit marker, items) are
+        # NOT walls — otherwise, BEFORE rules exist, the exit color is
+        # treated as a wall and the agent routes AROUND it, never wins,
+        # never forms rules (deadlock). Generic: structure is big, goals
+        # are small.
+        counts = np.bincount(frm.flatten(), minlength=16)
+        wall_colors = {int(c) for c in range(len(counts))
+                       if counts[c] > 16 and c != bg
+                       and c not in sprite and c not in tgtcolors}
+        wmap |= np.isin(frm, list(wall_colors)) if wall_colors else \
+            np.zeros((H, W), dtype=bool)
         emap |= (frm != bg)                       # non-floor = revealed
         avm = np.isin(frm, list(sprite))
         for (y, x) in np.argwhere(avm):           # reveal radius around avatar
             emap[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
-        # exit: visible target this frame, else remembered location
-        tmask = (np.isin(frm, list(tgtcolors))
-                 if tgtcolors else np.zeros((H, W), dtype=bool))
+        # TARGET (exit): the rule-known must-disappear color when known;
+        # else any small/rare non-floor color present (candidate exit) so
+        # the agent BEELINES to it pre-rules and bootstraps the win.
+        if tgtcolors:
+            tmask = np.isin(frm, list(tgtcolors))
+        else:
+            cand = (frm != bg) & (~avm) & (~np.isin(frm, list(wall_colors)))
+            tmask = cand
         if tmask.any():
             cc = np.argwhere(tmask)
             lane_goal_pos[lane_i] = (int(cc[:, 0].mean()),
@@ -2039,7 +2059,14 @@ def main() -> int:
                     frontier_f = max(
                         max_levels_seen[g_idx_f * K:(g_idx_f + 1) * K]
                     )
+                    # Only force on a DEEP frontier (>= nav_force_min_level).
+                    # L1/L2 must bootstrap with the proven random+archive
+                    # mechanisms — forcing fog-nav there starves them (they
+                    # win the early levels that form the rules fog-nav needs)
+                    # and the agent stalls at L0 (evt=0). Force where
+                    # navigation is the actual bottleneck: L3+.
                     if (last_levels[li] >= frontier_f
+                            and frontier_f >= args.nav_force_min_level
                             and rng.random() < args.nav_force_frontier):
                         actions[li] = nav_slot
 
