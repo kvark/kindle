@@ -1665,6 +1665,11 @@ def main() -> int:
                     "mode": "exploit" if tmask.any() else "explore",
                     "exit_seen": exit_seen,
                     "goal": list(gl_goal[key]) if gl_goal.get(key) else None,
+                    "tgtcolors": sorted(int(c) for c in tgtcolors),
+                    "c8": [[int(y), int(x)] for y, x in np.argwhere(frm == 8)],
+                    "c15": [[int(y), int(x)]
+                            for y, x in np.argwhere(frm == 15)],
+                    "frame": frm.copy() if len(_fog_dump) < 6 else None,
                 })
                 if len(_fog_dump) >= 200:
                     import pickle as _pk
