@@ -1541,6 +1541,7 @@ def main() -> int:
     gl_expl = {}                          # (g_idx, lvl) -> bool 64x64
     gl_goal = {}                          # (g_idx, lvl) -> exit centroid (diag)
     gl_target = {}                        # (g_idx, lvl) -> bool 64x64 pickup cells
+    gl_bumpcount = {}                     # (g_idx, lvl) -> int16 episodes-bumped
     # Bump-walls are UNCERTAIN (a stall could be a policy step or a
     # movement glitch, not a real wall) so they must NOT persist — a few
     # false walls per attempt compound across the persistent map and box
@@ -1564,6 +1565,7 @@ def main() -> int:
         if key not in gl_wall:
             gl_wall[key] = np.zeros((H, W), dtype=bool)
             gl_expl[key] = np.zeros((H, W), dtype=bool)
+            gl_bumpcount[key] = np.zeros((H, W), dtype=np.int16)
         wmap = gl_wall[key]
         emap = gl_expl[key]
         # transient bump overlay, reset on episode/restore boundary
@@ -1619,9 +1621,20 @@ def main() -> int:
                 if lane_stuck[lane_i] >= 2:
                     dy, dx = ps
                     by, bx = ay + dy * 5, ax + dx * 5  # one cell-step beyond
-                    # write to the TRANSIENT overlay, not the persistent map
-                    bumpmap[max(0, by - 1):by + 2,
-                            max(0, bx - 1):bx + 2] = True
+                    y0, y1 = max(0, by - 1), by + 2
+                    x0, x1 = max(0, bx - 1), bx + 2
+                    # newly bumped cells THIS episode (not already in the
+                    # transient overlay) -> raise their CONFIDENCE count.
+                    sub = bumpmap[y0:y1, x0:x1]
+                    newb = ~sub
+                    bumpmap[y0:y1, x0:x1] = True
+                    bc = gl_bumpcount[key]
+                    bc[y0:y1, x0:x1][newb] += 1
+                    # An INVISIBLE wall (never color-revealed) bumped in
+                    # >=3 separate episodes is real -> persist it so the
+                    # map completes and BFS can route the detour. One-off
+                    # false bumps stay below threshold (no over-walling).
+                    gl_wall[key][bc >= 3] = True
         else:
             ay = ax = -1
         # TARGET map: tu93 L3 has MULTIPLE pickup clusters (3 color-8/15
