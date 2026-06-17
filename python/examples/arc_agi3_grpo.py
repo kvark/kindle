@@ -995,11 +995,14 @@ def main() -> int:
                 g_idx = lane_i // K
                 gr = game_rules[g_idx]
                 avc = avatar_color_of(g_idx)
-                if args.fog_nav and o.frame and avc is not None:
-                    # Fog-of-war path: explore the maze (building a map)
-                    # until the exit is revealed, then route to it. Works
-                    # even before rules exist (exploration needs only the
-                    # avatar); the exit target comes from rules when ready.
+                if (args.fog_nav and o.frame and avc is not None
+                        and last_levels[lane_i] >= args.nav_force_min_level):
+                    # Fog-of-war path, ISOLATED to the deep frontier (L3+):
+                    # L1/L2 must bootstrap via the proven random+archive
+                    # path (engaging fog-nav there lets the policy lean on
+                    # it and starves the bootstrap -> evt stays ~0). Explore
+                    # the maze (building a map) until the exit reveals, then
+                    # route to it. Rule-free (exploration needs only avatar).
                     nav_a = fog_nav_resolve(
                         g_idx, lane_i, np.asarray(o.frame[0]).astype(np.int32),
                         avc)
