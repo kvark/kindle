@@ -1539,7 +1539,8 @@ def main() -> int:
     # spatial memory (remember the maze you've seen), NOT path-memorizing.
     gl_wall = {}                          # (g_idx, lvl) -> bool 64x64
     gl_expl = {}                          # (g_idx, lvl) -> bool 64x64
-    gl_goal = {}                          # (g_idx, lvl) -> exit centroid
+    gl_goal = {}                          # (g_idx, lvl) -> exit centroid (diag)
+    gl_target = {}                        # (g_idx, lvl) -> bool 64x64 pickup cells
     # Bump-walls are UNCERTAIN (a stall could be a policy step or a
     # movement glitch, not a real wall) so they must NOT persist — a few
     # false walls per attempt compound across the persistent map and box
@@ -1623,21 +1624,34 @@ def main() -> int:
                             max(0, bx - 1):bx + 2] = True
         else:
             ay = ax = -1
-        # TARGET (exit): the rule-known must-disappear color when known;
-        # else any small/rare non-floor color present (candidate exit) so
-        # the agent BEELINES to it pre-rules and bootstraps the win.
+        # TARGET map: tu93 L3 has MULTIPLE pickup clusters (3 color-8/15
+        # blocks); the level completes when all are collected. Targeting
+        # the centroid of all of them lands on EMPTY SPACE between clusters
+        # (observed goal=[29,23] = mean of 3 clusters). Instead keep a
+        # PERSISTENT target-cell map: add every revealed pickup cell, and
+        # REMOVE cells confirmed collected (within the avatar's reveal
+        # radius this frame yet no longer the pickup color). fog_nav_step
+        # then routes to the NEAREST remaining pickup -> visit them one by
+        # one (multi-pickup), exactly as the human does.
+        if key not in gl_target:
+            gl_target[key] = np.zeros((H, W), dtype=bool)
+        tg = gl_target[key]
         if tgtcolors:
-            tmask = np.isin(frm, list(tgtcolors))
+            vis_tgt = np.isin(frm, list(tgtcolors))
         else:
-            cand = (frm != bg) & (~avm) & (~np.isin(frm, list(wall_colors)))
-            tmask = cand
-        if tmask.any():
-            cc = np.argwhere(tmask)
+            vis_tgt = (frm != bg) & (~avm) & \
+                (~np.isin(frm, list(wall_colors)))
+        tg |= vis_tgt                              # add revealed pickups
+        # drop collected: remembered targets now inside the reveal radius
+        # but no longer the pickup color.
+        revealed_now = np.zeros((H, W), dtype=bool)
+        for (y, x) in avcells:
+            revealed_now[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+        tg &= ~(revealed_now & ~vis_tgt)
+        if vis_tgt.any():
+            cc = np.argwhere(vis_tgt)
             gl_goal[key] = (int(cc[:, 0].mean()), int(cc[:, 1].mean()))
-        elif gl_goal.get(key) is not None:
-            gy, gx = gl_goal[key]
-            tmask = np.zeros((H, W), dtype=bool)
-            tmask[gy, gx] = True
+        tmask = tg
         lane_prev_av[lane_i] = (ay, ax) if ay >= 0 else None
         step = _fog_nav(wmap | bumpmap, emap, avm,
                         tmask if tmask.any() else None)
