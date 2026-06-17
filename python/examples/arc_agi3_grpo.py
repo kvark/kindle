@@ -1536,6 +1536,8 @@ def main() -> int:
     lane_goal_pos = [None] * n_lanes      # remembered exit centroid
     lane_map_level = [-1] * n_lanes       # level the maps were built for
     lane_map_epstep = [0] * n_lanes       # ep_step when maps last reset
+    lane_prev_av = [None] * n_lanes       # prev avatar centroid (fog-nav)
+    lane_prev_step = [None] * n_lanes     # prev fog-nav (dy,dx) issued
     fog_uses = 0  # diagnostic
 
     def fog_nav_resolve(g_idx, lane_i, frm, avc):
@@ -1553,6 +1555,8 @@ def main() -> int:
             lane_wall_map[lane_i] = np.zeros((H, W), dtype=bool)
             lane_expl_map[lane_i] = np.zeros((H, W), dtype=bool)
             lane_goal_pos[lane_i] = None
+            lane_prev_av[lane_i] = None
+            lane_prev_step[lane_i] = None
             lane_map_level[lane_i] = last_levels[lane_i]
         lane_map_epstep[lane_i] = ep_step[lane_i]
         wmap = lane_wall_map[lane_i]
@@ -1579,8 +1583,27 @@ def main() -> int:
             np.zeros((H, W), dtype=bool)
         emap |= (frm != bg)                       # non-floor = revealed
         avm = np.isin(frm, list(sprite))
-        for (y, x) in np.argwhere(avm):           # reveal radius around avatar
+        avcells = np.argwhere(avm)
+        for (y, x) in avcells:                     # reveal radius around avatar
             emap[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+        # BUMP DETECTION: walls can be INVISIBLE — a cell may be a wall
+        # in-game yet render as floor-color (fog), so BFS routes into it,
+        # the avatar bumps and does NOT move, but the map never learns the
+        # wall -> permanent stuck at a junction (observed: 26+ steps frozen
+        # at one cell). If the avatar didn't move since the last fog step,
+        # the cell one step beyond it in that direction is a wall: mark it.
+        if len(avcells):
+            ay = int(avcells[:, 0].mean())
+            ax = int(avcells[:, 1].mean())
+            pv = lane_prev_av[lane_i]
+            ps = lane_prev_step[lane_i]
+            if (pv is not None and ps is not None
+                    and abs(ay - pv[0]) + abs(ax - pv[1]) <= 2):
+                dy, dx = ps
+                by, bx = ay + dy * 5, ax + dx * 5   # ~one cell-step beyond
+                wmap[max(0, by - 1):by + 2, max(0, bx - 1):bx + 2] = True
+        else:
+            ay = ax = -1
         # TARGET (exit): the rule-known must-disappear color when known;
         # else any small/rare non-floor color present (candidate exit) so
         # the agent BEELINES to it pre-rules and bootstraps the win.
@@ -1597,8 +1620,10 @@ def main() -> int:
             gy, gx = lane_goal_pos[lane_i]
             tmask = np.zeros((H, W), dtype=bool)
             tmask[gy, gx] = True
+        lane_prev_av[lane_i] = (ay, ax) if ay >= 0 else None
         step = _fog_nav(wmap, emap, avm,
                         tmask if tmask.any() else None)
+        lane_prev_step[lane_i] = step
         if step is None:
             nav_gate["fog_nostep"] += 1
             return None
