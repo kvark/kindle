@@ -1531,13 +1531,18 @@ def main() -> int:
     # SAME color as floor and walls reveal on approach, so single-frame
     # BFS plans through fog. We accumulate a persistent map and route on
     # it: explore frontiers until the exit is revealed, then go to it.
-    lane_wall_map = [None] * n_lanes
-    lane_expl_map = [None] * n_lanes
-    lane_goal_pos = [None] * n_lanes      # remembered exit centroid
-    lane_map_level = [-1] * n_lanes       # level the maps were built for
-    lane_map_epstep = [0] * n_lanes       # ep_step when maps last reset
+    # Maps are PERSISTENT per (game, level), NOT per-episode: the maze at
+    # a given level is deterministic (verified: identical across all human
+    # demos), so accumulating revealed+bumped walls over many attempts
+    # progressively maps the whole level and lets the agent route to the
+    # exit even though a single ~48-step attempt can't cover it. Generic
+    # spatial memory (remember the maze you've seen), NOT path-memorizing.
+    gl_wall = {}                          # (g_idx, lvl) -> bool 64x64
+    gl_expl = {}                          # (g_idx, lvl) -> bool 64x64
+    gl_goal = {}                          # (g_idx, lvl) -> exit centroid
     lane_prev_av = [None] * n_lanes       # prev avatar centroid (fog-nav)
     lane_prev_step = [None] * n_lanes     # prev fog-nav (dy,dx) issued
+    lane_stuck = [0] * n_lanes            # consecutive no-move count
     fog_uses = 0  # diagnostic
 
     def fog_nav_resolve(g_idx, lane_i, frm, avc):
@@ -1546,21 +1551,13 @@ def main() -> int:
         the nearest unexplored frontier. frm is int32 64x64."""
         nonlocal fog_uses
         H, W = frm.shape
-        # (re)init maps on level change OR episode/restore boundary
-        # (ep_step going backward = reset/Go-Explore restore -> the maze
-        # layout may have swapped, so the accumulated map is stale).
-        if (lane_map_level[lane_i] != last_levels[lane_i]
-                or ep_step[lane_i] < lane_map_epstep[lane_i]
-                or lane_wall_map[lane_i] is None):
-            lane_wall_map[lane_i] = np.zeros((H, W), dtype=bool)
-            lane_expl_map[lane_i] = np.zeros((H, W), dtype=bool)
-            lane_goal_pos[lane_i] = None
-            lane_prev_av[lane_i] = None
-            lane_prev_step[lane_i] = None
-            lane_map_level[lane_i] = last_levels[lane_i]
-        lane_map_epstep[lane_i] = ep_step[lane_i]
-        wmap = lane_wall_map[lane_i]
-        emap = lane_expl_map[lane_i]
+        # PERSISTENT per-(game,level) map (accumulates across attempts).
+        key = (g_idx, int(last_levels[lane_i]))
+        if key not in gl_wall:
+            gl_wall[key] = np.zeros((H, W), dtype=bool)
+            gl_expl[key] = np.zeros((H, W), dtype=bool)
+        wmap = gl_wall[key]
+        emap = gl_expl[key]
         gr = game_rules[g_idx]
         sprite = avatar_set_of(g_idx) or {avc}
         bg = int(np.bincount(frm.flatten()).argmax())
@@ -1597,11 +1594,18 @@ def main() -> int:
             ax = int(avcells[:, 1].mean())
             pv = lane_prev_av[lane_i]
             ps = lane_prev_step[lane_i]
-            if (pv is not None and ps is not None
-                    and abs(ay - pv[0]) + abs(ax - pv[1]) <= 2):
-                dy, dx = ps
-                by, bx = ay + dy * 5, ax + dx * 5   # ~one cell-step beyond
-                wmap[max(0, by - 1):by + 2, max(0, bx - 1):bx + 2] = True
+            moved = pv is None or abs(ay - pv[0]) + abs(ax - pv[1]) > 2
+            if moved:
+                lane_stuck[lane_i] = 0
+            elif ps is not None:
+                # require 2 consecutive no-moves before marking a wall
+                # (one stall could be a policy step, not a real bump);
+                # the map persists, so false walls are costly.
+                lane_stuck[lane_i] += 1
+                if lane_stuck[lane_i] >= 2:
+                    dy, dx = ps
+                    by, bx = ay + dy * 5, ax + dx * 5  # one cell-step beyond
+                    wmap[max(0, by - 1):by + 2, max(0, bx - 1):bx + 2] = True
         else:
             ay = ax = -1
         # TARGET (exit): the rule-known must-disappear color when known;
@@ -1614,10 +1618,9 @@ def main() -> int:
             tmask = cand
         if tmask.any():
             cc = np.argwhere(tmask)
-            lane_goal_pos[lane_i] = (int(cc[:, 0].mean()),
-                                     int(cc[:, 1].mean()))
-        elif lane_goal_pos[lane_i] is not None:
-            gy, gx = lane_goal_pos[lane_i]
+            gl_goal[key] = (int(cc[:, 0].mean()), int(cc[:, 1].mean()))
+        elif gl_goal.get(key) is not None:
+            gy, gx = gl_goal[key]
             tmask = np.zeros((H, W), dtype=bool)
             tmask[gy, gx] = True
         lane_prev_av[lane_i] = (ay, ax) if ay >= 0 else None
@@ -1646,8 +1649,7 @@ def main() -> int:
                     "explored": int(emap.sum()), "wall": int(wmap.sum()),
                     "mode": "exploit" if tmask.any() else "explore",
                     "exit_seen": exit_seen,
-                    "goal": list(lane_goal_pos[lane_i])
-                    if lane_goal_pos[lane_i] else None,
+                    "goal": list(gl_goal[key]) if gl_goal.get(key) else None,
                 })
                 if len(_fog_dump) >= 200:
                     import pickle as _pk
