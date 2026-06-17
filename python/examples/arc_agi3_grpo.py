@@ -1503,9 +1503,13 @@ def main() -> int:
         nav_gate["low_cos"] += 1
         return None
 
-    def action_for_step(g_idx, step):
+    def action_for_step(g_idx, step, blocked=()):
         """Pick the base action whose learned (sprite-centroid) effect
-        best matches a desired (dy,dx) step. Shared by BFS and fog-nav."""
+        best matches a desired (dy,dx) step. CLOSED-LOOP escape: prefer
+        the goal-ward action, but if it is currently BLOCKED (failed to
+        move the avatar last step) fall back to the best UNBLOCKED action
+        — even a perpendicular sidestep — so the avatar gets around walls
+        instead of repeating a no-op forever. Shared by BFS and fog-nav."""
         if step is None:
             return None
         eff = avatar_effects(g_idx)
@@ -1513,7 +1517,7 @@ def main() -> int:
             return None
         effs, effs_n = eff
         sy, sx = step
-        best_a, best_dot = None, -1e9
+        ranked = []                       # (dot, action)
         for a, n in effs_n.items():
             if n < 8:
                 continue
@@ -1521,10 +1525,18 @@ def main() -> int:
             mag = (ey * ey + ex * ex) ** 0.5
             if mag < 1e-6:
                 continue
-            dot = (sy * ey + sx * ex) / mag
-            if dot > best_dot:
-                best_dot, best_a = dot, a
-        return best_a if best_dot > 0.3 else None
+            ranked.append(((sy * ey + sx * ex) / mag, a))
+        ranked.sort(reverse=True)
+        # 1) best goal-ward (cos>0.3) action that isn't blocked
+        for dot, a in ranked:
+            if dot > 0.3 and a not in blocked:
+                return a
+        # 2) goal direction blocked -> any unblocked action (sidestep to
+        #    escape the wall; BFS re-routes from the new cell)
+        for dot, a in ranked:
+            if a not in blocked:
+                return a
+        return None
 
     # --- Fog-of-war map state (per lane), reset on level/episode change.
     # tu93 only ever shows ~15% of the maze; unexplored fog reads as the
@@ -1551,6 +1563,8 @@ def main() -> int:
     lane_bump_ep = [0] * n_lanes          # ep_step when overlay last reset
     lane_prev_av = [None] * n_lanes       # prev avatar centroid (fog-nav)
     lane_prev_step = [None] * n_lanes     # prev fog-nav (dy,dx) issued
+    lane_prev_action = [None] * n_lanes   # GameAction value last issued
+    lane_blocked = [None] * n_lanes       # set of dirs that failed to move
     lane_stuck = [0] * n_lanes            # consecutive no-move count
     fog_uses = 0  # diagnostic
 
@@ -1611,6 +1625,15 @@ def main() -> int:
             pv = lane_prev_av[lane_i]
             ps = lane_prev_step[lane_i]
             moved = pv is None or abs(ay - pv[0]) + abs(ax - pv[1]) > 2
+            # CLOSED-LOOP escape: forget blocked dirs once the avatar
+            # advances; otherwise mark the last-issued action blocked so
+            # action_for_step sidesteps to a different direction next.
+            if lane_blocked[lane_i] is None:
+                lane_blocked[lane_i] = set()
+            if moved:
+                lane_blocked[lane_i].clear()
+            elif lane_prev_action[lane_i] is not None:
+                lane_blocked[lane_i].add(lane_prev_action[lane_i])
             if moved:
                 lane_stuck[lane_i] = 0
             elif ps is not None:
@@ -1672,10 +1695,11 @@ def main() -> int:
         if step is None:
             nav_gate["fog_nostep"] += 1
             return None
-        a = action_for_step(g_idx, step)
+        a = action_for_step(g_idx, step, lane_blocked[lane_i] or ())
         if a is None:
             nav_gate["fog_lowcos"] += 1
             return None
+        lane_prev_action[lane_i] = a
         nav_gate["fog_resolved"] += 1
         fog_uses += 1
         if _FOG_DUMP:
