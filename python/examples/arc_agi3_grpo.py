@@ -1362,6 +1362,10 @@ def main() -> int:
     # the full-sprite centroid is stable. (Detection still uses the
     # per-color table; this needs the sprite known, which detection
     # supplies.)
+    # action_card[g][ga_id][cardinal] = vote count -> clean action->cardinal
+    # map (majority vote over the dominant move axis; robust to jitter).
+    action_card = [collections.defaultdict(collections.Counter)
+                   for _ in range(n_games)]
     sprite_act_eff = [dict() for _ in range(n_games)]
     sprite_act_eff_n = [collections.Counter() for _ in range(n_games)]
     lane_prev_sprite_cen = [None] * n_lanes
@@ -1503,44 +1507,42 @@ def main() -> int:
         nav_gate["low_cos"] += 1
         return None
 
+    def action_card_map(g_idx):
+        """Per-action majority cardinal -> {action: (dy,dx)}, only for
+        actions with >= 8 votes (calibrated)."""
+        out = {}
+        for a, ctr in action_card[g_idx].items():
+            if sum(ctr.values()) >= 8:
+                out[a] = ctr.most_common(1)[0][0]
+        return out
+
     def action_for_step(g_idx, step, blocked=()):
-        """Pick the base action whose learned (sprite-centroid) effect
-        best matches a desired (dy,dx) step. CLOSED-LOOP escape: prefer
-        the goal-ward action, but if it is currently BLOCKED (failed to
-        move the avatar last step) fall back to the best UNBLOCKED action
-        — even a perpendicular sidestep — so the avatar gets around walls
-        instead of repeating a no-op forever. Shared by BFS and fog-nav."""
+        """Pick the base action whose DOMINANT-cardinal move matches the
+        desired (dy,dx) step, using the clean majority-vote map (robust to
+        the core-jitter that made the cosine-on-EMA selection unreliable
+        and confined the avatar). CLOSED-LOOP escape: if the goal-ward
+        action is blocked, sidestep to any unblocked calibrated action so
+        the avatar gets around walls instead of freezing."""
         if step is None:
             return None
-        eff = avatar_effects(g_idx)
-        if eff is None:
+        cm = action_card_map(g_idx)
+        if not cm:
             return None
-        effs, effs_n = eff
-        sy, sx = step
-        ranked = []                       # (dot, action)
-        for a, n in effs_n.items():
-            if n < 8:
-                continue
-            ey, ex = effs[a]
-            mag = (ey * ey + ex * ex) ** 0.5
-            if mag < 1e-6:
-                continue
-            ranked.append(((sy * ey + sx * ex) / mag, a))
-        ranked.sort(reverse=True)
-        # 1) best goal-ward (cos>0.3) action that isn't blocked
-        for dot, a in ranked:
-            if dot > 0.3 and a not in blocked:
+        desired = (int(step[0]), int(step[1]))
+        # 1) action whose cardinal == desired, not blocked
+        for a, c in cm.items():
+            if c == desired and a not in blocked:
                 return a
-        # 2) goal direction blocked -> any unblocked action (sidestep to
-        #    escape the wall; BFS re-routes from the new cell)
-        for dot, a in ranked:
+        # 2) goal dir blocked/uncalibrated -> any unblocked action (escape)
+        for a, c in cm.items():
             if a not in blocked:
                 return a
-        # 3) EVERYTHING blocked -> never freeze: take the goal-ward best
-        #    anyway (caller clears the blocked set so escape can restart).
-        if ranked and ranked[0][0] > 0.3:
-            return ranked[0][1]
-        return None
+        # 3) everything blocked -> the goal-ward action anyway (caller
+        #    clears the blocked set so escape restarts).
+        for a, c in cm.items():
+            if c == desired:
+                return a
+        return next(iter(cm))
 
     # --- Fog-of-war map state (per lane), reset on level/episode change.
     # tu93 only ever shows ~15% of the maze; unexplored fog reads as the
@@ -2584,6 +2586,15 @@ def main() -> int:
                                     scur[0] = 0.8 * scur[0] + 0.2 * sdy
                                     scur[1] = 0.8 * scur[1] + 0.2 * sdx
                                 sprite_act_eff_n[g_idx_r][ga_id] += 1
+                                # CARDINAL VOTE: classify this move by its
+                                # DOMINANT axis (robust to core jitter, which
+                                # only adds a smaller perpendicular wobble) ->
+                                # a clean action->cardinal map for routing.
+                                if abs(sdy) >= abs(sdx):
+                                    card = (1, 0) if sdy > 0 else (-1, 0)
+                                else:
+                                    card = (0, 1) if sdx > 0 else (0, -1)
+                                action_card[g_idx_r][ga_id][card] += 1
                     lane_prev_sprite_cen[i] = spr_cen
                     lane_prev_cstats[i] = cs_now
                     if lane_pred[i] is None:
