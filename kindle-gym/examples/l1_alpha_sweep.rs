@@ -111,9 +111,12 @@ fn run_one(run: EnvRun, alpha: f32, steps: usize) -> (f32, f32, usize, f32) {
         }
 
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,

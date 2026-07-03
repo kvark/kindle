@@ -113,6 +113,11 @@ impl Environment for CartPole {
         self.check_bounds();
         self.update_homeo();
 
+        // The returned homeostatic state must reflect the pre-reset (failed)
+        // pole angle so falling is penalized, not reported as satisfied.
+        // reset() recomputes self.homeo for the next step.
+        let homeostatic = self.homeo.clone();
+
         // Auto-reset on failure (continual learning — no episode boundaries)
         if self.failed {
             self.reset();
@@ -120,7 +125,7 @@ impl Environment for CartPole {
 
         StepResult {
             observation: self.observe(),
-            homeostatic: self.homeo.clone(),
+            homeostatic,
         }
     }
 

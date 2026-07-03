@@ -173,14 +173,21 @@ impl Environment for Taxi {
         }
 
         self.step_count += 1;
+
+        // The returned homeostatic state must reflect the terminal
+        // (pre-reset) step so a successful dropoff is credited, not scored
+        // against the fresh episode's distance. reset() recomputes
+        // self.homeo for the next step.
+        self.update_homeo();
+        let homeostatic = self.homeo.clone();
+
         if terminated || self.step_count >= self.max_steps {
             self.reset();
         }
 
-        self.update_homeo();
         StepResult {
             observation: self.observe(),
-            homeostatic: self.homeo.clone(),
+            homeostatic,
         }
     }
 

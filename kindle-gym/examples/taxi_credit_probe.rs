@@ -1,11 +1,12 @@
 //! Investigate: why does Taxi regress when the L1 credit assigner is
 //! on vs off?
 //!
-//! Runs three configs on Taxi (seed 42, 3k steps) and reports
+//! Runs four configs on Taxi (seed 42, 3k steps) and reports
 //! early/late homeo_dev + distinct_modal_actions:
 //!   A) L0-only (num_options=1)
 //!   B) L1 without credit assigner (num_options=4, option_history_len=1)
 //!   C) L1 with credit assigner (num_options=4, option_history_len=8)
+//!   D) L1 with credit assigner + learned termination
 //!
 //! Run: `cargo run --release --example taxi_credit_probe`
 
@@ -68,9 +69,12 @@ fn run(label: &str, num_options: usize, option_history_len: usize, learned_term:
         }
 
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -98,14 +102,18 @@ fn run(label: &str, num_options: usize, option_history_len: usize, learned_term:
         distinct.insert(best_a);
     }
 
-    println!(
-        "  {:40} | wm_late={:.3} h_eff_l1={:.2} homeo {:.2}→{:.2} (Δ={:+.2}) distinct={}",
-        label,
-        wm_late,
-        h_eff_l1_late,
+    let homeo = format!(
+        "{:.2}→{:.2} (Δ={:+.2})",
         homeo_sum_early / WINDOW as f32,
         homeo_sum_late / WINDOW as f32,
         (homeo_sum_late - homeo_sum_early) / WINDOW as f32,
+    );
+    println!(
+        "  {:40} | {:>10.3} {:>10.2} {:>22} {:>8}",
+        label,
+        wm_late,
+        h_eff_l1_late,
+        homeo,
         distinct.len(),
     );
 }
@@ -114,8 +122,8 @@ fn main() {
     env_logger::init();
     println!("Taxi L1-credit probe ({STEPS} steps, seed 42)\n");
     println!(
-        "{:42} | {:16} {:16} {:20} distinct",
-        "config", "wm", "h_eff_l1", "homeo_dev"
+        "  {:40} | {:>10} {:>10} {:>22} {:>8}",
+        "config", "wm_late", "h_eff_l1", "homeo early→late", "distinct"
     );
     run("A) L0-only (num_options=1)", 1, 8, false);
     run("B) L1 no-credit (history_len=1)", 4, 1, false);

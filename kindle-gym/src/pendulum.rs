@@ -1,6 +1,7 @@
 //! Pendulum from OpenAI Gymnasium — inverted pendulum swing-up.
 //!
-//! The pendulum starts in a random position and must be swung upright.
+//! The pendulum starts hanging straight down (deterministic θ=π, θ̇=0)
+//! and must be swung upright.
 //! Continuous 1-D torque action in [-2, 2].
 //!
 //! Physics: `θ̈ = (3g)/(2l)·sin(θ) + (3)/(m·l²)·u`, Euler integration dt=0.05

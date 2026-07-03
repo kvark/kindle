@@ -137,9 +137,12 @@ fn main() {
         let obs = envs.observe(which);
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         envs.step(which, &action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = envs.observe(which);
         let env_ref: &dyn Environment = envs.env(which);
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
