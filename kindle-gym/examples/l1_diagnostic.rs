@@ -260,9 +260,12 @@ fn run_l1_on_env(run: EnvRun, steps: usize, num_options: usize) -> RunStats {
         }
 
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -391,9 +394,12 @@ fn skill_transfer(
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -423,9 +429,12 @@ fn skill_transfer(
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -455,9 +464,12 @@ fn skill_transfer(
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -486,6 +498,14 @@ fn main() {
 
     let num_options = 4;
     let steps = 2000;
+    // Derive option_dim the same way run_l1_on_env does, so the summary
+    // labels stay correct if the config changes.
+    let summary_config = agent_config(num_options);
+    let option_dim = if summary_config.option_dim == 0 {
+        summary_config.latent_dim
+    } else {
+        summary_config.option_dim
+    };
 
     let mut all_stats: Vec<(String, RunStats)> = Vec::new();
     for run in make_runs() {
@@ -555,7 +575,7 @@ fn main() {
             distinct_modal.insert(txt);
             print!(
                 "{}→{} ({:.0}%)  ",
-                option_text(o as u32, 8, num_options),
+                option_text(o as u32, option_dim, num_options),
                 txt,
                 pct
             );

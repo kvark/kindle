@@ -26,7 +26,7 @@ fn run(
     adapter: Box<dyn kindle::EnvAdapter>,
     alpha: f32,
     entropy_beta: f32,
-) -> (usize, f32) {
+) -> usize {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
@@ -70,9 +70,12 @@ fn run(
         }
 
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &*env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
@@ -112,7 +115,7 @@ fn run(
         print!("o{o}=a{}({:.0}%) ", best_a, pct);
     }
     println!("[distinct={}]", distinct_late.len());
-    (distinct_late.len(), final_entropy)
+    distinct_late.len()
 }
 
 fn main() {
@@ -198,10 +201,17 @@ fn main() {
 
     for &(alpha, beta) in &settings {
         println!("-- α={alpha:.1} β={beta:.2} --");
+        let mut diversified = 0usize;
         for (name, factory) in &envs {
             let (env, adapter) = factory();
-            run(name, env, adapter, alpha, beta);
+            if run(name, env, adapter, alpha, beta) >= 2 {
+                diversified += 1;
+            }
         }
-        println!();
+        println!(
+            "  => {}/{} envs diversified (distinct>=2)\n",
+            diversified,
+            envs.len()
+        );
     }
 }

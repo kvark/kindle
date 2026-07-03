@@ -74,14 +74,10 @@ fn main() {
     let mut env = GridWorld::new();
     let mut rng = rand::rngs::StdRng::seed_from_u64(42);
 
-    let entropy_floor = config.entropy_floor;
     // WM sanity bound: 10× the worst we've seen in the canary tests.
     let wm_explosion_threshold = 20.0f32;
-    // H_eff trend bookkeeping: we want it non-decreasing across the
-    // whole run (allow small dips; fail only if the late-run rolling
-    // average is meaningfully below the mid-run).
+    // H_eff trend bookkeeping (advisory only — see end-of-run summary).
     let mut h_eff_samples: Vec<f32> = Vec::new();
-    let mut h_eff_l1_samples: Vec<f32> = Vec::new();
 
     println!(
         "{:>9} | {:>9} {:>9} {:>9} {:>9} {:>9} {:>9} | {:>9} {:>9}",
@@ -93,41 +89,43 @@ fn main() {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
         env.step(&action);
+        // Post-action convention: observe() receives the observation
+        // RESULTING from the action (see Agent::observe docs).
+        let next_obs = env.observe();
         let env_ref: &dyn Environment = &env;
         agent.observe(
-            std::slice::from_ref(&obs),
+            std::slice::from_ref(&next_obs),
             std::slice::from_ref(&action),
             std::slice::from_ref(&env_ref),
             &mut rng,
         );
 
+        // --- Invariants (checked every step — cheap float checks) ---
+        let diags = agent.diagnostics();
+        let d = &diags[0];
+        for (name, v) in [
+            ("loss_wm", d.loss_world_model),
+            ("loss_credit", d.loss_credit),
+            ("loss_policy", d.loss_policy),
+            ("loss_replay", d.loss_replay),
+            ("reward_mean", d.reward_mean),
+            ("h_eff", d.h_eff),
+            ("h_eff_l1", d.h_eff_l1),
+            ("repr_drift", d.repr_drift),
+            ("entropy", d.policy_entropy),
+        ] {
+            assert!(v.is_finite(), "non-finite {name} = {v} at step {step}");
+        }
+        assert!(
+            d.loss_world_model < wm_explosion_threshold,
+            "WM loss exploded: {} > {} at step {}",
+            d.loss_world_model,
+            wm_explosion_threshold,
+            step
+        );
+
         if (step + 1) % checkpoint == 0 {
-            let d = agent.diagnostics()[0].clone();
-
-            // --- Invariants ---
-            for (name, v) in [
-                ("loss_wm", d.loss_world_model),
-                ("loss_credit", d.loss_credit),
-                ("loss_policy", d.loss_policy),
-                ("loss_replay", d.loss_replay),
-                ("reward_mean", d.reward_mean),
-                ("h_eff", d.h_eff),
-                ("h_eff_l1", d.h_eff_l1),
-                ("repr_drift", d.repr_drift),
-                ("entropy", d.policy_entropy),
-            ] {
-                assert!(v.is_finite(), "non-finite {name} = {v} at step {step}");
-            }
-            assert!(
-                d.loss_world_model < wm_explosion_threshold,
-                "WM loss exploded: {} > {} at step {}",
-                d.loss_world_model,
-                wm_explosion_threshold,
-                step
-            );
-
             h_eff_samples.push(d.h_eff);
-            h_eff_l1_samples.push(d.h_eff_l1);
 
             let throughput = (step + 1) as f64 / t0.elapsed().as_secs_f64();
             println!(
@@ -174,30 +172,25 @@ fn main() {
             late,
             late - early
         );
-        // README says "H_eff trending upward" — warn, don't fail, on a
-        // slight regression since the credit graph is noisy.
+        // README says "H_eff trending upward". This check is ADVISORY
+        // only (logged, never gated): the credit graph is noisy, so a
+        // hard assert would flake.
         if late < early - 0.5 {
             eprintln!(
-                "WARNING: h_eff late-mean {:.2} dropped more than 0.5 below early-mean {:.2}",
+                "WARNING (advisory, not a gate): h_eff late-mean {:.2} dropped more than 0.5 below early-mean {:.2}",
                 late, early
             );
         }
     }
 
-    // Entropy-floor gate: v3 lets entropy dip below the floor for
-    // recovery, so we check that the recorded final entropy is
-    // either above the floor OR the recovery kicked in. We simply
-    // assert non-negative (entropy can't go negative).
+    // Entropy gate: v3 lets entropy dip below config.entropy_floor while
+    // recovering, so we don't gate on that floor — but a healthy final
+    // policy must retain real stochasticity, not collapse to ~0.
     assert!(
-        d.policy_entropy.is_finite() && d.policy_entropy >= -1e-3,
-        "final entropy went negative: {}",
+        d.policy_entropy.is_finite() && d.policy_entropy > 0.01,
+        "final entropy collapsed: {}",
         d.policy_entropy
     );
-
-    // Ignore entropy-floor threshold here — post-v3 the agent is
-    // allowed to briefly fall below it as long as it recovers; the
-    // real smoke signal is the NaN / WM-explosion checks above.
-    let _ = entropy_floor;
 
     println!("stability invariants held; M5 PASS");
 }

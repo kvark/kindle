@@ -91,6 +91,13 @@ impl Environment for MountainCar {
 
         self.step_count += 1;
 
+        // The returned homeostatic state must reflect the terminal
+        // (pre-reset) step so reaching the goal is credited, not scored
+        // against the fresh episode's drive state. reset() recomputes
+        // self.homeo for the next step.
+        self.update_homeo();
+        let homeostatic = self.homeo.clone();
+
         // Auto-reset on goal or truncation (continual learning)
         let reached_goal = self.position >= GOAL_POSITION;
         let truncated = self.step_count >= self.max_steps;
@@ -98,11 +105,9 @@ impl Environment for MountainCar {
             self.reset();
         }
 
-        self.update_homeo();
-
         StepResult {
             observation: self.observe(),
-            homeostatic: self.homeo.clone(),
+            homeostatic,
         }
     }
 

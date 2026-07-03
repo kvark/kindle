@@ -43,9 +43,12 @@ fn stability_grid_world() {
     // Real GPUs run this orders of magnitude faster; longer sweeps belong
     // in a separate manual benchmark.
     let total_steps = 500usize;
-    let early_step = 100usize;
-    let mut early_loss = f32::NAN;
-    let mut late_loss = f32::NAN;
+    // Average WM loss over windows rather than single samples — per-step
+    // loss is noisy, so single-sample comparisons are unreliable.
+    let early_start = 100usize;
+    let avg_window = 20usize;
+    let mut early_losses: Vec<f32> = Vec::new();
+    let mut late_losses: Vec<f32> = Vec::new();
     let mut max_drift = 0.0f32;
 
     for step in 0..total_steps {
@@ -73,21 +76,24 @@ fn stability_grid_world() {
             d.reward_mean.is_finite(),
             "NaN/Inf in reward at step {step}"
         );
-        if step == early_step {
-            early_loss = d.loss_world_model;
+        if (early_start..early_start + avg_window).contains(&step) {
+            early_losses.push(d.loss_world_model);
         }
-        if step == total_steps - 1 {
-            late_loss = d.loss_world_model;
+        if step >= total_steps - avg_window {
+            late_losses.push(d.loss_world_model);
         }
         if d.repr_drift > max_drift {
             max_drift = d.repr_drift;
         }
     }
 
-    // World model should converge: late loss not worse than 10x early
+    let early_avg = early_losses.iter().sum::<f32>() / early_losses.len() as f32;
+    let late_avg = late_losses.iter().sum::<f32>() / late_losses.len() as f32;
+    // World model should converge: late average strictly below early
+    // average (escape hatch: absolute loss already tiny).
     assert!(
-        late_loss < early_loss * 10.0 || late_loss < 0.1,
-        "world model diverged: early={early_loss:.4}, late={late_loss:.4}"
+        late_avg < early_avg || late_avg < 0.1,
+        "world model did not converge: early_avg={early_avg:.4}, late_avg={late_avg:.4}"
     );
     // Drift stays bounded (we reduce encoder LR on excess drift)
     assert!(
