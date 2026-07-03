@@ -235,14 +235,22 @@ fn window_entropy(window: &VecDeque<u32>) -> f32 {
     }
     let n = window.len() as f32;
     let mut h = 0.0f32;
+    let mut occupied = 0usize;
     for c in counts {
         if c == 0 {
             continue;
         }
+        occupied += 1;
         let p = c as f32 / n;
         h -= p * p.ln();
     }
-    h
+    // Miller–Madow bias correction: the plug-in estimator is biased
+    // low by ≈ (K_occupied − 1) / 2N. The order reward differences a
+    // 64-sample window against a 512-sample one, so without the
+    // correction the recent window's 8×-larger bias made any
+    // diverse-but-stationary behavior earn a constant positive
+    // "order" reward for doing nothing structured.
+    h + (occupied.saturating_sub(1)) as f32 / (2.0 * n)
 }
 
 /// Deterministic random `out_dim × in_dim` matrix, scaled by `1/sqrt(in_dim)`

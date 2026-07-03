@@ -2,9 +2,9 @@
 //!
 //! Self-supervised goal discovery from per-step latent deltas.
 //! Maintains a rolling bank of latent positions where a significant
-//! state change was just observed. Reward each step is proportional
-//! to the inverse distance to the NEAREST goal in the bank — pulling
-//! the policy toward regions where interesting transitions happen,
+//! state change was just observed. Reward each step is the negative
+//! (clamped) distance to the NEAREST goal in the bank — pulling the
+//! policy toward regions where interesting transitions happen,
 //! without any task-specific shaping.
 //!
 //! Differences from M7 (`approach::ApproachState`):

@@ -78,7 +78,12 @@ impl<T: Clone + Default> RingBuffer<T> {
     }
 
     /// Sample `n` random indices (with replacement) from the buffer.
+    /// Returns an empty vec when the buffer is empty (an empty range
+    /// would otherwise panic in `random_range`).
     pub fn sample_indices<R: Rng>(&self, rng: &mut R, n: usize) -> Vec<usize> {
+        if self.len == 0 {
+            return Vec::new();
+        }
         (0..n).map(|_| rng.random_range(0..self.len)).collect()
     }
 }
@@ -413,17 +418,26 @@ impl ExperienceBuffer {
         Some(flat)
     }
 
-    /// Flatten a history window starting at a specific index.
+    /// Flatten a history window starting at a specific index. Rewards
+    /// are z-scored and clamped within the window, matching the input
+    /// convention of `flatten_history` (the credit net trains and
+    /// infers on both, so the reward feature must be scaled the same
+    /// way).
     pub fn flatten_history_at(&self, start: usize, n: usize) -> Option<Vec<f32>> {
         if start + n > self.len() {
             return None;
         }
+        let rewards: Vec<f32> = (start..start + n).map(|i| self.get(i).reward).collect();
+        let mean = rewards.iter().sum::<f32>() / rewards.len() as f32;
+        let std = (rewards.iter().map(|r| (r - mean).powi(2)).sum::<f32>() / rewards.len() as f32)
+            .sqrt()
+            .max(1e-6);
         let mut flat = Vec::new();
-        for i in start..start + n {
+        for (k, i) in (start..start + n).enumerate() {
             let t = self.get(i);
             flat.extend_from_slice(&t.latent);
             flat.extend_from_slice(&t.action);
-            flat.push(t.reward);
+            flat.push(((rewards[k] - mean) / std).clamp(-1.0, 1.0));
         }
         Some(flat)
     }

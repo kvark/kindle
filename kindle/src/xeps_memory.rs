@@ -33,6 +33,13 @@ pub struct StateActionMemory {
     counts: HashMap<(StateKey, u32), u32>,
 }
 
+/// Hard cap on distinct tracked pairs. With continuous latents,
+/// nearly every step can mint a new key (the same leak class
+/// `buffer.rs` caps with `visit_counts_max` — ~1 KB/step per lane,
+/// unbounded). When full, the map is cleared and counting restarts —
+/// same reset-the-baseline strategy as the buffer's visit counts.
+const MAX_TRACKED_PAIRS: usize = 250_000;
+
 impl StateActionMemory {
     pub fn new(grid_resolution: f32) -> Self {
         Self {
@@ -45,6 +52,9 @@ impl StateActionMemory {
     /// updated count for that pair.
     pub fn observe(&mut self, z: &[f32], action: u32) -> u32 {
         let key = (StateKey::from_latent(z, self.grid_resolution), action);
+        if !self.counts.contains_key(&key) && self.counts.len() >= MAX_TRACKED_PAIRS {
+            self.counts.clear();
+        }
         let c = self.counts.entry(key).or_insert(0);
         *c += 1;
         *c

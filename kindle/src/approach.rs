@@ -120,7 +120,18 @@ impl ApproachState {
             r_episode,
         });
         // Increment terminal-only visit count for this grid cell.
+        // Capped: with continuous latents nearly every terminal can
+        // mint a new key, growing the map unboundedly over long runs
+        // (same leak class as buffer.rs's visit_counts). Terminal
+        // events are per-episode (not per-step) so the cap is
+        // generous; clear-and-restart matches the buffer's strategy.
+        const MAX_TERMINAL_CELLS: usize = 100_000;
         let key = GridKey::from_latent(z_end, self.terminal_grid_resolution);
+        if !self.terminal_visit_counts.contains_key(&key)
+            && self.terminal_visit_counts.len() >= MAX_TERMINAL_CELLS
+        {
+            self.terminal_visit_counts.clear();
+        }
         *self.terminal_visit_counts.entry(key).or_insert(0) += 1;
         self.episodes_seen += 1;
         self.episodes_since_update += 1;
