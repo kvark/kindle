@@ -333,6 +333,17 @@ def main() -> int:
                         help="Enable learned per-state σ-head; planner noise "
                         "scales by σ_learned(z,a) × planner_noise_sigma.")
     parser.add_argument("--wm-sigma-loss-coef", type=float, default=0.5)
+    parser.add_argument("--recon-loss-coef", type=float, default=0.0,
+                        help="Anti-collapse reconstruction loss on the WM/CNN "
+                        "encoder (decode z back to the frame). Without it, the "
+                        "encoder can collapse to a near-constant z: the WM loss "
+                        "goes tiny (trivially predicting the constant) while the "
+                        "policy sees no state and stays uniform. The ARC GRPO "
+                        "recipe uses 10.0 with --recon-visual-target.")
+    parser.add_argument("--recon-visual-target", action="store_true",
+                        help="Reconstruct the downsampled visual frame instead "
+                        "of the (all-zero in this harness) obs token. Use "
+                        "whenever --recon-loss-coef > 0 here.")
     args = parser.parse_args()
     active_blocks = _apply_blocks(args, sys.argv[1:])
     if active_blocks:
@@ -407,6 +418,9 @@ def main() -> int:
         agent_kwargs["gae_lambda"] = args.gae_lambda
     if args.value_loss_coef != 1.0:
         agent_kwargs["value_loss_coef"] = args.value_loss_coef
+    if args.recon_loss_coef > 0.0:
+        agent_kwargs["recon_loss_coef"] = args.recon_loss_coef
+        agent_kwargs["recon_visual_target"] = args.recon_visual_target
 
     agent = kindle.BatchAgent(**agent_kwargs)
 
@@ -539,9 +553,15 @@ def main() -> int:
             nov = _safe(d.get("reward_novelty"))
             hom = _safe(d.get("reward_homeo"))
             rew = _safe(d.get("reward_mean"))
+            # Latent-collapse canary: per-dim std of z across lanes,
+            # averaged over dims. Near-zero + tiny WM loss + max
+            # entropy together mean the encoder collapsed to a
+            # constant and the policy is state-blind.
+            z = np.asarray(agent.latents(), dtype=np.float32)
+            z_std = float(z.std(axis=0).mean()) if z.size else 0.0
             print(
                 f"step={step:>6} eps={ep_count:>3} avg_ret={avg_ret:+6.1f} "
-                f"| wm={wm:.3f} pi={pi:+7.2f} ent={ent:.2f} "
+                f"| wm={wm:.3f} pi={pi:+7.2f} ent={ent:.2f} zstd={z_std:.3f} "
                 f"r={rew:+5.2f} surp={surp:+4.2f} nov={nov:+4.2f} hom={hom:+6.2f} "
                 f"| {sps:5.0f} env-steps/s"
             )
