@@ -71,15 +71,27 @@ action feedback, mask pinning):
 | 25 | 0 | 1.79 (max) | |
 | 50 | **1 (ls20)** | 1.72 | first fork-sync; **ls20 level event — the game where the preset baseline got zero in 6k steps** |
 | 100 | **2 (cd82+ls20)** | 1.65 | recon-WM 0.17, policy loss down 16× |
-| 175 | 2 | 1.56 | entropy still descending — the policy keeps committing |
+| 175 | 2 | 1.56 | entropy still descending |
+| 350 | 2 | **0.67** | strongly committed policy (bounces 0.67–1.2 after) |
+| 400 (end) | 2 | 1.12 | full run: 64k env-steps, 5.9h wall, 3 env/s |
 
-Two qualitative changes vs. the pre-fix picture: (1) entropy actually
-moves — the policy commits instead of staying uniform forever, and
-(2) level events appear on a game random exploration doesn't crack.
-Throughput is the binding constraint again: ~2 env/s aggregate for the
-256-dim CNN-DQN stack on lavapipe, so a session-length run covers only
-~4k micro-steps/lane. The historical wall ("1 game at L2 per 50k
-steps") needs a 50k+-step run on real hardware to test properly.
+Final per-game summary (400 macros, 8k micro-steps/lane):
+
+| game | episodes | events | max level | steps at L0 → L1 |
+|---|---|---|---|---|
+| cd82 | 316 | 1 | 1/6 | 6,551 → **25,449 at L1** |
+| ls20 | 459 | 1 | 1/7 | 3,263 → **28,737 at L1** |
+
+Three qualitative changes vs. the pre-fix picture: (1) entropy
+actually moves — down to 0.67 from the permanent 1.79 pin, so the
+policy commits instead of staying uniform forever; (2) level events
+appear on a game random exploration doesn't crack (ls20 found L1
+within 3.3k steps); and (3) the fork-sync LOCKS the level in — both
+games spent ~80–90% of the run operating AT level 1 rather than
+re-earning it each episode. No L2 event within this budget — the
+historical wall ("1 game at L2 per 50k steps") needs a 50k+
+micro-step run, ideally on real hardware (~3 env/s aggregate for the
+256-dim CNN-DQN stack on lavapipe).
 
 ## What to try next
 
