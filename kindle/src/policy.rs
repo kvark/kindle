@@ -63,10 +63,40 @@ fn per_option_fc2(
     hidden_dim: usize,
     action_dim: usize,
 ) -> NodeId {
+    let heads = per_option_heads_new(g, num_options, hidden_dim, action_dim);
+    per_option_fc2_forward(g, &heads, h, option_onehot, action_dim)
+}
+
+/// Construct the per-option fc2 heads once. Callers that need to run
+/// the per-option forward more than once in the same graph (e.g. the
+/// e2e entropy branch on `stop_gradient(z)`) MUST reuse these — a
+/// second `per_option_fc2` call creates brand-new parameter nodes
+/// (meganeura's `Graph::parameter` never dedups by name), i.e. a
+/// phantom weight copy the acting policy never reads.
+fn per_option_heads_new(
+    g: &mut Graph,
+    num_options: usize,
+    hidden_dim: usize,
+    action_dim: usize,
+) -> Vec<nn::Linear> {
+    (0..num_options)
+        .map(|o| nn::Linear::new(g, &format!("policy.fc2_opt{o}"), hidden_dim, action_dim))
+        .collect()
+}
+
+/// Forward through previously constructed per-option heads: each row's
+/// logits come from the head selected by its `option_onehot`.
+fn per_option_fc2_forward(
+    g: &mut Graph,
+    heads: &[nn::Linear],
+    h: NodeId,
+    option_onehot: NodeId,
+    action_dim: usize,
+) -> NodeId {
+    let num_options = heads.len();
     let ones_row = g.constant(vec![1.0f32; action_dim], &[1, action_dim]);
     let mut sum: Option<NodeId> = None;
-    for o in 0..num_options {
-        let head_o = nn::Linear::new(g, &format!("policy.fc2_opt{o}"), hidden_dim, action_dim);
+    for (o, head_o) in heads.iter().enumerate() {
         let logits_o = head_o.forward(g, h);
 
         let mut selector = vec![0.0f32; num_options];
@@ -375,16 +405,18 @@ pub fn build_ppo_policy_graph(
         policy.forward(&mut g, z)
     };
 
-    // Apply availability mask: masked_logits = logits + (mask - 1) * 60.
-    // (mask - 1) is 0 for valid actions and -1 for invalid; multiplied by
-    // 60 it adds 0 (unchanged) or -60 (effectively -inf for softmax —
-    // exp(-60) ≈ 1e-26 ≪ f32 precision) to each logit. We use 60 not
-    // 1e9: the upstream `scaled_tanh` on the policy head already clamps
-    // logits to ±50, so 60 is just outside that clamp and definitely
-    // dominates softmax. Larger magnitudes (we tried 1e9) produce
-    // numerical issues that zero out the policy loss — likely a tiny
-    // `mask*1e9` gradient flowing back through autodiff overflows
-    // somewhere downstream. With all-1.0 mask this is a no-op for
+    // Apply availability mask: masked_logits = logits·mask + (mask−1)·60.
+    // Valid actions (mask 1) pass through unchanged; invalid ones are
+    // PINNED to exactly −60 (exp(−60) ≈ 1e-26 ≪ f32 precision under
+    // softmax) regardless of their raw logit. The earlier additive-only
+    // form (`logits + (mask−1)·60`) relied on a ±50 logit clamp that
+    // has since been removed — with unbounded logits a strongly
+    // committed policy could spread valid/invalid logits past 60 nats
+    // and masked actions regained sampleable probability. Pinning also
+    // zeroes the policy gradient into masked logits (they're not
+    // trainable while unavailable). We use 60 not 1e9: larger
+    // magnitudes (we tried 1e9) produce numerical issues that zero out
+    // the policy loss. With an all-1.0 mask this is a no-op for
     // backward compat.
     let ones_full = g.constant(
         vec![1.0; batch_size * action_dim],
@@ -397,7 +429,8 @@ pub fn build_ppo_policy_graph(
         &[batch_size, action_dim],
     );
     let mask_offset = g.mul(mask_minus_one, big_const);
-    let logits = g.add(logits, mask_offset);
+    let gated_logits = g.mul(logits, action_mask);
+    let logits = g.add(gated_logits, mask_offset);
 
     // π_new(a | s) — probability of the taken action under the current
     // policy. Built from `softmax(logits) * one_hot` followed by a
@@ -571,33 +604,53 @@ pub fn build_policy_graph_e2e(
     // build_policy_graph: per_option_heads gives full per-option fc2
     // matrices; the cheaper shared-trunk + per-option-bias path is
     // used when per_option_heads=false.
-    let (logits, option_onehot) = if num_options > 1 && per_option_heads {
+    //
+    // Both forwards run through the SAME module structs. Re-creating
+    // a module by name for the entropy branch (the pre-fix code)
+    // creates brand-new parameter nodes — meganeura never dedups
+    // parameters by name — so the entropy gradient trained a phantom
+    // weight copy that the acting policy never read, i.e. entropy
+    // regularization silently did nothing in e2e runs.
+    let z_det = if entropy_beta == 0.0 {
+        None
+    } else {
+        // Detached copy for the entropy forward — see the comment on
+        // the entropy term below for why the encoder must not receive
+        // the entropy gradient.
+        Some(g.stop_gradient(z))
+    };
+    let (logits, logits_for_ent) = if num_options > 1 && per_option_heads {
         let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
         let fc1 = nn::Linear::new(&mut g, "policy.fc1", latent_dim, hidden_dim);
+        let heads = per_option_heads_new(&mut g, num_options, hidden_dim, action_dim);
         let h = fc1.forward(&mut g, z);
         let h = g.relu(h);
-        (
-            per_option_fc2(
-                &mut g,
-                h,
-                option_onehot,
-                num_options,
-                hidden_dim,
-                action_dim,
-            ),
-            Some(option_onehot),
-        )
+        let logits = per_option_fc2_forward(&mut g, &heads, h, option_onehot, action_dim);
+        let ent = z_det.map(|zd| {
+            let h = fc1.forward(&mut g, zd);
+            let h = g.relu(h);
+            per_option_fc2_forward(&mut g, &heads, h, option_onehot, action_dim)
+        });
+        (logits, ent)
     } else if num_options > 1 {
         let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-        let trunk_logits = policy.forward(&mut g, z);
         let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
         let option_bias =
             nn::Linear::no_bias(&mut g, "policy.option_bias", num_options, action_dim);
+        let trunk_logits = policy.forward(&mut g, z);
         let bias_out = option_bias.forward(&mut g, option_onehot);
-        (g.add(trunk_logits, bias_out), Some(option_onehot))
+        let logits = g.add(trunk_logits, bias_out);
+        let ent = z_det.map(|zd| {
+            let trunk = policy.forward(&mut g, zd);
+            let bias_out = option_bias.forward(&mut g, option_onehot);
+            g.add(trunk, bias_out)
+        });
+        (logits, ent)
     } else {
         let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-        (policy.forward(&mut g, z), None)
+        let logits = policy.forward(&mut g, z);
+        let ent = z_det.map(|zd| policy.forward(&mut g, zd));
+        (logits, ent)
     };
 
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
@@ -665,51 +718,14 @@ pub fn build_policy_graph_e2e(
     // with a runtime-mutable input "entropy_beta" (so the harness can
     // anneal it over training). If beta == 0, fully elide the branch —
     // preserves byte-identical behavior with pre-input-mode runs.
-    // Detach z before re-running the policy head on stop_gradient(z) —
-    // without this, the entropy bonus's gradient (which prefers uniform)
+    // The entropy forward ran on stop_gradient(z) above — without the
+    // detach, the entropy bonus's gradient (which prefers uniform)
     // flows back through the encoder, pushing it toward outputting
     // *constant* z (the degenerate maximum-entropy fixed point), which
-    // collapses V→0 and π→uniform within a few hundred steps.
-    //
-    // For options graphs we re-run the option-conditional forward on
-    // z_det. This shares the same parameter weights, so meganeura's
-    // autodiff sees both forwards reusing the same params; the
-    // entropy gradient hits the policy-side params (intentional —
-    // pushes policy head toward uniform) but not the encoder
-    // (intentional — stop_gradient).
-    let total_loss = if entropy_beta == 0.0 {
-        base_loss
-    } else {
-        let z_det = g.stop_gradient(z);
-        let logits_for_ent = if num_options > 1 && per_option_heads {
-            // Reuse the same fc1 + per_option_fc2 structure on z_det.
-            // Per-option fc2 weights are addressed by name inside
-            // `per_option_fc2`, so calling it again with the same args
-            // creates duplicate ops on the same params.
-            let option_onehot = option_onehot.expect("set above");
-            let fc1 = nn::Linear::new(&mut g, "policy.fc1", latent_dim, hidden_dim);
-            let h = fc1.forward(&mut g, z_det);
-            let h = g.relu(h);
-            per_option_fc2(
-                &mut g,
-                h,
-                option_onehot,
-                num_options,
-                hidden_dim,
-                action_dim,
-            )
-        } else if num_options > 1 {
-            let option_onehot = option_onehot.expect("set above");
-            let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-            let trunk_logits = policy.forward(&mut g, z_det);
-            let option_bias =
-                nn::Linear::no_bias(&mut g, "policy.option_bias", num_options, action_dim);
-            let bias_out = option_bias.forward(&mut g, option_onehot);
-            g.add(trunk_logits, bias_out)
-        } else {
-            let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-            policy.forward(&mut g, z_det)
-        };
+    // collapses V→0 and π→uniform within a few hundred steps. The
+    // entropy gradient hits the policy-head params (intentional —
+    // pushes the head toward uniform) but not the encoder.
+    let total_loss = if let Some(logits_for_ent) = logits_for_ent {
         let sm = g.softmax(logits_for_ent);
         let lsm = g.log_softmax(logits_for_ent);
         let p_log_p = g.mul(sm, lsm);
@@ -717,6 +733,8 @@ pub fn build_policy_graph_e2e(
         let beta_input = g.input("entropy_beta", &[1]);
         let ent_penalty = g.mul(mean_ent, beta_input);
         g.add(base_loss, ent_penalty)
+    } else {
+        base_loss
     };
 
     g.set_outputs(vec![total_loss, logits, value]);
@@ -745,8 +763,9 @@ pub fn build_policy_graph_e2e(
 ///
 /// The KL is computed exactly using stored old_logits (`[batch, action_dim]`
 /// input) — full distribution, not the single-sample approximation.
-/// Detaches z from the value head (same fix as the failed PPO+e2e
-/// debug round) to prevent value-loss-dominated encoder saturation.
+/// The value gradient deliberately FLOWS into the encoder (matching
+/// the working `build_policy_graph_e2e`); only the KL term runs on
+/// `stop_gradient(z)`.
 ///
 /// Inputs:
 /// - `"obs"`, `"task"`, `"action"` (advantage·one_hot): same as plain e2e.
@@ -939,7 +958,9 @@ pub fn build_ppo_policy_graph_e2e(
     let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
     let logits = policy.forward(&mut g, z);
 
-    // Apply availability mask: invalid logits → -1e9.
+    // Apply availability mask: valid logits pass through, invalid ones
+    // are pinned to exactly −60 (see the non-e2e variant for why
+    // pinning rather than an additive offset).
     let ones_full = g.constant(
         vec![1.0; batch_size * action_dim],
         &[batch_size, action_dim],
@@ -951,7 +972,8 @@ pub fn build_ppo_policy_graph_e2e(
         &[batch_size, action_dim],
     );
     let mask_offset = g.mul(mask_minus_one, big_const);
-    let logits = g.add(logits, mask_offset);
+    let gated_logits = g.mul(logits, action_mask);
+    let logits = g.add(gated_logits, mask_offset);
 
     let sm_new = g.softmax(logits);
     let p_per_class = g.mul(sm_new, action);
@@ -1026,7 +1048,8 @@ pub fn build_ppo_policy_graph_e2e(
             &[batch_size, action_dim],
         );
         let mask_offset2 = g.mul(mask_minus_one2, big_const2);
-        let logits_for_ent = g.add(logits_for_ent_raw, mask_offset2);
+        let gated_ent_logits = g.mul(logits_for_ent_raw, action_mask);
+        let logits_for_ent = g.add(gated_ent_logits, mask_offset2);
 
         let sm = g.softmax(logits_for_ent);
         let lsm = g.log_softmax(logits_for_ent);
@@ -1126,7 +1149,7 @@ pub fn softmax_probs(logits: &[f32]) -> Vec<f32> {
     exp.iter().map(|&e| e / sum).collect()
 }
 
-/// Sample an action from logits using the Gumbel-max trick.
+/// Sample an action from logits via softmax + inverse-CDF sampling.
 pub fn sample_action<R: rand::Rng>(logits: &[f32], rng: &mut R) -> usize {
     let probs = softmax_probs(logits);
     let u: f32 = rng.random_range(0.0..1.0);

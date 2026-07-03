@@ -166,7 +166,42 @@ pub fn build_option_credit_graph(
     g
 }
 
-/// Compute the effective temporal scope from credit weights.
+/// Normalize raw credit-head predictions into a distribution.
+///
+/// The head is TRAINED with MSE against a softmax-normalized target,
+/// so its outputs already live in probability space. Re-softmaxing
+/// them (the pre-fix consumer behavior) compressed the attribution
+/// ratio between any two steps to at most e ≈ 2.7 — for a
+/// well-trained head predicting [0.9, 0.05, 0.05] the re-softmax
+/// yields ≈ [0.44, 0.28, 0.28], flattening credit toward uniform.
+/// Negative predictions clamp to 0; a degenerate all-zero output
+/// falls back to uniform.
+pub fn normalize_distribution(preds: &[f32]) -> Vec<f32> {
+    let clamped: Vec<f32> = preds
+        .iter()
+        .map(|&p| if p.is_finite() { p.max(0.0) } else { 0.0 })
+        .collect();
+    let sum: f32 = clamped.iter().sum();
+    if sum <= 1e-8 {
+        return vec![1.0 / preds.len().max(1) as f32; preds.len()];
+    }
+    clamped.iter().map(|&p| p / sum).collect()
+}
+
+/// Effective temporal scope of credit-head PREDICTIONS (probability-
+/// space outputs): `H_eff = Σ_i i · p_i` after sum-normalization.
+pub fn effective_scope_probs(preds: &[f32]) -> f32 {
+    normalize_distribution(preds)
+        .iter()
+        .enumerate()
+        .map(|(i, &a)| i as f32 * a)
+        .sum()
+}
+
+/// Compute the effective temporal scope from SIGNED credit weights
+/// (e.g. reward-scaled credits stored in the buffer), normalized via
+/// softmax. For raw credit-head predictions use
+/// `effective_scope_probs` — they're already in probability space.
 ///
 /// `H_eff = sum_i (i * alpha_i)` where alpha is softmax-normalized.
 pub fn effective_scope(credit_weights: &[f32]) -> f32 {

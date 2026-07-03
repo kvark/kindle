@@ -114,15 +114,19 @@ impl DiscriminatorMlp {
         let mut d_logits = probs.clone();
         d_logits[target_class] -= 1.0;
 
-        // Backprop into w2 and b2.
+        // Backprop into w2 and b2. d_h must use the FORWARD-pass w2,
+        // so read the weight before the in-place update — using the
+        // freshly-updated value biased every w1 step by an
+        // O(lr·d²·h) term.
         let mut d_h = vec![0.0; self.hidden_dim];
         for c in 0..self.num_classes {
             self.b2[c] -= lr * d_logits[c];
             let row_off = c * self.hidden_dim;
             for j in 0..self.hidden_dim {
+                let w_old = self.w2[row_off + j];
                 self.w2[row_off + j] -= lr * d_logits[c] * h[j];
                 if mask[j] {
-                    d_h[j] += d_logits[c] * self.w2[row_off + j];
+                    d_h[j] += d_logits[c] * w_old;
                 }
             }
         }

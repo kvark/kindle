@@ -118,13 +118,17 @@ impl TwoLayerMlp {
         let mse = sq / self.out_dim as f32;
 
         // Backprop. w2[o, j]: grad = d_y[o] * h[j]; h[j] grad = Σ_o d_y[o] w2[o, j] (only if mask[j]).
+        // d_h must use the FORWARD-pass w2, so read the weight before
+        // the in-place update — using the freshly-updated value biased
+        // every w1 step by an O(lr·d²·h) term.
         let mut d_h = vec![0.0f32; self.hidden_dim];
         for o in 0..self.out_dim {
             let row_off = o * self.hidden_dim;
             for j in 0..self.hidden_dim {
+                let w_old = self.w2[row_off + j];
                 self.w2[row_off + j] -= lr * d_y[o] * h[j];
                 if mask[j] {
-                    d_h[j] += d_y[o] * self.w2[row_off + j];
+                    d_h[j] += d_y[o] * w_old;
                 }
             }
         }

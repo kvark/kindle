@@ -39,6 +39,11 @@ pub struct CoordHead {
     /// Last sampled (x, y) per lane in `[-1, 1]` space (pre-game
     /// rescale). Needed for REINFORCE's `(sample − μ)` term.
     per_lane_sample: Vec<[f32; 2]>,
+    /// The latent each lane's last sample was drawn FROM — cached so
+    /// `train_step` backprops through the activations that actually
+    /// produced μ. (Callers run train_step post-observe, when the
+    /// lane's "current" latent is already the next state.)
+    per_lane_z: Vec<Vec<f32>>,
     pub last_loss: f32,
 }
 
@@ -62,6 +67,7 @@ impl CoordHead {
             b2: [0.0; 2],
             per_lane_mu: vec![[0.0, 0.0]; batch_size.max(1)],
             per_lane_sample: vec![[0.0, 0.0]; batch_size.max(1)],
+            per_lane_z: vec![Vec::new(); batch_size.max(1)],
             last_loss: 0.0,
         }
     }
@@ -108,6 +114,8 @@ impl CoordHead {
         if lane_idx < self.per_lane_mu.len() {
             self.per_lane_mu[lane_idx] = mu;
             self.per_lane_sample[lane_idx] = [sx, sy];
+            self.per_lane_z[lane_idx].clear();
+            self.per_lane_z[lane_idx].extend_from_slice(z);
         }
         [sx, sy]
     }
@@ -115,19 +123,26 @@ impl CoordHead {
     /// REINFORCE update for one lane. Applies
     /// `grad(μ) = (sample − μ) / σ² · advantage` through the
     /// MLP. `lane_idx` must match an earlier `sample` call with
-    /// the same lane.
+    /// the same lane; the update backprops through the latent
+    /// cached by that `sample` call (the state μ was computed
+    /// from), not whatever the lane's current latent is.
     ///
     /// Returns the (signed) reward-weighted log-likelihood of the
     /// sample (for diagnostics); lower = worse; the head is
     /// minimizing negative-advantage-weighted log-likelihood.
     #[allow(clippy::needless_range_loop)]
-    pub fn train_step(&mut self, lane_idx: usize, z: &[f32], advantage: f32) -> f32 {
+    pub fn train_step(&mut self, lane_idx: usize, advantage: f32) -> f32 {
         if lane_idx >= self.per_lane_mu.len() {
             return 0.0;
         }
         if advantage.abs() < 1e-8 {
             return 0.0;
         }
+        if self.per_lane_z[lane_idx].len() != self.latent_dim {
+            // No matching sample() recorded for this lane yet.
+            return 0.0;
+        }
+        let z = std::mem::take(&mut self.per_lane_z[lane_idx]);
         let mu = self.per_lane_mu[lane_idx];
         let sample = self.per_lane_sample[lane_idx];
         // Forward, saving activations (mirrors `forward` but with
@@ -160,14 +175,17 @@ impl CoordHead {
         // Backprop into the hidden layer.
         let mut d_h = vec![0.0f32; self.hidden_dim];
         let lr = self.lr;
-        // w2 grads: dL/dw2[o, j] = d_pre[o] * h[j]. Update then
-        // accumulate d_h[j] = Σ_o d_pre[o] * w2[o, j].
+        // w2 grads: dL/dw2[o, j] = d_pre[o] * h[j]. The hidden-layer
+        // gradient must use the FORWARD-pass weights, so accumulate
+        // d_h from w2 before overwriting it — updating first biased
+        // every w1 step by an O(lr·d²·h) term.
         for o in 0..2 {
             let row_off = o * self.hidden_dim;
             for j in 0..self.hidden_dim {
+                let w_old = self.w2[row_off + j];
                 self.w2[row_off + j] += lr * d_mu_pre_tanh[o] * h[j];
                 if mask[j] {
-                    d_h[j] += d_mu_pre_tanh[o] * self.w2[row_off + j];
+                    d_h[j] += d_mu_pre_tanh[o] * w_old;
                 }
             }
             self.b2[o] += lr * d_mu_pre_tanh[o];
@@ -264,7 +282,7 @@ mod tests {
         let rng_high_x = fixed_normals(vec![(3.0, 0.0)]);
         let _s = h.sample(0, &z, rng_high_x);
         for _ in 0..200 {
-            h.train_step(0, &z, 1.0); // positive advantage
+            h.train_step(0, 1.0); // positive advantage
             // Resample to keep the stored sample valid (the head
             // stores the last sample; in a real loop the caller
             // re-samples each step).
@@ -287,7 +305,7 @@ mod tests {
         let z = vec![0.1f32; 4];
         let _s = h.sample(0, &z, fixed_normals(vec![(0.5, 0.5)]));
         let w1_before = h.w1.clone();
-        h.train_step(0, &z, 0.0);
+        h.train_step(0, 0.0);
         assert_eq!(h.w1, w1_before, "zero-advantage update must be a no-op");
     }
 }
