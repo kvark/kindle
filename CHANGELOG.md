@@ -62,19 +62,21 @@
   digest of the universal obs token, sliding recent/reference windows,
   `r_order = H_reference − H_recent`).
 - Universal obs/action tokens + per-env `EnvAdapter`; one compiled graph
-  handles discrete and continuous action spaces. `Agent::switch_env`
+  handles discrete and continuous action spaces. `Agent::switch_lane`
   hops between environments with no graph rebuild; per-env deterministic
   task embeddings keep representations disambiguated.
 - Continual-learning mechanics: experience replay mixing, representation
   drift monitor with reactive encoder-LR scaling, policy entropy floor.
-- Numerical confidence tooling: finite-difference gradient checks,
-  e-graph opt-level parity tests, CartPole / random-walk / world-model
-  canaries, long-run stability probes.
+- Numerical confidence tooling: e-graph opt-level parity tests,
+  CartPole / random-walk / world-model convergence canaries, long-run
+  stability probes. (Direct finite-difference gradient checks are
+  planned, not yet implemented — gradients are currently covered
+  indirectly by the convergence canaries.)
 - Seven built-in environments in `kindle-gym`: grid_world, cart_pole,
   mountain_car, pendulum, acrobot, taxi, random_walk.
 - Optional Python bindings (`kindle-py`, pyo3 + maturin): `kindle.Agent`
-  with `train(gym_env, steps)` and `diagnostics()`, drop-in for any
+  with `run(gym_env, steps)` and `diagnostics()`, drop-in for any
   gymnasium loop.
-- Cargo workspace layout: `kindle` (core, publishable), `kindle-gym`
+- Cargo workspace layout: `kindle` (core), `kindle-gym`
   (envs + runnable examples), `python` (maturin-built extension, out of
   the default workspace build).

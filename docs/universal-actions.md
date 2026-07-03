@@ -279,6 +279,9 @@ Phased rollout that doesn't break existing examples:
 - **`OBS_TOKEN_DIM` and `MAX_ACTION_DIM`** — picking from current envs:
   max `obs_dim` = 34 (Taxi), max `action_dim` = 6 (Taxi).
   Set `MAX_ACTION_DIM = 6`, `OBS_TOKEN_DIM = 64`. Both can grow later.
+  *(Superseded: `MAX_ACTION_DIM` did grow later — it is now 18
+  (`kindle/src/adapter.rs`), raised for the Atari/ARC-AGI-3 action
+  sets. `OBS_TOKEN_DIM` remains 64.)*
 - **Action mask: CPU side.** The graph stays clean; the per-env adapter
   zeros or softmaxes over the live dims before returning an action.
   Revisit if the wasted gradient on dead dims becomes a problem.

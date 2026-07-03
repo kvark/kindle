@@ -23,7 +23,9 @@ bridge:
   to the game's current `available_actions` list (filtered to
   ACTION1..ACTION7 "simple" actions only). `N` is set from
   `min(6, len(simple_available))` to match kindle's
-  `MAX_ACTION_DIM = 6`.
+  `MAX_ACTION_DIM = 6`. *(Superseded: `MAX_ACTION_DIM` is now 18
+  post-Atari work — `kindle/src/adapter.rs` — and the harness caps
+  at `min(18, len(available_actions))`.)*
 - **Homeo**: two variables:
   - `levels_completed` delta (spikes `-scale` on level
     completion; otherwise zero — this IS the only reliable
@@ -109,8 +111,9 @@ Multiple stacked problems, each genuine:
    obs token vector. Redesign of the encoder stack is needed.
 2. **Complex-action parameterization**: several games need
    coordinate actions. Kindle's action adapter (discrete +
-   continuous vectors, `MAX_ACTION_DIM = 6`) doesn't compose
-   with (x, y) coords. A structured action head would be
+   continuous vectors, `MAX_ACTION_DIM = 6`; since raised to 18,
+   which widens the discrete menu but still doesn't compose
+   with (x, y) coords) — a structured action head would be
    needed.
 3. **Goal / milestone discovery beyond kindle's current M7**:
    we showed M7's self-supervised prototype ranking fails on
@@ -218,8 +221,9 @@ Concretely for ARC-AGI-3 specifically:
 
   (c) **Coordinate action head** — needed for games that use
       complex actions. Kindle's MAX_ACTION_DIM=6 currently only
-      supports 6 simple actions; adding `(x, y)` parameters
-      requires either a new action shape or a separate
+      supports 6 simple actions (*superseded: now 18, so more
+      discrete slots are available*); adding `(x, y)` parameters
+      still requires either a new action shape or a separate
       continuous-coord head.
 
 None of these solves the *reward-class* problem — level

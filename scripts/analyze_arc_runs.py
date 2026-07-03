@@ -92,7 +92,7 @@ def fmt_per_lvl(d):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: analyze.py log1 [log2 ...]")
+        print("Usage: analyze_arc_runs.py log1 [log2 ...]")
         return 1
     runs = [parse_log(Path(arg)) for arg in sys.argv[1:]]
     # Final-state header

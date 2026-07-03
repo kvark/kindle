@@ -54,7 +54,7 @@ Open structural problems holding kindle back from a *general* ARC policy:
 
 ## Cross-cutting infrastructure (already done 2026-05-06)
 - `Agent.save_state(dir)` / `Agent.load_state(dir)` — checkpoint API used by items 2 & 3
-- `BatchAgent.latents()` + latent_probe.py — measures per-game centroid dominance
+- `BatchAgent.latents()` + a latent_probe.py analysis script (ad-hoc; not checked into this repo) — measures per-game centroid dominance
 - `--val-prefixes` + `--val-steps` train/val split — used by items 2 & 5
 - `--goal-bonus α` extrinsic pulse — best result so far
 - PPO + L1 options compatibility — needed by item 4

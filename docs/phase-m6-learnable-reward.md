@@ -142,7 +142,7 @@ LunarLander with episode_length ≈ 100–300, batch 256 fits.
 struct Lane {
     /// Trajectory buffer for the current episode: the sequence
     /// of `z_t` vectors since the last `env_boundary`. Capped at
-    /// `outcome_max_episode_len` (2000 — any env that exceeds
+    /// `outcome_max_episode_len` (default 256 — any env that exceeds
     /// gets its tail truncated; diagnostic warn on truncation).
     /// Cleared on episode start.
     outcome_ep_trajectory: Vec<Vec<f32>>,

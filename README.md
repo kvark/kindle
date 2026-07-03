@@ -3,9 +3,9 @@
 > To kindle is to start a fire from nothing. This agent does the same with intelligence — a cold network that bootstraps its own understanding from environment-agnostic primitives, with no pretraining and no handed-down reward.
 
 [![CI](https://github.com/kvark/kindle/actions/workflows/ci.yml/badge.svg)](https://github.com/kvark/kindle/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/kindle.svg)](https://crates.io/crates/kindle)
-[![docs.rs](https://img.shields.io/docsrs/kindle)](https://docs.rs/kindle)
-[![license](https://img.shields.io/crates/l/kindle.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Not on crates.io: kindle depends on git-pinned revisions of meganeura, so it is consumed as a git dependency for now.
 
 Built on [meganeura](https://github.com/kvark/meganeura) — a cross-platform Rust neural network library with GPU-accelerated training and inference via [blade-graphics](https://github.com/kvark/blade).
 
@@ -116,7 +116,7 @@ Trained contrastively: when similar latent states at different times receive dif
 
 ### Value Head + Policy
 
-Small MLP `V̂(z_t)` (actor-critic baseline) and stochastic policy `π(z_t)`. Both branches use the same universal continuous-Gaussian graph — for discrete envs the adapter interprets the first `n` head dims as logits and samples categorically. Updated by credit-weighted policy gradient with an entropy bonus that never anneals below a floor (preserving exploration forever).
+Small MLP `V̂(z_t)` (actor-critic baseline) and stochastic policy `π(z_t)`. The policy graph is picked at construction from the adapters' action kinds: all-discrete setups compile a cross-entropy-on-logits graph (categorical sampling over the first `n` of `MAX_ACTION_DIM` dims), all-continuous setups compile an MSE (unit-variance Gaussian) graph. Mixing discrete and continuous adapters in one agent is not supported (asserted at construction). Updated by credit-weighted policy gradient with an entropy bonus that never anneals below a floor (preserving exploration forever).
 
 -----
 
@@ -174,7 +174,7 @@ pub struct ExperienceBuffer {
     credits:      RingBuffer<f32>,
     pred_errors:  RingBuffer<f32>,
     env_ids:      RingBuffer<u32>,        // which env produced this transition
-    env_boundary: RingBuffer<bool>,       // true on the first step after switch_env
+    env_boundary: RingBuffer<bool>,       // true on the first step after switch_lane
     visit_counts: HashMap<StateKey, u32>, // for novelty
 }
 ```
@@ -244,8 +244,9 @@ Outcome gates, not calendar weeks. Each gate has a measurable exit condition; we
 - **M2 — Reward signal carries information.** All four primitives produce non-zero, finite values that vary across states; `reward_mean` separates trajectories that lead to homeostatic violations from those that don't. **Status: closed.**
 - **M3 — Policy learns on its own signal.** Kindle agent solves CartPole from a cold start using intrinsic reward only (mean episode length > 195 within 50k steps). **Status: open.**
 - **M4 — Cross-env generalisation.** Agent hops GridWorld → CartPole → MountainCar → Taxi → Acrobot → Pendulum without divergence; encoder representations remain meaningful after switches (drift < threshold). **Status: partial — no divergence, generalisation TBD.**
-- **M5 — Long-run stability.** 1M-step run on real GPU hardware with no NaN, no gradient explosion, `H_eff` trending upward, entropy above floor. **Status: open.**
-- **M6 — Learnable reward circuit (unfreeze).** Only attempted once M3–M5 are closed. Adds gradient updates to the reward weights under tight constraints documented at the time.
+- **M5 — Long-run stability.** 1M-step run on real GPU hardware with no NaN, no gradient explosion, `H_eff` trending upward, entropy above floor. **Status: closed — passes on GridWorld** (see [docs/next-steps.md](docs/next-steps.md) and `docs/stability_runs/`); a multi-env variant remains future work.
+- **M6 — Learnable reward circuit (unfreeze).** A learned outcome-value head `R̂` over episode trajectories augments the frozen four-primitive circuit. **Status: implemented** — `kindle/src/outcome.rs`, design in [docs/phase-m6-learnable-reward.md](docs/phase-m6-learnable-reward.md).
+- **M7 — Approach-reward primitive.** Approach-shaping reward from self-discovered prototypes, addressing the reward class M6 cannot express. **Status: implemented** — `kindle/src/approach.rs`, design in [docs/phase-m7-approach-reward.md](docs/phase-m7-approach-reward.md).
 
 -----
 
@@ -273,9 +274,10 @@ Structured JSON diagnostics every step (no external dependency required):
 
 ## Python Bindings
 
-Kindle ships an optional pyo3 extension under `python/`, built via [maturin](https://www.maturin.rs/):
+Kindle ships an optional pyo3 extension under `python/`, built via [maturin](https://www.maturin.rs/). `maturin develop` installs into the active environment, so run it inside a virtualenv (it fails outside one):
 
 ```bash
+python -m venv .venv && . .venv/bin/activate
 pip install maturin
 cd python && maturin develop --release
 ```
@@ -289,21 +291,11 @@ import kindle
 env = gym.make("CartPole-v1")
 agent = kindle.Agent(obs_dim=4, num_actions=2, env_id=0, seed=0)
 
-# A tiny adapter that returns obs as a plain list of floats.
-class Wrapped:
-    def __init__(self, env): self.env = env
-    def reset(self):
-        obs, _ = self.env.reset()
-        return [float(x) for x in obs]
-    def step(self, action):
-        obs, r, term, trunc, info = self.env.step(int(action) % 2)
-        if term or trunc:
-            obs, _ = self.env.reset()
-        return [float(x) for x in obs], float(r), bool(term), bool(trunc), info
-
-agent.train(Wrapped(env), steps=10_000)
+episode_returns = agent.run(env, steps=10_000)
 print(agent.diagnostics())
 ```
+
+`Agent.run(env, steps, homeo_fn=None)` drives any gymnasium-style env directly — it calls `reset()`/`step(action)` itself, handles both the 5-tuple and legacy 4-tuple step shapes, and auto-resets on episode end. It returns the completed episodes' extrinsic returns for monitoring; training remains purely intrinsic.
 
 The Python extension is a thin wrapper — training still runs on GPU through meganeura. Python is for scripting and for dropping kindle into a gymnasium loop; it is not a second implementation.
 
@@ -316,7 +308,7 @@ This is a Cargo workspace.
 ```
 kindle/
 ├── Cargo.toml                 # [workspace]
-├── kindle/                    # core library crate (publishable)
+├── kindle/                    # core library crate (git dependency; not on crates.io)
 │   ├── Cargo.toml
 │   ├── src/                   # agent, encoder, world_model, reward, credit, policy, …
 │   └── tests/                 # canaries, opt_parity, reward_signal
