@@ -250,6 +250,12 @@ def main() -> int:
             length = e - s
             if length < 4:
                 continue
+            # The trailing segment (no following env_boundary row) is an
+            # UNTERMINATED episode: its rewards stop at the buffer edge,
+            # so "discounted return from step j" is truncated and V-vs-
+            # return pairs from it would bias the comparison toward
+            # "V over-estimates". Exclude it from the paired arrays.
+            terminated = e < len(buf)
             rewards = np.asarray(
                 [buf[j]["reward"] for j in range(s, e)], dtype=np.float64
             )
@@ -259,9 +265,10 @@ def main() -> int:
             for j in range(length - 1, -1, -1):
                 running = rewards[j] + gamma * running
                 disc[j] = running
-            for j in range(length):
-                paired_v.append(buf[s + j]["value"])
-                paired_ret.append(disc[j])
+            if terminated:
+                for j in range(length):
+                    paired_v.append(buf[s + j]["value"])
+                    paired_ret.append(disc[j])
             per_episode_summaries.append(
                 (lane_idx, s, length, float(rewards.sum()),
                  float(np.mean([buf[j]["pred_error"] for j in range(s, e)])))

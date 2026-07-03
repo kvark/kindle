@@ -12,6 +12,16 @@ Standard Atari preprocessing:
 - framestack=4 → (C=4, H=84, W=84) per lane per step
 - uint8 → float32 / 255 at hand-off to kindle
 
+Reward routing: the raw per-step env reward is SIGNED (Pong point won
+= +1, point lost = −1) and is fed through kindle's first-class
+extrinsic-reward channel (`set_extrinsic_reward`, scaled by
+`extrinsic_reward_alpha`, default --extrinsic-alpha 1.0). The old
+default routed |reward| through the homeostatic channel, whose
+`-max(0, |value−target|−tol)` form is symmetric — a point won and a
+point lost both scored −0.5, training the agent to avoid scoring
+events of either sign. That legacy path is kept only behind
+--legacy-homeo-reward for A/B comparison.
+
 Usage:
     python python/examples/atari_batch.py --game Pong --lanes 8 --steps 5000
 """
@@ -136,17 +146,18 @@ def _write_frames_into_shared(obs_batch: np.ndarray, dest: np.ndarray) -> None:
 
 
 def homeo_for(step_reward: float) -> list[dict[str, float]]:
-    """Per-step env reward as a homeo variable.
+    """LEGACY (--legacy-homeo-reward only): per-step env reward as a
+    homeo variable, value = -step_reward, target = 0, tolerance = 0.5.
 
-    value = -step_reward, target = 0, tolerance = 0.5.
-
-    Most Atari steps produce 0 reward (deviation 0, inside tolerance →
-    homeo 0). A score event produces ±1, giving an immediate ±1 delta
-    that's sharp in time — exactly the per-step signal the policy
-    gradient needs. Cumulative-score formulations end up constant
-    mid-episode and the value head learns the DC offset, zeroing the
-    advantage; this delta formulation keeps the signal in the
-    advantage, not the value."""
+    Kindle's homeostatic reward is `-max(0, |value - target| - tol)` —
+    SYMMETRIC in the deviation. A Pong point won (+1) and a point lost
+    (−1) both land at −0.5: the sign of the env reward is discarded and
+    the agent is trained to avoid scoring events of either sign. The
+    default path instead passes the signed reward through kindle's
+    extrinsic channel (`set_extrinsic_reward`); this function is kept
+    only so old runs can be reproduced/compared. A homeo variable is
+    only appropriate for genuinely symmetric drives ("keep X near
+    target"), which per-step Atari score reward is not."""
     return [
         {"value": -step_reward, "target": 0.0, "tolerance": 0.5},
     ]
@@ -250,7 +261,14 @@ def main() -> int:
                         "Default is SyncVectorEnv (single process).")
     parser.add_argument("--reward-homeostatic", type=float, default=None,
                         help="Weight on the homeostatic primitive. Kindle default 2.0. "
-                        "With per-step reward-delta homeo, try 0.5-1.0.")
+                        "Only matters with --legacy-homeo-reward (the default "
+                        "config passes no homeo variables); then try 0.5-1.0.")
+    parser.add_argument("--legacy-homeo-reward", action="store_true",
+                        help="Restore the pre-audit reward routing: |env reward| "
+                        "through the SYMMETRIC homeostatic channel "
+                        "(-max(0, |value|-tol)) — a point won and a point lost "
+                        "both score −0.5. Sign-blind; kept only for A/B "
+                        "comparison against the extrinsic-channel default.")
     parser.add_argument("--reward-surprise", type=float, default=None)
     parser.add_argument("--reward-novelty", type=float, default=None)
     parser.add_argument("--reward-order", type=float, default=None)
@@ -289,14 +307,14 @@ def main() -> int:
                         "wrong direction on imbalanced envs (observed on Pong "
                         "at 400k env-steps: entropy drops 1.79→1.68 but "
                         "avg_return drifts −20.2→−21.0).")
-    parser.add_argument("--extrinsic-alpha", type=float, default=None,
+    parser.add_argument("--extrinsic-alpha", type=float, default=1.0,
                         help="Weight on kindle's first-class extrinsic-reward "
-                        "primitive. When > 0, the harness supplies the raw "
-                        "env reward ± directly to kindle's per-step reward "
+                        "primitive. When > 0 (default 1.0), the harness supplies "
+                        "the raw env reward ± directly to kindle's per-step reward "
                         "channel (additive alongside surprise/novelty/homeo/…). "
                         "Unlike homeo's distance-to-target, this is signed and "
                         "passes through — the correct integration for "
-                        "per-step ±1 Atari-style reward.")
+                        "per-step ±1 Atari-style reward. Set 0 to disable.")
     parser.add_argument("--rnd-alpha", type=float, default=None)
     parser.add_argument("--delta-goal-alpha", type=float, default=None)
     parser.add_argument("--delta-goal-threshold", type=float, default=None)
@@ -436,6 +454,13 @@ def main() -> int:
             obs_batch_u8, 255.0, out=frame_buf, dtype=np.float32, casting="unsafe"
         )
 
+    # Initial frame for step 0's act(). Inside the loop the frame is
+    # pushed once per step, just before observe(); the same buffer
+    # content then serves the NEXT iteration's act() — re-pushing the
+    # unchanged obs_batch before act() (the old behavior) doubled the
+    # reported frame-conversion cost for no effect.
+    push_frame(obs_batch)
+
     for step in range(args.steps):
         # 0) Periodic planner invocation (queues actions for the next K
         # act() calls). Triggered by `--planner-every` (set by the
@@ -448,17 +473,14 @@ def main() -> int:
         ):
             agent.plan_and_queue(num_actions)
 
-        # 1) Hand the current frame to kindle (one path-dependent copy).
-        t = time.time()
-        push_frame(obs_batch)
-        prof.tick("push_frame", time.time() - t)
-
-        # 2) Sample actions (batched).
+        # 1) Sample actions (batched). The visual slot already holds
+        # the current frame (pushed before the loop / at the end of
+        # the previous iteration).
         t = time.time()
         actions = agent.act(obs_token_small)
         prof.tick("agent.act", time.time() - t)
 
-        # 3) Step envs.
+        # 2) Step envs.
         t = time.time()
         actions_np = np.array(actions, dtype=np.int64)
         obs_batch, rewards, terms, truncs, _info = envs.step(actions_np)
@@ -467,18 +489,26 @@ def main() -> int:
         cur_scores += rewards
         dones = np.logical_or(terms, truncs)
 
-        # 4) Next-frame for observe()'s WM pass.
+        # 3) Next-frame for observe()'s WM pass (also reused by the
+        # next iteration's act()).
         t = time.time()
         push_frame(obs_batch)
-        prof.tick("push_frame (next)", time.time() - t)
+        prof.tick("push_frame", time.time() - t)
 
         t = time.time()
         shaped = balancer.scale(rewards) if balancer is not None else rewards
-        homeos = [homeo_for(float(shaped[i])) for i in range(args.lanes)]
-        if args.extrinsic_alpha is not None and args.extrinsic_alpha > 0:
+        if args.extrinsic_alpha > 0:
             # Raw env reward, signed, passed through kindle's extrinsic
-            # primitive. Shaped=balanced copy if --balance-events is on.
+            # primitive (mixed as extrinsic_reward_alpha × reward inside
+            # observe). Shaped=balanced copy if --balance-events is on.
             agent.set_extrinsic_reward(shaped.astype(np.float32, copy=False))
+        # Homeo channel only under --legacy-homeo-reward: its distance-
+        # to-target form is symmetric (sign-blind), see homeo_for().
+        homeos = (
+            [homeo_for(float(shaped[i])) for i in range(args.lanes)]
+            if args.legacy_homeo_reward
+            else None
+        )
         agent.observe(obs_token_small, [int(a) for a in actions], homeostatic=homeos)
         prof.tick("agent.observe", time.time() - t)
 

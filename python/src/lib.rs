@@ -7,12 +7,12 @@
 //!
 //! Build: `maturin develop -m python/Cargo.toml`
 
-// pyo3 0.22's `#[pymethods]` macro expansion emits `.into()` calls on
+// pyo3 0.28's `#[pymethods]` macro expansion emits `.into()` calls on
 // PyErr values, which clippy flags as useless. The code is in a macro
 // we don't own; silence the lint at the crate level.
 #![allow(clippy::useless_conversion)]
 
-use kindle::adapter::{GenericAdapter, OBS_TOKEN_DIM};
+use kindle::adapter::{GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
 use kindle::env::{
     Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
 };
@@ -26,6 +26,42 @@ use pyo3::types::{PyDict, PyList, PyTuple};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 
+/// Wrapper asserting a borrow may cross `Python::detach` (pyo3's
+/// GIL-releasing `allow_threads`).
+///
+/// `Agent` holds GPU-session raw pointers and is `!Send`, so a closure
+/// borrowing it doesn't satisfy `detach`'s `Ungil` (= `Send`) bound.
+/// Releasing the GIL never moves the closure off the calling thread,
+/// and both agent pyclasses are `unsendable` — other Python threads
+/// cannot touch them while the GIL is released — so the borrow never
+/// actually crosses a thread boundary.
+///
+/// Access the inner value through `get()` inside the closure: a method
+/// call captures the whole wrapper, whereas a direct `ctx.0` field
+/// access would make Rust 2021's disjoint-capture rules capture the
+/// (non-`Send`) field and bypass the wrapper.
+struct AssertSend<T>(T);
+unsafe impl<T> Send for AssertSend<T> {}
+
+impl<T> AssertSend<T> {
+    fn get(&mut self) -> &mut T {
+        &mut self.0
+    }
+}
+
+/// Raise `ValueError` when a wrapped setter's input length doesn't match
+/// what the underlying `Agent` method asserts on (which would otherwise
+/// cross the FFI boundary as an uncatchable-by-`except Exception`
+/// `PanicException`).
+fn check_len(what: &str, got: usize, expected: usize) -> PyResult<()> {
+    if got != expected {
+        return Err(PyValueError::new_err(format!(
+            "{what}: expected {expected} entries, got {got}"
+        )));
+    }
+    Ok(())
+}
+
 /// A kindle agent wired to a Python-side environment.
 ///
 /// Marked `unsendable` because the inner GPU session holds raw pointers
@@ -36,6 +72,7 @@ pub struct PyAgent {
     agent: Agent,
     rng: StdRng,
     num_actions: usize,
+    obs_dim: usize,
 }
 
 #[pymethods]
@@ -44,7 +81,7 @@ impl PyAgent {
     ///
     /// Args:
     ///     obs_dim (int): env observation vector length. Must be ≤ OBS_TOKEN_DIM.
-    ///     num_actions (int): number of discrete actions.
+    ///     num_actions (int): number of discrete actions. Must be ≤ MAX_ACTION_DIM (18).
     ///     env_id (int): stable identifier for this env (default 0).
     ///     seed (int): RNG seed (default 0).
     #[new]
@@ -55,12 +92,18 @@ impl PyAgent {
                 "obs_dim {obs_dim} exceeds kindle OBS_TOKEN_DIM {OBS_TOKEN_DIM}"
             )));
         }
+        if num_actions > MAX_ACTION_DIM {
+            return Err(PyValueError::new_err(format!(
+                "num_actions {num_actions} exceeds kindle MAX_ACTION_DIM {MAX_ACTION_DIM}"
+            )));
+        }
         let adapter = Box::new(GenericAdapter::discrete(env_id, obs_dim, num_actions));
         let agent = Agent::new(AgentConfig::default(), vec![adapter]);
         Ok(Self {
             agent,
             rng: StdRng::seed_from_u64(seed),
             num_actions,
+            obs_dim,
         })
     }
 
@@ -69,12 +112,16 @@ impl PyAgent {
     /// `obs` is any 1-D iterable of floats (list, tuple, numpy array).
     /// Returns the action index.
     fn act(&mut self, obs: &Bound<'_, PyAny>) -> PyResult<usize> {
-        let obs_vec = parse_obs(obs)?;
+        let py = obs.py();
+        let obs_vec = parse_obs(obs, self.obs_dim)?;
         let observation = Observation::new(obs_vec);
-        let action = self
-            .agent
-            .act(std::slice::from_ref(&observation), &mut self.rng)
-            .remove(0);
+        // Release the GIL for the GPU dispatch so Python-side env /
+        // logging threads can make progress (M-16).
+        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+        let action = py.detach(move || {
+            let (agent, rng) = ctx.get();
+            agent.act(std::slice::from_ref(&observation), rng).remove(0)
+        });
         match action {
             Action::Discrete(i) => Ok(i),
             Action::Continuous(_) => Err(PyRuntimeError::new_err(
@@ -103,24 +150,31 @@ impl PyAgent {
                 self.num_actions
             )));
         }
-        let obs_vec = parse_obs(next_obs)?;
+        let py = next_obs.py();
+        let obs_vec = parse_obs(next_obs, self.obs_dim)?;
         let observation = Observation::new(obs_vec);
         let homeo = match homeostatic {
             Some(h) => parse_homeo(h)?,
             None => Vec::new(),
         };
-        let proxy = ProxyEnv {
-            obs: &observation,
-            homeo,
-        };
-        let action = Action::Discrete(action);
-        let proxy_ref: &dyn Environment = &proxy;
-        self.agent.observe(
-            std::slice::from_ref(&observation),
-            std::slice::from_ref(&action),
-            std::slice::from_ref(&proxy_ref),
-            &mut self.rng,
-        );
+        // All Python data is extracted above; release the GIL for the
+        // GPU training dispatch (M-16).
+        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+        py.detach(move || {
+            let (agent, rng) = ctx.get();
+            let proxy = ProxyEnv {
+                obs: &observation,
+                homeo,
+            };
+            let action = Action::Discrete(action);
+            let proxy_ref: &dyn Environment = &proxy;
+            agent.observe(
+                std::slice::from_ref(&observation),
+                std::slice::from_ref(&action),
+                std::slice::from_ref(&proxy_ref),
+                rng,
+            );
+        });
         Ok(())
     }
 
@@ -153,7 +207,7 @@ impl PyAgent {
         homeo_fn: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<Vec<f32>> {
         let reset_ret = env.call_method0("reset")?;
-        let mut obs_vec = unpack_reset(&reset_ret)?;
+        let mut obs_vec = unpack_reset(&reset_ret, self.obs_dim)?;
 
         let mut returns: Vec<f32> = Vec::new();
         let mut episode_return = 0.0f32;
@@ -165,18 +219,24 @@ impl PyAgent {
             }
 
             let observation = Observation::new(obs_vec.clone());
-            let action = self
-                .agent
-                .act(std::slice::from_ref(&observation), &mut self.rng)
-                .remove(0);
+            let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+            let action = py.detach(move || {
+                let (agent, rng) = ctx.get();
+                agent.act(std::slice::from_ref(&observation), rng).remove(0)
+            });
             let action_idx = match &action {
                 Action::Discrete(i) => *i,
-                Action::Continuous(_) => 0,
+                Action::Continuous(_) => {
+                    return Err(PyRuntimeError::new_err(
+                        "agent produced a continuous action; PyAgent.run expects a \
+                         discrete action space",
+                    ));
+                }
             };
 
             let step_args = PyTuple::new(py, [action_idx])?;
             let step_ret = env.call_method1("step", step_args)?;
-            let (next_vec, reward, terminated, truncated) = unpack_step(&step_ret)?;
+            let (next_vec, reward, terminated, truncated) = unpack_step(&step_ret, self.obs_dim)?;
             episode_return += reward;
 
             let homeo = match homeo_fn {
@@ -188,23 +248,27 @@ impl PyAgent {
                 None => Vec::new(),
             };
             let next_observation = Observation::new(next_vec.clone());
-            let proxy = ProxyEnv {
-                obs: &next_observation,
-                homeo,
-            };
-            let proxy_ref: &dyn Environment = &proxy;
-            self.agent.observe(
-                std::slice::from_ref(&next_observation),
-                std::slice::from_ref(&action),
-                std::slice::from_ref(&proxy_ref),
-                &mut self.rng,
-            );
+            let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+            py.detach(move || {
+                let (agent, rng) = ctx.get();
+                let proxy = ProxyEnv {
+                    obs: &next_observation,
+                    homeo,
+                };
+                let proxy_ref: &dyn Environment = &proxy;
+                agent.observe(
+                    std::slice::from_ref(&next_observation),
+                    std::slice::from_ref(&action),
+                    std::slice::from_ref(&proxy_ref),
+                    rng,
+                );
+            });
 
             if terminated || truncated {
                 returns.push(episode_return);
                 episode_return = 0.0;
                 let reset_ret = env.call_method0("reset")?;
-                obs_vec = unpack_reset(&reset_ret)?;
+                obs_vec = unpack_reset(&reset_ret, self.obs_dim)?;
                 self.agent.mark_boundary(0);
             } else {
                 obs_vec = next_vec;
@@ -265,21 +329,36 @@ impl<'a> Environment for ProxyEnv<'a> {
     fn reset(&mut self) {}
 }
 
-fn parse_obs(obj: &Bound<'_, PyAny>) -> PyResult<Vec<f32>> {
-    // Fast path: Python list of floats.
-    if let Ok(list) = obj.cast::<PyList>() {
-        let mut v = Vec::with_capacity(list.len());
-        for item in list.iter() {
-            v.push(item.extract::<f32>()?);
+/// Parse a 1-D observation and require exactly `expected_dim` entries.
+/// Without the check, longer observations would silently truncate at
+/// `OBS_TOKEN_DIM` and shorter ones silently zero-pad during
+/// tokenization (M-15).
+fn parse_obs(obj: &Bound<'_, PyAny>, expected_dim: usize) -> PyResult<Vec<f32>> {
+    let v = {
+        // Fast path: Python list of floats.
+        if let Ok(list) = obj.cast::<PyList>() {
+            let mut v = Vec::with_capacity(list.len());
+            for item in list.iter() {
+                v.push(item.extract::<f32>()?);
+            }
+            v
+        } else {
+            // Fallback: any iterable (tuple, numpy array, etc.).
+            let iter = obj.try_iter()?;
+            let mut v = Vec::new();
+            for item in iter {
+                let item: Bound<'_, PyAny> = item?;
+                v.push(item.extract::<f32>()?);
+            }
+            v
         }
-        return Ok(v);
-    }
-    // Fallback: any iterable (tuple, numpy array, etc.).
-    let iter = obj.try_iter()?;
-    let mut v = Vec::new();
-    for item in iter {
-        let item: Bound<'_, PyAny> = item?;
-        v.push(item.extract::<f32>()?);
+    };
+    if v.len() != expected_dim {
+        return Err(PyValueError::new_err(format!(
+            "observation length {} does not match obs_dim {expected_dim} \
+             given at agent construction",
+            v.len()
+        )));
     }
     Ok(v)
 }
@@ -332,18 +411,21 @@ fn dict_get_f32(dict: &Bound<'_, PyDict>, key: &str) -> PyResult<f32> {
 }
 
 /// Gymnasium: `reset() -> (obs, info)`. Older gym: `reset() -> obs`.
-fn unpack_reset(obj: &Bound<'_, PyAny>) -> PyResult<Vec<f32>> {
+fn unpack_reset(obj: &Bound<'_, PyAny>, expected_dim: usize) -> PyResult<Vec<f32>> {
     if let Ok(tup) = obj.cast::<PyTuple>() {
         if !tup.is_empty() {
-            return parse_obs(&tup.get_item(0)?);
+            return parse_obs(&tup.get_item(0)?, expected_dim);
         }
     }
-    parse_obs(obj)
+    parse_obs(obj, expected_dim)
 }
 
 /// Gymnasium: `(obs, reward, terminated, truncated, info)`.
 /// Older gym:  `(obs, reward, done, info)`.
-fn unpack_step(obj: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, f32, bool, bool)> {
+fn unpack_step(
+    obj: &Bound<'_, PyAny>,
+    expected_dim: usize,
+) -> PyResult<(Vec<f32>, f32, bool, bool)> {
     let tup = obj
         .cast::<PyTuple>()
         .map_err(|_| PyValueError::new_err("env.step() must return a tuple"))?;
@@ -353,7 +435,7 @@ fn unpack_step(obj: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, f32, bool, bool)> 
             "env.step() must return at least (obs, reward, done, info)",
         ));
     }
-    let obs = parse_obs(&tup.get_item(0)?)?;
+    let obs = parse_obs(&tup.get_item(0)?, expected_dim)?;
     let reward: f32 = tup.get_item(1)?.extract()?;
     let (terminated, truncated) = if n >= 5 {
         let t: bool = tup.get_item(2)?.extract()?;
@@ -392,6 +474,7 @@ pub struct PyBatchAgent {
     rng: StdRng,
     num_actions: usize,
     batch_size: usize,
+    obs_dim: usize,
 }
 
 #[pymethods]
@@ -729,6 +812,11 @@ impl PyBatchAgent {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
                 "obs_dim {obs_dim} exceeds kindle OBS_TOKEN_DIM {OBS_TOKEN_DIM}"
+            )));
+        }
+        if num_actions > MAX_ACTION_DIM {
+            return Err(PyValueError::new_err(format!(
+                "num_actions {num_actions} exceeds kindle MAX_ACTION_DIM {MAX_ACTION_DIM}"
             )));
         }
         if batch_size == 0 {
@@ -1288,8 +1376,7 @@ impl PyBatchAgent {
                             "encoder_kind='efficientnet_v2s' requires efficientnet_weights",
                         )
                     })?;
-                    config.efficientnet_weights_path =
-                        Some(std::path::PathBuf::from(path));
+                    config.efficientnet_weights_path = Some(std::path::PathBuf::from(path));
                     EncoderKind::EfficientNetV2S
                 }
                 other => {
@@ -1305,6 +1392,7 @@ impl PyBatchAgent {
             rng: StdRng::seed_from_u64(seed),
             num_actions,
             batch_size,
+            obs_dim,
         })
     }
 
@@ -1312,9 +1400,15 @@ impl PyBatchAgent {
     /// of length `batch_size` where each entry is a 1-D sequence of floats.
     /// Returns a list of integer action indices, length `batch_size`.
     fn act(&mut self, obs_list: &Bound<'_, PyAny>) -> PyResult<Vec<usize>> {
-        let obs_vecs = parse_obs_list(obs_list, self.batch_size)?;
+        let py = obs_list.py();
+        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
         let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
-        let actions = self.agent.act(&observations, &mut self.rng);
+        // Release the GIL for the batched GPU dispatch (M-16).
+        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+        let actions = py.detach(move || {
+            let (agent, rng) = ctx.get();
+            agent.act(&observations, rng)
+        });
         actions
             .into_iter()
             .map(|a| match a {
@@ -1339,7 +1433,8 @@ impl PyBatchAgent {
         actions_list: &Bound<'_, PyAny>,
         homeostatic: Option<&Bound<'_, PyAny>>,
     ) -> PyResult<()> {
-        let obs_vecs = parse_obs_list(next_obs_list, self.batch_size)?;
+        let py = next_obs_list.py();
+        let obs_vecs = parse_obs_list(next_obs_list, self.batch_size, self.obs_dim)?;
         let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
 
         // Parse actions list.
@@ -1374,33 +1469,40 @@ impl PyBatchAgent {
             None => (0..self.batch_size).map(|_| Vec::new()).collect(),
             Some(outer) => {
                 let mut out: Vec<Vec<HomeostaticVariable>> = Vec::with_capacity(self.batch_size);
-                for (i, inner) in outer.try_iter()?.enumerate() {
-                    if i >= self.batch_size {
-                        return Err(PyValueError::new_err(
-                            "homeostatic list longer than batch_size",
-                        ));
-                    }
+                for inner in outer.try_iter()? {
                     let inner: Bound<'_, PyAny> = inner?;
                     out.push(parse_homeo(&inner)?);
                 }
-                while out.len() < self.batch_size {
-                    out.push(Vec::new());
+                // One inner list per lane, exactly. Silently padding a
+                // short list would strip trailing lanes of their homeo
+                // signal with no diagnostic (M-19).
+                if out.len() != self.batch_size {
+                    return Err(PyValueError::new_err(format!(
+                        "homeostatic list length {} must equal batch_size {}",
+                        out.len(),
+                        self.batch_size
+                    )));
                 }
                 out
             }
         };
 
-        // Build proxy envs (hold the observations + homeostats for this step).
-        let proxies: Vec<ProxyEnv> = observations
-            .iter()
-            .zip(homeos.into_iter())
-            .map(|(obs, homeo)| ProxyEnv { obs, homeo })
-            .collect();
-        let env_refs: Vec<&dyn Environment> =
-            proxies.iter().map(|p| p as &dyn Environment).collect();
-
-        self.agent
-            .observe(&observations, &actions, &env_refs, &mut self.rng);
+        // All Python data is extracted; release the GIL for the batched
+        // GPU training dispatch (M-16).
+        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+        py.detach(move || {
+            let (agent, rng) = ctx.get();
+            // Build proxy envs (hold the observations + homeostats for
+            // this step).
+            let proxies: Vec<ProxyEnv> = observations
+                .iter()
+                .zip(homeos.into_iter())
+                .map(|(obs, homeo)| ProxyEnv { obs, homeo })
+                .collect();
+            let env_refs: Vec<&dyn Environment> =
+                proxies.iter().map(|p| p as &dyn Environment).collect();
+            agent.observe(&observations, &actions, &env_refs, rng);
+        });
         Ok(())
     }
 
@@ -1531,6 +1633,10 @@ impl PyBatchAgent {
     /// `observe()` when the agent's encoder is CNN; no-op for MLP
     /// agents.
     fn set_visual_obs(&mut self, visual: &Bound<'_, PyAny>) -> PyResult<()> {
+        // Expected float count: batch · channels · h · w. Zero for MLP
+        // agents, where the underlying call is a documented no-op —
+        // skip the length check in that case.
+        let expected = self.agent.visual_obs_host_size() / std::mem::size_of::<f32>();
         // Fast path: a contiguous float32 buffer (numpy array, bytes,
         // memoryview, etc.) — read directly via the buffer protocol
         // without materializing an intermediate Vec<f32>. For Atari's
@@ -1539,6 +1645,13 @@ impl PyBatchAgent {
         if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(visual) {
             let py = visual.py();
             if let Some(slice) = buf.as_slice(py) {
+                if expected != 0 {
+                    check_len(
+                        "set_visual_obs (batch · channels · h · w floats)",
+                        slice.len(),
+                        expected,
+                    )?;
+                }
                 // `ReadOnlyCell<f32>` has the same layout as `f32`;
                 // cast and hand kindle an ordinary slice.
                 let ptr = slice.as_ptr() as *const f32;
@@ -1551,6 +1664,13 @@ impl PyBatchAgent {
         // Fallback: extract to a Vec<f32>. Accepts any iterable of
         // floats (legacy `list[float]` usage).
         let v: Vec<f32> = visual.extract()?;
+        if expected != 0 {
+            check_len(
+                "set_visual_obs (batch · channels · h · w floats)",
+                v.len(),
+                expected,
+            )?;
+        }
         self.agent.set_visual_obs(&v);
         Ok(())
     }
@@ -1570,9 +1690,15 @@ impl PyBatchAgent {
     ///
     /// Accepts numpy arrays (zero-copy) or any iterable of floats.
     fn set_action_masks(&mut self, masks: &Bound<'_, PyAny>) -> PyResult<()> {
+        let expected = self.batch_size * MAX_ACTION_DIM;
         if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(masks) {
             let py = masks.py();
             if let Some(slice) = buf.as_slice(py) {
+                check_len(
+                    "set_action_masks (batch_size × MAX_ACTION_DIM floats)",
+                    slice.len(),
+                    expected,
+                )?;
                 let ptr = slice.as_ptr() as *const f32;
                 let len = slice.len();
                 let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
@@ -1581,6 +1707,11 @@ impl PyBatchAgent {
             }
         }
         let v: Vec<f32> = masks.extract()?;
+        check_len(
+            "set_action_masks (batch_size × MAX_ACTION_DIM floats)",
+            v.len(),
+            expected,
+        )?;
         self.agent.set_action_masks(&v);
         Ok(())
     }
@@ -1598,6 +1729,7 @@ impl PyBatchAgent {
         if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(rewards) {
             let py = rewards.py();
             if let Some(slice) = buf.as_slice(py) {
+                check_len("set_extrinsic_reward", slice.len(), self.batch_size)?;
                 let ptr = slice.as_ptr() as *const f32;
                 let len = slice.len();
                 let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
@@ -1606,6 +1738,7 @@ impl PyBatchAgent {
             }
         }
         let v: Vec<f32> = rewards.extract()?;
+        check_len("set_extrinsic_reward", v.len(), self.batch_size)?;
         self.agent.set_extrinsic_reward(&v);
         Ok(())
     }
@@ -1623,10 +1756,17 @@ impl PyBatchAgent {
     /// `set_extrinsic_reward` but does NOT count toward
     /// `sil_ep_event_count` — kept separate so the win-classifier's
     /// is_win label stays anchored on real extrinsic events.
+    ///
+    /// **Gate:** like `set_extrinsic_reward`, this is a silent no-op
+    /// when `extrinsic_reward_alpha == 0.0` (the constructor default) —
+    /// the rewards are scaled by `extrinsic_reward_alpha` inside the
+    /// agent. Construct the agent with `extrinsic_reward_alpha > 0` for
+    /// progress rewards to take effect.
     fn set_intrinsic_progress(&mut self, rewards: &Bound<'_, PyAny>) -> PyResult<()> {
         if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(rewards) {
             let py = rewards.py();
             if let Some(slice) = buf.as_slice(py) {
+                check_len("set_intrinsic_progress", slice.len(), self.batch_size)?;
                 let ptr = slice.as_ptr() as *const f32;
                 let len = slice.len();
                 let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
@@ -1635,6 +1775,7 @@ impl PyBatchAgent {
             }
         }
         let v: Vec<f32> = rewards.extract()?;
+        check_len("set_intrinsic_progress", v.len(), self.batch_size)?;
         self.agent.set_intrinsic_progress(&v);
         Ok(())
     }
@@ -2010,8 +2151,14 @@ impl PyBatchAgent {
     /// sequence. Call from the harness before `act()` when you
     /// want the next K actions to come from planning rather than
     /// the policy. No-op when `planner_horizon == 0`.
-    fn plan_and_queue(&mut self, num_actions: usize) {
-        self.agent.plan_and_queue(num_actions, &mut self.rng);
+    fn plan_and_queue(&mut self, py: Python<'_>, num_actions: usize) {
+        // Release the GIL: planning rolls the world model out on the
+        // GPU for `planner_samples × planner_horizon` steps (M-16).
+        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
+        py.detach(move || {
+            let (agent, rng) = ctx.get();
+            agent.plan_and_queue(num_actions, rng);
+        });
     }
 
     /// Total queued planner actions across all lanes. Diagnostic.
@@ -2108,13 +2255,10 @@ impl PyEfficientNet {
         g.set_outputs(vec![out]);
         let mut session = meganeura::build_inference_session(&g);
 
-        let weights =
-            meganeura::data::safetensors::SafeTensorsModel::load(safetensors_path.into())
-                .map_err(|e| {
-                    PyRuntimeError::new_err(format!(
-                        "EfficientNet: loading '{safetensors_path}': {e}"
-                    ))
-                })?;
+        let weights = meganeura::data::safetensors::SafeTensorsModel::load(safetensors_path.into())
+            .map_err(|e| {
+                PyRuntimeError::new_err(format!("EfficientNet: loading '{safetensors_path}': {e}"))
+            })?;
         for name in meganeura::models::efficientnet::weight_names() {
             let data = weights.tensor_f32(&name).map_err(|e| {
                 PyRuntimeError::new_err(format!("EfficientNet: parameter '{name}': {e}"))
@@ -2186,12 +2330,16 @@ impl PyEfficientNet {
 }
 
 /// Parse an outer sequence of length `expected` whose entries are each a
-/// 1-D obs vector (list/tuple/ndarray of floats).
-fn parse_obs_list(obj: &Bound<'_, PyAny>, expected: usize) -> PyResult<Vec<Vec<f32>>> {
+/// 1-D obs vector (list/tuple/ndarray of floats) of length `obs_dim`.
+fn parse_obs_list(
+    obj: &Bound<'_, PyAny>,
+    expected: usize,
+    obs_dim: usize,
+) -> PyResult<Vec<Vec<f32>>> {
     let mut out = Vec::with_capacity(expected);
     for item in obj.try_iter()? {
         let item: Bound<'_, PyAny> = item?;
-        out.push(parse_obs(&item)?);
+        out.push(parse_obs(&item, obs_dim)?);
     }
     if out.len() != expected {
         return Err(PyValueError::new_err(format!(
