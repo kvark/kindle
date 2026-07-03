@@ -1,10 +1,12 @@
 /target/
-/Cargo.lock
 *.trace
+*.pftrace
 /.claude/
 /.venv/
+.pytest_cache/
+__pycache__/
 python/target/
-python/Cargo.lock
+python/dist/
 python/.venv/
 python/**/__pycache__/
 python/*.egg-info/

@@ -7,6 +7,18 @@ hypothesis was, why we stopped.
 
 ## PPO + end-to-end encoder (build_ppo_policy_graph_e2e)
 
+> **Update 2026-05-01 — RESTORED.** `build_ppo_policy_graph_e2e` is
+> back in `kindle/src/policy.rs` and is dispatched again from
+> `Agent::new` when `use_ppo && end_to_end_encoder` (the
+> `assert!(!(use_ppo && end_to_end_encoder))` guard listed under
+> "Files removed" below is gone). The failure documented in this
+> entry was re-diagnosed as a symptom of a meganeura autodiff bug
+> (SumAll/MeanAll dropped `grad_output`), not a clipped-surrogate
+> pathology; post-fix the graph trains stably on LunarLander (29.7%
+> landings post-drop vs 0% before the fix — see CHANGELOG v0.2).
+> Everything below is kept unchanged as the historical record of the
+> pre-fix behavior.
+
 **Removed** 2026-04-26. The function was in `kindle/src/policy.rs`
 and dispatched in `agent.rs` when both `use_ppo=true` and
 `end_to_end_encoder=true`. Across four debug rounds it never
