@@ -296,19 +296,44 @@ def main() -> int:
         }
         return [levels_term, entropy_term]
 
-    def map_action(kindle_idx: int, lane: int, rng) -> tuple[GameAction, dict | None]:
+    def map_action(kindle_idx: int, lane: int, rng) -> tuple[GameAction, dict | None, int]:
+        """Returns (game_action, data, executed_idx). `executed_idx` is
+        the kindle index of the action ACTUALLY played — feed observe()
+        this, never the raw sample, so the policy isn't credited and
+        the WM isn't trained on actions that were never taken. With
+        set_action_masks pushed before act() the fallback should not
+        fire; it's kept as defense against a stale mask."""
         target_value = kindle_idx + 1  # 0..6 → 1..7
         aa = avail_actions[lane]
         # If the game doesn't have that action, fall back to first available.
         if target_value not in aa:
             target_value = aa[0]
         a = action_by_value[target_value]
+        executed_idx = target_value - 1
         if a.is_complex():
             x = rng.randrange(64)
             y = rng.randrange(64)
             a.set_data({"x": x, "y": y})
-            return a, {"x": x, "y": y}
-        return a, None
+            return a, {"x": x, "y": y}, executed_idx
+        return a, None, executed_idx
+
+    # Per-lane action masks: kindle's policy head is MAX_ACTION_DIM=18
+    # wide; mask slot idx gates GameAction value idx+1 (see map_action).
+    # Pushed before every act() so the policy only samples actions the
+    # game currently accepts (mirrors arc_agi3_grpo.py) — previously a
+    # sampled-but-unavailable action was silently substituted while
+    # observe() was fed the original index.
+    MAX_ACTION_DIM = 18
+    mask_buf = np.ones((n_games, MAX_ACTION_DIM), dtype=np.float32)
+
+    def push_action_masks(target_agent, buf, avail_per_lane) -> None:
+        buf.fill(0.0)
+        for lane_i, aa in enumerate(avail_per_lane):
+            for v in aa:
+                idx = int(v) - 1
+                if 0 <= idx < MAX_ACTION_DIM:
+                    buf[lane_i, idx] = 1.0
+        target_agent.set_action_masks(buf.reshape(-1))
 
     # --- Per-lane training state ---
     import random
@@ -357,16 +382,20 @@ def main() -> int:
         # convention, see Agent::observe docs.)
         pooled_batch = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32)) for o in obs_list]
 
-        # Act.
+        # Act (with current availability masked in — avail_actions can
+        # change after every env.step, so refresh each step).
+        push_action_masks(agent, mask_buf, avail_actions)
         actions = agent.act(pooled_batch)
 
         # Step each env.
         new_obs_list = []
         homeo_list = []
         new_pooled_batch = []
+        executed_actions: list[int] = []
         level_deltas = [0] * n_games
         for i in range(n_games):
-            game_action, action_data = map_action(int(actions[i]), i, rng)
+            game_action, action_data, exec_idx = map_action(int(actions[i]), i, rng)
+            executed_actions.append(exec_idx)
             try:
                 obs_new = envs[i].step(game_action, data=action_data)
             except Exception as exc:
@@ -398,10 +427,12 @@ def main() -> int:
             agent.set_extrinsic_reward(ext)
 
         # Observe (single batched call — this is where training happens).
+        # Feed the EXECUTED action indices: when map_action's fallback
+        # fires, the sampled index was never played.
         if frame_buf is not None:
             for i, o in enumerate(new_obs_list):
                 frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
-        agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
+        agent.observe(new_pooled_batch, executed_actions, homeostatic=homeo_list)
         obs_list = new_obs_list
 
         if args.log_every and step > 0 and step % args.log_every == 0:
@@ -501,18 +532,23 @@ def main() -> int:
         val_ep_step = [0] * n_val
         val_ep_count = [0] * n_val
 
+        # Same masking + executed-action bookkeeping as the train loop.
+        val_mask_buf = np.ones((n_val, MAX_ACTION_DIM), dtype=np.float32)
+
         def val_map_action(idx, lane):
+            """Returns (game_action, data, executed_idx) — see map_action."""
             target = idx + 1
             aa = val_avail_actions[lane]
             if target not in aa:
                 target = aa[0]
             a = action_by_value[target]
+            executed_idx = target - 1
             if a.is_complex():
                 x = rng.randrange(64)
                 y = rng.randrange(64)
                 a.set_data({"x": x, "y": y})
-                return a, {"x": x, "y": y}
-            return a, None
+                return a, {"x": x, "y": y}, executed_idx
+            return a, None, executed_idx
 
         t0v = time.time()
         for vstep in range(args.val_steps):
@@ -532,13 +568,16 @@ def main() -> int:
 
             pooled_batch = [preprocess_pooled(np.asarray(o.frame[0], dtype=np.float32)) for o in val_obs_list]
 
+            push_action_masks(val_agent, val_mask_buf, val_avail_actions)
             actions = val_agent.act(pooled_batch)
 
             new_obs_list = []
             homeo_list = []
             new_pooled_batch = []
+            executed_actions = []
             for i in range(n_val):
-                ga, ad = val_map_action(int(actions[i]), i)
+                ga, ad, exec_idx = val_map_action(int(actions[i]), i)
+                executed_actions.append(exec_idx)
                 try:
                     obs_new = val_envs[i].step(ga, data=ad)
                 except Exception:
@@ -561,7 +600,7 @@ def main() -> int:
             if val_frame_buf is not None:
                 for i, o in enumerate(new_obs_list):
                     val_frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
-            val_agent.observe(new_pooled_batch, list(actions), homeostatic=homeo_list)
+            val_agent.observe(new_pooled_batch, executed_actions, homeostatic=homeo_list)
             val_obs_list = new_obs_list
 
         velapsed = time.time() - t0v

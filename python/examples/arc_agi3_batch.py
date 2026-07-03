@@ -351,16 +351,24 @@ def main() -> int:
     def action_to_game(
         kindle_action_idx: int,
         kindle_xy: tuple[float, float] | None = None,
-    ) -> tuple[GameAction, dict | None]:
+    ) -> tuple[GameAction, dict | None, int]:
         """Map kindle's 0-indexed discrete output to the current
         frame's `available_actions`. For complex actions
         (currently ACTION6), attach `(x, y)` coordinates.
 
-        Returns (game_action, data_dict). The local wrapper's
-        env.step() reads x/y from the `data` kwarg; the GameAction
-        itself does not carry payload across the wire (some game
-        implementations read self.action.data["x"] directly without
-        defensive checks, so passing data via env.step is required).
+        Returns (game_action, data_dict, executed_idx). The local
+        wrapper's env.step() reads x/y from the `data` kwarg; the
+        GameAction itself does not carry payload across the wire
+        (some game implementations read self.action.data["x"]
+        directly without defensive checks, so passing data via
+        env.step is required).
+
+        `executed_idx` is the (possibly clamped) index actually
+        played — the caller MUST feed observe() this index, not the
+        raw sample, so policy credit and WM training match the
+        action that was really taken. With `update_action_mask()`
+        active the clamp never fires for policy-sampled actions;
+        it can still fire for macro-injected random actions.
 
         If `kindle_xy` is supplied (values in `[-1, 1]` from the
         coord head), rescale to `[0, 63]`; otherwise fall back to
@@ -369,7 +377,7 @@ def main() -> int:
         """
         aa = available_actions
         if not aa:
-            return action_by_value[1], None
+            return action_by_value[1], None, 0
         idx = max(0, min(kindle_action_idx, len(aa) - 1))
         action_num = int(aa[idx])
         a = action_by_value[action_num]
@@ -385,8 +393,8 @@ def main() -> int:
                 x = rng.randrange(64)
                 y = rng.randrange(64)
             a.set_data({"x": x, "y": y})
-            return a, {"x": x, "y": y}
-        return a, None
+            return a, {"x": x, "y": y}, idx
+        return a, None, idx
 
     # --- Kindle agent (one lane) ---
     if args.agent == "kindle":
@@ -474,6 +482,20 @@ def main() -> int:
     import random
     rng = random.Random(args.seed)
 
+    # Per-lane action masks (kindle's policy head is MAX_ACTION_DIM=18
+    # wide regardless of num_actions). Slot i gates "index i into the
+    # current available_actions list" — masking indices beyond the
+    # current list keeps act() from sampling actions that
+    # action_to_game would have to clamp to a DIFFERENT action.
+    MAX_ACTION_DIM = 18
+    mask_buf = np.zeros((1, MAX_ACTION_DIM), dtype=np.float32)
+
+    def update_action_mask() -> None:
+        mask_buf.fill(0.0)
+        n_valid = min(num_actions, len(available_actions))
+        mask_buf[0, :n_valid] = 1.0
+        agent.set_action_masks(mask_buf.reshape(-1))
+
     current_obs = preprocess(frame)
     last_levels = int(obs_raw.levels_completed)
     ep_step = 0
@@ -544,8 +566,13 @@ def main() -> int:
 
         # Choose action
         if agent is not None:
-            if args.encoder == "cnn":
+            if args.encoder in ("cnn", "cnn_dqn"):
                 agent.set_visual_obs(preprocess_visual(frame))
+            # Refresh the action mask so act() only samples indices
+            # that map onto the CURRENT available_actions (they can
+            # shrink mid-game; without the mask the clamp in
+            # action_to_game silently substituted a different action).
+            update_action_mask()
             # Track 3 planner: periodically replan the next K-action
             # sequence if enabled. The agent's queue is consumed by
             # act() below — when non-empty, act() returns the planned
@@ -582,7 +609,9 @@ def main() -> int:
             kindle_action = macro[0]
             macro_queue = macro[1:]
             macros_injected += 1
-        game_action, action_data = action_to_game(kindle_action, kindle_xy)
+        game_action, action_data, executed_action = action_to_game(
+            kindle_action, kindle_xy
+        )
 
         # Step env. Pass `data` separately so games that read
         # self.action.data["x"] without defensive checks (bp35, cn04,
@@ -599,12 +628,15 @@ def main() -> int:
             levels_events += delta_levels
         last_levels = new_levels
 
-        # Feed observation back to kindle
+        # Feed observation back to kindle. `executed_action` is the
+        # index actually played (post-clamp) — crediting the policy /
+        # training the WM on the pre-clamp sample would attribute the
+        # outcome to an action that was never taken.
         if agent is not None:
-            if args.encoder == "cnn":
+            if args.encoder in ("cnn", "cnn_dqn"):
                 agent.set_visual_obs(preprocess_visual(frame))
             homeos = [homeo_for(frame, new_levels, int(obs_raw.win_levels))]
-            agent.observe([new_obs], [kindle_action], homeostatic=homeos)
+            agent.observe([new_obs], [executed_action], homeostatic=homeos)
             # Coord-head REINFORCE step using this step's reward.
             if args.coord_alpha is not None and args.coord_alpha > 0:
                 agent.train_coord_head()

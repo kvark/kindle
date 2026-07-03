@@ -1229,6 +1229,36 @@ def main() -> int:
             # avail_actions can change after each env.step() so we
             # refresh every micro-step.
             update_action_mask()
+            # (3, PPO-safe variant) Frontier-restore / stagnation random
+            # override, decided BEFORE act() and routed through the
+            # planner-queue mechanism. Replacing the action AFTER act()
+            # (the non-PPO branch below) corrupts PPO's importance
+            # ratio: act() caches last_prob_taken / last_logits (π_old)
+            # for the action IT sampled, while training sees the
+            # override (audit M-18). queue_actions() makes act() play
+            # the override itself, so π_old is recorded for the action
+            # actually executed. Queued here — before plan_and_queue —
+            # so the planner skips lanes with a pending override; if an
+            # earlier plan/skill sequence is still draining, the
+            # override plays right after it instead of clobbering it.
+            if args.use_ppo and (
+                args.frontier_random_steps > 0 or args.stagnation_random_after > 0
+            ):
+                for li in range(n_lanes):
+                    use_random = False
+                    if frontier_random_left[li] > 0:
+                        use_random = True
+                        frontier_random_left[li] -= 1
+                    elif (args.stagnation_random_after > 0
+                          and stagnation_steps[li] >= args.stagnation_random_after):
+                        use_random = True
+                    if use_random:
+                        avail = avail_actions[li]
+                        # avail holds 1-based action values; the agent's
+                        # action index is value-1 (see map_action).
+                        agent.queue_actions(
+                            li, [avail[rng.randrange(len(avail))] - 1]
+                        )
             # Run the model-based planner. No-op when planner_horizon == 0
             # OR when every lane's queue still has actions to play. When
             # the queue is empty, the planner samples planner_samples
@@ -1281,7 +1311,16 @@ def main() -> int:
             # (the value/goal/change signals point at L1-known territory),
             # so the planner exploits backward. A random burst forces
             # exploration of the L2 frontier neighborhood.
-            if args.frontier_random_steps > 0 or args.stagnation_random_after > 0:
+            #
+            # Non-PPO path only: replacing the action after act() leaves
+            # the cached π_old pointing at the un-executed sample, which
+            # would corrupt PPO importance ratios (audit M-18). Under
+            # --use-ppo the override is routed through queue_actions
+            # before act() (see above); plain-PG training is fed the
+            # executed action via observe(), so this path stays correct.
+            if not args.use_ppo and (
+                args.frontier_random_steps > 0 or args.stagnation_random_after > 0
+            ):
                 actions = list(actions)
                 for li in range(n_lanes):
                     use_random = False

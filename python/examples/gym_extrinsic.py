@@ -337,6 +337,14 @@ def main() -> int:
     obs_dim = obs_batch.shape[-1]
     act_space = envs.single_action_space
     is_discrete = isinstance(act_space, gym.spaces.Discrete)
+    if not is_discrete:
+        # make_env() discretizes Box action spaces; anything else
+        # (MultiDiscrete, Tuple, …) has no adapter in this harness.
+        raise NotImplementedError(
+            f"unsupported action space {act_space!r}: this harness only "
+            "drives Discrete spaces (Box spaces are auto-wrapped in "
+            "Discretize by make_env)"
+        )
     num_actions = int(act_space.n) if is_discrete else int(np.prod(act_space.shape))
     print(
         f"env={args.env} lanes={args.lanes} obs_dim={obs_dim} "
@@ -398,6 +406,13 @@ def main() -> int:
     )
     print("agent ready (MLP encoder)")
 
+    # Effective policy LR actually in use: the explicit --lr-policy
+    # override, or the binding's auto-derived lr × 0.5 (the constructor
+    # sets config.lr_policy = lr * 0.5 when lr_policy is None — see
+    # python/src/lib.rs). The --lr-drop-on-solve path must divide THIS,
+    # not the 0.0 sentinel default, or the drop freezes the policy.
+    effective_lr_policy = args.lr_policy if args.lr_policy > 0 else args.lr * 0.5
+
     if args.policy_head_lr_mul != 1.0:
         agent.set_policy_lr_multiplier("policy.", args.policy_head_lr_mul)
         print(f"[policy-head LR multiplier] policy.* params × {args.policy_head_lr_mul}")
@@ -429,11 +444,10 @@ def main() -> int:
         # Normalize obs lists to list-of-lists for kindle.act()
         obs_lists = [obs_batch[i].astype(np.float32).tolist() for i in range(args.lanes)]
         actions = agent.act(obs_lists)
-        if is_discrete:
-            actions_np = np.array(actions, dtype=np.int64)
-        else:
-            # kindle returns discrete indices even for continuous; map to box center
-            actions_np = np.array(actions, dtype=np.float32)
+        # Always discrete: make_env() wraps continuous-action envs in
+        # Discretize (the old `else` branch here was unreachable and
+        # would have sent action INDICES as continuous action values).
+        actions_np = np.array(actions, dtype=np.int64)
         next_obs, rewards, terms, truncs, _ = envs.step(actions_np)
         cur_ret += rewards
         dones = np.logical_or(terms, truncs)
@@ -500,7 +514,11 @@ def main() -> int:
                     main._solve_streak = 0
                 if main._solve_streak >= args.solve_windows:
                     new_lr = args.lr / args.lr_drop_on_solve
-                    new_lr_policy = args.lr_policy / args.lr_drop_on_solve
+                    # Drop from the EFFECTIVE policy LR (auto-derived
+                    # lr/2 unless --lr-policy overrode it) — dividing
+                    # the 0.0 sentinel set the policy LR to exactly 0
+                    # and froze learning at solve time.
+                    new_lr_policy = effective_lr_policy / args.lr_drop_on_solve
                     agent.set_learning_rate(new_lr)
                     agent.set_lr_policy(new_lr_policy)
                     main._lr_dropped = True
@@ -508,7 +526,7 @@ def main() -> int:
                           f"threshold={threshold:+.1f} "
                           f"streak={main._solve_streak} "
                           f"→ lr {args.lr:.1e} → {new_lr:.1e}, "
-                          f"lr_policy {args.lr_policy:.1e} → {new_lr_policy:.1e}")
+                          f"lr_policy {effective_lr_policy:.1e} → {new_lr_policy:.1e}")
             elapsed = time.time() - t0
             sps = step * args.lanes / max(1e-3, elapsed)
             # Per-lane V and entropy distribution: V std across lanes
