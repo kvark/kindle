@@ -290,3 +290,439 @@ if __name__ == "__main__":
         print(f"Trial {trial}: token shape={tok.shape}, n_nonempty_obj_slots={n_objs}")
         print(f"  first-object features: color={tok[0]:.3f} cy={tok[1]:.3f} cx={tok[2]:.3f} h={tok[3]:.3f} w={tok[4]:.3f} area={tok[5]:.3f} holes={tok[6]:.3f}")
         print(f"  globals: n/k={tok[8*7]:.3f} total_area={tok[8*7+1]:.3f} distinct={tok[8*7+2]:.3f}")
+
+
+# --- Rule inference over object configurations (2026-06-10) ---
+#
+# Learns the start->win transformation from the agent's OWN level
+# completions, per color, in continuous feature space (no symbols, no
+# demos, no game knowledge), and transfers the averaged rule to the
+# unsolved frontier level as a predicted win configuration. Consumers:
+# potential-based shaping toward the prediction, and rule-guided
+# archive-restore ranking.
+
+def object_set(frame: np.ndarray, max_objects: int = 16) -> list[dict]:
+    """Normalized per-object records for rule inference. Unlike the
+    token encoders this keeps ALL distinct objects (up to max_objects
+    by area) so small rule-relevant pieces aren't truncated."""
+    h, w = frame.shape
+    objs = _connected_components(frame)
+    objs.sort(key=lambda o: -o["area"])
+    out = []
+    for o in objs[:max_objects]:
+        y0, x0, y1, x1 = o["bbox"]
+        out.append({
+            "color": int(o["color"]),
+            "cy": (y0 + y1) / 2.0 / max(1.0, h - 1),
+            "cx": (x0 + x1) / 2.0 / max(1.0, w - 1),
+            "area": o["area"] / float(h * w),
+        })
+    return out
+
+
+def _color_stats(objset: list[dict]) -> dict:
+    """Per-color aggregate: count, mean position, total area."""
+    stats = {}
+    for o in objset:
+        c = o["color"]
+        s = stats.setdefault(c, {"n": 0, "cy": 0.0, "cx": 0.0, "area": 0.0})
+        s["n"] += 1
+        s["cy"] += o["cy"]
+        s["cx"] += o["cx"]
+        s["area"] += o["area"]
+    for s in stats.values():
+        s["cy"] /= s["n"]
+        s["cx"] /= s["n"]
+    return stats
+
+
+def extract_color_rules(pairs: list[tuple[list[dict], list[dict]]]) -> dict:
+    """Aggregate (start_objset, win_objset) pairs into per-color rules.
+
+    For each color seen at start, collect across pairs:
+      - survival: fraction of pairs where the color still exists at win
+      - relative move: (win_pos - start_pos) per pair
+      - absolute target: win_pos per pair
+    The rule uses whichever of relative/absolute clusters more tightly
+    across wins (lower positional variance) — a generic disambiguation
+    between "move X by delta" and "bring X to place P" rules.
+    Returns {color: {survives, mode, dy, dx, ty, tx, d_area}}.
+    """
+    by_color: dict = {}
+    for start, win in pairs:
+        ss = _color_stats(start)
+        ws = _color_stats(win)
+        for c, s in ss.items():
+            rec = by_color.setdefault(
+                c, {"seen": 0, "alive": 0, "rel": [], "abs": [], "darea": []}
+            )
+            rec["seen"] += 1
+            if c in ws:
+                wv = ws[c]
+                rec["alive"] += 1
+                rec["rel"].append((wv["cy"] - s["cy"], wv["cx"] - s["cx"]))
+                rec["abs"].append((wv["cy"], wv["cx"]))
+                rec["darea"].append(wv["area"] - s["area"])
+    rules = {}
+    for c, rec in by_color.items():
+        if rec["seen"] == 0:
+            continue
+        survives = rec["alive"] / rec["seen"] >= 0.5
+        rule = {"survives": survives, "mode": "rel",
+                "dy": 0.0, "dx": 0.0, "ty": 0.0, "tx": 0.0, "d_area": 0.0}
+        if survives and rec["rel"]:
+            rel = np.asarray(rec["rel"], dtype=np.float32)
+            ab = np.asarray(rec["abs"], dtype=np.float32)
+            var_rel = float(rel.var(axis=0).sum())
+            var_abs = float(ab.var(axis=0).sum())
+            if var_abs < var_rel:
+                rule["mode"] = "abs"
+                rule["ty"], rule["tx"] = (float(v) for v in ab.mean(axis=0))
+            else:
+                rule["dy"], rule["dx"] = (float(v) for v in rel.mean(axis=0))
+            rule["d_area"] = float(np.mean(rec["darea"]))
+        rules[c] = rule
+    return rules
+
+
+def predict_win_stats(start_objset: list[dict], rules: dict) -> dict:
+    """Apply per-color rules to a start configuration. Returns the
+    predicted per-color stats at the win state ({color: {n, cy, cx,
+    area}}). Colors without a rule are predicted unchanged (weakest
+    assumption)."""
+    pred = {}
+    for c, s in _color_stats(start_objset).items():
+        rule = rules.get(c)
+        if rule is None:
+            pred[c] = dict(s)
+            continue
+        if not rule["survives"]:
+            continue  # predicted to disappear
+        p = dict(s)
+        if rule["mode"] == "abs":
+            p["cy"], p["cx"] = rule["ty"], rule["tx"]
+        else:
+            p["cy"] = min(1.0, max(0.0, s["cy"] + rule["dy"]))
+            p["cx"] = min(1.0, max(0.0, s["cx"] + rule["dx"]))
+        p["area"] = max(0.0, s["area"] + rule["d_area"])
+        pred[c] = p
+    return pred
+
+
+def config_distance(objset: list[dict], pred_stats: dict) -> float:
+    """Distance between a current configuration and a predicted win
+    configuration, in [0, ~2]. Per predicted color: positional error
+    (L2 of mean positions) + presence mismatch; colors present but
+    predicted-absent count as mismatch. Mean over the union."""
+    cur = _color_stats(objset)
+    colors = set(cur) | set(pred_stats)
+    if not colors:
+        return 0.0
+    total = 0.0
+    for c in colors:
+        s, p = cur.get(c), pred_stats.get(c)
+        if s is None or p is None:
+            total += 1.0  # presence mismatch
+            continue
+        dy, dx = s["cy"] - p["cy"], s["cx"] - p["cx"]
+        total += min(1.0, (dy * dy + dx * dx) ** 0.5 * 2.0)
+        total += min(1.0, abs(s["area"] - p["area"]) * 8.0)
+    return total / len(colors)
+
+
+def extract_relation_rules(
+    pairs: list[tuple[list[dict], list[dict]]],
+    var_threshold: float = 0.02,
+) -> dict:
+    """Pairwise-relational win constraints (rule-inference v2).
+
+    For every color pair (c1, c2) present together in win states,
+    collect the relative offset between their mean positions across
+    wins. Pairs whose win-state offsets cluster tightly (variance
+    below threshold) are treated as part of the win condition —
+    "c1 ends up at offset (dy, dx) from c2" — regardless of where
+    either started. This captures arrangement rules (adjacency,
+    alignment, containment-by-position) that per-color motion rules
+    (v1) cannot express. Returns {(c1, c2): (dy, dx)} with c1 < c2.
+    """
+    rels: dict = {}
+    for _start, win in pairs:
+        ws = _color_stats(win)
+        colors = sorted(ws)
+        for i, c1 in enumerate(colors):
+            for c2 in colors[i + 1:]:
+                rels.setdefault((c1, c2), []).append(
+                    (ws[c1]["cy"] - ws[c2]["cy"],
+                     ws[c1]["cx"] - ws[c2]["cx"])
+                )
+    rules = {}
+    for key, offsets in rels.items():
+        if len(offsets) < 2:
+            continue
+        a = np.asarray(offsets, dtype=np.float32)
+        if float(a.var(axis=0).sum()) < var_threshold:
+            rules[key] = (float(a[:, 0].mean()), float(a[:, 1].mean()))
+    return rules
+
+
+def relation_distance(objset: list[dict], rel_rules: dict) -> float:
+    """Mean violation of the relational win constraints by the current
+    configuration, in [0, 1]. Pairs with a missing color contribute a
+    full violation (the arrangement cannot be satisfied without both
+    parties present). 0.0 when no rules exist."""
+    if not rel_rules:
+        return 0.0
+    cur = _color_stats(objset)
+    total = 0.0
+    for (c1, c2), (ty, tx) in rel_rules.items():
+        s1, s2 = cur.get(c1), cur.get(c2)
+        if s1 is None or s2 is None:
+            total += 1.0
+            continue
+        dy = (s1["cy"] - s2["cy"]) - ty
+        dx = (s1["cx"] - s2["cx"]) - tx
+        total += min(1.0, (dy * dy + dx * dx) ** 0.5 * 2.0)
+    return total / len(rel_rules)
+
+
+def nearest_target_distance(
+    objset: list[dict],
+    avatar_color: int,
+    target_colors: set,
+    fallback_rel: dict | None = None,
+) -> float | None:
+    """Rule v3 waypoint potential: distance from the controllable
+    (avatar) object to the NEAREST remaining object of a color the
+    learned rule says must disappear. When none remain, falls back to
+    the v2 relational target for the avatar's color pair (the exit
+    leg). Returns None when the avatar color is absent (no gradient
+    available). Distances are normalized grid units; the per-leg form
+    gives a monotone approach gradient that color-MEAN distances
+    cannot (collecting one of three pickups makes the mean jump).
+    """
+    avatars = [o for o in objset if o["color"] == avatar_color]
+    if not avatars:
+        return None
+    av = max(avatars, key=lambda o: o["area"])
+    targets = [o for o in objset if o["color"] in target_colors]
+    if targets:
+        best = min(
+            ((o["cy"] - av["cy"]) ** 2 + (o["cx"] - av["cx"]) ** 2) ** 0.5
+            for o in targets
+        )
+        # +1 per remaining target keeps the potential monotone across
+        # pickups: collecting one strictly lowers phi even if the next
+        # target is farther than the previous one was.
+        return min(1.0, best * 2.0) + float(len(targets))
+    if fallback_rel:
+        # Exit leg: satisfy the tightest relational constraint that
+        # involves the avatar color.
+        cur = _color_stats(objset)
+        best = None
+        for (c1, c2), (ty, tx) in fallback_rel.items():
+            if avatar_color not in (c1, c2):
+                continue
+            other = c2 if c1 == avatar_color else c1
+            if other not in cur:
+                continue
+            sign = 1.0 if c1 == avatar_color else -1.0
+            dy = (av["cy"] - cur[other]["cy"]) - sign * ty
+            dx = (av["cx"] - cur[other]["cx"]) - sign * tx
+            d = (dy * dy + dx * dx) ** 0.5
+            if best is None or d < best:
+                best = d
+        if best is not None:
+            return min(1.0, best * 2.0)
+    return 0.0
+
+
+# Public alias for harness-side per-color aggregation (rule v3).
+color_stats = _color_stats
+
+
+def bfs_target_distance(
+    frame: np.ndarray,
+    avatar_color: int,
+    target_colors: set,
+    background_color: int | None = None,
+):
+    """Rule v3.1: wall-aware PATH distance from the avatar to the
+    nearest reachable target, by BFS over passable cells. Straight-line
+    distance points through walls in a maze — the gradient is wrong
+    wherever a wall sits between avatar and goal; path distance is the
+    correct potential. Passable = background (modal) color, target
+    colors, or avatar color; everything else is a wall ("you can't
+    walk through things" — no game knowledge). +1 per remaining target
+    keeps phi monotone across pickups. Returns normalized distance, or
+    None when the avatar is absent or no target is reachable (caller
+    falls back to the straight-line / relational forms).
+    """
+    from collections import deque
+    a = np.asarray(frame)
+    if background_color is None:
+        vals, counts = np.unique(a, return_counts=True)
+        background_color = int(vals[counts.argmax()])
+    av = np.argwhere(a == avatar_color)
+    if av.size == 0:
+        return None
+    tgt_mask = np.isin(a, list(target_colors)) if target_colors else None
+    n_targets = int(tgt_mask.sum() and len(np.unique(a[tgt_mask]))) if target_colors else 0
+    # passable: background OR target OR avatar
+    passable = (a == background_color) | (a == avatar_color)
+    if target_colors:
+        passable |= np.isin(a, list(target_colors))
+    H, W = a.shape
+    ay, ax = av.mean(axis=0).astype(int)
+    # snap the start to the nearest passable cell (avatar block edges)
+    if not passable[ay, ax]:
+        cand = av[0]
+        ay, ax = int(cand[0]), int(cand[1])
+    seen = np.zeros((H, W), dtype=bool)
+    q = deque([(ay, ax, 0)])
+    seen[ay, ax] = True
+    while q:
+        y, x, dist = q.popleft()
+        if target_colors and tgt_mask[y, x] and not (a[y, x] == avatar_color):
+            # reached a target cell
+            norm = dist / float(H + W)
+            n_left = len(np.unique(a[tgt_mask])) if tgt_mask.any() else 0
+            return min(1.0, norm) + float(n_left)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < H and 0 <= nx < W and not seen[ny, nx] and passable[ny, nx]:
+                seen[ny, nx] = True
+                q.append((ny, nx, dist + 1))
+    return None
+
+
+def bfs_first_step(
+    frame: np.ndarray,
+    avatar_color: int,
+    target_colors: set,
+    background_color: int | None = None,
+):
+    """Rule v3.2: the FIRST MOVE of the optimal path from the avatar to
+    the nearest reachable target, as a (dy, dx) unit direction in
+    {(-1,0),(1,0),(0,-1),(0,1)}. BFS over passable cells (background +
+    targets + avatar; everything else is a wall). Returns None if no
+    target is reachable. This turns the maze-navigation MOTOR problem
+    — which a pooled observation cannot solve — into a single learned
+    primitive: the policy only has to decide WHEN to navigate; the
+    route is computed. Fully generic (no game knowledge): avatar and
+    targets are learned, walls are 'non-background structure'.
+    """
+    from collections import deque
+    a = np.asarray(frame)
+    if background_color is None:
+        vals, counts = np.unique(a, return_counts=True)
+        background_color = int(vals[counts.argmax()])
+    # avatar_color may be a single color or a SET of co-moving sprite
+    # colors. A multi-color sprite (e.g. tu93's core + body + facing
+    # marker) would otherwise trap BFS: the detected core cell is walled
+    # in by its own body colors. Treat the whole sprite as passable and
+    # start from its centroid.
+    if isinstance(avatar_color, (set, frozenset, list, tuple)):
+        av_colors = list(avatar_color)
+    else:
+        av_colors = [avatar_color]
+    av_mask = np.isin(a, av_colors)
+    av = np.argwhere(av_mask)
+    if av.size == 0 or not target_colors:
+        return None
+    passable = (a == background_color) | av_mask | np.isin(a, list(target_colors))
+    H, W = a.shape
+    tgt = np.isin(a, list(target_colors))
+    # MULTI-SOURCE BFS seeded from the WHOLE sprite. The avatar moves as
+    # a 3x3 blob; seeding from the sprite centroid made the "first step"
+    # a move WITHIN the sprite (e.g. centroid -> body cell), which the
+    # agent can't act on and which stalls it at junctions. Instead, seed
+    # every sprite cell at distance 0 and record, for each cell the BFS
+    # leaves the sprite into, the DIRECTION of that exit move. That
+    # direction is a real avatar move (out of the blob toward the goal).
+    seen = av_mask.copy()
+    q = deque()
+    for (sy, sx) in av:
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = sy + dy, sx + dx
+            if (0 <= ny < H and 0 <= nx < W and passable[ny, nx]
+                    and not seen[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, (dy, dx)))
+    while q:
+        y, x, first = q.popleft()
+        if tgt[y, x]:
+            return first
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < H and 0 <= nx < W and not seen[ny, nx] and passable[ny, nx]:
+                seen[ny, nx] = True
+                q.append((ny, nx, first))
+    return None
+
+
+def fog_nav_step(wall_map, explored_map, avatar_mask, target_mask=None):
+    """FOG-OF-WAR navigation. The frame only ever shows ~15% of the maze;
+    unexplored cells read as the SAME color as floor, and walls are
+    revealed only as the avatar approaches. So single-frame BFS plans
+    straight through fog that turns into walls — it never works.
+
+    This routes over a PERSISTENT, accumulated map instead:
+      - wall_map[y,x]:     cells ever observed as a wall (walls persist).
+      - explored_map[y,x]: cells whose content is known (within the
+                           avatar's reveal radius at some past step).
+      - avatar_mask:       current avatar (sprite) cells.
+      - target_mask:       currently-visible goal cells, or None.
+
+    Two modes (multi-source BFS from the avatar, never entering walls):
+      1. EXPLOIT — if the goal is visible, return the first step toward
+         the nearest goal cell.
+      2. EXPLORE — otherwise head to the nearest FRONTIER: an explored,
+         non-wall cell adjacent to an UNEXPLORED cell. Reaching frontiers
+         reveals new maze and, eventually, the goal.
+    Returns a (dy,dx) unit step that LEAVES the avatar blob, or None.
+    """
+    from collections import deque
+    a = np.asarray
+    wall = a(wall_map)
+    expl = a(explored_map)
+    av = a(avatar_mask)
+    H, W = wall.shape
+    src = np.argwhere(av)
+    if src.size == 0:
+        return None
+    passable = ~wall                       # fog is optimistically passable
+    if target_mask is not None and a(target_mask).any():
+        goal = a(target_mask) & passable
+        goal_is_frontier = False
+    else:
+        # frontier = explored, non-wall, adjacent to an unexplored cell
+        unexpl = ~expl
+        adj = np.zeros((H, W), dtype=bool)
+        adj[:-1, :] |= unexpl[1:, :]
+        adj[1:, :] |= unexpl[:-1, :]
+        adj[:, :-1] |= unexpl[:, 1:]
+        adj[:, 1:] |= unexpl[:, :-1]
+        goal = expl & passable & adj
+        goal_is_frontier = True
+    if not goal.any():
+        return None
+    seen = av.copy()
+    q = deque()
+    for (sy, sx) in src:
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = sy + dy, sx + dx
+            if (0 <= ny < H and 0 <= nx < W and passable[ny, nx]
+                    and not seen[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, (dy, dx)))
+    while q:
+        y, x, first = q.popleft()
+        if goal[y, x]:
+            return first
+        for dy, dx in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            ny, nx = y + dy, x + dx
+            if (0 <= ny < H and 0 <= nx < W and not seen[ny, nx]
+                    and passable[ny, nx]):
+                seen[ny, nx] = True
+                q.append((ny, nx, first))
+    return None

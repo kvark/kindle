@@ -173,6 +173,92 @@ def main() -> int:
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
                         help="UCB1 exploration constant. Default sqrt(2).")
+    parser.add_argument("--stagnation-reset", type=int, default=0,
+                        help="Press GameAction RESET (in-game level "
+                        "restart, levels_completed preserved) on a lane "
+                        "after N consecutive steps without a NOVEL frame "
+                        "(per-lane frame-hash). No novelty for that long "
+                        "is the signature of a doomed state (e.g. a "
+                        "depleted step budget where nothing new can "
+                        "happen) — the situation where human players "
+                        "press RESET (~20x/run in the tu93 demos). "
+                        "Harness-level: does not dilute the action "
+                        "space or planner rollouts. 0 = off. Try 30-60.")
+    parser.add_argument("--nav-action", type=int, default=0,
+                        help="Add a learned NAVIGATION action slot: it "
+                        "executes the action whose learned avatar-"
+                        "displacement best matches the first BFS step "
+                        "from the avatar to the nearest must-disappear "
+                        "target (pickup), else toward the avatar's "
+                        "relational exit-partner. Turns maze motor-"
+                        "control (unsolvable from a pooled obs) into one "
+                        "primitive the policy chooses WHEN to use; route "
+                        "+ avatar + targets + action effects are all "
+                        "learned from the agent's own experience. "
+                        "Requires --rule-goal-coef>0 for target rules. "
+                        "0 = off.")
+    parser.add_argument("--fog-nav", type=int, default=0,
+                        help="Fog-of-war navigation: accumulate a "
+                        "persistent per-episode map (revealed walls + "
+                        "explored mask) and route on it — to the exit "
+                        "color when visible/remembered, else to the "
+                        "nearest unexplored FRONTIER to reveal more maze. "
+                        "Replaces single-frame BFS (which plans through "
+                        "fog that turns to walls). Requires --nav-action. "
+                        "0 = off.")
+    parser.add_argument("--nav-force-min-level", type=int, default=2,
+                        help="Only force fog/nav on the frontier when the "
+                        "frontier level (levels_completed) is >= this. "
+                        "Keeps L1/L2 bootstrapping via random+archive (which "
+                        "form the rules fog-nav needs); force only at the "
+                        "deep frontier where navigation is the bottleneck.")
+    parser.add_argument("--nav-force-frontier", type=float, default=0.0,
+                        help="Probability of FORCING the nav action on a "
+                        "lane currently at the frontier (deepest-seen) "
+                        "level whenever nav resolves there. The frontier "
+                        "level has no reward signal yet (never won), so "
+                        "the policy chooses nav only at its prior (~6%); "
+                        "without commitment it cannot complete a multi-leg "
+                        "pickup->...->exit route under the step budget. "
+                        "Generic exploration assist (route is computed "
+                        "generically), analogous to --frontier-random-"
+                        "steps but goal-directed. 0 = off.")
+    parser.add_argument("--reset-action", type=int, default=0,
+                        help="Expose GameAction RESET (id 0) as a "
+                        "learnable discrete action slot. RESET restarts "
+                        "the CURRENT level (levels_completed preserved) "
+                        "and is legal in every ARC game but never "
+                        "advertised in available_actions — without it "
+                        "the agent cannot escape doomed in-level states "
+                        "(e.g. depleted step budgets). Human recordings "
+                        "use it ~20x per run. 0 = off.")
+    parser.add_argument("--reset-action-min-step", type=int, default=0,
+                        help="Mask the RESET slot until ep_step >= N "
+                        "(safety knob against early-exploration reset "
+                        "spam). Default 0 (always available).")
+    parser.add_argument("--restore-value-rank", type=int, default=0,
+                        help="Rank frontier-level archive restores by "
+                        "the win-classifier value V recorded at "
+                        "admission time: prefer restoring states that "
+                        "look like winning trajectories instead of "
+                        "uniform choice (which, with depth-biased "
+                        "admission, prefers doomed late-budget states). "
+                        "Samples 12 candidates, picks max V. 0 = off.")
+    parser.add_argument("--rule-goal-coef", type=float, default=0.0,
+                        help="Rule-inference goal shaping: learn the "
+                        "start->win object transformation per color from "
+                        "the agent's OWN level completions, transfer the "
+                        "averaged rule to the frontier level as a "
+                        "predicted win configuration, and add potential-"
+                        "based reward coef*(phi_prev - phi_cur) where phi "
+                        "= object-config distance to the prediction. "
+                        "Active only at the game's frontier level. "
+                        "0 = off. Try 0.5-2.0.")
+    parser.add_argument("--rule-goal-restore", type=int, default=0,
+                        help="Rank frontier-level archive restores by "
+                        "rule-goal proximity instead of uniform choice "
+                        "(samples 12 candidates, picks the closest to "
+                        "the predicted win configuration). 0 = off.")
     parser.add_argument("--object-click-slots", type=int, default=0,
                         help="Extend the action space with N extra "
                         "discrete slots meaning 'ACTION6-click the i-th "
@@ -671,10 +757,36 @@ def main() -> int:
     # NUM_ACTIONS + i = "ACTION6 at the centroid of the i-th largest
     # object". The policy/planner treat them as ordinary actions; the
     # mask gates them on ACTION6 availability + object existence.
-    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS))
+    _reserved = (1 if args.reset_action else 0) + (1 if args.nav_action else 0)
+    click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS - _reserved))
     total_actions = NUM_ACTIONS + click_slots
+    nav_slot = None
+    if args.nav_action:
+        nav_slot = total_actions
+        total_actions += 1
+    reset_slot = total_actions if args.reset_action else None
+    if reset_slot is not None:
+        total_actions += 1
     if click_slots:
         from object_features import object_centroids as _obj_centroids
+
+    # Rule-inference goal shaping (see --rule-goal-coef). All state is
+    # per-game; rules recompute lazily when new win pairs land.
+    rule_goal_on = args.rule_goal_coef > 0.0 or args.rule_goal_restore
+    if rule_goal_on:
+        from object_features import (
+            object_set as _objset,
+            extract_color_rules as _extract_rules,
+            predict_win_stats as _predict_win,
+            config_distance as _config_dist,
+            extract_relation_rules as _extract_rel,
+            relation_distance as _rel_dist,
+            nearest_target_distance as _waypoint_dist,
+            bfs_target_distance as _bfs_dist,
+            bfs_first_step as _bfs_first,
+            fog_nav_step as _fog_nav,
+            color_stats as _cstats,
+        )
 
     agent_kwargs = dict(
         obs_dim=64,
@@ -790,13 +902,33 @@ def main() -> int:
         elif args.object_token:
             print("[obs] using OBJECT-LEVEL token (8 objects + 8 globals = 64 dims)")
 
+    # Token cache keyed by frame hash: ARC frames are mostly static
+    # and K forks of a game often share frames, so the expensive
+    # object/hybrid token extraction (scipy connected components per
+    # call) hits the cache the vast majority of steps. Pixel-pool mode
+    # is cheap but caches too (free win). Shared across lanes on
+    # purpose; bounded by a hard clear at 60k entries (~15 MB).
+    _token_cache: dict = {}
+
     def preprocess_pooled(frame_arr):
+        import hashlib as _hl
+        key = _hl.blake2b(
+            frame_arr.astype(np.uint8).tobytes(), digest_size=8
+        ).digest()
+        tok = _token_cache.get(key)
+        if tok is not None:
+            return tok
         if args.hybrid_token:
-            return _hybrid_tok(frame_arr.astype(np.int32)).tolist()
-        if args.object_token:
-            return _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
-        arr = frame_arr.astype(np.float32) / 15.0
-        return arr.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten().tolist()
+            tok = _hybrid_tok(frame_arr.astype(np.int32)).tolist()
+        elif args.object_token:
+            tok = _obj_tok(frame_arr.astype(np.int32), k=8).tolist()
+        else:
+            arr = frame_arr.astype(np.float32) / 15.0
+            tok = arr.reshape(8, 8, 8, 8).mean(axis=(1, 3)).flatten().tolist()
+        if len(_token_cache) > 60000:
+            _token_cache.clear()
+        _token_cache[key] = tok
+        return tok
 
     def homeo_for(frame_arr, new_levels, win_levels):
         remaining = max(0, win_levels - new_levels)
@@ -818,6 +950,9 @@ def main() -> int:
     # so this is nearly free despite scipy label calls).
     lane_centroids = [[] for _ in range(n_lanes)]
     lane_centroid_hash = [None] * n_lanes
+    # (nav-action) resolved base game-action per lane for this micro-
+    # step (computed in update_action_mask, consumed by map_action).
+    lane_nav_action = [None] * n_lanes
 
     def refresh_lane_objects():
         for lane_i in range(n_lanes):
@@ -850,9 +985,178 @@ def main() -> int:
             if click_slots and 6 in avail_actions[lane_i]:
                 for i in range(min(click_slots, len(lane_centroids[lane_i]))):
                     mask_buf[lane_i, NUM_ACTIONS + i] = 1.0
+            if (reset_slot is not None
+                    and level_step[lane_i] >= args.reset_action_min_step):
+                mask_buf[lane_i, reset_slot] = 1.0
+            # (nav-action) resolve + gate the nav slot for this lane.
+            if nav_slot is not None:
+                lane_nav_action[lane_i] = None
+                o = obs_list[lane_i]
+                g_idx = lane_i // K
+                gr = game_rules[g_idx]
+                avc = avatar_color_of(g_idx)
+                if (args.fog_nav and o.frame and avc is not None
+                        and last_levels[lane_i] >= args.nav_force_min_level):
+                    # Fog-of-war path, ISOLATED to the deep frontier (L3+):
+                    # L1/L2 must bootstrap via the proven random+archive
+                    # path (engaging fog-nav there lets the policy lean on
+                    # it and starves the bootstrap -> evt stays ~0). Explore
+                    # the maze (building a map) until the exit reveals, then
+                    # route to it. Rule-free (exploration needs only avatar).
+                    nav_a = fog_nav_resolve(
+                        g_idx, lane_i, np.asarray(o.frame[0]).astype(np.int32),
+                        avc)
+                    if nav_a is not None and nav_a in avail_actions[lane_i]:
+                        lane_nav_action[lane_i] = nav_a
+                        mask_buf[lane_i, nav_slot] = 1.0
+                    elif nav_a is not None:
+                        nav_gate["not_avail"] += 1
+                elif not (o.frame):
+                    nav_gate["no_frame"] += 1
+                elif gr is None:
+                    nav_gate["no_gr"] += 1
+                elif avc is None:
+                    nav_gate["no_avc"] += 1
+                else:
+                    frm = np.asarray(o.frame[0])
+                    frm_colors = set(np.unique(frm).tolist())
+                    # Must-disappear targets (pickups) that are STILL
+                    # PRESENT this frame. Using the rule set unfiltered
+                    # would keep targeting already-collected colors (absent
+                    # from the frame) — BFS then finds no path AND the
+                    # exit-leg never fires, so the agent strands itself
+                    # after the last pickup. Multi-leg routing falls out of
+                    # this naturally: each collected pickup drops from the
+                    # present set, so nav retargets the next nearest one,
+                    # then the exit once none remain.
+                    tgt = {c for c, r in (gr["color"] or {}).items()
+                           if not r["survives"] and c != avc
+                           and c in frm_colors}
+                    if not tgt and gr["rel"]:
+                        # exit leg: target the avatar's relational partner
+                        # color (where it must end up). Prefer a SMALL,
+                        # distinctive partner — the exit/goal is a compact
+                        # object, whereas the maze walls (color 2 in tu93,
+                        # ~thousands of cells across dozens of components)
+                        # are a structural color the relation rule
+                        # spuriously pairs with the ever-present avatar.
+                        # Routing to walls strands the avatar adjacent to
+                        # them (observed: stuck at one cell for 27 steps).
+                        fi3 = frm.astype(np.int32)
+                        npix = fi3.size
+                        bg3 = int(np.bincount(fi3.flatten()).argmax())
+                        # Always exclude the avatar's OWN sprite colors (the
+                        # relation rule trivially pairs the core with its
+                        # adjacent body -> "routes to itself", never moves).
+                        sprite = avatar_set_of(g_idx) or {avc}
+                        # Score each present relational partner. PREFER a
+                        # small, distinctive object (the exit/goal), but
+                        # NEVER strand: rank by (is-structural, is-bg, cells)
+                        # and always pick the best available. Over-filtering
+                        # to "decline" broke L2 completion (the agent could
+                        # no longer reach the exit after the pickup).
+                        cand = []
+                        for (c1, c2) in gr["rel"]:
+                            if avc not in (c1, c2):
+                                continue
+                            partner = c2 if c1 == avc else c1
+                            if partner not in frm_colors or partner in sprite:
+                                continue
+                            cells = int(np.sum(fi3 == partner))
+                            structural = 1 if cells > 0.03 * npix else 0
+                            is_bg = 1 if partner == bg3 else 0
+                            cand.append((is_bg, structural, cells, partner))
+                        if cand:
+                            cand.sort()
+                            tgt = {cand[0][3]}
+                    nav_a = nav_action_for(g_idx, frm, avc, tgt)
+                    if (_NAV_DUMP and last_levels[lane_i] >= 2
+                            and len(_nav_dump) < 24):
+                        _nav_dump_calls[0] += 1
+                        # sample every 3rd L3 decision: dense enough to see
+                        # within-episode avatar movement + pickup collection.
+                        if _nav_dump_calls[0] % 3 == 0:
+                            all_md = sorted(
+                                int(c) for c, r in (gr["color"] or {}).items()
+                                if not r["survives"] and c != avc)
+                            present_md = [c for c in all_md if c in frm_colors]
+                            fi2 = frm.astype(np.int32)
+                            md_cells = {int(c): int(np.sum(fi2 == c))
+                                        for c in all_md}
+                            ay, ax = np.argwhere(fi2 == avc).mean(axis=0) \
+                                if (fi2 == avc).any() else (-1, -1)
+                            _spr = avatar_set_of(g_idx) or {avc}
+                            pdist = _bfs_dist(fi2, avc, set(tgt)) if tgt \
+                                else None
+                            ppos = {}
+                            for c in present_md:
+                                cc = np.argwhere(fi2 == c)
+                                if cc.size:
+                                    ppos[int(c)] = [int(cc.mean(0)[0]),
+                                                    int(cc.mean(0)[1])]
+                            _eff = avatar_effects(g_idx)
+                            eff_tbl = {}
+                            if _eff is not None:
+                                _e, _en = _eff
+                                eff_tbl = {int(a): [round(_e[a][0], 4),
+                                                    round(_e[a][1], 4),
+                                                    int(_en[a])]
+                                           for a in _e}
+                            _stp = _bfs_first(fi2, _spr, set(tgt)) \
+                                if tgt else None
+                            _nav_dump.append({
+                                "lvl": int(last_levels[lane_i]),
+                                "ep_step": int(ep_step[lane_i]),
+                                "lane": int(lane_i),
+                                "all_md": all_md,
+                                "present_md": present_md,
+                                "md_cells": md_cells,
+                                "av_pos": [int(ay), int(ax)],
+                                "pickup_pos": ppos,
+                                "sprite": sorted(int(c) for c in _spr),
+                                "bg": int(np.bincount(fi2.flatten()).argmax()),
+                                "frame": fi2.copy(),
+                                "exit_leg": len(present_md) == 0,
+                                "tgt": sorted(int(t) for t in tgt),
+                                "bfs_step": (list(_stp) if _stp else []),
+                                "nav_a": (int(nav_a) if nav_a is not None
+                                          else -1),
+                                "eff": eff_tbl,
+                                "bfs_ok": nav_a is not None,
+                            })
+                            if len(_nav_dump) >= 24:
+                                import pickle as _pk
+                                with open("/tmp/l3runs/nav_l3_dump.pkl",
+                                          "wb") as _df:
+                                    _pk.dump(_nav_dump, _df)
+                                print("[nav-dump] wrote 24 L3 records")
+                                _nav_dump.clear()  # rolling: latest 24
+                    if nav_a is not None and nav_a in avail_actions[lane_i]:
+                        lane_nav_action[lane_i] = nav_a
+                        mask_buf[lane_i, nav_slot] = 1.0
+                    elif nav_a is not None:
+                        nav_gate["not_avail"] += 1
         agent.set_action_masks(mask_buf.reshape(-1))
 
     def map_action(idx, lane):
+        # RESET slot: restart the current level (lc preserved). An
+        # in-game action — no episode boundary, so the WM learns the
+        # (deterministic) reset dynamics and the planner can plan
+        # through restarts.
+        if reset_slot is not None and idx == reset_slot:
+            return action_by_value[0], None
+        # NAV slot: the learned base action routing the avatar one BFS
+        # step toward the nearest target. Resolved in update_action_mask
+        # (and only unmasked when resolvable); fall back to a valid
+        # action if the frame moved since.
+        if nav_slot is not None and idx == nav_slot:
+            nonlocal nav_uses
+            na = lane_nav_action[lane]
+            if na is not None and na in avail_actions[lane]:
+                nav_uses += 1
+                return action_by_value[na], None
+            aa = avail_actions[lane]
+            return action_by_value[aa[0] if aa else 1], None
         # Object-click slot: ACTION6 aimed at the i-th largest object's
         # centroid. The mask guarantees ACTION6 availability and object
         # existence at mask-build time; if the frame changed since, fall
@@ -1008,6 +1312,486 @@ def main() -> int:
     cell_seen = [dict() for _ in range(n_games)]  # level -> set(bytes)
     cell_last_add = [-(10 ** 9)] * n_lanes
     cell_archive_adds = 0  # diagnostic
+
+    # Rule-goal state. rule_pairs[g][lvl] = recent (start_objset,
+    # win_objset) pairs for completed levels; game_rules[g] = cached
+    # per-color rules aggregated across levels (None until >= 2 pairs).
+    # ep_start_objset anchors the prediction at the CURRENT level's
+    # start (reset on episode boundary AND on each level event).
+    # lane_phi = previous potential for the shaping difference.
+    rule_pairs = [collections.defaultdict(
+        lambda: collections.deque(maxlen=50)) for _ in range(n_games)]
+    game_rules = [None] * n_games
+    rules_dirty = [False] * n_games
+    # Steps since the lane's CURRENT level started (reset on level
+    # event, episode reset, and RESET presses). Gates the RESET slot:
+    # a restart only makes sense after a meaningful fraction of the
+    # attempt has been spent.
+    level_step = [0] * n_lanes
+    # (stagnation-reset) per-lane counter of consecutive steps without
+    # a novel frame-hash; cleared on novelty, level events, episode
+    # boundaries, and fired RESETs.
+    stale_steps = [0] * n_lanes
+    stagnation_resets = 0  # diagnostic
+    # Best (lowest) rule-goal potential reached this level per lane:
+    # improving toward the predicted win clears the staleness clock —
+    # retracing KNOWN ground toward a goal is not stagnation. Reset
+    # at rule anchors (level start).
+    lane_best_phi = [None] * n_lanes
+    # (rule v3 / nav-action) Controllability detection via ACTION
+    # CORRELATION. For each color that is a single connected blob (n==1)
+    # in both frames, EMA the centroid displacement (dy,dx) produced by
+    # each base action 1..NUM_ACTIONS. The avatar is the color whose
+    # per-action directions are most DISTINCT (cardinal spread) — its
+    # motion depends on which action was pressed. This rejects
+    # deterministic drifters (e.g. tu93's budget bar shrinks left every
+    # step regardless of action: high move-count but zero distinctness)
+    # that a naive "most-moving color" heuristic mistakes for the avatar.
+    # The chosen avatar's per-action EMA IS the inverse-dynamics table
+    # the nav slot routes with — no game knowledge anywhere.
+    lane_prev_cstats = [None] * n_lanes
+    # color_act_eff[g][c][gid] = [dy, dx] EMA ; _n[g][c][gid] = count
+    # (used for AVATAR DETECTION via per-action distinctness).
+    color_act_eff = [collections.defaultdict(dict) for _ in range(n_games)]
+    color_act_eff_n = [collections.defaultdict(collections.Counter)
+                       for _ in range(n_games)]
+    # sprite_act_eff[g][gid] = [dy, dx] EMA of the SPRITE-MASK centroid
+    # (all avatar colors). Used for NAV ROUTING: the single-cell core
+    # jitters within the re-orienting sprite (same action -> +dy then
+    # -dy), so its per-component EMA cancels to ~0 and nav can't route;
+    # the full-sprite centroid is stable. (Detection still uses the
+    # per-color table; this needs the sprite known, which detection
+    # supplies.)
+    # action_card[g][ga_id][cardinal] = vote count -> clean action->cardinal
+    # map (majority vote over the dominant move axis; robust to jitter).
+    action_card = [collections.defaultdict(collections.Counter)
+                   for _ in range(n_games)]
+    sprite_act_eff = [dict() for _ in range(n_games)]
+    sprite_act_eff_n = [collections.Counter() for _ in range(n_games)]
+    lane_prev_sprite_cen = [None] * n_lanes
+    nav_uses = 0  # diagnostic
+    nav_gate = collections.Counter()  # diagnostic: why nav didn't fire
+    import os as _os
+    _NAV_DUMP = bool(_os.environ.get("NAV_DUMP"))
+    _nav_dump = []  # captured L3 nav-decision records when NAV_DUMP set
+    _nav_dump_calls = [0]
+    _FOG_DUMP = bool(_os.environ.get("FOG_DUMP"))
+    _fog_dump = []
+    _fog_dump_calls = [0]
+    _avatar_cache = [None] * n_games   # (color_or_None, set, stamp)
+    _avatar_calls = [0] * n_games
+
+    def _distinctness(effs, effs_n):
+        """Mean pairwise distance between the per-action unit directions
+        of a color (only actions with >= 8 samples). High => the color
+        moves a different way per action (avatar-like)."""
+        units = []
+        for gid, n in effs_n.items():
+            if n < 8:
+                continue
+            ey, ex = effs[gid]
+            mag = (ey * ey + ex * ex) ** 0.5
+            if mag < 1e-9:
+                continue
+            units.append((ey / mag, ex / mag))
+        if len(units) < 3:
+            return 0.0, len(units)
+        s, npair = 0.0, 0
+        for i in range(len(units)):
+            for j in range(i + 1, len(units)):
+                dy = units[i][0] - units[j][0]
+                dx = units[i][1] - units[j][1]
+                s += (dy * dy + dx * dx) ** 0.5
+                npair += 1
+        return s / npair, len(units)
+
+    def _recompute_avatar(g_idx):
+        _avatar_calls[g_idx] += 1
+        cached = _avatar_cache[g_idx]
+        if cached is not None and (_avatar_calls[g_idx] - cached[2]) < 64:
+            return cached
+        best_c, best_score = None, 0.0
+        scores = {}
+        for c, effs in color_act_eff[g_idx].items():
+            score, nready = _distinctness(effs, color_act_eff_n[g_idx][c])
+            if nready >= 3:
+                scores[c] = score
+                if score > best_score:
+                    best_score, best_c = score, c
+        # require genuine action-correlation (drifters score ~0; clean
+        # cardinal avatars score ~1.5). Threshold well clear of noise.
+        avatar = best_c if best_score > 0.9 else None
+        # Hysteresis: tu93's avatar sprite spans a few co-moving colors
+        # (4/9/14) with near-equal distinctness, so the argmax flickers
+        # between them frame-to-frame, churning the effect table and BFS
+        # start cell. Keep the previous avatar if it still scores within
+        # 85% of the new best — only switch on a clear improvement.
+        prev = cached[0] if cached is not None else None
+        if (prev is not None and prev in scores and scores[prev] > 0.9
+                and scores[prev] >= 0.85 * best_score):
+            avatar = prev
+        # The avatar SPRITE = ALL co-moving action-correlated colors
+        # (distinctness > 0.9). The primary avatar (cleanest cardinal,
+        # for the effect table + BFS start) is one cell of it, but the
+        # sprite's other colors box it in — BFS must treat the whole
+        # sprite as passable or it can never leave the start cell.
+        av_set = {c for c, s in scores.items() if s > 0.9}
+        if avatar is not None:
+            av_set.add(avatar)
+        result = (avatar, av_set, _avatar_calls[g_idx])
+        _avatar_cache[g_idx] = result
+        return result
+
+    def avatar_color_of(g_idx):
+        return _recompute_avatar(g_idx)[0]
+
+    def avatar_set_of(g_idx):
+        return _recompute_avatar(g_idx)[1]
+
+    def avatar_effects(g_idx):
+        av = avatar_color_of(g_idx)
+        if av is None:
+            return None
+        # Prefer the STABLE sprite-centroid inverse-dynamics once it has
+        # >= 3 calibrated actions; the per-color core table jitters and
+        # cancels to ~0 (see sprite_act_eff comment). Fall back to the
+        # core table while the sprite table is still warming up.
+        sn = sprite_act_eff_n[g_idx]
+        if sum(1 for a in sn if sn[a] >= 8) >= 3:
+            return sprite_act_eff[g_idx], sprite_act_eff_n[g_idx]
+        return color_act_eff[g_idx][av], color_act_eff_n[g_idx][av]
+
+    def action_effects_ready(g_idx):
+        # The avatar is only selected once its per-action effects are
+        # calibrated, so a non-None avatar IS ready by construction.
+        return avatar_color_of(g_idx) is not None
+
+    def nav_action_for(g_idx, frm, av_c, targets):
+        """Base action (GameAction value) whose learned avatar
+        displacement best matches the BFS first step toward the nearest
+        target. None when no reachable target / effects uncalibrated."""
+        if av_c is None:
+            nav_gate["no_avc"] += 1
+            return None
+        if not targets:
+            nav_gate["no_tgt"] += 1
+            return None
+        eff = avatar_effects(g_idx)
+        if eff is None:
+            nav_gate["ae_notready"] += 1
+            return None
+        effs, effs_n = eff
+        # Pass the whole avatar sprite as passable (the core color is
+        # boxed in by its own body colors otherwise — see analyze_dump).
+        av_set = avatar_set_of(g_idx) or {av_c}
+        step = _bfs_first(frm.astype(np.int32), av_set, set(targets))
+        if step is None:
+            nav_gate["no_bfs"] += 1
+            return None
+        sy, sx = step
+        best_a, best_dot = None, -1e9
+        for a, n in effs_n.items():
+            if n < 8:
+                continue
+            ey, ex = effs[a]
+            mag = (ey * ey + ex * ex) ** 0.5
+            if mag < 1e-6:
+                continue
+            dot = (sy * ey + sx * ex) / mag  # cosine-ish (step is unit)
+            if dot > best_dot:
+                best_dot, best_a = dot, a
+        # require the best action to actually point the right way
+        if best_dot > 0.3:
+            nav_gate["resolved"] += 1
+            return best_a
+        nav_gate["low_cos"] += 1
+        return None
+
+    def action_card_map(g_idx):
+        """Per-action majority cardinal -> {action: (dy,dx)}, only for
+        actions with >= 8 votes (calibrated)."""
+        out = {}
+        for a, ctr in action_card[g_idx].items():
+            if sum(ctr.values()) >= 8:
+                out[a] = ctr.most_common(1)[0][0]
+        return out
+
+    def action_for_step(g_idx, step, blocked=()):
+        """Pick the base action whose DOMINANT-cardinal move matches the
+        desired (dy,dx) step, using the clean majority-vote map (robust to
+        the core-jitter that made the cosine-on-EMA selection unreliable
+        and confined the avatar). CLOSED-LOOP escape: if the goal-ward
+        action is blocked, sidestep to any unblocked calibrated action so
+        the avatar gets around walls instead of freezing."""
+        if step is None:
+            return None
+        cm = action_card_map(g_idx)
+        if not cm:
+            return None
+        desired = (int(step[0]), int(step[1]))
+        # 1) action whose cardinal == desired, not blocked
+        for a, c in cm.items():
+            if c == desired and a not in blocked:
+                return a
+        # 2) goal dir blocked/uncalibrated -> any unblocked action (escape)
+        for a, c in cm.items():
+            if a not in blocked:
+                return a
+        # 3) everything blocked -> the goal-ward action anyway (caller
+        #    clears the blocked set so escape restarts).
+        for a, c in cm.items():
+            if c == desired:
+                return a
+        return next(iter(cm))
+
+    # --- Fog-of-war map state (per lane), reset on level/episode change.
+    # tu93 only ever shows ~15% of the maze; unexplored fog reads as the
+    # SAME color as floor and walls reveal on approach, so single-frame
+    # BFS plans through fog. We accumulate a persistent map and route on
+    # it: explore frontiers until the exit is revealed, then go to it.
+    # Maps are PERSISTENT per (game, level), NOT per-episode: the maze at
+    # a given level is deterministic (verified: identical across all human
+    # demos), so accumulating revealed+bumped walls over many attempts
+    # progressively maps the whole level and lets the agent route to the
+    # exit even though a single ~48-step attempt can't cover it. Generic
+    # spatial memory (remember the maze you've seen), NOT path-memorizing.
+    gl_wall = {}                          # (g_idx, lvl) -> bool 64x64
+    gl_expl = {}                          # (g_idx, lvl) -> bool 64x64
+    gl_goal = {}                          # (g_idx, lvl) -> exit centroid (diag)
+    gl_target = {}                        # (g_idx, lvl) -> bool 64x64 pickup cells
+    gl_bumpcount = {}                     # (g_idx, lvl) -> int16 episodes-bumped
+    # Bump-walls are UNCERTAIN (a stall could be a policy step or a
+    # movement glitch, not a real wall) so they must NOT persist — a few
+    # false walls per attempt compound across the persistent map and box
+    # the avatar in (observed: fog_nostep explodes, fog stops). Keep them
+    # in a TRANSIENT per-lane overlay, reset each episode.
+    lane_bump = [None] * n_lanes          # transient bump-wall overlay
+    lane_bump_ep = [0] * n_lanes          # ep_step when overlay last reset
+    lane_prev_av = [None] * n_lanes       # prev avatar centroid (fog-nav)
+    lane_prev_step = [None] * n_lanes     # prev fog-nav (dy,dx) issued
+    lane_prev_action = [None] * n_lanes   # GameAction value last issued
+    lane_blocked = [None] * n_lanes       # set of dirs that failed to move
+    lane_stuck = [0] * n_lanes            # consecutive no-move count
+    fog_uses = 0  # diagnostic
+
+    def fog_nav_resolve(g_idx, lane_i, frm, avc):
+        """Accumulate the persistent map from this frame and return the
+        base action toward the exit (if visible/remembered) else toward
+        the nearest unexplored frontier. frm is int32 64x64."""
+        nonlocal fog_uses
+        H, W = frm.shape
+        # PERSISTENT per-(game,level) map (accumulates across attempts).
+        key = (g_idx, int(last_levels[lane_i]))
+        if key not in gl_wall:
+            gl_wall[key] = np.zeros((H, W), dtype=bool)
+            gl_expl[key] = np.zeros((H, W), dtype=bool)
+            gl_bumpcount[key] = np.zeros((H, W), dtype=np.int16)
+        wmap = gl_wall[key]
+        emap = gl_expl[key]
+        # transient bump overlay, reset on episode/restore boundary
+        if (lane_bump[lane_i] is None
+                or ep_step[lane_i] < lane_bump_ep[lane_i]):
+            lane_bump[lane_i] = np.zeros((H, W), dtype=bool)
+        lane_bump_ep[lane_i] = ep_step[lane_i]
+        bumpmap = lane_bump[lane_i]
+        gr = game_rules[g_idx]
+        sprite = avatar_set_of(g_idx) or {avc}
+        bg = int(np.bincount(frm.flatten()).argmax())
+        tgtcolors = set()
+        if gr:
+            tgtcolors = {int(c) for c, r in (gr["color"] or {}).items()
+                         if not r["survives"] and c != avc}
+        # WALLS = LARGE structural colors only. A color is a wall if it
+        # is non-floor, non-avatar, non-target AND covers many cells
+        # (>16). Small/rare non-floor colors (the exit marker, items) are
+        # NOT walls — otherwise, BEFORE rules exist, the exit color is
+        # treated as a wall and the agent routes AROUND it, never wins,
+        # never forms rules (deadlock). Generic: structure is big, goals
+        # are small.
+        counts = np.bincount(frm.flatten(), minlength=16)
+        wall_colors = {int(c) for c in range(len(counts))
+                       if counts[c] > 16 and c != bg
+                       and c not in sprite and c not in tgtcolors}
+        wmap |= np.isin(frm, list(wall_colors)) if wall_colors else \
+            np.zeros((H, W), dtype=bool)
+        emap |= (frm != bg)                       # non-floor = revealed
+        avm = np.isin(frm, list(sprite))
+        avcells = np.argwhere(avm)
+        for (y, x) in avcells:                     # reveal radius around avatar
+            emap[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+        # BUMP DETECTION: walls can be INVISIBLE — a cell may be a wall
+        # in-game yet render as floor-color (fog), so BFS routes into it,
+        # the avatar bumps and does NOT move, but the map never learns the
+        # wall -> permanent stuck at a junction (observed: 26+ steps frozen
+        # at one cell). If the avatar didn't move since the last fog step,
+        # the cell one step beyond it in that direction is a wall: mark it.
+        if len(avcells):
+            ay = int(avcells[:, 0].mean())
+            ax = int(avcells[:, 1].mean())
+            pv = lane_prev_av[lane_i]
+            ps = lane_prev_step[lane_i]
+            moved = pv is None or abs(ay - pv[0]) + abs(ax - pv[1]) > 2
+            # CLOSED-LOOP escape: forget blocked dirs once the avatar
+            # advances; otherwise mark the last-issued action blocked so
+            # action_for_step sidesteps to a different direction next.
+            if lane_blocked[lane_i] is None:
+                lane_blocked[lane_i] = set()
+            if moved:
+                lane_blocked[lane_i].clear()
+            elif lane_prev_action[lane_i] is not None:
+                lane_blocked[lane_i].add(lane_prev_action[lane_i])
+                # all 4 cardinal move-dirs blocked & still no movement ->
+                # truly stuck this frame; clear so escape restarts (rely on
+                # bump + BFS reroute) rather than freezing fog forever.
+                if len(lane_blocked[lane_i]) >= 4:
+                    lane_blocked[lane_i].clear()
+            if moved:
+                lane_stuck[lane_i] = 0
+            elif ps is not None:
+                # require 2 consecutive no-moves before marking a wall
+                # (one stall could be a policy step, not a real bump);
+                # the map persists, so false walls are costly.
+                lane_stuck[lane_i] += 1
+                if lane_stuck[lane_i] >= 2:
+                    dy, dx = ps
+                    by, bx = ay + dy * 5, ax + dx * 5  # one cell-step beyond
+                    y0, y1 = max(0, by - 1), by + 2
+                    x0, x1 = max(0, bx - 1), bx + 2
+                    # newly bumped cells THIS episode (not already in the
+                    # transient overlay) -> raise their CONFIDENCE count.
+                    sub = bumpmap[y0:y1, x0:x1]
+                    newb = ~sub
+                    bumpmap[y0:y1, x0:x1] = True
+                    bc = gl_bumpcount[key]
+                    bc[y0:y1, x0:x1][newb] += 1
+                    # An INVISIBLE wall (never color-revealed) bumped in
+                    # >=3 separate episodes is real -> persist it so the
+                    # map completes and BFS can route the detour. One-off
+                    # false bumps stay below threshold (no over-walling).
+                    gl_wall[key][bc >= 3] = True
+        else:
+            ay = ax = -1
+        # TARGET map: tu93 L3 has MULTIPLE pickup clusters (3 color-8/15
+        # blocks); the level completes when all are collected. Targeting
+        # the centroid of all of them lands on EMPTY SPACE between clusters
+        # (observed goal=[29,23] = mean of 3 clusters). Instead keep a
+        # PERSISTENT target-cell map: add every revealed pickup cell, and
+        # REMOVE cells confirmed collected (within the avatar's reveal
+        # radius this frame yet no longer the pickup color). fog_nav_step
+        # then routes to the NEAREST remaining pickup -> visit them one by
+        # one (multi-pickup), exactly as the human does.
+        if key not in gl_target:
+            gl_target[key] = np.zeros((H, W), dtype=bool)
+        tg = gl_target[key]
+        if tgtcolors:
+            vis_tgt = np.isin(frm, list(tgtcolors))
+        else:
+            vis_tgt = (frm != bg) & (~avm) & \
+                (~np.isin(frm, list(wall_colors)))
+        tg |= vis_tgt                              # add revealed pickups
+        # drop collected: remembered targets now inside the reveal radius
+        # but no longer the pickup color.
+        revealed_now = np.zeros((H, W), dtype=bool)
+        for (y, x) in avcells:
+            revealed_now[max(0, y - 6):y + 7, max(0, x - 6):x + 7] = True
+        tg &= ~(revealed_now & ~vis_tgt)
+        if vis_tgt.any():
+            cc = np.argwhere(vis_tgt)
+            gl_goal[key] = (int(cc[:, 0].mean()), int(cc[:, 1].mean()))
+        tmask = tg
+        lane_prev_av[lane_i] = (ay, ax) if ay >= 0 else None
+        step = _fog_nav(wmap | bumpmap, emap, avm,
+                        tmask if tmask.any() else None)
+        lane_prev_step[lane_i] = step
+        if step is None:
+            nav_gate["fog_nostep"] += 1
+            return None
+        a = action_for_step(g_idx, step, lane_blocked[lane_i] or ())
+        if a is None:
+            nav_gate["fog_lowcos"] += 1
+            return None
+        lane_prev_action[lane_i] = a
+        nav_gate["fog_resolved"] += 1
+        fog_uses += 1
+        if _FOG_DUMP:
+            _fog_dump_calls[0] += 1
+            if _fog_dump_calls[0] % 5 == 0 and len(_fog_dump) < 200:
+                exit_seen = bool(tgtcolors) and \
+                    bool(np.isin(frm, list(tgtcolors)).any())
+                avc2 = np.argwhere(avm)
+                _fog_dump.append({
+                    "lane": int(lane_i), "ep_step": int(ep_step[lane_i]),
+                    "av": [int(avc2[:, 0].mean()), int(avc2[:, 1].mean())]
+                    if len(avc2) else [-1, -1],
+                    "explored": int(emap.sum()), "wall": int(wmap.sum()),
+                    "mode": "exploit" if tmask.any() else "explore",
+                    "exit_seen": exit_seen,
+                    "goal": list(gl_goal[key]) if gl_goal.get(key) else None,
+                    "tgtcolors": sorted(int(c) for c in tgtcolors),
+                    "c8": [[int(y), int(x)] for y, x in np.argwhere(frm == 8)],
+                    "c15": [[int(y), int(x)]
+                            for y, x in np.argwhere(frm == 15)],
+                    "frame": frm.copy() if len(_fog_dump) < 6 else None,
+                })
+                if len(_fog_dump) >= 200:
+                    import pickle as _pk
+                    with open("/tmp/l3runs/fog_dump.pkl", "wb") as _df:
+                        _pk.dump(_fog_dump, _df)
+                    print("[fog-dump] wrote 200 L3 fog records")
+        return a
+    ep_start_objset = [None] * n_lanes
+    lane_pred = [None] * n_lanes      # predicted win stats for this episode
+    lane_phi = [None] * n_lanes
+    lane_objset_hash = [None] * n_lanes
+    lane_objset_cache = [None] * n_lanes
+    rule_shaping_total = 0.0  # diagnostic
+    rule_pairs_count = 0      # diagnostic
+
+    def lane_objset(i, frm):
+        h = frame_hash(frm)
+        if h != lane_objset_hash[i]:
+            lane_objset_hash[i] = h
+            # cap 64 (not the library default 16): tu93 has ~32 wall
+            # segments + floor + budget bar that crowd out the small
+            # (1-cell) avatar under a 16-object area cap, making it
+            # invisible to avatar detection and rule inference alike.
+            lane_objset_cache[i] = _objset(frm.astype(np.int32),
+                                           max_objects=64)
+        return lane_objset_cache[i]
+
+    def refresh_rules(g_idx):
+        all_pairs = []
+        for lvl_pairs in rule_pairs[g_idx].values():
+            all_pairs.extend(lvl_pairs)
+        if len(all_pairs) >= 2:
+            game_rules[g_idx] = {
+                "color": _extract_rules(all_pairs),
+                # v2: pairwise-relational win constraints — arrangement
+                # rules ("c1 ends at offset (dy,dx) from c2") that hold
+                # across wins regardless of starting layout.
+                "rel": _extract_rel(all_pairs),
+            }
+        else:
+            game_rules[g_idx] = None
+        rules_dirty[g_idx] = False
+
+    def reset_rule_anchor(i, frm):
+        """Anchor the rule prediction at a fresh level start for lane
+        i. Called on episode boundary and after each level event."""
+        g_idx = i // K
+        if rules_dirty[g_idx]:
+            refresh_rules(g_idx)
+        ep_start_objset[i] = lane_objset(i, frm)
+        lane_phi[i] = None
+        lane_best_phi[i] = None
+        rules = game_rules[g_idx]
+        if rules:
+            lane_pred[i] = {
+                "pred": _predict_win(ep_start_objset[i], rules["color"]),
+                "rel": rules["rel"],
+            }
+        else:
+            lane_pred[i] = None
     if args.load_archive:
         try:
             try:
@@ -1117,6 +1901,43 @@ def main() -> int:
                     or state is GameState.WIN
                     or ep_step[i] >= lane_budget
                 )
+                _g_sr = i // K
+                _frontier_sr = max(
+                    max_levels_seen[_g_sr * K:(_g_sr + 1) * K]
+                )
+                _g_events_sr = sum(
+                    levels_events[_g_sr * K + kk] for kk in range(K)
+                )
+                if (args.stagnation_reset > 0
+                        and _g_events_sr >= 20
+                        and stale_steps[i] >= args.stagnation_reset
+                        and last_levels[i] >= _frontier_sr
+                        and state not in (GameState.NOT_PLAYED,
+                                          GameState.GAME_OVER,
+                                          GameState.WIN)):
+                    # In-game level restart: the lane produced nothing
+                    # novel for N steps — the doomed-state signature
+                    # (e.g. depleted budget). Restart the LEVEL
+                    # (levels_completed preserved), keep the episode.
+                    try:
+                        obs_r = envs[i].step(action_by_value[0])
+                    except Exception:
+                        obs_r = None
+                    if obs_r is not None and obs_r.frame:
+                        obs_list[i] = obs_r
+                        if list(obs_r.available_actions):
+                            avail_actions[i] = list(obs_r.available_actions)
+                        last_levels[i] = int(obs_r.levels_completed)
+                        agent.mark_boundary(i)
+                        level_step[i] = 0
+                        stale_steps[i] = 0
+                        stagnation_resets += 1
+                        if rule_goal_on and obs_list[i].frame:
+                            reset_rule_anchor(
+                                i, np.asarray(obs_list[i].frame[0])
+                            )
+                        if win_trail_on:
+                            win_trails[i].clear()
                 if need_reset:
                     if ep_step[i] > 0:
                         ep_count[i] += 1
@@ -1181,6 +2002,63 @@ def main() -> int:
                         chosen_lvl = rng.choices(levels_with, weights=weights, k=1)[0]
                         gar = archive[g_idx][chosen_lvl]
                         entry = gar[rng.randrange(len(gar))]
+                        # Rule-goal restore ranking: at the frontier
+                        # level with rules available, sample a few
+                        # candidates and restore the one closest to
+                        # the predicted win configuration (predictions
+                        # anchored at each entry's own frame — exact
+                        # for absolute-target rules, neutral for
+                        # relative ones).
+                        game_events = sum(
+                            levels_events[g_idx * K + kk] for kk in range(K)
+                        )
+                        if (args.restore_value_rank
+                                and game_events >= 20
+                                and rng.random() < 0.5
+                                and chosen_lvl == max(
+                                    max_levels_seen[g_idx * K:(g_idx + 1) * K])
+                                and len(gar) > 1):
+                            # V-rank only once the classifier has real
+                            # win labels (>= 20 events) — before that
+                            # stored V is noise and max-of-12 selection
+                            # concentrates restores on garbage entries
+                            # (verified: 12x slower bootstrap). 50/50
+                            # mix with uniform keeps frontier diversity.
+                            # Prefer restoring states the win classifier
+                            # scored as winning-trajectory-like at
+                            # admission. With depth-biased admission the
+                            # uniform choice prefers doomed late-budget
+                            # states; V is the learned antidote.
+                            best_v, best_e = None, entry
+                            for _cand in range(min(12, len(gar))):
+                                e2 = gar[rng.randrange(len(gar))]
+                                v2 = e2.get("v", 0.0)
+                                if best_v is None or v2 > best_v:
+                                    best_v, best_e = v2, e2
+                            entry = best_e
+                        if (args.rule_goal_restore and rule_goal_on
+                                and game_rules[g_idx]
+                                and chosen_lvl == max(
+                                    max_levels_seen[g_idx * K:(g_idx + 1) * K])):
+                            best_d, best_e = None, entry
+                            for _cand in range(min(12, len(gar))):
+                                e2 = gar[rng.randrange(len(gar))]
+                                if not e2["obs"].frame:
+                                    continue
+                                fr2 = np.asarray(e2["obs"].frame[0])
+                                os2 = _objset(fr2.astype(np.int32))
+                                gr = game_rules[g_idx]
+                                d2 = _config_dist(
+                                    os2,
+                                    _predict_win(os2, gr["color"]),
+                                )
+                                if gr["rel"]:
+                                    d2 = 0.5 * d2 + 0.5 * _rel_dist(
+                                        os2, gr["rel"]
+                                    )
+                                if best_d is None or d2 < best_d:
+                                    best_d, best_e = d2, e2
+                            entry = best_e
                         envs[i] = copy.deepcopy(entry["env"])
                         obs_list[i] = entry["obs"]
                         last_levels[i] = entry["levels"]
@@ -1199,7 +2077,12 @@ def main() -> int:
                         avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
                         last_levels[i] = int(obs_list[i].levels_completed)
                         ep_step[i] = 0
+                    level_step[i] = 0
                     agent.mark_boundary(i)
+                    if rule_goal_on and obs_list[i].frame:
+                        reset_rule_anchor(
+                            i, np.asarray(obs_list[i].frame[0])
+                        )
                     if win_trail_on:
                         win_trails[i].clear()
                     if progress_on:
@@ -1336,6 +2219,32 @@ def main() -> int:
                         # action index is value-1 (see map_action).
                         actions[li] = avail[rng.randrange(len(avail))] - 1
 
+            # (nav) Frontier-nav commitment. On a lane at the deepest-seen
+            # level (the unsolved frontier, e.g. L3) where nav resolved
+            # this step, force the nav action with prob p. The frontier
+            # has no reward gradient yet, so the policy under-uses nav
+            # there; committing to the computed route is what completes a
+            # multi-leg pickup->exit run within budget. Generic assist.
+            if (nav_slot is not None and args.nav_force_frontier > 0.0):
+                actions = list(actions)
+                for li in range(n_lanes):
+                    if lane_nav_action[li] is None:
+                        continue
+                    g_idx_f = li // K
+                    frontier_f = max(
+                        max_levels_seen[g_idx_f * K:(g_idx_f + 1) * K]
+                    )
+                    # Only force on a DEEP frontier (>= nav_force_min_level).
+                    # L1/L2 must bootstrap with the proven random+archive
+                    # mechanisms — forcing fog-nav there starves them (they
+                    # win the early levels that form the rules fog-nav needs)
+                    # and the agent stalls at L0 (evt=0). Force where
+                    # navigation is the actual bottleneck: L3+.
+                    if (last_levels[li] >= frontier_f
+                            and frontier_f >= args.nav_force_min_level
+                            and rng.random() < args.nav_force_frontier):
+                        actions[li] = nav_slot
+
             # Record action history per lane for skill capture on
             # level-up below.
             if skills_on:
@@ -1346,6 +2255,7 @@ def main() -> int:
             homeo_list = []
             new_pooled = []
             level_deltas = [0] * n_lanes
+            lane_values = agent.values()
             for i in range(n_lanes):
                 # #2 Trail snapshot: capture state BEFORE the step. If
                 # this step turns out to be a winning one, the trail
@@ -1360,6 +2270,7 @@ def main() -> int:
                             "levels": last_levels[i],
                             "ep_step": ep_step[i],
                             "avail_actions": list(avail_actions[i]),
+                            "v": float(lane_values[i]),
                         })
                 trail_step_counter[i] += 1
 
@@ -1376,6 +2287,8 @@ def main() -> int:
                     obs_new = envs[i].reset()
                     avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
                     agent.mark_boundary(i)
+                    if rule_goal_on and obs_new.frame:
+                        reset_rule_anchor(i, np.asarray(obs_new.frame[0]))
                     if win_trail_on:
                         win_trails[i].clear()
                 new_obs_list.append(obs_new)
@@ -1429,6 +2342,7 @@ def main() -> int:
                                 "levels": int(new_levels),
                                 "ep_step": int(ep_step[i] + 1),
                                 "avail_actions": list(obs_new.available_actions or [1]),
+                                "v": float(lane_values[i]),
                             }
                     # Tally per-level. The delta is usually 1; for
                     # delta>1 (rare multi-level jump) credit each
@@ -1522,6 +2436,27 @@ def main() -> int:
                     stagnation_steps[i] += 1
                 last_levels[i] = new_levels
                 steps_at_level[i // K][new_levels] += 1
+                level_step[i] = 0 if d > 0 else level_step[i] + 1
+                if d > 0:
+                    stale_steps[i] = 0
+                if (reset_slot is not None
+                        and int(actions[i]) == reset_slot):
+                    level_step[i] = 0
+                # Rule-goal: a level event means obs_list[i] (pre-step)
+                # was a WIN state for the level anchored at
+                # ep_start_objset. Record the (start, win) pair and
+                # re-anchor at the new level's first frame.
+                if (rule_goal_on and d > 0
+                        and obs_list[i].frame and obs_new.frame):
+                    g_idx_r = i // K
+                    if ep_start_objset[i] is not None:
+                        pre_frm = np.asarray(obs_list[i].frame[0])
+                        rule_pairs[g_idx_r][new_levels - d].append(
+                            (ep_start_objset[i], lane_objset(i, pre_frm))
+                        )
+                        rules_dirty[g_idx_r] = True
+                        rule_pairs_count += 1
+                    reset_rule_anchor(i, np.asarray(obs_new.frame[0]))
                 if not obs_new.frame:
                     # Defensive fallback for empty-frame Observations
                     # (rare; primarily seen when restoring archive
@@ -1565,6 +2500,9 @@ def main() -> int:
                     gcounts[h] = 1
                 elif h in gcounts:
                     gcounts[h] = gc
+                # (stagnation-reset) novel frame for this game clears
+                # the lane's staleness clock.
+                stale_steps[i] = 0 if gc == 1 else stale_steps[i] + 1
                 macro_novelty[i] += 1.0 / (gc ** 0.5)
                 # Build the per-step extrinsic-reward signal. Goal-bonus
                 # fires on level events (binary 0/1). novelty bonus
@@ -1609,6 +2547,154 @@ def main() -> int:
                     f"{ext_vec[li]:.3f},{frontier_random_left[li]}\n"
                 )
 
+            # Rule-goal potential shaping (Term 4): at the frontier
+            # level, reward movement toward the rule-predicted win
+            # configuration. Potential-based (phi difference), so it
+            # cannot create reward loops.
+            rg_vec = None
+            if rule_goal_on and args.rule_goal_coef > 0.0:
+                rg_vec = [0.0] * n_lanes
+                for i in range(n_lanes):
+                    if not new_obs_list[i].frame:
+                        continue
+                    g_idx_r = i // K
+                    frm = np.asarray(new_obs_list[i].frame[0])
+                    cur_os = lane_objset(i, frm)
+                    # (v3) Controllability statistics: which color moved?
+                    cs_now = _cstats(cur_os)
+                    cs_prev = lane_prev_cstats[i]
+                    a_taken = int(actions[i])
+                    # (nav) STABLE sprite-mask centroid for routing effects.
+                    spr_cen = None
+                    _spr_now = avatar_set_of(g_idx_r)
+                    if _spr_now:
+                        _m = np.isin(frm.astype(np.int32), list(_spr_now))
+                        if _m.any():
+                            _ys, _xs = _m.nonzero()
+                            spr_cen = (float(_ys.mean()) / 63.0,
+                                       float(_xs.mean()) / 63.0)
+                    spr_prev = lane_prev_sprite_cen[i]
+                    if (cs_prev is not None and nav_slot is not None
+                            and a_taken < NUM_ACTIONS):
+                        # (nav-action) Learn per-color, per-action inverse
+                        # dynamics: for every single-blob (n==1) color that
+                        # exists in both frames, EMA the centroid
+                        # displacement this base action produced. The
+                        # avatar is later picked as the color whose
+                        # per-action directions are most distinct
+                        # (avatar_color_of) — so we DON'T need to know the
+                        # avatar first (no chicken-and-egg). n==1 excludes
+                        # the maze, floor, and segmented UI.
+                        ga_id = a_taken + 1
+                        for c, st in cs_now.items():
+                            pv = cs_prev.get(c)
+                            if pv is None or st["n"] != 1 or pv["n"] != 1:
+                                continue
+                            dy = st["cy"] - pv["cy"]
+                            dx = st["cx"] - pv["cx"]
+                            # Reject TELEPORTS: a single grid move is small
+                            # (~0.02-0.05 normalized); level transitions,
+                            # episode resets and archive RESTORES jump the
+                            # avatar across the frame (>0.15). Those huge
+                            # deltas poison the EMA (alpha=0.2 can't shrug a
+                            # 0.5 jump), collapsing the per-action
+                            # directions to one diagonal and destroying the
+                            # cardinal signal avatar detection relies on.
+                            # The live run restores constantly, so this cap
+                            # is essential (a low-restore standalone barely
+                            # shows the corruption).
+                            d = abs(dy) + abs(dx)
+                            if 0.003 < d < 0.15:
+                                cur = color_act_eff[g_idx_r][c].get(ga_id)
+                                if cur is None:
+                                    color_act_eff[g_idx_r][c][ga_id] = [dy, dx]
+                                else:
+                                    cur[0] = 0.8 * cur[0] + 0.2 * dy
+                                    cur[1] = 0.8 * cur[1] + 0.2 * dx
+                                color_act_eff_n[g_idx_r][c][ga_id] += 1
+                        # sprite-centroid effect (stable; primary for nav)
+                        if spr_cen is not None and spr_prev is not None:
+                            sdy = spr_cen[0] - spr_prev[0]
+                            sdx = spr_cen[1] - spr_prev[1]
+                            sd = abs(sdy) + abs(sdx)
+                            if 0.003 < sd < 0.15:
+                                scur = sprite_act_eff[g_idx_r].get(ga_id)
+                                if scur is None:
+                                    sprite_act_eff[g_idx_r][ga_id] = [sdy, sdx]
+                                else:
+                                    scur[0] = 0.8 * scur[0] + 0.2 * sdy
+                                    scur[1] = 0.8 * scur[1] + 0.2 * sdx
+                                sprite_act_eff_n[g_idx_r][ga_id] += 1
+                                # CARDINAL VOTE: classify this move by its
+                                # DOMINANT axis (robust to core jitter, which
+                                # only adds a smaller perpendicular wobble) ->
+                                # a clean action->cardinal map for routing.
+                                if abs(sdy) >= abs(sdx):
+                                    card = (1, 0) if sdy > 0 else (-1, 0)
+                                else:
+                                    card = (0, 1) if sdx > 0 else (0, -1)
+                                action_card[g_idx_r][ga_id][card] += 1
+                    lane_prev_sprite_cen[i] = spr_cen
+                    lane_prev_cstats[i] = cs_now
+                    if lane_pred[i] is None:
+                        continue
+                    frontier_r = max(
+                        max_levels_seen[g_idx_r * K:(g_idx_r + 1) * K]
+                    )
+                    if last_levels[i] < frontier_r:
+                        # Below the frontier the real wins teach
+                        # directly; shaping is for the unsolved level.
+                        lane_phi[i] = None
+                        continue
+                    lp = lane_pred[i]
+                    # Combined potential: v1 per-color prediction +
+                    # v2 relational-arrangement violation, averaged
+                    # over whichever components exist.
+                    # (v3) Waypoint potential: with a detected avatar
+                    # and must-disappear target colors, phi becomes the
+                    # sequential-leg distance (nearest remaining target,
+                    # then the exit relation) — a monotone navigation
+                    # gradient the color-mean forms cannot give.
+                    phi = None
+                    av_c = avatar_color_of(g_idx_r)
+                    gr_r = game_rules[g_idx_r]
+                    if av_c is not None and gr_r:
+                        tgt = {
+                            c for c, r in (gr_r["color"] or {}).items()
+                            if not r["survives"] and c != av_c
+                        }
+                        # v3.1: wall-aware path distance is the correct
+                        # maze potential; straight-line is the fallback
+                        # when no target is reachable by BFS (or none
+                        # remain — exit leg via the relational form).
+                        if tgt:
+                            phi = _bfs_dist(frm, av_c, tgt)
+                        if phi is None:
+                            wd = _waypoint_dist(
+                                cur_os, av_c, tgt, gr_r["rel"] or None
+                            )
+                            if wd is not None:
+                                phi = wd
+                    if phi is None:
+                        parts = []
+                        if lp["pred"]:
+                            parts.append(_config_dist(cur_os, lp["pred"]))
+                        if lp["rel"]:
+                            parts.append(_rel_dist(cur_os, lp["rel"]))
+                        if not parts:
+                            continue
+                        phi = sum(parts) / len(parts)
+                    if lane_best_phi[i] is None or phi < lane_best_phi[i] - 0.01:
+                        lane_best_phi[i] = phi
+                        stale_steps[i] = 0
+                    if lane_phi[i] is not None:
+                        r = args.rule_goal_coef * (lane_phi[i] - phi)
+                        rg_vec[i] = r
+                        rule_shaping_total += abs(r)
+                    lane_phi[i] = phi
+                if not progress_on:
+                    agent.set_intrinsic_progress(rg_vec)
+
             # Intrinsic progress signals (Term 1 + Term 2).
             if progress_on:
                 prog_vec = [0.0] * n_lanes
@@ -1648,6 +2734,9 @@ def main() -> int:
                     # Term 3: empowerment (refreshed each planner call).
                     if args.progress_empowerment_coef > 0.0:
                         prog_vec[i] += args.progress_empowerment_coef * last_empowerment[i]
+                    # Term 4: rule-goal potential shaping.
+                    if rg_vec is not None:
+                        prog_vec[i] += rg_vec[i]
                     progress_total += prog_vec[i]
                 agent.set_intrinsic_progress(prog_vec)
 
@@ -1693,6 +2782,7 @@ def main() -> int:
                         "levels": int(lvl),
                         "ep_step": int(ep_step[i] + 1),
                         "avail_actions": list(obs_i.available_actions or [1]),
+                        "v": float(agent.values()[i]),
                     }
                     gar = archive[g_idx].setdefault(lvl, [])
                     if len(gar) < args.archive_cap:
@@ -1836,6 +2926,24 @@ def main() -> int:
                     trail_tag += f",f{frontier_archive_adds}"
                 if cell_archive_on:
                     trail_tag += f",c{cell_archive_adds}"
+                if rule_goal_on:
+                    trail_tag += (
+                        f" rg={rule_pairs_count}p/{rule_shaping_total:.0f}"
+                    )
+                if args.stagnation_reset > 0:
+                    trail_tag += f" sr={stagnation_resets}"
+                if nav_slot is not None:
+                    trail_tag += f" nav={nav_uses}"
+                    if args.fog_nav:
+                        trail_tag += f" fog={fog_uses}"
+                    if nav_gate:
+                        g0 = game_rules[0] if 0 < len(game_rules) else None
+                        av0 = avatar_color_of(0)
+                        ar0 = action_effects_ready(0)
+                        top_g = nav_gate.most_common(3)
+                        trail_tag += (" navg[" + ",".join(
+                            f"{k}:{v}" for k, v in top_g)
+                            + f"|av0={av0} ready0={ar0}]")
                     # Per-level archive occupancy of game 0 — at a
                     # glance: are stepping stones accumulating at the
                     # frontier level?
