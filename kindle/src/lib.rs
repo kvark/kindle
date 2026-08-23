@@ -1,76 +1,17 @@
-#![allow(
-    clippy::match_like_matches_macro,
-    clippy::redundant_pattern_matching,
-    clippy::needless_lifetimes,
-    clippy::new_without_default,
-    clippy::single_match,
-    clippy::too_many_arguments,
-    clippy::collapsible_if,
-    clippy::collapsible_match,
-    // Numerical kernels: matrix-style indexing with row/col loop vars
-    // is clearer than enumerate adapters. See diayn::forward_softmax,
-    // backward, etc.
-    clippy::needless_range_loop,
-    // Several test helpers use vec! for clarity even when fixed-size
-    // arrays would compile.
-    clippy::useless_vec,
-    // Match against owned value through a borrowed reference is the
-    // intended pattern in some adapter code (e.g. Action enum match
-    // on `&action`).
-    clippy::pattern_type_mismatch
-)]
 #![warn(trivial_numeric_casts, unused_extern_crates)]
 
-//! kindle: a continually self-training RL agent built on meganeura.
+//! Kindle's DreamerV3 baseline with frozen DINOv3 perception.
 //!
-//! The agent starts from a cold network, trains perpetually from experience,
-//! and derives reward from four frozen primitives: surprise, novelty,
-//! homeostatic balance, and order. To kindle is to start a fire from
-//! nothing — this crate is the ignition.
+//! The first implementation deliberately exposes a small surface: visual
+//! environment types, a discrete-action Dreamer agent, its configuration and
+//! metrics, and the frozen DINO encoder used at the perception boundary.
 
-pub mod adapter;
-pub mod agent;
-pub mod approach;
-pub mod buffer;
-pub mod coord;
-pub mod delta_goals;
-pub mod diayn;
-pub mod encoder;
+pub mod dreamer;
 pub mod env;
-pub mod mcts;
-pub mod option;
-pub mod outcome;
-pub mod planner;
-pub mod policy;
-pub mod reward;
-pub mod rnd;
-pub mod v2s_preprocess;
-pub mod value_head;
-pub mod world_model;
-pub mod xeps_memory;
+pub mod vision;
 
-pub use adapter::{
-    ACTION_PARAMETER_DIM, EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, WM_ACTION_DIM,
+pub use dreamer::{
+    ActionMode, BehaviorMetrics, DreamerAgent, DreamerConfig, DreamerCore, FrameFlags, LearnReport,
+    LossScales, ModelSize, Reward, WorldMetrics,
 };
-pub use agent::{Agent, AgentConfig, BindV2sImageError};
-// Re-export blade-graphics' ExternalMemorySource so kindle-py and
-// other consumers don't need a direct blade-graphics dep just to
-// construct an `Fd(Some(_))` / `Dma(Some(_))` / `HostAllocation(_)`
-// argument for `Agent::bind_v2s_image_external`.
-pub use blade_graphics::ExternalMemorySource;
-pub use buffer::ExperienceBuffer;
-pub use env::{
-    Action, ActionKind, Environment, HomeostaticProvider, HomeostaticVariable, Observation,
-    StepResult,
-};
-pub use reward::{RewardCircuit, RewardWeights};
-
-/// Controls whether meganeura's e-graph optimizer is used.
-#[derive(Clone, Copy, Debug, Default)]
-pub enum OptLevel {
-    /// Skip full-graph e-graph optimization (forward graph is still optimized).
-    None,
-    /// Default meganeura optimization pipeline.
-    #[default]
-    Full,
-}
+pub use env::{Environment, RgbFrame, Transition};

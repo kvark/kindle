@@ -1,25 +1,17 @@
-"""kindle: a continually self-training RL agent.
-
-The public API is re-exported from the native pyo3 extension built via
-maturin (``kindle._native``).
-"""
+"""Pixel-first DreamerV3 agent with frozen DINOv3 perception."""
 
 from ._native import (  # type: ignore[attr-defined]
-    ACTION_PARAMETER_DIM,
     Agent,
-    BatchAgent,
-    EfficientNet,
-    MAX_ACTION_DIM,
-    OBS_TOKEN_DIM,
-    WM_ACTION_DIM,
+    DINO_CHECKPOINT_REVISION,
+    DINO_MODEL_ID,
+    DREAMERV3_REVISION,
+    default_config,
 )
 
 __all__ = [
-    "ACTION_PARAMETER_DIM",
     "Agent",
-    "BatchAgent",
-    "EfficientNet",
-    "MAX_ACTION_DIM",
-    "OBS_TOKEN_DIM",
-    "WM_ACTION_DIM",
+    "DINO_CHECKPOINT_REVISION",
+    "DINO_MODEL_ID",
+    "DREAMERV3_REVISION",
+    "default_config",
 ]

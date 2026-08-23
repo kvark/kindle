@@ -1,0 +1,178 @@
+//! Meganeura session construction, D3 initialization, and model syncing.
+
+use std::collections::HashMap;
+use std::sync::Arc;
+
+use meganeura::graph::Op;
+use meganeura::{Graph, Mode, Session, SessionConfig};
+use rand::{Rng, SeedableRng, rngs::StdRng};
+
+use super::config::DreamerConfig;
+
+pub(crate) fn build_session(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    mode: Mode,
+    skip_full_optimize: bool,
+) -> Session {
+    meganeura::build(
+        graph,
+        SessionConfig {
+            mode,
+            gpu: Some(Arc::clone(gpu)),
+            skip_full_optimize: mode == Mode::Training && skip_full_optimize,
+            ..SessionConfig::default()
+        },
+    )
+    .0
+}
+
+pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
+    let shapes = graph
+        .nodes()
+        .iter()
+        .filter_map(|node| match &node.op {
+            Op::Parameter { name } => Some((name.as_str(), node.ty.shape.as_slice())),
+            _ => None,
+        })
+        .collect::<HashMap<_, _>>();
+    let parameters = session
+        .param_names()
+        .into_iter()
+        .map(|name| {
+            let size = session.param_size(name).expect("known parameter size");
+            (name.to_owned(), size)
+        })
+        .collect::<Vec<_>>();
+    for (name, size) in parameters {
+        let shape = shapes
+            .get(name.as_str())
+            .copied()
+            .unwrap_or_else(|| panic!("parameter {name} missing from source graph"));
+        let values = if name.ends_with(".norm.weight") {
+            vec![1.0; size]
+        } else if name.ends_with(".bias") {
+            vec![0.0; size]
+        } else if name == "world.reward.out.weight" || name == "behavior.value.out.weight" {
+            // D3 initializes reward and value predictions to exactly zero.
+            vec![0.0; size]
+        } else {
+            let output_scale = if name == "behavior.actor.out.weight" {
+                0.01
+            } else {
+                1.0
+            };
+            let fan_in = shape.first().copied().unwrap_or(size).max(1);
+            truncated_normal(&name, size, fan_in, output_scale, seed)
+        };
+        session.set_parameter(&name, &values);
+    }
+}
+
+fn truncated_normal(
+    name: &str,
+    size: usize,
+    fan_in: usize,
+    output_scale: f32,
+    seed: u64,
+) -> Vec<f32> {
+    let mut hash = seed ^ 0xcbf2_9ce4_8422_2325;
+    for byte in name.bytes() {
+        hash ^= u64::from(byte);
+        hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
+    }
+    let mut rng = StdRng::seed_from_u64(hash);
+    let scale = 1.1368 / (fan_in as f32).sqrt() * output_scale;
+    let mut output = Vec::with_capacity(size);
+    while output.len() < size {
+        let u1 = rng.random_range(f32::EPSILON..1.0);
+        let u2 = rng.random::<f32>();
+        let radius = (-2.0 * u1.ln()).sqrt();
+        let angle = std::f32::consts::TAU * u2;
+        for normal in [radius * angle.cos(), radius * angle.sin()] {
+            if normal.abs() <= 2.0 {
+                output.push(normal * scale);
+                if output.len() == size {
+                    break;
+                }
+            }
+        }
+    }
+    output
+}
+
+pub(crate) fn sync_matching(source: &Session, target: &mut Session, prefix: &str) {
+    let names = source
+        .param_names()
+        .into_iter()
+        .filter(|name| name.starts_with(prefix))
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    for name in names {
+        let Some(size) = source.param_size(&name) else {
+            continue;
+        };
+        if target.param_size(&name) != Some(size) {
+            continue;
+        }
+        let mut values = vec![0.0; size];
+        source.read_param(&name, &mut values);
+        target.set_parameter(&name, &values);
+    }
+}
+
+pub(crate) fn ema_matching(source: &Session, target: &mut Session, prefix: &str, rate: f32) {
+    assert!((0.0..0.5).contains(&rate));
+    let names = source
+        .param_names()
+        .into_iter()
+        .filter(|name| name.starts_with(prefix))
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    for name in names {
+        let Some(size) = source.param_size(&name) else {
+            continue;
+        };
+        if target.param_size(&name) != Some(size) {
+            continue;
+        }
+        let mut source_values = vec![0.0; size];
+        let mut target_values = vec![0.0; size];
+        source.read_param(&name, &mut source_values);
+        target.read_param(&name, &mut target_values);
+        for (target, source) in target_values.iter_mut().zip(source_values) {
+            *target = rate * source + (1.0 - rate) * *target;
+        }
+        target.set_parameter(&name, &target_values);
+    }
+}
+
+pub(crate) fn configure_adam(session: &mut Session, config: &DreamerConfig, learner_step: u64) {
+    let warmup = config.learning_rate_warmup;
+    let multiplier = if warmup == 0 {
+        1.0
+    } else {
+        ((learner_step + 1) as f32 / warmup as f32).min(1.0)
+    };
+    session.set_adam(
+        config.learning_rate * multiplier,
+        config.adam_beta1,
+        config.adam_beta2,
+        config.adam_epsilon,
+    );
+    session.set_grad_clip_norm(config.gradient_clip_norm);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn truncation_is_deterministic_and_bounded() {
+        let left = truncated_normal("weight", 10_000, 100, 1.0, 7);
+        let right = truncated_normal("weight", 10_000, 100, 1.0, 7);
+        assert_eq!(left, right);
+        let bound = 2.0 * 1.1368 / 10.0;
+        assert!(left.iter().all(|value| value.abs() <= bound));
+    }
+}

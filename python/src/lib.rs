@@ -1,2531 +1,306 @@
-//! Python bindings for the kindle RL agent.
-//!
-//! Built as a maturin extension module. Exposes a thin `Agent` wrapper
-//! with a gymnasium-native API: `act(obs)`, `observe(next_obs, action,
-//! homeostatic=...)`, `mark_boundary()`, and a convenience `run(env,
-//! steps, homeo_fn=...)` that drives any `gymnasium.Env`.
-//!
-//! Build: `maturin develop -m python/Cargo.toml`
+//! Python bindings for the pixel-first Dreamer baseline.
 
-// pyo3 0.28's `#[pymethods]` macro expansion emits `.into()` calls on
-// PyErr values, which clippy flags as useless. The code is in a macro
-// we don't own; silence the lint at the crate level.
-#![allow(clippy::useless_conversion)]
+use std::path::Path;
 
-use kindle::adapter::{
-    GenericAdapter, ACTION_PARAMETER_DIM, MAX_ACTION_DIM, OBS_TOKEN_DIM, WM_ACTION_DIM,
-};
-use kindle::env::{
-    Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
-};
 use kindle::{
-    agent::{ApproachRankBy, EncoderKind, OutcomeBonus, OutcomeTarget},
-    Agent, AgentConfig,
+    ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
 };
-use pyo3::exceptions::{PyKeyError, PyRuntimeError, PyValueError};
+use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::{PyDict, PyList, PyTuple};
-use rand::rngs::StdRng;
-use rand::SeedableRng;
+use pyo3::types::{PyAny, PyBytes, PyModule, PyType};
 
-/// Wrapper asserting a borrow may cross `Python::detach` (pyo3's
-/// GIL-releasing `allow_threads`).
-///
-/// `Agent` holds GPU-session raw pointers and is `!Send`, so a closure
-/// borrowing it doesn't satisfy `detach`'s `Ungil` (= `Send`) bound.
-/// Releasing the GIL never moves the closure off the calling thread,
-/// and both agent pyclasses are `unsendable` — other Python threads
-/// cannot touch them while the GIL is released — so the borrow never
-/// actually crosses a thread boundary.
-///
-/// Access the inner value through `get()` inside the closure: a method
-/// call captures the whole wrapper, whereas a direct `ctx.0` field
-/// access would make Rust 2021's disjoint-capture rules capture the
-/// (non-`Send`) field and bypass the wrapper.
-struct AssertSend<T>(T);
-unsafe impl<T> Send for AssertSend<T> {}
-
-impl<T> AssertSend<T> {
-    fn get(&mut self) -> &mut T {
-        &mut self.0
-    }
-}
-
-/// Raise `ValueError` when a wrapped setter's input length doesn't match
-/// what the underlying `Agent` method asserts on (which would otherwise
-/// cross the FFI boundary as an uncatchable-by-`except Exception`
-/// `PanicException`).
-fn check_len(what: &str, got: usize, expected: usize) -> PyResult<()> {
-    if got != expected {
-        return Err(PyValueError::new_err(format!(
-            "{what}: expected {expected} entries, got {got}"
-        )));
-    }
-    Ok(())
-}
-
-/// A kindle agent wired to a Python-side environment.
-///
-/// Marked `unsendable` because the inner GPU session holds raw pointers
-/// that are not `Send`. Python callers must keep the `Agent` on the thread
-/// that created it.
 #[pyclass(name = "Agent", module = "kindle", unsendable)]
-pub struct PyAgent {
-    agent: Agent,
-    rng: StdRng,
-    num_actions: usize,
-    obs_dim: usize,
+struct PyAgent {
+    inner: DreamerAgent,
 }
 
 #[pymethods]
 impl PyAgent {
-    /// Create a new agent.
-    ///
-    /// Args:
-    ///     obs_dim (int): env observation vector length. Must be ≤ OBS_TOKEN_DIM.
-    ///     num_actions (int): number of discrete actions. Must be ≤ MAX_ACTION_DIM (18).
-    ///     env_id (int): stable identifier for this env (default 0).
-    ///     seed (int): RNG seed (default 0).
     #[new]
-    #[pyo3(signature = (obs_dim, num_actions, env_id = 0, seed = 0))]
-    fn new(obs_dim: usize, num_actions: usize, env_id: u32, seed: u64) -> PyResult<Self> {
-        if obs_dim > OBS_TOKEN_DIM {
-            return Err(PyValueError::new_err(format!(
-                "obs_dim {obs_dim} exceeds kindle OBS_TOKEN_DIM {OBS_TOKEN_DIM}"
-            )));
+    #[pyo3(signature = (
+        dino_checkpoint,
+        num_actions,
+        model_size = "12m",
+        seed = 0,
+        replay_capacity = None,
+        batch_size = None,
+        batch_length = None,
+        train_ratio = None,
+        imagination_length = None,
+        intrinsic_reward_scale = 0.0,
+        extrinsic_reward_scale = 1.0,
+        learning_rate = None,
+        dino_plan_cache = None,
+        skip_full_optimize = false,
+    ))]
+    #[allow(clippy::too_many_arguments)]
+    fn new(
+        dino_checkpoint: &str,
+        num_actions: usize,
+        model_size: &str,
+        seed: u64,
+        replay_capacity: Option<usize>,
+        batch_size: Option<usize>,
+        batch_length: Option<usize>,
+        train_ratio: Option<f32>,
+        imagination_length: Option<usize>,
+        intrinsic_reward_scale: f32,
+        extrinsic_reward_scale: f32,
+        learning_rate: Option<f32>,
+        dino_plan_cache: Option<&str>,
+        skip_full_optimize: bool,
+    ) -> PyResult<Self> {
+        validate_action_count(num_actions)?;
+        let mut config = DreamerConfig::new(num_actions);
+        config.model_size = parse_model_size(model_size)?;
+        config.seed = seed;
+        config.intrinsic_reward_scale = intrinsic_reward_scale;
+        config.extrinsic_reward_scale = extrinsic_reward_scale;
+        config.skip_full_optimize = skip_full_optimize;
+        if let Some(value) = replay_capacity {
+            config.replay_capacity = value;
         }
-        if num_actions > MAX_ACTION_DIM {
-            return Err(PyValueError::new_err(format!(
-                "num_actions {num_actions} exceeds kindle MAX_ACTION_DIM {MAX_ACTION_DIM}"
-            )));
+        if let Some(value) = batch_size {
+            config.batch_size = value;
         }
-        let adapter = Box::new(GenericAdapter::discrete(env_id, obs_dim, num_actions));
-        let agent = Agent::new(AgentConfig::default(), vec![adapter]);
-        Ok(Self {
-            agent,
-            rng: StdRng::seed_from_u64(seed),
-            num_actions,
-            obs_dim,
-        })
+        if let Some(value) = batch_length {
+            config.batch_length = value;
+        }
+        if let Some(value) = train_ratio {
+            config.train_ratio = value;
+        }
+        if let Some(value) = imagination_length {
+            config.imagination_length = value;
+        }
+        if let Some(value) = learning_rate {
+            config.learning_rate = value;
+        }
+        config
+            .check()
+            .map_err(|error| PyValueError::new_err(format!("invalid Dreamer config: {error}")))?;
+        let cache = dino_plan_cache.map(Path::new);
+        let inner = DreamerAgent::new(config, dino_checkpoint, cache)
+            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Ok(Self { inner })
     }
 
-    /// Sample a discrete action for the given observation.
-    ///
-    /// `obs` is any 1-D iterable of floats (list, tuple, numpy array).
-    /// Returns the action index.
-    fn act(&mut self, obs: &Bound<'_, PyAny>) -> PyResult<usize> {
-        let py = obs.py();
-        let obs_vec = parse_obs(obs, self.obs_dim)?;
-        let observation = Observation::new(obs_vec);
-        // Release the GIL for the GPU dispatch so Python-side env /
-        // logging threads can make progress (M-16).
-        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-        let action = py.detach(move || {
-            let (agent, rng) = ctx.get();
-            agent.act(std::slice::from_ref(&observation), rng).remove(0)
-        });
-        match action {
-            Action::Discrete(i) => Ok(i),
-            Action::Continuous(_) => Err(PyRuntimeError::new_err(
-                "agent produced a continuous action; PyAgent expects a discrete action space",
-            )),
-        }
+    #[classmethod]
+    #[pyo3(signature = (dreamer_checkpoint, dino_checkpoint, dino_plan_cache = None))]
+    fn restore(
+        _class: &Bound<'_, PyType>,
+        dreamer_checkpoint: &str,
+        dino_checkpoint: &str,
+        dino_plan_cache: Option<&str>,
+    ) -> PyResult<Self> {
+        let cache = dino_plan_cache.map(Path::new);
+        let inner = DreamerAgent::restore(dreamer_checkpoint, dino_checkpoint, cache)
+            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Ok(Self { inner })
     }
 
-    /// Observe the transition `(prev_obs, action) -> next_obs` and train.
-    ///
-    /// `action` is the integer index returned by a prior `act()` call.
-    /// `homeostatic` is an optional list of dicts with keys `"value"`,
-    /// `"target"`, `"tolerance"` — these drive the homeostatic reward
-    /// primitive. Without them, homeostatic reward is zero for this step
-    /// and the agent trains on surprise + novelty + order alone.
-    #[pyo3(signature = (next_obs, action, homeostatic = None))]
-    fn observe(
-        &mut self,
-        next_obs: &Bound<'_, PyAny>,
-        action: usize,
-        homeostatic: Option<&Bound<'_, PyAny>>,
-    ) -> PyResult<()> {
-        if action >= self.num_actions {
-            return Err(PyValueError::new_err(format!(
-                "action {action} out of range for num_actions={}",
-                self.num_actions
-            )));
-        }
-        let py = next_obs.py();
-        let obs_vec = parse_obs(next_obs, self.obs_dim)?;
-        let observation = Observation::new(obs_vec);
-        let homeo = match homeostatic {
-            Some(h) => parse_homeo(h)?,
-            None => Vec::new(),
-        };
-        // All Python data is extracted above; release the GIL for the
-        // GPU training dispatch (M-16).
-        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-        py.detach(move || {
-            let (agent, rng) = ctx.get();
-            let proxy = ProxyEnv {
-                obs: &observation,
-                homeo,
-            };
-            let action = Action::Discrete(action);
-            let proxy_ref: &dyn Environment = &proxy;
-            agent.observe(
-                std::slice::from_ref(&observation),
-                std::slice::from_ref(&action),
-                std::slice::from_ref(&proxy_ref),
-                rng,
-            );
-        });
+    /// Supply the first H×W×3 uint8 frame after reset.
+    fn begin_episode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<()> {
+        let frame = parse_rgb_frame(frame)?;
+        self.inner.begin_episode(&frame);
         Ok(())
     }
 
-    /// Mark the next observed transition as the start of a new episode.
-    /// Call this after a gymnasium `terminated | truncated` reset so the
-    /// world model and return estimators don't cross the reset.
-    fn mark_boundary(&mut self) {
-        self.agent.mark_boundary(0);
-    }
-
-    /// Convenience: drive a gymnasium-style env for `steps` iterations.
-    ///
-    /// Handles both the modern gymnasium API (`reset() -> (obs, info)`,
-    /// `step() -> (obs, reward, terminated, truncated, info)`) and the
-    /// older 4-tuple shape. Returns a list of completed-episode returns
-    /// (sums of extrinsic env reward). Extrinsic reward is **not** used
-    /// for training — it's returned for monitoring only.
-    ///
-    /// Args:
-    ///     env: any object with `reset()` and `step(action)` methods.
-    ///     steps: number of agent steps to run.
-    ///     homeo_fn: optional callable `obs -> list[{value, target, tolerance}]`
-    ///         mapping each observation to homeostatic targets.
-    #[pyo3(signature = (env, steps, homeo_fn = None))]
-    fn run(
-        &mut self,
-        py: Python<'_>,
-        env: &Bound<'_, PyAny>,
-        steps: usize,
-        homeo_fn: Option<&Bound<'_, PyAny>>,
-    ) -> PyResult<Vec<f32>> {
-        let reset_ret = env.call_method0("reset")?;
-        let mut obs_vec = unpack_reset(&reset_ret, self.obs_dim)?;
-
-        let mut returns: Vec<f32> = Vec::new();
-        let mut episode_return = 0.0f32;
-
-        for step in 0..steps {
-            // Allow Ctrl-C during long runs.
-            if step % 256 == 0 {
-                py.check_signals()?;
+    #[pyo3(signature = (greedy = false, action_mask = None))]
+    fn act(&mut self, greedy: bool, action_mask: Option<Vec<bool>>) -> PyResult<usize> {
+        if let Some(mask) = &action_mask {
+            let expected = self.inner.core().config().action_count;
+            if mask.len() != expected {
+                return Err(PyValueError::new_err(format!(
+                    "action_mask has {} entries, expected {expected}",
+                    mask.len()
+                )));
             }
-
-            let observation = Observation::new(obs_vec.clone());
-            let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-            let action = py.detach(move || {
-                let (agent, rng) = ctx.get();
-                agent.act(std::slice::from_ref(&observation), rng).remove(0)
-            });
-            let action_idx = match &action {
-                Action::Discrete(i) => *i,
-                Action::Continuous(_) => {
-                    return Err(PyRuntimeError::new_err(
-                        "agent produced a continuous action; PyAgent.run expects a \
-                         discrete action space",
-                    ));
-                }
-            };
-
-            let step_args = PyTuple::new(py, [action_idx])?;
-            let step_ret = env.call_method1("step", step_args)?;
-            let (next_vec, reward, terminated, truncated) = unpack_step(&step_ret, self.obs_dim)?;
-            episode_return += reward;
-
-            let homeo = match homeo_fn {
-                Some(fun) => {
-                    let obs_list = PyList::new(py, next_vec.iter().copied())?;
-                    let ret = fun.call1((obs_list,))?;
-                    parse_homeo(&ret)?
-                }
-                None => Vec::new(),
-            };
-            let next_observation = Observation::new(next_vec.clone());
-            let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-            py.detach(move || {
-                let (agent, rng) = ctx.get();
-                let proxy = ProxyEnv {
-                    obs: &next_observation,
-                    homeo,
-                };
-                let proxy_ref: &dyn Environment = &proxy;
-                agent.observe(
-                    std::slice::from_ref(&next_observation),
-                    std::slice::from_ref(&action),
-                    std::slice::from_ref(&proxy_ref),
-                    rng,
-                );
-            });
-
-            if terminated || truncated {
-                returns.push(episode_return);
-                episode_return = 0.0;
-                let reset_ret = env.call_method0("reset")?;
-                obs_vec = unpack_reset(&reset_ret, self.obs_dim)?;
-                self.agent.mark_boundary(0);
-            } else {
-                obs_vec = next_vec;
+            if !mask.iter().any(|valid| *valid) {
+                return Err(PyValueError::new_err(
+                    "action_mask must enable at least one action",
+                ));
             }
         }
-        Ok(returns)
-    }
-
-    /// Current agent step count.
-    fn step_count(&self) -> usize {
-        self.agent.step_count()
-    }
-
-    /// Diagnostics as a plain Python dict (lane 0).
-    ///
-    /// The underlying agent is multi-lane (Phase E); `PyAgent` currently
-    /// exposes a single-lane wrapper, so this returns lane 0's snapshot.
-    fn diagnostics<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let diags = self.agent.diagnostics();
-        let d = diags
-            .first()
-            .ok_or_else(|| PyRuntimeError::new_err("agent has no lanes"))?;
-        let json = serde_json::to_string(d).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
-        let json_mod = py.import("json")?;
-        json_mod.call_method1("loads", (json,))
-    }
-}
-
-/// Lightweight Environment proxy: holds a reference to the current obs
-/// and an owned list of homeostatic variables built from Python input.
-struct ProxyEnv<'a> {
-    obs: &'a Observation,
-    homeo: Vec<HomeostaticVariable>,
-}
-
-impl<'a> HomeostaticProvider for ProxyEnv<'a> {
-    fn homeostatic_variables(&self) -> &[HomeostaticVariable] {
-        &self.homeo
-    }
-}
-
-impl<'a> Environment for ProxyEnv<'a> {
-    fn observation_dim(&self) -> usize {
-        self.obs.dim()
-    }
-    fn num_actions(&self) -> usize {
-        0
-    }
-    fn observe(&self) -> Observation {
-        self.obs.clone()
-    }
-    fn step(&mut self, _action: &Action) -> StepResult {
-        StepResult {
-            observation: self.obs.clone(),
-            homeostatic: self.homeo.clone(),
-            reward: 0.0,
-            task_event: false,
-            terminated: false,
-            truncated: false,
-        }
-    }
-    fn reset(&mut self) {}
-}
-
-/// Parse a 1-D observation and require exactly `expected_dim` entries.
-/// Without the check, longer observations would silently truncate at
-/// `OBS_TOKEN_DIM` and shorter ones silently zero-pad during
-/// tokenization (M-15).
-fn parse_obs(obj: &Bound<'_, PyAny>, expected_dim: usize) -> PyResult<Vec<f32>> {
-    let v = {
-        // Fast path: Python list of floats.
-        if let Ok(list) = obj.cast::<PyList>() {
-            let mut v = Vec::with_capacity(list.len());
-            for item in list.iter() {
-                v.push(item.extract::<f32>()?);
-            }
-            v
+        let mode = if greedy {
+            ActionMode::Greedy
         } else {
-            // Fallback: any iterable (tuple, numpy array, etc.).
-            let iter = obj.try_iter()?;
-            let mut v = Vec::new();
-            for item in iter {
-                let item: Bound<'_, PyAny> = item?;
-                v.push(item.extract::<f32>()?);
-            }
-            v
+            ActionMode::Sample
+        };
+        Ok(self.inner.act(mode, action_mask.as_deref()))
+    }
+
+    /// Record the frame and rewards produced by the preceding action.
+    #[pyo3(signature = (
+        frame,
+        extrinsic_reward = 0.0,
+        intrinsic_reward = 0.0,
+        terminated = false,
+        truncated = false,
+    ))]
+    fn observe(
+        &mut self,
+        frame: &Bound<'_, PyAny>,
+        extrinsic_reward: f32,
+        intrinsic_reward: f32,
+        terminated: bool,
+        truncated: bool,
+    ) -> PyResult<()> {
+        if !extrinsic_reward.is_finite() || !intrinsic_reward.is_finite() {
+            return Err(PyValueError::new_err("rewards must be finite"));
         }
-    };
-    if v.len() != expected_dim {
-        return Err(PyValueError::new_err(format!(
-            "observation length {} does not match obs_dim {expected_dim} \
-             given at agent construction",
-            v.len()
-        )));
+        let transition = Transition {
+            frame: parse_rgb_frame(frame)?,
+            reward: Reward {
+                extrinsic: extrinsic_reward,
+                intrinsic: intrinsic_reward,
+            },
+            terminated,
+            truncated,
+        };
+        self.inner.observe(&transition);
+        Ok(())
     }
-    Ok(v)
+
+    #[pyo3(signature = (updates = 1))]
+    fn learn<'py>(&mut self, py: Python<'py>, updates: usize) -> PyResult<Bound<'py, PyAny>> {
+        let reports = (0..updates)
+            .filter_map(|_| self.inner.learn())
+            .collect::<Vec<_>>();
+        reports_to_python(py, &reports)
+    }
+
+    #[pyo3(signature = (maximum_updates = 1))]
+    fn learn_scheduled<'py>(
+        &mut self,
+        py: Python<'py>,
+        maximum_updates: usize,
+    ) -> PyResult<Bound<'py, PyAny>> {
+        let reports = self.inner.learn_scheduled(maximum_updates);
+        reports_to_python(py, &reports)
+    }
+
+    fn save_checkpoint(&mut self, path: &str) -> PyResult<()> {
+        self.inner
+            .save_checkpoint(path)
+            .map_err(|error| PyRuntimeError::new_err(error.to_string()))
+    }
+
+    #[getter]
+    fn learner_step(&self) -> u64 {
+        self.inner.core().learner_step()
+    }
+
+    #[getter]
+    fn environment_step(&self) -> u64 {
+        self.inner.core().environment_step()
+    }
+
+    #[getter]
+    fn replay_len(&self) -> usize {
+        self.inner.core().replay_len()
+    }
+
+    #[getter]
+    fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, self.inner.core().config())
+    }
 }
 
-fn parse_homeo(obj: &Bound<'_, PyAny>) -> PyResult<Vec<HomeostaticVariable>> {
-    let mut out = Vec::new();
-    for item in obj.try_iter()? {
-        let item: Bound<'_, PyAny> = item?;
-        out.push(parse_homeo_one(&item)?);
-    }
-    Ok(out)
+#[pyfunction]
+#[pyo3(signature = (num_actions, model_size = "12m"))]
+fn default_config<'py>(
+    py: Python<'py>,
+    num_actions: usize,
+    model_size: &str,
+) -> PyResult<Bound<'py, PyAny>> {
+    validate_action_count(num_actions)?;
+    let mut config = DreamerConfig::new(num_actions);
+    config.model_size = parse_model_size(model_size)?;
+    json_to_python(py, &config)
 }
 
-fn parse_homeo_one(obj: &Bound<'_, PyAny>) -> PyResult<HomeostaticVariable> {
-    // Accept either a {"value", "target", "tolerance"} dict or a 3-tuple/list.
-    if let Ok(dict) = obj.cast::<PyDict>() {
-        let value = dict_get_f32(dict, "value")?;
-        let target = dict_get_f32(dict, "target")?;
-        let tolerance = dict_get_f32(dict, "tolerance")?;
-        return Ok(HomeostaticVariable {
-            value,
-            target,
-            tolerance,
-        });
+fn validate_action_count(num_actions: usize) -> PyResult<()> {
+    if num_actions <= 1 {
+        Err(PyValueError::new_err(
+            "num_actions must be greater than one",
+        ))
+    } else {
+        Ok(())
     }
-    if let Ok(tup) = obj.cast::<PyTuple>() {
-        if tup.len() != 3 {
-            return Err(PyValueError::new_err(
-                "homeostatic tuple must have length 3: (value, target, tolerance)",
-            ));
-        }
-        return Ok(HomeostaticVariable {
-            value: tup.get_item(0)?.extract()?,
-            target: tup.get_item(1)?.extract()?,
-            tolerance: tup.get_item(2)?.extract()?,
-        });
-    }
-    Err(PyValueError::new_err(
-        "homeostatic entry must be a dict with keys value/target/tolerance or a 3-tuple",
-    ))
 }
 
-fn dict_get_f32(dict: &Bound<'_, PyDict>, key: &str) -> PyResult<f32> {
-    match dict.get_item(key)? {
-        Some(v) => v.extract::<f32>(),
-        None => Err(PyKeyError::new_err(format!(
-            "homeostatic dict missing key '{key}'"
+fn parse_model_size(value: &str) -> PyResult<ModelSize> {
+    match value {
+        "tiny" => Ok(ModelSize::Tiny),
+        "1m" => Ok(ModelSize::Size1M),
+        "12m" => Ok(ModelSize::Size12M),
+        "25m" => Ok(ModelSize::Size25M),
+        "50m" => Ok(ModelSize::Size50M),
+        "100m" => Ok(ModelSize::Size100M),
+        "200m" => Ok(ModelSize::Size200M),
+        _ => Err(PyValueError::new_err(format!(
+            "unknown model_size {value:?}; expected tiny, 1m, 12m, 25m, 50m, 100m, or 200m"
         ))),
     }
 }
 
-/// Gymnasium: `reset() -> (obs, info)`. Older gym: `reset() -> obs`.
-fn unpack_reset(obj: &Bound<'_, PyAny>, expected_dim: usize) -> PyResult<Vec<f32>> {
-    if let Ok(tup) = obj.cast::<PyTuple>() {
-        if !tup.is_empty() {
-            return parse_obs(&tup.get_item(0)?, expected_dim);
-        }
+fn parse_rgb_frame(frame: &Bound<'_, PyAny>) -> PyResult<RgbFrame> {
+    let shape = frame
+        .getattr("shape")
+        .map_err(|_| PyValueError::new_err("frame must expose shape (height, width, 3)"))?;
+    let (height, width, channels): (usize, usize, usize) = shape
+        .extract()
+        .map_err(|_| PyValueError::new_err("frame shape must be (height, width, 3)"))?;
+    if height == 0 || width == 0 || channels != 3 {
+        return Err(PyValueError::new_err(format!(
+            "frame shape must be non-empty H×W×3, got {height}×{width}×{channels}"
+        )));
     }
-    parse_obs(obj, expected_dim)
+    let bytes = frame
+        .call_method0("tobytes")
+        .map_err(|_| PyValueError::new_err("frame must provide tobytes()"))?;
+    let bytes = bytes
+        .cast::<PyBytes>()
+        .map_err(|_| PyValueError::new_err("frame.tobytes() must return bytes"))?;
+    let bytes = bytes.as_bytes();
+    let expected = height
+        .checked_mul(width)
+        .and_then(|pixels| pixels.checked_mul(channels))
+        .ok_or_else(|| PyValueError::new_err("frame dimensions are too large"))?;
+    if bytes.len() != expected {
+        return Err(PyValueError::new_err(format!(
+            "frame must use uint8 RGB storage: got {} bytes for shape {height}×{width}×3, expected {expected}",
+            bytes.len()
+        )));
+    }
+    Ok(RgbFrame::new(width, height, bytes.to_vec()))
 }
 
-/// Gymnasium: `(obs, reward, terminated, truncated, info)`.
-/// Older gym:  `(obs, reward, done, info)`.
-fn unpack_step(
-    obj: &Bound<'_, PyAny>,
-    expected_dim: usize,
-) -> PyResult<(Vec<f32>, f32, bool, bool)> {
-    let tup = obj
-        .cast::<PyTuple>()
-        .map_err(|_| PyValueError::new_err("env.step() must return a tuple"))?;
-    let n = tup.len();
-    if n < 4 {
-        return Err(PyValueError::new_err(
-            "env.step() must return at least (obs, reward, done, info)",
-        ));
-    }
-    let obs = parse_obs(&tup.get_item(0)?, expected_dim)?;
-    let reward: f32 = tup.get_item(1)?.extract()?;
-    let (terminated, truncated) = if n >= 5 {
-        let t: bool = tup.get_item(2)?.extract()?;
-        let tr: bool = tup.get_item(3)?.extract()?;
-        (t, tr)
-    } else {
-        let done: bool = tup.get_item(2)?.extract()?;
-        (done, false)
-    };
-    Ok((obs, reward, terminated, truncated))
+fn reports_to_python<'py>(py: Python<'py>, reports: &[LearnReport]) -> PyResult<Bound<'py, PyAny>> {
+    json_to_python(py, reports)
+}
+
+fn json_to_python<'py, T: serde::Serialize + ?Sized>(
+    py: Python<'py>,
+    value: &T,
+) -> PyResult<Bound<'py, PyAny>> {
+    let encoded =
+        serde_json::to_string(value).map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+    py.import("json")?.call_method1("loads", (encoded,))
 }
 
 #[pymodule]
-fn _native(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<PyAgent>()?;
-    m.add_class::<PyBatchAgent>()?;
-    m.add_class::<PyEfficientNet>()?;
-    m.add("OBS_TOKEN_DIM", OBS_TOKEN_DIM)?;
-    m.add("MAX_ACTION_DIM", MAX_ACTION_DIM)?;
-    m.add("ACTION_PARAMETER_DIM", ACTION_PARAMETER_DIM)?;
-    m.add("WM_ACTION_DIM", WM_ACTION_DIM)?;
+fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
+    module.add_class::<PyAgent>()?;
+    module.add_function(wrap_pyfunction!(default_config, module)?)?;
+    module.add("DINO_MODEL_ID", kindle::vision::VITS16_MODEL_ID)?;
+    module.add(
+        "DINO_CHECKPOINT_REVISION",
+        kindle::vision::VITS16_CHECKPOINT_REV,
+    )?;
+    module.add(
+        "DREAMERV3_REVISION",
+        kindle::dreamer::DREAMERV3_UPSTREAM_REV,
+    )?;
     Ok(())
-}
-
-/// Multi-lane ("batched") kindle agent — N concurrent envs share a single
-/// set of compiled GPU graphs.
-///
-/// Construction:
-///     BatchAgent(obs_dim, num_actions, batch_size, env_ids=None, seed=0)
-///
-/// Each step drives N envs synchronously: `act(list_of_obs)` returns a
-/// list of N action indices; `observe(list_of_next_obs, list_of_actions,
-/// homeostatic=list_of_lists)` trains across all lanes with one batched
-/// world-model and policy dispatch. `diagnostics()` returns a list of per-lane
-/// dicts; `mark_boundary(lane_idx)` marks a single-lane episode reset.
-#[pyclass(name = "BatchAgent", module = "kindle", unsendable)]
-pub struct PyBatchAgent {
-    agent: Agent,
-    rng: StdRng,
-    num_actions: usize,
-    batch_size: usize,
-    obs_dim: usize,
-}
-
-#[pymethods]
-impl PyBatchAgent {
-    #[new]
-    #[pyo3(signature = (
-        obs_dim,
-        num_actions,
-        batch_size,
-        env_ids = None,
-        seed = 0,
-        learning_rate = None,
-        warmup_steps = None,
-        latent_dim = None,
-        hidden_dim = None,
-        action_repeat = None,
-        lr_policy = None,
-        entropy_beta = None,
-        entropy_floor = None,
-        advantage_clamp = None,
-        policy_loss_watchdog_threshold = None,
-        replay_ratio = None,
-        label_smoothing = None,
-        num_options = None,
-        option_horizon = None,
-        per_option_heads = None,
-        option_entropy_beta = None,
-        diayn_reward_alpha = None,
-        diayn_hidden_dim = None,
-        diayn_lr = None,
-        gamma = None,
-        n_step = None,
-        outcome_reward_alpha = None,
-        lr_outcome = None,
-        outcome_baseline_ema = None,
-        outcome_clamp = None,
-        outcome_target = None,
-        outcome_bonus = None,
-        outcome_window = None,
-        outcome_max_episode_len = None,
-        approach_reward_alpha = None,
-        approach_buffer_size = None,
-        approach_top_frac = None,
-        approach_update_interval = None,
-        approach_warmup_episodes = None,
-        approach_distance_clamp = None,
-        approach_confidence_saturation = None,
-        homeo_confidence_taper = None,
-        approach_rank_by = None,
-        encoder_kind = None,
-        encoder_channels = None,
-        encoder_height = None,
-        encoder_width = None,
-        efficientnet_weights = None,
-        reward_surprise = None,
-        reward_novelty = None,
-        reward_homeostatic = None,
-        reward_order = None,
-        grid_resolution = None,
-        visit_counts_max = None,
-        rnd_reward_alpha = None,
-        rnd_feature_dim = None,
-        rnd_hidden_dim = None,
-        rnd_lr = None,
-        coord_action_alpha = None,
-        coord_hidden_dim = None,
-        coord_sigma = None,
-        coord_lr = None,
-        delta_goal_alpha = None,
-        delta_goal_threshold = None,
-        delta_goal_merge_radius = None,
-        delta_goal_bank_size = None,
-        delta_goal_distance_clamp = None,
-        delta_goal_surprise_threshold = None,
-        xeps_reward_alpha = None,
-        xeps_grid_resolution = None,
-        extrinsic_reward_alpha = None,
-        policy_adv_global_clip = None,
-        policy_lr_adaptive_target = None,
-        policy_lr_adaptive_ema = None,
-        value_bootstrap = None,
-        gae_lambda = None,
-        value_loss_coef = None,
-        policy_update_interval = None,
-        advantage_normalize = None,
-        use_ppo = None,
-        ppo_clip_eps = None,
-        use_adam = None,
-        adam_eps = None,
-        grad_clip_norm = None,
-        grad_clip_every = None,
-        use_grpo = None,
-        use_grpo_episode = None,
-        use_sil = None,
-        sil_loss_coef = None,
-        sil_event_filter = None,
-        sil_event_horizon = None,
-        sil_buffer_capacity = None,
-        sil_baseline_decay = None,
-        use_kl_ppo = None,
-        kl_beta = None,
-        kl_use_snapshot = None,
-        ppo_n_epochs = None,
-        policy_warmup_steps = None,
-        recompute_base_v = None,
-        end_to_end_encoder = None,
-        rollout_length = None,
-        value_clip_scale = None,
-        bootstrap_value_clamp = None,
-        value_target_clamp = None,
-        terminal_proximity_k = None,
-        terminal_proximity_bonus = None,
-        terminal_proximity_threshold = None,
-        recon_loss_coef = None,
-        recon_visual_target = None,
-        policy_z_layer_norm = None,
-        policy_z_layer_norm_scale = None,
-        reward_pred_loss_coef = None,
-        planner_horizon = None,
-        planner_samples = None,
-        planner_action_repeat = None,
-        wm_kstep_k = None,
-        wm_kstep_batch = None,
-        wm_kstep_train_prob = None,
-        wm_kstep_loss_coef = None,
-        planner_refresh_interval = None,
-        planner_policy_mix = None,
-        planner_policy_temperature = None,
-        planner_use_mcts = None,
-        mcts_simulations = None,
-        mcts_c_puct = None,
-        planner_noise_sigma = None,
-        replan_surprise_mult = None,
-        surprise_ring_capacity = None,
-        plasticity_interval = None,
-        plasticity_shrink = None,
-        plasticity_noise = None,
-        surprise_replay_mult = None,
-        planner_sigma_alpha = None,
-        planner_sigma_horizon = None,
-        wm_stochastic = None,
-        wm_sigma_loss_coef = None,
-        planner_goal_alpha = None,
-        goal_states_cap = None,
-        visit_count_dims = None,
-        visit_count_proj_dim = None,
-        value_head_train_coef = None,
-        planner_value_alpha = None,
-        value_head_gamma = None,
-        value_head_buffer_capacity = None,
-        value_head_hidden_dim = None,
-        value_head_lr_scale = None,
-        goal_states_her_prob = None,
-        bc_planner_synthetic_r = None,
-        planner_change_alpha = None,
-        value_buffer_cross_game = None,
-        goal_states_cross_game = None,
-        subgoal_k = None,
-        subgoal_lr = None,
-        planner_subgoal_alpha = None,
-        confidence_mode = None,
-        confidence_win_increment = None,
-        confidence_novelty_drop_rate = None,
-    ))]
-    #[allow(clippy::too_many_arguments)]
-    fn new(
-        obs_dim: usize,
-        num_actions: usize,
-        batch_size: usize,
-        env_ids: Option<Vec<u32>>,
-        seed: u64,
-        learning_rate: Option<f32>,
-        warmup_steps: Option<usize>,
-        latent_dim: Option<usize>,
-        hidden_dim: Option<usize>,
-        action_repeat: Option<usize>,
-        lr_policy: Option<f32>,
-        entropy_beta: Option<f32>,
-        entropy_floor: Option<f32>,
-        advantage_clamp: Option<f32>,
-        policy_loss_watchdog_threshold: Option<f32>,
-        replay_ratio: Option<f32>,
-        label_smoothing: Option<f32>,
-        num_options: Option<usize>,
-        option_horizon: Option<usize>,
-        per_option_heads: Option<bool>,
-        option_entropy_beta: Option<f32>,
-        diayn_reward_alpha: Option<f32>,
-        diayn_hidden_dim: Option<usize>,
-        diayn_lr: Option<f32>,
-        gamma: Option<f32>,
-        n_step: Option<usize>,
-        outcome_reward_alpha: Option<f32>,
-        lr_outcome: Option<f32>,
-        outcome_baseline_ema: Option<f32>,
-        outcome_clamp: Option<f32>,
-        outcome_target: Option<String>,
-        outcome_bonus: Option<String>,
-        outcome_window: Option<usize>,
-        outcome_max_episode_len: Option<usize>,
-        approach_reward_alpha: Option<f32>,
-        approach_buffer_size: Option<usize>,
-        approach_top_frac: Option<f32>,
-        approach_update_interval: Option<usize>,
-        approach_warmup_episodes: Option<usize>,
-        approach_distance_clamp: Option<f32>,
-        approach_confidence_saturation: Option<usize>,
-        homeo_confidence_taper: Option<f32>,
-        approach_rank_by: Option<String>,
-        encoder_kind: Option<String>,
-        encoder_channels: Option<u32>,
-        encoder_height: Option<u32>,
-        encoder_width: Option<u32>,
-        efficientnet_weights: Option<String>,
-        reward_surprise: Option<f32>,
-        reward_novelty: Option<f32>,
-        reward_homeostatic: Option<f32>,
-        reward_order: Option<f32>,
-        grid_resolution: Option<f32>,
-        visit_counts_max: Option<usize>,
-        rnd_reward_alpha: Option<f32>,
-        rnd_feature_dim: Option<usize>,
-        rnd_hidden_dim: Option<usize>,
-        rnd_lr: Option<f32>,
-        coord_action_alpha: Option<f32>,
-        coord_hidden_dim: Option<usize>,
-        coord_sigma: Option<f32>,
-        coord_lr: Option<f32>,
-        delta_goal_alpha: Option<f32>,
-        delta_goal_threshold: Option<f32>,
-        delta_goal_merge_radius: Option<f32>,
-        delta_goal_bank_size: Option<usize>,
-        delta_goal_distance_clamp: Option<f32>,
-        delta_goal_surprise_threshold: Option<f32>,
-        xeps_reward_alpha: Option<f32>,
-        xeps_grid_resolution: Option<f32>,
-        extrinsic_reward_alpha: Option<f32>,
-        policy_adv_global_clip: Option<f32>,
-        policy_lr_adaptive_target: Option<f32>,
-        policy_lr_adaptive_ema: Option<f32>,
-        value_bootstrap: Option<bool>,
-        gae_lambda: Option<f32>,
-        value_loss_coef: Option<f32>,
-        policy_update_interval: Option<usize>,
-        advantage_normalize: Option<bool>,
-        use_ppo: Option<bool>,
-        ppo_clip_eps: Option<f32>,
-        use_adam: Option<bool>,
-        adam_eps: Option<f32>,
-        grad_clip_norm: Option<f32>,
-        grad_clip_every: Option<u32>,
-        use_grpo: Option<bool>,
-        use_grpo_episode: Option<bool>,
-        use_sil: Option<bool>,
-        sil_loss_coef: Option<f32>,
-        sil_event_filter: Option<bool>,
-        sil_event_horizon: Option<usize>,
-        sil_buffer_capacity: Option<usize>,
-        sil_baseline_decay: Option<f32>,
-        use_kl_ppo: Option<bool>,
-        kl_beta: Option<f32>,
-        kl_use_snapshot: Option<bool>,
-        ppo_n_epochs: Option<usize>,
-        policy_warmup_steps: Option<usize>,
-        recompute_base_v: Option<bool>,
-        end_to_end_encoder: Option<bool>,
-        rollout_length: Option<usize>,
-        value_clip_scale: Option<f32>,
-        bootstrap_value_clamp: Option<f32>,
-        value_target_clamp: Option<f32>,
-        terminal_proximity_k: Option<usize>,
-        terminal_proximity_bonus: Option<f32>,
-        terminal_proximity_threshold: Option<f32>,
-        recon_loss_coef: Option<f32>,
-        recon_visual_target: Option<bool>,
-        policy_z_layer_norm: Option<bool>,
-        policy_z_layer_norm_scale: Option<f32>,
-        reward_pred_loss_coef: Option<f32>,
-        planner_horizon: Option<usize>,
-        planner_samples: Option<usize>,
-        planner_action_repeat: Option<usize>,
-        wm_kstep_k: Option<usize>,
-        wm_kstep_batch: Option<usize>,
-        wm_kstep_train_prob: Option<f32>,
-        wm_kstep_loss_coef: Option<f32>,
-        planner_refresh_interval: Option<usize>,
-        planner_policy_mix: Option<f32>,
-        planner_policy_temperature: Option<f32>,
-        planner_use_mcts: Option<bool>,
-        mcts_simulations: Option<usize>,
-        mcts_c_puct: Option<f32>,
-        planner_noise_sigma: Option<f32>,
-        replan_surprise_mult: Option<f32>,
-        surprise_ring_capacity: Option<usize>,
-        plasticity_interval: Option<usize>,
-        plasticity_shrink: Option<f32>,
-        plasticity_noise: Option<f32>,
-        surprise_replay_mult: Option<f32>,
-        planner_sigma_alpha: Option<f32>,
-        planner_sigma_horizon: Option<f32>,
-        wm_stochastic: Option<bool>,
-        wm_sigma_loss_coef: Option<f32>,
-        planner_goal_alpha: Option<f32>,
-        goal_states_cap: Option<usize>,
-        visit_count_dims: Option<usize>,
-        visit_count_proj_dim: Option<usize>,
-        value_head_train_coef: Option<f32>,
-        planner_value_alpha: Option<f32>,
-        value_head_gamma: Option<f32>,
-        value_head_buffer_capacity: Option<usize>,
-        value_head_hidden_dim: Option<usize>,
-        value_head_lr_scale: Option<f32>,
-        goal_states_her_prob: Option<f32>,
-        bc_planner_synthetic_r: Option<f32>,
-        planner_change_alpha: Option<f32>,
-        value_buffer_cross_game: Option<bool>,
-        goal_states_cross_game: Option<bool>,
-        subgoal_k: Option<usize>,
-        subgoal_lr: Option<f32>,
-        planner_subgoal_alpha: Option<f32>,
-        confidence_mode: Option<bool>,
-        confidence_win_increment: Option<f32>,
-        confidence_novelty_drop_rate: Option<f32>,
-    ) -> PyResult<Self> {
-        if obs_dim > OBS_TOKEN_DIM {
-            return Err(PyValueError::new_err(format!(
-                "obs_dim {obs_dim} exceeds kindle OBS_TOKEN_DIM {OBS_TOKEN_DIM}"
-            )));
-        }
-        if num_actions > MAX_ACTION_DIM {
-            return Err(PyValueError::new_err(format!(
-                "num_actions {num_actions} exceeds kindle MAX_ACTION_DIM {MAX_ACTION_DIM}"
-            )));
-        }
-        if batch_size == 0 {
-            return Err(PyValueError::new_err("batch_size must be >= 1"));
-        }
-        let ids: Vec<u32> = match env_ids {
-            Some(v) => {
-                if v.len() != batch_size {
-                    return Err(PyValueError::new_err(format!(
-                        "env_ids length {} does not match batch_size {}",
-                        v.len(),
-                        batch_size
-                    )));
-                }
-                v
-            }
-            // Vectorized lanes normally represent independent copies of the
-            // same task. Give them one task id by default; callers doing
-            // multi-task batches can provide explicit per-lane ids.
-            None => vec![0; batch_size],
-        };
-        let adapters: Vec<Box<dyn kindle::EnvAdapter>> = ids
-            .into_iter()
-            .map(|id| {
-                Box::new(GenericAdapter::discrete(id, obs_dim, num_actions))
-                    as Box<dyn kindle::EnvAdapter>
-            })
-            .collect();
-        let mut config = AgentConfig {
-            batch_size,
-            ..AgentConfig::default()
-        };
-        if let Some(lr) = learning_rate {
-            config.learning_rate = lr;
-            // Scale the policy LR proportionally to preserve the documented
-            // 0.5× ratio.
-            config.lr_policy = lr * 0.5;
-        }
-        if let Some(w) = warmup_steps {
-            config.warmup_steps = w;
-        }
-        if let Some(ld) = latent_dim {
-            config.latent_dim = ld;
-        }
-        if let Some(hd) = hidden_dim {
-            config.hidden_dim = hd;
-        }
-        if let Some(k) = action_repeat {
-            if k == 0 {
-                return Err(PyValueError::new_err("action_repeat must be >= 1"));
-            }
-            config.action_repeat = k;
-        }
-        // Per-head LR overrides apply *after* the `learning_rate`-derived
-        // scaling above, so callers can target a specific head. Useful for LunarLander-style problems
-        // where the policy needs a bigger LR than the world model.
-        if let Some(lrp) = lr_policy {
-            config.lr_policy = lrp;
-        }
-        if let Some(ef) = entropy_floor {
-            config.entropy_floor = ef;
-        }
-        if let Some(ac) = advantage_clamp {
-            config.advantage_clamp = ac;
-        }
-        if let Some(wd) = policy_loss_watchdog_threshold {
-            config.policy_loss_watchdog_threshold = wd;
-        }
-        if let Some(rr) = replay_ratio {
-            config.replay_ratio = rr;
-        }
-        if let Some(eb) = entropy_beta {
-            config.entropy_beta = eb;
-        }
-        if let Some(ls) = label_smoothing {
-            config.label_smoothing = ls;
-        }
-        if let Some(no) = num_options {
-            config.num_options = no;
-        }
-        if let Some(oh) = option_horizon {
-            config.option_horizon = oh;
-        }
-        if let Some(p) = per_option_heads {
-            config.per_option_heads = p;
-        }
-        if let Some(b) = option_entropy_beta {
-            config.option_entropy_beta = b;
-        }
-        if let Some(a) = diayn_reward_alpha {
-            config.diayn_reward_alpha = a;
-        }
-        if let Some(h) = diayn_hidden_dim {
-            config.diayn_hidden_dim = h;
-        }
-        if let Some(lr) = diayn_lr {
-            config.diayn_lr = Some(lr);
-        }
-        if let Some(g) = gamma {
-            config.gamma = g;
-        }
-        if let Some(ns) = n_step {
-            config.n_step = ns;
-        }
-        if let Some(a) = outcome_reward_alpha {
-            config.outcome_reward_alpha = a;
-        }
-        if let Some(lr) = lr_outcome {
-            config.lr_outcome = Some(lr);
-        }
-        if let Some(ema) = outcome_baseline_ema {
-            config.outcome_baseline_ema = ema;
-        }
-        if let Some(c) = outcome_clamp {
-            config.outcome_clamp = c;
-        }
-        if let Some(t) = outcome_target {
-            config.outcome_target = match t.as_str() {
-                "episode_sum" | "episode-sum" => OutcomeTarget::EpisodeSum,
-                "terminal_reward" | "terminal-reward" | "terminal" => OutcomeTarget::TerminalReward,
-                "reward_to_go" | "reward-to-go" | "rtg" => OutcomeTarget::RewardToGo,
-                other => {
-                    return Err(PyValueError::new_err(format!(
-                        "outcome_target must be 'episode_sum', 'terminal_reward' or \
-                         'reward_to_go', got {other:?}"
-                    )));
-                }
-            };
-        }
-        if let Some(b) = outcome_bonus {
-            config.outcome_bonus = match b.as_str() {
-                "raw" => OutcomeBonus::Raw,
-                "potential_delta" | "potential-delta" | "delta" => OutcomeBonus::PotentialDelta,
-                other => {
-                    return Err(PyValueError::new_err(format!(
-                        "outcome_bonus must be 'raw' or 'potential_delta', got {other:?}"
-                    )));
-                }
-            };
-        }
-        if let Some(w) = outcome_window {
-            config.outcome_window = w.max(1);
-        }
-        if let Some(l) = outcome_max_episode_len {
-            config.outcome_max_episode_len = l;
-        }
-        if let Some(a) = approach_reward_alpha {
-            config.approach_reward_alpha = a;
-        }
-        if let Some(s) = approach_buffer_size {
-            config.approach_buffer_size = s;
-        }
-        if let Some(tf) = approach_top_frac {
-            config.approach_top_frac = tf;
-        }
-        if let Some(ui) = approach_update_interval {
-            config.approach_update_interval = ui;
-        }
-        if let Some(we) = approach_warmup_episodes {
-            config.approach_warmup_episodes = we;
-        }
-        if let Some(dc) = approach_distance_clamp {
-            config.approach_distance_clamp = dc;
-        }
-        if let Some(cs) = approach_confidence_saturation {
-            config.approach_confidence_saturation = cs;
-        }
-        if let Some(ht) = homeo_confidence_taper {
-            config.homeo_confidence_taper = ht;
-        }
-        if let Some(rb) = approach_rank_by {
-            config.approach_rank_by = match rb.as_str() {
-                "return" => ApproachRankBy::Return,
-                "novelty" => ApproachRankBy::Novelty,
-                other => {
-                    return Err(PyValueError::new_err(format!(
-                        "approach_rank_by must be 'return' or 'novelty', got {other:?}"
-                    )));
-                }
-            };
-        }
-        if let Some(v) = reward_surprise {
-            config.reward_weights.surprise = v;
-        }
-        if let Some(v) = reward_novelty {
-            config.reward_weights.novelty = v;
-        }
-        if let Some(v) = reward_homeostatic {
-            config.reward_weights.homeostatic = v;
-        }
-        if let Some(v) = reward_order {
-            config.reward_weights.order = v;
-        }
-        if let Some(gr) = grid_resolution {
-            config.grid_resolution = gr;
-        }
-        if let Some(v) = visit_counts_max {
-            config.visit_counts_max = v;
-        }
-        if let Some(v) = rnd_reward_alpha {
-            config.rnd_reward_alpha = v;
-        }
-        if let Some(v) = rnd_feature_dim {
-            config.rnd_feature_dim = v;
-        }
-        if let Some(v) = rnd_hidden_dim {
-            config.rnd_hidden_dim = v;
-        }
-        if let Some(v) = rnd_lr {
-            config.rnd_lr = Some(v);
-        }
-        if let Some(v) = coord_action_alpha {
-            config.coord_action_alpha = v;
-        }
-        if let Some(v) = coord_hidden_dim {
-            config.coord_hidden_dim = v;
-        }
-        if let Some(v) = coord_sigma {
-            config.coord_sigma = v;
-        }
-        if let Some(v) = coord_lr {
-            config.coord_lr = Some(v);
-        }
-        if let Some(v) = delta_goal_alpha {
-            config.delta_goal_alpha = v;
-        }
-        if let Some(v) = delta_goal_threshold {
-            config.delta_goal_threshold = v;
-        }
-        if let Some(v) = delta_goal_merge_radius {
-            config.delta_goal_merge_radius = v;
-        }
-        if let Some(v) = delta_goal_bank_size {
-            config.delta_goal_bank_size = v;
-        }
-        if let Some(v) = delta_goal_distance_clamp {
-            config.delta_goal_distance_clamp = v;
-        }
-        if let Some(v) = delta_goal_surprise_threshold {
-            config.delta_goal_surprise_threshold = v;
-        }
-        if let Some(v) = xeps_reward_alpha {
-            config.xeps_reward_alpha = v;
-        }
-        if let Some(v) = xeps_grid_resolution {
-            config.xeps_grid_resolution = Some(v);
-        }
-        if let Some(v) = extrinsic_reward_alpha {
-            config.extrinsic_reward_alpha = v;
-        }
-        if let Some(v) = policy_adv_global_clip {
-            config.policy_adv_global_clip = v;
-        }
-        if let Some(v) = policy_lr_adaptive_target {
-            config.policy_lr_adaptive_target = v;
-        }
-        if let Some(v) = policy_lr_adaptive_ema {
-            config.policy_lr_adaptive_ema = v;
-        }
-        if let Some(v) = value_bootstrap {
-            config.value_bootstrap = v;
-        }
-        if let Some(v) = gae_lambda {
-            config.gae_lambda = v;
-        }
-        if let Some(v) = value_loss_coef {
-            config.value_loss_coef = v;
-        }
-        if let Some(v) = policy_update_interval {
-            config.policy_update_interval = v;
-        }
-        if let Some(v) = advantage_normalize {
-            config.advantage_normalize = v;
-        }
-        if let Some(v) = use_ppo {
-            config.use_ppo = v;
-        }
-        if let Some(v) = ppo_clip_eps {
-            config.ppo_clip_eps = v;
-        }
-        if let Some(v) = use_adam {
-            config.use_adam = v;
-        }
-        if let Some(v) = adam_eps {
-            config.adam_eps = v;
-        }
-        if let Some(v) = grad_clip_norm {
-            config.grad_clip_norm = v;
-        }
-        if let Some(v) = grad_clip_every {
-            config.grad_clip_every = v;
-        }
-        if let Some(v) = use_grpo {
-            config.use_grpo = v;
-        }
-        if let Some(v) = use_grpo_episode {
-            config.use_grpo_episode = v;
-        }
-        if let Some(v) = use_sil {
-            config.use_sil = v;
-        }
-        if let Some(v) = sil_loss_coef {
-            config.sil_loss_coef = v;
-        }
-        if let Some(v) = sil_event_filter {
-            config.sil_event_filter = v;
-        }
-        if let Some(v) = sil_event_horizon {
-            config.sil_event_horizon = v;
-        }
-        if let Some(v) = sil_buffer_capacity {
-            config.sil_buffer_capacity = v;
-        }
-        if let Some(v) = sil_baseline_decay {
-            config.sil_baseline_decay = v;
-        }
-        if let Some(v) = use_kl_ppo {
-            config.use_kl_ppo = v;
-        }
-        if let Some(v) = kl_beta {
-            config.kl_beta = v;
-        }
-        if let Some(v) = kl_use_snapshot {
-            config.kl_use_snapshot = v;
-        }
-        if let Some(v) = ppo_n_epochs {
-            config.ppo_n_epochs = v;
-        }
-        if let Some(v) = policy_warmup_steps {
-            config.policy_warmup_steps = v;
-        }
-        if let Some(v) = recompute_base_v {
-            config.recompute_base_v = v;
-        }
-        if let Some(v) = end_to_end_encoder {
-            config.end_to_end_encoder = v;
-        }
-        if let Some(v) = rollout_length {
-            config.rollout_length = v;
-        }
-        if let Some(v) = value_clip_scale {
-            config.value_clip_scale = v;
-        }
-        if let Some(v) = bootstrap_value_clamp {
-            config.bootstrap_value_clamp = v;
-        }
-        if let Some(v) = value_target_clamp {
-            config.value_target_clamp = v;
-        }
-        if let Some(v) = terminal_proximity_k {
-            config.terminal_proximity_k = v;
-        }
-        if let Some(v) = terminal_proximity_bonus {
-            config.terminal_proximity_bonus = v;
-        }
-        if let Some(v) = terminal_proximity_threshold {
-            config.terminal_proximity_threshold = v;
-        }
-        if let Some(v) = recon_loss_coef {
-            config.recon_loss_coef = v;
-        }
-        if let Some(v) = recon_visual_target {
-            config.recon_visual_target = v;
-        }
-        if let Some(v) = policy_z_layer_norm {
-            config.policy_z_layer_norm = v;
-        }
-        if let Some(v) = policy_z_layer_norm_scale {
-            config.policy_z_layer_norm_scale = v;
-        }
-        if let Some(v) = reward_pred_loss_coef {
-            config.reward_pred_loss_coef = v;
-        }
-        if let Some(v) = planner_horizon {
-            config.planner_horizon = v;
-        }
-        if let Some(v) = planner_samples {
-            config.planner_samples = v;
-        }
-        if let Some(v) = planner_action_repeat {
-            config.planner_action_repeat = v;
-        }
-        if let Some(v) = wm_kstep_k {
-            config.wm_kstep_k = v;
-        }
-        if let Some(v) = wm_kstep_batch {
-            config.wm_kstep_batch = v;
-        }
-        if let Some(v) = wm_kstep_train_prob {
-            config.wm_kstep_train_prob = v;
-        }
-        if let Some(v) = wm_kstep_loss_coef {
-            config.wm_kstep_loss_coef = v;
-        }
-        if let Some(v) = planner_refresh_interval {
-            config.planner_refresh_interval = v;
-        }
-        if let Some(v) = planner_policy_mix {
-            config.planner_policy_mix = v;
-        }
-        if let Some(v) = planner_policy_temperature {
-            config.planner_policy_temperature = v;
-        }
-        if let Some(v) = planner_use_mcts {
-            config.planner_use_mcts = v;
-        }
-        if let Some(v) = mcts_simulations {
-            config.mcts_simulations = v;
-        }
-        if let Some(v) = mcts_c_puct {
-            config.mcts_c_puct = v;
-        }
-        if let Some(v) = replan_surprise_mult {
-            config.replan_surprise_mult = v;
-        }
-        if let Some(v) = surprise_ring_capacity {
-            config.surprise_ring_capacity = v;
-        }
-        if let Some(v) = plasticity_interval {
-            config.plasticity_interval = v;
-        }
-        if let Some(v) = plasticity_shrink {
-            config.plasticity_shrink = v;
-        }
-        if let Some(v) = plasticity_noise {
-            config.plasticity_noise = v;
-        }
-        if let Some(v) = surprise_replay_mult {
-            config.surprise_replay_mult = v;
-        }
-        if let Some(v) = planner_sigma_alpha {
-            config.planner_sigma_alpha = v;
-        }
-        if let Some(v) = planner_sigma_horizon {
-            config.planner_sigma_horizon = v;
-        }
-        if let Some(v) = planner_noise_sigma {
-            config.planner_noise_sigma = v;
-        }
-        if let Some(v) = wm_stochastic {
-            config.wm_stochastic = v;
-        }
-        if let Some(v) = wm_sigma_loss_coef {
-            config.wm_sigma_loss_coef = v;
-        }
-        if let Some(v) = planner_goal_alpha {
-            config.planner_goal_alpha = v;
-        }
-        if let Some(v) = goal_states_cap {
-            config.goal_states_cap = v;
-        }
-        if let Some(v) = visit_count_dims {
-            config.visit_count_dims = v;
-        }
-        if let Some(v) = visit_count_proj_dim {
-            config.visit_count_proj_dim = v;
-        }
-        if let Some(v) = value_head_train_coef {
-            config.value_head_train_coef = v;
-        }
-        if let Some(v) = planner_value_alpha {
-            config.planner_value_alpha = v;
-        }
-        if let Some(v) = value_head_gamma {
-            config.value_head_gamma = v;
-        }
-        if let Some(v) = value_head_buffer_capacity {
-            config.value_head_buffer_capacity = v;
-        }
-        if let Some(v) = value_head_hidden_dim {
-            config.value_head_hidden_dim = v;
-        }
-        if let Some(v) = value_head_lr_scale {
-            config.value_head_lr_scale = v;
-        }
-        if let Some(v) = goal_states_her_prob {
-            config.goal_states_her_prob = v;
-        }
-        if let Some(v) = bc_planner_synthetic_r {
-            config.bc_planner_synthetic_r = v;
-        }
-        if let Some(v) = planner_change_alpha {
-            config.planner_change_alpha = v;
-        }
-        if let Some(v) = value_buffer_cross_game {
-            config.value_buffer_cross_game = v;
-        }
-        if let Some(v) = goal_states_cross_game {
-            config.goal_states_cross_game = v;
-        }
-        if let Some(v) = subgoal_k {
-            config.subgoal_k = v;
-        }
-        if let Some(v) = subgoal_lr {
-            config.subgoal_lr = v;
-        }
-        if let Some(v) = planner_subgoal_alpha {
-            config.planner_subgoal_alpha = v;
-        }
-        if let Some(v) = confidence_mode {
-            config.confidence_mode = v;
-        }
-        if let Some(v) = confidence_win_increment {
-            config.confidence_win_increment = v;
-        }
-        if let Some(v) = confidence_novelty_drop_rate {
-            config.confidence_novelty_drop_rate = v;
-        }
-        if let Some(ek) = encoder_kind {
-            config.encoder_kind = match ek.as_str() {
-                "mlp" => EncoderKind::Mlp,
-                "cnn" | "cnn_dqn" => {
-                    let channels = encoder_channels.ok_or_else(|| {
-                        PyValueError::new_err(format!(
-                            "encoder_kind='{ek}' requires encoder_channels"
-                        ))
-                    })?;
-                    let height = encoder_height.ok_or_else(|| {
-                        PyValueError::new_err(format!(
-                            "encoder_kind='{ek}' requires encoder_height"
-                        ))
-                    })?;
-                    let width = encoder_width.ok_or_else(|| {
-                        PyValueError::new_err(format!("encoder_kind='{ek}' requires encoder_width"))
-                    })?;
-                    if ek.as_str() == "cnn" {
-                        EncoderKind::Cnn {
-                            channels,
-                            height,
-                            width,
-                        }
-                    } else {
-                        EncoderKind::CnnDqn {
-                            channels,
-                            height,
-                            width,
-                        }
-                    }
-                }
-                "efficientnet_v2s" => {
-                    let path = efficientnet_weights.as_ref().ok_or_else(|| {
-                        PyValueError::new_err(
-                            "encoder_kind='efficientnet_v2s' requires efficientnet_weights",
-                        )
-                    })?;
-                    config.efficientnet_weights_path = Some(std::path::PathBuf::from(path));
-                    EncoderKind::EfficientNetV2S
-                }
-                other => {
-                    return Err(PyValueError::new_err(format!(
-                        "encoder_kind must be 'mlp', 'cnn', 'cnn_dqn', or 'efficientnet_v2s', got {other:?}"
-                    )));
-                }
-            };
-        }
-        let agent = Agent::new(config, adapters);
-        Ok(Self {
-            agent,
-            rng: StdRng::seed_from_u64(seed),
-            num_actions,
-            batch_size,
-            obs_dim,
-        })
-    }
-
-    /// Sample one discrete action per lane. `obs_list` must be a sequence
-    /// of length `batch_size` where each entry is a 1-D sequence of floats.
-    /// Returns a list of integer action indices, length `batch_size`.
-    #[pyo3(signature = (obs_list, deterministic = false))]
-    fn act(&mut self, obs_list: &Bound<'_, PyAny>, deterministic: bool) -> PyResult<Vec<usize>> {
-        let py = obs_list.py();
-        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
-        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
-        // Release the GIL for the batched GPU dispatch (M-16).
-        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-        let actions = py.detach(move || {
-            let (agent, rng) = ctx.get();
-            if deterministic {
-                agent.act_greedy(&observations, rng)
-            } else {
-                agent.act(&observations, rng)
-            }
-        });
-        actions
-            .into_iter()
-            .map(|a| match a {
-                Action::Discrete(i) => Ok(i),
-                Action::Continuous(_) => Err(PyRuntimeError::new_err(
-                    "agent produced a continuous action; BatchAgent expects discrete actions",
-                )),
-            })
-            .collect()
-    }
-
-    /// Observe one synchronous step across all lanes.
-    ///
-    /// `next_obs_list` and `actions_list` must have length `batch_size`.
-    /// `homeostatic` is an optional list-of-lists (one list per lane) — each
-    /// inner list is a sequence of `{"value", "target", "tolerance"}` dicts
-    /// (or 3-tuples).
-    #[pyo3(signature = (next_obs_list, actions_list, homeostatic = None))]
-    fn observe(
-        &mut self,
-        next_obs_list: &Bound<'_, PyAny>,
-        actions_list: &Bound<'_, PyAny>,
-        homeostatic: Option<&Bound<'_, PyAny>>,
-    ) -> PyResult<()> {
-        let py = next_obs_list.py();
-        let obs_vecs = parse_obs_list(next_obs_list, self.batch_size, self.obs_dim)?;
-        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
-
-        // Parse actions list.
-        let actions_outer: Vec<Bound<'_, PyAny>> = {
-            let mut v = Vec::with_capacity(self.batch_size);
-            for item in actions_list.try_iter()? {
-                v.push(item?);
-            }
-            v
-        };
-        if actions_outer.len() != self.batch_size {
-            return Err(PyValueError::new_err(format!(
-                "actions_list length {} must equal batch_size {}",
-                actions_outer.len(),
-                self.batch_size
-            )));
-        }
-        let mut actions = Vec::with_capacity(self.batch_size);
-        for (i, item) in actions_outer.into_iter().enumerate() {
-            let a: usize = item.extract()?;
-            if a >= self.num_actions {
-                return Err(PyValueError::new_err(format!(
-                    "action {a} at lane {i} out of range for num_actions={}",
-                    self.num_actions
-                )));
-            }
-            actions.push(Action::Discrete(a));
-        }
-
-        // Parse optional per-lane homeostatic lists.
-        let homeos: Vec<Vec<HomeostaticVariable>> = match homeostatic {
-            None => (0..self.batch_size).map(|_| Vec::new()).collect(),
-            Some(outer) => {
-                let mut out: Vec<Vec<HomeostaticVariable>> = Vec::with_capacity(self.batch_size);
-                for inner in outer.try_iter()? {
-                    let inner: Bound<'_, PyAny> = inner?;
-                    out.push(parse_homeo(&inner)?);
-                }
-                // One inner list per lane, exactly. Silently padding a
-                // short list would strip trailing lanes of their homeo
-                // signal with no diagnostic (M-19).
-                if out.len() != self.batch_size {
-                    return Err(PyValueError::new_err(format!(
-                        "homeostatic list length {} must equal batch_size {}",
-                        out.len(),
-                        self.batch_size
-                    )));
-                }
-                out
-            }
-        };
-
-        // All Python data is extracted; release the GIL for the batched
-        // GPU training dispatch (M-16).
-        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-        py.detach(move || {
-            let (agent, rng) = ctx.get();
-            // Build proxy envs (hold the observations + homeostats for
-            // this step).
-            let proxies: Vec<ProxyEnv> = observations
-                .iter()
-                .zip(homeos.into_iter())
-                .map(|(obs, homeo)| ProxyEnv { obs, homeo })
-                .collect();
-            let env_refs: Vec<&dyn Environment> =
-                proxies.iter().map(|p| p as &dyn Environment).collect();
-            agent.observe(&observations, &actions, &env_refs, rng);
-        });
-        Ok(())
-    }
-
-    /// Mark lane `lane_idx` as starting a new episode on the next observe.
-    fn mark_boundary(&mut self, lane_idx: usize) {
-        self.agent.mark_boundary(lane_idx);
-    }
-
-    /// Current agent step count.
-    fn step_count(&self) -> usize {
-        self.agent.step_count()
-    }
-
-    /// Number of lanes.
-    fn num_lanes(&self) -> usize {
-        self.agent.num_lanes()
-    }
-
-    /// Number of (s, a, R, V) samples in the SIL replay buffer.
-    fn sil_buffer_size(&self) -> usize {
-        self.agent.sil_buffer_size()
-    }
-
-    /// Current SIL "successful episode" baseline value.
-    fn sil_baseline(&self) -> f32 {
-        self.agent.sil_baseline_value()
-    }
-
-    /// SIL update counters: (attempted, fired, last_active_rows).
-    fn sil_counters(&self) -> (u64, u64, u32) {
-        (
-            self.agent.sil_updates_attempted_count(),
-            self.agent.sil_updates_fired_count(),
-            self.agent.sil_last_active(),
-        )
-    }
-
-    /// L1 param change from most recent SIL step.
-    fn sil_last_param_change(&self) -> f32 {
-        self.agent.sil_last_param_change_value()
-    }
-
-    /// Per-lane diagnostics as a list of plain Python dicts.
-    fn diagnostics<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let diags = self.agent.diagnostics();
-        let json =
-            serde_json::to_string(&diags).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
-        let json_mod = py.import("json")?;
-        json_mod.call_method1("loads", (json,))
-    }
-
-    /// Cheap per-step getter: list of `R̂(z_t)` values, one per lane.
-    /// Avoids the JSON round-trip of `diagnostics()` so per-step
-    /// M6 instrumentation in a Python harness stays in the noise
-    /// budget. Returns zeros when M6 is disabled.
-    fn r_hats(&self) -> Vec<f32> {
-        self.agent.r_hats()
-    }
-
-    /// Per-lane confidence C ∈ [0, 1]. Constant 0.5 when
-    /// `confidence_mode=False`.
-    fn confidence(&self) -> Vec<f32> {
-        self.agent.confidence()
-    }
-
-    /// Per-lane value baseline V(s_t) from the most recent act().
-    /// Used for diagnosing whether the value head is discriminating
-    /// across states or just predicting the mean return everywhere
-    /// (degenerate case → advantage ≈ 0 → policy can't learn).
-    fn values(&self) -> Vec<f32> {
-        self.agent.values()
-    }
-
-    /// Per-lane policy entropy from the most recent act().
-    fn entropies(&self) -> Vec<f32> {
-        self.agent.entropies()
-    }
-
-    /// Per-lane current latent z (encoder output). Returns a list of
-    /// `batch_size` lists of length `latent_dim`. Empty inner list if a
-    /// lane has no transitions yet. Diagnostic for whether the encoder
-    /// produces game-distinguishing latents under multi-env training.
-    fn latents(&self) -> Vec<Vec<f32>> {
-        self.agent.latents()
-    }
-
-    /// One masked behavior-cloning update on externally labeled discrete
-    /// states. Requires the plain end-to-end categorical policy graph.
-    #[pyo3(signature = (obs_list, action_indices, weight = 1.0))]
-    fn train_policy_supervised(
-        &mut self,
-        obs_list: &Bound<'_, PyAny>,
-        action_indices: Vec<usize>,
-        weight: f32,
-    ) -> PyResult<()> {
-        if action_indices.len() != self.batch_size {
-            return Err(PyValueError::new_err(format!(
-                "train_policy_supervised action_indices length {} must equal batch_size {}",
-                action_indices.len(),
-                self.batch_size
-            )));
-        }
-        if let Some((lane, action)) = action_indices
-            .iter()
-            .copied()
-            .enumerate()
-            .find(|(_, action)| *action >= self.num_actions)
-        {
-            return Err(PyValueError::new_err(format!(
-                "train_policy_supervised action {action} at lane {lane} is outside num_actions {}",
-                self.num_actions
-            )));
-        }
-        if !weight.is_finite() || weight <= 0.0 {
-            return Err(PyValueError::new_err(
-                "train_policy_supervised weight must be finite and positive",
-            ));
-        }
-        let py = obs_list.py();
-        let observations = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?
-            .into_iter()
-            .map(Observation::new)
-            .collect::<Vec<_>>();
-        let mut ctx = AssertSend((&mut self.agent, observations, action_indices));
-        py.detach(move || {
-            let (agent, observations, action_indices) = ctx.get();
-            agent.train_policy_supervised(observations, action_indices, weight)
-        })
-        .map_err(PyValueError::new_err)?;
-        Ok(())
-    }
-
-    /// Save trainable weights to a directory. Writes one safetensors
-    /// file per session (wm, policy, and optional option) plus coord.bin
-    /// when the CPU coordinate head is enabled.
-    /// Use with `load_weights` on a freshly constructed agent of the
-    /// same architecture for clean train/val splits.
-    fn save_weights(&mut self, dir: &str) -> PyResult<()> {
-        self.agent
-            .save_weights(std::path::Path::new(dir))
-            .map_err(|e| PyValueError::new_err(format!("save_weights: {e}")))
-    }
-
-    /// Load trainable weights from a directory previously written by
-    /// `save_weights`. The agent must have been constructed with the
-    /// same graph topology (latent_dim, hidden_dim, encoder kind,
-    /// num_options, recon flags, layer-norm flags).
-    /// This does not restore replay, optimizer, RNG, lane, or harness state.
-    fn load_weights(&mut self, dir: &str) -> PyResult<()> {
-        self.agent
-            .load_weights(std::path::Path::new(dir))
-            .map_err(|e| PyValueError::new_err(format!("load_weights: {e}")))
-    }
-
-    /// Partial-loader: read a single safetensors file into the
-    /// wm_session only. Missing parameters are tolerated (meganeura's
-    /// load_checkpoint logs a warning and skips them). Used to inject
-    /// a pretrained CNN encoder without touching the policy.
-    fn load_wm_checkpoint(&mut self, path: &str) -> PyResult<()> {
-        self.agent
-            .load_wm_checkpoint(std::path::Path::new(path))
-            .map_err(|e| PyValueError::new_err(format!("load_wm_checkpoint: {e}")))
-    }
-
-    /// Per-parameter LR multiplier on the wm_session. Used to freeze
-    /// (mul=0.0) or down-weight specific layers — e.g.,
-    /// `set_wm_lr_multiplier("encoder.", 0.0)` freezes a pretrained
-    /// encoder while WM/value/policy adapt to its latents.
-    fn set_wm_lr_multiplier(&mut self, prefix: &str, mul: f32) {
-        self.agent.set_wm_lr_multiplier(prefix, mul);
-    }
-
-    /// Visual-encoder input setter for `encoder_kind='cnn'` agents.
-    /// Accepts a 1-D sequence of length `batch_size · channels · height · width`
-    /// laid out as flat NCHW. Must be called before each
-    /// `observe()` when the agent's encoder is CNN; no-op for MLP
-    /// agents.
-    fn set_visual_obs(&mut self, visual: &Bound<'_, PyAny>) -> PyResult<()> {
-        // Expected float count: batch · channels · h · w. Zero for MLP
-        // agents, where the underlying call is a documented no-op —
-        // skip the length check in that case.
-        let expected = self.agent.visual_obs_host_size() / std::mem::size_of::<f32>();
-        // Fast path: a contiguous float32 buffer (numpy array, bytes,
-        // memoryview, etc.) — read directly via the buffer protocol
-        // without materializing an intermediate Vec<f32>. For Atari's
-        // 28224 floats / lane / step this is ~50× cheaper than
-        // `Vec::<f32>::extract`, which iterates a Python sequence.
-        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(visual) {
-            let py = visual.py();
-            if let Some(slice) = buf.as_slice(py) {
-                if expected != 0 {
-                    check_len(
-                        "set_visual_obs (batch · channels · h · w floats)",
-                        slice.len(),
-                        expected,
-                    )?;
-                }
-                // `ReadOnlyCell<f32>` has the same layout as `f32`;
-                // cast and hand kindle an ordinary slice.
-                let ptr = slice.as_ptr() as *const f32;
-                let len = slice.len();
-                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-                self.agent.set_visual_obs(slice);
-                return Ok(());
-            }
-        }
-        // Fallback: extract to a Vec<f32>. Accepts any iterable of
-        // floats (legacy `list[float]` usage).
-        let v: Vec<f32> = visual.extract()?;
-        if expected != 0 {
-            check_len(
-                "set_visual_obs (batch · channels · h · w floats)",
-                v.len(),
-                expected,
-            )?;
-        }
-        self.agent.set_visual_obs(&v);
-        Ok(())
-    }
-
-    /// Set per-lane action availability masks for the next and subsequent
-    /// `act()` calls. `masks` is a flat `[batch_size × MAX_ACTION_DIM]`
-    /// (=18) buffer of float values; entries >= 0.5 are treated as valid,
-    /// < 0.5 as invalid. Invalid actions get -inf logits before sampling
-    /// so the policy never picks them; the masked distribution feeds
-    /// `last_prob_taken` (PPO π_old) and `last_logits` (KL-PPO old policy)
-    /// so the importance ratio's denominator matches the sampling dist.
-    ///
-    /// Persists across `act()` calls until re-set; pass an all-1.0 buffer
-    /// or call `clear_action_masks` to disable. If all entries in a lane
-    /// row are < 0.5 (no valid action), that row falls back to unmasked
-    /// to avoid a NaN softmax.
-    ///
-    /// Accepts numpy arrays (zero-copy) or any iterable of floats.
-    fn set_action_masks(&mut self, masks: &Bound<'_, PyAny>) -> PyResult<()> {
-        let expected = self.batch_size * MAX_ACTION_DIM;
-        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(masks) {
-            let py = masks.py();
-            if let Some(slice) = buf.as_slice(py) {
-                check_len(
-                    "set_action_masks (batch_size × MAX_ACTION_DIM floats)",
-                    slice.len(),
-                    expected,
-                )?;
-                let ptr = slice.as_ptr() as *const f32;
-                let len = slice.len();
-                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-                self.agent.set_action_masks(slice);
-                return Ok(());
-            }
-        }
-        let v: Vec<f32> = masks.extract()?;
-        check_len(
-            "set_action_masks (batch_size × MAX_ACTION_DIM floats)",
-            v.len(),
-            expected,
-        )?;
-        self.agent.set_action_masks(&v);
-        Ok(())
-    }
-
-    /// Reset all action masks to the all-valid default.
-    fn clear_action_masks(&mut self) {
-        self.agent.clear_action_masks();
-    }
-
-    /// Declare which discrete action slots consume `(x, y)` parameters.
-    /// Flat bool layout `[batch_size × MAX_ACTION_DIM]`. The planner samples
-    /// coordinates only for marked actions and keeps ordinary WM tails zero.
-    fn set_action_parameter_masks(&mut self, masks: Vec<bool>) -> PyResult<()> {
-        let expected = self.batch_size * MAX_ACTION_DIM;
-        check_len("set_action_parameter_masks", masks.len(), expected)?;
-        self.agent.set_action_parameter_masks(&masks);
-        Ok(())
-    }
-
-    /// Reset all action slots to the unparameterized default.
-    fn clear_action_parameter_masks(&mut self) {
-        self.agent.clear_action_parameter_masks();
-    }
-
-    /// Stage normalized `(x, y)`-style parameters for the next `observe()`.
-    /// `parameters` is flat `[batch_size × ACTION_PARAMETER_DIM]`; the bool
-    /// `active_mask` selects lanes whose executed action consumed them. This
-    /// augments only the world-model action token; policy labels stay one-hot.
-    fn set_action_parameters(
-        &mut self,
-        parameters: &Bound<'_, PyAny>,
-        active_mask: Vec<bool>,
-    ) -> PyResult<()> {
-        let expected = self.batch_size * ACTION_PARAMETER_DIM;
-        check_len(
-            "set_action_parameters active_mask",
-            active_mask.len(),
-            self.batch_size,
-        )?;
-        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(parameters) {
-            let py = parameters.py();
-            if let Some(slice) = buf.as_slice(py) {
-                check_len("set_action_parameters", slice.len(), expected)?;
-                let ptr = slice.as_ptr() as *const f32;
-                let len = slice.len();
-                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-                self.agent.set_action_parameters(slice, &active_mask);
-                return Ok(());
-            }
-        }
-        let values: Vec<f32> = parameters.extract()?;
-        check_len("set_action_parameters", values.len(), expected)?;
-        self.agent.set_action_parameters(&values, &active_mask);
-        Ok(())
-    }
-
-    /// Set per-lane extrinsic (env) reward for the next `observe()`
-    /// call. `rewards` is a length-`batch_size` buffer (numpy array
-    /// preferred for zero-copy; any iterable also accepted). No-op
-    /// when `extrinsic_reward_alpha == 0.0` at agent construction.
-    fn set_extrinsic_reward(&mut self, rewards: &Bound<'_, PyAny>) -> PyResult<()> {
-        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(rewards) {
-            let py = rewards.py();
-            if let Some(slice) = buf.as_slice(py) {
-                check_len("set_extrinsic_reward", slice.len(), self.batch_size)?;
-                let ptr = slice.as_ptr() as *const f32;
-                let len = slice.len();
-                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-                self.agent.set_extrinsic_reward(slice);
-                return Ok(());
-            }
-        }
-        let v: Vec<f32> = rewards.extract()?;
-        check_len("set_extrinsic_reward", v.len(), self.batch_size)?;
-        self.agent.set_extrinsic_reward(&v);
-        Ok(())
-    }
-
-    /// Mark per-lane task-success events for the next `observe()` call.
-    /// Use this when success can terminate on a zero or negative reward;
-    /// positive extrinsic rewards are already treated as events implicitly.
-    fn set_extrinsic_events(&mut self, events: Vec<bool>) -> PyResult<()> {
-        check_len("set_extrinsic_events", events.len(), self.batch_size)?;
-        self.agent.set_extrinsic_events(&events);
-        Ok(())
-    }
-
-    /// Per-lane empowerment estimate from the most recent
-    /// plan_and_queue call. Mean-of-per-dim cross-sample variance of
-    /// step-0 z_next. High = options diverge; low = stuck. Returns
-    /// `[]` when the planner is off.
-    fn empowerment(&self) -> Vec<f32> {
-        self.agent.empowerment()
-    }
-
-    /// Set per-lane intrinsic progress reward (e.g. configurational
-    /// delta + per-episode entropy). Same shape contract as
-    /// `set_extrinsic_reward` but does NOT count toward
-    /// `sil_ep_event_count` — kept separate so the win-classifier's
-    /// is_win label stays anchored on real extrinsic events.
-    ///
-    /// **Gate:** like `set_extrinsic_reward`, this is a silent no-op
-    /// when `extrinsic_reward_alpha == 0.0` (the constructor default) —
-    /// the rewards are scaled by `extrinsic_reward_alpha` inside the
-    /// agent. Construct the agent with `extrinsic_reward_alpha > 0` for
-    /// progress rewards to take effect.
-    fn set_intrinsic_progress(&mut self, rewards: &Bound<'_, PyAny>) -> PyResult<()> {
-        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(rewards) {
-            let py = rewards.py();
-            if let Some(slice) = buf.as_slice(py) {
-                check_len("set_intrinsic_progress", slice.len(), self.batch_size)?;
-                let ptr = slice.as_ptr() as *const f32;
-                let len = slice.len();
-                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-                self.agent.set_intrinsic_progress(slice);
-                return Ok(());
-            }
-        }
-        let v: Vec<f32> = rewards.extract()?;
-        check_len("set_intrinsic_progress", v.len(), self.batch_size)?;
-        self.agent.set_intrinsic_progress(&v);
-        Ok(())
-    }
-
-    /// Update the base learning rate at runtime. Picked up by every
-    /// per-step `set_learning_rate` across all sessions on the next
-    /// `observe()`. Use case: drop LR after sustained-solve detected,
-    /// to head off the on-policy AC post-solve crash.
-    ///
-    /// **Footgun:** the policy session reads `lr_policy`, not
-    /// `learning_rate`. Calling only this setter is usually a silent
-    /// no-op for an LR schedule (the policy is the post-solve
-    /// destabilizer). Prefer `set_all_learning_rates` for a single-
-    /// knob LR drop.
-    fn set_learning_rate(&mut self, lr: f32) {
-        self.agent.set_learning_rate(lr);
-    }
-
-    /// Update the policy-session learning rate at runtime. Independent
-    /// of `set_learning_rate`. Most direct lever for stabilizing a
-    /// committed-good policy.
-    fn set_lr_policy(&mut self, lr: f32) {
-        self.agent.set_lr_policy(lr);
-    }
-
-    /// Update base + policy learning rates together, preserving the
-    /// constructor's 0.5× ratio. The
-    /// recommended setter for LR schedules — avoids the
-    /// `set_learning_rate`-without-`set_lr_policy` no-op footgun.
-    fn set_all_learning_rates(&mut self, lr: f32) {
-        self.agent.set_all_learning_rates(lr);
-    }
-
-    /// Update entropy bonus weight at runtime. Currently only effective
-    /// for the e2e graph (where entropy_beta is a graph input). Use case:
-    /// anneal entropy from high → 0 over training to maintain exploration
-    /// early then commit late. Standard PPO/A2C entropy schedule.
-    fn set_entropy_beta(&mut self, beta: f32) {
-        self.agent.set_entropy_beta(beta);
-    }
-
-    /// Update KL-PPO trust-region weight at runtime. Use Schulman 2017's
-    /// adaptive rule: read `last_kl()`, double β if KL > target × 1.5,
-    /// halve if KL < target / 1.5.
-    fn set_kl_beta(&mut self, beta: f32) {
-        self.agent.set_kl_beta(beta);
-    }
-
-    /// Most recent observed KL(π_new ‖ π_old) from the last training
-    /// step. 0.0 when KL-PPO is off.
-    fn last_kl(&self) -> f32 {
-        self.agent.last_kl()
-    }
-
-    /// Print a summary of the largest policy-session gradient norms
-    /// (descending), with grad/weight ratios. Diagnostic for which
-    /// parameter is driving instability. Print goes to stderr.
-    fn dump_policy_grad_summary(&self, top_n: usize) {
-        self.agent.dump_policy_grad_summary(top_n);
-    }
-
-    /// Bulk read of (param_name, grad_norm) pairs from the policy session.
-    /// Useful for plotting or anomaly detection without printing.
-    fn policy_grad_norms(&self) -> Vec<(String, f32)> {
-        self.agent.policy_grad_norms()
-    }
-
-    /// Bulk read of (param_name, weight_norm) pairs from the policy session.
-    fn policy_weight_norms(&self) -> Vec<(String, f32)> {
-        self.agent.policy_weight_norms()
-    }
-
-    /// Dump all policy-session parameters as `[(name, values), ...]`.
-    /// Values are Python lists of f32. Use `load_policy_params` to
-    /// restore. For full checkpoint save in train_kindle_vec.py.
-    fn dump_policy_params(&self) -> Vec<(String, Vec<f32>)> {
-        self.agent.dump_policy_params()
-    }
-
-    /// Upload all policy-session parameters from `[(name, values), ...]`.
-    /// Returns the number of params successfully uploaded.
-    fn load_policy_params(&mut self, params: Vec<(String, Vec<f32>)>) -> usize {
-        self.agent.load_policy_params(&params)
-    }
-
-    /// Set a per-parameter LR multiplier on the policy session by
-    /// name prefix. Use to rebalance asymmetric gradient flow between
-    /// encoder and policy head — see Agent::set_policy_lr_multiplier
-    /// for the diagnostic context.
-    fn set_policy_lr_multiplier(&mut self, prefix: &str, mul: f32) {
-        self.agent.set_policy_lr_multiplier(prefix, mul);
-    }
-
-    /// Clear all per-parameter LR multipliers on the policy session.
-    fn clear_policy_lr_multipliers(&mut self) {
-        self.agent.clear_policy_lr_multipliers();
-    }
-
-    /// Writable `memoryview` over the world-model session's
-    /// `visual_obs` input buffer. Meganeura allocates that buffer
-    /// as `Memory::Shared` (device-local + host-visible + host-
-    /// coherent), so a Python write through this memoryview lands
-    /// directly in the GPU-side memory — no staging, no explicit
-    /// upload, no `VK_EXT_external_memory_host` import.
-    ///
-    /// Typical usage:
-    ///
-    /// ```python
-    /// mv = agent.visual_obs_memoryview()
-    /// buf = np.frombuffer(mv, dtype=np.float32).reshape(
-    ///     batch, channels, height, width
-    /// )
-    /// np.divide(raw_u8, 255.0, out=buf, dtype=np.float32, casting="unsafe")
-    /// agent.observe(...)  # reads the just-written frames
-    /// ```
-    ///
-    /// Returns an error when the encoder is MLP (no visual slot).
-    /// The memoryview lifetime is tied to the agent; the agent
-    /// must not be dropped while Python still holds the view.
-    ///
-    /// Ordering: writes through this pointer must complete before
-    /// the next `observe()` call. `observe()` internally waits for
-    /// the previous step's GPU reads to finish before returning,
-    /// so any write performed between two `observe()` calls is
-    /// safe.
-    fn visual_obs_memoryview<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let (ptr, size) = self.agent.visual_obs_host_ptr().ok_or_else(|| {
-            PyRuntimeError::new_err(
-                "visual_obs_memoryview: no visual_obs slot (encoder is MLP, not CNN)",
-            )
-        })?;
-        // Safety: `ptr`/`size` are stable for the lifetime of the
-        // agent (backed by meganeura's owned graph buffer). The
-        // memoryview is a non-owning view; Python must not outlive
-        // the BatchAgent, which matches typical harness usage.
-        let mv = unsafe {
-            let ffi_mv = pyo3::ffi::PyMemoryView_FromMemory(
-                ptr as *mut std::os::raw::c_char,
-                size as pyo3::ffi::Py_ssize_t,
-                pyo3::ffi::PyBUF_WRITE,
-            );
-            if ffi_mv.is_null() {
-                return Err(PyErr::fetch(py));
-            }
-            Bound::from_owned_ptr(py, ffi_mv)
-        };
-        Ok(mv)
-    }
-
-    /// Byte size of the `visual_obs` input buffer. Matches the
-    /// length of the memoryview returned by `visual_obs_memoryview`.
-    /// Zero when the encoder is MLP.
-    fn visual_obs_host_size(&self) -> usize {
-        self.agent.visual_obs_host_size()
-    }
-
-    /// Writable `memoryview` over the V2-S session's `image` input
-    /// buffer. Returns an error when the encoder isn't
-    /// `efficientnet_v2s`. Layout is `[batch, 3, 192, 192]` NCHW
-    /// f32, raw [0, 1] pixel range — no ImageNet normalization.
-    /// Same `Memory::Shared` host-coherent buffer trick as
-    /// `visual_obs_memoryview`: writes through the view land
-    /// directly in GPU-mapped memory.
-    fn image_input_memoryview<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let (ptr, size) = self.agent.image_input_host_ptr().ok_or_else(|| {
-            PyRuntimeError::new_err(
-                "image_input_memoryview: only available with encoder_kind='efficientnet_v2s'",
-            )
-        })?;
-        let mv = unsafe {
-            let ffi_mv = pyo3::ffi::PyMemoryView_FromMemory(
-                ptr as *mut std::os::raw::c_char,
-                size as pyo3::ffi::Py_ssize_t,
-                pyo3::ffi::PyBUF_WRITE,
-            );
-            if ffi_mv.is_null() {
-                return Err(PyErr::fetch(py));
-            }
-            Bound::from_owned_ptr(py, ffi_mv)
-        };
-        Ok(mv)
-    }
-
-    /// Byte size of the V2-S `image` input buffer. Zero when
-    /// V2-S isn't in use.
-    fn image_input_host_size(&self) -> usize {
-        self.agent.image_input_host_size()
-    }
-
-    /// Replace the V2-S `image` input slot with an externally-imported
-    /// Vulkan opaque-fd buffer.
-    ///
-    /// `fd` must be a Linux file descriptor returned by
-    /// `mind_games_rs.connect_dullahan_gpu(...)["fd"]` (or any other
-    /// `vkGetMemoryFdKHR`-style export). On a successful import the
-    /// driver takes ownership of the fd and the caller MUST NOT close
-    /// it. On failure the fd is left untouched and may still be closed
-    /// by the caller.
-    ///
-    /// `size` is the byte length of the imported allocation. It must
-    /// be at least the V2-S `image` slot's required size (typically
-    /// `batch * 3 * 192 * 192 * sizeof::<f32>()`); the producer is
-    /// responsible for either making the import exactly that size or
-    /// running a preprocess pass that fills the first N bytes with
-    /// the right NCHW f32 layout. See Track B.2 in
-    /// `docs/kindle_rl_pipeline_design.md`.
-    ///
-    /// Errors:
-    /// * `RuntimeError` if `encoder_kind != "efficientnet_v2s"`.
-    /// * `RuntimeError` if `size` is below the V2-S slot's needed
-    ///   byte count.
-    fn bind_v2s_image_external_fd(&mut self, fd: i32, size: u64) -> PyResult<()> {
-        let source = kindle::ExternalMemorySource::Fd(Some(fd));
-        self.agent
-            .bind_v2s_image_external(source, size)
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
-    }
-
-    /// Same as [`bind_v2s_image_external_fd`] but treats `fd` as a
-    /// DMA-BUF (the usual export path on Linux/Mesa for sharing with
-    /// GStreamer / V4L2 / EGL / Wayland — and what Dullahan's
-    /// `VK_KHR_external_memory_fd` path actually emits).
-    fn bind_v2s_image_external_dmabuf(&mut self, fd: i32, size: u64) -> PyResult<()> {
-        let source = kindle::ExternalMemorySource::Dma(Some(fd));
-        self.agent
-            .bind_v2s_image_external(source, size)
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
-    }
-
-    /// Replace the V2-S `image` input slot with an externally-imported
-    /// host pointer (e.g. a page-aligned Python `bytearray` mapped
-    /// from `mmap.mmap`). The pointer must remain valid for the
-    /// lifetime of the BatchAgent.
-    ///
-    /// `ptr` is the integer-cast address (cast a `bytearray` /
-    /// `numpy.ndarray.ctypes.data` to int). `size` is the buffer's
-    /// byte length and must be ≥ the V2-S slot's required size.
-    /// Useful when the producer is CPU-resident (e.g. a torch tensor
-    /// `.numpy().ctypes.data`); avoids the host-roundtrip that
-    /// `image_input_memoryview()` requires.
-    fn bind_v2s_image_external_host(&mut self, ptr: usize, size: u64) -> PyResult<()> {
-        let source = kindle::ExternalMemorySource::HostAllocation(ptr);
-        self.agent
-            .bind_v2s_image_external(source, size)
-            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
-    }
-
-    /// Register (or replace) the per-lane Dullahan source buffer that
-    /// the V2-S preprocess pipeline samples each step.  The pipeline
-    /// imports `fd` into the agent's blade context as
-    /// `Memory::External(Fd(_))` and remembers the SHM frame layout so
-    /// `v2s_preprocess_step` can compute slot offsets per call.
-    ///
-    /// Args:
-    ///     lane (int): lane index (0..batch_size).
-    ///     fd (int): Dullahan-exported OPAQUE_FD.  Blade takes
-    ///         ownership — closes it when the buffer is destroyed.
-    ///     allocation_size (int): total bytes of the imported allocation.
-    ///     frame_data_offset (int): bytes from start-of-allocation to
-    ///         the first frame ring slot (= SHM `data_offset`).
-    ///     bytes_per_frame (int): bytes per frame slot
-    ///         (= `width * height * 4`).
-    ///     src_w (int), src_h (int): source frame dimensions in pixels.
-    ///     is_rgba (bool): True for `VK_FORMAT_R8G8B8A8_UNORM`,
-    ///         False for the BGRA default (`B8G8R8A8`).
-    ///
-    /// Errors: `RuntimeError` if the agent has no V2-S preprocess
-    /// pipeline or the lane index is out of range.
-    #[allow(clippy::too_many_arguments)]
-    fn register_v2s_source(
-        &mut self,
-        lane: usize,
-        fd: i32,
-        allocation_size: u64,
-        frame_data_offset: u64,
-        bytes_per_frame: u64,
-        src_w: u32,
-        src_h: u32,
-        is_rgba: bool,
-    ) -> PyResult<()> {
-        self.agent
-            .register_v2s_source(
-                lane,
-                fd,
-                allocation_size,
-                frame_data_offset,
-                bytes_per_frame,
-                src_w,
-                src_h,
-                is_rgba,
-            )
-            .map_err(PyRuntimeError::new_err)
-    }
-
-    /// Drop the per-lane source for `lane`.  Use before re-registering
-    /// with a fresh fd after `VectorRustGameEnv::reset_lane`.
-    fn release_v2s_source(&mut self, lane: usize) {
-        self.agent.release_v2s_source(lane);
-    }
-
-    /// Configure the HUD-mask rects the preprocess shader zeros after
-    /// sampling.  Each rect is `(x0, y0, x1, y1)` in V2-S 192² input
-    /// pixel space (NOT game-frame coords — the trainer must rescale
-    /// from game resolution before calling).  Up to 4 rects supported;
-    /// pass an empty list to disable masking.  Settings persist across
-    /// `v2s_preprocess_step` calls.  No-op when the agent has no V2-S
-    /// preprocess pipeline.
-    fn set_v2s_hud_masks(&mut self, rects: Vec<(u32, u32, u32, u32)>) {
-        self.agent.set_v2s_hud_masks(&rects);
-    }
-
-    /// Run one preprocess dispatch per registered lane.  `slot_indices`
-    /// is one entry per lane: `Some(slot)` for lanes where the
-    /// producer just wrote frame slot `slot`, `None` to skip.
-    ///
-    /// The dispatch resamples the source frame to 192×192, swizzles
-    /// BGRA→RGB, normalises uint8→f32 / 255, and writes the result
-    /// directly into V2-S's `image` input buffer at `[lane, :, :, :]`.
-    /// Submits and waits — the next `observe()` call reads the result.
-    fn v2s_preprocess_step(&mut self, slot_indices: Vec<Option<u32>>) {
-        self.agent.v2s_preprocess_step(&slot_indices);
-    }
-
-    /// Re-initialize the RND predictor. Used to re-activate
-    /// curiosity when the agent enters a new state distribution
-    /// (e.g. on level-up in ARC-AGI-3). No-op when RND is
-    /// disabled.
-    fn reset_rnd_predictor(&mut self) {
-        self.agent.reset_rnd_predictor();
-    }
-
-    /// Sample per-lane `(x, y)` from the coord head, each in
-    /// `[−1, 1]`. Harness rescales to the target env's coord
-    /// range. Returns zeros per lane when the coord head is
-    /// disabled. Call before the env step; kindle caches sample
-    /// state so `train_coord_head` can apply the REINFORCE
-    /// update once the resulting reward is known.
-    fn sample_coords(&mut self) -> Vec<(f32, f32)> {
-        self.agent.sample_coords(&mut self.rng)
-    }
-
-    /// Deterministic coordinate means for the supplied current observations.
-    /// This encodes `obs_list` directly rather than reading buffered latents.
-    fn coord_means(&mut self, obs_list: &Bound<'_, PyAny>) -> PyResult<Vec<(f32, f32)>> {
-        let py = obs_list.py();
-        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
-        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
-        let mut ctx = AssertSend((&mut self.agent, observations));
-        Ok(py.detach(move || {
-            let (agent, observations) = ctx.get();
-            agent.coord_means_for_observations(observations)
-        }))
-    }
-
-    /// Supervised coordinate imitation from successful demonstration states.
-    /// `targets` contains normalized `(x, y)` pairs in `[−1, 1]`.
-    #[pyo3(signature = (obs_list, targets, active_mask = None, weight = 1.0))]
-    fn train_coord_head_supervised(
-        &mut self,
-        obs_list: &Bound<'_, PyAny>,
-        targets: Vec<(f32, f32)>,
-        active_mask: Option<Vec<bool>>,
-        weight: f32,
-    ) -> PyResult<f32> {
-        let py = obs_list.py();
-        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
-        check_len(
-            "train_coord_head_supervised targets",
-            targets.len(),
-            self.batch_size,
-        )?;
-        let active = active_mask.unwrap_or_else(|| vec![true; self.batch_size]);
-        check_len(
-            "train_coord_head_supervised active_mask",
-            active.len(),
-            self.batch_size,
-        )?;
-        if !weight.is_finite() || weight < 0.0 {
-            return Err(PyValueError::new_err(
-                "train_coord_head_supervised weight must be finite and >= 0",
-            ));
-        }
-        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
-        let targets: Vec<[f32; 2]> = targets.into_iter().map(|(x, y)| [x, y]).collect();
-        let mut ctx = AssertSend((&mut self.agent, observations, targets, active));
-        Ok(py.detach(move || {
-            let (agent, observations, targets, active) = ctx.get();
-            agent.train_coord_head_supervised(observations, targets, active, weight)
-        }))
-    }
-
-    /// Consume coordinate parameters attached to actions returned by the most
-    /// recent `act()`. Entries are None for policy/skill actions or ordinary
-    /// discrete planner actions. Call after `act()` and before env.step().
-    fn take_planned_action_parameters(&mut self) -> Vec<Option<(f32, f32)>> {
-        self.agent
-            .take_planned_action_parameters()
-            .into_iter()
-            .map(|parameters| parameters.map(|p| (p[0], p[1])))
-            .collect()
-    }
-
-    /// Train the coord head on rewards cached during the last `observe()`.
-    /// `active_mask` identifies lanes whose executed action actually consumed
-    /// coordinates; inactive lanes neither train nor affect the reward baseline.
-    /// Optional `rewards` supplies one explicit scalar per lane (for example,
-    /// sparse level progress) instead of Kindle's combined intrinsic/extrinsic
-    /// reward. Omitting both arguments preserves backwards compatibility.
-    #[pyo3(signature = (active_mask = None, rewards = None))]
-    fn train_coord_head(
-        &mut self,
-        active_mask: Option<Vec<bool>>,
-        rewards: Option<Vec<f32>>,
-    ) -> PyResult<()> {
-        let mask = active_mask.unwrap_or_else(|| vec![true; self.batch_size]);
-        check_len("train_coord_head active_mask", mask.len(), self.batch_size)?;
-        if let Some(rewards) = rewards {
-            check_len("train_coord_head rewards", rewards.len(), self.batch_size)?;
-            self.agent
-                .train_coord_head_masked_with_rewards(&mask, &rewards);
-        } else {
-            self.agent.train_coord_head_masked(&mask);
-        }
-        Ok(())
-    }
-
-    /// Current size of the M8 delta-goal bank. Returns 0 when
-    /// M8 is disabled.
-    fn delta_goal_bank_size(&self) -> usize {
-        self.agent.delta_goal_bank_size()
-    }
-
-    /// Number of M8 goal-events recorded during the most recent
-    /// `observe()` call, summed across lanes. Returns 0 when M8
-    /// is disabled.
-    fn last_delta_goal_events(&self) -> usize {
-        self.agent.last_delta_goal_events()
-    }
-
-    /// Distinct `(quantized_state, action)` pairs tracked by the
-    /// cross-episode memory. Returns 0 when disabled.
-    fn xeps_distinct_pairs(&self) -> usize {
-        self.agent.xeps_distinct_pairs()
-    }
-
-    /// Run the Track 3 model-based planner for every lane with an
-    /// empty planner queue. Samples `planner_samples` random action
-    /// sequences of length `planner_horizon`, rolls each out
-    /// through the WM, and queues the highest-novelty-score
-    /// sequence. Call from the harness before `act()` when you
-    /// want the next K actions to come from planning rather than
-    /// the policy. No-op when `planner_horizon == 0`.
-    fn plan_and_queue(&mut self, py: Python<'_>, num_actions: usize) {
-        // Release the GIL: planning rolls the world model out on the
-        // GPU for `planner_samples × planner_horizon` steps (M-16).
-        let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
-        py.detach(move || {
-            let (agent, rng) = ctx.get();
-            agent.plan_and_queue(num_actions, rng);
-        });
-    }
-
-    /// Total queued planner actions across all lanes. Diagnostic.
-    fn planner_queue_len(&self) -> usize {
-        self.agent.planner_queue_len()
-    }
-
-    /// Append a sequence of action indices to a specific lane's
-    /// planner queue. Used by the harness to inject learned skills
-    /// without going through `plan_and_queue`.
-    fn queue_actions(&mut self, lane: usize, actions: Vec<u32>) {
-        self.agent.queue_actions(lane, &actions);
-    }
-
-    /// Queue explicit `(action, (x, y))` planner decisions for one lane.
-    fn queue_parameterized_actions(&mut self, lane: usize, actions: Vec<(u32, (f32, f32))>) {
-        let actions: Vec<(u32, [f32; ACTION_PARAMETER_DIM])> = actions
-            .into_iter()
-            .map(|(action, (x, y))| (action, [x, y]))
-            .collect();
-        self.agent.queue_parameterized_actions(lane, &actions);
-    }
-
-    /// Snapshot the most recent `n` transitions of `lane_idx`, oldest
-    /// first, as a list of dicts. Each dict contains:
-    ///   observation (list[float]), latent (list[float]),
-    ///   action (list[float]), action_parameters (list[float]), reward (float),
-    ///   pred_error (float), value (float), prob_taken (float),
-    ///   option_idx (int), env_id (int), env_boundary (bool).
-    /// Diagnostic-only — used to inspect rollout buffers offline
-    /// (e.g. compare V(s_t) trajectory to discounted return, plot
-    /// pred_error over time, locate landing windows by reward spikes).
-    fn dump_buffer<'py>(
-        &self,
-        py: Python<'py>,
-        lane_idx: usize,
-        n: usize,
-    ) -> PyResult<Bound<'py, PyList>> {
-        let snap = self.agent.recent_transitions(lane_idx, n);
-        let out = PyList::empty(py);
-        for t in snap.iter() {
-            let d = PyDict::new(py);
-            d.set_item("observation", t.observation.clone())?;
-            d.set_item("latent", t.latent.clone())?;
-            d.set_item("action", t.action.clone())?;
-            d.set_item("action_parameters", t.action_parameters.clone())?;
-            d.set_item("reward", t.reward)?;
-            d.set_item("pred_error", t.pred_error)?;
-            d.set_item("value", t.value)?;
-            d.set_item("prob_taken", t.prob_taken)?;
-            d.set_item("option_idx", t.option_idx)?;
-            d.set_item("env_id", t.env_id)?;
-            d.set_item("env_boundary", t.env_boundary)?;
-            out.append(d)?;
-        }
-        Ok(out)
-    }
-}
-
-// ---------------------------------------------------------------------------
-// EfficientNetV2-S inference (frozen ImageNet-pretrained features[0:6]).
-//
-// Used by the host as the visual frontend for KindleVisualActor — replaces
-// the PyTorch-based EfficientNet-B0 path with an end-to-end-on-GPU meganeura
-// session that matches torchvision V2-S to ~1e-4 abs error (see meganeura's
-// `tests/efficientnet_correctness.rs`).
-//
-// Construction:
-//   PyEfficientNet(safetensors_path) — load `efficientnet_v2s.safetensors`
-//   produced by `meganeura/bench/dump_efficientnet_v2_reference.py`.
-//
-// Step:
-//   1. Write a `[3, 192, 192]` f32 NCHW image into `input_memoryview()`.
-//   2. Call `forward()` → returns flat `[160 * 12 * 12]` f32 features.
-// ---------------------------------------------------------------------------
-
-const EFFICIENTNET_INPUT_C: usize = 3;
-const EFFICIENTNET_INPUT_HW: usize = 192;
-const EFFICIENTNET_OUTPUT_C: usize = 160;
-const EFFICIENTNET_OUTPUT_HW: usize = 12;
-const EFFICIENTNET_INPUT_SIZE: usize =
-    EFFICIENTNET_INPUT_C * EFFICIENTNET_INPUT_HW * EFFICIENTNET_INPUT_HW;
-const EFFICIENTNET_OUTPUT_SIZE: usize =
-    EFFICIENTNET_OUTPUT_C * EFFICIENTNET_OUTPUT_HW * EFFICIENTNET_OUTPUT_HW;
-
-/// Frozen EfficientNetV2-S features[0:6] inference, end-to-end on the
-/// meganeura GPU session. Outputs `[160, 12, 12]` features for a
-/// `[3, 192, 192]` RGB input (raw [0,1] pixel range — no ImageNet
-/// normalization, matching the torchvision parity test).
-#[pyclass(name = "EfficientNet", module = "kindle", unsendable)]
-pub struct PyEfficientNet {
-    session: meganeura::Session,
-}
-
-#[pymethods]
-impl PyEfficientNet {
-    /// Build the V2-S graph, load the BN-folded safetensors weights,
-    /// and return a ready-to-step session.
-    #[new]
-    fn new(safetensors_path: &str) -> PyResult<Self> {
-        let mut g = meganeura::Graph::new();
-        let out = meganeura::models::efficientnet::build_graph(&mut g, /*batch=*/ 1);
-        g.set_outputs(vec![out]);
-        let mut session = meganeura::build_inference_session(&g);
-
-        let weights = meganeura::data::safetensors::SafeTensorsModel::load(safetensors_path.into())
-            .map_err(|e| {
-                PyRuntimeError::new_err(format!("EfficientNet: loading '{safetensors_path}': {e}"))
-            })?;
-        for name in meganeura::models::efficientnet::weight_names() {
-            let data = weights.tensor_f32(&name).map_err(|e| {
-                PyRuntimeError::new_err(format!("EfficientNet: parameter '{name}': {e}"))
-            })?;
-            session.set_parameter(&name, &data);
-        }
-        Ok(Self { session })
-    }
-
-    /// Writable `memoryview` over the GPU-side `image` input buffer
-    /// (`Memory::Shared` — host-coherent). Layout is `[3, 192, 192]`
-    /// NCHW f32. Caller is responsible for dividing by 255 and writing
-    /// before each `forward()` call.
-    fn input_memoryview<'py>(&mut self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        let (ptr, size) = self.session.input_host_ptr("image").ok_or_else(|| {
-            PyRuntimeError::new_err("EfficientNet: input 'image' has no host-mapped buffer")
-        })?;
-        let mv = unsafe {
-            let ffi_mv = pyo3::ffi::PyMemoryView_FromMemory(
-                ptr as *mut std::os::raw::c_char,
-                size as pyo3::ffi::Py_ssize_t,
-                pyo3::ffi::PyBUF_WRITE,
-            );
-            if ffi_mv.is_null() {
-                return Err(PyErr::fetch(py));
-            }
-            Bound::from_owned_ptr(py, ffi_mv)
-        };
-        Ok(mv)
-    }
-
-    /// Run a single forward pass on the contents of `input_memoryview`.
-    /// Returns a flat `[160 * 12 * 12]` f32 list (NCHW row-major).
-    fn forward(&mut self) -> Vec<f32> {
-        self.session.step();
-        self.session.wait();
-        self.session.read_output(EFFICIENTNET_OUTPUT_SIZE)
-    }
-
-    /// Element count of the input tensor (3 × 192 × 192 = 110592).
-    #[staticmethod]
-    fn input_size() -> usize {
-        EFFICIENTNET_INPUT_SIZE
-    }
-
-    /// Element count of the output tensor (160 × 12 × 12 = 23040).
-    #[staticmethod]
-    fn output_size() -> usize {
-        EFFICIENTNET_OUTPUT_SIZE
-    }
-
-    /// Output channel count (160).
-    #[staticmethod]
-    fn output_channels() -> usize {
-        EFFICIENTNET_OUTPUT_C
-    }
-
-    /// Output spatial side length (12).
-    #[staticmethod]
-    fn output_spatial() -> usize {
-        EFFICIENTNET_OUTPUT_HW
-    }
-
-    /// Input spatial side length (192).
-    #[staticmethod]
-    fn input_spatial() -> usize {
-        EFFICIENTNET_INPUT_HW
-    }
-}
-
-/// Parse an outer sequence of length `expected` whose entries are each a
-/// 1-D obs vector (list/tuple/ndarray of floats) of length `obs_dim`.
-fn parse_obs_list(
-    obj: &Bound<'_, PyAny>,
-    expected: usize,
-    obs_dim: usize,
-) -> PyResult<Vec<Vec<f32>>> {
-    let mut out = Vec::with_capacity(expected);
-    for item in obj.try_iter()? {
-        let item: Bound<'_, PyAny> = item?;
-        out.push(parse_obs(&item, obs_dim)?);
-    }
-    if out.len() != expected {
-        return Err(PyValueError::new_err(format!(
-            "expected outer sequence of length {expected}, got {}",
-            out.len()
-        )));
-    }
-    Ok(out)
 }

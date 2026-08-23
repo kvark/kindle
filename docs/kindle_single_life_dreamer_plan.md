@@ -1,0 +1,448 @@
+# Kindle: Dreamer baseline and single-life research plan
+
+**Decision date:** 2026-08-23
+**Status:** initial baseline implemented; empirical validation next
+
+## Executive decision
+
+Kindle now starts from DreamerV3 rather than from its previous collection of
+policy, planning, credit, option, and reward experiments.
+
+The immediate objective is narrow:
+
+> Reproduce the DreamerV3 online data regime and learning algorithm on the
+> Meganeura/Blade stack, using a frozen DINOv3 ViT-S/16 visual encoder.
+
+This is intentionally a hybrid, not a literal copy:
+
+- DreamerV3 supplies replay, recurrent state, world-model losses, imagination,
+  actor/critic learning, and scaling presets.
+- DINOv3 supplies a generic visual prior so the first experiment does not also
+  need to learn vision from scratch.
+- Kindle retains explicit seams for intrinsic reward and game adapters.
+- Dreamer 4 remains a scaling reference, not the baseline.
+
+The earlier Kindle architecture is not maintained side by side. Its useful ideas
+remain in git history and should return only through controlled ablations against
+the Dreamer baseline.
+
+## 1. Research boundary
+
+### 1.1 What “single life” means
+
+The long-term project assumes one factual stream of external consequences:
+
+- no cloning, rewinding, or restoring the external environment for training;
+- game death/respawn is an ordinary transition when the game implements it;
+- actual memories may be retained and replayed;
+- counterfactual branches may be generated inside the learned world model;
+- independent lifetimes remain necessary for scientific evaluation.
+
+The current baseline supports this data model but does not yet solve lifelong
+memory, safe policy deployment, self-directed goals, or irreversible exploration.
+
+### 1.2 Baseline before novelty
+
+The first scientific control is ordinary externally rewarded Dreamer. Intrinsic
+reward channels exist, but their default scale is zero. Every Kindle extension
+must answer a concrete ablation:
+
+1. Does standard Dreamer learn the task?
+2. Does the extension improve interaction efficiency, robustness, transfer, or
+   retention at matched compute?
+3. Which added mechanism caused the improvement?
+
+This ordering is the main lesson of the pivot.
+
+## 2. Why DreamerV3 rather than Dreamer 4
+
+“Latest” and “best fit” are different questions.
+
+DreamerV3 is the closer fit for Kindle's first implementation because it is an
+online model-based reinforcement-learning agent:
+
+- it trains continually from an online replay stream;
+- its recurrent stochastic state handles partial observability;
+- it learns reward and continuation together with dynamics;
+- its actor and critic learn from short latent imagined trajectories;
+- it has established small-to-large network presets and robust normalization.
+
+Dreamer 4 explores a different axis: large offline video world models,
+task-conditioned finetuning, behavioral cloning, and policy learning inside a
+mostly fixed model. Its results are important evidence for scalable imagination,
+but adopting that stack would add offline data, tokenizer/world-model
+pretraining, and much larger compute to the first Kindle experiment.
+
+Dreamer 4 becomes relevant later if the recurrent baseline hits a clear scaling
+limit. VidTok is similarly deferred until video tokenization is itself the
+experiment.
+
+## 3. Visual perception decision
+
+### 3.1 Frozen DINOv3 ViT-S/16
+
+The baseline uses `facebook/dinov3-vits16-pretrain-lvd1689m`:
+
+- 224×224 RGB input;
+- 16×16 patches, producing a 14×14 patch grid;
+- 384 channels;
+- 12 transformer layers, 6 attention heads, and 4 register tokens;
+- frozen inference in a session separate from every optimizer.
+
+CLS and register tokens participate in faithful DINO inference but are removed
+at the Dreamer boundary. The RSSM consumes dense spatial patch tokens; it owns
+time and recurrent belief.
+
+Arbitrary game resolutions are resized with deterministic aspect-preserving
+letterboxing. Padding uses the ImageNet mean so it becomes approximately zero
+after normalization.
+
+### 3.2 Replay representation
+
+Storing every 14×14×384 output would make online replay unnecessarily large.
+The baseline therefore applies two frozen operations:
+
+1. a seeded Rademacher projection from 384 to 64 channels;
+2. fixed 2×2 average pooling from 14×14 to 7×7.
+
+One replay observation is 7×7×64 = 3,136 floats. The seed and projection are
+part of the architecture contract, not learned parameters. The Dreamer decoder
+reconstructs this compressed DINO feature map rather than raw pixels.
+
+This is the largest deliberate departure from canonical DreamerV3 and must be
+ablated later against full tokens, alternative pooling, selected intermediate
+layers, and eventually learned pixel encoders.
+
+## 4. Baseline contract
+
+The behavioral reference is DreamerV3 revision
+`e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
+
+| Area | Baseline |
+|---|---|
+| Replay | Uniform online replay, 100k-frame capacity, batch 16, length 64, one context frame |
+| World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
+| Train ratio | 32 replayed samples per real environment step |
+| State | Block-recurrent deterministic state plus 32 categorical variables |
+| Categorical support | Preset-dependent classes, 1% uniform mixture |
+| World losses | Feature reconstruction, reward, continuation, dynamics KL, representation KL |
+| KL | Dynamics scale 1.0, representation scale 0.1, 1 free nat |
+| Reward/value | 255-bin symmetric exponentially spaced two-hot distributions |
+| Imagination | 15 steps from every posterior sequence state |
+| Actor | Categorical REINFORCE, 1% uniform mixture, entropy scale 3e-4 |
+| Critic | Imagined lambda returns plus replay-value loss and slow-value regularization |
+| Discount | Learned continuation including horizon discount, horizon 333 |
+| Lambda | 0.95 |
+| Slow value | EMA rate 0.02 |
+| Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
+| Optimizer | Adam, 4e-5, 1,000-step warmup |
+| Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
+
+DreamerV3 uses adaptive gradient clipping at 0.3. Meganeura currently exposes
+global norm clipping, so this implementation records an explicit optimizer
+accommodation rather than pretending exact parity. Meganeura also compiles a
+statically unrolled recurrent graph: unrolling all 64 steps made even small
+presets impractical to build. Kindle therefore uses 8-step truncated BPTT,
+accumulates and averages gradients across all eight chunks, and retains the
+full 64-step replay sample and all posterior imagination starts. This is an
+implementation accommodation, not a claimed D3-equivalent gradient path.
+
+The default replay capacity is 100,000 frames instead of upstream D3's five
+million. A compressed observation plus 12M-preset recurrent context is about
+22.5 KiB in the current f32 representation, so the smaller default is already
+roughly 2.3 GB. The current backend also trains in f32 rather than bfloat16.
+Both are explicit resource accommodations to revisit with packed/f16 replay
+and backend profiling.
+
+World and behavior parameters live in separate Adam sessions because their
+static graphs execute in stages. Targets are formed before either update and
+the replay-value representation gradient is retained, but global norm clipping
+is applied separately to the two parameter groups rather than to one joint
+gradient.
+
+The network-size presets `1M` through `200M` mirror upstream. `12M` is the
+default Dreamer model size; DINO's frozen parameters are additional.
+
+## 5. Learning flow
+
+For each real transition:
+
+1. DINO encodes the new RGB frame.
+2. The posterior updates the live recurrent state from the prior state and
+   preceding action.
+3. The frame, reward channels, flags, and recurrent context enter replay.
+4. Scheduler credit accumulates according to D3's train ratio.
+
+For each learner update:
+
+1. Uniform replay samples contiguous sequences with one preceding context frame.
+2. An inference pass samples hard posterior categoricals.
+3. A training pass inserts those samples with a straight-through estimator and
+   updates reconstruction, reward, continuation, and balanced KL losses.
+4. Every posterior state in the sequence starts a latent imagined trajectory.
+5. The current actor samples imagined actions; the frozen world optimizer
+   boundary prevents behavior gradients from rewriting dynamics.
+6. Reward, continuation, current value, and slow value produce lambda returns,
+   score-function policy targets, and distributional value targets.
+7. Actor/value Adam updates run, the slow value network receives its EMA update,
+   and inference sessions receive the new parameters.
+
+D3's replay-value loss also sends a representation gradient into the RSSM. To
+retain that path with separate static learner graphs, Kindle evaluates a fixed
+copy of the current critic inside the world graph. Its input gradient updates
+the world representation; the critic parameters remain owned and updated once
+by the behavior optimizer.
+
+Acting and learning are separate API calls. A runner may put them on different
+threads later, but the first implementation does not yet provide policy
+candidate promotion or a real-time scheduler.
+
+## 6. Environment and reward seams
+
+The model-facing environment contract is intentionally small:
+
+- an RGB8 frame with its native width and height;
+- a fixed categorical action vocabulary;
+- an optional validity mask;
+- separate extrinsic and intrinsic reward scalars;
+- `terminated` versus `truncated` flags.
+
+The distinction matters: both close a replay return trace, while only a true
+terminal suppresses value bootstrapping.
+
+Different games own their adapters. Atari can expose its discrete ALE action
+set directly. A native game can render its own RGB frame. ARC needs a stable
+categorical action vocabulary; coordinate-parameterized actions are not yet
+represented by this baseline and should be added as an explicit model change.
+
+The optional validity mask applies to live action selection. Imagination does
+not yet predict future masks and therefore uses the complete vocabulary;
+adapters must define invalid controls as benign/no-op transitions in this
+baseline.
+
+The reward seam is:
+
+```text
+combined = extrinsic_scale × extrinsic + intrinsic_scale × intrinsic
+```
+
+This keeps future curiosity, information-gain, homeostasis, or learned
+preference experiments outside the D3 mechanics. It does not endorse any old
+intrinsic reward formula.
+
+## 7. Checkpoint and reproducibility contract
+
+A model checkpoint contains:
+
+- world-model parameters and Adam moments;
+- actor/value parameters and Adam moments;
+- slow value parameters;
+- full configuration and pinned source/model revisions;
+- fixed DINO projection seed and observation shape;
+- learner/environment counters;
+- return-normalizer state.
+
+Replay and the live episode are excluded. Restoring begins between episodes
+with empty replay. This choice keeps model checkpoints bounded and makes replay
+persistence a separate future storage decision.
+
+The DINO checkpoint is external and separately licensed. Kindle records its
+expected repository and immutable snapshot revision but cannot prove that an
+arbitrary file path contains those exact bytes.
+
+## 8. What was removed
+
+The pivot removes these from the active baseline:
+
+- one-step deterministic latent models;
+- PPO, GRPO, SIL, causal-credit, option, DIAYN, RND, outcome, coordinate, and
+  planner variants;
+- the frozen four-term scalar reward circuit;
+- universal vector observation tokens and mixed continuous action machinery;
+- custom visual pretraining and EfficientNet/V2-S paths;
+- old ARC/Atari recipes, audit reports, stability logs, and parameter sweeps.
+
+Removal is not a claim that every idea was wrong. It makes Dreamer the control
+and prevents stale interfaces from silently constraining the new experiments.
+Promising concepts return one at a time with a stated hypothesis and ablation.
+
+## 9. Roadmap
+
+### Phase 0 — Establish implementation confidence
+
+Implemented in the initial pivot:
+
+- native DINOv3 ViT-S/16 with fixed checkpoint and source revisions;
+- numerical golden parity against Transformers/PyTorch;
+- categorical RSSM, balanced KL, two-hot heads, continuation, and feature
+  reconstruction;
+- sequence replay and exact terminal/truncation alignment;
+- posterior-start imagination, actor/value learning, slow critic, and return
+  normalization;
+- complete synthetic acting/learning/checkpoint GPU canary;
+- minimal Rust and Python visual environment APIs.
+
+The world learner uses 8-step recurrent gradient chunks as described above;
+the exit gate must measure whether longer chunks materially improve results
+once the backend can compile them economically.
+
+Exit gate:
+
+- formatting, Clippy, unit tests, GPU learner canary, and DINO parity are green;
+- one short native run and one Atari data-collection run produce finite metrics;
+- checkpoint restore continues learning after replay refill;
+- model/loss parameter counts and throughput are recorded for each preset.
+
+### Phase 1 — Externally rewarded baseline
+
+Run D3-compatible evaluations before enabling intrinsic reward:
+
+- native visual GridWorld as an integration test;
+- at least one dense-reward Atari game;
+- at least one sparse-reward Atari game;
+- a small visual persistent world with endogenous rather than harness resets.
+
+Measure environment steps, learner updates, wall time, replay memory, return,
+world losses, continuation calibration, value calibration, actor entropy, and
+multi-step latent prediction error. Use multiple independent seeds.
+
+The goal is not immediate state-of-the-art performance. The gate is a credible,
+reproducible learning curve whose failures can be located in perception,
+dynamics, reward prediction, value learning, or behavior learning.
+
+### Phase 2 — Perception ablations
+
+Compare at matched interaction and learner compute:
+
+1. fixed projected/pooled final-layer DINO patches;
+2. full 14×14×384 patches;
+3. alternative fixed projections and channel counts;
+4. selected intermediate DINO layers;
+5. a small learned Dreamer pixel encoder;
+6. another frozen visual model only if it has a concrete hypothesis.
+
+VidTok belongs here only if temporal tokenization becomes the hypothesis.
+
+### Phase 3 — Intrinsic reward
+
+Start with mechanisms whose semantics are testable:
+
+- count- or density-based novelty in frozen observation space;
+- ensemble disagreement or information gain in the RSSM;
+- learning-progress reward that discounts irreducible noise;
+- homeostatic/outcome channels when an environment exposes grounded signals.
+
+Every experiment keeps the extrinsic-only run and random policy as controls.
+Report task return separately from intrinsic return.
+
+### Phase 4 — Continual memory and multiple games
+
+Add only after single-game Dreamer is sound:
+
+- fixed-capacity recent plus reservoir replay;
+- task/environment identity at the adapter boundary;
+- sampling that prevents inactive games from disappearing;
+- separate tests for world-model retention and actor retention;
+- actor rehearsal or distillation if the model remembers while behavior forgets;
+- raw-frame anchor re-encoding to detect representation drift.
+
+The first multi-game result should use compatible categorical action spaces.
+Parameterized and continuous controls require an explicit distributional design.
+
+### Phase 5 — Single-life safety and recoverability
+
+Introduce:
+
+- epistemic uncertainty separate from predicted observation noise;
+- recoverability and resource outcome heads;
+- risk-aware action selection;
+- hard environment safety constraints;
+- live/candidate policy synchronization and rollback;
+- prequential scoring before each transition is learned.
+
+External rollback remains forbidden; policy rollback is allowed because it
+changes the controller, not history.
+
+### Phase 6 — Planning, hierarchy, and scaling
+
+Only after actor-only Dreamer is understood:
+
+- selective runtime planning on high uncertainty or high consequence;
+- planner-to-actor distillation;
+- goal-conditioned critics and reusable skills;
+- event-level memory and reflective proposal systems;
+- Dreamer-4-style or VidTok world-model scaling if recurrence is the measured
+  bottleneck.
+
+## 10. Required ablations
+
+At fixed real-interaction and compute budgets:
+
+1. random policy;
+2. D3 algorithm with frozen DINO and extrinsic reward;
+3. the same agent with each perception alternative;
+4. each intrinsic reward individually and in combination;
+5. FIFO versus lifetime replay;
+6. actor-only versus selective planning;
+7. immediate policy synchronization versus candidate promotion;
+8. recurrent baseline versus any later video-transformer model.
+
+Claims about transfer or retention require an independent evaluation phase with
+learning frozen, not training diagnostics alone.
+
+## 11. Main risks
+
+### Frozen features omit control-relevant details
+
+DINO may underrepresent tiny sprites, exact coordinates, counters, or animation
+phase. Dense patch tokens help, but projection and pooling can still erase
+information. Diagnose this with probes and perception ablations before changing
+the RSSM.
+
+### Model exploitation
+
+The actor can exploit errors in imagined trajectories. Keep rollouts short,
+start from posterior states, prevent actor gradients into the world model, and
+later add calibrated uncertainty.
+
+### Curiosity traps
+
+Prediction error rewards stochastic televisions and noise. Prefer reducible
+uncertainty or learning progress, and always report external task performance.
+
+### Replay cost
+
+Even compressed observations are about 12.5 KiB each in f32; 100,000 frames are
+about 1.25 GB before recurrent context and container overhead. Profile memory
+before increasing capacity and consider f16 storage as a measured change.
+
+### Architecture inflation
+
+Kindle's old failure mode was accumulating plausible mechanisms without a strong
+control. New modules enter only after the baseline is measured and only with a
+falsifiable exit gate.
+
+## 12. Pinned sources
+
+- DreamerV3 behavioral reference:
+  [danijar/dreamerv3](https://github.com/danijar/dreamerv3), revision
+  `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
+- DINOv3 source reference:
+  [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3),
+  revision `6876159a11b4df116f30f667f8c9888617df0751`.
+- Native Meganeura transcription source:
+  [kvark/dinovision](https://github.com/kvark/dinovision), revision
+  `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
+- Meganeura graph/runtime dependency:
+  [kvark/meganeura](https://github.com/kvark/meganeura), revision
+  `b2cc25638127c64944f96c2aeea7bf8e5c124691`.
+- Blade graphics dependency:
+  [kvark/blade](https://github.com/kvark/blade), revision
+  `a6ae6a73219762f63efb4e5be4550fbc0d301b2f` (the revision selected by
+  Meganeura so the shared context types remain unified).
+- DINO model:
+  [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
+  snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
+
+The intended trajectory is still “Dreamer inside, Kindle outside,” but the
+inside is now a working baseline rather than a placeholder for future design.
