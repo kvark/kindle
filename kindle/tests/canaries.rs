@@ -232,10 +232,10 @@ fn canary_kindle_world_model() {
     );
 }
 
-/// SIL must dispatch independently of a live on-policy advantage. Before the
-/// 2026-08 audit the call lived only at the tail of selected policy-update
-/// branches, so default n_step=1 agents could accumulate event samples forever
-/// without replaying them.
+/// SIL must dispatch independently of a live on-policy advantage. The call used
+/// to live only at the tail of selected policy-update branches, so default
+/// n_step=1 agents could accumulate event samples forever without replaying
+/// them.
 #[test]
 #[ignore] // requires GPU
 fn canary_sil_runs_with_default_n_step() {

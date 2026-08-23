@@ -451,7 +451,9 @@ impl CoordHead {
             ));
         }
         let values = bytes[24..]
-            .chunks_exact(4)
+            // `bytes.len() == expected` above proves that there is no
+            // partial float at the end.
+            .chunks(4)
             .map(|chunk| f32::from_le_bytes(chunk.try_into().unwrap()))
             .collect::<Vec<_>>();
         self.load_parameters(&values)
@@ -615,7 +617,7 @@ mod tests {
             h.train_supervised_batch(&inputs, &targets, &active, 1.0);
         }
         let mse = inputs
-            .chunks_exact(4)
+            .chunks(4)
             .zip(targets)
             .map(|(input, target)| {
                 let prediction = h.forward(input);

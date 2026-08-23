@@ -1,6 +1,6 @@
 # ARC-AGI-3: first integration and diagnosis
 
-> **2026-08-23 audit correction:** ARC retains `levels_completed` across
+> **2026-08-23 correction:** ARC retains `levels_completed` across
 > `env.reset()` calls. The April “90%/100% L1 episode reach rate” was therefore
 > a cumulative-state artifact: after the first L1 event, later attempts still
 > reported level 1. The event itself was real, but repeated L1 reliability and
@@ -715,10 +715,10 @@ rate attempts. The only viable directions violate generality
 (demos, curriculum, symbolic priors). ARC-AGI-3 is off the
 research path.
 
-### 2026-08-23 audit correction and coordinate probe
+### 2026-08-23 correction and coordinate probe
 
 The “final” wording above is a historical conclusion, not a current removal of
-ARC from the project goal. The audit corrected three invalid assumptions:
+ARC from the project goal. Later validation corrected three invalid assumptions:
 `levels_completed` persists across resets, fixed action indices must not follow
 the changing position in `available_actions`, and different ACTION6 coordinates
 must not share one dynamics token. Kindle now keeps an 18-way discrete policy
@@ -753,7 +753,7 @@ task-progress objective.
 The first object-click probe could not start because the example imported
 SciPy solely for connected components even though SciPy was not an ARC extra.
 A deterministic 4-connected flood fill now handles the 64×64 frames without
-that dependency. The audit also found two semantic errors in the initial
+that dependency. Validation also found two semantic errors in the initial
 object proposal scheme: it assumed background color zero (FT09's is modal
 color 5), and bounding-box centers could miss concave components.
 

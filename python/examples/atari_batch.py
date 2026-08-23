@@ -631,7 +631,7 @@ def main() -> int:
                         help="Weight on the homeostatic primitive. Disabled by "
                         "default; only meaningful here with --legacy-homeo-reward.")
     parser.add_argument("--legacy-homeo-reward", action="store_true",
-                        help="Restore the pre-audit reward routing: |env reward| "
+                        help="Restore the legacy reward routing: |env reward| "
                         "through the SYMMETRIC homeostatic channel "
                         "(-max(0, |value|-tol)) — a point won and a point lost "
                         "both score −0.5. Sign-blind; kept only for A/B "

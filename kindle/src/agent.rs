@@ -5254,8 +5254,9 @@ impl Agent {
         let rnd_mses = if let Some(state) = rnd_state.as_mut() {
             let rows: Vec<&[f32]> = self
                 .obs_token_scratch
-                .chunks_exact(OBS_TOKEN_DIM)
-                .take(n)
+                .get(..n * OBS_TOKEN_DIM)
+                .expect("observation scratch has one row per active lane")
+                .chunks(OBS_TOKEN_DIM)
                 .collect();
             state.step_batch(&rows)
         } else {
