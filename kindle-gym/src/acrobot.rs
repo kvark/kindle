@@ -186,6 +186,7 @@ impl Environment for Acrobot {
         // self.homeo for the next step.
         self.update_homeo();
         let homeostatic = self.homeo.clone();
+        let observation = self.observe();
 
         // Auto-reset on goal or truncation
         let reached_goal = self.tip_height() > 1.0;
@@ -195,8 +196,12 @@ impl Environment for Acrobot {
         }
 
         StepResult {
-            observation: self.observe(),
+            observation,
             homeostatic,
+            reward: -1.0,
+            task_event: reached_goal,
+            terminated: reached_goal,
+            truncated,
         }
     }
 
@@ -235,6 +240,21 @@ mod tests {
         }
         // Should have built angular momentum
         assert!(env.dtheta1.abs() > 0.0 || env.dtheta2.abs() > 0.0);
+    }
+
+    #[test]
+    fn acrobot_reports_time_limit_before_reset() {
+        let mut env = Acrobot::new();
+        env.step_count = env.max_steps - 1;
+
+        let result = env.step(&Action::Discrete(1));
+
+        assert_eq!(result.reward, -1.0);
+        assert!(!result.task_event);
+        assert!(result.truncated);
+        assert!(result.done());
+        assert_eq!(env.step_count, 0);
+        assert_ne!(result.observation.data, env.observe().data);
     }
 
     #[test]

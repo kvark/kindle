@@ -33,7 +33,6 @@ pub mod agent;
 pub mod approach;
 pub mod buffer;
 pub mod coord;
-pub mod credit;
 pub mod delta_goals;
 pub mod diayn;
 pub mod encoder;
@@ -50,7 +49,9 @@ pub mod value_head;
 pub mod world_model;
 pub mod xeps_memory;
 
-pub use adapter::{EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
+pub use adapter::{
+    ACTION_PARAMETER_DIM, EnvAdapter, GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, WM_ACTION_DIM,
+};
 pub use agent::{Agent, AgentConfig, BindV2sImageError};
 // Re-export blade-graphics' ExternalMemorySource so kindle-py and
 // other consumers don't need a direct blade-graphics dep just to
@@ -58,8 +59,11 @@ pub use agent::{Agent, AgentConfig, BindV2sImageError};
 // argument for `Agent::bind_v2s_image_external`.
 pub use blade_graphics::ExternalMemorySource;
 pub use buffer::ExperienceBuffer;
-pub use env::{Action, ActionKind, Environment, HomeostaticProvider, Observation};
-pub use reward::RewardCircuit;
+pub use env::{
+    Action, ActionKind, Environment, HomeostaticProvider, HomeostaticVariable, Observation,
+    StepResult,
+};
+pub use reward::{RewardCircuit, RewardWeights};
 
 /// Controls whether meganeura's e-graph optimizer is used.
 #[derive(Clone, Copy, Debug, Default)]

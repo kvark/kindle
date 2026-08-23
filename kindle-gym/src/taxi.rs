@@ -122,6 +122,18 @@ impl Environment for Taxi {
         Observation::new(data)
     }
 
+    fn action_mask(&self) -> Option<Vec<bool>> {
+        let (row, col) = self.pos;
+        Some(vec![
+            row < GRID_SIZE - 1,
+            row > 0,
+            col < GRID_SIZE - 1 && !wall_between(row, col, col + 1),
+            col > 0 && !wall_between(row, col - 1, col),
+            self.passenger < NUM_LOCS && self.pos == LOCS[self.passenger],
+            self.passenger == NUM_LOCS && self.pos == LOCS[self.destination],
+        ])
+    }
+
     fn step(&mut self, action: &Action) -> StepResult {
         let &Action::Discrete(a) = action else {
             panic!("Taxi uses discrete actions");
@@ -129,6 +141,7 @@ impl Environment for Taxi {
 
         let (row, col) = self.pos;
         let mut terminated = false;
+        let mut reward = -1.0;
 
         match a {
             0 => {
@@ -159,6 +172,8 @@ impl Environment for Taxi {
                 // pickup
                 if self.passenger < NUM_LOCS && self.pos == LOCS[self.passenger] {
                     self.passenger = NUM_LOCS; // now in taxi
+                } else {
+                    reward = -10.0;
                 }
             }
             5 => {
@@ -167,6 +182,9 @@ impl Environment for Taxi {
                     // Successful delivery
                     self.passenger = self.destination;
                     terminated = true;
+                    reward = 20.0;
+                } else {
+                    reward = -10.0;
                 }
             }
             _ => {}
@@ -180,14 +198,20 @@ impl Environment for Taxi {
         // self.homeo for the next step.
         self.update_homeo();
         let homeostatic = self.homeo.clone();
+        let observation = self.observe();
+        let truncated = self.step_count >= self.max_steps;
 
-        if terminated || self.step_count >= self.max_steps {
+        if terminated || truncated {
             self.reset();
         }
 
         StepResult {
-            observation: self.observe(),
+            observation,
             homeostatic,
+            reward,
+            task_event: terminated,
+            terminated,
+            truncated,
         }
     }
 
@@ -226,6 +250,9 @@ mod tests {
         let obs = env.observe();
         let hot: f32 = obs.data.iter().sum();
         assert!((hot - 3.0).abs() < 1e-5);
+        let mask = env.action_mask().expect("Taxi has dynamic actions");
+        assert_eq!(mask.len(), NUM_ACTIONS);
+        assert!(mask.iter().any(|&valid| valid));
     }
 
     #[test]
@@ -249,13 +276,27 @@ mod tests {
         env.passenger = 0;
         env.destination = 1;
 
+        let pickup_mask = env.action_mask().unwrap();
+        assert!(pickup_mask[4]);
+        assert!(!pickup_mask[5]);
+
         // Pickup
-        env.step(&Action::Discrete(4));
+        let pickup = env.step(&Action::Discrete(4));
+        assert_eq!(pickup.reward, -1.0);
+        assert!(!pickup.done());
         assert_eq!(env.passenger, NUM_LOCS, "passenger should be in taxi");
 
         // Move to destination (loc 1 = (0,4))
         env.pos = LOCS[1];
-        env.step(&Action::Discrete(5)); // dropoff
+        let dropoff_mask = env.action_mask().unwrap();
+        assert!(!dropoff_mask[4]);
+        assert!(dropoff_mask[5]);
+        let dropoff = env.step(&Action::Discrete(5));
+        assert_eq!(dropoff.reward, 20.0);
+        assert!(dropoff.task_event);
+        assert!(dropoff.terminated);
+        assert!(dropoff.done());
+        assert_eq!(dropoff.homeostatic[0].value, 0.0);
         // After dropoff, episode terminates and env resets
         assert_eq!(env.step_count, 0);
     }
@@ -265,7 +306,9 @@ mod tests {
         let mut env = Taxi::new();
         env.pos = (2, 2); // not at passenger location
         env.passenger = 0;
-        env.step(&Action::Discrete(4)); // pickup
+        let result = env.step(&Action::Discrete(4)); // pickup
+        assert_eq!(result.reward, -10.0);
+        assert!(!result.done());
         assert_eq!(env.passenger, 0, "passenger should not be picked up");
     }
 }

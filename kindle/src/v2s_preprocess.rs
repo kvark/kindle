@@ -130,6 +130,7 @@ impl PreprocessPipeline {
             // One frame in flight per dispatch + one queued at a time
             // is enough — the trainer's outer loop ping-pongs.
             buffer_count: 2,
+            manual_barriers: false,
         });
         Self {
             gpu,

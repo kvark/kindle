@@ -73,6 +73,10 @@ impl Environment for RandomWalk {
         StepResult {
             observation: self.observe(),
             homeostatic: self.homeo.clone(),
+            reward: 0.0,
+            task_event: false,
+            terminated: false,
+            truncated: false,
         }
     }
 

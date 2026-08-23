@@ -99,14 +99,24 @@ impl Environment for Pendulum {
         self.theta = Self::normalize_angle(self.theta);
 
         self.step_count += 1;
-        if self.step_count >= self.max_steps {
+        self.update_homeo();
+        let theta_norm = Self::normalize_angle(self.theta);
+        let reward =
+            -(theta_norm * theta_norm + 0.1 * self.theta_dot * self.theta_dot + 0.001 * u * u);
+        let observation = self.observe();
+        let homeostatic = self.homeo.clone();
+        let truncated = self.step_count >= self.max_steps;
+        if truncated {
             self.reset();
         }
-        self.update_homeo();
 
         StepResult {
-            observation: self.observe(),
-            homeostatic: self.homeo.clone(),
+            observation,
+            homeostatic,
+            reward,
+            task_event: false,
+            terminated: false,
+            truncated,
         }
     }
 
@@ -153,5 +163,20 @@ mod tests {
             env.step(&huge);
         }
         assert!(env.theta_dot.is_finite());
+    }
+
+    #[test]
+    fn pendulum_reports_dense_reward_and_time_limit() {
+        let mut env = Pendulum::new();
+        env.step_count = env.max_steps - 1;
+
+        let result = env.step(&Action::Continuous(vec![1.0]));
+
+        assert!(result.reward.is_finite());
+        assert!(result.reward < 0.0);
+        assert!(!result.terminated);
+        assert!(result.truncated);
+        assert_eq!(env.step_count, 0);
+        assert_ne!(result.observation.data, env.observe().data);
     }
 }

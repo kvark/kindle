@@ -57,6 +57,10 @@ impl Environment for RingEnv {
         StepResult {
             observation: self.observe(),
             homeostatic: vec![],
+            reward: 0.0,
+            task_event: false,
+            terminated: false,
+            truncated: false,
         }
     }
     fn reset(&mut self) {
@@ -177,4 +181,262 @@ fn wm_rolls_forward_in_time() {
          z(s+1) for only {forward_wins}/{RING} states (a backward model \
          scores 0-1 here)"
     );
+}
+
+/// The same discrete action with different continuous parameters must learn
+/// different dynamics. This catches regressions where ARC clicks are stored
+/// separately but silently dropped before the WM graph or replay path.
+#[test]
+#[ignore] // requires GPU
+fn wm_distinguishes_action_parameters() {
+    struct ParamEnv {
+        state: usize,
+    }
+
+    impl ParamEnv {
+        fn observe_state(&self) -> Observation {
+            let mut obs = vec![0.0; 3];
+            obs[self.state] = 1.0;
+            Observation::new(obs)
+        }
+
+        fn advance(&mut self, parameter: f32) {
+            self.state = if self.state == 0 {
+                if parameter < 0.0 { 1 } else { 2 }
+            } else {
+                0
+            };
+        }
+    }
+
+    impl HomeostaticProvider for ParamEnv {
+        fn homeostatic_variables(&self) -> &[HomeostaticVariable] {
+            &[]
+        }
+    }
+
+    impl Environment for ParamEnv {
+        fn observation_dim(&self) -> usize {
+            3
+        }
+        fn num_actions(&self) -> usize {
+            1
+        }
+        fn observe(&self) -> Observation {
+            self.observe_state()
+        }
+        fn step(&mut self, _action: &Action) -> StepResult {
+            unreachable!("the test stages its external parameter via advance()")
+        }
+        fn reset(&mut self) {
+            self.state = 0;
+        }
+    }
+
+    let mut env = ParamEnv { state: 0 };
+    let adapter = Box::new(GenericAdapter::discrete(0, 3, 1));
+    let config = AgentConfig {
+        latent_dim: 8,
+        hidden_dim: 32,
+        buffer_capacity: 5000,
+        batch_size: 1,
+        learning_rate: 2e-3,
+        recon_loss_coef: 1.0,
+        ..AgentConfig::default()
+    };
+    let mut agent = Agent::new(config, vec![adapter]);
+    let mut rng = rand::rngs::StdRng::seed_from_u64(91);
+    let action = Action::Discrete(0);
+    let mut negative_branch = true;
+    let mut z_of_state = vec![vec![0.0f32; 8]; 3];
+
+    for _ in 0..4000 {
+        let obs = env.observe();
+        let _ = agent.act(std::slice::from_ref(&obs), &mut rng);
+        let is_decision = env.state == 0;
+        let parameter = if is_decision {
+            if negative_branch { -1.0 } else { 1.0 }
+        } else {
+            0.0
+        };
+        if is_decision {
+            negative_branch = !negative_branch;
+        }
+        env.advance(parameter);
+        let next_obs = env.observe();
+        agent.set_action_parameters(&[parameter, 0.0], &[is_decision]);
+        let env_ref: &dyn Environment = &env;
+        agent.observe(
+            std::slice::from_ref(&next_obs),
+            std::slice::from_ref(&action),
+            std::slice::from_ref(&env_ref),
+            &mut rng,
+        );
+        z_of_state[env.state] = agent.latents()[0].clone();
+    }
+
+    let dist =
+        |a: &[f32], b: &[f32]| -> f32 { a.iter().zip(b).map(|(x, y)| (x - y) * (x - y)).sum() };
+    let mut negative_action = vec![0.0f32; kindle::WM_ACTION_DIM];
+    negative_action[0] = 1.0;
+    negative_action[kindle::MAX_ACTION_DIM] = -1.0;
+    let mut positive_action = negative_action.clone();
+    positive_action[kindle::MAX_ACTION_DIM] = 1.0;
+
+    let pred_negative = agent.wm_predict(&z_of_state[0], &negative_action);
+    let pred_positive = agent.wm_predict(&z_of_state[0], &positive_action);
+    let neg_to_1 = dist(&pred_negative, &z_of_state[1]);
+    let neg_to_2 = dist(&pred_negative, &z_of_state[2]);
+    let pos_to_1 = dist(&pred_positive, &z_of_state[1]);
+    let pos_to_2 = dist(&pred_positive, &z_of_state[2]);
+    eprintln!(
+        "parameter probe: neg→(s1={neg_to_1:.4}, s2={neg_to_2:.4}), \
+         pos→(s1={pos_to_1:.4}, s2={pos_to_2:.4})"
+    );
+    assert!(
+        neg_to_1 < neg_to_2 && pos_to_2 < pos_to_1,
+        "world model did not distinguish the parameter-controlled branches"
+    );
+}
+
+/// End-to-end parameterized planning: learn that negative x changes state
+/// while positive x is a no-op, then require shooting MPC to queue a negative
+/// coordinate under its latent-change objective.
+#[test]
+#[ignore] // requires GPU
+fn planner_searches_and_queues_action_parameters() {
+    struct ClickEnv {
+        state: usize,
+    }
+
+    impl ClickEnv {
+        fn advance(&mut self, x: f32) {
+            self.state = if self.state == 0 && x < 0.0 { 1 } else { 0 };
+        }
+    }
+
+    impl HomeostaticProvider for ClickEnv {
+        fn homeostatic_variables(&self) -> &[HomeostaticVariable] {
+            &[]
+        }
+    }
+
+    impl Environment for ClickEnv {
+        fn observation_dim(&self) -> usize {
+            2
+        }
+        fn num_actions(&self) -> usize {
+            1
+        }
+        fn observe(&self) -> Observation {
+            let mut obs = vec![0.0; 2];
+            obs[self.state] = 1.0;
+            Observation::new(obs)
+        }
+        fn step(&mut self, _action: &Action) -> StepResult {
+            unreachable!("the test advances its parameterized transition directly")
+        }
+        fn reset(&mut self) {
+            self.state = 0;
+        }
+    }
+
+    let mut env = ClickEnv { state: 0 };
+    let config = AgentConfig {
+        latent_dim: 8,
+        hidden_dim: 32,
+        buffer_capacity: 6000,
+        batch_size: 1,
+        learning_rate: 2e-3,
+        recon_loss_coef: 1.0,
+        planner_horizon: 1,
+        planner_samples: 128,
+        planner_policy_mix: 0.0,
+        planner_change_alpha: 20.0,
+        planner_refresh_interval: 1,
+        ..AgentConfig::default()
+    };
+    let adapter = Box::new(GenericAdapter::discrete(0, 2, 1));
+    let mut agent = Agent::new(config, vec![adapter]);
+    let mut parameter_mask = vec![false; kindle::MAX_ACTION_DIM];
+    parameter_mask[0] = true;
+    agent.set_action_parameter_masks(&parameter_mask);
+    let mut rng = rand::rngs::StdRng::seed_from_u64(123);
+    let action = Action::Discrete(0);
+    let mut negative = true;
+    let mut z_of_state = vec![vec![0.0f32; 8]; 2];
+
+    for _ in 0..5000 {
+        let obs = env.observe();
+        let _ = agent.act(std::slice::from_ref(&obs), &mut rng);
+        // State 0 is the parameterized decision. State 1 deterministically
+        // returns to state 0 with an inactive/zero parameter tail.
+        let active = env.state == 0;
+        let x = if active {
+            let x = if negative { -1.0 } else { 1.0 };
+            negative = !negative;
+            x
+        } else {
+            0.0
+        };
+        let y = if active {
+            rand::Rng::random_range(&mut rng, -1.0..1.0)
+        } else {
+            0.0
+        };
+        env.advance(x);
+        agent.set_action_parameters(&[x, y], &[active]);
+        let next_obs = env.observe();
+        let env_ref: &dyn Environment = &env;
+        agent.observe(
+            std::slice::from_ref(&next_obs),
+            std::slice::from_ref(&action),
+            std::slice::from_ref(&env_ref),
+            &mut rng,
+        );
+        z_of_state[env.state] = agent.latents()[0].clone();
+    }
+
+    // Make the live and buffered state the decision state before planning.
+    if env.state != 0 {
+        let obs = env.observe();
+        let _ = agent.act(std::slice::from_ref(&obs), &mut rng);
+        env.advance(0.0);
+        agent.set_action_parameters(&[0.0, 0.0], &[false]);
+        let next_obs = env.observe();
+        let env_ref: &dyn Environment = &env;
+        agent.observe(
+            std::slice::from_ref(&next_obs),
+            std::slice::from_ref(&action),
+            std::slice::from_ref(&env_ref),
+            &mut rng,
+        );
+        z_of_state[0] = agent.latents()[0].clone();
+    }
+
+    agent.plan_and_queue(1, &mut rng);
+    assert_eq!(agent.planner_queue_len(), 1);
+    let planned_action = agent.act(std::slice::from_ref(&env.observe()), &mut rng);
+    assert!(matches!(planned_action.as_slice(), [Action::Discrete(0)]));
+    let planned = agent.take_planned_action_parameters()[0]
+        .expect("parameterized shooting plan must attach coordinates");
+
+    let mut token = vec![0.0f32; kindle::WM_ACTION_DIM];
+    token[0] = 1.0;
+    token[kindle::MAX_ACTION_DIM] = planned[0];
+    token[kindle::MAX_ACTION_DIM + 1] = planned[1];
+    let prediction = agent.wm_predict(&z_of_state[0], &token);
+    let dist =
+        |a: &[f32], b: &[f32]| -> f32 { a.iter().zip(b).map(|(x, y)| (x - y) * (x - y)).sum() };
+    let d_change = dist(&prediction, &z_of_state[1]);
+    let d_stay = dist(&prediction, &z_of_state[0]);
+    eprintln!(
+        "planned coordinate=({:.3},{:.3}), d_change={d_change:.4}, d_stay={d_stay:.4}",
+        planned[0], planned[1]
+    );
+    assert!(
+        planned[0] < 0.0 && d_change < d_stay,
+        "planner did not select the learned state-changing coordinate"
+    );
+    assert_eq!(agent.take_planned_action_parameters(), vec![None]);
 }

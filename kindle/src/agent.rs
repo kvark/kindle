@@ -1,10 +1,10 @@
 //! Top-level Agent struct and training loop.
 //!
 //! The agent orchestrates the full pipeline:
-//! observation → (adapter) → encoder → world model → reward → credit → policy → (adapter) → action.
+//! observation → (adapter) → encoder → world model → reward/return → policy → (adapter) → action.
 //!
 //! The agent's GPU graphs are built once with universal token sizes
-//! (`OBS_TOKEN_DIM`, `MAX_ACTION_DIM`); a per-env `EnvAdapter` translates
+//! (`OBS_TOKEN_DIM`, `MAX_ACTION_DIM`, `WM_ACTION_DIM`); a per-env `EnvAdapter` translates
 //! between the env's native shapes and these token sizes. `switch_lane`
 //! swaps one lane's adapter without touching any compiled graph.
 //!
@@ -15,17 +15,15 @@
 //! experience buffer, reward circuit and boundary flag; every `observe()`
 //! call advances all N lanes in lockstep, stacking per-lane obs/action/
 //! z_target/task rows into a single batched dispatch for the world model
-//! and policy. Credit assignment is CPU-light per-lane (the credit graph
-//! is sized for one lane's history and is called N times per step).
+//! and policy.
 //!
 //! For `N = 1` the runtime behaviour matches the pre-Phase-E single-lane
 //! agent — construction takes a one-element `vec![adapter]` and every
 //! step fed a one-element slice.
 //!
-//! Three GPU sessions with independent learning rates:
+//! Two core GPU sessions with independent learning rates:
 //! 1. World model (encoder + world model): base LR
-//! 2. Credit assigner: 0.3× base
-//! 3. Policy + value: 0.5× base, gated on warmup
+//! 2. Policy + value: 0.5× base, gated on warmup
 //!
 //! Phase 4 continual learning mechanisms:
 //! - Replay mixing
@@ -33,15 +31,16 @@
 //! - Entropy floor
 
 use crate::OptLevel;
-use crate::adapter::{EnvAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, TASK_DIM};
+use crate::adapter::{
+    ACTION_PARAMETER_DIM, EnvAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM, TASK_DIM, WM_ACTION_DIM,
+};
 use crate::approach;
 use crate::buffer::{ExperienceBuffer, Transition};
 use crate::coord;
-use crate::credit;
 use crate::delta_goals;
 use crate::diayn;
 use crate::encoder::{CnnEncoder, Encoder};
-use crate::env::{Action, ActionKind, Environment, Observation};
+use crate::env::{Action, ActionKind, Environment, Observation, StepResult};
 use crate::option;
 use crate::outcome;
 use crate::planner;
@@ -256,14 +255,12 @@ pub enum OutcomeBonus {
 pub struct AgentConfig {
     pub latent_dim: usize,
     pub hidden_dim: usize,
-    pub history_len: usize,
     pub buffer_capacity: usize,
     pub batch_size: usize,
     pub learning_rate: f32,
-    pub lr_credit: f32,
     pub lr_policy: f32,
     /// Use the Adam optimizer instead of SGD for all sessions
-    /// (policy, wm, credit, option). Standard for vision-based RL
+    /// (policy, wm, option). Standard for vision-based RL
     /// (Atari, etc) where SGD's lack of per-parameter scaling makes
     /// CNN training extremely slow under sparse rewards. Adam betas
     /// fixed at 0.9 / 0.999, epsilon 1e-8 (PyTorch defaults). Default
@@ -275,8 +272,8 @@ pub struct AgentConfig {
     /// collapse stems from `v_t -> 0` on idle parameters. The larger
     /// eps bounds the per-parameter update by ~lr/eps when v is tiny.
     pub adam_eps: f32,
-    /// Global L2 gradient-norm clip applied to every policy/wm/credit
-    /// session step. 0.0 (default) disables it on the wm/credit
+    /// Global L2 gradient-norm clip applied to every policy/wm/option
+    /// session step. 0.0 (default) disables it on the wm/option
     /// sessions; standard PPO uses 0.5. Bounds the per-step parameter
     /// update — required for sustained long-horizon training on
     /// sparse-reward visual tasks where Adam's variance estimate
@@ -379,15 +376,6 @@ pub struct AgentConfig {
     pub diayn_lr: Option<f32>,
     /// L1 option-policy learning rate.
     pub lr_option: f32,
-    /// Phase G v5: number of recent options held in the L1 credit
-    /// assigner's history window. A value < 2 disables the L1 credit
-    /// assigner (its session is not compiled); the option policy then
-    /// trains on per-option advantage only, no cross-option credit.
-    /// Default `8` mirrors the design-doc recommendation.
-    pub option_history_len: usize,
-    /// L1 credit assigner learning rate (analogous to `lr_credit` for
-    /// L0). Applied with the same `√N` batch scale as other L1 LRs.
-    pub lr_option_credit: f32,
     /// Goal-achievement bonus coefficient. When L1 is active, each step's
     /// L0 reward is augmented with `−α · ‖z_t − goal‖`, giving L0 a
     /// self-supervised signal to drive the latent toward the option's goal
@@ -559,8 +547,9 @@ pub struct AgentConfig {
     /// CPU MLP `z → (μ_x, μ_y) ∈ [−1, 1]` that the harness can
     /// sample from to pick spatial-click coordinates on envs
     /// that support them (ARC-AGI-3 complex actions). The head
-    /// trains via REINFORCE on a per-step advantage supplied by
-    /// the harness; `α` scales the reinforcement magnitude.
+    /// trains via REINFORCE on the last observed reward minus an EMA
+    /// baseline; `α` scales the reinforcement magnitude. Harnesses should
+    /// mask out lanes whose executed action did not consume coordinates.
     pub coord_action_alpha: f32,
     /// Hidden width for the coord head. Default 32.
     pub coord_hidden_dim: usize,
@@ -809,12 +798,13 @@ pub struct AgentConfig {
     /// positive landing-style outcome (e.g. >5.0 for LunarLander where
     /// landing yields a +30 spike vs intrinsic rewards typically <5).
     pub terminal_proximity_threshold: f32,
-    /// Reconstruction decoder anti-collapse loss coefficient. When > 0
-    /// (e2e only), the policy graph builds a decoder `z → obs'` and
-    /// adds MSE(obs', stop_grad(obs)) to the total loss. Forces the
+    /// Reconstruction decoder anti-collapse loss coefficient. When > 0,
+    /// the world-model graph builds a decoder `z → obs'` and adds
+    /// MSE(obs', stop_grad(obs)) to the total loss. Forces the
     /// encoder to retain enough information about the raw observation
     /// that an inverse exists — the classical auto-encoder anti-
-    /// collapse term. Default 0.0.
+    /// collapse term. Default 1.0 because forward-dynamics loss targets a
+    /// stopped latent and therefore cannot train the encoder by itself.
     pub recon_loss_coef: f32,
     /// When true (and the encoder is CNN/CnnDqn), the WM-session recon
     /// branch targets the raw `visual_obs` (reshaped to
@@ -932,10 +922,10 @@ pub struct AgentConfig {
     /// `use_grpo_episode`:
     ///
     /// - per-step (default, `use_grpo_episode = false`): n-step return
-    ///   without V bootstrap, normalized across the policy batch.
+    ///   without V bootstrap, normalized among lanes with the same env id.
     /// - per-episode (`use_grpo_episode = true`): each lane's most
     ///   recently completed episode return is used as the per-transition
-    ///   advantage; cross-lane normalization gives the GRPO advantage.
+    ///   advantage; within-env fork normalization gives the GRPO advantage.
     ///   Closer to the canonical DeepSeek-R1 formulation but introduces
     ///   inter-update lag (lane only contributes after first episode
     ///   completes).
@@ -946,14 +936,14 @@ pub struct AgentConfig {
     ///   Standard GRPO from DeepSeek-R1.
     /// - `use_grpo + use_kl_ppo`: KL-penalty PPO + GRPO advantage.
     ///
-    /// Requires `advantage_normalize = true` since the cross-batch
+    /// Requires `advantage_normalize = true` since the within-task
     /// normalization IS GRPO's core. `value_loss_coef = 0.0` is
     /// natural (V unused) but harmless if non-zero.
     pub use_grpo: bool,
     /// Per-episode variant of GRPO. When set with `use_grpo`, advantage
     /// is computed from each lane's most-recent completed-episode
     /// return G_i (sum of in-episode rewards), instead of n-step
-    /// return. Cross-lane normalization uses the batch of recent G's.
+    /// return. Normalization uses recent G's from the same env id.
     /// Default `false` (per-step GRPO).
     pub use_grpo_episode: bool,
     /// Enable Self-Imitation Learning (Oh et al. 2018). When `true`,
@@ -974,28 +964,35 @@ pub struct AgentConfig {
     ///
     /// Requires successful episodes to actually occur (sparse-reward
     /// problems with zero successes won't benefit). Compatible with
-    /// any policy graph (plain PG e2e, KL-PPO, GRPO).
+    /// plain PG, end-to-end, PPO, and GRPO policy graphs; KL-PPO is skipped
+    /// because SIL samples do not retain its full old-logit snapshot.
     pub use_sil: bool,
-    /// Weight applied to the SIL CE loss. Each SIL update treats
-    /// every (s, a) as a positive example with effective advantage
-    /// = `sil_loss_coef`. Default 0.5 — SIL gradient half the
-    /// magnitude of a unit-advantage on-policy update. Larger values
-    /// pull the policy more aggressively toward past successes.
+    /// Multiplier on the clipped positive SIL advantage. Default 0.5;
+    /// larger values pull the policy more aggressively toward replayed
+    /// successes.
     pub sil_loss_coef: f32,
     /// When true, the SIL push gate is restricted to episodes that
-    /// contained at least one extrinsic-reward event (i.e., the
-    /// harness's `set_extrinsic_reward` fired > 0 at least once).
+    /// contained at least one task event (an explicit
+    /// `set_extrinsic_events` mark or a positive extrinsic reward).
     /// Combined with `extrinsic_reward_alpha > 0` this turns the
     /// SIL buffer into a "winning trajectories" replay rather than
-    /// a generic above-baseline-return replay. Default false (the
-    /// existing behavior — push when episode return exceeds the
-    /// baseline EMA).
+    /// a generic above-baseline-return replay. Its quality baseline compares
+    /// event episodes only, and every retained event transition has at least
+    /// unit pre-coefficient imitation advantage so negative step costs cannot
+    /// remove the successful prefix. Default false.
     pub sil_event_filter: bool,
+    /// When greater than zero, event-filtered SIL immediately retains at most
+    /// this many transitions ending at each positive task event instead of
+    /// waiting for and replaying the whole environment episode. This is useful
+    /// for continuing games whose meaningful credit boundary is a point or
+    /// subgoal rather than game-over (for example Pong). The window never
+    /// crosses a real environment boundary. Default 0 keeps episode-level SIL.
+    pub sil_event_horizon: usize,
     /// Capacity of the SIL replay buffer. Older samples are evicted
     /// FIFO when full. Default 10000.
     pub sil_buffer_capacity: usize,
     /// EMA decay rate for the "successful episode" baseline. The
-    /// baseline tracks recent episode returns; an episode qualifies
+    /// baseline tracks recent eligible episode returns; an episode qualifies
     /// for SIL push if its return strictly exceeds the current
     /// baseline. Default 0.99 (≈ 100-episode horizon). Lower values
     /// make the baseline more reactive (fewer episodes qualify but
@@ -1036,6 +1033,12 @@ pub struct AgentConfig {
     /// representation. Discrete-policy non-options non-PPO only;
     /// other graph variants need their own e2e implementation.
     pub end_to_end_encoder: bool,
+    /// Use orthogonal one-hot task codes for env ids below `TASK_DIM`.
+    /// This gives common tasks isolated columns in the trainable task
+    /// projection and improves sequential adaptation. Default `false` keeps
+    /// the historical dense-hash codes so existing checkpoints retain their
+    /// input semantics. Ids beyond `TASK_DIM` use normalized dense hashes.
+    pub orthogonal_task_codes: bool,
     /// Recompute V on `ripe.latent` at policy-training time rather
     /// than using the `ripe.value` stored when the action was taken.
     /// Default `false` (use stored).
@@ -1078,10 +1081,11 @@ pub struct AgentConfig {
     /// `planner_samples` random sequences of length `planner_horizon`,
     /// rolling each out through the frozen WM, scoring by sum of
     /// `1/sqrt(1+visit_count)` over the predicted latents, and
-    /// queueing the best sequence for subsequent `act()` calls to
-    /// consume. Disabled (0) by default. Applies to discrete-action
-    /// envs only (continuous actions are skipped; the queue stays
-    /// empty).
+    /// queueing the best sequence for subsequent `act()` calls to consume.
+    /// Slots declared by `set_action_parameter_masks()` are searched jointly
+    /// with normalized `(x, y)` values. Disabled (0) by default. Applies to
+    /// discrete and discrete-plus-parameter spaces; fully continuous policies
+    /// are skipped.
     pub planner_horizon: usize,
     /// Number of random action sequences sampled per plan call.
     /// Cost scales O(samples × horizon × hidden²). Default 32.
@@ -1133,8 +1137,8 @@ pub struct AgentConfig {
     /// peaked policy: T = 2-3 keeps planner exploration broad even
     /// when the policy has committed.
     pub planner_policy_temperature: f32,
-    /// Use MCTS tree search instead of CEM/random-shooting MPC for the
-    /// planner. When `true`, `plan_and_queue` builds a per-lane Monte
+    /// Use MCTS tree search instead of CEM/random-shooting MPC for ordinary
+    /// discrete action spaces. When `true`, `plan_and_queue` builds a per-lane Monte
     /// Carlo tree, running `mcts_simulations` expansions before reading
     /// off the most-visited action sequence from the root.
     ///
@@ -1144,8 +1148,9 @@ pub struct AgentConfig {
     /// when the WM and novelty score actually discriminate trajectories).
     /// In the kindle setting where `visit_count ≈ 1` makes novelty
     /// near-uniform, MCTS degenerates to depth-first exploration —
-    /// similar to random shooting in expectation but with lower
-    /// effective branching.
+    /// similar to random shooting in expectation but with lower effective
+    /// branching. Parameterized spaces automatically use shooting because the
+    /// current tree cannot compare multiple coordinates for one identity.
     pub planner_use_mcts: bool,
     /// Number of MCTS simulations per planning call (per lane). Each
     /// simulation walks the tree from root to a leaf, expands one new
@@ -1241,23 +1246,6 @@ pub struct AgentConfig {
     /// Loss coefficient on the σ-regression term added to the WM loss.
     /// Only applied when `wm_stochastic = true`. Default 0.5.
     pub wm_sigma_loss_coef: f32,
-    /// Blend factor for adding RND-based novelty to the planner's
-    /// trajectory score. When > 0, the planner scores each latent in
-    /// its predicted trajectory as:
-    ///   visit_count_score + planner_rnd_alpha * rnd_state.reward(z)
-    /// where the visit_count score is the existing `1/sqrt(count+1)`.
-    /// 0 (default) = visit_count only (legacy behavior).
-    ///
-    /// RND's `reward(z)` is the per-state predictor-target MSE — a
-    /// learned novelty signal that scales with how unfamiliar z is to
-    /// the predictor specifically. Unlike visit_count, RND varies
-    /// continuously across the latent space and is informative even
-    /// at 256-dim where visit_count is mostly ≈1. The planner can
-    /// then prefer trajectories landing in genuinely-novel latent
-    /// regions, not just "unique-hash" regions.
-    ///
-    /// Only effective when `rnd_reward_alpha > 0` (i.e., RND is on).
-    pub planner_rnd_alpha: f32,
     /// Goal-conditioned planning. When > 0, the planner adds a goal-
     /// similarity term to its trajectory scoring:
     ///
@@ -1337,24 +1325,12 @@ pub struct AgentConfig {
     /// Replay-buffer capacity for value-head training samples (latent,
     /// R_to_go). FIFO eviction. Default 10_000.
     pub value_head_buffer_capacity: usize,
-    /// Per-step batch size for value-head training. Default 32. Drawn
-    /// uniformly from the replay buffer each `observe()` call once the
-    /// buffer has at least this many samples.
-    pub value_head_train_batch: usize,
     /// Hidden dim for the value head's MLP. 0 = use `hidden_dim`.
     pub value_head_hidden_dim: usize,
     /// LR scale applied to the value-head optimizer step relative to
     /// the agent's base `learning_rate`. 1.0 = same; lower stabilizes
     /// V early in training when targets are noisy.
     pub value_head_lr_scale: f32,
-    /// OBSOLETE (2026-06-10, kept for API compatibility): the win
-    /// classifier now trains on STORED latents via the `value_z`
-    /// graph input and never touches the encoder. The old
-    /// encoder-shaping path read enc(current visual/obs) during
-    /// value replay, which in CNN modes paired archived labels with
-    /// whatever frames were still in the visual slot — noise. See
-    /// the value-branch comment in the wm graph construction.
-    pub value_head_grad_to_encoder: bool,
     /// Cross-game value classifier mode. When `false` (default),
     /// `value_replay_step` samples round-robin across env_id buckets
     /// (game-stratified) — each game contributes equally regardless
@@ -1387,16 +1363,14 @@ pub struct AgentConfig {
     pub goal_states_cross_game: bool,
     /// Confidence-weighted planner mode. When `true`, the planner
     /// scoring loop weights exploit terms (goal_alpha, value_alpha)
-    /// by per-lane confidence C, and explore terms (change_alpha,
-    /// rnd_alpha) by (1 − C). visit_count remains as an always-on
+    /// by per-lane confidence C, and explore terms (change and model
+    /// uncertainty) by (1 − C). visit_count remains as an always-on
     /// base novelty signal.
     ///
     /// C is per-lane, starts at 0.5, and updates each observe() step:
     /// - rises by `confidence_win_increment` on each extrinsic event
     ///   (sil_ep_event_count incrementing by 1)
-    /// - falls by `confidence_novelty_drop_rate * surprise_signal`
-    ///   when WM surprise on the current step is above
-    ///   `confidence_novelty_threshold`
+    /// - falls by the constant `confidence_novelty_drop_rate` each step
     ///
     /// The asymmetry ("rises only on winning") keeps the planner
     /// in explore-mode at frontier states (newly reached levels)
@@ -1420,9 +1394,6 @@ pub struct AgentConfig {
     /// to ~0.001 to target C ≈ 0.4 at tu93's typical event rate).
     /// Lower drop_rate → more exploit; higher → more explore.
     pub confidence_novelty_drop_rate: f32,
-    /// Unused since 2026-05-22 refactor (was visit-count threshold).
-    /// Kept to avoid breaking existing CLI calls; ignored by core.
-    pub confidence_novelty_threshold: f32,
     /// Sub-goal centroid count for online k-means clustering of the
     /// `goal_states` queue. 0 (default) = disabled. When > 0, the
     /// agent maintains K centroid vectors per env (or pooled when
@@ -1505,11 +1476,9 @@ impl Default for AgentConfig {
         Self {
             latent_dim: 16,
             hidden_dim: 32,
-            history_len: 16,
             buffer_capacity: 10_000,
             batch_size: 1,
             learning_rate: 1e-3,
-            lr_credit: 3e-4, // 0.3× base
             lr_policy: 5e-4, // 0.5× base
             reward_weights: RewardWeights::default(),
             warmup_steps: 100,
@@ -1533,8 +1502,6 @@ impl Default for AgentConfig {
             diayn_hidden_dim: 32,
             diayn_lr: None,
             lr_option: 2.5e-4,
-            option_history_len: 8,
-            lr_option_credit: 7.5e-5,
             goal_bonus_alpha: 0.1,
             learned_termination: false,
             per_option_heads: true,
@@ -1589,7 +1556,7 @@ impl Default for AgentConfig {
             terminal_proximity_k: 0,
             terminal_proximity_bonus: 0.0,
             terminal_proximity_threshold: 0.0,
-            recon_loss_coef: 0.0,
+            recon_loss_coef: 1.0,
             recon_visual_target: false,
             policy_z_layer_norm: false,
             policy_z_layer_norm_scale: 1.0,
@@ -1603,6 +1570,7 @@ impl Default for AgentConfig {
             use_sil: false,
             sil_loss_coef: 0.5,
             sil_event_filter: false,
+            sil_event_horizon: 0,
             sil_buffer_capacity: 10_000,
             sil_baseline_decay: 0.99,
             use_kl_ppo: false,
@@ -1612,6 +1580,7 @@ impl Default for AgentConfig {
             policy_warmup_steps: 0,
             recompute_base_v: false,
             end_to_end_encoder: false,
+            orthogonal_task_codes: false,
             rollout_length: 1,
             planner_horizon: 0,
             planner_samples: 32,
@@ -1637,7 +1606,6 @@ impl Default for AgentConfig {
             planner_sigma_horizon: 0.0,
             wm_stochastic: false,
             wm_sigma_loss_coef: 0.5,
-            planner_rnd_alpha: 0.0,
             planner_goal_alpha: 0.0,
             goal_states_cap: 100,
             goal_states_her_prob: 0.0,
@@ -1647,16 +1615,13 @@ impl Default for AgentConfig {
             planner_change_alpha: 0.0,
             value_head_gamma: 0.99,
             value_head_buffer_capacity: 10_000,
-            value_head_train_batch: 32,
             value_head_hidden_dim: 0,
             value_head_lr_scale: 1.0,
-            value_head_grad_to_encoder: true,
             value_buffer_cross_game: false,
             goal_states_cross_game: false,
             confidence_mode: false,
             confidence_win_increment: 0.02,
             confidence_novelty_drop_rate: 0.0001,
-            confidence_novelty_threshold: 0.3,
             subgoal_k: 0,
             subgoal_lr: 0.05,
             planner_subgoal_alpha: 0.0,
@@ -1676,8 +1641,12 @@ impl Default for AgentConfig {
 pub struct Diagnostics {
     pub step: usize,
     pub env_id: u32,
+    /// Forward-dynamics prediction MSE only. This intentionally excludes
+    /// the reconstruction regularizer used to train the encoder.
     pub loss_world_model: f32,
-    pub loss_credit: f32,
+    /// Observation/frame reconstruction MSE before its configured weight.
+    /// Zero when reconstruction is disabled.
+    pub loss_reconstruction: f32,
     pub loss_policy: f32,
     pub loss_replay: f32,
     pub reward_mean: f32,
@@ -1685,7 +1654,6 @@ pub struct Diagnostics {
     pub reward_novelty: f32,
     pub reward_homeo: f32,
     pub reward_order: f32,
-    pub h_eff: f32,
     pub policy_entropy: f32,
     pub repr_drift: f32,
     pub buffer_len: usize,
@@ -1695,12 +1663,6 @@ pub struct Diagnostics {
     pub option_return: f32,
     /// L1: ‖z_t − goal‖ — how close the lane's latent is to its goal.
     pub goal_distance: f32,
-    /// L1 effective credit scope: `Σ_i (i · α_i)` over the last
-    /// `option_history_len` options. Zero when the L1 credit assigner
-    /// is disabled (`option_history_len < 2`). Increasing over training
-    /// means option credit is being attributed to older options — the
-    /// agent is learning longer-horizon option structure.
-    pub h_eff_l1: f32,
     /// L1 continuous goal prototypes: mean pairwise Euclidean distance
     /// across the `num_options` goal vectors. Zero until the table
     /// diverges from init; drops toward zero if prototypes collapse to
@@ -1760,155 +1722,69 @@ pub struct Diagnostics {
 struct ReplaySample {
     obs: Vec<f32>,
     action: Vec<f32>,
+    action_parameters: Vec<f32>,
     z_target: Vec<f32>,
     env_id: u32,
 }
 
-/// One completed-option entry for the L1 credit assigner's history.
-#[derive(Clone)]
-struct OptionEntry {
-    /// Encoder latent at option start — the "state" input row for the
-    /// L1 credit graph.
-    z_start: Vec<f32>,
-    /// Option index (one-hot-encoded into the history row).
-    option_idx: u32,
-    /// Sum of `last_reward` over this option's window.
-    option_return: f32,
-    /// Number of env steps the option ran before termination.
-    option_length: u32,
+/// One committed planner decision. Parameters are separate from the discrete
+/// identity so queued plans cannot corrupt policy one-hot labels. `None` means
+/// the caller should obtain parameters from its normal action head/fallback.
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct PlannedAction {
+    action: u32,
+    parameters: Option<[f32; ACTION_PARAMETER_DIM]>,
 }
 
-/// Fixed-capacity ring buffer of recently-terminated options per lane.
-struct OptionHistory {
-    entries: std::collections::VecDeque<OptionEntry>,
-    capacity: usize,
+fn compose_wm_action_token(base_action: &[f32], parameters: &[f32], out: &mut [f32]) {
+    assert_eq!(out.len(), WM_ACTION_DIM);
+    out.fill(0.0);
+    let base_len = base_action.len().min(MAX_ACTION_DIM);
+    out[..base_len].copy_from_slice(&base_action[..base_len]);
+    let parameter_len = parameters.len().min(ACTION_PARAMETER_DIM);
+    out[MAX_ACTION_DIM..MAX_ACTION_DIM + parameter_len]
+        .copy_from_slice(&parameters[..parameter_len]);
 }
 
-impl OptionHistory {
-    fn new(capacity: usize) -> Self {
-        Self {
-            entries: std::collections::VecDeque::with_capacity(capacity.max(1)),
-            capacity: capacity.max(1),
-        }
-    }
-
-    fn push(&mut self, entry: OptionEntry) {
-        if self.entries.len() == self.capacity {
-            self.entries.pop_front();
-        }
-        self.entries.push_back(entry);
-    }
-
-    fn len(&self) -> usize {
-        self.entries.len()
-    }
-
-    fn get(&self, i: usize) -> &OptionEntry {
-        &self.entries[i]
-    }
-
-    /// Flatten the last `history_len` entries row-major into a single
-    /// `[history_len × input_dim]` vector for the credit graph. The
-    /// per-row layout is `[z_start | option_onehot | option_return | length]`.
-    /// Panics if `self.len() < history_len`.
-    fn flatten(&self, history_len: usize, num_options: usize, latent_dim: usize) -> Vec<f32> {
-        debug_assert!(self.len() >= history_len);
-        let input_dim = latent_dim + num_options + 2;
-        let mut out = Vec::with_capacity(history_len * input_dim);
-        let start = self.len() - history_len;
-        for e in self.entries.iter().skip(start) {
-            out.extend_from_slice(&e.z_start);
-            for k in 0..num_options {
-                out.push(if k == e.option_idx as usize { 1.0 } else { 0.0 });
+fn compose_coord_features(observation: &[f32], task_embedding: &[f32]) -> Vec<f32> {
+    (0..OBS_TOKEN_DIM + TASK_DIM)
+        .map(|i| {
+            if i < OBS_TOKEN_DIM {
+                observation.get(i).copied().unwrap_or(0.0)
+            } else {
+                task_embedding
+                    .get(i - OBS_TOKEN_DIM)
+                    .copied()
+                    .unwrap_or(0.0)
             }
-            out.push(e.option_return);
-            out.push(e.option_length as f32);
-        }
-        out
-    }
+        })
+        .map(|value| {
+            if value.is_finite() {
+                value.clamp(-10.0, 10.0)
+            } else {
+                0.0
+            }
+        })
+        .collect()
+}
 
-    /// Locate a contrastive pair in the last `history_len` entries: two
-    /// options with similar `z_start` but divergent realized returns.
-    /// Returns `(high_return_idx_within_window, low_return_idx_within_window)`
-    /// in `[0, history_len)`. None if not enough data or no useful pair.
-    fn find_contrastive_pair<R: Rng>(
-        &self,
-        rng: &mut R,
-        history_len: usize,
-    ) -> Option<(usize, usize)> {
-        if self.len() < history_len {
-            return None;
-        }
-        let start = self.len() - history_len;
-        let mut best: Option<(usize, usize)> = None;
-        let mut best_score = 0.0f32;
-        // Brute-force over all (i, j) pairs in the window; history_len
-        // is O(8) so this is 56 comparisons.
-        for a in 0..history_len {
-            for b in (a + 1)..history_len {
-                let ei = self.get(start + a);
-                let ej = self.get(start + b);
-                let z_dist: f32 = ei
-                    .z_start
-                    .iter()
-                    .zip(ej.z_start.iter())
-                    .map(|(x, y)| (x - y).powi(2))
-                    .sum::<f32>()
-                    .sqrt();
-                let ret_diff = (ei.option_return - ej.option_return).abs();
-                let score = ret_diff / (z_dist + 0.1);
-                if score > best_score {
-                    best_score = score;
-                    best = if ei.option_return >= ej.option_return {
-                        Some((a, b))
-                    } else {
-                        Some((b, a))
-                    };
-                }
-            }
-        }
-        // Optional RNG usage so the seed remains referenced; swaps the
-        // returned pair with a small probability for sample diversity.
-        if let Some((hi, lo)) = best {
-            if rng.random_range(0.0..1.0) < 0.1 {
-                return Some((lo, hi));
-            }
-            return Some((hi, lo));
-        }
-        None
-    }
+fn is_task_event(explicit_event: Option<bool>, extrinsic_reward: f32) -> bool {
+    explicit_event.unwrap_or(extrinsic_reward > 0.0)
+}
 
-    /// Option-divergence contrastive target for the credit assigner.
-    /// Produces a softmax-normalized `[history_len]` vector whose peak
-    /// is at indices where the hi/lo pair took different options.
-    fn contrastive_target(&self, hi: usize, lo: usize, history_len: usize) -> Vec<f32> {
-        let start = self.len() - history_len;
-        let mut divergence = vec![0.0f32; history_len];
-        // We don't align two windows here (unlike L0 which compares
-        // parallel histories at two end-points). Instead we measure
-        // divergence as "this step's option differs from the
-        // high-return option at hi" — a cheap heuristic that scores
-        // steps where the agent took an option distinct from the
-        // locally best one.
-        let hi_idx = self.get(start + hi).option_idx;
-        for (i, div) in divergence.iter_mut().enumerate() {
-            let ent = self.get(start + i);
-            *div = if ent.option_idx == hi_idx { 0.0 } else { 1.0 };
+fn greedy_policy_action(kind: ActionKind, head: &[f32]) -> Action {
+    match kind {
+        ActionKind::Discrete { n } => {
+            let live = n.min(head.len());
+            assert!(live > 0, "discrete action space must not be empty");
+            let index = (0..live)
+                .max_by(|&left, &right| head[left].total_cmp(&head[right]))
+                .unwrap_or(0);
+            Action::Discrete(index)
         }
-        // Softmax normalize.
-        let max = divergence.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-        let exp_sum: f32 = divergence.iter().map(|d| (d - max).exp()).sum();
-        if exp_sum > 0.0 {
-            for d in divergence.iter_mut() {
-                *d = (*d - max).exp() / exp_sum;
-            }
-        } else {
-            for d in divergence.iter_mut() {
-                *d = 1.0 / history_len as f32;
-            }
+        ActionKind::Continuous { dim, .. } => {
+            Action::Continuous(head[..dim.min(head.len())].to_vec())
         }
-        let _ = lo;
-        divergence
     }
 }
 
@@ -1934,12 +1810,9 @@ struct Lane {
     option_return: f32,
     /// Value prediction cached at option-start for advantage computation.
     option_start_value: f32,
-    /// Encoder latent captured at option-start, used as the per-option
-    /// `z_start` row fed to the L1 credit assigner.
+    /// Encoder latent captured at option-start. The option policy must train
+    /// the choice against the state where it was made, not its terminal state.
     option_start_z: Vec<f32>,
-    /// Option-level history ring buffer for the L1 credit assigner.
-    /// Each entry is one completed option window.
-    option_history: OptionHistory,
 
     // Cached last-step values for diagnostics & policy advantage.
     last_value: f32,
@@ -1991,10 +1864,10 @@ struct Lane {
     outcome_ep_trajectory: Vec<Vec<f32>>,
     /// Running sum of `r_base` over the current episode.
     outcome_ep_return: f32,
-    /// Most recently completed episode's total return (snapshotted from
-    /// `outcome_ep_return` at env_boundary, before reset). Used by GRPO
-    /// per-episode advantage mode (`use_grpo_episode`). Initialized to 0;
-    /// becomes meaningful after the lane's first episode completes.
+    /// Most recently completed episode's full policy return (snapshotted
+    /// from `sil_ep_return` at env_boundary, before reset). Used by GRPO
+    /// per-episode advantage mode (`use_grpo_episode`), so this must include
+    /// extrinsic reward rather than the M6-specific intrinsic accumulator.
     last_episode_return: f32,
     /// SIL episode return: accumulates the FULL per-step reward
     /// (including extrinsic) over the current episode. Used by SIL's
@@ -2004,11 +1877,10 @@ struct Lane {
     /// intrinsics (surprise=0, novelty=0) would have outcome_ep_return
     /// stuck at 0 and SIL would never push.
     sil_ep_return: f32,
-    /// Number of times this episode's per-step extrinsic reward was
-    /// strictly positive (i.e., a goal-completion / level-transition pulse fired).
+    /// Number of positive task-achievement events in this episode.
     /// Used by SIL's optional event-filter mode (`sil_event_filter`)
     /// to push ONLY trajectories that contained at least one
-    /// extrinsic-reward event — turning the SIL buffer into a
+    /// task event — turning the SIL buffer into a
     /// "winning trajectories" replay rather than a generic
     /// above-baseline-return replay.
     sil_ep_event_count: u32,
@@ -2051,11 +1923,10 @@ pub struct Agent {
     gpu: Arc<blade_graphics::Context>,
     /// N lanes, N = config.batch_size. Fixed at construction.
     lanes: Vec<Lane>,
-    /// Per-env task embedding (key = env_id, value length = TASK_DIM). Each
-    /// env gets a fixed deterministic-random vector based on its id; we
-    /// tile the active per-lane embeddings row-wise into the encoder input
-    /// each step. Not trained (the encoder learns to map (obs,
-    /// env_embedding) into per-env latents).
+    /// Per-env task code (key = env_id, value length = TASK_DIM). Codes use the
+    /// checkpoint-compatible dense hash by default or orthogonal common ids
+    /// when configured. We tile active lane codes into the encoder input each
+    /// step. The codes are not trained; their projection is.
     task_embeddings: HashMap<u32, Vec<f32>>,
     wm_session: Session,
     /// Optional sibling session running EfficientNetV2-S features[0:6]
@@ -2077,24 +1948,19 @@ pub struct Agent {
     /// V2-S isn't in use, in which case callers stage frames via the
     /// legacy host-pointer path (`image_input_host_ptr`) instead.
     v2s_preprocess: Option<crate::v2s_preprocess::PreprocessPipeline>,
-    credit_session: Session,
-    /// Policy graph always uses the continuous branch (MSE loss on Gaussian
-    /// means). For discrete envs, the adapter softmax+samples over the
-    /// first `n` head dims. This gives one universal policy graph.
+    /// Policy graph selected at construction: categorical cross-entropy for
+    /// discrete adapters or advantage-weighted fixed-variance Gaussian NLL
+    /// for continuous adapters.
     policy_session: Session,
     /// L1 option-policy session. `None` when `num_options <= 1` (L0-only).
     option_session: Option<Session>,
-    /// L1 credit-assigner session. `None` when L1 is off or when
-    /// `option_history_len < 2`. Runs contrastively per-lane like the
-    /// L0 credit graph.
-    option_credit_session: Option<Session>,
     /// Per-lane latent dim (the WM graph is [N, latent_dim]).
     latent_dim: usize,
     step_count: usize,
     probe_obs: Option<Vec<Vec<f32>>>,
     probe_reference: Option<Vec<Vec<f32>>>,
     last_wm_loss: f32,
-    last_credit_loss: f32,
+    last_recon_loss: f32,
     last_policy_loss: f32,
     /// EMA of `|last_policy_loss|`. Updated inside the policy
     /// training paths after each `step()`. Drives
@@ -2108,12 +1974,10 @@ pub struct Agent {
     /// of ripe transitions and resets to 0.
     policy_update_ticks: usize,
     last_replay_loss: f32,
-    last_option_credit_loss: f32,
-    last_h_eff_l1: f32,
     last_drift: f32,
     encoder_lr_scale: f32,
     /// Batch LR compensation: user's `learning_rate` is per-sample, but
-    /// every WM/credit/policy loss is averaged over N rows, so per-sample
+    /// every WM/policy loss is averaged over N rows, so per-sample
     /// gradient magnitude shrinks linearly with N. We multiply every
     /// learning rate by √N at the use sites so the effective per-sample
     /// update matches the N = 1 reference. √N (not N) is the standard
@@ -2130,22 +1994,40 @@ pub struct Agent {
     /// `wm_session.input_host_ptr("visual_obs")` — so kindle keeps
     /// no CPU-side scratch for the CNN input.
     visual_obs_size_bytes: usize,
+    /// Base action identity/value used by the policy. Always
+    /// `[lanes × MAX_ACTION_DIM]`; never contains auxiliary parameters.
     action_token_scratch: Vec<f32>,
+    /// World-model action rows: the base action token followed by optional
+    /// normalized parameters such as ARC click `(x, y)`.
+    wm_action_token_scratch: Vec<f32>,
+    /// One-shot parameters staged by the host for the next `observe()`.
+    action_parameter_scratch: Vec<f32>,
+    action_parameter_active: Vec<bool>,
+    /// Per-lane/per-discrete-action declaration that the action consumes the
+    /// two auxiliary parameters. The planner samples parameter tails only for
+    /// these entries; ordinary actions must keep a zero tail to avoid OOD WM
+    /// exploitation.
+    action_parameter_masks: Vec<bool>,
+    /// Parameters attached to the most recent planner-queued action popped by
+    /// `act()`. The host consumes them once via
+    /// `take_planned_action_parameters()` before stepping the environment.
+    last_planned_action_parameters: Vec<Option<[f32; ACTION_PARAMETER_DIM]>>,
     z_target_scratch: Vec<f32>,
     task_scratch: Vec<f32>,
     value_target_scratch: Vec<f32>,
-    /// Per-row advantage-weighted action targets for the policy dispatch,
-    /// sized `[N, MAX_ACTION_DIM]`. Computed as `advantage_i · one_hot_i`,
-    /// which gives each lane its own signed gradient magnitude through
-    /// either the cross-entropy or MSE loss path without needing a
-    /// per-row loss weighting input on the graph side.
+    /// Per-row policy action targets for the policy dispatch. Discrete
+    /// plain-PG folds advantage into these labels; PPO and continuous PG keep
+    /// the raw action here and stage advantage separately.
     policy_action_scratch: Vec<f32>,
     /// Mask scratch buffer fed to the policy graph's `action_mask`
     /// input each policy_step. Same `[policy_batch × MAX_ACTION_DIM]`
     /// layout as `policy_action_scratch`. Populated from
-    /// `self.action_masks` (lane × MAX_ACTION_DIM). Default 1.0 means
-    /// no masking (graph behaves as before).
+    /// `self.action_masks` (lane × MAX_ACTION_DIM). Padded action heads are
+    /// invalid by default for discrete adapters.
     policy_action_mask_scratch: Vec<f32>,
+    /// True for discrete policy graphs, all of which consume an
+    /// `action_mask` input. Continuous policy graphs do not expose it.
+    policy_action_mask_input_present: bool,
     /// Pre-allocated `[policy_batch × latent_dim]` buffer for the
     /// policy session's `z` input. At rollout_length=1 this is the
     /// same size as the encoder's per-lane z output; at >1 the
@@ -2237,9 +2119,9 @@ pub struct Agent {
     /// REINFORCE update at the NEXT step can use the advantage
     /// `reward − running_baseline`. We recompute on observe.
     coord_last_reward: Vec<f32>,
-    /// EMA baseline of per-step reward for coord-head advantage
-    /// centering.
-    coord_reward_baseline: f32,
+    /// Per-lane EMA baselines for coord-head advantage centering. A single
+    /// shared baseline mixes unrelated reward scales in heterogeneous batches.
+    coord_reward_baseline: Vec<f32>,
     /// M7 per-lane episode-return accumulator (in kindle's
     /// intrinsic reward). Used so the prototype-updater sees the
     /// same `r_ep` that trained the policy, not a separate
@@ -2292,7 +2174,7 @@ pub struct Agent {
     /// Scratch buffers for wm_kstep_session inputs.
     /// - kstep_z_scratch: [N, ld]
     /// - kstep_z_target_scratch: [N, ld]
-    /// - kstep_action_scratch_per_step: Vec<Vec<f32>>, k entries each [N, MAX_ACTION_DIM]
+    /// - kstep_action_scratch_per_step: Vec<Vec<f32>>, k entries each [N, WM_ACTION_DIM]
     kstep_z_scratch: Vec<f32>,
     kstep_z_target_scratch: Vec<f32>,
     kstep_action_scratch_per_step: Vec<Vec<f32>>,
@@ -2317,7 +2199,7 @@ pub struct Agent {
     /// the config when computing batch offsets.
     planner_samples_cached: usize,
     /// Scratch buffers for the GPU planner. Sized once at construction
-    /// to `planner_batch * MAX_ACTION_DIM` / latent_dim respectively.
+    /// to `planner_batch * WM_ACTION_DIM` / latent_dim respectively.
     /// All three are `Vec<f32>` so the planner can avoid per-call
     /// allocation in the hot path.
     planner_z_scratch: Vec<f32>,
@@ -2358,7 +2240,7 @@ pub struct Agent {
     /// Per-lane action queue populated by the planner. `act()`
     /// pops from the front of this queue before policy sampling,
     /// so a queued sequence commits the next-K actions.
-    planner_queue: Vec<std::collections::VecDeque<u32>>,
+    planner_queue: Vec<std::collections::VecDeque<PlannedAction>>,
     /// Number of `plan_and_queue` calls since the last WM-weight
     /// refresh. Triggers a refresh when it hits
     /// `planner_refresh_interval`.
@@ -2370,6 +2252,13 @@ pub struct Agent {
     /// previous step's value. Only consumed when
     /// `extrinsic_reward_alpha > 0`.
     extrinsic_reward: Vec<f32>,
+    /// Explicit per-lane task-event override for the next `observe()` call.
+    /// Native `terminated` results populate this even when the environment's
+    /// reward is zero or negative (for example MountainCar's terminal -1).
+    /// `None` retains the legacy positive-reward inference; `Some(false)` is
+    /// important for environments such as CartPole whose positive reward does
+    /// not mean the current transition was successful.
+    extrinsic_event: Vec<Option<bool>>,
     /// Per-lane intrinsic progress reward, set via
     /// `set_intrinsic_progress`. Adds to the per-step reward sum
     /// but does NOT increment `sil_ep_event_count` — the
@@ -2419,8 +2308,8 @@ pub struct Agent {
     subgoal_centroids: hashbrown::HashMap<u32, Vec<Vec<f32>>>,
     /// Per-lane action availability mask for `act()` sampling. Flat
     /// `[batch_size × MAX_ACTION_DIM]` layout; 1.0 = valid, 0.0 = invalid.
-    /// Default (all 1.0) preserves prior behaviour. Set via
-    /// `Agent::set_action_masks`. Persists across `act()` calls until
+    /// Defaults to each adapter's static action range (padded heads invalid).
+    /// Set via `Agent::set_action_masks`. Persists across `act()` calls until
     /// re-set (unlike `extrinsic_reward`, which auto-clears) — masks
     /// usually stay stable for many steps within an episode.
     /// Invalid logits are forced to large-negative before sampling so
@@ -2429,15 +2318,16 @@ pub struct Agent {
     /// distribution actually sampled from.
     action_masks: Vec<f32>,
     /// SIL replay buffer: (obs, action_idx, value_target, env_id)
-    /// from successful episodes. See `AgentConfig::use_sil`.
+    /// from successful episodes. Capacity is balanced across represented task
+    /// ids, including inactive ones, while updates balance only ids active in
+    /// the current lanes. Long/fast tasks therefore cannot erase another
+    /// task, and stale action semantics cannot block adaptation after a switch.
+    /// See `AgentConfig::use_sil`.
     sil_buffer: std::collections::VecDeque<SilSample>,
-    /// EMA of recent episode returns, used as the threshold for
-    /// "successful episode" → SIL push. Initialized lazily on first
-    /// completed episode.
-    sil_baseline: f32,
-    /// Whether `sil_baseline` has been initialized from a real
-    /// episode return (false = use first episode's return as init).
-    sil_baseline_initialized: bool,
+    /// Per-task EMA of eligible episode returns, used as the threshold for
+    /// "successful episode" → SIL push. Comparing unrelated reward scales
+    /// made positive-return games suppress successful negative-return games.
+    sil_baselines: hashbrown::HashMap<u32, f32>,
     /// Counts of SIL update outcomes for diagnostics.
     sil_updates_attempted: u64,
     sil_updates_fired: u64,
@@ -2498,7 +2388,9 @@ pub struct Agent {
 /// gradient on transitions where the actual outcome exceeded V's
 /// prediction at collection time, naturally weighting the late-
 /// episode "surprising success" moments (e.g. the touchdown noop
-/// that yields +100) over routine descent steps.
+/// that yields +100) over routine descent steps. With explicit event
+/// filtering, event-success samples instead have a minimum unit advantage so
+/// negative step costs cannot erase the successful trajectory prefix.
 #[derive(Clone)]
 pub struct SilSample {
     pub obs: Vec<f32>,
@@ -2507,11 +2399,248 @@ pub struct SilSample {
     /// by the non-e2e SIL path; e2e re-encodes `obs` instead.
     pub z: Vec<f32>,
     pub action_idx: usize,
+    /// Action availability at collection time (length MAX_ACTION_DIM).
+    pub action_mask: Vec<f32>,
     /// Undiscounted return-to-go from this step to episode end.
     pub r_to_go: f32,
     /// V(s) baseline cached at collection time.
     pub v_at_collect: f32,
+    /// True when this transition came from an episode containing a real task
+    /// event. Event-filtered SIL uses this provenance to
+    /// imitate successful trajectories even when step costs make their early
+    /// return-to-go negative.
+    pub event_success: bool,
     pub env_id: u32,
+}
+
+fn sil_imitation_advantage(
+    r_to_go: f32,
+    v_at_collect: f32,
+    event_success: bool,
+    event_filter: bool,
+    cap: f32,
+) -> f32 {
+    let positive_advantage = (r_to_go - v_at_collect).max(0.0);
+    let advantage = if event_filter && event_success {
+        positive_advantage.max(1.0)
+    } else {
+        positive_advantage
+    };
+    advantage.min(cap.max(0.1))
+}
+
+fn admit_sil_episode(
+    baseline: &mut f32,
+    initialized: &mut bool,
+    episode_return: f32,
+    event_success: bool,
+    event_filter: bool,
+    decay: f32,
+) -> bool {
+    if event_filter && !event_success {
+        return false;
+    }
+    let first_eligible = !*initialized;
+    let admit = if first_eligible {
+        *baseline = episode_return;
+        *initialized = true;
+        // A sparse event may be rare enough that throwing the first one away
+        // leaves nothing to learn from. Standard SIL retains its historical
+        // first-episode warmup behavior.
+        event_filter
+    } else {
+        episode_return > *baseline
+    };
+    if !first_eligible {
+        let decay = decay.clamp(0.0, 1.0);
+        *baseline = decay * *baseline + (1.0 - decay) * episode_return;
+    }
+    admit
+}
+
+fn admit_sil_episode_for_env(
+    baselines: &mut hashbrown::HashMap<u32, f32>,
+    env_id: u32,
+    episode_return: f32,
+    event_success: bool,
+    event_filter: bool,
+    decay: f32,
+) -> bool {
+    if let Some(baseline) = baselines.get_mut(&env_id) {
+        let mut initialized = true;
+        return admit_sil_episode(
+            baseline,
+            &mut initialized,
+            episode_return,
+            event_success,
+            event_filter,
+            decay,
+        );
+    }
+    let mut baseline = 0.0;
+    let mut initialized = false;
+    let admitted = admit_sil_episode(
+        &mut baseline,
+        &mut initialized,
+        episode_return,
+        event_success,
+        event_filter,
+        decay,
+    );
+    if initialized {
+        baselines.insert(env_id, baseline);
+    }
+    admitted
+}
+
+fn balanced_sil_sample_indices(
+    buffer: &std::collections::VecDeque<SilSample>,
+    batch_size: usize,
+    seed: u64,
+    active_env_ids: &std::collections::BTreeSet<u32>,
+) -> Vec<usize> {
+    if buffer.is_empty() || batch_size == 0 {
+        return Vec::new();
+    }
+    let mut indices_by_env = std::collections::BTreeMap::<u32, Vec<usize>>::new();
+    for (index, sample) in buffer.iter().enumerate() {
+        if active_env_ids.is_empty() || active_env_ids.contains(&sample.env_id) {
+            indices_by_env.entry(sample.env_id).or_default().push(index);
+        }
+    }
+    if indices_by_env.is_empty() {
+        return Vec::new();
+    }
+    let groups = indices_by_env.values().collect::<Vec<_>>();
+    use rand::{Rng, SeedableRng};
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    (0..batch_size)
+        .map(|row| {
+            let group = groups[row % groups.len()];
+            group[rng.random_range(0..group.len())]
+        })
+        .collect()
+}
+
+fn sil_samples_from_recent_trajectory(
+    buffer: &ExperienceBuffer,
+    max_samples: usize,
+    event_success: bool,
+    value_target_clamp: f32,
+) -> Vec<SilSample> {
+    if max_samples == 0 || buffer.len() < 2 {
+        return Vec::new();
+    }
+
+    let mut samples = Vec::with_capacity(max_samples.min(buffer.len() - 1));
+    let mut r_to_go = 0.0f32;
+    let mut idx = buffer.len() - 1;
+    loop {
+        let transition = buffer.get(idx);
+        if transition.reward.is_finite() {
+            r_to_go += transition.reward;
+        }
+
+        // A transition stores the observation reached by its action. Pair that
+        // action with the preceding record, which is the acted-from state.
+        // Boundary records have no in-episode predecessor and are not samples.
+        if !transition.env_boundary && idx > 0 {
+            let from = buffer.get(idx - 1);
+            samples.push(SilSample {
+                obs: from.observation.clone(),
+                z: from.latent.clone(),
+                action_idx: transition
+                    .action
+                    .iter()
+                    .position(|&value| value > 0.5)
+                    .unwrap_or(0),
+                action_mask: transition.action_mask.clone(),
+                r_to_go: r_to_go.clamp(-value_target_clamp, value_target_clamp),
+                v_at_collect: if transition.value.is_finite() {
+                    transition.value
+                } else {
+                    0.0
+                },
+                event_success,
+                env_id: transition.env_id,
+            });
+            if samples.len() >= max_samples {
+                break;
+            }
+        }
+
+        if transition.env_boundary || idx == 0 {
+            break;
+        }
+        idx -= 1;
+    }
+    samples
+}
+
+fn append_sil_samples(
+    buffer: &mut std::collections::VecDeque<SilSample>,
+    samples: impl IntoIterator<Item = SilSample>,
+    capacity: usize,
+) {
+    if capacity == 0 {
+        return;
+    }
+    buffer.extend(samples);
+    if buffer.len() <= capacity {
+        return;
+    }
+
+    // Bound each represented task fairly instead of evicting from the global
+    // front. Global FIFO eventually erased every replay sample for an inactive
+    // task during a sequential curriculum. Water-filling lets small/new tasks
+    // keep all samples they currently have and divides the remaining capacity
+    // across larger tasks. With one task this reduces exactly to ordinary FIFO.
+    let mut counts = std::collections::BTreeMap::<u32, usize>::new();
+    for sample in buffer.iter() {
+        *counts.entry(sample.env_id).or_default() += 1;
+    }
+    let mut targets = counts
+        .keys()
+        .map(|&env_id| (env_id, 0usize))
+        .collect::<std::collections::BTreeMap<_, _>>();
+    let mut remaining = capacity.min(buffer.len());
+    while remaining > 0 {
+        let active = counts
+            .iter()
+            .filter_map(|(&env_id, &count)| (targets[&env_id] < count).then_some(env_id))
+            .collect::<Vec<_>>();
+        if active.is_empty() {
+            break;
+        }
+        let share = remaining / active.len();
+        if share == 0 {
+            for env_id in active.into_iter().take(remaining) {
+                *targets.get_mut(&env_id).expect("target exists") += 1;
+            }
+            break;
+        }
+        for env_id in active {
+            let target = targets.get_mut(&env_id).expect("target exists");
+            let available = counts[&env_id] - *target;
+            let added = available.min(share);
+            *target += added;
+            remaining -= added;
+        }
+    }
+
+    let mut drops = counts
+        .into_iter()
+        .map(|(env_id, count)| (env_id, count - targets[&env_id]))
+        .collect::<hashbrown::HashMap<_, _>>();
+    buffer.retain(|sample| {
+        let drop = drops.get_mut(&sample.env_id).expect("drop count exists");
+        if *drop == 0 {
+            true
+        } else {
+            *drop -= 1;
+            false
+        }
+    });
 }
 
 /// Apply the terminal-proximity bonus retroactively to the K
@@ -2678,6 +2807,76 @@ fn compute_gae_advantage(
         adv = delta + gamma * lambda * adv;
     }
     adv
+}
+
+/// Normalize active advantages either as one batch (`group_ids = None`) or
+/// independently within each task/group. Groups with fewer than two active
+/// samples are left unchanged: there is no relative baseline to estimate.
+///
+/// GRPO must compare forks of the same task. Centering returns from unrelated
+/// games together leaks reward-scale and difficulty differences into the
+/// gradient, so callers pass the lane's environment/task id for GRPO batches.
+fn normalize_active_advantages(
+    advantages: &mut [f32],
+    active: &[bool],
+    group_ids: Option<&[u32]>,
+    divide_by_std: bool,
+) {
+    debug_assert_eq!(advantages.len(), active.len());
+    if let Some(ids) = group_ids {
+        debug_assert_eq!(advantages.len(), ids.len());
+    }
+
+    #[derive(Clone, Copy, Default)]
+    struct Stats {
+        count: usize,
+        sum: f32,
+        sq_sum: f32,
+    }
+
+    let group_for = |i: usize| group_ids.map_or(0, |ids| ids[i]);
+    let mut stats: HashMap<u32, Stats> = HashMap::new();
+    for (i, &value) in advantages.iter().enumerate() {
+        if active[i] {
+            let entry = stats.entry(group_for(i)).or_default();
+            entry.count += 1;
+            entry.sum += value;
+        }
+    }
+    for (i, &value) in advantages.iter().enumerate() {
+        if !active[i] {
+            continue;
+        }
+        let entry = stats.get_mut(&group_for(i)).expect("group was collected");
+        if entry.count >= 2 {
+            let mean = entry.sum / entry.count as f32;
+            let d = value - mean;
+            entry.sq_sum += d * d;
+        }
+    }
+    for (i, value) in advantages.iter_mut().enumerate() {
+        if !active[i] {
+            continue;
+        }
+        let entry = stats.get(&group_for(i)).expect("group was collected");
+        if entry.count < 2 {
+            continue;
+        }
+        let mean = entry.sum / entry.count as f32;
+        let std = if divide_by_std {
+            (entry.sq_sum / entry.count as f32).sqrt().max(1e-3)
+        } else {
+            1.0
+        };
+        *value = (*value - mean) / std;
+    }
+}
+
+fn restore_action_mask(dst: &mut [f32], stored: &[f32]) {
+    dst.fill(1.0);
+    if stored.len() == dst.len() {
+        dst.copy_from_slice(stored);
+    }
 }
 
 fn unit_cosine(a: &[f32], b: &[f32]) -> f32 {
@@ -2851,7 +3050,7 @@ fn build_wm_kstep_graph(
     let mut action_nodes = Vec::with_capacity(k);
     for i in 0..k {
         let name = format!("action_step_{}", i);
-        let a = g.input(&name, &[batch_size, MAX_ACTION_DIM]);
+        let a = g.input(&name, &[batch_size, WM_ACTION_DIM]);
         let a = g.stop_gradient(a);
         action_nodes.push(a);
     }
@@ -2862,9 +3061,9 @@ fn build_wm_kstep_graph(
     // the rolled-out μ — σ training only happens in the main
     // wm_session (single-step heteroscedastic regression).
     let wm = if wm_stochastic {
-        WorldModel::new_stochastic(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+        WorldModel::new_stochastic(&mut g, latent_dim, WM_ACTION_DIM, hidden_dim)
     } else {
-        WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+        WorldModel::new(&mut g, latent_dim, WM_ACTION_DIM, hidden_dim)
     };
     let z_hat_k = wm.rollout_k(&mut g, z, &action_nodes);
     let loss = g.mse_loss(z_hat_k, z_target);
@@ -2881,16 +3080,16 @@ fn build_wm_planner_graph(
 ) -> Graph {
     let mut g = Graph::new();
     let z_raw = g.input("z", &[batch_size, latent_dim]);
-    let action_raw = g.input("action", &[batch_size, MAX_ACTION_DIM]);
+    let action_raw = g.input("action", &[batch_size, WM_ACTION_DIM]);
     // Stop gradients on both inputs so set_outputs([z_next]) at the end
     // doesn't drive backward through the WM params — the planner is
     // forward-only.
     let z = g.stop_gradient(z_raw);
     let action = g.stop_gradient(action_raw);
     let wm = if wm_stochastic {
-        WorldModel::new_stochastic(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+        WorldModel::new_stochastic(&mut g, latent_dim, WM_ACTION_DIM, hidden_dim)
     } else {
-        WorldModel::new(&mut g, latent_dim, MAX_ACTION_DIM, hidden_dim)
+        WorldModel::new(&mut g, latent_dim, WM_ACTION_DIM, hidden_dim)
     };
     let (z_next, sigma_opt) = wm.forward_with_sigma(&mut g, z, action);
     let z_next = g.stop_gradient(z_next);
@@ -2988,7 +3187,7 @@ impl Agent {
     ///
     /// The underlying graphs use universal token sizes and will never need
     /// rebuilding for subsequent lane-adapter swaps (`switch_lane`).
-    pub fn new(mut config: AgentConfig, adapters: Vec<Box<dyn EnvAdapter>>) -> Self {
+    pub fn new(config: AgentConfig, adapters: Vec<Box<dyn EnvAdapter>>) -> Self {
         assert!(
             !adapters.is_empty(),
             "Agent::new requires at least one adapter (one lane)"
@@ -3015,13 +3214,13 @@ impl Agent {
 
         // --- World model graph (uses universal token sizes + task) ---
         //
-        // The task embedding is fed as a graph **input** named "task".
-        // Per-env values are deterministic-random and persisted CPU-side
-        // in `task_embeddings`. The encoder learns to map (obs_token,
-        // task) into per-env latents.
+        // The task code is fed as a graph **input** named "task" and persisted
+        // CPU-side in `task_embeddings`. It uses either historical dense hashes
+        // or configured orthogonal common ids. The encoder learns to map
+        // (obs_token, task) into per-env latents.
         let mut wm_session = {
             let mut g = Graph::new();
-            let action = g.input("action", &[config.batch_size, MAX_ACTION_DIM]);
+            let action = g.input("action", &[config.batch_size, WM_ACTION_DIM]);
             // Previous step's latent — the state the action was taken
             // FROM. Kept under the historical input name "z_target"
             // (set_input call sites and the python extension know it
@@ -3043,9 +3242,8 @@ impl Agent {
             // The encoder sees per-env conditioning and can specialize its
             // representations, but we don't backprop into the embedding
             // itself (meganeura's autodiff over a parameter on this code
-            // path is unstable). Each env's embedding is a fixed
-            // deterministic-random vector keyed off the env_id; the
-            // encoder learns to map (obs_token, env_embedding) into
+            // path is unstable). Each env's code is fixed and keyed by
+            // env_id; the encoder learns to map (obs_token, task_code) into
             // env-specific latents.
             let task = g.input("task", &[config.batch_size, TASK_DIM]);
 
@@ -3178,11 +3376,11 @@ impl Agent {
                 WorldModel::new_stochastic(
                     &mut g,
                     config.latent_dim,
-                    MAX_ACTION_DIM,
+                    WM_ACTION_DIM,
                     config.hidden_dim,
                 )
             } else {
-                WorldModel::new(&mut g, config.latent_dim, MAX_ACTION_DIM, config.hidden_dim)
+                WorldModel::new(&mut g, config.latent_dim, WM_ACTION_DIM, config.hidden_dim)
             };
             // Forward dynamics: ẑ_{t+1} = WM(z_t, a_t), trained against
             // the fresh encoder latent of the post-action observation.
@@ -3237,7 +3435,7 @@ impl Agent {
             // session's encoder (which produces the latents stored
             // in lane buffers and used for novelty / surprise / option
             // goals).
-            let wm_recon_loss = if config.recon_loss_coef > 0.0 {
+            let (wm_recon_loss, recon_loss_raw) = if config.recon_loss_coef > 0.0 {
                 let (target_node, target_dim) = match (config.recon_visual_target, visual_node_2d) {
                     (true, Some(v2d)) => (v2d, visual_recon_dim),
                     _ => (obs, OBS_TOKEN_DIM),
@@ -3253,9 +3451,9 @@ impl Agent {
                 let recon_loss_raw = g.mse_loss(recon, target_det);
                 let recon_coef = g.scalar(config.recon_loss_coef);
                 let recon_loss = g.mul(recon_loss_raw, recon_coef);
-                g.add(wm_loss, recon_loss)
+                (g.add(wm_loss, recon_loss), recon_loss_raw)
             } else {
-                wm_loss
+                (wm_loss, g.scalar(0.0))
             };
 
             // Win-classifier head atop the encoder output. Built when
@@ -3282,8 +3480,7 @@ impl Agent {
             // planner consumption (V over rollout latents via pulled
             // value_head.* weights) is unchanged — the in-graph V has
             // no other online consumer. Trade-off given up: BCE
-            // encoder shaping (`value_head_grad_to_encoder` is now a
-            // no-op); the only mode where that shaping ever paired
+            // encoder shaping; the only mode where that shaping ever paired
             // labels with the right states was MLP.
             //
             // Why BCE not MSE on R_to_go: an earlier regression
@@ -3338,11 +3535,11 @@ impl Agent {
             let neg_zhat = g.neg(z_hat);
             let diff = g.add(z_next_target, neg_zhat);
             let sq = g.mul(diff, diff);
-            // Output 3 (z_hat) backs `Agent::wm_predict` — a forward-
-            // only probe of the dynamics model used by tests and
-            // harness diagnostics. Appending keeps indices 1 (z_t)
-            // and 2 (sq) stable for the observe() readbacks.
-            g.set_outputs(vec![loss, z_t, sq, z_hat]);
+            // Output 3 (z_hat) backs `Agent::wm_predict`. Outputs 4 and 5
+            // keep prediction and reconstruction metrics separate from the
+            // combined optimization objective at output 0. Appending keeps
+            // indices 1 (z_t) and 2 (sq) stable for existing readbacks.
+            g.set_outputs(vec![loss, z_t, sq, z_hat, mu_loss, recon_loss_raw]);
             let mut s = build_session(&g, config.opt_level, &gpu);
             init_parameters(&mut s);
             s
@@ -3415,19 +3612,6 @@ impl Agent {
                 )
             });
 
-        // --- Credit assigner graph ---
-        let mut credit_session = {
-            let g = credit::build_credit_graph(
-                config.latent_dim,
-                MAX_ACTION_DIM,
-                config.history_len,
-                config.hidden_dim,
-            );
-            let mut s = build_session(&g, config.opt_level, &gpu);
-            init_parameters(&mut s);
-            s
-        };
-
         // --- Policy + value graph ---
         // Pick the policy graph shape from the adapters' action kinds. All
         // adapters must share a kind (agent-wide single policy session), so
@@ -3462,6 +3646,39 @@ impl Agent {
             );
         }
         let is_discrete = matches!(first_kind, ActionKind::Discrete { .. });
+        let continuous_dim = match first_kind {
+            ActionKind::Continuous { dim, .. } => dim,
+            ActionKind::Discrete { .. } => 0,
+        };
+        assert!(
+            is_discrete || !config.use_ppo,
+            "use_ppo is not implemented for continuous policies"
+        );
+        assert!(
+            is_discrete || !config.use_kl_ppo,
+            "use_kl_ppo is not implemented for continuous policies"
+        );
+        assert!(
+            is_discrete || !config.use_sil,
+            "SIL replay stores categorical action indices and is not implemented for continuous policies"
+        );
+        // Static padding mask: policy graphs are compiled at
+        // MAX_ACTION_DIM, but each discrete adapter may expose fewer real
+        // actions. Start padded heads invalid even when the environment has
+        // no dynamic mask API. Dynamic environments can overwrite these rows
+        // through `set_action_masks[_from_envs]` before act().
+        let mut initial_action_masks = vec![1.0; config.batch_size * MAX_ACTION_DIM];
+        if is_discrete {
+            initial_action_masks.fill(0.0);
+            for (lane, adapter) in adapters.iter().enumerate() {
+                let ActionKind::Discrete { n: action_count } = adapter.action_kind() else {
+                    unreachable!("mixed action kinds rejected above")
+                };
+                let valid = action_count.min(MAX_ACTION_DIM);
+                initial_action_masks[lane * MAX_ACTION_DIM..lane * MAX_ACTION_DIM + valid]
+                    .fill(1.0);
+            }
+        }
 
         // Resolve option_dim: 0 in config means "use latent_dim". This
         // is the dimensionality of the `option_goal` vector used by the
@@ -3477,14 +3694,21 @@ impl Agent {
         // The option-aware planner (build_policy_planner_graph) uses
         // the shared-trunk + option_bias path. If per_option_heads is
         // true, policy_session uses per_option_fc2 (no shared fc2)
-        // and param sync to policy_planner fails. Force false here.
-        if l1_active && config.planner_horizon > 0 && config.per_option_heads {
-            log::warn!(
-                "Forcing per_option_heads=false: option-aware planner only \
-                supports the shared-trunk + option_bias policy graph"
-            );
-            config.per_option_heads = false;
-        }
+        // and param sync to policy_planner fails. Reject the incompatible
+        // configuration rather than silently changing the requested model.
+        assert!(
+            !(l1_active && config.planner_horizon > 0 && config.per_option_heads),
+            "per_option_heads=true is incompatible with option-aware planning; \
+             set per_option_heads=false or planner_horizon=0"
+        );
+        assert!(
+            !(config.end_to_end_encoder
+                && config.planner_horizon > 0
+                && (config.planner_policy_mix > 0.0 || l1_active)),
+            "end_to_end_encoder uses a separate policy latent space and cannot \
+             guide world-model planning; disable policy guidance/options, or \
+             use the shared WM encoder policy path"
+        );
 
         // L0 policy graph — `z` is just the encoder latent. When L1 is
         // active, the graph also takes a one-hot `option_onehot` input
@@ -3493,8 +3717,8 @@ impl Agent {
         // Policy graph's batch_size covers the rollout: `lanes ×
         // rollout_length` rows per `session.step()`. At the default
         // `rollout_length = 1` this collapses to `lanes`, identical
-        // to the pre-rollout-buffer behavior. Other graphs (WM,
-        // credit, option) stay at `lanes` — they update per env-
+        // to the pre-rollout-buffer behavior. Other graphs (WM and
+        // option) stay at `lanes` — they update per env-
         // step on lane-current state, not on a rollout.
         let rollout_length = config.rollout_length.max(1);
         let policy_batch = config.batch_size * rollout_length;
@@ -3546,7 +3770,7 @@ impl Agent {
             );
             assert!(
                 !config.use_grpo || config.advantage_normalize,
-                "use_grpo requires advantage_normalize = true (cross-lane \
+                "use_grpo requires advantage_normalize = true (within-task \
                  mean/std normalization IS the GRPO advantage definition)"
             );
             let g = if is_discrete && config.end_to_end_encoder && config.use_kl_ppo {
@@ -3634,10 +3858,27 @@ impl Agent {
                     config.value_loss_coef,
                     config.value_clip_scale,
                 )
+            } else if config.end_to_end_encoder {
+                policy::build_continuous_policy_graph_e2e(
+                    OBS_TOKEN_DIM,
+                    TASK_DIM,
+                    MAX_ACTION_DIM,
+                    continuous_dim,
+                    config.hidden_dim,
+                    config.latent_dim,
+                    policy_batch,
+                    config.num_options,
+                    config.per_option_heads,
+                    config.value_loss_coef,
+                    config.value_clip_scale,
+                    config.recon_loss_coef,
+                    config.reward_pred_loss_coef,
+                )
             } else {
                 policy::build_continuous_policy_graph(
                     config.latent_dim,
                     MAX_ACTION_DIM,
+                    continuous_dim,
                     config.hidden_dim,
                     policy_batch,
                     config.num_options,
@@ -3660,22 +3901,6 @@ impl Agent {
             s
         };
 
-        // L1 credit-assigner session — only built when L1 is active
-        // and the user asked for a non-degenerate history window.
-        let mut option_credit_session = if l1_active && config.option_history_len >= 2 {
-            let g = credit::build_option_credit_graph(
-                config.latent_dim,
-                config.num_options,
-                config.option_history_len,
-                config.hidden_dim,
-            );
-            let mut s = build_session(&g, config.opt_level, &gpu);
-            init_parameters(&mut s);
-            Some(s)
-        } else {
-            None
-        };
-
         // M7 approach-reward state. Constructed only when
         // `approach_reward_alpha > 0`. Cheap CPU data structure.
         // Coord-action head. Constructed only when
@@ -3683,12 +3908,12 @@ impl Agent {
         let coord_head = if config.coord_action_alpha > 0.0 {
             let lr = config.coord_lr.unwrap_or(config.learning_rate * 0.3);
             Some(coord::CoordHead::new(
-                config.latent_dim,
+                OBS_TOKEN_DIM + TASK_DIM,
                 config.coord_hidden_dim,
                 config.batch_size,
                 lr,
                 config.coord_sigma,
-                0xC001_0D25_DECA_FBADu64 ^ (config.batch_size as u64).wrapping_mul(0x9E37_79B9),
+                0xC001_0D25_DECA_FBADu64,
             ))
         } else {
             None
@@ -3780,7 +4005,7 @@ impl Agent {
         let planner = if config.planner_horizon > 0 {
             Some(planner::WmRollout::new(
                 config.latent_dim,
-                MAX_ACTION_DIM,
+                WM_ACTION_DIM,
                 config.hidden_dim,
             ))
         } else {
@@ -3863,7 +4088,7 @@ impl Agent {
         let kstep_z_target_scratch = kstep_z_scratch.clone();
         let kstep_action_scratch_per_step = if config.wm_kstep_k > 1 {
             (0..config.wm_kstep_k)
-                .map(|_| vec![0.0f32; config.wm_kstep_batch.max(1) * MAX_ACTION_DIM])
+                .map(|_| vec![0.0f32; config.wm_kstep_batch.max(1) * WM_ACTION_DIM])
                 .collect()
         } else {
             Vec::new()
@@ -3904,7 +4129,7 @@ impl Agent {
             None
         };
         let planner_z_scratch = vec![0.0f32; planner_batch * config.latent_dim];
-        let planner_action_scratch = vec![0.0f32; planner_batch * MAX_ACTION_DIM];
+        let planner_action_scratch = vec![0.0f32; planner_batch * WM_ACTION_DIM];
         let planner_option_onehot_scratch = if config.num_options >= 2 && config.planner_horizon > 0
         {
             vec![0.0f32; planner_batch * config.num_options]
@@ -3938,7 +4163,7 @@ impl Agent {
         let planner_param_dim = config
             .hidden_dim
             .max(config.latent_dim)
-            .max(MAX_ACTION_DIM)
+            .max(WM_ACTION_DIM)
             .max(config.num_options.max(1))
             .max(config.value_head_hidden_dim);
         let planner_param_buf = vec![0.0f32; planner_param_dim * planner_param_dim];
@@ -3986,13 +4211,7 @@ impl Agent {
             wm_session.set_grad_clip_every(every);
             policy_session.set_grad_clip_norm(n);
             policy_session.set_grad_clip_every(every);
-            credit_session.set_grad_clip_norm(n);
-            credit_session.set_grad_clip_every(every);
             if let Some(ref mut s) = option_session {
-                s.set_grad_clip_norm(n);
-                s.set_grad_clip_every(every);
-            }
-            if let Some(ref mut s) = option_credit_session {
                 s.set_grad_clip_norm(n);
                 s.set_grad_clip_every(every);
             }
@@ -4004,64 +4223,66 @@ impl Agent {
         // for every env id present in the initial lane set.
         let mut task_embeddings: HashMap<u32, Vec<f32>> = HashMap::new();
         for adapter in &adapters {
-            task_embeddings
-                .entry(adapter.id())
-                .or_insert_with(|| embedding_for(adapter.id(), TASK_DIM));
+            task_embeddings.entry(adapter.id()).or_insert_with(|| {
+                embedding_for(adapter.id(), TASK_DIM, config.orthogonal_task_codes)
+            });
         }
 
-        // Build per-lane state. Each lane gets a lane-index-seeded reward
-        // circuit so per-lane order digests don't collide across lanes.
+        // Build per-lane state. Lanes for the same task share the reward
+        // circuit projection seed so synchronous forks receive comparable
+        // intrinsic rewards; recurrent digest state remains lane-local.
         let lanes: Vec<Lane> = adapters
             .into_iter()
-            .enumerate()
-            .map(|(i, adapter)| Lane {
-                adapter,
-                buffer: ExperienceBuffer::with_visit_count_config(
-                    config.buffer_capacity,
-                    config.grid_resolution,
-                    config.visit_counts_max,
-                    config.visit_count_dims,
-                    config.visit_count_proj_dim,
-                    config.visit_count_proj_seed,
-                ),
-                reward_circuit: RewardCircuit::with_seed(
-                    config.reward_weights.clone(),
-                    0xA11CE ^ i as u64,
-                ),
-                pending_boundary: false,
-                cached_action: None,
-                repeats_left: 0,
-                current_option: 0,
-                option_goal: vec![0.0; option_dim],
-                option_steps_left: 0, // triggers initial option sample
-                option_elapsed: 0,
-                option_return: 0.0,
-                option_start_value: 0.0,
-                option_start_z: vec![0.0; config.latent_dim],
-                option_history: OptionHistory::new(config.option_history_len.max(1)),
-                last_value: 0.0,
-                last_prob_taken: 1.0,
-                pred_error_ema: 0.0,
-                last_logits: vec![0.0; MAX_ACTION_DIM],
-                last_entropy: 0.0,
-                last_surprise: 0.0,
-                confidence: 0.5,
-                last_novelty: 0.0,
-                last_homeo: 0.0,
-                last_order: 0.0,
-                last_reward: 0.0,
-                last_base_reward: 0.0,
-                outcome_ep_trajectory: Vec::new(),
-                outcome_ep_return: 0.0,
-                last_episode_return: 0.0,
-                sil_ep_return: 0.0,
-                sil_ep_event_count: 0,
-                outcome_last_step_reward: 0.0,
-                outcome_ep_step_rewards: Vec::new(),
-                prev_r_hat: 0.0,
-                outcome_baseline: 0.0,
-                last_r_hat: 0.0,
-                outcome_baseline_seeded: false,
+            .map(|adapter| {
+                let reward_seed = 0xA11CE ^ adapter.id() as u64;
+                Lane {
+                    adapter,
+                    buffer: ExperienceBuffer::with_visit_count_config(
+                        config.buffer_capacity,
+                        config.grid_resolution,
+                        config.visit_counts_max,
+                        config.visit_count_dims,
+                        config.visit_count_proj_dim,
+                        config.visit_count_proj_seed,
+                    ),
+                    reward_circuit: RewardCircuit::with_seed(
+                        config.reward_weights.clone(),
+                        reward_seed,
+                    ),
+                    pending_boundary: false,
+                    cached_action: None,
+                    repeats_left: 0,
+                    current_option: 0,
+                    option_goal: vec![0.0; option_dim],
+                    option_steps_left: 0, // triggers initial option sample
+                    option_elapsed: 0,
+                    option_return: 0.0,
+                    option_start_value: 0.0,
+                    option_start_z: vec![0.0; config.latent_dim],
+                    last_value: 0.0,
+                    last_prob_taken: 1.0,
+                    pred_error_ema: 0.0,
+                    last_logits: vec![0.0; MAX_ACTION_DIM],
+                    last_entropy: 0.0,
+                    last_surprise: 0.0,
+                    confidence: 0.5,
+                    last_novelty: 0.0,
+                    last_homeo: 0.0,
+                    last_order: 0.0,
+                    last_reward: 0.0,
+                    last_base_reward: 0.0,
+                    outcome_ep_trajectory: Vec::new(),
+                    outcome_ep_return: 0.0,
+                    last_episode_return: 0.0,
+                    sil_ep_return: 0.0,
+                    sil_ep_event_count: 0,
+                    outcome_last_step_reward: 0.0,
+                    outcome_ep_step_rewards: Vec::new(),
+                    prev_r_hat: 0.0,
+                    outcome_baseline: 0.0,
+                    last_r_hat: 0.0,
+                    outcome_baseline_seeded: false,
+                }
             })
             .collect();
 
@@ -4074,22 +4295,18 @@ impl Agent {
             efficientnet_input_size_bytes,
             efficientnet_output_buf,
             v2s_preprocess,
-            credit_session,
             policy_session,
             option_session,
-            option_credit_session,
             latent_dim: config.latent_dim,
             step_count: 0,
             probe_obs: None,
             probe_reference: None,
             last_wm_loss: 0.0,
-            last_credit_loss: 0.0,
+            last_recon_loss: 0.0,
             last_policy_loss: 0.0,
             policy_update_ticks: 0,
             policy_loss_ema: 0.0,
             last_replay_loss: 0.0,
-            last_option_credit_loss: 0.0,
-            last_h_eff_l1: 0.0,
             last_drift: 0.0,
             encoder_lr_scale: 1.0,
             batch_lr_scale: (config.batch_size as f32).sqrt(),
@@ -4102,6 +4319,11 @@ impl Agent {
                 * config.encoder_kind.visual_dim()
                 * std::mem::size_of::<f32>(),
             action_token_scratch: vec![0.0; n * MAX_ACTION_DIM],
+            wm_action_token_scratch: vec![0.0; n * WM_ACTION_DIM],
+            action_parameter_scratch: vec![0.0; n * ACTION_PARAMETER_DIM],
+            action_parameter_active: vec![false; n],
+            action_parameter_masks: vec![false; n * MAX_ACTION_DIM],
+            last_planned_action_parameters: vec![None; n],
             z_target_scratch: vec![0.0; n * config.latent_dim],
             task_scratch: vec![0.0; obs_scratch_rows * TASK_DIM],
             // Policy-session inputs are sized for the expanded rollout
@@ -4114,6 +4336,7 @@ impl Agent {
             value_target_scratch: vec![0.0; policy_batch],
             policy_action_scratch: vec![0.0; policy_batch * MAX_ACTION_DIM],
             policy_action_mask_scratch: vec![1.0; policy_batch * MAX_ACTION_DIM],
+            policy_action_mask_input_present: is_discrete,
             policy_z_scratch: vec![0.0; policy_batch * config.latent_dim],
             ppo_advantage_scratch: vec![0.0; policy_batch],
             ppo_old_prob_scratch: vec![1.0; policy_batch],
@@ -4126,7 +4349,8 @@ impl Agent {
             // The KL-PPO graph variant doesn't include the entropy
             // regularization branch (no entropy_beta input), so gate
             // it out here too.
-            entropy_beta_input_present: config.end_to_end_encoder
+            entropy_beta_input_present: is_discrete
+                && config.end_to_end_encoder
                 && config.entropy_beta > 0.0
                 && !config.use_kl_ppo,
             // Input is built only when use_kl_ppo + kl_beta > 0.
@@ -4163,7 +4387,7 @@ impl Agent {
             last_diayn_reward: 0.0,
             coord_head,
             coord_last_reward: vec![0.0; n],
-            coord_reward_baseline: 0.0,
+            coord_reward_baseline: vec![0.0; n],
             delta_goal_bank,
             delta_goal_prev_latent: (0..n).map(|_| None).collect(),
             last_delta_goal_events: 0,
@@ -4198,14 +4422,14 @@ impl Agent {
             planner_queue: (0..n).map(|_| std::collections::VecDeque::new()).collect(),
             planner_calls_since_refresh: 0,
             extrinsic_reward: vec![0.0; n],
+            extrinsic_event: vec![None; n],
             intrinsic_progress_reward: vec![0.0; n],
             last_empowerment: vec![0.0; n],
             goal_states: hashbrown::HashMap::new(),
             subgoal_centroids: hashbrown::HashMap::new(),
-            action_masks: vec![1.0; n * MAX_ACTION_DIM],
+            action_masks: initial_action_masks,
             sil_buffer: std::collections::VecDeque::with_capacity(config.sil_buffer_capacity),
-            sil_baseline: 0.0,
-            sil_baseline_initialized: false,
+            sil_baselines: hashbrown::HashMap::new(),
             sil_updates_attempted: 0,
             sil_updates_fired: 0,
             replan_clears: 0,
@@ -4263,12 +4487,13 @@ impl Agent {
         // ended — they were planned from a now-dead latent and would
         // otherwise be blindly played into the fresh episode.
         self.planner_queue[lane_idx].clear();
+        self.last_planned_action_parameters[lane_idx] = None;
     }
 
     /// Swap the active adapter on one lane. Preserves all learned
     /// parameters; the next transition stored on that lane is marked as
-    /// an env boundary so the world model and credit assigner don't try
-    /// to attribute dynamics or reward across the switch. Other lanes
+    /// an env boundary so the world model and return estimators do not
+    /// cross the switch. Other lanes
     /// are unaffected.
     ///
     /// A new env's task embedding is lazily initialized on first sight;
@@ -4276,9 +4501,10 @@ impl Agent {
     /// vector, preserving the encoder's per-env specialization.
     pub fn switch_lane(&mut self, lane_idx: usize, adapter: Box<dyn EnvAdapter>) {
         let incoming_id = adapter.id();
+        let orthogonal_task_codes = self.config.orthogonal_task_codes;
         self.task_embeddings
             .entry(incoming_id)
-            .or_insert_with(|| embedding_for(incoming_id, TASK_DIM));
+            .or_insert_with(|| embedding_for(incoming_id, TASK_DIM, orthogonal_task_codes));
 
         let lane = &mut self.lanes[lane_idx];
         lane.adapter = adapter;
@@ -4289,6 +4515,9 @@ impl Agent {
         // Queued planner actions were planned for the OUTGOING env —
         // playing them into the incoming one would be nonsense.
         self.planner_queue[lane_idx].clear();
+        self.last_planned_action_parameters[lane_idx] = None;
+        self.action_parameter_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM]
+            .fill(false);
     }
 
     /// Env id of the adapter currently bound to `lane_idx`.
@@ -4304,6 +4533,22 @@ impl Agent {
     /// signature to match the multi-lane contract and to make room for a
     /// future obs-conditioned exploration policy.
     pub fn act<R: Rng>(&mut self, observations: &[Observation], rng: &mut R) -> Vec<Action> {
+        self.act_with_mode(observations, rng, false)
+    }
+
+    /// Select the highest-logit discrete action (or continuous mean) instead of
+    /// sampling. Planner queues and action persistence still take precedence.
+    /// This is intended for evaluation, not exploration.
+    pub fn act_greedy<R: Rng>(&mut self, observations: &[Observation], rng: &mut R) -> Vec<Action> {
+        self.act_with_mode(observations, rng, true)
+    }
+
+    fn act_with_mode<R: Rng>(
+        &mut self,
+        observations: &[Observation],
+        rng: &mut R,
+        greedy: bool,
+    ) -> Vec<Action> {
         let n = self.lanes.len();
         assert_eq!(
             observations.len(),
@@ -4507,42 +4752,21 @@ impl Agent {
                     }
                 }
 
-                // --- Record each terminated option into its lane's
-                // history and, if L1 credit is enabled, run one credit
-                // forward+backward pass on the resulting window. The
-                // option's `z_start` was captured at its last
-                // resample; `option_elapsed` tracks the realized
-                // length even when learned-termination fires early.
+                // Update each terminated option's continuous goal prototype.
                 let ema_rate = self.config.goal_ema_rate;
                 for &i in &lanes_to_terminate {
                     let lane = &mut self.lanes[i];
-                    if lane.option_elapsed > 0 {
-                        let entry = OptionEntry {
-                            z_start: lane.option_start_z.clone(),
-                            option_idx: lane.current_option,
-                            option_return: lane.option_return,
-                            option_length: lane.option_elapsed,
-                        };
-                        lane.option_history.push(entry);
-
-                        // Tier-3 continuous goal prototype: pull the
-                        // just-terminated option's goal toward the
-                        // observed end-state latent. Uses the first
-                        // `copy_dim` dims of z (the goal vector lives
-                        // in R^{option_dim}, which may be ≤ latent_dim).
-                        if ema_rate > 0.0 {
-                            let old_opt = lane.current_option as usize;
-                            let z_end = &z_stack[i * ld..(i + 1) * ld];
-                            let base = old_opt * od;
-                            let copy_dim = od.min(ld);
-                            let goal = &mut self.goal_table[base..base + od];
-                            for k in 0..copy_dim {
-                                goal[k] += ema_rate * (z_end[k] - goal[k]);
-                            }
+                    if lane.option_elapsed > 0 && ema_rate > 0.0 {
+                        let old_opt = lane.current_option as usize;
+                        let z_end = &z_stack[i * ld..(i + 1) * ld];
+                        let base = old_opt * od;
+                        let copy_dim = od.min(ld);
+                        let goal = &mut self.goal_table[base..base + od];
+                        for k in 0..copy_dim {
+                            goal[k] += ema_rate * (z_end[k] - goal[k]);
                         }
                     }
                 }
-                self.option_credit_step(rng, &lanes_to_terminate);
 
                 // --- Sample new option for each terminated lane ---
                 for &i in &lanes_to_terminate {
@@ -4554,9 +4778,6 @@ impl Agent {
                     lane.option_steps_left = horizon;
                     lane.option_elapsed = 0;
                     lane.option_return = 0.0;
-                    // Capture `z_start` for this new option from the
-                    // current z_stack row — this is the latent we just
-                    // computed above and will begin this option from.
                     let z_row = &z_stack[i * ld..(i + 1) * ld];
                     lane.option_start_z.clear();
                     lane.option_start_z.extend_from_slice(z_row);
@@ -4620,9 +4841,9 @@ impl Agent {
 
         // The policy graph's `action`/`action_mask` inputs are sized
         // for the rollout batch (`lanes × rollout_length` rows), while
-        // `action_token_scratch` is the WM session's `lanes`-row
-        // buffer — feeding it here panicked on the byte-size check for
-        // any `rollout_length > 1`. Use the policy-batch scratches.
+        // `action_token_scratch` is only the collection batch's `lanes`-row
+        // discrete-label buffer — feeding it here panicked on the byte-size
+        // check for any `rollout_length > 1`. Use the policy-batch scratches.
         self.policy_action_scratch.fill(0.0);
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
@@ -4632,7 +4853,7 @@ impl Agent {
         // mismatch here is harmless beyond the per-lane sampling — but
         // keeping it consistent avoids surprises when the same graph
         // is reused for training in `policy_step_batched`.
-        if self.config.use_ppo {
+        if self.policy_action_mask_input_present {
             self.populate_policy_action_mask_scratch();
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
@@ -4649,20 +4870,20 @@ impl Agent {
             self.policy_session
                 .set_input("old_logits", &self.kl_old_logits_scratch);
         }
-        // PPO graph requires `advantage` and `old_prob_taken` inputs.
+        // PPO and continuous graphs require an `advantage` input.
         // act() doesn't read the loss output but the forward pass still
-        // computes the policy_loss subgraph, which divides by
-        // old_prob_taken — leaving it at the buffer default (0) on the
-        // very first act() produces Inf/NaN that propagates and trips
-        // the watchdog on the first training step. Zero advantage and
-        // unit old_prob keep the PPO subgraph well-defined here.
-        if self.config.use_ppo {
+        // computes their policy-loss subgraphs. Zero advantage makes those
+        // loss terms inert. PPO additionally needs a unit old probability to
+        // keep its ratio finite.
+        if self.config.use_ppo || !self.policy_action_mask_input_present {
             self.ppo_advantage_scratch.fill(0.0);
+            self.policy_session
+                .set_input("advantage", &self.ppo_advantage_scratch);
+        }
+        if self.config.use_ppo {
             for v in self.ppo_old_prob_scratch.iter_mut() {
                 *v = 1.0;
             }
-            self.policy_session
-                .set_input("advantage", &self.ppo_advantage_scratch);
             self.policy_session
                 .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
         }
@@ -4749,16 +4970,34 @@ impl Agent {
             // the policy head. Skips action_repeat accounting — a
             // planned sequence is semantically one committed plan,
             // not independent samples to repeat.
-            let queued = self.planner_queue[i].pop_front();
-            let action = if let Some(a) = queued {
-                let act = Action::Discrete(a as usize);
+            let mut queued = self.planner_queue[i].pop_front();
+            if any_valid
+                && queued.is_some_and(|planned| {
+                    let idx = planned.action as usize;
+                    idx >= MAX_ACTION_DIM || mask_row[idx] < 0.5
+                })
+            {
+                // Availability can change after every environment step. A
+                // stale queued action would otherwise be executed despite the
+                // current mask, corrupting PPO's acted-action probability and
+                // possibly applying coordinates to a substituted action.
+                queued = None;
+                self.planner_queue[i].clear();
+            }
+            self.last_planned_action_parameters[i] = queued.and_then(|p| p.parameters);
+            let action = if let Some(planned) = queued {
+                let act = Action::Discrete(planned.action as usize);
                 lane.cached_action = Some(act.clone());
                 lane.repeats_left = 0;
                 act
             } else {
                 let resample = lane.repeats_left == 0 || lane.cached_action.is_none();
                 if resample {
-                    let a = lane.adapter.sample_action(head, rng);
+                    let a = if greedy {
+                        greedy_policy_action(lane.adapter.action_kind(), head)
+                    } else {
+                        lane.adapter.sample_action(head, rng)
+                    };
                     lane.cached_action = Some(a.clone());
                     lane.repeats_left = action_repeat - 1;
                     a
@@ -4827,10 +5066,24 @@ impl Agent {
         envs: &[&dyn Environment],
         rng: &mut R,
     ) {
+        let homeostatic = envs
+            .iter()
+            .map(|env| env.homeostatic_variables())
+            .collect::<Vec<_>>();
+        self.observe_with_homeostatic(observations, actions, &homeostatic, rng);
+    }
+
+    fn observe_with_homeostatic<R: Rng>(
+        &mut self,
+        observations: &[Observation],
+        actions: &[Action],
+        homeostatic: &[&[crate::env::HomeostaticVariable]],
+        rng: &mut R,
+    ) {
         let n = self.lanes.len();
         assert_eq!(observations.len(), n, "observations.len() must equal N");
         assert_eq!(actions.len(), n, "actions.len() must equal N");
-        assert_eq!(envs.len(), n, "envs.len() must equal N");
+        assert_eq!(homeostatic.len(), n, "homeostatic.len() must equal N");
 
         let ld = self.latent_dim;
 
@@ -4863,13 +5116,19 @@ impl Agent {
                 None => task_row.fill(0.0),
             }
         }
+        self.stage_wm_action_tokens();
 
         // --- One batched WM forward+backward ---
-        let wm_loss = self.wm_forward_backward_stacked(
+        let optimization_loss = self.wm_forward_backward_stacked(
             self.config.learning_rate * self.encoder_lr_scale * self.batch_lr_scale,
         );
-        if wm_loss.is_finite() {
-            self.last_wm_loss = wm_loss;
+        if optimization_loss.is_finite() {
+            let mut dynamics_loss = [0.0f32];
+            let mut recon_loss = [0.0f32];
+            self.wm_session.read_output_by_index(4, &mut dynamics_loss);
+            self.wm_session.read_output_by_index(5, &mut recon_loss);
+            self.last_wm_loss = dynamics_loss[0];
+            self.last_recon_loss = recon_loss[0];
         } else {
             log::warn!(
                 "WM loss went non-finite at step {}, re-initialized WM params",
@@ -4877,6 +5136,7 @@ impl Agent {
             );
             init_parameters(&mut self.wm_session);
             self.last_wm_loss = 0.0;
+            self.last_recon_loss = 0.0;
         }
 
         // Read stacked z_t output [N, latent_dim] and per-lane
@@ -4988,6 +5248,19 @@ impl Agent {
             .unwrap_or(0);
         let ring_mult = self.config.surprise_replay_mult.max(1.0);
         let mut ring_admits: Vec<(usize, f32)> = Vec::new();
+        // Score every synchronous lane against the same RND predictor
+        // snapshot, then update it as one batch. Calling `step` inside the
+        // lane loop made curiosity depend on iteration order.
+        let rnd_mses = if let Some(state) = rnd_state.as_mut() {
+            let rows: Vec<&[f32]> = self
+                .obs_token_scratch
+                .chunks_exact(OBS_TOKEN_DIM)
+                .take(n)
+                .collect();
+            state.step_batch(&rows)
+        } else {
+            vec![0.0; n]
+        };
         for (i, lane) in self.lanes.iter_mut().enumerate() {
             let z_row = &z_stack[i * ld..(i + 1) * ld];
             let obs_row = &self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
@@ -5032,7 +5305,7 @@ impl Agent {
 
             let visit_count = lane.buffer.visit_count(z_row);
             let novelty = RewardCircuit::novelty(visit_count);
-            let homeo_raw = RewardCircuit::homeostatic(envs[i].homeostatic_variables());
+            let homeo_raw = RewardCircuit::homeostatic(homeostatic[i]);
             // M7↔homeo confidence taper: once M7 has confidence,
             // reduce the homeo contribution so M7's approach signal
             // isn't dominated by homeo's (potentially misaligned)
@@ -5171,74 +5444,38 @@ impl Agent {
                 lane.outcome_ep_trajectory.clear();
                 // Snapshot the just-completed episode return for GRPO
                 // per-episode advantage mode before resetting.
-                lane.last_episode_return = lane.outcome_ep_return;
+                lane.last_episode_return = lane.sil_ep_return;
                 // SIL: push successful episode's transitions into the
                 // replay buffer. "Successful" = return strictly above
                 // the EMA baseline of recent episode returns.
                 // Uses sil_ep_return (full reward incl. extrinsic), NOT
                 // outcome_ep_return (only intrinsic) — see Lane field doc.
-                if self.config.use_sil {
+                if self.config.use_sil
+                    && !(self.config.sil_event_filter && self.config.sil_event_horizon > 0)
+                {
                     let ep_ret = lane.sil_ep_return;
-                    let baseline_pass = if !self.sil_baseline_initialized {
-                        // First episode: initialize baseline, don't push
-                        self.sil_baseline = ep_ret;
-                        self.sil_baseline_initialized = true;
-                        false
-                    } else {
-                        ep_ret > self.sil_baseline
-                    };
-                    let event_pass = !self.config.sil_event_filter || lane.sil_ep_event_count > 0;
-                    let push = baseline_pass && event_pass;
+                    let event_success = lane.sil_ep_event_count > 0;
+                    let push = admit_sil_episode_for_env(
+                        &mut self.sil_baselines,
+                        lane.adapter.id(),
+                        ep_ret,
+                        event_success,
+                        self.config.sil_event_filter,
+                        self.config.sil_baseline_decay,
+                    );
                     if push {
-                        let blen = lane.buffer.len();
-                        if blen > 0 {
-                            let vtc = self.config.value_target_clamp;
-                            // Walk back from terminal, accumulating
-                            // undiscounted R-to-go per transition.
-                            let mut r_acc = 0.0f32;
-                            let mut idx = blen - 1;
-                            loop {
-                                let tr = lane.buffer.get(idx);
-                                if tr.reward.is_finite() {
-                                    r_acc += tr.reward;
-                                }
-                                let action_idx =
-                                    tr.action.iter().position(|&v| v > 0.5).unwrap_or(0);
-                                let v_at_collect =
-                                    if tr.value.is_finite() { tr.value } else { 0.0 };
-                                // The state the action was taken FROM is
-                                // the previous record. The episode's
-                                // first record (env_boundary, or buffer
-                                // start) has no in-episode predecessor —
-                                // accumulate its reward into r_to_go but
-                                // don't push a sample for it.
-                                if !tr.env_boundary && idx > 0 {
-                                    if self.sil_buffer.len() >= self.config.sil_buffer_capacity {
-                                        self.sil_buffer.pop_front();
-                                    }
-                                    let from = lane.buffer.get(idx - 1);
-                                    self.sil_buffer.push_back(SilSample {
-                                        obs: from.observation.clone(),
-                                        z: from.latent.clone(),
-                                        action_idx,
-                                        r_to_go: r_acc.clamp(-vtc, vtc),
-                                        v_at_collect,
-                                        env_id: tr.env_id,
-                                    });
-                                }
-                                if tr.env_boundary {
-                                    break;
-                                }
-                                if idx == 0 {
-                                    break;
-                                }
-                                idx -= 1;
-                            }
-                        }
+                        let samples = sil_samples_from_recent_trajectory(
+                            &lane.buffer,
+                            usize::MAX,
+                            event_success,
+                            self.config.value_target_clamp,
+                        );
+                        append_sil_samples(
+                            &mut self.sil_buffer,
+                            samples,
+                            self.config.sil_buffer_capacity,
+                        );
                     }
-                    // EMA-update baseline regardless of push.
-                    let d = self.config.sil_baseline_decay;
-                    self.sil_baseline = d * self.sil_baseline + (1.0 - d) * ep_ret;
                 }
                 // Retroactively annotate the just-completed episode's
                 // transitions in lane.buffer with their episode_return
@@ -5478,8 +5715,8 @@ impl Agent {
             // quickly on any z — killing RND's signal. The obs
             // token carries more raw variation across frames, so
             // MSE stays informative longer.
-            let rnd_reward = if let Some(state) = rnd_state.as_mut() {
-                let mse = state.step(obs_row);
+            let rnd_reward = if rnd_state.is_some() {
+                let mse = rnd_mses[i];
                 rnd_mse_sum += mse;
                 rnd_mse_count += 1;
                 rnd_alpha * mse
@@ -5569,6 +5806,7 @@ impl Agent {
             // kindle's intrinsic primitives. Harness sets
             // `self.extrinsic_reward[i]` via `set_extrinsic_reward`
             // before calling observe; we consume and zero it here.
+            let ext_event = is_task_event(self.extrinsic_event[i].take(), self.extrinsic_reward[i]);
             let ext_reward = ext_alpha * self.extrinsic_reward[i];
             self.extrinsic_reward[i] = 0.0;
 
@@ -5577,7 +5815,7 @@ impl Agent {
             // per-step reward sum (consumed by SIL accumulator and
             // policy training) BUT does NOT increment
             // `sil_ep_event_count` — that's reserved for real
-            // extrinsic events. This keeps the win-classifier's
+            // task events. This keeps the win-classifier's
             // is_win label clean: a "win episode" still means an
             // episode with a real event, not just one with high
             // intermediate progress.
@@ -5604,14 +5842,10 @@ impl Agent {
             // — SIL needs the actual gym/env signal to gate "successful
             // episode" pushes.
             lane.sil_ep_return += reward;
-            // Count extrinsic-reward events this episode for the
-            // optional `sil_event_filter` SIL push gate. We use the
-            // pre-alpha `self.extrinsic_reward[i]` value... but it was
-            // already zeroed above. Use `ext_reward > 0` as the proxy:
-            // since alpha is positive (gated by `ext_alpha > 0`
-            // logically), ext_reward > 0 iff the harness set a
-            // positive extrinsic this step.
-            if ext_reward > 0.0 {
+            // Count explicit task success or a legacy positive reward pulse.
+            // Success is not synonymous with positive reward: Gymnasium
+            // MountainCar, for example, terminates successfully on a -1 step.
+            if ext_event {
                 lane.sil_ep_event_count += 1;
                 // Confidence: a validated extrinsic event raises C.
                 // This is the ONLY signal that increases confidence.
@@ -5669,8 +5903,12 @@ impl Agent {
                 observation: obs_row.to_vec(),
                 latent: z_row.to_vec(),
                 action: act_row.to_vec(),
+                action_parameters: self.wm_action_token_scratch
+                    [i * WM_ACTION_DIM + MAX_ACTION_DIM..(i + 1) * WM_ACTION_DIM]
+                    .to_vec(),
+                action_mask: self.action_masks[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM]
+                    .to_vec(),
                 reward,
-                credit: 0.0,
                 pred_error,
                 value: lane.last_value,
                 prob_taken: lane.last_prob_taken,
@@ -5685,6 +5923,29 @@ impl Agent {
                 episode_return: 0.0,
                 episode_complete: false,
             });
+
+            // Continuing tasks often expose a meaningful credit boundary long
+            // before environment termination. Retain a bounded backward window
+            // immediately at the positive event, without marking a fake reset
+            // or cutting world-model continuity. Episode-level event SIL is
+            // disabled when this mode is active, avoiding duplicate replay.
+            if ext_event
+                && self.config.use_sil
+                && self.config.sil_event_filter
+                && self.config.sil_event_horizon > 0
+            {
+                let samples = sil_samples_from_recent_trajectory(
+                    &lane.buffer,
+                    self.config.sil_event_horizon,
+                    true,
+                    self.config.value_target_clamp,
+                );
+                append_sil_samples(
+                    &mut self.sil_buffer,
+                    samples,
+                    self.config.sil_buffer_capacity,
+                );
+            }
 
             lane.last_surprise = surprise;
             lane.last_novelty = novelty;
@@ -5747,8 +6008,8 @@ impl Agent {
                         )
                     }
                     .to_vec();
-                    let action = self.action_token_scratch
-                        [i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM]
+                    let action = self.wm_action_token_scratch
+                        [i * WM_ACTION_DIM..(i + 1) * WM_ACTION_DIM]
                         .to_vec();
                     let z_prev = self.z_target_scratch[i * ld_..(i + 1) * ld_].to_vec();
                     let obs =
@@ -5796,13 +6057,6 @@ impl Agent {
         self.last_delta_goal_events = dg_events_this_step;
         self.xeps_memory = xeps_memory;
 
-        // --- Credit assignment (per-lane, sequential CPU-light dispatches) ---
-        for i in 0..n {
-            if self.lanes[i].buffer.len() >= self.config.history_len {
-                self.credit_step(i, rng);
-            }
-        }
-
         // --- Policy + value training (one batched dispatch over all lanes) ---
         //
         // Gate is applied per-lane via the reward/advantage signal. Lanes
@@ -5811,6 +6065,22 @@ impl Agent {
         // single graph dispatch.
         if self.step_count >= self.config.warmup_steps {
             self.policy_step_batched();
+            // SIL is an independent replay update: it must still run when the
+            // current on-policy batch has zero advantage. Keeping this call
+            // inside the successful policy-gradient paths made all n_step=1
+            // agents silently skip SIL and made PPO run it once per epoch.
+            let sil_interval = if self.config.n_step >= 2 {
+                if self.config.rollout_length > 1 {
+                    self.config.rollout_length
+                } else {
+                    self.config.policy_update_interval.max(1)
+                }
+            } else {
+                1
+            };
+            if (self.step_count + 1).is_multiple_of(sil_interval) {
+                self.maybe_run_sil_update();
+            }
         }
 
         // --- Replay mixing: one batched replay per call, one transition
@@ -5929,14 +6199,14 @@ impl Agent {
                     // uses tr[t+1+i].action (previously `t + i`: every
                     // kstep window was trained with the action sequence
                     // shifted one step into the past).
-                    let act = &lane.buffer.get(t + 1 + i).action;
+                    let transition = lane.buffer.get(t + 1 + i);
                     let dst_a = &mut self.kstep_action_scratch_per_step[i]
-                        [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
-                    let alen = act.len().min(MAX_ACTION_DIM);
-                    dst_a[..alen].copy_from_slice(&act[..alen]);
-                    if alen < MAX_ACTION_DIM {
-                        dst_a[alen..].fill(0.0);
-                    }
+                        [row * WM_ACTION_DIM..(row + 1) * WM_ACTION_DIM];
+                    compose_wm_action_token(
+                        &transition.action,
+                        &transition.action_parameters,
+                        dst_a,
+                    );
                 }
                 found = true;
                 staged += 1;
@@ -5964,8 +6234,8 @@ impl Agent {
                 .copy_within(donor * ld..(donor + 1) * ld, row * ld);
             for i in 0..k {
                 self.kstep_action_scratch_per_step[i].copy_within(
-                    donor * MAX_ACTION_DIM..(donor + 1) * MAX_ACTION_DIM,
-                    row * MAX_ACTION_DIM,
+                    donor * WM_ACTION_DIM..(donor + 1) * WM_ACTION_DIM,
+                    row * WM_ACTION_DIM,
                 );
             }
         }
@@ -5981,7 +6251,7 @@ impl Agent {
         let wm_params: [(&str, usize); 6] = [
             ("world_model.z_proj.weight", ld_ * hd_),
             ("world_model.z_proj.bias", hd_),
-            ("world_model.a_proj.weight", MAX_ACTION_DIM * hd_),
+            ("world_model.a_proj.weight", WM_ACTION_DIM * hd_),
             ("world_model.fc2.weight", hd_ * hd_),
             ("world_model.fc2.bias", hd_),
             ("world_model.fc_out.weight", hd_ * ld_),
@@ -5992,7 +6262,7 @@ impl Agent {
         // Without this, the kstep session trains a private lineage
         // from its own random init and the sync-back after the step
         // would overwrite the trained WM with it (including right
-        // after load_state, which doesn't checkpoint this session).
+        // after load_weights, which doesn't checkpoint this session).
         for (name, n_elem) in wm_params.iter() {
             let buf = &mut self.planner_param_buf[..*n_elem];
             self.wm_session.read_param(name, buf);
@@ -6100,7 +6370,7 @@ impl Agent {
         // linger in the device buffers.
         self.obs_token_scratch.fill(0.0);
         self.task_scratch.fill(0.0);
-        self.action_token_scratch.fill(0.0);
+        self.wm_action_token_scratch.fill(0.0);
         self.z_target_scratch.fill(0.0);
 
         // Flip the gates.
@@ -6114,7 +6384,7 @@ impl Agent {
             self.run_efficientnet_v2s();
         }
         self.wm_session
-            .set_input("action", &self.action_token_scratch);
+            .set_input("action", &self.wm_action_token_scratch);
         self.wm_session
             .set_input("z_target", &self.z_target_scratch);
         self.wm_session
@@ -6154,7 +6424,7 @@ impl Agent {
     }
 
     /// Run one world-model forward+backward pass on the currently staged
-    /// `obs_token_scratch` / `action_token_scratch` / `z_target_scratch` /
+    /// `obs_token_scratch` / `wm_action_token_scratch` / `z_target_scratch` /
     /// `task_scratch` inputs. Returns the scalar batch-mean loss.
     ///
     /// obs/task are sliced to the first `lanes` rows: with
@@ -6169,7 +6439,7 @@ impl Agent {
             self.run_efficientnet_v2s();
         }
         self.wm_session
-            .set_input("action", &self.action_token_scratch);
+            .set_input("action", &self.wm_action_token_scratch);
         self.wm_session
             .set_input("z_target", &self.z_target_scratch);
         self.wm_session
@@ -6206,13 +6476,100 @@ impl Agent {
         self.config.value_head_train_coef > 0.0 || self.config.planner_value_alpha > 0.0
     }
 
-    /// Populate the visual-obs buffer for the next `observe()`.
-    ///
-    /// Per-lane extrinsic (env) reward for the NEXT `observe()` call.
-    /// `rewards.len()` must equal `batch_size`. No-op when
-    /// `extrinsic_reward_alpha == 0.0`.
-    ///
-    /// Call between env step and `observe` — the harness is the only
+    /// Stage optional normalized action parameters for the next `observe()`.
+    /// `parameters` is flat `[batch_size × ACTION_PARAMETER_DIM]`; `active`
+    /// selects lanes whose executed action consumed those values. Inactive
+    /// rows get a zero parameter tail. The staging is one-shot and clears
+    /// after `observe`, preventing stale click coordinates from leaking into
+    /// later ordinary actions.
+    pub fn set_action_parameters(&mut self, parameters: &[f32], active: &[bool]) {
+        assert_eq!(
+            parameters.len(),
+            self.action_parameter_scratch.len(),
+            "set_action_parameters: expected {} parameters, got {}",
+            self.action_parameter_scratch.len(),
+            parameters.len()
+        );
+        assert_eq!(
+            active.len(),
+            self.action_parameter_active.len(),
+            "set_action_parameters: expected {} active flags, got {}",
+            self.action_parameter_active.len(),
+            active.len()
+        );
+        for (dst, &src) in self.action_parameter_scratch.iter_mut().zip(parameters) {
+            *dst = if src.is_finite() {
+                src.clamp(-1.0, 1.0)
+            } else {
+                0.0
+            };
+        }
+        self.action_parameter_active.copy_from_slice(active);
+    }
+
+    /// Declare which discrete actions consume the auxiliary parameter tail.
+    /// Flat layout `[batch_size × MAX_ACTION_DIM]`. This is deliberately
+    /// separate from availability: an action may be legal yet unparameterized.
+    /// Changing a lane's declaration invalidates plans built under the old
+    /// action schema, so that lane's queue is cleared.
+    pub fn set_action_parameter_masks(&mut self, masks: &[bool]) {
+        assert_eq!(
+            masks.len(),
+            self.action_parameter_masks.len(),
+            "set_action_parameter_masks: expected {} entries, got {}",
+            self.action_parameter_masks.len(),
+            masks.len()
+        );
+        for lane in 0..self.lanes.len() {
+            let range = lane * MAX_ACTION_DIM..(lane + 1) * MAX_ACTION_DIM;
+            if self.action_parameter_masks[range.clone()] != masks[range.clone()] {
+                self.planner_queue[lane].clear();
+                self.last_planned_action_parameters[lane] = None;
+            }
+        }
+        self.action_parameter_masks.copy_from_slice(masks);
+    }
+
+    /// Reset every action to the unparameterized default.
+    pub fn clear_action_parameter_masks(&mut self) {
+        self.action_parameter_masks.fill(false);
+        for lane in 0..self.lanes.len() {
+            self.planner_queue[lane].clear();
+            self.last_planned_action_parameters[lane] = None;
+        }
+    }
+
+    /// Consume planner-supplied parameters for the actions returned by the
+    /// most recent `act()` call. Each entry is `Some([x, y])` only when that
+    /// action came from a parameterized planner candidate. Calling this before
+    /// `act()` or twice returns `None` for the affected lane.
+    pub fn take_planned_action_parameters(&mut self) -> Vec<Option<[f32; ACTION_PARAMETER_DIM]>> {
+        self.last_planned_action_parameters
+            .iter_mut()
+            .map(Option::take)
+            .collect()
+    }
+
+    /// Compose policy action identities and one-shot parameters into the
+    /// world-model-only action rows.
+    fn stage_wm_action_tokens(&mut self) {
+        for lane in 0..self.lanes.len() {
+            let base =
+                &self.action_token_scratch[lane * MAX_ACTION_DIM..(lane + 1) * MAX_ACTION_DIM];
+            let wm =
+                &mut self.wm_action_token_scratch[lane * WM_ACTION_DIM..(lane + 1) * WM_ACTION_DIM];
+            if self.action_parameter_active[lane] {
+                let params = &self.action_parameter_scratch
+                    [lane * ACTION_PARAMETER_DIM..(lane + 1) * ACTION_PARAMETER_DIM];
+                compose_wm_action_token(base, params, wm);
+            } else {
+                compose_wm_action_token(base, &[], wm);
+            }
+        }
+        self.action_parameter_active.fill(false);
+        self.action_parameter_scratch.fill(0.0);
+    }
+
     /// Set per-lane action availability masks for the NEXT and subsequent
     /// `act()` calls. Flat layout `[batch_size × MAX_ACTION_DIM]`; entries
     /// `>= 0.5` are treated as valid, `< 0.5` as invalid. Invalid actions get
@@ -6223,9 +6580,10 @@ impl Agent {
     /// the importance ratio's denominator consistent with the sampling
     /// distribution.
     ///
-    /// Persists across calls until re-set; pass an all-1.0 buffer to
-    /// disable masking. There is no auto-clear (unlike `extrinsic_reward`)
-    /// because masks typically stay stable over many env steps.
+    /// Persists across calls until re-set. There is no auto-clear (unlike
+    /// `extrinsic_reward`) because masks typically stay stable over many env
+    /// steps. [`Self::clear_action_masks`] restores the adapter's static
+    /// action range.
     ///
     /// Panics if `masks.len() != batch_size * MAX_ACTION_DIM`. A no-op
     /// when at least one entry per lane row is < 0.5; if all entries in a
@@ -6244,10 +6602,57 @@ impl Agent {
         self.action_masks.copy_from_slice(masks);
     }
 
-    /// Reset all action masks to the all-valid default (1.0 everywhere).
-    /// Equivalent to `set_action_masks(&vec![1.0; batch_size * MAX_ACTION_DIM])`.
+    /// Reset action masks to each adapter's static action range.
+    /// Discrete padded heads remain invalid; continuous rows are all-valid.
     pub fn clear_action_masks(&mut self) {
-        self.action_masks.fill(1.0);
+        self.action_masks.fill(0.0);
+        for (lane_idx, lane) in self.lanes.iter().enumerate() {
+            let row =
+                &mut self.action_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            match lane.adapter.action_kind() {
+                ActionKind::Discrete { n } => row[..n.min(MAX_ACTION_DIM)].fill(1.0),
+                ActionKind::Continuous { .. } => row.fill(1.0),
+            }
+        }
+    }
+
+    /// Synchronize per-lane action masks from native environments before
+    /// [`Self::act`]. Environments without a dynamic mask expose all actions.
+    pub fn set_action_masks_from_envs(&mut self, envs: &[&dyn Environment]) {
+        let n = self.lanes.len();
+        assert_eq!(envs.len(), n, "envs.len() must equal N");
+        self.action_masks.fill(0.0);
+
+        for (lane_idx, (lane, env)) in self.lanes.iter().zip(envs).enumerate() {
+            let row =
+                &mut self.action_masks[lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            match lane.adapter.action_kind() {
+                ActionKind::Continuous { .. } => row.fill(1.0),
+                ActionKind::Discrete { n: action_count } => {
+                    assert_eq!(
+                        env.num_actions(),
+                        action_count,
+                        "environment and adapter action counts differ on lane {lane_idx}"
+                    );
+                    if let Some(mask) = env.action_mask() {
+                        assert_eq!(
+                            mask.len(),
+                            action_count,
+                            "environment action mask length differs from num_actions on lane {lane_idx}"
+                        );
+                        assert!(
+                            mask.iter().any(|&valid| valid),
+                            "environment action mask has no valid action on lane {lane_idx}"
+                        );
+                        for (dst, valid) in row.iter_mut().zip(mask) {
+                            *dst = f32::from(valid);
+                        }
+                    } else {
+                        row[..action_count].fill(1.0);
+                    }
+                }
+            }
+        }
     }
 
     /// Populate `policy_action_mask_scratch` from current per-lane
@@ -6283,6 +6688,28 @@ impl Agent {
         self.extrinsic_reward.copy_from_slice(rewards);
     }
 
+    /// Set explicit per-lane task-event decisions for the next `observe()`.
+    /// This is separate from scalar reward so successful transitions with
+    /// non-positive reward can seed event-filtered SIL and positive-reward
+    /// transitions that are not achievements can explicitly suppress it.
+    /// Decisions are one-shot and clear after `observe()`.
+    pub fn set_extrinsic_events(&mut self, events: &[bool]) {
+        if self.config.extrinsic_reward_alpha == 0.0 {
+            return;
+        }
+        assert_eq!(
+            events.len(),
+            self.extrinsic_event.len(),
+            "set_extrinsic_events: expected {} events, got {}",
+            self.extrinsic_event.len(),
+            events.len()
+        );
+        self.extrinsic_event
+            .iter_mut()
+            .zip(events)
+            .for_each(|(slot, &event)| *slot = Some(event));
+    }
+
     /// Per-lane empowerment estimate from the most recent
     /// `plan_and_queue` call (updated at planner cadence, not
     /// every step). Mean-of-per-dim cross-sample variance of
@@ -6297,7 +6724,7 @@ impl Agent {
     /// Per-lane intrinsic progress reward for the NEXT `observe()`.
     /// Adds to per-step reward sum like extrinsic, but does NOT
     /// increment `sil_ep_event_count` — the win-classifier's is_win
-    /// label stays gated on real extrinsic events. Use for dense
+    /// label stays gated on real task events. Use for dense
     /// progress signals (persistent configurational change, per-
     /// episode entropy growth, empowerment) that should bias
     /// exploration without polluting "did this episode win?".
@@ -6322,8 +6749,7 @@ impl Agent {
     /// per-step `set_learning_rate` call across all sessions on the
     /// next `observe`. Use case: drop LR once a sustained-solve
     /// threshold is reached, to prevent the on-policy AC post-solve
-    /// crash. Does NOT modify `lr_policy`/`lr_credit`/etc — those have
-    /// their own setters since they may need independent tuning.
+    /// crash. Does NOT modify `lr_policy`, which may need independent tuning.
     ///
     /// **Footgun:** the policy session uses `lr_policy`, not
     /// `learning_rate`. Calling only `set_learning_rate` updates the
@@ -6336,23 +6762,20 @@ impl Agent {
         self.config.learning_rate = lr;
     }
 
-    /// Set the base, policy, and credit learning rates together,
-    /// preserving the same `0.5×` / `0.3×` ratios the Python
-    /// constructor uses. Intended for LR schedules that want a
+    /// Set the base and policy learning rates together, preserving the
+    /// `0.5×` ratio the Python constructor uses. Intended for schedules that want a
     /// single knob to control the whole agent's update magnitude.
     ///
     /// Equivalent to:
     /// ```ignore
     /// agent.set_learning_rate(lr);
     /// agent.set_lr_policy(lr * 0.5);
-    /// agent.set_lr_credit(lr * 0.3);  // (no public setter; we set config directly)
     /// ```
     /// without the easy-to-forget pair-call. See `set_learning_rate`
     /// for the footgun this exists to avoid.
     pub fn set_all_learning_rates(&mut self, lr: f32) {
         self.config.learning_rate = lr;
         self.config.lr_policy = lr * 0.5;
-        self.config.lr_credit = lr * 0.3;
     }
 
     /// Mutate the entropy bonus weight at runtime. Currently only
@@ -6366,6 +6789,17 @@ impl Agent {
     /// LunarLander.
     pub fn set_entropy_beta(&mut self, beta: f32) {
         self.config.entropy_beta = beta;
+    }
+
+    /// Change action persistence at runtime. Cached actions are cleared so the
+    /// new repeat length takes effect on the next `act()` call rather than
+    /// inheriting the remainder of an old macro-action.
+    pub fn set_action_repeat(&mut self, repeat: usize) {
+        self.config.action_repeat = repeat.max(1);
+        for lane in &mut self.lanes {
+            lane.cached_action = None;
+            lane.repeats_left = 0;
+        }
     }
 
     /// Feed the current `config.entropy_beta` into the e2e policy
@@ -6441,6 +6875,28 @@ impl Agent {
         self.policy_session.read_all_param_norms()
     }
 
+    /// Snapshot the world-model session's encoder parameters for diagnostics
+    /// and regression tests. This makes it possible to verify that the
+    /// representation objective is actually updating the encoder rather than
+    /// merely reporting a decreasing dynamics loss over fixed random features.
+    pub fn dump_encoder_params(&self) -> Vec<(String, Vec<f32>)> {
+        let names: Vec<String> = self
+            .wm_session
+            .param_names()
+            .into_iter()
+            .filter(|name| name.starts_with("encoder."))
+            .map(str::to_string)
+            .collect();
+        let mut out = Vec::with_capacity(names.len());
+        for name in names {
+            let n = self.wm_session.param_size(&name).expect("param size known");
+            let mut buf = vec![0.0f32; n];
+            self.wm_session.read_param(&name, &mut buf);
+            out.push((name, buf));
+        }
+        out
+    }
+
     /// Dump all policy-session parameters as `(name, values)` pairs.
     /// Values are flattened f32 vectors in the parameter's natural layout
     /// (compile-order, stable across runs of the same graph). Use
@@ -6469,7 +6925,7 @@ impl Agent {
     /// Names and sizes must match the current graph. Missing or
     /// extra names are silently ignored — callers should validate.
     /// Returns the number of params successfully uploaded.
-    pub fn load_policy_params(&self, params: &[(String, Vec<f32>)]) -> usize {
+    pub fn load_policy_params(&mut self, params: &[(String, Vec<f32>)]) -> usize {
         let mut loaded = 0;
         for (name, data) in params {
             match self.policy_session.param_size(name) {
@@ -6541,10 +6997,55 @@ impl Agent {
         }
     }
 
+    /// Consume native environment results for one synchronous step.
+    ///
+    /// This is the preferred native-environment counterpart to [`Self::observe`]:
+    /// it forwards task rewards and explicit task events, preserves terminal
+    /// homeostatic state even when an environment auto-resets, and marks episode
+    /// boundaries consistently.
+    pub fn observe_step_results<R: Rng>(
+        &mut self,
+        results: &[StepResult],
+        actions: &[Action],
+        rng: &mut R,
+    ) {
+        let n = self.lanes.len();
+        assert_eq!(results.len(), n, "results.len() must equal N");
+        assert_eq!(actions.len(), n, "actions.len() must equal N");
+
+        let rewards = results
+            .iter()
+            .map(|result| result.reward)
+            .collect::<Vec<_>>();
+        let events = results
+            .iter()
+            .map(|result| result.task_event)
+            .collect::<Vec<_>>();
+        let observations = results
+            .iter()
+            .map(|result| result.observation.clone())
+            .collect::<Vec<_>>();
+        let homeostatic = results
+            .iter()
+            .map(|result| result.homeostatic.as_slice())
+            .collect::<Vec<_>>();
+
+        self.set_extrinsic_reward(&rewards);
+        self.set_extrinsic_events(&events);
+        self.observe_with_homeostatic(&observations, actions, &homeostatic, rng);
+
+        for (lane, result) in results.iter().enumerate() {
+            if result.done() {
+                self.mark_boundary(lane);
+            }
+        }
+    }
+
     /// Forward-only probe of the dynamics model: ẑ_next = WM(z, a)
     /// for a full batch of rows. `z_rows` is `[N · latent_dim]`,
-    /// `action_rows` is `[N · MAX_ACTION_DIM]`; returns
-    /// `[N · latent_dim]` predictions.
+    /// `action_rows` is `[N · WM_ACTION_DIM]`; base-only
+    /// `[N · MAX_ACTION_DIM]` rows are accepted and zero-pad the parameter
+    /// tail for compatibility. Returns `[N · latent_dim]` predictions.
     ///
     /// Runs the wm_session at LR = 0 (no parameter change). The
     /// encoder branch runs on whatever obs/visual content is staged —
@@ -6559,11 +7060,25 @@ impl Agent {
             n * ld,
             "wm_predict: z_rows must be N·latent_dim"
         );
-        assert_eq!(
-            action_rows.len(),
-            n * MAX_ACTION_DIM,
-            "wm_predict: action_rows must be N·MAX_ACTION_DIM"
-        );
+        let padded_actions = if action_rows.len() == n * MAX_ACTION_DIM {
+            let mut padded = vec![0.0; n * WM_ACTION_DIM];
+            for lane in 0..n {
+                compose_wm_action_token(
+                    &action_rows[lane * MAX_ACTION_DIM..(lane + 1) * MAX_ACTION_DIM],
+                    &[],
+                    &mut padded[lane * WM_ACTION_DIM..(lane + 1) * WM_ACTION_DIM],
+                );
+            }
+            Some(padded)
+        } else {
+            assert_eq!(
+                action_rows.len(),
+                n * WM_ACTION_DIM,
+                "wm_predict: action_rows must be N·MAX_ACTION_DIM or N·WM_ACTION_DIM"
+            );
+            None
+        };
+        let action_rows = padded_actions.as_deref().unwrap_or(action_rows);
         self.wm_session
             .set_input("obs", &vec![0.0; n * OBS_TOKEN_DIM]);
         self.wm_session.set_input("action", action_rows);
@@ -6856,7 +7371,7 @@ impl Agent {
             }
             visual[row * per_sample..(row + 1) * per_sample]
                 .copy_from_slice(&self.surprise_ring_frames[idx]);
-            self.action_token_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM]
+            self.wm_action_token_scratch[row * WM_ACTION_DIM..(row + 1) * WM_ACTION_DIM]
                 .copy_from_slice(&self.surprise_ring_actions[idx]);
             self.z_target_scratch[row * ld..(row + 1) * ld]
                 .copy_from_slice(&self.surprise_ring_zprev[idx]);
@@ -6929,6 +7444,7 @@ impl Agent {
                 found = Some(ReplaySample {
                     obs: tj.observation.clone(),
                     action: tj.action.clone(),
+                    action_parameters: tj.action_parameters.clone(),
                     z_target: ti.latent.clone(),
                     env_id: ti.env_id,
                 });
@@ -6954,13 +7470,14 @@ impl Agent {
             let sample = sample.as_ref().expect("filled above");
             let obs = &sample.obs;
             let act = &sample.action;
+            let action_parameters = &sample.action_parameters;
             let z_target = &sample.z_target;
             let env_id = &sample.env_id;
             let obs_row = &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM];
             obs_row.copy_from_slice(obs);
             let act_row =
-                &mut self.action_token_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
-            act_row.copy_from_slice(act);
+                &mut self.wm_action_token_scratch[i * WM_ACTION_DIM..(i + 1) * WM_ACTION_DIM];
+            compose_wm_action_token(act, action_parameters, act_row);
             let z_row = &mut self.z_target_scratch[i * ld..(i + 1) * ld];
             z_row.copy_from_slice(z_target);
 
@@ -7047,7 +7564,7 @@ impl Agent {
         for chunk_start in (0..probes.len()).step_by(n) {
             // Stage batch inputs.
             self.obs_token_scratch.fill(0.0);
-            self.action_token_scratch.fill(0.0);
+            self.wm_action_token_scratch.fill(0.0);
             self.z_target_scratch.fill(0.0);
             for i in 0..n {
                 let task_row = &mut self.task_scratch[i * TASK_DIM..(i + 1) * TASK_DIM];
@@ -7065,7 +7582,7 @@ impl Agent {
             self.wm_session
                 .set_input("obs", &self.obs_token_scratch[..n * OBS_TOKEN_DIM]);
             self.wm_session
-                .set_input("action", &self.action_token_scratch);
+                .set_input("action", &self.wm_action_token_scratch);
             self.wm_session
                 .set_input("z_target", &self.z_target_scratch);
             self.wm_session
@@ -7117,213 +7634,15 @@ impl Agent {
         }
     }
 
-    /// Run one credit-assigner pass on a single lane's history. The credit
-    /// graph is sized `[history_len, input_dim]` (one-lane by design — see
-    /// the design doc); we call it N times per step, once per lane.
-    fn credit_step<R: Rng>(&mut self, lane_idx: usize, rng: &mut R) {
-        let h = self.config.history_len;
-        let latent_dim = self.config.latent_dim;
-        // Credit runs per-lane (serialized), not batched — so it doesn't
-        // get the loss-averaging dilution. But the shared credit weights
-        // absorb N updates per synchronous step instead of 1, and we want
-        // each of those updates scaled consistently with the WM/policy
-        // updates on the same step. √N keeps the magnitudes aligned.
-        let lr_credit = self.config.lr_credit * self.batch_lr_scale;
-
-        let sanitize = |flat: &[f32]| -> Vec<f32> {
-            flat.iter()
-                .map(|v| {
-                    if v.is_finite() {
-                        v.clamp(-5.0, 5.0)
-                    } else {
-                        0.0
-                    }
-                })
-                .collect()
-        };
-
-        // Build the training pair + the recent window on the immutable
-        // borrow of the lane, then drop it before touching
-        // `self.credit_session`.
-        //
-        // The training INPUT must be the same window the contrastive
-        // target describes — the high-reward window of the pair. The
-        // pre-fix code fed the most RECENT window against the pair's
-        // divergence profile, so the supervision was uncorrelated
-        // row-for-row with the input and the head could only learn the
-        // marginal mean target (≈ uniform).
-        let (train_clean, target_clean, recent_clean, r_t) = {
-            let lane = &self.lanes[lane_idx];
-            let Some(recent_flat) = lane.buffer.flatten_history(h) else {
-                return;
-            };
-            let pair = lane
-                .buffer
-                .find_contrastive_pair(rng, h, latent_dim)
-                .and_then(|(hi, lo)| {
-                    let high_start = hi.saturating_sub(h - 1);
-                    lane.buffer
-                        .flatten_history_at(high_start, h)
-                        .map(|hw| (hw, lane.buffer.contrastive_target(hi, lo, h)))
-                });
-            let (train_flat, target) = match pair {
-                Some(p) => p,
-                // No usable pair: uniform target on the recent window
-                // (keeps the head anchored without a divergence signal).
-                None => (recent_flat.clone(), vec![1.0 / h as f32; h]),
-            };
-            let target_clean: Vec<f32> = target
-                .iter()
-                .map(|v| if v.is_finite() { *v } else { 1.0 / h as f32 })
-                .collect();
-            (
-                sanitize(&train_flat),
-                target_clean,
-                sanitize(&recent_flat),
-                lane.last_reward,
-            )
-        };
-
-        self.credit_session.set_input("history", &train_clean);
-        self.credit_session
-            .set_input("credit_target", &target_clean);
-        apply_lr(
-            &mut self.credit_session,
-            lr_credit,
-            self.config.use_adam,
-            self.config.adam_eps,
-        );
-        self.credit_session.step();
-        self.credit_session.wait();
-
-        let loss = self.credit_session.read_loss();
-        if loss.is_finite() {
-            self.last_credit_loss = loss;
-        } else {
-            log::warn!(
-                "credit loss went non-finite at step {}, re-initialized credit params",
-                self.step_count
-            );
-            init_parameters(&mut self.credit_session);
-            self.last_credit_loss = 0.0;
-        }
-
-        // Forward-only pass on the RECENT window to read the credit
-        // profile that gets written back to the buffer (the training
-        // pass above may have staged a different window).
-        self.credit_session.set_input("history", &recent_clean);
-        self.credit_session.clear_optimizer();
-        self.credit_session.step();
-        self.credit_session.wait();
-
-        let mut credit_logits = vec![0.0f32; h];
-        self.credit_session
-            .read_output_by_index(1, &mut credit_logits);
-
-        // The head's outputs are trained directly against a softmax-
-        // normalized target — sum-normalize them; re-softmaxing would
-        // flatten the learned attribution toward uniform.
-        let alpha = credit::normalize_distribution(&credit_logits);
-        let credits: Vec<f32> = alpha.iter().map(|&a| r_t * a).collect();
-        self.lanes[lane_idx].buffer.write_credits(&credits);
-    }
-
-    /// Run the L1 credit assigner for each lane that just terminated an
-    /// option (and thus has a fresh row in `option_history`). Trains the
-    /// option-credit graph contrastively on the lane's own option
-    /// history; reads back credit logits, softmaxes them, and updates
-    /// the per-lane `h_eff_l1` diagnostic. Agent-wide loss reported as
-    /// the last lane's loss (sufficient for diagnostic tracking).
-    ///
-    /// Called from `act()` after new history entries are pushed and
-    /// before the next options are sampled.
-    fn option_credit_step<R: Rng>(&mut self, rng: &mut R, lanes_to_update: &[usize]) {
-        let Some(ref mut opt_credit_sess) = self.option_credit_session else {
-            return;
-        };
-        let history_len = self.config.option_history_len;
-        let num_options = self.config.num_options;
-        let latent_dim = self.latent_dim;
-        let lr = self.config.lr_option_credit * self.batch_lr_scale;
-        let warmup_done = self.step_count >= self.config.warmup_steps;
-
-        for &i in lanes_to_update {
-            // Stage the per-lane history + contrastive target, then
-            // drop the borrow before touching the session mutably.
-            let (history_flat, target_flat) = {
-                let lane = &self.lanes[i];
-                if lane.option_history.len() < history_len {
-                    continue;
-                }
-                let hist = lane
-                    .option_history
-                    .flatten(history_len, num_options, latent_dim);
-                let tgt = if let Some((hi, lo)) =
-                    lane.option_history.find_contrastive_pair(rng, history_len)
-                {
-                    lane.option_history.contrastive_target(hi, lo, history_len)
-                } else {
-                    vec![1.0 / history_len as f32; history_len]
-                };
-                (hist, tgt)
-            };
-
-            opt_credit_sess.set_input("history", &history_flat);
-            opt_credit_sess.set_input("credit_target", &target_flat);
-            if warmup_done {
-                apply_lr(
-                    opt_credit_sess,
-                    lr,
-                    self.config.use_adam,
-                    self.config.adam_eps,
-                );
-            } else {
-                // Warmup forward: skip the optimizer pass entirely
-                // (see act() for why lr = 0 under Adam is not a no-op).
-                opt_credit_sess.clear_optimizer();
-            }
-            opt_credit_sess.step();
-            opt_credit_sess.wait();
-
-            let loss = opt_credit_sess.read_loss();
-            if loss.is_finite() {
-                self.last_option_credit_loss = loss;
-            } else {
-                log::warn!(
-                    "option-credit loss went non-finite at step {}, re-initialized option-credit params",
-                    self.step_count
-                );
-                init_parameters(opt_credit_sess);
-                self.last_option_credit_loss = 0.0;
-            }
-
-            let mut credit_logits = vec![0.0f32; history_len];
-            opt_credit_sess.read_output_by_index(1, &mut credit_logits);
-            // Sanitize any NaN/Inf: the credit graph occasionally
-            // produces non-finite values in early training on
-            // small-variance envs (Pendulum). Fall back to 0 so the
-            // normalization degrades to uniform and `h_eff_l1` stays
-            // finite. The head's outputs are probability-space (MSE
-            // against a softmax target) — sum-normalize rather than
-            // re-softmax, which flattened the diagnostic toward the
-            // uniform value (H-1)/2.
-            for v in credit_logits.iter_mut() {
-                if !v.is_finite() {
-                    *v = 0.0;
-                }
-            }
-            self.last_h_eff_l1 = credit::effective_scope_probs(&credit_logits);
-        }
-    }
-
     /// Batched policy + value step over all lanes. The graph input `"z"` is
     /// the stacked per-lane latents produced this step; `"action"` is the
     /// stacked action tokens already in `action_token_scratch`;
-    /// `"value_target"` is the stacked per-lane rewards. `"action"` is
-    /// fed as a per-row advantage-weighted scaled one-hot — see below.
+    /// `"value_target"` is the stacked per-lane rewards. Categorical plain-PG
+    /// feeds `"action"` as a per-row advantage-weighted scaled one-hot;
+    /// continuous PG feeds the raw action and a separate scalar advantage.
     ///
-    /// Per-row advantage weighting, without a graph change: for either
-    /// policy loss variant the gradient w.r.t. logits is
+    /// Per-row categorical advantage weighting, without a graph change: the
+    /// cross-entropy gradient w.r.t. logits is
     /// `target_weight · (pred − one_hot)`. So if we feed the action
     /// input as `advantage_i · one_hot_i` (signed, clamped) rather than
     /// just `one_hot_i`, each lane's gradient magnitude and sign come
@@ -7332,10 +7651,9 @@ impl Agent {
     /// push it away, and lanes with ~zero advantage contribute ~nothing.
     /// The shared LR is a fixed `lr_policy · batch_lr_scale`.
     ///
-    /// This is the zero-graph-change analog of a proper per-row loss
-    /// weighting input. It works for the discrete cross-entropy graph
-    /// and the continuous MSE graph uniformly (both use `"action"` as
-    /// their target).
+    /// This is the zero-graph-change analog of a proper per-row loss-weight
+    /// input for categorical cross-entropy. Continuous squared error cannot
+    /// use that trick, so its graph explicitly weights each row loss.
     fn policy_step_batched(&mut self) {
         let n_step = self.config.n_step.max(1);
         // When the user opts into n-step lookahead, defer to the
@@ -7492,17 +7810,21 @@ impl Agent {
         // (deficit = 0 → eps = eps_base, effective_adv = advantage).
         self.policy_action_scratch.fill(0.0);
         let use_ppo = self.config.use_ppo;
-        if use_ppo {
+        let continuous = !self.policy_action_mask_input_present;
+        if use_ppo || continuous {
             // PPO surrogate inputs: rows for skipped lanes stay at
             // advantage = 0, which zeroes both surrogate terms — the
             // masking equivalent of the CE path's all-zero label rows.
+            // Continuous PG uses the same scalar scratch as its explicit
+            // per-row loss weight.
             self.ppo_advantage_scratch.fill(0.0);
+        }
+        if use_ppo {
             self.ppo_old_prob_scratch.fill(1.0);
         }
         let mut any_active = false;
         let eps_base = self.config.label_smoothing;
         let floor = self.config.entropy_floor;
-        let k = MAX_ACTION_DIM as f32;
         for (i, lane) in self.lanes.iter().enumerate() {
             // The policy input below is the acted-from latent (the
             // z_target_scratch staged this step). Boundary lanes have
@@ -7544,6 +7866,16 @@ impl Agent {
                 continue;
             }
 
+            if continuous {
+                let act_src =
+                    &self.action_token_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+                let act_dst =
+                    &mut self.policy_action_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+                act_dst.copy_from_slice(act_src);
+                self.ppo_advantage_scratch[i] = advantage;
+                continue;
+            }
+
             // Amplify label-smoothing toward uniform when entropy is low.
             let eps = (eps_base + (1.0 - eps_base) * entropy_deficit).min(1.0);
             // Synthesize a recovery advantage only when the real
@@ -7560,9 +7892,14 @@ impl Agent {
             let act_src = &self.action_token_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
             let act_dst =
                 &mut self.policy_action_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
-            for (dst, &src) in act_dst.iter_mut().zip(act_src.iter()) {
-                let smoothed = (1.0 - eps) * src + eps / k;
-                *dst = effective_adv * smoothed;
+            let mask = &self.action_masks[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+            let valid_count = mask.iter().filter(|&&m| m >= 0.5).count().max(1) as f32;
+            for ((dst, &src), &valid) in act_dst.iter_mut().zip(act_src.iter()).zip(mask) {
+                *dst = if valid >= 0.5 {
+                    effective_adv * ((1.0 - eps) * src + eps / valid_count)
+                } else {
+                    0.0
+                };
             }
         }
         if !any_active {
@@ -7574,7 +7911,7 @@ impl Agent {
         // so clip that; otherwise it's folded into the action targets.
         let clip = self.config.policy_adv_global_clip;
         if clip > 0.0 {
-            let buf: &mut [f32] = if use_ppo {
+            let buf: &mut [f32] = if use_ppo || continuous {
                 &mut self.ppo_advantage_scratch
             } else {
                 &mut self.policy_action_scratch
@@ -7630,11 +7967,15 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
-        if use_ppo {
+        if use_ppo || continuous {
             self.policy_session
                 .set_input("advantage", &self.ppo_advantage_scratch);
+        }
+        if use_ppo {
             self.policy_session
                 .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
+        }
+        if self.policy_action_mask_input_present {
             self.populate_policy_action_mask_scratch();
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
@@ -7700,7 +8041,6 @@ impl Agent {
         let gamma = self.config.gamma;
         let eps_base = self.config.label_smoothing;
         let floor = self.config.entropy_floor;
-        let k_actions = MAX_ACTION_DIM as f32;
 
         // The n-step return `Σ γ^k r_{t+k}` is compared against a
         // value-head baseline that tracks the *single-step* reward —
@@ -7789,7 +8129,7 @@ impl Agent {
             self.policy_action_scratch.fill(0.0);
             self.policy_session
                 .set_input("action", &self.policy_action_scratch);
-            if self.config.use_ppo {
+            if self.policy_action_mask_input_present {
                 self.populate_policy_action_mask_scratch();
                 self.policy_session
                     .set_input("action_mask", &self.policy_action_mask_scratch);
@@ -7797,13 +8137,15 @@ impl Agent {
             self.value_target_scratch.fill(0.0);
             self.policy_session
                 .set_input("value_target", &self.value_target_scratch);
-            if self.config.use_ppo {
+            if self.config.use_ppo || !self.policy_action_mask_input_present {
                 self.ppo_advantage_scratch.fill(0.0);
+                self.policy_session
+                    .set_input("advantage", &self.ppo_advantage_scratch);
+            }
+            if self.config.use_ppo {
                 for v in self.ppo_old_prob_scratch.iter_mut() {
                     *v = 1.0;
                 }
-                self.policy_session
-                    .set_input("advantage", &self.ppo_advantage_scratch);
                 self.policy_session
                     .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
             }
@@ -7898,50 +8240,37 @@ impl Agent {
             lane_active[i] = true;
         }
 
-        // Optional zero-mean / unit-std normalization across the active
-        // lanes. Strips the "V lags reward" bias and rescales gradient
-        // magnitudes to O(1) regardless of reward scale. Computed over
-        // active lanes only; inactive lanes contribute nothing.
+        // Optional zero-mean / unit-std normalization. Plain actor-critic
+        // uses the whole active batch. GRPO normalizes independently within
+        // each env/task id so forks of one game are never compared with the
+        // return scale or difficulty of another game.
         if self.config.advantage_normalize {
-            let active_count = lane_active.iter().filter(|&&a| a).count();
-            if active_count >= 2 {
-                let mut sum = 0.0f32;
-                for (i, &a) in raw_advantages.iter().enumerate() {
-                    if lane_active[i] {
-                        sum += a;
-                    }
-                }
-                let mean = sum / active_count as f32;
-                // For per-episode GRPO: only mean-center, don't divide
-                // by std. With clustered episode returns (8 similar
-                // policies), std → 0 and (a-mean)/std collapses the
-                // gradient to zero. Mean-centering preserves the raw
-                // reward scale; advantage_clamp caps if needed.
-                let divide_by_std = !(self.config.use_grpo && self.config.use_grpo_episode);
-                let std = if divide_by_std {
-                    let mut sq_sum = 0.0f32;
-                    for (i, &a) in raw_advantages.iter().enumerate() {
-                        if lane_active[i] {
-                            let d = a - mean;
-                            sq_sum += d * d;
-                        }
-                    }
-                    (sq_sum / active_count as f32).sqrt().max(1e-3)
-                } else {
-                    1.0
-                };
-                for (i, a) in raw_advantages.iter_mut().enumerate() {
-                    if lane_active[i] {
-                        *a = (*a - mean) / std;
-                    }
-                }
-            }
+            let group_ids = self.config.use_grpo.then(|| {
+                self.lanes
+                    .iter()
+                    .map(|lane| lane.adapter.id())
+                    .collect::<Vec<_>>()
+            });
+            let divide_by_std = !(self.config.use_grpo && self.config.use_grpo_episode);
+            normalize_active_advantages(
+                &mut raw_advantages,
+                &lane_active,
+                group_ids.as_deref(),
+                divide_by_std,
+            );
         }
 
         let use_ppo = self.config.use_ppo;
-        if use_ppo {
+        let uses_action_mask = self.policy_action_mask_input_present;
+        let continuous = !uses_action_mask;
+        if use_ppo || continuous {
             self.ppo_advantage_scratch.fill(0.0);
+        }
+        if use_ppo {
             self.ppo_old_prob_scratch.fill(1.0);
+        }
+        if uses_action_mask {
+            self.policy_action_mask_scratch.fill(1.0);
         }
         // KL-PPO: stage each ripe transition's stored collection-time
         // logits as π_old. Before this, only the rollout-batch path
@@ -8019,6 +8348,13 @@ impl Agent {
                 }
             }
 
+            if uses_action_mask {
+                restore_action_mask(
+                    &mut self.policy_action_mask_scratch
+                        [i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM],
+                    &ripe.action_mask,
+                );
+            }
             if use_ppo {
                 // PPO feeds: plain one-hot `action` (sum=1), scalar
                 // `advantage`, scalar `old_prob_taken`. The clip and
@@ -8030,6 +8366,11 @@ impl Agent {
                 }
                 self.ppo_advantage_scratch[i] = advantage;
                 self.ppo_old_prob_scratch[i] = ripe.prob_taken.max(1e-8);
+            } else if continuous {
+                let act_dst =
+                    &mut self.policy_action_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
+                act_dst.copy_from_slice(&ripe.action);
+                self.ppo_advantage_scratch[i] = advantage;
             } else {
                 let eps = (eps_base + (1.0 - eps_base) * entropy_deficit).min(1.0);
                 let effective_adv = if advantage.abs() < 1e-3 && entropy_deficit > 0.0 {
@@ -8040,9 +8381,14 @@ impl Agent {
                 let act_src = &ripe.action;
                 let act_dst =
                     &mut self.policy_action_scratch[i * MAX_ACTION_DIM..(i + 1) * MAX_ACTION_DIM];
-                for (dst, &src) in act_dst.iter_mut().zip(act_src.iter()) {
-                    let smoothed = (1.0 - eps) * src + eps / k_actions;
-                    *dst = effective_adv * smoothed;
+                let mask = &ripe.action_mask;
+                let valid_count = mask.iter().filter(|&&m| m >= 0.5).count().max(1) as f32;
+                for ((dst, &src), &valid) in act_dst.iter_mut().zip(act_src.iter()).zip(mask) {
+                    *dst = if valid >= 0.5 {
+                        effective_adv * ((1.0 - eps) * src + eps / valid_count)
+                    } else {
+                        0.0
+                    };
                 }
             }
 
@@ -8071,11 +8417,21 @@ impl Agent {
         // bounding the batch L2 norm bounds the update magnitude.
         let clip = self.config.policy_adv_global_clip;
         if clip > 0.0 {
-            let sum_sq: f32 = self.policy_action_scratch.iter().map(|v| v * v).sum();
+            let policy_signal: &[f32] = if continuous {
+                &self.ppo_advantage_scratch
+            } else {
+                &self.policy_action_scratch
+            };
+            let sum_sq: f32 = policy_signal.iter().map(|v| v * v).sum();
             let norm = sum_sq.sqrt();
             if norm > clip {
                 let scale = clip / norm;
-                for v in self.policy_action_scratch.iter_mut() {
+                let policy_signal: &mut [f32] = if continuous {
+                    &mut self.ppo_advantage_scratch
+                } else {
+                    &mut self.policy_action_scratch
+                };
+                for v in policy_signal {
                     *v *= scale;
                 }
             }
@@ -8106,16 +8462,17 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
-        if self.config.use_ppo {
-            self.populate_policy_action_mask_scratch();
+        if uses_action_mask {
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
         }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
-        if use_ppo {
+        if use_ppo || continuous {
             self.policy_session
                 .set_input("advantage", &self.ppo_advantage_scratch);
+        }
+        if use_ppo {
             self.policy_session
                 .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
         }
@@ -8154,7 +8511,6 @@ impl Agent {
             let rate = self.config.policy_lr_adaptive_ema.clamp(0.001, 1.0);
             self.policy_loss_ema = (1.0 - rate) * self.policy_loss_ema + rate * loss.abs();
         }
-        self.maybe_run_sil_update();
     }
 
     /// Big-batch rollout policy update: flatten the `rollout_length`-
@@ -8214,7 +8570,6 @@ impl Agent {
         let ld = self.latent_dim;
         let num_options = self.config.num_options;
         let has_options = self.option_session.is_some();
-        let k_actions = MAX_ACTION_DIM as f32;
         let eps_base = self.config.label_smoothing;
         let floor = self.config.entropy_floor;
 
@@ -8223,6 +8578,8 @@ impl Agent {
         let bootstrap_headroom = needs_bootstrap_slot as usize;
         let value_target_bootstrap = self.config.value_bootstrap || use_gae;
         let use_ppo = self.config.use_ppo;
+        let uses_action_mask = self.policy_action_mask_input_present;
+        let continuous = !uses_action_mask;
 
         // Initialize scratch buffers for the whole batch.
         self.policy_action_scratch.fill(0.0);
@@ -8231,11 +8588,16 @@ impl Agent {
         if has_options {
             self.option_onehot_scratch.fill(0.0);
         }
-        if use_ppo {
+        if use_ppo || continuous {
             self.ppo_advantage_scratch.fill(0.0);
+        }
+        if use_ppo {
             for v in self.ppo_old_prob_scratch.iter_mut() {
                 *v = 1.0;
             }
+        }
+        if uses_action_mask {
+            self.policy_action_mask_scratch.fill(1.0);
         }
 
         // First pass: compute raw advantages + value targets for
@@ -8246,6 +8608,7 @@ impl Agent {
         let mut value_targets = vec![0.0f32; policy_batch];
         let mut row_active = vec![false; policy_batch];
         let mut ripe_action = vec![vec![0.0f32; MAX_ACTION_DIM]; policy_batch];
+        let mut ripe_action_mask = vec![vec![1.0f32; MAX_ACTION_DIM]; policy_batch];
         let mut ripe_latent = vec![vec![0.0f32; ld]; policy_batch];
         let mut ripe_option = vec![0u32; policy_batch];
         let mut ripe_prob_taken = vec![1.0f32; policy_batch];
@@ -8330,6 +8693,7 @@ impl Agent {
                 };
                 ripe_latent[row].copy_from_slice(&acted_from.latent);
                 ripe_action[row].copy_from_slice(&ripe.action);
+                restore_action_mask(&mut ripe_action_mask[row], &ripe.action_mask);
                 ripe_option[row] = ripe.option_idx;
                 ripe_prob_taken[row] = ripe.prob_taken.max(1e-8);
                 // KL-PPO old_logits sourcing:
@@ -8417,16 +8781,18 @@ impl Agent {
             // target / PPO inputs already filled with zeros above.
             self.policy_session
                 .set_input("action", &self.policy_action_scratch);
-            if self.config.use_ppo {
+            if uses_action_mask {
                 self.populate_policy_action_mask_scratch();
                 self.policy_session
                     .set_input("action_mask", &self.policy_action_mask_scratch);
             }
             self.policy_session
                 .set_input("value_target", &self.value_target_scratch);
-            if use_ppo {
+            if use_ppo || continuous {
                 self.policy_session
                     .set_input("advantage", &self.ppo_advantage_scratch);
+            }
+            if use_ppo {
                 self.policy_session
                     .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
             }
@@ -8467,43 +8833,23 @@ impl Agent {
             let _ = (&ripe_returns, &ripe_stored_v);
         }
 
-        // Advantage normalization across the full rollout batch.
-        // This is where the big-batch layout actually pays off for
-        // normalization: std over N*R samples is a much better
-        // estimate of population std than std over N samples at one
-        // time slice.
+        // Advantage normalization across the rollout batch. Plain
+        // actor-critic uses all active rows. GRPO uses one group per
+        // environment/task id, retaining all rollout-time samples for that
+        // group while never comparing unrelated games.
         if self.config.advantage_normalize {
-            let active_count = row_active.iter().filter(|&&a| a).count();
-            if active_count >= 2 {
-                let mut sum = 0.0f32;
-                for (i, &a) in raw_advantages.iter().enumerate() {
-                    if row_active[i] {
-                        sum += a;
-                    }
-                }
-                let mean = sum / active_count as f32;
-                // For per-episode GRPO: skip variance normalization to
-                // avoid the clustered-returns degeneracy (see other
-                // apply_pg_update path for explanation).
-                let divide_by_std = !(self.config.use_grpo && self.config.use_grpo_episode);
-                let std = if divide_by_std {
-                    let mut sq_sum = 0.0f32;
-                    for (i, &a) in raw_advantages.iter().enumerate() {
-                        if row_active[i] {
-                            let d = a - mean;
-                            sq_sum += d * d;
-                        }
-                    }
-                    (sq_sum / active_count as f32).sqrt().max(1e-3)
-                } else {
-                    1.0
-                };
-                for (i, a) in raw_advantages.iter_mut().enumerate() {
-                    if row_active[i] {
-                        *a = (*a - mean) / std;
-                    }
-                }
-            }
+            let group_ids = self.config.use_grpo.then(|| {
+                (0..policy_batch)
+                    .map(|row| self.lanes[row % lanes].adapter.id())
+                    .collect::<Vec<_>>()
+            });
+            let divide_by_std = !(self.config.use_grpo && self.config.use_grpo_episode);
+            normalize_active_advantages(
+                &mut raw_advantages,
+                &row_active,
+                group_ids.as_deref(),
+                divide_by_std,
+            );
         }
 
         // Second pass: fill scratch buffers.
@@ -8578,12 +8924,21 @@ impl Agent {
                 }
             }
 
+            if uses_action_mask {
+                self.policy_action_mask_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM]
+                    .copy_from_slice(&ripe_action_mask[row]);
+            }
             if use_ppo {
                 let act_dst = &mut self.policy_action_scratch
                     [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
                 act_dst.copy_from_slice(&ripe_action[row]);
                 self.ppo_advantage_scratch[row] = advantage;
                 self.ppo_old_prob_scratch[row] = ripe_prob_taken[row];
+            } else if continuous {
+                let act_dst = &mut self.policy_action_scratch
+                    [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                act_dst.copy_from_slice(&ripe_action[row]);
+                self.ppo_advantage_scratch[row] = advantage;
             } else {
                 // Plain advantage-weighted CE path. Use the corresponding
                 // lane's current entropy as the entropy-deficit source;
@@ -8606,9 +8961,16 @@ impl Agent {
                 };
                 let act_dst = &mut self.policy_action_scratch
                     [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
-                for (dst, &src) in act_dst.iter_mut().zip(ripe_action[row].iter()) {
-                    let smoothed = (1.0 - eps) * src + eps / k_actions;
-                    *dst = effective_adv * smoothed;
+                let mask = &ripe_action_mask[row];
+                let valid_count = mask.iter().filter(|&&m| m >= 0.5).count().max(1) as f32;
+                for ((dst, &src), &valid) in
+                    act_dst.iter_mut().zip(ripe_action[row].iter()).zip(mask)
+                {
+                    *dst = if valid >= 0.5 {
+                        effective_adv * ((1.0 - eps) * src + eps / valid_count)
+                    } else {
+                        0.0
+                    };
                 }
             }
 
@@ -8626,11 +8988,21 @@ impl Agent {
         // Global advantage-norm clip (L2 bound across the whole batch).
         let clip = self.config.policy_adv_global_clip;
         if clip > 0.0 {
-            let sum_sq: f32 = self.policy_action_scratch.iter().map(|v| v * v).sum();
+            let policy_signal: &[f32] = if continuous {
+                &self.ppo_advantage_scratch
+            } else {
+                &self.policy_action_scratch
+            };
+            let sum_sq: f32 = policy_signal.iter().map(|v| v * v).sum();
             let norm = sum_sq.sqrt();
             if norm > clip {
                 let scale = clip / norm;
-                for v in self.policy_action_scratch.iter_mut() {
+                let policy_signal: &mut [f32] = if continuous {
+                    &mut self.ppo_advantage_scratch
+                } else {
+                    &mut self.policy_action_scratch
+                };
+                for v in policy_signal {
                     *v *= scale;
                 }
             }
@@ -8657,16 +9029,17 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
-        if self.config.use_ppo {
-            self.populate_policy_action_mask_scratch();
+        if uses_action_mask {
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
         }
         self.policy_session
             .set_input("value_target", &self.value_target_scratch);
-        if use_ppo {
+        if use_ppo || continuous {
             self.policy_session
                 .set_input("advantage", &self.ppo_advantage_scratch);
+        }
+        if use_ppo {
             self.policy_session
                 .set_input("old_prob_taken", &self.ppo_old_prob_scratch);
         }
@@ -8726,7 +9099,6 @@ impl Agent {
             let rate = self.config.policy_lr_adaptive_ema.clamp(0.001, 1.0);
             self.policy_loss_ema = (1.0 - rate) * self.policy_loss_ema + rate * loss.abs();
         }
-        self.maybe_run_sil_update();
     }
 
     /// Self-Imitation Learning step: run one supervised update on
@@ -8752,7 +9124,7 @@ impl Agent {
     /// and BC-from-planner pushed samples that were never trained on
     /// in any ARC run (all of which are non-e2e + PPO).
     fn maybe_run_sil_update(&mut self) {
-        if !self.config.use_sil {
+        if !self.config.use_sil || !self.policy_action_mask_input_present {
             return;
         }
         self.sil_updates_attempted += 1;
@@ -8766,11 +9138,26 @@ impl Agent {
             return;
         }
 
-        // Sample policy_batch indices.
-        use rand::Rng;
-        let mut rng = rand::rng();
-        let n = self.sil_buffer.len();
-        let sampled_idx: Vec<usize> = (0..policy_batch).map(|_| rng.random_range(0..n)).collect();
+        // Sample reproducibly and round-robin across tasks active in the
+        // current lanes. Uniform sampling from the global FIFO let long
+        // successful episodes drown out short ones; replaying inactive task
+        // labels after a switch also blocked the new task from adapting.
+        // Inactive samples remain capacity-protected and become eligible again
+        // when their task returns.
+        let sample_seed = 0x511A_710A_7EED_u64
+            ^ (self.step_count as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            ^ self.sil_updates_attempted;
+        let active_env_ids = self
+            .lanes
+            .iter()
+            .map(|lane| lane.adapter.id())
+            .collect::<std::collections::BTreeSet<_>>();
+        let sampled_idx = balanced_sil_sample_indices(
+            &self.sil_buffer,
+            policy_batch,
+            sample_seed,
+            &active_env_ids,
+        );
 
         // Fill scratch buffers from the sampled SIL transitions.
         let ld = self.latent_dim;
@@ -8780,6 +9167,9 @@ impl Agent {
         self.value_target_scratch.fill(0.0);
         if !e2e {
             self.policy_z_scratch.fill(0.0);
+        }
+        if self.policy_action_mask_input_present {
+            self.policy_action_mask_scratch.fill(1.0);
         }
         if use_ppo {
             self.ppo_advantage_scratch.fill(0.0);
@@ -8797,16 +9187,18 @@ impl Agent {
         let mut n_active = 0;
         for (row, &si) in (0..policy_batch).zip(sampled_idx.iter()) {
             let sample = &self.sil_buffer[si];
-            // Positive-advantage filter (Oh et al. 2018):
-            //   sil_advantage = max(0, R_to_go - V_at_collect)
-            // Transitions where the actual outcome did not exceed V's
-            // prediction at collection time get zero gradient — they
-            // are "expected" successes that don't carry surprise.
-            // Successful TD transitions where R_to_go ≫ V get the
-            // strongest pull. This naturally weights late-episode
-            // moments (touchdown noops) over routine descent.
-            let raw_adv = (sample.r_to_go - sample.v_at_collect).max(0.0);
-            let adv = raw_adv.min(adv_cap);
+            // Standard SIL uses max(0, R_to_go - V_at_collect). In explicit
+            // event-filter mode, every transition from a real event episode
+            // receives at least unit BC advantage: otherwise environments
+            // with negative step costs discard the early, essential part of
+            // every successful trajectory and imitate only the terminal tail.
+            let adv = sil_imitation_advantage(
+                sample.r_to_go,
+                sample.v_at_collect,
+                sample.event_success,
+                self.config.sil_event_filter,
+                adv_cap,
+            );
             let weight = coef * adv;
             if e2e {
                 // obs
@@ -8827,6 +9219,13 @@ impl Agent {
             }
             let act_dst =
                 &mut self.policy_action_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+            if self.policy_action_mask_input_present {
+                restore_action_mask(
+                    &mut self.policy_action_mask_scratch
+                        [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM],
+                    &sample.action_mask,
+                );
+            }
             if use_ppo {
                 // Plain one-hot; the weight rides in `advantage`.
                 if sample.action_idx < MAX_ACTION_DIM && weight > 0.0 {
@@ -8879,10 +9278,11 @@ impl Agent {
         }
         self.policy_session
             .set_input("action", &self.policy_action_scratch);
-        if use_ppo {
-            self.populate_policy_action_mask_scratch();
+        if self.policy_action_mask_input_present {
             self.policy_session
                 .set_input("action_mask", &self.policy_action_mask_scratch);
+        }
+        if use_ppo {
             self.policy_session
                 .set_input("advantage", &self.ppo_advantage_scratch);
             self.policy_session
@@ -8927,40 +9327,32 @@ impl Agent {
         self.step_count
     }
 
-    /// Save trainable state to a directory: one safetensors file per
-    /// neural-network session (wm, policy, credit, optional option +
-    /// option_credit). Lane state, step count, and harness scratch
+    /// Save trainable weights to a directory: one safetensors file per
+    /// neural-network session (wm, policy, and optional option), plus the
+    /// CPU coordinate head when enabled. Lane state, step count, and harness scratch
     /// buffers are NOT saved — load expects a freshly-instantiated
     /// agent with the same architecture (latent_dim, hidden_dim,
     /// encoder kind, etc.).
-    pub fn save_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
+    pub fn save_weights(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
         std::fs::create_dir_all(dir)?;
         self.wm_session
             .save_checkpoint(&dir.join("wm.safetensors"))?;
         self.policy_session
             .save_checkpoint(&dir.join("policy.safetensors"))?;
-        self.credit_session
-            .save_checkpoint(&dir.join("credit.safetensors"))?;
         if let Some(ref mut s) = self.option_session {
             s.save_checkpoint(&dir.join("option.safetensors"))?;
         }
-        if let Some(ref mut s) = self.option_credit_session {
-            s.save_checkpoint(&dir.join("option_credit.safetensors"))?;
+        if let Some(ref head) = self.coord_head {
+            head.save(&dir.join("coord.bin"))?;
         }
         Ok(())
     }
 
-    /// Load trainable state from a directory previously written by
-    /// `save_state`. The agent must already be constructed with the
-    /// same graph topology (same latent_dim, hidden_dim, encoder
-    /// kind, num_options, recon flags, layer-norm flags). Returns
-    /// an error if any session's file is missing or shape-mismatched.
     /// Load ONLY the wm_session checkpoint from a single safetensors
     /// file. Used for partial pretrained-encoder injection: the file
     /// can contain just `encoder.conv*.weight` etc; missing entries
     /// are tolerated by meganeura's load_checkpoint (the matching
-    /// param keeps its xavier init). Policy + credit sessions are
-    /// untouched.
+    /// param keeps its xavier init). The policy session is untouched.
     pub fn load_wm_checkpoint(&mut self, path: &std::path::Path) -> std::io::Result<()> {
         self.wm_session.load_checkpoint(path)?;
         Ok(())
@@ -8973,23 +9365,25 @@ impl Agent {
         self.wm_session.set_lr_multiplier(prefix, mul);
     }
 
-    pub fn load_state(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
+    /// Load trainable weights from a directory previously written by
+    /// `save_weights`. The agent must already be constructed with the same
+    /// graph topology. This is not a resumable training checkpoint: replay,
+    /// optimizer, RNG, lane, archive, and schedule state are not restored.
+    pub fn load_weights(&mut self, dir: &std::path::Path) -> std::io::Result<()> {
         self.wm_session
             .load_checkpoint(&dir.join("wm.safetensors"))?;
         self.policy_session
             .load_checkpoint(&dir.join("policy.safetensors"))?;
-        self.credit_session
-            .load_checkpoint(&dir.join("credit.safetensors"))?;
         if let Some(ref mut s) = self.option_session {
             let p = dir.join("option.safetensors");
             if p.exists() {
                 s.load_checkpoint(&p)?;
             }
         }
-        if let Some(ref mut s) = self.option_credit_session {
-            let p = dir.join("option_credit.safetensors");
+        if let Some(ref mut head) = self.coord_head {
+            let p = dir.join("coord.bin");
             if p.exists() {
-                s.load_checkpoint(&p)?;
+                head.load(&p)?;
             }
         }
         Ok(())
@@ -9037,10 +9431,116 @@ impl Agent {
             .collect()
     }
 
-    /// Current M7 confidence ∈ [0, 1]. Zero until warmup is met;
-    /// ramps linearly to 1 over `approach_confidence_saturation`
-    /// episodes. 1 once warmup is met if saturation = 0. Always 0
-    /// when M7 is disabled.
+    /// One behavior-cloning update from externally labeled discrete states.
+    ///
+    /// This is deliberately narrower than the online RL path: it requires the
+    /// plain end-to-end categorical graph and trains only positive masked
+    /// cross-entropy labels. It retains simulator/controller paths without
+    /// inventing synthetic rewards or depending on an untrained value baseline.
+    pub fn train_policy_supervised(
+        &mut self,
+        observations: &[Observation],
+        action_indices: &[usize],
+        weight: f32,
+    ) -> Result<(), String> {
+        let n = self.lanes.len();
+        if observations.len() != n {
+            return Err(format!(
+                "train_policy_supervised: observations.len() {} must equal num_lanes {n}",
+                observations.len()
+            ));
+        }
+        if action_indices.len() != n {
+            return Err(format!(
+                "train_policy_supervised: action_indices.len() {} must equal num_lanes {n}",
+                action_indices.len()
+            ));
+        }
+        if !weight.is_finite() || weight <= 0.0 {
+            return Err("train_policy_supervised: weight must be finite and positive".into());
+        }
+        if !(self.config.end_to_end_encoder
+            && !self.config.use_ppo
+            && !self.config.use_kl_ppo
+            && self.config.num_options == 1
+            && self.policy_action_mask_input_present
+            && self.config.value_loss_coef == 0.0
+            && self.config.recon_loss_coef == 0.0
+            && self.config.reward_pred_loss_coef == 0.0
+            && self.config.entropy_beta == 0.0)
+        {
+            return Err(
+                "train_policy_supervised requires the plain end-to-end categorical policy graph with auxiliary losses disabled"
+                    .into(),
+            );
+        }
+
+        let policy_batch = n * self.config.rollout_length.max(1);
+        self.obs_token_scratch.fill(0.0);
+        self.task_scratch.fill(0.0);
+        self.policy_action_scratch.fill(0.0);
+        self.policy_action_mask_scratch.fill(0.0);
+        self.value_target_scratch.fill(0.0);
+
+        for row in 0..policy_batch {
+            let lane = row % n;
+            let action_index = action_indices[lane];
+            if action_index >= MAX_ACTION_DIM {
+                return Err(format!(
+                    "train_policy_supervised: action index {action_index} exceeds MAX_ACTION_DIM"
+                ));
+            }
+            let source_mask =
+                &self.action_masks[lane * MAX_ACTION_DIM..(lane + 1) * MAX_ACTION_DIM];
+            if source_mask[action_index] < 0.5 {
+                return Err(format!(
+                    "train_policy_supervised: labeled action {action_index} is masked on lane {lane}"
+                ));
+            }
+
+            let obs_row =
+                &mut self.obs_token_scratch[row * OBS_TOKEN_DIM..(row + 1) * OBS_TOKEN_DIM];
+            self.lanes[lane]
+                .adapter
+                .obs_to_token(&observations[lane], obs_row);
+            if let Some(embedding) = self.task_embeddings.get(&self.lanes[lane].adapter.id()) {
+                self.task_scratch[row * TASK_DIM..(row + 1) * TASK_DIM].copy_from_slice(embedding);
+            }
+            self.policy_action_scratch[row * MAX_ACTION_DIM + action_index] = weight;
+            self.policy_action_mask_scratch[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM]
+                .copy_from_slice(source_mask);
+        }
+
+        self.policy_session
+            .set_input("obs", &self.obs_token_scratch);
+        self.policy_session.set_input("task", &self.task_scratch);
+        self.policy_session
+            .set_input("action", &self.policy_action_scratch);
+        self.policy_session
+            .set_input("action_mask", &self.policy_action_mask_scratch);
+        self.policy_session
+            .set_input("value_target", &self.value_target_scratch);
+        if self.reward_pred_input_present {
+            self.reward_target_scratch.fill(0.0);
+            self.policy_session
+                .set_input("reward_target", &self.reward_target_scratch);
+        }
+        self.feed_entropy_beta_input();
+        let lr = self.config.lr_policy * self.batch_lr_scale;
+        apply_lr(
+            &mut self.policy_session,
+            lr,
+            self.config.use_adam,
+            self.config.adam_eps,
+        );
+        self.policy_session.step();
+        self.policy_session.wait();
+        let mut loss = [0.0f32; 1];
+        self.policy_session.read_output_by_index(0, &mut loss);
+        self.last_policy_loss = loss[0];
+        Ok(())
+    }
+
     /// Sample per-lane `(x, y)` coordinates from the coord head's
     /// current policy. Returns a `[(x, y); N]` vector in `[−1, 1]`
     /// space; callers rescale to the target env's coord range.
@@ -9057,11 +9557,15 @@ impl Agent {
         };
         let mut out = Vec::with_capacity(n);
         for (i, lane) in self.lanes.iter().enumerate() {
-            let z = match lane.buffer.last() {
-                Some(t) => t.latent.clone(),
-                None => vec![0.0; self.latent_dim],
-            };
-            let [sx, sy] = head.sample(i, &z, || {
+            let task_embedding = self
+                .task_embeddings
+                .get(&lane.adapter.id())
+                .map_or(&[][..], Vec::as_slice);
+            let features = lane.buffer.last().map_or_else(
+                || compose_coord_features(&[], task_embedding),
+                |transition| compose_coord_features(&transition.observation, task_embedding),
+            );
+            let [sx, sy] = head.sample(i, &features, || {
                 // Box-Muller from a pair of uniforms.
                 let u1: f32 = rng.random_range(1e-7..1.0);
                 let u2: f32 = rng.random_range(0.0..1.0);
@@ -9074,23 +9578,166 @@ impl Agent {
         out
     }
 
-    /// Train the coord head on the most recent step's rewards via
-    /// REINFORCE. `advantage = per_lane_reward − running_baseline`;
-    /// the running baseline is an EMA updated inside the agent.
-    /// No-op when the coord head is disabled.
+    /// Deterministic coordinate-head means for supplied current observations.
+    /// Unlike `sample_coords`, this tokenizes the provided states directly and
+    /// does not depend on the lane buffer or run the world-model encoder.
+    pub fn coord_means_for_observations(
+        &mut self,
+        observations: &[Observation],
+    ) -> Vec<(f32, f32)> {
+        assert_eq!(
+            observations.len(),
+            self.lanes.len(),
+            "coord_means_for_observations: observations.len() must equal num_lanes"
+        );
+        for (i, lane) in self.lanes.iter().enumerate() {
+            lane.adapter.obs_to_token(
+                &observations[i],
+                &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM],
+            );
+        }
+        let Some(head) = self.coord_head.as_ref() else {
+            return vec![(0.0, 0.0); self.lanes.len()];
+        };
+        (0..self.lanes.len())
+            .map(|i| {
+                let task_embedding = self
+                    .task_embeddings
+                    .get(&self.lanes[i].adapter.id())
+                    .map_or(&[][..], Vec::as_slice);
+                let features = compose_coord_features(
+                    &self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM],
+                    task_embedding,
+                );
+                let [x, y] = head.forward(&features);
+                (x, y)
+            })
+            .collect()
+    }
+
+    /// Supervised coordinate imitation from externally successful states.
+    /// Updates only the CPU coordinate head from adapter observation tokens
+    /// and the lanes' fixed task embeddings.
+    /// Returns mean weighted MSE over active lanes.
+    pub fn train_coord_head_supervised(
+        &mut self,
+        observations: &[Observation],
+        targets: &[[f32; 2]],
+        active: &[bool],
+        weight: f32,
+    ) -> f32 {
+        let n = self.lanes.len();
+        assert_eq!(
+            observations.len(),
+            n,
+            "train_coord_head_supervised: observations.len() must equal num_lanes"
+        );
+        assert_eq!(
+            targets.len(),
+            n,
+            "train_coord_head_supervised: targets.len() must equal num_lanes"
+        );
+        assert_eq!(
+            active.len(),
+            n,
+            "train_coord_head_supervised: active.len() must equal num_lanes"
+        );
+        for (i, lane) in self.lanes.iter().enumerate() {
+            lane.adapter.obs_to_token(
+                &observations[i],
+                &mut self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM],
+            );
+        }
+        let mut features = Vec::with_capacity(n * (OBS_TOKEN_DIM + TASK_DIM));
+        for i in 0..n {
+            let task_embedding = self
+                .task_embeddings
+                .get(&self.lanes[i].adapter.id())
+                .map_or(&[][..], Vec::as_slice);
+            features.extend(compose_coord_features(
+                &self.obs_token_scratch[i * OBS_TOKEN_DIM..(i + 1) * OBS_TOKEN_DIM],
+                task_embedding,
+            ));
+        }
+        let mut active_per_task = HashMap::<u32, usize>::new();
+        let mut active_count = 0usize;
+        for (lane, &enabled) in self.lanes.iter().zip(active) {
+            if enabled {
+                *active_per_task.entry(lane.adapter.id()).or_default() += 1;
+                active_count += 1;
+            }
+        }
+        if active_count == 0 {
+            return 0.0;
+        }
+        let task_count = active_per_task.len();
+        let sample_weights = self
+            .lanes
+            .iter()
+            .zip(active)
+            .map(|(lane, &enabled)| {
+                if !enabled {
+                    return 0.0;
+                }
+                let task_samples = active_per_task[&lane.adapter.id()];
+                weight * active_count as f32 / (task_count * task_samples) as f32
+            })
+            .collect::<Vec<_>>();
+        let Some(head) = self.coord_head.as_mut() else {
+            return 0.0;
+        };
+        head.train_supervised_batch_weighted(&features, targets, &sample_weights)
+    }
+
+    /// Train every lane of the coord head on the most recent step's rewards.
+    /// Prefer [`Self::train_coord_head_masked`] when only some executed actions
+    /// consumed coordinates.
     pub fn train_coord_head(&mut self) {
+        let active = vec![true; self.lanes.len()];
+        self.train_coord_head_masked(&active);
+    }
+
+    /// Train only lanes whose executed action consumed the sampled coordinate.
+    /// The reward baseline is computed from and updated by active lanes only, so
+    /// rewards from ordinary discrete actions cannot reinforce unrelated click
+    /// locations. No-op when the coord head is disabled or no lane is active.
+    pub fn train_coord_head_masked(&mut self, active: &[bool]) {
+        let rewards = self.coord_last_reward.clone();
+        self.train_coord_head_masked_with_rewards(active, &rewards);
+    }
+
+    /// Train selected coordinate lanes from an explicit per-lane reward signal.
+    /// This lets an environment use sparse task reward for click credit while
+    /// the main policy continues to optimize Kindle's combined reward. Each
+    /// lane is centered against its own EMA, avoiding cross-task leakage.
+    pub fn train_coord_head_masked_with_rewards(&mut self, active: &[bool], rewards: &[f32]) {
+        assert_eq!(
+            active.len(),
+            self.lanes.len(),
+            "train_coord_head_masked_with_rewards: active.len() must equal num_lanes"
+        );
+        assert_eq!(
+            rewards.len(),
+            self.lanes.len(),
+            "train_coord_head_masked_with_rewards: rewards.len() must equal num_lanes"
+        );
         let Some(head) = self.coord_head.as_mut() else {
             return;
         };
         let alpha = self.config.coord_action_alpha;
-        // Per-step reward baseline (shared across lanes — simple
-        // rolling average is enough).
-        let mean_r: f32 = self.coord_last_reward.iter().copied().sum::<f32>()
-            / self.coord_last_reward.len().max(1) as f32;
         let ema = 0.02f32;
-        self.coord_reward_baseline = (1.0 - ema) * self.coord_reward_baseline + ema * mean_r;
         for i in 0..self.lanes.len() {
-            let adv = (self.coord_last_reward[i] - self.coord_reward_baseline) * alpha;
+            if !active[i] {
+                continue;
+            }
+            let reward = if rewards[i].is_finite() {
+                rewards[i]
+            } else {
+                0.0
+            };
+            self.coord_reward_baseline[i] =
+                (1.0 - ema) * self.coord_reward_baseline[i] + ema * reward;
+            let adv = (reward - self.coord_reward_baseline[i]) * alpha;
             // The head backprops through the latent it cached at
             // sample() time — passing the lane's current latent here
             // paired the previous state's action-sample residual with
@@ -9134,11 +9781,13 @@ impl Agent {
     ///   the caller — typically from the env's action space).
     /// - Roll each sequence out through the frozen WM starting
     ///   from the lane's most recent latent.
+    /// - For slots marked by `set_action_parameter_masks`, sample normalized
+    ///   `(x, y)` and include them in the WM rollout.
     /// - Score each by the sum of `1/sqrt(1+visit_count)` across
     ///   predicted latents — pulling toward under-visited regions
     ///   of the state space.
-    /// - Queue the highest-scoring sequence for consumption by
-    ///   subsequent `act()` calls.
+    /// - Queue the highest-scoring action/parameter sequence for consumption
+    ///   by `act()` and `take_planned_action_parameters()`.
     ///
     /// No-op when `planner_horizon == 0` or when a lane has no
     /// prior observation (first step of the agent's life).
@@ -9150,8 +9799,15 @@ impl Agent {
             return;
         }
 
-        // MCTS path (takes priority when enabled).
-        if self.config.planner_use_mcts && self.wm_mcts_session.is_some() {
+        // The current MCTS tree has one child per discrete identity, so it
+        // cannot compare multiple parameter values for the same action. Route
+        // parameterized action spaces through batched random shooting, whose
+        // candidate rows do represent distinct `(action, x, y)` tuples.
+        let has_parameterized_actions = self.action_parameter_masks.iter().any(|&active| active);
+        if self.config.planner_use_mcts
+            && !has_parameterized_actions
+            && self.wm_mcts_session.is_some()
+        {
             self.plan_and_queue_mcts(num_actions, rng);
             return;
         }
@@ -9174,9 +9830,9 @@ impl Agent {
         }
         self.planner_calls_since_refresh += 1;
 
-        let num_actions_eff = num_actions.min(planner.action_dim).max(1);
-        let mut one_hot = vec![0.0f32; planner.action_dim];
+        let num_actions_eff = num_actions.clamp(1, MAX_ACTION_DIM);
         let mut traj = vec![0.0f32; k * planner.latent_dim];
+        let mut action_tokens = vec![0.0f32; k * planner.action_dim];
 
         for (lane_idx, lane) in self.lanes.iter().enumerate() {
             if !self.planner_queue[lane_idx].is_empty() {
@@ -9199,12 +9855,31 @@ impl Agent {
             };
 
             let mut best_score = f32::NEG_INFINITY;
-            let mut best_actions: Vec<u32> = Vec::new();
+            let parameter_mask = &self.action_parameter_masks
+                [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
+            let mut best_actions: Vec<PlannedAction> = Vec::new();
             for _ in 0..m {
                 let actions: Vec<u32> = (0..k)
                     .map(|_| valid[rng.random_range(0..valid.len())])
                     .collect();
-                planner.rollout(&z0, &actions, &mut one_hot, &mut traj);
+                action_tokens.fill(0.0);
+                let mut planned = Vec::with_capacity(k);
+                for (step, &action) in actions.iter().enumerate() {
+                    let action_idx = action as usize;
+                    let row = &mut action_tokens
+                        [step * planner.action_dim..(step + 1) * planner.action_dim];
+                    row[action_idx] = 1.0;
+                    let parameters = if parameter_mask[action_idx] {
+                        let values = [rng.random_range(-1.0..=1.0), rng.random_range(-1.0..=1.0)];
+                        row[MAX_ACTION_DIM..MAX_ACTION_DIM + ACTION_PARAMETER_DIM]
+                            .copy_from_slice(&values);
+                        Some(values)
+                    } else {
+                        None
+                    };
+                    planned.push(PlannedAction { action, parameters });
+                }
+                planner.rollout_tokens(&z0, &action_tokens, &mut traj);
 
                 let mut score = 0.0f32;
                 for step in 0..k {
@@ -9214,11 +9889,11 @@ impl Agent {
                 }
                 if score > best_score {
                     best_score = score;
-                    best_actions = actions;
+                    best_actions = planned;
                 }
             }
-            for a in best_actions {
-                self.planner_queue[lane_idx].push_back(a);
+            for planned in best_actions {
+                self.planner_queue[lane_idx].push_back(planned);
             }
         }
     }
@@ -9294,6 +9969,8 @@ impl Agent {
             self.config.planner_action_repeat.max(1)
         };
         let mut all_actions = vec![0u32; batch * k * inner_iters];
+        let mut all_action_parameters =
+            vec![0.0f32; batch * k * inner_iters * ACTION_PARAMETER_DIM];
 
         // Seed z input: replicate each lane's z0 m times.
         self.planner_z_scratch.fill(0.0);
@@ -9341,7 +10018,7 @@ impl Agent {
             let wm_planner_ptr: *mut Session = self.wm_planner_session.as_mut().unwrap();
             for inner_idx in 0..inner_iters {
                 // Policy forward (option-conditional when use_options)
-                if need_policy {
+                if need_policy && (use_options || inner_idx == 0) {
                     let policy_planner = self.policy_planner_session.as_mut().unwrap();
                     policy_planner.set_input("z", &self.planner_z_scratch);
                     if use_options {
@@ -9360,56 +10037,83 @@ impl Agent {
                         continue;
                     }
                     let valid = &valid_per_lane[lane_idx];
+                    let parameter_mask = &self.action_parameter_masks
+                        [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM];
                     for s in 0..m {
                         let row = lane_idx * m + s;
-                        let use_policy =
-                            need_policy && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
-                        let action_idx: u32 = if !use_policy {
-                            valid[rng.random_range(0..valid.len())]
+                        let sequence_idx = row * k * inner_iters + t * inner_iters + inner_idx;
+                        let action_idx: u32 = if !use_options && inner_idx > 0 {
+                            all_actions[sequence_idx - inner_idx]
                         } else {
-                            let lrow =
-                                &policy_logits[row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
-                            let mut max_l = f32::NEG_INFINITY;
-                            for &v in valid {
-                                let l = lrow[v as usize] / policy_temp;
-                                if l.is_finite() && l > max_l {
-                                    max_l = l;
-                                }
-                            }
-                            if !max_l.is_finite() {
-                                max_l = 0.0;
-                            }
-                            let mut sum = 0.0f32;
-                            let probs: Vec<f32> = valid
-                                .iter()
-                                .map(|&v| {
-                                    let p = (lrow[v as usize] / policy_temp - max_l).exp();
-                                    sum += p;
-                                    p
-                                })
-                                .collect();
-                            if sum <= 0.0 || !sum.is_finite() {
+                            let use_policy =
+                                need_policy && rng.random_range(0.0..1.0_f32) < policy_mix_eff;
+                            if !use_policy {
                                 valid[rng.random_range(0..valid.len())]
                             } else {
-                                let u: f32 = rng.random_range(0.0..1.0) * sum;
-                                let mut cum = 0.0;
-                                let mut chosen = 0;
-                                for (i, &p) in probs.iter().enumerate() {
-                                    cum += p;
-                                    if u <= cum {
-                                        chosen = i;
-                                        break;
+                                let lrow = &policy_logits
+                                    [row * MAX_ACTION_DIM..(row + 1) * MAX_ACTION_DIM];
+                                let mut max_l = f32::NEG_INFINITY;
+                                for &v in valid {
+                                    let l = lrow[v as usize] / policy_temp;
+                                    if l.is_finite() && l > max_l {
+                                        max_l = l;
                                     }
                                 }
-                                valid[chosen]
+                                if !max_l.is_finite() {
+                                    max_l = 0.0;
+                                }
+                                let mut sum = 0.0f32;
+                                let probs: Vec<f32> = valid
+                                    .iter()
+                                    .map(|&v| {
+                                        let p = (lrow[v as usize] / policy_temp - max_l).exp();
+                                        sum += p;
+                                        p
+                                    })
+                                    .collect();
+                                if sum <= 0.0 || !sum.is_finite() {
+                                    valid[rng.random_range(0..valid.len())]
+                                } else {
+                                    let u: f32 = rng.random_range(0.0..1.0) * sum;
+                                    let mut cum = 0.0;
+                                    let mut chosen = 0;
+                                    for (i, &p) in probs.iter().enumerate() {
+                                        cum += p;
+                                        if u <= cum {
+                                            chosen = i;
+                                            break;
+                                        }
+                                    }
+                                    valid[chosen]
+                                }
                             }
                         };
                         // Store in (row, t, inner_idx) layout
-                        all_actions[row * k * inner_iters + t * inner_iters + inner_idx] =
-                            action_idx;
+                        all_actions[sequence_idx] = action_idx;
                         if (action_idx as usize) < MAX_ACTION_DIM {
                             self.planner_action_scratch
-                                [row * MAX_ACTION_DIM + action_idx as usize] = 1.0;
+                                [row * WM_ACTION_DIM + action_idx as usize] = 1.0;
+                            if parameter_mask[action_idx as usize] {
+                                let parameter_offset = sequence_idx * ACTION_PARAMETER_DIM;
+                                if !use_options && inner_idx > 0 {
+                                    let source = (sequence_idx - inner_idx) * ACTION_PARAMETER_DIM;
+                                    all_action_parameters.copy_within(
+                                        source..source + ACTION_PARAMETER_DIM,
+                                        parameter_offset,
+                                    );
+                                } else {
+                                    all_action_parameters[parameter_offset] =
+                                        rng.random_range(-1.0..1.0);
+                                    all_action_parameters[parameter_offset + 1] =
+                                        rng.random_range(-1.0..1.0);
+                                }
+                                self.planner_action_scratch[row * WM_ACTION_DIM + MAX_ACTION_DIM
+                                    ..row * WM_ACTION_DIM + WM_ACTION_DIM]
+                                    .copy_from_slice(
+                                        &all_action_parameters[parameter_offset
+                                            ..parameter_offset + ACTION_PARAMETER_DIM],
+                                    );
+                            }
                         }
                     }
                 }
@@ -9567,7 +10271,6 @@ impl Agent {
 
         // Score each row by sum-of-novelty over its trajectory.
         // Pick best row per lane and queue its actions.
-        let rnd_alpha = self.config.planner_rnd_alpha;
         let sigma_alpha = self.config.planner_sigma_alpha;
         let sigma_budget = self.config.planner_sigma_horizon;
         let have_sigma_traj = self.config.wm_stochastic
@@ -9578,7 +10281,6 @@ impl Agent {
         let change_alpha = self.config.planner_change_alpha;
         let subgoal_alpha = self.config.planner_subgoal_alpha;
         let has_value = self.wm_planner_has_value_head;
-        let rnd_ref = self.rnd_state.as_ref();
         for lane_idx in 0..n {
             if !lane_active[lane_idx] {
                 continue;
@@ -9643,11 +10345,6 @@ impl Agent {
                     let z_step = &self.planner_traj_scratch[off..off + ld];
                     let c = lane.buffer.visit_count(z_step);
                     score += 1.0 / ((c as f32 + 1.0).sqrt());
-                    if rnd_alpha > 0.0 {
-                        if let Some(rnd) = rnd_ref {
-                            score += w_explore * rnd_alpha * rnd.reward(z_step);
-                        }
-                    }
                     if let Some(gq) = goals {
                         if !gq.is_empty() {
                             score += w_exploit * goal_alpha * max_goal_similarity(z_step, gq);
@@ -9711,7 +10408,21 @@ impl Agent {
             for t in 0..best_trusted_k {
                 for inner_idx in 0..inner_iters {
                     let act = all_actions[best_row * k * inner_iters + t * inner_iters + inner_idx];
-                    self.planner_queue[lane_idx].push_back(act);
+                    let sequence_idx = best_row * k * inner_iters + t * inner_iters + inner_idx;
+                    let parameters =
+                        if self.action_parameter_masks[lane_idx * MAX_ACTION_DIM + act as usize] {
+                            let offset = sequence_idx * ACTION_PARAMETER_DIM;
+                            Some([
+                                all_action_parameters[offset],
+                                all_action_parameters[offset + 1],
+                            ])
+                        } else {
+                            None
+                        };
+                    self.planner_queue[lane_idx].push_back(PlannedAction {
+                        action: act,
+                        parameters,
+                    });
                 }
             }
             // BC-from-planner: push the (s, planner-chosen a) pair into
@@ -9732,21 +10443,26 @@ impl Agent {
                     // planner never chose.
                     let action_idx = all_actions[best_row * k * inner_iters] as usize;
                     let r = self.config.bc_planner_synthetic_r;
-                    let cap = self.config.sil_buffer_capacity;
-                    if self.sil_buffer.len() >= cap {
-                        self.sil_buffer.pop_front();
-                    }
                     // Pairing note: `last` is the most recent record,
                     // whose latent IS the state the planner just
                     // planned from — the (s, a) pair is correct as-is.
-                    self.sil_buffer.push_back(SilSample {
+                    let sample = SilSample {
                         obs: last.observation.clone(),
                         z: last.latent.clone(),
                         action_idx,
+                        action_mask: self.action_masks
+                            [lane_idx * MAX_ACTION_DIM..(lane_idx + 1) * MAX_ACTION_DIM]
+                            .to_vec(),
                         r_to_go: r,
                         v_at_collect: 0.0,
+                        event_success: false,
                         env_id: lane.adapter.id(),
-                    });
+                    };
+                    append_sil_samples(
+                        &mut self.sil_buffer,
+                        std::iter::once(sample),
+                        self.config.sil_buffer_capacity,
+                    );
                 }
             }
         }
@@ -9817,7 +10533,7 @@ impl Agent {
         // Scratch for the n_lanes-sized WM dispatch (z in, action in,
         // z_next out). Sized once per call.
         let mut z_in = vec![0.0f32; n * ld];
-        let mut a_in = vec![0.0f32; n * MAX_ACTION_DIM];
+        let mut a_in = vec![0.0f32; n * WM_ACTION_DIM];
         let mut z_out = vec![0.0f32; n * ld];
 
         for _sim in 0..n_sim {
@@ -9849,7 +10565,7 @@ impl Agent {
                     let parent_z = &tree.nodes[parent_idx].z;
                     z_in[lane_idx * ld..(lane_idx + 1) * ld].copy_from_slice(parent_z);
                     if (action as usize) < MAX_ACTION_DIM {
-                        a_in[lane_idx * MAX_ACTION_DIM + action as usize] = 1.0;
+                        a_in[lane_idx * WM_ACTION_DIM + action as usize] = 1.0;
                     }
                 }
             }
@@ -9862,19 +10578,12 @@ impl Agent {
             wm_mcts.read_output_by_index(0, &mut z_out);
 
             // 4) Per-lane: add child node, compute novelty score, backup.
-            let rnd_alpha = self.config.planner_rnd_alpha;
             let goal_alpha = self.config.planner_goal_alpha;
-            let rnd_ref = self.rnd_state.as_ref();
             for lane_idx in 0..n {
                 if let Some((path, action)) = leaves[lane_idx].take() {
                     let child_z = z_out[lane_idx * ld..(lane_idx + 1) * ld].to_vec();
                     let count = self.lanes[lane_idx].buffer.visit_count(&child_z);
                     let mut value = 1.0 / ((count as f32 + 1.0).sqrt());
-                    if rnd_alpha > 0.0 {
-                        if let Some(rnd) = rnd_ref {
-                            value += rnd_alpha * rnd.reward(&child_z);
-                        }
-                    }
                     if goal_alpha > 0.0 || self.config.planner_subgoal_alpha > 0.0 {
                         let goal_key = if self.config.goal_states_cross_game {
                             0u32
@@ -9931,7 +10640,10 @@ impl Agent {
                     }
                     match best_a {
                         Some(a) => {
-                            self.planner_queue[lane_idx].push_back(a as u32);
+                            self.planner_queue[lane_idx].push_back(PlannedAction {
+                                action: a as u32,
+                                parameters: None,
+                            });
                             cur = node.children[a as usize];
                         }
                         None => break,
@@ -9957,7 +10669,7 @@ impl Agent {
         let mut wm_params: Vec<(&str, usize)> = vec![
             ("world_model.z_proj.weight", ld * hd),
             ("world_model.z_proj.bias", hd),
-            ("world_model.a_proj.weight", MAX_ACTION_DIM * hd),
+            ("world_model.a_proj.weight", WM_ACTION_DIM * hd),
             ("world_model.fc2.weight", hd * hd),
             ("world_model.fc2.bias", hd),
             ("world_model.fc_out.weight", hd * ld),
@@ -10061,10 +10773,48 @@ impl Agent {
             return;
         }
         for &a in actions {
-            self.planner_queue[lane].push_back(a);
+            if a as usize >= MAX_ACTION_DIM {
+                continue;
+            }
+            self.planner_queue[lane].push_back(PlannedAction {
+                action: a,
+                parameters: None,
+            });
         }
     }
 
+    /// External-API push for explicit `(action, [x, y])` decisions. Values are
+    /// sanitized to the same normalized range as `set_action_parameters`.
+    pub fn queue_parameterized_actions(
+        &mut self,
+        lane: usize,
+        actions: &[(u32, [f32; ACTION_PARAMETER_DIM])],
+    ) {
+        if lane >= self.planner_queue.len() {
+            return;
+        }
+        for &(action, mut parameters) in actions {
+            if action as usize >= MAX_ACTION_DIM {
+                continue;
+            }
+            for value in &mut parameters {
+                *value = if value.is_finite() {
+                    value.clamp(-1.0, 1.0)
+                } else {
+                    0.0
+                };
+            }
+            self.planner_queue[lane].push_back(PlannedAction {
+                action,
+                parameters: Some(parameters),
+            });
+        }
+    }
+
+    /// Current M7 confidence ∈ [0, 1]. Zero until warmup is met;
+    /// ramps linearly to 1 over `approach_confidence_saturation`
+    /// episodes. One once warmup is met if saturation is zero, and always
+    /// zero when M7 is disabled.
     pub fn approach_confidence(&self) -> f32 {
         let Some(state) = self.approach_state.as_ref() else {
             return 0.0;
@@ -10098,10 +10848,10 @@ impl Agent {
 
     /// Per-lane diagnostics, one entry per lane in lane order.
     ///
-    /// Global (batch-shared) signals — `loss_world_model`, `loss_credit`,
+    /// Global (batch-shared) signals — `loss_world_model`,
     /// `loss_policy`, `loss_replay`, `repr_drift` — are broadcast to every
     /// lane's row. Lane-specific fields (`env_id`, `reward_*`,
-    /// `policy_entropy`, `buffer_len`, `h_eff`) vary per row.
+    /// `policy_entropy` and `buffer_len`) vary per row.
     /// Number of (s, a, R_to_go, V) samples currently in the SIL buffer.
     /// Useful for verifying SIL is actually populating during training.
     pub fn sil_buffer_size(&self) -> usize {
@@ -10145,14 +10895,21 @@ impl Agent {
         self.sil_last_param_change
     }
 
-    /// Current SIL "successful episode" baseline. Returns 0 before
-    /// the first episode completes.
+    /// Current SIL "successful episode" baseline for lane 0's task. Returns
+    /// 0 before that task completes its first eligible episode. Kept as the
+    /// single-value compatibility diagnostic; multi-task callers can use
+    /// [`Self::sil_baseline_value_for_env`].
     pub fn sil_baseline_value(&self) -> f32 {
-        if self.sil_baseline_initialized {
-            self.sil_baseline
-        } else {
-            0.0
-        }
+        self.lanes
+            .first()
+            .and_then(|lane| self.sil_baselines.get(&lane.adapter.id()))
+            .copied()
+            .unwrap_or(0.0)
+    }
+
+    /// Current SIL admission baseline for a specific task id.
+    pub fn sil_baseline_value_for_env(&self, env_id: u32) -> Option<f32> {
+        self.sil_baselines.get(&env_id).copied()
     }
 
     pub fn diagnostics(&self) -> Vec<Diagnostics> {
@@ -10160,14 +10917,6 @@ impl Agent {
             .iter()
             .enumerate()
             .map(|(lane_idx, lane)| {
-                let recent = lane.buffer.recent_window(self.config.history_len);
-                let credit_weights: Vec<f32> = recent.iter().map(|t| t.credit).collect();
-                let h_eff = if credit_weights.is_empty() {
-                    0.0
-                } else {
-                    credit::effective_scope(&credit_weights)
-                };
-
                 let goal_diversity =
                     if self.option_session.is_some() && self.config.num_options >= 2 {
                         let n_opt = self.config.num_options;
@@ -10209,7 +10958,7 @@ impl Agent {
                     step: self.step_count,
                     env_id: lane.adapter.id(),
                     loss_world_model: self.last_wm_loss,
-                    loss_credit: self.last_credit_loss,
+                    loss_reconstruction: self.last_recon_loss,
                     loss_policy: self.last_policy_loss,
                     loss_replay: self.last_replay_loss,
                     reward_mean: lane.last_reward,
@@ -10217,14 +10966,12 @@ impl Agent {
                     reward_novelty: lane.last_novelty,
                     reward_homeo: lane.last_homeo,
                     reward_order: lane.last_order,
-                    h_eff,
                     policy_entropy: lane.last_entropy,
                     repr_drift: self.last_drift,
                     buffer_len: lane.buffer.len(),
                     current_option: lane.current_option,
                     option_return: lane.option_return,
                     goal_distance,
-                    h_eff_l1: self.last_h_eff_l1,
                     goal_diversity,
                     r_hat: lane.last_r_hat,
                     outcome_baseline: lane.outcome_baseline,
@@ -10261,29 +11008,59 @@ impl Agent {
     }
 }
 
-/// Deterministic per-env task embedding. Same env_id always produces the
-/// Variant-only equality on `ActionKind`. The enum isn't `Eq` because it
-/// carries `f32` in the continuous branch; we just want to check the two
-/// adapters agree on which branch of the sum type they are.
+/// Compatibility for one shared policy graph. Discrete lanes may expose
+/// different categorical widths because masking handles padded heads;
+/// continuous lanes must agree on both live dimension and exploration scale.
 fn kinds_match(a: ActionKind, b: ActionKind) -> bool {
-    matches!(
-        (a, b),
-        (ActionKind::Discrete { .. }, ActionKind::Discrete { .. })
-            | (ActionKind::Continuous { .. }, ActionKind::Continuous { .. })
-    )
+    match (a, b) {
+        (ActionKind::Discrete { .. }, ActionKind::Discrete { .. }) => true,
+        (
+            ActionKind::Continuous {
+                dim: left_dim,
+                scale: left_scale,
+            },
+            ActionKind::Continuous {
+                dim: right_dim,
+                scale: right_scale,
+            },
+        ) => left_dim == right_dim && left_scale.to_bits() == right_scale.to_bits(),
+        _ => false,
+    }
 }
 
-/// same vector, so swapping in and out across runs is consistent. Values
-/// are spread in [-0.5, 0.5] via a golden-ratio hash.
-fn embedding_for(env_id: u32, dim: usize) -> Vec<f32> {
+/// Deterministic task code. In orthogonal mode, the first `dim` ids receive
+/// one-hot directions, so training one common task does not update every column
+/// of the trainable task projection and poison a later task's adapter bias.
+/// Larger ids fall back to a normalized dense hash. Compatibility mode returns
+/// the historical unnormalized dense hash for every id.
+fn embedding_for(env_id: u32, dim: usize, orthogonal: bool) -> Vec<f32> {
+    if orthogonal && (env_id as usize) < dim {
+        let mut embedding = vec![0.0; dim];
+        embedding[env_id as usize] = 1.0;
+        return embedding;
+    }
     use std::f32::consts::PI;
-    (0..dim)
+    let mut embedding = (0..dim)
         .map(|i| {
             let h =
                 ((env_id as f64 + i as f64 * 17.0 + 1.0) * 0.618_033_988_749_895).fract() as f32;
             (h * PI * 2.0).sin() * 0.5
         })
-        .collect()
+        .collect::<Vec<_>>();
+    if !orthogonal {
+        return embedding;
+    }
+    let norm = embedding
+        .iter()
+        .map(|value| value * value)
+        .sum::<f32>()
+        .sqrt();
+    if norm > 0.0 {
+        for value in &mut embedding {
+            *value /= norm;
+        }
+    }
+    embedding
 }
 
 /// Initialize all parameters with Xavier (Glorot) initialization.
@@ -10324,6 +11101,32 @@ mod tests {
     use super::*;
     use crate::buffer::{ExperienceBuffer, Transition};
 
+    #[test]
+    fn task_code_modes_preserve_dense_compatibility_and_isolate_common_ids() {
+        for env_id in 0..TASK_DIM as u32 {
+            let embedding = embedding_for(env_id, TASK_DIM, true);
+            assert_eq!(embedding[env_id as usize], 1.0);
+            assert_eq!(embedding.iter().filter(|&&value| value != 0.0).count(), 1);
+        }
+        let fallback = embedding_for(TASK_DIM as u32 + 7, TASK_DIM, true);
+        let norm = fallback
+            .iter()
+            .map(|value| value * value)
+            .sum::<f32>()
+            .sqrt();
+        assert!((norm - 1.0).abs() < 1e-6, "norm={norm}");
+
+        let env_id = 3;
+        let historical = (0..TASK_DIM)
+            .map(|i| {
+                let h = ((env_id as f64 + i as f64 * 17.0 + 1.0) * 0.618_033_988_749_895).fract()
+                    as f32;
+                (h * std::f32::consts::PI * 2.0).sin() * 0.5
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(embedding_for(env_id, TASK_DIM, false), historical);
+    }
+
     /// Build an ExperienceBuffer with one transition per tuple
     /// `(reward, value, env_boundary)`. Latent and other fields are
     /// filled with zeros; they don't matter for the TD-target math.
@@ -10334,8 +11137,9 @@ mod tests {
                 observation: vec![0.0; 4],
                 latent: vec![0.0; 4],
                 action: vec![0.0; MAX_ACTION_DIM],
+                action_parameters: vec![0.0; ACTION_PARAMETER_DIM],
+                action_mask: vec![1.0; MAX_ACTION_DIM],
                 reward,
-                credit: 0.0,
                 pred_error: 0.0,
                 value,
                 prob_taken: 1.0,
@@ -10348,6 +11152,297 @@ mod tests {
             });
         }
         buf
+    }
+
+    #[test]
+    fn event_filtered_sil_imitates_negative_return_successes() {
+        assert_eq!(sil_imitation_advantage(-20.0, 0.0, false, true, 2.0), 0.0);
+        assert_eq!(sil_imitation_advantage(-20.0, 0.0, true, false, 2.0), 0.0);
+        assert_eq!(sil_imitation_advantage(-20.0, 0.0, true, true, 2.0), 1.0);
+        assert_eq!(sil_imitation_advantage(5.0, 1.0, true, true, 2.0), 2.0);
+    }
+
+    #[test]
+    fn greedy_policy_actions_respect_live_discrete_width_and_continuous_dim() {
+        let discrete = greedy_policy_action(ActionKind::Discrete { n: 3 }, &[0.1, 0.9, 0.2, 99.0]);
+        assert!(matches!(discrete, Action::Discrete(1)));
+
+        let continuous = greedy_policy_action(
+            ActionKind::Continuous { dim: 2, scale: 0.5 },
+            &[0.25, -0.75, 8.0],
+        );
+        assert!(matches!(continuous, Action::Continuous(ref values) if values == &[0.25, -0.75]));
+    }
+
+    #[test]
+    fn event_filtered_sil_baseline_compares_successes_only() {
+        let mut baseline = 0.0;
+        let mut initialized = false;
+        assert!(!admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            -200.0,
+            false,
+            true,
+            0.99,
+        ));
+        assert!(!initialized, "failed episodes must not seed event baseline");
+        assert!(admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            -80.0,
+            true,
+            true,
+            0.99,
+        ));
+        assert_eq!(baseline, -80.0);
+        assert!(!admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            -100.0,
+            true,
+            true,
+            0.99,
+        ));
+        assert!(baseline < -80.0 && baseline > -81.0);
+        assert!(admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            -60.0,
+            true,
+            true,
+            0.99,
+        ));
+    }
+
+    #[test]
+    fn sil_admission_baselines_are_independent_per_task() {
+        let mut baselines = hashbrown::HashMap::new();
+        assert!(admit_sil_episode_for_env(
+            &mut baselines,
+            0,
+            500.0,
+            true,
+            true,
+            0.99,
+        ));
+        assert!(admit_sil_episode_for_env(
+            &mut baselines,
+            1,
+            -80.0,
+            true,
+            true,
+            0.99,
+        ));
+        assert_eq!(baselines.get(&0), Some(&500.0));
+        assert_eq!(baselines.get(&1), Some(&-80.0));
+
+        let mut failed_only = hashbrown::HashMap::new();
+        assert!(!admit_sil_episode_for_env(
+            &mut failed_only,
+            7,
+            -200.0,
+            false,
+            true,
+            0.99,
+        ));
+        assert!(!failed_only.contains_key(&7));
+    }
+
+    #[test]
+    fn sil_sampling_balances_tasks_not_transition_volume() {
+        let sample = |env_id| SilSample {
+            obs: vec![0.0; 4],
+            z: vec![0.0; 4],
+            action_idx: 0,
+            action_mask: vec![1.0; MAX_ACTION_DIM],
+            r_to_go: 1.0,
+            v_at_collect: 0.0,
+            event_success: true,
+            env_id,
+        };
+        let mut buffer = std::collections::VecDeque::new();
+        buffer.extend((0..100).map(|_| sample(0)));
+        buffer.push_back(sample(1));
+
+        let indices = balanced_sil_sample_indices(&buffer, 20, 42, &[0, 1].into_iter().collect());
+        let env_ids = indices
+            .iter()
+            .map(|&index| buffer[index].env_id)
+            .collect::<Vec<_>>();
+        assert_eq!(env_ids.iter().filter(|&&env_id| env_id == 0).count(), 10);
+        assert_eq!(env_ids.iter().filter(|&&env_id| env_id == 1).count(), 10);
+
+        let active_only = balanced_sil_sample_indices(&buffer, 20, 42, &[1].into_iter().collect());
+        assert!(
+            active_only.iter().all(|&index| buffer[index].env_id == 1),
+            "inactive task labels must not train the current lanes"
+        );
+    }
+
+    #[test]
+    fn sil_capacity_retains_inactive_tasks_and_single_task_fifo() {
+        let sample = |env_id, marker| SilSample {
+            obs: vec![marker],
+            z: vec![0.0; 4],
+            action_idx: 0,
+            action_mask: vec![1.0; MAX_ACTION_DIM],
+            r_to_go: 1.0,
+            v_at_collect: 0.0,
+            event_success: true,
+            env_id,
+        };
+
+        let mut buffer = std::collections::VecDeque::new();
+        append_sil_samples(&mut buffer, (0..10).map(|i| sample(0, i as f32)), 10);
+        append_sil_samples(&mut buffer, (10..20).map(|i| sample(0, i as f32)), 10);
+        assert_eq!(buffer.len(), 10);
+        assert_eq!(buffer.front().expect("sample").obs, vec![10.0]);
+        assert_eq!(buffer.back().expect("sample").obs, vec![19.0]);
+
+        append_sil_samples(
+            &mut buffer,
+            (0..10).map(|i| sample(1, 100.0 + i as f32)),
+            10,
+        );
+        assert_eq!(buffer.iter().filter(|sample| sample.env_id == 0).count(), 5);
+        assert_eq!(buffer.iter().filter(|sample| sample.env_id == 1).count(), 5);
+        assert_eq!(
+            buffer
+                .iter()
+                .filter(|sample| sample.env_id == 0)
+                .map(|sample| sample.obs[0])
+                .collect::<Vec<_>>(),
+            vec![15.0, 16.0, 17.0, 18.0, 19.0]
+        );
+    }
+
+    #[test]
+    fn event_sil_window_is_bounded_and_does_not_cross_environment_boundaries() {
+        let mut buffer = mk_buffer(&[
+            (0.0, 0.0, false),
+            (0.0, 0.0, false),
+            (0.0, 0.0, false),
+            (0.0, 0.0, false),
+            (1.0, 0.0, false),
+        ]);
+        for idx in 0..buffer.len() {
+            buffer.get_mut(idx).observation[0] = idx as f32;
+            buffer.get_mut(idx).action[idx] = 1.0;
+            buffer.get_mut(idx).env_id = 7;
+        }
+
+        let samples = sil_samples_from_recent_trajectory(&buffer, 3, true, 100.0);
+
+        assert_eq!(samples.len(), 3);
+        assert_eq!(
+            samples
+                .iter()
+                .map(|sample| sample.action_idx)
+                .collect::<Vec<_>>(),
+            vec![4, 3, 2]
+        );
+        assert_eq!(
+            samples
+                .iter()
+                .map(|sample| sample.obs[0])
+                .collect::<Vec<_>>(),
+            vec![3.0, 2.0, 1.0]
+        );
+        assert!(samples.iter().all(|sample| sample.r_to_go == 1.0));
+        assert!(samples.iter().all(|sample| sample.event_success));
+        assert!(samples.iter().all(|sample| sample.env_id == 7));
+
+        buffer.get_mut(3).env_boundary = true;
+        let bounded = sil_samples_from_recent_trajectory(&buffer, 10, true, 100.0);
+        assert_eq!(bounded.len(), 1, "event replay must stop at a real reset");
+        assert_eq!(bounded[0].action_idx, 4);
+    }
+
+    #[test]
+    fn standard_sil_keeps_first_episode_warmup() {
+        let mut baseline = 0.0;
+        let mut initialized = false;
+        assert!(!admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            10.0,
+            false,
+            false,
+            0.99,
+        ));
+        assert!(initialized);
+        assert!(admit_sil_episode(
+            &mut baseline,
+            &mut initialized,
+            11.0,
+            false,
+            false,
+            0.99,
+        ));
+    }
+
+    #[test]
+    fn wm_action_token_keeps_policy_identity_and_appends_parameters() {
+        let mut base = vec![0.0; MAX_ACTION_DIM];
+        base[5] = 1.0;
+        let mut out = vec![f32::NAN; WM_ACTION_DIM];
+
+        compose_wm_action_token(&base, &[-0.75, 0.5], &mut out);
+
+        assert_eq!(&out[..MAX_ACTION_DIM], base.as_slice());
+        assert_eq!(&out[MAX_ACTION_DIM..], &[-0.75, 0.5]);
+
+        compose_wm_action_token(&base, &[], &mut out);
+        assert_eq!(&out[..MAX_ACTION_DIM], base.as_slice());
+        assert_eq!(&out[MAX_ACTION_DIM..], &[0.0, 0.0]);
+    }
+
+    #[test]
+    fn explicit_terminal_event_does_not_require_positive_reward() {
+        assert!(is_task_event(Some(true), -1.0));
+        assert!(!is_task_event(Some(false), 1.0));
+        assert!(is_task_event(None, 1.0));
+        assert!(!is_task_event(None, -1.0));
+    }
+
+    #[test]
+    fn grpo_advantages_normalize_within_task_groups() {
+        let mut advantages = vec![1.0, 3.0, 100.0, 104.0];
+        let active = vec![true; 4];
+        let groups = vec![7, 7, 9, 9];
+        normalize_active_advantages(&mut advantages, &active, Some(&groups), true);
+        for (actual, expected) in advantages.iter().zip([-1.0, 1.0, -1.0, 1.0]) {
+            assert!((actual - expected).abs() < 1e-5, "{advantages:?}");
+        }
+    }
+
+    #[test]
+    fn stored_action_mask_is_restored_or_defaults_to_all_actions() {
+        let mut dst = vec![0.0; 4];
+        restore_action_mask(&mut dst, &[1.0, 0.0, 1.0, 0.0]);
+        assert_eq!(dst, [1.0, 0.0, 1.0, 0.0]);
+
+        restore_action_mask(&mut dst, &[]);
+        assert_eq!(dst, [1.0; 4]);
+    }
+
+    #[test]
+    fn grpo_advantages_leave_singletons_and_inactive_rows_unchanged() {
+        let mut advantages = vec![5.0, 99.0, 7.0];
+        let active = vec![true, false, true];
+        let groups = vec![1, 1, 2];
+        normalize_active_advantages(&mut advantages, &active, Some(&groups), true);
+        assert_eq!(advantages, vec![5.0, 99.0, 7.0]);
+    }
+
+    #[test]
+    fn episode_grpo_mean_centers_without_rescaling() {
+        let mut advantages = vec![2.0, 6.0];
+        let active = vec![true, true];
+        let groups = vec![3, 3];
+        normalize_active_advantages(&mut advantages, &active, Some(&groups), false);
+        assert_eq!(advantages, vec![-2.0, 2.0]);
     }
 
     #[test]

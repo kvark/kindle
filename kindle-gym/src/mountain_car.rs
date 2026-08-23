@@ -97,6 +97,7 @@ impl Environment for MountainCar {
         // self.homeo for the next step.
         self.update_homeo();
         let homeostatic = self.homeo.clone();
+        let observation = self.observe();
 
         // Auto-reset on goal or truncation (continual learning)
         let reached_goal = self.position >= GOAL_POSITION;
@@ -106,8 +107,12 @@ impl Environment for MountainCar {
         }
 
         StepResult {
-            observation: self.observe(),
+            observation,
             homeostatic,
+            reward: -1.0,
+            task_event: reached_goal,
+            terminated: reached_goal,
+            truncated,
         }
     }
 
@@ -140,12 +145,29 @@ mod tests {
     #[test]
     fn mountain_car_auto_resets() {
         let mut env = MountainCar::new();
-        // Run 250 steps — should auto-reset at 200
-        for _ in 0..250 {
-            env.step(&Action::Discrete(1)); // no push
-        }
-        // After reset, step_count should be < 200
-        assert!(env.step_count < 200);
+        env.step_count = env.max_steps - 1;
+
+        let result = env.step(&Action::Discrete(1));
+
+        assert_eq!(result.reward, -1.0);
+        assert!(!result.task_event);
+        assert!(!result.terminated);
+        assert!(result.truncated);
+        assert!(result.done());
+        assert_eq!(env.step_count, 0);
+        assert_ne!(result.observation.data, env.observe().data);
+    }
+
+    #[test]
+    fn mountain_car_goal_is_an_event_despite_negative_reward() {
+        let mut env = MountainCar::new();
+        env.position = GOAL_POSITION;
+
+        let result = env.step(&Action::Discrete(2));
+
+        assert_eq!(result.reward, -1.0);
+        assert!(result.task_event);
+        assert!(result.terminated);
     }
 
     #[test]

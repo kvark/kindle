@@ -94,8 +94,17 @@ pub struct Transition {
     pub observation: Vec<f32>,
     pub latent: Vec<f32>,
     pub action: Vec<f32>,
+    /// Optional normalized parameters consumed by the action (currently ARC
+    /// click x/y). Length ACTION_PARAMETER_DIM for agent-collected
+    /// transitions; zeros mean no parameters or a centered parameter value.
+    /// Kept separate so discrete policy labels remain valid one-hot vectors.
+    pub action_parameters: Vec<f32>,
+    /// Discrete-action availability mask in effect when `action` was
+    /// sampled. Length MAX_ACTION_DIM for agent-collected transitions.
+    /// Delayed PPO updates need the acted-from state's mask, not the mask
+    /// of whichever environment state is live at update time.
+    pub action_mask: Vec<f32>,
     pub reward: f32,
-    pub credit: f32,
     pub pred_error: f32,
     /// Value baseline V(s_t) at this step, cached from the act-time
     /// policy forward. Used by the n-step advantage path (see
@@ -121,7 +130,7 @@ pub struct Transition {
     /// Used to stratify sampling and mark env-boundary resets.
     pub env_id: u32,
     /// Boundary flag: true on the first transition after `switch_env`, so
-    /// the credit assigner and world model skip cross-env attribution.
+    /// the world model and return estimators do not cross environments.
     pub env_boundary: bool,
     /// Total episode return at the time this episode COMPLETED. Set
     /// retroactively when the episode-end boundary is detected
@@ -389,173 +398,6 @@ impl ExperienceBuffer {
     /// Get a mutable reference to transition by logical index.
     pub fn get_mut(&mut self, index: usize) -> &mut Transition {
         self.transitions.get_mut(index)
-    }
-
-    /// Flatten a history window into a single vector for the credit assigner.
-    ///
-    /// Each timestep becomes `[latent..., action..., reward_normalized]`,
-    /// concatenated across `n` steps. Rewards are normalized to zero mean
-    /// and clamped to [-1, 1] to prevent gradient explosion.
-    pub fn flatten_history(&self, n: usize) -> Option<Vec<f32>> {
-        if self.len() < n {
-            return None;
-        }
-        let window = self.recent_window(n);
-
-        // Normalize rewards in the window
-        let rewards: Vec<f32> = window.iter().map(|t| t.reward).collect();
-        let mean = rewards.iter().sum::<f32>() / rewards.len() as f32;
-        let std = (rewards.iter().map(|r| (r - mean).powi(2)).sum::<f32>() / rewards.len() as f32)
-            .sqrt()
-            .max(1e-6);
-
-        let mut flat = Vec::new();
-        for (i, t) in window.iter().enumerate() {
-            flat.extend_from_slice(&t.latent);
-            flat.extend_from_slice(&t.action);
-            flat.push(((rewards[i] - mean) / std).clamp(-1.0, 1.0));
-        }
-        Some(flat)
-    }
-
-    /// Flatten a history window starting at a specific index. Rewards
-    /// are z-scored and clamped within the window, matching the input
-    /// convention of `flatten_history` (the credit net trains and
-    /// infers on both, so the reward feature must be scaled the same
-    /// way).
-    pub fn flatten_history_at(&self, start: usize, n: usize) -> Option<Vec<f32>> {
-        if start + n > self.len() {
-            return None;
-        }
-        let rewards: Vec<f32> = (start..start + n).map(|i| self.get(i).reward).collect();
-        let mean = rewards.iter().sum::<f32>() / rewards.len() as f32;
-        let std = (rewards.iter().map(|r| (r - mean).powi(2)).sum::<f32>() / rewards.len() as f32)
-            .sqrt()
-            .max(1e-6);
-        let mut flat = Vec::new();
-        for (k, i) in (start..start + n).enumerate() {
-            let t = self.get(i);
-            flat.extend_from_slice(&t.latent);
-            flat.extend_from_slice(&t.action);
-            flat.push(((rewards[k] - mean) / std).clamp(-1.0, 1.0));
-        }
-        Some(flat)
-    }
-
-    /// Find a contrastive pair: two timesteps with similar latents but
-    /// divergent rewards. Returns `(high_reward_idx, low_reward_idx)`.
-    ///
-    /// Searches a random subset of the buffer for efficiency.
-    pub fn find_contrastive_pair<R: Rng>(
-        &self,
-        rng: &mut R,
-        history_len: usize,
-        _latent_dim: usize,
-    ) -> Option<(usize, usize)> {
-        if self.len() < history_len * 2 {
-            return None;
-        }
-
-        let search_range = history_len..self.len();
-        let num_candidates = 50.min(search_range.len());
-
-        let mut best_pair: Option<(usize, usize)> = None;
-        let mut best_score = 0.0f32;
-
-        for _ in 0..num_candidates {
-            let i = rng.random_range(search_range.clone());
-            let j = rng.random_range(search_range.clone());
-            if i == j {
-                continue;
-            }
-
-            let ti = self.get(i);
-            let tj = self.get(j);
-
-            // Stratify by env_id: contrastive pairs must come from the
-            // same environment, otherwise the signal "rewards differ" is
-            // meaningless (different envs have different reward scales).
-            if ti.env_id != tj.env_id {
-                continue;
-            }
-
-            // Latent similarity (lower = more similar)
-            let latent_dist: f32 = ti
-                .latent
-                .iter()
-                .zip(tj.latent.iter())
-                .map(|(a, b)| (a - b).powi(2))
-                .sum::<f32>()
-                .sqrt();
-
-            // Reward divergence (higher = better pair)
-            let reward_diff = (ti.reward - tj.reward).abs();
-
-            // Score: high reward divergence relative to latent similarity
-            let score = reward_diff / (latent_dist + 0.1);
-
-            if score > best_score {
-                best_score = score;
-                if ti.reward >= tj.reward {
-                    best_pair = Some((i, j));
-                } else {
-                    best_pair = Some((j, i));
-                }
-            }
-        }
-
-        best_pair
-    }
-
-    /// Compute contrastive credit target: high credit to timesteps where
-    /// actions diverged between two history windows.
-    ///
-    /// Returns a softmax-normalized target of length `history_len`.
-    pub fn contrastive_target(
-        &self,
-        high_idx: usize,
-        low_idx: usize,
-        history_len: usize,
-    ) -> Vec<f32> {
-        let mut divergence = vec![0.0f32; history_len];
-
-        let high_start = high_idx.saturating_sub(history_len - 1);
-        let low_start = low_idx.saturating_sub(history_len - 1);
-
-        for (i, div) in divergence.iter_mut().enumerate() {
-            let h_idx = high_start + i;
-            let l_idx = low_start + i;
-            if h_idx < self.len() && l_idx < self.len() {
-                let th = self.get(h_idx);
-                let tl = self.get(l_idx);
-                *div = th
-                    .action
-                    .iter()
-                    .zip(tl.action.iter())
-                    .map(|(a, b)| (a - b).powi(2))
-                    .sum::<f32>()
-                    .sqrt();
-            }
-        }
-
-        // Softmax normalize
-        let max = divergence.iter().cloned().fold(f32::NEG_INFINITY, f32::max);
-        let exp_sum: f32 = divergence.iter().map(|&d| (d - max).exp()).sum();
-        if exp_sum > 0.0 {
-            divergence
-                .iter_mut()
-                .for_each(|d| *d = (*d - max).exp() / exp_sum);
-        }
-        divergence
-    }
-
-    /// Write credit values back to the most recent N transitions.
-    pub fn write_credits(&mut self, credits: &[f32]) {
-        let n = credits.len().min(self.len());
-        let start = self.len() - n;
-        for (i, &c) in credits.iter().enumerate() {
-            self.get_mut(start + i).credit = c;
-        }
     }
 
     /// Sample a batch for training: `replay_ratio` fraction from full history,

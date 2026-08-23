@@ -12,7 +12,9 @@
 // we don't own; silence the lint at the crate level.
 #![allow(clippy::useless_conversion)]
 
-use kindle::adapter::{GenericAdapter, MAX_ACTION_DIM, OBS_TOKEN_DIM};
+use kindle::adapter::{
+    GenericAdapter, ACTION_PARAMETER_DIM, MAX_ACTION_DIM, OBS_TOKEN_DIM, WM_ACTION_DIM,
+};
 use kindle::env::{
     Action, Environment, HomeostaticProvider, HomeostaticVariable, Observation, StepResult,
 };
@@ -180,7 +182,7 @@ impl PyAgent {
 
     /// Mark the next observed transition as the start of a new episode.
     /// Call this after a gymnasium `terminated | truncated` reset so the
-    /// world model and credit assigner don't attribute across the reset.
+    /// world model and return estimators don't cross the reset.
     fn mark_boundary(&mut self) {
         self.agent.mark_boundary(0);
     }
@@ -324,6 +326,10 @@ impl<'a> Environment for ProxyEnv<'a> {
         StepResult {
             observation: self.obs.clone(),
             homeostatic: self.homeo.clone(),
+            reward: 0.0,
+            task_event: false,
+            terminated: false,
+            truncated: false,
         }
     }
     fn reset(&mut self) {}
@@ -454,6 +460,9 @@ fn _native(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyBatchAgent>()?;
     m.add_class::<PyEfficientNet>()?;
     m.add("OBS_TOKEN_DIM", OBS_TOKEN_DIM)?;
+    m.add("MAX_ACTION_DIM", MAX_ACTION_DIM)?;
+    m.add("ACTION_PARAMETER_DIM", ACTION_PARAMETER_DIM)?;
+    m.add("WM_ACTION_DIM", WM_ACTION_DIM)?;
     Ok(())
 }
 
@@ -492,7 +501,6 @@ impl PyBatchAgent {
         hidden_dim = None,
         action_repeat = None,
         lr_policy = None,
-        lr_credit = None,
         entropy_beta = None,
         entropy_floor = None,
         advantage_clamp = None,
@@ -506,7 +514,6 @@ impl PyBatchAgent {
         diayn_reward_alpha = None,
         diayn_hidden_dim = None,
         diayn_lr = None,
-        history_len = None,
         gamma = None,
         n_step = None,
         outcome_reward_alpha = None,
@@ -573,6 +580,7 @@ impl PyBatchAgent {
         use_sil = None,
         sil_loss_coef = None,
         sil_event_filter = None,
+        sil_event_horizon = None,
         sil_buffer_capacity = None,
         sil_baseline_decay = None,
         use_kl_ppo = None,
@@ -618,7 +626,6 @@ impl PyBatchAgent {
         planner_sigma_horizon = None,
         wm_stochastic = None,
         wm_sigma_loss_coef = None,
-        planner_rnd_alpha = None,
         planner_goal_alpha = None,
         goal_states_cap = None,
         visit_count_dims = None,
@@ -627,11 +634,9 @@ impl PyBatchAgent {
         planner_value_alpha = None,
         value_head_gamma = None,
         value_head_buffer_capacity = None,
-        value_head_train_batch = None,
         value_head_hidden_dim = None,
         value_head_lr_scale = None,
         goal_states_her_prob = None,
-        value_head_grad_to_encoder = None,
         bc_planner_synthetic_r = None,
         planner_change_alpha = None,
         value_buffer_cross_game = None,
@@ -642,7 +647,6 @@ impl PyBatchAgent {
         confidence_mode = None,
         confidence_win_increment = None,
         confidence_novelty_drop_rate = None,
-        confidence_novelty_threshold = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -657,7 +661,6 @@ impl PyBatchAgent {
         hidden_dim: Option<usize>,
         action_repeat: Option<usize>,
         lr_policy: Option<f32>,
-        lr_credit: Option<f32>,
         entropy_beta: Option<f32>,
         entropy_floor: Option<f32>,
         advantage_clamp: Option<f32>,
@@ -671,7 +674,6 @@ impl PyBatchAgent {
         diayn_reward_alpha: Option<f32>,
         diayn_hidden_dim: Option<usize>,
         diayn_lr: Option<f32>,
-        history_len: Option<usize>,
         gamma: Option<f32>,
         n_step: Option<usize>,
         outcome_reward_alpha: Option<f32>,
@@ -738,6 +740,7 @@ impl PyBatchAgent {
         use_sil: Option<bool>,
         sil_loss_coef: Option<f32>,
         sil_event_filter: Option<bool>,
+        sil_event_horizon: Option<usize>,
         sil_buffer_capacity: Option<usize>,
         sil_baseline_decay: Option<f32>,
         use_kl_ppo: Option<bool>,
@@ -783,7 +786,6 @@ impl PyBatchAgent {
         planner_sigma_horizon: Option<f32>,
         wm_stochastic: Option<bool>,
         wm_sigma_loss_coef: Option<f32>,
-        planner_rnd_alpha: Option<f32>,
         planner_goal_alpha: Option<f32>,
         goal_states_cap: Option<usize>,
         visit_count_dims: Option<usize>,
@@ -792,11 +794,9 @@ impl PyBatchAgent {
         planner_value_alpha: Option<f32>,
         value_head_gamma: Option<f32>,
         value_head_buffer_capacity: Option<usize>,
-        value_head_train_batch: Option<usize>,
         value_head_hidden_dim: Option<usize>,
         value_head_lr_scale: Option<f32>,
         goal_states_her_prob: Option<f32>,
-        value_head_grad_to_encoder: Option<bool>,
         bc_planner_synthetic_r: Option<f32>,
         planner_change_alpha: Option<f32>,
         value_buffer_cross_game: Option<bool>,
@@ -807,7 +807,6 @@ impl PyBatchAgent {
         confidence_mode: Option<bool>,
         confidence_win_increment: Option<f32>,
         confidence_novelty_drop_rate: Option<f32>,
-        confidence_novelty_threshold: Option<f32>,
     ) -> PyResult<Self> {
         if obs_dim > OBS_TOKEN_DIM {
             return Err(PyValueError::new_err(format!(
@@ -833,7 +832,10 @@ impl PyBatchAgent {
                 }
                 v
             }
-            None => (0..batch_size as u32).collect(),
+            // Vectorized lanes normally represent independent copies of the
+            // same task. Give them one task id by default; callers doing
+            // multi-task batches can provide explicit per-lane ids.
+            None => vec![0; batch_size],
         };
         let adapters: Vec<Box<dyn kindle::EnvAdapter>> = ids
             .into_iter()
@@ -848,9 +850,8 @@ impl PyBatchAgent {
         };
         if let Some(lr) = learning_rate {
             config.learning_rate = lr;
-            // Scale dependent LRs proportionally to preserve the 0.3×/0.5×
-            // ratios documented in the agent module.
-            config.lr_credit = lr * 0.3;
+            // Scale the policy LR proportionally to preserve the documented
+            // 0.5× ratio.
             config.lr_policy = lr * 0.5;
         }
         if let Some(w) = warmup_steps {
@@ -869,14 +870,10 @@ impl PyBatchAgent {
             config.action_repeat = k;
         }
         // Per-head LR overrides apply *after* the `learning_rate`-derived
-        // scaling above, so callers can target a specific head without
-        // retuning the other two. Useful for LunarLander-style problems
+        // scaling above, so callers can target a specific head. Useful for LunarLander-style problems
         // where the policy needs a bigger LR than the world model.
         if let Some(lrp) = lr_policy {
             config.lr_policy = lrp;
-        }
-        if let Some(lrc) = lr_credit {
-            config.lr_credit = lrc;
         }
         if let Some(ef) = entropy_floor {
             config.entropy_floor = ef;
@@ -916,9 +913,6 @@ impl PyBatchAgent {
         }
         if let Some(lr) = diayn_lr {
             config.diayn_lr = Some(lr);
-        }
-        if let Some(h) = history_len {
-            config.history_len = h;
         }
         if let Some(g) = gamma {
             config.gamma = g;
@@ -1129,6 +1123,9 @@ impl PyBatchAgent {
         if let Some(v) = sil_event_filter {
             config.sil_event_filter = v;
         }
+        if let Some(v) = sil_event_horizon {
+            config.sil_event_horizon = v;
+        }
         if let Some(v) = sil_buffer_capacity {
             config.sil_buffer_capacity = v;
         }
@@ -1264,9 +1261,6 @@ impl PyBatchAgent {
         if let Some(v) = wm_sigma_loss_coef {
             config.wm_sigma_loss_coef = v;
         }
-        if let Some(v) = planner_rnd_alpha {
-            config.planner_rnd_alpha = v;
-        }
         if let Some(v) = planner_goal_alpha {
             config.planner_goal_alpha = v;
         }
@@ -1291,9 +1285,6 @@ impl PyBatchAgent {
         if let Some(v) = value_head_buffer_capacity {
             config.value_head_buffer_capacity = v;
         }
-        if let Some(v) = value_head_train_batch {
-            config.value_head_train_batch = v;
-        }
         if let Some(v) = value_head_hidden_dim {
             config.value_head_hidden_dim = v;
         }
@@ -1302,9 +1293,6 @@ impl PyBatchAgent {
         }
         if let Some(v) = goal_states_her_prob {
             config.goal_states_her_prob = v;
-        }
-        if let Some(v) = value_head_grad_to_encoder {
-            config.value_head_grad_to_encoder = v;
         }
         if let Some(v) = bc_planner_synthetic_r {
             config.bc_planner_synthetic_r = v;
@@ -1335,9 +1323,6 @@ impl PyBatchAgent {
         }
         if let Some(v) = confidence_novelty_drop_rate {
             config.confidence_novelty_drop_rate = v;
-        }
-        if let Some(v) = confidence_novelty_threshold {
-            config.confidence_novelty_threshold = v;
         }
         if let Some(ek) = encoder_kind {
             config.encoder_kind = match ek.as_str() {
@@ -1399,7 +1384,8 @@ impl PyBatchAgent {
     /// Sample one discrete action per lane. `obs_list` must be a sequence
     /// of length `batch_size` where each entry is a 1-D sequence of floats.
     /// Returns a list of integer action indices, length `batch_size`.
-    fn act(&mut self, obs_list: &Bound<'_, PyAny>) -> PyResult<Vec<usize>> {
+    #[pyo3(signature = (obs_list, deterministic = false))]
+    fn act(&mut self, obs_list: &Bound<'_, PyAny>, deterministic: bool) -> PyResult<Vec<usize>> {
         let py = obs_list.py();
         let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
         let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
@@ -1407,7 +1393,11 @@ impl PyBatchAgent {
         let mut ctx = AssertSend((&mut self.agent, &mut self.rng));
         let actions = py.detach(move || {
             let (agent, rng) = ctx.get();
-            agent.act(&observations, rng)
+            if deterministic {
+                agent.act_greedy(&observations, rng)
+            } else {
+                agent.act(&observations, rng)
+            }
         });
         actions
             .into_iter()
@@ -1589,30 +1579,78 @@ impl PyBatchAgent {
         self.agent.latents()
     }
 
-    /// Save trainable state to a directory. Writes one safetensors
-    /// file per session (wm, policy, credit, optional option + option_credit).
-    /// Use with `load_state` on a freshly constructed agent of the
-    /// same architecture for clean train/val splits.
-    fn save_state(&mut self, dir: &str) -> PyResult<()> {
-        self.agent
-            .save_state(std::path::Path::new(dir))
-            .map_err(|e| PyValueError::new_err(format!("save_state: {e}")))
+    /// One masked behavior-cloning update on externally labeled discrete
+    /// states. Requires the plain end-to-end categorical policy graph.
+    #[pyo3(signature = (obs_list, action_indices, weight = 1.0))]
+    fn train_policy_supervised(
+        &mut self,
+        obs_list: &Bound<'_, PyAny>,
+        action_indices: Vec<usize>,
+        weight: f32,
+    ) -> PyResult<()> {
+        if action_indices.len() != self.batch_size {
+            return Err(PyValueError::new_err(format!(
+                "train_policy_supervised action_indices length {} must equal batch_size {}",
+                action_indices.len(),
+                self.batch_size
+            )));
+        }
+        if let Some((lane, action)) = action_indices
+            .iter()
+            .copied()
+            .enumerate()
+            .find(|(_, action)| *action >= self.num_actions)
+        {
+            return Err(PyValueError::new_err(format!(
+                "train_policy_supervised action {action} at lane {lane} is outside num_actions {}",
+                self.num_actions
+            )));
+        }
+        if !weight.is_finite() || weight <= 0.0 {
+            return Err(PyValueError::new_err(
+                "train_policy_supervised weight must be finite and positive",
+            ));
+        }
+        let py = obs_list.py();
+        let observations = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?
+            .into_iter()
+            .map(Observation::new)
+            .collect::<Vec<_>>();
+        let mut ctx = AssertSend((&mut self.agent, observations, action_indices));
+        py.detach(move || {
+            let (agent, observations, action_indices) = ctx.get();
+            agent.train_policy_supervised(observations, action_indices, weight)
+        })
+        .map_err(PyValueError::new_err)?;
+        Ok(())
     }
 
-    /// Load trainable state from a directory previously written by
-    /// `save_state`. The agent must have been constructed with the
+    /// Save trainable weights to a directory. Writes one safetensors
+    /// file per session (wm, policy, and optional option) plus coord.bin
+    /// when the CPU coordinate head is enabled.
+    /// Use with `load_weights` on a freshly constructed agent of the
+    /// same architecture for clean train/val splits.
+    fn save_weights(&mut self, dir: &str) -> PyResult<()> {
+        self.agent
+            .save_weights(std::path::Path::new(dir))
+            .map_err(|e| PyValueError::new_err(format!("save_weights: {e}")))
+    }
+
+    /// Load trainable weights from a directory previously written by
+    /// `save_weights`. The agent must have been constructed with the
     /// same graph topology (latent_dim, hidden_dim, encoder kind,
     /// num_options, recon flags, layer-norm flags).
-    fn load_state(&mut self, dir: &str) -> PyResult<()> {
+    /// This does not restore replay, optimizer, RNG, lane, or harness state.
+    fn load_weights(&mut self, dir: &str) -> PyResult<()> {
         self.agent
-            .load_state(std::path::Path::new(dir))
-            .map_err(|e| PyValueError::new_err(format!("load_state: {e}")))
+            .load_weights(std::path::Path::new(dir))
+            .map_err(|e| PyValueError::new_err(format!("load_weights: {e}")))
     }
 
     /// Partial-loader: read a single safetensors file into the
     /// wm_session only. Missing parameters are tolerated (meganeura's
     /// load_checkpoint logs a warning and skips them). Used to inject
-    /// a pretrained CNN encoder without touching policy/credit.
+    /// a pretrained CNN encoder without touching the policy.
     fn load_wm_checkpoint(&mut self, path: &str) -> PyResult<()> {
         self.agent
             .load_wm_checkpoint(std::path::Path::new(path))
@@ -1721,6 +1759,53 @@ impl PyBatchAgent {
         self.agent.clear_action_masks();
     }
 
+    /// Declare which discrete action slots consume `(x, y)` parameters.
+    /// Flat bool layout `[batch_size × MAX_ACTION_DIM]`. The planner samples
+    /// coordinates only for marked actions and keeps ordinary WM tails zero.
+    fn set_action_parameter_masks(&mut self, masks: Vec<bool>) -> PyResult<()> {
+        let expected = self.batch_size * MAX_ACTION_DIM;
+        check_len("set_action_parameter_masks", masks.len(), expected)?;
+        self.agent.set_action_parameter_masks(&masks);
+        Ok(())
+    }
+
+    /// Reset all action slots to the unparameterized default.
+    fn clear_action_parameter_masks(&mut self) {
+        self.agent.clear_action_parameter_masks();
+    }
+
+    /// Stage normalized `(x, y)`-style parameters for the next `observe()`.
+    /// `parameters` is flat `[batch_size × ACTION_PARAMETER_DIM]`; the bool
+    /// `active_mask` selects lanes whose executed action consumed them. This
+    /// augments only the world-model action token; policy labels stay one-hot.
+    fn set_action_parameters(
+        &mut self,
+        parameters: &Bound<'_, PyAny>,
+        active_mask: Vec<bool>,
+    ) -> PyResult<()> {
+        let expected = self.batch_size * ACTION_PARAMETER_DIM;
+        check_len(
+            "set_action_parameters active_mask",
+            active_mask.len(),
+            self.batch_size,
+        )?;
+        if let Ok(buf) = pyo3::buffer::PyBuffer::<f32>::get(parameters) {
+            let py = parameters.py();
+            if let Some(slice) = buf.as_slice(py) {
+                check_len("set_action_parameters", slice.len(), expected)?;
+                let ptr = slice.as_ptr() as *const f32;
+                let len = slice.len();
+                let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+                self.agent.set_action_parameters(slice, &active_mask);
+                return Ok(());
+            }
+        }
+        let values: Vec<f32> = parameters.extract()?;
+        check_len("set_action_parameters", values.len(), expected)?;
+        self.agent.set_action_parameters(&values, &active_mask);
+        Ok(())
+    }
+
     /// Set per-lane extrinsic (env) reward for the next `observe()`
     /// call. `rewards` is a length-`batch_size` buffer (numpy array
     /// preferred for zero-copy; any iterable also accepted). No-op
@@ -1740,6 +1825,15 @@ impl PyBatchAgent {
         let v: Vec<f32> = rewards.extract()?;
         check_len("set_extrinsic_reward", v.len(), self.batch_size)?;
         self.agent.set_extrinsic_reward(&v);
+        Ok(())
+    }
+
+    /// Mark per-lane task-success events for the next `observe()` call.
+    /// Use this when success can terminate on a zero or negative reward;
+    /// positive extrinsic rewards are already treated as events implicitly.
+    fn set_extrinsic_events(&mut self, events: Vec<bool>) -> PyResult<()> {
+        check_len("set_extrinsic_events", events.len(), self.batch_size)?;
+        self.agent.set_extrinsic_events(&events);
         Ok(())
     }
 
@@ -1801,8 +1895,8 @@ impl PyBatchAgent {
         self.agent.set_lr_policy(lr);
     }
 
-    /// Update base + policy + credit learning rates together,
-    /// preserving the constructor's 0.5× / 0.3× ratios. The
+    /// Update base + policy learning rates together, preserving the
+    /// constructor's 0.5× ratio. The
     /// recommended setter for LR schedules — avoids the
     /// `set_learning_rate`-without-`set_lr_policy` no-op footgun.
     fn set_all_learning_rates(&mut self, lr: f32) {
@@ -1857,7 +1951,7 @@ impl PyBatchAgent {
 
     /// Upload all policy-session parameters from `[(name, values), ...]`.
     /// Returns the number of params successfully uploaded.
-    fn load_policy_params(&self, params: Vec<(String, Vec<f32>)>) -> usize {
+    fn load_policy_params(&mut self, params: Vec<(String, Vec<f32>)>) -> usize {
         self.agent.load_policy_params(&params)
     }
 
@@ -2117,12 +2211,89 @@ impl PyBatchAgent {
         self.agent.sample_coords(&mut self.rng)
     }
 
-    /// Train the coord head on the per-step rewards cached during
-    /// the last `observe()`. Uses an EMA reward baseline inside
-    /// the agent so the harness doesn't need to supply
-    /// advantages. No-op when the coord head is disabled.
-    fn train_coord_head(&mut self) {
-        self.agent.train_coord_head();
+    /// Deterministic coordinate means for the supplied current observations.
+    /// This encodes `obs_list` directly rather than reading buffered latents.
+    fn coord_means(&mut self, obs_list: &Bound<'_, PyAny>) -> PyResult<Vec<(f32, f32)>> {
+        let py = obs_list.py();
+        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
+        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
+        let mut ctx = AssertSend((&mut self.agent, observations));
+        Ok(py.detach(move || {
+            let (agent, observations) = ctx.get();
+            agent.coord_means_for_observations(observations)
+        }))
+    }
+
+    /// Supervised coordinate imitation from successful demonstration states.
+    /// `targets` contains normalized `(x, y)` pairs in `[−1, 1]`.
+    #[pyo3(signature = (obs_list, targets, active_mask = None, weight = 1.0))]
+    fn train_coord_head_supervised(
+        &mut self,
+        obs_list: &Bound<'_, PyAny>,
+        targets: Vec<(f32, f32)>,
+        active_mask: Option<Vec<bool>>,
+        weight: f32,
+    ) -> PyResult<f32> {
+        let py = obs_list.py();
+        let obs_vecs = parse_obs_list(obs_list, self.batch_size, self.obs_dim)?;
+        check_len(
+            "train_coord_head_supervised targets",
+            targets.len(),
+            self.batch_size,
+        )?;
+        let active = active_mask.unwrap_or_else(|| vec![true; self.batch_size]);
+        check_len(
+            "train_coord_head_supervised active_mask",
+            active.len(),
+            self.batch_size,
+        )?;
+        if !weight.is_finite() || weight < 0.0 {
+            return Err(PyValueError::new_err(
+                "train_coord_head_supervised weight must be finite and >= 0",
+            ));
+        }
+        let observations: Vec<Observation> = obs_vecs.into_iter().map(Observation::new).collect();
+        let targets: Vec<[f32; 2]> = targets.into_iter().map(|(x, y)| [x, y]).collect();
+        let mut ctx = AssertSend((&mut self.agent, observations, targets, active));
+        Ok(py.detach(move || {
+            let (agent, observations, targets, active) = ctx.get();
+            agent.train_coord_head_supervised(observations, targets, active, weight)
+        }))
+    }
+
+    /// Consume coordinate parameters attached to actions returned by the most
+    /// recent `act()`. Entries are None for policy/skill actions or ordinary
+    /// discrete planner actions. Call after `act()` and before env.step().
+    fn take_planned_action_parameters(&mut self) -> Vec<Option<(f32, f32)>> {
+        self.agent
+            .take_planned_action_parameters()
+            .into_iter()
+            .map(|parameters| parameters.map(|p| (p[0], p[1])))
+            .collect()
+    }
+
+    /// Train the coord head on rewards cached during the last `observe()`.
+    /// `active_mask` identifies lanes whose executed action actually consumed
+    /// coordinates; inactive lanes neither train nor affect the reward baseline.
+    /// Optional `rewards` supplies one explicit scalar per lane (for example,
+    /// sparse level progress) instead of Kindle's combined intrinsic/extrinsic
+    /// reward. Omitting both arguments preserves backwards compatibility.
+    #[pyo3(signature = (active_mask = None, rewards = None))]
+    fn train_coord_head(
+        &mut self,
+        active_mask: Option<Vec<bool>>,
+        rewards: Option<Vec<f32>>,
+    ) -> PyResult<()> {
+        let mask = active_mask.unwrap_or_else(|| vec![true; self.batch_size]);
+        check_len("train_coord_head active_mask", mask.len(), self.batch_size)?;
+        if let Some(rewards) = rewards {
+            check_len("train_coord_head rewards", rewards.len(), self.batch_size)?;
+            self.agent
+                .train_coord_head_masked_with_rewards(&mask, &rewards);
+        } else {
+            self.agent.train_coord_head_masked(&mask);
+        }
+        Ok(())
     }
 
     /// Current size of the M8 delta-goal bank. Returns 0 when
@@ -2173,10 +2344,19 @@ impl PyBatchAgent {
         self.agent.queue_actions(lane, &actions);
     }
 
+    /// Queue explicit `(action, (x, y))` planner decisions for one lane.
+    fn queue_parameterized_actions(&mut self, lane: usize, actions: Vec<(u32, (f32, f32))>) {
+        let actions: Vec<(u32, [f32; ACTION_PARAMETER_DIM])> = actions
+            .into_iter()
+            .map(|(action, (x, y))| (action, [x, y]))
+            .collect();
+        self.agent.queue_parameterized_actions(lane, &actions);
+    }
+
     /// Snapshot the most recent `n` transitions of `lane_idx`, oldest
     /// first, as a list of dicts. Each dict contains:
     ///   observation (list[float]), latent (list[float]),
-    ///   action (list[float]), reward (float), credit (float),
+    ///   action (list[float]), action_parameters (list[float]), reward (float),
     ///   pred_error (float), value (float), prob_taken (float),
     ///   option_idx (int), env_id (int), env_boundary (bool).
     /// Diagnostic-only — used to inspect rollout buffers offline
@@ -2195,8 +2375,8 @@ impl PyBatchAgent {
             d.set_item("observation", t.observation.clone())?;
             d.set_item("latent", t.latent.clone())?;
             d.set_item("action", t.action.clone())?;
+            d.set_item("action_parameters", t.action_parameters.clone())?;
             d.set_item("reward", t.reward)?;
-            d.set_item("credit", t.credit)?;
             d.set_item("pred_error", t.pred_error)?;
             d.set_item("value", t.value)?;
             d.set_item("prob_taken", t.prob_taken)?;

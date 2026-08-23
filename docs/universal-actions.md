@@ -10,12 +10,18 @@ can:
 3. Train multiple agent copies in parallel envs and merge their experience.
 4. Adapt quickly to never-seen environments (ARC-AGI3 target).
 
-This document plans the architecture. No code yet.
+This is a historical design record. The adapter and batched-lane portions are
+implemented; current source and README are authoritative where later work
+diverged from this plan. In particular, the experimental credit assigner was
+removed in 2026-08 because its outputs never affected policy advantages. The
+later parameterized-action split is also authoritative: policy labels are
+`MAX_ACTION_DIM = 18`, while the world model receives `WM_ACTION_DIM = 20`
+with a separate two-value parameter tail.
 
 ## Where we are today
 
 - `AgentConfig` bakes `obs_dim`, `action_dim`, and `action_kind` at agent
-  construction. The three GPU sessions (world model, credit, policy) all
+  construction. The core GPU sessions (world model and policy) both
   have these dimensions hard-wired into their compiled graphs.
 - `Action::Discrete(n) | Continuous(Vec<f32>)` exists at the trait level,
   but the agent's policy graph picks one branch at build time and then
@@ -44,10 +50,13 @@ This document plans the architecture. No code yet.
 
 Pick a maximum action dim `MAX_ACTION_DIM` (say 16) and a maximum observation
 projection dim `OBS_TOKEN_DIM` (say 64). The core (encoder, world model,
-credit, policy, value) only ever sees:
+policy, value) only ever sees:
 
 - An observation token of shape `[batch, OBS_TOKEN_DIM]`.
-- An action token of shape `[batch, MAX_ACTION_DIM]`.
+- A policy action token of shape `[batch, MAX_ACTION_DIM]`.
+- A world-model action token of shape `[batch, WM_ACTION_DIM]`, composed of
+  the same discrete identity plus `ACTION_PARAMETER_DIM = 2` normalized
+  parameters. Non-parameterized actions use a zero tail.
 
 What changes per env:
 
@@ -60,6 +69,13 @@ What changes per env:
   takes the first N policy outputs, softmaxes, samples. Continuous env
   with K dims takes the first K policy outputs as the Gaussian mean. An
   `action_mask: Vec<bool>` describes which output dims are "live".
+
+Parameterized discrete environments additionally declare their parameterized
+slots with `set_action_parameter_masks`. The policy still selects an 18-way
+identity; shooting MPC samples a two-value tail only for declared slots, and
+the host consumes the selected tail once after `act()`. This keeps ordinary
+actions at an in-distribution zero tail instead of letting the planner exploit
+untrained parameter dimensions.
 
 Rust shape (sketch):
 
@@ -108,7 +124,7 @@ impl Agent {
 Effects:
 
 - Push a sentinel `Transition` to the buffer marking the boundary, so the
-  credit assigner doesn't try to attribute reward across the boundary.
+  world model and return estimators do not cross environments.
 - Swap the active adapter.
 - Optionally: take a parameter snapshot ("checkpoint") for rollback if the
   new env destabilizes training.
@@ -130,7 +146,7 @@ current step. This requires:
 
 - The shared universal interface (so all envs produce same-shape inputs).
 - The buffer becomes per-env (a `Vec<ExperienceBuffer>`) so per-env
-  rewards and credit don't get mixed.
+  rewards and returns do not get mixed.
 - The policy/value/world-model losses sum across the batch as usual; this
   is just the standard "batch dim is env dim" trick. Meganeura supports
   `batch_size > 1` already; we've just been using `batch_size = 1`.
@@ -230,8 +246,8 @@ the design above:
 
 - **Pretraining**: run the agent in fork-join mode across a curriculum of
   the seven existing built-in envs (and any synthetic ones we add). The
-  core encoder, world model, and credit assigner learn generic
-  representations and dynamics.
+  encoder, world model, and policy learn reusable representations and
+  behavior where the observation/action contracts overlap.
 - **Adaptation**: when a new ARC-AGI3 env arrives, freeze the core (set
   encoder LR scale to ~0), let the per-env adapter and task embedding
   train. The buffer collects new transitions; novelty rewards drive
@@ -244,7 +260,11 @@ the design above:
 For this to work, the universal action interface has to be expressive
 enough for ARC-AGI3 actions. ARC-AGI3 actions are typically grid clicks
 or transformations, which fit naturally as `Discrete(N)` or short
-continuous vectors. We don't need a token-vocabulary action space.
+continuous vectors. Variable object sets do not need a global token-vocabulary
+action space: the stable discrete head selects the action kind, then a small
+candidate pointer scores environment-supplied feature rows. The retained ARC
+checkpoint chooses among as many as 65 live objects while `MAX_ACTION_DIM`
+remains 18.
 
 ## Migration path
 
@@ -281,14 +301,12 @@ Phased rollout that doesn't break existing examples:
   Set `MAX_ACTION_DIM = 6`, `OBS_TOKEN_DIM = 64`. Both can grow later.
   *(Superseded: `MAX_ACTION_DIM` did grow later — it is now 18
   (`kindle/src/adapter.rs`), raised for the Atari/ARC-AGI-3 action
-  sets. `OBS_TOKEN_DIM` remains 64.)*
+  sets. `OBS_TOKEN_DIM` remains 64. Parameterized dynamics append two
+  values, making `WM_ACTION_DIM = 20`, without corrupting policy one-hot
+  labels.)*
 - **Action mask: CPU side.** The graph stays clean; the per-env adapter
   zeros or softmaxes over the live dims before returning an action.
   Revisit if the wasted gradient on dead dims becomes a problem.
-- **One shared credit assigner** across all envs. Sample contrastive
-  pairs only within the same env (env_id-stratified) so the signal
-  stays meaningful. Simpler than per-env credit and keeps transfer of
-  temporal-attribution circuitry across envs.
 
 ## Still to decide later
 

@@ -174,7 +174,6 @@ fn agent_config(num_options: usize) -> AgentConfig {
     AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
-        history_len: 16,
         buffer_capacity: 5000,
         batch_size: 1,
         learning_rate: 1e-3,
@@ -259,15 +258,11 @@ fn run_l1_on_env(run: EnvRun, steps: usize, num_options: usize) -> RunStats {
             text_samples.push((step, d_pre.current_option, action_text(run.env_id, &action)));
         }
 
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
+        let result = env.step(&action);
         let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 
@@ -290,9 +285,8 @@ fn run_l1_on_env(run: EnvRun, steps: usize, num_options: usize) -> RunStats {
         }
     }
 
-    let final_h_eff_l1 = agent.diagnostics()[0].h_eff_l1;
     println!(
-        "  {}: wm {:.3}→{:.3}  homeo_dev {:.2}→{:.2}  reward_mean(late) {:+.2}  entropy {:.2}  h_eff_l1 {:.2}",
+        "  {}: wm {:.3}→{:.3}  homeo_dev {:.2}→{:.2}  reward_mean(late) {:+.2}  entropy {:.2}",
         run.name,
         wm_early,
         wm_late,
@@ -300,7 +294,6 @@ fn run_l1_on_env(run: EnvRun, steps: usize, num_options: usize) -> RunStats {
         homeo_sum_late / window as f32,
         reward_sum_late / window as f32,
         final_entropy,
-        final_h_eff_l1,
     );
 
     // Option histogram and per-option modal action.
@@ -393,15 +386,10 @@ fn skill_transfer(
     for _ in 0..pretrain {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
-        let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = env.step(&action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
     }
@@ -428,15 +416,11 @@ fn skill_transfer(
     for step in 0..target_steps {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
+        let result = env.step(&action);
         let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
         if step < 200 {
@@ -463,15 +447,11 @@ fn skill_transfer(
     for step in 0..target_steps {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
+        let result = env.step(&action);
         let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
         if step < 200 {

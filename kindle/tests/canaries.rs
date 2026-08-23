@@ -136,6 +136,10 @@ fn canary_kindle_world_model() {
             StepResult {
                 observation: self.observe(),
                 homeostatic: vec![],
+                reward: 0.0,
+                task_event: false,
+                terminated: false,
+                truncated: false,
             }
         }
         fn reset(&mut self) {
@@ -151,17 +155,14 @@ fn canary_kindle_world_model() {
         buffer_capacity: 500,
         batch_size: 1,
         learning_rate: 3e-3,
-        // Anti-collapse recon, as in the real operating config. The
-        // 2026-06-10 forward-dynamics fix put stop_grad on the WM
-        // target: the encoder no longer receives WM-loss gradients,
-        // so without recon it stays at its (task-dominated, near-
-        // collinear) init and the convergence threshold below would
-        // measure noise.
-        recon_loss_coef: 1.0,
+        // AgentConfig's default reconstruction objective is required here:
+        // the stopped WM target cannot train the encoder on its own.
         ..AgentConfig::default()
     };
 
     let mut agent = Agent::new(config, vec![adapter]);
+    let encoder_before = agent.dump_encoder_params();
+    assert!(!encoder_before.is_empty(), "encoder parameters must exist");
     let mut rng = rand::rng();
 
     // Collect early loss
@@ -203,6 +204,19 @@ fn canary_kindle_world_model() {
         );
     }
     let late_loss = agent.diagnostics()[0].loss_world_model;
+    let encoder_after = agent.dump_encoder_params();
+    let encoder_change: f32 = encoder_before
+        .iter()
+        .zip(encoder_after.iter())
+        .map(|((name_before, before), (name_after, after))| {
+            assert_eq!(name_before, name_after);
+            before
+                .iter()
+                .zip(after.iter())
+                .map(|(a, b)| (a - b).abs())
+                .sum::<f32>()
+        })
+        .sum();
 
     // The early loss is near-zero for the WRONG reason (collapsed
     // encoder init makes every target identical), so `late < early`
@@ -212,4 +226,218 @@ fn canary_kindle_world_model() {
         late_loss < 0.15,
         "kindle world model didn't converge: early={early_loss:.4}, late={late_loss:.4}"
     );
+    assert!(
+        encoder_change > 1e-4,
+        "default representation objective did not update encoder parameters: Δ={encoder_change}"
+    );
+}
+
+/// SIL must dispatch independently of a live on-policy advantage. Before the
+/// 2026-08 audit the call lived only at the tail of selected policy-update
+/// branches, so default n_step=1 agents could accumulate event samples forever
+/// without replaying them.
+#[test]
+#[ignore] // requires GPU
+fn canary_sil_runs_with_default_n_step() {
+    use kindle::env::{Observation, StepResult};
+    use kindle::{Agent, AgentConfig, GenericAdapter};
+    use rand::SeedableRng;
+
+    let config = AgentConfig {
+        batch_size: 1,
+        latent_dim: 4,
+        hidden_dim: 8,
+        warmup_steps: 0,
+        extrinsic_reward_alpha: 1.0,
+        use_sil: true,
+        sil_event_filter: true,
+        sil_event_horizon: 1,
+        value_loss_coef: 0.0,
+        ..AgentConfig::default()
+    };
+    let adapter = Box::new(GenericAdapter::discrete(0, 4, 2));
+    let mut agent = Agent::new(config, vec![adapter]);
+    let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+
+    for (step, reward) in [0.0, 1.0].into_iter().enumerate() {
+        let obs = Observation::new(vec![step as f32, 0.0, 0.0, 0.0]);
+        let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
+        let result = StepResult {
+            observation: Observation::new(vec![step as f32 + 1.0, 0.0, 0.0, 0.0]),
+            homeostatic: vec![],
+            reward,
+            task_event: reward > 0.0,
+            terminated: false,
+            truncated: false,
+        };
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
+            std::slice::from_ref(&action),
+            &mut rng,
+        );
+    }
+
+    assert_eq!(agent.sil_buffer_size(), 1);
+    assert_eq!(agent.sil_updates_attempted_count(), 2);
+    assert!(agent.sil_updates_fired_count() >= 1);
+}
+
+/// Dynamic masks must remain aligned with the acted-from state across a
+/// delayed KL-PPO rollout update. This catches missing graph inputs and the
+/// stale-live-mask bug where every historical row used the newest mask.
+#[test]
+#[ignore] // requires GPU
+fn canary_kl_ppo_dynamic_action_masks() {
+    use kindle::{
+        Action, Agent, AgentConfig, GenericAdapter, HomeostaticVariable, Observation,
+        RewardWeights, StepResult,
+    };
+    use rand::SeedableRng;
+
+    const LANES: usize = 4;
+    let adapters = (0..LANES)
+        .map(|_| Box::new(GenericAdapter::discrete(0, 4, 2)) as Box<dyn kindle::EnvAdapter>)
+        .collect::<Vec<_>>();
+    let config = AgentConfig {
+        latent_dim: 8,
+        hidden_dim: 16,
+        batch_size: LANES,
+        learning_rate: 3e-4,
+        lr_policy: 3e-4,
+        reward_weights: RewardWeights {
+            surprise: 0.0,
+            novelty: 0.0,
+            homeostatic: 0.0,
+            order: 0.0,
+        },
+        extrinsic_reward_alpha: 1.0,
+        end_to_end_encoder: true,
+        n_step: 2,
+        rollout_length: 4,
+        use_kl_ppo: true,
+        kl_beta: 0.05,
+        ppo_n_epochs: 2,
+        ..AgentConfig::default()
+    };
+    let mut agent = Agent::new(config, adapters);
+    let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+    let mut observations = vec![Observation::new(vec![1.0, 0.0, 0.0, 0.0]); LANES];
+
+    for step in 0..64 {
+        let mut masks = vec![0.0; LANES * kindle::MAX_ACTION_DIM];
+        let expected = (0..LANES).map(|lane| (step + lane) % 2).collect::<Vec<_>>();
+        for (lane, &action) in expected.iter().enumerate() {
+            masks[lane * kindle::MAX_ACTION_DIM + action] = 1.0;
+        }
+        agent.set_action_masks(&masks);
+        let actions = agent.act(&observations, &mut rng);
+        for (actual, &want) in actions.iter().zip(&expected) {
+            assert!(matches!(actual, Action::Discrete(value) if *value == want));
+        }
+
+        let results = expected
+            .iter()
+            .enumerate()
+            .map(|(lane, &action)| {
+                let mut data = vec![0.0; 4];
+                data[(step + lane + action + 1) % 4] = 1.0;
+                StepResult {
+                    observation: Observation::new(data),
+                    homeostatic: Vec::<HomeostaticVariable>::new(),
+                    reward: 1.0,
+                    task_event: false,
+                    terminated: (step + 1) % 11 == 0,
+                    truncated: false,
+                }
+            })
+            .collect::<Vec<_>>();
+        agent.observe_step_results(&results, &actions, &mut rng);
+        observations = results
+            .iter()
+            .map(|result| result.observation.clone())
+            .collect();
+
+        let diagnostics = &agent.diagnostics()[0];
+        assert!(diagnostics.loss_policy.is_finite());
+        assert!(diagnostics.loss_world_model.is_finite());
+    }
+}
+
+/// Plain advantage-weighted CE uses the same dynamic action-mask contract as
+/// PPO. In particular, delayed rollout rows must use their collection-time
+/// mask and the graph must not allocate probability to padded action heads.
+#[test]
+#[ignore] // requires GPU
+fn canary_plain_policy_dynamic_action_masks() {
+    use kindle::{
+        Action, Agent, AgentConfig, GenericAdapter, Observation, RewardWeights, StepResult,
+    };
+    use rand::SeedableRng;
+
+    const LANES: usize = 4;
+    let adapters = (0..LANES)
+        .map(|_| Box::new(GenericAdapter::discrete(0, 4, 2)) as Box<dyn kindle::EnvAdapter>)
+        .collect::<Vec<_>>();
+    let config = AgentConfig {
+        latent_dim: 8,
+        hidden_dim: 16,
+        batch_size: LANES,
+        learning_rate: 3e-4,
+        lr_policy: 3e-4,
+        reward_weights: RewardWeights {
+            surprise: 0.0,
+            novelty: 0.0,
+            homeostatic: 0.0,
+            order: 0.0,
+        },
+        extrinsic_reward_alpha: 1.0,
+        n_step: 2,
+        rollout_length: 4,
+        advantage_normalize: true,
+        use_grpo: true,
+        entropy_floor: 0.5,
+        ..AgentConfig::default()
+    };
+    let mut agent = Agent::new(config, adapters);
+    let mut rng = rand::rngs::StdRng::seed_from_u64(17);
+    let mut observations = vec![Observation::new(vec![1.0, 0.0, 0.0, 0.0]); LANES];
+
+    for step in 0..48 {
+        let mut masks = vec![0.0; LANES * kindle::MAX_ACTION_DIM];
+        let expected = (0..LANES).map(|lane| (step + lane) % 2).collect::<Vec<_>>();
+        for (lane, &action) in expected.iter().enumerate() {
+            masks[lane * kindle::MAX_ACTION_DIM + action] = 1.0;
+        }
+        agent.set_action_masks(&masks);
+        let actions = agent.act(&observations, &mut rng);
+        for (actual, &want) in actions.iter().zip(&expected) {
+            assert!(matches!(actual, Action::Discrete(value) if *value == want));
+        }
+
+        let results = expected
+            .iter()
+            .enumerate()
+            .map(|(lane, &action)| {
+                let mut data = vec![0.0; 4];
+                data[(step + lane + action + 1) % 4] = 1.0;
+                StepResult {
+                    observation: Observation::new(data),
+                    homeostatic: vec![],
+                    reward: if action == lane % 2 { 1.0 } else { -1.0 },
+                    task_event: false,
+                    terminated: (step + 1) % 13 == 0,
+                    truncated: false,
+                }
+            })
+            .collect::<Vec<_>>();
+        agent.observe_step_results(&results, &actions, &mut rng);
+        observations = results
+            .iter()
+            .map(|result| result.observation.clone())
+            .collect();
+
+        let diagnostics = &agent.diagnostics()[0];
+        assert!(diagnostics.loss_policy.is_finite());
+        assert!(diagnostics.loss_world_model.is_finite());
+    }
 }

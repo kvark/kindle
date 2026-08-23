@@ -1,9 +1,9 @@
 //! Policy and Value Head.
 //!
-//! - **Policy** `π(z_t) → action distribution`, updated by credit-weighted
-//!   policy gradient with entropy bonus.
-//! - **Value Head** `V(z_t) → V̂`, trained via TD using the credit-adjusted
-//!   reward signal, serving as a variance-reduction baseline.
+//! - **Policy** `π(z_t) → action distribution`, updated from return or
+//!   advantage estimates with an entropy bonus.
+//! - **Value Head** `V(z_t) → V̂`, trained from reward/return targets and
+//!   used as a variance-reduction baseline.
 
 use meganeura::graph::{Graph, NodeId};
 use meganeura::nn;
@@ -20,6 +20,31 @@ fn scaled_tanh(g: &mut Graph, x: NodeId, scale: f32, batch_size: usize, last_dim
     let shrunk = g.mul(x, inv_scale_full);
     let squashed = g.tanh(shrunk);
     g.mul(squashed, scale_full)
+}
+
+/// Pin invalid discrete-action logits to -60 while leaving valid logits
+/// unchanged. Multiplying by the mask also prevents gradients from updating
+/// unavailable action heads.
+fn mask_discrete_logits(
+    g: &mut Graph,
+    logits: NodeId,
+    action_mask: NodeId,
+    batch_size: usize,
+    action_dim: usize,
+) -> NodeId {
+    let ones = g.constant(
+        vec![1.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let neg_ones = g.neg(ones);
+    let mask_minus_one = g.add(action_mask, neg_ones);
+    let sixty = g.constant(
+        vec![60.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let mask_offset = g.mul(mask_minus_one, sixty);
+    let gated_logits = g.mul(logits, action_mask);
+    g.add(gated_logits, mask_offset)
 }
 
 /// Stochastic policy network for discrete action spaces.
@@ -177,6 +202,7 @@ pub fn build_policy_graph(
     let mut g = Graph::new();
     let z = g.input("z", &[batch_size, latent_dim]);
     let action = g.input("action", &[batch_size, action_dim]);
+    let action_mask = g.input("action_mask", &[batch_size, action_dim]);
     let value_target = g.input("value_target", &[batch_size, 1]);
 
     // Phase G v2: per-option direct-to-logits bias head. Each option
@@ -223,7 +249,7 @@ pub fn build_policy_graph(
     // dominant long-run overflow source; clamping value output alone
     // (below) is sufficient to keep policy-loss finite over 1M-step
     // runs.
-    let logits = raw_logits;
+    let logits = mask_discrete_logits(&mut g, raw_logits, action_mask, batch_size, action_dim);
 
     // Value head conditions on z only — option-agnostic baseline so
     // `advantage = reward − value` retains the option-conditional
@@ -258,7 +284,7 @@ pub fn build_policy_graph(
 
     // Entropy regularizer: subtract β · H(π) from the loss.
     //
-    //   mean_all(p · log p) = -<H>/K   (negative scalar, K = action_dim)
+    //   action_dim · mean_all(p · log p) = -<H>   (negative scalar)
     //
     // so `loss += β · mean_all(p · log p)` adds a negative term for β > 0
     // (encouraging entropy, since minimizing a more-negative value lets
@@ -275,7 +301,10 @@ pub fn build_policy_graph(
         let lsm = g.log_softmax(logits);
         let p_log_p = g.mul(sm, lsm);
         let mean_ent = g.mean_all(p_log_p);
-        let beta_node = g.scalar(entropy_beta);
+        // mean_all includes the action dimension. Multiply by action_dim so
+        // entropy_beta is the conventional coefficient on mean batch entropy,
+        // rather than silently being entropy_beta/action_dim.
+        let beta_node = g.scalar(entropy_beta * action_dim as f32);
         let ent_penalty = g.mul(mean_ent, beta_node);
         g.add(base_loss, ent_penalty)
     };
@@ -418,19 +447,7 @@ pub fn build_ppo_policy_graph(
     // magnitudes (we tried 1e9) produce numerical issues that zero out
     // the policy loss. With an all-1.0 mask this is a no-op for
     // backward compat.
-    let ones_full = g.constant(
-        vec![1.0; batch_size * action_dim],
-        &[batch_size, action_dim],
-    );
-    let neg_ones_full = g.neg(ones_full);
-    let mask_minus_one = g.add(action_mask, neg_ones_full);
-    let big_const = g.constant(
-        vec![60.0; batch_size * action_dim],
-        &[batch_size, action_dim],
-    );
-    let mask_offset = g.mul(mask_minus_one, big_const);
-    let gated_logits = g.mul(logits, action_mask);
-    let logits = g.add(gated_logits, mask_offset);
+    let logits = mask_discrete_logits(&mut g, logits, action_mask, batch_size, action_dim);
 
     // π_new(a | s) — probability of the taken action under the current
     // policy. Built from `softmax(logits) * one_hot` followed by a
@@ -508,7 +525,7 @@ pub fn build_ppo_policy_graph(
         let lsm = g.log_softmax(logits);
         let p_log_p = g.mul(sm, lsm);
         let mean_ent = g.mean_all(p_log_p);
-        let beta_node = g.scalar(entropy_beta);
+        let beta_node = g.scalar(entropy_beta * action_dim as f32);
         let ent_penalty = g.mul(mean_ent, beta_node);
         g.add(base_loss, ent_penalty)
     };
@@ -523,17 +540,19 @@ pub fn build_ppo_policy_graph(
 /// Inputs:
 /// - `"z"`: `[batch_size, latent_dim]` — latent from encoder
 /// - `"action"`: `[batch_size, action_dim]` — the taken action vector
+/// - `"advantage"`: `[batch_size, 1]` — signed per-row policy advantage
 /// - `"value_target"`: `[batch_size, 1]` — TD target for value head
 ///
 /// Outputs:
-/// - `[0]`: combined loss (mean MSE + value MSE, mean over batch)
+/// - `[0]`: combined loss (advantage-weighted Gaussian NLL + value MSE)
 /// - `[1]`: action mean `[batch_size, action_dim]` — sampled by adding Gaussian noise
 /// - `[2]`: value `[batch_size, 1]`
 ///
 /// For a fixed-variance Gaussian, the negative log-likelihood of the taken
 /// action is `0.5·(a − μ)² / σ² + const`. With σ² = 1 this reduces to the
-/// MSE between predicted mean and taken action, up to a constant — the
-/// same advantage-weighted LR trick applies.
+/// MSE between predicted mean and taken action, up to a constant. Unlike
+/// categorical cross-entropy, scaling the target action does *not* scale the
+/// MSE gradient; the advantage must multiply the per-row loss explicitly.
 /// End-to-end discrete policy graph: encoder + policy + value all in
 /// one graph, trained on the combined loss. Owns its own copy of the
 /// encoder weights (under `policy_encoder.*` names so they don't
@@ -588,6 +607,7 @@ pub fn build_policy_graph_e2e(
     let obs = g.input("obs", &[batch_size, obs_dim]);
     let task = g.input("task", &[batch_size, task_dim]);
     let action = g.input("action", &[batch_size, action_dim]);
+    let action_mask = g.input("action_mask", &[batch_size, action_dim]);
     let value_target = g.input("value_target", &[batch_size, 1]);
 
     // Dedicated policy-side encoder. Same arch as the WM-side encoder
@@ -652,6 +672,9 @@ pub fn build_policy_graph_e2e(
         let ent = z_det.map(|zd| policy.forward(&mut g, zd));
         (logits, ent)
     };
+    let logits = mask_discrete_logits(&mut g, logits, action_mask, batch_size, action_dim);
+    let logits_for_ent = logits_for_ent
+        .map(|raw| mask_discrete_logits(&mut g, raw, action_mask, batch_size, action_dim));
 
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
     let raw_value = value_head.forward(&mut g, z);
@@ -730,8 +753,10 @@ pub fn build_policy_graph_e2e(
         let lsm = g.log_softmax(logits_for_ent);
         let p_log_p = g.mul(sm, lsm);
         let mean_ent = g.mean_all(p_log_p);
+        let entropy_scale = g.scalar(action_dim as f32);
+        let mean_entropy = g.mul(mean_ent, entropy_scale);
         let beta_input = g.input("entropy_beta", &[1]);
-        let ent_penalty = g.mul(mean_ent, beta_input);
+        let ent_penalty = g.mul(mean_entropy, beta_input);
         g.add(base_loss, ent_penalty)
     } else {
         base_loss
@@ -769,6 +794,7 @@ pub fn build_policy_graph_e2e(
 ///
 /// Inputs:
 /// - `"obs"`, `"task"`, `"action"` (advantage·one_hot): same as plain e2e.
+/// - `"action_mask"`: collection-time availability mask for each row.
 /// - `"old_logits"`: `[batch_size, action_dim]` — π_old's pre-softmax
 ///   logits at action-time. Stored per-lane in the agent's transition
 ///   buffer alongside `prob_taken`.
@@ -791,6 +817,7 @@ pub fn build_kl_policy_graph_e2e(
     let obs = g.input("obs", &[batch_size, obs_dim]);
     let task = g.input("task", &[batch_size, task_dim]);
     let action = g.input("action", &[batch_size, action_dim]);
+    let action_mask = g.input("action_mask", &[batch_size, action_dim]);
     // old_logits input is only declared when kl_beta > 0 — meganeura
     // optimizer would prune unused inputs and break set_input calls.
     let old_logits_opt = if kl_beta > 0.0 {
@@ -804,7 +831,20 @@ pub fn build_kl_policy_graph_e2e(
     let z = encoder_forward(&mut g, &encoder, obs, task);
 
     let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
-    let logits = policy.forward(&mut g, z);
+    let logits_raw = policy.forward(&mut g, z);
+    let ones_full = g.constant(
+        vec![1.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let neg_ones_full = g.neg(ones_full);
+    let mask_minus_one = g.add(action_mask, neg_ones_full);
+    let big_const = g.constant(
+        vec![60.0; batch_size * action_dim],
+        &[batch_size, action_dim],
+    );
+    let mask_offset = g.mul(mask_minus_one, big_const);
+    let gated_logits = g.mul(logits_raw, action_mask);
+    let logits = g.add(gated_logits, mask_offset);
 
     // Plain PG cross-entropy loss — the proven-working policy gradient
     // signal. Action input is `advantage · one_hot(taken)`, same convention
@@ -849,7 +889,9 @@ pub fn build_kl_policy_graph_e2e(
         // value loss. This is the same trick that fixes the entropy-
         // collapses-encoder bug on the plain e2e graph.
         let z_for_kl = g.stop_gradient(z);
-        let logits_for_kl = policy.forward(&mut g, z_for_kl);
+        let logits_for_kl_raw = policy.forward(&mut g, z_for_kl);
+        let gated_logits_for_kl = g.mul(logits_for_kl_raw, action_mask);
+        let logits_for_kl = g.add(gated_logits_for_kl, mask_offset);
         let sm_new = g.softmax(logits_for_kl);
         let lsm_new = g.log_softmax(logits_for_kl);
         let lsm_old = g.log_softmax(old_logits);
@@ -961,19 +1003,7 @@ pub fn build_ppo_policy_graph_e2e(
     // Apply availability mask: valid logits pass through, invalid ones
     // are pinned to exactly −60 (see the non-e2e variant for why
     // pinning rather than an additive offset).
-    let ones_full = g.constant(
-        vec![1.0; batch_size * action_dim],
-        &[batch_size, action_dim],
-    );
-    let neg_ones_full = g.neg(ones_full);
-    let mask_minus_one = g.add(action_mask, neg_ones_full);
-    let big_const = g.constant(
-        vec![60.0; batch_size * action_dim],
-        &[batch_size, action_dim],
-    );
-    let mask_offset = g.mul(mask_minus_one, big_const);
-    let gated_logits = g.mul(logits, action_mask);
-    let logits = g.add(gated_logits, mask_offset);
+    let logits = mask_discrete_logits(&mut g, logits, action_mask, batch_size, action_dim);
 
     let sm_new = g.softmax(logits);
     let p_per_class = g.mul(sm_new, action);
@@ -1037,26 +1067,22 @@ pub fn build_ppo_policy_graph_e2e(
         let logits_for_ent_raw = policy.forward(&mut g, z_det);
         // Apply same mask to entropy logits so the regularizer sees the
         // post-mask distribution (entropy spreads only over valid actions).
-        let ones_full2 = g.constant(
-            vec![1.0; batch_size * action_dim],
-            &[batch_size, action_dim],
+        let logits_for_ent = mask_discrete_logits(
+            &mut g,
+            logits_for_ent_raw,
+            action_mask,
+            batch_size,
+            action_dim,
         );
-        let neg_ones_full2 = g.neg(ones_full2);
-        let mask_minus_one2 = g.add(action_mask, neg_ones_full2);
-        let big_const2 = g.constant(
-            vec![60.0; batch_size * action_dim],
-            &[batch_size, action_dim],
-        );
-        let mask_offset2 = g.mul(mask_minus_one2, big_const2);
-        let gated_ent_logits = g.mul(logits_for_ent_raw, action_mask);
-        let logits_for_ent = g.add(gated_ent_logits, mask_offset2);
 
         let sm = g.softmax(logits_for_ent);
         let lsm = g.log_softmax(logits_for_ent);
         let p_log_p = g.mul(sm, lsm);
         let mean_ent = g.mean_all(p_log_p);
+        let entropy_scale = g.scalar(action_dim as f32);
+        let mean_entropy = g.mul(mean_ent, entropy_scale);
         let beta_input = g.input("entropy_beta", &[1]);
-        let ent_penalty = g.mul(mean_ent, beta_input);
+        let ent_penalty = g.mul(mean_entropy, beta_input);
         g.add(base_loss, ent_penalty)
     };
 
@@ -1064,9 +1090,38 @@ pub fn build_ppo_policy_graph_e2e(
     g
 }
 
+fn advantage_weighted_continuous_loss(
+    g: &mut Graph,
+    mean: NodeId,
+    action: NodeId,
+    advantage: NodeId,
+    batch_size: usize,
+    action_dim: usize,
+    active_action_dim: usize,
+) -> NodeId {
+    assert!(
+        (1..=action_dim).contains(&active_action_dim),
+        "active continuous action dimension must be in 1..={action_dim}, got {active_action_dim}"
+    );
+    let negative_action = g.neg(action);
+    let action_error = g.add(mean, negative_action);
+    let squared_error = g.mul(action_error, action_error);
+    let mut mask = vec![0.0; batch_size * action_dim];
+    for row in mask.chunks_exact_mut(action_dim) {
+        row[..active_action_dim].fill(1.0);
+    }
+    let active_mask = g.constant(mask, &[batch_size, action_dim]);
+    let active_squared_error = g.mul(squared_error, active_mask);
+    let per_row_squared_error = g.sum_inner(active_squared_error);
+    let weighted_policy_loss = g.mul(per_row_squared_error, advantage);
+    g.mean_all(weighted_policy_loss)
+}
+
+#[allow(clippy::too_many_arguments)]
 pub fn build_continuous_policy_graph(
     latent_dim: usize,
     action_dim: usize,
+    active_action_dim: usize,
     hidden_dim: usize,
     batch_size: usize,
     num_options: usize,
@@ -1077,6 +1132,7 @@ pub fn build_continuous_policy_graph(
     let mut g = Graph::new();
     let z = g.input("z", &[batch_size, latent_dim]);
     let action = g.input("action", &[batch_size, action_dim]);
+    let advantage = g.input("advantage", &[batch_size, 1]);
     let value_target = g.input("value_target", &[batch_size, 1]);
 
     // Phase G v2: per-option direct-to-mean bias head. See discrete
@@ -1112,8 +1168,6 @@ pub fn build_continuous_policy_graph(
         let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
         policy.forward(&mut g, z)
     };
-    // No soft-clamp on the Gaussian mean either — see the discrete
-    // build_policy_graph for rationale.
     let mean = raw_mean;
 
     let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
@@ -1126,8 +1180,18 @@ pub fn build_continuous_policy_graph(
     let _ = value_clip_scale;
     let value = raw_value;
 
-    // Policy loss: MSE(μ, taken_action) ≡ Gaussian NLL with σ² = 1
-    let policy_loss = g.mse_loss(mean, action);
+    // Policy loss: advantage · MSE(μ, taken_action). A positive advantage
+    // moves the Gaussian mean toward the sampled action; a negative one moves
+    // it away. `sum_inner` keeps the scalar advantage aligned per batch row.
+    let policy_loss = advantage_weighted_continuous_loss(
+        &mut g,
+        mean,
+        action,
+        advantage,
+        batch_size,
+        action_dim,
+        active_action_dim,
+    );
     let value_loss_raw = g.mse_loss(value, value_target);
     let value_loss = if (value_loss_coef - 1.0).abs() < 1e-6 {
         value_loss_raw
@@ -1136,6 +1200,116 @@ pub fn build_continuous_policy_graph(
         g.mul(value_loss_raw, coef)
     };
     let total_loss = g.add(policy_loss, value_loss);
+
+    g.set_outputs(vec![total_loss, mean, value]);
+    g
+}
+
+/// End-to-end counterpart of [`build_continuous_policy_graph`]. The policy
+/// gradient trains a dedicated observation encoder instead of stopping at the
+/// world-model latent, matching the discrete e2e control path.
+#[allow(clippy::too_many_arguments)]
+pub fn build_continuous_policy_graph_e2e(
+    obs_dim: usize,
+    task_dim: usize,
+    action_dim: usize,
+    active_action_dim: usize,
+    hidden_dim: usize,
+    latent_dim: usize,
+    batch_size: usize,
+    num_options: usize,
+    per_option_heads: bool,
+    value_loss_coef: f32,
+    value_clip_scale: f32,
+    recon_loss_coef: f32,
+    reward_pred_loss_coef: f32,
+) -> Graph {
+    let mut g = Graph::new();
+    let obs = g.input("obs", &[batch_size, obs_dim]);
+    let task = g.input("task", &[batch_size, task_dim]);
+    let action = g.input("action", &[batch_size, action_dim]);
+    let advantage = g.input("advantage", &[batch_size, 1]);
+    let value_target = g.input("value_target", &[batch_size, 1]);
+
+    let encoder = build_named_encoder(&mut g, obs_dim, task_dim, latent_dim, hidden_dim);
+    let z = encoder_forward(&mut g, &encoder, obs, task);
+    let mean = if num_options > 1 && per_option_heads {
+        let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
+        let fc1 = nn::Linear::new(&mut g, "policy.fc1", latent_dim, hidden_dim);
+        let h = fc1.forward(&mut g, z);
+        let h = g.relu(h);
+        per_option_fc2(
+            &mut g,
+            h,
+            option_onehot,
+            num_options,
+            hidden_dim,
+            action_dim,
+        )
+    } else if num_options > 1 {
+        let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
+        let trunk_mean = policy.forward(&mut g, z);
+        let option_onehot = g.input("option_onehot", &[batch_size, num_options]);
+        let option_bias =
+            nn::Linear::no_bias(&mut g, "policy.option_bias", num_options, action_dim);
+        let bias = option_bias.forward(&mut g, option_onehot);
+        g.add(trunk_mean, bias)
+    } else {
+        let policy = Policy::new(&mut g, latent_dim, action_dim, hidden_dim);
+        policy.forward(&mut g, z)
+    };
+
+    let policy_loss = advantage_weighted_continuous_loss(
+        &mut g,
+        mean,
+        action,
+        advantage,
+        batch_size,
+        action_dim,
+        active_action_dim,
+    );
+    let value_head = ValueHead::new(&mut g, latent_dim, hidden_dim);
+    let value = value_head.forward(&mut g, z);
+    let _ = value_clip_scale;
+    let value_loss_raw = g.mse_loss(value, value_target);
+    let value_loss = if (value_loss_coef - 1.0).abs() < 1e-6 {
+        value_loss_raw
+    } else {
+        let coef = g.scalar(value_loss_coef);
+        g.mul(value_loss_raw, coef)
+    };
+    let base_loss = g.add(policy_loss, value_loss);
+
+    let base_loss = if recon_loss_coef > 0.0 {
+        let dec_fc1 = nn::Linear::new(&mut g, "recon.fc1", latent_dim, hidden_dim);
+        let dec_fc2 = nn::Linear::no_bias(&mut g, "recon.fc2", hidden_dim, obs_dim);
+        let hidden = dec_fc1.forward(&mut g, z);
+        let hidden = g.relu(hidden);
+        let recon = dec_fc2.forward(&mut g, hidden);
+        let obs_target = g.stop_gradient(obs);
+        let recon_loss_raw = g.mse_loss(recon, obs_target);
+        let coef = g.scalar(recon_loss_coef);
+        let recon_loss = g.mul(recon_loss_raw, coef);
+        g.add(base_loss, recon_loss)
+    } else {
+        base_loss
+    };
+
+    let total_loss = if reward_pred_loss_coef > 0.0 {
+        let reward_target = g.input("reward_target", &[batch_size, 1]);
+        let fc1 = nn::Linear::new(&mut g, "reward_pred.fc1", latent_dim, hidden_dim);
+        let fc2 = nn::Linear::no_bias(&mut g, "reward_pred.fc2", hidden_dim, 1);
+        let hidden = fc1.forward(&mut g, z);
+        let hidden = g.relu(hidden);
+        let reward_prediction = fc2.forward(&mut g, hidden);
+        let reward_target = g.stop_gradient(reward_target);
+        let reward_loss_raw = g.mse_loss(reward_prediction, reward_target);
+        let coef = g.scalar(reward_pred_loss_coef);
+        let reward_loss = g.mul(reward_loss_raw, coef);
+        g.add(base_loss, reward_loss)
+    } else {
+        base_loss
+    };
 
     g.set_outputs(vec![total_loss, mean, value]);
     g
@@ -1185,4 +1359,43 @@ pub fn sample_gaussian_action<R: rand::Rng>(mu: &[f32], scale: f32, rng: &mut R)
             m + scale * noise
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use meganeura::graph::Op;
+
+    fn has_input(graph: &Graph, expected: &str) -> bool {
+        graph
+            .nodes()
+            .iter()
+            .any(|node| matches!(&node.op, Op::Input { name } if name == expected))
+    }
+
+    #[test]
+    fn continuous_policy_graphs_require_explicit_advantage_weighting() {
+        let latent = build_continuous_policy_graph(4, 16, 1, 8, 2, 1, false, 0.0, 100.0);
+        let e2e = build_continuous_policy_graph_e2e(
+            64, 16, 16, 1, 8, 4, 2, 1, false, 0.0, 100.0, 0.0, 0.0,
+        );
+
+        for graph in [&latent, &e2e] {
+            assert!(has_input(graph, "action"));
+            assert!(has_input(graph, "advantage"));
+            assert!(
+                graph
+                    .nodes()
+                    .iter()
+                    .any(|node| matches!(node.op, Op::SumInner)),
+                "continuous Gaussian loss must reduce action error per row before weighting"
+            );
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "active continuous action dimension")]
+    fn continuous_policy_graph_rejects_zero_live_actions() {
+        let _ = build_continuous_policy_graph(4, 16, 0, 8, 2, 1, false, 0.0, 100.0);
+    }
 }

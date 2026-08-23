@@ -7,11 +7,10 @@ unfamiliar games — single-game training is the wrong protocol.
 
 Design:
   - One BatchAgent with `batch_size=N_games` (one ARC env per lane).
-  - Unified action space: kindle outputs 0..6; we map idx → ARC
-    GameAction value 1..7. Each game receives the action as-is; if
-    the game's `available_actions` doesn't include that value, the
-    env-side wrapper either treats it as no-op or errors (we catch
-    the error and substitute the first available action).
+  - Unified action space: kindle outputs 0..6; index i always maps to
+    ARC GameAction value i+1. A per-lane dynamic mask prevents the
+    policy from sampling unavailable values without changing action
+    semantics between states.
   - Each lane carries its own homeostatic signal (distance-to-win
     levels + frame entropy). The shared policy must learn behaviours
     that generalize across game dynamics.
@@ -30,6 +29,15 @@ import sys
 import time
 
 
+def _wm_action_parameters(action_data: dict | None) -> list[float]:
+    """Encode the executed ARC coordinate in Kindle's normalized space."""
+    if action_data is None:
+        return [0.0, 0.0]
+    x = max(0.0, min(63.0, float(action_data["x"])))
+    y = max(0.0, min(63.0, float(action_data["y"])))
+    return [2.0 * x / 63.0 - 1.0, 2.0 * y / 63.0 - 1.0]
+
+
 def main() -> int:
     try:
         from arc_agi import Arcade
@@ -38,12 +46,14 @@ def main() -> int:
         print(f"missing arc_agi toolkit: {exc}", file=sys.stderr)
         return 1
     import numpy as np
-    import kindle
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--steps", type=int, default=50000,
                         help="Total training steps (each step advances all lanes once).")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--random-policy", action="store_true",
+                        help="Sample uniformly from each lane's currently valid ARC "
+                        "actions and skip all Kindle updates. Use to calibrate gates.")
     parser.add_argument("--max-episode-steps", type=int, default=400)
     parser.add_argument("--log-every", type=int, default=1000)
     parser.add_argument("--lr", type=float, default=1e-5)
@@ -57,6 +67,22 @@ def main() -> int:
     parser.add_argument("--grad-clip-norm", type=float, default=0.5)
     parser.add_argument("--rnd-alpha", type=float, default=2.0,
                         help="RND curiosity weight per lane. 'full' preset uses 2.0.")
+    parser.add_argument("--coord-alpha", type=float, default=0.0,
+                        help="Coordinate-head REINFORCE weight. 0 keeps seeded random "
+                        "clicks; >0 lets Kindle control complex-action coordinates.")
+    parser.add_argument("--coord-sigma", type=float, default=0.3,
+                        help="Coordinate-head Gaussian exploration sigma.")
+    parser.add_argument("--coord-lr", type=float, default=None,
+                        help="Coordinate-head learning rate (default: main LR × 0.3).")
+    parser.add_argument(
+        "--project-learned-coordinates-to-objects",
+        action="store_true",
+        help=(
+            "Project coordinate-head clicks onto visible object representatives, "
+            "with a stable-motion prior. Random clicks and the default pixel-"
+            "coordinate mode are unchanged."
+        ),
+    )
     parser.add_argument("--reward-surprise", type=float, default=5.0)
     parser.add_argument("--reward-homeostatic", type=float, default=0.1)
     parser.add_argument("--use-ppo", type=int, default=0,
@@ -78,7 +104,7 @@ def main() -> int:
                         "SIL pushes to episodes that contained ≥1 extrinsic "
                         "reward event (i.e., a level transition fired). Turns "
                         "the SIL buffer into a 'winning trajectories' replay.")
-    parser.add_argument("--recon-loss-coef", type=float, default=0.0,
+    parser.add_argument("--recon-loss-coef", type=float, default=1.0,
                         help="Weight on the WM-session obs reconstruction loss. >0 "
                         "forces encoder to retain enough info to reconstruct the "
                         "obs token. Standard anti-collapse pressure. Try 1.0.")
@@ -131,18 +157,29 @@ def main() -> int:
     parser.add_argument("--val-steps", type=int, default=10000,
                         help="Steps to run on val games (lr=0, no training). Default 10k.")
     parser.add_argument("--checkpoint-dir", default=None,
-                        help="Optional directory to save the trained agent state "
+                        help="Optional directory to save the trained agent weights "
                         "to (after training, before any val pass). Useful for "
                         "post-hoc analysis.")
-    parser.add_argument("--load-state", default=None,
+    parser.add_argument("--load-weights", default=None,
                         help="Optional directory to load a previously-saved agent "
-                        "state from BEFORE training begins. Used for curriculum / "
+                        "weights from BEFORE training begins. Used for curriculum / "
                         "transfer experiments: train subset → save → load into "
                         "full-corpus agent → continue training. The graph "
                         "topology (latent_dim, hidden_dim, encoder kind, "
                         "num_options, recon flags, layer-norm flags) MUST match "
                         "what was saved.")
+    parser.add_argument("--require-games-with-events", type=int, default=None,
+                        help="Exit 2 unless this many training games produce at least "
+                        "one level-completion event.")
+    parser.add_argument("--require-total-events", type=int, default=None,
+                        help="Exit 2 unless training produces this many total level events.")
+    parser.add_argument("--require-max-level", type=int, default=None,
+                        help="Exit 2 unless at least one training game reaches this level.")
     args = parser.parse_args()
+    if args.random_policy and (args.val_prefixes or args.checkpoint_dir or args.load_weights):
+        parser.error(
+            "--random-policy cannot be combined with validation or weight I/O"
+        )
 
     # --- Discover all games ---
     arcade = Arcade()
@@ -193,6 +230,9 @@ def main() -> int:
         obs_list.append(obs)
         avail_actions.append(list(obs.available_actions) or [1])
         win_levels_per.append(int(obs.win_levels))
+    click_history = [[] for _ in range(n_games)]
+    if args.project_learned_coordinates_to_objects:
+        from object_features import project_with_object_motion
 
     print(
         f"joint training: {n_games} games × {args.steps} steps = "
@@ -210,61 +250,79 @@ def main() -> int:
     NUM_ACTIONS = 7
     action_by_value = {int(a.value): a for a in GameAction}
 
-    # --- Build the shared agent ---
-    agent_kwargs = dict(
-        obs_dim=64,
-        num_actions=NUM_ACTIONS,
-        batch_size=n_games,
-        env_ids=list(range(n_games)),
-        seed=args.seed,
-        learning_rate=args.lr,
-        latent_dim=args.latent_dim,
-        hidden_dim=args.hidden_dim,
-        policy_loss_watchdog_threshold=args.watchdog_threshold,
-        use_adam=bool(args.adam),
-        adam_eps=args.adam_eps,
-        grad_clip_norm=args.grad_clip_norm,
-        reward_homeostatic=args.reward_homeostatic,
-        reward_surprise=args.reward_surprise,
-        rnd_reward_alpha=args.rnd_alpha,
-        entropy_beta=args.entropy_beta,
-        use_ppo=bool(args.use_ppo),
-        ppo_clip_eps=args.ppo_clip_eps,
-        use_sil=bool(args.use_sil),
-        sil_loss_coef=args.sil_loss_coef,
-        sil_event_filter=bool(args.sil_event_filter),
-        recon_loss_coef=args.recon_loss_coef,
-        recon_visual_target=bool(args.recon_visual_target),
-        policy_z_layer_norm=bool(args.policy_z_layer_norm),
-        policy_z_layer_norm_scale=args.policy_z_layer_norm_scale,
-        extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
-    )
-    if args.num_options >= 2:
-        agent_kwargs["num_options"] = args.num_options
-        agent_kwargs["per_option_heads"] = bool(args.per_option_heads)
-    if args.encoder == "cnn":
-        agent_kwargs.update(
-            encoder_kind="cnn",
-            encoder_channels=1,
-            encoder_height=64,
-            encoder_width=64,
+    # --- Build the shared agent (the random baseline needs no Kindle install) ---
+    agent = None
+    agent_kwargs = {}
+    if args.random_policy:
+        print("agent: seeded uniform random over each lane's valid actions")
+    else:
+        import kindle
+
+        agent_kwargs = dict(
+            obs_dim=64,
+            num_actions=NUM_ACTIONS,
+            batch_size=n_games,
+            env_ids=list(range(n_games)),
+            seed=args.seed,
+            learning_rate=args.lr,
+            latent_dim=args.latent_dim,
+            hidden_dim=args.hidden_dim,
+            policy_loss_watchdog_threshold=args.watchdog_threshold,
+            use_adam=bool(args.adam),
+            adam_eps=args.adam_eps,
+            grad_clip_norm=args.grad_clip_norm,
+            reward_homeostatic=args.reward_homeostatic,
+            reward_surprise=args.reward_surprise,
+            rnd_reward_alpha=args.rnd_alpha,
+            coord_action_alpha=args.coord_alpha,
+            coord_sigma=args.coord_sigma,
+            entropy_beta=args.entropy_beta,
+            use_ppo=bool(args.use_ppo),
+            ppo_clip_eps=args.ppo_clip_eps,
+            use_sil=bool(args.use_sil),
+            sil_loss_coef=args.sil_loss_coef,
+            sil_event_filter=bool(args.sil_event_filter),
+            recon_loss_coef=args.recon_loss_coef,
+            recon_visual_target=bool(args.recon_visual_target),
+            policy_z_layer_norm=bool(args.policy_z_layer_norm),
+            policy_z_layer_norm_scale=args.policy_z_layer_norm_scale,
+            extrinsic_reward_alpha=args.goal_bonus if args.goal_bonus > 0 else 0.0,
         )
-    elif args.encoder == "cnn_dqn":
-        agent_kwargs.update(
-            encoder_kind="cnn_dqn",
-            encoder_channels=1,
-            encoder_height=64,
-            encoder_width=64,
+        if args.coord_lr is not None:
+            agent_kwargs["coord_lr"] = args.coord_lr
+        if args.num_options >= 2:
+            agent_kwargs["num_options"] = args.num_options
+            agent_kwargs["per_option_heads"] = bool(args.per_option_heads)
+        if args.encoder == "cnn":
+            agent_kwargs.update(
+                encoder_kind="cnn",
+                encoder_channels=1,
+                encoder_height=64,
+                encoder_width=64,
+            )
+        elif args.encoder == "cnn_dqn":
+            agent_kwargs.update(
+                encoder_kind="cnn_dqn",
+                encoder_channels=1,
+                encoder_height=64,
+                encoder_width=64,
+            )
+        agent = kindle.BatchAgent(**agent_kwargs)
+        parameter_row = [False] * kindle.MAX_ACTION_DIM
+        for value, game_action in action_by_value.items():
+            idx = value - 1
+            if 0 <= idx < kindle.MAX_ACTION_DIM:
+                parameter_row[idx] = bool(game_action.is_complex())
+        agent.set_action_parameter_masks(parameter_row * n_games)
+        if args.load_weights:
+            agent.load_weights(args.load_weights)
+            print(f"loaded prior weights from {args.load_weights}")
+        print(
+            f"agent: {NUM_ACTIONS} actions, latent={args.latent_dim}, "
+            f"hidden={args.hidden_dim}, encoder={args.encoder}, lr={args.lr}, "
+            f"adam={bool(args.adam)} eps={args.adam_eps} "
+            f"grad_clip={args.grad_clip_norm}"
         )
-    agent = kindle.BatchAgent(**agent_kwargs)
-    if args.load_state:
-        agent.load_state(args.load_state)
-        print(f"loaded prior state from {args.load_state}")
-    print(
-        f"agent: {NUM_ACTIONS} actions, latent={args.latent_dim}, "
-        f"hidden={args.hidden_dim}, encoder={args.encoder}, lr={args.lr}, "
-        f"adam={bool(args.adam)} eps={args.adam_eps} grad_clip={args.grad_clip_norm}"
-    )
 
     # --- Helpers ---
     def preprocess_pooled(frame_arr: np.ndarray) -> list[float]:
@@ -272,10 +330,6 @@ def main() -> int:
         arr = frame_arr.astype(np.float32) / 15.0
         pooled = arr.reshape(8, 8, 8, 8).mean(axis=(1, 3))
         return pooled.flatten().tolist()
-
-    def preprocess_visual(frame_arr: np.ndarray) -> np.ndarray:
-        """64×64 int → flat 4096-dim float in [0, 1]."""
-        return (frame_arr.astype(np.float32) / 15.0).flatten()
 
     def homeo_for(
         frame_arr: np.ndarray,
@@ -296,7 +350,12 @@ def main() -> int:
         }
         return [levels_term, entropy_term]
 
-    def map_action(kindle_idx: int, lane: int, rng) -> tuple[GameAction, dict | None, int]:
+    def map_action(
+        kindle_idx: int,
+        lane: int,
+        rng,
+        kindle_xy: tuple[float, float] | None = None,
+    ) -> tuple[GameAction, dict | None, int]:
         """Returns (game_action, data, executed_idx). `executed_idx` is
         the kindle index of the action ACTUALLY played — feed observe()
         this, never the raw sample, so the policy isn't credited and
@@ -311,10 +370,29 @@ def main() -> int:
         a = action_by_value[target_value]
         executed_idx = target_value - 1
         if a.is_complex():
-            x = rng.randrange(64)
-            y = rng.randrange(64)
+            if kindle_xy is None:
+                x = rng.randrange(64)
+                y = rng.randrange(64)
+            else:
+                sx, sy = kindle_xy
+                x = max(0, min(63, int(round((sx + 1.0) * 0.5 * 63.0))))
+                y = max(0, min(63, int(round((sy + 1.0) * 0.5 * 63.0))))
+                if args.project_learned_coordinates_to_objects:
+                    frame = np.asarray(obs_list[lane].frame[0], dtype=np.int32)
+                    x, y = project_with_object_motion(
+                        frame,
+                        x,
+                        y,
+                        click_history[lane],
+                        max_n=64,
+                    )
+                    click_history[lane].append((x, y))
+            if kindle_xy is None and args.project_learned_coordinates_to_objects:
+                click_history[lane].clear()
             a.set_data({"x": x, "y": y})
             return a, {"x": x, "y": y}, executed_idx
+        if args.project_learned_coordinates_to_objects:
+            click_history[lane].clear()
         return a, None, executed_idx
 
     # Per-lane action masks: kindle's policy head is MAX_ACTION_DIM=18
@@ -335,19 +413,27 @@ def main() -> int:
                     buf[lane_i, idx] = 1.0
         target_agent.set_action_masks(buf.reshape(-1))
 
+    def valid_indices(available) -> list[int]:
+        valid = sorted({int(v) - 1 for v in available if 1 <= int(v) <= NUM_ACTIONS})
+        if not valid:
+            raise RuntimeError("ARC frame exposes no supported actions (values 1..7)")
+        return valid
+
     # --- Per-lane training state ---
     import random
     rng = random.Random(args.seed)
 
     last_levels = [int(o.levels_completed) for o in obs_list]
+    max_levels_seen = last_levels.copy()
+    attempt_start_levels = last_levels.copy()
     levels_events = [0] * n_games  # per-game total level events
     ep_step = [0] * n_games
     ep_count = [0] * n_games
-    ep_levels_at_end: list[list[int]] = [[] for _ in range(n_games)]
+    attempt_level_gains: list[list[int]] = [[] for _ in range(n_games)]
     ep_lens: list[list[int]] = [[] for _ in range(n_games)]
 
     # Initial visual_obs upload (CNN encoders only).
-    if args.encoder in ("cnn", "cnn_dqn"):
+    if args.encoder in ("cnn", "cnn_dqn") and not args.random_policy:
         frame_mv = agent.visual_obs_memoryview()
         frame_buf = np.frombuffer(frame_mv, dtype=np.float32).reshape(
             n_games, 1, 64, 64
@@ -369,13 +455,19 @@ def main() -> int:
             if need_reset:
                 if ep_step[i] > 0:
                     ep_count[i] += 1
-                    ep_levels_at_end[i].append(int(obs.levels_completed))
+                    attempt_level_gains[i].append(
+                        max(0, int(obs.levels_completed) - attempt_start_levels[i])
+                    )
                     ep_lens[i].append(ep_step[i])
                 obs_list[i] = envs[i].reset()
                 avail_actions[i] = list(obs_list[i].available_actions) or avail_actions[i]
                 last_levels[i] = int(obs_list[i].levels_completed)
+                attempt_start_levels[i] = last_levels[i]
                 ep_step[i] = 0
-                agent.mark_boundary(i)
+                if args.project_learned_coordinates_to_objects:
+                    click_history[i].clear()
+                if not args.random_policy:
+                    agent.mark_boundary(i)
 
         # Build observation batch. (Frames are written to the visual
         # slot just before agent.observe() below — post-action
@@ -384,18 +476,33 @@ def main() -> int:
 
         # Act (with current availability masked in — avail_actions can
         # change after every env.step, so refresh each step).
-        push_action_masks(agent, mask_buf, avail_actions)
-        actions = agent.act(pooled_batch)
+        if args.random_policy:
+            actions = [rng.choice(valid_indices(aa)) for aa in avail_actions]
+            coord_samples = [None] * n_games
+        else:
+            push_action_masks(agent, mask_buf, avail_actions)
+            actions = agent.act(pooled_batch)
+            coord_samples = (
+                agent.sample_coords() if args.coord_alpha > 0
+                else [None] * n_games
+            )
 
         # Step each env.
         new_obs_list = []
         homeo_list = []
         new_pooled_batch = []
         executed_actions: list[int] = []
+        coord_actions: list[bool] = []
+        action_parameters: list[float] = []
         level_deltas = [0] * n_games
         for i in range(n_games):
-            game_action, action_data, exec_idx = map_action(int(actions[i]), i, rng)
+            game_action, action_data, exec_idx = map_action(
+                int(actions[i]), i, rng, coord_samples[i]
+            )
             executed_actions.append(exec_idx)
+            coord_active = game_action.is_complex() and action_data is not None
+            coord_actions.append(coord_active)
+            action_parameters.extend(_wm_action_parameters(action_data))
             try:
                 obs_new = envs[i].step(game_action, data=action_data)
             except Exception as exc:
@@ -404,16 +511,22 @@ def main() -> int:
                     print(f"  lane {i} step error: {exc}", file=sys.stderr)
                 obs_new = envs[i].reset()
                 avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
-                agent.mark_boundary(i)
+                if not args.random_policy:
+                    agent.mark_boundary(i)
+                if args.project_learned_coordinates_to_objects:
+                    click_history[i].clear()
             frame = np.asarray(obs_new.frame[0], dtype=np.float32)
             new_obs_list.append(obs_new)
             if list(obs_new.available_actions):
                 avail_actions[i] = list(obs_new.available_actions)
             new_levels = int(obs_new.levels_completed)
+            max_levels_seen[i] = max(max_levels_seen[i], new_levels)
             delta = new_levels - last_levels[i]
             level_deltas[i] = delta
             if delta > 0:
                 levels_events[i] += delta
+                if args.project_learned_coordinates_to_objects:
+                    click_history[i].clear()
             last_levels[i] = new_levels
             new_pooled_batch.append(preprocess_pooled(frame))
             homeo_list.append(homeo_for(frame, new_levels, win_levels_per[i]))
@@ -422,17 +535,24 @@ def main() -> int:
         # Goal-completion extrinsic bonus: per-lane 1.0 on positive level
         # transitions, 0 otherwise. Applied via kindle's extrinsic-reward
         # path (multiplied by extrinsic_reward_alpha at observe-time).
-        if args.goal_bonus > 0:
+        if args.goal_bonus > 0 and not args.random_policy:
             ext = [1.0 if d > 0 else 0.0 for d in level_deltas]
             agent.set_extrinsic_reward(ext)
 
         # Observe (single batched call — this is where training happens).
         # Feed the EXECUTED action indices: when map_action's fallback
         # fires, the sampled index was never played.
-        if frame_buf is not None:
-            for i, o in enumerate(new_obs_list):
-                frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
-        agent.observe(new_pooled_batch, executed_actions, homeostatic=homeo_list)
+        if not args.random_policy:
+            if frame_buf is not None:
+                for i, o in enumerate(new_obs_list):
+                    frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+            agent.set_action_parameters(action_parameters, coord_actions)
+            agent.observe(new_pooled_batch, executed_actions, homeostatic=homeo_list)
+            if args.coord_alpha > 0:
+                agent.train_coord_head(
+                    coord_actions,
+                    rewards=[float(max(0, delta)) for delta in level_deltas],
+                )
         obs_list = new_obs_list
 
         if args.log_every and step > 0 and step % args.log_every == 0:
@@ -447,13 +567,18 @@ def main() -> int:
                 f"{env_infos[i].game_id[:4]}:{levels_events[i]}"
                 for i in range(n_games) if levels_events[i] > 0
             ) or "(none)"
-            d0 = agent.diagnostics()[0]
+            if args.random_policy:
+                losses = "random policy | "
+            else:
+                d0 = agent.diagnostics()[0]
+                losses = (
+                    f"wm={float(d0['loss_world_model']):.3f} "
+                    f"pi={float(d0['loss_policy']):.3f} "
+                    f"ent={float(d0['policy_entropy']):.2f} | "
+                )
             print(
                 f"step={step:>6} eps={total_eps:>4} lvl_events={total_events:>3} "
-                f"({evt_str}) | "
-                f"wm={float(d0['loss_world_model']):.3f} "
-                f"pi={float(d0['loss_policy']):.3f} "
-                f"ent={float(d0['policy_entropy']):.2f} | "
+                f"({evt_str}) | {losses}"
                 f"{sps:5.0f} step/s × {n_games} = {agg_sps:6.0f} env/s"
             )
 
@@ -461,18 +586,16 @@ def main() -> int:
     sps = args.steps / max(1e-3, elapsed)
 
     print()
-    print("--- Per-game summary ---")
-    print(f"{'game':<6} {'eps':>4} {'evt':>4} {'mean_lvl':>9} {'max_lvl':>7} {'win':>4} {'mean_len':>8}")
+    mode = "random" if args.random_policy else "kindle"
+    print(f"--- Per-game summary ({mode}) ---")
+    print(f"{'game':<6} {'try':>4} {'evt':>4} {'prog_try':>8} {'max_lvl':>7} {'win':>4} {'mean_len':>8}")
     for i, e in enumerate(env_infos):
-        mean_lvl = (
-            sum(ep_levels_at_end[i]) / len(ep_levels_at_end[i])
-            if ep_levels_at_end[i] else 0.0
-        )
-        max_lvl = max(ep_levels_at_end[i]) if ep_levels_at_end[i] else 0
+        progress_attempts = sum(gain > 0 for gain in attempt_level_gains[i])
         mean_len = sum(ep_lens[i]) / len(ep_lens[i]) if ep_lens[i] else 0.0
         print(
             f"{e.game_id[:4]:<6} {ep_count[i]:>4} {levels_events[i]:>4} "
-            f"{mean_lvl:>9.2f} {max_lvl:>7d} {win_levels_per[i]:>4d} "
+            f"{progress_attempts:>8d} {max_levels_seen[i]:>7d} "
+            f"{win_levels_per[i]:>4d} "
             f"{mean_len:>8.1f}"
         )
     total_evt = sum(levels_events)
@@ -480,7 +603,25 @@ def main() -> int:
     print()
     print(f"games with ≥1 level event: {games_with_events}/{n_games}")
     print(f"total level events: {total_evt}")
+    print(f"highest level reached: {max(max_levels_seen)}")
     print(f"throughput: {sps:.1f} step/s ({sps * n_games:.0f} env/s; {elapsed:.0f}s total)")
+
+    gate_failures = []
+    if (args.require_games_with_events is not None
+            and games_with_events < args.require_games_with_events):
+        gate_failures.append(
+            f"games with events {games_with_events} < required "
+            f"{args.require_games_with_events}"
+        )
+    if args.require_total_events is not None and total_evt < args.require_total_events:
+        gate_failures.append(
+            f"total events {total_evt} < required {args.require_total_events}"
+        )
+    highest_level = max(max_levels_seen)
+    if args.require_max_level is not None and highest_level < args.require_max_level:
+        gate_failures.append(
+            f"highest level {highest_level} < required {args.require_max_level}"
+        )
 
     # --- Save checkpoint (always when val pass is requested, optional otherwise) ---
     ckpt_dir = args.checkpoint_dir
@@ -488,7 +629,7 @@ def main() -> int:
         import tempfile
         ckpt_dir = tempfile.mkdtemp(prefix="kindle_ckpt_")
     if ckpt_dir is not None:
-        agent.save_state(ckpt_dir)
+        agent.save_weights(ckpt_dir)
         print(f"\nsaved trained agent to {ckpt_dir}")
 
     # --- Validation pass on held-out games ---
@@ -515,7 +656,8 @@ def main() -> int:
         val_kwargs["batch_size"] = n_val
         val_kwargs["env_ids"] = list(range(n_val))
         val_agent = kindle.BatchAgent(**val_kwargs)
-        val_agent.load_state(ckpt_dir)
+        val_agent.set_action_parameter_masks(parameter_row * n_val)
+        val_agent.load_weights(ckpt_dir)
         val_agent.set_all_learning_rates(0.0)
         print(f"loaded trained weights into val agent ({n_val} lanes), lr=0")
 
@@ -575,9 +717,14 @@ def main() -> int:
             homeo_list = []
             new_pooled_batch = []
             executed_actions = []
+            coord_actions = []
+            action_parameters = []
             for i in range(n_val):
                 ga, ad, exec_idx = val_map_action(int(actions[i]), i)
                 executed_actions.append(exec_idx)
+                coord_active = ga.is_complex() and ad is not None
+                coord_actions.append(coord_active)
+                action_parameters.extend(_wm_action_parameters(ad))
                 try:
                     obs_new = val_envs[i].step(ga, data=ad)
                 except Exception:
@@ -600,6 +747,7 @@ def main() -> int:
             if val_frame_buf is not None:
                 for i, o in enumerate(new_obs_list):
                     val_frame_buf[i, 0] = np.asarray(o.frame[0], dtype=np.float32) / 15.0
+            val_agent.set_action_parameters(action_parameters, coord_actions)
             val_agent.observe(new_pooled_batch, executed_actions, homeostatic=homeo_list)
             val_obs_list = new_obs_list
 
@@ -616,6 +764,18 @@ def main() -> int:
         print(f"val throughput: {args.val_steps / max(1e-3, velapsed):.1f} step/s "
               f"({velapsed:.0f}s total)")
 
+    if gate_failures:
+        print("OUTCOME GATE FAILED: " + "; ".join(gate_failures), file=sys.stderr)
+        return 2
+    if any(
+        value is not None
+        for value in (
+            args.require_games_with_events,
+            args.require_total_events,
+            args.require_max_level,
+        )
+    ):
+        print("OUTCOME GATE PASSED")
     return 0
 
 

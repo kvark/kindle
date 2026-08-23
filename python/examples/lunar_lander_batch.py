@@ -363,8 +363,8 @@ def main() -> int:
         type=int,
         default=1,
         help="hold each sampled action for K env steps per lane (Phase E.v3 "
-        "action-persistence; K=1 is classic reactive L0, K>1 stretches the "
-        "effective credit horizon by K× with no graph change)",
+        "action-persistence; K=1 is classic reactive L0, K>1 creates "
+        "temporally extended behavior)",
     )
     parser.add_argument(
         "--lr-policy",
@@ -385,9 +385,6 @@ def main() -> int:
                         help="L1 option count. 1 (default) = L0-only. ≥ 2 activates Phase G.")
     parser.add_argument("--option-horizon", type=int, default=None,
                         help="env steps per option (Phase G). Default 10.")
-    parser.add_argument("--history-len", type=int, default=None,
-                        help="L0 causal-attention credit window. Default 16. Widen to "
-                        "attribute long-horizon reward (e.g. 64 for LunarLander descent).")
     parser.add_argument("--gamma", type=float, default=None,
                         help="Discount factor for n-step returns. Default 0.95. "
                         "Only consulted when --n-step >= 2.")
@@ -524,9 +521,9 @@ def main() -> int:
         f"action_repeat={args.action_repeat}"
     )
 
-    # Distinct env_ids per lane so the agent builds per-lane task embeddings
-    # (still shares the encoder — same universal obs/action tokens).
-    env_ids = [1 + i for i in range(args.lanes)]
+    # Vector lanes are independent trajectories of the same task and should
+    # share one task embedding/archive key.
+    env_ids = [0] * args.lanes
     agent = kindle.BatchAgent(
         obs_dim=obs_dim,
         num_actions=num_actions,
@@ -546,7 +543,6 @@ def main() -> int:
         label_smoothing=args.label_smoothing,
         num_options=args.num_options,
         option_horizon=args.option_horizon,
-        history_len=args.history_len,
         gamma=args.gamma,
         n_step=args.n_step,
         outcome_reward_alpha=args.outcome_alpha,

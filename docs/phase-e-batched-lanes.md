@@ -1,5 +1,10 @@
 # Phase E — Batched lanes
 
+> Historical implementation plan. Batched lanes shipped; the credit assigner
+> described below was removed in 2026-08 because it did not affect policy
+> advantages. Current parameterized dynamics use `WM_ACTION_DIM = 20`, while
+> policy labels remain `MAX_ACTION_DIM = 18`.
+
 ## Goal
 
 Lift `Agent` from one env per step to **N envs per step**, where N is baked
@@ -125,7 +130,8 @@ for each step:
     2. Build stacked obs_token input: [N, OBS_TOKEN_DIM], one row per lane.
     3. Build stacked z_target input: [N, LATENT_DIM], per-lane previous
        latent (zeros if pending_boundary[lane] || buffer[lane] empty).
-    4. Build stacked action input: [N, MAX_ACTION_DIM] from the actions.
+    4. Build stacked policy action labels `[N, MAX_ACTION_DIM]` and WM action
+       inputs `[N, WM_ACTION_DIM]` from the executed action plus parameters.
     5. wm_session.step() + read loss + read z_t → [N, LATENT_DIM].
     6. For each lane i:
          - pred_error_i    = sqrt(latent_dim · wm_loss).  (loss is mean)

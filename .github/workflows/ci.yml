@@ -55,7 +55,8 @@ jobs:
       - name: GPU tests (opt parity + canaries + stability)
         if: runner.os == 'Linux'
         run: |
-          cargo test -p kindle --test opt_parity --test canaries --test wm_direction -- --ignored
+          cargo test -p kindle \
+            --test opt_parity --test canaries --test wm_direction -- --ignored
           cargo test -p kindle-gym --test stability -- --ignored
 
   python:
@@ -66,6 +67,8 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
 
       - name: Install lavapipe and Vulkan
         run: |
@@ -79,6 +82,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: python
+
+      - name: Rust formatting and Clippy
+        run: |
+          cargo fmt --manifest-path python/Cargo.toml -- --check
+          cargo clippy --manifest-path python/Cargo.toml \
+            --all-targets -- -D warnings
 
       - name: Build and install extension
         run: |
