@@ -14,5 +14,6 @@ python/kindle/*.so
 *.safetensors
 *.meganeura-plan
 /checkpoints/
+/runs/
 /environment_files/
 python/environment_files/

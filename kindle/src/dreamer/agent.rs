@@ -71,6 +71,15 @@ pub struct WorldMetrics {
     /// Replay-value loss as seen by the frozen critic inside the world graph.
     /// Its gradient updates RSSM/representation parameters, not critic weights.
     pub replay_value_loss: f32,
+    pub replay_reward_prediction_mean: f32,
+    pub replay_reward_target_mean: f32,
+    pub replay_reward_mae: f32,
+    pub rewarded_prediction_mean: f32,
+    pub unrewarded_prediction_mean: f32,
+    pub rewarded_count: usize,
+    pub replay_continuation_prediction_mean: f32,
+    pub replay_continuation_target_mean: f32,
+    pub replay_continuation_mae: f32,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -79,10 +88,16 @@ pub struct BehaviorMetrics {
     pub policy_loss: f32,
     pub value_loss: f32,
     pub replay_value_loss: f32,
+    /// Mean categorical entropy before trajectory weighting.
     pub policy_entropy: f32,
+    /// Entropy after the same continuation weighting used by the actor loss.
+    pub weighted_policy_entropy: f32,
     pub imagined_reward_mean: f32,
     pub imagined_continuation_mean: f32,
     pub return_mean: f32,
+    pub return_scale: f32,
+    pub advantage_abs_mean: f32,
+    pub weighted_advantage_abs_mean: f32,
 }
 
 #[derive(Clone, Debug, serde::Serialize)]
@@ -111,6 +126,18 @@ struct BehaviorTrainingBatch {
     imagined_reward_mean: f32,
     imagined_continuation_mean: f32,
     return_mean: f32,
+    return_scale: f32,
+    advantage_abs_mean: f32,
+    weighted_advantage_abs_mean: f32,
+    replay_reward_prediction_mean: f32,
+    replay_reward_target_mean: f32,
+    replay_reward_mae: f32,
+    rewarded_prediction_mean: f32,
+    unrewarded_prediction_mean: f32,
+    rewarded_count: usize,
+    replay_continuation_prediction_mean: f32,
+    replay_continuation_target_mean: f32,
+    replay_continuation_mae: f32,
 }
 
 /// DreamerV3 learner over precomputed frozen-DINO observations.
@@ -709,6 +736,15 @@ impl DreamerCore {
         metrics.reward_loss *= scale;
         metrics.continuation_loss *= scale;
         metrics.replay_value_loss *= scale;
+        metrics.replay_reward_prediction_mean = behavior.replay_reward_prediction_mean;
+        metrics.replay_reward_target_mean = behavior.replay_reward_target_mean;
+        metrics.replay_reward_mae = behavior.replay_reward_mae;
+        metrics.rewarded_prediction_mean = behavior.rewarded_prediction_mean;
+        metrics.unrewarded_prediction_mean = behavior.unrewarded_prediction_mean;
+        metrics.rewarded_count = behavior.rewarded_count;
+        metrics.replay_continuation_prediction_mean = behavior.replay_continuation_prediction_mean;
+        metrics.replay_continuation_target_mean = behavior.replay_continuation_target_mean;
+        metrics.replay_continuation_mae = behavior.replay_continuation_mae;
         assert!(all_finite(&[
             metrics.total_loss,
             metrics.reconstruction_loss,
@@ -717,6 +753,14 @@ impl DreamerCore {
             metrics.reward_loss,
             metrics.continuation_loss,
             metrics.replay_value_loss,
+            metrics.replay_reward_prediction_mean,
+            metrics.replay_reward_target_mean,
+            metrics.replay_reward_mae,
+            metrics.rewarded_prediction_mean,
+            metrics.unrewarded_prediction_mean,
+            metrics.replay_continuation_prediction_mean,
+            metrics.replay_continuation_target_mean,
+            metrics.replay_continuation_mae,
         ]));
         metrics
     }
@@ -863,11 +907,15 @@ impl DreamerCore {
         let mut imagined_weight = vec![0.0; imagined_rows];
         let mut imagined_value_target = vec![0.0; imagined_rows * self.config.value_bins];
         let mut imagined_slow_target = vec![0.0; imagined_rows * self.config.value_bins];
+        let mut advantage_abs_sum = 0.0;
+        let mut weighted_advantage_abs_sum = 0.0;
         for time in 0..horizon {
             imagined_feature.extend_from_slice(&features[time]);
             for start in 0..starts {
                 let row = time * starts + start;
                 let advantage = (returns[time][start] - values[time][start]) / return_scale;
+                advantage_abs_sum += advantage.abs();
+                weighted_advantage_abs_sum += (weights[time][start] * advantage).abs();
                 action_target[row * self.config.action_count + actions[time][start]] =
                     weights[time][start] * advantage;
                 imagined_weight[row] = weights[time][start];
@@ -883,6 +931,41 @@ impl DreamerCore {
                 );
             }
         }
+
+        let replay_reward_target = flatten_time(&batch.rewards);
+        let replay_reward_prediction = &rewards[0];
+        let replay_reward_prediction_mean = mean(replay_reward_prediction);
+        let replay_reward_target_mean = mean(&replay_reward_target);
+        let replay_reward_mae =
+            mean_absolute_error(replay_reward_prediction, &replay_reward_target);
+        let mut rewarded_prediction_sum = 0.0;
+        let mut unrewarded_prediction_sum = 0.0;
+        let mut rewarded_count = 0;
+        let mut unrewarded_count = 0;
+        for (prediction, target) in replay_reward_prediction.iter().zip(&replay_reward_target) {
+            if *target != 0.0 {
+                rewarded_prediction_sum += prediction;
+                rewarded_count += 1;
+            } else {
+                unrewarded_prediction_sum += prediction;
+                unrewarded_count += 1;
+            }
+        }
+        let rewarded_prediction_mean = rewarded_prediction_sum / rewarded_count.max(1) as f32;
+        let unrewarded_prediction_mean = unrewarded_prediction_sum / unrewarded_count.max(1) as f32;
+        let replay_continuation_prediction = &continuations[0];
+        let replay_continuation_target = batch
+            .flags
+            .iter()
+            .flatten()
+            .map(|flags| {
+                if flags.is_terminal {
+                    0.0
+                } else {
+                    self.config.continuation_discount()
+                }
+            })
+            .collect::<Vec<_>>();
 
         let replay_rows = self.config.batch_size * (self.config.batch_length - 1);
         let mut replay_feature = vec![0.0; replay_rows * self.config.feature_dim()];
@@ -950,6 +1033,21 @@ impl DreamerCore {
             imagined_reward_mean: mean_nested(&rewards[1..]),
             imagined_continuation_mean: mean_nested(&continuations),
             return_mean: mean_nested(&returns),
+            return_scale,
+            advantage_abs_mean: advantage_abs_sum / imagined_rows as f32,
+            weighted_advantage_abs_mean: weighted_advantage_abs_sum / imagined_rows as f32,
+            replay_reward_prediction_mean,
+            replay_reward_target_mean,
+            replay_reward_mae,
+            rewarded_prediction_mean,
+            unrewarded_prediction_mean,
+            rewarded_count,
+            replay_continuation_prediction_mean: mean(replay_continuation_prediction),
+            replay_continuation_target_mean: mean(&replay_continuation_target),
+            replay_continuation_mae: mean_absolute_error(
+                replay_continuation_prediction,
+                &replay_continuation_target,
+            ),
         }
     }
 
@@ -981,9 +1079,16 @@ impl DreamerCore {
             value_loss: read_scalar(&self.behavior_train, behavior::LOSS_VALUE),
             replay_value_loss: read_scalar(&self.behavior_train, behavior::LOSS_REPLAY_VALUE),
             policy_entropy: read_scalar(&self.behavior_train, behavior::POLICY_ENTROPY),
+            weighted_policy_entropy: read_scalar(
+                &self.behavior_train,
+                behavior::WEIGHTED_POLICY_ENTROPY,
+            ),
             imagined_reward_mean: batch.imagined_reward_mean,
             imagined_continuation_mean: batch.imagined_continuation_mean,
             return_mean: batch.return_mean,
+            return_scale: batch.return_scale,
+            advantage_abs_mean: batch.advantage_abs_mean,
+            weighted_advantage_abs_mean: batch.weighted_advantage_abs_mean,
         };
         assert!(all_finite(&[
             metrics.total_loss,
@@ -991,9 +1096,13 @@ impl DreamerCore {
             metrics.value_loss,
             metrics.replay_value_loss,
             metrics.policy_entropy,
+            metrics.weighted_policy_entropy,
             metrics.imagined_reward_mean,
             metrics.imagined_continuation_mean,
             metrics.return_mean,
+            metrics.return_scale,
+            metrics.advantage_abs_mean,
+            metrics.weighted_advantage_abs_mean,
         ]));
         sync_matching(&self.behavior_train, &mut self.behavior_online, "behavior.");
         ema_matching(
@@ -1276,6 +1385,21 @@ fn mean_nested(values: &[Vec<f32>]) -> f32 {
     }
 }
 
+fn mean(values: &[f32]) -> f32 {
+    assert!(!values.is_empty());
+    values.iter().sum::<f32>() / values.len() as f32
+}
+
+fn mean_absolute_error(left: &[f32], right: &[f32]) -> f32 {
+    assert_eq!(left.len(), right.len());
+    assert!(!left.is_empty());
+    left.iter()
+        .zip(right)
+        .map(|(left, right)| (left - right).abs())
+        .sum::<f32>()
+        / left.len() as f32
+}
+
 fn all_finite(values: &[f32]) -> bool {
     values.iter().all(|value| value.is_finite())
 }
@@ -1356,6 +1480,15 @@ mod tests {
         assert_eq!(report.replay_len, 9);
         assert!(report.world.total_loss.is_finite());
         assert!(report.behavior.total_loss.is_finite());
+        assert!(
+            (report.world.reward_loss - (agent.config.value_bins as f32).ln()).abs() < 1e-3,
+            "uniform initial reward logits should report full cross-entropy"
+        );
+        assert!(
+            (report.behavior.policy_entropy - (agent.config.action_count as f32).ln()).abs() < 0.02,
+            "initial raw actor entropy should be close to uniform"
+        );
+        assert!(report.behavior.weighted_policy_entropy <= report.behavior.policy_entropy);
 
         let mut world_parameter = vec![0.0; config_value_bins(&agent)];
         let mut world_adam = vec![0.0; config_value_bins(&agent)];
@@ -1433,6 +1566,56 @@ mod tests {
         );
         drop(restored);
         fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    #[test]
+    #[ignore = "runs a sustained tiny-core GPU learning diagnostic"]
+    fn tiny_core_learns_action_conditioned_reward() {
+        let mut config = DreamerConfig::tiny(2);
+        config.learning_rate_warmup = 0;
+        let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
+        let mut agent = DreamerCore::with_gpu(config, gpu);
+        let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+
+        agent.begin_episode(observation());
+        for step in 0..512 {
+            let action = agent.act(ActionMode::Sample, None);
+            agent.observe(
+                observation(),
+                Reward {
+                    extrinsic: f32::from(action == 1),
+                    intrinsic: 0.0,
+                },
+                FrameFlags {
+                    is_last: step == 511,
+                    ..FrameFlags::default()
+                },
+            );
+            let _ = agent.learn();
+        }
+
+        let mut optimal = 0;
+        for _ in 0..100 {
+            agent.begin_episode(observation());
+            let action = agent.act(ActionMode::Greedy, None);
+            optimal += usize::from(action == 1);
+            agent.observe(
+                observation(),
+                Reward {
+                    extrinsic: f32::from(action == 1),
+                    intrinsic: 0.0,
+                },
+                FrameFlags {
+                    is_last: true,
+                    is_terminal: true,
+                    ..FrameFlags::default()
+                },
+            );
+        }
+        assert!(
+            optimal >= 90,
+            "greedy policy chose the paying action {optimal}/100 times"
+        );
     }
 
     fn config_value_bins(agent: &DreamerCore) -> usize {

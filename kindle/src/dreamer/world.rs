@@ -135,6 +135,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     let mut reward_losses = Vec::with_capacity(length);
     let mut continuation_losses = Vec::with_capacity(length);
     let mut replay_value_losses = Vec::with_capacity(length);
+    let reward_weight = graph.constant(vec![1.0; batch], &[batch, 1]);
 
     for time in 0..length {
         let observation = graph.input(
@@ -243,7 +244,15 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         ));
 
         let (reward, continuation) = model.heads.forward(&mut graph, state);
-        reward_losses.push(graph.cross_entropy_loss(reward, reward_target));
+        // Keep the reduction explicit because this value is composed into the
+        // joint loss and exported as a metric. The fused backend loss stores
+        // per-row partials and is only scalar when used as a terminal output.
+        reward_losses.push(weighted_cross_entropy(
+            &mut graph,
+            reward,
+            reward_target,
+            reward_weight,
+        ));
         continuation_losses.push(graph.bce_loss(continuation, continuation_target));
         let value = model.replay_value.forward_frozen(&mut graph, state);
         let value_target =
