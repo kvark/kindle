@@ -26,7 +26,6 @@ fn stability_grid_world() {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 16,
-        history_len: 8,
         buffer_capacity: 2000,
         batch_size: 1,
         learning_rate: 1e-3,
@@ -42,7 +41,7 @@ fn stability_grid_world() {
     // Step count chosen to fit within ~2 minutes on lavapipe (CPU Vulkan).
     // Real GPUs run this orders of magnitude faster; longer sweeps belong
     // in a separate manual benchmark.
-    let total_steps = 500usize;
+    let total_steps = 5000usize;
     // Average WM loss over windows rather than single samples — per-step
     // loss is noisy, so single-sample comparisons are unreliable.
     let early_start = 100usize;
@@ -54,15 +53,10 @@ fn stability_grid_world() {
     for step in 0..total_steps {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
-        let env_ref: &dyn Environment = &env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = env.step(&action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 
@@ -113,7 +107,6 @@ fn stability_random_walk_convergence() {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 16,
-        history_len: 8,
         buffer_capacity: 2000,
         batch_size: 1,
         learning_rate: 1e-3,
@@ -125,18 +118,13 @@ fn stability_random_walk_convergence() {
     let mut agent = Agent::new(config, vec![adapter]);
     let mut rng = rand::rngs::StdRng::seed_from_u64(7);
 
-    for _ in 0..500 {
+    for _ in 0..5000 {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
-        let env_ref: &dyn Environment = &env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = env.step(&action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
     }

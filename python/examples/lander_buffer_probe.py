@@ -11,7 +11,7 @@ the rollout buffer and answers three questions:
 2. Is reward temporally dilated correctly? For each completed episode in
    the buffer, computes the discounted return from each step and compares
    to the stored value baseline `V(s_{t-1})`. If V tracks the discounted
-   return (high correlation, low MAE), the credit assignment is propagating
+   return (high correlation, low MAE), the value estimator is propagating
    late-episode signal back to earlier states — i.e. stable lander
    positions near landing should carry higher V than risky ones.
 
@@ -29,6 +29,18 @@ import time
 from collections import defaultdict
 
 import numpy as np
+
+
+def _transition_observations(reset_obs, dones, infos):
+    """Replace SAME_STEP reset observations with true terminal observations."""
+    if not np.any(dones):
+        return reset_obs
+    if "final_obs" not in infos:
+        raise RuntimeError("completed vector transition omitted final_obs")
+    transition_obs = reset_obs.copy()
+    for lane in np.flatnonzero(dones):
+        transition_obs[lane] = infos["final_obs"][lane]
+    return transition_obs
 
 
 def main() -> int:
@@ -62,7 +74,7 @@ def main() -> int:
     p.add_argument("--bootstrap-value-clamp", type=float, default=200.0)
     p.add_argument("--value-clip-scale", type=float, default=400.0)
     p.add_argument("--lr-drop-on-solve", type=float, default=100.0)
-    p.add_argument("--recon-loss-coef", type=float, default=0.0,
+    p.add_argument("--recon-loss-coef", type=float, default=1.0,
                    help="Reconstruction decoder anti-collapse loss "
                    "coefficient. >0 adds a decoder z→obs' + MSE loss "
                    "vs. stop_gradient(obs). Forces encoder to retain "
@@ -81,7 +93,8 @@ def main() -> int:
     args = p.parse_args()
 
     envs = gym.vector.SyncVectorEnv(
-        [lambda: gym.make(args.env) for _ in range(args.lanes)]
+        [lambda: gym.make(args.env) for _ in range(args.lanes)],
+        autoreset_mode=gym.vector.AutoresetMode.SAME_STEP,
     )
     obs, _ = envs.reset(seed=args.seed)
     obs_dim = obs.shape[-1]
@@ -92,7 +105,7 @@ def main() -> int:
         obs_dim=obs_dim,
         num_actions=num_actions,
         batch_size=args.lanes,
-        env_ids=[1 + i for i in range(args.lanes)],
+        env_ids=[0] * args.lanes,
         seed=args.seed,
         learning_rate=args.lr,
         latent_dim=args.latent_dim,
@@ -117,7 +130,7 @@ def main() -> int:
     )
     if args.wm_only:
         agent.set_lr_policy(0.0)
-        print("wm-only: policy LR forced to 0; only WM + credit train")
+        print("wm-only: policy LR forced to 0; only the WM trains")
     print(f"agent ready  [tag={args.tag} vlc={args.value_loss_coef} "
           f"wm_only={args.wm_only}]")
 
@@ -133,13 +146,21 @@ def main() -> int:
         obs_lists = [obs[i].astype(np.float32).tolist() for i in range(args.lanes)]
         actions = agent.act(obs_lists)
         actions_np = np.array(actions, dtype=np.int64)
-        next_obs, rewards, terms, truncs, _ = envs.step(actions_np)
+        next_obs, rewards, terms, truncs, infos = envs.step(actions_np)
         cur_ret += rewards
         dones = np.logical_or(terms, truncs)
+        transition_obs = _transition_observations(next_obs, dones, infos)
 
         agent.set_extrinsic_reward(rewards.astype(np.float32, copy=False))
-        next_lists = [next_obs[i].astype(np.float32).tolist() for i in range(args.lanes)]
-        agent.observe(next_lists, [int(a) for a in actions], homeostatic=[[] for _ in range(args.lanes)])
+        transition_lists = [
+            transition_obs[i].astype(np.float32).tolist()
+            for i in range(args.lanes)
+        ]
+        agent.observe(
+            transition_lists,
+            [int(a) for a in actions],
+            homeostatic=[[] for _ in range(args.lanes)],
+        )
 
         for i, done in enumerate(dones):
             if done:

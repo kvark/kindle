@@ -80,7 +80,8 @@ impl Environment for GridWorld {
         }
 
         self.energy = (self.energy - 0.05).max(0.0);
-        if self.food.contains(&self.pos) {
+        let ate_food = self.food.contains(&self.pos);
+        if ate_food {
             self.energy = (self.energy + 0.3).min(1.0);
         }
 
@@ -89,6 +90,10 @@ impl Environment for GridWorld {
         StepResult {
             observation: self.make_obs(),
             homeostatic: self.homeo.clone(),
+            reward: if ate_food { 1.0 } else { 0.0 },
+            task_event: ate_food,
+            terminated: false,
+            truncated: false,
         }
     }
 
@@ -111,8 +116,10 @@ mod tests {
         env.step(&Action::Discrete(1)); // down to (1,1)
         env.step(&Action::Discrete(1)); // down to (1,2)
         let pre_food = env.energy;
-        env.step(&Action::Discrete(1)); // down to (1,3) — food!
+        let result = env.step(&Action::Discrete(1)); // down to (1,3) — food!
         assert!(env.energy > pre_food, "food should replenish energy");
+        assert_eq!(result.reward, 1.0);
+        assert!(!result.done());
     }
 
     #[test]

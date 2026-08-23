@@ -133,6 +133,24 @@ impl WmRollout {
             z_cur.copy_from_slice(out_row);
         }
     }
+
+    /// Roll out already-composed action rows. `action_tokens` has shape
+    /// `[K × action_dim]`, allowing callers to include continuous parameter
+    /// tails without changing the discrete action identity.
+    pub fn rollout_tokens(&self, z0: &[f32], action_tokens: &[f32], trajectory: &mut [f32]) {
+        debug_assert_eq!(z0.len(), self.latent_dim);
+        debug_assert_eq!(action_tokens.len() % self.action_dim, 0);
+        let steps = action_tokens.len() / self.action_dim;
+        debug_assert_eq!(trajectory.len(), steps * self.latent_dim);
+
+        let mut z_cur = z0.to_vec();
+        for step in 0..steps {
+            let action = &action_tokens[step * self.action_dim..(step + 1) * self.action_dim];
+            let out_row = &mut trajectory[step * self.latent_dim..(step + 1) * self.latent_dim];
+            self.forward_step(&z_cur, action, out_row);
+            z_cur.copy_from_slice(out_row);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -213,6 +231,24 @@ mod tests {
         assert!((traj[3] - 1.0).abs() < 1e-5);
         assert!((traj[4] - 3.0).abs() < 1e-5);
         assert!((traj[5] - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn rollout_tokens_preserves_parameter_tail() {
+        let mut wm = WmRollout::new(1, 3, 1);
+        wm.w_z = vec![1.0];
+        wm.b_z = vec![0.0];
+        // Base action contributes 1, second slot is unused, parameter
+        // contributes 2×p.
+        wm.w_a = vec![1.0, 0.0, 2.0];
+        wm.w_fc2 = vec![1.0];
+        wm.b_fc2 = vec![0.0];
+        wm.w_fc_out = vec![1.0];
+
+        let mut trajectory = vec![0.0; 2];
+        wm.rollout_tokens(&[1.0], &[1.0, 0.0, -0.25, 1.0, 0.0, 0.5], &mut trajectory);
+        assert!((trajectory[0] - 1.5).abs() < 1e-6);
+        assert!((trajectory[1] - 3.5).abs() < 1e-6);
     }
 
     #[test]

@@ -1,5 +1,13 @@
 # ARC-AGI-3 generalization plan (2026-05-06)
 
+> **Superseded by the 2026-08-23 audit.** The result below was never compared
+> against a matched current-package random baseline, and cumulative
+> `levels_completed` persists across resets. Current seed-42 random reaches
+> 8/25 games, 9 events, and max level 2 by 10k steps. At 2k steps it reaches
+> 5 games/6 events/max L2, while a rerun of the documented learner reaches
+> 4/4/max L1. The old recipe is therefore a hypothesis, not a best validated
+> learner. See `docs/audit-2026-08-23.md` and the prospective gate in README.
+
 ## Where we are
 
 Best joint-training recipe (`arc_agi3_multi.py`, 25-game lanes, 20k steps):
@@ -22,12 +30,13 @@ Open structural problems holding kindle back from a *general* ARC policy:
 **Hypothesis**: cd82→L2 happened at step 20k. The policy may keep climbing (more games to L1, some reaching L2) if we run longer.
 **Action**: 100k–200k step run with K+goal-bonus recipe. Save checkpoints every 50k for offline analysis.
 **Cost**: 3.5–7 hours of GPU per run.
-**Status**: starting now (item 1 of 5).
+**Status**: superseded; do not extend until a learner beats the calibrated
+random baseline at a shorter gated budget.
 **Decision rule**: if at 100k we see ≥3 games at L2 OR ≥2 games with ≥3 events, the recipe is working — push to 200k. Otherwise plateau confirmed → move to items 2–4.
 
 ### 2. Curriculum: subset corpus → full corpus
 **Hypothesis**: 15 of 25 games never produce events; their lanes contribute pure-zero advantage and dilute the policy gradient. Train on the unlockable subset first; transfer the trained encoder/policy to the full corpus.
-**Action**: 50k steps on `--game-prefixes "cd82,sp80,ft09,lp85,ls20,m0r0,r11l,sk48,tr87,vc33"` (the 10 unlockable games), checkpoint, then 50k more on all 25 with `--load-state` from the checkpoint.
+**Action**: 50k steps on `--game-prefixes "cd82,sp80,ft09,lp85,ls20,m0r0,r11l,sk48,tr87,vc33"` (the 10 unlockable games), save weights, then 50k more on all 25 with `--load-weights`.
 **Cost**: ~50 min subset run + ~70 min full-corpus run = ~2 hours of GPU.
 **Decision rule**: if subset training pushes ≥3 games to L2 in 50k steps, the curriculum hypothesis is right. The "expand to 25" stage tests transfer.
 
@@ -53,7 +62,7 @@ Open structural problems holding kindle back from a *general* ARC policy:
 **Decision rule**: if val rate ≈ train rate on the held-out middle-difficulty games, generalization confirmed.
 
 ## Cross-cutting infrastructure (already done 2026-05-06)
-- `Agent.save_state(dir)` / `Agent.load_state(dir)` — checkpoint API used by items 2 & 3
+- `Agent.save_weights(dir)` / `Agent.load_weights(dir)` — weights-only transfer API used by items 2 & 3
 - `BatchAgent.latents()` + a latent_probe.py analysis script (ad-hoc; not checked into this repo) — measures per-game centroid dominance
 - `--val-prefixes` + `--val-steps` train/val split — used by items 2 & 5
 - `--goal-bonus α` extrinsic pulse — best result so far

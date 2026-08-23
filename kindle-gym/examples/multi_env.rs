@@ -1,6 +1,6 @@
 //! Run the kindle agent across multiple environments, hopping between them
 //! on a schedule. Tests cross-env transfer: the agent's encoder, world
-//! model, credit assigner, and policy all persist through env switches;
+//! model and policy persist through env switches;
 //! only the adapter changes.
 //!
 //! Run: `cargo run --example multi_env`
@@ -41,25 +41,11 @@ impl Envs {
         }
     }
 
-    fn step(&mut self, which: Which, action: &kindle::Action) {
+    fn step(&mut self, which: Which, action: &kindle::Action) -> kindle::StepResult {
         match which {
-            Which::Grid => {
-                self.grid.step(action);
-            }
-            Which::Cart => {
-                self.cart.step(action);
-            }
-            Which::Mountain => {
-                self.mountain.step(action);
-            }
-        }
-    }
-
-    fn env(&self, which: Which) -> &dyn Environment {
-        match which {
-            Which::Grid => &self.grid,
-            Which::Cart => &self.cart,
-            Which::Mountain => &self.mountain,
+            Which::Grid => self.grid.step(action),
+            Which::Cart => self.cart.step(action),
+            Which::Mountain => self.mountain.step(action),
         }
     }
 }
@@ -81,12 +67,10 @@ fn main() {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
-        history_len: 8,
         buffer_capacity: 5000,
         batch_size: 1,
         // Conservative LR — works across all three envs
         learning_rate: 1e-4,
-        lr_credit: 3e-5,
         lr_policy: 5e-5,
         warmup_steps: 200,
         ..AgentConfig::default()
@@ -136,15 +120,10 @@ fn main() {
 
         let obs = envs.observe(which);
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        envs.step(which, &action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = envs.observe(which);
-        let env_ref: &dyn Environment = envs.env(which);
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = envs.step(which, &action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 
@@ -152,11 +131,10 @@ fn main() {
             let diags = agent.diagnostics();
             let d = &diags[0];
             println!(
-                "step {:>4} env={} | wm={:.4} cr={:.4} pi={:.4} | r={:.3} drift={:.3} buf={}",
+                "step {:>4} env={} | wm={:.4} pi={:.4} | r={:.3} drift={:.3} buf={}",
                 d.step,
                 d.env_id,
                 d.loss_world_model,
-                d.loss_credit,
                 d.loss_policy,
                 d.reward_mean,
                 d.repr_drift,

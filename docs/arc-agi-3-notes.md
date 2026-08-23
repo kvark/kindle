@@ -1,5 +1,15 @@
 # ARC-AGI-3: first integration and diagnosis
 
+> **2026-08-23 audit correction:** ARC retains `levels_completed` across
+> `env.reset()` calls. The April “90%/100% L1 episode reach rate” was therefore
+> a cumulative-state artifact: after the first L1 event, later attempts still
+> reported level 1. The event itself was real, but repeated L1 reliability and
+> policy mastery were not demonstrated. Across five current 30k-step seeds,
+> random produced 7 CD82 events and reached L2 twice; the historical `full`
+> Kindle preset produced 5 events and never passed L1. Current harness
+> summaries report level gain per attempt and expose executable
+> event/max-level gates.
+
 ## Pulled
 
 - `arc-agi` python toolkit (0.9.8) and `arcengine` (0.9.3) — both
@@ -19,30 +29,28 @@ bridge:
 - **Observation**: 64×64 int8 grid (colours 0–15) → mean-pool to
   8×8 (64 cells) → flatten to 64-dim float in `[0, 1]`. Matches
   kindle's `OBS_TOKEN_DIM = 64`.
-- **Action**: kindle emits discrete action index 0..N−1; we map
-  to the game's current `available_actions` list (filtered to
-  ACTION1..ACTION7 "simple" actions only). `N` is set from
-  `min(6, len(simple_available))` to match kindle's
-  `MAX_ACTION_DIM = 6`. *(Superseded: `MAX_ACTION_DIM` is now 18
-  post-Atari work — `kindle/src/adapter.rs` — and the harness caps
-  at `min(18, len(available_actions))`.)*
+- **Action**: kindle emits a fixed discrete index 0..6, always mapped to
+  `GameAction.value == index + 1`. A dynamic mask removes values absent from
+  the current `available_actions` list without changing policy semantics.
+  Kindle's shared policy head is padded to `MAX_ACTION_DIM = 18`. Complex
+  actions additionally stage their exact normalized `(x, y)` in the
+  world-model-only parameter tail (`WM_ACTION_DIM = 20`).
 - **Homeo**: two variables:
-  - `levels_completed` delta (spikes `-scale` on level
-    completion; otherwise zero — this IS the only reliable
-    progress signal on ARC-AGI-3).
+  - persistent distance to the reported win level; this becomes less negative
+    when `levels_completed` increases.
   - frame-entropy proxy (1 − unique_colours/16): small negative
     when the agent is in a visually monotonous state.
-- **Episode boundary**: `state ∈ {NOT_PLAYED, GAME_OVER, WIN}`
-  or `ep_step ≥ max_episode_steps`.
+- **Attempt boundary**: `state ∈ {NOT_PLAYED, GAME_OVER, WIN}`
+  or `ep_step ≥ max_episode_steps`. Completed-level count can persist across
+  these resets, so an attempt is not an independent fresh game.
 
-### What the adapter doesn't handle
+### Remaining adapter limitations
 
-- **Complex actions** (`ACTION6`, sometimes `ACTION5`) that take
-  `(x, y)` coordinates. Several games (m0r0, s5i5, sp80, ...)
-  mark these as `available_actions` but stepping them raises
-  `KeyError: 'x'` without coordinate data. Our adapter filters
-  to simple actions only; games whose simple-action set is
-  empty are out of scope.
+- **Complex-action planning**: `ACTION6` (and any other action reported as
+  complex) receives seeded-random coordinates or coordinate-head samples, and
+  the exact executed values train the world model. The built-in planner still
+  searches only the discrete action identity and supplies a zero coordinate
+  tail; it cannot optimize or queue `(action, x, y)` jointly.
 - **Multi-frame state** (`frame` is a list; only frame[0] used).
   ARC-AGI-3 games can present multiple frames per step; we
   drop all but the first.
@@ -109,12 +117,11 @@ Multiple stacked problems, each genuine:
    entire state. A conv-net encoder is the obvious choice;
    kindle's current encoder is a dense MLP on an 8-dim-range
    obs token vector. Redesign of the encoder stack is needed.
-2. **Complex-action parameterization**: several games need
-   coordinate actions. Kindle's action adapter (discrete +
-   continuous vectors, `MAX_ACTION_DIM = 6`; since raised to 18,
-   which widens the discrete menu but still doesn't compose
-   with (x, y) coords) — a structured action head would be
-   needed.
+2. **Complex-action search**: several games need precise coordinate actions.
+   Kindle now has a separate coordinate head and conditions learned dynamics
+   on the executed `(x, y)`, while retaining an 18-way discrete policy label.
+   What remains is joint planning/search over the discrete action and its two
+   continuous parameters (or a principled finite object-centric action set).
 3. **Goal / milestone discovery beyond kindle's current M7**:
    we showed M7's self-supervised prototype ranking fails on
    LunarLander where success is well-defined in obs-space
@@ -328,26 +335,26 @@ Two small changes to the ARC-AGI-3 harness:
     config: CNN encoder, RND α=50, homeo weight 0.5, levels-reward-scale 5.0
 
 At step 2000–3000: agent completes level 1 for the first time.
-Over 10–50k subsequent steps: **90% of episodes end at level 1**.
-Never reaches level 2.
+The historical claim that 90% of later episodes independently reached L1 was
+invalid: `levels_completed` remained at 1 across resets. Never reaches level 2.
 
 This is the **first level event on any ARC-AGI-3 game** under any
 kindle configuration we've tested. Proves the infrastructure end
 to end: vision encoder → RND-driven exploration → complex
-actions → homeo pointing at distance-to-win → credit propagates
-through 55-action episode → policy learns "reach L1".
+actions → homeo pointing at distance-to-win. It does not by itself prove
+credit propagation or that the policy learned the transition.
 
 But the agent then stalls. Possible reasons (each testable
 separately):
 
 - RND saturates as predictor fits the post-L1 state
   distribution. Once rnd_mse → 0, curiosity stops driving.
-- The policy learned "L0→L1" behaviour generalizes poorly to
-  "L1→L2" game dynamics (different actions needed).
+- The policy may not have learned the discovered L0→L1 behaviour at all;
+  comparison against multiple random seeds was not performed.
 - Max_episode_steps = 400 might cap attempts before L2 sequences
   are tried. cd82 baseline L2 = 8 expert actions; random prob
-  from L1 start ≈ 6^−8 ≈ 10^−6, so over hundreds of L1-reaching
-  episodes we might still miss it.
+  from the retained L1 state ≈ 6^−8 ≈ 10^−6, so feasible budgets may
+  still miss it.
 
 Other games (ls20, ft09, su15, sb26) still show 0 level events
 in 15k steps with the same config. Possible reasons: more
@@ -364,9 +371,8 @@ action coord specifics that random can't find).
   ✅ Homeo signal corrected: level-ups give positive advantage
      instead of one-step penalty.
   ✅ **First level event achieved on cd82.**
-  ⚠ Multi-level progression: agent reaches L1 reliably on cd82
-    but never progresses. Structural — RND saturates, policy
-    overfits to single-level behaviour.
+  ⚠ Multi-level progression: one L1 event was observed on cd82,
+    but no repeat-learning advantage or L2 progression was established.
   ❌ Coordinate action policy: `(x, y)` still random, not
      policy-controlled. Games that need SPECIFIC coords for
      progress are gated by chance.
@@ -402,25 +408,16 @@ Two more primitives added, matching the "continue" discussion:
 
 ### Results on cd82 (30k steps each, CNN + all primitives):
 
-  config                                  events   L1 reach rate
-  prior M7+RND+homeo-fix                     1      90%
-  + RND reset on L1                          1      (unchanged)
-  + coord head (α=1)                         1      **100%**
+Each configuration produced one L1 event. The previously reported 90%/100%
+reach rates counted the retained cumulative level after reset and are invalid.
+These runs establish discovery of one transition, not a learned, repeatable
+L1 policy.
 
-With all three enabled — RND, RND-reset-on-level, coord head,
-fixed homeo — **kindle reaches L1 on every completed episode**
-(100% reliability, up from 90% with RND alone). The stack is
-stable and the L1-reaching policy is fully learned.
-
-But **no L2 events**. Observed mechanism: RND-reset fires on
-L1, MSE spikes 0.01 → 0.12, pi_loss jumps +11.55 (policy
-disrupted). MSE decays to 0.01 within ~5000 steps as the
-predictor re-fits the post-L1 state distribution. The agent
-then stabilizes on "reach L1 and stop" because that's the
-nearest local optimum in the current reward landscape. L2
-requires an 8-action specific sequence FROM L1; random +
-coord-policy exploration in the 300–400 step window after L1
-doesn't find it.
+But **no L2 events**. RND-reset fires on L1, MSE spikes 0.01 → 0.12,
+and MSE decays again within roughly 5000 steps as the predictor fits the
+post-L1 distribution. The former interpretation—that the policy repeatedly
+reached L1 and then stopped—is unsupported. L2 still requires an 8-action
+specific sequence from the retained L1 state, which was not discovered.
 
 ### sb26 (coord-controlled clickpoints):
 
@@ -441,7 +438,7 @@ coord policy wanders randomly. Consistent with the
   ✅ First level event on cd82
   ✅ RND predictor reset
   ✅ Coord action head (kindle-controlled clicks)
-  ✅ 100% L1 reliability on cd82
+  ⚠ One L1 event on cd82; repeatability over random is unproven
   ⚠ Multi-level progression: still gated on per-game dynamics
     and requires finding level-completion sequences that our
     current exploration doesn't discover (cd82 never sees L2,
@@ -625,14 +622,14 @@ hit the target at prob `6⁻⁸ ≈ 6e-7`; 906 random macros at prob
 ~5% started-at-L1 gives `906 × 0.05 × 6e-7 ≈ 2.7e-5` expected
 successes — effectively zero at any feasible budget.
 
-Longer macros + higher prob actually REGRESS mean-levels (from 0.99
-baseline to 0.81 at `len=5, p=0.1`) because 20% of decisions are
-random, disrupting the learned L1-reaching policy.
+The historical “mean-levels” comparison for longer macros is not a valid
+regression metric: it is dominated by when the first persistent event occurred,
+not by independent per-attempt competence.
 
 ### Summary — what works and what doesn't on ARC-AGI-3
 
-Tried and null on L2 progression within 10k–30k steps on cd82
-(where L1 is reached reliably):
+Tried and null on L2 progression within 10k–30k steps on cd82 after an L1
+event had moved the persistent environment frontier:
 - M6 outcome head (v1 + trajectory v2 + RTG v3)
 - M7 approach reward (v1 + confidence-weighted v2 + novelty ranking)
 - M8 delta-goal bank (v1 + WM-surprise-gated v2)
@@ -643,8 +640,8 @@ Tried and null on L2 progression within 10k–30k steps on cd82
 - xeps + macros combined
 
 Helped partially:
-- RND + coord head: 100% L1 reliability (up from 90%), no L2
-- Fixed homeo signal: enabled first L1 event at all
+- RND + coord head: one historical L1 event, no demonstrated advantage over random
+- Fixed homeo signal: present on the first observed L1 event
 
 Not yet tried (would break generality constraint):
 - Expert trajectory bootstrapping
@@ -717,3 +714,175 @@ sequence; all general exploration mechanisms produce ~6e-7-hit-
 rate attempts. The only viable directions violate generality
 (demos, curriculum, symbolic priors). ARC-AGI-3 is off the
 research path.
+
+### 2026-08-23 audit correction and coordinate probe
+
+The “final” wording above is a historical conclusion, not a current removal of
+ARC from the project goal. The audit corrected three invalid assumptions:
+`levels_completed` persists across resets, fixed action indices must not follow
+the changing position in `available_actions`, and different ACTION6 coordinates
+must not share one dynamics token. Kindle now keeps an 18-way discrete policy
+label while appending exact normalized `(x, y)` to a 20-value world-model token
+through online, replay, surprise-replay, and k-step paths.
+
+Coordinate REINFORCE now uses per-lane baselines and ARC supplies explicit
+positive level deltas for click credit instead of the dense combined intrinsic
+reward. A matched seed-42 5k-step probe on the six ACTION6-only games still did
+not beat uniform random: learner 1 game/1 event/max L1 versus random 2 games/2
+events/max L1. This closes a representation bug, not the ARC outcome gate.
+Broader or object-centric coordinate exploration remains open.
+
+The next remediation added joint coordinate shooting. ARC declares which
+stable action slots consume `(x, y)`; batched MPC samples those values, rolls
+the full 20D token through the WM, and queues the winning identity/coordinate
+pair for exact execution. Stale queued actions are dropped when dynamic
+availability changes. The discrete MCTS implementation automatically yields to
+shooting because it cannot compare more than one coordinate per action.
+
+The mechanism passes a synthetic GPU gate: after learning that negative x
+changes state and positive x is a no-op, change-scored shooting selected
+`x=-0.927`; its prediction was 0.0387 from the changed-state latent versus
+0.2858 from the no-op latent. Real FT09 evidence remains neutral. Across seeds
+42–44 at 5k steps, shooting produced two total level events/max L1, exactly the
+same as uniform random; a denser seed-42 schedule produced none. The planner
+transport/search bug is closed, but novelty/change is not yet a sufficient ARC
+task-progress objective.
+
+### Object-centric action correction, 2026-08-23
+
+The first object-click probe could not start because the example imported
+SciPy solely for connected components even though SciPy was not an ARC extra.
+A deterministic 4-connected flood fill now handles the 64×64 frames without
+that dependency. The audit also found two semantic errors in the initial
+object proposal scheme: it assumed background color zero (FT09's is modal
+color 5), and bounding-box centers could miss concave components.
+
+After modal-background inference and on-component representatives, a one-step
+FT09 sweep still showed that all eight state-changing cells were excluded by
+the 11-slot policy budget: pure area ranking placed them at ranks 21–33.
+Ranking components nested inside larger panels first moves those cells to
+slots 0–7. Object slots now remain deterministic semantic actions in the world
+model and planner; only the base ACTION6 exposes a freely searched coordinate.
+
+Across seeds 42–44 at 5k total environment steps, this corrected object action
+set produced one L1 event in each run (3 total/max L1), compared with uniform
+coordinates at 2 total/max L1. This is directional evidence for structured
+exploration, not a solve: no run reached L2, so task-progress scoring and
+multi-step object interaction remain open.
+
+### Clone-backed object-state search, 2026-08-23
+
+The fixed 18-way policy can expose only 11 object-click slots after ARC's seven
+base actions. That is already insufficient on FT09 L1, which has 13 distinct
+state-changing cells. Raising the universal action width would penalize every
+other environment and still fail on larger variable object sets, so the next
+implementation uses ACTION6's existing continuous parameter channel instead.
+
+`arc_agi3_object_search.py` runs only on cloneable local environments. It
+extracts every visible component proposal, probes and deduplicates one-step
+visual outcomes, and searches cloned states for an external level increment.
+It empirically detects actions that are visually involutive and pairwise
+commutative; for those levels it enumerates increasing-index combinations and
+never explores reordered copies of the same action set. A cropped visual key
+can exclude volatile one-pixel HUD borders such as FT09's countdown.
+
+This produces the first deterministic multi-level ARC result in the project:
+FT09 reaches L2 with four L0 clicks plus seven L1 clicks after 2,978 expanded
+states. VC33 reaches L2 in ten solution actions and 45 expanded states. At a
+500-state, depth-8 L0 cap over the six ACTION6-only games, FT09, LP85, R11L,
+and VC33 reach L1 (4/6), versus 2/6 for the prior uniform-coordinate baseline.
+S5I5 and TN36 remain at L0. FT09's next level has a 23-action basis and did not
+reach L3 within 20,000 expanded states (78,798 states discovered), showing the
+remaining combinatorial limit.
+
+This is honest simulator-backed planning, not evidence that Kindle's learned
+policy generalizes. Its next useful role is curriculum generation: execute the
+found coordinate paths through Kindle, retain exact parameterized transitions,
+and distill them into SIL/value/goal learning so future attempts need less
+clone search.
+
+## 2026-08-23 dynamic search and joint policy retention
+
+The original search froze its root action basis for the whole level. That
+pruned actions and coordinates that were initially no-ops but became useful
+after another move. Non-commutative levels now regenerate proposals at every
+expanded state, while verified commuting involutions retain the cheaper static
+combination path. The harness also caps attempted cloned transitions and skips
+engine-rejected branches instead of aborting the remaining games.
+
+This adds L1 paths for SP80, CD82, LF52, and SU15. A curated eight-game gate
+reaches all eight in 246 expanded states; over all 19 games exposing a complex
+action, 8 reach L1 under 200–500-state caps. The broader result has no matched
+random baseline and remains clone-backed planning.
+
+Search demonstrations now store action availability and a hybrid object/pixel
+token. Pure object tokens aliased four distinct LF52 states that required
+different coordinates. Action identity trains through a dedicated positive,
+masked cross-entropy update rather than a synthetic-reward/value workaround.
+The coordinate head consumes the raw token plus Kindle's fixed task embedding;
+its former random latent input added a GPU dispatch and made outputs depend on
+training versus evaluation batch topology. The deterministic task context later
+proved necessary to prevent coordinate interference when L2 demonstrations
+were added to the joint corpus.
+
+A 39-sample joint checkpoint reaches 100% action-label accuracy and coordinate
+MSE 0.002191. Its raw coordinate head initially reached L1 on 7/8 games after
+fresh batch-1 reloads: SU15 reproduced three clicks, then predicted `(31,33)`
+instead of `(28,35)`. Nearest-object snapping chose another intervening cell
+and still failed. Projecting after a generic constant-motion prior (activated
+only after two matching executed displacements) reproduces all seven SU15
+clicks and closes the fresh-checkpoint L1 gate at 8/8. No clone access is used
+during evaluation. This is retained imitation with an object-aware executor,
+not autonomous discovery or unseen-level transfer.
+
+### Demonstrated L2 retention
+
+The distiller can now merge compatible demonstration files, remove exact
+duplicate model-visible states, and reject conflicting labels rather than
+silently optimizing an impossible target. Combining the eight-game L1 corpus
+with FT09/VC33 searches through L2 produces 53 unique rows after seven repeated
+L0 rows are removed.
+
+A shared token-only coordinate head at aggregate MSE 0.002194 regressed R11L's
+second click and reduced the L1 gate to 7/8, even though both deeper games
+replayed to L2. Adding the fixed task embedding removes this cross-game
+ambiguity. The earlier MSE freeze threshold of 0.0022 was also too weak: a
+fresh checkpoint just below it still missed a discrete object boundary.
+
+A reproducible one-stage run with a 35,000-epoch ceiling and freeze threshold
+0.0015 reaches 100% action-label accuracy and coordinate MSE 0.001792. After
+fresh batch-1 reloads, one mixed-depth gate reaches L1 on all eight games and
+L2 on FT09 and VC33. Evaluation clears the click-motion history at level
+transitions, so a repeated-coordinate sequence from one level cannot leak into
+the next. This extends retention to demonstrated multi-level paths, but still
+does not show unseen-level transfer or online reward-driven discovery.
+
+### VC33 L3 search, failed fixed heads, and pointer retention
+
+A bounded deeper run reaches VC33 L3: the L2→L3 segment takes 23 solution
+actions, 1,124 expanded states, and 34,067 attempted transitions; including
+the retained L0/L1 paths gives 33 actions and 1,169 expansions total. Unlike
+FT09's larger combinatorial level, this is practical clone-backed curriculum
+generation.
+
+It does not transfer through the current coordinate head. The combined corpus
+contains 76 unique model-visible rows. Shared regression, equal-per-task
+gradient weighting, and a VC33-only fit all stop at L2. A temporary alternative
+turned deterministic object ranks into discrete actions and widened the
+universal head from 18 to 64, but four capacity/rate probes fit at most 86.8%
+of the training rows. Required ranks reach 50 while the compact hybrid token
+explicitly represents only six objects. The widened head was therefore
+removed rather than making every environment pay for an interface that could
+not retain the demonstrated program.
+
+The search export now records `object_index`, `object_candidate_count`, and 12
+normalized features for every candidate. A generic two-layer pointer scores
+that current variable set after Kindle selects the stable complex-action
+identity. It fits all 67 complex labels in the 76-row joint corpus. A separate
+zero-update process reloads the categorical policy and pointer checkpoints and
+reaches L1 on all eight games, FT09 L2, and VC33 L3 in 33 actions. No clone,
+coordinate projection, or motion extrapolation is used during evaluation.
+
+This closes demonstrated L3 retention while keeping `MAX_ACTION_DIM = 18`.
+The result remains behavior cloning on search-generated paths: unseen-level
+transfer and online reward-driven discovery are still open.

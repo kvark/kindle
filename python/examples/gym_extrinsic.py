@@ -22,6 +22,25 @@ import time
 import numpy as np
 
 
+def _transition_observations(
+    reset_obs: np.ndarray, dones: np.ndarray, infos: dict
+) -> np.ndarray:
+    """Replace SAME_STEP reset observations with true terminal observations."""
+    if not np.any(dones):
+        return reset_obs
+    if "final_obs" not in infos:
+        raise RuntimeError(
+            "vector env omitted final_obs for a completed SAME_STEP transition"
+        )
+    transition_obs = reset_obs.copy()
+    for lane in np.flatnonzero(dones):
+        final_obs = infos["final_obs"][lane]
+        if final_obs is None:
+            raise RuntimeError(f"vector env omitted final_obs for lane {lane}")
+        transition_obs[lane] = final_obs
+    return transition_obs
+
+
 def main() -> int:
     try:
         import gymnasium as gym
@@ -39,14 +58,13 @@ def main() -> int:
     parser.add_argument("--lr", type=float, default=3e-4,
                         help="Base learning rate. Drives WM/encoder; the "
                         "Python binding also auto-derives lr_policy = lr/2 "
-                        "and lr_credit = lr·0.3 unless overridden.")
+                        "unless overridden.")
     parser.add_argument("--lr-policy", type=float, default=0.0,
                         help="Override the auto-derived policy LR. 0 = use "
                         "the auto-derived value (lr/2). Useful for freezing "
                         "the encoder (set --lr 0) while training the policy.")
     parser.add_argument("--latent-dim", type=int, default=16)
     parser.add_argument("--hidden-dim", type=int, default=32)
-    parser.add_argument("--history-len", type=int, default=32)
     parser.add_argument("--action-repeat", type=int, default=1,
                         help="Repeat each chosen action for N env-steps. "
                         "Effective macro-action exploration: at N=5 random "
@@ -101,9 +119,9 @@ def main() -> int:
     parser.add_argument("--advantage-clamp", type=float, default=2.0)
     parser.add_argument("--extrinsic-alpha", type=float, default=1.0)
     parser.add_argument("--reward-homeostatic", type=float, default=0.0)
-    parser.add_argument("--reward-surprise", type=float, default=0.1)
-    parser.add_argument("--reward-novelty", type=float, default=0.1)
-    parser.add_argument("--reward-order", type=float, default=0.1)
+    parser.add_argument("--reward-surprise", type=float, default=0.0)
+    parser.add_argument("--reward-novelty", type=float, default=0.0)
+    parser.add_argument("--reward-order", type=float, default=0.0)
     parser.add_argument("--rnd-reward-alpha", type=float, default=0.0,
                         help="Random Network Distillation curiosity bonus "
                         "weight. Frozen target network + trained predictor; "
@@ -171,15 +189,15 @@ def main() -> int:
                         "exceed ±100, but expect more violent post-solve "
                         "crashes (CartPole regresses peak +329 → +64 if "
                         "raised to 200 unilaterally).")
-    parser.add_argument("--recon-loss-coef", type=float, default=0.0,
+    parser.add_argument("--recon-loss-coef", type=float, default=1.0,
                         help="Reconstruction decoder anti-collapse loss "
-                        "coefficient. >0 (e2e only) adds a decoder z→obs' "
+                        "coefficient. >0 adds a WM decoder z→obs' "
                         "+ MSE loss vs. stop_gradient(obs). Empirically "
                         "binary: any nonzero value engages the encoder "
                         "anti-collapse signal; magnitude in [0.1, 2.0] "
                         "doesn't differentiate. Validated on LunarLander "
                         "(sustained mean -291→-115 across 3 seeds at "
-                        "200k×8). Default 0.0 (off) for byte-parity.")
+                        "200k×8). Default 1.0.")
     parser.add_argument("--reward-pred-loss-coef", type=float, default=0.0,
                         help="Reward-from-z auxiliary loss coefficient. "
                         ">0 adds head z→r̂ + MSE vs. per-row reward. Kills "
@@ -201,6 +219,13 @@ def main() -> int:
                         "firing the LR drop. Default 1 (immediate). Set "
                         "2-3 to wait for sustained solve and avoid firing "
                         "on a noisy first-time peak.")
+    parser.add_argument("--require-recent-return", type=float, default=None,
+                        help="Exit non-zero unless the final recent-episode "
+                        "mean reaches this value. Turns the harness into a "
+                        "reproducible learning gate (195 for CartPole-v1).")
+    parser.add_argument("--recent-episodes-per-lane", type=int, default=5,
+                        help="Completed episodes retained per lane for the "
+                        "final --require-recent-return gate.")
     parser.add_argument("--solve-auto-multiple", type=float, default=0.0,
                         help="Auto-threshold: when > 0, ignore "
                         "--solve-threshold and instead trigger LR-drop "
@@ -238,6 +263,20 @@ def main() -> int:
                         "Strips the \"V lags reward\" bias — critical early "
                         "in training when V hasn't caught up and every "
                         "advantage is same-sign.")
+    parser.add_argument("--use-grpo", action="store_true",
+                        help="Normalize policy advantages among parallel "
+                        "forks of this task instead of using the value "
+                        "baseline. Requires --advantage-normalize.")
+    parser.add_argument("--use-grpo-episode", action="store_true",
+                        help="With --use-grpo, rank completed whole-episode "
+                        "returns across lanes. Useful when per-step rewards "
+                        "are uninformative but episode length/outcome is not.")
+    parser.add_argument("--use-sil", action="store_true",
+                        help="Replay actions from completed episodes whose "
+                        "return beats the moving baseline (self-imitation).")
+    parser.add_argument("--sil-loss-coef", type=float, default=1.0,
+                        help="Weight of the self-imitation update when "
+                        "--use-sil is enabled.")
     parser.add_argument("--use-ppo", action="store_true",
                         help="Use the PPO clipped-surrogate policy loss. "
                         "Requires policy_update_interval > 1 to exercise the "
@@ -306,6 +345,10 @@ def main() -> int:
                         "buckets so PyBatchAgent's discrete adapter can drive "
                         "them. Pendulum needs ≥5 to be solvable.")
     args = parser.parse_args()
+    if args.use_grpo and not args.advantage_normalize:
+        parser.error("--use-grpo requires --advantage-normalize")
+    if args.use_grpo_episode and not args.use_grpo:
+        parser.error("--use-grpo-episode requires --use-grpo")
 
     # PyBatchAgent forces discrete actions. For continuous envs
     # (Pendulum, etc.), wrap them with a Discretize wrapper that
@@ -329,10 +372,13 @@ def main() -> int:
         return e
 
     thunks = [lambda i=i: make_env() for i in range(args.lanes)]
+    autoreset_mode = gym.vector.AutoresetMode.SAME_STEP
     if args.async_envs:
-        envs = gym.vector.AsyncVectorEnv(thunks, shared_memory=True)
+        envs = gym.vector.AsyncVectorEnv(
+            thunks, shared_memory=True, autoreset_mode=autoreset_mode
+        )
     else:
-        envs = gym.vector.SyncVectorEnv(thunks)
+        envs = gym.vector.SyncVectorEnv(thunks, autoreset_mode=autoreset_mode)
     obs_batch, _ = envs.reset(seed=args.seed)
     obs_dim = obs_batch.shape[-1]
     act_space = envs.single_action_space
@@ -355,13 +401,12 @@ def main() -> int:
         obs_dim=obs_dim,
         num_actions=num_actions,
         batch_size=args.lanes,
-        env_ids=[1 + i for i in range(args.lanes)],
+        env_ids=[0] * args.lanes,
         seed=args.seed,
         learning_rate=args.lr,
         lr_policy=args.lr_policy if args.lr_policy > 0 else None,
         latent_dim=args.latent_dim,
         hidden_dim=args.hidden_dim,
-        history_len=args.history_len,
         action_repeat=args.action_repeat,
         num_options=args.num_options,
         option_horizon=args.option_horizon,
@@ -389,6 +434,10 @@ def main() -> int:
         value_loss_coef=args.value_loss_coef,
         policy_update_interval=args.policy_update_interval,
         advantage_normalize=args.advantage_normalize,
+        use_grpo=args.use_grpo,
+        use_grpo_episode=args.use_grpo_episode,
+        use_sil=args.use_sil,
+        sil_loss_coef=args.sil_loss_coef,
         use_ppo=args.use_ppo,
         ppo_clip_eps=args.ppo_clip_eps,
         use_kl_ppo=args.use_kl_ppo,
@@ -448,14 +497,22 @@ def main() -> int:
         # Discretize (the old `else` branch here was unreachable and
         # would have sent action INDICES as continuous action values).
         actions_np = np.array(actions, dtype=np.int64)
-        next_obs, rewards, terms, truncs, _ = envs.step(actions_np)
+        next_obs, rewards, terms, truncs, infos = envs.step(actions_np)
         cur_ret += rewards
         dones = np.logical_or(terms, truncs)
+        transition_obs = _transition_observations(next_obs, dones, infos)
 
         # Extrinsic reward — the only training signal.
         agent.set_extrinsic_reward(rewards.astype(np.float32, copy=False))
-        next_lists = [next_obs[i].astype(np.float32).tolist() for i in range(args.lanes)]
-        agent.observe(next_lists, [int(a) for a in actions], homeostatic=[[] for _ in range(args.lanes)])
+        transition_lists = [
+            transition_obs[i].astype(np.float32).tolist()
+            for i in range(args.lanes)
+        ]
+        agent.observe(
+            transition_lists,
+            [int(a) for a in actions],
+            homeostatic=[[] for _ in range(args.lanes)],
+        )
 
         for i, done in enumerate(dones):
             if done:
@@ -473,7 +530,11 @@ def main() -> int:
         if args.log_every and step > 0 and step % args.log_every == 0:
             diags = agent.diagnostics()
             d = diags[0]
-            all_recent = [r for lane_rets in ep_returns for r in lane_rets[-5:]]
+            all_recent = [
+                r
+                for lane_rets in ep_returns
+                for r in lane_rets[-args.recent_episodes_per_lane:]
+            ]
             avg_ret = sum(all_recent) / max(1, len(all_recent))
             # One-shot LR drop on sustained solve detection.
             # Requires `--solve-windows` consecutive windows above
@@ -561,10 +622,33 @@ def main() -> int:
     print(f"\n--- {args.env} summary ---")
     print(f"total env-steps: {args.steps * args.lanes}")
     print(f"episodes: {total_eps}, mean return: {mean_ret:+.2f}")
+    final_recent = [
+        r
+        for lane_rets in ep_returns
+        for r in lane_rets[-args.recent_episodes_per_lane:]
+    ]
+    recent_mean = (
+        sum(final_recent) / len(final_recent)
+        if final_recent
+        else float("nan")
+    )
+    print(
+        f"recent episodes: {len(final_recent)}, "
+        f"recent mean return: {recent_mean:+.2f}"
+    )
     print(
         f"wall: {elapsed:.1f}s, throughput: "
         f"{args.steps * args.lanes / max(1e-3, elapsed):.0f} env-steps/s"
     )
+    if args.require_recent_return is not None:
+        passed = bool(final_recent) and recent_mean >= args.require_recent_return
+        print(
+            "learning gate: "
+            f"{'PASS' if passed else 'FAIL'} "
+            f"(recent {recent_mean:+.2f} vs required "
+            f"{args.require_recent_return:+.2f})"
+        )
+        return 0 if passed else 2
     return 0
 
 

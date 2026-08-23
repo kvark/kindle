@@ -58,9 +58,33 @@ impl Action {
 }
 
 /// Outcome of a single environment step.
+///
+/// Native environments may reset themselves immediately after producing a
+/// terminal result to support continual loops. In that case `observation`
+/// and `homeostatic` still describe the pre-reset transition; a subsequent
+/// [`Environment::observe`] call describes the fresh episode.
+#[derive(Clone, Debug)]
 pub struct StepResult {
     pub observation: Observation,
     pub homeostatic: Vec<HomeostaticVariable>,
+    /// Task-provided reward for the transition.
+    pub reward: f32,
+    /// A positive task achievement, independent of reward sign and episode end.
+    ///
+    /// Examples include reaching MountainCar's goal, completing a Taxi drop-off,
+    /// or collecting food in GridWorld. This must not be inferred from
+    /// `terminated`: some tasks terminate on failure (for example CartPole).
+    pub task_event: bool,
+    /// The task reached a natural terminal state (success or failure).
+    pub terminated: bool,
+    /// The episode ended because of a time/resource limit.
+    pub truncated: bool,
+}
+
+impl StepResult {
+    pub fn done(&self) -> bool {
+        self.terminated || self.truncated
+    }
 }
 
 /// Action space kind for agent configuration.
@@ -97,6 +121,15 @@ pub trait Environment: HomeostaticProvider {
 
     /// Current observation without advancing state.
     fn observe(&self) -> Observation;
+
+    /// Optional validity mask for the current discrete-action state.
+    ///
+    /// When present, the vector must have `num_actions()` entries; `true`
+    /// means the action may be executed. Environments with a fixed action
+    /// set can use the default `None` (all actions available).
+    fn action_mask(&self) -> Option<Vec<bool>> {
+        None
+    }
 
     /// Apply an action and advance one timestep.
     fn step(&mut self, action: &Action) -> StepResult;

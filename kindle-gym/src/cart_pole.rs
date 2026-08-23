@@ -28,6 +28,7 @@ pub struct CartPole {
     theta_dot: f32,
     failed: bool,
     step_count: usize,
+    max_steps: usize,
     homeo: Vec<HomeostaticVariable>,
 }
 
@@ -40,6 +41,7 @@ impl CartPole {
             theta_dot: 0.0,
             failed: false,
             step_count: 0,
+            max_steps: 500,
             homeo: Vec::new(),
         };
         env.update_homeo();
@@ -117,15 +119,23 @@ impl Environment for CartPole {
         // pole angle so falling is penalized, not reported as satisfied.
         // reset() recomputes self.homeo for the next step.
         let homeostatic = self.homeo.clone();
+        let observation = self.observe();
+        let terminated = self.failed;
+        let truncated = self.step_count >= self.max_steps;
 
-        // Auto-reset on failure (continual learning — no episode boundaries)
-        if self.failed {
+        // Auto-reset after capturing the transition result. Callers still see
+        // the terminal observation and can mark the agent lane boundary.
+        if terminated || truncated {
             self.reset();
         }
 
         StepResult {
-            observation: self.observe(),
+            observation,
             homeostatic,
+            reward: 1.0,
+            task_event: truncated && !terminated,
+            terminated,
+            truncated,
         }
     }
 
@@ -160,17 +170,38 @@ mod tests {
     fn cartpole_falls_without_control() {
         let mut env = CartPole::new();
         // Always push right — pole will fall
-        let mut fell = false;
+        let mut terminal = None;
         for _ in 0..500 {
-            env.step(&Action::Discrete(1));
-            if env.theta.abs() > ANGLE_LIMIT || env.x.abs() > POSITION_LIMIT {
-                fell = true;
+            let result = env.step(&Action::Discrete(1));
+            if result.terminated {
+                terminal = Some(result);
                 break;
             }
         }
-        // It should have auto-reset, so fell might not be caught directly.
-        // At least verify it doesn't panic.
-        assert!(fell || env.step_count < 500);
+        let result = terminal.expect("constant force should terminate CartPole");
+        assert!(result.done());
+        assert_eq!(result.reward, 1.0);
+        assert!(!result.task_event, "falling is not a successful task event");
+        assert!(result.observation.data[0].abs() > 1.0 || result.observation.data[2].abs() > 1.0);
+        assert_eq!(
+            env.step_count, 0,
+            "environment should be ready for a new episode"
+        );
+    }
+
+    #[test]
+    fn cartpole_reports_time_limit_before_reset() {
+        let mut env = CartPole::new();
+        env.step_count = env.max_steps - 1;
+
+        let result = env.step(&Action::Discrete(0));
+
+        assert!(!result.terminated);
+        assert!(result.truncated);
+        assert!(result.task_event, "surviving the full horizon is success");
+        assert!(result.done());
+        assert_eq!(env.step_count, 0);
+        assert_ne!(result.observation.data, env.observe().data);
     }
 
     #[test]

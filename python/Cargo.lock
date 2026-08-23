@@ -160,9 +160,9 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bit-set"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34ddef2995421ab6a5c779542c81ee77c115206f4ad9d5a8e05f4ff49716a3dd"
+checksum = "09ec2f926cc3060f09db9ebc5b52823d85268d24bb917e472c0c4bea35780a7d"
 dependencies = [
  "bit-vec",
 ]
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "blade-graphics"
 version = "0.8.4"
-source = "git+https://github.com/kvark/blade?rev=72c30c1#72c30c12f3bb6dff6beb285c33283f30cdea5f6f"
+source = "git+https://github.com/kvark/blade?rev=bd74bdc82f870f8d7f02589de5f0fbb949b6e8a8#bd74bdc82f870f8d7f02589de5f0fbb949b6e8a8"
 dependencies = [
  "ash",
  "ash-window",
@@ -247,7 +247,7 @@ dependencies = [
 [[package]]
 name = "blade-macros"
 version = "0.3.0"
-source = "git+https://github.com/kvark/blade?rev=72c30c1#72c30c12f3bb6dff6beb285c33283f30cdea5f6f"
+source = "git+https://github.com/kvark/blade?rev=bd74bdc82f870f8d7f02589de5f0fbb949b6e8a8#bd74bdc82f870f8d7f02589de5f0fbb949b6e8a8"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1346,12 +1346,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
-name = "hexf-parse"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
-
-[[package]]
 name = "hf-hub"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1728,7 +1722,7 @@ name = "kindle"
 version = "0.1.0"
 dependencies = [
  "blade-graphics",
- "blade-macros 0.3.0 (git+https://github.com/kvark/blade?rev=72c30c1)",
+ "blade-macros 0.3.0 (git+https://github.com/kvark/blade?rev=bd74bdc82f870f8d7f02589de5f0fbb949b6e8a8)",
  "bytemuck",
  "env_logger",
  "hashbrown 0.17.1",
@@ -1857,7 +1851,7 @@ dependencies = [
 [[package]]
 name = "meganeura"
 version = "0.2.0"
-source = "git+https://github.com/kvark/meganeura?rev=bf9833a#bf9833a1d826289aa58ce098714525718a4b1aee"
+source = "git+https://github.com/kvark/meganeura?rev=822ab46#822ab4699427f5bc0f904e8b4ff1c6a8746f9147"
 dependencies = [
  "blade-graphics",
  "blade-macros 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1952,9 +1946,8 @@ dependencies = [
 
 [[package]]
 name = "naga"
-version = "29.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2bf919621e7975acb27d881bae2fb993e0d45c8e0446e85e6272971e00dc8df"
+version = "29.0.0"
+source = "git+https://github.com/kvark/wgpu?rev=cefd48f6cff61d64abe1cdb4002c4e39bfc2c728#cefd48f6cff61d64abe1cdb4002c4e39bfc2c728"
 dependencies = [
  "arrayvec",
  "bit-set",
@@ -1964,7 +1957,6 @@ dependencies = [
  "codespan-reporting",
  "half",
  "hashbrown 0.16.1",
- "hexf-parse",
  "indexmap",
  "libm",
  "log",

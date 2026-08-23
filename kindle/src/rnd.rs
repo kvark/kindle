@@ -55,7 +55,7 @@ impl TwoLayerMlp {
     /// Forward. Returns the `out_dim`-long feature vector.
     #[allow(clippy::needless_range_loop)]
     fn forward(&self, z: &[f32]) -> Vec<f32> {
-        debug_assert_eq!(z.len(), self.in_dim);
+        assert_eq!(z.len(), self.in_dim, "RND input dimension mismatch");
         let mut h = vec![0.0f32; self.hidden_dim];
         for j in 0..self.hidden_dim {
             let mut acc = 0.0f32;
@@ -83,8 +83,8 @@ impl TwoLayerMlp {
     /// forward).
     #[allow(clippy::needless_range_loop)]
     fn train_step(&mut self, z: &[f32], target: &[f32], lr: f32) -> f32 {
-        debug_assert_eq!(z.len(), self.in_dim);
-        debug_assert_eq!(target.len(), self.out_dim);
+        assert_eq!(z.len(), self.in_dim, "RND input dimension mismatch");
+        assert_eq!(target.len(), self.out_dim, "RND target dimension mismatch");
         // Forward (recompute — cheap for small nets, simpler code).
         let mut h = vec![0.0f32; self.hidden_dim];
         let mut mask = vec![false; self.hidden_dim];
@@ -202,11 +202,45 @@ impl RndState {
     /// formulation: the reward is the predictor's CURRENT
     /// confusion, not the lower post-update value.
     pub fn step(&mut self, z: &[f32]) -> f32 {
-        debug_assert_eq!(z.len(), self.target.in_dim);
+        assert_eq!(z.len(), self.target.in_dim, "RND input dimension mismatch");
         let target_out = self.target.forward(z);
         let mse = self.predictor.train_step(z, &target_out, self.lr);
         self.last_mse = mse;
         mse
+    }
+
+    /// Score a synchronous batch against one predictor snapshot, then train
+    /// on every row. Separating scoring from updates makes curiosity rewards
+    /// invariant to lane order: identical observations in simultaneous forks
+    /// receive identical rewards instead of later lanes seeing a predictor
+    /// already updated by earlier lanes.
+    pub fn step_batch(&mut self, rows: &[&[f32]]) -> Vec<f32> {
+        if rows.is_empty() {
+            self.last_mse = 0.0;
+            return Vec::new();
+        }
+        let targets: Vec<Vec<f32>> = rows.iter().map(|z| self.target.forward(z)).collect();
+        let rewards: Vec<f32> = rows
+            .iter()
+            .zip(targets.iter())
+            .map(|(z, target)| {
+                let prediction = self.predictor.forward(z);
+                prediction
+                    .iter()
+                    .zip(target.iter())
+                    .map(|(p, t)| {
+                        let d = p - t;
+                        d * d
+                    })
+                    .sum::<f32>()
+                    / self.feature_dim as f32
+            })
+            .collect();
+        for (z, target) in rows.iter().zip(targets.iter()) {
+            self.predictor.train_step(z, target, self.lr);
+        }
+        self.last_mse = rewards.iter().sum::<f32>() / rewards.len() as f32;
+        rewards
     }
 
     /// Re-initialize the predictor to a fresh random starting
@@ -287,6 +321,19 @@ mod tests {
         let z = vec![0.1f32; 8];
         let mse = s.step(&z);
         assert!(mse > 0.0, "init MSE should be > 0, got {mse}");
+    }
+
+    #[test]
+    fn rnd_batch_rewards_do_not_depend_on_lane_order() {
+        let mut s = RndState::new(8, 16, 32, 1e-2, 42);
+        let repeated = vec![0.25f32; 8];
+        let other: Vec<f32> = (0..8).map(|i| i as f32 / 8.0).collect();
+        let rewards = s.step_batch(&[&repeated, &other, &repeated]);
+        assert_eq!(rewards.len(), 3);
+        assert_eq!(
+            rewards[0], rewards[2],
+            "synchronous duplicate states must receive equal curiosity reward"
+        );
     }
 
     #[test]

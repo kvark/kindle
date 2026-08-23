@@ -45,7 +45,6 @@ fn run(env: Box<dyn Environment>, adapter: Box<dyn kindle::EnvAdapter>, learned:
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
-        history_len: 16,
         buffer_capacity: 5000,
         batch_size: 1,
         learning_rate: 1e-3,
@@ -101,15 +100,11 @@ fn run(env: Box<dyn Environment>, adapter: Box<dyn kindle::EnvAdapter>, learned:
             per_option_tail[opt as usize][a_idx] += 1;
         }
 
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
+        let result = env.step(&action);
         let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 

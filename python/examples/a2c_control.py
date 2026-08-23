@@ -118,7 +118,10 @@ def main():
     p.add_argument("--log-every", type=int, default=2000)
     args = p.parse_args()
 
-    envs = gym.vector.SyncVectorEnv([lambda i=i: gym.make(args.env) for i in range(args.n_envs)])
+    envs = gym.vector.SyncVectorEnv(
+        [lambda i=i: gym.make(args.env) for i in range(args.n_envs)],
+        autoreset_mode=gym.vector.AutoresetMode.SAME_STEP,
+    )
     obs, _ = envs.reset(seed=args.seed)
     obs_dim = obs.shape[-1]
     n_actions = int(envs.single_action_space.n)

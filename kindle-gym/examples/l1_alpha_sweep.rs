@@ -69,7 +69,6 @@ fn run_one(run: EnvRun, alpha: f32, steps: usize) -> (f32, f32, usize, f32) {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
-        history_len: 16,
         buffer_capacity: 5000,
         batch_size: 1,
         learning_rate: 1e-3,
@@ -110,15 +109,10 @@ fn run_one(run: EnvRun, alpha: f32, steps: usize) -> (f32, f32, usize, f32) {
             }
         }
 
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
-        let env_ref: &dyn Environment = &*env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = env.step(&action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 

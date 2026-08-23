@@ -15,6 +15,15 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
 ]
 
+[project.optional-dependencies]
+gym = ["gymnasium>=1.1,<2"]
+atari = ["gymnasium[atari]>=1.1,<2", "opencv-python-headless>=4.10"]
+arc = [
+  "arc-agi==0.9.8; python_version >= '3.12'",
+  "arcengine==0.9.3; python_version >= '3.12'",
+]
+test = ["pytest>=8", "numpy>=1.26", "gymnasium>=1.1,<2"]
+
 [project.urls]
 Repository = "https://github.com/kvark/kindle"
 

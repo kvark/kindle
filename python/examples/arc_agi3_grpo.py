@@ -34,6 +34,15 @@ import sys
 import time
 
 
+def _wm_action_parameters(action_data: dict | None) -> list[float]:
+    """Encode the executed ARC coordinate in Kindle's normalized space."""
+    if action_data is None:
+        return [0.0, 0.0]
+    x = max(0.0, min(63.0, float(action_data["x"])))
+    y = max(0.0, min(63.0, float(action_data["y"])))
+    return [2.0 * x / 63.0 - 1.0, 2.0 * y / 63.0 - 1.0]
+
+
 def main() -> int:
     try:
         from arc_agi import Arcade
@@ -142,7 +151,7 @@ def main() -> int:
     parser.add_argument("--planner-horizon", type=int, default=0,
                         help="Enable kindle's model-based planner. The "
                         "trained world model rolls forward K=planner-horizon "
-                        "steps for each of `planner-samples` random action "
+                        "steps for each of `planner-samples` random action/coordinate "
                         "sequences (per lane), picks the trajectory with "
                         "highest latent-visit-count novelty score, and "
                         "queues the actions to override the policy. 0 = off. "
@@ -168,7 +177,9 @@ def main() -> int:
                         "tree search. Uses kindle's wm_mcts_session for "
                         "expansion + latent-visit-count novelty for leaf "
                         "scoring + UCB1 for selection. Output: most-visited "
-                        "root path (depth planner_horizon).")
+                        "root path (depth planner_horizon). Parameterized action "
+                        "spaces automatically retain shooting so multiple coordinates "
+                        "for the same action can be compared.")
     parser.add_argument("--mcts-simulations", type=int, default=64,
                         help="MCTS simulations per planning call (per lane).")
     parser.add_argument("--mcts-c-puct", type=float, default=1.4142,
@@ -176,13 +187,23 @@ def main() -> int:
     parser.add_argument("--object-click-slots", type=int, default=0,
                         help="Extend the action space with N extra "
                         "discrete slots meaning 'ACTION6-click the i-th "
-                        "largest object on screen' (connected-component "
+                        "salient object on screen' (nested components first, "
                         "centroids — generic visual salience, no game "
                         "knowledge). Replaces the uniform-random click "
                         "coordinate lottery (1/4096 per click) with a "
                         "learnable object choice. Slots are masked when "
                         "ACTION6 is unavailable or fewer objects exist. "
                         "0 = off. Max 11 (MAX_ACTION_DIM headroom).")
+    parser.add_argument(
+        "--project-learned-coordinates-to-objects",
+        type=int,
+        default=0,
+        help=(
+            "Project planner/coordinate-head clicks onto visible object "
+            "representatives, with a stable-motion prior. Random clicks and "
+            "the default pixel-coordinate mode are unchanged."
+        ),
+    )
     parser.add_argument("--plasticity-interval", type=int, default=0,
                         help="(P5) Shrink-and-perturb the encoder/WM/"
                         "recon params every N steps (p <- 0.999p + "
@@ -238,13 +259,6 @@ def main() -> int:
     parser.add_argument("--wm-sigma-loss-coef", type=float, default=0.5,
                         help="Coefficient on the σ-head regression loss in "
                         "the main WM loss. Default 0.5.")
-    parser.add_argument("--planner-rnd-alpha", type=float, default=0.0,
-                        help="Blend factor for RND novelty in the planner's "
-                        "trajectory score. score = visit_count_score + alpha * "
-                        "rnd_reward(z). RND varies continuously across latent "
-                        "space (unlike visit_count which is mostly ≈1 at "
-                        "256-dim), so even small alpha makes the score "
-                        "discriminating. Try 1.0-10.0 with rnd_alpha=2.0 on.")
     parser.add_argument("--planner-goal-alpha", type=float, default=0.0,
                         help="Goal-conditioned planner: blend factor for "
                         "max cos-sim to past win-state latents. Agent "
@@ -275,8 +289,6 @@ def main() -> int:
                         help="Discount factor for value-head return-to-go.")
     parser.add_argument("--value-head-buffer-capacity", type=int, default=10000,
                         help="Replay buffer cap for (latent, R_to_go) samples.")
-    parser.add_argument("--value-head-train-batch", type=int, default=32,
-                        help="Per-step value-head training batch size.")
     parser.add_argument("--goal-states-her-prob", type=float, default=0.0,
                         help="HER relabel probability: on each failed "
                         "episode end (zero extrinsic events), push the "
@@ -285,12 +297,6 @@ def main() -> int:
                         "(GAME_OVER) latents which mislead the win-"
                         "region cos-sim scorer. Default-off; needs a "
                         "separate non-win-region consumer to be useful.")
-    parser.add_argument("--value-head-grad-to-encoder", type=int, default=0,
-                        help="Allow V loss to backprop through encoder. "
-                        "Default 0: V trains atop frozen-relative-to-V "
-                        "encoder (R_to_go ≈ 0 dominates and would "
-                        "collapse representations otherwise). Set 1 to "
-                        "experiment with encoder shaping.")
     parser.add_argument("--bc-planner-synthetic-r", type=float, default=0.0,
                         help="BC-from-planner: synthetic R_to_go pushed "
                         "into sil_buffer for each planner-chosen first "
@@ -340,9 +346,9 @@ def main() -> int:
                         "1.0-3.0 alongside goal_alpha=1.0-2.0.")
     parser.add_argument("--confidence-mode", type=int, default=0,
                         help="Confidence-weighted planner scoring. C rises "
-                        "on extrinsic events, falls on WM surprise above "
-                        "threshold. Exploit terms (value, goal, subgoal) "
-                        "scaled by C; explore terms (change, rnd) scaled by "
+                        "on extrinsic events and otherwise decays. Exploit "
+                        "terms (value, goal, subgoal) scaled by C; explore "
+                        "terms (change, uncertainty) scaled by "
                         "(1-C); visit_count always on. 0 = off (static "
                         "weights, default). 1 = on.")
     parser.add_argument("--confidence-win-increment", type=float, default=0.02,
@@ -350,13 +356,7 @@ def main() -> int:
                         "(sil_ep_event_count incrementing).")
     parser.add_argument("--confidence-novelty-drop-rate", type=float,
                         default=0.005,
-                        help="C -= rate * (visit_novelty - threshold) when "
-                        "visit-count novelty > threshold.")
-    parser.add_argument("--confidence-novelty-threshold", type=float, default=0.3,
-                        help="Visit-count novelty (1/sqrt(visit+1)) above this "
-                        "counts as 'novel'. 0.3 ~= visit_count<10. Bounded in "
-                        "[0,1]; visit-count chosen over surprise because "
-                        "surprise magnitude depends on latent_dim.")
+                        help="Constant per-step confidence decay.")
     parser.add_argument("--win-trail-cap", type=int, default=0,
                         help="Full-trajectory archive: per-lane env-state "
                         "snapshot trail size. On extrinsic-event step, "
@@ -460,7 +460,7 @@ def main() -> int:
     parser.add_argument("--archive-level-weight-base", type=float, default=1.0,
                         help="Exponential base for level-weighted "
                         "archive restore. 1.0 = uniform (default). "
-                        "2.0: L1=2 L2=4 L3=8 → L3 gets ~57% of "
+                        "2.0: L1=2 L2=4 L3=8 → L3 gets ~57%% of "
                         "restores when L1/L2/L3 all populated. Push "
                         "for higher-level attempts.")
     parser.add_argument("--frame-diff", type=int, default=0,
@@ -577,11 +577,11 @@ def main() -> int:
                         "revisits are common and the novelty signal becomes "
                         "informative.")
     parser.add_argument("--checkpoint-dir", default=None)
-    parser.add_argument("--load-state", default=None)
+    parser.add_argument("--load-weights", default=None)
     parser.add_argument("--pretrained-cnn", default=None,
                         help="Path to a wm.safetensors-format file with "
                         "pretrained encoder.conv{1,2,3} + encoder.fc1 "
-                        "weights. Injected into wm_session AFTER load-state "
+                        "weights. Injected into wm_session AFTER load-weights "
                         "(so pretrained CNN overrides any random init). "
                         "Use pretrain/train_dae.py to produce.")
     parser.add_argument("--encoder-lr-mult", type=float, default=1.0,
@@ -668,19 +668,23 @@ def main() -> int:
     NUM_ACTIONS = 7
     action_by_value = {int(a.value): a for a in GameAction}
     # Object-click slots extend the discrete action space: slot
-    # NUM_ACTIONS + i = "ACTION6 at the centroid of the i-th largest
-    # object". The policy/planner treat them as ordinary actions; the
+    # NUM_ACTIONS + i = "ACTION6 at the representative cell of the i-th
+    # salient object". The policy/planner treat them as ordinary actions; the
     # mask gates them on ACTION6 availability + object existence.
     click_slots = max(0, min(int(args.object_click_slots), 18 - NUM_ACTIONS))
     total_actions = NUM_ACTIONS + click_slots
-    if click_slots:
+    if click_slots or args.project_learned_coordinates_to_objects:
         from object_features import object_centroids as _obj_centroids
+    if args.project_learned_coordinates_to_objects:
+        from object_features import project_with_object_motion as _project_click
 
     agent_kwargs = dict(
         obs_dim=64,
         num_actions=total_actions,
         batch_size=n_lanes,
-        env_ids=list(range(n_lanes)),
+        # Forks of one game form a GRPO comparison group and share task
+        # embeddings/archives. Lane layout is game_idx * K + fork_idx.
+        env_ids=[g_idx for g_idx in range(n_games) for _ in range(K)],
         seed=args.seed,
         learning_rate=args.lr,
         latent_dim=args.latent_dim,
@@ -723,16 +727,13 @@ def main() -> int:
         planner_sigma_horizon=args.planner_sigma_horizon,
         wm_stochastic=bool(args.wm_stochastic),
         wm_sigma_loss_coef=args.wm_sigma_loss_coef,
-        planner_rnd_alpha=args.planner_rnd_alpha,
         planner_goal_alpha=args.planner_goal_alpha,
         goal_states_cap=args.goal_states_cap,
         value_head_train_coef=args.value_head_train_coef,
         planner_value_alpha=args.planner_value_alpha,
         value_head_gamma=args.value_head_gamma,
         value_head_buffer_capacity=args.value_head_buffer_capacity,
-        value_head_train_batch=args.value_head_train_batch,
         goal_states_her_prob=args.goal_states_her_prob,
-        value_head_grad_to_encoder=bool(args.value_head_grad_to_encoder),
         bc_planner_synthetic_r=args.bc_planner_synthetic_r,
         planner_change_alpha=args.planner_change_alpha,
         value_buffer_cross_game=bool(args.value_buffer_cross_game),
@@ -743,7 +744,6 @@ def main() -> int:
         confidence_mode=bool(args.confidence_mode),
         confidence_win_increment=args.confidence_win_increment,
         confidence_novelty_drop_rate=args.confidence_novelty_drop_rate,
-        confidence_novelty_threshold=args.confidence_novelty_threshold,
         planner_action_repeat=args.planner_action_repeat,
         wm_kstep_k=args.wm_kstep_k,
         wm_kstep_batch=args.wm_kstep_batch,
@@ -768,9 +768,9 @@ def main() -> int:
             encoder_height=64, encoder_width=64,
         )
     agent = kindle.BatchAgent(**agent_kwargs)
-    if args.load_state:
-        agent.load_state(args.load_state)
-        print(f"loaded prior state from {args.load_state}")
+    if args.load_weights:
+        agent.load_weights(args.load_weights)
+        print(f"loaded prior weights from {args.load_weights}")
     if args.pretrained_cnn:
         agent.load_wm_checkpoint(args.pretrained_cnn)
         print(f"loaded pretrained CNN from {args.pretrained_cnn}")
@@ -782,7 +782,7 @@ def main() -> int:
     _obj_tok = None
     _hybrid_tok = None
     if args.object_token or args.hybrid_token:
-        import sys, os
+        import os
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from object_features import object_token as _obj_tok, hybrid_token as _hybrid_tok
         if args.hybrid_token:
@@ -812,12 +812,23 @@ def main() -> int:
     # unused slots to -inf so the policy never samples them.
     MAX_ACTION_DIM = 18
     mask_buf = np.ones((n_lanes, MAX_ACTION_DIM), dtype=np.float32)
+    parameter_row = [False] * MAX_ACTION_DIM
+    for value, game_action in action_by_value.items():
+        idx = value - 1
+        if 0 <= idx < MAX_ACTION_DIM:
+            parameter_row[idx] = bool(game_action.is_complex())
+    # Object slots are semantic discrete actions: slot i always means
+    # "click salient object i" in the current state. Their coordinate is
+    # derived deterministically by the host, so it is neither searched nor
+    # included as a separate WM input. Only the base complex action exposes
+    # a freely chosen coordinate to the parameterized planner.
+    agent.set_action_parameter_masks(parameter_row * n_lanes)
 
     # Per-lane object-centroid cache for the click slots. Recomputed
-    # only when the frame hash changes (ARC frames are mostly static,
-    # so this is nearly free despite scipy label calls).
+    # only when the frame hash changes (ARC frames are mostly static).
     lane_centroids = [[] for _ in range(n_lanes)]
     lane_centroid_hash = [None] * n_lanes
+    lane_click_history = [[] for _ in range(n_lanes)]
 
     def refresh_lane_objects():
         for lane_i in range(n_lanes):
@@ -852,9 +863,9 @@ def main() -> int:
                     mask_buf[lane_i, NUM_ACTIONS + i] = 1.0
         agent.set_action_masks(mask_buf.reshape(-1))
 
-    def map_action(idx, lane):
-        # Object-click slot: ACTION6 aimed at the i-th largest object's
-        # centroid. The mask guarantees ACTION6 availability and object
+    def map_action(idx, lane, planned_xy=None):
+        # Object-click slot: ACTION6 aimed at the i-th salient object's
+        # representative cell. The mask guarantees ACTION6 availability and object
         # existence at mask-build time; if the frame changed since, fall
         # back to the last known centroid (still a salient point).
         if idx >= NUM_ACTIONS:
@@ -871,6 +882,8 @@ def main() -> int:
                 y, x = rng.randrange(64), rng.randrange(64)
             a = action_by_value[6]
             a.set_data({"x": int(x), "y": int(y)})
+            if args.project_learned_coordinates_to_objects:
+                lane_click_history[lane].append((int(x), int(y)))
             return a, {"x": int(x), "y": int(y)}
         # Kindle now masks invalid actions before sampling, so `idx`
         # should always map to an action in `avail_actions[lane]`.
@@ -885,10 +898,29 @@ def main() -> int:
         )
         a = action_by_value[target]
         if a.is_complex():
-            x = rng.randrange(64)
-            y = rng.randrange(64)
+            if planned_xy is None:
+                x = rng.randrange(64)
+                y = rng.randrange(64)
+                if args.project_learned_coordinates_to_objects:
+                    lane_click_history[lane].clear()
+            else:
+                sx, sy = planned_xy
+                x = max(0, min(63, int(round((sx + 1.0) * 0.5 * 63.0))))
+                y = max(0, min(63, int(round((sy + 1.0) * 0.5 * 63.0))))
+                if args.project_learned_coordinates_to_objects:
+                    frame = np.asarray(obs_list[lane].frame[0], dtype=np.int32)
+                    x, y = _project_click(
+                        frame,
+                        x,
+                        y,
+                        lane_click_history[lane],
+                        max_n=64,
+                    )
+                    lane_click_history[lane].append((x, y))
             a.set_data({"x": x, "y": y})
             return a, {"x": x, "y": y}
+        if args.project_learned_coordinates_to_objects:
+            lane_click_history[lane].clear()
         return a, None
 
     import random
@@ -1200,6 +1232,8 @@ def main() -> int:
                         last_levels[i] = int(obs_list[i].levels_completed)
                         ep_step[i] = 0
                     agent.mark_boundary(i)
+                    if args.project_learned_coordinates_to_objects:
+                        lane_click_history[i].clear()
                     if win_trail_on:
                         win_trails[i].clear()
                     if progress_on:
@@ -1303,6 +1337,7 @@ def main() -> int:
                     agent.queue_actions(i, list(seq))
                     skill_replays += 1
             actions = agent.act(pooled)
+            planned_coords = agent.take_planned_action_parameters()
 
             # (3) Frontier-restore random override. When a lane was just
             # restored from a high-score archive entry, force pure random
@@ -1335,6 +1370,7 @@ def main() -> int:
                         # avail holds 1-based action values; the agent's
                         # action index is value-1 (see map_action).
                         actions[li] = avail[rng.randrange(len(avail))] - 1
+                        planned_coords[li] = None
 
             # Record action history per lane for skill capture on
             # level-up below.
@@ -1345,6 +1381,8 @@ def main() -> int:
             new_obs_list = []
             homeo_list = []
             new_pooled = []
+            coord_actions = []
+            action_parameters = []
             level_deltas = [0] * n_lanes
             for i in range(n_lanes):
                 # #2 Trail snapshot: capture state BEFORE the step. If
@@ -1363,7 +1401,17 @@ def main() -> int:
                         })
                 trail_step_counter[i] += 1
 
-                ga, ad = map_action(int(actions[i]), i)
+                ga, ad = map_action(int(actions[i]), i, planned_coords[i])
+                # Object slots have deterministic state-derived coordinates;
+                # their stable discrete identity is the complete WM action.
+                # Only base ARC actions carry independently selectable params.
+                coord_active = (
+                    int(actions[i]) < NUM_ACTIONS
+                    and ga.is_complex()
+                    and ad is not None
+                )
+                coord_actions.append(coord_active)
+                action_parameters.extend(_wm_action_parameters(ad))
                 try:
                     obs_new = envs[i].step(ga, data=ad)
                 except Exception:
@@ -1376,6 +1424,8 @@ def main() -> int:
                     obs_new = envs[i].reset()
                     avail_actions[i] = list(obs_new.available_actions) or avail_actions[i]
                     agent.mark_boundary(i)
+                    if args.project_learned_coordinates_to_objects:
+                        lane_click_history[i].clear()
                     if win_trail_on:
                         win_trails[i].clear()
                 new_obs_list.append(obs_new)
@@ -1385,6 +1435,8 @@ def main() -> int:
                 d = new_levels - last_levels[i]
                 level_deltas[i] = d
                 if d > 0:
+                    if args.project_learned_coordinates_to_objects:
+                        lane_click_history[i].clear()
                     levels_events[i] += d
                     macro_return[i] += float(d)  # cheap proxy for "did good things happen"
                     # (7) Reset stagnation counter on any extrinsic event.
@@ -1722,7 +1774,12 @@ def main() -> int:
                         # encoder sees +/- changes symmetrically.
                         frame_buf[i, 1] = cur - prev_frame[i]
                         prev_frame[i] = cur
+            agent.set_action_parameters(action_parameters, coord_actions)
             agent.observe(new_pooled, list(actions), homeostatic=homeo_list)
+            # Click credit uses actual task progress, not the much denser
+            # intrinsic novelty/surprise signal. Object-click slots and random
+            # fallbacks are still represented in the WM even though this GRPO
+            # harness has no separate continuous coord-head update.
             obs_list = new_obs_list
 
         # END OF MACRO WINDOW: synchronize forks per game.
@@ -1770,6 +1827,10 @@ def main() -> int:
                 last_levels[base + k] = last_levels[base + best_k]
                 avail_actions[base + k] = list(avail_actions[base + best_k])
                 ep_step[base + k] = ep_step[base + best_k]
+                if args.project_learned_coordinates_to_objects:
+                    lane_click_history[base + k] = list(
+                        lane_click_history[base + best_k]
+                    )
                 agent.mark_boundary(base + k)
             syncs += 1
             # Archive-add: only save non-terminal env states. Terminal
@@ -1923,8 +1984,8 @@ def main() -> int:
           f"({elapsed:.0f}s total)")
 
     if args.checkpoint_dir:
-        agent.save_state(args.checkpoint_dir)
-        print(f"saved trained agent to {args.checkpoint_dir}")
+        agent.save_weights(args.checkpoint_dir)
+        print(f"saved trained weights to {args.checkpoint_dir}")
     if args.save_archive:
         try:
             # cloudpickle handles unusual module names (e.g.

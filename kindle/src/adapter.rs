@@ -18,6 +18,16 @@ use rand::{Rng, RngCore};
 /// separate network.
 pub const MAX_ACTION_DIM: usize = 18;
 
+/// Optional continuous parameters appended only to the world-model action
+/// token. The policy still predicts `MAX_ACTION_DIM` discrete/continuous base
+/// actions; spatial environments can additionally stage normalized `(x, y)`
+/// values without turning them into invalid policy labels.
+pub const ACTION_PARAMETER_DIM: usize = 2;
+
+/// World-model action width: base action identity/values plus optional
+/// normalized action parameters. Non-parameterized actions use a zero tail.
+pub const WM_ACTION_DIM: usize = MAX_ACTION_DIM + ACTION_PARAMETER_DIM;
+
 /// Observation token dimension. Raw observations of any size are projected
 /// (padded with zeros initially) to this size.
 pub const OBS_TOKEN_DIM: usize = 64;
@@ -93,8 +103,18 @@ impl GenericAdapter {
     /// Adapter for a continuous env with `dim` action dims and Gaussian
     /// exploration noise of standard deviation `scale`.
     pub fn continuous(id: u32, obs_dim: usize, dim: usize, scale: f32) -> Self {
-        assert!(dim <= MAX_ACTION_DIM);
-        assert!(obs_dim <= OBS_TOKEN_DIM);
+        assert!(
+            (1..=MAX_ACTION_DIM).contains(&dim),
+            "continuous dim ({dim}) must be in 1..={MAX_ACTION_DIM}"
+        );
+        assert!(
+            scale.is_finite() && scale >= 0.0,
+            "continuous scale ({scale}) must be finite and non-negative"
+        );
+        assert!(
+            obs_dim <= OBS_TOKEN_DIM,
+            "obs_dim ({obs_dim}) exceeds OBS_TOKEN_DIM ({OBS_TOKEN_DIM})"
+        );
         Self {
             id,
             obs_dim,
@@ -279,5 +299,17 @@ mod tests {
     #[should_panic]
     fn obs_dim_too_large_panics() {
         let _ = GenericAdapter::discrete(0, OBS_TOKEN_DIM + 1, 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "continuous dim")]
+    fn continuous_zero_dim_panics() {
+        let _ = GenericAdapter::continuous(0, 4, 0, 1.0);
+    }
+
+    #[test]
+    #[should_panic(expected = "continuous scale")]
+    fn continuous_negative_scale_panics() {
+        let _ = GenericAdapter::continuous(0, 4, 1, -1.0);
     }
 }

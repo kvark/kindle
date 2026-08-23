@@ -21,9 +21,11 @@ Setup:
     anonymous key via Arcade).
   - 64×64 int8 frame → downsample to 8×8 via average pool →
     flatten to 64-dim obs (matches kindle's OBS_TOKEN_DIM=64).
-  - Simple discrete actions only (ignore complex / coord
-    actions for v1). Kindle emits MAX_ACTION_DIM=6 action dims;
-    we map to the game's `available_actions` list.
+  - A fixed seven-action policy space: policy index `i` always means
+    `GameAction.value == i + 1`. Dynamic masks remove unavailable
+    actions without changing the meaning of the remaining indices.
+    Coordinate payloads for complex actions come from Kindle's coord
+    head when enabled, or from seeded random exploration otherwise.
   - Homeo signal: `levels_completed` increment (rare event)
     plus a frame-entropy term (count of unique cells, which on
     ARC-AGI-3 correlates with "discovering states"). No
@@ -33,9 +35,41 @@ Setup:
 from __future__ import annotations
 
 import argparse
-import math
 import sys
 import time
+
+
+ARC_NUM_ACTIONS = 7
+MAX_ACTION_DIM = 18
+
+
+def _valid_action_indices(available_actions) -> list[int]:
+    """Convert ARC action values (1..7) to stable Kindle indices (0..6)."""
+    return sorted(
+        {
+            int(value) - 1
+            for value in available_actions
+            if 1 <= int(value) <= ARC_NUM_ACTIONS
+        }
+    )
+
+
+def _fill_action_mask(mask_row, available_actions) -> list[int]:
+    """Fill one MAX_ACTION_DIM mask row and return its valid indices."""
+    mask_row[:] = 0.0
+    valid = _valid_action_indices(available_actions)
+    for idx in valid:
+        mask_row[idx] = 1.0
+    return valid
+
+
+def _wm_action_parameters(action_data: dict | None) -> list[float]:
+    """Encode the executed ARC coordinate in Kindle's normalized space."""
+    if action_data is None:
+        return [0.0, 0.0]
+    x = max(0.0, min(63.0, float(action_data["x"])))
+    y = max(0.0, min(63.0, float(action_data["y"])))
+    return [2.0 * x / 63.0 - 1.0, 2.0 * y / 63.0 - 1.0]
 
 
 # --- Ablation blocks ------------------------------------------------------
@@ -50,10 +84,10 @@ import time
 # "explicit" by scanning sys.argv so that omitting a flag leaves block
 # defaults in force.
 #
-# PRESETS compose blocks into named combinations. `full` is the
-# validated 100% L1 reach stack on cd82. `everything` tries all landed
-# primitives simultaneously — mainly useful for confirming they don't
-# collide.
+# PRESETS compose blocks into named combinations. `full` preserves the
+# historical CD82 intrinsic stack; the old "100% L1" interpretation was
+# invalid because ARC retains `levels_completed` across resets. Use the
+# outcome gates below to make current progress claims.
 
 BLOCKS: dict[str, dict[str, object]] = {
     "cnn": {
@@ -92,18 +126,22 @@ BLOCKS: dict[str, dict[str, object]] = {
         "reward_homeostatic": 0.1,
         "reward_surprise": 5.0,
     },
+    "level_reward": {
+        "goal_bonus": 10.0,
+    },
 }
 
 PRESETS: dict[str, list[str]] = {
     "none": [],
-    # Validated 100% L1 stack on cd82 (commit 45a6e6c).
+    # Historical CD82 intrinsic stack. Kept for reproducibility, not a
+    # solve claim; current seeded runs must be compared with random.
     "full": ["cnn", "rnd", "coord", "arc_rewards"],
     # All landed reward/exploration primitives simultaneously. Mainly
     # a collision check — M8/xeps/planner were each independently null
     # on cd82 L2; stacking them stays null (structural cap).
     "everything": [
         "cnn", "rnd", "coord", "arc_rewards",
-        "m8", "xeps", "planner",
+        "level_reward", "m8", "xeps", "planner",
     ],
 }
 
@@ -148,15 +186,14 @@ def main() -> int:
         print(f"missing arc_agi toolkit: {exc}", file=sys.stderr)
         return 1
     import numpy as np
-    import kindle
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     # Ablation harness: preset + composable enable/disable. Any explicit
     # `--foo` flag wins over whatever the block would set. See BLOCKS /
     # PRESETS at the top of this file.
     parser.add_argument("--preset", choices=list(PRESETS.keys()), default="none",
-                        help="Named block combination. 'full' = validated 100%% "
-                        "L1 stack on cd82 (cnn+rnd+coord+arc_rewards). 'everything' "
+                        help="Named block combination. 'full' = historical CD82 "
+                        "intrinsic stack (cnn+rnd+coord+arc_rewards). 'everything' "
                         "stacks every landed primitive for collision testing. "
                         "'none' (default) runs bare kindle.")
     parser.add_argument("--enable", default=None,
@@ -180,7 +217,10 @@ def main() -> int:
     parser.add_argument("--advantage-clamp", type=float, default=20.0)
     parser.add_argument("--watchdog-threshold", type=float, default=1e6)
     parser.add_argument("--levels-reward-scale", type=float, default=10.0,
-                        help="Homeo spike magnitude per level completed.")
+                        help="Scale for the sustained homeostatic distance-to-win term.")
+    parser.add_argument("--goal-bonus", type=float, default=0.0,
+                        help="Extrinsic reward weight for a positive levels_completed "
+                        "delta. 0 disables; 10 is the joint-trainer recipe.")
     parser.add_argument("--encoder", choices=["mlp", "cnn", "cnn_dqn"], default="mlp",
                         help="'mlp' (default) = pre-pooled 64-dim token → MLP encoder. "
                         "'cnn' = raw 64×64 grid → conv encoder (spatial info preserved). "
@@ -196,25 +236,25 @@ def main() -> int:
     parser.add_argument("--grad-clip-norm", type=float, default=0.0,
                         help="Global L2 gradient norm clip per step (PPO standard "
                         "0.5). 0 disables.")
-    parser.add_argument("--reward-surprise", type=float, default=None,
-                        help="Weight on the world-model surprise primitive. Default 1.0 "
-                        "from kindle. For ARC, try 5-10 (homeo is meaningless here, so "
+    parser.add_argument("--reward-surprise", type=float, default=1.0,
+                        help="Weight on the world-model surprise primitive. For ARC, "
+                        "try 5-10 (homeo is weak here, so "
                         "surprise becomes the primary exploration signal).")
-    parser.add_argument("--reward-novelty", type=float, default=None,
+    parser.add_argument("--reward-novelty", type=float, default=0.5,
                         help="Weight on the latent-visit-count novelty primitive. "
                         "Default 0.5.")
-    parser.add_argument("--reward-homeostatic", type=float, default=None,
+    parser.add_argument("--reward-homeostatic", type=float, default=2.0,
                         help="Weight on the homeostatic primitive. Default 2.0 from "
-                        "kindle. For ARC, try 0.1 — the only 'homeo' signal we have "
-                        "here is the levels-completed delta, which is sparse.")
-    parser.add_argument("--reward-order", type=float, default=None,
+                        "kindle. For ARC, try 0.1 — the level-distance term is "
+                        "persistent and otherwise dominates the reward.")
+    parser.add_argument("--reward-order", type=float, default=0.5,
                         help="Weight on the order primitive. Default 0.5. Reduced for "
                         "CNN mode where the order-digest may be less meaningful.")
     parser.add_argument("--grid-resolution", type=float, default=None,
                         help="Latent-grid bucket size for the novelty visit counter. "
                         "Default 0.5. Lower = finer buckets = novelty stays high longer "
                         "but fewer rare-state matches.")
-    parser.add_argument("--rnd-alpha", type=float, default=None,
+    parser.add_argument("--rnd-alpha", type=float, default=0.0,
                         help="RND curiosity weight. 0 (default) disables. Try 0.5-5.0 on "
                         "visual envs where kindle's surprise/novelty primitives saturate.")
     parser.add_argument("--rnd-feature-dim", type=int, default=None,
@@ -235,6 +275,15 @@ def main() -> int:
                         help="Gaussian exploration noise for coord head. Default 0.3.")
     parser.add_argument("--coord-lr", type=float, default=None,
                         help="Coord head LR. Default = learning_rate × 0.3.")
+    parser.add_argument(
+        "--project-learned-coordinates-to-objects",
+        action="store_true",
+        help=(
+            "Project planner/coordinate-head clicks onto visible object "
+            "representatives, with a stable-motion prior. Random clicks and "
+            "the default pixel-coordinate mode are unchanged."
+        ),
+    )
     parser.add_argument("--delta-goal-alpha", type=float, default=None,
                         help="M8 delta-goal reward weight. 0 (default) disables. "
                         "Try 0.1-1.0 on envs where state-change events are rare "
@@ -274,7 +323,7 @@ def main() -> int:
     parser.add_argument("--planner-horizon", type=int, default=0,
                         help="Track 3 model-based planner horizon. 0 (default) "
                         "disables planning. K >= 1 samples random K-action "
-                        "sequences, rolls them through the WM, picks the one "
+                        "and coordinate sequences, rolls them through the WM, picks the one "
                         "whose predicted latents visit the least-seen cells, "
                         "and commits that sequence for the next K act() calls.")
     parser.add_argument("--planner-samples", type=int, default=None,
@@ -291,6 +340,15 @@ def main() -> int:
     parser.add_argument("--planner-every", type=int, default=0,
                         help="Harness trigger: call plan_and_queue every N env "
                         "steps. 0 disables harness-side planning invocation.")
+    parser.add_argument("--planner-change-alpha", type=float, default=0.0,
+                        help="Planner score weight for predicted latent change. "
+                        "Useful for coordinate search because visit-count novelty "
+                        "often ties across unseen click candidates.")
+    parser.add_argument("--require-level-events", type=int, default=None,
+                        help="Exit 2 unless at least this many level-completion events "
+                        "occur. Useful as a reproducible learning gate.")
+    parser.add_argument("--require-max-level", type=int, default=None,
+                        help="Exit 2 unless this level is reached at least once.")
     args = parser.parse_args()
     active_blocks = _apply_blocks(args, sys.argv[1:])
     if active_blocks:
@@ -313,6 +371,9 @@ def main() -> int:
     env = arcade.make(env_info.game_id)
     obs_raw = env.reset()
     frame = np.asarray(obs_raw.frame[0], dtype=np.float32)  # (64, 64)
+    click_history = []
+    if args.project_learned_coordinates_to_objects:
+        from object_features import project_with_object_motion
     print(
         f"game={env_info.title} id={env_info.game_id} "
         f"available_actions={obs_raw.available_actions} "
@@ -321,15 +382,13 @@ def main() -> int:
     )
 
     available_actions = list(obs_raw.available_actions)
-    if not available_actions:
+    if not _valid_action_indices(available_actions):
         print("no available actions on initial frame", file=sys.stderr)
         return 1
-    # kindle's discrete adapter emits actions 0..num_actions-1.
-    # MAX_ACTION_DIM=18 (post Atari work) so we can cover full ARC
-    # action space. (Complex actions — ACTION6 — are allowed here;
-    # their (x, y) payload is filled with random coords per step by
-    # `action_to_game` below.)
-    num_actions = min(18, len(available_actions))
+    # Keep policy semantics stable across frames: index 0 always means
+    # ACTION1, ..., index 6 always means ACTION7. Availability changes
+    # are represented only by the dynamic mask below.
+    num_actions = ARC_NUM_ACTIONS
 
     def preprocess(frame_ndarray: np.ndarray) -> list[float]:
         """64×64 int → 8×8 mean-pooled → flat 64-dim float in [0, 1].
@@ -352,9 +411,11 @@ def main() -> int:
         kindle_action_idx: int,
         kindle_xy: tuple[float, float] | None = None,
     ) -> tuple[GameAction, dict | None, int]:
-        """Map kindle's 0-indexed discrete output to the current
-        frame's `available_actions`. For complex actions
-        (currently ACTION6), attach `(x, y)` coordinates.
+        """Map a stable Kindle index to `GameAction.value == index + 1`.
+
+        If a stale/macro action is unavailable, fall back to the first
+        currently valid action. For complex actions (currently ACTION6),
+        attach `(x, y)` coordinates.
 
         Returns (game_action, data_dict, executed_idx). The local
         wrapper's env.step() reads x/y from the `data` kwarg; the
@@ -363,23 +424,24 @@ def main() -> int:
         directly without defensive checks, so passing data via
         env.step is required).
 
-        `executed_idx` is the (possibly clamped) index actually
+        `executed_idx` is the (possibly substituted) index actually
         played — the caller MUST feed observe() this index, not the
         raw sample, so policy credit and WM training match the
-        action that was really taken. With `update_action_mask()`
-        active the clamp never fires for policy-sampled actions;
-        it can still fire for macro-injected random actions.
+        action that was really taken. With `update_action_mask()` active
+        substitution never fires for policy-sampled actions.
 
         If `kindle_xy` is supplied (values in `[-1, 1]` from the
         coord head), rescale to `[0, 63]`; otherwise fall back to
         uniform random coords in `[0, 63]`. Simple actions return
         data=None.
         """
-        aa = available_actions
-        if not aa:
+        valid_indices = _valid_action_indices(available_actions)
+        if not valid_indices:
             return action_by_value[1], None, 0
-        idx = max(0, min(kindle_action_idx, len(aa) - 1))
-        action_num = int(aa[idx])
+        idx = int(kindle_action_idx)
+        if idx not in valid_indices:
+            idx = valid_indices[0]
+        action_num = idx + 1
         a = action_by_value[action_num]
         if a.is_complex():
             if kindle_xy is not None:
@@ -389,15 +451,30 @@ def main() -> int:
                 y = int(round((sy + 1.0) * 0.5 * 63.0))
                 x = max(0, min(63, x))
                 y = max(0, min(63, y))
+                if args.project_learned_coordinates_to_objects:
+                    x, y = project_with_object_motion(
+                        frame.astype(np.int32),
+                        x,
+                        y,
+                        click_history,
+                        max_n=64,
+                    )
+                    click_history.append((x, y))
             else:
                 x = rng.randrange(64)
                 y = rng.randrange(64)
+                if args.project_learned_coordinates_to_objects:
+                    click_history.clear()
             a.set_data({"x": x, "y": y})
             return a, {"x": x, "y": y}, idx
+        if args.project_learned_coordinates_to_objects:
+            click_history.clear()
         return a, None, idx
 
     # --- Kindle agent (one lane) ---
     if args.agent == "kindle":
+        import kindle
+
         obs_dim = 64  # token dim for reward circuit (always 64)
         agent_kwargs = dict(
             obs_dim=obs_dim,
@@ -414,6 +491,12 @@ def main() -> int:
             use_adam=bool(args.adam),
             adam_eps=args.adam_eps,
             grad_clip_norm=args.grad_clip_norm,
+            reward_surprise=args.reward_surprise,
+            reward_novelty=args.reward_novelty,
+            reward_homeostatic=args.reward_homeostatic,
+            reward_order=args.reward_order,
+            rnd_reward_alpha=args.rnd_alpha,
+            extrinsic_reward_alpha=args.goal_bonus,
         )
         if args.encoder == "cnn":
             agent_kwargs.update(
@@ -429,18 +512,8 @@ def main() -> int:
                 encoder_height=64,
                 encoder_width=64,
             )
-        if args.reward_surprise is not None:
-            agent_kwargs["reward_surprise"] = args.reward_surprise
-        if args.reward_novelty is not None:
-            agent_kwargs["reward_novelty"] = args.reward_novelty
-        if args.reward_homeostatic is not None:
-            agent_kwargs["reward_homeostatic"] = args.reward_homeostatic
-        if args.reward_order is not None:
-            agent_kwargs["reward_order"] = args.reward_order
         if args.grid_resolution is not None:
             agent_kwargs["grid_resolution"] = args.grid_resolution
-        if args.rnd_alpha is not None:
-            agent_kwargs["rnd_reward_alpha"] = args.rnd_alpha
         if args.rnd_feature_dim is not None:
             agent_kwargs["rnd_feature_dim"] = args.rnd_feature_dim
         if args.rnd_hidden_dim is not None:
@@ -475,32 +548,39 @@ def main() -> int:
             agent_kwargs["planner_samples"] = args.planner_samples
         if args.planner_refresh_interval is not None:
             agent_kwargs["planner_refresh_interval"] = args.planner_refresh_interval
+        if args.planner_change_alpha > 0:
+            agent_kwargs["planner_change_alpha"] = args.planner_change_alpha
         agent = kindle.BatchAgent(**agent_kwargs)
+        parameter_mask = [False] * MAX_ACTION_DIM
+        for value, game_action in action_by_value.items():
+            idx = value - 1
+            if 0 <= idx < MAX_ACTION_DIM:
+                parameter_mask[idx] = bool(game_action.is_complex())
+        agent.set_action_parameter_masks(parameter_mask)
     else:
         agent = None  # random baseline
 
     import random
     rng = random.Random(args.seed)
 
-    # Per-lane action masks (kindle's policy head is MAX_ACTION_DIM=18
-    # wide regardless of num_actions). Slot i gates "index i into the
-    # current available_actions list" — masking indices beyond the
-    # current list keeps act() from sampling actions that
-    # action_to_game would have to clamp to a DIFFERENT action.
-    MAX_ACTION_DIM = 18
+    # Slot i gates fixed GameAction value i+1. The policy therefore sees
+    # one stable vocabulary even if a game's available set changes.
     mask_buf = np.zeros((1, MAX_ACTION_DIM), dtype=np.float32)
 
-    def update_action_mask() -> None:
-        mask_buf.fill(0.0)
-        n_valid = min(num_actions, len(available_actions))
-        mask_buf[0, :n_valid] = 1.0
+    def update_action_mask() -> list[int]:
+        valid = _fill_action_mask(mask_buf[0], available_actions)
+        if not valid:
+            raise RuntimeError("ARC frame exposes no supported actions (values 1..7)")
         agent.set_action_masks(mask_buf.reshape(-1))
+        return valid
 
     current_obs = preprocess(frame)
     last_levels = int(obs_raw.levels_completed)
+    max_level_seen = last_levels
+    attempt_start_level = last_levels
     ep_step = 0
     ep_count = 0
-    ep_levels_at_end: list[int] = []
+    attempt_level_gains: list[int] = []
     ep_lens: list[int] = []
     levels_events = 0  # total level completions across all episodes
     # Harness-side action-macro injection state.
@@ -553,26 +633,29 @@ def main() -> int:
         if need_reset or ep_step >= args.max_episode_steps:
             if ep_step > 0:
                 ep_count += 1
-                ep_levels_at_end.append(int(obs_raw.levels_completed))
+                attempt_level_gains.append(
+                    max(0, int(obs_raw.levels_completed) - attempt_start_level)
+                )
                 ep_lens.append(ep_step)
             obs_raw = env.reset()
             frame = np.asarray(obs_raw.frame[0], dtype=np.float32)
             current_obs = preprocess(frame)
             last_levels = int(obs_raw.levels_completed)
+            attempt_start_level = last_levels
             available_actions[:] = list(obs_raw.available_actions) or available_actions
             ep_step = 0
+            if args.project_learned_coordinates_to_objects:
+                click_history.clear()
             if agent is not None:
                 agent.mark_boundary(0)
 
         # Choose action
         if agent is not None:
-            if args.encoder in ("cnn", "cnn_dqn"):
-                agent.set_visual_obs(preprocess_visual(frame))
             # Refresh the action mask so act() only samples indices
             # that map onto the CURRENT available_actions (they can
             # shrink mid-game; without the mask the clamp in
             # action_to_game silently substituted a different action).
-            update_action_mask()
+            valid_action_indices = update_action_mask()
             # Track 3 planner: periodically replan the next K-action
             # sequence if enabled. The agent's queue is consumed by
             # act() below — when non-empty, act() returns the planned
@@ -584,16 +667,24 @@ def main() -> int:
                 and step % args.planner_every == 0
             ):
                 agent.plan_and_queue(num_actions)
-            # Sample coords BEFORE act so kindle can cache the
-            # sample state; train happens post-observe.
-            kindle_xy = None
-            if args.coord_alpha is not None and args.coord_alpha > 0:
-                kindle_xy = tuple(agent.sample_coords()[0])
             actions = agent.act([current_obs])
             kindle_action = int(actions[0])
+            planned_xy = agent.take_planned_action_parameters()[0]
+            coord_trainable = False
+            if planned_xy is not None:
+                kindle_xy = tuple(planned_xy)
+            elif args.coord_alpha is not None and args.coord_alpha > 0:
+                kindle_xy = tuple(agent.sample_coords()[0])
+                coord_trainable = True
+            else:
+                kindle_xy = None
         else:
-            kindle_action = rng.randrange(num_actions)
+            valid_action_indices = _valid_action_indices(available_actions)
+            if not valid_action_indices:
+                raise RuntimeError("ARC frame exposes no supported actions (values 1..7)")
+            kindle_action = rng.choice(valid_action_indices)
             kindle_xy = None
+            coord_trainable = False
         # Harness-side action-macro injection. If a macro is queued,
         # pop its next action and use it instead of kindle's. If none
         # queued and the per-step injection-prob fires, sample a new
@@ -604,11 +695,15 @@ def main() -> int:
         # gradients are mildly off-policy for macro-injected steps).
         if macro_queue:
             kindle_action = macro_queue.pop(0)
+            kindle_xy = None
+            coord_trainable = False
         elif args.macro_len > 0 and rng.random() < args.macro_inject_prob:
-            macro = [rng.randrange(num_actions) for _ in range(args.macro_len)]
+            macro = [rng.choice(valid_action_indices) for _ in range(args.macro_len)]
             kindle_action = macro[0]
             macro_queue = macro[1:]
             macros_injected += 1
+            kindle_xy = None
+            coord_trainable = False
         game_action, action_data, executed_action = action_to_game(
             kindle_action, kindle_xy
         )
@@ -623,9 +718,12 @@ def main() -> int:
         new_obs = preprocess(frame)
 
         new_levels = int(obs_raw.levels_completed)
+        max_level_seen = max(max_level_seen, new_levels)
         delta_levels = new_levels - last_levels
         if delta_levels > 0:
             levels_events += delta_levels
+            if args.project_learned_coordinates_to_objects:
+                click_history.clear()
         last_levels = new_levels
 
         # Feed observation back to kindle. `executed_action` is the
@@ -633,13 +731,25 @@ def main() -> int:
         # training the WM on the pre-clamp sample would attribute the
         # outcome to an action that was never taken.
         if agent is not None:
+            if args.goal_bonus > 0:
+                agent.set_extrinsic_reward([float(max(0, delta_levels))])
             if args.encoder in ("cnn", "cnn_dqn"):
                 agent.set_visual_obs(preprocess_visual(frame))
             homeos = [homeo_for(frame, new_levels, int(obs_raw.win_levels))]
+            coord_active = game_action.is_complex() and action_data is not None
+            agent.set_action_parameters(
+                _wm_action_parameters(action_data), [coord_active]
+            )
             agent.observe([new_obs], [executed_action], homeostatic=homeos)
-            # Coord-head REINFORCE step using this step's reward.
+            # Coord-head REINFORCE step only when the executed action
+            # actually consumed the sampled coordinate. Use explicit task
+            # progress for click credit; the combined intrinsic signal can be
+            # high for a surprising but useless location.
             if args.coord_alpha is not None and args.coord_alpha > 0:
-                agent.train_coord_head()
+                agent.train_coord_head(
+                    [coord_active and coord_trainable],
+                    rewards=[float(max(0, delta_levels))],
+                )
             # Reset RND predictor on level transitions to
             # re-activate curiosity on the new state distribution.
             if args.rnd_reset_on_level and delta_levels > 0:
@@ -682,17 +792,31 @@ def main() -> int:
     print()
     print(f"--- {env_info.title} summary ({args.agent}) ---")
     print(f"total steps: {args.steps}")
-    print(f"episodes completed: {ep_count}")
+    print(f"attempts completed: {ep_count}")
     print(f"total level events: {levels_events}")
-    if ep_levels_at_end:
-        mean_final = sum(ep_levels_at_end) / len(ep_levels_at_end)
-        print(
-            f"mean levels at episode end: {mean_final:.2f} "
-            f"(max {max(ep_levels_at_end)} / win {obs_raw.win_levels})"
-        )
+    print(f"max level reached: {max_level_seen} / {obs_raw.win_levels}")
+    if attempt_level_gains:
+        attempts_with_progress = sum(gain > 0 for gain in attempt_level_gains)
+        mean_gain = sum(attempt_level_gains) / len(attempt_level_gains)
+        print(f"attempts with progress: {attempts_with_progress}/{ep_count}")
+        print(f"mean level gain per attempt: {mean_gain:.3f}")
         mean_len = sum(ep_lens) / len(ep_lens)
-        print(f"mean episode length: {mean_len:.1f}")
+        print(f"mean attempt length: {mean_len:.1f}")
     print(f"throughput: {sps:.1f} steps/s ({elapsed:.1f}s total)")
+    failures = []
+    if args.require_level_events is not None and levels_events < args.require_level_events:
+        failures.append(
+            f"level events {levels_events} < required {args.require_level_events}"
+        )
+    if args.require_max_level is not None and max_level_seen < args.require_max_level:
+        failures.append(
+            f"max level {max_level_seen} < required {args.require_max_level}"
+        )
+    if failures:
+        print("OUTCOME GATE FAILED: " + "; ".join(failures), file=sys.stderr)
+        return 2
+    if args.require_level_events is not None or args.require_max_level is not None:
+        print("OUTCOME GATE PASSED")
     return 0
 
 

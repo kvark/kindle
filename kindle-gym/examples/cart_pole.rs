@@ -17,10 +17,10 @@ fn main() {
     let config = AgentConfig {
         latent_dim: 8,
         hidden_dim: 32,
-        history_len: 16,
         buffer_capacity: 5000,
         batch_size: 1,
         learning_rate: 1e-3,
+        extrinsic_reward_alpha: 1.0,
         warmup_steps: 200,
         ..AgentConfig::default()
     };
@@ -35,29 +35,22 @@ fn main() {
     for step in 0..num_steps {
         let obs = env.observe();
         let action = agent.act(std::slice::from_ref(&obs), &mut rng).remove(0);
-        env.step(&action);
-        // Post-action convention: observe() receives the observation
-        // RESULTING from the action (see Agent::observe docs).
-        let next_obs = env.observe();
-        let env_ref: &dyn Environment = &env;
-        agent.observe(
-            std::slice::from_ref(&next_obs),
+        let result = env.step(&action);
+        agent.observe_step_results(
+            std::slice::from_ref(&result),
             std::slice::from_ref(&action),
-            std::slice::from_ref(&env_ref),
             &mut rng,
         );
 
         if (step + 1) % 1000 == 0 {
             let d = &agent.diagnostics()[0];
             println!(
-                "step {:>5} | wm={:.4} cr={:.4} pi={:.4} | r={:.3} ent={:.2} H={:.1} | buf={}",
+                "step {:>5} | wm={:.4} pi={:.4} | r={:.3} ent={:.2} | buf={}",
                 d.step,
                 d.loss_world_model,
-                d.loss_credit,
                 d.loss_policy,
                 d.reward_mean,
                 d.policy_entropy,
-                d.h_eff,
                 d.buffer_len,
             );
         }

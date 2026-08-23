@@ -2,8 +2,9 @@
 
 ARC-AGI-3 frames are H×W integer grids (typically 64×64, values 0-15).
 Each connected region of the same non-background color is an object.
-This module extracts top-K objects by area and returns a fixed-size
-feature vector that can replace or augment kindle's pooled obs token.
+This module ranks nested components before their larger containers, then
+returns a fixed-size feature vector that can replace or augment kindle's
+pooled obs token.
 
 Generalization motivation: pixel-pool encoding produces a different
 latent for every layout; object-level features carry over across
@@ -23,61 +24,244 @@ Default K=8 → 56 dims, leaving room within OBS_TOKEN_DIM=64 for an
 
 from __future__ import annotations
 
-import numpy as np
 from collections import deque
-from scipy.ndimage import label as _scipy_label, find_objects as _scipy_find_objects
+
+import numpy as np
 
 
-def _connected_components(grid: np.ndarray, ignore_color: int = 0) -> list[dict]:
-    """Per-color connected components via scipy.ndimage.label.
-    Much faster than the Python BFS (10-100x on 64x64). Returns list
-    of dicts with: color, area, bbox (y0, x0, y1, x1), cells (np
-    array of (y,x) coordinates)."""
+def _connected_components(
+    grid: np.ndarray, ignore_color: int | None = None,
+) -> list[dict]:
+    """Return the 4-connected regions of each non-background color.
+
+    ARC frames are only 64x64, so a local flood fill keeps this optional
+    example dependency-free without putting SciPy on the runtime path.
+    Colors and components are visited in deterministic raster order. By
+    default, the modal color is treated as background; interactive ARC
+    games do not consistently use color zero for their canvas.
+    """
     objects = []
     h, w = grid.shape
-    # Iterate distinct non-background colors
-    unique = np.unique(grid)
-    for color in unique:
+    if ignore_color is None:
+        colors, counts = np.unique(grid, return_counts=True)
+        ignore_color = int(colors[np.argmax(counts)])
+    for color in np.unique(grid):
         c = int(color)
         if c == ignore_color:
             continue
         mask = (grid == c)
-        labeled, n = _scipy_label(mask)
-        if n == 0:
-            continue
-        slices = _scipy_find_objects(labeled)
-        for cc_idx in range(n):
-            ys, xs = slices[cc_idx]  # bbox slices
-            sub_mask = labeled[ys, xs] == (cc_idx + 1)
-            area = int(sub_mask.sum())
-            if area == 0:
-                continue
-            y0, y1 = ys.start, ys.stop - 1
-            x0, x1 = xs.start, xs.stop - 1
-            objects.append({
-                "color": c,
-                "area": area,
-                "bbox": (y0, x0, y1, x1),
-                # Cells stored as relative-to-bbox mask for holes;
-                # avoid allocating big coord lists.
-                "_sub_mask": sub_mask,
-            })
+        visited = np.zeros((h, w), dtype=bool)
+        for start_y in range(h):
+            for start_x in range(w):
+                if not mask[start_y, start_x] or visited[start_y, start_x]:
+                    continue
+
+                queue = deque([(start_y, start_x)])
+                visited[start_y, start_x] = True
+                cells = []
+                y0 = y1 = start_y
+                x0 = x1 = start_x
+                while queue:
+                    y, x = queue.popleft()
+                    cells.append((y, x))
+                    y0, y1 = min(y0, y), max(y1, y)
+                    x0, x1 = min(x0, x), max(x1, x)
+                    for ny, nx in (
+                        (y - 1, x), (y + 1, x),
+                        (y, x - 1), (y, x + 1),
+                    ):
+                        if (0 <= ny < h and 0 <= nx < w
+                                and mask[ny, nx] and not visited[ny, nx]):
+                            visited[ny, nx] = True
+                            queue.append((ny, nx))
+
+                sub_mask = np.zeros((y1 - y0 + 1, x1 - x0 + 1), dtype=bool)
+                for y, x in cells:
+                    sub_mask[y - y0, x - x0] = True
+                objects.append({
+                    "color": c,
+                    "area": len(cells),
+                    "bbox": (y0, x0, y1, x1),
+                    "_sub_mask": sub_mask,
+                })
     return objects
 
 
+def _containment_depth(obj: dict, objects: list[dict]) -> int:
+    """Number of distinct component boxes that geometrically contain `obj`."""
+    y0, x0, y1, x1 = obj["bbox"]
+    return sum(
+        1
+        for outer in objects
+        if outer is not obj
+        and outer["bbox"] != obj["bbox"]
+        and outer["bbox"][0] <= y0
+        and outer["bbox"][1] <= x0
+        and outer["bbox"][2] >= y1
+        and outer["bbox"][3] >= x1
+    )
+
+
+def _rank_objects(objects: list[dict]) -> list[dict]:
+    """Rank likely controls/pieces ahead of enclosing panels.
+
+    Interactive grids commonly draw a large board component with smaller
+    pieces inside its bounding box. Pure area ranking exhausts the fixed
+    object budget on backgrounds, panels, and decorations. Bounding-box
+    containment is a cheap, game-independent hierarchy signal.
+    """
+    return sorted(
+        objects,
+        key=lambda o: (
+            -_containment_depth(o, objects),
+            -o["area"],
+            o["bbox"][0],
+            o["bbox"][1],
+        ),
+    )
+
+
+def _representative_cell(obj: dict) -> tuple[int, int]:
+    """Return the component cell closest to its arithmetic center."""
+    y0, x0, _y1, _x1 = obj["bbox"]
+    cells = np.argwhere(obj["_sub_mask"])
+    center = cells.mean(axis=0)
+    # A bounding-box or arithmetic center can fall outside an L/ring.
+    # Argmin's raster-order tie break keeps this deterministic.
+    cell = cells[np.square(cells - center).sum(axis=1).argmin()]
+    return y0 + int(cell[0]), x0 + int(cell[1])
+
+
+def object_candidates(
+    grid: np.ndarray,
+    max_n: int = 8,
+    max_color: int = 16,
+) -> list[tuple[int, int, np.ndarray]]:
+    """Ranked object representatives with features for pointer policies.
+
+    Each row is ``(y, x, features)``. The 12 normalized features describe
+    candidate identity and geometry, followed by its relative rank and the
+    current candidate-set size. A variable-set policy can score these rows
+    directly instead of allocating one permanent policy logit per object.
+    """
+    if grid.ndim != 2 or grid.size == 0:
+        raise ValueError("grid must be a non-empty 2D array")
+    if max_n < 1:
+        raise ValueError("max_n must be positive")
+    if max_color < 1:
+        raise ValueError("max_color must be positive")
+
+    height, width = grid.shape
+    all_objects = _connected_components(grid)
+    ranked = _rank_objects(all_objects)[:max_n]
+    count = len(ranked)
+    candidates = []
+    for rank, obj in enumerate(ranked):
+        y0, x0, y1, x1 = obj["bbox"]
+        y, x = _representative_cell(obj)
+        features = np.asarray([
+            obj["color"] / float(max_color),
+            y / max(1.0, height - 1),
+            x / max(1.0, width - 1),
+            (y0 + y1) * 0.5 / max(1.0, height - 1),
+            (x0 + x1) * 0.5 / max(1.0, width - 1),
+            (y1 - y0 + 1) / float(height),
+            (x1 - x0 + 1) / float(width),
+            obj["area"] / float(height * width),
+            min(_count_holes(obj, grid.shape) / 8.0, 1.0),
+            min(_containment_depth(obj, all_objects) / 8.0, 1.0),
+            rank / max(1.0, count - 1),
+            min(count / 256.0, 1.0),
+        ], dtype=np.float32)
+        candidates.append((y, x, features))
+    return candidates
+
+
 def object_centroids(grid: np.ndarray, max_n: int = 8) -> list[tuple[int, int]]:
-    """Top-`max_n` object centroids, largest area first (ties broken by
-    bbox position for determinism). Returns [(y, x)] ints. Generic
-    connected-component salience — no game-specific knowledge. Used by
-    the object-click action slots: the policy picks WHICH object to
-    click; this provides WHERE that object is."""
-    objs = _connected_components(grid)
-    objs.sort(key=lambda o: (-o["area"], o["bbox"][0], o["bbox"][1]))
-    out = []
-    for o in objs[:max_n]:
-        y0, x0, y1, x1 = o["bbox"]
-        out.append(((y0 + y1) // 2, (x0 + x1) // 2))
-    return out
+    """Top-`max_n` salient object representatives as ``(y, x)`` cells.
+
+    Nested objects rank before containers; remaining ties use area and
+    bbox position. Every returned coordinate lies on its component.
+    """
+    objects = _rank_objects(_connected_components(grid))[:max_n]
+    return [_representative_cell(obj) for obj in objects]
+
+
+def project_to_object_centroid(
+    grid: np.ndarray,
+    x: float,
+    y: float,
+    max_n: int = 256,
+) -> tuple[int, int]:
+    """Project an approximate click onto the nearest salient object cell.
+
+    The returned coordinate is ``(x, y)`` for ARC action payloads. Object
+    representatives are exactly the ones used by object search, so a learned
+    coordinate cannot miss a discrete target merely because of regression
+    error. If the frame contains no foreground object, return the rounded,
+    bounds-clamped input coordinate.
+    """
+    if grid.ndim != 2 or grid.size == 0:
+        raise ValueError("grid must be a non-empty 2D array")
+    if max_n < 1:
+        raise ValueError("max_n must be positive")
+
+    height, width = grid.shape
+    clamped_x = max(0, min(width - 1, round(x)))
+    clamped_y = max(0, min(height - 1, round(y)))
+    centroids = object_centroids(grid, max_n=max_n)
+    if not centroids:
+        return clamped_x, clamped_y
+    nearest_y, nearest_x = min(
+        centroids,
+        key=lambda point: (
+            (point[1] - x) ** 2 + (point[0] - y) ** 2,
+            point[0],
+            point[1],
+        ),
+    )
+    return nearest_x, nearest_y
+
+
+def project_with_object_motion(
+    grid: np.ndarray,
+    x: float,
+    y: float,
+    click_history: list[tuple[int, int]],
+    max_n: int = 64,
+    max_extrapolation_distance: float = 5.0,
+) -> tuple[int, int]:
+    """Project a click, extrapolating a stable object-space motion first.
+
+    Two identical consecutive displacements are enough to establish the
+    motion prior, but extrapolation is used only while the learned coordinate
+    remains within ``max_extrapolation_distance`` pixels of it. A deliberate
+    large jump therefore breaks a formerly stable sequence. Irregular and
+    short histories continue to use the learned coordinate directly. History
+    and return values use ARC payload order ``(x, y)``.
+    """
+    target_x, target_y = x, y
+    if len(click_history) >= 3:
+        x0, y0 = click_history[-3]
+        x1, y1 = click_history[-2]
+        x2, y2 = click_history[-1]
+        first_delta = (x1 - x0, y1 - y0)
+        second_delta = (x2 - x1, y2 - y1)
+        if first_delta == second_delta:
+            extrapolated_x = x2 + second_delta[0]
+            extrapolated_y = y2 + second_delta[1]
+            distance_squared = (
+                (x - extrapolated_x) ** 2 + (y - extrapolated_y) ** 2
+            )
+            if distance_squared <= max_extrapolation_distance ** 2:
+                target_x = extrapolated_x
+                target_y = extrapolated_y
+    return project_to_object_centroid(
+        grid,
+        target_x,
+        target_y,
+        max_n=max_n,
+    )
 
 
 def _count_holes(obj: dict, grid_shape: tuple[int, int]) -> int:
@@ -154,7 +338,7 @@ def hybrid_token(frame: np.ndarray, pixel_grid: int = 4, k_objects: int = 6,
     Args:
         frame: 2D int grid (typically 64×64)
         pixel_grid: pool side (4 = 4x4 = 16 dims)
-        k_objects: top-k objects by area
+        k_objects: number of salient objects to keep
         max_color: color count for normalization
     """
     h, w = frame.shape
@@ -168,9 +352,7 @@ def hybrid_token(frame: np.ndarray, pixel_grid: int = 4, k_objects: int = 6,
     ).flatten()
     pdim = pixel_grid * pixel_grid
 
-    objs = _connected_components(frame)
-    objs.sort(key=lambda o: -o["area"])
-    objs = objs[:k_objects]
+    objs = _rank_objects(_connected_components(frame))[:k_objects]
 
     obj_dim = k_objects * _FEATURES_PER_OBJECT
     obj_part = np.zeros(obj_dim, dtype=np.float32)
@@ -199,7 +381,7 @@ def hybrid_token(frame: np.ndarray, pixel_grid: int = 4, k_objects: int = 6,
         if n_globals > 1:
             globals_part[1] = sum(o["area"] for o in objs) / float(h * w)
         if n_globals > 2:
-            distinct = len(set(o["color"] for o in objs))
+            distinct = len({o["color"] for o in objs})
             globals_part[2] = distinct / float(max_color)
         if n_globals > 3 and objs:
             globals_part[3] = (sum(o["area"] for o in objs) / len(objs)) / float(h * w)
@@ -220,12 +402,12 @@ def hybrid_token(frame: np.ndarray, pixel_grid: int = 4, k_objects: int = 6,
 def object_token(frame: np.ndarray, k: int = 8, max_color: int = 16) -> np.ndarray:
     """Extract a fixed-size object-level token.
 
-    Returns a length-(k*7 + 8) array, default 64. Top-k objects by area
-    occupy the first k*7 dims; remaining 8 dims are global stats.
+    Returns a length-(k*7 + 8) array, default 64. Top-ranked salient
+    objects occupy the first k*7 dims; remaining 8 dims are global stats.
 
     Args:
         frame: 2D int array, the ARC-AGI grid.
-        k: number of objects to keep (top-k by area).
+        k: number of salient objects to keep.
         max_color: color count for normalization.
 
     Output dims:
@@ -235,9 +417,7 @@ def object_token(frame: np.ndarray, k: int = 8, max_color: int = 16) -> np.ndarr
                      0, 0, 0]
     """
     h, w = frame.shape
-    objs = _connected_components(frame)
-    objs.sort(key=lambda o: -o["area"])  # largest first
-    objs = objs[:k]
+    objs = _rank_objects(_connected_components(frame))[:k]
 
     out = np.zeros(k * _FEATURES_PER_OBJECT + _GLOBAL_FEATURES, dtype=np.float32)
     for i, o in enumerate(objs):
@@ -261,7 +441,7 @@ def object_token(frame: np.ndarray, k: int = 8, max_color: int = 16) -> np.ndarr
     g_off = k * _FEATURES_PER_OBJECT
     out[g_off + 0] = min(len(objs) / float(k), 1.0)
     out[g_off + 1] = sum(o["area"] for o in objs) / float(h * w)
-    distinct_colors = len(set(o["color"] for o in objs))
+    distinct_colors = len({o["color"] for o in objs})
     out[g_off + 2] = distinct_colors / float(max_color)
     if objs:
         out[g_off + 3] = (sum(o["area"] for o in objs) / len(objs)) / float(h * w)

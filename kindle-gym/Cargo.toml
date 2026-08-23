@@ -63,9 +63,9 @@ name = "l1_learned_term"
 path = "examples/l1_learned_term.rs"
 
 [[example]]
-name = "taxi_credit_probe"
-path = "examples/taxi_credit_probe.rs"
-
-[[example]]
 name = "stability_1m"
 path = "examples/stability_1m.rs"
+
+[[example]]
+name = "native_learning"
+path = "examples/native_learning.rs"
