@@ -5,67 +5,10 @@ authors = ["Dzmitry Malyshau"]
 repository = "https://github.com/kvark/kindle"
 edition = "2024"
 rust-version = "1.88"
-description = "Built-in Rust environments and runnable examples for the kindle RL agent."
+description = "Native visual smoke-test environments for Kindle."
 license = "MIT"
 
 [dependencies]
 kindle = { path = "../kindle", version = "0.1" }
-rand = "0.9"
 env_logger = "0.11"
 serde_json = "1"
-
-[[example]]
-name = "grid_world"
-path = "examples/grid_world.rs"
-
-[[example]]
-name = "cart_pole"
-path = "examples/cart_pole.rs"
-
-[[example]]
-name = "acrobot"
-path = "examples/acrobot.rs"
-
-[[example]]
-name = "mountain_car"
-path = "examples/mountain_car.rs"
-
-[[example]]
-name = "pendulum"
-path = "examples/pendulum.rs"
-
-[[example]]
-name = "taxi"
-path = "examples/taxi.rs"
-
-[[example]]
-name = "multi_env"
-path = "examples/multi_env.rs"
-
-[[example]]
-name = "l1_diagnostic"
-path = "examples/l1_diagnostic.rs"
-
-[[example]]
-name = "wm_probe"
-path = "examples/wm_probe.rs"
-
-[[example]]
-name = "l1_alpha_sweep"
-path = "examples/l1_alpha_sweep.rs"
-
-[[example]]
-name = "l1_long"
-path = "examples/l1_long.rs"
-
-[[example]]
-name = "l1_learned_term"
-path = "examples/l1_learned_term.rs"
-
-[[example]]
-name = "stability_1m"
-path = "examples/stability_1m.rs"
-
-[[example]]
-name = "native_learning"
-path = "examples/native_learning.rs"

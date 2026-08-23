@@ -4,8 +4,8 @@ build-backend = "maturin"
 
 [project]
 name = "kindle"
-version = "0.2.0"
-description = "Python bindings for the kindle RL agent."
+version = "0.3.0"
+description = "DreamerV3 with frozen DINOv3 perception on a native GPU stack."
 authors = [{ name = "Dzmitry Malyshau" }]
 license = { text = "MIT" }
 requires-python = ">=3.9"
@@ -17,12 +17,12 @@ classifiers = [
 
 [project.optional-dependencies]
 gym = ["gymnasium>=1.1,<2"]
-atari = ["gymnasium[atari]>=1.1,<2", "opencv-python-headless>=4.10"]
+atari = ["gymnasium[atari]>=1.1,<2"]
 arc = [
   "arc-agi==0.9.8; python_version >= '3.12'",
   "arcengine==0.9.3; python_version >= '3.12'",
 ]
-test = ["pytest>=8", "numpy>=1.26", "gymnasium>=1.1,<2"]
+test = ["pytest>=8", "numpy>=1.26"]
 
 [project.urls]
 Repository = "https://github.com/kvark/kindle"

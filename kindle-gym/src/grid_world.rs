@@ -1,106 +1,157 @@
-//! 5x5 grid world with homeostatic energy.
-//!
-//! The agent navigates a grid with food sources that replenish energy.
-//! Energy decays each step. The homeostatic challenge is maintaining energy
-//! within a healthy range.
-
-use kindle::env::*;
+use kindle::{Environment, Reward, RgbFrame, Transition};
 
 pub const WIDTH: usize = 5;
 pub const HEIGHT: usize = 5;
-pub const OBS_DIM: usize = WIDTH * HEIGHT + 1;
-pub const NUM_ACTIONS: usize = 4;
+pub const ACTION_COUNT: usize = 4;
+pub const FRAME_WIDTH: usize = 160;
+pub const FRAME_HEIGHT: usize = 176;
+const CELL: usize = 32;
+const STATUS_HEIGHT: usize = FRAME_HEIGHT - HEIGHT * CELL;
+const EPISODE_LIMIT: usize = 200;
 
+/// A deterministic visual task with sparse food reward and an energy-based
+/// terminal. Its purpose is integration testing, not benchmarking Dreamer.
 pub struct GridWorld {
-    pub pos: (usize, usize),
-    pub energy: f32,
-    food: Vec<(usize, usize)>,
-    homeo: Vec<HomeostaticVariable>,
+    position: (usize, usize),
+    energy: f32,
+    food_index: usize,
+    steps: usize,
+}
+
+impl Default for GridWorld {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl GridWorld {
+    const FOOD: [(usize, usize); 3] = [(1, 3), (3, 1), (4, 4)];
+
     pub fn new() -> Self {
-        let food = vec![(1, 3), (3, 1), (4, 4)];
-        let mut w = Self {
-            pos: (0, 0),
+        Self {
+            position: (0, 0),
             energy: 1.0,
-            food,
-            homeo: Vec::new(),
-        };
-        w.update_homeo();
-        w
+            food_index: 0,
+            steps: 0,
+        }
     }
 
-    fn update_homeo(&mut self) {
-        self.homeo = vec![HomeostaticVariable {
-            value: self.energy,
-            target: 0.6,
-            tolerance: 0.3,
-        }];
+    pub fn position(&self) -> (usize, usize) {
+        self.position
     }
 
-    fn make_obs(&self) -> Observation {
-        let mut data = vec![0.0f32; OBS_DIM];
-        data[self.pos.1 * WIDTH + self.pos.0] = 1.0;
-        data[WIDTH * HEIGHT] = self.energy;
-        Observation::new(data)
+    pub fn energy(&self) -> f32 {
+        self.energy
     }
-}
 
-impl HomeostaticProvider for GridWorld {
-    fn homeostatic_variables(&self) -> &[HomeostaticVariable] {
-        &self.homeo
+    pub fn render(&self) -> RgbFrame {
+        let mut pixels = vec![18_u8; FRAME_WIDTH * FRAME_HEIGHT * 3];
+        let energy_width = (self.energy * (FRAME_WIDTH - 8) as f32).round() as usize;
+        fill_rect(
+            &mut pixels,
+            4,
+            4,
+            energy_width,
+            STATUS_HEIGHT - 8,
+            [48, 196, 96],
+        );
+
+        for y in 0..HEIGHT {
+            for x in 0..WIDTH {
+                let color = if (x + y) % 2 == 0 {
+                    [38, 42, 54]
+                } else {
+                    [45, 49, 62]
+                };
+                fill_rect(
+                    &mut pixels,
+                    x * CELL + 1,
+                    STATUS_HEIGHT + y * CELL + 1,
+                    CELL - 2,
+                    CELL - 2,
+                    color,
+                );
+            }
+        }
+
+        let (food_x, food_y) = Self::FOOD[self.food_index];
+        fill_rect(
+            &mut pixels,
+            food_x * CELL + 9,
+            STATUS_HEIGHT + food_y * CELL + 9,
+            14,
+            14,
+            [244, 162, 54],
+        );
+        fill_rect(
+            &mut pixels,
+            self.position.0 * CELL + 6,
+            STATUS_HEIGHT + self.position.1 * CELL + 6,
+            20,
+            20,
+            [65, 182, 230],
+        );
+        RgbFrame::new(FRAME_WIDTH, FRAME_HEIGHT, pixels)
     }
 }
 
 impl Environment for GridWorld {
-    fn observation_dim(&self) -> usize {
-        OBS_DIM
+    fn action_count(&self) -> usize {
+        ACTION_COUNT
     }
 
-    fn num_actions(&self) -> usize {
-        NUM_ACTIONS
+    fn reset(&mut self) -> RgbFrame {
+        self.position = (0, 0);
+        self.energy = 1.0;
+        self.food_index = 0;
+        self.steps = 0;
+        self.render()
     }
 
-    fn observe(&self) -> Observation {
-        self.make_obs()
+    fn action_mask(&self) -> Option<Vec<bool>> {
+        Some(vec![
+            self.position.1 > 0,
+            self.position.1 + 1 < HEIGHT,
+            self.position.0 > 0,
+            self.position.0 + 1 < WIDTH,
+        ])
     }
 
-    fn step(&mut self, action: &Action) -> StepResult {
-        let &Action::Discrete(a) = action else {
-            panic!("grid world uses discrete actions");
-        };
-
-        match a {
-            0 if self.pos.1 > 0 => self.pos.1 -= 1,
-            1 if self.pos.1 < HEIGHT - 1 => self.pos.1 += 1,
-            2 if self.pos.0 > 0 => self.pos.0 -= 1,
-            3 if self.pos.0 < WIDTH - 1 => self.pos.0 += 1,
+    fn step(&mut self, action: usize) -> Transition {
+        assert!(action < ACTION_COUNT);
+        match action {
+            0 if self.position.1 > 0 => self.position.1 -= 1,
+            1 if self.position.1 + 1 < HEIGHT => self.position.1 += 1,
+            2 if self.position.0 > 0 => self.position.0 -= 1,
+            3 if self.position.0 + 1 < WIDTH => self.position.0 += 1,
             _ => {}
         }
-
-        self.energy = (self.energy - 0.05).max(0.0);
-        let ate_food = self.food.contains(&self.pos);
-        if ate_food {
-            self.energy = (self.energy + 0.3).min(1.0);
+        self.steps += 1;
+        self.energy = (self.energy - 0.01).max(0.0);
+        let found_food = self.position == Self::FOOD[self.food_index];
+        if found_food {
+            self.energy = (self.energy + 0.35).min(1.0);
+            self.food_index = (self.food_index + 1) % Self::FOOD.len();
         }
-
-        self.update_homeo();
-
-        StepResult {
-            observation: self.make_obs(),
-            homeostatic: self.homeo.clone(),
-            reward: if ate_food { 1.0 } else { 0.0 },
-            task_event: ate_food,
-            terminated: false,
-            truncated: false,
+        Transition {
+            frame: self.render(),
+            reward: Reward {
+                extrinsic: if found_food { 1.0 } else { 0.0 },
+                intrinsic: 0.0,
+            },
+            terminated: self.energy == 0.0,
+            truncated: self.steps >= EPISODE_LIMIT,
         }
     }
+}
 
-    fn reset(&mut self) {
-        self.pos = (0, 0);
-        self.energy = 1.0;
-        self.update_homeo();
+fn fill_rect(pixels: &mut [u8], x: usize, y: usize, width: usize, height: usize, color: [u8; 3]) {
+    assert!(x + width <= FRAME_WIDTH && y + height <= FRAME_HEIGHT);
+    for row in y..y + height {
+        for column in x..x + width {
+            let offset = (row * FRAME_WIDTH + column) * 3;
+            pixels[offset..offset + 3].copy_from_slice(&color);
+        }
     }
 }
 
@@ -109,24 +160,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn grid_world_food_replenishes_energy() {
-        let mut env = GridWorld::new();
-        // Walk to food at (1,3): right, down, down, down
-        env.step(&Action::Discrete(3)); // right to (1,0)
-        env.step(&Action::Discrete(1)); // down to (1,1)
-        env.step(&Action::Discrete(1)); // down to (1,2)
-        let pre_food = env.energy;
-        let result = env.step(&Action::Discrete(1)); // down to (1,3) — food!
-        assert!(env.energy > pre_food, "food should replenish energy");
-        assert_eq!(result.reward, 1.0);
-        assert!(!result.done());
+    fn render_and_action_mask_follow_state() {
+        let mut world = GridWorld::new();
+        let frame = world.reset();
+        assert_eq!((frame.width(), frame.height()), (160, 176));
+        assert_eq!(world.action_mask().unwrap(), vec![false, true, false, true]);
+        world.step(3);
+        assert_eq!(world.position(), (1, 0));
+        assert_eq!(world.action_mask().unwrap(), vec![false, true, true, true]);
     }
 
     #[test]
-    fn grid_world_energy_decays() {
-        let mut env = GridWorld::new();
-        let e0 = env.energy;
-        env.step(&Action::Discrete(0)); // move (away from food)
-        assert!(env.energy < e0);
+    fn food_is_sparse_extrinsic_reward() {
+        let mut world = GridWorld::new();
+        world.reset();
+        for action in [3, 1, 1] {
+            assert_eq!(world.step(action).reward.extrinsic, 0.0);
+        }
+        assert_eq!(world.step(1).reward.extrinsic, 1.0);
     }
 }

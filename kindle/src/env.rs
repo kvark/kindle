@@ -1,139 +1,104 @@
-//! Environment traits defining the boundary between kindle and any world.
+//! Small pixel-environment boundary shared by native and Python runners.
 
-/// A single homeostatic variable exposed by the environment.
-#[derive(Clone, Debug)]
-pub struct HomeostaticVariable {
-    pub value: f32,
-    pub target: f32,
-    pub tolerance: f32,
+use crate::dreamer::{FrameFlags, Reward};
+
+/// Interleaved row-major RGB8 frame. Perception handles resizing, so game
+/// adapters should preserve their native aspect ratio here.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct RgbFrame {
+    width: usize,
+    height: usize,
+    pixels: Vec<u8>,
 }
 
-/// Provides homeostatic signals to the agent.
-pub trait HomeostaticProvider {
-    fn homeostatic_variables(&self) -> &[HomeostaticVariable];
-}
-
-/// Raw observation from the environment.
-#[derive(Clone, Debug)]
-pub struct Observation {
-    pub data: Vec<f32>,
-}
-
-impl Observation {
-    pub fn new(data: Vec<f32>) -> Self {
-        Self { data }
-    }
-
-    pub fn dim(&self) -> usize {
-        self.data.len()
-    }
-}
-
-/// Agent action — discrete or continuous.
-#[derive(Clone, Debug)]
-pub enum Action {
-    Discrete(usize),
-    Continuous(Vec<f32>),
-}
-
-impl Action {
-    /// One-hot encode a discrete action into a vector of length `num_actions`.
-    pub fn to_one_hot(&self, num_actions: usize) -> Vec<f32> {
-        match *self {
-            Action::Discrete(i) => {
-                let mut v = vec![0.0; num_actions];
-                v[i] = 1.0;
-                v
-            }
-            Action::Continuous(ref v) => v.clone(),
+impl RgbFrame {
+    pub fn new(width: usize, height: usize, pixels: Vec<u8>) -> Self {
+        assert!(width > 0 && height > 0);
+        let expected = width
+            .checked_mul(height)
+            .and_then(|pixels| pixels.checked_mul(3))
+            .expect("RGB frame dimensions overflow usize");
+        assert_eq!(pixels.len(), expected);
+        Self {
+            width,
+            height,
+            pixels,
         }
     }
 
-    pub fn dim(&self, num_actions: usize) -> usize {
-        match *self {
-            Action::Discrete(_) => num_actions,
-            Action::Continuous(ref v) => v.len(),
-        }
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    pub fn pixels(&self) -> &[u8] {
+        &self.pixels
     }
 }
 
-/// Outcome of a single environment step.
-///
-/// Native environments may reset themselves immediately after producing a
-/// terminal result to support continual loops. In that case `observation`
-/// and `homeostatic` still describe the pre-reset transition; a subsequent
-/// [`Environment::observe`] call describes the fresh episode.
+/// Result of one environment action.
 #[derive(Clone, Debug)]
-pub struct StepResult {
-    pub observation: Observation,
-    pub homeostatic: Vec<HomeostaticVariable>,
-    /// Task-provided reward for the transition.
-    pub reward: f32,
-    /// A positive task achievement, independent of reward sign and episode end.
-    ///
-    /// Examples include reaching MountainCar's goal, completing a Taxi drop-off,
-    /// or collecting food in GridWorld. This must not be inferred from
-    /// `terminated`: some tasks terminate on failure (for example CartPole).
-    pub task_event: bool,
-    /// The task reached a natural terminal state (success or failure).
+pub struct Transition {
+    pub frame: RgbFrame,
+    pub reward: Reward,
+    /// Natural task terminal; value targets must not bootstrap through it.
     pub terminated: bool,
-    /// The episode ended because of a time/resource limit.
+    /// Time/resource limit; closes the replay trace but may bootstrap.
     pub truncated: bool,
 }
 
-impl StepResult {
-    pub fn done(&self) -> bool {
-        self.terminated || self.truncated
-    }
-}
-
-/// Action space kind for agent configuration.
-///
-/// - `Discrete { n }`: categorical policy, `n` mutually-exclusive actions,
-///   cross-entropy loss against one-hot target.
-/// - `Continuous { dim, scale }`: diagonal-Gaussian policy with fixed unit
-///   variance, `dim`-dimensional action vectors sampled as `μ + ε·scale`
-///   where `ε ~ N(0, 1)`. Loss is MSE between predicted μ and taken action,
-///   which is equivalent to the negative log-likelihood up to a constant.
-#[derive(Clone, Copy, Debug)]
-pub enum ActionKind {
-    Discrete { n: usize },
-    Continuous { dim: usize, scale: f32 },
-}
-
-impl ActionKind {
-    /// Dimensionality of the action vector fed to the world model and policy.
-    pub fn dim(&self) -> usize {
-        match *self {
-            ActionKind::Discrete { n } => n,
-            ActionKind::Continuous { dim, .. } => dim,
+impl Transition {
+    pub fn flags(&self) -> FrameFlags {
+        FrameFlags {
+            is_first: false,
+            is_last: self.terminated || self.truncated,
+            is_terminal: self.terminated,
         }
     }
 }
 
-/// The environment trait that any world must implement.
-pub trait Environment: HomeostaticProvider {
-    /// Dimensionality of the observation vector.
-    fn observation_dim(&self) -> usize;
+/// Minimal contract for a discrete-action visual environment.
+///
+/// D3's first Kindle baseline intentionally fixes the action family at
+/// construction. Environment-specific controls belong in adapters outside
+/// the model; they expose a categorical vocabulary and optional validity
+/// mask through this trait.
+pub trait Environment {
+    fn action_count(&self) -> usize;
 
-    /// Number of discrete actions (for discrete action spaces).
-    fn num_actions(&self) -> usize;
+    /// Reset the environment and return its first frame.
+    fn reset(&mut self) -> RgbFrame;
 
-    /// Current observation without advancing state.
-    fn observe(&self) -> Observation;
-
-    /// Optional validity mask for the current discrete-action state.
-    ///
-    /// When present, the vector must have `num_actions()` entries; `true`
-    /// means the action may be executed. Environments with a fixed action
-    /// set can use the default `None` (all actions available).
+    /// Optional mask over the current categorical action vocabulary.
     fn action_mask(&self) -> Option<Vec<bool>> {
         None
     }
 
-    /// Apply an action and advance one timestep.
-    fn step(&mut self, action: &Action) -> StepResult;
+    fn step(&mut self, action: usize) -> Transition;
+}
 
-    /// Reset to initial state.
-    fn reset(&mut self);
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn time_limit_is_last_but_not_terminal() {
+        let transition = Transition {
+            frame: RgbFrame::new(1, 1, vec![0, 0, 0]),
+            reward: Reward::default(),
+            terminated: false,
+            truncated: true,
+        };
+        assert_eq!(
+            transition.flags(),
+            FrameFlags {
+                is_first: false,
+                is_last: true,
+                is_terminal: false,
+            }
+        );
+    }
 }
