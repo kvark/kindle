@@ -44,6 +44,10 @@ impl GridWorld {
         self.energy
     }
 
+    pub fn food_index(&self) -> usize {
+        self.food_index
+    }
+
     pub fn render(&self) -> RgbFrame {
         let mut pixels = vec![18_u8; FRAME_WIDTH * FRAME_HEIGHT * 3];
         let energy_width = (self.energy * (FRAME_WIDTH - 8) as f32).round() as usize;

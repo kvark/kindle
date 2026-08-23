@@ -47,10 +47,10 @@ jobs:
       # DINO weights are separately licensed and unavailable in CI. This
       # synthetic observation canary still executes the complete Dreamer
       # acting, learning, optimizer, checkpoint, and restore path.
-      - name: Dreamer GPU canary
+      - name: Dreamer GPU canaries
         if: runner.os == 'Linux'
         run: >-
-          cargo test -p kindle tiny_agent_completes_an_act_and_learn_cycle
+          cargo test -p kindle tiny_
           --lib -- --ignored
 
   python:

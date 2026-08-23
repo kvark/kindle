@@ -10,6 +10,7 @@ pub const LOSS_POLICY: usize = 1;
 pub const LOSS_VALUE: usize = 2;
 pub const LOSS_REPLAY_VALUE: usize = 3;
 pub const POLICY_ENTROPY: usize = 4;
+pub const WEIGHTED_POLICY_ENTROPY: usize = 5;
 
 struct BehaviorModel {
     actor: MlpHead,
@@ -103,11 +104,18 @@ pub fn build_training_graph(
     );
     let probabilities = graph.add(probabilities, uniform);
     let mixed_logits = graph.log(probabilities);
-    let score_loss = graph.cross_entropy_loss(mixed_logits, action_target);
+    // Keep this reduction explicit. Meganeura's fused cross-entropy stores
+    // per-row partials for terminal losses, whereas this loss is composed with
+    // entropy and value terms and must remain a true scalar metric.
+    let score_terms = graph.mul(action_target, mixed_logits);
+    let score_loss = graph.sum_inner(score_terms);
+    let score_loss = graph.mean_all(score_loss);
+    let score_loss = graph.neg(score_loss);
     let log_probabilities = graph.log(probabilities);
     let p_log_p = graph.mul(probabilities, log_probabilities);
     let entropy = graph.sum_inner(p_log_p);
     let entropy = graph.neg(entropy);
+    let mean_entropy = graph.mean_all(entropy);
     let weighted_entropy = graph.mul(entropy, imagined_weight);
     let weighted_entropy = graph.mean_all(weighted_entropy);
     let entropy_bonus = scale(&mut graph, weighted_entropy, -config.actor_entropy);
@@ -141,7 +149,14 @@ pub fn build_training_graph(
         &mut graph,
         &[weighted_policy, weighted_value, weighted_replay],
     );
-    graph.set_outputs(vec![total, policy, value, replay_value, weighted_entropy]);
+    graph.set_outputs(vec![
+        total,
+        policy,
+        value,
+        replay_value,
+        mean_entropy,
+        weighted_entropy,
+    ]);
     graph
 }
 
@@ -203,7 +218,7 @@ mod tests {
     fn behavior_graphs_have_d3_heads() {
         let config = DreamerConfig::tiny(5);
         let training = build_training_graph(&config, 12, 6);
-        assert_eq!(training.outputs().len(), 5);
+        assert_eq!(training.outputs().len(), 6);
         let inference = build_inference_graph(&config, 7);
         assert_eq!(inference.node(inference.outputs()[0]).ty.shape, vec![7, 5]);
         assert_eq!(

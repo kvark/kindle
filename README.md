@@ -106,11 +106,38 @@ let reports = agent.learn_scheduled(1);
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
-`kindle-gym` contains one rendered GridWorld for native integration:
+`kindle-gym` contains one rendered GridWorld for native integration and the
+first measured baseline. It writes JSONL learner, episode, interval, and final
+summary events to stdout:
 
 ```bash
 cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors 2000
+  /models/dinov3/model.safetensors --steps 100000 --seed 0 \
+  --checkpoint checkpoints/gridworld-seed-0
+
+# Matched random valid-action control (does not need DINO weights):
+cargo run -p kindle-gym --example grid_world --release -- \
+  --random --steps 100000 --seed 0
+
+# Resume model/optimizer state; replay is deliberately refilled from scratch:
+cargo run -p kindle-gym --example grid_world --release -- \
+  /models/dinov3/model.safetensors --steps 100000 \
+  --restore checkpoints/gridworld-seed-0 \
+  --checkpoint checkpoints/gridworld-seed-0-resumed
+
+# Frozen greedy evaluation (updates recurrent state, but not parameters):
+cargo run -p kindle-gym --example grid_world --release -- \
+  /models/dinov3/model.safetensors --steps 10000 \
+  --restore checkpoints/gridworld-seed-0 --evaluate
+
+# Short compute-heavy diagnostic, explicitly not the default baseline:
+cargo run -p kindle-gym --example grid_world --release -- \
+  /models/dinov3/model.safetensors --steps 2000 --model-size tiny \
+  --learning-rate-warmup 0 --train-ratio 256
+
+# Frozen-perception probe for GridWorld position and food-state separability:
+cargo run -p kindle-gym --example probe_grid_world --release -- \
+  /models/dinov3/model.safetensors --samples 500 --seed 0
 ```
 
 ## Python use
@@ -173,6 +200,10 @@ cargo test --workspace --lib
 
 # Synthetic full acting/learning/checkpoint cycle on a GPU:
 cargo test -p kindle tiny_agent_completes_an_act_and_learn_cycle \
+  --lib -- --ignored
+
+# Sustained behavior-learning isolation test (no DINO inference):
+cargo test -p kindle tiny_core_learns_action_conditioned_reward \
   --lib -- --ignored
 
 # Full DINO checkpoint parity:
