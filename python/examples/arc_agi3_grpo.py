@@ -1269,7 +1269,7 @@ def main() -> int:
             # (the non-PPO branch below) corrupts PPO's importance
             # ratio: act() caches last_prob_taken / last_logits (π_old)
             # for the action IT sampled, while training sees the
-            # override (audit M-18). queue_actions() makes act() play
+            # override. queue_actions() makes act() play
             # the override itself, so π_old is recorded for the action
             # actually executed. Queued here — before plan_and_queue —
             # so the planner skips lanes with a pending override; if an
@@ -1349,7 +1349,7 @@ def main() -> int:
             #
             # Non-PPO path only: replacing the action after act() leaves
             # the cached π_old pointing at the un-executed sample, which
-            # would corrupt PPO importance ratios (audit M-18). Under
+            # would corrupt PPO importance ratios. Under
             # --use-ppo the override is routed through queue_actions
             # before act() (see above); plain-PG training is fed the
             # executed action via observe(), so this path stays correct.

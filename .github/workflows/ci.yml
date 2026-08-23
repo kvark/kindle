@@ -90,12 +90,13 @@ jobs:
             --all-targets -- -D warnings
 
       - name: Build and install extension
+        working-directory: python
         run: |
-          python -m venv .venv
-          . .venv/bin/activate
+          python -m venv ../.venv
+          . ../.venv/bin/activate
           pip install --upgrade pip
-          pip install maturin pytest gymnasium
-          maturin develop --release -m python/Cargo.toml
+          pip install maturin
+          maturin develop --release --extras test,atari
 
       - name: Pytest
         run: |

@@ -1,12 +1,12 @@
 # ARC-AGI-3 generalization plan (2026-05-06)
 
-> **Superseded by the 2026-08-23 audit.** The result below was never compared
+> **Historical, not a validated baseline.** The result below was never compared
 > against a matched current-package random baseline, and cumulative
 > `levels_completed` persists across resets. Current seed-42 random reaches
 > 8/25 games, 9 events, and max level 2 by 10k steps. At 2k steps it reaches
 > 5 games/6 events/max L2, while a rerun of the documented learner reaches
 > 4/4/max L1. The old recipe is therefore a hypothesis, not a best validated
-> learner. See `docs/audit-2026-08-23.md` and the prospective gate in README.
+> learner.
 
 ## Where we are
 

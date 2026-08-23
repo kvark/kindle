@@ -2,8 +2,8 @@
 
 Every case here used to cross the FFI boundary as a Rust panic
 (pyo3 PanicException, a BaseException) or silently mis-train; the
-bindings now validate up front and raise ValueError (audit M-14,
-M-15, M-19). Kept GPU-light: constructors plus a step or two.
+bindings now validate up front and raise ValueError. Kept GPU-light:
+constructors plus a step or two.
 """
 
 import pytest
