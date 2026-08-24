@@ -345,11 +345,14 @@ fn reward_prediction_metrics(
     let mut counts = [0_usize; 2];
     let mut correct = [0_usize; 2];
     let mut absolute_error = 0.0_f32;
+    let mut scored = Vec::with_capacity(samples.len());
     for sample in samples {
         let actual = label(sample);
         let prediction = sample
             .reward_prediction
             .expect("checkpoint samples have reward predictions");
+        assert!(prediction.is_finite());
+        scored.push((prediction, actual));
         prediction_sums[actual] += prediction;
         counts[actual] += 1;
         correct[actual] += usize::from(usize::from(prediction >= 0.5) == actual);
@@ -368,9 +371,15 @@ fn reward_prediction_metrics(
     let prediction_gap = prediction_means[1]
         .zip(prediction_means[0])
         .map(|(positive, negative)| positive - negative);
+    let (roc_auc, average_precision, best_balanced_accuracy, best_threshold) =
+        ranking_metrics(&mut scored, counts);
     json!({
         "accuracy": (correct[0] + correct[1]) as f32 / samples.len() as f32,
         "balanced_accuracy": balanced_accuracy,
+        "best_balanced_accuracy": best_balanced_accuracy,
+        "best_threshold": best_threshold,
+        "roc_auc": roc_auc,
+        "average_precision": average_precision,
         "mean_absolute_error": absolute_error / samples.len() as f32,
         "negative_prediction_mean": prediction_means[0],
         "positive_prediction_mean": prediction_means[1],
@@ -378,4 +387,109 @@ fn reward_prediction_metrics(
         "class_counts": counts,
         "recall_by_class": recalls,
     })
+}
+
+fn ranking_metrics(
+    scored: &mut [(f32, usize)],
+    counts: [usize; 2],
+) -> (Option<f32>, Option<f32>, Option<f32>, Option<f32>) {
+    if counts.contains(&0) {
+        return (None, None, None, None);
+    }
+
+    let mut concordance = 0.0_f32;
+    for &(positive, label) in scored.iter() {
+        if label != 1 {
+            continue;
+        }
+        for &(negative, other_label) in scored.iter() {
+            if other_label != 0 {
+                continue;
+            }
+            concordance += match positive.total_cmp(&negative) {
+                std::cmp::Ordering::Greater => 1.0,
+                std::cmp::Ordering::Equal => 0.5,
+                std::cmp::Ordering::Less => 0.0,
+            };
+        }
+    }
+    let roc_auc = concordance / (counts[0] * counts[1]) as f32;
+
+    scored.sort_by(|left, right| right.0.total_cmp(&left.0));
+    let mut seen = 0_usize;
+    let mut positive_seen = 0_usize;
+    let mut average_precision_sum = 0.0_f32;
+    let mut best_balanced_accuracy = 0.0_f32;
+    let mut best_threshold = scored[0].0;
+    let mut start = 0;
+    while start < scored.len() {
+        let threshold = scored[start].0;
+        let mut end = start + 1;
+        while end < scored.len() && scored[end].0.total_cmp(&threshold) == std::cmp::Ordering::Equal
+        {
+            end += 1;
+        }
+        let group_positives = scored[start..end]
+            .iter()
+            .filter(|(_, label)| *label == 1)
+            .count();
+        seen += end - start;
+        positive_seen += group_positives;
+        let precision = positive_seen as f32 / seen as f32;
+        average_precision_sum += group_positives as f32 * precision;
+
+        let true_positive_rate = positive_seen as f32 / counts[1] as f32;
+        let false_positives = seen - positive_seen;
+        let true_negative_rate = (counts[0] - false_positives) as f32 / counts[0] as f32;
+        let balanced = 0.5 * (true_positive_rate + true_negative_rate);
+        if balanced > best_balanced_accuracy {
+            best_balanced_accuracy = balanced;
+            best_threshold = threshold;
+        }
+        start = end;
+    }
+    (
+        Some(roc_auc),
+        Some(average_precision_sum / counts[1] as f32),
+        Some(best_balanced_accuracy),
+        Some(best_threshold),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sample(label: usize, prediction: f32) -> Sample {
+        Sample {
+            representations: vec![vec![0.0]],
+            position: 0,
+            dense_right: label,
+            food: 0,
+            rewarded: label,
+            reward_prediction: Some(prediction),
+        }
+    }
+
+    #[test]
+    fn reward_ranking_metrics_recognize_perfect_separation() {
+        let samples = [
+            sample(0, 0.01),
+            sample(1, 0.20),
+            sample(0, 0.02),
+            sample(1, 0.10),
+        ];
+        let metrics = reward_prediction_metrics(&samples, |sample| sample.rewarded);
+        assert_eq!(metrics["roc_auc"], 1.0);
+        assert_eq!(metrics["average_precision"], 1.0);
+        assert_eq!(metrics["best_balanced_accuracy"], 1.0);
+    }
+
+    #[test]
+    fn tied_reward_predictions_have_chance_auc() {
+        let samples = [sample(0, 0.02), sample(1, 0.02)];
+        let metrics = reward_prediction_metrics(&samples, |sample| sample.rewarded);
+        assert_eq!(metrics["roc_auc"], 0.5);
+        assert_eq!(metrics["average_precision"], 0.5);
+    }
 }
