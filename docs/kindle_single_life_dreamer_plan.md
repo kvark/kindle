@@ -482,6 +482,26 @@ therefore measurable bottlenecks. The next one-variable ablation shortens
 imagination from 15 transitions to the two-transition horizon that the held-out
 prior currently supports, retaining all other settings.
 
+The first short-horizon run exposed an experimental confound: Kindle used one
+RNG for live actions, live and replay posterior samples, replay selection, and
+imagination. Changing imagination length therefore changed every later random
+trajectory, not only behavior targets. These concerns are now independent,
+deterministically seeded streams, and read-only probes use a separate seed
+derived from learner/environment step. This also prevents learner throughput
+from silently perturbing the environment policy.
+
+The repeated two-step run with isolated streams still rejects the ablation. It
+earns 94/10,000 online and 0/10,000 frozen; the frozen policy selects `down`
+9,841 times. The final-100 posterior reward gap is 0.496 and held-out posterior
+reward reaches 0.864 ROC AUC with a 0.439 gap, but one-step prior reward is at
+chance (0.491 AUC with a negative gap). Actor/prior argmax agreement is 9.8%,
+and the actor argmax chooses an available rewarding action only 22.6% of the
+time, below the 25% uniform baseline. Short imagination weakens useful value
+context and does not solve prior calibration or behavior learning here. The
+next control returns to 15 steps and lowers behavior optimization from `1e-4`
+to D3's `4e-5`, leaving the fast world learner unchanged so sparse reward can
+ground before the actor specializes.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
