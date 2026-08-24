@@ -550,6 +550,29 @@ including defined border no-ops, against exact random controls of 188/10,000
 (seed 0) and 178/10,000 (seed 1). It retains the same free nat, learning rates,
 model, and update budget.
 
+The all-action control removes the hidden collapse but does not yet beat
+random. It earns 158/10,000 online and its frozen greedy policy earns
+176/10,000, versus matched random returns of 188 and 178. Applying the old live
+mask to that same frozen model reduces return to 99/10,000, confirming that
+masking changes the recurrent action/state distribution rather than harmlessly
+removing no-ops. Over the final 100 updates, KL is 1.109, posterior reward gap
+is 0.932, entropy is 0.398, and imagined reward is 0.046. This is substantially
+better calibrated than the masked run's 0.067 entropy and 0.307 imagined
+reward, and it preserves random-level behavior across freezing.
+
+The matched all-action probe localizes the remaining failure. Posterior reward
+recognition reaches 1.0 ROC AUC and a 0.524 gap. Prior reward stays useful at
+horizons one and two (ROC AUC 0.851/0.824 and gaps 0.117/0.107), but horizon
+three falls to 0.679 AUC and a 0.004 gap; later horizons are inconsistent. On
+31 states with an immediately rewarding action, the prior-reward argmax chooses
+one 51.6% of the time, while the actor argmax does so only 35.5% of the time
+and assigns 32.5% probability to rewarding actions versus a 25% uniform
+baseline. Actor and prior argmaxes agree on only 41.4% of all probe states.
+Both unreliable multi-step prediction and actor/value credit assignment are
+therefore measurable bottlenecks. The next one-variable ablation shortens
+imagination from 15 transitions to the two-transition horizon that the held-out
+prior currently supports, retaining all other settings.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
