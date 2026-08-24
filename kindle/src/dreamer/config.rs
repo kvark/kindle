@@ -153,12 +153,13 @@ pub struct DreamerConfig {
     pub return_norm_rate: f32,
     pub learning_rate: f32,
     pub learning_rate_warmup: u64,
-    pub adam_beta1: f32,
-    pub adam_beta2: f32,
-    pub adam_epsilon: f32,
-    /// Meganeura currently provides global clipping rather than D3's AGC.
-    /// This is the one optimizer-level stack accommodation.
-    pub gradient_clip_norm: f32,
+    pub optimizer_beta1: f32,
+    pub optimizer_beta2: f32,
+    pub optimizer_epsilon: f32,
+    /// DreamerV3's per-parameter adaptive-gradient clipping ratio.
+    pub agc: f32,
+    /// Lower bound for the parameter norm used by adaptive clipping.
+    pub agc_pmin: f32,
     pub loss_scales: LossScales,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
@@ -191,10 +192,11 @@ impl DreamerConfig {
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
             learning_rate_warmup: 1_000,
-            adam_beta1: 0.9,
-            adam_beta2: 0.999,
-            adam_epsilon: 1e-20,
-            gradient_clip_norm: 100.0,
+            optimizer_beta1: 0.9,
+            optimizer_beta2: 0.999,
+            optimizer_epsilon: 1e-20,
+            agc: 0.3,
+            agc_pmin: 1e-3,
             loss_scales: LossScales::default(),
             extrinsic_reward_scale: 1.0,
             intrinsic_reward_scale: 0.0,
@@ -304,18 +306,21 @@ impl DreamerConfig {
         if !self.learning_rate.is_finite() || self.learning_rate <= 0.0 {
             return Err("learning_rate must be finite and positive".into());
         }
-        if !self.adam_beta1.is_finite()
-            || !self.adam_beta2.is_finite()
-            || !(0.0..1.0).contains(&self.adam_beta1)
-            || !(0.0..1.0).contains(&self.adam_beta2)
+        if !self.optimizer_beta1.is_finite()
+            || !self.optimizer_beta2.is_finite()
+            || !(0.0..1.0).contains(&self.optimizer_beta1)
+            || !(0.0..1.0).contains(&self.optimizer_beta2)
         {
-            return Err("Adam beta values must be finite and in [0, 1)".into());
+            return Err("optimizer beta values must be finite and in [0, 1)".into());
         }
-        if !self.adam_epsilon.is_finite() || self.adam_epsilon <= 0.0 {
-            return Err("adam_epsilon must be finite and positive".into());
+        if !self.optimizer_epsilon.is_finite() || self.optimizer_epsilon <= 0.0 {
+            return Err("optimizer_epsilon must be finite and positive".into());
         }
-        if !self.gradient_clip_norm.is_finite() || self.gradient_clip_norm <= 0.0 {
-            return Err("gradient_clip_norm must be finite and positive".into());
+        if !self.agc.is_finite() || self.agc < 0.0 {
+            return Err("agc must be finite and non-negative".into());
+        }
+        if !self.agc_pmin.is_finite() || self.agc_pmin < 0.0 {
+            return Err("agc_pmin must be finite and non-negative".into());
         }
         let loss_scales = [
             self.loss_scales.reconstruction,

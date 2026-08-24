@@ -1,8 +1,7 @@
 # Kindle: 100-Hour Game Learning Plan
 
-**Decision date:** 2026-09-01  
-**Status:** revised near-term research target  
-**Recommended repository path:** `docs/kindle_single_life_dreamer_plan.md`
+**Decision date:** 2026-08-23
+**Status:** baseline implemented; environment-learning validation in progress
 
 ## Executive decision
 
@@ -129,17 +128,40 @@ imagined steps, wall-clock time, and GPU utilization are all reported.
 
 ## 2. Operational definition of “learn how to play”
 
-The phrase must be converted into a game-specific metric before training begins.
+| Area | Baseline |
+|---|---|
+| Replay | Uniform online replay, 100k-frame capacity, batch 16, length 64, one context frame |
+| World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
+| Train ratio | 32 replayed samples per real environment step |
+| State | Block-recurrent deterministic state plus 32 categorical variables |
+| Categorical support | Preset-dependent classes, 1% uniform mixture |
+| World losses | Feature reconstruction, reward, continuation, dynamics KL, representation KL |
+| KL | Dynamics scale 1.0, representation scale 0.1, 1 free nat |
+| Reward/value | 255-bin symmetric exponentially spaced two-hot distributions |
+| Imagination | 15 steps from every posterior sequence state |
+| Actor | Categorical REINFORCE, 1% uniform mixture, entropy scale 3e-4 |
+| Critic | Imagined lambda returns plus replay-value loss and slow-value regularization |
+| Discount | Learned continuation including horizon discount, horizon 333 |
+| Lambda | 0.95 |
+| Slow value | EMA rate 0.02 |
+| Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
+| Optimizer | Per-parameter AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
+| Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
 
-### 2.1 Required baselines
+Meganeura implements DreamerV3's optimizer chain directly: per-parameter
+adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
+also compiles a statically unrolled recurrent graph: unrolling all 64 steps made
+even small presets impractical to build. Kindle therefore uses 8-step truncated
+BPTT, accumulates and averages gradients across all eight chunks, and retains
+the full 64-step replay sample and all posterior imagination starts. This is an
+implementation accommodation, not a claimed D3-equivalent gradient path.
 
 For the selected game, collect:
 
-1. a random or uniformly exploratory policy baseline;
-2. the untrained Kindle policy at hour zero;
-3. a novice-human baseline under the same scoring protocol;
-4. optionally, a frozen Pixels2Play behavior-cloning policy as a practical upper
-   comparison, not as Kindle initialization.
+World and behavior parameters live in separate optimizer sessions because their
+static graphs execute in stages. Targets are formed before either update, the
+replay-value representation gradient is retained, and D3's adaptive clipping is
+applied independently to each parameter leaf.
 
 ### 2.2 Primary score
 
@@ -157,9 +179,17 @@ must remain primary.
 
 A useful normalized score is:
 
-\[
-S_{norm}=\frac{S_{agent}-S_{random}}{S_{novice}-S_{random}}.
-\]
+1. Uniform replay samples contiguous sequences with one preceding context frame.
+2. An inference pass samples hard posterior categoricals.
+3. A training pass inserts those samples with a straight-through estimator and
+   updates reconstruction, reward, continuation, and balanced KL losses.
+4. Every posterior state in the sequence starts a latent imagined trajectory.
+5. The current actor samples imagined actions; the frozen world optimizer
+   boundary prevents behavior gradients from rewriting dynamics.
+6. Reward, continuation, current value, and slow value produce lambda returns,
+   score-function policy targets, and distributional value targets.
+7. Actor/value optimizer updates run, the slow value network receives its EMA
+   update, and inference sessions receive the new parameters.
 
 The exact threshold is fixed before the first full run. A reasonable initial
 success bar is closing at least 25% of the random-to-novice gap, provided the
@@ -290,8 +320,13 @@ The video encoder produces a deterministic perceptual representation:
 u_t=E(o_{t-L:t}).
 \]
 
-The encoder should be causal in time: the representation at time \(t\) may use
-current and previous frames but never future frames.
+- world-model parameters and optimizer moments;
+- actor/value parameters and optimizer moments;
+- slow value parameters;
+- full configuration and pinned source/model revisions;
+- fixed DINO projection seed and observation shape;
+- learner/environment counters;
+- return-normalizer state.
 
 Do not rely only on a clip-level class token. Games contain small, localized,
 fast-changing cues. The first practical representation should retain:
@@ -345,7 +380,28 @@ Here:
 - the balanced KL and free-nat behavior remain DreamerV3-style;
 - reward, continuation, and replay-value losses retain their current roles.
 
-The implementation should expose two representation-prediction variants:
+Validation snapshot (2026-08-24):
+
+- formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
+  full-checkpoint DINO parity pass on the pinned stack;
+- a held-out nearest-centroid probe over 500 GridWorld frames classifies
+  position at 85/100 and food state at 95/100, observing all 25 and 3 classes;
+- the valid-action random control averages 21.073 rewards per 1,000 steps over
+  ten independent 100,000-step seeds;
+- a corrected tiny-model diagnostic at Atari-100k's train ratio ran for 2,000
+  environment steps and 500 learner updates without non-finite values, but its
+  frozen greedy policy scored 0 versus 36 for the matched random seed;
+- raising the diagnostic learning rate from 4e-5 to 1e-3 reduced feature
+  reconstruction loss from roughly 3,900 to 462, but frozen return was still
+  only 13/2,000 and rewarded versus unrewarded predictions did not separate.
+
+These are implementation and failure-localization results, not evidence that
+the baseline learns the environment. Five hundred updates are only about 2% of
+the 25,000 updates in an Atari-100k-ratio run. The next exit gate is a longer
+fresh run using checkpoint format 2, followed by frozen evaluation; online
+training return and falling reconstruction loss are not sufficient.
+
+### Phase 1 — Externally rewarded baseline
 
 1. **posterior representation prediction**, which ensures the belief state
    retains the perceptual information needed for behavior;
@@ -475,408 +531,26 @@ For every policy decision:
 
 ### 6.2 Learner update
 
-For each update:
-
-1. sample contiguous replay sequences with burn-in/context;
-2. reconstruct posterior states across the sequence;
-3. update representation prediction, KL, reward, continuation, and replay-value
-   losses;
-4. start imagined trajectories from posterior states;
-5. train actor and critic from imagined rewards and lambda returns;
-6. update the slow critic;
-7. synchronize inference parameters.
-
-### 6.3 Evaluation windows
-
-Every five hours, run a fixed evaluation window with:
-
-- learning disabled;
-- policy sampling mode fixed in advance;
-- fresh natural episodes, never restored game states;
-- the same observation and action path as training.
-
-Evaluation time counts toward the 100-hour budget. Record score distributions and
-video at hours 0, 5, 10, 25, 50, 75, and 100.
-
-### 6.4 No mid-run search
-
-A full 100-hour run uses a frozen configuration. Fatal implementation bugs may
-terminate the run, but changing reward scales, learning rates, action mappings,
-or model sizes produces a new experiment rather than silently continuing the
-same one.
-
----
-
-## 7. Reward contract
-
-The first experiment uses game-native extrinsic feedback only.
-
-Acceptable reward sources include:
-
-- score deltas;
-- win/loss events;
-- level or checkpoint completion;
-- lives lost;
-- other outcomes already defined by the game.
-
-The adapter may combine these into a documented scalar, but it should avoid
-continuous hand-shaped hints such as distance to a hidden objective or privileged
-enemy coordinates.
-
-Intrinsic reward remains at zero in the primary run. If the selected game is so
-sparse that no positive event is observed in the first 25 hours, that is a valid
-failure of the chosen setup. A separate follow-up may add one predeclared
-intrinsic signal, preferably epistemic disagreement or learning progress, but it
-must not be introduced halfway through the primary run.
-
-No target image or latent goal distance is used.
-
----
-
-## 8. Replay and 100-hour storage
-
-The current 100,000-transition replay is too short to represent a 100-hour run.
-The revised experiment needs explicit lifetime storage.
-
-### 8.1 Append-only audit archive
-
-Store the complete interaction stream on disk:
-
-- compressed RGB video or frame chunks;
-- actions;
-- rewards and boundary flags;
-- episode and lifetime timestamps;
-- model and policy versions;
-- periodic diagnostics.
-
-This archive is primarily for postmortem analysis and future re-encoding. It is
-not necessarily sampled directly on every learner update.
-
-### 8.2 Training replay
-
-Use two sequence-preserving stores:
-
-1. **Recent FIFO:** approximately 500,000 transitions, retaining the latest hours
-   at full density.
-2. **Lifetime reservoir:** fixed-size reservoir sampling over contiguous chunks,
-   targeting another 500,000–1,000,000 transitions spread across the entire run.
-
-A simple initial sampling mixture is 75% recent and 25% lifetime. This keeps the
-agent responsive to its current state distribution while preventing early-game
-situations from disappearing completely.
-
-### 8.3 Representation storage
-
-With a frozen encoder, replay can store perceptual latents rather than rerun the
-video transformer for every learner sample.
-
-Use packed `f16` or another measured compact format for:
-
-- perceptual tokens;
-- recurrent context when needed;
-- action and boundary metadata.
-
-Keep the raw compressed video archive because later encoder fine-tuning would
-otherwise make old latent targets impossible to regenerate.
-
-### 8.4 Checkpoint policy
-
-Write periodic model, optimizer, normalizer, replay-index, and experiment-state
-checkpoints for fault recovery and postmortem analysis.
-
-Checkpoints must not be used to branch the environment, choose the best historical
-policy, or retry a bad decision. A resumed run continues from the game's current
-or next natural episode and is marked as resumed.
-
----
-
-## 9. Experiment sequence
-
-Running every variant for 100 hours immediately would waste compute. Use staged
-elimination.
-
-### Stage A — Two-hour systems smoke tests
-
-Run every candidate configuration long enough to verify:
-
-- finite world and behavior losses;
-- stable recurrent state;
-- encoder and actor meeting the control deadline;
-- replay sampling correctness;
-- checkpoint and log integrity;
-- non-degenerate actions and posterior states.
-
-No learning claim is made.
-
-### Stage B — Ten-hour kill tests
-
-Compare:
-
-1. current DINO Dreamer control;
-2. DINO plus reconstruction-free representation prediction;
-3. generic LeVJEPA plus representation prediction;
-4. Pixels2Play-adapted LeVJEPA plus representation prediction.
-
-Terminate variants with clear numerical instability, frozen policies, invalid
-reward plumbing, or severe throughput debt.
-
-### Stage C — Twenty-five-hour pilots
-
-Run the strongest two variants with fixed settings. Add action-conditioned P2P
-world-model pretraining if its pipeline is ready.
-
-The gate is not final competence. It is evidence of a directional learning curve
-and a diagnosis of where remaining failure lies.
-
-### Stage D — One 100-hour engineering run
-
-Select the mainline architecture before starting. Complete the full run without
-hyperparameter intervention and publish the entire curve, including regressions.
-
-### Stage E — Scientific confirmation
-
-Repeat the final configuration over at least three independent lifetimes with
-identical hyperparameters and target-game initialization. Repeat the strongest
-control when resources permit.
-
-Do not report only the best seed.
-
----
-
-## 10. Development milestones
-
-### M0 — Freeze the benchmark contract
-
-Deliver:
-
-- selected game and immutable version;
-- observation and action rates;
-- action vocabulary;
-- reward definition;
-- random and novice-human baselines;
-- success threshold;
-- target-game exclusion record for pretraining;
-- 100-hour run manifest format.
-
-**Exit gate:** another person can reproduce the environment boundary and scoring
-without reading Kindle internals.
-
-### M1 — Validate the current DINO Dreamer control
-
-Use the existing implementation unchanged except for the target-game adapter and
-long-run logging.
-
-**Exit gate:** a two-hour smoke test and ten-hour run complete with finite losses,
-correct reward alignment, and bounded training debt.
-
-### M2 — Replace feature reconstruction with latent prediction
-
-Refactor `ObservationDecoder` into a perceptual-representation predictor while
-keeping DINO and all behavior-learning code fixed.
-
-Add diagnostics for:
-
-- posterior representation error;
-- prior one-step representation error;
-- multi-step open-loop representation error;
-- latent variance and collapse.
-
-**Exit gate:** the DINO-CDP variant trains stably and is not materially worse than
-the current DINO decoder on the native smoke environment.
-
-### M3 — Introduce the LeVJEPA frontend
-
-Add a `VisionEncoder` boundary supporting:
-
-- the current DINO path;
-- a LeVJEPA-style block-causal encoder;
-- identical compact output shapes at the RSSM boundary;
-- incremental temporal state or KV-cache handling;
-- checkpoint provenance.
-
-**Exit gate:** numerical inference tests pass, real-time latency is acceptable,
-and the 10-hour target-game run does not exhibit perceptual or latent collapse.
-
-### M4 — Gameplay-domain visual adaptation
-
-Build a reproducible Pixels2Play clip pipeline for LeVJEPA continuation training,
-with the target game excluded.
-
-**Exit gate:** the adapted encoder improves held-out gameplay representation
-probes or downstream 10-hour learning relative to generic-video LeVJEPA.
-
-### M5 — Optional action-conditioned world pretraining
-
-Pretrain compatible RSSM dynamics and representation prediction from
-Pixels2Play image-action sequences without reward or policy training.
-
-**Exit gate:** on the first hour of the held-out game, the pretrained model has
-lower prior prediction error or faster reward-model adaptation than a randomly
-initialized RSSM, without causing worse online control.
-
-### M6 — Lifetime replay and run reliability
-
-Implement:
-
-- recent and reservoir sequence replay;
-- packed latent storage;
-- append-only video/action audit log;
-- resumable checkpoints;
-- automated periodic evaluation and video capture;
-- a run dashboard or report generator.
-
-**Exit gate:** a synthetic or game run survives at least 25 hours without memory
-growth beyond the configured bound, missing logs, or unrecoverable learner drift.
-
-### M7 — Complete the 100-hour run
-
-**Exit gate:** the experiment reaches hour 100 and the predeclared success gate is
-reported honestly, whether it passes or fails.
-
----
-
-## 11. Diagnostics
-
-### 11.1 Gameplay
-
-- episode return and primary game metric;
-- score distribution in frozen evaluation windows;
-- survival time, progress, win/completion rate;
-- action frequencies and action-transition entropy;
-- behavior videos at fixed hours.
-
-### 11.2 Perception and world model
-
-- representation-prediction loss;
-- prior/posterior KL and categorical entropy;
-- one-, five-, and fifteen-step open-loop latent error;
-- reward prediction calibration;
-- continuation prediction calibration;
-- perceptual-token variance and effective rank;
-- zero-shot prediction error before target-game learning.
-
-### 11.3 Actor and critic
-
-- actor entropy and policy KL over time;
-- imagined return distribution;
-- critic error on realized returns;
-- current versus slow-critic disagreement;
-- replay-value loss;
-- imagined-versus-real reward discrepancy.
-
-### 11.4 Systems
-
-- frame capture, encoder, actor, learner, and synchronization latency;
-- 50th, 95th, and 99th percentile action latency;
-- environment steps, replay steps, and imagination steps per second;
-- learner debt;
-- GPU memory and utilization;
-- replay occupancy and sample-age distribution;
-- checkpoint and archive sizes.
-
----
-
-## 12. Failure interpretation
-
-A failed 100-hour run is useful only if the failure can be localized.
-
-| Observation | Likely problem | Next experiment |
-|---|---|---|
-| Perceptual targets omit visible score or critical objects | Encoder or token compression | Higher spatial resolution, intermediate tokens, or slow upper-layer adaptation |
-| One-step prior error remains high | Action-conditioned dynamics | Action representation, RSSM capacity, or P2P dynamics pretraining |
-| Latent prediction is good but reward prediction is poor | Reward cue absent or too sparse | Better game-native reward extraction; inspect encoder sensitivity to reward cues |
-| Reward and value learn but policy stays near random | Actor optimization or action vocabulary | Verify imagined advantages, entropy, masks, and controllability |
-| Imagined return rises while real play worsens | Model exploitation | Shorter imagination, stronger world training, uncertainty diagnostics |
-| Early skill appears and later disappears | Replay or critic drift | Increase reservoir share; separate world-model and actor retention tests |
-| P2P pretraining hurts | Domain mismatch or inherited action bias | Fall back to generic LeVJEPA or transfer only lower visual layers |
-| Learner falls increasingly behind | Systems budget is invalid | Lower train ratio, compact tokens, smaller preset, or slower control rate |
-| No positive reward occurs | Benchmark/reward mismatch | Report failure; run a separate intrinsic-exploration experiment |
-
-The full 100-hour run is not the place for exploratory debugging. These failure
-modes should first be exercised in the two-, ten-, and twenty-five-hour stages.
-
----
-
-## 13. Explicit non-goals
-
-The following are valuable but deferred until one game can be learned reliably:
-
-- self-generated or fully intrinsic objectives;
-- multi-game continual learning;
-- indefinite lifetime memory;
-- online visual-encoder plasticity;
-- critic-free group-relative imagination;
-- runtime planning, CEM, or MCTS;
-- hierarchical options and semantic reflection;
-- language-conditioned goals;
-- public online multiplayer operation;
-- physical robot control;
-- irreversible-world safety guarantees.
-
-The larger Kindle vision is not abandoned. It is gated on proving the smallest
-complete learning loop first.
-
----
-
-## 14. Required artifacts from the 100-hour experiment
-
-A completed run must publish or retain:
-
-- exact source revisions;
-- complete model and environment configuration;
-- pretraining checkpoint provenance and target-game exclusion record;
-- action and reward adapter definitions;
-- random and novice baselines;
-- full time-series logs, not only summary metrics;
-- frozen-evaluation results at fixed hours;
-- behavior videos at hours 0, 5, 10, 25, 50, 75, and 100;
-- final and periodic model checkpoints;
-- replay/archive statistics;
-- a short postmortem explaining what the agent learned and what it did not.
-
-No best-checkpoint result should replace the hour-100 result.
-
----
-
-## 15. Immediate implementation order
-
-1. **Select and freeze the target game contract.** Architecture work without a
-   fixed metric will drift.
-2. **Run the current DINO Dreamer baseline for 2 and 10 hours.** Establish that
-   game capture, reward alignment, replay, and actor learning are real.
-3. **Refactor the world loss from `ObservationDecoder` to a latent
-   representation-prediction head while keeping DINO fixed.** This isolates the
-   reconstruction-free change.
-4. **Add a `VisionEncoder` interface and LeVJEPA inference path with the same
-   compact token shape.** Do not change RSSM and action modeling at the same
-   time.
-5. **Add packed long-run replay, audit video, and automated frozen evaluation.**
-6. **Compare generic and Pixels2Play-adapted LeVJEPA in 10-hour kill tests.**
-7. **Only then build action-conditioned P2P world-model pretraining.**
-8. **Choose the final configuration before starting the 100-hour run.**
-
-The first coding milestone is therefore not a controller, critic replacement, or
-new intrinsic reward. It is a clean reconstruction-free representation target
-inside the already implemented Dreamer loop, followed by a causal video frontend
-that can carry useful priors into a held-out game.
-
----
-
-## References
-
-- Hafner et al., *Mastering Diverse Control Tasks through World Models*
-  (DreamerV3), arXiv:2301.04104; Nature, 2025.
-- Hauri and Zenke, *Dreamer-CDP: Improving Reconstruction-free World Models Via
-  Continuous Deterministic Representation Prediction*, arXiv:2603.07083.
-- Kuhn et al., *LeVJEPA: Efficient & Scalable Video Pretraining without the
-  Heuristics*, arXiv:2608.27395.
-- Maes et al., *LeWorldModel: Stable End-to-End Joint-Embedding Predictive
-  Architecture from Pixels*, arXiv:2603.19312.
-- Yue et al., *Pixels to Play: A Foundation Model for 3D Gameplay*,
-  arXiv:2508.14295.
-
-## Repository notes
-
-- Current architecture: `README.md`
-- Current Dreamer world loss: `kindle/src/dreamer/world.rs`
-- Current broader plan path: `docs/kindle_single_life_dreamer_plan.md`
+- DreamerV3 behavioral reference:
+  [danijar/dreamerv3](https://github.com/danijar/dreamerv3), revision
+  `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
+- DINOv3 source reference:
+  [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3),
+  revision `6876159a11b4df116f30f667f8c9888617df0751`.
+- Native Meganeura transcription source:
+  [kvark/dinovision](https://github.com/kvark/dinovision), revision
+  `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
+- Meganeura graph/runtime dependency:
+  [kvark/meganeura](https://github.com/kvark/meganeura), revision
+  `3f2b91d95288d625a7616179604c33bba6472aaf`.
+- Blade graphics dependency:
+  [kvark/blade](https://github.com/kvark/blade), revision
+  `95f5004fb02785a792c883a5312ca5ac37872a75` (the revision selected by
+  Meganeura so the shared context types remain unified).
+- DINO model:
+  [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
+  snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
+
+The intended trajectory is still “Dreamer inside, Kindle outside.” The inside
+is now an implemented and testable baseline rather than a placeholder, while
+its task-learning gate remains deliberately open.

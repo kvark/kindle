@@ -45,14 +45,13 @@ The learning algorithm follows DreamerV3 at pinned upstream revision
 - 15-step imagination from every posterior sequence state;
 - REINFORCE actor loss, entropy regularization, lambda returns, replay-value
   learning, and a 2% EMA value model;
-- Adam at `4e-5` with 1,000-step warmup.
+- per-parameter adaptive gradient clipping followed by RMS normalization and
+  momentum (LaProp-style ordering), at `4e-5` with 1,000-step warmup.
 
 Intentional differences are explicit:
 
 - Perception is frozen DINOv3 rather than DreamerV3's learned pixel encoder.
 - Replay reconstructs a fixed compressed DINO feature map rather than pixels.
-- Meganeura currently supplies global gradient-norm clipping instead of D3's
-  adaptive gradient clipping.
 - World-model gradients are truncated every 8 recurrent steps to keep
   Meganeura's static training graph practical. Each update still samples the
   full 16×64 replay batch, averages gradients across all eight chunks, and
@@ -61,9 +60,9 @@ Intentional differences are explicit:
   the current f32 observation and recurrent context consume roughly 2.3 GB at
   that capacity. Larger/f16 lifetime storage is a measured follow-up.
 - Dreamer computation is f32 on the current backend rather than D3's bfloat16.
-- World and behavior parameter groups use separate Adam sessions; objectives
-  and representation-gradient paths are preserved, while global clipping is
-  consequently applied per group rather than across one joint gradient.
+- World and behavior parameter groups use separate optimizer sessions;
+  objectives, per-parameter clipping, and representation-gradient paths are
+  preserved.
 - The first baseline supports categorical actions only.
 
 Extrinsic and intrinsic reward channels are separate in replay and independently
@@ -113,7 +112,8 @@ summary events to stdout:
 ```bash
 cargo run -p kindle-gym --example grid_world --release -- \
   /models/dinov3/model.safetensors --steps 100000 --seed 0 \
-  --checkpoint checkpoints/gridworld-seed-0
+  --checkpoint checkpoints/gridworld-seed-0 \
+  --output runs/gridworld-seed-0.jsonl
 
 # Matched random valid-action control (does not need DINO weights):
 cargo run -p kindle-gym --example grid_world --release -- \
@@ -178,8 +178,8 @@ defined benign/no-op meaning until mask prediction is added to the world model.
 
 `DreamerAgent::save_checkpoint()` writes:
 
-- world-model parameters and Adam state;
-- actor/value parameters and Adam state;
+- world-model parameters and optimizer moments;
+- actor/value parameters and optimizer moments;
 - the slow value model;
 - configuration, source revisions, learner counters, and return normalization.
 
@@ -198,13 +198,8 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace --lib
 
-# Synthetic full acting/learning/checkpoint cycle on a GPU:
-cargo test -p kindle tiny_agent_completes_an_act_and_learn_cycle \
-  --lib -- --ignored
-
-# Sustained behavior-learning isolation test (no DINO inference):
-cargo test -p kindle tiny_core_learns_action_conditioned_reward \
-  --lib -- --ignored
+# Serialized GPU act/learn/checkpoint and learning-wiring canaries:
+cargo test -p kindle tiny_ --lib -- --ignored --test-threads=1
 
 # Full DINO checkpoint parity:
 KINDLE_DINOV3_WEIGHTS=/models/dinov3/model.safetensors \

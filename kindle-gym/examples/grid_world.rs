@@ -1,4 +1,5 @@
-use std::io::{self, Write};
+use std::fs::File;
+use std::io::{self, BufWriter, Write};
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -68,6 +69,10 @@ struct Arguments {
     #[arg(long)]
     learning_rate_warmup: Option<u64>,
 
+    /// Override D3's 4e-5 learning rate for short wiring diagnostics.
+    #[arg(long)]
+    learning_rate: Option<f32>,
+
     /// Override replayed samples per environment step (Atari-100k uses 256).
     #[arg(long)]
     train_ratio: Option<f32>,
@@ -75,6 +80,10 @@ struct Arguments {
     /// Emit an aggregate interval event every N environment steps.
     #[arg(long, default_value_t = 1_000)]
     report_every: usize,
+
+    /// Write JSONL directly to this file instead of stdout.
+    #[arg(long, value_name = "FILE")]
+    output: Option<PathBuf>,
 
     /// Restore model/optimizer state from this checkpoint. Replay refills fresh.
     #[arg(long, value_name = "DIRECTORY")]
@@ -116,6 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if arguments.dino_checkpoint.is_some()
             || arguments.restore.is_some()
             || arguments.checkpoint.is_some()
+            || arguments.learning_rate.is_some()
             || arguments.learning_rate_warmup.is_some()
             || arguments.train_ratio.is_some()
             || arguments.evaluate
@@ -131,7 +141,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .as_ref()
             .ok_or("DINO_CHECKPOINT is required unless --random is used")?;
         if arguments.restore.is_some()
-            && (arguments.learning_rate_warmup.is_some() || arguments.train_ratio.is_some())
+            && (arguments.learning_rate.is_some()
+                || arguments.learning_rate_warmup.is_some()
+                || arguments.train_ratio.is_some())
         {
             return Err("training overrides cannot change restored configuration".into());
         }
@@ -146,7 +158,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
-    let mut output = io::BufWriter::new(io::stdout().lock());
+    let mut output = open_output(arguments)?;
     emit(
         &mut output,
         &json!({
@@ -204,6 +216,9 @@ fn run_dreamer(
     let mut config = DreamerConfig::new(ACTION_COUNT);
     config.model_size = arguments.model_size.into();
     config.seed = arguments.seed;
+    if let Some(learning_rate) = arguments.learning_rate {
+        config.learning_rate = learning_rate;
+    }
     if let Some(warmup) = arguments.learning_rate_warmup {
         config.learning_rate_warmup = warmup;
     }
@@ -216,7 +231,7 @@ fn run_dreamer(
         DreamerAgent::new(config, dino_checkpoint, None)?
     };
 
-    let mut output = io::BufWriter::new(io::stdout().lock());
+    let mut output = open_output(arguments)?;
     let starting_environment_step = agent.core().environment_step();
     let starting_learner_step = agent.core().learner_step();
     let agent_name = if arguments.evaluate {
@@ -403,4 +418,12 @@ fn emit_summary(
 fn emit(output: &mut impl Write, value: &serde_json::Value) -> io::Result<()> {
     serde_json::to_writer(&mut *output, value)?;
     writeln!(output)
+}
+
+fn open_output(arguments: &Arguments) -> io::Result<Box<dyn Write>> {
+    if let Some(path) = &arguments.output {
+        Ok(Box::new(BufWriter::new(File::create(path)?)))
+    } else {
+        Ok(Box::new(BufWriter::new(io::stdout())))
+    }
 }

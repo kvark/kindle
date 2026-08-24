@@ -51,7 +51,7 @@ jobs:
         if: runner.os == 'Linux'
         run: >-
           cargo test -p kindle tiny_
-          --lib -- --ignored
+          --lib -- --ignored --test-threads=1
 
   python:
     name: Python bindings

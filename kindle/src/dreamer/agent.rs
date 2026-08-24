@@ -15,7 +15,9 @@ use super::distributions::{
     softmax_unimix,
 };
 use super::replay::{FrameFlags, ReplayFrame, Reward, SequenceBatch, SequenceReplay};
-use super::runtime::{build_session, configure_adam, ema_matching, initialize_d3, sync_matching};
+use super::runtime::{
+    build_session, configure_d3_optimizer, ema_matching, initialize_d3, sync_matching,
+};
 use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
@@ -25,7 +27,7 @@ use crate::vision::{
     VITS16_MODEL_ID,
 };
 
-const CHECKPOINT_FORMAT: u32 = 1;
+const CHECKPOINT_FORMAT: u32 = 2;
 const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-dinov3-vits16";
 const CHECKPOINT_METADATA: &str = "metadata.json";
 const CHECKPOINT_WORLD: &str = "world.safetensors";
@@ -181,7 +183,7 @@ impl DreamerCore {
     ///
     /// Replay and the in-flight episode are deliberately not checkpointed.
     /// A restored agent starts between episodes with empty replay, while both
-    /// Adam optimizers, the slow critic, counters, and return normalization
+    /// optimizer moments, the slow critic, counters, and return normalization
     /// continue exactly from the saved learner state.
     pub fn restore(checkpoint: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
         let gpu = Arc::new(meganeura::init_gpu_context()?);
@@ -327,7 +329,7 @@ impl DreamerCore {
         self.environment_step
     }
 
-    /// Save model parameters, Adam state, the EMA critic, and scalar learner
+    /// Save model parameters, optimizer state, the EMA critic, and scalar learner
     /// state. Replay is intentionally excluded and can be refilled online.
     pub fn save_checkpoint(&mut self, checkpoint: impl AsRef<Path>) -> io::Result<()> {
         let checkpoint = checkpoint.as_ref();
@@ -712,7 +714,7 @@ impl DreamerCore {
             }
 
             if chunk + 1 == chunk_count {
-                configure_adam(&mut self.world_train, &self.config, self.learner_step);
+                configure_d3_optimizer(&mut self.world_train, &self.config, self.learner_step);
             } else {
                 self.world_train.clear_optimizer();
             }
@@ -1070,7 +1072,7 @@ impl DreamerCore {
             .set_input("replay_value_target", &batch.replay_value_target);
         self.behavior_train
             .set_input("replay_slow_target", &batch.replay_slow_target);
-        configure_adam(&mut self.behavior_train, &self.config, self.learner_step);
+        configure_d3_optimizer(&mut self.behavior_train, &self.config, self.learner_step);
         self.behavior_train.step();
         self.behavior_train.wait();
         let metrics = BehaviorMetrics {
@@ -1491,7 +1493,7 @@ mod tests {
         assert!(report.behavior.weighted_policy_entropy <= report.behavior.policy_entropy);
 
         let mut world_parameter = vec![0.0; config_value_bins(&agent)];
-        let mut world_adam = vec![0.0; config_value_bins(&agent)];
+        let mut world_momentum = vec![0.0; config_value_bins(&agent)];
         let mut behavior_parameter = vec![0.0; 3];
         let mut slow_parameter = vec![0.0; config_value_bins(&agent)];
         agent
@@ -1499,7 +1501,7 @@ mod tests {
             .read_param("world.reward.out.bias", &mut world_parameter);
         agent
             .world_train
-            .read_adam_m("world.reward.out.bias", &mut world_adam);
+            .read_adam_m("world.reward.out.bias", &mut world_momentum);
         agent
             .behavior_train
             .read_param("behavior.actor.out.bias", &mut behavior_parameter);
@@ -1523,7 +1525,7 @@ mod tests {
         assert_eq!(restored.environment_step(), 8);
         assert_eq!(restored.replay_len(), 0);
         let mut restored_world = vec![0.0; config_value_bins(&restored)];
-        let mut restored_adam = vec![0.0; config_value_bins(&restored)];
+        let mut restored_momentum = vec![0.0; config_value_bins(&restored)];
         let mut restored_behavior = vec![0.0; 3];
         let mut restored_slow = vec![0.0; config_value_bins(&restored)];
         restored
@@ -1531,7 +1533,7 @@ mod tests {
             .read_param("world.reward.out.bias", &mut restored_world);
         restored
             .world_train
-            .read_adam_m("world.reward.out.bias", &mut restored_adam);
+            .read_adam_m("world.reward.out.bias", &mut restored_momentum);
         restored
             .behavior_train
             .read_param("behavior.actor.out.bias", &mut restored_behavior);
@@ -1539,7 +1541,7 @@ mod tests {
             .behavior_slow
             .read_param("behavior.value.out.bias", &mut restored_slow);
         assert_eq!(restored_world, world_parameter);
-        assert_eq!(restored_adam, world_adam);
+        assert_eq!(restored_momentum, world_momentum);
         assert_eq!(restored_behavior, behavior_parameter);
         assert_eq!(restored_slow, slow_parameter);
         assert_eq!(restored.return_normalizer.state(), return_state);
@@ -1572,13 +1574,14 @@ mod tests {
     #[ignore = "runs a sustained tiny-core GPU learning diagnostic"]
     fn tiny_core_learns_action_conditioned_reward() {
         let mut config = DreamerConfig::tiny(2);
+        config.learning_rate = 1e-3;
         config.learning_rate_warmup = 0;
         let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
         let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
 
-        agent.begin_episode(observation());
-        for step in 0..512 {
+        for _ in 0..512 {
+            agent.begin_episode(observation());
             let action = agent.act(ActionMode::Sample, None);
             agent.observe(
                 observation(),
@@ -1587,8 +1590,9 @@ mod tests {
                     intrinsic: 0.0,
                 },
                 FrameFlags {
-                    is_last: step == 511,
-                    ..FrameFlags::default()
+                    is_last: true,
+                    is_terminal: true,
+                    ..Default::default()
                 },
             );
             let _ = agent.learn();
@@ -1615,6 +1619,93 @@ mod tests {
         assert!(
             optimal >= 90,
             "greedy policy chose the paying action {optimal}/100 times"
+        );
+    }
+
+    #[test]
+    #[ignore = "runs a sustained tiny-core GPU learning diagnostic"]
+    fn tiny_core_learns_observation_conditioned_reward() {
+        let mut config = DreamerConfig::tiny(2);
+        // Make this a wiring canary rather than a small-scale benchmark: the
+        // only trainable objective is reward prediction and every replay row
+        // resets the RSSM, so class information can only arrive through the
+        // observation encoder and posterior straight-through gradient.
+        config.learning_rate = 1e-3;
+        config.learning_rate_warmup = 0;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.continuation = 0.0;
+        config.loss_scales.dynamics = 0.0;
+        config.loss_scales.representation = 0.0;
+        config.loss_scales.policy = 0.0;
+        config.loss_scales.value = 0.0;
+        config.loss_scales.replay_value = 0.0;
+        let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
+        let mut agent = DreamerCore::with_gpu(config, gpu);
+        let observation = |class: usize| {
+            let mut values = vec![0.0; DinoObservation::LEN];
+            for (index, value) in values.iter_mut().enumerate() {
+                if index % 2 == class {
+                    *value = 1.0;
+                }
+            }
+            DinoObservation::from_vec(values)
+        };
+
+        let size = agent.config.network();
+        for index in 0..512 {
+            let class = index % 2;
+            agent.replay.push(
+                ReplayFrame {
+                    observation: observation(class),
+                    previous_action: None,
+                    reward: Reward {
+                        extrinsic: class as f32,
+                        intrinsic: 0.0,
+                    },
+                    flags: FrameFlags {
+                        is_first: true,
+                        is_last: true,
+                        is_terminal: true,
+                    },
+                    deter: vec![0.0; size.deter].into_boxed_slice(),
+                    stoch: vec![0.0; size.stoch * size.classes].into_boxed_slice(),
+                },
+                &agent.config,
+            );
+        }
+        for update in 0..512 {
+            let report = agent.learn().expect("pre-filled replay learns");
+            if (update + 1) % 128 == 0 {
+                eprintln!(
+                    "update={} reward_loss={} rewarded={} unrewarded={}",
+                    update + 1,
+                    report.world.reward_loss,
+                    report.world.rewarded_prediction_mean,
+                    report.world.unrewarded_prediction_mean,
+                );
+            }
+        }
+
+        let predict = |agent: &mut DreamerCore, class: usize| {
+            agent.posterior_live(observation(class).as_slice(), None, true);
+            let starts = agent.config.batch_size * agent.config.batch_length;
+            agent
+                .world_heads
+                .set_input("deter", &agent.deter.repeat(starts));
+            agent
+                .world_heads
+                .set_input("stoch", &agent.stoch.repeat(starts));
+            agent.world_heads.step();
+            agent.world_heads.wait();
+            let mut logits = vec![0.0; starts * agent.config.value_bins];
+            agent.world_heads.read_output_by_index(0, &mut logits);
+            agent.bins.decode_logits(&logits[..agent.config.value_bins])
+        };
+        let negative = (0..32).map(|_| predict(&mut agent, 0)).sum::<f32>() / 32.0;
+        let positive = (0..32).map(|_| predict(&mut agent, 1)).sum::<f32>() / 32.0;
+        assert!(
+            positive > negative + 0.5,
+            "observation-conditioned reward predictions did not separate: positive={positive}, negative={negative}"
         );
     }
 
