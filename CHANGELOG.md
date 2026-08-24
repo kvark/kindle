@@ -13,7 +13,8 @@
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
   deterministic/categorical RSSM boundaries to localize representation loss.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
-  controls plus held-out reward-head metrics to reject action-history shortcuts.
+  controls plus held-out reward-head calibration, ROC-AUC, and average-precision
+  metrics to reject action-history shortcuts and score rare rewards fairly.
 - Made the replay-value auxiliary gradient into the RSSM representation
   optional without changing behavior-critic training.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit
