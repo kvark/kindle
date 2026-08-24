@@ -190,6 +190,7 @@ pub struct DreamerCore {
     world_observe_batch: Session,
     world_observe_live: Session,
     world_transition: Session,
+    world_transition_live: Session,
     world_heads: Session,
     world_heads_live: Session,
     behavior_train: Session,
@@ -270,6 +271,7 @@ impl DreamerCore {
         let world_observe_batch_graph = world::build_observe_graph(&config, config.batch_size);
         let world_observe_live_graph = world::build_observe_graph(&config, 1);
         let world_transition_graph = world::build_transition_graph(&config, starts);
+        let world_transition_live_graph = world::build_transition_graph(&config, 1);
         let world_head_graph = world::build_head_graph(&config, starts);
         let world_head_live_graph = world::build_head_graph(&config, 1);
         let behavior_train_graph =
@@ -290,6 +292,8 @@ impl DreamerCore {
             build_session(&world_observe_live_graph, &gpu, Mode::Inference, false);
         let mut world_transition =
             build_session(&world_transition_graph, &gpu, Mode::Inference, false);
+        let mut world_transition_live =
+            build_session(&world_transition_live_graph, &gpu, Mode::Inference, false);
         let mut world_heads = build_session(&world_head_graph, &gpu, Mode::Inference, false);
         let mut world_heads_live =
             build_session(&world_head_live_graph, &gpu, Mode::Inference, false);
@@ -314,6 +318,7 @@ impl DreamerCore {
             &mut world_observe_batch,
             &mut world_observe_live,
             &mut world_transition,
+            &mut world_transition_live,
             &mut world_heads,
             &mut world_heads_live,
         ] {
@@ -345,6 +350,7 @@ impl DreamerCore {
             world_observe_batch,
             world_observe_live,
             world_transition,
+            world_transition_live,
             world_heads,
             world_heads_live,
             behavior_train,
@@ -405,6 +411,63 @@ impl DreamerCore {
         self.world_heads_live
             .read_output_by_index(0, &mut reward_logits);
         decode_rows(&reward_logits, 1, &self.bins)[0]
+    }
+
+    /// Reward predicted after one prior transition from the current state.
+    ///
+    /// This read-only diagnostic clones the categorical RNG, so probing does
+    /// not perturb subsequent acting or posterior sampling.
+    pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
+        self.prior_reward_rollout(&[action])[0]
+    }
+
+    /// Open-loop prior reward predictions for a proposed action sequence.
+    /// The live posterior state and RNG are left unchanged.
+    pub fn prior_reward_rollout(&mut self, actions: &[usize]) -> Vec<f32> {
+        assert!(self.active, "call begin_episode before probing the prior");
+        assert!(!actions.is_empty());
+        assert!(
+            actions
+                .iter()
+                .all(|action| *action < self.config.action_count)
+        );
+        let size = self.config.network();
+        let mut deter = self.deter.clone();
+        let mut stoch = self.stoch.clone();
+        let mut rng = self.rng.clone();
+        let mut predictions = Vec::with_capacity(actions.len());
+        for &action in actions {
+            let mut action_one_hot = vec![0.0; self.config.action_count];
+            action_one_hot[action] = 1.0;
+            self.world_transition_live.set_input("deter", &deter);
+            self.world_transition_live.set_input("stoch", &stoch);
+            self.world_transition_live
+                .set_input("action", &action_one_hot);
+            self.world_transition_live.step();
+            self.world_transition_live.wait();
+            let mut prior_logits = vec![0.0; size.stoch * size.classes];
+            self.world_transition_live
+                .read_output_by_index(0, &mut deter);
+            self.world_transition_live
+                .read_output_by_index(1, &mut prior_logits);
+            stoch = sample_latents(
+                &prior_logits,
+                1,
+                size.stoch,
+                size.classes,
+                self.config.unimix,
+                &mut rng,
+            );
+            self.world_heads_live.set_input("deter", &deter);
+            self.world_heads_live.set_input("stoch", &stoch);
+            self.world_heads_live.step();
+            self.world_heads_live.wait();
+            let mut reward_logits = vec![0.0; self.config.value_bins];
+            self.world_heads_live
+                .read_output_by_index(0, &mut reward_logits);
+            predictions.push(decode_rows(&reward_logits, 1, &self.bins)[0]);
+        }
+        predictions
     }
 
     /// Save model parameters, optimizer state, the EMA critic, and scalar learner
@@ -860,6 +923,7 @@ impl DreamerCore {
             &mut self.world_observe_batch,
             &mut self.world_observe_live,
             &mut self.world_transition,
+            &mut self.world_transition_live,
             &mut self.world_heads,
             &mut self.world_heads_live,
         ] {
@@ -1274,6 +1338,16 @@ impl DreamerAgent {
     /// Reward predicted from the current posterior state.
     pub fn posterior_reward_prediction(&mut self) -> f32 {
         self.core.posterior_reward_prediction()
+    }
+
+    /// One-step prior reward prediction for a proposed categorical action.
+    pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
+        self.core.prior_reward_prediction(action)
+    }
+
+    /// Open-loop prior reward predictions for a proposed action sequence.
+    pub fn prior_reward_rollout(&mut self, actions: &[usize]) -> Vec<f32> {
+        self.core.prior_reward_rollout(actions)
     }
 
     pub fn begin_episode(&mut self, frame: &RgbFrame) {

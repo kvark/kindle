@@ -404,6 +404,29 @@ uses the successful `1e-3`, zero-warmup, 16-free-nat regime; it tests whether
 the remaining weak reward ordering can become grounded, sequential control
 rather than extending the low-rate run blindly.
 
+That high-rate sparse run grounds the posterior reward but still fails control.
+With the shared `1e-3` world/behavior rate, it earns only 43/10,000 before
+falling into a deterministic loop; its frozen policy scores 0/10,000. Yet the
+held-out posterior reward head is perfect (ROC AUC and average precision 1.0,
+predictions 0.0020 versus 0.9983). Slowing only actor/critic optimization to
+`1e-4` preserves substantially more exploration and improves online reward to
+126/10,000, but remains below the 217 random control and also freezes at
+0/10,000. Its final-100 entropy is 0.780, posterior reward gap is 0.998, and
+imagined reward is only 0.00066. Premature actor collapse is therefore harmful
+but not the remaining root cause.
+
+An open-loop prior probe locates the next failure. From held-out posterior
+states, the split-rate model's action-conditioned reward prediction has ROC AUC
+0.883 and a 0.136 gap after one transition. After two transitions, ROC AUC is
+0.580 and predictions collapse to 0.00020 on positives versus 0.00044 on
+negatives; horizon three is at chance. The diagnostic's 16-free-nat setting
+explains this: dynamics and representation KL average 16.00013 across the run
+and 16.000004 over the final 100 updates. The clamped KL objective therefore
+supplies essentially no prior/posterior alignment gradient. The earlier
+16-free-nat runs remain valid posterior/reward wiring probes, but cannot
+validate Dreamer imagination. The next matched sparse run restores D3's one
+free nat while retaining the repaired representation and split optimizer rates.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,

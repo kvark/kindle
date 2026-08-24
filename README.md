@@ -154,7 +154,8 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position
 
-# The same held-out centroid, calibration, and ranking probes after the RSSM:
+# The same held-out centroid and reward probes after the RSSM, including the
+# action-conditioned one-step prior prediction for each executed transition:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \

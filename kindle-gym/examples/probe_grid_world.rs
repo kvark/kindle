@@ -24,6 +24,10 @@ struct Arguments {
     #[arg(long, default_value_t = 500)]
     samples: usize,
 
+    /// Maximum open-loop prior horizon scored from each posterior state.
+    #[arg(long, default_value_t = 15)]
+    rollout_horizon: usize,
+
     #[arg(long, default_value_t = 0)]
     seed: u64,
 
@@ -40,12 +44,18 @@ struct Sample {
     food: usize,
     rewarded: usize,
     reward_prediction: Option<f32>,
+    next_rewarded: Option<usize>,
+    prior_reward_prediction: Option<f32>,
+    prior_reward_rollout: Vec<(f32, usize)>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments = Arguments::parse();
     if arguments.samples < 100 {
         return Err("--samples must be at least 100".into());
+    }
+    if arguments.rollout_horizon == 0 || arguments.rollout_horizon > 64 {
+        return Err("--rollout-horizon must be in 1..=64".into());
     }
 
     let (source, samples, representation_names) = if let Some(checkpoint) = &arguments.checkpoint {
@@ -80,6 +90,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ),
         })
     });
+    let one_step_prior_reward = samples
+        .iter()
+        .any(|sample| sample.prior_reward_prediction.is_some())
+        .then(|| prior_reward_prediction_metrics(&samples));
+    let open_loop_prior_reward = (0..arguments.rollout_horizon)
+        .filter_map(|horizon| {
+            rollout_reward_prediction_metrics(&samples, horizon).map(|metrics| {
+                json!({
+                    "horizon": horizon + 1,
+                    "metrics": metrics,
+                })
+            })
+        })
+        .collect::<Vec<_>>();
     println!(
         "{}",
         serde_json::to_string(&json!({
@@ -91,6 +115,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "feature_dims": feature_dims,
             "representations": representations,
             "reward_head": reward_head,
+            "one_step_prior_reward": one_step_prior_reward,
+            "open_loop_prior_reward": open_loop_prior_reward,
         }))?
     );
     Ok(())
@@ -122,6 +148,9 @@ fn collect_perception_samples(
             food: environment.food_index(),
             rewarded: usize::from(rewarded),
             reward_prediction: None,
+            next_rewarded: None,
+            prior_reward_prediction: None,
+            prior_reward_rollout: Vec::new(),
         });
         if samples.len() == arguments.samples {
             break;
@@ -159,7 +188,34 @@ fn collect_latent_samples(
         if samples.len() == arguments.samples {
             break;
         }
+        let mut preview_environment = environment.clone();
+        let mut preview_rng = rng.clone();
+        let mut preview_position_rng = position_rng.clone();
+        let mut rollout_actions = Vec::with_capacity(arguments.rollout_horizon);
+        let mut rollout_labels = Vec::with_capacity(arguments.rollout_horizon);
+        for _ in 0..arguments.rollout_horizon {
+            let action = random_valid_action(&preview_environment, &mut preview_rng);
+            let mut transition = preview_environment.step(action);
+            if arguments.randomize_position {
+                preview_environment.randomize_position(&mut transition, &mut preview_position_rng);
+            }
+            rollout_actions.push(action);
+            rollout_labels.push(usize::from(transition.reward.extrinsic != 0.0));
+            if transition.terminated || transition.truncated {
+                break;
+            }
+        }
+        let rollout_predictions = agent.prior_reward_rollout(&rollout_actions);
+        let sample = samples.last_mut().expect("current latent sample");
+        sample.prior_reward_prediction = Some(rollout_predictions[0]);
+        sample.next_rewarded = Some(rollout_labels[0]);
+        sample.prior_reward_rollout = rollout_predictions
+            .into_iter()
+            .zip(rollout_labels)
+            .collect();
+
         let action = random_valid_action(&environment, &mut rng);
+        assert_eq!(action, rollout_actions[0]);
         let mut forced_mask = [false; ACTION_COUNT];
         forced_mask[action] = true;
         assert_eq!(agent.act(ActionMode::Sample, Some(&forced_mask)), action);
@@ -168,6 +224,7 @@ fn collect_latent_samples(
             environment.randomize_position(&mut transition, &mut position_rng);
         }
         rewarded = transition.reward.extrinsic != 0.0;
+        assert_eq!(usize::from(rewarded), sample.next_rewarded.unwrap());
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
         if ended {
@@ -201,6 +258,9 @@ fn push_latent_sample(
         food: environment.food_index(),
         rewarded: usize::from(rewarded),
         reward_prediction: Some(reward_prediction),
+        next_rewarded: None,
+        prior_reward_prediction: None,
+        prior_reward_rollout: Vec::new(),
     });
 }
 
@@ -341,18 +401,50 @@ fn reward_prediction_metrics(
     samples: &[Sample],
     label: impl Fn(&Sample) -> usize,
 ) -> serde_json::Value {
+    prediction_metrics(
+        samples
+            .iter()
+            .map(|sample| {
+                (
+                    sample
+                        .reward_prediction
+                        .expect("checkpoint samples have reward predictions"),
+                    label(sample),
+                )
+            })
+            .collect(),
+    )
+}
+
+fn prior_reward_prediction_metrics(samples: &[Sample]) -> serde_json::Value {
+    prediction_metrics(
+        samples
+            .iter()
+            .filter_map(|sample| sample.prior_reward_prediction.zip(sample.next_rewarded))
+            .collect(),
+    )
+}
+
+fn rollout_reward_prediction_metrics(
+    samples: &[Sample],
+    horizon: usize,
+) -> Option<serde_json::Value> {
+    let scored = samples
+        .iter()
+        .filter_map(|sample| sample.prior_reward_rollout.get(horizon).copied())
+        .collect::<Vec<_>>();
+    (!scored.is_empty()).then(|| prediction_metrics(scored))
+}
+
+fn prediction_metrics(mut scored: Vec<(f32, usize)>) -> serde_json::Value {
+    assert!(!scored.is_empty());
     let mut prediction_sums = [0.0_f32; 2];
     let mut counts = [0_usize; 2];
     let mut correct = [0_usize; 2];
     let mut absolute_error = 0.0_f32;
-    let mut scored = Vec::with_capacity(samples.len());
-    for sample in samples {
-        let actual = label(sample);
-        let prediction = sample
-            .reward_prediction
-            .expect("checkpoint samples have reward predictions");
+    for &(prediction, actual) in &scored {
+        assert!(actual < 2);
         assert!(prediction.is_finite());
-        scored.push((prediction, actual));
         prediction_sums[actual] += prediction;
         counts[actual] += 1;
         correct[actual] += usize::from(usize::from(prediction >= 0.5) == actual);
@@ -373,14 +465,15 @@ fn reward_prediction_metrics(
         .map(|(positive, negative)| positive - negative);
     let (roc_auc, average_precision, best_balanced_accuracy, best_threshold) =
         ranking_metrics(&mut scored, counts);
+    let sample_count = scored.len();
     json!({
-        "accuracy": (correct[0] + correct[1]) as f32 / samples.len() as f32,
+        "accuracy": (correct[0] + correct[1]) as f32 / sample_count as f32,
         "balanced_accuracy": balanced_accuracy,
         "best_balanced_accuracy": best_balanced_accuracy,
         "best_threshold": best_threshold,
         "roc_auc": roc_auc,
         "average_precision": average_precision,
-        "mean_absolute_error": absolute_error / samples.len() as f32,
+        "mean_absolute_error": absolute_error / sample_count as f32,
         "negative_prediction_mean": prediction_means[0],
         "positive_prediction_mean": prediction_means[1],
         "prediction_gap": prediction_gap,
@@ -468,6 +561,9 @@ mod tests {
             food: 0,
             rewarded: label,
             reward_prediction: Some(prediction),
+            next_rewarded: None,
+            prior_reward_prediction: None,
+            prior_reward_rollout: Vec::new(),
         }
     }
 
@@ -491,5 +587,19 @@ mod tests {
         let metrics = reward_prediction_metrics(&samples, |sample| sample.rewarded);
         assert_eq!(metrics["roc_auc"], 0.5);
         assert_eq!(metrics["average_precision"], 0.5);
+    }
+
+    #[test]
+    fn prior_reward_metrics_align_executed_transitions() {
+        let mut negative = sample(0, 0.0);
+        negative.prior_reward_prediction = Some(0.1);
+        negative.next_rewarded = Some(0);
+        let mut positive = sample(0, 0.0);
+        positive.prior_reward_prediction = Some(0.9);
+        positive.next_rewarded = Some(1);
+        let trailing = sample(0, 0.0);
+        let metrics = prior_reward_prediction_metrics(&[negative, positive, trailing]);
+        assert_eq!(metrics["class_counts"], json!([1, 1]));
+        assert_eq!(metrics["roc_auc"], 1.0);
     }
 }

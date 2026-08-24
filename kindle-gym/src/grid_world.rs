@@ -13,6 +13,7 @@ const EPISODE_LIMIT: usize = 200;
 
 /// A deterministic visual task with sparse food reward and an energy-based
 /// terminal. Its purpose is integration testing, not benchmarking Dreamer.
+#[derive(Clone)]
 pub struct GridWorld {
     position: (usize, usize),
     energy: f32,
