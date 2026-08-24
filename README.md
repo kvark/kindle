@@ -140,9 +140,14 @@ cargo run -p kindle-gym --example grid_world --release -- \
   /models/dinov3/model.safetensors --steps 2000 --model-size tiny \
   --learning-rate-warmup 0 --train-ratio 256
 
-# Frozen-perception probe for GridWorld position and food-state separability:
+# Frozen-perception probe for GridWorld state separability:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 0
+
+# The same held-out centroid probe after the trainable encoder and RSSM:
+cargo run -p kindle-gym --example probe_grid_world --release -- \
+  /models/dinov3/model.safetensors --samples 500 --seed 0 \
+  --checkpoint checkpoints/gridworld-seed-0
 ```
 
 ## Python use

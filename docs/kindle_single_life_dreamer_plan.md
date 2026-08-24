@@ -300,30 +300,40 @@ Validation snapshot (2026-08-24):
 
 - formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
   full-checkpoint DINO parity pass on the pinned stack;
-- a held-out nearest-centroid probe over 500 GridWorld frames classifies
-  position at 85/100 and food state at 95/100, observing all 25 and 3 classes;
+- a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
+  frozen-DINO position at 85/100 and food state at 95/100, observing all 25
+  and 3 classes. It also recognizes both held-out reward frames, although that
+  rare two-example test is only directional evidence;
 - the valid-action random control averages 21.073 rewards per 1,000 steps over
   ten independent 100,000-step seeds;
-- a corrected tiny-model diagnostic at Atari-100k's train ratio ran for 2,000
-  environment steps and 500 learner updates without non-finite values, but its
-  frozen greedy policy scored 0 versus 36 for the matched random seed;
-- raising the diagnostic learning rate from 4e-5 to 1e-3 reduced feature
-  reconstruction loss from roughly 3,900 to 462, but frozen return was still
-  only 13/2,000 and rewarded versus unrewarded predictions did not separate;
-- a longer tiny-model run at the default learning rate completed 10,000
-  interactions and 2,500 updates with 150 reward versus 217 for the matched
-  random seed. Its frozen greedy policy scored 0/2,000, and its final rewarded
-  and unrewarded predictions were 0.011608 and 0.011600 despite reward loss
-  falling from 5.54 to 0.33.
+- tiny-model wiring controls remained at or below random return at both the
+  default and a diagnostic 1e-3 learning rate; they stayed finite and reduced
+  reconstruction loss, but did not learn reward-conditioned predictions;
+- the corrected upstream 1M preset first learned at environment step 1,081
+  with exactly 1,088 replay frames, then completed 10,000 interactions and
+  2,230 updates. Online reward was 216 versus 217 for the matched random seed;
+  its frozen greedy policy scored 0/2,000 while choosing only up/down;
+- over the final 100 updates of that 1M run, rewarded and unrewarded
+  predictions averaged 0.019785 and 0.019775 and policy entropy averaged
+  1.3829 (uniform over four actions is 1.3863). Reconstruction fell from
+  4,017.8 on the first update to 2,237.6 on the final update;
+- on the same held-out trajectory, the trained 196-value adapter still
+  classified position at 37/100, food state at 83/100, and both reward frames.
+  The sampled 640-value posterior classified position at 4/100 and missed both
+  reward frames; its deterministic and categorical components were similarly
+  near chance for position. The current failure is therefore downstream of
+  DINO and primarily at the RSSM posterior boundary.
 
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
 and evaluates warmup at optimizer step zero; Kindle had started as soon as one
 sequence existed and used the next step's warmup rate. Those startup semantics
-are now corrected. The tiny network is a wiring preset rather than an upstream
-size, so the next exit gate is a fresh 1M-preset run followed by frozen
-evaluation. Online return and falling scalar losses are not sufficient.
+are now corrected and measured end to end. The tiny network remains a wiring
+preset rather than an upstream size. The next diagnostic is a dense,
+observation-conditioned visual reward using the 1M preset; it will distinguish
+sparse-data pressure from a posterior learning failure before changing the
+architecture. Online return and falling scalar losses are not sufficient.
 
 ### Phase 1 — Externally rewarded baseline
 

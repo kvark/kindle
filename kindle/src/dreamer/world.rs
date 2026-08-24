@@ -297,7 +297,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
 /// One posterior update used both by the live actor and the pre-training
 /// categorical sampling pass.
 ///
-/// Outputs: next deterministic state, posterior logits, prior logits.
+/// Outputs: next deterministic state, posterior logits, prior logits, and the
+/// trainable observation-encoder output used by the posterior.
 pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
@@ -330,7 +331,7 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
     let posterior = representation
         .posterior
         .forward(&mut graph, deter, encoded, batch);
-    graph.set_outputs(vec![deter, posterior, prior]);
+    graph.set_outputs(vec![deter, posterior, prior, encoded]);
     graph
 }
 
@@ -408,6 +409,10 @@ mod tests {
         assert_eq!(
             observe.node(observe.outputs()[1]).ty.shape,
             vec![2 * size.stoch, size.classes]
+        );
+        assert_eq!(
+            observe.node(observe.outputs()[3]).ty.shape,
+            vec![2, OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth]
         );
         let transition = build_transition_graph(&config, 5);
         assert_eq!(

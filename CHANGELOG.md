@@ -10,6 +10,8 @@
   1,024-item replay prefill gate, and zero-indexed learning-rate warmup.
 - Added a native frozen DINOv3 ViT-S/16 frontend with numerical parity coverage.
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
+- Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
+  deterministic/categorical RSSM boundaries to localize representation loss.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit
   scales; intrinsic reward remains disabled in the baseline.
 - Replaced vector/homeostatic environment APIs with a minimal RGB,
