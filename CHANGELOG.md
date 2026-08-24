@@ -12,6 +12,10 @@
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
   deterministic/categorical RSSM boundaries to localize representation loss.
+- Added dense visual-reward, forced-action-coverage, and randomized-position
+  controls plus held-out reward-head metrics to reject action-history shortcuts.
+- Made the replay-value auxiliary gradient into the RSSM representation
+  optional without changing behavior-critic training.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit
   scales; intrinsic reward remains disabled in the baseline.
 - Replaced vector/homeostatic environment APIs with a minimal RGB,

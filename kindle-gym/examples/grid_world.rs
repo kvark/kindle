@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use clap::{Parser, ValueEnum};
 use kindle::{ActionMode, DreamerAgent, DreamerConfig, Environment, ModelSize};
-use kindle_gym::grid_world::{ACTION_COUNT, GridWorld};
+use kindle_gym::grid_world::{ACTION_COUNT, GridWorld, POSITION_RANDOMIZATION_SEED_XOR, WIDTH};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use serde_json::json;
 
@@ -42,6 +42,30 @@ impl From<Size> for ModelSize {
     }
 }
 
+#[derive(Clone, Copy, Debug, Default, ValueEnum)]
+enum RewardMode {
+    /// The environment's sparse food reward used by the baseline.
+    #[default]
+    SparseFood,
+    /// Diagnostic: reward every frame in either of the two rightmost columns.
+    DenseRight,
+}
+
+impl RewardMode {
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::SparseFood => "sparse_food",
+            Self::DenseRight => "dense_right",
+        }
+    }
+
+    fn apply(self, environment: &GridWorld, transition: &mut kindle::Transition) {
+        if matches!(self, Self::DenseRight) {
+            transition.reward.extrinsic = f32::from(environment.position().0 >= WIDTH - 2);
+        }
+    }
+}
+
 #[derive(Debug, Parser)]
 #[command(about = "Run a measured Dreamer or random-policy GridWorld baseline")]
 struct Arguments {
@@ -61,9 +85,19 @@ struct Arguments {
     #[arg(long, default_value_t = 0)]
     seed: u64,
 
-    /// Dreamer network preset. The first baseline uses 1m.
-    #[arg(long, value_enum, default_value_t = Size::OneMillion)]
-    model_size: Size,
+    /// Extrinsic reward definition. Dense-right is a visual learning probe,
+    /// not a replacement for the sparse-food baseline.
+    #[arg(long, value_enum, default_value_t = RewardMode::SparseFood)]
+    reward_mode: RewardMode,
+
+    /// Teleport to a uniformly random cell after each action. This makes the
+    /// rendered position unpredictable from action history for visual probes.
+    #[arg(long)]
+    randomize_position: bool,
+
+    /// Override the baseline's D3 12m network preset.
+    #[arg(long, value_enum)]
+    model_size: Option<Size>,
 
     /// Override D3's 1,000-update warmup for short diagnostic runs.
     #[arg(long)]
@@ -76,6 +110,30 @@ struct Arguments {
     /// Override replayed samples per environment step (Atari-100k uses 256).
     #[arg(long)]
     train_ratio: Option<f32>,
+
+    /// Override the posterior/prior free-nat information budget.
+    #[arg(long)]
+    free_nats: Option<f32>,
+
+    /// Override the DINO-feature reconstruction loss weight.
+    #[arg(long)]
+    reconstruction_loss_scale: Option<f32>,
+
+    /// Stop replay-value gradients at the RSSM boundary while retaining the
+    /// behavior critic's replay-value training objective.
+    #[arg(long)]
+    stop_replay_value_gradient: bool,
+
+    /// Train only the reward-prediction path. This is a wiring diagnostic,
+    /// not a control-learning baseline.
+    #[arg(long)]
+    reward_only: bool,
+
+    /// Force uniformly random valid actions for the first N interactions
+    /// while still training the complete agent. This isolates replay coverage
+    /// from representation and behavior learning.
+    #[arg(long, default_value_t = 0)]
+    random_action_steps: usize,
 
     /// Emit an aggregate interval event every N environment steps.
     #[arg(long, default_value_t = 1_000)]
@@ -98,6 +156,19 @@ struct Arguments {
     checkpoint: Option<PathBuf>,
 }
 
+impl Arguments {
+    fn has_training_config_override(&self) -> bool {
+        self.model_size.is_some()
+            || self.learning_rate.is_some()
+            || self.learning_rate_warmup.is_some()
+            || self.train_ratio.is_some()
+            || self.free_nats.is_some()
+            || self.reconstruction_loss_scale.is_some()
+            || self.stop_replay_value_gradient
+            || self.reward_only
+    }
+}
+
 #[derive(Default)]
 struct RunMetrics {
     total_reward: f32,
@@ -108,6 +179,7 @@ struct RunMetrics {
     episodes: usize,
     interval_episodes: usize,
     learner_updates: usize,
+    interval_learner_updates: usize,
     action_counts: [usize; ACTION_COUNT],
     interval_action_counts: [usize; ACTION_COUNT],
 }
@@ -121,13 +193,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if arguments.report_every == 0 {
         return Err("--report-every must be positive".into());
     }
+    if arguments.randomize_position && !matches!(arguments.reward_mode, RewardMode::DenseRight) {
+        return Err("--randomize-position requires --reward-mode dense-right".into());
+    }
     if arguments.random {
         if arguments.dino_checkpoint.is_some()
             || arguments.restore.is_some()
             || arguments.checkpoint.is_some()
-            || arguments.learning_rate.is_some()
-            || arguments.learning_rate_warmup.is_some()
-            || arguments.train_ratio.is_some()
+            || arguments.has_training_config_override()
+            || arguments.random_action_steps != 0
             || arguments.evaluate
         {
             return Err(
@@ -140,11 +214,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .dino_checkpoint
             .as_ref()
             .ok_or("DINO_CHECKPOINT is required unless --random is used")?;
-        if arguments.restore.is_some()
-            && (arguments.learning_rate.is_some()
-                || arguments.learning_rate_warmup.is_some()
-                || arguments.train_ratio.is_some())
-        {
+        if arguments.restore.is_some() && arguments.has_training_config_override() {
             return Err("training overrides cannot change restored configuration".into());
         }
         if arguments.evaluate && arguments.restore.is_none() {
@@ -152,6 +222,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         if arguments.evaluate && arguments.checkpoint.is_some() {
             return Err("--evaluate does not write a training checkpoint".into());
+        }
+        if arguments.evaluate && arguments.random_action_steps != 0 {
+            return Err("--evaluate does not accept --random-action-steps".into());
+        }
+        if arguments.reward_only && arguments.reconstruction_loss_scale.is_some() {
+            return Err("--reward-only already fixes all loss weights".into());
         }
         run_dreamer(&arguments, dino_checkpoint)
     }
@@ -166,25 +242,28 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
             "agent": "random",
             "steps": arguments.steps,
             "seed": arguments.seed,
+            "reward_mode": arguments.reward_mode.as_str(),
+            "randomize_position": arguments.randomize_position,
+            "random_action_steps": arguments.steps,
             "actions": ACTION_NAMES,
         }),
     )?;
 
     let started = Instant::now();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
+    let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
     let mut environment = GridWorld::new();
     environment.reset();
     let mut metrics = RunMetrics::default();
 
     for run_step in 1..=arguments.steps {
-        let mask = environment.action_mask().expect("GridWorld action mask");
-        let valid = mask
-            .iter()
-            .enumerate()
-            .filter_map(|(action, enabled)| enabled.then_some(action))
-            .collect::<Vec<_>>();
-        let action = valid[rng.random_range(0..valid.len())];
-        let transition = environment.step(action);
+        let mask = environment.action_mask();
+        let action = random_valid_action(mask.as_deref(), &mut rng);
+        let mut transition = environment.step(action);
+        if arguments.randomize_position {
+            environment.randomize_position(&mut transition, &mut position_rng);
+        }
+        arguments.reward_mode.apply(&environment, &mut transition);
         record_transition(
             &mut output,
             &mut metrics,
@@ -214,7 +293,9 @@ fn run_dreamer(
     dino_checkpoint: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = DreamerConfig::new(ACTION_COUNT);
-    config.model_size = arguments.model_size.into();
+    if let Some(model_size) = arguments.model_size {
+        config.model_size = model_size.into();
+    }
     config.seed = arguments.seed;
     if let Some(learning_rate) = arguments.learning_rate {
         config.learning_rate = learning_rate;
@@ -225,6 +306,24 @@ fn run_dreamer(
     if let Some(train_ratio) = arguments.train_ratio {
         config.train_ratio = train_ratio;
     }
+    if let Some(free_nats) = arguments.free_nats {
+        config.free_nats = free_nats;
+    }
+    if let Some(scale) = arguments.reconstruction_loss_scale {
+        config.loss_scales.reconstruction = scale;
+    }
+    if arguments.stop_replay_value_gradient {
+        config.replay_value_gradient = false;
+    }
+    if arguments.reward_only {
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.continuation = 0.0;
+        config.loss_scales.dynamics = 0.0;
+        config.loss_scales.representation = 0.0;
+        config.loss_scales.policy = 0.0;
+        config.loss_scales.value = 0.0;
+        config.loss_scales.replay_value = 0.0;
+    }
     let mut agent = if let Some(checkpoint) = &arguments.restore {
         DreamerAgent::restore(checkpoint, dino_checkpoint, None)?
     } else {
@@ -234,6 +333,7 @@ fn run_dreamer(
     let mut output = open_output(arguments)?;
     let starting_environment_step = agent.core().environment_step();
     let starting_learner_step = agent.core().learner_step();
+    let (world_parameters, behavior_parameters) = agent.core().trainable_parameter_counts();
     let agent_name = if arguments.evaluate {
         "dreamer_eval"
     } else {
@@ -248,6 +348,14 @@ fn run_dreamer(
             "restored": arguments.restore.is_some(),
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
+            "reward_mode": arguments.reward_mode.as_str(),
+            "randomize_position": arguments.randomize_position,
+            "random_action_steps": arguments.random_action_steps,
+            "trainable_parameters": {
+                "world": world_parameters,
+                "behavior": behavior_parameters,
+                "total": world_parameters + behavior_parameters,
+            },
             "config": agent.core().config(),
             "actions": ACTION_NAMES,
         }),
@@ -258,21 +366,37 @@ fn run_dreamer(
     let first = environment.reset();
     agent.begin_episode(&first);
     let mut metrics = RunMetrics::default();
+    // A separate RNG keeps the agent's categorical samples unchanged while
+    // matching the standalone random-policy trajectory for the same seed.
+    let mut exploration_rng = StdRng::seed_from_u64(arguments.seed);
+    let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
 
     for run_step in 1..=arguments.steps {
         let mask = environment.action_mask();
-        let mode = if arguments.evaluate {
-            ActionMode::Greedy
+        let action = if run_step <= arguments.random_action_steps {
+            let action = random_valid_action(mask.as_deref(), &mut exploration_rng);
+            let mut forced_mask = [false; ACTION_COUNT];
+            forced_mask[action] = true;
+            agent.act(ActionMode::Sample, Some(&forced_mask))
         } else {
-            ActionMode::Sample
+            let mode = if arguments.evaluate {
+                ActionMode::Greedy
+            } else {
+                ActionMode::Sample
+            };
+            agent.act(mode, mask.as_deref())
         };
-        let action = agent.act(mode, mask.as_deref());
-        let transition = environment.step(action);
+        let mut transition = environment.step(action);
+        if arguments.randomize_position {
+            environment.randomize_position(&mut transition, &mut position_rng);
+        }
+        arguments.reward_mode.apply(&environment, &mut transition);
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
         if !arguments.evaluate {
             for report in agent.learn_scheduled(1) {
                 metrics.learner_updates += 1;
+                metrics.interval_learner_updates += 1;
                 emit(
                     &mut output,
                     &json!({
@@ -322,6 +446,13 @@ fn run_dreamer(
     )
 }
 
+fn random_valid_action(mask: Option<&[bool]>, rng: &mut StdRng) -> usize {
+    let valid = (0..ACTION_COUNT)
+        .filter(|&action| mask.is_none_or(|mask| mask[action]))
+        .collect::<Vec<_>>();
+    valid[rng.random_range(0..valid.len())]
+}
+
 fn record_transition(
     output: &mut impl Write,
     metrics: &mut RunMetrics,
@@ -368,13 +499,14 @@ fn record_transition(
                 "interval_steps": report_every,
                 "reward": metrics.interval_reward,
                 "completed_episodes": metrics.interval_episodes,
-                "learner_updates": metrics.learner_updates,
+                "learner_updates": metrics.interval_learner_updates,
                 "action_counts": metrics.interval_action_counts,
                 "elapsed_seconds": started.elapsed().as_secs_f64(),
             }),
         )?;
         metrics.interval_reward = 0.0;
         metrics.interval_episodes = 0;
+        metrics.interval_learner_updates = 0;
         metrics.interval_action_counts.fill(0);
     }
     Ok(())
@@ -417,7 +549,8 @@ fn emit_summary(
 
 fn emit(output: &mut impl Write, value: &serde_json::Value) -> io::Result<()> {
     serde_json::to_writer(&mut *output, value)?;
-    writeln!(output)
+    writeln!(output)?;
+    output.flush()
 }
 
 fn open_output(arguments: &Arguments) -> io::Result<Box<dyn Write>> {
@@ -425,5 +558,30 @@ fn open_output(arguments: &Arguments) -> io::Result<Box<dyn Write>> {
         Ok(Box::new(BufWriter::new(File::create(path)?)))
     } else {
         Ok(Box::new(BufWriter::new(io::stdout())))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dense_right_reward_is_determined_by_rendered_position() {
+        let mut environment = GridWorld::new();
+        environment.reset();
+        for expected in [0.0, 0.0, 1.0] {
+            let mut transition = environment.step(3);
+            RewardMode::DenseRight.apply(&environment, &mut transition);
+            assert_eq!(transition.reward.extrinsic, expected);
+        }
+    }
+
+    #[test]
+    fn random_action_respects_the_environment_mask() {
+        let mut rng = StdRng::seed_from_u64(7);
+        let mask = [false, true, false, true];
+        for _ in 0..100 {
+            assert!(matches!(random_valid_action(Some(&mask), &mut rng), 1 | 3));
+        }
     }
 }

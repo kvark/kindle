@@ -3,7 +3,9 @@ use std::path::{Path, PathBuf};
 use clap::Parser;
 use kindle::vision::DinoPerception;
 use kindle::{ActionMode, DreamerAgent, Environment};
-use kindle_gym::grid_world::{ACTION_COUNT, GridWorld, HEIGHT, WIDTH};
+use kindle_gym::grid_world::{
+    ACTION_COUNT, GridWorld, HEIGHT, POSITION_RANDOMIZATION_SEED_XOR, WIDTH,
+};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use serde_json::json;
 
@@ -24,13 +26,20 @@ struct Arguments {
 
     #[arg(long, default_value_t = 0)]
     seed: u64,
+
+    /// Teleport to a uniformly random cell after each action so position must
+    /// be inferred from the rendered observation rather than action history.
+    #[arg(long)]
+    randomize_position: bool,
 }
 
 struct Sample {
     representations: Vec<Vec<f32>>,
     position: usize,
+    dense_right: usize,
     food: usize,
     rewarded: usize,
+    reward_prediction: Option<f32>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -62,6 +71,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             json!(samples[0].representations[index].len()),
         );
     }
+    let reward_head = samples[0].reward_prediction.map(|_| {
+        json!({
+            "dense_right": reward_prediction_metrics(&samples, |sample| sample.dense_right),
+            "previous_sparse_reward": reward_prediction_metrics(
+                &samples,
+                |sample| sample.rewarded,
+            ),
+        })
+    });
     println!(
         "{}",
         serde_json::to_string(&json!({
@@ -69,8 +87,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "source": source,
             "samples": arguments.samples,
             "seed": arguments.seed,
+            "randomize_position": arguments.randomize_position,
             "feature_dims": feature_dims,
             "representations": representations,
+            "reward_head": reward_head,
         }))?
     );
     Ok(())
@@ -82,11 +102,12 @@ fn collect_perception_samples(
     let mut perception = DinoPerception::load_vits16(&arguments.dino_checkpoint, None, None)?;
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
+    let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
     environment.reset();
     let mut samples = Vec::with_capacity(arguments.samples);
     let mut rewarded = false;
 
-    for _ in 0..arguments.samples {
+    while samples.len() < arguments.samples {
         let frame = environment.render();
         let (x, y) = environment.position();
         samples.push(Sample {
@@ -97,12 +118,20 @@ fn collect_perception_samples(
                     .to_vec(),
             ],
             position: y * WIDTH + x,
+            dense_right: usize::from(x >= WIDTH - 2),
             food: environment.food_index(),
             rewarded: usize::from(rewarded),
+            reward_prediction: None,
         });
+        if samples.len() == arguments.samples {
+            break;
+        }
 
         let action = random_valid_action(&environment, &mut rng);
-        let transition = environment.step(action);
+        let mut transition = environment.step(action);
+        if arguments.randomize_position {
+            environment.randomize_position(&mut transition, &mut position_rng);
+        }
         rewarded = transition.reward.extrinsic != 0.0;
         if transition.terminated || transition.truncated {
             environment.reset();
@@ -119,23 +148,31 @@ fn collect_latent_samples(
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
+    let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
     let first = environment.reset();
     agent.begin_episode(&first);
     let mut samples = Vec::with_capacity(arguments.samples);
-    push_latent_sample(&mut samples, &agent, &environment, false);
+    let mut rewarded = false;
 
     while samples.len() < arguments.samples {
+        push_latent_sample(&mut samples, &mut agent, &environment, rewarded);
+        if samples.len() == arguments.samples {
+            break;
+        }
         let action = random_valid_action(&environment, &mut rng);
         let mut forced_mask = [false; ACTION_COUNT];
         forced_mask[action] = true;
         assert_eq!(agent.act(ActionMode::Sample, Some(&forced_mask)), action);
-        let transition = environment.step(action);
-        let rewarded = transition.reward.extrinsic != 0.0;
+        let mut transition = environment.step(action);
+        if arguments.randomize_position {
+            environment.randomize_position(&mut transition, &mut position_rng);
+        }
+        rewarded = transition.reward.extrinsic != 0.0;
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
-        push_latent_sample(&mut samples, &agent, &environment, rewarded);
-        if ended && samples.len() < arguments.samples {
+        if ended {
             agent.begin_episode(&environment.reset());
+            rewarded = false;
         }
     }
     Ok(samples)
@@ -143,23 +180,27 @@ fn collect_latent_samples(
 
 fn push_latent_sample(
     samples: &mut Vec<Sample>,
-    agent: &DreamerAgent,
+    agent: &mut DreamerAgent,
     environment: &GridWorld,
     rewarded: bool,
 ) {
     let (x, y) = environment.position();
     let deter_dim = agent.core().config().network().deter;
     let latent = agent.latent_feature();
+    let representations = vec![
+        agent.encoded_observation().to_vec(),
+        latent.to_vec(),
+        latent[..deter_dim].to_vec(),
+        latent[deter_dim..].to_vec(),
+    ];
+    let reward_prediction = agent.posterior_reward_prediction();
     samples.push(Sample {
-        representations: vec![
-            agent.encoded_observation().to_vec(),
-            latent.to_vec(),
-            latent[..deter_dim].to_vec(),
-            latent[deter_dim..].to_vec(),
-        ],
+        representations,
         position: y * WIDTH + x,
+        dense_right: usize::from(x >= WIDTH - 2),
         food: environment.food_index(),
         rewarded: usize::from(rewarded),
+        reward_prediction: Some(reward_prediction),
     });
 }
 
@@ -180,6 +221,12 @@ fn label_probes(samples: &[Sample], representation: usize) -> serde_json::Value 
             representation,
             WIDTH * HEIGHT,
             |sample| sample.position,
+        ),
+        "dense_right": centroid_accuracy(
+            samples,
+            representation,
+            2,
+            |sample| sample.dense_right,
         ),
         "food": centroid_accuracy(
             samples,
@@ -288,4 +335,47 @@ fn squared_distance(left: &[f32], right: &[f32]) -> f32 {
             difference * difference
         })
         .sum()
+}
+
+fn reward_prediction_metrics(
+    samples: &[Sample],
+    label: impl Fn(&Sample) -> usize,
+) -> serde_json::Value {
+    let mut prediction_sums = [0.0_f32; 2];
+    let mut counts = [0_usize; 2];
+    let mut correct = [0_usize; 2];
+    let mut absolute_error = 0.0_f32;
+    for sample in samples {
+        let actual = label(sample);
+        let prediction = sample
+            .reward_prediction
+            .expect("checkpoint samples have reward predictions");
+        prediction_sums[actual] += prediction;
+        counts[actual] += 1;
+        correct[actual] += usize::from(usize::from(prediction >= 0.5) == actual);
+        absolute_error += (prediction - actual as f32).abs();
+    }
+    let prediction_means = [
+        (counts[0] > 0).then(|| prediction_sums[0] / counts[0] as f32),
+        (counts[1] > 0).then(|| prediction_sums[1] / counts[1] as f32),
+    ];
+    let recalls = [
+        (counts[0] > 0).then(|| correct[0] as f32 / counts[0] as f32),
+        (counts[1] > 0).then(|| correct[1] as f32 / counts[1] as f32),
+    ];
+    let balanced_accuracy = recalls.iter().flatten().sum::<f32>()
+        / recalls.iter().filter(|recall| recall.is_some()).count() as f32;
+    let prediction_gap = prediction_means[1]
+        .zip(prediction_means[0])
+        .map(|(positive, negative)| positive - negative);
+    json!({
+        "accuracy": (correct[0] + correct[1]) as f32 / samples.len() as f32,
+        "balanced_accuracy": balanced_accuracy,
+        "mean_absolute_error": absolute_error / samples.len() as f32,
+        "negative_prediction_mean": prediction_means[0],
+        "positive_prediction_mean": prediction_means[1],
+        "prediction_gap": prediction_gap,
+        "class_counts": counts,
+        "recall_by_class": recalls,
+    })
 }

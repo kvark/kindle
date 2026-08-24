@@ -161,6 +161,10 @@ pub struct DreamerConfig {
     /// Lower bound for the parameter norm used by adaptive clipping.
     pub agc_pmin: f32,
     pub loss_scales: LossScales,
+    /// Route D3's replay-value auxiliary loss into the world representation.
+    /// The behavior critic is trained regardless of this switch.
+    #[serde(default = "default_replay_value_gradient")]
+    pub replay_value_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
     pub seed: u64,
@@ -198,6 +202,7 @@ impl DreamerConfig {
             agc: 0.3,
             agc_pmin: 1e-3,
             loss_scales: LossScales::default(),
+            replay_value_gradient: true,
             extrinsic_reward_scale: 1.0,
             intrinsic_reward_scale: 0.0,
             seed: 0,
@@ -356,6 +361,10 @@ impl DreamerConfig {
     }
 }
 
+const fn default_replay_value_gradient() -> bool {
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -391,6 +400,7 @@ mod tests {
         assert_eq!(config.replay_warmup_frames(), 1_088);
         assert_eq!(config.train_ratio, 32.0);
         assert_eq!(config.actor_unimix, 0.01);
+        assert!(config.replay_value_gradient);
     }
 
     #[test]
@@ -403,5 +413,16 @@ mod tests {
         );
         config.loss_scales.reconstruction = -1.0;
         assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn older_configs_default_to_replay_value_gradients() {
+        let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
+        value
+            .as_object_mut()
+            .unwrap()
+            .remove("replay_value_gradient");
+        let restored: DreamerConfig = serde_json::from_value(value).unwrap();
+        assert!(restored.replay_value_gradient);
     }
 }
