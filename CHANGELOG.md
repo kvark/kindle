@@ -21,8 +21,9 @@
 - Added an optional behavior-only learning-rate override for controlled sparse
   reward diagnostics; the default remains D3's shared optimizer rate.
 - Added explicit GridWorld all-action and imagination-length controls plus a
-  posterior-policy invalid-action probe, so live action masks cannot silently
-  confound latent-imagination experiments.
+  posterior-policy invalid-action and reward-action alignment probe, so live
+  action masks and actor/world disagreement cannot silently confound latent
+  imagination experiments.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit
   scales; intrinsic reward remains disabled in the baseline.
 - Replaced vector/homeostatic environment APIs with a minimal RGB,
