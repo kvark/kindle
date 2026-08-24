@@ -130,7 +130,7 @@ imagined steps, wall-clock time, and GPU utilization are all reported.
 
 | Area | Baseline |
 |---|---|
-| Replay | Uniform online replay, 100k-frame capacity, batch 16, length 64, one context frame |
+| Replay | Uniform online replay, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
 | World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
 | Train ratio | 32 replayed samples per real environment step |
 | State | Block-recurrent deterministic state plus 32 categorical variables |
@@ -191,9 +191,16 @@ A useful normalized score is:
 7. Actor/value optimizer updates run, the slow value network receives its EMA
    update, and inference sessions receive the new parameters.
 
-The exact threshold is fixed before the first full run. A reasonable initial
-success bar is closing at least 25% of the random-to-novice gap, provided the
-metric is well behaved.
+Scheduled optimization begins after replay contains 1,024 complete sequence
+starts. As in D3's runner, prefill interactions do not accumulate a learner
+backlog: the first eligible scheduler call yields one update, and subsequent
+calls follow the configured replay-sample ratio.
+
+D3's replay-value loss also sends a representation gradient into the RSSM. To
+retain that path with separate static learner graphs, Kindle evaluates a fixed
+copy of the current critic inside the world graph. Its input gradient updates
+the world representation; the critic parameters remain owned and updated once
+by the behavior optimizer.
 
 ### 2.3 Minimum success gate
 
@@ -393,13 +400,21 @@ Validation snapshot (2026-08-24):
   frozen greedy policy scored 0 versus 36 for the matched random seed;
 - raising the diagnostic learning rate from 4e-5 to 1e-3 reduced feature
   reconstruction loss from roughly 3,900 to 462, but frozen return was still
-  only 13/2,000 and rewarded versus unrewarded predictions did not separate.
+  only 13/2,000 and rewarded versus unrewarded predictions did not separate;
+- a longer tiny-model run at the default learning rate completed 10,000
+  interactions and 2,500 updates with 150 reward versus 217 for the matched
+  random seed. Its frozen greedy policy scored 0/2,000, and its final rewarded
+  and unrewarded predictions were 0.011608 and 0.011600 despite reward loss
+  falling from 5.54 to 0.33.
 
 These are implementation and failure-localization results, not evidence that
-the baseline learns the environment. Five hundred updates are only about 2% of
-the 25,000 updates in an Atari-100k-ratio run. The next exit gate is a longer
-fresh run using checkpoint format 2, followed by frozen evaluation; online
-training return and falling reconstruction loss are not sufficient.
+the baseline learns the environment. A pinned-source follow-up also found that
+D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
+and evaluates warmup at optimizer step zero; Kindle had started as soon as one
+sequence existed and used the next step's warmup rate. Those startup semantics
+are now corrected. The tiny network is a wiring preset rather than an upstream
+size, so the next exit gate is a fresh 1M-preset run followed by frozen
+evaluation. Online return and falling scalar losses are not sufficient.
 
 ### Phase 1 — Externally rewarded baseline
 
@@ -534,6 +549,9 @@ For every policy decision:
 - DreamerV3 behavioral reference:
   [danijar/dreamerv3](https://github.com/danijar/dreamerv3), revision
   `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
+- D3 runner ratio-scheduler reference:
+  [danijar/elements](https://github.com/danijar/elements), revision
+  `b781f900b6a3b5be3a9037fd1dbb3977ad70d219`.
 - DINOv3 source reference:
   [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3),
   revision `6876159a11b4df116f30f667f8c9888617df0751`.

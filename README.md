@@ -38,7 +38,8 @@ frozen DINOv3 ViT-S/16 patch tokens
 The learning algorithm follows DreamerV3 at pinned upstream revision
 `e3f02248693a79dc8b0ebd62c93683888ddaccfe`:
 
-- uniform online sequence replay with batch 16 and length 64;
+- uniform online sequence replay with batch 16, length 64, and a 1,024-item
+  learner prefill gate;
 - block-recurrent deterministic state plus 32 categorical stochastic variables;
 - posterior/prior KL balancing, 1 free nat, and 1% uniform mixing;
 - feature reconstruction, two-hot reward prediction, and learned continuation;
@@ -104,6 +105,10 @@ agent.observe(&transition);
 let reports = agent.learn_scheduled(1);
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
+
+Scheduled learning deliberately returns no reports until replay exposes 1,024
+complete sequence starts (1,088 frames with the default length and context).
+`DreamerCore::learn()` remains available for isolated learner diagnostics.
 
 `kindle-gym` contains one rendered GridWorld for native integration and the
 first measured baseline. It writes JSONL learner, episode, interval, and final

@@ -6,6 +6,8 @@
   imagined actor/critic learner, sequence replay, and resumable checkpoints.
 - Preserved length-64 replay updates while accumulating world-model gradients
   over 8-step truncated-BPTT chunks for practical static graph compilation.
+- Matched DreamerV3's feature-loss reduction, per-parameter optimizer chain,
+  1,024-item replay prefill gate, and zero-indexed learning-rate warmup.
 - Added a native frozen DINOv3 ViT-S/16 frontend with numerical parity coverage.
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit

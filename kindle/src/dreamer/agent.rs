@@ -142,6 +142,39 @@ struct BehaviorTrainingBatch {
     replay_continuation_mae: f32,
 }
 
+/// D3's runner does not call its ratio scheduler before replay is ready. The
+/// first eligible call yields one update; only later environment steps accrue
+/// fractional train-ratio credit.
+#[derive(Default)]
+struct D3TrainScheduler {
+    started: bool,
+    credit: f32,
+}
+
+impl D3TrainScheduler {
+    fn observe(&mut self, credit: f32) {
+        if self.started {
+            self.credit += credit;
+        }
+    }
+
+    fn update_due(&mut self, replay_ready: bool) -> bool {
+        if !replay_ready {
+            return false;
+        }
+        if !self.started {
+            self.started = true;
+            self.credit = 1.0;
+        }
+        self.credit >= 1.0
+    }
+
+    fn consume_update(&mut self) {
+        assert!(self.credit >= 1.0);
+        self.credit -= 1.0;
+    }
+}
+
 /// DreamerV3 learner over precomputed frozen-DINO observations.
 ///
 /// Acting never trains implicitly. Call [`Self::learn`] explicitly, or use
@@ -170,7 +203,7 @@ pub struct DreamerCore {
     needs_reset: bool,
     learner_step: u64,
     environment_step: u64,
-    train_credit: f32,
+    train_scheduler: D3TrainScheduler,
 }
 
 impl DreamerCore {
@@ -299,7 +332,7 @@ impl DreamerCore {
             needs_reset: false,
             learner_step: 0,
             environment_step: 0,
-            train_credit: 0.0,
+            train_scheduler: D3TrainScheduler::default(),
             config,
             world_train,
             world_observe_batch,
@@ -475,19 +508,22 @@ impl DreamerCore {
             &self.config,
         );
         self.environment_step += 1;
-        self.train_credit +=
-            self.config.train_ratio / (self.config.batch_size * self.config.batch_length) as f32;
+        self.train_scheduler.observe(
+            self.config.train_ratio / (self.config.batch_size * self.config.batch_length) as f32,
+        );
         self.needs_reset = flags.is_last;
     }
 
     /// Execute at most `maximum_updates` updates due under D3's train ratio.
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         let mut reports = Vec::new();
-        while reports.len() < maximum_updates && self.train_credit >= 1.0 {
+        let replay_ready =
+            self.replay.valid_sequence_count(&self.config) >= self.config.replay_warmup_sequences();
+        while reports.len() < maximum_updates && self.train_scheduler.update_due(replay_ready) {
             let Some(report) = self.learn() else {
                 break;
             };
-            self.train_credit -= 1.0;
+            self.train_scheduler.consume_update();
             reports.push(report);
         }
         reports
@@ -1418,6 +1454,25 @@ mod tests {
             assert_eq!(row.iter().sum::<f32>(), 1.0);
             assert_eq!(row.iter().filter(|value| **value == 1.0).count(), 1);
         }
+    }
+
+    #[test]
+    fn d3_scheduler_discards_prefill_credit() {
+        let mut scheduler = D3TrainScheduler::default();
+        for _ in 0..100 {
+            scheduler.observe(0.25);
+        }
+        assert!(!scheduler.update_due(false));
+        assert!(scheduler.update_due(true));
+        scheduler.consume_update();
+        assert!(!scheduler.update_due(true));
+
+        for _ in 0..3 {
+            scheduler.observe(0.25);
+            assert!(!scheduler.update_due(true));
+        }
+        scheduler.observe(0.25);
+        assert!(scheduler.update_due(true));
     }
 
     #[test]

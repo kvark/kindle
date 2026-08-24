@@ -83,6 +83,14 @@ impl SequenceReplay {
         self.frames.len()
     }
 
+    /// Number of complete context-plus-training sequences currently eligible
+    /// for uniform sampling. Upstream D3 gates scheduled training on at least
+    /// `batch_size * batch_length` such replay items.
+    pub fn valid_sequence_count(&self, config: &DreamerConfig) -> usize {
+        let required = config.replay_context + config.batch_length;
+        self.frames.len().saturating_sub(required - 1)
+    }
+
     pub fn push(&mut self, frame: ReplayFrame, config: &DreamerConfig) {
         frame.validate(config);
         if self.frames.len() == self.capacity {
@@ -233,10 +241,25 @@ mod tests {
         }
         let mut rng = StdRng::seed_from_u64(1);
         let batch = replay.sample(&config, &mut rng).unwrap();
+        assert_eq!(replay.valid_sequence_count(&config), 1);
         assert_eq!(batch.initial_deter[0], 0.0);
         assert_eq!(batch.observations[0][0], 1.0);
         assert_eq!(batch.rewards[0][0], 51.0);
         assert_eq!(batch.previous_actions[0], vec![0.0, 1.0, 0.0]);
+    }
+
+    #[test]
+    fn d3_prefill_counts_complete_sequence_starts() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 4;
+        let mut replay = SequenceReplay::new(16);
+        for index in 0..11 {
+            replay.push(frame(index, &config), &config);
+        }
+        assert_eq!(replay.valid_sequence_count(&config), 7);
+        replay.push(frame(11, &config), &config);
+        assert_eq!(replay.valid_sequence_count(&config), 8);
     }
 
     #[test]

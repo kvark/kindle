@@ -234,6 +234,17 @@ impl DreamerConfig {
         DinoObservation::LEN
     }
 
+    /// Eligible replay items required before scheduled learning begins.
+    pub fn replay_warmup_sequences(&self) -> usize {
+        self.batch_size * self.batch_length
+    }
+
+    /// Frames needed to expose [`Self::replay_warmup_sequences`] complete
+    /// context-plus-training sequences.
+    pub fn replay_warmup_frames(&self) -> usize {
+        self.replay_warmup_sequences() + self.replay_context + self.batch_length - 1
+    }
+
     pub fn continuation_discount(&self) -> f32 {
         1.0 - 1.0 / self.horizon as f32
     }
@@ -270,8 +281,8 @@ impl DreamerConfig {
         {
             return Err("world_backprop_length must be a positive divisor of batch_length".into());
         }
-        if self.replay_capacity < self.batch_length + self.replay_context {
-            return Err("replay_capacity cannot hold one training sequence plus context".into());
+        if self.replay_capacity < self.replay_warmup_frames() {
+            return Err("replay_capacity cannot satisfy the D3 learner warmup gate".into());
         }
         if !self.train_ratio.is_finite() || self.train_ratio <= 0.0 {
             return Err("train_ratio must be finite and positive".into());
@@ -376,6 +387,8 @@ mod tests {
         assert_eq!(config.imagination_length, 15);
         assert_eq!(config.value_bins, 255);
         assert_eq!(config.replay_context, 1);
+        assert_eq!(config.replay_warmup_sequences(), 1_024);
+        assert_eq!(config.replay_warmup_frames(), 1_088);
         assert_eq!(config.train_ratio, 32.0);
         assert_eq!(config.actor_unimix, 0.01);
     }

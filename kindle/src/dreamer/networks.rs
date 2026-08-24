@@ -78,6 +78,8 @@ pub(crate) fn sum(graph: &mut Graph, values: &[NodeId]) -> NodeId {
     result
 }
 
+// Upstream `nn.Norm("rms")` applies a learned scale but no shift. Its `shift`
+// option is only read by the layer-normalization branch.
 struct LinearNorm {
     linear: nn::Linear,
     norm: nn::RmsNorm,

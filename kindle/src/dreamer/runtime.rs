@@ -160,19 +160,23 @@ pub(crate) fn configure_d3_optimizer(
     config: &DreamerConfig,
     learner_step: u64,
 ) {
-    let warmup = config.learning_rate_warmup;
-    let multiplier = if warmup == 0 {
-        1.0
-    } else {
-        ((learner_step + 1) as f32 / warmup as f32).min(1.0)
-    };
     session.set_laprop(
-        config.learning_rate * multiplier,
+        d3_learning_rate(config, learner_step),
         config.optimizer_beta1,
         config.optimizer_beta2,
         config.optimizer_epsilon,
     );
     session.set_adaptive_grad_clip(config.agc, config.agc_pmin);
+}
+
+fn d3_learning_rate(config: &DreamerConfig, learner_step: u64) -> f32 {
+    let warmup = config.learning_rate_warmup;
+    let multiplier = if warmup == 0 {
+        1.0
+    } else {
+        (learner_step as f32 / warmup as f32).min(1.0)
+    };
+    config.learning_rate * multiplier
 }
 
 #[cfg(test)]
@@ -192,5 +196,16 @@ mod tests {
     fn grouped_block_linear_uses_upstream_fan_in() {
         assert_eq!(d3_fan_in(&[8, 96, 64]), 768);
         assert_eq!(d3_fan_in(&[96, 64]), 96);
+    }
+
+    #[test]
+    fn learning_rate_warmup_matches_optax_step_indexing() {
+        let mut config = DreamerConfig::tiny(2);
+        config.learning_rate = 4e-5;
+        config.learning_rate_warmup = 1_000;
+        assert_eq!(d3_learning_rate(&config, 0), 0.0);
+        assert_eq!(d3_learning_rate(&config, 500), 2e-5);
+        assert_eq!(d3_learning_rate(&config, 1_000), 4e-5);
+        assert_eq!(d3_learning_rate(&config, 2_000), 4e-5);
     }
 }
