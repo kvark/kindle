@@ -11,7 +11,8 @@
 - Added a native frozen DINOv3 ViT-S/16 frontend with numerical parity coverage.
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
-  deterministic/categorical RSSM boundaries to localize representation loss.
+  deterministic/categorical RSSM boundaries, plus one-step prior reward
+  predictions, to localize representation and imagination loss.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
   controls plus held-out reward-head calibration, ROC-AUC, and average-precision
   metrics to reject action-history shortcuts and score rare rewards fairly.
