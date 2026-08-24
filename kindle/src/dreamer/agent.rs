@@ -33,6 +33,13 @@ const CHECKPOINT_METADATA: &str = "metadata.json";
 const CHECKPOINT_WORLD: &str = "world.safetensors";
 const CHECKPOINT_BEHAVIOR: &str = "behavior.safetensors";
 const CHECKPOINT_SLOW_VALUE: &str = "slow_value.safetensors";
+const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
+const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
+const RNG_REPLAY: u64 = 0x7265_706c_6179_0001;
+const RNG_TRAIN_POSTERIOR: u64 = 0x7472_6169_6e70_6f73;
+const RNG_IMAGINATION: u64 = 0x696d_6167_696e_6501;
+const RNG_DIAGNOSTIC: u64 = 0x6469_6167_6e6f_7374;
+const RNG_RESUME: u64 = 0x7265_7375_6d65_0001;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct CheckpointMetadata {
@@ -151,6 +158,38 @@ struct D3TrainScheduler {
     credit: f32,
 }
 
+struct DreamerRngs {
+    policy: StdRng,
+    live_posterior: StdRng,
+    replay: StdRng,
+    train_posterior: StdRng,
+    imagination: StdRng,
+}
+
+impl DreamerRngs {
+    fn new(seed: u64) -> Self {
+        Self {
+            policy: StdRng::seed_from_u64(seed ^ RNG_POLICY),
+            live_posterior: StdRng::seed_from_u64(seed ^ RNG_LIVE_POSTERIOR),
+            replay: StdRng::seed_from_u64(seed ^ RNG_REPLAY),
+            train_posterior: StdRng::seed_from_u64(seed ^ RNG_TRAIN_POSTERIOR),
+            imagination: StdRng::seed_from_u64(seed ^ RNG_IMAGINATION),
+        }
+    }
+
+    fn resumed(seed: u64, learner_step: u64, environment_step: u64) -> Self {
+        Self::new(
+            seed ^ RNG_RESUME ^ learner_step.rotate_left(17) ^ environment_step.rotate_left(41),
+        )
+    }
+
+    fn diagnostic(seed: u64, learner_step: u64, environment_step: u64) -> StdRng {
+        StdRng::seed_from_u64(
+            seed ^ RNG_DIAGNOSTIC ^ learner_step.rotate_left(23) ^ environment_step.rotate_left(47),
+        )
+    }
+}
+
 impl D3TrainScheduler {
     fn observe(&mut self, credit: f32) {
         if self.started {
@@ -184,7 +223,7 @@ pub struct DreamerCore {
     config: DreamerConfig,
     bins: TwoHotBins,
     replay: SequenceReplay,
-    rng: StdRng,
+    rngs: DreamerRngs,
     return_normalizer: PercentileNormalizer,
     world_train: Session,
     world_observe_batch: Session,
@@ -243,9 +282,8 @@ impl DreamerCore {
         core.environment_step = metadata.environment_step;
         core.return_normalizer
             .restore(metadata.return_low, metadata.return_high);
-        core.rng = StdRng::seed_from_u64(
-            core.config.seed ^ core.learner_step.rotate_left(17) ^ 0xc0de_cafe_5eed_0001,
-        );
+        core.rngs =
+            DreamerRngs::resumed(core.config.seed, core.learner_step, core.environment_step);
         core.sync_world_inference();
         sync_matching(&core.behavior_train, &mut core.behavior_online, "behavior.");
         sync_matching(
@@ -333,7 +371,7 @@ impl DreamerCore {
         Self {
             bins: TwoHotBins::new(config.value_bins),
             replay: SequenceReplay::new(config.replay_capacity),
-            rng: StdRng::seed_from_u64(config.seed),
+            rngs: DreamerRngs::new(config.seed),
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
@@ -434,7 +472,8 @@ impl DreamerCore {
         let size = self.config.network();
         let mut deter = self.deter.clone();
         let mut stoch = self.stoch.clone();
-        let mut rng = self.rng.clone();
+        let mut rng =
+            DreamerRngs::diagnostic(self.config.seed, self.learner_step, self.environment_step);
         let mut predictions = Vec::with_capacity(actions.len());
         for &action in actions {
             let mut action_one_hot = vec![0.0; self.config.action_count];
@@ -557,7 +596,7 @@ impl DreamerCore {
         );
         let probabilities = self.posterior_action_probabilities(action_mask);
         let action = match mode {
-            ActionMode::Sample => sample_probabilities(&probabilities, &mut self.rng),
+            ActionMode::Sample => sample_probabilities(&probabilities, &mut self.rngs.policy),
             ActionMode::Greedy => argmax(&probabilities),
         };
         self.pending_action = Some(action);
@@ -647,7 +686,7 @@ impl DreamerCore {
 
     /// Perform one D3 learner update, independent of scheduler credit.
     pub fn learn(&mut self) -> Option<LearnReport> {
-        let batch = self.replay.sample(&self.config, &mut self.rng)?;
+        let batch = self.replay.sample(&self.config, &mut self.rngs.replay)?;
         let posterior = self.sample_posterior_batch(&batch);
         // D3 forms all targets from the same pre-update parameters. Keeping
         // this ordering also gives the world graph replay-value targets while
@@ -702,7 +741,7 @@ impl DreamerCore {
             size.stoch,
             size.classes,
             self.config.unimix,
-            &mut self.rng,
+            &mut self.rngs.live_posterior,
         );
         self.feature = join_features(&self.deter, &self.stoch, 1, &self.config);
         assert!(self.feature.iter().all(|value| value.is_finite()));
@@ -744,7 +783,7 @@ impl DreamerCore {
                 size.stoch,
                 size.classes,
                 self.config.unimix,
-                &mut self.rng,
+                &mut self.rngs.train_posterior,
             );
             previous_deter = deter.clone();
             previous_stoch = stoch.clone();
@@ -1000,7 +1039,8 @@ impl DreamerCore {
             for row in 0..starts {
                 let logits = &actor_logits
                     [row * self.config.action_count..(row + 1) * self.config.action_count];
-                let action = sample_logits(logits, self.config.actor_unimix, &mut self.rng);
+                let action =
+                    sample_logits(logits, self.config.actor_unimix, &mut self.rngs.imagination);
                 action_indices[row] = action;
                 action_one_hot[row * self.config.action_count + action] = 1.0;
             }
@@ -1022,7 +1062,7 @@ impl DreamerCore {
                 size.stoch,
                 size.classes,
                 self.config.unimix,
-                &mut self.rng,
+                &mut self.rngs.imagination,
             );
             deter = next_deter;
             stoch = next_stoch;
@@ -1615,6 +1655,7 @@ fn all_finite(values: &[f32]) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::Rng;
 
     #[test]
     fn categorical_latents_are_one_hot_per_variable() {
@@ -1643,6 +1684,35 @@ mod tests {
         }
         scheduler.observe(0.25);
         assert!(scheduler.update_due(true));
+    }
+
+    #[test]
+    fn dreamer_rng_streams_advance_independently() {
+        let mut advanced = DreamerRngs::new(7);
+        let mut baseline = DreamerRngs::new(7);
+        for _ in 0..100 {
+            let _: u64 = advanced.imagination.random();
+            let _: u64 = advanced.replay.random();
+            let _: u64 = advanced.train_posterior.random();
+        }
+        assert_eq!(
+            advanced.policy.random::<u64>(),
+            baseline.policy.random::<u64>()
+        );
+        assert_eq!(
+            advanced.live_posterior.random::<u64>(),
+            baseline.live_posterior.random::<u64>()
+        );
+        assert_ne!(
+            advanced.imagination.random::<u64>(),
+            baseline.imagination.random::<u64>()
+        );
+
+        let mut left = DreamerRngs::diagnostic(7, 11, 13);
+        let mut right = DreamerRngs::diagnostic(7, 11, 13);
+        let mut next_step = DreamerRngs::diagnostic(7, 11, 14);
+        assert_eq!(left.random::<u64>(), right.random::<u64>());
+        assert_ne!(left.random::<u64>(), next_step.random::<u64>());
     }
 
     #[test]

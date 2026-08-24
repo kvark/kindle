@@ -24,6 +24,9 @@
   posterior-policy invalid-action and reward-action alignment probe, so live
   action masks and actor/world disagreement cannot silently confound latent
   imagination experiments.
+- Split live-policy, live-posterior, replay, training-posterior, imagination,
+  and diagnostic randomness into deterministic independent streams so compute
+  and rollout-length ablations do not perturb unrelated sampling trajectories.
 - Preserved separate intrinsic and extrinsic reward channels behind explicit
   scales; intrinsic reward remains disabled in the baseline.
 - Replaced vector/homeostatic environment APIs with a minimal RGB,

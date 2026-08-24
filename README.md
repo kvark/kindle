@@ -109,6 +109,10 @@ let reports = agent.learn_scheduled(1);
 Scheduled learning deliberately returns no reports until replay exposes 1,024
 complete sequence starts (1,088 frames with the default length and context).
 `DreamerCore::learn()` remains available for isolated learner diagnostics.
+Live policy sampling, live and training posterior sampling, replay selection,
+imagination, and read-only probes use independent deterministic RNG streams.
+Changing learner throughput or imagination length therefore does not silently
+advance the environment policy or replay RNG.
 
 `kindle-gym` contains one rendered GridWorld for native integration and the
 first measured baseline. It writes JSONL learner, episode, interval, and final
