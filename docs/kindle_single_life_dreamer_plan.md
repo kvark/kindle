@@ -518,6 +518,38 @@ supplies essentially no prior/posterior alignment gradient. The earlier
 validate Dreamer imagination. The next matched sparse run restores D3's one
 free nat while retaining the repaired representation and split optimizer rates.
 
+That one-free-nat run restores an actual prior-learning signal, but only learns
+a partial policy. It earns 130/10,000 online versus 217 for the seed-matched
+valid-action random control. Its frozen greedy policy earns 96/10,000 versus
+207 random by reliably collecting the first food once per episode and then
+failing to continue the sequence. Over the final 100 updates, dynamics KL is
+1.072 rather than pinned to the floor, posterior reward separation is 0.972,
+policy entropy is 0.067, and predicted reward on actor-selected imagined states
+is 0.307 per step despite real reward averaging only 0.013 per step.
+
+Held-out prior measurements identify model exploitation rather than missing
+reward recognition. On a random valid-action trajectory, the posterior reward
+head reaches 0.940 ROC AUC and a 0.129 gap. The one-step prior has 0.732 ROC AUC
+but a reversed calibration gap: rewarded transitions average 0.00022 prediction
+versus 0.00771 for negatives. At horizon two, ROC AUC falls to 0.537 and the
+gap is -0.0177; no later horizon has useful absolute calibration. The actor is
+therefore finding high-reward imagined latents that held-out real trajectories
+do not reach.
+
+GridWorld's live validity mask is also a material confound. Across the random
+valid-action probe, the unmasked posterior policy assigns 8.2% probability to
+invalid border moves and chooses one as its argmax on 8.0% of states. More
+decisively, removing the mask during frozen evaluation leaves return at 96 but
+changes the 10,000 actions to 9,904 `down` and 96 `right`: after reaching the
+bottom edge, the policy repeatedly selects a hidden no-op that the masked
+runner had redirected into horizontal motion. An all-action held-out trajectory
+also changes prior calibration substantially (one-step ROC AUC 0.814 and gap
+0.036), showing that the action distribution affects the learned latent regime.
+The next one-variable control therefore trains with all four actions exposed,
+including defined border no-ops, against exact random controls of 188/10,000
+(seed 0) and 178/10,000 (seed 1). It retains the same free nat, learning rates,
+model, and update budget.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
