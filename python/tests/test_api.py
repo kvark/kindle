@@ -9,6 +9,9 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["batch_length"] == 64
     assert config["imagination_length"] == 15
     assert config["actor_unimix"] == 0.01
+    assert config["train_ratio"] == 32.0
+    assert config["loss_scales"]["reconstruction"] == 1.0
+    assert config["replay_value_gradient"] is True
     assert kindle.DINO_MODEL_ID.startswith("facebook/dinov3-vits16")
 
 
