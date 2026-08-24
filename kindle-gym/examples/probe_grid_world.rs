@@ -54,6 +54,21 @@ struct Sample {
     prior_reward_rollout: Vec<(f32, usize)>,
     invalid_action_probability: Option<f32>,
     unmasked_argmax_invalid: Option<usize>,
+    policy_reward_alignment: Option<PolicyRewardAlignment>,
+}
+
+#[derive(Clone, Copy)]
+struct PolicyRewardAlignment {
+    policy_expected_prior_reward: f32,
+    uniform_expected_prior_reward: f32,
+    policy_argmax_prior_reward: f32,
+    best_prior_reward: f32,
+    argmax_agreement: usize,
+    has_rewarding_action: usize,
+    rewarding_action_probability: f32,
+    uniform_rewarding_action_probability: f32,
+    policy_argmax_rewarded: usize,
+    prior_argmax_rewarded: usize,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -112,6 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .collect::<Vec<_>>();
     let posterior_policy_action_mask = policy_action_mask_metrics(&samples);
+    let posterior_policy_reward_alignment = policy_reward_alignment_metrics(&samples);
     println!(
         "{}",
         serde_json::to_string(&json!({
@@ -127,6 +143,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "one_step_prior_reward": one_step_prior_reward,
             "open_loop_prior_reward": open_loop_prior_reward,
             "posterior_policy_action_mask": posterior_policy_action_mask,
+            "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
         }))?
     );
     Ok(())
@@ -163,6 +180,7 @@ fn collect_perception_samples(
             prior_reward_rollout: Vec::new(),
             invalid_action_probability: None,
             unmasked_argmax_invalid: None,
+            policy_reward_alignment: None,
         });
         if samples.len() == arguments.samples {
             break;
@@ -196,7 +214,13 @@ fn collect_latent_samples(
     let mut rewarded = false;
 
     while samples.len() < arguments.samples {
-        push_latent_sample(&mut samples, &mut agent, &environment, rewarded);
+        push_latent_sample(
+            &mut samples,
+            &mut agent,
+            &environment,
+            rewarded,
+            arguments.all_actions,
+        );
         if samples.len() == arguments.samples {
             break;
         }
@@ -256,6 +280,7 @@ fn push_latent_sample(
     agent: &mut DreamerAgent,
     environment: &GridWorld,
     rewarded: bool,
+    all_actions: bool,
 ) {
     let (x, y) = environment.position();
     let deter_dim = agent.core().config().network().deter;
@@ -280,6 +305,65 @@ fn push_latent_sample(
         .max_by(|(_, left), (_, right)| left.total_cmp(right))
         .map(|(action, _)| action)
         .expect("non-empty action distribution");
+    let policy_probabilities = if all_actions {
+        probabilities.clone()
+    } else {
+        agent.posterior_action_probabilities(Some(&action_mask))
+    };
+    let eligible_actions = (0..ACTION_COUNT)
+        .filter(|action| all_actions || action_mask[*action])
+        .collect::<Vec<_>>();
+    let prior_rewards = eligible_actions
+        .iter()
+        .map(|action| agent.prior_reward_prediction(*action))
+        .collect::<Vec<_>>();
+    let actual_rewards = eligible_actions
+        .iter()
+        .map(|action| {
+            let mut preview = environment.clone();
+            usize::from(preview.step(*action).reward.extrinsic != 0.0)
+        })
+        .collect::<Vec<_>>();
+    let policy_argmax_index = eligible_actions
+        .iter()
+        .enumerate()
+        .max_by(|(_, left), (_, right)| {
+            policy_probabilities[**left].total_cmp(&policy_probabilities[**right])
+        })
+        .map(|(index, _)| index)
+        .expect("at least one eligible action");
+    let prior_argmax_index = prior_rewards
+        .iter()
+        .enumerate()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .map(|(index, _)| index)
+        .expect("at least one eligible prior prediction");
+    let rewarding_action_count = actual_rewards.iter().sum::<usize>();
+    let policy_expected_prior_reward = eligible_actions
+        .iter()
+        .zip(&prior_rewards)
+        .map(|(action, reward)| policy_probabilities[*action] * reward)
+        .sum();
+    let uniform_expected_prior_reward =
+        prior_rewards.iter().sum::<f32>() / eligible_actions.len() as f32;
+    let rewarding_action_probability = eligible_actions
+        .iter()
+        .zip(&actual_rewards)
+        .filter_map(|(action, rewarded)| (*rewarded != 0).then_some(policy_probabilities[*action]))
+        .sum();
+    let policy_reward_alignment = PolicyRewardAlignment {
+        policy_expected_prior_reward,
+        uniform_expected_prior_reward,
+        policy_argmax_prior_reward: prior_rewards[policy_argmax_index],
+        best_prior_reward: prior_rewards[prior_argmax_index],
+        argmax_agreement: usize::from(policy_argmax_index == prior_argmax_index),
+        has_rewarding_action: usize::from(rewarding_action_count != 0),
+        rewarding_action_probability,
+        uniform_rewarding_action_probability: rewarding_action_count as f32
+            / eligible_actions.len() as f32,
+        policy_argmax_rewarded: actual_rewards[policy_argmax_index],
+        prior_argmax_rewarded: actual_rewards[prior_argmax_index],
+    };
     samples.push(Sample {
         representations,
         position: y * WIDTH + x,
@@ -292,6 +376,7 @@ fn push_latent_sample(
         prior_reward_rollout: Vec::new(),
         invalid_action_probability: Some(invalid_action_probability),
         unmasked_argmax_invalid: Some(usize::from(!action_mask[unmasked_argmax])),
+        policy_reward_alignment: Some(policy_reward_alignment),
     });
 }
 
@@ -497,6 +582,54 @@ fn policy_action_mask_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
     }))
 }
 
+fn policy_reward_alignment_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
+    let scored = samples
+        .iter()
+        .filter_map(|sample| sample.policy_reward_alignment)
+        .collect::<Vec<_>>();
+    if scored.is_empty() {
+        return None;
+    }
+    let mean = |value: fn(&PolicyRewardAlignment) -> f32| {
+        scored.iter().map(value).sum::<f32>() / scored.len() as f32
+    };
+    let rewarding = scored
+        .iter()
+        .filter(|sample| sample.has_rewarding_action != 0)
+        .collect::<Vec<_>>();
+    let rewarding_metrics = (!rewarding.is_empty()).then(|| {
+        let mean = |value: fn(&PolicyRewardAlignment) -> f32| {
+            rewarding.iter().map(|sample| value(sample)).sum::<f32>() / rewarding.len() as f32
+        };
+        json!({
+            "policy_rewarding_action_probability_mean": mean(
+                |sample| sample.rewarding_action_probability,
+            ),
+            "uniform_rewarding_action_probability_mean": mean(
+                |sample| sample.uniform_rewarding_action_probability,
+            ),
+            "policy_argmax_reward_rate": mean(|sample| sample.policy_argmax_rewarded as f32),
+            "prior_argmax_reward_rate": mean(|sample| sample.prior_argmax_rewarded as f32),
+        })
+    });
+    Some(json!({
+        "sample_count": scored.len(),
+        "policy_expected_prior_reward_mean": mean(
+            |sample| sample.policy_expected_prior_reward,
+        ),
+        "uniform_expected_prior_reward_mean": mean(
+            |sample| sample.uniform_expected_prior_reward,
+        ),
+        "policy_argmax_prior_reward_mean": mean(
+            |sample| sample.policy_argmax_prior_reward,
+        ),
+        "best_prior_reward_mean": mean(|sample| sample.best_prior_reward),
+        "policy_prior_argmax_agreement_rate": mean(|sample| sample.argmax_agreement as f32),
+        "rewarding_state_count": rewarding.len(),
+        "rewarding_states": rewarding_metrics,
+    }))
+}
+
 fn prediction_metrics(mut scored: Vec<(f32, usize)>) -> serde_json::Value {
     assert!(!scored.is_empty());
     let mut prediction_sums = [0.0_f32; 2];
@@ -627,6 +760,7 @@ mod tests {
             prior_reward_rollout: Vec::new(),
             invalid_action_probability: None,
             unmasked_argmax_invalid: None,
+            policy_reward_alignment: None,
         }
     }
 
@@ -678,6 +812,52 @@ mod tests {
         assert!((metrics["invalid_probability_mean"].as_f64().unwrap() - 0.15).abs() < 1e-6);
         assert_eq!(metrics["invalid_argmax_rate"], 0.5);
         assert_eq!(metrics["invalid_argmax_count"], 1);
+    }
+
+    #[test]
+    fn policy_reward_alignment_separates_model_and_actor_choices() {
+        let mut rewarding = sample(0, 0.0);
+        rewarding.policy_reward_alignment = Some(PolicyRewardAlignment {
+            policy_expected_prior_reward: 0.2,
+            uniform_expected_prior_reward: 0.1,
+            policy_argmax_prior_reward: 0.3,
+            best_prior_reward: 0.4,
+            argmax_agreement: 0,
+            has_rewarding_action: 1,
+            rewarding_action_probability: 0.75,
+            uniform_rewarding_action_probability: 0.25,
+            policy_argmax_rewarded: 1,
+            prior_argmax_rewarded: 0,
+        });
+        let mut ordinary = sample(0, 0.0);
+        ordinary.policy_reward_alignment = Some(PolicyRewardAlignment {
+            policy_expected_prior_reward: 0.0,
+            uniform_expected_prior_reward: 0.0,
+            policy_argmax_prior_reward: 0.0,
+            best_prior_reward: 0.0,
+            argmax_agreement: 1,
+            has_rewarding_action: 0,
+            rewarding_action_probability: 0.0,
+            uniform_rewarding_action_probability: 0.0,
+            policy_argmax_rewarded: 0,
+            prior_argmax_rewarded: 0,
+        });
+        let metrics = policy_reward_alignment_metrics(&[rewarding, ordinary]).unwrap();
+        assert!(
+            (metrics["policy_expected_prior_reward_mean"]
+                .as_f64()
+                .unwrap()
+                - 0.1)
+                .abs()
+                < 1e-6,
+        );
+        assert_eq!(metrics["policy_prior_argmax_agreement_rate"], 0.5);
+        assert_eq!(metrics["rewarding_state_count"], 1);
+        assert_eq!(
+            metrics["rewarding_states"]["policy_rewarding_action_probability_mean"],
+            0.75,
+        );
+        assert_eq!(metrics["rewarding_states"]["prior_argmax_reward_rate"], 0.0,);
     }
 
     #[test]

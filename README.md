@@ -160,7 +160,8 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
   --randomize-position
 
 # The same held-out probes after the RSSM, including the posterior policy's
-# invalid-action mass and action-conditioned prior reward through horizon 15:
+# invalid-action mass, agreement with true/model-predicted rewarding actions,
+# and action-conditioned prior reward through horizon 15:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \
