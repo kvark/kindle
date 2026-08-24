@@ -159,9 +159,10 @@ pub(crate) fn configure_d3_optimizer(
     session: &mut Session,
     config: &DreamerConfig,
     learner_step: u64,
+    learning_rate: f32,
 ) {
     session.set_laprop(
-        d3_learning_rate(config, learner_step),
+        d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step),
         config.optimizer_beta1,
         config.optimizer_beta2,
         config.optimizer_epsilon,
@@ -169,14 +170,13 @@ pub(crate) fn configure_d3_optimizer(
     session.set_adaptive_grad_clip(config.agc, config.agc_pmin);
 }
 
-fn d3_learning_rate(config: &DreamerConfig, learner_step: u64) -> f32 {
-    let warmup = config.learning_rate_warmup;
+fn d3_learning_rate(learning_rate: f32, warmup: u64, learner_step: u64) -> f32 {
     let multiplier = if warmup == 0 {
         1.0
     } else {
         (learner_step as f32 / warmup as f32).min(1.0)
     };
-    config.learning_rate * multiplier
+    learning_rate * multiplier
 }
 
 #[cfg(test)]
@@ -203,9 +203,9 @@ mod tests {
         let mut config = DreamerConfig::tiny(2);
         config.learning_rate = 4e-5;
         config.learning_rate_warmup = 1_000;
-        assert_eq!(d3_learning_rate(&config, 0), 0.0);
-        assert_eq!(d3_learning_rate(&config, 500), 2e-5);
-        assert_eq!(d3_learning_rate(&config, 1_000), 4e-5);
-        assert_eq!(d3_learning_rate(&config, 2_000), 4e-5);
+        assert_eq!(d3_learning_rate(config.learning_rate, 1_000, 0), 0.0);
+        assert_eq!(d3_learning_rate(config.learning_rate, 1_000, 500), 2e-5);
+        assert_eq!(d3_learning_rate(config.learning_rate, 1_000, 1_000), 4e-5);
+        assert_eq!(d3_learning_rate(config.learning_rate, 1_000, 2_000), 4e-5);
     }
 }

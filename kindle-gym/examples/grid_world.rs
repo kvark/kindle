@@ -107,6 +107,11 @@ struct Arguments {
     #[arg(long)]
     learning_rate: Option<f32>,
 
+    /// Override only the actor/critic rate. By default it follows
+    /// --learning-rate, preserving D3's shared optimizer rate.
+    #[arg(long)]
+    behavior_learning_rate: Option<f32>,
+
     /// Override replayed samples per environment step (Atari-100k uses 256).
     #[arg(long)]
     train_ratio: Option<f32>,
@@ -160,6 +165,7 @@ impl Arguments {
     fn has_training_config_override(&self) -> bool {
         self.model_size.is_some()
             || self.learning_rate.is_some()
+            || self.behavior_learning_rate.is_some()
             || self.learning_rate_warmup.is_some()
             || self.train_ratio.is_some()
             || self.free_nats.is_some()
@@ -299,6 +305,9 @@ fn run_dreamer(
     config.seed = arguments.seed;
     if let Some(learning_rate) = arguments.learning_rate {
         config.learning_rate = learning_rate;
+    }
+    if let Some(learning_rate) = arguments.behavior_learning_rate {
+        config.behavior_learning_rate = Some(learning_rate);
     }
     if let Some(warmup) = arguments.learning_rate_warmup {
         config.learning_rate_warmup = warmup;

@@ -152,6 +152,10 @@ pub struct DreamerConfig {
     pub slow_value_rate: f32,
     pub return_norm_rate: f32,
     pub learning_rate: f32,
+    /// Optional actor/critic rate for optimization diagnostics. `None` keeps
+    /// D3's shared world/behavior learning rate.
+    #[serde(default)]
+    pub behavior_learning_rate: Option<f32>,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -195,6 +199,7 @@ impl DreamerConfig {
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
+            behavior_learning_rate: None,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -237,6 +242,10 @@ impl DreamerConfig {
 
     pub const fn observation_dim(&self) -> usize {
         DinoObservation::LEN
+    }
+
+    pub fn behavior_learning_rate(&self) -> f32 {
+        self.behavior_learning_rate.unwrap_or(self.learning_rate)
     }
 
     /// Eligible replay items required before scheduled learning begins.
@@ -322,6 +331,12 @@ impl DreamerConfig {
         if !self.learning_rate.is_finite() || self.learning_rate <= 0.0 {
             return Err("learning_rate must be finite and positive".into());
         }
+        if self
+            .behavior_learning_rate
+            .is_some_and(|rate| !rate.is_finite() || rate <= 0.0)
+        {
+            return Err("behavior_learning_rate must be finite and positive".into());
+        }
         if !self.optimizer_beta1.is_finite()
             || !self.optimizer_beta2.is_finite()
             || !(0.0..1.0).contains(&self.optimizer_beta1)
@@ -400,6 +415,8 @@ mod tests {
         assert_eq!(config.replay_warmup_frames(), 1_088);
         assert_eq!(config.train_ratio, 32.0);
         assert_eq!(config.actor_unimix, 0.01);
+        assert_eq!(config.behavior_learning_rate, None);
+        assert_eq!(config.behavior_learning_rate(), config.learning_rate);
         assert!(config.replay_value_gradient);
     }
 
@@ -416,13 +433,14 @@ mod tests {
     }
 
     #[test]
-    fn older_configs_default_to_replay_value_gradients() {
+    fn older_configs_default_new_diagnostic_switches() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
-        value
-            .as_object_mut()
-            .unwrap()
-            .remove("replay_value_gradient");
+        let object = value.as_object_mut().unwrap();
+        object.remove("replay_value_gradient");
+        object.remove("behavior_learning_rate");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
+        assert_eq!(restored.behavior_learning_rate, None);
+        assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
     }
 }

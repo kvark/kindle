@@ -167,6 +167,11 @@ gradient because matched ablations found that it prevented visual reward
 learning at this budget; the behavior critic still receives its normal
 replay-value updates.
 
+Short optimization diagnostics can also set `--behavior-learning-rate`
+independently from the world-model `--learning-rate`. Omitting it preserves
+D3's shared rate; the split exists to test whether a fast world learner causes
+the actor/critic to collapse before a sparse reward model is grounded.
+
 ## Python use
 
 Build the extension with Maturin:
