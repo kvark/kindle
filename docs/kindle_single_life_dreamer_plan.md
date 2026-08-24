@@ -593,6 +593,22 @@ next control returns to 15 steps and lowers behavior optimization from `1e-4`
 to D3's `4e-5`, leaving the fast world learner unchanged so sparse reward can
 ground before the actor specializes.
 
+That lower-rate behavior control also fails. It preserves near-uniform
+exploration much longer and eventually recovers to 1.327 final-100 policy
+entropy, but earns only 120/10,000 online versus the 188 all-action random
+control. Its frozen greedy policy selects `left` on all 10,000 steps and earns
+zero. The final-100 replay reward gap is 0.806 and a held-out trajectory gives
+the posterior reward head 0.9998 ROC AUC with a 0.915 gap, so sparse reward is
+grounded. It does not transfer through the dynamics: one-step prior reward is
+only 0.554 AUC with a -0.0080 gap, and the actor and prior argmaxes agree on
+just 1.4% of states. On states with an immediately rewarding action, the actor
+assigns 24.4% probability to rewarding actions versus the 25% uniform baseline.
+Merely slowing actor/critic learning therefore trades premature specialization
+for underfit behavior without repairing the prior. The next controlled
+diagnostic must improve posterior/prior alignment while holding replay coverage
+fixed; further actor-rate or imagination-length tuning is not justified by
+these results.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
