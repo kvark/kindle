@@ -95,6 +95,11 @@ struct Arguments {
     #[arg(long)]
     randomize_position: bool,
 
+    /// Expose all four actions, including border no-ops. Dreamer imagination
+    /// has no environment action mask, so this removes a real/prior mismatch.
+    #[arg(long)]
+    all_actions: bool,
+
     /// Override the baseline's D3 12m network preset.
     #[arg(long, value_enum)]
     model_size: Option<Size>,
@@ -115,6 +120,10 @@ struct Arguments {
     /// Override replayed samples per environment step (Atari-100k uses 256).
     #[arg(long)]
     train_ratio: Option<f32>,
+
+    /// Override the number of prior transitions in each imagined rollout.
+    #[arg(long)]
+    imagination_length: Option<usize>,
 
     /// Override the posterior/prior free-nat information budget.
     #[arg(long)]
@@ -168,6 +177,7 @@ impl Arguments {
             || self.behavior_learning_rate.is_some()
             || self.learning_rate_warmup.is_some()
             || self.train_ratio.is_some()
+            || self.imagination_length.is_some()
             || self.free_nats.is_some()
             || self.reconstruction_loss_scale.is_some()
             || self.stop_replay_value_gradient
@@ -250,6 +260,7 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
             "seed": arguments.seed,
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
+            "all_actions": arguments.all_actions,
             "random_action_steps": arguments.steps,
             "actions": ACTION_NAMES,
         }),
@@ -263,7 +274,11 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
     let mut metrics = RunMetrics::default();
 
     for run_step in 1..=arguments.steps {
-        let mask = environment.action_mask();
+        let mask = if arguments.all_actions {
+            None
+        } else {
+            environment.action_mask()
+        };
         let action = random_valid_action(mask.as_deref(), &mut rng);
         let mut transition = environment.step(action);
         if arguments.randomize_position {
@@ -315,6 +330,9 @@ fn run_dreamer(
     if let Some(train_ratio) = arguments.train_ratio {
         config.train_ratio = train_ratio;
     }
+    if let Some(imagination_length) = arguments.imagination_length {
+        config.imagination_length = imagination_length;
+    }
     if let Some(free_nats) = arguments.free_nats {
         config.free_nats = free_nats;
     }
@@ -359,6 +377,7 @@ fn run_dreamer(
             "starting_learner_step": starting_learner_step,
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
+            "all_actions": arguments.all_actions,
             "random_action_steps": arguments.random_action_steps,
             "trainable_parameters": {
                 "world": world_parameters,
@@ -381,7 +400,11 @@ fn run_dreamer(
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
 
     for run_step in 1..=arguments.steps {
-        let mask = environment.action_mask();
+        let mask = if arguments.all_actions {
+            None
+        } else {
+            environment.action_mask()
+        };
         let action = if run_step <= arguments.random_action_steps {
             let action = random_valid_action(mask.as_deref(), &mut exploration_rng);
             let mut forced_mask = [false; ACTION_COUNT];

@@ -555,6 +555,19 @@ impl DreamerCore {
             self.pending_action.is_none(),
             "observe the pending action first"
         );
+        let probabilities = self.posterior_action_probabilities(action_mask);
+        let action = match mode {
+            ActionMode::Sample => sample_probabilities(&probabilities, &mut self.rng),
+            ActionMode::Greedy => argmax(&probabilities),
+        };
+        self.pending_action = Some(action);
+        action
+    }
+
+    /// Current posterior policy after optional action masking and actor
+    /// unimix. This read-only diagnostic does not sample or alter live state.
+    pub fn posterior_action_probabilities(&mut self, action_mask: Option<&[bool]>) -> Vec<f32> {
+        assert!(self.active, "call begin_episode before probing the policy");
         if let Some(mask) = action_mask {
             assert_eq!(mask.len(), self.config.action_count);
             assert!(mask.iter().any(|valid| *valid));
@@ -571,27 +584,22 @@ impl DreamerCore {
                 }
             }
         }
-        let action = match mode {
-            ActionMode::Sample if action_mask.is_some() => {
-                let mask = action_mask.unwrap();
-                let valid_count = mask.iter().filter(|valid| **valid).count();
-                let mut probabilities = vec![0.0; self.config.action_count];
-                softmax_unimix(&logits, 0.0, &mut probabilities);
-                for (probability, valid) in probabilities.iter_mut().zip(mask) {
-                    *probability = if *valid {
-                        (1.0 - self.config.actor_unimix) * *probability
-                            + self.config.actor_unimix / valid_count as f32
-                    } else {
-                        0.0
-                    };
-                }
-                sample_probabilities(&probabilities, &mut self.rng)
+        let mut probabilities = vec![0.0; self.config.action_count];
+        if let Some(mask) = action_mask {
+            let valid_count = mask.iter().filter(|valid| **valid).count();
+            softmax_unimix(&logits, 0.0, &mut probabilities);
+            for (probability, valid) in probabilities.iter_mut().zip(mask) {
+                *probability = if *valid {
+                    (1.0 - self.config.actor_unimix) * *probability
+                        + self.config.actor_unimix / valid_count as f32
+                } else {
+                    0.0
+                };
             }
-            ActionMode::Sample => sample_logits(&logits, self.config.actor_unimix, &mut self.rng),
-            ActionMode::Greedy => argmax(&logits),
-        };
-        self.pending_action = Some(action);
-        action
+        } else {
+            softmax_unimix(&logits, self.config.actor_unimix, &mut probabilities);
+        }
+        probabilities
     }
 
     pub fn observe(&mut self, observation: DinoObservation, reward: Reward, flags: FrameFlags) {
@@ -1350,6 +1358,12 @@ impl DreamerAgent {
         self.core.prior_reward_rollout(actions)
     }
 
+    /// Current posterior policy after optional action masking and actor
+    /// unimix. This does not sample or alter the live recurrent state.
+    pub fn posterior_action_probabilities(&mut self, action_mask: Option<&[bool]>) -> Vec<f32> {
+        self.core.posterior_action_probabilities(action_mask)
+    }
+
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
         let observation =
             self.perception
@@ -1674,6 +1688,11 @@ mod tests {
 
         agent.begin_episode(observation());
         assert!(agent.posterior_reward_prediction().is_finite());
+        let probabilities = agent.posterior_action_probabilities(None);
+        assert!((probabilities.iter().sum::<f32>() - 1.0).abs() < 1e-5);
+        let masked = agent.posterior_action_probabilities(Some(&[true, false, true]));
+        assert_eq!(masked[1], 0.0);
+        assert!((masked.iter().sum::<f32>() - 1.0).abs() < 1e-5);
         for step in 0..8 {
             let action = agent.act(ActionMode::Greedy, None);
             assert!(action < 3);

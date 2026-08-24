@@ -124,6 +124,11 @@ cargo run -p kindle-gym --example grid_world --release -- \
 cargo run -p kindle-gym --example grid_world --release -- \
   --random --steps 100000 --seed 0
 
+# Atari-like fixed action vocabulary: border moves become benign no-ops in
+# both the random control and Dreamer run instead of being masked live:
+cargo run -p kindle-gym --example grid_world --release -- \
+  --random --all-actions --steps 100000 --seed 0
+
 # Resume model/optimizer state; replay is deliberately refilled from scratch:
 cargo run -p kindle-gym --example grid_world --release -- \
   /models/dinov3/model.safetensors --steps 100000 \
@@ -154,8 +159,8 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position
 
-# The same held-out centroid and reward probes after the RSSM, including the
-# action-conditioned one-step prior prediction for each executed transition:
+# The same held-out probes after the RSSM, including the posterior policy's
+# invalid-action mass and action-conditioned prior reward through horizon 15:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \
@@ -172,6 +177,10 @@ Short optimization diagnostics can also set `--behavior-learning-rate`
 independently from the world-model `--learning-rate`. Omitting it preserves
 D3's shared rate; the split exists to test whether a fast world learner causes
 the actor/critic to collapse before a sparse reward model is grounded.
+`--imagination-length` isolates rollout-horizon failures. `--all-actions`
+exposes GridWorld's border moves as no-ops, matching the full action vocabulary
+used inside imagination; pass the same switch to the random control, frozen
+evaluation, and representation probe.
 
 ## Python use
 
