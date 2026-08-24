@@ -30,6 +30,10 @@ impl PyAgent {
         intrinsic_reward_scale = 0.0,
         extrinsic_reward_scale = 1.0,
         learning_rate = None,
+        learning_rate_warmup = None,
+        free_nats = None,
+        reconstruction_loss_scale = None,
+        replay_value_gradient = None,
         dino_plan_cache = None,
         skip_full_optimize = false,
     ))]
@@ -47,6 +51,10 @@ impl PyAgent {
         intrinsic_reward_scale: f32,
         extrinsic_reward_scale: f32,
         learning_rate: Option<f32>,
+        learning_rate_warmup: Option<u64>,
+        free_nats: Option<f32>,
+        reconstruction_loss_scale: Option<f32>,
+        replay_value_gradient: Option<bool>,
         dino_plan_cache: Option<&str>,
         skip_full_optimize: bool,
     ) -> PyResult<Self> {
@@ -74,6 +82,18 @@ impl PyAgent {
         }
         if let Some(value) = learning_rate {
             config.learning_rate = value;
+        }
+        if let Some(value) = learning_rate_warmup {
+            config.learning_rate_warmup = value;
+        }
+        if let Some(value) = free_nats {
+            config.free_nats = value;
+        }
+        if let Some(value) = reconstruction_loss_scale {
+            config.loss_scales.reconstruction = value;
+        }
+        if let Some(value) = replay_value_gradient {
+            config.replay_value_gradient = value;
         }
         config
             .check()

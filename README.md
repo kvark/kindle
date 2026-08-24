@@ -193,6 +193,10 @@ reports = agent.learn_scheduled()
 ```
 
 See [`python/examples/atari.py`](python/examples/atari.py) for a Gymnasium loop.
+It uses the D3 Atari-100k interaction and train-ratio settings, while selecting
+the mean feature reconstruction and isolated replay-value gradient supported by
+the frozen-DINO diagnostics. Both adaptations remain explicit command-line and
+Python constructor options.
 ARC and other games should adapt their native controls into a stable categorical
 vocabulary plus an optional validity mask; coordinate-parameterized actions are
 a later extension, not hidden inside this baseline.

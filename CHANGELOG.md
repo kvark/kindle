@@ -21,7 +21,9 @@
 - Replaced vector/homeostatic environment APIs with a minimal RGB,
   discrete-action contract and deterministic frame letterboxing.
 - Reduced the Python binding to the pixel Dreamer lifecycle and retained one
-  native GridWorld plus one Atari example.
+  native GridWorld plus one Atari example. The Atari loop now matches D3's
+  Atari-100k interaction settings and train ratio, emits JSONL metrics, and
+  exposes frozen-DINO ablations.
 - Removed the superseded planners, policy variants, reward experiments,
   pretraining utilities, historical experiment scripts, and stale design notes.
   Their full history remains available in git.
