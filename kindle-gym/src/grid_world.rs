@@ -1,10 +1,12 @@
 use kindle::{Environment, Reward, RgbFrame, Transition};
+use rand::Rng;
 
 pub const WIDTH: usize = 5;
 pub const HEIGHT: usize = 5;
 pub const ACTION_COUNT: usize = 4;
 pub const FRAME_WIDTH: usize = 160;
 pub const FRAME_HEIGHT: usize = 176;
+pub const POSITION_RANDOMIZATION_SEED_XOR: u64 = 0x7051_7100_0000_0001;
 const CELL: usize = 32;
 const STATUS_HEIGHT: usize = FRAME_HEIGHT - HEIGHT * CELL;
 const EPISODE_LIMIT: usize = 200;
@@ -38,6 +40,20 @@ impl GridWorld {
 
     pub fn position(&self) -> (usize, usize) {
         self.position
+    }
+
+    /// Move the agent without advancing time. This is used by visual
+    /// representation probes that must break action-history predictability.
+    fn teleport(&mut self, position: (usize, usize)) {
+        assert!(position.0 < WIDTH && position.1 < HEIGHT);
+        self.position = position;
+    }
+
+    /// Teleport to a uniformly sampled cell and keep a pending transition's
+    /// rendered observation aligned with the environment state.
+    pub fn randomize_position(&mut self, transition: &mut Transition, rng: &mut impl Rng) {
+        self.teleport((rng.random_range(0..WIDTH), rng.random_range(0..HEIGHT)));
+        transition.frame = self.render();
     }
 
     pub fn energy(&self) -> f32 {
@@ -162,6 +178,7 @@ fn fill_rect(pixels: &mut [u8], x: usize, y: usize, width: usize, height: usize,
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::{SeedableRng, rngs::StdRng};
 
     #[test]
     fn render_and_action_mask_follow_state() {
@@ -182,5 +199,26 @@ mod tests {
             assert_eq!(world.step(action).reward.extrinsic, 0.0);
         }
         assert_eq!(world.step(1).reward.extrinsic, 1.0);
+    }
+
+    #[test]
+    fn teleport_updates_rendered_state_and_action_mask() {
+        let mut world = GridWorld::new();
+        world.reset();
+        let before = world.render();
+        world.teleport((4, 4));
+        assert_eq!(world.position(), (4, 4));
+        assert_eq!(world.action_mask().unwrap(), vec![true, false, true, false]);
+        assert_ne!(world.render().pixels(), before.pixels());
+    }
+
+    #[test]
+    fn randomized_position_updates_the_pending_frame() {
+        let mut world = GridWorld::new();
+        world.reset();
+        let mut transition = world.step(3);
+        let mut rng = StdRng::seed_from_u64(3);
+        world.randomize_position(&mut transition, &mut rng);
+        assert_eq!(transition.frame.pixels(), world.render().pixels());
     }
 }

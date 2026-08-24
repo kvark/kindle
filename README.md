@@ -140,15 +140,32 @@ cargo run -p kindle-gym --example grid_world --release -- \
   /models/dinov3/model.safetensors --steps 2000 --model-size tiny \
   --learning-rate-warmup 0 --train-ratio 256
 
+# Strict dense visual-representation diagnostic, with action history removed:
+cargo run -p kindle-gym --example grid_world --release -- \
+  /models/dinov3/model.safetensors --steps 3000 --model-size 1m \
+  --learning-rate 1e-3 --learning-rate-warmup 0 --train-ratio 256 \
+  --free-nats 16 --reconstruction-loss-scale 3.1887755e-4 \
+  --stop-replay-value-gradient --reward-mode dense-right \
+  --randomize-position --random-action-steps 3000 \
+  --checkpoint checkpoints/gridworld-dense-probe-seed-0
+
 # Frozen-perception probe for GridWorld state separability:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
-  /models/dinov3/model.safetensors --samples 500 --seed 0
+  /models/dinov3/model.safetensors --samples 500 --seed 1 \
+  --randomize-position
 
-# The same held-out centroid probe after the trainable encoder and RSSM:
+# The same held-out centroid and reward-head probes after the trained RSSM:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
-  /models/dinov3/model.safetensors --samples 500 --seed 0 \
-  --checkpoint checkpoints/gridworld-seed-0
+  /models/dinov3/model.safetensors --samples 500 --seed 1 \
+  --randomize-position \
+  --checkpoint checkpoints/gridworld-dense-probe-seed-0
 ```
+
+The D3-compatible replay-value representation gradient remains enabled in
+`DreamerConfig` by default. The strict frozen-DINO diagnostic stops that
+gradient because matched ablations found that it prevented visual reward
+learning at this budget; the behavior critic still receives its normal
+replay-value updates.
 
 ## Python use
 

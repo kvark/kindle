@@ -324,16 +324,62 @@ Validation snapshot (2026-08-24):
   near chance for position. The current failure is therefore downstream of
   DINO and primarily at the RSSM posterior boundary.
 
+The follow-up uses a dense diagnostic reward for either of the two rightmost
+columns. Forced random actions give every learner the same trajectory, while
+randomizing position after every action makes the next observation and reward
+unpredictable from action history. This distinction matters: on the ordinary
+grid, the validity mask lets a policy move globally right without recognizing
+the frame. Reconstruction scale `1 / 3,136` turns the summed DINO-feature event
+loss into a per-feature mean while leaving the reported raw loss comparable.
+Except for the named 12M run, these controls use the 1M preset, learning rate
+`1e-3`, zero warmup, train ratio 256, and 16 free nats.
+
+| Dense diagnostic (3,000 frames, ~480 updates) | Position regime | Reconstruction scale | Final-100 reward gap | Held-out randomized dense-right accuracy |
+|---|---:|---:|---:|---:|
+| Reward objective only | ordinary | 0 | 0.991 | posterior 81%, adapter 75% |
+| Full objective | ordinary | 1 | 0.053 | — |
+| Full objective | ordinary | 0 | 0.634 | — |
+| Full objective | ordinary | 1 / 3,136 | 0.427 | posterior 47%, adapter 65% |
+| Full objective | randomized | 1 / 3,136 | 0.00021 | posterior 58%, adapter 63% |
+| Full objective | randomized | 0 | 0.000035 | posterior 51%, adapter 71% |
+| Full objective, 12M | randomized | 1 / 3,136 | 0.00415 | posterior 52%, adapter 87% |
+| No reconstruction or replay-value representation gradient | randomized | 0 | 0.217 | posterior 99%, adapter 86% |
+| Replay-value representation gradient stopped | randomized | 1 / 3,136 | 0.0545 | posterior 89%, adapter 80% |
+
+The reward-only model transfers to unseen randomized positions, proving that
+the frozen-DINO adapter, posterior straight-through path, and reward head can
+carry the visual label. Apparent full-objective success on the ordinary grid
+mostly follows dynamics and action history: its deterministic latent reached
+83% there but only 48% after randomization. The strict 1M and 12M runs both
+remain failures when all D3 representation gradients are preserved. The 12M
+adapter classified exact position at 79% and the dense-right label at 87%, but
+its posterior was at 52% and its own reward head predicted 0.40484 versus
+0.40493 on held-out negatives and positives. Increasing capacity therefore
+improves the adapter without carrying visual state across the posterior
+boundary. Removing feature reconstruction also leaves the 1M posterior at
+chance despite 80% exact-position accuracy at the adapter.
+
+The replay-value auxiliary gradient can instead be stopped at the RSSM
+boundary while retaining normal critic training. With reconstruction disabled,
+that control succeeds after a late phase transition: its final replay
+predictions are 0.049 versus 0.923, and on held-out positions its stochastic
+posterior classifies dense-right at 99%. The model's own reward head reaches
+97.6% accuracy with predictions of 0.077 and 0.951. Reintroducing mean-scaled
+feature reconstruction preserves the result, though it delays learning: the
+final 20 replay gaps average 0.264, the held-out posterior reaches 89%, and the
+reward head reaches 85.2% accuracy (87.7% balanced) with a 0.540 prediction
+gap. The no-reconstruction run remains the sharper wiring control; the next
+sparse-food run keeps reconstruction and stops only the replay-value
+representation gradient.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
 and evaluates warmup at optimizer step zero; Kindle had started as soon as one
 sequence existed and used the next step's warmup rate. Those startup semantics
 are now corrected and measured end to end. The tiny network remains a wiring
-preset rather than an upstream size. The next diagnostic is a dense,
-observation-conditioned visual reward using the 1M preset; it will distinguish
-sparse-data pressure from a posterior learning failure before changing the
-architecture. Online return and falling scalar losses are not sufficient.
+preset rather than an upstream size. Online return and falling scalar losses
+are not sufficient.
 
 ### Phase 1 — Externally rewarded baseline
 

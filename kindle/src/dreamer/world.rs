@@ -250,7 +250,14 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
             reward_weight,
         ));
         continuation_losses.push(graph.bce_loss(continuation, continuation_target));
-        let value = model.replay_value.forward_frozen(&mut graph, state);
+        let replay_value_state = if config.replay_value_gradient {
+            state
+        } else {
+            graph.stop_gradient(state)
+        };
+        let value = model
+            .replay_value
+            .forward_frozen(&mut graph, replay_value_state);
         let value_target =
             weighted_cross_entropy(&mut graph, value, replay_value_target, replay_value_weight);
         let slow_target =

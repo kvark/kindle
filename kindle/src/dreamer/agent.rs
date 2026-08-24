@@ -191,6 +191,7 @@ pub struct DreamerCore {
     world_observe_live: Session,
     world_transition: Session,
     world_heads: Session,
+    world_heads_live: Session,
     behavior_train: Session,
     behavior_online: Session,
     behavior_slow: Session,
@@ -270,6 +271,7 @@ impl DreamerCore {
         let world_observe_live_graph = world::build_observe_graph(&config, 1);
         let world_transition_graph = world::build_transition_graph(&config, starts);
         let world_head_graph = world::build_head_graph(&config, starts);
+        let world_head_live_graph = world::build_head_graph(&config, 1);
         let behavior_train_graph =
             behavior::build_training_graph(&config, imagined_rows, replay_rows);
         let behavior_online_graph = behavior::build_inference_graph(&config, starts);
@@ -289,6 +291,8 @@ impl DreamerCore {
         let mut world_transition =
             build_session(&world_transition_graph, &gpu, Mode::Inference, false);
         let mut world_heads = build_session(&world_head_graph, &gpu, Mode::Inference, false);
+        let mut world_heads_live =
+            build_session(&world_head_live_graph, &gpu, Mode::Inference, false);
         let mut behavior_train = build_session(
             &behavior_train_graph,
             &gpu,
@@ -311,6 +315,7 @@ impl DreamerCore {
             &mut world_observe_live,
             &mut world_transition,
             &mut world_heads,
+            &mut world_heads_live,
         ] {
             sync_matching(&world_train, target, "world.");
         }
@@ -341,6 +346,7 @@ impl DreamerCore {
             world_observe_live,
             world_transition,
             world_heads,
+            world_heads_live,
             behavior_train,
             behavior_online,
             behavior_slow,
@@ -364,6 +370,15 @@ impl DreamerCore {
         self.environment_step
     }
 
+    /// Trainable world and behavior parameter counts, excluding frozen DINO,
+    /// inference-session copies, and the EMA value model.
+    pub fn trainable_parameter_counts(&self) -> (usize, usize) {
+        (
+            trainable_parameter_count(&self.world_train),
+            trainable_parameter_count(&self.behavior_train),
+        )
+    }
+
     /// Current posterior feature (`deter` followed by flattened categoricals).
     ///
     /// This read-only view is useful for representation probes. It must not be
@@ -375,6 +390,21 @@ impl DreamerCore {
     /// Current output of the trainable adapter between DINO and the RSSM.
     pub fn encoded_observation(&self) -> &[f32] {
         &self.encoded_observation
+    }
+
+    /// Reward predicted from the current posterior state.
+    ///
+    /// This runs the synchronized inference head without changing recurrent
+    /// state and is intended for frozen evaluation and representation probes.
+    pub fn posterior_reward_prediction(&mut self) -> f32 {
+        self.world_heads_live.set_input("deter", &self.deter);
+        self.world_heads_live.set_input("stoch", &self.stoch);
+        self.world_heads_live.step();
+        self.world_heads_live.wait();
+        let mut reward_logits = vec![0.0; self.config.value_bins];
+        self.world_heads_live
+            .read_output_by_index(0, &mut reward_logits);
+        decode_rows(&reward_logits, 1, &self.bins)[0]
     }
 
     /// Save model parameters, optimizer state, the EMA critic, and scalar learner
@@ -826,6 +856,7 @@ impl DreamerCore {
             &mut self.world_observe_live,
             &mut self.world_transition,
             &mut self.world_heads,
+            &mut self.world_heads_live,
         ] {
             sync_matching(&self.world_train, target, "world.");
         }
@@ -1230,6 +1261,11 @@ impl DreamerAgent {
         self.core.encoded_observation()
     }
 
+    /// Reward predicted from the current posterior state.
+    pub fn posterior_reward_prediction(&mut self) -> f32 {
+        self.core.posterior_reward_prediction()
+    }
+
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
         let observation =
             self.perception
@@ -1441,6 +1477,15 @@ fn read_scalar(session: &Session, index: usize) -> f32 {
     output[0]
 }
 
+fn trainable_parameter_count(session: &Session) -> usize {
+    session
+        .param_names()
+        .into_iter()
+        .filter(|name| session.has_param_grad(name))
+        .map(|name| session.param_size(name).expect("known parameter size"))
+        .sum()
+}
+
 fn mean_nested(values: &[Vec<f32>]) -> f32 {
     let count = values.iter().map(Vec::len).sum::<usize>();
     if count == 0 {
@@ -1527,6 +1572,8 @@ mod tests {
         config.skip_full_optimize = true;
         let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
+        let (world_parameters, behavior_parameters) = agent.trainable_parameter_counts();
+        assert!(world_parameters > 0 && behavior_parameters > 0);
         assert!(
             !agent
                 .world_train
@@ -1542,6 +1589,7 @@ mod tests {
         let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
 
         agent.begin_episode(observation());
+        assert!(agent.posterior_reward_prediction().is_finite());
         for step in 0..8 {
             let action = agent.act(ActionMode::Greedy, None);
             assert!(action < 3);
@@ -1770,18 +1818,7 @@ mod tests {
 
         let predict = |agent: &mut DreamerCore, class: usize| {
             agent.posterior_live(observation(class).as_slice(), None, true);
-            let starts = agent.config.batch_size * agent.config.batch_length;
-            agent
-                .world_heads
-                .set_input("deter", &agent.deter.repeat(starts));
-            agent
-                .world_heads
-                .set_input("stoch", &agent.stoch.repeat(starts));
-            agent.world_heads.step();
-            agent.world_heads.wait();
-            let mut logits = vec![0.0; starts * agent.config.value_bins];
-            agent.world_heads.read_output_by_index(0, &mut logits);
-            agent.bins.decode_logits(&logits[..agent.config.value_bins])
+            agent.posterior_reward_prediction()
         };
         let negative = (0..32).map(|_| predict(&mut agent, 0)).sum::<f32>() / 32.0;
         let positive = (0..32).map(|_| predict(&mut agent, 1)).sum::<f32>() / 32.0;
