@@ -797,7 +797,12 @@ impl DreamerCore {
             }
 
             if chunk + 1 == chunk_count {
-                configure_d3_optimizer(&mut self.world_train, &self.config, self.learner_step);
+                configure_d3_optimizer(
+                    &mut self.world_train,
+                    &self.config,
+                    self.learner_step,
+                    self.config.learning_rate,
+                );
             } else {
                 self.world_train.clear_optimizer();
             }
@@ -1156,7 +1161,12 @@ impl DreamerCore {
             .set_input("replay_value_target", &batch.replay_value_target);
         self.behavior_train
             .set_input("replay_slow_target", &batch.replay_slow_target);
-        configure_d3_optimizer(&mut self.behavior_train, &self.config, self.learner_step);
+        configure_d3_optimizer(
+            &mut self.behavior_train,
+            &self.config,
+            self.learner_step,
+            self.config.behavior_learning_rate(),
+        );
         self.behavior_train.step();
         self.behavior_train.wait();
         let metrics = BehaviorMetrics {
