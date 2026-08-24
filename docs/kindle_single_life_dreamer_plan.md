@@ -345,6 +345,7 @@ Except for the named 12M run, these controls use the 1M preset, learning rate
 | Full objective, 12M | randomized | 1 / 3,136 | 0.00415 | posterior 52%, adapter 87% |
 | No reconstruction or replay-value representation gradient | randomized | 0 | 0.217 | posterior 99%, adapter 86% |
 | Replay-value representation gradient stopped | randomized | 1 / 3,136 | 0.0545 | posterior 89%, adapter 80% |
+| Replay-value representation gradient stopped, agent-controlled (5,000 frames) | ordinary | 1 / 3,136 | 0.999 | posterior 68%, adapter 80% |
 
 The reward-only model transfers to unseen randomized positions, proving that
 the frozen-DINO adapter, posterior straight-through path, and reward head can
@@ -371,6 +372,37 @@ reward head reaches 85.2% accuracy (87.7% balanced) with a 0.540 prediction
 gap. The no-reconstruction run remains the sharper wiring control; the next
 sparse-food run keeps reconstruction and stops only the replay-value
 representation gradient.
+
+That matched sparse-food follow-up completed 10,000 interactions and 2,230
+updates at D3's `4e-5` learning rate. It earned 192 reward versus 217 for the
+matched random seed and 216 for the original full-gradient agent. Its final-100
+replay reward gap was -0.000002, policy entropy was 1.3861, and its frozen
+greedy policy earned 0/10,000 while alternating left/right, versus 207 for the
+seed-matched random evaluation. A frozen 500-frame probe does find weak reward
+ordering: ROC AUC 0.659, average precision 0.0365 at a 1.8% positive rate, and
+best balanced accuracy 0.691. The prediction gap is only 0.0000096, however,
+so this is an early ranking signal rather than a calibrated reward model or a
+usable controller. Stopping the interfering gradient is necessary for the
+dense visual control, but is not sufficient at this short D3-rate budget.
+
+The agent-controlled dense follow-up uses the same repaired representation with
+the diagnostic `1e-3` learning rate, zero warmup, and 16 free nats. It undergoes
+a clear phase transition near update 240: reward separation rises from 0.002 to
+0.166 and then to 0.87, while interval return recovers from 24--69/250 to
+246/250. It earns 1,518/3,000 at the old comparison point, versus 1,109 for
+random actions and 570 for the old full-gradient agent, and finishes at
+3,472/5,000. The last 3,000 interactions earn 2,927 reward. Its frozen greedy
+policy scores 1,959/2,000 versus 707 for the exact random control, establishing
+that world-model, actor, and critic learning can work end to end.
+
+This dense result is not yet robust visual navigation. On held-out positions
+randomized after every action, the posterior classifies dense-right at 68% and
+the adapter at 80%, but the model's own reward head has only 0.541 ROC AUC and
+a 0.059 prediction gap. The ordinary task can be solved largely from action
+history and the live validity mask. The next sparse-food diagnostic therefore
+uses the successful `1e-3`, zero-warmup, 16-free-nat regime; it tests whether
+the remaining weak reward ordering can become grounded, sequential control
+rather than extending the low-rate run blindly.
 
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
