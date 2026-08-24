@@ -35,6 +35,11 @@ struct Arguments {
     /// be inferred from the rendered observation rather than action history.
     #[arg(long)]
     randomize_position: bool,
+
+    /// Sample all four actions, including border no-ops, instead of applying
+    /// GridWorld's action mask. This matches unmasked training runs.
+    #[arg(long)]
+    all_actions: bool,
 }
 
 struct Sample {
@@ -47,6 +52,8 @@ struct Sample {
     next_rewarded: Option<usize>,
     prior_reward_prediction: Option<f32>,
     prior_reward_rollout: Vec<(f32, usize)>,
+    invalid_action_probability: Option<f32>,
+    unmasked_argmax_invalid: Option<usize>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -104,6 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
         })
         .collect::<Vec<_>>();
+    let posterior_policy_action_mask = policy_action_mask_metrics(&samples);
     println!(
         "{}",
         serde_json::to_string(&json!({
@@ -112,11 +120,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "samples": arguments.samples,
             "seed": arguments.seed,
             "randomize_position": arguments.randomize_position,
+            "all_actions": arguments.all_actions,
             "feature_dims": feature_dims,
             "representations": representations,
             "reward_head": reward_head,
             "one_step_prior_reward": one_step_prior_reward,
             "open_loop_prior_reward": open_loop_prior_reward,
+            "posterior_policy_action_mask": posterior_policy_action_mask,
         }))?
     );
     Ok(())
@@ -151,12 +161,14 @@ fn collect_perception_samples(
             next_rewarded: None,
             prior_reward_prediction: None,
             prior_reward_rollout: Vec::new(),
+            invalid_action_probability: None,
+            unmasked_argmax_invalid: None,
         });
         if samples.len() == arguments.samples {
             break;
         }
 
-        let action = random_valid_action(&environment, &mut rng);
+        let action = random_action(&environment, arguments.all_actions, &mut rng);
         let mut transition = environment.step(action);
         if arguments.randomize_position {
             environment.randomize_position(&mut transition, &mut position_rng);
@@ -194,7 +206,11 @@ fn collect_latent_samples(
         let mut rollout_actions = Vec::with_capacity(arguments.rollout_horizon);
         let mut rollout_labels = Vec::with_capacity(arguments.rollout_horizon);
         for _ in 0..arguments.rollout_horizon {
-            let action = random_valid_action(&preview_environment, &mut preview_rng);
+            let action = random_action(
+                &preview_environment,
+                arguments.all_actions,
+                &mut preview_rng,
+            );
             let mut transition = preview_environment.step(action);
             if arguments.randomize_position {
                 preview_environment.randomize_position(&mut transition, &mut preview_position_rng);
@@ -214,7 +230,7 @@ fn collect_latent_samples(
             .zip(rollout_labels)
             .collect();
 
-        let action = random_valid_action(&environment, &mut rng);
+        let action = random_action(&environment, arguments.all_actions, &mut rng);
         assert_eq!(action, rollout_actions[0]);
         let mut forced_mask = [false; ACTION_COUNT];
         forced_mask[action] = true;
@@ -251,6 +267,19 @@ fn push_latent_sample(
         latent[deter_dim..].to_vec(),
     ];
     let reward_prediction = agent.posterior_reward_prediction();
+    let probabilities = agent.posterior_action_probabilities(None);
+    let action_mask = environment.action_mask().expect("GridWorld action mask");
+    let invalid_action_probability = probabilities
+        .iter()
+        .zip(&action_mask)
+        .filter_map(|(probability, valid)| (!valid).then_some(*probability))
+        .sum();
+    let unmasked_argmax = probabilities
+        .iter()
+        .enumerate()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .map(|(action, _)| action)
+        .expect("non-empty action distribution");
     samples.push(Sample {
         representations,
         position: y * WIDTH + x,
@@ -261,10 +290,15 @@ fn push_latent_sample(
         next_rewarded: None,
         prior_reward_prediction: None,
         prior_reward_rollout: Vec::new(),
+        invalid_action_probability: Some(invalid_action_probability),
+        unmasked_argmax_invalid: Some(usize::from(!action_mask[unmasked_argmax])),
     });
 }
 
-fn random_valid_action(environment: &GridWorld, rng: &mut StdRng) -> usize {
+fn random_action(environment: &GridWorld, all_actions: bool, rng: &mut StdRng) -> usize {
+    if all_actions {
+        return rng.random_range(0..ACTION_COUNT);
+    }
     let mask = environment.action_mask().expect("GridWorld action mask");
     let valid = mask
         .iter()
@@ -436,6 +470,33 @@ fn rollout_reward_prediction_metrics(
     (!scored.is_empty()).then(|| prediction_metrics(scored))
 }
 
+fn policy_action_mask_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
+    let scored = samples
+        .iter()
+        .filter_map(|sample| {
+            sample
+                .invalid_action_probability
+                .zip(sample.unmasked_argmax_invalid)
+        })
+        .collect::<Vec<_>>();
+    if scored.is_empty() {
+        return None;
+    }
+    let sample_count = scored.len();
+    let invalid_probability_mean = scored
+        .iter()
+        .map(|(probability, _)| probability)
+        .sum::<f32>()
+        / sample_count as f32;
+    let invalid_argmax_count = scored.iter().map(|(_, invalid)| invalid).sum::<usize>();
+    Some(json!({
+        "invalid_probability_mean": invalid_probability_mean,
+        "invalid_argmax_rate": invalid_argmax_count as f32 / sample_count as f32,
+        "invalid_argmax_count": invalid_argmax_count,
+        "sample_count": sample_count,
+    }))
+}
+
 fn prediction_metrics(mut scored: Vec<(f32, usize)>) -> serde_json::Value {
     assert!(!scored.is_empty());
     let mut prediction_sums = [0.0_f32; 2];
@@ -564,6 +625,8 @@ mod tests {
             next_rewarded: None,
             prior_reward_prediction: None,
             prior_reward_rollout: Vec::new(),
+            invalid_action_probability: None,
+            unmasked_argmax_invalid: None,
         }
     }
 
@@ -601,5 +664,31 @@ mod tests {
         let metrics = prior_reward_prediction_metrics(&[negative, positive, trailing]);
         assert_eq!(metrics["class_counts"], json!([1, 1]));
         assert_eq!(metrics["roc_auc"], 1.0);
+    }
+
+    #[test]
+    fn policy_mask_metrics_report_invalid_mass_and_argmaxes() {
+        let mut invalid = sample(0, 0.0);
+        invalid.invalid_action_probability = Some(0.25);
+        invalid.unmasked_argmax_invalid = Some(1);
+        let mut valid = sample(0, 0.0);
+        valid.invalid_action_probability = Some(0.05);
+        valid.unmasked_argmax_invalid = Some(0);
+        let metrics = policy_action_mask_metrics(&[invalid, valid]).unwrap();
+        assert!((metrics["invalid_probability_mean"].as_f64().unwrap() - 0.15).abs() < 1e-6);
+        assert_eq!(metrics["invalid_argmax_rate"], 0.5);
+        assert_eq!(metrics["invalid_argmax_count"], 1);
+    }
+
+    #[test]
+    fn all_action_sampling_includes_border_noops() {
+        let mut environment = GridWorld::new();
+        environment.reset();
+        let mut rng = StdRng::seed_from_u64(7);
+        let mut seen = [false; ACTION_COUNT];
+        for _ in 0..100 {
+            seen[random_action(&environment, true, &mut rng)] = true;
+        }
+        assert!(seen.into_iter().all(|sampled| sampled));
     }
 }
