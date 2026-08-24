@@ -197,6 +197,7 @@ pub struct DreamerCore {
     policy_live: Session,
     deter: Vec<f32>,
     stoch: Vec<f32>,
+    encoded_observation: Vec<f32>,
     feature: Vec<f32>,
     pending_action: Option<usize>,
     active: bool,
@@ -326,6 +327,7 @@ impl DreamerCore {
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
+            encoded_observation: vec![0.0; OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth],
             feature: vec![0.0; config.feature_dim()],
             pending_action: None,
             active: false,
@@ -360,6 +362,19 @@ impl DreamerCore {
 
     pub fn environment_step(&self) -> u64 {
         self.environment_step
+    }
+
+    /// Current posterior feature (`deter` followed by flattened categoricals).
+    ///
+    /// This read-only view is useful for representation probes. It must not be
+    /// persisted as agent state; replay owns the recurrent context it needs.
+    pub fn latent_feature(&self) -> &[f32] {
+        &self.feature
+    }
+
+    /// Current output of the trainable adapter between DINO and the RSSM.
+    pub fn encoded_observation(&self) -> &[f32] {
+        &self.encoded_observation
     }
 
     /// Save model parameters, optimizer state, the EMA critic, and scalar learner
@@ -578,6 +593,8 @@ impl DreamerCore {
             .read_output_by_index(0, &mut self.deter);
         let mut logits = vec![0.0; size.stoch * size.classes];
         self.world_observe_live.read_output_by_index(1, &mut logits);
+        self.world_observe_live
+            .read_output_by_index(3, &mut self.encoded_observation);
         self.stoch = sample_latents(
             &logits,
             1,
@@ -1201,6 +1218,16 @@ impl DreamerAgent {
 
     pub fn core_mut(&mut self) -> &mut DreamerCore {
         &mut self.core
+    }
+
+    /// Current posterior feature for representation diagnostics.
+    pub fn latent_feature(&self) -> &[f32] {
+        self.core.latent_feature()
+    }
+
+    /// Current output of the trainable adapter between DINO and the RSSM.
+    pub fn encoded_observation(&self) -> &[f32] {
+        self.core.encoded_observation()
     }
 
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
