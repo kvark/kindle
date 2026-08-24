@@ -208,15 +208,11 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         let residual = graph.add(reconstruction, negative_target);
         let squared = graph.mul(residual, residual);
         let reconstruction_loss = graph.sum_all(squared);
-        // D3 averages decoder losses over both the batch and every event
-        // dimension. Without the patch/channel divisor this one head would
-        // outweigh the reward, continuation, and KL terms by 3,136x.
-        let elements = batch * patches * OBSERVATION_CHANNELS;
-        reconstruction_losses.push(scale(
-            &mut graph,
-            reconstruction_loss,
-            1.0 / elements as f32,
-        ));
+        // D3's decoder distribution sums every observation event dimension
+        // and the outer learner averages only batch and time. Preserve that
+        // reduction here: averaging the 7x7x64 feature event would suppress
+        // the representation-learning signal by 3,136x.
+        reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / batch as f32));
 
         dynamics_losses.push(categorical_kl(
             &mut graph,
@@ -384,6 +380,26 @@ mod tests {
         let size = config.network();
         let training = build_training_graph(&config, config.world_backprop_length);
         assert_eq!(training.outputs().len(), 7);
+        let grouped_weight = training
+            .nodes()
+            .iter()
+            .find_map(|node| match &node.op {
+                meganeura::graph::Op::Parameter { name }
+                    if name == "world.dynamics.core.dynhid0.weight" =>
+                {
+                    Some(node.ty.shape.as_slice())
+                }
+                _ => None,
+            })
+            .expect("grouped RSSM weight");
+        assert_eq!(
+            grouped_weight,
+            [
+                size.blocks,
+                size.deter / size.blocks + 3 * size.hidden,
+                size.deter / size.blocks,
+            ]
+        );
         let observe = build_observe_graph(&config, 2);
         assert_eq!(
             observe.node(observe.outputs()[0]).ty.shape,

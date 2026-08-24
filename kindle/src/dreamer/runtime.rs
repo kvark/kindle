@@ -62,10 +62,18 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
             } else {
                 1.0
             };
-            let fan_in = shape.first().copied().unwrap_or(size).max(1);
+            let fan_in = d3_fan_in(shape);
             truncated_normal(&name, size, fan_in, output_scale, seed)
         };
         session.set_parameter(&name, &values);
+    }
+}
+
+fn d3_fan_in(shape: &[usize]) -> usize {
+    match shape {
+        [] | [_] => 1,
+        [input, _] => *input,
+        _ => shape[..shape.len() - 1].iter().product(),
     }
 }
 
@@ -147,20 +155,24 @@ pub(crate) fn ema_matching(source: &Session, target: &mut Session, prefix: &str,
     }
 }
 
-pub(crate) fn configure_adam(session: &mut Session, config: &DreamerConfig, learner_step: u64) {
+pub(crate) fn configure_d3_optimizer(
+    session: &mut Session,
+    config: &DreamerConfig,
+    learner_step: u64,
+) {
     let warmup = config.learning_rate_warmup;
     let multiplier = if warmup == 0 {
         1.0
     } else {
         ((learner_step + 1) as f32 / warmup as f32).min(1.0)
     };
-    session.set_adam(
+    session.set_laprop(
         config.learning_rate * multiplier,
-        config.adam_beta1,
-        config.adam_beta2,
-        config.adam_epsilon,
+        config.optimizer_beta1,
+        config.optimizer_beta2,
+        config.optimizer_epsilon,
     );
-    session.set_grad_clip_norm(config.gradient_clip_norm);
+    session.set_adaptive_grad_clip(config.agc, config.agc_pmin);
 }
 
 #[cfg(test)]
@@ -174,5 +186,11 @@ mod tests {
         assert_eq!(left, right);
         let bound = 2.0 * 1.1368 / 10.0;
         assert!(left.iter().all(|value| value.abs() <= bound));
+    }
+
+    #[test]
+    fn grouped_block_linear_uses_upstream_fan_in() {
+        assert_eq!(d3_fan_in(&[8, 96, 64]), 768);
+        assert_eq!(d3_fan_in(&[96, 64]), 96);
     }
 }

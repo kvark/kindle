@@ -1,7 +1,7 @@
 # Kindle: Dreamer baseline and single-life research plan
 
 **Decision date:** 2026-08-23
-**Status:** initial baseline implemented; empirical validation next
+**Status:** baseline implemented; environment-learning validation in progress
 
 ## Executive decision
 
@@ -135,16 +135,15 @@ The behavioral reference is DreamerV3 revision
 | Lambda | 0.95 |
 | Slow value | EMA rate 0.02 |
 | Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
-| Optimizer | Adam, 4e-5, 1,000-step warmup |
+| Optimizer | Per-parameter AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
 | Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
 
-DreamerV3 uses adaptive gradient clipping at 0.3. Meganeura currently exposes
-global norm clipping, so this implementation records an explicit optimizer
-accommodation rather than pretending exact parity. Meganeura also compiles a
-statically unrolled recurrent graph: unrolling all 64 steps made even small
-presets impractical to build. Kindle therefore uses 8-step truncated BPTT,
-accumulates and averages gradients across all eight chunks, and retains the
-full 64-step replay sample and all posterior imagination starts. This is an
+Meganeura implements DreamerV3's optimizer chain directly: per-parameter
+adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
+also compiles a statically unrolled recurrent graph: unrolling all 64 steps made
+even small presets impractical to build. Kindle therefore uses 8-step truncated
+BPTT, accumulates and averages gradients across all eight chunks, and retains
+the full 64-step replay sample and all posterior imagination starts. This is an
 implementation accommodation, not a claimed D3-equivalent gradient path.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
@@ -154,11 +153,10 @@ roughly 2.3 GB. The current backend also trains in f32 rather than bfloat16.
 Both are explicit resource accommodations to revisit with packed/f16 replay
 and backend profiling.
 
-World and behavior parameters live in separate Adam sessions because their
-static graphs execute in stages. Targets are formed before either update and
-the replay-value representation gradient is retained, but global norm clipping
-is applied separately to the two parameter groups rather than to one joint
-gradient.
+World and behavior parameters live in separate optimizer sessions because their
+static graphs execute in stages. Targets are formed before either update, the
+replay-value representation gradient is retained, and D3's adaptive clipping is
+applied independently to each parameter leaf.
 
 The network-size presets `1M` through `200M` mirror upstream. `12M` is the
 default Dreamer model size; DINO's frozen parameters are additional.
@@ -184,8 +182,8 @@ For each learner update:
    boundary prevents behavior gradients from rewriting dynamics.
 6. Reward, continuation, current value, and slow value produce lambda returns,
    score-function policy targets, and distributional value targets.
-7. Actor/value Adam updates run, the slow value network receives its EMA update,
-   and inference sessions receive the new parameters.
+7. Actor/value optimizer updates run, the slow value network receives its EMA
+   update, and inference sessions receive the new parameters.
 
 D3's replay-value loss also sends a representation gradient into the RSSM. To
 retain that path with separate static learner graphs, Kindle evaluates a fixed
@@ -234,8 +232,8 @@ intrinsic reward formula.
 
 A model checkpoint contains:
 
-- world-model parameters and Adam moments;
-- actor/value parameters and Adam moments;
+- world-model parameters and optimizer moments;
+- actor/value parameters and optimizer moments;
 - slow value parameters;
 - full configuration and pinned source/model revisions;
 - fixed DINO projection seed and observation shape;
@@ -292,6 +290,27 @@ Exit gate:
 - one short native run and one Atari data-collection run produce finite metrics;
 - checkpoint restore continues learning after replay refill;
 - model/loss parameter counts and throughput are recorded for each preset.
+
+Validation snapshot (2026-08-24):
+
+- formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
+  full-checkpoint DINO parity pass on the pinned stack;
+- a held-out nearest-centroid probe over 500 GridWorld frames classifies
+  position at 85/100 and food state at 95/100, observing all 25 and 3 classes;
+- the valid-action random control averages 21.073 rewards per 1,000 steps over
+  ten independent 100,000-step seeds;
+- a corrected tiny-model diagnostic at Atari-100k's train ratio ran for 2,000
+  environment steps and 500 learner updates without non-finite values, but its
+  frozen greedy policy scored 0 versus 36 for the matched random seed;
+- raising the diagnostic learning rate from 4e-5 to 1e-3 reduced feature
+  reconstruction loss from roughly 3,900 to 462, but frozen return was still
+  only 13/2,000 and rewarded versus unrewarded predictions did not separate.
+
+These are implementation and failure-localization results, not evidence that
+the baseline learns the environment. Five hundred updates are only about 2% of
+the 25,000 updates in an Atari-100k-ratio run. The next exit gate is a longer
+fresh run using checkpoint format 2, followed by frozen evaluation; online
+training return and falling reconstruction loss are not sufficient.
 
 ### Phase 1 — Externally rewarded baseline
 
@@ -435,14 +454,15 @@ falsifiable exit gate.
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `b2cc25638127c64944f96c2aeea7bf8e5c124691`.
+  `3f2b91d95288d625a7616179604c33bba6472aaf`.
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
-  `a6ae6a73219762f63efb4e5be4550fbc0d301b2f` (the revision selected by
+  `95f5004fb02785a792c883a5312ca5ac37872a75` (the revision selected by
   Meganeura so the shared context types remain unified).
 - DINO model:
   [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
   snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
 
-The intended trajectory is still “Dreamer inside, Kindle outside,” but the
-inside is now a working baseline rather than a placeholder for future design.
+The intended trajectory is still “Dreamer inside, Kindle outside.” The inside
+is now an implemented and testable baseline rather than a placeholder, while
+its task-learning gate remains deliberately open.

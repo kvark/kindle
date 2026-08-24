@@ -120,11 +120,13 @@ impl LinearNorm {
     }
 }
 
-/// D3 BlockLinear expressed as independent small linears. This has the same
-/// block-diagonal function and parameter count as upstream without requiring
-/// a custom grouped-matmul operator in Meganeura.
+/// D3 BlockLinear expressed with one grouped weight and bias parameter.
+/// Individual block views feed ordinary matmuls, preserving upstream's
+/// parameter leaves for initialization, AGC, and checkpointing.
 struct BlockLinear {
-    blocks: Vec<nn::Linear>,
+    weight: NodeId,
+    bias: NodeId,
+    blocks: usize,
     input_per_block: usize,
     output_per_block: usize,
 }
@@ -137,17 +139,12 @@ impl BlockLinear {
         input_per_block: usize,
         output_per_block: usize,
     ) -> Self {
-        let blocks = (0..blocks)
-            .map(|block| {
-                nn::Linear::new(
-                    graph,
-                    &format!("{name}.block{block}"),
-                    input_per_block,
-                    output_per_block,
-                )
-            })
-            .collect();
         Self {
+            weight: graph.parameter(
+                &format!("{name}.weight"),
+                &[blocks, input_per_block, output_per_block],
+            ),
+            bias: graph.parameter(&format!("{name}.bias"), &[blocks * output_per_block]),
             blocks,
             input_per_block,
             output_per_block,
@@ -155,9 +152,10 @@ impl BlockLinear {
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let total_input = self.input_per_block * self.blocks.len();
-        let mut outputs = Vec::with_capacity(self.blocks.len());
-        for (block, linear) in self.blocks.iter().enumerate() {
+        let total_input = self.input_per_block * self.blocks;
+        let weight_size = self.input_per_block * self.output_per_block;
+        let mut outputs = Vec::with_capacity(self.blocks);
+        for block in 0..self.blocks {
             let block_input = slice_columns(
                 graph,
                 input,
@@ -166,7 +164,26 @@ impl BlockLinear {
                 block * self.input_per_block,
                 self.input_per_block,
             );
-            outputs.push(linear.forward(graph, block_input));
+            let weight = slice_columns(
+                graph,
+                self.weight,
+                1,
+                self.blocks * weight_size,
+                block * weight_size,
+                weight_size,
+            );
+            let weight = graph.reshape(weight, &[self.input_per_block, self.output_per_block]);
+            let value = graph.matmul(block_input, weight);
+            let bias = slice_columns(
+                graph,
+                self.bias,
+                1,
+                self.blocks * self.output_per_block,
+                block * self.output_per_block,
+                self.output_per_block,
+            );
+            let bias = graph.reshape(bias, &[self.output_per_block]);
+            outputs.push(graph.bias_add(value, bias));
         }
         let mut joined = outputs[0];
         let mut width = self.output_per_block;
