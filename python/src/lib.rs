@@ -228,6 +228,26 @@ impl PyAgent {
         Ok(self.inner.act(mode, action_mask.as_deref()))
     }
 
+    /// Reward predicted from the current posterior state.
+    ///
+    /// This diagnostic does not change recurrent state or random streams.
+    fn posterior_reward_prediction(&mut self) -> f32 {
+        self.inner.posterior_reward_prediction()
+    }
+
+    /// Reward predicted after applying one action to the current latent state.
+    ///
+    /// This diagnostic does not change recurrent state or random streams.
+    fn prior_reward_prediction(&mut self, action: usize) -> PyResult<f32> {
+        let action_count = self.inner.core().config().action_count;
+        if action >= action_count {
+            return Err(PyValueError::new_err(format!(
+                "action {action} is out of range for {action_count} actions"
+            )));
+        }
+        Ok(self.inner.prior_reward_prediction(action))
+    }
+
     /// Record the frame and rewards produced by the preceding action.
     #[pyo3(signature = (
         frame,

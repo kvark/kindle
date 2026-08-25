@@ -36,3 +36,8 @@ def test_invalid_action_count_is_a_python_error() -> None:
         assert "num_actions must be greater than one" in str(error)
     else:
         raise AssertionError("invalid action count was accepted")
+
+
+def test_agent_exposes_read_only_reward_probes() -> None:
+    assert hasattr(kindle.Agent, "posterior_reward_prediction")
+    assert hasattr(kindle.Agent, "prior_reward_prediction")
