@@ -397,11 +397,13 @@ fn run_dreamer(
         config.loss_scales.value = 0.0;
         config.loss_scales.replay_value = 0.0;
     }
+    let construction_started = Instant::now();
     let mut agent = if let Some(checkpoint) = &arguments.restore {
         DreamerAgent::restore(checkpoint, dino_checkpoint, None)?
     } else {
         DreamerAgent::new(config, dino_checkpoint, None)?
     };
+    let agent_construction_seconds = construction_started.elapsed().as_secs_f64();
 
     let mut output = open_output(arguments)?;
     let starting_environment_step = agent.core().environment_step();
@@ -421,6 +423,7 @@ fn run_dreamer(
             "restored": arguments.restore.is_some(),
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
+            "agent_construction_seconds": agent_construction_seconds,
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
             "all_actions": arguments.all_actions,
