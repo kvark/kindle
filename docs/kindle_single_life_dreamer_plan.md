@@ -591,6 +591,24 @@ Validation snapshot (updated 2026-08-25):
   losses, despite assigning increasingly sharp action preferences. This is the
   strongest evidence for testing full recurrent gradients before actor-loss
   changes;
+- at 50,000 steps, the checkpoint contains 12,229 learner updates and the
+  matched trajectory hash remains unchanged. Posterior and one-step-prior
+  reward-event ROC-AUC improve to 0.943 and 0.937; negative-vs-rest AUC reaches
+  0.953 and 0.943. Their negative-minus-zero gaps widen to -0.30350 and
+  -0.27080, but all three positive events are again predicted below zero
+  events. Final-100 reconstruction loss, raw KL, reward MAE, and policy entropy
+  are 44.39, 2.613, 0.03175, and 1.0488. The exact
+  180,000--200,000-frame online window averages -20.667 over returns -21, -20,
+  -20, -21, -21, and -21, versus -16.25 for D3 seed zero and -13.42 across its
+  five seeds. Online effective-action entropy is 1.266. Frozen sampled
+  evaluation then scores -21.0 on six episodes that all terminate in exactly
+  764 decisions; 64.0% of actions are `LEFT` aliases and 33.7% are `LEFTFIRE`,
+  for only 0.767 effective-action entropy. No positive reward occurs, while
+  negative-event AUC is still 0.977 posterior and 0.971 prior. This definitive
+  50,000-step control failure selects full 64-step recurrent gradients as the
+  next causal run. The current curve remains immutable and continues through
+  its existing 75,000- and 100,000-step gates to measure whether the collapse
+  eventually recovers;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
@@ -600,8 +618,8 @@ Validation snapshot (updated 2026-08-25):
   These phase markers are diagnostic rather than size-matched acceptance gates:
   the active Kindle run is 1M with eight-step truncated BPTT and frozen DINO,
   while the published artifact uses the default D3 model and full recurrence.
-  The 50,000-step checkpoint therefore precedes the controlled BPTT-length or
-  capacity follow-up;
+  The 50,000-step diagnostics select BPTT length before capacity as the first
+  controlled follow-up;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
