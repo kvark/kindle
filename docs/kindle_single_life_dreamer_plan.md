@@ -404,6 +404,20 @@ Validation snapshot (updated 2026-08-25):
   about -0.000017 to -0.000961. Separately, the sampled policy remains
   random-level at -20.6 over five episodes. This is a causal checkpoint-model
   learning curve, but not calibrated reward prediction or learned control yet;
+- at the 20,000-step checkpoint, the same matched trajectory improves again:
+  reward-event-vs-zero ROC-AUC reaches 0.814 posterior and 0.803 one-step
+  prior, with negative-vs-rest AUC of 0.815 and 0.803. The normalized episode
+  and interval records, including every action count and reward, have an
+  identical SHA-256 across the 10,000-, 15,000-, and 20,000-step probes. The
+  posterior negative-minus-zero prediction gap is now -0.02713 and the prior
+  gap is -0.02425. However, all three rare positive targets are still predicted
+  negative, so the event AUC partly reflects prediction magnitude rather than
+  correct reward sign. Over the last 100 updates before the checkpoint,
+  reconstruction loss averages 72.30, raw KL 2.525, replay reward MAE 0.04361,
+  and policy entropy 2.8546. Online control remains random-level: 21 completed
+  episodes average -20.333 with a best return of -18. The curve therefore
+  continues unchanged to the 25,000-step diagnostic rather than treating early
+  negative-event separation as policy progress;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
