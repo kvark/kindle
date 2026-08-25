@@ -53,6 +53,9 @@ Intentional differences are explicit:
 
 - Perception is frozen DINOv3 rather than DreamerV3's learned pixel encoder.
 - Replay reconstructs a fixed compressed DINO feature map rather than pixels.
+- The decoder keeps 64 hidden channels per patch before its 64-channel DINO
+  output. Dreamer's small pixel presets end at only 4–16 channels because they
+  predict RGB; reusing that width imposed a measurable low-rank bottleneck.
 - World-model gradients are truncated every 8 recurrent steps to keep
   Meganeura's static training graph practical. Each update still samples the
   full 16×64 replay batch, averages gradients across all eight chunks, and
@@ -179,8 +182,9 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
 # invalid-action mass, agreement with true/model-predicted rewarding actions,
 # action-conditioned prior reward, and decoded-DINO prediction error against a
 # no-change persistence baseline through horizon 15. The output also reports
-# affine rank floors for the 64-channel DINO patches, exposing decoder widths
-# that cannot represent the observation data even with a perfect latent:
+# affine rank floors for the 64-channel DINO patches and the checkpoint's
+# configured decoder depth, exposing widths that cannot represent the
+# observation data even with a perfect latent:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \

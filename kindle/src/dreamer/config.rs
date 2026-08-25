@@ -1,4 +1,4 @@
-use crate::vision::DinoObservation;
+use crate::vision::{DinoObservation, OBSERVATION_CHANNELS};
 
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -133,6 +133,11 @@ impl Default for LossScales {
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
+    /// Per-patch hidden width immediately before the 64-channel DINO decoder
+    /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
+    /// Zero preserves the preset vision depth for legacy checkpoints.
+    #[serde(default)]
+    pub observation_decoder_depth: usize,
     pub replay_capacity: usize,
     pub batch_size: usize,
     pub batch_length: usize,
@@ -191,6 +196,7 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full DINO replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
             replay_capacity: 100_000,
@@ -255,6 +261,14 @@ impl DreamerConfig {
 
     pub const fn observation_dim(&self) -> usize {
         DinoObservation::LEN
+    }
+
+    pub fn observation_decoder_depth(&self) -> usize {
+        if self.observation_decoder_depth == 0 {
+            self.network().vision_depth
+        } else {
+            self.observation_decoder_depth
+        }
     }
 
     pub fn behavior_learning_rate(&self) -> f32 {
@@ -452,6 +466,8 @@ mod tests {
         assert_eq!(config.behavior_learning_rate(), config.learning_rate);
         assert_eq!(config.actor_learning_starts, 0);
         assert_eq!(config.actor_update_scale(0), 1.0);
+        assert_eq!(config.observation_decoder_depth, OBSERVATION_CHANNELS);
+        assert_eq!(config.observation_decoder_depth(), OBSERVATION_CHANNELS);
         assert!(config.replay_value_gradient);
     }
 
@@ -499,6 +515,7 @@ mod tests {
         object.remove("behavior_learning_rate");
         object.remove("dynamics_free_nats");
         object.remove("actor_learning_starts");
+        object.remove("observation_decoder_depth");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
@@ -507,5 +524,10 @@ mod tests {
         assert_eq!(restored.dynamics_free_nats(), restored.free_nats);
         assert_eq!(restored.actor_learning_starts, 0);
         assert_eq!(restored.actor_update_scale(0), 1.0);
+        assert_eq!(restored.observation_decoder_depth, 0);
+        assert_eq!(
+            restored.observation_decoder_depth(),
+            restored.network().vision_depth
+        );
     }
 }

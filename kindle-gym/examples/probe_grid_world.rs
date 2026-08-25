@@ -62,6 +62,7 @@ struct Sample {
 struct SampleCollection {
     samples: Vec<Sample>,
     dino_patch_statistics: DinoPatchStatistics,
+    observation_decoder_depth: Option<usize>,
 }
 
 /// Sufficient statistics for the best affine low-rank approximation of the
@@ -246,6 +247,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let SampleCollection {
         samples,
         dino_patch_statistics,
+        observation_decoder_depth,
     } = collection;
     let dino_patch_affine_rank_floor = dino_patch_statistics.metrics();
     let mut representations = serde_json::Map::new();
@@ -303,6 +305,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "randomize_position": arguments.randomize_position,
             "all_actions": arguments.all_actions,
             "feature_dims": feature_dims,
+            "observation_decoder_depth": observation_decoder_depth,
             "representations": representations,
             "reward_head": reward_head,
             "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
@@ -369,6 +372,7 @@ fn collect_perception_samples(
     Ok(SampleCollection {
         samples,
         dino_patch_statistics,
+        observation_decoder_depth: None,
     })
 }
 
@@ -377,6 +381,7 @@ fn collect_latent_samples(
     checkpoint: &Path,
 ) -> Result<SampleCollection, Box<dyn std::error::Error>> {
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
+    let observation_decoder_depth = agent.core().config().observation_decoder_depth();
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
@@ -465,6 +470,7 @@ fn collect_latent_samples(
     Ok(SampleCollection {
         samples,
         dino_patch_statistics,
+        observation_decoder_depth: Some(observation_decoder_depth),
     })
 }
 

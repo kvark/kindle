@@ -108,6 +108,9 @@ The baseline therefore applies two frozen operations:
 One replay observation is 7×7×64 = 3,136 floats. The seed and projection are
 part of the architecture contract, not learned parameters. The Dreamer decoder
 reconstructs this compressed DINO feature map rather than raw pixels.
+Its final per-patch hidden width is 64: the 4–16 channels inherited by smaller
+Dreamer pixel presets are appropriate before RGB output but impose an
+unnecessary affine rank limit before a 64-channel feature target.
 
 This is the largest deliberate departure from canonical DreamerV3 and must be
 ablated later against full tokens, alternative pooling, selected intermediate
@@ -613,9 +616,10 @@ the decoder maps only four hidden patch channels into the 64-channel DINO
 target. An affine PCA bound over the same frozen-DINO data gives minimum MSE
 0.01825 at rank four, so this decoder cannot beat persistence even with a
 perfect latent and optimizer. Rank 16 lowers the bound to 0.00337 (97.0% of
-variance explained), and rank 64 removes it. The next visual-model run must
-widen or nonlinearly lift the decoder's final patch representation before
-decoded prediction error can be interpreted as a dynamics result.
+variance explained), and rank 64 removes it. Fresh configurations now use
+depth 64; zero or a missing field retains the legacy preset depth so existing
+checkpoints remain loadable. The next visual-model run uses the widened decoder
+before decoded prediction error is interpreted as a dynamics result.
 
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
