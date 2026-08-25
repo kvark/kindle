@@ -193,6 +193,14 @@ rate as the patched BPTT-16 canary. Thus full recurrence is a viable controlled
 production defaults remain on BPTT-8 so this ongoing baseline stays immutable;
 larger-preset memory and a longer BPTT-64 learning curve remain unproven.
 
+The conditional action-alias fallback is validated on that same graph path. A
+six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
+peaks at 1.88 GiB, and completes the identical 1,120 interactions and nine
+finite learner updates. Its measured run phase is 82.0 seconds at 0.1097
+updates/s. Reducing the action vocabulary therefore introduces no new backend,
+memory, or throughput risk; it remains conditional on the full-action
+BPTT-64 result rather than running ahead of that causal comparison.
+
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
 22.5 KiB in the current f32 representation, so the smaller default is already
