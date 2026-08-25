@@ -376,10 +376,15 @@ Validation snapshot (updated 2026-08-25):
   completed online episodes. A separate 5,000-step sampled-policy probe scored
   -20.2 over five episodes. Its posterior reward means for positive, zero, and
   negative targets were -0.02237, -0.02232, and -0.02233; the chosen-action
-  one-step prior was equally flat. Thus the model is finite and reconstructing
+  one-step prior was equally flat. Ranking is weak but above chance for the 110
+  negative events: posterior negative-vs-rest and any-reward-vs-zero ROC-AUC
+  are 0.638 and 0.646, while the corresponding one-step-prior values are 0.565
+  and 0.571. Only four positive events were observed, so their below-chance
+  ranking is too noisy to interpret. Thus the model is finite and reconstructing
   substantially better (first-100 to final-100 loss 3,977.4 to 86.84), but has
-  not learned reward-conditioned state at 10% of the interaction budget. The
-  curve continues; this is an early marker, not an endpoint comparison;
+  not learned calibrated reward-conditioned state at 10% of the interaction
+  budget. The curve continues; this is an early marker, not an endpoint
+  comparison;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
