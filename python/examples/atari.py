@@ -275,6 +275,12 @@ def main() -> None:
     starting_environment_step = agent.environment_step if agent is not None else 0
     starting_learner_step = agent.learner_step if agent is not None else 0
 
+    def absolute_environment_step(run_step: int) -> int:
+        return starting_environment_step + run_step
+
+    def absolute_environment_frames(run_step: int) -> int:
+        return absolute_environment_step(run_step) * ATARI_ACTION_REPEAT
+
     output = (
         open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
     )
@@ -358,7 +364,8 @@ def main() -> None:
                     {
                         "event": "learner",
                         "run_step": run_step,
-                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
+                        "environment_step": absolute_environment_step(run_step),
+                        "environment_frames": absolute_environment_frames(run_step),
                         "elapsed_seconds": time.perf_counter() - started,
                         "report": report,
                     }
@@ -378,7 +385,8 @@ def main() -> None:
                     {
                         "event": "episode",
                         "run_step": run_step,
-                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
+                        "environment_step": absolute_environment_step(run_step),
+                        "environment_frames": absolute_environment_frames(run_step),
                         "return": episode_return,
                         "length": episode_length,
                         "terminated": terminated,
@@ -396,7 +404,8 @@ def main() -> None:
                     {
                         "event": "interval",
                         "run_step": run_step,
-                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
+                        "environment_step": absolute_environment_step(run_step),
+                        "environment_frames": absolute_environment_frames(run_step),
                         "interval_steps": args.report_every,
                         "reward": interval_reward,
                         "completed_episodes": interval_episodes,
@@ -438,7 +447,9 @@ def main() -> None:
                 "event": "run_end",
                 "environment": args.environment,
                 "steps": args.steps,
-                "environment_frames": args.steps * ATARI_ACTION_REPEAT,
+                "environment_step": absolute_environment_step(args.steps),
+                "environment_frames": absolute_environment_frames(args.steps),
+                "environment_frame_delta": args.steps * ATARI_ACTION_REPEAT,
                 "seed": args.seed,
                 "mode": run_mode,
                 "total_reward": total_reward,
