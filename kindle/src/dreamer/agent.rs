@@ -85,9 +85,18 @@ pub struct WorldMetrics {
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
+    /// Mean prediction for nonzero reward targets. Retained for compatibility
+    /// with sparse tasks whose only nonzero reward is positive.
     pub rewarded_prediction_mean: f32,
+    /// Mean prediction for zero reward targets.
     pub unrewarded_prediction_mean: f32,
     pub rewarded_count: usize,
+    pub positive_reward_prediction_mean: f32,
+    pub zero_reward_prediction_mean: f32,
+    pub negative_reward_prediction_mean: f32,
+    pub positive_reward_count: usize,
+    pub zero_reward_count: usize,
+    pub negative_reward_count: usize,
     pub replay_continuation_prediction_mean: f32,
     pub replay_continuation_target_mean: f32,
     pub replay_continuation_mae: f32,
@@ -148,6 +157,12 @@ struct BehaviorTrainingBatch {
     rewarded_prediction_mean: f32,
     unrewarded_prediction_mean: f32,
     rewarded_count: usize,
+    positive_reward_prediction_mean: f32,
+    zero_reward_prediction_mean: f32,
+    negative_reward_prediction_mean: f32,
+    positive_reward_count: usize,
+    zero_reward_count: usize,
+    negative_reward_count: usize,
     replay_continuation_prediction_mean: f32,
     replay_continuation_target_mean: f32,
     replay_continuation_mae: f32,
@@ -1022,6 +1037,12 @@ impl DreamerCore {
         metrics.rewarded_prediction_mean = behavior.rewarded_prediction_mean;
         metrics.unrewarded_prediction_mean = behavior.unrewarded_prediction_mean;
         metrics.rewarded_count = behavior.rewarded_count;
+        metrics.positive_reward_prediction_mean = behavior.positive_reward_prediction_mean;
+        metrics.zero_reward_prediction_mean = behavior.zero_reward_prediction_mean;
+        metrics.negative_reward_prediction_mean = behavior.negative_reward_prediction_mean;
+        metrics.positive_reward_count = behavior.positive_reward_count;
+        metrics.zero_reward_count = behavior.zero_reward_count;
+        metrics.negative_reward_count = behavior.negative_reward_count;
         metrics.replay_continuation_prediction_mean = behavior.replay_continuation_prediction_mean;
         metrics.replay_continuation_target_mean = behavior.replay_continuation_target_mean;
         metrics.replay_continuation_mae = behavior.replay_continuation_mae;
@@ -1039,6 +1060,9 @@ impl DreamerCore {
             metrics.replay_reward_mae,
             metrics.rewarded_prediction_mean,
             metrics.unrewarded_prediction_mean,
+            metrics.positive_reward_prediction_mean,
+            metrics.zero_reward_prediction_mean,
+            metrics.negative_reward_prediction_mean,
             metrics.replay_continuation_prediction_mean,
             metrics.replay_continuation_target_mean,
             metrics.replay_continuation_mae,
@@ -1225,21 +1249,8 @@ impl DreamerCore {
         let replay_reward_target_mean = mean(&replay_reward_target);
         let replay_reward_mae =
             mean_absolute_error(replay_reward_prediction, &replay_reward_target);
-        let mut rewarded_prediction_sum = 0.0;
-        let mut unrewarded_prediction_sum = 0.0;
-        let mut rewarded_count = 0;
-        let mut unrewarded_count = 0;
-        for (prediction, target) in replay_reward_prediction.iter().zip(&replay_reward_target) {
-            if *target != 0.0 {
-                rewarded_prediction_sum += prediction;
-                rewarded_count += 1;
-            } else {
-                unrewarded_prediction_sum += prediction;
-                unrewarded_count += 1;
-            }
-        }
-        let rewarded_prediction_mean = rewarded_prediction_sum / rewarded_count.max(1) as f32;
-        let unrewarded_prediction_mean = unrewarded_prediction_sum / unrewarded_count.max(1) as f32;
+        let reward_summary =
+            summarize_reward_predictions(replay_reward_prediction, &replay_reward_target);
         let replay_continuation_prediction = &continuations[0];
         let replay_continuation_target = batch
             .flags
@@ -1326,9 +1337,15 @@ impl DreamerCore {
             replay_reward_prediction_mean,
             replay_reward_target_mean,
             replay_reward_mae,
-            rewarded_prediction_mean,
-            unrewarded_prediction_mean,
-            rewarded_count,
+            rewarded_prediction_mean: reward_summary.nonzero_prediction_mean,
+            unrewarded_prediction_mean: reward_summary.zero_prediction_mean,
+            rewarded_count: reward_summary.nonzero_count,
+            positive_reward_prediction_mean: reward_summary.positive_prediction_mean,
+            zero_reward_prediction_mean: reward_summary.zero_prediction_mean,
+            negative_reward_prediction_mean: reward_summary.negative_prediction_mean,
+            positive_reward_count: reward_summary.positive_count,
+            zero_reward_count: reward_summary.zero_count,
+            negative_reward_count: reward_summary.negative_count,
             replay_continuation_prediction_mean: mean(replay_continuation_prediction),
             replay_continuation_target_mean: mean(&replay_continuation_target),
             replay_continuation_mae: mean_absolute_error(
@@ -1756,6 +1773,48 @@ fn mean_absolute_error(left: &[f32], right: &[f32]) -> f32 {
         / left.len() as f32
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+struct RewardPredictionSummary {
+    nonzero_prediction_mean: f32,
+    zero_prediction_mean: f32,
+    positive_prediction_mean: f32,
+    negative_prediction_mean: f32,
+    nonzero_count: usize,
+    zero_count: usize,
+    positive_count: usize,
+    negative_count: usize,
+}
+
+fn summarize_reward_predictions(predictions: &[f32], targets: &[f32]) -> RewardPredictionSummary {
+    assert_eq!(predictions.len(), targets.len());
+    let mut nonzero_sum = 0.0;
+    let mut zero_sum = 0.0;
+    let mut positive_sum = 0.0;
+    let mut negative_sum = 0.0;
+    let mut summary = RewardPredictionSummary::default();
+    for (&prediction, &target) in predictions.iter().zip(targets) {
+        if target > 0.0 {
+            positive_sum += prediction;
+            summary.positive_count += 1;
+            nonzero_sum += prediction;
+            summary.nonzero_count += 1;
+        } else if target < 0.0 {
+            negative_sum += prediction;
+            summary.negative_count += 1;
+            nonzero_sum += prediction;
+            summary.nonzero_count += 1;
+        } else {
+            zero_sum += prediction;
+            summary.zero_count += 1;
+        }
+    }
+    summary.nonzero_prediction_mean = nonzero_sum / summary.nonzero_count.max(1) as f32;
+    summary.zero_prediction_mean = zero_sum / summary.zero_count.max(1) as f32;
+    summary.positive_prediction_mean = positive_sum / summary.positive_count.max(1) as f32;
+    summary.negative_prediction_mean = negative_sum / summary.negative_count.max(1) as f32;
+    summary
+}
+
 fn all_finite(values: &[f32]) -> bool {
     values.iter().all(|value| value.is_finite())
 }
@@ -1773,6 +1832,20 @@ mod tests {
             assert_eq!(row.iter().sum::<f32>(), 1.0);
             assert_eq!(row.iter().filter(|value| **value == 1.0).count(), 1);
         }
+    }
+
+    #[test]
+    fn reward_prediction_summary_separates_reward_signs() {
+        let summary =
+            summarize_reward_predictions(&[-1.0, 0.0, 1.0, 3.0, 7.0], &[-1.0, 0.0, 1.0, 2.0, 0.0]);
+        assert_eq!(summary.nonzero_prediction_mean, 1.0);
+        assert_eq!(summary.zero_prediction_mean, 3.5);
+        assert_eq!(summary.positive_prediction_mean, 2.0);
+        assert_eq!(summary.negative_prediction_mean, -1.0);
+        assert_eq!(summary.nonzero_count, 3);
+        assert_eq!(summary.zero_count, 2);
+        assert_eq!(summary.positive_count, 2);
+        assert_eq!(summary.negative_count, 1);
     }
 
     #[test]

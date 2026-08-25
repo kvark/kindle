@@ -49,6 +49,8 @@
   source's current Atari-100k wrapper and the historical settings behind its
   published score artifact; replay shape, capacity, and world-model BPTT length
   remain explicit for labeled protocol and scaling checks.
+- Added signed replay-reward diagnostics for positive, zero, and negative
+  targets, and included the missing episode index in Atari JSONL events.
 - Added a held-out Pong perception probe that compares raw resized pixels,
   projected 14×14 DINO patches, and the production pooled 7×7 representation
   using independent train, validation, and test emulator seeds. On the first
