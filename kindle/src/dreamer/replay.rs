@@ -282,6 +282,42 @@ mod tests {
     }
 
     #[test]
+    fn replay_preserves_episode_boundaries_and_action_alignment() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 1;
+        config.batch_length = 3;
+        let mut replay = SequenceReplay::new(16);
+
+        replay.push(frame(0, &config), &config);
+        let mut terminal = frame(1, &config);
+        terminal.flags.is_last = true;
+        terminal.flags.is_terminal = true;
+        let terminal_flags = terminal.flags;
+        replay.push(terminal, &config);
+        let mut reset = frame(2, &config);
+        reset.previous_action = None;
+        reset.reward = Reward::default();
+        reset.flags.is_first = true;
+        let reset_flags = reset.flags;
+        replay.push(reset, &config);
+        replay.push(frame(3, &config), &config);
+
+        let mut rng = StdRng::seed_from_u64(1);
+        let batch = replay.sample(&config, &mut rng).unwrap();
+
+        assert_eq!(batch.flags[0][0], terminal_flags);
+        assert_eq!(batch.flags[1][0], reset_flags);
+        assert_eq!(batch.flags[2][0], FrameFlags::default());
+        assert_eq!(batch.previous_actions[0], vec![0.0, 1.0, 0.0]);
+        assert_eq!(batch.previous_actions[1], vec![0.0, 0.0, 0.0]);
+        assert_eq!(batch.previous_actions[2], vec![1.0, 0.0, 0.0]);
+        assert_eq!(
+            [batch.keep(0, 0), batch.keep(1, 0), batch.keep(2, 0)],
+            [1.0, 0.0, 1.0]
+        );
+    }
+
+    #[test]
     fn d3_prefill_counts_complete_sequence_starts() {
         let mut config = DreamerConfig::tiny(3);
         config.batch_size = 2;
