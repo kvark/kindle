@@ -5,6 +5,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import random
 import sys
@@ -26,6 +27,14 @@ ATARI_SCREEN_SIZE = 64
 ATARI_MAX_EPISODE_FRAMES = 108_000
 ATARI_SCORE_WINDOW_START_FRAMES = 350_000
 ATARI_SCORE_WINDOW_END_FRAMES = 400_000
+
+
+def sha256_file(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as source:
+        while chunk := source.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 class DreamerAtariPreprocessing(gym.Wrapper):
@@ -251,6 +260,9 @@ def main() -> None:
             f"environment exposes {action_count} actions but "
             f"{len(action_meanings)} action meanings"
         )
+    dino_checkpoint_sha256 = (
+        None if args.random_policy else sha256_file(args.dino_checkpoint)
+    )
     construction_started = time.perf_counter()
     if args.random_policy:
         agent = None
@@ -376,6 +388,13 @@ def main() -> None:
             "action_meanings": action_meanings,
             "mode": run_mode,
             "output_appended": args.append_output,
+            "dino_model_id": (
+                kindle.DINO_MODEL_ID if agent is not None else None
+            ),
+            "dino_checkpoint_revision": (
+                kindle.DINO_CHECKPOINT_REVISION if agent is not None else None
+            ),
+            "dino_checkpoint_sha256": dino_checkpoint_sha256,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,
