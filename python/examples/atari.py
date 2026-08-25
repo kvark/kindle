@@ -21,7 +21,7 @@ import kindle
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
-MEAN_DINO_RECONSTRUCTION_SCALE = 1.0 / (7 * 7 * 64)
+DINO_RECONSTRUCTION_SCALE = 0.25
 ATARI_ACTION_REPEAT = 4
 ATARI_NOOP_MAX = 30
 ATARI_SCREEN_SIZE = 64
@@ -206,8 +206,8 @@ def main() -> None:
     parser.add_argument(
         "--reconstruction-loss-scale",
         type=float,
-        default=MEAN_DINO_RECONSTRUCTION_SCALE,
-        help="frozen-DINO candidate uses a per-feature mean (1 / 3136)",
+        default=DINO_RECONSTRUCTION_SCALE,
+        help="frozen-DINO scale calibrated to D3's summed-pixel loss magnitude",
     )
     parser.add_argument(
         "--replay-value-gradient",

@@ -244,12 +244,12 @@ reset no-ops, a 108,000-frame episode cap, and Pillow bilinear 64×64 RGB
 resizing). `--atari-protocol published` selects the older all-18-action,
 zero-no-op, 100,000-frame-cap settings associated with D3's released scores.
 Thus 100,000 runner steps correspond to the conventional 400,000-frame Atari
-budget. The model uses the mean feature reconstruction and isolated
-replay-value gradient supported by the frozen-DINO diagnostics. Both adaptations
-remain explicit command-line and Python constructor options. The same runner
-provides deterministic random controls, resumable training, and frozen sampled
-evaluation matching D3; `--greedy` is available as a separate policy
-diagnostic:
+budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
+scale and isolated replay-value gradient supported by the visual diagnostics.
+Both adaptations remain explicit command-line and Python constructor options.
+The same runner provides deterministic random controls, resumable training, and
+frozen sampled evaluation matching D3; `--greedy` is available as a separate
+policy diagnostic:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.
