@@ -129,6 +129,14 @@ def main() -> None:
         default=256.0,
         help="replayed samples per environment step (D3 Atari-100k: 256)",
     )
+    parser.add_argument("--replay-capacity", type=int)
+    parser.add_argument("--batch-size", type=int)
+    parser.add_argument("--batch-length", type=int)
+    parser.add_argument(
+        "--world-backprop-length",
+        type=int,
+        help="truncated world-model BPTT length (D3-equivalent: 64)",
+    )
     parser.add_argument("--learning-rate", type=float)
     parser.add_argument(
         "--actor-learning-starts",
@@ -174,7 +182,12 @@ def main() -> None:
     parser.add_argument(
         "--evaluate",
         action="store_true",
-        help="run the restored policy greedily without learning",
+        help="run the restored sampled policy without learning, matching D3",
+    )
+    parser.add_argument(
+        "--greedy",
+        action="store_true",
+        help="use actor argmax during --evaluate instead of D3's sampling",
     )
     parser.add_argument("--checkpoint")
     parser.add_argument("--output", help="write JSONL metrics to this file")
@@ -190,6 +203,8 @@ def main() -> None:
         parser.error("--evaluate requires --restore")
     if args.evaluate and args.random_action_steps:
         parser.error("--evaluate cannot be combined with --random-action-steps")
+    if args.greedy and not args.evaluate:
+        parser.error("--greedy requires --evaluate")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
 
@@ -222,6 +237,10 @@ def main() -> None:
             model_size=args.model_size,
             observation_decoder_depth=args.observation_decoder_depth,
             seed=args.seed,
+            replay_capacity=args.replay_capacity,
+            batch_size=args.batch_size,
+            batch_length=args.batch_length,
+            world_backprop_length=args.world_backprop_length,
             train_ratio=args.train_ratio,
             learning_rate=args.learning_rate,
             actor_learning_starts=args.actor_learning_starts,
@@ -235,9 +254,12 @@ def main() -> None:
     if agent is not None:
         agent.begin_episode(frame)
     random_actions = random.Random(args.seed ^ 0xA7A2_1000)
-    run_mode = (
-        "random" if args.random_policy else "evaluate" if args.evaluate else "train"
-    )
+    if args.random_policy:
+        run_mode = "random"
+    elif args.evaluate:
+        run_mode = "evaluate_greedy" if args.greedy else "evaluate_sample"
+    else:
+        run_mode = "train"
 
     output = (
         open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
@@ -284,7 +306,7 @@ def main() -> None:
                 assert action == forced_action
             else:
                 assert agent is not None
-                action = agent.act(greedy=args.evaluate)
+                action = agent.act(greedy=args.evaluate and args.greedy)
             frame, reward, terminated, truncated, _ = environment.step(action)
             reward = float(reward)
             terminated = bool(terminated)
