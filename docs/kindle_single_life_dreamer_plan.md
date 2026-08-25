@@ -400,10 +400,13 @@ Here:
 - the balanced KL and free-nat behavior remain DreamerV3-style;
 - reward, continuation, and replay-value losses retain their current roles.
 
-Validation snapshot (2026-08-24):
+Validation snapshot (updated 2026-08-25):
 
 - formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
   full-checkpoint DINO parity pass on the pinned stack;
+- the Gymnasium/ALE adapter discovers 104 bundled games; Pong, Freeway, and
+  Montezuma's Revenge reset to RGB observations, and repeated seeded 100-step
+  Pong random controls produce identical actions and rewards;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
