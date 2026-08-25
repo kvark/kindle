@@ -50,6 +50,10 @@
   source's current Atari-100k wrapper and the historical settings behind its
   published score artifact; replay shape, capacity, and world-model BPTT length
   remain explicit for labeled protocol and scaling checks.
+- Added a strict multi-seed Atari score aggregator that verifies protocol and
+  complete 350k--400k-frame coverage, joins resumed segments, averages episodes
+  within each seed before averaging seeds, and reports deltas to pinned random,
+  size-matched 12M, and published 200M reference scores.
 - Added signed replay-reward diagnostics for positive, zero, and negative
   targets, read-only prior/posterior reward calibration during Atari evaluation,
   tie-aware reward ranking metrics, and the missing episode index in Atari JSONL
