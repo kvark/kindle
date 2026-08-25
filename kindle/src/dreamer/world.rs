@@ -386,6 +386,23 @@ pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     graph
 }
 
+/// Decode posterior or imagined states back into the frozen DINO observation
+/// space. This graph is constructed lazily by diagnostics, so ordinary acting
+/// and learning do not carry another synchronized decoder session.
+pub fn build_decoder_graph(config: &DreamerConfig, batch: usize) -> Graph {
+    config.validate();
+    assert!(batch > 0);
+    let size = config.network();
+    let mut graph = Graph::new();
+    let decoder = ObservationDecoder::new(&mut graph, config);
+    let deter = graph.input("deter", &[batch, size.deter]);
+    let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
+    let state = feature(&mut graph, deter, stoch, batch, config);
+    let observation = decoder.forward(&mut graph, state, batch);
+    graph.set_outputs(vec![observation]);
+    graph
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -440,6 +457,14 @@ mod tests {
             vec![5, config.value_bins]
         );
         assert_eq!(heads.node(heads.outputs()[1]).ty.shape, vec![5, 1]);
+        let decoder = build_decoder_graph(&config, 5);
+        assert_eq!(
+            decoder.node(decoder.outputs()[0]).ty.shape,
+            vec![
+                5 * OBSERVATION_GRID * OBSERVATION_GRID,
+                OBSERVATION_CHANNELS
+            ]
+        );
     }
 
     #[test]
