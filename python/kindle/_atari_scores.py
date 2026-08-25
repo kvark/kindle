@@ -10,32 +10,55 @@ from typing import Iterable
 
 SCORE_WINDOW_FRAMES = (350_000, 400_000)
 
-PUBLISHED_PROFILE = {
-    "action_repeat": 4,
-    "full_action_space": True,
-    "noop_max": 0,
-    "max_episode_frames": 100_000,
+ATARI_PROFILES = {
+    "current": {
+        "action_repeat": 4,
+        "full_action_space": False,
+        "noop_max": 30,
+        "max_episode_frames": 108_000,
+    },
+    "published": {
+        "action_repeat": 4,
+        "full_action_space": True,
+        "noop_max": 0,
+        "max_episode_frames": 100_000,
+    },
+    "published-minimal": {
+        "action_repeat": 4,
+        "full_action_space": False,
+        "noop_max": 0,
+        "max_episode_frames": 100_000,
+    },
 }
 
-# The 12M values are the rounded DreamerV3XS results reported by Wang et al.
-# (ICLR 2025). The released comparison does not include its raw XS curves, so
-# these remain secondary targets. The 200M values come from the pinned D3 score
-# artifact and use the exact score window above.
+# Reference scores are keyed by exact wrapper protocol. The 12M values are the
+# rounded DreamerV3XS results reported by Wang et al. (ICLR 2025); its released
+# comparison omits raw XS curves, so these remain secondary targets. The 200M
+# values come from the pinned D3 score artifact. Both use all 18 actions and
+# therefore stay under `published`; `published-minimal` has only its own
+# three-seed random control.
 ATARI_TARGETS = {
-    "ALE/Pong-v5": {
-        "matched_random_3_seed": -20.622710622710624,
-        "dreamerv3_12m_reported": -10.0,
-        "dreamerv3_200m_published": -4.537,
+    "published": {
+        "ALE/Pong-v5": {
+            "matched_random_3_seed": -20.622710622710624,
+            "dreamerv3_12m_reported": -10.0,
+            "dreamerv3_200m_published": -4.537,
+        },
+        "ALE/PrivateEye-v5": {
+            "matched_random_3_seed": 46.666666666666664,
+            "dreamerv3_12m_reported": 207.0,
+            "dreamerv3_200m_published": 2_895.24,
+        },
+        "ALE/Freeway-v5": {
+            "matched_random_3_seed": 0.0,
+            "dreamerv3_12m_reported": 0.0,
+            "dreamerv3_200m_published": 0.0,
+        },
     },
-    "ALE/PrivateEye-v5": {
-        "matched_random_3_seed": 46.666666666666664,
-        "dreamerv3_12m_reported": 207.0,
-        "dreamerv3_200m_published": 2_895.24,
-    },
-    "ALE/Freeway-v5": {
-        "matched_random_3_seed": 0.0,
-        "dreamerv3_12m_reported": 0.0,
-        "dreamerv3_200m_published": 0.0,
+    "published-minimal": {
+        "ALE/Pong-v5": {
+            "matched_random_3_seed": -20.446031746031746,
+        },
     },
 }
 
@@ -132,13 +155,14 @@ def _validate_segment(
         )
     if tuple(segment["score_window_frames"]) != SCORE_WINDOW_FRAMES:
         raise AtariScoreError(f"{source}: unexpected score window")
-    if expected_protocol == "published":
-        for field, expected in PUBLISHED_PROFILE.items():
-            if segment[field] != expected:
-                raise AtariScoreError(
-                    f"{source}: published profile requires {field}={expected!r}, "
-                    f"found {segment[field]!r}"
-                )
+    if expected_protocol not in ATARI_PROFILES:
+        raise AtariScoreError(f"unknown Atari protocol {expected_protocol!r}")
+    for field, expected in ATARI_PROFILES[expected_protocol].items():
+        if segment[field] != expected:
+            raise AtariScoreError(
+                f"{source}: {expected_protocol} profile requires "
+                f"{field}={expected!r}, found {segment[field]!r}"
+            )
 
 
 def _covers_window(intervals: list[tuple[int, int]]) -> bool:
@@ -204,6 +228,7 @@ def summarize_scores(
         )
 
     environment_summaries = {}
+    protocol_targets = ATARI_TARGETS.get(expected_protocol, {})
     for environment, seeds in sorted(environments.items()):
         seed_mean = sum(seed["score"] for seed in seeds) / len(seeds)
         targets = {
@@ -212,7 +237,7 @@ def summarize_scores(
                 "delta": seed_mean - target,
                 "met": seed_mean >= target,
             }
-            for name, target in ATARI_TARGETS.get(environment, {}).items()
+            for name, target in protocol_targets.get(environment, {}).items()
         }
         environment_summaries[environment] = {
             "seed_results": seeds,

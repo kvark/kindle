@@ -5,7 +5,16 @@ import pytest
 from kindle._atari_scores import AtariScoreError, load_segments, summarize_scores
 
 
-def write_run(path, *, seed, start, end, episodes, protocol="published"):
+def write_run(
+    path,
+    *,
+    seed,
+    start,
+    end,
+    episodes,
+    protocol="published",
+    full_action_space=True,
+):
     records = [
         {
             "event": "run_start",
@@ -14,7 +23,7 @@ def write_run(path, *, seed, start, end, episodes, protocol="published"):
             "mode": "train",
             "atari_protocol": protocol,
             "action_repeat": 4,
-            "full_action_space": True,
+            "full_action_space": full_action_space,
             "noop_max": 0,
             "max_episode_frames": 100_000,
             "score_window_frames": [350_000, 400_000],
@@ -104,3 +113,46 @@ def test_published_profile_mismatch_is_rejected(tmp_path) -> None:
 
     with pytest.raises(AtariScoreError, match="expected 'published' protocol"):
         summarize_scores(load_segments([path]))
+
+
+def test_published_minimal_uses_only_its_matched_random_target(tmp_path) -> None:
+    path = tmp_path / "minimal.jsonl"
+    write_run(
+        path,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -20)],
+        protocol="published-minimal",
+        full_action_space=False,
+    )
+
+    summary = summarize_scores(
+        load_segments([path]), expected_protocol="published-minimal"
+    )
+    targets = summary["environments"]["ALE/Pong-v5"]["targets"]
+    assert targets == {
+        "matched_random_3_seed": {
+            "score": -20.446031746031746,
+            "delta": 0.4460317460317462,
+            "met": True,
+        }
+    }
+
+
+def test_published_minimal_action_metadata_is_enforced(tmp_path) -> None:
+    path = tmp_path / "minimal-all-actions.jsonl"
+    write_run(
+        path,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -20)],
+        protocol="published-minimal",
+        full_action_space=True,
+    )
+
+    with pytest.raises(AtariScoreError, match="requires full_action_space=False"):
+        summarize_scores(
+            load_segments([path]), expected_protocol="published-minimal"
+        )
