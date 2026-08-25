@@ -370,6 +370,16 @@ Validation snapshot (updated 2026-08-25):
   targets average each seed's episode scores over the same recorded-frame
   window, then average five seeds. Pong and Private Eye remain the first dense
   and sparse Atari curves;
+- the first published-protocol 1M Pong curve is running with the calibrated
+  reconstruction scale and D3 representation gradients. At the 10,000-step
+  checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
+  completed online episodes. A separate 5,000-step sampled-policy probe scored
+  -20.2 over five episodes. Its posterior reward means for positive, zero, and
+  negative targets were -0.02237, -0.02232, and -0.02233; the chosen-action
+  one-step prior was equally flat. Thus the model is finite and reconstructing
+  substantially better (first-100 to final-100 loss 3,977.4 to 86.84), but has
+  not learned reward-conditioned state at 10% of the interaction budget. The
+  curve continues; this is an early marker, not an endpoint comparison;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
