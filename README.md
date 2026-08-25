@@ -237,15 +237,18 @@ reports = agent.learn_scheduled()
 ```
 
 See [`python/examples/atari.py`](python/examples/atari.py) for a Gymnasium loop.
-It reproduces D3's Atari-100k preprocessing (minimal actions, repeat 4,
-two-frame max pooling, non-sticky actions, 0--30 reset no-ops, and Pillow
-bilinear 64×64 RGB resizing) and train-ratio setting. Thus 100,000 runner steps
-correspond to the conventional 400,000-frame Atari budget. The model uses the
-mean feature reconstruction and isolated replay-value gradient supported by the
-frozen-DINO diagnostics. Both adaptations remain explicit command-line and
-Python constructor options. The same runner provides deterministic random
-controls, resumable training, and frozen sampled evaluation matching D3;
-`--greedy` is available as a separate policy diagnostic:
+Its default `current` protocol reproduces the pinned D3 Atari-100k preprocessing
+(minimal actions, repeat 4, two-frame max pooling, non-sticky actions, 0--30
+reset no-ops, a 108,000-frame episode cap, and Pillow bilinear 64×64 RGB
+resizing). `--atari-protocol published` selects the older all-18-action,
+zero-no-op, 100,000-frame-cap settings associated with D3's released scores.
+Thus 100,000 runner steps correspond to the conventional 400,000-frame Atari
+budget. The model uses the mean feature reconstruction and isolated
+replay-value gradient supported by the frozen-DINO diagnostics. Both adaptations
+remain explicit command-line and Python constructor options. The same runner
+provides deterministic random controls, resumable training, and frozen sampled
+evaluation matching D3; `--greedy` is available as a separate policy
+diagnostic:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.
@@ -254,17 +257,20 @@ python python/examples/atari.py /unused ALE/Pong-v5 \
 
 # Train and save, then evaluate without learner updates.
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
-  --steps 100000 --checkpoint checkpoints/pong-seed0 \
+  --steps 100000 --atari-protocol published \
+  --checkpoint checkpoints/pong-seed0 \
   --checkpoint-every 10000 \
   --output runs/pong-seed0.jsonl
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
-  --steps 10000 --restore checkpoints/pong-seed0 --evaluate \
+  --steps 10000 --atari-protocol published \
+  --restore checkpoints/pong-seed0 --evaluate \
   --output runs/pong-seed0-eval.jsonl
 ```
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.
-Write each resumed invocation to a new JSONL file; environment-step and frame
+Write each resumed invocation to a new JSONL file, or use `--append-output` with
+`--restore` to preserve one continuous log. Environment-step and frame
 coordinates remain absolute, while the summary also reports segment deltas.
 
 ARC and other games should adapt their native controls into a stable categorical

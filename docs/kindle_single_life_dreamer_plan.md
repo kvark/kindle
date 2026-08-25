@@ -339,7 +339,12 @@ Validation snapshot (updated 2026-08-25):
   committed with D3's 200M default and an older environment profile (all 18
   actions, zero reset no-ops, and a 100,000-frame episode cap),
   so it is a published target rather than a matched 12M/current-protocol
-  control. Pong and Private Eye remain the first dense and sparse Atari curves;
+  control. The runner now exposes those historical wrapper settings as
+  `--atari-protocol published` while retaining the pinned source's newer
+  defaults as `current`; it records the selected profile, action-space mode,
+  no-op range, and episode cap in every run header. Full comparison curves use
+  `published`. Pong and Private Eye remain the first dense and sparse Atari
+  curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
