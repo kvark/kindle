@@ -143,6 +143,8 @@ pub fn build_training_graph(
 
     let scales = config.loss_scales;
     let weighted_policy = scale(&mut graph, policy, scales.policy);
+    let actor_update_scale = graph.input("actor_update_scale", &[1]);
+    let weighted_policy = graph.mul(weighted_policy, actor_update_scale);
     let weighted_value = scale(&mut graph, value, scales.value);
     let weighted_replay = scale(&mut graph, replay_value, scales.replay_value);
     let total = sum(

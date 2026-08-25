@@ -670,6 +670,25 @@ That shared pressure can therefore starve task information despite the explicit
 representation free-nat floor. Scale one and four now bracket the useful
 tradeoff; the next matched control tests a two-times dynamics coefficient.
 
+The two-times coefficient does not recover the missing middle. Its final-100
+raw KL is 0.116, posterior reward gap is 0.426, representation KL is 1.084,
+policy entropy is 0.099, and imagined reward is 0.061. Frozen evaluation earns
+zero by choosing `down` on all 10,000 steps. On the same 5,000-sample held-out
+probe, posterior/one-step-prior AUC are 0.852/0.586; prior AUC stays between
+0.557 and 0.574 through horizons two to five, with small and sometimes negative
+reward gaps. The actor and prior argmax choose an immediately rewarding action
+on 29.7% and 34.5% of eligible states. Scale two is therefore dominated by the
+asymmetric scale-one run, which reaches 0.979/0.630 posterior/prior AUC and 59
+frozen rewards under otherwise identical data and compute. Coefficient tuning
+ends here: scale one is the world-model candidate for the next behavior test.
+
+That next test delays only actor gradients until learner update 1,300, the
+point where the matched scale-one run first develops a grounded replay reward
+gap. The behavior critic continues learning from update zero, so the experiment
+preserves early value fitting and broad imagined-state coverage while asking
+whether policy specialization—not world or critic learning—happened too soon.
+The gate defaults to zero and is diagnostic rather than a baseline change.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,

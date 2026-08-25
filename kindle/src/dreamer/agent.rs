@@ -97,6 +97,8 @@ pub struct WorldMetrics {
 pub struct BehaviorMetrics {
     pub total_loss: f32,
     pub policy_loss: f32,
+    /// One when the policy objective contributes gradients, otherwise zero.
+    pub actor_update_scale: f32,
     pub value_loss: f32,
     pub replay_value_loss: f32,
     /// Mean categorical entropy before trajectory weighting.
@@ -1260,6 +1262,7 @@ impl DreamerCore {
     }
 
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
+        let actor_update_scale = self.config.actor_update_scale(self.learner_step);
         self.behavior_train
             .set_input("imagined_feature", &batch.imagined_feature);
         self.behavior_train
@@ -1278,6 +1281,8 @@ impl DreamerCore {
             .set_input("replay_value_target", &batch.replay_value_target);
         self.behavior_train
             .set_input("replay_slow_target", &batch.replay_slow_target);
+        self.behavior_train
+            .set_input("actor_update_scale", &[actor_update_scale]);
         configure_d3_optimizer(
             &mut self.behavior_train,
             &self.config,
@@ -1289,6 +1294,7 @@ impl DreamerCore {
         let metrics = BehaviorMetrics {
             total_loss: read_scalar(&self.behavior_train, behavior::LOSS_TOTAL),
             policy_loss: read_scalar(&self.behavior_train, behavior::LOSS_POLICY),
+            actor_update_scale,
             value_loss: read_scalar(&self.behavior_train, behavior::LOSS_VALUE),
             replay_value_loss: read_scalar(&self.behavior_train, behavior::LOSS_REPLAY_VALUE),
             policy_entropy: read_scalar(&self.behavior_train, behavior::POLICY_ENTROPY),
@@ -1306,6 +1312,7 @@ impl DreamerCore {
         assert!(all_finite(&[
             metrics.total_loss,
             metrics.policy_loss,
+            metrics.actor_update_scale,
             metrics.value_loss,
             metrics.replay_value_loss,
             metrics.policy_entropy,
@@ -1743,6 +1750,7 @@ mod tests {
         config.batch_length = 8;
         config.world_backprop_length = 4;
         config.dynamics_free_nats = Some(0.0);
+        config.actor_learning_starts = 1;
         config.skip_full_optimize = true;
         let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
@@ -1786,6 +1794,10 @@ mod tests {
             );
         }
 
+        let mut initial_actor_parameter = vec![0.0; 3];
+        agent
+            .behavior_train
+            .read_param("behavior.actor.out.bias", &mut initial_actor_parameter);
         let report = agent.learn().expect("nine frames fill one tiny sequence");
         assert_eq!(report.learner_step, 1);
         assert_eq!(report.replay_len, 9);
@@ -1794,6 +1806,7 @@ mod tests {
         assert!((report.world.dynamics_kl - report.world.raw_kl).abs() < 1e-6);
         assert!(report.world.representation_kl >= agent.config.free_nats);
         assert!(report.behavior.total_loss.is_finite());
+        assert_eq!(report.behavior.actor_update_scale, 0.0);
         assert!(
             (report.world.reward_loss - (agent.config.value_bins as f32).ln()).abs() < 1e-3,
             "uniform initial reward logits should report full cross-entropy"
@@ -1817,6 +1830,7 @@ mod tests {
         agent
             .behavior_train
             .read_param("behavior.actor.out.bias", &mut behavior_parameter);
+        assert_eq!(behavior_parameter, initial_actor_parameter);
         agent
             .behavior_slow
             .read_param("behavior.value.out.bias", &mut slow_parameter);
@@ -1871,13 +1885,9 @@ mod tests {
                 },
             );
         }
-        assert_eq!(
-            restored
-                .learn()
-                .expect("refilled replay learns")
-                .learner_step,
-            2
-        );
+        let report = restored.learn().expect("refilled replay learns");
+        assert_eq!(report.learner_step, 2);
+        assert_eq!(report.behavior.actor_update_scale, 1.0);
         drop(restored);
         fs::remove_dir_all(checkpoint).unwrap();
     }

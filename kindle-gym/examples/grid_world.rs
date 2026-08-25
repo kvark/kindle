@@ -117,6 +117,11 @@ struct Arguments {
     #[arg(long)]
     behavior_learning_rate: Option<f32>,
 
+    /// Delay only actor gradients until this learner update. The behavior
+    /// critic continues training from the first update.
+    #[arg(long)]
+    actor_learning_starts: Option<u64>,
+
     /// Override replayed samples per environment step (Atari-100k uses 256).
     #[arg(long)]
     train_ratio: Option<f32>,
@@ -184,6 +189,7 @@ impl Arguments {
         self.model_size.is_some()
             || self.learning_rate.is_some()
             || self.behavior_learning_rate.is_some()
+            || self.actor_learning_starts.is_some()
             || self.learning_rate_warmup.is_some()
             || self.train_ratio.is_some()
             || self.imagination_length.is_some()
@@ -337,6 +343,9 @@ fn run_dreamer(
     }
     if let Some(learning_rate) = arguments.behavior_learning_rate {
         config.behavior_learning_rate = Some(learning_rate);
+    }
+    if let Some(learner_step) = arguments.actor_learning_starts {
+        config.actor_learning_starts = learner_step;
     }
     if let Some(warmup) = arguments.learning_rate_warmup {
         config.learning_rate_warmup = warmup;
