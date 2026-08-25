@@ -544,6 +544,26 @@ diagnostic therefore separates the two floors: zero free nats for the dynamics
 loss that trains the prior, while retaining one free nat for the representation
 loss that protects posterior information.
 
+That asymmetric-floor run is a real but incomplete improvement. It uses the
+same forced-random trajectory and earns the expected 188 training rewards. Its
+final-100 posterior reward gap is 0.735, raw dynamics KL is 0.335,
+representation KL is 1.127, policy entropy is 0.177, and imagined reward is
+0.069 versus 0.019 in replay. Frozen greedy evaluation earns 59/10,000 by
+selecting `right` 9,356 times and intermittently reaching only the first food.
+A larger 5,000-sample held-out probe, shared by all three floor controls,
+contains 93 rewarded transitions and makes the tradeoff less noisy. Posterior
+and one-step-prior AUC are respectively 1.000/0.544 for global free-one,
+0.740/0.741 for global free-zero, and 0.979/0.630 for asymmetric free nats.
+The asymmetric prior remains above chance through horizon five but its gaps are
+small (0.0055 at one step), while raw KL rises over the final training blocks.
+The actor chooses an immediately rewarding action on 34.5% of eligible states
+and the prior-reward argmax does so on 40.4%, both improvements over global
+free-one but below a reliable controller. Continuous prior gradients therefore
+retain most posterior task information and improve alignment, but are not
+strong enough to track the rapidly changing posterior at the diagnostic
+`1e-3` world rate. The next matched control raises only the dynamics-loss
+coefficient, leaving both free-nat floors, data, rates, and update budget fixed.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,

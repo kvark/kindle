@@ -42,6 +42,11 @@ def main() -> None:
         help="override only the prior/dynamics KL floor",
     )
     parser.add_argument(
+        "--dynamics-loss-scale",
+        type=float,
+        help="override the prior/dynamics KL loss coefficient",
+    )
+    parser.add_argument(
         "--reconstruction-loss-scale",
         type=float,
         default=MEAN_DINO_RECONSTRUCTION_SCALE,
@@ -96,6 +101,7 @@ def main() -> None:
         learning_rate_warmup=args.learning_rate_warmup,
         free_nats=args.free_nats,
         dynamics_free_nats=args.dynamics_free_nats,
+        dynamics_loss_scale=args.dynamics_loss_scale,
         reconstruction_loss_scale=args.reconstruction_loss_scale,
         replay_value_gradient=args.replay_value_gradient,
     )

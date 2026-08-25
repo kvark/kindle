@@ -20,9 +20,10 @@
   optional without changing behavior-critic training.
 - Added an optional behavior-only learning-rate override for controlled sparse
   reward diagnostics; the default remains D3's shared optimizer rate.
-- Added an optional dynamics-only free-nat override and an unclipped KL metric,
-  allowing the prior to train continuously without removing the posterior's
-  D3 information budget. The default remains D3's shared one-nat floor.
+- Added optional dynamics-only free-nat and loss-scale overrides plus an
+  unclipped KL metric, allowing the prior to train continuously or more
+  strongly without removing the posterior's D3 information budget. Defaults
+  retain D3's shared one-nat floor and loss coefficient.
 - Added explicit GridWorld all-action and imagination-length controls plus a
   posterior-policy invalid-action and reward-action alignment probe, so live
   action masks and actor/world disagreement cannot silently confound latent
