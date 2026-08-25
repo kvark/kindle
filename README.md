@@ -297,7 +297,17 @@ python python/examples/probe_atari_reward_perception.py \
   /models/dinov3/model.safetensors ALE/Pong-v5 \
   --atari-protocol published \
   --output runs/pong-dino-reward-probe.json
+
+# Aggregate complete curves by averaging episodes within each seed first.
+python python/examples/summarize_atari_scores.py \
+  runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
+  --output runs/pong-published-summary.json
 ```
+
+The score summarizer rejects incomplete 350k--400k-frame coverage, mixed run
+modes, and wrapper settings that do not match the selected protocol. It supports
+resumed curves split across files and reports deltas to matched random, reported
+12M DreamerV3XS, and pinned 200M DreamerV3 targets where available.
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.

@@ -396,7 +396,10 @@ Validation snapshot (updated 2026-08-25):
   Dreamer as non-sticky/full-action, but the repository does not contain the XS
   run configuration or raw curves, so those rounded scores are supporting
   evidence rather than a protocol-matched acceptance gate. Pong and Private
-  Eye remain the first dense and sparse Atari curves;
+  Eye remain the first dense and sparse Atari curves. The strict JSONL score
+  aggregator reproduces the matched random means exactly, rejects the active
+  curve before `run_end`, and requires complete window coverage and matching
+  wrapper metadata before reporting target deltas;
 - the first published-protocol 1M Pong curve is running with the calibrated
   reconstruction scale and D3 representation gradients. At the 10,000-step
   checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
