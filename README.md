@@ -178,7 +178,9 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
 # The same held-out probes after the RSSM, including the posterior policy's
 # invalid-action mass, agreement with true/model-predicted rewarding actions,
 # action-conditioned prior reward, and decoded-DINO prediction error against a
-# no-change persistence baseline through horizon 15:
+# no-change persistence baseline through horizon 15. The output also reports
+# affine rank floors for the 64-channel DINO patches, exposing decoder widths
+# that cannot represent the observation data even with a perfect latent:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \

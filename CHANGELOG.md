@@ -16,6 +16,8 @@
 - Added a posterior reconstruction floor and horizon-wise open-loop error in
   frozen-DINO feature space, paired with a persistence baseline, so visual
   model quality is measured directly rather than inferred only from rewards.
+- Added affine low-rank reconstruction floors for frozen-DINO patch data, making
+  decoder output-width limits explicit for every Dreamer size preset.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
   controls plus held-out reward-head calibration, ROC-AUC, and average-precision
   metrics to reject action-history shortcuts and score rare rewards fairly.
