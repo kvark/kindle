@@ -24,8 +24,9 @@
 - Added an optional behavior-only learning-rate override for controlled sparse
   reward diagnostics; the default remains D3's shared optimizer rate.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
-  The value and replay-value objectives continue training while policy
-  gradients are disabled, and the D3-compatible default remains ungated.
+  The value and replay-value objectives plus actor optimizer moments continue
+  training while policy parameter updates are disabled, and the D3-compatible
+  default remains ungated.
 - Added optional dynamics-only free-nat and loss-scale overrides plus an
   unclipped KL metric, allowing the prior to train continuously or more
   strongly without removing the posterior's D3 information budget. Defaults

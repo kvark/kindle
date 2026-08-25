@@ -692,12 +692,14 @@ asymmetric scale-one run, which reaches 0.979/0.630 posterior/prior AUC and 59
 frozen rewards under otherwise identical data and compute. Coefficient tuning
 ends here: scale one is the world-model candidate for the next behavior test.
 
-That next test delays only actor gradients until learner update 1,300, the
+That next test delays only actor parameter updates until learner update 1,300, the
 point where the matched scale-one run first develops a grounded replay reward
 gap. The behavior critic continues learning from update zero, so the experiment
 preserves early value fitting and broad imagined-state coverage while asking
 whether policy specialization—not world or critic learning—happened too soon.
-The gate defaults to zero and is diagnostic rather than a baseline change.
+Actor optimizer moments continue tracking gradients while the parameters are
+frozen. The gate defaults to zero and is diagnostic rather than a baseline
+change.
 
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that

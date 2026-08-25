@@ -117,8 +117,8 @@ struct Arguments {
     #[arg(long)]
     behavior_learning_rate: Option<f32>,
 
-    /// Delay only actor gradients until this learner update. The behavior
-    /// critic continues training from the first update.
+    /// Delay only actor parameter updates until this learner update. Actor
+    /// optimizer moments and the behavior critic train from the first update.
     #[arg(long)]
     actor_learning_starts: Option<u64>,
 
