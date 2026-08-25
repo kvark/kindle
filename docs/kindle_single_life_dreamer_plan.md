@@ -183,7 +183,22 @@ posterior imagination starts. The chunk length remains configurable for
 targeted scaling checks. This is an implementation accommodation, not a claimed
 D3-equivalent gradient path.
 
-For the selected game, collect:
+A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
+graph constructs successfully in 4.70 seconds, but its first learner update
+panics in Blade with `descriptor pool count overflow` after peaking at only
+518 MiB host memory. Blade's current upstream head is the revision pinned here.
+Its Vulkan allocator grows descriptor-set pools from 65,536 directly to
+1,048,576 sets, at which point the conservative inline-uniform byte budget
+overflows `u32`. BPTT-16 is therefore blocked by descriptor-pool bookkeeping,
+not demonstrated model-memory pressure; it is not enabled until that backend
+path is fixed and a real learner canary passes.
+
+The default replay capacity is 100,000 frames instead of upstream D3's five
+million. A compressed observation plus 12M-preset recurrent context is about
+22.5 KiB in the current f32 representation, so the smaller default is already
+roughly 2.3 GB. The current backend also trains in f32 rather than bfloat16.
+Both are explicit resource accommodations to revisit with packed/f16 replay
+and backend profiling.
 
 World and behavior parameters live in separate optimizer sessions because their
 static graphs execute in stages. Targets are formed before either update, the
