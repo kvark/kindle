@@ -5,6 +5,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     config = kindle.default_config(18, "12m")
     assert config["action_count"] == 18
     assert config["model_size"] == "size12_m"
+    assert config["observation_decoder_depth"] == 64
     assert config["batch_size"] == 16
     assert config["batch_length"] == 64
     assert config["imagination_length"] == 15

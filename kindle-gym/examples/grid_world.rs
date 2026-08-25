@@ -104,6 +104,11 @@ struct Arguments {
     #[arg(long, value_enum)]
     model_size: Option<Size>,
 
+    /// Override the per-patch hidden width of the 64-channel DINO decoder.
+    /// Zero restores the legacy preset width for checkpoint compatibility.
+    #[arg(long)]
+    observation_decoder_depth: Option<usize>,
+
     /// Override D3's 1,000-update warmup for short diagnostic runs.
     #[arg(long)]
     learning_rate_warmup: Option<u64>,
@@ -187,6 +192,7 @@ struct Arguments {
 impl Arguments {
     fn has_training_config_override(&self) -> bool {
         self.model_size.is_some()
+            || self.observation_decoder_depth.is_some()
             || self.learning_rate.is_some()
             || self.behavior_learning_rate.is_some()
             || self.actor_learning_starts.is_some()
@@ -336,6 +342,9 @@ fn run_dreamer(
     let mut config = DreamerConfig::new(ACTION_COUNT);
     if let Some(model_size) = arguments.model_size {
         config.model_size = model_size.into();
+    }
+    if let Some(depth) = arguments.observation_decoder_depth {
+        config.observation_decoder_depth = depth;
     }
     config.seed = arguments.seed;
     if let Some(learning_rate) = arguments.learning_rate {

@@ -21,6 +21,7 @@ impl PyAgent {
         dino_checkpoint,
         num_actions,
         model_size = "12m",
+        observation_decoder_depth = None,
         seed = 0,
         replay_capacity = None,
         batch_size = None,
@@ -46,6 +47,7 @@ impl PyAgent {
         dino_checkpoint: &str,
         num_actions: usize,
         model_size: &str,
+        observation_decoder_depth: Option<usize>,
         seed: u64,
         replay_capacity: Option<usize>,
         batch_size: Option<usize>,
@@ -69,6 +71,9 @@ impl PyAgent {
         validate_action_count(num_actions)?;
         let mut config = DreamerConfig::new(num_actions);
         config.model_size = parse_model_size(model_size)?;
+        if let Some(value) = observation_decoder_depth {
+            config.observation_decoder_depth = value;
+        }
         config.seed = seed;
         config.intrinsic_reward_scale = intrinsic_reward_scale;
         config.extrinsic_reward_scale = extrinsic_reward_scale;

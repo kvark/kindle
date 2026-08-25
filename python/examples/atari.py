@@ -28,6 +28,11 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--model-size", choices=MODEL_SIZES, default="12m")
     parser.add_argument(
+        "--observation-decoder-depth",
+        type=int,
+        help="per-patch DINO decoder width (default: 64; 0 restores legacy preset width)",
+    )
+    parser.add_argument(
         "--train-ratio",
         type=float,
         default=256.0,
@@ -100,6 +105,7 @@ def main() -> None:
         args.dino_checkpoint,
         action_count,
         model_size=args.model_size,
+        observation_decoder_depth=args.observation_decoder_depth,
         seed=args.seed,
         train_ratio=args.train_ratio,
         learning_rate=args.learning_rate,

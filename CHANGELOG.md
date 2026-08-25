@@ -18,6 +18,9 @@
   model quality is measured directly rather than inferred only from rewards.
 - Added affine low-rank reconstruction floors for frozen-DINO patch data, making
   decoder output-width limits explicit for every Dreamer size preset.
+- Raised fresh configs' per-patch decoder depth to 64, removing the inherited
+  pixel-decoder rank bottleneck while preserving old checkpoints through a
+  legacy-depth fallback for configs that predate the field.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
   controls plus held-out reward-head calibration, ROC-AUC, and average-precision
   metrics to reject action-history shortcuts and score rare rewards fairly.
