@@ -554,6 +554,22 @@ Validation snapshot (updated 2026-08-25):
   progressing while the actor/value path converges toward a repeatable losing
   strategy. The unchanged curve continues to the already scheduled 50,000-step
   discriminator;
+- a paired behavior probe on the same 45,000-step checkpoint evaluates all 18
+  candidate actions at 250 posterior states along the fixed random trajectory.
+  Its one-step diagnostic target is predicted next reward plus predicted
+  continuation times next critic value. The actor is directionally aligned
+  with that target: mean within-state policy/value correlation is 0.426,
+  pairwise ranking accuracy is 0.679, and the policy-weighted target exceeds
+  the uniform-action mean by 0.01987. The greedy action is the one-step maximum
+  on only 22.8% of states, but its mean gap to that maximum is just 0.01349.
+  The critic's mean action span is itself only 0.06474, comprising a 0.01384
+  reward span and 0.05994 next-value span. Its best raw action falls in a
+  `LEFTFIRE` alias on 131/250 states, `LEFT` on 74, `RIGHTFIRE` on 28, and
+  `RIGHT` on 12; the actor's greedy choices concentrate on those same effective
+  groups. Thus the actor largely follows weak, alias-sensitive model values.
+  Together with the native control and source audit, this is evidence against
+  a reversed policy gradient or stale actor synchronization and for improving
+  temporal/value learning before changing the policy objective;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
