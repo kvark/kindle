@@ -710,16 +710,39 @@ constant, not because it tracks the trajectory. Width 64 is still the correct
 capacity control, but a per-feature-mean reconstruction coefficient lets this
 decoder fit observation statistics without forcing useful recurrent state. The
 next exact control retains the width and raises only reconstruction scale to
-0.25, approximately matching D3's initial summed-pixel loss magnitude.
+0.25. The pinned D3 source divides uint8 images by 255, predicts them with a
+sigmoid decoder, and sums squared error over all image event dimensions at
+coefficient one. On Kindle's first matched batch, 0.25 maps the raw DINO loss
+from 4,201.95 to 1,050.49, putting it in the same order as D3's summed pixel
+objective instead of dividing the visual gradient by 3,136.
 
-These are implementation and failure-localization results, not evidence that
-the baseline learns the environment. A pinned-source follow-up also found that
-D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
-and evaluates warmup at optimizer step zero; Kindle had started as soon as one
+That one-variable control solves the integration task. Reward separation first
+exceeds 0.1 at update 681 rather than 1,877 and stays near one. Over its final
+100 updates, reconstruction MSE is 0.00241, reward separation is 0.9988, raw KL
+is 0.778, imagined reward is 0.220, and policy entropy is 0.246. Throughput is
+unchanged at 0.452 updates/s. Frozen greedy evaluation earns exactly 50 rewards
+in each of 50 200-step episodes, or 2,500/10,000, while cycling all four actions;
+the mean-scaled checkpoint earned zero.
+
+The independent 5,000-state probe supports the behavioral result. The complete
+posterior and deterministic state decode position at 90% and 100%, up from
+12.4% and 11.5%. Posterior and one-step-prior reward AUC are both 1.0, with
+prediction gaps 0.998 and 0.991. On all 354 states with an immediately rewarding
+action, both policy and prior argmax select one, and the policy assigns it 96.5%
+probability on average. Open-loop DINO MSE changes only from 0.00239 at horizon
+one to 0.00248 at horizon fifteen while beating persistence on 78.6% to 97.3%
+of samples. This is still a single-seed, forced-random-data diagnostic with a
+gated actor and non-default optimizer settings; the next gate is unforced,
+online-first multi-seed training, not a claim of Atari performance.
+
+The native result demonstrates learning in the integration environment but not
+benchmark-level generality. A pinned-source follow-up also found that D3 waits
+for 1,024 eligible replay items, discards prefill-time train credit, and
+evaluates warmup at optimizer step zero; Kindle had started as soon as one
 sequence existed and used the next step's warmup rate. Those startup semantics
 are now corrected and measured end to end. The tiny network remains a wiring
 preset rather than an upstream size. Online return and falling scalar losses
-are not sufficient.
+alone are not sufficient.
 
 ### Phase 1 — Externally rewarded baseline
 
