@@ -126,9 +126,9 @@ impl Default for LossScales {
 /// Configuration of the D3 baseline.
 ///
 /// Defaults mirror the pinned DreamerV3 configuration where the stack can
-/// express it directly. The default network is the upstream 12M preset: it
-/// is large enough to be representative while keeping rapid local
-/// experiments practical. Larger upstream presets remain one enum change.
+/// express it directly. Kindle uses the upstream 12M preset for rapid local
+/// iteration; the pinned D3 default is 200M. Larger presets remain one enum
+/// change.
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DreamerConfig {
     pub action_count: usize,
