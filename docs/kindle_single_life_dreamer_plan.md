@@ -748,7 +748,10 @@ Validation snapshot (updated 2026-08-25):
   the active Kindle run is 1M with eight-step truncated BPTT and frozen DINO,
   while the published artifact uses the default D3 model and full recurrence.
   The 50,000-step diagnostics select BPTT length before capacity as the first
-  controlled follow-up;
+  controlled follow-up. If full recurrence does not close the control gap, the
+  next run uses `published-minimal`, which keeps the published profile's zero
+  reset no-ops and 100,000-frame episode cap while changing only the redundant
+  all-18-action vocabulary;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
