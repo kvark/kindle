@@ -564,6 +564,21 @@ strong enough to track the rapidly changing posterior at the diagnostic
 `1e-3` world rate. The next matched control raises only the dynamics-loss
 coefficient, leaving both free-nat floors, data, rates, and update budget fixed.
 
+A four-times dynamics coefficient overshoots that balance. Over the final 100
+updates, raw KL falls to 0.0053 and representation KL stays exactly at its
+one-nat floor, but posterior reward separation reaches only 0.038, policy
+entropy is 0.322, and imagined reward is 0.060. Frozen evaluation earns
+96/10,000 by choosing `right` 9,712 times and `down` 288 times: it reliably
+collects only the first food. On the 5,000-sample held-out probe, posterior and
+one-step-prior AUC converge to 0.707/0.706 with positive 0.0233/0.0227 gaps;
+prior AUC remains about 0.70 through horizon five. This is well aligned but
+less informative than even global free-zero's 0.740/0.741 pair. Increasing the
+dynamics coefficient changes the shared recurrent-core gradient mixture even
+though LaProp largely normalizes away a pure scale on prior-only parameters.
+That shared pressure can therefore starve task information despite the explicit
+representation free-nat floor. Scale one and four now bracket the useful
+tradeoff; the next matched control tests a two-times dynamics coefficient.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
