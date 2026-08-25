@@ -305,6 +305,13 @@ python python/examples/probe_atari_dynamics.py \
   --steps 5000 --horizon 15 --stride 50 --atari-protocol published \
   --output runs/pong-open-loop.json
 
+# Compare policy probabilities with paired reward-plus-value predictions for
+# every candidate action at sampled posterior states.
+python python/examples/probe_atari_behavior.py \
+  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
+  --steps 5000 --stride 20 --atari-protocol published \
+  --output runs/pong-behavior.json
+
 # Aggregate complete curves by averaging episodes within each seed first.
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
@@ -321,6 +328,13 @@ proposed action sequence and a deterministic unrelated-action sequence using
 identical categorical random draws. Horizon-wise feature MSE against the actual
 future is reported beside both that action control and a persistence predictor;
 episode-crossing predictions are excluded.
+
+The behavior probe is also read-only. At each sampled posterior it evaluates
+every candidate action with identical latent draws and compares the actor's
+probabilities against `reward(next) + continuation(next) * value(next)`. This
+one-step consistency check does not replace Dreamer's full imagined return, but
+it distinguishes a flat or misleading critic from an actor that ignores its
+own model's local action ranking.
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.

@@ -43,6 +43,12 @@ def test_agent_exposes_read_only_reward_probes() -> None:
     assert hasattr(kindle.Agent, "prior_reward_prediction")
 
 
+def test_agent_exposes_read_only_behavior_probes() -> None:
+    assert hasattr(kindle.Agent, "posterior_value_prediction")
+    assert hasattr(kindle.Agent, "posterior_action_probabilities")
+    assert hasattr(kindle.Agent, "prior_behavior_rollout")
+
+
 def test_agent_exposes_read_only_dynamics_probes() -> None:
     assert hasattr(kindle.Agent, "dino_observation")
     assert hasattr(kindle.Agent, "posterior_observation_prediction")

@@ -168,6 +168,14 @@ struct BehaviorTrainingBatch {
     replay_continuation_mae: f32,
 }
 
+#[derive(Default)]
+struct PriorRollout {
+    rewards: Vec<f32>,
+    continuations: Vec<f32>,
+    values: Vec<f32>,
+    observations: Vec<Vec<f32>>,
+}
+
 /// D3's runner does not call its ratio scheduler before replay is ready. The
 /// first eligible call yields one update; only later environment steps accrue
 /// fractional train-ratio credit.
@@ -257,6 +265,7 @@ pub struct DreamerCore {
     behavior_online: Session,
     behavior_slow: Session,
     policy_live: Session,
+    behavior_value_live: Option<Session>,
     deter: Vec<f32>,
     stoch: Vec<f32>,
     observation: Vec<f32>,
@@ -420,6 +429,7 @@ impl DreamerCore {
             behavior_online,
             behavior_slow,
             policy_live,
+            behavior_value_live: None,
         }
     }
 
@@ -502,6 +512,24 @@ impl DreamerCore {
         decode_rows(&reward_logits, 1, &self.bins)[0]
     }
 
+    /// Value predicted from the current posterior state.
+    ///
+    /// The diagnostic value session is initialized lazily and synchronized
+    /// with the behavior critic without changing recurrent or optimizer state.
+    pub fn posterior_value_prediction(&mut self) -> f32 {
+        self.ensure_behavior_value_live();
+        let value = self
+            .behavior_value_live
+            .as_mut()
+            .expect("diagnostic value session initialized");
+        value.set_input("feature", &self.feature);
+        value.step();
+        value.wait();
+        let mut logits = vec![0.0; self.config.value_bins];
+        value.read_output_by_index(0, &mut logits);
+        decode_rows(&logits, 1, &self.bins)[0]
+    }
+
     /// Reward predicted after one prior transition from the current state.
     ///
     /// This read-only diagnostic clones the categorical RNG, so probing does
@@ -513,20 +541,31 @@ impl DreamerCore {
     /// Open-loop prior reward predictions for a proposed action sequence.
     /// The live posterior state and RNG are left unchanged.
     pub fn prior_reward_rollout(&mut self, actions: &[usize]) -> Vec<f32> {
-        self.prior_rollout(actions, false).0
+        self.prior_rollout(actions, false, false).rewards
     }
 
     /// Open-loop prior rewards and decoded frozen-DINO observations.
     /// This diagnostic leaves the live posterior and all RNG streams intact.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
-        self.prior_rollout(actions, true)
+        let rollout = self.prior_rollout(actions, true, false);
+        (rollout.rewards, rollout.observations)
+    }
+
+    /// Open-loop reward, continuation, and value predictions.
+    ///
+    /// Calling this independently for candidate actions reuses identical
+    /// categorical draws, making one-step counterfactual comparisons paired.
+    pub fn prior_behavior_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+        let rollout = self.prior_rollout(actions, false, true);
+        (rollout.rewards, rollout.continuations, rollout.values)
     }
 
     fn prior_rollout(
         &mut self,
         actions: &[usize],
         decode_observations: bool,
-    ) -> (Vec<f32>, Vec<Vec<f32>>) {
+        decode_behavior: bool,
+    ) -> PriorRollout {
         assert!(self.active, "call begin_episode before probing the prior");
         assert!(!actions.is_empty());
         assert!(
@@ -539,10 +578,21 @@ impl DreamerCore {
         let mut stoch = self.stoch.clone();
         let mut rng =
             DreamerRngs::diagnostic(self.config.seed, self.learner_step, self.environment_step);
-        let mut predictions = Vec::with_capacity(actions.len());
-        let mut observations = Vec::with_capacity(actions.len());
+        let mut rollout = PriorRollout {
+            rewards: Vec::with_capacity(actions.len()),
+            continuations: Vec::with_capacity(if decode_behavior { actions.len() } else { 0 }),
+            values: Vec::with_capacity(if decode_behavior { actions.len() } else { 0 }),
+            observations: Vec::with_capacity(if decode_observations {
+                actions.len()
+            } else {
+                0
+            }),
+        };
         if decode_observations {
             self.ensure_world_decoder_live();
+        }
+        if decode_behavior {
+            self.ensure_behavior_value_live();
         }
         for &action in actions {
             let mut action_one_hot = vec![0.0; self.config.action_count];
@@ -573,7 +623,28 @@ impl DreamerCore {
             let mut reward_logits = vec![0.0; self.config.value_bins];
             self.world_heads_live
                 .read_output_by_index(0, &mut reward_logits);
-            predictions.push(decode_rows(&reward_logits, 1, &self.bins)[0]);
+            rollout
+                .rewards
+                .push(decode_rows(&reward_logits, 1, &self.bins)[0]);
+            if decode_behavior {
+                let mut continuation = [0.0];
+                self.world_heads_live
+                    .read_output_by_index(1, &mut continuation);
+                rollout.continuations.push(continuation[0]);
+                let feature = join_features(&deter, &stoch, 1, &self.config);
+                let value = self
+                    .behavior_value_live
+                    .as_mut()
+                    .expect("diagnostic value session initialized");
+                value.set_input("feature", &feature);
+                value.step();
+                value.wait();
+                let mut value_logits = vec![0.0; self.config.value_bins];
+                value.read_output_by_index(0, &mut value_logits);
+                rollout
+                    .values
+                    .push(decode_rows(&value_logits, 1, &self.bins)[0]);
+            }
             if decode_observations {
                 let decoder = self
                     .world_decoder_live
@@ -585,10 +656,10 @@ impl DreamerCore {
                 decoder.wait();
                 let mut observation = vec![0.0; DinoObservation::LEN];
                 decoder.read_output_by_index(0, &mut observation);
-                observations.push(observation);
+                rollout.observations.push(observation);
             }
         }
-        (predictions, observations)
+        rollout
     }
 
     fn ensure_world_decoder_live(&mut self) {
@@ -599,6 +670,16 @@ impl DreamerCore {
         let mut decoder = build_session(&graph, &self.gpu, Mode::Inference, false);
         sync_matching(&self.world_train, &mut decoder, "world.decoder.");
         self.world_decoder_live = Some(decoder);
+    }
+
+    fn ensure_behavior_value_live(&mut self) {
+        if self.behavior_value_live.is_some() {
+            return;
+        }
+        let graph = behavior::build_value_inference_graph(&self.config, 1);
+        let mut value = build_session(&graph, &self.gpu, Mode::Inference, false);
+        sync_matching(&self.behavior_train, &mut value, "behavior.value.");
+        self.behavior_value_live = Some(value);
     }
 
     /// Save model parameters, optimizer state, the EMA critic, and scalar learner
@@ -1423,6 +1504,9 @@ impl DreamerCore {
             metrics.weighted_advantage_abs_mean,
         ]));
         sync_matching(&self.behavior_train, &mut self.behavior_online, "behavior.");
+        if let Some(value) = &mut self.behavior_value_live {
+            sync_matching(&self.behavior_train, value, "behavior.value.");
+        }
         ema_matching(
             &self.behavior_train,
             &mut self.behavior_slow,
@@ -1508,6 +1592,11 @@ impl DreamerAgent {
         self.core.posterior_reward_prediction()
     }
 
+    /// Value predicted from the current posterior state.
+    pub fn posterior_value_prediction(&mut self) -> f32 {
+        self.core.posterior_value_prediction()
+    }
+
     /// One-step prior reward prediction for a proposed categorical action.
     pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
         self.core.prior_reward_prediction(action)
@@ -1521,6 +1610,11 @@ impl DreamerAgent {
     /// Open-loop prior rewards and decoded frozen-DINO observations.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         self.core.prior_diagnostic_rollout(actions)
+    }
+
+    /// Open-loop reward, continuation, and value predictions.
+    pub fn prior_behavior_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+        self.core.prior_behavior_rollout(actions)
     }
 
     /// Current posterior policy after optional action masking and actor
@@ -1942,6 +2036,7 @@ mod tests {
         agent.begin_episode(observation());
         assert_eq!(agent.dino_observation(), vec![0.0; DinoObservation::LEN]);
         assert!(agent.posterior_reward_prediction().is_finite());
+        assert!(agent.posterior_value_prediction().is_finite());
         let posterior_observation = agent.posterior_observation_prediction();
         assert_eq!(posterior_observation.len(), DinoObservation::LEN);
         assert!(posterior_observation.iter().all(|value| value.is_finite()));
@@ -1953,6 +2048,18 @@ mod tests {
             observation.len() == DinoObservation::LEN
                 && observation.iter().all(|value| value.is_finite())
         }));
+        let (rewards, continuations, values) = agent.prior_behavior_rollout(&[0, 1]);
+        assert_eq!(
+            (rewards.len(), continuations.len(), values.len()),
+            (2, 2, 2)
+        );
+        assert!(
+            rewards
+                .iter()
+                .chain(&continuations)
+                .chain(&values)
+                .all(|value| value.is_finite())
+        );
         let probabilities = agent.posterior_action_probabilities(None);
         assert!((probabilities.iter().sum::<f32>() - 1.0).abs() < 1e-5);
         let masked = agent.posterior_action_probabilities(Some(&[true, false, true]));
