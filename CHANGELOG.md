@@ -28,6 +28,8 @@
   optional without changing behavior-critic training.
 - Added an optional behavior-only learning-rate override for controlled sparse
   reward diagnostics; the default remains D3's shared optimizer rate.
+- Added deterministic Atari random controls, forced-random prefixes, checkpoint
+  restore, and frozen greedy evaluation to the Gymnasium runner.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible

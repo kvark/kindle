@@ -239,7 +239,23 @@ See [`python/examples/atari.py`](python/examples/atari.py) for a Gymnasium loop.
 It uses the D3 Atari-100k interaction and train-ratio settings, while selecting
 the mean feature reconstruction and isolated replay-value gradient supported by
 the frozen-DINO diagnostics. Both adaptations remain explicit command-line and
-Python constructor options.
+Python constructor options. The same runner provides deterministic random
+controls, resumable training, and frozen greedy evaluation:
+
+```bash
+# Environment-only random control; the DINO path is not opened.
+python python/examples/atari.py /unused ALE/Pong-v5 \
+  --steps 100000 --random-policy --output runs/pong-random-seed0.jsonl
+
+# Train and save, then evaluate without learner updates.
+python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
+  --steps 100000 --checkpoint checkpoints/pong-seed0 \
+  --output runs/pong-seed0.jsonl
+python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
+  --steps 10000 --restore checkpoints/pong-seed0 --evaluate \
+  --output runs/pong-seed0-eval.jsonl
+```
+
 ARC and other games should adapt their native controls into a stable categorical
 vocabulary plus an optional validity mask; coordinate-parameterized actions are
 a later extension, not hidden inside this baseline.

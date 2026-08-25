@@ -6,6 +6,7 @@ Usage:
 
 import argparse
 import json
+import random
 import sys
 import time
 
@@ -68,6 +69,23 @@ def main() -> None:
         default=False,
         help="let replay-value loss shape the RSSM (D3 default; disabled by the frozen-DINO candidate)",
     )
+    parser.add_argument(
+        "--random-action-steps",
+        type=int,
+        default=0,
+        help="force uniformly random actions for the first N interactions",
+    )
+    parser.add_argument(
+        "--random-policy",
+        action="store_true",
+        help="run a deterministic random control without constructing Dreamer",
+    )
+    parser.add_argument("--restore", help="restore a Dreamer checkpoint")
+    parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="run the restored policy greedily without learning",
+    )
     parser.add_argument("--checkpoint")
     parser.add_argument("--output", help="write JSONL metrics to this file")
     parser.add_argument("--report-every", type=int, default=1_000)
@@ -76,6 +94,14 @@ def main() -> None:
         parser.error("--steps must be positive")
     if args.report_every <= 0:
         parser.error("--report-every must be positive")
+    if args.random_action_steps < 0:
+        parser.error("--random-action-steps must be non-negative")
+    if args.evaluate and not args.restore:
+        parser.error("--evaluate requires --restore")
+    if args.evaluate and args.random_action_steps:
+        parser.error("--evaluate cannot be combined with --random-action-steps")
+    if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
+        parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
 
     # Match D3's Atari-100k interaction protocol: minimal action set, four
     # repeated frames, max-pooling over the last two, no sticky actions, and
@@ -101,23 +127,35 @@ def main() -> None:
     if getattr(frame, "ndim", 0) != 3:
         raise ValueError("the environment must return H×W×3 RGB observations")
     action_count = int(environment.action_space.n)
-    agent = kindle.Agent(
-        args.dino_checkpoint,
-        action_count,
-        model_size=args.model_size,
-        observation_decoder_depth=args.observation_decoder_depth,
-        seed=args.seed,
-        train_ratio=args.train_ratio,
-        learning_rate=args.learning_rate,
-        actor_learning_starts=args.actor_learning_starts,
-        learning_rate_warmup=args.learning_rate_warmup,
-        free_nats=args.free_nats,
-        dynamics_free_nats=args.dynamics_free_nats,
-        dynamics_loss_scale=args.dynamics_loss_scale,
-        reconstruction_loss_scale=args.reconstruction_loss_scale,
-        replay_value_gradient=args.replay_value_gradient,
-    )
-    agent.begin_episode(frame)
+    if args.random_policy:
+        agent = None
+    elif args.restore:
+        agent = kindle.Agent.restore(args.restore, args.dino_checkpoint)
+        restored_actions = int(agent.config["action_count"])
+        if restored_actions != action_count:
+            raise ValueError(
+                f"checkpoint has {restored_actions} actions, environment has {action_count}"
+            )
+    else:
+        agent = kindle.Agent(
+            args.dino_checkpoint,
+            action_count,
+            model_size=args.model_size,
+            observation_decoder_depth=args.observation_decoder_depth,
+            seed=args.seed,
+            train_ratio=args.train_ratio,
+            learning_rate=args.learning_rate,
+            actor_learning_starts=args.actor_learning_starts,
+            learning_rate_warmup=args.learning_rate_warmup,
+            free_nats=args.free_nats,
+            dynamics_free_nats=args.dynamics_free_nats,
+            dynamics_loss_scale=args.dynamics_loss_scale,
+            reconstruction_loss_scale=args.reconstruction_loss_scale,
+            replay_value_gradient=args.replay_value_gradient,
+        )
+    if agent is not None:
+        agent.begin_episode(frame)
+    random_actions = random.Random(args.seed ^ 0xA7A2_1000)
 
     output = (
         open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
@@ -144,24 +182,32 @@ def main() -> None:
             "steps": args.steps,
             "seed": args.seed,
             "actions": action_count,
-            "config": agent.config,
+            "mode": (
+                "random" if args.random_policy else "evaluate" if args.evaluate else "train"
+            ),
+            "config": agent.config if agent is not None else None,
         }
     )
 
     try:
         for run_step in range(1, args.steps + 1):
-            action = agent.act()
+            if args.random_policy or run_step <= args.random_action_steps:
+                action = random_actions.randrange(action_count)
+            else:
+                assert agent is not None
+                action = agent.act(greedy=args.evaluate)
             frame, reward, terminated, truncated, _ = environment.step(action)
             reward = float(reward)
             terminated = bool(terminated)
             truncated = bool(truncated)
-            agent.observe(
-                frame,
-                extrinsic_reward=reward,
-                terminated=terminated,
-                truncated=truncated,
-            )
-            reports = agent.learn_scheduled()
+            if agent is not None:
+                agent.observe(
+                    frame,
+                    extrinsic_reward=reward,
+                    terminated=terminated,
+                    truncated=truncated,
+                )
+            reports = [] if agent is None or args.evaluate else agent.learn_scheduled()
             interval_updates += len(reports)
             for report in reports:
                 emit(
@@ -194,7 +240,8 @@ def main() -> None:
                     }
                 )
                 frame, _ = environment.reset()
-                agent.begin_episode(frame)
+                if agent is not None:
+                    agent.begin_episode(frame)
                 episode_return = 0.0
                 episode_length = 0
 
@@ -216,7 +263,7 @@ def main() -> None:
                 interval_updates = 0
                 interval_action_counts = [0] * action_count
 
-        if args.checkpoint:
+        if args.checkpoint and agent is not None:
             agent.save_checkpoint(args.checkpoint)
             emit(
                 {
@@ -240,7 +287,7 @@ def main() -> None:
                 "partial_episode_return": episode_return,
                 "partial_episode_length": episode_length,
                 "action_counts": action_counts,
-                "learner_updates": agent.learner_step,
+                "learner_updates": agent.learner_step if agent is not None else 0,
                 "elapsed_seconds": elapsed,
                 "environment_steps_per_second": args.steps / elapsed,
             }
