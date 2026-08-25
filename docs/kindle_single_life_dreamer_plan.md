@@ -187,9 +187,12 @@ are additional. On the current 29 GiB host and 16 GiB GPU, a guarded 200M
 construction probe reached its 22 GiB host-memory ceiling before the training
 graph reached the GPU, so that preset is not runnable without backend or memory
 layout work. The 12M Pong canary constructs in 23.5 seconds, peaks near 6.25 GiB
-of VRAM, and sustains 0.129 learner updates/s. At Atari-100k's train ratio, one
-full 12M seed is therefore roughly 53--55 GPU-hours; it is the practical first
-learning curve rather than an official-size substitute.
+of VRAM, and sustains 0.129 learner updates/s. A repeated published-protocol
+canary with explicit RTX selection and the final D3 gradient path constructs in
+22.5 seconds, uses 6.28 GiB, and sustains 0.122 learner updates/s over 104
+updates. At Atari-100k's train ratio, one full 12M seed is therefore roughly 56
+GPU-hours. The corresponding 1M run sustains about 0.45 updates/s and is a
+14--15-hour scaling curve. Neither is an official-size substitute.
 
 Select one primary metric that reflects the game's actual objective, such as:
 
