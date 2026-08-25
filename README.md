@@ -120,6 +120,10 @@ the prior-training floor while `free_nats` continues to protect posterior
 information; leaving it unset preserves D3's shared one-nat default. The native
 and Python runners also expose the existing dynamics loss coefficient for
 controlled prior-alignment diagnostics.
+`DreamerConfig::actor_learning_starts` can delay policy gradients by a fixed
+number of learner updates without delaying either critic objective. Its default
+is zero, and learner reports expose `behavior.actor_update_scale` so gated and
+active updates are unambiguous in experiment logs.
 
 `kindle-gym` contains one rendered GridWorld for native integration and the
 first measured baseline. It writes JSONL learner, episode, interval, and final
@@ -193,6 +197,10 @@ the actor/critic to collapse before a sparse reward model is grounded.
 exposes GridWorld's border moves as no-ops, matching the full action vocabulary
 used inside imagination; pass the same switch to the random control, frozen
 evaluation, and representation probe.
+`--actor-learning-starts N` is a causal diagnostic for premature actor
+specialization: it holds only actor gradients through the first `N` learner
+updates while the behavior critic learns from the same imagined and replayed
+states.
 
 ## Python use
 

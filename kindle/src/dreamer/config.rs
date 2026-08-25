@@ -162,6 +162,10 @@ pub struct DreamerConfig {
     /// D3's shared world/behavior learning rate.
     #[serde(default)]
     pub behavior_learning_rate: Option<f32>,
+    /// Number of completed learner updates before actor gradients are enabled.
+    /// The behavior critic continues training while the actor is gated.
+    #[serde(default)]
+    pub actor_learning_starts: u64,
     pub learning_rate_warmup: u64,
     pub optimizer_beta1: f32,
     pub optimizer_beta2: f32,
@@ -207,6 +211,7 @@ impl DreamerConfig {
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
             behavior_learning_rate: None,
+            actor_learning_starts: 0,
             learning_rate_warmup: 1_000,
             optimizer_beta1: 0.9,
             optimizer_beta2: 0.999,
@@ -253,6 +258,14 @@ impl DreamerConfig {
 
     pub fn behavior_learning_rate(&self) -> f32 {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
+    }
+
+    pub const fn actor_update_scale(&self, learner_step: u64) -> f32 {
+        if learner_step >= self.actor_learning_starts {
+            1.0
+        } else {
+            0.0
+        }
     }
 
     pub fn dynamics_free_nats(&self) -> f32 {
@@ -436,6 +449,8 @@ mod tests {
         assert_eq!(config.dynamics_free_nats(), config.free_nats);
         assert_eq!(config.behavior_learning_rate, None);
         assert_eq!(config.behavior_learning_rate(), config.learning_rate);
+        assert_eq!(config.actor_learning_starts, 0);
+        assert_eq!(config.actor_update_scale(0), 1.0);
         assert!(config.replay_value_gradient);
     }
 
@@ -467,17 +482,29 @@ mod tests {
     }
 
     #[test]
+    fn actor_learning_gate_has_an_explicit_update_boundary() {
+        let mut config = DreamerConfig::tiny(3);
+        config.actor_learning_starts = 1_300;
+        assert_eq!(config.actor_update_scale(0), 0.0);
+        assert_eq!(config.actor_update_scale(1_299), 0.0);
+        assert_eq!(config.actor_update_scale(1_300), 1.0);
+    }
+
+    #[test]
     fn older_configs_default_new_diagnostic_switches() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
         object.remove("behavior_learning_rate");
         object.remove("dynamics_free_nats");
+        object.remove("actor_learning_starts");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
         assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
         assert_eq!(restored.dynamics_free_nats, None);
         assert_eq!(restored.dynamics_free_nats(), restored.free_nats);
+        assert_eq!(restored.actor_learning_starts, 0);
+        assert_eq!(restored.actor_update_scale(0), 1.0);
     }
 }

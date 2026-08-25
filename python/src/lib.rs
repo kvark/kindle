@@ -31,6 +31,7 @@ impl PyAgent {
         extrinsic_reward_scale = 1.0,
         learning_rate = None,
         behavior_learning_rate = None,
+        actor_learning_starts = None,
         learning_rate_warmup = None,
         free_nats = None,
         dynamics_free_nats = None,
@@ -55,6 +56,7 @@ impl PyAgent {
         extrinsic_reward_scale: f32,
         learning_rate: Option<f32>,
         behavior_learning_rate: Option<f32>,
+        actor_learning_starts: Option<u64>,
         learning_rate_warmup: Option<u64>,
         free_nats: Option<f32>,
         dynamics_free_nats: Option<f32>,
@@ -91,6 +93,9 @@ impl PyAgent {
         }
         if let Some(value) = behavior_learning_rate {
             config.behavior_learning_rate = Some(value);
+        }
+        if let Some(value) = actor_learning_starts {
+            config.actor_learning_starts = value;
         }
         if let Some(value) = learning_rate_warmup {
             config.learning_rate_warmup = value;

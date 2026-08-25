@@ -34,6 +34,11 @@ def main() -> None:
         help="replayed samples per environment step (D3 Atari-100k: 256)",
     )
     parser.add_argument("--learning-rate", type=float)
+    parser.add_argument(
+        "--actor-learning-starts",
+        type=int,
+        help="delay actor gradients for this many learner updates; critic training is unchanged",
+    )
     parser.add_argument("--learning-rate-warmup", type=int)
     parser.add_argument("--free-nats", type=float)
     parser.add_argument(
@@ -98,6 +103,7 @@ def main() -> None:
         seed=args.seed,
         train_ratio=args.train_ratio,
         learning_rate=args.learning_rate,
+        actor_learning_starts=args.actor_learning_starts,
         learning_rate_warmup=args.learning_rate_warmup,
         free_nats=args.free_nats,
         dynamics_free_nats=args.dynamics_free_nats,
