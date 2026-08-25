@@ -10,7 +10,7 @@ import json
 import random
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import ale_py
 import gymnasium as gym
@@ -18,6 +18,7 @@ import numpy as np
 from PIL import Image
 
 import kindle
+from kindle._reward_probe import RewardProbe
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
@@ -28,91 +29,6 @@ ATARI_SCREEN_SIZE = 64
 ATARI_MAX_EPISODE_FRAMES = 108_000
 ATARI_SCORE_WINDOW_START_FRAMES = 350_000
 ATARI_SCORE_WINDOW_END_FRAMES = 400_000
-
-
-@dataclass
-class RewardProbeStats:
-    count: int = 0
-    target_sum: float = 0.0
-    one_step_prior_prediction_sum: float = 0.0
-    posterior_prediction_sum: float = 0.0
-    one_step_prior_absolute_error_sum: float = 0.0
-    posterior_absolute_error_sum: float = 0.0
-
-    def record(
-        self,
-        target: float,
-        one_step_prior_prediction: float,
-        posterior_prediction: float,
-    ) -> None:
-        self.count += 1
-        self.target_sum += target
-        self.one_step_prior_prediction_sum += one_step_prior_prediction
-        self.posterior_prediction_sum += posterior_prediction
-        self.one_step_prior_absolute_error_sum += abs(
-            one_step_prior_prediction - target
-        )
-        self.posterior_absolute_error_sum += abs(posterior_prediction - target)
-
-    def summary(self) -> dict[str, object]:
-        if not self.count:
-            return {
-                "count": 0,
-                "target_mean": None,
-                "one_step_prior_prediction_mean": None,
-                "posterior_prediction_mean": None,
-                "one_step_prior_mae": None,
-                "posterior_mae": None,
-            }
-        count = float(self.count)
-        return {
-            "count": self.count,
-            "target_mean": self.target_sum / count,
-            "one_step_prior_prediction_mean": (
-                self.one_step_prior_prediction_sum / count
-            ),
-            "posterior_prediction_mean": self.posterior_prediction_sum / count,
-            "one_step_prior_mae": (
-                self.one_step_prior_absolute_error_sum / count
-            ),
-            "posterior_mae": self.posterior_absolute_error_sum / count,
-        }
-
-
-@dataclass
-class RewardProbe:
-    overall: RewardProbeStats = field(default_factory=RewardProbeStats)
-    by_reward_sign: dict[str, RewardProbeStats] = field(
-        default_factory=lambda: {
-            "positive": RewardProbeStats(),
-            "zero": RewardProbeStats(),
-            "negative": RewardProbeStats(),
-        }
-    )
-
-    def record(
-        self,
-        target: float,
-        one_step_prior_prediction: float,
-        posterior_prediction: float,
-    ) -> None:
-        sign = "positive" if target > 0 else "negative" if target < 0 else "zero"
-        self.overall.record(target, one_step_prior_prediction, posterior_prediction)
-        self.by_reward_sign[sign].record(
-            target, one_step_prior_prediction, posterior_prediction
-        )
-
-    def summary(self) -> dict[str, object]:
-        overall = self.overall.summary()
-        return {
-            "samples": self.overall.count,
-            "one_step_prior_mae": overall["one_step_prior_mae"],
-            "posterior_mae": overall["posterior_mae"],
-            "by_reward_sign": {
-                sign: stats.summary()
-                for sign, stats in self.by_reward_sign.items()
-            },
-        }
 
 
 @dataclass(frozen=True)
