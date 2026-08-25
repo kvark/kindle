@@ -510,6 +510,7 @@ def main() -> None:
                 emit(
                     {
                         "event": "episode",
+                        "episode": episodes,
                         "run_step": run_step,
                         "environment_step": absolute_environment_step(run_step),
                         "environment_frames": absolute_environment_frames(run_step),

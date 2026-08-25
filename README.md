@@ -132,7 +132,10 @@ Changing learner throughput or imagination length therefore does not silently
 advance the environment policy or replay RNG.
 
 Learner reports expose both D3's floor-clipped dynamics/representation losses
-and `raw_kl`. `DreamerConfig::dynamics_free_nats` can optionally override only
+and `raw_kl`. Replay reward diagnostics retain the sparse-task nonzero/zero
+summary and also report separate positive, zero, and negative prediction means
+and target counts for signed-reward games. `DreamerConfig::dynamics_free_nats`
+can optionally override only
 the prior-training floor while `free_nats` continues to protect posterior
 information; leaving it unset preserves D3's shared one-nat default. The native
 and Python runners also expose the existing dynamics loss coefficient for
