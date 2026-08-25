@@ -638,13 +638,37 @@ Validation snapshot (updated 2026-08-25):
   model therefore predicts action-conditioned visual change over imagination's
   full horizon; short-term precision is imperfect, but an action-blind prior is
   not the explanation for the failed endpoint policy;
-- this early lack of control matches the pinned D3 Pong artifact rather than
-  putting Kindle behind it. D3's five-seed episode means in 20,000-frame
-  windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
-  -20.37, -20.93, -20.80, and -20.63. They first improve to -19.80 at 120,000
-  frames (30,000 agent steps) and -18.17 at 140,000 frames (35,000 agent
-  steps). Kindle's matched reward probes therefore include 30,000 and 35,000
-  steps in addition to the coarser 25,000/50,000/75,000/100,000 milestones;
+- at 45,000 steps, the immutable checkpoint contains 10,979 learner updates
+  and the matched trajectory hash remains identical through all eight probes.
+  Posterior and one-step-prior reward-event ROC-AUC rise to 0.927 and 0.921;
+  negative-vs-rest AUC reaches 0.934 and 0.926. The posterior
+  negative-minus-zero prediction gap widens to -0.26386, while the prior gap
+  stays near -0.22628. The prior now ranks the three positive events slightly
+  above zero on average, but both means remain negative and the posterior still
+  reverses that ordering. Final-100 reconstruction loss, raw KL, reward MAE,
+  and policy entropy are 48.35, 2.561, 0.03307, and 1.3474. In the exact
+  160,000--180,000-frame online window, returns of -20, -21, -20, -19, and -20
+  average -20.0, versus -18.0 for D3 seed zero and -14.97 across its five
+  seeds. Online effective-action entropy recovers to 1.293, with 35.7%
+  `RIGHTFIRE`, 30.8% `LEFTFIRE`, and 27.9% `LEFT`, but the broader action mix
+  does not improve return. Frozen sampled evaluation is worse: all six
+  completed episodes score -21.0, five terminate in exactly 764 decisions,
+  and no positive reward occurs. That policy's negative-event AUC is still
+  0.968 posterior and 0.961 prior. Reward-state learning is therefore
+  progressing while the actor/value path converges toward a repeatable losing
+  strategy. The unchanged curve continues to the already scheduled 50,000-step
+  discriminator;
+- the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
+  rather than merely matching its random early regime. D3's five-seed episode
+  means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
+  100,000, 120,000, 140,000, 160,000, and 180,000 emulator frames are -20.40,
+  -20.37, -20.93, -20.80, -20.63, -19.80, -18.17, -15.13, and -14.97
+  respectively.
+  These phase markers are diagnostic rather than size-matched acceptance gates:
+  the active Kindle run is 1M with eight-step truncated BPTT and frozen DINO,
+  while the published artifact uses the default D3 model and full recurrence.
+  The 50,000-step checkpoint therefore precedes the controlled BPTT-length or
+  capacity follow-up;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
