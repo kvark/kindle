@@ -7,7 +7,9 @@
 - Preserved length-64 replay updates while accumulating world-model gradients
   over 8-step truncated-BPTT chunks for practical static graph compilation.
 - Matched DreamerV3's feature-loss reduction, per-parameter optimizer chain,
-  1,024-item replay prefill gate, and zero-indexed learning-rate warmup.
+  online-first replay queue, 1,024-item replay prefill gate, and zero-indexed
+  learning-rate warmup. Fresh non-overlapping sequences are consumed FIFO
+  before uniform replay fallback.
 - Added a native frozen DINOv3 ViT-S/16 frontend with numerical parity coverage.
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and

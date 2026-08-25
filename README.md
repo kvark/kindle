@@ -38,7 +38,8 @@ frozen DINOv3 ViT-S/16 patch tokens
 The learning algorithm follows DreamerV3 at pinned upstream revision
 `e3f02248693a79dc8b0ebd62c93683888ddaccfe`:
 
-- uniform online sequence replay with batch 16, length 64, and a 1,024-item
+- online-first sequence replay that consumes fresh non-overlapping sequences
+  FIFO before uniform fallback, with batch 16, length 64, and a 1,024-item
   learner prefill gate;
 - block-recurrent deterministic state plus 32 categorical stochastic variables;
 - posterior/prior KL balancing, 1 free nat, and 1% uniform mixing;
