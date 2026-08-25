@@ -281,6 +281,15 @@ def main() -> None:
         run_mode = "train"
     starting_environment_step = agent.environment_step if agent is not None else 0
     starting_learner_step = agent.learner_step if agent is not None else 0
+    if agent is None:
+        trainable_parameters = None
+    else:
+        world_parameters, behavior_parameters = agent.trainable_parameter_counts
+        trainable_parameters = {
+            "world": world_parameters,
+            "behavior": behavior_parameters,
+            "total": world_parameters + behavior_parameters,
+        }
 
     def absolute_environment_step(run_step: int) -> int:
         return starting_environment_step + run_step
@@ -336,6 +345,7 @@ def main() -> None:
             "mode": run_mode,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
+            "trainable_parameters": trainable_parameters,
             "config": agent.config if agent is not None else None,
         }
     )
