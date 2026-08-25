@@ -671,6 +671,15 @@ Validation snapshot (updated 2026-08-25):
   `LEFTFIRE` alias on 131/250 states, `LEFT` on 74, `RIGHTFIRE` on 28, and
   `RIGHT` on 12; the actor's greedy choices concentrate on those same effective
   groups. Thus the actor largely follows weak, alias-sensitive model values.
+  On the identical first 1,000 trajectory decisions, 250-state probes at
+  10,000, 25,000, 35,000, 40,000, and 45,000 training checkpoints show the
+  one-step action span growing from 0.00007 through 0.01236, 0.03240, 0.04756,
+  and 0.06428, while policy/value correlation changes from 0.111 through 0.246,
+  0.233, 0.284, and 0.402. Alignment strengthens while game control fails.
+  At 45,000 steps, mean values for the three environment-equivalent
+  `LEFTFIRE` aliases alone differ by 0.02106, about one third of the entire raw
+  action span. The critic is learning increasingly sharp but partly spurious
+  action distinctions rather than staying flat.
   Together with the native control and source audit, this is evidence against
   a reversed policy gradient or stale actor synchronization and for improving
   temporal/value learning before changing the policy objective;
