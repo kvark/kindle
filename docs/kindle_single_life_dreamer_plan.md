@@ -435,8 +435,23 @@ Validation snapshot (updated 2026-08-25):
   probe likewise averages -20.667 over six episodes while retaining 2.871
   action entropy out of a 2.890 maximum. The separate argmax diagnostic chooses
   `UPRIGHT` for all 2,000 steps and scores -21 on both completed episodes. The
-  curve therefore continues unchanged to the 25,000-step diagnostic rather
+  curve therefore continued unchanged to the 25,000-step diagnostic rather
   than treating early negative-event separation as policy progress;
+- at 25,000 steps, matched reward learning remains monotonic. Posterior and
+  one-step-prior reward-event ROC-AUC reach 0.869 and 0.850, while their
+  negative-vs-rest AUCs reach 0.870 and 0.852. Posterior negative-minus-zero
+  separation grows to -0.07855 and prior separation to -0.06615. Positive
+  targets now rank between zero and negative targets, but all three are still
+  predicted negative, so correct reward sign remains unproven. The normalized
+  trajectory hash is identical across all four 10,000--25,000-step probes.
+  Final-100 reconstruction, raw KL, reward MAE, and policy entropy are 62.40,
+  2.547, 0.04081, and 2.5429. In the corresponding 80,000--100,000
+  emulator-frame window, Kindle averages -20.857 over seven online episodes
+  versus -20.833 for pinned D3 seed zero. Kindle's repeated losses last 764
+  decisions; the D3 artifact contains long stretches of the same -21 return
+  every 765 decisions in this phase. Frozen sampled evaluation remains
+  random-level at -20.667 over six episodes. The curve continues unchanged to
+  the 30,000- and 35,000-step behavior discriminators;
 - this early lack of control matches the pinned D3 Pong artifact rather than
   putting Kindle behind it. D3's five-seed episode means in 20,000-frame
   windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
