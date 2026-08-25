@@ -1,4 +1,4 @@
-//! Uniform online sequence replay with D3-aligned frame semantics.
+//! Online-first sequence replay with D3-aligned frame semantics.
 
 use std::collections::VecDeque;
 
@@ -68,6 +68,8 @@ impl ReplayFrame {
 pub struct SequenceReplay {
     capacity: usize,
     frames: VecDeque<ReplayFrame>,
+    total_frames: u64,
+    fresh_starts: VecDeque<u64>,
 }
 
 impl SequenceReplay {
@@ -76,6 +78,8 @@ impl SequenceReplay {
         Self {
             capacity,
             frames: VecDeque::with_capacity(capacity.min(65_536)),
+            total_frames: 0,
+            fresh_starts: VecDeque::new(),
         }
     }
 
@@ -84,7 +88,7 @@ impl SequenceReplay {
     }
 
     /// Number of complete context-plus-training sequences currently eligible
-    /// for uniform sampling. Upstream D3 gates scheduled training on at least
+    /// for sampling. Upstream D3 gates scheduled training on at least
     /// `batch_size * batch_length` such replay items.
     pub fn valid_sequence_count(&self, config: &DreamerConfig) -> usize {
         let required = config.replay_context + config.batch_length;
@@ -97,9 +101,30 @@ impl SequenceReplay {
             self.frames.pop_front();
         }
         self.frames.push_back(frame);
+
+        self.total_frames = self
+            .total_frames
+            .checked_add(1)
+            .expect("replay frame index overflowed");
+        let required = (config.replay_context + config.batch_length) as u64;
+        // D3's online counter is checked before it is incremented, so it skips
+        // start zero and queues fresh non-overlapping starts 1, 1 + required,
+        // and so on. Learner batches drain this queue before sampling uniformly.
+        if self.total_frames > required && (self.total_frames - 1).is_multiple_of(required) {
+            self.fresh_starts.push_back(self.total_frames - required);
+        }
+
+        let oldest_frame = self.total_frames - self.frames.len() as u64;
+        while self
+            .fresh_starts
+            .front()
+            .is_some_and(|start| *start < oldest_frame)
+        {
+            self.fresh_starts.pop_front();
+        }
     }
 
-    pub fn sample(&self, config: &DreamerConfig, rng: &mut impl Rng) -> Option<SequenceBatch> {
+    pub fn sample(&mut self, config: &DreamerConfig, rng: &mut impl Rng) -> Option<SequenceBatch> {
         let required = config.replay_context + config.batch_length;
         if self.frames.len() < required {
             return None;
@@ -122,8 +147,16 @@ impl SequenceReplay {
         let mut frame_indices = (0..length).map(|_| vec![0; batch]).collect::<Vec<_>>();
 
         let last_start = self.frames.len() - required;
+        let oldest_frame = self.total_frames - self.frames.len() as u64;
         for row in 0..batch {
-            let start = rng.random_range(0..=last_start);
+            let start = if let Some(fresh_start) = self.fresh_starts.pop_front() {
+                let local_start = usize::try_from(fresh_start - oldest_frame)
+                    .expect("fresh replay start does not fit usize");
+                assert!(local_start <= last_start, "fresh replay start is invalid");
+                local_start
+            } else {
+                rng.random_range(0..=last_start)
+            };
             let context = &self.frames[start + config.replay_context - 1];
             initial_deter[row * size.deter..(row + 1) * size.deter].copy_from_slice(&context.deter);
             let stoch_width = size.stoch * size.classes;
@@ -260,6 +293,37 @@ mod tests {
         assert_eq!(replay.valid_sequence_count(&config), 7);
         replay.push(frame(11, &config), &config);
         assert_eq!(replay.valid_sequence_count(&config), 8);
+    }
+
+    #[test]
+    fn d3_online_queue_precedes_uniform_sampling() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = 3;
+        let mut replay = SequenceReplay::new(16);
+        for index in 0..9 {
+            replay.push(frame(index, &config), &config);
+        }
+
+        let mut rng = StdRng::seed_from_u64(1);
+        let batch = replay.sample(&config, &mut rng).unwrap();
+        assert_eq!(batch.frame_indices[0], vec![2, 6]);
+    }
+
+    #[test]
+    fn evicted_online_sequences_are_pruned() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 1;
+        config.batch_length = 3;
+        let mut replay = SequenceReplay::new(4);
+        for index in 0..9 {
+            replay.push(frame(index, &config), &config);
+        }
+
+        let mut rng = StdRng::seed_from_u64(1);
+        let batch = replay.sample(&config, &mut rng).unwrap();
+        assert_eq!(batch.frame_indices[0], vec![1]);
+        assert_eq!(batch.observations[0][0], 6.0);
     }
 
     #[test]

@@ -132,7 +132,7 @@ imagined steps, wall-clock time, and GPU utilization are all reported.
 
 | Area | Baseline |
 |---|---|
-| Replay | Uniform online replay, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
+| Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
 | World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
 | Train ratio | 32 replayed samples per real environment step |
 | State | Block-recurrent deterministic state plus 32 categorical variables |
@@ -188,7 +188,8 @@ must remain primary.
 
 A useful normalized score is:
 
-1. Uniform replay samples contiguous sequences with one preceding context frame.
+1. Replay drains D3's FIFO of fresh non-overlapping sequences, then samples
+   contiguous sequences uniformly; every sample has one preceding context frame.
 2. An inference pass samples hard posterior categoricals.
 3. A training pass inserts those samples with a straight-through estimator and
    updates reconstruction, reward, continuation, and balanced KL losses.
@@ -204,6 +205,13 @@ Scheduled optimization begins after replay contains 1,024 complete sequence
 starts. As in D3's runner, prefill interactions do not accumulate a learner
 backlog: the first eligible scheduler call yields one update, and subsequent
 calls follow the configured replay-sample ratio.
+
+The initial diagnostics below used uniform-only sampling before D3's small
+online-first queue was identified in the upstream replay implementation. They
+remain useful matched implementation controls, but post-correction curves must
+be labeled separately. With the default 65-frame context-plus-training span,
+fresh starts are 1, 66, 131, and so on; queued starts are consumed before the
+uniform sampler.
 
 D3's replay-value loss also sends a representation gradient into the RSSM. To
 retain that path with separate static learner graphs, Kindle evaluates a fixed
