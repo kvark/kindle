@@ -429,12 +429,14 @@ Validation snapshot (updated 2026-08-25):
   completed-episode means -20.210, -20.189, and -20.308 across seeds zero
   through two, or -20.236 pooled over 318 episodes. Random Private Eye has
   means 47.730, -2.135, and -6.270, or 13.108 pooled over 111 episodes. The
-  pinned D3 score artifact reaches -4.537 on Pong and 2,895.24 on Private Eye,
-  whereas it remains at zero on Freeway. These targets average each seed's
-  episode scores from 350,000 through 400,000 recorded emulator frames, then
-  average the five seeds. The artifact was committed with D3's 200M default
-  and an older environment profile (all 18 actions, zero reset no-ops, and a
-  100,000-frame episode cap),
+  benchmark-aligned 350,000--400,000-frame window averages -20.128 on Pong
+  and 68.13 on Private Eye across the three random seeds, using respectively
+  13 and 5 completed episodes per seed. The pinned D3 score artifact reaches
+  -4.537 on Pong and 2,895.24 on Private Eye, whereas it remains at zero on
+  Freeway. These targets average each seed's episode scores over that same
+  recorded-frame window, then average the five seeds. The artifact was
+  committed with D3's 200M default and an older environment profile (all 18
+  actions, zero reset no-ops, and a 100,000-frame episode cap),
   so it is a published target rather than a matched 12M/current-protocol
   control. Pong and Private Eye remain the first dense and sparse Atari curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
