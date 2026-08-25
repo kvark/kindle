@@ -331,7 +331,9 @@ python python/examples/summarize_atari_scores.py \
 The score summarizer rejects incomplete 350k--400k-frame coverage, mixed run
 modes, and wrapper settings that do not match the selected protocol. It supports
 resumed curves split across files and reports deltas to matched random, reported
-12M DreamerV3XS, and pinned 200M DreamerV3 targets where available.
+12M DreamerV3XS, and pinned 200M DreamerV3 targets only where they match the
+selected protocol. The `published-minimal` profile reports its own matched
+random target and does not label the released all-action D3 scores as matched.
 
 The dynamics probe is read-only. At each sampled posterior it decodes the
 proposed action sequence and a deterministic unrelated-action sequence using

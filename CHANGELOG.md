@@ -53,7 +53,8 @@
 - Added a strict multi-seed Atari score aggregator that verifies protocol and
   complete 350k--400k-frame coverage, joins resumed segments, averages episodes
   within each seed before averaging seeds, and reports deltas to pinned random,
-  size-matched 12M, and published 200M reference scores.
+  size-matched 12M, and published 200M reference scores only for matching
+  wrapper profiles.
 - Added signed replay-reward diagnostics for positive, zero, and negative
   targets, read-only prior/posterior reward calibration during Atari evaluation,
   tie-aware reward ranking metrics, and the missing episode index in Atari JSONL

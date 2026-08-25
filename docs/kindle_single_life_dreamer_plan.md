@@ -499,7 +499,12 @@ Validation snapshot (updated 2026-08-25):
   score -20.615, -20.714, and -20.538 on Pong and 80, -20, and 80 on Private
   Eye in the benchmark window, for seed means -20.623 and 46.67. The windows
   contain 13, 14, and 13 completed Pong episodes and five Private Eye episodes
-  per seed, so the sparse-game estimate remains noisy. The published D3 target
+  per seed, so the sparse-game estimate remains noisy. Under the controlled
+  `published-minimal` profile, three new Pong random seeds score -20.267,
+  -20.786, and -20.286 over 15, 14, and 14 benchmark-window episodes, for a
+  -20.446 seed mean. The score aggregator selects this profile-specific random
+  target and omits the all-action D3 targets rather than presenting them as
+  protocol-matched. The published D3 target
   is -4.537 on Pong and 2,895.24 on Private Eye, and zero on Freeway. These
   targets average each seed's episode scores over the same recorded-frame
   window, then average five seeds. An independent ICLR 2025 comparison also
