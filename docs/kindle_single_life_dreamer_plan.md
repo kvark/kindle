@@ -746,6 +746,18 @@ Validation snapshot (updated 2026-08-25):
   without learning useful episodic ordering, and the actor specializes around
   them. Full recurrence remains the first controlled test, with reward
   calibration and capacity now explicit follow-up discriminators;
+- through 60,000 steps, all 13 completed episodes after the 50,000-step
+  checkpoint score -21 and terminate in exactly 764 decisions. Kindle averages
+  -21.0 over both the 200,000--220,000-frame window (seven episodes) and the
+  220,000--240,000-frame window (six episodes). Pinned D3 seed zero scores
+  -14.5 and -17.25 in those windows, while its five-seed means are -12.10 and
+  -12.92. A policy-distribution phase change has started but has not repaired
+  behavior: final-100 learner entropy falls to 0.695 at 55,000 steps and
+  rebounds to 1.183 at 60,000. In the final 1,000 interactions, effective
+  action entropy is 1.191, split mainly across `LEFTFIRE` at 44.6%, `LEFT` at
+  28.1%, and `RIGHTFIRE` at 24.1%. The broader action mix still loses every
+  point, so the immutable curve continues to its 75,000-step evaluation rather
+  than treating entropy recovery as control recovery;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
