@@ -421,6 +421,13 @@ Validation snapshot (updated 2026-08-25):
   `UPRIGHT` for all 2,000 steps and scores -21 on both completed episodes. The
   curve therefore continues unchanged to the 25,000-step diagnostic rather
   than treating early negative-event separation as policy progress;
+- this early lack of control matches the pinned D3 Pong artifact rather than
+  putting Kindle behind it. D3's five-seed episode means in 20,000-frame
+  windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
+  -20.37, -20.93, -20.80, and -20.63. They first improve to -19.80 at 120,000
+  frames (30,000 agent steps) and -18.17 at 140,000 frames (35,000 agent
+  steps). Kindle's matched reward probes therefore include 30,000 and 35,000
+  steps in addition to the coarser 25,000/50,000/75,000/100,000 milestones;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
