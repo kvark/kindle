@@ -309,6 +309,10 @@ Validation snapshot (updated 2026-08-25):
 - the Gymnasium/ALE adapter discovers 104 bundled games; Pong, Freeway, and
   Montezuma's Revenge reset to RGB observations, and repeated seeded 100-step
   Pong random controls produce identical actions and rewards;
+- over 100,000 preprocessed interactions each, random Pong scores -2,177,
+  -2,208, and -2,204 across seeds zero through two (mean -2,196.3), while
+  random Freeway scores 0, 0, and 1 (mean 0.33). These are the matched external
+  controls for the first dense and sparse Atari curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that

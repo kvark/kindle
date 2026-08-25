@@ -156,6 +156,9 @@ def main() -> None:
     if agent is not None:
         agent.begin_episode(frame)
     random_actions = random.Random(args.seed ^ 0xA7A2_1000)
+    run_mode = (
+        "random" if args.random_policy else "evaluate" if args.evaluate else "train"
+    )
 
     output = (
         open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
@@ -182,9 +185,7 @@ def main() -> None:
             "steps": args.steps,
             "seed": args.seed,
             "actions": action_count,
-            "mode": (
-                "random" if args.random_policy else "evaluate" if args.evaluate else "train"
-            ),
+            "mode": run_mode,
             "config": agent.config if agent is not None else None,
         }
     )
@@ -279,6 +280,8 @@ def main() -> None:
                 "event": "run_end",
                 "environment": args.environment,
                 "steps": args.steps,
+                "seed": args.seed,
+                "mode": run_mode,
                 "total_reward": total_reward,
                 "completed_episodes": episodes,
                 "mean_completed_return": (
