@@ -116,6 +116,17 @@ This is the largest deliberate departure from canonical DreamerV3 and must be
 ablated later against full tokens, alternative pooling, selected intermediate
 layers, and eventually learned pixel encoders.
 
+The first spatial-information gate supports keeping the compact representation.
+An independent-seed Pong probe collected 512 labeled frames per seed, trained
+linear coordinate decoders on seeds zero and one, selected regularization on
+seed two, and tested on seed three. Projected 14×14×64 patches reach 0.9890 mean
+R² across ball and paddle coordinates; the production pooled 7×7×64 features
+reach 0.9867 while using one quarter as many values. Ball-x R² changes only
+from 0.9650 to 0.9602 (3.58 to 4.03 source-pixel MAE). Raw resized pixels reach
+0.9158 mean R² and only 0.6881 on ball x under the same linear probe. Pooling is
+therefore not the evident Pong perception bottleneck, although this static
+probe does not establish temporal sufficiency or downstream control quality.
+
 ## 4. Baseline contract
 
 The behavioral reference is DreamerV3 revision
@@ -332,16 +343,14 @@ Validation snapshot (updated 2026-08-25):
   Gymnasium's stock preprocessing differs: 0--30 reset no-ops, terminal-frame
   capture before the two-frame max pool, and Pillow bilinear resize. Repeated
   seeded 100-step Pong controls produce identical actions, pixels, and rewards;
-- over 100,000 decisions (400,000 nominal emulator frames), random Pong has
+- under the pinned source's `current` profile and over 100,000 decisions
+  (400,000 nominal emulator frames), random Pong has
   completed-episode means -20.210, -20.189, and -20.308 across seeds zero
   through two, or -20.236 pooled over 318 episodes. Random Private Eye has
   means 47.730, -2.135, and -6.270, or 13.108 pooled over 111 episodes. The
   benchmark-aligned 350,000--400,000-frame window averages -20.128 on Pong
   and 68.13 on Private Eye across the three random seeds, using respectively
-  13 and 5 completed episodes per seed. The pinned D3 score artifact reaches
-  -4.537 on Pong and 2,895.24 on Private Eye, whereas it remains at zero on
-  Freeway. These targets average each seed's episode scores over that same
-  recorded-frame window, then average the five seeds. The artifact was
+  13 and 5 completed episodes per seed. The pinned D3 score artifact was
   committed with D3's 200M default and an older environment profile (all 18
   actions, zero reset no-ops, and a 100,000-frame episode cap),
   so it is a published target rather than a matched 12M/current-protocol
@@ -349,8 +358,15 @@ Validation snapshot (updated 2026-08-25):
   `--atari-protocol published` while retaining the pinned source's newer
   defaults as `current`; it records the selected profile, action-space mode,
   no-op range, and episode cap in every run header. Full comparison curves use
-  `published`. Pong and Private Eye remain the first dense and sparse Atari
-  curves;
+  `published`. New matched three-seed random controls under that exact profile
+  score -20.615, -20.714, and -20.538 on Pong and 80, -20, and 80 on Private
+  Eye in the benchmark window, for seed means -20.623 and 46.67. The windows
+  contain 13, 14, and 13 completed Pong episodes and five Private Eye episodes
+  per seed, so the sparse-game estimate remains noisy. The published D3 target
+  is -4.537 on Pong and 2,895.24 on Private Eye, and zero on Freeway. These
+  targets average each seed's episode scores over the same recorded-frame
+  window, then average five seeds. Pong and Private Eye remain the first dense
+  and sparse Atari curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
