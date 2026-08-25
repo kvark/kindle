@@ -134,6 +134,10 @@ struct Arguments {
     #[arg(long)]
     dynamics_free_nats: Option<f32>,
 
+    /// Override D3's dynamics/prior KL loss coefficient.
+    #[arg(long)]
+    dynamics_loss_scale: Option<f32>,
+
     /// Override the DINO-feature reconstruction loss weight.
     #[arg(long)]
     reconstruction_loss_scale: Option<f32>,
@@ -185,6 +189,7 @@ impl Arguments {
             || self.imagination_length.is_some()
             || self.free_nats.is_some()
             || self.dynamics_free_nats.is_some()
+            || self.dynamics_loss_scale.is_some()
             || self.reconstruction_loss_scale.is_some()
             || self.stop_replay_value_gradient
             || self.reward_only
@@ -248,7 +253,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if arguments.evaluate && arguments.random_action_steps != 0 {
             return Err("--evaluate does not accept --random-action-steps".into());
         }
-        if arguments.reward_only && arguments.reconstruction_loss_scale.is_some() {
+        if arguments.reward_only
+            && (arguments.reconstruction_loss_scale.is_some()
+                || arguments.dynamics_loss_scale.is_some())
+        {
             return Err("--reward-only already fixes all loss weights".into());
         }
         run_dreamer(&arguments, dino_checkpoint)
@@ -344,6 +352,9 @@ fn run_dreamer(
     }
     if let Some(free_nats) = arguments.dynamics_free_nats {
         config.dynamics_free_nats = Some(free_nats);
+    }
+    if let Some(scale) = arguments.dynamics_loss_scale {
+        config.loss_scales.dynamics = scale;
     }
     if let Some(scale) = arguments.reconstruction_loss_scale {
         config.loss_scales.reconstruction = scale;

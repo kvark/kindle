@@ -117,7 +117,9 @@ advance the environment policy or replay RNG.
 Learner reports expose both D3's floor-clipped dynamics/representation losses
 and `raw_kl`. `DreamerConfig::dynamics_free_nats` can optionally override only
 the prior-training floor while `free_nats` continues to protect posterior
-information; leaving it unset preserves D3's shared one-nat default.
+information; leaving it unset preserves D3's shared one-nat default. The native
+and Python runners also expose the existing dynamics loss coefficient for
+controlled prior-alignment diagnostics.
 
 `kindle-gym` contains one rendered GridWorld for native integration and the
 first measured baseline. It writes JSONL learner, episode, interval, and final
