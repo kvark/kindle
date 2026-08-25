@@ -619,6 +619,21 @@ too soon. Actor optimizer moments continue tracking gradients while the
 parameters are frozen. The gate defaults to zero and is diagnostic rather than
 a baseline change.
 
+The first execution used an older version of the gate that skipped actor
+optimizer calls entirely, leaving LaProp's clock and moments cold until update
+1,301. It is therefore a negative implementation control, not the intended
+A/B. Entropy fell from 1.386 at the boundary to 0.875 by update 1,350 and 0.213
+by update 1,500 before rebounding; its final-100 mean was 0.229. Forced-random
+training earned the fixed 188 rewards, and frozen evaluation earned 78/10,000
+by selecting `right` 9,360 times, still below both exact random controls. The
+isolation itself worked: all 153 non-value tensors in the world checkpoint and
+all non-value world report fields are byte-for-byte identical to the ungated
+run. On the shared 5,000-sample probe, posterior/one-step-prior reward AUC are
+0.979/0.630 with gaps 0.678/0.0055, while the actor chooses an immediately
+rewarding action on only 33.6% of eligible states. Delaying specialization with
+a cold optimizer does not repair weak prior calibration or actor credit. The
+corrected control warms moments while holding actor parameters fixed.
+
 Direct decoded-DINO scoring exposes a separate architectural limit in the 1M
 diagnostic preset. On a 100-frame held-out trajectory, the asymmetric
 scale-one checkpoint has posterior reconstruction MSE 0.03603 and one-step
