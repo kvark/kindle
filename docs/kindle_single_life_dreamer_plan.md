@@ -631,9 +631,17 @@ Validation snapshot (updated 2026-08-25):
   that small optimism compounds over the 333-step horizon. On the same policy
   trajectory, actual reward averages -0.0274 while the one-step prior predicts
   -0.01955, so underestimating loss-event magnitude explains a substantial
-  part of the long-horizon value bias. Full recurrence remains the first
-  controlled test, with reward calibration and capacity now explicit follow-up
-  discriminators;
+  part of the long-horizon value bias. Matching 5,000-step probes at 10,000,
+  25,000, 35,000, 40,000, 45,000, and 50,000 checkpoints preserve every
+  available prior evaluation trajectory exactly. Their Bellman target
+  correlations are -0.011, 0.241, 0.386, 0.357, 0.561, and 0.634, while
+  value/realized-return correlations remain 0.017, 0.089, 0.015,
+  -0.043, 0.045, and -0.015. Over the same sequence, policy entropy falls from
+  2.890 to 0.956 and critic standard deviation grows from 0.00002 to 0.132.
+  The critic therefore learns increasingly varied, locally consistent values
+  without learning useful episodic ordering, and the actor specializes around
+  them. Full recurrence remains the first controlled test, with reward
+  calibration and capacity now explicit follow-up discriminators;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
