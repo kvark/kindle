@@ -236,9 +236,12 @@ reports = agent.learn_scheduled()
 ```
 
 See [`python/examples/atari.py`](python/examples/atari.py) for a Gymnasium loop.
-It uses the D3 Atari-100k interaction and train-ratio settings, while selecting
-the mean feature reconstruction and isolated replay-value gradient supported by
-the frozen-DINO diagnostics. Both adaptations remain explicit command-line and
+It reproduces D3's Atari-100k preprocessing (minimal actions, repeat 4,
+two-frame max pooling, non-sticky actions, 0--30 reset no-ops, and Pillow
+bilinear 64×64 RGB resizing) and train-ratio setting. Thus 100,000 runner steps
+correspond to the conventional 400,000-frame Atari budget. The model uses the
+mean feature reconstruction and isolated replay-value gradient supported by the
+frozen-DINO diagnostics. Both adaptations remain explicit command-line and
 Python constructor options. The same runner provides deterministic random
 controls, resumable training, and frozen greedy evaluation:
 

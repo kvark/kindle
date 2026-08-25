@@ -404,13 +404,19 @@ Validation snapshot (updated 2026-08-25):
 
 - formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
   full-checkpoint DINO parity pass on the pinned stack;
-- the Gymnasium/ALE adapter discovers 104 bundled games; Pong, Freeway, and
-  Montezuma's Revenge reset to RGB observations, and repeated seeded 100-step
-  Pong random controls produce identical actions and rewards;
-- over 100,000 preprocessed interactions each, random Pong scores -2,177,
-  -2,208, and -2,204 across seeds zero through two (mean -2,196.3), while
-  random Freeway scores 0, 0, and 1 (mean 0.33). These are the matched external
-  controls for the first dense and sparse Atari curves;
+- the Gymnasium/ALE adapter discovers 104 bundled games; Pong, Private Eye,
+  and Montezuma's Revenge reset to RGB observations. A small local wrapper now
+  matches the pinned D3 Atari-100k protocol on the consequential points where
+  Gymnasium's stock preprocessing differs: 0--30 reset no-ops, terminal-frame
+  capture before the two-frame max pool, and Pillow bilinear resize. Repeated
+  seeded 100-step Pong controls produce identical actions, pixels, and rewards;
+- over 100,000 decisions (400,000 nominal emulator frames), random Pong has
+  completed-episode means -20.210, -20.189, and -20.308 across seeds zero
+  through two, or -20.236 pooled over 318 episodes. Random Private Eye has
+  means 47.730, -2.135, and -6.270, or 13.108 pooled over 111 episodes. The
+  pinned D3 score artifact reaches a five-seed late-run mean of -4.537 on Pong
+  and 2,895.24 on Private Eye, whereas it remains at zero on Freeway. Pong and
+  Private Eye are therefore the first dense and sparse Atari curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that

@@ -12,12 +12,102 @@ import time
 
 import ale_py
 import gymnasium as gym
+import numpy as np
+from PIL import Image
 
 import kindle
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
 MEAN_DINO_RECONSTRUCTION_SCALE = 1.0 / (7 * 7 * 64)
+ATARI_ACTION_REPEAT = 4
+ATARI_NOOP_MAX = 30
+ATARI_SCREEN_SIZE = 64
+ATARI_MAX_EPISODE_FRAMES = 108_000
+
+
+class DreamerAtariPreprocessing(gym.Wrapper):
+    """DreamerV3's Atari-100k image and interaction protocol.
+
+    Gymnasium's AtariPreprocessing differs in three consequential details: it
+    samples 1--30 rather than 0--30 reset no-ops, resizes with OpenCV, and
+    checks termination before capturing a frame for the two-frame max pool.
+    """
+
+    def __init__(self, environment: gym.Env):
+        super().__init__(environment)
+        action_meanings = environment.unwrapped.get_action_meanings()
+        if not action_meanings or action_meanings[0] != "NOOP":
+            raise ValueError("Atari action 0 must be NOOP")
+        raw_space = environment.observation_space
+        if raw_space.shape is None or len(raw_space.shape) != 3:
+            raise ValueError("the Atari environment must return RGB images")
+        self.observation_space = gym.spaces.Box(
+            low=0,
+            high=255,
+            shape=(ATARI_SCREEN_SIZE, ATARI_SCREEN_SIZE, 3),
+            dtype=np.uint8,
+        )
+        self._frames: list[np.ndarray] = []
+        self._episode_frames = 0
+
+    def reset(self, *, seed=None, options=None):
+        observation, info = self.env.reset(seed=seed, options=options)
+        info = dict(info)
+        noops = int(
+            self.env.unwrapped.np_random.integers(ATARI_NOOP_MAX + 1)
+        )
+        for _ in range(noops):
+            observation, _, terminated, truncated, step_info = self.env.step(0)
+            info.update(step_info)
+            if terminated or truncated:
+                observation, reset_info = self.env.reset(options=options)
+                info.update(reset_info)
+        frame = np.asarray(observation, dtype=np.uint8)
+        self._frames = [frame.copy(), frame.copy()]
+        self._episode_frames = 0
+        info["noop_count"] = noops
+        return self._observation(), info
+
+    def step(self, action):
+        total_reward = 0.0
+        terminated = False
+        truncated = False
+        info = {}
+        for repeat in range(ATARI_ACTION_REPEAT):
+            observation, reward, terminated, truncated, info = self.env.step(
+                action
+            )
+            total_reward += float(reward)
+            self._episode_frames += 1
+
+            # D3 captures before checking game-over, so a terminal frame in
+            # either of the last two repeats remains visible to the agent.
+            if repeat >= ATARI_ACTION_REPEAT - 2:
+                self._frames.append(
+                    np.asarray(observation, dtype=np.uint8).copy()
+                )
+                self._frames = self._frames[-2:]
+
+            if self._episode_frames >= ATARI_MAX_EPISODE_FRAMES:
+                truncated = True
+            if terminated or truncated:
+                break
+
+        return (
+            self._observation(),
+            total_reward,
+            bool(terminated),
+            bool(truncated),
+            info,
+        )
+
+    def _observation(self) -> np.ndarray:
+        image = np.maximum(self._frames[0], self._frames[1])
+        image = Image.fromarray(image).resize(
+            (ATARI_SCREEN_SIZE, ATARI_SCREEN_SIZE), Image.Resampling.BILINEAR
+        )
+        return np.asarray(image, dtype=np.uint8)
 
 
 def main() -> None:
@@ -103,26 +193,15 @@ def main() -> None:
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
 
-    # Match D3's Atari-100k interaction protocol: minimal action set, four
-    # repeated frames, max-pooling over the last two, no sticky actions, and
-    # up to 30 random no-op frames after reset. Gymnasium's wrapper uses its
-    # own OpenCV resize rather than D3's Pillow resize.
+    # Match D3's Atari-100k protocol: minimal actions, repeat 4, max-pool 2,
+    # non-sticky actions, 0--30 reset no-ops, and Pillow bilinear RGB resize.
     environment = gym.make(
         args.environment,
         frameskip=1,
         repeat_action_probability=0.0,
         full_action_space=False,
     )
-    environment = gym.wrappers.AtariPreprocessing(
-        environment,
-        noop_max=30,
-        frame_skip=4,
-        screen_size=64,
-        terminal_on_life_loss=False,
-        grayscale_obs=False,
-        grayscale_newaxis=False,
-        scale_obs=False,
-    )
+    environment = DreamerAtariPreprocessing(environment)
     frame, _ = environment.reset(seed=args.seed)
     if getattr(frame, "ndim", 0) != 3:
         raise ValueError("the environment must return H×W×3 RGB observations")
@@ -183,6 +262,8 @@ def main() -> None:
             "event": "run_start",
             "environment": args.environment,
             "steps": args.steps,
+            "action_repeat": ATARI_ACTION_REPEAT,
+            "environment_frame_budget": args.steps * ATARI_ACTION_REPEAT,
             "seed": args.seed,
             "actions": action_count,
             "mode": run_mode,
@@ -222,6 +303,7 @@ def main() -> None:
                     {
                         "event": "learner",
                         "run_step": run_step,
+                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
                         "elapsed_seconds": time.perf_counter() - started,
                         "report": report,
                     }
@@ -241,6 +323,7 @@ def main() -> None:
                     {
                         "event": "episode",
                         "run_step": run_step,
+                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
                         "return": episode_return,
                         "length": episode_length,
                         "terminated": terminated,
@@ -258,6 +341,7 @@ def main() -> None:
                     {
                         "event": "interval",
                         "run_step": run_step,
+                        "environment_frames": run_step * ATARI_ACTION_REPEAT,
                         "interval_steps": args.report_every,
                         "reward": interval_reward,
                         "completed_episodes": interval_episodes,
@@ -278,6 +362,9 @@ def main() -> None:
                     "event": "checkpoint",
                     "path": args.checkpoint,
                     "environment_step": agent.environment_step,
+                    "environment_frames": (
+                        agent.environment_step * ATARI_ACTION_REPEAT
+                    ),
                     "learner_step": agent.learner_step,
                 }
             )
@@ -287,6 +374,7 @@ def main() -> None:
                 "event": "run_end",
                 "environment": args.environment,
                 "steps": args.steps,
+                "environment_frames": args.steps * ATARI_ACTION_REPEAT,
                 "seed": args.seed,
                 "mode": run_mode,
                 "total_reward": total_reward,

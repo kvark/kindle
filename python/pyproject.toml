@@ -19,7 +19,7 @@ classifiers = [
 gym = ["gymnasium>=1.1,<2"]
 atari = [
   "gymnasium[atari]>=1.1,<2",
-  "opencv-python-headless>=4.8",
+  "pillow>=10",
 ]
 arc = [
   "arc-agi==0.9.8; python_version >= '3.12'",
