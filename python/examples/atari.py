@@ -190,6 +190,12 @@ def main() -> None:
         help="use actor argmax during --evaluate instead of D3's sampling",
     )
     parser.add_argument("--checkpoint")
+    parser.add_argument(
+        "--checkpoint-every",
+        type=int,
+        default=0,
+        help="save --checkpoint every N runner steps in addition to the final save",
+    )
     parser.add_argument("--output", help="write JSONL metrics to this file")
     parser.add_argument("--report-every", type=int, default=1_000)
     args = parser.parse_args()
@@ -199,10 +205,16 @@ def main() -> None:
         parser.error("--report-every must be positive")
     if args.random_action_steps < 0:
         parser.error("--random-action-steps must be non-negative")
+    if args.checkpoint_every < 0:
+        parser.error("--checkpoint-every must be non-negative")
+    if args.checkpoint_every and not args.checkpoint:
+        parser.error("--checkpoint-every requires --checkpoint")
     if args.evaluate and not args.restore:
         parser.error("--evaluate requires --restore")
     if args.evaluate and args.random_action_steps:
         parser.error("--evaluate cannot be combined with --random-action-steps")
+    if args.evaluate and args.checkpoint:
+        parser.error("--evaluate does not write training checkpoints")
     if args.greedy and not args.evaluate:
         parser.error("--greedy requires --evaluate")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
@@ -267,6 +279,23 @@ def main() -> None:
 
     def emit(event: dict[str, object]) -> None:
         print(json.dumps(event, separators=(",", ":")), file=output, flush=True)
+
+    def save_checkpoint(run_step: int) -> None:
+        assert args.checkpoint is not None
+        assert agent is not None
+        agent.save_checkpoint(args.checkpoint)
+        emit(
+            {
+                "event": "checkpoint",
+                "path": args.checkpoint,
+                "run_step": run_step,
+                "environment_step": agent.environment_step,
+                "environment_frames": (
+                    agent.environment_step * ATARI_ACTION_REPEAT
+                ),
+                "learner_step": agent.learner_step,
+            }
+        )
 
     started = time.perf_counter()
     total_reward = 0.0
@@ -377,19 +406,18 @@ def main() -> None:
                 interval_updates = 0
                 interval_action_counts = [0] * action_count
 
-        if args.checkpoint and agent is not None:
-            agent.save_checkpoint(args.checkpoint)
-            emit(
-                {
-                    "event": "checkpoint",
-                    "path": args.checkpoint,
-                    "environment_step": agent.environment_step,
-                    "environment_frames": (
-                        agent.environment_step * ATARI_ACTION_REPEAT
-                    ),
-                    "learner_step": agent.learner_step,
-                }
-            )
+            if (
+                args.checkpoint
+                and args.checkpoint_every
+                and run_step % args.checkpoint_every == 0
+            ):
+                save_checkpoint(run_step)
+
+        if args.checkpoint and (
+            not args.checkpoint_every
+            or args.steps % args.checkpoint_every != 0
+        ):
+            save_checkpoint(args.steps)
         elapsed = time.perf_counter() - started
         emit(
             {

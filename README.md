@@ -255,11 +255,15 @@ python python/examples/atari.py /unused ALE/Pong-v5 \
 # Train and save, then evaluate without learner updates.
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --steps 100000 --checkpoint checkpoints/pong-seed0 \
+  --checkpoint-every 10000 \
   --output runs/pong-seed0.jsonl
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --steps 10000 --restore checkpoints/pong-seed0 --evaluate \
   --output runs/pong-seed0-eval.jsonl
 ```
+
+Periodic saves atomically replace the model-sized checkpoint files. Replay is
+not checkpointed, so a resumed run must refill it before learning continues.
 
 ARC and other games should adapt their native controls into a stable categorical
 vocabulary plus an optional validity mask; coordinate-parameterized actions are
