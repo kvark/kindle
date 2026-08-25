@@ -495,6 +495,25 @@ Validation snapshot (updated 2026-08-25):
   still negative. This is the first modest evidence of learned Pong control,
   not a solved curve; checkpoints at 40,000 and 45,000 steps test it against
   D3's sharper next-phase improvement before the existing 50,000-step probe;
+- at 40,000 steps, the checkpoint contains 9,729 learner updates and the
+  matched trajectory hash remains unchanged. Posterior reward-event and
+  negative-vs-rest ROC-AUC improve to 0.902 and 0.909, and their one-step-prior
+  counterparts reach 0.889 and 0.894. Posterior and prior negative-minus-zero
+  gaps widen again to -0.24611 and -0.22647, but the three positive targets
+  remain predicted negative and below zero targets. Final-100 reconstruction
+  loss, raw KL, reward MAE, and policy entropy are 53.29, 2.476, 0.03449, and
+  1.2575. World-model reward discrimination is therefore still improving.
+  Control is not: the exact 140,000--160,000-frame online window averages -20.0
+  over five episodes, versus -18.67 for D3 seed zero and -15.13 across its five
+  seeds. Online actions are almost entirely split between `RIGHTFIRE` at 44.3%
+  and `LEFTFIRE` at 43.7%, with 1.111 effective-action entropy. The frozen
+  endpoint policy regresses to -20.833 over six episodes, choosing those groups
+  33.4% and 53.1% of the time with 1.103 entropy. Its sole positive reward ranks
+  above negative and zero targets, but one event cannot establish calibration.
+  The 35,000-step signal was not sustained: the reward model is viable while
+  state-dependent control remains the active bottleneck. The unchanged curve
+  continues through 45,000 and 50,000 steps before choosing a BPTT-length or
+  capacity follow-up;
 - this early lack of control matches the pinned D3 Pong artifact rather than
   putting Kindle behind it. D3's five-seed episode means in 20,000-frame
   windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
