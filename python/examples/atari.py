@@ -10,7 +10,7 @@ import json
 import random
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import ale_py
 import gymnasium as gym
@@ -28,6 +28,91 @@ ATARI_SCREEN_SIZE = 64
 ATARI_MAX_EPISODE_FRAMES = 108_000
 ATARI_SCORE_WINDOW_START_FRAMES = 350_000
 ATARI_SCORE_WINDOW_END_FRAMES = 400_000
+
+
+@dataclass
+class RewardProbeStats:
+    count: int = 0
+    target_sum: float = 0.0
+    one_step_prior_prediction_sum: float = 0.0
+    posterior_prediction_sum: float = 0.0
+    one_step_prior_absolute_error_sum: float = 0.0
+    posterior_absolute_error_sum: float = 0.0
+
+    def record(
+        self,
+        target: float,
+        one_step_prior_prediction: float,
+        posterior_prediction: float,
+    ) -> None:
+        self.count += 1
+        self.target_sum += target
+        self.one_step_prior_prediction_sum += one_step_prior_prediction
+        self.posterior_prediction_sum += posterior_prediction
+        self.one_step_prior_absolute_error_sum += abs(
+            one_step_prior_prediction - target
+        )
+        self.posterior_absolute_error_sum += abs(posterior_prediction - target)
+
+    def summary(self) -> dict[str, object]:
+        if not self.count:
+            return {
+                "count": 0,
+                "target_mean": None,
+                "one_step_prior_prediction_mean": None,
+                "posterior_prediction_mean": None,
+                "one_step_prior_mae": None,
+                "posterior_mae": None,
+            }
+        count = float(self.count)
+        return {
+            "count": self.count,
+            "target_mean": self.target_sum / count,
+            "one_step_prior_prediction_mean": (
+                self.one_step_prior_prediction_sum / count
+            ),
+            "posterior_prediction_mean": self.posterior_prediction_sum / count,
+            "one_step_prior_mae": (
+                self.one_step_prior_absolute_error_sum / count
+            ),
+            "posterior_mae": self.posterior_absolute_error_sum / count,
+        }
+
+
+@dataclass
+class RewardProbe:
+    overall: RewardProbeStats = field(default_factory=RewardProbeStats)
+    by_reward_sign: dict[str, RewardProbeStats] = field(
+        default_factory=lambda: {
+            "positive": RewardProbeStats(),
+            "zero": RewardProbeStats(),
+            "negative": RewardProbeStats(),
+        }
+    )
+
+    def record(
+        self,
+        target: float,
+        one_step_prior_prediction: float,
+        posterior_prediction: float,
+    ) -> None:
+        sign = "positive" if target > 0 else "negative" if target < 0 else "zero"
+        self.overall.record(target, one_step_prior_prediction, posterior_prediction)
+        self.by_reward_sign[sign].record(
+            target, one_step_prior_prediction, posterior_prediction
+        )
+
+    def summary(self) -> dict[str, object]:
+        overall = self.overall.summary()
+        return {
+            "samples": self.overall.count,
+            "one_step_prior_mae": overall["one_step_prior_mae"],
+            "posterior_mae": overall["posterior_mae"],
+            "by_reward_sign": {
+                sign: stats.summary()
+                for sign, stats in self.by_reward_sign.items()
+            },
+        }
 
 
 @dataclass(frozen=True)
@@ -237,6 +322,11 @@ def main() -> None:
         action="store_true",
         help="use actor argmax during --evaluate instead of D3's sampling",
     )
+    parser.add_argument(
+        "--reward-probe",
+        action="store_true",
+        help="during --evaluate, report prior/posterior reward calibration by target sign",
+    )
     parser.add_argument("--checkpoint")
     parser.add_argument(
         "--checkpoint-every",
@@ -270,6 +360,8 @@ def main() -> None:
         parser.error("--evaluate does not write training checkpoints")
     if args.greedy and not args.evaluate:
         parser.error("--greedy requires --evaluate")
+    if args.reward_probe and not args.evaluate:
+        parser.error("--reward-probe requires --evaluate")
     if args.append_output and not args.output:
         parser.error("--append-output requires --output")
     if args.append_output and not args.restore:
@@ -414,6 +506,7 @@ def main() -> None:
     interval_updates = 0
     action_counts = [0] * action_count
     interval_action_counts = [0] * action_count
+    reward_probe = RewardProbe() if args.reward_probe else None
     emit(
         {
             "event": "run_start",
@@ -433,6 +526,7 @@ def main() -> None:
             "actions": action_count,
             "action_meanings": action_meanings,
             "mode": run_mode,
+            "reward_probe": args.reward_probe,
             "output_appended": args.append_output,
             "dino_model_id": (
                 kindle.DINO_MODEL_ID if agent is not None else None
@@ -464,6 +558,11 @@ def main() -> None:
             else:
                 assert agent is not None
                 action = agent.act(greedy=args.evaluate and args.greedy)
+            one_step_prior_reward = (
+                agent.prior_reward_prediction(action)
+                if reward_probe is not None and agent is not None
+                else None
+            )
             frame, reward, terminated, truncated, _ = environment.step(action)
             reward = float(reward)
             terminated = bool(terminated)
@@ -474,6 +573,14 @@ def main() -> None:
                     extrinsic_reward=reward,
                     terminated=terminated,
                     truncated=truncated,
+                )
+            if reward_probe is not None:
+                assert agent is not None
+                assert one_step_prior_reward is not None
+                reward_probe.record(
+                    reward,
+                    one_step_prior_reward,
+                    agent.posterior_reward_prediction(),
                 )
             reports = [] if agent is None or args.evaluate else agent.learn_scheduled()
             interval_updates += len(reports)
@@ -569,6 +676,16 @@ def main() -> None:
             if agent is not None
             else 0
         )
+        if reward_probe is not None:
+            emit(
+                {
+                    "event": "reward_probe",
+                    "run_step": args.steps,
+                    "environment_step": absolute_environment_step(args.steps),
+                    "environment_frames": absolute_environment_frames(args.steps),
+                    **reward_probe.summary(),
+                }
+            )
         starting_environment_frames = starting_environment_step * ATARI_ACTION_REPEAT
         ending_environment_frames = absolute_environment_frames(args.steps)
         emit(

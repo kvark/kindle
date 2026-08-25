@@ -266,7 +266,9 @@ scale and D3's replay-value representation gradient. Use
 remain explicit Python constructor options as well.
 The same runner provides deterministic random controls, resumable training, and
 frozen sampled evaluation matching D3; `--greedy` is available as a separate
-policy diagnostic:
+policy diagnostic. During evaluation, `--reward-probe` measures the chosen
+action's one-step prior and the resulting posterior reward prediction against
+actual rewards, split into positive, zero, and negative targets:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.
@@ -281,7 +283,7 @@ python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --output runs/pong-seed0.jsonl
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --steps 10000 --atari-protocol published \
-  --restore checkpoints/pong-seed0 --evaluate \
+  --restore checkpoints/pong-seed0 --evaluate --reward-probe \
   --output runs/pong-seed0-eval.jsonl
 ```
 
