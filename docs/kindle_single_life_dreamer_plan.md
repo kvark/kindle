@@ -518,6 +518,32 @@ diagnostic must improve posterior/prior alignment while holding replay coverage
 fixed; further actor-rate or imagination-length tuning is not justified by
 these results.
 
+A paired forced-random control then gives both KL settings the exact same
+10,000 actions, 188 rewards, observation/action/reward trajectory, replay
+sample indices, and update count.
+With D3's one free nat, the final-100 replay reward gap is 0.893 and held-out
+posterior reward reaches 1.0 ROC AUC with a 0.903 gap, but one-step prior reward
+is only 0.581 AUC with a 0.0016 gap. The frozen actor selects `down` on every
+step and earns zero. Its deterministic latent retains only 17% held-out
+position accuracy versus 72% at the encoder, and the prior argmax chooses an
+actually rewarding action on 22.6% of eligible states, below the 25% uniform
+baseline. Exact random coverage therefore does not repair the clipped prior.
+
+Removing the free-nat floor from both balanced-KL directions produces the
+opposite tradeoff. Raw KL falls to 0.00069 over the final 100 updates and the
+held-out posterior reward head degrades to 0.659 AUC with a 0.0053 gap. The
+prior becomes materially more useful, however: one-step reward reaches 0.650
+AUC with a positive 0.0082 gap, horizons two through five retain positive gaps,
+deterministic-state position accuracy rises to 34%, and the prior argmax chooses
+an actually rewarding action 51.6% of the time. Actor/prior agreement also
+rises from 43.2% to 54.4%, but the actor itself chooses rewarding actions only
+29.0% of the time and its frozen down/right loop still earns zero. Global
+free-zero aligns by starving the posterior; global free-one preserves sparse
+reward information but leaves almost all prior gradients clipped. The next
+diagnostic therefore separates the two floors: zero free nats for the dynamics
+loss that trains the prior, while retaining one free nat for the representation
+loss that protects posterior information.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
