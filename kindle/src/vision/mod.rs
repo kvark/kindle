@@ -82,6 +82,10 @@ impl DinoPerception {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let gpu = match gpu {
+            Some(gpu) => gpu,
+            None => Arc::new(crate::init_gpu_context()?),
+        };
         let config = dinov3::Config::vits16();
         let mut graph = Graph::new();
         let tokens = dinov3::build_encoder(&mut graph, &config);
@@ -100,7 +104,7 @@ impl DinoPerception {
             &graph,
             SessionConfig {
                 mode: Mode::Inference,
-                gpu,
+                gpu: Some(gpu),
                 cache: plan_cache,
                 ..SessionConfig::default()
             },
@@ -115,6 +119,10 @@ impl DinoPerception {
             config,
             session,
         })
+    }
+
+    pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
+        crate::gpu_device_info(self.session.device_information())
     }
 
     pub fn encode_rgb8(&mut self, rgb: &[u8]) -> DinoObservation {
@@ -226,6 +234,10 @@ impl DinoEncoder {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let gpu = match gpu {
+            Some(gpu) => gpu,
+            None => Arc::new(crate::init_gpu_context()?),
+        };
         let mut graph = Graph::new();
         let output = dinov3::build_encoder(&mut graph, &config);
         graph.set_outputs(vec![output]);
@@ -234,7 +246,7 @@ impl DinoEncoder {
             &graph,
             SessionConfig {
                 mode: Mode::Inference,
-                gpu,
+                gpu: Some(gpu),
                 cache: plan_cache,
                 ..SessionConfig::default()
             },
@@ -248,6 +260,10 @@ impl DinoEncoder {
             config,
             session,
         })
+    }
+
+    pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
+        crate::gpu_device_info(self.session.device_information())
     }
 
     pub fn config(&self) -> &dinov3::Config {

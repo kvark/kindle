@@ -257,7 +257,7 @@ pub struct DreamerCore {
 
 impl DreamerCore {
     pub fn new(config: DreamerConfig) -> Result<Self, blade_graphics::NotSupportedError> {
-        let gpu = Arc::new(meganeura::init_gpu_context()?);
+        let gpu = Arc::new(crate::init_gpu_context()?);
         Ok(Self::with_gpu(config, gpu))
     }
 
@@ -268,7 +268,7 @@ impl DreamerCore {
     /// optimizer moments, the slow critic, counters, and return normalization
     /// continue exactly from the saved learner state.
     pub fn restore(checkpoint: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
-        let gpu = Arc::new(meganeura::init_gpu_context()?);
+        let gpu = Arc::new(crate::init_gpu_context()?);
         Self::restore_with_gpu(checkpoint.as_ref(), gpu)
     }
 
@@ -431,6 +431,11 @@ impl DreamerCore {
             trainable_parameter_count(&self.world_train),
             trainable_parameter_count(&self.behavior_train),
         )
+    }
+
+    /// Adapter and driver used by all perception and Dreamer sessions.
+    pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
+        crate::gpu_device_info(self.gpu.device_information())
     }
 
     /// Current posterior feature (`deter` followed by flattened categoricals).
@@ -1435,7 +1440,7 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let gpu = Arc::new(meganeura::init_gpu_context()?);
+        let gpu = Arc::new(crate::init_gpu_context()?);
         let perception =
             DinoPerception::load_vits16(dino_checkpoint, Some(Arc::clone(&gpu)), dino_plan_cache)?;
         let core = DreamerCore::with_gpu(config, gpu);
@@ -1447,7 +1452,7 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let gpu = Arc::new(meganeura::init_gpu_context()?);
+        let gpu = Arc::new(crate::init_gpu_context()?);
         let core = DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu))?;
         let perception = DinoPerception::load_vits16(dino_checkpoint, Some(gpu), dino_plan_cache)?;
         Ok(Self { perception, core })
@@ -1843,7 +1848,7 @@ mod tests {
         config.dynamics_free_nats = Some(0.0);
         config.actor_learning_starts = 1;
         config.skip_full_optimize = true;
-        let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
         let (world_parameters, behavior_parameters) = agent.trainable_parameter_counts();
         assert!(world_parameters > 0 && behavior_parameters > 0);
@@ -2009,7 +2014,7 @@ mod tests {
         let mut config = DreamerConfig::tiny(2);
         config.learning_rate = 1e-3;
         config.learning_rate_warmup = 0;
-        let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
         let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
 
@@ -2072,7 +2077,7 @@ mod tests {
         config.loss_scales.policy = 0.0;
         config.loss_scales.value = 0.0;
         config.loss_scales.replay_value = 0.0;
-        let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
         let observation = |class: usize| {
             let mut values = vec![0.0; DinoObservation::LEN];

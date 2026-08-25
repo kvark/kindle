@@ -56,6 +56,11 @@ impl PyDinoPerception {
     fn pooled_shape(&self) -> (usize, usize, usize) {
         (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
     }
+
+    #[getter]
+    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_device())
+    }
 }
 
 #[pymethods]
@@ -297,6 +302,11 @@ impl PyAgent {
     #[getter]
     fn trainable_parameter_counts(&self) -> (usize, usize) {
         self.inner.core().trainable_parameter_counts()
+    }
+
+    #[getter]
+    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.core().gpu_device())
     }
 
     #[getter]

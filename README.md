@@ -85,6 +85,19 @@ model license before downloading or redistributing them. The native
 implementation is numerically checked against Transformers/PyTorch golden
 outputs by an ignored local parity test.
 
+On hosts with multiple Vulkan adapters, select the intended accelerator by its
+backend-reported numeric device ID. Kindle opts into Meganeura's selector and
+records the selected device and driver in every measured run. For example,
+the RTX 5080 on the current benchmark host reports device ID `0x2c02`:
+
+```bash
+MEGANEURA_DEVICE_ID=0x2c02 cargo run -p kindle-gym --example grid_world --release -- \
+  /models/dinov3/model.safetensors --steps 10000
+```
+
+Without the variable, Blade's default adapter is retained. The hexadecimal ID
+is normally the Vulkan/PCI device ID, not an adapter ordinal.
+
 ## Rust use
 
 ```rust,ignore
