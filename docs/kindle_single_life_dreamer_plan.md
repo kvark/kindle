@@ -728,7 +728,16 @@ Validation snapshot (updated 2026-08-25):
   realized horizon-discounted returns average -5.949 with standard deviation
   2.222. Bias is +2.546, MAE 3.009, RMSE 3.383, and value/return correlation
   is -0.015. The actor is therefore becoming more faithful to a critic that
-  has almost no useful temporal ranking, reinforcing the BPTT-length test;
+  has almost no useful temporal ranking. An extended probe preserves that
+  trajectory and every prior metric bit-for-bit while also comparing each
+  value with its realized one-step Bellman target. Those targets correlate
+  0.634 with the critic; one-step bias is only +0.0139 and MAE is 0.0576, but
+  that small optimism compounds over the 333-step horizon. On the same policy
+  trajectory, actual reward averages -0.0274 while the one-step prior predicts
+  -0.01955, so underestimating loss-event magnitude explains a substantial
+  part of the long-horizon value bias. Full recurrence remains the first
+  controlled test, with reward calibration and capacity now explicit follow-up
+  discriminators;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
