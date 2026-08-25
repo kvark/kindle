@@ -240,6 +240,7 @@ def main() -> None:
             f"environment exposes {action_count} actions but "
             f"{len(action_meanings)} action meanings"
         )
+    construction_started = time.perf_counter()
     if args.random_policy:
         agent = None
     elif args.restore:
@@ -270,6 +271,9 @@ def main() -> None:
             reconstruction_loss_scale=args.reconstruction_loss_scale,
             replay_value_gradient=args.replay_value_gradient,
         )
+    agent_construction_seconds = (
+        time.perf_counter() - construction_started if agent is not None else None
+    )
     if agent is not None:
         agent.begin_episode(frame)
     random_actions = random.Random(args.seed ^ 0xA7A2_1000)
@@ -350,6 +354,7 @@ def main() -> None:
             "mode": run_mode,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
+            "agent_construction_seconds": agent_construction_seconds,
             "trainable_parameters": trainable_parameters,
             "config": agent.config if agent is not None else None,
         }
