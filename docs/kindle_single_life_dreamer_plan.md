@@ -782,6 +782,30 @@ depth 64; zero or a missing field retains the legacy preset depth so existing
 checkpoints remain loadable. The next visual-model run uses the widened decoder
 before decoded prediction error is interpreted as a dynamics result.
 
+That widened, mean-scaled control removes the decoder bottleneck but does not
+repair control. It follows the same 10,000 forced-random actions and 2,230
+updates as the rank-four run, with effectively unchanged throughput (0.449
+versus 0.448 updates/s). Reward grounding is delayed: the replay prediction gap
+first exceeds 0.1 at update 1,877 rather than 1,224. Over the final 100 updates,
+reconstruction MSE is 0.01351, replay reward separation is 0.397, raw KL is
+0.100, and policy entropy is 0.149. Frozen evaluation earns 0/10,000 by choosing
+`down` on every step.
+
+The shared 5,000-state probe shows that the wider decoder learned a better
+marginal reconstruction without a correspondingly better state model. The
+trainable DINO adapter retains 66.1% exact-position accuracy, but the complete
+posterior feature retains only 12.4%. Posterior and one-step-prior reward AUC
+are 0.858 and 0.574, with gaps 0.477 and 0.0092. The actor and prior argmaxes
+choose an immediately rewarding action on only 29.7% and 33.9% of eligible
+states. Posterior reconstruction MSE is 0.01351; open-loop MSE changes only from
+0.01355 at horizon one to 0.01391 at horizon fifteen. It beats persistence only
+from horizon four because persistence degrades while the model remains nearly
+constant, not because it tracks the trajectory. Width 64 is still the correct
+capacity control, but a per-feature-mean reconstruction coefficient lets this
+decoder fit observation statistics without forcing useful recurrent state. The
+next exact control retains the width and raises only reconstruction scale to
+0.25, approximately matching D3's initial summed-pixel loss magnitude.
+
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
 D3 waits for 1,024 eligible replay items, discards prefill-time train credit,
