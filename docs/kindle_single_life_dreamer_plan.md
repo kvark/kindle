@@ -174,14 +174,11 @@ weak 0.646 posterior reward-event ranking arises downstream of frozen vision.
 
 Meganeura implements DreamerV3's optimizer chain directly: per-parameter
 adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
-also compiles a statically unrolled recurrent graph: unrolling all 64 steps made
-even small presets impractical to build. A fresh 1M compile probe ran for more
-than 11 minutes and reached roughly 1.5 GB resident memory without completing.
-Kindle therefore uses 8-step truncated BPTT, accumulates and averages gradients
-across all eight chunks, and retains the full 64-step replay sample and all
-posterior imagination starts. The chunk length remains configurable for
-targeted scaling checks. This is an implementation accommodation, not a claimed
-D3-equivalent gradient path.
+also compiles a statically unrolled recurrent graph. The production baseline
+uses 8-step truncated BPTT, accumulates and averages gradients across all eight
+chunks, and retains the full 64-step replay sample and all posterior imagination
+starts. The chunk length remains configurable for targeted scaling checks. This
+is an implementation accommodation, not a claimed D3-equivalent gradient path.
 
 A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
 graph constructs successfully in 4.70 seconds, but its first learner update
@@ -192,9 +189,18 @@ Its Vulkan allocator grows descriptor-set pools from 65,536 directly to
 overflows `u32`. An isolated Blade build that doubles sub-pool capacity instead
 completes the identical 1,120-step trajectory and all nine scheduled BPTT-16
 learner updates with finite metrics, peaking at 517 MiB. This proves the current
-limit is descriptor-pool bookkeeping rather than model-memory pressure. Kindle
-remains on BPTT-8 until that one-line dependency fix is upstreamed, pinned, and
-followed by a longer comparative curve.
+limit is descriptor-pool bookkeeping rather than model-memory pressure.
+
+The same isolated allocator fix now makes the full D3-equivalent 64-step 1M
+graph practical too. It constructs in 97.7 seconds with 1.93 GiB peak host
+memory and no swap. The corresponding 1,120-step Atari canary completes in
+2:58 wall time, including construction, and executes all nine scheduled learner
+updates with finite metrics. The measured run phase is 82.0 seconds and reports
+0.110 learner updates/s including replay prefill, essentially the same short-run
+rate as the patched BPTT-16 canary. Thus full recurrence is a viable controlled
+1M follow-up once the Blade fix is upstreamed and pinned. The active curve and
+production defaults remain on BPTT-8 so this ongoing baseline stays immutable;
+larger-preset memory and a longer BPTT-64 learning curve remain unproven.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
