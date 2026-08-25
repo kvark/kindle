@@ -458,6 +458,22 @@ Validation snapshot (updated 2026-08-25):
   every 765 decisions in this phase. Frozen sampled evaluation remains
   random-level at -20.667 over six episodes. The curve continues unchanged to
   the 30,000- and 35,000-step behavior discriminators;
+- at 30,000 steps, the immutable checkpoint contains 7,229 learner updates and
+  the matched trajectory hash still agrees exactly with every 10,000--25,000
+  probe. Posterior and one-step-prior reward-event ROC-AUC rise again to 0.885
+  and 0.877; negative-vs-rest AUC reaches 0.891 and 0.881. Posterior and prior
+  negative-minus-zero prediction gaps widen to -0.14999 and -0.12180. The three
+  positive events remain slightly below zero and all predictions remain
+  negative, so reward-sign calibration is still not solved. Final-100
+  reconstruction loss, raw KL, reward MAE, and policy entropy are 58.88, 2.421,
+  0.03908, and 1.4975. In the exact 100,000--120,000 emulator-frame window,
+  Kindle averages -20.5 over six online episodes versus -21.0 for pinned D3
+  seed zero and -19.80 across its five seeds. Frozen sampled evaluation is
+  likewise unchanged at -20.6 over five episodes, but its effective six-action
+  entropy falls from 1.710 at 25,000 steps to 1.171: `RIGHTFIRE` aliases account
+  for 59.9% of actions. World-model ranking is still improving while control
+  remains random-level and increasingly concentrated, so the unchanged curve
+  continues to the stronger 35,000-step recovery-versus-collapse discriminator;
 - this early lack of control matches the pinned D3 Pong artifact rather than
   putting Kindle behind it. D3's five-seed episode means in 20,000-frame
   windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
