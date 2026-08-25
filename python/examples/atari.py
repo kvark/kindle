@@ -270,8 +270,6 @@ def main() -> None:
         parser.error("--checkpoint-every requires --checkpoint")
     if args.evaluate and not args.restore:
         parser.error("--evaluate requires --restore")
-    if args.evaluate and args.random_action_steps:
-        parser.error("--evaluate cannot be combined with --random-action-steps")
     if args.evaluate and args.checkpoint:
         parser.error("--evaluate does not write training checkpoints")
     if args.greedy and not args.evaluate:
@@ -353,7 +351,13 @@ def main() -> None:
     if args.random_policy:
         run_mode = "random"
     elif args.evaluate:
-        run_mode = "evaluate_greedy" if args.greedy else "evaluate_sample"
+        evaluation_policy = "greedy" if args.greedy else "sample"
+        if args.random_action_steps >= args.steps:
+            run_mode = "evaluate_forced_random"
+        elif args.random_action_steps:
+            run_mode = f"evaluate_forced_random_then_{evaluation_policy}"
+        else:
+            run_mode = f"evaluate_{evaluation_policy}"
     else:
         run_mode = "train"
     starting_environment_step = agent.environment_step if agent is not None else 0
@@ -443,6 +447,7 @@ def main() -> None:
             "action_meanings": action_meanings,
             "mode": run_mode,
             "reward_probe": args.reward_probe,
+            "random_action_steps": args.random_action_steps,
             "output_appended": args.append_output,
             "dino_model_id": (
                 kindle.DINO_MODEL_ID if agent is not None else None
