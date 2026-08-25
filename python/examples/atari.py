@@ -37,7 +37,7 @@ def main() -> None:
     parser.add_argument(
         "--actor-learning-starts",
         type=int,
-        help="delay actor gradients for this many learner updates; critic training is unchanged",
+        help="delay actor parameter updates for this many learner updates; critic training is unchanged",
     )
     parser.add_argument("--learning-rate-warmup", type=int)
     parser.add_argument("--free-nats", type=float)

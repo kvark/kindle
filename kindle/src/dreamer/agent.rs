@@ -1353,8 +1353,12 @@ impl DreamerCore {
             .set_input("replay_value_target", &batch.replay_value_target);
         self.behavior_train
             .set_input("replay_slow_target", &batch.replay_slow_target);
+        // Freeze actor parameters, not their gradients. Letting LaProp track
+        // moments while the actor LR is zero avoids turning the first enabled
+        // update into a large bias-correction transient after an old, empty
+        // shared actor/critic optimizer clock.
         self.behavior_train
-            .set_input("actor_update_scale", &[actor_update_scale]);
+            .set_lr_multiplier("behavior.actor.", actor_update_scale);
         configure_d3_optimizer(
             &mut self.behavior_train,
             &self.config,
@@ -1919,6 +1923,7 @@ mod tests {
         let mut world_parameter = vec![0.0; config_value_bins(&agent)];
         let mut world_momentum = vec![0.0; config_value_bins(&agent)];
         let mut behavior_parameter = vec![0.0; 3];
+        let mut behavior_momentum = vec![0.0; 3];
         let mut slow_parameter = vec![0.0; config_value_bins(&agent)];
         agent
             .world_train
@@ -1929,7 +1934,14 @@ mod tests {
         agent
             .behavior_train
             .read_param("behavior.actor.out.bias", &mut behavior_parameter);
+        agent
+            .behavior_train
+            .read_adam_m("behavior.actor.out.bias", &mut behavior_momentum);
         assert_eq!(behavior_parameter, initial_actor_parameter);
+        assert!(
+            behavior_momentum.iter().any(|value| *value != 0.0),
+            "the frozen actor should warm its optimizer moments"
+        );
         agent
             .behavior_slow
             .read_param("behavior.value.out.bias", &mut slow_parameter);

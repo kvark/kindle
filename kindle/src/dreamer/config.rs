@@ -162,8 +162,9 @@ pub struct DreamerConfig {
     /// D3's shared world/behavior learning rate.
     #[serde(default)]
     pub behavior_learning_rate: Option<f32>,
-    /// Number of completed learner updates before actor gradients are enabled.
-    /// The behavior critic continues training while the actor is gated.
+    /// Number of completed learner updates before actor parameter updates are
+    /// enabled. The behavior critic and actor optimizer moments continue
+    /// training while the actor parameters are gated.
     #[serde(default)]
     pub actor_learning_starts: u64,
     pub learning_rate_warmup: u64,
