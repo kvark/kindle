@@ -9,7 +9,8 @@ Dreamer:
 
 Ridge probes predict Pong's ball and paddle positions. Seeds are split by
 role so adjacent frames never cross the train/validation/test boundary:
-two seeds train, one selects the ridge penalty, and one is the final test.
+two seeds train, one selects each target's ridge penalty, and one is the final
+test.
 """
 
 from __future__ import annotations
@@ -44,6 +45,9 @@ RIDGE_ALPHAS = (
     3e-1,
     1.0,
     3.0,
+    10.0,
+    30.0,
+    100.0,
 )
 
 
@@ -160,20 +164,6 @@ def _standardize(
     )
 
 
-def _predict_dual_ridge(
-    train_x: np.ndarray,
-    train_y: np.ndarray,
-    test_x: np.ndarray,
-    alpha: float,
-) -> np.ndarray:
-    target_mean = train_y.mean(axis=0)
-    centered_targets = np.asarray(train_y - target_mean, dtype=np.float64)
-    gram = np.asarray(train_x @ train_x.T, dtype=np.float64)
-    gram.flat[:: gram.shape[0] + 1] += alpha
-    coefficients = np.linalg.solve(gram, centered_targets)
-    return np.asarray(test_x @ train_x.T @ coefficients + target_mean)
-
-
 def _predict_dual_ridge_many(
     train_x: np.ndarray,
     train_y: np.ndarray,
@@ -231,8 +221,6 @@ def evaluate_representation(
     selection_x, validation_x = _standardize(selection_x, feature_splits[2])
 
     validation_scores = {}
-    best_alpha = None
-    best_error = float("inf")
     validation_predictions = _predict_dual_ridge_many(
         selection_x,
         selection_y,
@@ -240,21 +228,40 @@ def evaluate_representation(
         RIDGE_ALPHAS,
     )
     for alpha, prediction in validation_predictions.items():
-        error = float(np.square(prediction - label_splits[2]).mean())
-        validation_scores[str(alpha)] = error
-        if error < best_error:
-            best_error = error
-            best_alpha = alpha
-    assert best_alpha is not None
+        validation_scores[str(alpha)] = {
+            name: float(
+                np.square(prediction[:, index] - label_splits[2][:, index]).mean()
+            )
+            for index, name in enumerate(TARGETS)
+        }
+    selected_alphas = [
+        min(
+            RIDGE_ALPHAS,
+            key=lambda alpha: validation_scores[str(alpha)][name],
+        )
+        for name in TARGETS
+    ]
 
     refit_x = np.concatenate(feature_splits[:3])
     refit_y = np.concatenate(label_splits[:3])
     refit_x, test_x = _standardize(refit_x, feature_splits[3])
-    prediction = _predict_dual_ridge(refit_x, refit_y, test_x, best_alpha)
+    refit_predictions = _predict_dual_ridge_many(
+        refit_x,
+        refit_y,
+        test_x,
+        tuple(sorted(set(selected_alphas))),
+    )
+    prediction = np.stack(
+        [
+            refit_predictions[alpha][:, index]
+            for index, alpha in enumerate(selected_alphas)
+        ],
+        axis=1,
+    )
     baseline = np.broadcast_to(refit_y.mean(axis=0), label_splits[3].shape)
     return {
         "dimensions": int(feature_splits[0].shape[1]),
-        "selected_alpha": best_alpha,
+        "selected_alpha_by_target": dict(zip(TARGETS, selected_alphas)),
         "validation_mse_by_alpha": validation_scores,
         "test": _metrics(prediction, label_splits[3]),
         "constant_baseline": _metrics(baseline, label_splits[3]),
@@ -266,7 +273,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("dino_checkpoint")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
-    parser.add_argument("--samples-per-seed", type=int, default=256)
+    parser.add_argument("--samples-per-seed", type=int, default=512)
     parser.add_argument("--seeds", type=int, nargs=4, default=(0, 1, 2, 3))
     parser.add_argument("--dino-plan-cache")
     parser.add_argument("--output")
