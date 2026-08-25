@@ -2,6 +2,7 @@
 
 use std::path::Path;
 
+use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID};
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
 };
@@ -12,6 +13,49 @@ use pyo3::types::{PyAny, PyBytes, PyModule, PyType};
 #[pyclass(name = "Agent", module = "kindle", unsendable)]
 struct PyAgent {
     inner: DreamerAgent,
+}
+
+/// Frozen perception-only session for representation probes.
+///
+/// The first element returned by `encode` is the projected 14x14 patch grid;
+/// the second is the exact pooled 7x7 observation consumed by Dreamer.
+#[pyclass(name = "DinoPerception", module = "kindle._native", unsendable)]
+struct PyDinoPerception {
+    inner: DinoPerception,
+}
+
+#[pymethods]
+impl PyDinoPerception {
+    #[new]
+    #[pyo3(signature = (dino_checkpoint, dino_plan_cache = None))]
+    fn new(dino_checkpoint: &str, dino_plan_cache: Option<&str>) -> PyResult<Self> {
+        let cache = dino_plan_cache.map(Path::new);
+        let inner = DinoPerception::load_vits16(dino_checkpoint, None, cache)
+            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        let frame = parse_rgb_frame(frame)?;
+        let pooled = self
+            .inner
+            .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
+        Ok((
+            self.inner.projected_patches().to_vec(),
+            pooled.as_slice().to_vec(),
+        ))
+    }
+
+    #[getter]
+    fn projected_shape(&self) -> (usize, usize, usize) {
+        let grid = self.inner.projected_grid();
+        (grid, grid, OBSERVATION_CHANNELS)
+    }
+
+    #[getter]
+    fn pooled_shape(&self) -> (usize, usize, usize) {
+        (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
+    }
 }
 
 #[pymethods]
@@ -347,6 +391,7 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 #[pymodule]
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
+    module.add_class::<PyDinoPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("DINO_MODEL_ID", kindle::vision::VITS16_MODEL_ID)?;
     module.add(
