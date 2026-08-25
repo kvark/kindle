@@ -192,8 +192,15 @@ def main() -> None:
 
     try:
         for run_step in range(1, args.steps + 1):
-            if args.random_policy or run_step <= args.random_action_steps:
+            if args.random_policy:
                 action = random_actions.randrange(action_count)
+            elif run_step <= args.random_action_steps:
+                forced_action = random_actions.randrange(action_count)
+                action_mask = [False] * action_count
+                action_mask[forced_action] = True
+                assert agent is not None
+                action = agent.act(action_mask=action_mask)
+                assert action == forced_action
             else:
                 assert agent is not None
                 action = agent.act(greedy=args.evaluate)
