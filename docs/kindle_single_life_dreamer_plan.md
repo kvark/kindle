@@ -484,26 +484,25 @@ Validation snapshot (updated 2026-08-25):
   reconstruction scale and D3 representation gradients. At the 10,000-step
   checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
   completed online episodes. A separate 5,000-step sampled-policy probe scored
-  -20.2 over five episodes. Its posterior reward means for positive, zero, and
-  negative targets were -0.02237, -0.02232, and -0.02233; the chosen-action
-  one-step prior was equally flat. Ranking is weak but above chance for the 110
-  negative events: posterior negative-vs-rest and any-reward-vs-zero ROC-AUC
-  are 0.638 and 0.646, while the corresponding one-step-prior values are 0.565
-  and 0.571. Only four positive events were observed, so their below-chance
-  ranking is too noisy to interpret. Thus the model is finite and reconstructing
-  substantially better (first-100 to final-100 loss 3,977.4 to 86.84), but has
-  not learned calibrated reward-conditioned state at 10% of the interaction
-  budget. The curve continues; this is an early marker, not an endpoint
-  comparison;
+  -20.2 over five episodes. On a separate fixed random-action trajectory reused
+  across checkpoints, its posterior reward means for positive, zero, and
+  negative targets are -0.02235, -0.02232, and -0.02234; the one-step prior is
+  equally flat. Ranking is weak but above chance for the 108 negative events:
+  posterior negative-vs-rest and any-reward-vs-zero ROC-AUC are 0.636 and
+  0.641, while the corresponding one-step-prior values are 0.543 and 0.546.
+  Only three positive events occur, so their ranking is too noisy to interpret.
+  Thus the model is finite and reconstructing substantially better (first-100
+  to final-100 loss 3,977.4 to 86.84), but has not learned calibrated
+  reward-conditioned state at 10% of the interaction budget. The curve
+  continues; this is an early marker, not an endpoint comparison;
 - by the 15,000-step checkpoint, reward ordering improves materially without
-  yet changing control. On the same 5,000-step probe, posterior
-  reward-event-vs-zero ROC-AUC rises from 0.646 to 0.765 and the one-step prior
-  rises from 0.571 to 0.744. Negative-vs-rest AUC reaches 0.770 posterior and
-  0.751 prior. The posterior negative-minus-zero prediction gap grows from
-  about -0.000015 to -0.000914, while the sampled policy remains random-level
-  at -20.6 over five episodes. Only two positive events occur, so their ranking
-  remains too noisy to use. This is a measurable world-model learning curve,
-  but not calibrated reward prediction or learned control yet;
+  yet changing control. On the identical fixed trajectory, posterior
+  reward-event-vs-zero ROC-AUC rises from 0.641 to 0.790 and the one-step prior
+  rises from 0.546 to 0.765. Negative-vs-rest AUC reaches 0.792 posterior and
+  0.767 prior. The posterior negative-minus-zero prediction gap grows from
+  about -0.000017 to -0.000961. Separately, the sampled policy remains
+  random-level at -20.6 over five episodes. This is a causal checkpoint-model
+  learning curve, but not calibrated reward prediction or learned control yet;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
