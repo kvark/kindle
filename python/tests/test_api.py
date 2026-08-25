@@ -8,6 +8,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["observation_decoder_depth"] == 64
     assert config["batch_size"] == 16
     assert config["batch_length"] == 64
+    assert config["world_backprop_length"] == 8
     assert config["imagination_length"] == 15
     assert config["actor_unimix"] == 0.01
     assert config["train_ratio"] == 32.0

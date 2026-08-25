@@ -243,7 +243,8 @@ correspond to the conventional 400,000-frame Atari budget. The model uses the
 mean feature reconstruction and isolated replay-value gradient supported by the
 frozen-DINO diagnostics. Both adaptations remain explicit command-line and
 Python constructor options. The same runner provides deterministic random
-controls, resumable training, and frozen greedy evaluation:
+controls, resumable training, and frozen sampled evaluation matching D3;
+`--greedy` is available as a separate policy diagnostic:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.

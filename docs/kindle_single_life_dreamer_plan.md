@@ -144,10 +144,13 @@ The behavioral reference is DreamerV3 revision
 Meganeura implements DreamerV3's optimizer chain directly: per-parameter
 adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
 also compiles a statically unrolled recurrent graph: unrolling all 64 steps made
-even small presets impractical to build. Kindle therefore uses 8-step truncated
-BPTT, accumulates and averages gradients across all eight chunks, and retains
-the full 64-step replay sample and all posterior imagination starts. This is an
-implementation accommodation, not a claimed D3-equivalent gradient path.
+even small presets impractical to build. A fresh 1M compile probe ran for more
+than 11 minutes and reached roughly 1.5 GB resident memory without completing.
+Kindle therefore uses 8-step truncated BPTT, accumulates and averages gradients
+across all eight chunks, and retains the full 64-step replay sample and all
+posterior imagination starts. The chunk length remains configurable for
+targeted scaling checks. This is an implementation accommodation, not a claimed
+D3-equivalent gradient path.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
@@ -161,8 +164,11 @@ static graphs execute in stages. Targets are formed before either update, the
 replay-value representation gradient is retained, and D3's adaptive clipping is
 applied independently to each parameter leaf.
 
-The network-size presets `1M` through `200M` mirror upstream. `12M` is the
-default Dreamer model size; DINO's frozen parameters are additional.
+The network-size presets `1M` through `200M` mirror upstream. Kindle defaults
+to `12M` for practical iteration; the pinned upstream default associated with
+the published Atari-100k score artifact is `200M`. A 12M run is a labeled
+scaling ablation, not an official-score reproduction. DINO's frozen parameters
+are additional.
 
 ## 5. Learning flow
 
@@ -317,8 +323,11 @@ Validation snapshot (updated 2026-08-25):
   through two, or -20.236 pooled over 318 episodes. Random Private Eye has
   means 47.730, -2.135, and -6.270, or 13.108 pooled over 111 episodes. The
   pinned D3 score artifact reaches a five-seed late-run mean of -4.537 on Pong
-  and 2,895.24 on Private Eye, whereas it remains at zero on Freeway. Pong and
-  Private Eye are therefore the first dense and sparse Atari curves;
+  and 2,895.24 on Private Eye, whereas it remains at zero on Freeway. That
+  artifact was committed with D3's 200M default and an older environment
+  profile (all 18 actions, zero reset no-ops, and a 100,000-frame episode cap),
+  so it is a published target rather than a matched 12M/current-protocol
+  control. Pong and Private Eye remain the first dense and sparse Atari curves;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
