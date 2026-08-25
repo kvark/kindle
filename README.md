@@ -268,7 +268,9 @@ The same runner provides deterministic random controls, resumable training, and
 frozen sampled evaluation matching D3; `--greedy` is available as a separate
 policy diagnostic. During evaluation, `--reward-probe` measures the chosen
 action's one-step prior and the resulting posterior reward prediction against
-actual rewards, split into positive, zero, and negative targets:
+actual rewards, split into positive, zero, and negative targets. It also reports
+tie-aware ROC-AUC for reward occurrence and signed ordering, exposing weak
+ranking before the head becomes calibrated:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.
