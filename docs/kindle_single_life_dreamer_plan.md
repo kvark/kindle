@@ -474,6 +474,27 @@ Validation snapshot (updated 2026-08-25):
   for 59.9% of actions. World-model ranking is still improving while control
   remains random-level and increasingly concentrated, so the unchanged curve
   continues to the stronger 35,000-step recovery-versus-collapse discriminator;
+- at 35,000 steps, the checkpoint contains 8,479 learner updates and the
+  matched trajectory hash remains identical through all six probes. Posterior
+  reward-event and negative-vs-rest ROC-AUC edge up to 0.891 and 0.893, while
+  their one-step-prior counterparts dip slightly to 0.874 and 0.879. Posterior
+  and prior negative-minus-zero gaps nevertheless widen to -0.23007 and
+  -0.21156. All three matched positive targets remain predicted negative and
+  below zero targets, so matched reward ranking is plateauing without correct
+  sign calibration. Final-100 reconstruction loss, raw KL, reward MAE, and
+  policy entropy are 56.02, 2.360, 0.03659, and 1.4545. The exact
+  120,000--140,000-frame online window contains returns -18, -19, -20, and -21:
+  its -19.5 mean is one point better than pinned D3 seed zero's -20.5, but below
+  D3's -18.17 five-seed mean. Online effective actions also recover from the
+  one-sided 30,000-step concentration to 43.6% `RIGHTFIRE` and 32.3%
+  `LEFTFIRE`. Frozen sampled evaluation improves from -20.6 to -20.0 over four
+  completed episodes, with 47.8% `RIGHTFIRE`, 35.7% `LEFTFIRE`, and 1.212
+  effective-action entropy. On that policy's separate trajectory, five positive
+  targets are finally predicted above zero targets on average and posterior
+  positive-vs-negative AUC reaches 0.902, although the positive mean itself is
+  still negative. This is the first modest evidence of learned Pong control,
+  not a solved curve; checkpoints at 40,000 and 45,000 steps test it against
+  D3's sharper next-phase improvement before the existing 50,000-step probe;
 - this early lack of control matches the pinned D3 Pong artifact rather than
   putting Kindle behind it. D3's five-seed episode means in 20,000-frame
   windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are
