@@ -139,6 +139,20 @@ impl DinoPerception {
         self.run()
     }
 
+    /// Projected patch tokens before the production 2x2 spatial pooling.
+    ///
+    /// This is exposed for representation diagnostics. Dreamer continues to
+    /// consume only the pooled [`DinoObservation`], so reading these values
+    /// cannot change training or replay compatibility.
+    pub fn projected_patches(&self) -> &[f32] {
+        &self.projected
+    }
+
+    /// Side length of the square grid returned by [`Self::projected_patches`].
+    pub fn projected_grid(&self) -> usize {
+        self.config.grid()
+    }
+
     fn run(&mut self) -> DinoObservation {
         self.session.set_input("patches", &self.input);
         self.session.step();
