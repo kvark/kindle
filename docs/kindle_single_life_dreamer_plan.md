@@ -156,7 +156,7 @@ weak 0.646 posterior reward-event ranking arises downstream of frozen vision.
 |---|---|
 | Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
 | World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
-| Train ratio | 32 replayed samples per real environment step |
+| Train ratio | 32 replayed samples per real environment step by default; 256 for Atari-100K |
 | State | Block-recurrent deterministic state plus 32 categorical variables |
 | Categorical support | Preset-dependent classes, 1% uniform mixture |
 | World losses | Feature reconstruction, reward, continuation, dynamics KL, representation KL |
@@ -713,6 +713,22 @@ Validation snapshot (updated 2026-08-25):
   next causal run. The current curve remains immutable and continues through
   its existing 75,000- and 100,000-step gates to measure whether the collapse
   eventually recovers;
+- paired behavior and value diagnostics at the same 50,000-step checkpoint
+  show that the collapse is increasingly critic-led. Across 250 states on the
+  fixed forced-action trajectory, actor/one-step-value correlation rises from
+  0.426 at 45,000 steps to 0.516, pairwise ranking accuracy rises from 0.679 to
+  0.717, and greedy agreement with the one-step maximum rises from 22.8% to
+  43.6%, even as policy entropy falls from 1.328 to 1.048. The actor assigns
+  89.0% mean probability to the raw `DOWNLEFT` and `DOWNLEFTFIRE` aliases,
+  whose greedy choices cover 247/250 states. The one-step action span remains
+  small at 0.0621. On the separate sampled-policy trajectory, the calibration
+  probe reproduces all 18 action counts and six -21 episodes of exactly 764
+  decisions from the frozen endpoint evaluation. Across their 4,584 states,
+  predicted values average -3.403 with standard deviation 0.132, whereas
+  realized horizon-discounted returns average -5.949 with standard deviation
+  2.222. Bias is +2.546, MAE 3.009, RMSE 3.383, and value/return correlation
+  is -0.015. The actor is therefore becoming more faithful to a critic that
+  has almost no useful temporal ranking, reinforcing the BPTT-length test;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
