@@ -43,7 +43,8 @@
 - Added deterministic Atari random controls, forced-random prefixes, checkpoint
   restore, periodic saves for long runs, D3-style sampled evaluation,
   append-safe metrics, resume-safe absolute event coordinates and counter
-  deltas, and an explicit greedy diagnostic to the Gymnasium runner. JSONL
+  deltas, matched forced-random checkpoint evaluation, and an explicit greedy
+  diagnostic to the Gymnasium runner. JSONL
   records the exact ALE action vocabulary, DINO weight fingerprint, throughput,
   and D3's 350k--400k-frame score window. The runner exposes both the pinned
   source's current Atari-100k wrapper and the historical settings behind its

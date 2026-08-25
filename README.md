@@ -270,7 +270,9 @@ policy diagnostic. During evaluation, `--reward-probe` measures the chosen
 action's one-step prior and the resulting posterior reward prediction against
 actual rewards, split into positive, zero, and negative targets. It also reports
 tie-aware ROC-AUC for reward occurrence and signed ordering, exposing weak
-ranking before the head becomes calibrated:
+ranking before the head becomes calibrated. Set `--random-action-steps` to the
+evaluation length to compare checkpoints on the same deterministic external
+action and environment trajectory while still updating each model's RSSM:
 
 ```bash
 # Environment-only random control; the DINO path is not opened.
@@ -286,6 +288,7 @@ python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
 python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --steps 10000 --atari-protocol published \
   --restore checkpoints/pong-seed0 --evaluate --reward-probe \
+  --random-action-steps 10000 \
   --output runs/pong-seed0-eval.jsonl
 
 # Verify that reward-event evidence survives frozen DINO and 2x2 pooling on
