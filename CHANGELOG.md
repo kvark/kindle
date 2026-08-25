@@ -23,6 +23,10 @@
 - Raised fresh configs' per-patch decoder depth to 64, removing the inherited
   pixel-decoder rank bottleneck while preserving old checkpoints through a
   legacy-depth fallback for configs that predate the field.
+- Calibrated the Atari runner's default DINO reconstruction coefficient to
+  `0.25`, matching the order of D3's summed-pixel objective. An exact native
+  control changed frozen return from zero to 2,500/10,000 without a throughput
+  penalty; the coefficient remains overridable for ablations.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
   controls plus held-out reward-head calibration, ROC-AUC, and average-precision
   metrics to reject action-history shortcuts and score rare rewards fairly.
