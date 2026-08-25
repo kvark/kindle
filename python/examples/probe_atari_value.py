@@ -1,4 +1,4 @@
-"""Measure critic calibration on a frozen Atari policy trajectory."""
+"""Measure Monte Carlo and one-step critic calibration on a frozen Atari policy."""
 
 import argparse
 import json
@@ -62,6 +62,7 @@ def main() -> None:
 
     values = []
     rewards = []
+    bellman_targets = []
     policy_entropies = []
     action_counts = [0] * action_count
     episode_boundaries = []
@@ -77,7 +78,8 @@ def main() -> None:
             raise RuntimeError("policy returned the wrong action count")
         if not np.isclose(float(np.sum(probabilities)), 1.0):
             raise RuntimeError("policy probabilities do not sum to one")
-        values.append(float(agent.posterior_value_prediction()))
+        value = float(agent.posterior_value_prediction())
+        values.append(value)
         policy_entropies.append(
             -float(
                 np.sum(probabilities * np.log(np.maximum(probabilities, 1e-30)))
@@ -96,6 +98,10 @@ def main() -> None:
             extrinsic_reward=reward,
             terminated=terminated,
             truncated=truncated,
+        )
+        next_value = float(agent.posterior_value_prediction())
+        bellman_targets.append(
+            reward + (0.0 if terminated else gamma * next_value)
         )
         if terminated or truncated:
             end = step + 1
@@ -130,6 +136,9 @@ def main() -> None:
     predictions = np.asarray([values[index] for index in evaluated_indices])
     targets = np.asarray([monte_carlo_returns[index] for index in evaluated_indices])
     errors = predictions - targets
+    bellman_predictions = np.asarray(values)
+    bellman_targets = np.asarray(bellman_targets)
+    bellman_residuals = bellman_predictions - bellman_targets
     prediction_variance = float(np.var(predictions))
     calibration_slope = (
         float(np.cov(predictions, targets, ddof=0)[0, 1] / prediction_variance)
@@ -171,6 +180,15 @@ def main() -> None:
         "value_return_correlation": checked_correlation(predictions, targets),
         "calibration_slope": calibration_slope,
         "calibration_intercept": calibration_intercept,
+        "bellman_target_mean": float(np.mean(bellman_targets)),
+        "bellman_target_std": float(np.std(bellman_targets)),
+        "bellman_residual_mean": float(np.mean(bellman_residuals)),
+        "bellman_residual_std": float(np.std(bellman_residuals)),
+        "bellman_mae": float(np.mean(np.abs(bellman_residuals))),
+        "bellman_rmse": float(np.sqrt(np.mean(np.square(bellman_residuals)))),
+        "bellman_value_target_correlation": checked_correlation(
+            bellman_predictions, bellman_targets
+        ),
     }
     encoded = json.dumps(result, indent=2, sort_keys=True)
     if args.output:

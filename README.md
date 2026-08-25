@@ -313,7 +313,7 @@ python python/examples/probe_atari_behavior.py \
   --output runs/pong-behavior.json
 
 # Compare critic values with realized discounted returns from complete frozen
-# policy episodes.
+# policy episodes and with one-step Bellman targets on the full trajectory.
 python python/examples/probe_atari_value.py \
   /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
   --steps 5000 --atari-protocol published \
