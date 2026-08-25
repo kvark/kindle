@@ -379,8 +379,14 @@ Validation snapshot (updated 2026-08-25):
   per seed, so the sparse-game estimate remains noisy. The published D3 target
   is -4.537 on Pong and 2,895.24 on Private Eye, and zero on Freeway. These
   targets average each seed's episode scores over the same recorded-frame
-  window, then average five seeds. Pong and Private Eye remain the first dense
-  and sparse Atari curves;
+  window, then average five seeds. An independent ICLR 2025 comparison also
+  reports a 12M `DreamerV3XS` at -10 on Pong and 207 on Private Eye after the
+  Atari-100K budget, giving the practical preset a more appropriate secondary
+  target than the original 200M model. Its released benchmark metadata marks
+  Dreamer as non-sticky/full-action, but the repository does not contain the XS
+  run configuration or raw curves, so those rounded scores are supporting
+  evidence rather than a protocol-matched acceptance gate. Pong and Private
+  Eye remain the first dense and sparse Atari curves;
 - the first published-protocol 1M Pong curve is running with the calibrated
   reconstruction scale and D3 representation gradients. At the 10,000-step
   checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
@@ -1007,6 +1013,10 @@ falsifiable exit gate.
 - DreamerV3 behavioral reference:
   [danijar/dreamerv3](https://github.com/danijar/dreamerv3), revision
   `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
+- Size-matched Atari comparison:
+  [Drama ICLR 2025 paper](https://proceedings.iclr.cc/paper_files/paper/2025/file/bc968adbdff4a2551649d464b83f264a-Paper-Conference.pdf)
+  and [released code](https://github.com/realwenlongwang/Drama), revision
+  `a50bd54c34e77d1d13e988a031733a47817098e2`.
 - D3 runner ratio-scheduler reference:
   [danijar/elements](https://github.com/danijar/elements), revision
   `b781f900b6a3b5be3a9037fd1dbb3977ad70d219`.
