@@ -13,6 +13,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["loss_scales"]["reconstruction"] == 1.0
     assert config["replay_value_gradient"] is True
     assert config["behavior_learning_rate"] is None
+    assert config["dynamics_free_nats"] is None
     assert kindle.DINO_MODEL_ID.startswith("facebook/dinov3-vits16")
 
 

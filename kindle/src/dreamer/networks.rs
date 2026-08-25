@@ -525,6 +525,11 @@ pub(crate) fn straight_through_sample(
     graph.add(hard_sample, correction)
 }
 
+pub(crate) struct CategoricalKl {
+    pub(crate) loss: NodeId,
+    pub(crate) raw: NodeId,
+}
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn categorical_kl(
     graph: &mut Graph,
@@ -537,7 +542,7 @@ pub(crate) fn categorical_kl(
     stop_posterior: bool,
     stop_prior: bool,
     free_nats: f32,
-) -> NodeId {
+) -> CategoricalKl {
     let posterior_logits = if stop_posterior {
         graph.stop_gradient(posterior_logits)
     } else {
@@ -559,16 +564,18 @@ pub(crate) fn categorical_kl(
     let per_variable = graph.sum_inner(elements);
     let per_variable = graph.reshape(per_variable, &[batch, stoch]);
     let per_state = graph.sum_inner(per_variable);
-    let per_state = if free_nats == 0.0 {
-        per_state
+    let raw = graph.mean_all(per_state);
+    let loss = if free_nats == 0.0 {
+        raw
     } else {
         let negative_floor = graph.constant(vec![-free_nats; batch], &[batch, 1]);
         let excess = graph.add(per_state, negative_floor);
         let excess = graph.relu(excess);
         let floor = graph.constant(vec![free_nats; batch], &[batch, 1]);
-        graph.add(excess, floor)
+        let clamped = graph.add(excess, floor);
+        graph.mean_all(clamped)
     };
-    graph.mean_all(per_state)
+    CategoricalKl { loss, raw }
 }
 
 pub(crate) fn feature(

@@ -144,7 +144,13 @@ pub struct DreamerConfig {
     pub imagination_length: usize,
     pub horizon: usize,
     pub lambda: f32,
+    /// Free-nat floor for the representation KL and, by default, dynamics KL.
     pub free_nats: f32,
+    /// Optional dynamics-only floor. `None` preserves D3's shared floor;
+    /// `Some(0.0)` continuously trains the prior while leaving the posterior's
+    /// representation free-nat budget unchanged.
+    #[serde(default)]
+    pub dynamics_free_nats: Option<f32>,
     pub unimix: f32,
     pub value_bins: usize,
     pub actor_unimix: f32,
@@ -192,6 +198,7 @@ impl DreamerConfig {
             horizon: 333,
             lambda: 0.95,
             free_nats: 1.0,
+            dynamics_free_nats: None,
             unimix: 0.01,
             value_bins: 255,
             actor_unimix: 0.01,
@@ -246,6 +253,10 @@ impl DreamerConfig {
 
     pub fn behavior_learning_rate(&self) -> f32 {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
+    }
+
+    pub fn dynamics_free_nats(&self) -> f32 {
+        self.dynamics_free_nats.unwrap_or(self.free_nats)
     }
 
     /// Eligible replay items required before scheduled learning begins.
@@ -309,6 +320,12 @@ impl DreamerConfig {
         }
         if !self.free_nats.is_finite() || self.free_nats < 0.0 {
             return Err("free_nats must be finite and non-negative".into());
+        }
+        if self
+            .dynamics_free_nats
+            .is_some_and(|free_nats| !free_nats.is_finite() || free_nats < 0.0)
+        {
+            return Err("dynamics_free_nats must be finite and non-negative".into());
         }
         if !(0.0..1.0).contains(&self.unimix) {
             return Err("RSSM unimix must be in [0, 1)".into());
@@ -415,6 +432,8 @@ mod tests {
         assert_eq!(config.replay_warmup_frames(), 1_088);
         assert_eq!(config.train_ratio, 32.0);
         assert_eq!(config.actor_unimix, 0.01);
+        assert_eq!(config.dynamics_free_nats, None);
+        assert_eq!(config.dynamics_free_nats(), config.free_nats);
         assert_eq!(config.behavior_learning_rate, None);
         assert_eq!(config.behavior_learning_rate(), config.learning_rate);
         assert!(config.replay_value_gradient);
@@ -433,14 +452,32 @@ mod tests {
     }
 
     #[test]
+    fn dynamics_floor_can_override_the_d3_shared_default() {
+        let mut config = DreamerConfig::tiny(3);
+        config.free_nats = 1.0;
+        assert_eq!(config.dynamics_free_nats(), 1.0);
+        config.dynamics_free_nats = Some(0.0);
+        assert_eq!(config.dynamics_free_nats(), 0.0);
+        assert!(config.check().is_ok());
+        config.dynamics_free_nats = Some(-1.0);
+        assert_eq!(
+            config.check().unwrap_err(),
+            "dynamics_free_nats must be finite and non-negative"
+        );
+    }
+
+    #[test]
     fn older_configs_default_new_diagnostic_switches() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
         object.remove("behavior_learning_rate");
+        object.remove("dynamics_free_nats");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
         assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
+        assert_eq!(restored.dynamics_free_nats, None);
+        assert_eq!(restored.dynamics_free_nats(), restored.free_nats);
     }
 }

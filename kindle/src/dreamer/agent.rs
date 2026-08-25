@@ -73,6 +73,8 @@ pub enum ActionMode {
 pub struct WorldMetrics {
     pub total_loss: f32,
     pub reconstruction_loss: f32,
+    /// Unclipped posterior-to-prior KL before either free-nat floor.
+    pub raw_kl: f32,
     pub dynamics_kl: f32,
     pub representation_kl: f32,
     pub reward_loss: f32,
@@ -921,6 +923,7 @@ impl DreamerCore {
             metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
             metrics.reconstruction_loss +=
                 read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
+            metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
             metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
             metrics.representation_kl += read_scalar(&self.world_train, world::LOSS_REPRESENTATION);
             metrics.reward_loss += read_scalar(&self.world_train, world::LOSS_REWARD);
@@ -931,6 +934,7 @@ impl DreamerCore {
         let scale = 1.0 / chunk_count as f32;
         metrics.total_loss *= scale;
         metrics.reconstruction_loss *= scale;
+        metrics.raw_kl *= scale;
         metrics.dynamics_kl *= scale;
         metrics.representation_kl *= scale;
         metrics.reward_loss *= scale;
@@ -948,6 +952,7 @@ impl DreamerCore {
         assert!(all_finite(&[
             metrics.total_loss,
             metrics.reconstruction_loss,
+            metrics.raw_kl,
             metrics.dynamics_kl,
             metrics.representation_kl,
             metrics.reward_loss,
@@ -1737,6 +1742,7 @@ mod tests {
         let mut config = DreamerConfig::tiny(3);
         config.batch_length = 8;
         config.world_backprop_length = 4;
+        config.dynamics_free_nats = Some(0.0);
         config.skip_full_optimize = true;
         let gpu = Arc::new(meganeura::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
@@ -1784,6 +1790,9 @@ mod tests {
         assert_eq!(report.learner_step, 1);
         assert_eq!(report.replay_len, 9);
         assert!(report.world.total_loss.is_finite());
+        assert!(report.world.raw_kl >= 0.0);
+        assert!((report.world.dynamics_kl - report.world.raw_kl).abs() < 1e-6);
+        assert!(report.world.representation_kl >= agent.config.free_nats);
         assert!(report.behavior.total_loss.is_finite());
         assert!(
             (report.world.reward_loss - (agent.config.value_bins as f32).ln()).abs() < 1e-3,

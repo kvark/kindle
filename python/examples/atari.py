@@ -37,6 +37,11 @@ def main() -> None:
     parser.add_argument("--learning-rate-warmup", type=int)
     parser.add_argument("--free-nats", type=float)
     parser.add_argument(
+        "--dynamics-free-nats",
+        type=float,
+        help="override only the prior/dynamics KL floor",
+    )
+    parser.add_argument(
         "--reconstruction-loss-scale",
         type=float,
         default=MEAN_DINO_RECONSTRUCTION_SCALE,
@@ -90,6 +95,7 @@ def main() -> None:
         learning_rate=args.learning_rate,
         learning_rate_warmup=args.learning_rate_warmup,
         free_nats=args.free_nats,
+        dynamics_free_nats=args.dynamics_free_nats,
         reconstruction_loss_scale=args.reconstruction_loss_scale,
         replay_value_gradient=args.replay_value_gradient,
     )

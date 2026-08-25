@@ -16,6 +16,7 @@ pub const LOSS_REPRESENTATION: usize = 3;
 pub const LOSS_REWARD: usize = 4;
 pub const LOSS_CONTINUATION: usize = 5;
 pub const LOSS_REPLAY_VALUE: usize = 6;
+pub const RAW_KL: usize = 7;
 
 struct Dynamics {
     core: RssmCore,
@@ -132,6 +133,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     let mut reconstruction_losses = Vec::with_capacity(length);
     let mut dynamics_losses = Vec::with_capacity(length);
     let mut representation_losses = Vec::with_capacity(length);
+    let mut raw_kl_metrics = Vec::with_capacity(length);
     let mut reward_losses = Vec::with_capacity(length);
     let mut continuation_losses = Vec::with_capacity(length);
     let mut replay_value_losses = Vec::with_capacity(length);
@@ -214,7 +216,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         // the representation-learning signal by 3,136x.
         reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / batch as f32));
 
-        dynamics_losses.push(categorical_kl(
+        let dynamics_kl = categorical_kl(
             &mut graph,
             posterior_logits,
             prior_logits,
@@ -224,9 +226,11 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
             config.unimix,
             true,
             false,
-            config.free_nats,
-        ));
-        representation_losses.push(categorical_kl(
+            config.dynamics_free_nats(),
+        );
+        dynamics_losses.push(dynamics_kl.loss);
+        raw_kl_metrics.push(dynamics_kl.raw);
+        let representation_kl = categorical_kl(
             &mut graph,
             posterior_logits,
             prior_logits,
@@ -237,7 +241,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
             false,
             true,
             config.free_nats,
-        ));
+        );
+        representation_losses.push(representation_kl.loss);
 
         let (reward, continuation) = model.heads.forward(&mut graph, state);
         // Keep the reduction explicit because this value is composed into the
@@ -272,6 +277,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     let dynamics = scale(&mut graph, dynamics, average);
     let representation = sum(&mut graph, &representation_losses);
     let representation = scale(&mut graph, representation, average);
+    let raw_kl = sum(&mut graph, &raw_kl_metrics);
+    let raw_kl = scale(&mut graph, raw_kl, average);
     let reward = sum(&mut graph, &reward_losses);
     let reward = scale(&mut graph, reward, average);
     let continuation = sum(&mut graph, &continuation_losses);
@@ -297,6 +304,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         reward,
         continuation,
         replay_value,
+        raw_kl,
     ]);
     graph
 }
@@ -387,7 +395,7 @@ mod tests {
         let config = DreamerConfig::tiny(3);
         let size = config.network();
         let training = build_training_graph(&config, config.world_backprop_length);
-        assert_eq!(training.outputs().len(), 7);
+        assert_eq!(training.outputs().len(), 8);
         let grouped_weight = training
             .nodes()
             .iter()

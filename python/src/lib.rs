@@ -33,6 +33,7 @@ impl PyAgent {
         behavior_learning_rate = None,
         learning_rate_warmup = None,
         free_nats = None,
+        dynamics_free_nats = None,
         reconstruction_loss_scale = None,
         replay_value_gradient = None,
         dino_plan_cache = None,
@@ -55,6 +56,7 @@ impl PyAgent {
         behavior_learning_rate: Option<f32>,
         learning_rate_warmup: Option<u64>,
         free_nats: Option<f32>,
+        dynamics_free_nats: Option<f32>,
         reconstruction_loss_scale: Option<f32>,
         replay_value_gradient: Option<bool>,
         dino_plan_cache: Option<&str>,
@@ -93,6 +95,9 @@ impl PyAgent {
         }
         if let Some(value) = free_nats {
             config.free_nats = value;
+        }
+        if let Some(value) = dynamics_free_nats {
+            config.dynamics_free_nats = Some(value);
         }
         if let Some(value) = reconstruction_loss_scale {
             config.loss_scales.reconstruction = value;
