@@ -24,6 +24,8 @@ ATARI_ACTION_REPEAT = 4
 ATARI_NOOP_MAX = 30
 ATARI_SCREEN_SIZE = 64
 ATARI_MAX_EPISODE_FRAMES = 108_000
+ATARI_SCORE_WINDOW_START_FRAMES = 350_000
+ATARI_SCORE_WINDOW_END_FRAMES = 400_000
 
 
 class DreamerAtariPreprocessing(gym.Wrapper):
@@ -336,6 +338,8 @@ def main() -> None:
     episode_length = 0
     completed_return_sum = 0.0
     episodes = 0
+    score_window_return_sum = 0.0
+    score_window_episodes = 0
     interval_reward = 0.0
     interval_episodes = 0
     interval_updates = 0
@@ -348,6 +352,10 @@ def main() -> None:
             "steps": args.steps,
             "action_repeat": ATARI_ACTION_REPEAT,
             "environment_frame_budget": args.steps * ATARI_ACTION_REPEAT,
+            "score_window_frames": [
+                ATARI_SCORE_WINDOW_START_FRAMES,
+                ATARI_SCORE_WINDOW_END_FRAMES,
+            ],
             "seed": args.seed,
             "actions": action_count,
             "action_meanings": action_meanings,
@@ -406,9 +414,17 @@ def main() -> None:
             action_counts[action] += 1
             interval_action_counts[action] += 1
             if terminated or truncated:
+                episode_environment_frames = absolute_environment_frames(run_step)
                 episodes += 1
                 interval_episodes += 1
                 completed_return_sum += episode_return
+                if (
+                    ATARI_SCORE_WINDOW_START_FRAMES
+                    <= episode_environment_frames
+                    <= ATARI_SCORE_WINDOW_END_FRAMES
+                ):
+                    score_window_return_sum += episode_return
+                    score_window_episodes += 1
                 emit(
                     {
                         "event": "episode",
@@ -470,13 +486,15 @@ def main() -> None:
             if agent is not None
             else 0
         )
+        starting_environment_frames = starting_environment_step * ATARI_ACTION_REPEAT
+        ending_environment_frames = absolute_environment_frames(args.steps)
         emit(
             {
                 "event": "run_end",
                 "environment": args.environment,
                 "steps": args.steps,
                 "environment_step": absolute_environment_step(args.steps),
-                "environment_frames": absolute_environment_frames(args.steps),
+                "environment_frames": ending_environment_frames,
                 "environment_frame_delta": args.steps * ATARI_ACTION_REPEAT,
                 "seed": args.seed,
                 "mode": run_mode,
@@ -485,6 +503,22 @@ def main() -> None:
                 "mean_completed_return": (
                     completed_return_sum / episodes if episodes else 0.0
                 ),
+                "score_window": {
+                    "start_environment_frames": ATARI_SCORE_WINDOW_START_FRAMES,
+                    "end_environment_frames": ATARI_SCORE_WINDOW_END_FRAMES,
+                    "complete": (
+                        starting_environment_frames
+                        <= ATARI_SCORE_WINDOW_START_FRAMES
+                        and ending_environment_frames
+                        >= ATARI_SCORE_WINDOW_END_FRAMES
+                    ),
+                    "completed_episodes": score_window_episodes,
+                    "mean_completed_return": (
+                        score_window_return_sum / score_window_episodes
+                        if score_window_episodes
+                        else None
+                    ),
+                },
                 "partial_episode_return": episode_return,
                 "partial_episode_length": episode_length,
                 "action_counts": action_counts,
