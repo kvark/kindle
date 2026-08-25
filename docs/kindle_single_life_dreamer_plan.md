@@ -754,8 +754,36 @@ action, both policy and prior argmax select one, and the policy assigns it 96.5%
 probability on average. Open-loop DINO MSE changes only from 0.00239 at horizon
 one to 0.00248 at horizon fifteen while beating persistence on 78.6% to 97.3%
 of samples. This is still a single-seed, forced-random-data diagnostic with a
-gated actor and non-default optimizer settings; the next gate is unforced,
-online-first multi-seed training, not a claim of Atari performance.
+gated actor and non-default optimizer settings, not a claim of Atari
+performance.
+
+A matched fidelity control restores both D3 gradient choices that the
+diagnostic had changed: the dynamics and representation KL terms share one
+free nat, and replay-value loss again sends its representation gradient into
+the RSSM. It follows the same forced-random 10,000-step trajectory. Reward
+separation first exceeds 0.1 at update 720, only 39 updates later than the
+adapted control. Its final-100 reconstruction loss, reward gap, raw KL,
+imagined reward, and policy entropy are 7.01, 0.9991, 0.554, 0.223, and 0.264.
+Frozen greedy evaluation again earns exactly 2,500/10,000. The held-out probe
+decodes position from the full and deterministic states at 92.7% and 95.1%;
+posterior, one-step-prior, and horizon-15 prior reward AUC are all 1.0 with
+about 0.999 prediction gaps. The policy selects an immediately rewarding
+action on 99.7% of eligible states and assigns rewarding actions 97.1%
+probability. Open-loop DINO MSE rises only from 0.00223 at horizon one to
+0.00233 at horizon fifteen. The earlier full-gradient failures were therefore
+conditional on an underweighted visual objective, not evidence that D3's
+gradient routing must be removed. D3's routing remains the baseline and the
+isolated path remains an explicit ablation.
+
+The first unforced online-first run used that isolated ablation because it was
+already in flight. It nevertheless establishes that the integration result
+survives agent-controlled data: reward separation first exceeds 0.1 at update
+705, total online reward is 1,179/10,000, and the last four 1,000-step intervals
+earn 238, 241, 242, and 246 rewards. Frozen greedy evaluation earns the exact
+2,500/10,000 ceiling. A second seed crossed the reward threshold around update
+520 before this demoted multi-seed job was stopped at 5,352 interactions to
+spend the device on the selected configuration. Unforced D3-gradient training
+is the remaining native reproducibility gate.
 
 The native result demonstrates learning in the integration environment but not
 benchmark-level generality. A pinned-source follow-up also found that D3 waits
