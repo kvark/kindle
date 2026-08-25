@@ -683,6 +683,18 @@ Validation snapshot (updated 2026-08-25):
   Together with the native control and source audit, this is evidence against
   a reversed policy gradient or stale actor synchronization and for improving
   temporal/value learning before changing the policy objective;
+- an on-policy calibration probe makes that value failure explicit. Read-only
+  value and probability queries reproduce the 45,000-step sampled trajectory
+  exactly: all 18 action counts, six episode boundaries, five 764-decision
+  episodes, the final 875-decision episode, and six -21 returns match the
+  earlier probe bit-for-bit. Across the 4,695 states belonging to those fully
+  terminated episodes, the critic predicts -3.205 on average while the realized
+  horizon-discounted return is -5.906. Its optimism bias is 2.701, MAE is 3.083,
+  RMSE is 3.457, and value/return correlation is only 0.045. The critic therefore
+  neither calibrates the return level nor tracks which on-policy states precede
+  losses, despite assigning increasingly sharp action preferences. This is the
+  strongest evidence for testing full recurrent gradients before actor-loss
+  changes;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
