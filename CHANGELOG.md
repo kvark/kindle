@@ -32,10 +32,16 @@
   reward diagnostics; the default remains D3's shared optimizer rate.
 - Added deterministic Atari random controls, forced-random prefixes, checkpoint
   restore, periodic saves for long runs, D3-style sampled evaluation,
-  resume-safe absolute event coordinates and counter deltas, and an explicit
-  greedy diagnostic to the Gymnasium runner. JSONL records the exact ALE action
-  vocabulary; replay shape, capacity, and world-model BPTT length are exposed
-  for labeled protocol and scaling checks.
+  append-safe metrics, resume-safe absolute event coordinates and counter
+  deltas, and an explicit greedy diagnostic to the Gymnasium runner. JSONL
+  records the exact ALE action vocabulary, DINO weight fingerprint, throughput,
+  and D3's 350k--400k-frame score window. The runner exposes both the pinned
+  source's current Atari-100k wrapper and the historical settings behind its
+  published score artifact; replay shape, capacity, and world-model BPTT length
+  remain explicit for labeled protocol and scaling checks.
+- Added a held-out Pong perception probe that compares raw resized pixels,
+  projected 14×14 DINO patches, and the production pooled 7×7 representation
+  using independent train, validation, and test emulator seeds.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible
