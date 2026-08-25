@@ -212,8 +212,8 @@ def main() -> None:
     parser.add_argument(
         "--replay-value-gradient",
         action=argparse.BooleanOptionalAction,
-        default=False,
-        help="let replay-value loss shape the RSSM (D3 default; disabled by the frozen-DINO candidate)",
+        default=True,
+        help="let replay-value loss shape the RSSM (D3 default; use --no-replay-value-gradient for the isolated ablation)",
     )
     parser.add_argument(
         "--random-action-steps",

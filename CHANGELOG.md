@@ -34,6 +34,10 @@
   metrics to reject action-history shortcuts and score rare rewards fairly.
 - Made the replay-value auxiliary gradient into the RSSM representation
   optional without changing behavior-critic training.
+- Retained D3's replay-value representation gradient as the Atari runner
+  default after the calibrated reconstruction control learned the sparse visual
+  task with the shared one-nat KL objective; the isolated path remains an
+  explicit ablation.
 - Added an optional behavior-only learning-rate override for controlled sparse
   reward diagnostics; the default remains D3's shared optimizer rate.
 - Added deterministic Atari random controls, forced-random prefixes, checkpoint

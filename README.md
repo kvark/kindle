@@ -258,8 +258,9 @@ resizing). `--atari-protocol published` selects the older all-18-action,
 zero-no-op, 100,000-frame-cap settings associated with D3's released scores.
 Thus 100,000 runner steps correspond to the conventional 400,000-frame Atari
 budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
-scale and isolated replay-value gradient supported by the visual diagnostics.
-Both adaptations remain explicit command-line and Python constructor options.
+scale and D3's replay-value representation gradient. Use
+`--no-replay-value-gradient` for the isolated-gradient ablation; both choices
+remain explicit Python constructor options as well.
 The same runner provides deterministic random controls, resumable training, and
 frozen sampled evaluation matching D3; `--greedy` is available as a separate
 policy diagnostic:
