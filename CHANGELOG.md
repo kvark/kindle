@@ -45,7 +45,9 @@
   remain explicit for labeled protocol and scaling checks.
 - Added a held-out Pong perception probe that compares raw resized pixels,
   projected 14×14 DINO patches, and the production pooled 7×7 representation
-  using independent train, validation, and test emulator seeds.
+  using independent train, validation, and test emulator seeds. On the first
+  four-seed split, pooling cuts replay observations by four while retaining
+  0.9867 mean coordinate R² versus 0.9890 before pooling.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible
