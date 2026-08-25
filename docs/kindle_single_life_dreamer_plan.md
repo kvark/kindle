@@ -366,7 +366,17 @@ The current same-step DINO feature decoder is replaced by a representation
 prediction head. The target remains in latent space; no RGB decoder is part of
 the optimization path.
 
-A first objective is:
+- native DINOv3 ViT-S/16 with fixed checkpoint and source revisions;
+- numerical golden parity against Transformers/PyTorch;
+- categorical RSSM, balanced KL, two-hot heads, continuation, and feature
+  reconstruction;
+- sequence replay and exact terminal/truncation alignment;
+- posterior-start imagination, actor/value learning, slow critic, and return
+  normalization;
+- held-out horizon-wise decoded-DINO prediction error against a persistence
+  baseline, alongside posterior/prior reward and representation probes;
+- complete synthetic acting/learning/checkpoint GPU canary;
+- minimal Rust and Python visual environment APIs.
 
 \[
 \begin{aligned}

@@ -13,6 +13,9 @@
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
   deterministic/categorical RSSM boundaries, plus one-step prior reward
   predictions, to localize representation and imagination loss.
+- Added a posterior reconstruction floor and horizon-wise open-loop error in
+  frozen-DINO feature space, paired with a persistence baseline, so visual
+  model quality is measured directly rather than inferred only from rewards.
 - Added dense visual-reward, forced-action-coverage, and randomized-position
   controls plus held-out reward-head calibration, ROC-AUC, and average-precision
   metrics to reject action-history shortcuts and score rare rewards fairly.

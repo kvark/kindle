@@ -49,12 +49,27 @@ struct Sample {
     food: usize,
     rewarded: usize,
     reward_prediction: Option<f32>,
+    posterior_observation_mse: Option<f32>,
     next_rewarded: Option<usize>,
     prior_reward_prediction: Option<f32>,
     prior_reward_rollout: Vec<(f32, usize)>,
+    prior_observation_rollout: Vec<ObservationPredictionError>,
     invalid_action_probability: Option<f32>,
     unmasked_argmax_invalid: Option<usize>,
     policy_reward_alignment: Option<PolicyRewardAlignment>,
+}
+
+#[derive(Clone, Copy)]
+struct ObservationPredictionError {
+    model_mse: f32,
+    persistence_mse: f32,
+}
+
+struct PendingObservationRollout {
+    sample_index: usize,
+    next_horizon: usize,
+    predictions: Vec<Vec<f32>>,
+    persistence: Vec<f32>,
 }
 
 #[derive(Clone, Copy)]
@@ -112,6 +127,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ),
         })
     });
+    let posterior_dino_reconstruction = posterior_observation_prediction_metrics(&samples);
     let one_step_prior_reward = samples
         .iter()
         .any(|sample| sample.prior_reward_prediction.is_some())
@@ -119,6 +135,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let open_loop_prior_reward = (0..arguments.rollout_horizon)
         .filter_map(|horizon| {
             rollout_reward_prediction_metrics(&samples, horizon).map(|metrics| {
+                json!({
+                    "horizon": horizon + 1,
+                    "metrics": metrics,
+                })
+            })
+        })
+        .collect::<Vec<_>>();
+    let open_loop_dino_reconstruction = (0..arguments.rollout_horizon)
+        .filter_map(|horizon| {
+            rollout_observation_prediction_metrics(&samples, horizon).map(|metrics| {
                 json!({
                     "horizon": horizon + 1,
                     "metrics": metrics,
@@ -140,8 +166,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "feature_dims": feature_dims,
             "representations": representations,
             "reward_head": reward_head,
+            "posterior_dino_reconstruction": posterior_dino_reconstruction,
             "one_step_prior_reward": one_step_prior_reward,
             "open_loop_prior_reward": open_loop_prior_reward,
+            "open_loop_dino_reconstruction": open_loop_dino_reconstruction,
             "posterior_policy_action_mask": posterior_policy_action_mask,
             "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
         }))?
@@ -175,9 +203,11 @@ fn collect_perception_samples(
             food: environment.food_index(),
             rewarded: usize::from(rewarded),
             reward_prediction: None,
+            posterior_observation_mse: None,
             next_rewarded: None,
             prior_reward_prediction: None,
             prior_reward_rollout: Vec::new(),
+            prior_observation_rollout: Vec::new(),
             invalid_action_probability: None,
             unmasked_argmax_invalid: None,
             policy_reward_alignment: None,
@@ -211,9 +241,15 @@ fn collect_latent_samples(
     let first = environment.reset();
     agent.begin_episode(&first);
     let mut samples = Vec::with_capacity(arguments.samples);
+    let mut pending_observations = Vec::<PendingObservationRollout>::new();
     let mut rewarded = false;
 
     while samples.len() < arguments.samples {
+        score_pending_observations(
+            &mut pending_observations,
+            &mut samples,
+            agent.dino_observation(),
+        );
         push_latent_sample(
             &mut samples,
             &mut agent,
@@ -245,7 +281,10 @@ fn collect_latent_samples(
                 break;
             }
         }
-        let rollout_predictions = agent.prior_reward_rollout(&rollout_actions);
+        let (rollout_predictions, rollout_observations) =
+            agent.prior_diagnostic_rollout(&rollout_actions);
+        assert_eq!(rollout_predictions.len(), rollout_observations.len());
+        let sample_index = samples.len() - 1;
         let sample = samples.last_mut().expect("current latent sample");
         sample.prior_reward_prediction = Some(rollout_predictions[0]);
         sample.next_rewarded = Some(rollout_labels[0]);
@@ -253,6 +292,12 @@ fn collect_latent_samples(
             .into_iter()
             .zip(rollout_labels)
             .collect();
+        pending_observations.push(PendingObservationRollout {
+            sample_index,
+            next_horizon: 0,
+            predictions: rollout_observations,
+            persistence: agent.dino_observation().to_vec(),
+        });
 
         let action = random_action(&environment, arguments.all_actions, &mut rng);
         assert_eq!(action, rollout_actions[0]);
@@ -268,6 +313,7 @@ fn collect_latent_samples(
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
         if ended {
+            pending_observations.clear();
             agent.begin_episode(&environment.reset());
             rewarded = false;
         }
@@ -292,6 +338,9 @@ fn push_latent_sample(
         latent[deter_dim..].to_vec(),
     ];
     let reward_prediction = agent.posterior_reward_prediction();
+    let observation = agent.dino_observation().to_vec();
+    let posterior_observation = agent.posterior_observation_prediction();
+    let posterior_observation_mse = mean_squared_error(&posterior_observation, &observation);
     let probabilities = agent.posterior_action_probabilities(None);
     let action_mask = environment.action_mask().expect("GridWorld action mask");
     let invalid_action_probability = probabilities
@@ -371,13 +420,46 @@ fn push_latent_sample(
         food: environment.food_index(),
         rewarded: usize::from(rewarded),
         reward_prediction: Some(reward_prediction),
+        posterior_observation_mse: Some(posterior_observation_mse),
         next_rewarded: None,
         prior_reward_prediction: None,
         prior_reward_rollout: Vec::new(),
+        prior_observation_rollout: Vec::new(),
         invalid_action_probability: Some(invalid_action_probability),
         unmasked_argmax_invalid: Some(usize::from(!action_mask[unmasked_argmax])),
         policy_reward_alignment: Some(policy_reward_alignment),
     });
+}
+
+fn score_pending_observations(
+    pending: &mut Vec<PendingObservationRollout>,
+    samples: &mut [Sample],
+    actual: &[f32],
+) {
+    for rollout in pending.iter_mut() {
+        let predicted = &rollout.predictions[rollout.next_horizon];
+        samples[rollout.sample_index]
+            .prior_observation_rollout
+            .push(ObservationPredictionError {
+                model_mse: mean_squared_error(predicted, actual),
+                persistence_mse: mean_squared_error(&rollout.persistence, actual),
+            });
+        rollout.next_horizon += 1;
+    }
+    pending.retain(|rollout| rollout.next_horizon < rollout.predictions.len());
+}
+
+fn mean_squared_error(prediction: &[f32], target: &[f32]) -> f32 {
+    assert_eq!(prediction.len(), target.len());
+    prediction
+        .iter()
+        .zip(target)
+        .map(|(prediction, target)| {
+            let error = prediction - target;
+            error * error
+        })
+        .sum::<f32>()
+        / prediction.len() as f32
 }
 
 fn random_action(environment: &GridWorld, all_actions: bool, rng: &mut StdRng) -> usize {
@@ -553,6 +635,56 @@ fn rollout_reward_prediction_metrics(
         .filter_map(|sample| sample.prior_reward_rollout.get(horizon).copied())
         .collect::<Vec<_>>();
     (!scored.is_empty()).then(|| prediction_metrics(scored))
+}
+
+fn rollout_observation_prediction_metrics(
+    samples: &[Sample],
+    horizon: usize,
+) -> Option<serde_json::Value> {
+    let scored = samples
+        .iter()
+        .filter_map(|sample| sample.prior_observation_rollout.get(horizon).copied())
+        .collect::<Vec<_>>();
+    if scored.is_empty() {
+        return None;
+    }
+    let count = scored.len();
+    let model_mse = scored.iter().map(|error| error.model_mse).sum::<f32>() / count as f32;
+    let persistence_mse = scored
+        .iter()
+        .map(|error| error.persistence_mse)
+        .sum::<f32>()
+        / count as f32;
+    let relative_mse_reduction = (persistence_mse > 0.0).then(|| 1.0 - model_mse / persistence_mse);
+    let model_better_count = scored
+        .iter()
+        .filter(|error| error.model_mse < error.persistence_mse)
+        .count();
+    Some(json!({
+        "mean_squared_error": model_mse,
+        "root_mean_squared_error": model_mse.sqrt(),
+        "persistence_mean_squared_error": persistence_mse,
+        "persistence_root_mean_squared_error": persistence_mse.sqrt(),
+        "relative_mse_reduction": relative_mse_reduction,
+        "model_better_rate": model_better_count as f32 / count as f32,
+        "sample_count": count,
+    }))
+}
+
+fn posterior_observation_prediction_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
+    let errors = samples
+        .iter()
+        .filter_map(|sample| sample.posterior_observation_mse)
+        .collect::<Vec<_>>();
+    if errors.is_empty() {
+        return None;
+    }
+    let mean_squared_error = errors.iter().sum::<f32>() / errors.len() as f32;
+    Some(json!({
+        "mean_squared_error": mean_squared_error,
+        "root_mean_squared_error": mean_squared_error.sqrt(),
+        "sample_count": errors.len(),
+    }))
 }
 
 fn policy_action_mask_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
@@ -755,9 +887,11 @@ mod tests {
             food: 0,
             rewarded: label,
             reward_prediction: Some(prediction),
+            posterior_observation_mse: None,
             next_rewarded: None,
             prior_reward_prediction: None,
             prior_reward_rollout: Vec::new(),
+            prior_observation_rollout: Vec::new(),
             invalid_action_probability: None,
             unmasked_argmax_invalid: None,
             policy_reward_alignment: None,
@@ -798,6 +932,34 @@ mod tests {
         let metrics = prior_reward_prediction_metrics(&[negative, positive, trailing]);
         assert_eq!(metrics["class_counts"], json!([1, 1]));
         assert_eq!(metrics["roc_auc"], 1.0);
+    }
+
+    #[test]
+    fn observation_rollout_metrics_compare_against_persistence() {
+        let mut first = sample(0, 0.0);
+        first.posterior_observation_mse = Some(1.0);
+        first
+            .prior_observation_rollout
+            .push(ObservationPredictionError {
+                model_mse: 1.0,
+                persistence_mse: 2.0,
+            });
+        let mut second = sample(0, 0.0);
+        second.posterior_observation_mse = Some(3.0);
+        second
+            .prior_observation_rollout
+            .push(ObservationPredictionError {
+                model_mse: 3.0,
+                persistence_mse: 6.0,
+            });
+        let samples = [first, second];
+        let metrics = rollout_observation_prediction_metrics(&samples, 0).unwrap();
+        assert_eq!(metrics["mean_squared_error"], 2.0);
+        assert_eq!(metrics["persistence_mean_squared_error"], 4.0);
+        assert_eq!(metrics["relative_mse_reduction"], 0.5);
+        assert_eq!(metrics["model_better_rate"], 1.0);
+        let posterior = posterior_observation_prediction_metrics(&samples).unwrap();
+        assert_eq!(posterior["mean_squared_error"], 2.0);
     }
 
     #[test]
