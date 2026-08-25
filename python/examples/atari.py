@@ -543,6 +543,10 @@ def main() -> None:
                 "learner_updates": learner_step_delta,
                 "elapsed_seconds": elapsed,
                 "environment_steps_per_second": args.steps / elapsed,
+                "environment_frames_per_second": (
+                    args.steps * ATARI_ACTION_REPEAT / elapsed
+                ),
+                "learner_updates_per_second": learner_step_delta / elapsed,
             }
         )
     finally:
