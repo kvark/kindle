@@ -211,6 +211,15 @@ Scaling a successful BPTT-64 result to 12M will first require graph
 checkpointing/chunking, a shorter recurrence, or another memory-layout change;
 the existing 12M throughput estimates below apply only to BPTT-8.
 
+A bounded recurrence sweep locates the current 12M construction limit more
+closely. BPTT-16 constructs on the integrated AMD GPU in 7.74 seconds with a
+3.7 GiB host-memory peak, preserving the 64-state batch and splitting it into
+four gradient-averaged chunks. BPTT-32 reaches an 8.6 GiB host-memory peak and
+requests about 10.7 GiB of AMD buffer space, after which the driver rejects VM
+mappings with `BO_VA (-12)` before a run header is emitted. BPTT-16 is therefore
+the longest demonstrated 12M construction on this device; its first learner
+update and sustained throughput remain untested.
+
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
 22.5 KiB in the current f32 representation, so the smaller default is already
