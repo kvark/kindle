@@ -881,8 +881,26 @@ survives agent-controlled data: reward separation first exceeds 0.1 at update
 earn 238, 241, 242, and 246 rewards. Frozen greedy evaluation earns the exact
 2,500/10,000 ceiling. A second seed crossed the reward threshold around update
 520 before this demoted multi-seed job was stopped at 5,352 interactions to
-spend the device on the selected configuration. Unforced D3-gradient training
-is the remaining native reproducibility gate.
+spend the device on the selected configuration.
+
+The selected D3-gradient configuration then passes the unforced gate directly.
+Reward separation first exceeds 0.1 at update 712. It earns 1,234/10,000
+online, with its final five 1,000-step intervals scoring 193, 243, 244, 246,
+and 244 rewards while using all four actions evenly. Over the final 100 learner
+updates, reward separation is 0.9996, reconstruction loss is 6.16, raw KL is
+0.638, imagined reward is 0.228, and policy entropy is 0.217. Frozen greedy
+evaluation earns the exact 2,500/10,000 ceiling across 50 episodes.
+
+Its independent 5,000-state probe decodes position from the full and
+deterministic states at 95.5% and 97.0%. Posterior and one-step-prior reward AUC
+are 0.99999 and 0.99939 with prediction gaps 0.954 and 0.920; horizon-15 prior
+reward AUC remains 0.99791 with a 0.855 gap. The actor chooses an immediately
+rewarding action on 99.2% of eligible states and assigns rewarding actions
+95.5% probability. Open-loop DINO MSE rises from 0.00277 at horizon one to
+0.00321 at horizon fifteen while still beating persistence on 96.2% of the
+last-horizon samples. This completes the native online integration gate for
+the D3 gradient path; Atari learning curves, not another GridWorld objective
+ablation, are now the baseline-critical experiment.
 
 The native result demonstrates learning in the integration environment but not
 benchmark-level generality. A pinned-source follow-up also found that D3 waits
