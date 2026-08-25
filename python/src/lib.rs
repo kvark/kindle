@@ -251,6 +251,11 @@ impl PyAgent {
     }
 
     #[getter]
+    fn trainable_parameter_counts(&self) -> (usize, usize) {
+        self.inner.core().trainable_parameter_counts()
+    }
+
+    #[getter]
     fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, self.inner.core().config())
     }
