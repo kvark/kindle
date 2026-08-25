@@ -374,7 +374,8 @@ the optimization path.
 - posterior-start imagination, actor/value learning, slow critic, and return
   normalization;
 - held-out horizon-wise decoded-DINO prediction error against a persistence
-  baseline, alongside posterior/prior reward and representation probes;
+  baseline, affine low-rank floors for the decoder's 64-channel output, and
+  posterior/prior reward and representation probes;
 - complete synthetic acting/learning/checkpoint GPU canary;
 - minimal Rust and Python visual environment APIs.
 

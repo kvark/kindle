@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use clap::Parser;
-use kindle::vision::DinoPerception;
+use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS};
 use kindle::{ActionMode, DreamerAgent, Environment};
 use kindle_gym::grid_world::{
     ACTION_COUNT, GridWorld, HEIGHT, POSITION_RANDOMIZATION_SEED_XOR, WIDTH,
@@ -59,6 +59,139 @@ struct Sample {
     policy_reward_alignment: Option<PolicyRewardAlignment>,
 }
 
+struct SampleCollection {
+    samples: Vec<Sample>,
+    dino_patch_statistics: DinoPatchStatistics,
+}
+
+/// Sufficient statistics for the best affine low-rank approximation of the
+/// frozen DINO patch vectors. The decoder's final shared linear layer maps
+/// `vision_depth` hidden channels to 64 DINO channels, so this is a hard lower
+/// bound on its reconstruction MSE independent of the RSSM or optimizer.
+struct DinoPatchStatistics {
+    count: usize,
+    sum: [f64; OBSERVATION_CHANNELS],
+    second_moment: Vec<f64>,
+}
+
+impl DinoPatchStatistics {
+    fn new() -> Self {
+        Self {
+            count: 0,
+            sum: [0.0; OBSERVATION_CHANNELS],
+            second_moment: vec![0.0; OBSERVATION_CHANNELS * OBSERVATION_CHANNELS],
+        }
+    }
+
+    fn add_observation(&mut self, observation: &[f32]) {
+        let (patches, remainder) = observation.as_chunks::<OBSERVATION_CHANNELS>();
+        assert!(remainder.is_empty());
+        for patch in patches {
+            self.count += 1;
+            for (channel, value) in patch.iter().enumerate() {
+                let value = f64::from(*value);
+                self.sum[channel] += value;
+                for (other_channel, other) in patch.iter().enumerate() {
+                    self.second_moment[channel * OBSERVATION_CHANNELS + other_channel] +=
+                        value * f64::from(*other);
+                }
+            }
+        }
+    }
+
+    fn metrics(&self) -> serde_json::Value {
+        assert!(self.count > 0);
+        let count = self.count as f64;
+        let mean = self.sum.map(|sum| sum / count);
+        let mut covariance = self
+            .second_moment
+            .iter()
+            .map(|moment| moment / count)
+            .collect::<Vec<_>>();
+        for row in 0..OBSERVATION_CHANNELS {
+            for column in 0..OBSERVATION_CHANNELS {
+                covariance[row * OBSERVATION_CHANNELS + column] -= mean[row] * mean[column];
+            }
+        }
+        let mut eigenvalues = symmetric_eigenvalues(covariance, OBSERVATION_CHANNELS);
+        eigenvalues.sort_by(|left, right| right.total_cmp(left));
+        for value in &mut eigenvalues {
+            *value = value.max(0.0);
+        }
+        let total_variance = eigenvalues.iter().sum::<f64>();
+        let rank_floors = [0, 4, 16, 24, 32, 48, 64]
+            .into_iter()
+            .map(|rank| {
+                let retained_variance = eigenvalues[..rank].iter().sum::<f64>();
+                let residual_variance = (total_variance - retained_variance).max(0.0);
+                json!({
+                    "rank": rank,
+                    "minimum_mean_squared_error": residual_variance
+                        / OBSERVATION_CHANNELS as f64,
+                    "explained_variance": (total_variance > 0.0)
+                        .then(|| retained_variance / total_variance),
+                })
+            })
+            .collect::<Vec<_>>();
+        json!({
+            "patch_samples": self.count,
+            "channel_count": OBSERVATION_CHANNELS,
+            "rank_floors": rank_floors,
+        })
+    }
+}
+
+/// Eigenvalues of a real symmetric row-major matrix via cyclic Jacobi
+/// rotations. This keeps the standalone probe dependency-free; 64 channels
+/// make the small O(n^3) diagnostic negligible next to DINO inference.
+fn symmetric_eigenvalues(mut matrix: Vec<f64>, size: usize) -> Vec<f64> {
+    assert_eq!(matrix.len(), size * size);
+    for _ in 0..64 {
+        let mut largest_off_diagonal = 0.0_f64;
+        for row in 0..size {
+            for column in row + 1..size {
+                let offset = row * size + column;
+                let off_diagonal = matrix[offset];
+                largest_off_diagonal = largest_off_diagonal.max(off_diagonal.abs());
+                if off_diagonal.abs() <= 1e-14 {
+                    continue;
+                }
+                let row_diagonal = matrix[row * size + row];
+                let column_diagonal = matrix[column * size + column];
+                let tau = (column_diagonal - row_diagonal) / (2.0 * off_diagonal);
+                let sign = if tau >= 0.0 { 1.0 } else { -1.0 };
+                let tangent = sign / (tau.abs() + (1.0 + tau * tau).sqrt());
+                let cosine = 1.0 / (1.0 + tangent * tangent).sqrt();
+                let sine = tangent * cosine;
+
+                for index in 0..size {
+                    if index == row || index == column {
+                        continue;
+                    }
+                    let index_row = matrix[index * size + row];
+                    let index_column = matrix[index * size + column];
+                    let rotated_row = cosine * index_row - sine * index_column;
+                    let rotated_column = sine * index_row + cosine * index_column;
+                    matrix[index * size + row] = rotated_row;
+                    matrix[row * size + index] = rotated_row;
+                    matrix[index * size + column] = rotated_column;
+                    matrix[column * size + index] = rotated_column;
+                }
+                matrix[row * size + row] = row_diagonal - tangent * off_diagonal;
+                matrix[column * size + column] = column_diagonal + tangent * off_diagonal;
+                matrix[offset] = 0.0;
+                matrix[column * size + row] = 0.0;
+            }
+        }
+        if largest_off_diagonal <= 1e-12 {
+            break;
+        }
+    }
+    (0..size)
+        .map(|index| matrix[index * size + index])
+        .collect()
+}
+
 #[derive(Clone, Copy)]
 struct ObservationPredictionError {
     model_mse: f32,
@@ -95,7 +228,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("--rollout-horizon must be in 1..=64".into());
     }
 
-    let (source, samples, representation_names) = if let Some(checkpoint) = &arguments.checkpoint {
+    let (source, collection, representation_names) = if let Some(checkpoint) = &arguments.checkpoint
+    {
         (
             "dreamer_posterior",
             collect_latent_samples(&arguments, checkpoint)?,
@@ -109,6 +243,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         )
     };
 
+    let SampleCollection {
+        samples,
+        dino_patch_statistics,
+    } = collection;
+    let dino_patch_affine_rank_floor = dino_patch_statistics.metrics();
     let mut representations = serde_json::Map::new();
     let mut feature_dims = serde_json::Map::new();
     for (index, name) in representation_names.iter().enumerate() {
@@ -166,6 +305,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "feature_dims": feature_dims,
             "representations": representations,
             "reward_head": reward_head,
+            "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
             "posterior_dino_reconstruction": posterior_dino_reconstruction,
             "one_step_prior_reward": one_step_prior_reward,
             "open_loop_prior_reward": open_loop_prior_reward,
@@ -179,25 +319,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn collect_perception_samples(
     arguments: &Arguments,
-) -> Result<Vec<Sample>, Box<dyn std::error::Error>> {
+) -> Result<SampleCollection, Box<dyn std::error::Error>> {
     let mut perception = DinoPerception::load_vits16(&arguments.dino_checkpoint, None, None)?;
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
     environment.reset();
     let mut samples = Vec::with_capacity(arguments.samples);
+    let mut dino_patch_statistics = DinoPatchStatistics::new();
     let mut rewarded = false;
 
     while samples.len() < arguments.samples {
         let frame = environment.render();
         let (x, y) = environment.position();
+        let observation =
+            perception.encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
+        dino_patch_statistics.add_observation(observation.as_slice());
         samples.push(Sample {
-            representations: vec![
-                perception
-                    .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height())
-                    .as_slice()
-                    .to_vec(),
-            ],
+            representations: vec![observation.as_slice().to_vec()],
             position: y * WIDTH + x,
             dense_right: usize::from(x >= WIDTH - 2),
             food: environment.food_index(),
@@ -227,13 +366,16 @@ fn collect_perception_samples(
             rewarded = false;
         }
     }
-    Ok(samples)
+    Ok(SampleCollection {
+        samples,
+        dino_patch_statistics,
+    })
 }
 
 fn collect_latent_samples(
     arguments: &Arguments,
     checkpoint: &Path,
-) -> Result<Vec<Sample>, Box<dyn std::error::Error>> {
+) -> Result<SampleCollection, Box<dyn std::error::Error>> {
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
@@ -241,10 +383,12 @@ fn collect_latent_samples(
     let first = environment.reset();
     agent.begin_episode(&first);
     let mut samples = Vec::with_capacity(arguments.samples);
+    let mut dino_patch_statistics = DinoPatchStatistics::new();
     let mut pending_observations = Vec::<PendingObservationRollout>::new();
     let mut rewarded = false;
 
     while samples.len() < arguments.samples {
+        dino_patch_statistics.add_observation(agent.dino_observation());
         score_pending_observations(
             &mut pending_observations,
             &mut samples,
@@ -318,7 +462,10 @@ fn collect_latent_samples(
             rewarded = false;
         }
     }
-    Ok(samples)
+    Ok(SampleCollection {
+        samples,
+        dino_patch_statistics,
+    })
 }
 
 fn push_latent_sample(
@@ -878,6 +1025,31 @@ fn ranking_metrics(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn jacobi_eigenvalues_match_symmetric_matrix() {
+        let mut eigenvalues = symmetric_eigenvalues(vec![2.0, 1.0, 1.0, 2.0], 2);
+        eigenvalues.sort_by(|left, right| right.total_cmp(left));
+        assert!((eigenvalues[0] - 3.0).abs() < 1e-12);
+        assert!((eigenvalues[1] - 1.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn affine_rank_floor_recognizes_rank_one_patch_data() {
+        let mut statistics = DinoPatchStatistics::new();
+        let mut positive = [0.0_f32; OBSERVATION_CHANNELS];
+        positive[0] = 1.0;
+        let mut negative = positive;
+        negative[0] = -1.0;
+        statistics.add_observation(&positive);
+        statistics.add_observation(&negative);
+        let metrics = statistics.metrics();
+        let floors = metrics["rank_floors"].as_array().unwrap();
+        let rank_zero = floors[0]["minimum_mean_squared_error"].as_f64().unwrap();
+        let rank_four = floors[1]["minimum_mean_squared_error"].as_f64().unwrap();
+        assert!((rank_zero - 1.0 / OBSERVATION_CHANNELS as f64).abs() < 1e-12);
+        assert!(rank_four < 1e-12);
+    }
 
     fn sample(label: usize, prediction: f32) -> Sample {
         Sample {
