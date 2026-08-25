@@ -210,6 +210,16 @@ updates/s. Reducing the action vocabulary therefore introduces no new backend,
 memory, or throughput risk; it remains conditional on the full-action
 BPTT-64 result rather than running ahead of that causal comparison.
 
+The identical full-recurrence construction does not currently scale to the
+12M preset on this host. A construction-only published-protocol Pong probe with
+the patched Blade allocator, batch length 64, and BPTT length 64 reached a
+guarded 12 GiB host-memory ceiling in 2.95 seconds, before emitting the run
+header or taking an environment step. Raising that ceiling would consume the
+headroom protecting the active run, so the controlled comparison stays at 1M.
+Scaling a successful BPTT-64 result to 12M will first require graph
+checkpointing/chunking, a shorter recurrence, or another memory-layout change;
+the existing 12M throughput estimates below apply only to BPTT-8.
+
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
 22.5 KiB in the current f32 representation, so the smaller default is already
