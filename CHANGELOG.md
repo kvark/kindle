@@ -12,6 +12,8 @@
   before uniform replay fallback.
 - Added a native frozen DINOv3 ViT-S/16 frontend with numerical parity coverage.
   Replay stores a fixed projected and pooled 7×7×64 patch representation.
+- Honored Meganeura's explicit multi-adapter selector at every Kindle GPU entry
+  point and recorded the actual adapter/driver in native and Python runs.
 - Added held-out GridWorld probes at the frozen DINO, trainable adapter, and
   deterministic/categorical RSSM boundaries, plus one-step prior reward
   predictions, to localize representation and imagination loss.

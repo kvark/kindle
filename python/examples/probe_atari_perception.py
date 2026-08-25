@@ -322,6 +322,7 @@ def main() -> None:
         },
         "projected_shape": encoder.projected_shape,
         "pooled_shape": encoder.pooled_shape,
+        "gpu_device": encoder.gpu_device,
         "results": results,
     }
     encoded = json.dumps(summary, indent=2)

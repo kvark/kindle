@@ -424,6 +424,7 @@ fn run_dreamer(
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,
+            "gpu_device": agent.core().gpu_device(),
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
             "all_actions": arguments.all_actions,

@@ -444,6 +444,7 @@ def main() -> None:
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,
+            "gpu_device": agent.gpu_device if agent is not None else None,
             "trainable_parameters": trainable_parameters,
             "config": agent.config if agent is not None else None,
         }
