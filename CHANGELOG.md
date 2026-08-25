@@ -58,6 +58,9 @@
   targets, read-only prior/posterior reward calibration during Atari evaluation,
   tie-aware reward ranking metrics, and the missing episode index in Atari JSONL
   events.
+- Added a `published-minimal` Atari profile that changes only the released
+  profile's action vocabulary, keeping reset no-ops and the episode cap fixed
+  for a controlled action-alias ablation.
 - Added a held-out Pong perception probe that compares raw resized pixels,
   projected 14×14 DINO patches, and the production pooled 7×7 representation
   using independent train, validation, and test emulator seeds. On the first

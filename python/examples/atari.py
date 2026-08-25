@@ -44,6 +44,9 @@ ATARI_PROTOCOLS = {
     # Wrapper settings used to produce scores/atari100k-dreamerv3.json.gz at
     # upstream commit 2411f7d1.
     "published": AtariProtocol(True, 0, 100_000),
+    # One-variable action-alias ablation: retain every published wrapper
+    # setting while exposing only each game's minimal legal action set.
+    "published-minimal": AtariProtocol(False, 0, 100_000),
 }
 
 
@@ -163,7 +166,8 @@ def main() -> None:
         default="current",
         help=(
             "Atari wrapper profile: current follows pinned D3 source; "
-            "published matches the settings behind its released score artifact"
+            "published matches its released score artifact; published-minimal "
+            "changes only the published action vocabulary"
         ),
     )
     parser.add_argument("--model-size", choices=MODEL_SIZES, default="12m")

@@ -259,6 +259,9 @@ Its default `current` protocol reproduces the pinned D3 Atari-100k preprocessing
 reset no-ops, a 108,000-frame episode cap, and Pillow bilinear 64×64 RGB
 resizing). `--atari-protocol published` selects the older all-18-action,
 zero-no-op, 100,000-frame-cap settings associated with D3's released scores.
+`--atari-protocol published-minimal` retains the latter two settings but uses
+each game's minimal legal action set, isolating action aliases as a diagnostic;
+its scores are not protocol-matched to the released all-action artifact.
 Thus 100,000 runner steps correspond to the conventional 400,000-frame Atari
 budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
 scale and D3's replay-value representation gradient. Use
