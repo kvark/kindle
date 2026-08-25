@@ -33,8 +33,9 @@
 - Added deterministic Atari random controls, forced-random prefixes, checkpoint
   restore, periodic saves for long runs, D3-style sampled evaluation,
   resume-safe absolute event coordinates and counter deltas, and an explicit
-  greedy diagnostic to the Gymnasium runner. Replay shape, capacity, and
-  world-model BPTT length are exposed for labeled protocol and scaling checks.
+  greedy diagnostic to the Gymnasium runner. JSONL records the exact ALE action
+  vocabulary; replay shape, capacity, and world-model BPTT length are exposed
+  for labeled protocol and scaling checks.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible

@@ -39,6 +39,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         action_meanings = environment.unwrapped.get_action_meanings()
         if not action_meanings or action_meanings[0] != "NOOP":
             raise ValueError("Atari action 0 must be NOOP")
+        self.action_meanings = tuple(str(action) for action in action_meanings)
         raw_space = environment.observation_space
         if raw_space.shape is None or len(raw_space.shape) != 3:
             raise ValueError("the Atari environment must return RGB images")
@@ -233,6 +234,12 @@ def main() -> None:
     if getattr(frame, "ndim", 0) != 3:
         raise ValueError("the environment must return H×W×3 RGB observations")
     action_count = int(environment.action_space.n)
+    action_meanings = list(environment.action_meanings)
+    if len(action_meanings) != action_count:
+        raise ValueError(
+            f"environment exposes {action_count} actions but "
+            f"{len(action_meanings)} action meanings"
+        )
     if args.random_policy:
         agent = None
     elif args.restore:
@@ -325,6 +332,7 @@ def main() -> None:
             "environment_frame_budget": args.steps * ATARI_ACTION_REPEAT,
             "seed": args.seed,
             "actions": action_count,
+            "action_meanings": action_meanings,
             "mode": run_mode,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
