@@ -643,6 +643,19 @@ rewarding action on only 33.6% of eligible states. Delaying specialization with
 a cold optimizer does not repair weak prior calibration or actor credit. The
 corrected control warms moments while holding actor parameters fixed.
 
+The corrected control confirms that conclusion. Warming the actor optimizer
+smooths the initial response to the gate, but the trajectories converge and
+then undergo the same late collapse: final-100 policy entropy is 0.209 versus
+0.229 for the cold-moment control, while imagined reward is 0.069 for both.
+Frozen greedy evaluation earns 65/10,000 by selecting `right` 9,361 times,
+below the cold control's 78. The held-out posterior/one-step-prior reward AUC
+and gaps are exactly unchanged at 0.979/0.630 and 0.678/0.0055. The actor's
+immediately rewarding argmax rate moves only from 33.6% to 33.9%. All 153
+non-value tensors in the world checkpoint remain exact; the only 11 changed
+tensors are the embedded frozen critic copy used to report replay-value loss.
+Optimizer startup state therefore changes the gate transient but does not
+repair prior calibration or behavior credit, and this diagnostic ends here.
+
 Direct decoded-DINO scoring exposes a separate architectural limit in the 1M
 diagnostic preset. On a 100-frame held-out trajectory, the asymmetric
 scale-one checkpoint has posterior reconstruction MSE 0.03603 and one-step
