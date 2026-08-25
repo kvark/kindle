@@ -495,6 +495,15 @@ Validation snapshot (updated 2026-08-25):
   not learned calibrated reward-conditioned state at 10% of the interaction
   budget. The curve continues; this is an early marker, not an endpoint
   comparison;
+- by the 15,000-step checkpoint, reward ordering improves materially without
+  yet changing control. On the same 5,000-step probe, posterior
+  reward-event-vs-zero ROC-AUC rises from 0.646 to 0.765 and the one-step prior
+  rises from 0.571 to 0.744. Negative-vs-rest AUC reaches 0.770 posterior and
+  0.751 prior. The posterior negative-minus-zero prediction gap grows from
+  about -0.000015 to -0.000914, while the sampled policy remains random-level
+  at -20.6 over five episodes. Only two positive events occur, so their ranking
+  remains too noisy to use. This is a measurable world-model learning curve,
+  but not calibrated reward prediction or learned control yet;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
