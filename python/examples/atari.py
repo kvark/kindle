@@ -10,6 +10,7 @@ import json
 import random
 import sys
 import time
+from dataclasses import dataclass
 
 import ale_py
 import gymnasium as gym
@@ -29,6 +30,22 @@ ATARI_SCORE_WINDOW_START_FRAMES = 350_000
 ATARI_SCORE_WINDOW_END_FRAMES = 400_000
 
 
+@dataclass(frozen=True)
+class AtariProtocol:
+    full_action_space: bool
+    noop_max: int
+    max_episode_frames: int
+
+
+ATARI_PROTOCOLS = {
+    # Pinned Dreamer V3's current Atari-100k wrapper defaults.
+    "current": AtariProtocol(False, ATARI_NOOP_MAX, ATARI_MAX_EPISODE_FRAMES),
+    # Wrapper settings used to produce scores/atari100k-dreamerv3.json.gz at
+    # upstream commit 2411f7d1.
+    "published": AtariProtocol(True, 0, 100_000),
+}
+
+
 def sha256_file(path: str) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as source:
@@ -45,8 +62,18 @@ class DreamerAtariPreprocessing(gym.Wrapper):
     checks termination before capturing a frame for the two-frame max pool.
     """
 
-    def __init__(self, environment: gym.Env):
+    def __init__(
+        self,
+        environment: gym.Env,
+        *,
+        noop_max: int = ATARI_NOOP_MAX,
+        max_episode_frames: int = ATARI_MAX_EPISODE_FRAMES,
+    ):
         super().__init__(environment)
+        if noop_max < 0:
+            raise ValueError("noop_max must be non-negative")
+        if max_episode_frames <= 0:
+            raise ValueError("max_episode_frames must be positive")
         action_meanings = environment.unwrapped.get_action_meanings()
         if not action_meanings or action_meanings[0] != "NOOP":
             raise ValueError("Atari action 0 must be NOOP")
@@ -62,13 +89,13 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         )
         self._frames: list[np.ndarray] = []
         self._episode_frames = 0
+        self._noop_max = noop_max
+        self._max_episode_frames = max_episode_frames
 
     def reset(self, *, seed=None, options=None):
         observation, info = self.env.reset(seed=seed, options=options)
         info = dict(info)
-        noops = int(
-            self.env.unwrapped.np_random.integers(ATARI_NOOP_MAX + 1)
-        )
+        noops = int(self.env.unwrapped.np_random.integers(self._noop_max + 1))
         for _ in range(noops):
             observation, _, terminated, truncated, step_info = self.env.step(0)
             info.update(step_info)
@@ -101,7 +128,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
                 )
                 self._frames = self._frames[-2:]
 
-            if self._episode_frames >= ATARI_MAX_EPISODE_FRAMES:
+            if self._episode_frames >= self._max_episode_frames:
                 truncated = True
             if terminated or truncated:
                 break
@@ -129,6 +156,15 @@ def main() -> None:
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--atari-protocol",
+        choices=tuple(ATARI_PROTOCOLS),
+        default="current",
+        help=(
+            "Atari wrapper profile: current follows pinned D3 source; "
+            "published matches the settings behind its released score artifact"
+        ),
+    )
     parser.add_argument("--model-size", choices=MODEL_SIZES, default="12m")
     parser.add_argument(
         "--observation-decoder-depth",
@@ -241,15 +277,21 @@ def main() -> None:
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
 
-    # Match D3's Atari-100k protocol: minimal actions, repeat 4, max-pool 2,
-    # non-sticky actions, 0--30 reset no-ops, and Pillow bilinear RGB resize.
+    protocol = ATARI_PROTOCOLS[args.atari_protocol]
+    # Both D3 Atari-100k profiles use repeat 4, max-pool 2, non-sticky
+    # actions, and Pillow bilinear RGB resize. The released score artifact
+    # predates changes to the action set, reset no-ops, and episode cap.
     environment = gym.make(
         args.environment,
         frameskip=1,
         repeat_action_probability=0.0,
-        full_action_space=False,
+        full_action_space=protocol.full_action_space,
     )
-    environment = DreamerAtariPreprocessing(environment)
+    environment = DreamerAtariPreprocessing(
+        environment,
+        noop_max=protocol.noop_max,
+        max_episode_frames=protocol.max_episode_frames,
+    )
     frame, _ = environment.reset(seed=args.seed)
     if getattr(frame, "ndim", 0) != 3:
         raise ValueError("the environment must return H×W×3 RGB observations")
@@ -377,7 +419,11 @@ def main() -> None:
             "event": "run_start",
             "environment": args.environment,
             "steps": args.steps,
+            "atari_protocol": args.atari_protocol,
             "action_repeat": ATARI_ACTION_REPEAT,
+            "full_action_space": protocol.full_action_space,
+            "noop_max": protocol.noop_max,
+            "max_episode_frames": protocol.max_episode_frames,
             "environment_frame_budget": args.steps * ATARI_ACTION_REPEAT,
             "score_window_frames": [
                 ATARI_SCORE_WINDOW_START_FRAMES,
