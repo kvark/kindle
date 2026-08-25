@@ -264,6 +264,8 @@ python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.
+Write each resumed invocation to a new JSONL file; environment-step and frame
+coordinates remain absolute, while the summary also reports segment deltas.
 
 ARC and other games should adapt their native controls into a stable categorical
 vocabulary plus an optional validity mask; coordinate-parameterized actions are
