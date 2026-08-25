@@ -693,14 +693,28 @@ asymmetric scale-one run, which reaches 0.979/0.630 posterior/prior AUC and 59
 frozen rewards under otherwise identical data and compute. Coefficient tuning
 ends here: scale one is the world-model candidate for the next behavior test.
 
-That next test delays only actor parameter updates until learner update 1,300, the
-point where the matched scale-one run first develops a grounded replay reward
-gap. The behavior critic continues learning from update zero, so the experiment
-preserves early value fitting and broad imagined-state coverage while asking
-whether policy specialization—not world or critic learning—happened too soon.
-Actor optimizer moments continue tracking gradients while the parameters are
-frozen. The gate defaults to zero and is diagnostic rather than a baseline
-change.
+That next test delays only actor parameter updates until learner update 1,300,
+the point where the matched scale-one run first develops a grounded replay
+reward gap. The behavior critic continues learning from update zero, so the
+experiment preserves early value fitting and broad imagined-state coverage
+while asking whether policy specialization—not world or critic learning—happened
+too soon. Actor optimizer moments continue tracking gradients while the
+parameters are frozen. The gate defaults to zero and is diagnostic rather than
+a baseline change.
+
+Direct decoded-DINO scoring exposes a separate architectural limit in the 1M
+diagnostic preset. On a 100-frame held-out trajectory, the asymmetric
+scale-one checkpoint has posterior reconstruction MSE 0.03603 and one-step
+prior MSE 0.03604, while copying the current observation forward scores
+0.00930. The prior therefore adds almost no decoded error beyond the posterior
+floor, but both are substantially worse than persistence. More importantly,
+the decoder maps only four hidden patch channels into the 64-channel DINO
+target. An affine PCA bound over the same frozen-DINO data gives minimum MSE
+0.01825 at rank four, so this decoder cannot beat persistence even with a
+perfect latent and optimizer. Rank 16 lowers the bound to 0.00337 (97.0% of
+variance explained), and rank 64 removes it. The next visual-model run must
+widen or nonlinearly lift the decoder's final patch representation before
+decoded prediction error can be interpreted as a dynamics result.
 
 These are implementation and failure-localization results, not evidence that
 the baseline learns the environment. A pinned-source follow-up also found that
