@@ -177,7 +177,7 @@ cargo run -p kindle-gym --example grid_world --release -- \
 # Frozen-perception probe for GridWorld state separability:
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
-  --randomize-position
+  --randomize-position --output runs/gridworld-dino-probe-seed1.json
 
 # The same held-out probes after the RSSM, including the posterior policy's
 # invalid-action mass, agreement with true/model-predicted rewarding actions,
@@ -189,7 +189,8 @@ cargo run -p kindle-gym --example probe_grid_world --release -- \
 cargo run -p kindle-gym --example probe_grid_world --release -- \
   /models/dinov3/model.safetensors --samples 500 --seed 1 \
   --randomize-position \
-  --checkpoint checkpoints/gridworld-dense-probe-seed-0
+  --checkpoint checkpoints/gridworld-dense-probe-seed-0 \
+  --output runs/gridworld-rssm-probe-seed1.json
 ```
 
 The D3-compatible replay-value representation gradient remains enabled in
