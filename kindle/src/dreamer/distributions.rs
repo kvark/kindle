@@ -267,4 +267,25 @@ mod tests {
         );
         assert_eq!(result, vec![2.8, 2.0]);
     }
+
+    #[test]
+    fn timeout_cuts_trace_but_retains_bootstrap() {
+        let last = [0.0, 0.0, 1.0];
+        let reward = [0.0, 0.0, 2.0];
+        let value = [0.0; 3];
+        let bootstrap = [0.0, 0.0, 10.0];
+        let timeout = lambda_returns(&last, &[0.0; 3], &reward, &value, &bootstrap, 0.5, 1.0);
+        let terminal = lambda_returns(
+            &last,
+            &[0.0, 0.0, 1.0],
+            &reward,
+            &value,
+            &bootstrap,
+            0.5,
+            1.0,
+        );
+
+        assert_eq!(timeout, vec![3.5, 7.0]);
+        assert_eq!(terminal, vec![1.0, 2.0]);
+    }
 }
