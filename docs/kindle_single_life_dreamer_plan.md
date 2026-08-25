@@ -514,9 +514,12 @@ Validation snapshot (updated 2026-08-25):
   correct reward sign. Over the last 100 updates before the checkpoint,
   reconstruction loss averages 72.30, raw KL 2.525, replay reward MAE 0.04361,
   and policy entropy 2.8546. Online control remains random-level: 21 completed
-  episodes average -20.333 with a best return of -18. The curve therefore
-  continues unchanged to the 25,000-step diagnostic rather than treating early
-  negative-event separation as policy progress;
+  episodes average -20.333 with a best return of -18. A frozen sampled-policy
+  probe likewise averages -20.667 over six episodes while retaining 2.871
+  action entropy out of a 2.890 maximum. The separate argmax diagnostic chooses
+  `UPRIGHT` for all 2,000 steps and scores -21 on both completed episodes. The
+  curve therefore continues unchanged to the 25,000-step diagnostic rather
+  than treating early negative-event separation as policy progress;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
