@@ -624,6 +624,20 @@ Validation snapshot (updated 2026-08-25):
   state-dependent control remains the active bottleneck. The unchanged curve
   continues through 45,000 and 50,000 steps before choosing a BPTT-length or
   capacity follow-up;
+- a read-only open-loop probe on that 40,000-step checkpoint further localizes
+  the control failure. Across 100 starts on a 5,000-action forced trajectory,
+  posterior DINO reconstruction MSE is 0.01917. Prior MSE at horizons 1, 5, and
+  15 is 0.01758, 0.02055, and 0.02344. Persistence is better at one step
+  (0.01033), but degrades to 0.03105 and 0.04925, making the prior 0.662x and
+  0.476x persistence at horizons 5 and 15. To reject a generic mean-prediction
+  explanation, a paired unrelated-action rollout starts from the same latent
+  state and reuses identical categorical random draws. Correct-action MSE is
+  0.996x, 0.837x, and 0.714x that control at horizons 1, 5, and 15. All original
+  measurements reproduce bit-for-bit in the paired run, and 98--100 valid
+  samples remain at every horizon after excluding episode crossings. The world
+  model therefore predicts action-conditioned visual change over imagination's
+  full horizon; short-term precision is imperfect, but an action-blind prior is
+  not the explanation for the failed endpoint policy;
 - this early lack of control matches the pinned D3 Pong artifact rather than
   putting Kindle behind it. D3's five-seed episode means in 20,000-frame
   windows ending at 40,000, 60,000, 80,000, and 100,000 emulator frames are

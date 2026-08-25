@@ -41,3 +41,9 @@ def test_invalid_action_count_is_a_python_error() -> None:
 def test_agent_exposes_read_only_reward_probes() -> None:
     assert hasattr(kindle.Agent, "posterior_reward_prediction")
     assert hasattr(kindle.Agent, "prior_reward_prediction")
+
+
+def test_agent_exposes_read_only_dynamics_probes() -> None:
+    assert hasattr(kindle.Agent, "dino_observation")
+    assert hasattr(kindle.Agent, "posterior_observation_prediction")
+    assert hasattr(kindle.Agent, "prior_diagnostic_rollout")

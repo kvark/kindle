@@ -298,6 +298,13 @@ python python/examples/probe_atari_reward_perception.py \
   --atari-protocol published \
   --output runs/pong-dino-reward-probe.json
 
+# Compare open-loop decoded DINO features with the realized trajectory,
+# persistence, and an unrelated-action rollout from the same latent state.
+python python/examples/probe_atari_dynamics.py \
+  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
+  --steps 5000 --horizon 15 --stride 50 --atari-protocol published \
+  --output runs/pong-open-loop.json
+
 # Aggregate complete curves by averaging episodes within each seed first.
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
@@ -308,6 +315,12 @@ The score summarizer rejects incomplete 350k--400k-frame coverage, mixed run
 modes, and wrapper settings that do not match the selected protocol. It supports
 resumed curves split across files and reports deltas to matched random, reported
 12M DreamerV3XS, and pinned 200M DreamerV3 targets where available.
+
+The dynamics probe is read-only. At each sampled posterior it decodes the
+proposed action sequence and a deterministic unrelated-action sequence using
+identical categorical random draws. Horizon-wise feature MSE against the actual
+future is reported beside both that action control and a persistence predictor;
+episode-crossing predictions are excluded.
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.
