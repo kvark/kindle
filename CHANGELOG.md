@@ -58,6 +58,9 @@
   using independent train, validation, and test emulator seeds. On the first
   four-seed split, pooling cuts replay observations by four while retaining
   0.9867 mean coordinate R² versus 0.9890 before pooling.
+- Added the corresponding seed-split reward-event probe, retaining every scored
+  transition and a deterministic sample of zero-reward frames so raw pixels,
+  projected patches, and pooled Dreamer inputs can be compared directly.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible

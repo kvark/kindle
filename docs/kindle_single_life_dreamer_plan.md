@@ -137,6 +137,17 @@ from 0.9650 to 0.9602 (3.58 to 4.03 source-pixel MAE). Raw resized pixels reach
 therefore not the evident Pong perception bottleneck, although this static
 probe does not establish temporal sufficiency or downstream control quality.
 
+A second seed-split probe tests the actual published-protocol reward frames.
+It trains on random trajectories from seeds 10 and 11, selects ridge penalties
+on seed 12, and tests on seed 13 while retaining every reward event and a fixed
+5% sample of zero-reward frames. The held-out split contains 117 negative, four
+positive, and 248 zero targets. Pooled 7×7 features reach 0.9929 reward-event
+ROC-AUC and 0.9911 negative-vs-rest ROC-AUC, compared with 0.9886 and 0.9830
+for raw resized pixels. Positive-vs-negative AUC is 0.9936 for both, although
+four positives make that estimate directional. The compact DINO input therefore
+preserves the immediate visual evidence of scoring; the 10,000-step checkpoint's
+weak 0.646 posterior reward-event ranking arises downstream of frozen vision.
+
 ## 4. Baseline contract
 
 ## 2. Operational definition of “learn how to play”

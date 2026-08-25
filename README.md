@@ -287,6 +287,13 @@ python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
   --steps 10000 --atari-protocol published \
   --restore checkpoints/pong-seed0 --evaluate --reward-probe \
   --output runs/pong-seed0-eval.jsonl
+
+# Verify that reward-event evidence survives frozen DINO and 2x2 pooling on
+# independent random-policy train, validation, and test emulator seeds.
+python python/examples/probe_atari_reward_perception.py \
+  /models/dinov3/model.safetensors ALE/Pong-v5 \
+  --atari-protocol published \
+  --output runs/pong-dino-reward-probe.json
 ```
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
