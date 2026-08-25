@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::{Path, PathBuf};
 
 use clap::Parser;
@@ -19,6 +20,10 @@ struct Arguments {
     /// Without this option, probe the frozen DINO observation directly.
     #[arg(long)]
     checkpoint: Option<PathBuf>,
+
+    /// Also write the JSON result to this file.
+    #[arg(long)]
+    output: Option<PathBuf>,
 
     /// Number of frames from a random valid-action trajectory.
     #[arg(long, default_value_t = 500)]
@@ -295,28 +300,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .collect::<Vec<_>>();
     let posterior_policy_action_mask = policy_action_mask_metrics(&samples);
     let posterior_policy_reward_alignment = policy_reward_alignment_metrics(&samples);
-    println!(
-        "{}",
-        serde_json::to_string(&json!({
-            "event": "representation_probe",
-            "source": source,
-            "samples": arguments.samples,
-            "seed": arguments.seed,
-            "randomize_position": arguments.randomize_position,
-            "all_actions": arguments.all_actions,
-            "feature_dims": feature_dims,
-            "observation_decoder_depth": observation_decoder_depth,
-            "representations": representations,
-            "reward_head": reward_head,
-            "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
-            "posterior_dino_reconstruction": posterior_dino_reconstruction,
-            "one_step_prior_reward": one_step_prior_reward,
-            "open_loop_prior_reward": open_loop_prior_reward,
-            "open_loop_dino_reconstruction": open_loop_dino_reconstruction,
-            "posterior_policy_action_mask": posterior_policy_action_mask,
-            "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
-        }))?
-    );
+    let encoded = serde_json::to_string(&json!({
+        "event": "representation_probe",
+        "source": source,
+        "samples": arguments.samples,
+        "seed": arguments.seed,
+        "randomize_position": arguments.randomize_position,
+        "all_actions": arguments.all_actions,
+        "feature_dims": feature_dims,
+        "observation_decoder_depth": observation_decoder_depth,
+        "representations": representations,
+        "reward_head": reward_head,
+        "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
+        "posterior_dino_reconstruction": posterior_dino_reconstruction,
+        "one_step_prior_reward": one_step_prior_reward,
+        "open_loop_prior_reward": open_loop_prior_reward,
+        "open_loop_dino_reconstruction": open_loop_dino_reconstruction,
+        "posterior_policy_action_mask": posterior_policy_action_mask,
+        "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
+    }))?;
+    println!("{encoded}");
+    if let Some(path) = &arguments.output {
+        if let Some(parent) = path
+            .parent()
+            .filter(|parent| !parent.as_os_str().is_empty())
+        {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(path, format!("{encoded}\n"))?;
+    }
     Ok(())
 }
 
