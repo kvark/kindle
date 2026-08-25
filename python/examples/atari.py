@@ -200,6 +200,11 @@ def main() -> None:
         help="save --checkpoint every N runner steps in addition to the final save",
     )
     parser.add_argument("--output", help="write JSONL metrics to this file")
+    parser.add_argument(
+        "--append-output",
+        action="store_true",
+        help="append to --output when continuing with --restore",
+    )
     parser.add_argument("--report-every", type=int, default=1_000)
     args = parser.parse_args()
     if args.steps <= 0:
@@ -220,6 +225,10 @@ def main() -> None:
         parser.error("--evaluate does not write training checkpoints")
     if args.greedy and not args.evaluate:
         parser.error("--greedy requires --evaluate")
+    if args.append_output and not args.output:
+        parser.error("--append-output requires --output")
+    if args.append_output and not args.restore:
+        parser.error("--append-output requires --restore")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
 
@@ -309,7 +318,13 @@ def main() -> None:
         return absolute_environment_step(run_step) * ATARI_ACTION_REPEAT
 
     output = (
-        open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
+        open(
+            args.output,
+            "a" if args.append_output else "w",
+            encoding="utf-8",
+        )
+        if args.output
+        else sys.stdout
     )
 
     def emit(event: dict[str, object]) -> None:
@@ -360,6 +375,7 @@ def main() -> None:
             "actions": action_count,
             "action_meanings": action_meanings,
             "mode": run_mode,
+            "output_appended": args.append_output,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,
