@@ -72,6 +72,8 @@
 - Exposed read-only policy, critic, and prior continuation/value predictions,
   with an Atari behavior probe that compares policy probabilities against
   paired per-action one-step model values.
+- Added an on-policy Atari critic-calibration probe that compares posterior
+  values against realized discounted returns from fully terminated episodes.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible

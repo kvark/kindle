@@ -312,6 +312,13 @@ python python/examples/probe_atari_behavior.py \
   --steps 5000 --stride 20 --atari-protocol published \
   --output runs/pong-behavior.json
 
+# Compare critic values with realized discounted returns from complete frozen
+# policy episodes.
+python python/examples/probe_atari_value.py \
+  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
+  --steps 5000 --atari-protocol published \
+  --output runs/pong-value.json
+
 # Aggregate complete curves by averaging episodes within each seed first.
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
@@ -335,6 +342,11 @@ probabilities against `reward(next) + continuation(next) * value(next)`. This
 one-step consistency check does not replace Dreamer's full imagined return, but
 it distinguishes a flat or misleading critic from an actor that ignores its
 own model's local action ranking.
+
+The value probe follows the frozen sampled or greedy policy and computes exact
+horizon-discounted Monte Carlo returns for fully terminated episodes. It
+reports critic bias, error, correlation, and linear calibration; truncated and
+trailing partial episodes are excluded rather than assigned zero bootstrap.
 
 Periodic saves atomically replace the model-sized checkpoint files. Replay is
 not checkpointed, so a resumed run must refill it before learning continues.
