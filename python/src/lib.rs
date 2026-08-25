@@ -235,6 +235,21 @@ impl PyAgent {
         self.inner.posterior_reward_prediction()
     }
 
+    /// Current frozen-DINO observation consumed by the world model.
+    ///
+    /// The returned copy is read-only and does not change recurrent state.
+    #[getter]
+    fn dino_observation(&self) -> Vec<f32> {
+        self.inner.dino_observation().to_vec()
+    }
+
+    /// Frozen-DINO observation reconstructed from the current posterior.
+    ///
+    /// This diagnostic does not change recurrent state or random streams.
+    fn posterior_observation_prediction(&mut self) -> Vec<f32> {
+        self.inner.posterior_observation_prediction()
+    }
+
     /// Reward predicted after applying one action to the current latent state.
     ///
     /// This diagnostic does not change recurrent state or random streams.
@@ -246,6 +261,26 @@ impl PyAgent {
             )));
         }
         Ok(self.inner.prior_reward_prediction(action))
+    }
+
+    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    ///
+    /// This diagnostic clones its categorical random stream and leaves the
+    /// live posterior, policy, and all training state unchanged.
+    fn prior_diagnostic_rollout(
+        &mut self,
+        actions: Vec<usize>,
+    ) -> PyResult<(Vec<f32>, Vec<Vec<f32>>)> {
+        if actions.is_empty() {
+            return Err(PyValueError::new_err("actions must not be empty"));
+        }
+        let action_count = self.inner.core().config().action_count;
+        if let Some(action) = actions.iter().find(|action| **action >= action_count) {
+            return Err(PyValueError::new_err(format!(
+                "action {action} is out of range for {action_count} actions"
+            )));
+        }
+        Ok(self.inner.prior_diagnostic_rollout(&actions))
     }
 
     /// Record the frame and rewards produced by the preceding action.

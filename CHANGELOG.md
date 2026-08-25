@@ -66,6 +66,9 @@
 - Added the corresponding seed-split reward-event probe, retaining every scored
   transition and a deterministic sample of zero-reward frames so raw pixels,
   projected patches, and pooled Dreamer inputs can be compared directly.
+- Exposed read-only posterior DINO reconstruction and open-loop prior rollouts
+  to Python, with an Atari dynamics probe that compares the realized action
+  sequence against persistence and an unrelated-action control at each horizon.
 - Added an actor-only learner-update gate for causal sparse-reward diagnostics.
   The value and replay-value objectives plus actor optimizer moments continue
   training while policy parameter updates are disabled, and the D3-compatible
