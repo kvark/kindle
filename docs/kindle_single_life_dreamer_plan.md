@@ -189,9 +189,12 @@ panics in Blade with `descriptor pool count overflow` after peaking at only
 518 MiB host memory. Blade's current upstream head is the revision pinned here.
 Its Vulkan allocator grows descriptor-set pools from 65,536 directly to
 1,048,576 sets, at which point the conservative inline-uniform byte budget
-overflows `u32`. BPTT-16 is therefore blocked by descriptor-pool bookkeeping,
-not demonstrated model-memory pressure; it is not enabled until that backend
-path is fixed and a real learner canary passes.
+overflows `u32`. An isolated Blade build that doubles sub-pool capacity instead
+completes the identical 1,120-step trajectory and all nine scheduled BPTT-16
+learner updates with finite metrics, peaking at 517 MiB. This proves the current
+limit is descriptor-pool bookkeeping rather than model-memory pressure. Kindle
+remains on BPTT-8 until that one-line dependency fix is upstreamed, pinned, and
+followed by a longer comparative curve.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
