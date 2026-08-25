@@ -272,6 +272,8 @@ def main() -> None:
         run_mode = "evaluate_greedy" if args.greedy else "evaluate_sample"
     else:
         run_mode = "train"
+    starting_environment_step = agent.environment_step if agent is not None else 0
+    starting_learner_step = agent.learner_step if agent is not None else 0
 
     output = (
         open(args.output, "w", encoding="utf-8") if args.output else sys.stdout
@@ -318,6 +320,8 @@ def main() -> None:
             "seed": args.seed,
             "actions": action_count,
             "mode": run_mode,
+            "starting_environment_step": starting_environment_step,
+            "starting_learner_step": starting_learner_step,
             "config": agent.config if agent is not None else None,
         }
     )
@@ -419,6 +423,16 @@ def main() -> None:
         ):
             save_checkpoint(args.steps)
         elapsed = time.perf_counter() - started
+        environment_step_delta = (
+            agent.environment_step - starting_environment_step
+            if agent is not None
+            else args.steps
+        )
+        learner_step_delta = (
+            agent.learner_step - starting_learner_step
+            if agent is not None
+            else 0
+        )
         emit(
             {
                 "event": "run_end",
@@ -435,7 +449,9 @@ def main() -> None:
                 "partial_episode_return": episode_return,
                 "partial_episode_length": episode_length,
                 "action_counts": action_counts,
-                "learner_updates": agent.learner_step if agent is not None else 0,
+                "environment_step_delta": environment_step_delta,
+                "learner_step_delta": learner_step_delta,
+                "learner_updates": learner_step_delta,
                 "elapsed_seconds": elapsed,
                 "environment_steps_per_second": args.steps / elapsed,
             }
