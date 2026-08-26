@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterable
@@ -64,6 +65,60 @@ ATARI_TARGETS = {
     },
 }
 
+UPSTREAM_D3_REFERENCE = {
+    (
+        "source",
+        "repository",
+    ): "https://github.com/danijar/dreamerv3",
+    ("source", "revision"): "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+    (
+        "source",
+        "config_only_diff_sha256",
+    ): "334ca81ec0662714e58d39cc48a7b32473e201e5d7fee006f840a16490d90717",
+    (
+        "runtime",
+        "package_freeze_sha256",
+    ): "3e8c642b4c002e50b1e8301afbed959774887319468c02fc3e44e3bd5f352f0e",
+    ("runtime", "python"): "3.11.15",
+    ("runtime", "jax"): "0.4.33",
+    ("runtime", "jaxlib"): "0.4.33",
+    ("runtime", "ale_py"): "0.9.0",
+    ("runtime", "compute_dtype"): "bfloat16",
+    ("runtime", "device_class"): "NVIDIA CUDA",
+    ("experiment", "task"): "atari100k_pong",
+    ("experiment", "environment"): "ALE/Pong-v5",
+    ("experiment", "model_input"): "learned 64x64 RGB encoder",
+    ("experiment", "world_backpropagation"): "full 64-step recurrence",
+    (
+        "experiment",
+        "configs",
+    ): ["atari100k", "size1m", "kindle_published"],
+    ("experiment", "steps"): 100_000,
+    ("experiment", "train_ratio"): 256,
+    ("experiment", "batch_size"): 16,
+    ("experiment", "batch_length"): 64,
+    ("experiment", "replay_context"): 1,
+    ("atari_protocol", "name"): "published",
+    ("atari_protocol", "action_repeat"): 4,
+    ("atari_protocol", "actions"): "all",
+    ("atari_protocol", "sticky_actions"): False,
+    ("atari_protocol", "reset_noop_max"): 0,
+    ("atari_protocol", "episode_frame_cap"): 100_000,
+    ("atari_protocol", "frame_pool"): "max of final 2",
+    ("atari_protocol", "resize"): "Pillow bilinear",
+    ("atari_protocol", "environment_seeded"): True,
+    ("score_window_frames",): [350_000, 400_000],
+    (
+        "completion_evidence",
+    ): (
+        "RUN_COMPLETE is installed only after the upstream process exits with "
+        "status zero"
+    ),
+    (
+        "kindle_commit_at_configuration",
+    ): "f395188cc08b0968c03ebdd91fd3e706570962ea",
+}
+
 
 class AtariScoreError(ValueError):
     """Raised when logs cannot prove a protocol-complete score."""
@@ -71,7 +126,11 @@ class AtariScoreError(ValueError):
 
 def _read_events(path: Path) -> list[dict[str, object]]:
     events = []
-    with path.open(encoding="utf-8") as stream:
+    try:
+        stream = path.open(encoding="utf-8")
+    except FileNotFoundError as error:
+        raise AtariScoreError(f"missing required file: {path}") from error
+    with stream:
         for line_number, line in enumerate(stream, 1):
             if not line.strip():
                 continue
@@ -87,6 +146,127 @@ def _read_events(path: Path) -> list[dict[str, object]]:
                 )
             events.append(event)
     return events
+
+
+def _read_json_object(path: Path) -> dict[str, object]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as error:
+        raise AtariScoreError(f"missing required file: {path}") from error
+    except json.JSONDecodeError as error:
+        raise AtariScoreError(f"{path}: invalid JSON: {error.msg}") from error
+    if not isinstance(value, dict):
+        raise AtariScoreError(f"{path}: JSON value must be an object")
+    return value
+
+
+def _manifest_value(
+    manifest: dict[str, object], path: tuple[str, ...], source: Path
+) -> object:
+    value: object = manifest
+    for key in path:
+        if not isinstance(value, dict) or key not in value:
+            raise AtariScoreError(
+                f"{source}: manifest is missing {'.'.join(path)!r}"
+            )
+        value = value[key]
+    return value
+
+
+def load_upstream_d3_segments(
+    logdirs: Iterable[Path],
+) -> list[dict[str, object]]:
+    """Load completed, provenance-pinned upstream D3 reference curves."""
+    segments = []
+    for logdir in logdirs:
+        logdir = Path(logdir)
+        completion = logdir / "RUN_COMPLETE"
+        if not completion.is_file():
+            raise AtariScoreError(
+                f"{logdir}: upstream run has no RUN_COMPLETE evidence"
+            )
+
+        manifest_path = logdir / "reference-manifest.json"
+        manifest = _read_json_object(manifest_path)
+        for path, expected in UPSTREAM_D3_REFERENCE.items():
+            actual = _manifest_value(manifest, path, manifest_path)
+            if type(actual) is not type(expected) or actual != expected:
+                raise AtariScoreError(
+                    f"{manifest_path}: expected {'.'.join(path)}={expected!r}, "
+                    f"found {actual!r}"
+                )
+
+        experiment = manifest["experiment"]
+        protocol = manifest["atari_protocol"]
+        assert isinstance(experiment, dict)
+        assert isinstance(protocol, dict)
+        seed = experiment.get("seed")
+        if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+            raise AtariScoreError(
+                f"{manifest_path}: experiment.seed must be a non-negative integer"
+            )
+        action_repeat = int(protocol["action_repeat"])
+        end_frame = int(experiment["steps"]) * action_repeat
+
+        scores_path = logdir / "scores.jsonl"
+        records = _read_events(scores_path)
+        episodes = []
+        seen_steps = set()
+        for line_number, record in enumerate(records, 1):
+            if "step" not in record or "episode/score" not in record:
+                raise AtariScoreError(
+                    f"{scores_path}:{line_number}: expected step and "
+                    "episode/score"
+                )
+            raw_step = record["step"]
+            if isinstance(raw_step, bool) or not isinstance(raw_step, int):
+                raise AtariScoreError(
+                    f"{scores_path}:{line_number}: step must be an integer"
+                )
+            if not 0 <= raw_step <= end_frame:
+                raise AtariScoreError(
+                    f"{scores_path}:{line_number}: step {raw_step} is outside "
+                    f"the completed 0--{end_frame} frame run"
+                )
+            if raw_step in seen_steps:
+                raise AtariScoreError(
+                    f"{scores_path}:{line_number}: duplicate episode step "
+                    f"{raw_step}"
+                )
+            seen_steps.add(raw_step)
+            raw_score = record["episode/score"]
+            if (
+                isinstance(raw_score, bool)
+                or not isinstance(raw_score, (int, float))
+                or not math.isfinite(raw_score)
+            ):
+                raise AtariScoreError(
+                    f"{scores_path}:{line_number}: episode/score must be finite"
+                )
+            episodes.append(
+                {"environment_frames": raw_step, "return": float(raw_score)}
+            )
+
+        segments.append(
+            {
+                "source": str(scores_path),
+                "environment": str(experiment["environment"]),
+                "seed": seed,
+                "mode": "train",
+                "atari_protocol": str(protocol["name"]),
+                "action_repeat": action_repeat,
+                "full_action_space": protocol["actions"] == "all",
+                "noop_max": int(protocol["reset_noop_max"]),
+                "max_episode_frames": int(protocol["episode_frame_cap"]),
+                "score_window_frames": tuple(manifest["score_window_frames"]),
+                "start_frame": 0,
+                "end_frame": end_frame,
+                "episodes": episodes,
+            }
+        )
+    if not segments:
+        raise AtariScoreError("no upstream D3 log directories provided")
+    return segments
 
 
 def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
@@ -214,7 +394,13 @@ def summarize_scores(
                     raise AtariScoreError(
                         f"{environment} seed {seed}: duplicate episode at frame {frame}"
                     )
-                episodes_by_frame[frame] = float(episode["return"])
+                episode_return = float(episode["return"])
+                if not math.isfinite(episode_return):
+                    raise AtariScoreError(
+                        f"{segment['source']}: episode at frame {frame} has a "
+                        "non-finite return"
+                    )
+                episodes_by_frame[frame] = episode_return
         if not episodes_by_frame:
             raise AtariScoreError(
                 f"{environment} seed {seed}: complete window contains no episodes"
