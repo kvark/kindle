@@ -806,6 +806,27 @@ Validation snapshot (updated 2026-08-26):
   provisional -19.333 mean. This incomplete-window value is useful live
   evidence but is not a protocol score; strict aggregation still waits for the
   100,000-step `run_end`;
+- at environment step 94,254 and learner step 23,293, a system-wide OOM killed
+  the BPTT-8 process. Kernel evidence shows the pressure was external to the
+  experiment: a simultaneous container/Xorg burst filled all 8 GiB of swap,
+  while Kindle's unit peaked at 2.1 GiB. The six uninterrupted score-window
+  endpoints available before the kill are -18, -20, -20, -17, -15, and -19,
+  averaging -18.167. They remain diagnostic only. The exact crash log is
+  preserved separately with SHA-256
+  `e87fa98f2642515050b3de07e1b7e45eee64f19611578202befee82e6d3bbb5d`;
+  no completion event was fabricated;
+- recovery resumes the real atomic 90,000-step checkpoint at learner step
+  22,229 and appends an explicit checkpoint segment. Strict aggregation
+  requires that the nested start preserve the environment, seed, protocol,
+  runtime, DINO identity, parameter counts, and full agent config, and that its
+  environment and learner counters match a prior checkpoint event. It closes
+  the interrupted segment at 360,000 frames and discards the superseded
+  post-checkpoint crash tail before combining episode endpoints, exposing the
+  recovery count in the score summary. Because Kindle checkpoints do not yet
+  persist replay, the resumed learner also refills 1,024 transitions before
+  updating. The final result is therefore labeled checkpoint-recovered rather
+  than uninterrupted; a winning configuration still requires an independent
+  clean replication;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,

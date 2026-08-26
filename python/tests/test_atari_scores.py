@@ -126,6 +126,99 @@ def test_resumed_segments_can_jointly_cover_score_window(tmp_path) -> None:
     ]
 
 
+def test_appended_checkpoint_recovery_discards_superseded_tail(tmp_path) -> None:
+    path = tmp_path / "recovered.jsonl"
+    common = {
+        "environment": "ALE/Pong-v5",
+        "seed": 0,
+        "mode": "train",
+        "atari_protocol": "published",
+        "action_repeat": 4,
+        "full_action_space": True,
+        "noop_max": 0,
+        "max_episode_frames": 100_000,
+        "score_window_frames": [350_000, 400_000],
+        "actions": 18,
+        "action_meanings": ["NOOP", "FIRE"],
+        "dino_model_id": "test-dino",
+        "dino_checkpoint_revision": "revision",
+        "dino_checkpoint_sha256": "sha256",
+        "trainable_parameters": {"total": 1},
+        "config": {"batch_length": 64},
+    }
+    records = [
+        {"event": "run_start", "starting_environment_step": 0, **common},
+        {"event": "episode", "environment_frames": 352_000, "return": -18},
+        {
+            "event": "checkpoint",
+            "environment_step": 90_000,
+            "learner_step": 22_229,
+        },
+        {"event": "episode", "environment_frames": 368_000, "return": 21},
+        {
+            "event": "run_start",
+            "starting_environment_step": 90_000,
+            "starting_learner_step": 22_229,
+            "output_appended": True,
+            **common,
+        },
+        {"event": "episode", "environment_frames": 380_000, "return": -10},
+        {
+            "event": "run_end",
+            "environment": "ALE/Pong-v5",
+            "seed": 0,
+            "environment_frames": 400_000,
+        },
+    ]
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
+        encoding="utf-8",
+    )
+
+    summary = summarize_scores(load_segments([path]))
+    assert summary["environments"]["ALE/Pong-v5"]["seed_results"] == [
+        {
+            "seed": 0,
+            "score": -14.0,
+            "completed_episodes": 2,
+            "segment_count": 2,
+            "checkpoint_recoveries": 1,
+        }
+    ]
+
+
+def test_appended_checkpoint_recovery_requires_matching_checkpoint(tmp_path) -> None:
+    path = tmp_path / "unproven-recovery.jsonl"
+    common = {
+        "environment": "ALE/Pong-v5",
+        "seed": 0,
+        "mode": "train",
+        "atari_protocol": "published",
+        "action_repeat": 4,
+        "full_action_space": True,
+        "noop_max": 0,
+        "max_episode_frames": 100_000,
+        "score_window_frames": [350_000, 400_000],
+    }
+    records = [
+        {"event": "run_start", "starting_environment_step": 0, **common},
+        {
+            "event": "run_start",
+            "starting_environment_step": 90_000,
+            "starting_learner_step": 22_229,
+            "output_appended": True,
+            **common,
+        },
+    ]
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(AtariScoreError, match="no matching checkpoint event"):
+        load_segments([path])
+
+
 def test_incomplete_window_is_rejected(tmp_path) -> None:
     path = tmp_path / "incomplete.jsonl"
     write_run(path, seed=0, start=0, end=390_000, episodes=[(380_000, -10)])
