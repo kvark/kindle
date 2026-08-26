@@ -143,6 +143,15 @@ weak 0.646 posterior reward-event ranking arises downstream of frozen vision.
 The behavioral reference is DreamerV3 revision
 `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
 
+That code pin and the released benchmark curves have different provenance.
+The Atari-100K score file was bundled at upstream commit `2411f7d1` in April
+2024; it predates the current agent/RSSM rewrite and the subsequent replay-
+context previous-action fix. The score file is still useful historical result
+evidence, but it is not an executable golden output for the May 2026 code pin.
+Implementation-parity claims below refer to `e3f02248`; final score deltas label
+the 2024 artifact separately, and a locally reproduced current-D3 curve remains
+the strongest future matched reference.
+
 | Area | Baseline |
 |---|---|
 | Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
@@ -427,7 +436,7 @@ Validation snapshot (updated 2026-08-25):
   -20.786, and -20.286 over 15, 14, and 14 benchmark-window episodes, for a
   -20.446 seed mean. The score aggregator selects this profile-specific random
   target and omits the all-action D3 targets rather than presenting them as
-  protocol-matched. The published D3 target
+  protocol-matched. The historical 2024 D3 artifact target
   is -4.537 on Pong and 2,895.24 on Private Eye, and zero on Freeway. These
   targets average each seed's episode scores over the same recorded-frame
   window, then average five seeds. An independent ICLR 2025 comparison also
@@ -1150,6 +1159,8 @@ alone are not sufficient.
 Run D3-compatible evaluations before enabling intrinsic reward:
 
 - native visual GridWorld as an integration test;
+- one locally reproduced pinned-upstream D3 curve at a resource-matched preset
+  and wrapper protocol;
 - at least one dense-reward Atari game;
 - at least one sparse-reward Atari game;
 - a small visual persistent world with endogenous rather than harness resets.
