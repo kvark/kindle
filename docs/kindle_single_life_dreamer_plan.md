@@ -231,9 +231,19 @@ memory and no swap. The corresponding 1,120-step Atari canary completes in
 updates with finite metrics. The measured run phase is 82.0 seconds and reports
 0.110 learner updates/s including replay prefill, essentially the same short-run
 rate as the patched BPTT-16 canary. Thus full recurrence is a viable controlled
-1M follow-up once the Blade fix is upstreamed and pinned. The active curve and
-production defaults remain on BPTT-8 so this ongoing baseline stays immutable;
-larger-preset memory and a longer BPTT-64 learning curve remain unproven.
+1M follow-up. The allocator correction is now merged and reproducibly pinned by
+Meganeura `e67ced75` to Blade `ae0f7ad1`. The already queued BPTT-64 curve stays
+immutable on its pre-merge Kindle worktree (`7d5f0179`, local diff SHA-256
+`a3b0da454e7483f2abf9d0eaff44ee33f3ad947293670857665bbec2e8617c8b`)
+and allocator worktree (`95f5004f`, local diff SHA-256
+`86a6f18432b80f469678f55a02d2b3b3dbb0e929d5246463c73995f01a46d14a`).
+A source-tree comparison finds that its Kindle learner differs from the pinned
+branch only by later read-only diagnostic sessions and revision constants; its
+runner and extension are additionally guarded by SHA-256 hashes
+`0680de555b4418fdd4a24ca7e8563fadb33070ca6a01330fa48ea11d50381b82`
+and `22c8435fcff2c642fa8fcbc7e8bb9bcee8e50639616ad15a649f18d091c67f6b`.
+The production default and active BPTT-8 curve remain unchanged; larger-preset
+memory and the long BPTT-64 learning result remain unproven.
 
 The conditional action-alias fallback is validated on that same graph path. A
 six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
