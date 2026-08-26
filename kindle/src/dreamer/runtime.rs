@@ -167,7 +167,7 @@ pub(crate) fn configure_d3_optimizer(
         config.optimizer_beta2,
         config.optimizer_epsilon,
     );
-    session.set_optax_adaptive_grad_clip(config.agc, config.agc_pmin);
+    session.set_adaptive_grad_clip(config.agc, config.agc_pmin);
 }
 
 fn d3_learning_rate(learning_rate: f32, warmup: u64, learner_step: u64) -> f32 {

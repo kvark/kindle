@@ -187,24 +187,20 @@ Kindle logs.
 | Lambda | 0.95 |
 | Slow value | EMA rate 0.02 |
 | Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
-| Optimizer | Optax output-unit AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
+| Optimizer | Parameter-leaf AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
 | Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
 
-Meganeura implements DreamerV3's optimizer chain directly: Optax-compatible
-rank-dependent output-unit adaptive gradient clipping at 0.3, RMS
-normalization, then momentum. Meganeura also compiles a statically unrolled
-recurrent graph. The production baseline uses 8-step truncated BPTT,
+Meganeura implements DreamerV3's optimizer chain directly: parameter-leaf
+adaptive gradient clipping at 0.3, RMS normalization, then momentum. This is
+the exact convention at the pinned D3 source: `Agent._make_opt()` calls its
+own `embodied.jax.opt.clip_by_agc()`, which flattens each parameter leaf before
+computing the parameter and update norms. It does not call Optax's separate
+rank-dependent unit-wise AGC helper. Meganeura also compiles a statically
+unrolled recurrent graph. The production baseline uses 8-step truncated BPTT,
 accumulates and averages gradients across all eight chunks, and retains the
 full 64-step replay sample and all posterior imagination starts. The chunk
 length remains configurable for targeted scaling checks. This is an
 implementation accommodation, not a claimed D3-equivalent gradient path.
-
-The immutable BPTT-8 curve and its queued BPTT-64 recurrence control were
-built before that axis mismatch was found. Their Meganeura revision clips one
-norm per complete parameter leaf, so they isolate recurrence under the old
-optimizer but are not optimizer-exact D3 reproductions. The corrected
-unit-wise stack is pinned separately and starts a fresh curve rather than
-restoring those checkpoints.
 
 A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
 graph constructs successfully in 4.70 seconds, but its first learner update
@@ -1341,8 +1337,7 @@ falsifiable exit gate.
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `d8b7c217d02a96d67a084195a16ed0041567bd53` (including Optax-compatible
-  output-unit adaptive gradient clipping).
+  `e67ced7568ae051c0f1d9f20d67370d5019d2b58`.
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
   `ae0f7ad1f05443bea121eb514fab2fc0b867a662` (the revision selected by
