@@ -97,6 +97,7 @@ def test_scores_average_episodes_per_seed_before_seeds(tmp_path) -> None:
 
     summary = summarize_scores(load_segments([seed0, seed1]))
     pong = summary["environments"]["ALE/Pong-v5"]
+    assert pong["target_runtime"] == "kindle-ale_py-0.12.1"
     assert pong["seed_mean"] == 5.0
     assert [seed["completed_episodes"] for seed in pong["seed_results"]] == [1, 3]
     assert pong["targets"]["dreamerv3_12m_reported"] == {
@@ -200,6 +201,7 @@ def test_completed_upstream_d3_run_uses_the_same_score_window(tmp_path) -> None:
 
     summary = summarize_scores(load_upstream_d3_segments([logdir]))
     pong = summary["environments"]["ALE/Pong-v5"]
+    assert pong["target_runtime"] == "upstream-d3-ale_py-0.9.0"
     assert pong["seed_results"] == [
         {"seed": 0, "score": -4.0, "completed_episodes": 2, "segment_count": 1}
     ]
@@ -208,6 +210,23 @@ def test_completed_upstream_d3_run_uses_the_same_score_window(tmp_path) -> None:
         "delta": pytest.approx(0.537),
         "met": True,
     }
+    assert pong["targets"]["matched_random_3_seed"] == {
+        "score": pytest.approx(-20.373626373626372),
+        "delta": pytest.approx(16.373626373626372),
+        "met": True,
+    }
+
+
+def test_score_summary_rejects_mixed_target_runtimes(tmp_path) -> None:
+    first = tmp_path / "first.jsonl"
+    second = tmp_path / "second.jsonl"
+    write_run(first, seed=0, start=0, end=400_000, episodes=[(380_000, -20)])
+    write_run(second, seed=1, start=0, end=400_000, episodes=[(380_000, -20)])
+    segments = load_segments([first, second])
+    segments[1]["target_runtime"] = "kindle-ale_py-0.13.0"
+
+    with pytest.raises(AtariScoreError, match="cannot mix target runtimes"):
+        summarize_scores(segments)
 
 
 def test_upstream_d3_run_requires_completion_evidence(tmp_path) -> None:
