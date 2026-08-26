@@ -840,6 +840,43 @@ Validation snapshot (updated 2026-08-26):
   actions. The recovery segment has not reproduced the superseded crash tail's
   -17 and -15 episodes, another reason not to present either partial trajectory
   as the final score;
+- the checkpoint-recovered BPTT-8 curve now has a real 100,000-step `run_end`.
+  Strict recovery-aware aggregation retains the -18 and -20 episode endpoints
+  before the 90,000-step checkpoint and combines them with the eight resumed
+  endpoints, producing -18.9 across ten completed score-window episodes. This
+  is 1.723 points above the ALE 0.12 matched-random target (-20.623), but 8.9
+  points below the reported 12M D3 target (-10) and 14.363 below the historical
+  200M artifact (-4.537). The final 5,000 interactions improve to -18.0 across
+  four episodes (-19, -18, -17, and -18). Their 1,250 learner updates average
+  reconstruction loss 31.612, raw KL 2.816, reward loss 0.0500, replay-value
+  loss 1.626, policy entropy 0.977, and imagined return -3.588. Effective
+  action entropy falls to 1.005, with `RIGHT` at 58.5% and `LEFTFIRE` at 30.5%.
+  Across the full resumed 10,000 interactions, 2,229 updates average
+  reconstruction loss 31.746, raw KL 2.727, reward loss 0.0492, replay-value
+  loss 1.596, policy entropy 1.123, and imagined return -3.796. The missing 271
+  updates relative to an uninterrupted interval are exactly the consequence of
+  replay refill without deferred scheduler credit. The above-random endpoint
+  is a real late-learning signal, but it is neither a D3-baseline pass nor a
+  clean replication; the immutable BPTT-64 comparison and endpoint probes
+  determine the next intervention;
+- paired read-only endpoint probes confirm that the late improvement is visible
+  off the training trajectory. The seed-100 matched-random stream is identical
+  at both checkpoints and scores -20.4. On that same environment stream, the
+  frozen sampled policy changes from -20.5 across six completed episodes at
+  75,000 steps to -18.667 across three at 100,000, with a further -13 partial
+  game still open after 1,176 decisions. The latter's smaller episode count
+  makes this directional evidence rather than another benchmark score. Its
+  critic is materially less wrong about realized discounted returns: value
+  bias falls from +1.865 to +0.510, MAE from 2.501 to 1.277, and statewise
+  value/return correlation rises from 0.014 to 0.204. One-step Bellman MAE
+  improves from 0.0743 to 0.0657 and target correlation from 0.746 to 0.761.
+  Actor alignment does not improve uniformly: probability on the model's best
+  one-step action rises from 6.5% to 10.3% and greedy agreement from 3.2% to
+  10.0%, but policy/value correlation falls from 0.294 to 0.204 and gain over
+  uniform falls from 0.0133 to 0.0086. Thus late BPTT-8 learning improves
+  temporal value calibration and control while leaving the 18-action actor
+  only weakly aligned with small, alias-sensitive one-step differences. The
+  full-recurrence control was released only after these probes completed;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
