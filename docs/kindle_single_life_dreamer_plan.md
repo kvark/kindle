@@ -174,7 +174,10 @@ about 1.35 GiB observed process memory. Kindle uses ALE 0.12.1, so the wrapper
 mechanics are matched but trajectories are not claimed to be byte-identical
 across the two ALE revisions. The CUDA reference curve is queued only after the
 immutable Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics release
-the RTX.
+the RTX. The score CLI accepts that upstream format only when its pinned
+manifest and post-success `RUN_COMPLETE` marker are present, then routes its
+episodes through the same 350,000--400,000-frame, per-seed aggregation used for
+Kindle logs.
 
 | Area | Baseline |
 |---|---|
