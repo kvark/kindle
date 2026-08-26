@@ -258,9 +258,15 @@ closely. BPTT-16 constructs on the integrated AMD GPU in 7.74 seconds with a
 3.7 GiB host-memory peak, preserving the 64-state batch and splitting it into
 four gradient-averaged chunks. BPTT-32 reaches an 8.6 GiB host-memory peak and
 requests about 10.7 GiB of AMD buffer space, after which the driver rejects VM
-mappings with `BO_VA (-12)` before a run header is emitted. BPTT-16 is therefore
-the longest demonstrated 12M construction on this device; its first learner
-update and sustained throughput remain untested.
+mappings with `BO_VA (-12)` before a run header is emitted. That failure does
+not unwind cleanly: the Python process remains in uninterruptible kernel sleep
+with `SIGKILL` pending, retains about 10.7 GiB of GTT mappings, and prevents the
+AMD render node from being enumerated. A memory-capped BPTT-16 learner retry
+therefore stopped at device discovery before constructing an agent; it is not
+evidence against BPTT-16. Driver recovery or a reboot is required before more
+integrated-GPU checks. BPTT-16 remains the longest demonstrated 12M
+construction on this device; its first learner update and sustained throughput
+remain untested.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
@@ -748,10 +754,16 @@ Validation snapshot (updated 2026-08-25):
   the active Kindle run is 1M with eight-step truncated BPTT and frozen DINO,
   while the published artifact uses the default D3 model and full recurrence.
   The 50,000-step diagnostics select BPTT length before capacity as the first
-  controlled follow-up. If full recurrence does not close the control gap, the
-  next run uses `published-minimal`, which keeps the published profile's zero
-  reset no-ops and 100,000-frame episode cap while changing only the redundant
-  all-18-action vocabulary;
+  controlled follow-up. That full-recurrence result is interpreted only beside
+  the completed BPTT-8 curve and the queued, resource-matched current-D3 run:
+  a BPTT-64 improvement is replicated before scaling; a successful upstream
+  1M run with a failed Kindle BPTT-64 run selects the frozen-vision interface
+  as the next causal axis; failure of both 1M runs selects capacity rather than
+  an encoder or policy change. The six-action `published-minimal` control is
+  justified only if full recurrence produces useful temporal values while the
+  all-action critic remains dominated by environment-equivalent aliases. It
+  keeps the published profile's zero reset no-ops and 100,000-frame episode cap
+  while changing only that redundant vocabulary;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
