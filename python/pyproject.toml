@@ -25,7 +25,12 @@ arc = [
   "arc-agi==0.9.8; python_version >= '3.12'",
   "arcengine==0.9.3; python_version >= '3.12'",
 ]
-test = ["pytest>=8", "numpy>=1.26"]
+test = [
+  "pytest>=8",
+  "numpy>=1.26",
+  "gymnasium[atari]>=1.1,<2",
+  "pillow>=10",
+]
 
 [project.urls]
 Repository = "https://github.com/kvark/kindle"
