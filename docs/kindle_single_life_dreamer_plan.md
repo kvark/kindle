@@ -848,6 +848,15 @@ Validation snapshot (updated 2026-08-25):
   matched-random, sampled-policy, behavior, and value probes remain queued
   after the immutable 100,000-step endpoint so they do not contend with
   training for the RTX;
+- the atomic 80,000-step checkpoint contains 19,729 learner updates. The six
+  episodes ending from 75,000 through 80,000 interactions score -21, -20, -20,
+  -19, -21, and -20, for a -20.167 mean. Across the 1,250 learner updates in
+  that interval, reconstruction loss averages 35.287, raw KL 2.617, reward loss
+  0.0575, replay-value loss 1.460, policy entropy 1.518, and imagined return
+  -3.890. The 5,000 live actions have effective six-action entropy 1.367 and
+  remain concentrated on `RIGHTFIRE` (39.7%), `LEFTFIRE` (28.9%), and `LEFT`
+  (20.9%). This is another random-level late marker, not a benchmark score:
+  the 350,000-frame score window starts at interaction 87,500;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
