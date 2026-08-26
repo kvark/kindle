@@ -435,6 +435,7 @@ def main() -> None:
         {
             "event": "run_start",
             "environment": args.environment,
+            "ale_py_version": ale_py.__version__,
             "steps": args.steps,
             "atari_protocol": args.atari_protocol,
             "action_repeat": ATARI_ACTION_REPEAT,

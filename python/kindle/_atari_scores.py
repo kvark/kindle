@@ -11,6 +11,9 @@ from typing import Iterable
 
 SCORE_WINDOW_FRAMES = (350_000, 400_000)
 
+KINDLE_TARGET_RUNTIME = "kindle-ale_py-0.12.1"
+UPSTREAM_D3_TARGET_RUNTIME = "upstream-d3-ale_py-0.9.0"
+
 ATARI_PROFILES = {
     "current": {
         "action_repeat": 4,
@@ -61,6 +64,24 @@ ATARI_TARGETS = {
     "published-minimal": {
         "ALE/Pong-v5": {
             "matched_random_3_seed": -20.446031746031746,
+        },
+    },
+}
+
+# The pinned upstream executable and Kindle use different ALE releases. A
+# paired control feeds the exact same three seeded random-action streams to
+# both published-protocol wrappers for 100,000 decisions. Their trajectories
+# first differ at decision 15. In the 350k--400k emulator-frame score window,
+# upstream ALE 0.9 averages -1854/91 = -20.373626... across seeds 0--2 (13,
+# 13, and 14 episodes), while Kindle ALE 0.12 reproduces the -20.622710...
+# target above. Keep the historical D3 targets shared, but never attribute the
+# ALE 0.12 random floor to the locally reproduced ALE 0.9 reference curve.
+ATARI_TARGET_OVERRIDES = {
+    UPSTREAM_D3_TARGET_RUNTIME: {
+        "published": {
+            "ALE/Pong-v5": {
+                "matched_random_3_seed": -20.373626373626372,
+            },
         },
     },
 }
@@ -253,6 +274,7 @@ def load_upstream_d3_segments(
                 "environment": str(experiment["environment"]),
                 "seed": seed,
                 "mode": "train",
+                "target_runtime": UPSTREAM_D3_TARGET_RUNTIME,
                 "atari_protocol": str(protocol["name"]),
                 "action_repeat": action_repeat,
                 "full_action_space": protocol["actions"] == "all",
@@ -285,6 +307,11 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
                     "environment": str(event["environment"]),
                     "seed": int(event["seed"]),
                     "mode": str(event["mode"]),
+                    "target_runtime": (
+                        KINDLE_TARGET_RUNTIME
+                        if event.get("ale_py_version") in (None, "0.12.1")
+                        else f"kindle-ale_py-{event['ale_py_version']}"
+                    ),
                     "atari_protocol": str(event["atari_protocol"]),
                     "action_repeat": action_repeat,
                     "full_action_space": bool(event["full_action_space"]),
@@ -367,8 +394,17 @@ def summarize_scores(
 ) -> dict[str, object]:
     """Compute episode means per seed, then the equally weighted seed mean."""
     grouped = defaultdict(list)
+    target_runtimes = {}
     for segment in segments:
         _validate_segment(segment, expected_protocol, expected_mode)
+        environment = segment["environment"]
+        target_runtime = segment["target_runtime"]
+        previous_runtime = target_runtimes.setdefault(environment, target_runtime)
+        if previous_runtime != target_runtime:
+            raise AtariScoreError(
+                f"{environment}: cannot mix target runtimes "
+                f"{previous_runtime!r} and {target_runtime!r}"
+            )
         grouped[(segment["environment"], segment["seed"])].append(segment)
 
     environments = defaultdict(list)
@@ -419,15 +455,25 @@ def summarize_scores(
     protocol_targets = ATARI_TARGETS.get(expected_protocol, {})
     for environment, seeds in sorted(environments.items()):
         seed_mean = sum(seed["score"] for seed in seeds) / len(seeds)
+        target_runtime = target_runtimes[environment]
+        environment_targets = dict(protocol_targets.get(environment, {}))
+        if target_runtime != KINDLE_TARGET_RUNTIME:
+            environment_targets.pop("matched_random_3_seed", None)
+        environment_targets.update(
+            ATARI_TARGET_OVERRIDES.get(target_runtime, {})
+            .get(expected_protocol, {})
+            .get(environment, {})
+        )
         targets = {
             name: {
                 "score": target,
                 "delta": seed_mean - target,
                 "met": seed_mean >= target,
             }
-            for name, target in protocol_targets.get(environment, {}).items()
+            for name, target in environment_targets.items()
         }
         environment_summaries[environment] = {
+            "target_runtime": target_runtime,
             "seed_results": seeds,
             "seed_mean": seed_mean,
             "seed_count": len(seeds),
