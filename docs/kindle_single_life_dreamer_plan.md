@@ -1427,11 +1427,12 @@ For every policy decision:
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `3f2b91d95288d625a7616179604c33bba6472aaf`.
+  `e67ced7568ae051c0f1d9f20d67370d5019d2b58`.
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
-  `95f5004fb02785a792c883a5312ca5ac37872a75` (the revision selected by
-  Meganeura so the shared context types remain unified).
+  `ae0f7ad1f05443bea121eb514fab2fc0b867a662` (the revision selected by
+  Meganeura so the shared context types remain unified and full-length world
+  BPTT does not overflow descriptor-pool growth).
 - DINO model:
   [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
   snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.

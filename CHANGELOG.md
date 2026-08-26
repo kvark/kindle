@@ -6,6 +6,8 @@
   imagined actor/critic learner, sequence replay, and resumable checkpoints.
 - Preserved length-64 replay updates while accumulating world-model gradients
   over 8-step truncated-BPTT chunks for practical static graph compilation.
+- Fixed Blade's descriptor-pool growth so controlled full 64-step BPTT runs
+  build from pinned dependencies instead of requiring a local source patch.
 - Matched DreamerV3's feature-loss reduction, per-parameter optimizer chain,
   online-first replay queue, 1,024-item replay prefill gate, and zero-indexed
   learning-rate warmup. Fresh non-overlapping sequences are consumed FIFO
