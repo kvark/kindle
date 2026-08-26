@@ -828,6 +828,18 @@ Validation snapshot (updated 2026-08-26):
   environment step 91,086. The final result is therefore labeled checkpoint-
   recovered rather than uninterrupted; a winning configuration still requires
   an independent clean replication;
+- the recovered atomic 95,000-step checkpoint contains learner step 23,208,
+  only 979 updates after 90,000 because replay refill intentionally earns no
+  deferred training credit. Its four resumed episodes score -20, -20, -20,
+  and -19, averaging -19.75. Combining them with the two retained pre-recovery
+  score-window endpoints gives a provisional recovery-aware mean of -19.5 over
+  six episodes. Across the 979 resumed updates, reconstruction loss averages
+  31.918, raw KL 2.614, reward loss 0.0482, replay-value loss 1.557, policy
+  entropy 1.308, and imagined return -4.062. Effective action entropy is 1.286:
+  `RIGHT` receives 41.1%, `LEFTFIRE` 34.0%, and `LEFT` 17.2% of the 5,000
+  actions. The recovery segment has not reproduced the superseded crash tail's
+  -17 and -15 episodes, another reason not to present either partial trajectory
+  as the final score;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
