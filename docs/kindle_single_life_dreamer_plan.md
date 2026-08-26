@@ -161,12 +161,19 @@ Implementation-parity claims below refer to `e3f02248`; final score deltas label
 the 2024 artifact separately, and a locally reproduced current-D3 curve remains
 the strongest future matched reference.
 
-That local reference is prepared as a resource-matched `size1m`, seed-zero,
+That local reference is prepared with the standard upstream `size1m`, seed-zero,
 100,000-step Pong run with batch 16x64, train ratio 256, full recurrent
 backpropagation, and upstream's learned 64x64 RGB encoder. A config-only overlay
 restores the released artifact's all-18-action, zero-no-op, 100,000-frame
 episode wrapper and opts into deterministic environment seeding; the upstream
-algorithm remains pinned at `e3f02248`. Its isolated Python 3.11 environment
+algorithm remains pinned at `e3f02248`. A CPU-only parameter initialization of
+that exact preset and 18-action space reports 688,004 trainable parameters;
+Kindle's `1M` run reports 721,888 world and 116,817 behavior parameters, or
+838,705 total. The first upstream control is therefore preset-class matched,
+not count matched: Kindle has 150,701 (21.9%) more trainable parameters. Keeping
+the standard upstream preset avoids changing the reference architecture; an
+exact-capacity control is warranted only if the result leaves capacity as a
+plausible explanation. Its isolated Python 3.11 environment
 uses the requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only
 smoke completed 1,200 Pong transitions and more than 100 finite learner updates,
 including replay, checkpoint, policy, train, and report graph compilation, with
@@ -310,7 +317,9 @@ static graphs execute in stages. Targets are formed before either update, the
 replay-value representation gradient is retained, and D3's adaptive clipping is
 applied independently to each parameter leaf.
 
-The network-size presets `1M` through `200M` mirror upstream. Kindle defaults
+The network-size presets `1M` through `200M` mirror upstream's width settings,
+not exact parameter totals across the different observation encoders and
+heads. Kindle defaults
 to `12M` for practical iteration; the pinned upstream default associated with
 the published Atari-100k score artifact is `200M`. A 12M run is a labeled
 scaling ablation, not an official-score reproduction. DINO's frozen parameters
