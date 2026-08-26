@@ -793,6 +793,19 @@ Validation snapshot (updated 2026-08-26):
   `LEFT` 15.3% of actions. The changing mix still loses essentially every
   point. At 340,000 emulator frames this is the final atomic checkpoint before
   the protocol score window, not evidence from inside that window;
+- the atomic 90,000-step checkpoint contains 22,229 learner updates. The four
+  episodes ending from 85,000 through 90,000 interactions score -21, -19, -18,
+  and -20, averaging -19.5. Across the interval's 1,250 learner updates,
+  reconstruction loss averages 32.472, raw KL 2.641, reward loss 0.0526,
+  replay-value loss 1.478, policy entropy 1.337, and imagined return -3.909.
+  Effective action entropy falls to 1.284: `RIGHT` receives 43.6% and
+  `LEFTFIRE` 35.4% of the 5,000 actions, followed by `LEFT` at 10.5% and
+  `RIGHTFIRE` at 7.2%. The interval sustains 1.772 environment decisions/s.
+  The first three episode endpoints in the 350,000--400,000-frame score window
+  are -18, -20, and -20 at frames 351,696, 356,492, and 360,248, for a
+  provisional -19.333 mean. This incomplete-window value is useful live
+  evidence but is not a protocol score; strict aggregation still waits for the
+  100,000-step `run_end`;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
@@ -804,7 +817,7 @@ Validation snapshot (updated 2026-08-26):
   while the published artifact uses the default D3 model and full recurrence.
   The 50,000-step diagnostics select BPTT length before capacity as the first
   controlled follow-up. That full-recurrence result is interpreted only beside
-  the completed BPTT-8 curve and the queued, resource-matched current-D3 run:
+  the completed BPTT-8 curve and the queued, standard-size1m current-D3 run:
   a BPTT-64 improvement is replicated before scaling; a successful upstream
   1M run with a failed Kindle BPTT-64 run selects the frozen-vision interface
   as the next causal axis; failure of both 1M runs selects capacity rather than
