@@ -927,10 +927,11 @@ Validation snapshot (updated 2026-08-26):
   the interrupted segment at 360,000 frames and discards the superseded
   post-checkpoint crash tail before combining episode endpoints, exposing the
   recovery count in the score summary. Because Kindle checkpoints do not yet
-  persist replay, the resumed learner also refills 1,024 transitions before
-  updating. The final result is therefore labeled checkpoint-recovered rather
-  than uninterrupted; a winning configuration still requires an independent
-  clean replication;
+  persist replay, the resumed learner also refills 1,088 frames, providing
+  1,024 eligible length-64 sequence starts, before updating at absolute
+  environment step 91,086. The final result is therefore labeled checkpoint-
+  recovered rather than uninterrupted; a winning configuration still requires
+  an independent clean replication;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
