@@ -187,16 +187,20 @@ Kindle logs.
 | Lambda | 0.95 |
 | Slow value | EMA rate 0.02 |
 | Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
-| Optimizer | Per-parameter AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
+| Optimizer | Parameter-leaf AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
 | Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
 
-Meganeura implements DreamerV3's optimizer chain directly: per-parameter
-adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
-also compiles a statically unrolled recurrent graph. The production baseline
-uses 8-step truncated BPTT, accumulates and averages gradients across all eight
-chunks, and retains the full 64-step replay sample and all posterior imagination
-starts. The chunk length remains configurable for targeted scaling checks. This
-is an implementation accommodation, not a claimed D3-equivalent gradient path.
+Meganeura implements DreamerV3's optimizer chain directly: parameter-leaf
+adaptive gradient clipping at 0.3, RMS normalization, then momentum. This is
+the exact convention at the pinned D3 source: `Agent._make_opt()` calls its
+own `embodied.jax.opt.clip_by_agc()`, which flattens each parameter leaf before
+computing the parameter and update norms. It does not call Optax's separate
+rank-dependent unit-wise AGC helper. Meganeura also compiles a statically
+unrolled recurrent graph. The production baseline uses 8-step truncated BPTT,
+accumulates and averages gradients across all eight chunks, and retains the
+full 64-step replay sample and all posterior imagination starts. The chunk
+length remains configurable for targeted scaling checks. This is an
+implementation accommodation, not a claimed D3-equivalent gradient path.
 
 A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
 graph constructs successfully in 4.70 seconds, but its first learner update
@@ -713,6 +717,16 @@ Validation snapshot (updated 2026-08-25):
   28.1%, and `RIGHTFIRE` at 24.1%. The broader action mix still loses every
   point, so the immutable curve continues to its 75,000-step evaluation rather
   than treating entropy recovery as control recovery;
+- the atomic 75,000-step checkpoint is now archived. The six episodes ending
+  from 70,000 through 75,000 interactions average -20.833 (range -21 to -20),
+  and the twelve ending from 65,000 through 75,000 average -20.5 (range -21
+  to -19). Over the complete 70,000--75,000 learner interval,
+  reconstruction loss averages 36.44, raw KL 2.504, reward loss 0.0580,
+  replay-value loss 1.434, policy entropy 1.375, and imagined return -3.834.
+  The model losses continue to improve without an online control recovery;
+  matched-random, sampled-policy, behavior, and value probes remain queued
+  after the immutable 100,000-step endpoint so they do not contend with
+  training for the RTX;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
