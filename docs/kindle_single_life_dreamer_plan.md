@@ -187,16 +187,24 @@ Kindle logs.
 | Lambda | 0.95 |
 | Slow value | EMA rate 0.02 |
 | Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
-| Optimizer | Per-parameter AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
+| Optimizer | Optax output-unit AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
 | Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
 
-Meganeura implements DreamerV3's optimizer chain directly: per-parameter
-adaptive gradient clipping at 0.3, RMS normalization, then momentum. Meganeura
-also compiles a statically unrolled recurrent graph. The production baseline
-uses 8-step truncated BPTT, accumulates and averages gradients across all eight
-chunks, and retains the full 64-step replay sample and all posterior imagination
-starts. The chunk length remains configurable for targeted scaling checks. This
-is an implementation accommodation, not a claimed D3-equivalent gradient path.
+Meganeura implements DreamerV3's optimizer chain directly: Optax-compatible
+rank-dependent output-unit adaptive gradient clipping at 0.3, RMS
+normalization, then momentum. Meganeura also compiles a statically unrolled
+recurrent graph. The production baseline uses 8-step truncated BPTT,
+accumulates and averages gradients across all eight chunks, and retains the
+full 64-step replay sample and all posterior imagination starts. The chunk
+length remains configurable for targeted scaling checks. This is an
+implementation accommodation, not a claimed D3-equivalent gradient path.
+
+The immutable BPTT-8 curve and its queued BPTT-64 recurrence control were
+built before that axis mismatch was found. Their Meganeura revision clips one
+norm per complete parameter leaf, so they isolate recurrence under the old
+optimizer but are not optimizer-exact D3 reproductions. The corrected
+unit-wise stack is pinned separately and starts a fresh curve rather than
+restoring those checkpoints.
 
 A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
 graph constructs successfully in 4.70 seconds, but its first learner update
