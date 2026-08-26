@@ -161,6 +161,21 @@ Implementation-parity claims below refer to `e3f02248`; final score deltas label
 the 2024 artifact separately, and a locally reproduced current-D3 curve remains
 the strongest future matched reference.
 
+That local reference is prepared as a resource-matched `size1m`, seed-zero,
+100,000-step Pong run with batch 16x64, train ratio 256, full recurrent
+backpropagation, and upstream's learned 64x64 RGB encoder. A config-only overlay
+restores the released artifact's all-18-action, zero-no-op, 100,000-frame
+episode wrapper and opts into deterministic environment seeding; the upstream
+algorithm remains pinned at `e3f02248`. Its isolated Python 3.11 environment
+uses the requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only
+smoke completed 1,200 Pong transitions and more than 100 finite learner updates,
+including replay, checkpoint, policy, train, and report graph compilation, with
+about 1.35 GiB observed process memory. Kindle uses ALE 0.12.1, so the wrapper
+mechanics are matched but trajectories are not claimed to be byte-identical
+across the two ALE revisions. The CUDA reference curve is queued only after the
+immutable Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics release
+the RTX.
+
 | Area | Baseline |
 |---|---|
 | Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
