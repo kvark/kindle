@@ -981,6 +981,24 @@ Validation snapshot (updated 2026-08-26):
   temporal value calibration and control while leaving the 18-action actor
   only weakly aligned with small, alias-sensitive one-step differences. The
   full-recurrence control was released only after these probes completed;
+- the first BPTT-64 launch exposed a runtime-protection mistake before its
+  first checkpoint: it inherited `OOMScoreAdjust=200`, the same preference that
+  made the kernel select BPTT-8 during unrelated host pressure. Its incomplete
+  1,542-step/115-update startup log is preserved with SHA-256
+  `b4dda8957203ddae4d72b371e4235c03a58216b0938244edf21764ee5a24f8ab`.
+  With no checkpoint to migrate, the identical source-pinned command restarted
+  from seed zero under a guarded launcher whose SHA-256 is
+  `e40d4764fb60e68b04e1364ab8a6d7ffae77695da320b9483d5c5030022b74aa`.
+  Removing timing-only fields makes both JSON streams bit-identical through
+  environment step 1,138 (normalized SHA-256
+  `e1cd30a50a0197e8611770e88252f16f306b05efb4fe13036e53735c30887570`),
+  so the restart changes no trajectory or optimization input. The user manager
+  imposes an effective process floor of +100 despite the unit's requested zero,
+  still improving on +200; the waiting diagnostic and upstream workers now use
+  the same protection. The authoritative restart constructs in 97.25 seconds,
+  its first 50 updates are finite and average 2.248 seconds/update (1.780
+  environment decisions/s), and it peaks initially at 1.96 GiB host and 3,267
+  MiB device memory without unit swap;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
