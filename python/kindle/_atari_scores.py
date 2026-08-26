@@ -292,7 +292,65 @@ def load_upstream_d3_segments(
 
 
 def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
-    """Load complete run segments, including multiple appended runs per file."""
+    """Load complete runs, including explicit checkpoint-recovery segments."""
+
+    recovery_identity_fields = (
+        "environment",
+        "seed",
+        "mode",
+        "atari_protocol",
+        "action_repeat",
+        "full_action_space",
+        "noop_max",
+        "max_episode_frames",
+        "score_window_frames",
+        "actions",
+        "action_meanings",
+        "dino_model_id",
+        "dino_checkpoint_revision",
+        "dino_checkpoint_sha256",
+        "trainable_parameters",
+        "config",
+    )
+
+    def start_segment(path: Path, event: dict[str, object]) -> dict[str, object]:
+        action_repeat = int(event["action_repeat"])
+        return {
+            "source": str(path),
+            "environment": str(event["environment"]),
+            "seed": int(event["seed"]),
+            "mode": str(event["mode"]),
+            "target_runtime": (
+                KINDLE_TARGET_RUNTIME
+                if event.get("ale_py_version") in (None, "0.12.1")
+                else f"kindle-ale_py-{event['ale_py_version']}"
+            ),
+            "atari_protocol": str(event["atari_protocol"]),
+            "action_repeat": action_repeat,
+            "full_action_space": bool(event["full_action_space"]),
+            "noop_max": int(event["noop_max"]),
+            "max_episode_frames": int(event["max_episode_frames"]),
+            "score_window_frames": tuple(event["score_window_frames"]),
+            "start_frame": (
+                int(event["starting_environment_step"]) * action_repeat
+            ),
+            "episodes": [],
+            "_run_start": event,
+            "_checkpoints": {},
+        }
+
+    def finish_segment(
+        current: dict[str, object], end_frame: int
+    ) -> dict[str, object]:
+        current["end_frame"] = end_frame
+        if current["end_frame"] < current["start_frame"]:
+            raise AtariScoreError(
+                f"{current['source']}: run ends before it starts"
+            )
+        current.pop("_run_start")
+        current.pop("_checkpoints")
+        return current
+
     segments = []
     for path in paths:
         current = None
@@ -300,29 +358,54 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
             event_type = event.get("event")
             if event_type == "run_start":
                 if current is not None:
-                    raise AtariScoreError(f"{path}: nested run_start event")
-                action_repeat = int(event["action_repeat"])
-                current = {
-                    "source": str(path),
-                    "environment": str(event["environment"]),
-                    "seed": int(event["seed"]),
-                    "mode": str(event["mode"]),
-                    "target_runtime": (
-                        KINDLE_TARGET_RUNTIME
-                        if event.get("ale_py_version") in (None, "0.12.1")
-                        else f"kindle-ale_py-{event['ale_py_version']}"
-                    ),
-                    "atari_protocol": str(event["atari_protocol"]),
-                    "action_repeat": action_repeat,
-                    "full_action_space": bool(event["full_action_space"]),
-                    "noop_max": int(event["noop_max"]),
-                    "max_episode_frames": int(event["max_episode_frames"]),
-                    "score_window_frames": tuple(event["score_window_frames"]),
-                    "start_frame": (
-                        int(event["starting_environment_step"]) * action_repeat
-                    ),
-                    "episodes": [],
-                }
+                    if event.get("output_appended") is not True:
+                        raise AtariScoreError(f"{path}: nested run_start event")
+                    previous_start = current["_run_start"]
+                    for field in recovery_identity_fields:
+                        if previous_start.get(field) != event.get(field):
+                            raise AtariScoreError(
+                                f"{path}: checkpoint recovery changed {field}"
+                            )
+                    action_repeat = int(current["action_repeat"])
+                    resume_step = int(event["starting_environment_step"])
+                    resume_frame = resume_step * action_repeat
+                    checkpoints = current["_checkpoints"]
+                    if resume_step not in checkpoints:
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery at step {resume_step} "
+                            "has no matching checkpoint event"
+                        )
+                    restored_learner = int(event["starting_learner_step"])
+                    if restored_learner != checkpoints[resume_step]:
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery learner step "
+                            f"{restored_learner} does not match "
+                            f"{checkpoints[resume_step]}"
+                        )
+                    if resume_frame <= int(current["start_frame"]):
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery did not advance the run"
+                        )
+                    current["episodes"] = [
+                        episode
+                        for episode in current["episodes"]
+                        if episode["environment_frames"] <= resume_frame
+                    ]
+                    current["checkpoint_recovered"] = True
+                    segments.append(finish_segment(current, resume_frame))
+                current = start_segment(path, event)
+                if event.get("output_appended") is True:
+                    current["checkpoint_recovery_start"] = True
+            elif event_type == "checkpoint" and current is not None:
+                checkpoint_step = int(event["environment_step"])
+                learner_step = int(event["learner_step"])
+                previous = current["_checkpoints"].setdefault(
+                    checkpoint_step, learner_step
+                )
+                if previous != learner_step:
+                    raise AtariScoreError(
+                        f"{path}: conflicting checkpoint at step {checkpoint_step}"
+                    )
             elif event_type == "episode" and current is not None:
                 current["episodes"].append(
                     {
@@ -337,10 +420,8 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
                     raise AtariScoreError(f"{path}: environment changed within run")
                 if int(event["seed"]) != current["seed"]:
                     raise AtariScoreError(f"{path}: seed changed within run")
-                current["end_frame"] = int(event["environment_frames"])
-                if current["end_frame"] < current["start_frame"]:
-                    raise AtariScoreError(f"{path}: run ends before it starts")
-                segments.append(current)
+                end_frame = int(event["environment_frames"])
+                segments.append(finish_segment(current, end_frame))
                 current = None
         if current is not None:
             raise AtariScoreError(f"{path}: incomplete run has no run_end event")
@@ -442,14 +523,19 @@ def summarize_scores(
                 f"{environment} seed {seed}: complete window contains no episodes"
             )
         returns = [episodes_by_frame[frame] for frame in sorted(episodes_by_frame)]
-        environments[environment].append(
-            {
-                "seed": seed,
-                "score": sum(returns) / len(returns),
-                "completed_episodes": len(returns),
-                "segment_count": len(seed_segments),
-            }
+        seed_result = {
+            "seed": seed,
+            "score": sum(returns) / len(returns),
+            "completed_episodes": len(returns),
+            "segment_count": len(seed_segments),
+        }
+        checkpoint_recoveries = sum(
+            bool(segment.get("checkpoint_recovery_start"))
+            for segment in seed_segments
         )
+        if checkpoint_recoveries:
+            seed_result["checkpoint_recoveries"] = checkpoint_recoveries
+        environments[environment].append(seed_result)
 
     environment_summaries = {}
     protocol_targets = ATARI_TARGETS.get(expected_protocol, {})
