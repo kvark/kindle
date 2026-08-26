@@ -254,6 +254,17 @@ and `22c8435fcff2c642fa8fcbc7e8bb9bcee8e50639616ad15a649f18d091c67f6b`.
 The production default and active BPTT-8 curve remain unchanged; larger-preset
 memory and the long BPTT-64 learning result remain unproven.
 
+The prefill-amortized canary rate is not a useful long-run estimate. Its first
+update arrives at 67.70 seconds after 1,086 interactions; the next eight updates
+are spaced by 1.772 seconds on average, or 0.564 scheduled updates/s. BPTT-16 is
+nearly identical at 1.741 seconds/update, while the active BPTT-8 curve averages
+2.247 seconds/update from 80,000 onward because each logical update submits and
+waits on eight chunk graphs. Holding the measured four-interaction cadence
+projects roughly 12.2 hours after construction for a 100,000-interaction
+BPTT-64 run on the measured AMD path. The queued RTX curve remains the
+authoritative sustained measurement, but full recurrence is not assumed to be
+slower merely because its differentiated graph is larger.
+
 The conditional action-alias fallback is validated on that same graph path. A
 six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
 peaks at 1.88 GiB, and completes the identical 1,120 interactions and nine
@@ -555,7 +566,7 @@ Here:
 - the balanced KL and free-nat behavior remain DreamerV3-style;
 - reward, continuation, and replay-value losses retain their current roles.
 
-Validation snapshot (updated 2026-08-25):
+Validation snapshot (updated 2026-08-26):
 
 - formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
   full-checkpoint DINO parity pass on the pinned stack;
@@ -867,6 +878,16 @@ Validation snapshot (updated 2026-08-25):
   remain concentrated on `RIGHTFIRE` (39.7%), `LEFTFIRE` (28.9%), and `LEFT`
   (20.9%). This is another random-level late marker, not a benchmark score:
   the 350,000-frame score window starts at interaction 87,500;
+- the atomic 85,000-step checkpoint contains 20,979 learner updates. The six
+  episodes ending from 80,000 through 85,000 interactions score -19, -21, -20,
+  -21, -21, and -21, averaging -20.5. Across the interval's 1,250 learner
+  updates, reconstruction loss averages 33.798, raw KL 2.549, reward loss
+  0.0536, replay-value loss 1.470, policy entropy 1.532, and imagined return
+  -3.946. Effective action entropy is 1.414 over the six Pong transition
+  groups; `LEFTFIRE` now receives 38.8%, `RIGHTFIRE` 24.3%, `RIGHT` 19.2%, and
+  `LEFT` 15.3% of actions. The changing mix still loses essentially every
+  point. At 340,000 emulator frames this is the final atomic checkpoint before
+  the protocol score window, not evidence from inside that window;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
