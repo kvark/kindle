@@ -161,7 +161,12 @@ algorithm remains pinned at `e3f02248`. Its isolated Python 3.11 environment
 uses the requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only
 smoke completed 1,200 Pong transitions and more than 100 finite learner updates,
 including replay, checkpoint, policy, train, and report graph compilation, with
-about 1.35 GiB observed process memory. Kindle uses ALE 0.12.1, so the wrapper
+about 1.35 GiB observed process memory. Upstream keeps its stopping counter in
+agent decisions: the driver increments it once per transition and compares it
+directly with `run.steps`. Its logger independently multiplies that raw counter
+by the Atari action repeat, so the smoke's final logged step is 4,760 near its
+1,200-decision limit, and the queued 100,000-decision run reports episode steps
+through 400,000 emulator frames. Kindle uses ALE 0.12.1, so the wrapper
 mechanics are matched but trajectories are not byte-identical across the two
 ALE revisions. A paired fixed-action trace is pixel-identical through decision
 14 and first diverges at decision 15. Exact 100,000-decision random controls
