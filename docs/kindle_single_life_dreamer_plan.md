@@ -1323,7 +1323,8 @@ falsifiable exit gate.
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `e67ced7568ae051c0f1d9f20d67370d5019d2b58`.
+  `a7ce38c4e54b8116d8765ac7bdf20f426161cac4` (including Optax-compatible
+  output-unit adaptive gradient clipping).
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
   `ae0f7ad1f05443bea121eb514fab2fc0b867a662` (the revision selected by
