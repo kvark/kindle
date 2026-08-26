@@ -891,10 +891,34 @@ Validation snapshot (updated 2026-08-26):
   so the restart changes no trajectory or optimization input. The user manager
   imposes an effective process floor of +100 despite the unit's requested zero,
   still improving on +200; the waiting diagnostic and upstream workers now use
-  the same protection. The authoritative restart constructs in 97.25 seconds,
+  the same protection. The protected restart constructs in 97.25 seconds,
   its first 50 updates are finite and average 2.248 seconds/update (1.780
   environment decisions/s), and it peaks initially at 1.96 GiB host and 3,267
   MiB device memory without unit swap;
+- that protection does not make concurrent full-BPTT and eight-environment
+  Quake collection safe while all 8 GiB of host swap remains occupied. The
+  separate `mind-games` controller again grew to about 2.6 GiB, each of its
+  eight `vkquake` processes to about 0.55 GiB plus Xorg, and host availability
+  fell from 6.4 to 4.5 GiB while Kindle was active. Kindle therefore yielded
+  voluntarily before the first checkpoint at environment step 2,018 and
+  learner step 234; that incomplete log is preserved with SHA-256
+  `4817b70c80a136a752f3608fdb1899b25a68928fb7732e7614330d9bddc9aee1`.
+  A later clean restart similarly yielded at step 2,022/update 235 when a
+  diagnostic repeat appeared, preserving SHA-256
+  `8bd4de43e19364595d483c5b054ead9927126a35e3fb534a05a89de871a11a28`.
+  All three stopped starts are timing-normalized and bit-identical through the
+  first start's complete step 1,542 prefix (SHA-256
+  `1e356a31b979902a58ccf7cd9485398d39682897fd88bc21a1b411a0317734ad`).
+  None is a result or recovery segment: no checkpoint existed, and the
+  authoritative curve restarts from seed zero. A narrow contention guard
+  (SHA-256
+  `02c958d42eed623d88d3c9ab7ece3ddd157031793ac0f67ba19d759d6bb3cf85`)
+  watches only for that known external controller, freezes Kindle's dependent
+  workers, and stops only Kindle; it never signals or changes `mind-games`.
+  A one-shot resume worker (SHA-256
+  `c1bcb053a4084f66ae953fca5214402746e59e6cb785d7bf4a4c2daacb1a8335`)
+  now requires ten uninterrupted quiet minutes before relaunching the exact
+  pinned command, thawing the queue, and arming the guard again;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
