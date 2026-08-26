@@ -267,6 +267,12 @@ budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
 scale and D3's replay-value representation gradient. Use
 `--no-replay-value-gradient` for the isolated-gradient ablation; both choices
 remain explicit Python constructor options as well.
+The experimental `--dino-spatial-pool 1` option retains DINO's full projected
+14×14×64 grid instead of the default 7×7×64 map. This changes model shapes and
+uses four times as much observation replay memory, so it starts a new agent and
+cannot override a restored checkpoint. Its summed reconstruction event is also
+four times larger; comparisons must choose and record an explicit reconstruction
+scale rather than inheriting the compact baseline's calibration silently.
 The same runner provides deterministic random controls, resumable training, and
 frozen sampled evaluation matching D3; `--greedy` is available as a separate
 policy diagnostic. During evaluation, `--reward-probe` measures the chosen

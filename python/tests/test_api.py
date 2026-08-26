@@ -5,6 +5,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     config = kindle.default_config(18, "12m")
     assert config["action_count"] == 18
     assert config["model_size"] == "size12_m"
+    assert config["dino_spatial_pool"] == 2
     assert config["observation_decoder_depth"] == 64
     assert config["batch_size"] == 16
     assert config["batch_length"] == 64
@@ -36,6 +37,15 @@ def test_invalid_action_count_is_a_python_error() -> None:
         assert "num_actions must be greater than one" in str(error)
     else:
         raise AssertionError("invalid action count was accepted")
+
+
+def test_invalid_dino_spatial_pool_is_a_python_error_before_gpu_setup() -> None:
+    try:
+        kindle.Agent("/unused", 2, dino_spatial_pool=3)
+    except ValueError as error:
+        assert "dino_spatial_pool must be 1 or 2" in str(error)
+    else:
+        raise AssertionError("invalid DINO spatial pool was accepted")
 
 
 def test_agent_exposes_read_only_reward_probes() -> None:

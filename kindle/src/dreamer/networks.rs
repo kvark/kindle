@@ -3,7 +3,7 @@
 use meganeura::{Graph, graph::NodeId, nn};
 
 use super::config::DreamerConfig;
-use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use crate::vision::OBSERVATION_CHANNELS;
 
 const DREAMER_NORM_EPSILON: f32 = 1e-4;
 
@@ -407,12 +407,14 @@ impl Prior {
 pub(crate) struct ObservationEncoder {
     patch0: LinearNorm,
     patch1: LinearNorm,
+    patches: usize,
     depth: usize,
 }
 
 impl ObservationEncoder {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
+        let grid = config.observation_grid();
         Self {
             patch0: LinearNorm::new(
                 graph,
@@ -421,17 +423,17 @@ impl ObservationEncoder {
                 depth,
             ),
             patch1: LinearNorm::new(graph, "world.representation.encoder.patch1", depth, depth),
+            patches: grid * grid,
             depth,
         }
     }
 
     pub(crate) fn output_dim(&self) -> usize {
-        OBSERVATION_GRID * OBSERVATION_GRID * self.depth
+        self.patches * self.depth
     }
 
     pub(crate) fn forward(&self, graph: &mut Graph, observation: NodeId, batch: usize) -> NodeId {
-        let patches = OBSERVATION_GRID * OBSERVATION_GRID;
-        let observation = graph.reshape(observation, &[batch * patches, OBSERVATION_CHANNELS]);
+        let observation = graph.reshape(observation, &[batch * self.patches, OBSERVATION_CHANNELS]);
         let value = self.patch0.forward(graph, observation);
         let value = self.patch1.forward(graph, value);
         graph.reshape(value, &[batch, self.output_dim()])
@@ -658,13 +660,15 @@ pub(crate) struct ObservationDecoder {
     spatial: nn::Linear,
     patch_norm: nn::RmsNorm,
     output: nn::Linear,
+    patches: usize,
     depth: usize,
 }
 
 impl ObservationDecoder {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let size = config.network();
-        let patches = OBSERVATION_GRID * OBSERVATION_GRID;
+        let grid = config.observation_grid();
+        let patches = grid * grid;
         let depth = config.observation_decoder_depth();
         Self {
             trunk: LinearNorm::new(
@@ -681,15 +685,15 @@ impl ObservationDecoder {
                 DREAMER_NORM_EPSILON,
             ),
             output: nn::Linear::new(graph, "world.decoder.out", depth, OBSERVATION_CHANNELS),
+            patches,
             depth,
         }
     }
 
     pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let patches = OBSERVATION_GRID * OBSERVATION_GRID;
         let value = self.trunk.forward(graph, input);
         let value = self.spatial.forward(graph, value);
-        let value = graph.reshape(value, &[batch * patches, self.depth]);
+        let value = graph.reshape(value, &[batch * self.patches, self.depth]);
         let value = self.patch_norm.forward(graph, value);
         let value = graph.silu(value);
         self.output.forward(graph, value)

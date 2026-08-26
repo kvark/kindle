@@ -23,8 +23,7 @@ use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
 use crate::vision::{
     DINOV3_UPSTREAM_REV, DINOVISION_SOURCE_REV, DinoObservation, DinoPerception,
-    OBSERVATION_CHANNELS, OBSERVATION_GRID, PROJECTION_SEED, VITS16_CHECKPOINT_REV,
-    VITS16_MODEL_ID,
+    OBSERVATION_CHANNELS, PROJECTION_SEED, VITS16_CHECKPOINT_REV, VITS16_MODEL_ID,
 };
 
 const CHECKPOINT_FORMAT: u32 = 2;
@@ -399,6 +398,8 @@ impl DreamerCore {
         sync_matching(&behavior_train, &mut world_train, "behavior.value.");
 
         let size = config.network();
+        let observation_dim = config.observation_dim();
+        let observation_grid = config.observation_grid();
         Self {
             gpu,
             bins: TwoHotBins::new(config.value_bins),
@@ -407,8 +408,8 @@ impl DreamerCore {
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
-            observation: vec![0.0; DinoObservation::LEN],
-            encoded_observation: vec![0.0; OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth],
+            observation: vec![0.0; observation_dim],
+            encoded_observation: vec![0.0; observation_grid * observation_grid * size.vision_depth],
             feature: vec![0.0; config.feature_dim()],
             pending_action: None,
             active: false,
@@ -492,7 +493,7 @@ impl DreamerCore {
         decoder.set_input("stoch", &self.stoch);
         decoder.step();
         decoder.wait();
-        let mut observation = vec![0.0; DinoObservation::LEN];
+        let mut observation = vec![0.0; self.config.observation_dim()];
         decoder.read_output_by_index(0, &mut observation);
         observation
     }
@@ -654,7 +655,7 @@ impl DreamerCore {
                 decoder.set_input("stoch", &stoch);
                 decoder.step();
                 decoder.wait();
-                let mut observation = vec![0.0; DinoObservation::LEN];
+                let mut observation = vec![0.0; self.config.observation_dim()];
                 decoder.read_output_by_index(0, &mut observation);
                 rollout.observations.push(observation);
             }
@@ -709,7 +710,7 @@ impl DreamerCore {
             dino_model_id: VITS16_MODEL_ID.to_owned(),
             dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
-            observation_grid: OBSERVATION_GRID,
+            observation_grid: self.config.observation_grid(),
             observation_channels: OBSERVATION_CHANNELS,
             config: self.config.clone(),
             learner_step: self.learner_step,
@@ -727,6 +728,7 @@ impl DreamerCore {
     /// Begin the first episode or the next episode after `is_last`.
     /// Replay and all optimizer/model state survive this recurrent reset.
     pub fn begin_episode(&mut self, observation: DinoObservation) {
+        assert_eq!(observation.len(), self.config.observation_dim());
         assert!(
             self.pending_action.is_none(),
             "cannot reset with a pending action"
@@ -815,6 +817,7 @@ impl DreamerCore {
     }
 
     pub fn observe(&mut self, observation: DinoObservation, reward: Reward, flags: FrameFlags) {
+        assert_eq!(observation.len(), self.config.observation_dim());
         assert!(!flags.is_first, "use begin_episode for an is_first frame");
         if flags.is_terminal {
             assert!(flags.is_last);
@@ -1541,9 +1544,15 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        config.validate();
+        let spatial_pool = config.dino_spatial_pool;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception =
-            DinoPerception::load_vits16(dino_checkpoint, Some(Arc::clone(&gpu)), dino_plan_cache)?;
+        let perception = DinoPerception::load_vits16_with_spatial_pool(
+            dino_checkpoint,
+            Some(Arc::clone(&gpu)),
+            dino_plan_cache,
+            spatial_pool,
+        )?;
         let core = DreamerCore::with_gpu(config, gpu);
         Ok(Self { perception, core })
     }
@@ -1555,7 +1564,12 @@ impl DreamerAgent {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let gpu = Arc::new(crate::init_gpu_context()?);
         let core = DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu))?;
-        let perception = DinoPerception::load_vits16(dino_checkpoint, Some(gpu), dino_plan_cache)?;
+        let perception = DinoPerception::load_vits16_with_spatial_pool(
+            dino_checkpoint,
+            Some(gpu),
+            dino_plan_cache,
+            core.config().dino_spatial_pool,
+        )?;
         Ok(Self { perception, core })
     }
 
@@ -1723,11 +1737,15 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             ));
         }
     }
+    metadata
+        .config
+        .check()
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     let expected_vision = [
         ("projection seed", PROJECTION_SEED, metadata.projection_seed),
         (
             "observation grid",
-            OBSERVATION_GRID as u64,
+            metadata.config.observation_grid() as u64,
             metadata.observation_grid as u64,
         ),
         (
@@ -1744,10 +1762,7 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             ));
         }
     }
-    metadata
-        .config
-        .check()
-        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+    Ok(())
 }
 
 fn keep_masks(
@@ -2314,6 +2329,16 @@ mod tests {
             positive > negative + 0.5,
             "observation-conditioned reward predictions did not separate: positive={positive}, negative={negative}"
         );
+    }
+
+    #[test]
+    #[ignore = "builds all tiny Dreamer GPU sessions with the full DINO patch grid"]
+    fn tiny_full_dino_grid_sessions_build() {
+        let mut config = DreamerConfig::tiny(3);
+        config.dino_spatial_pool = 1;
+        let agent = DreamerCore::new(config).unwrap();
+        assert_eq!(agent.config().observation_grid(), 14);
+        assert_eq!(agent.observation.len(), agent.config().observation_dim());
     }
 
     fn config_value_bins(agent: &DreamerCore) -> usize {

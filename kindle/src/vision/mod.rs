@@ -6,6 +6,7 @@
 //! retained internally for faithful DINO inference and removed at this API
 //! boundary.
 
+use std::io;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -26,8 +27,12 @@ pub const VITS16_MODEL_ID: &str = "facebook/dinov3-vits16-pretrain-lvd1689m";
 pub const VITS16_CHECKPOINT_REV: &str = "114c1379950215c8b35dfcd4e90a5c251dde0d32";
 /// Channels retained by the fixed Johnson–Lindenstrauss projection.
 pub const OBSERVATION_CHANNELS: usize = 64;
+/// Spatial side of DINOv3 ViT-S/16's projected patch grid.
+pub const DINO_PATCH_GRID: usize = 14;
+/// Default spatial pooling factor used by the baseline and legacy checkpoints.
+pub const DEFAULT_DINO_SPATIAL_POOL: usize = 2;
 /// Spatial side after fixed 2×2 pooling of DINO's 14×14 patch grid.
-pub const OBSERVATION_GRID: usize = 7;
+pub const OBSERVATION_GRID: usize = DINO_PATCH_GRID / DEFAULT_DINO_SPATIAL_POOL;
 /// Stable seed for the non-trainable projection matrix.
 pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
 
@@ -40,10 +45,13 @@ pub struct DinoObservation {
 }
 
 impl DinoObservation {
+    /// Length of the default pooled observation retained for source and
+    /// checkpoint compatibility. Configurable callers should use
+    /// `DreamerConfig::observation_dim()` instead.
     pub const LEN: usize = OBSERVATION_GRID * OBSERVATION_GRID * OBSERVATION_CHANNELS;
 
     pub fn from_vec(values: Vec<f32>) -> Self {
-        assert_eq!(values.len(), Self::LEN);
+        assert!(!values.is_empty());
         assert!(values.iter().all(|value| value.is_finite()));
         Self {
             values: values.into_boxed_slice(),
@@ -52,6 +60,14 @@ impl DinoObservation {
 
     pub fn as_slice(&self) -> &[f32] {
         &self.values
+    }
+
+    pub fn len(&self) -> usize {
+        self.values.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.values.is_empty()
     }
 }
 
@@ -70,10 +86,11 @@ pub struct DinoEncoder {
 /// and never changes, so cached replay observations remain valid forever.
 pub struct DinoPerception {
     config: dinov3::Config,
+    spatial_pool: usize,
     session: Session,
     input: Vec<f32>,
     projected: Vec<f32>,
-    pooled: Vec<f32>,
+    observation: Vec<f32>,
 }
 
 impl DinoPerception {
@@ -82,11 +99,28 @@ impl DinoPerception {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::load_vits16_with_spatial_pool(checkpoint, gpu, plan_cache, DEFAULT_DINO_SPATIAL_POOL)
+    }
+
+    pub fn load_vits16_with_spatial_pool(
+        checkpoint: impl AsRef<Path>,
+        gpu: Option<Arc<blade_graphics::Context>>,
+        plan_cache: Option<&Path>,
+        spatial_pool: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        if !matches!(spatial_pool, 1 | 2) {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("DINO spatial pool must be 1 or 2, found {spatial_pool}"),
+            )
+            .into());
+        }
         let gpu = match gpu {
             Some(gpu) => gpu,
             None => Arc::new(crate::init_gpu_context()?),
         };
         let config = dinov3::Config::vits16();
+        assert_eq!(config.grid(), DINO_PATCH_GRID);
         let mut graph = Graph::new();
         let tokens = dinov3::build_encoder(&mut graph, &config);
         let prefix_values = config.num_prefix_tokens() * config.hidden_size;
@@ -115,8 +149,14 @@ impl DinoPerception {
         Ok(Self {
             input: vec![0.0; config.num_patches() * config.patch_dim()],
             projected: vec![0.0; config.num_patches() * OBSERVATION_CHANNELS],
-            pooled: vec![0.0; DinoObservation::LEN],
+            observation: vec![
+                0.0;
+                (config.grid() / spatial_pool)
+                    * (config.grid() / spatial_pool)
+                    * OBSERVATION_CHANNELS
+            ],
             config,
+            spatial_pool,
             session,
         })
     }
@@ -161,18 +201,28 @@ impl DinoPerception {
         self.config.grid()
     }
 
+    /// Spatial side of the observation returned to Dreamer.
+    pub fn observation_grid(&self) -> usize {
+        self.config.grid() / self.spatial_pool
+    }
+
+    pub fn spatial_pool(&self) -> usize {
+        self.spatial_pool
+    }
+
     fn run(&mut self) -> DinoObservation {
         self.session.set_input("patches", &self.input);
         self.session.step();
         self.session.wait();
         self.session.read_output_by_index(0, &mut self.projected);
-        pool_2x2_token_major(
+        pool_token_major(
             &self.projected,
             self.config.grid(),
             OBSERVATION_CHANNELS,
-            &mut self.pooled,
+            self.spatial_pool,
+            &mut self.observation,
         );
-        DinoObservation::from_vec(self.pooled.clone())
+        DinoObservation::from_vec(self.observation.clone())
     }
 }
 
@@ -192,22 +242,30 @@ fn fixed_projection(input: usize, output: usize, seed: u64) -> Vec<f32> {
         .collect()
 }
 
-fn pool_2x2_token_major(input: &[f32], grid: usize, channels: usize, output: &mut [f32]) {
-    assert_eq!(grid % 2, 0);
+fn pool_token_major(
+    input: &[f32],
+    grid: usize,
+    channels: usize,
+    spatial_pool: usize,
+    output: &mut [f32],
+) {
+    assert!(matches!(spatial_pool, 1 | 2));
+    assert_eq!(grid % spatial_pool, 0);
     assert_eq!(input.len(), grid * grid * channels);
-    let out_grid = grid / 2;
+    let out_grid = grid / spatial_pool;
     assert_eq!(output.len(), out_grid * out_grid * channels);
     for y in 0..out_grid {
         for x in 0..out_grid {
             for channel in 0..channels {
                 let mut sum = 0.0;
-                for dy in 0..2 {
-                    for dx in 0..2 {
-                        let token = (2 * y + dy) * grid + 2 * x + dx;
+                for dy in 0..spatial_pool {
+                    for dx in 0..spatial_pool {
+                        let token = (spatial_pool * y + dy) * grid + spatial_pool * x + dx;
                         sum += input[token * channels + channel];
                     }
                 }
-                output[(y * out_grid + x) * channels + channel] = 0.25 * sum;
+                output[(y * out_grid + x) * channels + channel] =
+                    sum / (spatial_pool * spatial_pool) as f32;
             }
         }
     }
@@ -327,10 +385,14 @@ mod tests {
         );
         let input: Vec<f32> = (0..14 * 14 * 2).map(|value| value as f32).collect();
         let mut output = vec![0.0; 7 * 7 * 2];
-        pool_2x2_token_major(&input, 14, 2, &mut output);
+        pool_token_major(&input, 14, 2, 2, &mut output);
         let expected = (input[0] + input[2] + input[28] + input[30]) / 4.0;
         assert_eq!(output[0], expected);
         assert_eq!(output.len(), 98);
+
+        let mut unpooled = vec![0.0; input.len()];
+        pool_token_major(&input, 14, 2, 1, &mut unpooled);
+        assert_eq!(unpooled, input);
     }
 
     /// Full-checkpoint parity against Transformers 5.15.0 / PyTorch 2.13.
@@ -400,10 +462,11 @@ mod tests {
             }
         }
         let mut expected_observation = vec![0.0; DinoObservation::LEN];
-        pool_2x2_token_major(
+        pool_token_major(
             &projected,
             14,
             OBSERVATION_CHANNELS,
+            DEFAULT_DINO_SPATIAL_POOL,
             &mut expected_observation,
         );
         drop(encoder);

@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS};
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
 };
@@ -18,7 +18,7 @@ struct PyAgent {
 /// Frozen perception-only session for representation probes.
 ///
 /// The first element returned by `encode` is the projected 14x14 patch grid;
-/// the second is the exact pooled 7x7 observation consumed by Dreamer.
+/// the second is the configured observation consumed by Dreamer.
 #[pyclass(name = "DinoPerception", module = "kindle._native", unsendable)]
 struct PyDinoPerception {
     inner: DinoPerception,
@@ -27,11 +27,25 @@ struct PyDinoPerception {
 #[pymethods]
 impl PyDinoPerception {
     #[new]
-    #[pyo3(signature = (dino_checkpoint, dino_plan_cache = None))]
-    fn new(dino_checkpoint: &str, dino_plan_cache: Option<&str>) -> PyResult<Self> {
+    #[pyo3(signature = (
+        dino_checkpoint,
+        dino_plan_cache = None,
+        spatial_pool = 2,
+    ))]
+    fn new(
+        dino_checkpoint: &str,
+        dino_plan_cache: Option<&str>,
+        spatial_pool: usize,
+    ) -> PyResult<Self> {
+        validate_dino_spatial_pool(spatial_pool)?;
         let cache = dino_plan_cache.map(Path::new);
-        let inner = DinoPerception::load_vits16(dino_checkpoint, None, cache)
-            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        let inner = DinoPerception::load_vits16_with_spatial_pool(
+            dino_checkpoint,
+            None,
+            cache,
+            spatial_pool,
+        )
+        .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
 
@@ -54,7 +68,8 @@ impl PyDinoPerception {
 
     #[getter]
     fn pooled_shape(&self) -> (usize, usize, usize) {
-        (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
+        let grid = self.inner.observation_grid();
+        (grid, grid, OBSERVATION_CHANNELS)
     }
 
     #[getter]
@@ -91,6 +106,7 @@ impl PyAgent {
         replay_value_gradient = None,
         dino_plan_cache = None,
         skip_full_optimize = false,
+        dino_spatial_pool = 2,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -118,10 +134,12 @@ impl PyAgent {
         replay_value_gradient: Option<bool>,
         dino_plan_cache: Option<&str>,
         skip_full_optimize: bool,
+        dino_spatial_pool: usize,
     ) -> PyResult<Self> {
         validate_action_count(num_actions)?;
         let mut config = DreamerConfig::new(num_actions);
         config.model_size = parse_model_size(model_size)?;
+        config.dino_spatial_pool = dino_spatial_pool;
         if let Some(value) = observation_decoder_depth {
             config.observation_decoder_depth = value;
         }
@@ -424,6 +442,14 @@ fn validate_action_count(num_actions: usize) -> PyResult<()> {
         ))
     } else {
         Ok(())
+    }
+}
+
+fn validate_dino_spatial_pool(spatial_pool: usize) -> PyResult<()> {
+    if matches!(spatial_pool, 1 | 2) {
+        Ok(())
+    } else {
+        Err(PyValueError::new_err("dino_spatial_pool must be 1 or 2"))
     }
 }
 

@@ -172,6 +172,16 @@ def main() -> None:
     )
     parser.add_argument("--model-size", choices=MODEL_SIZES, default="12m")
     parser.add_argument(
+        "--dino-spatial-pool",
+        type=int,
+        choices=(1, 2),
+        default=None,
+        help=(
+            "pooling factor for DINO's projected 14x14 patch grid: 2 is the "
+            "7x7 baseline; 1 retains the full grid (new agents only)"
+        ),
+    )
+    parser.add_argument(
         "--observation-decoder-depth",
         type=int,
         help="per-patch DINO decoder width (default: 64; 0 restores legacy preset width)",
@@ -286,6 +296,12 @@ def main() -> None:
         parser.error("--append-output requires --restore")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
+    if args.random_policy and args.dino_spatial_pool is not None:
+        parser.error("--dino-spatial-pool requires a Dreamer agent")
+    if args.restore and args.dino_spatial_pool is not None:
+        parser.error(
+            "--dino-spatial-pool cannot override a checkpoint; its saved config is restored"
+        )
 
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     # Both D3 Atari-100k profiles use repeat 4, max-pool 2, non-sticky
@@ -330,6 +346,11 @@ def main() -> None:
             args.dino_checkpoint,
             action_count,
             model_size=args.model_size,
+            dino_spatial_pool=(
+                args.dino_spatial_pool
+                if args.dino_spatial_pool is not None
+                else 2
+            ),
             observation_decoder_depth=args.observation_decoder_depth,
             seed=args.seed,
             replay_capacity=args.replay_capacity,

@@ -1,4 +1,4 @@
-use crate::vision::{DinoObservation, OBSERVATION_CHANNELS};
+use crate::vision::{DEFAULT_DINO_SPATIAL_POOL, DINO_PATCH_GRID, OBSERVATION_CHANNELS};
 
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -133,6 +133,10 @@ impl Default for LossScales {
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
+    /// Spatial pooling applied to DINO's projected 14×14 patch grid. Two is
+    /// the compact 7×7 baseline; one retains all projected patch locations.
+    #[serde(default = "default_dino_spatial_pool")]
+    pub dino_spatial_pool: usize,
     /// Per-patch hidden width immediately before the 64-channel DINO decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -196,9 +200,10 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            dino_spatial_pool: DEFAULT_DINO_SPATIAL_POOL,
             observation_decoder_depth: OBSERVATION_CHANNELS,
-            // Full DINO replay entries are intentionally compressed to a
-            // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
+            // The default 7x7x64 DINO map uses ~1.25 GB for 100k f32 entries
+            // before RSSM context. Pool one is an explicit 4x storage ablation.
             replay_capacity: 100_000,
             batch_size: 16,
             batch_length: 64,
@@ -259,8 +264,14 @@ impl DreamerConfig {
         size.deter + size.stoch * size.classes
     }
 
-    pub const fn observation_dim(&self) -> usize {
-        DinoObservation::LEN
+    pub fn observation_grid(&self) -> usize {
+        assert!(matches!(self.dino_spatial_pool, 1 | 2));
+        DINO_PATCH_GRID / self.dino_spatial_pool
+    }
+
+    pub fn observation_dim(&self) -> usize {
+        let grid = self.observation_grid();
+        grid * grid * OBSERVATION_CHANNELS
     }
 
     pub fn observation_decoder_depth(&self) -> usize {
@@ -321,6 +332,9 @@ impl DreamerConfig {
         }
         if size.units == 0 || size.vision_depth == 0 {
             return Err("head and vision dimensions must be non-zero".into());
+        }
+        if !matches!(self.dino_spatial_pool, 1 | 2) {
+            return Err("dino_spatial_pool must be 1 or 2".into());
         }
         if self.replay_context != 1 {
             return Err("the baseline pins D3's one-step replay context".into());
@@ -425,6 +439,10 @@ const fn default_replay_value_gradient() -> bool {
     true
 }
 
+const fn default_dino_spatial_pool() -> usize {
+    DEFAULT_DINO_SPATIAL_POOL
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -466,6 +484,9 @@ mod tests {
         assert_eq!(config.behavior_learning_rate(), config.learning_rate);
         assert_eq!(config.actor_learning_starts, 0);
         assert_eq!(config.actor_update_scale(0), 1.0);
+        assert_eq!(config.dino_spatial_pool, 2);
+        assert_eq!(config.observation_grid(), 7);
+        assert_eq!(config.observation_dim(), 7 * 7 * OBSERVATION_CHANNELS);
         assert_eq!(config.observation_decoder_depth, OBSERVATION_CHANNELS);
         assert_eq!(config.observation_decoder_depth(), OBSERVATION_CHANNELS);
         assert!(config.replay_value_gradient);
@@ -481,6 +502,20 @@ mod tests {
         );
         config.loss_scales.reconstruction = -1.0;
         assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn full_projected_patch_grid_is_an_explicit_shape() {
+        let mut config = DreamerConfig::tiny(3);
+        config.dino_spatial_pool = 1;
+        assert_eq!(config.observation_grid(), 14);
+        assert_eq!(config.observation_dim(), 14 * 14 * OBSERVATION_CHANNELS);
+        assert!(config.check().is_ok());
+        config.dino_spatial_pool = 3;
+        assert_eq!(
+            config.check().unwrap_err(),
+            "dino_spatial_pool must be 1 or 2"
+        );
     }
 
     #[test]
@@ -516,6 +551,7 @@ mod tests {
         object.remove("dynamics_free_nats");
         object.remove("actor_learning_starts");
         object.remove("observation_decoder_depth");
+        object.remove("dino_spatial_pool");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
@@ -524,6 +560,11 @@ mod tests {
         assert_eq!(restored.dynamics_free_nats(), restored.free_nats);
         assert_eq!(restored.actor_learning_starts, 0);
         assert_eq!(restored.actor_update_scale(0), 1.0);
+        assert_eq!(restored.dino_spatial_pool, DEFAULT_DINO_SPATIAL_POOL);
+        assert_eq!(
+            restored.observation_grid(),
+            DINO_PATCH_GRID / DEFAULT_DINO_SPATIAL_POOL
+        );
         assert_eq!(restored.observation_decoder_depth, 0);
         assert_eq!(
             restored.observation_decoder_depth(),

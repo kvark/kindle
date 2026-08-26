@@ -7,7 +7,7 @@ use super::networks::{
     MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
     mixed_probabilities, scale, straight_through_sample, sum,
 };
-use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use crate::vision::OBSERVATION_CHANNELS;
 
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_RECONSTRUCTION: usize = 1;
@@ -123,7 +123,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     assert!(length > 0 && length <= config.batch_length);
     let batch = config.batch_size;
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
+    let grid = config.observation_grid();
+    let patches = grid * grid;
 
     let mut graph = Graph::new();
     let model = WorldModel::new(&mut graph, config);
@@ -212,8 +213,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         let reconstruction_loss = graph.sum_all(squared);
         // D3's decoder distribution sums every observation event dimension
         // and the outer learner averages only batch and time. Preserve that
-        // reduction here: averaging the 7x7x64 feature event would suppress
-        // the representation-learning signal by 3,136x.
+        // reduction here: averaging the full feature event would suppress
+        // the representation-learning signal by the observation event count.
         reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / batch as f32));
 
         let dynamics_kl = categorical_kl(
@@ -318,7 +319,8 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
+    let grid = config.observation_grid();
+    let patches = grid * grid;
     let mut graph = Graph::new();
     let dynamics = Dynamics::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
@@ -444,7 +446,10 @@ mod tests {
         );
         assert_eq!(
             observe.node(observe.outputs()[3]).ty.shape,
-            vec![2, OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth]
+            vec![
+                2,
+                config.observation_grid() * config.observation_grid() * size.vision_depth
+            ]
         );
         let transition = build_transition_graph(&config, 5);
         assert_eq!(
@@ -461,10 +466,29 @@ mod tests {
         assert_eq!(
             decoder.node(decoder.outputs()[0]).ty.shape,
             vec![
-                5 * OBSERVATION_GRID * OBSERVATION_GRID,
+                5 * config.observation_grid() * config.observation_grid(),
                 OBSERVATION_CHANNELS
             ]
         );
+    }
+
+    #[test]
+    fn full_projected_grid_flows_through_world_graphs() {
+        let mut config = DreamerConfig::tiny(3);
+        config.dino_spatial_pool = 1;
+        let size = config.network();
+        let observe = build_observe_graph(&config, 2);
+        assert_eq!(
+            observe.node(observe.outputs()[3]).ty.shape,
+            vec![2, 14 * 14 * size.vision_depth]
+        );
+        let decoder = build_decoder_graph(&config, 2);
+        assert_eq!(
+            decoder.node(decoder.outputs()[0]).ty.shape,
+            vec![2 * 14 * 14, OBSERVATION_CHANNELS]
+        );
+        let training = build_training_graph(&config, config.world_backprop_length);
+        assert_eq!(training.outputs().len(), 8);
     }
 
     #[test]
