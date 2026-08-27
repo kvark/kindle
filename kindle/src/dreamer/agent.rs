@@ -2102,7 +2102,7 @@ mod tests {
 
     #[test]
     #[ignore = "builds and runs all Dreamer GPU sessions"]
-    fn world_microbatch_matches_the_effective_batch_update() {
+    fn tiny_world_microbatch_matches_the_effective_batch_update() {
         struct ParameterSnapshot {
             name: String,
             initial: Vec<f32>,
