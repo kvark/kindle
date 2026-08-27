@@ -471,7 +471,7 @@ Exit gate:
 - checkpoint restore continues learning after replay refill;
 - model/loss parameter counts and throughput are recorded for each preset.
 
-Validation snapshot (updated 2026-08-26):
+Validation snapshot (updated 2026-08-27):
 
 - formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
   full-checkpoint DINO parity pass on the pinned stack;
@@ -919,6 +919,31 @@ Validation snapshot (updated 2026-08-26):
   `c1bcb053a4084f66ae953fca5214402746e59e6cb785d7bf4a4c2daacb1a8335`)
   now requires ten uninterrupted quiet minutes before relaunching the exact
   pinned command, thawing the queue, and arming the guard again;
+- the guard later yielded once more at environment step 1,226/update 36 when
+  the external controller reappeared. That pre-checkpoint log is preserved
+  with SHA-256
+  `739da93e6fbf861b2da47e7c6298e227f769e8eabf257d16a05c25edcb6490a7`.
+  An hourly coordinator (SHA-256
+  `97bda29acd12377ffc0b72fdeb73778d0b2b86305511f57967d7aa331869dddc`)
+  closes the one-shot worker's stale edge case: it observes but never signals
+  the external workload, preserves an inactive pre-checkpoint output, and
+  rearms the same ten-minute quiet-window worker. After the competing goals
+  were paused, it released a fourth seed-zero start. Removing only construction
+  and event timing fields makes that authoritative start and the preserved
+  1,226-step prefix bit-identical (SHA-256
+  `46d817baba115db4f33afcf5b014274011a283ffb12a566b75fe320ad64c2dd8`).
+  The resulting curve is uninterrupted through its archived 75,000-step
+  checkpoint, which contains learner step 18,479. Over the final 100 updates,
+  full BPTT-64 versus matched BPTT-8 has reconstruction loss 30.966 versus
+  35.821, reward loss 0.03613 versus 0.05600, raw KL 2.158 versus 2.514,
+  replay-value loss 1.398 versus 1.452, and policy entropy 1.754 versus 1.440.
+  Effective six-action entropy over the final 5,000 interactions is likewise
+  higher at 1.614 versus 1.252. This improved model fit and avoided the
+  truncated run's sharper action collapse, but has not yet improved control
+  convincingly: its five completed episodes average -20.4 versus -20.833 over
+  six for BPTT-8, and its last-25,000-step mean is -20.607 versus -20.742.
+  The protocol score window does not start until interaction 87,500, so the
+  immutable run continues to 100,000 and the queued frozen-policy probes;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
