@@ -120,6 +120,7 @@ def test_summarizes_latest_complete_window_and_pong_aliases(tmp_path) -> None:
     ]
     assert effective["counts"] == [1_000, 0, 0, 0, 1_000, 0]
     assert effective["entropy"] == pytest.approx(0.6931471805599453)
+    assert summary["actions"]["within_effective_group_entropy"] == 0
 
 
 def test_rejects_window_without_exact_interval_coverage(tmp_path) -> None:
