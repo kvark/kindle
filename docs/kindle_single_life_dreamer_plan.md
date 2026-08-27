@@ -1003,6 +1003,30 @@ Validation snapshot (updated 2026-08-27):
   episode endpoints are now all -18, at emulator frames 356,996, 365,896, and
   372,848, for a provisional -18.0 mean. Strict scoring remains withheld until
   the uninterrupted 100,000-step completion event;
+- the full-BPTT curve now has one uninterrupted 100,000-step `run_end`, one
+  start, zero recoveries, 24,729 learner updates, and all 20 atomic snapshots.
+  Its five score-window episode endpoints are -18, -18, -18, -19, and -16 at
+  emulator frames 356,996, 365,896, 372,848, 381,484, and 391,924. The strict
+  score is therefore -17.8. The unfinished episode at the 400,000-frame cutoff
+  had reached -10 over 2,019 decisions and is correctly excluded. This beats
+  Kindle ALE 0.12's matched-random mean by 2.823 points and the recovered
+  BPTT-8 curve by 1.1 points, but remains 7.8 points below the reported 12M D3
+  target and 13.263 below the historical 200M artifact. The final 5,000
+  interactions are a fully update-matched late comparison: full BPTT-64 versus
+  BPTT-8 completes -19 and -16 episodes (mean -17.5 and mean length 2,384.5)
+  versus -19, -18, -17, and -18 (mean -18.0 and mean length 1,280.5), collects
+  -32 versus -65 reward, and wins all five 1,000-step slices by +5, +9, +4,
+  +9, and +6. Across 1,250 updates each, it averages reconstruction loss
+  27.918 versus 31.612, reward loss 0.03488 versus 0.0500, raw KL 2.443 versus
+  2.816, replay-value loss 1.640 versus 1.626, policy entropy 0.512 versus
+  0.977, and imagined return -2.690 versus -3.588. Its effective-action
+  entropy is 1.158 versus 1.005, while within-equivalent-group entropy falls
+  to 0.102 versus 0.660. Thus full recurrence yields a clean, distributed
+  improvement in model fit and control without evidence that action aliases
+  are the remaining bottleneck. The final log SHA-256 is
+  `5aef1d954be438f81084caa9bb8edb4544a0bf12e5733de11c0c1b3318cdaf4c`;
+  the score artifact records the same source hash. Frozen-policy and value
+  probes now run before the pinned upstream size1m D3 control;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
