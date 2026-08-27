@@ -190,6 +190,14 @@ def main() -> None:
         type=int,
         help="truncated world-model BPTT length (D3-equivalent: 64)",
     )
+    parser.add_argument(
+        "--world-microbatch-size",
+        type=int,
+        help=(
+            "world-model rows per gradient-accumulation pass; defaults to the "
+            "full effective batch"
+        ),
+    )
     parser.add_argument("--learning-rate", type=float)
     parser.add_argument(
         "--actor-learning-starts",
@@ -336,6 +344,7 @@ def main() -> None:
             batch_size=args.batch_size,
             batch_length=args.batch_length,
             world_backprop_length=args.world_backprop_length,
+            world_microbatch_size=args.world_microbatch_size,
             train_ratio=args.train_ratio,
             learning_rate=args.learning_rate,
             actor_learning_starts=args.actor_learning_starts,

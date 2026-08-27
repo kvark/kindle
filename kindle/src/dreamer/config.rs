@@ -144,6 +144,11 @@ pub struct DreamerConfig {
     /// Static truncated-BPTT chunk used by the Meganeura world graph. Replay
     /// and imagination still use the full D3 batch length.
     pub world_backprop_length: usize,
+    /// Optional row microbatch for the world-model graph. Gradients are
+    /// averaged across equal microbatches before one optimizer step, so this
+    /// changes peak activation memory without changing the effective D3 batch.
+    #[serde(default)]
+    pub world_microbatch_size: Option<usize>,
     pub replay_context: usize,
     pub train_ratio: f32,
     pub imagination_length: usize,
@@ -203,6 +208,7 @@ impl DreamerConfig {
             batch_size: 16,
             batch_length: 64,
             world_backprop_length: 8,
+            world_microbatch_size: None,
             replay_context: 1,
             train_ratio: 32.0,
             imagination_length: 15,
@@ -275,6 +281,10 @@ impl DreamerConfig {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
     }
 
+    pub fn world_microbatch_size(&self) -> usize {
+        self.world_microbatch_size.unwrap_or(self.batch_size)
+    }
+
     pub const fn actor_update_scale(&self, learner_step: u64) -> f32 {
         if learner_step >= self.actor_learning_starts {
             1.0
@@ -333,6 +343,13 @@ impl DreamerConfig {
             || !self.batch_length.is_multiple_of(self.world_backprop_length)
         {
             return Err("world_backprop_length must be a positive divisor of batch_length".into());
+        }
+        let world_microbatch_size = self.world_microbatch_size();
+        if world_microbatch_size == 0
+            || world_microbatch_size > self.batch_size
+            || !self.batch_size.is_multiple_of(world_microbatch_size)
+        {
+            return Err("world_microbatch_size must be a positive divisor of batch_size".into());
         }
         if self.replay_capacity < self.replay_warmup_frames() {
             return Err("replay_capacity cannot satisfy the D3 learner warmup gate".into());
@@ -453,6 +470,8 @@ mod tests {
         let config = DreamerConfig::new(18);
         assert_eq!((config.batch_size, config.batch_length), (16, 64));
         assert_eq!(config.world_backprop_length, 8);
+        assert_eq!(config.world_microbatch_size, None);
+        assert_eq!(config.world_microbatch_size(), 16);
         assert_eq!(config.imagination_length, 15);
         assert_eq!(config.value_bins, 255);
         assert_eq!(config.replay_context, 1);
@@ -469,6 +488,24 @@ mod tests {
         assert_eq!(config.observation_decoder_depth, OBSERVATION_CHANNELS);
         assert_eq!(config.observation_decoder_depth(), OBSERVATION_CHANNELS);
         assert!(config.replay_value_gradient);
+    }
+
+    #[test]
+    fn world_microbatch_must_partition_the_effective_batch() {
+        let mut config = DreamerConfig::new(18);
+        config.world_microbatch_size = Some(4);
+        assert_eq!(config.world_microbatch_size(), 4);
+        assert!(config.check().is_ok());
+
+        config.world_microbatch_size = Some(3);
+        assert_eq!(
+            config.check().unwrap_err(),
+            "world_microbatch_size must be a positive divisor of batch_size"
+        );
+        config.world_microbatch_size = Some(0);
+        assert!(config.check().is_err());
+        config.world_microbatch_size = Some(32);
+        assert!(config.check().is_err());
     }
 
     #[test]
@@ -508,7 +545,7 @@ mod tests {
     }
 
     #[test]
-    fn older_configs_default_new_diagnostic_switches() {
+    fn older_configs_default_new_fields() {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
@@ -516,6 +553,7 @@ mod tests {
         object.remove("dynamics_free_nats");
         object.remove("actor_learning_starts");
         object.remove("observation_decoder_depth");
+        object.remove("world_microbatch_size");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
@@ -529,5 +567,7 @@ mod tests {
             restored.observation_decoder_depth(),
             restored.network().vision_depth
         );
+        assert_eq!(restored.world_microbatch_size, None);
+        assert_eq!(restored.world_microbatch_size(), restored.batch_size);
     }
 }
