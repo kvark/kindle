@@ -2103,10 +2103,46 @@ mod tests {
     #[test]
     #[ignore = "builds and runs all Dreamer GPU sessions"]
     fn world_microbatch_matches_the_effective_batch_update() {
+        struct ParameterSnapshot {
+            name: String,
+            initial: Vec<f32>,
+            updated: Vec<f32>,
+            second_moment: Vec<f32>,
+        }
+
+        #[derive(Debug, Default)]
+        struct VectorComparison {
+            difference_square_sum: f64,
+            left_square_sum: f64,
+            right_square_sum: f64,
+            dot_product: f64,
+        }
+
+        impl VectorComparison {
+            fn add(&mut self, left: f32, right: f32) {
+                self.difference_square_sum += f64::from(left - right).powi(2);
+                self.left_square_sum += f64::from(left).powi(2);
+                self.right_square_sum += f64::from(right).powi(2);
+                self.dot_product += f64::from(left) * f64::from(right);
+            }
+
+            fn relative_difference(&self) -> f64 {
+                self.difference_square_sum.sqrt()
+                    / self
+                        .left_square_sum
+                        .sqrt()
+                        .max(self.right_square_sum.sqrt())
+            }
+
+            fn cosine(&self) -> f64 {
+                self.dot_product / (self.left_square_sum * self.right_square_sum).sqrt()
+            }
+        }
+
         fn run(
             gpu: Arc<blade_graphics::Context>,
             world_microbatch_size: Option<usize>,
-        ) -> (WorldMetrics, Vec<(String, Vec<f32>)>) {
+        ) -> (WorldMetrics, Vec<ParameterSnapshot>) {
             let mut config = DreamerConfig::tiny(3);
             config.batch_length = 4;
             config.world_backprop_length = 4;
@@ -2114,6 +2150,21 @@ mod tests {
             config.learning_rate_warmup = 0;
             config.skip_full_optimize = true;
             let mut agent = DreamerCore::with_gpu(config, gpu);
+            let names = agent
+                .world_train
+                .param_names()
+                .into_iter()
+                .filter(|name| name.starts_with("world.") && agent.world_train.has_param_grad(name))
+                .map(str::to_owned)
+                .collect::<Vec<_>>();
+            let initial = names
+                .iter()
+                .map(|name| {
+                    let mut values = vec![0.0; agent.world_train.param_size(name).unwrap()];
+                    agent.world_train.read_param(name, &mut values);
+                    values
+                })
+                .collect::<Vec<_>>();
             let observation = |step: usize| {
                 DinoObservation::from_vec(vec![step as f32 / 10.0; DinoObservation::LEN])
             };
@@ -2132,20 +2183,21 @@ mod tests {
                 );
             }
             let report = agent.learn().expect("nine frames fill one tiny sequence");
-            let names = agent
-                .world_train
-                .param_names()
-                .into_iter()
-                .filter(|name| name.starts_with("world.") && agent.world_train.has_param_grad(name))
-                .map(str::to_owned)
-                .collect::<Vec<_>>();
             let parameters = names
                 .into_iter()
-                .map(|name| {
+                .zip(initial)
+                .map(|(name, initial)| {
                     let size = agent.world_train.param_size(&name).unwrap();
-                    let mut values = vec![0.0; size];
-                    agent.world_train.read_param(&name, &mut values);
-                    (name, values)
+                    let mut updated = vec![0.0; size];
+                    let mut second_moment = vec![0.0; size];
+                    agent.world_train.read_param(&name, &mut updated);
+                    agent.world_train.read_adam_v(&name, &mut second_moment);
+                    ParameterSnapshot {
+                        name,
+                        initial,
+                        updated,
+                        second_moment,
+                    }
                 })
                 .collect();
             (report.world, parameters)
@@ -2180,19 +2232,55 @@ mod tests {
         }
         assert!(!full_parameters.is_empty());
         assert_eq!(full_parameters.len(), micro_parameters.len());
-        let mut max_parameter_difference = 0.0f32;
-        for ((full_name, full_values), (micro_name, micro_values)) in
-            full_parameters.iter().zip(&micro_parameters)
-        {
-            assert_eq!(full_name, micro_name);
-            assert_eq!(full_values.len(), micro_values.len());
-            for (full, micro) in full_values.iter().zip(micro_values) {
-                max_parameter_difference = max_parameter_difference.max((full - micro).abs());
+        let mut maximum_parameter_difference = (0.0f32, String::new(), 0usize, 0.0f32, 0.0f32);
+        let mut update_comparison = VectorComparison::default();
+        let mut second_moment_comparison = VectorComparison::default();
+        for (full, micro) in full_parameters.iter().zip(&micro_parameters) {
+            assert_eq!(full.name, micro.name);
+            assert_eq!(full.initial, micro.initial);
+            assert_eq!(full.updated.len(), micro.updated.len());
+            assert_eq!(full.second_moment.len(), micro.second_moment.len());
+            for (index, (&full_value, &micro_value)) in
+                full.updated.iter().zip(&micro.updated).enumerate()
+            {
+                let difference = (full_value - micro_value).abs();
+                if difference > maximum_parameter_difference.0 {
+                    maximum_parameter_difference = (
+                        difference,
+                        full.name.clone(),
+                        index,
+                        full_value,
+                        micro_value,
+                    );
+                }
+                update_comparison.add(
+                    full_value - full.initial[index],
+                    micro_value - micro.initial[index],
+                );
+            }
+            for (&full_value, &micro_value) in full.second_moment.iter().zip(&micro.second_moment) {
+                second_moment_comparison.add(full_value, micro_value);
             }
         }
+
+        // Equal row partitions reorder f32 reductions. At coordinates where
+        // gradients nearly cancel, first-step LaProp can therefore turn an
+        // infinitesimal sign change into opposite one-learning-rate updates.
+        // Bound that pointwise effect while requiring the complete update and
+        // RMS state to remain aligned.
+        let learning_rate = f64::from(DreamerConfig::tiny(3).learning_rate);
         assert!(
-            max_parameter_difference < 1e-5,
-            "microbatch changed the effective world update by {max_parameter_difference}"
+            f64::from(maximum_parameter_difference.0) <= 2.1 * learning_rate,
+            "microbatch update exceeded the reduction-order bound: {maximum_parameter_difference:?}"
+        );
+        assert!(
+            update_comparison.relative_difference() < 0.025 && update_comparison.cosine() > 0.999,
+            "microbatch changed the aggregate world update: {update_comparison:?}"
+        );
+        assert!(
+            second_moment_comparison.relative_difference() < 0.001
+                && second_moment_comparison.cosine() > 0.99999,
+            "microbatch changed LaProp's RMS state: {second_moment_comparison:?}"
         );
     }
 
