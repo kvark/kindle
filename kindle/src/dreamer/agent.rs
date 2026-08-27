@@ -336,7 +336,9 @@ impl DreamerCore {
         let imagined_rows = starts * config.imagination_length;
         let replay_rows = config.batch_size * (config.batch_length - 1);
 
-        let world_train_graph = world::build_training_graph(&config, config.world_backprop_length);
+        let world_train_config = world_training_config(&config);
+        let world_train_graph =
+            world::build_training_graph(&world_train_config, config.world_backprop_length);
         let world_observe_batch_graph = world::build_observe_graph(&config, config.batch_size);
         let world_observe_live_graph = world::build_observe_graph(&config, 1);
         let world_transition_graph = world::build_transition_graph(&config, starts);
@@ -977,133 +979,172 @@ impl DreamerCore {
         behavior: &BehaviorTrainingBatch,
     ) -> WorldMetrics {
         let rows = self.config.batch_size;
+        let network = self.config.network();
+        let stochastic_width = network.stoch * network.classes;
+        let observation_width = self.config.observation_dim();
+        let microbatch_rows = self.config.world_microbatch_size();
+        let microbatch_count = rows / microbatch_rows;
         let chunk_length = self.config.world_backprop_length;
         let chunk_count = self.config.batch_length / chunk_length;
+        let pass_count = chunk_count * microbatch_count;
         self.world_train
-            .set_grad_accumulate(chunk_count.try_into().unwrap());
+            .set_grad_accumulate(pass_count.try_into().unwrap());
         self.world_train.zero_grad();
         let mut metrics = WorldMetrics::default();
 
         for chunk in 0..chunk_count {
             let start = chunk * chunk_length;
-            if start == 0 {
-                self.world_train
-                    .set_input("initial_deter", &batch.initial_deter);
-                self.world_train
-                    .set_input("initial_stoch", &batch.initial_stoch);
-            } else {
-                self.world_train
-                    .set_input("initial_deter", &posterior.deter[start - 1]);
-                self.world_train
-                    .set_input("initial_stoch", &posterior.stoch[start - 1]);
-            }
+            for microbatch in 0..microbatch_count {
+                let first_row = microbatch * microbatch_rows;
+                let initial_deter = if start == 0 {
+                    &batch.initial_deter
+                } else {
+                    &posterior.deter[start - 1]
+                };
+                let initial_stoch = if start == 0 {
+                    &batch.initial_stoch
+                } else {
+                    &posterior.stoch[start - 1]
+                };
+                self.world_train.set_input(
+                    "initial_deter",
+                    row_slice(initial_deter, first_row, microbatch_rows, network.deter),
+                );
+                self.world_train.set_input(
+                    "initial_stoch",
+                    row_slice(initial_stoch, first_row, microbatch_rows, stochastic_width),
+                );
 
-            for local_time in 0..chunk_length {
-                let time = start + local_time;
-                let (keep_deter, keep_stoch, keep_action) = keep_masks(batch, time, &self.config);
-                self.world_train.set_input(
-                    &format!("observation_{local_time}"),
-                    &batch.observations[time],
-                );
-                self.world_train.set_input(
-                    &format!("previous_action_{local_time}"),
-                    &batch.previous_actions[time],
-                );
-                self.world_train
-                    .set_input(&format!("keep_deter_{local_time}"), &keep_deter);
-                self.world_train
-                    .set_input(&format!("keep_stoch_{local_time}"), &keep_stoch);
-                self.world_train
-                    .set_input(&format!("keep_action_{local_time}"), &keep_action);
-                self.world_train.set_input(
-                    &format!("posterior_sample_{local_time}"),
-                    &posterior.stoch[time],
-                );
-                let mut reward_target = vec![0.0; rows * self.config.value_bins];
-                for row in 0..rows {
-                    self.bins.encode(
-                        batch.rewards[time][row],
-                        &mut reward_target
-                            [row * self.config.value_bins..(row + 1) * self.config.value_bins],
+                for local_time in 0..chunk_length {
+                    let time = start + local_time;
+                    let (keep_deter, keep_stoch, keep_action) =
+                        keep_masks_range(batch, time, first_row, microbatch_rows, &self.config);
+                    self.world_train.set_input(
+                        &format!("observation_{local_time}"),
+                        row_slice(
+                            &batch.observations[time],
+                            first_row,
+                            microbatch_rows,
+                            observation_width,
+                        ),
+                    );
+                    self.world_train.set_input(
+                        &format!("previous_action_{local_time}"),
+                        row_slice(
+                            &batch.previous_actions[time],
+                            first_row,
+                            microbatch_rows,
+                            self.config.action_count,
+                        ),
+                    );
+                    self.world_train
+                        .set_input(&format!("keep_deter_{local_time}"), &keep_deter);
+                    self.world_train
+                        .set_input(&format!("keep_stoch_{local_time}"), &keep_stoch);
+                    self.world_train
+                        .set_input(&format!("keep_action_{local_time}"), &keep_action);
+                    self.world_train.set_input(
+                        &format!("posterior_sample_{local_time}"),
+                        row_slice(
+                            &posterior.stoch[time],
+                            first_row,
+                            microbatch_rows,
+                            stochastic_width,
+                        ),
+                    );
+                    let mut reward_target = vec![0.0; microbatch_rows * self.config.value_bins];
+                    for local_row in 0..microbatch_rows {
+                        self.bins.encode(
+                            batch.rewards[time][first_row + local_row],
+                            &mut reward_target[local_row * self.config.value_bins
+                                ..(local_row + 1) * self.config.value_bins],
+                        );
+                    }
+                    self.world_train
+                        .set_input(&format!("reward_target_{local_time}"), &reward_target);
+                    let continuation_target = batch.flags[time]
+                        [first_row..first_row + microbatch_rows]
+                        .iter()
+                        .map(|flags| {
+                            if flags.is_terminal {
+                                0.0
+                            } else {
+                                self.config.continuation_discount()
+                            }
+                        })
+                        .collect::<Vec<_>>();
+                    self.world_train.set_input(
+                        &format!("continuation_target_{local_time}"),
+                        &continuation_target,
+                    );
+                    let mut replay_value_target =
+                        vec![0.0; microbatch_rows * self.config.value_bins];
+                    let mut replay_slow_target =
+                        vec![0.0; microbatch_rows * self.config.value_bins];
+                    let mut replay_value_weight = vec![0.0; microbatch_rows];
+                    if time + 1 < self.config.batch_length {
+                        let replay_row = time * rows + first_row;
+                        let value_start = replay_row * self.config.value_bins;
+                        let value_end = value_start + microbatch_rows * self.config.value_bins;
+                        replay_value_target
+                            .copy_from_slice(&behavior.replay_value_target[value_start..value_end]);
+                        replay_slow_target
+                            .copy_from_slice(&behavior.replay_slow_target[value_start..value_end]);
+                        // This graph averages across all T states, whereas D3's
+                        // replay-value loss contains T-1 targets. Correct that
+                        // denominator while keeping the final state's weight 0.
+                        let denominator_correction =
+                            self.config.batch_length as f32 / (self.config.batch_length - 1) as f32;
+                        for (target, source) in replay_value_weight
+                            .iter_mut()
+                            .zip(&behavior.replay_weight[replay_row..replay_row + microbatch_rows])
+                        {
+                            *target = *source * denominator_correction;
+                        }
+                    }
+                    self.world_train.set_input(
+                        &format!("replay_value_target_{local_time}"),
+                        &replay_value_target,
+                    );
+                    self.world_train.set_input(
+                        &format!("replay_slow_target_{local_time}"),
+                        &replay_slow_target,
+                    );
+                    self.world_train.set_input(
+                        &format!("replay_value_weight_{local_time}"),
+                        &replay_value_weight,
                     );
                 }
-                self.world_train
-                    .set_input(&format!("reward_target_{local_time}"), &reward_target);
-                let continuation_target = batch.flags[time]
-                    .iter()
-                    .map(|flags| {
-                        if flags.is_terminal {
-                            0.0
-                        } else {
-                            self.config.continuation_discount()
-                        }
-                    })
-                    .collect::<Vec<_>>();
-                self.world_train.set_input(
-                    &format!("continuation_target_{local_time}"),
-                    &continuation_target,
-                );
-                let mut replay_value_target = vec![0.0; rows * self.config.value_bins];
-                let mut replay_slow_target = vec![0.0; rows * self.config.value_bins];
-                let mut replay_value_weight = vec![0.0; rows];
-                if time + 1 < self.config.batch_length {
-                    let row_start = time * rows;
-                    let value_start = row_start * self.config.value_bins;
-                    let value_end = value_start + rows * self.config.value_bins;
-                    replay_value_target
-                        .copy_from_slice(&behavior.replay_value_target[value_start..value_end]);
-                    replay_slow_target
-                        .copy_from_slice(&behavior.replay_slow_target[value_start..value_end]);
-                    // This graph averages across all T states, whereas D3's
-                    // replay-value loss contains T-1 targets. Correct that
-                    // denominator while keeping the final state's weight 0.
-                    let denominator_correction =
-                        self.config.batch_length as f32 / (self.config.batch_length - 1) as f32;
-                    for (target, source) in replay_value_weight
-                        .iter_mut()
-                        .zip(&behavior.replay_weight[row_start..row_start + rows])
-                    {
-                        *target = *source * denominator_correction;
-                    }
-                }
-                self.world_train.set_input(
-                    &format!("replay_value_target_{local_time}"),
-                    &replay_value_target,
-                );
-                self.world_train.set_input(
-                    &format!("replay_slow_target_{local_time}"),
-                    &replay_slow_target,
-                );
-                self.world_train.set_input(
-                    &format!("replay_value_weight_{local_time}"),
-                    &replay_value_weight,
-                );
-            }
 
-            if chunk + 1 == chunk_count {
-                configure_d3_optimizer(
-                    &mut self.world_train,
-                    &self.config,
-                    self.learner_step,
-                    self.config.learning_rate,
-                );
-            } else {
-                self.world_train.clear_optimizer();
+                let pass = chunk * microbatch_count + microbatch;
+                if pass + 1 == pass_count {
+                    configure_d3_optimizer(
+                        &mut self.world_train,
+                        &self.config,
+                        self.learner_step,
+                        self.config.learning_rate,
+                    );
+                } else {
+                    self.world_train.clear_optimizer();
+                }
+                self.world_train.step();
+                self.world_train.wait();
+                metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                metrics.reconstruction_loss +=
+                    read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
+                metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
+                metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
+                metrics.representation_kl +=
+                    read_scalar(&self.world_train, world::LOSS_REPRESENTATION);
+                metrics.reward_loss += read_scalar(&self.world_train, world::LOSS_REWARD);
+                metrics.continuation_loss +=
+                    read_scalar(&self.world_train, world::LOSS_CONTINUATION);
+                metrics.replay_value_loss +=
+                    read_scalar(&self.world_train, world::LOSS_REPLAY_VALUE);
             }
-            self.world_train.step();
-            self.world_train.wait();
-            metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
-            metrics.reconstruction_loss +=
-                read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
-            metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
-            metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
-            metrics.representation_kl += read_scalar(&self.world_train, world::LOSS_REPRESENTATION);
-            metrics.reward_loss += read_scalar(&self.world_train, world::LOSS_REWARD);
-            metrics.continuation_loss += read_scalar(&self.world_train, world::LOSS_CONTINUATION);
-            metrics.replay_value_loss += read_scalar(&self.world_train, world::LOSS_REPLAY_VALUE);
         }
         self.world_train.clear_grad_accumulate();
-        let scale = 1.0 / chunk_count as f32;
+        let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
         metrics.reconstruction_loss *= scale;
         metrics.raw_kl *= scale;
@@ -1755,18 +1796,52 @@ fn keep_masks(
     time: usize,
     config: &DreamerConfig,
 ) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+    keep_masks_range(batch, time, 0, config.batch_size, config)
+}
+
+fn keep_masks_range(
+    batch: &SequenceBatch,
+    time: usize,
+    first_row: usize,
+    row_count: usize,
+    config: &DreamerConfig,
+) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+    let end_row = first_row
+        .checked_add(row_count)
+        .expect("keep-mask row range overflowed");
+    assert!(end_row <= config.batch_size);
     let size = config.network();
-    let mut deter = vec![0.0; config.batch_size * size.deter];
-    let mut stoch = vec![0.0; config.batch_size * size.stoch * size.classes];
-    let mut action = vec![0.0; config.batch_size * config.action_count];
-    for row in 0..config.batch_size {
-        let keep = batch.keep(time, row);
-        deter[row * size.deter..(row + 1) * size.deter].fill(keep);
+    let mut deter = vec![0.0; row_count * size.deter];
+    let mut stoch = vec![0.0; row_count * size.stoch * size.classes];
+    let mut action = vec![0.0; row_count * config.action_count];
+    for local_row in 0..row_count {
+        let keep = batch.keep(time, first_row + local_row);
+        deter[local_row * size.deter..(local_row + 1) * size.deter].fill(keep);
         let width = size.stoch * size.classes;
-        stoch[row * width..(row + 1) * width].fill(keep);
-        action[row * config.action_count..(row + 1) * config.action_count].fill(keep);
+        stoch[local_row * width..(local_row + 1) * width].fill(keep);
+        action[local_row * config.action_count..(local_row + 1) * config.action_count].fill(keep);
     }
     (deter, stoch, action)
+}
+
+fn row_slice(values: &[f32], first_row: usize, row_count: usize, row_width: usize) -> &[f32] {
+    assert!(row_width > 0);
+    let start = first_row
+        .checked_mul(row_width)
+        .expect("row slice start overflowed");
+    let end_row = first_row
+        .checked_add(row_count)
+        .expect("row slice range overflowed");
+    let end = end_row
+        .checked_mul(row_width)
+        .expect("row slice end overflowed");
+    &values[start..end]
+}
+
+fn world_training_config(config: &DreamerConfig) -> DreamerConfig {
+    let mut world = config.clone();
+    world.batch_size = config.world_microbatch_size();
+    world
 }
 
 fn sample_latents(
@@ -2003,6 +2078,121 @@ mod tests {
             feature[size.deter..config.feature_dim()]
                 .iter()
                 .all(|value| *value == 1.0)
+        );
+    }
+
+    #[test]
+    fn world_microbatch_changes_only_the_training_graph_batch() {
+        let mut config = DreamerConfig::tiny(3);
+        config.world_microbatch_size = Some(1);
+        let world = world_training_config(&config);
+        assert_eq!(config.batch_size, 2);
+        assert_eq!(world.batch_size, 1);
+        assert_eq!(world.batch_length, config.batch_length);
+        assert_eq!(world.world_backprop_length, config.world_backprop_length);
+        assert_eq!(world.network(), config.network());
+    }
+
+    #[test]
+    fn row_slice_selects_complete_contiguous_rows() {
+        let values = (0..15).map(|value| value as f32).collect::<Vec<_>>();
+        assert_eq!(row_slice(&values, 1, 3, 3), &values[3..12]);
+        assert!(row_slice(&values, 5, 0, 3).is_empty());
+    }
+
+    #[test]
+    #[ignore = "builds and runs all Dreamer GPU sessions"]
+    fn world_microbatch_matches_the_effective_batch_update() {
+        fn run(
+            gpu: Arc<blade_graphics::Context>,
+            world_microbatch_size: Option<usize>,
+        ) -> (WorldMetrics, Vec<(String, Vec<f32>)>) {
+            let mut config = DreamerConfig::tiny(3);
+            config.batch_length = 4;
+            config.world_backprop_length = 4;
+            config.world_microbatch_size = world_microbatch_size;
+            config.learning_rate_warmup = 0;
+            config.skip_full_optimize = true;
+            let mut agent = DreamerCore::with_gpu(config, gpu);
+            let observation = |step: usize| {
+                DinoObservation::from_vec(vec![step as f32 / 10.0; DinoObservation::LEN])
+            };
+
+            agent.begin_episode(observation(0));
+            for step in 1..=8 {
+                let action = agent.act(ActionMode::Greedy, None);
+                assert!(action < 3);
+                agent.observe(
+                    observation(step),
+                    Reward {
+                        extrinsic: if step.is_multiple_of(3) { 1.0 } else { 0.0 },
+                        intrinsic: 0.0,
+                    },
+                    FrameFlags::default(),
+                );
+            }
+            let report = agent.learn().expect("nine frames fill one tiny sequence");
+            let names = agent
+                .world_train
+                .param_names()
+                .into_iter()
+                .filter(|name| name.starts_with("world.") && agent.world_train.has_param_grad(name))
+                .map(str::to_owned)
+                .collect::<Vec<_>>();
+            let parameters = names
+                .into_iter()
+                .map(|name| {
+                    let size = agent.world_train.param_size(&name).unwrap();
+                    let mut values = vec![0.0; size];
+                    agent.world_train.read_param(&name, &mut values);
+                    (name, values)
+                })
+                .collect();
+            (report.world, parameters)
+        }
+
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let (full_metrics, full_parameters) = run(Arc::clone(&gpu), None);
+        let (micro_metrics, micro_parameters) = run(gpu, Some(1));
+        let metric_pairs = [
+            (full_metrics.total_loss, micro_metrics.total_loss),
+            (
+                full_metrics.reconstruction_loss,
+                micro_metrics.reconstruction_loss,
+            ),
+            (full_metrics.raw_kl, micro_metrics.raw_kl),
+            (full_metrics.reward_loss, micro_metrics.reward_loss),
+            (
+                full_metrics.continuation_loss,
+                micro_metrics.continuation_loss,
+            ),
+            (
+                full_metrics.replay_value_loss,
+                micro_metrics.replay_value_loss,
+            ),
+        ];
+        for (full, micro) in metric_pairs {
+            let tolerance = 1e-4 * full.abs().max(1.0);
+            assert!(
+                (full - micro).abs() <= tolerance,
+                "full-batch metric {full} != microbatch metric {micro}"
+            );
+        }
+        assert!(!full_parameters.is_empty());
+        assert_eq!(full_parameters.len(), micro_parameters.len());
+        let mut max_parameter_difference = 0.0f32;
+        for ((full_name, full_values), (micro_name, micro_values)) in
+            full_parameters.iter().zip(&micro_parameters)
+        {
+            assert_eq!(full_name, micro_name);
+            assert_eq!(full_values.len(), micro_values.len());
+            for (full, micro) in full_values.iter().zip(micro_values) {
+                max_parameter_difference = max_parameter_difference.max((full - micro).abs());
+            }
+        }
+        assert!(
+            max_parameter_difference < 1e-5,
+            "microbatch changed the effective world update by {max_parameter_difference}"
         );
     }
 

@@ -212,6 +212,7 @@ Kindle logs.
 |---|---|
 | Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
 | World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
+| World microbatch | Full effective batch by default; optional equal row partitions are gradient-averaged before the same single optimizer update |
 | Train ratio | 32 replayed samples per real environment step by default; 256 for Atari-100K |
 | State | Block-recurrent deterministic state plus 32 categorical variables |
 | Categorical support | Preset-dependent classes, 1% uniform mixture |
@@ -269,27 +270,34 @@ branch only by later read-only diagnostic sessions and revision constants; its
 runner and extension are additionally guarded by SHA-256 hashes
 `0680de555b4418fdd4a24ca7e8563fadb33070ca6a01330fa48ea11d50381b82`
 and `22c8435fcff2c642fa8fcbc7e8bb9bcee8e50639616ad15a649f18d091c67f6b`.
-The production default and active BPTT-8 curve remain unchanged; larger-preset
-memory and the long BPTT-64 learning result remain unproven.
+The production BPTT-8 default remains unchanged. The immutable BPTT-64
+seed-zero curve completed all 100,000 interactions and 24,729 learner updates;
+its five strict score-window endpoints are -18, -18, -18, -19, and -16, for a
+-17.8 mean. That improves on the matched recovered BPTT-8 result of -18.9 but
+remains below the reported 12M D3 result of -10. A seed-one replication is
+active, while larger-preset full recurrence remains unproven.
 
 The prefill-amortized canary rate is not a useful long-run estimate. Its first
 update arrives at 67.70 seconds after 1,086 interactions; the next eight updates
 are spaced by 1.772 seconds on average, or 0.564 scheduled updates/s. BPTT-16 is
-nearly identical at 1.741 seconds/update, while the active BPTT-8 curve averages
-2.247 seconds/update from 80,000 onward because each logical update submits and
-waits on eight chunk graphs. Holding the measured four-interaction cadence
-projects roughly 12.2 hours after construction for a 100,000-interaction
-BPTT-64 run on the measured AMD path. The queued RTX curve remains the
-authoritative sustained measurement, but full recurrence is not assumed to be
-slower merely because its differentiated graph is larger.
+nearly identical at 1.741 seconds/update, while the completed BPTT-8 curve
+averages 2.247 seconds/update from 80,000 onward because each logical update
+submits and waits on eight chunk graphs. The completed seed-zero RTX curve
+supplies the authoritative sustained measurement: after 95.2 seconds of graph
+construction,
+the run phase took 53,409 seconds for 100,000 interactions and 24,729 learner
+updates, or 0.463 updates/s including replay prefill. The seed-one replication
+uses the same immutable contract.
 
 The conditional action-alias fallback is validated on that same graph path. A
 six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
 peaks at 1.88 GiB, and completes the identical 1,120 interactions and nine
 finite learner updates. Its measured run phase is 82.0 seconds at 0.1097
 updates/s. Reducing the action vocabulary therefore introduces no new backend,
-memory, or throughput risk; it remains conditional on the full-action
-BPTT-64 result rather than running ahead of that causal comparison.
+memory, or throughput risk. The completed full-action result and its
+post-curve diagnostics do not identify action aliases as the current
+bottleneck, so the six-action variant remains a diagnostic rather than the
+next experiment.
 
 The identical full-recurrence construction does not currently scale to the
 12M preset on this host. A construction-only published-protocol Pong probe with
@@ -297,9 +305,18 @@ the patched Blade allocator, batch length 64, and BPTT length 64 reached a
 guarded 12 GiB host-memory ceiling in 2.95 seconds, before emitting the run
 header or taking an environment step. Raising that ceiling would consume the
 headroom protecting the active run, so the controlled comparison stays at 1M.
-Scaling a successful BPTT-64 result to 12M will first require graph
-checkpointing/chunking, a shorter recurrence, or another memory-layout change;
-the existing 12M throughput estimates below apply only to BPTT-8.
+The first capacity-oriented memory-layout change is implemented but is not yet
+a benchmark result. `world_microbatch_size` partitions only the world-model
+batch rows while preserving the effective replay batch of 16, all 64 sequence
+states, the posterior pass, imagination, and behavior training. Meganeura
+averages gradients across the equal row partitions and temporal chunks before
+one AGC/RMS-normalized momentum update. The option defaults to the old
+full-batch graph and is serialized in checkpoints; old checkpoints default
+back to that behavior. Configuration, slicing, graph construction, workspace,
+clippy, extension, and isolated-wheel checks pass. The direct GPU update-parity
+test waits for the seed-one curve to release the RTX. If parity passes, the
+next canary is 12M, BPTT-64, effective batch 16, and world microbatch 4. The
+existing 12M throughput estimates below still apply only to BPTT-8.
 
 A bounded recurrence sweep locates the current 12M construction limit more
 closely. BPTT-16 constructs on the integrated AMD GPU in 7.74 seconds with a

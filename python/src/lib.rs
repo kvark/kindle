@@ -76,6 +76,7 @@ impl PyAgent {
         batch_size = None,
         batch_length = None,
         world_backprop_length = None,
+        world_microbatch_size = None,
         train_ratio = None,
         imagination_length = None,
         intrinsic_reward_scale = 0.0,
@@ -103,6 +104,7 @@ impl PyAgent {
         batch_size: Option<usize>,
         batch_length: Option<usize>,
         world_backprop_length: Option<usize>,
+        world_microbatch_size: Option<usize>,
         train_ratio: Option<f32>,
         imagination_length: Option<usize>,
         intrinsic_reward_scale: f32,
@@ -140,6 +142,9 @@ impl PyAgent {
         }
         if let Some(value) = world_backprop_length {
             config.world_backprop_length = value;
+        }
+        if let Some(value) = world_microbatch_size {
+            config.world_microbatch_size = Some(value);
         }
         if let Some(value) = train_ratio {
             config.train_ratio = value;

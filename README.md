@@ -267,6 +267,10 @@ budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
 scale and D3's replay-value representation gradient. Use
 `--no-replay-value-gradient` for the isolated-gradient ablation; both choices
 remain explicit Python constructor options as well.
+`--world-microbatch-size` can partition only the world-model batch rows to
+reduce peak activation memory. The effective replay batch, sequence length,
+posterior and behavior passes, and single optimizer update stay unchanged; the
+default uses the full batch in one pass.
 The same runner provides deterministic random controls, resumable training, and
 frozen sampled evaluation matching D3; `--greedy` is available as a separate
 policy diagnostic. During evaluation, `--reward-probe` measures the chosen

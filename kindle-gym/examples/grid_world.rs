@@ -113,6 +113,11 @@ struct Arguments {
     #[arg(long)]
     world_backprop_length: Option<usize>,
 
+    /// World-model rows per gradient-accumulation pass. The effective batch
+    /// is unchanged and must divide evenly by this value.
+    #[arg(long)]
+    world_microbatch_size: Option<usize>,
+
     /// Override D3's 1,000-update warmup for short diagnostic runs.
     #[arg(long)]
     learning_rate_warmup: Option<u64>,
@@ -198,6 +203,7 @@ impl Arguments {
         self.model_size.is_some()
             || self.observation_decoder_depth.is_some()
             || self.world_backprop_length.is_some()
+            || self.world_microbatch_size.is_some()
             || self.learning_rate.is_some()
             || self.behavior_learning_rate.is_some()
             || self.actor_learning_starts.is_some()
@@ -353,6 +359,9 @@ fn run_dreamer(
     }
     if let Some(length) = arguments.world_backprop_length {
         config.world_backprop_length = length;
+    }
+    if let Some(size) = arguments.world_microbatch_size {
+        config.world_microbatch_size = Some(size);
     }
     config.seed = arguments.seed;
     if let Some(learning_rate) = arguments.learning_rate {
