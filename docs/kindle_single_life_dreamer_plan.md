@@ -1055,6 +1055,23 @@ Validation snapshot (updated 2026-08-27):
   six for BPTT-8, and its last-25,000-step mean is -20.607 versus -20.742.
   The protocol score window does not start until interaction 87,500, so the
   immutable run continues to 100,000 and the queued frozen-policy probes;
+- the same uninterrupted full-BPTT curve now has an archived 85,000-step
+  checkpoint at learner step 20,979, the final atomic checkpoint before the
+  score window. Over interactions 80,000--85,000, its four completed episodes
+  score -18, -17, -16, and -17, averaging -17.0, while matched BPTT-8 averages
+  -20.5 across six episodes. The interval reward is -51 versus -122. Across
+  the identical 1,250 updates, full BPTT-64 versus BPTT-8 averages
+  reconstruction loss 29.626 versus 33.798, reward loss 0.03512 versus
+  0.05356, raw KL 2.269 versus 2.549, replay-value loss 1.517 versus 1.470,
+  and policy entropy 0.789 versus 1.532. Its effective Pong actions are 28.0%
+  `NOOP`, 34.5% `LEFT`, and 29.8% `RIGHTFIRE`, with the remaining three groups
+  totaling 7.7%. Effective-action entropy is 1.349 versus 1.414, but the
+  conditional entropy spent among environment-equivalent aliases is only
+  0.293 versus BPTT-8's 0.772. Thus the late improvement is accompanied by
+  more consistent representatives for redundant actions rather than alias
+  confusion. This is strong pre-window evidence that full recurrence changes
+  control, but it remains diagnostic until the uninterrupted 100,000-step
+  `run_end` closes the 350,000--400,000-frame score window;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
