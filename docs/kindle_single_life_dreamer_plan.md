@@ -968,6 +968,24 @@ Validation snapshot (updated 2026-08-27):
   confusion. This is strong pre-window evidence that full recurrence changes
   control, but it remains diagnostic until the uninterrupted 100,000-step
   `run_end` closes the 350,000--400,000-frame score window;
+- its atomic 90,000-step checkpoint is archived at learner step 22,229. Over
+  interactions 85,000--90,000, full BPTT-64 completes two episodes at -17 and
+  -18 (mean -17.5 and mean length 2,131), while matched BPTT-8 completes four
+  at -21, -19, -18, and -20 (mean -19.5 and mean length 1,091). Total reward
+  is -41 versus -91, and the five consecutive 1,000-step reward deltas are
+  +14, +8, +10, +8, and +10, so the advantage is distributed across the
+  interval rather than coming from one rally. Across the identical 1,250
+  updates, full BPTT-64 versus BPTT-8 averages reconstruction loss 29.041
+  versus 32.472, reward loss 0.03567 versus 0.05257, raw KL 2.358 versus
+  2.641, replay-value loss 1.521 versus 1.478, policy entropy 0.599 versus
+  1.337, and imagined return -3.061 versus -3.909. Full BPTT-64 concentrates
+  its effective actions on `LEFT` (43.5%), `RIGHTFIRE` (39.5%), and `NOOP`
+  (11.6%); its effective-action entropy is 1.185 versus 1.284, and its
+  within-equivalent-group entropy is only 0.207 versus 0.700. The first
+  episode endpoint in the protocol score window is -18 at emulator frame
+  356,996, giving a provisional one-episode mean of -18.0. This remains live
+  evidence, not a score: strict aggregation still requires complete coverage
+  through frame 400,000 and a valid 100,000-step `run_end`;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
