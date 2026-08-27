@@ -164,11 +164,23 @@ Kindle's `1M` run reports 721,888 world and 116,817 behavior parameters, or
 not count matched: Kindle has 150,701 (21.9%) more trainable parameters. Keeping
 the standard upstream preset avoids changing the reference architecture; an
 exact-capacity control is warranted only if the result leaves capacity as a
-plausible explanation. Its isolated Python 3.11 environment
-uses the requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only
-smoke completed 1,200 Pong driver transitions and more than 100 finite learner
+plausible explanation. Its initial isolated Python 3.11 environment used the
+requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only smoke
+completed 1,200 Pong driver transitions and more than 100 finite learner
 updates, including replay, checkpoint, policy, train, and report graph
-compilation, with about 1.35 GiB observed process memory. Upstream compares its
+compilation, with about 1.35 GiB observed process memory. That JAX wheel
+predates the host RTX 5080: the queued CUDA run failed before taking an
+environment step because its bundled CUDA 12.1 assembler does not support
+compute capability 12.0, and redirecting it to the host CUDA 13.1 assembler
+then exposed unsupported Blackwell code generation inside the old XLA/LLVM.
+The failed startup is preserved as environment evidence, not a result. The
+executable control therefore keeps the exact D3 source, config, Python 3.11,
+ALE 0.9.0, and all non-JAX package versions, while upgrading only JAX, JAXlib,
+and their CUDA plugin/compiler packages to 0.6.2 and NVCC 12.9.86. JAX 0.6 is
+the first release line built with CUDA 12.8; an RTX smoke initializes all
+688,004 parameters, compiles policy/train/report, saves a checkpoint, fills
+replay, and emits finite learner losses. Its exact package freeze is pinned by
+the score manifest. Upstream compares its
 driver-transition counter directly with `run.steps`; importantly, that counter
 includes the initial observation and each post-episode reset observation even
 though those transitions execute no repeated ALE action. Its logger then
