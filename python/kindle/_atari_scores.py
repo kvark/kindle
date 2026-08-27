@@ -572,3 +572,75 @@ def summarize_scores(
         "score_window_frames": list(SCORE_WINDOW_FRAMES),
         "environments": environment_summaries,
     }
+
+
+def compare_runtime_scores(
+    kindle: dict[str, object], upstream_d3: dict[str, object]
+) -> dict[str, object]:
+    """Compare Kindle and upstream D3 after removing their ALE random floors."""
+    identity_fields = ("atari_protocol", "mode", "score_window_frames")
+    for field in identity_fields:
+        if kindle.get(field) != upstream_d3.get(field):
+            raise AtariScoreError(
+                f"cannot compare score summaries with different {field}"
+            )
+
+    kindle_environments = kindle["environments"]
+    upstream_environments = upstream_d3["environments"]
+    if not isinstance(kindle_environments, dict) or not isinstance(
+        upstream_environments, dict
+    ):
+        raise AtariScoreError("score summaries have invalid environment mappings")
+    if kindle_environments.keys() != upstream_environments.keys():
+        raise AtariScoreError("score summaries cover different environments")
+
+    comparisons = {}
+    for environment in sorted(kindle_environments):
+        kindle_result = kindle_environments[environment]
+        upstream_result = upstream_environments[environment]
+        if not isinstance(kindle_result, dict) or not isinstance(upstream_result, dict):
+            raise AtariScoreError(f"{environment}: invalid score summary")
+        if kindle_result.get("target_runtime") != KINDLE_TARGET_RUNTIME:
+            raise AtariScoreError(
+                f"{environment}: first summary is not the Kindle runtime"
+            )
+        if upstream_result.get("target_runtime") != UPSTREAM_D3_TARGET_RUNTIME:
+            raise AtariScoreError(
+                f"{environment}: second summary is not the pinned upstream runtime"
+            )
+
+        try:
+            kindle_score = float(kindle_result["seed_mean"])
+            upstream_score = float(upstream_result["seed_mean"])
+            kindle_random = float(
+                kindle_result["targets"]["matched_random_3_seed"]["score"]
+            )
+            upstream_random = float(
+                upstream_result["targets"]["matched_random_3_seed"]["score"]
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise AtariScoreError(
+                f"{environment}: summaries lack matched random targets"
+            ) from error
+
+        kindle_gain = kindle_score - kindle_random
+        upstream_gain = upstream_score - upstream_random
+        comparisons[environment] = {
+            "kindle_score": kindle_score,
+            "upstream_d3_score": upstream_score,
+            "raw_score_delta": kindle_score - upstream_score,
+            "kindle_random_score": kindle_random,
+            "upstream_d3_random_score": upstream_random,
+            "kindle_gain_over_random": kindle_gain,
+            "upstream_d3_gain_over_random": upstream_gain,
+            "random_adjusted_delta": kindle_gain - upstream_gain,
+        }
+
+    return {
+        "atari_protocol": kindle["atari_protocol"],
+        "mode": kindle["mode"],
+        "score_window_frames": kindle["score_window_frames"],
+        "kindle": kindle_environments,
+        "upstream_d3": upstream_environments,
+        "comparisons": comparisons,
+    }

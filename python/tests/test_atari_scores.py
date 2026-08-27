@@ -9,6 +9,7 @@ import pytest
 from kindle._atari_scores import (
     UPSTREAM_D3_REFERENCE,
     AtariScoreError,
+    compare_runtime_scores,
     load_segments,
     load_upstream_d3_segments,
     summarize_scores,
@@ -330,6 +331,87 @@ def test_completed_upstream_d3_run_uses_the_same_score_window(tmp_path) -> None:
         "delta": pytest.approx(16.373626373626372),
         "met": True,
     }
+
+
+def test_runtime_comparison_removes_each_ale_random_floor(tmp_path) -> None:
+    kindle_log = tmp_path / "kindle.jsonl"
+    upstream_logdir = tmp_path / "upstream"
+    write_run(
+        kindle_log,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(360_000, -12), (380_000, -8)],
+    )
+    write_upstream_run(
+        upstream_logdir,
+        episodes=[(360_000, -10), (380_000, -8)],
+    )
+
+    kindle = summarize_scores(load_segments([kindle_log]))
+    upstream = summarize_scores(load_upstream_d3_segments([upstream_logdir]))
+    comparison = compare_runtime_scores(kindle, upstream)
+    pong = comparison["comparisons"]["ALE/Pong-v5"]
+    assert pong == {
+        "kindle_score": -10.0,
+        "upstream_d3_score": -9.0,
+        "raw_score_delta": -1.0,
+        "kindle_random_score": pytest.approx(-20.622710622710624),
+        "upstream_d3_random_score": pytest.approx(-20.373626373626372),
+        "kindle_gain_over_random": pytest.approx(10.622710622710624),
+        "upstream_d3_gain_over_random": pytest.approx(11.373626373626372),
+        "random_adjusted_delta": pytest.approx(-0.7509157509157489),
+    }
+
+
+def test_runtime_comparison_rejects_reversed_inputs(tmp_path) -> None:
+    kindle_log = tmp_path / "kindle.jsonl"
+    upstream_logdir = tmp_path / "upstream"
+    write_run(
+        kindle_log,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -10)],
+    )
+    write_upstream_run(upstream_logdir, episodes=[(380_000, -9)])
+    kindle = summarize_scores(load_segments([kindle_log]))
+    upstream = summarize_scores(load_upstream_d3_segments([upstream_logdir]))
+
+    with pytest.raises(AtariScoreError, match="first summary is not the Kindle"):
+        compare_runtime_scores(upstream, kindle)
+
+
+def test_score_cli_compares_kindle_and_upstream_runs(tmp_path) -> None:
+    kindle_log = tmp_path / "kindle.jsonl"
+    upstream_logdir = tmp_path / "upstream"
+    write_run(
+        kindle_log,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -10)],
+    )
+    write_upstream_run(upstream_logdir, episodes=[(380_000, -9)])
+    python_root = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(python_root / "examples" / "summarize_atari_scores.py"),
+            str(kindle_log),
+            "--upstream-d3-logdir",
+            str(upstream_logdir),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONPATH": str(python_root)},
+    )
+
+    comparison = json.loads(result.stdout)
+    pong = comparison["comparisons"]["ALE/Pong-v5"]
+    assert pong["raw_score_delta"] == -1.0
+    assert pong["random_adjusted_delta"] == pytest.approx(-0.7509157509157489)
 
 
 def test_score_summary_rejects_mixed_target_runtimes(tmp_path) -> None:

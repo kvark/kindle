@@ -326,6 +326,13 @@ python python/examples/probe_atari_value.py \
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
   --output runs/pong-published-summary.json
+
+# Compare against a completed pinned-upstream run after removing each ALE
+# version's matched random-policy floor.
+python python/examples/summarize_atari_scores.py \
+  runs/pong-seed0.jsonl \
+  --upstream-d3-logdir runs/upstream-dreamerv3-pong-seed0 \
+  --output runs/pong-runtime-adjusted-comparison.json
 ```
 
 The score summarizer rejects incomplete 350k--400k-frame coverage, mixed run
