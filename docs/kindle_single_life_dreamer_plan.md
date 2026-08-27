@@ -158,8 +158,8 @@ The Atari-100K score file was bundled at upstream commit `2411f7d1` in April
 context previous-action fix. The score file is still useful historical result
 evidence, but it is not an executable golden output for the May 2026 code pin.
 Implementation-parity claims below refer to `e3f02248`; final score deltas label
-the 2024 artifact separately, and a locally reproduced current-D3 curve remains
-the strongest future matched reference.
+the 2024 artifact separately, and the locally reproduced current-D3 curve is
+the strongest matched executable reference.
 
 That local reference is prepared with the standard upstream `size1m`, seed-zero,
 100,000-step Pong run with batch 16x64, train ratio 256, full recurrent
@@ -178,7 +178,7 @@ requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only smoke
 completed 1,200 Pong driver transitions and more than 100 finite learner
 updates, including replay, checkpoint, policy, train, and report graph
 compilation, with about 1.35 GiB observed process memory. That JAX wheel
-predates the host RTX 5080: the queued CUDA run failed before taking an
+predates the host RTX 5080: the initial CUDA attempt failed before taking an
 environment step because its bundled CUDA 12.1 assembler does not support
 compute capability 12.0, and redirecting it to the host CUDA 13.1 assembler
 then exposed unsupported Blackwell code generation inside the old XLA/LLVM.
@@ -194,9 +194,10 @@ driver-transition counter directly with `run.steps`; importantly, that counter
 includes the initial observation and each post-episode reset observation even
 though those transitions execute no repeated ALE action. Its logger then
 multiplies the counter by the Atari action repeat, so the smoke's final logged
-step is 4,760 near its 1,200-transition limit, and the queued 100,000-transition
-run reports nominal episode steps through 400,000 frames. This preserves native
-D3 replay, scheduler, stopping, and logging semantics. Kindle likewise inserts
+step is 4,760 near its 1,200-transition limit, and the completed
+100,000-transition run reports nominal episode steps through 400,000 frames.
+This preserves native D3 replay, scheduler, stopping, and logging semantics.
+Kindle likewise inserts
 reset observations into replay but counts only executed actions in its
 environment-step and frame budgets; on Pong the difference is roughly one
 logical transition per completed episode and is too small to explain a learning
@@ -209,9 +210,9 @@ controls using the same three seeded action streams score -20.374 on ALE 0.9
 versus -20.623 on Kindle's ALE 0.12 in the benchmark window, making the older
 runtime about 0.249 Pong points easier under this control. Score summaries
 therefore use runtime-specific random targets while retaining the same
-historical D3 targets. The CUDA reference curve is queued only after the
-immutable Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics release
-the RTX. The score CLI accepts that upstream format only when its pinned
+historical D3 targets. The CUDA reference curve ran only after the immutable
+Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics released the RTX.
+The score CLI accepts that upstream format only when its pinned
 manifest and post-success `RUN_COMPLETE` marker are present, then routes its
 episodes through the same 350,000--400,000-frame, per-seed aggregation used for
 Kindle logs.
@@ -1141,8 +1142,38 @@ Validation snapshot (updated 2026-08-27):
   improvement in model fit and control without evidence that action aliases
   are the remaining bottleneck. The final log SHA-256 is
   `5aef1d954be438f81084caa9bb8edb4544a0bf12e5733de11c0c1b3318cdaf4c`;
-  the score artifact records the same source hash. Frozen-policy and value
-  probes now run before the pinned upstream size1m D3 control;
+  the score artifact records the same source hash. Paired frozen-policy probes
+  use the same seed-100 action stream and give a matched-random mean of -20.4
+  at every checkpoint. The learned policy remains at random through step
+  50,000 (-20.6 at 10,000 and -21.0 at 25,000--50,000), then improves to
+  -18.0 over three complete episodes at 75,000 and -17.0 over two at 100,000;
+  unfinished episodes are excluded from those means. The transition coincides
+  with sharply improved critic calibration rather than an action-alias change.
+  At step 50,000 the actor already assigns 0.251 probability to the one-step
+  model-best action and its
+  logits correlate 0.418 with model Q, but the frozen critic has +2.615 return
+  bias, -0.110 return correlation, and only 0.241 Bellman-target correlation.
+  By step 100,000, full BPTT-64 versus matched BPTT-8 assigns 0.526 versus
+  0.103 probability to the model-best action, agrees with its argmax on 54%
+  versus 10% of states, and has model-Q correlation 0.369 versus 0.204. Its
+  reward-prediction MAE is 0.00426 versus 0.0361, value MAE 0.965 versus
+  1.277, and Bellman correlation 0.916 versus 0.761. Thus full recurrence
+  produces materially better temporal value calibration and actor alignment;
+- the pinned current-D3 `size1m` seed-zero control completed uninterrupted with
+  exit status zero, a post-success `RUN_COMPLETE` marker, 688,004 parameters,
+  and 122 finite metric records. Its 13 strict-window episode endpoints are
+  -21, -19, -20, -20, -20, -19, -21, -21, -21, -21, -21, -21, and -21,
+  for -20.462. This is 0.088 below its ALE 0.9 matched-random floor. Kindle's
+  full-BPTT score is therefore 2.662 points better raw and 2.911 points better
+  after subtracting each runtime's random floor. The upstream score JSONL,
+  pinned manifest, and combined comparison have SHA-256
+  `2e6f2d3d31ddac283cfd1d29f51093ec023b1d7408d4f975e5704a94ea78e1c7`,
+  `4107c22a98a4ddf1db5f71853c7d052e5028e0574034732e05f4f9e172d18abf`,
+  and `ca2dac1fdbf00626b6e7491166181171044cb3fe20a7dc8bb335197c65dd54fd`.
+  This single-seed, preset-class control does not make Kindle a D3-baseline
+  result: the reported -10 and historical -4.537 targets use larger models.
+  It does show that replacing DINO or the action vocabulary is not the next
+  supported change. Replicate full-BPTT at seed one, then test capacity;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
@@ -1150,19 +1181,13 @@ Validation snapshot (updated 2026-08-27):
   -20.37, -20.93, -20.80, -20.63, -19.80, -18.17, -15.13, and -14.97
   respectively.
   These phase markers are diagnostic rather than size-matched acceptance gates:
-  the active Kindle run is 1M with eight-step truncated BPTT and frozen DINO,
-  while the published artifact uses the default D3 model and full recurrence.
-  The 50,000-step diagnostics select BPTT length before capacity as the first
-  controlled follow-up. That full-recurrence result is interpreted only beside
-  the completed BPTT-8 curve and the queued, standard-size1m current-D3 run:
-  a BPTT-64 improvement is replicated before scaling; a successful upstream
-  1M run with a failed Kindle BPTT-64 run selects the frozen-vision interface
-  as the next causal axis; failure of both 1M runs selects capacity rather than
-  an encoder or policy change. The six-action `published-minimal` control is
-  justified only if full recurrence produces useful temporal values while the
-  all-action critic remains dominated by environment-equivalent aliases. It
-  keeps the published profile's zero reset no-ops and 100,000-frame episode cap
-  while changing only that redundant vocabulary;
+  the initial Kindle curve is 1M with eight-step truncated BPTT and frozen
+  DINO, while the published artifact uses a larger model and full recurrence.
+  The completed full-recurrence and current-D3 controls resolve the first
+  branch: BPTT-64 improves Kindle and the standard upstream 1M model remains at
+  random. A seed-one replication now precedes a capacity experiment. The
+  frozen-vision interface and six-action fallback are not selected by the
+  present evidence;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
   and 3 classes. It also recognizes both held-out reward frames, although that
