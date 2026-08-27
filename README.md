@@ -351,9 +351,9 @@ The training-window summarizer is a constant-memory diagnostic for one
 uninterrupted JSONL run. It requires interval events to cover the requested
 window exactly, checks learner and action totals, averages every numeric learner
 metric, and reports both raw 18-action and Pong's six environment-distinct
-action distributions. It may inspect a completed prefix of an active run, but
-it is not benchmark evidence and does not replace the completion-only score
-summarizer.
+action distributions, including the conditional entropy spent among equivalent
+aliases. It may inspect a completed prefix of an active run, but it is not
+benchmark evidence and does not replace the completion-only score summarizer.
 
 The dynamics probe is read-only. At each sampled posterior it decodes the
 proposed action sequence and a deterministic unrelated-action sequence using

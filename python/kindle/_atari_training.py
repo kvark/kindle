@@ -262,6 +262,11 @@ def summarize_training_window(
         name: metric_sums[name] / metric_counts[name]
         for name in sorted(metric_sums)
     }
+    action_entropy = _entropy(action_counts)
+    effective_actions = _effective_actions(
+        environment, action_meanings, action_counts
+    )
+    effective_entropy = float(effective_actions["entropy"])
     return {
         "source": str(path),
         "environment": environment,
@@ -300,9 +305,12 @@ def summarize_training_window(
             "names": action_meanings,
             "counts": action_counts,
             "fractions": _fractions(action_counts),
-            "entropy": _entropy(action_counts),
-            "effective": _effective_actions(
-                environment, action_meanings, action_counts
+            "entropy": action_entropy,
+            "effective": effective_actions,
+            # H(raw action) - H(environment-distinct action) is the expected
+            # entropy among aliases of the selected effective control.
+            "within_effective_group_entropy": (
+                action_entropy - effective_entropy
             ),
         },
         "learner": {
