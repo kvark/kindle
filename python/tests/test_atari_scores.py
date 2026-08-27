@@ -1,4 +1,8 @@
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -9,6 +13,24 @@ from kindle._atari_scores import (
     load_upstream_d3_segments,
     summarize_scores,
 )
+
+
+def test_score_module_does_not_load_native_extension() -> None:
+    python_root = Path(__file__).resolve().parents[1]
+    environment = {**os.environ, "PYTHONPATH": str(python_root)}
+    subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; import kindle._atari_scores; "
+                "assert 'kindle._native' not in sys.modules"
+            ),
+        ],
+        check=True,
+        cwd=python_root.parent,
+        env=environment,
+    )
 
 
 def write_run(
