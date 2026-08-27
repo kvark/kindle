@@ -6,7 +6,7 @@ import json
 import math
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Iterator
 
 
 SCORE_WINDOW_FRAMES = (350_000, 400_000)
@@ -145,8 +145,9 @@ class AtariScoreError(ValueError):
     """Raised when logs cannot prove a protocol-complete score."""
 
 
-def _read_events(path: Path) -> list[dict[str, object]]:
-    events = []
+def _read_events(path: Path) -> Iterator[dict[str, object]]:
+    """Yield validated JSONL events without retaining the full log."""
+
     try:
         stream = path.open(encoding="utf-8")
     except FileNotFoundError as error:
@@ -165,8 +166,7 @@ def _read_events(path: Path) -> list[dict[str, object]]:
                 raise AtariScoreError(
                     f"{path}:{line_number}: JSONL event must be an object"
                 )
-            events.append(event)
-    return events
+            yield event
 
 
 def _read_json_object(path: Path) -> dict[str, object]:
