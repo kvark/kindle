@@ -166,22 +166,29 @@ the standard upstream preset avoids changing the reference architecture; an
 exact-capacity control is warranted only if the result leaves capacity as a
 plausible explanation. Its isolated Python 3.11 environment
 uses the requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only
-smoke completed 1,200 Pong transitions and more than 100 finite learner updates,
-including replay, checkpoint, policy, train, and report graph compilation, with
-about 1.35 GiB observed process memory. Upstream keeps its stopping counter in
-agent decisions: the driver increments it once per transition and compares it
-directly with `run.steps`. Its logger independently multiplies that raw counter
-by the Atari action repeat, so the smoke's final logged step is 4,760 near its
-1,200-decision limit, and the queued 100,000-decision run reports episode steps
-through 400,000 emulator frames. Kindle uses ALE 0.12.1, so the wrapper
+smoke completed 1,200 Pong driver transitions and more than 100 finite learner
+updates, including replay, checkpoint, policy, train, and report graph
+compilation, with about 1.35 GiB observed process memory. Upstream compares its
+driver-transition counter directly with `run.steps`; importantly, that counter
+includes the initial observation and each post-episode reset observation even
+though those transitions execute no repeated ALE action. Its logger then
+multiplies the counter by the Atari action repeat, so the smoke's final logged
+step is 4,760 near its 1,200-transition limit, and the queued 100,000-transition
+run reports nominal episode steps through 400,000 frames. This preserves native
+D3 replay, scheduler, stopping, and logging semantics. Kindle likewise inserts
+reset observations into replay but counts only executed actions in its
+environment-step and frame budgets; on Pong the difference is roughly one
+logical transition per completed episode and is too small to explain a learning
+gap, but score comparisons disclose it rather than calling the counters exact
+action parity. Kindle uses ALE 0.12.1, so the wrapper
 mechanics are matched but trajectories are not byte-identical across the two
 ALE revisions. A paired fixed-action trace is pixel-identical through decision
-14 and first diverges at decision 15. Exact 100,000-decision random controls
-using the same three seeded action streams score -20.374 on ALE 0.9 versus
--20.623 on Kindle's ALE 0.12 in the benchmark window, making the older runtime
-about 0.249 Pong points easier under this control. Score summaries therefore
-use runtime-specific random targets while retaining the same historical D3
-targets. The CUDA reference curve is queued only after the
+14 and first diverges at decision 15. Separate exact 100,000-action random
+controls using the same three seeded action streams score -20.374 on ALE 0.9
+versus -20.623 on Kindle's ALE 0.12 in the benchmark window, making the older
+runtime about 0.249 Pong points easier under this control. Score summaries
+therefore use runtime-specific random targets while retaining the same
+historical D3 targets. The CUDA reference curve is queued only after the
 immutable Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics release
 the RTX. The score CLI accepts that upstream format only when its pinned
 manifest and post-success `RUN_COMPLETE` marker are present, then routes its
