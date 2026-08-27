@@ -1090,6 +1090,23 @@ Validation snapshot (updated 2026-08-27):
   356,996, giving a provisional one-episode mean of -18.0. This remains live
   evidence, not a score: strict aggregation still requires complete coverage
   through frame 400,000 and a valid 100,000-step `run_end`;
+- the uninterrupted curve's atomic 95,000-step checkpoint is archived at
+  learner step 23,479. Over interactions 90,000--95,000, full BPTT-64
+  completes two -18 episodes (mean length 1,981.5) and collects -43 reward.
+  The recovery-aware BPTT-8 segment completes -20, -20, -20, and -19 episodes
+  (mean -19.75 and mean length 978) and collects -96 reward. Full BPTT-64 wins
+  all five 1,000-step reward slices by +16, +7, +12, +9, and +9. This is not
+  an update-count-matched comparison: BPTT-8 deliberately performs only 979
+  updates after refilling replay, versus the uninterrupted run's 1,250.
+  Across those respective updates, full BPTT-64 versus recovered BPTT-8
+  averages reconstruction loss 28.448 versus 31.918, reward loss 0.03557
+  versus 0.0482, raw KL 2.414 versus 2.614, replay-value loss 1.592 versus
+  1.557, policy entropy 0.546 versus 1.308, and imagined return -2.820 versus
+  -4.062. Its within-equivalent-group action entropy is 0.152 versus 0.758,
+  further weakening the six-action fallback. The first three score-window
+  episode endpoints are now all -18, at emulator frames 356,996, 365,896, and
+  372,848, for a provisional -18.0 mean. Strict scoring remains withheld until
+  the uninterrupted 100,000-step completion event;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
