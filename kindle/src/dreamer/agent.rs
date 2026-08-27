@@ -2144,6 +2144,7 @@ mod tests {
             world_microbatch_size: Option<usize>,
         ) -> (WorldMetrics, Vec<ParameterSnapshot>) {
             let mut config = DreamerConfig::tiny(3);
+            config.batch_size = 4;
             config.batch_length = 4;
             config.world_backprop_length = 4;
             config.world_microbatch_size = world_microbatch_size;
@@ -2170,7 +2171,7 @@ mod tests {
             };
 
             agent.begin_episode(observation(0));
-            for step in 1..=8 {
+            for step in 1..=16 {
                 let action = agent.act(ActionMode::Greedy, None);
                 assert!(action < 3);
                 agent.observe(
@@ -2182,7 +2183,9 @@ mod tests {
                     FrameFlags::default(),
                 );
             }
-            let report = agent.learn().expect("nine frames fill one tiny sequence");
+            let report = agent
+                .learn()
+                .expect("seventeen frames fill four tiny sequences");
             let parameters = names
                 .into_iter()
                 .zip(initial)
