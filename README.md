@@ -322,6 +322,11 @@ python python/examples/probe_atari_value.py \
   --steps 5000 --atari-protocol published \
   --output runs/pong-value.json
 
+# Summarize the latest complete 5,000-step training window, or pass explicit
+# interval-aligned --start-step and --end-step bounds for matched comparisons.
+python python/examples/summarize_atari_training.py runs/pong-seed0.jsonl \
+  --window-steps 5000 --output runs/pong-seed0-latest-training.json
+
 # Aggregate complete curves by averaging episodes within each seed first.
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
@@ -341,6 +346,14 @@ resumed curves split across files and reports deltas to matched random, reported
 12M DreamerV3XS, and pinned 200M DreamerV3 targets only where they match the
 selected protocol. The `published-minimal` profile reports its own matched
 random target and does not label the released all-action D3 scores as matched.
+
+The training-window summarizer is a constant-memory diagnostic for one
+uninterrupted JSONL run. It requires interval events to cover the requested
+window exactly, checks learner and action totals, averages every numeric learner
+metric, and reports both raw 18-action and Pong's six environment-distinct
+action distributions. It may inspect a completed prefix of an active run, but
+it is not benchmark evidence and does not replace the completion-only score
+summarizer.
 
 The dynamics probe is read-only. At each sampled posterior it decodes the
 proposed action sequence and a deterministic unrelated-action sequence using
