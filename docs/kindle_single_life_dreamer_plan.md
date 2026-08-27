@@ -315,14 +315,14 @@ full-batch graph and is serialized in checkpoints; old checkpoints default
 back to that behavior. Configuration, slicing, graph construction, workspace,
 clippy, extension, and isolated-wheel checks pass. The direct all-parameter
 update-parity test also passes through Meganeura on CPU-only Lavapipe. Across
-122,016 trainable world coordinates, full batch versus two equal row partitions
-has update cosine 0.999815 and 1.924% relative L2 difference; LaProp's RMS state
-has cosine 0.999999916 and 0.041% relative difference. Reordered f32 reductions
-flip 11 nearly cancelling coordinates, producing the expected maximum
-two-learning-rate gap of 8.002e-5. The same test on the RTX waits for the
-seed-one curve to release it. If that passes, the next canary is 12M, BPTT-64,
-effective batch 16, and world microbatch 4. The existing 12M throughput
-estimates below still apply only to BPTT-8.
+122,016 trainable world coordinates, full batch versus four equal row
+partitions—the candidate's accumulation count—has update cosine 0.999866 and
+1.638% relative L2 difference; LaProp's RMS state has cosine 0.999999969 and
+0.025% relative difference. Reordered f32 reductions remain within the expected
+two-learning-rate pointwise bound at nearly cancelling coordinates. The same
+test on the RTX waits for the seed-one curve to release it. If that passes, the
+next canary is 12M, BPTT-64, effective batch 16, and world microbatch 4. The
+existing 12M throughput estimates below still apply only to BPTT-8.
 
 A bounded recurrence sweep locates the current 12M construction limit more
 closely. BPTT-16 constructs on the integrated AMD GPU in 7.74 seconds with a
