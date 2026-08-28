@@ -173,7 +173,20 @@ Kindle's `1M` run reports 721,888 world and 116,817 behavior parameters, or
 not count matched: Kindle has 150,701 (21.9%) more trainable parameters. Keeping
 the standard upstream preset avoids changing the reference architecture; an
 exact-capacity control is warranted only if the result leaves capacity as a
-plausible explanation. Its initial isolated Python 3.11 environment used the
+plausible explanation.
+
+The capacity experiment is more closely matched than the `12M` preset label
+alone establishes. CPU-only parameter initialization of pinned D3 with
+`atari100k`, `size12m`, and the full-action published wrapper reports
+10,498,772 trainable parameters. The immutable Kindle 12M run header reports
+8,766,208 world and 1,646,097 behavior parameters, or 10,412,305 total,
+with frozen DINO excluded; the upstream count includes its learned pixel
+encoder. Kindle therefore has 86,467 fewer learned parameters, a 0.824%
+difference. The encoder and decoder allocations differ, but overall learned
+capacity is matched to within one percent rather than merely belonging to the
+same width preset.
+
+The upstream control's initial isolated Python 3.11 environment used the
 requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only smoke
 completed 1,200 Pong driver transitions and more than 100 finite learner
 updates, including replay, checkpoint, policy, train, and report graph
