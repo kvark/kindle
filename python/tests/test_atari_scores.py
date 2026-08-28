@@ -130,6 +130,36 @@ def test_scores_average_episodes_per_seed_before_seeds(tmp_path) -> None:
     }
 
 
+def test_scores_enforce_minimum_independent_seed_count(tmp_path) -> None:
+    paths = []
+    for seed in range(3):
+        path = tmp_path / f"seed{seed}.jsonl"
+        write_run(
+            path,
+            seed=seed,
+            start=0,
+            end=400_000,
+            episodes=[(380_000, -10 + seed)],
+        )
+        paths.append(path)
+
+    with pytest.raises(
+        AtariScoreError,
+        match="requires at least 3 independent seeds, found 2",
+    ):
+        summarize_scores(load_segments(paths[:2]), minimum_seeds=3)
+
+    summary = summarize_scores(load_segments(paths), minimum_seeds=3)
+    assert summary["minimum_seed_count"] == 3
+    assert summary["environments"]["ALE/Pong-v5"]["seed_count"] == 3
+
+
+@pytest.mark.parametrize("minimum_seeds", [True, 0, -1, 1.5])
+def test_scores_reject_invalid_minimum_seed_count(minimum_seeds) -> None:
+    with pytest.raises(AtariScoreError, match="minimum_seeds"):
+        summarize_scores([], minimum_seeds=minimum_seeds)
+
+
 def test_resumed_segments_can_jointly_cover_score_window(tmp_path) -> None:
     first = tmp_path / "first.jsonl"
     second = tmp_path / "second.jsonl"
@@ -351,6 +381,7 @@ def test_runtime_comparison_removes_each_ale_random_floor(tmp_path) -> None:
     kindle = summarize_scores(load_segments([kindle_log]))
     upstream = summarize_scores(load_upstream_d3_segments([upstream_logdir]))
     comparison = compare_runtime_scores(kindle, upstream)
+    assert comparison["minimum_seed_counts"] == {"kindle": 1, "upstream_d3": 1}
     pong = comparison["comparisons"]["ALE/Pong-v5"]
     assert pong == {
         "kindle_score": -10.0,

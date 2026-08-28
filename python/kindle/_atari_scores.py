@@ -473,8 +473,14 @@ def summarize_scores(
     segments: list[dict[str, object]],
     expected_protocol: str = "published",
     expected_mode: str = "train",
+    minimum_seeds: int = 1,
 ) -> dict[str, object]:
     """Compute episode means per seed, then the equally weighted seed mean."""
+    if isinstance(minimum_seeds, bool) or not isinstance(minimum_seeds, int):
+        raise AtariScoreError("minimum_seeds must be an integer")
+    if minimum_seeds <= 0:
+        raise AtariScoreError("minimum_seeds must be positive")
+
     grouped = defaultdict(list)
     target_runtimes = {}
     for segment in segments:
@@ -541,6 +547,11 @@ def summarize_scores(
     environment_summaries = {}
     protocol_targets = ATARI_TARGETS.get(expected_protocol, {})
     for environment, seeds in sorted(environments.items()):
+        if len(seeds) < minimum_seeds:
+            raise AtariScoreError(
+                f"{environment}: requires at least {minimum_seeds} independent "
+                f"seeds, found {len(seeds)}"
+            )
         seed_mean = sum(seed["score"] for seed in seeds) / len(seeds)
         target_runtime = target_runtimes[environment]
         environment_targets = dict(protocol_targets.get(environment, {}))
@@ -570,6 +581,7 @@ def summarize_scores(
     return {
         "atari_protocol": expected_protocol,
         "mode": expected_mode,
+        "minimum_seed_count": minimum_seeds,
         "score_window_frames": list(SCORE_WINDOW_FRAMES),
         "environments": environment_summaries,
     }
@@ -640,6 +652,10 @@ def compare_runtime_scores(
     return {
         "atari_protocol": kindle["atari_protocol"],
         "mode": kindle["mode"],
+        "minimum_seed_counts": {
+            "kindle": kindle["minimum_seed_count"],
+            "upstream_d3": upstream_d3["minimum_seed_count"],
+        },
         "score_window_frames": kindle["score_window_frames"],
         "kindle": kindle_environments,
         "upstream_d3": upstream_environments,

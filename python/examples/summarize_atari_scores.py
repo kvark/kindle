@@ -32,6 +32,18 @@ def main() -> None:
     )
     parser.add_argument("--atari-protocol", default="published")
     parser.add_argument("--mode", default="train")
+    parser.add_argument(
+        "--minimum-kindle-seeds",
+        type=int,
+        default=1,
+        help="require this many independent seeds in the Kindle JSONL logs",
+    )
+    parser.add_argument(
+        "--minimum-upstream-seeds",
+        type=int,
+        default=1,
+        help="require this many independent seeds in the upstream D3 logs",
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if not args.logs and not args.upstream_d3_logdir:
@@ -45,6 +57,7 @@ def main() -> None:
                     load_segments(args.logs),
                     expected_protocol=args.atari_protocol,
                     expected_mode=args.mode,
+                    minimum_seeds=args.minimum_kindle_seeds,
                 )
             )
         if args.upstream_d3_logdir:
@@ -53,6 +66,7 @@ def main() -> None:
                     load_upstream_d3_segments(args.upstream_d3_logdir),
                     expected_protocol=args.atari_protocol,
                     expected_mode=args.mode,
+                    minimum_seeds=args.minimum_upstream_seeds,
                 )
             )
         summary = (
