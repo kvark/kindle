@@ -198,6 +198,14 @@ def main() -> None:
             "full effective batch"
         ),
     )
+    parser.add_argument(
+        "--skip-full-optimize",
+        action="store_true",
+        help=(
+            "skip Meganeura's post-autodiff rewrite pass; preserves graph "
+            "semantics but may reduce training throughput"
+        ),
+    )
     parser.add_argument("--learning-rate", type=float)
     parser.add_argument(
         "--actor-learning-starts",
@@ -354,6 +362,7 @@ def main() -> None:
             dynamics_loss_scale=args.dynamics_loss_scale,
             reconstruction_loss_scale=args.reconstruction_loss_scale,
             replay_value_gradient=args.replay_value_gradient,
+            skip_full_optimize=args.skip_full_optimize,
         )
     agent_construction_seconds = (
         time.perf_counter() - construction_started if agent is not None else None
