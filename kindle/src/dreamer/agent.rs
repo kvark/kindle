@@ -2066,6 +2066,32 @@ mod tests {
     }
 
     #[test]
+    fn dreamer_rng_streams_change_with_experiment_seed() {
+        let mut seed_zero = DreamerRngs::new(0);
+        let mut seed_one = DreamerRngs::new(1);
+        assert_ne!(
+            seed_zero.policy.random::<u64>(),
+            seed_one.policy.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.live_posterior.random::<u64>(),
+            seed_one.live_posterior.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.replay.random::<u64>(),
+            seed_one.replay.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.train_posterior.random::<u64>(),
+            seed_one.train_posterior.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.imagination.random::<u64>(),
+            seed_one.imagination.random::<u64>()
+        );
+    }
+
+    #[test]
     fn state_features_concatenate_deter_and_flat_categoricals() {
         let config = DreamerConfig::tiny(3);
         let size = config.network();

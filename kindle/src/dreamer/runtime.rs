@@ -193,6 +193,13 @@ mod tests {
     }
 
     #[test]
+    fn truncation_changes_with_experiment_seed() {
+        let seed_zero = truncated_normal("weight", 10_000, 100, 1.0, 0);
+        let seed_one = truncated_normal("weight", 10_000, 100, 1.0, 1);
+        assert_ne!(seed_zero, seed_one);
+    }
+
+    #[test]
     fn grouped_block_linear_uses_upstream_fan_in() {
         assert_eq!(d3_fan_in(&[8, 96, 64]), 768);
         assert_eq!(d3_fan_in(&[96, 64]), 96);

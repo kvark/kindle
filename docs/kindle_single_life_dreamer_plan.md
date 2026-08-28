@@ -1435,7 +1435,13 @@ imagination. Changing imagination length therefore changed every later random
 trajectory, not only behavior targets. These concerns are now independent,
 deterministically seeded streams, and read-only probes use a separate seed
 derived from learner/environment step. This also prevents learner throughput
-from silently perturbing the environment policy.
+from silently perturbing the environment policy. The top-level experiment seed
+also changes ALE state, every stochastic stream, and name-hashed parameter
+initialization; only the frozen DINO projection seed remains fixed as part of
+the architecture. At the identical 15,000 environment and 3,479 learner steps,
+the completed seed-zero and seed-one full-BPTT controls have different world,
+behavior, and slow-value checkpoint hashes. Regression tests now require both
+same-seed determinism and cross-seed divergence.
 
 The repeated two-step run with isolated streams still rejects the ablation. It
 earns 94/10,000 online and 0/10,000 frozen; the frozen policy selects `down`
