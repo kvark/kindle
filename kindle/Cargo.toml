@@ -9,7 +9,7 @@ description = "A DreamerV3 agent with frozen DINOv3 visual perception."
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "e67ced7568ae051c0f1d9f20d67370d5019d2b58" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "a81027b2497f0a77df2ad5ac4f99b5fc4069c798" }
 # Pinned to the same Blade revision as Meganeura so their GPU context types
 # remain identical at the perception/learner boundary.
 blade-graphics = { git = "https://github.com/kvark/blade", rev = "ae0f7ad1f05443bea121eb514fab2fc0b867a662" }
