@@ -283,8 +283,12 @@ The production BPTT-8 default remains unchanged. The immutable BPTT-64
 seed-zero curve completed all 100,000 interactions and 24,729 learner updates;
 its five strict score-window endpoints are -18, -18, -18, -19, and -16, for a
 -17.8 mean. That improves on the matched recovered BPTT-8 result of -18.9 but
-remains below the reported 12M D3 result of -10. A seed-one replication is
-active, while larger-preset full recurrence remains unproven.
+remains below the reported 12M D3 result of -10. The uninterrupted seed-one
+replication also completed all 100,000 interactions and 24,729 updates. Its
+eight strict-window endpoints are -18, -18, -17, -19, -19, -20, -19, and -17,
+for -18.375. The two-seed mean is -18.0875: full recurrence replicates its
+improvement over random, but the 1M preset still misses the 12M target. This
+supports testing capacity rather than changing the vision or action interface.
 
 The prefill-amortized canary rate is not a useful long-run estimate. Its first
 update arrives at 67.70 seconds after 1,086 interactions; the next eight updates
@@ -296,7 +300,8 @@ supplies the authoritative sustained measurement: after 95.2 seconds of graph
 construction,
 the run phase took 53,409 seconds for 100,000 interactions and 24,729 learner
 updates, or 0.463 updates/s including replay prefill. The seed-one replication
-uses the same immutable contract.
+used the same immutable contract and completed in 54,113 seconds at 0.457
+updates/s.
 
 The conditional action-alias fallback is validated on that same graph path. A
 six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
@@ -1206,7 +1211,8 @@ Validation snapshot (updated 2026-08-27):
   This single-seed, preset-class control does not make Kindle a D3-baseline
   result: the reported -10 and historical -4.537 targets use larger models.
   It does show that replacing DINO or the action vocabulary is not the next
-  supported change. Replicate full-BPTT at seed one, then test capacity;
+  supported change. The clean seed-one replication scores -18.375, producing
+  a -18.0875 two-seed mean and selecting the 12M capacity experiment;
 - the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
   rather than merely matching its random early regime. D3's five-seed episode
   means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
@@ -1218,8 +1224,9 @@ Validation snapshot (updated 2026-08-27):
   DINO, while the published artifact uses a larger model and full recurrence.
   The completed full-recurrence and current-D3 controls resolve the first
   branch: BPTT-64 improves Kindle and the standard upstream 1M model remains at
-  random. A seed-one replication now precedes a capacity experiment. The
-  frozen-vision interface and six-action fallback are not selected by the
+  random. The completed seed-one replication confirms that result, so the
+  capacity experiment now precedes any vision or action-vocabulary ablation.
+  The frozen-vision interface and six-action fallback are not selected by the
   present evidence;
 - a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
   frozen-DINO position at 85/100 and food state at 95/100, observing all 25
