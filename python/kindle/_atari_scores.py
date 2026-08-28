@@ -36,9 +36,12 @@ ATARI_PROFILES = {
 }
 
 # Reference scores are keyed by exact wrapper protocol. The 12M values are the
-# rounded DreamerV3XS results reported by Wang et al. (ICLR 2025); its released
-# comparison omits raw XS curves, so these remain secondary targets. The 200M
-# values come from the D3 score artifact bundled at upstream commit 2411f7d1.
+# rounded DreamerV3XS results reported by Wang et al. (ICLR 2025). That study
+# reports five independent seeds and five-episode running-average curves, but
+# its release omits the raw XS curves. Kindle's strict 350k--400k-frame episode
+# window is therefore a conservative engineering comparison, not an exact
+# statistical reproduction. The 200M values come from the D3 score artifact
+# bundled at upstream commit 2411f7d1.
 # That artifact predates the pinned e3f02248 implementation reference, so it is
 # historical result evidence rather than an executable golden for that code.
 # Both use all 18 actions and therefore stay under `published`;

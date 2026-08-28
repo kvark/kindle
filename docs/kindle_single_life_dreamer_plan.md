@@ -673,14 +673,20 @@ Validation snapshot (updated 2026-08-27):
   window, then average five seeds. An independent ICLR 2025 comparison also
   reports a 12M `DreamerV3XS` at -10 on Pong and 207 on Private Eye after the
   Atari-100K budget, giving the practical preset a more appropriate secondary
-  target than the original 200M model. Its released benchmark metadata marks
-  Dreamer as non-sticky/full-action, but the repository does not contain the XS
-  run configuration or raw curves, so those rounded scores are supporting
-  evidence rather than a protocol-matched acceptance gate. Pong and Private
-  Eye remain the first dense and sparse Atari curves. The strict JSONL score
-  aggregator reproduces the matched random means exactly, rejects the active
-  curve before `run_end`, and requires complete window coverage and matching
-  wrapper metadata before reporting target deltas;
+  target than the original 200M model. That study reports five independent
+  seeds and tracks training performance with a five-episode running average.
+  Its released benchmark metadata marks Dreamer as non-sticky/full-action, but
+  the repository does not contain the XS run configuration or raw curves.
+  Kindle therefore predeclares a deliberately conservative engineering gate:
+  at least three independent uninterrupted runs, each with complete coverage,
+  aggregated over every episode ending in the 350,000--400,000-frame window,
+  must have an across-seed mean of at least -10. Passing that gate would match the
+  reported score threshold under Kindle's stricter audit; it would not be an
+  exact statistical reproduction of the paper's five-seed running-average
+  curve. Pong and Private Eye remain the first dense and sparse Atari curves.
+  The strict JSONL score aggregator reproduces the matched random means exactly,
+  rejects the active curve before `run_end`, and requires complete window
+  coverage and matching wrapper metadata before reporting target deltas;
 - the first published-protocol 1M Pong curve is running with the calibrated
   reconstruction scale and D3 representation gradients. At the 10,000-step
   checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
