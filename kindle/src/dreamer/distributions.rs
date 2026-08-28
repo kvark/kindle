@@ -164,6 +164,20 @@ pub fn lambda_returns(
     result
 }
 
+/// D3 weights imagined losses by the cumulative predicted continuation,
+/// including the continuation predicted at the posterior start state.
+pub fn continuation_weights(continuation: &[f32]) -> Vec<f32> {
+    let mut cumulative = 1.0;
+    continuation
+        .iter()
+        .map(|value| {
+            assert!(value.is_finite());
+            cumulative *= value.clamp(0.0, 1.0);
+            cumulative
+        })
+        .collect()
+}
+
 #[derive(Clone, Debug)]
 pub struct PercentileNormalizer {
     low: f32,
@@ -287,5 +301,23 @@ mod tests {
 
         assert_eq!(timeout, vec![3.5, 7.0]);
         assert_eq!(terminal, vec![1.0, 2.0]);
+    }
+
+    #[test]
+    fn imagination_weights_include_the_start_state_continuation() {
+        let weights = continuation_weights(&[0.8, 0.5, 0.25]);
+        assert_eq!(weights, vec![0.8, 0.4, 0.1]);
+    }
+
+    #[test]
+    fn percentile_normalizer_matches_d3_linear_percentiles_and_ema() {
+        let mut normalizer = PercentileNormalizer::new(0.5, 1.0);
+        normalizer.update(&(0..=20).map(|value| value as f32).collect::<Vec<_>>());
+        assert_eq!(normalizer.state(), (0.5, 9.5));
+        assert_eq!(normalizer.scale(), 9.0);
+
+        normalizer.update(&[4.0; 21]);
+        assert_eq!(normalizer.state(), (2.25, 6.75));
+        assert_eq!(normalizer.scale(), 4.5);
     }
 }

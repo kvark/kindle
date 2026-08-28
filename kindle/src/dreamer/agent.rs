@@ -11,8 +11,8 @@ use rand::{SeedableRng, rngs::StdRng};
 use super::behavior;
 use super::config::DreamerConfig;
 use super::distributions::{
-    PercentileNormalizer, TwoHotBins, lambda_returns, sample_logits, sample_probabilities,
-    softmax_unimix,
+    PercentileNormalizer, TwoHotBins, continuation_weights, lambda_returns, sample_logits,
+    sample_probabilities, softmax_unimix,
 };
 use super::replay::{FrameFlags, ReplayFrame, Reward, SequenceBatch, SequenceReplay};
 use super::runtime::{
@@ -1323,11 +1323,10 @@ impl DreamerCore {
                 1.0,
                 self.config.lambda,
             );
-            let mut weight = 1.0;
+            let trajectory_weights = continuation_weights(&continuation[..horizon]);
             for time in 0..horizon {
                 returns[time][start] = trajectory[time];
-                weight *= continuation[time];
-                weights[time][start] = weight;
+                weights[time][start] = trajectory_weights[time];
             }
         }
         let all_returns = flatten_time(&returns);
