@@ -131,6 +131,56 @@ def test_scores_average_episodes_per_seed_before_seeds(tmp_path) -> None:
     }
 
 
+def test_dreamerv3_12m_target_boundary_is_inclusive(tmp_path) -> None:
+    paths = []
+    for seed in range(3):
+        path = tmp_path / f"seed{seed}.jsonl"
+        write_run(
+            path,
+            seed=seed,
+            start=0,
+            end=400_000,
+            episodes=[(380_000, -10.0)],
+        )
+        paths.append(path)
+
+    summary = summarize_scores(
+        load_segments(paths),
+        minimum_seeds=3,
+        require_uninterrupted=True,
+    )
+    target = summary["environments"]["ALE/Pong-v5"]["targets"][
+        "dreamerv3_12m_reported"
+    ]
+    assert target == {"score": -10.0, "delta": 0.0, "met": True}
+
+
+def test_dreamerv3_12m_target_rejects_score_just_below_boundary(tmp_path) -> None:
+    paths = []
+    for seed, score in enumerate((-10.0, -10.0, -10.003)):
+        path = tmp_path / f"seed{seed}.jsonl"
+        write_run(
+            path,
+            seed=seed,
+            start=0,
+            end=400_000,
+            episodes=[(380_000, score)],
+        )
+        paths.append(path)
+
+    summary = summarize_scores(
+        load_segments(paths),
+        minimum_seeds=3,
+        require_uninterrupted=True,
+    )
+    target = summary["environments"]["ALE/Pong-v5"]["targets"][
+        "dreamerv3_12m_reported"
+    ]
+    assert target["score"] == -10.0
+    assert target["delta"] == pytest.approx(-0.001)
+    assert target["met"] is False
+
+
 def test_scores_enforce_minimum_independent_seed_count(tmp_path) -> None:
     paths = []
     for seed in range(3):
@@ -153,6 +203,25 @@ def test_scores_enforce_minimum_independent_seed_count(tmp_path) -> None:
     summary = summarize_scores(load_segments(paths), minimum_seeds=3)
     assert summary["minimum_seed_count"] == 3
     assert summary["environments"]["ALE/Pong-v5"]["seed_count"] == 3
+
+
+def test_multiple_segments_do_not_inflate_independent_seed_count(tmp_path) -> None:
+    first = tmp_path / "seed0-first.jsonl"
+    second = tmp_path / "seed0-second.jsonl"
+    write_run(first, seed=0, start=0, end=375_000, episodes=[(360_000, -10)])
+    write_run(
+        second,
+        seed=0,
+        start=375_000,
+        end=400_000,
+        episodes=[(390_000, -10)],
+    )
+
+    with pytest.raises(
+        AtariScoreError,
+        match="requires at least 3 independent seeds, found 1",
+    ):
+        summarize_scores(load_segments([first, second]), minimum_seeds=3)
 
 
 @pytest.mark.parametrize("minimum_seeds", [True, 0, -1, 1.5])
