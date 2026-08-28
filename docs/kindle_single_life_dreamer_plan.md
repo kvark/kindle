@@ -1849,7 +1849,9 @@ For every policy decision:
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `d904e12e52af6910b041873cd203a5d5e5fd3b3c`.
+  `5429fcd043acd58dec77f35a44c452737d892fd2` (including bounded training
+  allocations and scalar-f32 routing for derivative matmuls whose operands
+  require the f32 exponent range).
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
   `824d55fbd6485a102ee220553bc54a30c1af5936` (the revision selected by
