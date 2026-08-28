@@ -450,24 +450,51 @@ mod tests {
     fn upstream_size_presets_are_pinned() {
         let one = ModelSize::Size1M.network();
         assert_eq!(
-            (one.deter, one.hidden, one.stoch, one.classes),
-            (512, 64, 32, 4)
+            (
+                one.deter,
+                one.hidden,
+                one.stoch,
+                one.classes,
+                one.blocks,
+                one.units,
+                one.vision_depth,
+            ),
+            (512, 64, 32, 4, 8, 64, 4)
         );
         let twelve = ModelSize::Size12M.network();
         assert_eq!(
-            (twelve.deter, twelve.hidden, twelve.classes),
-            (2_048, 256, 16)
+            (
+                twelve.deter,
+                twelve.hidden,
+                twelve.stoch,
+                twelve.classes,
+                twelve.blocks,
+                twelve.units,
+                twelve.vision_depth,
+            ),
+            (2_048, 256, 32, 16, 8, 256, 16)
         );
         let two_hundred = ModelSize::Size200M.network();
         assert_eq!(
-            (two_hundred.deter, two_hundred.hidden, two_hundred.classes),
-            (8_192, 1_024, 64)
+            (
+                two_hundred.deter,
+                two_hundred.hidden,
+                two_hundred.stoch,
+                two_hundred.classes,
+                two_hundred.blocks,
+                two_hundred.units,
+                two_hundred.vision_depth,
+            ),
+            (8_192, 1_024, 32, 64, 8, 1_024, 64)
         );
     }
 
     #[test]
     fn d3_data_defaults_are_explicit() {
         let config = DreamerConfig::new(18);
+        assert_eq!(config.action_count, 18);
+        assert_eq!(config.model_size, ModelSize::Size12M);
+        assert_eq!(config.replay_capacity, 100_000);
         assert_eq!((config.batch_size, config.batch_length), (16, 64));
         assert_eq!(config.world_backprop_length, 8);
         assert_eq!(config.world_microbatch_size, None);
@@ -478,7 +505,23 @@ mod tests {
         assert_eq!(config.replay_warmup_sequences(), 1_024);
         assert_eq!(config.replay_warmup_frames(), 1_088);
         assert_eq!(config.train_ratio, 32.0);
+        assert_eq!(config.horizon, 333);
+        assert_eq!(config.continuation_discount(), 1.0 - 1.0 / 333.0);
+        assert_eq!(config.lambda, 0.95);
+        assert_eq!(config.free_nats, 1.0);
+        assert_eq!(config.unimix, 0.01);
         assert_eq!(config.actor_unimix, 0.01);
+        assert_eq!(config.actor_entropy, 3e-4);
+        assert_eq!(config.slow_value_rate, 0.02);
+        assert_eq!(config.return_norm_rate, 0.01);
+        assert_eq!(config.learning_rate, 4e-5);
+        assert_eq!(config.learning_rate_warmup, 1_000);
+        assert_eq!(config.optimizer_beta1, 0.9);
+        assert_eq!(config.optimizer_beta2, 0.999);
+        assert_eq!(config.optimizer_epsilon, 1e-20);
+        assert_eq!(config.agc, 0.3);
+        assert_eq!(config.agc_pmin, 1e-3);
+        assert_eq!(config.loss_scales, LossScales::default());
         assert_eq!(config.dynamics_free_nats, None);
         assert_eq!(config.dynamics_free_nats(), config.free_nats);
         assert_eq!(config.behavior_learning_rate, None);
@@ -488,6 +531,10 @@ mod tests {
         assert_eq!(config.observation_decoder_depth, OBSERVATION_CHANNELS);
         assert_eq!(config.observation_decoder_depth(), OBSERVATION_CHANNELS);
         assert!(config.replay_value_gradient);
+        assert_eq!(config.extrinsic_reward_scale, 1.0);
+        assert_eq!(config.intrinsic_reward_scale, 0.0);
+        assert_eq!(config.seed, 0);
+        assert!(!config.skip_full_optimize);
     }
 
     #[test]
