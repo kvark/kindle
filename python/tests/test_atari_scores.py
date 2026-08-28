@@ -43,6 +43,8 @@ def write_run(
     episodes,
     protocol="published",
     full_action_space=True,
+    config=None,
+    random_action_steps=0,
 ):
     records = [
         {
@@ -57,6 +59,8 @@ def write_run(
             "max_episode_frames": 100_000,
             "score_window_frames": [350_000, 400_000],
             "starting_environment_step": start // 4,
+            "config": config,
+            "random_action_steps": random_action_steps,
         },
         *[
             {
@@ -203,6 +207,50 @@ def test_scores_enforce_minimum_independent_seed_count(tmp_path) -> None:
     summary = summarize_scores(load_segments(paths), minimum_seeds=3)
     assert summary["minimum_seed_count"] == 3
     assert summary["environments"]["ALE/Pong-v5"]["seed_count"] == 3
+
+
+def test_scores_require_one_experiment_identity_across_seeds(tmp_path) -> None:
+    paths = []
+    for seed in range(3):
+        path = tmp_path / f"seed{seed}.jsonl"
+        write_run(
+            path,
+            seed=seed,
+            start=0,
+            end=400_000,
+            episodes=[(380_000, -10.0)],
+            config={"model_size": "size12_m", "seed": seed},
+        )
+        paths.append(path)
+
+    summary = summarize_scores(load_segments(paths), minimum_seeds=3)
+    identity = summary["environments"]["ALE/Pong-v5"]["experiment_identity"]
+    assert identity["config_without_seed"] == {"model_size": "size12_m"}
+
+    write_run(
+        paths[2],
+        seed=2,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -10.0)],
+        config={"model_size": "size1_m", "seed": 2},
+    )
+    with pytest.raises(AtariScoreError, match="different experiment identities"):
+        summarize_scores(load_segments(paths), minimum_seeds=3)
+
+
+def test_scores_reject_config_seed_mismatch(tmp_path) -> None:
+    path = tmp_path / "seed0.jsonl"
+    write_run(
+        path,
+        seed=0,
+        start=0,
+        end=400_000,
+        episodes=[(380_000, -10.0)],
+        config={"model_size": "size12_m", "seed": 1},
+    )
+    with pytest.raises(AtariScoreError, match="run seed 0 does not match config seed 1"):
+        load_segments([path])
 
 
 def test_multiple_segments_do_not_inflate_independent_seed_count(tmp_path) -> None:

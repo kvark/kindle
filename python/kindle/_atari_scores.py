@@ -315,7 +315,34 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
         "dino_checkpoint_sha256",
         "trainable_parameters",
         "config",
+        "random_action_steps",
     )
+
+    def experiment_identity(
+        path: Path, event: dict[str, object]
+    ) -> dict[str, object]:
+        seed = int(event["seed"])
+        raw_config = event.get("config")
+        if raw_config is not None and not isinstance(raw_config, dict):
+            raise AtariScoreError(f"{path}: run config must be an object or null")
+        config = dict(raw_config) if isinstance(raw_config, dict) else None
+        if config is not None and "seed" in config:
+            config_seed = config.pop("seed")
+            if type(config_seed) is not int or config_seed != seed:
+                raise AtariScoreError(
+                    f"{path}: run seed {seed} does not match config seed "
+                    f"{config_seed!r}"
+                )
+        return {
+            "actions": event.get("actions"),
+            "action_meanings": event.get("action_meanings"),
+            "dino_model_id": event.get("dino_model_id"),
+            "dino_checkpoint_revision": event.get("dino_checkpoint_revision"),
+            "dino_checkpoint_sha256": event.get("dino_checkpoint_sha256"),
+            "trainable_parameters": event.get("trainable_parameters"),
+            "config_without_seed": config,
+            "random_action_steps": event.get("random_action_steps"),
+        }
 
     def start_segment(path: Path, event: dict[str, object]) -> dict[str, object]:
         action_repeat = int(event["action_repeat"])
@@ -335,6 +362,7 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
             "noop_max": int(event["noop_max"]),
             "max_episode_frames": int(event["max_episode_frames"]),
             "score_window_frames": tuple(event["score_window_frames"]),
+            "experiment_identity": experiment_identity(path, event),
             "start_frame": (
                 int(event["starting_environment_step"]) * action_repeat
             ),
@@ -489,6 +517,7 @@ def summarize_scores(
 
     grouped = defaultdict(list)
     target_runtimes = {}
+    experiment_identities = {}
     for segment in segments:
         _validate_segment(segment, expected_protocol, expected_mode)
         environment = segment["environment"]
@@ -499,6 +528,14 @@ def summarize_scores(
                 f"{environment}: cannot mix target runtimes "
                 f"{previous_runtime!r} and {target_runtime!r}"
             )
+        experiment_identity = segment.get("experiment_identity")
+        if environment in experiment_identities:
+            if experiment_identities[environment] != experiment_identity:
+                raise AtariScoreError(
+                    f"{environment}: cannot mix different experiment identities"
+                )
+        else:
+            experiment_identities[environment] = experiment_identity
         grouped[(segment["environment"], segment["seed"])].append(segment)
 
     environments = defaultdict(list)
@@ -583,6 +620,7 @@ def summarize_scores(
         }
         environment_summaries[environment] = {
             "target_runtime": target_runtime,
+            "experiment_identity": experiment_identities[environment],
             "seed_results": seeds,
             "seed_mean": seed_mean,
             "seed_count": len(seeds),
