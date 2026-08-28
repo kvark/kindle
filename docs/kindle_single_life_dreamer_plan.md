@@ -362,9 +362,15 @@ Long runs and GPU diagnostics serialize ownership with the repository-wide
 `target/gpu-training.lock`. Reference D3/JAX audits remain CPU-only while a
 Vulkan trainer owns that lock; probing the same NVIDIA device through CUDA/UVM
 concurrently is not a valid health check and can itself trigger kernel mapping
-failures.
-The optional regression command is
-`cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn`;
+failures. The optional regression command acquires the same lock:
+
+```sh
+common_git_dir=$(git rev-parse --path-format=absolute --git-common-dir)
+gpu_lock=$(dirname "$common_git_dir")/target/gpu-training.lock
+flock -n "$gpu_lock" \
+  cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn
+```
+
 `MEGANEURA_DEVICE_ID` selects the adapter on multi-GPU hosts.
 
 `world_microbatch_size` remains a valid compute control: it partitions only the
