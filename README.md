@@ -335,6 +335,7 @@ python python/examples/summarize_atari_training.py runs/pong-seed0.jsonl \
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
   --minimum-kindle-seeds 3 \
+  --require-uninterrupted-kindle \
   --output runs/pong-published-summary.json
 
 # Compare against a completed pinned-upstream run after removing each ALE
@@ -351,10 +352,12 @@ independent seeds than requested. `--minimum-kindle-seeds` and
 `--minimum-upstream-seeds` gate the two sides independently, so a three-seed
 Kindle result can be compared with a single pinned-upstream control. The output
 records both minimums. The summarizer supports resumed curves split across
-files and reports deltas to matched random, reported 12M DreamerV3XS, and pinned
-200M DreamerV3 targets only where they match the selected protocol. The
-`published-minimal` profile reports its own matched random target and does not
-label the released all-action D3 scores as matched.
+files, but `--require-uninterrupted-kindle` rejects model-only checkpoint
+recoveries whose replay state was not restored. It reports deltas to matched
+random, reported 12M DreamerV3XS, and pinned 200M DreamerV3 targets only where
+they match the selected protocol. The `published-minimal` profile reports its
+own matched random target and does not label the released all-action D3 scores
+as matched.
 
 The training-window summarizer is a constant-memory diagnostic for one
 uninterrupted JSONL run. It requires interval events to cover the requested

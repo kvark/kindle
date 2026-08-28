@@ -474,12 +474,15 @@ def summarize_scores(
     expected_protocol: str = "published",
     expected_mode: str = "train",
     minimum_seeds: int = 1,
+    require_uninterrupted: bool = False,
 ) -> dict[str, object]:
     """Compute episode means per seed, then the equally weighted seed mean."""
     if isinstance(minimum_seeds, bool) or not isinstance(minimum_seeds, int):
         raise AtariScoreError("minimum_seeds must be an integer")
     if minimum_seeds <= 0:
         raise AtariScoreError("minimum_seeds must be positive")
+    if not isinstance(require_uninterrupted, bool):
+        raise AtariScoreError("require_uninterrupted must be a boolean")
 
     grouped = defaultdict(list)
     target_runtimes = {}
@@ -540,6 +543,11 @@ def summarize_scores(
             bool(segment.get("checkpoint_recovery_start"))
             for segment in seed_segments
         )
+        if require_uninterrupted and checkpoint_recoveries:
+            raise AtariScoreError(
+                f"{environment} seed {seed}: uninterrupted scoring rejects "
+                f"{checkpoint_recoveries} checkpoint recovery segment(s)"
+            )
         if checkpoint_recoveries:
             seed_result["checkpoint_recoveries"] = checkpoint_recoveries
         environments[environment].append(seed_result)
@@ -582,6 +590,7 @@ def summarize_scores(
         "atari_protocol": expected_protocol,
         "mode": expected_mode,
         "minimum_seed_count": minimum_seeds,
+        "require_uninterrupted": require_uninterrupted,
         "score_window_frames": list(SCORE_WINDOW_FRAMES),
         "environments": environment_summaries,
     }
@@ -655,6 +664,10 @@ def compare_runtime_scores(
         "minimum_seed_counts": {
             "kindle": kindle["minimum_seed_count"],
             "upstream_d3": upstream_d3["minimum_seed_count"],
+        },
+        "require_uninterrupted": {
+            "kindle": kindle["require_uninterrupted"],
+            "upstream_d3": upstream_d3["require_uninterrupted"],
         },
         "score_window_frames": kindle["score_window_frames"],
         "kindle": kindle_environments,

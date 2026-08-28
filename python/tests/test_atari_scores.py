@@ -119,6 +119,7 @@ def test_scores_average_episodes_per_seed_before_seeds(tmp_path) -> None:
     )
 
     summary = summarize_scores(load_segments([seed0, seed1]))
+    assert summary["require_uninterrupted"] is False
     pong = summary["environments"]["ALE/Pong-v5"]
     assert pong["target_runtime"] == "kindle-ale_py-0.12.1"
     assert pong["seed_mean"] == 5.0
@@ -238,6 +239,31 @@ def test_appended_checkpoint_recovery_discards_superseded_tail(tmp_path) -> None
             "checkpoint_recoveries": 1,
         }
     ]
+
+    with pytest.raises(
+        AtariScoreError,
+        match="uninterrupted scoring rejects 1 checkpoint recovery",
+    ):
+        summarize_scores(
+            load_segments([path]),
+            require_uninterrupted=True,
+        )
+
+    python_root = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(python_root / "examples" / "summarize_atari_scores.py"),
+            str(path),
+            "--require-uninterrupted-kindle",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONPATH": str(python_root)},
+    )
+    assert result.returncode == 2
+    assert "uninterrupted scoring rejects 1 checkpoint recovery" in result.stderr
 
 
 def test_appended_checkpoint_recovery_requires_matching_checkpoint(tmp_path) -> None:
@@ -382,6 +408,10 @@ def test_runtime_comparison_removes_each_ale_random_floor(tmp_path) -> None:
     upstream = summarize_scores(load_upstream_d3_segments([upstream_logdir]))
     comparison = compare_runtime_scores(kindle, upstream)
     assert comparison["minimum_seed_counts"] == {"kindle": 1, "upstream_d3": 1}
+    assert comparison["require_uninterrupted"] == {
+        "kindle": False,
+        "upstream_d3": False,
+    }
     pong = comparison["comparisons"]["ALE/Pong-v5"]
     assert pong == {
         "kindle_score": -10.0,

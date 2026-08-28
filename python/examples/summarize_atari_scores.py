@@ -44,6 +44,14 @@ def main() -> None:
         default=1,
         help="require this many independent seeds in the upstream D3 logs",
     )
+    parser.add_argument(
+        "--require-uninterrupted-kindle",
+        action="store_true",
+        help=(
+            "reject Kindle seeds resumed from model-only checkpoints because "
+            "their replay state was not restored"
+        ),
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if not args.logs and not args.upstream_d3_logdir:
@@ -58,6 +66,7 @@ def main() -> None:
                     expected_protocol=args.atari_protocol,
                     expected_mode=args.mode,
                     minimum_seeds=args.minimum_kindle_seeds,
+                    require_uninterrupted=args.require_uninterrupted_kindle,
                 )
             )
         if args.upstream_d3_logdir:
