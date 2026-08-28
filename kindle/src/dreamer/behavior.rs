@@ -212,7 +212,12 @@ pub fn build_value_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
+    use meganeura::Mode;
+
     use super::*;
+    use crate::dreamer::runtime::{build_session, configure_d3_optimizer, initialize_d3};
 
     #[test]
     fn behavior_graphs_have_d3_heads() {
@@ -240,5 +245,59 @@ mod tests {
         let graph = build_training_graph(&config, 12, 6);
         let (plan, _) = meganeura::compile_training_graph(&graph);
         assert!(!plan.dispatches.is_empty());
+    }
+
+    #[test]
+    #[ignore = "requires a Vulkan compute device"]
+    fn size12m_actor_first_layer_receives_dense_gradient() {
+        let mut config = DreamerConfig::new(18);
+        config.learning_rate_warmup = 0;
+        let rows = 4;
+        let graph = build_training_graph(&config, rows, rows);
+        let gpu = Arc::new(crate::init_gpu_context().expect("Vulkan compute device"));
+        let mut session = build_session(&graph, &gpu, Mode::Training, false);
+        initialize_d3(&mut session, &graph, config.seed ^ 0x5eed_0000_0000_0001);
+
+        let feature = (0..rows * config.feature_dim())
+            .map(|index| {
+                let row = index / config.feature_dim();
+                let column = index % config.feature_dim();
+                0.25 + (column % 17) as f32 / 17.0 + row as f32 / 23.0
+            })
+            .collect::<Vec<_>>();
+        let mut action_target = vec![0.0; rows * config.action_count];
+        for (row, scale) in [1.0, 0.7, -0.4, 0.2].into_iter().enumerate() {
+            action_target[row * config.action_count + row] = scale;
+        }
+        let mut value_target = vec![0.0; rows * config.value_bins];
+        for row in 0..rows {
+            value_target[row * config.value_bins + config.value_bins / 2 + row] = 1.0;
+        }
+        let weights = vec![1.0; rows];
+
+        session.set_input("imagined_feature", &feature);
+        session.set_input("action_target", &action_target);
+        session.set_input("imagined_weight", &weights);
+        session.set_input("imagined_value_target", &value_target);
+        session.set_input("imagined_slow_target", &value_target);
+        session.set_input("replay_feature", &feature);
+        session.set_input("replay_weight", &weights);
+        session.set_input("replay_value_target", &value_target);
+        session.set_input("replay_slow_target", &value_target);
+        configure_d3_optimizer(&mut session, &config, 1, config.behavior_learning_rate());
+        session.step();
+        session.wait();
+
+        let name = "behavior.actor.layer0.weight";
+        let mut momentum = vec![0.0; session.param_size(name).expect("actor parameter")];
+        session.read_adam_m(name, &mut momentum);
+        assert!(momentum.iter().all(|value| value.is_finite()));
+        let zero_count = momentum.iter().filter(|value| **value == 0.0).count();
+        assert_eq!(
+            zero_count,
+            0,
+            "actor first-layer momentum has {zero_count}/{} zero entries",
+            momentum.len(),
+        );
     }
 }
