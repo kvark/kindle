@@ -1992,6 +1992,45 @@ mod tests {
     use super::*;
     use rand::Rng;
 
+    fn valid_checkpoint_metadata() -> CheckpointMetadata {
+        CheckpointMetadata {
+            format: CHECKPOINT_FORMAT,
+            architecture: CHECKPOINT_ARCHITECTURE.to_owned(),
+            dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
+            meganeura_revision: MEGANEURA_REV.to_owned(),
+            blade_revision: BLADE_REV.to_owned(),
+            dinov3_revision: DINOV3_UPSTREAM_REV.to_owned(),
+            dinovision_revision: DINOVISION_SOURCE_REV.to_owned(),
+            dino_model_id: VITS16_MODEL_ID.to_owned(),
+            dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
+            projection_seed: PROJECTION_SEED,
+            observation_grid: OBSERVATION_GRID,
+            observation_channels: OBSERVATION_CHANNELS,
+            config: DreamerConfig::tiny(3),
+            learner_step: 1,
+            environment_step: 8,
+            return_low: 0.0,
+            return_high: 1.0,
+        }
+    }
+
+    #[test]
+    fn checkpoint_metadata_rejects_backend_revision_mismatch() {
+        validate_checkpoint_metadata(&valid_checkpoint_metadata()).unwrap();
+
+        let mut old_meganeura = valid_checkpoint_metadata();
+        old_meganeura.meganeura_revision = "d904e12e52af6910b041873cd203a5d5e5fd3b3c".to_owned();
+        let error = validate_checkpoint_metadata(&old_meganeura).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("checkpoint Meganeura revision"));
+
+        let mut wrong_blade = valid_checkpoint_metadata();
+        wrong_blade.blade_revision = "wrong-revision".to_owned();
+        let error = validate_checkpoint_metadata(&wrong_blade).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("checkpoint Blade revision"));
+    }
+
     #[test]
     fn categorical_latents_are_one_hot_per_variable() {
         let mut rng = StdRng::seed_from_u64(3);
