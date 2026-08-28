@@ -358,6 +358,11 @@ cycles.
 Dropping the context releases it, after which `nvidia-smi` reports 2 MiB and the
 host again has 27 GiB available. No RAM clearing, module reload, or reboot is
 part of normal training startup or teardown.
+Long runs and GPU diagnostics serialize ownership with the repository-wide
+`target/gpu-training.lock`. Reference D3/JAX audits remain CPU-only while a
+Vulkan trainer owns that lock; probing the same NVIDIA device through CUDA/UVM
+concurrently is not a valid health check and can itself trigger kernel mapping
+failures.
 The optional regression command is
 `cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn`;
 `MEGANEURA_DEVICE_ID` selects the adapter on multi-GPU hosts.
