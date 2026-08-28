@@ -299,45 +299,55 @@ post-curve diagnostics do not identify action aliases as the current
 bottleneck, so the six-action variant remains a diagnostic rather than the
 next experiment.
 
-The identical full-recurrence construction does not currently scale to the
-12M preset on this host. A construction-only published-protocol Pong probe with
-the patched Blade allocator, batch length 64, and BPTT length 64 reached a
-guarded 12 GiB host-memory ceiling in 2.95 seconds, before emitting the run
-header or taking an environment step. Raising that ceiling would consume the
-headroom protecting the active run, so the controlled comparison stays at 1M.
-The first capacity-oriented memory-layout change is implemented but is not yet
-a benchmark result. `world_microbatch_size` partitions only the world-model
-batch rows while preserving the effective replay batch of 16, all 64 sequence
-states, the posterior pass, imagination, and behavior training. Meganeura
-averages gradients across the equal row partitions and temporal chunks before
-one AGC/RMS-normalized momentum update. The option defaults to the old
-full-batch graph and is serialized in checkpoints; old checkpoints default
-back to that behavior. Configuration, slicing, graph construction, workspace,
-clippy, extension, and isolated-wheel checks pass. The direct all-parameter
-update-parity test also passes through Meganeura on CPU-only Lavapipe. Across
-122,016 trainable world coordinates, full batch versus four equal row
-partitions—the candidate's accumulation count—has update cosine 0.999866 and
-1.638% relative L2 difference; LaProp's RMS state has cosine 0.999999969 and
-0.025% relative difference. Reordered f32 reductions remain within the expected
-two-learning-rate pointwise bound at nearly cancelling coordinates. The same
-test on the RTX waits for the seed-one curve to release it. If that passes, the
-next canary is 12M, BPTT-64, effective batch 16, and world microbatch 4. The
-existing 12M throughput estimates below still apply only to BPTT-8.
+The 12M full-recurrence failure was a stack memory bug, not a requirement for
+routine host cleanup or reboot. At the failing revisions, the BPTT-64,
+effective-batch-16, microbatch-4 world plan contained 40.214 GB of logical
+buffers and requested 21.92 GB for physical buffers and Adam state from a GPU
+reporting a 16.58 GB budget. Meganeura did not reject the impossible plan.
+Vulkan therefore oversubscribed host-visible mappings; on the RTX 5080 the
+NVIDIA kernel retained about 12.7 GB after the process failed. A freshly booted
+machine became unhealthy because one training launch created the bad state.
 
-A bounded recurrence sweep locates the current 12M construction limit more
-closely. BPTT-16 constructs on the integrated AMD GPU in 7.74 seconds with a
-3.7 GiB host-memory peak, preserving the 64-state batch and splitting it into
-four gradient-averaged chunks. BPTT-32 reaches an 8.6 GiB host-memory peak and
-requests about 10.7 GiB of AMD buffer space, after which the driver rejects VM
-mappings with `BO_VA (-12)` before a run header is emitted. That failure does
-not unwind cleanly: the Python process remains in uninterruptible kernel sleep
-with `SIGKILL` pending, retains about 10.7 GiB of GTT mappings, and prevents the
-AMD render node from being enumerated. A memory-capped BPTT-16 learner retry
-therefore stopped at device discovery before constructing an agent; it is not
-evidence against BPTT-16. Driver recovery or a reboot is required before more
-integrated-GPU checks. BPTT-16 remains the longest demonstrated 12M
-construction on this device; its first learner update and sustained throughput
-remain untested.
+The corrected stack fixes each material source rather than relying on a launch
+ritual:
+
+- Meganeura checks planned session, optimizer, and lazy gradient-accumulator
+  bytes against 90% of the reported device budget before allocating;
+- 15,045 bit-identical recurrent zero, one, and scale constants share immutable
+  allocations, removing 6.720 GB;
+- 15,302 compiler-eliminated logical buffers share one 8.4 MB placeholder
+  instead of consuming 3.884 GB;
+- Meganeura marks its same-lifetime device-buffer batches for Blade's free-list
+  allocator, avoiding about 2.3 GB of buddy-allocator power-of-two rounding;
+- Blade explicitly cleans cached free-list blocks when the GPU context drops.
+
+The exact previously failing geometry now maps 107,314 logical buffers to
+11,258 physical allocations totaling 11.252 GB. The complete Dreamer core uses
+13.631 GB on the RTX 5080. A synthetic replay canary executes one full world and
+behavior optimizer update in 7.46 seconds with finite losses; process RSS peaks
+at 1.24 GiB without swap. Dropping a core leaves a bounded 135.4 MB free-list
+cache that remains identical across three same-context 12M/BPTT-4 construction
+cycles.
+Dropping the context releases it, after which `nvidia-smi` reports 2 MiB and the
+host again has 27 GiB available. No RAM clearing, module reload, or reboot is
+part of normal training startup or teardown.
+The optional regression command is
+`cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn`;
+`MEGANEURA_DEVICE_ID` selects the adapter on multi-GPU hosts.
+
+`world_microbatch_size` remains a valid compute control: it partitions only the
+world-model rows while preserving the effective replay batch, all sequence
+states, posterior pass, imagination, and behavior training. Four-way
+microbatching alone could not fix the old allocation because it did not remove
+the duplicated recurrent constants or allocator rounding. The direct
+all-parameter parity test remains within the documented f32 reduction-order
+bounds. The production BPTT-8 default is unchanged; 12M/BPTT-64/microbatch-4 is
+now a safe capacity experiment rather than the default.
+
+The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
+unchecked oversubscription path. It remains useful evidence about how that
+driver fails, but it is no longer a recovery prerequisite or a measured
+architecture limit: oversized plans are now stopped before Vulkan allocation.
 
 The default replay capacity is 100,000 frames instead of upstream D3's five
 million. A compressed observation plus 12M-preset recurrent context is about
@@ -1703,12 +1713,13 @@ falsifiable exit gate.
   `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
 - Meganeura graph/runtime dependency:
   [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `e67ced7568ae051c0f1d9f20d67370d5019d2b58`.
+  `d904e12e52af6910b041873cd203a5d5e5fd3b3c`.
 - Blade graphics dependency:
   [kvark/blade](https://github.com/kvark/blade), revision
-  `ae0f7ad1f05443bea121eb514fab2fc0b867a662` (the revision selected by
-  Meganeura so the shared context types remain unified and full-length world
-  BPTT does not overflow descriptor-pool growth).
+  `824d55fbd6485a102ee220553bc54a30c1af5936` (the revision selected by
+  Meganeura so the shared context types remain unified, same-lifetime tensor
+  batches avoid buddy-allocation waste, allocator caches are released at
+  context teardown, and full-length world BPTT retains descriptor-pool growth).
 - DINO model:
   [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
   snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
