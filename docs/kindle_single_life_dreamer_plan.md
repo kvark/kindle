@@ -509,6 +509,26 @@ artifact scores 0.003541 agent points per decision in this phase, versus
 0.000636 for matched random. These remain diagnostic phase markers; no Kindle
 endpoint from this phase was inspected before fixing them.
 
+All later 20,000-frame diagnostic windows were frozen at the same time, before
+Kindle entered the first one. Parentheses in the aggregate columns give the
+pooled endpoint mean and endpoint count; point rates pool completed-episode
+agent points over their decision lengths. These phase markers expose when the
+released curve changes regime, but the predeclared 350,000--400,000-frame
+three-seed gate remains the only acceptance result.
+
+| Frames | Released D3 per-seed means | D3 equal (pooled / n) | Local D3 1M (n) | Random per-seed means | Random equal (pooled / n) | Agent-point rate D3 / random |
+|---|---|---:|---:|---|---:|---:|
+| 200k--220k | -14.5, -10, -12, -11, -13 | -12.100 (-12.000 / 9) | -21.000 (7) | -19.6, -20.333, -19.2 | -19.711 (-19.750 / 16) | 0.004116 / 0.001233 |
+| 220k--240k | -17.25, -14.333, -12.5, -6.5, -14 | -12.917 (-13.692 / 13) | -21.000 (6) | -20.8, -20.4, -19.6 | -20.267 (-20.267 / 15) | 0.003250 / 0.000776 |
+| 240k--260k | -16, -11.5, -6.5, -7, -13.5 | -10.900 (-11.333 / 9) | -21.000 (6) | -19.2, -20.667, -20.8 | -20.222 (-20.250 / 16) | 0.004008 / 0.000799 |
+| 260k--280k | -12, -12.333, -0.5, -8.5, -7 | -8.067 (-8.600 / 10) | -21.000 (6) | -20.2, -20.4, -20.667 | -20.422 (-20.438 / 16) | 0.004558 / 0.000596 |
+| 280k--300k | -13, -10.5, -7, -5, -3 | -7.700 (-9.375 / 8) | -21.000 (6) | -20.6, -20.8, -20.4 | -20.600 (-20.600 / 15) | 0.004335 / 0.000418 |
+| 300k--320k | -11.5, -11.5, -1, -5, -3.5 | -6.500 (-7.375 / 8) | -20.500 (6) | -20.333, -20, -20.333 | -20.222 (-20.235 / 17) | 0.004393 / 0.000830 |
+| 320k--340k | -11, -14.333, -5.5, 0, -11 | -8.367 (-8.444 / 9) | -20.667 (6) | -20.333, -20.667, -20.4 | -20.467 (-20.471 / 17) | 0.004223 / 0.000590 |
+| 340k--360k | -8.5, -10.5, -4, -2, -5 | -6.000 (-6.444 / 9) | -20.200 (5) | -20.8, -20.667, -20.667 | -20.711 (-20.706 / 17) | 0.004674 / 0.000330 |
+| 360k--380k | -2.5, -10, -1, -2, -5 | -4.100 (-4.714 / 7) | -20.000 (4) | -20.5, -20.6, -20.2 | -20.433 (-20.438 / 16) | 0.005056 / 0.000601 |
+| 380k--400k | -9, -8.5, -1.5, -3, -2.5 | -4.900 (-4.625 / 8) | -21.000 (6) | -20.8, -20.667, -20.6 | -20.689 (-20.688 / 16) | 0.005003 / 0.000349 |
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
