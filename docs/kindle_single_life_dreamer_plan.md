@@ -430,6 +430,28 @@ the local current-D3 1M seed's -20.167 over six endpoints and the released
 D3 artifact's -19.803 five-seed mean. Two endpoints are too few for a score
 claim; these remain learning-health markers for the uninterrupted strict run.
 
+The checksum-sealed 35,000-step checkpoint is at learner step 8,479. All 241
+stored tensors are finite, all 20,824,610 Adam moment elements are nonzero, and
+every one of the 95 parameter/slow-value tensors changed from step 30,000. Only
+11 isolated scalar entries remain exact across 12,119,311 otherwise-changing
+parameters. Component update RMS relative to parameter RMS is 3.12% for
+continuation, 4.34% for dynamics, 4.80% for the actor, 5.90% for the decoder,
+6.65% for representation, 7.81% for reward, 8.10% for value, and 8.19% for
+slow value. Both actor moments cover every deterministic input, categorical
+input, and hidden channel, and the world graph's frozen replay critic remains
+bit-identical to the behavior critic.
+
+Over steps 30,001--35,000, the three completed episodes score -18, -20, and
+-19 and average -19.0 over 2,083.7 decisions. Reward per 1,000-decision block
+is -13, -9, -14, -8, and -7. The full window's count-weighted positive-reward
+prediction is +0.221 while the negative prediction is -0.852; the final two
+blocks reach +0.308 and +0.294 without policy-entropy or value-loss collapse.
+The five episode endpoints in the exact 100,000--140,000-frame phase average
+-18.8, compared with -20.25 for the locally reproduced current-D3 1M seed and
+-19.139 for the released D3-200M artifact's equal-weight five-seed mean. This
+is still one early seed, and the strict score window does not begin until
+350,000 frames.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
