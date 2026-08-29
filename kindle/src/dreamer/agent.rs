@@ -728,6 +728,12 @@ impl DreamerCore {
 
     /// Begin the first episode or the next episode after `is_last`.
     /// Replay and all optimizer/model state survive this recurrent reset.
+    ///
+    /// The reset observation enters replay but does not advance
+    /// `environment_step` or earn scheduler credit. Kindle's environment
+    /// budget counts executed actions; upstream D3's driver counter also
+    /// counts these action-free reset records, a small disclosed accounting
+    /// difference in episode-based environments.
     pub fn begin_episode(&mut self, observation: DinoObservation) {
         assert!(
             self.pending_action.is_none(),
@@ -844,7 +850,8 @@ impl DreamerCore {
         self.needs_reset = flags.is_last;
     }
 
-    /// Execute at most `maximum_updates` updates due under D3's train ratio.
+    /// Execute at most `maximum_updates` updates due under D3's numeric train
+    /// ratio, clocked by Kindle's executed-action environment steps.
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         let mut reports = Vec::new();
         let replay_ready =
