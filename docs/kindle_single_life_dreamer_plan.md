@@ -489,6 +489,16 @@ reconstruction loss, raw KL, replay-value loss, and policy entropy are 17.865,
 released D3 phase transition; it is neither a baseline result nor a numerical
 collapse, so the immutable run continues to the strict final score window.
 
+Before the active episode crossed to an endpoint, the exact
+160,000--180,000-frame comparators were also frozen. Released D3-200M has
+per-seed means of -18.0, -15.667, -15.0, -11.667, and -14.5, for an
+equal-weight mean of -14.967 (-15.0 across its 13 pooled endpoints). The local
+current-D3 1M seed averages -20.5 over six endpoints. Three matched random
+seeds average -20.4, -20.667, and -20.333, for an equal-seed mean of -20.467.
+The released artifact scores 0.003020 agent points per decision in this phase,
+versus 0.000583 for matched random. As above, these markers diagnose the curve
+but do not replace the strict final three-seed gate.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
