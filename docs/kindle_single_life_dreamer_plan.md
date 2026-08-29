@@ -499,6 +499,31 @@ The released artifact scores 0.003020 agent points per decision in this phase,
 versus 0.000583 for matched random. As above, these markers diagnose the curve
 but do not replace the strict final three-seed gate.
 
+The checksum-sealed 45,000-step checkpoint closes that phase at learner step
+10,979. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
+optimizer element is zero, and every one of the 95 parameter/slow-value tensors
+changed from step 40,000. Only eight scalar entries remain exact across
+12,119,311 otherwise-changing elements. Component update RMS relative to
+parameter RMS is 3.32% for continuation, 3.90% for dynamics, 4.47% for the
+actor, 4.92% for the decoder, 6.41% for representation, 8.31% for reward,
+11.27% for value and its replay copy, and 11.27% for slow value. Both actor
+moments retain complete input/channel coverage, and the replay critic remains
+bit-identical to the behavior critic.
+
+Over steps 40,001--45,000, reward per 1,000-decision block is -10, -4, -12,
+-8, and -4. The exact 160,000--180,000-frame endpoints score -17 and -19 over
+2,984 and 1,779 decisions, for means of -18.0 and 2,381.5 decisions. That
+matches released D3 seed zero, trails its five-seed -14.967 mean, and remains
+ahead of local current-D3 1M at -20.5 and matched random at -20.467. Kindle
+scores six points in 4,763 decisions (0.001260 per decision), 2.16 times the
+matched-random rate and 41.7% of the released D3 phase rate. Effective actions
+remain balanced at 43.3% `RIGHT`, 41.6% `LEFT`, and 1.185 entropy. Across the
+checkpoint interval, count-weighted positive- and negative-reward predictions
+are +0.537 and -0.865; final-1,000 reconstruction loss, raw KL, replay-value
+loss, and policy entropy are 16.784, 2.346, 1.587, and 0.424. The curve is
+healthy and above random but has not reproduced the released D3 phase
+transition, so the uninterrupted run continues.
+
 Before Kindle crossed 180,000 frames, the exact 180,000--200,000-frame
 comparators were frozen as well. Released D3-200M has per-seed means of
 -16.25, -14.333, -12.5, -9.0, and -15.0, for an equal-weight mean of -13.417
