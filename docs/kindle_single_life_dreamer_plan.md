@@ -578,6 +578,14 @@ roughly 2.3 GB. The current backend also trains in f32 rather than bfloat16.
 Both are explicit resource accommodations to revisit with packed/f16 replay
 and backend profiling.
 
+The immutable Atari campaign also uses reconstruction scale 0.25 instead of
+D3's 1.0. Kindle reconstructs a 7x7x64 DINO feature map rather than a 64x64x3
+pixel image, so the raw event-summed loss has a different scale. The coefficient
+was selected before the campaign from the controlled Phase 0 integration
+result below. All remaining loss scales retain their D3 values. This is a
+declared calibration of the representation interface, not a result-conditioned
+change to the active curve.
+
 World and behavior parameters live in separate optimizer sessions because their
 static graphs execute in stages. Targets are formed before either update, the
 replay-value representation gradient is retained, and D3's adaptive clipping is
