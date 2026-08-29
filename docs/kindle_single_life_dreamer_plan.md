@@ -408,6 +408,28 @@ two 100-update blocks, while negative rewards remain near -0.8. These are
 learning-health markers from one early seed, not a benchmark result; the
 uninterrupted run continues toward the strict three-seed 400,000-frame gate.
 
+The checksum-sealed 30,000-step checkpoint is at learner step 7,229 and
+repeats the full audit. All 241 stored tensors are finite, all 20,824,610 Adam
+moment elements are nonzero, and every one of the 95 parameter/slow-value
+tensors changed from step 25,000. Seven isolated scalar entries remain exact
+across 12,119,311 otherwise-changing parameters. Component update RMS relative
+to parameter RMS is 3.03% for continuation, 4.57% for dynamics, 5.28% for the
+actor, 6.54% for the decoder, 6.60% for representation, 8.21% for reward,
+8.49% for value, and 8.46% for slow value. The world graph's frozen replay
+critic is bit-identical to the behavior critic at the checkpoint.
+
+Over steps 25,001--30,000, the two completed episodes score -18 and -19 and
+average -18.5 over 2,035.5 decisions; the episode active at the 30,000-step
+boundary is excluded. Reward per 1,000-decision block is -12, -9, -6, -10,
+and -3. The count-weighted positive-reward prediction rises from +0.0437 to
+about +0.14 while negative predictions remain near -0.85. Raw policy entropy
+falls, but effective-action entropy stays near 1.0 and the 5,000-step action
+totals are balanced across right and left aliases. In the exact
+100,000--120,000-frame phase, the current two-endpoint -18.5 mean is ahead of
+the local current-D3 1M seed's -20.167 over six endpoints and the released
+D3 artifact's -19.803 five-seed mean. Two endpoints are too few for a score
+claim; these remain learning-health markers for the uninterrupted strict run.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
