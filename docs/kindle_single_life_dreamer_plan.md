@@ -215,7 +215,16 @@ reset observations into replay but counts only executed actions in its
 environment-step and frame budgets; on Pong the difference is roughly one
 logical transition per completed episode and is too small to explain a learning
 gap, but score comparisons disclose it rather than calling the counters exact
-action parity. Kindle uses ALE 0.12.1, so the wrapper
+action parity. There is also one deliberate endpoint-semantics difference.
+Pinned D3's Atari wrapper writes `is_terminal=is_last`, including at its time
+limit, despite computing a separate terminal flag. Kindle preserves
+Gymnasium's distinction: both termination and truncation end the replay return
+trace, but only a true terminal disables value bootstrapping. This difference
+does not affect the current Pong comparison: every completed endpoint in the
+immutable 12M curve through episode 29 is a true ALE termination, and none
+reaches the 100,000-emulator-frame episode cap. Final score reports retain the
+termination/truncation fields so this assumption remains auditable. Kindle
+uses ALE 0.12.1, so the wrapper
 mechanics are matched but trajectories are not byte-identical across the two
 ALE revisions. A paired fixed-action trace is pixel-identical through decision
 14 and first diverges at decision 15. Separate exact 100,000-action random
@@ -646,7 +655,7 @@ the optimization path.
 - numerical golden parity against Transformers/PyTorch;
 - categorical RSSM, balanced KL, two-hot heads, continuation, and feature
   reconstruction;
-- sequence replay and exact terminal/truncation alignment;
+- sequence replay with explicit terminal/truncation alignment;
 - posterior-start imagination, actor/value learning, slow critic, and return
   normalization;
 - held-out horizon-wise decoded-DINO prediction error against a persistence
