@@ -383,17 +383,20 @@ bounds. The production BPTT-8 default is unchanged; 12M/BPTT-64/microbatch-4 is
 now a safe capacity experiment rather than the default.
 
 The first immutable corrected capacity curve pins Kindle `ac3e4f67`,
-Meganeura `5429fcd0`, and Blade `824d55fb`. Its checksum-sealed 20,000-step
-checkpoint is at learner step 4,729. Every model tensor and all 20.8 million
-optimizer elements are finite, every optimizer moment is nonzero, all 655,360
-actor first-layer weights changed from step 15,000, and no parameter tensor is
-unchanged. Over steps 15,001--20,000, six completed Pong episodes average
--20.333 with effective six-action entropy 1.700 out of 1.792. The exact
-60,000--80,000-frame bin is therefore modestly ahead of matched random (-21.0)
-and the pinned D3 five-seed early marker (-20.80). Positive-reward calibration
-remains the measured weakness: 42 positive replay samples in the final 100
-updates average -0.0969 prediction. This is a learning-health marker, not a
-score; the uninterrupted run continues toward the strict 400,000-frame gate.
+Meganeura `5429fcd0`, and Blade `824d55fb`. Its checksum-sealed 25,000-step
+checkpoint is at learner step 5,979. Every model tensor and all 20.8 million
+optimizer elements are finite, every optimizer moment is nonzero, and every
+parameter tensor changed from step 20,000. Twelve isolated scalar entries were
+bit-identical across otherwise-changing tensors. Over steps 20,001--25,000,
+three completed Pong episodes average -19.667; the reward rate improved from
+-23.0 to -12.4 per 1,000 decisions across the last two 5,000-step intervals.
+This exact 80,000--100,000-frame phase is 1.17 points ahead of both the
+historical corrected Kindle 1M phase (-20.857) and pinned upstream D3 seed 0
+(-20.833). Positive-reward calibration also crossed zero: its count-weighted
+prediction is +0.0176 and +0.0339 in the final two 100-update blocks, while
+negative rewards remain near -0.8. These are learning-health markers from one
+early seed, not a benchmark result; the uninterrupted run continues toward the
+strict three-seed 400,000-frame gate.
 
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
