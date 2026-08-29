@@ -462,6 +462,33 @@ endpoints. Three matched published-protocol random seeds have means of
 diagnostic phase markers rather than acceptance gates; the strict Kindle
 result remains the equal-weight three-seed mean over 350,000--400,000 frames.
 
+The checksum-sealed 40,000-step checkpoint closes that phase at learner step
+9,729. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
+optimizer element is zero, and every one of the 95 parameter/slow-value tensors
+changed from step 35,000. Only 14 scalar entries remain exact across
+12,119,311 otherwise-changing elements. Component update RMS relative to
+parameter RMS is 3.18% for continuation, 4.02% for dynamics, 5.37% for the
+decoder, 5.55% for the actor, 6.52% for representation, 8.06% for slow value,
+8.23% for value, and 8.27% for reward. Both actor moments still cover every
+deterministic input, categorical input, and hidden channel, and the world
+graph's replay critic remains bit-identical to the behavior critic.
+
+Over steps 35,001--40,000, reward per 1,000-decision block is -12, -7, -9,
+-5, and -6. The exact 140,000--160,000-frame endpoints score -20 and -18 over
+1,817 and 2,395 decisions, for means of -19.0 and 2,106 decisions. That is
+slightly behind released D3 seed zero's -18.667 and well behind its five-seed
+-15.133 mean, while remaining ahead of local current-D3 1M at -21.0 and the
+three-seed random mean at -20.811. Kindle scores four points in 4,212 decisions
+(0.000950 per decision), 4.57 times the matched-random rate but only 31.7% of
+the released D3 phase rate. Its effective actions remain balanced at 45.1%
+`RIGHT`, 39.8% `LEFT`, and 1.183 entropy. Count-weighted positive- and
+negative-reward predictions are +0.428 and -0.856 across the checkpoint
+interval and +0.474 and -0.862 in its final 1,000 decisions. Final-1,000
+reconstruction loss, raw KL, replay-value loss, and policy entropy are 17.865,
+2.359, 1.500, and 0.472. This is genuine above-random learning without the
+released D3 phase transition; it is neither a baseline result nor a numerical
+collapse, so the immutable run continues to the strict final score window.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
