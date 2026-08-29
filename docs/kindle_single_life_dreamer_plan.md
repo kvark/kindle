@@ -390,13 +390,14 @@ parameter tensor changed from step 20,000. Twelve isolated scalar entries were
 bit-identical across otherwise-changing tensors. Over steps 20,001--25,000,
 three completed Pong episodes average -19.667; the reward rate improved from
 -23.0 to -12.4 per 1,000 decisions across the last two 5,000-step intervals.
-This exact 80,000--100,000-frame phase is 1.17 points ahead of both the
-historical corrected Kindle 1M phase (-20.857) and pinned upstream D3 seed 0
-(-20.833). Positive-reward calibration also crossed zero: its count-weighted
-prediction is +0.0176 and +0.0339 in the final two 100-update blocks, while
-negative rewards remain near -0.8. These are learning-health markers from one
-early seed, not a benchmark result; the uninterrupted run continues toward the
-strict three-seed 400,000-frame gate.
+The historical corrected Kindle 1M/BPTT-8 phase is -20.857, the released
+D3-200M artifact's seed 0 is -20.833, and the locally reproduced current-D3
+1M seed 0 is -20.2 in the same frame window. The current phase is ahead of all
+three, but contains only three episodes. Positive-reward calibration also
+crossed zero: its count-weighted prediction is +0.0176 and +0.0339 in the final
+two 100-update blocks, while negative rewards remain near -0.8. These are
+learning-health markers from one early seed, not a benchmark result; the
+uninterrupted run continues toward the strict three-seed 400,000-frame gate.
 
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
