@@ -382,6 +382,19 @@ all-parameter parity test remains within the documented f32 reduction-order
 bounds. The production BPTT-8 default is unchanged; 12M/BPTT-64/microbatch-4 is
 now a safe capacity experiment rather than the default.
 
+The first immutable corrected capacity curve pins Kindle `ac3e4f67`,
+Meganeura `5429fcd0`, and Blade `824d55fb`. Its checksum-sealed 20,000-step
+checkpoint is at learner step 4,729. Every model tensor and all 20.8 million
+optimizer elements are finite, every optimizer moment is nonzero, all 655,360
+actor first-layer weights changed from step 15,000, and no parameter tensor is
+unchanged. Over steps 15,001--20,000, six completed Pong episodes average
+-20.333 with effective six-action entropy 1.700 out of 1.792. The exact
+60,000--80,000-frame bin is therefore modestly ahead of matched random (-21.0)
+and the pinned D3 five-seed early marker (-20.80). Positive-reward calibration
+remains the measured weakness: 42 positive replay samples in the final 100
+updates average -0.0969 prediction. This is a learning-health marker, not a
+score; the uninterrupted run continues toward the strict 400,000-frame gate.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
