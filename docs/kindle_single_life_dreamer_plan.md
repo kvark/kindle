@@ -186,6 +186,18 @@ difference. The encoder and decoder allocations differ, but overall learned
 capacity is matched to within one percent rather than merely belonging to the
 same width preset.
 
+The discrete actor has one source-provenance wrinkle. The April 2024 code that
+accompanies the released Atari curves used `actor_dist_disc: onehot`; that
+output path applied the configured 1% uniform mixture. Revision `e3f02248`
+instead uses `policy_dist_disc: categorical`, whose categorical-head path does
+not forward its configured `unimix` value, so the same 1% setting is inert for
+discrete Atari actions in the current executable reference. Kindle deliberately
+applies the 1% mixture. It therefore matches the released-result-era behavior
+and the stated D3 configuration, but not this detail of the newer rewrite.
+The immutable 12M campaign keeps that predeclared setting. If it misses the
+score gate, zero actor unimix is a narrowly defined executable-pin comparator;
+it is not a reason to alter or relabel the active runs.
+
 The upstream control's initial isolated Python 3.11 environment used the
 requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only smoke
 completed 1,200 Pong driver transitions and more than 100 finite learner
