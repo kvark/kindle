@@ -499,6 +499,16 @@ The released artifact scores 0.003020 agent points per decision in this phase,
 versus 0.000583 for matched random. As above, these markers diagnose the curve
 but do not replace the strict final three-seed gate.
 
+Before Kindle crossed 180,000 frames, the exact 180,000--200,000-frame
+comparators were frozen as well. Released D3-200M has per-seed means of
+-16.25, -14.333, -12.5, -9.0, and -15.0, for an equal-weight mean of -13.417
+(-13.923 across its 13 pooled endpoints). The local current-D3 1M seed
+averages -20.833 over six endpoints. Three matched random seeds average -20.0,
+-20.6, and -20.6, for both an equal-seed and pooled mean of -20.4. The released
+artifact scores 0.003541 agent points per decision in this phase, versus
+0.000636 for matched random. These remain diagnostic phase markers; no Kindle
+endpoint from this phase was inspected before fixing them.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
