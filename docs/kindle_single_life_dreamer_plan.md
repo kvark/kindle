@@ -452,6 +452,16 @@ The five episode endpoints in the exact 100,000--140,000-frame phase average
 is still one early seed, and the strict score window does not begin until
 350,000 frames.
 
+Before the current curve produced an episode endpoint in the next phase, the
+exact 140,000--160,000-frame comparators were frozen. The released D3-200M
+artifact has per-seed means of -18.667, -14.0, -16.0, -12.5, and -14.5, for an
+equal-weight five-seed mean of -15.133 (-15.385 when its 13 endpoints are
+pooled). The locally reproduced current-D3 1M seed scores -21.0 over six
+endpoints. Three matched published-protocol random seeds have means of
+-20.833, -21.0, and -20.6, for an equal-seed mean of -20.811. These are
+diagnostic phase markers rather than acceptance gates; the strict Kindle
+result remains the equal-weight three-seed mean over 350,000--400,000 frames.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
