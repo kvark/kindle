@@ -161,3 +161,50 @@ def test_rejects_non_integer_window_bounds(tmp_path) -> None:
 
     with pytest.raises(AtariTrainingError, match="window steps must be integers"):
         summarize_training_window(path, start_step=0.5, end_step=1_000)
+
+
+def test_reward_prediction_means_are_weighted_by_sample_count(tmp_path) -> None:
+    path = tmp_path / "reward-calibration.jsonl"
+    counts = [0] * 18
+    counts[0] = 1_000
+    first = learner(250, 1, 10)
+    first["report"]["world"].update(
+        positive_reward_prediction_mean=-0.5,
+        positive_reward_count=1,
+        zero_reward_prediction_mean=-0.01,
+        zero_reward_count=999,
+        negative_reward_prediction_mean=-0.8,
+        negative_reward_count=24,
+        rewarded_prediction_mean=-0.75,
+        rewarded_count=25,
+    )
+    second = learner(750, 2, 10)
+    second["report"]["world"].update(
+        positive_reward_prediction_mean=0.25,
+        positive_reward_count=3,
+        zero_reward_prediction_mean=-0.02,
+        zero_reward_count=997,
+        negative_reward_prediction_mean=-0.9,
+        negative_reward_count=21,
+        rewarded_prediction_mean=-0.75,
+        rewarded_count=24,
+    )
+    write_events(
+        path,
+        [run_start(), first, second, interval(1_000, counts, updates=2)],
+    )
+
+    predictions = summarize_training_window(path)["learner"]["reward_predictions"]
+    assert predictions["positive"] == {
+        "reports": 2,
+        "sampled_update_groups": 2,
+        "prediction_above_zero_groups": 1,
+        "sample_count": 4,
+        "count_weighted_mean": pytest.approx(0.0625),
+    }
+    assert predictions["negative"]["sample_count"] == 45
+    assert predictions["negative"]["count_weighted_mean"] == pytest.approx(
+        -0.8466666667
+    )
+    assert predictions["zero"]["sample_count"] == 1_996
+    assert predictions["rewarded"]["sample_count"] == 49

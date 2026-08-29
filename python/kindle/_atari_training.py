@@ -186,6 +186,23 @@ def summarize_training_window(
     last_learner_step = None
     metric_sums: defaultdict[str, float] = defaultdict(float)
     metric_counts: defaultdict[str, int] = defaultdict(int)
+    reward_prediction_fields = {
+        "positive": (
+            "positive_reward_prediction_mean",
+            "positive_reward_count",
+        ),
+        "zero": ("zero_reward_prediction_mean", "zero_reward_count"),
+        "negative": (
+            "negative_reward_prediction_mean",
+            "negative_reward_count",
+        ),
+        "rewarded": ("rewarded_prediction_mean", "rewarded_count"),
+    }
+    reward_prediction_reports: defaultdict[str, int] = defaultdict(int)
+    reward_prediction_groups: defaultdict[str, int] = defaultdict(int)
+    reward_prediction_positive_groups: defaultdict[str, int] = defaultdict(int)
+    reward_prediction_samples: defaultdict[str, int] = defaultdict(int)
+    reward_prediction_weighted_sums: defaultdict[str, float] = defaultdict(float)
 
     for line_number, event in _events(path):
         event_type = event.get("event")
@@ -233,6 +250,28 @@ def summarize_training_window(
                 for name, value in _numeric_leaves(report):
                     metric_sums[name] += value
                     metric_counts[name] += 1
+                world = report.get("world")
+                if isinstance(world, dict):
+                    for label, (mean_field, count_field) in (
+                        reward_prediction_fields.items()
+                    ):
+                        prediction = _finite_number(world.get(mean_field))
+                        raw_count = _finite_number(world.get(count_field))
+                        if prediction is None or raw_count is None:
+                            continue
+                        if raw_count < 0 or not raw_count.is_integer():
+                            raise AtariTrainingError(
+                                f"{path}:{line_number}: {count_field} must be a "
+                                "non-negative integer"
+                            )
+                        count = int(raw_count)
+                        reward_prediction_reports[label] += 1
+                        reward_prediction_samples[label] += count
+                        reward_prediction_weighted_sums[label] += prediction * count
+                        if count:
+                            reward_prediction_groups[label] += 1
+                            if prediction > 0:
+                                reward_prediction_positive_groups[label] += 1
 
     intervals.sort()
     cursor = start_step
@@ -261,6 +300,22 @@ def summarize_training_window(
     metric_means = {
         name: metric_sums[name] / metric_counts[name]
         for name in sorted(metric_sums)
+    }
+    reward_predictions = {
+        label: {
+            "reports": reward_prediction_reports[label],
+            "sampled_update_groups": reward_prediction_groups[label],
+            "prediction_above_zero_groups": reward_prediction_positive_groups[label],
+            "sample_count": reward_prediction_samples[label],
+            "count_weighted_mean": (
+                reward_prediction_weighted_sums[label]
+                / reward_prediction_samples[label]
+                if reward_prediction_samples[label]
+                else None
+            ),
+        }
+        for label in reward_prediction_fields
+        if reward_prediction_reports[label]
     }
     action_entropy = _entropy(action_counts)
     effective_actions = _effective_actions(
@@ -318,5 +373,6 @@ def summarize_training_window(
             "first_step": first_learner_step,
             "last_step": last_learner_step,
             "metric_means": metric_means,
+            "reward_predictions": reward_predictions,
         },
     }
