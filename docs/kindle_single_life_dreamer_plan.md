@@ -820,6 +820,43 @@ it is outside the frozen 350,000--400,000-frame acceptance window and is only
 one endpoint from one seed. The immutable run therefore continues toward the
 strict three-seed score.
 
+The checksum-sealed 90,000-step checkpoint closes the 340,000--360,000-frame
+phase at learner step 22,229. All four archive hashes verify, and its metadata
+retains the dependency revisions, seed zero, and exact campaign configuration;
+the campaign provenance separately seals the Kindle source revision. All 241
+stored tensors and all 20,824,610 Adam elements are finite, every Adam element
+is nonzero, and all 95 parameter/slow-value tensors changed from step 85,000.
+Only 11 scalar entries remain exact across 12,119,311 otherwise-changing
+parameters. Component update RMS relative to the current parameter RMS is
+2.98% for the actor, 3.01% for the decoder, 3.26% for continuation, 3.41% for
+dynamics, 4.84% for representation, 6.05% for reward, 7.30% for slow value,
+and 7.25% for value and its replay copy. All 655,360 actor first-layer weights
+changed, with 0.001342 delta RMS; both corresponding Adam moments retain
+complete nonzero coverage. The replay critic remains bit-identical to the
+behavior critic.
+
+Over steps 85,001--90,000, reward per 1,000-decision block is -3, -2, 0, -1,
+and +1. The exact 340,000--360,000-frame diagnostic phase has one completed
+endpoint: -14 over 3,688 decisions at frame 340,248. The episode active at the
+360,000-frame boundary is excluded from this phase; because it was also active
+when the frozen score window opened at frame 350,000, its eventual endpoint
+will be the first strict-window observation if it occurs by frame 400,000.
+Kindle trails released D3's
+equal-seed -6.000 mean by 8.000 points and its pooled -6.444 mean by 7.556,
+while exceeding local current-D3 1M at -20.200 by 6.200 points and matched
+random's equal-seed -20.711 mean by 6.711. Its seven agent points give a
+0.001898 point rate, 5.75 times matched random and 40.6% of released D3 in this
+phase. Effective control counts are 9, 250, 1,556, 2,237, 784, and 164 for
+`NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively;
+`RIGHT` and `LEFT` account for 31.12% and 44.74% with 1.287 entropy. Across the
+final 1,000 decisions, reconstruction loss, raw KL, replay-value loss, and
+policy entropy average 13.331, 2.439, 2.053, and 0.344; count-weighted
+positive- and negative-reward predictions are +0.844 and -0.919. This phase
+remains above both controls but below the released curve. No episode endpoint
+occurs in the strict 350,000--360,000-frame subwindow, so the acceptance score
+remains unobserved rather than provisionally inferred from interval rewards.
+The immutable run therefore continues toward the strict three-seed score.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
