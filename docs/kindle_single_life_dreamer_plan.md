@@ -624,8 +624,9 @@ early single-seed diagnostic rather than the strict baseline result.
 
 The checksum-sealed 60,000-step checkpoint closes the 220,000--240,000-frame
 phase at learner step 14,729. All four archive hashes verify and its metadata
-retains the sealed source, DreamerV3, Meganeura, Blade, DINOv3, and model
-revisions and exact campaign configuration. All 241 stored tensors and all
+retains the exact DreamerV3, Meganeura, Blade, DINOv3, model, and campaign
+configuration revisions; the campaign provenance separately seals the Kindle
+source revision. All 241 stored tensors and all
 20,824,610 Adam elements are finite, every Adam element is nonzero, and all 95
 parameter/slow-value tensors changed from step 55,000. Only nine scalar entries
 remain exact across 12,119,311 otherwise-changing parameters. Component update
@@ -655,8 +656,9 @@ The immutable run therefore continues toward the strict three-seed score.
 
 The checksum-sealed 65,000-step checkpoint closes the 240,000--260,000-frame
 phase at learner step 15,979. All four archive hashes verify, and its metadata
-retains the sealed source and dependency revisions, seed zero, and exact
-campaign configuration. All 241 stored tensors and all 20,824,610 Adam
+retains the dependency revisions, seed zero, and exact campaign configuration;
+the campaign provenance separately seals the Kindle source revision. All 241
+stored tensors and all 20,824,610 Adam
 elements are finite, every Adam element is nonzero, and all 95
 parameter/slow-value tensors changed from step 60,000. Only 12 scalar entries
 remain exact across 12,119,311 otherwise-changing parameters. Component update
@@ -686,8 +688,9 @@ immutable run continues toward the strict three-seed score.
 
 The checksum-sealed 70,000-step checkpoint closes the 260,000--280,000-frame
 phase at learner step 17,229. All four archive hashes verify, and its metadata
-retains the sealed source and dependency revisions, seed zero, and exact
-campaign configuration. All 241 stored tensors and all 20,824,610 Adam
+retains the dependency revisions, seed zero, and exact campaign configuration;
+the campaign provenance separately seals the Kindle source revision. All 241
+stored tensors and all 20,824,610 Adam
 elements are finite, every Adam element is nonzero, and all 95
 parameter/slow-value tensors changed from step 65,000. Only seven scalar entries
 remain exact across 12,119,311 otherwise-changing parameters. Component update
@@ -718,8 +721,9 @@ strict three-seed score.
 
 The checksum-sealed 75,000-step checkpoint closes the 280,000--300,000-frame
 phase at learner step 18,479. All four archive hashes verify, and its metadata
-retains the sealed source and dependency revisions, seed zero, and exact
-campaign configuration. All 241 stored tensors and all 20,824,610 Adam
+retains the dependency revisions, seed zero, and exact campaign configuration;
+the campaign provenance separately seals the Kindle source revision. All 241
+stored tensors and all 20,824,610 Adam
 elements are finite, every Adam element is nonzero, and all 95
 parameter/slow-value tensors changed from step 70,000. Only six scalar entries
 remain exact across 12,119,311 otherwise-changing parameters. Component update
