@@ -546,6 +546,33 @@ artifact scores 0.003541 agent points per decision in this phase, versus
 0.000636 for matched random. These remain diagnostic phase markers; no Kindle
 endpoint from this phase was inspected before fixing them.
 
+The checksum-sealed 50,000-step checkpoint closes that phase at learner step
+12,229. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
+optimizer element is zero, and every one of the 95 parameter/slow-value tensors
+changed from step 45,000. Only 12 scalar entries remain exact across
+12,119,311 otherwise-changing parameters. Component update RMS relative to
+parameter RMS is 3.15% for continuation, 3.80% for dynamics, 4.05% for the
+actor, 4.46% for the decoder, 6.27% for representation, 8.89% for reward,
+10.22% for value and its replay copy, and 10.25% for slow value. Both actor
+moments retain complete deterministic, categorical, and hidden-channel
+coverage, and the replay critic remains bit-identical to the behavior critic.
+
+Over steps 45,001--50,000, reward per 1,000-decision block is 0, -7, -1, -3,
+and -7. The exact 180,000--200,000-frame phase has one completed endpoint: -13
+over 3,391 decisions at frame 187,212. The episode still active at the 200,000-
+frame boundary is excluded by the frozen endpoint rule. That one endpoint is
+numerically above released D3 seed zero's -16.25, its five-seed -13.417 mean,
+local current-D3 1M at -20.833, and matched random at -20.4, but one episode is
+not a baseline result. Its eight agent points give 0.002359 points per decision,
+3.71 times the matched-random rate and 66.6% of the released D3 phase rate.
+Effective actions remain balanced at 43.52% `RIGHT`, 42.74% `LEFT`, and 1.156
+entropy. Count-weighted positive- and negative-reward predictions are +0.579
+and -0.871 across the final 1,000 decisions; reconstruction loss, raw KL,
+replay-value loss, and policy entropy average 16.313, 2.365, 1.658, and 0.361.
+This is the first phase in which Kindle reaches the released curve's diagnostic
+return level, while its lower point rate and single endpoint keep the evidence
+provisional. The immutable run continues toward the strict three-seed score.
+
 All later 20,000-frame diagnostic windows were frozen at the same time, before
 Kindle entered the first one. Parentheses in the aggregate columns give the
 pooled endpoint mean and endpoint count; point rates pool completed-episode
