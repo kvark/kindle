@@ -857,6 +857,19 @@ occurs in the strict 350,000--360,000-frame subwindow, so the acceptance score
 remains unobserved rather than provisionally inferred from interval rewards.
 The immutable run therefore continues toward the strict three-seed score.
 
+After the 90,000-step checkpoint, episode 47 ends at frame 363,460 with return
+-5 over 5,803 decisions. This is seed zero's first endpoint inside the frozen
+350,000--400,000-frame window; the partial endpoint mean is therefore -5.000.
+The episode began before the score boundary, but the predeclared endpoint rule
+intentionally includes its complete return. It trails released D3's
+360,000--380,000-frame equal-seed -4.100 mean by 0.900 points and its pooled
+-4.714 mean by 0.286, while exceeding local current-D3 1M at -20.000 by
+15.000 points and matched random's equal-seed -20.433 mean by 15.433. Its 16
+agent points give a 0.002757 point rate, 4.59 times matched random and 54.5% of
+released D3 in that phase. The endpoint numerically clears the eventual -10
+gate, but the seed-zero window is incomplete and two independent seeds have
+not yet run, so this is partial evidence rather than an accepted score.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
