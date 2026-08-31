@@ -903,6 +903,18 @@ predictions are +0.835 and -0.915. The strict seed-zero endpoint mean remains
 complete and two independent seeds remain. The immutable run therefore
 continues toward the strict three-seed score.
 
+After the 95,000-step checkpoint, episode 48 ends at frame 382,856 with return
+-3 over 4,849 decisions. This is seed zero's second endpoint inside the frozen
+score window and raises its partial strict mean to -4.000. In the exact
+380,000--400,000-frame phase, the endpoint exceeds released D3's equal-seed
+-4.900 mean by 1.900 points and its pooled -4.625 mean by 1.625, while
+exceeding local current-D3 1M at -21.000 by 18.000 points and matched random's
+equal-seed -20.689 mean by 17.689. Its 18 agent points give a 0.003712 point
+rate, 10.64 times matched random and 74.2% of released D3 in this phase. The
+two-endpoint mean clears the numeric gate provisionally, but the seed-zero
+window is still incomplete and two independent seeds remain, so it is not yet
+an accepted baseline result.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
