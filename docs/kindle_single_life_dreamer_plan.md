@@ -915,6 +915,52 @@ two-endpoint mean clears the numeric gate provisionally, but the seed-zero
 window is still incomplete and two independent seeds remain, so it is not yet
 an accepted baseline result.
 
+The checksum-sealed 100,000-step checkpoint closes the run at exactly 400,000
+frames and learner step 24,729. All four archive hashes verify, completing the
+20-checkpoint series, and the final metadata retains the exact dependency,
+model, seed, and campaign identity. All 241 stored tensors and all 20,824,610
+Adam elements are finite, every Adam element is nonzero, and all 95
+parameter/slow-value tensors changed from step 95,000. Only five scalar entries
+remain exact across 12,119,311 otherwise-changing parameters. Component update
+RMS relative to the final parameter RMS is 2.69% for the actor, 2.86% for the
+decoder, 3.61% for continuation, 3.54% for dynamics, 4.31% for representation,
+4.50% for reward, 7.98% for slow value, and 7.85% for value and its replay copy.
+All 655,360 actor first-layer weights changed, with 0.001252 delta RMS; both
+corresponding Adam moments retain complete nonzero coverage. The replay critic
+remains bit-identical to the behavior critic.
+
+Over steps 95,001--100,000, reward per 1,000-decision block is +2, -1, -2, -1,
+and +4. Effective control counts are 6, 329, 1,892, 2,164, 427, and 182 for
+`NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively;
+`RIGHT` and `LEFT` account for 37.84% and 43.28% with 1.248 entropy. Across the
+final 1,000 decisions, reconstruction loss, raw KL, replay-value loss, and
+policy entropy average 12.800, 2.406, 2.164, and 0.319; count-weighted positive-
+and negative-reward predictions are +0.857 and -0.926. The run ends with a
+partial episode at return +2 after 4,286 decisions, which is correctly excluded
+by the frozen endpoint rule. The two completed strict-window endpoints remain
+-5 and -3, producing the final seed-zero score of -4.000. The strict scorer
+marks the -10 reported-12M target met by 6.000 points, the published-200M
+-4.537 reference met by 0.537, and matched random exceeded by 16.623. This is
+one fully audited independent seed, not the required equal-weight three-seed
+result; seeds one and two remain necessary.
+
+At 04:46 UTC, the monitor and campaign's transient `tmux-spawn` scopes exited
+while the separately scoped trainer continued uninterrupted through its 05:32
+`run_end`. This was an orchestration-only lifecycle failure: the trainer wrote
+the complete JSONL and stable final checkpoint, and no training segment was
+resumed or appended. Re-running the original sealed monitor after process exit
+atomically archived step 100,000, verified its hashes, and wrote a healthy
+completion record with GPU allocation returned to 2 MiB, 27.4 GiB host memory
+available, and zero blocked processes or kernel errors. The campaign then
+passed its complete seed-zero audit. Future seeds are supervised as direct
+children of the persistent linger-enabled
+`kindle-dreamer-strict-campaign.service` user service rather than tmux panes;
+the campaign manifest seals the replacement script at
+`ac3ffbb2fe662ebb3f03fdc16089f9d884bd59d9c5854e04ee2f428bd2017ea7`.
+This changes orchestration durability only, not the immutable trainer,
+monitor, model, data, or scoring protocol. Seed one started under that service
+at 05:37 UTC with the exact frozen experiment identity.
+
 The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
 unchecked oversubscription path. It remains useful evidence about how that
 driver fails, but it is no longer a recovery prerequisite or a measured
