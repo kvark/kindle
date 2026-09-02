@@ -1,7 +1,8 @@
 # Kindle: 100-Hour Game Learning Plan
 
-**Decision date:** 2026-08-23
-**Status:** baseline implemented; environment-learning validation in progress
+**Decision date:** 2026-09-01  
+**Status:** revised near-term research target  
+**Recommended repository path:** `docs/kindle_single_life_dreamer_plan.md`
 
 ## Executive decision
 
@@ -114,894 +115,33 @@ There are no parallel rollout workers.
 
 The intended systems budget is one consumer workstation:
 
-One replay observation is 7×7×64 = 3,136 floats. The seed and projection are
-part of the architecture contract, not learned parameters. The Dreamer decoder
-reconstructs this compressed DINO feature map rather than raw pixels.
-Its final per-patch hidden width is 64: the 4–16 channels inherited by smaller
-Dreamer pixel presets are appropriate before RGB output but impose an
-unnecessary affine rank limit before a 64-channel feature target.
+- one GPU for vision, world-model learning, and behavior learning;
+- actor inference at the game's chosen control rate;
+- asynchronous or interleaved learner updates;
+- no unbounded training debt.
 
 The actor must continue meeting its control deadline while learning is enabled.
 The learner may temporarily fall behind, but the backlog must not grow
 monotonically throughout the run. Environment steps, replayed sequence steps,
 imagined steps, wall-clock time, and GPU utilization are all reported.
 
-The first spatial-information gate supports keeping the compact representation.
-An independent-seed Pong probe collected 512 labeled frames per seed, trained
-linear coordinate decoders on seeds zero and one, selected regularization on
-seed two, and tested on seed three. Projected 14×14×64 patches reach 0.9890 mean
-R² across ball and paddle coordinates; the production pooled 7×7×64 features
-reach 0.9867 while using one quarter as many values. Ball-x R² changes only
-from 0.9650 to 0.9602 (3.58 to 4.03 source-pixel MAE). Raw resized pixels reach
-0.9158 mean R² and only 0.6881 on ball x under the same linear probe. Pooling is
-therefore not the evident Pong perception bottleneck, although this static
-probe does not establish temporal sufficiency or downstream control quality.
-
-A second seed-split probe tests the actual published-protocol reward frames.
-It trains on random trajectories from seeds 10 and 11, selects ridge penalties
-on seed 12, and tests on seed 13 while retaining every reward event and a fixed
-5% sample of zero-reward frames. The held-out split contains 117 negative, four
-positive, and 248 zero targets. Pooled 7×7 features reach 0.9929 reward-event
-ROC-AUC and 0.9911 negative-vs-rest ROC-AUC, compared with 0.9886 and 0.9830
-for raw resized pixels. Positive-vs-negative AUC is 0.9936 for both, although
-four positives make that estimate directional. The compact DINO input therefore
-preserves the immediate visual evidence of scoring; the 10,000-step checkpoint's
-weak 0.646 posterior reward-event ranking arises downstream of frozen vision.
-
-## 4. Baseline contract
+---
 
 ## 2. Operational definition of “learn how to play”
 
-That code pin and the released benchmark curves have different provenance.
-The Atari-100K score file was bundled at upstream commit `2411f7d1` in April
-2024; it predates the current agent/RSSM rewrite and the subsequent replay-
-context previous-action fix. The score file is still useful historical result
-evidence, but it is not an executable golden output for the May 2026 code pin.
-Implementation-parity claims below refer to `e3f02248`; final score deltas label
-the 2024 artifact separately, and the locally reproduced current-D3 curve is
-the strongest matched executable reference.
+The phrase must be converted into a game-specific metric before training begins.
 
-That local reference is prepared with the standard upstream `size1m`, seed-zero,
-100,000-step Pong run with batch 16x64, train ratio 256, full recurrent
-backpropagation, and upstream's learned 64x64 RGB encoder. A config-only overlay
-restores the released artifact's all-18-action, zero-no-op, 100,000-frame
-episode wrapper and opts into deterministic environment seeding; the upstream
-algorithm remains pinned at `e3f02248`. A CPU-only parameter initialization of
-that exact preset and 18-action space reports 688,004 trainable parameters;
-Kindle's `1M` run reports 721,888 world and 116,817 behavior parameters, or
-838,705 total. The first upstream control is therefore preset-class matched,
-not count matched: Kindle has 150,701 (21.9%) more trainable parameters. Keeping
-the standard upstream preset avoids changing the reference architecture; an
-exact-capacity control is warranted only if the result leaves capacity as a
-plausible explanation.
+### 2.1 Required baselines
 
-The capacity experiment is more closely matched than the `12M` preset label
-alone establishes. CPU-only parameter initialization of pinned D3 with
-`atari100k`, `size12m`, and the full-action published wrapper reports
-10,498,772 trainable parameters. The immutable Kindle 12M run header reports
-8,766,208 world and 1,646,097 behavior parameters, or 10,412,305 total,
-with frozen DINO excluded; the upstream count includes its learned pixel
-encoder. Kindle therefore has 86,467 fewer learned parameters, a 0.824%
-difference. The encoder and decoder allocations differ, but overall learned
-capacity is matched to within one percent rather than merely belonging to the
-same width preset.
+For the selected game, collect:
 
-The discrete actor has one source-provenance wrinkle. The April 2024 code that
-accompanies the released Atari curves used `actor_dist_disc: onehot`; that
-output path applied the configured 1% uniform mixture. Revision `e3f02248`
-instead uses `policy_dist_disc: categorical`, whose categorical-head path does
-not forward its configured `unimix` value, so the same 1% setting is inert for
-discrete Atari actions in the current executable reference. Kindle deliberately
-applies the 1% mixture. It therefore matches the released-result-era behavior
-and the stated D3 configuration, but not this detail of the newer rewrite.
-The immutable 12M campaign keeps that predeclared setting. If it misses the
-score gate, zero actor unimix is a narrowly defined executable-pin comparator;
-it is not a reason to alter or relabel the active runs.
+1. a random or uniformly exploratory policy baseline;
+2. the untrained Kindle policy at hour zero;
+3. a novice-human baseline under the same scoring protocol;
+4. optionally, a frozen Pixels2Play behavior-cloning policy as a practical upper
+   comparison, not as Kindle initialization.
 
-The upstream control's initial isolated Python 3.11 environment used the
-requested JAX/JAXlib 0.4.33 and ALE 0.9.0 versions. A bounded CPU-only smoke
-completed 1,200 Pong driver transitions and more than 100 finite learner
-updates, including replay, checkpoint, policy, train, and report graph
-compilation, with about 1.35 GiB observed process memory. That JAX wheel
-predates the host RTX 5080: the initial CUDA attempt failed before taking an
-environment step because its bundled CUDA 12.1 assembler does not support
-compute capability 12.0, and redirecting it to the host CUDA 13.1 assembler
-then exposed unsupported Blackwell code generation inside the old XLA/LLVM.
-The failed startup is preserved as environment evidence, not a result. The
-executable control therefore keeps the exact D3 source, config, Python 3.11,
-ALE 0.9.0, and all non-JAX package versions, while upgrading only JAX, JAXlib,
-and their CUDA plugin/compiler packages to 0.6.2 and NVCC 12.9.86. JAX 0.6 is
-the first release line built with CUDA 12.8; an RTX smoke initializes all
-688,004 parameters, compiles policy/train/report, saves a checkpoint, fills
-replay, and emits finite learner losses. Its exact package freeze is pinned by
-the score manifest. Upstream compares its
-driver-transition counter directly with `run.steps`; importantly, that counter
-includes the initial observation and each post-episode reset observation even
-though those transitions execute no repeated ALE action. Its logger then
-multiplies the counter by the Atari action repeat, so the smoke's final logged
-step is 4,760 near its 1,200-transition limit, and the completed
-100,000-transition run reports nominal episode steps through 400,000 frames.
-This preserves native D3 replay, scheduler, stopping, and logging semantics.
-Kindle likewise inserts
-reset observations into replay but counts only executed actions in its
-environment-step and frame budgets; on Pong the difference is roughly one
-logical transition per completed episode and is too small to explain a learning
-gap, but score comparisons disclose it rather than calling the counters exact
-action parity. There is also one deliberate endpoint-semantics difference.
-Pinned D3's Atari wrapper writes `is_terminal=is_last`, including at its time
-limit, despite computing a separate terminal flag. Kindle preserves
-Gymnasium's distinction: both termination and truncation end the replay return
-trace, but only a true terminal disables value bootstrapping. This difference
-does not affect the current Pong comparison: every completed endpoint in the
-immutable 12M curve through episode 29 is a true ALE termination, and none
-reaches the 100,000-emulator-frame episode cap. Final score reports retain the
-termination/truncation fields so this assumption remains auditable. Kindle
-uses ALE 0.12.1, so the wrapper
-mechanics are matched but trajectories are not byte-identical across the two
-ALE revisions. A paired fixed-action trace is pixel-identical through decision
-14 and first diverges at decision 15. Separate exact 100,000-action random
-controls using the same three seeded action streams score -20.374 on ALE 0.9
-versus -20.623 on Kindle's ALE 0.12 in the benchmark window, making the older
-runtime about 0.249 Pong points easier under this control. Score summaries
-therefore use runtime-specific random targets while retaining the same
-historical D3 targets. The CUDA reference curve ran only after the immutable
-Kindle BPTT-8 and BPTT-64 comparisons and their diagnostics released the RTX.
-The score CLI accepts that upstream format only when its pinned
-manifest and post-success `RUN_COMPLETE` marker are present, then routes its
-episodes through the same 350,000--400,000-frame, per-seed aggregation used for
-Kindle logs.
-
-| Area | Baseline |
-|---|---|
-| Replay | Fresh non-overlapping sequences FIFO before uniform fallback, 100k-frame capacity, batch 16, length 64, one context frame, 1,024 valid-sequence warmup |
-| World BPTT | 8-step truncated chunks, gradient-averaged over the full length-64 batch |
-| World microbatch | Full effective batch by default; optional equal row partitions are gradient-averaged before the same single optimizer update |
-| Train ratio | 32 replayed samples per real environment step by default; 256 for Atari-100K |
-| State | Block-recurrent deterministic state plus 32 categorical variables |
-| Categorical support | Preset-dependent classes, 1% uniform mixture |
-| World losses | Feature reconstruction, reward, continuation, dynamics KL, representation KL |
-| KL | Dynamics scale 1.0, representation scale 0.1, 1 free nat |
-| Reward/value | 255-bin symmetric exponentially spaced two-hot distributions |
-| Imagination | 15 steps from every posterior sequence state |
-| Actor | Categorical REINFORCE, 1% uniform mixture, entropy scale 3e-4 |
-| Critic | Imagined lambda returns plus replay-value loss and slow-value regularization |
-| Discount | Learned continuation including horizon discount, horizon 333 |
-| Lambda | 0.95 |
-| Slow value | EMA rate 0.02 |
-| Return scale | 5th/95th percentile EMA, rate 0.01, minimum scale 1 |
-| Optimizer | Parameter-leaf AGC 0.3, RMS normalization, momentum, 4e-5, 1,000-step warmup |
-| Initialization | Truncated fan-in normal; zero reward/value outputs; actor output scale 0.01 |
-
-Meganeura implements DreamerV3's optimizer chain directly: parameter-leaf
-adaptive gradient clipping at 0.3, RMS normalization, then momentum. This is
-the exact convention at the pinned D3 source: `Agent._make_opt()` calls its
-own `embodied.jax.opt.clip_by_agc()`, which flattens each parameter leaf before
-computing the parameter and update norms. It does not call Optax's separate
-rank-dependent unit-wise AGC helper. Meganeura also compiles a statically
-unrolled recurrent graph. The production baseline uses 8-step truncated BPTT,
-accumulates and averages gradients across all eight chunks, and retains the
-full 64-step replay sample and all posterior imagination starts. The chunk
-length remains configurable for targeted scaling checks. This is an
-implementation accommodation, not a claimed D3-equivalent gradient path.
-
-A fresh 1M/BPTT-16 check now narrows that accommodation further. The doubled
-graph constructs successfully in 4.70 seconds, but its first learner update
-panics in Blade with `descriptor pool count overflow` after peaking at only
-518 MiB host memory. Blade's current upstream head is the revision pinned here.
-Its Vulkan allocator grows descriptor-set pools from 65,536 directly to
-1,048,576 sets, at which point the conservative inline-uniform byte budget
-overflows `u32`. An isolated Blade build that doubles sub-pool capacity instead
-completes the identical 1,120-step trajectory and all nine scheduled BPTT-16
-learner updates with finite metrics, peaking at 517 MiB. This proves the current
-limit is descriptor-pool bookkeeping rather than model-memory pressure.
-
-The same isolated allocator fix now makes the full D3-equivalent 64-step 1M
-graph practical too. It constructs in 97.7 seconds with 1.93 GiB peak host
-memory and no swap. The corresponding 1,120-step Atari canary completes in
-2:58 wall time, including construction, and executes all nine scheduled learner
-updates with finite metrics. The measured run phase is 82.0 seconds and reports
-0.110 learner updates/s including replay prefill, essentially the same short-run
-rate as the patched BPTT-16 canary. Thus full recurrence is a viable controlled
-1M follow-up. The allocator correction is now merged and reproducibly pinned by
-Meganeura `e67ced75` to Blade `ae0f7ad1`. The already queued BPTT-64 curve stays
-immutable on its pre-merge Kindle worktree (`7d5f0179`, local diff SHA-256
-`a3b0da454e7483f2abf9d0eaff44ee33f3ad947293670857665bbec2e8617c8b`)
-and allocator worktree (`95f5004f`, local diff SHA-256
-`86a6f18432b80f469678f55a02d2b3b3dbb0e929d5246463c73995f01a46d14a`).
-A source-tree comparison finds that its Kindle learner differs from the pinned
-branch only by later read-only diagnostic sessions and revision constants; its
-runner and extension are additionally guarded by SHA-256 hashes
-`0680de555b4418fdd4a24ca7e8563fadb33070ca6a01330fa48ea11d50381b82`
-and `22c8435fcff2c642fa8fcbc7e8bb9bcee8e50639616ad15a649f18d091c67f6b`.
-The production BPTT-8 default remains unchanged. The immutable BPTT-64
-seed-zero curve completed all 100,000 interactions and 24,729 learner updates;
-its five strict score-window endpoints are -18, -18, -18, -19, and -16, for a
--17.8 mean. That improves on the matched recovered BPTT-8 result of -18.9 but
-remains below the reported 12M D3 result of -10. The uninterrupted seed-one
-replication also completed all 100,000 interactions and 24,729 updates. Its
-eight strict-window endpoints are -18, -18, -17, -19, -19, -20, -19, and -17,
-for -18.375. The two-seed mean is -18.0875: full recurrence replicates its
-improvement over random, but the 1M preset still misses the 12M target. This
-supports testing capacity rather than changing the vision or action interface.
-
-The prefill-amortized canary rate is not a useful long-run estimate. Its first
-update arrives at 67.70 seconds after 1,086 interactions; the next eight updates
-are spaced by 1.772 seconds on average, or 0.564 scheduled updates/s. BPTT-16 is
-nearly identical at 1.741 seconds/update, while the completed BPTT-8 curve
-averages 2.247 seconds/update from 80,000 onward because each logical update
-submits and waits on eight chunk graphs. The completed seed-zero RTX curve
-supplies the authoritative sustained measurement: after 95.2 seconds of graph
-construction,
-the run phase took 53,409 seconds for 100,000 interactions and 24,729 learner
-updates, or 0.463 updates/s including replay prefill. The seed-one replication
-used the same immutable contract and completed in 54,113 seconds at 0.457
-updates/s.
-
-The conditional action-alias fallback is validated on that same graph path. A
-six-action `published-minimal` 1M/BPTT-64 canary constructs in 96.4 seconds,
-peaks at 1.88 GiB, and completes the identical 1,120 interactions and nine
-finite learner updates. Its measured run phase is 82.0 seconds at 0.1097
-updates/s. Reducing the action vocabulary therefore introduces no new backend,
-memory, or throughput risk. The completed full-action result and its
-post-curve diagnostics do not identify action aliases as the current
-bottleneck, so the six-action variant remains a diagnostic rather than the
-next experiment.
-
-The 12M full-recurrence failure was a stack memory bug, not a requirement for
-routine host cleanup or reboot. At the failing revisions, the BPTT-64,
-effective-batch-16, microbatch-4 world plan contained 40.214 GB of logical
-buffers and requested 21.92 GB for physical buffers and Adam state from a GPU
-reporting a 16.58 GB budget. Meganeura did not reject the impossible plan.
-Vulkan therefore oversubscribed host-visible mappings; on the RTX 5080 the
-NVIDIA kernel retained about 12.7 GB after the process failed. A freshly booted
-machine became unhealthy because one training launch created the bad state.
-
-The corrected stack fixes each material source rather than relying on a launch
-ritual:
-
-- Meganeura checks planned session, optimizer, and lazy gradient-accumulator
-  bytes against 90% of the reported device budget before allocating;
-- 15,045 bit-identical recurrent zero, one, and scale constants share immutable
-  allocations, removing 6.720 GB;
-- 15,302 compiler-eliminated logical buffers share one 8.4 MB placeholder
-  instead of consuming 3.884 GB;
-- Meganeura marks its same-lifetime device-buffer batches for Blade's free-list
-  allocator, avoiding about 2.3 GB of buddy-allocator power-of-two rounding;
-- Blade explicitly cleans cached free-list blocks when the GPU context drops.
-
-The exact previously failing geometry now maps 107,314 logical buffers to
-11,258 physical allocations totaling 11.252 GB. The complete Dreamer core uses
-13.631 GB on the RTX 5080. A synthetic replay canary executes one full world and
-behavior optimizer update in 7.46 seconds with finite losses; process RSS peaks
-at 1.24 GiB without swap. Dropping a core leaves a bounded 135.4 MB free-list
-cache that remains identical across three same-context 12M/BPTT-4 construction
-cycles.
-Dropping the context releases it, after which `nvidia-smi` reports 2 MiB and the
-host again has 27 GiB available. No RAM clearing, module reload, or reboot is
-part of normal training startup or teardown.
-Long runs and GPU diagnostics serialize ownership with the repository-wide
-`target/gpu-training.lock`. Reference D3/JAX audits remain CPU-only while a
-Vulkan trainer owns that lock; probing the same NVIDIA device through CUDA/UVM
-concurrently is not a valid health check and can itself trigger kernel mapping
-failures. The optional regression command acquires the same lock:
-
-```sh
-common_git_dir=$(git rev-parse --path-format=absolute --git-common-dir)
-gpu_lock=$(dirname "$common_git_dir")/target/gpu-training.lock
-flock -n "$gpu_lock" \
-  cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn
-```
-
-`MEGANEURA_DEVICE_ID` selects the adapter on multi-GPU hosts.
-
-`world_microbatch_size` remains a valid compute control: it partitions only the
-world-model rows while preserving the effective replay batch, all sequence
-states, posterior pass, imagination, and behavior training. Four-way
-microbatching alone could not fix the old allocation because it did not remove
-the duplicated recurrent constants or allocator rounding. The direct
-all-parameter parity test remains within the documented f32 reduction-order
-bounds. The production BPTT-8 default is unchanged; 12M/BPTT-64/microbatch-4 is
-now a safe capacity experiment rather than the default.
-
-The first immutable corrected capacity curve pins Kindle `ac3e4f67`,
-Meganeura `5429fcd0`, and Blade `824d55fb`. Its checksum-sealed 25,000-step
-checkpoint is at learner step 5,979. Every model tensor and all 20.8 million
-optimizer elements are finite, every optimizer moment is nonzero, and every
-parameter tensor changed from step 20,000. Twelve isolated scalar entries were
-bit-identical across otherwise-changing tensors. Over steps 20,001--25,000,
-three completed Pong episodes average -19.667; the reward rate improved from
--23.0 to -12.4 per 1,000 decisions across the last two 5,000-step intervals.
-The historical corrected Kindle 1M/BPTT-8 phase is -20.857, the released
-D3-200M artifact's seed 0 is -20.833, and the locally reproduced current-D3
-1M seed 0 is -20.2 in the same frame window. The current phase is ahead of all
-three, but contains only three episodes. Positive-reward calibration also
-crossed zero: its count-weighted prediction is +0.0176 and +0.0339 in the final
-two 100-update blocks, while negative rewards remain near -0.8. These are
-learning-health markers from one early seed, not a benchmark result; the
-uninterrupted run continues toward the strict three-seed 400,000-frame gate.
-
-The checksum-sealed 30,000-step checkpoint is at learner step 7,229 and
-repeats the full audit. All 241 stored tensors are finite, all 20,824,610 Adam
-moment elements are nonzero, and every one of the 95 parameter/slow-value
-tensors changed from step 25,000. Seven isolated scalar entries remain exact
-across 12,119,311 otherwise-changing parameters. Component update RMS relative
-to parameter RMS is 3.03% for continuation, 4.57% for dynamics, 5.28% for the
-actor, 6.54% for the decoder, 6.60% for representation, 8.21% for reward,
-8.49% for value, and 8.46% for slow value. The world graph's frozen replay
-critic is bit-identical to the behavior critic at the checkpoint.
-
-Over steps 25,001--30,000, the two completed episodes score -18 and -19 and
-average -18.5 over 2,035.5 decisions; the episode active at the 30,000-step
-boundary is excluded. Reward per 1,000-decision block is -12, -9, -6, -10,
-and -3. The count-weighted positive-reward prediction rises from +0.0437 to
-about +0.14 while negative predictions remain near -0.85. Raw policy entropy
-falls, but effective-action entropy stays near 1.0 and the 5,000-step action
-totals are balanced across right and left aliases. In the exact
-100,000--120,000-frame phase, the current two-endpoint -18.5 mean is ahead of
-the local current-D3 1M seed's -20.167 over six endpoints and the released
-D3 artifact's -19.803 five-seed mean. Two endpoints are too few for a score
-claim; these remain learning-health markers for the uninterrupted strict run.
-
-The checksum-sealed 35,000-step checkpoint is at learner step 8,479. All 241
-stored tensors are finite, all 20,824,610 Adam moment elements are nonzero, and
-every one of the 95 parameter/slow-value tensors changed from step 30,000. Only
-11 isolated scalar entries remain exact across 12,119,311 otherwise-changing
-parameters. Component update RMS relative to parameter RMS is 3.12% for
-continuation, 4.34% for dynamics, 4.80% for the actor, 5.90% for the decoder,
-6.65% for representation, 7.81% for reward, 8.10% for value, and 8.19% for
-slow value. Both actor moments cover every deterministic input, categorical
-input, and hidden channel, and the world graph's frozen replay critic remains
-bit-identical to the behavior critic.
-
-Over steps 30,001--35,000, the three completed episodes score -18, -20, and
--19 and average -19.0 over 2,083.7 decisions. Reward per 1,000-decision block
-is -13, -9, -14, -8, and -7. The full window's count-weighted positive-reward
-prediction is +0.221 while the negative prediction is -0.852; the final two
-blocks reach +0.308 and +0.294 without policy-entropy or value-loss collapse.
-The five episode endpoints in the exact 100,000--140,000-frame phase average
--18.8, compared with -20.25 for the locally reproduced current-D3 1M seed and
--19.139 for the released D3-200M artifact's equal-weight five-seed mean. This
-is still one early seed, and the strict score window does not begin until
-350,000 frames.
-
-Before the current curve produced an episode endpoint in the next phase, the
-exact 140,000--160,000-frame comparators were frozen. The released D3-200M
-artifact has per-seed means of -18.667, -14.0, -16.0, -12.5, and -14.5, for an
-equal-weight five-seed mean of -15.133 (-15.385 when its 13 endpoints are
-pooled). The locally reproduced current-D3 1M seed scores -21.0 over six
-endpoints. Three matched published-protocol random seeds have means of
--20.833, -21.0, and -20.6, for an equal-seed mean of -20.811. These are
-diagnostic phase markers rather than acceptance gates; the strict Kindle
-result remains the equal-weight three-seed mean over 350,000--400,000 frames.
-
-The checksum-sealed 40,000-step checkpoint closes that phase at learner step
-9,729. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
-optimizer element is zero, and every one of the 95 parameter/slow-value tensors
-changed from step 35,000. Only 14 scalar entries remain exact across
-12,119,311 otherwise-changing elements. Component update RMS relative to
-parameter RMS is 3.18% for continuation, 4.02% for dynamics, 5.37% for the
-decoder, 5.55% for the actor, 6.52% for representation, 8.06% for slow value,
-8.23% for value, and 8.27% for reward. Both actor moments still cover every
-deterministic input, categorical input, and hidden channel, and the world
-graph's replay critic remains bit-identical to the behavior critic.
-
-Over steps 35,001--40,000, reward per 1,000-decision block is -12, -7, -9,
--5, and -6. The exact 140,000--160,000-frame endpoints score -20 and -18 over
-1,817 and 2,395 decisions, for means of -19.0 and 2,106 decisions. That is
-slightly behind released D3 seed zero's -18.667 and well behind its five-seed
--15.133 mean, while remaining ahead of local current-D3 1M at -21.0 and the
-three-seed random mean at -20.811. Kindle scores four points in 4,212 decisions
-(0.000950 per decision), 4.57 times the matched-random rate but only 31.7% of
-the released D3 phase rate. Its effective actions remain balanced at 45.1%
-`RIGHT`, 39.8% `LEFT`, and 1.183 entropy. Count-weighted positive- and
-negative-reward predictions are +0.428 and -0.856 across the checkpoint
-interval and +0.474 and -0.862 in its final 1,000 decisions. Final-1,000
-reconstruction loss, raw KL, replay-value loss, and policy entropy are 17.865,
-2.359, 1.500, and 0.472. This is genuine above-random learning without the
-released D3 phase transition; it is neither a baseline result nor a numerical
-collapse, so the immutable run continues to the strict final score window.
-
-Before the active episode crossed to an endpoint, the exact
-160,000--180,000-frame comparators were also frozen. Released D3-200M has
-per-seed means of -18.0, -15.667, -15.0, -11.667, and -14.5, for an
-equal-weight mean of -14.967 (-15.0 across its 13 pooled endpoints). The local
-current-D3 1M seed averages -20.5 over six endpoints. Three matched random
-seeds average -20.4, -20.667, and -20.333, for an equal-seed mean of -20.467.
-The released artifact scores 0.003020 agent points per decision in this phase,
-versus 0.000583 for matched random. As above, these markers diagnose the curve
-but do not replace the strict final three-seed gate.
-
-The checksum-sealed 45,000-step checkpoint closes that phase at learner step
-10,979. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
-optimizer element is zero, and every one of the 95 parameter/slow-value tensors
-changed from step 40,000. Only eight scalar entries remain exact across
-12,119,311 otherwise-changing elements. Component update RMS relative to
-parameter RMS is 3.32% for continuation, 3.90% for dynamics, 4.47% for the
-actor, 4.92% for the decoder, 6.41% for representation, 8.31% for reward,
-11.27% for value and its replay copy, and 11.27% for slow value. Both actor
-moments retain complete input/channel coverage, and the replay critic remains
-bit-identical to the behavior critic.
-
-Over steps 40,001--45,000, reward per 1,000-decision block is -10, -4, -12,
--8, and -4. The exact 160,000--180,000-frame endpoints score -17 and -19 over
-2,984 and 1,779 decisions, for means of -18.0 and 2,381.5 decisions. That
-matches released D3 seed zero, trails its five-seed -14.967 mean, and remains
-ahead of local current-D3 1M at -20.5 and matched random at -20.467. Kindle
-scores six points in 4,763 decisions (0.001260 per decision), 2.16 times the
-matched-random rate and 41.7% of the released D3 phase rate. Effective actions
-remain balanced at 43.3% `RIGHT`, 41.6% `LEFT`, and 1.185 entropy. Across the
-checkpoint interval, count-weighted positive- and negative-reward predictions
-are +0.537 and -0.865; final-1,000 reconstruction loss, raw KL, replay-value
-loss, and policy entropy are 16.784, 2.346, 1.587, and 0.424. The curve is
-healthy and above random but has not reproduced the released D3 phase
-transition, so the uninterrupted run continues.
-
-Before Kindle crossed 180,000 frames, the exact 180,000--200,000-frame
-comparators were frozen as well. Released D3-200M has per-seed means of
--16.25, -14.333, -12.5, -9.0, and -15.0, for an equal-weight mean of -13.417
-(-13.923 across its 13 pooled endpoints). The local current-D3 1M seed
-averages -20.833 over six endpoints. Three matched random seeds average -20.0,
--20.6, and -20.6, for both an equal-seed and pooled mean of -20.4. The released
-artifact scores 0.003541 agent points per decision in this phase, versus
-0.000636 for matched random. These remain diagnostic phase markers; no Kindle
-endpoint from this phase was inspected before fixing them.
-
-The checksum-sealed 50,000-step checkpoint closes that phase at learner step
-12,229. All 241 stored tensors and all 20,824,610 Adam elements are finite, no
-optimizer element is zero, and every one of the 95 parameter/slow-value tensors
-changed from step 45,000. Only 12 scalar entries remain exact across
-12,119,311 otherwise-changing parameters. Component update RMS relative to
-parameter RMS is 3.15% for continuation, 3.80% for dynamics, 4.05% for the
-actor, 4.46% for the decoder, 6.27% for representation, 8.89% for reward,
-10.22% for value and its replay copy, and 10.25% for slow value. Both actor
-moments retain complete deterministic, categorical, and hidden-channel
-coverage, and the replay critic remains bit-identical to the behavior critic.
-
-Over steps 45,001--50,000, reward per 1,000-decision block is 0, -7, -1, -3,
-and -7. The exact 180,000--200,000-frame phase has one completed endpoint: -13
-over 3,391 decisions at frame 187,212. The episode still active at the 200,000-
-frame boundary is excluded by the frozen endpoint rule. That one endpoint is
-numerically above released D3 seed zero's -16.25, its five-seed -13.417 mean,
-local current-D3 1M at -20.833, and matched random at -20.4, but one episode is
-not a baseline result. Its eight agent points give 0.002359 points per decision,
-3.71 times the matched-random rate and 66.6% of the released D3 phase rate.
-Effective actions remain balanced at 43.52% `RIGHT`, 42.74% `LEFT`, and 1.156
-entropy. Count-weighted positive- and negative-reward predictions are +0.579
-and -0.871 across the final 1,000 decisions; reconstruction loss, raw KL,
-replay-value loss, and policy entropy average 16.313, 2.365, 1.658, and 0.361.
-This is the first phase in which Kindle reaches the released curve's diagnostic
-return level, while its lower point rate and single endpoint keep the evidence
-provisional. The immutable run continues toward the strict three-seed score.
-
-All later 20,000-frame diagnostic windows were frozen at the same time, before
-Kindle entered the first one. Parentheses in the aggregate columns give the
-pooled endpoint mean and endpoint count; point rates pool completed-episode
-agent points over their decision lengths. These phase markers expose when the
-released curve changes regime, but the predeclared 350,000--400,000-frame
-three-seed gate remains the only acceptance result.
-
-| Frames | Released D3 per-seed means | D3 equal (pooled / n) | Local D3 1M (n) | Random per-seed means | Random equal (pooled / n) | Agent-point rate D3 / random |
-|---|---|---:|---:|---|---:|---:|
-| 200k--220k | -14.5, -10, -12, -11, -13 | -12.100 (-12.000 / 9) | -21.000 (7) | -19.6, -20.333, -19.2 | -19.711 (-19.750 / 16) | 0.004116 / 0.001233 |
-| 220k--240k | -17.25, -14.333, -12.5, -6.5, -14 | -12.917 (-13.692 / 13) | -21.000 (6) | -20.8, -20.4, -19.6 | -20.267 (-20.267 / 15) | 0.003250 / 0.000776 |
-| 240k--260k | -16, -11.5, -6.5, -7, -13.5 | -10.900 (-11.333 / 9) | -21.000 (6) | -19.2, -20.667, -20.8 | -20.222 (-20.250 / 16) | 0.004008 / 0.000799 |
-| 260k--280k | -12, -12.333, -0.5, -8.5, -7 | -8.067 (-8.600 / 10) | -21.000 (6) | -20.2, -20.4, -20.667 | -20.422 (-20.438 / 16) | 0.004558 / 0.000596 |
-| 280k--300k | -13, -10.5, -7, -5, -3 | -7.700 (-9.375 / 8) | -21.000 (6) | -20.6, -20.8, -20.4 | -20.600 (-20.600 / 15) | 0.004335 / 0.000418 |
-| 300k--320k | -11.5, -11.5, -1, -5, -3.5 | -6.500 (-7.375 / 8) | -20.500 (6) | -20.333, -20, -20.333 | -20.222 (-20.235 / 17) | 0.004393 / 0.000830 |
-| 320k--340k | -11, -14.333, -5.5, 0, -11 | -8.367 (-8.444 / 9) | -20.667 (6) | -20.333, -20.667, -20.4 | -20.467 (-20.471 / 17) | 0.004223 / 0.000590 |
-| 340k--360k | -8.5, -10.5, -4, -2, -5 | -6.000 (-6.444 / 9) | -20.200 (5) | -20.8, -20.667, -20.667 | -20.711 (-20.706 / 17) | 0.004674 / 0.000330 |
-| 360k--380k | -2.5, -10, -1, -2, -5 | -4.100 (-4.714 / 7) | -20.000 (4) | -20.5, -20.6, -20.2 | -20.433 (-20.438 / 16) | 0.005056 / 0.000601 |
-| 380k--400k | -9, -8.5, -1.5, -3, -2.5 | -4.900 (-4.625 / 8) | -21.000 (6) | -20.8, -20.667, -20.6 | -20.689 (-20.688 / 16) | 0.005003 / 0.000349 |
-
-The checksum-sealed 55,000-step checkpoint closes the first frozen later
-phase at exactly 220,000 frames and learner step 13,479. All four archive
-hashes verify. All 241 stored tensors and all 20,824,610 Adam elements are
-finite, every Adam element is nonzero, and all 95 parameter/slow-value tensors
-changed from step 50,000. Only six scalar entries remain exact across
-12,119,311 otherwise-changing parameters. Component update RMS relative to
-the current parameter RMS is 3.67% for dynamics, 3.70% for the actor, 3.72%
-for continuation, 4.16% for the decoder, 6.01% for representation, 9.88% for
-reward, 9.98% for value and its replay copy, and 9.97% for slow value. All but
-one of the actor's 655,360 first-layer weights changed, with 0.001636 delta
-RMS; both corresponding Adam moments have complete nonzero coverage. The
-replay critic remains bit-identical to the behavior critic.
-
-Over steps 50,001--55,000, reward per 1,000-decision block is -4, -5, -2, 0,
-and -6. The exact 200,000--220,000-frame phase has two completed endpoints:
--15 over 3,934 decisions at frame 202,948 and -11 over 3,978 decisions at
-frame 218,860. The episode active at the 220,000-frame boundary is excluded by
-the frozen endpoint rule. Kindle's -13.0 phase mean trails released D3's
-equal-seed -12.1 by 0.9 points and its pooled -12.0 by one point, while
-exceeding local current-D3 1M by 8.0 points and matched random by 6.711. Its 16
-agent points over 7,912 decisions give a 0.002022 point rate, 1.64 times random
-and 49.1% of released D3. Effective controls remain balanced at 44.60%
-`RIGHT`, 46.64% `LEFT`, and 1.014 entropy. Across the final 1,000 decisions,
-reconstruction loss, raw KL, replay-value loss, and policy entropy average
-15.749, 2.406, 1.766, and 0.333; count-weighted positive- and negative-reward
-predictions are +0.645 and -0.873. The second endpoint reaches -11, but the
-phase aggregate remains slightly behind the released curve and is still an
-early single-seed diagnostic rather than the strict baseline result.
-
-The checksum-sealed 60,000-step checkpoint closes the 220,000--240,000-frame
-phase at learner step 14,729. All four archive hashes verify and its metadata
-retains the exact DreamerV3, Meganeura, Blade, DINOv3, model, and campaign
-configuration revisions; the campaign provenance separately seals the Kindle
-source revision. All 241 stored tensors and all
-20,824,610 Adam elements are finite, every Adam element is nonzero, and all 95
-parameter/slow-value tensors changed from step 55,000. Only nine scalar entries
-remain exact across 12,119,311 otherwise-changing parameters. Component update
-RMS relative to the current parameter RMS is 3.22% for continuation, 3.28% for
-the actor, 3.67% for dynamics, 3.86% for the decoder, 6.01% for representation,
-8.71% for value and its replay copy, 8.74% for slow value, and 10.00% for
-reward. All 655,360 actor first-layer weights changed, with 0.001473 delta RMS;
-both corresponding Adam moments have complete nonzero coverage. The replay
-critic remains bit-identical to the behavior critic.
-
-Over steps 55,001--60,000, reward per 1,000-decision block is -4, -6, -7, -7,
-and -3. The exact 220,000--240,000-frame phase has one completed endpoint: -18
-over 2,977 decisions at frame 230,768. The episode active at the 240,000-frame
-boundary is excluded by the frozen endpoint rule. Kindle trails released D3's
-equal-seed -12.917 mean by 5.083 points and its pooled -13.692 mean by 4.308,
-while exceeding local current-D3 1M at -21.0 by 3.0 points and matched random
-at -20.267 by 2.267. Its three agent points give a 0.001008 point rate, 1.30
-times random and 31.0% of released D3. Effective control counts are 6, 29,
-2,157, 2,332, 344, and 132 for `NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`,
-and `LEFTFIRE`, respectively; `RIGHT` and `LEFT` account for 43.14% and 46.64%
-with 1.036 entropy. Across the final 1,000 decisions, reconstruction loss, raw
-KL, replay-value loss, and policy entropy average 15.039, 2.371, 1.731, and
-0.294; count-weighted positive- and negative-reward predictions are +0.700 and
--0.891. This phase remains numerically above both controls but below the
-released curve, and its single endpoint is insufficient to establish a trend.
-The immutable run therefore continues toward the strict three-seed score.
-
-The checksum-sealed 65,000-step checkpoint closes the 240,000--260,000-frame
-phase at learner step 15,979. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam
-elements are finite, every Adam element is nonzero, and all 95
-parameter/slow-value tensors changed from step 60,000. Only 12 scalar entries
-remain exact across 12,119,311 otherwise-changing parameters. Component update
-RMS relative to the current parameter RMS is 2.99% for continuation, 3.27% for
-the actor, 3.53% for dynamics, 3.55% for the decoder, 5.85% for representation,
-7.82% for value and its replay copy, 7.88% for slow value, and 9.72% for reward.
-All but two of the actor's 655,360 first-layer weights changed, with 0.001464
-delta RMS; both corresponding Adam moments retain complete nonzero coverage.
-The replay critic remains bit-identical to the behavior critic.
-
-Over steps 60,001--65,000, reward per 1,000-decision block is -7, 0, -6, +1,
-and -3. The exact 240,000--260,000-frame phase has one completed endpoint: -19
-over 3,238 decisions at frame 243,720. The episode active at the 260,000-frame
-boundary is excluded by the frozen endpoint rule. Kindle trails released D3's
-equal-seed -10.900 mean by 8.100 points and its pooled -11.333 mean by 7.667,
-while exceeding local current-D3 1M at -21.0 by 2.0 points and matched random's
-equal-seed -20.222 mean by 1.222. Its two agent points give a 0.000618 point
-rate, 77.3% of matched random and 15.4% of released D3 in this phase. Effective
-control counts are 6, 14, 2,378, 2,376, 142, and 84 for `NOOP`, `FIRE`,
-`RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`; `RIGHT` and `LEFT` account for
-47.56% and 47.52% with 0.901 entropy. Across the final 1,000 decisions,
-reconstruction loss, raw KL, replay-value loss, and policy entropy average
-14.306, 2.329, 1.764, and 0.283; count-weighted positive- and negative-reward
-predictions are +0.715 and -0.898. This phase remains numerically above both
-controls but materially below the released curve, with only one endpoint. The
-immutable run continues toward the strict three-seed score.
-
-The checksum-sealed 70,000-step checkpoint closes the 260,000--280,000-frame
-phase at learner step 17,229. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam
-elements are finite, every Adam element is nonzero, and all 95
-parameter/slow-value tensors changed from step 65,000. Only seven scalar entries
-remain exact across 12,119,311 otherwise-changing parameters. Component update
-RMS relative to the current parameter RMS is 3.00% for the actor, 3.36% for the
-decoder, 3.43% for dynamics and continuation, 5.67% for representation, 8.31%
-for slow value, 8.32% for value and its replay copy, and 9.12% for reward. All
-but one of the actor's 655,360 first-layer weights changed, with 0.001354 delta
-RMS; both corresponding Adam moments retain complete nonzero coverage. The
-replay critic remains bit-identical to the behavior critic.
-
-Over steps 65,001--70,000, reward per 1,000-decision block is +1, -4, 0, -5,
-and -1. The exact 260,000--280,000-frame phase has one completed endpoint: -8
-over 5,153 decisions at frame 264,332. The episode active at the 280,000-frame
-boundary is excluded by the frozen endpoint rule. This endpoint exceeds
-released D3's equal-seed -8.067 mean by 0.067 points and its pooled -8.600 mean
-by 0.600, local current-D3 1M at -21.0 by 13.0, and matched random's equal-seed
--20.422 mean by 12.422. Its 13 agent points give a 0.002523 point rate, 4.23
-times matched random and 55.3% of released D3 in this phase. Effective control
-counts are 13, 36, 2,352, 2,360, 145, and 94 for `NOOP`, `FIRE`, `RIGHT`,
-`LEFT`, `RIGHTFIRE`, and `LEFTFIRE`; `RIGHT` and `LEFT` account for 47.04% and
-47.20% with 0.938 entropy. Across the final 1,000 decisions, reconstruction
-loss, raw KL, replay-value loss, and policy entropy average 14.204, 2.427,
-1.846, and 0.280; count-weighted positive- and negative-reward predictions are
-+0.731 and -0.896. This is the first frozen later phase in which Kindle's
-endpoint return reaches the released curve, but one endpoint and the lower
-point rate are not baseline evidence. The immutable run continues toward the
-strict three-seed score.
-
-The checksum-sealed 75,000-step checkpoint closes the 280,000--300,000-frame
-phase at learner step 18,479. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam
-elements are finite, every Adam element is nonzero, and all 95
-parameter/slow-value tensors changed from step 70,000. Only six scalar entries
-remain exact across 12,119,311 otherwise-changing parameters. Component update
-RMS relative to the current parameter RMS is 2.74% for continuation, 2.92% for
-the actor, 3.14% for the decoder, 3.32% for dynamics, 5.44% for
-representation, 7.77% for value, its replay copy, and slow value, and 8.61%
-for reward. All 655,360 actor first-layer weights changed, with 0.001334 delta
-RMS; both corresponding Adam moments retain complete nonzero coverage. The
-replay critic remains bit-identical to the behavior critic.
-
-Over steps 70,001--75,000, reward per 1,000-decision block is 0, -5, -2, 0,
-and -3. The exact 280,000--300,000-frame phase has one completed endpoint: -11
-over 5,351 decisions at frame 285,736. The episode active at the 300,000-frame
-boundary is excluded by the frozen endpoint rule. Kindle trails released D3's
-equal-seed -7.700 mean by 3.300 points and its pooled -9.375 mean by 1.625,
-while exceeding local current-D3 1M at -21.0 by 10.0 points and matched
-random's equal-seed -20.600 mean by 9.600. Its 10 agent points give a 0.001869
-point rate, 4.47 times matched random and 43.1% of released D3 in this phase.
-Effective control counts are 2, 33, 2,367, 2,393, 115, and 90 for `NOOP`,
-`FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively; `RIGHT`
-and `LEFT` account for 47.34% and 47.86% with 0.902 entropy. Across the final
-1,000 decisions, reconstruction loss, raw KL, replay-value loss, and policy
-entropy average 13.798, 2.421, 1.890, and 0.276; count-weighted positive- and
-negative-reward predictions are +0.753 and -0.904. This phase remains well
-above both controls but below the released curve, with only one endpoint. The
-immutable run continues toward the strict three-seed score.
-
-The checksum-sealed 80,000-step checkpoint closes the 300,000--320,000-frame
-phase at learner step 19,729. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam elements are finite, every Adam element
-is nonzero, and all 95 parameter/slow-value tensors changed from step 75,000.
-Only seven scalar entries remain exact across 12,119,311 otherwise-changing
-parameters. Component update RMS relative to the current parameter RMS is
-3.01% for the actor, 3.04% for the decoder, 3.05% for continuation, 3.42% for
-dynamics, 5.04% for representation, 7.76% for reward, 8.67% for slow value,
-and 8.75% for value and its replay copy. All but one of the actor's 655,360
-first-layer weights changed, with 0.001360 delta RMS; both corresponding Adam
-moments retain complete nonzero coverage. The replay critic remains
-bit-identical to the behavior critic.
-
-Over steps 75,001--80,000, reward per 1,000-decision block is 0, -1, +3, -1,
-and -4. The exact 300,000--320,000-frame phase has one completed endpoint: -9
-over 4,601 decisions at frame 304,140. The episode active at the 320,000-frame
-boundary is excluded by the frozen endpoint rule. Kindle trails released D3's
-equal-seed -6.500 mean by 2.500 points and its pooled -7.375 mean by 1.625,
-while exceeding local current-D3 1M at -20.500 by 11.500 points and matched
-random's equal-seed -20.222 mean by 11.222. Its 12 agent points give a
-0.002608 point rate, 3.14 times matched random and 59.4% of released D3 in this
-phase. Effective control counts are 8, 97, 2,150, 2,394, 220, and 131 for
-`NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively;
-`RIGHT` and `LEFT` account for 43.00% and 47.88% with 1.035 entropy. Across the
-final 1,000 decisions, reconstruction loss, raw KL, replay-value loss, and
-policy entropy average 13.864, 2.474, 1.997, and 0.302; count-weighted
-positive- and negative-reward predictions are +0.790 and -0.905. This
-endpoint numerically clears the eventual -10 gate and remains well above both
-controls, but it is outside the frozen 350,000--400,000-frame acceptance
-window, trails the released curve, and is only one endpoint from one seed. The
-immutable run therefore continues toward the strict three-seed score.
-
-The checksum-sealed 85,000-step checkpoint closes the 320,000--340,000-frame
-phase at learner step 20,979. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam elements are finite, every Adam element
-is nonzero, and all 95 parameter/slow-value tensors changed from step 80,000.
-Only 11 scalar entries remain exact across 12,119,311 otherwise-changing
-parameters. Component update RMS relative to the current parameter RMS is
-3.27% for the actor, 3.05% for the decoder, 3.23% for continuation, 3.54% for
-dynamics, 5.47% for representation, 6.94% for reward, 8.26% for slow value,
-and 8.21% for value and its replay copy. All but one of the actor's 655,360
-first-layer weights changed, with 0.001475 delta RMS; both corresponding Adam
-moments retain complete nonzero coverage. The replay critic remains
-bit-identical to the behavior critic.
-
-Over steps 80,001--85,000, reward per 1,000-decision block is -1, -1, -3, -2,
-and -9. The exact 320,000--340,000-frame phase has one completed endpoint: -5
-over 5,339 decisions at frame 325,496. The episode active at the 340,000-frame
-boundary is excluded by the frozen endpoint rule; it subsequently ends at
-frame 340,248 with return -14 and belongs to the next diagnostic phase. Kindle
-exceeds released D3's equal-seed -8.367 mean by 3.367 points and its pooled
--8.444 mean by 3.444, while exceeding local current-D3 1M at -20.667 by
-15.667 points and matched random's equal-seed -20.467 mean by 15.467. Its 16
-agent points give a 0.002997 point rate, 5.08 times matched random and 71.0% of
-released D3 in this phase. Effective control counts are 8, 149, 1,890, 2,354,
-464, and 135 for `NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`,
-respectively; `RIGHT` and `LEFT` account for 37.80% and 47.08% with 1.156
-entropy. Across the final 1,000 decisions, reconstruction loss, raw KL,
-replay-value loss, and policy entropy average 13.625, 2.453, 2.033, and 0.341;
-count-weighted positive- and negative-reward predictions are +0.808 and
--0.907. This endpoint beats the released curve as well as both controls, but
-it is outside the frozen 350,000--400,000-frame acceptance window and is only
-one endpoint from one seed. The immutable run therefore continues toward the
-strict three-seed score.
-
-The checksum-sealed 90,000-step checkpoint closes the 340,000--360,000-frame
-phase at learner step 22,229. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam elements are finite, every Adam element
-is nonzero, and all 95 parameter/slow-value tensors changed from step 85,000.
-Only 11 scalar entries remain exact across 12,119,311 otherwise-changing
-parameters. Component update RMS relative to the current parameter RMS is
-2.98% for the actor, 3.01% for the decoder, 3.26% for continuation, 3.41% for
-dynamics, 4.84% for representation, 6.05% for reward, 7.30% for slow value,
-and 7.25% for value and its replay copy. All 655,360 actor first-layer weights
-changed, with 0.001342 delta RMS; both corresponding Adam moments retain
-complete nonzero coverage. The replay critic remains bit-identical to the
-behavior critic.
-
-Over steps 85,001--90,000, reward per 1,000-decision block is -3, -2, 0, -1,
-and +1. The exact 340,000--360,000-frame diagnostic phase has one completed
-endpoint: -14 over 3,688 decisions at frame 340,248. The episode active at the
-360,000-frame boundary is excluded from this phase; because it was also active
-when the frozen score window opened at frame 350,000, its eventual endpoint
-will be the first strict-window observation if it occurs by frame 400,000.
-Kindle trails released D3's
-equal-seed -6.000 mean by 8.000 points and its pooled -6.444 mean by 7.556,
-while exceeding local current-D3 1M at -20.200 by 6.200 points and matched
-random's equal-seed -20.711 mean by 6.711. Its seven agent points give a
-0.001898 point rate, 5.75 times matched random and 40.6% of released D3 in this
-phase. Effective control counts are 9, 250, 1,556, 2,237, 784, and 164 for
-`NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively;
-`RIGHT` and `LEFT` account for 31.12% and 44.74% with 1.287 entropy. Across the
-final 1,000 decisions, reconstruction loss, raw KL, replay-value loss, and
-policy entropy average 13.331, 2.439, 2.053, and 0.344; count-weighted
-positive- and negative-reward predictions are +0.844 and -0.919. This phase
-remains above both controls but below the released curve. No episode endpoint
-occurs in the strict 350,000--360,000-frame subwindow, so the acceptance score
-remains unobserved rather than provisionally inferred from interval rewards.
-The immutable run therefore continues toward the strict three-seed score.
-
-After the 90,000-step checkpoint, episode 47 ends at frame 363,460 with return
--5 over 5,803 decisions. This is seed zero's first endpoint inside the frozen
-350,000--400,000-frame window; the partial endpoint mean is therefore -5.000.
-The episode began before the score boundary, but the predeclared endpoint rule
-intentionally includes its complete return. It trails released D3's
-360,000--380,000-frame equal-seed -4.100 mean by 0.900 points and its pooled
--4.714 mean by 0.286, while exceeding local current-D3 1M at -20.000 by
-15.000 points and matched random's equal-seed -20.433 mean by 15.433. Its 16
-agent points give a 0.002757 point rate, 4.59 times matched random and 54.5% of
-released D3 in that phase. The endpoint numerically clears the eventual -10
-gate, but the seed-zero window is incomplete and two independent seeds have
-not yet run, so this is partial evidence rather than an accepted score.
-
-The checksum-sealed 95,000-step checkpoint closes the 360,000--380,000-frame
-phase at learner step 23,479. All four archive hashes verify, and its metadata
-retains the dependency revisions, seed zero, and exact campaign configuration;
-the campaign provenance separately seals the Kindle source revision. All 241
-stored tensors and all 20,824,610 Adam elements are finite, every Adam element
-is nonzero, and all 95 parameter/slow-value tensors changed from step 90,000.
-Only 11 scalar entries remain exact across 12,119,311 otherwise-changing
-parameters. Component update RMS relative to the current parameter RMS is
-2.77% for the actor, 2.96% for the decoder, 3.47% for continuation, 3.39% for
-dynamics, 4.45% for representation, 5.91% for reward, 7.51% for slow value,
-and 7.72% for value and its replay copy. All 655,360 actor first-layer weights
-changed, with 0.001272 delta RMS; both corresponding Adam moments retain
-complete nonzero coverage. The replay critic remains bit-identical to the
-behavior critic.
-
-Over steps 90,001--95,000, reward per 1,000-decision block is -1, -2, +2, -1,
-and -2. The exact 360,000--380,000-frame phase has the single -5 endpoint at
-frame 363,460; the episode active at the 380,000-frame boundary is excluded by
-the frozen endpoint rule. Kindle trails released D3's equal-seed -4.100 mean
-by 0.900 points and its pooled -4.714 mean by 0.286, while exceeding local
-current-D3 1M at -20.000 by 15.000 points and matched random's equal-seed
--20.433 mean by 15.433. Its 16 agent points give a 0.002757 point rate, 4.59
-times matched random and 54.5% of released D3 in this phase. Effective control
-counts are 8, 239, 1,704, 2,227, 661, and 161 for `NOOP`, `FIRE`, `RIGHT`,
-`LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively; `RIGHT` and `LEFT` account
-for 34.08% and 44.54% with 1.261 entropy. Across the final 1,000 decisions,
-reconstruction loss, raw KL, replay-value loss, and policy entropy average
-13.230, 2.455, 2.158, and 0.335; count-weighted positive- and negative-reward
-predictions are +0.835 and -0.915. The strict seed-zero endpoint mean remains
--5.000, which clears the numeric gate provisionally, but the window is not
-complete and two independent seeds remain. The immutable run therefore
-continues toward the strict three-seed score.
-
-After the 95,000-step checkpoint, episode 48 ends at frame 382,856 with return
--3 over 4,849 decisions. This is seed zero's second endpoint inside the frozen
-score window and raises its partial strict mean to -4.000. In the exact
-380,000--400,000-frame phase, the endpoint exceeds released D3's equal-seed
--4.900 mean by 1.900 points and its pooled -4.625 mean by 1.625, while
-exceeding local current-D3 1M at -21.000 by 18.000 points and matched random's
-equal-seed -20.689 mean by 17.689. Its 18 agent points give a 0.003712 point
-rate, 10.64 times matched random and 74.2% of released D3 in this phase. The
-two-endpoint mean clears the numeric gate provisionally, but the seed-zero
-window is still incomplete and two independent seeds remain, so it is not yet
-an accepted baseline result.
-
-The checksum-sealed 100,000-step checkpoint closes the run at exactly 400,000
-frames and learner step 24,729. All four archive hashes verify, completing the
-20-checkpoint series, and the final metadata retains the exact dependency,
-model, seed, and campaign identity. All 241 stored tensors and all 20,824,610
-Adam elements are finite, every Adam element is nonzero, and all 95
-parameter/slow-value tensors changed from step 95,000. Only five scalar entries
-remain exact across 12,119,311 otherwise-changing parameters. Component update
-RMS relative to the final parameter RMS is 2.69% for the actor, 2.86% for the
-decoder, 3.61% for continuation, 3.54% for dynamics, 4.31% for representation,
-4.50% for reward, 7.98% for slow value, and 7.85% for value and its replay copy.
-All 655,360 actor first-layer weights changed, with 0.001252 delta RMS; both
-corresponding Adam moments retain complete nonzero coverage. The replay critic
-remains bit-identical to the behavior critic.
-
-Over steps 95,001--100,000, reward per 1,000-decision block is +2, -1, -2, -1,
-and +4. Effective control counts are 6, 329, 1,892, 2,164, 427, and 182 for
-`NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`, respectively;
-`RIGHT` and `LEFT` account for 37.84% and 43.28% with 1.248 entropy. Across the
-final 1,000 decisions, reconstruction loss, raw KL, replay-value loss, and
-policy entropy average 12.800, 2.406, 2.164, and 0.319; count-weighted positive-
-and negative-reward predictions are +0.857 and -0.926. The run ends with a
-partial episode at return +2 after 4,286 decisions, which is correctly excluded
-by the frozen endpoint rule. The two completed strict-window endpoints remain
--5 and -3, producing the final seed-zero score of -4.000. The strict scorer
-marks the -10 reported-12M target met by 6.000 points, the published-200M
--4.537 reference met by 0.537, and matched random exceeded by 16.623. This is
-one fully audited independent seed, not the required equal-weight three-seed
-result; seeds one and two remain necessary.
-
-At 04:46 UTC, the monitor and campaign's transient `tmux-spawn` scopes exited
-while the separately scoped trainer continued uninterrupted through its 05:32
-`run_end`. This was an orchestration-only lifecycle failure: the trainer wrote
-the complete JSONL and stable final checkpoint, and no training segment was
-resumed or appended. Re-running the original sealed monitor after process exit
-atomically archived step 100,000, verified its hashes, and wrote a healthy
-completion record with GPU allocation returned to 2 MiB, 27.4 GiB host memory
-available, and zero blocked processes or kernel errors. The campaign then
-passed its complete seed-zero audit. Future seeds are supervised as direct
-children of the persistent linger-enabled
-`kindle-dreamer-strict-campaign.service` user service rather than tmux panes;
-the campaign manifest seals the replacement script at
-`ac3ffbb2fe662ebb3f03fdc16089f9d884bd59d9c5854e04ee2f428bd2017ea7`.
-This changes orchestration durability only, not the immutable trainer,
-monitor, model, data, or scoring protocol. Seed one started under that service
-at 05:37 UTC with the exact frozen experiment identity.
-
-The earlier AMD `BO_VA (-12)` and uninterruptible-process incident was another
-unchecked oversubscription path. It remains useful evidence about how that
-driver fails, but it is no longer a recovery prerequisite or a measured
-architecture limit: oversized plans are now stopped before Vulkan allocation.
-
-The default replay capacity is 100,000 frames instead of upstream D3's five
-million. A compressed observation plus 12M-preset recurrent context is about
-22.5 KiB in the current f32 representation, so the smaller default is already
-roughly 2.3 GB. The current backend also trains in f32 rather than bfloat16.
-Both are explicit resource accommodations to revisit with packed/f16 replay
-and backend profiling.
-
-The immutable Atari campaign also uses reconstruction scale 0.25 instead of
-D3's 1.0. Kindle reconstructs a 7x7x64 DINO feature map rather than a 64x64x3
-pixel image, so the raw event-summed loss has a different scale. The coefficient
-was selected before the campaign from the controlled Phase 0 integration
-result below. All remaining loss scales retain their D3 values. This is a
-declared calibration of the representation interface, not a result-conditioned
-change to the active curve.
-
-World and behavior parameters live in separate optimizer sessions because their
-static graphs execute in stages. Targets are formed before either update, the
-replay-value representation gradient is retained, and D3's adaptive clipping is
-applied independently to each parameter leaf.
-
-The network-size presets `1M` through `200M` mirror upstream's width settings,
-not exact parameter totals across the different observation encoders and
-heads. Kindle defaults
-to `12M` for practical iteration; the pinned upstream default associated with
-the published Atari-100k score artifact is `200M`. A 12M run is a labeled
-scaling ablation, not an official-score reproduction. DINO's frozen parameters
-are additional. On the current 29 GiB host and 16 GiB GPU, a guarded 200M
-construction probe reached its 22 GiB host-memory ceiling before the training
-graph reached the GPU, so that preset is not runnable without backend or memory
-layout work. The 12M Pong canary constructs in 23.5 seconds, peaks near 6.25 GiB
-of VRAM, and sustains 0.129 learner updates/s. A repeated published-protocol
-canary with explicit RTX selection and the final D3 gradient path constructs in
-22.5 seconds, uses 6.28 GiB, and sustains 0.122 learner updates/s over 104
-updates. At Atari-100k's train ratio, one full 12M seed is therefore roughly 56
-GPU-hours. The corresponding 1M run sustains about 0.45 updates/s and is a
-14--15-hour scaling curve. Neither is an official-size substitute.
+### 2.2 Primary score
 
 Select one primary metric that reflects the game's actual objective, such as:
 
@@ -1017,36 +157,13 @@ must remain primary.
 
 A useful normalized score is:
 
-1. Replay drains D3's FIFO of fresh non-overlapping sequences, then samples
-   contiguous sequences uniformly; every sample has one preceding context frame.
-2. An inference pass samples hard posterior categoricals.
-3. A training pass inserts those samples with a straight-through estimator and
-   updates reconstruction, reward, continuation, and balanced KL losses.
-4. Every posterior state in the sequence starts a latent imagined trajectory.
-5. The current actor samples imagined actions; the frozen world optimizer
-   boundary prevents behavior gradients from rewriting dynamics.
-6. Reward, continuation, current value, and slow value produce lambda returns,
-   score-function policy targets, and distributional value targets.
-7. Actor/value optimizer updates run, the slow value network receives its EMA
-   update, and inference sessions receive the new parameters.
+\[
+S_{norm}=\frac{S_{agent}-S_{random}}{S_{novice}-S_{random}}.
+\]
 
-Scheduled optimization begins after replay contains 1,024 complete sequence
-starts. As in D3's runner, prefill interactions do not accumulate a learner
-backlog: the first eligible scheduler call yields one update, and subsequent
-calls follow the configured replay-sample ratio.
-
-The initial diagnostics below used uniform-only sampling before D3's small
-online-first queue was identified in the upstream replay implementation. They
-remain useful matched implementation controls, but post-correction curves must
-be labeled separately. With the default 65-frame context-plus-training span,
-fresh starts are 1, 66, 131, and so on; queued starts are consumed before the
-uniform sampler.
-
-D3's replay-value loss also sends a representation gradient into the RSSM. To
-retain that path with separate static learner graphs, Kindle evaluates a fixed
-copy of the current critic inside the world graph. Its input gradient updates
-the world representation; the critic parameters remain owned and updated once
-by the behavior optimizer.
+The exact threshold is fixed before the first full run. A reasonable initial
+success bar is closing at least 25% of the random-to-novice gap, provided the
+metric is well behaved.
 
 ### 2.3 Minimum success gate
 
@@ -1173,13 +290,8 @@ The video encoder produces a deterministic perceptual representation:
 u_t=E(o_{t-L:t}).
 \]
 
-- world-model parameters and optimizer moments;
-- actor/value parameters and optimizer moments;
-- slow value parameters;
-- full configuration and pinned source/model revisions;
-- fixed DINO projection seed and observation shape;
-- learner/environment counters;
-- return-normalizer state.
+The encoder should be causal in time: the representation at time \(t\) may use
+current and previous frames but never future frames.
 
 Do not rely only on a clip-level class token. Games contain small, localized,
 fast-changing cues. The first practical representation should retain:
@@ -1212,18 +324,7 @@ The current same-step DINO feature decoder is replaced by a representation
 prediction head. The target remains in latent space; no RGB decoder is part of
 the optimization path.
 
-- native DINOv3 ViT-S/16 with fixed checkpoint and source revisions;
-- numerical golden parity against Transformers/PyTorch;
-- categorical RSSM, balanced KL, two-hot heads, continuation, and feature
-  reconstruction;
-- sequence replay with explicit terminal/truncation alignment;
-- posterior-start imagination, actor/value learning, slow critic, and return
-  normalization;
-- held-out horizon-wise decoded-DINO prediction error against a persistence
-  baseline, affine low-rank floors for the decoder's 64-channel output, and
-  posterior/prior reward and representation probes;
-- complete synthetic acting/learning/checkpoint GPU canary;
-- minimal Rust and Python visual environment APIs.
+A first objective is:
 
 \[
 \begin{aligned}
@@ -1244,1059 +345,7 @@ Here:
 - the balanced KL and free-nat behavior remain DreamerV3-style;
 - reward, continuation, and replay-value losses retain their current roles.
 
-Validation snapshot (updated 2026-08-27):
-
-- formatting, Clippy, Rust/Python tests, serialized GPU learner canaries, and
-  full-checkpoint DINO parity pass on the pinned stack;
-- the Gymnasium/ALE adapter discovers 104 bundled games; Pong, Private Eye,
-  and Montezuma's Revenge reset to RGB observations. A small local wrapper now
-  matches the pinned D3 Atari-100k protocol on the consequential points where
-  Gymnasium's stock preprocessing differs: 0--30 reset no-ops, terminal-frame
-  capture before the two-frame max pool, and Pillow bilinear resize. Repeated
-  seeded 100-step Pong controls produce identical actions, pixels, and rewards;
-- under the pinned source's `current` profile and over 100,000 decisions
-  (400,000 nominal emulator frames), random Pong has
-  completed-episode means -20.210, -20.189, and -20.308 across seeds zero
-  through two, or -20.236 pooled over 318 episodes. Random Private Eye has
-  means 47.730, -2.135, and -6.270, or 13.108 pooled over 111 episodes. The
-  benchmark-aligned 350,000--400,000-frame window averages -20.128 on Pong
-  and 68.13 on Private Eye across the three random seeds, using respectively
-  13 and 5 completed episodes per seed. The pinned D3 score artifact was
-  committed with D3's 200M default and an older environment profile (all 18
-  actions, zero reset no-ops, and a 100,000-frame episode cap),
-  so it is a published target rather than a matched 12M/current-protocol
-  control. The runner now exposes those historical wrapper settings as
-  `--atari-protocol published` while retaining the pinned source's newer
-  defaults as `current`; it records the selected profile, action-space mode,
-  no-op range, and episode cap in every run header. Full comparison curves use
-  `published`. New matched three-seed random controls under that exact profile
-  score -20.615, -20.714, and -20.538 on Pong and 80, -20, and 80 on Private
-  Eye in the benchmark window, for seed means -20.623 and 46.67. The windows
-  contain 13, 14, and 13 completed Pong episodes and five Private Eye episodes
-  per seed, so the sparse-game estimate remains noisy. Under the controlled
-  `published-minimal` profile, three new Pong random seeds score -20.267,
-  -20.786, and -20.286 over 15, 14, and 14 benchmark-window episodes, for a
-  -20.446 seed mean. The score aggregator selects this profile-specific random
-  target and omits the all-action D3 targets rather than presenting them as
-  protocol-matched. The historical 2024 D3 artifact target
-  is -4.537 on Pong and 2,895.24 on Private Eye, and zero on Freeway. These
-  targets average each seed's episode scores over the same recorded-frame
-  window, then average five seeds. An independent ICLR 2025 comparison also
-  reports a 12M `DreamerV3XS` at -10 on Pong and 207 on Private Eye after the
-  Atari-100K budget, giving the practical preset a more appropriate secondary
-  target than the original 200M model. That study reports five independent
-  seeds and tracks training performance with a five-episode running average.
-  Its released benchmark metadata marks Dreamer as non-sticky/full-action, but
-  the repository does not contain the XS run configuration or raw curves.
-  Kindle therefore predeclares a deliberately conservative engineering gate:
-  at least three independent uninterrupted runs, each with complete coverage,
-  aggregated over every episode ending in the 350,000--400,000-frame window,
-  must have an across-seed mean of at least -10. Passing that gate would match the
-  reported score threshold under Kindle's stricter audit; it would not be an
-  exact statistical reproduction of the paper's five-seed running-average
-  curve. Pong and Private Eye remain the first dense and sparse Atari curves.
-  The strict JSONL score aggregator reproduces the matched random means exactly,
-  rejects the active curve before `run_end`, and requires complete window
-  coverage and matching wrapper metadata before reporting target deltas;
-- the first published-protocol 1M Pong curve is running with the calibrated
-  reconstruction scale and D3 representation gradients. At the 10,000-step
-  checkpoint it had made 2,229 learner updates and averaged -20.636 over 11
-  completed online episodes. A separate 5,000-step sampled-policy probe scored
-  -20.2 over five episodes. On a separate fixed random-action trajectory reused
-  across checkpoints, its posterior reward means for positive, zero, and
-  negative targets are -0.02235, -0.02232, and -0.02234; the one-step prior is
-  equally flat. Ranking is weak but above chance for the 108 negative events:
-  posterior negative-vs-rest and any-reward-vs-zero ROC-AUC are 0.636 and
-  0.641, while the corresponding one-step-prior values are 0.543 and 0.546.
-  Only three positive events occur, so their ranking is too noisy to interpret.
-  Thus the model is finite and reconstructing substantially better (first-100
-  to final-100 loss 3,977.4 to 86.84), but has not learned calibrated
-  reward-conditioned state at 10% of the interaction budget. The curve
-  continues; this is an early marker, not an endpoint comparison;
-- by the 15,000-step checkpoint, reward ordering improves materially without
-  yet changing control. On the identical fixed trajectory, posterior
-  reward-event-vs-zero ROC-AUC rises from 0.641 to 0.790 and the one-step prior
-  rises from 0.546 to 0.765. Negative-vs-rest AUC reaches 0.792 posterior and
-  0.767 prior. The posterior negative-minus-zero prediction gap grows from
-  about -0.000017 to -0.000961. Separately, the sampled policy remains
-  random-level at -20.6 over five episodes. This is a causal checkpoint-model
-  learning curve, but not calibrated reward prediction or learned control yet;
-- at the 20,000-step checkpoint, the same matched trajectory improves again:
-  reward-event-vs-zero ROC-AUC reaches 0.814 posterior and 0.803 one-step
-  prior, with negative-vs-rest AUC of 0.815 and 0.803. The normalized episode
-  and interval records, including every action count and reward, have an
-  identical SHA-256 across the 10,000-, 15,000-, and 20,000-step probes. The
-  posterior negative-minus-zero prediction gap is now -0.02713 and the prior
-  gap is -0.02425. However, all three rare positive targets are still predicted
-  negative, so the event AUC partly reflects prediction magnitude rather than
-  correct reward sign. Over the last 100 updates before the checkpoint,
-  reconstruction loss averages 72.30, raw KL 2.525, replay reward MAE 0.04361,
-  and policy entropy 2.8546. Online control remains random-level: 21 completed
-  episodes average -20.333 with a best return of -18. A frozen sampled-policy
-  probe likewise averages -20.667 over six episodes while retaining 2.871
-  action entropy out of a 2.890 maximum. The separate argmax diagnostic chooses
-  `UPRIGHT` for all 2,000 steps and scores -21 on both completed episodes. The
-  curve therefore continued unchanged to the 25,000-step diagnostic rather
-  than treating early negative-event separation as policy progress;
-- at 25,000 steps, matched reward learning remains monotonic. Posterior and
-  one-step-prior reward-event ROC-AUC reach 0.869 and 0.850, while their
-  negative-vs-rest AUCs reach 0.870 and 0.852. Posterior negative-minus-zero
-  separation grows to -0.07855 and prior separation to -0.06615. Positive
-  targets now rank between zero and negative targets, but all three are still
-  predicted negative, so correct reward sign remains unproven. The normalized
-  trajectory hash is identical across all four 10,000--25,000-step probes.
-  Final-100 reconstruction, raw KL, reward MAE, and policy entropy are 62.40,
-  2.547, 0.04081, and 2.5429. In the corresponding 80,000--100,000
-  emulator-frame window, Kindle averages -20.857 over seven online episodes
-  versus -20.833 for pinned D3 seed zero. Kindle's repeated losses last 764
-  decisions; the D3 artifact contains long stretches of the same -21 return
-  every 765 decisions in this phase. Frozen sampled evaluation remains
-  random-level at -20.667 over six episodes. The curve continues unchanged to
-  the 30,000- and 35,000-step behavior discriminators;
-- at 30,000 steps, the immutable checkpoint contains 7,229 learner updates and
-  the matched trajectory hash still agrees exactly with every 10,000--25,000
-  probe. Posterior and one-step-prior reward-event ROC-AUC rise again to 0.885
-  and 0.877; negative-vs-rest AUC reaches 0.891 and 0.881. Posterior and prior
-  negative-minus-zero prediction gaps widen to -0.14999 and -0.12180. The three
-  positive events remain slightly below zero and all predictions remain
-  negative, so reward-sign calibration is still not solved. Final-100
-  reconstruction loss, raw KL, reward MAE, and policy entropy are 58.88, 2.421,
-  0.03908, and 1.4975. In the exact 100,000--120,000 emulator-frame window,
-  Kindle averages -20.5 over six online episodes versus -21.0 for pinned D3
-  seed zero and -19.80 across its five seeds. Frozen sampled evaluation is
-  likewise unchanged at -20.6 over five episodes, but its effective six-action
-  entropy falls from 1.710 at 25,000 steps to 1.171: `RIGHTFIRE` aliases account
-  for 59.9% of actions. World-model ranking is still improving while control
-  remains random-level and increasingly concentrated, so the unchanged curve
-  continues to the stronger 35,000-step recovery-versus-collapse discriminator;
-- at 35,000 steps, the checkpoint contains 8,479 learner updates and the
-  matched trajectory hash remains identical through all six probes. Posterior
-  reward-event and negative-vs-rest ROC-AUC edge up to 0.891 and 0.893, while
-  their one-step-prior counterparts dip slightly to 0.874 and 0.879. Posterior
-  and prior negative-minus-zero gaps nevertheless widen to -0.23007 and
-  -0.21156. All three matched positive targets remain predicted negative and
-  below zero targets, so matched reward ranking is plateauing without correct
-  sign calibration. Final-100 reconstruction loss, raw KL, reward MAE, and
-  policy entropy are 56.02, 2.360, 0.03659, and 1.4545. The exact
-  120,000--140,000-frame online window contains returns -18, -19, -20, and -21:
-  its -19.5 mean is one point better than pinned D3 seed zero's -20.5, but below
-  D3's -18.17 five-seed mean. Online effective actions also recover from the
-  one-sided 30,000-step concentration to 43.6% `RIGHTFIRE` and 32.3%
-  `LEFTFIRE`. Frozen sampled evaluation improves from -20.6 to -20.0 over four
-  completed episodes, with 47.8% `RIGHTFIRE`, 35.7% `LEFTFIRE`, and 1.212
-  effective-action entropy. On that policy's separate trajectory, five positive
-  targets are finally predicted above zero targets on average and posterior
-  positive-vs-negative AUC reaches 0.902, although the positive mean itself is
-  still negative. This is the first modest evidence of learned Pong control,
-  not a solved curve; checkpoints at 40,000 and 45,000 steps test it against
-  D3's sharper next-phase improvement before the existing 50,000-step probe;
-- at 40,000 steps, the checkpoint contains 9,729 learner updates and the
-  matched trajectory hash remains unchanged. Posterior reward-event and
-  negative-vs-rest ROC-AUC improve to 0.902 and 0.909, and their one-step-prior
-  counterparts reach 0.889 and 0.894. Posterior and prior negative-minus-zero
-  gaps widen again to -0.24611 and -0.22647, but the three positive targets
-  remain predicted negative and below zero targets. Final-100 reconstruction
-  loss, raw KL, reward MAE, and policy entropy are 53.29, 2.476, 0.03449, and
-  1.2575. World-model reward discrimination is therefore still improving.
-  Control is not: the exact 140,000--160,000-frame online window averages -20.0
-  over five episodes, versus -18.67 for D3 seed zero and -15.13 across its five
-  seeds. Online actions are almost entirely split between `RIGHTFIRE` at 44.3%
-  and `LEFTFIRE` at 43.7%, with 1.111 effective-action entropy. The frozen
-  endpoint policy regresses to -20.833 over six episodes, choosing those groups
-  33.4% and 53.1% of the time with 1.103 entropy. Its sole positive reward ranks
-  above negative and zero targets, but one event cannot establish calibration.
-  The 35,000-step signal was not sustained: the reward model is viable while
-  state-dependent control remains the active bottleneck. The unchanged curve
-  continues through 45,000 and 50,000 steps before choosing a BPTT-length or
-  capacity follow-up;
-- a read-only open-loop probe on that 40,000-step checkpoint further localizes
-  the control failure. Across 100 starts on a 5,000-action forced trajectory,
-  posterior DINO reconstruction MSE is 0.01917. Prior MSE at horizons 1, 5, and
-  15 is 0.01758, 0.02055, and 0.02344. Persistence is better at one step
-  (0.01033), but degrades to 0.03105 and 0.04925, making the prior 0.662x and
-  0.476x persistence at horizons 5 and 15. To reject a generic mean-prediction
-  explanation, a paired unrelated-action rollout starts from the same latent
-  state and reuses identical categorical random draws. Correct-action MSE is
-  0.996x, 0.837x, and 0.714x that control at horizons 1, 5, and 15. All original
-  measurements reproduce bit-for-bit in the paired run, and 98--100 valid
-  samples remain at every horizon after excluding episode crossings. The world
-  model therefore predicts action-conditioned visual change over imagination's
-  full horizon; short-term precision is imperfect, but an action-blind prior is
-  not the explanation for the failed endpoint policy;
-- at 45,000 steps, the immutable checkpoint contains 10,979 learner updates
-  and the matched trajectory hash remains identical through all eight probes.
-  Posterior and one-step-prior reward-event ROC-AUC rise to 0.927 and 0.921;
-  negative-vs-rest AUC reaches 0.934 and 0.926. The posterior
-  negative-minus-zero prediction gap widens to -0.26386, while the prior gap
-  stays near -0.22628. The prior now ranks the three positive events slightly
-  above zero on average, but both means remain negative and the posterior still
-  reverses that ordering. Final-100 reconstruction loss, raw KL, reward MAE,
-  and policy entropy are 48.35, 2.561, 0.03307, and 1.3474. In the exact
-  160,000--180,000-frame online window, returns of -20, -21, -20, -19, and -20
-  average -20.0, versus -18.0 for D3 seed zero and -14.97 across its five
-  seeds. Online effective-action entropy recovers to 1.293, with 35.7%
-  `RIGHTFIRE`, 30.8% `LEFTFIRE`, and 27.9% `LEFT`, but the broader action mix
-  does not improve return. Frozen sampled evaluation is worse: all six
-  completed episodes score -21.0, five terminate in exactly 764 decisions,
-  and no positive reward occurs. That policy's negative-event AUC is still
-  0.968 posterior and 0.961 prior. Reward-state learning is therefore
-  progressing while the actor/value path converges toward a repeatable losing
-  strategy. The unchanged curve continues to the already scheduled 50,000-step
-  discriminator;
-- a paired behavior probe on the same 45,000-step checkpoint evaluates all 18
-  candidate actions at 250 posterior states along the fixed random trajectory.
-  Its one-step diagnostic target is predicted next reward plus predicted
-  continuation times next critic value. The actor is directionally aligned
-  with that target: mean within-state policy/value correlation is 0.426,
-  pairwise ranking accuracy is 0.679, and the policy-weighted target exceeds
-  the uniform-action mean by 0.01987. The greedy action is the one-step maximum
-  on only 22.8% of states, but its mean gap to that maximum is just 0.01349.
-  The critic's mean action span is itself only 0.06474, comprising a 0.01384
-  reward span and 0.05994 next-value span. Its best raw action falls in a
-  `LEFTFIRE` alias on 131/250 states, `LEFT` on 74, `RIGHTFIRE` on 28, and
-  `RIGHT` on 12; the actor's greedy choices concentrate on those same effective
-  groups. Thus the actor largely follows weak, alias-sensitive model values.
-  On the identical first 1,000 trajectory decisions, 250-state probes at
-  10,000, 25,000, 35,000, 40,000, and 45,000 training checkpoints show the
-  one-step action span growing from 0.00007 through 0.01236, 0.03240, 0.04756,
-  and 0.06428, while policy/value correlation changes from 0.111 through 0.246,
-  0.233, 0.284, and 0.402. Alignment strengthens while game control fails.
-  At 45,000 steps, mean values for the three environment-equivalent
-  `LEFTFIRE` aliases alone differ by 0.02106, about one third of the entire raw
-  action span. The critic is learning increasingly sharp but partly spurious
-  action distinctions rather than staying flat.
-  Together with the native control and source audit, this is evidence against
-  a reversed policy gradient or stale actor synchronization and for improving
-  temporal/value learning before changing the policy objective;
-- an on-policy calibration probe makes that value failure explicit. Read-only
-  value and probability queries reproduce the 45,000-step sampled trajectory
-  exactly: all 18 action counts, six episode boundaries, five 764-decision
-  episodes, the final 875-decision episode, and six -21 returns match the
-  earlier probe bit-for-bit. Across the 4,695 states belonging to those fully
-  terminated episodes, the critic predicts -3.205 on average while the realized
-  horizon-discounted return is -5.906. Its optimism bias is 2.701, MAE is 3.083,
-  RMSE is 3.457, and value/return correlation is only 0.045. The critic therefore
-  neither calibrates the return level nor tracks which on-policy states precede
-  losses, despite assigning increasingly sharp action preferences. This is the
-  strongest evidence for testing full recurrent gradients before actor-loss
-  changes;
-- at 50,000 steps, the checkpoint contains 12,229 learner updates and the
-  matched trajectory hash remains unchanged. Posterior and one-step-prior
-  reward-event ROC-AUC improve to 0.943 and 0.937; negative-vs-rest AUC reaches
-  0.953 and 0.943. Their negative-minus-zero gaps widen to -0.30350 and
-  -0.27080, but all three positive events are again predicted below zero
-  events. Final-100 reconstruction loss, raw KL, reward MAE, and policy entropy
-  are 44.39, 2.613, 0.03175, and 1.0488. The exact
-  180,000--200,000-frame online window averages -20.667 over returns -21, -20,
-  -20, -21, -21, and -21, versus -16.25 for D3 seed zero and -13.42 across its
-  five seeds. Online effective-action entropy is 1.266. Frozen sampled
-  evaluation then scores -21.0 on six episodes that all terminate in exactly
-  764 decisions; 64.0% of actions are `LEFT` aliases and 33.7% are `LEFTFIRE`,
-  for only 0.767 effective-action entropy. No positive reward occurs, while
-  negative-event AUC is still 0.977 posterior and 0.971 prior. This definitive
-  50,000-step control failure selects full 64-step recurrent gradients as the
-  next causal run. The current curve remains immutable and continues through
-  its existing 75,000- and 100,000-step gates to measure whether the collapse
-  eventually recovers;
-- paired behavior and value diagnostics at the same 50,000-step checkpoint
-  show that the collapse is increasingly critic-led. Across 250 states on the
-  fixed forced-action trajectory, actor/one-step-value correlation rises from
-  0.426 at 45,000 steps to 0.516, pairwise ranking accuracy rises from 0.679 to
-  0.717, and greedy agreement with the one-step maximum rises from 22.8% to
-  43.6%, even as policy entropy falls from 1.328 to 1.048. The actor assigns
-  89.0% mean probability to the raw `DOWNLEFT` and `DOWNLEFTFIRE` aliases,
-  whose greedy choices cover 247/250 states. The one-step action span remains
-  small at 0.0621. On the separate sampled-policy trajectory, the calibration
-  probe reproduces all 18 action counts and six -21 episodes of exactly 764
-  decisions from the frozen endpoint evaluation. Across their 4,584 states,
-  predicted values average -3.403 with standard deviation 0.132, whereas
-  realized horizon-discounted returns average -5.949 with standard deviation
-  2.222. Bias is +2.546, MAE 3.009, RMSE 3.383, and value/return correlation
-  is -0.015. The actor is therefore becoming more faithful to a critic that
-  has almost no useful temporal ranking. An extended probe preserves that
-  trajectory and every prior metric bit-for-bit while also comparing each
-  value with its realized one-step Bellman target. Those targets correlate
-  0.634 with the critic; one-step bias is only +0.0139 and MAE is 0.0576, but
-  that small optimism compounds over the 333-step horizon. On the same policy
-  trajectory, actual reward averages -0.0274 while the one-step prior predicts
-  -0.01955, so underestimating loss-event magnitude explains a substantial
-  part of the long-horizon value bias. Matching 5,000-step probes at 10,000,
-  25,000, 35,000, 40,000, 45,000, and 50,000 checkpoints preserve every
-  available prior evaluation trajectory exactly. Their Bellman target
-  correlations are -0.011, 0.241, 0.386, 0.357, 0.561, and 0.634, while
-  value/realized-return correlations remain 0.017, 0.089, 0.015,
-  -0.043, 0.045, and -0.015. Over the same sequence, policy entropy falls from
-  2.890 to 0.956 and critic standard deviation grows from 0.00002 to 0.132.
-  The critic therefore learns increasingly varied, locally consistent values
-  without learning useful episodic ordering, and the actor specializes around
-  them. Full recurrence remains the first controlled test, with reward
-  calibration and capacity now explicit follow-up discriminators;
-- through 60,000 steps, all 13 completed episodes after the 50,000-step
-  checkpoint score -21 and terminate in exactly 764 decisions. Kindle averages
-  -21.0 over both the 200,000--220,000-frame window (seven episodes) and the
-  220,000--240,000-frame window (six episodes). Pinned D3 seed zero scores
-  -14.5 and -17.25 in those windows, while its five-seed means are -12.10 and
-  -12.92. A policy-distribution phase change has started but has not repaired
-  behavior: final-100 learner entropy falls to 0.695 at 55,000 steps and
-  rebounds to 1.183 at 60,000. In the final 1,000 interactions, effective
-  action entropy is 1.191, split mainly across `LEFTFIRE` at 44.6%, `LEFT` at
-  28.1%, and `RIGHTFIRE` at 24.1%. The broader action mix still loses every
-  point, so the immutable curve continues to its 75,000-step evaluation rather
-  than treating entropy recovery as control recovery;
-- the atomic 75,000-step checkpoint is now archived. The six episodes ending
-  from 70,000 through 75,000 interactions average -20.833 (range -21 to -20),
-  and the twelve ending from 65,000 through 75,000 average -20.5 (range -21
-  to -19). Over the complete 70,000--75,000 learner interval,
-  reconstruction loss averages 36.44, raw KL 2.504, reward loss 0.0580,
-  replay-value loss 1.434, policy entropy 1.375, and imagined return -3.834.
-  The model losses continue to improve without an online control recovery;
-  matched-random, sampled-policy, behavior, and value probes remain queued
-  after the immutable 100,000-step endpoint so they do not contend with
-  training for the RTX;
-- the atomic 80,000-step checkpoint contains 19,729 learner updates. The six
-  episodes ending from 75,000 through 80,000 interactions score -21, -20, -20,
-  -19, -21, and -20, for a -20.167 mean. Across the 1,250 learner updates in
-  that interval, reconstruction loss averages 35.287, raw KL 2.617, reward loss
-  0.0575, replay-value loss 1.460, policy entropy 1.518, and imagined return
-  -3.890. The 5,000 live actions have effective six-action entropy 1.367 and
-  remain concentrated on `RIGHTFIRE` (39.7%), `LEFTFIRE` (28.9%), and `LEFT`
-  (20.9%). This is another random-level late marker, not a benchmark score:
-  the 350,000-frame score window starts at interaction 87,500;
-- the atomic 85,000-step checkpoint contains 20,979 learner updates. The six
-  episodes ending from 80,000 through 85,000 interactions score -19, -21, -20,
-  -21, -21, and -21, averaging -20.5. Across the interval's 1,250 learner
-  updates, reconstruction loss averages 33.798, raw KL 2.549, reward loss
-  0.0536, replay-value loss 1.470, policy entropy 1.532, and imagined return
-  -3.946. Effective action entropy is 1.414 over the six Pong transition
-  groups; `LEFTFIRE` now receives 38.8%, `RIGHTFIRE` 24.3%, `RIGHT` 19.2%, and
-  `LEFT` 15.3% of actions. The changing mix still loses essentially every
-  point. At 340,000 emulator frames this is the final atomic checkpoint before
-  the protocol score window, not evidence from inside that window;
-- the atomic 90,000-step checkpoint contains 22,229 learner updates. The four
-  episodes ending from 85,000 through 90,000 interactions score -21, -19, -18,
-  and -20, averaging -19.5. Across the interval's 1,250 learner updates,
-  reconstruction loss averages 32.472, raw KL 2.641, reward loss 0.0526,
-  replay-value loss 1.478, policy entropy 1.337, and imagined return -3.909.
-  Effective action entropy falls to 1.284: `RIGHT` receives 43.6% and
-  `LEFTFIRE` 35.4% of the 5,000 actions, followed by `LEFT` at 10.5% and
-  `RIGHTFIRE` at 7.2%. The interval sustains 1.772 environment decisions/s.
-  The first three episode endpoints in the 350,000--400,000-frame score window
-  are -18, -20, and -20 at frames 351,696, 356,492, and 360,248, for a
-  provisional -19.333 mean. This incomplete-window value is useful live
-  evidence but is not a protocol score; strict aggregation still waits for the
-  100,000-step `run_end`;
-- at environment step 94,254 and learner step 23,293, a system-wide OOM killed
-  the BPTT-8 process. Kernel evidence shows the pressure was external to the
-  experiment: a simultaneous container/Xorg burst filled all 8 GiB of swap,
-  while Kindle's unit peaked at 2.1 GiB. The six uninterrupted score-window
-  endpoints available before the kill are -18, -20, -20, -17, -15, and -19,
-  averaging -18.167. They remain diagnostic only. The exact crash log is
-  preserved separately with SHA-256
-  `e87fa98f2642515050b3de07e1b7e45eee64f19611578202befee82e6d3bbb5d`;
-  no completion event was fabricated;
-- recovery resumes the real atomic 90,000-step checkpoint at learner step
-  22,229 and appends an explicit checkpoint segment. Strict aggregation
-  requires that the nested start preserve the environment, seed, protocol,
-  runtime, DINO identity, parameter counts, and full agent config, and that its
-  environment and learner counters match a prior checkpoint event. It closes
-  the interrupted segment at 360,000 frames and discards the superseded
-  post-checkpoint crash tail before combining episode endpoints, exposing the
-  recovery count in the score summary. Because Kindle checkpoints do not yet
-  persist replay, the resumed learner also refills 1,088 frames, providing
-  1,024 eligible length-64 sequence starts, before updating at absolute
-  environment step 91,086. The final result is therefore labeled checkpoint-
-  recovered rather than uninterrupted; a winning configuration still requires
-  an independent clean replication;
-- the recovered atomic 95,000-step checkpoint contains learner step 23,208,
-  only 979 updates after 90,000 because replay refill intentionally earns no
-  deferred training credit. Its four resumed episodes score -20, -20, -20,
-  and -19, averaging -19.75. Combining them with the two retained pre-recovery
-  score-window endpoints gives a provisional recovery-aware mean of -19.5 over
-  six episodes. Across the 979 resumed updates, reconstruction loss averages
-  31.918, raw KL 2.614, reward loss 0.0482, replay-value loss 1.557, policy
-  entropy 1.308, and imagined return -4.062. Effective action entropy is 1.286:
-  `RIGHT` receives 41.1%, `LEFTFIRE` 34.0%, and `LEFT` 17.2% of the 5,000
-  actions. The recovery segment has not reproduced the superseded crash tail's
-  -17 and -15 episodes, another reason not to present either partial trajectory
-  as the final score;
-- the checkpoint-recovered BPTT-8 curve now has a real 100,000-step `run_end`.
-  Strict recovery-aware aggregation retains the -18 and -20 episode endpoints
-  before the 90,000-step checkpoint and combines them with the eight resumed
-  endpoints, producing -18.9 across ten completed score-window episodes. This
-  is 1.723 points above the ALE 0.12 matched-random target (-20.623), but 8.9
-  points below the reported 12M D3 target (-10) and 14.363 below the historical
-  200M artifact (-4.537). The final 5,000 interactions improve to -18.0 across
-  four episodes (-19, -18, -17, and -18). Their 1,250 learner updates average
-  reconstruction loss 31.612, raw KL 2.816, reward loss 0.0500, replay-value
-  loss 1.626, policy entropy 0.977, and imagined return -3.588. Effective
-  action entropy falls to 1.005, with `RIGHT` at 58.5% and `LEFTFIRE` at 30.5%.
-  Across the full resumed 10,000 interactions, 2,229 updates average
-  reconstruction loss 31.746, raw KL 2.727, reward loss 0.0492, replay-value
-  loss 1.596, policy entropy 1.123, and imagined return -3.796. The missing 271
-  updates relative to an uninterrupted interval are exactly the consequence of
-  replay refill without deferred scheduler credit. The above-random endpoint
-  is a real late-learning signal, but it is neither a D3-baseline pass nor a
-  clean replication; the immutable BPTT-64 comparison and endpoint probes
-  determine the next intervention;
-- paired read-only endpoint probes confirm that the late improvement is visible
-  off the training trajectory. The seed-100 matched-random stream is identical
-  at both checkpoints and scores -20.4. On that same environment stream, the
-  frozen sampled policy changes from -20.5 across six completed episodes at
-  75,000 steps to -18.667 across three at 100,000, with a further -13 partial
-  game still open after 1,176 decisions. The latter's smaller episode count
-  makes this directional evidence rather than another benchmark score. Its
-  critic is materially less wrong about realized discounted returns: value
-  bias falls from +1.865 to +0.510, MAE from 2.501 to 1.277, and statewise
-  value/return correlation rises from 0.014 to 0.204. One-step Bellman MAE
-  improves from 0.0743 to 0.0657 and target correlation from 0.746 to 0.761.
-  Actor alignment does not improve uniformly: probability on the model's best
-  one-step action rises from 6.5% to 10.3% and greedy agreement from 3.2% to
-  10.0%, but policy/value correlation falls from 0.294 to 0.204 and gain over
-  uniform falls from 0.0133 to 0.0086. Thus late BPTT-8 learning improves
-  temporal value calibration and control while leaving the 18-action actor
-  only weakly aligned with small, alias-sensitive one-step differences. The
-  full-recurrence control was released only after these probes completed;
-- the first BPTT-64 launch exposed a runtime-protection mistake before its
-  first checkpoint: it inherited `OOMScoreAdjust=200`, the same preference that
-  made the kernel select BPTT-8 during unrelated host pressure. Its incomplete
-  1,542-step/115-update startup log is preserved with SHA-256
-  `b4dda8957203ddae4d72b371e4235c03a58216b0938244edf21764ee5a24f8ab`.
-  With no checkpoint to migrate, the identical source-pinned command restarted
-  from seed zero under a guarded launcher whose SHA-256 is
-  `e40d4764fb60e68b04e1364ab8a6d7ffae77695da320b9483d5c5030022b74aa`.
-  Removing timing-only fields makes both JSON streams bit-identical through
-  environment step 1,138 (normalized SHA-256
-  `e1cd30a50a0197e8611770e88252f16f306b05efb4fe13036e53735c30887570`),
-  so the restart changes no trajectory or optimization input. The user manager
-  imposes an effective process floor of +100 despite the unit's requested zero,
-  still improving on +200; the waiting diagnostic and upstream workers now use
-  the same protection. The protected restart constructs in 97.25 seconds,
-  its first 50 updates are finite and average 2.248 seconds/update (1.780
-  environment decisions/s), and it peaks initially at 1.96 GiB host and 3,267
-  MiB device memory without unit swap;
-- that protection does not make concurrent full-BPTT and eight-environment
-  Quake collection safe while all 8 GiB of host swap remains occupied. The
-  separate `mind-games` controller again grew to about 2.6 GiB, each of its
-  eight `vkquake` processes to about 0.55 GiB plus Xorg, and host availability
-  fell from 6.4 to 4.5 GiB while Kindle was active. Kindle therefore yielded
-  voluntarily before the first checkpoint at environment step 2,018 and
-  learner step 234; that incomplete log is preserved with SHA-256
-  `4817b70c80a136a752f3608fdb1899b25a68928fb7732e7614330d9bddc9aee1`.
-  A later clean restart similarly yielded at step 2,022/update 235 when a
-  diagnostic repeat appeared, preserving SHA-256
-  `8bd4de43e19364595d483c5b054ead9927126a35e3fb534a05a89de871a11a28`.
-  All three stopped starts are timing-normalized and bit-identical through the
-  first start's complete step 1,542 prefix (SHA-256
-  `1e356a31b979902a58ccf7cd9485398d39682897fd88bc21a1b411a0317734ad`).
-  None is a result or recovery segment: no checkpoint existed, and the
-  authoritative curve restarts from seed zero. A narrow contention guard
-  (SHA-256
-  `02c958d42eed623d88d3c9ab7ece3ddd157031793ac0f67ba19d759d6bb3cf85`)
-  watches only for that known external controller, freezes Kindle's dependent
-  workers, and stops only Kindle; it never signals or changes `mind-games`.
-  A one-shot resume worker (SHA-256
-  `c1bcb053a4084f66ae953fca5214402746e59e6cb785d7bf4a4c2daacb1a8335`)
-  now requires ten uninterrupted quiet minutes before relaunching the exact
-  pinned command, thawing the queue, and arming the guard again;
-- the guard later yielded once more at environment step 1,226/update 36 when
-  the external controller reappeared. That pre-checkpoint log is preserved
-  with SHA-256
-  `739da93e6fbf861b2da47e7c6298e227f769e8eabf257d16a05c25edcb6490a7`.
-  An hourly coordinator (SHA-256
-  `97bda29acd12377ffc0b72fdeb73778d0b2b86305511f57967d7aa331869dddc`)
-  closes the one-shot worker's stale edge case: it observes but never signals
-  the external workload, preserves an inactive pre-checkpoint output, and
-  rearms the same ten-minute quiet-window worker. After the competing goals
-  were paused, it released a fourth seed-zero start. Removing only construction
-  and event timing fields makes that authoritative start and the preserved
-  1,226-step prefix bit-identical (SHA-256
-  `46d817baba115db4f33afcf5b014274011a283ffb12a566b75fe320ad64c2dd8`).
-  The resulting curve is uninterrupted through its archived 75,000-step
-  checkpoint, which contains learner step 18,479. Over the final 100 updates,
-  full BPTT-64 versus matched BPTT-8 has reconstruction loss 30.966 versus
-  35.821, reward loss 0.03613 versus 0.05600, raw KL 2.158 versus 2.514,
-  replay-value loss 1.398 versus 1.452, and policy entropy 1.754 versus 1.440.
-  Effective six-action entropy over the final 5,000 interactions is likewise
-  higher at 1.614 versus 1.252. This improved model fit and avoided the
-  truncated run's sharper action collapse, but has not yet improved control
-  convincingly: its five completed episodes average -20.4 versus -20.833 over
-  six for BPTT-8, and its last-25,000-step mean is -20.607 versus -20.742.
-  The protocol score window does not start until interaction 87,500, so the
-  immutable run continues to 100,000 and the queued frozen-policy probes;
-- the same uninterrupted full-BPTT curve now has an archived 85,000-step
-  checkpoint at learner step 20,979, the final atomic checkpoint before the
-  score window. Over interactions 80,000--85,000, its four completed episodes
-  score -18, -17, -16, and -17, averaging -17.0, while matched BPTT-8 averages
-  -20.5 across six episodes. The interval reward is -51 versus -122. Across
-  the identical 1,250 updates, full BPTT-64 versus BPTT-8 averages
-  reconstruction loss 29.626 versus 33.798, reward loss 0.03512 versus
-  0.05356, raw KL 2.269 versus 2.549, replay-value loss 1.517 versus 1.470,
-  and policy entropy 0.789 versus 1.532. Its effective Pong actions are 28.0%
-  `NOOP`, 34.5% `LEFT`, and 29.8% `RIGHTFIRE`, with the remaining three groups
-  totaling 7.7%. Effective-action entropy is 1.349 versus 1.414, but the
-  conditional entropy spent among environment-equivalent aliases is only
-  0.293 versus BPTT-8's 0.772. Thus the late improvement is accompanied by
-  more consistent representatives for redundant actions rather than alias
-  confusion. This is strong pre-window evidence that full recurrence changes
-  control, but it remains diagnostic until the uninterrupted 100,000-step
-  `run_end` closes the 350,000--400,000-frame score window;
-- its atomic 90,000-step checkpoint is archived at learner step 22,229. Over
-  interactions 85,000--90,000, full BPTT-64 completes two episodes at -17 and
-  -18 (mean -17.5 and mean length 2,131), while matched BPTT-8 completes four
-  at -21, -19, -18, and -20 (mean -19.5 and mean length 1,091). Total reward
-  is -41 versus -91, and the five consecutive 1,000-step reward deltas are
-  +14, +8, +10, +8, and +10, so the advantage is distributed across the
-  interval rather than coming from one rally. Across the identical 1,250
-  updates, full BPTT-64 versus BPTT-8 averages reconstruction loss 29.041
-  versus 32.472, reward loss 0.03567 versus 0.05257, raw KL 2.358 versus
-  2.641, replay-value loss 1.521 versus 1.478, policy entropy 0.599 versus
-  1.337, and imagined return -3.061 versus -3.909. Full BPTT-64 concentrates
-  its effective actions on `LEFT` (43.5%), `RIGHTFIRE` (39.5%), and `NOOP`
-  (11.6%); its effective-action entropy is 1.185 versus 1.284, and its
-  within-equivalent-group entropy is only 0.207 versus 0.700. The first
-  episode endpoint in the protocol score window is -18 at emulator frame
-  356,996, giving a provisional one-episode mean of -18.0. This remains live
-  evidence, not a score: strict aggregation still requires complete coverage
-  through frame 400,000 and a valid 100,000-step `run_end`;
-- the uninterrupted curve's atomic 95,000-step checkpoint is archived at
-  learner step 23,479. Over interactions 90,000--95,000, full BPTT-64
-  completes two -18 episodes (mean length 1,981.5) and collects -43 reward.
-  The recovery-aware BPTT-8 segment completes -20, -20, -20, and -19 episodes
-  (mean -19.75 and mean length 978) and collects -96 reward. Full BPTT-64 wins
-  all five 1,000-step reward slices by +16, +7, +12, +9, and +9. This is not
-  an update-count-matched comparison: BPTT-8 deliberately performs only 979
-  updates after refilling replay, versus the uninterrupted run's 1,250.
-  Across those respective updates, full BPTT-64 versus recovered BPTT-8
-  averages reconstruction loss 28.448 versus 31.918, reward loss 0.03557
-  versus 0.0482, raw KL 2.414 versus 2.614, replay-value loss 1.592 versus
-  1.557, policy entropy 0.546 versus 1.308, and imagined return -2.820 versus
-  -4.062. Its within-equivalent-group action entropy is 0.152 versus 0.758,
-  further weakening the six-action fallback. The first three score-window
-  episode endpoints are now all -18, at emulator frames 356,996, 365,896, and
-  372,848, for a provisional -18.0 mean. Strict scoring remains withheld until
-  the uninterrupted 100,000-step completion event;
-- the full-BPTT curve now has one uninterrupted 100,000-step `run_end`, one
-  start, zero recoveries, 24,729 learner updates, and all 20 atomic snapshots.
-  Its five score-window episode endpoints are -18, -18, -18, -19, and -16 at
-  emulator frames 356,996, 365,896, 372,848, 381,484, and 391,924. The strict
-  score is therefore -17.8. The unfinished episode at the 400,000-frame cutoff
-  had reached -10 over 2,019 decisions and is correctly excluded. This beats
-  Kindle ALE 0.12's matched-random mean by 2.823 points and the recovered
-  BPTT-8 curve by 1.1 points, but remains 7.8 points below the reported 12M D3
-  target and 13.263 below the historical 200M artifact. The final 5,000
-  interactions are a fully update-matched late comparison: full BPTT-64 versus
-  BPTT-8 completes -19 and -16 episodes (mean -17.5 and mean length 2,384.5)
-  versus -19, -18, -17, and -18 (mean -18.0 and mean length 1,280.5), collects
-  -32 versus -65 reward, and wins all five 1,000-step slices by +5, +9, +4,
-  +9, and +6. Across 1,250 updates each, it averages reconstruction loss
-  27.918 versus 31.612, reward loss 0.03488 versus 0.0500, raw KL 2.443 versus
-  2.816, replay-value loss 1.640 versus 1.626, policy entropy 0.512 versus
-  0.977, and imagined return -2.690 versus -3.588. Its effective-action
-  entropy is 1.158 versus 1.005, while within-equivalent-group entropy falls
-  to 0.102 versus 0.660. Thus full recurrence yields a clean, distributed
-  improvement in model fit and control without evidence that action aliases
-  are the remaining bottleneck. The final log SHA-256 is
-  `5aef1d954be438f81084caa9bb8edb4544a0bf12e5733de11c0c1b3318cdaf4c`;
-  the score artifact records the same source hash. Paired frozen-policy probes
-  use the same seed-100 action stream and give a matched-random mean of -20.4
-  at every checkpoint. The learned policy remains at random through step
-  50,000 (-20.6 at 10,000 and -21.0 at 25,000--50,000), then improves to
-  -18.0 over three complete episodes at 75,000 and -17.0 over two at 100,000;
-  unfinished episodes are excluded from those means. The transition coincides
-  with sharply improved critic calibration rather than an action-alias change.
-  At step 50,000 the actor already assigns 0.251 probability to the one-step
-  model-best action and its
-  logits correlate 0.418 with model Q, but the frozen critic has +2.615 return
-  bias, -0.110 return correlation, and only 0.241 Bellman-target correlation.
-  By step 100,000, full BPTT-64 versus matched BPTT-8 assigns 0.526 versus
-  0.103 probability to the model-best action, agrees with its argmax on 54%
-  versus 10% of states, and has model-Q correlation 0.369 versus 0.204. Its
-  reward-prediction MAE is 0.00426 versus 0.0361, value MAE 0.965 versus
-  1.277, and Bellman correlation 0.916 versus 0.761. Thus full recurrence
-  produces materially better temporal value calibration and actor alignment;
-- the pinned current-D3 `size1m` seed-zero control completed uninterrupted with
-  exit status zero, a post-success `RUN_COMPLETE` marker, 688,004 parameters,
-  and 122 finite metric records. Its 13 strict-window episode endpoints are
-  -21, -19, -20, -20, -20, -19, -21, -21, -21, -21, -21, -21, and -21,
-  for -20.462. This is 0.088 below its ALE 0.9 matched-random floor. Kindle's
-  full-BPTT score is therefore 2.662 points better raw and 2.911 points better
-  after subtracting each runtime's random floor. The upstream score JSONL,
-  pinned manifest, and combined comparison have SHA-256
-  `2e6f2d3d31ddac283cfd1d29f51093ec023b1d7408d4f975e5704a94ea78e1c7`,
-  `4107c22a98a4ddf1db5f71853c7d052e5028e0574034732e05f4f9e172d18abf`,
-  and `ca2dac1fdbf00626b6e7491166181171044cb3fe20a7dc8bb335197c65dd54fd`.
-  This single-seed, preset-class control does not make Kindle a D3-baseline
-  result: the reported -10 and historical -4.537 targets use larger models.
-  It does show that replacing DINO or the action vocabulary is not the next
-  supported change. The clean seed-one replication scores -18.375, producing
-  a -18.0875 two-seed mean and selecting the 12M capacity experiment;
-- the phase comparison now puts Kindle behind the pinned D3 Pong artifact,
-  rather than merely matching its random early regime. D3's five-seed episode
-  means in 20,000-frame windows ending at 20,000, 40,000, 60,000, 80,000,
-  100,000, 120,000, 140,000, 160,000, and 180,000 emulator frames are -20.40,
-  -20.37, -20.93, -20.80, -20.63, -19.80, -18.17, -15.13, and -14.97
-  respectively.
-  These phase markers are diagnostic rather than size-matched acceptance gates:
-  the initial Kindle curve is 1M with eight-step truncated BPTT and frozen
-  DINO, while the published artifact uses a larger model and full recurrence.
-  The completed full-recurrence and current-D3 controls resolve the first
-  branch: BPTT-64 improves Kindle and the standard upstream 1M model remains at
-  random. The completed seed-one replication confirms that result, so the
-  capacity experiment now precedes any vision or action-vocabulary ablation.
-  The frozen-vision interface and six-action fallback are not selected by the
-  present evidence;
-- a held-out nearest-centroid probe over 500 GridWorld frames classifies raw
-  frozen-DINO position at 85/100 and food state at 95/100, observing all 25
-  and 3 classes. It also recognizes both held-out reward frames, although that
-  rare two-example test is only directional evidence;
-- the valid-action random control averages 21.073 rewards per 1,000 steps over
-  ten independent 100,000-step seeds;
-- tiny-model wiring controls remained at or below random return at both the
-  default and a diagnostic 1e-3 learning rate; they stayed finite and reduced
-  reconstruction loss, but did not learn reward-conditioned predictions;
-- the corrected upstream 1M preset first learned at environment step 1,081
-  with exactly 1,088 replay frames, then completed 10,000 interactions and
-  2,230 updates. Online reward was 216 versus 217 for the matched random seed;
-  its frozen greedy policy scored 0/2,000 while choosing only up/down;
-- over the final 100 updates of that 1M run, rewarded and unrewarded
-  predictions averaged 0.019785 and 0.019775 and policy entropy averaged
-  1.3829 (uniform over four actions is 1.3863). Reconstruction fell from
-  4,017.8 on the first update to 2,237.6 on the final update;
-- on the same held-out trajectory, the trained 196-value adapter still
-  classified position at 37/100, food state at 83/100, and both reward frames.
-  The sampled 640-value posterior classified position at 4/100 and missed both
-  reward frames; its deterministic and categorical components were similarly
-  near chance for position. The current failure is therefore downstream of
-  DINO and primarily at the RSSM posterior boundary.
-
-The follow-up uses a dense diagnostic reward for either of the two rightmost
-columns. Forced random actions give every learner the same trajectory, while
-randomizing position after every action makes the next observation and reward
-unpredictable from action history. This distinction matters: on the ordinary
-grid, the validity mask lets a policy move globally right without recognizing
-the frame. Reconstruction scale `1 / 3,136` turns the summed DINO-feature event
-loss into a per-feature mean while leaving the reported raw loss comparable.
-Except for the named 12M run, these controls use the 1M preset, learning rate
-`1e-3`, zero warmup, train ratio 256, and 16 free nats.
-
-| Dense diagnostic (3,000 frames, ~480 updates) | Position regime | Reconstruction scale | Final-100 reward gap | Held-out randomized dense-right accuracy |
-|---|---:|---:|---:|---:|
-| Reward objective only | ordinary | 0 | 0.991 | posterior 81%, adapter 75% |
-| Full objective | ordinary | 1 | 0.053 | — |
-| Full objective | ordinary | 0 | 0.634 | — |
-| Full objective | ordinary | 1 / 3,136 | 0.427 | posterior 47%, adapter 65% |
-| Full objective | randomized | 1 / 3,136 | 0.00021 | posterior 58%, adapter 63% |
-| Full objective | randomized | 0 | 0.000035 | posterior 51%, adapter 71% |
-| Full objective, 12M | randomized | 1 / 3,136 | 0.00415 | posterior 52%, adapter 87% |
-| No reconstruction or replay-value representation gradient | randomized | 0 | 0.217 | posterior 99%, adapter 86% |
-| Replay-value representation gradient stopped | randomized | 1 / 3,136 | 0.0545 | posterior 89%, adapter 80% |
-| Replay-value representation gradient stopped, agent-controlled (5,000 frames) | ordinary | 1 / 3,136 | 0.999 | posterior 68%, adapter 80% |
-
-The reward-only model transfers to unseen randomized positions, proving that
-the frozen-DINO adapter, posterior straight-through path, and reward head can
-carry the visual label. Apparent full-objective success on the ordinary grid
-mostly follows dynamics and action history: its deterministic latent reached
-83% there but only 48% after randomization. The strict 1M and 12M runs both
-remain failures when all D3 representation gradients are preserved. The 12M
-adapter classified exact position at 79% and the dense-right label at 87%, but
-its posterior was at 52% and its own reward head predicted 0.40484 versus
-0.40493 on held-out negatives and positives. Increasing capacity therefore
-improves the adapter without carrying visual state across the posterior
-boundary. Removing feature reconstruction also leaves the 1M posterior at
-chance despite 80% exact-position accuracy at the adapter.
-
-The replay-value auxiliary gradient can instead be stopped at the RSSM
-boundary while retaining normal critic training. With reconstruction disabled,
-that control succeeds after a late phase transition: its final replay
-predictions are 0.049 versus 0.923, and on held-out positions its stochastic
-posterior classifies dense-right at 99%. The model's own reward head reaches
-97.6% accuracy with predictions of 0.077 and 0.951. Reintroducing mean-scaled
-feature reconstruction preserves the result, though it delays learning: the
-final 20 replay gaps average 0.264, the held-out posterior reaches 89%, and the
-reward head reaches 85.2% accuracy (87.7% balanced) with a 0.540 prediction
-gap. The no-reconstruction run remains the sharper wiring control; the next
-sparse-food run keeps reconstruction and stops only the replay-value
-representation gradient.
-
-That matched sparse-food follow-up completed 10,000 interactions and 2,230
-updates at D3's `4e-5` learning rate. It earned 192 reward versus 217 for the
-matched random seed and 216 for the original full-gradient agent. Its final-100
-replay reward gap was -0.000002, policy entropy was 1.3861, and its frozen
-greedy policy earned 0/10,000 while alternating left/right, versus 207 for the
-seed-matched random evaluation. A frozen 500-frame probe does find weak reward
-ordering: ROC AUC 0.659, average precision 0.0365 at a 1.8% positive rate, and
-best balanced accuracy 0.691. The prediction gap is only 0.0000096, however,
-so this is an early ranking signal rather than a calibrated reward model or a
-usable controller. Stopping the interfering gradient is necessary for the
-dense visual control, but is not sufficient at this short D3-rate budget.
-
-The agent-controlled dense follow-up uses the same repaired representation with
-the diagnostic `1e-3` learning rate, zero warmup, and 16 free nats. It undergoes
-a clear phase transition near update 240: reward separation rises from 0.002 to
-0.166 and then to 0.87, while interval return recovers from 24--69/250 to
-246/250. It earns 1,518/3,000 at the old comparison point, versus 1,109 for
-random actions and 570 for the old full-gradient agent, and finishes at
-3,472/5,000. The last 3,000 interactions earn 2,927 reward. Its frozen greedy
-policy scores 1,959/2,000 versus 707 for the exact random control, establishing
-that world-model, actor, and critic learning can work end to end.
-
-This dense result is not yet robust visual navigation. On held-out positions
-randomized after every action, the posterior classifies dense-right at 68% and
-the adapter at 80%, but the model's own reward head has only 0.541 ROC AUC and
-a 0.059 prediction gap. The ordinary task can be solved largely from action
-history and the live validity mask. The next sparse-food diagnostic therefore
-uses the successful `1e-3`, zero-warmup, 16-free-nat regime; it tests whether
-the remaining weak reward ordering can become grounded, sequential control
-rather than extending the low-rate run blindly.
-
-That high-rate sparse run grounds the posterior reward but still fails control.
-With the shared `1e-3` world/behavior rate, it earns only 43/10,000 before
-falling into a deterministic loop; its frozen policy scores 0/10,000. Yet the
-held-out posterior reward head is perfect (ROC AUC and average precision 1.0,
-predictions 0.0020 versus 0.9983). Slowing only actor/critic optimization to
-`1e-4` preserves substantially more exploration and improves online reward to
-126/10,000, but remains below the 217 random control and also freezes at
-0/10,000. Its final-100 entropy is 0.780, posterior reward gap is 0.998, and
-imagined reward is only 0.00066. Premature actor collapse is therefore harmful
-but not the remaining root cause.
-
-An open-loop prior probe locates the next failure. From held-out posterior
-states, the split-rate model's action-conditioned reward prediction has ROC AUC
-0.883 and a 0.136 gap after one transition. After two transitions, ROC AUC is
-0.580 and predictions collapse to 0.00020 on positives versus 0.00044 on
-negatives; horizon three is at chance. The diagnostic's 16-free-nat setting
-explains this: dynamics and representation KL average 16.00013 across the run
-and 16.000004 over the final 100 updates. The clamped KL objective therefore
-supplies essentially no prior/posterior alignment gradient. The earlier
-16-free-nat runs remain valid posterior/reward wiring probes, but cannot
-validate Dreamer imagination. The next matched sparse run restores D3's one
-free nat while retaining the repaired representation and split optimizer rates.
-
-That one-free-nat run restores an actual prior-learning signal, but only learns
-a partial policy. It earns 130/10,000 online versus 217 for the seed-matched
-valid-action random control. Its frozen greedy policy earns 96/10,000 versus
-207 random by reliably collecting the first food once per episode and then
-failing to continue the sequence. Over the final 100 updates, dynamics KL is
-1.072 rather than pinned to the floor, posterior reward separation is 0.972,
-policy entropy is 0.067, and predicted reward on actor-selected imagined states
-is 0.307 per step despite real reward averaging only 0.013 per step.
-
-Held-out prior measurements identify model exploitation rather than missing
-reward recognition. On a random valid-action trajectory, the posterior reward
-head reaches 0.940 ROC AUC and a 0.129 gap. The one-step prior has 0.732 ROC AUC
-but a reversed calibration gap: rewarded transitions average 0.00022 prediction
-versus 0.00771 for negatives. At horizon two, ROC AUC falls to 0.537 and the
-gap is -0.0177; no later horizon has useful absolute calibration. The actor is
-therefore finding high-reward imagined latents that held-out real trajectories
-do not reach.
-
-GridWorld's live validity mask is also a material confound. Across the random
-valid-action probe, the unmasked posterior policy assigns 8.2% probability to
-invalid border moves and chooses one as its argmax on 8.0% of states. More
-decisively, removing the mask during frozen evaluation leaves return at 96 but
-changes the 10,000 actions to 9,904 `down` and 96 `right`: after reaching the
-bottom edge, the policy repeatedly selects a hidden no-op that the masked
-runner had redirected into horizontal motion. An all-action held-out trajectory
-also changes prior calibration substantially (one-step ROC AUC 0.814 and gap
-0.036), showing that the action distribution affects the learned latent regime.
-The next one-variable control therefore trains with all four actions exposed,
-including defined border no-ops, against exact random controls of 188/10,000
-(seed 0) and 178/10,000 (seed 1). It retains the same free nat, learning rates,
-model, and update budget.
-
-The all-action control removes the hidden collapse but does not yet beat
-random. It earns 158/10,000 online and its frozen greedy policy earns
-176/10,000, versus matched random returns of 188 and 178. Applying the old live
-mask to that same frozen model reduces return to 99/10,000, confirming that
-masking changes the recurrent action/state distribution rather than harmlessly
-removing no-ops. Over the final 100 updates, KL is 1.109, posterior reward gap
-is 0.932, entropy is 0.398, and imagined reward is 0.046. This is substantially
-better calibrated than the masked run's 0.067 entropy and 0.307 imagined
-reward, and it preserves random-level behavior across freezing.
-
-The matched all-action probe localizes the remaining failure. Posterior reward
-recognition reaches 1.0 ROC AUC and a 0.524 gap. Prior reward stays useful at
-horizons one and two (ROC AUC 0.851/0.824 and gaps 0.117/0.107), but horizon
-three falls to 0.679 AUC and a 0.004 gap; later horizons are inconsistent. On
-31 states with an immediately rewarding action, the prior-reward argmax chooses
-one 51.6% of the time, while the actor argmax does so only 35.5% of the time
-and assigns 32.5% probability to rewarding actions versus a 25% uniform
-baseline. Actor and prior argmaxes agree on only 41.4% of all probe states.
-Both unreliable multi-step prediction and actor/value credit assignment are
-therefore measurable bottlenecks. The next one-variable ablation shortens
-imagination from 15 transitions to the two-transition horizon that the held-out
-prior currently supports, retaining all other settings.
-
-The first short-horizon run exposed an experimental confound: Kindle used one
-RNG for live actions, live and replay posterior samples, replay selection, and
-imagination. Changing imagination length therefore changed every later random
-trajectory, not only behavior targets. These concerns are now independent,
-deterministically seeded streams, and read-only probes use a separate seed
-derived from learner/environment step. This also prevents learner throughput
-from silently perturbing the environment policy. The top-level experiment seed
-also changes ALE state, every stochastic stream, and name-hashed parameter
-initialization; only the frozen DINO projection seed remains fixed as part of
-the architecture. At the identical 15,000 environment and 3,479 learner steps,
-the completed seed-zero and seed-one full-BPTT controls have different world,
-behavior, and slow-value checkpoint hashes. Regression tests now require both
-same-seed determinism and cross-seed divergence.
-
-The repeated two-step run with isolated streams still rejects the ablation. It
-earns 94/10,000 online and 0/10,000 frozen; the frozen policy selects `down`
-9,841 times. The final-100 posterior reward gap is 0.496 and held-out posterior
-reward reaches 0.864 ROC AUC with a 0.439 gap, but one-step prior reward is at
-chance (0.491 AUC with a negative gap). Actor/prior argmax agreement is 9.8%,
-and the actor argmax chooses an available rewarding action only 22.6% of the
-time, below the 25% uniform baseline. Short imagination weakens useful value
-context and does not solve prior calibration or behavior learning here. The
-next control returns to 15 steps and lowers behavior optimization from `1e-4`
-to D3's `4e-5`, leaving the fast world learner unchanged so sparse reward can
-ground before the actor specializes.
-
-That lower-rate behavior control also fails. It preserves near-uniform
-exploration much longer and eventually recovers to 1.327 final-100 policy
-entropy, but earns only 120/10,000 online versus the 188 all-action random
-control. Its frozen greedy policy selects `left` on all 10,000 steps and earns
-zero. The final-100 replay reward gap is 0.806 and a held-out trajectory gives
-the posterior reward head 0.9998 ROC AUC with a 0.915 gap, so sparse reward is
-grounded. It does not transfer through the dynamics: one-step prior reward is
-only 0.554 AUC with a -0.0080 gap, and the actor and prior argmaxes agree on
-just 1.4% of states. On states with an immediately rewarding action, the actor
-assigns 24.4% probability to rewarding actions versus the 25% uniform baseline.
-Merely slowing actor/critic learning therefore trades premature specialization
-for underfit behavior without repairing the prior. The next controlled
-diagnostic must improve posterior/prior alignment while holding replay coverage
-fixed; further actor-rate or imagination-length tuning is not justified by
-these results.
-
-A paired forced-random control then gives both KL settings the exact same
-10,000 actions, 188 rewards, observation/action/reward trajectory, replay
-sample indices, and update count.
-With D3's one free nat, the final-100 replay reward gap is 0.893 and held-out
-posterior reward reaches 1.0 ROC AUC with a 0.903 gap, but one-step prior reward
-is only 0.581 AUC with a 0.0016 gap. The frozen actor selects `down` on every
-step and earns zero. Its deterministic latent retains only 17% held-out
-position accuracy versus 72% at the encoder, and the prior argmax chooses an
-actually rewarding action on 22.6% of eligible states, below the 25% uniform
-baseline. Exact random coverage therefore does not repair the clipped prior.
-
-Removing the free-nat floor from both balanced-KL directions produces the
-opposite tradeoff. Raw KL falls to 0.00069 over the final 100 updates and the
-held-out posterior reward head degrades to 0.659 AUC with a 0.0053 gap. The
-prior becomes materially more useful, however: one-step reward reaches 0.650
-AUC with a positive 0.0082 gap, horizons two through five retain positive gaps,
-deterministic-state position accuracy rises to 34%, and the prior argmax chooses
-an actually rewarding action 51.6% of the time. Actor/prior agreement also
-rises from 43.2% to 54.4%, but the actor itself chooses rewarding actions only
-29.0% of the time and its frozen down/right loop still earns zero. Global
-free-zero aligns by starving the posterior; global free-one preserves sparse
-reward information but leaves almost all prior gradients clipped. The next
-diagnostic therefore separates the two floors: zero free nats for the dynamics
-loss that trains the prior, while retaining one free nat for the representation
-loss that protects posterior information.
-
-That asymmetric-floor run is a real but incomplete improvement. It uses the
-same forced-random trajectory and earns the expected 188 training rewards. Its
-final-100 posterior reward gap is 0.735, raw dynamics KL is 0.335,
-representation KL is 1.127, policy entropy is 0.177, and imagined reward is
-0.069 versus 0.019 in replay. Frozen greedy evaluation earns 59/10,000 by
-selecting `right` 9,356 times and intermittently reaching only the first food.
-A larger 5,000-sample held-out probe, shared by all three floor controls,
-contains 93 rewarded transitions and makes the tradeoff less noisy. Posterior
-and one-step-prior AUC are respectively 1.000/0.544 for global free-one,
-0.740/0.741 for global free-zero, and 0.979/0.630 for asymmetric free nats.
-The asymmetric prior remains above chance through horizon five but its gaps are
-small (0.0055 at one step), while raw KL rises over the final training blocks.
-The actor chooses an immediately rewarding action on 34.5% of eligible states
-and the prior-reward argmax does so on 40.4%, both improvements over global
-free-one but below a reliable controller. Continuous prior gradients therefore
-retain most posterior task information and improve alignment, but are not
-strong enough to track the rapidly changing posterior at the diagnostic
-`1e-3` world rate. The next matched control raises only the dynamics-loss
-coefficient, leaving both free-nat floors, data, rates, and update budget fixed.
-
-A four-times dynamics coefficient overshoots that balance. Over the final 100
-updates, raw KL falls to 0.0053 and representation KL stays exactly at its
-one-nat floor, but posterior reward separation reaches only 0.038, policy
-entropy is 0.322, and imagined reward is 0.060. Frozen evaluation earns
-96/10,000 by choosing `right` 9,712 times and `down` 288 times: it reliably
-collects only the first food. On the 5,000-sample held-out probe, posterior and
-one-step-prior AUC converge to 0.707/0.706 with positive 0.0233/0.0227 gaps;
-prior AUC remains about 0.70 through horizon five. This is well aligned but
-less informative than even global free-zero's 0.740/0.741 pair. Increasing the
-dynamics coefficient changes the shared recurrent-core gradient mixture even
-though LaProp largely normalizes away a pure scale on prior-only parameters.
-That shared pressure can therefore starve task information despite the explicit
-representation free-nat floor. Scale one and four now bracket the useful
-tradeoff; the next matched control tests a two-times dynamics coefficient.
-
-The two-times coefficient does not recover the missing middle. Its final-100
-raw KL is 0.116, posterior reward gap is 0.426, representation KL is 1.084,
-policy entropy is 0.099, and imagined reward is 0.061. Frozen evaluation earns
-zero by choosing `down` on all 10,000 steps. On the same 5,000-sample held-out
-probe, posterior/one-step-prior AUC are 0.852/0.586; prior AUC stays between
-0.557 and 0.574 through horizons two to five, with small and sometimes negative
-reward gaps. The actor and prior argmax choose an immediately rewarding action
-on 29.7% and 34.5% of eligible states. Scale two is therefore dominated by the
-asymmetric scale-one run, which reaches 0.979/0.630 posterior/prior AUC and 59
-frozen rewards under otherwise identical data and compute. Coefficient tuning
-ends here: scale one is the world-model candidate for the next behavior test.
-
-That next test delays only actor parameter updates until learner update 1,300,
-the point where the matched scale-one run first develops a grounded replay
-reward gap. The behavior critic continues learning from update zero, so the
-experiment preserves early value fitting and broad imagined-state coverage
-while asking whether policy specialization—not world or critic learning—happened
-too soon. Actor optimizer moments continue tracking gradients while the
-parameters are frozen. The gate defaults to zero and is diagnostic rather than
-a baseline change.
-
-The first execution used an older version of the gate that skipped actor
-optimizer calls entirely, leaving LaProp's clock and moments cold until update
-1,301. It is therefore a negative implementation control, not the intended
-A/B. Entropy fell from 1.386 at the boundary to 0.875 by update 1,350 and 0.213
-by update 1,500 before rebounding; its final-100 mean was 0.229. Forced-random
-training earned the fixed 188 rewards, and frozen evaluation earned 78/10,000
-by selecting `right` 9,360 times, still below both exact random controls. The
-isolation itself worked: all 153 non-value tensors in the world checkpoint and
-all non-value world report fields are byte-for-byte identical to the ungated
-run. On the shared 5,000-sample probe, posterior/one-step-prior reward AUC are
-0.979/0.630 with gaps 0.678/0.0055, while the actor chooses an immediately
-rewarding action on only 33.6% of eligible states. Delaying specialization with
-a cold optimizer does not repair weak prior calibration or actor credit. The
-corrected control warms moments while holding actor parameters fixed.
-
-The corrected control confirms that conclusion. Warming the actor optimizer
-smooths the initial response to the gate, but the trajectories converge and
-then undergo the same late collapse: final-100 policy entropy is 0.209 versus
-0.229 for the cold-moment control, while imagined reward is 0.069 for both.
-Frozen greedy evaluation earns 65/10,000 by selecting `right` 9,361 times,
-below the cold control's 78. The held-out posterior/one-step-prior reward AUC
-and gaps are exactly unchanged at 0.979/0.630 and 0.678/0.0055. The actor's
-immediately rewarding argmax rate moves only from 33.6% to 33.9%. All 153
-non-value tensors in the world checkpoint remain exact; the only 11 changed
-tensors are the embedded frozen critic copy used to report replay-value loss.
-Optimizer startup state therefore changes the gate transient but does not
-repair prior calibration or behavior credit, and this diagnostic ends here.
-
-Direct decoded-DINO scoring exposes a separate architectural limit in the 1M
-diagnostic preset. On a 100-frame held-out trajectory, the asymmetric
-scale-one checkpoint has posterior reconstruction MSE 0.03603 and one-step
-prior MSE 0.03604, while copying the current observation forward scores
-0.00930. The prior therefore adds almost no decoded error beyond the posterior
-floor, but both are substantially worse than persistence. More importantly,
-the decoder maps only four hidden patch channels into the 64-channel DINO
-target. An affine PCA bound over the same frozen-DINO data gives minimum MSE
-0.01825 at rank four, so this decoder cannot beat persistence even with a
-perfect latent and optimizer. Rank 16 lowers the bound to 0.00337 (97.0% of
-variance explained), and rank 64 removes it. Fresh configurations now use
-depth 64; zero or a missing field retains the legacy preset depth so existing
-checkpoints remain loadable. The next visual-model run uses the widened decoder
-before decoded prediction error is interpreted as a dynamics result.
-
-That widened, mean-scaled control removes the decoder bottleneck but does not
-repair control. It follows the same 10,000 forced-random actions and 2,230
-updates as the rank-four run, with effectively unchanged throughput (0.449
-versus 0.448 updates/s). Reward grounding is delayed: the replay prediction gap
-first exceeds 0.1 at update 1,877 rather than 1,224. Over the final 100 updates,
-reconstruction MSE is 0.01351, replay reward separation is 0.397, raw KL is
-0.100, and policy entropy is 0.149. Frozen evaluation earns 0/10,000 by choosing
-`down` on every step.
-
-The shared 5,000-state probe shows that the wider decoder learned a better
-marginal reconstruction without a correspondingly better state model. The
-trainable DINO adapter retains 66.1% exact-position accuracy, but the complete
-posterior feature retains only 12.4%. Posterior and one-step-prior reward AUC
-are 0.858 and 0.574, with gaps 0.477 and 0.0092. The actor and prior argmaxes
-choose an immediately rewarding action on only 29.7% and 33.9% of eligible
-states. Posterior reconstruction MSE is 0.01351; open-loop MSE changes only from
-0.01355 at horizon one to 0.01391 at horizon fifteen. It beats persistence only
-from horizon four because persistence degrades while the model remains nearly
-constant, not because it tracks the trajectory. Width 64 is still the correct
-capacity control, but a per-feature-mean reconstruction coefficient lets this
-decoder fit observation statistics without forcing useful recurrent state. The
-next exact control retains the width and raises only reconstruction scale to
-0.25. The pinned D3 source divides uint8 images by 255, predicts them with a
-sigmoid decoder, and sums squared error over all image event dimensions at
-coefficient one. On Kindle's first matched batch, 0.25 maps the raw DINO loss
-from 4,201.95 to 1,050.49, putting it in the same order as D3's summed pixel
-objective instead of dividing the visual gradient by 3,136.
-
-That one-variable control solves the integration task. Reward separation first
-exceeds 0.1 at update 681 rather than 1,877 and stays near one. Over its final
-100 updates, reconstruction MSE is 0.00241, reward separation is 0.9988, raw KL
-is 0.778, imagined reward is 0.220, and policy entropy is 0.246. Throughput is
-unchanged at 0.452 updates/s. Frozen greedy evaluation earns exactly 50 rewards
-in each of 50 200-step episodes, or 2,500/10,000, while cycling all four actions;
-the mean-scaled checkpoint earned zero.
-
-The independent 5,000-state probe supports the behavioral result. The complete
-posterior and deterministic state decode position at 90% and 100%, up from
-12.4% and 11.5%. Posterior and one-step-prior reward AUC are both 1.0, with
-prediction gaps 0.998 and 0.991. On all 354 states with an immediately rewarding
-action, both policy and prior argmax select one, and the policy assigns it 96.5%
-probability on average. Open-loop DINO MSE changes only from 0.00239 at horizon
-one to 0.00248 at horizon fifteen while beating persistence on 78.6% to 97.3%
-of samples. This is still a single-seed, forced-random-data diagnostic with a
-gated actor and non-default optimizer settings, not a claim of Atari
-performance.
-
-A matched fidelity control restores both D3 gradient choices that the
-diagnostic had changed: the dynamics and representation KL terms share one
-free nat, and replay-value loss again sends its representation gradient into
-the RSSM. It follows the same forced-random 10,000-step trajectory. Reward
-separation first exceeds 0.1 at update 720, only 39 updates later than the
-adapted control. Its final-100 reconstruction loss, reward gap, raw KL,
-imagined reward, and policy entropy are 7.01, 0.9991, 0.554, 0.223, and 0.264.
-Frozen greedy evaluation again earns exactly 2,500/10,000. The held-out probe
-decodes position from the full and deterministic states at 92.7% and 95.1%;
-posterior, one-step-prior, and horizon-15 prior reward AUC are all 1.0 with
-about 0.999 prediction gaps. The policy selects an immediately rewarding
-action on 99.7% of eligible states and assigns rewarding actions 97.1%
-probability. Open-loop DINO MSE rises only from 0.00223 at horizon one to
-0.00233 at horizon fifteen. The earlier full-gradient failures were therefore
-conditional on an underweighted visual objective, not evidence that D3's
-gradient routing must be removed. D3's routing remains the baseline and the
-isolated path remains an explicit ablation.
-
-The first unforced online-first run used that isolated ablation because it was
-already in flight. It nevertheless establishes that the integration result
-survives agent-controlled data: reward separation first exceeds 0.1 at update
-705, total online reward is 1,179/10,000, and the last four 1,000-step intervals
-earn 238, 241, 242, and 246 rewards. Frozen greedy evaluation earns the exact
-2,500/10,000 ceiling. A second seed crossed the reward threshold around update
-520 before this demoted multi-seed job was stopped at 5,352 interactions to
-spend the device on the selected configuration.
-
-The selected D3-gradient configuration then passes the unforced gate directly.
-Reward separation first exceeds 0.1 at update 712. It earns 1,234/10,000
-online, with its final five 1,000-step intervals scoring 193, 243, 244, 246,
-and 244 rewards while using all four actions evenly. Over the final 100 learner
-updates, reward separation is 0.9996, reconstruction loss is 6.16, raw KL is
-0.638, imagined reward is 0.228, and policy entropy is 0.217. Frozen greedy
-evaluation earns the exact 2,500/10,000 ceiling across 50 episodes.
-
-Its independent 5,000-state probe decodes position from the full and
-deterministic states at 95.5% and 97.0%. Posterior and one-step-prior reward AUC
-are 0.99999 and 0.99939 with prediction gaps 0.954 and 0.920; horizon-15 prior
-reward AUC remains 0.99791 with a 0.855 gap. The actor chooses an immediately
-rewarding action on 99.2% of eligible states and assigns rewarding actions
-95.5% probability. Open-loop DINO MSE rises from 0.00277 at horizon one to
-0.00321 at horizon fifteen while still beating persistence on 96.2% of the
-last-horizon samples. This completes the native online integration gate for
-the D3 gradient path; Atari learning curves, not another GridWorld objective
-ablation, are now the baseline-critical experiment.
-
-The native result demonstrates learning in the integration environment but not
-benchmark-level generality. A pinned-source follow-up also found that D3 waits
-for 1,024 eligible replay items, discards prefill-time train credit, and
-evaluates warmup at optimizer step zero; Kindle had started as soon as one
-sequence existed and used the next step's warmup rate. Those startup semantics
-are now corrected and measured end to end. The tiny network remains a wiring
-preset rather than an upstream size. Online return and falling scalar losses
-alone are not sufficient.
-
-### Phase 1 — Externally rewarded baseline
+The implementation should expose two representation-prediction variants:
 
 1. **posterior representation prediction**, which ensures the belief state
    retains the perceptual information needed for behavior;
@@ -2304,12 +353,9 @@ alone are not sufficient.
    observation is incorporated, which measures whether action-conditioned
    dynamics actually predict the next perceptual state.
 
-- native visual GridWorld as an integration test;
-- one locally reproduced pinned-upstream D3 curve at a resource-matched preset
-  and wrapper protocol;
-- at least one dense-reward Atari game;
-- at least one sparse-reward Atari game;
-- a small visual persistent world with endogenous rather than harness resets.
+The posterior variant is the safer initial replacement for the current decoder.
+The prior/future term is then added as an ablation rather than changing the
+encoder and world loss simultaneously.
 
 ### 4.4 Encoder training
 
@@ -2429,37 +475,408 @@ For every policy decision:
 
 ### 6.2 Learner update
 
-- DreamerV3 behavioral reference:
-  [danijar/dreamerv3](https://github.com/danijar/dreamerv3), revision
-  `e3f02248693a79dc8b0ebd62c93683888ddaccfe`.
-- Size-matched Atari comparison:
-  [Drama ICLR 2025 paper](https://proceedings.iclr.cc/paper_files/paper/2025/file/bc968adbdff4a2551649d464b83f264a-Paper-Conference.pdf)
-  and [released code](https://github.com/realwenlongwang/Drama), revision
-  `a50bd54c34e77d1d13e988a031733a47817098e2`.
-- D3 runner ratio-scheduler reference:
-  [danijar/elements](https://github.com/danijar/elements), revision
-  `b781f900b6a3b5be3a9037fd1dbb3977ad70d219`.
-- DINOv3 source reference:
-  [facebookresearch/dinov3](https://github.com/facebookresearch/dinov3),
-  revision `6876159a11b4df116f30f667f8c9888617df0751`.
-- Native Meganeura transcription source:
-  [kvark/dinovision](https://github.com/kvark/dinovision), revision
-  `dc35cdf1c7c910cdd93c5b5362846842ae469a21`.
-- Meganeura graph/runtime dependency:
-  [kvark/meganeura](https://github.com/kvark/meganeura), revision
-  `5429fcd043acd58dec77f35a44c452737d892fd2` (including bounded training
-  allocations and scalar-f32 routing for derivative matmuls whose operands
-  require the f32 exponent range).
-- Blade graphics dependency:
-  [kvark/blade](https://github.com/kvark/blade), revision
-  `824d55fbd6485a102ee220553bc54a30c1af5936` (the revision selected by
-  Meganeura so the shared context types remain unified, same-lifetime tensor
-  batches avoid buddy-allocation waste, allocator caches are released at
-  context teardown, and full-length world BPTT retains descriptor-pool growth).
-- DINO model:
-  [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
-  snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
+For each update:
 
-The intended trajectory is still “Dreamer inside, Kindle outside.” The inside
-is now an implemented and testable baseline rather than a placeholder, while
-its task-learning gate remains deliberately open.
+1. sample contiguous replay sequences with burn-in/context;
+2. reconstruct posterior states across the sequence;
+3. update representation prediction, KL, reward, continuation, and replay-value
+   losses;
+4. start imagined trajectories from posterior states;
+5. train actor and critic from imagined rewards and lambda returns;
+6. update the slow critic;
+7. synchronize inference parameters.
+
+### 6.3 Evaluation windows
+
+Every five hours, run a fixed evaluation window with:
+
+- learning disabled;
+- policy sampling mode fixed in advance;
+- fresh natural episodes, never restored game states;
+- the same observation and action path as training.
+
+Evaluation time counts toward the 100-hour budget. Record score distributions and
+video at hours 0, 5, 10, 25, 50, 75, and 100.
+
+### 6.4 No mid-run search
+
+A full 100-hour run uses a frozen configuration. Fatal implementation bugs may
+terminate the run, but changing reward scales, learning rates, action mappings,
+or model sizes produces a new experiment rather than silently continuing the
+same one.
+
+---
+
+## 7. Reward contract
+
+The first experiment uses game-native extrinsic feedback only.
+
+Acceptable reward sources include:
+
+- score deltas;
+- win/loss events;
+- level or checkpoint completion;
+- lives lost;
+- other outcomes already defined by the game.
+
+The adapter may combine these into a documented scalar, but it should avoid
+continuous hand-shaped hints such as distance to a hidden objective or privileged
+enemy coordinates.
+
+Intrinsic reward remains at zero in the primary run. If the selected game is so
+sparse that no positive event is observed in the first 25 hours, that is a valid
+failure of the chosen setup. A separate follow-up may add one predeclared
+intrinsic signal, preferably epistemic disagreement or learning progress, but it
+must not be introduced halfway through the primary run.
+
+No target image or latent goal distance is used.
+
+---
+
+## 8. Replay and 100-hour storage
+
+The current 100,000-transition replay is too short to represent a 100-hour run.
+The revised experiment needs explicit lifetime storage.
+
+### 8.1 Append-only audit archive
+
+Store the complete interaction stream on disk:
+
+- compressed RGB video or frame chunks;
+- actions;
+- rewards and boundary flags;
+- episode and lifetime timestamps;
+- model and policy versions;
+- periodic diagnostics.
+
+This archive is primarily for postmortem analysis and future re-encoding. It is
+not necessarily sampled directly on every learner update.
+
+### 8.2 Training replay
+
+Use two sequence-preserving stores:
+
+1. **Recent FIFO:** approximately 500,000 transitions, retaining the latest hours
+   at full density.
+2. **Lifetime reservoir:** fixed-size reservoir sampling over contiguous chunks,
+   targeting another 500,000–1,000,000 transitions spread across the entire run.
+
+A simple initial sampling mixture is 75% recent and 25% lifetime. This keeps the
+agent responsive to its current state distribution while preventing early-game
+situations from disappearing completely.
+
+### 8.3 Representation storage
+
+With a frozen encoder, replay can store perceptual latents rather than rerun the
+video transformer for every learner sample.
+
+Use packed `f16` or another measured compact format for:
+
+- perceptual tokens;
+- recurrent context when needed;
+- action and boundary metadata.
+
+Keep the raw compressed video archive because later encoder fine-tuning would
+otherwise make old latent targets impossible to regenerate.
+
+### 8.4 Checkpoint policy
+
+Write periodic model, optimizer, normalizer, replay-index, and experiment-state
+checkpoints for fault recovery and postmortem analysis.
+
+Checkpoints must not be used to branch the environment, choose the best historical
+policy, or retry a bad decision. A resumed run continues from the game's current
+or next natural episode and is marked as resumed.
+
+---
+
+## 9. Experiment sequence
+
+Running every variant for 100 hours immediately would waste compute. Use staged
+elimination.
+
+### Stage A — Two-hour systems smoke tests
+
+Run every candidate configuration long enough to verify:
+
+- finite world and behavior losses;
+- stable recurrent state;
+- encoder and actor meeting the control deadline;
+- replay sampling correctness;
+- checkpoint and log integrity;
+- non-degenerate actions and posterior states.
+
+No learning claim is made.
+
+### Stage B — Ten-hour kill tests
+
+Compare:
+
+1. current DINO Dreamer control;
+2. DINO plus reconstruction-free representation prediction;
+3. generic LeVJEPA plus representation prediction;
+4. Pixels2Play-adapted LeVJEPA plus representation prediction.
+
+Terminate variants with clear numerical instability, frozen policies, invalid
+reward plumbing, or severe throughput debt.
+
+### Stage C — Twenty-five-hour pilots
+
+Run the strongest two variants with fixed settings. Add action-conditioned P2P
+world-model pretraining if its pipeline is ready.
+
+The gate is not final competence. It is evidence of a directional learning curve
+and a diagnosis of where remaining failure lies.
+
+### Stage D — One 100-hour engineering run
+
+Select the mainline architecture before starting. Complete the full run without
+hyperparameter intervention and publish the entire curve, including regressions.
+
+### Stage E — Scientific confirmation
+
+Repeat the final configuration over at least three independent lifetimes with
+identical hyperparameters and target-game initialization. Repeat the strongest
+control when resources permit.
+
+Do not report only the best seed.
+
+---
+
+## 10. Development milestones
+
+### M0 — Freeze the benchmark contract
+
+Deliver:
+
+- selected game and immutable version;
+- observation and action rates;
+- action vocabulary;
+- reward definition;
+- random and novice-human baselines;
+- success threshold;
+- target-game exclusion record for pretraining;
+- 100-hour run manifest format.
+
+**Exit gate:** another person can reproduce the environment boundary and scoring
+without reading Kindle internals.
+
+### M1 — Validate the current DINO Dreamer control
+
+Use the existing implementation unchanged except for the target-game adapter and
+long-run logging.
+
+**Exit gate:** a two-hour smoke test and ten-hour run complete with finite losses,
+correct reward alignment, and bounded training debt.
+
+### M2 — Replace feature reconstruction with latent prediction
+
+Refactor `ObservationDecoder` into a perceptual-representation predictor while
+keeping DINO and all behavior-learning code fixed.
+
+Add diagnostics for:
+
+- posterior representation error;
+- prior one-step representation error;
+- multi-step open-loop representation error;
+- latent variance and collapse.
+
+**Exit gate:** the DINO-CDP variant trains stably and is not materially worse than
+the current DINO decoder on the native smoke environment.
+
+### M3 — Introduce the LeVJEPA frontend
+
+Add a `VisionEncoder` boundary supporting:
+
+- the current DINO path;
+- a LeVJEPA-style block-causal encoder;
+- identical compact output shapes at the RSSM boundary;
+- incremental temporal state or KV-cache handling;
+- checkpoint provenance.
+
+**Exit gate:** numerical inference tests pass, real-time latency is acceptable,
+and the 10-hour target-game run does not exhibit perceptual or latent collapse.
+
+### M4 — Gameplay-domain visual adaptation
+
+Build a reproducible Pixels2Play clip pipeline for LeVJEPA continuation training,
+with the target game excluded.
+
+**Exit gate:** the adapted encoder improves held-out gameplay representation
+probes or downstream 10-hour learning relative to generic-video LeVJEPA.
+
+### M5 — Optional action-conditioned world pretraining
+
+Pretrain compatible RSSM dynamics and representation prediction from
+Pixels2Play image-action sequences without reward or policy training.
+
+**Exit gate:** on the first hour of the held-out game, the pretrained model has
+lower prior prediction error or faster reward-model adaptation than a randomly
+initialized RSSM, without causing worse online control.
+
+### M6 — Lifetime replay and run reliability
+
+Implement:
+
+- recent and reservoir sequence replay;
+- packed latent storage;
+- append-only video/action audit log;
+- resumable checkpoints;
+- automated periodic evaluation and video capture;
+- a run dashboard or report generator.
+
+**Exit gate:** a synthetic or game run survives at least 25 hours without memory
+growth beyond the configured bound, missing logs, or unrecoverable learner drift.
+
+### M7 — Complete the 100-hour run
+
+**Exit gate:** the experiment reaches hour 100 and the predeclared success gate is
+reported honestly, whether it passes or fails.
+
+---
+
+## 11. Diagnostics
+
+### 11.1 Gameplay
+
+- episode return and primary game metric;
+- score distribution in frozen evaluation windows;
+- survival time, progress, win/completion rate;
+- action frequencies and action-transition entropy;
+- behavior videos at fixed hours.
+
+### 11.2 Perception and world model
+
+- representation-prediction loss;
+- prior/posterior KL and categorical entropy;
+- one-, five-, and fifteen-step open-loop latent error;
+- reward prediction calibration;
+- continuation prediction calibration;
+- perceptual-token variance and effective rank;
+- zero-shot prediction error before target-game learning.
+
+### 11.3 Actor and critic
+
+- actor entropy and policy KL over time;
+- imagined return distribution;
+- critic error on realized returns;
+- current versus slow-critic disagreement;
+- replay-value loss;
+- imagined-versus-real reward discrepancy.
+
+### 11.4 Systems
+
+- frame capture, encoder, actor, learner, and synchronization latency;
+- 50th, 95th, and 99th percentile action latency;
+- environment steps, replay steps, and imagination steps per second;
+- learner debt;
+- GPU memory and utilization;
+- replay occupancy and sample-age distribution;
+- checkpoint and archive sizes.
+
+---
+
+## 12. Failure interpretation
+
+A failed 100-hour run is useful only if the failure can be localized.
+
+| Observation | Likely problem | Next experiment |
+|---|---|---|
+| Perceptual targets omit visible score or critical objects | Encoder or token compression | Higher spatial resolution, intermediate tokens, or slow upper-layer adaptation |
+| One-step prior error remains high | Action-conditioned dynamics | Action representation, RSSM capacity, or P2P dynamics pretraining |
+| Latent prediction is good but reward prediction is poor | Reward cue absent or too sparse | Better game-native reward extraction; inspect encoder sensitivity to reward cues |
+| Reward and value learn but policy stays near random | Actor optimization or action vocabulary | Verify imagined advantages, entropy, masks, and controllability |
+| Imagined return rises while real play worsens | Model exploitation | Shorter imagination, stronger world training, uncertainty diagnostics |
+| Early skill appears and later disappears | Replay or critic drift | Increase reservoir share; separate world-model and actor retention tests |
+| P2P pretraining hurts | Domain mismatch or inherited action bias | Fall back to generic LeVJEPA or transfer only lower visual layers |
+| Learner falls increasingly behind | Systems budget is invalid | Lower train ratio, compact tokens, smaller preset, or slower control rate |
+| No positive reward occurs | Benchmark/reward mismatch | Report failure; run a separate intrinsic-exploration experiment |
+
+The full 100-hour run is not the place for exploratory debugging. These failure
+modes should first be exercised in the two-, ten-, and twenty-five-hour stages.
+
+---
+
+## 13. Explicit non-goals
+
+The following are valuable but deferred until one game can be learned reliably:
+
+- self-generated or fully intrinsic objectives;
+- multi-game continual learning;
+- indefinite lifetime memory;
+- online visual-encoder plasticity;
+- critic-free group-relative imagination;
+- runtime planning, CEM, or MCTS;
+- hierarchical options and semantic reflection;
+- language-conditioned goals;
+- public online multiplayer operation;
+- physical robot control;
+- irreversible-world safety guarantees.
+
+The larger Kindle vision is not abandoned. It is gated on proving the smallest
+complete learning loop first.
+
+---
+
+## 14. Required artifacts from the 100-hour experiment
+
+A completed run must publish or retain:
+
+- exact source revisions;
+- complete model and environment configuration;
+- pretraining checkpoint provenance and target-game exclusion record;
+- action and reward adapter definitions;
+- random and novice baselines;
+- full time-series logs, not only summary metrics;
+- frozen-evaluation results at fixed hours;
+- behavior videos at hours 0, 5, 10, 25, 50, 75, and 100;
+- final and periodic model checkpoints;
+- replay/archive statistics;
+- a short postmortem explaining what the agent learned and what it did not.
+
+No best-checkpoint result should replace the hour-100 result.
+
+---
+
+## 15. Immediate implementation order
+
+1. **Select and freeze the target game contract.** Architecture work without a
+   fixed metric will drift.
+2. **Run the current DINO Dreamer baseline for 2 and 10 hours.** Establish that
+   game capture, reward alignment, replay, and actor learning are real.
+3. **Refactor the world loss from `ObservationDecoder` to a latent
+   representation-prediction head while keeping DINO fixed.** This isolates the
+   reconstruction-free change.
+4. **Add a `VisionEncoder` interface and LeVJEPA inference path with the same
+   compact token shape.** Do not change RSSM and action modeling at the same
+   time.
+5. **Add packed long-run replay, audit video, and automated frozen evaluation.**
+6. **Compare generic and Pixels2Play-adapted LeVJEPA in 10-hour kill tests.**
+7. **Only then build action-conditioned P2P world-model pretraining.**
+8. **Choose the final configuration before starting the 100-hour run.**
+
+The first coding milestone is therefore not a controller, critic replacement, or
+new intrinsic reward. It is a clean reconstruction-free representation target
+inside the already implemented Dreamer loop, followed by a causal video frontend
+that can carry useful priors into a held-out game.
+
+---
+
+## References
+
+- Hafner et al., *Mastering Diverse Control Tasks through World Models*
+  (DreamerV3), arXiv:2301.04104; Nature, 2025.
+- Hauri and Zenke, *Dreamer-CDP: Improving Reconstruction-free World Models Via
+  Continuous Deterministic Representation Prediction*, arXiv:2603.07083.
+- Kuhn et al., *LeVJEPA: Efficient & Scalable Video Pretraining without the
+  Heuristics*, arXiv:2608.27395.
+- Maes et al., *LeWorldModel: Stable End-to-End Joint-Embedding Predictive
+  Architecture from Pixels*, arXiv:2603.19312.
+- Yue et al., *Pixels to Play: A Foundation Model for 3D Gameplay*,
+  arXiv:2508.14295.
+
+## Repository notes
+
+- Current architecture: `README.md`
+- Current Dreamer world loss: `kindle/src/dreamer/world.rs`
+- Current broader plan path: `docs/kindle_single_life_dreamer_plan.md`
