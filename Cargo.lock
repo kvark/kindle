@@ -168,7 +168,7 @@ dependencies = [
 [[package]]
 name = "blade-graphics"
 version = "0.8.4"
-source = "git+https://github.com/kvark/blade?rev=824d55fbd6485a102ee220553bc54a30c1af5936#824d55fbd6485a102ee220553bc54a30c1af5936"
+source = "git+https://github.com/kvark/blade?rev=b208f3b1f97196c2971436b5726e61e71b149c37#b208f3b1f97196c2971436b5726e61e71b149c37"
 dependencies = [
  "ash",
  "ash-window",
@@ -204,7 +204,7 @@ dependencies = [
 [[package]]
 name = "blade-macros"
 version = "0.3.0"
-source = "git+https://github.com/kvark/blade?rev=824d55fbd6485a102ee220553bc54a30c1af5936#824d55fbd6485a102ee220553bc54a30c1af5936"
+source = "git+https://github.com/kvark/blade?rev=b208f3b1f97196c2971436b5726e61e71b149c37#b208f3b1f97196c2971436b5726e61e71b149c37"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1096,7 +1096,7 @@ dependencies = [
 [[package]]
 name = "meganeura"
 version = "0.2.0"
-source = "git+https://github.com/kvark/meganeura?rev=5429fcd043acd58dec77f35a44c452737d892fd2#5429fcd043acd58dec77f35a44c452737d892fd2"
+source = "git+https://github.com/kvark/meganeura?rev=bd6be0882c53b94f65f164f88464cc6b24e9df4d#bd6be0882c53b94f65f164f88464cc6b24e9df4d"
 dependencies = [
  "blade-graphics",
  "blade-macros",
