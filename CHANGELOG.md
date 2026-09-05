@@ -6,13 +6,17 @@
   recorded ongoing priorities in `AGENTS.md`.
 - Recovered the missing 12M branch's backend pins, full-BPTT row microbatching,
   large-actor gradient checks and strict multi-seed score/training summaries.
-- Added learner stage timing and inference traces. Batched CPU-cached readback
-  removes dominant imagination and parameter-synchronization stalls without
-  changing the learning metrics in the paired eight-update canary.
+- Added learner stage timing, inference traces and whole-gradient GPU spans.
+  Batched CPU-cached readback reduces a 12M synthetic update from 7.42 to 1.26 s;
+  all 241 checkpoint tensors and eight learning reports remain identical.
 - Added a causal deterministic-state feature predictor, optional alongside or
-  instead of posterior reconstruction, with reset masking and GPU gradient tests.
+  instead of posterior reconstruction, with matched spatial heads/initialization,
+  reset masking, versioned checkpoints and GPU gradient tests.
 - Added persistent native GridWorld dynamics and bounded visual visitation
-  novelty, with checkpointed counts and separate intrinsic/extrinsic metrics.
+  novelty, with versioned centered hashes, checkpointed counts and separate
+  intrinsic/extrinsic metrics. Novelty remains disabled by default.
+- Added causal motion/recurrent-belief probes, unrelated-action prediction
+  controls, exact executed emulator-frame counters and a pinned upstream runner.
 - Removed the unused ARC package extra and stale README experiment recipes.
 
 ## Unreleased — Dreamer baseline pivot

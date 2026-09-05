@@ -178,6 +178,11 @@ def summarize_training_window(
     interval_reward = 0.0
     interval_episodes = 0
     interval_updates = 0
+    optional_interval_fields = (
+        "intrinsic_reward", "positive_reward_events", "negative_reward_events",
+    )
+    optional_interval_sums = dict.fromkeys(optional_interval_fields, 0)
+    optional_interval_counts = dict.fromkeys(optional_interval_fields, 0)
     action_counts = [0] * action_count
     episode_returns: list[float] = []
     episode_lengths: list[int] = []
@@ -222,6 +227,24 @@ def summarize_training_window(
                 interval_reward += float(event["reward"])
                 interval_episodes += int(event["completed_episodes"])
                 interval_updates += int(event["learner_updates"])
+                for name in optional_interval_fields:
+                    if name not in event:
+                        continue
+                    value = _finite_number(event[name])
+                    if value is None:
+                        raise AtariTrainingError(
+                            f"{path}:{line_number}: {name} must be finite"
+                        )
+                    if name.endswith("_events") and (
+                        not value.is_integer() or not 0 <= value <= interval_size
+                    ):
+                        raise AtariTrainingError(
+                            f"{path}:{line_number}: invalid {name} count"
+                        )
+                    optional_interval_sums[name] += (
+                        int(value) if name.endswith("_events") else value
+                    )
+                    optional_interval_counts[name] += 1
                 counts = event["action_counts"]
                 if not isinstance(counts, list) or len(counts) != action_count:
                     raise AtariTrainingError(
@@ -296,6 +319,9 @@ def summarize_training_window(
             f"{path}: found {learner_events} learner events but intervals report "
             f"{interval_updates} updates"
         )
+    for name, count in optional_interval_counts.items():
+        if count not in (0, len(intervals)):
+            raise AtariTrainingError(f"{path}: incomplete interval coverage for {name}")
 
     metric_means = {
         name: metric_sums[name] / metric_counts[name]
@@ -327,6 +353,8 @@ def summarize_training_window(
         "environment": environment,
         "seed": int(run_start["seed"]),
         "atari_protocol": str(run_start["atari_protocol"]),
+        "config": run_start.get("config"),
+        "model_provenance": run_start.get("model_provenance"),
         "run_complete": run_end_step is not None,
         "run_end_step": run_end_step,
         "window": {
@@ -355,6 +383,10 @@ def summarize_training_window(
             "reward": interval_reward,
             "completed_episodes": interval_episodes,
             "learner_updates": interval_updates,
+            **{
+                name: (optional_interval_sums[name] if optional_interval_counts[name] else None)
+                for name in optional_interval_fields
+            },
         },
         "actions": {
             "names": action_meanings,

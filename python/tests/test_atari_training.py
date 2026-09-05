@@ -103,6 +103,8 @@ def test_summarizes_latest_complete_window_and_pong_aliases(tmp_path) -> None:
         "mean_length": 1_500.0,
     }
     assert summary["intervals"]["reward"] == -3.0
+    assert summary["intervals"]["intrinsic_reward"] is None
+    assert summary["intervals"]["positive_reward_events"] is None
     assert summary["learner"]["events"] == 2
     assert summary["learner"]["metric_means"] == {
         "behavior/policy_entropy": 1.5,
@@ -208,3 +210,43 @@ def test_reward_prediction_means_are_weighted_by_sample_count(tmp_path) -> None:
     )
     assert predictions["zero"]["sample_count"] == 1_996
     assert predictions["rewarded"]["sample_count"] == 49
+
+
+def test_separates_game_reward_from_intrinsic_reward_and_sparse_events(tmp_path) -> None:
+    path = tmp_path / "mixed.jsonl"
+    counts = [1_000] + [0] * 17
+    start = run_start()
+    start["config"] = {"extrinsic_reward_scale": 1.0, "intrinsic_reward_scale": 0.1}
+    start["model_provenance"] = {"visitation_hash_version": 2}
+    first = interval(1_000, counts, reward=100, updates=0)
+    second = interval(2_000, counts, reward=-1, updates=0)
+    first.update(intrinsic_reward=250.5, positive_reward_events=1, negative_reward_events=0)
+    second.update(intrinsic_reward=100.0, positive_reward_events=0, negative_reward_events=1)
+    write_events(path, [start, first, second])
+    summary = summarize_training_window(path, default_window_steps=2_000)
+    assert summary["intervals"]["reward"] == 99
+    assert summary["intervals"]["intrinsic_reward"] == 350.5
+    assert summary["intervals"]["positive_reward_events"] == 1
+    assert summary["intervals"]["negative_reward_events"] == 1
+    assert summary["config"] == start["config"]
+    assert summary["model_provenance"] == start["model_provenance"]
+
+
+def test_rejects_partial_intrinsic_interval_coverage(tmp_path) -> None:
+    path = tmp_path / "partial.jsonl"
+    counts = [1_000] + [0] * 17
+    first = interval(1_000, counts, updates=0)
+    first["intrinsic_reward"] = 0.0
+    write_events(path, [run_start(), first, interval(2_000, counts, updates=0)])
+    with pytest.raises(AtariTrainingError, match="incomplete interval coverage for intrinsic_reward"):
+        summarize_training_window(path, default_window_steps=2_000)
+
+
+@pytest.mark.parametrize("value", [True, None, -1, 0.5, 1_001])
+def test_rejects_invalid_sparse_event_counts(tmp_path, value) -> None:
+    path = tmp_path / "events.jsonl"
+    record = interval(1_000, [1_000] + [0] * 17, updates=0)
+    record["positive_reward_events"] = value
+    write_events(path, [run_start(), record])
+    with pytest.raises(AtariTrainingError, match="positive_reward_events"):
+        summarize_training_window(path)

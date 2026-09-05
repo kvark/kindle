@@ -676,8 +676,8 @@ impl DreamerCore {
 
     /// Reward predicted after one prior transition from the current state.
     ///
-    /// This read-only diagnostic clones the categorical RNG, so probing does
-    /// not perturb subsequent acting or posterior sampling.
+    /// This read-only diagnostic uses an independent categorical RNG, so
+    /// probing does not perturb subsequent acting or posterior sampling.
     pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
         self.prior_reward_rollout(&[action])[0]
     }
