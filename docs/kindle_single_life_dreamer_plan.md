@@ -40,7 +40,7 @@ framework in advance.
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
-| Checkpoints | Model, optimizer, counters, return normalizer, backend/head/hash identity and actual encoder-file fingerprint | Replay/live state absent; resume is a new data segment |
+| Checkpoints | Model, optimizer, counters, return normalizer, backend/head/hash identity, encoder/tensor-file fingerprints and required-tensor checks | Replay/live state absent; non-atomic generation; resume is a new data segment |
 | Native tests | `kindle-gym`: episodic/persistent visual GridWorld and representation/dynamics probes | Small deterministic integration task, not general lifetime evidence |
 | Game experiments | `python/examples/atari.py` and strict score/training summaries | Atari only; no video archive or real-time deadline scheduler |
 
@@ -329,6 +329,11 @@ capacity. Checkpoint parameters/optimizer, normalizers, RNG streams, replay and
 scheduler together with an atomic generation manifest before claiming fault-tolerant
 continuation. Mark model-only restores as recovery with replay loss. No game
 rewind or branching is permitted.
+
+Current saves detect damaged/mixed tensor files through metadata fingerprints;
+restores also require all model and optimizer tensors instead of accepting the
+backend's partial-load fallback. This detects a torn overwrite but does not retain
+the preceding generation. Keep a separate known-good checkpoint in the meantime.
 
 ## The eventual 100-hour contract
 

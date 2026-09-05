@@ -10,6 +10,10 @@ use meganeura::{Mode, Session};
 use rand::{SeedableRng, rngs::StdRng};
 
 use super::behavior;
+use super::checkpoint::{self, TensorFingerprints};
+use super::checkpoint::{
+    BEHAVIOR as CHECKPOINT_BEHAVIOR, SLOW_VALUE as CHECKPOINT_SLOW_VALUE, WORLD as CHECKPOINT_WORLD,
+};
 use super::config::DreamerConfig;
 use super::distributions::{
     PercentileNormalizer, TwoHotBins, continuation_weights, lambda_returns, sample_logits,
@@ -33,9 +37,6 @@ use crate::vision::{
 const CHECKPOINT_FORMAT: u32 = 2;
 const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-dinov3-vits16";
 const CHECKPOINT_METADATA: &str = "metadata.json";
-const CHECKPOINT_WORLD: &str = "world.safetensors";
-const CHECKPOINT_BEHAVIOR: &str = "behavior.safetensors";
-const CHECKPOINT_SLOW_VALUE: &str = "slow_value.safetensors";
 const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
 const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
 const RNG_REPLAY: u64 = 0x7265_706c_6179_0001;
@@ -69,6 +70,8 @@ struct CheckpointMetadata {
     visitation: Option<VisitationState>,
     #[serde(default)]
     future_head_revision: Option<String>,
+    #[serde(default)]
+    tensor_sha256: Option<TensorFingerprints>,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -344,12 +347,15 @@ impl DreamerCore {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let mut core = Self::with_gpu(metadata.config.clone(), gpu);
         core.dino_checkpoint_sha256 = metadata.dino_checkpoint_sha256;
-        core.world_train
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_WORLD))?;
-        core.behavior_train
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_BEHAVIOR))?;
-        core.behavior_slow
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_SLOW_VALUE))?;
+        checkpoint::load_session(&mut core.world_train, &checkpoint.join(CHECKPOINT_WORLD))?;
+        checkpoint::load_session(
+            &mut core.behavior_train,
+            &checkpoint.join(CHECKPOINT_BEHAVIOR),
+        )?;
+        checkpoint::load_session(
+            &mut core.behavior_slow,
+            &checkpoint.join(CHECKPOINT_SLOW_VALUE),
+        )?;
         core.learner_step = metadata.learner_step;
         core.environment_step = metadata.environment_step;
         core.return_normalizer
@@ -871,6 +877,7 @@ impl DreamerCore {
             return_high,
             visitation: self.visitation.as_ref().map(VisitationBonus::state),
             future_head_revision: self.provenance().future_head_revision.map(str::to_owned),
+            tensor_sha256: Some(TensorFingerprints::read(checkpoint)?),
         };
         let encoded = serde_json::to_vec_pretty(&metadata).map_err(io::Error::other)?;
         let metadata_temporary = checkpoint.join(format!("{CHECKPOINT_METADATA}.tmp"));
@@ -1918,6 +1925,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
     let metadata = serde_json::from_slice(&encoded)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     validate_checkpoint_metadata(&metadata)?;
+    if let Some(fingerprints) = &metadata.tensor_sha256 {
+        fingerprints.verify(checkpoint)?;
+    }
     Ok(metadata)
 }
 
@@ -2279,6 +2289,7 @@ mod tests {
             visitation: None,
             future_head_revision: None,
             dino_checkpoint_sha256: None,
+            tensor_sha256: None,
         }
     }
 
@@ -2349,6 +2360,52 @@ mod tests {
             .expect("different encoder must be rejected");
         fs::remove_dir_all(directory).unwrap();
         assert!(error.to_string().contains("DINO checkpoint SHA-256"));
+    }
+
+    #[test]
+    fn checkpoint_restore_rejects_mixed_tensor_files_before_gpu_construction() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "kindle-checkpoint-integrity-{}-{unique}",
+            std::process::id(),
+        ));
+        fs::create_dir(&directory).unwrap();
+        let files = [CHECKPOINT_WORLD, CHECKPOINT_BEHAVIOR, CHECKPOINT_SLOW_VALUE];
+        for name in files {
+            fs::write(directory.join(name), b"original tensor file").unwrap();
+        }
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.tensor_sha256 = Some(TensorFingerprints::read(&directory).unwrap());
+        fs::write(
+            directory.join(CHECKPOINT_METADATA),
+            serde_json::to_vec(&metadata).unwrap(),
+        )
+        .unwrap();
+        read_checkpoint_metadata(&directory).unwrap();
+        for name in files {
+            fs::write(directory.join(name), b"different learner generation").unwrap();
+            let error = DreamerCore::restore(&directory)
+                .err()
+                .expect("a mixed save must be rejected");
+            assert!(error.to_string().contains(name));
+            assert!(error.to_string().contains("SHA-256 mismatch"));
+            fs::write(directory.join(name), b"original tensor file").unwrap();
+        }
+        fs::remove_file(directory.join(CHECKPOINT_WORLD)).unwrap();
+        assert!(read_checkpoint_metadata(&directory).is_err());
+        fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn historical_metadata_may_lack_tensor_fingerprints() {
+        let mut encoded = serde_json::to_value(valid_checkpoint_metadata()).unwrap();
+        encoded.as_object_mut().unwrap().remove("tensor_sha256");
+        let metadata: CheckpointMetadata = serde_json::from_value(encoded).unwrap();
+        assert!(metadata.tensor_sha256.is_none());
+        validate_checkpoint_metadata(&metadata).unwrap();
     }
 
     #[test]

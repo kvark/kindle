@@ -22,6 +22,7 @@ guidance are allowed while establishing reliable learning.
   Match head structure and initialization when comparing objectives, and version
   changed heads or intrinsic hash schemes instead of reinterpreting old state.
   Verify the actual encoder file on restore; matching shapes are not identity.
+  Require complete checkpoint tensors; a detected torn save is not atomic recovery.
 - Profile learner stages, synchronization, and GPU idle time before committing
   days of compute. Check existing branches and local run artifacts before
   repeating old experiments. Preserve corrected full-precision gradients and

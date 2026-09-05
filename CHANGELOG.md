@@ -19,6 +19,8 @@
   controls, exact executed emulator-frame counters and a pinned upstream runner.
 - Fingerprinted actual encoder weights in pixel-agent checkpoints and rejected
   mismatches before GPU construction; legacy restores require the pinned file.
+- Fingerprinted saved tensor files and rejected missing model/optimizer tensors;
+  damaged or mixed-generation saves no longer silently restore initialized state.
 - Removed the unused ARC package extra and stale README experiment recipes.
 
 ## Unreleased — Dreamer baseline pivot

@@ -7,6 +7,7 @@
 
 mod agent;
 mod behavior;
+mod checkpoint;
 mod config;
 mod distributions;
 mod intrinsic;
