@@ -29,6 +29,8 @@ guidance are allowed while establishing reliable learning.
 - Test dense Atari, sparse Atari, and a small native persistent environment.
   Keep external reward and intrinsic reward separate. Retain an extrinsic-only
   control for every intrinsic-reward experiment.
+  Record human guidance and the action actually executed; distinguish assisted
+  behavior from unguided evaluation and game rewards from human feedback.
 - Gate video encoders and pretraining on evidence: a usable pinned checkpoint,
   causal streaming semantics, native numerical parity, latency, and improved
   held-out control-relevant probes. A paper alone is not an implementation plan.

@@ -23,6 +23,13 @@ and learning can coexist at the declared control rate and that a shorter run
 produces useful learning. Atari's accelerated laboratory protocol and a real-time
 lifetime are different experiments; neither clock substitutes for the other.
 
+Guidance should enter through ordinary, recorded interactions: action overrides,
+demonstrations or explicitly labeled feedback. Preserve the actual executed action
+and distinguish game reward from human feedback in experiment records. Report
+unguided evaluation separately; do not attribute assisted behavior to the agent.
+Build a small adapter for the first real guidance source, not a preference-learning
+framework in advance.
+
 ## What exists
 
 | Component | Implementation and purpose | Current limitation |
@@ -139,16 +146,15 @@ Keep categorical RSSM sampling, balanced KL, two-hot reward/value heads, learned
 continuation, short imagination, REINFORCE actor, critic and slow value. No
 planner, critic replacement or action-space redesign is needed for this gate.
 
-## Immediate work and exit gates
+## Execution gates: status and next work
 
 ### 1. Recover and measure the working control
 
-Integrate the missing branch code. Verify native/Python tests and serialized GPU
-numerical canaries. Align both lockfiles and checkpoint revision metadata.
-Preserve old checkpoints; never silently rewrite their provenance.
-Pixel-agent restores now verify the actual DINO file's SHA-256 before GPU
-construction. Legacy checkpoints without a fingerprint require the pinned
-reference file, not an arbitrary same-shaped encoder.
+Recovery is complete, both lockfiles and revision metadata agree, and native,
+Python and serialized GPU tests pass. Pixel-agent restores verify the actual DINO
+file's SHA-256 before GPU construction. Legacy checkpoints without a fingerprint
+require the pinned reference file, not an arbitrary same-shaped encoder. Preserve
+older checkpoints under their original backend provenance.
 
 Measure replay sampling, posterior inference, imagination/targets, world update,
 behavior update, synchronization and total time. Obtain GPU timestamps or a trace
@@ -156,30 +162,21 @@ for dominant stages. Report unprofiled wall time separately: kernel profiling
 changes launch overhead. Compare the same workload before/after optimization and
 verify parameter-update equivalence.
 
-The first measurement found uncached host reads dominating: 12M updates fell
-from 8.43 to 1.43 seconds after batched cached readback, with identical world and
-behavior reports over eight paired synthetic updates. Imagination fell from
-4.62 to 0.30 seconds and world synchronization from 2.20 to 0.014 seconds.
-These are canary medians after two warmup updates, not game throughput. Continue
-profiling before a shared-buffer or fused-graph rewrite; launch gaps and arithmetic
-need different fixes. A clean confirmation measured 7.42→1.43 s and found all
-241 parameter/optimizer/slow-value tensors bit-identical by name, with matching
-metadata. Container key ordering is not tensor inequality.
+Uncached host reads dominated the initial profile. Batched cached parameter and
+output reads reduce the 12M canary from 7.42 to about 1.26 s/update (**5.87×**),
+preserving all 241 parameter/optimizer/slow-value tensors by name and eight
+world/behavior reports exactly. These are medians after two warmup updates, not
+end-to-end game throughput.
 
-Extending this to posterior outputs and removing redundant waits reaches about
-1.26 s/update, again preserving all 241 tensors and eight reports. A world B4×T64
-gradient pass contains 76,016 dispatches and takes 154 ms GPU versus 221 ms wall,
-without optimizer/accumulation. Whole-pass timing works; the backend's 1,000-pass
-limit prevents a full per-dispatch trace. Next add windowed profiling and test
-batching/fusion of non-recurrent encoder/head work across B×T. Preserve full
-recurrence, gradient range and measured learning when changing graph layout.
-
-An isolated instrumentation-only capacity increase now provides the complete
-trace without changing production pins or saved tensors. About 79% of 76,016
-dispatches are pointwise/layout operations; 11,264 forced copies write 7.82 GB
-per microbatch. First test removal of redundant materializations, then grouped
-RSSM/layout fusion and batched non-recurrent heads. Full instrumentation costs
-2.39× wall time, so lower-perturbation windowed profiling remains useful.
+A world B4×T64 gradient pass now contains 76,016 dispatches and takes 154 ms GPU
+versus 221 ms wall, without optimizer/accumulation. An isolated instrumentation
+capacity increase provides the complete trace without changing production pins
+or saved tensors. About 79% of dispatches are pointwise/layout operations;
+11,264 forced copies write 7.82 GB per microbatch. First test removal of redundant
+materializations, then grouped RSSM/layout fusion and batching non-recurrent heads
+across B×T. Preserve full recurrence, gradient range and measured learning.
+Full instrumentation costs 2.39× wall time, so lower-perturbation windowed
+profiling remains useful. Launch gaps and arithmetic need different fixes.
 
 ### 2. Test prediction on controlled sequences
 

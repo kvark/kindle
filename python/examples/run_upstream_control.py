@@ -50,6 +50,8 @@ def configured_source(original: str) -> str:
 def validate_source(source: Path) -> str:
     if git(source, "rev-parse", "HEAD").strip() != REVISION:
         raise ValueError(f"upstream must be at {REVISION}")
+    if git(source, "ls-files", "--others", "--exclude-standard").strip():
+        raise ValueError("upstream must not contain untracked source files")
     changed = git(source, "diff", "--name-only", "HEAD").splitlines()
     if changed != ["dreamerv3/configs.yaml"]:
         raise ValueError("only the declared published-wrapper config may differ from upstream")
