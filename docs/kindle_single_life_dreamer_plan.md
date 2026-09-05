@@ -29,11 +29,11 @@ lifetime are different experiments; neither clock substitutes for the other.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | New objective retains native control but has not improved prediction or control |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Small native prediction gain for the auxiliary; no better control or Atari validation |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
-| Checkpoints | Model, optimizer, counters, return normalizer, provenance | Replay/live state absent; resume is a new data segment |
+| Checkpoints | Model, optimizer, counters, return normalizer, backend/head/hash identity and actual encoder-file fingerprint | Replay/live state absent; resume is a new data segment |
 | Native tests | `kindle-gym`: episodic/persistent visual GridWorld and representation/dynamics probes | Small deterministic integration task, not general lifetime evidence |
 | Game experiments | `python/examples/atari.py` and strict score/training summaries | Atari only; no video archive or real-time deadline scheduler |
 
@@ -146,6 +146,9 @@ planner, critic replacement or action-space redesign is needed for this gate.
 Integrate the missing branch code. Verify native/Python tests and serialized GPU
 numerical canaries. Align both lockfiles and checkpoint revision metadata.
 Preserve old checkpoints; never silently rewrite their provenance.
+Pixel-agent restores now verify the actual DINO file's SHA-256 before GPU
+construction. Legacy checkpoints without a fingerprint require the pinned
+reference file, not an arbitrary same-shaped encoder.
 
 Measure replay sampling, posterior inference, imagination/targets, world update,
 behavior update, synchronization and total time. Obtain GPU timestamps or a trace
@@ -176,14 +179,16 @@ recurrence, gradient range and measured learning when changing graph layout.
 The optional deterministic future-feature head is implemented. GPU tests verify
 causality, action sensitivity, reset masking and gradients through earlier
 observations; a zero reconstruction weight removes that decoder's parameters.
-Checkpoint round trips and predictive microbatch equivalence pass for the pilot.
-Reconstruction and global-MLP prediction-only 1M runs both retain 2,500 food
-rewards in 10,000 frozen native actions after identical random-trajectory training;
-the auxiliary gives 2,496 with 29% more parameters. All beat feature persistence
-on held-out open-loop probes, but reconstruction has the lowest error. Match the
-head structure before drawing a loss-level conclusion. Reconstruction remains the
-default. Also test agent-controlled data and harder action-sensitive sequences;
-this small task is not an Atari or general representation result.
+Checkpoint round trips and predictive microbatch equivalence pass for the
+matched spatial head. After identical 10k random-trajectory native training,
+reconstruction gives 2,500 frozen food rewards; prediction-only and auxiliary
+give 2,499 each. The auxiliary reduces held-out feature MSE by about 4.7% with
+29% more parameters, and strongly beats unrelated actions. Prediction-only's
+error is slightly higher than the control's. The earlier global-MLP pilot was
+confounded by head structure and is retained only in the experiment report.
+Reconstruction remains the default. Next test agent-controlled data and harder
+action-sensitive sequences: this near-saturated task is not an Atari or general
+representation result.
 
 Advance if action-sensitive held-out prediction and native control are retained.
 If the auxiliary works and prediction-only fails, keep the auxiliary and diagnose

@@ -24,12 +24,36 @@ pub const DINOVISION_SOURCE_REV: &str = "dc35cdf1c7c910cdd93c5b5362846842ae469a2
 pub const VITS16_MODEL_ID: &str = "facebook/dinov3-vits16-pretrain-lvd1689m";
 /// Immutable Hugging Face snapshot used for the numerical golden values.
 pub const VITS16_CHECKPOINT_REV: &str = "114c1379950215c8b35dfcd4e90a5c251dde0d32";
+/// SHA-256/LFS object ID of the pinned reference weight file.
+pub const VITS16_CHECKPOINT_SHA256: &str =
+    "4610ad75edef83e75afdebf162d148dc628045ea6cbb83d67d4708c709c4f91d";
 /// Channels retained by the fixed Johnson–Lindenstrauss projection.
 pub const OBSERVATION_CHANNELS: usize = 64;
 /// Spatial side after fixed 2×2 pooling of DINO's 14×14 patch grid.
 pub const OBSERVATION_GRID: usize = 7;
 /// Stable seed for the non-trainable projection matrix.
 pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
+
+pub(crate) fn checkpoint_sha256(path: &Path) -> std::io::Result<String> {
+    hash_reader(std::fs::File::open(path)?)
+}
+
+fn hash_reader(mut reader: impl std::io::Read) -> std::io::Result<String> {
+    use sha2::{Digest, Sha256};
+
+    let mut digest = Sha256::new();
+    let mut buffer = [0; 65_536];
+    loop {
+        let count = match reader.read(&mut buffer) {
+            Err(error) if error.kind() == std::io::ErrorKind::Interrupted => continue,
+            result => result?,
+        };
+        if count == 0 {
+            return Ok(format!("{:x}", digest.finalize()));
+        }
+        digest.update(&buffer[..count]);
+    }
+}
 
 /// One frozen, compressed DINO observation in token-major `[7 * 7, 64]`
 /// order. This is the representation stored in replay and reconstructed by
@@ -309,6 +333,25 @@ mod tests {
     use super::*;
 
     #[test]
+    fn fingerprint_matches_sha256_known_vectors_and_chunked_reads() {
+        use sha2::{Digest, Sha256};
+
+        assert_eq!(
+            hash_reader(&b"abc"[..]).unwrap(),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+        assert_eq!(
+            hash_reader(&b""[..]).unwrap(),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+        let bytes = vec![17; 131_079];
+        assert_eq!(
+            hash_reader(bytes.as_slice()).unwrap(),
+            format!("{:x}", Sha256::digest(&bytes))
+        );
+    }
+
+    #[test]
     fn baseline_is_full_vits16_with_dense_patch_output() {
         let config = dinov3::Config::vits16();
         assert_eq!(config.num_hidden_layers, 12);
@@ -343,6 +386,10 @@ mod tests {
     fn vits16_checkpoint_matches_hugging_face() {
         let checkpoint = std::env::var_os("KINDLE_DINOV3_WEIGHTS")
             .expect("set KINDLE_DINOV3_WEIGHTS to the ViT-S/16 safetensors file");
+        assert_eq!(
+            checkpoint_sha256(Path::new(&checkpoint)).unwrap(),
+            VITS16_CHECKPOINT_SHA256
+        );
         let mut encoder =
             DinoEncoder::load_vits16(&checkpoint, None, None).expect("load DINOv3 ViT-S/16");
         let rgb: Vec<u8> = (0..224 * 224 * 3)

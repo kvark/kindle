@@ -110,6 +110,8 @@ GridWorld is a small visual integration task, not a general benchmark:
 cargo run --release -p kindle-gym --example grid_world -- \
   /models/dino/model.safetensors --steps 10000 --model-size 1m \
   --all-actions --world-backprop-length 64 --train-ratio 256 \
+  --random-action-steps 10000 --learning-rate 0.001 \
+  --behavior-learning-rate 0.0001 --learning-rate-warmup 0 \
   --reconstruction-loss-scale 0.25 \
   --checkpoint checkpoints/grid --output runs/grid.jsonl
 
@@ -120,6 +122,10 @@ cargo run --release -p kindle-gym --example grid_world -- \
   /models/dino/model.safetensors --all-actions --steps 10000 \
   --restore checkpoints/grid --evaluate --output runs/grid-eval.jsonl
 ```
+
+This native gate uses diagnostic learning rates and a fixed random training
+trajectory before frozen evaluation. Omit `--random-action-steps` to let the
+learning agent collect its own data; the persistent reward comparison does so.
 
 `--persistent` disables the artificial episode limit. Exhaustion respawns the
 agent through normal dynamics, costs one game reward, and preserves food
@@ -169,7 +175,7 @@ sampled policy; `--greedy` is a separate diagnostic. Restores refill replay and
 must not be presented as uninterrupted runs.
 
 The recovered 12M Pong runs scored −4, +6 and −2 (seed mean 0), versus matched
-random −20.623. A local pinned upstream 1M control also exists. See the plan for
+random −20.623. Local pinned upstream 1M and 12M controls also exist. See the plan for
 the small episode counts, runtime/perception differences and artifact locations.
 
 Read-only native and Atari probes measure reward calibration, representation
@@ -188,6 +194,11 @@ old artifacts require their original checkout. Experimental head and hash
 revisions are also checked. Run headers expose model provenance; Atari headers
 add the executable extension and runner hashes, preventing mixed implementations
 from silently becoming a multi-seed score.
+
+New pixel-agent checkpoints also fingerprint the actual DINO weight file.
+Restore checks its SHA-256 before GPU construction. Legacy checkpoints without
+that field require the pinned reference file; equal tensor shapes do not make
+different perceptual representations compatible.
 
 `LearnReport.timing` separates replay, posterior, imagination, training and
 synchronization wall time. The synthetic canary avoids perception/environment

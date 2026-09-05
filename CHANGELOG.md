@@ -17,6 +17,8 @@
   intrinsic/extrinsic metrics. Novelty remains disabled by default.
 - Added causal motion/recurrent-belief probes, unrelated-action prediction
   controls, exact executed emulator-frame counters and a pinned upstream runner.
+- Fingerprinted actual encoder weights in pixel-agent checkpoints and rejected
+  mismatches before GPU construction; legacy restores require the pinned file.
 - Removed the unused ARC package extra and stale README experiment recipes.
 
 ## Unreleased — Dreamer baseline pivot

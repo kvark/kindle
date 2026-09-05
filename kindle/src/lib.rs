@@ -12,7 +12,7 @@ pub mod vision;
 
 pub use dreamer::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerConfig, DreamerCore, FrameFlags, LearnReport,
-    LearnTiming, LossScales, ModelSize, Reward, WorldMetrics,
+    LearnTiming, LossScales, ModelProvenance, ModelSize, Reward, WorldMetrics,
 };
 pub use env::{Environment, RgbFrame, Transition};
 

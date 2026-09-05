@@ -56,6 +56,8 @@ struct CheckpointMetadata {
     dino_model_id: String,
     dino_checkpoint_revision: String,
     projection_seed: u64,
+    #[serde(default)]
+    dino_checkpoint_sha256: Option<String>,
     observation_grid: usize,
     observation_channels: usize,
     config: DreamerConfig,
@@ -84,6 +86,8 @@ pub struct ModelProvenance {
     pub blade_revision: &'static str,
     pub future_head_revision: Option<&'static str>,
     pub visitation_hash_version: Option<u32>,
+    /// Bound by the pixel agent; absent for a core fed precomputed features.
+    pub dino_checkpoint_sha256: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -283,6 +287,7 @@ pub struct DreamerCore {
     gpu: Arc<blade_graphics::Context>,
     readback: Readback,
     config: DreamerConfig,
+    dino_checkpoint_sha256: Option<String>,
     bins: TwoHotBins,
     replay: SequenceReplay,
     visitation: Option<VisitationBonus>,
@@ -327,17 +332,18 @@ impl DreamerCore {
     /// optimizer moments, the slow critic, counters, and return normalization
     /// continue exactly from the saved learner state.
     pub fn restore(checkpoint: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        Self::restore_with_gpu(checkpoint.as_ref(), gpu)
+        Self::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)
     }
 
     fn restore_with_gpu(
         checkpoint: &Path,
         gpu: Arc<blade_graphics::Context>,
+        metadata: CheckpointMetadata,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let metadata = read_checkpoint_metadata(checkpoint)?;
-        validate_checkpoint_metadata(&metadata)?;
         let mut core = Self::with_gpu(metadata.config.clone(), gpu);
+        core.dino_checkpoint_sha256 = metadata.dino_checkpoint_sha256;
         core.world_train
             .load_checkpoint(&checkpoint.join(CHECKPOINT_WORLD))?;
         core.behavior_train
@@ -459,6 +465,7 @@ impl DreamerCore {
             environment_step: 0,
             train_scheduler: D3TrainScheduler::default(),
             config,
+            dino_checkpoint_sha256: None,
             world_train,
             world_observe_batch,
             world_observe_live,
@@ -490,6 +497,7 @@ impl DreamerCore {
                 .config
                 .visitation_bonus
                 .then_some(super::intrinsic::VERSION),
+            dino_checkpoint_sha256: self.dino_checkpoint_sha256.clone(),
         }
     }
 
@@ -853,6 +861,7 @@ impl DreamerCore {
             dino_model_id: VITS16_MODEL_ID.to_owned(),
             dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
+            dino_checkpoint_sha256: self.dino_checkpoint_sha256.clone(),
             observation_grid: OBSERVATION_GRID,
             observation_channels: OBSERVATION_CHANNELS,
             config: self.config.clone(),
@@ -1780,10 +1789,12 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let fingerprint = crate::vision::checkpoint_sha256(dino_checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
         let perception =
             DinoPerception::load_vits16(dino_checkpoint, Some(Arc::clone(&gpu)), dino_plan_cache)?;
-        let core = DreamerCore::with_gpu(config, gpu);
+        let mut core = DreamerCore::with_gpu(config, gpu);
+        core.dino_checkpoint_sha256 = Some(fingerprint);
         Ok(Self { perception, core })
     }
 
@@ -1792,8 +1803,13 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(dreamer_checkpoint.as_ref())?;
+        let fingerprint = crate::vision::checkpoint_sha256(dino_checkpoint.as_ref())?;
+        validate_perception_fingerprint(metadata.dino_checkpoint_sha256.as_deref(), &fingerprint)?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let core = DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu))?;
+        let mut core =
+            DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu), metadata)?;
+        core.dino_checkpoint_sha256 = Some(fingerprint);
         let perception = DinoPerception::load_vits16(dino_checkpoint, Some(gpu), dino_plan_cache)?;
         Ok(Self { perception, core })
     }
@@ -1899,11 +1915,41 @@ impl DreamerAgent {
 
 fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata> {
     let encoded = fs::read(checkpoint.join(CHECKPOINT_METADATA))?;
-    serde_json::from_slice(&encoded)
-        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+    let metadata = serde_json::from_slice(&encoded)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    validate_checkpoint_metadata(&metadata)?;
+    Ok(metadata)
+}
+
+fn validate_perception_fingerprint(expected: Option<&str>, actual: &str) -> io::Result<()> {
+    // Legacy checkpoints declare this exact reference revision but do not
+    // fingerprint the supplied file. Do not accept arbitrary weights for them.
+    let expected = expected.unwrap_or(crate::vision::VITS16_CHECKPOINT_SHA256);
+    if actual != expected {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("DINO checkpoint SHA-256 is {actual}, expected {expected}"),
+        ));
+    }
+    Ok(())
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata
+        .dino_checkpoint_sha256
+        .as_ref()
+        .is_some_and(|hash| {
+            hash.len() != 64
+                || !hash
+                    .bytes()
+                    .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        })
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "invalid DINO fingerprint",
+        ));
+    }
     let expected = [
         (
             "architecture",
@@ -2232,6 +2278,7 @@ mod tests {
             return_high: 1.0,
             visitation: None,
             future_head_revision: None,
+            dino_checkpoint_sha256: None,
         }
     }
 
@@ -2250,6 +2297,58 @@ mod tests {
         let error = validate_checkpoint_metadata(&wrong_blade).unwrap_err();
         assert_eq!(error.kind(), io::ErrorKind::InvalidData);
         assert!(error.to_string().contains("checkpoint Blade revision"));
+    }
+
+    #[test]
+    fn perception_fingerprints_match_exact_files_and_constrain_legacy_restores() {
+        let reference = crate::vision::VITS16_CHECKPOINT_SHA256;
+        validate_perception_fingerprint(None, reference).unwrap();
+        validate_perception_fingerprint(Some(reference), reference).unwrap();
+        let custom = "a".repeat(64);
+        assert!(validate_perception_fingerprint(None, &custom).is_err());
+        assert!(validate_perception_fingerprint(Some(reference), &custom).is_err());
+        validate_perception_fingerprint(Some(&custom), &custom).unwrap();
+
+        let mut metadata = valid_checkpoint_metadata();
+        for malformed in ["", "xyz", &"A".repeat(64)] {
+            metadata.dino_checkpoint_sha256 = Some(malformed.to_owned());
+            assert!(validate_checkpoint_metadata(&metadata).is_err());
+        }
+        metadata.dino_checkpoint_sha256 = Some(custom);
+        validate_checkpoint_metadata(&metadata).unwrap();
+        let mut encoded = serde_json::to_value(metadata).unwrap();
+        encoded
+            .as_object_mut()
+            .unwrap()
+            .remove("dino_checkpoint_sha256");
+        let legacy: CheckpointMetadata = serde_json::from_value(encoded).unwrap();
+        assert!(legacy.dino_checkpoint_sha256.is_none());
+        validate_checkpoint_metadata(&legacy).unwrap();
+    }
+
+    #[test]
+    fn pixel_restore_rejects_wrong_weights_before_gpu_construction() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "kindle-fingerprint-{}-{unique}",
+            std::process::id(),
+        ));
+        fs::create_dir(&directory).unwrap();
+        fs::write(
+            directory.join(CHECKPOINT_METADATA),
+            serde_json::to_vec(&valid_checkpoint_metadata()).unwrap(),
+        )
+        .unwrap();
+        let weights = directory.join("wrong-weights.safetensors");
+        fs::write(&weights, b"not the pinned encoder").unwrap();
+        let error = DreamerAgent::restore(&directory, weights, None)
+            .err()
+            .expect("different encoder must be rejected");
+        fs::remove_dir_all(directory).unwrap();
+        assert!(error.to_string().contains("DINO checkpoint SHA-256"));
     }
 
     #[test]
@@ -2756,7 +2855,8 @@ mod tests {
         agent.save_checkpoint(&checkpoint).unwrap();
         drop(agent);
 
-        let mut restored = DreamerCore::restore_with_gpu(&checkpoint, gpu).unwrap();
+        let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+        let mut restored = DreamerCore::restore_with_gpu(&checkpoint, gpu, metadata).unwrap();
         assert_eq!(restored.learner_step(), 1);
         assert_eq!(restored.environment_step(), 8);
         assert_eq!(restored.replay_len(), 0);
@@ -2902,7 +3002,9 @@ mod tests {
         left.save_checkpoint(&checkpoint).unwrap();
         let parameter = "world.future_predictor.trunk.weight";
         let expected = left.world_train.read_params(&[parameter]);
-        let restored = DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&left.gpu)).unwrap();
+        let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+        let restored =
+            DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&left.gpu), metadata).unwrap();
         assert_eq!(restored.config(), &config);
         assert_eq!(restored.world_train.read_params(&[parameter]), expected);
         assert!(
