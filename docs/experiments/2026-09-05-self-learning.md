@@ -71,7 +71,7 @@ updates and 828,707 parameters. The saved world contains future-predictor tensor
 and no decoder tensors; its encoder and three tensor-file hashes validate.
 Training takes 645.55 s excluding construction; frozen execution takes 54.01 s.
 Neither run has a harness reset. This is the first positive agent-collected native
-result for the causal architecture, not yet a multi-seed or Atari result.
+result for the causal architecture, not yet a multi-seed result.
 Artifacts: `runs/selflearn-20260905-grid-predictive-seed0{,-eval}.{jsonl,log}`
 and `checkpoints/selflearn-20260905-grid-predictive-seed0`.
 
@@ -79,25 +79,52 @@ The Pong zero-update baseline completes 50k sampled actions and 55 episodes at
 mean return −20.3455, with zero learner updates and 199,948 actual action frames.
 Its execution time is 302.24 s, excluding construction. This is an untrained
 behavior baseline, not an Atari-100k training-window score.
-Pong prediction-only seed 0 wins its first game with return **+13 at action
-44,075**: episode 41 naturally terminates after 1,962 actions, without truncation.
-The 35k–40k diagnostic window averages −8.6667 over three games (−8/−14/−4),
-and 40k–45k averages +2.5 over two (−8/+13). Their 5k-action reward-event counts
-are respectively 28 positive / 51 negative and 42 / 30. This is the first
-agent-collected online Pong success for the causal architecture, not yet a
-declared final-window score or frozen-policy result. The 100k training run
-continues unchanged, followed automatically by 50k frozen evaluation.
+Pong prediction-only seed 0 completes training and passes every declared
+per-seed gate using the final 100k checkpoint:
+
+| Measure | Result |
+| --- | ---: |
+| Agent-selected training actions / learner updates | 100,000 / 24,729 |
+| Final 350k–400k nominal-frame training-window mean / games | +18.1429 / 7 |
+| Whole-training complete-game mean / games | −3.8286 / 70 |
+| Frozen sampled actions / learner updates | 50,000 / 0 |
+| Frozen complete-game mean / naturally terminated wins | +19.0714 / 28 of 28 |
+| Actual training / frozen action frames | 399,910 / 199,947 |
+| Training / frozen execution time, excluding construction | 13,770.78 s / 306.66 s |
+
+Its first win is **+13 at action 44,075**: episode 41 naturally terminates
+after 1,962 actions, without truncation. The final training-window returns are
+15/18/14/20/20/20/20; the frozen returns range from +8 to +20. No evaluation
+game is truncated. The unfinished final evaluation game is +16 after 1,369
+actions and is excluded from complete-game scores. Early training losses remain
+in the whole-run mean; neither checkpoint nor episodes were selected by score.
 
 It has 10,281,233 trainable parameters. Startup checks verify the same
 executable, runner, encoder, ALE, GPU, vocabulary and initial counters as the
 zero-update baseline; only train ratio differs (0 versus 256). First-1,000-action
 counts, rewards and frame accounting match before the learner starts. Rechecking
 the win confirms zero forced actions, reconstruction 0, future prediction 0.25,
-extrinsic scale 1, intrinsic scale 0 and the frozen executable hashes. Updates
-remain finite and average about 0.53 s. The matched reconstruction run and
-independent training-seed confirmations remain required. Artifact:
-`runs/selflearn-20260905-pong-predictive-seed0.jsonl`; exact diagnostic summaries
-are `runs/selflearn-20260905-pong-predictive-seed0-step{040000,045000}-window.json`.
+extrinsic scale 1, intrinsic scale 0 and the frozen executable hashes. All 24,729
+world/behavior/timing reports and all 241 saved F32 tensors are finite. The final
+checkpoint has the predictive head and no reconstruction decoder; all three
+tensor-file fingerprints validate. Frozen evaluation verifies the identical
+configuration, model/encoder/backend identity and executable, starts at counters
+100k/24,729, and makes no updates. Training averages 7.26 actions/s: this is still
+an accelerated laboratory learning result, not a real-time 15 Hz Pong agent.
+
+Artifacts: `runs/selflearn-20260905-pong-predictive-seed0{,-eval}.{jsonl,log}`,
+`...-score.json`, `...-eval-summary.json`, `...-audit.json` and
+`...-final-tensors.json`. The immutable final copy is
+`checkpoints/selflearn-20260905-pong-predictive-seed0-step100000`; earlier
+diagnostic copies are retained, not used to select the evaluation endpoint.
+
+The matched reconstruction seed-0 run has started. Its configuration differs
+only in the two objective weights, with the corresponding head identity and
+131,072 additional posterior-input parameters (10,412,305 total). The executable,
+encoder, backend, wrapper, full BPTT, row batch, schedule and behavior settings
+match. Its completed result and independent native/Pong training seeds remain
+required. Current evidence establishes first native and Atari learning for the
+causal architecture, not superiority to reconstruction or multi-seed reliability.
 
 Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
 

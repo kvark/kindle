@@ -36,7 +36,7 @@ framework in advance.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Initial causal native/Pong learning; frozen Atari evaluation and replication pending |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Causal native/Pong learning survives frozen evaluation; replication and matched Atari control pending |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
@@ -199,10 +199,14 @@ global-MLP pilot was confounded by head structure and is retained only in the re
 Reconstruction remains the default. A subsequent prediction-only, agent-controlled
 persistent seed-0 run collects 1,137 food in 10k actions and retains 2,495 food
 with no deaths in 10k frozen actions. It uses no forced coverage or intrinsic
-bonus. Causal Pong seed 0 then wins a naturally terminated game (+13 at action
-44,075); its 40k–45k diagnostic window averages +2.5 over two games. Complete
-the declared 100k budget, frozen Atari evaluation, matched reconstruction control
-and independent seeds before a broader claim. The [self-learning report](experiments/2026-09-05-self-learning.md)
+bonus. Causal Pong seed 0 completes 100k agent-selected actions and 24,729
+updates: final-window mean +18.1429 over seven games. The final checkpoint wins
+all 28 completed games in 50k frozen sampled actions, mean +19.0714, versus
+−20.3455 for the zero-update baseline. All training reports and checkpoint
+tensors are finite. This is first positive control on both games, not proof of
+superiority to reconstruction or multi-seed reliability. Finish the matched
+reconstruction run and independent seeds before a broader claim. The
+[self-learning report](experiments/2026-09-05-self-learning.md)
 records the acceptance criteria, raw artifacts and pending comparisons.
 
 Native single-variable AGC-off and BPTT-8 tests also retain 2,500 rewards on that
