@@ -74,9 +74,18 @@ result for the causal architecture, not yet a multi-seed or Atari result.
 Artifacts: `runs/selflearn-20260905-grid-predictive-seed0{,-eval}.{jsonl,log}`
 and `checkpoints/selflearn-20260905-grid-predictive-seed0`.
 
-Pong seed 0 is now running the declared zero-update baseline, followed by fresh
-prediction-only training and frozen evaluation. The matched reconstruction run
-and independent training-seed confirmations remain required.
+The Pong zero-update baseline completes 50k sampled actions and 55 episodes at
+mean return −20.3455, with zero learner updates and 199,948 actual action frames.
+Its execution time is 302.24 s, excluding construction. This is an untrained
+behavior baseline, not an Atari-100k training-window score.
+Pong prediction-only seed-0 training is underway, followed automatically by frozen
+evaluation. It has 10,281,233 trainable parameters. Startup checks verify the same
+executable, runner, encoder, ALE, GPU, vocabulary and initial counters as the
+zero-update baseline; only train ratio differs (0 versus 256). First-1,000-action
+counts, rewards and frame accounting match before the learner starts. Early
+updates are finite and take about 0.52 s. This is runtime evidence, not a learned
+Pong result yet. The matched reconstruction run and independent training-seed
+confirmations remain required.
 
 Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
 
