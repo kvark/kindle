@@ -1,4 +1,4 @@
-"""Constant-memory diagnostics for Kindle Atari training windows."""
+"""Constant-memory diagnostics for a Kindle Atari run segment."""
 
 from __future__ import annotations
 
@@ -114,8 +114,10 @@ def summarize_training_window(
     end_step: int | None = None,
     default_window_steps: int = 5_000,
 ) -> dict[str, object]:
-    """Summarize one exact `(start_step, end_step]` training window.
+    """Summarize one exact `(start_step, end_step]` window in a run segment.
 
+    Bounds use absolute environment steps, including the offset of a restored
+    training or frozen-evaluation run. A segment is not an uninterrupted lifetime.
     The first pass chooses the latest complete interval when ``end_step`` is
     omitted. The second pass aggregates only records inside the fixed window,
     so a concurrently appended log cannot change the requested result.
@@ -145,10 +147,17 @@ def summarize_training_window(
         )
     if latest_interval_step is None:
         raise AtariTrainingError(f"{path}: no complete interval events")
+    segment_start = run_start.get("starting_environment_step", 0)
+    if (
+        isinstance(segment_start, bool)
+        or not isinstance(segment_start, int)
+        or segment_start < 0
+    ):
+        raise AtariTrainingError("starting_environment_step must be a non-negative integer")
     if end_step is None:
         end_step = latest_interval_step
     if start_step is None:
-        start_step = max(0, end_step - default_window_steps)
+        start_step = max(segment_start, end_step - default_window_steps)
     if (
         isinstance(start_step, bool)
         or not isinstance(start_step, int)
@@ -156,14 +165,14 @@ def summarize_training_window(
         or not isinstance(end_step, int)
     ):
         raise AtariTrainingError("window steps must be integers")
-    if not 0 <= start_step < end_step:
+    if not segment_start <= start_step < end_step:
         raise AtariTrainingError(
             f"invalid training window ({start_step}, {end_step}]"
         )
-    declared_steps = int(run_start["steps"])
-    if end_step > declared_steps:
+    declared_end = segment_start + int(run_start["steps"])
+    if end_step > declared_end:
         raise AtariTrainingError(
-            f"window ends at {end_step}, beyond declared run length {declared_steps}"
+            f"window ends at {end_step}, beyond declared run end {declared_end}"
         )
 
     environment = str(run_start["environment"])
@@ -352,6 +361,8 @@ def summarize_training_window(
         "source": str(path),
         "environment": environment,
         "seed": int(run_start["seed"]),
+        "mode": run_start.get("mode"),
+        "starting_environment_step": segment_start,
         "atari_protocol": str(run_start["atari_protocol"]),
         "config": run_start.get("config"),
         "model_provenance": run_start.get("model_provenance"),

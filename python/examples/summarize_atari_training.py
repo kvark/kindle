@@ -13,8 +13,8 @@ from kindle._atari_training import AtariTrainingError, summarize_training_window
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("log", type=Path)
-    parser.add_argument("--start-step", type=int)
-    parser.add_argument("--end-step", type=int)
+    parser.add_argument("--start-step", type=int, help="exclusive absolute environment step")
+    parser.add_argument("--end-step", type=int, help="inclusive absolute environment step")
     parser.add_argument("--window-steps", type=int, default=5_000)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()

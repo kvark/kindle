@@ -165,6 +165,47 @@ def test_rejects_non_integer_window_bounds(tmp_path) -> None:
         summarize_training_window(path, start_step=0.5, end_step=1_000)
 
 
+@pytest.mark.parametrize("mode", ["train", "evaluate_sample"])
+def test_restored_segment_uses_absolute_step_bounds(tmp_path, mode) -> None:
+    path = tmp_path / "restored.jsonl"
+    start = {**run_start(), "starting_environment_step": 100_000,
+             "steps": 2_000, "mode": mode}
+    updates = int(mode == "train")
+    records = [start]
+    for step in (101_000, 102_000):
+        if updates:
+            records.append(learner(step, step // 1_000, 10))
+        records.append(interval(step, [1_000] + [0] * 17, updates=updates))
+    records.append({"event": "run_end", "environment_step": 102_000})
+    write_events(path, records)
+
+    summary = summarize_training_window(path)
+    assert summary["window"] == {
+        "start_step_exclusive": 100_000,
+        "end_step_inclusive": 102_000,
+        "steps": 2_000,
+        "start_frame_exclusive": 400_000,
+        "end_frame_inclusive": 408_000,
+    }
+    assert summary["run_complete"] is True
+    assert summary["mode"] == mode
+    assert summary["starting_environment_step"] == 100_000
+    assert summary["learner"]["events"] == 2 * updates
+    with pytest.raises(AtariTrainingError, match="invalid training window"):
+        summarize_training_window(path, start_step=99_000, end_step=102_000)
+    with pytest.raises(AtariTrainingError, match="beyond declared run end"):
+        summarize_training_window(path, start_step=100_000, end_step=103_000)
+
+
+@pytest.mark.parametrize("offset", [True, -1, 0.5, "100000", None])
+def test_rejects_invalid_segment_offset(tmp_path, offset) -> None:
+    path = tmp_path / "offset.jsonl"
+    start = {**run_start(), "starting_environment_step": offset}
+    write_events(path, [start, interval(1_000, [1_000] + [0] * 17, updates=0)])
+    with pytest.raises(AtariTrainingError, match="starting_environment_step"):
+        summarize_training_window(path)
+
+
 def test_reward_prediction_means_are_weighted_by_sample_count(tmp_path) -> None:
     path = tmp_path / "reward-calibration.jsonl"
     counts = [0] * 18

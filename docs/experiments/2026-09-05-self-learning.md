@@ -42,7 +42,8 @@ checks regressions; the candidate need not beat it to establish initial learning
   Report all complete episodes in the conventional final training window and
   50k actions of frozen sampled evaluation, including actual frame counts.
   Seek final-window and frozen means above −10, with at least five complete
-  frozen episodes and a won game, then confirm on another independent training
+  frozen episodes and a naturally terminated game with positive return (a
+  time-limit cutoff does not count as a win), then confirm on another training
   seed. Keep random and zero-update baselines separate from learned behavior.
 
 Inspect the seed-0 native result before starting long Atari work. If pure
@@ -99,3 +100,15 @@ Each executes 100k actions, with no reset no-ops and zero learner updates.
 Artifacts: `runs/selflearn-20260905-pong-random-seed{0,1,2}.{jsonl,log}`.
 They ran on the CPU while the native learner occupied the single GPU; native
 wall times are descriptive, not isolated performance comparisons.
+
+## Evaluation-analysis correction
+
+Preparing frozen evaluation exposed an absolute/local-step mismatch in the
+window summarizer. It now bounds restored windows by starting environment step
+plus local run length, clips the default window to that segment, and reports the
+run mode/offset. Seven regression cases cover restored training/evaluation and
+malformed offsets; all 83 Python tests pass. A completed historical evaluation
+successfully summarizes steps `(100000, 105000]` with zero learner updates;
+artifact: `runs/selflearn-20260905-historical-evaluation-summary.json`.
+Only analysis code changed. The running experiment's runner, native binary and
+extension hashes remain unchanged and verified.
