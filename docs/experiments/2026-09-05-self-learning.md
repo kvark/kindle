@@ -112,3 +112,25 @@ successfully summarizes steps `(100000, 105000]` with zero learner updates;
 artifact: `runs/selflearn-20260905-historical-evaluation-summary.json`.
 Only analysis code changed. The running experiment's runner, native binary and
 extension hashes remain unchanged and verified.
+
+## Gameplay evidence preparation
+
+`python/examples/record_atari.py` records raw emulator frames during frozen
+evaluation or a random control, without changing the training runner or adding
+policy calls. Its movie and raw-frame hashes link to the ordinary evaluation
+log. Playback is nominal 60 Hz, not measured acting latency; reset no-ops count
+as frames, but reset images do not. Existing outputs are refused and an encoder
+failure cannot produce a completion manifest.
+
+A current-wrapper Pong random seed-17 check executes 2k actions with and without
+recording. All six JSONL records agree exactly except wall-time fields, including
+the two episode returns (−20, −21), action counts, reset accounting and zero
+updates. The movie decodes to exactly 7,998 frames at 160×210, matching actual
+emulator steps. Nine recorder tests cover transition/RNG parity, no-op/reset
+handling, output preservation and failure cleanup; all 92 Python tests pass.
+Artifacts: `runs/selflearn-20260905-video-parity-plain.jsonl`,
+`runs/selflearn-20260905-video-parity-recorded-v2.jsonl` and
+`runs/selflearn-20260905-video-parity-v2.mp4{,.json}`. This is recording validation,
+not a trained-policy result. Learned-policy recording waits for the single GPU.
+The experiment's native binary, extension and Atari runner still match their
+frozen executable manifest.

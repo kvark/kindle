@@ -174,6 +174,20 @@ not frozen endpoint evaluations. `--restore ... --evaluate` runs a frozen
 sampled policy; `--greedy` is a separate diagnostic. Restores refill replay and
 must not be presented as uninterrupted runs.
 
+For a qualitative check of the final checkpoint, the separate recorder leaves
+the training runner unchanged:
+
+```bash
+python python/examples/record_atari.py /models/dino/model.safetensors ALE/Pong-v5 \
+  --restore checkpoints/pong --evaluate --steps 10000 --seed 0 \
+  --atari-protocol published --output runs/pong-video.jsonl --video runs/pong.mp4
+```
+
+This requires `ffmpeg` and writes raw-emulator gameplay at nominal 60 Hz, including
+reset no-ops, with a hashed `pong.mp4.json` manifest and ordinary evaluation log.
+It refuses existing artifacts and training runs. Playback is not wall-clock agent
+latency; videos supplement fixed-budget scores, not selected-checkpoint claims.
+
 The recovered 12M Pong runs scored −4, +6 and −2 (seed mean 0), versus matched
 random −20.623. Local pinned upstream 1M and 12M controls also exist. See the plan for
 the small episode counts, runtime/perception differences and artifact locations.

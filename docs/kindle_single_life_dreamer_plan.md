@@ -42,7 +42,7 @@ framework in advance.
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
 | Checkpoints | Model, optimizer, counters, return normalizer, backend/head/hash identity, encoder/tensor-file fingerprints and required-tensor checks | Replay/live state absent; non-atomic generation; resume is a new data segment |
 | Native tests | `kindle-gym`: episodic/persistent visual GridWorld and representation/dynamics probes | Small deterministic integration task, not general lifetime evidence |
-| Game experiments | `python/examples/atari.py` and strict score/training summaries | Atari only; no video archive or real-time deadline scheduler |
+| Game experiments | `python/examples/atari.py`, strict summaries and optional frozen-evaluation video | Atari only; no lifetime archive or real-time deadline scheduler |
 
 Python handles adapters and analysis; inference and learning remain Rust.
 The 12M preset has about 10.4M trainable parameters with this frontend; its
