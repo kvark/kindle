@@ -5,7 +5,7 @@ use meganeura::{Graph, graph::NodeId};
 use super::config::DreamerConfig;
 use super::networks::{
     MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
-    mixed_probabilities, scale, straight_through_sample, sum,
+    mixed_probabilities, scale, straight_through_sample, sum, weighted_cross_entropy,
 };
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
@@ -112,20 +112,6 @@ fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> ObservationDec
         "world.future_predictor",
         config.network().deter,
     )
-}
-
-fn weighted_cross_entropy(
-    graph: &mut Graph,
-    logits: NodeId,
-    target: NodeId,
-    weight: NodeId,
-) -> NodeId {
-    let log_probability = graph.log_softmax(logits);
-    let product = graph.mul(target, log_probability);
-    let per_row = graph.sum_inner(product);
-    let per_row = graph.neg(per_row);
-    let weighted = graph.mul(per_row, weight);
-    graph.mean_all(weighted)
 }
 
 /// Full sequence loss with externally sampled hard posterior states.

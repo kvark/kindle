@@ -3,7 +3,7 @@
 use meganeura::{Graph, graph::NodeId};
 
 use super::config::DreamerConfig;
-use super::networks::{MlpHead, scale, sum};
+use super::networks::{MlpHead, scale, sum, weighted_cross_entropy};
 
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_POLICY: usize = 1;
@@ -39,20 +39,6 @@ impl BehaviorModel {
             ),
         }
     }
-}
-
-fn weighted_cross_entropy(
-    graph: &mut Graph,
-    logits: NodeId,
-    target: NodeId,
-    weight: NodeId,
-) -> NodeId {
-    let log_probability = graph.log_softmax(logits);
-    let product = graph.mul(target, log_probability);
-    let per_row = graph.sum_inner(product);
-    let per_row = graph.neg(per_row);
-    let weighted = graph.mul(per_row, weight);
-    graph.mean_all(weighted)
 }
 
 fn value_loss(

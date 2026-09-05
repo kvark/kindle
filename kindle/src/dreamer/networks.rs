@@ -78,6 +78,20 @@ pub(crate) fn sum(graph: &mut Graph, values: &[NodeId]) -> NodeId {
     result
 }
 
+pub(crate) fn weighted_cross_entropy(
+    graph: &mut Graph,
+    logits: NodeId,
+    target: NodeId,
+    weight: NodeId,
+) -> NodeId {
+    let log_probability = graph.log_softmax(logits);
+    let product = graph.mul(target, log_probability);
+    let per_row = graph.sum_inner(product);
+    let per_row = graph.neg(per_row);
+    let weighted = graph.mul(per_row, weight);
+    graph.mean_all(weighted)
+}
+
 // Upstream `nn.Norm("rms")` applies a learned scale but no shift. Its `shift`
 // option is only read by the layer-normalization branch.
 struct LinearNorm {
