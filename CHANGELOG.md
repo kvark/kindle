@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — Dreamer + predictive representation kickoff
+
+- Consolidated the two research plans into one evidence-backed direction and
+  recorded ongoing priorities in `AGENTS.md`.
+- Recovered the missing 12M branch's backend pins, full-BPTT row microbatching,
+  large-actor gradient checks and strict multi-seed score/training summaries.
+- Added learner stage timing and inference traces. Batched CPU-cached readback
+  removes dominant imagination and parameter-synchronization stalls without
+  changing the learning metrics in the paired eight-update canary.
+- Added a causal deterministic-state feature predictor, optional alongside or
+  instead of posterior reconstruction, with reset masking and GPU gradient tests.
+- Added persistent native GridWorld dynamics and bounded visual visitation
+  novelty, with checkpointed counts and separate intrinsic/extrinsic metrics.
+- Removed the unused ARC package extra and stale README experiment recipes.
+
 ## Unreleased — Dreamer baseline pivot
 
 - Replaced the previous Kindle model stack with a DreamerV3 categorical RSSM,

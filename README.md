@@ -1,238 +1,75 @@
 # Kindle
 
-Kindle is an experimental DreamerV3 agent implemented on
-[Meganeura](https://github.com/kvark/meganeura) and
-[Blade](https://github.com/kvark/blade). It learns a categorical recurrent
-world model from one stream of game frames, trains its actor and critic in
-latent imagination, and uses a frozen DINOv3 ViT-S/16 as its visual frontend.
+Kindle is an experimental Rust agent that learns while acting. It combines
+Dreamer's recurrent world model and imagined actor/critic with frozen DINOv3
+perception, using [Meganeura](https://github.com/kvark/meganeura) and
+[Blade](https://github.com/kvark/blade) for native GPU computation.
 
-This repository has deliberately pivoted to a small, legible baseline. Earlier
-Kindle policies, planners, reward circuits, pretraining scripts, and experiment
-harnesses remain in git history; they are not part of the current architecture.
+The current pivot adds action-conditioned prediction of unseen visual features.
+The reconstruction agent remains the measured control; a predictive objective
+is not yet a demonstrated replacement. Games are our first testbed, with
+intrinsic motivation, continual learning and experience sharing as longer-term
+goals.
 
-The native crates require Rust 1.88 or newer and a Blade-supported graphics
-backend (Vulkan on Linux in CI, Metal on macOS). A software Vulkan driver such
-as lavapipe is sufficient for tests; practical DINO inference and learning need
-a real GPU.
+Read the [single project plan](docs/kindle_single_life_dreamer_plan.md) for the
+architecture, evidence and research gates, and [AGENTS.md](AGENTS.md) for working
+directions. Superseded planners and training stacks remain in git history.
 
-## Baseline
+## Architecture
 
 ```text
-RGB game frame
-    │  aspect-preserving resize
-    ▼
-frozen DINOv3 ViT-S/16 patch tokens
-    │  fixed 384→64 projection + 2×2 spatial pooling
-    ▼
-7×7×64 observation ──► categorical RSSM ──► reward / continuation / reconstruction
-                              │
-                              └── posterior replay states
-                                      │
-                                      ▼
-                               latent imagination
-                                      │
-                                      ▼
-                          categorical actor + two-hot critic
+previous belief + action ──► deterministic state ──► forecast frozen features
+                                     │
+RGB ──► frozen DINOv3 ──► 7×7×64 ────┤
+                                     ▼
+                            categorical posterior
+                                     │
+                     reward / continuation / reconstruction
+                                     │
+                       imagined actor + two-hot critic
 ```
 
-The learning algorithm follows DreamerV3 at pinned upstream revision
-`e3f02248693a79dc8b0ebd62c93683888ddaccfe`:
+The forecast reads the deterministic state *before* the current observation
+enters the posterior. The feature-reconstruction control reads the posterior.
+Both retain balanced KL, categorical sampling, replay-value learning, 15-step
+imagination and DreamerV3's LaProp/AGC optimizer ordering.
 
-- online-first sequence replay that consumes fresh non-overlapping sequences
-  FIFO before uniform fallback, with batch 16, length 64, and a 1,024-item
-  learner prefill gate;
-- block-recurrent deterministic state plus 32 categorical stochastic variables;
-- posterior/prior KL balancing, 1 free nat, and 1% uniform mixing;
-- feature reconstruction, two-hot reward prediction, and learned continuation;
-- 15-step imagination from every posterior sequence state;
-- REINFORCE actor loss, entropy regularization, lambda returns, replay-value
-  learning, and a 2% EMA value model;
-- per-parameter adaptive gradient clipping followed by RMS normalization and
-  momentum (LaProp-style ordering), at `4e-5` with 1,000-step warmup.
+Three objective settings are exposed in both native and Atari runners:
 
-Intentional differences are explicit:
+| Experiment | `--reconstruction-loss-scale` | `--future-prediction-loss-scale` |
+| --- | ---: | ---: |
+| Calibrated reconstruction control | 0.25 | 0 |
+| Predictive auxiliary | 0.25 | 0.25 |
+| Prediction only | 0 | 0.25 |
 
-- Perception is frozen DINOv3 rather than DreamerV3's learned pixel encoder.
-- Replay reconstructs a fixed compressed DINO feature map rather than pixels.
-- The decoder keeps 64 hidden channels per patch before its 64-channel DINO
-  output. Dreamer's small pixel presets end at only 4–16 channels because they
-  predict RGB; reusing that width imposed a measurable low-rank bottleneck.
-- World-model gradients are truncated every 8 recurrent steps to keep
-  Meganeura's static training graph practical. Each update still samples the
-  full 16×64 replay batch, averages gradients across all eight chunks, and
-  starts imagination from all 1,024 posterior states.
-- Replay holds 100,000 compressed observations rather than D3's five million;
-  the current f32 observation and recurrent context consume roughly 2.3 GB at
-  that capacity. Larger/f16 lifetime storage is a measured follow-up.
-- Dreamer computation is f32 on the current backend rather than D3's bfloat16.
-- World and behavior parameter groups use separate optimizer sessions;
-  objectives, per-parameter clipping, and representation-gradient paths are
-  preserved.
-- The first baseline supports categorical actions only.
+Zero disables and removes the corresponding head's parameters. Future targets
+are stop-gradient frozen features; reset observations do not contribute to that
+loss. These coefficients are experimental settings, not universally tuned values.
 
-Extrinsic and intrinsic reward channels are separate in replay and independently
-scaled. Intrinsic reward defaults to zero so externally rewarded Dreamer remains
-the control baseline.
+Intentional differences from the pinned upstream DreamerV3 include frozen DINO
+instead of learned RGB perception, f32 computation, 100k-entry replay, and
+separate world/behavior optimizer sessions. Library defaults retain BPTT 8 and
+train ratio 32 for compatibility; measured Atari controls explicitly use full
+BPTT 64, B16×T64, row microbatch 4 and ratio 256. Microbatching accumulates
+gradients before one update; it does not truncate recurrence.
 
-## DINOv3 weights
+## Build and weights
 
-Kindle expects `model.safetensors` from
+Use Rust 1.88 or newer and a Blade-supported GPU backend. Linux experiments use
+Vulkan. Practical learning needs a hardware accelerator.
+
+DINO weights are supplied separately:
 [`facebook/dinov3-vits16-pretrain-lvd1689m`](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
 snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
+The model is externally licensed and is not committed here.
 
-The weights are externally licensed and are never committed here. Review Meta's
-model license before downloading or redistributing them. The native
-implementation is numerically checked against Transformers/PyTorch golden
-outputs by an ignored local parity test.
-
-On hosts with multiple Vulkan adapters, select the intended accelerator by its
-backend-reported numeric device ID. Kindle opts into Meganeura's selector and
-records the selected device and driver in every measured run. For example,
-the RTX 5080 on the current benchmark host reports device ID `0x2c02`:
+On multi-adapter hosts, `MEGANEURA_DEVICE_ID` selects a backend-reported numeric
+device ID, not an adapter ordinal. Our RTX 5080 uses `0x2c02`; omit the variable
+to retain Blade's default selection.
 
 ```bash
-MEGANEURA_DEVICE_ID=0x2c02 cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 10000
-```
+cargo build --release --workspace --examples
 
-Without the variable, Blade's default adapter is retained. The hexadecimal ID
-is normally the Vulkan/PCI device ID, not an adapter ordinal.
-
-## Rust use
-
-```rust,ignore
-use kindle::{
-    ActionMode, DreamerAgent, DreamerConfig, Reward, RgbFrame, Transition,
-};
-
-let config = DreamerConfig::new(18);
-let mut agent = DreamerAgent::new(config, "/models/dinov3/model.safetensors", None)?;
-
-let first = RgbFrame::new(width, height, first_rgb);
-agent.begin_episode(&first);
-
-let action = agent.act(ActionMode::Sample, action_mask.as_deref());
-let transition = Transition {
-    frame: RgbFrame::new(width, height, next_rgb),
-    reward: Reward { extrinsic: score, intrinsic: 0.0 },
-    terminated,
-    truncated,
-};
-agent.observe(&transition);
-let reports = agent.learn_scheduled(1);
-# Ok::<(), Box<dyn std::error::Error>>(())
-```
-
-Scheduled learning deliberately returns no reports until replay exposes 1,024
-complete sequence starts (1,088 frames with the default length and context).
-`DreamerCore::learn()` remains available for isolated learner diagnostics.
-Live policy sampling, live and training posterior sampling, replay selection,
-imagination, and read-only probes use independent deterministic RNG streams.
-Changing learner throughput or imagination length therefore does not silently
-advance the environment policy or replay RNG.
-
-Learner reports expose both D3's floor-clipped dynamics/representation losses
-and `raw_kl`. Replay reward diagnostics retain the sparse-task nonzero/zero
-summary and also report separate positive, zero, and negative prediction means
-and target counts for signed-reward games. `DreamerConfig::dynamics_free_nats`
-can optionally override only
-the prior-training floor while `free_nats` continues to protect posterior
-information; leaving it unset preserves D3's shared one-nat default. The native
-and Python runners also expose the existing dynamics loss coefficient for
-controlled prior-alignment diagnostics.
-`DreamerConfig::actor_learning_starts` can delay policy parameter updates by a
-fixed number of learner updates without delaying either critic objective. Its
-default is zero, actor optimizer moments continue tracking gradients, and
-learner reports expose `behavior.actor_update_scale` so gated and active
-updates are unambiguous in experiment logs.
-
-`kindle-gym` contains one rendered GridWorld for native integration and the
-first measured baseline. It writes JSONL learner, episode, interval, and final
-summary events to stdout:
-
-```bash
-cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 100000 --seed 0 \
-  --checkpoint checkpoints/gridworld-seed-0 \
-  --output runs/gridworld-seed-0.jsonl
-
-# Matched random valid-action control (does not need DINO weights):
-cargo run -p kindle-gym --example grid_world --release -- \
-  --random --steps 100000 --seed 0
-
-# Atari-like fixed action vocabulary: border moves become benign no-ops in
-# both the random control and Dreamer run instead of being masked live:
-cargo run -p kindle-gym --example grid_world --release -- \
-  --random --all-actions --steps 100000 --seed 0
-
-# Resume model/optimizer state; replay is deliberately refilled from scratch:
-cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 100000 \
-  --restore checkpoints/gridworld-seed-0 \
-  --checkpoint checkpoints/gridworld-seed-0-resumed
-
-# Frozen greedy evaluation (updates recurrent state, but not parameters):
-cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 10000 \
-  --restore checkpoints/gridworld-seed-0 --evaluate
-
-# Short compute-heavy diagnostic, explicitly not the default baseline:
-cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 2000 --model-size tiny \
-  --learning-rate-warmup 0 --train-ratio 256
-
-# Strict dense visual-representation diagnostic, with action history removed:
-cargo run -p kindle-gym --example grid_world --release -- \
-  /models/dinov3/model.safetensors --steps 3000 --model-size 1m \
-  --learning-rate 1e-3 --learning-rate-warmup 0 --train-ratio 256 \
-  --free-nats 16 --reconstruction-loss-scale 3.1887755e-4 \
-  --stop-replay-value-gradient --reward-mode dense-right \
-  --randomize-position --random-action-steps 3000 \
-  --checkpoint checkpoints/gridworld-dense-probe-seed-0
-
-# Frozen-perception probe for GridWorld state separability:
-cargo run -p kindle-gym --example probe_grid_world --release -- \
-  /models/dinov3/model.safetensors --samples 500 --seed 1 \
-  --randomize-position --output runs/gridworld-dino-probe-seed1.json
-
-# The same held-out probes after the RSSM, including the posterior policy's
-# invalid-action mass, agreement with true/model-predicted rewarding actions,
-# action-conditioned prior reward, and decoded-DINO prediction error against a
-# no-change persistence baseline through horizon 15. The output also reports
-# affine rank floors for the 64-channel DINO patches and the checkpoint's
-# configured decoder depth, exposing widths that cannot represent the
-# observation data even with a perfect latent:
-cargo run -p kindle-gym --example probe_grid_world --release -- \
-  /models/dinov3/model.safetensors --samples 500 --seed 1 \
-  --randomize-position \
-  --checkpoint checkpoints/gridworld-dense-probe-seed-0 \
-  --output runs/gridworld-rssm-probe-seed1.json
-```
-
-The D3-compatible replay-value representation gradient remains enabled in
-`DreamerConfig` by default. The strict frozen-DINO diagnostic stops that
-gradient because matched ablations found that it prevented visual reward
-learning at this budget; the behavior critic still receives its normal
-replay-value updates.
-
-Short optimization diagnostics can also set `--behavior-learning-rate`
-independently from the world-model `--learning-rate`. Omitting it preserves
-D3's shared rate; the split exists to test whether a fast world learner causes
-the actor/critic to collapse before a sparse reward model is grounded.
-`--imagination-length` isolates rollout-horizon failures. `--all-actions`
-exposes GridWorld's border moves as no-ops, matching the full action vocabulary
-used inside imagination; pass the same switch to the random control, frozen
-evaluation, and representation probe.
-`--actor-learning-starts N` is a causal diagnostic for premature actor
-specialization: it holds only actor parameter updates through the first `N`
-learner updates while the actor optimizer moments and behavior critic learn
-from the same imagined and replayed states.
-
-## Python use
-
-Build the extension with Maturin:
-
-```bash
 cd python
 python -m venv .venv
 . .venv/bin/activate
@@ -240,178 +77,128 @@ pip install maturin
 maturin develop --release --extras test
 ```
 
-The Python agent consumes `H×W×3` NumPy-compatible `uint8` frames:
+## Native use
 
-```python
-import kindle
+```rust,ignore
+use kindle::{ActionMode, DreamerAgent, DreamerConfig};
 
-agent = kindle.Agent("/models/dinov3/model.safetensors", num_actions=18)
-agent.begin_episode(first_frame)
-action = agent.act()
-agent.observe(next_frame, extrinsic_reward=reward,
-              terminated=terminated, truncated=truncated)
-reports = agent.learn_scheduled()
+let mut config = DreamerConfig::new(environment.action_count());
+config.loss_scales.reconstruction = 0.25;
+let mut agent = DreamerAgent::new(config, "/models/dino/model.safetensors", None)?;
+agent.begin_episode(&environment.reset());
+
+let action = agent.act(ActionMode::Sample, None);
+let transition = environment.step(action);
+let reward_channels = agent.observe(&transition);
+let reports = agent.learn_scheduled(1);
+if transition.terminated || transition.truncated {
+    agent.begin_episode(&environment.reset());
+}
 ```
 
-See [`python/examples/atari.py`](python/examples/atari.py) for a Gymnasium loop.
-Its default `current` protocol reproduces the pinned D3 Atari-100k preprocessing
-(minimal actions, repeat 4, two-frame max pooling, non-sticky actions, 0--30
-reset no-ops, a 108,000-frame episode cap, and Pillow bilinear 64×64 RGB
-resizing). `--atari-protocol published` selects the older all-18-action,
-zero-no-op, 100,000-frame-cap settings associated with D3's released scores.
-`--atari-protocol published-minimal` retains the latter two settings but uses
-each game's minimal legal action set, isolating action aliases as a diagnostic;
-its scores are not protocol-matched to the released all-action artifact.
-Thus 100,000 runner steps correspond to the conventional 400,000-frame Atari
-budget. The runner defaults to the D3-order `0.25` frozen-DINO reconstruction
-scale and D3's replay-value representation gradient. Use
-`--no-replay-value-gradient` for the isolated-gradient ablation; both choices
-remain explicit Python constructor options as well.
-The same runner provides deterministic random controls, resumable training, and
-frozen sampled evaluation matching D3; `--greedy` is available as a separate
-policy diagnostic. During evaluation, `--reward-probe` measures the chosen
-action's one-step prior and the resulting posterior reward prediction against
-actual rewards, split into positive, zero, and negative targets. It also reports
-tie-aware ROC-AUC for reward occurrence and signed ordering, exposing weak
-ranking before the head becomes calibrated. Set `--random-action-steps` to the
-evaluation length to compare checkpoints on the same deterministic external
-action and environment trajectory while still updating each model's RSSM:
+The first reset and executed transitions have different replay semantics.
+Learning starts after enough complete replay sequences exist. State and learning
+persist across natural episodes; `begin_episode` resets recurrence only.
+Validity masks affect live actions, not imagination: give invalid actions a
+benign meaning or use the same fixed vocabulary throughout.
+
+GridWorld is a small visual integration task, not a general benchmark:
 
 ```bash
-# Environment-only random control; the DINO path is not opened.
+cargo run --release -p kindle-gym --example grid_world -- \
+  /models/dino/model.safetensors --steps 10000 --model-size 1m \
+  --all-actions --world-backprop-length 64 --train-ratio 256 \
+  --reconstruction-loss-scale 0.25 \
+  --checkpoint checkpoints/grid --output runs/grid.jsonl
+
+cargo run --release -p kindle-gym --example grid_world -- \
+  --random --all-actions --persistent --steps 10000
+
+cargo run --release -p kindle-gym --example grid_world -- \
+  /models/dino/model.safetensors --all-actions --steps 10000 \
+  --restore checkpoints/grid --evaluate --output runs/grid-eval.jsonl
+```
+
+`--persistent` disables the artificial episode limit. Exhaustion respawns the
+agent through normal dynamics, costs one game reward, and preserves food
+progress. In this mode positive/negative reward events count food/deaths.
+Keep this flag and action vocabulary matched across training and evaluation.
+
+`--visitation-bonus --intrinsic-reward-scale 0.1` enables an optional bounded
+visual-novelty experiment. A fixed 16-bit random-hyperplane hash counts visits;
+bonus is `1/sqrt(previous_count + 1)`. Counts survive episode resets and
+checkpoints, and saturate instead of wrapping. Collisions reduce novelty.
+This is not epistemic uncertainty. Intrinsic and extrinsic channels are logged
+separately; neither intrinsic generation nor its learning scale is enabled by
+default.
+
+## Atari and analysis
+
+From an activated Python environment at the repository root:
+
+```bash
+python python/examples/atari.py /models/dino/model.safetensors ALE/Pong-v5 \
+  --steps 100000 --seed 0 --atari-protocol published \
+  --model-size 12m --world-backprop-length 64 --world-microbatch-size 4 \
+  --checkpoint checkpoints/pong --output runs/pong-seed0.jsonl
+
 python python/examples/atari.py /unused ALE/Pong-v5 \
-  --steps 100000 --random-policy --output runs/pong-random-seed0.jsonl
+  --steps 100000 --seed 0 --atari-protocol published --random-policy \
+  --output runs/pong-random-seed0.jsonl
 
-# Train and save, then evaluate without learner updates.
-python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
-  --steps 100000 --atari-protocol published \
-  --checkpoint checkpoints/pong-seed0 \
-  --checkpoint-every 10000 \
-  --output runs/pong-seed0.jsonl
-python python/examples/atari.py /models/dinov3/model.safetensors ALE/Pong-v5 \
-  --steps 10000 --atari-protocol published \
-  --restore checkpoints/pong-seed0 --evaluate --reward-probe \
-  --random-action-steps 10000 \
-  --output runs/pong-seed0-eval.jsonl
-
-# Verify that reward-event evidence survives frozen DINO and 2x2 pooling on
-# independent random-policy train, validation, and test emulator seeds.
-python python/examples/probe_atari_reward_perception.py \
-  /models/dinov3/model.safetensors ALE/Pong-v5 \
-  --atari-protocol published \
-  --output runs/pong-dino-reward-probe.json
-
-# Compare open-loop decoded DINO features with the realized trajectory,
-# persistence, and an unrelated-action rollout from the same latent state.
-python python/examples/probe_atari_dynamics.py \
-  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
-  --steps 5000 --horizon 15 --stride 50 --atari-protocol published \
-  --output runs/pong-open-loop.json
-
-# Compare policy probabilities with paired reward-plus-value predictions for
-# every candidate action at sampled posterior states.
-python python/examples/probe_atari_behavior.py \
-  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
-  --steps 5000 --stride 20 --atari-protocol published \
-  --output runs/pong-behavior.json
-
-# Compare critic values with realized discounted returns from complete frozen
-# policy episodes and with one-step Bellman targets on the full trajectory.
-python python/examples/probe_atari_value.py \
-  /models/dinov3/model.safetensors checkpoints/pong-seed0 ALE/Pong-v5 \
-  --steps 5000 --atari-protocol published \
-  --output runs/pong-value.json
-
-# Aggregate complete curves by averaging episodes within each seed first.
 python python/examples/summarize_atari_scores.py \
   runs/pong-seed0.jsonl runs/pong-seed1.jsonl runs/pong-seed2.jsonl \
-  --output runs/pong-published-summary.json
+  --minimum-kindle-seeds 3 --require-uninterrupted-kindle
+
+python python/examples/summarize_atari_training.py runs/pong-seed0.jsonl
 ```
 
-The score summarizer rejects incomplete 350k--400k-frame coverage, mixed run
-modes, and wrapper settings that do not match the selected protocol. It supports
-resumed curves split across files and reports deltas to matched random, reported
-12M DreamerV3XS, and pinned 200M DreamerV3 targets only where they match the
-selected protocol. The `published-minimal` profile reports its own matched
-random target and does not label the released all-action D3 scores as matched.
+`published` uses all 18 actions, no reset no-ops, repeat four, max-pooling,
+non-sticky actions, a 100k-frame episode cap and Pillow 64×64 RGB resizing.
+`current` follows the pinned upstream source's newer wrapper.
+`published-minimal` changes only the action vocabulary. Do not mix protocols.
 
-The dynamics probe is read-only. At each sampled posterior it decodes the
-proposed action sequence and a deterministic unrelated-action sequence using
-identical categorical random draws. Horizon-wise feature MSE against the actual
-future is reported beside both that action control and a persistence predictor;
-episode-crossing predictions are excluded.
+The conventional score window is 350k–400k nominal frames, with episode scores
+averaged within seed before averaging seeds. These are training-window scores,
+not frozen endpoint evaluations. `--restore ... --evaluate` runs a frozen
+sampled policy; `--greedy` is a separate diagnostic. Restores refill replay and
+must not be presented as uninterrupted runs.
 
-The behavior probe is also read-only. At each sampled posterior it evaluates
-every candidate action with identical latent draws and compares the actor's
-probabilities against `reward(next) + continuation(next) * value(next)`. This
-one-step consistency check does not replace Dreamer's full imagined return, but
-it distinguishes a flat or misleading critic from an actor that ignores its
-own model's local action ranking.
+The recovered 12M Pong runs scored −4, +6 and −2 (seed mean 0), versus matched
+random −20.623. A local pinned upstream 1M control also exists. See the plan for
+the small episode counts, runtime/perception differences and artifact locations.
 
-The value probe follows the frozen sampled or greedy policy and computes exact
-horizon-discounted Monte Carlo returns for fully terminated episodes. It
-reports critic bias, error, correlation, and linear calibration; truncated and
-trailing partial episodes are excluded rather than assigned zero bootstrap.
+Read-only native and Atari probes measure reward calibration, representation
+separability, open-loop feature error against persistence/unrelated actions,
+actor/model agreement and critic calibration. Each example's `--help` describes
+the exact protocol.
 
-Periodic saves atomically replace the model-sized checkpoint files. Replay is
-not checkpointed, so a resumed run must refill it before learning continues.
-Write each resumed invocation to a new JSONL file, or use `--append-output` with
-`--restore` to preserve one continuous log. Environment-step and frame
-coordinates remain absolute, while the summary also reports segment deltas.
+## Checkpoints and verification
 
-ARC and other games should adapt their native controls into a stable categorical
-vocabulary plus an optional validity mask; coordinate-parameterized actions are
-a later extension, not hidden inside this baseline.
+Checkpoints contain world/behavior parameters and optimizer moments, the slow
+critic, configuration, backend/vision provenance, counters, return normalization
+and optional visitation counts. Replay, scheduler credit, exact RNG state and
+the in-flight environment are absent. Restore is model recovery into a fresh
+data segment, not exact lifetime continuation. Backend revisions are validated;
+old artifacts require their original checkout.
 
-Validity masks constrain live action selection only. Latent imagination uses
-the full fixed vocabulary, so adapters should give state-invalid actions a
-defined benign/no-op meaning until mask prediction is added to the world model.
-
-## Checkpoints
-
-`DreamerAgent::save_checkpoint()` writes:
-
-- world-model parameters and optimizer moments;
-- actor/value parameters and optimizer moments;
-- the slow value model;
-- configuration, source revisions, learner counters, and return normalization.
-
-The metadata also pins the Meganeura/Blade revisions and the fixed DINO
-projection seed/shape. It does not embed or hash the separately supplied DINO
-weights.
-
-Replay and the in-flight episode are intentionally excluded. Restoring therefore
-starts between episodes with empty replay while retaining learned parameters and
-optimizer state.
-
-## Verification
+`LearnReport.timing` separates replay, posterior, imagination, training and
+synchronization wall time. The synthetic canary avoids perception/environment
+costs and can export GPU inference traces:
 
 ```bash
+MEGANEURA_GPU_TIMING=1 cargo run --release -p kindle --example dreamer_canary -- \
+  12m 64 4 --learn --updates 8 --profile-dir runs/profile
+
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace --lib
-
-# Serialized GPU act/learn/checkpoint and learning-wiring canaries:
-cargo test -p kindle tiny_ --lib -- --ignored --test-threads=1
-
-# Full DINO checkpoint parity:
-KINDLE_DINOV3_WEIGHTS=/models/dinov3/model.safetensors \
-  cargo test -p kindle vits16_checkpoint_matches_hugging_face \
+cargo test --workspace --all-targets
+cargo test --release -p kindle tiny_ --lib -- --ignored --test-threads=1
+KINDLE_DINOV3_WEIGHTS=/models/dino/model.safetensors \
+  cargo test --release -p kindle vits16_checkpoint_matches_hugging_face \
   --lib -- --ignored
+PYTHONPATH=python python -m pytest python/tests
 ```
 
-The design rationale and next research gates are in
-[`docs/kindle_single_life_dreamer_plan.md`](docs/kindle_single_life_dreamer_plan.md).
-
-## Repository
-
-```text
-kindle/src/dreamer/   DreamerV3 model, replay, learner, and checkpointing
-kindle/src/vision/    native frozen DINOv3 ViT-S/16
-kindle/src/env.rs     minimal visual environment boundary
-kindle-gym/           native rendered smoke environment
-python/               compact PyO3 binding and Atari example
-```
-
-Kindle is experimental research software, not a production-safe autonomous
-control system.
+Serialize GPU-heavy tests and experiments on one device. Trace instrumentation
+changes launch overhead; report ordinary wall time alongside GPU timestamps.

@@ -212,7 +212,12 @@ pub fn build_value_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
+    use meganeura::Mode;
+
     use super::*;
+    use crate::dreamer::runtime::{build_session, configure_d3_optimizer, initialize_d3};
 
     #[test]
     fn behavior_graphs_have_d3_heads() {
@@ -240,5 +245,108 @@ mod tests {
         let graph = build_training_graph(&config, 12, 6);
         let (plan, _) = meganeura::compile_training_graph(&graph);
         assert!(!plan.dispatches.is_empty());
+    }
+
+    #[test]
+    #[ignore = "requires a Vulkan compute device"]
+    fn size12m_actor_first_layer_covers_dense_and_categorical_features() {
+        let mut config = DreamerConfig::new(18);
+        config.learning_rate_warmup = 0;
+        let rows = 1_024;
+        let graph = build_training_graph(&config, rows, rows);
+        let gpu = Arc::new(crate::init_gpu_context().expect("Vulkan compute device"));
+        let mut session = build_session(&graph, &gpu, Mode::Training, false);
+        initialize_d3(&mut session, &graph, config.seed ^ 0x5eed_0000_0000_0001);
+
+        let network = config.network();
+        let mut feature_rng = 0xd1b5_4a32_d192_ed03_u64;
+        let mut feature = vec![0.0; rows * config.feature_dim()];
+        for row in 0..rows {
+            for column in 0..network.deter {
+                feature_rng = feature_rng
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1_442_695_040_888_963_407);
+                let unit = ((feature_rng >> 40) as f32 + 0.5) / (1_u32 << 24) as f32;
+                feature[row * config.feature_dim() + column] = 2.0 * unit - 1.0;
+            }
+            for variable in 0..network.stoch {
+                feature_rng = feature_rng
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1_442_695_040_888_963_407);
+                let class = ((feature_rng >> 32) as usize) % network.classes;
+                let column = network.deter + variable * network.classes + class;
+                feature[row * config.feature_dim() + column] = 1.0;
+            }
+        }
+        let mut action_target = vec![0.0; rows * config.action_count];
+        let mut target_rng = 0x94d0_49bb_1331_11eb_u64;
+        for row in 0..rows {
+            target_rng = target_rng
+                .wrapping_mul(2_862_933_555_777_941_757)
+                .wrapping_add(3_037_000_493);
+            let action = (target_rng as usize) % config.action_count;
+            let signed = ((target_rng >> 32) as u32) as f32 / u32::MAX as f32;
+            action_target[row * config.action_count + action] = 2.0 * signed - 1.0;
+        }
+        let mut value_target = vec![0.0; rows * config.value_bins];
+        for row in 0..rows {
+            value_target[row * config.value_bins + config.value_bins / 2 + row % 7] = 1.0;
+        }
+        let weights = vec![1.0; rows];
+
+        session.set_input("imagined_feature", &feature);
+        session.set_input("action_target", &action_target);
+        session.set_input("imagined_weight", &weights);
+        session.set_input("imagined_value_target", &value_target);
+        session.set_input("imagined_slow_target", &value_target);
+        session.set_input("replay_feature", &feature);
+        session.set_input("replay_weight", &weights);
+        session.set_input("replay_value_target", &value_target);
+        session.set_input("replay_slow_target", &value_target);
+        configure_d3_optimizer(&mut session, &config, 1, config.behavior_learning_rate());
+        session.step();
+        session.wait();
+
+        let name = "behavior.actor.layer0.weight";
+        let mut momentum = vec![0.0; session.param_size(name).expect("actor parameter")];
+        session.read_adam_m(name, &mut momentum);
+        assert!(momentum.iter().all(|value| value.is_finite()));
+        let zero_count = momentum.iter().filter(|value| **value == 0.0).count();
+        let units = network.units;
+        let deterministic_end = network.deter * units;
+        let deterministic_zero_count = momentum[..deterministic_end]
+            .iter()
+            .filter(|value| **value == 0.0)
+            .count();
+        let categorical_zero_count = momentum[deterministic_end..]
+            .iter()
+            .filter(|value| **value == 0.0)
+            .count();
+        let missing_hidden_channels = (0..units)
+            .filter(|output| {
+                (0..network.deter).all(|input| momentum[input * units + output] == 0.0)
+            })
+            .collect::<Vec<_>>();
+        let categorical_inputs_without_gradient = momentum[deterministic_end..]
+            .chunks_exact(units)
+            .enumerate()
+            .filter_map(|(input, values)| values.iter().all(|value| *value == 0.0).then_some(input))
+            .collect::<Vec<_>>();
+        assert_eq!(
+            deterministic_zero_count,
+            0,
+            "dense deterministic features left {deterministic_zero_count} actor weights without \
+             gradient; total zeros {zero_count}/{}, categorical zeros {categorical_zero_count}",
+            momentum.len()
+        );
+        assert!(
+            missing_hidden_channels.is_empty(),
+            "actor gradient missed hidden channels {missing_hidden_channels:?}"
+        );
+        assert!(
+            categorical_inputs_without_gradient.is_empty(),
+            "sampled categorical inputs without any gradient: \
+             {categorical_inputs_without_gradient:?}"
+        );
     }
 }

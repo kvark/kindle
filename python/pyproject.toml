@@ -5,7 +5,7 @@ build-backend = "maturin"
 [project]
 name = "kindle"
 version = "0.3.0"
-description = "DreamerV3 with frozen DINOv3 perception on a native GPU stack."
+description = "Live Dreamer learning with causal visual prediction on a native GPU stack."
 authors = [{ name = "Dzmitry Malyshau" }]
 license = { text = "MIT" }
 requires-python = ">=3.9"
@@ -21,11 +21,12 @@ atari = [
   "gymnasium[atari]>=1.1,<2",
   "pillow>=10",
 ]
-arc = [
-  "arc-agi==0.9.8; python_version >= '3.12'",
-  "arcengine==0.9.3; python_version >= '3.12'",
+test = [
+  "pytest>=8",
+  "numpy>=1.26",
+  "gymnasium[atari]>=1.1,<2",
+  "pillow>=10",
 ]
-test = ["pytest>=8", "numpy>=1.26"]
 
 [project.urls]
 Repository = "https://github.com/kvark/kindle"

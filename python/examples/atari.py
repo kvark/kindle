@@ -190,7 +190,30 @@ def main() -> None:
         type=int,
         help="truncated world-model BPTT length (D3-equivalent: 64)",
     )
+    parser.add_argument(
+        "--world-microbatch-size",
+        type=int,
+        help=(
+            "world-model rows per gradient-accumulation pass; defaults to the "
+            "full effective batch"
+        ),
+    )
+    parser.add_argument(
+        "--skip-full-optimize",
+        action="store_true",
+        help=(
+            "skip Meganeura's post-autodiff rewrite pass; preserves graph "
+            "semantics but may reduce training throughput"
+        ),
+    )
     parser.add_argument("--learning-rate", type=float)
+    parser.add_argument("--agc", type=float, help="adaptive gradient clipping ratio; zero disables it")
+    parser.add_argument("--visitation-bonus", action="store_true",
+                        help="bounded novelty in frozen visual features")
+    parser.add_argument("--intrinsic-reward-scale", type=float, default=0.0)
+    parser.add_argument("--extrinsic-reward-scale", type=float, default=1.0)
+    parser.add_argument("--future-prediction-loss-scale", type=float, default=0.0,
+                        help="predict the next frozen features before observing them")
     parser.add_argument(
         "--actor-learning-starts",
         type=int,
@@ -336,6 +359,7 @@ def main() -> None:
             batch_size=args.batch_size,
             batch_length=args.batch_length,
             world_backprop_length=args.world_backprop_length,
+            world_microbatch_size=args.world_microbatch_size,
             train_ratio=args.train_ratio,
             learning_rate=args.learning_rate,
             actor_learning_starts=args.actor_learning_starts,
@@ -344,7 +368,13 @@ def main() -> None:
             dynamics_free_nats=args.dynamics_free_nats,
             dynamics_loss_scale=args.dynamics_loss_scale,
             reconstruction_loss_scale=args.reconstruction_loss_scale,
+            future_prediction_loss_scale=args.future_prediction_loss_scale,
+            agc=args.agc,
+            visitation_bonus=args.visitation_bonus,
+            intrinsic_reward_scale=args.intrinsic_reward_scale,
+            extrinsic_reward_scale=args.extrinsic_reward_scale,
             replay_value_gradient=args.replay_value_gradient,
+            skip_full_optimize=args.skip_full_optimize,
         )
     agent_construction_seconds = (
         time.perf_counter() - construction_started if agent is not None else None
@@ -419,6 +449,12 @@ def main() -> None:
 
     started = time.perf_counter()
     total_reward = 0.0
+    total_intrinsic_reward = 0.0
+    interval_intrinsic_reward = 0.0
+    positive_reward_events = 0
+    negative_reward_events = 0
+    interval_positive_reward_events = 0
+    interval_negative_reward_events = 0
     episode_return = 0.0
     episode_length = 0
     completed_return_sum = 0.0
@@ -435,6 +471,7 @@ def main() -> None:
         {
             "event": "run_start",
             "environment": args.environment,
+            "ale_py_version": ale_py.__version__,
             "steps": args.steps,
             "atari_protocol": args.atari_protocol,
             "action_repeat": ATARI_ACTION_REPEAT,
@@ -492,8 +529,9 @@ def main() -> None:
             reward = float(reward)
             terminated = bool(terminated)
             truncated = bool(truncated)
+            intrinsic_reward = 0.0
             if agent is not None:
-                agent.observe(
+                _, intrinsic_reward = agent.observe(
                     frame,
                     extrinsic_reward=reward,
                     terminated=terminated,
@@ -523,6 +561,12 @@ def main() -> None:
 
             total_reward += reward
             interval_reward += reward
+            total_intrinsic_reward += intrinsic_reward
+            interval_intrinsic_reward += intrinsic_reward
+            positive_reward_events += int(reward > 0.0)
+            negative_reward_events += int(reward < 0.0)
+            interval_positive_reward_events += int(reward > 0.0)
+            interval_negative_reward_events += int(reward < 0.0)
             episode_return += reward
             episode_length += 1
             action_counts[action] += 1
@@ -567,6 +611,9 @@ def main() -> None:
                         "environment_frames": absolute_environment_frames(run_step),
                         "interval_steps": args.report_every,
                         "reward": interval_reward,
+                        "intrinsic_reward": interval_intrinsic_reward,
+                        "positive_reward_events": interval_positive_reward_events,
+                        "negative_reward_events": interval_negative_reward_events,
                         "completed_episodes": interval_episodes,
                         "learner_updates": interval_updates,
                         "action_counts": interval_action_counts,
@@ -574,6 +621,9 @@ def main() -> None:
                     }
                 )
                 interval_reward = 0.0
+                interval_intrinsic_reward = 0.0
+                interval_positive_reward_events = 0
+                interval_negative_reward_events = 0
                 interval_episodes = 0
                 interval_updates = 0
                 interval_action_counts = [0] * action_count
@@ -624,6 +674,9 @@ def main() -> None:
                 "seed": args.seed,
                 "mode": run_mode,
                 "total_reward": total_reward,
+                "total_intrinsic_reward": total_intrinsic_reward,
+                "positive_reward_events": positive_reward_events,
+                "negative_reward_events": negative_reward_events,
                 "completed_episodes": episodes,
                 "mean_completed_return": (
                     completed_return_sum / episodes if episodes else 0.0

@@ -76,10 +76,12 @@ impl PyAgent {
         batch_size = None,
         batch_length = None,
         world_backprop_length = None,
+        world_microbatch_size = None,
         train_ratio = None,
         imagination_length = None,
         intrinsic_reward_scale = 0.0,
         extrinsic_reward_scale = 1.0,
+        visitation_bonus = false,
         learning_rate = None,
         behavior_learning_rate = None,
         actor_learning_starts = None,
@@ -88,6 +90,8 @@ impl PyAgent {
         dynamics_free_nats = None,
         dynamics_loss_scale = None,
         reconstruction_loss_scale = None,
+        future_prediction_loss_scale = None,
+        agc = None,
         replay_value_gradient = None,
         dino_plan_cache = None,
         skip_full_optimize = false,
@@ -103,10 +107,12 @@ impl PyAgent {
         batch_size: Option<usize>,
         batch_length: Option<usize>,
         world_backprop_length: Option<usize>,
+        world_microbatch_size: Option<usize>,
         train_ratio: Option<f32>,
         imagination_length: Option<usize>,
         intrinsic_reward_scale: f32,
         extrinsic_reward_scale: f32,
+        visitation_bonus: bool,
         learning_rate: Option<f32>,
         behavior_learning_rate: Option<f32>,
         actor_learning_starts: Option<u64>,
@@ -115,6 +121,8 @@ impl PyAgent {
         dynamics_free_nats: Option<f32>,
         dynamics_loss_scale: Option<f32>,
         reconstruction_loss_scale: Option<f32>,
+        future_prediction_loss_scale: Option<f32>,
+        agc: Option<f32>,
         replay_value_gradient: Option<bool>,
         dino_plan_cache: Option<&str>,
         skip_full_optimize: bool,
@@ -128,6 +136,7 @@ impl PyAgent {
         config.seed = seed;
         config.intrinsic_reward_scale = intrinsic_reward_scale;
         config.extrinsic_reward_scale = extrinsic_reward_scale;
+        config.visitation_bonus = visitation_bonus;
         config.skip_full_optimize = skip_full_optimize;
         if let Some(value) = replay_capacity {
             config.replay_capacity = value;
@@ -140,6 +149,9 @@ impl PyAgent {
         }
         if let Some(value) = world_backprop_length {
             config.world_backprop_length = value;
+        }
+        if let Some(value) = world_microbatch_size {
+            config.world_microbatch_size = Some(value);
         }
         if let Some(value) = train_ratio {
             config.train_ratio = value;
@@ -170,6 +182,12 @@ impl PyAgent {
         }
         if let Some(value) = reconstruction_loss_scale {
             config.loss_scales.reconstruction = value;
+        }
+        if let Some(value) = future_prediction_loss_scale {
+            config.loss_scales.future_prediction = value;
+        }
+        if let Some(value) = agc {
+            config.agc = value;
         }
         if let Some(value) = replay_value_gradient {
             config.replay_value_gradient = value;
@@ -260,8 +278,8 @@ impl PyAgent {
     /// Frozen-DINO observation reconstructed from the current posterior.
     ///
     /// This diagnostic does not change recurrent state or random streams.
-    fn posterior_observation_prediction(&mut self) -> Vec<f32> {
-        self.inner.posterior_observation_prediction()
+    fn observation_prediction(&mut self) -> Vec<f32> {
+        self.inner.observation_prediction()
     }
 
     /// Reward predicted after applying one action to the current latent state.
@@ -317,7 +335,8 @@ impl PyAgent {
         Ok(self.inner.prior_behavior_rollout(&actions))
     }
 
-    /// Record the frame and rewards produced by the preceding action.
+    /// Record an arrival and return (extrinsic, intrinsic), including configured
+    /// novelty. These channels are unscaled, as stored in replay.
     #[pyo3(signature = (
         frame,
         extrinsic_reward = 0.0,
@@ -332,7 +351,7 @@ impl PyAgent {
         intrinsic_reward: f32,
         terminated: bool,
         truncated: bool,
-    ) -> PyResult<()> {
+    ) -> PyResult<(f32, f32)> {
         if !extrinsic_reward.is_finite() || !intrinsic_reward.is_finite() {
             return Err(PyValueError::new_err("rewards must be finite"));
         }
@@ -345,8 +364,8 @@ impl PyAgent {
             terminated,
             truncated,
         };
-        self.inner.observe(&transition);
-        Ok(())
+        let reward = self.inner.observe(&transition);
+        Ok((reward.extrinsic, reward.intrinsic))
     }
 
     #[pyo3(signature = (updates = 1))]

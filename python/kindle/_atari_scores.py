@@ -6,10 +6,13 @@ import json
 import math
 from collections import defaultdict
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Iterator
 
 
 SCORE_WINDOW_FRAMES = (350_000, 400_000)
+
+KINDLE_TARGET_RUNTIME = "kindle-ale_py-0.12.1"
+UPSTREAM_D3_TARGET_RUNTIME = "upstream-d3-ale_py-0.9.0"
 
 ATARI_PROFILES = {
     "current": {
@@ -33,9 +36,12 @@ ATARI_PROFILES = {
 }
 
 # Reference scores are keyed by exact wrapper protocol. The 12M values are the
-# rounded DreamerV3XS results reported by Wang et al. (ICLR 2025); its released
-# comparison omits raw XS curves, so these remain secondary targets. The 200M
-# values come from the D3 score artifact bundled at upstream commit 2411f7d1.
+# rounded DreamerV3XS results reported by Wang et al. (ICLR 2025). That study
+# reports five independent seeds and five-episode running-average curves, but
+# its release omits the raw XS curves. Kindle's strict 350k--400k-frame episode
+# window is therefore a conservative engineering comparison, not an exact
+# statistical reproduction. The 200M values come from the D3 score artifact
+# bundled at upstream commit 2411f7d1.
 # That artifact predates the pinned e3f02248 implementation reference, so it is
 # historical result evidence rather than an executable golden for that code.
 # Both use all 18 actions and therefore stay under `published`;
@@ -65,6 +71,24 @@ ATARI_TARGETS = {
     },
 }
 
+# The pinned upstream executable and Kindle use different ALE releases. A
+# paired control feeds the exact same three seeded random-action streams to
+# both published-protocol wrappers for 100,000 decisions. Their trajectories
+# first differ at decision 15. In the 350k--400k emulator-frame score window,
+# upstream ALE 0.9 averages -1854/91 = -20.373626... across seeds 0--2 (13,
+# 13, and 14 episodes), while Kindle ALE 0.12 reproduces the -20.622710...
+# target above. Keep the historical D3 targets shared, but never attribute the
+# ALE 0.12 random floor to the locally reproduced ALE 0.9 reference curve.
+ATARI_TARGET_OVERRIDES = {
+    UPSTREAM_D3_TARGET_RUNTIME: {
+        "published": {
+            "ALE/Pong-v5": {
+                "matched_random_3_seed": -20.373626373626372,
+            },
+        },
+    },
+}
+
 UPSTREAM_D3_REFERENCE = {
     (
         "source",
@@ -78,10 +102,11 @@ UPSTREAM_D3_REFERENCE = {
     (
         "runtime",
         "package_freeze_sha256",
-    ): "3e8c642b4c002e50b1e8301afbed959774887319468c02fc3e44e3bd5f352f0e",
+    ): "cc5d751228c82831548251e44640f49317bd95ba708786cf2ec3172d796f0999",
     ("runtime", "python"): "3.11.15",
-    ("runtime", "jax"): "0.4.33",
-    ("runtime", "jaxlib"): "0.4.33",
+    ("runtime", "jax"): "0.6.2",
+    ("runtime", "jaxlib"): "0.6.2",
+    ("runtime", "cuda_nvcc"): "12.9.86",
     ("runtime", "ale_py"): "0.9.0",
     ("runtime", "compute_dtype"): "bfloat16",
     ("runtime", "device_class"): "NVIDIA CUDA",
@@ -124,8 +149,9 @@ class AtariScoreError(ValueError):
     """Raised when logs cannot prove a protocol-complete score."""
 
 
-def _read_events(path: Path) -> list[dict[str, object]]:
-    events = []
+def _read_events(path: Path) -> Iterator[dict[str, object]]:
+    """Yield validated JSONL events without retaining the full log."""
+
     try:
         stream = path.open(encoding="utf-8")
     except FileNotFoundError as error:
@@ -144,8 +170,7 @@ def _read_events(path: Path) -> list[dict[str, object]]:
                 raise AtariScoreError(
                     f"{path}:{line_number}: JSONL event must be an object"
                 )
-            events.append(event)
-    return events
+            yield event
 
 
 def _read_json_object(path: Path) -> dict[str, object]:
@@ -253,6 +278,7 @@ def load_upstream_d3_segments(
                 "environment": str(experiment["environment"]),
                 "seed": seed,
                 "mode": "train",
+                "target_runtime": UPSTREAM_D3_TARGET_RUNTIME,
                 "atari_protocol": str(protocol["name"]),
                 "action_repeat": action_repeat,
                 "full_action_space": protocol["actions"] == "all",
@@ -270,7 +296,93 @@ def load_upstream_d3_segments(
 
 
 def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
-    """Load complete run segments, including multiple appended runs per file."""
+    """Load complete runs, including explicit checkpoint-recovery segments."""
+
+    recovery_identity_fields = (
+        "environment",
+        "seed",
+        "mode",
+        "atari_protocol",
+        "action_repeat",
+        "full_action_space",
+        "noop_max",
+        "max_episode_frames",
+        "score_window_frames",
+        "actions",
+        "action_meanings",
+        "dino_model_id",
+        "dino_checkpoint_revision",
+        "dino_checkpoint_sha256",
+        "trainable_parameters",
+        "config",
+        "random_action_steps",
+    )
+
+    def experiment_identity(
+        path: Path, event: dict[str, object]
+    ) -> dict[str, object]:
+        seed = int(event["seed"])
+        raw_config = event.get("config")
+        if raw_config is not None and not isinstance(raw_config, dict):
+            raise AtariScoreError(f"{path}: run config must be an object or null")
+        config = dict(raw_config) if isinstance(raw_config, dict) else None
+        if config is not None and "seed" in config:
+            config_seed = config.pop("seed")
+            if type(config_seed) is not int or config_seed != seed:
+                raise AtariScoreError(
+                    f"{path}: run seed {seed} does not match config seed "
+                    f"{config_seed!r}"
+                )
+        return {
+            "actions": event.get("actions"),
+            "action_meanings": event.get("action_meanings"),
+            "dino_model_id": event.get("dino_model_id"),
+            "dino_checkpoint_revision": event.get("dino_checkpoint_revision"),
+            "dino_checkpoint_sha256": event.get("dino_checkpoint_sha256"),
+            "trainable_parameters": event.get("trainable_parameters"),
+            "config_without_seed": config,
+            "random_action_steps": event.get("random_action_steps"),
+        }
+
+    def start_segment(path: Path, event: dict[str, object]) -> dict[str, object]:
+        action_repeat = int(event["action_repeat"])
+        return {
+            "source": str(path),
+            "environment": str(event["environment"]),
+            "seed": int(event["seed"]),
+            "mode": str(event["mode"]),
+            "target_runtime": (
+                KINDLE_TARGET_RUNTIME
+                if event.get("ale_py_version") in (None, "0.12.1")
+                else f"kindle-ale_py-{event['ale_py_version']}"
+            ),
+            "atari_protocol": str(event["atari_protocol"]),
+            "action_repeat": action_repeat,
+            "full_action_space": bool(event["full_action_space"]),
+            "noop_max": int(event["noop_max"]),
+            "max_episode_frames": int(event["max_episode_frames"]),
+            "score_window_frames": tuple(event["score_window_frames"]),
+            "experiment_identity": experiment_identity(path, event),
+            "start_frame": (
+                int(event["starting_environment_step"]) * action_repeat
+            ),
+            "episodes": [],
+            "_run_start": event,
+            "_checkpoints": {},
+        }
+
+    def finish_segment(
+        current: dict[str, object], end_frame: int
+    ) -> dict[str, object]:
+        current["end_frame"] = end_frame
+        if current["end_frame"] < current["start_frame"]:
+            raise AtariScoreError(
+                f"{current['source']}: run ends before it starts"
+            )
+        current.pop("_run_start")
+        current.pop("_checkpoints")
+        return current
+
     segments = []
     for path in paths:
         current = None
@@ -278,24 +390,54 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
             event_type = event.get("event")
             if event_type == "run_start":
                 if current is not None:
-                    raise AtariScoreError(f"{path}: nested run_start event")
-                action_repeat = int(event["action_repeat"])
-                current = {
-                    "source": str(path),
-                    "environment": str(event["environment"]),
-                    "seed": int(event["seed"]),
-                    "mode": str(event["mode"]),
-                    "atari_protocol": str(event["atari_protocol"]),
-                    "action_repeat": action_repeat,
-                    "full_action_space": bool(event["full_action_space"]),
-                    "noop_max": int(event["noop_max"]),
-                    "max_episode_frames": int(event["max_episode_frames"]),
-                    "score_window_frames": tuple(event["score_window_frames"]),
-                    "start_frame": (
-                        int(event["starting_environment_step"]) * action_repeat
-                    ),
-                    "episodes": [],
-                }
+                    if event.get("output_appended") is not True:
+                        raise AtariScoreError(f"{path}: nested run_start event")
+                    previous_start = current["_run_start"]
+                    for field in recovery_identity_fields:
+                        if previous_start.get(field) != event.get(field):
+                            raise AtariScoreError(
+                                f"{path}: checkpoint recovery changed {field}"
+                            )
+                    action_repeat = int(current["action_repeat"])
+                    resume_step = int(event["starting_environment_step"])
+                    resume_frame = resume_step * action_repeat
+                    checkpoints = current["_checkpoints"]
+                    if resume_step not in checkpoints:
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery at step {resume_step} "
+                            "has no matching checkpoint event"
+                        )
+                    restored_learner = int(event["starting_learner_step"])
+                    if restored_learner != checkpoints[resume_step]:
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery learner step "
+                            f"{restored_learner} does not match "
+                            f"{checkpoints[resume_step]}"
+                        )
+                    if resume_frame <= int(current["start_frame"]):
+                        raise AtariScoreError(
+                            f"{path}: checkpoint recovery did not advance the run"
+                        )
+                    current["episodes"] = [
+                        episode
+                        for episode in current["episodes"]
+                        if episode["environment_frames"] <= resume_frame
+                    ]
+                    current["checkpoint_recovered"] = True
+                    segments.append(finish_segment(current, resume_frame))
+                current = start_segment(path, event)
+                if event.get("output_appended") is True:
+                    current["checkpoint_recovery_start"] = True
+            elif event_type == "checkpoint" and current is not None:
+                checkpoint_step = int(event["environment_step"])
+                learner_step = int(event["learner_step"])
+                previous = current["_checkpoints"].setdefault(
+                    checkpoint_step, learner_step
+                )
+                if previous != learner_step:
+                    raise AtariScoreError(
+                        f"{path}: conflicting checkpoint at step {checkpoint_step}"
+                    )
             elif event_type == "episode" and current is not None:
                 current["episodes"].append(
                     {
@@ -310,10 +452,8 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
                     raise AtariScoreError(f"{path}: environment changed within run")
                 if int(event["seed"]) != current["seed"]:
                     raise AtariScoreError(f"{path}: seed changed within run")
-                current["end_frame"] = int(event["environment_frames"])
-                if current["end_frame"] < current["start_frame"]:
-                    raise AtariScoreError(f"{path}: run ends before it starts")
-                segments.append(current)
+                end_frame = int(event["environment_frames"])
+                segments.append(finish_segment(current, end_frame))
                 current = None
         if current is not None:
             raise AtariScoreError(f"{path}: incomplete run has no run_end event")
@@ -364,11 +504,38 @@ def summarize_scores(
     segments: list[dict[str, object]],
     expected_protocol: str = "published",
     expected_mode: str = "train",
+    minimum_seeds: int = 1,
+    require_uninterrupted: bool = False,
 ) -> dict[str, object]:
     """Compute episode means per seed, then the equally weighted seed mean."""
+    if isinstance(minimum_seeds, bool) or not isinstance(minimum_seeds, int):
+        raise AtariScoreError("minimum_seeds must be an integer")
+    if minimum_seeds <= 0:
+        raise AtariScoreError("minimum_seeds must be positive")
+    if not isinstance(require_uninterrupted, bool):
+        raise AtariScoreError("require_uninterrupted must be a boolean")
+
     grouped = defaultdict(list)
+    target_runtimes = {}
+    experiment_identities = {}
     for segment in segments:
         _validate_segment(segment, expected_protocol, expected_mode)
+        environment = segment["environment"]
+        target_runtime = segment["target_runtime"]
+        previous_runtime = target_runtimes.setdefault(environment, target_runtime)
+        if previous_runtime != target_runtime:
+            raise AtariScoreError(
+                f"{environment}: cannot mix target runtimes "
+                f"{previous_runtime!r} and {target_runtime!r}"
+            )
+        experiment_identity = segment.get("experiment_identity")
+        if environment in experiment_identities:
+            if experiment_identities[environment] != experiment_identity:
+                raise AtariScoreError(
+                    f"{environment}: cannot mix different experiment identities"
+                )
+        else:
+            experiment_identities[environment] = experiment_identity
         grouped[(segment["environment"], segment["seed"])].append(segment)
 
     environments = defaultdict(list)
@@ -406,28 +573,54 @@ def summarize_scores(
                 f"{environment} seed {seed}: complete window contains no episodes"
             )
         returns = [episodes_by_frame[frame] for frame in sorted(episodes_by_frame)]
-        environments[environment].append(
-            {
-                "seed": seed,
-                "score": sum(returns) / len(returns),
-                "completed_episodes": len(returns),
-                "segment_count": len(seed_segments),
-            }
+        seed_result = {
+            "seed": seed,
+            "score": sum(returns) / len(returns),
+            "completed_episodes": len(returns),
+            "segment_count": len(seed_segments),
+        }
+        checkpoint_recoveries = sum(
+            bool(segment.get("checkpoint_recovery_start"))
+            for segment in seed_segments
         )
+        if require_uninterrupted and checkpoint_recoveries:
+            raise AtariScoreError(
+                f"{environment} seed {seed}: uninterrupted scoring rejects "
+                f"{checkpoint_recoveries} checkpoint recovery segment(s)"
+            )
+        if checkpoint_recoveries:
+            seed_result["checkpoint_recoveries"] = checkpoint_recoveries
+        environments[environment].append(seed_result)
 
     environment_summaries = {}
     protocol_targets = ATARI_TARGETS.get(expected_protocol, {})
     for environment, seeds in sorted(environments.items()):
+        if len(seeds) < minimum_seeds:
+            raise AtariScoreError(
+                f"{environment}: requires at least {minimum_seeds} independent "
+                f"seeds, found {len(seeds)}"
+            )
         seed_mean = sum(seed["score"] for seed in seeds) / len(seeds)
+        target_runtime = target_runtimes[environment]
+        environment_targets = dict(protocol_targets.get(environment, {}))
+        if target_runtime != KINDLE_TARGET_RUNTIME:
+            environment_targets.pop("matched_random_3_seed", None)
+        environment_targets.update(
+            ATARI_TARGET_OVERRIDES.get(target_runtime, {})
+            .get(expected_protocol, {})
+            .get(environment, {})
+        )
         targets = {
             name: {
                 "score": target,
                 "delta": seed_mean - target,
                 "met": seed_mean >= target,
             }
-            for name, target in protocol_targets.get(environment, {}).items()
+            for name, target in environment_targets.items()
         }
         environment_summaries[environment] = {
+            "target_runtime": target_runtime,
+            "experiment_identity": experiment_identities[environment],
             "seed_results": seeds,
             "seed_mean": seed_mean,
             "seed_count": len(seeds),
@@ -437,6 +630,88 @@ def summarize_scores(
     return {
         "atari_protocol": expected_protocol,
         "mode": expected_mode,
+        "minimum_seed_count": minimum_seeds,
+        "require_uninterrupted": require_uninterrupted,
         "score_window_frames": list(SCORE_WINDOW_FRAMES),
         "environments": environment_summaries,
+    }
+
+
+def compare_runtime_scores(
+    kindle: dict[str, object], upstream_d3: dict[str, object]
+) -> dict[str, object]:
+    """Compare Kindle and upstream D3 after removing their ALE random floors."""
+    identity_fields = ("atari_protocol", "mode", "score_window_frames")
+    for field in identity_fields:
+        if kindle.get(field) != upstream_d3.get(field):
+            raise AtariScoreError(
+                f"cannot compare score summaries with different {field}"
+            )
+
+    kindle_environments = kindle["environments"]
+    upstream_environments = upstream_d3["environments"]
+    if not isinstance(kindle_environments, dict) or not isinstance(
+        upstream_environments, dict
+    ):
+        raise AtariScoreError("score summaries have invalid environment mappings")
+    if kindle_environments.keys() != upstream_environments.keys():
+        raise AtariScoreError("score summaries cover different environments")
+
+    comparisons = {}
+    for environment in sorted(kindle_environments):
+        kindle_result = kindle_environments[environment]
+        upstream_result = upstream_environments[environment]
+        if not isinstance(kindle_result, dict) or not isinstance(upstream_result, dict):
+            raise AtariScoreError(f"{environment}: invalid score summary")
+        if kindle_result.get("target_runtime") != KINDLE_TARGET_RUNTIME:
+            raise AtariScoreError(
+                f"{environment}: first summary is not the Kindle runtime"
+            )
+        if upstream_result.get("target_runtime") != UPSTREAM_D3_TARGET_RUNTIME:
+            raise AtariScoreError(
+                f"{environment}: second summary is not the pinned upstream runtime"
+            )
+
+        try:
+            kindle_score = float(kindle_result["seed_mean"])
+            upstream_score = float(upstream_result["seed_mean"])
+            kindle_random = float(
+                kindle_result["targets"]["matched_random_3_seed"]["score"]
+            )
+            upstream_random = float(
+                upstream_result["targets"]["matched_random_3_seed"]["score"]
+            )
+        except (KeyError, TypeError, ValueError) as error:
+            raise AtariScoreError(
+                f"{environment}: summaries lack matched random targets"
+            ) from error
+
+        kindle_gain = kindle_score - kindle_random
+        upstream_gain = upstream_score - upstream_random
+        comparisons[environment] = {
+            "kindle_score": kindle_score,
+            "upstream_d3_score": upstream_score,
+            "raw_score_delta": kindle_score - upstream_score,
+            "kindle_random_score": kindle_random,
+            "upstream_d3_random_score": upstream_random,
+            "kindle_gain_over_random": kindle_gain,
+            "upstream_d3_gain_over_random": upstream_gain,
+            "random_adjusted_delta": kindle_gain - upstream_gain,
+        }
+
+    return {
+        "atari_protocol": kindle["atari_protocol"],
+        "mode": kindle["mode"],
+        "minimum_seed_counts": {
+            "kindle": kindle["minimum_seed_count"],
+            "upstream_d3": upstream_d3["minimum_seed_count"],
+        },
+        "require_uninterrupted": {
+            "kindle": kindle["require_uninterrupted"],
+            "upstream_d3": upstream_d3["require_uninterrupted"],
+        },
+        "score_window_frames": kindle["score_window_frames"],
+        "kindle": kindle_environments,
+        "upstream_d3": upstream_environments,
+        "comparisons": comparisons,
     }

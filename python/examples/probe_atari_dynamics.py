@@ -91,7 +91,7 @@ def main() -> None:
         if step % args.stride == 0 and step + horizon <= args.steps:
             start_observation = np.asarray(agent.dino_observation, dtype=np.float64)
             posterior = np.asarray(
-                agent.posterior_observation_prediction(), dtype=np.float64
+                agent.observation_prediction(), dtype=np.float64
             )
             posterior_mse_sum += float(
                 np.mean(np.square(posterior - start_observation))
@@ -200,7 +200,11 @@ def main() -> None:
         "rollout_starts": rollout_starts,
         "completed_episodes": episodes,
         "gpu_device": agent.gpu_device,
-        "posterior_reconstruction_mse": checked_mean(
+        "observation_prediction_source": (
+            "posterior_reconstruction" if agent.config["loss_scales"]["reconstruction"] > 0
+            else "deterministic_forecast"
+        ),
+        "observed_state_prediction_mse": checked_mean(
             posterior_mse_sum, posterior_count
         ),
         "sample_count_by_horizon": sample_count,

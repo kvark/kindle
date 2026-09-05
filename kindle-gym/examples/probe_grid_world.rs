@@ -68,6 +68,7 @@ struct SampleCollection {
     samples: Vec<Sample>,
     dino_patch_statistics: DinoPatchStatistics,
     observation_decoder_depth: Option<usize>,
+    observation_prediction_source: Option<&'static str>,
     gpu_device: kindle::GpuDeviceInfo,
 }
 
@@ -254,6 +255,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         samples,
         dino_patch_statistics,
         observation_decoder_depth,
+        observation_prediction_source,
         gpu_device,
     } = collection;
     let dino_patch_affine_rank_floor = dino_patch_statistics.metrics();
@@ -275,7 +277,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ),
         })
     });
-    let posterior_dino_reconstruction = posterior_observation_prediction_metrics(&samples);
+    let observed_state_prediction = observation_prediction_metrics(&samples);
     let one_step_prior_reward = samples
         .iter()
         .any(|sample| sample.prior_reward_prediction.is_some())
@@ -290,7 +292,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
         })
         .collect::<Vec<_>>();
-    let open_loop_dino_reconstruction = (0..arguments.rollout_horizon)
+    let open_loop_observation_prediction = (0..arguments.rollout_horizon)
         .filter_map(|horizon| {
             rollout_observation_prediction_metrics(&samples, horizon).map(|metrics| {
                 json!({
@@ -311,14 +313,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "all_actions": arguments.all_actions,
         "feature_dims": feature_dims,
         "observation_decoder_depth": observation_decoder_depth,
+        "observation_prediction_source": observation_prediction_source,
         "gpu_device": gpu_device,
         "representations": representations,
         "reward_head": reward_head,
         "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
-        "posterior_dino_reconstruction": posterior_dino_reconstruction,
+        "observed_state_prediction": observed_state_prediction,
         "one_step_prior_reward": one_step_prior_reward,
         "open_loop_prior_reward": open_loop_prior_reward,
-        "open_loop_dino_reconstruction": open_loop_dino_reconstruction,
+        "open_loop_observation_prediction": open_loop_observation_prediction,
         "posterior_policy_action_mask": posterior_policy_action_mask,
         "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
     }))?;
@@ -389,6 +392,7 @@ fn collect_perception_samples(
         samples,
         dino_patch_statistics,
         observation_decoder_depth: None,
+        observation_prediction_source: None,
         gpu_device,
     })
 }
@@ -400,6 +404,11 @@ fn collect_latent_samples(
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
     let gpu_device = agent.core().gpu_device();
     let observation_decoder_depth = agent.core().config().observation_decoder_depth();
+    let observation_prediction_source = if agent.core().config().loss_scales.reconstruction > 0.0 {
+        "posterior_reconstruction"
+    } else {
+        "deterministic_forecast"
+    };
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
@@ -489,6 +498,7 @@ fn collect_latent_samples(
         samples,
         dino_patch_statistics,
         observation_decoder_depth: Some(observation_decoder_depth),
+        observation_prediction_source: Some(observation_prediction_source),
         gpu_device,
     })
 }
@@ -511,7 +521,7 @@ fn push_latent_sample(
     ];
     let reward_prediction = agent.posterior_reward_prediction();
     let observation = agent.dino_observation().to_vec();
-    let posterior_observation = agent.posterior_observation_prediction();
+    let posterior_observation = agent.observation_prediction();
     let posterior_observation_mse = mean_squared_error(&posterior_observation, &observation);
     let probabilities = agent.posterior_action_probabilities(None);
     let action_mask = environment.action_mask().expect("GridWorld action mask");
@@ -843,7 +853,7 @@ fn rollout_observation_prediction_metrics(
     }))
 }
 
-fn posterior_observation_prediction_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
+fn observation_prediction_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
     let errors = samples
         .iter()
         .filter_map(|sample| sample.posterior_observation_mse)
@@ -1155,7 +1165,7 @@ mod tests {
         assert_eq!(metrics["persistence_mean_squared_error"], 4.0);
         assert_eq!(metrics["relative_mse_reduction"], 0.5);
         assert_eq!(metrics["model_better_rate"], 1.0);
-        let posterior = posterior_observation_prediction_metrics(&samples).unwrap();
+        let posterior = observation_prediction_metrics(&samples).unwrap();
         assert_eq!(posterior["mean_squared_error"], 2.0);
     }
 

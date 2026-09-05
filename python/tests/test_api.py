@@ -9,10 +9,14 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["batch_size"] == 16
     assert config["batch_length"] == 64
     assert config["world_backprop_length"] == 8
+    assert config["world_microbatch_size"] is None
     assert config["imagination_length"] == 15
     assert config["actor_unimix"] == 0.01
     assert config["train_ratio"] == 32.0
     assert config["loss_scales"]["reconstruction"] == 1.0
+    assert config["loss_scales"]["future_prediction"] == 0.0
+    assert config["visitation_bonus"] is False
+    assert config["intrinsic_reward_scale"] == 0.0
     assert config["replay_value_gradient"] is True
     assert config["behavior_learning_rate"] is None
     assert config["actor_learning_starts"] == 0
@@ -51,5 +55,5 @@ def test_agent_exposes_read_only_behavior_probes() -> None:
 
 def test_agent_exposes_read_only_dynamics_probes() -> None:
     assert hasattr(kindle.Agent, "dino_observation")
-    assert hasattr(kindle.Agent, "posterior_observation_prediction")
+    assert hasattr(kindle.Agent, "observation_prediction")
     assert hasattr(kindle.Agent, "prior_diagnostic_rollout")

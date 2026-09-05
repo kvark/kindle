@@ -17,6 +17,7 @@ pub const LOSS_REWARD: usize = 4;
 pub const LOSS_CONTINUATION: usize = 5;
 pub const LOSS_REPLAY_VALUE: usize = 6;
 pub const RAW_KL: usize = 7;
+pub const LOSS_FUTURE_PREDICTION: usize = 8;
 
 struct Dynamics {
     core: RssmCore,
@@ -71,7 +72,8 @@ impl WorldHeads {
 struct WorldModel {
     dynamics: Dynamics,
     representation: Representation,
-    decoder: ObservationDecoder,
+    decoder: Option<ObservationDecoder>,
+    future_predictor: Option<MlpHead>,
     heads: WorldHeads,
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
@@ -84,7 +86,10 @@ impl WorldModel {
         Self {
             dynamics: Dynamics::new(graph, config),
             representation: Representation::new(graph, config),
-            decoder: ObservationDecoder::new(graph, config),
+            decoder: (config.loss_scales.reconstruction > 0.0)
+                .then(|| ObservationDecoder::new(graph, config)),
+            future_predictor: (config.loss_scales.future_prediction > 0.0)
+                .then(|| future_predictor(graph, config)),
             heads: WorldHeads::new(graph, config),
             replay_value: MlpHead::new(
                 graph,
@@ -96,6 +101,17 @@ impl WorldModel {
             ),
         }
     }
+}
+
+fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> MlpHead {
+    MlpHead::new(
+        graph,
+        "world.future_predictor",
+        config.network().deter,
+        config.network().units,
+        2,
+        config.observation_dim(),
+    )
 }
 
 fn weighted_cross_entropy(
@@ -131,6 +147,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
 
     let mut reconstruction_losses = Vec::with_capacity(length);
+    let mut future_prediction_losses = Vec::with_capacity(length);
     let mut dynamics_losses = Vec::with_capacity(length);
     let mut representation_losses = Vec::with_capacity(length);
     let mut raw_kl_metrics = Vec::with_capacity(length);
@@ -187,6 +204,24 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
             batch,
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
+        if let Some(predictor) = &model.future_predictor {
+            let prediction = predictor.forward(&mut graph, deter);
+            let target = graph.reshape(observation, &[batch, config.observation_dim()]);
+            let target = graph.stop_gradient(target);
+            let negative_target = graph.neg(target);
+            let residual = graph.add(prediction, negative_target);
+            let squared = graph.mul(residual, residual);
+            let per_row = graph.sum_inner(squared);
+            // Reset observations have no preceding action-conditioned state.
+            // Their zero keep mask removes them without cutting valid sequence
+            // or microbatch boundaries. Normalize over the same B*T as D3.
+            let keep = graph.sum_inner(keep_action);
+            let normalization =
+                graph.constant(vec![1.0 / config.action_count as f32; batch], &[batch, 1]);
+            let keep = graph.mul(keep, normalization);
+            let masked = graph.mul(per_row, keep);
+            future_prediction_losses.push(graph.mean_all(masked));
+        }
         let encoded = model
             .representation
             .encoder
@@ -205,16 +240,15 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         stoch = straight_through_sample(&mut graph, hard_sample, probabilities);
 
         let state = feature(&mut graph, deter, stoch, batch, config);
-        let reconstruction = model.decoder.forward(&mut graph, state, batch);
-        let negative_target = graph.neg(observation);
-        let residual = graph.add(reconstruction, negative_target);
-        let squared = graph.mul(residual, residual);
-        let reconstruction_loss = graph.sum_all(squared);
-        // D3's decoder distribution sums every observation event dimension
-        // and the outer learner averages only batch and time. Preserve that
-        // reduction here: averaging the 7x7x64 feature event would suppress
-        // the representation-learning signal by 3,136x.
-        reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / batch as f32));
+        if let Some(decoder) = &model.decoder {
+            let reconstruction = decoder.forward(&mut graph, state, batch);
+            let negative_target = graph.neg(observation);
+            let residual = graph.add(reconstruction, negative_target);
+            let squared = graph.mul(residual, residual);
+            let reconstruction_loss = graph.sum_all(squared);
+            // Sum event dimensions and average B*T, as in the D3 control.
+            reconstruction_losses.push(scale(&mut graph, reconstruction_loss, 1.0 / batch as f32));
+        }
 
         let dynamics_kl = categorical_kl(
             &mut graph,
@@ -271,8 +305,10 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     }
 
     let average = 1.0 / length as f32;
-    let reconstruction = sum(&mut graph, &reconstruction_losses);
+    let reconstruction = sum_or_zero(&mut graph, &reconstruction_losses);
     let reconstruction = scale(&mut graph, reconstruction, average);
+    let future_prediction = sum_or_zero(&mut graph, &future_prediction_losses);
+    let future_prediction = scale(&mut graph, future_prediction, average);
     let dynamics = sum(&mut graph, &dynamics_losses);
     let dynamics = scale(&mut graph, dynamics, average);
     let representation = sum(&mut graph, &representation_losses);
@@ -289,6 +325,7 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
     let scales = config.loss_scales;
     let weighted = [
         scale(&mut graph, reconstruction, scales.reconstruction),
+        scale(&mut graph, future_prediction, scales.future_prediction),
         scale(&mut graph, dynamics, scales.dynamics),
         scale(&mut graph, representation, scales.representation),
         scale(&mut graph, reward, scales.reward),
@@ -305,8 +342,17 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         continuation,
         replay_value,
         raw_kl,
+        future_prediction,
     ]);
     graph
+}
+
+fn sum_or_zero(graph: &mut Graph, values: &[NodeId]) -> NodeId {
+    if values.is_empty() {
+        graph.constant(vec![0.0], &[1])
+    } else {
+        sum(graph, values)
+    }
 }
 
 /// One posterior update used both by the live actor and the pre-training
@@ -386,14 +432,26 @@ pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     graph
 }
 
-/// Decode posterior or imagined states back into the frozen DINO observation
-/// space. This graph is constructed lazily by diagnostics, so ordinary acting
-/// and learning do not carry another synchronized decoder session.
+/// Evaluate the configured observation head. Reconstruction reads the full
+/// state; prediction-only reads the deterministic state before observation.
+/// This graph is constructed lazily by diagnostics.
 pub fn build_decoder_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
     let mut graph = Graph::new();
+    if config.loss_scales.reconstruction == 0.0 {
+        assert!(
+            config.loss_scales.future_prediction > 0.0,
+            "no observation prediction head"
+        );
+        let predictor = future_predictor(&mut graph, config);
+        let deter = graph.input("deter", &[batch, size.deter]);
+        graph.input("stoch", &[batch * size.stoch, size.classes]);
+        let observation = predictor.forward(&mut graph, deter);
+        graph.set_outputs(vec![observation]);
+        return graph;
+    }
     let decoder = ObservationDecoder::new(&mut graph, config);
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
@@ -412,7 +470,7 @@ mod tests {
         let config = DreamerConfig::tiny(3);
         let size = config.network();
         let training = build_training_graph(&config, config.world_backprop_length);
-        assert_eq!(training.outputs().len(), 8);
+        assert_eq!(training.outputs().len(), 9);
         let grouped_weight = training
             .nodes()
             .iter()
@@ -464,6 +522,28 @@ mod tests {
                 5 * OBSERVATION_GRID * OBSERVATION_GRID,
                 OBSERVATION_CHANNELS
             ]
+        );
+    }
+
+    #[test]
+    fn prediction_only_omits_decoder_parameters() {
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        let graph = build_training_graph(&config, config.world_backprop_length);
+        let names = graph
+            .nodes()
+            .iter()
+            .filter_map(|node| match &node.op {
+                meganeura::graph::Op::Parameter { name } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        assert!(!names.iter().any(|name| name.starts_with("world.decoder.")));
+        assert!(
+            names
+                .iter()
+                .any(|name| name.starts_with("world.future_predictor."))
         );
     }
 

@@ -176,7 +176,7 @@ impl DinoPerception {
     }
 }
 
-fn fixed_projection(input: usize, output: usize, seed: u64) -> Vec<f32> {
+pub(crate) fn fixed_projection(input: usize, output: usize, seed: u64) -> Vec<f32> {
     assert!(input > 0 && output > 0);
     let scale = 1.0 / (output as f32).sqrt();
     let mut state = seed;

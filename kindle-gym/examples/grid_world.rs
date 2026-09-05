@@ -100,6 +100,11 @@ struct Arguments {
     #[arg(long)]
     all_actions: bool,
 
+    /// Continue one world through exhaustion and endogenous respawn. Food
+    /// progress persists; there is no time-limit reset.
+    #[arg(long)]
+    persistent: bool,
+
     /// Override the baseline's D3 12m network preset.
     #[arg(long, value_enum)]
     model_size: Option<Size>,
@@ -112,6 +117,11 @@ struct Arguments {
     /// Override the static world-model BPTT chunk (D3-equivalent: 64).
     #[arg(long)]
     world_backprop_length: Option<usize>,
+
+    /// World-model rows per gradient-accumulation pass. The effective batch
+    /// is unchanged and must divide evenly by this value.
+    #[arg(long)]
+    world_microbatch_size: Option<usize>,
 
     /// Override D3's 1,000-update warmup for short diagnostic runs.
     #[arg(long)]
@@ -156,6 +166,24 @@ struct Arguments {
     #[arg(long)]
     reconstruction_loss_scale: Option<f32>,
 
+    /// Predict frozen features before the current observation enters the RSSM.
+    #[arg(long)]
+    future_prediction_loss_scale: Option<f32>,
+
+    /// Adaptive gradient clipping ratio; zero disables clipping.
+    #[arg(long)]
+    agc: Option<f32>,
+
+    /// Fixed-feature visitation bonus; recorded separately from game reward.
+    #[arg(long)]
+    visitation_bonus: bool,
+
+    #[arg(long)]
+    intrinsic_reward_scale: Option<f32>,
+
+    #[arg(long)]
+    extrinsic_reward_scale: Option<f32>,
+
     /// Stop replay-value gradients at the RSSM boundary while retaining the
     /// behavior critic's replay-value training objective.
     #[arg(long)]
@@ -198,6 +226,7 @@ impl Arguments {
         self.model_size.is_some()
             || self.observation_decoder_depth.is_some()
             || self.world_backprop_length.is_some()
+            || self.world_microbatch_size.is_some()
             || self.learning_rate.is_some()
             || self.behavior_learning_rate.is_some()
             || self.actor_learning_starts.is_some()
@@ -208,6 +237,11 @@ impl Arguments {
             || self.dynamics_free_nats.is_some()
             || self.dynamics_loss_scale.is_some()
             || self.reconstruction_loss_scale.is_some()
+            || self.future_prediction_loss_scale.is_some()
+            || self.agc.is_some()
+            || self.visitation_bonus
+            || self.intrinsic_reward_scale.is_some()
+            || self.extrinsic_reward_scale.is_some()
             || self.stop_replay_value_gradient
             || self.reward_only
     }
@@ -217,6 +251,12 @@ impl Arguments {
 struct RunMetrics {
     total_reward: f32,
     interval_reward: f32,
+    total_intrinsic_reward: f32,
+    interval_intrinsic_reward: f32,
+    positive_reward_events: usize,
+    negative_reward_events: usize,
+    interval_positive_reward_events: usize,
+    interval_negative_reward_events: usize,
     completed_return_sum: f32,
     episode_return: f32,
     episode_length: usize,
@@ -239,6 +279,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if arguments.randomize_position && !matches!(arguments.reward_mode, RewardMode::DenseRight) {
         return Err("--randomize-position requires --reward-mode dense-right".into());
+    }
+    if arguments.persistent
+        && (arguments.randomize_position
+            || !matches!(arguments.reward_mode, RewardMode::SparseFood))
+    {
+        return Err(
+            "--persistent uses native sparse food/death rewards without teleportation".into(),
+        );
     }
     if arguments.random {
         if arguments.dino_checkpoint.is_some()
@@ -272,6 +320,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         if arguments.reward_only
             && (arguments.reconstruction_loss_scale.is_some()
+                || arguments.future_prediction_loss_scale.is_some()
                 || arguments.dynamics_loss_scale.is_some())
         {
             return Err("--reward-only already fixes all loss weights".into());
@@ -292,6 +341,7 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
             "all_actions": arguments.all_actions,
+            "persistent": arguments.persistent,
             "random_action_steps": arguments.steps,
             "actions": ACTION_NAMES,
         }),
@@ -300,7 +350,11 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
     let started = Instant::now();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
-    let mut environment = GridWorld::new();
+    let mut environment = if arguments.persistent {
+        GridWorld::persistent()
+    } else {
+        GridWorld::new()
+    };
     environment.reset();
     let mut metrics = RunMetrics::default();
 
@@ -354,6 +408,9 @@ fn run_dreamer(
     if let Some(length) = arguments.world_backprop_length {
         config.world_backprop_length = length;
     }
+    if let Some(size) = arguments.world_microbatch_size {
+        config.world_microbatch_size = Some(size);
+    }
     config.seed = arguments.seed;
     if let Some(learning_rate) = arguments.learning_rate {
         config.learning_rate = learning_rate;
@@ -384,6 +441,19 @@ fn run_dreamer(
     }
     if let Some(scale) = arguments.reconstruction_loss_scale {
         config.loss_scales.reconstruction = scale;
+    }
+    if let Some(scale) = arguments.future_prediction_loss_scale {
+        config.loss_scales.future_prediction = scale;
+    }
+    if let Some(agc) = arguments.agc {
+        config.agc = agc;
+    }
+    config.visitation_bonus = arguments.visitation_bonus;
+    if let Some(scale) = arguments.intrinsic_reward_scale {
+        config.intrinsic_reward_scale = scale;
+    }
+    if let Some(scale) = arguments.extrinsic_reward_scale {
+        config.extrinsic_reward_scale = scale;
     }
     if arguments.stop_replay_value_gradient {
         config.replay_value_gradient = false;
@@ -428,6 +498,7 @@ fn run_dreamer(
             "reward_mode": arguments.reward_mode.as_str(),
             "randomize_position": arguments.randomize_position,
             "all_actions": arguments.all_actions,
+            "persistent": arguments.persistent,
             "random_action_steps": arguments.random_action_steps,
             "trainable_parameters": {
                 "world": world_parameters,
@@ -440,7 +511,11 @@ fn run_dreamer(
     )?;
 
     let started = Instant::now();
-    let mut environment = GridWorld::new();
+    let mut environment = if arguments.persistent {
+        GridWorld::persistent()
+    } else {
+        GridWorld::new()
+    };
     let first = environment.reset();
     agent.begin_episode(&first);
     let mut metrics = RunMetrics::default();
@@ -474,7 +549,7 @@ fn run_dreamer(
         }
         arguments.reward_mode.apply(&environment, &mut transition);
         let ended = transition.terminated || transition.truncated;
-        agent.observe(&transition);
+        transition.reward = agent.observe(&transition);
         if !arguments.evaluate {
             for report in agent.learn_scheduled(1) {
                 metrics.learner_updates += 1;
@@ -549,6 +624,12 @@ fn record_transition(
     let reward = transition.reward.extrinsic;
     metrics.total_reward += reward;
     metrics.interval_reward += reward;
+    metrics.total_intrinsic_reward += transition.reward.intrinsic;
+    metrics.interval_intrinsic_reward += transition.reward.intrinsic;
+    metrics.positive_reward_events += usize::from(reward > 0.0);
+    metrics.negative_reward_events += usize::from(reward < 0.0);
+    metrics.interval_positive_reward_events += usize::from(reward > 0.0);
+    metrics.interval_negative_reward_events += usize::from(reward < 0.0);
     metrics.episode_return += reward;
     metrics.episode_length += 1;
 
@@ -580,6 +661,9 @@ fn record_transition(
                 "run_step": run_step,
                 "interval_steps": report_every,
                 "reward": metrics.interval_reward,
+                "intrinsic_reward": metrics.interval_intrinsic_reward,
+                "positive_reward_events": metrics.interval_positive_reward_events,
+                "negative_reward_events": metrics.interval_negative_reward_events,
                 "completed_episodes": metrics.interval_episodes,
                 "learner_updates": metrics.interval_learner_updates,
                 "action_counts": metrics.interval_action_counts,
@@ -587,6 +671,9 @@ fn record_transition(
             }),
         )?;
         metrics.interval_reward = 0.0;
+        metrics.interval_intrinsic_reward = 0.0;
+        metrics.interval_positive_reward_events = 0;
+        metrics.interval_negative_reward_events = 0;
         metrics.interval_episodes = 0;
         metrics.interval_learner_updates = 0;
         metrics.interval_action_counts.fill(0);
@@ -612,6 +699,9 @@ fn emit_summary(
             "agent": agent,
             "steps": steps,
             "total_reward": metrics.total_reward,
+            "total_intrinsic_reward": metrics.total_intrinsic_reward,
+            "positive_reward_events": metrics.positive_reward_events,
+            "negative_reward_events": metrics.negative_reward_events,
             "completed_episodes": metrics.episodes,
             "mean_completed_return": (metrics.episodes > 0)
                 .then(|| metrics.completed_return_sum / metrics.episodes as f32),
