@@ -79,14 +79,25 @@ The Pong zero-update baseline completes 50k sampled actions and 55 episodes at
 mean return −20.3455, with zero learner updates and 199,948 actual action frames.
 Its execution time is 302.24 s, excluding construction. This is an untrained
 behavior baseline, not an Atari-100k training-window score.
-Pong prediction-only seed-0 training is underway, followed automatically by frozen
-evaluation. It has 10,281,233 trainable parameters. Startup checks verify the same
+Pong prediction-only seed 0 wins its first game with return **+13 at action
+44,075**: episode 41 naturally terminates after 1,962 actions, without truncation.
+The 35k–40k diagnostic window averages −8.6667 over three games (−8/−14/−4),
+and 40k–45k averages +2.5 over two (−8/+13). Their 5k-action reward-event counts
+are respectively 28 positive / 51 negative and 42 / 30. This is the first
+agent-collected online Pong success for the causal architecture, not yet a
+declared final-window score or frozen-policy result. The 100k training run
+continues unchanged, followed automatically by 50k frozen evaluation.
+
+It has 10,281,233 trainable parameters. Startup checks verify the same
 executable, runner, encoder, ALE, GPU, vocabulary and initial counters as the
 zero-update baseline; only train ratio differs (0 versus 256). First-1,000-action
-counts, rewards and frame accounting match before the learner starts. Early
-updates are finite and take about 0.52 s. This is runtime evidence, not a learned
-Pong result yet. The matched reconstruction run and independent training-seed
-confirmations remain required.
+counts, rewards and frame accounting match before the learner starts. Rechecking
+the win confirms zero forced actions, reconstruction 0, future prediction 0.25,
+extrinsic scale 1, intrinsic scale 0 and the frozen executable hashes. Updates
+remain finite and average about 0.53 s. The matched reconstruction run and
+independent training-seed confirmations remain required. Artifact:
+`runs/selflearn-20260905-pong-predictive-seed0.jsonl`; exact diagnostic summaries
+are `runs/selflearn-20260905-pong-predictive-seed0-step{040000,045000}-window.json`.
 
 Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
 
