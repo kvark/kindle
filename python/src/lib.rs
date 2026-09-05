@@ -280,7 +280,13 @@ impl PyAgent {
         self.inner.dino_observation().to_vec()
     }
 
-    /// Frozen-DINO observation reconstructed from the current posterior.
+    /// The recurrent policy input, without an additional GPU execution.
+    #[getter]
+    fn latent_feature(&self) -> Vec<f32> {
+        self.inner.latent_feature().to_vec()
+    }
+
+    /// Deterministic forecast when enabled, otherwise posterior reconstruction.
     ///
     /// This diagnostic does not change recurrent state or random streams.
     fn observation_prediction(&mut self) -> Vec<f32> {

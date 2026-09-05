@@ -55,5 +55,7 @@ def test_agent_exposes_read_only_behavior_probes() -> None:
 
 def test_agent_exposes_read_only_dynamics_probes() -> None:
     assert hasattr(kindle.Agent, "dino_observation")
+    assert hasattr(kindle.Agent, "latent_feature")
     assert hasattr(kindle.Agent, "observation_prediction")
     assert hasattr(kindle.Agent, "prior_diagnostic_rollout")
+    assert hasattr(kindle.Agent, "provenance")

@@ -24,7 +24,7 @@ import ale_py
 import gymnasium as gym
 import numpy as np
 
-from atari import ATARI_PROTOCOLS, DreamerAtariPreprocessing
+from atari import ATARI_PROTOCOLS, DreamerAtariPreprocessing, sha256_file
 from kindle import _native
 
 
@@ -376,7 +376,11 @@ def main() -> None:
 
     summary = {
         "environment": args.environment,
+        "ale_py_version": ale_py.__version__,
         "atari_protocol": args.atari_protocol,
+        "dino_checkpoint_sha256": sha256_file(args.dino_checkpoint),
+        "native_extension_sha256": sha256_file(_native.__file__),
+        "runner_sha256": sha256_file(__file__),
         "target": "displacement_t_minus_1_to_t" if args.motion else "position_t",
         "history": "[u_t, u_t - u_(t-1)]; no future input" if args.motion else None,
         "samples_per_seed": args.samples_per_seed,
@@ -391,6 +395,8 @@ def main() -> None:
         "gpu_device": encoder.gpu_device,
         "agent_checkpoint": str(args.agent_checkpoint) if args.agent_checkpoint else None,
         "agent_checkpoint_metadata": agent_metadata,
+        "agent_world_sha256": (sha256_file(args.agent_checkpoint / "world.safetensors")
+                               if args.agent_checkpoint else None),
         "agent_learner_updates": 0 if args.agent_checkpoint else None,
         "results": results,
     }
