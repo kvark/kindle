@@ -200,10 +200,11 @@ Restore checks its SHA-256 before GPU construction. Legacy checkpoints without
 that field require the pinned reference file; equal tensor shapes do not make
 different perceptual representations compatible.
 
-New saves fingerprint all three tensor files in metadata. Restore rejects a
-damaged or mixed-generation save and requires every model and optimizer tensor,
-including for legacy files. Individual file renames are not an atomic generation:
-an interrupted overwrite can be detected but is not automatically recoverable.
+New saves fingerprint all three tensor files in metadata so restore can reject
+damaged or mixed-generation files. Every restore requires all model and optimizer
+tensors, but legacy files without hashes cannot prove generation consistency.
+Individual file renames are not an atomic generation: a torn hashed save can be
+detected but is not automatically recoverable.
 Keep a separate known-good checkpoint until generation-based recovery is added.
 
 `LearnReport.timing` separates replay, posterior, imagination, training and

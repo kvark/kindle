@@ -333,7 +333,8 @@ rewind or branching is permitted.
 Current saves detect damaged/mixed tensor files through metadata fingerprints;
 restores also require all model and optimizer tensors instead of accepting the
 backend's partial-load fallback. This detects a torn overwrite but does not retain
-the preceding generation. Keep a separate known-good checkpoint in the meantime.
+the preceding generation. Legacy files without hashes cannot prove generation
+consistency. Keep a separate known-good checkpoint in the meantime.
 
 ## The eventual 100-hour contract
 
