@@ -151,16 +151,21 @@ behavior reports over eight paired synthetic updates. Imagination fell from
 4.62 to 0.30 seconds and world synchronization from 2.20 to 0.014 seconds.
 These are canary medians after two warmup updates, not game throughput. Continue
 profiling before a shared-buffer or fused-graph rewrite; launch gaps and arithmetic
-need different fixes. Full checkpoint equivalence remains a separate check.
+need different fixes. A clean confirmation measured 7.42→1.43 s and found all
+241 parameter/optimizer/slow-value tensors bit-identical by name, with matching
+metadata. Container key ordering is not tensor inequality.
 
 ### 2. Test prediction on controlled sequences
 
 The optional deterministic future-feature head is implemented. GPU tests verify
 causality, action sensitivity, reset masking and gradients through earlier
 observations; a zero reconstruction weight removes that decoder's parameters.
-Test checkpoint round trips and microbatch equivalence, then matched reconstruction,
-auxiliary and prediction-only native controls on fixed trajectories and
-agent-controlled data. The reconstruction control remains the default.
+Checkpoint round trips and predictive microbatch equivalence pass. Matched
+reconstruction and prediction-only 1M runs both retain 2,500 food rewards in
+10,000 frozen native actions after identical random-trajectory training. Complete
+the auxiliary and held-out dynamics comparisons, then agent-controlled data.
+The reconstruction control remains the default; this small task is not an Atari
+or general representation result.
 
 Advance if action-sensitive held-out prediction and native control are retained.
 If the auxiliary works and prediction-only fails, keep the auxiliary and diagnose
@@ -307,5 +312,6 @@ pipeline belongs in the current core.
   `4610ad75edef83e75afdebf162d148dc628045ea6cbb83d67d4708c709c4f91d`.
 
 Record actual source/configuration for every run and preserve older backend
-results under their original provenance. See the kickoff experiment report for
-new implementation measurements.
+results under their original provenance. See the
+[kickoff experiment report](experiments/2026-09-05-kickoff.md) for measurements,
+commands and remaining experimental checks.

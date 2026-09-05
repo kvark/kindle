@@ -552,8 +552,9 @@ impl DreamerCore {
         &self.observation
     }
 
-    /// Current observation-head output: posterior reconstruction when enabled,
-    /// otherwise the deterministic forecast made before this observation.
+    /// Forecast made before this observation when future prediction is enabled,
+    /// otherwise posterior reconstruction. Reset observations have no forecast
+    /// target and should be excluded from diagnostic error summaries.
     pub fn observation_prediction(&mut self) -> Vec<f32> {
         self.ensure_world_decoder_live();
         let decoder = self

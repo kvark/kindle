@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 from kindle._atari_scores import ATARI_PROFILES
 
 
@@ -8,6 +10,7 @@ EXAMPLES = Path(__file__).resolve().parents[1] / "examples"
 sys.path.insert(0, str(EXAMPLES))
 
 from atari import ATARI_PROTOCOLS  # noqa: E402
+import atari  # noqa: E402
 
 
 def test_published_minimal_changes_only_action_vocabulary() -> None:
@@ -29,3 +32,13 @@ def test_runner_and_score_protocol_metadata_agree() -> None:
             "noop_max": protocol.noop_max,
             "max_episode_frames": protocol.max_episode_frames,
         }
+
+
+@pytest.mark.parametrize("mode", [["--restore", "/unused"], ["--random-policy"]])
+@pytest.mark.parametrize("option", ["--visitation-bonus", "--future-prediction-loss-scale=.25", "--agc=0"])
+def test_training_overrides_are_not_silently_ignored(monkeypatch, capsys, mode, option) -> None:
+    monkeypatch.setattr(sys, "argv", ["atari.py", "/unused", *mode, option])
+    with pytest.raises(SystemExit) as error:
+        atari.main()
+    assert error.value.code == 2
+    assert "training overrides require a fresh Dreamer run" in capsys.readouterr().err

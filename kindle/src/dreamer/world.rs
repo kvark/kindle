@@ -432,19 +432,15 @@ pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     graph
 }
 
-/// Evaluate the configured observation head. Reconstruction reads the full
-/// state; prediction-only reads the deterministic state before observation.
+/// Evaluate the future head when enabled, otherwise posterior reconstruction.
+/// Forecasts read only the deterministic state, including in auxiliary runs.
 /// This graph is constructed lazily by diagnostics.
 pub fn build_decoder_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
     let mut graph = Graph::new();
-    if config.loss_scales.reconstruction == 0.0 {
-        assert!(
-            config.loss_scales.future_prediction > 0.0,
-            "no observation prediction head"
-        );
+    if config.loss_scales.future_prediction > 0.0 {
         let predictor = future_predictor(&mut graph, config);
         let deter = graph.input("deter", &[batch, size.deter]);
         graph.input("stoch", &[batch * size.stoch, size.classes]);
@@ -452,6 +448,10 @@ pub fn build_decoder_graph(config: &DreamerConfig, batch: usize) -> Graph {
         graph.set_outputs(vec![observation]);
         return graph;
     }
+    assert!(
+        config.loss_scales.reconstruction > 0.0,
+        "no observation prediction head"
+    );
     let decoder = ObservationDecoder::new(&mut graph, config);
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);

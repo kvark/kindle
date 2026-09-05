@@ -86,6 +86,8 @@ def main() -> None:
     rollout_starts = 0
     episodes = 0
     pending = {}
+    is_first = True
+    forecasts = agent.config["loss_scales"]["future_prediction"] > 0
 
     for step, action in enumerate(actions):
         if step % args.stride == 0 and step + horizon <= args.steps:
@@ -93,10 +95,11 @@ def main() -> None:
             posterior = np.asarray(
                 agent.observation_prediction(), dtype=np.float64
             )
-            posterior_mse_sum += float(
-                np.mean(np.square(posterior - start_observation))
-            )
-            posterior_count += 1
+            if not is_first or not forecasts:
+                posterior_mse_sum += float(
+                    np.mean(np.square(posterior - start_observation))
+                )
+                posterior_count += 1
             predicted_rewards, predicted_observations = (
                 agent.prior_diagnostic_rollout(actions[step : step + horizon])
             )
@@ -175,6 +178,7 @@ def main() -> None:
             pending.clear()
             frame, _ = environment.reset()
             agent.begin_episode(frame)
+        is_first = terminated or truncated
     environment.close()
 
     model_mse = [
@@ -201,9 +205,9 @@ def main() -> None:
         "completed_episodes": episodes,
         "gpu_device": agent.gpu_device,
         "observation_prediction_source": (
-            "posterior_reconstruction" if agent.config["loss_scales"]["reconstruction"] > 0
-            else "deterministic_forecast"
+            "deterministic_forecast" if forecasts else "posterior_reconstruction"
         ),
+        "observed_state_prediction_count": posterior_count,
         "observed_state_prediction_mse": checked_mean(
             posterior_mse_sum, posterior_count
         ),

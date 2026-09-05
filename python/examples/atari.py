@@ -309,6 +309,19 @@ def main() -> None:
         parser.error("--append-output requires --restore")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
+    training_flags = {
+        "--model-size", "--observation-decoder-depth", "--train-ratio",
+        "--replay-capacity", "--batch-size", "--batch-length",
+        "--world-backprop-length", "--world-microbatch-size", "--skip-full-optimize",
+        "--learning-rate", "--learning-rate-warmup", "--actor-learning-starts",
+        "--free-nats", "--dynamics-free-nats", "--dynamics-loss-scale",
+        "--reconstruction-loss-scale", "--future-prediction-loss-scale", "--agc",
+        "--replay-value-gradient", "--no-replay-value-gradient", "--visitation-bonus",
+        "--intrinsic-reward-scale", "--extrinsic-reward-scale",
+    }
+    explicit_training = training_flags.intersection(arg.split("=", 1)[0] for arg in sys.argv[1:])
+    if (args.restore or args.random_policy) and explicit_training:
+        parser.error("training overrides require a fresh Dreamer run: " + ", ".join(sorted(explicit_training)))
 
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     # Both D3 Atari-100k profiles use repeat 4, max-pool 2, non-sticky

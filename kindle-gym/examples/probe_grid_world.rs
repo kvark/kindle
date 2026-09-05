@@ -404,10 +404,11 @@ fn collect_latent_samples(
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
     let gpu_device = agent.core().gpu_device();
     let observation_decoder_depth = agent.core().config().observation_decoder_depth();
-    let observation_prediction_source = if agent.core().config().loss_scales.reconstruction > 0.0 {
-        "posterior_reconstruction"
-    } else {
+    let observation_prediction_source = if agent.core().config().loss_scales.future_prediction > 0.0
+    {
         "deterministic_forecast"
+    } else {
+        "posterior_reconstruction"
     };
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
@@ -418,6 +419,7 @@ fn collect_latent_samples(
     let mut dino_patch_statistics = DinoPatchStatistics::new();
     let mut pending_observations = Vec::<PendingObservationRollout>::new();
     let mut rewarded = false;
+    let mut is_first = true;
 
     while samples.len() < arguments.samples {
         dino_patch_statistics.add_observation(agent.dino_observation());
@@ -432,6 +434,7 @@ fn collect_latent_samples(
             &environment,
             rewarded,
             arguments.all_actions,
+            is_first,
         );
         if samples.len() == arguments.samples {
             break;
@@ -488,6 +491,7 @@ fn collect_latent_samples(
         assert_eq!(usize::from(rewarded), sample.next_rewarded.unwrap());
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
+        is_first = ended;
         if ended {
             pending_observations.clear();
             agent.begin_episode(&environment.reset());
@@ -509,6 +513,7 @@ fn push_latent_sample(
     environment: &GridWorld,
     rewarded: bool,
     all_actions: bool,
+    is_first: bool,
 ) {
     let (x, y) = environment.position();
     let deter_dim = agent.core().config().network().deter;
@@ -602,7 +607,9 @@ fn push_latent_sample(
         food: environment.food_index(),
         rewarded: usize::from(rewarded),
         reward_prediction: Some(reward_prediction),
-        posterior_observation_mse: Some(posterior_observation_mse),
+        posterior_observation_mse: (!is_first
+            || agent.core().config().loss_scales.future_prediction == 0.0)
+            .then_some(posterior_observation_mse),
         next_rewarded: None,
         prior_reward_prediction: None,
         prior_reward_rollout: Vec::new(),
