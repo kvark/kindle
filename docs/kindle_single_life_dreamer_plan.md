@@ -36,7 +36,7 @@ framework in advance.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Small native prediction gain for the auxiliary; no better control or Atari validation |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | First agent-collected predictive native success; replication and Atari validation pending |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
@@ -196,9 +196,12 @@ give 2,499 each. The auxiliary reduces terminal-inclusive held-out feature MSE
 by about 5% with 29% more parameters, and strongly beats unrelated actions.
 Prediction-only's error is slightly higher than the control's. The earlier
 global-MLP pilot was confounded by head structure and is retained only in the report.
-Reconstruction remains the default. Next test agent-controlled data and harder
-action-sensitive sequences: this near-saturated task is not an Atari or general
-representation result.
+Reconstruction remains the default. A subsequent prediction-only, agent-controlled
+persistent seed-0 run collects 1,137 food in 10k actions and retains 2,495 food
+with no deaths in 10k frozen actions. It uses no forced coverage or intrinsic
+bonus. This is initial online learning evidence; replicate it and test Atari
+before a broader claim. The [self-learning report](experiments/2026-09-05-self-learning.md)
+records the acceptance criteria, raw artifacts and pending comparisons.
 
 Native single-variable AGC-off and BPTT-8 tests also retain 2,500 rewards on that
 same trajectory. The task does not separate their control quality. Keep the

@@ -51,4 +51,42 @@ silently relabeling reconstruction as the new architecture.
 
 ## Status
 
-The native prediction-only seed-0 run is starting. No new success is claimed yet.
+Native prediction-only seed 0 passes the declared per-seed gate:
+
+| Measure | Result |
+| --- | ---: |
+| Agent-selected training actions | 10,000 |
+| Learner updates | 2,229 |
+| Training food / deaths / game return | 1,137 / 38 / 1,099 |
+| Final two 1k-action windows, food / deaths | 246 / 0; 245 / 0 |
+| Frozen 10k-action food / deaths | 2,495 / 0 |
+| Frozen learner updates | 0 |
+
+The learning curve changes from 3 food / 9 deaths in actions 4,001–5,000 to
+113 / 3, then 242 / 0, 245 / 0, 246 / 0 and 245 / 0 in successive windows.
+All 2,229 world/behavior/timing reports are finite. Its header verifies
+reconstruction 0, future prediction 0.25, zero forced actions, zero starting
+updates and 828,707 parameters. The saved world contains future-predictor tensors
+and no decoder tensors; its encoder and three tensor-file hashes validate.
+Training takes 645.55 s excluding construction; frozen execution takes 54.01 s.
+Neither run has a harness reset. This is the first positive agent-collected native
+result for the causal architecture, not yet a multi-seed or Atari result.
+Artifacts: `runs/selflearn-20260905-grid-predictive-seed0{,-eval}.{jsonl,log}`
+and `checkpoints/selflearn-20260905-grid-predictive-seed0`.
+
+Pong seed 0 is now running the declared zero-update baseline, followed by fresh
+prediction-only training and frozen evaluation. The matched reconstruction run
+and independent training-seed confirmations remain required.
+
+Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
+
+| Seed | Final-window mean | Complete window episodes | Actual action frames |
+| --- | ---: | ---: | ---: |
+| 0 | −20.6154 | 13 | 399,903 |
+| 1 | −20.7143 | 14 | 399,899 |
+| 2 | −20.5385 | 13 | 399,901 |
+
+Each executes 100k actions, with no reset no-ops and zero learner updates.
+Artifacts: `runs/selflearn-20260905-pong-random-seed{0,1,2}.{jsonl,log}`.
+They ran on the CPU while the native learner occupied the single GPU; native
+wall times are descriptive, not isolated performance comparisons.

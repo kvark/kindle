@@ -32,6 +32,8 @@ guidance are allowed while establishing reliable learning.
   control for every intrinsic-reward experiment.
   Record human guidance and the action actually executed; distinguish assisted
   behavior from unguided evaluation and game rewards from human feedback.
+  Distinguish agent-collected online learning from forced-random coverage tests;
+  verify learned behavior under frozen evaluation against untrained controls.
   Visual novelty is not task competence. Evaluate intrinsic exploration through
   held-out dynamics and later guided adaptation, with explicit reward provenance.
 - Gate video encoders and pretraining on evidence: a usable pinned checkpoint,
