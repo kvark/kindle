@@ -242,6 +242,17 @@ reward stalls late, despite more evenly distributed visual visitation;
 the small mixed/control difference is inconclusive. Retain this bounded bonus
 as an off-by-default negative control, not a demonstrated exploration solution.
 
+This baseline combines historical intrinsic and extrinsic scalars when making
+replay targets, so the world reward head learns a decaying visitation signal too.
+That signal is nonstationary, unlike a fixed game reward. A next intrinsic design
+should separate environment-reward prediction from current intrinsic valuation
+in imagination, and evaluate held-out dynamics plus later guided adaptation,
+not only bucket coverage or unguided game score. [Plan2Explore](https://arxiv.org/abs/2005.05960v2)
+provides the relevant precedent: an exploration policy maximizes imagined latent
+disagreement, then the learned world model supports downstream task policies.
+Test a small uncertainty proxy only against the existing bounded novelty and
+extrinsic controls; disagreement is not automatically calibrated uncertainty.
+
 ### 5. Make real-time learning feasible
 
 For action rate `f`, batch `B×T`, ratio `R`, and update duration `U`, learner
