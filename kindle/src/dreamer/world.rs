@@ -18,6 +18,7 @@ pub const LOSS_CONTINUATION: usize = 5;
 pub const LOSS_REPLAY_VALUE: usize = 6;
 pub const RAW_KL: usize = 7;
 pub const LOSS_FUTURE_PREDICTION: usize = 8;
+pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 struct Dynamics {
     core: RssmCore,
@@ -73,7 +74,7 @@ struct WorldModel {
     dynamics: Dynamics,
     representation: Representation,
     decoder: Option<ObservationDecoder>,
-    future_predictor: Option<MlpHead>,
+    future_predictor: Option<ObservationDecoder>,
     heads: WorldHeads,
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
@@ -86,8 +87,9 @@ impl WorldModel {
         Self {
             dynamics: Dynamics::new(graph, config),
             representation: Representation::new(graph, config),
-            decoder: (config.loss_scales.reconstruction > 0.0)
-                .then(|| ObservationDecoder::new(graph, config)),
+            decoder: (config.loss_scales.reconstruction > 0.0).then(|| {
+                ObservationDecoder::new(graph, config, "world.decoder", config.feature_dim())
+            }),
             future_predictor: (config.loss_scales.future_prediction > 0.0)
                 .then(|| future_predictor(graph, config)),
             heads: WorldHeads::new(graph, config),
@@ -103,14 +105,12 @@ impl WorldModel {
     }
 }
 
-fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> MlpHead {
-    MlpHead::new(
+fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> ObservationDecoder {
+    ObservationDecoder::new(
         graph,
+        config,
         "world.future_predictor",
         config.network().deter,
-        config.network().units,
-        2,
-        config.observation_dim(),
     )
 }
 
@@ -205,7 +205,8 @@ pub fn build_training_graph(config: &DreamerConfig, length: usize) -> Graph {
         );
         let prior_logits = model.dynamics.prior.forward(&mut graph, deter, batch);
         if let Some(predictor) = &model.future_predictor {
-            let prediction = predictor.forward(&mut graph, deter);
+            let prediction = predictor.forward(&mut graph, deter, batch);
+            let prediction = graph.reshape(prediction, &[batch, config.observation_dim()]);
             let target = graph.reshape(observation, &[batch, config.observation_dim()]);
             let target = graph.stop_gradient(target);
             let negative_target = graph.neg(target);
@@ -444,7 +445,7 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
         let predictor = future_predictor(&mut graph, config);
         let deter = graph.input("deter", &[batch, size.deter]);
         graph.input("stoch", &[batch * size.stoch, size.classes]);
-        let observation = predictor.forward(&mut graph, deter);
+        let observation = predictor.forward(&mut graph, deter, batch);
         graph.set_outputs(vec![observation]);
         return graph;
     }
@@ -452,7 +453,8 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
         config.loss_scales.reconstruction > 0.0,
         "no observation prediction head"
     );
-    let decoder = ObservationDecoder::new(&mut graph, config);
+    let decoder =
+        ObservationDecoder::new(&mut graph, config, "world.decoder", config.feature_dim());
     let deter = graph.input("deter", &[batch, size.deter]);
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
@@ -545,6 +547,33 @@ mod tests {
                 .iter()
                 .any(|name| name.starts_with("world.future_predictor."))
         );
+    }
+
+    #[test]
+    fn future_and_reconstruction_heads_share_spatial_parameterization() {
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.future_prediction = 0.25;
+        let graph = build_training_graph(&config, config.world_backprop_length);
+        let parameters = graph
+            .nodes()
+            .iter()
+            .filter_map(|node| match &node.op {
+                meganeura::graph::Op::Parameter { name } => Some((name, &node.ty.shape)),
+                _ => None,
+            })
+            .collect::<std::collections::HashMap<_, _>>();
+        for (name, shape) in &parameters {
+            if let Some(suffix) = name.strip_prefix("world.decoder.") {
+                let future = parameters[&format!("world.future_predictor.{suffix}")];
+                if suffix == "trunk.weight" {
+                    assert_eq!(future[0], config.network().deter);
+                    assert_eq!(shape[0], config.feature_dim());
+                    assert_eq!(future[1..], shape[1..]);
+                } else {
+                    assert_eq!(future, *shape);
+                }
+            }
+        }
     }
 
     #[test]

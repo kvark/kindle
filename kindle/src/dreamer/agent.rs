@@ -65,6 +65,8 @@ struct CheckpointMetadata {
     return_high: f32,
     #[serde(default)]
     visitation: Option<VisitationState>,
+    #[serde(default)]
+    future_head_revision: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -72,6 +74,16 @@ pub enum ActionMode {
     #[default]
     Sample,
     Greedy,
+}
+
+/// Executable graph and reward identities, separate from run hyperparameters.
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
+pub struct ModelProvenance {
+    pub dreamerv3_revision: &'static str,
+    pub meganeura_revision: &'static str,
+    pub blade_revision: &'static str,
+    pub future_head_revision: Option<&'static str>,
+    pub visitation_hash_version: Option<u32>,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -467,6 +479,20 @@ impl DreamerCore {
         &self.config
     }
 
+    pub fn provenance(&self) -> ModelProvenance {
+        ModelProvenance {
+            dreamerv3_revision: DREAMERV3_UPSTREAM_REV,
+            meganeura_revision: MEGANEURA_REV,
+            blade_revision: BLADE_REV,
+            future_head_revision: (self.config.loss_scales.future_prediction > 0.0)
+                .then_some(world::FUTURE_HEAD_REVISION),
+            visitation_hash_version: self
+                .config
+                .visitation_bonus
+                .then_some(super::intrinsic::VERSION),
+        }
+    }
+
     pub fn replay_len(&self) -> usize {
         self.replay.len()
     }
@@ -493,43 +519,88 @@ impl DreamerCore {
         crate::gpu_device_info(self.gpu.device_information())
     }
 
-    /// Profile the inference sessions on inputs left by a completed learner
-    /// update. Requires a context created with `MEGANEURA_GPU_TIMING=1`.
-    /// Parameter values, replay, counters and RNG streams are unchanged.
-    pub fn profile_inference(
+    /// Profile sessions on inputs left by a completed learner update. Requires
+    /// a context created with `MEGANEURA_GPU_TIMING=1`. Training captures only
+    /// forward/backward work on the final row microbatch, without optimizer,
+    /// clipping or accumulation passes. Parameters, optimizer moments, replay,
+    /// counters and RNG streams are unchanged. The next learner update installs
+    /// its ordinary optimizer settings and overwrites scratch gradients.
+    pub fn profile_sessions(
         &mut self,
         directory: impl AsRef<Path>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        use meganeura::profiler::{
-            CaptureOptions, capture_session_profile, save_session_profile_json,
-        };
+        use meganeura::profiler::{CaptureOptions, ProfileError, capture_session_profile};
 
         assert!(self.learner_step > 0, "learn once before profiling");
         fs::create_dir_all(directory.as_ref())?;
+        for session in [&mut self.world_train, &mut self.behavior_train] {
+            session.clear_optimizer();
+            session.clear_grad_accumulate();
+            session.disable_grad_clip();
+        }
         for (name, session) in [
             ("posterior", &mut self.world_observe_batch),
             ("actor_value", &mut self.behavior_online),
             ("slow_value", &mut self.behavior_slow),
             ("world_heads", &mut self.world_heads),
             ("transition", &mut self.world_transition),
+            ("world_gradient", &mut self.world_train),
+            ("behavior_gradient", &mut self.behavior_train),
         ] {
             let mut durations = Vec::new();
-            for _ in 0..11 {
+            let mut gpu_durations = Vec::new();
+            for iteration in 0..13 {
                 let started = Instant::now();
                 session.step();
                 session.wait();
-                durations.push(started.elapsed().as_secs_f64() * 1_000.0);
+                let wall_ms = started.elapsed().as_secs_f64() * 1_000.0;
+                // Advance the command-buffer ring before retaining timestamps
+                // from these fixed-input, optimizer-free normal executions.
+                if iteration >= 2 {
+                    durations.push(wall_ms);
+                    let timings = session.gpu_timings();
+                    if !timings.is_empty() {
+                        gpu_durations.push(
+                            timings
+                                .iter()
+                                .map(|(_, duration)| duration.as_secs_f64())
+                                .sum::<f64>()
+                                * 1_000.0,
+                        );
+                    }
+                }
             }
             durations.sort_by(f64::total_cmp);
+            gpu_durations.sort_by(f64::total_cmp);
+            let unprofiled_median_ms = durations[durations.len() / 2];
             let profile = capture_session_profile(
                 session,
                 |_| {},
                 CaptureOptions {
-                    unprofiled_median_ms: Some(durations[durations.len() / 2]),
+                    unprofiled_median_ms: Some(unprofiled_median_ms),
                     ..CaptureOptions::default()
                 },
-            )?;
-            save_session_profile_json(directory.as_ref().join(format!("{name}.json")), &profile)?;
+            );
+            let path = directory.as_ref().join(format!("{name}.json"));
+            let mut data = match profile {
+                Ok(profile) => serde_json::to_value(profile)?,
+                Err(ProfileError::TooManyDispatches { count, limit }) => {
+                    // Keep the wall measurement and the reason no GPU trace
+                    // exists. A truncated timestamp stream is not a profile.
+                    serde_json::json!({
+                        "unprofiled_median_ms": unprofiled_median_ms,
+                        "dispatch_count": count,
+                        "timestamp_pass_limit": limit,
+                        "per_dispatch_timing_unavailable": "dispatch count exceeds timestamp capacity",
+                    })
+                }
+                Err(error) => return Err(error.into()),
+            };
+            data["ordinary_gpu_median_ms"] =
+                serde_json::json!(gpu_durations.get(gpu_durations.len() / 2));
+            data["ordinary_gpu_samples_ms"] = serde_json::json!(gpu_durations);
+            data["ordinary_wall_samples_ms"] = serde_json::json!(durations);
+            fs::write(path, serde_json::to_vec_pretty(&data)?)?;
         }
         Ok(())
     }
@@ -790,6 +861,7 @@ impl DreamerCore {
             return_low,
             return_high,
             visitation: self.visitation.as_ref().map(VisitationBonus::state),
+            future_head_revision: self.provenance().future_head_revision.map(str::to_owned),
         };
         let encoded = serde_json::to_vec_pretty(&metadata).map_err(io::Error::other)?;
         let metadata_temporary = checkpoint.join(format!("{CHECKPOINT_METADATA}.tmp"));
@@ -1023,13 +1095,15 @@ impl DreamerCore {
         self.world_observe_live
             .set_input("keep_action", &vec![keep; self.config.action_count]);
         self.world_observe_live.step();
-        self.world_observe_live.wait();
-        self.world_observe_live
-            .read_output_by_index(0, &mut self.deter);
         let mut logits = vec![0.0; size.stoch * size.classes];
-        self.world_observe_live.read_output_by_index(1, &mut logits);
-        self.world_observe_live
-            .read_output_by_index(3, &mut self.encoded_observation);
+        self.readback.read(
+            &self.world_observe_live,
+            &mut [
+                (0, &mut self.deter),
+                (1, &mut logits),
+                (3, &mut self.encoded_observation),
+            ],
+        );
         self.stoch = sample_latents(
             &logits,
             1,
@@ -1066,12 +1140,12 @@ impl DreamerCore {
             self.world_observe_batch
                 .set_input("keep_action", &keep_action);
             self.world_observe_batch.step();
-            self.world_observe_batch.wait();
             let mut deter = vec![0.0; rows * size.deter];
             let mut logits = vec![0.0; rows * size.stoch * size.classes];
-            self.world_observe_batch.read_output_by_index(0, &mut deter);
-            self.world_observe_batch
-                .read_output_by_index(1, &mut logits);
+            self.readback.read(
+                &self.world_observe_batch,
+                &mut [(0, &mut deter), (1, &mut logits)],
+            );
             let stoch = sample_latents(
                 &logits,
                 rows,
@@ -1352,7 +1426,6 @@ impl DreamerCore {
             let state_feature = join_features(&deter, &stoch, starts, &self.config);
             self.behavior_online.set_input("feature", &state_feature);
             self.behavior_online.step();
-            self.behavior_online.wait();
             let mut actor_logits = vec![0.0; starts * self.config.action_count];
             let mut value_logits = vec![0.0; starts * self.config.value_bins];
             self.readback.read(
@@ -1362,7 +1435,6 @@ impl DreamerCore {
 
             self.behavior_slow.set_input("feature", &state_feature);
             self.behavior_slow.step();
-            self.behavior_slow.wait();
             let mut slow_logits = vec![0.0; starts * self.config.value_bins];
             self.readback
                 .read(&self.behavior_slow, &mut [(0, &mut slow_logits)]);
@@ -1370,7 +1442,6 @@ impl DreamerCore {
             self.world_heads.set_input("deter", &deter);
             self.world_heads.set_input("stoch", &stoch);
             self.world_heads.step();
-            self.world_heads.wait();
             let mut reward_logits = vec![0.0; starts * self.config.value_bins];
             let mut continuation = vec![0.0; starts];
             self.readback.read(
@@ -1405,7 +1476,6 @@ impl DreamerCore {
             self.world_transition.set_input("stoch", &stoch);
             self.world_transition.set_input("action", &action_one_hot);
             self.world_transition.step();
-            self.world_transition.wait();
             let mut next_deter = vec![0.0; starts * size.deter];
             let mut prior_logits = vec![0.0; starts * size.stoch * size.classes];
             self.readback.read(
@@ -1914,6 +1984,14 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             ));
         }
     }
+    let expected_future_head = (metadata.config.loss_scales.future_prediction > 0.0)
+        .then_some(world::FUTURE_HEAD_REVISION);
+    if metadata.future_head_revision.as_deref() != expected_future_head {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "incompatible future-prediction head; use the original source revision",
+        ));
+    }
     if metadata.config.visitation_bonus != metadata.visitation.is_some()
         || metadata
             .visitation
@@ -2153,6 +2231,7 @@ mod tests {
             return_low: 0.0,
             return_high: 1.0,
             visitation: None,
+            future_head_revision: None,
         }
     }
 
@@ -2181,6 +2260,17 @@ mod tests {
         metadata.visitation = Some(VisitationBonus::new().state());
         validate_checkpoint_metadata(&metadata).unwrap();
         metadata.config.visitation_bonus = false;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+    }
+
+    #[test]
+    fn checkpoint_metadata_rejects_the_retired_global_future_head() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.config.loss_scales.future_prediction = 0.25;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.future_head_revision = Some(world::FUTURE_HEAD_REVISION.to_owned());
+        validate_checkpoint_metadata(&metadata).unwrap();
+        metadata.config.loss_scales.future_prediction = 0.0;
         assert!(validate_checkpoint_metadata(&metadata).is_err());
     }
 
@@ -2734,6 +2824,23 @@ mod tests {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut left = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         let mut right = DreamerCore::with_gpu(config.clone(), gpu);
+        let mut control_config = config.clone();
+        control_config.loss_scales.future_prediction = 0.0;
+        control_config.loss_scales.reconstruction = 0.25;
+        let control_graph = world::build_observation_prediction_graph(&control_config, 1);
+        let mut control = build_session(&control_graph, &left.gpu, Mode::Inference, false);
+        initialize_d3(&mut control, &control_graph, config.seed);
+        for name in control.param_names() {
+            if name == "world.decoder.trunk.weight" {
+                continue;
+            }
+            let future_name = name.replacen("world.decoder.", "world.future_predictor.", 1);
+            assert_eq!(
+                control.read_params(&[name]),
+                left.world_train.read_params(&[&future_name]),
+                "matched downstream initialization for {name}"
+            );
+        }
         let observation = |value| DinoObservation::from_vec(vec![value; DinoObservation::LEN]);
         for agent in [&mut left, &mut right] {
             agent.begin_episode(observation(0.2));
@@ -2793,7 +2900,7 @@ mod tests {
             std::process::id()
         ));
         left.save_checkpoint(&checkpoint).unwrap();
-        let parameter = "world.future_predictor.layer0.weight";
+        let parameter = "world.future_predictor.trunk.weight";
         let expected = left.world_train.read_params(&[parameter]);
         let restored = DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&left.gpu)).unwrap();
         assert_eq!(restored.config(), &config);

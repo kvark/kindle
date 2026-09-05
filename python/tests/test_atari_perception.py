@@ -38,11 +38,34 @@ def test_motion_pairs_do_not_cross_boundaries(monkeypatch, boundary) -> None:
             value = float(frame[0, 0, 0])
             return [value, value], [value]
 
+    class Agent:
+        config = {"action_count": 4}
+        observed = 0
+        resets = 0
+
+        def begin_episode(self, frame):
+            self.resets += 1
+
+        def act(self, *, action_mask):
+            return action_mask.index(True)
+
+        def observe(self, frame, **kwargs):
+            self.observed += 1
+
+        @property
+        def latent_feature(self):
+            return [self.observed]
+
     environment = Environment()
     monkeypatch.setattr(probe.gym, "make", lambda *args, **kwargs: environment)
     monkeypatch.setattr(probe, "DreamerAtariPreprocessing", lambda env, **kwargs: env)
     monkeypatch.setattr(probe, "pong_labels", lambda env: env.label)
-    features, labels = probe.collect_split(Encoder(), "ALE/Pong-v5", 0, 2, motion=True)
+    agent = Agent()
+    features, labels = probe.collect_split(Encoder(), "ALE/Pong-v5", 0, 2,
+                                          motion=True, agent=agent)
     np.testing.assert_array_equal(features["pooled7_history"], [[2, 1], [101, 1]])
     np.testing.assert_array_equal(labels, np.ones((2, 4)))
+    np.testing.assert_array_equal(features["rssm"], [[2], [5]])
+    assert agent.observed == 5
+    assert agent.resets == (2 if boundary == "terminal" else 1)
     assert environment.closed

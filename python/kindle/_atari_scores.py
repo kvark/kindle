@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from collections import defaultdict
@@ -144,6 +145,24 @@ UPSTREAM_D3_REFERENCE = {
     ): "f395188cc08b0968c03ebdd91fd3e706570962ea",
 }
 
+# The new runner records the actual command/package inventory, instead of the
+# hand-written manifest retained above for the historical 1M control.
+UPSTREAM_RUNNER_CONFIG_SHA256 = "a4af337550047d181c0e46a5b5fd562854fedab9e2040728725a83652dd7c939"
+UPSTREAM_RUNNER_REFERENCE = {
+    ("source_revision",): UPSTREAM_D3_REFERENCE[("source", "revision")],
+    ("source_config_diff_sha256",): UPSTREAM_RUNNER_CONFIG_SHA256,
+    ("python",): "3.11.15",
+    ("packages", "jax"): "0.6.2",
+    ("packages", "jaxlib"): "0.6.2",
+    ("packages", "jax-cuda12-plugin"): "0.6.2",
+    ("packages", "jax-cuda12-pjrt"): "0.6.2",
+    ("packages", "nvidia-cuda-nvcc-cu12"): "12.9.86",
+    ("packages", "ale-py"): "0.9.0",
+    ("protocol",): "published",
+    ("status",): "complete",
+    ("exit_code",): 0,
+}
+
 
 class AtariScoreError(ValueError):
     """Raised when logs cannot prove a protocol-complete score."""
@@ -198,6 +217,53 @@ def _manifest_value(
     return value
 
 
+def _validate_upstream_manifest(manifest: dict, source: Path) -> dict:
+    runner = "source_revision" in manifest
+    reference = UPSTREAM_RUNNER_REFERENCE if runner else UPSTREAM_D3_REFERENCE
+    for path, expected in reference.items():
+        actual = _manifest_value(manifest, path, source)
+        if type(actual) is not type(expected) or actual != expected:
+            raise AtariScoreError(
+                f"{source}: expected {'.'.join(path)}={expected!r}, found {actual!r}"
+            )
+    if not runner:
+        return manifest
+
+    patch = manifest.get("source_config_diff")
+    if not isinstance(patch, str) or hashlib.sha256(patch.encode()).hexdigest() != manifest["source_config_diff_sha256"]:
+        raise AtariScoreError(f"{source}: source config diff does not match its hash")
+    command = manifest.get("command")
+    if (not isinstance(command, list) or len(command) != 18
+            or not all(isinstance(value, str) for value in command)):
+        raise AtariScoreError(f"{source}: unrecognized upstream command")
+    if command[4] not in ("size1m", "size12m"):
+        raise AtariScoreError(f"{source}: unsupported upstream model preset")
+    expected = [
+        command[0], command[1], "--configs", "atari100k", command[4],
+        "kindle_published", "--task", "atari100k_pong", "--seed", command[9],
+        "--run.steps", "100000", "--logdir", command[13],
+        "--logger.outputs", "jsonl", "--run.log_every", "60",
+    ]
+    if command != expected or not command[9].isdecimal():
+        raise AtariScoreError(f"{source}: command is not a complete pinned Pong control")
+    return {
+        "source": {
+            "revision": manifest["source_revision"],
+            "config_only_diff_sha256": manifest["source_config_diff_sha256"],
+        },
+        "runtime": {"python": manifest["python"], "packages": manifest["packages"]},
+        "experiment": {
+            "environment": "ALE/Pong-v5", "seed": int(command[9]),
+            "steps": 100_000, "configs": command[3:6],
+        },
+        "atari_protocol": {
+            "name": "published", "action_repeat": 4, "actions": "all",
+            "reset_noop_max": 0, "episode_frame_cap": 100_000,
+        },
+        "score_window_frames": list(SCORE_WINDOW_FRAMES),
+    }
+
+
 def load_upstream_d3_segments(
     logdirs: Iterable[Path],
 ) -> list[dict[str, object]]:
@@ -212,14 +278,9 @@ def load_upstream_d3_segments(
             )
 
         manifest_path = logdir / "reference-manifest.json"
-        manifest = _read_json_object(manifest_path)
-        for path, expected in UPSTREAM_D3_REFERENCE.items():
-            actual = _manifest_value(manifest, path, manifest_path)
-            if type(actual) is not type(expected) or actual != expected:
-                raise AtariScoreError(
-                    f"{manifest_path}: expected {'.'.join(path)}={expected!r}, "
-                    f"found {actual!r}"
-                )
+        manifest = _validate_upstream_manifest(
+            _read_json_object(manifest_path), manifest_path
+        )
 
         experiment = manifest["experiment"]
         protocol = manifest["atari_protocol"]
@@ -279,6 +340,11 @@ def load_upstream_d3_segments(
                 "seed": seed,
                 "mode": "train",
                 "target_runtime": UPSTREAM_D3_TARGET_RUNTIME,
+                "experiment_identity": {
+                    "configs": experiment["configs"],
+                    "source": manifest["source"],
+                    "runtime": manifest["runtime"],
+                },
                 "atari_protocol": str(protocol["name"]),
                 "action_repeat": action_repeat,
                 "full_action_space": protocol["actions"] == "all",
@@ -313,6 +379,9 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
         "dino_model_id",
         "dino_checkpoint_revision",
         "dino_checkpoint_sha256",
+        "model_provenance",
+        "native_extension_sha256",
+        "runner_sha256",
         "trainable_parameters",
         "config",
         "random_action_steps",
@@ -339,6 +408,9 @@ def load_segments(paths: Iterable[Path]) -> list[dict[str, object]]:
             "dino_model_id": event.get("dino_model_id"),
             "dino_checkpoint_revision": event.get("dino_checkpoint_revision"),
             "dino_checkpoint_sha256": event.get("dino_checkpoint_sha256"),
+            "model_provenance": event.get("model_provenance"),
+            "native_extension_sha256": event.get("native_extension_sha256"),
+            "runner_sha256": event.get("runner_sha256"),
             "trainable_parameters": event.get("trainable_parameters"),
             "config_without_seed": config,
             "random_action_steps": event.get("random_action_steps"),

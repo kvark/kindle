@@ -95,8 +95,8 @@ fn main() {
             }
             report_memory("after learner update", &gpu);
             if let Some(directory) = &profile_directory {
-                core.profile_inference(directory)
-                    .expect("profile inference sessions");
+                core.profile_sessions(directory)
+                    .expect("profile model sessions");
             }
             if let Some(path) = &checkpoint {
                 core.save_checkpoint(path).expect("save canary state");

@@ -65,6 +65,11 @@ impl PyDinoPerception {
 
 #[pymethods]
 impl PyAgent {
+    #[getter]
+    fn provenance<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.core().provenance())
+    }
+
     #[new]
     #[pyo3(signature = (
         dino_checkpoint,

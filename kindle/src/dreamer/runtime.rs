@@ -63,7 +63,13 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
                 1.0
             };
             let fan_in = d3_fan_in(shape);
-            truncated_normal(&name, size, fan_in, output_scale, seed)
+            // Match reconstruction's spatial-head initialization in the causal
+            // ablation. Only the trunk's smaller deterministic input differs.
+            let initialization_name = match name.strip_prefix("world.future_predictor.") {
+                Some(suffix) => format!("world.decoder.{suffix}"),
+                None => name.clone(),
+            };
+            truncated_normal(&initialization_name, size, fan_in, output_scale, seed)
         };
         session.set_parameter(&name, &values);
     }

@@ -662,25 +662,30 @@ pub(crate) struct ObservationDecoder {
 }
 
 impl ObservationDecoder {
-    pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
+    pub(crate) fn new(
+        graph: &mut Graph,
+        config: &DreamerConfig,
+        name: &str,
+        input_dim: usize,
+    ) -> Self {
         let size = config.network();
         let patches = OBSERVATION_GRID * OBSERVATION_GRID;
         let depth = config.observation_decoder_depth();
         Self {
-            trunk: LinearNorm::new(
+            trunk: LinearNorm::new(graph, &format!("{name}.trunk"), input_dim, size.units),
+            spatial: nn::Linear::new(
                 graph,
-                "world.decoder.trunk",
-                config.feature_dim(),
+                &format!("{name}.spatial"),
                 size.units,
+                patches * depth,
             ),
-            spatial: nn::Linear::new(graph, "world.decoder.spatial", size.units, patches * depth),
             patch_norm: nn::RmsNorm::new(
                 graph,
-                "world.decoder.patch.norm.weight",
+                &format!("{name}.patch.norm.weight"),
                 depth,
                 DREAMER_NORM_EPSILON,
             ),
-            output: nn::Linear::new(graph, "world.decoder.out", depth, OBSERVATION_CHANNELS),
+            output: nn::Linear::new(graph, &format!("{name}.out"), depth, OBSERVATION_CHANNELS),
             depth,
         }
     }

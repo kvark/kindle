@@ -53,6 +53,7 @@ its chronological experiment diary as a second plan.
 | Native sparse-food GridWorld, DINO reconstruction scale 0.25 | Online learning and 2,500 rewards in 10,000 frozen greedy actions | Complete loop works on a simple visual task; diagnostic rates differ from Atari |
 | Seed-split Pong perception probes | Coordinate R² 0.9867 pooled versus 0.9890 unpooled; pooled reward-event AUC 0.9929 | Static task cues survive compression; temporal sufficiency remains unproven |
 | Local pinned upstream D3, size1m, Pong seed 0 | −20.462 in the declared final window | A local control already exists; JAX 0.6.2, ALE 0.9.0, bfloat16, learned RGB perception |
+| Local pinned upstream D3, size12m, Pong seed 0 | −10.667 across six final-window episodes; 28.6 minutes | Current executable capacity control; one seed and runtime/perception differences limit the claim |
 | Kindle 1M, full BPTT, Pong seed 0 | −17.8 in the same nominal window | Useful small-preset comparison; perception, runtime and reset accounting differ |
 | Kindle 12M, full BPTT, row microbatch 4, Pong seeds 0/1/2 | −4 / +6 / −2; seed mean 0; 2/3/4 complete episodes | Three independent uninterrupted learning runs, above matched random −20.623 |
 
@@ -77,8 +78,9 @@ The local upstream directory is
 It contains a completion marker, exact config and runtime manifest. The requested
 JAX 0.4.33 could not run on Blackwell; record the actual 0.6.2 runtime. Upstream
 counts action-free reset records in its step budget; Kindle counts executed
-actions. ALE versions differ. A new 12M upstream control answers a different
-capacity question and follows profiling; do not repeat the completed 1M control.
+actions. ALE versions differ. The new 12M capacity control is in
+`runs/kickoff-upstream-pong-12m-seed0-100k-v2`; do not repeat the completed 1M
+control. Upstream still trains much faster than the optimized Rust loop.
 
 ## Architecture and causal objective
 
@@ -107,6 +109,12 @@ Compare three objectives with perception and behavior fixed:
 2. Predictive auxiliary: retain reconstruction and add `g(h[t]) → u[t]`.
 3. Prediction only: remove the posterior decoder; retain the predictive head,
    reward, continuation, balanced KL and replay value.
+
+Use the same spatial decoder structure and matched downstream initialization for
+all heads; only the predictive trunk lacks the current posterior's stochastic
+input. The first kickoff predictor used a global MLP, confounding the objective
+with a different spatial parameterization despite similar parameter counts.
+Keep those pilot results labeled; do not interpret them as a causal-loss ablation.
 
 The hypothesis is that a deterministic target scored before observation gives
 the recurrent model a more direct signal than posterior categorical prediction
@@ -155,17 +163,26 @@ need different fixes. A clean confirmation measured 7.42→1.43 s and found all
 241 parameter/optimizer/slow-value tensors bit-identical by name, with matching
 metadata. Container key ordering is not tensor inequality.
 
+Extending this to posterior outputs and removing redundant waits reaches about
+1.26 s/update, again preserving all 241 tensors and eight reports. A world B4×T64
+gradient pass contains 76,016 dispatches and takes 154 ms GPU versus 221 ms wall,
+without optimizer/accumulation. Whole-pass timing works; the backend's 1,000-pass
+limit prevents a full per-dispatch trace. Next add windowed profiling and test
+batching/fusion of non-recurrent encoder/head work across B×T. Preserve full
+recurrence, gradient range and measured learning when changing graph layout.
+
 ### 2. Test prediction on controlled sequences
 
 The optional deterministic future-feature head is implemented. GPU tests verify
 causality, action sensitivity, reset masking and gradients through earlier
 observations; a zero reconstruction weight removes that decoder's parameters.
-Checkpoint round trips and predictive microbatch equivalence pass. Matched
-reconstruction and prediction-only 1M runs both retain 2,500 food rewards in
-10,000 frozen native actions after identical random-trajectory training; the
-auxiliary gives 2,496 with 29% more parameters. All beat feature persistence on
-held-out open-loop probes, but reconstruction has the lowest error. Keep it as
-the default. Next use agent-controlled data and harder action-sensitive sequences;
+Checkpoint round trips and predictive microbatch equivalence pass for the pilot.
+Reconstruction and global-MLP prediction-only 1M runs both retain 2,500 food
+rewards in 10,000 frozen native actions after identical random-trajectory training;
+the auxiliary gives 2,496 with 29% more parameters. All beat feature persistence
+on held-out open-loop probes, but reconstruction has the lowest error. Match the
+head structure before drawing a loss-level conclusion. Reconstruction remains the
+default. Also test agent-controlled data and harder action-sensitive sequences;
 this small task is not an Atari or general representation result.
 
 Advance if action-sensitive held-out prediction and native control are retained.
@@ -183,6 +200,8 @@ dynamics, retains food progress and requires no harness time-limit resets.
 Measure food, deaths, action diversity and return per fixed interaction window.
 This is a continuity integration test, not broad lifelong skill. Privileged
 environment state must not enter observations or intrinsic reward.
+The first agent-controlled extrinsic-only 10k run collects 1,100 food with 37
+deaths and no harness resets; its final windows approach 250 food/1,000 actions.
 
 ### 4. Add one bounded intrinsic-reward experiment
 
@@ -200,19 +219,26 @@ whether the bonus responds to controllable states or irrelevant visual noise.
 Disagreement or learning progress follows a specific observed failure; raw
 world-model prediction error is not the default reward.
 
+The first continuing native comparison gives food/deaths of 1,100/37 for
+extrinsic-only, 1,116/32 for mixed reward and 150/60 for intrinsic-only over 10k
+actions (one seed each). Intrinsic-only is roughly random overall and stalls late;
+the small mixed/control difference is inconclusive. Retain this bounded bonus
+as an off-by-default negative control, not a demonstrated exploration solution.
+
 ### 5. Make real-time learning feasible
 
 For action rate `f`, batch `B×T`, ratio `R`, and update duration `U`, learner
 demand is `f × R / (B×T)` updates/s. Acting, perception and learning must fit
 available device time with headroom. At 10 actions/s, B16×T64 and R256 require
-2.5 updates/s, roughly 3.6 times the optimized 12M canary throughput, before
+2.5 updates/s, roughly 3.2 times the optimized 12M canary throughput, before
 perception and acting costs. The original read path was roughly 20 times short.
 
 Report p50/p95/p99 action latency, missed deadlines, effective ratio and training
 credit. Bound backlog explicitly; dropping credit is an experimental policy to
 report. When concurrency is necessary, use separately owned acting state and
 versioned parameter snapshots. Threads around the current mutable core are
-insufficient.
+insufficient. Preserve arrival order and explicitly mark any observation gaps;
+bounded queues must not turn missing transitions into fictitious adjacent frames.
 
 Choose the full-run rate and ratio from measurements. If smaller models or
 lower ratios are required, measure their learning curves. Do not silently slow
@@ -223,8 +249,9 @@ a native real-time game to accommodate Atari's compute budget.
 DINO remains the first control: native inference is validated and static Pong
 probes are strong. A four-seed motion probe improves mean displacement R² from
 0.247 to 0.676 by appending causal feature differences, but horizontal ball motion
-remains weak (0.173). Test this cheap temporal input in downstream learning and
-measure latency before assuming it solves control or replacing the encoder.
+remains weak (0.173). The RSSM already has history: probe motion in its trained
+belief before adding redundant input channels. Test any temporal-input change
+in downstream learning and measure latency before replacing the encoder.
 
 [LeVJEPA](https://arxiv.org/abs/2608.27395v1) is a later frontend candidate. Its
 [released checkpoint](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)
@@ -299,7 +326,10 @@ Test retention across two games with compatible actions. Then share immutable
 experience chunks between two independent Kindles, carrying environment version,
 action meanings, encoder identity and behavior-policy provenance. Measure useful
 transfer and harm from mismatched experience before swarm services or shared
-optimizer state.
+optimizer state. Recompute the receiving agent's recurrent context rather than
+sharing learned latent states as if their coordinates agreed. Another Kindle's
+visitation bonus is not the receiver's novelty; keep reward-generator identity
+and ownership explicit.
 
 Goal conditioning, learned preferences, uncertainty-aware exploration, selective
 planning and hierarchy return when a measured failure calls for them. No parallel

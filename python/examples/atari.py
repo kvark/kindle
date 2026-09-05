@@ -526,6 +526,11 @@ def main() -> None:
             "gpu_device": agent.gpu_device if agent is not None else None,
             "trainable_parameters": trainable_parameters,
             "config": agent_config,
+            "model_provenance": agent.provenance if agent is not None else None,
+            "native_extension_sha256": (
+                sha256_file(kindle._native.__file__) if agent is not None else None
+            ),
+            "runner_sha256": sha256_file(__file__),
         }
     )
 

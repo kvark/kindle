@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import subprocess
@@ -8,12 +9,72 @@ import pytest
 
 from kindle._atari_scores import (
     UPSTREAM_D3_REFERENCE,
+    UPSTREAM_RUNNER_REFERENCE,
     AtariScoreError,
     compare_runtime_scores,
     load_segments,
     load_upstream_d3_segments,
     summarize_scores,
 )
+
+
+def write_runner_control(logdir, monkeypatch, *, size="size12m", seed=0, mutate=None):
+    patch = "fixture: independently checked config diff\n"
+    patch_hash = hashlib.sha256(patch.encode()).hexdigest()
+    monkeypatch.setitem(UPSTREAM_RUNNER_REFERENCE, ("source_config_diff_sha256",), patch_hash)
+    manifest = {}
+    for path, value in UPSTREAM_RUNNER_REFERENCE.items():
+        target = manifest
+        for key in path[:-1]:
+            target = target.setdefault(key, {})
+        target[path[-1]] = value
+    manifest.update(source_config_diff=patch, command=[
+        "/upstream/python", "/upstream/dreamerv3/main.py", "--configs",
+        "atari100k", size, "kindle_published", "--task", "atari100k_pong",
+        "--seed", str(seed), "--run.steps", "100000", "--logdir", str(logdir),
+        "--logger.outputs", "jsonl", "--run.log_every", "60",
+    ])
+    if mutate:
+        mutate(manifest)
+    logdir.mkdir()
+    (logdir / "reference-manifest.json").write_text(json.dumps(manifest))
+    (logdir / "RUN_COMPLETE").write_text("exit status zero\n")
+    (logdir / "scores.jsonl").write_text(
+        json.dumps({"step": 380_000, "episode/score": -10}) + "\n"
+    )
+
+
+def test_runner_control_preserves_preset_identity(tmp_path, monkeypatch):
+    logdir = tmp_path / "size12m"
+    write_runner_control(logdir, monkeypatch)
+    summary = summarize_scores(load_upstream_d3_segments([logdir]))
+    pong = summary["environments"]["ALE/Pong-v5"]
+    assert pong["seed_mean"] == -10
+    assert pong["experiment_identity"]["configs"][1] == "size12m"
+
+
+def test_runner_controls_cannot_pool_different_presets(tmp_path, monkeypatch):
+    small, large = tmp_path / "size1m", tmp_path / "size12m"
+    write_runner_control(small, monkeypatch, size="size1m")
+    write_runner_control(large, monkeypatch, seed=1)
+    with pytest.raises(AtariScoreError, match="different experiment identities"):
+        summarize_scores(load_upstream_d3_segments([small, large]))
+
+
+@pytest.mark.parametrize("mutate, message", [
+    (lambda m: m.update(status="running"), "status"),
+    (lambda m: m.update(exit_code=1), "exit_code"),
+    (lambda m: m.update(source_config_diff="other patch"), "does not match"),
+    (lambda m: m["packages"].update(jax="0.4.33"), "packages.jax"),
+    (lambda m: m["command"].__setitem__(11, "20000"), "complete pinned"),
+    (lambda m: m["command"].__setitem__(9, "-1"), "complete pinned"),
+    (lambda m: m["command"].extend(["--run.train_ratio", "32"]), "unrecognized"),
+])
+def test_runner_control_rejects_unmatched_provenance(tmp_path, monkeypatch, mutate, message):
+    logdir = tmp_path / "control"
+    write_runner_control(logdir, monkeypatch, mutate=mutate)
+    with pytest.raises(AtariScoreError, match=message):
+        load_upstream_d3_segments([logdir])
 
 
 def test_score_module_does_not_load_native_extension() -> None:
@@ -251,6 +312,23 @@ def test_scores_reject_config_seed_mismatch(tmp_path) -> None:
     )
     with pytest.raises(AtariScoreError, match="run seed 0 does not match config seed 1"):
         load_segments([path])
+
+
+@pytest.mark.parametrize("field", [
+    "model_provenance", "native_extension_sha256", "runner_sha256",
+])
+def test_scores_reject_changed_executable_provenance(tmp_path, field) -> None:
+    paths = []
+    for seed in range(2):
+        path = tmp_path / f"seed{seed}.jsonl"
+        write_run(path, seed=seed, start=0, end=400_000,
+                  episodes=[(380_000, -10)])
+        events = [json.loads(line) for line in path.read_text().splitlines()]
+        events[0][field] = f"implementation-{seed}"
+        path.write_text("".join(json.dumps(event) + "\n" for event in events))
+        paths.append(path)
+    with pytest.raises(AtariScoreError, match="different experiment identities"):
+        summarize_scores(load_segments(paths))
 
 
 def test_multiple_segments_do_not_inflate_independent_seed_count(tmp_path) -> None:

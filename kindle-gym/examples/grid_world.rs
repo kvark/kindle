@@ -522,6 +522,7 @@ fn run_dreamer(
                 "total": world_parameters + behavior_parameters,
             },
             "config": agent.core().config(),
+            "model_provenance": agent.core().provenance(),
             "actions": ACTION_NAMES,
         }),
     )?;

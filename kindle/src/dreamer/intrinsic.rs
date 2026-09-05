@@ -7,7 +7,7 @@ use crate::vision::{DinoObservation, fixed_projection};
 
 const HASH_BITS: usize = 16;
 const HASH_SEED: u64 = 0x6b69_6e64_6c65_7631;
-const VERSION: u32 = 2;
+pub(super) const VERSION: u32 = 2;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub(super) struct VisitationState {

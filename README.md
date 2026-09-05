@@ -44,7 +44,9 @@ Three objective settings are exposed in both native and Atari runners:
 
 Zero disables and removes the corresponding head's parameters. Future targets
 are stop-gradient frozen features; reset observations do not contribute to that
-loss. These coefficients are experimental settings, not universally tuned values.
+loss. Both heads use the same spatial structure and matched downstream
+initialization. These coefficients are experimental settings, not universally
+tuned values.
 
 Intentional differences from the pinned upstream DreamerV3 include frozen DINO
 instead of learned RGB perception, f32 computation, 100k-entry replay, and
@@ -131,7 +133,8 @@ The bonus is `1/sqrt(previous_count + 1)`. Counts survive episode resets and
 checkpoints, and saturate instead of wrapping. Collisions reduce novelty.
 This is not epistemic uncertainty. Intrinsic and extrinsic channels are logged
 separately; neither intrinsic generation nor its learning scale is enabled by
-default.
+default. `--train-ratio 0` disables scheduled updates for coverage/noise checks;
+the native `--fixed-action N --all-actions` supplies a stationary-action control.
 
 ## Atari and analysis
 
@@ -181,11 +184,17 @@ critic, configuration, backend/vision provenance, counters, return normalization
 and optional visitation counts. Replay, scheduler credit, exact RNG state and
 the in-flight environment are absent. Restore is model recovery into a fresh
 data segment, not exact lifetime continuation. Backend revisions are validated;
-old artifacts require their original checkout.
+old artifacts require their original checkout. Experimental head and hash
+revisions are also checked. Run headers expose model provenance; Atari headers
+add the executable extension and runner hashes, preventing mixed implementations
+from silently becoming a multi-seed score.
 
 `LearnReport.timing` separates replay, posterior, imagination, training and
 synchronization wall time. The synthetic canary avoids perception/environment
-costs and can export GPU inference traces:
+costs and can export inference and gradient traces. Gradient captures exclude
+optimizer/clipping/accumulation and use the final row microbatch. Graphs exceeding
+Blade's timestamp capacity retain ordinary wall time and an explicit missing-trace
+reason; they are not silently reported as complete GPU profiles:
 
 ```bash
 MEGANEURA_GPU_TIMING=1 cargo run --release -p kindle --example dreamer_canary -- \

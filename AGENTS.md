@@ -19,6 +19,8 @@ guidance are allowed while establishing reliable learning.
 - Change one scientific variable per comparison. Report real interactions,
   learner updates, wall time, model/data provenance, all seeds, and failures.
   A short integration test or an historical score is not a matched benchmark.
+  Match head structure and initialization when comparing objectives, and version
+  changed heads or intrinsic hash schemes instead of reinterpreting old state.
 - Profile learner stages, synchronization, and GPU idle time before committing
   days of compute. Check existing branches and local run artifacts before
   repeating old experiments. Preserve corrected full-precision gradients and
@@ -29,6 +31,8 @@ guidance are allowed while establishing reliable learning.
 - Gate video encoders and pretraining on evidence: a usable pinned checkpoint,
   causal streaming semantics, native numerical parity, latency, and improved
   held-out control-relevant probes. A paper alone is not an implementation plan.
+  Probe the trained recurrent belief before inferring a need for more temporal
+  input from single-frame feature probes.
 - Respect the single stream of external consequences. Natural deaths and
   respawns are allowed; cloning or rewinding the game for training is not.
   Mark accelerated laboratory tests separately from real-time lifetime runs.

@@ -99,6 +99,7 @@ def collect_split(
     sample_count: int,
     motion: bool = False,
     protocol_name: str = "current",
+    agent=None,
 ) -> tuple[dict[str, np.ndarray], np.ndarray]:
     protocol = ATARI_PROTOCOLS[protocol_name]
     environment = gym.make(
@@ -114,6 +115,11 @@ def collect_split(
     features = {"rgb64": [], "projected14": [], "pooled7": []}
     if motion:
         features["pooled7_history"] = []
+    if agent is not None:
+        if agent.config["action_count"] != environment.action_space.n:
+            raise ValueError("checkpoint and probe action vocabularies differ")
+        agent.begin_episode(frame)
+        features["rssm"] = []
     previous = None
     labels = []
     attempts = 0
@@ -123,7 +129,16 @@ def collect_split(
         while len(labels) < sample_count and attempts < maximum_attempts:
             attempts += 1
             action = actions.randrange(environment.action_space.n)
-            frame, _, terminated, truncated, _ = environment.step(action)
+            if agent is not None:
+                mask = [index == action for index in range(environment.action_space.n)]
+                if agent.act(action_mask=mask) != action:
+                    raise RuntimeError("forced action was not honored")
+            frame, reward, terminated, truncated, _ = environment.step(action)
+            if agent is not None:
+                # Recurrence consumes every arrival, including unlabeled frames.
+                # No learner update or privileged object label enters the agent.
+                agent.observe(frame, extrinsic_reward=float(reward),
+                              terminated=bool(terminated), truncated=bool(truncated))
             label = pong_labels(environment)
             if label is not None and not (terminated or truncated):
                 projected, pooled = encoder.encode(frame)
@@ -132,6 +147,8 @@ def collect_split(
                     "projected14": np.asarray(projected, dtype=np.float32),
                     "pooled7": np.asarray(pooled, dtype=np.float32),
                 }
+                if agent is not None:
+                    current["rssm"] = np.asarray(agent.latent_feature, dtype=np.float32)
                 if not motion or previous is not None:
                     for name, values in current.items():
                         features[name].append(values)
@@ -154,6 +171,8 @@ def collect_split(
                 previous = None
             if terminated or truncated:
                 frame, _ = environment.reset()
+                if agent is not None:
+                    agent.begin_episode(frame)
     finally:
         environment.close()
 
@@ -296,6 +315,8 @@ def main() -> None:
     parser.add_argument("--samples-per-seed", type=int, default=512)
     parser.add_argument("--seeds", type=int, nargs=4, default=(0, 1, 2, 3))
     parser.add_argument("--dino-plan-cache")
+    parser.add_argument("--agent-checkpoint", type=Path,
+                        help="also probe a frozen RSSM's policy input; use its original backend")
     parser.add_argument("--output")
     parser.add_argument("--motion", action="store_true",
                         help="probe last-action displacement, adding causal two-frame pooled history")
@@ -314,23 +335,34 @@ def main() -> None:
         args.dino_checkpoint,
         dino_plan_cache=args.dino_plan_cache,
     )
+    agent_metadata = None
+    if args.agent_checkpoint:
+        agent_metadata = json.loads((args.agent_checkpoint / "metadata.json").read_text())
     print(
         f"DINO feature shapes: projected={encoder.projected_shape}, "
         f"pooled={encoder.pooled_shape}",
         flush=True,
     )
 
-    splits = [
-        collect_split(
+    splits = []
+    for seed in args.seeds:
+        # Each independent environment starts from the same checkpoint/RNG.
+        # Do not manufacture a terminal flag to reset a live agent between seeds.
+        agent = (_native.Agent.restore(str(args.agent_checkpoint), args.dino_checkpoint)
+                 if args.agent_checkpoint else None)
+        starting_learner_step = agent.learner_step if agent is not None else None
+        splits.append(collect_split(
             encoder,
             args.environment,
             seed,
             args.samples_per_seed,
             args.motion,
             args.atari_protocol,
-        )
-        for seed in args.seeds
-    ]
+            agent,
+        ))
+        if agent is not None and agent.learner_step != starting_learner_step:
+            raise RuntimeError("a frozen representation probe must not learn")
+        del agent
     label_splits = [labels for _, labels in splits]
     results = {}
     targets = tuple(f"delta_{name}" for name in TARGETS) if args.motion else TARGETS
@@ -357,6 +389,9 @@ def main() -> None:
         "projected_shape": encoder.projected_shape,
         "pooled_shape": encoder.pooled_shape,
         "gpu_device": encoder.gpu_device,
+        "agent_checkpoint": str(args.agent_checkpoint) if args.agent_checkpoint else None,
+        "agent_checkpoint_metadata": agent_metadata,
+        "agent_learner_updates": 0 if args.agent_checkpoint else None,
         "results": results,
     }
     encoded = json.dumps(summary, indent=2)
