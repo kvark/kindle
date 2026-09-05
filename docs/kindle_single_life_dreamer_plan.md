@@ -58,7 +58,7 @@ its chronological experiment diary as a second plan.
 | Completed experiment | Result | What it establishes |
 | --- | --- | --- |
 | Native sparse-food GridWorld, DINO reconstruction scale 0.25 | Online learning and 2,500 rewards in 10,000 frozen greedy actions | Complete loop works on a simple visual task; diagnostic rates differ from Atari |
-| Seed-split Pong perception probes | Coordinate R² 0.9867 pooled versus 0.9890 unpooled; pooled reward-event AUC 0.9929 | Static task cues survive compression; temporal sufficiency remains unproven |
+| Seed-split Pong perception probes | Coordinate R² 0.9867 pooled versus 0.9890 unpooled; pooled reward-event AUC 0.9929 | Static task cues survive compression; this is not a temporal test |
 | Local pinned upstream D3, size1m, Pong seed 0 | −20.462 in the declared final window | A local control already exists; JAX 0.6.2, ALE 0.9.0, bfloat16, learned RGB perception |
 | Local pinned upstream D3, size12m, Pong seed 0 | −10.667 across six final-window episodes; 28.6 minutes | Current executable capacity control; one seed and runtime/perception differences limit the claim |
 | Kindle 1M, full BPTT, Pong seed 0 | −17.8 in the same nominal window | Useful small-preset comparison; perception, runtime and reset accounting differ |
@@ -163,20 +163,26 @@ changes launch overhead. Compare the same workload before/after optimization and
 verify parameter-update equivalence.
 
 Uncached host reads dominated the initial profile. Batched cached parameter and
-output reads reduce the 12M canary from 7.42 to about 1.26 s/update (**5.87×**),
+output reads, followed by removal of three forced graph materializations, reduce
+the 12M canary from 7.42 to about 1.05 s/update (**7.06×**),
 preserving all 241 parameter/optimizer/slow-value tensors by name and eight
 world/behavior reports exactly. These are medians after two warmup updates, not
-end-to-end game throughput.
+end-to-end game throughput. A 10k-action native confirmation also preserves all
+2,230 update reports and 241 tensors, then retains 2,500 frozen food rewards.
 
-A world B4×T64 gradient pass now contains 76,016 dispatches and takes 154 ms GPU
-versus 221 ms wall, without optimizer/accumulation. An isolated instrumentation
-capacity increase provides the complete trace without changing production pins
-or saved tensors. About 79% of dispatches are pointwise/layout operations;
-11,264 forced copies write 7.82 GB per microbatch. First test removal of redundant
-materializations, then grouped RSSM/layout fusion and batching non-recurrent heads
-across B×T. Preserve full recurrence, gradient range and measured learning.
-Full instrumentation costs 2.39× wall time, so lower-perturbation windowed
-profiling remains useful. Launch gaps and arithmetic need different fixes.
+Complete dispatch capture in an isolated instrumentation build identified 11,264
+forced copies writing 7.82 GB per microbatch. Removing them lowers a world B4×T64
+gradient pass from 76,016 to 64,752 dispatches and from 154/221 ms GPU/wall to
+119/175 ms, without optimizer/accumulation. Device allocation falls from 13.63 to
+6.11 GB. Production dependency pins stay unchanged. Full instrumentation costs
+2.39× wall time, so lower-perturbation windowed profiling remains useful.
+
+A full 16-row batch now fits at 6.30 GB and measures 0.54 s/update, but changes
+floating-point reductions and is not byte-exact after eight updates. Validate its
+learning behavior before replacing the measured microbatch-4 Atari control. Next
+optimize grouped RSSM/layout operations and batch non-recurrent heads across B×T.
+Preserve full recurrence, gradient range and measured learning; launch gaps and
+arithmetic need different fixes.
 
 ### 2. Test prediction on controlled sequences
 
@@ -186,10 +192,10 @@ observations; a zero reconstruction weight removes that decoder's parameters.
 Checkpoint round trips and predictive microbatch equivalence pass for the
 matched spatial head. After identical 10k random-trajectory native training,
 reconstruction gives 2,500 frozen food rewards; prediction-only and auxiliary
-give 2,499 each. The auxiliary reduces held-out feature MSE by about 4.7% with
-29% more parameters, and strongly beats unrelated actions. Prediction-only's
-error is slightly higher than the control's. The earlier global-MLP pilot was
-confounded by head structure and is retained only in the experiment report.
+give 2,499 each. The auxiliary reduces terminal-inclusive held-out feature MSE
+by about 5% with 29% more parameters, and strongly beats unrelated actions.
+Prediction-only's error is slightly higher than the control's. The earlier
+global-MLP pilot was confounded by head structure and is retained only in the report.
 Reconstruction remains the default. Next test agent-controlled data and harder
 action-sensitive sequences: this near-saturated task is not an Atari or general
 representation result.
@@ -207,6 +213,12 @@ missing posterior information. Removing a decoder is not itself the objective.
 Keep Pong as the dense Atari reference. Use Private Eye under the same pinned
 wrapper for the first sparse Atari probe, with random and extrinsic-only controls.
 Record reward-event counts; a short rare-reward curve cannot establish generality.
+
+The first 20k-action seed-0 check is complete: random scores 700, extrinsic-only
+−2,900 and mixed novelty 1,251. Both learners make 4,729 full-BPTT updates. The
+mixed result comes from one 4,069-reward episode, followed by 8,000 actions with
+no reward events. Replicate this discovery before treating it as sustained sparse
+competence or extending the run budget; no Atari-100k score is claimed.
 
 The native `--persistent` world handles exhaustion and respawn through ordinary
 dynamics, retains food progress and requires no harness time-limit resets.
@@ -237,7 +249,8 @@ extrinsic-only, 1,116/32 for mixed reward and 150/60 for intrinsic-only over 10k
 actions (one seed each). Intrinsic-only is roughly random overall and its game
 reward stalls late, despite more evenly distributed visual visitation;
 the small mixed/control difference is inconclusive. Retain this bounded bonus
-as an off-by-default negative control, not a demonstrated exploration solution.
+off by default. Its single-episode Private Eye discovery is worth replication,
+but neither experiment demonstrates a reliable general exploration solution.
 
 This baseline combines historical intrinsic and extrinsic scalars when making
 replay targets, so the world reward head learns a decaying visitation signal too.
@@ -255,8 +268,10 @@ extrinsic controls; disagreement is not automatically calibrated uncertainty.
 For action rate `f`, batch `B×T`, ratio `R`, and update duration `U`, learner
 demand is `f × R / (B×T)` updates/s. Acting, perception and learning must fit
 available device time with headroom. At 10 actions/s, B16×T64 and R256 require
-2.5 updates/s, roughly 3.2 times the optimized 12M canary throughput, before
-perception and acting costs. The original read path was roughly 20 times short.
+2.5 updates/s, roughly 2.6 times the optimized microbatch-4 12M canary throughput,
+before perception and acting costs. The admitted full-batch candidate reduces
+that gap to about 1.35× but still requires learning validation and runtime headroom.
+The original read path was roughly 20 times short.
 
 Report p50/p95/p99 action latency, missed deadlines, effective ratio and training
 credit. Bound backlog explicitly; dropping credit is an experimental policy to

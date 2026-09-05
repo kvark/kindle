@@ -32,6 +32,8 @@ guidance are allowed while establishing reliable learning.
   control for every intrinsic-reward experiment.
   Record human guidance and the action actually executed; distinguish assisted
   behavior from unguided evaluation and game rewards from human feedback.
+  Visual novelty is not task competence. Evaluate intrinsic exploration through
+  held-out dynamics and later guided adaptation, with explicit reward provenance.
 - Gate video encoders and pretraining on evidence: a usable pinned checkpoint,
   causal streaming semantics, native numerical parity, latency, and improved
   held-out control-relevant probes. A paper alone is not an implementation plan.
@@ -40,6 +42,8 @@ guidance are allowed while establishing reliable learning.
 - Respect the single stream of external consequences. Natural deaths and
   respawns are allowed; cloning or rewinding the game for training is not.
   Mark accelerated laboratory tests separately from real-time lifetime runs.
+  Gate actor/learner separation on frozen-policy state/action parity; preserve
+  arrival order, mark observation gaps and bound training debt before concurrency.
 - Delete superseded code and redundant documentation when they have no current
   purpose. Git retains history. Prefer small concrete modules over speculative
   frameworks, broad configuration surfaces, or premature swarm infrastructure.

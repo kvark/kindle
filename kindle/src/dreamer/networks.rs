@@ -16,9 +16,7 @@ pub(crate) fn concat_columns(
     right_dim: usize,
 ) -> NodeId {
     let left = graph.reshape(left, &[batch * left_dim]);
-    let left = graph.materialize(left);
     let right = graph.reshape(right, &[batch * right_dim]);
-    let right = graph.materialize(right);
     let joined = graph.concat(
         left,
         right,
@@ -43,7 +41,6 @@ pub(crate) fn slice_columns(
         return graph.reshape(input, &[batch, length]);
     }
     let input = graph.reshape(input, &[batch * total]);
-    let input = graph.materialize(input);
     let suffix = if start == 0 {
         input
     } else {

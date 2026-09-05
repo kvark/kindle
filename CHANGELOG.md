@@ -7,7 +7,8 @@
 - Recovered the missing 12M branch's backend pins, full-BPTT row microbatching,
   large-actor gradient checks and strict multi-seed score/training summaries.
 - Added learner stage timing, inference traces and whole-gradient GPU spans.
-  Batched CPU-cached readback reduces a 12M synthetic update from 7.42 to 1.26 s;
+  Batched CPU-cached readback and removal of forced graph copies reduce a 12M
+  synthetic update from 7.42 to 1.05 s and device allocation from 13.63 to 6.11 GB;
   all 241 checkpoint tensors and eight learning reports remain identical.
 - Added a causal deterministic-state feature predictor, optional alongside or
   instead of posterior reconstruction, with matched spatial heads/initialization,
