@@ -283,7 +283,7 @@ pub struct DreamerCore {
     world_transition_live: Session,
     world_heads: Session,
     world_heads_live: Session,
-    world_decoder_live: Option<Session>,
+    world_prediction_live: Option<Session>,
     behavior_train: Session,
     behavior_online: Session,
     behavior_slow: Session,
@@ -454,7 +454,7 @@ impl DreamerCore {
             world_transition_live,
             world_heads,
             world_heads_live,
-            world_decoder_live: None,
+            world_prediction_live: None,
             behavior_train,
             behavior_online,
             behavior_slow,
@@ -556,9 +556,9 @@ impl DreamerCore {
     /// otherwise posterior reconstruction. Reset observations have no forecast
     /// target and should be excluded from diagnostic error summaries.
     pub fn observation_prediction(&mut self) -> Vec<f32> {
-        self.ensure_world_decoder_live();
+        self.ensure_world_prediction_live();
         let decoder = self
-            .world_decoder_live
+            .world_prediction_live
             .as_mut()
             .expect("diagnostic decoder initialized");
         decoder.set_input("deter", &self.deter);
@@ -662,7 +662,7 @@ impl DreamerCore {
             }),
         };
         if decode_observations {
-            self.ensure_world_decoder_live();
+            self.ensure_world_prediction_live();
         }
         if decode_behavior {
             self.ensure_behavior_value_live();
@@ -720,7 +720,7 @@ impl DreamerCore {
             }
             if decode_observations {
                 let decoder = self
-                    .world_decoder_live
+                    .world_prediction_live
                     .as_mut()
                     .expect("diagnostic decoder initialized");
                 decoder.set_input("deter", &deter);
@@ -735,14 +735,14 @@ impl DreamerCore {
         rollout
     }
 
-    fn ensure_world_decoder_live(&mut self) {
-        if self.world_decoder_live.is_some() {
+    fn ensure_world_prediction_live(&mut self) {
+        if self.world_prediction_live.is_some() {
             return;
         }
-        let graph = world::build_decoder_graph(&self.config, 1);
+        let graph = world::build_observation_prediction_graph(&self.config, 1);
         let mut decoder = build_session(&graph, &self.gpu, Mode::Inference, false);
         sync_matching(&self.world_train, &mut decoder, "world.");
-        self.world_decoder_live = Some(decoder);
+        self.world_prediction_live = Some(decoder);
     }
 
     fn ensure_behavior_value_live(&mut self) {
@@ -940,6 +940,9 @@ impl DreamerCore {
     /// ratio, clocked by Kindle's executed-action environment steps.
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         let mut reports = Vec::new();
+        if self.config.train_ratio == 0.0 {
+            return reports;
+        }
         let replay_ready =
             self.replay.valid_sequence_count(&self.config) >= self.config.replay_warmup_sequences();
         while reports.len() < maximum_updates && self.train_scheduler.update_due(replay_ready) {
@@ -1323,7 +1326,7 @@ impl DreamerCore {
         ] {
             sync_matching(&self.world_train, target, "world.");
         }
-        if let Some(decoder) = &mut self.world_decoder_live {
+        if let Some(decoder) = &mut self.world_prediction_live {
             sync_matching(&self.world_train, decoder, "world.");
         }
     }
@@ -2526,6 +2529,7 @@ mod tests {
         config.dynamics_free_nats = Some(0.0);
         config.actor_learning_starts = 1;
         config.visitation_bonus = true;
+        config.train_ratio = 0.0;
         config.skip_full_optimize = true;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
@@ -2596,6 +2600,10 @@ mod tests {
             assert!((reward.intrinsic - 1.0 / ((step + 2) as f32).sqrt()).abs() < 1e-7);
         }
 
+        assert!(
+            agent.learn_scheduled(3).is_empty(),
+            "zero ratio disables even the initial scheduled update"
+        );
         let mut initial_actor_parameter = vec![0.0; 3];
         agent
             .behavior_train

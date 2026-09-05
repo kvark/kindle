@@ -155,6 +155,8 @@ pub struct DreamerConfig {
     #[serde(default)]
     pub world_microbatch_size: Option<usize>,
     pub replay_context: usize,
+    /// Replay samples per action. Zero disables scheduled updates; explicit
+    /// `DreamerCore::learn` remains available for isolated diagnostics.
     pub train_ratio: f32,
     pub imagination_length: usize,
     pub horizon: usize,
@@ -364,8 +366,8 @@ impl DreamerConfig {
         if self.replay_capacity < self.replay_warmup_frames() {
             return Err("replay_capacity cannot satisfy the D3 learner warmup gate".into());
         }
-        if !self.train_ratio.is_finite() || self.train_ratio <= 0.0 {
-            return Err("train_ratio must be finite and positive".into());
+        if !self.train_ratio.is_finite() || self.train_ratio < 0.0 {
+            return Err("train_ratio must be finite and non-negative".into());
         }
         if self.imagination_length == 0 || self.horizon <= 1 {
             return Err("imagination_length must be positive and horizon must exceed one".into());

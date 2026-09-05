@@ -33,6 +33,20 @@ def git(source: Path, *args: str) -> str:
     return subprocess.check_output(["git", "-C", str(source), *args], text=True)
 
 
+def configured_source(original: str) -> str:
+    # Elements only permits overrides of declared keys. Expose the existing
+    # wrapper defaults before overriding them in the published profile.
+    lines = original.splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if line.startswith("    atari100k:"):
+            lines[index] = line.replace("clip_reward: False}",
+                "clip_reward: False, length: 108000, use_seed: False}")
+            if lines[index] == line:
+                raise ValueError("unrecognized pinned Atari default declaration")
+            return "".join(lines) + PUBLISHED_CONFIG
+    raise ValueError("missing pinned Atari defaults")
+
+
 def validate_source(source: Path) -> str:
     if git(source, "rev-parse", "HEAD").strip() != REVISION:
         raise ValueError(f"upstream must be at {REVISION}")
@@ -41,8 +55,8 @@ def validate_source(source: Path) -> str:
         raise ValueError("only the declared published-wrapper config may differ from upstream")
     original = git(source, "show", f"{REVISION}:dreamerv3/configs.yaml")
     actual = (source / "dreamerv3/configs.yaml").read_text()
-    if actual != original + PUBLISHED_CONFIG:
-        raise ValueError("append PUBLISHED_CONFIG from this runner to the pinned configs.yaml")
+    if actual != configured_source(original):
+        raise ValueError("configs.yaml must match configured_source and PUBLISHED_CONFIG from this runner")
     return git(source, "diff", "HEAD", "--", "dreamerv3/configs.yaml")
 
 

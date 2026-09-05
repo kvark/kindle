@@ -126,7 +126,8 @@ Keep this flag and action vocabulary matched across training and evaluation.
 
 `--visitation-bonus --intrinsic-reward-scale 0.1` enables an optional bounded
 visual-novelty experiment. A fixed 16-bit random-hyperplane hash counts visits;
-bonus is `1/sqrt(previous_count + 1)`. Counts survive episode resets and
+features are centered on a checkpointed, fixed first-observation reference.
+The bonus is `1/sqrt(previous_count + 1)`. Counts survive episode resets and
 checkpoints, and saturate instead of wrapping. Collisions reduce novelty.
 This is not epistemic uncertainty. Intrinsic and extrinsic channels are logged
 separately; neither intrinsic generation nor its learning scale is enabled by

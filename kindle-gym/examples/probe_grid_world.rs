@@ -402,6 +402,11 @@ fn collect_latent_samples(
     checkpoint: &Path,
 ) -> Result<SampleCollection, Box<dyn std::error::Error>> {
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
+    if agent.core().config().extrinsic_reward_scale != 1.0
+        || agent.core().config().intrinsic_reward_scale != 0.0
+    {
+        return Err("this probe's reward labels require unscaled extrinsic-only training".into());
+    }
     let gpu_device = agent.core().gpu_device();
     let observation_decoder_depth = agent.core().config().observation_decoder_depth();
     let observation_prediction_source = if agent.core().config().loss_scales.future_prediction > 0.0

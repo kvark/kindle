@@ -435,7 +435,7 @@ pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
 /// Evaluate the future head when enabled, otherwise posterior reconstruction.
 /// Forecasts read only the deterministic state, including in auxiliary runs.
 /// This graph is constructed lazily by diagnostics.
-pub fn build_decoder_graph(config: &DreamerConfig, batch: usize) -> Graph {
+pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
@@ -515,7 +515,7 @@ mod tests {
             vec![5, config.value_bins]
         );
         assert_eq!(heads.node(heads.outputs()[1]).ty.shape, vec![5, 1]);
-        let decoder = build_decoder_graph(&config, 5);
+        let decoder = build_observation_prediction_graph(&config, 5);
         assert_eq!(
             decoder.node(decoder.outputs()[0]).ty.shape,
             vec![

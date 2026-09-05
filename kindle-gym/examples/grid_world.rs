@@ -200,6 +200,11 @@ struct Arguments {
     #[arg(long, default_value_t = 0)]
     random_action_steps: usize,
 
+    /// Force one action for a visual-noise/coverage diagnostic. Requires the
+    /// fixed all-action vocabulary, so border moves have defined no-op meaning.
+    #[arg(long, requires = "all_actions")]
+    fixed_action: Option<usize>,
+
     /// Emit an aggregate interval event every N environment steps.
     #[arg(long, default_value_t = 1_000)]
     report_every: usize,
@@ -277,6 +282,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if arguments.report_every == 0 {
         return Err("--report-every must be positive".into());
     }
+    if arguments
+        .fixed_action
+        .is_some_and(|action| action >= ACTION_COUNT)
+    {
+        return Err("--fixed-action must be in 0..4".into());
+    }
+    if arguments.fixed_action.is_some() && arguments.random_action_steps != 0 {
+        return Err("--fixed-action cannot be combined with a random prefix".into());
+    }
     if arguments.randomize_position && !matches!(arguments.reward_mode, RewardMode::DenseRight) {
         return Err("--randomize-position requires --reward-mode dense-right".into());
     }
@@ -294,6 +308,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             || arguments.checkpoint.is_some()
             || arguments.has_training_config_override()
             || arguments.random_action_steps != 0
+            || arguments.fixed_action.is_some()
             || arguments.evaluate
         {
             return Err(
@@ -500,6 +515,7 @@ fn run_dreamer(
             "all_actions": arguments.all_actions,
             "persistent": arguments.persistent,
             "random_action_steps": arguments.random_action_steps,
+            "fixed_action": arguments.fixed_action,
             "trainable_parameters": {
                 "world": world_parameters,
                 "behavior": behavior_parameters,
@@ -530,7 +546,11 @@ fn run_dreamer(
         } else {
             environment.action_mask()
         };
-        let action = if run_step <= arguments.random_action_steps {
+        let action = if let Some(action) = arguments.fixed_action {
+            let mut forced_mask = [false; ACTION_COUNT];
+            forced_mask[action] = true;
+            agent.act(ActionMode::Sample, Some(&forced_mask))
+        } else if run_step <= arguments.random_action_steps {
             let action = random_valid_action(mask.as_deref(), &mut exploration_rng);
             let mut forced_mask = [false; ACTION_COUNT];
             forced_mask[action] = true;

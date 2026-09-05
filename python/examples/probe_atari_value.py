@@ -54,6 +54,8 @@ def main() -> None:
     action_count = int(environment.action_space.n)
     action_meanings = list(environment.unwrapped.get_action_meanings())
     agent = kindle.Agent.restore(args.checkpoint, args.dino_checkpoint)
+    if agent.config["intrinsic_reward_scale"] != 0 or agent.config["extrinsic_reward_scale"] != 1:
+        raise ValueError("this probe's return labels require unscaled extrinsic-only training")
     if int(agent.config["action_count"]) != action_count:
         raise ValueError("checkpoint and environment action counts differ")
     agent.begin_episode(frame)

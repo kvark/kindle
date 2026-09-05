@@ -7,23 +7,35 @@ use crate::vision::{DinoObservation, fixed_projection};
 
 const HASH_BITS: usize = 16;
 const HASH_SEED: u64 = 0x6b69_6e64_6c65_7631;
-const VERSION: u32 = 1;
+const VERSION: u32 = 2;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub(super) struct VisitationState {
     version: u32,
     counts: Box<[u32]>,
+    /// Fixed first observation removes common background without drifting the
+    /// coordinate system as counts accumulate.
+    reference: Option<Box<[f32]>>,
 }
 
 impl VisitationState {
     pub fn is_valid(&self) -> bool {
-        self.version == VERSION && self.counts.len() == 1 << HASH_BITS
+        self.version == VERSION
+            && self.counts.len() == 1 << HASH_BITS
+            && match &self.reference {
+                Some(values) => {
+                    values.len() == DinoObservation::LEN
+                        && values.iter().all(|value| value.is_finite())
+                }
+                None => self.counts.iter().all(|count| *count == 0),
+            }
     }
 }
 
 pub(super) struct VisitationBonus {
     projection: Vec<f32>,
     counts: Box<[u32]>,
+    reference: Option<Box<[f32]>>,
 }
 
 impl VisitationBonus {
@@ -31,6 +43,7 @@ impl VisitationBonus {
         Self {
             projection: fixed_projection(DinoObservation::LEN, HASH_BITS, HASH_SEED),
             counts: vec![0; 1 << HASH_BITS].into_boxed_slice(),
+            reference: None,
         }
     }
 
@@ -38,25 +51,31 @@ impl VisitationBonus {
         VisitationState {
             version: VERSION,
             counts: self.counts.clone(),
+            reference: self.reference.clone(),
         }
     }
 
     pub fn restore(&mut self, state: VisitationState) {
         assert!(state.is_valid(), "incompatible visitation state");
         self.counts = state.counts;
+        self.reference = state.reference;
     }
 
     /// Score this arrival using the previous count, then count the visit.
     /// Counts saturate; memory and the bonus remain bounded for a long life.
     pub fn observe(&mut self, observation: &DinoObservation) -> f32 {
         let mut projected = [0.0; HASH_BITS];
-        for (&value, weights) in observation
+        let reference = self
+            .reference
+            .get_or_insert_with(|| observation.as_slice().into());
+        for ((&value, &reference), weights) in observation
             .as_slice()
             .iter()
+            .zip(reference.iter())
             .zip(self.projection.as_chunks::<HASH_BITS>().0)
         {
             for (sum, &weight) in projected.iter_mut().zip(weights) {
-                *sum += value * weight;
+                *sum += (value - reference) * weight;
             }
         }
         let bucket = projected.iter().enumerate().fold(0, |bits, (bit, &value)| {
@@ -108,6 +127,17 @@ mod tests {
         assert!(!state.is_valid());
         state.version = VERSION;
         state.counts = Box::new([]);
+        assert!(!state.is_valid());
+    }
+
+    #[test]
+    fn checkpoint_requires_a_finite_fixed_reference_after_visiting() {
+        let mut state = VisitationBonus::new().state();
+        state.counts[0] = 1;
+        assert!(!state.is_valid());
+        state.reference = Some(vec![0.0; DinoObservation::LEN].into_boxed_slice());
+        assert!(state.is_valid());
+        state.reference.as_mut().unwrap()[0] = f32::NAN;
         assert!(!state.is_valid());
     }
 }

@@ -8,11 +8,11 @@ import run_upstream_control as control  # noqa: E402
 
 
 def test_upstream_accepts_only_the_declared_config_patch(tmp_path, monkeypatch) -> None:
-    original = "defaults: {}\n"
+    original = "defaults:\n  env:\n    atari100k: {clip_reward: False}\n"
     directory = tmp_path / "dreamerv3"
     directory.mkdir()
     config = directory / "configs.yaml"
-    config.write_text(original + control.PUBLISHED_CONFIG)
+    config.write_text(control.configured_source(original))
 
     def git(source, *args):
         return {
@@ -24,7 +24,7 @@ def test_upstream_accepts_only_the_declared_config_patch(tmp_path, monkeypatch) 
 
     monkeypatch.setattr(control, "git", git)
     assert control.validate_source(tmp_path) == "declared diff"
-    config.write_text(original + control.PUBLISHED_CONFIG.replace("noops: 0", "noops: 30"))
+    config.write_text(control.configured_source(original).replace("noops: 0", "noops: 30"))
     with pytest.raises(ValueError, match="PUBLISHED_CONFIG"):
         control.validate_source(tmp_path)
 

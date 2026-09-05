@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 
 import pytest
+import gymnasium as gym
+import numpy as np
 
 from kindle._atari_scores import ATARI_PROFILES
 
@@ -42,3 +44,36 @@ def test_training_overrides_are_not_silently_ignored(monkeypatch, capsys, mode, 
         atari.main()
     assert error.value.code == 2
     assert "training overrides require a fresh Dreamer run" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("terminal_at, frame_limit, expected_frames", [(2, 100, 2), (100, 5, 5)])
+def test_exact_frame_counts_survive_resets(terminal_at, frame_limit, expected_frames) -> None:
+    class Environment(gym.Env):
+        observation_space = gym.spaces.Box(0, 255, (8, 8, 3), dtype=np.uint8)
+        action_space = gym.spaces.Discrete(2)
+
+        def get_action_meanings(self):
+            return ["NOOP", "FIRE"]
+
+        def reset(self, *, seed=None, options=None):
+            super().reset(seed=seed)
+            self.steps = 0
+            return np.zeros((8, 8, 3), dtype=np.uint8), {}
+
+        def step(self, action):
+            self.steps += 1
+            return (np.zeros((8, 8, 3), dtype=np.uint8), 0.0,
+                    self.steps >= terminal_at, False, {})
+
+    environment = atari.DreamerAtariPreprocessing(
+        Environment(), noop_max=0, max_episode_frames=frame_limit)
+    environment.reset(seed=0)
+    ended = False
+    while not ended:
+        _, _, terminal, truncated, _ = environment.step(1)
+        ended = terminal or truncated
+    assert environment.executed_action_frames == expected_frames
+    assert environment.reset_noop_frames == 0
+    environment.reset()
+    assert environment.executed_action_frames == expected_frames
+    assert environment.emulator_resets == 2

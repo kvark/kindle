@@ -29,12 +29,12 @@ lifetime are different experiments; neither clock substitutes for the other.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, feature decoder | Current decoder sees the current posterior |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | New objective retains native control but has not improved prediction or control |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
 | Checkpoints | Model, optimizer, counters, return normalizer, provenance | Replay/live state absent; resume is a new data segment |
-| Native tests | `kindle-gym`: visual GridWorld and representation/dynamics probes | Small integration task with artificial episode limits |
+| Native tests | `kindle-gym`: episodic/persistent visual GridWorld and representation/dynamics probes | Small deterministic integration task, not general lifetime evidence |
 | Game experiments | `python/examples/atari.py` and strict score/training summaries | Atari only; no video archive or real-time deadline scheduler |
 
 Python handles adapters and analysis; inference and learning remain Rust.
@@ -162,10 +162,11 @@ causality, action sensitivity, reset masking and gradients through earlier
 observations; a zero reconstruction weight removes that decoder's parameters.
 Checkpoint round trips and predictive microbatch equivalence pass. Matched
 reconstruction and prediction-only 1M runs both retain 2,500 food rewards in
-10,000 frozen native actions after identical random-trajectory training. Complete
-the auxiliary and held-out dynamics comparisons, then agent-controlled data.
-The reconstruction control remains the default; this small task is not an Atari
-or general representation result.
+10,000 frozen native actions after identical random-trajectory training; the
+auxiliary gives 2,496 with 29% more parameters. All beat feature persistence on
+held-out open-loop probes, but reconstruction has the lowest error. Keep it as
+the default. Next use agent-controlled data and harder action-sensitive sequences;
+this small task is not an Atari or general representation result.
 
 Advance if action-sensitive held-out prediction and native control are retained.
 If the auxiliary works and prediction-only fails, keep the auxiliary and diagnose
@@ -186,8 +187,10 @@ environment state must not enter observations or intrinsic reward.
 ### 4. Add one bounded intrinsic-reward experiment
 
 The optional `--visitation-bonus` uses a fixed 16-bit random-hyperplane hash of
-frozen visual features and 65,536 saturating counters. Versioned counts survive
-episodes and checkpoints. Score each arrival before updating its count and
+frozen visual features and 65,536 saturating counters. Subtract a fixed,
+checkpointed first-observation reference: an uncentered native smoke collapsed
+2,001 observations into five buckets; centering occupied 637 on the same stream.
+Versioned counts survive episodes and checkpoints. Score each arrival before updating its count and
 preserve the intrinsic scalar in replay. Both runners report intrinsic and
 extrinsic returns separately. Validate its perceptual discrimination empirically.
 
@@ -202,7 +205,8 @@ world-model prediction error is not the default reward.
 For action rate `f`, batch `B×T`, ratio `R`, and update duration `U`, learner
 demand is `f × R / (B×T)` updates/s. Acting, perception and learning must fit
 available device time with headroom. At 10 actions/s, B16×T64 and R256 require
-2.5 updates/s, roughly 20 times the recovered 12M throughput.
+2.5 updates/s, roughly 3.6 times the optimized 12M canary throughput, before
+perception and acting costs. The original read path was roughly 20 times short.
 
 Report p50/p95/p99 action latency, missed deadlines, effective ratio and training
 credit. Bound backlog explicitly; dropping credit is an experimental policy to
@@ -217,8 +221,10 @@ a native real-time game to accommodate Atari's compute budget.
 ## Perception and pretraining ladder
 
 DINO remains the first control: native inference is validated and static Pong
-probes are strong. First test a cheap motion-sensitive alternative, such as causal
-differences between frozen features, measuring downstream learning and latency.
+probes are strong. A four-seed motion probe improves mean displacement R² from
+0.247 to 0.676 by appending causal feature differences, but horizontal ball motion
+remains weak (0.173). Test this cheap temporal input in downstream learning and
+measure latency before assuming it solves control or replacing the encoder.
 
 [LeVJEPA](https://arxiv.org/abs/2608.27395v1) is a later frontend candidate. Its
 [released checkpoint](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)

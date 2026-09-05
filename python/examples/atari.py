@@ -93,18 +93,26 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         )
         self._frames: list[np.ndarray] = []
         self._episode_frames = 0
+        # Exact emulator step() calls, separate from the conventional action×4
+        # score coordinates. Early terminals need not execute all four repeats.
+        self.executed_action_frames = 0
+        self.reset_noop_frames = 0
+        self.emulator_resets = 0
         self._noop_max = noop_max
         self._max_episode_frames = max_episode_frames
 
     def reset(self, *, seed=None, options=None):
         observation, info = self.env.reset(seed=seed, options=options)
+        self.emulator_resets += 1
         info = dict(info)
         noops = int(self.env.unwrapped.np_random.integers(self._noop_max + 1))
         for _ in range(noops):
             observation, _, terminated, truncated, step_info = self.env.step(0)
+            self.reset_noop_frames += 1
             info.update(step_info)
             if terminated or truncated:
                 observation, reset_info = self.env.reset(options=options)
+                self.emulator_resets += 1
                 info.update(reset_info)
         frame = np.asarray(observation, dtype=np.uint8)
         self._frames = [frame.copy(), frame.copy()]
@@ -123,6 +131,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
             )
             total_reward += float(reward)
             self._episode_frames += 1
+            self.executed_action_frames += 1
 
             # D3 captures before checking game-over, so a terminal frame in
             # either of the last two repeats remains visible to the agent.
@@ -392,6 +401,7 @@ def main() -> None:
     agent_construction_seconds = (
         time.perf_counter() - construction_started if agent is not None else None
     )
+    agent_config = agent.config if agent is not None else None
     if agent is not None:
         agent.begin_episode(frame)
     random_actions = random.Random(args.seed ^ 0xA7A2_1000)
@@ -515,7 +525,7 @@ def main() -> None:
             "agent_construction_seconds": agent_construction_seconds,
             "gpu_device": agent.gpu_device if agent is not None else None,
             "trainable_parameters": trainable_parameters,
-            "config": agent.config if agent is not None else None,
+            "config": agent_config,
         }
     )
 
@@ -554,7 +564,8 @@ def main() -> None:
                 assert agent is not None
                 assert one_step_prior_reward is not None
                 reward_probe.record(
-                    reward,
+                    (agent_config["extrinsic_reward_scale"] * reward
+                     + agent_config["intrinsic_reward_scale"] * intrinsic_reward),
                     one_step_prior_reward,
                     agent.posterior_reward_prediction(),
                 )
@@ -623,6 +634,9 @@ def main() -> None:
                         "environment_step": absolute_environment_step(run_step),
                         "environment_frames": absolute_environment_frames(run_step),
                         "interval_steps": args.report_every,
+                        "executed_action_frames": environment.executed_action_frames,
+                        "reset_noop_frames": environment.reset_noop_frames,
+                        "emulator_resets": environment.emulator_resets,
                         "reward": interval_reward,
                         "intrinsic_reward": interval_intrinsic_reward,
                         "positive_reward_events": interval_positive_reward_events,
@@ -668,6 +682,7 @@ def main() -> None:
             emit(
                 {
                     "event": "reward_probe",
+                    "target": "scaled_extrinsic_plus_intrinsic",
                     "run_step": args.steps,
                     "environment_step": absolute_environment_step(args.steps),
                     "environment_frames": absolute_environment_frames(args.steps),
@@ -684,6 +699,9 @@ def main() -> None:
                 "environment_step": absolute_environment_step(args.steps),
                 "environment_frames": ending_environment_frames,
                 "environment_frame_delta": args.steps * ATARI_ACTION_REPEAT,
+                "executed_action_frames": environment.executed_action_frames,
+                "reset_noop_frames": environment.reset_noop_frames,
+                "emulator_resets": environment.emulator_resets,
                 "seed": args.seed,
                 "mode": run_mode,
                 "total_reward": total_reward,
