@@ -174,6 +174,13 @@ limit prevents a full per-dispatch trace. Next add windowed profiling and test
 batching/fusion of non-recurrent encoder/head work across B×T. Preserve full
 recurrence, gradient range and measured learning when changing graph layout.
 
+An isolated instrumentation-only capacity increase now provides the complete
+trace without changing production pins or saved tensors. About 79% of 76,016
+dispatches are pointwise/layout operations; 11,264 forced copies write 7.82 GB
+per microbatch. First test removal of redundant materializations, then grouped
+RSSM/layout fusion and batched non-recurrent heads. Full instrumentation costs
+2.39× wall time, so lower-perturbation windowed profiling remains useful.
+
 ### 2. Test prediction on controlled sequences
 
 The optional deterministic future-feature head is implemented. GPU tests verify
@@ -189,6 +196,10 @@ confounded by head structure and is retained only in the experiment report.
 Reconstruction remains the default. Next test agent-controlled data and harder
 action-sensitive sequences: this near-saturated task is not an Atari or general
 representation result.
+
+Native single-variable AGC-off and BPTT-8 tests also retain 2,500 rewards on that
+same trajectory. The task does not separate their control quality. Keep the
+clipped full-BPTT Atari control; these toy ablations do not justify changing it.
 
 Advance if action-sensitive held-out prediction and native control are retained.
 If the auxiliary works and prediction-only fails, keep the auxiliary and diagnose
@@ -226,7 +237,8 @@ world-model prediction error is not the default reward.
 
 The first continuing native comparison gives food/deaths of 1,100/37 for
 extrinsic-only, 1,116/32 for mixed reward and 150/60 for intrinsic-only over 10k
-actions (one seed each). Intrinsic-only is roughly random overall and stalls late;
+actions (one seed each). Intrinsic-only is roughly random overall and its game
+reward stalls late, despite more evenly distributed visual visitation;
 the small mixed/control difference is inconclusive. Retain this bounded bonus
 as an off-by-default negative control, not a demonstrated exploration solution.
 
@@ -245,6 +257,13 @@ versioned parameter snapshots. Threads around the current mutable core are
 insufficient. Preserve arrival order and explicitly mark any observation gaps;
 bounded queues must not turn missing transitions into fictitious adjacent frames.
 
+Start that separation with an inference-only frozen actor. Current evaluation
+restores build all training graphs: native full-BPTT construction takes about
+90–100 seconds versus five for BPTT 8, even when no update will run. Match the
+new actor's logits, recurrent states and sampled actions against the frozen
+monolithic core before adding versioned learner snapshots or concurrent queues.
+Do not shorten training's credit horizon merely to make evaluation cheap.
+
 Choose the full-run rate and ratio from measurements. If smaller models or
 lower ratios are required, measure their learning curves. Do not silently slow
 a native real-time game to accommodate Atari's compute budget.
@@ -254,9 +273,12 @@ a native real-time game to accommodate Atari's compute budget.
 DINO remains the first control: native inference is validated and static Pong
 probes are strong. A four-seed motion probe improves mean displacement R² from
 0.247 to 0.676 by appending causal feature differences, but horizontal ball motion
-remains weak (0.173). The RSSM already has history: probe motion in its trained
-belief before adding redundant input channels. Test any temporal-input change
-in downstream learning and measure latency before replacing the encoder.
+remains weak (0.173). The trained seed-0 Pong RSSM reaches mean motion R² 0.768
+and horizontal-ball R² 0.608 on the same held-out seeds, without extra input
+channels or learner updates. Keep the current frontend: there is no demonstrated
+temporal-capacity hole in this trained belief. Early sample efficiency and other
+games remain open questions; measure downstream learning and latency before a
+temporal-input or encoder replacement.
 
 [LeVJEPA](https://arxiv.org/abs/2608.27395v1) is a later frontend candidate. Its
 [released checkpoint](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)

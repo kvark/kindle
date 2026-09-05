@@ -432,11 +432,6 @@ fn collect_latent_samples(
 
     while samples.len() < arguments.samples {
         dino_patch_statistics.add_observation(agent.dino_observation());
-        score_pending_observations(
-            &mut pending_observations,
-            &mut samples,
-            agent.dino_observation(),
-        );
         push_latent_sample(
             &mut samples,
             &mut agent,
@@ -505,9 +500,14 @@ fn collect_latent_samples(
         assert_eq!(usize::from(rewarded), sample.next_rewarded.unwrap());
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
+        score_observation_arrival(
+            &mut pending_observations,
+            &mut samples,
+            agent.dino_observation(),
+            ended,
+        );
         is_first = ended;
         if ended {
-            pending_observations.clear();
             agent.begin_episode(&environment.reset());
             rewarded = false;
         }
@@ -634,10 +634,11 @@ fn push_latent_sample(
     });
 }
 
-fn score_pending_observations(
+fn score_observation_arrival(
     pending: &mut Vec<PendingObservationRollout>,
     samples: &mut [Sample],
     actual: &[f32],
+    is_last: bool,
 ) {
     for rollout in pending.iter_mut() {
         let predicted = &rollout.predictions[rollout.next_horizon];
@@ -653,7 +654,13 @@ fn score_pending_observations(
             });
         rollout.next_horizon += 1;
     }
-    pending.retain(|rollout| rollout.next_horizon < rollout.predictions.len());
+    // The terminal arrival is predictable from the preceding action. Only
+    // forecasts crossing into the following reset must be discarded.
+    if is_last {
+        pending.clear();
+    } else {
+        pending.retain(|rollout| rollout.next_horizon < rollout.predictions.len());
+    }
 }
 
 fn mean_squared_error(prediction: &[f32], target: &[f32]) -> f32 {
@@ -1210,6 +1217,30 @@ mod tests {
         assert_eq!(metrics["model_beats_unrelated_action_rate"], 0.5);
         let posterior = observation_prediction_metrics(&samples).unwrap();
         assert_eq!(posterior["mean_squared_error"], 2.0);
+    }
+
+    #[test]
+    fn terminal_arrivals_are_scored_before_discarding_future_forecasts() {
+        for is_last in [false, true] {
+            let mut samples = [sample(0, 0.0)];
+            let mut pending = vec![PendingObservationRollout {
+                sample_index: 0,
+                next_horizon: 0,
+                predictions: vec![vec![1.0], vec![2.0]],
+                unrelated_predictions: vec![vec![3.0], vec![4.0]],
+                persistence: vec![0.0],
+            }];
+            score_observation_arrival(&mut pending, &mut samples, &[1.0], is_last);
+            assert_eq!(samples[0].prior_observation_rollout.len(), 1);
+            let error = samples[0].prior_observation_rollout[0];
+            assert_eq!(error.model_mse, 0.0);
+            assert_eq!(error.persistence_mse, 1.0);
+            assert_eq!(error.unrelated_action_mse, 4.0);
+            assert_eq!(pending.is_empty(), is_last);
+            if !is_last {
+                assert_eq!(pending[0].next_horizon, 1);
+            }
+        }
     }
 
     #[test]
