@@ -248,4 +248,5 @@ predictions average +0.4639/−0.8351/−0.0026 over their corresponding replay
 samples. Mean update time is 0.5388 s. The small run-local
 `inspect_checkpoint.py` checks rolling-save fingerprints, complete metric
 prefixes, update cadence and exact recent windows without running another GPU
-agent. The full-budget serial launcher remains active.
+agent. The full-budget serial launcher was still active at this checkpoint;
+it was later interrupted for vectorization as recorded above.

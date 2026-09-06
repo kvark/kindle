@@ -162,21 +162,101 @@ The lower busy fraction despite higher useful throughput is another reason not
 to optimize the utilization percentage alone. Keep B16 as the learning control
 until a predeclared quality comparison validates a larger batch.
 
+`runs/vector-20260906-b64/` tests B64/full row64 at N=2 and N=4, with 6,144
+aggregate actions planned per job. N=2 completes and passes the accounting
+audit (121 updates over the full run). Its final 1,024 actions / 64 updates
+take **129.50 s, 7.907 actions/s**, mean update 1.45014 s, GPU activity 54.95%,
+126.66 W and 12,999 MiB peak. This does not beat B32. Synchronization grows to
+roughly 0.12 s world / 0.09 s behavior per update; that observation is not yet a
+diagnosis of the cause.
+
+N=4/B64 is **rejected during construction**, before a run header or any training,
+by Meganeura's memory-budget guard: 14.91 GB already allocated, another 0.07 GB
+requested, and 10% of the 16.57 GB reported device budget reserved for the driver
+and pipelines. Do not disable that reserve or report this job as a timing result.
+The raw failure is retained in `n4.log`; the original matrix command exits
+nonzero and has no complete matrix summary. The profiler now retains explicit
+failed-job summaries before returning a nonzero exit status.
+
+B64 native SHA-256 (metadata-getter/API cleanup only since the B32 build):
+`86fe65da46c99698a20f471e925b712f0e0689ced6a462085ce0d0b902484c73`.
+Runner SHA-256 (rejects zero row-microbatch arguments):
+`54ed3e3d91fa098d2257370fdf170d7a2fd26eb407d53a15ee8b63a6a4e11ee6`.
+
+## Compensated tensor-core candidate: not adopted
+
+The production pin remains Meganeura `35a410c`; production LeVJEPA remains F32.
+An isolated backend candidate at `bc3a1e41303c046a1126c56cc9048d02eeade6b0`
+adds an explicit, opt-in `CompensatedF16` policy. It splits bounded inference
+operands into high and scaled-low components, uses three f16-input/f32-accumulator
+matrix products, and leaves the sensitive-gradient F32 guard and default `Auto`
+policy intact. This is not full-f32 exponent range and not permission to use
+raw f16 gradients.
+
+The first cast-roundtrip split produced **exactly the raw f16 result**, with
+no residual correction; scaling that residual did not help. Explicit f32
+mantissa masking makes the correction effective. Normal/transposed matrix
+products and fused tanh epilogues then pass: worst tested plain-matrix absolute
+error drops from 0.00155342 to 0.00000715. Both hardware tests and all 218 backend
+CPU tests pass, including the tiny-gradient guard. No system profiling/security
+settings were changed when `perf` access was denied.
+
+Kindle's isolated experiment is preserved at `70a7ce76bd2be8d27e3b671acdaec84ca735bce1`
+on `exp/levjepa-compensated`, not integrated into the production branch. It uses
+an explicitly different encoding identity and actual dependency pins. The full
+37-observation pinned Pong reference passes, including automatic chunk boundaries,
+explicit resets and projected/pooled features: worst dense absolute error
+0.00038910 and relative L2 0.00001054 (gates 0.005 and 0.0001).
+
+A matched two-stream diagnostic processes 64 synthetic 160×210 RGB frames per
+stream, with unequal resets, excluding the first chunk from timing. Both paths
+use the same unoptimized Rust test build and GPU; dense diagnostic readback is
+outside the timed encoding call. F32 averages **96.459 ms/vector call** and the
+candidate **95.689 ms**, with 97 genuinely compensated dispatches. Maximum dense
+disagreement is 0.00019646, relative L2 0.00000562. The <1% mean improvement does
+not demonstrate a material frontend win and is not a production throughput claim.
+Do not change the production encoding or rerun a long learning suite for this
+candidate; keep the smaller, measured F32 control. A different kernel would need
+a new latency/accuracy comparison.
+
+## Pixel checkpoint/restore canary
+
+`runs/vector-20260906-canary/` starts a fresh seed-99, N=2/B16 agent with the
+production F32 frontend. It completes 2,000 aggregate own-action transitions,
+213 scheduled updates and two natural games (both −21). Its 166.46 s execution
+time includes replay prefill, so **12.02 aggregate actions/s is not a steady
+learning speed claim**. The complete accounting and real-frame clocks pass.
+
+`checkpoints/levjepa-vector-canary-20260906` records format 3, the exact encoder
+hash, `collection_streams: 2`, action 2,000 and update 213. Restoring this shared
+model into N=1 frozen sampled evaluation completes 1,000 further actions with
+exactly zero updates; its one completed game scores −19, not mastery. The frozen
+run is bound to the final vector save by equal metadata/tensor fingerprints,
+and its full audit passes. It takes 48.43 s excluding construction (20.65
+actions/s, 1.376× the game clock), which establishes frozen play only. Replay,
+live belief, visual history and RNG continuation remain fresh on restore.
+
+These are integration checks, not a continuation or replacement endpoint for
+the interrupted single-stream LeVJEPA mastery experiment. No long learning
+queue was restarted by these canaries.
+
 ## Next measured changes
 
 Current CPU checks: 75 Kindle and five gym tests pass, with 15 hardware tests
-explicitly skipped by the ordinary command; 135 Python tests pass. Rust/Python
+explicitly skipped by the ordinary command; 136 Python tests pass. Rust/Python
 Clippy and formatting checks pass. The vector auditor also verifies reported
 aggregate/per-stream game clocks and rejects invalid throughput accounting.
 Later API-only cleanup exposes learner metadata directly instead of returning
 an unused single-stream diagnostic core; the measured binaries remain archived.
 
-1. Measure larger learner row batches if memory permits. Preserve total replay
-   ratio and full BPTT; declare changed optimizer cadence as an ablation.
-2. A bounded-operand compensated tensor-core frontend is an experimental
-   candidate, not enabled in the running matrix. It must pass the existing
-   strict causal/reference gates and demonstrate a latency win. Never re-enable
-   reduced-exponent-range kernels for sensitive learner gradients.
+1. Keep B16 as the learning control. B32 has a throughput benefit but needs a
+   predeclared learning-quality comparison at matched aggregate interactions,
+   with its changed optimizer cadence and warmup reported. B64 is not the next
+   default: it did not beat B32 at N=2 and failed the memory guard at N=4.
+2. Focus subsequent systems work on batched non-recurrent learner heads, grouped
+   RSSM/layout work and host/GPU transfers. The tested compensated frontend did
+   not demonstrate a material speedup. Never re-enable reduced-exponent-range
+   kernels for sensitive learner gradients.
 3. Only after throughput and accounting checks, predeclare fresh vectorized
    Pong training seeds, aggregate interaction budgets and final frozen gates.
    Preserve failed/interrupted runs and do not select winning checkpoints.

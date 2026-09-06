@@ -88,17 +88,21 @@ def main():
                 "--query-gpu=timestamp,uuid,utilization.gpu,memory.used,power.draw", "--format=csv", "-l", "1"],
                 stdout=gpu_output, env={**os.environ, "TZ": "UTC"})
             try:
-                subprocess.run(command, stdout=run_output, stderr=subprocess.STDOUT, check=True)
+                process = subprocess.run(command, stdout=run_output, stderr=subprocess.STDOUT, check=False)
             finally:
                 monitor.terminate()
                 monitor.wait(timeout=10)
-        result = summarize(log, trace)
+        result = (dict(status="failed", num_envs=count, batch_size=args.batch_size,
+                       exit_code=process.returncode, command=command, log=str(path.with_suffix(".log")))
+                  if process.returncode else dict(status="complete", **summarize(log, trace)))
         results.append(result)
         with path.with_suffix(".summary.json").open("x") as output:
             json.dump(result, output, indent=2, allow_nan=False)
         print(json.dumps({k: v for k, v in result.items() if k not in ("config", "stage_seconds")}), flush=True)
     with (args.directory / "summary.json").open("x") as output:
         json.dump(results, output, indent=2, allow_nan=False)
+    if any(result["status"] != "complete" for result in results):
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

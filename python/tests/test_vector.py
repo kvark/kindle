@@ -2,6 +2,7 @@ import copy
 import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import kindle
@@ -49,6 +50,21 @@ def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, cap
     assert error.value.code == 2
     assert message in capsys.readouterr().err
     assert not directory.exists()
+
+
+def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path):
+    directory = tmp_path / "matrix"
+    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), "--num-envs", "2"])
+    monitor = SimpleNamespace(terminate=lambda: None, wait=lambda **_: None)
+    monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", lambda *_, **__: monitor)
+    monkeypatch.setattr(profile_atari_vector.subprocess, "run", lambda *_, **__: SimpleNamespace(returncode=1))
+    with pytest.raises(SystemExit) as error:
+        profile_atari_vector.main()
+    assert error.value.code == 1
+    results = json.loads((directory / "summary.json").read_text())
+    assert results[0]["status"] == "failed"
+    assert results[0]["num_envs"] == 2 and results[0]["exit_code"] == 1
+    assert "actions_per_second" not in results[0]
 
 
 @pytest.mark.parametrize("bad", [None, float("nan"), float("inf"), "0.0", True])

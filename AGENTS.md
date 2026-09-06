@@ -1,9 +1,11 @@
 # Kindle working direction
 
-Kindle is a Rust agent that learns while acting in one continuing stream of
-experience. Games are the first testbed. Intrinsic motivation and experience
-sharing between independent Kindles are long-term goals; game rewards and human
-guidance are allowed while establishing reliable learning.
+Kindle is a Rust agent that learns while acting. Each environment contributes
+its own continuing stream of experience; vector collection shares one learner
+and policy without joining causal histories. Games are the first testbed.
+Intrinsic motivation and experience sharing between independent Kindles are
+long-term goals; game rewards and human guidance are allowed while establishing
+reliable learning.
 
 - Favor minimalism, expressiveness, safety, and speed. Keep the native learning
   and inference path on Meganeura and Blade. Python is for adapters, controls,
@@ -46,6 +48,9 @@ guidance are allowed while establishing reliable learning.
   days of compute. Check existing branches and local run artifacts before
   repeating old experiments. Preserve corrected full-precision gradients and
   full-recurrence row microbatching when integrating backend work.
+  Judge useful throughput at the declared replay ratio, not GPU busy percentage
+  alone. Retain the GPU memory safety margin; a larger batch needs both a timing
+  win and a learning-quality comparison before becoming the new control.
 - Test dense Atari, sparse Atari, and a small native persistent environment.
   Keep external reward and intrinsic reward separate. Retain an extrinsic-only
   control for every intrinsic-reward experiment.
