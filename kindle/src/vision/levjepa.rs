@@ -20,7 +20,7 @@ pub const MODEL_ID: &str = "galilai-group/LeVJEPA-VideoMix-Large";
 pub const CHECKPOINT_REV: &str = "e831a0347737fcaa660b39c57d41c109de399845";
 pub const CHECKPOINT_SHA256: &str =
     "da8bd836ce6532e1b0074ee5a6a46c65b67103f96323529ec4195be1538edc7d";
-pub const ENCODING_REV: &str = "levjepa-large-f32-chunk16-letterbox224-jl64-pool2-v1";
+pub const ENCODING_REV: &str = "levjepa-large-compensated-f16-chunk16-letterbox224-jl64-pool2-v1";
 pub const FRAMES: usize = 16;
 pub const IMAGE_SIZE: usize = 224;
 pub const PATCH_SIZE: usize = 16;
@@ -56,6 +56,22 @@ impl LeVJepaPerception {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Error> {
+        Self::load_batched_with_coop(
+            checkpoint,
+            streams,
+            gpu,
+            plan_cache,
+            meganeura::CoopPolicy::CompensatedF16,
+        )
+    }
+
+    fn load_batched_with_coop(
+        checkpoint: impl AsRef<Path>,
+        streams: usize,
+        gpu: Option<Arc<blade_graphics::Context>>,
+        plan_cache: Option<&Path>,
+        coop: meganeura::CoopPolicy,
+    ) -> Result<Self, Error> {
         if streams == 0 {
             return Err("LeVJEPA needs at least one stream".into());
         }
@@ -80,7 +96,7 @@ impl LeVJepaPerception {
                 gpu: Some(gpu),
                 cache: plan_cache,
                 runtime: meganeura::SessionOptions {
-                    coop: meganeura::CoopPolicy::Disabled,
+                    coop,
                     ..Default::default()
                 },
                 ..SessionConfig::default()
@@ -630,6 +646,107 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires GPU and pinned LeVJEPA weights; bounded precision/latency experiment"]
+    fn compensated_frontend_matches_f32_and_times_complete_chunks() {
+        let checkpoint =
+            std::env::var_os("KINDLE_LEVJEPA_WEIGHTS").expect("set KINDLE_LEVJEPA_WEIGHTS");
+        assert_eq!(
+            super::super::checkpoint_sha256(Path::new(&checkpoint)).unwrap(),
+            CHECKPOINT_SHA256
+        );
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let frames: Vec<_> = (0..64)
+            .map(|tick| {
+                (0..2)
+                    .map(|stream| {
+                        crate::RgbFrame::new(
+                            160,
+                            210,
+                            (0..160 * 210 * 3)
+                                .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                                .collect(),
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect();
+        let mut reference = Vec::new();
+        for policy in [
+            meganeura::CoopPolicy::Disabled,
+            meganeura::CoopPolicy::CompensatedF16,
+        ] {
+            let mut perception = LeVJepaPerception::load_batched_with_coop(
+                &checkpoint,
+                2,
+                Some(Arc::clone(&gpu)),
+                None,
+                policy,
+            )
+            .unwrap();
+            let compensated = perception
+                .session
+                .plan()
+                .dispatches
+                .iter()
+                .filter(|d| d.use_coop_compensated)
+                .count();
+            eprintln!("LeVJEPA policy={policy:?} compensated_dispatches={compensated}");
+            if policy == meganeura::CoopPolicy::CompensatedF16 {
+                assert!(
+                    compensated > 0,
+                    "experiment must actually use compensated kernels"
+                );
+            }
+            let mut durations = Vec::new();
+            let mut worst_absolute = 0.0_f32;
+            let mut worst_relative = 0.0_f64;
+            for (tick, frames) in frames.iter().enumerate() {
+                let arrivals: Vec<_> = frames
+                    .iter()
+                    .enumerate()
+                    .map(|(stream, frame)| (stream, frame, tick == 0 || (stream == 1 && tick == 7)))
+                    .collect();
+                let started = std::time::Instant::now();
+                let pooled = perception.encode_frames_rgb8(&arrivals);
+                if tick >= 16 {
+                    durations.push(started.elapsed().as_secs_f64());
+                }
+                let tokens = perception.patch_tokens();
+                if policy == meganeura::CoopPolicy::Disabled {
+                    reference.push((tokens, pooled));
+                    continue;
+                }
+                let (expected, expected_pooled) = &reference[tick];
+                let mut error = 0.0_f64;
+                let mut energy = 0.0_f64;
+                for (&actual, &expected) in tokens.iter().zip(expected) {
+                    assert!(actual.is_finite());
+                    worst_absolute = worst_absolute.max((actual - expected).abs());
+                    error += f64::from(actual - expected).powi(2);
+                    energy += f64::from(expected).powi(2);
+                }
+                worst_relative = worst_relative.max((error / energy).sqrt());
+                for (actual, expected) in pooled.iter().zip(expected_pooled) {
+                    assert!(
+                        actual
+                            .as_slice()
+                            .iter()
+                            .zip(expected.as_slice())
+                            .all(|(a, b)| (a - b).abs() < 0.005)
+                    );
+                }
+            }
+            durations.sort_by(f64::total_cmp);
+            let mean_seconds = durations.iter().sum::<f64>() / durations.len() as f64;
+            eprintln!(
+                "LeVJEPA policy={policy:?} streams=2 mean_seconds={mean_seconds:.6} median_seconds={:.6} max_abs={worst_absolute:.8} relative_l2={worst_relative:.8}",
+                durations[durations.len() / 2]
+            );
+            assert!(worst_absolute < 0.005 && worst_relative < 1e-4);
+        }
+    }
+
+    #[test]
     #[ignore = "requires GPU, pinned LeVJEPA weights and PyTorch parity fixture"]
     fn checkpoint_matches_causal_reference_and_resets() {
         let checkpoint =
@@ -708,7 +825,7 @@ mod tests {
             }
             let relative = (error_sq / reference_sq).sqrt();
             eprintln!(
-                "LeVJEPA F32 source={source} step={step} seconds={elapsed:.6} relative_l2={relative:.8} max_abs={worst:.8}"
+                "LeVJEPA {ENCODING_REV} source={source} step={step} seconds={elapsed:.6} relative_l2={relative:.8} max_abs={worst:.8}"
             );
             assert!(
                 relative < 1e-4 && worst < 0.005,

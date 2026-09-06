@@ -9,7 +9,7 @@ description = "A live-learning Dreamer agent with frozen causal visual perceptio
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "35a410ce1262c396e137db5bfab1d58e35cee50a" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "bc3a1e41303c046a1126c56cc9048d02eeade6b0" }
 # Pinned to the same Blade revision as Meganeura so their GPU context types
 # remain identical at the perception/learner boundary.
 blade-graphics = { git = "https://github.com/kvark/blade", rev = "b208f3b1f97196c2971436b5726e61e71b149c37" }
