@@ -122,6 +122,15 @@ information, but two-frame DINO remains competitive. The older trained-DINO
 RSSM probe is a contextual baseline with different provenance, not part of this
 matched comparison. Raw reports: `probe-{dino,levjepa}-motion.json`.
 
+The corresponding held-out position probes favor DINO: projected/pooled mean
+R² is 0.9915/0.9871 for DINO versus 0.9621/0.9612 for LeVJEPA. In the production
+pooled grid, ball-x R² is 0.9642 versus 0.9100 and player-y R² is 0.9898 versus
+0.9694. Thus the video frontend improves motion information at a cost in precise
+current-frame localization; it is not uniformly better. Both retain strong
+position information, which supports proceeding to the actual learning test.
+Raw reports: `probe-{dino,levjepa}-position.json`, with the same split roles and
+512 samples per seed as above. No probe labels enter agent training.
+
 A 2,000-action seed-99 training canary on backend `0ff33a4` completed 229 updates,
 with finite tensors and decreasing prediction/reward losses. Two completed
 games averaged −20: no competence is claimed. Construction took 90.79 s,
@@ -160,3 +169,25 @@ to their final saves, checks uninterrupted seeds, implementation/config identity
 finite tensors and reports, complete reward/action/update ledgers, and the
 ratio-256 warmup/cadence. Its zero-update control is a fresh seed-0 agent with
 the identical recipe except train ratio zero, acting for 20,000 steps.
+
+## Declared experiment launch
+
+Source commit `60bc30b` was committed and pushed before launch. Backend pin:
+`35a410ce1262c396e137db5bfab1d58e35cee50a`; Blade remains
+`b208f3b1f97196c2971436b5726e61e71b149c37`. The actual CPython-3.14 extension
+SHA-256 is `bd07b277bd379e6b5f24e8c111501903995aff9eaa0b85ee11ccf0c406216476`;
+the Atari runner is `ea05a28053b92bc7d462ecd56b358d0a63e4eeb73b71fcece710c2323a8474fe`.
+The launcher checks both identities before every job and refuses existing output
+or checkpoint targets. DINO reference parity also passes on this backend.
+
+The serial launcher is `runs/levjepa-pong-20260906/run-mastery.sh`; it started
+at 2026-09-06 17:27 UTC with the 20k zero-update control, followed by training
+and frozen evaluation for seeds 0, 1 and 2. Each 200k training run saves a rolling
+recovery checkpoint every 20k actions, but only its declared 200k final state is
+accepted. Recovery would start a different segment and fail the uninterrupted
+gate; no old checkpoint is selected for scoring. `gpu.csv` samples utilization,
+memory, power and clocks once per second. Report observed peak VRAM, not a
+guarantee that sampling catches every transient allocation.
+
+No full-budget learning result is available at launch. Passing preflight does
+not complete the Pong mastery goal.
