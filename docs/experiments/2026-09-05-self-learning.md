@@ -75,6 +75,20 @@ result for the causal architecture, not yet a multi-seed result.
 Artifacts: `runs/selflearn-20260905-grid-predictive-seed0{,-eval}.{jsonl,log}`
 and `checkpoints/selflearn-20260905-grid-predictive-seed0`.
 
+The same-build native reconstruction control does **not** retain its late
+training performance under the declared frozen greedy evaluation. Training
+collects 1,100 food / 37 deaths; the final two 1k-action windows each collect
+247 food with no deaths. Frozen evaluation collects only 2 food / 98 deaths,
+with no food after its first 1k actions. Both runs have zero harness resets;
+evaluation makes zero updates. The 2,229 training reports, saved tensors,
+configuration, encoder, counters, hashes and reward/action accounting validate.
+Training samples actions; evaluation is greedy and starts fresh recurrent state.
+Their separate effects need diagnosis, not an assumed checkpoint-corruption
+explanation or replacement of the failed endpoint. A sampled frozen diagnostic
+would be additional evidence, not a substitute for this predeclared test.
+Artifacts: `runs/selflearn-20260905-grid-control-seed0{,-eval}.{jsonl,log}`,
+`...-audit.json`, `...-final-tensors.json` and the matching checkpoint directory.
+
 The Pong zero-update baseline completes 50k sampled actions and 55 episodes at
 mean return −20.3455, with zero learner updates and 199,948 actual action frames.
 Its execution time is 302.24 s, excluding construction. This is an untrained

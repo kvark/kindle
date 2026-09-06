@@ -212,6 +212,13 @@ independent seeds before a broader claim. The
 [self-learning report](experiments/2026-09-05-self-learning.md)
 records the acceptance criteria, raw artifacts and pending comparisons.
 
+The matched native reconstruction control exposes a frozen-policy failure:
+1,100 training food and 247 in each final 1k window, but only 2 food / 98 deaths
+in 10k frozen greedy actions. Tensor/configuration/counter checks pass. Diagnose
+the action-mode and fresh-recurrent-state changes separately; do not replace the
+failed declared endpoint with a sampled result. Strong online training alone
+does not establish retained behavior.
+
 Native single-variable AGC-off and BPTT-8 tests also retain 2,500 rewards on that
 same trajectory. The task does not separate their control quality. Keep the
 clipped full-BPTT Atari control; these toy ablations do not justify changing it.
