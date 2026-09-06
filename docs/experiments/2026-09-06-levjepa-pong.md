@@ -191,3 +191,10 @@ guarantee that sampling catches every transient allocation.
 
 No full-budget learning result is available at launch. Passing preflight does
 not complete the Pong mastery goal.
+
+The zero-update control completed all 20,000 actions in 974.46 s: 79,980 actual
+emulator frames, 22 natural games, mean return −20.4545, no wins or timeouts,
+and exactly zero updates. It scored 12 positive points and conceded 464, with
+a −2 unfinished tail. The reward/action ledgers and all three fingerprinted,
+finite checkpoint files validate (`untrained-audit.json`). Frozen execution
+was 1.3679× real time. Seed 0 training began at 2026-09-06 17:45:39 UTC.
