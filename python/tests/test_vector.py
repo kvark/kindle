@@ -10,6 +10,7 @@ from kindle._vector_audit import audit, require_numbers
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 import atari_vector
+import audit_pong
 import profile_atari_vector
 
 
@@ -136,3 +137,85 @@ def test_vector_audit_rejects_broken_ledgers(tmp_path, mutation):
         events.pop()
     with pytest.raises(ValueError):
         audit(write_log(tmp_path, events))
+
+
+def mastery_events():
+    events = fixture_events()
+    events[0].update(model_provenance={"perception": {}}, trainable_parameter_counts={"world": 1})
+    events[-1].update(reset_noop_frames=[0, 0], emulator_resets=[2, 1])
+    return events
+
+
+def test_vector_mastery_reader_keeps_unfinished_tails_and_per_stream_clocks(tmp_path):
+    result = audit_pong.audit_vector_run(write_log(tmp_path, mastery_events()))
+    assert result["natural_games"] == result["natural_wins"] == 1
+    assert result["timeouts"] == 0
+    assert result["mean_return"] == 2
+    assert result["end"]["partial_returns"] == [1, 0]
+    assert result["simulated_to_wall"] == 0.2
+    assert result["per_stream_simulated_to_wall"] == [0.1, 0.1]
+
+
+def test_vector_mastery_timeout_is_not_a_win_or_dropped_from_score(tmp_path):
+    events = mastery_events()
+    transition = next(e for e in events if e["event"] == "transition" and e["run_step"] == 4)
+    transition["terminated"][0] = False
+    transition["truncated"][0] = True
+    next(e for e in events if e["event"] == "episode").update(terminated=False, truncated=True)
+    events[-1]["natural_wins"] = 0
+    result = audit_pong.audit_vector_run(write_log(tmp_path, events))
+    assert result["natural_games"] == result["natural_wins"] == result["win_fraction"] == 0
+    assert result["timeouts"] == 1 and result["mean_return"] == 2
+
+
+def test_vector_mastery_rejects_shaping_even_when_reward_ledgers_balance(tmp_path):
+    events = mastery_events()
+    events[1]["rewards"][0] = events[1]["stored_rewards"][0][0] = 2.0
+    next(e for e in events if e["event"] == "episode")["episode_return"] = 3.0
+    events[-1].update(total_rewards=[4.0, 0.0], mean_completed_return=3.0)
+    assert audit(write_log(tmp_path, events))["accounting_valid"]
+    with pytest.raises(ValueError, match="unshaped Pong"):
+        audit_pong.audit_vector_run(write_log(tmp_path, events))
+
+
+@pytest.mark.parametrize("mutation, message", [
+    (lambda rows: rows[-1].update(reason="interrupted"), "interrupted"),
+    (lambda rows: rows[-1].update(emulator_resets=[3, 1]), "clock/reset"),
+    (lambda rows: rows[1]["stored_rewards"][0].__setitem__(1, 0.5), "intrinsic reward"),
+])
+def test_vector_mastery_rejects_interruption_extra_resets_and_intrinsic_reward(tmp_path, mutation, message):
+    events = mastery_events()
+    mutation(events)
+    with pytest.raises(ValueError, match=message):
+        audit_pong.audit_vector_run(write_log(tmp_path, events))
+
+
+def vector_protocol_run():
+    perception = dict(kind="levjepa", checkpoint_sha256=audit_pong.ENCODER_SHA256,
+                      model_id="galilai-group/LeVJEPA-VideoMix-Large",
+                      checkpoint_revision="e831a0347737fcaa660b39c57d41c109de399845",
+                      encoding_revision="levjepa-large-f32-chunk16-letterbox224-jl64-pool2-v1")
+    return dict(path="fixture", start=dict(protocol="kindle-vector-v1", environment="ALE/Pong-v5",
+        ale_py_version="0.12.1", atari_protocol="published", action_repeat=4,
+        full_action_space=True, noop_max=0, max_episode_frames=100_000,
+        mode="train", steps=200_000, seed=0, num_envs=4, sticky_actions=0.0,
+        environment_seeds=[0, 1000003, 2000006, 3000009],
+        policy_seed_rule="config.seed + stream (wrapping u64)",
+        config={"seed": 0, "action_count": 18}, action_meanings=list(range(18)),
+        perception=perception, model_provenance={"perception": perception}))
+
+
+def test_vector_mastery_protocol_preserves_declared_aggregate_budget_and_frontend():
+    audit_pong.validate_protocol(vector_protocol_run(), "train", 200_000, 4)
+
+
+@pytest.mark.parametrize("field, value", [
+    ("steps", 50_000), ("num_envs", 2), ("mode", "evaluate_greedy"),
+    ("environment_seeds", [0, 0, 0, 0]), ("sticky_actions", 0.25),
+    ("policy_seed_rule", "shared"), ("noop_max", 30),
+])
+def test_vector_mastery_protocol_rejects_changed_collection(field, value):
+    run = vector_protocol_run()
+    run["start"][field] = value
+    with pytest.raises(ValueError):
+        audit_pong.validate_protocol(run, "train", 200_000, 4)

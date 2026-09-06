@@ -51,6 +51,10 @@ reliable learning.
   Judge useful throughput at the declared replay ratio, not GPU busy percentage
   alone. Retain the GPU memory safety margin; a larger batch needs both a timing
   win and a learning-quality comparison before becoming the new control.
+  Batch row-independent replay encoding and heads across time without batching
+  away recurrence or introducing future inputs. Check production-sized losses,
+  all parameter gradients and reset causality; composed losses need complete
+  scalar reductions, not backend workgroup partials.
 - Test dense Atari, sparse Atari, and a small native persistent environment.
   Keep external reward and intrinsic reward separate. Retain an extrinsic-only
   control for every intrinsic-reward experiment.

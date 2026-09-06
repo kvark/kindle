@@ -240,10 +240,63 @@ These are integration checks, not a continuation or replacement endpoint for
 the interrupted single-stream LeVJEPA mastery experiment. No long learning
 queue was restarted by these canaries.
 
+## Temporal replay encoding and heads
+
+The next candidate batches the trainable observation encoder and independent
+prediction/reconstruction, reward, continuation and frozen replay-value heads
+over replay time. The RSSM and posterior stay sequential, with unchanged hard
+posterior samples, reset masks and full BPTT. Balanced concatenation/split trees
+keep time-major rows separate and avoid quadratic copying. Per-row RMS norms
+do not introduce future information. Parameter names, shapes, initialization,
+optimizer cadence and loss coefficients are unchanged; no checkpoint/head or
+frontend identity is reinterpreted.
+
+`runs/head-batching-20260906/` preserves the old full-size executable, an initial
+rejected candidate, the corrected executable and all logs/checkpoints. The
+synthetic 12M B16/T64/R256 prediction-only control runs eight updates. The first
+candidate exposes a backend BCE limitation: above 256 rows its nominal scalar
+contains workgroup partials. Continuation loss incorrectly reads 0.1641 instead
+of 0.6328. It is **rejected**, not a speed/learning result. Explicit weighted
+scalar-sized BCE reductions now cover every row. CPU-reference GPU tests at
+513 and 1,024 rows verify both the composed loss and all logits gradients.
+
+Corrected synthetic means over updates 3–8: world training **0.20331 → 0.15685 s**
+(22.9% less), total measured learner **0.48735 → 0.42870 s** (12.0% less).
+Allocated core device memory is **6.265 → 6.416 GB**. Changes in unchanged
+posterior/imagination stages also contribute to the total timing difference;
+the following real-game matrix is the stronger end-to-end measurement.
+
+This is not bitwise-identical math. The largest loss differences across eight
+updates are 0.00284 total, 0.0099 prediction, 0.000384 raw KL, and 0.00003024
+continuation. All checkpoint tensors are finite with equal names/shapes. World
+parameter max absolute difference is 7.69e-7 (relative L2 1.11e-7); behavior is
+6.41e-7 (1.16e-7). Normalized LaProp momentum is more sensitive: world/behavior
+aggregate relative L2 differences are 0.002135/0.003003. Preserve both results;
+later categorical trajectories can diverge.
+
+Direct no-optimizer gradient comparisons cover asymmetric resets, non-power-of-
+two T=3, T=4, prediction-only and reconstruction, free-nats floors and frozen
+replay-value input-gradient settings. Worst per-parameter relative L2 is 1.44e-6.
+The production B16/T64/12M comparison also passes: worst 0.00074572, within its
+pre-run 0.003 per-parameter tolerance plus 1e-7 absolute L2 (loss tolerance
+0.0003 × max(1, |reference|)). Larger forward shapes may select different
+kernels; sensitive derivative operands remain F32. Run the large check with
+`KINDLE_FULL_WORLD_PARITY=1` and the ignored
+`temporal_batching_matches_serial_losses_and_gradients` test.
+Existing causal-gradient/reset, reconstruction/predictive row-microbatch, and
+N=1 vector-learning/checkpoint GPU regressions pass as well.
+
+Corrected native SHA-256:
+`f663dd9317bd934f173b240041ea68b7e21e0f7d037ebaf22b9549a9ae91bb4e`.
+The runner and wrapper remain unchanged. `runs/vector-20260906-temporal/`
+measures N=2/4/8 at the fixed B16 recipe, including complete GPU traces and
+accounting. A [new vectorized Pong protocol](2026-09-06-vector-pong.md) preserves
+the three-seed mastery gate; it is not completion of the interrupted serial run.
+
 ## Next measured changes
 
-Current CPU checks: 75 Kindle and five gym tests pass, with 15 hardware tests
-explicitly skipped by the ordinary command; 136 Python tests pass. Rust/Python
+Current CPU checks: 75 Kindle and five gym tests pass, with 17 hardware tests
+explicitly skipped by the ordinary command; 150 Python tests pass. Rust/Python
 Clippy and formatting checks pass. The vector auditor also verifies reported
 aggregate/per-stream game clocks and rejects invalid throughput accounting.
 Later API-only cleanup exposes learner metadata directly instead of returning
@@ -253,8 +306,8 @@ an unused single-stream diagnostic core; the measured binaries remain archived.
    predeclared learning-quality comparison at matched aggregate interactions,
    with its changed optimizer cadence and warmup reported. B64 is not the next
    default: it did not beat B32 at N=2 and failed the memory guard at N=4.
-2. Focus subsequent systems work on batched non-recurrent learner heads, grouped
-   RSSM/layout work and host/GPU transfers. The tested compensated frontend did
+2. Finish the temporal-head real-game throughput check; later systems work can
+   target grouped RSSM/layout work and host/GPU transfers. The compensated frontend did
    not demonstrate a material speedup. Never re-enable reduced-exponent-range
    kernels for sensitive learner gradients.
 3. Only after throughput and accounting checks, predeclare fresh vectorized

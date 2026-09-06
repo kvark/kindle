@@ -34,9 +34,11 @@ fn main() {
     let mut updates = 1usize;
     let mut profile_directory = None;
     let mut checkpoint = None;
+    let mut prediction_only = false;
     while let Some(option) = args.next() {
         match option.as_str() {
             "--learn" => run_learner = true,
+            "--prediction-only" => prediction_only = true,
             "--repeat" => repetitions = parse_usize("repetition count", args.next()),
             "--updates" => updates = parse_usize("learner update count", args.next()),
             "--profile-dir" => {
@@ -44,7 +46,7 @@ fn main() {
             }
             "--checkpoint" => checkpoint = Some(args.next().expect("missing checkpoint path")),
             other => panic!(
-                "unknown option {other:?}; use --learn, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
+                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
             ),
         }
     }
@@ -56,6 +58,11 @@ fn main() {
     config.world_backprop_length = world_backprop_length;
     config.world_microbatch_size = Some(world_microbatch_size);
     config.replay_capacity = 2_048;
+    if prediction_only {
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config.train_ratio = 256.0;
+    }
     config.validate();
     assert!(repetitions > 0 && updates > 0);
     assert!(

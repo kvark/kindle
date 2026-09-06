@@ -104,3 +104,8 @@ def test_checkpoint_evaluation_is_bound_to_exact_files(tmp_path):
     evaluation["start"]["restored_checkpoint"]["tensor_sha256"]["world"] = "wrong"
     with pytest.raises(ValueError, match="different checkpoint files"):
         audit_pong.audit_checkpoint(tmp_path, train, evaluation)
+    train["start"]["num_envs"] = 4
+    metadata["collection_streams"] = 2
+    metadata_path.write_text(json.dumps(metadata))
+    with pytest.raises(ValueError, match="collection stream count"):
+        audit_pong.audit_checkpoint(tmp_path, train, evaluation)

@@ -203,6 +203,13 @@ validated. These are throughput measurements, not mastery claims. See the
 [vectorization record](experiments/2026-09-06-vectorization.md) for the controls,
 numerical checks, GPU traces and subsequent optimizations.
 
+Temporal replay encoding and non-recurrent heads now pass production-sized
+loss/gradient checks while preserving full RSSM recurrence. The synthetic
+learner is about 12% faster; the real-game N=2/4/8 matrix is the acceptance
+measurement, not that synthetic number. Fresh vectorized Pong training follows
+its [declared protocol](experiments/2026-09-06-vector-pong.md), retaining three
+independent seeds and final frozen mastery gates. LeVJEPA mastery is still open.
+
 Measure acceleration as simulated game seconds / wall seconds. Report cold
 construction separately and also include end-to-end run cost. Track actual
 emulator frames, policy decisions, replay samples, imagined transitions and
