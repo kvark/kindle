@@ -122,8 +122,11 @@ The matched reconstruction seed-0 run has started. Its configuration differs
 only in the two objective weights, with the corresponding head identity and
 131,072 additional posterior-input parameters (10,412,305 total). The executable,
 encoder, backend, wrapper, full BPTT, row batch, schedule and behavior settings
-match. Its completed result and independent native/Pong training seeds remain
-required. Current evidence establishes first native and Atari learning for the
+match. It wins its first naturally terminated game, +6, at action 74,366
+(episode 49, length 3,626, no truncation). Prediction's first win was +13 at
+44,075. These first-win times are diagnostics, not substitute endpoints or
+multi-seed evidence. The control's completed result and independent native/Pong
+training seeds remain required. Current evidence establishes first native and Atari learning for the
 causal architecture, not superiority to reconstruction or multi-seed reliability.
 
 Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
