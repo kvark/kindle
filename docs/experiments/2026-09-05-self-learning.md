@@ -52,28 +52,33 @@ silently relabeling reconstruction as the new architecture.
 
 ## Status
 
-Native prediction-only seed 0 passes the declared per-seed gate:
+Native prediction-only passes all declared gates on independent seeds 0, 1 and 2.
+Each starts fresh, executes 10k agent-selected training actions and 2,229 updates,
+then evaluates the final checkpoint for 10k frozen greedy actions with zero
+updates. There are no harness resets, forced actions or intrinsic bonuses.
 
-| Measure | Result |
-| --- | ---: |
-| Agent-selected training actions | 10,000 |
-| Learner updates | 2,229 |
-| Training food / deaths / game return | 1,137 / 38 / 1,099 |
-| Final two 1k-action windows, food / deaths | 246 / 0; 245 / 0 |
-| Frozen 10k-action food / deaths | 2,495 / 0 |
-| Frozen learner updates | 0 |
+| Seed | Training food / deaths | Final two 1k windows, food | Frozen food / deaths |
+| --- | ---: | ---: | ---: |
+| 0 | 1,137 / 38 | 246 / 245 | 2,495 / 0 |
+| 1 | 1,237 / 36 | 247 / 250 | 2,498 / 0 |
+| 2 | 1,278 / 28 | 243 / 247 | 2,373 / 5 |
 
-The learning curve changes from 3 food / 9 deaths in actions 4,001–5,000 to
+All final training windows have zero deaths. Seed 2's five frozen deaths occur
+in its first 1k actions, which collect 123 food; each subsequent window collects
+250 food without deaths. This recovery is included, not discarded as warmup.
+Seed 0's learning curve changes from 3 food / 9 deaths in actions 4,001–5,000 to
 113 / 3, then 242 / 0, 245 / 0, 246 / 0 and 245 / 0 in successive windows.
-All 2,229 world/behavior/timing reports are finite. Its header verifies
-reconstruction 0, future prediction 0.25, zero forced actions, zero starting
-updates and 828,707 parameters. The saved world contains future-predictor tensors
-and no decoder tensors; its encoder and three tensor-file hashes validate.
-Training takes 645.55 s excluding construction; frozen execution takes 54.01 s.
-Neither run has a harness reset. This is the first positive agent-collected native
-result for the causal architecture, not yet a multi-seed result.
-Artifacts: `runs/selflearn-20260905-grid-predictive-seed0{,-eval}.{jsonl,log}`
-and `checkpoints/selflearn-20260905-grid-predictive-seed0`.
+All world/behavior/timing reports and saved F32 tensors are finite. Headers verify
+reconstruction 0, future prediction 0.25, zero starting updates and 828,707
+parameters. Configuration differs only by seed; train/frozen model, encoder,
+GPU, parameter counts and action meanings match. Every saved world contains
+future-predictor tensors and no decoder tensors; all tensor-file hashes, counters,
+ordered learner schedules and reward/action ledgers validate.
+Training execution takes 645.55/648.34/649.10 s; frozen execution takes
+54.01/53.74/53.74 s, excluding construction. This confirms agent-collected causal
+learning across three seeds on a small persistent task, not broad generalization.
+Artifacts use `runs/selflearn-20260905-grid-predictive-seed{0,1,2}` prefixes with
+`{,-eval}.{jsonl,log}`, audit/tensor reports and matching checkpoint directories.
 
 The same-build native reconstruction control does **not** retain its late
 training performance under the declared frozen greedy evaluation. Training
@@ -156,8 +161,8 @@ Reconstruction's first win is +6 at action 74,366 (episode 49, length 3,626,
 no truncation), versus prediction's +13 at 44,075. These first-win times are
 diagnostics, not substitute endpoints or multi-seed evidence. The endpoint
 results support viable causal learning with no observed seed-0 Pong regression,
-not superiority or multi-seed reliability. Independent native/Pong training
-seeds remain required.
+not superiority or multi-seed Pong reliability. Native confirmations are complete;
+the independent Pong training seed remains required.
 
 Control artifacts: `runs/selflearn-20260905-pong-control-seed0{,-eval}.{jsonl,log}`,
 `...-score.json`, `...-eval-summary.json`, `...-audit.json` and
