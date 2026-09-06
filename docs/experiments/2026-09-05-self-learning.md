@@ -52,6 +52,11 @@ silently relabeling reconstruction as the new architecture.
 
 ## Status
 
+Completed 2026-09-06: all five candidates pass their predeclared gates (three
+native seeds, two Pong seeds). Both matched controls are complete and inspected;
+the native control's frozen failure is retained. This achieves the initial
+reward-guided self-learning gate, with substantial Pong seed sensitivity.
+
 Native prediction-only passes all declared gates on independent seeds 0, 1 and 2.
 Each starts fresh, executes 10k agent-selected training actions and 2,229 updates,
 then evaluates the final checkpoint for 10k frozen greedy actions with zero
@@ -161,8 +166,9 @@ Reconstruction's first win is +6 at action 74,366 (episode 49, length 3,626,
 no truncation), versus prediction's +13 at 44,075. These first-win times are
 diagnostics, not substitute endpoints or multi-seed evidence. The endpoint
 results support viable causal learning with no observed seed-0 Pong regression,
-not superiority or multi-seed Pong reliability. Native confirmations are complete;
-the independent Pong training seed remains required.
+not superiority. The independent causal confirmation below passes, but its much
+weaker result prevents a claim of reliable Pong dominance. There is only one
+matched reconstruction seed; this comparison does not isolate that variability.
 
 Control artifacts: `runs/selflearn-20260905-pong-control-seed0{,-eval}.{jsonl,log}`,
 `...-score.json`, `...-eval-summary.json`, `...-audit.json` and
@@ -227,7 +233,57 @@ visually inspected. This is qualitative evidence, not a replacement evaluation.
 Artifacts: `runs/selflearn-20260905-pong-predictive-seed0.mp4{,.json}` and
 `...-seed0-video.{jsonl,log}`, with `...-seed0-video-audit.json`.
 
-Independent causal Pong seed 1 starts after recording, with fresh world/behavior
-weights and zero counters. Its configuration differs only by seed; the executable,
-encoder, backend, ALE, wrapper, GPU, parameter counts and action meanings match.
-It runs the unchanged 100k training / 50k frozen protocol. Its result is pending.
+## Independent Pong confirmation and decision
+
+Causal Pong seed 1 starts after recording with fresh world/behavior weights and
+zero counters. Its configuration differs only by seed; the executable, encoder,
+backend, ALE, wrapper, GPU, parameter counts and action meanings match. It
+completes the unchanged 100k training / 50k frozen protocol and passes all gates:
+
+| Measure | Result |
+| --- | ---: |
+| Agent-selected training actions / learner updates | 100,000 / 24,729 |
+| Final 350k–400k nominal-frame training-window mean / games | −0.2500 / 4 |
+| Whole-training complete-game mean / games | −15.5410 / 61 |
+| Frozen sampled actions / learner updates | 50,000 / 0 |
+| Frozen complete-game mean / natural wins | −1.0714 / 3 of 14 |
+| Actual training / frozen action frames | 399,942 / 199,983 |
+| Training / frozen execution time, excluding construction | 13,728.88 s / 305.54 s |
+
+Its first natural win is +5 at action 91,684 (episode 59, length 3,033), followed
+by +1 at 95,144 and a −6 loss at 98,075. The final-window returns are −1/5/1/−6;
+the late regression is included. All 14 frozen games terminate naturally without
+truncation, with returns −1/4/−3/−4/−1/−1/−1/4/3/−7/−1/−3/−3/−1. The final
+unfinished training game (+1 after 1,925 actions) and frozen game (+2 after 1,730)
+are excluded from complete-game means, not from interaction or reward totals.
+
+All 24,729 learner reports and all 241 saved F32 tensors are finite. The final
+checkpoint's configuration, encoder, causal head, three tensor-file hashes and
+counters validate; its world has no reconstruction decoder. Frozen evaluation
+verifies identical configuration and runtime identities, starts at 100k/24,729,
+and makes zero updates. Independent reward, episode, action and frame ledgers
+reconcile. Construction takes 90.60/90.22 s; training averages 7.28 actions/s.
+CPU analysis tests run briefly during evaluation, so its wall time is descriptive,
+not an isolated performance comparison.
+
+Artifacts: `runs/selflearn-20260905-pong-predictive-seed1{,-eval}.{jsonl,log}`,
+`...-score.json`, `...-eval-summary.json`, `...-audit.json`, `...-ledger-audit.json`,
+`...-final-tensors.json` and the immutable final copy
+`checkpoints/selflearn-20260905-pong-predictive-seed1-step100000`.
+Earlier fixed-window summaries and diagnostic checkpoint copies remain separate;
+none selected the evaluation endpoint.
+
+The final review reruns strict audits on all five candidates and both controls:
+`runs/selflearn-20260906-final-acceptance.json`. The 92 project Python tests and
+23 experiment-audit/tensor tests pass together. All experiment queues finish.
+No acceptance threshold, runtime setting or training budget changed after seeing
+seed 1's slower learning.
+
+Decision: proceed with causal prediction as the next experimental recipe, retaining
+reconstruction as the measured control. This is initial reward-guided learning,
+not intrinsic-only learning, superiority, broad game competence or real-time
+lifelong operation. Seed 1 still loses most frozen Pong games. Prioritize a cheap
+inference-only actor with exact frozen state/action parity; diagnose native
+reconstruction's sampled/greedy and fresh-state effects separately. Then test
+retention, sparse-task adaptation and bounded training debt before longer runs or
+experience sharing. The project plan remains the single roadmap.

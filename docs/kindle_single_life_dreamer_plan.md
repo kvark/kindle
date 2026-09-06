@@ -12,11 +12,17 @@ Progress toward intrinsic motivation, retention across tasks, and independent
 Kindles sharing useful experience. Keep the implementation small, native Rust,
 and efficient on Meganeura and Blade.
 
-The next architecture is Dreamer's recurrent belief and imagined actor/critic
+The working candidate is Dreamer's recurrent belief and imagined actor/critic
 with an action-conditioned prediction objective over frozen perceptual features.
 Keep the measured DINO feature-reconstruction agent as the control. Establish
 whether predicting unseen observations improves dynamics and control before
 changing the visual encoder or building pretraining infrastructure.
+
+Initial reward-guided self-learning is now confirmed on three native seeds and
+two Pong seeds, using their declared final checkpoints. Pong seed variation is
+large; this is not reliable dominance or superiority to reconstruction. The next
+engineering step is a lightweight frozen actor with state/action parity, before
+concurrent learning or a long real-time exposure.
 
 A 100-hour game exposure is a later engineering gate. First prove that acting
 and learning can coexist at the declared control rate and that a shorter run
@@ -36,7 +42,7 @@ framework in advance.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Causal learning survives frozen native evaluation across three seeds; matched Pong control completes, Pong replication pending |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Initial own-action learning confirmed on native/Pong; large Pong seed variation |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
@@ -178,9 +184,10 @@ gradient pass from 76,016 to 64,752 dispatches and from 154/221 ms GPU/wall to
 2.39× wall time, so lower-perturbation windowed profiling remains useful.
 
 A full 16-row batch now fits at 6.30 GB and measures 0.54 s/update, but changes
-floating-point reductions and is not byte-exact after eight updates. Validate its
-learning behavior before replacing the measured microbatch-4 Atari control. Next
-optimize grouped RSSM/layout operations and batch non-recurrent heads across B×T.
+floating-point reductions and is not byte-exact after eight updates. The matched
+native/Pong runs below now validate initial learning with this batch size, not
+equivalence to the historical microbatch-4 control. Keep that provenance separate.
+Next optimize grouped RSSM/layout operations and batch non-recurrent heads across B×T.
 Preserve full recurrence, gradient range and measured learning; launch gaps and
 arithmetic need different fixes.
 
@@ -200,18 +207,26 @@ Reconstruction remains the default. Subsequent prediction-only, agent-controlled
 persistent seeds 0/1/2 collect 1,137/1,237/1,278 food in 10k actions and retain
 2,495/2,498/2,373 food with 0/0/5 deaths in 10k frozen greedy actions. Every seed
 passes the declared training and frozen gates, without forced coverage or an
-intrinsic bonus. Causal Pong seed 0 completes 100k agent-selected actions and 24,729
-updates: final-window mean +18.1429 over seven games. The final checkpoint wins
-all 28 completed games in 50k frozen sampled actions, mean +19.0714, versus
-−20.3455 for the zero-update baseline. All training reports and checkpoint
-tensors are finite. This is first positive control on both games, not proof of
-superiority to reconstruction or multi-seed Pong reliability. The same-build matched
-reconstruction run also succeeds: final-window mean +17.6667 over six games and
-frozen mean +19.2143, with 28 wins in 28 games. Both complete the same 100k-action,
-24,729-update budget in about 3.83 hours, excluding construction. Finish the
-independent Pong seed before a broader claim. The
+intrinsic bonus. Two independent causal Pong seeds and the same-build
+reconstruction control each complete 100k agent-selected actions / 24,729 updates,
+then 50k frozen sampled actions from the final checkpoint with zero updates:
+
+| Pong objective / seed | Final training-window mean / games | Frozen mean / natural wins |
+| --- | ---: | ---: |
+| Prediction only / 0 | +18.1429 / 7 | +19.0714 / 28 of 28 |
+| Prediction only / 1 | −0.2500 / 4 | −1.0714 / 3 of 14 |
+| Reconstruction / 0 | +17.6667 / 6 | +19.2143 / 28 of 28 |
+
+Both causal seeds pass the predeclared initial-learning gates; the zero-update
+baseline is −20.3455. All reports and checkpoint tensors are finite, and full
+schedule, identity, reward/action/frame and checkpoint checks pass. Each training
+run takes about 3.8 hours excluding construction. Seed 1's first win arrives at
+91,684 actions versus seed 0's 44,075, and its frozen policy still loses most
+games. Preserve this variation and the late training regression, not just wins.
+The result establishes reward-guided online learning on both games, not stable
+Pong dominance, superiority to reconstruction or intrinsic-only competence. The
 [self-learning report](experiments/2026-09-05-self-learning.md)
-records the acceptance criteria, raw artifacts and pending comparisons.
+records the fixed acceptance criteria and all candidate/control results.
 
 The matched native reconstruction control exposes a frozen-policy failure:
 1,100 training food and 247 in each final 1k window, but only 2 food / 98 deaths
@@ -289,8 +304,9 @@ For action rate `f`, batch `B×T`, ratio `R`, and update duration `U`, learner
 demand is `f × R / (B×T)` updates/s. Acting, perception and learning must fit
 available device time with headroom. At 10 actions/s, B16×T64 and R256 require
 2.5 updates/s, roughly 2.6 times the optimized microbatch-4 12M canary throughput,
-before perception and acting costs. The admitted full-batch candidate reduces
-that gap to about 1.35× but still requires learning validation and runtime headroom.
+before perception and acting costs. The full-batch candidate reduces that gap
+to about 1.35× and now passes the initial learning gates, but still lacks runtime
+headroom for this rate. Its synchronous Pong training averages 7.26–7.28 actions/s.
 The original read path was roughly 20 times short.
 
 Report p50/p95/p99 action latency, missed deadlines, effective ratio and training
