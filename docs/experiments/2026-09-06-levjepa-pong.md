@@ -221,3 +221,13 @@ reward predictions now average +0.1312, versus −0.8186 on negative events and
 −0.0039 on zero events. This is improving reward discrimination, not competent
 control. Mean update time remains 0.5378 s. The original 200k/frozen-75k gate
 and all training settings remain unchanged.
+
+At 60k, the rolling checkpoint validates with 14,729 updates. Its 54 completed
+games average −19.6667, with no wins or timeouts. The 55k–60k window contains
+two −13 games, 20 positive points and 50 negative points; this is gradual
+online improvement, not frozen-policy mastery. Positive/negative/zero reward
+predictions average +0.4639/−0.8351/−0.0026 over their corresponding replay
+samples. Mean update time is 0.5388 s. The small run-local
+`inspect_checkpoint.py` checks rolling-save fingerprints, complete metric
+prefixes, update cadence and exact recent windows without running another GPU
+agent. The full-budget serial launcher remains active.
