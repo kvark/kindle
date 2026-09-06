@@ -118,16 +118,37 @@ Artifacts: `runs/selflearn-20260905-pong-predictive-seed0{,-eval}.{jsonl,log}`,
 `checkpoints/selflearn-20260905-pong-predictive-seed0-step100000`; earlier
 diagnostic copies are retained, not used to select the evaluation endpoint.
 
-The matched reconstruction seed-0 run has started. Its configuration differs
+The matched reconstruction seed-0 run is complete. Its configuration differs
 only in the two objective weights, with the corresponding head identity and
 131,072 additional posterior-input parameters (10,412,305 total). The executable,
 encoder, backend, wrapper, full BPTT, row batch, schedule and behavior settings
-match. It wins its first naturally terminated game, +6, at action 74,366
-(episode 49, length 3,626, no truncation). Prediction's first win was +13 at
-44,075. These first-win times are diagnostics, not substitute endpoints or
-multi-seed evidence. The control's completed result and independent native/Pong
-training seeds remain required. Current evidence establishes first native and Atari learning for the
-causal architecture, not superiority to reconstruction or multi-seed reliability.
+match. Both runs complete 100k training actions and 24,729 updates, then evaluate
+their final checkpoints for 50k sampled actions with zero updates:
+
+| Seed-0 objective | Final training-window mean / games | Frozen mean / wins |
+| --- | ---: | ---: |
+| Prediction only | +18.1429 / 7 | +19.0714 / 28 of 28 |
+| Reconstruction | +17.6667 / 6 | +19.2143 / 28 of 28 |
+
+The control's final-window returns are 18/21/14/21/16/16. All 28 frozen games
+terminate naturally without truncation; the unfinished +1 game after 152 actions
+is excluded. Actual training/frozen action frames are 399,940/199,943; execution
+takes 13,795.83/304.72 s excluding construction. All 24,729 training reports and
+241 saved tensors are finite. Configuration, encoder, executable, checkpoint
+hashes, the full ordered learner schedule and reward/action accounting validate.
+Its saved world has reconstruction tensors and no future predictor.
+
+Reconstruction's first win is +6 at action 74,366 (episode 49, length 3,626,
+no truncation), versus prediction's +13 at 44,075. These first-win times are
+diagnostics, not substitute endpoints or multi-seed evidence. The endpoint
+results support viable causal learning with no observed seed-0 Pong regression,
+not superiority or multi-seed reliability. Independent native/Pong training
+seeds remain required.
+
+Control artifacts: `runs/selflearn-20260905-pong-control-seed0{,-eval}.{jsonl,log}`,
+`...-score.json`, `...-eval-summary.json`, `...-audit.json` and
+`...-final-tensors.json`; immutable final copy:
+`checkpoints/selflearn-20260905-pong-control-seed0-step100000`.
 
 Fresh CPU-only Pong random controls are complete on the current wrapper/ALE:
 

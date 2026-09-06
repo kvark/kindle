@@ -1,6 +1,6 @@
 # Kindle: live learning with Dreamer and predictive representations
 
-Updated 2026-09-05. This is the single project plan, replacing both earlier
+Updated 2026-09-06. This is the single project plan, replacing both earlier
 Dreamer plans. Detailed logs stay in `runs/`; decisions and their strongest
 evidence belong here. Working rules are in [AGENTS.md](../AGENTS.md).
 
@@ -36,7 +36,7 @@ framework in advance.
 | --- | --- | --- |
 | Pixel boundary | `kindle/src/env.rs`: RGB8, categorical actions, reward, terminal/truncation flags | Synchronous trait; no desktop-game capture/input adapter |
 | Perception | `kindle/src/vision/`: frozen DINOv3 ViT-S/16, deterministic letterboxing, fixed projection/pooling | Single frame; fixed 7×7×64 observations; GPU readback |
-| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Causal native/Pong learning survives frozen evaluation; replication and matched Atari control pending |
+| Recurrent model | `dreamer/networks.rs`, `world.rs`: block RSSM, categorical posterior/prior, reward, continuation, optional reconstruction and causal forecast | Causal native/Pong learning survives frozen evaluation; matched Pong control completes, independent replication pending |
 | Learning | `dreamer/agent.rs`, `behavior.rs`, `distributions.rs`: posterior replay, imagination, two-hot returns, actor/critic, slow value | Host/GPU round trips; acting and learning share one mutable core |
 | Replay | `dreamer/replay.rs`: bounded FIFO, fresh-sequence queue then uniform sampling, cached context | f32 storage; no lifetime sample or persistence |
 | Runtime | `dreamer/runtime.rs`: initialization, LaProp with leaf-wise AGC, inference synchronization | Parameter synchronization passes through host memory |
@@ -204,8 +204,11 @@ updates: final-window mean +18.1429 over seven games. The final checkpoint wins
 all 28 completed games in 50k frozen sampled actions, mean +19.0714, versus
 −20.3455 for the zero-update baseline. All training reports and checkpoint
 tensors are finite. This is first positive control on both games, not proof of
-superiority to reconstruction or multi-seed reliability. Finish the matched
-reconstruction run and independent seeds before a broader claim. The
+superiority to reconstruction or multi-seed reliability. The same-build matched
+reconstruction run also succeeds: final-window mean +17.6667 over six games and
+frozen mean +19.2143, with 28 wins in 28 games. Both complete the same 100k-action,
+24,729-update budget in about 3.83 hours, excluding construction. Finish the
+independent seeds before a broader claim. The
 [self-learning report](experiments/2026-09-05-self-learning.md)
 records the acceptance criteria, raw artifacts and pending comparisons.
 
