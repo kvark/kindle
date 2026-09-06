@@ -35,15 +35,17 @@ def sha256(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def finite(value) -> None:
+def finite(value, *, numeric: bool = False) -> None:
+    if numeric:
+        require(type(value) in (int, float, dict, list), "non-numeric learner report value")
     if isinstance(value, float):
         require(math.isfinite(value), "non-finite report value")
     elif isinstance(value, dict):
         for child in value.values():
-            finite(child)
+            finite(child, numeric=numeric)
     elif isinstance(value, list):
         for child in value:
-            finite(child)
+            finite(child, numeric=numeric)
 
 
 def audit_run(path: Path) -> dict:
@@ -66,6 +68,9 @@ def audit_run(path: Path) -> dict:
         if kind == "learner":
             updates += 1
             report = event["report"]
+            # serde_json encodes non-finite Rust floats as null. Learner
+            # metrics have no optional leaves; null must not hide a NaN.
+            finite(report, numeric=True)
             require(report["learner_step"] == start["starting_learner_step"] + updates,
                     f"{path}: learner counter gap")
             if first_update is None:

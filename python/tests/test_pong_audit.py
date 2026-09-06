@@ -70,6 +70,15 @@ def test_audit_rejects_broken_ledgers(tmp_path, mutation, message):
         audit_pong.audit_run(write_run(tmp_path / "run.jsonl", data))
 
 
+@pytest.mark.parametrize("value", [None, True, "NaN", float("nan"), float("inf")])
+def test_learner_metrics_cannot_hide_nonfinite_values_as_json_null(tmp_path, value):
+    data = events()
+    data.insert(1, {"event": "learner", "run_step": 1, "report": {
+        "learner_step": 49_730, "world": {"total_loss": value}}})
+    with pytest.raises(ValueError, match="non-numeric|non-finite"):
+        audit_pong.audit_run(write_run(tmp_path / "run.jsonl", data))
+
+
 def test_checkpoint_evaluation_is_bound_to_exact_files(tmp_path):
     metadata = {"format": 3, "architecture": "dreamerv3-visual-features",
                 "config": {}, "perception": {}, "environment_step": 200_000,
