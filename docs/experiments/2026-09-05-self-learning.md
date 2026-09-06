@@ -194,7 +194,7 @@ artifact: `runs/selflearn-20260905-historical-evaluation-summary.json`.
 Only analysis code changed. The running experiment's runner, native binary and
 extension hashes remain unchanged and verified.
 
-## Gameplay evidence preparation
+## Gameplay evidence
 
 `python/examples/record_atari.py` records raw emulator frames during frozen
 evaluation or a random control, without changing the training runner or adding
@@ -212,6 +212,22 @@ handling, output preservation and failure cleanup; all 92 Python tests pass.
 Artifacts: `runs/selflearn-20260905-video-parity-plain.jsonl`,
 `runs/selflearn-20260905-video-parity-recorded-v2.jsonl` and
 `runs/selflearn-20260905-video-parity-v2.mp4{,.json}`. This is recording validation,
-not a trained-policy result. Learned-policy recording waits for the single GPU.
+not a trained-policy result.
 The experiment's native binary, extension and Atari runner still match their
 frozen executable manifest.
+
+The final 100k causal Pong seed-0 checkpoint also completes 10k additional frozen
+sampled actions with recording: five naturally terminated, untruncated +20 wins,
+plus an unfinished +19 game excluded from complete-game scores. All 15 episode
+and interval records match the original 50k evaluation's first 10k actions exactly
+except elapsed time. Header differences are only the shorter action/frame budget
+and construction time. The movie decodes to exactly 39,991 frames at 160×210,
+nominal 60 Hz; movie/log/recorder/runner hashes validate and a gameplay frame was
+visually inspected. This is qualitative evidence, not a replacement evaluation.
+Artifacts: `runs/selflearn-20260905-pong-predictive-seed0.mp4{,.json}` and
+`...-seed0-video.{jsonl,log}`, with `...-seed0-video-audit.json`.
+
+Independent causal Pong seed 1 starts after recording, with fresh world/behavior
+weights and zero counters. Its configuration differs only by seed; the executable,
+encoder, backend, ALE, wrapper, GPU, parameter counts and action meanings match.
+It runs the unchanged 100k training / 50k frozen protocol. Its result is pending.
