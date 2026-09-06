@@ -20,7 +20,7 @@ changing the visual encoder or building pretraining infrastructure.
 
 A 100-hour game exposure is a later engineering gate. First prove that acting
 and learning can coexist at the declared control rate and that a shorter run
-produces useful learning. Atari's accelerated laboratory protocol and a real-time
+produces useful learning. Atari's step-driven laboratory protocol and a real-time
 lifetime are different experiments; neither clock substitutes for the other.
 
 Guidance should enter through ordinary, recorded interactions: action overrides,

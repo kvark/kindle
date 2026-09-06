@@ -109,8 +109,8 @@ world/behavior/timing reports and all 241 saved F32 tensors are finite. The fina
 checkpoint has the predictive head and no reconstruction decoder; all three
 tensor-file fingerprints validate. Frozen evaluation verifies the identical
 configuration, model/encoder/backend identity and executable, starts at counters
-100k/24,729, and makes no updates. Training averages 7.26 actions/s: this is still
-an accelerated laboratory learning result, not a real-time 15 Hz Pong agent.
+100k/24,729, and makes no updates. Training averages 7.26 actions/s and the emulator
+waits for learning. This demonstrates online learning, not real-time 15 Hz control.
 
 Artifacts: `runs/selflearn-20260905-pong-predictive-seed0{,-eval}.{jsonl,log}`,
 `...-score.json`, `...-eval-summary.json`, `...-audit.json` and
