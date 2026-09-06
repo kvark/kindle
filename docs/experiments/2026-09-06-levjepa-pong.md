@@ -198,3 +198,18 @@ and exactly zero updates. It scored 12 positive points and conceded 464, with
 a −2 unfinished tail. The reward/action ledgers and all three fingerprinted,
 finite checkpoint files validate (`untrained-audit.json`). Frozen execution
 was 1.3679× real time. Seed 0 training began at 2026-09-06 17:45:39 UTC.
+
+At 20k actions, seed 0's rolling checkpoint has the expected 4,729 updates and
+all 241 stored tensors are finite with matching save-event hashes. The full
+metric prefix is finite and follows the exact update cadence. Gameplay has not
+improved: 23 completed games average −20.7391, with no wins. The 15k–20k window
+contains six −21 games and no positive points. Mean policy entropy is 0.5946;
+the policy strongly favors one movement direction. Reward prediction now
+distinguishes many negative events, but positive-event predictions remain poor.
+
+For context, the older DINO causal seeds also struggled in the 15k–20k window:
+seed 0 averaged −20.7143 and seed 1 −21, with policy entropy 1.0048/1.2213.
+Those are historical trajectories, not new matched LeVJEPA controls, and do
+not guarantee recovery. Continue the declared budget; do not reinterpret the
+20k save as an accepted endpoint. Window reports and the checkpoint audit are
+under the run directory, without changing the authoritative roadmap.
