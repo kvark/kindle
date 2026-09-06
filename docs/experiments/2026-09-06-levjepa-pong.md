@@ -213,3 +213,11 @@ Those are historical trajectories, not new matched LeVJEPA controls, and do
 not guarantee recovery. Continue the declared budget; do not reinterpret the
 20k save as an accepted endpoint. Window reports and the checkpoint audit are
 under the run directory, without changing the authoritative roadmap.
+
+The 40k checkpoint also validates (9,729 updates, 241 finite stored tensors).
+Through that exact boundary there are 43 completed games, mean −20.5814 and
+no wins. The 35k–40k window averages −20.25 across four games. Positive-event
+reward predictions now average +0.1312, versus −0.8186 on negative events and
+−0.0039 on zero events. This is improving reward discrimination, not competent
+control. Mean update time remains 0.5378 s. The original 200k/frozen-75k gate
+and all training settings remain unchanged.
