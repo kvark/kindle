@@ -1,4 +1,4 @@
-use crate::vision::{DinoObservation, OBSERVATION_CHANNELS};
+use crate::vision::{OBSERVATION_CHANNELS, Observation};
 
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -138,7 +138,7 @@ impl Default for LossScales {
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
-    /// Per-patch hidden width immediately before the 64-channel DINO decoder
+    /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
     #[serde(default)]
@@ -213,7 +213,7 @@ impl DreamerConfig {
             action_count,
             model_size: ModelSize::Size12M,
             observation_decoder_depth: OBSERVATION_CHANNELS,
-            // Full DINO replay entries are intentionally compressed to a
+            // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
             replay_capacity: 100_000,
             batch_size: 16,
@@ -278,7 +278,7 @@ impl DreamerConfig {
     }
 
     pub const fn observation_dim(&self) -> usize {
-        DinoObservation::LEN
+        Observation::LEN
     }
 
     pub fn observation_decoder_depth(&self) -> usize {

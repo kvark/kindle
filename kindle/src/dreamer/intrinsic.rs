@@ -3,7 +3,7 @@
 //! Fixed random-hyperplane hashing groups nearby observations. Collisions
 //! conservatively reduce novelty; this is visitation, not model uncertainty.
 
-use crate::vision::{DinoObservation, fixed_projection};
+use crate::vision::{Observation, fixed_projection};
 
 const HASH_BITS: usize = 16;
 const HASH_SEED: u64 = 0x6b69_6e64_6c65_7631;
@@ -24,8 +24,7 @@ impl VisitationState {
             && self.counts.len() == 1 << HASH_BITS
             && match &self.reference {
                 Some(values) => {
-                    values.len() == DinoObservation::LEN
-                        && values.iter().all(|value| value.is_finite())
+                    values.len() == Observation::LEN && values.iter().all(|value| value.is_finite())
                 }
                 None => self.counts.iter().all(|count| *count == 0),
             }
@@ -41,7 +40,7 @@ pub(super) struct VisitationBonus {
 impl VisitationBonus {
     pub fn new() -> Self {
         Self {
-            projection: fixed_projection(DinoObservation::LEN, HASH_BITS, HASH_SEED),
+            projection: fixed_projection(Observation::LEN, HASH_BITS, HASH_SEED),
             counts: vec![0; 1 << HASH_BITS].into_boxed_slice(),
             reference: None,
         }
@@ -63,7 +62,7 @@ impl VisitationBonus {
 
     /// Score this arrival using the previous count, then count the visit.
     /// Counts saturate; memory and the bonus remain bounded for a long life.
-    pub fn observe(&mut self, observation: &DinoObservation) -> f32 {
+    pub fn observe(&mut self, observation: &Observation) -> f32 {
         let mut projected = [0.0; HASH_BITS];
         let reference = self
             .reference
@@ -94,7 +93,7 @@ mod tests {
 
     #[test]
     fn repeated_visits_decay_and_survive_serialization() {
-        let observation = DinoObservation::from_vec(vec![0.2; DinoObservation::LEN]);
+        let observation = Observation::from_vec(vec![0.2; Observation::LEN]);
         let mut bonus = VisitationBonus::new();
         assert_eq!(bonus.observe(&observation), 1.0);
         assert!((bonus.observe(&observation) - 1.0 / 2.0_f32.sqrt()).abs() < 1e-7);
@@ -103,7 +102,7 @@ mod tests {
         restored.restore(serde_json::from_slice(&encoded).unwrap());
         assert_eq!(restored.observe(&observation), bonus.observe(&observation));
         assert_eq!(
-            restored.observe(&DinoObservation::from_vec(vec![-0.2; DinoObservation::LEN])),
+            restored.observe(&Observation::from_vec(vec![-0.2; Observation::LEN])),
             1.0
         );
     }
@@ -112,7 +111,7 @@ mod tests {
     fn saturated_counts_never_wrap_or_create_fresh_novelty() {
         let mut bonus = VisitationBonus::new();
         bonus.counts.fill(u32::MAX);
-        let observation = DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+        let observation = Observation::from_vec(vec![0.0; Observation::LEN]);
         let first = bonus.observe(&observation);
         assert!(first > 0.0 && first < 0.00002);
         assert_eq!(bonus.observe(&observation), first);
@@ -135,7 +134,7 @@ mod tests {
         let mut state = VisitationBonus::new().state();
         state.counts[0] = 1;
         assert!(!state.is_valid());
-        state.reference = Some(vec![0.0; DinoObservation::LEN].into_boxed_slice());
+        state.reference = Some(vec![0.0; Observation::LEN].into_boxed_slice());
         assert!(state.is_valid());
         state.reference.as_mut().unwrap()[0] = f32::NAN;
         assert!(!state.is_valid());

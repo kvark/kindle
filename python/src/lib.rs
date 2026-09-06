@@ -2,7 +2,10 @@
 
 use std::path::Path;
 
-use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use kindle::vision::{
+    DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
+    levjepa::LeVJepaPerception,
+};
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
 };
@@ -24,6 +27,62 @@ struct PyDinoPerception {
     inner: DinoPerception,
 }
 
+#[pyclass(name = "LeVJepaPerception", module = "kindle._native", unsendable)]
+struct PyLeVJepaPerception {
+    inner: LeVJepaPerception,
+}
+
+#[pymethods]
+impl PyLeVJepaPerception {
+    #[new]
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None))]
+    fn new(encoder_checkpoint: &str, encoder_plan_cache: Option<&str>) -> PyResult<Self> {
+        let inner =
+            LeVJepaPerception::load(encoder_checkpoint, None, encoder_plan_cache.map(Path::new))
+                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        let frame = parse_rgb_frame(frame)?;
+        let pooled = self
+            .inner
+            .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
+        Ok((
+            self.inner.projected_patches().to_vec(),
+            pooled.as_slice().to_vec(),
+        ))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+
+    #[getter]
+    fn next_frame_in_chunk(&self) -> usize {
+        self.inner.next_frame_in_chunk()
+    }
+
+    #[getter]
+    fn projected_shape(&self) -> (usize, usize, usize) {
+        (
+            kindle::vision::levjepa::GRID,
+            kindle::vision::levjepa::GRID,
+            OBSERVATION_CHANNELS,
+        )
+    }
+
+    #[getter]
+    fn pooled_shape(&self) -> (usize, usize, usize) {
+        (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
+    }
+
+    #[getter]
+    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_device())
+    }
+}
+
 #[pymethods]
 impl PyDinoPerception {
     #[new]
@@ -34,6 +93,8 @@ impl PyDinoPerception {
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
+
+    fn reset(&mut self) {}
 
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
         let frame = parse_rgb_frame(frame)?;
@@ -72,7 +133,7 @@ impl PyAgent {
 
     #[new]
     #[pyo3(signature = (
-        dino_checkpoint,
+        encoder_checkpoint,
         num_actions,
         model_size = "12m",
         observation_decoder_depth = None,
@@ -98,12 +159,13 @@ impl PyAgent {
         future_prediction_loss_scale = None,
         agc = None,
         replay_value_gradient = None,
-        dino_plan_cache = None,
+        encoder_plan_cache = None,
         skip_full_optimize = false,
+        encoder = "dinov3",
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
-        dino_checkpoint: &str,
+        encoder_checkpoint: &str,
         num_actions: usize,
         model_size: &str,
         observation_decoder_depth: Option<usize>,
@@ -129,10 +191,12 @@ impl PyAgent {
         future_prediction_loss_scale: Option<f32>,
         agc: Option<f32>,
         replay_value_gradient: Option<bool>,
-        dino_plan_cache: Option<&str>,
+        encoder_plan_cache: Option<&str>,
         skip_full_optimize: bool,
+        encoder: &str,
     ) -> PyResult<Self> {
         validate_action_count(num_actions)?;
+        let kind = parse_perception_kind(encoder)?;
         let mut config = DreamerConfig::new(num_actions);
         config.model_size = parse_model_size(model_size)?;
         if let Some(value) = observation_decoder_depth {
@@ -200,22 +264,22 @@ impl PyAgent {
         config
             .check()
             .map_err(|error| PyValueError::new_err(format!("invalid Dreamer config: {error}")))?;
-        let cache = dino_plan_cache.map(Path::new);
-        let inner = DreamerAgent::new(config, dino_checkpoint, cache)
+        let cache = encoder_plan_cache.map(Path::new);
+        let inner = DreamerAgent::with_perception(config, kind, encoder_checkpoint, cache)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
 
     #[classmethod]
-    #[pyo3(signature = (dreamer_checkpoint, dino_checkpoint, dino_plan_cache = None))]
+    #[pyo3(signature = (dreamer_checkpoint, encoder_checkpoint, encoder_plan_cache = None))]
     fn restore(
         _class: &Bound<'_, PyType>,
         dreamer_checkpoint: &str,
-        dino_checkpoint: &str,
-        dino_plan_cache: Option<&str>,
+        encoder_checkpoint: &str,
+        encoder_plan_cache: Option<&str>,
     ) -> PyResult<Self> {
-        let cache = dino_plan_cache.map(Path::new);
-        let inner = DreamerAgent::restore(dreamer_checkpoint, dino_checkpoint, cache)
+        let cache = encoder_plan_cache.map(Path::new);
+        let inner = DreamerAgent::restore(dreamer_checkpoint, encoder_checkpoint, cache)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
@@ -272,12 +336,12 @@ impl PyAgent {
         self.inner.posterior_action_probabilities(None)
     }
 
-    /// Current frozen-DINO observation consumed by the world model.
+    /// Current frozen visual observation consumed by the world model.
     ///
     /// The returned copy is read-only and does not change recurrent state.
     #[getter]
-    fn dino_observation(&self) -> Vec<f32> {
-        self.inner.dino_observation().to_vec()
+    fn visual_observation(&self) -> Vec<f32> {
+        self.inner.visual_observation().to_vec()
     }
 
     /// The recurrent policy input, without an additional GPU execution.
@@ -306,7 +370,7 @@ impl PyAgent {
         Ok(self.inner.prior_reward_prediction(action))
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     ///
     /// This diagnostic clones its categorical random stream and leaves the
     /// live posterior, policy, and all training state unchanged.
@@ -472,6 +536,14 @@ fn parse_model_size(value: &str) -> PyResult<ModelSize> {
     }
 }
 
+fn parse_perception_kind(value: &str) -> PyResult<PerceptionKind> {
+    match value {
+        "dinov3" => Ok(PerceptionKind::DinoV3),
+        "levjepa" => Ok(PerceptionKind::LeVJepa),
+        _ => Err(PyValueError::new_err("encoder must be dinov3 or levjepa")),
+    }
+}
+
 fn parse_rgb_frame(frame: &Bound<'_, PyAny>) -> PyResult<RgbFrame> {
     let shape = frame
         .getattr("shape")
@@ -521,8 +593,14 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<PyDinoPerception>()?;
+    module.add_class::<PyLeVJepaPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("DINO_MODEL_ID", kindle::vision::VITS16_MODEL_ID)?;
+    module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;
+    module.add(
+        "LEVJEPA_CHECKPOINT_REVISION",
+        kindle::vision::levjepa::CHECKPOINT_REV,
+    )?;
     module.add(
         "DINO_CHECKPOINT_REVISION",
         kindle::vision::VITS16_CHECKPOINT_REV,

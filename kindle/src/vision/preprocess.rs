@@ -14,8 +14,6 @@
 //! Get this wrong and the model still runs, producing confident nonsense
 //! — so it is pinned down by tests below.
 
-use crate::vision::dinov3::Config;
-
 /// ImageNet statistics from the model's `preprocessor_config.json`.
 pub const IMAGE_MEAN: [f32; 3] = [0.485, 0.456, 0.406];
 pub const IMAGE_STD: [f32; 3] = [0.229, 0.224, 0.225];
@@ -84,10 +82,9 @@ pub fn resize_letterbox_rgb8(rgb: &[u8], width: usize, height: usize, target: us
 /// differences out of a numerics comparison.
 ///
 /// Returns `[num_patches, patch_dim]` in row-major grid order.
-pub fn patches_from_pixels_chw(pixels: &[f32], config: &Config) -> Vec<f32> {
-    let size = config.image_size;
-    let ps = config.patch_size;
-    let grid = config.grid();
+pub fn patches_from_pixels_chw(pixels: &[f32], size: usize, ps: usize) -> Vec<f32> {
+    assert!(ps > 0 && size > 0 && size.is_multiple_of(ps));
+    let grid = size / ps;
     assert_eq!(
         pixels.len(),
         3 * size * size,
@@ -97,11 +94,12 @@ pub fn patches_from_pixels_chw(pixels: &[f32], config: &Config) -> Vec<f32> {
 
     let plane = size * size;
     let patch_area = ps * ps;
-    let mut out = vec![0.0f32; config.num_patches() * config.patch_dim()];
+    let patch_dim = 3 * patch_area;
+    let mut out = vec![0.0f32; grid * grid * patch_dim];
 
     for gy in 0..grid {
         for gx in 0..grid {
-            let patch = (gy * grid + gx) * config.patch_dim();
+            let patch = (gy * grid + gx) * patch_dim;
             for c in 0..3 {
                 for ky in 0..ps {
                     let src_row = c * plane + (gy * ps + ky) * size + gx * ps;
@@ -121,10 +119,9 @@ pub fn patches_from_pixels_chw(pixels: &[f32], config: &Config) -> Vec<f32> {
 /// `rgb` is `[image_size, image_size, 3]` — the layout image decoders and
 /// camera conversions naturally produce. No resizing happens here; the
 /// caller supplies an image already at `config.image_size`.
-pub fn patches_from_rgb8(rgb: &[u8], config: &Config) -> Vec<f32> {
-    let size = config.image_size;
-    let ps = config.patch_size;
-    let grid = config.grid();
+pub fn patches_from_rgb8(rgb: &[u8], size: usize, ps: usize) -> Vec<f32> {
+    assert!(ps > 0 && size > 0 && size.is_multiple_of(ps));
+    let grid = size / ps;
     assert_eq!(
         rgb.len(),
         3 * size * size,
@@ -133,11 +130,12 @@ pub fn patches_from_rgb8(rgb: &[u8], config: &Config) -> Vec<f32> {
     );
 
     let patch_area = ps * ps;
-    let mut out = vec![0.0f32; config.num_patches() * config.patch_dim()];
+    let patch_dim = 3 * patch_area;
+    let mut out = vec![0.0f32; grid * grid * patch_dim];
 
     for gy in 0..grid {
         for gx in 0..grid {
-            let patch = (gy * grid + gx) * config.patch_dim();
+            let patch = (gy * grid + gx) * patch_dim;
             for ky in 0..ps {
                 let y = gy * ps + ky;
                 for kx in 0..ps {
@@ -180,6 +178,7 @@ pub fn conv_weight_to_matmul(weight: &[f32], out_channels: usize, patch_dim: usi
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::vision::dinov3::Config;
 
     #[test]
     fn chw_patch_layout_is_channel_major() {
@@ -188,7 +187,7 @@ mod tests {
         // mapping is checkable by arithmetic.
         let size = c.image_size;
         let pixels: Vec<f32> = (0..3 * size * size).map(|i| i as f32).collect();
-        let patches = patches_from_pixels_chw(&pixels, &c);
+        let patches = patches_from_pixels_chw(&pixels, c.image_size, c.patch_size);
 
         let ps = c.patch_size;
         let plane = size * size;
@@ -217,8 +216,8 @@ mod tests {
             }
         }
 
-        let from_rgb = patches_from_rgb8(&rgb, &c);
-        let from_chw = patches_from_pixels_chw(&chw, &c);
+        let from_rgb = patches_from_rgb8(&rgb, c.image_size, c.patch_size);
+        let from_chw = patches_from_pixels_chw(&chw, c.image_size, c.patch_size);
         assert_eq!(from_rgb.len(), from_chw.len());
         let worst = from_rgb
             .iter()
@@ -233,7 +232,7 @@ mod tests {
         let c = Config::vits16();
         // 0.485*255 ≈ 124 is the red-channel mean, so red lands near 0.
         let rgb = vec![124u8; 3 * c.image_size * c.image_size];
-        let patches = patches_from_rgb8(&rgb, &c);
+        let patches = patches_from_rgb8(&rgb, c.image_size, c.patch_size);
         assert!(
             patches[0].abs() < 0.02,
             "red channel not centred: {}",

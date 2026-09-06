@@ -431,7 +431,7 @@ fn collect_latent_samples(
     let mut is_first = true;
 
     while samples.len() < arguments.samples {
-        dino_patch_statistics.add_observation(agent.dino_observation());
+        dino_patch_statistics.add_observation(agent.visual_observation());
         push_latent_sample(
             &mut samples,
             &mut agent,
@@ -484,7 +484,7 @@ fn collect_latent_samples(
             next_horizon: 0,
             predictions: rollout_observations,
             unrelated_predictions: unrelated_observations,
-            persistence: agent.dino_observation().to_vec(),
+            persistence: agent.visual_observation().to_vec(),
         });
 
         let action = random_action(&environment, arguments.all_actions, &mut rng);
@@ -503,7 +503,7 @@ fn collect_latent_samples(
         score_observation_arrival(
             &mut pending_observations,
             &mut samples,
-            agent.dino_observation(),
+            agent.visual_observation(),
             ended,
         );
         is_first = ended;
@@ -539,7 +539,7 @@ fn push_latent_sample(
         latent[deter_dim..].to_vec(),
     ];
     let reward_prediction = agent.posterior_reward_prediction();
-    let observation = agent.dino_observation().to_vec();
+    let observation = agent.visual_observation().to_vec();
     let posterior_observation = agent.observation_prediction();
     let posterior_observation_mse = mean_squared_error(&posterior_observation, &observation);
     let probabilities = agent.posterior_action_probabilities(None);

@@ -11,6 +11,7 @@ import random
 import sys
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 import ale_py
 import gymnasium as gym
@@ -22,7 +23,7 @@ from kindle._reward_probe import RewardProbe
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
-DINO_RECONSTRUCTION_SCALE = 0.25
+FEATURE_RECONSTRUCTION_SCALE = 0.25
 ATARI_ACTION_REPEAT = 4
 ATARI_NOOP_MAX = 30
 ATARI_SCREEN_SIZE = 64
@@ -50,12 +51,24 @@ ATARI_PROTOCOLS = {
 }
 
 
-def sha256_file(path: str) -> str:
+def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as source:
         while chunk := source.read(1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def checkpoint_identity(path: str | Path) -> dict:
+    checkpoint = Path(path)
+    return {
+        "path": str(checkpoint.resolve()),
+        "metadata_sha256": sha256_file(checkpoint / "metadata.json"),
+        "tensor_sha256": {
+            name: sha256_file(checkpoint / f"{name}.safetensors")
+            for name in ("world", "behavior", "slow_value")
+        },
+    }
 
 
 class DreamerAtariPreprocessing(gym.Wrapper):
@@ -165,7 +178,9 @@ class DreamerAtariPreprocessing(gym.Wrapper):
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default=None,
+                        help="fresh-run frontend (default: dinov3); restore reads its saved identity")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=0)
@@ -243,7 +258,7 @@ def main() -> None:
     parser.add_argument(
         "--reconstruction-loss-scale",
         type=float,
-        default=DINO_RECONSTRUCTION_SCALE,
+        default=FEATURE_RECONSTRUCTION_SCALE,
         help="frozen-DINO scale calibrated to D3's summed-pixel loss magnitude",
     )
     parser.add_argument(
@@ -357,14 +372,17 @@ def main() -> None:
             f"environment exposes {action_count} actions but "
             f"{len(action_meanings)} action meanings"
         )
-    dino_checkpoint_sha256 = (
-        None if args.random_policy else sha256_file(args.dino_checkpoint)
+    encoder_checkpoint_sha256 = (
+        None if args.random_policy else sha256_file(args.encoder_checkpoint)
     )
+    restored_checkpoint = checkpoint_identity(args.restore) if args.restore else None
     construction_started = time.perf_counter()
     if args.random_policy:
         agent = None
     elif args.restore:
-        agent = kindle.Agent.restore(args.restore, args.dino_checkpoint)
+        agent = kindle.Agent.restore(args.restore, args.encoder_checkpoint)
+        if args.encoder and agent.provenance["perception"]["kind"] != args.encoder:
+            raise ValueError("--encoder does not match the restored perception identity")
         restored_actions = int(agent.config["action_count"])
         if restored_actions != action_count:
             raise ValueError(
@@ -372,8 +390,9 @@ def main() -> None:
             )
     else:
         agent = kindle.Agent(
-            args.dino_checkpoint,
+            args.encoder_checkpoint,
             action_count,
+            encoder=args.encoder or "dinov3",
             model_size=args.model_size,
             observation_decoder_depth=args.observation_decoder_depth,
             seed=args.seed,
@@ -467,6 +486,7 @@ def main() -> None:
                     agent.environment_step * ATARI_ACTION_REPEAT
                 ),
                 "learner_step": agent.learner_step,
+                "identity": checkpoint_identity(args.checkpoint),
             }
         )
 
@@ -513,13 +533,9 @@ def main() -> None:
             "reward_probe": args.reward_probe,
             "random_action_steps": args.random_action_steps,
             "output_appended": args.append_output,
-            "dino_model_id": (
-                kindle.DINO_MODEL_ID if agent is not None else None
-            ),
-            "dino_checkpoint_revision": (
-                kindle.DINO_CHECKPOINT_REVISION if agent is not None else None
-            ),
-            "dino_checkpoint_sha256": dino_checkpoint_sha256,
+            "restored_checkpoint": restored_checkpoint,
+            "perception": agent.provenance["perception"] if agent is not None else None,
+            "encoder_checkpoint_sha256": encoder_checkpoint_sha256,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,

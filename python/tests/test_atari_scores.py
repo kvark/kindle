@@ -316,6 +316,7 @@ def test_scores_reject_config_seed_mismatch(tmp_path) -> None:
 
 @pytest.mark.parametrize("field", [
     "model_provenance", "native_extension_sha256", "runner_sha256",
+    "perception", "encoder_checkpoint_sha256",
 ])
 def test_scores_reject_changed_executable_provenance(tmp_path, field) -> None:
     paths = []

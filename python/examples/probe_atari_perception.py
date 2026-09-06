@@ -1,10 +1,10 @@
-"""Probe whether Kindle's frozen DINO features retain small Atari objects.
+"""Probe whether Kindle's frozen visual features retain small Atari objects.
 
 The probe compares three representations of the exact 64x64 frame given to
 Dreamer:
 
 * raw RGB pixels (the positive control),
-* the fixed 64-channel projection of DINO's 14x14 patch grid, and
+* the fixed 64-channel projection of the encoder's 14x14 patch grid, and
 * the production 7x7 grid after fixed 2x2 spatial pooling.
 
 Ridge probes predict Pong's ball and paddle positions. Seeds are split by
@@ -111,6 +111,8 @@ def collect_split(
     environment = DreamerAtariPreprocessing(environment, noop_max=protocol.noop_max,
                                             max_episode_frames=protocol.max_episode_frames)
     frame, _ = environment.reset(seed=seed)
+    encoder.reset()
+    encoder.encode(frame)
     actions = random.Random(seed ^ 0xD1_30_00_03)
     features = {"rgb64": [], "projected14": [], "pooled7": []}
     if motion:
@@ -134,6 +136,9 @@ def collect_split(
                 if agent.act(action_mask=mask) != action:
                     raise RuntimeError("forced action was not honored")
             frame, reward, terminated, truncated, _ = environment.step(action)
+            # Temporal perception must consume every arrival, not just frames
+            # for which our privileged object detector happens to find a label.
+            projected, pooled = encoder.encode(frame)
             if agent is not None:
                 # Recurrence consumes every arrival, including unlabeled frames.
                 # No learner update or privileged object label enters the agent.
@@ -141,7 +146,6 @@ def collect_split(
                               terminated=bool(terminated), truncated=bool(truncated))
             label = pong_labels(environment)
             if label is not None and not (terminated or truncated):
-                projected, pooled = encoder.encode(frame)
                 current = {
                     "rgb64": np.asarray(frame, dtype=np.float32).reshape(-1) / 255.0,
                     "projected14": np.asarray(projected, dtype=np.float32),
@@ -171,6 +175,8 @@ def collect_split(
                 previous = None
             if terminated or truncated:
                 frame, _ = environment.reset()
+                encoder.reset()
+                encoder.encode(frame)
                 if agent is not None:
                     agent.begin_episode(frame)
     finally:
@@ -310,11 +316,12 @@ def evaluate_representation(
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default="dinov3")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--samples-per-seed", type=int, default=512)
     parser.add_argument("--seeds", type=int, nargs=4, default=(0, 1, 2, 3))
-    parser.add_argument("--dino-plan-cache")
+    parser.add_argument("--encoder-plan-cache")
     parser.add_argument("--agent-checkpoint", type=Path,
                         help="also probe a frozen RSSM's policy input; use its original backend")
     parser.add_argument("--output")
@@ -328,18 +335,13 @@ def main() -> None:
         parser.error("train, validation and test seeds must be distinct")
     if args.environment != "ALE/Pong-v5":
         parser.error("this color/object probe is specific to ALE/Pong-v5")
-    if not hasattr(_native, "DinoPerception"):
-        parser.error("rebuild the Kindle extension to enable the DINO probe")
-
-    encoder = _native.DinoPerception(
-        args.dino_checkpoint,
-        dino_plan_cache=args.dino_plan_cache,
-    )
+    encoder_type = _native.LeVJepaPerception if args.encoder == "levjepa" else _native.DinoPerception
+    encoder = encoder_type(args.encoder_checkpoint, args.encoder_plan_cache)
     agent_metadata = None
     if args.agent_checkpoint:
         agent_metadata = json.loads((args.agent_checkpoint / "metadata.json").read_text())
     print(
-        f"DINO feature shapes: projected={encoder.projected_shape}, "
+        f"{args.encoder} feature shapes: projected={encoder.projected_shape}, "
         f"pooled={encoder.pooled_shape}",
         flush=True,
     )
@@ -348,7 +350,7 @@ def main() -> None:
     for seed in args.seeds:
         # Each independent environment starts from the same checkpoint/RNG.
         # Do not manufacture a terminal flag to reset a live agent between seeds.
-        agent = (_native.Agent.restore(str(args.agent_checkpoint), args.dino_checkpoint)
+        agent = (_native.Agent.restore(str(args.agent_checkpoint), args.encoder_checkpoint)
                  if args.agent_checkpoint else None)
         starting_learner_step = agent.learner_step if agent is not None else None
         splits.append(collect_split(
@@ -378,7 +380,9 @@ def main() -> None:
         "environment": args.environment,
         "ale_py_version": ale_py.__version__,
         "atari_protocol": args.atari_protocol,
-        "dino_checkpoint_sha256": sha256_file(args.dino_checkpoint),
+        "encoder": args.encoder,
+        "encoder_checkpoint_sha256": sha256_file(args.encoder_checkpoint),
+        "encoder_history": "causal nonoverlapping chunks of 16 arrivals" if args.encoder == "levjepa" else "current frame",
         "native_extension_sha256": sha256_file(_native.__file__),
         "runner_sha256": sha256_file(__file__),
         "target": "displacement_t_minus_1_to_t" if args.motion else "position_t",

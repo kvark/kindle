@@ -1,10 +1,9 @@
-//! Frozen DINOv3 perception for Dreamer.
+//! Frozen visual perception for Dreamer.
 //!
 //! The encoder runs in a separate inference-only Meganeura session. Its
 //! parameters therefore cannot accidentally enter the Dreamer optimizer.
-//! Dreamer consumes the dense patch-token grid; CLS and register tokens are
-//! retained internally for faithful DINO inference and removed at this API
-//! boundary.
+//! Dreamer consumes a fixed-size projected patch grid. Encoder identity and
+//! temporal semantics are checkpointed; equal shapes do not mean equal features.
 
 use std::path::Path;
 use std::sync::Arc;
@@ -13,6 +12,7 @@ use meganeura::data::safetensors::SafeTensorsModel;
 use meganeura::{Graph, Mode, Session, SessionConfig};
 
 pub mod dinov3;
+pub mod levjepa;
 pub mod preprocess;
 mod weights;
 
@@ -33,6 +33,129 @@ pub const OBSERVATION_CHANNELS: usize = 64;
 pub const OBSERVATION_GRID: usize = 7;
 /// Stable seed for the non-trainable projection matrix.
 pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum PerceptionKind {
+    DinoV3,
+    LeVJepa,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PerceptionIdentity {
+    pub kind: PerceptionKind,
+    pub model_id: String,
+    pub checkpoint_revision: String,
+    pub encoding_revision: String,
+    pub checkpoint_sha256: String,
+}
+
+impl PerceptionKind {
+    pub fn identity(self, fingerprint: String) -> PerceptionIdentity {
+        let (model_id, checkpoint_revision, encoding_revision) = match self {
+            Self::DinoV3 => (
+                VITS16_MODEL_ID,
+                VITS16_CHECKPOINT_REV,
+                "dinov3-vits16-letterbox224-jl64-pool2-v1",
+            ),
+            Self::LeVJepa => (
+                levjepa::MODEL_ID,
+                levjepa::CHECKPOINT_REV,
+                levjepa::ENCODING_REV,
+            ),
+        };
+        PerceptionIdentity {
+            kind: self,
+            model_id: model_id.to_owned(),
+            checkpoint_revision: checkpoint_revision.to_owned(),
+            encoding_revision: encoding_revision.to_owned(),
+            checkpoint_sha256: fingerprint,
+        }
+    }
+}
+
+impl PerceptionIdentity {
+    pub(crate) fn validate(&self) -> std::io::Result<()> {
+        let hash = &self.checkpoint_sha256;
+        if hash.len() != 64
+            || !hash
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "invalid perception fingerprint",
+            ));
+        }
+        if *self != self.kind.identity(hash.clone()) {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "unsupported perception identity or temporal encoding",
+            ));
+        }
+        Ok(())
+    }
+
+    pub(crate) fn verify_file(&self, checkpoint: &Path) -> std::io::Result<()> {
+        self.validate()?;
+        let actual = checkpoint_sha256(checkpoint)?;
+        if actual != self.checkpoint_sha256 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!(
+                    "perception checkpoint SHA-256 is {actual}, expected {}",
+                    self.checkpoint_sha256
+                ),
+            ));
+        }
+        Ok(())
+    }
+}
+
+pub(crate) enum Perception {
+    Dino(DinoPerception),
+    LeVJepa(levjepa::LeVJepaPerception),
+}
+
+impl Perception {
+    pub(crate) fn load(
+        kind: PerceptionKind,
+        checkpoint: &Path,
+        gpu: Arc<blade_graphics::Context>,
+        cache: Option<&Path>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        match kind {
+            PerceptionKind::DinoV3 => Ok(Self::Dino(DinoPerception::load_vits16(
+                checkpoint,
+                Some(gpu),
+                cache,
+            )?)),
+            PerceptionKind::LeVJepa => Ok(Self::LeVJepa(levjepa::LeVJepaPerception::load(
+                checkpoint,
+                Some(gpu),
+                cache,
+            )?)),
+        }
+    }
+
+    pub(crate) fn reset(&mut self) {
+        if let Self::LeVJepa(encoder) = self {
+            encoder.reset();
+        }
+    }
+
+    pub(crate) fn encode_frame_rgb8(
+        &mut self,
+        rgb: &[u8],
+        width: usize,
+        height: usize,
+    ) -> Observation {
+        match self {
+            Self::Dino(encoder) => encoder.encode_frame_rgb8(rgb, width, height),
+            Self::LeVJepa(encoder) => encoder.encode_frame_rgb8(rgb, width, height),
+        }
+    }
+}
 
 pub(crate) fn checkpoint_sha256(path: &Path) -> std::io::Result<String> {
     hash_reader(std::fs::File::open(path)?)
@@ -55,15 +178,14 @@ fn hash_reader(mut reader: impl std::io::Read) -> std::io::Result<String> {
     }
 }
 
-/// One frozen, compressed DINO observation in token-major `[7 * 7, 64]`
-/// order. This is the representation stored in replay and reconstructed by
-/// the Dreamer world model.
+/// One frozen, compressed visual observation in token-major `[7 * 7, 64]`
+/// order. Replay retains the exact features observed at collection time.
 #[derive(Clone, Debug)]
-pub struct DinoObservation {
+pub struct Observation {
     values: Box<[f32]>,
 }
 
-impl DinoObservation {
+impl Observation {
     pub const LEN: usize = OBSERVATION_GRID * OBSERVATION_GRID * OBSERVATION_CHANNELS;
 
     pub fn from_vec(values: Vec<f32>) -> Self {
@@ -139,7 +261,7 @@ impl DinoPerception {
         Ok(Self {
             input: vec![0.0; config.num_patches() * config.patch_dim()],
             projected: vec![0.0; config.num_patches() * OBSERVATION_CHANNELS],
-            pooled: vec![0.0; DinoObservation::LEN],
+            pooled: vec![0.0; Observation::LEN],
             config,
             session,
         })
@@ -149,32 +271,32 @@ impl DinoPerception {
         crate::gpu_device_info(self.session.device_information())
     }
 
-    pub fn encode_rgb8(&mut self, rgb: &[u8]) -> DinoObservation {
-        self.input = preprocess::patches_from_rgb8(rgb, &self.config);
+    pub fn encode_rgb8(&mut self, rgb: &[u8]) -> Observation {
+        self.input =
+            preprocess::patches_from_rgb8(rgb, self.config.image_size, self.config.patch_size);
         self.run()
     }
 
     /// Encode any non-empty RGB8 frame using deterministic, aspect-preserving
     /// letterboxing to DINO's fixed 224×224 input.
-    pub fn encode_frame_rgb8(
-        &mut self,
-        rgb: &[u8],
-        width: usize,
-        height: usize,
-    ) -> DinoObservation {
+    pub fn encode_frame_rgb8(&mut self, rgb: &[u8], width: usize, height: usize) -> Observation {
         let resized = preprocess::resize_letterbox_rgb8(rgb, width, height, self.config.image_size);
         self.encode_rgb8(&resized)
     }
 
-    pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> DinoObservation {
-        self.input = preprocess::patches_from_pixels_chw(pixels, &self.config);
+    pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> Observation {
+        self.input = preprocess::patches_from_pixels_chw(
+            pixels,
+            self.config.image_size,
+            self.config.patch_size,
+        );
         self.run()
     }
 
     /// Projected patch tokens before the production 2x2 spatial pooling.
     ///
     /// This is exposed for representation diagnostics. Dreamer continues to
-    /// consume only the pooled [`DinoObservation`], so reading these values
+    /// consume only the pooled [`Observation`], so reading these values
     /// cannot change training or replay compatibility.
     pub fn projected_patches(&self) -> &[f32] {
         &self.projected
@@ -185,7 +307,7 @@ impl DinoPerception {
         self.config.grid()
     }
 
-    fn run(&mut self) -> DinoObservation {
+    fn run(&mut self) -> Observation {
         self.session.set_input("patches", &self.input);
         self.session.step();
         self.session.wait();
@@ -196,7 +318,7 @@ impl DinoPerception {
             OBSERVATION_CHANNELS,
             &mut self.pooled,
         );
-        DinoObservation::from_vec(self.pooled.clone())
+        Observation::from_vec(self.pooled.clone())
     }
 }
 
@@ -300,14 +422,19 @@ impl DinoEncoder {
     /// This method does not resize. The caller must provide
     /// `image_size × image_size × 3` bytes, currently 224×224 RGB.
     pub fn encode_rgb8(&mut self, rgb: &[u8]) -> &[f32] {
-        self.input = preprocess::patches_from_rgb8(rgb, &self.config);
+        self.input =
+            preprocess::patches_from_rgb8(rgb, self.config.image_size, self.config.patch_size);
         self.run()
     }
 
     /// Encode normalized CHW pixels using the same tensor convention as the
     /// Hugging Face reference processor.
     pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> &[f32] {
-        self.input = preprocess::patches_from_pixels_chw(pixels, &self.config);
+        self.input = preprocess::patches_from_pixels_chw(
+            pixels,
+            self.config.image_size,
+            self.config.patch_size,
+        );
         self.run()
     }
 
@@ -446,7 +573,7 @@ mod tests {
                     .sum();
             }
         }
-        let mut expected_observation = vec![0.0; DinoObservation::LEN];
+        let mut expected_observation = vec![0.0; Observation::LEN];
         pool_2x2_token_major(
             &projected,
             14,

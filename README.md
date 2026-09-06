@@ -1,14 +1,15 @@
 # Kindle
 
 Kindle is an experimental Rust agent that learns while acting. It combines
-Dreamer's recurrent world model and imagined actor/critic with frozen DINOv3
-perception, using [Meganeura](https://github.com/kvark/meganeura) and
+Dreamer's recurrent world model and imagined actor/critic with frozen DINOv3 or
+causal LeVJEPA perception, using [Meganeura](https://github.com/kvark/meganeura) and
 [Blade](https://github.com/kvark/blade) for native GPU computation.
 
 The current pivot adds action-conditioned prediction of unseen visual features.
 Prediction-only has passed initial own-action learning gates on native GridWorld
-and Pong, still with DINOv3. The target LeVJEPA-style causal video frontend is
-not implemented yet; reconstruction remains the measured control. Next comes
+and Pong with DINOv3. The native LeVJEPA video frontend is now implemented;
+[numerical checks and Pong mastery experiments](docs/experiments/2026-09-06-levjepa-pong.md)
+are in progress. Reconstruction remains the measured control. Next comes
 broader single-actor gameplay, accelerated playing plus training, pretraining and
 cross-game transfer. Concurrency and experience sharing follow strong results
 across games, not the first Pong win.
@@ -22,7 +23,7 @@ directions. Superseded planners and training stacks remain in git history.
 ```text
 previous belief + action ──► deterministic state ──► forecast frozen features
                                      │
-RGB ──► frozen DINOv3 ──► 7×7×64 ────┤
+RGB ──► frozen encoder ──► 7×7×64 ───┤
                                      ▼
                             categorical posterior
                                      │
@@ -50,7 +51,7 @@ loss. Both heads use the same spatial structure and matched downstream
 initialization. These coefficients are experimental settings, not universally
 tuned values.
 
-Intentional differences from the pinned upstream DreamerV3 include frozen DINO
+Intentional differences from the pinned upstream DreamerV3 include frozen features
 instead of learned RGB perception, f32 computation, 100k-entry replay, and
 separate world/behavior optimizer sessions. Library defaults retain BPTT 8 and
 train ratio 32 for compatibility. The historical Atari control uses full BPTT 64,
@@ -67,6 +68,17 @@ DINO weights are supplied separately:
 [`facebook/dinov3-vits16-pretrain-lvd1689m`](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
 snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`.
 The model is externally licensed and is not committed here.
+
+LeVJEPA uses the separately licensed CC-BY-NC-4.0
+[`galilai-group/LeVJEPA-VideoMix-Large`](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large),
+snapshot `e831a0347737fcaa660b39c57d41c109de399845`. Select it with
+`--encoder levjepa` in the Atari runner, `encoder="levjepa"` in Python's Agent,
+or `DreamerAgent::with_perception(..., PerceptionKind::LeVJepa, ...)` in Rust.
+It processes every arrival in bounded 16-frame causal chunks using F32 native
+inference; the world model stays continuous across chunk boundaries.
+Checkpoint restore verifies the saved encoder identity and actual weight file.
+Format-2 DINO checkpoints remain usable with their original executable, not as
+initializers for the new frontend's coordinates.
 
 On multi-adapter hosts, `MEGANEURA_DEVICE_ID` selects a backend-reported numeric
 device ID, not an adapter ordinal. Our RTX 5080 uses `0x2c02`; omit the variable
@@ -103,7 +115,7 @@ if transition.terminated || transition.truncated {
 
 The first reset and executed transitions have different replay semantics.
 Learning starts after enough complete replay sequences exist. State and learning
-persist across natural episodes; `begin_episode` resets recurrence only.
+persist across natural episodes; `begin_episode` resets belief and visual history.
 Validity masks affect live actions, not imagination: give invalid actions a
 benign meaning or use the same fixed vocabulary throughout.
 
@@ -212,10 +224,10 @@ revisions are also checked. Run headers expose model provenance; Atari headers
 add the executable extension and runner hashes, preventing mixed implementations
 from silently becoming a multi-seed score.
 
-New pixel-agent checkpoints also fingerprint the actual DINO weight file.
-Restore checks its SHA-256 before GPU construction. Legacy checkpoints without
-that field require the pinned reference file; equal tensor shapes do not make
-different perceptual representations compatible.
+Format-3 pixel-agent checkpoints record the frontend, its causal/preprocessing
+semantics and the actual encoder weight-file SHA-256. Restore checks all three
+before GPU construction; equal tensor shapes do not make different perceptual
+representations compatible. Format-2 checkpoints require their original build.
 
 New saves fingerprint all three tensor files in metadata so restore can reject
 damaged or mixed-generation files. Every restore requires all model and optimizer

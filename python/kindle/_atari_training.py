@@ -366,6 +366,7 @@ def summarize_training_window(
         "atari_protocol": str(run_start["atari_protocol"]),
         "config": run_start.get("config"),
         "model_provenance": run_start.get("model_provenance"),
+        "perception": run_start.get("perception"),
         "run_complete": run_end_step is not None,
         "run_end_step": run_end_step,
         "window": {

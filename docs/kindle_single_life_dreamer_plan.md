@@ -32,12 +32,15 @@ for gameplay progress or a reason to split the agent.
 
 ## Architecture: measured stepping stone versus target
 
-The completed experiments still use frozen DINOv3 ViT-S/16. They do not use
-LeVJEPA, a video encoder, or a pretrained action-conditioned world model.
+The completed competence experiments still use frozen DINOv3 ViT-S/16. The native
+LeVJEPA frontend now passes numerical parity and short training/restore checks;
+its [experiment record](experiments/2026-09-06-levjepa-pong.md) contains the
+predeclared stronger Pong mastery gate. No LeVJEPA gameplay success or pretrained
+action-conditioned world model is claimed yet.
 
 | Part | Running implementation | Target and missing work |
 | --- | --- | --- |
-| Perception | Frozen single-frame DINOv3, fixed projection/pooling to 7×7×64 | Frozen causal video features; LeVJEPA is the first candidate to implement and test |
+| Perception | DINOv3 control; native LeVJEPA candidate, both projected/pooled to 7×7×64 | Validate causal video features in actual learning and measure their cost |
 | World model | Categorical Dreamer RSSM; causal feature prediction, reward, continuation, balanced KL and replay value | Retain this learning/control baseline; bootstrap compatible dynamics from other games |
 | Behavior | Imagined categorical actor and two-hot critic, trained from the agent's own rewarded actions | Retain behavior across compatible games; measure adaptation and forgetting |
 | Runtime | One mutable agent; explicit act, observe and scheduled learning calls | Fast adaptive execution in one game stream, with trustworthy clocks and recovery |
@@ -56,8 +59,9 @@ z[t]     = posterior(h[t], u[t])
 (h[t], z[t]) --> reward / continuation / imagination --> actor / critic
 ~~~
 
-For the current encoder, E uses only RGB[t]. The target encoder may use a bounded
-history ending at t, never future frames. During imagination only the RSSM prior
+For DINO, E uses only RGB[t]. LeVJEPA uses the causal prefix of the current
+16-arrival chunk, never future frames. Chunk boundaries reset only perception,
+not RSSM state or replay. During imagination only the RSSM prior
 runs; the video encoder does not. Its short visual history and the RSSM's longer
 action-conditioned belief have different jobs.
 
@@ -172,11 +176,17 @@ These are different capabilities:
 | Free-running learning without time control | The game cannot be frozen while the agent computes | Required eventually; not validated by step-driven Atari |
 | Frozen evaluation | Act without parameter updates | Supported; does not establish training throughput |
 
-The tested full-BPTT, B16×T64, row-batch-16, ratio-256 Pong learner runs at
+The tested DINO full-BPTT, B16×T64, row-batch-16, ratio-256 Pong learner runs at
 7.26–7.28 actions/s. With action repeat four and a 60 Hz game clock this is
 about 0.48× real time, not super-real-time. Frozen evaluation is about 10.9×.
 GridWorld has no declared real-time clock, so its actions/s alone is not a
 speedup ratio.
+
+The much larger native LeVJEPA frontend adds roughly 47 ms per observation
+(growing with context). Its initial canary is slower still: around 0.35× in
+steady coupled learning, versus roughly 1.2× frozen. See the separate LeVJEPA
+experiment for construction costs, the cache-attention speedup and full-run
+results; do not transfer DINO throughput claims to the video encoder.
 
 Measure acceleration as simulated game seconds / wall seconds. Report cold
 construction separately and also include end-to-end run cost. Track actual
@@ -218,8 +228,7 @@ the no-time-control requirement.
 
 ### First: complete the missing frontend experiment
 
-LeVJEPA is an explicit next architecture gate, not an already-used encoder or
-an indefinitely deferred footnote. The
+LeVJEPA is implemented but has not yet passed the gameplay gate. The
 [released model card](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)
 describes a 303.1M-parameter ViT-L/16 trained on 16-frame clips, with block-causal
 attention. It is much larger than today's ViT-S and cannot be assumed faster or
@@ -407,8 +416,8 @@ contamination before any larger swarm or shared-optimizer design.
 
 ## Immediate work and invariants
 
-Next work is a bounded LeVJEPA frontend feasibility/parity experiment, the Atari
-diagnostic panel and serial playing-plus-training throughput. Then add the
+Current work is LeVJEPA numerical/gameplay validation, stronger Pong mastery and
+serial playing-plus-training throughput. Then broaden the Atari panel and add the
 world-only pretraining seam and current-Dreamer mind-games adapter as their gates
 are reached. Do not start actor/learner separation, multi-lane collection or
 another arbitrary 100-hour run as a substitute for stronger behavior.

@@ -1,4 +1,5 @@
 import sys
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,20 @@ sys.path.insert(0, str(EXAMPLES))
 
 from atari import ATARI_PROTOCOLS  # noqa: E402
 import atari  # noqa: E402
+
+
+def test_checkpoint_identity_fingerprints_actual_files(tmp_path) -> None:
+    names = ("metadata.json", "world.safetensors", "behavior.safetensors", "slow_value.safetensors")
+    for name in names:
+        (tmp_path / name).write_bytes(name.encode())
+    identity = atari.checkpoint_identity(tmp_path)
+    assert identity["path"] == str(tmp_path.resolve())
+    assert identity["metadata_sha256"] == hashlib.sha256(b"metadata.json").hexdigest()
+    assert identity["tensor_sha256"] == {
+        Path(name).stem: hashlib.sha256(name.encode()).hexdigest() for name in names[1:]
+    }
+    (tmp_path / "world.safetensors").write_bytes(b"changed weights")
+    assert atari.checkpoint_identity(tmp_path)["tensor_sha256"]["world"] != identity["tensor_sha256"]["world"]
 
 
 def test_published_minimal_changes_only_action_vocabulary() -> None:

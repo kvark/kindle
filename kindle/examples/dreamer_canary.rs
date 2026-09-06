@@ -6,7 +6,7 @@
 
 use std::{env, sync::Arc, time::Instant};
 
-use kindle::vision::DinoObservation;
+use kindle::vision::Observation;
 use kindle::{ActionMode, DreamerConfig, DreamerCore, FrameFlags, ModelSize, Reward};
 
 fn parse_model_size(value: &str) -> ModelSize {
@@ -113,7 +113,7 @@ fn main() {
 
 fn fill_synthetic_replay(core: &mut DreamerCore, config: &DreamerConfig) {
     let observation =
-        |step: usize| DinoObservation::from_vec(vec![step as f32 / 1_000.0; DinoObservation::LEN]);
+        |step: usize| Observation::from_vec(vec![step as f32 / 1_000.0; Observation::LEN]);
     core.begin_episode(observation(0));
     for step in 1..=config.batch_length {
         core.act(ActionMode::Greedy, None);

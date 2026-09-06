@@ -1,4 +1,4 @@
-"""Measure open-loop Atari dynamics in frozen-DINO feature space.
+"""Measure open-loop Atari dynamics in frozen visual feature space.
 
 The probe restores a checkpoint, follows a deterministic forced-action
 trajectory, and compares decoded prior predictions with the observations that
@@ -29,7 +29,7 @@ def checked_mean(total, count):
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
     parser.add_argument("checkpoint")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=5_000)
@@ -62,7 +62,7 @@ def main() -> None:
     )
     frame, _ = environment.reset(seed=args.seed)
     action_count = int(environment.action_space.n)
-    agent = kindle.Agent.restore(args.checkpoint, args.dino_checkpoint)
+    agent = kindle.Agent.restore(args.checkpoint, args.encoder_checkpoint)
     if agent.config["intrinsic_reward_scale"] != 0 or agent.config["extrinsic_reward_scale"] != 1:
         raise ValueError("this probe's reward labels require unscaled extrinsic-only training")
     if int(agent.config["action_count"]) != action_count:
@@ -93,7 +93,7 @@ def main() -> None:
 
     for step, action in enumerate(actions):
         if step % args.stride == 0 and step + horizon <= args.steps:
-            start_observation = np.asarray(agent.dino_observation, dtype=np.float64)
+            start_observation = np.asarray(agent.visual_observation, dtype=np.float64)
             posterior = np.asarray(
                 agent.observation_prediction(), dtype=np.float64
             )
@@ -153,7 +153,7 @@ def main() -> None:
             terminated=terminated,
             truncated=truncated,
         )
-        target_observation = np.asarray(agent.dino_observation, dtype=np.float64)
+        target_observation = np.asarray(agent.visual_observation, dtype=np.float64)
         for (
             offset,
             predicted_reward,

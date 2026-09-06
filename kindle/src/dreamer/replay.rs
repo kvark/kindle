@@ -5,7 +5,7 @@ use std::collections::VecDeque;
 use rand::Rng;
 
 use super::config::DreamerConfig;
-use crate::vision::DinoObservation;
+use crate::vision::Observation;
 
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
 pub struct Reward {
@@ -34,7 +34,7 @@ pub struct FrameFlags {
 
 #[derive(Clone, Debug)]
 pub struct ReplayFrame {
-    pub observation: DinoObservation,
+    pub observation: Observation,
     /// Action taken from the preceding frame to reach this observation.
     pub previous_action: Option<usize>,
     /// Reward observed together with this frame, caused by `previous_action`.
@@ -247,7 +247,7 @@ mod tests {
     fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
         let size = config.network();
         ReplayFrame {
-            observation: DinoObservation::from_vec(vec![index as f32; config.observation_dim()]),
+            observation: Observation::from_vec(vec![index as f32; config.observation_dim()]),
             previous_action: (index > 0).then_some(index % config.action_count),
             reward: Reward {
                 extrinsic: index as f32,

@@ -29,13 +29,12 @@ use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
 use crate::vision::{
-    DINOV3_UPSTREAM_REV, DINOVISION_SOURCE_REV, DinoObservation, DinoPerception,
-    OBSERVATION_CHANNELS, OBSERVATION_GRID, PROJECTION_SEED, VITS16_CHECKPOINT_REV,
-    VITS16_MODEL_ID,
+    OBSERVATION_CHANNELS, OBSERVATION_GRID, Observation, PROJECTION_SEED, Perception,
+    PerceptionIdentity, PerceptionKind,
 };
 
-const CHECKPOINT_FORMAT: u32 = 2;
-const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-dinov3-vits16";
+const CHECKPOINT_FORMAT: u32 = 3;
+const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-visual-features";
 const CHECKPOINT_METADATA: &str = "metadata.json";
 const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
 const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
@@ -52,13 +51,9 @@ struct CheckpointMetadata {
     dreamerv3_revision: String,
     meganeura_revision: String,
     blade_revision: String,
-    dinov3_revision: String,
-    dinovision_revision: String,
-    dino_model_id: String,
-    dino_checkpoint_revision: String,
     projection_seed: u64,
     #[serde(default)]
-    dino_checkpoint_sha256: Option<String>,
+    perception: Option<PerceptionIdentity>,
     observation_grid: usize,
     observation_channels: usize,
     config: DreamerConfig,
@@ -90,7 +85,7 @@ pub struct ModelProvenance {
     pub future_head_revision: Option<&'static str>,
     pub visitation_hash_version: Option<u32>,
     /// Bound by the pixel agent; absent for a core fed precomputed features.
-    pub dino_checkpoint_sha256: Option<String>,
+    pub perception: Option<PerceptionIdentity>,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -281,7 +276,7 @@ impl D3TrainScheduler {
     }
 }
 
-/// DreamerV3 learner over precomputed frozen-DINO observations.
+/// DreamerV3 learner over precomputed frozen visual observations.
 ///
 /// Acting never trains implicitly. Call [`Self::learn`] explicitly, or use
 /// [`Self::learn_scheduled`] to honor D3's replay-samples-per-environment-step
@@ -290,7 +285,7 @@ pub struct DreamerCore {
     gpu: Arc<blade_graphics::Context>,
     readback: Readback,
     config: DreamerConfig,
-    dino_checkpoint_sha256: Option<String>,
+    perception_identity: Option<PerceptionIdentity>,
     bins: TwoHotBins,
     replay: SequenceReplay,
     visitation: Option<VisitationBonus>,
@@ -346,7 +341,7 @@ impl DreamerCore {
         metadata: CheckpointMetadata,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let mut core = Self::with_gpu(metadata.config.clone(), gpu);
-        core.dino_checkpoint_sha256 = metadata.dino_checkpoint_sha256;
+        core.perception_identity = metadata.perception;
         checkpoint::load_session(&mut core.world_train, &checkpoint.join(CHECKPOINT_WORLD))?;
         checkpoint::load_session(
             &mut core.behavior_train,
@@ -461,7 +456,7 @@ impl DreamerCore {
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
-            observation: vec![0.0; DinoObservation::LEN],
+            observation: vec![0.0; Observation::LEN],
             encoded_observation: vec![0.0; OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth],
             feature: vec![0.0; config.feature_dim()],
             pending_action: None,
@@ -471,7 +466,7 @@ impl DreamerCore {
             environment_step: 0,
             train_scheduler: D3TrainScheduler::default(),
             config,
-            dino_checkpoint_sha256: None,
+            perception_identity: None,
             world_train,
             world_observe_batch,
             world_observe_live,
@@ -503,7 +498,7 @@ impl DreamerCore {
                 .config
                 .visitation_bonus
                 .then_some(super::intrinsic::VERSION),
-            dino_checkpoint_sha256: self.dino_checkpoint_sha256.clone(),
+            perception: self.perception_identity.clone(),
         }
     }
 
@@ -519,7 +514,7 @@ impl DreamerCore {
         self.environment_step
     }
 
-    /// Trainable world and behavior parameter counts, excluding frozen DINO,
+    /// Trainable world and behavior parameter counts, excluding frozen perception,
     /// inference-session copies, and the EMA value model.
     pub fn trainable_parameter_counts(&self) -> (usize, usize) {
         (
@@ -627,13 +622,13 @@ impl DreamerCore {
         &self.feature
     }
 
-    /// Current output of the trainable adapter between DINO and the RSSM.
+    /// Current output of the trainable adapter between perception and the RSSM.
     pub fn encoded_observation(&self) -> &[f32] {
         &self.encoded_observation
     }
 
-    /// Current frozen-DINO observation before the trainable adapter.
-    pub fn dino_observation(&self) -> &[f32] {
+    /// Current frozen visual observation before the trainable adapter.
+    pub fn visual_observation(&self) -> &[f32] {
         &self.observation
     }
 
@@ -650,7 +645,7 @@ impl DreamerCore {
         decoder.set_input("stoch", &self.stoch);
         decoder.step();
         decoder.wait();
-        let mut observation = vec![0.0; DinoObservation::LEN];
+        let mut observation = vec![0.0; Observation::LEN];
         decoder.read_output_by_index(0, &mut observation);
         observation
     }
@@ -702,7 +697,7 @@ impl DreamerCore {
         self.prior_rollout(actions, false, false).rewards
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     /// This diagnostic leaves the live posterior and all RNG streams intact.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         let rollout = self.prior_rollout(actions, true, false);
@@ -812,7 +807,7 @@ impl DreamerCore {
                 decoder.set_input("stoch", &stoch);
                 decoder.step();
                 decoder.wait();
-                let mut observation = vec![0.0; DinoObservation::LEN];
+                let mut observation = vec![0.0; Observation::LEN];
                 decoder.read_output_by_index(0, &mut observation);
                 rollout.observations.push(observation);
             }
@@ -862,12 +857,8 @@ impl DreamerCore {
             dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
             meganeura_revision: MEGANEURA_REV.to_owned(),
             blade_revision: BLADE_REV.to_owned(),
-            dinov3_revision: DINOV3_UPSTREAM_REV.to_owned(),
-            dinovision_revision: DINOVISION_SOURCE_REV.to_owned(),
-            dino_model_id: VITS16_MODEL_ID.to_owned(),
-            dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
-            dino_checkpoint_sha256: self.dino_checkpoint_sha256.clone(),
+            perception: self.perception_identity.clone(),
             observation_grid: OBSERVATION_GRID,
             observation_channels: OBSERVATION_CHANNELS,
             config: self.config.clone(),
@@ -894,15 +885,8 @@ impl DreamerCore {
     /// budget counts executed actions; upstream D3's driver counter also
     /// counts these action-free reset records, a small disclosed accounting
     /// difference in episode-based environments.
-    pub fn begin_episode(&mut self, observation: DinoObservation) {
-        assert!(
-            self.pending_action.is_none(),
-            "cannot reset with a pending action"
-        );
-        assert!(
-            !self.active || self.needs_reset,
-            "begin_episode is only legal initially or after an is_last frame"
-        );
+    pub fn begin_episode(&mut self, observation: Observation) {
+        self.check_episode_boundary();
         self.deter.fill(0.0);
         self.stoch.fill(0.0);
         if let Some(bonus) = &mut self.visitation {
@@ -926,6 +910,17 @@ impl DreamerCore {
         );
         self.active = true;
         self.needs_reset = false;
+    }
+
+    fn check_episode_boundary(&self) {
+        assert!(
+            self.pending_action.is_none(),
+            "cannot reset with a pending action"
+        );
+        assert!(
+            !self.active || self.needs_reset,
+            "begin_episode is only legal initially or after an is_last frame"
+        );
     }
 
     pub fn act(&mut self, mode: ActionMode, action_mask: Option<&[bool]>) -> usize {
@@ -989,7 +984,7 @@ impl DreamerCore {
     /// including optional visitation novelty. Scales apply only during learning.
     pub fn observe(
         &mut self,
-        observation: DinoObservation,
+        observation: Observation,
         mut reward: Reward,
         flags: FrameFlags,
     ) -> Reward {
@@ -1784,9 +1779,9 @@ impl DreamerCore {
     }
 }
 
-/// Pixel-facing agent combining the frozen DINO frontend and Dreamer core.
+/// Pixel-facing agent combining frozen visual perception and the Dreamer core.
 pub struct DreamerAgent {
-    perception: DinoPerception,
+    perception: Perception,
     core: DreamerCore,
 }
 
@@ -1796,28 +1791,51 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let fingerprint = crate::vision::checkpoint_sha256(dino_checkpoint.as_ref())?;
+        Self::with_perception(
+            config,
+            PerceptionKind::DinoV3,
+            dino_checkpoint,
+            dino_plan_cache,
+        )
+    }
+
+    pub fn with_perception(
+        config: DreamerConfig,
+        kind: PerceptionKind,
+        encoder_checkpoint: impl AsRef<Path>,
+        encoder_plan_cache: Option<&Path>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let fingerprint = crate::vision::checkpoint_sha256(encoder_checkpoint.as_ref())?;
+        let identity = kind.identity(fingerprint);
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception =
-            DinoPerception::load_vits16(dino_checkpoint, Some(Arc::clone(&gpu)), dino_plan_cache)?;
+        let perception = Perception::load(
+            kind,
+            encoder_checkpoint.as_ref(),
+            Arc::clone(&gpu),
+            encoder_plan_cache,
+        )?;
         let mut core = DreamerCore::with_gpu(config, gpu);
-        core.dino_checkpoint_sha256 = Some(fingerprint);
+        core.perception_identity = Some(identity);
         Ok(Self { perception, core })
     }
 
     pub fn restore(
         dreamer_checkpoint: impl AsRef<Path>,
-        dino_checkpoint: impl AsRef<Path>,
-        dino_plan_cache: Option<&Path>,
+        encoder_checkpoint: impl AsRef<Path>,
+        encoder_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let metadata = read_checkpoint_metadata(dreamer_checkpoint.as_ref())?;
-        let fingerprint = crate::vision::checkpoint_sha256(dino_checkpoint.as_ref())?;
-        validate_perception_fingerprint(metadata.dino_checkpoint_sha256.as_deref(), &fingerprint)?;
+        let identity = metadata
+            .perception
+            .as_ref()
+            .ok_or("pixel restore requires a recorded perception identity")?;
+        identity.verify_file(encoder_checkpoint.as_ref())?;
+        let kind = identity.kind;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let mut core =
+        let core =
             DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu), metadata)?;
-        core.dino_checkpoint_sha256 = Some(fingerprint);
-        let perception = DinoPerception::load_vits16(dino_checkpoint, Some(gpu), dino_plan_cache)?;
+        let perception =
+            Perception::load(kind, encoder_checkpoint.as_ref(), gpu, encoder_plan_cache)?;
         Ok(Self { perception, core })
     }
 
@@ -1834,14 +1852,14 @@ impl DreamerAgent {
         self.core.latent_feature()
     }
 
-    /// Current output of the trainable adapter between DINO and the RSSM.
+    /// Current output of the trainable adapter between perception and the RSSM.
     pub fn encoded_observation(&self) -> &[f32] {
         self.core.encoded_observation()
     }
 
-    /// Current frozen-DINO observation before the trainable adapter.
-    pub fn dino_observation(&self) -> &[f32] {
-        self.core.dino_observation()
+    /// Current frozen visual observation before the trainable adapter.
+    pub fn visual_observation(&self) -> &[f32] {
+        self.core.visual_observation()
     }
 
     /// Current configured observation-head output; see [`DreamerCore::observation_prediction`].
@@ -1869,7 +1887,7 @@ impl DreamerAgent {
         self.core.prior_reward_rollout(actions)
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         self.core.prior_diagnostic_rollout(actions)
     }
@@ -1886,6 +1904,8 @@ impl DreamerAgent {
     }
 
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
+        self.core.check_episode_boundary();
+        self.perception.reset();
         let observation =
             self.perception
                 .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
@@ -1898,6 +1918,10 @@ impl DreamerAgent {
 
     /// Return the unscaled reward channels, including configured novelty.
     pub fn observe(&mut self, transition: &Transition) -> Reward {
+        assert!(
+            self.core.pending_action.is_some(),
+            "act must precede observe"
+        );
         let observation = self.perception.encode_frame_rgb8(
             transition.frame.pixels(),
             transition.frame.width(),
@@ -1931,34 +1955,9 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
     Ok(metadata)
 }
 
-fn validate_perception_fingerprint(expected: Option<&str>, actual: &str) -> io::Result<()> {
-    // Legacy checkpoints declare this exact reference revision but do not
-    // fingerprint the supplied file. Do not accept arbitrary weights for them.
-    let expected = expected.unwrap_or(crate::vision::VITS16_CHECKPOINT_SHA256);
-    if actual != expected {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            format!("DINO checkpoint SHA-256 is {actual}, expected {expected}"),
-        ));
-    }
-    Ok(())
-}
-
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
-    if metadata
-        .dino_checkpoint_sha256
-        .as_ref()
-        .is_some_and(|hash| {
-            hash.len() != 64
-                || !hash
-                    .bytes()
-                    .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
-        })
-    {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "invalid DINO fingerprint",
-        ));
+    if let Some(perception) = &metadata.perception {
+        perception.validate()?;
     }
     let expected = [
         (
@@ -1980,26 +1979,6 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             "Blade revision",
             BLADE_REV,
             metadata.blade_revision.as_str(),
-        ),
-        (
-            "DINOv3 revision",
-            DINOV3_UPSTREAM_REV,
-            metadata.dinov3_revision.as_str(),
-        ),
-        (
-            "DINO transcription revision",
-            DINOVISION_SOURCE_REV,
-            metadata.dinovision_revision.as_str(),
-        ),
-        (
-            "DINO model",
-            VITS16_MODEL_ID,
-            metadata.dino_model_id.as_str(),
-        ),
-        (
-            "DINO checkpoint revision",
-            VITS16_CHECKPOINT_REV,
-            metadata.dino_checkpoint_revision.as_str(),
         ),
     ];
     if metadata.format != CHECKPOINT_FORMAT {
@@ -2274,10 +2253,6 @@ mod tests {
             dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
             meganeura_revision: MEGANEURA_REV.to_owned(),
             blade_revision: BLADE_REV.to_owned(),
-            dinov3_revision: DINOV3_UPSTREAM_REV.to_owned(),
-            dinovision_revision: DINOVISION_SOURCE_REV.to_owned(),
-            dino_model_id: VITS16_MODEL_ID.to_owned(),
-            dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
             observation_grid: OBSERVATION_GRID,
             observation_channels: OBSERVATION_CHANNELS,
@@ -2288,7 +2263,9 @@ mod tests {
             return_high: 1.0,
             visitation: None,
             future_head_revision: None,
-            dino_checkpoint_sha256: None,
+            perception: Some(
+                PerceptionKind::DinoV3.identity(crate::vision::VITS16_CHECKPOINT_SHA256.to_owned()),
+            ),
             tensor_sha256: None,
         }
     }
@@ -2311,30 +2288,27 @@ mod tests {
     }
 
     #[test]
-    fn perception_fingerprints_match_exact_files_and_constrain_legacy_restores() {
-        let reference = crate::vision::VITS16_CHECKPOINT_SHA256;
-        validate_perception_fingerprint(None, reference).unwrap();
-        validate_perception_fingerprint(Some(reference), reference).unwrap();
-        let custom = "a".repeat(64);
-        assert!(validate_perception_fingerprint(None, &custom).is_err());
-        assert!(validate_perception_fingerprint(Some(reference), &custom).is_err());
-        validate_perception_fingerprint(Some(&custom), &custom).unwrap();
-
+    fn perception_identity_rejects_changed_kind_semantics_and_malformed_hashes() {
         let mut metadata = valid_checkpoint_metadata();
         for malformed in ["", "xyz", &"A".repeat(64)] {
-            metadata.dino_checkpoint_sha256 = Some(malformed.to_owned());
+            metadata.perception.as_mut().unwrap().checkpoint_sha256 = malformed.to_owned();
             assert!(validate_checkpoint_metadata(&metadata).is_err());
         }
-        metadata.dino_checkpoint_sha256 = Some(custom);
+        metadata.perception = Some(
+            PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
+        );
         validate_checkpoint_metadata(&metadata).unwrap();
-        let mut encoded = serde_json::to_value(metadata).unwrap();
-        encoded
-            .as_object_mut()
-            .unwrap()
-            .remove("dino_checkpoint_sha256");
-        let legacy: CheckpointMetadata = serde_json::from_value(encoded).unwrap();
-        assert!(legacy.dino_checkpoint_sha256.is_none());
-        validate_checkpoint_metadata(&legacy).unwrap();
+        metadata.perception.as_mut().unwrap().kind = PerceptionKind::DinoV3;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.perception = Some(
+            PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
+        );
+        metadata.perception.as_mut().unwrap().encoding_revision = "full-attention".to_owned();
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.perception = None;
+        validate_checkpoint_metadata(&metadata).unwrap(); // feature-only core
+        metadata.format = 2;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
     }
 
     #[test]
@@ -2359,7 +2333,7 @@ mod tests {
             .err()
             .expect("different encoder must be rejected");
         fs::remove_dir_all(directory).unwrap();
-        assert!(error.to_string().contains("DINO checkpoint SHA-256"));
+        assert!(error.to_string().contains("perception checkpoint SHA-256"));
     }
 
     #[test]
@@ -2641,9 +2615,8 @@ mod tests {
                     values
                 })
                 .collect::<Vec<_>>();
-            let observation = |step: usize| {
-                DinoObservation::from_vec(vec![step as f32 / 10.0; DinoObservation::LEN])
-            };
+            let observation =
+                |step: usize| Observation::from_vec(vec![step as f32 / 10.0; Observation::LEN]);
 
             agent.begin_episode(observation(0));
             for step in 1..=16 {
@@ -2793,21 +2766,21 @@ mod tests {
                 .has_param_grad("world.dynamics.core.dynin0.weight"),
             "replay value must retain a gradient path into the world model"
         );
-        let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+        let observation = || Observation::from_vec(vec![0.0; Observation::LEN]);
 
         agent.begin_episode(observation());
-        assert_eq!(agent.dino_observation(), vec![0.0; DinoObservation::LEN]);
+        assert_eq!(agent.visual_observation(), vec![0.0; Observation::LEN]);
         assert!(agent.posterior_reward_prediction().is_finite());
         assert!(agent.posterior_value_prediction().is_finite());
         let posterior_observation = agent.observation_prediction();
-        assert_eq!(posterior_observation.len(), DinoObservation::LEN);
+        assert_eq!(posterior_observation.len(), Observation::LEN);
         assert!(posterior_observation.iter().all(|value| value.is_finite()));
         let (prior_rewards, prior_observations) = agent.prior_diagnostic_rollout(&[0, 1]);
         assert_eq!(prior_rewards.len(), 2);
         assert_eq!(prior_observations.len(), 2);
         assert!(prior_rewards.iter().all(|value| value.is_finite()));
         assert!(prior_observations.iter().all(|observation| {
-            observation.len() == DinoObservation::LEN
+            observation.len() == Observation::LEN
                 && observation.iter().all(|value| value.is_finite())
         }));
         let (rewards, continuations, values) = agent.prior_behavior_rollout(&[0, 1]);
@@ -2998,7 +2971,7 @@ mod tests {
                 "matched downstream initialization for {name}"
             );
         }
-        let observation = |value| DinoObservation::from_vec(vec![value; DinoObservation::LEN]);
+        let observation = |value| Observation::from_vec(vec![value; Observation::LEN]);
         for agent in [&mut left, &mut right] {
             agent.begin_episode(observation(0.2));
             assert_eq!(
@@ -3082,7 +3055,7 @@ mod tests {
         config.learning_rate_warmup = 0;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
-        let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+        let observation = || Observation::from_vec(vec![0.0; Observation::LEN]);
 
         for _ in 0..512 {
             agent.begin_episode(observation());
@@ -3146,13 +3119,13 @@ mod tests {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
         let observation = |class: usize| {
-            let mut values = vec![0.0; DinoObservation::LEN];
+            let mut values = vec![0.0; Observation::LEN];
             for (index, value) in values.iter_mut().enumerate() {
                 if index % 2 == class {
                     *value = 1.0;
                 }
             }
-            DinoObservation::from_vec(values)
+            Observation::from_vec(values)
         };
 
         let size = agent.config.network();

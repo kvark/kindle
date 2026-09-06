@@ -54,8 +54,18 @@ def test_agent_exposes_read_only_behavior_probes() -> None:
 
 
 def test_agent_exposes_read_only_dynamics_probes() -> None:
-    assert hasattr(kindle.Agent, "dino_observation")
+    assert hasattr(kindle.Agent, "visual_observation")
     assert hasattr(kindle.Agent, "latent_feature")
     assert hasattr(kindle.Agent, "observation_prediction")
     assert hasattr(kindle.Agent, "prior_diagnostic_rollout")
     assert hasattr(kindle.Agent, "provenance")
+
+
+def test_encoder_selection_is_explicit_and_rejects_typos_before_gpu() -> None:
+    import pytest
+
+    assert kindle.LEVJEPA_MODEL_ID == "galilai-group/LeVJEPA-VideoMix-Large"
+    assert hasattr(kindle._native.LeVJepaPerception, "reset")
+    assert hasattr(kindle._native.LeVJepaPerception, "next_frame_in_chunk")
+    with pytest.raises(ValueError, match="encoder must be dinov3 or levjepa"):
+        kindle.Agent("unused", 18, encoder="lev-jepa?")
