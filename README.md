@@ -6,10 +6,12 @@ perception, using [Meganeura](https://github.com/kvark/meganeura) and
 [Blade](https://github.com/kvark/blade) for native GPU computation.
 
 The current pivot adds action-conditioned prediction of unseen visual features.
-The reconstruction agent remains the measured control; a predictive objective
-is not yet a demonstrated replacement. Games are our first testbed, with
-intrinsic motivation, continual learning and experience sharing as longer-term
-goals.
+Prediction-only has passed initial own-action learning gates on native GridWorld
+and Pong, still with DINOv3. The target LeVJEPA-style causal video frontend is
+not implemented yet; reconstruction remains the measured control. Next comes
+broader single-actor gameplay, accelerated playing plus training, pretraining and
+cross-game transfer. Concurrency and experience sharing follow strong results
+across games, not the first Pong win.
 
 Read the [single project plan](docs/kindle_single_life_dreamer_plan.md) for the
 architecture, evidence and research gates, and [AGENTS.md](AGENTS.md) for working
@@ -51,9 +53,10 @@ tuned values.
 Intentional differences from the pinned upstream DreamerV3 include frozen DINO
 instead of learned RGB perception, f32 computation, 100k-entry replay, and
 separate world/behavior optimizer sessions. Library defaults retain BPTT 8 and
-train ratio 32 for compatibility; measured Atari controls explicitly use full
-BPTT 64, B16×T64, row microbatch 4 and ratio 256. Microbatching accumulates
-gradients before one update; it does not truncate recurrence.
+train ratio 32 for compatibility. The historical Atari control uses full BPTT 64,
+B16×T64, row microbatch 4 and ratio 256; the new matched causal/reconstruction
+runs use row batch 16. Keep those results' provenance separate. Microbatching
+accumulates gradients before one update; it does not truncate recurrence.
 
 ## Build and weights
 

@@ -12,10 +12,19 @@ guidance are allowed while establishing reliable learning.
   `docs/kindle_single_life_dreamer_plan.md`. Keep its claims tied to code and
   measured results. Experiment logs belong in `runs/`, not in an ever-growing
   chronological plan.
+- Prioritize one learning actor: Atari breadth, video/world pretraining and fast
+  serial playing plus training, then mind-games (vkQuake2/TMNF), GOG/Wine games,
+  cross-game adaptation and retention. Pong's initial-learning gate is achieved,
+  not consistent mastery. Require strong single-actor GOG and transfer results
+  before swarm learning. Actor/learner concurrency is not the next milestone;
+  GPU kernel parallelism and batched replay remain useful.
 - Preserve a measured Dreamer control. Add JEPA-style prediction as a causal,
   action-conditioned objective that predicts an observation before consuming
   it. Predicting the current frozen DINO features from the posterior is already
   the existing feature-reconstruction control.
+  Current positive runs use DINOv3 plus causal prediction, not LeVJEPA. Complete
+  a bounded, matched causal-video frontend experiment with LeVJEPA as the first
+  candidate; do not describe the DINO stepping stone as the full video pivot.
 - Change one scientific variable per comparison. Report real interactions,
   learner updates, wall time, model/data provenance, all seeds, and failures.
   A short integration test or an historical score is not a matched benchmark.
@@ -45,11 +54,22 @@ guidance are allowed while establishing reliable learning.
   held-out control-relevant probes. A paper alone is not an implementation plan.
   Probe the trained recurrent belief before inferring a need for more temporal
   input from single-frame feature probes.
+- Distinguish video-encoder initialization, action-conditioned world pretraining
+  and policy-skill transfer. Missing action/reward labels are not NOOP/zero.
+  Hold target titles out of source data and tuning; measure adaptation and
+  forgetting. Retain the source policy when testing full-policy transfer, while
+  declaring head, optimizer, normalizer, replay and recurrent-state resets.
+- Reuse mind-games' launch, time-control, capture and input infrastructure.
+  Verify its Kindle revision/API before integration; legacy BatchAgent adapters
+  are not the current Dreamer path. Keep privileged reward/task observers outside
+  policy inputs, and do not inherit unreported shaping or scripted gameplay.
 - Respect the single stream of external consequences. Natural deaths and
   respawns are allowed; cloning or rewinding the game for training is not.
-  Mark accelerated laboratory tests separately from real-time lifetime runs.
-  Gate actor/learner separation on frozen-policy state/action parity; preserve
-  arrival order, mark observation gaps and bound training debt before concurrency.
+  Distinguish uncapped stepping, super-real-time playing plus training, and a
+  free-running game without time control. Measure simulated/wall time with
+  learning enabled; fast frozen inference is not training throughput. Preserve
+  arrival order, actual action durations and observation gaps, and bound training
+  debt. Try measured serial scheduling before any actor/learner separation.
 - Delete superseded code and redundant documentation when they have no current
   purpose. Git retains history. Prefer small concrete modules over speculative
   frameworks, broad configuration surfaces, or premature swarm infrastructure.

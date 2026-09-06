@@ -282,8 +282,7 @@ seed 1's slower learning.
 Decision: proceed with causal prediction as the next experimental recipe, retaining
 reconstruction as the measured control. This is initial reward-guided learning,
 not intrinsic-only learning, superiority, broad game competence or real-time
-lifelong operation. Seed 1 still loses most frozen Pong games. Prioritize a cheap
-inference-only actor with exact frozen state/action parity; diagnose native
-reconstruction's sampled/greedy and fresh-state effects separately. Then test
-retention, sparse-task adaptation and bounded training debt before longer runs or
-experience sharing. The project plan remains the single roadmap.
+lifelong operation. Seed 1 still loses most frozen Pong games. Follow-up priorities
+are defined in the [single project roadmap](../kindle_single_life_dreamer_plan.md),
+including its subsequent single-actor-first revision; this experiment report does
+not establish a separate runtime-development sequence.
