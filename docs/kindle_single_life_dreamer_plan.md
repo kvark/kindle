@@ -24,9 +24,12 @@ The order is:
    unseen shooter and retention of previous games.
 6. Only after strong single-actor GOG and transfer results, investigate swarms.
 
-Actor/learner concurrency is not the next project. GPU kernel parallelism,
-batched replay and efficient serial scheduling are welcome; separate live
-rollout workers, learner services and swarm infrastructure are deferred.
+Vectorized collection and batched live inference for one shared learner are
+now the immediate runtime priority, explicitly requested after inspecting GPU
+utilization. Independent environments are collection streams, not independent
+learners or a swarm. Preserve each stream's causal history, belief, RNG and
+replay continuity; count all executed interactions and honor the training ratio.
+Separate learner services and swarm infrastructure remain deferred.
 A cheap evaluation constructor can be a local optimization, not a prerequisite
 for gameplay progress or a reason to split the agent.
 
@@ -43,7 +46,7 @@ action-conditioned world model is claimed yet.
 | Perception | DINOv3 control; native LeVJEPA candidate, both projected/pooled to 7×7×64 | Validate causal video features in actual learning and measure their cost |
 | World model | Categorical Dreamer RSSM; causal feature prediction, reward, continuation, balanced KL and replay value | Retain this learning/control baseline; bootstrap compatible dynamics from other games |
 | Behavior | Imagined categorical actor and two-hot critic, trained from the agent's own rewarded actions | Retain behavior across compatible games; measure adaptation and forgetting |
-| Runtime | One mutable agent; explicit act, observe and scheduled learning calls | Fast adaptive execution in one game stream, with trustworthy clocks and recovery |
+| Runtime | Serial control and native vectorized LeVJEPA/RSSM/policy inference; one shared learner | Eliminate measured learner bubbles; retain trustworthy per-stream clocks and recovery |
 
 The JEPA-inspired change that actually landed is prediction before observation:
 the predictive head reads the deterministic prior state, not the posterior that
@@ -188,6 +191,18 @@ steady coupled learning, versus roughly 1.2× frozen. See the separate LeVJEPA
 experiment for construction costs, the cache-attention speedup and full-run
 results; do not transfer DINO throughput claims to the video encoder.
 
+The serial LeVJEPA mastery queue was interrupted at the user's request to make
+vectorization the priority. The 60k-action checkpoint is retained, not a passed
+mastery gate. The first vector matrix measures 5.39 / 5.85 / 6.03 aggregate
+actions/s at N=1/2/4, all at R256 and B16×T64. Batched inference is implemented,
+but the learner still dominates wall time. Numerics-preserving CPU/readback
+cleanup raises N=2 to 6.50 actions/s with every learner report and executed
+transition unchanged. A separate B32 experiment reaches 8.12 actions/s at the
+same replay ratio but changes optimizer cadence; learning quality is not yet
+validated. These are throughput measurements, not mastery claims. See the
+[vectorization record](experiments/2026-09-06-vectorization.md) for the controls,
+numerical checks, GPU traces and subsequent optimizations.
+
 Measure acceleration as simulated game seconds / wall seconds. Report cold
 construction separately and also include end-to-end run cost. Track actual
 emulator frames, policy decisions, replay samples, imagined transitions and
@@ -203,13 +218,29 @@ only game rendering cannot fix that.
 
 The next performance target is sustained >1× playing plus training on simple
 games, with 2× as a useful stretch target and retained learning quality.
-Profile the complete serial loop: environment/capture, preprocessing/encoder,
+Profile the complete vectorized loop against N=1: environment/capture, preprocessing/encoder,
 posterior/action, replay, world update, imagination/behavior and synchronization.
 Prioritize grouped RSSM/layout work, batched non-recurrent heads, fewer host/GPU
 round trips and measured feature/replay packing. Preserve recovered F32 gradient
 safeguards and full-recurrence row batching. Earlier cached-read/materialization
 work already reduced a 12M canary from 7.42 to 1.05 s/update; full rows reach 0.54 s.
 Those measurements are in the kickoff report; do not repeat that investigation.
+
+Use one learner with batched live inference, not one full GPU model per game.
+Keep independent visual caches, beliefs, RNG streams and sequence replay. Sample
+uniformly over eligible per-stream sequence starts after the fresh-item queue;
+never concatenate unrelated environments into a temporal sequence. Preserve
+terminal observations before resetting only the affected streams. Report total
+actions, actions per stream, updates and training debt. A vector tick is not one
+interaction, and aggregate acceleration is not per-stream real-time play.
+
+Before another multi-day learning queue: finish fixed-ratio throughput controls,
+remove measured CPU/readback bubbles, and test larger replay batches if memory
+permits. Treat a changed learner batch as an algorithmic ablation, not a free
+systems speedup. Require independent reset/cache parity and validated action,
+reward, update and checkpoint ledgers before long vectorized training. Declare
+its aggregate budget and final frozen evaluations as a new experiment; do not
+reinterpret the interrupted single-stream mastery protocol.
 
 Smaller models or lower train ratios are valid experiments, not free speedups.
 Change one variable, report actual updates per real interaction, and retest

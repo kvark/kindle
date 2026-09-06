@@ -9,6 +9,7 @@ mod agent;
 mod behavior;
 mod checkpoint;
 mod config;
+mod cpu;
 mod distributions;
 mod intrinsic;
 mod networks;
@@ -19,7 +20,7 @@ mod world;
 
 pub use agent::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, LearnReport, LearnTiming,
-    ModelProvenance, WorldMetrics,
+    ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
 pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize};
 pub use replay::{FrameFlags, Reward};

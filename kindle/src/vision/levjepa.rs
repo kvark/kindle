@@ -35,7 +35,7 @@ type Error = Box<dyn std::error::Error>;
 
 pub struct LeVJepaPerception {
     session: Session,
-    frame: usize,
+    frames: Vec<usize>,
     projected: Vec<f32>,
     pooled: Vec<f32>,
 }
@@ -46,6 +46,19 @@ impl LeVJepaPerception {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Error> {
+        Self::load_batched(checkpoint, 1, gpu, plan_cache)
+    }
+
+    /// One set of frozen weights, batched dense layers, independent KV caches.
+    pub fn load_batched(
+        checkpoint: impl AsRef<Path>,
+        streams: usize,
+        gpu: Option<Arc<blade_graphics::Context>>,
+        plan_cache: Option<&Path>,
+    ) -> Result<Self, Error> {
+        if streams == 0 {
+            return Err("LeVJEPA needs at least one stream".into());
+        }
         let model = SafeTensorsModel::load(checkpoint.as_ref().to_path_buf())?;
         validate_weights(&model)?;
         let gpu = match gpu {
@@ -53,7 +66,7 @@ impl LeVJepaPerception {
             None => Arc::new(crate::init_gpu_context()?),
         };
         let mut graph = Graph::new();
-        let tokens = build_encoder(&mut graph);
+        let tokens = build_encoder(&mut graph, streams);
         let projection = graph.constant(
             fixed_projection(HIDDEN, OBSERVATION_CHANNELS, PROJECTION_SEED),
             &[HIDDEN, OBSERVATION_CHANNELS],
@@ -73,23 +86,25 @@ impl LeVJepaPerception {
                 ..SessionConfig::default()
             },
         );
-        load_weights(&mut session, &model)?;
+        load_weights(&mut session, &model, streams)?;
         Ok(Self {
             session,
-            frame: 0,
-            projected: vec![0.0; PATCHES * OBSERVATION_CHANNELS],
-            pooled: vec![0.0; Observation::LEN],
+            frames: vec![0; streams],
+            projected: vec![0.0; streams * PATCHES * OBSERVATION_CHANNELS],
+            pooled: vec![0.0; streams * Observation::LEN],
         })
     }
 
     /// Forget all visual history at a real environment boundary. Stale cache
     /// rows need not be cleared: the valid prefix excludes them until overwritten.
     pub fn reset(&mut self) {
-        self.frame = 0;
+        assert_eq!(self.frames.len(), 1, "use per-stream resets for a batch");
+        self.frames[0] = 0;
     }
 
     pub fn next_frame_in_chunk(&self) -> usize {
-        self.frame
+        assert_eq!(self.frames.len(), 1);
+        self.frames[0]
     }
 
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
@@ -114,27 +129,82 @@ impl LeVJepaPerception {
     /// Dense current-frame features for numerical verification. Production
     /// reads only the much smaller projected output, not these 200,704 floats.
     pub fn patch_tokens(&self) -> Vec<f32> {
-        let mut tokens = vec![0.0; PATCHES * HIDDEN];
+        let mut tokens = vec![0.0; self.frames.len() * PATCHES * HIDDEN];
         self.session.read_output_by_index(1, &mut tokens);
         tokens
     }
 
     fn run(&mut self, patches: &[f32]) -> Observation {
+        assert_eq!(self.frames.len(), 1);
+        self.run_batch(patches, &[0]).pop().unwrap()
+    }
+
+    /// Encode selected stream arrivals together. Omitted streams do not advance.
+    /// Reset flags belong to real environment boundaries, not vector ticks.
+    pub fn encode_frames_rgb8(
+        &mut self,
+        arrivals: &[(usize, &crate::RgbFrame, bool)],
+    ) -> Vec<Observation> {
+        let mut present = vec![false; self.frames.len()];
+        for &(stream, _, _) in arrivals {
+            assert!(
+                stream < present.len() && !present[stream],
+                "invalid or repeated stream"
+            );
+            present[stream] = true;
+        }
+        if arrivals.is_empty() {
+            return Vec::new();
+        }
+        let width = PATCHES * PATCH_DIM;
+        let mut patches = vec![0.0; self.frames.len() * width];
+        for &(stream, frame, reset) in arrivals {
+            let rgb = preprocess::resize_letterbox_rgb8(
+                frame.pixels(),
+                frame.width(),
+                frame.height(),
+                IMAGE_SIZE,
+            );
+            patches[stream * width..(stream + 1) * width]
+                .copy_from_slice(&preprocess::patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE));
+            if reset {
+                self.frames[stream] = 0;
+            }
+        }
+        self.run_batch(&patches, &arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+    }
+
+    fn run_batch(&mut self, patches: &[f32], active: &[usize]) -> Vec<Observation> {
         self.session.set_input("patches", patches);
-        self.session.set_input_u32("frame", &[self.frame as u32]);
-        self.session
-            .set_input_u32("last_token", &[((self.frame + 1) * PATCHES - 1) as u32]);
+        for (stream, &frame) in self.frames.iter().enumerate() {
+            self.session
+                .set_input_u32(&format!("frame.{stream}"), &[frame as u32]);
+            self.session.set_input_u32(
+                &format!("last_token.{stream}"),
+                &[((frame + 1) * PATCHES - 1) as u32],
+            );
+        }
         self.session.step();
         self.session.wait();
         self.session.read_output_by_index(0, &mut self.projected);
-        pool_2x2_token_major(
-            &self.projected,
-            GRID,
-            OBSERVATION_CHANNELS,
-            &mut self.pooled,
-        );
-        self.frame = (self.frame + 1) % FRAMES;
-        Observation::from_vec(self.pooled.clone())
+        // Inactive rows write only their next, unused cache slot. Before that
+        // stream consumes it, a real arrival overwrites it at the same position.
+        active
+            .iter()
+            .map(|&stream| {
+                let projected_width = PATCHES * OBSERVATION_CHANNELS;
+                let pooled =
+                    &mut self.pooled[stream * Observation::LEN..(stream + 1) * Observation::LEN];
+                pool_2x2_token_major(
+                    &self.projected[stream * projected_width..(stream + 1) * projected_width],
+                    GRID,
+                    OBSERVATION_CHANNELS,
+                    pooled,
+                );
+                self.frames[stream] = (self.frames[stream] + 1) % FRAMES;
+                Observation::from_vec(pooled.to_vec())
+            })
+            .collect()
     }
 }
 
@@ -200,12 +270,13 @@ fn shift(g: &mut Graph, x: NodeId, value: f32) -> NodeId {
 fn rope(g: &mut Graph, x: NodeId, cos: NodeId, sin: NodeId) -> NodeId {
     // The release rotates adjacent pairs, but repeats each axis's frequency
     // vector in two halves. Do not substitute standard interleaved RoPE.
-    let pairs = (PATCHES * HIDDEN / 2) as u32;
+    let shape = g.node(x).ty.shape.clone();
+    let pairs = (g.node(x).ty.num_elements() / 2) as u32;
     let even = g.split_a(x, pairs, 1, 1, 1);
     let odd = g.split_b(x, pairs, 1, 1, 1);
     let negative_odd = g.neg(odd);
     let rotated = g.concat(negative_odd, even, pairs, 1, 1, 1);
-    let rotated = g.reshape(rotated, &[PATCHES, HIDDEN]);
+    let rotated = g.reshape(rotated, &shape);
     let a = g.mul(x, cos);
     let b = g.mul(rotated, sin);
     g.add(a, b)
@@ -239,47 +310,89 @@ fn rope_tables() -> (Vec<f32>, Vec<f32>) {
     (cos, sin)
 }
 
-fn build_encoder(g: &mut Graph) -> NodeId {
-    let input = g.input("patches", &[PATCHES, PATCH_DIM]);
-    let frame = g.input_u32("frame", &[1]);
-    let last_token = g.input_u32("last_token", &[1]);
+fn stream_rows(g: &mut Graph, x: NodeId, stream: usize, streams: usize, width: usize) -> NodeId {
+    let mut x = x;
+    if stream > 0 {
+        x = g.split_b(x, 1, stream as u32, (streams - stream) as u32, width as u32);
+    }
+    if stream + 1 < streams {
+        x = g.split_a(x, 1, 1, (streams - stream - 1) as u32, width as u32);
+    }
+    x
+}
+
+fn stack_streams(g: &mut Graph, rows: &[NodeId], width: usize) -> NodeId {
+    let mut x = rows[0];
+    for (stream, &row) in rows.iter().enumerate().skip(1) {
+        x = g.concat(x, row, 1, stream as u32, 1, width as u32);
+    }
+    x
+}
+
+fn build_encoder(g: &mut Graph, streams: usize) -> NodeId {
+    let rows = streams * PATCHES;
+    let input = g.input("patches", &[rows, PATCH_DIM]);
+    let frames: Vec<_> = (0..streams)
+        .map(|s| g.input_u32(&format!("frame.{s}"), &[1]))
+        .collect();
+    let last_tokens: Vec<_> = (0..streams)
+        .map(|s| g.input_u32(&format!("last_token.{s}"), &[1]))
+        .collect();
     let (cos, sin) = rope_tables();
     let cos = g.constant(cos, &[FRAMES, PATCHES * HIDDEN]);
     let sin = g.constant(sin, &[FRAMES, PATCHES * HIDDEN]);
-    let cos = g.embedding(frame, cos);
-    let sin = g.embedding(frame, sin);
-    let cos = g.reshape(cos, &[PATCHES, HIDDEN]);
-    let sin = g.reshape(sin, &[PATCHES, HIDDEN]);
+    let cos: Vec<_> = frames.iter().map(|&f| g.embedding(f, cos)).collect();
+    let sin: Vec<_> = frames.iter().map(|&f| g.embedding(f, sin)).collect();
+    let cos = stack_streams(g, &cos, PATCHES * HIDDEN);
+    let sin = stack_streams(g, &sin, PATCHES * HIDDEN);
+    let cos = g.reshape(cos, &[rows, HIDDEN]);
+    let sin = g.reshape(sin, &[rows, HIDDEN]);
     let mut x = linear(g, input, "encoder.patch_embed.proj", PATCH_DIM, HIDDEN);
     for layer in 0..LAYERS {
         let name = format!("encoder.blocks.{layer}");
         let n = norm(g, x, &format!("{name}.norm1"));
         let qkv = linear(g, n, &format!("{name}.attn.qkv"), HIDDEN, 3 * HIDDEN);
-        let q = g.split_a(qkv, PATCHES as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
-        let kv = g.split_b(qkv, PATCHES as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
-        let k = g.split_a(kv, PATCHES as u32, HIDDEN as u32, HIDDEN as u32, 1);
-        let v = g.split_b(kv, PATCHES as u32, HIDDEN as u32, HIDDEN as u32, 1);
-        let q = g.reshape(q, &[PATCHES, HIDDEN]);
-        let k = g.reshape(k, &[PATCHES, HIDDEN]);
+        let q = g.split_a(qkv, rows as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
+        let kv = g.split_b(qkv, rows as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
+        let k = g.split_a(kv, rows as u32, HIDDEN as u32, HIDDEN as u32, 1);
+        let v = g.split_b(kv, rows as u32, HIDDEN as u32, HIDDEN as u32, 1);
+        let q = g.reshape(q, &[rows, HIDDEN]);
+        let k = g.reshape(k, &[rows, HIDDEN]);
         let q = rope(g, q, cos, sin);
         let k = rope(g, k, cos, sin);
-        let k = g.reshape(k, &[1, PATCHES * HIDDEN]);
-        let v = g.reshape(v, &[1, PATCHES * HIDDEN]);
-        let k_cache = g.parameter(&format!("cache.{layer}.k"), &[FRAMES, PATCHES * HIDDEN]);
-        let v_cache = g.parameter(&format!("cache.{layer}.v"), &[FRAMES, PATCHES * HIDDEN]);
-        let k = g.cache_write(k, k_cache, frame);
-        let v = g.cache_write(v, v_cache, frame);
-        let k = g.reshape(k, &[FRAMES * PATCHES, HIDDEN]);
-        let v = g.reshape(v, &[FRAMES * PATCHES, HIDDEN]);
-        let attention = g.cached_attention(
-            q,
-            k,
-            v,
-            last_token,
-            HEADS as u32,
-            HEADS as u32,
-            HEAD_DIM as u32,
-        );
+        let attention: Vec<_> = (0..streams)
+            .map(|stream| {
+                let q = stream_rows(g, q, stream, streams, PATCHES * HIDDEN);
+                let k = stream_rows(g, k, stream, streams, PATCHES * HIDDEN);
+                let v = stream_rows(g, v, stream, streams, PATCHES * HIDDEN);
+                let q = g.reshape(q, &[PATCHES, HIDDEN]);
+                let k = g.reshape(k, &[1, PATCHES * HIDDEN]);
+                let v = g.reshape(v, &[1, PATCHES * HIDDEN]);
+                let k_cache = g.parameter(
+                    &format!("cache.{layer}.{stream}.k"),
+                    &[FRAMES, PATCHES * HIDDEN],
+                );
+                let v_cache = g.parameter(
+                    &format!("cache.{layer}.{stream}.v"),
+                    &[FRAMES, PATCHES * HIDDEN],
+                );
+                let k = g.cache_write(k, k_cache, frames[stream]);
+                let v = g.cache_write(v, v_cache, frames[stream]);
+                let k = g.reshape(k, &[FRAMES * PATCHES, HIDDEN]);
+                let v = g.reshape(v, &[FRAMES * PATCHES, HIDDEN]);
+                g.cached_attention(
+                    q,
+                    k,
+                    v,
+                    last_tokens[stream],
+                    HEADS as u32,
+                    HEADS as u32,
+                    HEAD_DIM as u32,
+                )
+            })
+            .collect();
+        let attention = stack_streams(g, &attention, PATCHES * HIDDEN);
+        let attention = g.reshape(attention, &[rows, HIDDEN]);
         let attention = linear(g, attention, &format!("{name}.attn.proj"), HIDDEN, HIDDEN);
         x = g.add(x, attention);
         let n = norm(g, x, &format!("{name}.norm2"));
@@ -344,7 +457,11 @@ fn validate_weights(model: &SafeTensorsModel) -> Result<(), Error> {
     Ok(())
 }
 
-fn load_weights(session: &mut Session, model: &SafeTensorsModel) -> Result<(), Error> {
+fn load_weights(
+    session: &mut Session,
+    model: &SafeTensorsModel,
+    streams: usize,
+) -> Result<(), Error> {
     for (name, shape) in weight_shapes() {
         if name == "encoder.cls_token" {
             continue;
@@ -362,8 +479,10 @@ fn load_weights(session: &mut Session, model: &SafeTensorsModel) -> Result<(), E
     }
     let zeros = vec![0.0; FRAMES * PATCHES * HIDDEN];
     for layer in 0..LAYERS {
-        session.set_parameter(&format!("cache.{layer}.k"), &zeros);
-        session.set_parameter(&format!("cache.{layer}.v"), &zeros);
+        for stream in 0..streams {
+            session.set_parameter(&format!("cache.{layer}.{stream}.k"), &zeros);
+            session.set_parameter(&format!("cache.{layer}.{stream}.v"), &zeros);
+        }
     }
     Ok(())
 }
@@ -398,11 +517,116 @@ mod tests {
     #[test]
     fn streaming_graph_builds_without_cls() {
         let mut graph = Graph::new();
-        let output = build_encoder(&mut graph);
+        let output = build_encoder(&mut graph, 1);
         assert_eq!(graph.node(output).ty.shape, [PATCHES, HIDDEN]);
         assert!(!graph.nodes().iter().any(
             |node| matches!(&node.op, meganeura::graph::Op::Parameter {name} if name.contains("cls"))
         ));
+    }
+
+    #[test]
+    fn vector_graph_shares_weights_but_not_history() {
+        let mut graph = Graph::new();
+        let output = build_encoder(&mut graph, 3);
+        assert_eq!(graph.node(output).ty.shape, [3 * PATCHES, HIDDEN]);
+        let parameters: Vec<_> = graph
+            .nodes()
+            .iter()
+            .filter_map(|node| match &node.op {
+                meganeura::graph::Op::Parameter { name } => Some(name.as_str()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            parameters
+                .iter()
+                .filter(|name| name.starts_with("encoder."))
+                .count(),
+            292
+        );
+        assert_eq!(
+            parameters
+                .iter()
+                .filter(|name| name.starts_with("cache."))
+                .count(),
+            3 * LAYERS * 2
+        );
+    }
+
+    #[test]
+    #[ignore = "requires GPU and pinned LeVJEPA weights"]
+    fn batched_streams_match_serial_with_asymmetric_resets_and_gaps() {
+        let checkpoint =
+            std::env::var_os("KINDLE_LEVJEPA_WEIGHTS").expect("set KINDLE_LEVJEPA_WEIGHTS");
+        let frame = |stream: usize, tick: usize| {
+            crate::RgbFrame::new(
+                64,
+                64,
+                (0..64 * 64 * 3)
+                    .map(|i| ((i * 37 + stream * 71 + tick * 13) % 256) as u8)
+                    .collect(),
+            )
+        };
+        let active = |stream, tick| stream == 0 || ![4, 15, 16, 32].contains(&tick);
+        let reset = |stream, tick| tick == 0 || (stream == 1 && tick == 7);
+        let mut expected = Vec::new();
+        {
+            let mut serial = LeVJepaPerception::load(&checkpoint, None, None).unwrap();
+            for stream in 0..2 {
+                serial.reset();
+                let mut values = Vec::new();
+                for tick in 0..36 {
+                    if !active(stream, tick) {
+                        values.push(None);
+                        continue;
+                    }
+                    if reset(stream, tick) {
+                        serial.reset();
+                    }
+                    let frame = frame(stream, tick);
+                    let observation =
+                        serial.encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
+                    values.push(Some((observation, serial.patch_tokens())));
+                }
+                expected.push(values);
+            }
+        }
+        let mut batch = LeVJepaPerception::load_batched(&checkpoint, 2, None, None).unwrap();
+        let mut worst = 0.0_f32;
+        for tick in 0..36 {
+            let frames = [frame(0, tick), frame(1, tick)];
+            // Reversed input order must not change stream ownership.
+            let arrivals: Vec<_> = (0..2)
+                .rev()
+                .filter(|&s| active(s, tick))
+                .map(|s| (s, &frames[s], reset(s, tick)))
+                .collect();
+            let observations = batch.encode_frames_rgb8(&arrivals);
+            let tokens = batch.patch_tokens();
+            for ((stream, _, _), observation) in arrivals.iter().zip(observations) {
+                let (reference, reference_tokens) = expected[*stream][tick].as_ref().unwrap();
+                for (actual, expected) in observation.as_slice().iter().zip(reference.as_slice()) {
+                    assert!(
+                        (actual - expected).abs() < 0.005,
+                        "pooled stream {stream} tick {tick}"
+                    );
+                }
+                let actual = &tokens[stream * PATCHES * HIDDEN..(stream + 1) * PATCHES * HIDDEN];
+                let mut error = 0.0_f64;
+                let mut energy = 0.0_f64;
+                for (&actual, &expected) in actual.iter().zip(reference_tokens) {
+                    worst = worst.max((actual - expected).abs());
+                    error += f64::from(actual - expected).powi(2);
+                    energy += f64::from(expected).powi(2);
+                }
+                assert!(
+                    (error / energy).sqrt() < 1e-4,
+                    "dense stream {stream} tick {tick}"
+                );
+            }
+        }
+        assert!(worst < 0.005, "batched maximum absolute error {worst}");
+        eprintln!("LeVJEPA batched/serial maximum absolute error {worst}");
     }
 
     #[test]

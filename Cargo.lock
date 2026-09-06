@@ -1080,6 +1080,7 @@ dependencies = [
  "log",
  "meganeura",
  "rand",
+ "rayon",
  "serde",
  "serde_json",
  "sha2",

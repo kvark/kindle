@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from ._native import (  # type: ignore[attr-defined]
         Agent,
+        VectorAgent,
         DINO_CHECKPOINT_REVISION,
         DINO_MODEL_ID,
         DREAMERV3_REVISION,
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "Agent",
+    "VectorAgent",
     "DINO_CHECKPOINT_REVISION",
     "DINO_MODEL_ID",
     "DREAMERV3_REVISION",

@@ -4,6 +4,24 @@ Started 2026-09-06. Implementation and diagnostic work is in progress; no
 LeVJEPA gameplay result is claimed yet. Earlier positive Pong results used
 DINOv3 and remain a separate control.
 
+## Serial experiment interrupted for throughput work
+
+At 2026-09-06 21:01 UTC the user explicitly prioritized vectorized environments
+and batched inference. The serial launcher was stopped with SIGINT during seed 0;
+its last complete logged learner record is action 64,390 / update 15,827. The
+verified 60,000-action checkpoint and all logs remain intact. Unlogged in-flight
+work is not counted as audited experience. No final frozen evaluation or other
+training seeds ran; the predeclared mastery gate is **not achieved**. A model
+restore is not an exact replay/RNG/environment continuation.
+
+The 1 Hz GPU trace's final inspected 30-minute window contained 1,800 samples:
+mean GPU activity 58.64% (range 4–99%), memory 8,217 MiB, mean power 117.90 W
+on the RTX 5080 (360 W limit). These are sampled activity/power, not a measurement
+of achieved FLOP efficiency. Serial coupled throughput is about 5.5 actions/s;
+updates take about 0.54 s, dominated by imagination and world training.
+The zero-update control remains useful. Vectorized collection will be a new,
+explicitly identified experiment, not completion of this single-stream protocol.
+
 ## Frozen frontend contract
 
 The first target implementation uses

@@ -29,9 +29,18 @@ impl Readback {
     /// Kindle graphs expose f32 outputs. Copy requested prefixes in one submit;
     /// waiting on this transfer also completes the producer's earlier submit.
     pub fn read(&mut self, session: &Session, outputs: &mut [(usize, &mut [f32])]) {
-        assert!(Arc::ptr_eq(&self.gpu, &session.context()));
+        let mut sources: Vec<_> = outputs
+            .iter_mut()
+            .map(|(index, output)| (session, *index, &mut **output))
+            .collect();
+        self.read_many(&mut sources);
+    }
+
+    /// Read independent, already-submitted producers with one transfer/wait.
+    pub fn read_many(&mut self, outputs: &mut [(&Session, usize, &mut [f32])]) {
         let mut bytes = 0usize;
-        for (index, output) in outputs.iter() {
+        for (session, index, output) in outputs.iter() {
+            assert!(Arc::ptr_eq(&self.gpu, &session.context()));
             let size = std::mem::size_of_val(*output);
             let available = session
                 .slot_size(ExternalSlot::Output(*index))
@@ -58,7 +67,7 @@ impl Readback {
         let mut offset = 0;
         {
             let mut transfer = self.encoder.transfer("kindle_readback");
-            for (index, output) in outputs.iter() {
+            for (session, index, output) in outputs.iter() {
                 let size = std::mem::size_of_val(*output);
                 if size > 0 {
                     transfer.copy_buffer_to_buffer(
@@ -78,7 +87,7 @@ impl Readback {
             "readback did not complete"
         );
         let mut offset = 0;
-        for (_, output) in outputs {
+        for (_, _, output) in outputs {
             // The completed transfer initialized these aligned f32 regions in
             // CPU-visible memory. Neither allocation can be freed or mutated
             // while this method holds their exclusive borrows.
@@ -135,6 +144,32 @@ mod tests {
             readback.read(&session, &mut [(0, &mut prefix)]);
             assert_eq!(prefix, [-values[0], -values[1]]);
             assert_eq!(readback.capacity, 12 * std::mem::size_of::<f32>());
+        }
+    }
+
+    #[test]
+    #[ignore = "requires a GPU"]
+    fn independent_producers_share_one_readback_without_a_host_wait_between_them() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let mut graph = meganeura::Graph::new();
+        let input = graph.input("input", &[2, 3]);
+        let negative = graph.neg(input);
+        graph.set_outputs(vec![negative]);
+        let mut a =
+            super::super::runtime::build_session(&graph, &gpu, meganeura::Mode::Inference, false);
+        let mut b =
+            super::super::runtime::build_session(&graph, &gpu, meganeura::Mode::Inference, false);
+        let mut readback = Readback::new(gpu);
+        for scale in [1.0, 2.0, 3.0] {
+            a.set_input("input", &[scale; 6]);
+            a.step();
+            b.set_input("input", &[-scale; 6]);
+            b.step();
+            let mut left = [0.0; 6];
+            let mut right = [0.0; 6];
+            readback.read_many(&mut [(&b, 0, &mut right), (&a, 0, &mut left)]);
+            assert_eq!(left, [-scale; 6]);
+            assert_eq!(right, [scale; 6]);
         }
     }
 }

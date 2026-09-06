@@ -1,5 +1,8 @@
 //! Online acting, replay learning, and latent imagination.
 
+mod vector;
+pub use vector::VectorDreamerAgent;
+
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -7,7 +10,8 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use meganeura::{Mode, Session};
-use rand::{SeedableRng, rngs::StdRng};
+use rand::{Rng, SeedableRng, rngs::StdRng};
+use rayon::prelude::*;
 
 use super::behavior;
 use super::checkpoint::{self, TensorFingerprints};
@@ -15,9 +19,10 @@ use super::checkpoint::{
     BEHAVIOR as CHECKPOINT_BEHAVIOR, SLOW_VALUE as CHECKPOINT_SLOW_VALUE, WORLD as CHECKPOINT_WORLD,
 };
 use super::config::DreamerConfig;
+use super::cpu;
 use super::distributions::{
-    PercentileNormalizer, TwoHotBins, continuation_weights, lambda_returns, sample_logits,
-    sample_probabilities, softmax_unimix,
+    PercentileNormalizer, TwoHotBins, continuation_weights, lambda_returns, sample_probabilities,
+    sample_probabilities_at, softmax_unimix,
 };
 use super::intrinsic::{VisitationBonus, VisitationState};
 use super::readback::Readback;
@@ -59,6 +64,8 @@ struct CheckpointMetadata {
     config: DreamerConfig,
     learner_step: u64,
     environment_step: u64,
+    #[serde(default = "single_stream")]
+    collection_streams: usize,
     return_low: f32,
     return_high: f32,
     #[serde(default)]
@@ -67,6 +74,10 @@ struct CheckpointMetadata {
     future_head_revision: Option<String>,
     #[serde(default)]
     tensor_sha256: Option<TensorFingerprints>,
+}
+
+fn single_stream() -> usize {
+    1
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -315,6 +326,7 @@ pub struct DreamerCore {
     learner_step: u64,
     environment_step: u64,
     train_scheduler: D3TrainScheduler,
+    collection_streams: usize,
 }
 
 impl DreamerCore {
@@ -465,6 +477,7 @@ impl DreamerCore {
             learner_step: 0,
             environment_step: 0,
             train_scheduler: D3TrainScheduler::default(),
+            collection_streams: 1,
             config,
             perception_identity: None,
             world_train,
@@ -512,6 +525,10 @@ impl DreamerCore {
 
     pub fn environment_step(&self) -> u64 {
         self.environment_step
+    }
+
+    pub fn cpu_worker_threads(&self) -> usize {
+        cpu::threads()
     }
 
     /// Trainable world and behavior parameter counts, excluding frozen perception,
@@ -864,6 +881,7 @@ impl DreamerCore {
             config: self.config.clone(),
             learner_step: self.learner_step,
             environment_step: self.environment_step,
+            collection_streams: self.collection_streams,
             return_low,
             return_high,
             visitation: self.visitation.as_ref().map(VisitationBonus::state),
@@ -1439,26 +1457,23 @@ impl DreamerCore {
             self.behavior_online.step();
             let mut actor_logits = vec![0.0; starts * self.config.action_count];
             let mut value_logits = vec![0.0; starts * self.config.value_bins];
-            self.readback.read(
-                &self.behavior_online,
-                &mut [(0, &mut actor_logits), (1, &mut value_logits)],
-            );
 
             self.behavior_slow.set_input("feature", &state_feature);
             self.behavior_slow.step();
             let mut slow_logits = vec![0.0; starts * self.config.value_bins];
-            self.readback
-                .read(&self.behavior_slow, &mut [(0, &mut slow_logits)]);
 
             self.world_heads.set_input("deter", &deter);
             self.world_heads.set_input("stoch", &stoch);
             self.world_heads.step();
             let mut reward_logits = vec![0.0; starts * self.config.value_bins];
             let mut continuation = vec![0.0; starts];
-            self.readback.read(
-                &self.world_heads,
-                &mut [(0, &mut reward_logits), (1, &mut continuation)],
-            );
+            self.readback.read_many(&mut [
+                (&self.behavior_online, 0, &mut actor_logits),
+                (&self.behavior_online, 1, &mut value_logits),
+                (&self.behavior_slow, 0, &mut slow_logits),
+                (&self.world_heads, 0, &mut reward_logits),
+                (&self.world_heads, 1, &mut continuation),
+            ]);
 
             let decoded_reward = decode_rows(&reward_logits, starts, &self.bins);
             let decoded_value = decode_rows(&value_logits, starts, &self.bins);
@@ -1474,11 +1489,12 @@ impl DreamerCore {
             }
             let mut action_indices = vec![0; starts];
             let mut action_one_hot = vec![0.0; starts * self.config.action_count];
+            let mut probabilities = vec![0.0; self.config.action_count];
             for row in 0..starts {
                 let logits = &actor_logits
                     [row * self.config.action_count..(row + 1) * self.config.action_count];
-                let action =
-                    sample_logits(logits, self.config.actor_unimix, &mut self.rngs.imagination);
+                softmax_unimix(logits, self.config.actor_unimix, &mut probabilities);
+                let action = sample_probabilities(&probabilities, &mut self.rngs.imagination);
                 action_indices[row] = action;
                 action_one_hot[row * self.config.action_count + action] = 1.0;
             }
@@ -1956,6 +1972,12 @@ fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata>
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.collection_streams == 0 {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "checkpoint collection stream count must be positive",
+        ));
+    }
     if let Some(perception) = &metadata.perception {
         perception.validate()?;
     }
@@ -2107,9 +2129,30 @@ fn sample_latents(
 ) -> Vec<f32> {
     assert_eq!(logits.len(), batch * stoch * classes);
     let mut output = vec![0.0; logits.len()];
+    if batch * stoch >= 4096 {
+        // Draw in the original flat order before distributing independent rows.
+        // Neither thread scheduling nor worker count changes the RNG stream.
+        let draws: Vec<f32> = (0..batch * stoch).map(|_| rng.random()).collect();
+        cpu::parallel(|| {
+            output
+                .par_chunks_exact_mut(classes)
+                .zip(logits.par_chunks_exact(classes))
+                .zip(draws.par_iter())
+                .for_each_init(
+                    || vec![0.0; classes],
+                    |probabilities, ((output, logits), &draw)| {
+                        softmax_unimix(logits, unimix, probabilities);
+                        output[sample_probabilities_at(probabilities, draw)] = 1.0;
+                    },
+                );
+        });
+        return output;
+    }
+    let mut probabilities = vec![0.0; classes];
     for row in 0..batch * stoch {
         let start = row * classes;
-        let class = sample_logits(&logits[start..start + classes], unimix, rng);
+        softmax_unimix(&logits[start..start + classes], unimix, &mut probabilities);
+        let class = sample_probabilities(&probabilities, rng);
         output[start + class] = 1.0;
     }
     output
@@ -2140,8 +2183,25 @@ fn flatten_time(values: &[Vec<f32>]) -> Vec<f32> {
 
 fn decode_rows(logits: &[f32], rows: usize, bins: &TwoHotBins) -> Vec<f32> {
     assert_eq!(logits.len(), rows * bins.len());
+    if rows >= 256 {
+        return cpu::parallel(|| {
+            logits
+                .par_chunks_exact(bins.len())
+                .map_init(
+                    || vec![0.0; bins.len()],
+                    |scratch, row| bins.decode_logits_with_scratch(row, scratch),
+                )
+                .collect()
+        });
+    }
+    let mut scratch = vec![0.0; bins.len()];
     (0..rows)
-        .map(|row| bins.decode_logits(&logits[row * bins.len()..(row + 1) * bins.len()]))
+        .map(|row| {
+            bins.decode_logits_with_scratch(
+                &logits[row * bins.len()..(row + 1) * bins.len()],
+                &mut scratch,
+            )
+        })
         .collect()
 }
 
@@ -2259,6 +2319,7 @@ mod tests {
             config: DreamerConfig::tiny(3),
             learner_step: 1,
             environment_step: 8,
+            collection_streams: 1,
             return_low: 0.0,
             return_high: 1.0,
             visitation: None,
@@ -2412,6 +2473,43 @@ mod tests {
             assert_eq!(row.iter().sum::<f32>(), 1.0);
             assert_eq!(row.iter().filter(|value| **value == 1.0).count(), 1);
         }
+    }
+
+    #[test]
+    fn parallel_categorical_rows_preserve_samples_and_rng_position() {
+        let (batch, stoch, classes) = (256, 32, 32);
+        let logits: Vec<_> = (0..batch * stoch * classes)
+            .map(|i| ((i * 137) % 1019) as f32 / 50.0 - 10.0)
+            .collect();
+        let mut serial_rng = StdRng::seed_from_u64(141);
+        let mut parallel_rng = serial_rng.clone();
+        let mut expected = vec![0.0; logits.len()];
+        let mut probabilities = vec![0.0; classes];
+        for (row, output) in logits
+            .chunks_exact(classes)
+            .zip(expected.chunks_exact_mut(classes))
+        {
+            softmax_unimix(row, 0.01, &mut probabilities);
+            output[sample_probabilities(&probabilities, &mut serial_rng)] = 1.0;
+        }
+        let actual = sample_latents(&logits, batch, stoch, classes, 0.01, &mut parallel_rng);
+        assert_eq!(actual, expected);
+        assert_eq!(serial_rng.random::<u64>(), parallel_rng.random::<u64>());
+    }
+
+    #[test]
+    fn parallel_scalar_decoding_preserves_row_order_and_bits() {
+        let bins = TwoHotBins::new(255);
+        let rows = 512;
+        let logits: Vec<_> = (0..rows * bins.len())
+            .map(|i| ((i * 137) % 1019) as f32 / 50.0 - 10.0)
+            .collect();
+        let mut scratch = vec![0.0; bins.len()];
+        let expected: Vec<_> = logits
+            .chunks_exact(bins.len())
+            .map(|row| bins.decode_logits_with_scratch(row, &mut scratch))
+            .collect();
+        assert_eq!(decode_rows(&logits, rows, &bins), expected);
     }
 
     #[test]

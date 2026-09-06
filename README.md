@@ -11,8 +11,8 @@ and Pong with DINOv3. The native LeVJEPA video frontend is now implemented;
 [numerical checks and Pong mastery experiments](docs/experiments/2026-09-06-levjepa-pong.md)
 are in progress. Reconstruction remains the measured control. Next comes
 broader single-actor gameplay, accelerated playing plus training, pretraining and
-cross-game transfer. Concurrency and experience sharing follow strong results
-across games, not the first Pong win.
+cross-game transfer. Vectorized environments now share batched inference and one
+learner; distributed learning and experience sharing remain later milestones.
 
 Read the [single project plan](docs/kindle_single_life_dreamer_plan.md) for the
 architecture, evidence and research gates, and [AGENTS.md](AGENTS.md) for working
@@ -211,6 +211,33 @@ Read-only native and Atari probes measure reward calibration, representation
 separability, open-loop feature error against persistence/unrelated actions,
 actor/model agreement and critic calibration. Each example's `--help` describes
 the exact protocol.
+
+### Vectorized LeVJEPA collection
+
+`VectorAgent` shares one encoder and learner across independent Atari streams.
+LeVJEPA's dense layers and Dreamer's live posterior/policy are GPU-batched;
+visual caches, beliefs, RNGs and replay sequences remain separate. CPU emulator
+steps are synchronous: measured environment work is below 1% of wall time.
+
+```bash
+python python/examples/profile_atari_vector.py /models/levjepa/model.safetensors \
+  runs/vector-profile --num-envs 1 2 4
+
+python python/examples/atari_vector.py /models/levjepa/model.safetensors \
+  --num-envs 4 --steps 20000 --checkpoint checkpoints/vector-canary \
+  --output runs/vector-canary.jsonl
+
+python -m kindle._vector_audit runs/vector-canary.jsonl
+```
+
+`--steps` is the **total executed actions across all environments**, not actions
+per environment. The runner drains scheduled learner credit after each vector
+step and records aggregate and per-stream simulated/wall time separately.
+Reset frames enter replay but earn no action credit. SIGINT/SIGTERM stop at a
+completed vector round and save when `--checkpoint` is supplied. Output and
+checkpoint paths must be fresh. Restore starts fresh environment histories and
+replay; it is not exact lifetime recovery. `--restore ... --evaluate` is frozen,
+sampled evaluation; a throughput check or accounting audit is not Pong mastery.
 
 ## Checkpoints and verification
 

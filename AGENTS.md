@@ -13,11 +13,15 @@ guidance are allowed while establishing reliable learning.
   measured results. Experiment logs belong in `runs/`, not in an ever-growing
   chronological plan.
 - Prioritize one learning actor: Atari breadth, video/world pretraining and fast
-  serial playing plus training, then mind-games (vkQuake2/TMNF), GOG/Wine games,
+  accelerated playing plus training, then mind-games (vkQuake2/TMNF), GOG/Wine games,
   cross-game adaptation and retention. Pong's initial-learning gate is achieved,
   not consistent mastery. Require strong single-actor GOG and transfer results
-  before swarm learning. Actor/learner concurrency is not the next milestone;
-  GPU kernel parallelism and batched replay remain useful.
+  before swarm learning. Prioritize vectorized environments and batched live
+  inference for one shared learner/policy, as explicitly requested. This is a
+  collection/throughput protocol, not swarm learning or separate learner services.
+  Keep each environment's visual cache, recurrent belief, RNG and replay sequence
+  independent. Count actual interactions across all environments, not vector ticks;
+  preserve train-ratio credit and report aggregate and per-environment throughput.
 - Preserve a measured Dreamer control. Add JEPA-style prediction as a causal,
   action-conditioned objective that predicts an observation before consuming
   it. Predicting the current frozen DINO features from the posterior is already
@@ -69,8 +73,10 @@ guidance are allowed while establishing reliable learning.
   Verify its Kindle revision/API before integration; legacy BatchAgent adapters
   are not the current Dreamer path. Keep privileged reward/task observers outside
   policy inputs, and do not inherit unreported shaping or scripted gameplay.
-- Respect the single stream of external consequences. Natural deaths and
-  respawns are allowed; cloning or rewinding the game for training is not.
+- Respect each stream of external consequences. Natural deaths and respawns
+  are allowed; cloning or rewinding a live game for training is not. Independently
+  initialized vector environments are allowed under a declared new protocol;
+  do not relabel their experience as a continuation of a single-life experiment.
   Distinguish uncapped stepping, super-real-time playing plus training, and a
   free-running game without time control. Measure simulated/wall time with
   learning enabled; fast frozen inference is not training throughput. Preserve

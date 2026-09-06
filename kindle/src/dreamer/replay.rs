@@ -67,24 +67,41 @@ impl ReplayFrame {
 
 pub struct SequenceReplay {
     capacity: usize,
+    streams: Vec<ReplayStream>,
+    arrival_order: VecDeque<usize>,
+    fresh_starts: VecDeque<(usize, u64)>,
+}
+
+#[derive(Default)]
+struct ReplayStream {
     frames: VecDeque<ReplayFrame>,
     total_frames: u64,
-    fresh_starts: VecDeque<u64>,
+}
+
+impl ReplayStream {
+    fn oldest_frame(&self) -> u64 {
+        self.total_frames - self.frames.len() as u64
+    }
 }
 
 impl SequenceReplay {
     pub fn new(capacity: usize) -> Self {
+        Self::with_streams(capacity, 1)
+    }
+
+    pub fn with_streams(capacity: usize, streams: usize) -> Self {
         assert!(capacity > 1);
+        assert!(streams > 0);
         Self {
             capacity,
-            frames: VecDeque::with_capacity(capacity.min(65_536)),
-            total_frames: 0,
+            streams: (0..streams).map(|_| ReplayStream::default()).collect(),
+            arrival_order: VecDeque::with_capacity(capacity.min(65_536)),
             fresh_starts: VecDeque::new(),
         }
     }
 
     pub fn len(&self) -> usize {
-        self.frames.len()
+        self.arrival_order.len()
     }
 
     /// Number of complete context-plus-training sequences currently eligible
@@ -92,17 +109,28 @@ impl SequenceReplay {
     /// `batch_size * batch_length` such replay items.
     pub fn valid_sequence_count(&self, config: &DreamerConfig) -> usize {
         let required = config.replay_context + config.batch_length;
-        self.frames.len().saturating_sub(required - 1)
+        self.streams
+            .iter()
+            .map(|stream| stream.frames.len().saturating_sub(required - 1))
+            .sum()
     }
 
     pub fn push(&mut self, frame: ReplayFrame, config: &DreamerConfig) {
-        frame.validate(config);
-        if self.frames.len() == self.capacity {
-            self.frames.pop_front();
-        }
-        self.frames.push_back(frame);
+        self.push_stream(0, frame, config);
+    }
 
-        self.total_frames = self
+    pub fn push_stream(&mut self, stream: usize, frame: ReplayFrame, config: &DreamerConfig) {
+        assert!(stream < self.streams.len());
+        frame.validate(config);
+        if self.len() == self.capacity {
+            let oldest = self.arrival_order.pop_front().unwrap();
+            self.streams[oldest].frames.pop_front();
+        }
+        self.arrival_order.push_back(stream);
+        let history = &mut self.streams[stream];
+        history.frames.push_back(frame);
+
+        history.total_frames = history
             .total_frames
             .checked_add(1)
             .expect("replay frame index overflowed");
@@ -110,15 +138,17 @@ impl SequenceReplay {
         // D3's online counter is checked before it is incremented, so it skips
         // start zero and queues fresh non-overlapping starts 1, 1 + required,
         // and so on. Learner batches drain this queue before sampling uniformly.
-        if self.total_frames > required && (self.total_frames - 1).is_multiple_of(required) {
-            self.fresh_starts.push_back(self.total_frames - required);
+        if history.total_frames > required && (history.total_frames - 1).is_multiple_of(required) {
+            self.fresh_starts
+                .push_back((stream, history.total_frames - required));
         }
 
-        let oldest_frame = self.total_frames - self.frames.len() as u64;
+        // Prune lazily at the head; stale items later in the queue are skipped
+        // when reached. No scan proportional to replay capacity on every action.
         while self
             .fresh_starts
             .front()
-            .is_some_and(|start| *start < oldest_frame)
+            .is_some_and(|&(stream, start)| start < self.streams[stream].oldest_frame())
         {
             self.fresh_starts.pop_front();
         }
@@ -126,7 +156,13 @@ impl SequenceReplay {
 
     pub fn sample(&mut self, config: &DreamerConfig, rng: &mut impl Rng) -> Option<SequenceBatch> {
         let required = config.replay_context + config.batch_length;
-        if self.frames.len() < required {
+        let counts: Vec<_> = self
+            .streams
+            .iter()
+            .map(|stream| stream.frames.len().saturating_sub(required - 1))
+            .collect();
+        let valid_count: usize = counts.iter().sum();
+        if valid_count == 0 {
             return None;
         }
         let size = config.network();
@@ -144,20 +180,41 @@ impl SequenceReplay {
         let mut flags = (0..length)
             .map(|_| vec![FrameFlags::default(); batch])
             .collect::<Vec<_>>();
-        let mut frame_indices = (0..length).map(|_| vec![0; batch]).collect::<Vec<_>>();
+        let mut frame_indices = (0..length).map(|_| vec![(0, 0); batch]).collect::<Vec<_>>();
 
-        let last_start = self.frames.len() - required;
-        let oldest_frame = self.total_frames - self.frames.len() as u64;
         for row in 0..batch {
-            let start = if let Some(fresh_start) = self.fresh_starts.pop_front() {
-                let local_start = usize::try_from(fresh_start - oldest_frame)
-                    .expect("fresh replay start does not fit usize");
-                assert!(local_start <= last_start, "fresh replay start is invalid");
-                local_start
-            } else {
-                rng.random_range(0..=last_start)
+            let fresh = loop {
+                match self.fresh_starts.pop_front() {
+                    Some((stream, start)) if start >= self.streams[stream].oldest_frame() => {
+                        break Some((
+                            stream,
+                            (start - self.streams[stream].oldest_frame()) as usize,
+                        ));
+                    }
+                    Some(_) => continue,
+                    None => break None,
+                }
             };
-            let context = &self.frames[start + config.replay_context - 1];
+            let (stream, start) = if let Some(fresh) = fresh {
+                fresh
+            } else {
+                let mut start = rng.random_range(0..valid_count);
+                let stream = counts
+                    .iter()
+                    .position(|&count| {
+                        if start < count {
+                            true
+                        } else {
+                            start -= count;
+                            false
+                        }
+                    })
+                    .unwrap();
+                (stream, start)
+            };
+            assert!(start < counts[stream], "fresh replay start is invalid");
+            let frames = &self.streams[stream].frames;
+            let context = &frames[start + config.replay_context - 1];
             initial_deter[row * size.deter..(row + 1) * size.deter].copy_from_slice(&context.deter);
             let stoch_width = size.stoch * size.classes;
             initial_stoch[row * stoch_width..(row + 1) * stoch_width]
@@ -165,7 +222,7 @@ impl SequenceReplay {
 
             for time in 0..length {
                 let index = start + config.replay_context + time;
-                let frame = &self.frames[index];
+                let frame = &frames[index];
                 observations[time]
                     [row * config.observation_dim()..(row + 1) * config.observation_dim()]
                     .copy_from_slice(frame.observation.as_slice());
@@ -174,7 +231,7 @@ impl SequenceReplay {
                 }
                 rewards[time][row] = frame.reward.combined(config);
                 flags[time][row] = frame.flags;
-                frame_indices[time][row] = index;
+                frame_indices[time][row] = (stream, index);
             }
         }
 
@@ -206,7 +263,8 @@ impl SequenceReplay {
                 config.batch_size * size.stoch * size.classes
             );
             for row in 0..config.batch_size {
-                let frame = &mut self.frames[batch.frame_indices[time][row]];
+                let (stream, index) = batch.frame_indices[time][row];
+                let frame = &mut self.streams[stream].frames[index];
                 frame
                     .deter
                     .copy_from_slice(&deter[time][row * size.deter..(row + 1) * size.deter]);
@@ -226,7 +284,7 @@ pub struct SequenceBatch {
     pub previous_actions: Vec<Vec<f32>>,
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
-    frame_indices: Vec<Vec<usize>>,
+    frame_indices: Vec<Vec<(usize, usize)>>,
 }
 
 impl SequenceBatch {
@@ -343,7 +401,7 @@ mod tests {
 
         let mut rng = StdRng::seed_from_u64(1);
         let batch = replay.sample(&config, &mut rng).unwrap();
-        assert_eq!(batch.frame_indices[0], vec![2, 6]);
+        assert_eq!(batch.frame_indices[0], vec![(0, 2), (0, 6)]);
     }
 
     #[test]
@@ -358,7 +416,7 @@ mod tests {
 
         let mut rng = StdRng::seed_from_u64(1);
         let batch = replay.sample(&config, &mut rng).unwrap();
-        assert_eq!(batch.frame_indices[0], vec![1]);
+        assert_eq!(batch.frame_indices[0], vec![(0, 1)]);
         assert_eq!(batch.observations[0][0], 6.0);
     }
 
@@ -369,5 +427,53 @@ mod tests {
         invalid.flags.is_terminal = true;
         let result = std::panic::catch_unwind(|| invalid.validate(&config));
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn vector_sequences_never_cross_streams_even_after_eviction_and_refresh() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 8;
+        config.batch_length = 3;
+        let mut replay = SequenceReplay::with_streams(19, 3);
+        for tick in 0..30 {
+            for stream in 0..3 {
+                // Unequal arrival rates and a shared global eviction budget.
+                if stream == 2 && tick % 2 == 0 {
+                    continue;
+                }
+                let index = replay.streams[stream].total_frames as usize;
+                replay.push_stream(stream, frame(stream * 100 + index, &config), &config);
+            }
+        }
+        assert_eq!(replay.len(), 19);
+        assert_eq!(replay.valid_sequence_count(&config), 10);
+        let mut rng = StdRng::seed_from_u64(17);
+        for _ in 0..20 {
+            let batch = replay.sample(&config, &mut rng).unwrap();
+            for row in 0..config.batch_size {
+                let (stream, index) = batch.frame_indices[0][row];
+                for time in 0..config.batch_length {
+                    assert_eq!(batch.frame_indices[time][row], (stream, index + time));
+                    assert_eq!(
+                        batch.observations[time][row * config.observation_dim()],
+                        batch.observations[0][row * config.observation_dim()] + time as f32
+                    );
+                    assert_eq!((batch.rewards[time][row] / 100.0) as usize, stream);
+                }
+            }
+            let size = config.network();
+            let deter = vec![vec![123.0; config.batch_size * size.deter]; config.batch_length];
+            let stoch = vec![
+                vec![456.0; config.batch_size * size.stoch * size.classes];
+                config.batch_length
+            ];
+            replay.update_context(&batch, &deter, &stoch, &config);
+            for indices in &batch.frame_indices {
+                for &(stream, index) in indices {
+                    assert_eq!(replay.streams[stream].frames[index].deter[0], 123.0);
+                    assert_eq!(replay.streams[stream].frames[index].stoch[0], 456.0);
+                }
+            }
+        }
     }
 }
