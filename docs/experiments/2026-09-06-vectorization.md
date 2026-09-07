@@ -293,6 +293,43 @@ measures N=2/4/8 at the fixed B16 recipe, including complete GPU traces and
 accounting. A [new vectorized Pong protocol](2026-09-06-vector-pong.md) preserves
 the three-seed mastery gate; it is not completion of the interrupted serial run.
 
+The real-game matrix completes with all action/reward/update ledgers valid:
+
+| Streams | Actions/s | Update seconds | GPU activity | Power W | Peak MiB |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2 | 7.0963 | 0.42606 | 55.63% | 134.18 | 9,295 |
+| 4 | 7.1422 | 0.42802 | 59.58% | 134.81 | 10,954 |
+| 8 | 7.3663 | 0.42274 | 58.51% | 139.54 | 14,148 |
+
+Each final window contains 1,024 actions and 256 updates. Cold construction
+takes 65.31/66.35/65.90 s, down from roughly 93 s with the serial-head graph.
+The complete 3,072-action jobs perform 481/450/387 updates because independent
+streams have different replay-prefill costs. N=2 completes two −21 games;
+N=4/8 complete none. These are throughput runs, not competence results.
+
+N=2 improves 9.2% over the preceding CPU-parallel control at unchanged B16/R256.
+N=8 improves 36.5% over the original N=1 run (5.3948 actions/s); that combined
+comparison includes collection and systems changes, not identical trajectories.
+More streams are a small marginal win: N=8 is only 3.14% faster than N=4.
+The predeclared rule chooses the fewest streams within 3% of the measured best;
+N=4 narrowly misses that cutoff, so **N=8** is selected. This single-window
+selection is not a claim of statistically established superiority.
+
+GPU activity remains about 56–60%, not full utilization. At N=2, the measured
+window spends 109.93 s in learning, 33.61 s observing and only 0.54 s stepping
+environments. CPU environment parallelism is not the present priority. Aggregate
+coupled game-clock speed is about 0.49× at N=8, and each stream advances about
+0.061×: **super-real-time training is still not achieved**. The memory reserve
+remains enabled. The common native binary, runner/wrapper and all raw reports
+are archived.
+
+The corrected native executable also restores the earlier 2,000-action pixel
+canary checkpoint into N=1. A 64-action frozen smoke check has zero updates,
+an unchanged restored checkpoint identity and **all 64 transitions identical**
+to the previous executable's evaluation prefix (excluding timestamps). Its
+complete accounting passes. This checks checkpoint compatibility, not new
+training trajectory equivalence or Pong mastery.
+
 ## Next measured changes
 
 Current CPU checks: 75 Kindle and five gym tests pass, with 17 hardware tests
@@ -306,8 +343,8 @@ an unused single-stream diagnostic core; the measured binaries remain archived.
    predeclared learning-quality comparison at matched aggregate interactions,
    with its changed optimizer cadence and warmup reported. B64 is not the next
    default: it did not beat B32 at N=2 and failed the memory guard at N=4.
-2. Finish the temporal-head real-game throughput check; later systems work can
-   target grouped RSSM/layout work and host/GPU transfers. The compensated frontend did
+2. Temporal-head timing and numerical checks are complete. Later systems work
+   can target grouped RSSM/layout and host/GPU transfers. The compensated frontend did
    not demonstrate a material speedup. Never re-enable reduced-exponent-range
    kernels for sensitive learner gradients.
 3. Only after throughput and accounting checks, predeclare fresh vectorized

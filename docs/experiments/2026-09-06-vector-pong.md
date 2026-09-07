@@ -80,3 +80,36 @@ ratios, learner-stage time, debt, and a 1 Hz trace of GPU UUID
 `GPU-6869e50d-83aa-bec7-6169-adc413f49b32` (RTX 5080). GPU-heavy jobs are serialized.
 High busy percentage or fast frozen inference does not establish accelerated
 playing plus training or game competence.
+
+## Selection before launch
+
+Source commit `cea5a93` contains the temporal batching implementation and this
+predeclared protocol. The N=2/4/8 matrix completes at 7.0963/7.1422/7.3663 actions/s,
+with every accounting audit valid. The declared rule selects **N=8**: N=4 narrowly
+misses the 3%-below-best cutoff. Each seed therefore contributes 25,000 actions
+per stream and 200,000 total; this is not 200,000 per environment. Peak observed
+VRAM is 14,148 MiB, with the 10% reserve intact. No score-based selection occurred.
+
+Native extension SHA-256:
+`f663dd9317bd934f173b240041ea68b7e21e0f7d037ebaf22b9549a9ae91bb4e`.
+Vector runner SHA-256:
+`54ed3e3d91fa098d2257370fdf170d7a2fd26eb407d53a15ee8b63a6a4e11ee6`.
+Shared wrapper SHA-256:
+`ea05a28053b92bc7d462ecd56b358d0a63e4eeb73b71fcece710c2323a8474fe`.
+The launcher also pins both audit implementations. It writes a fresh manifest
+with exact source/launcher hashes, runs one GPU job at a time and stops after
+an interrupted or invalid job instead of silently continuing the queue.
+
+The final restore smoke check passes: the corrected executable restores the
+earlier pixel canary into N=1, performs zero updates and reproduces all 64 frozen
+evaluation-prefix transitions. This is compatibility evidence, not competence.
+
+Launch command:
+
+```sh
+MEGANEURA_DEVICE_ID=0x2c02 python/.venv/bin/python \
+  runs/levjepa-vector-pong-20260906/run_mastery.py --num-envs 8
+```
+
+Order: fresh zero-update control, then training and frozen evaluation for
+seeds 0, 1 and 2. Passing the launch checks does not pass the mastery gate.
