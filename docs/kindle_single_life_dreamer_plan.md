@@ -40,7 +40,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued. |
-| Boxing | Fresh roots 1009/2017: 123/123 and 207/207 wins, means +83.8699 / +90.5845; paired untrained means −0.7222 / +0.8056 | Two paired learning gates pass. Root 3019 is training; three-seed confirmation is unfinished. |
+| Boxing | Fresh roots 1009/2017: 123/123 and 207/207 wins, means +83.8699 / +90.5845; paired untrained means −0.7222 / +0.8056 | Two paired learning gates pass. Root 3019 finished training; its final frozen evaluation is running and its untrained control remains pending. Three-seed confirmation is unfinished. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued. |
 | Breakout | No learned result yet | Fixed seed-0 pilot queued; fresh-seed confirmation still required afterwards. |
 | Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |

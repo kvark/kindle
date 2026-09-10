@@ -239,10 +239,15 @@ reliable learning.
   failing competence as required. Both full checkpoints, replays/decoded videos,
   all six commands and four GPU windows independently reverify with all 429
   experiment and 756 handoff pins; the second paired learning gate passes.
-  Root 3019 started fresh training at 16:58:59 UTC on September 10. Its actual
-  header verifies the unchanged package/recipe, disjoint live RNG range and
-  zero starting counters without a restore. Two complete passing roots do not
-  establish three-seed reliability. Preserve the remaining fixed phases.
+  Root 3019 completed fresh training at 23:28:41 UTC on September 10:
+  200,004 actions / 49,651 updates. Its original header verifies the unchanged
+  package/recipe, disjoint live RNG range and zero starting counters without a
+  restore. All 241 saved entries and 49,651 learner reports are finite; complete
+  optimizer state, actual encoder identity and full GPU coverage reverify,
+  retaining at least 3,302 MiB directly free. Its declared 75k unassisted sampled
+  frozen evaluation is running from the verified final save; this is not a
+  competence result. Two complete passing roots do not establish three-seed
+  reliability. Preserve the remaining fixed phases and untrained control.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.
