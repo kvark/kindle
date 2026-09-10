@@ -1,8 +1,8 @@
 # Fresh three-seed Boxing confirmation
 
 Started September 10 at 01:10 UTC. Root 1009 passes its complete trained-versus-
-untrained comparison. Root 2017 has completed training and is in frozen
-evaluation; root 3019 remains queued.
+untrained comparison. Root 2017 passes frozen evaluation; its untrained control
+is running. Root 3019 remains queued.
 
 The R256 pilot's 162/162 frozen wins and mean +92.4877 justify testing its
 stability, not assuming it. The current Meganeura package has completed exact
@@ -53,7 +53,7 @@ weak seed, new assistance or changed thresholds after seeing results.
 | Training root | Training | Final frozen gate | Untrained control |
 | --- | --- | --- | --- |
 | 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Complete: 17/36 wins, mean −0.7222; fails competence gate |
-| 2017 | Complete: 200,004 actions / 49,651 updates | Running | Pending |
+| 2017 | Complete: 200,004 actions / 49,651 updates | Pass: 207/207 wins, mean +90.5845 | Running |
 | 3019 | Queued | Pending | Pending |
 
 Seed 1009 finished training normally at **07:42:37 UTC on September 10**.
@@ -143,11 +143,34 @@ reverify. The training loop took 23,437.51 s, or 8.5335 actions/s and 0.5688×
 aggregate real time (about 0.0948× per stream). This is not a matched speed
 comparison or frozen competence.
 
-Its 75k unassisted sampled evaluation started at **15:36:48 UTC**, restoring the
-declared final state at 200,004 actions / 49,651 updates. This frozen-start check
-does not establish its final score or complete the paired untrained comparison.
-Root 3019 remains queued. One complete passing root does not establish
-three-seed reliability or complete the five-game objective.
+### Second frozen result: pass
+
+Root 2017's unassisted sampled evaluation finished normally at **16:17:25 UTC**,
+followed by its complete CPU replay at **16:18:04 UTC**. It restores only the
+declared final state and completes 75,000 actions with **207/207 natural wins,
+mean +90.5845**, no cutoffs and zero learner updates. The six unfinished tails
+(+44/+5/+62/+40/+44/+47) remain separate. The stream-bootstrap 95% mean interval
+is [89.3939, 91.8333], conditional on this policy, not training-seed reliability.
+
+The independent CPU audit reproduces the complete
+[score](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.score.json),
+rechecking both full ledgers, all 241 tensors and optimizer counters, actual
+encoder identity, three command exits/output hashes, full replay/video binding,
+all 429 experiment pins and 756 handoff pins. Both raw GPU windows reproduce
+their recorded checks; frozen evaluation retains at least **3,413 MiB directly
+free** over 9,735 samples, with a 0.268 s maximum gap and 88.79% mean activity.
+The score SHA-256 is
+`56bb6feeec059a092e33762d29e37e9d2069ffdbd165865ccd0703085178f955`.
+
+Watch the [whole stream-0 rollout](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4).
+All **49,994 frames** decode at 60 fps, including the unfinished tail. This is
+the replay-validated reconstruction of recorded controls, not a selected win
+clip or a comparison against separately saved live RGB. Its SHA-256 is
+`1c949c34bcb5000347e07faa9c435c860b67380599baf5e9f3d8fc501866d2d5`.
+
+The separately initialized untrained control has started. Root 3019 remains
+queued. Two passing frozen policies do not complete the second paired control,
+establish three-seed reliability or complete the five-game objective.
 
 ### Completed training-cost readout
 
@@ -228,12 +251,13 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed2017-evaluation.jsonl` and `gpu.csv` for live progress.
+Read `events.jsonl`, `seed2017-untrained-evaluation.jsonl` and `gpu.csv` for live progress.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
-Both root-1009 frozen workers (2347336 and 2350470) and root-2017's training
-worker (2353178) exited normally. The current root-2017 frozen worker is 2382137,
-start ticks 112676217. Recheck live process identities.
+Both root-1009 frozen workers (2347336 and 2350470), root-2017's training worker
+(2353178) and its trained frozen worker (2382137) exited normally. The current
+root-2017 untrained frozen worker is 2386142, start ticks 112930906. Recheck live
+process identities.
 Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
 appear only after their corresponding phases finish. Movies will be
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.

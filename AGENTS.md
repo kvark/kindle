@@ -59,12 +59,21 @@ reliable learning.
   optimizer moments on restore, excluding only plan-identified Winograd caches.
   Keep backend identity checks and historical executables intact.
   The current backend is 4d45ba3a: upstream runtime e59bd32d plus the required
-  cache corrections. The September 10 06:49 UTC remote check finds main 4d669394;
-  its two newer commits change only docs/paper, with identical source/test trees.
-  Keep the qualified runtime pin; there are no additional runtime fixes to adopt.
-  It preserves frame-prefix query attention alongside upstream's different
-  token-causal blocks and early cache
-  aliases. Its 95 Rust/547 Python CPU tests and 18 GPU checks pass, including
+  cache corrections. The September 10 16:29 UTC remote check finds main ce80e9cd,
+  superseding the earlier documentation-only 4d669394 check. It fixes generated
+  matmul epilogues and now includes the required LeVJEPA cache patches upstream.
+  The isolated 1e00e818 candidate at `exp/meganeura-upstream-20260910` changes
+  only dependency/identity files. Its 95 Rust/547 Python and 80 focused backend
+  CPU tests pass in `runs/meganeura-upstream-20260910.ERT7QD`; all 561 package
+  input pins, source/wheel/import identity and historical/active controls reverify.
+  Candidate native abf4ae5d is CPU-qualified only. No GPU gate, adoption or speedup
+  is claimed. Keep active and queued packages fixed and GPU work serialized;
+  require full gradient/cache/state/trace, memory and timing checks before use.
+  Upstream's block-matmul operator and experimental tuning options are not
+  automatically enabled in Kindle by this dependency update.
+  The qualified 4d45ba3a package preserves frame-prefix query attention alongside
+  upstream's different token-causal blocks and early cache aliases. Its
+  95 Rust/547 Python CPU tests and 18 GPU checks pass, including
   production all-gradient and LeVJEPA N4/N6/N8 parity. Both eight-update full-state
   canary pairs also match exactly. The N6 pixel AB/BA and override gate completed
   in `runs/meganeura-refresh-20260909.xfF3AZ`: all 374 pins, complete state/reports/
@@ -219,10 +228,13 @@ reliable learning.
   the paired learning gate passes. Root 2017 completed its fresh training at
   15:36:45 UTC: 200,004 actions / 49,651 updates, with all 241 saved tensor
   entries and every learner report finite, complete optimizer state and passing
-  full GPU coverage retaining 3,302 MiB directly free. Its actual frozen worker
-  restored that final checkpoint; the 75k evaluation and paired untrained
-  control are pending. Root 3019 remains queued, so three-seed reliability
-  is not established.
+  full GPU coverage retaining 3,302 MiB directly free. Its 75k final frozen
+  evaluation passes: 207/207 natural wins, mean +90.5845, with no cutoffs or
+  updates. The independent complete state/score/replay/video audit and both
+  raw GPU windows pass; frozen memory retains at least 3,413 MiB directly free.
+  The paired untrained control is running. Root 3019 remains queued, so this
+  second frozen pass does not yet establish a second paired comparison or
+  three-seed reliability.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.

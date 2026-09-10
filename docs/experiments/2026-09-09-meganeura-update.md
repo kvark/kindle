@@ -20,13 +20,53 @@ runtime, shader, dependency or test changes to adopt. Keep the qualified
 documentation-only head would not pick up a fix. This read-only revision check
 is not another qualification run or speed measurement.
 
+### September 10 follow-up: new correctness update, not yet adopted
+
+The **16:29 UTC** direct remote check resolves main to
+[`ce80e9cd`](https://github.com/kvark/meganeura/commit/ce80e9cd6056c230590b8b7e1eb9ffe9bbce08bc).
+This supersedes the earlier docs-only status. It fixes epilogue fusion that
+could replace a generated pointwise operation, such as clamp, with its legacy
+shader-layout sentinel. Cache format 7 invalidates affected old compiled plans.
+It also includes the two required LeVJEPA cache corrections upstream; the
+cached-query hardware fixture is unchanged from the qualified downstream pin.
+The broader update adds experimental matmul/convolution and parameter-memory
+options, plus the CPU-tested block-matmul operator. Their presence is not
+activation or a measured benefit in Kindle.
+
+The isolated Kindle candidate **`1e00e818`**, branch
+`exp/meganeura-upstream-20260910`, starts from qualified Atari source `90b4763`.
+Only its dependency, two lockfiles and reported backend identity change; the
+recipe, graph builders, Python package sources and Blade version are unchanged.
+CPU qualification completed in `runs/meganeura-upstream-20260910.ERT7QD`, using
+one build job and a separate target directory. Formatting and workspace/Python
+Clippy pass; **95 Rust tests** pass, with 22 hardware tests ignored. Another
+**80 focused backend CPU tests** cover compilation, cache invalidation, shader
+generation and block-matmul chain rules. The isolated wheel passes all **547
+Python tests** through its actual extension, with matching six Python source
+files and source/wheel/import bytes. The native SHA-256 is
+`abf4ae5d37a0bc75d3425073ae80c17ab5fa94bd6e843a5d39cf1c335e85b668`.
+An independent CPU reread verifies all 561 package input pins, every command
+exit/log hash, test counts and unchanged historical/active native controls.
+The [package result](../../runs/meganeura-upstream-20260910.ERT7QD/package-result.json)
+has SHA-256 `3a690190f89f1fbae0e7edbb112fe63dd53c1bfb8e68e905a29f66a457c6857f`.
+No native agent, GPU gate or follower is started by this preparation. Keep the
+running Boxing experiment and all serial-handoff inputs on their qualified packages.
+
+Before adoption, require the unchanged production loss/all-gradient and LeVJEPA
+cache/stream checks, complete learning-state/report/trace comparisons from
+update 1, direct-memory coverage and matched N6 runtime measurements. Retain
+the generated-epilogue regression and old-cache rejection tests. Do not infer
+that this compiler bug caused the historical Pong failures, or turn a numerical
+change into a claimed identical-recipe speedup. The already-declared learning
+queue retains GPU priority; this candidate is not yet runtime-qualified.
+
 ## Preserve the encoding contract
 
-Upstream's new cached block attention masks queries by token position. LeVJEPA
+Upstream's cached block attention masks queries by token position. LeVJEPA
 needs every patch in the current frame to attend to the entire current frame,
 plus earlier frames. Substituting the new operator would silently change the
-representation. Main also lacks the carried early cache-write alias correction:
-a view of the write result can otherwise point at a separate unused buffer.
+representation. At `e59bd32d`, main also lacked the early cache-write alias
+correction: a view of the write result can otherwise point at a separate unused buffer.
 
 The new downstream revision
 [`4d45ba3a`](https://github.com/kvark/meganeura/commit/4d45ba3a1830107769ae07fabcf3b95d0762973c)
