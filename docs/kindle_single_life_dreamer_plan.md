@@ -324,7 +324,9 @@ The first root completed its 200,004 actions / 49,651 updates and passes its
 final frozen gate: 123/123 wins, mean +83.8699, no cutoffs or updates, with full
 state/replay/video and GPU checks. Its complete paired untrained control has
 17/36 wins and mean −0.7222, so this root passes the learning comparison.
-Root 2017 is training and 3019 remains queued; reliability is not established. The
+Root 2017 completed the same training budget with complete finite state and
+passing GPU coverage; its final frozen evaluation is running. Root 3019 remains
+queued, so reliability is not established. The
 [first Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md)
 are now conditionally declared: 200,004 fresh seed-0 actions per game, no
 exploration overrides, final-checkpoint episode-budgeted evaluation and

@@ -216,8 +216,13 @@ reliable learning.
   least 3,413 MiB directly free. Its complete untrained control has 17/36 wins
   and mean −0.7222, failing competence as required. Both full checkpoints,
   replays/videos, six commands and four GPU windows reverify with all 429 pins;
-  the paired learning gate passes. Root 2017 started fresh at 09:04:59 UTC;
-  root 3019 remains queued, so three-seed reliability is not established.
+  the paired learning gate passes. Root 2017 completed its fresh training at
+  15:36:45 UTC: 200,004 actions / 49,651 updates, with all 241 saved tensor
+  entries and every learner report finite, complete optimizer state and passing
+  full GPU coverage retaining 3,302 MiB directly free. Its actual frozen worker
+  restored that final checkpoint; the 75k evaluation and paired untrained
+  control are pending. Root 3019 remains queued, so three-seed reliability
+  is not established.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.
