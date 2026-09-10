@@ -232,9 +232,14 @@ reliable learning.
   evaluation passes: 207/207 natural wins, mean +90.5845, with no cutoffs or
   updates. The independent complete state/score/replay/video audit and both
   raw GPU windows pass; frozen memory retains at least 3,413 MiB directly free.
-  The paired untrained control is running. Root 3019 remains queued, so this
-  second frozen pass does not yet establish a second paired comparison or
-  three-seed reliability.
+  Its complete untrained control has 20/36 natural wins and mean +0.8056,
+  failing competence as required. Both full checkpoints, replays/decoded videos,
+  all six commands and four GPU windows independently reverify with all 429
+  experiment and 756 handoff pins; the second paired learning gate passes.
+  Root 3019 started fresh training at 16:58:59 UTC on September 10. Its actual
+  header verifies the unchanged package/recipe, disjoint live RNG range and
+  zero starting counters without a restore. Two complete passing roots do not
+  establish three-seed reliability. Preserve the remaining fixed phases.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.

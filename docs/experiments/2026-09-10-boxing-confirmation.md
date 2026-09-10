@@ -1,8 +1,8 @@
 # Fresh three-seed Boxing confirmation
 
-Started September 10 at 01:10 UTC. Root 1009 passes its complete trained-versus-
-untrained comparison. Root 2017 passes frozen evaluation; its untrained control
-is running. Root 3019 remains queued.
+Started September 10 at 01:10 UTC. Roots 1009 and 2017 pass their complete
+trained-versus-untrained comparisons. Root 3019 is training; three-seed
+reliability remains unproven.
 
 The R256 pilot's 162/162 frozen wins and mean +92.4877 justify testing its
 stability, not assuming it. The current Meganeura package has completed exact
@@ -53,8 +53,8 @@ weak seed, new assistance or changed thresholds after seeing results.
 | Training root | Training | Final frozen gate | Untrained control |
 | --- | --- | --- | --- |
 | 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Complete: 17/36 wins, mean −0.7222; fails competence gate |
-| 2017 | Complete: 200,004 actions / 49,651 updates | Pass: 207/207 wins, mean +90.5845 | Running |
-| 3019 | Queued | Pending | Pending |
+| 2017 | Complete: 200,004 actions / 49,651 updates | Pass: 207/207 wins, mean +90.5845 | Complete: 20/36 wins, mean +0.8056; fails competence gate |
+| 3019 | Running: fixed 200,004-action budget | Pending | Pending |
 
 Seed 1009 finished training normally at **07:42:37 UTC on September 10**.
 An independent CPU read rechecks the complete training ledger, all 429 pins,
@@ -168,9 +168,32 @@ the replay-validated reconstruction of recorded controls, not a selected win
 clip or a comparison against separately saved live RGB. Its SHA-256 is
 `1c949c34bcb5000347e07faa9c435c860b67380599baf5e9f3d8fc501866d2d5`.
 
-The separately initialized untrained control has started. Root 3019 remains
-queued. Two passing frozen policies do not complete the second paired control,
-establish three-seed reliability or complete the five-game objective.
+### Second paired comparison: complete and passing
+
+The separately restored untrained policy finishes all 75,000 actions with
+**20/36 natural wins, mean +0.8056**, three draws, 13 losses, no cutoffs and zero
+updates. Its stream-bootstrap mean interval is [−0.7222, +2.1111], conditional on
+this fixed policy. The control fails the unchanged competence gate and scores
+below the trained policy. Its full replay finished at **16:58:58 UTC**.
+Watch the [whole untrained stream-0 baseline](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-untrained-evaluation.mp4),
+not another success video: all 49,982 frames decode at 60 fps.
+
+The independent CPU audit recomputes both stored scores and the
+[complete paired result](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-result.json).
+It reverifies all four full ledgers, both 241-entry checkpoints, six successful
+commands/output hashes, both full replays/decoded videos, all 429 experiment
+pins and 756 handoff pins. The untrained checkpoint's 146 optimizer-moment
+tensors are complete and zero. All four raw GPU windows reproduce their stored
+checks, with at least 3,302 MiB directly free overall and 3,413 MiB in both 75k
+frozen evaluations. The paired result SHA-256 is
+`840369fcb569e346a9f2d792812bbcb8d567896b9f69f71f2d1f26d630f8a4c1`.
+
+Root **3019 started fresh training at 16:58:59 UTC**. Its actual command/start
+header verifies the unchanged source/package and recipe, 200,004-action budget,
+disjoint live policy/posterior RNG range and zero counters without a restore.
+This is a start check, not completed training or a frozen result. Two complete
+passing roots do not establish three-seed reliability or finish the five-game
+objective. Keep the final root and all its evaluation phases fixed.
 
 ### Completed training-cost readout
 
@@ -251,13 +274,13 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed2017-untrained-evaluation.jsonl` and `gpu.csv` for live progress.
+Read `events.jsonl`, `seed3019-train.jsonl` and `gpu.csv` for live progress.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
 Both root-1009 frozen workers (2347336 and 2350470), root-2017's training worker
-(2353178) and its trained frozen worker (2382137) exited normally. The current
-root-2017 untrained frozen worker is 2386142, start ticks 112930906. Recheck live
-process identities.
+(2353178) and both its frozen workers (2382137 and 2386142) exited normally.
+The current root-3019 training worker is 2402252, start ticks 113169386. Recheck
+live process identities.
 Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
 appear only after their corresponding phases finish. Movies will be
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.

@@ -326,8 +326,10 @@ state/replay/video and GPU checks. Its complete paired untrained control has
 17/36 wins and mean −0.7222, so this root passes the learning comparison.
 Root 2017 completed the same training budget and passes its final frozen gate:
 207/207 wins, mean +90.5845, no cutoffs or updates, with complete state/replay/
-video and GPU checks. Its paired untrained control is running; root 3019 remains
-queued, so three-seed reliability is not established. The
+video and GPU checks. Its complete untrained control has 20/36 wins and mean
++0.8056, failing competence, so the second paired learning comparison passes.
+Root 3019 has started fresh training; three-seed reliability is not established.
+The
 [first Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md)
 are now conditionally declared: 200,004 fresh seed-0 actions per game, no
 exploration overrides, final-checkpoint episode-budgeted evaluation and
@@ -756,8 +758,9 @@ has started. Its all-seed gates and separately restored controls are fixed.
 The episode-count evaluation gate is complete through a separately declared
 continuation after interruption: full frozen-state/default-trace/prefix parity
 and direct-memory checks pass. Preserve the interrupted original and completed
-continuation; this is tooling validation, not a new learned result. The requested
-latest Meganeura refresh is qualified and adopted, with no measured speedup.
+continuation; this is tooling validation, not a new learned result. The
+e59bd32d-based Meganeura refresh is qualified and adopted, with no measured speedup;
+the newer ce80e9cd candidate has passed CPU checks but still needs GPU qualification.
 Fresh three-seed Boxing confirmation is now running on that qualified package.
 Keep its seeds, 200,004-action budgets, frozen evaluations and controls fixed.
 The corrected v2 Breakout/Qbert pilots are declared but not running. Their 521 pins,
