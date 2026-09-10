@@ -262,10 +262,12 @@ reliable learning.
   state/replays, declared commands and twelve GPU windows before its eight
   serialized native phases. Competence failures remain failures, not incomplete
   data or five-game success. Keep the gate's inputs fixed; no new long-run
-  learning declaration is supplied by this gate. The first seed-1009 20,004-action
-  save is archived and all 241 tensor entries are complete/finite; prefix GPU
-  coverage retains 3,302 MiB directly free. This is early state health only,
-  never a replacement for the declared final frozen model or all-seed gates.
+  learning declaration is supplied by this gate. All three first 20,004-action /
+  4,651-update saves are archived, with all 241 tensor entries complete/finite
+  and prefix GPU coverage retaining at least 3,302 MiB directly free. Root 3019's
+  current-schema/encoder and exact 4,651-report prefix checks also pass. Preserve
+  these completed snapshots; they are early state health, never replacements
+  for the declared final frozen models or all-seed gates.
   The first Breakout/Qbert seed-0 pilots are now conditionally declared in
   `runs/breakout-qbert-pilots-v2-20260910.9zf9T3`, with 521 pins and 92 passing CPU
   tests. Their actual CLI refuses the live Boxing predecessor before GPU work;

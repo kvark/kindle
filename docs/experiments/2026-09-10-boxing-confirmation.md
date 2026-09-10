@@ -261,8 +261,18 @@ Its 18,440 prefix GPU samples retain at least 3,302 MiB directly free, with a
 its complete tensor fingerprints and verifies the rolling files before and after
 reading. It does not restore a policy or change training. Its result SHA-256 is
 `e7755bea470a4f3779523473eb6f14734a83f3bb05de8fc6cb6286ebb92c5513`.
-These are early health checks, not a complete-run ledger audit, frozen result
-or training-seed reliability.
+Root 3019's **20,004-action / 4,651-update** save completed at **17:36:56 UTC**
+and is archived as `seed3019-020004-checkpoint`. Its
+[inspection](../../runs/boxing-confirmation-20260910.hTEDcu/seed3019-020004-inspection.json)
+and independent CPU reread pass all 241 tensors, current native layout/backend,
+encoder identity, optimizer state and the exact 4,651-report finite prefix.
+All 9,092 GPU samples through the save pass coverage, with a 0.268 s maximum
+gap and at least 3,302 MiB directly free. All 429 experiment and 756 handoff pins
+reverify. The inspection SHA-256 is
+`78d3d6065d50ecd08b0ba09f387e3fbcf0e1f1a5f14ccbe3cbe248c47b3021da`.
+
+These are early health checks, not complete-run ledger audits, frozen results
+or training-seed reliability. Training and every final-checkpoint gate are unchanged.
 
 The worker reuses the unchanged match scorer, strict complete-checkpoint auditor
 and campaign checker’s match-replay binding. It does **not** invoke or bypass
