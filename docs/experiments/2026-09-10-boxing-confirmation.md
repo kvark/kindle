@@ -153,6 +153,15 @@ This is an early state-health snapshot, not stable-training proof or frozen
 competence. Training and final-checkpoint acceptance are unchanged; do not
 substitute this archive for the declared final model.
 
+Root 2017's matching **20,004-action / 4,651-update** snapshot is also archived
+as `seed2017-020004-checkpoint`, using the unchanged CPU inspector. All 241 tensor
+entries and native optimizer counters pass; its 9,113 prefix GPU samples retain
+at least 3,303 MiB directly free with a 0.268 s maximum gap. The
+[inspection](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-020004-inspection.json)
+has SHA-256 `6b12c6e3e01b72f7c2c2d88fb3e0206621992fed4c792a0eaadaa4f3996581ff`.
+Training continues unchanged. This is early state health, not a complete-run
+ledger audit, frozen result or training-seed reliability.
+
 The worker reuses the unchanged match scorer, strict complete-checkpoint auditor
 and campaign checker’s match-replay binding. It does **not** invoke or bypass
 the old replication-v2 runtime checker: that checker deliberately binds an older
