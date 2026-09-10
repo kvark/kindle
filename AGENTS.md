@@ -1,5 +1,11 @@
 # Kindle working direction
 
+This isolated `exp/block-matmul` candidate is not the active Atari package.
+It groups only small-batch F32 block products, retaining serial GEMV, large
+imagination batches and original GRU gates. CPU checks are not GPU/full-learning
+parity or adoption. Preserve the active Boxing and serial-handoff queues in the
+root workspace; do not schedule this candidate over them.
+
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner
 and policy without joining causal histories. Games are the first testbed.

@@ -9,8 +9,8 @@ description = "A live-learning Dreamer agent with frozen causal visual perceptio
 license = "MIT"
 
 [dependencies]
-# Latest main plus the two carried LeVJEPA cached-query-block patches.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "4d45ba3a1830107769ae07fabcf3b95d0762973c" }
+# Isolated F32 block-matmul candidate; not the qualified Atari backend.
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "70803c22dd23ee73150febb69aae77818c568ab4" }
 # Match Meganeura's published dependency so GPU context types stay identical.
 blade-graphics = "=0.9.0"
 rand = "0.9"
