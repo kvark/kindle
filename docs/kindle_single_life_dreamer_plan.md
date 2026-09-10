@@ -471,6 +471,12 @@ already improved exact paired pixel throughput by 12.9–13.3%; the subsequent
 focused output/gradient tests but failed exact full-learning parity from
 update 3. It remains experimental; its short timing is not an adopted speedup.
 
+A separate [small-batch block-matmul candidate](experiments/2026-09-10-block-matmul.md)
+retains those original GRU gates and the GEMV/large-imagination paths. CPU graph
+checks reduce each isolated small-batch block layer from 65 dispatches to 2;
+94 focused backend and 98 Kindle CPU tests pass. It has no GPU, full-learning,
+memory or timing result and does not displace the active learning queue.
+
 A small [world-sync fan-out candidate](experiments/2026-09-09-world-sync-fanout.md)
 removes repeated reads of overlapping weights while retaining backend cache
 refresh. It is CPU-tested only; require GPU state/trace equality, memory headroom

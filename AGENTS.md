@@ -115,6 +115,12 @@ reliable learning.
   gradient difference: zero-LR update 1 still updates optimizer moments. Capture
   intermediate state from update 1 in any future diagnostic; no cause, fix or
   new GPU queue is established. See the grouped-RSSM experiment report.
+  The separate `exp/block-matmul` candidate (Kindle 4ae539a/Meganeura 70803c2)
+  groups small-batch F32 block products, retaining serial GEMV, large imagination
+  batches and original GRU gates. Its 94 focused backend/98 Kindle CPU checks
+  and block-only 65-to-2 dispatch counts are not GPU parity or a speedup. Preserve
+  its 33-pin evidence and all active queues; no candidate GPU follower or adoption exists.
+  See `docs/experiments/2026-09-10-block-matmul.md` for required hardware gates.
   Do not repeat large CPU graph
   compilation alongside training: the first memory-plan probe caused host
   pressure, and its two capped follow-ups failed without yielding smaller-row
