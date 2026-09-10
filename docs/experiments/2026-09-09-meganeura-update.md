@@ -9,6 +9,17 @@ These fixes do not by themselves explain the old Pong seed failures.
 The September 10 00:30, 03:32 and 04:27 UTC remote rechecks still resolve the same
 upstream revision.
 
+The September 10 **06:49 UTC** remote recheck finds main
+[`4d669394`](https://github.com/kvark/meganeura/commit/4d669394fb8029c3e85a37b9b3117d57de2942d8).
+The two commits since `e59bd32d` (`f61aff80`, `4d669394`) change only four
+documentation/paper files. The complete diff outside `docs/` and `paper/` is
+empty; both revisions have source tree `e9911a5811b3424bd478a8bd0fabc1faa86c9f14`
+and test tree `5d829f8f0d8f10a437d7fce1e34a15494fd47ec9`. There are no additional
+runtime, shader, dependency or test changes to adopt. Keep the qualified
+`4d45ba3a` runtime and active experiment packages unchanged; rebuilding for a
+documentation-only head would not pick up a fix. This read-only revision check
+is not another qualification run or speed measurement.
+
 ## Preserve the encoding contract
 
 Upstream's new cached block attention masks queries by token position. LeVJEPA

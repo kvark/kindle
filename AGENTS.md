@@ -58,9 +58,12 @@ reliable learning.
   blocks or cache aliases when updating again. Require logical weights and all
   optimizer moments on restore, excluding only plan-identified Winograd caches.
   Keep backend identity checks and historical executables intact.
-  The current backend is 4d45ba3a: upstream main e59bd32d, still current at the
-  September 10 recheck, plus the required cache corrections. It preserves frame-prefix query
-  attention alongside upstream's different token-causal blocks and early cache
+  The current backend is 4d45ba3a: upstream runtime e59bd32d plus the required
+  cache corrections. The September 10 06:49 UTC remote check finds main 4d669394;
+  its two newer commits change only docs/paper, with identical source/test trees.
+  Keep the qualified runtime pin; there are no additional runtime fixes to adopt.
+  It preserves frame-prefix query attention alongside upstream's different
+  token-causal blocks and early cache
   aliases. Its 95 Rust/547 Python CPU tests and 18 GPU checks pass, including
   production all-gradient and LeVJEPA N4/N6/N8 parity. Both eight-update full-state
   canary pairs also match exactly. The N6 pixel AB/BA and override gate completed

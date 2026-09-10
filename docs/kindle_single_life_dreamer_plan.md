@@ -405,7 +405,7 @@ row-independent replay/head work are implemented without batching away recurrenc
 For new experiment declarations use the
 [qualified current package](experiments/2026-09-09-meganeura-update.md#use-the-qualified-package)
 (`f6a2b6ad…`) with its matching Python modules, runner and auditors. The adopted
-backend `4d45ba3a…` carries current upstream `e59bd32d…` plus the required
+backend `4d45ba3a…` carries upstream runtime `e59bd32d…` plus the required
 LeVJEPA frame-prefix attention and cache-alias corrections, with Blade 0.9.0 and
 Rust 1.92 minimum. Production numerical checks, exact complete synthetic/pixel
 learning-state comparisons and direct-memory gates pass. The main worktree's
@@ -413,7 +413,10 @@ backend integration also passes CPU/GPU checks. Its historical Python accounting
 interface differs from the isolated Atari package: do not mix them.
 The default editable extension and all old models' executables remain intact.
 Strict restore identity still requires each historical model's original backend.
-Existing campaigns are not silently switched to the new package.
+Existing campaigns are not silently switched to the new package. The September
+10 06:49 UTC remote recheck finds main `4d669394…`; its two newer commits change
+only documentation/paper files. Runtime, shaders, dependencies and tests are
+unchanged, so the qualified runtime pin remains current for fixes.
 
 ### Measured throughput and memory
 
