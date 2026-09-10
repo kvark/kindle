@@ -320,9 +320,10 @@ reverify first.
 The [fresh Boxing confirmation](experiments/2026-09-10-boxing-confirmation.md)
 has started on the qualified current backend: roots 1009/2017/3019 each receive
 200,004 training and 75,000 frozen actions, plus a paired untrained control.
-The first root completed its 200,004 actions / 49,651 updates with full state
-and GPU checks; its exact final-checkpoint frozen evaluation is running.
-There is no confirmation result yet. The
+The first root completed its 200,004 actions / 49,651 updates and passes its
+final frozen gate: 123/123 wins, mean +83.8699, no cutoffs or updates, with full
+state/replay/video and GPU checks. Its paired untrained control is running;
+the other two roots remain pending, so reliability is not established. The
 [first Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md)
 are now conditionally declared: 200,004 fresh seed-0 actions per game, no
 exploration overrides, final-checkpoint episode-budgeted evaluation and

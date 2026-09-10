@@ -1,6 +1,7 @@
 # Fresh three-seed Boxing confirmation
 
-Started September 10 at 01:10 UTC. No confirmation result is available yet.
+Started September 10 at 01:10 UTC. The first final frozen policy passes;
+its paired untrained control and the other two training roots remain pending.
 
 The R256 pilot's 162/162 frozen wins and mean +92.4877 justify testing its
 stability, not assuming it. The current Meganeura package has completed exact
@@ -50,7 +51,7 @@ weak seed, new assistance or changed thresholds after seeing results.
 
 | Training root | Training | Final frozen gate | Untrained control |
 | --- | --- | --- | --- |
-| 1009 | Complete: 200,004 actions / 49,651 updates | Evaluating; not scored | Pending |
+| 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Evaluating |
 | 2017 | Queued | Pending | Pending |
 | 3019 | Queued | Pending | Pending |
 
@@ -71,8 +72,41 @@ Its actual start header matches the final checkpoint's metadata hash
 `ad22049074e3315fd481fddc36bf4e4126a9053d18de24d4ae1027cc199c9b88`, all
 three tensor-file hashes, original model root and 200,004/49,651 counters.
 It uses the unchanged package, sampled unassisted policy and 75,000-action
-budget. This verifies the restore/start, not the unfinished frozen result,
-untrained comparison or three-seed reliability. Keep every remaining phase fixed.
+budget. That initial check verifies the restore/start; the completed frozen
+result is below. Keep every remaining phase fixed.
+
+### First frozen result: pass, paired control pending
+
+The frozen worker exited normally at **08:23:53 UTC**, followed by the complete
+CPU replay at **08:24:30 UTC**. Its 75,000 unassisted sampled actions produce
+**123/123 natural wins, mean +83.8699**, with no cutoffs or learner updates.
+All six unfinished tails are retained separately: +85/+71/+65/+13/+20/+13.
+The stream-bootstrap 95% mean interval is [82.7438, 85.1260], conditional on this
+fixed policy, not a measure of training-seed reliability.
+
+An independent CPU audit reproduces the stored
+[score](../../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.score.json)
+from both complete ledgers, rechecks all 429 pins, all final tensors and optimizer
+counters, three successful command/output records and the complete replay/video
+binding. Both native GPU windows reverify from raw samples: the frozen phase
+retains at least 3,413 MiB directly free over 9,873 samples, with a 0.268 s
+maximum gap and 87.83% mean activity. Frozen activity is not training throughput.
+The score SHA-256 is
+`d04f51854bf70e37d874201212a3c53daa29308ab75f6659f30b2f3c6130891c`.
+
+Watch the [whole stream-0 rollout](../../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4).
+It is a CPU reconstruction of the actual recorded controls, not a selected win
+clip: all 49,992 frames decode at 60 fps, including the unfinished tail.
+The replay validates actions, rewards, boundaries and frame accounting; original
+live RGB was not stored for a separate pixel comparison. Its video SHA-256 is
+`fa80e94629c400dbbca5a4bf44ba0ed20ab1b0ec0766c76a0bae07854e2cdbea`.
+
+The separately restored untrained evaluation started at **08:25:40 UTC**.
+Its complete score/replay and fresh roots 2017/3019 remain pending. This is one
+fresh final-policy pass, not a completed learning comparison, all-seed reliability
+or the five-game objective.
+
+### Earlier training-health evidence
 
 The early learning-enabled 2,004→4,008-action window executes 501 updates with
 no training debt at either endpoint: 8.569 actions/s, 0.5713× aggregate real
@@ -107,10 +141,11 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed1009-evaluation.jsonl` and `gpu.csv` for live progress.
+Read `events.jsonl`, `seed1009-untrained-evaluation.jsonl` and `gpu.csv` for live progress.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
-That training child has exited normally; the first frozen worker is 2347336.
+That training child and frozen worker 2347336 exited normally; the current
+untrained frozen worker is 2350470. Recheck live process identities.
 Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
 appear only after their corresponding phases finish. Movies will be
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.

@@ -205,8 +205,11 @@ reliable learning.
   integrity/runtime-safety failure and preserve the artifacts. Seed 1009 completed
   training at 07:42 UTC on September 10: 200,004 actions / 49,651 updates, with
   complete finite state and full GPU coverage retaining 3,302 MiB directly free.
-  Its exact final-checkpoint frozen evaluation has started; no frozen result
-  or reliability is claimed yet. Keep all 429 pins and this active queue unchanged;
+  Its 75k final frozen evaluation passes: 123/123 natural wins, mean +83.8699,
+  no cutoffs or updates, with complete checkpoint/replay/video checks and at
+  least 3,413 MiB directly free. The paired untrained evaluation is running;
+  roots 2017/3019 remain pending, so three-seed reliability is not established.
+  Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.
   See `docs/experiments/2026-09-10-boxing-confirmation.md`. Prepare current-package
