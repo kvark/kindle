@@ -183,13 +183,19 @@ competence. Training and final-checkpoint acceptance are unchanged; do not
 substitute this archive for the declared final model.
 
 Root 2017's matching **20,004-action / 4,651-update** snapshot is also archived
-as `seed2017-020004-checkpoint`, using the unchanged CPU inspector. All 241 tensor
-entries and native optimizer counters pass; its 9,113 prefix GPU samples retain
-at least 3,303 MiB directly free with a 0.268 s maximum gap. The
+as `seed2017-020004-checkpoint`; its
 [inspection](../../runs/boxing-confirmation-20260910.hTEDcu/seed2017-020004-inspection.json)
-has SHA-256 `6b12c6e3e01b72f7c2c2d88fb3e0206621992fed4c792a0eaadaa4f3996581ff`.
-Training continues unchanged. This is early state health, not a complete-run
-ledger audit, frozen result or training-seed reliability.
+passes complete state and prefix-memory checks. A later read-only
+[40,008-action / 9,652-update inspection](../../runs/boxing-health-20260910.hssMF3/inspection.json)
+also passes all 241 tensor entries, current-package identity/layout and optimizer
+counters. All 9,652 learner reports through that save have finite scalars.
+Its 18,440 prefix GPU samples retain at least 3,302 MiB directly free, with a
+0.268 s maximum gap. The latter save is **not archived**: the inspection records
+its complete tensor fingerprints and verifies the rolling files before and after
+reading. It does not restore a policy or change training. Its result SHA-256 is
+`e7755bea470a4f3779523473eb6f14734a83f3bb05de8fc6cb6286ebb92c5513`.
+These are early health checks, not a complete-run ledger audit, frozen result
+or training-seed reliability.
 
 The worker reuses the unchanged match scorer, strict complete-checkpoint auditor
 and campaign checker’s match-replay binding. It does **not** invoke or bypass
