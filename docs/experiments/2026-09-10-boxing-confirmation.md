@@ -128,6 +128,35 @@ disjoint live RNG range and zero starting counters with no restored checkpoint.
 It is training; root 3019 remains queued. One complete passing root does not
 establish three-seed reliability or complete the five-game objective.
 
+### Completed training-cost readout
+
+The retrospective CPU-only [stage readout](../../runs/boxing-runtime-20260910.CSrdK6/readout.json)
+reverifies the complete seed-1009 training ledger and all 429 inputs. Its five
+adjacent windows cover actions 4,008→200,004, excluding warmup: 195,996 actual
+actions and 48,999 updates, with zero debt at every endpoint. The four small
+accounting tests check credit, nested timings and actual-frame clocks. No native
+agent is constructed and the active seed-2017 run is unchanged.
+
+This interval reaches **8.4698 actions/s, 0.5645× aggregate real time**, about
+0.0941× per stream. Learning takes 73.20% of wall time, observation 26.17% and
+emulation 0.464%. All 92,425 GPU samples pass coverage and direct-memory checks:
+minimum free memory 3,302 MiB, maximum gap 0.268 s, mean activity 68.99%.
+
+Native learner time remains **344.89–345.85 ms/update** across the five windows.
+Weighted mean costs are world training 161.45 ms, imagination 85.09 ms,
+posterior inference 58.89 ms, behavior training 18.58 ms, world synchronization
+16.41 ms and behavior synchronization 3.45 ms. These native subtimings are
+inside the outer learning timer, not additional wall time or GPU idle gaps.
+With other work held fixed, actual game-frame increments leave only **140.02
+ms/update** for aggregate 1×. Even world training alone exceeds that budget;
+world synchronization accounts for only 3.48% of wall time. Keep world-training
+and recurrent execution the main systems targets without displacing the active
+learning queue. This is not a matched speedup or another reliability result.
+
+The readout SHA-256 is
+`5fa4a1f346fe70ac99009c7a11ef3163128e54355a01c62f1157d0ea4981628e`.
+It binds the analysis source and exact GPU-file prefix, not the growing tail.
+
 ### Earlier training-health evidence
 
 The early learning-enabled 2,004→4,008-action window executes 501 updates with

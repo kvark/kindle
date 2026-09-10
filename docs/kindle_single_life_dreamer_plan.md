@@ -463,9 +463,19 @@ occupancy or a measurement of idle gaps. Full learner calls are approximately
 345–346 ms: world training ~160 ms, imagination ~85 ms, posterior inference
 ~59 ms, with behavior and synchronization making up most of the remainder.
 
+The [completed fresh Boxing training readout](experiments/2026-09-10-boxing-confirmation.md#completed-training-cost-readout)
+confirms this over 195,996 post-warmup actions: 73.2% learning, 26.2% observation,
+8.4698 actions/s and 0.5645× aggregate real time. Learner time stays around
+345–346 ms across five adjacent windows, with at least 3,302 MiB directly free.
+This is a long-run cost breakdown, not a matched speedup. Its actual-frame
+clock leaves only 140 ms/update for aggregate 1×; world training alone takes
+161 ms. World synchronization is only 3.48% of total wall time.
+
 At 15 aggregate actions/s, R256 and B16×T64 require 3.75 learner updates/s.
 The updates alone exceed the one-second budget. Including roughly 30 ms of
 observation/other work per action leaves only about **145–150 ms/update** for 1×.
+The completed longer run's slightly higher non-learning cost tightens that
+budget to about **140 ms/update**.
 Eliminating host handoffs alone cannot deliver that: world training already
 costs more. The simplicity of Atari does not make this replay-heavy computation
 cheap.

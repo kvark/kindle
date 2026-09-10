@@ -160,6 +160,12 @@ reliable learning.
   The completed Boxing 40k–50k windows attribute 74.4% of R256 time to learning
   and 56.1% of R64 time to observation. Use actual emulator-frame increments
   for game clocks, and reprofile the dominant stage after recipe selection.
+  The current-backend fresh Boxing seed-1009 readout covers 195,996 post-warmup
+  actions: 73.2% learning, 26.2% observation and 0.5645× aggregate real time.
+  Updates stay around 345–346 ms; actual-frame clocks leave 140 ms/update for
+  aggregate 1×, below world training alone at 161 ms. World sync is only 3.48%
+  of wall time. Preserve `runs/boxing-runtime-20260910.CSrdK6`; this retrospective
+  CPU readout is not a speedup or seed-reliability result. Keep active queues fixed.
   Host readback waits include unfinished producer computation and transfers;
   do not relabel them GPU idle time. Substage timings are contained in their
   parent stage totals, not additional elapsed time.
