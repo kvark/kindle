@@ -1,7 +1,7 @@
 # Fresh three-seed Boxing confirmation
 
-Started September 10 at 01:10 UTC. The first final frozen policy passes;
-its paired untrained control and the other two training roots remain pending.
+Started September 10 at 01:10 UTC. Root 1009 passes its complete trained-versus-
+untrained comparison. Root 2017 is training; root 3019 remains queued.
 
 The R256 pilot's 162/162 frozen wins and mean +92.4877 justify testing its
 stability, not assuming it. The current Meganeura package has completed exact
@@ -51,8 +51,8 @@ weak seed, new assistance or changed thresholds after seeing results.
 
 | Training root | Training | Final frozen gate | Untrained control |
 | --- | --- | --- | --- |
-| 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Evaluating |
-| 2017 | Queued | Pending | Pending |
+| 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Complete: 17/36 wins, mean −0.7222; fails competence gate |
+| 2017 | Running | Pending | Pending |
 | 3019 | Queued | Pending | Pending |
 
 Seed 1009 finished training normally at **07:42:37 UTC on September 10**.
@@ -75,7 +75,7 @@ It uses the unchanged package, sampled unassisted policy and 75,000-action
 budget. That initial check verifies the restore/start; the completed frozen
 result is below. Keep every remaining phase fixed.
 
-### First frozen result: pass, paired control pending
+### First frozen result: pass
 
 The frozen worker exited normally at **08:23:53 UTC**, followed by the complete
 CPU replay at **08:24:30 UTC**. Its 75,000 unassisted sampled actions produce
@@ -101,10 +101,32 @@ The replay validates actions, rewards, boundaries and frame accounting; original
 live RGB was not stored for a separate pixel comparison. Its video SHA-256 is
 `fa80e94629c400dbbca5a4bf44ba0ed20ab1b0ec0766c76a0bae07854e2cdbea`.
 
-The separately restored untrained evaluation started at **08:25:40 UTC**.
-Its complete score/replay and fresh roots 2017/3019 remain pending. This is one
-fresh final-policy pass, not a completed learning comparison, all-seed reliability
-or the five-game objective.
+### First paired comparison: complete and passing
+
+The separately restored untrained policy completes the same 75,000-action
+budget with **17/36 natural wins, mean −0.7222**, no cutoffs and zero updates.
+Its mean interval is [−2.1111, +0.6389], conditional on this fixed policy.
+The six partial tails (+1/+5/0/−2/0/+2) remain separate from completed matches.
+The control fails the fixed competence gate and scores below the trained policy,
+so root 1009 passes the declared paired learning comparison. Its replay finished
+at **09:04:58 UTC**. Watch the
+[whole untrained stream-0 rollout](../../runs/boxing-confirmation-20260910.hTEDcu/seed1009-untrained-evaluation.mp4)
+for the matched baseline, not another success video.
+
+The independent paired audit rechecks all four complete native ledgers, both
+241-entry checkpoints, all six successful command/output records, both complete
+CPU replays, both decoded videos and all 429 pins. The control's 146 optimizer-
+moment tensors are complete and zero. All four GPU windows reverify; directly
+free memory stays at least 3,302 MiB overall and 3,413 MiB during both 75k frozen
+evaluations. The baseline video contains all 49,982 stream-zero frames at 60 fps.
+The [paired result](../../runs/boxing-confirmation-20260910.hTEDcu/seed1009-result.json)
+has SHA-256 `dc63f48af9c66f5e039f77ee10110def26d50f3309b20e2ec9858e07fd4e785e`.
+
+Root **2017 started at 09:04:59 UTC**. Its actual native command and start header
+verify the unchanged recipe/package, 200,004-action budget, new model root,
+disjoint live RNG range and zero starting counters with no restored checkpoint.
+It is training; root 3019 remains queued. One complete passing root does not
+establish three-seed reliability or complete the five-game objective.
 
 ### Earlier training-health evidence
 
@@ -141,11 +163,11 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed1009-untrained-evaluation.jsonl` and `gpu.csv` for live progress.
+Read `events.jsonl`, `seed2017-train.jsonl` and `gpu.csv` for live progress.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
-That training child and frozen worker 2347336 exited normally; the current
-untrained frozen worker is 2350470. Recheck live process identities.
+Both root-1009 frozen workers (2347336 and 2350470) exited normally. The current
+root-2017 training worker is 2353178. Recheck live process identities.
 Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
 appear only after their corresponding phases finish. Movies will be
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.

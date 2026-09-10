@@ -207,8 +207,11 @@ reliable learning.
   complete finite state and full GPU coverage retaining 3,302 MiB directly free.
   Its 75k final frozen evaluation passes: 123/123 natural wins, mean +83.8699,
   no cutoffs or updates, with complete checkpoint/replay/video checks and at
-  least 3,413 MiB directly free. The paired untrained evaluation is running;
-  roots 2017/3019 remain pending, so three-seed reliability is not established.
+  least 3,413 MiB directly free. Its complete untrained control has 17/36 wins
+  and mean −0.7222, failing competence as required. Both full checkpoints,
+  replays/videos, six commands and four GPU windows reverify with all 429 pins;
+  the paired learning gate passes. Root 2017 started fresh at 09:04:59 UTC;
+  root 3019 remains queued, so three-seed reliability is not established.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.
