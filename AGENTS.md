@@ -13,7 +13,10 @@ reliable learning.
 - Maintain one authoritative research plan at
   `docs/kindle_single_life_dreamer_plan.md`. Keep its claims tied to code and
   measured results. Experiment logs belong in `runs/`, not in an ever-growing
-  chronological plan.
+  chronological plan. Keep the roadmap decision-focused, with one current
+  game-status table and direct video/world-report links. Put checkpoint-level
+  chronology and repeated validation details in the linked experiment reports;
+  a documentation update never changes a pinned declaration or acceptance gate.
 - Prioritize one learning actor: Atari breadth, video/world pretraining and fast
   accelerated playing plus training, then mind-games (vkQuake2/TMNF), GOG/Wine games,
   cross-game adaptation and retention. Pong's initial-learning gate is achieved,
