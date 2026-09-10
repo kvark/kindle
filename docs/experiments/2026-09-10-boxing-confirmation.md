@@ -50,9 +50,29 @@ weak seed, new assistance or changed thresholds after seeing results.
 
 | Training root | Training | Final frozen gate | Untrained control |
 | --- | --- | --- | --- |
-| 1009 | Running | Pending | Pending |
+| 1009 | Complete: 200,004 actions / 49,651 updates | Evaluating; not scored | Pending |
 | 2017 | Queued | Pending | Pending |
 | 3019 | Queued | Pending | Pending |
+
+Seed 1009 finished training normally at **07:42:37 UTC on September 10**.
+An independent CPU read rechecks the complete training ledger, all 429 pins,
+command exit/output hashes, the final save identity and all 241 tensor entries
+against the qualified package's schema. Logical weights and optimizer moments
+are complete and finite, second moments are nonnegative, and native optimizer
+counters and return normalizers pass. The closed training log has SHA-256
+`ad4e09bc4483afa9ee7b38d46fc69eb51e0b99db5774f28dddbe028e2d41ec5b`;
+its accounting is in `seed1009-train.accounting.json`. All 94,089 raw GPU samples
+through the full command reverify `seed1009-train.gpu.json`: minimum directly
+free memory is 3,302 MiB, maximum sample gap 0.268 s and mean activity 68.82%.
+The command takes 23,557.35 seconds; this is not a matched speed comparison.
+
+The controller started the declared frozen evaluation at **07:42:40 UTC**.
+Its actual start header matches the final checkpoint's metadata hash
+`ad22049074e3315fd481fddc36bf4e4126a9053d18de24d4ae1027cc199c9b88`, all
+three tensor-file hashes, original model root and 200,004/49,651 counters.
+It uses the unchanged package, sampled unassisted policy and 75,000-action
+budget. This verifies the restore/start, not the unfinished frozen result,
+untrained comparison or three-seed reliability. Keep every remaining phase fixed.
 
 The early learning-enabled 2,004→4,008-action window executes 501 updates with
 no training debt at either endpoint: 8.569 actions/s, 0.5713× aggregate real
@@ -87,9 +107,10 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed1009-train.stdout` and `gpu.csv` for live progress.
+Read `events.jsonl`, `seed1009-evaluation.jsonl` and `gpu.csv` for live progress.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
+That training child has exited normally; the first frozen worker is 2347336.
 Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
 appear only after their corresponding phases finish. Movies will be
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.

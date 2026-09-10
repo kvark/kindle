@@ -202,7 +202,10 @@ reliable learning.
   unassisted frozen actions and a separately restored same-seed untrained control.
   All three fixed Boxing gates and paired controls must pass their declared
   learning comparison. Continue all seeds after a competence failure; stop on
-  integrity/runtime-safety failure and preserve the artifacts. No frozen result
+  integrity/runtime-safety failure and preserve the artifacts. Seed 1009 completed
+  training at 07:42 UTC on September 10: 200,004 actions / 49,651 updates, with
+  complete finite state and full GPU coverage retaining 3,302 MiB directly free.
+  Its exact final-checkpoint frozen evaluation has started; no frozen result
   or reliability is claimed yet. Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.
