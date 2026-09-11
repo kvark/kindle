@@ -318,6 +318,26 @@ reliable learning.
   bind both actual driver headers to the new proof; do not rewrite headers or
   rerun completed training. Preserve all original queues and Breakout's final checkpoint;
   see `docs/experiments/2026-09-11-meganeura-runtime.md`.
+  The separate continuation in `runs/atari-driver-continuation-20260911.LR9yT3`
+  binds 1,593 pins and 55 passing CPU checks. Actual launch freshly reverifies
+  completed Breakout training, the original episode gate and raw recovered-driver
+  qualification, then starts the driver episode fixture at 16:19:10 UTC on
+  September 11. Require its exact old-driver 10,716-action trace and complete
+  frozen state before the missing Breakout evaluation/control, then fresh Qbert.
+  That fixture completes at 16:25:45: full state and trace match exactly, all
+  1,578 GPU samples retain at least 3,413 MiB directly free, and independent raw
+  state/trace/command/memory and 1,593-pin rereads pass. Do not restart this gate.
+  Breakout frozen evaluation starts at 16:25:49. Actual startup confirms the
+  original complete checkpoint hashes and 200,004 / 49,652 restored counters,
+  native f6a2b6ad and the unchanged unassisted v4 rule on driver 595.91.07.
+  No complete frozen or paired control result is available yet; Qbert is queued.
+  Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
+  four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
+  complete checkpoint/replay/video checks and measured direct-free headroom.
+  These are still pilots, not fresh-seed reliability. This worker starts no
+  Freeway/Pong successor; preserve that subsequent order and declare their own
+  recovered-driver continuations. Keep the live scripts, pins and old queues
+  unchanged; see `docs/experiments/2026-09-11-atari-continuation.md`.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can
