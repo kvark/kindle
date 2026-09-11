@@ -245,9 +245,17 @@ reliable learning.
   restore. All 241 saved entries and 49,651 learner reports are finite; complete
   optimizer state, actual encoder identity and full GPU coverage reverify,
   retaining at least 3,302 MiB directly free. Its declared 75k unassisted sampled
-  frozen evaluation is running from the verified final save; this is not a
-  competence result. Two complete passing roots do not establish three-seed
-  reliability. Preserve the remaining fixed phases and untrained control.
+  frozen evaluation completed at 00:10:02 UTC on September 11: 51/51 natural
+  wins, mean +83.5294, no cutoffs or updates. Complete final state, score,
+  replay/decoded video, command outputs and raw GPU coverage independently
+  reverify, retaining 3,413 MiB directly free. All three trained frozen gates
+  now pass, but root 3019's restored 75k untrained control is still running.
+  All three original zero-update saves and actual restore headers reverify:
+  every pair differs in all 31 nonconstant parameter tensors; the 64 expected
+  constant tensors match and all 146 optimizer moments per save are zero.
+  Distinct initial values and disjoint RNG inputs are not a statistical proof
+  of independence. Finish the third paired control before claiming complete
+  three-seed confirmation; preserve its fixed phases.
   Keep all 429 pins and this active queue unchanged;
   do not restart it or run GPU-heavy work alongside it. This separate confirmation
   does not bypass the old replication-v2 runtime checker or satisfy all five games.

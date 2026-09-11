@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-10. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-11. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -40,15 +40,16 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued. |
-| Boxing | Fresh roots 1009/2017: 123/123 and 207/207 wins, means +83.8699 / +90.5845; paired untrained means −0.7222 / +0.8056 | Two paired learning gates pass. Root 3019 finished training; its final frozen evaluation is running and its untrained control remains pending. Three-seed confirmation is unfinished. |
+| Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. First two untrained means −0.7222 / +0.8056. | All three trained frozen gates pass, with distinct initial parameters verified. Two paired learning gates pass; root 3019's restored untrained control is running. Full confirmation remains unfinished. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued. |
 | Breakout | No learned result yet | Fixed seed-0 pilot queued; fresh-seed confirmation still required afterwards. |
 | Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
-- [Boxing root 1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4)
-  and [root 2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4);
+- [Boxing root 1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4),
+  [root 2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4)
+  and [root 3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4);
   [scores, controls and replay checks](experiments/2026-09-10-boxing-confirmation.md).
 - [Freeway hold64](../runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4)
   and [hold1](../runs/freeway-persistence-learning-20260909.C0GoqT/hold1-evaluation.mp4);
