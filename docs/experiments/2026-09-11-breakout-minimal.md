@@ -284,3 +284,50 @@ native controls for exact state/report/trace parity: saves outside the loop are
 not presumed neutral. Native initialization/restore, frozen v4 prefixes, full
 replay and combined-memory qualification remain required after the queued
 hardware gate. There is no additional follower or learning result.
+
+## Pixel ledger/state matrix — completed CPU preparation
+
+The [read-only checker preparation](../../runs/breakout-pixel-runtime-20260911.k3pn4Z/result.json)
+passes **102 CPU tests**, with **215 evidence pins**. It connects the immutable
+capture and action-specific state libraries to the actual `0591eda` vector
+ledger and complete-run reader. It is **not a GPU declaration or entrypoint**;
+the waiting hardware gate and learning queue remain unchanged.
+
+The prepared matrix has eight short phases per action width: plain/captured
+3,840-action fresh training; plain/captured 768-action trained frozen restores;
+a 768-action zero-update restore; 18,000 fixed frozen actions; one episode per
+stream capped at 18,000; and the six-action negative cap. Both widths keep
+N6/R256/B16/T64/full BPTT and the same backend. These are runtime fixtures,
+not game-evaluation budgets or an action-width learning comparison.
+
+Every restored counter comes from its completely inspected producer checkpoint
+and reset-dependent ledger. Fabricated full-size scheduling fixtures yield
+610 updates without early resets and 611 with them at the same 3,840 actions;
+neither declares the future native count. Headers, actual source/backend/encoder
+identities, full production report fields, final saves and every logical tensor/
+moment remain mandatory. Same-width controls require exact state, reports and
+action/episode/reset histories, excluding only declared timing and separately
+checked file identities. Cross-width comparison is limited to common initial
+shapes, not differently shaped trained states.
+
+The positive frozen phases will require **ten full CPU replays**. The six-action
+cap must remain valid but **incomplete**: the ordinary complete-run reader still
+rejects it. Its exact prefix must be covered by the fully replayed fixed run;
+it is not relabelled a standalone completed replay. The pure argument builder
+permits post-hoc reconstruction without disabling the original capture library's
+fresh-output checks. A future worker must compare their arguments before launch.
+
+Fresh CPU imports match the new package, and the adapter checks all **241 entries**
+in a real qualified eighteen-action checkpoint. It rejects the wrong action
+schema, the old Boxing runner/header and an actually imported historical editable
+package. Whole-matrix routing tests use mocked state fingerprints; they are not
+four-action native initialization, restore or GPU parity evidence. No agent,
+production ML graph, ALE replay or GPU phase executes in this preparation.
+
+The enforced one-core / 2 GiB / zero-swap scope peaks near **198 MiB host memory**.
+All 1,870 waiting hardware pins reverify before and after. Preserve the completed
+preparation and its development notes, including the pre-declaration driver
+syntax correction. Actual command lifecycle, captures, replays, combined memory
+and timing still need a new declaration after complete hardware/prerequisite
+verification. The checker deliberately leaves those qualification flags false;
+there is no new pixel follower, speedup, adoption or learning result.

@@ -421,28 +421,29 @@ reliable learning.
   traces/v4 replays and combined learner/perception memory unqualified. Require
   a new declaration for those gates and a matched learning trial; update 1 already
   changes optimizer moments. This is not a speedup or a Breakout reliability result.
-  The separate CPU state inspector in `runs/breakout-action-state-20260911.lOcNzn`
-  passes 88 tests with 53 pins and exactly agrees on three qualified eighteen-action
-  saves. It permits only RSSM dynin2 weight and actor output weight/bias resizing
-  plus their six moments, retaining all 241 entries and actual encoder identity.
-  The old eighteen-action state helper stays pinned. All moments and the normalizer
-  must be truly zero at update 0; the real update-1 control already has 122 nonzero
-  moment tensors. Its generated four/eighteen-action files are synthetic fixtures,
-  not native saves/restores. The 86,184-byte logical state reduction is not measured
-  VRAM or a speedup. Preserve all outputs and 1,870 hardware pins; bind this checker
-  in a new native pixel declaration only after that gate. No pixel follower exists.
-  The capture library in `runs/breakout-pixel-capture-20260911.dJZZaz` passes
-  71 CPU tests with 184 pins, real 0591eda/abf4ae5d import/default-config checks
-  and the actual historical editable-package negative. It saves before/after
-  the unchanged loop and restores Python bindings on errors; fake-object tests
-  are not native save/restore or neutrality evidence. Its 3,840-action training
-  and 6/768/18,000-action frozen contracts are runtime fixtures, not changed game
-  budgets. Derive actual updates from the complete ledger, never fixture counters.
-  Importing it loads no Kindle/native module; direct execution refuses. Preserve
-  its inputs, original packages and all 1,870 hardware pins. There is no new GPU
-  entrypoint/follower; require captured/uncaptured native parity and complete
-  state/replay/memory checks in a separately declared post-hardware runtime gate.
-  Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
+  The remaining pixel preparations are CPU-only and preserved: the strict state
+  inspector `runs/breakout-action-state-20260911.lOcNzn` (88 tests/53 pins), capture
+  library `runs/breakout-pixel-capture-20260911.dJZZaz` (71/184), and read-only
+  matrix `runs/breakout-pixel-runtime-20260911.k3pn4Z` (102/215). Actual source-matched
+  imports and qualified eighteen-action states reverify; historical package and
+  wrong-width negatives remain. No four-action native restore, GPU declaration
+  or pixel follower exists. Bind the prepared matrix only in a new declaration
+  after the hardware gate and complete raw prerequisite proof. Keep its 16 short
+  native phases, ten complete frozen replays and six-action incomplete-cap prefixes
+  distinct from learning budgets. Never weaken the complete-run reader to accept
+  that cap, or mistake fake ledgers/state fingerprints for native/ALE evidence.
+  Derive restore/update counts from complete producer ledgers, not fixture 610/611.
+  Preserve the original capture freshness guard and require captured/uncaptured
+  state/report/trace parity within each width. The old eighteen-action schema
+  stays pinned: only dynin2 and actor output weights/bias plus six moments resize;
+  all 241 entries and actual encoder identity remain mandatory. Compare common
+  initial shapes across widths, never full trained state. Update 0 requires zero
+  moments/normalizer; update 1 already has 122 nonzero moments. The 86,184-byte
+  logical reduction is not measured VRAM. Preserve every input and all 1,870
+  hardware pins; require actual command/replay/memory/timing proof before any
+  qualification or learning trial. See the linked Breakout minimal report.
+  The recovered Breakout/Qbert worker retains source 24b2968/native f6a2b6ad,
+  the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.
   These are still pilots, not fresh-seed reliability. This worker starts no

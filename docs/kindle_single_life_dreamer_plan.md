@@ -206,9 +206,10 @@ fixtures support a separately pinned, one-shot hardware/synthetic diagnostic
 after the learning queue. No diagnostic GPU result
 exists yet. Even a pass leaves native four-action initialization/restore, N6 pixel
 replay and combined-memory checks before a paired learning declaration and then
-fresh-root confirmation. Keep comparisons within each action width exact; do not
-add exploration assistance or a longer budget in the same comparison. Completed
-pilots and scheduling never establish five-game success.
+fresh-root confirmation. The state/capture/ledger matrix is CPU-prepared, not
+native qualification or another GPU follower. Keep comparisons within each
+action width exact; do not add exploration assistance or a longer budget in the
+same comparison. Completed pilots and scheduling never establish five-game success.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the
