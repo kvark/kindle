@@ -331,3 +331,37 @@ syntax correction. Actual command lifecycle, captures, replays, combined memory
 and timing still need a new declaration after complete hardware/prerequisite
 verification. The checker deliberately leaves those qualification flags false;
 there is no new pixel follower, speedup, adoption or learning result.
+
+## Conditional capture execution — completed CPU preparation
+
+The [execution preparation](../../runs/breakout-pixel-execution-20260911.n9akxr/result.json)
+passes **74 CPU tests**, with **1,990 evidence pins**. Its conditional CLI requires
+a new post-hardware runtime declaration; it creates neither that declaration nor
+a follower. Both the actual launch and prerequisite-audit CLIs refuse the bound
+live hardware follower before runtime files or a native context are created.
+
+After actual exit, the read-only prerequisite must independently recheck the
+whole learning queue, hardware gradients/full-state pairs/memory, saved proofs,
+and the follower's exact command, spawn, successful exit and output hashes.
+Valid competence failures remain recorded failures. A terminal marker alone
+cannot satisfy this prerequisite. These positive lifecycle tests are fabricated;
+the real hardware gate is still waiting and has not been verified complete.
+
+Historical verification runs in a **separate process**. Real import-only probes
+confirm that the old helpers select their `f6a2b6ad` package and breadth `checks`
+module, while capture selects `0591eda`/`abf4ae5d` and the new state/ledger checker.
+This avoids both native-package and same-name Python-module contamination without
+rewriting either package. Neither import probe runs a verifier or native agent.
+
+The captured-phase path derives restore counters from complete producer state,
+checks the original freshness guard and exact arguments, then requires complete
+post-run state/ledger checks. Plain controls remain direct invocations of the
+original runner. The executor still leaves full replay, command/memory coverage,
+whole-matrix qualification and learning-quality flags false.
+
+The one-core / 2 GiB / zero-swap CPU scope peaks near **58.2 MiB host memory**;
+all 1,870 waiting hardware pins reverify. Preserve this completed preparation.
+The measured controller and ten replay bindings still need connecting before a
+new runtime declaration. Keep new state/ledger/replay audits in source-matched
+fresh processes if that controller imports historical measurement helpers.
+No pixel worker, four-action native restore, adoption or learning result exists.

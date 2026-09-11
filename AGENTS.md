@@ -442,6 +442,16 @@ reliable learning.
   logical reduction is not measured VRAM. Preserve every input and all 1,870
   hardware pins; require actual command/replay/memory/timing proof before any
   qualification or learning trial. See the linked Breakout minimal report.
+  The conditional executor at `runs/breakout-pixel-execution-20260911.n9akxr`
+  passes 74 CPU tests with 1,990 pins and two actual live-hardware CLI refusals.
+  It creates no runtime declaration or follower. Positive lifecycle tests are
+  fabricated, not completed hardware or native capture evidence. Recheck the raw
+  hardware/whole learning queue plus actual follower command/exit/output bindings
+  before use. Keep historical prerequisite/measurement imports separate from new
+  native/state/ledger/replay processes: their native packages and modules named
+  checks differ. Actual import-only probes verify both paths, not GPU execution.
+  The measured controller and ten replay bindings remain unconnected; all pixel
+  qualification flags stay false. Preserve this preparation and all queue inputs.
   The recovered Breakout/Qbert worker retains source 24b2968/native f6a2b6ad,
   the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
