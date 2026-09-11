@@ -42,7 +42,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is declared but unstarted. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is declared but unstarted. |
-| Breakout | No frozen result yet | Seed-0 training completed 200,004 actions / 49,652 updates; final state verified. Evaluation is blocked by the host driver mismatch; fresh-seed confirmation still required. |
+| Breakout | No frozen result yet | Seed-0 training completed 200,004 actions / 49,652 updates; final state verified. Recovered-driver runtime checks pass; evaluation awaits a separate continuation. Fresh-seed confirmation is still required. |
 | Qbert | No learned result yet | Fixed seed-0 pilot declared but unstarted; first-pyramid completion alone will not pass sustained competence. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
@@ -50,8 +50,10 @@ stopped the runtime handoff: an unattended NVIDIA update left new user-space
 libraries mismatched with the loaded kernel driver. Breakout finished training
 on its original mappings, then the device guard failed before evaluation.
 The trainer, logger and serial follower have exited. Preserve completed work
-and the failure; host repair needs approval, and a changed driver needs runtime
-requalification before a separately declared continuation. This is not a gameplay result.
+and the failure. The host now reports matching driver/library 595.91.07, and
+[runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
+The missing evaluations and successors still need a separately declared
+continuation. This is not a gameplay result.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -292,22 +294,27 @@ microbatch 16, F32**. Six independent environments share one learner/policy.
 Live visual/RSSM/policy inference and row-independent replay/head work are
 batched without removing recurrence or mixing histories.
 
-### Meganeura: adopted runtime versus latest candidate
+### Meganeura: current source and pinned runtimes
 
-The [qualified Atari package](experiments/2026-09-09-meganeura-update.md#use-the-qualified-package)
-is native `f6a2b6ad`, matching source `90b4763` and Meganeura `4d45ba3a`:
-upstream runtime `e59bd32d` plus required LeVJEPA frame-prefix query and early
-cache-alias corrections. Blade is 0.9.0; minimum Rust is 1.92. Production gradients,
-cache parity, complete learning-state/trace pairs and memory gates pass.
-The dependency update showed **no measured speedup**.
+Main now pins upstream `ce80e9cd`, still latest at the September 11 remote
+recheck. It fixes generated matmul epilogues and includes the required LeVJEPA
+frame-prefix attention/cache-alias corrections. Blade stays 0.9.0; minimum Rust
+is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
+passes full production gradients, cache parity, complete optimizer/state/report/
+trace comparisons and memory checks. Main's separate source-matched integration
+also passes. No block-matmul or experimental tuning is enabled by this update.
 
-The September 11 remote recheck still finds newer main `ce80e9cd`. It fixes
-generated matmul epilogues and includes the required LeVJEPA cache fixes upstream.
-Isolated dependency-only candidate `1e00e818` passes 95 Rust, 547 Python and 80
-focused backend CPU tests with source/wheel/import identity verified. It is
-**not GPU-qualified or adopted**; no Kindle block-matmul or experimental tuning
-is enabled by that update. Preserve active/queued packages and qualify the new
-candidate separately before use.
+The pixel-qualified upstream Atari package is native `abf4ae5d`, with matching
+source `1e00e818`. Both warmed N6/R256 orders show only **0.6–0.9%** higher
+throughput, still **0.573× aggregate real time** and about **0.0955× per stream**.
+At least 3,303 MiB stays directly free. These short exact-state comparisons do
+not establish training reliability or solve the runtime bottleneck.
+
+The historical [Atari control](experiments/2026-09-09-meganeura-update.md#use-the-qualified-package)
+remains `f6a2b6ad` / source `90b4763` / backend `4d45ba3a`; its prior update had
+no measured speedup. It also reproduces archived old-driver results on the
+recovered driver. Existing declarations and old checkpoints retain their pinned
+packages and source-matched Python bundles; this source update does not switch them.
 
 Main's Python accounting interface differs from the isolated Atari package.
 Keep source-matched runners/auditors with each package; don't mix them. Historical
@@ -492,14 +499,13 @@ accounting do not support an apples-to-apples superiority claim. Keep exact
 historical pins in their manifests and the [native frontend](../kindle/src/vision/mod.rs),
 not a moving label in the roadmap.
 
-Boxing's confirmation and the original-driver episode runtime qualification
-are complete. The immediate prerequisite is approved host recovery and runtime
-requalification if the driver changes. Then declare a continuation that reuses
+Boxing's confirmation, recovered-driver and latest-backend runtime qualification
+and source integration are complete. Declare a continuation that reuses
 the verified Breakout final checkpoint, preserves its missing evaluation/control
 and Qbert/Freeway/Pong order, and does not rerun completed training. Use actual
 results to declare the missing Breakout/Qbert fresh confirmations
-or a bounded repair experiment. Separately qualify the latest Meganeura and
-world-model diagnostic candidates when the shared GPU is available, without
+or a bounded repair experiment. Separately qualify the multi-match
+world-model diagnostic candidate when the shared GPU is available, without
 changing or displacing pinned work. Optimize measured costs, not activity percentage.
 Do not substitute another framework, larger perception, arbitrary long run or
 concurrent learner for evidence of stronger single-agent behavior.

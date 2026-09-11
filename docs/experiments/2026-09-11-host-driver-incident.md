@@ -58,8 +58,9 @@ the observer correctly stopped on that terminal process change. Do not wait
 on those old handles, restart the original queue or bypass the device guard.
 The logged memory above describes completed training, not current free VRAM.
 
-The final checkpoint is now saved and independently verified. Fresh NVML still
-fails with the driver/library mismatch; host repair remains unapproved. Do not
+The final checkpoint is now saved and independently verified. At the last
+pre-recovery check, fresh NVML still failed with the driver/library mismatch;
+host repair remained unapproved. Do not
 reboot, reload the driver or downgrade host packages without user approval.
 A reboot would terminate all host processes, not just this experiment.
 
@@ -72,3 +73,25 @@ requirements. Do not rewrite the original queue or assume it succeeded.
 Boxing's completed three-root result remains preserved. Breakout is still a
 seed-0 pilot, and Qbert, fresh Freeway and fresh Pong remain unstarted successors.
 The five-game objective is not complete.
+
+## Observed recovery and runtime qualification
+
+The September 11 **14:36 UTC** read-only recheck finds matching loaded kernel
+and NVML driver **595.91.07** on the original RTX 5080 UUID. NVML directly
+reports 15,841 MiB free, 462 MiB reserved and 2 MiB used. The subsequent
+unrestricted host process check finds no training worker or old follower.
+The host has rebooted since the incident; this investigation did not reboot it
+or change its driver, services or packages.
+
+The fresh [preparation manifest](../../runs/meganeura-runtime-20260911.Nnfxk4/prepare-manifest.json)
+records the actual boot, kernel and loaded driver and rechecks the preserved
+experiment inputs. The [runtime qualification](2026-09-11-meganeura-runtime.md)
+completed at **15:56:10 UTC** on this same recovered host. The unchanged backend
+reproduces its archived old-driver full learning state and pixel traces exactly;
+the latest upstream backend also passes the separate hardware, state, trace,
+memory and timing comparison. Host availability alone was not the qualification.
+
+The original failed queues remain terminal. Breakout's final checkpoint is
+preserved; any missing evaluation or successor work still needs a separate
+driver-aware continuation bound to this proof. Preserve both actual driver
+headers and the original executable. Never rerun the completed training.

@@ -10,9 +10,9 @@ Prediction-only has passed initial own-action learning gates on native GridWorld
 and Pong with DINOv3. The native LeVJEPA video frontend is now implemented;
 [three vectorized Pong seeds](docs/experiments/2026-09-06-vector-pong.md) have
 completed frozen evaluation: one passes the stronger mastery gate, two fail.
-LeVJEPA also passes the one-seed Boxing pilot; Freeway's plain-policy pilot
-fails its frozen gate. This demonstrates learned play, not a consistently
-reliable five-game recipe.
+LeVJEPA now passes Boxing's fresh three-root confirmation. Freeway's exploration
+pilot also passes unassisted frozen evaluation, but still needs fresh-seed
+confirmation. This demonstrates learned play, not a reliable five-game recipe.
 Reconstruction remains the measured control. Next comes
 broader single-actor gameplay, accelerated playing plus training, pretraining and
 cross-game transfer. Vectorized environments now share batched inference and one
@@ -35,23 +35,27 @@ or selected best games. Videos are local, git-ignored artifacts. See the
 [footage record](docs/experiments/2026-09-06-vector-pong.md#reconstructed-gameplay-footage)
 for provenance; the full frozen evaluation, not one video, determines mastery.
 
-Boxing: [trained full-stream video](runs/atari-five-continue-20260908.JrdVto/boxing-r256-seed0-eval.mp4)
-and [trained/untrained comparison](runs/atari-five-continue-20260908.JrdVto/report.html).
-The R256 seed-0 frozen evaluation wins 162/162 natural matches across eight
-streams, mean +92.49. This passes the pilot's task gate, not fresh-seed reliability.
+Boxing: [root 1009](runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4),
+[root 2017](runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4),
+[root 3019](runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4).
+All three fresh roots pass the declared frozen gate and beat their separately
+restored untrained controls; see the
+[confirmation report](docs/experiments/2026-09-10-boxing-confirmation.md).
 
-Freeway: [failed full-stream video](runs/freeway-pilot-20260908.WWxHEM/evaluation.mp4)
-and [evidence](docs/experiments/2026-09-09-freeway-zero-signal.md#final-frozen-policy-no-learned-crossing-skill).
-After 200k training actions, all 36 frozen rounds return zero. Both games' videos
-are complete CPU reconstructions of stream 0, including its unfinished tail;
-their full multi-stream evaluations determine the scores.
-The [untrained Freeway control](runs/freeway-pilot-20260908.WWxHEM/untrained-evaluation.mp4)
-also returns zero in all 36 rounds under the same frozen protocol.
+Freeway: [hold64](runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4)
+and [hold1](runs/freeway-persistence-learning-20260909.C0GoqT/hold1-evaluation.mp4).
+Both seed-0 policies pass **unassisted** frozen evaluation after assisted training;
+the [matched pilot report](docs/experiments/2026-09-09-freeway-persistence.md)
+retains the successful controls and the earlier reward-starved failure.
+Fresh-seed reliability is not established. These videos reconstruct whole
+stream-zero evaluations, including unfinished tails; the full multi-stream
+evaluations determine the scores.
 
 The local [common-match forecast report](runs/common-world-report-20260909.O7nqqe/report.html)
 compares all three final Pong world models on the same three recordings, with
-reward/feature baselines and clickable video point times. Each predicts rewards
-best on its own match; the strongest player is not the best common-pool predictor.
+reward/feature baselines and clickable video point times. Each predicts positive
+rewards and features best on its own match; the strongest player is not the best
+common-pool predictor.
 The original [own-policy forecast report](runs/world-evaluation-20260908.Xzx3pN/report.html)
 retains longer-horizon traces. Neither report is a new gameplay evaluation.
 
@@ -132,8 +136,10 @@ maturin develop --release --extras test
 ```
 
 During pinned local experiments, use an isolated package rather than replacing
-the historical editable extension. The [backend refresh record](docs/experiments/2026-09-08-meganeura-refresh.md#use-the-adopted-package)
-shows how to select the validated current package in this workspace.
+the historical editable extension. The
+[current runtime/package status](docs/kindle_single_life_dreamer_plan.md#meganeura-current-source-and-pinned-runtimes)
+distinguishes qualified packages from candidates. Keep each package with its
+matching runner and auditor; old checkpoints retain their original executable.
 
 ## Native use
 

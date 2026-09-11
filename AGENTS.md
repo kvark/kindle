@@ -61,7 +61,13 @@ reliable learning.
   blocks or cache aliases when updating again. Require logical weights and all
   optimizer moments on restore, excluding only plan-identified Winograd caches.
   Keep backend identity checks and historical executables intact.
-  The current backend is 4d45ba3a: upstream runtime e59bd32d plus the required
+  Main now adopts ce80e9cd. Its fresh source-matched integration passes 92 Rust/
+  253 Python CPU tests, formatting, both Clippy checks and three focused GPU checks.
+  `runs/meganeura-runtime-20260911.Nnfxk4/main-package` is native 1735b8a6:
+  source-matched integration evidence, not long-run Atari runtime qualification.
+  The separate source-adoption audit freshly reverifies the complete runtime
+  and main evidence, binding 346 source/artifact pins including new checkpoints.
+  The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated
   matmul epilogues and now includes the required LeVJEPA cache patches upstream.
@@ -69,9 +75,18 @@ reliable learning.
   only dependency/identity files. Its 95 Rust/547 Python and 80 focused backend
   CPU tests pass in `runs/meganeura-upstream-20260910.ERT7QD`; all 561 package
   input pins, source/wheel/import identity and historical/active controls reverify.
-  Candidate native abf4ae5d is CPU-qualified only. No GPU gate, adoption or speedup
-  is claimed. Keep active and queued packages fixed and GPU work serialized;
-  require full gradient/cache/state/trace, memory and timing checks before use.
+  Native abf4ae5d is now runtime-qualified on recovered driver 595.91.07 in
+  `runs/meganeura-runtime-20260911.Nnfxk4`. All 1,364 input pins, 47 CPU wrapper
+  checks, 18 control/19 upstream hardware checks, complete update-1/eight-update
+  state and optimizer moments, pixel AB/BA traces and override accounting reverify.
+  The unchanged control exactly reproduces its archived old-driver canary and
+  pixel results. All six canary/ten pixel native windows pass with at least
+  3,303 MiB directly free. Timing ratios 1.005750/1.009460 pass the declared gates,
+  but this 0.6–0.9% short-window gain still leaves R256 near 0.573x aggregate
+  real time and does not establish learning reliability. Preserve all completed
+  gates and packages. Keep queued packages fixed and GPU work serialized; a
+  dependency adoption does not rewrite old checkpoints or switch pinned experiments.
+  See `docs/experiments/2026-09-11-meganeura-runtime.md`.
   Upstream's block-matmul operator and experimental tuning options are not
   automatically enabled in Kindle by this dependency update.
   The qualified 4d45ba3a package preserves frame-prefix query attention alongside
@@ -82,8 +97,8 @@ reliable learning.
   in `runs/meganeura-refresh-20260909.xfF3AZ`: all 374 pins, complete state/reports/
   traces and ten GPU phases independently reverify, with at least 3,302 MiB
   directly free. Timing ratios 1.004068/0.998255 pass the regression guard,
-  not the speedup gate. Main's four dependency/identity files now match that
-  candidate; 92 Rust/253 matched Python CPU tests and three main GPU checks pass.
+  not the speedup gate. That source integration passed 92 Rust/253 matched Python
+  CPU tests and three main GPU checks before the later ce80e9cd update.
   Preserve the initial mixed-Python-package failure and its old-backend negative
   control. Do not pair main's historical Pong auditor with the newer Atari
   accounting module. The qualified Atari package is `package` (native f6a2b6ad);
@@ -286,14 +301,23 @@ reliable learning.
   its CPU import-name failure; do not rerun its exclusive archive operation.
   At 06:42 UTC on September 11, an unattended host update installed NVIDIA
   595.91.07 user-space while the loaded kernel remained 595.71.05. Fresh NVML
-  queries still fail with exit 18. The original Breakout trainer and declared
+  queries failed with exit 18. The original Breakout trainer and declared
   logger finished on old mapped libraries and are now absent. Preserve the
   completed training and all pins; do not bypass device guards, restart the queue or change/reboot
   the host without user approval. Read `docs/experiments/2026-09-11-host-driver-incident.md`
   before any new runtime handoff. Its completed observer used the original
   logger and recorded the fresh query failure; it is not a live handle now.
   A changed driver requires runtime requalification and a separately declared
-  continuation; neither host recovery nor new-driver qualification is claimed.
+  continuation. The September 11 14:36 UTC recheck now observes matching
+  loaded/NVML 595.91.07 after an external host reboot; no host change was made
+  by this investigation. `runs/meganeura-runtime-20260911.Nnfxk4` completed fresh
+  old-backend/new-driver then latest-backend qualification at 15:56:10 UTC,
+  including exact archived old-driver state/pixel anchors and direct memory
+  coverage. This is runtime qualification, not a resumed learning queue. A
+  separate continuation must retain Breakout's original backend and explicitly
+  bind both actual driver headers to the new proof; do not rewrite headers or
+  rerun completed training. Preserve all original queues and Breakout's final checkpoint;
+  see `docs/experiments/2026-09-11-meganeura-runtime.md`.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can
