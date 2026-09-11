@@ -1,10 +1,11 @@
-# Minimal-action Breakout: isolated CPU candidate
+# Minimal-action Breakout: staged action-width qualification
 
 The candidate at `exp/breakout-minimal` (`0591eda`) prepares the
 [bounded comparison](2026-09-11-breakout-diagnostic.md#next-bounded-comparison)
 without changing an active experiment. Its source-matched package passes
 **620 Python CPU tests**. It has **no four-action GPU qualification, learning
-result, automatic follower or adopted action protocol**.
+result or adopted action protocol**. A separately declared hardware/synthetic
+diagnostic now waits after the existing learning queue; it starts no learning.
 
 The current Qbert → Freeway → Pong queue remains first. Boxing remains the
 only game with completed fresh three-root confirmation; this work adds no wins.
@@ -100,8 +101,9 @@ controls. Four actions necessarily change the actor output and RSSM action-input
 widths; do not describe the comparison as merely renaming action indices.
 Any provisional winner still needs a separately declared fresh three-root gate.
 
-Preserve the completed CPU package and its pins. This report neither launches
-those gates nor changes the active five-game campaign declarations.
+Preserve the completed CPU package and its pins. The bounded hardware/synthetic
+declaration below covers only part of these requirements and changes no active
+five-game campaign declaration.
 
 ## Prepared hardware fixtures — CPU checks only
 
@@ -153,5 +155,51 @@ All **134 completion pins**, the 102 package pins, 1,622 active scheduler pins a
 original qualified executables reverify. Preserve both artifact roots. The
 compiled fixture identities are recorded in the completion result; do not use
 stale root release binaries or replace historical executables. There is still
-**no new GPU follower or paired learning declaration**. Qbert → Freeway → Pong
-remains the active order, with the later runtime gates required before adoption.
+**no paired learning declaration**. Qbert → Freeway → Pong remains first, with
+the later runtime gates required before adoption.
+
+## Declared hardware/synthetic stage — waiting, not qualified
+
+The new [declaration](../../runs/breakout-minimal-hardware-20260911.PLAL8H/manifest.json)
+binds **1,870 pins** and **92 passing CPU checks**. Its
+[live-parent refusal](../../runs/breakout-minimal-hardware-20260911.PLAL8H/refusal.json)
+captures an actual CLI exit before hardware outputs, device queries or GPU work.
+The [one-shot follower](../../runs/breakout-minimal-hardware-20260911.PLAL8H/launch.json)
+started at **18:58:29 UTC on September 11** and is waiting for scheduler PID
+42730 / start ticks 1021056. Its own verified process is PID 52404 / start ticks
+1665628. Preserve this queue; do not manually launch the diagnostic or restart it.
+
+The stage has exactly **16 native phases**, serialized after complete Qbert,
+Freeway and Pong results:
+
+1. Four production gradient comparisons: world and full actor/value heads for
+   each of the eighteen- and four-action vocabularies. Force the full world
+   fixture, preserve every gradient check and keep the declared tolerances.
+2. Six complete synthetic state pairs: update 1 and two eight-update repeats per
+   vocabulary, with AB/BA order for the latter. The eighteen-action pairs use the
+   original qualified executable against the new fixture executable; four-action
+   pairs repeat the new executable independently. Also retain the qualified
+   eighteen-action checkpoint/report anchor. Require every logical tensor and
+   optimizer moment to match exactly within each pair, plus reports except timing.
+
+The new read-only whole-queue prerequisite auditor includes Pong's **24 commands**
+(12 native phases plus replays, scoring and world-recording extraction), actual
+source-matched v4 ledgers, complete checkpoints, paired frozen controls, replay/video
+bindings, selected first-four-match recordings and raw GPU coverage. It recursively
+rechecks Freeway, the breadth continuation and recovered-backend qualification.
+Valid competence failures are retained, not mistaken for incomplete results;
+complete CPU wrapper tests are **not** completed Pong evidence or native world
+forecasts. The fixture-development list/tuple assertion failure is preserved in
+the new root's development notes; no native result was involved.
+
+The follower polls only the bound process while it is live, waits at most 14 days,
+and allows at most 12 hours for this one diagnostic. Any changed pin/host,
+incomplete prerequisite, native failure or unsafe/incomplete memory window stops
+it without retry. Every phase requires ≥2,048 MiB **directly reported free**,
+250 ms sampling and no gap above 1.5 seconds. No GPU phase has run yet.
+
+Even a complete pass will leave four-action **zero-update initialization and
+restore, native N6 pixel traces/v4 replay, and combined learner-plus-perception
+memory** unqualified. Update 1 is not zero-update state: optimizer moments already
+change. These remaining checks need a separate declaration before any action-width
+learning pilot. There is no speedup, new Breakout win or seed-reliability claim.

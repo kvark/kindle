@@ -181,6 +181,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Qbert pilot [training]
   -> Freeway three-root confirmation [queued]
   -> longer-budget Pong three-root confirmation [queued]
+  -> Breakout action-width hardware/synthetic diagnostic [queued; no learning]
 ~~~
 
 Qbert retains its 200,004-action unassisted-training pilot. Freeway's fresh roots
@@ -198,13 +199,16 @@ manually launch successors. Each entrypoint requires actual predecessor exit and
 complete raw evidence before GPU work. Valid competence failures remain failures;
 integrity, incomplete-data or runtime-safety failures stop without retries.
 Breakout's isolated [four-action candidate](experiments/2026-09-11-breakout-minimal.md)
-passes 620 CPU tests with explicit replay/checkpoint schemas. Both future arms
+has CPU-tested explicit replay/checkpoint schemas. Both future arms
 must use its same qualified upstream backend; the old eighteen-action pilot is
-historical context, not the matched control. CPU mapping and package checks are
-not four-action runtime or learning evidence. Require new gradient/full-state/
-memory gates and a paired declaration after this queue, before fresh-root
-confirmation. Do not add exploration assistance or a longer budget in the same
-comparison. Completed pilots and scheduling never establish five-game success.
+historical context, not the matched control. Its compiled full-gradient/state
+fixtures support a separately pinned, one-shot hardware/synthetic diagnostic
+after the learning queue. No diagnostic GPU result
+exists yet. Even a pass leaves native four-action initialization/restore, N6 pixel
+replay and combined-memory checks before a paired learning declaration and then
+fresh-root confirmation. Keep comparisons within each action width exact; do not
+add exploration assistance or a longer budget in the same comparison. Completed
+pilots and scheduling never establish five-game success.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the

@@ -401,8 +401,26 @@ reliable learning.
   the first root `runs/breakout-minimal-fixtures-20260911.EaDRLF`, which passed
   81 library tests then failed an incorrect workspace-count assertion. The
   completed continuation is not a numerical fix or GPU gate. Keep the compiled
-  fixture identities, all original binaries and active queues fixed; no new
-  GPU follower or learning declaration exists yet.
+  fixture identities, all original binaries and active queues fixed. Its new
+  hardware/synthetic declaration is `runs/breakout-minimal-hardware-20260911.PLAL8H`,
+  with 1,870 pins and 92 passing CPU checks, including the actual live-parent
+  refusal before GPU work. The one-shot follower starts at 18:58:29 UTC on
+  September 11 and waits for the actual Qbert -> Freeway -> Pong scheduler
+  PID 42730/start ticks 1021056; its own PID is 52404/start ticks 1665628.
+  No diagnostic GPU phase has run. Preserve this queue and never manually start
+  its worker. It requires independent complete raw prerequisite evidence,
+  including Pong's 24 commands/12 native phases, matching v4 ledgers, all states,
+  frozen replays/videos, world-recording selection and GPU coverage; valid
+  competence failures remain failures and do not block the diagnostic.
+  The 16 native phases cover four full world/behavior gradient tests and six
+  exact update-1/update-8 canary pairs with the qualified eighteen-action control
+  and anchor. Compare complete logical weights/moments/reports within each width,
+  never across widths. Keep every tolerance and ≥2,048 MiB directly free in every
+  complete sampled window. No retries, automatic adoption or learning follower.
+  Even a pass leaves four-action zero-update initialization/restore, N6 pixel
+  traces/v4 replays and combined learner/perception memory unqualified. Require
+  a new declaration for those gates and a matched learning trial; update 1 already
+  changes optimizer moments. This is not a speedup or a Breakout reliability result.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.
