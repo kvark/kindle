@@ -372,6 +372,24 @@ reliable learning.
   output and RSSM action-input widths change; require matching qualification
   and a fresh paired declaration before training. See
   `docs/experiments/2026-09-11-breakout-diagnostic.md`.
+  The isolated `exp/breakout-minimal` candidate at `0591eda` carries only the
+  four native dependency/identity changes from qualified `1e00e818` onto the
+  current-episode source. All native/build inputs match that source; the fresh
+  `runs/breakout-minimal-package-20260911.fwfepW/package` combines unchanged
+  qualified abf4ae5d bytes with matching Python. All 620 CPU tests and 102 package
+  evidence pins pass, with all 1,622 active scheduler pins unchanged. Minimal
+  Breakout replay requires an explicit four-action declaration and v2; published
+  full-action replay stays v1. Checkpoints require a matching action-count schema.
+  Collection, recurrence, learning arithmetic, episode stopping and task gates
+  are unchanged. Both future learning arms must use this same new-backend bundle;
+  the old f6a2b6ad Breakout pilot is context, not its matched eighteen-action arm.
+  These CPU checks are not four-action GPU/runtime/learning qualification and
+  launch no follower. Existing production-gradient and synthetic-canary fixtures
+  hardcode eighteen actions; qualify matching four-action fixtures, complete
+  state from update 1, restores, traces and combined memory before learning.
+  Do not require identical learning states across different action widths or
+  infer a speedup. Preserve this package, every historical control and the active
+  Qbert -> Freeway -> Pong order. See `docs/experiments/2026-09-11-breakout-minimal.md`.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.

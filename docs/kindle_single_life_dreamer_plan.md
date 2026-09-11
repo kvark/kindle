@@ -197,12 +197,14 @@ not switch these experiments. Do not restart old queues, edit active inputs or
 manually launch successors. Each entrypoint requires actual predecessor exit and
 complete raw evidence before GPU work. Valid competence failures remain failures;
 integrity, incomplete-data or runtime-safety failures stop without retries.
-Breakout's next bounded candidate is the existing four-action vocabulary, retaining
-the eighteen-action control. Its CPU subset-mapping check is not native runtime
-qualification or learning evidence; require new full-state/memory gates and a
-paired declaration after this queue, before fresh-root confirmation. Do not add
-exploration assistance or a longer budget in the same comparison. Completed pilots
-and scheduling never establish five-game success.
+Breakout's isolated [four-action candidate](experiments/2026-09-11-breakout-minimal.md)
+passes 620 CPU tests with explicit replay/checkpoint schemas. Both future arms
+must use its same qualified upstream backend; the old eighteen-action pilot is
+historical context, not the matched control. CPU mapping and package checks are
+not four-action runtime or learning evidence. Require new gradient/full-state/
+memory gates and a paired declaration after this queue, before fresh-root
+confirmation. Do not add exploration assistance or a longer budget in the same
+comparison. Completed pilots and scheduling never establish five-game success.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the

@@ -103,3 +103,8 @@ No new GPU follower or learning comparison is declared here. Preserve the active
 Qbert → Freeway → Pong order. Reward/prior calibration and action-use diagnostics
 remain important; these descriptive results do not justify a larger encoder,
 intrinsic reward or a claim that a specific world-model error caused the plateau.
+
+The subsequent [isolated CPU candidate](2026-09-11-breakout-minimal.md) adds strict
+minimal-action replay/checkpoint support and passes 620 tests on a source-matched
+latest-backend bundle. Both future arms must use that same bundle; the historical
+pilot is not the matched control. Its four-action GPU gates remain unrun.
