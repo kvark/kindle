@@ -358,7 +358,9 @@ The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails 
 full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. Neither has a verified GPU speedup or may displace the fixed queue.
+evidence only. The block candidate now has an unchanged carry onto the qualified
+upstream backend, avoiding a backend change in its future comparison. Neither
+has a verified GPU speedup or may displace the fixed queue.
 
 For every optimization, require production losses/all gradients, reset causality,
 complete weights and optimizer moments from update 1, exact state/action traces,

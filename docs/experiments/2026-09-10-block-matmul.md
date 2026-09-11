@@ -1,8 +1,9 @@
 # Small-batch block matrix products: CPU-only candidate
 
-Prepared September 10. Not adopted, timed or GPU-qualified. The active Boxing
-confirmation and its serial successors keep their original packages and inputs.
-This candidate starts no GPU worker or follower.
+Prepared September 10, with a separate September 11 carry onto the qualified
+upstream backend below. Not adopted, timed or GPU-qualified. The pinned learning
+campaigns keep their original packages and inputs. Neither candidate starts a
+GPU worker or follower.
 
 ## Change and rationale
 
@@ -100,3 +101,46 @@ backend refresh, exploration, replay-ratio or BPTT changes.
 Only passing all gates would support runtime adoption. Fewer dispatches and
 passing component tests alone do not establish learning parity, super-real-time
 training, Pong reliability or any additional Atari win.
+
+## September 11: unchanged block candidate on qualified upstream
+
+The isolated `exp/block-matmul-upstream-20260911` branch, commit
+`7b190f881e07ffc39d01396da6dda98d3d90490f`, carries the candidate onto
+**qualified control source `1e00e818` / Meganeura `ce80e9cd`**. Its only native
+diff from that control is `networks.rs`, byte-identical to the original `4ae539a`
+candidate, including its tests. The other change is an isolated-worktree
+AGENTS.md notice. Both lockfiles, backend identity, manifests and all Python
+sources remain unchanged; upstream already contains the block operator.
+
+This removes the need to compare a new block graph against a different backend.
+It does not adopt the graph, transfer old performance claims or overwrite either
+original candidate. Future controls must use the same qualified upstream backend,
+without world-sync, action-vocabulary, reward, replay-ratio or BPTT changes.
+
+The [completed CPU preparation](../../runs/block-matmul-upstream-cpu-20260911.PZnUq0/result.json)
+passes **98 Rust workspace/all-target tests**, formatting, and both workspace
+and Python-binding Clippy checks with warnings denied. All **23 GPU tests remain
+ignored**. The release library and canary are compiled and pinned; the production
+block all-gradient test is listed but unrun, and the canary is not executed.
+Compiler output independently confirms the library was rebuilt from the actual
+candidate source, not reused from the copied control cache.
+
+The twenty raw/optimized component cases still show **65 → 2 dispatches** for
+batches 2/4/6/8/16 and the two production block shapes. Batch-one and large-batch
+graph serialization stays exact; parameter layouts and full-precision derivative
+markers pass. These are CPU graph properties, not GPU numeric parity, memory
+headroom or useful end-to-end speed. No production-sized world memory-plan probe
+ran alongside Qbert.
+
+All ten preparation command exits/output hashes and **5,683 evidence pins**
+independently reverify, including 3,699 copied-cache inputs and all 1,870 active
+hardware pins. Builds used a fresh target and one low-priority job under an
+enforced one-core / 2 GiB / zero-swap scope, peaking at **1,932.9 MiB host memory**.
+The original cache, controls and source are unchanged. This is not a GPU-memory
+measurement. No new Python native package was built or runtime-tested.
+
+Keep the current Qbert → Freeway → Pong → Breakout hardware queue fixed. This
+carry declares no GPU comparison or follower. The full hardware, complete-state
+from update 1, source-matched Python-package, pixel AB/BA, direct-free memory and
+timing gates above remain necessary before adoption for any later learning run.
+Preserve the completed preparation; no speedup or additional game is claimed.

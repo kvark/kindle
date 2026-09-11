@@ -150,6 +150,16 @@ reliable learning.
   batches and original GRU gates. Its 94 focused backend/98 Kindle CPU checks
   and block-only 65-to-2 dispatch counts are not GPU parity or a speedup. Preserve
   its 33-pin evidence and all active queues; no candidate GPU follower or adoption exists.
+  Its unchanged `networks.rs` is now carried onto qualified `1e00e818` / upstream
+  ce80e9cd in `exp/block-matmul-upstream-20260911` (`7b190f8`), without dependency,
+  identity or Python changes. `runs/block-matmul-upstream-cpu-20260911.PZnUq0`
+  passes 98 Rust CPU tests, fmt and both Clippy checks; 23 GPU tests remain ignored.
+  All ten commands and 5,683 pins reverify, including the copied build cache and
+  1,870 hardware pins. The fresh release library/canary are built, not GPU-tested.
+  The one-core / 2 GiB / zero-swap host scope peaks at 1,932.9 MiB. Preserve this
+  CPU-only carry and original candidate; no new Python package, GPU follower or
+  adoption exists. Require matched current-backend full-state, gradient, pixel,
+  memory and AB/BA timing gates after the fixed queue before later learning use.
   See `docs/experiments/2026-09-10-block-matmul.md` for required hardware gates.
   Do not repeat large CPU graph
   compilation alongside training: the first memory-plan probe caused host
