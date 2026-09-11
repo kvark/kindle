@@ -1,5 +1,16 @@
 # Kindle working direction
 
+This isolated `exp/block-matmul-upstream-20260911` worktree carries the existing
+small-batch BlockLinear candidate onto qualified source `1e00e818` / upstream
+Meganeura `ce80e9cd`, without changing any dependency or backend identity. Treat
+the inherited experiment statuses below as historical. Current Qbert -> Freeway
+-> Pong -> Breakout hardware scheduling remains fixed in the main worktree.
+CPU preparation must stay within one core / 2 GiB / zero swap; no production
+world graph probe, GPU worker or follower may run alongside that queue. Preserve
+all original controls. Component CPU dispatch counts do not qualify this
+candidate; full gradients, state from update 1, N6 pixel traces, direct memory
+headroom and AB/BA end-to-end timing still precede any runtime adoption.
+
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner
 and policy without joining causal histories. Games are the first testbed.
