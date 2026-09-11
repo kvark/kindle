@@ -42,7 +42,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued after Freeway. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued after Qbert. |
-| Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Completed pair verifies learned improvement, but the 200k pilot fails competence. Needs a bounded repair comparison before fresh-seed confirmation; the gate stays unchanged. |
+| Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
 | Qbert | No frozen result yet | Fresh seed-0 training is running in the recovered-driver continuation. First-pyramid completion alone will not pass sustained competence. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
@@ -197,8 +197,12 @@ not switch these experiments. Do not restart old queues, edit active inputs or
 manually launch successors. Each entrypoint requires actual predecessor exit and
 complete raw evidence before GPU work. Valid competence failures remain failures;
 integrity, incomplete-data or runtime-safety failures stop without retries.
-Breakout needs a bounded repair comparison after this queue, before fresh-root
-confirmation. Completed pilots and scheduling never establish five-game success.
+Breakout's next bounded candidate is the existing four-action vocabulary, retaining
+the eighteen-action control. Its CPU subset-mapping check is not native runtime
+qualification or learning evidence; require new full-state/memory gates and a
+paired declaration after this queue, before fresh-root confirmation. Do not add
+exploration assistance or a longer budget in the same comparison. Completed pilots
+and scheduling never establish five-game success.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the

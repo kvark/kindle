@@ -346,6 +346,32 @@ reliable learning.
   Qbert fresh seed-0 training starts at 16:40:35, with actual zero counters,
   no restore, the original LeVJEPA encoder and unchanged 200,004-action N6/R256
   recipe without overrides. No Qbert frozen result is available yet.
+  Its first 20,004-action / 4,651-update save completed at 17:18:58 UTC and is
+  archived in `runs/qbert-first-save-20260911.XTUykj`. All 241 finite tensor
+  entries, optimizer moments, actual encoder, full prefix ledger and 1,632 pins
+  reverify. The prefix has 438 positive reward events, 55 natural episodes and
+  14,075 aggregate reward, not a per-episode score or competence gate. All 9,199
+  GPU samples through the save retain at least 3,303 MiB directly free. Preserve
+  this completed archive and its wrong-counter negative; do not rerun the
+  exclusive archive or substitute this early model for the declared final one.
+  The completed Breakout diagnostic in `runs/breakout-diagnostic-20260911.BTTecu`
+  rechecks all 200,004 actions / 49,652 updates and both complete frozen replays,
+  preserving video RGB hashes, episode/life/bitmap accounting and 1,637 pins.
+  There are 5,251 positive training reward events and no reported positive-free
+  replay batches; late training returns average about 44–46. Even the best
+  frozen episode leaves 70/108 first-wall bricks. This is not Freeway-style
+  reward starvation, near competence or a causal diagnosis. Seven CPU fixtures
+  pass; RAM remains strictly post-hoc. Prioritize a separately declared minimal-
+  action comparison after the existing queue, retaining the eighteen-action
+  control and unchanged gates, without also changing budget/reward/perception.
+  The common-input CPU mapping in `runs/breakout-minimal-cpu-20260911.NcHj9r`
+  verifies 12,288 paired decisions / 24,576 actual wrapper interactions across
+  three seeds; reversed left/right is rejected at action 2. This proves the
+  shared NOOP/FIRE/RIGHT/LEFT subset, not equivalence of all eighteen actions,
+  native gradients/state/restore/memory, learning or a new GPU follower. Actor
+  output and RSSM action-input widths change; require matching qualification
+  and a fresh paired declaration before training. See
+  `docs/experiments/2026-09-11-breakout-diagnostic.md`.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.

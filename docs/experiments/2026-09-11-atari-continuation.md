@@ -119,3 +119,23 @@ original terminal queues fixed. The separately declared
 [recovered Freeway/Pong follower](2026-09-11-recovered-confirmations.md) now waits
 for this controller's actual exit and complete raw results. It preserves that
 order, all recipes and task gates, and does not start another GPU workload now.
+
+### First Qbert save: healthy prefix, not competence
+
+The first save completed at **17:18:58 UTC**, with **20,004 actions / 4,651
+updates**. Its separate [archive and inspection](../../runs/qbert-first-save-20260911.XTUykj/result.json)
+verifies all 241 tensor entries, optimizer moments, actual encoder identity,
+the complete prefix ledger and all 1,632 input/archive pins. The original rolling
+save is unchanged. The prefix correctly fails only for its missing `run_end`;
+a deliberately wrong checkpoint update count is rejected earlier.
+
+The prefix has 438 positive reward events and 14,075 total reward across all
+streams, with 55 natural completed episodes. That total is not a per-episode
+score or the Qbert competence gate. Every reported replay batch contains positive
+rewards; only updates 1 and 2 have zero absolute advantage. All reports and
+saved values are finite. The 9,199 raw GPU samples through the save have maximum
+gap .268 seconds and at least 3,303 MiB directly free.
+
+This archive is complete early-health evidence, not complete training, frozen
+evaluation or reliability. Do not rerun its exclusive archive operation, select
+it instead of the declared final model, or change the live queue.
