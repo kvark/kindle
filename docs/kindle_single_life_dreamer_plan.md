@@ -42,8 +42,8 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is declared but unstarted. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is declared but unstarted. |
-| Breakout | Frozen evaluation is running; no complete score yet | Seed-0 training completed 200,004 actions / 49,652 updates. The recovered-driver episode check passes exactly; the continuation restores the verified final checkpoint without repeating training. Fresh-seed confirmation is still required. |
-| Qbert | No learned result yet | Fixed seed-0 pilot queued behind Breakout's missing evaluation/control in the new continuation; first-pyramid completion alone will not pass sustained competence. |
+| Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Completed pair verifies learned improvement, but the 200k pilot fails competence. Needs a bounded repair comparison before fresh-seed confirmation; the gate stays unchanged. |
+| Qbert | No frozen result yet | Fresh seed-0 training is running in the recovered-driver continuation. First-pyramid completion alone will not pass sustained competence. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
 stopped the runtime handoff: an unattended NVIDIA update left new user-space
@@ -53,8 +53,8 @@ The trainer, logger and serial follower have exited. Preserve completed work
 and the failure. The host now reports matching driver/library 595.91.07, and
 [runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
 The separately declared [continuation](experiments/2026-09-11-atari-continuation.md)
-passes exact episode stopping and now evaluates Breakout before the Qbert pilot.
-This is not a gameplay result; fresh Freeway/Pong continuations remain next in order.
+passes exact episode stopping, completes Breakout's failed paired pilot and now
+trains Qbert. Fresh Freeway/Pong continuations remain next in order.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -65,6 +65,9 @@ Watch whole stream-zero evaluations, including failures and unfinished tails:
 - [Freeway hold64](../runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4)
   and [hold1](../runs/freeway-persistence-learning-20260909.C0GoqT/hold1-evaluation.mp4);
   both movies are **unassisted frozen evaluation**, unlike assisted training.
+- [Breakout trained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4)
+  and [untrained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4);
+  learned improvement, but neither completes both walls.
 - [Pong gameplay and world-model report](../runs/world-evaluation-20260908.Xzx3pN/report.html),
   plus the [common-recording comparison](../runs/common-world-report-20260909.O7nqqe/report.html).
   Forced cross-model recordings are diagnostics, not additional policy wins.

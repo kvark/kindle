@@ -75,6 +75,44 @@ completed fixture; it is not another pending gate.
 Breakout's missing frozen evaluation started at **16:25:49 UTC**. The actual
 startup confirms source-matched native `f6a2b6ad`, the original final checkpoint
 hashes, 200,004 / 49,652 restored counters, driver 595.91.07 and the unchanged
-unassisted v4 evaluation rule. Its process is live, but no complete frozen score
-or paired control result is available yet. Qbert remains queued. Keep scripts,
-inputs and original terminal queues fixed.
+unassisted v4 evaluation rule. The paired result completed at **16:40:33 UTC**.
+
+## Completed Breakout pair: improvement, not competence
+
+| Frozen policy | Actual actions | Natural episodes | Mean score | Two-wall completions |
+| --- | ---: | ---: | ---: | ---: |
+| Final trained model | 15,954 | 24 | 58.4583 | 0/24 |
+| Separately restored untrained control | 5,100 | 29 | 0.9655 | 0/29 |
+
+Both have zero updates, no cutoffs and complete per-stream episode targets.
+Different actual action and episode counts follow the same predeclared v4
+stopping rule; all completed episodes and unfinished tails remain included.
+The trained policy improves over its control but **fails the unchanged
+864-point/two-wall competence gate**. This is not a Breakout win or reliability.
+Do not spend a fresh three-root confirmation on a recipe that has not passed
+its pilot; use a separately declared bounded repair comparison after the
+existing queue, then require fresh-seed confirmation of a successful choice.
+
+Watch the whole stream-zero [trained rollout](../../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4)
+and [untrained control](../../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4).
+These are complete ALE reconstructions with checked actions, rewards,
+boundaries and frame counts, not selected successes.
+
+The [independent completed-pair readout](../../runs/atari-recovered-confirmations-20260911.xPz5ud/breakout-result.json)
+reverifies all six finished commands, complete finite checkpoints and optimizer
+state, both raw ledgers, task scores, full replays/videos and four native GPU
+windows including the driver fixture. Directly free memory remains at least
+3,413 MiB. Its 1,632 pins preserve the inputs and completed pair; the GPU log
+continues for Qbert, so this is a verified prefix, not whole-queue completion.
+The separate completion checker passes 15 CPU tests, including rejection of
+missing/changed commands and the missing driver fixture. It is preparation for
+the next handoff, not another declared or launched confirmation.
+
+## Qbert is now learning
+
+Fresh Qbert seed-0 training started at **16:40:35 UTC**. Actual startup confirms
+zero counters, no restore, original LeVJEPA weights, native `f6a2b6ad`, N6/R256
+and the unchanged 200,004-action recipe without action overrides. The worker
+will perform the declared final frozen evaluation and separate untrained control.
+No Qbert frozen result is available yet. Keep live scripts, inputs and the
+original terminal queues fixed; Freeway then Pong remain next in order.

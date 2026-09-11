@@ -330,7 +330,22 @@ reliable learning.
   Breakout frozen evaluation starts at 16:25:49. Actual startup confirms the
   original complete checkpoint hashes and 200,004 / 49,652 restored counters,
   native f6a2b6ad and the unchanged unassisted v4 rule on driver 595.91.07.
-  No complete frozen or paired control result is available yet; Qbert is queued.
+  Breakout's full pair completes at 16:40:33: trained mean 58.4583 across 24
+  natural episodes versus untrained 0.9655 across 29, with zero updates/cutoffs.
+  Neither has any two-wall completion: 0/24 and 0/29, so the pilot fails its
+  unchanged competence gate despite learned improvement. Complete checkpoints,
+  ledgers, scores, whole replay videos, six finished commands and four native
+  GPU windows independently reverify in
+  `runs/atari-recovered-confirmations-20260911.xPz5ud/breakout-result.json`,
+  retaining at least 3,413 MiB directly free and 1,632 pins. This is a completed
+  Breakout prefix, not whole-queue completion. Its separate completion checker
+  passes 15 CPU tests; no new confirmation or follower is declared by that work.
+  Do not replicate the failed Breakout recipe for a competence claim: declare a
+  bounded repair comparison after the existing queue, then confirm a successful
+  choice on fresh seeds. Preserve both trained and untrained outcomes and videos.
+  Qbert fresh seed-0 training starts at 16:40:35, with actual zero counters,
+  no restore, the original LeVJEPA encoder and unchanged 200,004-action N6/R256
+  recipe without overrides. No Qbert frozen result is available yet.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.

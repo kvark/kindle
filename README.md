@@ -51,6 +51,12 @@ Fresh-seed reliability is not established. These videos reconstruct whole
 stream-zero evaluations, including unfinished tails; the full multi-stream
 evaluations determine the scores.
 
+Breakout: [trained rollout](runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4)
+and [untrained control](runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4).
+The completed pair shows learned improvement but no two-wall completions;
+see the [failed competence result](docs/experiments/2026-09-11-atari-continuation.md#completed-breakout-pair-improvement-not-competence).
+These are whole rollouts, not successful-game selections.
+
 The local [common-match forecast report](runs/common-world-report-20260909.O7nqqe/report.html)
 compares all three final Pong world models on the same three recordings, with
 reward/feature baselines and clickable video point times. Each predicts positive
