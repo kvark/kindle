@@ -105,8 +105,8 @@ windows including the driver fixture. Directly free memory remains at least
 3,413 MiB. Its 1,632 pins preserve the inputs and completed pair; the GPU log
 continues for Qbert, so this is a verified prefix, not whole-queue completion.
 The separate completion checker passes 15 CPU tests, including rejection of
-missing/changed commands and the missing driver fixture. It is preparation for
-the next handoff, not another declared or launched confirmation.
+missing/changed commands and the missing driver fixture. That completed prefix
+alone does not qualify the next handoff; the full checker requires Qbert too.
 
 ## Qbert is now learning
 
@@ -115,4 +115,7 @@ zero counters, no restore, original LeVJEPA weights, native `f6a2b6ad`, N6/R256
 and the unchanged 200,004-action recipe without action overrides. The worker
 will perform the declared final frozen evaluation and separate untrained control.
 No Qbert frozen result is available yet. Keep live scripts, inputs and the
-original terminal queues fixed; Freeway then Pong remain next in order.
+original terminal queues fixed. The separately declared
+[recovered Freeway/Pong follower](2026-09-11-recovered-confirmations.md) now waits
+for this controller's actual exit and complete raw results. It preserves that
+order, all recipes and task gates, and does not start another GPU workload now.

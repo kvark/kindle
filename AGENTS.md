@@ -350,9 +350,26 @@ reliable learning.
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.
   These are still pilots, not fresh-seed reliability. This worker starts no
-  Freeway/Pong successor; preserve that subsequent order and declare their own
-  recovered-driver continuations. Keep the live scripts, pins and old queues
-  unchanged; see `docs/experiments/2026-09-11-atari-continuation.md`.
+  Freeway/Pong successor itself. Their separate recovered-driver continuations
+  now live under `runs/atari-recovered-confirmations-20260911.xPz5ud`: Freeway
+  binds 1,608 pins and Pong 1,613, retaining all original recipes, roots, budgets,
+  final frozen gates and untrained controls. The isolated runner passes 87 CPU
+  checks, including exact old/new native commands except output paths, copied
+  driver-template isolation, unchanged paired gates and scheduling/refusal errors.
+  Both actual entrypoints refuse the live breadth controller before GPU queries
+  or run outputs. Their declarations freshly reverify complete pilot/runtime data.
+  A once-only serial follower starts at 17:11:03 UTC on September 11 with 1,622
+  pins: PID 42730/start ticks 1021056, bound to controller 36135/705957. It waits
+  for actual breadth exit and complete raw checks, then Freeway and Pong in that
+  order. Neither fresh confirmation is training yet. Keep native f6a2b6ad and
+  matching sources 90b4763/24b2968; main's latest backend does not switch them.
+  Valid competence failures remain failures; incomplete data, changed host/input,
+  runtime or integrity failure stops without retry. Preserve the actual driver
+  headers, first-four-match Pong world-source selection and all old roots. No
+  world GPU work or extra game/optimization follower is included. Never manually
+  launch duplicates or restart this scheduler. See
+  `docs/experiments/2026-09-11-recovered-confirmations.md` and keep the live scripts,
+  pins and old queues unchanged; see also the original continuation report.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can

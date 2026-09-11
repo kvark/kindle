@@ -39,9 +39,9 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is declared but unstarted. |
+| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued after Freeway. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
-| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is declared but unstarted. |
+| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued after Qbert. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Completed pair verifies learned improvement, but the 200k pilot fails competence. Needs a bounded repair comparison before fresh-seed confirmation; the gate stays unchanged. |
 | Qbert | No frozen result yet | Fresh seed-0 training is running in the recovered-driver continuation. First-pyramid completion alone will not pass sustained competence. |
 
@@ -54,7 +54,8 @@ and the failure. The host now reports matching driver/library 595.91.07, and
 [runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
 The separately declared [continuation](experiments/2026-09-11-atari-continuation.md)
 passes exact episode stopping, completes Breakout's failed paired pilot and now
-trains Qbert. Fresh Freeway/Pong continuations remain next in order.
+trains Qbert. A new [serial follower](experiments/2026-09-11-recovered-confirmations.md)
+waits for complete Qbert data before fresh Freeway then Pong confirmation.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -168,51 +169,36 @@ random discovery, positive generic Atari scores and CPU tests are not Kindle win
 
 ### The immutable serial queue
 
-The [declared follower](experiments/2026-09-10-atari-serial-handoff.md) enforced
-this order and stopped on the post-training device failure. Do not restart it:
+The [original follower](experiments/2026-09-10-atari-serial-handoff.md) stopped
+on the driver failure and remains terminal. The separately declared
+[recovered-driver continuations](experiments/2026-09-11-recovered-confirmations.md)
+preserve completed work and now enforce this order:
 
 ~~~text
 Boxing: three fresh roots + final evaluations + untrained controls [complete]
-  -> current-package episode-evaluation runtime gate [complete]
-  -> Breakout training [complete] -> frozen evaluation [host guard failed]
-  -> Qbert pilot [unstarted]
-  -> Freeway three-root confirmation [unstarted]
-  -> longer-budget Pong three-root confirmation [unstarted]
+  -> episode/runtime and recovered-driver qualification [complete]
+  -> Breakout paired pilot [complete; competence failed]
+  -> Qbert pilot [training]
+  -> Freeway three-root confirmation [queued]
+  -> longer-budget Pong three-root confirmation [queued]
 ~~~
 
-- [Boxing](experiments/2026-09-10-boxing-confirmation.md): each root receives
-  200,004 fresh training actions and 75,000 unassisted sampled frozen actions.
-  All three complete paired results pass. This is the first completed game-specific
-  three-root confirmation, not completion of the five-game objective.
-- [Current episode evaluation](experiments/2026-09-09-episode-evaluation.md):
-  the previous-package stopping implementation passed after a declared
-  continuation of an interrupted gate. The unchanged-native current Python
-  bundle now passes all eight native phases: exact default learning and frozen
-  prefixes/state, correct episode stopping and direct-memory coverage. It is
-  qualified for the separately declared protocols, not a learning or speedup result.
-- [Corrected Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md):
-  Breakout training is complete and independently checked; evaluation/control
-  and Qbert remain unstarted after the host failure. Each declared pilot uses
-  fresh seed 0, 200,004 actions and no exploration overrides. Frozen v4 targets
-  four completed episodes per stream with a 600,000-action hard cap, plus matched
-  untrained controls. Cap exhaustion before the episode target is incomplete.
-  Pilots do **not** replace later fresh three-seed confirmation.
-- [Corrected Freeway confirmation](experiments/2026-09-10-freeway-confirmation.md):
-  each root gets 200,004 training actions with probability .5/hold64 exploration,
-  then 75,000 strictly unassisted frozen actions and its untrained control.
-  Both hold64 and hold1 succeeded in the pilot; keep the latter control.
-- [New Pong confirmation](experiments/2026-09-10-pong-confirmation.md):
-  each fresh root gets 400,008 training actions without overrides, then v4
-  four-episode-per-stream final evaluation, cap 600,000, and its untrained control.
-  This is larger-exposure confirmation on current N6/backend, not an isolated
-  budget ablation or repair of the failed historical 200k gate.
+Qbert retains its 200,004-action unassisted-training pilot. Freeway's fresh roots
+each receive 200,004 actions with probability .5/hold64 exploration, followed by
+75,000 unassisted frozen actions. Pong's fresh roots each receive 400,008 training
+actions without overrides. Qbert and Pong use v4 four-episode-per-stream frozen
+evaluation, cap 600,000. Every protocol keeps its separately restored untrained
+controls, unchanged task gates and all outcomes. Cap exhaustion before an episode
+target is incomplete. Pong is larger-exposure confirmation, not an isolated budget
+ablation or a reinterpretation of the old failed campaign.
 
-Do not modify pinned inputs, restart completed queues or manually launch
-successors. Preserve the withdrawn unstarted v1 Breakout/Qbert and Freeway
-declarations; use only their corrected v2 successors. Valid competence failures
-remain failures and do not stop remaining declared roots; integrity, incomplete
-data or runtime-safety failures stop the handoff without retries. Its completion
-alone cannot establish five-game success.
+Keep each pinned native/Python package together; main's dependency update does
+not switch these experiments. Do not restart old queues, edit active inputs or
+manually launch successors. Each entrypoint requires actual predecessor exit and
+complete raw evidence before GPU work. Valid competence failures remain failures;
+integrity, incomplete-data or runtime-safety failures stop without retries.
+Breakout needs a bounded repair comparison after this queue, before fresh-root
+confirmation. Completed pilots and scheduling never establish five-game success.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the
