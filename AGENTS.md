@@ -1,14 +1,21 @@
 # Kindle working direction
 
-This worktree is the isolated current-backend episode-count candidate. Its four
-Python implementation/test files are identical to `4281242`, on parent `90b4763`;
-native Rust and qualified f6a2b6ad bytes are unchanged. Its 580 Python CPU tests
-pass; it has no current-package GPU result or adoption. Follow the primary
-checkout's current experiment status: fresh Boxing confirmation is active in
-`runs/boxing-confirmation-20260910.hTEDcu`. Preserve that queue and every pin;
-do not launch GPU work alongside it. Historical status paragraphs below are
-inherited from the parent snapshot, not new pending queues. See
-`docs/experiments/2026-09-10-current-episode-evaluation.md`.
+This worktree is the isolated minimal-action Breakout candidate on `24b2968`.
+It carries only the four native dependency/identity changes from `1e00e818`
+(Meganeura `ce80e9cd`) and stages explicit four-action replay/checkpoint checks.
+Collection, learning arithmetic and frozen episode-count stopping are unchanged.
+Both future learning arms must use this same source-matched new-backend package;
+the historical 18-action pilot is not its matched control. This is not runtime
+qualification, a learning result, a GPU follower or an adopted action protocol.
+Follow the primary checkout's current status: Qbert is active in
+`runs/atari-driver-continuation-20260911.LR9yT3`, followed by the fresh Freeway then
+Pong confirmations in `runs/atari-recovered-confirmations-20260911.xPz5ud`.
+Preserve all queue inputs; do not launch GPU work alongside or ahead of them.
+Require matching four-action gradients, complete checkpoint/optimizer state,
+restore, replay, memory and runtime gates, then a separately declared learning
+comparison. Do not weaken Breakout's two-wall 864-point gate. Historical status
+paragraphs below are inherited context, not pending queues. The authoritative
+plan and current experiment reports remain in the primary checkout.
 
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner

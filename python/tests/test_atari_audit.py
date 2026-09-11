@@ -71,8 +71,9 @@ def test_pong_bound_and_single_stream_confidence():
     assert result['natural_win_wilson_95'][0] == pytest.approx(0.8388748419)
 
 
-def checkpoint_fixture(path):
-    metadata = dict(format=3, architecture='dreamerv3-visual-features', config={}, collection_streams=8,
+def checkpoint_fixture(path, action_count=18):
+    config = dict(action_count=action_count)
+    metadata = dict(format=3, architecture='dreamerv3-visual-features', config=config, collection_streams=8,
                     perception={'kind': 'levjepa'}, environment_step=200000, learner_step=12405,
                     tensor_sha256={})
     provenance = dict(perception=metadata['perception'], **{key: 'revision' for key in (
@@ -86,10 +87,10 @@ def checkpoint_fixture(path):
     (path / 'metadata.json').write_text(json.dumps(metadata))
     identity = dict(metadata_sha256=audit_atari.sha256(path / 'metadata.json'),
                     tensor_sha256=copy.deepcopy(metadata['tensor_sha256']))
-    training = dict(start=dict(config={}, num_envs=8, model_provenance=provenance),
+    training = dict(start=dict(config=copy.deepcopy(config), num_envs=8, model_provenance=provenance),
                     end=dict(environment_step=200000, learner_step=12405, run_step=200000),
                     checkpoint=dict(run_step=200000, learner_step=12405, identity=copy.deepcopy(identity)))
-    evaluation = dict(start=dict(config={}, model_provenance=provenance, starting_environment_step=200000,
+    evaluation = dict(start=dict(config=copy.deepcopy(config), model_provenance=provenance, starting_environment_step=200000,
                                 starting_learner_step=12405, restored_checkpoint=identity))
     return training, evaluation
 
@@ -129,6 +130,24 @@ def test_complete_tensor_schema_is_required(tmp_path):
                     tensor_sha256=metadata['tensor_sha256'])
     training['checkpoint']['identity'] = evaluation['start']['restored_checkpoint'] = identity
     with pytest.raises(ValueError, match='incomplete tensor names'):
+        audit_atari.verify_checkpoint(candidate, training, evaluation, reference)
+
+
+@pytest.mark.parametrize('action_count', [4, 18])
+def test_checkpoint_accepts_matching_action_schema(tmp_path, action_count):
+    training, evaluation = checkpoint_fixture(tmp_path, action_count)
+    assert audit_atari.verify_checkpoint(tmp_path, training, evaluation, tmp_path)['finite_and_complete']
+
+
+@pytest.mark.parametrize('action_count, schema_count', [(4, 18), (18, 4), (4, True), (True, 4),
+                                                       (4, 4.0), (4.0, 4), (0, 0), (None, None)])
+def test_checkpoint_rejects_wrong_action_schema_even_with_identical_tensor_shapes(tmp_path, action_count, schema_count):
+    candidate, reference = tmp_path / 'candidate', tmp_path / 'reference'
+    candidate.mkdir()
+    reference.mkdir()
+    training, evaluation = checkpoint_fixture(candidate, action_count)
+    checkpoint_fixture(reference, schema_count)
+    with pytest.raises(ValueError, match='changed checkpoint action schema'):
         audit_atari.verify_checkpoint(candidate, training, evaluation, reference)
 
 
