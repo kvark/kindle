@@ -9,7 +9,7 @@ This is an external runtime incident, not a changed learning recipe or a
 completed Breakout result. No driver, kernel, service, experiment input or
 running job was changed by this investigation.
 
-## Evidence and current scope
+## Evidence captured during training
 
 - [Host evidence](../../runs/host-driver-incident-20260911.1KckCc/host-evidence.json)
   preserves the failed observation and `/usr/bin/unattended-upgrade` history:
@@ -25,7 +25,7 @@ running job was changed by this investigation.
   libraries and the logger still using original NVML and `nvidia-smi`.
   Their files were unlinked by the package update but remain mapped in those
   existing processes. The loaded kernel module is also still 595.71.05.
-- The original, declared 250-ms GPU logger remains live and current. Its
+- The original, declared 250-ms GPU logger was still live and current. Its
   snapshot directly reports 3,303 MiB free, 462 MiB reserved and 12,540 MiB
   used on the same RTX 5080 UUID. This is an actual logger sample, not a
   total-minus-used estimate. Fresh NVML queries still fail; do not report
@@ -42,16 +42,24 @@ that logger, weaken the experiment's device guard, or launch a GPU workload.
 Other query errors, missing processes or stale logger samples still need
 independent rechecking; an observer exit never authorizes a training restart.
 
-## Next boundary
+## Actual terminal boundary
 
-The pinned pilot's `execute()` calls `memory.gpu_guard()` before every native
-phase. If this mismatch persists, the next guard will fail before frozen
-evaluation launches. Preserve the resulting failure and complete training
-artifacts rather than bypassing the guard or restarting the queue.
+The original training finished with exit 0 at **08:11:08 UTC**, completing
+200,004 actions and 49,652 updates. The
+[independent final-training audit](../../runs/breakout-final-training-20260911.6Mnq8o/result.json)
+passes full state, optimizer/encoder/ledger and whole-training GPU checks;
+see the [pilot report](2026-09-10-breakout-qbert-pilots.md#completed-training-frozen-evaluation-blocked).
+All 94,518 raw GPU samples pass coverage with at least 3,303 MiB directly free.
 
-Allow the original training to reach its declared final checkpoint while its
-process and logger remain healthy. Verify the complete final state, ledger and
-GPU window; current progress is not a substitute for those checks. Do not
+The pinned pilot's next `memory.gpu_guard()` failed at **08:11:10 UTC**, before
+frozen evaluation. The serial follower stopped at **08:11:11** with child exit
+1. All original trainer, logger, controller and follower PIDs are absent;
+the observer correctly stopped on that terminal process change. Do not wait
+on those old handles, restart the original queue or bypass the device guard.
+The logged memory above describes completed training, not current free VRAM.
+
+The final checkpoint is now saved and independently verified. Fresh NVML still
+fails with the driver/library mismatch; host repair remains unapproved. Do not
 reboot, reload the driver or downgrade host packages without user approval.
 A reboot would terminate all host processes, not just this experiment.
 

@@ -257,7 +257,7 @@ reliable learning.
   it does not reinterpret historical fixed-action evaluations or establish
   learning. Preserve all completed inputs and the earlier live-parent refusal;
   do not restart this gate. See `docs/experiments/2026-09-09-episode-evaluation.md`.
-  The first Breakout/Qbert seed-0 pilots are now running in
+  The first Breakout/Qbert seed-0 pilots were declared in
   `runs/breakout-qbert-pilots-v2-20260910.9zf9T3`, with 521 pins and 92 passing CPU
   tests. The existing serial follower launched the worker after the runtime
   gate's actual exit. It independently reverified the complete raw runtime proof
@@ -270,6 +270,14 @@ reliable learning.
   control. Keep all outcomes, task thresholds and fresh-seed requirements;
   these are pilots, not reliability. Preserve the declaration and longer frozen
   timeout. See `docs/experiments/2026-09-10-breakout-qbert-pilots.md`.
+  Breakout finished 200,004 actions / 49,652 updates at 08:11:08 UTC on
+  September 11. `runs/breakout-final-training-20260911.6Mnq8o` independently
+  verifies the full reset-dependent ledger, all 241 finite tensor entries and
+  optimizer moments, actual encoder, 756 pins and whole-training GPU coverage
+  with at least 3,303 MiB directly free. These are completed training checks,
+  not task wins. The next device guard failed with NVML exit 18 before frozen
+  evaluation; the pilot and serial follower stopped, and no successor started.
+  Preserve completed training and the failure; never restart the original queue.
   Breakout's first 20,004-action save is archived and checked in
   `runs/breakout-first-save-20260911.H7qmnT`: 4,652 actual updates, all 241 tensor
   entries complete/finite, 180 positive reward events and ≥3,303 MiB directly
@@ -278,13 +286,14 @@ reliable learning.
   its CPU import-name failure; do not rerun its exclusive archive operation.
   At 06:42 UTC on September 11, an unattended host update installed NVIDIA
   595.91.07 user-space while the loaded kernel remained 595.71.05. Fresh NVML
-  queries now fail with exit 18; the original Breakout trainer and declared
-  logger continue on old mapped libraries. Preserve the live training and all
-  pins; do not bypass the next device guard, restart the queue or change/reboot
+  queries still fail with exit 18. The original Breakout trainer and declared
+  logger finished on old mapped libraries and are now absent. Preserve the
+  completed training and all pins; do not bypass device guards, restart the queue or change/reboot
   the host without user approval. Read `docs/experiments/2026-09-11-host-driver-incident.md`
-  before the next runtime handoff. Its separately saved observer explicitly
-  uses the original logger and records the fresh query failure; this is not
-  recovered host health or qualification of the new driver.
+  before any new runtime handoff. Its completed observer used the original
+  logger and recorded the fresh query failure; it is not a live handle now.
+  A changed driver requires runtime requalification and a separately declared
+  continuation; neither host recovery nor new-driver qualification is claimed.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can
@@ -530,9 +539,11 @@ reliable learning.
   108736692 originally bound Boxing controller 2303115/107474767. Boxing has
   exited normally, and the unchanged episode runtime gate completed at 01:36:19
   UTC on September 11. The follower then launched the corrected B/Q controller,
-  PID 2454804/start ticks 116273468. Breakout is active after its complete raw
-  runtime check; Qbert, corrected Freeway and Pong remain queued in order.
-  Reverify actual live identities. Each still checks its full raw predecessors
+  PID 2454804/start ticks 116273468. After complete Breakout training, the next
+  device guard failed; this controller stopped at 08:11:10 UTC and the follower
+  at 08:11:11 UTC. All original processes are absent. Qbert, corrected Freeway
+  and Pong never started. Preserve this terminal handoff rather than waiting on
+  its old PIDs or restarting it. Each future entrypoint must check its raw predecessors
   before GPU work. Valid task failures remain failures;
   incomplete data, integrity/runtime failure or a changed stage stops the handoff
   without retries. Preserve all inputs and do not manually launch duplicate

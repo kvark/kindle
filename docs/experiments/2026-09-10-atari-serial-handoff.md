@@ -7,6 +7,12 @@ UTC on September 11**. The current episode runtime gate then completed at
 raw runtime revalidation. This supplies scheduling, not a new learning recipe
 or relaxed acceptance. The five-game objective remains incomplete.
 
+The follower **stopped at 08:11:11 UTC on September 11**. Breakout training
+completed normally; the pilot's next device guard failed on the
+[host NVIDIA mismatch](2026-09-11-host-driver-incident.md) before evaluation.
+No Qbert, Freeway or Pong successor started. Preserve this terminal queue;
+it must not be restarted or treated as a complete five-game campaign.
+
 The separate follower is
 `runs/atari-serial-handoff-20260910.zF8Hfh/follow_queue.py`, with **756 content
 pins and 52 passing CPU scheduling tests**. It originally bound Boxing PID
@@ -41,10 +47,11 @@ Following the completed Boxing training/frozen/untrained sequences:
 
 1. Complete: current-package episode-count runtime gate, with full
    default-learning, frozen-prefix, state and memory checks.
-2. Active: corrected seed-0 [Breakout/Qbert pilots](2026-09-10-breakout-qbert-pilots.md),
-   Breakout first and Qbert still queued.
-3. Run the corrected fresh three-seed [Freeway confirmation](2026-09-10-freeway-confirmation.md).
-4. Run the fresh larger-budget [Pong confirmation](2026-09-10-pong-confirmation.md).
+2. Stopped: corrected seed-0 [Breakout/Qbert pilots](2026-09-10-breakout-qbert-pilots.md).
+   Breakout training is complete and independently verified; its evaluation
+   and Qbert remain unstarted after the device failure.
+3. Unstarted: corrected fresh three-seed [Freeway confirmation](2026-09-10-freeway-confirmation.md).
+4. Unstarted: fresh larger-budget [Pong confirmation](2026-09-10-pong-confirmation.md).
 
 The follower invokes each existing entrypoint without arguments or source
 changes. All game thresholds, budgets, roots, packages, exploration choices,
@@ -58,9 +65,12 @@ It waits for the actual child exit before advancing and requires the matching
 declared data/runtime completion record. Valid competence failures remain
 failures and allow other games/seeds to proceed. A failed process, incomplete
 result, changed input, runtime-safety failure or timeout stops the handoff.
-There are no retries, restarts or replacement outputs. Breakout is active;
-Qbert, Freeway and Pong remain queued in order. Do not manually launch another
-worker alongside this follower.
+There are no retries, restarts or replacement outputs. The actual exit-1
+Breakout/Qbert child stopped this follower, exactly as declared. Its own final
+event is `failed`, with only `episode-runtime` in completed stages; Boxing was
+its already completed predecessor. All original processes are now absent.
+Host repair needs approval and any continuation must retain this evidence,
+completed training, unchanged task gates and pending stage order.
 
 ## Safety and evidence
 

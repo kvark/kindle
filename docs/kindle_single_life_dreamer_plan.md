@@ -39,18 +39,19 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued. |
+| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is declared but unstarted. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
-| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued. |
-| Breakout | No learned result yet | Fixed seed-0 training pilot active; fresh-seed confirmation still required afterwards. |
-| Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |
+| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is declared but unstarted. |
+| Breakout | No frozen result yet | Seed-0 training completed 200,004 actions / 49,652 updates; final state verified. Evaluation is blocked by the host driver mismatch; fresh-seed confirmation still required. |
+| Qbert | No learned result yet | Fixed seed-0 pilot declared but unstarted; first-pyramid completion alone will not pass sustained competence. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
-affects the next runtime handoff: an unattended NVIDIA update left new user-space
-libraries mismatched with the loaded kernel driver. Breakout's existing trainer
-and logger continue on the original mapped libraries; fresh GPU status checks
-fail. Preserve training and the pinned guard, obtain approval for host repair,
-and requalify a changed driver before new long work. This is not a gameplay result.
+stopped the runtime handoff: an unattended NVIDIA update left new user-space
+libraries mismatched with the loaded kernel driver. Breakout finished training
+on its original mappings, then the device guard failed before evaluation.
+The trainer, logger and serial follower have exited. Preserve completed work
+and the failure; host repair needs approval, and a changed driver needs runtime
+requalification before a separately declared continuation. This is not a gameplay result.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -161,15 +162,16 @@ random discovery, positive generic Atari scores and CPU tests are not Kindle win
 
 ### The immutable serial queue
 
-The [declared follower](experiments/2026-09-10-atari-serial-handoff.md) owns launch
-order and checks actual predecessor process identities and complete raw evidence:
+The [declared follower](experiments/2026-09-10-atari-serial-handoff.md) enforced
+this order and stopped on the post-training device failure. Do not restart it:
 
 ~~~text
 Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> current-package episode-evaluation runtime gate [complete]
-  -> corrected Breakout pilot [active] -> corrected Qbert pilot
-  -> corrected Freeway three-root confirmation
-  -> fresh longer-budget Pong three-root confirmation
+  -> Breakout training [complete] -> frozen evaluation [host guard failed]
+  -> Qbert pilot [unstarted]
+  -> Freeway three-root confirmation [unstarted]
+  -> longer-budget Pong three-root confirmation [unstarted]
 ~~~
 
 - [Boxing](experiments/2026-09-10-boxing-confirmation.md): each root receives
@@ -183,7 +185,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   prefixes/state, correct episode stopping and direct-memory coverage. It is
   qualified for the separately declared protocols, not a learning or speedup result.
 - [Corrected Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md):
-  Breakout is training after full runtime revalidation; Qbert follows. Each uses
+  Breakout training is complete and independently checked; evaluation/control
+  and Qbert remain unstarted after the host failure. Each declared pilot uses
   fresh seed 0, 200,004 actions and no exploration overrides. Frozen v4 targets
   four completed episodes per stream with a 600,000-action hard cap, plus matched
   untrained controls. Cap exhaustion before the episode target is incomplete.
@@ -489,10 +492,12 @@ accounting do not support an apples-to-apples superiority claim. Keep exact
 historical pins in their manifests and the [native frontend](../kindle/src/vision/mod.rs),
 not a moving label in the roadmap.
 
-Boxing's confirmation and current episode runtime qualification are complete.
-The immediate decision sequence remains fixed: finish the active Breakout pilot
-and declared Qbert/Freeway/Pong sequence, then use actual results to declare the
-missing Breakout/Qbert fresh confirmations
+Boxing's confirmation and the original-driver episode runtime qualification
+are complete. The immediate prerequisite is approved host recovery and runtime
+requalification if the driver changes. Then declare a continuation that reuses
+the verified Breakout final checkpoint, preserves its missing evaluation/control
+and Qbert/Freeway/Pong order, and does not rerun completed training. Use actual
+results to declare the missing Breakout/Qbert fresh confirmations
 or a bounded repair experiment. Separately qualify the latest Meganeura and
 world-model diagnostic candidates when the shared GPU is available, without
 changing or displacing pinned work. Optimize measured costs, not activity percentage.

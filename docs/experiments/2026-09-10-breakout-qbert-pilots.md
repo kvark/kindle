@@ -1,7 +1,8 @@
 # First Breakout and Qbert learning pilots
 
-Declared September 10, before either game was trained. **Breakout training is
-active**, starting at 01:36:44 UTC on September 11; Qbert remains queued. These
+Declared September 10, before either game was trained. **Breakout training
+completed at 08:11:08 UTC on September 11**, after starting at 01:36:44 UTC.
+The next device guard failed before evaluation; Qbert never started. These
 are fixed-budget seed-0 pilots, not fresh-seed confirmation or learned wins.
 
 The corrected v2 worker in `runs/breakout-qbert-pilots-v2-20260910.9zf9T3` has
@@ -114,7 +115,53 @@ Preserve the [initial CPU import-name failure](../../runs/breakout-first-save-20
 the standalone checker was renamed to avoid shadowing Python's `inspect` module.
 It failed before entering its inspection; training and all pinned inputs were
 unchanged. The corrected inspection completed; do not rerun its exclusive
-archive operation. The original training worker continues toward 200,004 actions.
+archive operation. That early snapshot is superseded for final-state assessment
+by the completed training audit below, not deleted or relabeled.
+
+## Completed training; frozen evaluation blocked
+
+The original trainer exited **0 at 08:11:08 UTC** after exactly **200,004
+actions and 49,652 updates**. The final save was recorded at 08:11:07 UTC.
+The [independent CPU audit](../../runs/breakout-final-training-20260911.6Mnq8o/result.json)
+rechecks the complete source-matched reset/action-credit ledger, actual command
+and output hashes, source/package/encoder identities and all 756 handoff pins.
+All **241 tensor entries** (world 164, behavior 66, slow value 11) have the
+required names, shapes and types and finite values. Optimizer steps are
+49,652/49,652/0, second moments are nonnegative and the return normalizer is valid.
+
+The final checkpoint remains at
+`runs/breakout-qbert-pilots-v2-20260910.9zf9T3/breakout-checkpoint`:
+
+- metadata: `03fd62e0d383a554d565e678b0538aa277b28af6ee1332316012ba0fdaf3a44d`
+- world: `5744a7346654f609c05c697a7e047b82b74d1cc4c0a6d022be431a6d1faa3707`
+- behavior: `bb151b358f3526368eae9484a533cca5fdd658916d81398b28ca5cc5053e2e6a`
+- slow value: `c2ac47902d15431a6b836f8e1a8b87ae7c28f80eae138114b3c002310a440082`
+
+All 49,652 learner reports are finite and contiguous; only updates 1 and 2
+report zero absolute advantage. The log contains 5,251 positive reward events
+and 194,753 zero events. Its 458 natural training episodes have mean return
+23.2096, with no cutoffs. Positive returns are **not** Breakout task wins, and
+these training statistics do not establish frozen competence or stability.
+
+All 94,518 samples in the actual native-command window independently pass
+coverage: maximum gap 0.268 s, minimum directly free memory 3,303 MiB and
+reserved memory 462 MiB. Mean GPU activity is 68.961%. The training loop
+reports 8.47694 actions/s and 0.56449× aggregate real time, not a matched
+speedup. The original logger retained its old, matching NVIDIA library mappings
+during the [unattended host update](2026-09-11-host-driver-incident.md).
+
+At **08:11:10 UTC**, the next `memory.gpu_guard()` failed with fresh NVML exit
+18. The pilot stopped; the serial follower recorded exit 1 and stopped at
+08:11:11. All four original process IDs are now absent. Frozen evaluation,
+the untrained control, Qbert and the Freeway/Pong successors never started.
+Do not infer a task failure or success, restart training, or bypass the guard.
+Preserve this incomplete pilot and arrange any continuation separately after
+approved host recovery and the required runtime checks.
+
+The audit result SHA-256 is
+`f1204ac28051ceaeb406d90b5a8924ce33af7d2381343fadb1814c884480efdf`;
+its [read-only method](../../runs/breakout-final-training-20260911.6Mnq8o/audit_training.py)
+is `9bd743483c76fa92048679f65eb4e54bbda8e92b300efb2f26a94b82b8953acc`.
 
 ## Prelaunch schedule correction
 
@@ -149,7 +196,8 @@ Per-game replay declarations bind back to that manifest and its content pins.
 `cpu-tests.xml` contains implementation checks, not learning results;
 `live-parent-refusal.json` records the actual negative launch check.
 
-The active declared worker is `run_pilots.py`; the outer follower owns scheduling.
+The original worker `run_pilots.py` and outer follower have stopped on the
+recorded device failure; neither is an active queue to resume.
 The worker itself starts no automatic follow-up. Per-game training, evaluation,
 replay/video, untrained-control and score artifacts appear only when their phases finish.
 `completed.json` requires both complete pilots and controls, including valid
