@@ -40,7 +40,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued. |
-| Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. First two untrained means −0.7222 / +0.8056. | All three trained frozen gates pass, with distinct initial parameters verified. Two paired learning gates pass; root 3019's restored untrained control is running. Full confirmation remains unfinished. |
+| Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued. |
 | Breakout | No learned result yet | Fixed seed-0 pilot queued; fresh-seed confirmation still required afterwards. |
 | Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |
@@ -158,8 +158,8 @@ The [declared follower](experiments/2026-09-10-atari-serial-handoff.md) owns lau
 order and checks actual predecessor process identities and complete raw evidence:
 
 ~~~text
-Boxing: three fresh roots + final evaluations + untrained controls
-  -> current-package episode-evaluation runtime gate
+Boxing: three fresh roots + final evaluations + untrained controls [complete]
+  -> current-package episode-evaluation runtime gate [active]
   -> corrected Breakout pilot -> corrected Qbert pilot
   -> corrected Freeway three-root confirmation
   -> fresh longer-budget Pong three-root confirmation
@@ -167,11 +167,13 @@ Boxing: three fresh roots + final evaluations + untrained controls
 
 - [Boxing](experiments/2026-09-10-boxing-confirmation.md): each root receives
   200,004 fresh training actions and 75,000 unassisted sampled frozen actions.
-  The first two complete paired results pass; root 3019 remains active.
+  All three complete paired results pass. This is the first completed game-specific
+  three-root confirmation, not completion of the five-game objective.
 - [Current episode evaluation](experiments/2026-09-09-episode-evaluation.md):
   the previous-package stopping implementation passed after a declared
   continuation of an interrupted gate. The unchanged-native current Python
-  bundle still needs its queued training/frozen-prefix/state/memory check.
+  bundle's training/frozen-prefix/state/memory check is now active after full
+  Boxing revalidation; it is not yet runtime-qualified.
 - [Corrected Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md):
   fresh seed 0, 200,004 actions each, no exploration overrides. Frozen v4 targets
   four completed episodes per stream with a 600,000-action hard cap, plus matched
@@ -478,7 +480,7 @@ accounting do not support an apples-to-apples superiority claim. Keep exact
 historical pins in their manifests and the [native frontend](../kindle/src/vision/mod.rs),
 not a moving label in the roadmap.
 
-The immediate decision sequence is fixed: finish the active Boxing confirmation,
+Boxing's confirmation is complete. The immediate decision sequence remains fixed:
 qualify the current episode rule, run the declared breadth/Freeway/Pong sequence,
 then use actual results to declare the missing Breakout/Qbert fresh confirmations
 or a bounded repair experiment. Separately qualify the latest Meganeura and

@@ -218,67 +218,41 @@ reliable learning.
   seed 1009. Use qualified native f6a2b6ad and matching source 90b4763, N6/R256;
   each root 1009/2017/3019 receives 200,004 fresh training actions, 75,000 sampled
   unassisted frozen actions and a separately restored same-seed untrained control.
-  All three fixed Boxing gates and paired controls must pass their declared
-  learning comparison. Continue all seeds after a competence failure; stop on
-  integrity/runtime-safety failure and preserve the artifacts. Seed 1009 completed
-  training at 07:42 UTC on September 10: 200,004 actions / 49,651 updates, with
-  complete finite state and full GPU coverage retaining 3,302 MiB directly free.
-  Its 75k final frozen evaluation passes: 123/123 natural wins, mean +83.8699,
-  no cutoffs or updates, with complete checkpoint/replay/video checks and at
-  least 3,413 MiB directly free. Its complete untrained control has 17/36 wins
-  and mean −0.7222, failing competence as required. Both full checkpoints,
-  replays/videos, six commands and four GPU windows reverify with all 429 pins;
-  the paired learning gate passes. Root 2017 completed its fresh training at
-  15:36:45 UTC: 200,004 actions / 49,651 updates, with all 241 saved tensor
-  entries and every learner report finite, complete optimizer state and passing
-  full GPU coverage retaining 3,302 MiB directly free. Its 75k final frozen
-  evaluation passes: 207/207 natural wins, mean +90.5845, with no cutoffs or
-  updates. The independent complete state/score/replay/video audit and both
-  raw GPU windows pass; frozen memory retains at least 3,413 MiB directly free.
-  Its complete untrained control has 20/36 natural wins and mean +0.8056,
-  failing competence as required. Both full checkpoints, replays/decoded videos,
-  all six commands and four GPU windows independently reverify with all 429
-  experiment and 756 handoff pins; the second paired learning gate passes.
-  Root 3019 completed fresh training at 23:28:41 UTC on September 10:
-  200,004 actions / 49,651 updates. Its original header verifies the unchanged
-  package/recipe, disjoint live RNG range and zero starting counters without a
-  restore. All 241 saved entries and 49,651 learner reports are finite; complete
-  optimizer state, actual encoder identity and full GPU coverage reverify,
-  retaining at least 3,302 MiB directly free. Its declared 75k unassisted sampled
-  frozen evaluation completed at 00:10:02 UTC on September 11: 51/51 natural
-  wins, mean +83.5294, no cutoffs or updates. Complete final state, score,
-  replay/decoded video, command outputs and raw GPU coverage independently
-  reverify, retaining 3,413 MiB directly free. All three trained frozen gates
-  now pass, but root 3019's restored 75k untrained control is still running.
+  The full confirmation completed normally at 00:51:13 UTC on September 11.
+  All three paired gates pass: trained natural wins 123/123, 207/207, 51/51;
+  means +83.8699/+90.5845/+83.5294. Untrained means −0.7222/+0.8056/+1.25
+  fail competence and score lower. Every training root completed 200,004 actions
+  and 49,651 updates; all six 75k frozen evaluations have zero updates and no
+  cutoffs. All 18 commands, 12 raw GPU windows, complete finite checkpoints,
+  optimizer moments, actual encoder identities, scores and replay/video bindings
+  independently reverify with all 429 experiment and 756 handoff pins. Directly
+  free memory remains at least 3,302 MiB overall and 3,413 MiB in frozen evaluation.
   All three original zero-update saves and actual restore headers reverify:
   every pair differs in all 31 nonconstant parameter tensors; the 64 expected
   constant tensors match and all 146 optimizer moments per save are zero.
   Distinct initial values and disjoint RNG inputs are not a statistical proof
-  of independence. Finish the third paired control before claiming complete
-  three-seed confirmation; preserve its fixed phases.
-  Keep all 429 pins and this active queue unchanged;
-  do not restart it or run GPU-heavy work alongside it. This separate confirmation
-  does not bypass the old replication-v2 runtime checker or satisfy all five games.
-  See `docs/experiments/2026-09-10-boxing-confirmation.md`. Prepare current-package
-  episode-count evaluation for Breakout/Qbert with light CPU work. Keep optional
+  of independence. Boxing meets the declared three-root gate, not a guarantee
+  for arbitrary seeds or protocols. Preserve this completed queue and all pins;
+  never restart it. This separate confirmation does not bypass the old
+  replication-v2 runtime checker or satisfy all five games.
+  See `docs/experiments/2026-09-10-boxing-confirmation.md`. Keep optional
   world-sync fan-out separate; its ~16 ms/update scope must not indefinitely
   displace actual learning, and its old-backend CPU checks are not adoption.
   The Python-only episode-count carry is now staged at `exp/current-episode-evaluation`
   (`24b2968`), with all 580 CPU tests passing on the unchanged f6a2b6ad native.
   `runs/current-episode-package-20260910.etyDN4` binds the source-matched bundle
   and evidence with 61 pins. It has no completed current-package GPU gate or
-  runtime adoption. Preserve its candidate inputs and finish the active Boxing
-  queue before any serialized default-training/frozen-prefix/memory check.
-  That executable gate is now declared in
+  runtime adoption. Preserve its candidate inputs. The executable gate in
   `runs/current-episode-runtime-20260910.uRF9VK`, with 498 pins and 47 passing
-  CPU tests. Its actual launch refuses the bound live Boxing controller before
-  GPU queries or run outputs. The gate's GPU worker has not started; the separate
-  serial follower below now waits for Boxing before invoking the unchanged gate.
-  After Boxing completes, reverify all three trained/untrained results, complete
-  state/replays, declared commands and twelve GPU windows before its eight
-  serialized native phases. Competence failures remain failures, not incomplete
-  data or five-game success. Keep the gate's inputs fixed; no new long-run
-  learning declaration is supplied by this gate. All three first 20,004-action /
+  CPU tests, started its first native phase at 00:51:36 UTC on September 11,
+  after the serial follower observed Boxing's actual exit and the gate
+  independently reverified all three trained/untrained results, complete state,
+  replays, 18 commands and 12 GPU windows. The gate is active, not passed or
+  adopted. Require all eight serialized native phases and their complete default-
+  learning, frozen-prefix, state and direct-memory checks. The earlier actual
+  live-parent refusal remains valid negative evidence. Competence failures remain
+  failures, not incomplete data or five-game success. Keep the gate's inputs fixed;
+  no new long-run learning declaration is supplied by this gate. All three first 20,004-action /
   4,651-update saves are archived, with all 241 tensor entries complete/finite
   and prefix GPU coverage retaining at least 3,302 MiB directly free. Root 3019's
   current-schema/encoder and exact 4,651-report prefix checks also pass. Preserve
@@ -536,10 +510,11 @@ reliable learning.
   The separately declared serial follower in
   `runs/atari-serial-handoff-20260910.zF8Hfh` started at 04:40 UTC on September 10,
   with 756 pins and 52 passing CPU scheduling tests. PID 2318785/start ticks
-  108736692 is bound to the actual live Boxing controller 2303115/107474767.
-  Reverify live identities, not just these numbers. It is waiting with no child
-  or GPU work; after Boxing it invokes the unchanged runtime, corrected B/Q,
-  corrected Freeway and Pong entrypoints in order. Each still checks its full
+  108736692 originally bound Boxing controller 2303115/107474767. Boxing has
+  exited normally, and the follower launched the unchanged episode runtime gate
+  at 00:51:16 UTC on September 11. Reverify actual live identities; its gate
+  controller at launch is 2449191/start ticks 116003083. Corrected B/Q, corrected
+  Freeway and Pong entrypoints remain queued in order. Each still checks its full
   raw predecessors before GPU work. Valid task failures remain failures;
   incomplete data, integrity/runtime failure or a changed stage stops the handoff
   without retries. Preserve all inputs and do not manually launch duplicate

@@ -1,20 +1,31 @@
 # Serialized execution of the declared Atari follow-ups
 
-Started September 10 at **04:40 UTC**, waiting on the actual live Boxing
-confirmation controller. This supplies scheduling, not a new learning recipe
-or relaxed acceptance. The five-game objective remains incomplete.
+Started September 10 at **04:40 UTC**, initially waiting on the actual live
+Boxing controller. Its three-seed confirmation completed normally at **00:51:13
+UTC on September 11**; the follower launched the current episode runtime gate at
+**00:51:16 UTC**. This supplies scheduling, not a new learning recipe or relaxed
+acceptance. The five-game objective remains incomplete.
 
 The separate follower is
 `runs/atari-serial-handoff-20260910.zF8Hfh/follow_queue.py`, with **756 content
-pins and 52 passing CPU scheduling tests**. It binds Boxing PID 2303115 and
-start ticks 107474767. Its own launch records PID 2318785/start ticks 108736692;
+pins and 52 passing CPU scheduling tests**. It originally bound Boxing PID
+2303115/start ticks 107474767. Its own launch records PID 2318785/start ticks 108736692;
 verify those live identities before relying on them. The initial real-process
-check confirms it is sleeping on the bound live parent with no child. The only
-reported GPU compute process remains Boxing's native worker 2303477.
+check confirmed it was sleeping on the bound live parent with no child. The
+initial GPU worker was Boxing's native worker 2303477; those original processes
+have now exited normally.
+
+The active runtime controller launched as PID **2449191/start ticks 116003083**.
+Its [Boxing predecessor proof](../../runs/current-episode-runtime-20260910.uRF9VK/boxing-proof.json)
+independently reconstructs all three paired results, six checkpoints/replays,
+18 commands and 12 GPU windows before its first GPU phase at **00:51:36 UTC**.
+The completed Boxing result SHA-256 is
+`cbbb598c4e3f4476de8899afe77a4c93b8df18eef5a1c46306f94077958b84b7`.
+This verifies the handoff prerequisite, not the unfinished runtime gate.
 
 ## Fixed order
 
-After all three Boxing training/frozen/untrained sequences finish normally:
+Following the completed Boxing training/frozen/untrained sequences:
 
 1. Run the current-package episode-count runtime gate, retaining its full
    default-learning, frozen-prefix, state and memory checks.
@@ -34,8 +45,9 @@ It waits for the actual child exit before advancing and requires the matching
 declared data/runtime completion record. Valid competence failures remain
 failures and allow other games/seeds to proceed. A failed process, incomplete
 result, changed input, runtime-safety failure or timeout stops the handoff.
-There are no retries, restarts or replacement outputs. No future worker has
-started yet; do not manually launch one alongside this follower.
+There are no retries, restarts or replacement outputs. The runtime gate is the
+only launched successor; Breakout/Qbert, Freeway and Pong remain queued. Do not
+manually launch another worker alongside this follower.
 
 ## Safety and evidence
 

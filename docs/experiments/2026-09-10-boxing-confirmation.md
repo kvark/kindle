@@ -1,9 +1,10 @@
 # Fresh three-seed Boxing confirmation
 
-Started September 10 at 01:10 UTC. All three trained final policies pass their
-frozen gates. Roots 1009 and 2017 also pass their complete trained-versus-untrained
-comparisons; root 3019's restored untrained evaluation is running. Full three-seed
-confirmation remains unfinished.
+Completed September 11 at **00:51:13 UTC**, after starting September 10 at
+01:10 UTC. **All three fresh roots pass their complete trained-versus-untrained
+comparisons** at the predeclared recipe and budget. Boxing meets the declared
+three-seed gate; this is not a guarantee for arbitrary seeds or protocols and
+does not finish the five-game objective.
 
 The R256 pilot's 162/162 frozen wins and mean +92.4877 justify testing its
 stability, not assuming it. The current Meganeura package has completed exact
@@ -55,7 +56,24 @@ weak seed, new assistance or changed thresholds after seeing results.
 | --- | --- | --- | --- |
 | 1009 | Complete: 200,004 actions / 49,651 updates | Pass: 123/123 wins, mean +83.8699 | Complete: 17/36 wins, mean −0.7222; fails competence gate |
 | 2017 | Complete: 200,004 actions / 49,651 updates | Pass: 207/207 wins, mean +90.5845 | Complete: 20/36 wins, mean +0.8056; fails competence gate |
-| 3019 | Complete: 200,004 actions / 49,651 updates | Pass: 51/51 wins, mean +83.5294 | Running: declared restored 75,000-action evaluation |
+| 3019 | Complete: 200,004 actions / 49,651 updates | Pass: 51/51 wins, mean +83.5294 | Complete: 24/36 wins, mean +1.25; fails competence gate |
+
+The independent whole-run audit reconstructs all **18 actual command exits,
+12 raw GPU windows, six complete checkpoints and six replay/video bindings**,
+with all **429 experiment and 756 handoff pins** unchanged. Every trained policy
+passes; every separately restored untrained control fails the competence gate
+and has a lower mean. All six 75k evaluations have zero updates and no cutoffs.
+Directly free memory stays at least **3,302 MiB** overall. The
+[completed confirmation](../../runs/boxing-confirmation-20260910.hTEDcu/completed.json)
+has SHA-256 `cbbb598c4e3f4476de8899afe77a4c93b8df18eef5a1c46306f94077958b84b7`.
+
+The campaign used **600,012 training actions / 148,953 updates**, plus 225,000
+trained frozen actions, 225,000 untrained frozen actions and 18 zero-update
+initial-save actions: **1,050,030 actual interactions** in total. From the first
+declared command to the completion event it took **85,273.73 s (23 h 41 m 14 s)**,
+including construction, evaluation and CPU replays. Training loops alone took
+23,487.93 / 23,437.51 / 23,313.08 s for roots 1009/2017/3019. This is a learning
+confirmation, not a matched runtime speedup. Preserve the completed queue.
 
 Seed 1009 finished training normally at **07:42:37 UTC on September 10**.
 An independent CPU read rechecks the complete training ledger, all 429 pins,
@@ -189,7 +207,7 @@ checks, with at least 3,302 MiB directly free overall and 3,413 MiB in both 75k
 frozen evaluations. The paired result SHA-256 is
 `840369fcb569e346a9f2d792812bbcb8d567896b9f69f71f2d1f26d630f8a4c1`.
 
-### Third trained frozen gate passed; untrained control running
+### Third paired learning gate passed
 
 Root **3019 started fresh training at 16:58:59 UTC** and finished normally at
 **23:28:41 UTC on September 10**, with **200,004 actions / 49,651 updates** and
@@ -233,7 +251,7 @@ per stream. This is frozen inference throughput, not playing plus training.
 
 The separate root-3019 initializer completed six frozen actions and zero
 updates at **00:11:51 UTC**. Its restored 75,000-action untrained evaluation
-started at **00:11:53 UTC** and remains running. All three original initial
+started at **00:11:53 UTC**. All three original initial
 checkpoints and actual restore headers independently reverify against the
 qualified native layouts and encoder. Each has **241 complete finite entries,
 146 zero optimizer moments and zero return normalizers**. Every pair of roots
@@ -244,10 +262,25 @@ All three initializer commands and raw GPU windows pass; the third retains
 at least 3,415 MiB directly free. Its metadata SHA-256 is
 `6745c3ea52ba08f10eba22ac6ed9d75c37b7492940cb346a63804865a1537156`.
 
-All three trained frozen gates pass, but the third untrained result and complete
-paired confirmation are still pending. The five-game objective is unfinished.
-All 429 experiment and 756 handoff pins remain unchanged; no package, recipe,
-budget or acceptance gate changed.
+The control finished normally at **00:50:35 UTC**: **24/36 natural wins, one
+draw, 11 losses, mean +1.25**, no cutoffs and zero updates. It fails the
+competence gate and scores below the trained mean +83.5294, so the third paired
+learning gate passes. The full CPU replay completed at **00:51:12 UTC**.
+Its [whole stream-0 movie](../../runs/boxing-confirmation-20260910.hTEDcu/seed3019-untrained-evaluation.mp4)
+decodes all **49,982 frames at 60 fps**; SHA-256
+`419293d247306b09bdd39961e0d69a03714e4798f275d6738e4f715d32c2eb62`.
+The [paired result](../../runs/boxing-confirmation-20260910.hTEDcu/seed3019-result.json)
+has SHA-256 `c57f1ab4a8a4749fad417afcbdf31c61eb3cdf9e5c2255903a464471f2f437b9`.
+All **9,275 control GPU samples** pass coverage with maximum gap **0.268 s**,
+minimum directly free memory **3,413 MiB** and mean activity **88.43%**.
+
+The complete three-root confirmation passes; the five-game objective remains
+unfinished. All 429 experiment and 756 handoff pins remain unchanged; no package,
+recipe, budget or acceptance gate changed. The existing
+[serial follower](2026-09-10-atari-serial-handoff.md) observed the actual controller
+exit and started the next gate process. That gate independently rechecked the
+full Boxing evidence before any GPU work. Do not restart this completed queue
+or manually duplicate its successors.
 
 ### Completed training-cost readout
 
@@ -338,19 +371,18 @@ packages and protocols.
 
 ## Artifacts
 
-Read `events.jsonl`, `seed3019-untrained-evaluation.jsonl` and `gpu.csv` for live progress.
+`events.jsonl`, all per-seed ledgers and `gpu.csv` are now closed evidence.
 Actual launcher PID at start was 2303115, with training child 2303477; check
 the process command and start identity, not just these recorded numbers.
 Both root-1009 frozen workers (2347336 and 2350470), root-2017's training worker
 (2353178) and both its frozen workers (2382137 and 2386142) exited normally.
-Root 3019's training worker (2402252), trained frozen worker (2440314) and
-untrained initializer (2444613) also exited normally. Its current untrained
-frozen worker is 2444889, start ticks 115766740. Recheck live process identities.
-Per-seed `*-evaluation.score.json`, `*-result.json` and complete replays will
-appear only after their corresponding phases finish. Movies will be
+Root 3019's training worker (2402252), trained frozen worker (2440314), untrained
+initializer (2444613) and untrained frozen worker (2444889) also exited normally.
+The controller and its GPU logger are terminal. All per-seed scores, paired
+results and complete replays exist. Whole stream-0 movies are
 `seed{seed}-evaluation.mp4` and `seed{seed}-untrained-evaluation.mp4`.
-`completed.json` is written only after all three roots and controls finish.
+`completed.json` contains all three completed roots and controls.
 
-Do not call the queued evaluations successful videos. Existing successful
+Queued evaluations for other games are not successful videos. Earlier successful
 pilot movies remain linked from the [five-game campaign](2026-09-08-atari-five.md)
 and [Freeway persistence report](2026-09-09-freeway-persistence.md).

@@ -197,7 +197,7 @@ or provide a speed benchmark. Preserve both artifact roots; neither queue
 should restart. The newly requested backend refresh now precedes the unrun
 world-sync comparison, without altering that candidate's pinned inputs.
 
-## Current-backend carry: CPU-qualified, GPU work not started
+## Current-backend carry: GPU gate active
 
 The isolated `exp/current-episode-evaluation` candidate at **24b2968** carries
 exactly the four Python implementation/test files from `4281242` onto the
@@ -211,11 +211,11 @@ records 61 pins, the clean source commit, exact earlier Python-file identities,
 unchanged native inputs/bytes, actual test exits and the complete test XML.
 Its SHA-256 is `9ee5b4eac750fa802016bc5a2a25db9c0641e2c82d99e17d00f7f237739132cb`.
 
-No new GPU gate has started, and this bundle is not runtime-qualified.
-After the active Boxing confirmation releases the device, require a separately
-declared current-package default-training state/report/trace check against the
-retained pixel control, frozen default/v4 prefix checks, a negative cap case,
-complete frozen state and direct-memory coverage. Keep all current queues fixed.
+The current-package GPU gate below is now running; this bundle is not yet
+runtime-qualified. Its default-training check compares state/reports/traces
+against the retained pixel control. It also covers frozen default/v4 prefixes,
+a negative cap case, complete frozen state and direct-memory coverage. Keep all
+current queues fixed.
 The separate Breakout/Qbert pilot declaration now supplies fixed learning budgets
 and stopping targets; none of these implementation checks is a learned result.
 
@@ -229,10 +229,13 @@ It binds the actual Boxing confirmation controller, PID 2303115/start tick
 refusal before a GPU query, event file or new GPU process; all 498 pins reverify.
 This is a readiness check, not a failed GPU experiment or a started queue.
 
-After Boxing finishes, the new read-only checker must reconstruct all three
+Before GPU work, the read-only checker reconstructed all three completed Boxing
 trained/untrained comparisons, exact declared commands, complete checkpoints,
-six replay/video bindings and all twelve native memory windows. It preserves
-the competence outcome: completed data can be valid even if a seed fails its
+six replay/video bindings and all twelve native memory windows. Its
+[predecessor proof](../../runs/current-episode-runtime-20260910.uRF9VK/boxing-proof.json)
+matches an independent full CPU audit and the completed result SHA-256
+`cbbb598c4e3f4476de8899afe77a4c93b8df18eef5a1c46306f94077958b84b7`.
+The checker preserves the competence outcome: completed data can be valid even if a seed fails its
 gate, but an interrupted or incomplete queue cannot release this gate.
 
 The eight serialized native phases then compare a fresh default-learning pair
@@ -243,9 +246,11 @@ traces and frozen prefixes must match; all phases require direct-memory coverage
 and ≥2,048 MiB free. The single timed pair guards a >2% regression, not an AB/BA
 speedup claim. The capture implementation is byte-identical to the earlier gate.
 
-The GPU worker has not started. A separate
-[serial follower](2026-09-10-atari-serial-handoff.md) now waits on the actual live
-Boxing controller before invoking this unchanged gate. Keep its inputs fixed;
-do not manually launch a duplicate. Its complete predecessor proof must still
-pass before GPU work. The separately declared
+The [serial follower](2026-09-10-atari-serial-handoff.md) observed Boxing's actual
+normal exit and launched this unchanged gate at **00:51:16 UTC on September 11**.
+Its controller launched as PID **2449191/start ticks 116003083**; recheck actual
+live identities. After full predecessor verification, the first native control
+training phase started at **00:51:36 UTC**. The gate is active, not passed or
+adopted; require all eight native phases and their full comparisons. Keep its
+498 pins fixed and do not manually launch a duplicate. The separately declared
 Breakout/Qbert pilots remain conditional on this gate; it starts no long run.
