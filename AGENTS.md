@@ -354,6 +354,18 @@ reliable learning.
   GPU samples through the save retain at least 3,303 MiB directly free. Preserve
   this completed archive and its wrong-counter negative; do not rerun the
   exclusive archive or substitute this early model for the declared final one.
+  The separate `runs/qbert-prefix-diagnostic-20260911.vfFXfK` completes a CPU
+  replay of the first 120,024 actions / 29,656 updates, with 12 tests and 1,882
+  pins. All 240 completed training episodes and six tails reconcile. Episode
+  means rise from 248.6364 to 997.7273 across six windows; median initial-pyramid
+  coverage rises from 6 to 18 of 21 cubes, with two first-pyramid completions in
+  the final 33 episodes. These are training milestones, not frozen competence.
+  All replay batches contain positive rewards from 3,505 distinct positive events;
+  this is not zero discovery or a demonstrated late plateau. Preserve the
+  incomplete prefix, negative counter, source/package identities and unchanged
+  final gate. Do not assume Freeway's assistance or Breakout's repair is appropriate
+  for Qbert; finish its declared pilot before selecting a changed recipe. No
+  checkpoint tensors, new world forecasts or GPU qualification are claimed here.
   The completed Breakout diagnostic in `runs/breakout-diagnostic-20260911.BTTecu`
   rechecks all 200,004 actions / 49,652 updates and both complete frozen replays,
   preserving video RGB hashes, episode/life/bitmap accounting and 1,637 pins.

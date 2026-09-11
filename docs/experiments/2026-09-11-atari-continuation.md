@@ -139,3 +139,55 @@ gap .268 seconds and at least 3,303 MiB directly free.
 This archive is complete early-health evidence, not complete training, frozen
 evaluation or reliability. Do not rerun its exclusive archive operation, select
 it instead of the declared final model, or change the live queue.
+
+### Replayed Qbert prefix: rising task progress, not a frozen result
+
+The [read-only diagnostic](../../runs/qbert-prefix-diagnostic-20260911.vfFXfK/result.json)
+archives the first **120,024 actions / 29,656 updates**, through that settled
+checkpoint event. It independently replays all those actions in the actual pinned
+ALE/ROM/wrapper, preserving **240 completed episodes** and six partial tails.
+Every reward, episode boundary, reset and actual frame count matches. The existing
+post-hoc Qbert observer finds **two first-pyramid completions**, both in the final
+inspected window. These are changing-policy **training milestones, not frozen
+wins** or the mean-15,000 sustained-competence gate.
+
+| Prefix endpoint | Completed episodes in window | Mean episode return | Median maximum initial cubes reached | First-pyramid completions |
+| --- | ---: | ---: | ---: | ---: |
+| 20,004 | 55 | 248.6364 | 6/21 | 0 |
+| 40,008 | 41 | 351.2195 | 11/21 | 0 |
+| 60,012 | 42 | 488.6905 | 12/21 | 0 |
+| 80,016 | 38 | 685.5263 | 14/21 | 0 |
+| 100,020 | 31 | 775.0000 | 17/21 | 0 |
+| 120,024 | 33 | 997.7273 | 18/21 | 2 |
+
+Each 20,004-action window assigns whole episodes to their ending window; their
+earlier rewards may cross its starting boundary. These are descriptive online
+returns, not held-out learning curves. The best completed return in this prefix
+is 4,800. There are **3,505 distinct positive reward events** and 136,975 aggregate
+reward across streams, not a per-episode score. All 29,656 reported replay batches
+contain positive rewards, and only updates 1 and 2 have zero absolute advantage.
+Repeated samples are not additional experience. Declining prediction training
+loss does not establish held-out prior reward accuracy or causal planning.
+
+This prefix does not resemble Freeway's zero-discovery failure or establish a
+Breakout-like late plateau. Keep the declared Qbert pilot running unchanged and
+judge its final frozen model/control before choosing a repair. Do not import
+Freeway's exploration assistance or Breakout's action-width hypothesis into
+Qbert on the basis of the shared Atari label. Continued training improvement
+also does not authorize an undeclared extension or imply eventual competence.
+
+The unchanged complete ledger auditor checks every learner row and rejects the
+archive only for **`missing run_end`**. A changed checkpoint-counter negative
+fails earlier. Only emulator reconstruction omits learner rows; the immutable
+source stays labelled training. The
+[prefix replay](../../runs/qbert-prefix-diagnostic-20260911.vfFXfK/prefix-replay.json)
+retains all task outcomes and tails. RAM never enters the policy or its rewards.
+No original RGB/video comparison, checkpoint tensor inspection, native agent
+construction or GPU work is claimed by this diagnostic.
+
+All **12 CPU tests / 1,882 evidence pins** independently reverify. The enforced
+one-core / 2 GiB / zero-swap scope peaks at **155.8 MiB host memory**. Source,
+encoder and package identities remain checked; the live source prefix is byte-
+identical after analysis. Preserve this completed exclusive archive and all queue
+inputs. Complete training, final frozen evaluation/control and fresh-root
+reliability remain outstanding; this does not add a game to the confirmed count.

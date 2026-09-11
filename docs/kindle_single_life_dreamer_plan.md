@@ -43,7 +43,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued after Qbert. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
-| Qbert | No frozen result yet | Fresh seed-0 training is running in the recovered-driver continuation. First-pyramid completion alone will not pass sustained competence. |
+| Qbert | No frozen result yet | Fresh seed-0 training is running. The [replayed training prefix](experiments/2026-09-11-atari-continuation.md#replayed-qbert-prefix-rising-task-progress-not-a-frozen-result) shows rising returns and two first-pyramid completions, not sustained competence. Finish the declared pilot before selecting a repair. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
 stopped the runtime handoff: an unattended NVIDIA update left new user-space
