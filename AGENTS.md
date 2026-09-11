@@ -270,6 +270,12 @@ reliable learning.
   control. Keep all outcomes, task thresholds and fresh-seed requirements;
   these are pilots, not reliability. Preserve the declaration and longer frozen
   timeout. See `docs/experiments/2026-09-10-breakout-qbert-pilots.md`.
+  Breakout's first 20,004-action save is archived and checked in
+  `runs/breakout-first-save-20260911.H7qmnT`: 4,652 actual updates, all 241 tensor
+  entries complete/finite, 180 positive reward events and ≥3,303 MiB directly
+  free through the save. The prefix remains explicitly incomplete; this is
+  early health, not frozen competence. Preserve the completed inspection and
+  its CPU import-name failure; do not rerun its exclusive archive operation.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can

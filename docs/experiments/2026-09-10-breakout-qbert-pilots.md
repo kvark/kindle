@@ -84,6 +84,38 @@ hour for CPU replay. The larger frozen cap needs more than Boxing's historical
 two-hour timeout. Integrity, process or memory failure stops the queue and
 preserves partial artifacts; restarting requires a separate continuation.
 
+## First saved-state check, not final evaluation
+
+Breakout's first completed save at **02:15:32 UTC on September 11** contains
+**20,004 actions / 4,652 updates**. Its exact recorded identity is preserved in
+`runs/breakout-first-save-20260911.H7qmnT/checkpoint`. All 241 tensor entries,
+optimizer counters/moments, normalizers and current frontend/backend identity
+pass CPU checks; the actual encoder file also matches. The extra update relative
+to Boxing is retained, not replaced with a copied counter.
+
+The byte-identical training prefix reaches all ledger checks through its recorded
+checkpoint. The unmodified source-matched auditor then correctly rejects the
+missing `run_end`: this is not complete-run accounting. A separately corrupted
+CPU fixture fails earlier on its wrong checkpoint counter. No final evaluation
+or game gate is inferred from either check.
+
+Actual interactions contain **180 positive reward events**, total reward 183,
+98 natural episodes and no cutoffs. Every one of the 4,652 reported replay batches
+contains positive rewards; only updates 1 and 2 report zero absolute advantage.
+Replay batches reuse experience; their count is not the number of distinct
+reward events. These early training signals do not establish task wins.
+All 9,298 GPU samples through the save pass coverage, with at least **3,303 MiB
+directly free** and maximum gap 0.268 s. This is not whole-pilot qualification
+or a matched speed benchmark.
+
+The [inspection result](../../runs/breakout-first-save-20260911.H7qmnT/result.json)
+SHA-256 is `fdd557821df895ed6f8b7cccff90f5c4eb1e6b7e31e4be54300bbb0def2c9305`.
+Preserve the [initial CPU import-name failure](../../runs/breakout-first-save-20260911.H7qmnT/import-failure.json):
+the standalone checker was renamed to avoid shadowing Python's `inspect` module.
+It failed before entering its inspection; training and all pinned inputs were
+unchanged. The corrected inspection completed; do not rerun its exclusive
+archive operation. The original training worker continues toward 200,004 actions.
+
 ## Prelaunch schedule correction
 
 The unstarted v1 declaration in `runs/breakout-qbert-pilots-20260910.h0l2PM`
