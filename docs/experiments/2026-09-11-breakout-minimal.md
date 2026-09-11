@@ -102,3 +102,56 @@ Any provisional winner still needs a separately declared fresh three-root gate.
 
 Preserve the completed CPU package and its pins. This report neither launches
 those gates nor changes the active five-game campaign declarations.
+
+## Prepared hardware fixtures — CPU checks only
+
+The separate `exp/breakout-minimal-gates` worktree, commit
+`18c7ffb751646ac42455aa44c777572ef5cf6337`, now provides the missing fixtures.
+It does not edit the frozen `0591eda` source/package above. All changes are in
+`cfg(test)` code and the synthetic canary example; production world/behavior
+code, other native/build inputs, Python and backend identity stay unchanged.
+
+- The existing temporal batching comparison has an explicit four-action
+  **production B16/T64/full-recurrence** test. The eighteen-action/default and
+  tiny controls retain their arithmetic, data, reset masks and tolerances.
+- New actor/value comparisons cover **15,360 imagined rows / 1,008 replay rows**,
+  not just a 1,024-row actor-layer probe. Both eighteen- and four-action fixtures
+  compare the full row-independent graph against sixteen disjoint row slices.
+  They verify matching initialization, all six loss/entropy outputs and every
+  parameter gradient. The reference averages slice results in F64; it never
+  partitions the RSSM or changes the deployed learner. Signed advantages,
+  zero/nonuniform weights and a nonzero test value head exercise the gradient paths.
+- The isolated canary accepts `--actions 4`, retaining eighteen by default.
+  Existing `--updates 1` / `--updates 8` and `--checkpoint` options can capture
+  full optimizer state from the first update. The two invalid-count CLI checks
+  exit before GPU initialization. No positive four-action canary has run yet.
+
+These are compiled test capabilities, **not passing GPU comparisons**. The
+world fixture retains loss/gradient tolerances `3e-4` / `3e-3` at production size;
+the new behavior fixture uses those respective bounds too, plus the same `1e-7`
+gradient absolute allowance. Preserve a failure rather than weakening bounds
+to obtain acceptance. Numerical agreement still needs actual hardware evidence,
+complete state/restore/pixel gates and combined learner-plus-perception headroom.
+
+The [completed CPU preparation](../../runs/breakout-minimal-fixtures-complete-20260911.dv2SqC/result.json)
+passes **98 Rust workspace tests**, formatting and Clippy with warnings denied.
+The suite counts are 81 library, 5 environment and 12 example tests; all 25 GPU
+tests remain ignored. Exact listing confirms the three new GPU fixtures are in
+the pinned executable. The synthetic canary also compiles. One build job ran
+under an enforced one-core / 2 GiB host-memory / zero-swap scope, whose measured
+peak was approximately **990 MiB**. This is host memory, not a VRAM measurement.
+No production-size ML graph was compiled or executed during the live trainer.
+
+The [initial preparation](../../runs/breakout-minimal-fixtures-20260911.EaDRLF/declaration.json)
+successfully compiled and passed all 81 library tests, then stopped on an
+incorrect assertion expecting the workspace-wide count of 98. Preserve that
+failure and its complete logs. The separate completion verified the raw prefix,
+ran the actual workspace/all-target suites and finished the remaining checks;
+no learning/backend source fix or GPU retry was involved.
+
+All **134 completion pins**, the 102 package pins, 1,622 active scheduler pins and
+original qualified executables reverify. Preserve both artifact roots. The
+compiled fixture identities are recorded in the completion result; do not use
+stale root release binaries or replace historical executables. There is still
+**no new GPU follower or paired learning declaration**. Qbert → Freeway → Pong
+remains the active order, with the later runtime gates required before adoption.

@@ -390,6 +390,19 @@ reliable learning.
   Do not require identical learning states across different action widths or
   infer a speedup. Preserve this package, every historical control and the active
   Qbert -> Freeway -> Pong order. See `docs/experiments/2026-09-11-breakout-minimal.md`.
+  Its separate `exp/breakout-minimal-gates` fixture source at `18c7ffb` changes
+  only cfg(test) code and the canary example, preserving the 0591eda/abf4ae5d
+  package. Four-action B16/T64 world gradients, full H15 actor/value row-gradient
+  comparisons for both vocabularies, and `dreamer_canary --actions 4` are built,
+  not GPU-validated. The completion in `runs/breakout-minimal-fixtures-complete-20260911.dv2SqC`
+  passes 98 Rust workspace tests, fmt and Clippy, preserving 134 completion,
+  102 package and 1,622 scheduler pins. The enforced one-core/2 GiB host scope
+  peaks near 990 MiB; no production ML graph or GPU fixture executes. Preserve
+  the first root `runs/breakout-minimal-fixtures-20260911.EaDRLF`, which passed
+  81 library tests then failed an incorrect workspace-count assertion. The
+  completed continuation is not a numerical fix or GPU gate. Keep the compiled
+  fixture identities, all original binaries and active queues fixed; no new
+  GPU follower or learning declaration exists yet.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.
