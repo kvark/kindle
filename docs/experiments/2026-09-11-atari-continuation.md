@@ -108,17 +108,65 @@ The separate completion checker passes 15 CPU tests, including rejection of
 missing/changed commands and the missing driver fixture. That completed prefix
 alone does not qualify the next handoff; the full checker requires Qbert too.
 
-## Qbert is now learning
+## Completed Qbert pilot: learning without competence
 
 Fresh Qbert seed-0 training started at **16:40:35 UTC**. Actual startup confirms
 zero counters, no restore, original LeVJEPA weights, native `f6a2b6ad`, N6/R256
-and the unchanged 200,004-action recipe without action overrides. The worker
-will perform the declared final frozen evaluation and separate untrained control.
-No Qbert frozen result is available yet. Keep live scripts, inputs and the
-original terminal queues fixed. The separately declared
-[recovered Freeway/Pong follower](2026-09-11-recovered-confirmations.md) now waits
-for this controller's actual exit and complete raw results. It preserves that
-order, all recipes and task gates, and does not start another GPU workload now.
+and the unchanged 200,004-action recipe without action overrides. Training
+completed normally at **23:13:47 UTC**, with **49,651 updates** and no unpaid
+training debt. Its final save, not an earlier selected checkpoint, was evaluated.
+The frozen trained run finished at **23:25:41**, followed by the separately
+saved/restored untrained control at **23:32:46**. The complete continuation
+exited normally at **23:32:55**. Preserve all inputs and results; never restart it
+or the original terminal queues.
+
+| Frozen policy | Actual actions | Natural episodes | Mean score | First-pyramid completions |
+| --- | ---: | ---: | ---: | ---: |
+| Final trained model | 20,232 | 24 | 3,754.17 | 17/24 (70.83%) |
+| Separately restored untrained control | 8,616 | 24 | 125.00 | 0/24 |
+
+Both evaluations complete exactly four episodes per stream, with zero updates
+and no cutoffs. All episodes and partial tails remain included in the replay
+artifacts. The trained policy improves over its control but **fails both the
+90% first-pyramid criterion and the mean-15,000 score criterion**. Its best
+episode scores 5,425; none reaches 15,000. The 17 initial-pyramid completions
+score 4,575–5,425, so fixing only the seven initial-pyramid misses would not
+by itself demonstrate sustained competence. These are descriptive outcomes,
+not a causal diagnosis or fresh-seed reliability.
+
+Watch the whole stream-zero [trained rollout](../../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4)
+and [untrained control](../../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4).
+The [paired result](../../runs/atari-driver-continuation-20260911.LR9yT3/qbert-result.json)
+binds final checkpoints, complete ledgers, task scores and all-action ALE
+replays/video hashes. The movies contain 13,485 and 5,736 stream-zero emulator
+frames, respectively, at 60 fps; they are not selected success clips.
+
+The [independent predecessor proof](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/predecessor-proof.json)
+rechecks **all twelve commands/eight native GPU phases** of the completed
+Breakout/Qbert continuation, all **1,593 pins**, complete finite checkpoints and
+optimizer moments, actual encoder identities, raw ledgers and replay/video
+bindings. It retains exact recovered-driver episode stopping and the original
+Breakout training. Directly free memory is at least **3,303 MiB** overall and
+**3,413 MiB** in Qbert's two frozen evaluations. Qbert's final save contains all
+241 finite tensor entries, including 146 optimizer moments; its training GPU
+window contains 94,263 samples. This is saved-state and runtime evidence, not
+task success.
+
+Whole Qbert training takes 23,525.91 seconds inside the recorded loop:
+8.50 actions/s, **0.5664× aggregate** and about **0.0944× per stream** real time.
+The full command takes 23,591.91 seconds including startup and shutdown.
+Mean recorded training GPU activity is 68.98%; this is not a new speedup or an
+idle-gap measurement. The faster frozen loop has learning disabled.
+
+Do not confirm this failed recipe unchanged or infer that Freeway's exploration
+assistance or Breakout's action-width repair applies to Qbert. First inspect the
+early-pyramid misses and later progression using the completed recordings, then
+declare a bounded, single-variable comparison and require fresh-root confirmation
+of a successful choice. Longer exposure remains a hypothesis, not an authorized
+extension of this completed pilot. The separately declared
+[Freeway/Pong follower](2026-09-11-recovered-confirmations.md) reverified the full
+raw predecessor and started fresh Freeway root 1009 at **23:34:06 UTC**. This
+handoff preserves both failed pilots; it does not add a confirmed Atari game.
 
 ### First Qbert save: healthy prefix, not competence
 
@@ -170,8 +218,8 @@ Repeated samples are not additional experience. Declining prediction training
 loss does not establish held-out prior reward accuracy or causal planning.
 
 This prefix does not resemble Freeway's zero-discovery failure or establish a
-Breakout-like late plateau. Keep the declared Qbert pilot running unchanged and
-judge its final frozen model/control before choosing a repair. Do not import
+Breakout-like late plateau. It supported finishing the unchanged pilot and
+judging its final frozen model/control before choosing a repair. Do not import
 Freeway's exploration assistance or Breakout's action-width hypothesis into
 Qbert on the basis of the shared Atari label. Continued training improvement
 also does not authorize an undeclared extension or imply eventual competence.
@@ -187,7 +235,8 @@ construction or GPU work is claimed by this diagnostic.
 
 All **12 CPU tests / 1,882 evidence pins** independently reverify. The enforced
 one-core / 2 GiB / zero-swap scope peaks at **155.8 MiB host memory**. Source,
-encoder and package identities remain checked; the live source prefix is byte-
+encoder and package identities remain checked; the then-live source prefix is byte-
 identical after analysis. Preserve this completed exclusive archive and all queue
-inputs. Complete training, final frozen evaluation/control and fresh-root
-reliability remain outstanding; this does not add a game to the confirmed count.
+inputs. The paired result above now supplies complete training and final frozen
+evaluation/control evidence; fresh-root reliability remains outstanding. This
+prefix does not add a game to the confirmed count.

@@ -1,9 +1,11 @@
 # Freeway and Pong confirmations after driver recovery
 
-The new serial follower started at **17:11:03 UTC on September 11**, bound to
-the actual live Breakout/Qbert continuation controller. It is waiting; neither
-fresh confirmation is training yet. Qbert remains the only GPU learner.
-Boxing is still the only game with a completed three-root competence result.
+The serial follower started at **17:11:03 UTC on September 11**, bound to the
+actual live Breakout/Qbert continuation controller. That predecessor completed
+normally at **23:32:55** with both pilots failing competence. The follower
+reverified its complete raw evidence and started **Freeway root 1009 at
+23:34:06 UTC**. Pong remains queued. Boxing is still the only game with a
+completed three-root competence result.
 
 The original stopped follower and unstarted Freeway/Pong roots are preserved.
 Do not restart them. Their driver-aware successors live under
@@ -75,12 +77,28 @@ and [Pong](../../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/live-pa
 
 Follower **42730/start ticks 1021056** is recorded in its
 [launch](../../runs/atari-recovered-confirmations-20260911.xPz5ud/scheduler/launch.json).
-It waits for the bound breadth controller's actual exit, then schedules Freeway
+It requires the bound breadth controller's actual exit, then schedules Freeway
 and Pong in that order. Every child rereads its complete raw predecessor before
 GPU work. The breadth checker requires all twelve commands/eight native windows,
 exact driver episode stopping, completed Breakout and Qbert pairs, full state,
 scores and replay/video evidence. Pong's handoff checks all eighteen Freeway
 commands/twelve native windows and all three paired results.
+
+The actual handoff observed the completed breadth result at **23:33:06 UTC**
+and launched the Freeway controller at **23:33:08**. Its
+[predecessor proof](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/predecessor-proof.json)
+verifies all twelve commands/eight native windows, complete state and scores,
+both failed pilot pairs, exact driver episode stopping and at least 3,303 MiB
+directly free. The original selected Freeway pilot and qualified runtime also
+reverify before the first device guard. This is completed prerequisite checking,
+not a Freeway reliability result.
+
+The [actual training header](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-train.jsonl)
+confirms fresh root 1009, zero starting counters, no restore, the original
+LeVJEPA weights and native `f6a2b6ad` on driver 595.91.07. It retains source
+`90b4763`, N6/R256, 200,004 training actions and probability .5/hold64
+exploration. Roots 2017/3019 and every unassisted frozen/control pair remain
+outstanding. Preserve the live package, scripts and declarations.
 
 A valid competence failure stays a failure and does not prevent an unrelated
 game. Missing episodes/data, runtime or integrity failure stops without retries.
@@ -90,6 +108,7 @@ predecessor refuses execution. Each child still starts no successor itself.
 Do not manually launch duplicates or displace this queue with GPU-heavy work.
 
 The scheduler is not a learning result, and its eventual completion cannot
-establish the five-game goal. Breakout's completed 200k pilot failed competence
-and needs a separately declared bounded repair comparison after this queue;
-Qbert also still requires fresh-seed confirmation after a successful pilot.
+establish the five-game goal. Both completed 200k Breakout/Qbert pilots failed
+competence and need separately declared bounded repair comparisons after this
+queue, then fresh-seed confirmation of successful choices. Do not repeat either
+unchanged failed recipe as a competence confirmation.

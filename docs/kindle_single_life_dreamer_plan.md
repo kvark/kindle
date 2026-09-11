@@ -41,9 +41,9 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued after Freeway. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
-| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued after Qbert. |
+| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is running, beginning with root 1009. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
-| Qbert | No frozen result yet | Fresh seed-0 training is running. The [replayed training prefix](experiments/2026-09-11-atari-continuation.md#replayed-qbert-prefix-rising-task-progress-not-a-frozen-result) shows rising returns and two first-pyramid completions, not sustained competence. Finish the declared pilot before selecting a repair. |
+| Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Learned improvement, not competence: both the 90% milestone rate and mean-15,000 gate fail. Inspect early-pyramid misses and subsequent progression before a bounded repair comparison; do not replicate this failed recipe unchanged. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
 stopped the runtime handoff: an unattended NVIDIA update left new user-space
@@ -53,9 +53,10 @@ The trainer, logger and serial follower have exited. Preserve completed work
 and the failure. The host now reports matching driver/library 595.91.07, and
 [runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
 The separately declared [continuation](experiments/2026-09-11-atari-continuation.md)
-passes exact episode stopping, completes Breakout's failed paired pilot and now
-trains Qbert. A new [serial follower](experiments/2026-09-11-recovered-confirmations.md)
-waits for complete Qbert data before fresh Freeway then Pong confirmation.
+passes exact episode stopping and completes both failed paired pilots. The
+[serial follower](experiments/2026-09-11-recovered-confirmations.md) has independently
+reverified their complete raw evidence and started fresh Freeway confirmation;
+Pong follows it. Preserve this completed continuation rather than restarting it.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -69,6 +70,10 @@ Watch whole stream-zero evaluations, including failures and unfinished tails:
 - [Breakout trained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4)
   and [untrained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4);
   learned improvement, but neither completes both walls.
+- [Qbert trained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4)
+  and [untrained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4);
+  initial-pyramid progress, not sustained competence. See the
+  [complete paired result](experiments/2026-09-11-atari-continuation.md#completed-qbert-pilot-learning-without-competence).
 - [Pong gameplay and world-model report](../runs/world-evaluation-20260908.Xzx3pN/report.html),
   plus the [common-recording comparison](../runs/common-world-report-20260909.O7nqqe/report.html).
   Forced cross-model recordings are diagnostics, not additional policy wins.
@@ -178,8 +183,8 @@ preserve completed work and now enforce this order:
 Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> episode/runtime and recovered-driver qualification [complete]
   -> Breakout paired pilot [complete; competence failed]
-  -> Qbert pilot [training]
-  -> Freeway three-root confirmation [queued]
+  -> Qbert paired pilot [complete; competence failed]
+  -> Freeway three-root confirmation [root 1009 training]
   -> longer-budget Pong three-root confirmation [queued]
   -> Breakout action-width hardware/synthetic diagnostic [queued; no learning]
 ~~~
@@ -506,12 +511,15 @@ historical pins in their manifests and the [native frontend](../kindle/src/visio
 not a moving label in the roadmap.
 
 Boxing's confirmation, recovered-driver and latest-backend runtime qualification
-and source integration are complete. Monitor the declared continuation that reuses
-the verified Breakout final checkpoint and then runs Qbert. Preserve its inputs,
-missing evaluations/controls and the subsequent Freeway/Pong order; do not rerun
-completed training or restart the original failed queues. Use actual
-results to declare the missing Breakout/Qbert fresh confirmations
-or a bounded repair experiment. Separately qualify the multi-match
+and source integration are complete. Breakout and Qbert have complete paired
+pilots, but both fail competence. Preserve their checkpoints, controls and videos;
+do not spend fresh three-root confirmations on these unchanged failed recipes.
+Monitor the declared Freeway confirmation and subsequent Pong run. Breakout's
+bounded action-width diagnostic remains queued after them. For Qbert, distinguish
+missed initial pyramids from insufficient full-episode progress before choosing a
+separate repair comparison; even its successful initial pyramids score only
+4,575–5,425. This does not identify a cause or authorize an undeclared extension.
+Confirm a successful repair on fresh roots. Separately qualify the multi-match
 world-model diagnostic candidate when the shared GPU is available, without
 changing or displacing pinned work. Optimize measured costs, not activity percentage.
 Do not substitute another framework, larger perception, arbitrary long run or

@@ -355,7 +355,23 @@ reliable learning.
   choice on fresh seeds. Preserve both trained and untrained outcomes and videos.
   Qbert fresh seed-0 training starts at 16:40:35, with actual zero counters,
   no restore, the original LeVJEPA encoder and unchanged 200,004-action N6/R256
-  recipe without overrides. No Qbert frozen result is available yet.
+  recipe without overrides. It completes normally at 23:13:47 UTC on September
+  11 with 200,004 actions / 49,651 updates. Final frozen evaluation completes
+  20,232 actions and 24 natural episodes: 17/24 first-pyramid completions, mean
+  3,754.1667. The restored untrained control completes 8,616 actions and 24
+  natural episodes: 0/24 first pyramids, mean 125. Both have zero updates and
+  no cutoffs. Qbert improves but fails both the 90% milestone and mean-15,000
+  gates; its best episode is 5,425. Preserve the whole trained/control videos
+  and final checkpoint. Do not confirm the unchanged failed recipe: inspect
+  initial-pyramid misses and subsequent progression before a separately declared
+  bounded repair, then confirm a successful choice on fresh roots. Neither
+  longer exposure nor Freeway/Breakout's interventions are established fixes.
+  The full continuation exits normally at 23:32:55. Its independently rechecked
+  twelve commands/eight native phases, 1,593 pins, complete finite states and
+  moments, actual encoders, ledgers and replay/video bindings pass, retaining
+  at least 3,303 MiB directly free overall and 3,413 MiB in Qbert frozen runs.
+  The proof is `runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/predecessor-proof.json`.
+  Preserve this completed queue and both competence failures; never restart it.
   Its first 20,004-action / 4,651-update save completed at 17:18:58 UTC and is
   archived in `runs/qbert-first-save-20260911.XTUykj`. All 241 finite tensor
   entries, optimizer moments, actual encoder, full prefix ledger and 1,632 pins
@@ -374,8 +390,9 @@ reliable learning.
   this is not zero discovery or a demonstrated late plateau. Preserve the
   incomplete prefix, negative counter, source/package identities and unchanged
   final gate. Do not assume Freeway's assistance or Breakout's repair is appropriate
-  for Qbert; finish its declared pilot before selecting a changed recipe. No
-  checkpoint tensors, new world forecasts or GPU qualification are claimed here.
+  for Qbert. Use the completed paired pilot above before selecting a changed
+  recipe; this earlier prefix alone did not justify one. No checkpoint tensors,
+  new world forecasts or GPU qualification are claimed by the prefix diagnostic.
   The completed Breakout diagnostic in `runs/breakout-diagnostic-20260911.BTTecu`
   rechecks all 200,004 actions / 49,652 updates and both complete frozen replays,
   preserving video RGB hashes, episode/life/bitmap accounting and 1,637 pins.
@@ -504,7 +521,13 @@ reliable learning.
   A once-only serial follower starts at 17:11:03 UTC on September 11 with 1,622
   pins: PID 42730/start ticks 1021056, bound to controller 36135/705957. It waits
   for actual breadth exit and complete raw checks, then Freeway and Pong in that
-  order. Neither fresh confirmation is training yet. Keep native f6a2b6ad and
+  order. The completed predecessor exits at 23:32:55; the follower observes it
+  at 23:33:06, launches the Freeway controller at 23:33:08 and starts fresh root
+  1009 training at 23:34:06 after full raw predecessor/pilot/runtime rechecks.
+  Actual startup verifies zero counters, no restore, the original LeVJEPA
+  encoder, N6/R256, 200,004 actions and probability .5/hold64 exploration.
+  Freeway roots 2017/3019, every fresh frozen/control pair and Pong remain
+  outstanding. This launch is not reliability. Keep native f6a2b6ad and
   matching sources 90b4763/24b2968; main's latest backend does not switch them.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
