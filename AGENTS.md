@@ -421,6 +421,16 @@ reliable learning.
   traces/v4 replays and combined learner/perception memory unqualified. Require
   a new declaration for those gates and a matched learning trial; update 1 already
   changes optimizer moments. This is not a speedup or a Breakout reliability result.
+  The separate CPU state inspector in `runs/breakout-action-state-20260911.lOcNzn`
+  passes 88 tests with 53 pins and exactly agrees on three qualified eighteen-action
+  saves. It permits only RSSM dynin2 weight and actor output weight/bias resizing
+  plus their six moments, retaining all 241 entries and actual encoder identity.
+  The old eighteen-action state helper stays pinned. All moments and the normalizer
+  must be truly zero at update 0; the real update-1 control already has 122 nonzero
+  moment tensors. Its generated four/eighteen-action files are synthetic fixtures,
+  not native saves/restores. The 86,184-byte logical state reduction is not measured
+  VRAM or a speedup. Preserve all outputs and 1,870 hardware pins; bind this checker
+  in a new native pixel declaration only after that gate. No pixel follower exists.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.

@@ -203,3 +203,48 @@ restore, native N6 pixel traces/v4 replay, and combined learner-plus-perception
 memory** unqualified. Update 1 is not zero-update state: optimizer moments already
 change. These remaining checks need a separate declaration before any action-width
 learning pilot. There is no speedup, new Breakout win or seed-reliability claim.
+
+## Action-width state inspector — completed CPU preparation
+
+The existing historical state helper binds its logical layout to eighteen
+actions, so it cannot certify the new four-action saves. Keep that pinned helper
+unchanged. The separate [CPU result](../../runs/breakout-action-state-20260911.lOcNzn/result.json)
+provides a strict inspector for the future runtime gate, with **88 passing tests
+and 53 evidence pins**. It accepts only the declared 12M recipes and these three
+production topology changes:
+
+| Parameter | Published shape | Minimal shape |
+| --- | --- | --- |
+| RSSM `world.dynamics.core.dynin2.weight` | `[18, 256]` | `[4, 256]` |
+| Actor `behavior.actor.out.weight` | `[256, 18]` | `[256, 4]` |
+| Actor `behavior.actor.out.bias` | `[18]` | `[4]` |
+
+Their six existing optimizer moments follow those shapes. All **241 entries**
+(95 parameter entries and 146 moments) remain mandatory; every other name,
+shape, dtype and optimizer membership stays fixed. This removes only **7,182
+parameter elements / 86,184 logical state bytes** including moments, not measured
+VRAM. Action simplification is a learning ablation, not a presumed memory or
+throughput fix.
+
+The inspector exactly agrees with the qualified checker on three real
+eighteen-action checkpoints: synthetic updates 1 and 8, and the N6 pixel save at
+610 updates. It hashes and checks every tensor, complete metadata and actual
+encoder identity. The real first-update save contains **122 nonzero optimizer
+moment tensors**; it is correctly rejected as zero-update state. Initial state
+requires all moments zero and the normalizer's actual native initial `(0, 0)`.
+
+Clearly named, CPU-generated four/eighteen-action files exercise full-size I/O,
+including all 92 same-shape initial parameter entries and 140 same-shape moments.
+These are **synthetic fixtures, not native initializations or restores**. Wrong
+action schemas, actual encoder files, torn payloads, old backend identity and
+update-one-as-zero state are rejected. Frozen-state checks retain weights,
+moments, normalizer, config, encoder and stream count, allowing only the declared
+action-counter increment.
+
+The one-core / 2 GiB / zero-swap CPU scope peaks at about **377.5 MiB host memory**.
+All 1,870 waiting hardware pins reverify before and after. No source, package,
+historical helper, checkpoint or queue changes; no GPU or production ML graph
+executes. Preserve the completed preparation and generated fixture labels. A
+future pixel declaration must bind this inspector to actual native captures and
+complete ledger/replay/memory evidence **after** the queued hardware gate; there
+is still no native four-action restore qualification or pixel follower.
