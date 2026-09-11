@@ -45,6 +45,13 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Breakout | No learned result yet | Fixed seed-0 training pilot active; fresh-seed confirmation still required afterwards. |
 | Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |
 
+The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
+affects the next runtime handoff: an unattended NVIDIA update left new user-space
+libraries mismatched with the loaded kernel driver. Breakout's existing trainer
+and logger continue on the original mapped libraries; fresh GPU status checks
+fail. Preserve training and the pinned guard, obtain approval for host repair,
+and requalify a changed driver before new long work. This is not a gameplay result.
+
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
 - [Boxing root 1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4),

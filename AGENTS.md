@@ -276,6 +276,15 @@ reliable learning.
   free through the save. The prefix remains explicitly incomplete; this is
   early health, not frozen competence. Preserve the completed inspection and
   its CPU import-name failure; do not rerun its exclusive archive operation.
+  At 06:42 UTC on September 11, an unattended host update installed NVIDIA
+  595.91.07 user-space while the loaded kernel remained 595.71.05. Fresh NVML
+  queries now fail with exit 18; the original Breakout trainer and declared
+  logger continue on old mapped libraries. Preserve the live training and all
+  pins; do not bypass the next device guard, restart the queue or change/reboot
+  the host without user approval. Read `docs/experiments/2026-09-11-host-driver-incident.md`
+  before the next runtime handoff. Its separately saved observer explicitly
+  uses the original logger and records the fresh query failure; this is not
+  recovered host health or qualification of the new driver.
   Preserve but never launch the superseded unstarted v1 root
   `runs/breakout-qbert-pilots-20260910.h0l2PM`. It incorrectly hardcoded Boxing's
   update count. Reset observations enter replay without action credit and can
