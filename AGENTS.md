@@ -431,6 +431,17 @@ reliable learning.
   not native saves/restores. The 86,184-byte logical state reduction is not measured
   VRAM or a speedup. Preserve all outputs and 1,870 hardware pins; bind this checker
   in a new native pixel declaration only after that gate. No pixel follower exists.
+  The capture library in `runs/breakout-pixel-capture-20260911.dJZZaz` passes
+  71 CPU tests with 184 pins, real 0591eda/abf4ae5d import/default-config checks
+  and the actual historical editable-package negative. It saves before/after
+  the unchanged loop and restores Python bindings on errors; fake-object tests
+  are not native save/restore or neutrality evidence. Its 3,840-action training
+  and 6/768/18,000-action frozen contracts are runtime fixtures, not changed game
+  budgets. Derive actual updates from the complete ledger, never fixture counters.
+  Importing it loads no Kindle/native module; direct execution refuses. Preserve
+  its inputs, original packages and all 1,870 hardware pins. There is no new GPU
+  entrypoint/follower; require captured/uncaptured native parity and complete
+  state/replay/memory checks in a separately declared post-hardware runtime gate.
   Retain source 24b2968/native f6a2b6ad, the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,
   complete checkpoint/replay/video checks and measured direct-free headroom.

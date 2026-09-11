@@ -248,3 +248,39 @@ executes. Preserve the completed preparation and generated fixture labels. A
 future pixel declaration must bind this inspector to actual native captures and
 complete ledger/replay/memory evidence **after** the queued hardware gate; there
 is still no native four-action restore qualification or pixel follower.
+
+## Capture harness — completed CPU preparation
+
+The [isolated capture library](../../runs/breakout-pixel-capture-20260911.dJZZaz/result.json)
+passes **71 CPU tests**, with **184 evidence pins**. It intercepts construction
+or restore, saves immediately before the original runner's loop, returns the
+actual object to that unchanged loop and saves again after normal return.
+Fresh training therefore captures zero-action/zero-update initialization, not
+the already-updated first learner state. Python bindings and arguments are
+restored on exceptions. Reused paths, symlink aliases and overlap with the source
+checkpoint are rejected.
+
+Its request contract is limited to short N6/R256/B16/T64/full-BPTT64 12M Breakout
+fixtures with four or eighteen actions: 3,840-action fresh training and fixed
+6/768/18,000-action frozen checks, including the existing one-episode-per-stream
+stopping/cap fixture. These are **runtime test budgets, not final game-evaluation
+budgets**. No exploration, greedy policy or restored-training overrides are added.
+Actual learner updates must come from the complete reset-dependent ledger, not
+the fake objects' counters. The library explicitly requires separate complete
+state and ledger audits; it cannot certify episode completion from counters alone.
+
+The lifecycle tests use fake objects, not native agents. Separate fresh-process
+checks verify real `0591eda`/`abf4ae5d` package/wrapper/runner imports and native
+default configuration for both action widths. The historical editable `f663dd93`
+package is actually imported and rejected as the wrong package, without changing
+it. Library import loads no Kindle/native module; direct execution refuses because
+there is **no declared GPU entrypoint**. The initial fake-factory recursion failure
+is preserved in development notes and was corrected only in the CPU fixture.
+
+The enforced one-core / 2 GiB / zero-swap scope peaks near **50.8 MiB host memory**;
+all 1,870 waiting hardware pins reverify. No native agent, GPU graph or pixel
+worker starts. A future runtime declaration must compare captured and uncaptured
+native controls for exact state/report/trace parity: saves outside the loop are
+not presumed neutral. Native initialization/restore, frozen v4 prefixes, full
+replay and combined-memory qualification remain required after the queued
+hardware gate. There is no additional follower or learning result.
