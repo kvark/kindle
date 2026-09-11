@@ -35,10 +35,12 @@ fn main() {
     let mut profile_directory = None;
     let mut checkpoint = None;
     let mut prediction_only = false;
+    let mut action_count = 18;
     while let Some(option) = args.next() {
         match option.as_str() {
             "--learn" => run_learner = true,
             "--prediction-only" => prediction_only = true,
+            "--actions" => action_count = parse_usize("action count", args.next()),
             "--repeat" => repetitions = parse_usize("repetition count", args.next()),
             "--updates" => updates = parse_usize("learner update count", args.next()),
             "--profile-dir" => {
@@ -46,12 +48,12 @@ fn main() {
             }
             "--checkpoint" => checkpoint = Some(args.next().expect("missing checkpoint path")),
             other => panic!(
-                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
+                "unknown option {other:?}; use --learn, --prediction-only, --actions N, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
             ),
         }
     }
 
-    let mut config = DreamerConfig::new(18);
+    let mut config = DreamerConfig::new(action_count);
     config.model_size = model_size;
     config.batch_size = 16;
     config.batch_length = 64;

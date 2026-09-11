@@ -1,12 +1,13 @@
 # Kindle working direction
 
-This worktree is the isolated minimal-action Breakout candidate on `24b2968`.
-It carries only the four native dependency/identity changes from `1e00e818`
-(Meganeura `ce80e9cd`) and stages explicit four-action replay/checkpoint checks.
-Collection, learning arithmetic and frozen episode-count stopping are unchanged.
-Both future learning arms must use this same source-matched new-backend package;
-the historical 18-action pilot is not its matched control. This is not runtime
-qualification, a learning result, a GPU follower or an adopted action protocol.
+This worktree isolates four-action GPU test fixtures on `0591eda`; it does not
+replace that candidate's frozen source or CPU-qualified abf4ae5d package in
+`runs/breakout-minimal-package-20260911.fwfepW`. Changes belong only to cfg(test)
+fixtures and the synthetic canary example. Production learning/inference code,
+Python collection/replay and dependency identities remain unchanged. The native
+package for any later learning comparison is still the separately pinned bundle.
+Preserve the original test executables and default eighteen-action arithmetic.
+These fixtures are not GPU qualification, a learning result or a new follower.
 Follow the primary checkout's current status: Qbert is active in
 `runs/atari-driver-continuation-20260911.LR9yT3`, followed by the fresh Freeway then
 Pong confirmations in `runs/atari-recovered-confirmations-20260911.xPz5ud`.

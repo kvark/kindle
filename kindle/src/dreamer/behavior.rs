@@ -197,6 +197,10 @@ pub fn build_value_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
 }
 
 #[cfg(test)]
+#[path = "behavior_parity.rs"]
+mod parity;
+
+#[cfg(test)]
 mod tests {
     use std::sync::Arc;
 
