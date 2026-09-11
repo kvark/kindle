@@ -2,9 +2,10 @@
 
 Started September 10 at **04:40 UTC**, initially waiting on the actual live
 Boxing controller. Its three-seed confirmation completed normally at **00:51:13
-UTC on September 11**; the follower launched the current episode runtime gate at
-**00:51:16 UTC**. This supplies scheduling, not a new learning recipe or relaxed
-acceptance. The five-game objective remains incomplete.
+UTC on September 11**. The current episode runtime gate then completed at
+**01:36:19 UTC**, and Breakout training started at **01:36:44 UTC** after complete
+raw runtime revalidation. This supplies scheduling, not a new learning recipe
+or relaxed acceptance. The five-game objective remains incomplete.
 
 The separate follower is
 `runs/atari-serial-handoff-20260910.zF8Hfh/follow_queue.py`, with **756 content
@@ -15,21 +16,33 @@ check confirmed it was sleeping on the bound live parent with no child. The
 initial GPU worker was Boxing's native worker 2303477; those original processes
 have now exited normally.
 
-The active runtime controller launched as PID **2449191/start ticks 116003083**.
+The completed runtime controller launched as PID **2449191/start ticks 116003083**.
 Its [Boxing predecessor proof](../../runs/current-episode-runtime-20260910.uRF9VK/boxing-proof.json)
 independently reconstructs all three paired results, six checkpoints/replays,
 18 commands and 12 GPU windows before its first GPU phase at **00:51:36 UTC**.
 The completed Boxing result SHA-256 is
 `cbbb598c4e3f4476de8899afe77a4c93b8df18eef5a1c46306f94077958b84b7`.
-This verifies the handoff prerequisite, not the unfinished runtime gate.
+The [complete runtime gate](2026-09-09-episode-evaluation.md#completed-current-package-evidence)
+now independently passes all twelve commands/eight GPU phases, exact default
+state/reports/traces, full frozen state/prefixes and ≥3,302 MiB directly free.
+Its completed SHA-256 is
+`300bd8bcc53666b3df11ed61093fdedee76b09c6c58de74ab4b6b203dfe04d3c`.
+
+After the gate's actual exit, the follower launched the B/Q controller at
+**01:36:20 UTC**, PID **2454804/start ticks 116273468**. Its
+[raw runtime proof](../../runs/breakout-qbert-pilots-v2-20260910.9zf9T3/runtime-proof.json)
+matches the independent full audit. Only then did the first Breakout native
+process start at **01:36:44 UTC**, PID **2455288/start ticks 116275878**.
+Reverify current process identities; startup is not a completed learning result.
 
 ## Fixed order
 
 Following the completed Boxing training/frozen/untrained sequences:
 
-1. Run the current-package episode-count runtime gate, retaining its full
+1. Complete: current-package episode-count runtime gate, with full
    default-learning, frozen-prefix, state and memory checks.
-2. Run the corrected seed-0 [Breakout/Qbert pilots](2026-09-10-breakout-qbert-pilots.md).
+2. Active: corrected seed-0 [Breakout/Qbert pilots](2026-09-10-breakout-qbert-pilots.md),
+   Breakout first and Qbert still queued.
 3. Run the corrected fresh three-seed [Freeway confirmation](2026-09-10-freeway-confirmation.md).
 4. Run the fresh larger-budget [Pong confirmation](2026-09-10-pong-confirmation.md).
 
@@ -45,9 +58,9 @@ It waits for the actual child exit before advancing and requires the matching
 declared data/runtime completion record. Valid competence failures remain
 failures and allow other games/seeds to proceed. A failed process, incomplete
 result, changed input, runtime-safety failure or timeout stops the handoff.
-There are no retries, restarts or replacement outputs. The runtime gate is the
-only launched successor; Breakout/Qbert, Freeway and Pong remain queued. Do not
-manually launch another worker alongside this follower.
+There are no retries, restarts or replacement outputs. Breakout is active;
+Qbert, Freeway and Pong remain queued in order. Do not manually launch another
+worker alongside this follower.
 
 ## Safety and evidence
 

@@ -42,7 +42,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is queued. |
-| Breakout | No learned result yet | Fixed seed-0 pilot queued; fresh-seed confirmation still required afterwards. |
+| Breakout | No learned result yet | Fixed seed-0 training pilot active; fresh-seed confirmation still required afterwards. |
 | Qbert | No learned result yet | Fixed seed-0 pilot queued; first-pyramid completion alone will not pass sustained competence. |
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
@@ -159,8 +159,8 @@ order and checks actual predecessor process identities and complete raw evidence
 
 ~~~text
 Boxing: three fresh roots + final evaluations + untrained controls [complete]
-  -> current-package episode-evaluation runtime gate [active]
-  -> corrected Breakout pilot -> corrected Qbert pilot
+  -> current-package episode-evaluation runtime gate [complete]
+  -> corrected Breakout pilot [active] -> corrected Qbert pilot
   -> corrected Freeway three-root confirmation
   -> fresh longer-budget Pong three-root confirmation
 ~~~
@@ -172,10 +172,12 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
 - [Current episode evaluation](experiments/2026-09-09-episode-evaluation.md):
   the previous-package stopping implementation passed after a declared
   continuation of an interrupted gate. The unchanged-native current Python
-  bundle's training/frozen-prefix/state/memory check is now active after full
-  Boxing revalidation; it is not yet runtime-qualified.
+  bundle now passes all eight native phases: exact default learning and frozen
+  prefixes/state, correct episode stopping and direct-memory coverage. It is
+  qualified for the separately declared protocols, not a learning or speedup result.
 - [Corrected Breakout/Qbert pilots](experiments/2026-09-10-breakout-qbert-pilots.md):
-  fresh seed 0, 200,004 actions each, no exploration overrides. Frozen v4 targets
+  Breakout is training after full runtime revalidation; Qbert follows. Each uses
+  fresh seed 0, 200,004 actions and no exploration overrides. Frozen v4 targets
   four completed episodes per stream with a 600,000-action hard cap, plus matched
   untrained controls. Cap exhaustion before the episode target is incomplete.
   Pilots do **not** replace later fresh three-seed confirmation.
@@ -289,7 +291,7 @@ cache-alias corrections. Blade is 0.9.0; minimum Rust is 1.92. Production gradie
 cache parity, complete learning-state/trace pairs and memory gates pass.
 The dependency update showed **no measured speedup**.
 
-The September 10 16:29 UTC remote check found newer main `ce80e9cd`. It fixes
+The September 11 remote recheck still finds newer main `ce80e9cd`. It fixes
 generated matmul epilogues and includes the required LeVJEPA cache fixes upstream.
 Isolated dependency-only candidate `1e00e818` passes 95 Rust, 547 Python and 80
 focused backend CPU tests with source/wheel/import identity verified. It is
@@ -480,9 +482,10 @@ accounting do not support an apples-to-apples superiority claim. Keep exact
 historical pins in their manifests and the [native frontend](../kindle/src/vision/mod.rs),
 not a moving label in the roadmap.
 
-Boxing's confirmation is complete. The immediate decision sequence remains fixed:
-qualify the current episode rule, run the declared breadth/Freeway/Pong sequence,
-then use actual results to declare the missing Breakout/Qbert fresh confirmations
+Boxing's confirmation and current episode runtime qualification are complete.
+The immediate decision sequence remains fixed: finish the active Breakout pilot
+and declared Qbert/Freeway/Pong sequence, then use actual results to declare the
+missing Breakout/Qbert fresh confirmations
 or a bounded repair experiment. Separately qualify the latest Meganeura and
 world-model diagnostic candidates when the shared GPU is available, without
 changing or displacing pinned work. Optimize measured costs, not activity percentage.

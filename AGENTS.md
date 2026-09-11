@@ -62,7 +62,7 @@ reliable learning.
   optimizer moments on restore, excluding only plan-identified Winograd caches.
   Keep backend identity checks and historical executables intact.
   The current backend is 4d45ba3a: upstream runtime e59bd32d plus the required
-  cache corrections. The September 10 16:29 UTC remote check finds main ce80e9cd,
+  cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated
   matmul epilogues and now includes the required LeVJEPA cache patches upstream.
   The isolated 1e00e818 candidate at `exp/meganeura-upstream-20260910` changes
@@ -238,31 +238,33 @@ reliable learning.
   See `docs/experiments/2026-09-10-boxing-confirmation.md`. Keep optional
   world-sync fan-out separate; its ~16 ms/update scope must not indefinitely
   displace actual learning, and its old-backend CPU checks are not adoption.
-  The Python-only episode-count carry is now staged at `exp/current-episode-evaluation`
-  (`24b2968`), with all 580 CPU tests passing on the unchanged f6a2b6ad native.
+  All three first 20,004-action / 4,651-update Boxing saves are archived, with
+  all 241 tensor entries complete/finite and prefix GPU coverage retaining at
+  least 3,302 MiB directly free. Preserve these completed early-health snapshots;
+  they never replace the declared final frozen models or all-seed gates.
+  The Python-only episode-count carry at `exp/current-episode-evaluation`
+  (`24b2968`) passes all 580 CPU tests on the unchanged f6a2b6ad native.
   `runs/current-episode-package-20260910.etyDN4` binds the source-matched bundle
-  and evidence with 61 pins. It has no completed current-package GPU gate or
-  runtime adoption. Preserve its candidate inputs. The executable gate in
+  and evidence with 61 pins. Its complete current-package runtime gate in
   `runs/current-episode-runtime-20260910.uRF9VK`, with 498 pins and 47 passing
-  CPU tests, started its first native phase at 00:51:36 UTC on September 11,
-  after the serial follower observed Boxing's actual exit and the gate
-  independently reverified all three trained/untrained results, complete state,
-  replays, 18 commands and 12 GPU windows. The gate is active, not passed or
-  adopted. Require all eight serialized native phases and their complete default-
-  learning, frozen-prefix, state and direct-memory checks. The earlier actual
-  live-parent refusal remains valid negative evidence. Competence failures remain
-  failures, not incomplete data or five-game success. Keep the gate's inputs fixed;
-  no new long-run learning declaration is supplied by this gate. All three first 20,004-action /
-  4,651-update saves are archived, with all 241 tensor entries complete/finite
-  and prefix GPU coverage retaining at least 3,302 MiB directly free. Root 3019's
-  current-schema/encoder and exact 4,651-report prefix checks also pass. Preserve
-  these completed snapshots; they are early state health, never replacements
-  for the declared final frozen models or all-seed gates.
-  The first Breakout/Qbert seed-0 pilots are now conditionally declared in
+  CPU tests, finished normally at 01:36:19 UTC on September 11. Independent raw
+  rechecking passes all 12 commands/eight GPU phases, exact default-learning
+  state/reports/traces and retained anchor, full frozen state and exact prefixes.
+  Episode stopping occurs at 10,716 actions; the six-action negative cap remains
+  incomplete as required. Directly free memory stays at least 3,302 MiB. The
+  single-pair throughput ratio 1.002376 clears the regression guard, not a speedup
+  gate. This qualifies the bundle for the separately declared new protocols;
+  it does not reinterpret historical fixed-action evaluations or establish
+  learning. Preserve all completed inputs and the earlier live-parent refusal;
+  do not restart this gate. See `docs/experiments/2026-09-09-episode-evaluation.md`.
+  The first Breakout/Qbert seed-0 pilots are now running in
   `runs/breakout-qbert-pilots-v2-20260910.9zf9T3`, with 521 pins and 92 passing CPU
-  tests. Their actual CLI refuses the live Boxing predecessor before GPU work;
-  no pilot worker is active. The separate serial follower requires complete
-  current-episode runtime evidence before launch. Each game gets 200,004 fresh R256 actions,
+  tests. The existing serial follower launched the worker after the runtime
+  gate's actual exit. It independently reverified the complete raw runtime proof
+  before fresh Breakout training started at 01:36:44 UTC on September 11.
+  Actual startup confirms source 24b2968/native f6a2b6ad, the encoder, fresh
+  seed 0/zero counters and no restore or overrides. Qbert remains queued; no
+  learned frozen result is available yet. Each game gets 200,004 fresh R256 actions,
   no exploration overrides, final-checkpoint v4 evaluation with four completed
   episodes per stream/cap 600,000 actions, and a separately restored untrained
   control. Keep all outcomes, task thresholds and fresh-seed requirements;
@@ -511,11 +513,12 @@ reliable learning.
   `runs/atari-serial-handoff-20260910.zF8Hfh` started at 04:40 UTC on September 10,
   with 756 pins and 52 passing CPU scheduling tests. PID 2318785/start ticks
   108736692 originally bound Boxing controller 2303115/107474767. Boxing has
-  exited normally, and the follower launched the unchanged episode runtime gate
-  at 00:51:16 UTC on September 11. Reverify actual live identities; its gate
-  controller at launch is 2449191/start ticks 116003083. Corrected B/Q, corrected
-  Freeway and Pong entrypoints remain queued in order. Each still checks its full
-  raw predecessors before GPU work. Valid task failures remain failures;
+  exited normally, and the unchanged episode runtime gate completed at 01:36:19
+  UTC on September 11. The follower then launched the corrected B/Q controller,
+  PID 2454804/start ticks 116273468. Breakout is active after its complete raw
+  runtime check; Qbert, corrected Freeway and Pong remain queued in order.
+  Reverify actual live identities. Each still checks its full raw predecessors
+  before GPU work. Valid task failures remain failures;
   incomplete data, integrity/runtime failure or a changed stage stops the handoff
   without retries. Preserve all inputs and do not manually launch duplicate
   successors, restart this follower or displace it with GPU-heavy diagnostics.

@@ -1,7 +1,8 @@
 # Bounded episode-budgeted frozen evaluation
 
-Staged on 2026-09-09 in `exp/episode-budget-evaluation`. This is a Python-only
-candidate, not an adopted evaluation protocol, GPU speedup or learned result.
+Initially staged on 2026-09-09 in `exp/episode-budget-evaluation`. The Python-only
+stopping rule now passes the complete current-package runtime gate below and is
+used by separately declared pilots. This is not a GPU speedup or learned result.
 All 580 Python CPU tests pass, including fabricated unequal-length vector
 episodes and stopping-rule failures. Four actual old N6 train/frozen ledgers
 retain exactly their saved v2 accounting. No native source or live input changed.
@@ -47,8 +48,8 @@ benchmark or playing-plus-training speed claim. See
 uses `kindle-vector-v4`; `--steps` is an explicit hard cap. The proposed
 N6 Breakout/Qbert evaluation uses four completed episodes per stream and a
 600,000-action cap. The [new pilot declaration](2026-09-10-breakout-qbert-pilots.md)
-now pins these settings, but remains conditional on complete current-package
-runtime qualification. Existing fixed-action evaluations remain unchanged.
+pins these settings and its complete current-package runtime prerequisite now
+passes. Existing fixed-action evaluations remain unchanged.
 
 - Stop at the first fully accounted vector tick when **every** stream has
   reached its episode target. Do not stop on reward, task success, or only the
@@ -99,8 +100,8 @@ coverage/reserve checks. Validate the native path rather than relying only
 on fabricated CPU streams. Do not insert work into the current pinned queues;
 Freeway, common-world, the exploration gate and its declared learning pilot
 completed in that order. The following frozen-only GPU gate is now complete
-through its separately declared continuation; no new long learning run has
-been launched.
+through its separately declared continuation; that gate itself launched no
+long learning run.
 
 The cap-check manifest SHA-256 is
 `7107388290448246c77e46db85fcc133e472d80ec31a628cd195b2ce207d657f`;
@@ -197,7 +198,7 @@ or provide a speed benchmark. Preserve both artifact roots; neither queue
 should restart. The newly requested backend refresh now precedes the unrun
 world-sync comparison, without altering that candidate's pinned inputs.
 
-## Current-backend carry: GPU gate active
+## Current-backend carry: runtime qualification complete
 
 The isolated `exp/current-episode-evaluation` candidate at **24b2968** carries
 exactly the four Python implementation/test files from `4281242` onto the
@@ -211,9 +212,10 @@ records 61 pins, the clean source commit, exact earlier Python-file identities,
 unchanged native inputs/bytes, actual test exits and the complete test XML.
 Its SHA-256 is `9ee5b4eac750fa802016bc5a2a25db9c0641e2c82d99e17d00f7f237739132cb`.
 
-The current-package GPU gate below is now running; this bundle is not yet
-runtime-qualified. Its default-training check compares state/reports/traces
-against the retained pixel control. It also covers frozen default/v4 prefixes,
+The current-package GPU gate below completed normally on September 11; this
+bundle is runtime-qualified for the separately declared protocols. Its default
+training check compares state/reports/traces against the retained pixel control.
+It also covers frozen default/v4 prefixes,
 a negative cap case, complete frozen state and direct-memory coverage. Keep all
 current queues fixed.
 The separate Breakout/Qbert pilot declaration now supplies fixed learning budgets
@@ -248,9 +250,47 @@ speedup claim. The capture implementation is byte-identical to the earlier gate.
 
 The [serial follower](2026-09-10-atari-serial-handoff.md) observed Boxing's actual
 normal exit and launched this unchanged gate at **00:51:16 UTC on September 11**.
-Its controller launched as PID **2449191/start ticks 116003083**; recheck actual
-live identities. After full predecessor verification, the first native control
-training phase started at **00:51:36 UTC**. The gate is active, not passed or
-adopted; require all eight native phases and their full comparisons. Keep its
-498 pins fixed and do not manually launch a duplicate. The separately declared
-Breakout/Qbert pilots remain conditional on this gate; it starts no long run.
+Its controller launched as PID **2449191/start ticks 116003083**. After full
+predecessor verification, the first native control training phase started at
+**00:51:36 UTC**. All phases completed normally at **01:36:19 UTC**; that
+controller and its children have exited. Preserve all 498 pins and completed
+artifacts; do not restart the gate.
+
+### Completed current-package evidence
+
+An independent CPU audit reconstructs all twelve actual commands and eight
+native phases, their exits/output identities and non-overlap, both default
+learning trials, all four frozen captures and all raw GPU windows. It also
+reverifies the complete Boxing prerequisite and source/native/encoder identities.
+
+The fresh default pair each completes **3,840 training actions / 610 updates**
+and 768 frozen actions. Complete saved state, all 610 non-timing learner reports
+and action/reward/episode/reset traces match exactly between packages and the
+retained current-backend pixel anchor. Candidate/control throughput is
+**1.002375915**, passing the ≥.98 regression guard. This single pair is not an
+AB/BA speedup measurement.
+
+| Frozen capture | Actual actions | Completed episodes per stream | Stop reason |
+| --- | ---: | --- | --- |
+| Control fixed | 18,000 | 1 / 1 / 1 / 1 / 1 / 1 | `budget_complete` |
+| Candidate episode budget | 10,716 | 1 / 1 / 1 / 1 / 1 / 1 | `episode_budget_complete` |
+| Candidate fixed | 18,000 | 1 / 1 / 1 / 1 / 1 / 1 | `budget_complete` |
+| Candidate negative cap | 6 | 0 / 0 / 0 / 0 / 0 / 0 | `action_cap_reached` |
+
+All four retain complete frozen model/optimizer/normalizer state and zero
+updates. The complete fixed traces and both shorter prefixes match exactly;
+the episode-budget run stops at the first eligible vector tick. The negative
+cap remains an incomplete episode budget, as required, not a failed gate.
+
+All eight raw GPU windows pass coverage and the directly-free reserve check:
+minimum **3,302 MiB**, maximum sample gap **0.267 s**, reserved memory **462 MiB**.
+Construction is included in phase coverage; short-phase activity averages are
+not warmed training throughput or verified idle-gap measurements.
+The [completed result](../../runs/current-episode-runtime-20260910.uRF9VK/completed.json)
+SHA-256 is `300bd8bcc53666b3df11ed61093fdedee76b09c6c58de74ab4b6b203dfe04d3c`.
+
+The existing serial follower then launched the separately declared Breakout/Qbert
+worker. Its [runtime proof](../../runs/breakout-qbert-pilots-v2-20260910.9zf9T3/runtime-proof.json)
+equals the independent full audit before the first Breakout training process
+started at **01:36:44 UTC**. This uses the qualified bundle under that declaration;
+it neither changes historical fixed-action evaluations nor establishes learning.

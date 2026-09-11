@@ -1,6 +1,7 @@
 # First Breakout and Qbert learning pilots
 
-Declared September 10, before either game is trained. **Not running.** These
+Declared September 10, before either game was trained. **Breakout training is
+active**, starting at 01:36:44 UTC on September 11; Qbert remains queued. These
 are fixed-budget seed-0 pilots, not fresh-seed confirmation or learned wins.
 
 The corrected v2 worker in `runs/breakout-qbert-pilots-v2-20260910.9zf9T3` has
@@ -11,10 +12,21 @@ reports, traces, frozen prefixes, twelve declared commands and eight GPU
 memory/coverage windows. A completion flag alone is insufficient.
 
 The actual pilot CLI was tested while the bound Boxing controller was live.
-It refused before any GPU query, native construction or run outputs. No pilot
-worker is active. The separate [serial follower](2026-09-10-atari-serial-handoff.md)
-now waits on Boxing and retains the full runtime prerequisite before these
-pilots. Preserve all inputs and do not manually launch a duplicate worker.
+It refused before any GPU query, native construction or run outputs. That
+negative check remains preserved. The separate
+[serial follower](2026-09-10-atari-serial-handoff.md) observed the runtime gate's
+actual normal exit and launched this worker at 01:36:20 UTC. Its complete
+[runtime proof](../../runs/breakout-qbert-pilots-v2-20260910.9zf9T3/runtime-proof.json)
+equals an independent raw audit before the first native process started.
+
+The actual Breakout startup header verifies the declared N6/R256 recipe,
+source 24b2968/native f6a2b6ad and encoder identity, fresh seed 0 with zero
+initial counters, no restored checkpoint and no exploration overrides. The
+controller launched as PID 2454804/start ticks 116273468; the first trainer as
+PID 2455288/start ticks 116275878. Recheck live identities rather than assuming
+these remain active. All 521 pilot, 498 runtime and 756 follower pins reverify.
+This is startup evidence only; no final frozen result exists yet. Preserve all
+inputs and do not manually launch a duplicate worker.
 
 ## Fixed comparison
 
@@ -105,9 +117,9 @@ Per-game replay declarations bind back to that manifest and its content pins.
 `cpu-tests.xml` contains implementation checks, not learning results;
 `live-parent-refusal.json` records the actual negative launch check.
 
-After all prerequisites complete, the declared worker is `run_pilots.py`.
-It starts no automatic follow-up. Per-game training, evaluation, replay/video,
-untrained-control and score artifacts appear only when their phases finish.
+The active declared worker is `run_pilots.py`; the outer follower owns scheduling.
+The worker itself starts no automatic follow-up. Per-game training, evaluation,
+replay/video, untrained-control and score artifacts appear only when their phases finish.
 `completed.json` requires both complete pilots and controls, including valid
 competence failures. It can never certify training-seed reliability or completion
 of the five-game goal. There are no Breakout/Qbert rollout results to view yet.
