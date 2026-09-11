@@ -450,8 +450,22 @@ reliable learning.
   before use. Keep historical prerequisite/measurement imports separate from new
   native/state/ledger/replay processes: their native packages and modules named
   checks differ. Actual import-only probes verify both paths, not GPU execution.
-  The measured controller and ten replay bindings remain unconnected; all pixel
-  qualification flags stay false. Preserve this preparation and all queue inputs.
+  The measured controller and ten replay bindings are now CPU-prepared in
+  `runs/breakout-pixel-controller-20260911.udgKEF`: 101 tests, 2,037 pins and three
+  actual declare/run/audit refusals of the live hardware follower. Its 43-command
+  sequence covers 16 native phases, their full state/ledger audits, ten complete
+  replays and a final independent matrix audit. Real-ALE fixtures retain 36,000
+  collected and 36,000 independently replayed actions with explicitly fake actors;
+  the native header checker rejects them. They are not native runtime or wins.
+  The actual historical measurement chain imports preserved 9cd176c1, not the
+  prerequisite auditor's f6a2b6ad or new abf4ae5d; keep all new audits in fresh
+  source-matched processes. Old Boxing timing-helper equivalence is not new
+  Breakout timing. The prepared within-width capture regression guard is 0.98
+  over 1,536 actions / 384 updates with actual-frame clocks; one pair per width
+  is not AB/BA or a speedup claim. All pixel qualification flags remain false.
+  There is still no GPU declaration or pixel follower; require actual complete
+  hardware/prerequisite proof before declaring it. Preserve all completed CPU
+  evidence, fixture-development failures and unchanged queue inputs.
   The recovered Breakout/Qbert worker retains source 24b2968/native f6a2b6ad,
   the original recipes and task criteria,
   four frozen episodes per stream/cap 600,000, actual reset-dependent updates,

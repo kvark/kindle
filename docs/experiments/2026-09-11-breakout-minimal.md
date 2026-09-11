@@ -361,7 +361,62 @@ whole-matrix qualification and learning-quality flags false.
 
 The one-core / 2 GiB / zero-swap CPU scope peaks near **58.2 MiB host memory**;
 all 1,870 waiting hardware pins reverify. Preserve this completed preparation.
-The measured controller and ten replay bindings still need connecting before a
-new runtime declaration. Keep new state/ledger/replay audits in source-matched
-fresh processes if that controller imports historical measurement helpers.
-No pixel worker, four-action native restore, adoption or learning result exists.
+The controller preparation below now connects the measured sequence and ten
+replay bindings. Keep new state/ledger/replay audits in source-matched fresh
+processes if that controller imports historical measurement helpers. No pixel
+worker, four-action native restore, adoption or learning result exists.
+
+## Measured pixel controller — completed CPU preparation
+
+The [controller result](../../runs/breakout-pixel-controller-20260911.udgKEF/result.json)
+passes **101 CPU tests**, with **2,037 evidence pins**. All seven preparation
+command exits/output hashes independently reverify, including three actual
+declare/run/audit refusals of the still-live hardware follower. It creates
+**no GPU declaration or pixel follower**. The current learning and hardware
+queues, packages and 1,870 hardware / 1,990 execution pins stay unchanged.
+
+The prepared runtime has **43 serial commands**: sixteen native phases, sixteen
+fresh-process complete state/ledger audits, ten full frozen replays and one
+matrix audit. Plain controls invoke the original runner; captured controls use
+the pinned executor. The final verifier independently recomputes all state,
+ledger and replay evidence, binds native log times to successful process windows,
+and checks every raw GPU window against the unchanged direct-free/coverage gate.
+It cannot infer runtime qualification from saved pass flags alone. The negative
+six-action cap stays incomplete and is covered only through its complete fixed
+replay's exact prefix.
+
+Unlike the earlier package replay fixtures, these integration tests use the
+**unchanged complete-run reader**, not a stub. Two real-ALE fixtures each collect
+18,000 actions and independently replay all 18,000: **36,000 collected plus
+36,000 replayed interactions**, across four/eighteen-action vocabularies and
+natural episode boundaries. Their explicitly fake actors construct no native
+agent, consume no observations and perform no learning. The native runtime
+header auditor rejects them. Their
+[retained raw fixtures](../../runs/breakout-pixel-controller-20260911.udgKEF/ale-fixtures)
+validate replay/accounting integration, **not Kindle wins or native qualification**.
+Controller lifecycle, GPU and positive declaration fixtures remain fabricated.
+
+The actual historical measurement helper imports preserved `9cd176c1`; this is
+different from both the prerequisite auditor's `f6a2b6ad` and the new `abf4ae5d`
+package. Fresh-process import probes bind these paths without changing them or
+constructing native agents. The new timing reader exactly matches the old helper
+on its qualified Boxing recording; that is historical equivalence, not a new
+Breakout timing result. New native state/ledger/replay checks never share the
+measurement process's imported package.
+
+Before native data, the preparation fixes the capture throughput guard at
+**≥0.98 of its same-width plain control**, measured over actions 2,304–3,840:
+1,536 interactions / 384 updates, using actual emulator frames and stage times.
+There is one plain/captured pair per width, not AB/BA; this is a regression guard,
+not a speedup gate or a comparison of learning quality. Full state/report/trace
+equality within each width remains mandatory. A real declaration must bind these
+settings only after complete hardware and prerequisite proof.
+
+The enforced one-core / 2 GiB / zero-swap scope peaks at **84.9 MiB host memory**.
+[Development notes](../../runs/breakout-pixel-controller-20260911.udgKEF/development-notes.md)
+retain the fabricated missing-protocol, path-normalization and small-`/tmp`
+fixture failures. The real 16 GiB disk guard was not weakened; a low-space
+negative now tests its refusal explicitly. No production ML graph or GPU work
+ran. Preserve this completed one-shot preparation and archive; native captures,
+restores, combined memory and timing still need actual runtime evidence before
+a paired learning declaration. No new adoption or game reliability is claimed.
