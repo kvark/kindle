@@ -198,13 +198,6 @@ and all **1,608 experiment pins** reverify; the capped CPU process peaks at
 all completed exclusive writers and the earlier inspection's historically
 incomplete control status; the later paired result supplies completion.
 
-The existing controller starts **fresh root 2017 at 07:25:38 UTC**. Its
-[actual startup header](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed2017-train.jsonl)
-verifies zero starting counters, no restore, the exact encoder/native/source,
-disjoint declared seeds and the unchanged N6/R256/.5-hold64 recipe. Training is
-running; no final score or new reliability result is available. Root 3019 and
-all three Pong roots remain queued.
-
 ### Bounded post-hoc behavior check
 
 The [CPU action/reference readout](../../runs/freeway-1009-behavior-20260912.qdz9AI/result.json)
@@ -226,6 +219,36 @@ roots finish. This is **not** proof of visual-feedback use, planning, a world-mo
 failure or the cause of seed variation. Training discovered rewards and remained
 finite; neither reward starvation nor numerical collapse is established here.
 No new learning recipe, GPU declaration or follower is introduced.
+
+### Freeway root 2017: first-save health
+
+The existing controller starts **fresh root 2017 at 07:25:38 UTC**. Its
+[actual startup header](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed2017-train.jsonl)
+verifies zero starting counters, no restore, the exact encoder/native/source,
+disjoint declared seeds and the unchanged N6/R256/.5-hold64 recipe.
+
+Its first save completes at **08:03:49 UTC**, with **20,004 actions / 4,651
+updates**. The [separate preserved archive](../../runs/freeway-2017-first-save-20260912.gRo8QA/result.json)
+passes all 241 finite tensor entries/146 optimizer moments, actual encoder,
+source-matched prefix ledger and wrong-counter negative. All **28 pins** and
+all 4,651 finite learner reports independently reverify. The prefix contains
+**81 distinct positive reward events**; its first six natural returns are
+**6 / 9 / 3 / 5 / 4 / 2** under assistance. These are early health observations,
+not unassisted competence or a prediction of the final score.
+
+All **9,154 prefix GPU samples** pass coverage, with maximum gap .268 seconds
+and at least **3,303 MiB directly free**. The one-core / 2 GiB / zero-swap
+archive process peaks at **255.87 MiB host memory** and constructs no agent.
+Preserve its completed exclusive writer and original source; this copy never
+replaces the declared final model. Training continues toward 200,004 actions;
+root 3019 and all three Pong roots remain queued.
+
+The [ad-hoc monitor note](../../runs/freeway-2017-first-save-20260912.gRo8QA/monitor-note.md)
+preserves an earlier live-tail count/gap assertion. Rereading the actual logger
+finds no gap or memory breach; its exact failing tail output was not captured,
+so a concurrent-append row-count race remains a hypothesis. The bounded EOF
+reader changes no pinned auditor, acceptance gate, logger or learner. No
+process was restarted and no new GPU work was launched.
 
 ### Remaining queue requirements
 

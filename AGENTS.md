@@ -615,6 +615,12 @@ reliable learning.
   all completed inspection writers. The existing controller starts fresh root
   2017 at 07:25:38. Its actual header verifies zero counters, no restore and the
   unchanged LeVJEPA/N6/R256/hold64 recipe. Root 3019 and Pong remain queued.
+  Root 2017's 08:03:49 first save is preserved in
+  `runs/freeway-2017-first-save-20260912.gRo8QA`: 20,004 actions / 4,651 updates,
+  all 241 finite entries/146 moments and 28 pins reverify. Its 81 positive events
+  are assisted early health, not frozen competence. All 9,154 prefix GPU samples
+  retain at least 3,303 MiB free. Preserve this completed exclusive archive and
+  its ad-hoc monitor note; no pinned gate, learner or queue was changed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,
