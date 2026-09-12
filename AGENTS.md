@@ -631,9 +631,15 @@ reliable learning.
   pins reverify in `runs/freeway-2017-final-training-20260912.AxpiAZ`.
   All 93,584 raw training GPU samples pass with at least 3,302 MiB directly free.
   The actual 13:56:05 frozen startup restores the exact final files/counters
-  without assistance. Its 75k result and same-seed untrained control remain
-  pending; root 3019 and Pong stay queued. Preserve the completed inspection
-  writer and normal handoff; no new competence or reliability is claimed.
+  without assistance. Its 75k frozen evaluation completes at 14:35:23: only
+  3/36 natural rounds qualify, mean 22.7778, with no updates/cutoffs. Both
+  competence thresholds fail. The separate `frozen-result.json` rechecks the
+  unchanged complete state, score/replay/video, 11 input/result pins and all
+  9,421 raw frozen GPU samples with at least 3,413 MiB free. The six-action
+  untrained save and actual 14:37:15 evaluator startup reverify all 146 zero
+  moments, zero normalizer and exact restore files/counters. Its 75k result
+  remains pending; root 3019 and Pong stay queued. Preserve both completed
+  inspection writers and the failed frozen result; no reliability is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,

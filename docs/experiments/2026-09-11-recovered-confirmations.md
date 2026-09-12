@@ -268,7 +268,7 @@ so a concurrent-append row-count race remains a hypothesis. The bounded EOF
 reader changes no pinned auditor, acceptance gate, logger or learner. No
 process was restarted and no new GPU work was launched.
 
-### Freeway root 2017: completed training, frozen evaluation running
+### Freeway root 2017: failed frozen gate
 
 Training exits normally at **13:56:01 UTC on September 12**, with **200,004
 actions / 49,651 updates** and zero remaining training debt. The separate
@@ -297,9 +297,35 @@ frozen evaluator at **13:56:05 UTC**. Its actual process and restore header bind
 the exact final files, **200,004 / 49,651** starting counters, unchanged
 LeVJEPA/source/native identities and sampled v2 75,000-action protocol, without
 exploration overrides. The old trainer monitor closes on this normal process
-transition; no queue is restarted. Frozen scoring, whole replay/video and the
-separately restored same-seed untrained control remain pending. Root 3019 and
-all three Pong roots are still queued; no new competence result is claimed.
+transition; no queue is restarted.
+
+Frozen evaluation exits normally at **14:35:23 UTC** after all **75,000 actions**,
+with **36 natural rounds**, no cutoffs and no learner updates. Only **3/36 rounds
+(8.33%)** reach 25 crossings; mean return is **22.7778**. Both the unchanged
+90%-success and mean-25 thresholds fail. The separate
+[frozen-result inspection](../../runs/freeway-2017-final-training-20260912.AxpiAZ/frozen-result.json)
+rechecks the complete unchanged trained state, source-matched ledgers, score,
+whole replay and [stream-zero video](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed2017-evaluation.mp4).
+All **11 result/input pins** and **1,608 experiment pins** reverify. The result
+SHA-256 is `3f0e85d71072b22d3b410b10f609c1c1caff92a7fde9f3b1dc78f60b68777fe7`.
+The video includes all 49,999 stream-zero frames and the unfinished tail; it
+is a failed competence evaluation, not a successful rollout.
+
+All **9,421 raw frozen GPU samples** pass coverage with at least **3,413 MiB
+directly free**. The separately initialized same-seed control completes its six
+actions with zero updates at **14:37:12 UTC**; all 265 initialization GPU samples
+pass, retaining at least 3,415 MiB free. Complete initial state, all **146 zero
+optimizer moments**, zero return normalizer and the actual untrained restore
+header reverify. The independent CPU inspection peaks at **137.13 MiB host
+memory** under the existing one-core / 2 GiB / zero-swap limits and constructs
+no GPU agent.
+
+The actual untrained evaluator starts at **14:37:15 UTC**, restoring the exact
+six-action / zero-update files with unchanged encoder, native and evaluation
+inputs. Its 75k evaluation and the complete paired result remain pending.
+Root 3019 and all three Pong roots remain queued. Preserve both completed
+inspection writers and the failed trained result; no reliability or five-game
+completion is claimed.
 
 ### Remaining queue requirements
 
