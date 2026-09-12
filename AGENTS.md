@@ -658,6 +658,14 @@ reliable learning.
   evaluation-environment seed difference. The agent RNG inputs still differ
   with the saved model roots; shared ALE seeds do not isolate learning from
   policy/posterior sampling. This check constructs no environment or learner.
+  The completed 32-pin action-only follow-up in
+  `runs/freeway-second-failure-actions-20260912.0xMdak` reproduces the old counts
+  and finds root 2017 uses UP labels 99.32% of the time. Its 510 non-UP actions
+  are close to the 500 expected from 1% uniform mixing of an all-UP policy;
+  this is consistent with saturation, not measured logits or a proven cause.
+  Reuse these counts and the existing action-order controls; investigate actual
+  decisions/predicted returns before selecting a repair. Preserve the completed
+  writer, remaining queue and unchanged gates; this starts no environment or GPU work.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
   headers, first-four-match Pong world-source selection and all old roots. No

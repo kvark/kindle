@@ -327,6 +327,31 @@ Root 3019 and all three Pong roots remain queued. Preserve both completed
 inspection writers and the failed trained result; no reliability or five-game
 completion is claimed.
 
+### Freeway second failure: action-only follow-up
+
+The [completed CPU inspection](../../runs/freeway-second-failure-actions-20260912.0xMdak/result.json)
+reuses the original action-count helper without rerunning its completed
+constant-UP experiment. All **32 pins** and per-stream totals reverify; each
+source contains 75,000 unassisted frozen actions with identical ALE inputs.
+The historical result remains context, not a newly matched native arm.
+
+| Frozen policy | UP-labelled actions | Mean natural-round return |
+| --- | --- | --- |
+| Historical root 0 | 91.4613% | 31.0556 |
+| Fresh root 1009 | 98.1427% | 24.5833 |
+| Fresh root 2017 | 99.3200% | 22.7778 |
+
+The [source/arithmetic note](../../runs/freeway-second-failure-actions-20260912.0xMdak/mixing-context.md)
+checks the actual sampled policy's 1% uniform mixing: a policy concentrated
+entirely on the six UP labels would have 500 expected non-UP actions; root
+2017 has 510. This is consistent with near-saturation, **not measured logits
+or a proven failure cause**. No new environment, replay, native agent or GPU
+work is constructed; the capped process peaks at 33.29 MiB host memory.
+Preserve its completed exclusive writer. Reuse the existing action-order
+controls; frequency alone cannot select a repair. Finish the unchanged queue
+and investigate the policy's decisions and predicted returns before choosing
+a separately declared learning comparison. No new GPU follower starts here.
+
 ### Remaining queue requirements
 
 A valid competence failure stays a failure and does not prevent an unrelated
