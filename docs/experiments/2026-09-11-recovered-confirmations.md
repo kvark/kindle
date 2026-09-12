@@ -373,6 +373,39 @@ controls; frequency alone cannot select a repair. Finish the unchanged queue
 and investigate the policy's decisions and predicted returns before choosing
 a separately declared learning comparison. No new GPU follower starts here.
 
+### Freeway training timeline: late change in the successful pilot
+
+The [completed CPU timeline](../../runs/freeway-training-action-timeline-20260912.DHDtM4/result.json)
+reads all 200,004 training actions from historical hold64 root 0 and fresh
+roots 1009/2017. It separates **policy-chosen actions with no override** from
+forced exploration, using fixed 20,004-action windows and a final 19,968-action
+window. All **15 input pins**, **30 window totals**, per-stream override totals
+and each run's **49,651 finite contiguous reports** reverify against the complete
+source-matched ledgers. Result SHA-256:
+`2e32e70d1a83f2f1fc450e262eb60aab63ce16aa560ae3987729a5bf5a284423`.
+The capped process peaks at **43.56 MiB host memory** and constructs no native
+actor, environment or GPU work. Preserve its completed exclusive writer.
+
+This qualifies the earlier saturation lead. The **successful pilot also spends
+the 20,004–180,036-action windows at 99.18–99.37% UP-labelled policy choices**.
+Only its final window drops to **97.0712%**, while the failed roots remain at
+**99.2701% / 99.2896%**. All three report zero absolute advantage only at updates
+1 and 2; their final-window mean absolute imagined advantages remain positive
+(0.01774 / 0.01744 / 0.01679). Near-UP behavior early in training therefore does
+not distinguish the successful pilot from the failures.
+
+These choices occur within **assisted histories**, not frozen-policy episodes.
+Imagined entropy/return summaries are not live policy probabilities or
+calibrated, action-specific world forecasts. The historical package remains
+context, not a newly matched arm, and this timeline proves neither a cause nor
+a cure. It makes a **separately declared, fresh continuous 400,008-action dose
+comparison with a retained 200,004-action midpoint** a useful next hypothesis
+after the unchanged queue. Keep the recipe, unassisted frozen gates and
+untrained controls fixed; do not resume an old model with missing replay/belief
+and call that the same continuous-budget comparison. A successful development
+comparison would still need fresh-seed confirmation. No new GPU declaration,
+follower or budget adoption is made here.
+
 ### Remaining queue requirements
 
 A valid competence failure stays a failure and does not prevent an unrelated

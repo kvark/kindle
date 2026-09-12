@@ -674,6 +674,17 @@ reliable learning.
   Reuse these counts and the existing action-order controls; investigate actual
   decisions/predicted returns before selecting a repair. Preserve the completed
   writer, remaining queue and unchanged gates; this starts no environment or GPU work.
+  The completed 15-pin training timeline in
+  `runs/freeway-training-action-timeline-20260912.DHDtM4` rechecks all 30 fixed
+  windows and full ledgers. The successful pilot is also near-UP through
+  180,036 actions, then drops to 97.07% policy-chosen UP in the final window;
+  failed roots stay at 99.27%/99.29%. Early saturation is not failure-specific.
+  Prefer a separately declared fresh continuous 400,008-action comparison with
+  a retained 200,004 midpoint as the next hypothesis after this queue, keeping
+  recipe, unassisted gates and controls fixed. A restore without replay/belief
+  is not that continuous comparison. No budget adoption, new GPU follower or
+  causal explanation is established; fresh confirmation would still be needed.
+  Preserve the completed timeline writer and the historical package distinction.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
   headers, first-four-match Pong world-source selection and all old roots. No
