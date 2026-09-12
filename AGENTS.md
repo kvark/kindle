@@ -67,12 +67,12 @@ reliable learning.
   source-matched integration evidence, not long-run Atari runtime qualification.
   The separate source-adoption audit freshly reverifies the complete runtime
   and main evidence, binding 346 source/artifact pins including new checkpoints.
-  The September 12 direct upstream preflight finds de7e6fcf: four newer commits
+  The September 12 07:40 UTC upstream recheck finds 3622e06f: five newer commits
   change only documentation/paper files. Every other tracked path, including
   runtime, shader, build and test inputs, is identical to ce80e9cd. Main and
   the current block-matmul/Breakout candidates contain all current upstream
-  runtime fixes. Preserve the 25-pin readout in
-  `runs/meganeura-upstream-recheck-20260912.jo1ZlX`; no dependency identity churn,
+  runtime fixes. Preserve the earlier 25-pin readout and its 27-pin recheck in
+  `runs/meganeura-upstream-recheck-20260912-0739.HyifGP`; no dependency identity churn,
   rebuild or GPU rerun is needed for these documentation-only changes.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
@@ -584,8 +584,8 @@ reliable learning.
   1009 training at 23:34:06 after full raw predecessor/pilot/runtime rechecks.
   Actual startup verifies zero counters, no restore, the original LeVJEPA
   encoder, N6/R256, 200,004 actions and probability .5/hold64 exploration.
-  Freeway roots 2017/3019, every fresh frozen/control pair and Pong remain
-  outstanding. This launch is not reliability. Keep native f6a2b6ad and
+  Freeway roots 2017/3019 and Pong remain outstanding; root 1009's completed
+  failed pair is below. This launch is not reliability. Keep native f6a2b6ad and
   matching sources 90b4763/24b2968; main's latest backend does not switch them.
   Freeway-1009's first save completes at 00:12:14 UTC on September 12:
   20,004 actions / 4,651 updates. `runs/freeway-first-save-20260912.7JGscu`
@@ -606,8 +606,15 @@ reliable learning.
   inspection rechecks complete state/score/replay/video and all 9,421 raw GPU
   samples with at least 3,413 MiB free. The six-action untrained initialization
   and actual restore verify all 146 zero moments and zero normalizer; its 75k
-  frozen evaluation starts at 06:45:39 and is still running. Other roots remain
-  outstanding. Preserve both completed inspections; never rerun their writers.
+  frozen evaluation completes at 07:24:57: all 36 natural rounds and six tails
+  return zero, with no updates/cutoffs. The complete pair closes at 07:25:36.
+  The separate `paired-result.json` rechecks all six commands, both full replays/
+  checkpoints and four complete GPU windows, retaining at least 3,303 MiB free.
+  All 11 result/input and 1,608 experiment pins reverify. The trained policy
+  improves over its control but fails competence; preserve that failed pair and
+  all completed inspection writers. The existing controller starts fresh root
+  2017 at 07:25:38. Its actual header verifies zero counters, no restore and the
+  unchanged LeVJEPA/N6/R256/hold64 recipe. Root 3019 and Pong remain queued.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,

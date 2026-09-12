@@ -7,9 +7,11 @@ reverified its complete raw evidence and started **Freeway root 1009 at
 23:34:06 UTC**. Its training completed normally at **06:04:24 UTC on September
 12**. Its completed unassisted frozen evaluation **fails**: mean **24.5833**,
 only **16/36** natural rounds reaching 25 crossings. The separately restored
-untrained control is running; roots 2017/3019 and Pong remain queued. Boxing is
-still the only game with a
-completed three-root competence result.
+untrained control completes all 36 natural rounds with return **zero**. The
+paired check completes at **07:25:36 UTC**, retaining the competence failure.
+The existing controller starts fresh **root 2017 at 07:25:38**; root 3019 and
+Pong remain queued. Boxing is still the only game with a completed three-root
+competence result.
 
 The original stopped follower and unstarted Freeway/Pong roots are preserved.
 Do not restart them. Their driver-aware successors live under
@@ -101,8 +103,8 @@ The [actual training header](../../runs/atari-recovered-confirmations-20260911.x
 confirms fresh root 1009, zero starting counters, no restore, the original
 LeVJEPA weights and native `f6a2b6ad` on driver 595.91.07. It retains source
 `90b4763`, N6/R256, 200,004 training actions and probability .5/hold64
-exploration. Root 1009's trained frozen result is below; its paired control and
-roots 2017/3019 remain outstanding. Preserve the live package, scripts and declarations.
+exploration. Root 1009's completed failed pair is below; roots 2017/3019 remain
+outstanding. Preserve the live package, scripts and declarations.
 
 ### Freeway root 1009: first-save health
 
@@ -157,8 +159,8 @@ maximum gap .269 seconds and at least **3,303 MiB directly free**. Mean GPU
 activity is **68.29%**. Actual-frame throughput is **8.5648 actions/s**, **0.5710×
 aggregate real time**, or **0.09516× per stream**, with learning enabled. This
 is another completed runtime measurement, not a matched speedup or an idle-gap
-measurement. Its completed frozen result is below; the separately restored
-untrained control and roots 2017/3019 remain outstanding.
+measurement. Its completed frozen/control pair is below; roots 2017/3019 remain
+outstanding.
 
 ### Freeway root 1009: failed frozen gate
 
@@ -180,9 +182,28 @@ not the training rate.
 The same-seed untrained model is freshly saved after **six actions / zero
 updates**. Its full state, all **146 zero optimizer moments**, zero normalizer
 and actual restored evaluation header reverify. Its 272-sample initialization
-window retains at least 3,415 MiB free. Its separate 75k evaluation starts at
-**06:45:39 UTC** and remains incomplete. No untrained score or complete paired
-root result is claimed yet. Preserve both completed exclusive inspection writers.
+window retains at least 3,415 MiB free. Its separate **75,000-action** evaluation
+completes at **07:24:57 UTC**: all **36 natural rounds and six unfinished tails
+return zero**, with no cutoffs or learner updates. Watch the matching
+[whole untrained control](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-untrained-evaluation.mp4).
+Its 9,421 raw frozen GPU samples retain at least **3,413 MiB directly free**.
+
+The independent [complete paired inspection](../../runs/freeway-final-training-20260912.GMVEG7/paired-result.json)
+rechecks all six command arguments/exits/output hashes, complete ledgers and
+trained/initial checkpoints, both whole replays/videos, all four raw GPU windows
+and the actual **07:25:36** root-completion event. Its **11 result/input pins**
+and all **1,608 experiment pins** reverify; the capped CPU process peaks at
+87.57 MiB host memory. This confirms improvement over the untrained control,
+**not competence or three-root reliability**. The paired gate is false. Preserve
+all completed exclusive writers and the earlier inspection's historically
+incomplete control status; the later paired result supplies completion.
+
+The existing controller starts **fresh root 2017 at 07:25:38 UTC**. Its
+[actual startup header](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed2017-train.jsonl)
+verifies zero starting counters, no restore, the exact encoder/native/source,
+disjoint declared seeds and the unchanged N6/R256/.5-hold64 recipe. Training is
+running; no final score or new reliability result is available. Root 3019 and
+all three Pong roots remain queued.
 
 ### Bounded post-hoc behavior check
 

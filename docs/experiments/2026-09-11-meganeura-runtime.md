@@ -159,6 +159,15 @@ The `src` and `tests` tree IDs and `Cargo.toml` blob ID match exactly. All 25
 source/checker pins are recorded; the shared backend checkout stays on its
 original clean `megakernel-probe` branch.
 
+The **07:40 UTC recheck** finds one further commit,
+[`3622e06f`](https://github.com/kvark/meganeura/commit/3622e06fb27ff84efb04e29d1aab9493c2c1415b),
+again changing only those four documentation/paper files. The
+[new recorded check](../../runs/meganeura-upstream-recheck-20260912-0739.HyifGP/result.json)
+reverifies all earlier source pins, every unchanged top-level object and the
+full runtime/build/test diff against `ce80e9cd`. All **27 pins** pass. There is
+still no missing runtime fix, package change, rebuild or GPU work. The original
+check remains preserved; fetching the remote did not change the shared checkout.
+
 | Kindle source | Actual runtime pin | Consequence |
 | --- | --- | --- |
 | Main, current block-matmul candidate, Breakout minimal candidate | `ce80e9cd` | All current upstream runtime fixes are present. No rebuild or new qualification follows from this documentation-only tip. |
