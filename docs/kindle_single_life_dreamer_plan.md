@@ -358,6 +358,10 @@ for aggregate 1× if other work stays unchanged. World training alone exceeds th
 World synchronization is only 3.48% of wall time; removing it cannot solve the
 throughput gap.
 
+A bounded [live CPU allocation check](experiments/2026-09-08-device-imagination.md#september-12-live-cpu-allocation-check)
+finds no CPU bandwidth quota or reduced affinity in the observed Freeway run.
+Low CPU occupancy and scheduler waits are not GPU idle-gap measurements.
+
 N6 retains ≥3,302 MiB directly free in qualified runtime and completed training
 checks. The earlier fixed-learner N4/N6/N8 comparison found roughly 4,889 / 3,302 /
 1,630 MiB directly free. N6 is about 1.2% slower than N8, chosen for safety,

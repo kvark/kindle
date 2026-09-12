@@ -184,6 +184,32 @@ refreshes backend-derived weights; a raw parameter-buffer copy is not sufficient
 Lower replay ratios or larger learner batches require separate learning-quality
 comparisons. No concurrent actor/learner service is introduced.
 
+### September 12: live CPU allocation check
+
+The [read-only Freeway seed-2017 sample](../../runs/freeway-cpu-allocation-20260912.pfZOXe/result.json)
+binds the actual live process, command and training header. Across 154.077 seconds,
+process counters accumulate **91.98 CPU seconds: 0.597 core equivalents**.
+The main thread accounts for 42.283 seconds and the eight Kindle CPU workers for
+48.881 seconds. All 39 thread identities and full 24-CPU affinity masks persist;
+their combined recorded runnable-queue wait is only **21.734 ms**.
+
+Both snapshots retain the complete cgroup ancestry: exposed CPU bandwidth
+limits are unlimited and exposed throttling counters remain zero. The trainer
+did not inherit the one-core cap used for our separate analysis probes. A later
+membership reread finds the same 39 threads in one domain: 37 ordinary-policy
+threads and two batch-policy disk workers. Its initially overstrict policy
+assertion is retained in the [notes and limits](../../runs/freeway-cpu-allocation-20260912.pfZOXe/notes.md);
+it was not a learner failure. All six [artifact pins](../../runs/freeway-cpu-allocation-20260912.pfZOXe/manifest.json)
+and the raw counter arithmetic reverify.
+
+This does not identify short CPU-critical sections, blocking/synchronization
+costs or GPU idle gaps. Runqueue wait is time waiting to be scheduled, not time
+waiting for the GPU; see the [kernel counter definitions](https://docs.kernel.org/scheduler/sched-stats.html#proc-pid-schedstat)
+and [hierarchical CPU bandwidth controls](https://docs.kernel.org/admin-guide/cgroup-v2.html#cpu-interface-files).
+No profiler was attached, scheduling changed, native code imported, GPU work
+started or speedup/learning result claimed. Preserve the snapshots and queue;
+keep world/recurrent/perception costs as the measured optimization targets.
+
 ### External profiler: recovered queue coverage, not kernel attribution
 
 The installed Nsight Systems 2023.4.4 captures lacked GPU workloads. A fresh

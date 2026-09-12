@@ -172,6 +172,8 @@ reliable learning.
   compilation alongside training: the first memory-plan probe caused host
   pressure, and its two capped follow-ups failed without yielding smaller-row
   world estimates. Preserve those failures; CPU-only does not mean low impact.
+  Distinguish the learner's actual cgroup/affinity from our capped CPU probes;
+  low CPU occupancy and scheduler runqueue waits do not locate GPU idle gaps.
   Track remaining world-training/recurrent/perception costs and profiler
   coverage in `docs/experiments/2026-09-08-device-imagination.md`.
   The isolated `exp/world-sync-fanout` candidate reads shared world weights
