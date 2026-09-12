@@ -1,4 +1,18 @@
-# Kindle working direction
+# Isolated Meganeura/Blade timing update
+
+This worktree stages Meganeura 45991be1 with its required Blade f6f2729e pin
+against qualified control 1e00e818. It is not adopted or GPU-qualified.
+Use `/x/Code/kindle/AGENTS.md`, the authoritative plan there, and
+`/mnt/data/GUIDELINES.md` for current direction and experiment status; the
+inherited record below is historical, not a live queue declaration.
+Change dependency/identity files and required API compatibility only. Do not
+enable block matmul, skip parameter initialization, low-priority GPU queues,
+tracing, tuning, or new learning settings in this dependency comparison.
+Keep all current packages and the Freeway -> Pong -> Breakout hardware queue
+unchanged. CPU work uses one core / 2 GiB / zero swap; no new GPU follower.
+Require complete gradient/cache/state/trace, memory, and timing gates before use.
+
+# Historical working direction
 
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner

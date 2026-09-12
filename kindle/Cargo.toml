@@ -10,9 +10,9 @@ license = "MIT"
 
 [dependencies]
 # Upstream includes LeVJEPA frame-prefix attention and cache-write aliases.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "ce80e9cd6056c230590b8b7e1eb9ffe9bbce08bc" }
-# Match Meganeura's published dependency so GPU context types stay identical.
-blade-graphics = "=0.9.0"
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "45991be11880e3b9da33fa75bab66098b6329c31" }
+# Calibrated timings are not published yet; share Meganeura's exact context type.
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "f6f2729e850cc0aefdc0bb18523da58a72765169" }
 rand = "0.9"
 rayon = "1.12"
 serde = { version = "1", features = ["derive"] }
