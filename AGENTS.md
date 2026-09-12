@@ -842,11 +842,18 @@ reliable learning.
   player predicts other recordings' rewards poorly. Model 1 has the worst
   common-pool positive error but the best negative error; do not call its whole
   world model uniformly worst. Four of six cross-model all-frame prior reward
-  errors exceed the zero baseline. Preserve per-recording and pooled event
+  MAEs exceed the zero baseline. Preserve per-recording and pooled event
   counts, visual-cache strata and the three-terminal limitation. This is limited cross-trajectory
-  generalization, not proof of the policy failure's cause. Keep current learning
-  arms fixed. Measure reward-event coverage and replay batches lacking each
-  reward class; repeated samples are not distinct experience, and posterior
+  generalization, not proof of the policy failure's cause. The September 12
+  point-score supplement in `runs/world-reward-scoring-20260912.TKogBc` preserves
+  those MAEs but finds all six cross pairs beat zero under MSE. Its eight
+  arithmetic fixtures, all nine raw rescored traces and 67 pins reverify without
+  new forecasts or GPU work. Keep MAE/MSE and event strata together: sparse
+  zero-baseline MAE failures do not establish absence of reward signal, and
+  neither decoded point score is a distributional calibration test. Preserve
+  the completed supplement and original reports; see the linked world report.
+  Keep current learning arms fixed. Measure reward-event coverage and replay
+  batches lacking each reward class; repeated samples are not distinct experience, and posterior
   training estimates are not held-out prior forecasts. Declare fixed all-seed
   budgets, own-policy frozen results and a new multi-match forecast set before
   selecting a changed recipe.

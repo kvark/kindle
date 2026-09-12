@@ -208,7 +208,9 @@ positive magnitude, but best on pooled negative magnitude; a blanket claim that
 its whole world model is worst is unsupported. Model 2's one negative point in
 its own match concealed poor negative prediction on the other recordings.
 Seeing the target frame does not remove the large cross-recording reward errors.
-Four of six cross-model pairs have all-frame prior reward error worse than zero.
+Four of six cross-model pairs have all-frame prior reward **MAE** worse than zero.
+This comparison is metric-specific; the squared-error supplement below finds
+useful signal relative to zero in every cross pair.
 
 This is evidence of limited generalization across these recorded trajectories,
 not proof of a particular failure mechanism or an unbiased estimate over Pong.
@@ -220,6 +222,46 @@ Only three terminal targets are available. Their MSE is 0.993 / 0.985 / 0.971,
 versus always-continue 0.994: none provides evidence of reliable terminal prediction.
 Common-pool policy entropy and value are descriptive only. Logged-action
 agreement is not action quality, and another policy's return is not a critic target.
+
+### September 12: the zero baseline is metric-specific
+
+The [point-score supplement](../../runs/world-reward-scoring-20260912.TKogBc/result.json)
+rechecks all nine saved H1 traces, common action/RGB/feature targets, original
+MAEs and all **67 input pins**, including the original diagnostic and report.
+It adds squared error and signed bias for prior, after-frame and unrelated-action
+point forecasts, retaining every recording and positive/zero/negative stratum.
+No new forecasts, latent draws, learner imports or GPU work are performed.
+
+All **six cross-recording prior forecasts beat zero under MSE**, by 3.6–29.2%,
+while four remain worse under MAE. Below is prior reward MSE divided by zero's
+MSE; lower is better, and diagonal cells are same-model recordings.
+
+| Model | Recording 0 | Recording 1 | Recording 2 |
+| --- | ---: | ---: | ---: |
+| 0 | 0.10197 | 0.81266 | 0.70783 |
+| 1 | 0.93572 | 0.54715 | 0.94994 |
+| 2 | 0.96357 | 0.91229 | 0.08599 |
+
+Pooled prior MSE is **0.004544 / 0.006106 / 0.005820**, versus zero's **0.007991**.
+This is the same inspected pool of 11,388 transitions per model, with 62 positive
+points, 29 negative points and three terminals. It is not new confirmation,
+evidence of statistical significance or a repaired gameplay result. The large
+recording-dependent event errors above remain; zero-baseline conclusions must
+name their scoring rule instead of implying no useful reward signal.
+
+Absolute error targets a predictive median, whereas squared error targets a
+predictive mean. With sparse rewards those differ. A simple analytical fixture
+with 99 zero rewards and one +1 has zero-predictor MAE/MSE .01/.01; predicting
+the mean .01 gives MAE .0198 but MSE .0099. See
+[Gneiting, *Making and Evaluating Point Forecasts*](https://arxiv.org/abs/0912.0902).
+The **eight passing arithmetic tests** include this synthetic example, missing
+classes, nonfinite rejection and un-clipped signed point forecasts; they are
+not native learning tests. The capped rescore peaks at **537.46 MiB host memory**.
+
+Retain MAE, MSE and event counts together. These saved decoded point estimates
+and one latent draw do **not** provide a probability/distributional calibration
+test or isolate the cause of policy failures. Preserve the original report,
+completed writers, learning objectives, all acceptance gates and current queues.
 
 ### Completed training coverage, not a causal explanation
 

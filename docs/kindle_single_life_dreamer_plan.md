@@ -260,8 +260,11 @@ per model, 62 positive rewards, 29 negative rewards and only three terminals.
 All three same-model diagonals reproduce prior results exactly; all six cross-model
 runs pass input/state/memory checks. Each model predicts positive rewards and
 features best on its own recording. Four of six cross-model all-frame prior reward
-errors exceed the always-zero baseline. Model 1 has the worst pooled positive
-error but the best negative error: its world model is not uniformly worst.
+MAEs exceed the always-zero baseline, but the [squared-error supplement](experiments/2026-09-08-world-evaluation.md#september-12-the-zero-baseline-is-metric-specific)
+finds every cross pair beats zero under MSE. Keep both metrics and event strata;
+the MAE comparison alone does not imply an absence of useful reward signal.
+Model 1 has the worst pooled positive error but the best negative error:
+its world model is not uniformly worst.
 
 This indicates limited cross-trajectory reward generalization, **not a proven
 cause** of the policy failures. Another policy's logged return is not an unbiased
