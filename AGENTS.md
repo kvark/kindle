@@ -727,6 +727,14 @@ reliable learning.
   the full final-evaluation/control/world-selection protocol unchanged; Breakout
   hardware remains after all of Pong. Preserve every completed inspection and
   failed pair; no five-game completion is claimed.
+  Pong-1009's first save is archived in `runs/pong-1009-first-save-20260912.eSQrnG`:
+  20,004 actions / 4,651 ledger-verified updates, all 241 finite tensor entries
+  and 146 optimizer moments. The raw prefix correctly remains incomplete;
+  a wrong checkpoint counter is rejected. All 9,218 prefix GPU samples pass
+  coverage with at least 3,303 MiB directly free; 1,883 source/queue pins reverify.
+  This is early saved-state health, not competence or completed training.
+  Never rerun its exclusive archive writer or substitute it for the declared
+  final checkpoint. The full 400,008-action root and queued roots stay unchanged.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,

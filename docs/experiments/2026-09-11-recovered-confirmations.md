@@ -29,8 +29,9 @@ Do not restart them. Their driver-aware successors live under
 ## Fixed learning and evaluation protocols
 
 Both keep native `f6a2b6ad`, original LeVJEPA weights, N6/R256/B16/T64, full
-BPTT64, microbatch 16, F32, 12M and learning rate .00004. Main's adopted latest
-Meganeura does not change these pinned comparisons. Each game retains fresh roots
+BPTT64, microbatch 16, F32, 12M and learning rate .00004. Their backend remains
+`4d45ba3a`; main's qualified `ce80e9cd` and the newer CPU-qualified `45991be1`
+candidate do not change these pinned comparisons. Each game retains fresh roots
 1009/2017/3019 and a separately saved/restored same-seed untrained control.
 
 | Protocol | Training per root | Unassisted final evaluation | Matched Python source |
@@ -473,6 +474,39 @@ queue or adoption is introduced by these checks.
 The captured results and startup header/processes then
 [reverify against 1,955 source/queue pins](../../runs/freeway-confirmation-audit-20260912.0nbr0A/artifact-recheck.json),
 including all 1,622 scheduler and 1,870 hardware-declaration inputs.
+
+### First Pong save: complete saved-state health, not competence
+
+Root 1009's first save completes at **23:47:17 UTC on September 12**, with
+**20,004 actions / 4,651 updates**. The separate
+[archive and inspection](../../runs/pong-1009-first-save-20260912.eSQrnG/result.json)
+verifies all **241 finite tensor entries**, including **146 optimizer moments**,
+the native logical layout/counters, actual LeVJEPA encoder, source-matched
+Python ledger and all **1,624 input/archive pins**. The update count comes from
+the complete reset/action-credit prefix, not another game's fixed count.
+Result SHA-256:
+`4c20c628398fb606e976bf1fc9f229200906a21206869fadb38192f0e378f7dc`.
+
+The untouched raw prefix correctly stops at the complete-run auditor's
+`missing run_end` guard. Its separate deliberately wrong checkpoint counter
+is rejected earlier. Every learner report is finite and present in order;
+only updates 1 and 2 report zero absolute advantage. There are 15 positive
+and 455 negative reward events. All 18 completed training games are natural,
+with mean return **−20.1667**. These changing-policy training outcomes are
+not frozen evaluation or evidence of competence.
+
+All **9,218 raw GPU samples** through the save pass coverage: maximum gap
+**0.268 seconds**, minimum directly free memory **3,303 MiB**. Mean GPU activity
+is **67.02%**, not an idle-gap measurement or speedup result. The one-CPU,
+2-GiB/zero-swap inspection peaks at **253.33 MiB host memory** and constructs
+no GPU agent. The [read-only recheck](../../runs/pong-1009-first-save-20260912.eSQrnG/recheck-result.json)
+reproduces all saved tensor fingerprints, prefix/negative and raw-memory checks,
+including **1,883 source/queue pins** and the actual five live process bindings.
+
+Preserve the completed exclusive archive writer; never rerun it. The first save
+is not restored or substituted for the declared final model. Root 1009 continues
+to 400,008 actions; roots 2017/3019, final v4 evaluations/controls, world-source
+selection and the following Breakout hardware diagnostic remain unchanged.
 
 ### Freeway second failure: action-only follow-up
 
