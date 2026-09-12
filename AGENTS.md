@@ -704,13 +704,29 @@ reliable learning.
   command outputs and all 1,608 pins. All 9,298 frozen GPU samples pass with at
   least 3,413 MiB directly free. The six-action zero-update initialization and
   actual 22:28:41 control restore verify all 146 zero moments, zero normalizer,
-  complete state and exact files/counters. Its 75k control is still running.
+  complete state and exact files/counters. Its 75k control exits normally at
+  23:06:52: all 36 natural rounds and six tails return zero, with no updates
+  or cutoffs. Replay finishes at 23:07:31 and the confirmation at 23:07:33.
+  The strict whole-reader inspection in `runs/freeway-confirmation-audit-20260912.0nbr0A`
+  reverifies all 18 commands/12 GPU windows, all three complete pairs/states/
+  replays, encoders and 1,692 pins, with at least 3,302 MiB directly free overall.
+  All three initial saves have 146 zero moments and zero normalizers; each pair
+  differs in all 31 nonconstant parameter tensors while 64 constants match.
+  This is not a statistical proof of independence. The complete confirmation
+  fails competence; preserve it and never restart it.
   Preserve both captured inspections: they bind then-live processes, not reusable
   completion writers. All three fresh trained policies fail their frozen gates;
-  the complete three-pair confirmation remains pending. Require
-  the unchanged complete `continuation.freeway_auditor().verify()` after all
-  three pairs. Pong stays queued. Preserve every completed inspection writer
-  and both failed pairs; no reliability or five-game completion is claimed.
+  the complete three-pair data/runtime checks pass. Keep the unchanged strict
+  `continuation.freeway_auditor().verify()`. The existing scheduler launches the
+  Pong controller at 23:07:35; after rechecking the same complete raw proof,
+  it starts fresh root 1009 at 23:08:50. `pong-start.json` binds actual processes,
+  command, package environment, mapped f6a2b6ad native and all 1,613 Pong pins.
+  Its actual 23:10:00 header confirms source 24b2968, the original LeVJEPA encoder,
+  zero counters/no restore, N6/R256 and 400,008 actions without assistance.
+  This is startup evidence, not learning or mastery. Keep roots 2017/3019 and
+  the full final-evaluation/control/world-selection protocol unchanged; Breakout
+  hardware remains after all of Pong. Preserve every completed inspection and
+  failed pair; no five-game completion is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,

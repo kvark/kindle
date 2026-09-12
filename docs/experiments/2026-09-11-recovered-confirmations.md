@@ -2,11 +2,13 @@
 
 All three fresh Freeway policies **fail competence**. Roots **1009/2017/3019**
 score means **24.5833 / 22.7778 / 22.4722**, with **16/36, 3/36 and 5/36**
-natural rounds reaching 25 crossings. The first two trained/control pairs are
-complete and their controls return zero. Root 3019's final frozen result is
-independently verified; its separately restored untrained evaluation is running.
-The complete confirmation audit remains pending. Pong stays queued. Boxing is
-still the only game with a completed three-root competence gate.
+natural rounds reaching 25 crossings. **All three trained/control pairs are
+complete**, with every control returning zero. The strict whole-confirmation
+audit passes data/runtime checks and retains the failed competence result.
+The original controller exits normally at **23:07:33 UTC on September 12**.
+The scheduled Pong worker starts fresh **root 1009 at 23:08:50**; its actual
+source/package/header and zero counters reverify. Roots 2017/3019 remain queued.
+Boxing is still the only game with a completed three-root competence gate.
 
 The serial follower started at **17:11:03 UTC on September 11**, bound to the
 actual Breakout/Qbert controller. That predecessor completed normally at
@@ -344,9 +346,9 @@ binds the real trainer process, full command and first header: **zero counters,
 no restore**, unchanged LeVJEPA/N6/R256/hold64 recipe and actual encoder.
 All **five handoff pins** and **1,608 experiment pins** reverify; this CPU-only
 inspection peaks at **51.95 MiB** and constructs no agent. Root 3019's first-save
-and completed-training/frozen checks are below; its final control remains
-pending. All three Pong roots remain queued. Preserve every completed inspection
-writer and both failed pairs; no reliability or five-game completion is claimed.
+and completed-training/frozen checks are below; its complete final control and
+whole-confirmation audit follow them. Preserve every completed inspection and
+failed pair; no Freeway competence or five-game completion is claimed.
 
 ### Freeway root 3019: first-save health
 
@@ -396,10 +398,9 @@ The existing controller launches frozen evaluation at **21:46:53 UTC**. Its
 actual **21:48:00** header restores the exact final files and counters, native
 f6a2b6ad and original LeVJEPA encoder, using **75,000 sampled v2 actions without
 exploration**. Actual process/start/parent/command and header identity reverify.
-The completed frozen result is below; its separately restored untrained control
-remains pending. Preserve both previous failed pairs; require the unchanged
-complete `continuation.freeway_auditor().verify()` after all three pairs, not
-a partial confirmation pass or a restarted queue.
+The completed frozen/control results are below. Preserve all failed pairs and
+the unchanged complete `continuation.freeway_auditor().verify()`; never replace
+the whole-confirmation check with a partial pass or restart the queue.
 
 ### Freeway root 3019: failed frozen gate
 
@@ -425,9 +426,53 @@ updates. The separately restored control's actual **22:28:41** header binds
 those exact files and counters, unchanged native/encoder/environment identities
 and **75,000 unassisted sampled actions**. All **146 initial optimizer moments**
 and the return normalizer are zero; complete tensor and native-layout checks
-pass. Its actual process/start/parent/command are verified. This control and
-the strict whole-confirmation audit remain pending; do not stop or restart the
-queue, weaken the gate, or claim the declared competence gate passed.
+pass. Its actual process/start/parent/command are verified. The completed control
+and strict whole-confirmation audit are below; do not restart the queue, weaken
+the gate, or claim the declared competence gate passed.
+
+### Completed Freeway confirmation and Pong handoff
+
+Root 3019's control completes **75,000 actions at 23:06:52 UTC on September 12**:
+all **36 natural rounds and six tails return zero**, with no updates or cutoffs.
+Its complete replay finishes at **23:07:31**; the confirmation and controller
+close normally at **23:07:33**, retaining `confirmation_passed=false`.
+
+The [strict independent whole-confirmation inspection](../../runs/freeway-confirmation-audit-20260912.0nbr0A/result.json)
+invokes the unchanged `continuation.freeway_auditor().verify()`. It rechecks
+**all 18 commands, 12 complete GPU windows, three fixed-budget trained/control
+pairs, complete states and moments, actual encoders, scores and replay/videos**.
+All **1,692 input/result pins** pass. Directly free memory remains at least
+**3,302 MiB overall** and **3,413 MiB in frozen evaluation**. Result SHA-256:
+`19cdee3101105ec0131534d69ac6f8a3cec905b2aeb9709cf76dee9521bd75ad`.
+The capped CPU process peaks at **317.51 MiB host memory** and constructs no agent.
+
+Every initial state has **146 zero optimizer moments** and a zero return
+normalizer. Each pair of roots differs in all **31 nonconstant parameter
+tensors**; **64 expected constant tensors** match. These raw parameter and
+disjoint-seed checks are not a statistical proof of independence. All three
+trained policies improve over their controls but miss both competence gates;
+the successful seed-0 pilot did not establish a reliable recipe. Preserve the
+complete failed confirmation and its captures; never restart it or relabel it
+as a successful replication.
+
+The existing scheduler starts the Pong controller at **23:07:35**. Its actual
+preflight independently reproduces the same full Freeway proof, then launches
+fresh root **1009 at 23:08:50**. The
+[startup-only inspection](../../runs/freeway-confirmation-audit-20260912.0nbr0A/pong-start.json)
+binds the real scheduler/controller/trainer/logger processes, full command,
+package environment and mapped native extension. The **23:10:00** header
+confirms source **24b2968**, native **f6a2b6ad**, the original LeVJEPA encoder,
+**zero counters/no restore**, N6/R256 and **400,008 actions without overrides**.
+All **1,613 Pong pins** reverify. Startup result SHA-256:
+`41d590a086012bfae9c57b742215c16f67c2eac122c5edf5ad812bf43fcb8abe`.
+This read-only inspection peaks at **52.09 MiB host memory**; it is not a
+training, full-memory or mastery result. Keep roots 2017/3019, all final v4
+evaluations/controls and the first-four-match world-source selection fixed.
+Breakout hardware remains behind the complete Pong confirmation; no new GPU
+queue or adoption is introduced by these checks.
+The captured results and startup header/processes then
+[reverify against 1,955 source/queue pins](../../runs/freeway-confirmation-audit-20260912.0nbr0A/artifact-recheck.json),
+including all 1,622 scheduler and 1,870 hardware-declaration inputs.
 
 ### Freeway second failure: action-only follow-up
 
