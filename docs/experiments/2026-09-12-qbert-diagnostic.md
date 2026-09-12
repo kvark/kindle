@@ -105,6 +105,34 @@ failure and revisit the intervention; do not automatically extend again. If it
 passes, separately confirm the selected recipe on fresh roots 1009/2017/3019
 with untrained controls. No pilot or CPU diagnostic adds a reliable game.
 
+### Checkpoint retention prepared, not a launched dose test
+
+The [external retention component](../../runs/qbert-dose-retention-20260912.AP0hmS/result.json)
+passes **36 CPU tests** and retains the completed pilot's real 200,004-action /
+49,651-update save byte-for-byte. All **241 tensor entries, 95 parameters and
+146 optimizer moments** are present, finite and layout-checked against the
+preserved first-save schema. The full source prefix passes every ledger check
+before its expected `missing run_end`; the original log and saved files remain
+unchanged. All **32 evidence pins** independently reverify. The capped one-core /
+2 GiB / zero-swap validation peaks at **256.74 MiB host memory**, not GPU memory.
+
+The [helper](../../runs/qbert-dose-retention-20260912.AP0hmS/retain.py) reads the
+existing runner's completed-save event and hashes; it never calls the learner,
+restarts training or changes the native/Python runtime. Wrong headers/counters,
+missing or nonfinite tensors/moments, changed encoder files, stale/moving saves,
+and preexisting destinations are rejected. A failed copy leaves its unqualified
+directory for inspection, without a completion marker or automatic retry. This
+is verified retention, not atomic checkpoint recovery.
+
+The proposed continuous run can use the existing `--checkpoint-every 200004`
+option, yielding the exact midpoint and final save without a new runner. This
+differs from the old pilot's 20,004-action save cadence; the within-run dose
+comparison is primary, and historical parity must be measured before claiming
+it. A future launcher must still bind the actual process, inputs, complete
+predecessor evidence and frozen/control budgets. **No 400k training, new GPU
+declaration, follower, runtime qualification or learning improvement occurred.**
+Preserve the completed validation; do not rerun its exclusive archive writer.
+
 ## Evidence and limits
 
 The [frozen diagnostics](../../runs/qbert-frozen-diagnostic-20260911.asgiON/result.json)

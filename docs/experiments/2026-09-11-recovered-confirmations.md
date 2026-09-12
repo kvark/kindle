@@ -100,6 +100,40 @@ LeVJEPA weights and native `f6a2b6ad` on driver 595.91.07. It retains source
 exploration. Roots 2017/3019 and every unassisted frozen/control pair remain
 outstanding. Preserve the live package, scripts and declarations.
 
+### Freeway root 1009: first-save health
+
+The first save completes at **00:12:14 UTC on September 12**, with **20,004
+actions / 4,651 updates**. The separate
+[preserved archive](../../runs/freeway-first-save-20260912.7JGscu/result.json)
+checks all 241 finite tensor entries, all 146 optimizer moments, logical layouts,
+actual LeVJEPA file and saved counters. The source-matched `90b4763` / `f6a2b6ad`
+package audits the complete prefix, including persistent-exploration accounting;
+only the expected missing final `run_end` remains. A changed checkpoint counter
+is rejected earlier. The bound trainer remains live before and after the copy.
+
+The prefix discovers **63 distinct positive reward events**. Its first six natural
+rounds return **2 / 4 / 2 / 2 / 0 / 2**; later partial rounds account for the
+remaining reward. There are 1,160 replay batches without positive rewards, but
+only updates 1 and 2 have zero absolute advantage. These are early assisted
+training observations, **not unassisted competence, final-model selection or
+seed reliability**. The declared training and all frozen/control budgets remain
+unchanged.
+
+All **9,139 prefix GPU samples** cover construction through the save, with
+maximum gap .266 seconds and at least **3,303 MiB directly free**. Mean activity
+is 67.04%, not a speedup or verified idle-gap measurement. All **24 archive/input
+pins** independently reverify. The one-core / 2 GiB / zero-swap CPU inspection
+peaks at **239.82 MiB host memory** and constructs no agent or GPU work.
+
+The initial [inspection import failure](../../runs/freeway-first-save-20260912.7JGscu/setup-failure.md)
+is preserved: the package requires explicit native-module import before reading
+its identity. It failed before any archive writes; the corrected invocation
+uses the same qualified package. Preserve this completed archive and never rerun
+its exclusive writer. It does not replace the final checkpoint or add a confirmed
+game.
+
+### Remaining queue requirements
+
 A valid competence failure stays a failure and does not prevent an unrelated
 game. Missing episodes/data, runtime or integrity failure stops without retries.
 Every native phase requires complete 250-ms GPU coverage, gaps no greater than

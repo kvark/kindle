@@ -384,6 +384,14 @@ reliable learning.
   failures require reassessment, a successful choice needs fresh-root confirmation.
   Preserve completed outputs and setup failures; do not rerun exclusive writers.
   See `docs/experiments/2026-09-12-qbert-diagnostic.md` for limits and full evidence.
+  The isolated external checkpoint-retention component in
+  `runs/qbert-dose-retention-20260912.AP0hmS` passes 36 CPU tests and archives the
+  complete historical 200,004/49,651 save with all 241 entries/146 moments and
+  32 verified pins. It changes no native or runner code. A future continuous
+  dose test can use `--checkpoint-every 200004`; its save cadence differs from
+  the old pilot, so historical parity is not inferred. No new GPU declaration,
+  follower or 400k result exists. Preserve its completed exclusive archive;
+  detected copy failure is not atomic recovery. See the linked Qbert report.
   The full continuation exits normally at 23:32:55. Its independently rechecked
   twelve commands/eight native phases, 1,593 pins, complete finite states and
   moments, actual encoders, ledgers and replay/video bindings pass, retaining
@@ -547,6 +555,14 @@ reliable learning.
   Freeway roots 2017/3019, every fresh frozen/control pair and Pong remain
   outstanding. This launch is not reliability. Keep native f6a2b6ad and
   matching sources 90b4763/24b2968; main's latest backend does not switch them.
+  Freeway-1009's first save completes at 00:12:14 UTC on September 12:
+  20,004 actions / 4,651 updates. `runs/freeway-first-save-20260912.7JGscu`
+  archives all 241 finite entries/146 optimizer moments, the source-matched full
+  prefix and actual encoder, with 24 pins. Its 63 positive reward events and
+  first six natural returns 2/4/2/2/0/2 are assisted early health, not competence.
+  All 9,139 prefix GPU samples retain at least 3,303 MiB directly free. Preserve
+  the completed archive, wrong-counter negative and import failure; never rerun
+  its exclusive writer or substitute this checkpoint for the declared final one.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
   headers, first-four-match Pong world-source selection and all old roots. No
