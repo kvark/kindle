@@ -628,6 +628,12 @@ reliable learning.
   The reference was not independently replayed, is not a Kindle win, and proves
   neither visual feedback nor the failure's cause. Preserve the unchanged gates
   and remaining queue; no new recipe, GPU declaration or follower starts here.
+  The 19-pin read-only check `runs/freeway-evaluation-conditions-20260912.Yc5Ub9`
+  verifies that historical root 0 and fresh root 1009 use identical frozen ALE
+  seeds/settings. Do not repeat their constant-UP reference for a nonexistent
+  evaluation-environment seed difference. The agent RNG inputs still differ
+  with the saved model roots; shared ALE seeds do not isolate learning from
+  policy/posterior sampling. This check constructs no environment or learner.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
   headers, first-four-match Pong world-source selection and all old roots. No

@@ -220,6 +220,17 @@ failure or the cause of seed variation. Training discovered rewards and remained
 finite; neither reward starvation nor numerical collapse is established here.
 No new learning recipe, GPU declaration or follower is introduced.
 
+The [environment-input comparison](../../runs/freeway-evaluation-conditions-20260912.Yc5Ub9/result.json)
+rechecks both complete 75k frozen ledgers, actual ROM/ALE/wrapper identity and
+19 pins. Both use the same six evaluation environment seeds, starting at
+100,000, and identical preprocessing/action settings. Repeating the constant-UP
+reference for the historical root would reuse those same inputs, so no second
+game run is needed. The shared environment seed is **not** a shared agent RNG:
+the declared agent inputs are 0–5 versus 1009–1014, derived from each model's
+saved configuration. This does not separate learned-state differences from
+evaluation sampling or turn the historical package into a newly matched arm.
+The capped CPU check constructs no environment or learner and changes no gate.
+
 ### Freeway root 2017: first-save health
 
 The existing controller starts **fresh root 2017 at 07:25:38 UTC**. Its
