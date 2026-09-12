@@ -1,17 +1,17 @@
 # Freeway and Pong confirmations after driver recovery
 
+Freeway roots **1009 and 2017 have completed their full trained/control pairs
+and fail competence**: trained means **24.5833 / 22.7778**, with **16/36 and 3/36**
+natural rounds reaching 25 crossings. Both restored untrained controls return
+zero. Root **3019 completes training at 21:46:49 UTC on September 12**, with
+200,004 actions / 49,651 updates and independently verified final state. Its
+unassisted frozen evaluation is running; the full pair remains pending. Pong
+stays queued. Boxing is still the only game with a completed three-root gate.
+
 The serial follower started at **17:11:03 UTC on September 11**, bound to the
-actual live Breakout/Qbert continuation controller. That predecessor completed
-normally at **23:32:55** with both pilots failing competence. The follower
-reverified its complete raw evidence and started **Freeway root 1009 at
-23:34:06 UTC**. Its training completed normally at **06:04:24 UTC on September
-12**. Its completed unassisted frozen evaluation **fails**: mean **24.5833**,
-only **16/36** natural rounds reaching 25 crossings. The separately restored
-untrained control completes all 36 natural rounds with return **zero**. The
-paired check completes at **07:25:36 UTC**, retaining the competence failure.
-The existing controller starts fresh **root 2017 at 07:25:38**; root 3019 and
-Pong remain queued. Boxing is still the only game with a completed three-root
-competence result.
+actual Breakout/Qbert controller. That predecessor completed normally at
+**23:32:55**, with both pilots failing competence. The follower reverified
+the complete raw evidence before starting Freeway; detailed chronology is below.
 
 The original stopped follower and unstarted Freeway/Pong roots are preserved.
 Do not restart them. Their driver-aware successors live under
@@ -343,10 +343,10 @@ at 15:16:43 UTC**. The [actual handoff check](../../runs/freeway-2017-final-trai
 binds the real trainer process, full command and first header: **zero counters,
 no restore**, unchanged LeVJEPA/N6/R256/hold64 recipe and actual encoder.
 All **five handoff pins** and **1,608 experiment pins** reverify; this CPU-only
-inspection peaks at **51.95 MiB** and constructs no agent. Root 3019 is training;
-its first-save check is below and its final result remains pending. All three
-Pong roots remain queued. Preserve every completed inspection writer and both failed
-pairs; no reliability or five-game completion is claimed.
+inspection peaks at **51.95 MiB** and constructs no agent. Root 3019's first-save
+and completed-training checks are below; its final frozen/control result remains
+pending. All three Pong roots remain queued. Preserve every completed inspection
+writer and both failed pairs; no reliability or five-game completion is claimed.
 
 ### Freeway root 3019: first-save health
 
@@ -369,8 +369,37 @@ All **9,159 raw prefix GPU samples** pass coverage: maximum gap **0.265 seconds*
 minimum **3,303 MiB directly free**. The one-core / 2 GiB / zero-swap inspection
 peaks at **266.60 MiB host memory** and constructs no agent. Preserve this
 completed exclusive archive and its negative fixture; never rerun the writer
-or substitute this early save for the declared final checkpoint. The same
-trainer continues toward its unchanged 200,004-action budget.
+or substitute this early save for the declared final checkpoint. At that point,
+the same trainer continued toward its unchanged 200,004-action budget.
+
+### Freeway root 3019: completed training
+
+The original trainer exits normally at **21:46:49 UTC on September 12** after
+**200,004 actions / 49,651 updates**. The
+[read-only final-training inspection](../../runs/freeway-3019-final-training-20260912.dRwzu9/result.json)
+rechecks the complete ledger and command lifecycle, all **241 complete finite
+tensor entries / 146 optimizer moments**, exact final checkpoint files and
+actual encoder, plus all **1,608 experiment pins**. Its result SHA-256 is
+`f6802b90ffe001642e7542337e8257f944ab41d67d74597b874c9440806e8956`.
+The captured command and execution record preserve this completed inspection;
+it binds the then-live evaluator and is not a reusable completion writer.
+
+All **93,531 raw training GPU samples** pass coverage, with maximum gap
+**0.268 seconds** and at least **3,303 MiB directly free**. The one-core /
+2 GiB / zero-swap inspection peaks at **179.08 MiB host memory** and constructs
+no agent. The training loop reports **8.5696 actions/s**, **0.5713x aggregate
+real time** and **0.0952x per stream**; this is not a matched speedup.
+All 96 natural training rounds are rewarded, mean **13.6458**, with exploration
+assistance. Those scores do not establish unassisted competence.
+
+The existing controller launches frozen evaluation at **21:46:53 UTC**. Its
+actual **21:48:00** header restores the exact final files and counters, native
+f6a2b6ad and original LeVJEPA encoder, using **75,000 sampled v2 actions without
+exploration**. Actual process/start/parent/command and header identity reverify.
+This evaluation and the separately restored untrained control remain pending.
+Preserve both previous failed pairs; require the unchanged complete
+`continuation.freeway_auditor().verify()` after all three pairs, not a partial
+confirmation pass or a restarted queue.
 
 ### Freeway second failure: action-only follow-up
 

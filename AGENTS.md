@@ -691,9 +691,18 @@ reliable learning.
   prefix has 72 positive reward events; all 9,159 GPU samples retain at least
   3,303 MiB directly free. Preserve the completed exclusive archive, incomplete
   prefix and wrong-counter negative; this is assisted early health, not frozen
-  competence. Root 3019 is still training; its final result remains pending.
-  Pong stays queued. Preserve every completed inspection writer and both
-  failed pairs; no reliability or five-game completion is claimed.
+  competence. Root 3019 training exits normally at 21:46:49 UTC on September 12:
+  200,004 actions / 49,651 updates. The read-only completed inspection in
+  `runs/freeway-3019-final-training-20260912.dRwzu9` rechecks the full ledger,
+  command lifecycle, all 241 finite entries/146 moments, actual encoder and
+  1,608 experiment pins. All 93,531 raw training GPU samples pass with at least
+  3,303 MiB directly free. The actual 21:48:00 frozen header restores the exact
+  final files/counters without assistance; its 75k evaluation and separately
+  restored untrained control remain pending. Preserve the captured inspection:
+  it binds the then-live evaluator, not a reusable completion writer. Require
+  the unchanged complete `continuation.freeway_auditor().verify()` after all
+  three pairs. Pong stays queued. Preserve every completed inspection writer
+  and both failed pairs; no reliability or five-game completion is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,
