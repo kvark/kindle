@@ -645,7 +645,13 @@ reliable learning.
   pins, earlier training/frozen pins and 1,608 experiment pins reverify.
   The actual 15:16:43 fresh root-3019 startup is verified in `next-start.json`:
   five handoff pins, zero counters/no restore, unchanged recipe and actual
-  encoder. Root 3019 is training; its first save/final result remain pending.
+  encoder. Its 15:54:55 first save is archived in
+  `runs/freeway-3019-first-save-20260912.YKbe2V`: 20,004 actions / 4,651 updates,
+  all 241 finite entries/146 moments and 26 pins independently reverify. The
+  prefix has 72 positive reward events; all 9,159 GPU samples retain at least
+  3,303 MiB directly free. Preserve the completed exclusive archive, incomplete
+  prefix and wrong-counter negative; this is assisted early health, not frozen
+  competence. Root 3019 is still training; its final result remains pending.
   Pong stays queued. Preserve every completed inspection writer and both
   failed pairs; no reliability or five-game completion is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`

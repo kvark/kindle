@@ -344,9 +344,33 @@ binds the real trainer process, full command and first header: **zero counters,
 no restore**, unchanged LeVJEPA/N6/R256/hold64 recipe and actual encoder.
 All **five handoff pins** and **1,608 experiment pins** reverify; this CPU-only
 inspection peaks at **51.95 MiB** and constructs no agent. Root 3019 is training;
-its first save and final result are not yet available. All three Pong roots
-remain queued. Preserve every completed inspection writer and both failed
+its first-save check is below and its final result remains pending. All three
+Pong roots remain queued. Preserve every completed inspection writer and both failed
 pairs; no reliability or five-game completion is claimed.
+
+### Freeway root 3019: first-save health
+
+The first checkpoint completes at **15:54:55 UTC on September 12**, with
+**20,004 actions / 4,651 updates**. The separately archived
+[first-save inspection](../../runs/freeway-3019-first-save-20260912.YKbe2V/result.json)
+and its independent read-only recheck verify all **241 finite tensor entries**,
+**146 optimizer moments**, the actual encoder and **26 input/artifact pins**.
+The result SHA-256 is `81b783dfe8c20edc13ee4383257516b04eb70f9e0248bfd3a46e9cd8c36b1fc8`.
+The private checkpoint copy remains fixed while training overwrites later live saves.
+
+The complete prefix ledger has **72 distinct positive reward events**, with
+first natural returns **7/3/4/10/2/1**. It contains 602 replay batches without
+positive rewards; only updates 1 and 2 report zero absolute advantage. The
+prefix is intentionally incomplete (`missing run_end`); incrementing its
+checkpoint counter is rejected as required. These are assisted training
+observations, not frozen-policy competence.
+
+All **9,159 raw prefix GPU samples** pass coverage: maximum gap **0.265 seconds**,
+minimum **3,303 MiB directly free**. The one-core / 2 GiB / zero-swap inspection
+peaks at **266.60 MiB host memory** and constructs no agent. Preserve this
+completed exclusive archive and its negative fixture; never rerun the writer
+or substitute this early save for the declared final checkpoint. The same
+trainer continues toward its unchanged 200,004-action budget.
 
 ### Freeway second failure: action-only follow-up
 
