@@ -400,6 +400,14 @@ reliable learning.
   must bind to one complete history; they are not independent roots. No new dose
   run, GPU declaration/follower or runtime qualification exists. Preserve this
   completed validation and the actual negative results; see the Qbert report.
+  The command/midpoint-observer preparation in
+  `runs/qbert-dose-execution-20260912.klONsv` passes 53 CPU tests with 70 pins.
+  Its transformed historical log is explicitly marked and rejected as native
+  training; actual CPU/Freeway children cannot bind as the proposed Qbert trainer.
+  It launches or signals no learner. A future controller must supervise observer
+  failure and require complete predecessor/command/GPU evidence before launch.
+  No dose declaration, follower or runtime qualification exists. Preserve its
+  completed exclusive fixture writer; do not rerun it. See the linked Qbert report.
   The full continuation exits normally at 23:32:55. Its independently rechecked
   twelve commands/eight native phases, 1,593 pins, complete finite states and
   moments, actual encoders, ledgers and replay/video bindings pass, retaining

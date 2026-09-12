@@ -159,6 +159,33 @@ GPU qualification or learning result**. New command-lifecycle and complete
 runtime/memory evidence still belong to a separate future declaration. No
 GPU job or follower starts here. Preserve the completed checker validation.
 
+### Midpoint observer and commands prepared
+
+The [execution preparation](../../runs/qbert-dose-execution-20260912.klONsv/result.json)
+passes **53 CPU tests**, with **70 verified pins**. It prepares one continuous
+training command, midpoint/final frozen evaluations, a separately saved/restored
+untrained control and three whole-stream replay/video commands. Training changes
+only the declared budget/save cadence and artifact paths; the other native
+commands differ from the historical pilot only in paths.
+
+The external observer binds PID, start time, parent and exact command. It reads
+new log bytes incrementally, waits for partial writes and retains the settled
+midpoint once. Wrong headers, missed saves, changed processes/logs and failed
+copies stop without a success marker or retry. It never starts, pauses, restores
+or signals the learner. The future controller must supervise both processes and
+propagate observer failures; complete prerequisite, command and GPU-window checks
+are still required before a separate launch declaration.
+
+The positive log fixture copies 83,869 historical rows, explicitly changes its
+budget/header and omits nine earlier saves. It is **marked CPU fixture data**,
+not a new native run: the production recipe check rejects that marker. The old
+pilot's save cadence is also rejected rather than reinterpreted. Actual `/proc`
+checks bind a short-lived CPU child and reject both that child and the live
+Freeway trainer as the proposed Qbert trainer. Validation peaks at **124.14 MiB
+host memory** under one-core / 2 GiB / zero-swap limits. No new checkpoint copy,
+runtime declaration, GPU work, follower or learning result exists. Preserve the
+completed exclusive fixture writer; do not rerun it.
+
 ## Evidence and limits
 
 The [frozen diagnostics](../../runs/qbert-frozen-diagnostic-20260911.asgiON/result.json)
