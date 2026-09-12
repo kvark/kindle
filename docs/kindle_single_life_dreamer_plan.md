@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-11. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-12. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -43,7 +43,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is running, beginning with root 1009. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
-| Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Learned improvement, not competence: both the 90% milestone rate and mean-15,000 gate fail. Inspect early-pyramid misses and subsequent progression before a bounded repair comparison; do not replicate this failed recipe unchanged. |
+| Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Both competence gates fail. Completed replay finds early misses and little post-bonus progress; prefer a separately declared bounded experience-budget comparison, not fresh-seed replication of this failed recipe. |
 
 The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
 stopped the runtime handoff: an unattended NVIDIA update left new user-space
@@ -515,11 +515,15 @@ and source integration are complete. Breakout and Qbert have complete paired
 pilots, but both fail competence. Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
 Monitor the declared Freeway confirmation and subsequent Pong run. Breakout's
-bounded action-width diagnostic remains queued after them. For Qbert, distinguish
-missed initial pyramids from insufficient full-episode progress before choosing a
-separate repair comparison; even its successful initial pyramids score only
-4,575–5,425. This does not identify a cause or authorize an undeclared extension.
-Confirm a successful repair on fresh roots. Separately qualify the multi-match
+bounded action-width diagnostic remains queued after them. Qbert's
+[completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
+initial misses from low post-bonus progress: only 4.68% of training frames follow
+the first pyramid, including its bonus animation. Prefer a separately declared
+fresh 400,008-action dose test with a retained 200,004-action midpoint, keeping
+the rest of the recipe fixed. No new GPU job is queued; stop at the declared
+endpoint, retain failures, and confirm a successful choice on fresh roots.
+Limited exposure is not a proven cause or a reason to relax the gates.
+Separately qualify the multi-match
 world-model diagnostic candidate when the shared GPU is available, without
 changing or displacing pinned work. Optimize measured costs, not activity percentage.
 Do not substitute another framework, larger perception, arbitrary long run or

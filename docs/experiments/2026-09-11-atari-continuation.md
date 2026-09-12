@@ -168,6 +168,12 @@ extension of this completed pilot. The separately declared
 raw predecessor and started fresh Freeway root 1009 at **23:34:06 UTC**. This
 handoff preserves both failed pilots; it does not add a confirmed Atari game.
 
+The subsequent [completed replay diagnostic](2026-09-12-qbert-diagnostic.md)
+separates early-pyramid misses from low post-bonus progress and replays the
+entire training history. It makes a bounded, separately declared experience-budget
+comparison the preferred next Qbert test; no new GPU queue, changed gate or
+reliability result is implied.
+
 ### First Qbert save: healthy prefix, not competence
 
 The first save completed at **17:18:58 UTC**, with **20,004 actions / 4,651

@@ -366,6 +366,24 @@ reliable learning.
   initial-pyramid misses and subsequent progression before a separately declared
   bounded repair, then confirm a successful choice on fresh roots. Neither
   longer exposure nor Freeway/Breakout's interventions are established fixes.
+  The completed CPU diagnostic in `runs/qbert-frozen-diagnostic-20260911.asgiON`
+  now replays both full frozen runs, all 200,004 training actions / 49,651 updates,
+  all earlier archived prefix episode outcomes and the original scripted positive/
+  negative fixtures. All 23 CPU tests, 115 summary pins and 47 raw replay snapshots
+  reverify. Four early misses stall at 20/21 cubes. All seventeen first completions
+  occur at 1,325 points and match the fixture's exact 3,100-point bonus timing;
+  subsequent play adds only 150–1,000 points. Thirteen retain three ALE lives at
+  first completion. Do not relabel display-color changes as verified later levels.
+  Training has 31 first-pyramid completions in 345 completed episodes; only
+  37,443/799,510 actual frames follow that milestone, including bonus animation.
+  Late online progress is uneven, not monotonic. Prefer a separately declared
+  fresh continuous 400,008-action Qbert dose comparison with a retained 200,004
+  midpoint, keeping the remaining recipe and both competence gates fixed. This
+  diagnostic starts no new GPU declaration or follower and does not change the
+  Freeway -> Pong -> Breakout hardware order. Stop at the declared endpoint;
+  failures require reassessment, a successful choice needs fresh-root confirmation.
+  Preserve completed outputs and setup failures; do not rerun exclusive writers.
+  See `docs/experiments/2026-09-12-qbert-diagnostic.md` for limits and full evidence.
   The full continuation exits normally at 23:32:55. Its independently rechecked
   twelve commands/eight native phases, 1,593 pins, complete finite states and
   moments, actual encoders, ledgers and replay/video bindings pass, retaining
