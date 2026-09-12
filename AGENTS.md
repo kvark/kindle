@@ -697,9 +697,17 @@ reliable learning.
   command lifecycle, all 241 finite entries/146 moments, actual encoder and
   1,608 experiment pins. All 93,531 raw training GPU samples pass with at least
   3,303 MiB directly free. The actual 21:48:00 frozen header restores the exact
-  final files/counters without assistance; its 75k evaluation and separately
-  restored untrained control remain pending. Preserve the captured inspection:
-  it binds the then-live evaluator, not a reusable completion writer. Require
+  final files/counters without assistance. Its 75k frozen run exits normally at
+  22:25:40: only 5/36 natural rounds qualify, mean 22.4722, with zero updates
+  and no cutoffs. Both competence thresholds fail. The captured read-only
+  `frozen-result.json` independently rechecks complete state/ledgers/replay/video,
+  command outputs and all 1,608 pins. All 9,298 frozen GPU samples pass with at
+  least 3,413 MiB directly free. The six-action zero-update initialization and
+  actual 22:28:41 control restore verify all 146 zero moments, zero normalizer,
+  complete state and exact files/counters. Its 75k control is still running.
+  Preserve both captured inspections: they bind then-live processes, not reusable
+  completion writers. All three fresh trained policies fail their frozen gates;
+  the complete three-pair confirmation remains pending. Require
   the unchanged complete `continuation.freeway_auditor().verify()` after all
   three pairs. Pong stays queued. Preserve every completed inspection writer
   and both failed pairs; no reliability or five-game completion is claimed.

@@ -1,12 +1,12 @@
 # Freeway and Pong confirmations after driver recovery
 
-Freeway roots **1009 and 2017 have completed their full trained/control pairs
-and fail competence**: trained means **24.5833 / 22.7778**, with **16/36 and 3/36**
-natural rounds reaching 25 crossings. Both restored untrained controls return
-zero. Root **3019 completes training at 21:46:49 UTC on September 12**, with
-200,004 actions / 49,651 updates and independently verified final state. Its
-unassisted frozen evaluation is running; the full pair remains pending. Pong
-stays queued. Boxing is still the only game with a completed three-root gate.
+All three fresh Freeway policies **fail competence**. Roots **1009/2017/3019**
+score means **24.5833 / 22.7778 / 22.4722**, with **16/36, 3/36 and 5/36**
+natural rounds reaching 25 crossings. The first two trained/control pairs are
+complete and their controls return zero. Root 3019's final frozen result is
+independently verified; its separately restored untrained evaluation is running.
+The complete confirmation audit remains pending. Pong stays queued. Boxing is
+still the only game with a completed three-root competence gate.
 
 The serial follower started at **17:11:03 UTC on September 11**, bound to the
 actual Breakout/Qbert controller. That predecessor completed normally at
@@ -344,7 +344,7 @@ binds the real trainer process, full command and first header: **zero counters,
 no restore**, unchanged LeVJEPA/N6/R256/hold64 recipe and actual encoder.
 All **five handoff pins** and **1,608 experiment pins** reverify; this CPU-only
 inspection peaks at **51.95 MiB** and constructs no agent. Root 3019's first-save
-and completed-training checks are below; its final frozen/control result remains
+and completed-training/frozen checks are below; its final control remains
 pending. All three Pong roots remain queued. Preserve every completed inspection
 writer and both failed pairs; no reliability or five-game completion is claimed.
 
@@ -396,10 +396,38 @@ The existing controller launches frozen evaluation at **21:46:53 UTC**. Its
 actual **21:48:00** header restores the exact final files and counters, native
 f6a2b6ad and original LeVJEPA encoder, using **75,000 sampled v2 actions without
 exploration**. Actual process/start/parent/command and header identity reverify.
-This evaluation and the separately restored untrained control remain pending.
-Preserve both previous failed pairs; require the unchanged complete
-`continuation.freeway_auditor().verify()` after all three pairs, not a partial
-confirmation pass or a restarted queue.
+The completed frozen result is below; its separately restored untrained control
+remains pending. Preserve both previous failed pairs; require the unchanged
+complete `continuation.freeway_auditor().verify()` after all three pairs, not
+a partial confirmation pass or a restarted queue.
+
+### Freeway root 3019: failed frozen gate
+
+The unassisted evaluator exits normally at **22:25:40 UTC on September 12**
+after **75,000 actions**, with **zero updates and no cutoffs**. The full replay
+finishes at **22:26:20**. Only **5/36 natural rounds** reach 25 crossings;
+mean return is **22.4722**. Both the 90% success-fraction and mean-25 gates fail.
+The [complete stream-zero video](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed3019-evaluation.mp4)
+is a failed-policy rollout, not a success selection.
+
+The [independent read-only inspection](../../runs/freeway-3019-final-training-20260912.dRwzu9/frozen-result.json)
+rechecks complete ledgers, final state and optimizer counters, actual encoder,
+score/replay/video, completed command outputs and all **1,608 experiment pins**.
+All **9,298 raw frozen GPU samples** pass coverage, with at least **3,413 MiB
+directly free**. Its result SHA-256 is
+`0ff15182909fe3240292d71839f451e6540080705794e83703e5ae84e5d10c5b`.
+The capped CPU process peaks at **195.27 MiB host memory** and constructs no agent.
+Preserve its captured command/result; it binds the then-live control and must
+not be rerun as a completion writer.
+
+The six-action same-seed initialization completes at **22:27:31**, with zero
+updates. The separately restored control's actual **22:28:41** header binds
+those exact files and counters, unchanged native/encoder/environment identities
+and **75,000 unassisted sampled actions**. All **146 initial optimizer moments**
+and the return normalizer are zero; complete tensor and native-layout checks
+pass. Its actual process/start/parent/command are verified. This control and
+the strict whole-confirmation audit remain pending; do not stop or restart the
+queue, weaken the gate, or claim the declared competence gate passed.
 
 ### Freeway second failure: action-only follow-up
 

@@ -41,7 +41,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued after Freeway. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
-| Freeway | Seed-0 hold64/hold1 pilots pass unassisted evaluation, means 31.0556 / 29.0278; untrained mean 0. Fresh roots 1009/2017 fail: means 24.5833 / 22.7778, with 16/36 and 3/36 qualifying rounds. Both complete untrained controls return 0. | The recipe is not reliable at the declared gate. Root 3019 has completed training; its final frozen/control pair is pending. The [training timeline](experiments/2026-09-11-recovered-confirmations.md#freeway-training-timeline-late-change-in-the-successful-pilot) shows late change in the successful pilot; prefer a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This is a hypothesis, not an adopted budget or relaxed gate. |
+| Freeway | Seed-0 hold64/hold1 pilots pass unassisted evaluation, means 31.0556 / 29.0278; untrained mean 0. Fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. The first two complete untrained controls return 0; the last is running. | The recipe is not reliable at the declared gate; whole-confirmation completion still awaits the last control. The [training timeline](experiments/2026-09-11-recovered-confirmations.md#freeway-training-timeline-late-change-in-the-successful-pilot) shows late change in the successful pilot; prefer a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This is a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
 | Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Both competence gates fail. Completed replay finds early misses and little post-bonus progress; prefer a separately declared bounded experience-budget comparison, not fresh-seed replication of this failed recipe. |
 
@@ -190,7 +190,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> episode/runtime and recovered-driver qualification [complete]
   -> Breakout paired pilot [complete; competence failed]
   -> Qbert paired pilot [complete; competence failed]
-  -> Freeway three-root confirmation [roots 1009/2017 fail; root 3019 final evaluation]
+  -> Freeway three-root confirmation [all trained gates fail; last control running]
   -> longer-budget Pong three-root confirmation [queued]
   -> Breakout action-width hardware/synthetic diagnostic [queued; no learning]
 ~~~
