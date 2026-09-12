@@ -67,6 +67,13 @@ reliable learning.
   source-matched integration evidence, not long-run Atari runtime qualification.
   The separate source-adoption audit freshly reverifies the complete runtime
   and main evidence, binding 346 source/artifact pins including new checkpoints.
+  The September 12 direct upstream preflight finds de7e6fcf: four newer commits
+  change only documentation/paper files. Every other tracked path, including
+  runtime, shader, build and test inputs, is identical to ce80e9cd. Main and
+  the current block-matmul/Breakout candidates contain all current upstream
+  runtime fixes. Preserve the 25-pin readout in
+  `runs/meganeura-upstream-recheck-20260912.jo1ZlX`; no dependency identity churn,
+  rebuild or GPU rerun is needed for these documentation-only changes.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated
@@ -185,6 +192,15 @@ reliable learning.
   changed heads or intrinsic hash schemes instead of reinterpreting old state.
   Verify the actual encoder file on restore; matching shapes are not identity.
   Require complete checkpoint tensors; a detected torn save is not atomic recovery.
+- Before new backend diagnosis or optimization, freshly check upstream main and
+  compare actual runtime/build changes with the candidate, including upstream
+  regression tests and fixes. Carry relevant fixes into an isolated candidate
+  before rediscovering old bugs. Record the checked tip; do not call an old
+  revision current or churn checkpoint identity for documentation-only changes.
+  The deferred grouped-RSSM and world-sync candidates still use a7e2efd9:
+  carry their candidate-only changes onto the current qualified backend before
+  any new diagnosis. Historical reproductions remain explicitly historical;
+  preserve their originals and all active packages/queues.
 - Profile learner stages, synchronization, and GPU idle time before committing
   days of compute. Check existing branches and local run artifacts before
   repeating old experiments. Preserve corrected full-precision gradients and
@@ -579,6 +595,26 @@ reliable learning.
   All 9,139 prefix GPU samples retain at least 3,303 MiB directly free. Preserve
   the completed archive, wrong-counter negative and import failure; never rerun
   its exclusive writer or substitute this checkpoint for the declared final one.
+  Freeway-1009 training completes normally at 06:04:24 UTC on September 12:
+  200,004 actions / 49,651 updates. `runs/freeway-final-training-20260912.GMVEG7`
+  independently rechecks all 241 finite entries/146 moments, the complete ledger,
+  actual encoder, 1,608 experiment pins and all 93,569 raw GPU samples, with
+  at least 3,303 MiB directly free. Its 0.5710x aggregate real time is not a
+  speedup. The 06:04:28 frozen startup restores the exact final files/counters
+  without assistance. Its complete 75k frozen result fails: mean 24.5833,
+  16/36 qualifying natural rounds, zero updates/cutoffs. The separate frozen
+  inspection rechecks complete state/score/replay/video and all 9,421 raw GPU
+  samples with at least 3,413 MiB free. The six-action untrained initialization
+  and actual restore verify all 146 zero moments and zero normalizer; its 75k
+  frozen evaluation starts at 06:45:39 and is still running. Other roots remain
+  outstanding. Preserve both completed inspections; never rerun their writers.
+  The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
+  finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
+  hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,
+  versus Kindle's 24.5833; all 16 pins and action/episode accounting reverify.
+  The reference was not independently replayed, is not a Kindle win, and proves
+  neither visual feedback nor the failure's cause. Preserve the unchanged gates
+  and remaining queue; no new recipe, GPU declaration or follower starts here.
   Valid competence failures remain failures; incomplete data, changed host/input,
   runtime or integrity failure stops without retry. Preserve the actual driver
   headers, first-four-match Pong world-source selection and all old roots. No

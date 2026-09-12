@@ -4,7 +4,11 @@ The serial follower started at **17:11:03 UTC on September 11**, bound to the
 actual live Breakout/Qbert continuation controller. That predecessor completed
 normally at **23:32:55** with both pilots failing competence. The follower
 reverified its complete raw evidence and started **Freeway root 1009 at
-23:34:06 UTC**. Pong remains queued. Boxing is still the only game with a
+23:34:06 UTC**. Its training completed normally at **06:04:24 UTC on September
+12**. Its completed unassisted frozen evaluation **fails**: mean **24.5833**,
+only **16/36** natural rounds reaching 25 crossings. The separately restored
+untrained control is running; roots 2017/3019 and Pong remain queued. Boxing is
+still the only game with a
 completed three-root competence result.
 
 The original stopped follower and unstarted Freeway/Pong roots are preserved.
@@ -97,8 +101,8 @@ The [actual training header](../../runs/atari-recovered-confirmations-20260911.x
 confirms fresh root 1009, zero starting counters, no restore, the original
 LeVJEPA weights and native `f6a2b6ad` on driver 595.91.07. It retains source
 `90b4763`, N6/R256, 200,004 training actions and probability .5/hold64
-exploration. Roots 2017/3019 and every unassisted frozen/control pair remain
-outstanding. Preserve the live package, scripts and declarations.
+exploration. Root 1009's trained frozen result is below; its paired control and
+roots 2017/3019 remain outstanding. Preserve the live package, scripts and declarations.
 
 ### Freeway root 1009: first-save health
 
@@ -131,6 +135,76 @@ its identity. It failed before any archive writes; the corrected invocation
 uses the same qualified package. Preserve this completed archive and never rerun
 its exclusive writer. It does not replace the final checkpoint or add a confirmed
 game.
+
+### Freeway root 1009: completed training
+
+The final model contains **200,004 actions / 49,651 updates**. The independent
+[completed-training inspection](../../runs/freeway-final-training-20260912.GMVEG7/result.json)
+rechecks the source-matched complete ledger, all 241 finite tensor entries and
+146 optimizer moments, actual encoder, normalizer, command outputs and all
+1,608 experiment pins. The actual frozen startup header restores those exact
+four checkpoint-file hashes and counters, without exploration assistance.
+The inspection launches no learner or GPU work; its one-core / 2 GiB / zero-swap
+scope peaks at 79.64 MiB host memory. Its completed writer must not be rerun.
+
+Training discovers **1,364 distinct positive reward events**, with 95 of 96
+natural rounds rewarded and mean return **13.96875** under assistance. Only
+updates 1 and 2 have zero absolute advantage; all 49,651 reports are finite.
+These are training observations, not final-policy competence or reliability.
+
+All **93,569 raw GPU samples** cover construction through command exit, with
+maximum gap .269 seconds and at least **3,303 MiB directly free**. Mean GPU
+activity is **68.29%**. Actual-frame throughput is **8.5648 actions/s**, **0.5710×
+aggregate real time**, or **0.09516× per stream**, with learning enabled. This
+is another completed runtime measurement, not a matched speedup or an idle-gap
+measurement. Its completed frozen result is below; the separately restored
+untrained control and roots 2017/3019 remain outstanding.
+
+### Freeway root 1009: failed frozen gate
+
+The **75,000-action** final evaluation completes all **36 natural rounds**,
+with no cutoffs or learner updates. Mean return is **24.5833**, and **16/36
+(44.44%)** reach 25 crossings. It fails both the mean-25 and 90%-success gates.
+Keep this failure and finish the remaining declared roots and controls; do not
+weaken the gate, select another checkpoint or restart training.
+
+The independent [frozen inspection](../../runs/freeway-final-training-20260912.GMVEG7/frozen-result.json)
+recomputes the complete source-matched ledger and task score, rechecks the actual
+final restore and unchanged complete trained state, and binds the successful
+whole CPU replay/video command. Watch the [whole stream-zero evaluation](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-evaluation.mp4):
+49,999 frames at 60 fps, including every round and the tail, not a success montage.
+All 9,421 raw frozen GPU samples pass coverage and retain at least **3,413 MiB
+directly free**. Frozen throughput is **2.1820× aggregate real time**; this is
+not the training rate.
+
+The same-seed untrained model is freshly saved after **six actions / zero
+updates**. Its full state, all **146 zero optimizer moments**, zero normalizer
+and actual restored evaluation header reverify. Its 272-sample initialization
+window retains at least 3,415 MiB free. Its separate 75k evaluation starts at
+**06:45:39 UTC** and remains incomplete. No untrained score or complete paired
+root result is claimed yet. Preserve both completed exclusive inspection writers.
+
+### Bounded post-hoc behavior check
+
+The [CPU action/reference readout](../../runs/freeway-1009-behavior-20260912.qdz9AI/result.json)
+finds **98.1427% UP-labelled actions** in the complete current frozen trace,
+versus **91.4613%** in the successful historical seed-0 hold64 trace. That pilot
+is historical context, not a newly matched native arm.
+
+A separately recorded, feedback-free **constant-UP CPU reference** uses the
+same wrapper, actual ROM, six environment seeds and 75,000-action budget. It
+returns mean **21.3333** over 36 natural rounds, none reaching 25; all completed
+rounds and tails are retained. Its 16 input pins and action/episode accounting
+reverify under one core / 2 GiB / zero swap, peaking at 35.86 MiB host memory.
+No Kindle or GPU is constructed. Independent ALE replay of this reference was
+not performed; its explicit constant action and trajectory digest are preserved.
+
+The trained policy exceeds that reference by **3.25 crossings**, but its
+near-UP action mix suggests limited behavior worth examining after the remaining
+roots finish. This is **not** proof of visual-feedback use, planning, a world-model
+failure or the cause of seed variation. Training discovered rewards and remained
+finite; neither reward starvation nor numerical collapse is established here.
+No new learning recipe, GPU declaration or follower is introduced.
 
 ### Remaining queue requirements
 

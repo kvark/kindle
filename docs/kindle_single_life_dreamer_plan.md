@@ -41,7 +41,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | --- | --- | --- |
 | Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the declared mastery gate. The old all-seed recipe fails; fresh longer confirmation is queued after Freeway. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
-| Freeway | Matched seed-0 exploration pilot: hold64 and hold1 both pass unassisted final evaluation, 36/36 qualifying rounds each; means 31.0556 / 29.0278. Untrained mean 0. | Hold64 is provisional, not proved necessary or reliable. Fresh three-seed confirmation is running, beginning with root 1009. |
+| Freeway | Seed-0 hold64/hold1 pilots pass unassisted evaluation, means 31.0556 / 29.0278; untrained mean 0. Fresh root 1009 fails: mean 24.5833, only 16/36 qualifying rounds. | The pilot did not establish reliability. Finish root 1009's control and the remaining declared roots; inspect the near-UP behavior before selecting any repair. Keep both gates unchanged. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
 | Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Both competence gates fail. Completed replay finds early misses and little post-bonus progress; prefer a separately declared bounded experience-budget comparison, not fresh-seed replication of this failed recipe. |
 
@@ -67,6 +67,8 @@ Watch whole stream-zero evaluations, including failures and unfinished tails:
 - [Freeway hold64](../runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4)
   and [hold1](../runs/freeway-persistence-learning-20260909.C0GoqT/hold1-evaluation.mp4);
   both movies are **unassisted frozen evaluation**, unlike assisted training.
+  [Fresh root 1009](../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-evaluation.mp4)
+  fails the unchanged competence gate; see its [score and bounded diagnostic](experiments/2026-09-11-recovered-confirmations.md#freeway-root-1009-failed-frozen-gate).
 - [Breakout trained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4)
   and [untrained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4);
   learned improvement, but neither completes both walls.
@@ -305,8 +307,12 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main now pins upstream `ce80e9cd`, still latest at the September 11 remote
-recheck. It fixes generated matmul epilogues and includes the required LeVJEPA
+Main pins upstream `ce80e9cd`. The [September 12 preflight](experiments/2026-09-11-meganeura-runtime.md#september-12-upstream-preflight)
+finds tip `de7e6fc` differs only in four documentation/paper files: all runtime,
+build and test inputs remain identical. No runtime fix is missing from main or
+the current block-matmul/Breakout candidates. Recheck upstream before new backend
+diagnosis; carry older candidates forward before testing them as current code.
+The pinned runtime fixes generated matmul epilogues and includes the required LeVJEPA
 frame-prefix attention/cache-alias corrections. Blade stays 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
 passes full production gradients, cache parity, complete optimizer/state/report/

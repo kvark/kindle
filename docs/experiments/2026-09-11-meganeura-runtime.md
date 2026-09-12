@@ -147,3 +147,28 @@ started by this qualification.
 World-model diagnostics remain separate from the dependency update: the
 [completed video reports](2026-09-08-world-evaluation.md) compare predictions
 made before observations with actual outcomes using each model's original build.
+
+## September 12 upstream preflight
+
+The fresh direct remote checks at **06:48–06:53 UTC** resolve main to
+[`de7e6fcf`](https://github.com/kvark/meganeura/commit/de7e6fcf7ebec6fda003e3dae4a7f3e6f3a93169),
+four commits beyond `ce80e9cd`. The [recorded comparison](../../runs/meganeura-upstream-recheck-20260912.jo1ZlX/result.json)
+verifies that only four documentation/paper files changed. Every other tracked
+path is identical, including runtime, shaders, build configuration and tests.
+The `src` and `tests` tree IDs and `Cargo.toml` blob ID match exactly. All 25
+source/checker pins are recorded; the shared backend checkout stays on its
+original clean `megakernel-probe` branch.
+
+| Kindle source | Actual runtime pin | Consequence |
+| --- | --- | --- |
+| Main, current block-matmul candidate, Breakout minimal candidate | `ce80e9cd` | All current upstream runtime fixes are present. No rebuild or new qualification follows from this documentation-only tip. |
+| Active Atari control | `4d45ba3a` | Preserve its explicit historical package/checkpoint identity and already declared comparisons. Do not switch a live run. |
+| Deferred grouped-RSSM and world-sync candidates | `a7e2efd9` | Carry candidate-only changes onto the current qualified backend before any new diagnosis. Their old evidence is not a current-backend result. |
+
+Before another backend diagnosis or optimization, repeat the upstream comparison
+and inspect relevant upstream fixes/regression tests first. Do not recreate a
+fix already available upstream. A changed runtime needs an isolated source-matched
+candidate and the existing numerical/state/memory/timing requirements; a changed
+paper does not justify checkpoint-identity churn or another GPU queue. This
+preflight changes no dependency, package, experiment or scheduled work and makes
+no speedup claim.
