@@ -164,9 +164,18 @@ reliable learning.
   All ten commands and 5,683 pins reverify, including the copied build cache and
   1,870 hardware pins. The fresh release library/canary are built, not GPU-tested.
   The one-core / 2 GiB / zero-swap host scope peaks at 1,932.9 MiB. Preserve this
-  CPU-only carry and original candidate; no new Python package, GPU follower or
-  adoption exists. Require matched current-backend full-state, gradient, pixel,
+  CPU-only carry and original candidate. That carry built no Python package
+  and started no GPU follower. Require matched current-backend full-state, gradient, pixel,
   memory and AB/BA timing gates after the fixed queue before later learning use.
+  The subsequent September 12 package in
+  `runs/block-matmul-package-continuation-20260912.QUT8zv` is CPU-qualified only:
+  native f4742ac7, 547 passing Python tests and 9,574 independently rechecked
+  pins, with source/wheel/import identity and all controls unchanged. The
+  one-core / 2 GiB / zero-swap build peaks at 2,048 MiB host memory. Preserve
+  the original pre-compilation Cargo PATH failure in
+  `runs/block-matmul-package-20260912.Ipk6gU` and the completed continuation;
+  never rerun either writer. Its read-only `audit.py` may be reused. No GPU declaration,
+  follower, runtime qualification, speedup or adoption exists for this package.
   See `docs/experiments/2026-09-10-block-matmul.md` for required hardware gates.
   Do not repeat large CPU graph
   compilation alongside training: the first memory-plan probe caused host

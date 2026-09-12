@@ -1,7 +1,8 @@
 # Small-batch block matrix products: CPU-only candidate
 
-Prepared September 10, with a separate September 11 carry onto the qualified
-upstream backend below. Not adopted, timed or GPU-qualified. The pinned learning
+Prepared September 10, with a September 11 carry onto the qualified upstream
+backend and a September 12 source-matched Python package below. Not adopted,
+timed or GPU-qualified. The pinned learning
 campaigns keep their original packages and inputs. Neither candidate starts a
 GPU worker or follower.
 
@@ -80,9 +81,9 @@ target directory, package, checkpoint or runner was replaced.
 
 ## Required hardware comparison, not yet declared or scheduled
 
-Retain the current serial learning queue. Afterwards, build source-matched
-candidate and control packages and predeclare a separate comparison on the
-qualified current backend. Do not combine this with world-sync fan-out, a
+Retain the current serial learning queue. Afterwards, predeclare a separate
+comparison using source-matched candidate and control packages on the qualified
+current backend. Do not combine this with world-sync fan-out, a
 backend refresh, exploration, replay-ratio or BPTT changes.
 
 1. Run the new ignored native f64 composed-loss/all-gradient test and Kindle's
@@ -144,3 +145,38 @@ carry declares no GPU comparison or follower. The full hardware, complete-state
 from update 1, source-matched Python-package, pixel AB/BA, direct-free memory and
 timing gates above remain necessary before adoption for any later learning run.
 Preserve the completed preparation; no speedup or additional game is claimed.
+
+## September 12: isolated Python package, CPU-qualified only
+
+The [completed package](../../runs/block-matmul-package-continuation-20260912.QUT8zv/result.json)
+builds the unchanged `7b190f8` candidate into an isolated CPython 3.14 wheel and
+package, native **`f4742ac7`**. Its actual import, compiled library and wheel
+bytes agree; all six Python modules match the candidate source. The build log
+confirms both Kindle and its Python binding compiled from that worktree.
+All **547 Python CPU tests pass** with this extension. The existing **98 Rust
+CPU tests / 23 ignored GPU tests** are rechecked from their pinned raw logs,
+not rerun or represented as GPU evidence.
+
+The [read-only rechecker](../../runs/block-matmul-package-continuation-20260912.QUT8zv/audit.py)
+independently verifies all **9,574 pins**, three command lifecycles and raw logs,
+source/wheel/import identity, test counts and the unchanged historical/default
+and qualified upstream controls. Result SHA-256:
+`b0feb3251cb1c8e41549c71cebebecbfc7e129fb86fa30830b94bbc6f7e736f7`.
+The fresh upstream preflight still finds `3622e06f`; only documentation/paper
+files differ from the package's qualified `ce80e9cd` runtime.
+
+The first attempt in `runs/block-matmul-package-20260912.Ipk6gU` stops before
+compilation because the capped service cannot find Cargo. Preserve its
+[original failure](../../runs/block-matmul-package-20260912.Ipk6gU/wheel-build.log)
+and copied cache. The separate continuation only exposes the installed Rust
+toolchain in the subprocess PATH; it changes no source or dependency. It finishes
+normally under one core / 2 GiB / zero swap, with a **2,048 MiB cgroup memory
+peak**. That is host memory, not GPU usage or extra headroom. No production world
+graph, GPU fixture or native learning agent is constructed.
+
+The package is ready for a future matched comparison against qualified
+`1e00e818` / native `abf4ae5d`, not for learning use yet. Keep the complete-state,
+all-gradient, cache/reset, N6 pixel AB/BA, direct-free memory and timing gates
+above. No GPU declaration or follower is added; the existing Freeway → Pong →
+Breakout hardware order remains unchanged. Preserve both exclusive packaging
+writers; the read-only rechecker may be reused.
