@@ -625,6 +625,15 @@ reliable learning.
   are assisted early health, not frozen competence. All 9,154 prefix GPU samples
   retain at least 3,303 MiB free. Preserve this completed exclusive archive and
   its ad-hoc monitor note; no pinned gate, learner or queue was changed.
+  Root 2017 training exits normally at 13:56:01 UTC on September 12 with
+  200,004 actions / 49,651 updates. The complete ledger, all 241 finite tensor
+  entries/146 moments, actual encoder, 1,608 experiment pins and 11 inspection
+  pins reverify in `runs/freeway-2017-final-training-20260912.AxpiAZ`.
+  All 93,584 raw training GPU samples pass with at least 3,302 MiB directly free.
+  The actual 13:56:05 frozen startup restores the exact final files/counters
+  without assistance. Its 75k result and same-seed untrained control remain
+  pending; root 3019 and Pong stay queued. Preserve the completed inspection
+  writer and normal handoff; no new competence or reliability is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,

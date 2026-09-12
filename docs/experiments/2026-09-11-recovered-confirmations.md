@@ -258,8 +258,8 @@ All **9,154 prefix GPU samples** pass coverage, with maximum gap .268 seconds
 and at least **3,303 MiB directly free**. The one-core / 2 GiB / zero-swap
 archive process peaks at **255.87 MiB host memory** and constructs no agent.
 Preserve its completed exclusive writer and original source; this copy never
-replaces the declared final model. Training continues toward 200,004 actions;
-root 3019 and all three Pong roots remain queued.
+replaces the declared final model. Training was still in progress at this
+inspection; its completed final-training check follows below.
 
 The [ad-hoc monitor note](../../runs/freeway-2017-first-save-20260912.gRo8QA/monitor-note.md)
 preserves an earlier live-tail count/gap assertion. Rereading the actual logger
@@ -267,6 +267,39 @@ finds no gap or memory breach; its exact failing tail output was not captured,
 so a concurrent-append row-count race remains a hypothesis. The bounded EOF
 reader changes no pinned auditor, acceptance gate, logger or learner. No
 process was restarted and no new GPU work was launched.
+
+### Freeway root 2017: completed training, frozen evaluation running
+
+Training exits normally at **13:56:01 UTC on September 12**, with **200,004
+actions / 49,651 updates** and zero remaining training debt. The separate
+[final-training inspection](../../runs/freeway-2017-final-training-20260912.AxpiAZ/result.json)
+rechecks the complete source-matched ledger, all 49,651 finite contiguous learner
+reports, actual encoder and all **241 finite tensor entries / 146 optimizer
+moments**. All **1,608 experiment pins** and the inspection's **11 input/result
+pins** reverify. Its result SHA-256 is
+`b2960d1f19a37fe190f5d7cf26a84f8e2124a6df867945e807208456e40e38d5`.
+Preserve this completed exclusive writer and all earlier inspections.
+
+The full history contains **1,371 distinct positive reward events**; all 96
+natural training rounds receive rewards, with mean **13.9896** and no cutoffs.
+Only updates 1 and 2 report zero absolute advantage; 307 replay batches lack
+positive rewards. These are **assisted training** observations, not unassisted
+competence or a diagnosis of seed reliability.
+
+All **93,584 raw training GPU samples** pass coverage, with maximum gap .268
+seconds and at least **3,302 MiB directly free**. Training-loop throughput is
+8.5630 actions/s, **0.5709x aggregate real time / 0.09514x per stream**, not a
+speedup. The one-core / 2 GiB / zero-swap inspection peaks at **131.93 MiB host
+memory** and constructs no GPU agent.
+
+The existing controller passes its device guard and launches the unassisted
+frozen evaluator at **13:56:05 UTC**. Its actual process and restore header bind
+the exact final files, **200,004 / 49,651** starting counters, unchanged
+LeVJEPA/source/native identities and sampled v2 75,000-action protocol, without
+exploration overrides. The old trainer monitor closes on this normal process
+transition; no queue is restarted. Frozen scoring, whole replay/video and the
+separately restored same-seed untrained control remain pending. Root 3019 and
+all three Pong roots are still queued; no new competence result is claimed.
 
 ### Remaining queue requirements
 
