@@ -94,3 +94,25 @@ state beginning at update 1, separating world training from posterior/imaginatio
 inference. Do not jump directly to update 3, relax the comparator or reinterpret
 this as harmless rounding. No GPU job is scheduled by this postmortem; the
 active Atari learning queue and its serial follower retain priority.
+
+## September 12: check upstream before reopening the diagnosis
+
+The 09:28 UTC remote check still finds Meganeura `3622e06f`; runtime/build
+inputs remain identical to qualified `ce80e9cd`. The preserved grouped candidate
+`f03fb9372cde25f00fdd7d6508f58ed74b09a925` instead pins `a7e2efd9`.
+That backend's `src/compile.rs::fuse_epilogues` discards a generated pointwise
+DAG and reconstructs an operation from its legacy shader sentinel. Upstream
+[`ce80e9cd`](https://github.com/kvark/meganeura/commit/ce80e9cd6056c230590b8b7e1eb9ffe9bbce08bc)
+preserves the actual DAG, adds an exact generated-clamp regression,
+and invalidates older execution-plan caches with format 7. This is a semantic
+correctness fix, not merely tuning; current Kindle already includes it.
+
+The candidate's passing `gate_graph` fixture supplies `gates` as a parameter.
+It does not exercise the preceding `BlockLinear` matrix multiplications in
+`RssmCore::forward`, so it cannot establish their fused-epilogue correctness.
+This source-level scope check neither identifies the old divergence's cause nor
+shows that the fix repairs it. Before any new numerical diagnosis, carry only
+the grouped-gate rewrite onto the current qualified backend and inspect the
+composed graph and complete state from update 1. Preserve the original failure,
+comparators and binaries. No rebuild, GPU run, candidate adoption or new queue
+was performed by this check; the current block-matmul candidate remains separate.

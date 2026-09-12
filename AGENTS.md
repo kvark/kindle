@@ -199,7 +199,9 @@ reliable learning.
   revision current or churn checkpoint identity for documentation-only changes.
   The deferred grouped-RSSM and world-sync candidates still use a7e2efd9:
   carry their candidate-only changes onto the current qualified backend before
-  any new diagnosis. Historical reproductions remain explicitly historical;
+  any new diagnosis. The grouped gate-only fixture supplies gate values directly;
+  its pass does not cover the preceding RSSM matrix products or their generated
+  epilogues. Historical reproductions remain explicitly historical;
   preserve their originals and all active packages/queues.
 - Profile learner stages, synchronization, and GPU idle time before committing
   days of compute. Check existing branches and local run artifacts before
