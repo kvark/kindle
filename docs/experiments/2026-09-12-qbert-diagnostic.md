@@ -133,6 +133,32 @@ predecessor evidence and frozen/control budgets. **No 400k training, new GPU
 declaration, follower, runtime qualification or learning improvement occurred.**
 Preserve the completed validation; do not rerun its exclusive archive writer.
 
+### Stage accounting prepared, not a completed dose study
+
+The [separate stage checker](../../runs/qbert-dose-stage-audit-20260912.ZL33p4/result.json)
+passes **40 CPU tests** and rechecks the real historical 200k checkpoint,
+retained-prefix binding, frozen evaluation, untrained initial save and restored
+control. Their task scores remain unchanged. All 146 optimizer moments in the
+untrained save are zero. All **57 input pins** independently reverify; the
+one-core / 2 GiB / zero-swap validation peaks at **47.13 MiB host memory**.
+
+The existing final-only checkpoint auditor is unchanged. The new checker
+requires the complete continuous training ledger, binds each retained stage to
+its exact checkpoint event and bytes, and checks its actual restored path,
+counters, recipe, four-episode-per-stream frozen budget and complete replay/video
+bindings. The compound dose check requires both 200,004/400,008 stages from one
+history and the separately saved/restored same-seed untrained control. It binds
+the prepared N6/R256 recipe, not a freely changed replay ratio or frontend.
+The two checkpoints are one training root, never two independent seeds.
+
+Three actual-data negatives pass: the retained prefix is still rejected as an
+incomplete run; the old frozen log cannot claim it restored from the later
+archive path; and the existing 200k pilot cannot satisfy the proposed 400k study.
+These are CPU accounting checks, **not a new 400k run, new frozen evaluation,
+GPU qualification or learning result**. New command-lifecycle and complete
+runtime/memory evidence still belong to a separate future declaration. No
+GPU job or follower starts here. Preserve the completed checker validation.
+
 ## Evidence and limits
 
 The [frozen diagnostics](../../runs/qbert-frozen-diagnostic-20260911.asgiON/result.json)

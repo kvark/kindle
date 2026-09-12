@@ -392,6 +392,14 @@ reliable learning.
   the old pilot, so historical parity is not inferred. No new GPU declaration,
   follower or 400k result exists. Preserve its completed exclusive archive;
   detected copy failure is not atomic recovery. See the linked Qbert report.
+  The separate `runs/qbert-dose-stage-audit-20260912.ZL33p4` stage checker passes
+  40 CPU tests and rechecks the actual historical final/control pair and retained
+  prefix with 57 pins, including all 146 untrained moments being zero. It keeps
+  the old final-only auditor intact: incomplete prefixes, invented archive-restore
+  paths and relabeling the old 200k run as 400k are rejected. Both dose checkpoints
+  must bind to one complete history; they are not independent roots. No new dose
+  run, GPU declaration/follower or runtime qualification exists. Preserve this
+  completed validation and the actual negative results; see the Qbert report.
   The full continuation exits normally at 23:32:55. Its independently rechecked
   twelve commands/eight native phases, 1,593 pins, complete finite states and
   moments, actual encoders, ledgers and replay/video bindings pass, retaining
