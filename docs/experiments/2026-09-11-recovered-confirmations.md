@@ -322,10 +322,31 @@ no GPU agent.
 
 The actual untrained evaluator starts at **14:37:15 UTC**, restoring the exact
 six-action / zero-update files with unchanged encoder, native and evaluation
-inputs. Its 75k evaluation and the complete paired result remain pending.
-Root 3019 and all three Pong roots remain queued. Preserve both completed
-inspection writers and the failed trained result; no reliability or five-game
-completion is claimed.
+inputs. It completes all **75,000 actions at 15:16:02 UTC**: all **36 natural
+rounds and six unfinished tails return zero**, with no updates or cutoffs. Its
+[whole stream-zero video](../../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed2017-untrained-evaluation.mp4)
+and complete CPU replay pass. All **9,297 raw control GPU samples** pass coverage
+with at least **3,413 MiB directly free**.
+
+The pair closes normally at **15:16:41 UTC**. The independent
+[paired-result inspection](../../runs/freeway-2017-final-training-20260912.AxpiAZ/paired-result.json)
+rechecks all **six command lifecycles**, both complete checkpoints/replays,
+zero initial moments and all **four raw GPU windows**, with at least **3,302 MiB
+directly free** overall. All **11 paired input/result pins**, the earlier
+training/frozen pins and **1,608 experiment pins** reverify. Its result SHA-256
+is `a0cc76680586e6cfcad1fdef8b2a52ec4b9e6bbdd62150fd5e573f419a821a1e`.
+The capped CPU process peaks at **140.35 MiB host memory**. The trained policy
+improves over its zero-score control, but **the paired competence gate fails**.
+
+The existing controller passes its device guard and starts fresh **root 3019
+at 15:16:43 UTC**. The [actual handoff check](../../runs/freeway-2017-final-training-20260912.AxpiAZ/next-start.json)
+binds the real trainer process, full command and first header: **zero counters,
+no restore**, unchanged LeVJEPA/N6/R256/hold64 recipe and actual encoder.
+All **five handoff pins** and **1,608 experiment pins** reverify; this CPU-only
+inspection peaks at **51.95 MiB** and constructs no agent. Root 3019 is training;
+its first save and final result are not yet available. All three Pong roots
+remain queued. Preserve every completed inspection writer and both failed
+pairs; no reliability or five-game completion is claimed.
 
 ### Freeway second failure: action-only follow-up
 

@@ -637,9 +637,17 @@ reliable learning.
   unchanged complete state, score/replay/video, 11 input/result pins and all
   9,421 raw frozen GPU samples with at least 3,413 MiB free. The six-action
   untrained save and actual 14:37:15 evaluator startup reverify all 146 zero
-  moments, zero normalizer and exact restore files/counters. Its 75k result
-  remains pending; root 3019 and Pong stay queued. Preserve both completed
-  inspection writers and the failed frozen result; no reliability is claimed.
+  moments, zero normalizer and exact restore files/counters. Its 75k control
+  completes at 15:16:02: all 36 natural rounds and six tails return zero, with
+  no updates/cutoffs. The complete pair closes at 15:16:41. Its independent
+  `paired-result.json` rechecks all six commands, both states/replays and all
+  four raw GPU windows with at least 3,302 MiB directly free. All 11 paired
+  pins, earlier training/frozen pins and 1,608 experiment pins reverify.
+  The actual 15:16:43 fresh root-3019 startup is verified in `next-start.json`:
+  five handoff pins, zero counters/no restore, unchanged recipe and actual
+  encoder. Root 3019 is training; its first save/final result remain pending.
+  Pong stays queued. Preserve every completed inspection writer and both
+  failed pairs; no reliability or five-game completion is claimed.
   The bounded post-hoc CPU reference in `runs/freeway-1009-behavior-20260912.qdz9AI`
   finds 98.1427% UP-labelled actions versus 91.4613% in the historical successful
   hold64 pilot. Literal constant UP scores 21.3333 over 36 natural rounds,
