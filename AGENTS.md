@@ -67,13 +67,38 @@ reliable learning.
   source-matched integration evidence, not long-run Atari runtime qualification.
   The separate source-adoption audit freshly reverifies the complete runtime
   and main evidence, binding 346 source/artifact pins including new checkpoints.
-  The September 12 07:40 UTC upstream recheck finds 3622e06f: five newer commits
+  The September 12 07:40 UTC upstream recheck found 3622e06f: five newer commits
   change only documentation/paper files. Every other tracked path, including
   runtime, shader, build and test inputs, is identical to ce80e9cd. Main and
-  the current block-matmul/Breakout candidates contain all current upstream
-  runtime fixes. Preserve the earlier 25-pin readout and its 27-pin recheck in
+  the block-matmul/Breakout candidates contained all upstream runtime fixes at
+  that check. Preserve the earlier 25-pin readout and its 27-pin recheck in
   `runs/meganeura-upstream-recheck-20260912-0739.HyifGP`; no dependency identity churn,
-  rebuild or GPU rerun is needed for these documentation-only changes.
+  rebuild or GPU rerun was needed for those documentation-only changes.
+  The September 12 19:12 UTC recheck now finds 45991be1, with actual runtime
+  changes: calibrated GPU/transfer timestamps, tracing/loading changes and a
+  shared-context helper. It requires shared git Blade f6f2729e; registry 0.9.0
+  does not contain that timing API. The isolated dependency/identity candidate
+  `exp/meganeura-timings-20260912` at a7fc16b passes 95 Kindle, 80 focused backend,
+  nine profiler and four Blade CPU tests, formatting and both Clippy checks.
+  All 18,358 CPU input/output pins independently reverify. Its isolated native
+  29774c09 passes all 547 Python tests; the completed package check in
+  `runs/meganeura-timings-package-check-20260912.hCiUlb` binds 23,920 pins and
+  source/wheel/import identity. The bundle is in
+  `runs/meganeura-timings-package-20260912.NBiJHP/package`. Preserve that build's
+  audit-only crate-version failure and the completed check; never rerun their
+  writers. The check's `--audit` is read-only. No GPU qualification or adoption
+  exists. Main remains qualified ce80e9cd; do not call the older block/Breakout
+  packages the latest upstream runtime. Preserve the
+  standalone-lock preflight failure in `runs/meganeura-timings-cpu-20260912.mlddbv`:
+  only seven Windows-target dependency edges changed beyond Blade. The explicit
+  continuation `runs/meganeura-timings-cpu-continuation-20260912.eNLRUw` binds those
+  exact edges and checksum-matched registry metadata. Both Kindle locks change
+  only Meganeura/Blade. No tracing, skipped initialization, low-priority queues,
+  block matmul or learning settings are enabled. Keep every active/queued package
+  and the Freeway -> Pong -> Breakout hardware order fixed. Require complete
+  GPU gradient/cache/state/trace, direct-memory and timing gates before adoption;
+  calibrated API availability is not a verified Kindle idle-gap measurement.
+  See `docs/experiments/2026-09-12-meganeura-timings.md`.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

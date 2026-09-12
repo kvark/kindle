@@ -314,13 +314,18 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins upstream `ce80e9cd`. The [September 12 preflight](experiments/2026-09-11-meganeura-runtime.md#september-12-upstream-preflight)
-finds tip `3622e06f` differs only in four documentation/paper files: all runtime,
-build and test inputs remain identical. No runtime fix is missing from main or
-the current block-matmul/Breakout candidates. Recheck upstream before new backend
-diagnosis; carry older candidates forward before testing them as current code.
-The pinned runtime fixes generated matmul epilogues and includes the required LeVJEPA
-frame-prefix attention/cache-alias corrections. Blade stays 0.9.0; minimum Rust
+Main pins qualified upstream `ce80e9cd`. The [morning preflight](experiments/2026-09-11-meganeura-runtime.md#september-12-upstream-preflight)
+found only documentation changes, but the **September 12 19:12 UTC recheck** finds
+new runtime tip `45991be1`. Its [isolated update](experiments/2026-09-12-meganeura-timings.md)
+adds calibrated timing and loading/context changes with required git Blade
+`f6f2729e`. Rust/backend CPU checks and all 547 Python tests pass on its isolated
+native `29774c09`, with verified source/wheel/import identity. No GPU result or
+adoption is claimed.
+Keep this dependency comparison separate from block-matmul and other optimizations.
+Recheck upstream before new backend diagnosis; carry older candidates forward
+before testing them as current code. Existing learning/hardware queues stay pinned.
+The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
+frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
 passes full production gradients, cache parity, complete optimizer/state/report/
 trace comparisons and memory checks. Main's separate source-matched integration
@@ -380,8 +385,8 @@ The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails 
 full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. The block candidate now has an unchanged carry onto the qualified
-upstream backend, avoiding a backend change in its future comparison. Neither
+evidence only. The block candidate has an unchanged carry onto qualified ce80e9cd;
+the newer timing backend must be separately qualified before another carry. Neither
 has a verified GPU speedup or may displace the fixed queue.
 
 For every optimization, require production losses/all gradients, reset causality,

@@ -162,8 +162,11 @@ independently verifies all **9,574 pins**, three command lifecycles and raw logs
 source/wheel/import identity, test counts and the unchanged historical/default
 and qualified upstream controls. Result SHA-256:
 `b0feb3251cb1c8e41549c71cebebecbfc7e129fb86fa30830b94bbc6f7e736f7`.
-The fresh upstream preflight still finds `3622e06f`; only documentation/paper
-files differ from the package's qualified `ce80e9cd` runtime.
+That upstream preflight found `3622e06f`; only documentation/paper files differed
+from the package's qualified `ce80e9cd` runtime. The later **19:12 UTC** check
+finds runtime changes at `45991be1`; see the separate
+[timing dependency update](2026-09-12-meganeura-timings.md). This package remains
+the preserved ce80e9cd candidate, not the newest upstream runtime.
 
 The first attempt in `runs/block-matmul-package-20260912.Ipk6gU` stops before
 compilation because the capped service cannot find Cargo. Preserve its
@@ -196,7 +199,8 @@ Its [read-only audit](../../runs/block-matmul-backend-fixture-20260912.TVdIQX/pr
 (`--audit`) independently reverifies all 12,287 input/output pins, the four
 command lifecycles, actual compiled source, raw CPU results and preserved controls.
 Result SHA-256: `a1ec7bc340f7a63ce5b65611c5f3a935bec45513f5f2386e355d20fd85095485`.
-The build uses one core / 2 GiB / zero swap and starts no GPU work. The fresh
-remote check still finds documentation-only tip 3622e06f. Preserve the completed
+The build uses one core / 2 GiB / zero swap and starts no GPU work. Its preceding
+remote check found documentation-only tip 3622e06f; the newer timing update above
+requires separate qualification before carrying this optimization forward. Preserve the completed
 exclusive writer; this supplies a missing executable for the future comparison,
 not GPU qualification, a speedup, adoption or a new follower.

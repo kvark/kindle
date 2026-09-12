@@ -150,6 +150,11 @@ made before observations with actual outcomes using each model's original build.
 
 ## September 12 upstream preflight
 
+These morning checks are historical. The **19:12 UTC recheck** discovers actual
+runtime changes at `45991be1`, now staged in the separate
+[Meganeura/Blade timing update](2026-09-12-meganeura-timings.md). Preserve all
+completed evidence below; it qualifies ce80e9cd, not that newer dependency.
+
 The fresh direct remote checks at **06:48–06:53 UTC** resolve main to
 [`de7e6fcf`](https://github.com/kvark/meganeura/commit/de7e6fcf7ebec6fda003e3dae4a7f3e6f3a93169),
 four commits beyond `ce80e9cd`. The [recorded comparison](../../runs/meganeura-upstream-recheck-20260912.jo1ZlX/result.json)
@@ -165,12 +170,12 @@ again changing only those four documentation/paper files. The
 [new recorded check](../../runs/meganeura-upstream-recheck-20260912-0739.HyifGP/result.json)
 reverifies all earlier source pins, every unchanged top-level object and the
 full runtime/build/test diff against `ce80e9cd`. All **27 pins** pass. There is
-still no missing runtime fix, package change, rebuild or GPU work. The original
+no missing runtime fix at that check, package change, rebuild or GPU work. The original
 check remains preserved; fetching the remote did not change the shared checkout.
 
 | Kindle source | Actual runtime pin | Consequence |
 | --- | --- | --- |
-| Main, current block-matmul candidate, Breakout minimal candidate | `ce80e9cd` | All current upstream runtime fixes are present. No rebuild or new qualification follows from this documentation-only tip. |
+| Main, block-matmul candidate, Breakout minimal candidate at 07:40 UTC | `ce80e9cd` | All upstream runtime fixes at that check are present. No rebuild or new qualification follows from that documentation-only tip. |
 | Active Atari control | `4d45ba3a` | Preserve its explicit historical package/checkpoint identity and already declared comparisons. Do not switch a live run. |
 | Deferred grouped-RSSM and world-sync candidates | `a7e2efd9` | Carry candidate-only changes onto the current qualified backend before any new diagnosis. Their old evidence is not a current-backend result. |
 
