@@ -180,3 +180,23 @@ all-gradient, cache/reset, N6 pixel AB/BA, direct-free memory and timing gates
 above. No GPU declaration or follower is added; the existing Freeway → Pong →
 Breakout hardware order remains unchanged. Preserve both exclusive packaging
 writers; the read-only rechecker may be reused.
+
+### Backend oracle executable
+
+The upstream oracle is the separate `block_matmul` test target; it is not in
+the already compiled `regression` executable. The [isolated preparation](../../runs/block-matmul-backend-fixture-20260912.TVdIQX/result.json)
+builds that target from unchanged ce80e9cd, using a private copy of the qualified
+build cache. All five CPU tests pass; `gpu_composed_losses_and_all_gradients_match_f64`
+is listed but not executed. No new test implementation or backend change was needed.
+
+The fresh release executable is `target/release/deps/block_matmul-4e7513bce8c1178f`
+under that run, SHA-256
+`331b32d6f9e0d94d13f45c56ba96600d1e8be7ed6e677a2c14130687c9be7389`.
+Its [read-only audit](../../runs/block-matmul-backend-fixture-20260912.TVdIQX/prepare.py)
+(`--audit`) independently reverifies all 12,287 input/output pins, the four
+command lifecycles, actual compiled source, raw CPU results and preserved controls.
+Result SHA-256: `a1ec7bc340f7a63ce5b65611c5f3a935bec45513f5f2386e355d20fd85095485`.
+The build uses one core / 2 GiB / zero swap and starts no GPU work. The fresh
+remote check still finds documentation-only tip 3622e06f. Preserve the completed
+exclusive writer; this supplies a missing executable for the future comparison,
+not GPU qualification, a speedup, adoption or a new follower.

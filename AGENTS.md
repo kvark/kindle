@@ -176,6 +176,12 @@ reliable learning.
   `runs/block-matmul-package-20260912.Ipk6gU` and the completed continuation;
   never rerun either writer. Its read-only `audit.py` may be reused. No GPU declaration,
   follower, runtime qualification, speedup or adoption exists for this package.
+  Its separate upstream backend oracle is now compiled in
+  `runs/block-matmul-backend-fixture-20260912.TVdIQX`: five CPU tests and 12,287
+  independently rechecked pins pass. The composed-loss/all-gradient GPU oracle
+  is listed, not run; it is a separate test target from `regression`. Preserve
+  the completed writer and executable 331b32d6; `prepare.py --audit` is read-only.
+  No backend change, GPU declaration, follower or qualification is added.
   See `docs/experiments/2026-09-10-block-matmul.md` for required hardware gates.
   Do not repeat large CPU graph
   compilation alongside training: the first memory-plan probe caused host
