@@ -203,7 +203,14 @@ incomplete control status; the later paired result supplies completion.
 The [CPU action/reference readout](../../runs/freeway-1009-behavior-20260912.qdz9AI/result.json)
 finds **98.1427% UP-labelled actions** in the complete current frozen trace,
 versus **91.4613%** in the successful historical seed-0 hold64 trace. That pilot
-is historical context, not a newly matched native arm.
+is historical context, not a newly matched native arm. Its completed
+[action-order controls](2026-09-09-freeway-persistence.md#action-ordering-versus-a-simple-up-bias)
+already preserve each stream's exact action counts in three shuffled orders:
+they return means **19.8056 / 20.7778 / 20.0000**, versus **31.0556** in recorded
+order. Reuse those controls before repeating an action-frequency diagnostic.
+The successful pilot's frequencies alone do not reproduce its score; changed
+timing and run lengths prevent attributing that difference to visual feedback.
+This does not diagnose the current root's failure.
 
 A separately recorded, feedback-free **constant-UP CPU reference** uses the
 same wrapper, actual ROM, six environment seeds and 75,000-action budget. It

@@ -632,6 +632,11 @@ reliable learning.
   The reference was not independently replayed, is not a Kindle win, and proves
   neither visual feedback nor the failure's cause. Preserve the unchanged gates
   and remaining queue; no new recipe, GPU declaration or follower starts here.
+  Reuse the successful pilot's completed action-order controls in
+  `runs/freeway-open-loop-20260909.Mm13RB`: exact-count shuffles score 19.81–20.78
+  versus recorded-order 31.06. Frequency alone does not reproduce that pilot's
+  score; changing timing/run lengths does not isolate visual feedback or explain
+  the fresh root's failure. Do not rerun its completed exclusive writer.
   The 19-pin read-only check `runs/freeway-evaluation-conditions-20260912.Yc5Ub9`
   verifies that historical root 0 and fresh root 1009 use identical frozen ALE
   seeds/settings. Do not repeat their constant-UP reference for a nonexistent
