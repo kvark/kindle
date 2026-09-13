@@ -218,13 +218,22 @@ reliable learning.
   the pre-declaration CPU mock correction and package-prerequisite correction.
   This starts no pixel, block or learning job and changes no adoption gate.
   N6 pixel/restore/override, combined-memory and matched timing remain required
-  before full dependency qualification; no pixel GPU declaration exists yet.
-  The unlaunched draft `runs/gpu-alias-pixels-20260913.dckRs2` contains only
-  protocol settings and a declaration outline for the unchanged ten native
-  windows. There is no launcher, CPU protocol suite, manifest or GPU work.
-  Before declaring it, test the direct Python/native-engine guard boundary,
-  source-matched readers and complete state/trace/memory/timing gates. Never
-  wrap a scheduler or any process that delegates GPU work to descendants.
+  before full dependency qualification. The separate pixel declaration in
+  `runs/gpu-alias-pixels-20260913.dckRs2` now binds 75,323 inputs and 26 passing
+  CPU checks, including actual CLI refusals and retained ce80 pixel/state data.
+  Preserve the two pre-declaration wrong-interpreter import failures; use
+  `python/.venv/bin/python`. Its ten native windows retain N6/R256/B16/T64,
+  all original budgets/seeds, exact full state/moments/traces/restore, the ce80
+  anchor, Freeway overrides and >=2 GiB directly free. Both AB/BA arms use the
+  same guard; do not compare historical unguarded timing. The guard owns the
+  direct Python process hosting the Rust extension, with actual imports,
+  interpreter/native/source bytes and environment pinned. This adapter steps
+  ALE synchronously and creates no GPU workers. Never wrap a scheduler or any
+  process that delegates GPU work to descendants. Each phase requires an
+  individual invocation and review; only index 0 has been invoked. Preserve
+  its inputs and inspect the terminal result before index 1. No candidate
+  pixel window, follower, retry, speedup, adoption or learning campaign follows
+  automatically. Main remains ce80; block qualification still precedes Pong.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

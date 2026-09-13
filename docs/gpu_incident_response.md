@@ -61,10 +61,16 @@ python3 /x/Code/kindle/python/examples/gpu_guard.py run /absolute/path/to/NEW-gu
   --exact --ignored --nocapture --test-threads=1
 ```
 
-Use only a **direct native executable**. Do not wrap a scheduler, Cargo, shell
-pipeline or controller that spawns GPU descendants: the guard owns and stops
-only its direct child. It is not a machine-wide lock; retain serialized GPU
-scheduling. Existing declared packages and launchers remain immutable.
+Use a **direct native executable**, or a separately declared Python process
+that executes the native extension in that same process. The latter requires
+pinning and checking the interpreter, actual imports, extension, adapter and
+environment; it is not permission to wrap an arbitrary Python launcher. The
+[guarded N6 protocol](../runs/gpu-alias-pixels-20260913.dckRs2/declaration.md)
+binds the specific synchronous ALE adapter, with no GPU worker descendants.
+Do not wrap a scheduler, Cargo, shell pipeline or controller that spawns GPU
+descendants: the guard owns and stops only its direct child. It is not a
+machine-wide lock; retain serialized GPU scheduling. Existing declared
+packages and launchers remain immutable.
 
 The guard refuses a faulted or unreadable kernel baseline, driver/boot/GPU
 identity changes, reset-required/N/A health, less than 2,048 MiB directly free,

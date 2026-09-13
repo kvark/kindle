@@ -244,8 +244,10 @@ all production gradients, clean health and at least 6,545 MiB directly free.
 All 19 required hardware checks and six complete-state canaries now pass,
 including LeVJEPA streaming/cache parity, every saved weight/moment and archived
 control anchors, with clean kernel evidence. This narrows the investigation
-without proving root cause; N6 pixel/restore/combined-memory and throughput
-qualification remain ahead of adoption. The
+without proving root cause. The separately declared ten-window N6 pixel gate
+has 26 passing CPU checks and verified source-matched packages; only its first
+control window has been invoked. Pixel/restore/combined-memory and matched
+throughput qualification remain ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
 Preserve both failures and distinguish historical raw-data audits, current-boot

@@ -357,12 +357,28 @@ This is synthetic complete-state qualification, not the combined encoder/ALE
 runtime or a measured speedup. A fresh pixel declaration must retain all ten
 native windows, N6/R256/B16/T64 settings, exact state/action/reset/restore checks,
 the ce80 pixel anchor, direct free-memory reserve and matched guarded AB/BA
-timing. No pixel GPU job, automatic follower or new learning campaign exists.
+timing. These completed canaries start no successor automatically.
 
-The [pixel protocol draft](../../runs/gpu-alias-pixels-20260913.dckRs2/declaration.md)
-currently contains settings and ten enumerated commands only: no launcher,
-CPU protocol suite, manifest or GPU execution. It keeps source-matched ce80/
-abf4ae5d and 1c314/f76c20b8 packages. The proposed guard owns the one Python
-process that synchronously steps ALE and executes the Rust extension, not a
-GPU scheduler or subprocess tree. Validate that boundary and the complete
-readers/refusals before any declaration; this draft is not runtime evidence.
+### Guarded pixel declaration
+
+The [new pixel protocol](../../runs/gpu-alias-pixels-20260913.dckRs2/declaration.md)
+now binds **75,323 inputs**, source-matched ce80/abf4ae5d and 1c314/f76c20b8
+packages, actual interpreter/import identities, and the unchanged ten native
+windows. All **26 CPU checks** pass, including real CLI refusals, complete
+retained ce80 pixel/state data and negative identity/budget/parity/restore
+fixtures. Two initial invocations used interpreters lacking `safetensors`;
+both stopped at import before any declaration or host/GPU work. Preserve the
+[development record](../../runs/gpu-alias-pixels-20260913.dckRs2/development.md).
+
+Fresh complete hardware, state, package and raw Pong/Freeway/hold audits pass.
+Upstream remains Meganeura 75dfe901 and Blade 68a23e49; the latter's changes
+beyond pinned f6f2729e remain renderer-only. The recovered boot has a clean
+idle-device check. The guard owns the one Python process that synchronously
+steps ALE and executes the Rust extension, not a GPU scheduler or subprocess
+tree. This boundary is specific to the pinned adapter and actual imports.
+
+Only phase 0, the qualified ce80 control's fresh training window, has been
+invoked. Inspect its complete native/guard/checkpoint result before separately
+invoking the frozen restore. No candidate pixel result, automatic follower,
+retry, throughput claim, adoption or new learning campaign is established.
+Both fresh timing arms are guarded; do not compare old unguarded timings.
