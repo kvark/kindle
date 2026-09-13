@@ -184,5 +184,9 @@ score-serialization mismatch. Its narrowly repaired, separately declared
 continuation verifies the whole pair, then **fails during GPU hardware testing**.
 The [device-loss report](2026-09-13-gpu-device-loss.md) preserves both failures,
 the successful schema repair, current upstream identity and downstream refusal.
-GPU recovery requires user approval. No state/pixel or block-matmul qualification,
+An external reboot subsequently restores observable health, but the
+[new bounded diagnostic](2026-09-13-world-gradient-recovery.md) reproduces device
+loss during candidate initialization after a successful same-boot control.
+The GPU again requires recovery, subject to user approval.
+No state/pixel or block-matmul qualification,
 speedup or backend adoption is established; remaining Pong roots stay held.

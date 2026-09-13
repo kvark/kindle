@@ -54,7 +54,7 @@ reliable learning.
   fourteen tests passed, but production world-gradient test hardware-14 exited
   101 with GPU device loss. Kernel Xid 62/154 first records GPU Reset Required
   at 13:20:03, followed by channel teardown and Xid 109 context-switch timeouts.
-  NVML activity remains unavailable; readable free memory is not recovered health.
+  NVML activity was still unavailable at 13:26; readable free memory was not recovered health.
   The 13:26 upstream recheck still finds those latest revisions. Root cause is
   not established, and this is not a measured gradient-value mismatch.
   All workers/loggers have exited. Full-runtime v2 wGOgE7 has 55 CPU checks/
@@ -65,6 +65,38 @@ reliable learning.
   full state/pixel and same-backend throughput gates. No new runtime qualification,
   speedup, adoption or learning is established. See
   `docs/experiments/2026-09-13-gpu-device-loss.md` and its preserved raw evidence.
+  A read-only recheck after an external 14:45 UTC reboot now observes boot
+  80351da1, matching 595.91.07 drivers, no recovery action and no current-boot
+  Xid. The agent performed no host recovery. This is health, not qualification.
+  The separately declared two-test diagnostic in
+  `runs/world-gradient-recovery-v2-20260913.CfqW0Y` binds 46,419 pins and 49 CPU
+  guard checks. Its isolated ce80/control and 75dfe/candidate release fixtures
+  each pass 78 CPU tests; identical 26-line test-only progress additions preserve
+  production B16/T64/F32 losses, all gradients and tolerances. Preserve the
+  first declaration's old-boot refusal in LKYbiO and its completed 5,806-pin
+  build. The private read-only adapter labels historical host context explicitly,
+  rechecks complete raw Pong/Freeway data and retains real new-boot checks;
+  original scripts and live launch guards remain unchanged. The same-boot
+  ce80 control subsequently passes the complete production gradient test, with
+  worst relative L2 0.000745721 and at least 6,545 MiB directly free. The latest
+  candidate fails with exit 101 at 15:42:19, before its first session becomes
+  ready, D3 weight initialization or any training step. Kernel Xid 62/154 begins
+  at 15:41:48; NVML again reports Reset Required and unavailable utilization.
+  The backtrace and CPU binary inspection locate error reporting at the
+  zero_optimizer submission in Session::build_session_impl. Earlier device
+  initialization may already have failed; this does not identify the originating
+  fault or establish a gradient mismatch. All workers/loggers have exited.
+  Preserve CfqW0Y and `runs/world-gradient-gpu-incident-20260913.fjNcOg`; never
+  restart the diagnostic. Its eleven command histories, 46,419 inputs and 69
+  incident pins reverify; the separate read-only audit in
+  `runs/world-gradient-gpu-audit-20260913.lvdFst` normalizes only candidate-stage
+  tuple/list rows. Preserve the collector; use that reader for JSON comparison.
+  The 15:47 upstream check still finds 75dfe901/f6f2729e. Recovery
+  again requires user approval. No retry, old-queue restart, automatic follow-up
+  or adoption. Do not reset/reload/reboot without approval; no later GPU stage
+  or learning job is declared by this failed comparison.
+  Keep full hardware/state/pixel and same-backend block throughput gates ahead
+  of remaining Pong. See `docs/experiments/2026-09-13-world-gradient-recovery.md`.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.

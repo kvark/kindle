@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Roots 2017/3019 remain held for throughput qualification and GPU recovery. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
+| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Roots 2017/3019 remain held for throughput qualification. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -201,7 +201,9 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [complete; paired gate passes]
   -> latest Meganeura/Blade qualification [75dfe901 hardware stopped: GPU device loss]
-  -> host recovery + new qualification declaration [requires user approval]
+  -> external host reboot [observed; health restored, not runtime qualification]
+  -> post-reboot world-gradient diagnostic [control passes; candidate initialization loses GPU]
+  -> GPU recovery + initialization diagnosis [requires user approval; diagnostic terminal]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -220,6 +222,11 @@ The tested boundary hold prevents the old launcher from starting root 2017
 after root 1009's complete paired protocol, without changing its active inputs.
 The old idle Breakout follower is retired. Preserve both original declarations
 and their terminal records; re-declare the remaining work, never restart them.
+After an external reboot, the [bounded production-gradient diagnostic](experiments/2026-09-13-world-gradient-recovery.md)
+passes on the qualified control but reproduces device loss during the latest
+candidate's session initialization, before training. The GPU again requires
+recovery; no new runtime qualification is established. Preserve both failures
+and distinguish historical raw-data audits from current-boot health.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and

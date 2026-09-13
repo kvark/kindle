@@ -1,6 +1,6 @@
 # Latest-backend qualification: GPU device loss
 
-Status: **hardware gate failed; GPU recovery requires user approval**. No new
+Status: **hardware gate failed; post-reboot diagnostic also fails on the candidate**. No new
 backend adoption, speedup or subsequent learning is established. Pong root
 1009's complete original paired result remains valid and preserved. All
 experiment processes have exited; do not restart any stopped queue.
@@ -70,9 +70,17 @@ No replacement block declaration or GPU job is launched. Preserve all original
 pre-GPU failures, the corrected hardware failure and the downstream refusal.
 
 Do not reset the GPU, reload/change drivers or reboot without user approval.
-After approved recovery, recheck device/driver health and separately declare a
+After recovery, recheck device/driver health and separately declare a
 bounded diagnostic with the qualified ce80 control and the latest candidate.
 Locate the failing execution before proceeding to full-state/pixel and matched
 block throughput gates. Retain all tolerances, memory margins and learning gates;
 do not turn a hardware failure into a pass by shrinking the production case.
 Pong roots 2017/3019 stay held, and Boxing remains the only confirmed three-root game.
+
+The host was subsequently rebooted externally at **14:45 UTC**. Read-only checks
+observe matching drivers, no requested recovery and no current-boot Xid. No host
+recovery was performed by this agent. The [new bounded diagnostic](2026-09-13-world-gradient-recovery.md)
+passes its same-boot qualified control, then reproduces the candidate's device
+loss during session initialization. The GPU again reports Reset Required.
+That separate declaration and historical/current-host separation do not restart
+or rehabilitate the failed attempt described here; both failures are preserved.
