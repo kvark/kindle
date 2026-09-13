@@ -420,6 +420,10 @@ direct-memory headroom and untraced AB/BA timing. Readback waits include unfinis
 producer compute and transfers; they are not automatically GPU idle. Current
 external captures resolve queue submissions, not individual kernels or calibrated
 idle gaps. Serialize GPU work and avoid large CPU graph builds during training.
+The separate [opt-in learner timeline](experiments/2026-09-13-learner-timeline.md)
+now has CPU-checked stage labels and completed-transfer harvesting on latest
+upstream, but no GPU capture or qualification. It stays outside the declared
+throughput queue; synthetic-core coverage cannot establish whole-Atari idle gaps.
 
 Lower replay ratios, smaller models and larger learner batches are separate
 learning-compute ablations. Historical R64 Boxing reaches about 1.31× aggregate

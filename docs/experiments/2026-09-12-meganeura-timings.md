@@ -154,6 +154,10 @@ context helper does not call for an actor/learner redesign. Its own device-copy
 and readback paths still wait on Blade directly, without harvesting their
 transfer timings. Updating dependencies alone therefore does not establish a
 complete transfer trace or calibrated idle-gap accounting for Kindle.
+The later [isolated learner-timeline candidate](2026-09-13-learner-timeline.md)
+prepares optional harvesting and core-stage labels on 75dfe901. Its CPU tests
+do not establish an actual GPU trace, calibration or whole-Atari coverage;
+the default and pinned packages remain unchanged.
 
 Before adoption, qualify the source-matched package above with the unchanged
 full production-gradient/cache/reset tests, complete logical state and optimizer

@@ -195,6 +195,18 @@ reliable learning.
   is not the separate speedup gate. No runtime qualification, speedup, adoption
   or automatic learning follows from this declaration. See
   `docs/experiments/2026-09-13-block-matmul-runtime.md`.
+  The separate opt-in learner timeline at `exp/learner-timeline-20260913`
+  (`ac8b52d`, same 75dfe901/Blade f6f2729e) is CPU-prepared only. Its completed
+  `runs/learner-timeline-cpu-v2-20260913.8diroE` passes 98 CPU tests in each
+  default/profiler build, three actual pre-GPU refusals and an independent
+  158-pin/15-command audit. Preserve the two pre-compilation lock-guard failures,
+  debug binaries and completed writers. Optional stage annotations and completed
+  transfer harvesting do not establish GPU coverage, calibration, parity or
+  speedup. Default production bodies match the parent; no timing is enabled.
+  It adds no GPU queue or Python package. Finish all three declared throughput
+  stages first; require a separate release/trace/state/memory/overhead gate
+  before diagnostic use. Its canary covers the synthetic core, not perception
+  or whole Atari. See `docs/experiments/2026-09-13-learner-timeline.md`.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

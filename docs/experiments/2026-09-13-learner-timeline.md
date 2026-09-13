@@ -1,0 +1,78 @@
+# Opt-in learner timeline: CPU preparation
+
+Status: **CPU-prepared, not GPU-qualified**. Candidate
+[`ac8b52d`](https://github.com/kvark/kindle/commit/ac8b52d3d7a9f811f0b74af48fa207e27adf2100)
+on `exp/learner-timeline-20260913` forks dependency-only 58f328a. Both use
+Meganeura **75dfe901** and Blade **f6f2729e**; the preparation freshly checks
+upstream main. Main, the active Pong pair and all three throughput waiters
+remain unchanged. No additional GPU declaration or follower is created.
+
+## What changes
+
+The optional `profiler` feature enables Meganeura's existing CPU/GPU trace
+writer. It labels the six core learner stages and the outer update, copy and
+readback calls. Kindle's two direct transfer paths now harvest their completed
+Blade timestamps after the existing waits, including the last pending device
+copy during drop. It adds no submit, wait, dispatch, sampling or learning change.
+The independent source check removes only the optional annotations/harvesting
+lines and reproduces all three original production source bodies exactly.
+
+`dreamer_canary --trace-dir` requires the feature, explicit GPU timing, one
+learning repetition and a fresh directory. It rejects simultaneous
+`--profile-dir`: that separate profiler changes dispatch grouping. The trace
+is saved after sessions/context drop so final pending queries are harvested.
+Its contract identifies **synthetic core only**, normal dispatch grouping and
+unqualified coverage. Default builds enable no instrumentation or GPU timing.
+No Python tracing API or source-matched Python package is added.
+
+This is not yet an Atari/perception timeline. CPU trace spans and GPU pass
+intervals are different measurements; a pass extends to the next pass start or
+submission completion, not an instruction-level kernel boundary. Clock-error
+bounds, actual imported coverage and device execution remain unverified. An
+uncovered interval must not be labeled GPU idle merely because it is blank.
+
+## Completed CPU evidence
+
+The [result](../../runs/learner-timeline-cpu-v2-20260913.8diroE/result.json) and
+[independent post-commit audit](../../runs/learner-timeline-cpu-v2-20260913.8diroE/independent-audit.json)
+reverify **158 source/output pins and all 15 command lifecycles**. Both default
+and profiler-enabled builds pass **98 CPU tests each**; each leaves 22 GPU tests
+ignored. Formatting, both feature-mode workspace Clippy checks and default
+Python Clippy pass. Three actual debug-canary invocations refuse missing
+features, missing timing or mixed dispatch profiling before GPU construction
+and output creation. These are negative entrypoint checks, not a trace capture.
+
+The two debug executables are retained separately. No release fixture, Python
+package, GPU trace, state-parity result or speedup is claimed. The enforced
+one-core / 2 GiB / zero-swap scope reaches its 2 GiB memory cap; CPU-only work
+is not assumed free of host contention.
+
+Preserve the initial [optional-edge guard failure](../../runs/learner-timeline-cpu-20260913.gzzymq/preparation.json)
+and [standalone-lock comparison failure](../../runs/learner-timeline-cpu-continuation-20260913.hAg8LO/execution.json).
+Both stop before compilation. The corrected checker verifies the seven optional
+tracing packages against upstream versions/checksums and registry requirements.
+It explicitly retains Kindle's existing log/smallvec versions and compatible
+Windows-only dependency edge; no old dependency is replaced. The default Python
+lock remains byte-identical. These tooling corrections change no learning code.
+
+## Before diagnostic use
+
+First finish the [already declared dependency and block qualification](2026-09-13-throughput-priority.md).
+Do not insert this preparation into those pinned queues. A separate diagnostic
+must then bind fresh release binaries and the selected runtime, verify the
+executing adapter and qualify:
+
+- A small real transfer/compute fixture: complete, nonduplicated query harvest,
+  ordered timestamps and host-bracket/calibration checks. Import the raw trace;
+  reject missing workload coverage or rejected timestamps.
+- Update-1 and eight-update full state, all 146 optimizer moments and non-timing
+  reports against the unchanged control. Trace annotations are not parity proof.
+- Actual six-stage coverage throughout the declared learner window, separately
+  from construction/teardown, and directly free memory of at least 2,048 MiB.
+- Instrumented versus uninstrumented overhead with retained untraced timing.
+  A traced duration is diagnostic, never the throughput benchmark.
+
+Only after those checks should this trace rank recurrent handoffs and producer
+work. A full N6 pixel trace, including perception and actual-frame clocks, is
+still needed before whole-Atari idle-gap claims. This work changes no game budget,
+seed, competence gate or five-game result.
