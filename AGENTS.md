@@ -20,6 +20,7 @@ reliable learning.
 - September 13 user priority: qualify throughput before unstarted Pong work.
   This supersedes older future queue-order instructions below, not historical
   inputs or results. Freeway is complete; Pong root 1009 had already started.
+  The user explicitly confirmed finishing its active pair before qualification.
   Preserve its full original training/frozen/control sequence. The tested hold
   in `runs/throughput-priority-20260913.Lb7p6I` reserves only the unopened
   `pong/seed2017-train.stdout` in recovered root xPz5ud: the pinned launcher's
@@ -37,13 +38,15 @@ reliable learning.
   See `docs/experiments/2026-09-13-throughput-priority.md` for the safe boundary
   and required next declarations. Do not silently mix backends across seeds;
   an adopted package requires an explicitly matched new campaign declaration.
-  The first latest-backend hardware stage is now declared in
+  The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
-  actual live-entrypoint refusal and an independently verified detached follower
-  260782/14012130, waiting on original scheduler 42730/1021056. It starts only
-  the 19 prepared native tests after the exact post-root-1009 hold and complete
-  raw pair/Freeway evidence reverify. No hardware test has run yet. Preserve its
-  live scripts, auditor, declaration and fixtures. Even a pass leaves full
+  actual live-entrypoint refusal and an independently verified detached follower.
+  New upstream runtime 75dfe901 supersedes it before GPU work. The idle follower
+  260782/14012130 was retired by bound pidfd at 05:57:57 UTC; its exact scripts,
+  declaration, fixtures and terminal record are preserved. Do not restart it or
+  treat its old live-handoff checker as a current process monitor. No hardware
+  test ran. Every latest-source handoff requires the exact post-root-1009 hold
+  and complete raw pair/Freeway evidence. Even a hardware pass leaves full
   update-1/eight-update state, N6 pixel/restore traces, combined memory and AB/BA
   timing before adoption; it starts no later GPU or learning job automatically.
 - Prioritize one learning actor: Atari breadth, video/world pretraining and fast
@@ -135,6 +138,37 @@ reliable learning.
   writer and private target; `prepare.py --audit` is read-only. No GPU declaration,
   follower, runtime qualification, timing result or adoption is added.
   See `docs/experiments/2026-09-12-meganeura-timings.md`.
+  The September 13 recheck finds newer runtime 75dfe901: opt-in shape-specialized
+  convolution tuning and qualification-adapter changes. The isolated dependency-
+  only `exp/meganeura-conv-20260913` at 58f328a retains shared Blade f6f2729e and
+  all learning settings. LeVJEPA uses patch matmuls; session autotuning stays off.
+  No automatic convolution speedup is expected or claimed. Its 95 Kindle and
+  122 focused backend/Blade CPU tests, formatting and both Clippy checks pass in
+  `runs/meganeura-conv-update-20260913.E9P9ai`, with 24,475 verified pins.
+  The source-matched package in `runs/meganeura-conv-package-20260913.yBx5nt`
+  is native fa6bdd2a; all 547 Python checks and 30,056 source/cache/artifact pins
+  reverify. Both locks change only the Meganeura revision relative to a7fc16b;
+  the standalone backend lock is byte-identical. Main and active packages are
+  unchanged. Preserve all completed writers and the obsolete idle-follower
+  retirement receipt; no GPU qualification, speedup or adoption is claimed.
+  Its completed release-fixture preparation in
+  `runs/meganeura-conv-fixtures-20260913.IwwfUr` verifies eight command lifecycles
+  and 31,640 pins; all five executables are source-matched and the nineteen GPU
+  tests are only listed, not run. The new first hardware stage is separately
+  declared in `runs/meganeura-conv-runtime-20260913.ZVxDeV`, with 46 CPU checks,
+  31,664 pins and actual pre-GPU live-parent refusal. Its independently checked
+  follower 269283/14332226 waits on scheduler 42730/1021056 after both obsolete
+  idle followers are retired. Keep these live inputs fixed. No hardware child
+  has started; full state and N6 pixel/memory/timing stages remain outstanding,
+  with no automatic later GPU or learning follower. See
+  `docs/experiments/2026-09-13-meganeura-conv.md`.
+  The identical block candidate is carried onto that same backend in
+  `exp/block-matmul-conv-20260913` at 20b9b8a. Its 98 Rust CPU tests, formatting,
+  both Clippy checks and twenty block-only 65-to-2 dispatch cases pass in
+  `runs/block-matmul-conv-cpu-20260913.4MgN62`, with 30,255 verified pins and
+  23 GPU tests ignored. No new block Python package, GPU gate, speedup or
+  adoption exists. Qualify the dependency first, then the same-backend graph
+  comparison; preserve all older block candidates and controls.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

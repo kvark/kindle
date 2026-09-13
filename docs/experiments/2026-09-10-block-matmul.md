@@ -5,6 +5,8 @@ before unstarted Pong work. The [boundary hold](2026-09-13-throughput-priority.m
 preserves active root 1009 and holds later roots. Qualify latest Meganeura/Blade
 separately before testing block-matmul on the same backend. Earlier queue-order
 statements below describe the preserved declarations, not the new priority.
+The [latest same-backend carry](#september-13-identical-carry-onto-latest-runtime)
+is now CPU-qualified on 75dfe901; dependency GPU qualification still comes first.
 
 Prepared September 10, with a September 11 carry onto the qualified upstream
 backend and a September 12 source-matched Python package below. Not adopted,
@@ -210,3 +212,25 @@ remote check found documentation-only tip 3622e06f; the newer timing update abov
 requires separate qualification before carrying this optimization forward. Preserve the completed
 exclusive writer; this supplies a missing executable for the future comparison,
 not GPU qualification, a speedup, adoption or a new follower.
+
+## September 13: identical carry onto latest runtime
+
+The isolated `exp/block-matmul-conv-20260913` branch, **`20b9b8a`**, carries the
+same `networks.rs` byte-for-byte onto dependency-only control **58f328a /
+Meganeura 75dfe901 / Blade f6f2729e**. Only that file and the worktree's AGENTS.md
+notice differ from the control. Both locks, backend identity, Python sources and
+learning settings remain unchanged. Older branches and packages are preserved.
+
+The [completed CPU check](../../runs/block-matmul-conv-cpu-20260913.4MgN62/result.json)
+passes **98 Rust tests**, formatting and both Clippy checks. All **23 GPU tests
+remain ignored**. The twenty raw/optimized block-only cases still give 65-to-2
+dispatches; the production output/all-gradient GPU fixture is listed, not run.
+All eight command lifecycles and **30,255 pins** reverify. Result hash:
+`da5bf33dacb5f16a07cb6c3fc919f9355e81c52cbfe6301c42b044dc8476e240`.
+
+The run uses one CPU core, one Cargo job, 2 GiB RAM, zero swap and a private cache
+copy. No production world graph, new Python package, GPU comparison or follower
+is created. Preserve the completed writer; `prepare_cpu.py --audit` is read-only.
+Qualify the [latest dependency](2026-09-13-meganeura-conv.md) first, then the full
+same-backend component/state/trace/memory/AB/BA comparison before the remaining
+Pong roots. These CPU results do not establish exact native learning or a speedup.

@@ -194,7 +194,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [active]
-  -> latest Meganeura/Blade qualification [first hardware stage declared; waiting]
+  -> latest Meganeura/Blade qualification [75dfe901 first hardware stage declared; waiting]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [next]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -323,17 +323,17 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins qualified upstream `ce80e9cd`. The [morning preflight](experiments/2026-09-11-meganeura-runtime.md#september-12-upstream-preflight)
-found only documentation changes, but the **September 12 19:12 UTC recheck** finds
-new runtime tip `45991be1`. Its [isolated update](experiments/2026-09-12-meganeura-timings.md)
-adds calibrated timing and loading/context changes with required git Blade
-`f6f2729e`. Rust/backend CPU checks and all 547 Python tests pass on its isolated
-native `29774c09`, with verified source/wheel/import identity. Source-matched
-release hardware fixtures are prepared; their GPU tests remain unrun. The
-[first hardware stage](experiments/2026-09-13-throughput-priority.md#first-native-stage-declared-and-waiting)
-is declared and waiting for the current paired run's verified boundary. Full
-state, pixel/restore, memory and AB/BA timing still follow before adoption.
-No GPU result or adoption is claimed.
+Main pins qualified upstream `ce80e9cd`. The latest **September 13** runtime
+candidate is [`75dfe901`](experiments/2026-09-13-meganeura-conv.md), retaining
+shared git Blade `f6f2729e` and the earlier calibrated-timing fixes. It additionally
+changes opt-in convolution tuning; LeVJEPA uses patch matmuls and Kindle leaves
+autotuning off, so no automatic gain is expected. Its isolated native `fa6bdd2a`
+passes 95 Kindle, 122 backend/Blade and 547 Python CPU tests with verified
+source/wheel/import identity. The superseded 45991 hardware follower was retired
+while idle; its inputs and terminal record remain intact. The separately declared
+new hardware follower waits for the complete active pair and verified hold. Full gradient/cache checks,
+update-1/eight-update state, pixel/restore traces, direct memory and AB/BA timing
+remain required. No GPU result, speedup or adoption is claimed.
 Keep this dependency comparison separate from block-matmul and other optimizations.
 Recheck upstream before new backend diagnosis; carry older candidates forward
 before testing them as current code. Active learning inputs stay pinned; the
@@ -399,8 +399,9 @@ The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails 
 full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. The block candidate has an unchanged carry onto qualified ce80e9cd;
-the newer timing backend must be separately qualified before another carry.
+evidence only. The identical block change is now CPU-qualified on latest 75dfe901,
+with the older ce80e9cd candidate preserved. Qualify the dependency-only runtime
+first, then test the block optimization against that same backend.
 Block-matmul correctness and throughput now take priority over unstarted Pong
 roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
 
@@ -548,7 +549,7 @@ historical pins in their manifests and the [native frontend](../kindle/src/visio
 not a moving label in the roadmap.
 
 Boxing's confirmation, recovered-driver qualification and ce80e9cd source
-adoption are complete; the newer 45991be1 candidate remains CPU-qualified only.
+adoption are complete; the newer 75dfe901 candidate remains CPU-qualified only.
 Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.

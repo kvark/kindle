@@ -6,6 +6,9 @@ No GPU work, runtime qualification, speedup or adoption is claimed. The user's
 September 13 [throughput priority](2026-09-13-throughput-priority.md) now places
 this qualification before unstarted Pong roots. Active root 1009 and every
 historical package stay fixed; earlier queue statements below are historical.
+The newer [September 13 convolution-runtime update](2026-09-13-meganeura-conv.md)
+supersedes this source candidate before GPU work. Preserve this completed CPU
+evidence and the retired, unrun hardware declaration; never restart its follower.
 
 ## Why this update comes before more backend diagnosis
 
@@ -133,12 +136,11 @@ is introduced. The required runtime and tracing checks below remain outstanding.
 
 ## What the timing changes can and cannot establish
 
-The September 13 [separate nineteen-test hardware stage](2026-09-13-throughput-priority.md#first-native-stage-declared-and-waiting)
-is now declared, with 42 CPU scheduling/proof checks and a once-only follower
-waiting for the current Pong pair's verified boundary. It reuses these compiled
-fixtures; no GPU test has run yet. This does not change the completed CPU
-preparation or qualify the full runtime. Full-state and pixel/timing stages remain
-required separately before adoption.
+The September 13 [separate nineteen-test hardware stage](2026-09-13-throughput-priority.md#superseded-first-native-stage)
+was declared with 42 CPU scheduling/proof checks. Its once-only follower was
+retired while idle after upstream advanced to 75dfe901; no GPU test ran. Preserve
+the compiled fixtures, declaration and terminal record. A separately declared
+latest-source handoff is required, followed by full-state and pixel/timing gates.
 
 Blade now exposes calibrated CPU-domain pass-start and completion timestamps.
 Meganeura harvests them after completion rather than placing passes using host
