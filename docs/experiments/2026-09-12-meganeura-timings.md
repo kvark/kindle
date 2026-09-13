@@ -105,6 +105,30 @@ Completed package-check SHA-256:
 This package has not constructed a GPU agent or passed a hardware gate. Do not
 use it for a new learning run or pair it with a different Python runner/auditor.
 
+### Release hardware fixtures are prepared, not executed
+
+The [compilation-only preparation](../../runs/meganeura-timings-fixtures-cpu-20260912.Xk29rR/result.json)
+completes on **September 13**. Its entrypoint freshly confirms upstream
+45991be1 and reverifies the completed Rust/backend and Python-package evidence.
+It copies only the release cache into a private target directory; the original
+cache, source locks, package and every active/historical control remain unchanged.
+
+All five source-matched release executables are built: Kindle's test binary,
+the backend regression/smoke/Gemma test binaries, and `dreamer_canary`. Cargo
+artifact records bind their exact manifests, release profiles and output paths.
+The four test binaries only run `--list`: all **19 required hardware-test names**
+are present, but **none is executed**. The canary is not run.
+
+All **eight command lifecycles and 25,489 input/output pins** independently
+[reverify](../../runs/meganeura-timings-fixtures-cpu-20260912.Xk29rR/independent-audit.json).
+Result SHA-256:
+`0f4b4c1a1e6fa3bfaa6e1f2ec3cb8824c021da5863b6ca22578dd5fa9f6f566c`.
+The one-CPU, 2-GiB/zero-swap preparation completes normally at its memory cap.
+This is host build evidence, not combined GPU-memory or runtime qualification.
+Preserve the completed writer; its `prepare.py --audit` is read-only.
+No GPU declaration, follower, queue change, numerical parity, speedup or adoption
+is introduced. The required runtime and tracing checks below remain outstanding.
+
 ## What the timing changes can and cannot establish
 
 Blade now exposes calibrated CPU-domain pass-start and completion timestamps.

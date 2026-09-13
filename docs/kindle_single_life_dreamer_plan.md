@@ -319,8 +319,9 @@ found only documentation changes, but the **September 12 19:12 UTC recheck** fin
 new runtime tip `45991be1`. Its [isolated update](experiments/2026-09-12-meganeura-timings.md)
 adds calibrated timing and loading/context changes with required git Blade
 `f6f2729e`. Rust/backend CPU checks and all 547 Python tests pass on its isolated
-native `29774c09`, with verified source/wheel/import identity. No GPU result or
-adoption is claimed.
+native `29774c09`, with verified source/wheel/import identity. Source-matched
+release hardware fixtures are prepared; their GPU tests remain unrun. No GPU
+result or adoption is claimed.
 Keep this dependency comparison separate from block-matmul and other optimizations.
 Recheck upstream before new backend diagnosis; carry older candidates forward
 before testing them as current code. Existing learning/hardware queues stay pinned.

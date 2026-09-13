@@ -98,6 +98,13 @@ reliable learning.
   and the Freeway -> Pong -> Breakout hardware order fixed. Require complete
   GPU gradient/cache/state/trace, direct-memory and timing gates before adoption;
   calibrated API availability is not a verified Kindle idle-gap measurement.
+  The September 13 compilation-only preparation in
+  `runs/meganeura-timings-fixtures-cpu-20260912.Xk29rR` completes all five release
+  executables and lists the 19 required hardware tests without running them.
+  Its eight command lifecycles and 25,489 pins independently reverify; source,
+  locks, packages and existing queues are unchanged. Preserve this completed
+  writer and private target; `prepare.py --audit` is read-only. No GPU declaration,
+  follower, runtime qualification, timing result or adoption is added.
   See `docs/experiments/2026-09-12-meganeura-timings.md`.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
