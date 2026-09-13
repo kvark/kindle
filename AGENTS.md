@@ -181,9 +181,38 @@ reliable learning.
   It explicitly reuses the completed exact production diagnostic and requires
   the other 18 original hardware tests one invocation at a time, with complete
   raw prerequisites, actual-device/trace/guard checks and result review before
-  follow-up. Individual tests are underway; the full group is not complete.
-  No run-all mode, retry,
-  follower, full runtime qualification, speedup, adoption or learning is declared.
+  follow-up. All 19 hardware tests now pass: 18 new executions plus the reused
+  production diagnostic, with 229 complete initialization sequences and 1,417
+  fresh health samples. Directly free memory remains at least 6,545 MiB; no
+  new kernel fault or unfinished child is recorded. The independent read-only
+  audit verifies all 67,128 inputs. Preserve this completed group; never rerun
+  its tests. No run-all mode, retry, follower, full runtime qualification,
+  speedup, proven historical root cause, adoption or learning follows. The
+  separate d62d356/1c314b14 package is native f76c20b8 in
+  `runs/gpu-alias-package-cpu-20260913.HqMccf/package`. Preserve that writer's
+  audit failure: the top-level Cargo depfile omits Git-package source paths,
+  so its identity check stops before pytest despite a completed build and
+  95 passing Rust tests, fmt and Clippy. The separate unchanged-byte completion
+  `runs/gpu-alias-package-check-20260913.5B9g7N` verifies the actual native ->
+  Kindle -> Meganeura fingerprint/depfile chain, shared Blade edge and source/
+  wheel/import identity. All 547 Python and eight reader CPU tests pass;
+  its two commands, all fourteen original command records (including the
+  preserved failure) and 74,673 pins reverify. Use its `check.py --audit`;
+  never rerun the original writer or claim it passed its old assertion. No
+  rebuild or package GPU execution occurred in the completion. Full state,
+  N6 pixel/restore/memory and same-backend block throughput gates still precede
+  held Pong. Main remains ce80e9cd.
+  The separate full-state declaration in `runs/gpu-alias-state-20260913.6zM5B1`
+  binds 74,701 pins and 14 CPU checks. It retains six individual ce80/1c314
+  canaries: control/candidate update 1, control/candidate update 8, then
+  candidate/control update 8. Require exact complete 241-entry state, all
+  146 moments, non-timing reports, retained ce80 anchors, native-device and
+  direct-memory/guard checks. Candidate sessions also require complete flushed
+  initialization traces. Only the first control invocation is in preflight;
+  no complete-state GPU result exists yet. Inspect each result before the next
+  explicit invocation; there is no run-all mode, retry or follower. Preserve
+  the pre-declaration CPU mock correction and package-prerequisite correction.
+  This starts no pixel, block or learning job and changes no adoption gate.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.

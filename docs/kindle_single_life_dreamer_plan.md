@@ -209,8 +209,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> external host reboot [17:21; observable health restored]
   -> guarded initialization control [production gradients and complete traces pass]
   -> allocation-order hypothesis [guarded production gradients and complete traces pass]
-  -> full hardware qualification [guarded one-test-at-a-time checks in progress]
-  -> full state/pixel/memory qualification [unrun]
+  -> full hardware qualification [all 19 guarded checks pass]
+  -> full state/pixel/memory qualification [six-canary gate declared; pixel unrun]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -241,8 +241,10 @@ Its guarded **control-only** production test passes all gradients and both
 complete initialization traces, retaining at least 6,545 MiB directly free.
 The separate allocation-order candidate also passes, with exact control plans,
 all production gradients, clean health and at least 6,545 MiB directly free.
-This narrows the investigation without proving root cause; full hardware,
-state/pixel/memory and throughput qualification remain ahead of adoption. The
+All 19 required hardware checks now pass on this candidate, including LeVJEPA
+streaming/cache parity, with clean kernel evidence. This narrows the investigation
+without proving root cause; full state/pixel/memory and throughput qualification
+remain ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
 Preserve both failures and distinguish historical raw-data audits, current-boot

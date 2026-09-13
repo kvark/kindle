@@ -1,7 +1,7 @@
 # Initialization breadcrumbs after the second GPU failure
 
-Status: **both the guarded instrumented control and the separately declared
-allocation-order candidate pass the production initialization/gradient diagnostic**.
+Status: **both production initialization/gradient diagnostics pass, and the
+allocation-order candidate passes all 19 required hardware checks**.
 Preserve both earlier device-loss incidents and every stopped queue. No adoption
 or learning continuation is established.
 This continues the [full-log investigation](2026-09-13-gpu-forensics.md), not the
@@ -229,9 +229,29 @@ fixture, production-gradient, original Pong/Freeway/hold and fresh host evidence
 It requires all **19 original hardware tests**, explicitly reusing the one
 completed, identical-executable production-gradient diagnostic above. Each of
 the remaining 18 tests requires its own invocation and result review; there is
-no run-all mode, retry or follower. Individual tests are underway; their separate
-`test-NN-result.json` files retain raw checks and output pins. The full group is
-not complete, and a declaration alone is not a hardware result.
+no run-all mode, retry or follower. Every individual test is now complete; the
+separate `test-NN-result.json` files retain raw checks and output pins.
+
+### Completed full hardware group
+
+The last native test finishes at **20:09:39 UTC**. All 18 new executions pass,
+including real LeVJEPA checkpoint/reference, asymmetric streaming and N4/N6/N8
+cache parity, full vector belief/learning/override state, logical restore,
+reductions and fused-math regressions. The exact production-gradient execution
+is reused, not rerun. The [last result](../../runs/gpu-alias-hardware-v2-20260913.s6BZNO/test-18-result.json)
+and every preceding result independently reverify through `run.py audit`:
+
+| Scope | Complete initialization sequences | Fresh health samples | Minimum directly free |
+| --- | --- | --- | --- |
+| Eighteen new tests | 227 | 937 | 7,905 MiB |
+| Reused production-gradient diagnostic | 2 | 480 | 6,545 MiB |
+
+Every native exit, original assertion/tolerance, actual-device header and full
+initialization/wait trace passes. The maximum health gap is **0.594 seconds**
+overall; no new kernel fault, unhealthy telemetry or unfinished child is recorded.
+The independent audit verifies **67,128 input pins** and all raw result/output
+bindings. The post-group fresh query reports recovery `None`, 0% activity and
+15,841 MiB directly free. Preserve this completed group; never restart its tests.
 
 Every native test retains its original assertions and tolerances, the unchanged
 guard, complete allocation/wait traces and actual executing-device checks.
@@ -242,7 +262,70 @@ separate gates; no adoption or new learning is declared.
 The source-only package candidate `exp/gpu-alias-init-20260913` at **d62d356**
 changes only dependency/identity files and its worktree instructions relative
 to 58f328a. Its production bodies match the tested fixture; test-only progress
-and helper imports are not carried into that source. The unstarted
+and helper imports are not carried into that source. The separate
 [package preparation](../../runs/gpu-alias-package-cpu-20260913.HqMccf/declaration.md)
-requires the complete hardware audit before its CPU build. This is staged
-source and formatting validation, not a built package or runtime adoption.
+ran after the complete hardware audit, with the GPU idle and a one-core,
+2 GiB, zero-swap build scope. This is CPU package preparation, not package GPU
+qualification or runtime adoption. Full state/pixel/memory and matched throughput
+gates remain outstanding.
+
+### Source-matched package and preserved audit failure
+
+The release build, **95 Rust CPU tests**, both formatting checks and both Clippy
+checks pass. The wheel builds, but the original identity check stops **before
+pytest**: it expects the Git dependency's `runtime.rs` in top-level
+`lib_native.d`, which lists only the path-package Kindle/Python sources. The
+actual backend rustc depfile does contain the expected 1c314b14 runtime and
+initialization helper. Cargo's [source-path tracking](https://doc.rust-lang.org/stable/nightly-rustc/src/cargo/core/compiler/fingerprint/dep_info.rs.html)
+skips registry/Git package paths in this tracking layer. This is a provenance-
+reader error, not a backend or Python-test failure. Preserve HqMccf's complete
+fourteen command records, failing assertion, executable, wheel and private cache.
+
+The separate [CPU audit completion](../../runs/gpu-alias-package-check-20260913.5B9g7N/result.json)
+changes no build or package byte and invokes no compiler or GPU. A private
+reader replaces only that assertion with the actual native -> Kindle ->
+Meganeura fingerprint chain, exact backend rustc dependency paths/bytes, shared
+Blade dependency, default features and build-window checks. Every other source,
+wheel and import check is retained. Its **eight reader tests and all 547 Python
+tests pass**; all **74,673 input/output pins**, two completion commands and the
+fourteen original command records reverify. This does not reinterpret the old
+failed assertion as passing.
+
+The package remains at
+[`HqMccf/package`](../../runs/gpu-alias-package-cpu-20260913.HqMccf/package), with
+native **f76c20b8**, source **d62d356**, Meganeura **1c314b14** and Blade
+**f6f2729e**. Use the completion's `check.py --audit` for read-only verification.
+No package GPU execution, full runtime qualification, speedup or adoption is
+established. Main remains ce80e9cd; the full-state, N6 pixel/restore/memory and
+same-backend block-throughput gates remain ahead of held Pong.
+
+## Separately declared complete-state comparison
+
+The [new declaration](../../runs/gpu-alias-state-20260913.6zM5B1/declaration.md)
+binds **74,701 pins and 14 CPU checks** after independent raw hardware, completed
+package, original Pong/Freeway/hold, upstream and same-boot health audits. The
+first qualified-control invocation is in preflight; no canary GPU result exists
+yet. The old full-runtime attempts remain terminal and untouched.
+
+Six individually invoked canaries retain the original order: ce80/control then
+1c314/candidate at update 1, control then candidate at update 8, then candidate
+and control at update 8. Keep 12M/B16/T64/full recurrence, prediction-only .25
+and all original settings. Require exact values/shapes for all **241 logical
+tensor entries and 146 optimizer moments**, full non-timing reports and exact
+retained ce80 update-1/update-8 anchors. The unmodified ce80 executable retains
+its actual-device header; the candidate additionally retains complete flushed
+initialization/wait traces. Every execution uses the standalone guard and the
+same direct-memory, fresh-health and no-retry gates.
+
+The CPU checks include actual archived complete-state reads and fabricated
+negative fixtures. Preserve the initial test-mock failure and its pre-declaration
+correction: a too-broad mocked JSON reader hid the fixture binary map before
+the intended old-boot refusal. The package prerequisite also changed only before
+declaration, to the separate completed audit above. Neither changed production
+math, an existing declaration or a hardware result.
+
+Inspect each terminal result before the next explicit invocation. This gate has
+no run-all mode or follower, starts no pixel/block/learning job, and establishes
+no throughput or adoption result. Even full canary parity leaves the N6 pixel,
+restore, exploration-override, combined-memory and matched-timing comparisons,
+then same-backend block-matmul qualification, ahead of the held Pong roots.
