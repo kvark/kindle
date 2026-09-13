@@ -285,13 +285,16 @@ reliable learning.
   `runs/native-f32-alias-hardware-20260913.7tXwMG` passes 26 CPU checks after
   a retained pre-declaration reader-import failure. Its 89,122 inputs bind the
   completed diagnostic, fixtures and original raw pair/hold proof; clean idle
-  preflight passes. It reuses PDrNaR only at production index 14. New tests 0–6
-  now pass, last exit at 23:04:30 UTC: cache/reset, F64 math, both matmul epilogues,
-  valid cached-block writes and Kindle device copies. Sixteen complete sessions /
-  40 fresh health samples pass, max gap 0.333 s, minimum directly free 15,795 MiB,
-  no fault or unfinished child. Preserve the earlier independent 89,122-pin /
-  three-result prefix audit. Index 7 is now in its separately invoked preflight;
-  no later test is running. Invoke each separately and inspect each
+  preflight passes. It reuses PDrNaR only at production index 14. New tests 0–9
+  now pass, last exit at 23:19:16 UTC: cache/reset, F64 math, matmul epilogues,
+  cached writes, device copies, logical cache restore, untrained round-trips and
+  the tiny act/learn/restore cycle. All 86 sessions / 214 fresh health samples
+  pass, max gap 0.333 s, minimum directly free 15,759 MiB, no fault or unfinished
+  child. Independent read-only prefix audit reverifies all 89,122 inputs and ten
+  raw results. Preserve the earlier three-result audit and its invocation failure.
+  Eleven of nineteen requirements are complete including reused index 14, not
+  eleven new executions. No later window has started; next is explicit index 10.
+  Latest reads still find 428fc2d/68a23e49. Invoke each separately and inspect each
   result before follow-up. No follower or automatic state/pixel stage.
   Main remains ce80; state/pixel/memory/timing and same-backend block gates remain.
   CPU-only complete-state preparation `runs/native-f32-alias-state-20260913.Xy2mtz`

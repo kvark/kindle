@@ -129,15 +129,26 @@ this same executable's production test at index 14 and requires eighteen further
 individually invoked native tests. There is no run-all, follower, retry or
 automatic state/pixel stage.
 
-New indices **0–6** pass, with each result inspected before the next launch:
+New indices **0–9** pass, with each result inspected before the next launch:
 cached-query/reset correctness, both F64 softplus comparisons, quantized and
 small-tile matmul epilogues, valid cached-block writes/selection, and Kindle's
-device packing/copy check. Their **sixteen complete initialization sequences**
-and **40 fresh health samples** pass, maximum gap **0.333 s**, at least
-**15,795 MiB directly free**, no kernel fault or unfinished child. Index 6
-completes at **23:04:30 UTC**. The production diagnostic above is separately
-reused at index 14, not another execution in this prefix. Index **7** is now
-in its separately invoked preflight; no later test is running.
+device packing/copy check, logical checkpoint/cache restoration, untrained agent
+round-trips, and the tiny act/learn/restore cycle. Their **86 complete initialization
+sequences** and **214 fresh health samples** pass, maximum gap **0.333 s**, at least
+**15,759 MiB directly free**, no kernel fault or unfinished child. Index 9
+completes at **23:19:16 UTC**. The production diagnostic above is separately
+reused at index 14: **eleven of nineteen hardware requirements** are complete,
+not eleven new executions here. No later window has started; next is explicit
+index **10**. The latest remote reads still find 428fc2d / 68a23e49 with identical
+non-renderer Blade inputs.
+
+The round-trip test uses the tiny core after zero/eight actions, with exact
+weights and zero optimizer moments. The subsequent tiny learning test checks
+selected restored weights/momentum, normalizer/visitation state and continued
+learning. These checks do not establish replay/live-belief resume, a production
+learning campaign, all-parameter production state parity or Atari competence.
+An independent read-only audit now reverifies all **89,122 inputs** and the
+complete raw results for indices 0–9. No native test or writer is rerun.
 
 An earlier independent read-only prefix audit reverifies all **89,122 input pins**
 and the first three complete raw results. Its first `systemd-run` invocation fails to
