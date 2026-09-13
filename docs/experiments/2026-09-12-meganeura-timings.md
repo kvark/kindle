@@ -2,8 +2,10 @@
 
 Status: isolated dependency/identity candidate; Rust/backend and Python CPU
 qualification complete. Candidate branch a7fc16b is committed and pushed.
-No GPU work, runtime qualification, speedup or adoption is claimed. The active
-Freeway → Pong → Breakout hardware queue and all historical packages stay fixed.
+No GPU work, runtime qualification, speedup or adoption is claimed. The user's
+September 13 [throughput priority](2026-09-13-throughput-priority.md) now places
+this qualification before unstarted Pong roots. Active root 1009 and every
+historical package stay fixed; earlier queue statements below are historical.
 
 ## Why this update comes before more backend diagnosis
 
@@ -130,6 +132,13 @@ No GPU declaration, follower, queue change, numerical parity, speedup or adoptio
 is introduced. The required runtime and tracing checks below remain outstanding.
 
 ## What the timing changes can and cannot establish
+
+The September 13 [separate nineteen-test hardware stage](2026-09-13-throughput-priority.md#first-native-stage-declared-and-waiting)
+is now declared, with 42 CPU scheduling/proof checks and a once-only follower
+waiting for the current Pong pair's verified boundary. It reuses these compiled
+fixtures; no GPU test has run yet. This does not change the completed CPU
+preparation or qualify the full runtime. Full-state and pixel/timing stages remain
+required separately before adoption.
 
 Blade now exposes calibrated CPU-domain pass-start and completion timestamps.
 Meganeura harvests them after completion rather than placing passes using host

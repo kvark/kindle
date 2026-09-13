@@ -17,6 +17,35 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 13 user priority: qualify throughput before unstarted Pong work.
+  This supersedes older future queue-order instructions below, not historical
+  inputs or results. Freeway is complete; Pong root 1009 had already started.
+  Preserve its full original training/frozen/control sequence. The tested hold
+  in `runs/throughput-priority-20260913.Lb7p6I` reserves only the unopened
+  `pong/seed2017-train.stdout` in recovered root xPz5ud: the pinned launcher's
+  exclusive open must fail before spawning root 2017. Preserve that explicit
+  notice; never remove it to restart the original queue. Its expected boundary
+  FileExistsError is a scheduling stop, not a native training failure or a
+  completed three-root experiment. All 1,870 old inputs reverify unchanged.
+  The idle Breakout hardware follower 52404/1665628 was retired with a bound
+  pidfd at 04:56:46 UTC; no hardware stage started and no active trainer/logger/
+  controller was interrupted. Do not wait on or restart that retired follower.
+  Qualify latest Meganeura/Blade separately, then block-matmul on the same
+  qualified backend, before re-declaring roots 2017/3019 and later game work.
+  Keep all training/evaluation budgets, seeds, controls and competence gates.
+  No GPU qualification, speedup or adoption follows from the queue hold.
+  See `docs/experiments/2026-09-13-throughput-priority.md` for the safe boundary
+  and required next declarations. Do not silently mix backends across seeds;
+  an adopted package requires an explicitly matched new campaign declaration.
+  The first latest-backend hardware stage is now declared in
+  `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
+  actual live-entrypoint refusal and an independently verified detached follower
+  260782/14012130, waiting on original scheduler 42730/1021056. It starts only
+  the 19 prepared native tests after the exact post-root-1009 hold and complete
+  raw pair/Freeway evidence reverify. No hardware test has run yet. Preserve its
+  live scripts, auditor, declaration and fixtures. Even a pass leaves full
+  update-1/eight-update state, N6 pixel/restore traces, combined memory and AB/BA
+  timing before adoption; it starts no later GPU or learning job automatically.
 - Prioritize one learning actor: Atari breadth, video/world pretraining and fast
   accelerated playing plus training, then mind-games (vkQuake2/TMNF), GOG/Wine games,
   cross-game adaptation and retention. Pong's initial-learning gate is achieved,
@@ -94,8 +123,8 @@ reliable learning.
   continuation `runs/meganeura-timings-cpu-continuation-20260912.eNLRUw` binds those
   exact edges and checksum-matched registry metadata. Both Kindle locks change
   only Meganeura/Blade. No tracing, skipped initialization, low-priority queues,
-  block matmul or learning settings are enabled. Keep every active/queued package
-  and the Freeway -> Pong -> Breakout hardware order fixed. Require complete
+  block matmul or learning settings are enabled. Keep completed/active packages
+  fixed; use the September 13 throughput priority for unstarted work. Require complete
   GPU gradient/cache/state/trace, direct-memory and timing gates before adoption;
   calibrated API availability is not a verified Kindle idle-gap measurement.
   The September 13 compilation-only preparation in

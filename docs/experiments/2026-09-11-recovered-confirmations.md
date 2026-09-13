@@ -1,5 +1,12 @@
 # Freeway and Pong confirmations after driver recovery
 
+September 13 scheduling update: the user has prioritized [throughput qualification
+before unstarted Pong work](2026-09-13-throughput-priority.md). Active root 1009
+keeps its full original paired protocol. Roots 2017/3019 are held before spawn
+and require a new declaration after qualification; the original idle Breakout
+follower is retired. The original learning inputs and all completed evidence below
+remain unchanged. The hold is installed; its final root-1009 boundary is not yet reached.
+
 All three fresh Freeway policies **fail competence**. Roots **1009/2017/3019**
 score means **24.5833 / 22.7778 / 22.4722**, with **16/36, 3/36 and 5/36**
 natural rounds reaching 25 crossings. **All three trained/control pairs are

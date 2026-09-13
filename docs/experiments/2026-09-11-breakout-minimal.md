@@ -1,5 +1,11 @@
 # Minimal-action Breakout: staged action-width qualification
 
+September 13: the user has prioritized [throughput qualification before unstarted
+Pong work](2026-09-13-throughput-priority.md). The idle hardware follower was
+retired before starting any stage. Its pinned declaration and CPU preparation
+remain preserved; any later execution needs a separate declaration. The older
+queue/wait statements below describe its original scheduling, not a live follower.
+
 The candidate at `exp/breakout-minimal` (`0591eda`) prepares the
 [bounded comparison](2026-09-11-breakout-diagnostic.md#next-bounded-comparison)
 without changing an active experiment. Its source-matched package passes

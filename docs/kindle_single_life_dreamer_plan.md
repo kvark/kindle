@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the old mastery gate. Fresh 400,008-action confirmation is running: root 1009 training, roots 2017/3019 queued. No new frozen result yet. |
+| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the old mastery gate. Fresh 400,008-action root 1009 is training; roots 2017/3019 are held for throughput qualification. No new frozen result yet. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -178,12 +178,14 @@ The [task observers](experiments/2026-09-08-atari-task-observers.md) are post-ho
 evaluation, never policy inputs or training rewards. Scripted ROM fixtures,
 random discovery, positive generic Atari scores and CPU tests are not Kindle wins.
 
-### The immutable serial queue
+### Serialized work: throughput before the remaining Pong roots
 
 The [original follower](experiments/2026-09-10-atari-serial-handoff.md) stopped
 on the driver failure and remains terminal. The separately declared
 [recovered-driver continuations](experiments/2026-09-11-recovered-confirmations.md)
-preserve completed work and now enforce this order:
+preserve completed work. The user's September 13
+[throughput priority](experiments/2026-09-13-throughput-priority.md) changes only
+unstarted work; root 1009 had already begun:
 
 ~~~text
 Boxing: three fresh roots + final evaluations + untrained controls [complete]
@@ -191,8 +193,11 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Breakout paired pilot [complete; competence failed]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
-  -> longer-budget Pong three-root confirmation [root 1009 training; others queued]
-  -> Breakout action-width hardware/synthetic diagnostic [queued; no learning]
+  -> Pong root 1009 training + frozen evaluation + untrained control [active]
+  -> latest Meganeura/Blade qualification [first hardware stage declared; waiting]
+  -> same-backend block-matmul correctness + N6 AB/BA throughput [next]
+  -> remaining Pong roots [held; new declaration required]
+  -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
 
 Qbert retains its 200,004-action unassisted-training pilot. Freeway's fresh roots
@@ -204,9 +209,13 @@ controls, unchanged task gates and all outcomes. Cap exhaustion before an episod
 target is incomplete. Pong is larger-exposure confirmation, not an isolated budget
 ablation or a reinterpretation of the old failed campaign.
 
+The tested boundary hold prevents the old launcher from starting root 2017
+after root 1009's complete paired protocol, without changing its active inputs.
+The old idle Breakout follower is retired. Preserve both original declarations
+and their terminal records; re-declare the remaining work, never restart them.
 Keep each pinned native/Python package together; main's dependency update does
-not switch these experiments. Do not restart old queues, edit active inputs or
-manually launch successors. Each entrypoint requires actual predecessor exit and
+not switch these experiments. Do not silently mix backends across roots when
+assessing reliability. Each entrypoint requires actual predecessor exit and
 complete raw evidence before GPU work. Valid competence failures remain failures;
 integrity, incomplete-data or runtime-safety failures stop without retries.
 Breakout's isolated [four-action candidate](experiments/2026-09-11-breakout-minimal.md)
@@ -214,7 +223,7 @@ has CPU-tested explicit replay/checkpoint schemas. Both future arms
 must use its same qualified upstream backend; the old eighteen-action pilot is
 historical context, not the matched control. Its compiled full-gradient/state
 fixtures support a separately pinned, one-shot hardware/synthetic diagnostic
-after the learning queue. No diagnostic GPU result
+after throughput qualification and the rescheduled learning work. No diagnostic GPU result
 exists yet. Even a pass leaves native four-action initialization/restore, N6 pixel
 replay and combined-memory checks before a paired learning declaration and then
 fresh-root confirmation. The state/capture/ledger matrix, measured controller and
@@ -320,11 +329,15 @@ new runtime tip `45991be1`. Its [isolated update](experiments/2026-09-12-meganeu
 adds calibrated timing and loading/context changes with required git Blade
 `f6f2729e`. Rust/backend CPU checks and all 547 Python tests pass on its isolated
 native `29774c09`, with verified source/wheel/import identity. Source-matched
-release hardware fixtures are prepared; their GPU tests remain unrun. No GPU
-result or adoption is claimed.
+release hardware fixtures are prepared; their GPU tests remain unrun. The
+[first hardware stage](experiments/2026-09-13-throughput-priority.md#first-native-stage-declared-and-waiting)
+is declared and waiting for the current paired run's verified boundary. Full
+state, pixel/restore, memory and AB/BA timing still follow before adoption.
+No GPU result or adoption is claimed.
 Keep this dependency comparison separate from block-matmul and other optimizations.
 Recheck upstream before new backend diagnosis; carry older candidates forward
-before testing them as current code. Existing learning/hardware queues stay pinned.
+before testing them as current code. Active learning inputs stay pinned; the
+user-authorized throughput priority holds only unstarted work.
 The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
 frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
@@ -387,8 +400,9 @@ full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
 evidence only. The block candidate has an unchanged carry onto qualified ce80e9cd;
-the newer timing backend must be separately qualified before another carry. Neither
-has a verified GPU speedup or may displace the fixed queue.
+the newer timing backend must be separately qualified before another carry.
+Block-matmul correctness and throughput now take priority over unstarted Pong
+roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
 
 For every optimization, require production losses/all gradients, reset causality,
 complete weights and optimizer moments from update 1, exact state/action traces,
@@ -538,9 +552,11 @@ adoption are complete; the newer 45991be1 candidate remains CPU-qualified only.
 Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
-Freeway's complete fresh confirmation also fails competence. Monitor the declared
-Pong confirmation; Breakout's bounded action-width diagnostic remains queued
-after it. Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
+Freeway's complete fresh confirmation also fails competence. Finish active Pong
+root 1009's unchanged paired protocol, then qualify latest Meganeura and matched
+block-matmul throughput before re-declaring remaining Pong work. Breakout's
+action-width candidate remains staged; its old idle follower is retired.
+Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
 initial misses from low post-bonus progress: only 4.68% of training frames follow
 the first pyramid, including its bonus animation. Prefer a separately declared
 fresh 400,008-action dose test with a retained 200,004-action midpoint, keeping

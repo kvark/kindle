@@ -1,5 +1,11 @@
 # Small-batch block matrix products: CPU-only candidate
 
+September 13 scheduling update: the user has prioritized throughput qualification
+before unstarted Pong work. The [boundary hold](2026-09-13-throughput-priority.md)
+preserves active root 1009 and holds later roots. Qualify latest Meganeura/Blade
+separately before testing block-matmul on the same backend. Earlier queue-order
+statements below describe the preserved declarations, not the new priority.
+
 Prepared September 10, with a September 11 carry onto the qualified upstream
 backend and a September 12 source-matched Python package below. Not adopted,
 timed or GPU-qualified. The pinned learning
