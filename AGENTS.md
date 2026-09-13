@@ -1,15 +1,19 @@
-# Isolated Meganeura/Blade timing update
+# Isolated latest-Meganeura dependency update
 
-This worktree stages Meganeura 45991be1 with its required Blade f6f2729e pin
-against qualified control 1e00e818. It is not adopted or GPU-qualified.
+This worktree carries the dependency-only a7fc16b candidate to Meganeura
+75dfe901, retaining shared Blade f6f2729e. It is not adopted or GPU-qualified.
+The new upstream convolution tuning is not enabled in Kindle. Its LeVJEPA
+frontend uses patch matmuls and session construction leaves autotuning off.
 Use `/x/Code/kindle/AGENTS.md`, the authoritative plan there, and
 `/mnt/data/GUIDELINES.md` for current direction and experiment status; the
 inherited record below is historical, not a live queue declaration.
 Change dependency/identity files and required API compatibility only. Do not
 enable block matmul, skip parameter initialization, low-priority GPU queues,
 tracing, tuning, or new learning settings in this dependency comparison.
-Keep all current packages and the Freeway -> Pong -> Breakout hardware queue
-unchanged. CPU work uses one core / 2 GiB / zero swap; no new GPU follower.
+Preserve the active Pong pair and held later roots. Do not rewrite the old
+45991be1 hardware declaration or its inputs; its upstream guard must refuse a
+different revision. This source change starts no GPU job or follower. CPU work
+uses one core / 2 GiB / zero swap and a separate target/cache copy.
 Require complete gradient/cache/state/trace, memory, and timing gates before use.
 
 # Historical working direction
