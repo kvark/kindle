@@ -182,9 +182,19 @@ reliable learning.
   `runs/block-matmul-conv-fixtures-20260913.UqzXlX` compiles all six executables,
   passes five scalar CPU oracles and lists 21 GPU tests without running them.
   Its ten command lifecycles and 37,446 pins reverify. Preserve these completed
-  writers and private caches; their `--audit` modes are read-only. No block GPU
-  declaration, follower, speedup or adoption exists. Qualify the dependency
-  first, then the same-backend graph comparison; preserve all older candidates.
+  writers and private caches; their `--audit` modes are read-only. The separate
+  block comparison is now declared in `runs/block-matmul-conv-runtime-20260913.fJSirl`,
+  with 103 passing CPU checks, 43,151 verified pins and both actual live-entrypoint
+  refusals. Its independently checked follower 282009/15020597 waits only on
+  full dependency follower 273381/14615337. All three stages remain unrun; keep
+  their inputs fixed and the original pair/seed hold unchanged. Require the full
+  raw dependency proof before block hardware, update-1/eight-update state and
+  N6 pixel AB/BA. Both arms restrict the child Vulkan loader to the pinned NVIDIA
+  driver; verify one actual RTX 5080 before tests, not just a memory query.
+  Preserve exact state/trace/moment and direct-memory gates; regression acceptance
+  is not the separate speedup gate. No runtime qualification, speedup, adoption
+  or automatic learning follows from this declaration. See
+  `docs/experiments/2026-09-13-block-matmul-runtime.md`.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

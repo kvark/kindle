@@ -195,7 +195,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [active]
   -> latest Meganeura/Blade qualification [75dfe901 hardware then full-state/pixel stages; waiting]
-  -> same-backend block-matmul correctness + N6 AB/BA throughput [next]
+  -> same-backend block-matmul correctness + N6 AB/BA throughput [declared; waiting]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
@@ -406,7 +406,11 @@ full learning from report 3 and is not adopted. The
 evidence only. The identical block change now has a CPU-qualified source-matched
 package on latest 75dfe901 and all 21 GPU test fixtures prepared but unrun;
 the older ce80e9cd candidate is preserved. Qualify the dependency-only runtime
-first, then test the block optimization against that same backend.
+first, then test the block optimization against that same backend. The separate
+[block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
+is now declared after both dependency stages, with 103 passing CPU checks and a
+verified live waiter. Its executing-adapter, full-state and throughput gates
+remain unrun; it changes no active pair, game budget or competence threshold.
 Block-matmul correctness and throughput now take priority over unstarted Pong
 roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
 

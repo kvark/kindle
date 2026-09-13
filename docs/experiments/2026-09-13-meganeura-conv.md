@@ -100,4 +100,6 @@ dependency refresh do not establish useful throughput or another Atari win.
 The [identical block carry](2026-09-10-block-matmul.md#september-13-identical-carry-onto-latest-runtime)
 now passes 98 Rust and 547 Python CPU tests on this same backend, with native
 5e4ea9e1 and all 21 GPU fixtures prepared. Its five scalar CPU oracles pass;
-no block GPU test, timing result, declaration or follower exists yet.
+the separate [block qualification](2026-09-13-block-matmul-runtime.md) is now
+declared and waiting after the full dependency gate. No block GPU test, timing
+result or adoption is claimed.

@@ -134,5 +134,14 @@ all four unchanged active pair processes and no native stage outputs or children
 Complete state/pixel/memory/timing qualification still remains unrun; neither
 stage adopts a runtime or starts further learning automatically.
 
+The separately declared [same-backend block comparison](2026-09-13-block-matmul-runtime.md)
+now follows full-runtime stage 273381/14615337. Its **103 CPU checks and 43,151
+pins** reverify; follower **282009/15020597** launches at **08:04:19 UTC**.
+The independent 08:06 handoff audit checks all three waiters, the unchanged
+original pair, both real entrypoint refusals and absence of any new GPU work.
+The parent stages are unchanged. Block hardware, exact state/moments, N6 pixel
+AB/BA and directly free memory must still qualify; no learning continuation or
+adoption starts automatically.
+
 The queue change establishes no speedup, adoption or additional Atari competence.
 Boxing remains the only confirmed three-root game.

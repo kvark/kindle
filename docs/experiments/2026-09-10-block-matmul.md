@@ -7,12 +7,14 @@ separately before testing block-matmul on the same backend. Earlier queue-order
 statements below describe the preserved declarations, not the new priority.
 The [latest same-backend carry](#september-13-identical-carry-onto-latest-runtime)
 is now CPU-qualified on 75dfe901; dependency GPU qualification still comes first.
+Its separate [hardware/state/timing comparison](2026-09-13-block-matmul-runtime.md)
+is now declared and waiting after both dependency stages. No GPU result exists.
 
 Prepared September 10, with a September 11 carry onto the qualified upstream
 backend and a September 12 source-matched Python package below. Not adopted,
 timed or GPU-qualified. The pinned learning
 campaigns keep their original packages and inputs. Neither candidate starts a
-GPU worker or follower.
+GPU worker or follower from those preparations.
 
 ## Change and rationale
 
@@ -273,3 +275,8 @@ or an NVIDIA memory query alone does not establish each test's selected GPU.
 Pong's full active pair and both declared dependency stages remain ahead of
 the separate same-backend block comparison. No game budget or competence gate
 changes with this preparation.
+
+The subsequent [conditional runtime declaration](2026-09-13-block-matmul-runtime.md)
+adds the executing-adapter check and the complete same-backend comparison after
+the existing dependency stages. It leaves this completed CPU preparation and
+every older control untouched; all new GPU checks remain unrun.
