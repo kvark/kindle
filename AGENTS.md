@@ -1,20 +1,22 @@
-# Isolated latest-Meganeura dependency update
+# Isolated block-matmul candidate on the latest dependency
 
-This worktree carries the dependency-only a7fc16b candidate to Meganeura
-75dfe901, retaining shared Blade f6f2729e. It is not adopted or GPU-qualified.
-The new upstream convolution tuning is not enabled in Kindle. Its LeVJEPA
-frontend uses patch matmuls and session construction leaves autotuning off.
+This worktree carries exactly the networks.rs change from the 7b190f8 candidate
+onto Kindle 58f328a / Meganeura 75dfe901 / shared Blade f6f2729e. It is not
+adopted or GPU-qualified. Keep the dependency-only control separate. The earlier
+ce80 package's CPU evidence is historical, not qualification for this package.
 Use `/x/Code/kindle/AGENTS.md`, the authoritative plan there, and
 `/mnt/data/GUIDELINES.md` for current direction and experiment status; the
 inherited record below is historical, not a live queue declaration.
-Change dependency/identity files and required API compatibility only. Do not
-enable block matmul, skip parameter initialization, low-priority GPU queues,
-tracing, tuning, or new learning settings in this dependency comparison.
-Preserve the active Pong pair and held later roots. Do not rewrite the old
-45991be1 hardware declaration or its inputs; its upstream guard must refuse a
-different revision. This source change starts no GPU job or follower. CPU work
-uses one core / 2 GiB / zero swap and a separate target/cache copy.
-Require complete gradient/cache/state/trace, memory, and timing gates before use.
+Group only small F32 batch-2-through-16 block products. Retain batch-one GEMV,
+large imagination batches, original GRU gates, initialization and full-precision
+gradients. Do not enable tuning, tracing, skipped initialization, low-priority
+GPU queues or changed learning settings. Keep N6/R256/B16/T64/full BPTT fixed.
+Preserve the active Pong pair and held later roots. CPU staging starts no GPU
+job or follower. Use one core / 2 GiB / zero swap and a private cache copy.
+Qualify the dependency-only backend first, then this same-backend optimization:
+composed-loss/all-gradient oracle, production blocks, complete state and moments
+from updates 1 and 8, exact N6 traces/restore, at least 2 GiB directly free and
+repeatable end-to-end AB/BA gains. Dispatch counts alone are not a speedup.
 
 # Historical working direction
 
