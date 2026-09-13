@@ -3,7 +3,9 @@
 Status: **two matching PMU-halt incidents; a later external reboot restores
 observable health**. The latest backend remains quarantined. The
 [initialization follow-up](2026-09-13-initialization-diagnostic.md) records the
-17:21 boot, matched diagnostic preparation and passing guarded production control.
+17:21 boot and passing guarded production control and allocation-order candidate.
+The candidate result narrows the investigation without establishing root cause
+or full runtime qualification.
 No reset, driver change or host recovery was performed by the agent.
 Pong's completed pair and the remaining-root hold are unchanged.
 
@@ -196,7 +198,8 @@ Before another candidate execution:
    an explicit operator decision, not automatic.
 
 This forensic report launches no GPU diagnostic or follower; the separately
-declared [control-only follow-up](2026-09-13-initialization-diagnostic.md) passes.
+declared [initialization follow-up](2026-09-13-initialization-diagnostic.md) records
+the passing control and separately tested allocation-order hypothesis.
 Even an initialization fix leaves full hardware gradients, update-1/eight-update
 state and moments, N6 pixel/restore/memory and same-backend block throughput
 qualification before the held Pong roots. No speedup, adoption or learning

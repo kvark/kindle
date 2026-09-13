@@ -208,7 +208,9 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> normal module reload [user performed; GSP initialization fails, GPU unavailable]
   -> external host reboot [17:21; observable health restored]
   -> guarded initialization control [production gradients and complete traces pass]
-  -> allocation-order hypothesis [CPU-qualified; candidate not GPU-tested]
+  -> allocation-order hypothesis [guarded production gradients and complete traces pass]
+  -> full hardware qualification [guarded one-test-at-a-time checks in progress]
+  -> full state/pixel/memory qualification [unrun]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -237,7 +239,10 @@ quarantined. The [initialization follow-up](experiments/2026-09-13-initializatio
 CPU-qualifies matched flushed breadcrumbs and fail-fast initialization waits.
 Its guarded **control-only** production test passes all gradients and both
 complete initialization traces, retaining at least 6,545 MiB directly free.
-The allocation-order hypothesis is separately CPU-staged, not GPU-qualified. The
+The separate allocation-order candidate also passes, with exact control plans,
+all production gradients, clean health and at least 6,545 MiB directly free.
+This narrows the investigation without proving root cause; full hardware,
+state/pixel/memory and throughput qualification remain ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
 Preserve both failures and distinguish historical raw-data audits, current-boot

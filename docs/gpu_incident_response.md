@@ -89,6 +89,10 @@ That sentinel performs no GPU computation. The separately declared
 also passes under the guard with clean kernel/health evidence and complete
 initialization traces. This is a control result, not qualification of the
 quarantined candidate or prevention of a future first fault.
+The separately declared [allocation-order candidate](experiments/2026-09-13-initialization-diagnostic.md#completed-candidate-result)
+also passes the production diagnostic under the guard. That does not qualify
+the original failing backend, establish root cause or replace the remaining
+hardware/state/pixel/memory gates.
 Before timed adoption, measure guard overhead with a matched healthy control;
 do not treat guarded and historical unguarded timings as an identical benchmark.
 
@@ -113,6 +117,7 @@ post-reset health fails.
 After recovery, freshly bind the boot, loaded/on-disk/userspace driver, GPU UUID
 and native executing adapter; require readable numeric health, no recovery
 action, clean kernel evidence and the direct free-memory margin. Recovery is
-not runtime qualification. Keep the latest candidate quarantined until a
-separately declared, guarded initialization diagnostic is ready; do not resume
-old queues or training automatically.
+not runtime qualification. Keep the original failing candidate quarantined;
+test changes only through separately declared guarded diagnostics. Inspect
+each result before continuing, and do not resume old queues or training
+automatically.

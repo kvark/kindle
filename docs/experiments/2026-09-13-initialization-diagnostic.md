@@ -1,8 +1,9 @@
 # Initialization breadcrumbs after the second GPU failure
 
-Status: **the guarded instrumented control passes the full production test;
-no candidate execution or adoption**. Preserve both earlier device-loss
-incidents and every stopped queue.
+Status: **both the guarded instrumented control and the separately declared
+allocation-order candidate pass the production initialization/gradient diagnostic**.
+Preserve both earlier device-loss incidents and every stopped queue. No adoption
+or learning continuation is established.
 This continues the [full-log investigation](2026-09-13-gpu-forensics.md), not the
 failed original qualification launcher.
 
@@ -54,7 +55,7 @@ is **fabricated CPU test input**, not another hardware incident.
 
 The old control retains alias-order allocation and immediate host zeroing.
 The latest candidate retains Shared-first allocation and deferred host zeroing.
-No ordering hypothesis is patched yet. Learning arithmetic, shaders, precision,
+Neither of these two fixtures changes ordering. Learning arithmetic, shaders, precision,
 batch/BPTT lengths, optimizer settings, default initialization and all production
 tolerances remain unchanged. A source normalizer removes only the enumerated
 diagnostic statements and checked waits and reproduces each original runtime.
@@ -144,7 +145,7 @@ allocation, pipeline construction and zeroing. This observation neither locates
 the historical candidate's first fault nor measures calibrated GPU idle time.
 Instrumentation and fresh-query overhead are not benchmark-qualified.
 
-The next **CPU-only** hypothesis is
+The separately prepared allocation-order hypothesis is
 [1c314b14](https://github.com/kvark/meganeura/commit/1c314b14360b985ec029e31249f31bed30386221):
 restore alias-order allocation on the traced latest backend, retaining its
 deferred host-zero phase and all descriptors, mappings, initialization and
@@ -157,3 +158,91 @@ guarded-control proof. Reuse only `prepare.py --audit`; no GPU job or follower
 is declared. A later hardware pass would be evidence for a useful candidate, not
 proof that allocation order alone caused either historical crash: those failed
 runs lacked the new diagnostics and fail-fast waits.
+
+## Separately declared allocation-order hardware diagnostic
+
+The new [declaration](../../runs/gpu-alias-order-runtime-20260913.3GAsGg/declaration.md)
+binds **62,825 pins and 22 CPU launch/reader checks**. It runs only the prepared
+1c314b14 candidate, preserving the completed same-boot control. The original
+75dfe901 and traced-but-original-order 50a51707 are not rerun. Main, historical
+packages, the completed Pong pair and the root-2017 hold remain unchanged.
+
+Fresh declaration and launch checks re-read upstream, the complete CPU/control
+proof and original Pong/Freeway/hold evidence. The private adapter reuses the
+immutable control's numerical, trace and health checks with explicit new paths,
+settings and candidate result labels; it never invokes an old writer. Before
+native execution it again requires the fixed boot/driver, clean kernel evidence
+and one idle actual RTX 5080. All guard time, memory and sampling gates remain.
+
+In addition to complete production losses/gradients and both initialization
+traces, this diagnostic requires the full native alias plans, graph sizes and
+executing-device headers to match the control. Allocation and host zeroing must
+follow the separately declared **alias-order / deferred-zero** sequence. No
+driver, precision, batch, learning or zero-initialization setting is changed.
+
+### Completed candidate result
+
+The direct native test completes **18:42:39–18:45:08 UTC**, with both complete
+initializations and all original production loss/gradient assertions passing.
+Its [raw result](../../runs/gpu-alias-order-runtime-20260913.3GAsGg/result.json)
+reports worst relative L2 **0.0007457205250121038**, matching the control's reported
+value. Both full allocation plans, graph sizes and device headers match exactly;
+the 44,926 flushed records verify alias-order allocation with deferred host
+zeroing. The guard records **480 fresh health samples**, maximum gap **0.594 s**,
+at least **6,545 MiB directly free**, clean kernel evidence and no unfinished
+child. Independent `run.py audit` reverifies **62,825 inputs and 59 outputs**.
+
+This is a useful candidate, not proof of the historical fault's cause. The
+earlier failing executions lacked these breadcrumbs and fail-fast waits. Do not
+rerun the completed diagnostic or the known-failing original merely to provoke
+another wedge. No full runtime qualification, speedup, adoption or learning is
+established.
+
+### Remaining hardware fixtures
+
+The separate [CPU preparation](../../runs/gpu-alias-fixtures-cpu-20260913.rLrwoD/result.json)
+compiles the three backend hardware-test targets and the Kindle canary in private
+release caches; it reuses the exact Kindle test executable that passed above.
+All **19 original hardware tests** are listed, not executed. Its **13 command
+lifecycles and 67,081 pins** independently reverify with `prepare.py --audit`.
+The standalone backend lock is byte-identical to the earlier fixture's lock;
+the detached backend's tracked source exactly matches 1c314b14. Builds retain
+the one-core / 2 GiB / zero-swap host scope. Fresh remote checks still find
+75dfe901 and renderer-only Blade 33e2a5b0.
+
+Inspect each guarded hardware result before follow-up. This preparation declares
+no GPU job, retry, follower or automatic continuation. Full hardware/cache,
+update-1/eight-update state/moments, N6 pixel/restore/memory and same-backend
+block-matmul throughput gates still precede the held Pong work.
+
+## Full hardware declaration
+
+The first preparation in `gpu-alias-hardware-20260913.IPpAJq` stops on a fresh
+Blade-head check before any host preflight or GPU launch. The new tip
+**68a23e49** adds renderer documentation only; actual tree comparison still
+matches f6f2729e at every path outside the unused `blade-render` package.
+Preserve that terminal writer and its 22 passing CPU tests.
+
+The new [v2 declaration](../../runs/gpu-alias-hardware-v2-20260913.s6BZNO/declaration.md)
+binds **67,128 pins**, passes the same **22 CPU checks**, and revalidates full
+fixture, production-gradient, original Pong/Freeway/hold and fresh host evidence.
+It requires all **19 original hardware tests**, explicitly reusing the one
+completed, identical-executable production-gradient diagnostic above. Each of
+the remaining 18 tests requires its own invocation and result review; there is
+no run-all mode, retry or follower. Individual tests are underway; their separate
+`test-NN-result.json` files retain raw checks and output pins. The full group is
+not complete, and a declaration alone is not a hardware result.
+
+Every native test retains its original assertions and tolerances, the unchanged
+guard, complete allocation/wait traces and actual executing-device checks.
+Changed inputs, an incomplete predecessor or any health/numerical failure stops
+the sequence. Full state/pixel/memory and same-backend block throughput remain
+separate gates; no adoption or new learning is declared.
+
+The source-only package candidate `exp/gpu-alias-init-20260913` at **d62d356**
+changes only dependency/identity files and its worktree instructions relative
+to 58f328a. Its production bodies match the tested fixture; test-only progress
+and helper imports are not carried into that source. The unstarted
+[package preparation](../../runs/gpu-alias-package-cpu-20260913.HqMccf/declaration.md)
+requires the complete hardware audit before its CPU build. This is staged
+source and formatting validation, not a built package or runtime adoption.

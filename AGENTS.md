@@ -155,6 +155,35 @@ reliable learning.
   historical crash cause. Retain all full-state/pixel/memory/block throughput
   gates ahead of Pong. See
   `docs/experiments/2026-09-13-initialization-diagnostic.md`.
+  The separately declared candidate diagnostic is now in
+  `runs/gpu-alias-order-runtime-20260913.3GAsGg`, with 22 CPU launch/reader checks
+  and 62,825 verified pins. It runs only prepared 1c314b14 after fresh complete
+  control/CPU/Pong/Freeway/hold, upstream and same-boot health checks. Require
+  both complete alias/deferred-zero traces and exact control alias plans in
+  addition to all production gradient, actual-device and guard/memory gates.
+  Its 18:42–18:45 execution now passes both complete initialization traces and
+  every production loss/gradient assertion, with worst relative L2 0.000745721
+  and exact control plans. All 480 fresh health samples pass with at least
+  6,545 MiB directly free, clean kernel evidence and no unfinished child.
+  Independent audit reverifies 62,825 inputs/59 outputs. Preserve this completed
+  diagnostic; no retry, full runtime qualification, proven root cause, speedup,
+  adoption or learning follows. The separate remaining-fixture CPU preparation
+  in `runs/gpu-alias-fixtures-cpu-20260913.rLrwoD` verifies 13 command lifecycles
+  and 67,081 pins. Three backend targets and the canary are release-built; the
+  exact tested Kindle executable is reused. All 19 hardware tests are listed,
+  not run. Preserve private caches and the completed writer; its `--audit` is
+  read-only. No GPU job is declared by this preparation. Keep all full hardware,
+  state/pixel/memory and same-backend block throughput gates ahead of Pong.
+  The first full-hardware declaration attempt IPpAJq stops before host/GPU work
+  on new Blade 68a23e49. Its actual changes remain confined to the unused renderer;
+  preserve that stop, with no dependency rebuild for documentation. The new
+  `runs/gpu-alias-hardware-v2-20260913.s6BZNO` binds 67,128 pins and 22 CPU checks.
+  It explicitly reuses the completed exact production diagnostic and requires
+  the other 18 original hardware tests one invocation at a time, with complete
+  raw prerequisites, actual-device/trace/guard checks and result review before
+  follow-up. Individual tests are underway; the full group is not complete.
+  No run-all mode, retry,
+  follower, full runtime qualification, speedup, adoption or learning is declared.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.
