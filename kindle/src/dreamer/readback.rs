@@ -37,6 +37,7 @@ impl Readback {
     }
 
     /// Read independent, already-submitted producers with one transfer/wait.
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all, fields(outputs = outputs.len())))]
     pub fn read_many(&mut self, outputs: &mut [(&Session, usize, &mut [f32])]) {
         let mut bytes = 0usize;
         for (session, index, output) in outputs.iter() {
@@ -86,6 +87,8 @@ impl Readback {
                 .expect("GPU readback wait failed"),
             "readback did not complete"
         );
+        #[cfg(feature = "profiler")]
+        meganeura::profiler::record_gpu_timings(self.encoder.get_timings());
         let mut offset = 0;
         for (_, _, output) in outputs {
             // The completed transfer initialized these aligned f32 regions in

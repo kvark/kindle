@@ -1,4 +1,22 @@
-# Isolated latest-Meganeura dependency update
+# Isolated learner timeline candidate
+
+This worktree forks the dependency-only parent 58f328a to prepare opt-in
+synthetic learner tracing on Meganeura 75dfe901 / Blade f6f2729e. The `profiler`
+feature labels learner stages and harvests completed Kindle transfer timestamps;
+`dreamer_canary --trace-dir` requires that feature, GPU timing, one learning
+repetition and a fresh output directory. It cannot be mixed with per-dispatch
+session profiling. Default builds enable no instrumentation or timing option.
+This is not an Atari/perception trace, GPU qualification, idle-gap proof or
+speedup. Keep all existing packages and GPU queues fixed; finish Pong-1009's
+original full pair, dependency qualification and block comparison first.
+Require independent trace coverage/calibration, complete state/report parity
+and measured overhead before diagnostic use. No GPU follower or automatic
+adoption is created here. Follow `/x/Code/kindle/AGENTS.md` and
+`/mnt/data/GUIDELINES.md`; CPU work uses one core / 2 GiB / zero swap and a
+separate target/cache copy. The inherited dependency-only record below applies
+to the preserved parent, not this new instrumentation candidate.
+
+# Historical latest-Meganeura dependency update
 
 This worktree carries the dependency-only a7fc16b candidate to Meganeura
 75dfe901, retaining shared Blade f6f2729e. It is not adopted or GPU-qualified.

@@ -33,6 +33,7 @@ impl DeviceCopies {
     /// Submit after producers and before consumers on the shared queue. The
     /// caller must complete these copies before overwriting inputs from the CPU
     /// or destroying sessions. No host wait is needed before a consumer step.
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all, fields(regions = copies.len())))]
     pub fn copy(&mut self, copies: &[DeviceCopy<'_>]) {
         let regions: Vec<_> = copies
             .iter()
@@ -80,6 +81,7 @@ impl DeviceCopies {
         self.completion = Some(self.gpu.submit(&mut self.encoder));
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn wait(&mut self) {
         if let Some(completion) = self.completion.take() {
             assert!(
@@ -88,6 +90,8 @@ impl DeviceCopies {
                     .expect("GPU device copy wait failed"),
                 "device copy did not complete"
             );
+            #[cfg(feature = "profiler")]
+            meganeura::profiler::record_gpu_timings(self.encoder.get_timings());
         }
     }
 }

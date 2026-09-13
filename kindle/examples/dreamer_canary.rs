@@ -4,7 +4,7 @@
 //! `cargo run --release -p kindle --example dreamer_canary -- 12m 64 4 --learn`
 //! Set `MEGANEURA_DEVICE_ID` when the host has multiple adapters.
 
-use std::{env, sync::Arc, time::Instant};
+use std::{env, fs, path::PathBuf, sync::Arc, time::Instant};
 
 use kindle::vision::Observation;
 use kindle::{ActionMode, DreamerConfig, DreamerCore, FrameFlags, ModelSize, Reward};
@@ -33,6 +33,7 @@ fn main() {
     let mut repetitions = 1usize;
     let mut updates = 1usize;
     let mut profile_directory = None;
+    let mut trace_directory = None;
     let mut checkpoint = None;
     let mut prediction_only = false;
     while let Some(option) = args.next() {
@@ -44,9 +45,10 @@ fn main() {
             "--profile-dir" => {
                 profile_directory = Some(args.next().expect("missing profile directory"))
             }
+            "--trace-dir" => trace_directory = Some(args.next().expect("missing trace directory")),
             "--checkpoint" => checkpoint = Some(args.next().expect("missing checkpoint path")),
             other => panic!(
-                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
+                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH, --trace-dir PATH or --checkpoint PATH"
             ),
         }
     }
@@ -68,6 +70,13 @@ fn main() {
     assert!(
         checkpoint.is_none() || (run_learner && repetitions == 1),
         "saving requires --learn and one repetition"
+    );
+    let trace = prepare_trace(
+        trace_directory.as_deref(),
+        run_learner,
+        repetitions,
+        profile_directory.is_some(),
+        &config,
     );
     eprintln!("config={}", serde_json::to_string(&config).unwrap());
 
@@ -116,6 +125,99 @@ fn main() {
 
     drop(gpu);
     eprintln!("GPU context dropped");
+    if let Some(directory) = trace {
+        // Session and transfer drops harvest their final pending submissions.
+        meganeura::profiler::record_instant("kindle_capture_complete");
+        meganeura::profiler::save(directory.join("trace.pftrace")).expect("save learner trace");
+    }
+}
+
+fn validate_trace(
+    enabled: bool,
+    feature: bool,
+    timing: bool,
+    learning: bool,
+    repetitions: usize,
+    session_profiles: bool,
+) -> Result<(), &'static str> {
+    if !enabled {
+        return Ok(());
+    }
+    if !feature {
+        return Err("--trace-dir requires building with --features profiler");
+    }
+    if !timing {
+        return Err("--trace-dir requires MEGANEURA_GPU_TIMING=1 before GPU construction");
+    }
+    if !learning || repetitions != 1 {
+        return Err("--trace-dir requires --learn and one repetition");
+    }
+    if session_profiles {
+        return Err("collect --profile-dir separately; it changes dispatch grouping");
+    }
+    Ok(())
+}
+
+fn prepare_trace(
+    directory: Option<&str>,
+    learning: bool,
+    repetitions: usize,
+    session_profiles: bool,
+    config: &DreamerConfig,
+) -> Option<PathBuf> {
+    let directory = PathBuf::from(directory?);
+    validate_trace(
+        true,
+        cfg!(feature = "profiler"),
+        meganeura::GpuOptions::from_env().timing,
+        learning,
+        repetitions,
+        session_profiles,
+    )
+    .expect("invalid trace configuration");
+    fs::create_dir(&directory).expect("trace directory must be fresh");
+    let file = fs::File::create_new(directory.join("contract.json")).expect("fresh trace contract");
+    serde_json::to_writer_pretty(
+        file,
+        &serde_json::json!({
+            "schema_version": 1,
+            "scope": "synthetic_core_only",
+            "gpu_timing": true,
+            "per_dispatch_profiling": false,
+            "config": config,
+            "timing_contract": "calibrated pass-start to next-start or submission completion; not instruction-level kernel time",
+            "speedup_assessed": false,
+            "coverage_qualified": false,
+        }),
+    )
+    .expect("write trace contract");
+    meganeura::profiler::init_with_targets(&["kindle"]);
+    meganeura::profiler::record_instant("kindle_capture_begin");
+    Some(directory)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::validate_trace;
+
+    #[test]
+    fn absent_trace_keeps_the_original_modes() {
+        assert_eq!(validate_trace(false, false, false, false, 7, true), Ok(()));
+    }
+
+    #[test]
+    fn trace_requires_explicit_feature_and_gpu_timing() {
+        assert!(validate_trace(true, false, true, true, 1, false).is_err());
+        assert!(validate_trace(true, true, false, true, 1, false).is_err());
+        assert_eq!(validate_trace(true, true, true, true, 1, false), Ok(()));
+    }
+
+    #[test]
+    fn trace_does_not_mix_repeated_or_per_dispatch_profiles() {
+        assert!(validate_trace(true, true, true, false, 1, false).is_err());
+        assert!(validate_trace(true, true, true, true, 2, false).is_err());
+        assert!(validate_trace(true, true, true, true, 1, true).is_err());
+    }
 }
 
 fn fill_synthetic_replay(core: &mut DreamerCore, config: &DreamerConfig) {
