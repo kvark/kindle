@@ -4,6 +4,10 @@ Status: **hardware gate failed; post-reboot diagnostic also fails on the candida
 backend adoption, speedup or subsequent learning is established. Pong root
 1009's complete original paired result remains valid and preserved. All
 experiment processes have exited; do not restart any stopped queue.
+The [full retained-log investigation](2026-09-13-gpu-forensics.md) now ties both
+incidents to an identical PMU-halt signature, records failed GSP initialization
+after the user's module reload, and prepares a kernel-aware guard and runbook.
+The GPU is still unrecovered; the candidate remains quarantined.
 
 ## Completed pair and report-format repair
 

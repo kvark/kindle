@@ -97,6 +97,32 @@ reliable learning.
   or learning job is declared by this failed comparison.
   Keep full hardware/state/pixel and same-backend block throughput gates ahead
   of remaining Pong. See `docs/experiments/2026-09-13-world-gradient-recovery.md`.
+  The user's subsequent reset returns Not Supported; normal module reload at
+  16:26 fails GSP initialization (RmInitAdapter 0x62:0x40:2168). NVML sees no
+  devices, while PCI still sees the RTX 5080. Do not repeat queries or resets
+  as recovery, force unload, or change drivers/reboot/power-cycle without approval.
+  Full retained-log analysis verifies 38,153 kernel records: both crashes have
+  identical Xid 62 payloads; the old logger emits numeric zeros for about 30
+  seconds after each first fault. No retained Xid predates today: journal
+  retention reaches August 26; separately preserved rotated kernel logs extend
+  to August 16 (16 files/20 pins in `runs/gpu-rotated-logs-20260913.vMfjdM`).
+  Package logs confirm the September 11 unattended driver/firmware update.
+  Allocation/host-zero ordering changed;
+  ignored initialization wait errors are pre-existing. Neither proves root cause.
+  The 17:01 upstream recheck still finds 75dfe901/f6f2729e. Preserve the sealed
+  forensic/source roots and first guard-check failure. The standalone
+  `python/examples/gpu_guard.py` passes 65 CPU tests and actual kernel-fault
+  launch refusal without an NVML query; completed v2 evidence is in
+  `runs/gpu-guard-cpu-v2-20260913.dn1CAS` (102 pins). Pin it for newly declared
+  direct native diagnostics, never insert it into old queues. It stops only its
+  own direct child, not process trees; do not wrap schedulers/Cargo/controllers.
+  Keep GPU work serialized, inspect each result before follow-up, retain native
+  device assertions and all gates. CPU guard tests are not GPU qualification,
+  measured overhead or first-wedge prevention. No replacement GPU job exists.
+  After approved recovery, stage flushed initialization breadcrumbs and fail-fast
+  waits in an isolated diagnostic before another candidate execution; no blind
+  retry, backend adoption or training. See
+  `docs/experiments/2026-09-13-gpu-forensics.md` and `docs/gpu_incident_response.md`.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.

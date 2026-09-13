@@ -1,8 +1,10 @@
 # Production world-gradient diagnostic after external recovery
 
 Status: **qualified control passes; latest candidate reproduces device loss
-during initialization**. The GPU again requires recovery, subject to user
-approval. Both failed attempts and Pong root 1009's complete successful pair
+during initialization**. The user's subsequent module reload failed to initialize
+GSP; the GPU remains unavailable. See the [full-log investigation and prepared
+guard](2026-09-13-gpu-forensics.md) before further recovery or diagnostics.
+Both failed attempts and Pong root 1009's complete successful pair
 are preserved; roots 2017/3019 stay held until throughput qualification.
 
 ## Recovery and scope

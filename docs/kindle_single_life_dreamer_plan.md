@@ -203,7 +203,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> latest Meganeura/Blade qualification [75dfe901 hardware stopped: GPU device loss]
   -> external host reboot [observed; health restored, not runtime qualification]
   -> post-reboot world-gradient diagnostic [control passes; candidate initialization loses GPU]
-  -> GPU recovery + initialization diagnosis [requires user approval; diagnostic terminal]
+  -> normal module reload [user performed; GSP initialization fails, GPU unavailable]
+  -> approved host recovery + guarded initialization diagnosis [pending; candidate quarantined]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -224,9 +225,16 @@ The old idle Breakout follower is retired. Preserve both original declarations
 and their terminal records; re-declare the remaining work, never restart them.
 After an external reboot, the [bounded production-gradient diagnostic](experiments/2026-09-13-world-gradient-recovery.md)
 passes on the qualified control but reproduces device loss during the latest
-candidate's session initialization, before training. The GPU again requires
-recovery; no new runtime qualification is established. Preserve both failures
-and distinguish historical raw-data audits from current-boot health.
+candidate's session initialization, before training. The
+[full-log investigation](experiments/2026-09-13-gpu-forensics.md) finds identical
+PMU-halt signatures and failed GSP initialization after the user's module reload.
+Keep the candidate quarantined: recovery still requires user involvement.
+The [incident guard and runbook](gpu_incident_response.md) are CPU-tested and
+refuse the unhealthy host; they do not prevent the first wedge or establish
+runtime qualification. Require kernel-aware monitoring, immediately visible
+initialization stages and stop-on-wait-error handling in a newly declared
+diagnostic, not another unchanged retry. Preserve both failures and distinguish
+historical raw-data audits from current-boot health.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
