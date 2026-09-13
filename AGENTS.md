@@ -207,6 +207,15 @@ reliable learning.
   stages first; require a separate release/trace/state/memory/overhead gate
   before diagnostic use. Its canary covers the synthetic core, not perception
   or whole Atari. See `docs/experiments/2026-09-13-learner-timeline.md`.
+  Its CPU-only reader in `runs/learner-timeline-reader-cpu-20260913.1qssZS`
+  passes 55 tests using the actual writer with fabricated GPU intervals.
+  Preserve its ten command histories, three files and final serialization-only
+  audit failure; separate read-only `audit.py` reverifies all 994 pins and
+  normalizes only tuple/list boundary rows. It rejects a controlled crossed-
+  thread CPU trace and a rejected timestamp; neither is a Kindle training
+  failure. Use bounded canary counts. Uncovered trace time is not GPU idle,
+  and this reader establishes no executing-device, calibration, runtime,
+  performance or Atari gate. No GPU follower is added.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

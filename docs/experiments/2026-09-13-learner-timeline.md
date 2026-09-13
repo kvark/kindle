@@ -57,6 +57,45 @@ lock remains byte-identical. These tooling corrections change no learning code.
 
 ## Before diagnostic use
 
+### CPU-only trace reader and writer fixtures
+
+The [reader check](../../runs/learner-timeline-reader-cpu-20260913.1qssZS/result.json)
+passes **55 CPU tests** against the pinned 75dfe trace format. A small Rust
+executable links the actual completed profiler libraries; it creates no GPU
+context. Its serial fixture records real CPU spans and **fabricated** GPU pass
+intervals, deliberately harvesting the latter after the CPU spans. The reader
+recovers two synthetic update windows, six stages each and 36 fabricated pass
+intervals. These are parser fixtures, not learner updates or GPU measurements.
+
+The two other actual-writer fixtures are correctly rejected: one carries a
+before-epoch timestamp rejection; the other forces two CPU threads to emit
+`A begin → B begin → A end → B end`. Upstream puts all four boundaries on the
+same CPU track. The reader refuses this crossed nesting rather than assigning
+the wrong durations. The format supplies no CPU thread identity, so even a
+structurally valid trace is not proof of correct arbitrary-thread attribution.
+This controlled fixture is not an observation of crossing spans in Kindle's
+gameplay, a training failure or a reason to change the current GPU queue.
+
+The [read-only continuation audit](../../runs/learner-timeline-reader-cpu-20260913.1qssZS/independent-audit.json)
+reverifies all ten command histories, actual writer PIDs, three raw files,
+55 tests and **994 pins**, plus its two supplementary pins. Preserve the
+original final audit's [exit 1](../../runs/learner-timeline-reader-cpu-20260913.1qssZS/execution.json):
+all commands completed, but tuple rows compared unequal to their serialized
+JSON list rows. The separate `audit.py` normalizes only those already-equal
+boundary rows, retaining all original checks. Never rerun the exclusive writer;
+the original `run.py --audit` retains that known comparison failure.
+
+This is a strict reader for the pinned writer subset, not an independently
+validated general Perfetto importer. Use bounded, declared canary update counts.
+It rejects malformed/incomplete fields, unordered or rejected timestamps,
+missing stages, crossed CPU slices and overlapping/duplicate GPU intervals.
+Equal adjacent GPU endpoints do not fail just because harvest order differs.
+It reports pass-interval coverage and **uncovered**, not idle, nanoseconds;
+execution, calibration, workload-coverage, idle-time and speedup qualification
+flags remain false. No hardware, state-parity or whole-Atari gate is added.
+
+### Remaining hardware and runtime checks
+
 First finish the [already declared dependency and block qualification](2026-09-13-throughput-priority.md).
 Do not insert this preparation into those pinned queues. A separate diagnostic
 must then bind fresh release binaries and the selected runtime, verify the
