@@ -4,7 +4,8 @@ Status: **CPU-qualified only**. Kindle `58f328a`, Meganeura `75dfe901`, shared
 Blade `f6f2729e`; isolated native `fa6bdd2a`. Main remains qualified ce80e9cd,
 and the active Pong pair remains on its original f6a2b6ad package. The user
 explicitly confirmed finishing that pair, then qualifying throughput before the
-remaining Pong roots. No GPU gate, speedup, adoption or new learning is claimed.
+remaining Pong roots. The hardware and full-state/pixel stages are separately
+declared and waiting. No GPU test result, speedup, adoption or new learning is claimed.
 
 ## Why another source update
 
@@ -88,8 +89,12 @@ the full active pair, reverify its complete raw evidence and exact no-spawn
 boundary, then qualify this dependency against ce80e9cd. Require full production
 gradients/cache/reset checks, complete state and all optimizer moments at updates
 1 and 8, N6 pixel/restore traces, at least 2,048 MiB directly free and untraced
-AB/BA timing. The first hardware stage starts none of those later jobs
-automatically and cannot adopt the runtime alone. Only then test block matmul on the same qualified backend, holding
+AB/BA timing. The first hardware stage is unchanged and cannot adopt the runtime
+alone. A separate [full-state/pixel continuation](2026-09-13-meganeura-runtime.md)
+is now declared after it: 55 passing CPU tests and 31,711 verified pins, with
+follower 273381/14615337 waiting on 269283/14332226. The independent live audit
+confirms the original pair is unchanged and neither GPU stage has started.
+Only then test block matmul on the same qualified backend, holding
 N6/R256/B16/T64/full BPTT/F32 and all scientific gates fixed. CPU tests and a
 dependency refresh do not establish useful throughput or another Atari win.
 The [identical block carry](2026-09-10-block-matmul.md#september-13-identical-carry-onto-latest-runtime)

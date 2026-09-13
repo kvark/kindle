@@ -159,8 +159,18 @@ reliable learning.
   31,664 pins and actual pre-GPU live-parent refusal. Its independently checked
   follower 269283/14332226 waits on scheduler 42730/1021056 after both obsolete
   idle followers are retired. Keep these live inputs fixed. No hardware child
-  has started; full state and N6 pixel/memory/timing stages remain outstanding,
-  with no automatic later GPU or learning follower. See
+  has started. A separate full-state/pixel continuation is now declared in
+  `runs/meganeura-conv-learning-20260913.461N2c`: 55 passing CPU checks,
+  31,711 verified pins and actual live-entrypoint refusal. Its independently
+  checked follower 273381/14615337 waits only on first-stage 269283/14332226;
+  it changes none of that stage's inputs. Require the complete original pair,
+  exact hold boundary and all raw hardware evidence before its update-1/eight-
+  update full-state canaries and N6 pixel AB/BA. Retain the ce80 control anchors,
+  all 241 tensor entries/146 optimizer moments, exact traces and direct-memory
+  gates across six canary/ten pixel windows. Neither stage has executed GPU
+  work. No speedup, runtime qualification, adoption or automatic learning is
+  established; the separate same-backend block comparison remains next. See
+  `docs/experiments/2026-09-13-meganeura-runtime.md` and
   `docs/experiments/2026-09-13-meganeura-conv.md`.
   The identical block candidate is carried onto that same backend in
   `exp/block-matmul-conv-20260913` at 20b9b8a. Its 98 Rust CPU tests, formatting,

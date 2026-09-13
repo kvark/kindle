@@ -125,8 +125,14 @@ Follower **269283/14332226**, launched at **06:09:35 UTC**, waits on scheduler
 passes every pin, launch/declaration binding, current process identity and
 no-child/no-GPU-output check. All four active pair processes remain unchanged;
 both obsolete followers are absent. Preserve the live scripts and declaration.
-No hardware test has executed, no later GPU/learning follower starts
-automatically, and complete state/pixel/memory/timing qualification still remains.
+No hardware test has executed. The first stage's behavior remains unchanged.
+A separate [full-state/pixel continuation](2026-09-13-meganeura-runtime.md) is
+now declared after it, with 55 passing CPU checks and 31,711 verified pins.
+Follower **273381/14615337**, launched at **06:56:46 UTC**, waits only on hardware
+follower 269283/14332226. Its independent live handoff audit confirms both waiters,
+all four unchanged active pair processes and no native stage outputs or children.
+Complete state/pixel/memory/timing qualification still remains unrun; neither
+stage adopts a runtime or starts further learning automatically.
 
 The queue change establishes no speedup, adoption or additional Atari competence.
 Boxing remains the only confirmed three-root game.

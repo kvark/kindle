@@ -194,7 +194,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [active]
-  -> latest Meganeura/Blade qualification [75dfe901 first hardware stage declared; waiting]
+  -> latest Meganeura/Blade qualification [75dfe901 hardware then full-state/pixel stages; waiting]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [next]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -331,9 +331,13 @@ autotuning off, so no automatic gain is expected. Its isolated native `fa6bdd2a`
 passes 95 Kindle, 122 backend/Blade and 547 Python CPU tests with verified
 source/wheel/import identity. The superseded 45991 hardware follower was retired
 while idle; its inputs and terminal record remain intact. The separately declared
-new hardware follower waits for the complete active pair and verified hold. Full gradient/cache checks,
-update-1/eight-update state, pixel/restore traces, direct memory and AB/BA timing
-remain required. No GPU result, speedup or adoption is claimed.
+new hardware follower waits for the complete active pair and verified hold. A
+separate [full-state/pixel continuation](experiments/2026-09-13-meganeura-runtime.md)
+waits after that hardware stage; its 55 CPU checks, raw control recheck and live
+handoff audit pass. Full gradient/cache checks, update-1/eight-update state,
+pixel/restore traces, direct memory and AB/BA timing remain unrun. These stages
+start no further learning or adoption automatically. No GPU result or speedup
+is claimed.
 Keep this dependency comparison separate from block-matmul and other optimizations.
 Recheck upstream before new backend diagnosis; carry older candidates forward
 before testing them as current code. Active learning inputs stay pinned; the
