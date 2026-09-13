@@ -29,8 +29,9 @@ preserves the actual check stdout; these are scheduling checks, not GPU gates.
 
 When root 1009 completes, the old controller should record root 2017's
 `command_start`, then fail with FileExistsError **before `command_spawned`**.
-The original scheduler should then stop. This expected terminal boundary must
-be independently verified; it has not occurred yet. It is a requested scheduling
+The original scheduler then stops. This exact terminal boundary occurred at
+12:55:19 UTC and is independently verified in the completed-pair section below.
+It is a requested scheduling
 stop, not a numerical failure or a complete three-root experiment. Preserve the
 old queue and reservation; never remove the notice to restart it. A future
 entrypoint must distinguish this exact boundary from unexpected runtime failure
@@ -145,3 +146,43 @@ adoption starts automatically.
 
 The queue change establishes no speedup, adoption or additional Atari competence.
 Boxing remains the only confirmed three-root game.
+
+## Completed Pong pair and qualification handoff
+
+Root **1009** completes the entire original pair on September 13. The
+[paired result](../../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-result.json)
+passes: **24/24 trained natural wins, mean +20.5833**, versus **0/24 untrained
+wins, mean −20.5417**. Both sampled frozen evaluations complete four matches per
+stream with zero updates and no cutoffs. Training completes **400,008 actions /
+99,652 updates**; final evaluation uses **41,844 actions**, the fresh initial
+save **6 / 0**, and restored untrained evaluation **23,412 / 0**.
+
+Watch the whole stream-zero [trained rollout](../../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-evaluation.mp4)
+and [untrained control](../../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-untrained-evaluation.mp4).
+Both complete CPU replays bind actions, rewards, boundaries, resets, actual
+frames and video hashes. The [world-source selection](../../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-world-recording.json)
+retains the first four complete stream-zero matches, **6,974 actions**, without
+score filtering. Native world forecasts on this checkpoint remain unvalidated.
+
+The [independent complete-pair check](../../runs/meganeura-conv-runtime-v2-20260913.tyHbhU/boundary-preflight.json)
+verifies all eight command lifecycles, complete trained/untrained tensors and
+optimizer moments, actual encoder, scores, replays and all four GPU windows.
+Minimum directly free memory is **3,302 MiB** overall and **3,413 MiB** in both
+frozen evaluations. The full training loop takes **47,255.24 seconds**, reaching
+**8.4648 actions/s / 0.56419× aggregate real time** (about **0.09403× per stream**).
+Learning accounts for about 73% of that loop. Mean activity is 68.70%, not an
+idle-gap measurement or a speedup result. This is one successful fresh root,
+not three-root reliability or an isolated budget-effect comparison.
+
+The old controller emits `seed_complete` at **12:55:16 UTC**, then the exact
+reserved-output FileExistsError at **12:55:19**. Root 2017 has a command-start
+record but no spawned child; root 3019 never starts. The scheduler exits at that
+requested boundary. Preserve the notice and terminal histories; never restart it.
+
+The original throughput followers subsequently stop before GPU work on a
+score-serialization mismatch. Its narrowly repaired, separately declared
+continuation verifies the whole pair, then **fails during GPU hardware testing**.
+The [device-loss report](2026-09-13-gpu-device-loss.md) preserves both failures,
+the successful schema repair, current upstream identity and downstream refusal.
+GPU recovery requires user approval. No state/pixel or block-matmul qualification,
+speedup or backend adoption is established; remaining Pong roots stay held.

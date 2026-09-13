@@ -1,11 +1,14 @@
 # Latest Meganeura: dependency-only convolution-runtime refresh
 
-Status: **CPU-qualified only**. Kindle `58f328a`, Meganeura `75dfe901`, shared
-Blade `f6f2729e`; isolated native `fa6bdd2a`. Main remains qualified ce80e9cd,
-and the active Pong pair remains on its original f6a2b6ad package. The user
-explicitly confirmed finishing that pair, then qualifying throughput before the
-remaining Pong roots. The hardware and full-state/pixel stages are separately
-declared and waiting. No GPU test result, speedup, adoption or new learning is claimed.
+Status: **hardware qualification failed with GPU device loss**. Kindle `58f328a`,
+Meganeura `75dfe901`, shared Blade `f6f2729e`; isolated native `fa6bdd2a`.
+Main remains qualified ce80e9cd. The original f6a2b6ad Pong pair completed and
+passed before qualification. The first handoff stopped before GPU work on a
+report-format mismatch; its isolated repair then passed fourteen hardware tests
+before the production world-gradient test lost the device. See the
+[failure and required recovery](2026-09-13-gpu-device-loss.md). No full runtime
+qualification, speedup, adoption or new learning is claimed. Original declarations
+and launch-time evidence below are preserved history, not live queues.
 
 ## Why another source update
 
@@ -60,7 +63,8 @@ also completes: five source-matched executables, eight command lifecycles and
 **31,640 pins**. The four test binaries only run `--list`, confirming all nineteen
 required GPU tests; the compiled canary is not executed. Its result hash is
 `e2fec7c9608583f88eac482fe4d5a3946affac4191a0b108bbcbb29e1ba4c972`.
-No GPU test or canary has run. Preserve the completed writer and private target.
+No GPU test or canary ran during that preparation. Preserve its completed writer
+and private target; later hardware execution is recorded in the failure report.
 
 ## Queue preservation and remaining qualification
 

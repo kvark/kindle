@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-12. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-13. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Old LeVJEPA 200k-action roots 0/1/2: means +10.2778 / +0.5 / +20.4651; wins 18/18, 7/12, 43/43 | Only root 2 passes the old mastery gate. Fresh 400,008-action root 1009 is training; roots 2017/3019 are held for throughput qualification. No new frozen result yet. |
+| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Roots 2017/3019 remain held for throughput qualification and GPU recovery. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -54,9 +54,11 @@ and the failure. The host now reports matching driver/library 595.91.07, and
 [runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
 The separately declared [continuation](experiments/2026-09-11-atari-continuation.md)
 passes exact episode stopping and completes both failed paired pilots. The
-[serial follower](experiments/2026-09-11-recovered-confirmations.md) has independently
-reverified their complete raw evidence and started fresh Freeway confirmation;
-Pong follows it. Preserve this completed continuation rather than restarting it.
+[serial follower](experiments/2026-09-11-recovered-confirmations.md) completed
+Freeway and Pong root 1009, then stopped at the requested no-launch boundary
+before root 2017. Preserve that terminal queue. The subsequent
+[latest-backend hardware attempt](experiments/2026-09-13-gpu-device-loss.md)
+lost the GPU; recovery requires user approval before new qualification work.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -80,7 +82,11 @@ Watch whole stream-zero evaluations, including failures and unfinished tails:
   and [untrained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4);
   initial-pyramid progress, not sustained competence. See the
   [complete paired result](experiments/2026-09-11-atari-continuation.md#completed-qbert-pilot-learning-without-competence).
-- [Pong gameplay and world-model report](../runs/world-evaluation-20260908.Xzx3pN/report.html),
+- [Fresh Pong root 1009](../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-evaluation.mp4)
+  and its [untrained control](../runs/atari-recovered-confirmations-20260911.xPz5ud/pong/seed1009-untrained-evaluation.mp4);
+  [complete paired result and throughput handoff](experiments/2026-09-13-throughput-priority.md#completed-pong-pair-and-qualification-handoff).
+  The first four complete matches are recorded for later world diagnostics, not yet forecast-validated.
+- [Historical Pong gameplay and world-model report](../runs/world-evaluation-20260908.Xzx3pN/report.html),
   plus the [common-recording comparison](../runs/common-world-report-20260909.O7nqqe/report.html).
   Forced cross-model recordings are diagnostics, not additional policy wins.
 
@@ -193,9 +199,10 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Breakout paired pilot [complete; competence failed]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
-  -> Pong root 1009 training + frozen evaluation + untrained control [active]
-  -> latest Meganeura/Blade qualification [75dfe901 hardware then full-state/pixel stages; waiting]
-  -> same-backend block-matmul correctness + N6 AB/BA throughput [declared; waiting]
+  -> Pong root 1009 training + frozen evaluation + untrained control [complete; paired gate passes]
+  -> latest Meganeura/Blade qualification [75dfe901 hardware stopped: GPU device loss]
+  -> host recovery + new qualification declaration [requires user approval]
+  -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
@@ -562,13 +569,15 @@ historical pins in their manifests and the [native frontend](../kindle/src/visio
 not a moving label in the roadmap.
 
 Boxing's confirmation, recovered-driver qualification and ce80e9cd source
-adoption are complete; the newer 75dfe901 candidate remains CPU-qualified only.
+adoption are complete; the newer 75dfe901 candidate failed its hardware gate
+with GPU device loss and remains unqualified for runtime use.
 Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
-Freeway's complete fresh confirmation also fails competence. Finish active Pong
-root 1009's unchanged paired protocol, then qualify latest Meganeura and matched
-block-matmul throughput before re-declaring remaining Pong work. Breakout's
+Freeway's complete fresh confirmation also fails competence. Pong root 1009's
+complete pair passes. Recover the GPU only with user approval, then qualify
+latest Meganeura and matched block-matmul throughput under new declarations
+before re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
 Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
 initial misses from low post-bonus progress: only 4.68% of training frames follow

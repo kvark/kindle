@@ -1,9 +1,12 @@
 # Same-backend block-matmul runtime qualification
 
-Status: **declared and waiting; 103 CPU checks pass, no GPU result**. Finish
-Pong root 1009's entire original pair, then both latest-dependency stages, then
-this optimization comparison. Remaining Pong roots stay held. No learning,
-adoption or five-game completion follows automatically.
+Status: **original follower stopped before GPU work; block comparison unrun**.
+Its 103 CPU checks remain valid, but no block GPU result exists. Pong root 1009's
+pair completed; the separately repaired dependency stage then suffered
+[GPU device loss](2026-09-13-gpu-device-loss.md). No replacement block stage is
+declared. Recover and qualify the dependency first, then this optimization.
+Remaining Pong roots stay held. No learning, adoption or five-game completion
+follows automatically. The launch-time evidence below is preserved history.
 
 ## Fixed inputs and live handoff
 

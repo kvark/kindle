@@ -38,6 +38,33 @@ reliable learning.
   See `docs/experiments/2026-09-13-throughput-priority.md` for the safe boundary
   and required next declarations. Do not silently mix backends across seeds;
   an adopted package requires an explicitly matched new campaign declaration.
+  Root 1009's entire original pair completed at 12:55 UTC: 400,008 training
+  actions / 99,652 updates, 24/24 frozen wins with mean +20.5833 versus the
+  restored untrained control's 0/24 and −20.5417. Both frozen runs have zero
+  updates and no cutoffs. Complete state/moments, replays/videos, encoder and
+  all four GPU windows reverify, with at least 3,302 MiB directly free.
+  The exact reserved-output stop occurred before spawning root 2017. Preserve
+  the completed pair, queue and hold; one fresh root is not three-root mastery.
+  The three original throughput followers subsequently stopped before GPU work
+  because their score helper omitted the CLI's `campaign_declaration: null`.
+  No common score field differed. The isolated repair in
+  `runs/meganeura-conv-runtime-v2-20260913.tyHbhU` passes 62 CPU checks and a
+  complete raw-pair audit with 43,233 pins, without changing any old input or gate.
+  Its actual 75dfe901/Blade f6f2729e hardware group then failed at 13:20:34 UTC:
+  fourteen tests passed, but production world-gradient test hardware-14 exited
+  101 with GPU device loss. Kernel Xid 62/154 first records GPU Reset Required
+  at 13:20:03, followed by channel teardown and Xid 109 context-switch timeouts.
+  NVML activity remains unavailable; readable free memory is not recovered health.
+  The 13:26 upstream recheck still finds those latest revisions. Root cause is
+  not established, and this is not a measured gradient-value mismatch.
+  All workers/loggers have exited. Full-runtime v2 wGOgE7 has 55 CPU checks/
+  43,251 pins but refuses launch on the missing hardware result; no replacement
+  block stage is declared. Never restart these stopped attempts. Do not reset
+  the GPU, change/reload drivers or reboot without user approval. After recovery,
+  require a separately declared qualified-control/candidate diagnostic before
+  full state/pixel and same-backend throughput gates. No new runtime qualification,
+  speedup, adoption or learning is established. See
+  `docs/experiments/2026-09-13-gpu-device-loss.md` and its preserved raw evidence.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.

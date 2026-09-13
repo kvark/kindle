@@ -1,7 +1,10 @@
 # Latest-backend full-state and pixel qualification
 
-Status: **declared and waiting; CPU checks pass, no GPU result**. This is the
-separate continuation after the [75dfe901 hardware stage](2026-09-13-meganeura-conv.md).
+Status: **stopped before GPU work**. The original follower is terminal; the
+separately declared v2 carry also refuses launch after
+[hardware device loss](2026-09-13-gpu-device-loss.md). Its 55 CPU checks pass,
+but no state/pixel runtime result exists. This is the separate continuation after
+the [75dfe901 hardware stage](2026-09-13-meganeura-conv.md).
 It preserves the user's decision: finish Pong root 1009's entire active pair,
 then qualify throughput before the held roots. It changes no active experiment
 input and starts no subsequent learning or adoption automatically.
