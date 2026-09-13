@@ -377,8 +377,12 @@ idle-device check. The guard owns the one Python process that synchronously
 steps ALE and executes the Rust extension, not a GPU scheduler or subprocess
 tree. This boundary is specific to the pinned adapter and actual imports.
 
-Only phase 0, the qualified ce80 control's fresh training window, has been
-invoked. Inspect its complete native/guard/checkpoint result before separately
-invoking the frozen restore. No candidate pixel result, automatic follower,
-retry, throughput claim, adoption or new learning campaign is established.
-Both fresh timing arms are guarded; do not compare old unguarded timings.
+Only phase 0 was invoked. Its final upstream preflight then stops at
+**21:28:31 UTC**, before any native process, after Meganeura advances to
+428fc2d. Preserve the declaration and all 32 command records; never restart
+this attempt. No pixel GPU result, automatic follower, retry, throughput claim,
+adoption or new learning campaign is established. The
+[latest-source carry](2026-09-13-native-f32-upstream.md) retains the initialization
+safeguards and keeps the new cooperative policy unselected. It needs its own
+source-matched qualification; old results are not relabeled. Both future timing
+arms must remain guarded rather than compared with old unguarded timings.

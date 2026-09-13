@@ -210,7 +210,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> guarded initialization control [production gradients and complete traces pass]
   -> allocation-order hypothesis [guarded production gradients and complete traces pass]
   -> full hardware qualification [all 19 guarded checks pass]
-  -> full state/pixel/memory qualification [six exact canaries pass; pixel unrun]
+  -> full state/pixel/memory qualification [six exact canaries pass; pixel preflight stops on new upstream]
+  -> latest upstream 428fc2d carry [CPU checks pass; cooperative policy unchanged]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -244,10 +245,12 @@ all production gradients, clean health and at least 6,545 MiB directly free.
 All 19 required hardware checks and six complete-state canaries now pass,
 including LeVJEPA streaming/cache parity, every saved weight/moment and archived
 control anchors, with clean kernel evidence. This narrows the investigation
-without proving root cause. The separately declared ten-window N6 pixel gate
-has 26 passing CPU checks and verified source-matched packages; only its first
-control window has been invoked. Pixel/restore/combined-memory and matched
-throughput qualification remain ahead of adoption. The
+without proving root cause. The ten-window pixel declaration stops before GPU
+work when upstream advances again. The [latest-source carry](experiments/2026-09-13-native-f32-upstream.md)
+includes the new cooperative-policy API without enabling it and retains the
+guarded initialization changes; its 95 Kindle/ten backend CPU checks pass. Source-matched
+hardware/state/pixel/combined-memory and matched throughput qualification remain
+ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
 Preserve both failures and distinguish historical raw-data audits, current-boot

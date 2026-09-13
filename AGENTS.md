@@ -230,10 +230,34 @@ reliable learning.
   interpreter/native/source bytes and environment pinned. This adapter steps
   ALE synchronously and creates no GPU workers. Never wrap a scheduler or any
   process that delegates GPU work to descendants. Each phase requires an
-  individual invocation and review; only index 0 has been invoked. Preserve
-  its inputs and inspect the terminal result before index 1. No candidate
-  pixel window, follower, retry, speedup, adoption or learning campaign follows
-  automatically. Main remains ce80; block qualification still precedes Pong.
+  individual invocation and review. Its sole index-0 invocation then stops
+  before GPU work at 21:28:31 UTC: upstream advances to 428fc2d. Preserve all
+  32 command records and the original 75,323 inputs; no Atari output, checkpoint,
+  native guard/health directory or later phase exists. Never restart this
+  stopped attempt. It is not a native failure or pixel result.
+  New upstream 428fc2d adds the NativeF32 cooperative policy; Auto and Disabled
+  behavior are unchanged, and it is not an initialization-order fix. The exact
+  upstream patch is carried onto guarded 1c314b14 as Meganeura 0a98775 in
+  `exp/kindle-native-f32-alias-20260913`; Kindle `exp/native-f32-alias-20260913`
+  at 7728d8d changes only dependency/locks/identity/instructions from d62d356.
+  NativeF32 is not selected: learner Auto and LeVJEPA Disabled remain fixed.
+  Both branches are pushed; shared Blade stays f6f2729e (68a23e49 is still
+  renderer-only). The CPU-only preparation in
+  `runs/native-f32-alias-cpu-20260913.jBt1GN` completes with 95 Kindle and ten
+  focused backend CPU tests, formatting and both Clippy checks. All 17 command
+  histories and 88,941 input/output pins independently reverify, including the
+  exact stopped pixel boundary. Private caches retain one core, 2 GiB and zero
+  swap; peak host memory reaches the cap. Preserve the completed writer/caches;
+  `prepare.py --audit` is read-only. All 22 Kindle GPU tests remain ignored;
+  no GPU work or Python package is declared. The copied target's old f76c20b8
+  extension is not a new 0a98775 package; require a fresh source-matched wheel
+  and actual compiler-chain/wheel/import identity before native Python use.
+  Do not relabel 1c314's completed GPU results as this new source's qualification.
+  Source-matched package/fixtures and separately guarded hardware/state/pixel/
+  memory/timing gates remain required. No native retry, follower, speedup,
+  adoption or learning campaign exists. Main remains ce80; same-backend block
+  qualification still precedes Pong. See
+  `docs/experiments/2026-09-13-native-f32-upstream.md`.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks
