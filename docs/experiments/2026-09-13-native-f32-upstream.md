@@ -1,6 +1,7 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **latest-source production diagnostic passed; full hardware declared**.
+Status: **latest-source production diagnostic and first three hardware checks
+pass; full runtime qualification remains incomplete**.
 Main remains on ce80e9cd. Completed 1c314 hardware and complete-state evidence is
 preserved; no new GPU incident, pixel result or learning campaign is added here.
 
@@ -62,7 +63,7 @@ declaration. Recorded host-memory peak reaches the 2 GiB cap; no extra memory
 headroom is claimed. Preserve the completed writer and both private caches;
 only `prepare.py --audit` is reusable.
 
-No Python wheel or GPU stage is produced. The private copied target still
+That source-carry stage produces no Python wheel or GPU stage. Its copied target
 contains the old **f76c20b8** extension from its cache source; that file is not
 a newly built 0a98775 package and must not be used as one. Build a fresh
 source-matched wheel and verify its actual compiler dependency chain, wheel
@@ -125,6 +126,27 @@ the unchanged completed initialization parser fixes only that reader lookup.
 Its declaration completes with **89,122 inputs**, rechecking the diagnostic,
 source fixtures, original raw pair/hold and current host/upstream evidence. It explicitly reuses
 this same executable's production test at index 14 and requires eighteen further
-individually invoked native tests. The separately invoked index 0 is in preflight;
-no later test is running. There is no
-run-all, follower, retry or automatic state/pixel stage.
+individually invoked native tests. There is no run-all, follower, retry or
+automatic state/pixel stage.
+
+The first three new native checks now pass, with each result inspected before
+the next launch: cached-query/reset correctness, softplus forward/all-gradient
+agreement with F64, and the normalized-mixture F64 comparison. Their eleven
+complete initialization sequences and 23 fresh health samples pass, with maximum
+gap **0.332 s**, at least **15,795 MiB directly free**, no kernel fault or unfinished
+child. Index 2 completes at **22:41:35 UTC**. The production diagnostic above is
+the separately reused fourth requirement, not a fourth new execution here.
+No later hardware window has started; the next explicit index is **3**.
+An independent read-only prefix audit reverifies all **89,122 input pins** and
+the three complete raw results. Its first `systemd-run` invocation fails to
+import the reader because the unit does not inherit the shell's working
+directory; explicitly binding the directory corrects the invocation. No source,
+writer, native test or acceptance gate is changed or rerun by that correction.
+
+The separate [complete-state reader preparation](../../runs/native-f32-alias-state-20260913.Xy2mtz/declaration.md)
+passes **18 standalone CPU checks**. It retains the original ce80 anchors,
+241 tensor entries, all 146 optimizer moments and exact non-timing reports.
+Additional negative fixtures require the exact guarded executable, declaration,
+environment and executing boot for both arms. No native math or tolerance changes.
+There is no state manifest, started declaration, GPU window or follower; full
+hardware completion must be inspected before declaring these six canaries.

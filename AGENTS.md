@@ -285,11 +285,21 @@ reliable learning.
   `runs/native-f32-alias-hardware-20260913.7tXwMG` passes 26 CPU checks after
   a retained pre-declaration reader-import failure. Its 89,122 inputs bind the
   completed diagnostic, fixtures and original raw pair/hold proof; clean idle
-  preflight passes. It reuses PDrNaR only at production index 14. The separately
-  invoked index 0 is in preflight; no further test is running. Invoke each
-  test separately and inspect
-  each result before follow-up. No follower or automatic state/pixel stage.
+  preflight passes. It reuses PDrNaR only at production index 14. New tests 0/1/2
+  now pass, last exit at 22:41:35 UTC: cached-query/reset and both F64 softplus
+  checks, eleven complete sessions/23 fresh health samples, max gap 0.332 s,
+  minimum directly free 15,795 MiB, no fault or unfinished child. Independent
+  read-only prefix audit reverifies all 89,122 inputs and three raw results.
+  No later window
+  has started; next is explicit index 3. Invoke each separately and inspect each
+  result before follow-up. No follower or automatic state/pixel stage.
   Main remains ce80; state/pixel/memory/timing and same-backend block gates remain.
+  CPU-only complete-state preparation `runs/native-f32-alias-state-20260913.Xy2mtz`
+  passes eighteen standalone checks, retaining both ce80 anchors, all 241 tensors,
+  146 moments and exact non-timing reports. It additionally binds exact guarded
+  executable/declaration/environment/boot for both arms. No state declaration
+  has started: no manifest, GPU job or follower. Finish and inspect all nineteen
+  hardware results before declaring its six individually invoked canaries.
   The latest block source-only carry is
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
