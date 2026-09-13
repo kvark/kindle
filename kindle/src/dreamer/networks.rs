@@ -165,6 +165,20 @@ impl BlockLinear {
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        // Keep batch-one GEMV and large-batch cooperative imagination on
+        // their original arithmetic. This candidate targets small F32 batches.
+        if (2..=16).contains(&batch) {
+            assert_eq!(
+                graph.node(input).ty.shape,
+                [batch, self.blocks * self.input_per_block]
+            );
+            let value = graph.block_matmul(input, self.weight);
+            return graph.bias_add(value, self.bias);
+        }
+        self.forward_serial(graph, input, batch)
+    }
+
+    fn forward_serial(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
         let total_input = self.input_per_block * self.blocks;
         let weight_size = self.input_per_block * self.output_per_block;
         let mut outputs = Vec::with_capacity(self.blocks);
@@ -709,5 +723,180 @@ impl ObservationDecoder {
         let value = self.patch_norm.forward(graph, value);
         let value = graph.silu(value);
         self.output.forward(graph, value)
+    }
+}
+
+#[cfg(test)]
+mod block_matmul_tests {
+    use super::*;
+    use meganeura::{Mode, SessionConfig, graph::Op};
+
+    fn graph(
+        batch: usize,
+        input_width: usize,
+        output_width: usize,
+        grouped: bool,
+        training: bool,
+    ) -> Graph {
+        let mut graph = Graph::new();
+        let input = graph.parameter("probe.input", &[batch, 8 * input_width]);
+        let block = BlockLinear::new(&mut graph, "probe.block", 8, input_width, output_width);
+        let value = if grouped {
+            block.forward(&mut graph, input, batch)
+        } else {
+            block.forward_serial(&mut graph, input, batch)
+        };
+        if training {
+            let square = graph.mul(value, value);
+            let mean = graph.mean_all(square);
+            let loss = graph.scale(mean, -0.7);
+            graph.set_outputs(vec![loss, value]);
+        } else {
+            graph.set_outputs(vec![value]);
+        }
+        graph
+    }
+
+    #[test]
+    fn small_batch_blocks_preserve_parameters_and_reduce_dispatches() {
+        for batch in [2, 4, 6, 8, 16] {
+            for (input, output) in [(1024, 256), (256, 768)] {
+                let candidate = graph(batch, input, output, true, false);
+                let control = graph(batch, input, output, false, false);
+                let parameters = |g: &Graph| {
+                    g.nodes()
+                        .iter()
+                        .filter_map(|n| match &n.op {
+                            Op::Parameter { name } => Some((name.clone(), n.ty.clone())),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                };
+                assert_eq!(parameters(&candidate), parameters(&control));
+                for (mode, candidate, control) in [
+                    ("raw", &candidate, &control),
+                    (
+                        "optimized",
+                        &meganeura::optimize::optimize(&candidate),
+                        &meganeura::optimize::optimize(&control),
+                    ),
+                ] {
+                    let candidate_plan = meganeura::compile::compile(candidate);
+                    let control_plan = meganeura::compile::compile(control);
+                    eprintln!(
+                        "block graph {mode} rows={batch} groups=8 input={input} output={output}: dispatches {} -> {}",
+                        control_plan.dispatches.len(),
+                        candidate_plan.dispatches.len()
+                    );
+                    assert_eq!(candidate_plan.dispatches.len(), 2);
+                    assert!(control_plan.dispatches.len() > candidate_plan.dispatches.len());
+                }
+                assert_eq!(
+                    candidate
+                        .nodes()
+                        .iter()
+                        .filter(|n| matches!(n.op, Op::BlockMatMul))
+                        .count(),
+                    1
+                );
+                assert_eq!(
+                    control
+                        .nodes()
+                        .iter()
+                        .filter(|n| matches!(n.op, Op::MatMul))
+                        .count(),
+                    8
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn gemv_and_large_batch_graphs_remain_exact() {
+        for batch in [1, 17, 64, 1024] {
+            let candidate = graph(batch, 5, 7, true, false);
+            let control = graph(batch, 5, 7, false, false);
+            assert_eq!(
+                serde_json::to_vec(candidate.nodes()).unwrap(),
+                serde_json::to_vec(control.nodes()).unwrap()
+            );
+            assert_eq!(candidate.outputs(), control.outputs());
+        }
+    }
+
+    #[test]
+    fn block_training_keeps_all_parameter_gradients_full_precision() {
+        let graph = graph(6, 5, 7, true, true);
+        let differentiated = meganeura::autodiff::differentiate(&graph);
+        let block_gradients = differentiated.nodes()[graph.nodes().len()..]
+            .iter()
+            .filter(|n| matches!(n.op, Op::BlockMatMulAT { .. } | Op::BlockMatMulBT))
+            .collect::<Vec<_>>();
+        assert_eq!(block_gradients.len(), 2);
+        assert!(block_gradients.iter().all(|n| n.requires_full_precision));
+        let (plan, _) = meganeura::compile_training_graph(&graph);
+        assert_eq!(plan.param_grad_pairs.len(), 3);
+    }
+
+    #[test]
+    #[ignore = "requires exclusive GPU and precedes full-learning/runtime qualification"]
+    fn production_blocks_match_serial_outputs_and_all_gradients_exactly() {
+        for batch in [6, 16] {
+            for (input, output) in [(1024, 256), (256, 768)] {
+                let control_graph = graph(batch, input, output, false, true);
+                let mut control = meganeura::build(
+                    &control_graph,
+                    SessionConfig {
+                        mode: Mode::Training,
+                        ..SessionConfig::default()
+                    },
+                )
+                .0;
+                let candidate_graph = graph(batch, input, output, true, true);
+                let mut candidate = meganeura::build(
+                    &candidate_graph,
+                    SessionConfig {
+                        mode: Mode::Training,
+                        gpu: Some(control.context()),
+                        ..SessionConfig::default()
+                    },
+                )
+                .0;
+                for (session, graph) in [
+                    (&mut control, &control_graph),
+                    (&mut candidate, &candidate_graph),
+                ] {
+                    crate::dreamer::runtime::initialize_d3(session, graph, 7301);
+                    session.set_adam(0.0, 0.9, 0.999, 1e-8);
+                    session.step();
+                    session.wait();
+                }
+                let exact = |label: &str, a: &[f32], b: &[f32]| {
+                    assert_eq!(a.len(), b.len());
+                    for (index, (&a, &b)) in a.iter().zip(b).enumerate() {
+                        assert!(a.is_finite() && b.is_finite());
+                        assert_eq!(
+                            a.to_bits(),
+                            b.to_bits(),
+                            "{batch}/{input}/{output} {label}[{index}]: {a} != {b}"
+                        );
+                    }
+                };
+                exact("loss", &[control.read_loss()], &[candidate.read_loss()]);
+                let mut a = vec![0.0; batch * 8 * output];
+                let mut b = a.clone();
+                control.read_output_by_index(1, &mut a);
+                candidate.read_output_by_index(1, &mut b);
+                exact("output", &a, &b);
+                for name in ["probe.input", "probe.block.weight", "probe.block.bias"] {
+                    let size = control.param_size(name).unwrap();
+                    let mut a = vec![0.0; size];
+                    let mut b = a.clone();
+                    control.read_param_grad(name, &mut a);
+                    candidate.read_param_grad(name, &mut b);
+                    exact(name, &a, &b);
+                }
+            }
+        }
     }
 }
