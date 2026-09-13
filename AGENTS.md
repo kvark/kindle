@@ -285,13 +285,13 @@ reliable learning.
   `runs/native-f32-alias-hardware-20260913.7tXwMG` passes 26 CPU checks after
   a retained pre-declaration reader-import failure. Its 89,122 inputs bind the
   completed diagnostic, fixtures and original raw pair/hold proof; clean idle
-  preflight passes. It reuses PDrNaR only at production index 14. New tests 0/1/2
-  now pass, last exit at 22:41:35 UTC: cached-query/reset and both F64 softplus
-  checks, eleven complete sessions/23 fresh health samples, max gap 0.332 s,
-  minimum directly free 15,795 MiB, no fault or unfinished child. Independent
-  read-only prefix audit reverifies all 89,122 inputs and three raw results.
-  No later window
-  has started; next is explicit index 3. Invoke each separately and inspect each
+  preflight passes. It reuses PDrNaR only at production index 14. New tests 0–6
+  now pass, last exit at 23:04:30 UTC: cache/reset, F64 math, both matmul epilogues,
+  valid cached-block writes and Kindle device copies. Sixteen complete sessions /
+  40 fresh health samples pass, max gap 0.333 s, minimum directly free 15,795 MiB,
+  no fault or unfinished child. Preserve the earlier independent 89,122-pin /
+  three-result prefix audit. Index 7 is now in its separately invoked preflight;
+  no later test is running. Invoke each separately and inspect each
   result before follow-up. No follower or automatic state/pixel stage.
   Main remains ce80; state/pixel/memory/timing and same-backend block gates remain.
   CPU-only complete-state preparation `runs/native-f32-alias-state-20260913.Xy2mtz`
@@ -305,8 +305,17 @@ reliable learning.
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
   all dependencies, identity, Python, initialization and learning settings remain
   matched. Source equality/formatting pass; branch is clean and pushed. No compile,
-  CPU unit suite, package, GPU declaration or speedup exists for this carry.
+  Rust unit suite, package, GPU declaration or speedup exists for this carry.
   Preserve the earlier f2e20af carry and finish dependency qualification first.
+  Its unstarted CPU preparation is
+  `runs/block-matmul-native-f32-cpu-20260913.WmUOos`: six cheap source/command
+  checks pass after a retained Cargo-list-suffix expectation error. No manifest,
+  copied cache, compilation or GPU job exists. The writer requires the complete
+  parent package and nineteen-test hardware proof before cache copy/build;
+  its 98 Rust tests, 23 ignored GPU tests, release Clippy and dispatch counts
+  are still planned, not passing results. Use only while GPU work is stopped,
+  with one core / 2 GiB / zero swap. Never use its copied parent extension as
+  a new block package. Full dependency state/pixel gates still precede block GPU work.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

@@ -1,7 +1,7 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **latest-source production diagnostic and first three hardware checks
-pass; full runtime qualification remains incomplete**.
+Status: **latest-source production diagnostic and hardware prefix pass;
+full runtime qualification remains incomplete**.
 Main remains on ce80e9cd. Completed 1c314 hardware and complete-state evidence is
 preserved; no new GPU incident, pixel result or learning campaign is added here.
 
@@ -129,16 +129,18 @@ this same executable's production test at index 14 and requires eighteen further
 individually invoked native tests. There is no run-all, follower, retry or
 automatic state/pixel stage.
 
-The first three new native checks now pass, with each result inspected before
-the next launch: cached-query/reset correctness, softplus forward/all-gradient
-agreement with F64, and the normalized-mixture F64 comparison. Their eleven
-complete initialization sequences and 23 fresh health samples pass, with maximum
-gap **0.332 s**, at least **15,795 MiB directly free**, no kernel fault or unfinished
-child. Index 2 completes at **22:41:35 UTC**. The production diagnostic above is
-the separately reused fourth requirement, not a fourth new execution here.
-No later hardware window has started; the next explicit index is **3**.
-An independent read-only prefix audit reverifies all **89,122 input pins** and
-the three complete raw results. Its first `systemd-run` invocation fails to
+New indices **0–6** pass, with each result inspected before the next launch:
+cached-query/reset correctness, both F64 softplus comparisons, quantized and
+small-tile matmul epilogues, valid cached-block writes/selection, and Kindle's
+device packing/copy check. Their **sixteen complete initialization sequences**
+and **40 fresh health samples** pass, maximum gap **0.333 s**, at least
+**15,795 MiB directly free**, no kernel fault or unfinished child. Index 6
+completes at **23:04:30 UTC**. The production diagnostic above is separately
+reused at index 14, not another execution in this prefix. Index **7** is now
+in its separately invoked preflight; no later test is running.
+
+An earlier independent read-only prefix audit reverifies all **89,122 input pins**
+and the first three complete raw results. Its first `systemd-run` invocation fails to
 import the reader because the unit does not inherit the shell's working
 directory; explicitly binding the directory corrects the invocation. No source,
 writer, native test or acceptance gate is changed or rerun by that correction.

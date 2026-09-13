@@ -322,3 +322,16 @@ has **no compile, CPU unit suite, package, GPU declaration or speedup result**.
 The dependency's new production diagnostic passes, but its remaining full
 hardware/state/pixel gates still precede a separately declared same-backend block
 comparison. No main adoption, old-queue restart or new learning campaign follows.
+
+The [new CPU preparation](../../runs/block-matmul-native-f32-cpu-20260913.WmUOos/declaration.md)
+passes six cheap source/command checks; its first listing-suffix assertion error
+is retained in `development.md`. That correction adds the already-present Cargo
+`--` separator to the expectation and changes no planned command. The writer
+has not run: no manifest, cache copy, compilation or GPU work exists. Its first
+two read-only commands require the completed parent package and all nineteen
+latest-source hardware results before copying a private cache. It then requires
+the original 98 Rust CPU tests, 23 ignored GPU tests, release Clippy/formatting
+and twenty dispatch-count cases. These remain planned checks, not results.
+Run only while GPU work is stopped, in the one-core / 2 GiB / zero-swap scope.
+The copied parent extension is not a new block package. Full dependency state/
+pixel qualification still precedes a separately declared block GPU comparison.
