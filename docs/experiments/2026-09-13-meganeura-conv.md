@@ -98,5 +98,6 @@ Only then test block matmul on the same qualified backend, holding
 N6/R256/B16/T64/full BPTT/F32 and all scientific gates fixed. CPU tests and a
 dependency refresh do not establish useful throughput or another Atari win.
 The [identical block carry](2026-09-10-block-matmul.md#september-13-identical-carry-onto-latest-runtime)
-now passes 98 Rust CPU tests on this same backend, but has no new Python package,
-GPU or timing result.
+now passes 98 Rust and 547 Python CPU tests on this same backend, with native
+5e4ea9e1 and all 21 GPU fixtures prepared. Its five scalar CPU oracles pass;
+no block GPU test, timing result, declaration or follower exists yet.

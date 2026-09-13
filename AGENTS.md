@@ -176,9 +176,15 @@ reliable learning.
   `exp/block-matmul-conv-20260913` at 20b9b8a. Its 98 Rust CPU tests, formatting,
   both Clippy checks and twenty block-only 65-to-2 dispatch cases pass in
   `runs/block-matmul-conv-cpu-20260913.4MgN62`, with 30,255 verified pins and
-  23 GPU tests ignored. No new block Python package, GPU gate, speedup or
-  adoption exists. Qualify the dependency first, then the same-backend graph
-  comparison; preserve all older block candidates and controls.
+  23 GPU tests ignored. Its source-matched native 5e4ea9e1 package now passes
+  all 547 Python checks in `runs/block-matmul-conv-package-20260913.L03uP0`,
+  with 35,850 verified pins. The release preparation in
+  `runs/block-matmul-conv-fixtures-20260913.UqzXlX` compiles all six executables,
+  passes five scalar CPU oracles and lists 21 GPU tests without running them.
+  Its ten command lifecycles and 37,446 pins reverify. Preserve these completed
+  writers and private caches; their `--audit` modes are read-only. No block GPU
+  declaration, follower, speedup or adoption exists. Qualify the dependency
+  first, then the same-backend graph comparison; preserve all older candidates.
   The previous backend 4d45ba3a is upstream runtime e59bd32d plus the required
   cache corrections. The September 11 remote recheck still finds main ce80e9cd,
   superseding the earlier documentation-only 4d669394 check. It fixes generated

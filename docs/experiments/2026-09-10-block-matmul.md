@@ -234,3 +234,42 @@ is created. Preserve the completed writer; `prepare_cpu.py --audit` is read-only
 Qualify the [latest dependency](2026-09-13-meganeura-conv.md) first, then the full
 same-backend component/state/trace/memory/AB/BA comparison before the remaining
 Pong roots. These CPU results do not establish exact native learning or a speedup.
+
+### Latest-source package and release fixtures
+
+The [isolated package](../../runs/block-matmul-conv-package-20260913.L03uP0/result.json)
+now passes all **547 Python CPU tests**, with all six Python modules and actual
+source/build/wheel/import identity checked. Its native is
+`5e4ea9e1be52e1739c3b87cfa756bf133521b94e773dacfd3ff3be80e30bb3ba`,
+distinct from the same-backend parent's fa6bdd2a. The three command lifecycles
+and **35,850 input/output pins** reverify. Result SHA-256:
+`f3f5a0d0bd5d4a0da1a9268293cd28d1d77e3978347546da0b81d2f09e191512`.
+The package uses a private copy of the completed parent's build cache; it changes
+no default or historical extension.
+
+The [release preparation](../../runs/block-matmul-conv-fixtures-20260913.UqzXlX/result.json)
+freshly compiles **six source-matched executables**: Kindle tests, upstream
+regression/smoke/gemma tests, the standalone block oracle and the learning
+canary. The **21 required GPU tests are listed, not run**: the nineteen retained
+dependency checks plus upstream's F64 composed-loss/all-gradient oracle and
+Kindle's production exact block output/all-gradient comparison. The canary is
+compiled but not executed.
+
+Only the standalone oracle's five `cpu_` tests execute, and all pass. They cover
+independent scalar blocks, all three finite-difference chain rules, production
+component dispatch geometry, both F32 shader tile sizes and invalid shapes or
+storage. No production world memory plan or GPU agent is constructed. The
+oracle executable is `target/release/deps/block_matmul-2c17ea612195fbc7`, SHA-256
+`0accacde7078e0e0ed4c167fd5f5ebfb003e46a83dc41e6481f7b75ff876c9a0`.
+All **ten command lifecycles and 37,446 pins** reverify. Result SHA-256:
+`06aeb496872af3de024063b7a7c8eb5d71947bb9a9aa585509f7a6485cab4957`.
+
+Both completed writers use one core, one Cargo job, 2 GiB host memory and zero
+swap; preserve their private caches and use only their read-only `--audit` modes
+for rechecking. No block GPU declaration, follower, timing result or adoption
+is added. The future hardware gate must verify the executing adapter: upstream
+`SessionConfig::default()` is environment-independent, so an environment selector
+or an NVIDIA memory query alone does not establish each test's selected GPU.
+Pong's full active pair and both declared dependency stages remain ahead of
+the separate same-backend block comparison. No game budget or competence gate
+changes with this preparation.

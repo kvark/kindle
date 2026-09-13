@@ -403,8 +403,9 @@ The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails 
 full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. The identical block change is now CPU-qualified on latest 75dfe901,
-with the older ce80e9cd candidate preserved. Qualify the dependency-only runtime
+evidence only. The identical block change now has a CPU-qualified source-matched
+package on latest 75dfe901 and all 21 GPU test fixtures prepared but unrun;
+the older ce80e9cd candidate is preserved. Qualify the dependency-only runtime
 first, then test the block optimization against that same backend.
 Block-matmul correctness and throughput now take priority over unstarted Pong
 roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
