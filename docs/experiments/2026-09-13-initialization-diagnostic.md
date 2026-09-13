@@ -1,7 +1,7 @@
 # Initialization breadcrumbs after the second GPU failure
 
-Status: **both production initialization/gradient diagnostics pass, and the
-allocation-order candidate passes all 19 required hardware checks**.
+Status: **both production initialization/gradient diagnostics, all 19 hardware
+checks and all six complete-state canaries pass**.
 Preserve both earlier device-loss incidents and every stopped queue. No adoption
 or learning continuation is established.
 This continues the [full-log investigation](2026-09-13-gpu-forensics.md), not the
@@ -304,8 +304,11 @@ same-backend block-throughput gates remain ahead of held Pong.
 The [new declaration](../../runs/gpu-alias-state-20260913.6zM5B1/declaration.md)
 binds **74,701 pins and 14 CPU checks** after independent raw hardware, completed
 package, original Pong/Freeway/hold, upstream and same-boot health audits. The
-first qualified-control invocation is in preflight; no canary GPU result exists
-yet. The old full-runtime attempts remain terminal and untouched.
+complete six-window group finishes at **20:55:50 UTC**. All three control/candidate
+pairs match exactly, including every one of the 241 tensor entries, 146 moments
+and non-timing reports. The ce80 update-1/update-8 controls also reproduce both
+archived complete states/reports exactly. The old full-runtime attempts remain
+terminal and untouched.
 
 Six individually invoked canaries retain the original order: ce80/control then
 1c314/candidate at update 1, control then candidate at update 8, then candidate
@@ -329,3 +332,37 @@ no run-all mode or follower, starts no pixel/block/learning job, and establishes
 no throughput or adoption result. Even full canary parity leaves the N6 pixel,
 restore, exploration-override, combined-memory and matched-timing comparisons,
 then same-backend block-matmul qualification, ahead of the held Pong roots.
+
+### Completed state result
+
+The [final window](../../runs/gpu-alias-state-20260913.6zM5B1/pair1-parent-result.json)
+closes the reverse-order pair. Independent `run.py audit` recomputes all six
+raw results, three exact pairs and two retained anchors, verifying **74,701 input
+pins** and every output binding. The guard records **1,289 fresh health samples**,
+maximum gap **0.594 seconds**, at least **9,560 MiB directly free**, clean kernel
+evidence and no unfinished child. All **33 candidate initialization sequences**
+pass. The update-1 pair retains at least 9,608 MiB; every eight-update window
+retains at least 9,560 MiB. Preserve all completed invocations; the audit is
+read-only and starts no successor.
+
+An additional read-only repeat comparison confirms exact candidate state and
+all eight non-timing reports across its two runs. Raw checkpoint-file comparison
+differs: all three Safetensors files have different JSON header ordering, but
+identical parsed headers and tensor payloads. Outer metadata differs only in
+the correctly recorded file hashes. The declared comparator already checks
+exact logical values and verifies each actual file hash; no tolerance or gate
+was changed, and no checkpoint was rewritten.
+
+This is synthetic complete-state qualification, not the combined encoder/ALE
+runtime or a measured speedup. A fresh pixel declaration must retain all ten
+native windows, N6/R256/B16/T64 settings, exact state/action/reset/restore checks,
+the ce80 pixel anchor, direct free-memory reserve and matched guarded AB/BA
+timing. No pixel GPU job, automatic follower or new learning campaign exists.
+
+The [pixel protocol draft](../../runs/gpu-alias-pixels-20260913.dckRs2/declaration.md)
+currently contains settings and ten enumerated commands only: no launcher,
+CPU protocol suite, manifest or GPU execution. It keeps source-matched ce80/
+abf4ae5d and 1c314/f76c20b8 packages. The proposed guard owns the one Python
+process that synchronously steps ALE and executes the Rust extension, not a
+GPU scheduler or subprocess tree. Validate that boundary and the complete
+readers/refusals before any declaration; this draft is not runtime evidence.

@@ -280,3 +280,27 @@ The subsequent [conditional runtime declaration](2026-09-13-block-matmul-runtime
 adds the executing-adapter check and the complete same-backend comparison after
 the existing dependency stages. It leaves this completed CPU preparation and
 every older control untouched; all new GPU checks remain unrun.
+
+## September 13: source-only carry after the GPU incidents
+
+The original dependency/block followers are terminal; do not restart them.
+The [initialization follow-up](2026-09-13-initialization-diagnostic.md) now has
+a passing allocation-order production diagnostic, all 19 hardware checks and
+a source-matched CPU package. Its six complete-state canaries also pass; N6
+pixel/restore/combined-memory qualification remains outstanding.
+
+The separate `exp/block-matmul-alias-20260913` branch at
+[`f2e20af`](https://github.com/kvark/kindle/commit/f2e20af5c0e97dc18b4f6e5d799eb505a90aeac7)
+carries only the existing block `networks.rs` onto **d62d356 / 1c314b14 /
+f6f2729e**, plus its worktree instructions. The entire network file has the
+same Git blob as 20b9b8a: `b336837f878485738fea6eb0c19338daafb0ba76`.
+Both locks, backend identity, Python and all other code remain unchanged from
+the dependency candidate. Fresh remote checks still find 75dfe901 and
+renderer-only Blade 68a23e49; all non-renderer Blade tree entries match f6f2729e.
+
+Formatting and source-difference checks pass. **No compilation, CPU unit suite,
+package, GPU declaration, follower or speed measurement exists for this carry.**
+It does not modify the active dependency tests. Finish that dependency's full
+state/pixel/memory gates, then prepare and separately qualify this same-backend
+block comparison with all existing numerical, complete-state and AB/BA gates.
+Keep the root-2017 hold and all learning budgets unchanged.

@@ -199,8 +199,8 @@ reliable learning.
   its two commands, all fourteen original command records (including the
   preserved failure) and 74,673 pins reverify. Use its `check.py --audit`;
   never rerun the original writer or claim it passed its old assertion. No
-  rebuild or package GPU execution occurred in the completion. Full state,
-  N6 pixel/restore/memory and same-backend block throughput gates still precede
+  rebuild or package GPU execution occurred in the completion. N6 pixel/restore/
+  memory and same-backend block throughput gates still precede
   held Pong. Main remains ce80e9cd.
   The separate full-state declaration in `runs/gpu-alias-state-20260913.6zM5B1`
   binds 74,701 pins and 14 CPU checks. It retains six individual ce80/1c314
@@ -208,11 +208,30 @@ reliable learning.
   candidate/control update 8. Require exact complete 241-entry state, all
   146 moments, non-timing reports, retained ce80 anchors, native-device and
   direct-memory/guard checks. Candidate sessions also require complete flushed
-  initialization traces. Only the first control invocation is in preflight;
-  no complete-state GPU result exists yet. Inspect each result before the next
-  explicit invocation; there is no run-all mode, retry or follower. Preserve
+  initialization traces. All six windows now pass: three exact control/candidate
+  pairs, two exact retained ce80 anchors, every 241-entry state/146 moments and
+  all non-timing reports. All 33 candidate initialization traces and 1,289 fresh
+  health samples pass, with at least 9,560 MiB directly free and no new fault or
+  unfinished child. The independent read-only audit verifies all 74,701 inputs
+  and raw outputs. Preserve this completed group; never rerun its invocations.
+  There is no run-all mode, retry or follower. Preserve
   the pre-declaration CPU mock correction and package-prerequisite correction.
   This starts no pixel, block or learning job and changes no adoption gate.
+  N6 pixel/restore/override, combined-memory and matched timing remain required
+  before full dependency qualification; no pixel GPU declaration exists yet.
+  The unlaunched draft `runs/gpu-alias-pixels-20260913.dckRs2` contains only
+  protocol settings and a declaration outline for the unchanged ten native
+  windows. There is no launcher, CPU protocol suite, manifest or GPU work.
+  Before declaring it, test the direct Python/native-engine guard boundary,
+  source-matched readers and complete state/trace/memory/timing gates. Never
+  wrap a scheduler or any process that delegates GPU work to descendants.
+  The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
+  has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
+  that file and its worktree instructions differ. Formatting/source checks
+  pass, but it is not compiled, unit-tested, packaged or GPU-declared. Keep
+  it separate from the active dependency checks; no follower or speedup exists.
+  Qualify the dependency fully, then the same-backend block comparison. See
+  `docs/experiments/2026-09-10-block-matmul.md`.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.
