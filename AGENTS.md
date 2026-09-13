@@ -123,6 +123,38 @@ reliable learning.
   waits in an isolated diagnostic before another candidate execution; no blind
   retry, backend adoption or training. See
   `docs/experiments/2026-09-13-gpu-forensics.md` and `docs/gpu_incident_response.md`.
+  A later external 17:21 reboot is now observed as boot 372a5604; fresh checks
+  find matching 595.91.07, recovery None, no current-boot Xid and 15,841 MiB
+  directly free. The agent performed no host recovery. The healthy CPU sentinel
+  in `runs/gpu-init-build-20260913.KkcDxH/health` passes, not GPU qualification.
+  Matched initialization breadcrumbs and three fail-fast waits are isolated in
+  Meganeura control 0a0316c0/ce80 and candidate 50a51707/75dfe. No allocation or
+  host-zero schedule, learning arithmetic or main dependency changes. Both
+  fixtures pass 87 CPU tests, formatting and Clippy; the completed continuation
+  `runs/gpu-init-completion-20260913.QQxpbe` reverifies 18 commands/11,517 pins.
+  Preserve CNPhDp's path-override identity failure, rrUftM's upstream-preflight
+  stop and KkcDxH's nested-workspace formatter invocation failure. Never rerun
+  their writers. Blade main advances to 33e2a5b0, but all tracked native inputs
+  outside blade-render match f6f2729e and that package is absent from the resolved
+  dependency graph. This is not a runtime fix or qualification. The new
+  control-only diagnostic in `runs/gpu-init-control-20260913.5C7onK` now passes
+  after 82 reader/launch/guard CPU checks and fresh raw pair/hold evidence.
+  Its 18:19–18:22 native test passes all production losses/gradients with the
+  unchanged worst relative L2 0.000745721. Both complete initialization traces
+  verify every physical allocation/Shared zero and checked wait (44,926 records
+  total). All 481 fresh health samples pass with at least 6,545 MiB directly
+  free and clean kernel evidence; no child remains. The read-only audit verifies
+  58,023 inputs/60 outputs. This control is completed; never restart it. No
+  candidate qualification, speedup, adoption, follower or learning is established.
+  The separate CPU-only allocation-order hypothesis 1c314b14 in
+  `runs/gpu-alias-order-cpu-20260913.cIUvR5` retains deferred host zeroing and all
+  other runtime/math/settings. Its release build, all 87 CPU tests, formatting
+  and Clippy pass; 12 commands/62,795 pins reverify. Preserve the completed writer
+  and use only `prepare.py --audit`. It declares no GPU work. Keep this hypothesis
+  separate from instrumentation; even a later pass would not alone prove the
+  historical crash cause. Retain all full-state/pixel/memory/block throughput
+  gates ahead of Pong. See
+  `docs/experiments/2026-09-13-initialization-diagnostic.md`.
   The first hardware stage was declared for 45991be1 in
   `runs/meganeura-timings-runtime-20260913.dA0BPQ`: 42 CPU checks, 25,506 pins,
   actual live-entrypoint refusal and an independently verified detached follower.

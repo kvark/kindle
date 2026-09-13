@@ -58,7 +58,9 @@ passes exact episode stopping and completes both failed paired pilots. The
 Freeway and Pong root 1009, then stopped at the requested no-launch boundary
 before root 2017. Preserve that terminal queue. The subsequent
 [latest-backend hardware attempt](experiments/2026-09-13-gpu-device-loss.md)
-lost the GPU; recovery requires user approval before new qualification work.
+lost the GPU twice. A later external reboot restores observable health;
+the [initialization diagnostic](experiments/2026-09-13-initialization-diagnostic.md)
+keeps the failing candidate quarantined and training held.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -204,7 +206,9 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> external host reboot [observed; health restored, not runtime qualification]
   -> post-reboot world-gradient diagnostic [control passes; candidate initialization loses GPU]
   -> normal module reload [user performed; GSP initialization fails, GPU unavailable]
-  -> approved host recovery + guarded initialization diagnosis [pending; candidate quarantined]
+  -> external host reboot [17:21; observable health restored]
+  -> guarded initialization control [production gradients and complete traces pass]
+  -> allocation-order hypothesis [CPU-qualified; candidate not GPU-tested]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -228,13 +232,16 @@ passes on the qualified control but reproduces device loss during the latest
 candidate's session initialization, before training. The
 [full-log investigation](experiments/2026-09-13-gpu-forensics.md) finds identical
 PMU-halt signatures and failed GSP initialization after the user's module reload.
-Keep the candidate quarantined: recovery still requires user involvement.
-The [incident guard and runbook](gpu_incident_response.md) are CPU-tested and
-refuse the unhealthy host; they do not prevent the first wedge or establish
-runtime qualification. Require kernel-aware monitoring, immediately visible
-initialization stages and stop-on-wait-error handling in a newly declared
-diagnostic, not another unchanged retry. Preserve both failures and distinguish
-historical raw-data audits from current-boot health.
+The external 17:21 reboot restores observable health; the candidate stays
+quarantined. The [initialization follow-up](experiments/2026-09-13-initialization-diagnostic.md)
+CPU-qualifies matched flushed breadcrumbs and fail-fast initialization waits.
+Its guarded **control-only** production test passes all gradients and both
+complete initialization traces, retaining at least 6,545 MiB directly free.
+The allocation-order hypothesis is separately CPU-staged, not GPU-qualified. The
+[incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
+refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
+Preserve both failures and distinguish historical raw-data audits, current-boot
+health and actual runtime qualification. Do not blindly rerun the bad candidate.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
@@ -590,8 +597,9 @@ Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
 Freeway's complete fresh confirmation also fails competence. Pong root 1009's
-complete pair passes. Recover the GPU only with user approval, then qualify
-latest Meganeura and matched block-matmul throughput under new declarations
+complete pair passes. Following the external recovery and passing guarded
+initialization control, isolate the candidate failure, then qualify latest
+Meganeura and matched block-matmul throughput under new declarations
 before re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
 Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates

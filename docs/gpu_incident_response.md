@@ -82,7 +82,13 @@ automatic override, retry, hardware reset or next job.
 Always inspect `result.json`, `events.jsonl` and `audit` output. A guard pass
 does not prove the job used the intended Vulkan adapter or computed correctly;
 retain actual native device assertions and all existing numerical/state/memory
-gates. Current validation is CPU tests plus real unhealthy-host refusal.
+gates. Validation includes CPU tests, real unhealthy-host refusal and a
+[healthy CPU-sentinel launch](experiments/2026-09-13-initialization-diagnostic.md).
+That sentinel performs no GPU computation. The separately declared
+[instrumented production control](experiments/2026-09-13-initialization-diagnostic.md#completed-guarded-control)
+also passes under the guard with clean kernel/health evidence and complete
+initialization traces. This is a control result, not qualification of the
+quarantined candidate or prevention of a future first fault.
 Before timed adoption, measure guard overhead with a matched healthy control;
 do not treat guarded and historical unguarded timings as an identical benchmark.
 
@@ -97,9 +103,11 @@ For this machine on September 13, the user already stopped clients and received
 **`GPU ... Not Supported`** from reset. Normal module unload/reload then failed
 GSP initialization. The card remained on PCI, so NVML's **`No devices were found`**
 was not proof it had fallen off the bus. Do not repeat those attempts, force
-module unload or improvise PCI/bus resets. The next escalation is a
-user-controlled full shutdown and power-on. NVIDIA says reset may not recover
-all components and recommends power cycling when post-reset health fails.
+module unload or improvise PCI/bus resets. The recommended escalation was a
+user-controlled full shutdown and power-on. A later external boot at 17:21
+restored observable health; the agent did not perform recovery. NVIDIA says
+reset may not recover all components and recommends power cycling when
+post-reset health fails.
 [NVIDIA reset guidance](https://docs.nvidia.com/deploy/nvidia-smi/#-r---gpu-reset)
 
 After recovery, freshly bind the boot, loaded/on-disk/userspace driver, GPU UUID

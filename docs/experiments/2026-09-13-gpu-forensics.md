@@ -1,8 +1,10 @@
 # RTX 5080 device-loss investigation and containment
 
-Status: **two matching PMU-halt incidents; the GPU is still unrecovered after
-the user's module reload**. The latest backend is quarantined. No GPU workload,
-reset, driver change or recovery was performed during this investigation.
+Status: **two matching PMU-halt incidents; a later external reboot restores
+observable health**. The latest backend remains quarantined. The
+[initialization follow-up](2026-09-13-initialization-diagnostic.md) records the
+17:21 boot, matched diagnostic preparation and passing guarded production control.
+No reset, driver change or host recovery was performed by the agent.
 Pong's completed pair and the remaining-root hold are unchanged.
 
 This is a device/firmware failure triggered during backend qualification, not
@@ -163,10 +165,12 @@ never rerun completed writers.
 
 ## Next diagnostic, not another blind retry
 
-First recover the host with the user's approval. A reset was explicitly
-unsupported, and normal module reload failed to boot GSP. Do not escalate to
+The host subsequently rebooted externally; fresh 17:24 checks find health
+restored, not runtime qualification. During the preceding failed recovery,
+a reset was explicitly unsupported, and normal module reload failed to boot GSP.
+Do not escalate to
 forced unload, PCI/bus resets, firmware changes or repeated NVML probing.
-The next recovery escalation is a user-controlled full shutdown and power-on,
+The recommended escalation was a user-controlled full shutdown and power-on,
 followed by fresh health checks; NVIDIA likewise requires health verification
 and recommends power cycling if reset leaves the GPU unhealthy.
 [NVIDIA reset guidance](https://docs.nvidia.com/deploy/nvidia-smi/#-r---gpu-reset)
@@ -191,8 +195,9 @@ Before another candidate execution:
    report is worthwhile before further reproduction; collection/upload is
    an explicit operator decision, not automatic.
 
-No replacement GPU diagnostic or follower is launched by this report. Even
-an initialization fix leaves full hardware gradients, update-1/eight-update
+This forensic report launches no GPU diagnostic or follower; the separately
+declared [control-only follow-up](2026-09-13-initialization-diagnostic.md) passes.
+Even an initialization fix leaves full hardware gradients, update-1/eight-update
 state and moments, N6 pixel/restore/memory and same-backend block throughput
 qualification before the held Pong roots. No speedup, adoption or learning
 result is claimed.
