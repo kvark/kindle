@@ -304,3 +304,21 @@ It does not modify the active dependency tests. Finish that dependency's full
 state/pixel/memory gates, then prepare and separately qualify this same-backend
 block comparison with all existing numerical, complete-state and AB/BA gates.
 Keep the root-2017 hold and all learning budgets unchanged.
+
+### Carry after the next upstream policy update
+
+The stopped 1c314 pixel declaration and its block source carry remain intact.
+The [latest dependency candidate](2026-09-13-native-f32-upstream.md) includes
+upstream 428fc2d without selecting its new cooperative policy. The new branch
+`exp/block-matmul-native-f32-alias-20260913`,
+[`c5a288e`](https://github.com/kvark/kindle/commit/c5a288e19ca2cc2ac1cd91318c3401603c67776c),
+puts the same complete `networks.rs` blob above onto **7728d8d / 0a98775 /
+f6f2729e**. Only that file and its worktree instructions differ. Both locks,
+reported backend identity, initialization instrumentation, precision policies,
+Python and learning settings remain exactly matched to the dependency candidate.
+
+Source equality and formatting pass; the branch is clean and pushed. This carry
+has **no compile, CPU unit suite, package, GPU declaration or speedup result**.
+The dependency's new production diagnostic passes, but its remaining full
+hardware/state/pixel gates still precede a separately declared same-backend block
+comparison. No main adoption, old-queue restart or new learning campaign follows.

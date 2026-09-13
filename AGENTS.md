@@ -258,6 +258,45 @@ reliable learning.
   adoption or learning campaign exists. Main remains ce80; same-backend block
   qualification still precedes Pong. See
   `docs/experiments/2026-09-13-native-f32-upstream.md`.
+  The fresh source-matched package in
+  `runs/native-f32-alias-package-20260913.8NE0Mw` is native 02b600a1. Its 547
+  Python/eight reader CPU checks pass, with nine complete command histories,
+  88,946 inputs and 48 outputs independently reverified. Actual native -> Kindle
+  -> Meganeura compiler edges, shared Blade, source/wheel/import bytes and
+  fresh wheel-window builds pass; the cached f76c20b8 is not reused as a new
+  artifact. Preserve this completed writer and package; `prepare.py --audit`
+  is read-only. No package GPU qualification or adoption follows. The separate
+  release preparation in `runs/native-f32-alias-fixtures-20260913.Vtc5J1`
+  completes five executables, fifteen command histories and 88,993 inputs /
+  38 outputs, independently reverified. It only lists the original nineteen
+  hardware tests and creates no GPU job. Preserve the completed writer/caches.
+  The separate one-test diagnostic in
+  `runs/native-f32-alias-initialization-20260913.PDrNaR` passes ten CPU checks
+  and binds 89,052 inputs, including the reverified same-boot ce80 control and
+  original raw Pong/Freeway/hold proof. The 22:14 upstream check still finds
+  428fc2d/68a23e49; non-renderer Blade inputs remain identical. Its separate
+  production B16/T64/F32 test completes at 22:23:52 UTC, exit zero, with worst
+  relative L2 0.0007457205250121038. Every native loss/gradient assertion passes;
+  both sessions' 44,926 initialization records and exact control allocation
+  plans pass. All 481 fresh health samples are clean, max gap 0.613 s, minimum
+  directly free 6,545 MiB, no unfinished child. Its independent read-only audit
+  reverifies all 89,052 inputs/58 outputs and sixteen command histories. Preserve
+  the completed writer; no retry. The separate full hardware declaration
+  `runs/native-f32-alias-hardware-20260913.7tXwMG` passes 26 CPU checks after
+  a retained pre-declaration reader-import failure. Its 89,122 inputs bind the
+  completed diagnostic, fixtures and original raw pair/hold proof; clean idle
+  preflight passes. It reuses PDrNaR only at production index 14. The separately
+  invoked index 0 is in preflight; no further test is running. Invoke each
+  test separately and inspect
+  each result before follow-up. No follower or automatic state/pixel stage.
+  Main remains ce80; state/pixel/memory/timing and same-backend block gates remain.
+  The latest block source-only carry is
+  `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
+  f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
+  all dependencies, identity, Python, initialization and learning settings remain
+  matched. Source equality/formatting pass; branch is clean and pushed. No compile,
+  CPU unit suite, package, GPU declaration or speedup exists for this carry.
+  Preserve the earlier f2e20af carry and finish dependency qualification first.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

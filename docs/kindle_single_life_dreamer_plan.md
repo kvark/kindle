@@ -248,7 +248,10 @@ control anchors, with clean kernel evidence. This narrows the investigation
 without proving root cause. The ten-window pixel declaration stops before GPU
 work when upstream advances again. The [latest-source carry](experiments/2026-09-13-native-f32-upstream.md)
 includes the new cooperative-policy API without enabling it and retains the
-guarded initialization changes; its 95 Kindle/ten backend CPU checks pass. Source-matched
+guarded initialization changes; its 95 Kindle/ten backend CPU checks and the
+fresh 02b600a1 package's 547 Python checks pass. Its new production diagnostic
+also passes all losses/gradients and complete initialization with clean guarded
+health; the separate full hardware qualification has begun. Source-matched
 hardware/state/pixel/combined-memory and matched throughput qualification remain
 ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy

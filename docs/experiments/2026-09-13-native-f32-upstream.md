@@ -1,8 +1,8 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **source carry and CPU preparation, not GPU qualification**. Main remains
-on ce80e9cd. Completed 1c314 hardware and complete-state evidence is preserved;
-no new GPU incident, pixel result or learning campaign is added here.
+Status: **latest-source production diagnostic passed; full hardware declared**.
+Main remains on ce80e9cd. Completed 1c314 hardware and complete-state evidence is
+preserved; no new GPU incident, pixel result or learning campaign is added here.
 
 ## The pixel launcher stopped before GPU work
 
@@ -73,3 +73,58 @@ then separately declared guarded hardware, full state/moments, N6 pixel/restore/
 override/direct-memory and matched timing gates. Completed 1c314 results are
 not relabeled as results of 0a98775. Same-backend block-matmul qualification
 still precedes any newly declared remaining Pong work.
+
+## Source-matched package and release preparation
+
+The [fresh package](../../runs/native-f32-alias-package-20260913.8NE0Mw/declaration.md)
+completes with native **02b600a1**, all **547 Python tests** and **eight reader
+CPU tests** passing. Independent audit verifies nine complete command histories,
+88,946 input pins and 48 output pins. The actual native → Kindle → Meganeura
+fingerprint chain, shared Blade dependency, compiler/profile/features, source
+depfiles, wheel and imported bytes agree. Both linked libraries and the native
+extension were freshly built during the recorded wheel window; this is not
+the old f76c20b8 cache artifact. The package is source-matched CPU evidence,
+not GPU qualification, a speedup or adoption. The one-core/no-swap build reaches
+its 2 GiB host-memory cap. Preserve the completed writer and package; its
+`prepare.py --audit` mode is read-only.
+
+The separate [release-fixture preparation](../../runs/native-f32-alias-fixtures-20260913.Vtc5J1/declaration.md)
+completes with **five release executables**, fifteen command histories and
+**88,993 inputs / 38 outputs** independently reverified. Cargo JSON identifies
+the three backend test targets, Kindle library tests and the non-test canary;
+the same nineteen hardware requirements are listed, not executed. The production
+world-gradient test body and tolerances match d62d356 exactly. The older
+diagnostic's test-only progress messages are not inserted; backend initialization
+tracing remains. This preparation creates no GPU job or follower.
+
+## Separately guarded production diagnostic
+
+The [one-test declaration](../../runs/native-f32-alias-initialization-20260913.PDrNaR/declaration.md)
+passes ten CPU checks and binds **89,052 inputs**. It reuses and independently
+rechecks the completed same-boot guarded ce80 control, not its execution. Fresh
+upstream reads at **22:14 UTC** still find 428fc2d / 68a23e49; the non-renderer
+Blade tree remains identical. Kernel/driver/idle preflight passes with 15,841 MiB
+directly free. No recovery action is performed.
+
+The separately invoked native window completes at **22:23:52 UTC**, exit zero.
+All original production B16/T64/F32 loss and gradient assertions pass; the unique
+T64 worst relative L2 is **0.0007457205250121038**, the same value as the retained
+control. Both sessions' **44,926 initialization records** are complete and their
+allocation plans match the control exactly. All three checked waits complete.
+The guard retains **481 fresh execution-health samples**, maximum gap **0.613 s**
+and at least **6,545 MiB directly free**, without fault/stop events or unfinished
+children. The independent read-only audit reverifies all 89,052 inputs,
+sixteen command histories and 58 output pins.
+No host recovery is performed. This is a successful new-source diagnostic, not
+root-cause proof, full runtime qualification, a speedup or adoption.
+
+The separate [full hardware preparation](../../runs/native-f32-alias-hardware-20260913.7tXwMG/declaration.md)
+passes **26 CPU tests**, including actual pre-output poisoned-environment refusal.
+Its first standalone CPU import failure is retained in `development.md`; binding
+the unchanged completed initialization parser fixes only that reader lookup.
+Its declaration completes with **89,122 inputs**, rechecking the diagnostic,
+source fixtures, original raw pair/hold and current host/upstream evidence. It explicitly reuses
+this same executable's production test at index 14 and requires eighteen further
+individually invoked native tests. The separately invoked index 0 is in preflight;
+no later test is running. There is no
+run-all, follower, retry or automatic state/pixel stage.
