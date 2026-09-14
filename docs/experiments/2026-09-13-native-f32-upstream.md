@@ -179,9 +179,15 @@ passes **18 standalone CPU checks**. It retains the original ce80 anchors,
 241 tensor entries, all 146 optimizer moments and exact non-timing reports.
 Additional negative fixtures require the exact guarded executable, declaration,
 environment and executing boot for both arms. No native math or tolerance changes.
-There is no state manifest, started declaration, GPU window or follower; full
-hardware completion is now inspected. Declare these six canaries separately,
-only while no CPU build or other GPU work is running.
+After complete hardware inspection and the separately completed block CPU build,
+its declaration finishes at **September 14 00:16:17 UTC**, with **89,014 input
+pins** and all eighteen CPU checks passing. Independent read-only checks reverify
+the inputs, all eight command lifecycles and clean same-boot declaration health.
+Latest reads still find 428fc2d / 68a23e49; no recovery action is performed.
+**No canary has executed.** Next is explicit index 0, the qualified ce80
+update-one control. Invoke all six windows separately and inspect each result
+before follow-up, with no overlapping CPU build or other GPU work. There is no
+automatic successor or follower, and no full-state result is claimed.
 
 The subsequent [N6 pixel reader preparation](../../runs/native-f32-alias-pixels-20260913.m6kNer/declaration.md)
 passes **30 standalone CPU checks**. It binds 02b600a1 and the new complete-state

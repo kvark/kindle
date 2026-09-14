@@ -317,8 +317,8 @@ f6f2729e**. Only that file and its worktree instructions differ. Both locks,
 reported backend identity, initialization instrumentation, precision policies,
 Python and learning settings remain exactly matched to the dependency candidate.
 
-Source equality and formatting pass; the branch is clean and pushed. This carry
-has **no completed CPU unit suite, package, GPU declaration or speedup result**.
+Source equality and formatting pass; the branch is clean and pushed. The CPU
+qualification below is complete; **no package, GPU declaration or speedup exists**.
 The dependency's new production diagnostic and all nineteen hardware checks
 pass; its remaining full-state/pixel gates still precede a separately declared
 same-backend block comparison. No main adoption, old-queue restart or new
@@ -329,12 +329,18 @@ passes six cheap source/command checks; its first listing-suffix assertion error
 is retained in `development.md`. That correction adds the already-present Cargo
 `--` separator to the expectation and changes no planned command. The writer
 was explicitly invoked at **September 14 00:05 UTC**, after independent complete
-hardware audit, with GPU work stopped. No completed build is claimed. Its first
+hardware audit, with GPU work stopped. Its first
 two read-only commands require the completed parent package and all nineteen
-latest-source hardware results before copying a private cache. It then requires
-the original 98 Rust CPU tests, 23 ignored GPU tests, release Clippy/formatting
-and twenty dispatch-count cases. These remain required checks, not results.
-Do not restart this active writer.
-Run only while GPU work is stopped, in the one-core / 2 GiB / zero-swap scope.
-The copied parent extension is not a new block package. Full dependency state/
-pixel qualification still precedes a separately declared block GPU comparison.
+latest-source hardware results before copying a private cache.
+
+All ten command lifecycles complete successfully: **98 Rust CPU tests**, both
+release Clippy checks, formatting and twenty block-only dispatch-count cases
+showing **65 → 2**. All **23 GPU tests remain ignored**; the additional exact
+production fixture is listed, not executed. The independent read-only audit
+reverifies **95,916 inputs / eleven outputs** (95,927 pins total). Peak host
+memory is **1,924.9 MiB**, within the one-core / 2 GiB / zero-swap scope.
+Preserve the completed writer and private cache; only `prepare_cpu.py --audit`
+is reusable. No Python runtime suite, wheel or block GPU work was run. The
+copied parent extension is not a new block package. Dispatch counts do not
+measure throughput. Full dependency state/pixel qualification still precedes
+a separately declared block GPU comparison with all original gates.

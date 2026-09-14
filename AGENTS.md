@@ -299,9 +299,13 @@ reliable learning.
   CPU-only complete-state preparation `runs/native-f32-alias-state-20260913.Xy2mtz`
   passes eighteen standalone checks, retaining both ce80 anchors, all 241 tensors,
   146 moments and exact non-timing reports. It additionally binds exact guarded
-  executable/declaration/environment/boot for both arms. No state declaration
-  has started: no manifest, GPU job or follower. Hardware is complete; separately
-  declare its six individually invoked canaries while no CPU build is running.
+  executable/declaration/environment/boot for both arms. Its separate declaration
+  completes at September 14 00:16:17 UTC, after hardware and the block CPU build
+  finish. Independent read-only checks reverify 89,014 inputs, all eight command
+  lifecycles and healthy same-boot evidence. No canary has executed; next is
+  explicit index 0, the qualified ce80 update-one control. Invoke each window
+  separately and inspect its result before follow-up, with GPU work serialized
+  and no overlapping CPU build. There is no automatic successor or follower.
   The new CPU-only N6 pixel preparation is
   `runs/native-f32-alias-pixels-20260913.m6kNer`: thirty standalone checks pass,
   including actual CLI refusals, exact guarded jobs and missing-state refusal.
@@ -314,20 +318,21 @@ reliable learning.
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
   all dependencies, identity, Python, initialization and learning settings remain
-  matched. Source equality/formatting pass; branch is clean and pushed. No complete
-  Rust unit suite, package, GPU declaration or speedup result exists for this carry.
+  matched. Source equality/formatting pass; branch is clean and pushed. Its CPU
+  qualification is now complete; no package, GPU declaration or speedup exists.
   Preserve the earlier f2e20af carry and finish dependency qualification first.
   Its CPU preparation is
   `runs/block-matmul-native-f32-cpu-20260913.WmUOos`: six cheap source/command
   checks pass after a retained Cargo-list-suffix expectation error. The writer
   was explicitly invoked after complete hardware inspection at September 14
-  00:05 UTC, with GPU work stopped. It is not a completed build. It requires the
-  complete parent package and nineteen-test hardware proof before cache copy/build;
-  its 98 Rust tests, 23 ignored GPU tests, release Clippy and dispatch counts
-  are still required, not passing results. Do not restart the active writer.
-  Use only while GPU work is stopped, with one core / 2 GiB / zero swap.
-  Never use its copied parent extension as
-  a new block package. Full dependency state/pixel gates still precede block GPU work.
+  00:05 UTC, with GPU work stopped. It completes all ten command lifecycles,
+  98 Rust CPU tests, formatting, both release Clippy checks and twenty block-only
+  65-to-2 dispatch cases; 23 GPU tests stay ignored. The independent read-only
+  audit reverifies 95,916 inputs / eleven outputs. Peak host memory is 1,924.9 MiB
+  in the one-core / 2 GiB / zero-swap scope. Preserve the completed writer/cache;
+  only `prepare_cpu.py --audit` is reusable. There is no Python runtime suite,
+  wheel or block GPU job. Its copied parent extension is not a new block package.
+  Full dependency state/pixel gates still precede block GPU work.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks
