@@ -318,9 +318,10 @@ reported backend identity, initialization instrumentation, precision policies,
 Python and learning settings remain exactly matched to the dependency candidate.
 
 Source equality and formatting pass; the branch is clean and pushed. The CPU
-qualification below is complete; **no package, GPU declaration or speedup exists**.
-The dependency's new production diagnostic and all nineteen hardware checks
-pass; its remaining full-state/pixel gates still precede a separately declared
+qualification and package below are complete; **no block GPU declaration or
+speedup exists**. The dependency's new production diagnostic, all nineteen
+hardware checks and six complete-state canaries pass; its remaining pixel gates
+still precede a separately declared
 same-backend block comparison. No main adoption, old-queue restart or new
 learning campaign follows.
 
@@ -344,3 +345,30 @@ is reusable. No Python runtime suite, wheel or block GPU work was run. The
 copied parent extension is not a new block package. Dispatch counts do not
 measure throughput. Full dependency state/pixel qualification still precedes
 a separately declared block GPU comparison with all original gates.
+
+The completed [package preparation](../../runs/block-matmul-native-f32-package-20260914.8dkrrW/declaration.md)
+passes eleven standalone CPU fixtures. It retains the actual compiler-chain,
+wheel/source/import and 547-test gates, binding c5a288e and rejecting parent
+02b600a1 as a new extension. Its declaration separately snapshots every
+private cache file; WmUOos's eleven output pins are not relabeled as compiled
+artifact pins. Its CPU-only writer is explicitly invoked at **September 14
+00:56 UTC**, after full-state completion, with all GPU work stopped. All nine
+command lifecycles and **547 Python tests** complete successfully. The new native
+is **bfa21957bebebc29b6ce1cf3c4d5f1e8761d0b5c4a47d546ccb0e9427b941945**.
+Independent read-only audit reverifies **102,791 inputs / 48 outputs**, including
+**6,849 newly declared cache pins**, compiler edges and source/wheel/import bytes.
+The native extension and Kindle library are fresh wheel-window builds; the
+Meganeura library is an exact declared cache artifact. Peak host memory reaches
+the 2 GiB cap in the one-core / zero-swap scope; no extra headroom is claimed.
+Preserve the completed writer, package and private cache; only `prepare.py --audit`
+is reusable. No block release-fixture preparation or GPU declaration follows
+automatically. Dependency pixels use 02b600a1, not this package. Full same-backend
+block hardware/state/pixel/memory/AB/BA gates still precede held Pong work.
+
+The [next release preparation](../../runs/block-matmul-native-f32-fixtures-20260914.InVKe1/declaration.md)
+passes ten cheap CPU reader checks, retaining the first two expected-exception
+fixture errors and their correction. It prepares six executables, all original
+21 hardware listings and five scalar CPU oracles, with separately pinned private
+caches. The writer has not started; there is no compilation or GPU result.
+Run the CPU-only build only while GPU work is stopped, and require the complete
+dependency pixel gate before a separately declared block GPU comparison.

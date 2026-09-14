@@ -302,24 +302,35 @@ reliable learning.
   executable/declaration/environment/boot for both arms. Its separate declaration
   completes at September 14 00:16:17 UTC, after hardware and the block CPU build
   finish. Independent read-only checks reverify 89,014 inputs, all eight command
-  lifecycles and healthy same-boot evidence. No canary has executed; next is
-  explicit index 0, the qualified ce80 update-one control. Invoke each window
-  separately and inspect its result before follow-up, with GPU work serialized
-  and no overlapping CPU build. There is no automatic successor or follower.
+  lifecycles and healthy same-boot evidence. All six separately reviewed canaries
+  now pass, final exit September 14 00:53:39 UTC: three exact complete-state pairs,
+  both archived ce80 anchors, all 241 tensor entries / 146 moments and non-timing
+  reports. The independent complete audit reverifies all 89,014 inputs and raw
+  results. Both eight-update within-backend repeats also match exactly. All 33
+  candidate initialization traces and 1,269 fresh health samples pass, max gap
+  0.574 s, minimum directly free 9,559 MiB, no fault or unfinished child. Preserve
+  this completed group; never rerun its windows. There is no automatic successor,
+  follower, pixel qualification, speedup or adoption.
   The new CPU-only N6 pixel preparation is
   `runs/native-f32-alias-pixels-20260913.m6kNer`: thirty standalone checks pass,
   including actual CLI refusals, exact guarded jobs and missing-state refusal.
   Preserve the first two historical-template fixture errors and corrections;
   the live reader has no historical-state fallback. Exact checkpoint/timing
   helpers and all ten windows, budgets/seeds, ce80 anchor, overrides and gates
-  remain fixed. No manifest, declaration command history, GPU phase or follower
-  exists. Complete hardware and all six state windows before declaring pixels.
+  remain fixed. Its declaration completes at September 14 01:02:11 UTC after
+  complete hardware/state inspection, binding 89,308 inputs and eleven command
+  lifecycles. Independent read-only declaration audit passes, including clean
+  same-boot health and actual imports. Preserve this completed declaration.
+  After the block package build completes, index 0 is explicitly invoked at
+  01:11 UTC; no later window or follower is started. Inspect each complete raw
+  result before the next individual invocation. No pixel result exists yet.
   The latest block source-only carry is
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
   all dependencies, identity, Python, initialization and learning settings remain
   matched. Source equality/formatting pass; branch is clean and pushed. Its CPU
-  qualification is now complete; no package, GPU declaration or speedup exists.
+  qualification and the package below are complete; no block GPU declaration
+  or speedup exists.
   Preserve the earlier f2e20af carry and finish dependency qualification first.
   Its CPU preparation is
   `runs/block-matmul-native-f32-cpu-20260913.WmUOos`: six cheap source/command
@@ -333,6 +344,29 @@ reliable learning.
   only `prepare_cpu.py --audit` is reusable. There is no Python runtime suite,
   wheel or block GPU job. Its copied parent extension is not a new block package.
   Full dependency state/pixel gates still precede block GPU work.
+  The completed block package preparation is
+  `runs/block-matmul-native-f32-package-20260914.8dkrrW`, with eleven passing
+  standalone CPU fixtures. It binds c5a288e, retains actual compiler-chain and
+  wheel/source/import checks and requires all 547 Python tests. Newly declared
+  cache pins must cover the private WmUOos target; its eleven old output pins
+  did not bind compiled artifacts. Reject parent 02b600a1 as a new extension.
+  Its CPU-only writer completes all nine commands and 547 Python tests after
+  full-state completion, with native bfa21957. Independent read-only audit
+  reverifies 102,791 inputs / 48 outputs, including 6,849 newly declared cache
+  pins, actual compiler edges and source/wheel/import bytes. The native and
+  Kindle library are fresh wheel-window builds; Meganeura is an exact declared
+  cache artifact. Peak host memory reaches the 2 GiB cap in the one-core /
+  zero-swap scope. Preserve this completed writer/package/private cache; only
+  `prepare.py --audit` is reusable. No block GPU declaration, qualification,
+  speedup or adoption follows. Dependency pixels still use parent package
+  02b600a1, not this block candidate.
+  The unstarted release preparation in
+  `runs/block-matmul-native-f32-fixtures-20260914.InVKe1` passes ten cheap CPU
+  reader checks after two retained expected-exception fixture corrections.
+  It retains all 21 hardware requirements and five scalar CPU oracles, with
+  separately pinned private caches. No writer, compilation or GPU job has
+  started. Run its CPU-only build only while GPU work is stopped; inspect
+  dependency pixel results before any block GPU declaration.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

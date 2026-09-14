@@ -65,8 +65,10 @@ Use a **direct native executable**, or a separately declared Python process
 that executes the native extension in that same process. The latter requires
 pinning and checking the interpreter, actual imports, extension, adapter and
 environment; it is not permission to wrap an arbitrary Python launcher. The
-[guarded N6 protocol](../runs/gpu-alias-pixels-20260913.dckRs2/declaration.md)
+[guarded N6 protocol](../runs/native-f32-alias-pixels-20260913.m6kNer/declaration.md)
 binds the specific synchronous ALE adapter, with no GPU worker descendants.
+The earlier dckRs2 declaration stopped before GPU work on an upstream change;
+never restart that attempt.
 Do not wrap a scheduler, Cargo, shell pipeline or controller that spawns GPU
 descendants: the guard owns and stops only its direct child. It is not a
 machine-wide lock; retain serialized GPU scheduling. Existing declared

@@ -251,10 +251,10 @@ includes the new cooperative-policy API without enabling it and retains the
 guarded initialization changes; its 95 Kindle/ten backend CPU checks and the
 fresh 02b600a1 package's 547 Python checks pass. Its new production diagnostic
 also passes all losses/gradients and complete initialization with clean guarded
-health; all nineteen source-matched hardware checks now pass, including causal
-LeVJEPA and batched-stream parity, with no new fault. Full state/moments,
-N6 pixel/restore/combined-memory and matched throughput qualification remain
-ahead of adoption. The
+health; all nineteen source-matched hardware checks and six full-state canaries
+now pass, including causal LeVJEPA/batched-stream parity, every optimizer moment
+and exact control anchors, with no new fault. N6 pixel/restore/combined-memory
+and matched throughput qualification remain ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
 Preserve both failures and distinguish historical raw-data audits, current-boot

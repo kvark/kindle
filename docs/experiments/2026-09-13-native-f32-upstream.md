@@ -1,9 +1,9 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **latest-source production diagnostic and all nineteen hardware checks pass;
-full runtime qualification remains incomplete**.
-Main remains on ce80e9cd. Completed 1c314 hardware and complete-state evidence is
-preserved; no new GPU incident, pixel result or learning campaign is added here.
+Status: **latest-source production diagnostic, nineteen hardware checks and six
+complete-state canaries pass; guarded pixel qualification is in progress**.
+Main remains on ce80e9cd. Completed 1c314 evidence is preserved; no new GPU
+incident, completed pixel result, runtime adoption or learning campaign is added.
 
 ## The pixel launcher stopped before GPU work
 
@@ -184,10 +184,18 @@ its declaration finishes at **September 14 00:16:17 UTC**, with **89,014 input
 pins** and all eighteen CPU checks passing. Independent read-only checks reverify
 the inputs, all eight command lifecycles and clean same-boot declaration health.
 Latest reads still find 428fc2d / 68a23e49; no recovery action is performed.
-**No canary has executed.** Next is explicit index 0, the qualified ce80
-update-one control. Invoke all six windows separately and inspect each result
-before follow-up, with no overlapping CPU build or other GPU work. There is no
-automatic successor or follower, and no full-state result is claimed.
+All six separately invoked windows now pass, final exit **September 14
+00:53:39 UTC**. Every pair has exact complete 241-entry state, all 146 optimizer
+moments and non-timing reports; both retained ce80 anchors match. The independent
+complete read-only audit reverifies all **89,014 inputs** and raw results.
+Additional read-only comparisons find exact eight-update repeatability within
+each backend across the two execution orders. No extra GPU execution is used.
+All **33 candidate initialization traces** and **1,269 fresh health samples**
+pass, maximum gap **0.574 s**, minimum directly free **9,559 MiB**, no new fault
+or unfinished child. Preserve this completed group; never rerun its windows.
+There is no automatic successor or follower. N6 pixel/restore/combined-memory
+and matched timing remain required before runtime adoption; this is not a
+throughput or Atari learning-quality result.
 
 The subsequent [N6 pixel reader preparation](../../runs/native-f32-alias-pixels-20260913.m6kNer/declaration.md)
 passes **30 standalone CPU checks**. It binds 02b600a1 and the new complete-state
@@ -195,6 +203,15 @@ root, retaining the exact prior checkpoint/timing readers, ce80 anchor, ten
 individual windows, all seeds/budgets, override accounting and separate
 regression/speedup gates. Both actual CLI refusals pass. The first CPU suite's
 two historical-template errors and their fixture-only corrections are retained;
-the live reader has no historical-state fallback. No manifest, declaration
-command history, native phase or follower exists. Complete the hardware and six
-state windows before declaring pixels; this preparation is not a pixel result.
+the live reader has no historical-state fallback. Its declaration completes at
+**September 14 01:02:11 UTC**, after complete hardware/state inspection, with
+**89,308 input pins** and eleven complete command lifecycles. Independent
+read-only checks reverify the declaration, actual package imports and clean
+same-boot health, with no native phase previously started. Preserve the completed
+declaration and all earlier stopped attempts.
+
+After the separate block package build completes, pixel index 0 is explicitly
+invoked at **01:11 UTC**. It must recheck all prerequisites and complete its
+guarded control window before further work. No later window or follower is
+started. This comparison uses dependency package **02b600a1**, not the block
+candidate's new bfa21957. No pixel result or speedup is claimed yet.
