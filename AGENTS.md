@@ -285,39 +285,48 @@ reliable learning.
   `runs/native-f32-alias-hardware-20260913.7tXwMG` passes 26 CPU checks after
   a retained pre-declaration reader-import failure. Its 89,122 inputs bind the
   completed diagnostic, fixtures and original raw pair/hold proof; clean idle
-  preflight passes. It reuses PDrNaR only at production index 14. New tests 0–9
-  now pass, last exit at 23:19:16 UTC: cache/reset, F64 math, matmul epilogues,
-  cached writes, device copies, logical cache restore, untrained round-trips and
-  the tiny act/learn/restore cycle. All 86 sessions / 214 fresh health samples
-  pass, max gap 0.333 s, minimum directly free 15,759 MiB, no fault or unfinished
-  child. Independent read-only prefix audit reverifies all 89,122 inputs and ten
-  raw results. Preserve the earlier three-result audit and its invocation failure.
-  Eleven of nineteen requirements are complete including reused index 14, not
-  eleven new executions. No later window has started; next is explicit index 10.
-  Latest reads still find 428fc2d/68a23e49. Invoke each separately and inspect each
-  result before follow-up. No follower or automatic state/pixel stage.
+  preflight passes. All nineteen requirements now pass, final native exit at
+  September 14 00:03:01 UTC: eighteen separately reviewed new executions plus
+  reused PDrNaR at production index 14. All 229 initialization sequences and
+  1,429 fresh health samples pass, max gap 0.613 s, minimum directly free
+  6,545 MiB, no fault or unfinished child. LeVJEPA's 37 reference frames pass;
+  N2/N4/N6/N8 dense batched features match serial exactly. The independent
+  complete read-only audit reverifies all 89,122 inputs and raw results.
+  Preserve every completed invocation and the earlier prefix audits/failure;
+  never restart this group. Latest reads still find 428fc2d/68a23e49.
+  No follower, automatic state/pixel stage, speedup or adoption follows.
   Main remains ce80; state/pixel/memory/timing and same-backend block gates remain.
   CPU-only complete-state preparation `runs/native-f32-alias-state-20260913.Xy2mtz`
   passes eighteen standalone checks, retaining both ce80 anchors, all 241 tensors,
   146 moments and exact non-timing reports. It additionally binds exact guarded
   executable/declaration/environment/boot for both arms. No state declaration
-  has started: no manifest, GPU job or follower. Finish and inspect all nineteen
-  hardware results before declaring its six individually invoked canaries.
+  has started: no manifest, GPU job or follower. Hardware is complete; separately
+  declare its six individually invoked canaries while no CPU build is running.
+  The new CPU-only N6 pixel preparation is
+  `runs/native-f32-alias-pixels-20260913.m6kNer`: thirty standalone checks pass,
+  including actual CLI refusals, exact guarded jobs and missing-state refusal.
+  Preserve the first two historical-template fixture errors and corrections;
+  the live reader has no historical-state fallback. Exact checkpoint/timing
+  helpers and all ten windows, budgets/seeds, ce80 anchor, overrides and gates
+  remain fixed. No manifest, declaration command history, GPU phase or follower
+  exists. Complete hardware and all six state windows before declaring pixels.
   The latest block source-only carry is
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
   all dependencies, identity, Python, initialization and learning settings remain
-  matched. Source equality/formatting pass; branch is clean and pushed. No compile,
-  Rust unit suite, package, GPU declaration or speedup exists for this carry.
+  matched. Source equality/formatting pass; branch is clean and pushed. No complete
+  Rust unit suite, package, GPU declaration or speedup result exists for this carry.
   Preserve the earlier f2e20af carry and finish dependency qualification first.
-  Its unstarted CPU preparation is
+  Its CPU preparation is
   `runs/block-matmul-native-f32-cpu-20260913.WmUOos`: six cheap source/command
-  checks pass after a retained Cargo-list-suffix expectation error. No manifest,
-  copied cache, compilation or GPU job exists. The writer requires the complete
-  parent package and nineteen-test hardware proof before cache copy/build;
+  checks pass after a retained Cargo-list-suffix expectation error. The writer
+  was explicitly invoked after complete hardware inspection at September 14
+  00:05 UTC, with GPU work stopped. It is not a completed build. It requires the
+  complete parent package and nineteen-test hardware proof before cache copy/build;
   its 98 Rust tests, 23 ignored GPU tests, release Clippy and dispatch counts
-  are still planned, not passing results. Use only while GPU work is stopped,
-  with one core / 2 GiB / zero swap. Never use its copied parent extension as
+  are still required, not passing results. Do not restart the active writer.
+  Use only while GPU work is stopped, with one core / 2 GiB / zero swap.
+  Never use its copied parent extension as
   a new block package. Full dependency state/pixel gates still precede block GPU work.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only

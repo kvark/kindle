@@ -1,11 +1,13 @@
 # RTX 5080 device-loss investigation and containment
 
 Status: **two matching PMU-halt incidents; a later external reboot restores
-observable health**. The latest backend remains quarantined. The
+observable health**. The failing 75dfe901 backend remains quarantined. The
 [initialization follow-up](2026-09-13-initialization-diagnostic.md) records the
 17:21 boot and passing guarded production control and allocation-order candidate.
 The candidate result narrows the investigation without establishing root cause
-or full runtime qualification.
+or full runtime qualification. The [latest-source follow-up](2026-09-13-native-f32-upstream.md)
+tracks the subsequent upstream carry and separately guarded qualification;
+it does not retry the known-failing initialization schedule.
 No reset, driver change or host recovery was performed by the agent.
 Pong's completed pair and the remaining-root hold are unchanged.
 

@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-13. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-14. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -251,8 +251,9 @@ includes the new cooperative-policy API without enabling it and retains the
 guarded initialization changes; its 95 Kindle/ten backend CPU checks and the
 fresh 02b600a1 package's 547 Python checks pass. Its new production diagnostic
 also passes all losses/gradients and complete initialization with clean guarded
-health; the separate full hardware qualification has begun. Source-matched
-hardware/state/pixel/combined-memory and matched throughput qualification remain
+health; all nineteen source-matched hardware checks now pass, including causal
+LeVJEPA and batched-stream parity, with no new fault. Full state/moments,
+N6 pixel/restore/combined-memory and matched throughput qualification remain
 ahead of adoption. The
 [incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
 refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.

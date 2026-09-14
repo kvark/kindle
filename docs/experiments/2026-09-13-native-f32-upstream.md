@@ -1,6 +1,6 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **latest-source production diagnostic and hardware prefix pass;
+Status: **latest-source production diagnostic and all nineteen hardware checks pass;
 full runtime qualification remains incomplete**.
 Main remains on ce80e9cd. Completed 1c314 hardware and complete-state evidence is
 preserved; no new GPU incident, pixel result or learning campaign is added here.
@@ -129,26 +129,44 @@ this same executable's production test at index 14 and requires eighteen further
 individually invoked native tests. There is no run-all, follower, retry or
 automatic state/pixel stage.
 
-New indices **0–9** pass, with each result inspected before the next launch:
+All **nineteen hardware requirements pass**, with each result inspected before
+the next launch. Eighteen are new executions; the already completed production
+diagnostic is reused only at index 14. The final native exit is **September 14
+00:03:01 UTC**. This group covers
 cached-query/reset correctness, both F64 softplus comparisons, quantized and
 small-tile matmul epilogues, valid cached-block writes/selection, and Kindle's
 device packing/copy check, logical checkpoint/cache restoration, untrained agent
-round-trips, and the tiny act/learn/restore cycle. Their **86 complete initialization
-sequences** and **214 fresh health samples** pass, maximum gap **0.333 s**, at least
-**15,759 MiB directly free**, no kernel fault or unfinished child. Index 9
-completes at **23:19:16 UTC**. The production diagnostic above is separately
-reused at index 14: **eleven of nineteen hardware requirements** are complete,
-not eleven new executions here. No later window has started; next is explicit
-index **10**. The latest remote reads still find 428fc2d / 68a23e49 with identical
-non-renderer Blade inputs.
+round-trips, the tiny act/learn/restore cycle, vector belief/policy/learning and
+override causality, large-row loss reductions, causal video encoding and fused
+F16 clamp bounds. Including the reused production diagnostic, **229 complete
+initialization sequences** and **1,429 fresh health samples** pass, maximum gap
+**0.613 s**, at least **6,545 MiB directly free**, no kernel fault or unfinished
+child. The eighteen new executions contribute 227 sequences and 948 samples;
+their maximum gap is 0.343 s and minimum free memory 7,905 MiB. The final remote
+reads still find 428fc2d / 68a23e49 with identical non-renderer Blade inputs.
+
+LeVJEPA matches all **37 pinned reference frames**, including automatic chunk
+boundaries and explicit resets: maximum relative L2 **8.47e-6**, maximum absolute
+feature error **0.00026131**. N2/N4/N6/N8 dense batched features match their serial
+streams exactly across reversed arrival order, gaps and asymmetric resets;
+pooled-feature checks also pass their unchanged tolerance. This is perception
+parity, not combined learner memory or an N8 collection recommendation.
 
 The round-trip test uses the tiny core after zero/eight actions, with exact
 weights and zero optimizer moments. The subsequent tiny learning test checks
 selected restored weights/momentum, normalizer/visitation state and continued
 learning. These checks do not establish replay/live-belief resume, a production
 learning campaign, all-parameter production state parity or Atari competence.
-An independent read-only audit now reverifies all **89,122 inputs** and the
-complete raw results for indices 0–9. No native test or writer is rerun.
+The three-stream live-state test checks sampled actions and beliefs across
+staggered resets. The one-stream learning test checks scheduled loss/weight and
+credit parity, followed by restore; the separate override test checks actual
+executed actions in belief and replay, including independent RNGs. These remain
+tiny-core integration checks, not the full production-state gate.
+
+The independent **complete read-only audit** now reverifies all **89,122 inputs**
+and all nineteen raw results, finishing at **September 14 00:04:49 UTC**. No
+native test or writer is rerun. Preserve the completed group and prefix audits;
+there is no automatic state/pixel successor or backend adoption.
 
 An earlier independent read-only prefix audit reverifies all **89,122 input pins**
 and the first three complete raw results. Its first `systemd-run` invocation fails to
@@ -162,4 +180,15 @@ passes **18 standalone CPU checks**. It retains the original ce80 anchors,
 Additional negative fixtures require the exact guarded executable, declaration,
 environment and executing boot for both arms. No native math or tolerance changes.
 There is no state manifest, started declaration, GPU window or follower; full
-hardware completion must be inspected before declaring these six canaries.
+hardware completion is now inspected. Declare these six canaries separately,
+only while no CPU build or other GPU work is running.
+
+The subsequent [N6 pixel reader preparation](../../runs/native-f32-alias-pixels-20260913.m6kNer/declaration.md)
+passes **30 standalone CPU checks**. It binds 02b600a1 and the new complete-state
+root, retaining the exact prior checkpoint/timing readers, ce80 anchor, ten
+individual windows, all seeds/budgets, override accounting and separate
+regression/speedup gates. Both actual CLI refusals pass. The first CPU suite's
+two historical-template errors and their fixture-only corrections are retained;
+the live reader has no historical-state fallback. No manifest, declaration
+command history, native phase or follower exists. Complete the hardware and six
+state windows before declaring pixels; this preparation is not a pixel result.
