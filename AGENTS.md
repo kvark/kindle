@@ -321,9 +321,16 @@ reliable learning.
   complete hardware/state inspection, binding 89,308 inputs and eleven command
   lifecycles. Independent read-only declaration audit passes, including clean
   same-boot health and actual imports. Preserve this completed declaration.
-  After the block package build completes, index 0 is explicitly invoked at
-  01:11 UTC; no later window or follower is started. Inspect each complete raw
-  result before the next individual invocation. No pixel result exists yet.
+  The fresh ce80 control train/frozen pair now passes, final exit September 14
+  01:31:16 UTC: 3,840 actions / 610 updates, then 768 frozen actions / zero
+  updates. Full state, all moments, headers, traces and learner reports match
+  the retained ce80 anchor exactly. Independent prefix audit reverifies all
+  89,308 inputs and both raw windows: 1,650 health samples, maximum gap 0.536 s,
+  minimum directly free 3,303 MiB, no fault or unfinished child. Warmed control
+  throughput is 8.5613 actions/s / 0.57075x aggregate real time, not a speedup.
+  No candidate pixel window or follower has started. Inspect each complete raw
+  result before the next individual invocation; full pixel qualification is
+  incomplete. Never rerun these completed control windows.
   The latest block source-only carry is
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
@@ -360,13 +367,20 @@ reliable learning.
   `prepare.py --audit` is reusable. No block GPU declaration, qualification,
   speedup or adoption follows. Dependency pixels still use parent package
   02b600a1, not this block candidate.
-  The unstarted release preparation in
+  The release preparation in
   `runs/block-matmul-native-f32-fixtures-20260914.InVKe1` passes ten cheap CPU
   reader checks after two retained expected-exception fixture corrections.
   It retains all 21 hardware requirements and five scalar CPU oracles, with
-  separately pinned private caches. No writer, compilation or GPU job has
-  started. Run its CPU-only build only while GPU work is stopped; inspect
-  dependency pixel results before any block GPU declaration.
+  separately pinned private caches. Its writer is explicitly invoked at
+  September 14 01:32 UTC, after the complete guarded pixel control pair is
+  inspected and GPU work stops. All six release executables, eighteen command
+  lifecycles and five scalar CPU oracles complete successfully. Independent
+  read-only audit reverifies 112,557 inputs / 47 outputs, including 9,726
+  private-cache pins. All 21 hardware tests are listed, not run. Peak host
+  memory reaches the 2 GiB cap; no extra headroom is claimed. Preserve this
+  completed writer/cache and use only `prepare.py --audit`. No block GPU job,
+  runtime qualification or speedup follows. Dependency pixel indices 2–9 still
+  precede any block GPU declaration; there is no automatic successor.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

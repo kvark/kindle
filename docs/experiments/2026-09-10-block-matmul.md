@@ -369,6 +369,22 @@ The [next release preparation](../../runs/block-matmul-native-f32-fixtures-20260
 passes ten cheap CPU reader checks, retaining the first two expected-exception
 fixture errors and their correction. It prepares six executables, all original
 21 hardware listings and five scalar CPU oracles, with separately pinned private
-caches. The writer has not started; there is no compilation or GPU result.
-Run the CPU-only build only while GPU work is stopped, and require the complete
-dependency pixel gate before a separately declared block GPU comparison.
+caches. The writer is explicitly invoked at **September 14 01:32 UTC**, after
+the guarded dependency pixel control pair passes and is independently inspected.
+GPU work is stopped. All **six release executables**, **eighteen command
+lifecycles** and **five scalar CPU oracles** complete successfully. The separate
+read-only audit reverifies **112,557 inputs / 47 outputs**, including **9,726
+private-cache pins**. All **21 hardware requirements are listed, not run**.
+The source/profile/target and actual compiled-artifact identities pass. Peak
+host memory reaches the 2 GiB cap in the one-core / zero-swap scope; no extra
+headroom is claimed. Preserve this completed writer and both private caches;
+only `prepare.py --audit` is reusable.
+
+The regression, smoke and gemma executables are byte-identical to the completed
+dependency fixtures. That is artifact identity, not a new block GPU result;
+any reuse of their seven hardware results must be explicit in a new declaration
+and retain their complete raw proof. The changed Kindle executable and new
+standalone block oracle still need their own GPU checks. Require the complete
+dependency pixel gate before that separately declared block comparison. This
+CPU preparation creates no GPU job, automatic successor, runtime qualification
+or speedup claim.

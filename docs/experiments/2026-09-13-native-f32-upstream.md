@@ -3,7 +3,8 @@
 Status: **latest-source production diagnostic, nineteen hardware checks and six
 complete-state canaries pass; guarded pixel qualification is in progress**.
 Main remains on ce80e9cd. Completed 1c314 evidence is preserved; no new GPU
-incident, completed pixel result, runtime adoption or learning campaign is added.
+incident, runtime adoption or learning campaign is added. The fresh pixel control
+pair passes; candidate pixel qualification remains incomplete.
 
 ## The pixel launcher stopped before GPU work
 
@@ -211,7 +212,23 @@ same-boot health, with no native phase previously started. Preserve the complete
 declaration and all earlier stopped attempts.
 
 After the separate block package build completes, pixel index 0 is explicitly
-invoked at **01:11 UTC**. It must recheck all prerequisites and complete its
-guarded control window before further work. No later window or follower is
-started. This comparison uses dependency package **02b600a1**, not the block
-candidate's new bfa21957. No pixel result or speedup is claimed yet.
+invoked at **01:11 UTC**. Its fresh ce80 control completes **3,840 actions / 610
+updates** at 01:23:13. After independent raw state/guard inspection, the separately
+invoked frozen restore completes **768 actions / zero updates** at **01:31:16**.
+The full checkpoint, all moments, headers, action/episode/reset traces and
+non-timing learner reports match the retained ce80 pixel anchor exactly.
+
+The independent prefix audit reverifies **all 89,308 inputs and both raw windows**.
+All **1,650 fresh health samples** pass, maximum gap **0.536 s**, minimum directly
+free **3,303 MiB** across the pair and **3,413 MiB** during frozen restore. There
+is no fault or unfinished child. The warmed 1,536-action / 384-update control
+window takes **179.4123 s**: **8.5613 actions/s**, **0.57075x aggregate** and
+**0.09513x per-stream real time**. This is a guarded control measurement, not
+a speedup or comparison against historical unguarded timing.
+
+No candidate pixel window or follower has started. The separate block fixture
+build subsequently completes and is independently audited while GPU work stays
+stopped. This pixel comparison still uses dependency package **02b600a1**, not
+block package bfa21957. Eight windows, the matched AB/BA ratios and override
+checks remain before full pixel qualification. Never rerun the completed control
+pair; the build starts no successor automatically.
