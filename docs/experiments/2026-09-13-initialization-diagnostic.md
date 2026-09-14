@@ -2,6 +2,9 @@
 
 Status: **both production initialization/gradient diagnostics, all 19 hardware
 checks and all six complete-state canaries pass**.
+These are limited historical passes. The later source carry causes a
+[third PMU-halt incident during combined pixel initialization](2026-09-14-pixel-initialization-incident.md);
+GPU work is stopped, and allocation-order restoration alone is insufficient.
 Preserve both earlier device-loss incidents and every stopped queue. No adoption
 or learning continuation is established.
 This continues the [full-log investigation](2026-09-13-gpu-forensics.md), not the

@@ -3,7 +3,10 @@
 For newly declared Kindle native jobs on Linux/NVIDIA. This is containment and
 evidence capture, not hardware recovery or numerical qualification. The
 [September 13 investigation](experiments/2026-09-13-gpu-forensics.md) records
-the actual RTX 5080 failures and failed module-reload recovery.
+the original RTX 5080 failures and failed module-reload recovery. The
+[September 14 incident](experiments/2026-09-14-pixel-initialization-incident.md)
+records another initialization fault despite passing isolated checks. GPU work
+is stopped; the latest candidate and its block carry are quarantined.
 
 ## Capture before recovery
 
@@ -28,6 +31,18 @@ modules, driver metadata and process states. Each probe has a time/output limit;
 `capture_incomplete` events describe missing evidence. Audit checks retained
 bytes, not whether all requested diagnostics succeeded. Do not overwrite or
 rerun a completed capture root.
+
+After inspecting the terminated job, one later **host-only** snapshot into a
+new directory can preserve delayed teardown. In the September 14 incident,
+GSP watchdog reports began after the guard's first snapshot and continued after
+the child exited. Do not use repeated NVML queries to obtain this evidence.
+
+Read terminal guard results and kernel faults before displaying the last health
+row. Retain source-monotonic and journal-receipt timestamps separately: delivery
+can lag the kernel event. A successful NVML request can straddle a fault and
+still return zero activity / no recovery action. Such a row is not evidence of
+current health, GPU idleness or a successful memory gate. The final flushed CPU
+breadcrumb is also not necessarily the operation that originated the fault.
 
 An optional vendor bundle requires an explicit operator decision and root:
 
@@ -68,7 +83,8 @@ environment; it is not permission to wrap an arbitrary Python launcher. The
 [guarded N6 protocol](../runs/native-f32-alias-pixels-20260913.m6kNer/declaration.md)
 binds the specific synchronous ALE adapter, with no GPU worker descendants.
 The earlier dckRs2 declaration stopped before GPU work on an upstream change;
-never restart that attempt.
+the later m6kNer candidate window failed with Xid 62/154. Never restart either
+attempt or treat that example as an authorized continuation.
 Do not wrap a scheduler, Cargo, shell pipeline or controller that spawns GPU
 descendants: the guard owns and stops only its direct child. It is not a
 machine-wide lock; retain serialized GPU scheduling. Existing declared
@@ -103,6 +119,12 @@ the original failing backend, establish root cause or replace the remaining
 hardware/state/pixel/memory gates.
 Before timed adoption, measure guard overhead with a matched healthy control;
 do not treat guarded and historical unguarded timings as an identical benchmark.
+
+The September 14 pixel incident supplies actual containment evidence: detection
+65 ms after journal receipt (313 ms after the kernel source timestamp), direct
+child terminated and reaped with SIGTERM, no unfinished child and no NVML query
+after detection. The driver continued emitting watchdog errors afterward.
+Containment succeeded; wedge prevention and hardware recovery did not follow.
 
 ## Recovery boundary
 

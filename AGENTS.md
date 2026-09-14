@@ -17,6 +17,36 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 14 safety stop supersedes older pending-stage instructions: the
+  first candidate pixel window in `runs/native-f32-alias-pixels-20260913.m6kNer`
+  faults at 01:49:19 UTC with the same Xid 62 payload as both September 13
+  incidents, followed by PMU halt / Xid 154 Reset Required. The guard stops and
+  reaps its direct child (-15); no training, checkpoint or later phase follows.
+  This is a driver fault during initialization, not a gradient mismatch or a
+  memory-reserve refusal. Quarantine 0a98775 / native 02b600a1 and its block carry
+  from new GPU work. Allocation-order restoration alone is not sufficient.
+  Preserve the valid component/state/control passes and this failed window;
+  never restart m6kNer or declare the prepared LK2cCI block helper. Main remains
+  ce80, all throughput/adoption gates and the Pong hold remain unchanged.
+  The guard's automatic snapshot and the later host-only capture in
+  `runs/native-f32-pixel-incident-20260914.4ZQG26` preserve the new fault. No
+  further NVML query, host recovery or GPU follow-up is authorized. Do not
+  reset/reload/reboot/power-cycle without user approval. See
+  `docs/experiments/2026-09-14-pixel-initialization-incident.md`.
+  The independent CPU reader reverifies 89,308 inputs, both complete control
+  windows, 86 terminal command records, 224 direct evidence pins and 46,520
+  kernel records. All 20,570 observed world allocation/zeroing events match
+  three passing standalone canary prefixes. Eighteen incident/clock fixtures
+  pass. Preserve the completed readers; only `--audit` modes are reusable.
+  The separate clock reader corrects the first result's `pre_fault_health`
+  label: those rows precede journal receipt, not necessarily the hardware fault.
+  Source-to-journal delay is 247 ms; detection follows receipt by 65 ms. The last
+  NVML call straddles the source event, and the final zeroing breadcrumb follows
+  it. No NVML query follows detection. Do not infer fault origin from either
+  stale health or the last CPU operation. Exact two-session allocation inputs
+  and a local vendor brief are prepared, not a GPU reproducer or external report.
+  After recovery, narrow the next diagnostic to combined frontend/world
+  initialization with matched observability; do not retry the quarantined bundle.
 - September 13 user priority: qualify throughput before unstarted Pong work.
   This supersedes older future queue-order instructions below, not historical
   inputs or results. Freeway is complete; Pong root 1009 had already started.
@@ -328,9 +358,9 @@ reliable learning.
   89,308 inputs and both raw windows: 1,650 health samples, maximum gap 0.536 s,
   minimum directly free 3,303 MiB, no fault or unfinished child. Warmed control
   throughput is 8.5613 actions/s / 0.57075x aggregate real time, not a speedup.
-  No candidate pixel window or follower has started. Inspect each complete raw
-  result before the next individual invocation; full pixel qualification is
-  incomplete. Never rerun these completed control windows.
+  The first candidate pixel window subsequently faults during initialization;
+  see the September 14 safety stop above. Full pixel qualification fails. Never
+  rerun either these completed control windows or the failed candidate window.
   The latest block source-only carry is
   `exp/block-matmul-native-f32-alias-20260913` at c5a288e, on 7728d8d / 0a98775 /
   f6f2729e. Only instructions and the exact old networks.rs blob b336837f change;
@@ -379,8 +409,8 @@ reliable learning.
   private-cache pins. All 21 hardware tests are listed, not run. Peak host
   memory reaches the 2 GiB cap; no extra headroom is claimed. Preserve this
   completed writer/cache and use only `prepare.py --audit`. No block GPU job,
-  runtime qualification or speedup follows. Dependency pixel indices 2–9 still
-  precede any block GPU declaration; there is no automatic successor.
+  runtime qualification or speedup follows. The subsequent dependency pixel
+  failure blocks any block GPU declaration; there is no automatic successor.
   The separate block source carry `exp/block-matmul-alias-20260913` at f2e20af
   has exactly the old 20b9b8a networks.rs on d62d356/1c314b14/f6f2729e; only
   that file and its worktree instructions differ. Formatting/source checks

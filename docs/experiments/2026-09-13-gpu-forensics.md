@@ -1,13 +1,17 @@
 # RTX 5080 device-loss investigation and containment
 
-Status: **two matching PMU-halt incidents; a later external reboot restores
-observable health**. The failing 75dfe901 backend remains quarantined. The
+Status: **three matching PMU-halt incidents; the GPU is faulted again**. This
+report preserves the original September 13 investigation. The [September 14
+combined-pixel incident](2026-09-14-pixel-initialization-incident.md) adds the
+third fault after recovery and passing isolated checks. Both the original
+75dfe901 and the changed 0a98775 candidate are quarantined from new GPU work. The
 [initialization follow-up](2026-09-13-initialization-diagnostic.md) records the
 17:21 boot and passing guarded production control and allocation-order candidate.
 The candidate result narrows the investigation without establishing root cause
 or full runtime qualification. The [latest-source follow-up](2026-09-13-native-f32-upstream.md)
 tracks the subsequent upstream carry and separately guarded qualification;
-it does not retry the known-failing initialization schedule.
+its combined-pixel failure shows that allocation-order restoration alone was
+not sufficient. Do not continue its stopped qualification or the block carry.
 No reset, driver change or host recovery was performed by the agent.
 Pong's completed pair and the remaining-root hold are unchanged.
 

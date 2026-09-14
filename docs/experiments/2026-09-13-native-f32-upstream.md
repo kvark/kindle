@@ -1,10 +1,11 @@
 # Latest upstream after the guarded allocation-order checks
 
-Status: **latest-source production diagnostic, nineteen hardware checks and six
-complete-state canaries pass; guarded pixel qualification is in progress**.
-Main remains on ce80e9cd. Completed 1c314 evidence is preserved; no new GPU
-incident, runtime adoption or learning campaign is added. The fresh pixel control
-pair passes; candidate pixel qualification remains incomplete.
+Status: **candidate pixel initialization causes another GPU fault at September 14
+01:49:19 UTC; qualification is stopped**. The preceding production diagnostic,
+nineteen hardware checks, six complete-state canaries and fresh pixel control
+pair remain valid limited passes. They do not qualify the failing combined
+runtime. Main remains ce80e9cd; 0a98775 / native 02b600a1 and its block carry are
+quarantined from new GPU work. See the [new incident report](2026-09-14-pixel-initialization-incident.md).
 
 ## The pixel launcher stopped before GPU work
 
@@ -226,9 +227,13 @@ window takes **179.4123 s**: **8.5613 actions/s**, **0.57075x aggregate** and
 **0.09513x per-stream real time**. This is a guarded control measurement, not
 a speedup or comparison against historical unguarded timing.
 
-No candidate pixel window or follower has started. The separate block fixture
-build subsequently completes and is independently audited while GPU work stays
-stopped. This pixel comparison still uses dependency package **02b600a1**, not
-block package bfa21957. Eight windows, the matched AB/BA ratios and override
-checks remain before full pixel qualification. Never rerun the completed control
-pair; the build starts no successor automatically.
+The separate block fixture build subsequently completes and is independently
+audited with GPU work stopped. The individually invoked candidate pixel index 2
+then fails during initialization, before training: Xid 62/154 at **September 14
+01:49:19 UTC**, with the same payload as both earlier crashes. The guard terminates
+and reaps its direct child (-15), captures evidence and exits 1. No candidate
+checkpoint, completed phase result or later window exists. This uses dependency
+package **02b600a1**, not block package bfa21957. Preserve the entire failed
+comparison; never restart it. The [incident report](2026-09-14-pixel-initialization-incident.md)
+records the partial initialization trace, containment and remaining uncertainty.
+No AB/BA speedup, full runtime qualification, adoption or learning follows.

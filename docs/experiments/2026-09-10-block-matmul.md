@@ -319,11 +319,11 @@ Python and learning settings remain exactly matched to the dependency candidate.
 
 Source equality and formatting pass; the branch is clean and pushed. The CPU
 qualification and package below are complete; **no block GPU declaration or
-speedup exists**. The dependency's new production diagnostic, all nineteen
-hardware checks and six complete-state canaries pass; its remaining pixel gates
-still precede a separately declared
-same-backend block comparison. No main adoption, old-queue restart or new
-learning campaign follows.
+speedup exists**. The dependency's production/component/state checks pass, but
+its [combined pixel initialization subsequently faults](2026-09-14-pixel-initialization-incident.md).
+This carry is therefore quarantined from new GPU work as well. Preserve its CPU
+artifacts, but do not declare a block comparison on this failed dependency.
+No main adoption, old-queue restart or learning campaign follows.
 
 The [new CPU preparation](../../runs/block-matmul-native-f32-cpu-20260913.WmUOos/declaration.md)
 passes six cheap source/command checks; its first listing-suffix assertion error
@@ -388,3 +388,10 @@ standalone block oracle still need their own GPU checks. Require the complete
 dependency pixel gate before that separately declared block comparison. This
 CPU preparation creates no GPU job, automatic successor, runtime qualification
 or speedup claim.
+
+The subsequently prepared helper in
+`runs/block-matmul-native-f32-hardware-20260914.LK2cCI` passes thirty standalone
+CPU checks. It explicitly binds the seven byte-identical backend results while
+retaining all 21 requirements and fourteen new checks. It has **no GPU declaration
+or execution**. The parent pixel failure leaves its full-dependency prerequisite
+unsatisfied; preserve this preparation without invoking its declaration writer.

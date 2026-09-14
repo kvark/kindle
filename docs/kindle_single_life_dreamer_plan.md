@@ -58,9 +58,11 @@ passes exact episode stopping and completes both failed paired pilots. The
 Freeway and Pong root 1009, then stopped at the requested no-launch boundary
 before root 2017. Preserve that terminal queue. The subsequent
 [latest-backend hardware attempt](experiments/2026-09-13-gpu-device-loss.md)
-lost the GPU twice. A later external reboot restores observable health;
-the [initialization diagnostic](experiments/2026-09-13-initialization-diagnostic.md)
-keeps the failing candidate quarantined and training held.
+lost the GPU twice. After external recovery and passing component/state checks,
+the changed candidate causes a [third matching GPU fault during combined pixel
+initialization](experiments/2026-09-14-pixel-initialization-incident.md). GPU work
+is stopped; the guard contained its process but did not recover the driver.
+Training remains held pending user-approved recovery and a new, narrower diagnostic.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -212,6 +214,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> full hardware qualification [all 19 guarded checks pass]
   -> full state/pixel/memory qualification [six exact canaries pass; pixel preflight stops on new upstream]
   -> latest upstream 428fc2d carry [CPU checks pass; cooperative policy unchanged]
+  -> latest-source hardware/state [19 checks + six exact canaries pass]
+  -> N6 pixels [fresh control passes; candidate initialization faults; all GPU work stopped]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -253,12 +257,17 @@ fresh 02b600a1 package's 547 Python checks pass. Its new production diagnostic
 also passes all losses/gradients and complete initialization with clean guarded
 health; all nineteen source-matched hardware checks and six full-state canaries
 now pass, including causal LeVJEPA/batched-stream parity, every optimizer moment
-and exact control anchors, with no new fault. N6 pixel/restore/combined-memory
-and matched throughput qualification remain ahead of adoption. The
-[incident guard and runbook](gpu_incident_response.md) now have actual unhealthy
-refusal and healthy CPU-sentinel evidence; they cannot prevent the first wedge.
-Preserve both failures and distinguish historical raw-data audits, current-boot
-health and actual runtime qualification. Do not blindly rerun the bad candidate.
+and exact control anchors. The fresh guarded ce80 pixel control also passes,
+but the candidate's first combined pixel window causes the same PMU-halt fault
+before training. Allocation-order restoration alone is therefore insufficient;
+the latest candidate and its block carry are quarantined. The
+[new incident report](experiments/2026-09-14-pixel-initialization-incident.md)
+narrowly locates the observed phase in world-session initialization after
+LeVJEPA is resident, without identifying the originating fault. The
+[guard and runbook](gpu_incident_response.md) now have real fault-containment
+evidence; they cannot prevent or recover a wedge. Preserve all three incidents.
+No retry or GPU follow-up exists. User-approved recovery, a separately declared
+narrow diagnostic and all full pixel/memory/timing gates precede adoption.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
