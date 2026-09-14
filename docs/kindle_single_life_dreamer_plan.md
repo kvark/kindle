@@ -268,6 +268,8 @@ LeVJEPA is resident, without identifying the originating fault. The
 evidence; they cannot prevent or recover a wedge. Preserve all three incidents.
 No retry or GPU follow-up exists. User-approved recovery, a separately declared
 narrow diagnostic and all full pixel/memory/timing gates precede adoption.
+An isolated [Vulkan allocation-observability component](experiments/2026-09-14-vulkan-allocation-observability.md)
+is CPU-compiled and tested; it is not a GPU-tested fix or a new Kindle package.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and

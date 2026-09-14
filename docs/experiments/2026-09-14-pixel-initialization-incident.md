@@ -140,6 +140,9 @@ Compare one explicit schedule hypothesis against a qualified control; restoring
 the old immediate create-and-zero schedule is an available hypothesis, not an
 established fix. Do not change driver, precision, batch size and initialization
 policy together. A local vendor-report brief is prepared; nothing is uploaded.
+The [Blade allocation-observability component](2026-09-14-vulkan-allocation-observability.md)
+is now CPU-compiled and tested in isolation. It does not yet supply a matched
+Kindle fixture, constant-upload trace or GPU result, and changes no failed input.
 
 **No further GPU stage is declared.** The CPU-only block helper LK2cCI is stopped
 on its failed dependency prerequisite. No backend adoption, throughput gain or

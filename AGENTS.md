@@ -47,6 +47,14 @@ reliable learning.
   and a local vendor brief are prepared, not a GPU reproducer or external report.
   After recovery, narrow the next diagnostic to combined frontend/world
   initialization with matched observability; do not retry the quarantined bundle.
+  The separate Blade observability branch `exp/vulkan-allocation-observe-20260914`
+  at 4d8c8bc passes thirteen CPU library tests, formatting and release Clippy in
+  `runs/vulkan-allocation-observability-20260914.Hx1FRJ`. Its seven commands,
+  191 inputs and 21 outputs re-audit after commit. It adds flushed allocator/
+  buffer/bind and cached memory-placement records, not a GPU query, allocation
+  policy change, Kindle package or hardware result. Preserve the completed
+  writer and private target; `prepare_cpu.py --audit` is read-only. No GPU job
+  or automatic successor exists. See the allocation-observability report.
 - September 13 user priority: qualify throughput before unstarted Pong work.
   This supersedes older future queue-order instructions below, not historical
   inputs or results. Freeway is complete; Pong root 1009 had already started.
