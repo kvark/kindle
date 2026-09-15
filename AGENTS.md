@@ -51,6 +51,13 @@ reliable learning.
   A local vendor brief is prepared, not submitted. See
   `docs/experiments/2026-09-15-interleaved-initialization-incident.md`.
   Main stays ce80 and all throughput/adoption gates and the Pong hold remain.
+  Host-only package readiness in D1mHzm preserves thirteen captured commands:
+  595.71.05 is unavailable in the current cache; 590 redirects to 595. Simulated
+  580-server-open and 610-open plans each replace fifteen packages with sixteen.
+  Neither is a fix or an authorized installation. Preserve the original unsealed
+  reader failure; separate check_capture.py --audit verifies 45 later pins and
+  eight CPU fixtures, not the missing original dpkg/input hashes. Driver choice,
+  recovery and any new GPU declaration still require operator approval.
 - September 15 current-upstream initialization hypothesis is separate from the
   completed historical control and quarantined candidate. Fresh host-only capture
   in runs/initialization-hypothesis-cpu-20260915.twWdPt observes the same efe90b23

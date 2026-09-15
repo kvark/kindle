@@ -166,3 +166,53 @@ The agent has not reset/reloaded/rebooted, changed drivers, run a vendor ioctl
 collector or sent an external report. Recovery requires renewed user approval.
 Even recovered health will not release the quarantines, full qualification
 requirements or Pong hold. The five-game goal remains incomplete.
+
+## Host-only driver comparison readiness
+
+The [D1mHzm capture](../../runs/driver-comparison-readiness-20260915.D1mHzm/declaration.md)
+examines installed packages and cached APT metadata, then runs three explicit
+`apt-get --simulate` commands. It does not update package lists, download or
+install packages, build DKMS modules, query the GPU or perform recovery.
+
+The installed stack remains **595-server-open 595.91.07**, with DKMS installed
+for kernels 7.0.0-30 and the running 7.0.0-31. The updates/security index files
+are dated September 15. Those are cached observations, not a fresh repository
+or compatibility guarantee.
+
+| Possible comparison | Captured package result | Limitation |
+| --- | --- | --- |
+| Previously used 595.71.05 | Not available; exact-version simulation exits 100 | The older available 595.58.03 is not the previously used version |
+| Package named 590-open | Transitional dependency on 595-open | Not an actual rollback to 590 |
+| 580-server-open 580.178.04 | Solver exits zero; 15 removals, 16 installs; metadata labels LTSB | Retains server/open variant, but changes driver branch; untested here |
+| 610-open 610.57.04 | Solver exits zero; 15 removals, 16 installs; metadata labels NFB | Changes branch and package track; untested here |
+
+Both alternatives' metadata include device 2C02, and cached precompiled-module
+packages are listed for kernel 7.0.0-31. The simulated plans choose DKMS; no
+alternative module has been built, loaded or validated. NVIDIA's
+[580 supported-device list](https://download.nvidia.com/XFree86/Linux-x86_64/580.178.04/README/supportedchips.html)
+also includes the RTX 5080. Device listing and a successful dependency solver
+do not establish Vulkan compatibility or a fix for this Xid 62. There is no
+NVIDIA package in the captured top-level completed APT archive inventory; the
+protected partial directory was not inspected. No exact rollback package is
+prepared. Do not apply either simulation without an operator decision and a
+reviewed recovery/rollback procedure.
+
+Preserve the original capture's failure: all thirteen commands finish, then its
+reader treats the inline kernel receipt as a filename and raises an unhandled
+TypeError. Its result/manifest and original input/dpkg-before-and-after hashes
+were never saved. The six original tests did not cover this receipt form.
+The [separate completion](../../runs/driver-comparison-readiness-20260915.D1mHzm/completion/result.json)
+passes eight reader tests and independently verifies all command lifecycles and
+45 **later-created** input pins. It does not rerun the capture, repair its absent
+result, or claim the missing original digest check passed. Only this reader is
+reusable:
+
+```bash
+python3 -B runs/driver-comparison-readiness-20260915.D1mHzm/check_capture.py --audit
+```
+
+The concrete pending choice is a controlled driver comparison (580 retains the
+current server/open variant; 610 changes the track too), or vendor review first.
+This package inspection supplies no driver recommendation proven to fix the
+fault, no GPU health result and no authority to change the host. The same-binary,
+new driver-bound declaration and all qualification gates above remain required.
