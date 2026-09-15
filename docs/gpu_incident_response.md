@@ -151,3 +151,12 @@ not runtime qualification. Keep the original failing candidate quarantined;
 test changes only through separately declared guarded diagnostics. Inspect
 each result before continuing, and do not resume old queues or training
 automatically.
+
+The [September 15 recovery and combined initialization control](experiments/2026-09-15-recovery-and-initialization-control.md)
+now verify a new boot and one guarded control execution without a fault. Its
+first report reader rejects two JSON presentations of the same F32 config;
+an independent exact CPU reader resolves that mismatch using the retained raw
+output. The GPU test is not rerun. Distinguish a post-execution reader failure
+from native device loss, and preserve both the original failure and correction.
+The failed candidate remains quarantined; this control does not establish its
+safety, a driver fix or readiness to resume training.

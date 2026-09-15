@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-14. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-15. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -62,7 +62,11 @@ lost the GPU twice. After external recovery and passing component/state checks,
 the changed candidate causes a [third matching GPU fault during combined pixel
 initialization](experiments/2026-09-14-pixel-initialization-incident.md). GPU work
 is stopped; the guard contained its process but did not recover the driver.
-Training remains held pending user-approved recovery and a new, narrower diagnostic.
+September 15 checks after the user's reboot verify observable health. A separately guarded
+initialization-only control now passes in the combined frontend/world context;
+the failed candidate remains quarantined. Training stays held for candidate
+diagnosis and the unchanged qualification/throughput gates. See the
+[recovery and control preparation](experiments/2026-09-15-recovery-and-initialization-control.md).
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -216,6 +220,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> latest upstream 428fc2d carry [CPU checks pass; cooperative policy unchanged]
   -> latest-source hardware/state [19 checks + six exact canaries pass]
   -> N6 pixels [fresh control passes; candidate initialization faults; all GPU work stopped]
+  -> September 15 recovery check [new boot and guarded combined-initialization control pass]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -266,8 +271,9 @@ narrowly locates the observed phase in world-session initialization after
 LeVJEPA is resident, without identifying the originating fault. The
 [guard and runbook](gpu_incident_response.md) now have real fault-containment
 evidence; they cannot prevent or recover a wedge. Preserve all three incidents.
-No retry or GPU follow-up exists. User-approved recovery, a separately declared
-narrow diagnostic and all full pixel/memory/timing gates precede adoption.
+September 15 recovery checks and the new guarded combined-initialization control
+pass. No candidate retry or automatic successor is declared. A distinct reviewed
+candidate hypothesis and all full pixel/memory/timing gates still precede adoption.
 An isolated [Vulkan allocation-observability component](experiments/2026-09-14-vulkan-allocation-observability.md)
 is CPU-compiled and tested; it is not a GPU-tested fix or a new Kindle package.
 Keep each pinned native/Python package together; main's dependency update does
@@ -380,25 +386,28 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins qualified upstream `ce80e9cd`. The latest **September 13** runtime
-candidate is [`75dfe901`](experiments/2026-09-13-meganeura-conv.md), retaining
-shared git Blade `f6f2729e` and the earlier calibrated-timing fixes. It additionally
-changes opt-in convolution tuning; LeVJEPA uses patch matmuls and Kindle leaves
-autotuning off, so no automatic gain is expected. Its isolated native `fa6bdd2a`
-passes 95 Kindle, 122 backend/Blade and 547 Python CPU tests with verified
-source/wheel/import identity. The superseded 45991 hardware follower was retired
-while idle; its inputs and terminal record remain intact. The separately declared
-new hardware follower waits for the complete active pair and verified hold. A
-separate [full-state/pixel continuation](experiments/2026-09-13-meganeura-runtime.md)
-waits after that hardware stage; its 55 CPU checks, raw control recheck and live
-handoff audit pass. Full gradient/cache checks, update-1/eight-update state,
-pixel/restore traces, direct memory and AB/BA timing remain unrun. These stages
-start no further learning or adoption automatically. No GPU result or speedup
-is claimed.
-Keep this dependency comparison separate from block-matmul and other optimizations.
-Recheck upstream before new backend diagnosis; carry older candidates forward
-before testing them as current code. Active learning inputs stay pinned; the
-user-authorized throughput priority holds only unstarted work.
+Main pins qualified upstream `ce80e9cd`. September 15 upstream reads find
+Meganeura **4f8c7689** and Blade **6ab5fcec**. Meganeura's runtime and Cargo files
+are unchanged from 428fc2d; the intervening commits concern documentation and
+paper artifacts. Blade adds shader-validation capabilities, not an observed
+initialization fix. Retain those real updates in a separately identified
+candidate; do not silently change the historical control.
+
+The [75dfe901 attempt](experiments/2026-09-13-meganeura-conv.md) and subsequent
+0a98775/native 02b600a1 combined-pixel attempt are stopped and unqualified.
+Their followers are terminal, not waiting. Preserve their valid component/state
+results and all three faults; neither allocation-order restoration nor passing
+standalone tests establishes combined-runtime safety. The new preparation
+targets only the known-good control's combined frontend/first-world initialization
+with allocation-placement and constant-upload traces. Its separately guarded
+native invocation now passes both complete plans and traces, with at least
+4,977 MiB directly free and zero actions/updates. The original controller's
+F32-JSON presentation failure is preserved; a separate exact read-only audit
+verifies the result. There is no candidate launch or automatic successor.
+
+Recheck upstream before new backend diagnosis. Keep dependency qualification
+separate from same-backend block-matmul correctness and throughput. Both remain
+ahead of newly declared Pong roots; existing packages, seeds and gates stay pinned.
 The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
 frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)

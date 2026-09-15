@@ -17,6 +17,47 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 15 recovery verification observes external boot efe90b23 (journal
+  begins September 14 at 14:07:36 UTC), with matching
+  595.91.07, clean current-boot kernel evidence, recovery None and 15,841 MiB
+  directly free. The agent performs no host recovery. This restores observable
+  health, not qualification, and does not lift the failed-bundle quarantine or
+  Pong hold. Fresh upstream reads find Meganeura 4f8c7689 (runtime unchanged from
+  428fc2d) and Blade 6ab5fcec (real shader-validation additions, no observed
+  initialization fix). Retain the latter in a future candidate, not the control.
+  The source-matched initialization-only control is Kindle ae7699ad / Meganeura
+  9b9e7ee7 / Blade c96a9a87: ce80 and published Blade 0.9.0 with observability,
+  original allocation/immediate-zero ordering and checked waits. The completed
+  CPU build in runs/combined-init-pinned-cpu-20260915.7cVANq passes 83 Kindle,
+  twelve Blade and nine backend CPU tests, formatting and release Clippy; all
+  23 Kindle GPU tests stay ignored. Its sixteen commands, 754 inputs and 100
+  artifact pins reverify. Preserve the earlier all-platform metadata stop and
+  path-override identity-test failure; neither writer may be rerun. The separate
+  kePI62 CPU reader review passes eighteen fixtures, cached-source equality
+  including all 67 WGSL files, complete pixel config and six source depfiles.
+  Only completed --audit readers are reusable. The separately declared
+  runs/combined-init-control-20260915.2bZO4V binds one direct guarded control-only
+  invocation, with ten passing launcher CPU tests and fresh host/upstream checks.
+  It loads N6 LeVJEPA and only the first production world session; no acting,
+  D3 initialization, update, checkpoint, later GPU session or automatic successor.
+  Require exact two-session plans, original interleaved zeroing, complete traced
+  allocations/binds/uploads/waits, actual device and >=2 GiB directly free.
+  Its sole native invocation now completes at 05:42 UTC, exit zero; the guard
+  passes and reaps PID 20382. Both exact plans, 632/9,439 physical slots, 10,081
+  buffer/allocation pairs, 14,645 constant-upload pairs and 143,121 trace records
+  verify. All 210 fresh health samples pass, max gap 0.5134 s, minimum directly
+  free 4,977 MiB; there are zero actions/updates and no unfinished child or fault.
+  Preserve the original controller's post-native `wrong fixture inputs` failure:
+  typed F32 configuration widened through serde_json::Value has a different JSON
+  presentation from checkpoint decimals. The separate P7XIB3 CPU reader passes
+  eight tests and canonicalizes only expected F32 values; it still rejects a
+  one-F64-ULP change, with all other exact gates unchanged. Use its
+  audit_control.py --audit for the complete raw result; never rerun 2bZO4V or
+  overwrite its absent top-level result. This is the matched initialization
+  control, not a latest-backend fix or full qualification. A distinct reviewed
+  candidate hypothesis is required before any further GPU work. No retry, training,
+  backend adoption, speedup or host recovery follows. See
+  docs/experiments/2026-09-15-recovery-and-initialization-control.md.
 - September 14 safety stop supersedes older pending-stage instructions: the
   first candidate pixel window in `runs/native-f32-alias-pixels-20260913.m6kNer`
   faults at 01:49:19 UTC with the same Xid 62 payload as both September 13
