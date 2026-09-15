@@ -1,19 +1,25 @@
 # Kindle working direction
 
-September 15 versioned CPU continuation supersedes historical stages below.
-The path-override attempt is preserved with its real dependency-identity failure.
-This continuation pins instrumented-control Meganeura 9b9e7ee7 and shared Blade
-c96a9a87 directly; both dependency locks and reported identity must agree. There
-is no identity-test skip or historical-source fallback. The initialization-only
-fixture and all production math/initialization remain byte-identical.
-Prepare only the combined LeVJEPA/first-world initialization control fixture.
-No acting, training, restore or GPU execution is declared by this branch.
-The ce80/Blade 0.9 control uses matched diagnostic breadcrumbs; its production
-initialization/zeroing and learning settings stay unchanged. A future direct
-GPU invocation needs a fresh declaration, exact dependencies/artifacts/weights,
-current upstream/host checks, actual-device gates and the existing direct-child
-guard. Keep 0a98775/native 02b600a1 and its block carry quarantined. Never restart
-m6kNer, old completed writers or the held queue. No host recovery without approval.
+September 15 interleaved initialization hypothesis supersedes historical stages.
+The completed historical control is ae7699ad / 9b9e7ee7 / c96a9a87, with its
+original reader failure and separate successful P7XIB3 interpretation preserved.
+This distinct candidate pins current Meganeura 09f7c410 plus immediate alias-order
+create/Shared-zero sequencing and matched observations as 7db0d05; shared Blade
+100bb813 carries the same allocation observations onto current 6ab5fcec. Retain
+latest upstream fixes, default cooperative settings, full graphs and all learning
+math. The ignored initialization-only fixture stays byte-identical to control.
+Both Git dependency locks and reported identity must agree; no path override.
+
+Prepare only CPU checks and the source-matched combined LeVJEPA/first-world
+fixture. No acting, training, restore, wheel or GPU execution is declared by this
+branch. A future direct native invocation requires a separate one-job declaration,
+matched observability, exact dependencies/artifacts/weights, fresh upstream/host
+checks, actual-device gates and direct-child guard. This is an initialization
+hypothesis, not a proven fault cause, runtime qualification, speedup or adoption.
+Keep 0a98775/native 02b600a1 and its block carry quarantined; never restart m6kNer,
+completed/failed writers or the held Pong queue. No automatic successor. Full
+dependency and same-backend block gates still precede unstarted Pong. No host
+recovery without approval. Main remains ce80.
 
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner

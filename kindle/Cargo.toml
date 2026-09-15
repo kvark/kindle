@@ -10,9 +10,9 @@ license = "MIT"
 
 [dependencies]
 # Upstream includes LeVJEPA frame-prefix attention and cache-write aliases.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "9b9e7ee7ebdb27764a16f87860e4e227a93387cc" }
-# Match the instrumented published-control dependency in Meganeura exactly.
-blade-graphics = { git = "https://github.com/kvark/blade", rev = "c96a9a87ad47d525467f9b41c17ce480ff876240" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "7db0d05c2b9838a546f60aa2ef9b1f1a5b68438f" }
+# Match the instrumented upstream candidate dependency in Meganeura exactly.
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "100bb813d8b66b120e9a28e2c533227d0db64cd0" }
 rand = "0.9"
 rayon = "1.12"
 serde = { version = "1", features = ["derive"] }
