@@ -45,34 +45,20 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
 | Qbert | Seed-0 final policy completes the first pyramid in 17/24 natural episodes, mean 3,754.17; untrained control 0/24, mean 125.00 | Both competence gates fail. Completed replay finds early misses and little post-bonus progress; prefer a separately declared bounded experience-budget comparison, not fresh-seed replication of this failed recipe. |
 
-The [September 11 host-driver incident](experiments/2026-09-11-host-driver-incident.md)
-stopped the runtime handoff: an unattended NVIDIA update left new user-space
-libraries mismatched with the loaded kernel driver. Breakout finished training
-on its original mappings, then the device guard failed before evaluation.
-The trainer, logger and serial follower have exited. Preserve completed work
-and the failure. The host now reports matching driver/library 595.91.07, and
-[runtime requalification](experiments/2026-09-11-meganeura-runtime.md) passes.
-The separately declared [continuation](experiments/2026-09-11-atari-continuation.md)
-passes exact episode stopping and completes both failed paired pilots. The
-[serial follower](experiments/2026-09-11-recovered-confirmations.md) completed
-Freeway and Pong root 1009, then stopped at the requested no-launch boundary
-before root 2017. Preserve that terminal queue. The subsequent
-[latest-backend hardware attempt](experiments/2026-09-13-gpu-device-loss.md)
-lost the GPU twice. After external recovery and passing component/state checks,
-the changed candidate causes a [third matching GPU fault during combined pixel
-initialization](experiments/2026-09-14-pixel-initialization-incident.md). GPU work
-is stopped; the guard contained its process but did not recover the driver.
-September 15 checks after the user's reboot verify observable health. A separately guarded
-initialization-only control now passes in the combined frontend/world context;
-the failed candidate remains quarantined. Training stays held for candidate
-diagnosis and the unchanged qualification/throughput gates. See the
-[recovery and control preparation](experiments/2026-09-15-recovery-and-initialization-control.md).
-The next [isolated initialization hypothesis](experiments/2026-09-15-interleaved-initialization.md)
-retains current upstream fixes and restores immediate Shared zeroing after each
-alias-order allocation. CPU validation and the guarded combined initialization
-diagnostic pass without a fault, retaining 4,973 MiB directly free. Full hardware,
-state/pixel and matched throughput qualification still precede learning; this is
-not a proven fault cause or permission to resume the held queue.
+The recovered-driver [continuation](experiments/2026-09-11-atari-continuation.md)
+completed both paired pilots; the [serial queue](experiments/2026-09-11-recovered-confirmations.md)
+then completed Freeway and Pong root 1009 and stopped before root 2017 as requested.
+Never restart that terminal queue or remove its hold.
+
+**GPU work is stopped again.** The latest guarded initialization attempt produces
+a [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md),
+despite a passing historical control and an earlier interleaved-initialization
+candidate. It includes upstream 5a570099/6ab5fcec. Complete CPU event prefixes and
+recorded resident-buffer placements match the passing runs; initialization-order
+restoration is not a sufficient fix. The guard contains its child but cannot
+recover the driver. All affected candidates remain quarantined, main stays ce80,
+and no training follows. Operator-approved driver/runtime investigation and
+recovery now precede further qualification; another blind retry is not the plan.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -214,19 +200,9 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [complete; paired gate passes]
-  -> latest Meganeura/Blade qualification [75dfe901 hardware stopped: GPU device loss]
-  -> external host reboot [observed; health restored, not runtime qualification]
-  -> post-reboot world-gradient diagnostic [control passes; candidate initialization loses GPU]
-  -> normal module reload [user performed; GSP initialization fails, GPU unavailable]
-  -> external host reboot [17:21; observable health restored]
-  -> guarded initialization control [production gradients and complete traces pass]
-  -> allocation-order hypothesis [guarded production gradients and complete traces pass]
-  -> full hardware qualification [all 19 guarded checks pass]
-  -> full state/pixel/memory qualification [six exact canaries pass; pixel preflight stops on new upstream]
-  -> latest upstream 428fc2d carry [CPU checks pass; cooperative policy unchanged]
-  -> latest-source hardware/state [19 checks + six exact canaries pass]
-  -> N6 pixels [fresh control passes; candidate initialization faults; all GPU work stopped]
-  -> September 15 recovery check [new boot and guarded combined-initialization control pass]
+  -> latest Meganeura/Blade qualification [blocked by repeated initialization PMU halts]
+  -> operator-approved recovery and driver/runtime investigation [no GPU job declared]
+  -> separately qualified dependency hardware/state/pixels/memory/timing [still required]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -245,43 +221,18 @@ The tested boundary hold prevents the old launcher from starting root 2017
 after root 1009's complete paired protocol, without changing its active inputs.
 The old idle Breakout follower is retired. Preserve both original declarations
 and their terminal records; re-declare the remaining work, never restart them.
-After an external reboot, the [bounded production-gradient diagnostic](experiments/2026-09-13-world-gradient-recovery.md)
-passes on the qualified control but reproduces device loss during the latest
-candidate's session initialization, before training. The
-[full-log investigation](experiments/2026-09-13-gpu-forensics.md) finds identical
-PMU-halt signatures and failed GSP initialization after the user's module reload.
-The external 17:21 reboot restores observable health; the candidate stays
-quarantined. The [initialization follow-up](experiments/2026-09-13-initialization-diagnostic.md)
-CPU-qualifies matched flushed breadcrumbs and fail-fast initialization waits.
-Its guarded **control-only** production test passes all gradients and both
-complete initialization traces, retaining at least 6,545 MiB directly free.
-The separate allocation-order candidate also passes, with exact control plans,
-all production gradients, clean health and at least 6,545 MiB directly free.
-All 19 required hardware checks and six complete-state canaries now pass,
-including LeVJEPA streaming/cache parity, every saved weight/moment and archived
-control anchors, with clean kernel evidence. This narrows the investigation
-without proving root cause. The ten-window pixel declaration stops before GPU
-work when upstream advances again. The [latest-source carry](experiments/2026-09-13-native-f32-upstream.md)
-includes the new cooperative-policy API without enabling it and retains the
-guarded initialization changes; its 95 Kindle/ten backend CPU checks and the
-fresh 02b600a1 package's 547 Python checks pass. Its new production diagnostic
-also passes all losses/gradients and complete initialization with clean guarded
-health; all nineteen source-matched hardware checks and six full-state canaries
-now pass, including causal LeVJEPA/batched-stream parity, every optimizer moment
-and exact control anchors. The fresh guarded ce80 pixel control also passes,
-but the candidate's first combined pixel window causes the same PMU-halt fault
-before training. Allocation-order restoration alone is therefore insufficient;
-the latest candidate and its block carry are quarantined. The
-[new incident report](experiments/2026-09-14-pixel-initialization-incident.md)
-narrowly locates the observed phase in world-session initialization after
-LeVJEPA is resident, without identifying the originating fault. The
-[guard and runbook](gpu_incident_response.md) now have real fault-containment
-evidence; they cannot prevent or recover a wedge. Preserve all three incidents.
-September 15 recovery checks and the new guarded combined-initialization control
-pass. No candidate retry or automatic successor is declared. A distinct reviewed
-candidate hypothesis and all full pixel/memory/timing gates still precede adoption.
-An isolated [Vulkan allocation-observability component](experiments/2026-09-14-vulkan-allocation-observability.md)
-is CPU-compiled and tested; it is not a GPU-tested fix or a new Kindle package.
+Preserve all four faults and the valid intermediate passes. The
+[original forensics](experiments/2026-09-13-gpu-forensics.md),
+[pixel failure](experiments/2026-09-14-pixel-initialization-incident.md) and
+[latest initialization incident](experiments/2026-09-15-interleaved-initialization-incident.md)
+retain the source, driver, clock and allocator evidence. Passing isolated hardware,
+complete state, or one combined initialization does not establish reliable safety.
+The [guard and runbook](gpu_incident_response.md) contain the direct child and
+preserve evidence; they do not prevent a first wedge or authorize recovery.
+No further GPU query, failed-job retry or automatic successor is permitted.
+After operator-approved recovery, select a distinct, bounded driver/runtime
+diagnostic before resuming full qualification. A changed driver needs explicit
+compatibility checks and a matched declaration, not a silent host change.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
@@ -392,24 +343,13 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins qualified upstream `ce80e9cd`. September 15 upstream reads find
-Meganeura **4f8c7689** and Blade **6ab5fcec**. Meganeura's runtime and Cargo files
-are unchanged from 428fc2d; the intervening commits concern documentation and
-paper artifacts. Blade adds shader-validation capabilities, not an observed
-initialization fix. Retain those real updates in a separately identified
-candidate; do not silently change the historical control.
-
-The [75dfe901 attempt](experiments/2026-09-13-meganeura-conv.md) and subsequent
-0a98775/native 02b600a1 combined-pixel attempt are stopped and unqualified.
-Their followers are terminal, not waiting. Preserve their valid component/state
-results and all three faults; neither allocation-order restoration nor passing
-standalone tests establishes combined-runtime safety. The new preparation
-targets only the known-good control's combined frontend/first-world initialization
-with allocation-placement and constant-upload traces. Its separately guarded
-native invocation now passes both complete plans and traces, with at least
-4,977 MiB directly free and zero actions/updates. The original controller's
-F32-JSON presentation failure is preserved; a separate exact read-only audit
-verifies the result. There is no candidate launch or automatic successor.
+Main pins qualified upstream `ce80e9cd`. The September 15 **15:39 UTC** source
+check finds Meganeura **5a570099** and Blade **6ab5fcec**. The latest isolated
+candidate includes these packed-format/runtime and shader-validation updates,
+plus matched observations and immediate Shared zeroing. Its CPU checks pass,
+but its [combined initialization fails](experiments/2026-09-15-interleaved-initialization-incident.md).
+It is not adopted or safe to retry. The earlier passing candidate remains a
+single preserved result, not an approved fallback. No successor is declared.
 
 Recheck upstream before new backend diagnosis. Keep dependency qualification
 separate from same-backend block-matmul correctness and throughput. Both remain
@@ -640,10 +580,10 @@ Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
 Freeway's complete fresh confirmation also fails competence. Pong root 1009's
-complete pair passes. Following the external recovery and passing guarded
-initialization control, isolate the candidate failure, then qualify latest
-Meganeura and matched block-matmul throughput under new declarations
-before re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
+complete pair passes. The fourth GPU fault now requires operator-approved
+recovery and a driver/runtime investigation before further GPU qualification.
+Latest-dependency and matched block-matmul throughput gates still precede
+re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
 Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
 initial misses from low post-bonus progress: only 4.68% of training frames follow

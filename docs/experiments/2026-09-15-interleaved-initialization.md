@@ -1,6 +1,11 @@
 # Interleaved initialization on current upstream
 
-Status: **the distinct candidate passes the combined initialization diagnostic**.
+Status: **one candidate execution passed; the later upstream carry faults**.
+The [fourth incident](2026-09-15-interleaved-initialization-incident.md) supersedes
+the pending qualification direction below. Both interleaved candidates are now
+quarantined from further GPU work. Preserve this completed pass without treating
+it as reliable safety evidence or retrying it.
+
 This follows the completed [combined initialization control](2026-09-15-recovery-and-initialization-control.md),
 not a retry of the quarantined pixel bundle. Training and held Pong roots remain
 stopped pending full dependency and same-backend throughput qualification.

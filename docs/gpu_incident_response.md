@@ -5,8 +5,11 @@ evidence capture, not hardware recovery or numerical qualification. The
 [September 13 investigation](experiments/2026-09-13-gpu-forensics.md) records
 the original RTX 5080 failures and failed module-reload recovery. The
 [September 14 incident](experiments/2026-09-14-pixel-initialization-incident.md)
-records another initialization fault despite passing isolated checks. GPU work
-is stopped; the latest candidate and its block carry are quarantined.
+records another initialization fault despite passing isolated checks. The
+[September 15 fourth incident](experiments/2026-09-15-interleaved-initialization-incident.md)
+also faults after restoring immediate zeroing and including current upstream.
+GPU work is stopped; both interleaved candidates and the earlier failed bundle
+and its block carry are quarantined.
 
 ## Capture before recovery
 
@@ -126,6 +129,15 @@ child terminated and reaped with SIGTERM, no unfinished child and no NVML query
 after detection. The driver continued emitting watchdog errors afterward.
 Containment succeeded; wedge prevention and hardware recovery did not follow.
 
+The fourth incident is detected through **NVML Reset**, before the next kernel
+poll. Journal receipt lags the kernel source event by 989.537 ms; detection is
+1.027 s after source. Three nominal health rows occur after that source event;
+none proves health. No NVML call follows detection. Do not require a
+`kernel_fault` event to recognize a failed guard, or relabel Reset as memory
+pressure. SIGTERM interrupts the final flushed JSON record: preserve the raw
+fragment, and use the separate incident reader to analyze only complete records.
+Never weaken a successful-run reader to accept that incomplete trace.
+
 ## Recovery boundary
 
 Capture first, then obtain the user's approval before resets, module/service
@@ -162,7 +174,14 @@ The failed candidate remains quarantined; this control does not establish its
 safety, a driver fix or readiness to resume training.
 
 A [distinct current-upstream initialization hypothesis](experiments/2026-09-15-interleaved-initialization.md)
-subsequently passes the same combined context: alias-order creation with immediate
+subsequently passes the same combined context once: alias-order creation with immediate
 Shared zeroing, matched observations, clean guard outcome and 4,973 MiB directly
 free. Preserve that completed invocation. It does not lift the original bundle's
 quarantine, establish the fault cause or replace full runtime qualification.
+Its [latest-upstream carry then faults](experiments/2026-09-15-interleaved-initialization-incident.md).
+The complete application event prefix and normalized resident-buffer placements
+match both passing runs; the change is not a sufficient fix. Both candidate
+snapshots are now quarantined from further GPU work. Stop broad qualification
+and seek an operator-approved driver/runtime investigation before another job.
+The updated local vendor brief is not submitted, and no vendor ioctl collector
+has run. Do not alter drivers or send logs externally without approval.

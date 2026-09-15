@@ -17,6 +17,40 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 15 15:30 UTC safety stop supersedes pending qualification work:
+  the sole latest-upstream initialization attempt in
+  `runs/interleaved-latest-init-20260915.7MdNse` faults with the same Xid 62
+  payload as the three earlier incidents, then PMU halt / Xid 154 Reset Required.
+  Its guard stops and reaps direct child 69243 (-15); no training or successor
+  runs. Preserve the failed invocation, absent top-level success result and all
+  completed CPU evidence. Do not rerun 7MdNse, the earlier passing WeUPsV, or
+  either failed fixture preparation (6hLrlv/hduqEv). Quarantine the interleaved
+  candidates 070f4b51 and 7db0d05c from further GPU work pending investigation;
+  the earlier single initialization pass does not establish reliability.
+  No further NVML query, GPU job or host recovery is authorized. Recovery again
+  requires user approval; no reset/reload/reboot/power-cycle/driver changes.
+  The guard snapshot and separate host-only capture in
+  `runs/interleaved-init-incident-20260915.Xd7nhF` retain the new evidence.
+  The independent terminal reader reverifies 960 inputs, 125 direct evidence
+  pins, 76,108 kernel records and 137,607 complete initialization records. Its
+  23 CPU fixtures pass. All 46,905 complete Kindle/Meganeura events match both
+  passing prefixes. A separate nine-test placement reader finds no overlap in
+  the 10,071 retained physical buffers; all offsets/extents/types and normalized
+  memory-sharing relationships match both passing runs (227 memory handles).
+  This is not a temporary-lifetime or hardware-safety proof. Preserve both
+  completed writers; only documented audit modes are reusable. The source clock
+  places the fault during allocation, before constant uploads; the final CPU
+  upload record is not its origin. Journal receipt lags source by 989.537 ms.
+  NVML detects Reset 1.027 s after source, with three stale nominal health rows
+  after source and no query after detection. No gradient mismatch is measured.
+  HEURED's latest-source CPU build and both failed fixture preparations remain
+  immutable. The 15:39 upstream check still finds 5a570099/6ab5fcec. No original
+  hardware requirement is fulfilled by the initialization-only fixture. Stop
+  broad qualification; the next decision requires operator-approved recovery
+  and a bounded driver/runtime investigation, not another candidate retry.
+  A local vendor brief is prepared, not submitted. See
+  `docs/experiments/2026-09-15-interleaved-initialization-incident.md`.
+  Main stays ce80 and all throughput/adoption gates and the Pong hold remain.
 - September 15 current-upstream initialization hypothesis is separate from the
   completed historical control and quarantined candidate. Fresh host-only capture
   in runs/initialization-hypothesis-cpu-20260915.twWdPt observes the same efe90b23
