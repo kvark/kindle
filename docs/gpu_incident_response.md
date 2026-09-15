@@ -160,3 +160,9 @@ output. The GPU test is not rerun. Distinguish a post-execution reader failure
 from native device loss, and preserve both the original failure and correction.
 The failed candidate remains quarantined; this control does not establish its
 safety, a driver fix or readiness to resume training.
+
+A [distinct current-upstream initialization hypothesis](experiments/2026-09-15-interleaved-initialization.md)
+subsequently passes the same combined context: alias-order creation with immediate
+Shared zeroing, matched observations, clean guard outcome and 4,973 MiB directly
+free. Preserve that completed invocation. It does not lift the original bundle's
+quarantine, establish the fault cause or replace full runtime qualification.

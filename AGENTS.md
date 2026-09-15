@@ -17,6 +17,35 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 15 current-upstream initialization hypothesis is separate from the
+  completed historical control and quarantined candidate. Fresh host-only capture
+  in runs/initialization-hypothesis-cpu-20260915.twWdPt observes the same efe90b23
+  boot and matching driver without a GPU query. Meganeura advances to 09f7c410
+  with packed-weight fixes, not an initialization-order fix; Blade stays 6ab5fcec.
+  Kindle 51ba190c / Meganeura 7db0d05c / shared Blade 100bb813 retain those updates
+  and matched observations, restoring alias-order creation with immediate Shared
+  zeroing. This is distinct from allocation-order-only 0a98775, not a proven
+  historical cause. The fixture is byte-identical to the completed control.
+  CPU preparation completes six source checks, 83 Kindle, thirteen Blade and
+  37 focused backend tests, formatting and release Clippy. All twenty commands,
+  760 inputs and 308 artifact/source pins independently re-audit. Meganeura's library
+  includes an unignored GPU test; use only reviewed CPU module filters here.
+  The separate WeUPsV declaration binds 931 pins, ten CPU refusal tests and fresh
+  healthy same-boot/upstream evidence. It permits only the direct native combined
+  initialization fixture, with exact plans/observations and guard/memory/device
+  gates. Its sole 14:59–15:00 UTC invocation now passes; PID 55770 exits zero
+  and is reaped. Both complete 632/9,439-slot plans, all interleaved zeros,
+  10,081 buffer/allocation pairs, 14,645 uploads and 143,121 trace records verify.
+  All 207 health samples pass, max gap 0.5729 s, minimum directly free 4,973 MiB,
+  no kernel fault or unfinished child. The independent complete audit reverifies
+  all 931 inputs and raw results. Preserve this completed invocation and CPU
+  writer/target; use only documented audit modes. This additional initialization
+  test replaces none of the original nineteen hardware requirements or remaining
+  state/pixel/memory/timing gates. No next GPU group is declared. No acting,
+  training, restore, automatic successor,
+  adoption or host recovery. Main remains ce80 and Pong remains held. Preserve
+  old writers, quarantine and all dependency/throughput gates. See
+  docs/experiments/2026-09-15-interleaved-initialization.md.
 - September 15 recovery verification observes external boot efe90b23 (journal
   begins September 14 at 14:07:36 UTC), with matching
   595.91.07, clean current-boot kernel evidence, recovery None and 15,841 MiB

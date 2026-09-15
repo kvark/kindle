@@ -67,6 +67,12 @@ initialization-only control now passes in the combined frontend/world context;
 the failed candidate remains quarantined. Training stays held for candidate
 diagnosis and the unchanged qualification/throughput gates. See the
 [recovery and control preparation](experiments/2026-09-15-recovery-and-initialization-control.md).
+The next [isolated initialization hypothesis](experiments/2026-09-15-interleaved-initialization.md)
+retains current upstream fixes and restores immediate Shared zeroing after each
+alias-order allocation. CPU validation and the guarded combined initialization
+diagnostic pass without a fault, retaining 4,973 MiB directly free. Full hardware,
+state/pixel and matched throughput qualification still precede learning; this is
+not a proven fault cause or permission to resume the held queue.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
