@@ -3,6 +3,9 @@
 mod vector;
 pub use vector::VectorDreamerAgent;
 
+#[cfg(test)]
+mod initialization;
+
 use std::fs;
 use std::io;
 use std::path::Path;

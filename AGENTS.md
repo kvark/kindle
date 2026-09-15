@@ -1,5 +1,15 @@
 # Kindle working direction
 
+September 15 isolated CPU preparation supersedes historical stages below.
+Prepare only the combined LeVJEPA/first-world initialization control fixture.
+No acting, training, restore or GPU execution is declared by this branch.
+The ce80/Blade 0.9 control uses matched diagnostic breadcrumbs; its production
+initialization/zeroing and learning settings stay unchanged. A future direct
+GPU invocation needs a fresh declaration, exact dependencies/artifacts/weights,
+current upstream/host checks, actual-device gates and the existing direct-child
+guard. Keep 0a98775/native 02b600a1 and its block carry quarantined. Never restart
+m6kNer, old completed writers or the held queue. No host recovery without approval.
+
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner
 and policy without joining causal histories. Games are the first testbed.
