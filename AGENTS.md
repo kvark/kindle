@@ -1,6 +1,11 @@
 # Kindle working direction
 
-September 15 isolated CPU preparation supersedes historical stages below.
+September 15 versioned CPU continuation supersedes historical stages below.
+The path-override attempt is preserved with its real dependency-identity failure.
+This continuation pins instrumented-control Meganeura 9b9e7ee7 and shared Blade
+c96a9a87 directly; both dependency locks and reported identity must agree. There
+is no identity-test skip or historical-source fallback. The initialization-only
+fixture and all production math/initialization remain byte-identical.
 Prepare only the combined LeVJEPA/first-world initialization control fixture.
 No acting, training, restore or GPU execution is declared by this branch.
 The ce80/Blade 0.9 control uses matched diagnostic breadcrumbs; its production
