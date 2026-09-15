@@ -1,6 +1,19 @@
 # Kindle working direction
 
 September 15 interleaved initialization hypothesis supersedes historical stages.
+The 51ba190c / 7db0d05c / 100bb813 candidate passes the combined initialization
+diagnostic in WeUPsV. Preserve it and its completed CPU target. Full-hardware
+fixture preparation stops before compilation on a previous-boot reader refusal
+(6hLrlv), then new upstream 5a570099 (hduqEv). Neither writer may be restarted.
+This source carries the exact initialization change onto 5a570099 as backend
+070f4b51, with unchanged Blade 100bb813 and native fixture/learning source.
+Retain the new packed-weight formats, tests and extracted shader files. The old
+initialization pass is prior-source evidence, not qualification of 070f4b51.
+Only CPU checks are prepared here. Fresh combined initialization, all original
+nineteen hardware requirements and full state/pixel/memory/timing gates remain.
+No automatic GPU follower or training. Do not reuse completed target directories
+in place or resume the old queue; keep the failed bundle quarantined.
+
 The completed historical control is ae7699ad / 9b9e7ee7 / c96a9a87, with its
 original reader failure and separate successful P7XIB3 interpretation preserved.
 This distinct candidate pins current Meganeura 09f7c410 plus immediate alias-order
