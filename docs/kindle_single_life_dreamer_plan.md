@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. The faster episode-capable runtime is adopted; roots 2017/3019 and a fresh 1009 are prepared on that same bundle. Do not mix the older successful 1009 into a new-backend claim. The old 200k recipe still failed on roots 0/1; root 2 alone passed. |
+| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One historical pair passes, not new-bundle reliability. The [matched fast-runtime campaign](experiments/2026-09-16-pong-block-confirmation.md) is running root 2017, followed by 3019 and a fresh 1009 on that same bundle. No new frozen score yet. The old 200k recipe still failed on roots 0/1; root 2 alone passed. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -67,7 +67,8 @@ offload. Freeway integration and the complete raw audit also pass.
 The [source integration](experiments/2026-09-16-block-runtime-adoption.md) is
 complete, including episode-budgeted frozen evaluation on that unchanged native.
 All six default/fixed/episode/cap GPU checks pass, followed by exact main-source
-verification and 702 Python tests. New matched Pong work is the next step.
+verification and 702 Python tests. [New matched Pong training](experiments/2026-09-16-pong-block-confirmation.md)
+is now running root 2017; frozen scores remain pending.
 The old queue and its hold remain terminal. No game competence is established by
 these short runtime windows.
 
@@ -228,7 +229,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> same-driver dependency pixels/restore/overrides/native-budget/timing [pass; throughput neutral]
   -> same-backend block-matmul [qualified; 27.3% higher N6 throughput, exact state/traces]
   -> episode-budget integration + source adoption [complete]
-  -> new matched Pong roots 2017/3019/1009 [prepared; not started]
+  -> new matched Pong roots 2017/3019/1009 [2017 training running]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
 
@@ -622,7 +623,8 @@ complete pair passes. After external recovery to driver 580, both bounded
 initialization and production-gradient pairs pass without NVML. Current-upstream
 hardware, same-driver state, N6 runtime and same-backend block correctness/
 throughput gates now all pass. Source and episode-budget integration also pass;
-start the separately declared matched Pong work. The four historical faults remain unexplained;
+the separately declared matched Pong campaign is training root 2017. Review each
+phase before launching its successor. The four historical faults remain unexplained;
 NVML stays disabled and host recovery is not authorized. Preserve all stopped
 attempts and the original queue hold. Breakout's
 action-width candidate remains staged; its old idle follower is retired.

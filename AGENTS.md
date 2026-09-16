@@ -61,10 +61,15 @@ match exactly. This is native graph optimization, not reduced training.
   editable extension remains historical; explicitly select the qualified
   source-matched package. See
   `docs/experiments/2026-09-16-block-runtime-adoption.md`.
-- Separately declare matched Pong on one bundle, keeping roots
-  1009/2017/3019 and 400,008 actions each. Start the unopened 2017/3019 roots,
-  then repeat 1009 on the same new bundle/driver. Do not mix the historical
-  successful root 1009 into this new three-root claim.
+- Matched Pong is now declared in `runs/pong-block-confirmation-20260916.rBwdGF`
+  with 5,329 pins and nine reader checks. Root 2017 training starts at 22:07 UTC,
+  direct native child 131029; do not duplicate it. Run order is 2017/3019/1009,
+  each fresh on one bundle with 400,008 training actions and the unchanged frozen/
+  untrained controls and gates. Each phase is individually invoked/reviewed;
+  host polling is one second, native memory coverage remains every GPU stage.
+  No automatic successor or recovery. Do not mix historical successful root
+  1009 into this new three-root claim. See
+  `docs/experiments/2026-09-16-pong-block-confirmation.md`.
 - The original xPz5ud queue and its reserved
   `pong/seed2017-train.stdout` remain terminal. Never remove the hold or restart
   that queue or any retired follower. Throughput qualification precedes Pong;

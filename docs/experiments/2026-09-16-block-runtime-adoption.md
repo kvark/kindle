@@ -1,8 +1,8 @@
 # Integrating the qualified GPU runtime
 
 Status: adopted after all six GPU integration phases and the main-source check
-pass. No new Pong campaign has started yet. GPU work uses driver 580.178.04 with
-NVML disabled throughout.
+pass. The [new matched Pong campaign](2026-09-16-pong-block-confirmation.md) is
+training root 2017. GPU work uses driver 580.178.04 with NVML disabled throughout.
 
 ## What changes
 
@@ -94,9 +94,10 @@ checks without a rebuild. Source integration never changes a historical executab
 or relabels a rebuilt binary as the tested artifact. Preserve this completed writer;
 its `check.py audit` is read-only.
 
-The prepared [matched Pong declaration](../../runs/pong-block-confirmation-20260916.rBwdGF/declaration.md)
+The separate [matched Pong declaration](../../runs/pong-block-confirmation-20260916.rBwdGF/declaration.md)
 keeps all original seeds, 400,008-action budgets, trained/untrained frozen controls
-and competence gates. It orders roots 2017, 3019, then a fresh 1009 on one bundle.
+and competence gates. It passes nine reader checks, binds 5,329 inputs and starts
+root 2017 at 22:07 UTC. It orders roots 2017, 3019, then a fresh 1009 on one bundle.
 Historical root 1009 remains separate evidence; it cannot supply the third root
 for a new-backend claim. The original queue and its reserved output hold remain
 terminal. No next game or automatic follower is declared.
