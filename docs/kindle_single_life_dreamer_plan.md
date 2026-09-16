@@ -288,9 +288,11 @@ Freeway and Qbert's next hypotheses are separately declared continuous
 753 Python tests and real historical/current checkpoint checks without changing
 the native learner or runner. Keep each game's existing exploration and frozen
 protocol, including untrained controls and unchanged competence thresholds.
-The midpoint and final are one training history, not independent roots. The
-live observer, current-source stage auditor and GPU declaration remain future work;
-no additional game is launched while the fixed Pong campaign continues.
+The midpoint and final are one training history, not independent roots. The bound
+incremental observer is also prepared, with 812 passing Python tests and unchanged
+native code. Its direct-child guard integration, current-source stage auditor and
+GPU declaration remain future work; no additional game is launched while the
+fixed Pong campaign continues.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the
@@ -473,7 +475,7 @@ after the dependency pixel fault. The current dependency-only comparison now
 passes under its new non-NVML protocol. The exact block source is carried at
 `dee38b2` on that same backend and is now qualified. Do not restart old followers
 or change game budgets/competence gates. The user's throughput-before-Pong gate
-is satisfied; finish source integration and resume matched learning. World-sync
+is satisfied; source integration is complete and matched Pong is running. World-sync
 remains secondary, not another prerequisite for Pong.
 
 For every optimization, require production losses/all gradients, reset causality,

@@ -88,6 +88,9 @@ match exactly. This is native graph optimization, not reduced training.
   backend complete-state inspection pass. No native/runner change or new GPU job.
   Main's exact carry also passes 753 tests in hfoYkE. Preserve both one-shot
   writers and teQLiJ's archives; the 400k dose pilots remain undeclared.
+  The separate bound midpoint observer `462702b` and exact main carry pass 812
+  Python tests in eYU7Cx/O4CMVU, with native code unchanged. Preserve both checks;
+  guard failure propagation/stage integration remain undeclared. No live follower.
   See `docs/experiments/2026-09-16-atari-dose-retention.md`.
 
 ## GPU operation

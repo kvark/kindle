@@ -44,6 +44,31 @@ The independent audit passes. Preserve the completed writer and both historical
 archives; only its `audit`/actual-import readers are reusable. No NVML, agent,
 GPU job, follower or 400k learning experiment starts in this preparation.
 
+## Incremental midpoint observer
+
+The [observer](../../python/examples/observe_atari_checkpoint.py) carries the
+earlier Qbert incremental reader onto this shared helper, without its historical
+source or recipe bindings. Source `462702b` changes only that module and its
+tests. It binds an explicitly supplied child command, parent and process-start
+identity; partial log writes wait, while changed headers, missed saves, replaced/
+truncated logs, child exit or a deadline fail without retry. It never launches,
+signals, pauses or restarts a process.
+
+The [isolated preparation](../../runs/atari-midpoint-observer-check-20260916.eYU7Cx/capture/result.json)
+and its read-only audit pass: **812 Python tests**, including 59 observer cases,
+all 32 unchanged native/build inputs and 176 input pins. Main carries the exact
+source and also passes [all 812 tests](../../runs/atari-midpoint-main-check-20260916.O4CMVU/tests.xml),
+with actual main-module and unchanged native-package imports checked before/after.
+Both checks use one CPU, 2 GiB and zero swap; no native binary is rebuilt. The
+process fixture is a harmless stdin-waiting child and its checkpoint state is
+explicitly synthetic—not a new GPU integration result. Active Pong pins remain
+unchanged. Preserve both completed checks and the isolated source.
+
+The caller must still propagate observer failure through its direct-child guard.
+A valid copied archive may survive a later observer failure, but without the
+observer's success event it does not satisfy that future experiment. The observer
+has no controller hook or automatic follower, and is not attached to live Pong.
+
 ## Next learning comparison, still undeclared
 
 Use one fresh uninterrupted **400,008-action** history per proposed pilot, with
@@ -59,8 +84,8 @@ action vocabulary, rewards and competence criteria fixed. The midpoint and final
 are one root, not two independent seeds or a historical-backend comparison.
 
 A new declaration must still bind the actual GPU child, current immutable native/
-adapter bundle, midpoint observer and failure propagation, complete training and
-frozen/control evidence, native memory budget and whole-rollout replays/videos.
+adapter bundle, the prepared midpoint observer and failure propagation, complete
+training and frozen/control evidence, native memory budget and whole-rollout replays/videos.
 The previous Qbert stage/execution readers retain their historical source/recipe
 bindings and must not be invoked as a current-runtime launcher. Preserve their
 completed tests. Source matching and the new Freeway frozen-stage contract need
