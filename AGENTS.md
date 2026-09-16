@@ -29,6 +29,18 @@ reliable learning.
   stays 5a570099. Timing is disabled in these matched historical fixtures.
   Keep the diagnostic runtimes fixed and reconsider the fix for later throughput
   qualification; do not call the frozen candidate the latest Blade runtime.
+- The later September 16 user direction explicitly resumes GPU work with NVML
+  temporarily disabled: use the GPU and prefer clean code over further CPU-only
+  workarounds. Start with the already prepared production-gradient ce80 control,
+  then the candidate after reviewing control, in the separate P34QyD declaration.
+  Reuse the existing host-only guard, native assertions and 900-second timeout;
+  no NVML, blind retry or host recovery. This supersedes the pending-approval
+  stop below, not completed evidence or numerical/throughput/Pong gates. The
+  earlier fault cause remains unproven. Direct GPU telemetry stays unmeasured.
+  Continue ordinary bounded GPU qualification/performance work under this
+  direction; do not treat superseded approval stops below as a blanket GPU ban
+  or ask again for each normal in-scope step. Review results between jobs and
+  stop on a new fault. No reset, reload, reboot or driver change is authorized.
 - Both approved non-NVML initializations are now complete in
   `runs/driver580-host-init-20260916.bT2bAx`: ce80 control PID 40606, then candidate
   PID 41120, each exit zero and reaped after separate invocation/result review.
@@ -44,14 +56,15 @@ reliable learning.
   production code/dependencies. ITVpsF passes 84 Kindle CPU tests, formatting,
   release Clippy and eight commands with 5,023 input/five artifact pins; its CPU
   suite leaves 23 GPU tests ignored. Preserve fHY59j's pre-compilation checker failure.
-  Both authorizations are consumed. No further GPU job, query, game training,
-  recovery or automatic successor is declared. A single candidate pass is not
+  Both initialization authorizations are consumed; those invocations stay terminal.
+  Later GPU work follows the resumed user direction and separate declarations.
+  A single candidate pass is not
   reliability, a driver/NVML causal fix or full runtime qualification. Keep the
   historical 3O90H9 sampling-gap failure, all quarantines and qualification gates,
   main ce80 and Pong hold unchanged. Further work needs a bounded non-NVML
-  declaration and approval; use only documented read-only audits. See
+  declaration; use only documented read-only audits of these completed runs. See
   `docs/experiments/2026-09-16-host-only-initialization.md`.
-- The next gradient pair has CPU-only fixtures, not GPU approval/declaration:
+- The completed gradient pair uses the separately prepared fixtures:
   afb973a/control and 0d0a831/candidate preserve their historical dependencies
   and change only world-test diagnostics/instructions. Their identical world.rs
   binds full B16/T64 and the real declared device, emits flushed numerical/stage
@@ -61,17 +74,27 @@ reliable learning.
   18,108 inputs and ten artifacts independently re-audit; only prepare.py --audit
   is reusable. New natives are b069df58/7b4b9a8c, not the completed init binaries.
   Preserve the completed writer/caches. Session::wait still discards errors;
-  step.wait_returned is not a successful-fence assertion. A strict new reader/
-  launcher, CPU refusal checks, separate non-NVML declaration and approval are
-  still required. No GPU test/query, NVML, training, recovery or successor runs.
-  See `docs/experiments/2026-09-16-driver-gradient-preparation.md`; no old gate,
-  quarantine, main dependency, Pong hold or five-game completion claim changes.
+  step.wait_returned is not a successful-fence assertion. P34QyD now completes
+  control PID 46858 then candidate 48099, both exit zero and reaped. Both pass
+  all nine losses and 51 nonzero gradients (62 parameters), worst relative L2
+  0.0007456096368231737, with identical cross-arm loss/gradient statistics.
+  Each complete 292,932-record trace, both historical plans, 29,602 uploads and
+  20,978 buffer/allocation pairs verify. Each guard has 546 host checks, no
+  recorded fault and zero NVML calls; direct GPU telemetry stays unmeasured.
+  Eight reader tests and 18,133 pinned inputs verify. Preserve both invocations;
+  only run.py audit control/candidate is reusable. Continue remaining bounded
+  GPU qualification/performance work, not another approval wait or retry.
+  See `docs/experiments/2026-09-16-driver580-gradients.md`; no main dependency,
+  full qualification, throughput, Pong hold or five-game completion gate changes.
 - User direction on driver 580: stop NVML calls, including `nvidia-smi`, Python
   bindings and the isolated persistent reader. The proposed cadence/parity test
   is withdrawn; do not request approval for it again. Preserve its CPU evidence,
   but do not adopt or execute the prototype. Historical `gpu_guard.py run` and
-  `profile_atari_vector.py` invoke NVML and must not launch under this policy;
-  host-only snapshot/audit modes remain usable. Future diagnostics need an
+  historical `profile_atari_vector.py` copies invoke NVML and must not launch
+  under this policy; host-only snapshot/audit modes remain usable. The current
+  vector profiler removes the monitor and its `--gpu` option, retaining throughput
+  and stage timings with null/unmeasured telemetry. Historical CSV analysis is
+  read-only. Future diagnostics need an
   explicit non-NVML declaration using kernel logs, host driver/boot identity,
   native device/error checks and bounded process lifetimes. Unavailable memory
   and utilization telemetry is unmeasured, not zero or proof of health; old

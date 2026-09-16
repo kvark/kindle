@@ -9,8 +9,11 @@ records another initialization fault despite passing isolated checks. The
 [September 15 fourth incident](experiments/2026-09-15-interleaved-initialization-incident.md)
 also faults after restoring immediate zeroing and including current upstream.
 The [two explicitly approved initialization-only tests on driver 580](experiments/2026-09-16-host-only-initialization.md)
-now pass without NVML. GPU work is stopped again after those two invocations;
-both interleaved candidates and the earlier failed bundle/block carry remain
+now pass without NVML. The user's later instruction resumes GPU work with NVML
+temporarily disabled, starting with the prepared production-gradient comparison.
+That [control/candidate pair also passes](experiments/2026-09-16-driver580-gradients.md)
+all original numerical assertions and both host guards, with no recorded fault.
+Both interleaved candidates and the earlier failed bundle/block carry remain
 quarantined outside separately authorized diagnostics. No driver fix is proven.
 
 ## Current policy: no NVML on driver 580
@@ -19,7 +22,12 @@ The user has stopped NVML calls, including `nvidia-smi` polling and the proposed
 persistent-reader experiment. That experiment is withdrawn, not awaiting
 approval. NVML is monitoring infrastructure, not part of Kindle's learning or
 inference path. Keep the historical guard and captures unchanged for auditing,
-but do not invoke its NVML-based `run` mode or the old vector profiler.
+but do not invoke its NVML-based `run` mode or historical profiler copies.
+The current vector profiler no longer spawns an NVML monitor. It still measures
+actions/sec, updates/sec and stage times, with absent telemetry represented as
+`null` and `gpu_telemetry: "unmeasured"`. Its optional historical CSV reader
+does not query the GPU. The profiler is a scheduler, so do not wrap it in the
+direct-child guard; guard the actual native-bearing process in new experiments.
 
 For a future separately authorized job, declare host-only kernel/boot/driver
 checks, native device assertions/errors and bounded child lifetimes. Kernel
@@ -27,7 +35,8 @@ reports can lag a fault; these checks are containment, not wedge prevention.
 Live recovery-action, utilization and directly free VRAM are no longer measured
 by NVML. Mark them unmeasured, never zero or healthy. Any replacement measurement
 and acceptance rule must be explicit in a new declaration; historical gates and
-results are not rewritten. No new GPU job or host recovery is authorized here.
+results are not rewritten. Use the user's resumed GPU authorization for bounded,
+reviewed progress; this document does not authorize host recovery or blind retries.
 
 ### Prepared host-only guard
 

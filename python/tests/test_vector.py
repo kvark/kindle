@@ -56,8 +56,9 @@ def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, cap
 def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path):
     directory = tmp_path / "matrix"
     monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), "--num-envs", "2"])
-    monitor = SimpleNamespace(terminate=lambda: None, wait=lambda **_: None)
-    monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", lambda *_, **__: monitor)
+    def no_monitor(*_args, **_kwargs):
+        pytest.fail("profiler must not spawn an NVML monitor")
+    monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", no_monitor)
     monkeypatch.setattr(profile_atari_vector.subprocess, "run", lambda *_, **__: SimpleNamespace(returncode=1))
     with pytest.raises(SystemExit) as error:
         profile_atari_vector.main()
@@ -66,6 +67,36 @@ def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkey
     assert results[0]["status"] == "failed"
     assert results[0]["num_envs"] == 2 and results[0]["exit_code"] == 1
     assert "actions_per_second" not in results[0]
+    assert not list(directory.glob("*.gpu.csv"))
+
+
+@pytest.mark.parametrize("historical", [False, True])
+def test_profiler_throughput_does_not_require_nvml(tmp_path, historical):
+    log = tmp_path / "run.jsonl"
+    events = [
+        dict(event="run_start", config=dict(train_ratio=1, batch_size=16, batch_length=64),
+             num_envs=2, mode="train", agent_construction_seconds=3,
+             native_extension_sha256="native", runner_sha256="runner"),
+        dict(event="progress", run_step=2048, elapsed_seconds=20, unix_time=0, stage_seconds=dict(act=1.0)),
+        dict(event="learner", run_step=3072, report=dict(timing=dict(total_seconds=2.0))),
+        dict(event="run_end", reason="budget_complete", run_step=3072, elapsed_seconds=30,
+             unix_time=10, training_debt=0, stage_seconds=dict(act=2.0)),
+    ]
+    log.write_text("\n".join(map(json.dumps, events)))
+    trace = tmp_path / "historical.csv" if historical else None
+    if trace is not None:
+        trace.write_text("timestamp, uuid, utilization.gpu [%], memory.used [MiB], power.draw [W]\n"
+                         "1970/01/01 00:00:05.000, GPU-test, 65 %, 100 MiB, 50 W\n")
+    result = profile_atari_vector.summarize(log, trace)
+    assert result["actions_per_second"] == 102.4
+    assert result["updates_per_second"] == 0.1
+    assert result["mean_update_seconds"] == 2.0
+    assert result["stage_seconds"] == dict(act=1.0)
+    assert result["gpu_telemetry"] == ("historical_trace" if historical else "unmeasured")
+    assert result["gpu_samples"] == int(historical)
+    assert result["mean_gpu_activity"] == (65.0 if historical else None)
+    assert result["mean_power_watts"] == (50.0 if historical else None)
+    assert result["peak_vram_mib"] == (100.0 if historical else None)
 
 
 @pytest.mark.parametrize("bad", [None, float("nan"), float("inf"), "0.0", True])

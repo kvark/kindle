@@ -56,13 +56,14 @@ each complete both sessions, all 143,121 initialization records and checked
 waits, with zero actions/updates. Separate raw audits and post-audit kernel checks
 pass; both children exit cleanly and no kernel fault is recorded. The two-job
 approval is consumed. This is useful diagnostic progress, not proven reliability,
-a driver/NVML causal fix or full runtime qualification. Further GPU work needs a
-new bounded declaration and approval; main remains ce80 and Pong remains held.
-The [next production-gradient pair](experiments/2026-09-16-driver-gradient-preparation.md)
-has matched driver-bound CPU fixtures (86 tests per arm), not a GPU result or
-launch declaration. It preserves the original graph/arithmetic/tolerances and
-adds flushed numerical evidence; its source-pinned reader and hardware approval
-remain required before execution.
+a driver/NVML causal fix or full runtime qualification. The user's later direction
+resumes GPU work with NVML temporarily disabled; main remains ce80 and Pong held.
+The [production-gradient pair](experiments/2026-09-16-driver580-gradients.md)
+now also passes on GPU: both arms meet all nine loss and 51 gradient comparisons,
+with worst relative L2 0.00074561 against the unchanged .003 limit. Complete
+initialization traces and host guards pass without recorded faults or NVML calls.
+Continue bounded GPU qualification/performance work under the resumed direction;
+reuse native tests and the existing guard, avoiding CPU-only workaround detours.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel

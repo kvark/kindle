@@ -2,7 +2,9 @@
 
 The two approved [initialization-only runs](2026-09-16-host-only-initialization.md)
 are complete. Approval for a separate production-gradient control/candidate pair
-is pending. This preparation executes **no GPU test or NVML query**, creates no
+was pending during this preparation. The user's later direction resumes GPU work,
+and the [separately declared pair now passes](2026-09-16-driver580-gradients.md).
+This preparation itself executes **no GPU test or NVML query**, creates no
 GPU launcher/declaration, and does not restart training or the held Pong queue.
 
 ## Matched test-only changes
