@@ -72,9 +72,17 @@ all optimizer moments and repeatability. The older cross-driver checkpoint
 comparison fails and remains preserved; it is not a backend regression result.
 Native profiling also preserves complete state and identifies **55,245 world
 gradient dispatches, including 29,020 splits/concatenations**, supporting the
-staged block-matmul test after remaining pixel/memory qualification. No speedup
+staged block-matmul test. The separate N6 pixel/native-budget gates now pass; no speedup
 is established. Keep execution on the GPU; no CPU fallback or actor/learner
 separation is needed for this next optimization.
+The [source-matched N6 pixel comparison](experiments/2026-09-16-native-memory-pixels.md)
+now passes all ten GPU phases with NVML disabled: four exact Boxing train/frozen
+runs, Freeway override/restore integration, and 3.21 GiB minimum estimated Vulkan
+budget headroom. The independent raw audit passes. Both throughput ratios are
+about 0.995× control—**still about 0.535× aggregate real time**, not a speedup.
+The unchanged block-matmul change is carried onto this same backend at `dee38b2`.
+Build and test that graph next; neither the backend nor block graph is adopted,
+and the original learning recipe, game budgets and Pong hold remain fixed.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
@@ -230,7 +238,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> external recovery to driver 580; non-NVML init/gradient control pairs [pass]
   -> current Meganeura/Blade native GPU tests [23 pass; NVML disabled]
   -> same-driver complete state/repeatability + native kernel profiles [pass]
-  -> dependency pixels/restore/overrides/memory/timing gates [still required]
+  -> same-driver dependency pixels/restore/overrides/native-budget/timing [pass; throughput neutral]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -379,7 +387,9 @@ calibration-delta handling and windowed profiling for large graphs. The separate
 current-upstream candidate uses that implementation, removes Kindle's obsolete
 timestamp-capacity fallback and carries explicit timing options to its sessions.
 It retains initialization observations and checks GPU waits; learning math is
-unchanged. GPU qualification is in progress, not an adopted speedup.
+unchanged. Its declared same-driver hardware/state/N6 checks now pass, including
+the new non-NVML budget measurement. This is not adoption or a speedup, and
+historical cross-driver/NVML gates remain unchanged.
 See the [current-source report](experiments/2026-09-16-current-upstream-timing.md)
 for pins, completed native results and the superseded local adapter.
 
@@ -392,8 +402,8 @@ and its passing 580/no-NVML initialization and production-gradient comparison
 remain distinct evidence. Neither proves the fault's cause or licenses a retry.
 
 Recheck upstream before new backend diagnosis. Keep dependency qualification
-separate from same-backend block-matmul correctness and throughput. Both remain
-ahead of newly declared Pong roots; existing packages, seeds and gates stay pinned.
+separate from same-backend block-matmul correctness and throughput. The latter
+is next, ahead of newly declared Pong roots; existing packages, seeds and gates stay pinned.
 The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
 frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
@@ -401,7 +411,7 @@ passes full production gradients, cache parity, complete optimizer/state/report/
 trace comparisons and memory checks. Main's separate source-matched integration
 also passes. No block-matmul or experimental tuning is enabled by this update.
 
-The pixel-qualified upstream Atari package is native `abf4ae5d`, with matching
+The historical pixel-qualified Atari package is native `abf4ae5d`, with matching
 source `1e00e818`. Both warmed N6/R256 orders show only **0.6–0.9%** higher
 throughput, still **0.573× aggregate real time** and about **0.0955× per stream**.
 At least 3,303 MiB stays directly free. These short exact-state comparisons do
@@ -450,6 +460,10 @@ their own matching runtime evidence.
 These are historical NVML measurements. With NVML now stopped, a new memory
 gate needs an explicitly declared non-NVML measurement; do not substitute old
 readings, estimates or fabricated zeros for directly measured free memory.
+The new same-driver N6 comparison explicitly uses **estimated Vulkan budget
+headroom**, passes all 11,555 post-stage samples with at least 3.21 GiB, and
+leaves physically free/peak memory unmeasured. It does not requalify N8 or
+reinterpret the older direct-memory gate.
 
 Prioritize world-training kernels/layout and recurrent handoffs, then perception.
 [Device-resident imagination](experiments/2026-09-08-device-imagination.md) already
@@ -462,8 +476,9 @@ evidence only. The identical block change has preserved CPU-qualified packages
 and 21 GPU test fixtures, but no block GPU qualification. The
 [old block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
 is terminal, not a live waiter. Its later 0a98775-based carry remains quarantined
-after the dependency pixel fault. Qualify the dependency-only runtime first,
-then carry and test the block optimization against that same backend in a fresh
+after the dependency pixel fault. The current dependency-only comparison now
+passes under its new non-NVML protocol. The exact block source is carried at
+`dee38b2` on that same backend; build and GPU-test it next under a fresh
 declaration. Do not restart old followers or change game budgets/competence gates.
 Block-matmul correctness and throughput now take priority over unstarted Pong
 roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
@@ -624,10 +639,12 @@ Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
 Freeway's complete fresh confirmation also fails competence. Pong root 1009's
 complete pair passes. After external recovery to driver 580, both bounded
-initialization and production-gradient pairs pass without NVML. Continue
-current-upstream GPU qualification under the user's resumed direction; the four
+initialization and production-gradient pairs pass without NVML. Current-upstream
+hardware, same-driver state and N6 runtime gates now also pass. Continue to
+same-backend block-matmul correctness and throughput under the user's resumed
+direction; the four
 historical faults remain unexplained and host recovery is not authorized.
-Latest-dependency and matched block-matmul throughput gates still precede
+Matched block-matmul correctness/throughput gates still precede
 re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
 Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates

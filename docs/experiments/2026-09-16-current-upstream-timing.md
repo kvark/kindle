@@ -6,7 +6,10 @@ driver 580.178.04, without NVML. It now also passes all three exact same-driver
 full-state pairs and completes a seven-session native kernel profile without
 changing the checkpoint. The older cross-driver anchor fails and is preserved
 separately below. No throughput improvement,
-complete dependency qualification, driver/NVML causal fix or Atari win is claimed.
+driver/NVML causal fix or Atari win is claimed. The subsequent
+[same-driver N6 runtime comparison](2026-09-16-native-memory-pixels.md) now also
+passes exact repeated state, restore/override, native budget and non-regression
+gates. It does not repair historical cross-driver/NVML gates.
 Main remains ce80; throughput qualification still precedes the held Pong roots.
 
 ## Use upstream, remove the temporary adapter
@@ -39,6 +42,9 @@ This declaration launches native test binaries only. The isolated source tree's
 historical Python profiler still contains NVML polling and must not be launched;
 main's corrected profiler is separate. A future Python package needs matching
 runners and the non-NVML monitoring policy, not an old scheduler copy.
+The subsequent [native-memory pixel packages](2026-09-16-native-memory-pixels.md)
+carry that corrected profiler and the same opt-in native budget getter in both
+arms. Their CPU checks and all ten separately guarded N6 GPU phases now pass.
 
 ## Bounded native evidence
 
@@ -121,8 +127,10 @@ remaining checks. The old writer's `complete: false` remains unchanged.
 
 ## Next decisions
 
-Complete N6 pixel/restore/override and matched throughput qualification after
-the same-driver state diagnostic below. The completed profile identifies a
+The N6 pixel/restore/override and matched non-regression comparison now passes
+under its separately declared native budget gate. Its AB/BA ratios are
+0.995114/0.994309, not a speedup. Proceed to the same-backend block-matmul
+candidate, retaining completed inputs and comparisons. The profile identifies a
 large split/concat dispatch burden, supporting the already staged block-matmul
 comparison on this same backend. Retain ordinary untraced end-to-end timing as
 the speed benchmark. A windowed replay profile is not GPU utilization or a
@@ -138,8 +146,9 @@ writer/cache. Its GPU state comparisons now complete as described below.
 GPU recovery action, utilization and directly free/reserved VRAM remain
 unmeasured. Existing native Vulkan allocation-budget checks remain enabled;
 they are not the historical NVML direct-memory gate. Declare a non-NVML memory
-measurement explicitly for the new full-runtime comparison rather than calling
-old readings current. Keep the same-backend block-matmul comparison ahead of
+measurement explicitly for new comparisons rather than calling old readings
+current; the completed N6 group does this with post-stage budget headroom.
+Keep the same-backend block-matmul comparison ahead of
 Pong, with unchanged game budgets and competence gates. Stop on a new fault;
 no reset, reload, reboot or driver change is authorized.
 
@@ -166,6 +175,15 @@ entries are zero. This outlier already exists in the historical control;
 its cause and effect on learning are not established. Keep it for a focused
 optimizer numerical/stability investigation, not an unannounced epsilon or
 learning-rule change during throughput qualification.
+
+The source uses **LaProp**, despite retaining the checkpoint names `adam_m`
+and `adam_v`: it normalizes each clipped gradient by its RMS estimate before
+accumulating momentum. Consequently these are not raw-gradient Adam first
+moments, and a raw-Adam moment/variance bound would be the wrong diagnostic.
+The existing upstream LaProp test checks ordinary-scale gradients with epsilon
+1e-8, not the retained Dreamer epsilon 1e-20 near variance underflow. A bounded
+native test of that regime remains appropriate; no optimizer parameter is
+changed in the pixel or throughput comparisons.
 
 The new [same-driver diagnostic](../../runs/current-driver-state-20260916.QJKcT5/declaration.md)
 pins **2,278 inputs**, reuses the completed 580 control after a fresh raw audit,

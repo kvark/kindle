@@ -17,6 +17,37 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 N6 pixel qualification is complete in
+  `runs/current-driver-pixels-20260916.cDLhXG`: ten individually invoked/reviewed
+  same-driver windows, no NVML or automatic successor. Its 3,141 pins and
+  fifteen CPU reader checks pass; source-matched control 5ff7b55/native55899347
+  and candidate e2a1d53/native234d43ac each pass all 562 Python tests. Keep both
+  source trees/packages and the declaration fixed. All ten GPU phases pass:
+  four exact Boxing train/frozen pairs and Freeway override/restore integration,
+  with 19,200 training actions / 3,050 updates and 3,840 frozen actions.
+  AB/BA ratios 0.995114/0.994309 pass non-regression, not speedup. The separate
+  vN4gvf completion reverifies 3,496 pins and all raw results; only its audit
+  mode is reusable. All 84 candidate initializations / 1,350,930 trace records,
+  11,555 native memory samples and 9,528 host checks pass; minimum estimated
+  budget headroom is 3.21 GiB. Every child exits zero and is reaped, with no
+  recorded fault or NVML query. These are not new game wins or a driver fix.
+  Preserve cDLhXG's terminal invocations and both completed writers; no run mode
+  or capture may be reused. The packages add only the same
+  opt-in shared-context Vulkan budget getter/sidecar and no-NVML profiler carry;
+  no CPU fallback or learning change. Retain all 241 tensors/146 moments, exact
+  traces/reports/restore, N6/R256/B16/T64 budgets and AB/BA throughput gates.
+  The separately declared >=2 GiB budget-headroom gate is not NVML physically
+  free VRAM or a peak measurement. Historical anchor/memory results stay unchanged.
+  Preserve gHOVn2's early directory failure and both swlgNZ identity-reader
+  failures; wIjRCa independently verifies the unchanged fresh packages. Only
+  its audit modes are reusable. The block carry dee38b2 has byte-identical
+  networks.rs to 7b190f88 on the same current backend; source only, not built
+  or GPU-qualified. Its fresh source-matched native build and block component/
+  world, complete-state and matched-throughput tests are next. Do not compile
+  during matched timing or repeat the completed backend group. Main stays ce80
+  and Pong held until same-backend block correctness/throughput qualify.
+  Stop on a new fault; no recovery. See
+  `docs/experiments/2026-09-16-native-memory-pixels.md`.
 - September 16 current-upstream qualification uses Kindle 9ec96cf / Meganeura
   589d73ab / shared Blade 2accfeee, carrying upstream 986f49a/92553493. Use the
   upstream timestamp/windowing implementation; the local timing adapter and
@@ -47,14 +78,15 @@ reliable learning.
   56,096 dispatches sampled three times and exact post-profile complete state.
   World gradients have 55,245 dispatches (29,020 splits/concats), with ordinary
   wall/GPU-pass medians 171.012/121.903 ms. Prioritize the staged block-matmul
-  comparison after remaining backend pixel/memory qualification. Windowed
+  comparison now that the new N6 backend pixel/budget group passes. Windowed
   profiles perturb timing and are not utilization or end-to-end speedups.
   All seven new native children (six state windows plus profiling) exit zero
   and are reaped, with no recorded fault or NVML query. Completed writers,
   targets and invocations are terminal; use only audit/verify modes. See
-  `docs/experiments/2026-09-16-current-upstream-timing.md`. N6 pixels/restore/
-  overrides, explicitly declared non-NVML memory measurement
-  and same-backend block throughput remain required. No host recovery.
+  `docs/experiments/2026-09-16-current-upstream-timing.md`. The subsequent
+  N6 pixels/restore/overrides and explicitly declared non-NVML budget measurement
+  now pass in cDLhXG; same-backend block correctness/throughput remains required.
+  No host recovery.
 - September 16 explicit approval permits two new initialization-only invocations
   on boot 4f5152d1 / driver 580.178.04: driver-bound ce80 control first, then the
   driver-bound quarantined 070f4b51 candidate only after a complete control pass.
