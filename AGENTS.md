@@ -35,16 +35,28 @@ reliable learning.
   NaQ1zs completes native 886bae68 with 4,445 inputs, all 562 Python tests,
   formatting/Clippy and actual compiler/source/wheel/import identity. Preserve
   its completed writer/target; audit only. The separate M7whE0 N6 declaration
-  binds 4,487 inputs and 17 reader checks, with its first serial training window
-  now active. Keep both source/package/reader roots fixed. Require all ten
-  individual N6 AB/BA/restore/override/native-budget windows, both retained
-  same-backend serial anchors, exact state/reports/traces and unchanged speed
-  gates. No compiler work during timing, NVML, run-all or automatic successor.
+  binds 4,487 inputs and 17 reader checks. All ten individual AB/BA/restore/
+  override/native-budget windows now pass, including both retained same-backend
+  serial anchors and exact state/reports/traces. AB/BA speed ratios are
+  1.272755/1.273359: 27.3% higher throughput, 0.681–0.683x aggregate real time,
+  not real-time training. All 140 initializations / 2,053,988 trace records,
+  11,555 native memory samples and 8,318 host checks verify. Every child exits
+  zero and is reaped, with no recorded fault or NVML. Estimated Vulkan budget
+  headroom minima are 3.21 GiB overall and 7.17 GiB in the block windows (rounded).
+  This is not physically free or peak VRAM. The separate oVOgnU complete raw audit
+  reverifies 4,843 pins and all ten results. Preserve both terminal writers and
+  every invocation; only retained-file audit/verify modes are reusable. Both
+  current-backend and same-backend block qualification gates are now satisfied.
+  Next integrate the qualified source and explicitly declare matched learning;
+  do not silently mix historical Pong root 1009 with new-backend roots for a
+  three-root reliability claim. No run-all, retry, NVML or automatic successor.
   Preserve the t8SQkG builder's failed relative-depfile reader, all 28 passing
   commands and unchanged binaries;
   Cx3Xei separately verifies their actual compiler/source identity without a
-  rebuild. Keep all completed/failed invocations terminal. N6 matched throughput
-  still precedes adoption/Pong; no N6 speedup or new learning is established.
+  rebuild. Keep all completed/failed invocations terminal. Main stays ce80 until
+  source integration; the original Pong queue/hold stays terminal. The isolated
+  block bundle is now runtime-qualified, not adopted, and establishes no new
+  game competence. All game seeds, budgets, controls and competence gates stay fixed.
   Use the GPU with NVML disabled, existing host-only containment, and no CPU
   fallback or recovery. See
   `docs/experiments/2026-09-16-current-block-matmul.md`.
@@ -74,9 +86,9 @@ reliable learning.
   its audit modes are reusable. The block carry dee38b2 has byte-identical
   networks.rs to 7b190f88 on the same current backend. Its fresh native fixtures
   and hardware tests now pass under the separate declaration above;
-  complete state now passes too, and matched N6 throughput remains. Do not compile
-  during matched timing or repeat the completed backend group. Main stays ce80
-  and Pong held until same-backend block correctness/throughput qualify.
+  complete state and matched N6 throughput now pass in the block group above.
+  Do not compile during matched timing or repeat the completed backend group.
+  Main stays ce80 and Pong held pending source integration and a new declaration.
   Stop on a new fault; no recovery. See
   `docs/experiments/2026-09-16-native-memory-pixels.md`.
 - September 16 current-upstream qualification uses Kindle 9ec96cf / Meganeura
@@ -108,15 +120,16 @@ reliable learning.
   The separately declared 814vSr GPU profile now passes all seven sessions,
   56,096 dispatches sampled three times and exact post-profile complete state.
   World gradients have 55,245 dispatches (29,020 splits/concats), with ordinary
-  wall/GPU-pass medians 171.012/121.903 ms. Prioritize the staged block-matmul
-  comparison now that the new N6 backend pixel/budget group passes. Windowed
-  profiles perturb timing and are not utilization or end-to-end speedups.
+  wall/GPU-pass medians 171.012/121.903 ms. The subsequent block-matmul
+  comparison now passes as recorded above. Windowed profiles perturb timing
+  and are not utilization or end-to-end speedups.
   All seven new native children (six state windows plus profiling) exit zero
   and are reaped, with no recorded fault or NVML query. Completed writers,
   targets and invocations are terminal; use only audit/verify modes. See
   `docs/experiments/2026-09-16-current-upstream-timing.md`. The subsequent
   N6 pixels/restore/overrides and explicitly declared non-NVML budget measurement
-  now pass in cDLhXG; same-backend block correctness/throughput remains required.
+  now pass in cDLhXG; same-backend block correctness/throughput also passes in the
+  later completed group above. Neither result automatically adopts source.
   No host recovery.
 - September 16 explicit approval permits two new initialization-only invocations
   on boot 4f5152d1 / driver 580.178.04: driver-bound ce80 control first, then the

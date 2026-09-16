@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Roots 2017/3019 remain held for throughput qualification. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
+| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Throughput now qualifies; roots 2017/3019 await source integration and a new matched declaration. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -50,53 +50,34 @@ completed both paired pilots; the [serial queue](experiments/2026-09-11-recovere
 then completed Freeway and Pong root 1009 and stopped before root 2017 as requested.
 Never restart that terminal queue or remove its hold.
 
-**Both approved initialization-only arms pass on 580.178.04 without NVML.**
-The [ce80 control and historical candidate](experiments/2026-09-16-host-only-initialization.md)
-each complete both sessions, all 143,121 initialization records and checked
-waits, with zero actions/updates. Separate raw audits and post-audit kernel checks
-pass; both children exit cleanly and no kernel fault is recorded. The two-job
-approval is consumed. This is useful diagnostic progress, not proven reliability,
-a driver/NVML causal fix or full runtime qualification. The user's later direction
-resumes GPU work with NVML temporarily disabled; main remains ce80 and Pong held.
-The [production-gradient pair](experiments/2026-09-16-driver580-gradients.md)
-now also passes on GPU: both arms meet all nine loss and 51 gradient comparisons,
-with worst relative L2 0.00074561 against the unchanged .003 limit. Complete
-initialization traces and host guards pass without recorded faults or NVML calls.
-Continue bounded GPU qualification/performance work under the resumed direction;
-reuse native tests and the existing guard, avoiding CPU-only workaround detours.
-The [current-upstream timing candidate](experiments/2026-09-16-current-upstream-timing.md)
-now passes all 23 native GPU tests: four profiling tests and the nineteen
-hardware requirements, including production gradients and causal/batched
-LeVJEPA parity. Three same-driver full-state pairs now match exactly, including
-all optimizer moments and repeatability. The older cross-driver checkpoint
-comparison fails and remains preserved; it is not a backend regression result.
-Native profiling also preserves complete state and identifies **55,245 world
-gradient dispatches, including 29,020 splits/concatenations**, supporting the
-staged block-matmul test. The separate N6 pixel/native-budget gates now pass; no speedup
-is established. Keep execution on the GPU; no CPU fallback or actor/learner
-separation is needed for this next optimization.
-The [source-matched N6 pixel comparison](experiments/2026-09-16-native-memory-pixels.md)
-now passes all ten GPU phases with NVML disabled: four exact Boxing train/frozen
-runs, Freeway override/restore integration, and 3.21 GiB minimum estimated Vulkan
-budget headroom. The independent raw audit passes. Both throughput ratios are
-about 0.995× control—**still about 0.535× aggregate real time**, not a speedup.
-The [same-backend block-matmul candidate](experiments/2026-09-16-current-block-matmul.md)
-at `dee38b2` now passes all fourteen new GPU tests and six complete-state canaries.
-All weights, optimizer moments and reports remain exact. Synthetic learner updates
-are 28–29% shorter and memory usage is lower; **N6 Atari throughput still needs
-measurement**. Neither change is adopted, and the original
-learning recipe, game budgets and Pong hold remain fixed.
+**Use the GPU; NVML remains temporarily disabled.** On driver 580.178.04,
+the [current-upstream timing candidate](experiments/2026-09-16-current-upstream-timing.md)
+passes all 23 native tests and exact same-driver complete-state comparisons.
+Its [ten N6 pixel/restore/override windows](experiments/2026-09-16-native-memory-pixels.md)
+also pass, including the explicitly declared native Vulkan budget gate. That
+backend update alone is throughput-neutral, at about 0.535× aggregate real time.
 
-NVML calls are stopped, including the withdrawn persistent-reader experiment.
+The [same-backend block-matmul candidate](experiments/2026-09-16-current-block-matmul.md)
+at `dee38b2` passes fourteen new native tests, six complete-state canaries and
+all ten N6 windows. **Throughput is 27.3% higher in both Boxing orders:**
+10.22–10.24 actions/s, 0.681–0.683× aggregate real time, about 0.114× per stream.
+All 241 tensors / 146 optimizer moments, reports and training/frozen traces
+remain exact. This is a small native graph change, not reduced training or CPU
+offload. Freeway integration and the complete raw audit also pass.
+Main stays ce80; the old Pong queue and its hold remain terminal. Re-declare
+learning on one qualified package without mixing backends across fresh roots.
+No game competence is established by these short runtime windows.
+
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
 logs, boot/driver identity, native assertions and bounded direct-child lifetimes.
 Recovery action, utilization and directly free/reserved GPU memory remain
-**unmeasured**, not zero or healthy. The [earlier control's failed 1.5 s sampling
-gate](experiments/2026-09-16-driver580-control-preparation.md) remains unchanged.
-The [four prior matching faults](experiments/2026-09-15-interleaved-initialization-incident.md)
-remain unexplained; short diagnostic passes do not establish long-run reliability.
-Full dependency/state/pixel/memory and same-backend throughput gates still precede
-unstarted Pong work.
+**unmeasured**; Vulkan budget headroom is a different, explicitly sampled measure.
+No new fault is recorded in the completed current-driver groups, but the
+[four prior matching faults](experiments/2026-09-15-interleaved-initialization-incident.md)
+remain unexplained. Preserve the failed historical cross-driver state comparison,
+old sampling gates, quarantined fixtures and completed invocations; no retry or
+host recovery. Short qualification is not long-run reliability or proof of a
+driver/NVML causal fix. Detailed diagnostic chronology belongs in the linked reports.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -242,7 +223,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> current Meganeura/Blade native GPU tests [23 pass; NVML disabled]
   -> same-driver complete state/repeatability + native kernel profiles [pass]
   -> same-driver dependency pixels/restore/overrides/native-budget/timing [pass; throughput neutral]
-  -> same-backend block-matmul [GPU hardware/state pass; N6 timing pending]
+  -> same-backend block-matmul [qualified; 27.3% higher N6 throughput, exact state/traces]
+  -> source adoption + new matched learning declaration [next]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
@@ -406,7 +388,8 @@ remain distinct evidence. Neither proves the fault's cause or licenses a retry.
 
 Recheck upstream before new backend diagnosis. Keep dependency qualification
 separate from same-backend block-matmul correctness and throughput. The latter
-is next, ahead of newly declared Pong roots; existing packages, seeds and gates stay pinned.
+now passes both N6 Boxing orders and every declared integration gate. Source
+adoption and newly declared Pong roots are next. Existing packages, seeds and gates stay pinned.
 The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
 frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
 is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
@@ -434,6 +417,15 @@ grouped-RSSM candidate: use the documented isolated package or rebuild, never
 assume a source checkout identifies an existing executable.
 
 ### What actually costs time
+
+The qualified block comparison reduces mean learner time from 365.7 to 259.1
+ms/update in its first matched warmed window. World training falls to 92.6 ms
+and posterior inference to 35.7 ms; imagination stays about 86.7 ms. Observation
+still costs about 49.7 seconds per 1,536 actions. Those remaining costs explain
+why the measured 27.3% speedup still reaches only about 0.682× aggregate real time.
+Keep the [short-window measurements](experiments/2026-09-16-current-block-matmul.md)
+separate from the older complete-learning readout below; GPU activity is currently
+unmeasured, and the fixed R256 training workload has not been reduced.
 
 The completed [fresh Boxing readout](experiments/2026-09-10-boxing-confirmation.md#completed-training-cost-readout)
 covers 195,996 post-warmup actions: **8.47 actions/s, 0.5645× aggregate real time,
@@ -643,12 +635,11 @@ do not spend fresh three-root confirmations on these unchanged failed recipes.
 Freeway's complete fresh confirmation also fails competence. Pong root 1009's
 complete pair passes. After external recovery to driver 580, both bounded
 initialization and production-gradient pairs pass without NVML. Current-upstream
-hardware, same-driver state and N6 runtime gates now also pass. Continue to
-same-backend block-matmul correctness and throughput under the user's resumed
-direction; the four
-historical faults remain unexplained and host recovery is not authorized.
-Matched block-matmul correctness/throughput gates still precede
-re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
+hardware, same-driver state, N6 runtime and same-backend block correctness/
+throughput gates now all pass. Integrate the qualified source and explicitly
+re-declare matched Pong work. The four historical faults remain unexplained;
+NVML stays disabled and host recovery is not authorized. Preserve all stopped
+attempts and the original queue hold. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
 Qbert's [completed replay diagnostic](experiments/2026-09-12-qbert-diagnostic.md) separates
 initial misses from low post-bonus progress: only 4.68% of training frames follow
