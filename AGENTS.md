@@ -51,6 +51,21 @@ reliable learning.
   main ce80 and Pong hold unchanged. Further work needs a bounded non-NVML
   declaration and approval; use only documented read-only audits. See
   `docs/experiments/2026-09-16-host-only-initialization.md`.
+- The next gradient pair has CPU-only fixtures, not GPU approval/declaration:
+  afb973a/control and 0d0a831/candidate preserve their historical dependencies
+  and change only world-test diagnostics/instructions. Their identical world.rs
+  binds full B16/T64 and the real declared device, emits flushed numerical/stage
+  records and rejects all-zero gradients; original arithmetic/tolerances remain.
+  `runs/driver-gradient-cpu-20260916.dPzrO2` passes 86 Kindle CPU tests per arm,
+  formatting and release Clippy, with 23 GPU tests ignored. Fourteen commands,
+  18,108 inputs and ten artifacts independently re-audit; only prepare.py --audit
+  is reusable. New natives are b069df58/7b4b9a8c, not the completed init binaries.
+  Preserve the completed writer/caches. Session::wait still discards errors;
+  step.wait_returned is not a successful-fence assertion. A strict new reader/
+  launcher, CPU refusal checks, separate non-NVML declaration and approval are
+  still required. No GPU test/query, NVML, training, recovery or successor runs.
+  See `docs/experiments/2026-09-16-driver-gradient-preparation.md`; no old gate,
+  quarantine, main dependency, Pong hold or five-game completion claim changes.
 - User direction on driver 580: stop NVML calls, including `nvidia-smi`, Python
   bindings and the isolated persistent reader. The proposed cadence/parity test
   is withdrawn; do not request approval for it again. Preserve its CPU evidence,

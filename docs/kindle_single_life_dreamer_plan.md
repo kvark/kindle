@@ -58,6 +58,11 @@ pass; both children exit cleanly and no kernel fault is recorded. The two-job
 approval is consumed. This is useful diagnostic progress, not proven reliability,
 a driver/NVML causal fix or full runtime qualification. Further GPU work needs a
 new bounded declaration and approval; main remains ce80 and Pong remains held.
+The [next production-gradient pair](experiments/2026-09-16-driver-gradient-preparation.md)
+has matched driver-bound CPU fixtures (86 tests per arm), not a GPU result or
+launch declaration. It preserves the original graph/arithmetic/tolerances and
+adds flushed numerical evidence; its source-pinned reader and hardware approval
+remain required before execution.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
