@@ -17,6 +17,12 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- The user has now stopped NVML calls on driver 580. This prototype's proposed
+  hardware cadence/parity test is withdrawn, not awaiting approval. Preserve the
+  completed CPU sources/evidence and use only documented read-only audits; do
+  not load NVML, invoke the worker on hardware, adopt it or ask to run the
+  withdrawn experiment. Future monitoring must follow the main worktree's
+  non-NVML direction. No GPU job, host recovery or training is authorized.
 - This worktree is the isolated CPU-only persistent-health prototype, not an
   adopted guard or GPU launcher. `gpu_health.py` opens NVML only on an explicit
   request; `gpu_health_client.py` bounds responses and retains the <=1.5 s gap.
