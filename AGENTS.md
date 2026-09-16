@@ -17,6 +17,21 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 host-only reads observe external boot 4f5152d1 and an externally
+  installed 580.178.04 server-open stack. Loaded/on-disk module and NVML library
+  versions match; all 1,444 captured current-boot kernel records contain no
+  observed Xid/PMU-halt fault. No GPU query or health verification occurred.
+  Upstream main remains 5a570099/6ab5fcec. The separate historical-control fixture
+  f7b1914 adds only explicit driver binding and CPU tests on ae7699ad/9b9e7ee7/
+  c96a9a87; production code and dependencies are unchanged. ZkxGRu passes all
+  84 Kindle CPU tests, formatting and release Clippy; 23 GPU tests stay ignored.
+  Its eight commands, 4,914 inputs and five artifacts independently re-audit.
+  Preserve this writer/private cache and Yz0Vmu's host capture; only their
+  documented --audit modes are reusable. No GPU declaration, execution, driver
+  fix or adoption follows. Explicit approval is still requested for health
+  queries and one newly declared guarded control-only initialization. All
+  quarantines, full qualification gates and Pong hold remain. See
+  `docs/experiments/2026-09-16-driver580-control-preparation.md`.
 - September 15 15:30 UTC safety stop supersedes pending qualification work:
   the sole latest-upstream initialization attempt in
   `runs/interleaved-latest-init-20260915.7MdNse` faults with the same Xid 62

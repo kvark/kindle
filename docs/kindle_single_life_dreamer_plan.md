@@ -1,6 +1,6 @@
 # Kindle: one actor learning to play
 
-Updated 2026-09-15. This is the authoritative roadmap: direction, current evidence
+Updated 2026-09-16. This is the authoritative roadmap: direction, current evidence
 and next decisions. Detailed protocols and measurements live in
 [experiment reports](experiments/2026-09-05-kickoff.md) and their pinned
 `runs/` artifacts. Working constraints remain in [AGENTS.md](../AGENTS.md).
@@ -50,15 +50,19 @@ completed both paired pilots; the [serial queue](experiments/2026-09-11-recovere
 then completed Freeway and Pong root 1009 and stopped before root 2017 as requested.
 Never restart that terminal queue or remove its hold.
 
-**GPU work is stopped again.** The latest guarded initialization attempt produces
-a [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md),
-despite a passing historical control and an earlier interleaved-initialization
-candidate. It includes upstream 5a570099/6ab5fcec. Complete CPU event prefixes and
-recorded resident-buffer placements match the passing runs; initialization-order
-restoration is not a sufficient fix. The guard contains its child but cannot
-recover the driver. All affected candidates remain quarantined, main stays ce80,
-and no training follows. Operator-approved driver/runtime investigation and
-recovery now precede further qualification; another blind retry is not the plan.
+**GPU work remains stopped pending an approved new-driver control.** Host records
+now show externally installed 580.178.04 and a new boot. The
+[driver-bound historical control](experiments/2026-09-16-driver580-control-preparation.md)
+passes CPU preparation, but GPU health and initialization on this driver remain
+unverified. Approval is requested for health queries and one guarded control-only
+initialization; no GPU declaration or training follows from this preparation.
+
+The latest upstream candidate previously produced a
+[fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).
+Upstream main remains 5a570099/6ab5fcec. Matching CPU event prefixes and recorded
+buffer placements did not establish safety; restoring initialization order was
+insufficient. All affected candidates stay quarantined, main stays ce80, and
+full dependency/state/pixel/memory and same-backend throughput gates precede Pong.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
