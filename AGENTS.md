@@ -1,5 +1,25 @@
 # Kindle working direction
 
+## September 16: isolated CPU-only driver-bound control
+
+This worktree starts at ae7699ad, the historical ce80/published-Blade control.
+Only the ignored initialization fixture and these instructions change. Require
+the new selection combined-driver-control-20260916 and an explicit expected
+driver (580.178.04 or 595.91.07); reject a missing/unlisted value before creating
+the GPU context, and require the actual device to match it in both sessions.
+The same binary can therefore bind either driver without rewriting metadata.
+This does not authorize installing either driver or comparing them on hardware.
+
+The September 15 safety stop in /x/Code/kindle/AGENTS.md supersedes older stage
+directions below. No GPU query, execution, health claim or GPU declaration is
+authorized by this CPU preparation. The user must approve health checks and a
+separately declared control-only invocation. All candidates remain quarantined.
+Preserve historical writers/targets; use a separately pinned private CPU target.
+No production runtime, dependency, learning setting, adoption gate or Pong hold
+changes. Supporting two explicit driver assertions is not cross-driver parity.
+
+## Earlier retained working direction
+
 September 15 versioned CPU continuation supersedes historical stages below.
 The path-override attempt is preserved with its real dependency-identity failure.
 This continuation pins instrumented-control Meganeura 9b9e7ee7 and shared Blade
