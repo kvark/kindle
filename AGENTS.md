@@ -17,6 +17,37 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 block qualification is now separately declared in
+  `runs/current-block-runtime-20260916.Cx3Xei`: 3,928 inputs, eight reader tests,
+  fourteen individually reviewed native invocations and seven explicitly reused
+  unchanged-backend results. All fourteen new GPU tests now pass, with 234
+  complete initializations and 580,871 trace records. This includes upstream
+  F64 loss/gradients, Kindle exact production block loss/output/all gradients,
+  production-world gradients and all cache/reset/vector/restore/LeVJEPA checks.
+  Every child exits zero and is reaped with no recorded fault or NVML. Preserve
+  this terminal group; audit/verify modes only, never a retry or successor.
+  The separate zc0Aig group now passes all six same-backend state canaries:
+  all 241 tensors/146 moments, reports, both anchors and repeats match exactly.
+  Its 4,274 inputs, six reader tests, 66 complete initializations and 780,729
+  records verify; every child exits zero/reaped with no recorded fault or NVML.
+  Preserve this completed group too. Synthetic update medians drop from
+  363.539/364.397 ms to 261.102/258.532 ms; this is not N6 Atari throughput.
+  NaQ1zs completes native 886bae68 with 4,445 inputs, all 562 Python tests,
+  formatting/Clippy and actual compiler/source/wheel/import identity. Preserve
+  its completed writer/target; audit only. The separate M7whE0 N6 declaration
+  binds 4,487 inputs and 17 reader checks, with its first serial training window
+  now active. Keep both source/package/reader roots fixed. Require all ten
+  individual N6 AB/BA/restore/override/native-budget windows, both retained
+  same-backend serial anchors, exact state/reports/traces and unchanged speed
+  gates. No compiler work during timing, NVML, run-all or automatic successor.
+  Preserve the t8SQkG builder's failed relative-depfile reader, all 28 passing
+  commands and unchanged binaries;
+  Cx3Xei separately verifies their actual compiler/source identity without a
+  rebuild. Keep all completed/failed invocations terminal. N6 matched throughput
+  still precedes adoption/Pong; no N6 speedup or new learning is established.
+  Use the GPU with NVML disabled, existing host-only containment, and no CPU
+  fallback or recovery. See
+  `docs/experiments/2026-09-16-current-block-matmul.md`.
 - September 16 N6 pixel qualification is complete in
   `runs/current-driver-pixels-20260916.cDLhXG`: ten individually invoked/reviewed
   same-driver windows, no NVML or automatic successor. Its 3,141 pins and
@@ -41,9 +72,9 @@ reliable learning.
   Preserve gHOVn2's early directory failure and both swlgNZ identity-reader
   failures; wIjRCa independently verifies the unchanged fresh packages. Only
   its audit modes are reusable. The block carry dee38b2 has byte-identical
-  networks.rs to 7b190f88 on the same current backend; source only, not built
-  or GPU-qualified. Its fresh source-matched native build and block component/
-  world, complete-state and matched-throughput tests are next. Do not compile
+  networks.rs to 7b190f88 on the same current backend. Its fresh native fixtures
+  and hardware tests now pass under the separate declaration above;
+  complete state now passes too, and matched N6 throughput remains. Do not compile
   during matched timing or repeat the completed backend group. Main stays ce80
   and Pong held until same-backend block correctness/throughput qualify.
   Stop on a new fault; no recovery. See

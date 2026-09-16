@@ -80,9 +80,12 @@ now passes all ten GPU phases with NVML disabled: four exact Boxing train/frozen
 runs, Freeway override/restore integration, and 3.21 GiB minimum estimated Vulkan
 budget headroom. The independent raw audit passes. Both throughput ratios are
 about 0.995× control—**still about 0.535× aggregate real time**, not a speedup.
-The unchanged block-matmul change is carried onto this same backend at `dee38b2`.
-Build and test that graph next; neither the backend nor block graph is adopted,
-and the original learning recipe, game budgets and Pong hold remain fixed.
+The [same-backend block-matmul candidate](experiments/2026-09-16-current-block-matmul.md)
+at `dee38b2` now passes all fourteen new GPU tests and six complete-state canaries.
+All weights, optimizer moments and reports remain exact. Synthetic learner updates
+are 28–29% shorter and memory usage is lower; **N6 Atari throughput still needs
+measurement**. Neither change is adopted, and the original
+learning recipe, game budgets and Pong hold remain fixed.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
@@ -239,7 +242,7 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> current Meganeura/Blade native GPU tests [23 pass; NVML disabled]
   -> same-driver complete state/repeatability + native kernel profiles [pass]
   -> same-driver dependency pixels/restore/overrides/native-budget/timing [pass; throughput neutral]
-  -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
+  -> same-backend block-matmul [GPU hardware/state pass; N6 timing pending]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
@@ -470,18 +473,18 @@ Prioritize world-training kernels/layout and recurrent handoffs, then perception
 improved exact paired throughput by 12.9–13.3%; preserve its completed controls.
 The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails exact
 full learning from report 3 and is not adopted. The
-[small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
-[world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. The identical block change has preserved CPU-qualified packages
-and 21 GPU test fixtures, but no block GPU qualification. The
+[current small-batch block-matmul](experiments/2026-09-16-current-block-matmul.md)
+passes all GPU component/hardware and complete-state tests; N6 timing remains. The
+[world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidate still
+has CPU evidence only. The
 [old block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
 is terminal, not a live waiter. Its later 0a98775-based carry remains quarantined
 after the dependency pixel fault. The current dependency-only comparison now
 passes under its new non-NVML protocol. The exact block source is carried at
-`dee38b2` on that same backend; build and GPU-test it next under a fresh
+`dee38b2` on that same backend, with fresh native fixtures and a separate GPU
 declaration. Do not restart old followers or change game budgets/competence gates.
 Block-matmul correctness and throughput now take priority over unstarted Pong
-roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
+roots. Neither candidate has a verified end-to-end Atari speedup; world-sync remains secondary.
 
 For every optimization, require production losses/all gradients, reset causality,
 complete weights and optimizer moments from update 1, exact state/action traces,
