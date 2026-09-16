@@ -94,6 +94,12 @@ match exactly. This is native graph optimization, not reduced training.
   The complete-study reader `f467014` and exact main carry pass 902 tests in
   dIT4dM/WyDKOL. Historical component reads preserve both failed 200k results;
   neither becomes a 400k study. Preserve these checks too; no new GPU job.
+  This isolated storage candidate prefers runner-owned `--checkpoint-history`:
+  save directly to fresh action-numbered slots, then retain/analyze after exit.
+  It removes the unused observer and its tests; preserve the completed observer
+  sources/evidence elsewhere. No guard change or live follower. The native binary
+  is unchanged, but bounded default/history/restore GPU checks remain required
+  before adoption or a new dose declaration. Do not modify the running Pong source.
   See `docs/experiments/2026-09-16-atari-dose-retention.md`.
 
 ## GPU operation
