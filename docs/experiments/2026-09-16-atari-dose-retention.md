@@ -1,4 +1,4 @@
-# Retaining checkpoints for the Freeway/Qbert exposure comparisons
+# Checkpoint support for the Freeway/Qbert exposure comparisons
 
 The [standalone snapshot helper](../../python/examples/retain_atari_checkpoint.py)
 recovers the tested Qbert retention code and adds the existing Freeway .5/hold64
@@ -69,6 +69,36 @@ A valid copied archive may survive a later observer failure, but without the
 observer's success event it does not satisfy that future experiment. The observer
 has no controller hook or automatic follower, and is not attached to live Pong.
 
+## Complete-study artifact reader
+
+The [result reader](../../python/examples/audit_atari_dose.py), isolated at
+`f467014`, adapts the historical Qbert stage reader to both games. It binds
+midpoint/final saves to one complete 400,008-action history, verifies all saved
+state and restored identities, retains separately initialized zero-moment controls,
+and reuses the existing task scorer and whole-stream replay/video bindings.
+Qbert keeps four complete episodes per stream with cap 600,000; Freeway keeps
+75,000 unassisted frozen actions. The R256 recipe and task gates stay fixed.
+
+The [completed check](../../runs/atari-dose-reader-check-20260916.dIT4dM/capture/result.json)
+passes **902 Python tests**, including 90 new reader cases, and its read-only
+audit reverifies 234 input pins and ten command records. All 32 native/build
+inputs remain unchanged; no binary is rebuilt. Main's exact carry also passes
+[all 902 tests](../../runs/atari-dose-reader-main-check-20260916.WyDKOL/tests.xml)
+with actual module/package identities checked before and after. Preserve both
+completed checks and the isolated source; only documented audit/import modes
+are reusable.
+
+The separate [historical component read](../../runs/atari-dose-reader-check-20260916.dIT4dM/integration.json)
+reproduces Qbert's 17/24 successes and mean 3,754.17 versus 125, and Freeway's
+16/36 successes and mean 24.5833 versus zero. Complete original/archived state,
+replays, video identities and untrained moments verify. Both remain failed
+**historical 200,004-action** experiments on their original backend. The new
+complete-study reader rejects their old budgets; no header or result is relabelled.
+
+This reader does not certify GPU execution, command lifecycles or midpoint-observer
+success. Those are explicit separate prerequisites for a future controller. A
+successful pilot would still be one root, not three-root or five-game reliability.
+
 ## Next learning comparison, still undeclared
 
 Use one fresh uninterrupted **400,008-action** history per proposed pilot, with
@@ -88,7 +118,8 @@ adapter bundle, the prepared midpoint observer and failure propagation, complete
 training and frozen/control evidence, native memory budget and whole-rollout replays/videos.
 The previous Qbert stage/execution readers retain their historical source/recipe
 bindings and must not be invoked as a current-runtime launcher. Preserve their
-completed tests. Source matching and the new Freeway frozen-stage contract need
-explicit binding in that future declaration; this helper does not certify them.
+completed tests. Bind the prepared current-source observer and complete-study
+reader explicitly in that future declaration; neither is a GPU launcher or
+proof that the guard propagates observer failure.
 Finish scheduled Pong and the Breakout action-width gates before launching more
 game work. A successful pilot still needs fresh-root reliability confirmation.

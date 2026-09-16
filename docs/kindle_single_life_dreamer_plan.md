@@ -289,10 +289,11 @@ Freeway and Qbert's next hypotheses are separately declared continuous
 the native learner or runner. Keep each game's existing exploration and frozen
 protocol, including untrained controls and unchanged competence thresholds.
 The midpoint and final are one training history, not independent roots. The bound
-incremental observer is also prepared, with 812 passing Python tests and unchanged
-native code. Its direct-child guard integration, current-source stage auditor and
-GPU declaration remain future work; no additional game is launched while the
-fixed Pong campaign continues.
+incremental observer and complete-study artifact reader are also prepared, with
+902 passing Python tests and unchanged native code. The reader preserves both
+games' frozen protocols and rejects historical 200k runs as new 400k results.
+Direct-child guard integration and a source-matched GPU declaration remain future
+work; no additional game is launched while the fixed Pong campaign continues.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the

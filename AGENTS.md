@@ -91,6 +91,9 @@ match exactly. This is native graph optimization, not reduced training.
   The separate bound midpoint observer `462702b` and exact main carry pass 812
   Python tests in eYU7Cx/O4CMVU, with native code unchanged. Preserve both checks;
   guard failure propagation/stage integration remain undeclared. No live follower.
+  The complete-study reader `f467014` and exact main carry pass 902 tests in
+  dIT4dM/WyDKOL. Historical component reads preserve both failed 200k results;
+  neither becomes a 400k study. Preserve these checks too; no new GPU job.
   See `docs/experiments/2026-09-16-atari-dose-retention.md`.
 
 ## GPU operation
