@@ -1,5 +1,22 @@
 # Kindle working direction
 
+- September 16 episode carry uses the now-qualified dee38b2/native886bae68
+  block runtime without changing or rebuilding native code. M7whE0/oVOgnU
+  complete both throughput orders, exact state/traces and Freeway integration.
+  Carry the already-tested 24b2968 episode-budgeted Python adapter here while
+  retaining native memory-budget reporting and the no-NVML profiler. Keep
+  all original seeds, action caps, episode targets and competence gates.
+  Build a fresh Python import bundle around the identical qualified native;
+  never overwrite old packages or sources. Check default learning parity,
+  complete frozen state, first-eligible episode stopping and negative action
+  caps on the GPU before a new matched learning declaration. Reuse completed
+  native hardware/state/throughput evidence explicitly; this Python-only carry
+  does not require recompiling the unchanged backend. New GPU phases use the
+  existing direct-child host-only guard, one invocation and result review at
+  a time. No NVML, retry, automatic successor, old queue restart or recovery.
+  Main source adoption remains pending; current instructions in /x/Code/kindle
+  supersede the historical preparation statuses below.
+
 - September 16 staged block-matmul carry: this worktree starts at the complete
   current pixel source e2a1d53, using unchanged Meganeura 589d73ab and shared
   Blade 2accfeee. Only networks.rs changes native behavior: the small-batch
