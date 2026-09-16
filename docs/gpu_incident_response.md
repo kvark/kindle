@@ -8,8 +8,10 @@ the original RTX 5080 failures and failed module-reload recovery. The
 records another initialization fault despite passing isolated checks. The
 [September 15 fourth incident](experiments/2026-09-15-interleaved-initialization-incident.md)
 also faults after restoring immediate zeroing and including current upstream.
-GPU work is stopped; both interleaved candidates and the earlier failed bundle
-and its block carry are quarantined.
+The [two explicitly approved initialization-only tests on driver 580](experiments/2026-09-16-host-only-initialization.md)
+now pass without NVML. GPU work is stopped again after those two invocations;
+both interleaved candidates and the earlier failed bundle/block carry remain
+quarantined outside separately authorized diagnostics. No driver fix is proven.
 
 ## Current policy: no NVML on driver 580
 
@@ -74,6 +76,15 @@ Preserve that completed CPU writer/sentinel; do not rerun them. This preparation
 starts no GPU diagnostic or learning campaign, changes no old acceptance gate
 and lifts no candidate quarantine or Pong hold. A future GPU invocation still
 requires its own explicit authorization and non-NVML experiment declaration.
+
+The separately approved **bT2bAx** diagnostic subsequently completes one ce80
+control and one historical candidate initialization. Both direct children exit
+zero and are reaped; each complete 143,121-record trace and checked wait passes.
+The 235/240 host checks and both post-audit kernel checks pass, with no recorded
+fault and zero NVML calls. This is actual containment-path execution, not evidence
+of stopping a new wedge, directly free memory, long-run reliability or a causal
+driver fix. Preserve the old 3O90H9 sampling-gap failure. Both authorizations are
+consumed; no retry, subsequent GPU session, game training or host recovery follows.
 
 ## Capture before recovery
 

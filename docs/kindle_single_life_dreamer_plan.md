@@ -50,27 +50,25 @@ completed both paired pilots; the [serial queue](experiments/2026-09-11-recovere
 then completed Freeway and Pong root 1009 and stopped before root 2017 as requested.
 Never restart that terminal queue or remove its hold.
 
-**Control initialization works on 580.178.04; qualification is still incomplete.**
-The [single approved control](experiments/2026-09-16-driver580-control-preparation.md)
-finishes both sessions without a recorded fault, with zero training. Its complete
-traces pass, but two teardown/final-query health gaps (1.756/1.656 s) exceed the
-unchanged 1.5 s coverage limit. Preserve this failed declared gate; no retry or
-automatic successor. The [CPU-only monitoring follow-up](experiments/2026-09-16-persistent-health-cpu.md)
-isolates slow startup/teardown queries, but the user has now stopped NVML calls
-on driver 580. The proposed cadence/parity test is withdrawn; its CPU-tested
-persistent reader stays unused. Future diagnostics must use host kernel logs,
-native device/error checks and timeouts, with non-NVML measurement requirements
-declared explicitly. The [host-only guard](gpu_incident_response.md#prepared-host-only-guard)
-passes 105 CPU tests and a real-host CPU print check, not GPU qualification.
-NVML is not part of the learner or inference path. This control does not prove
-a driver fix; no candidate or learning job follows.
+**Both approved initialization-only arms pass on 580.178.04 without NVML.**
+The [ce80 control and historical candidate](experiments/2026-09-16-host-only-initialization.md)
+each complete both sessions, all 143,121 initialization records and checked
+waits, with zero actions/updates. Separate raw audits and post-audit kernel checks
+pass; both children exit cleanly and no kernel fault is recorded. The two-job
+approval is consumed. This is useful diagnostic progress, not proven reliability,
+a driver/NVML causal fix or full runtime qualification. Further GPU work needs a
+new bounded declaration and approval; main remains ce80 and Pong remains held.
 
-The latest upstream candidate previously produced a
-[fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).
-Upstream main remains 5a570099/6ab5fcec. Matching CPU event prefixes and recorded
-buffer placements did not establish safety; restoring initialization order was
-insufficient. All affected candidates stay quarantined, main stays ce80, and
-full dependency/state/pixel/memory and same-backend throughput gates precede Pong.
+NVML calls are stopped, including the withdrawn persistent-reader experiment.
+The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
+logs, boot/driver identity, native assertions and bounded direct-child lifetimes.
+Recovery action, utilization and directly free/reserved GPU memory remain
+**unmeasured**, not zero or healthy. The [earlier control's failed 1.5 s sampling
+gate](experiments/2026-09-16-driver580-control-preparation.md) remains unchanged.
+The [four prior matching faults](experiments/2026-09-15-interleaved-initialization-incident.md)
+remain unexplained; one passing candidate execution does not lift quarantine.
+Full dependency/state/pixel/memory and same-backend throughput gates still precede
+unstarted Pong work.
 
 Watch whole stream-zero evaluations, including failures and unfinished tails:
 
@@ -355,13 +353,19 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins qualified upstream `ce80e9cd`. The September 15 **15:39 UTC** source
-check finds Meganeura **5a570099** and Blade **6ab5fcec**. The latest isolated
-candidate includes these packed-format/runtime and shader-validation updates,
-plus matched observations and immediate Shared zeroing. Its CPU checks pass,
-but its [combined initialization fails](experiments/2026-09-15-interleaved-initialization-incident.md).
-It is not adopted or safe to retry. The earlier passing candidate remains a
-single preserved result, not an approved fallback. No successor is declared.
+Main pins historically qualified upstream `ce80e9cd`; it is not fully requalified
+on driver 580. The September 16 source check finds Meganeura **5a570099** and
+Blade **bbf5bf5**. Blade's new **1c2e06bd** fixes optional timestamp collection and
+changes the API to resolve the submission just waited on. Pick up that fix with
+a compatible Meganeura integration before future timing qualification.
+
+The [driver diagnostic](experiments/2026-09-16-host-only-initialization.md) freezes
+the historical candidate's 070f4b51/100bb813 runtime, including packed-weight fixes,
+shader validation and immediate Shared zeroing. Timing is disabled in both arms;
+the new timing fix is not tested or claimed adopted. This candidate's
+[595 initialization fault](experiments/2026-09-15-interleaved-initialization-incident.md)
+and its single passing 580/no-NVML initialization remain distinct evidence.
+Neither proves the fault's cause or licenses a retry/automatic successor.
 
 Recheck upstream before new backend diagnosis. Keep dependency qualification
 separate from same-backend block-matmul correctness and throughput. Both remain
@@ -430,14 +434,13 @@ The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails 
 full learning from report 3 and is not adopted. The
 [small-batch block-matmul](experiments/2026-09-10-block-matmul.md) and
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidates have CPU
-evidence only. The identical block change now has a CPU-qualified source-matched
-package on latest 75dfe901 and all 21 GPU test fixtures prepared but unrun;
-the older ce80e9cd candidate is preserved. Qualify the dependency-only runtime
-first, then test the block optimization against that same backend. The separate
-[block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
-is now declared after both dependency stages, with 103 passing CPU checks and a
-verified live waiter. Its executing-adapter, full-state and throughput gates
-remain unrun; it changes no active pair, game budget or competence threshold.
+evidence only. The identical block change has preserved CPU-qualified packages
+and 21 GPU test fixtures, but no block GPU qualification. The
+[old block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
+is terminal, not a live waiter. Its later 0a98775-based carry remains quarantined
+after the dependency pixel fault. Qualify the dependency-only runtime first,
+then carry and test the block optimization against that same backend in a fresh
+declaration. Do not restart old followers or change game budgets/competence gates.
 Block-matmul correctness and throughput now take priority over unstarted Pong
 roots. Neither candidate has a verified GPU speedup; world-sync remains secondary.
 
@@ -448,9 +451,10 @@ producer compute and transfers; they are not automatically GPU idle. Current
 external captures resolve queue submissions, not individual kernels or calibrated
 idle gaps. Serialize GPU work and avoid large CPU graph builds during training.
 The separate [opt-in learner timeline](experiments/2026-09-13-learner-timeline.md)
-now has CPU-checked stage labels and completed-transfer harvesting on latest
-upstream, but no GPU capture or qualification. It stays outside the declared
-throughput queue; synthetic-core coverage cannot establish whole-Atari idle gaps.
+has CPU-checked stage labels and completed-transfer harvesting on its pinned
+75dfe901 backend, but no GPU capture or qualification. Rebase relevant work for
+future timing qualification; synthetic-core coverage cannot establish whole-Atari
+idle gaps.
 
 Lower replay ratios, smaller models and larger learner batches are separate
 learning-compute ablations. Historical R64 Boxing reaches about 1.31× aggregate

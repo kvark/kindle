@@ -17,6 +17,40 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 explicit approval permits two new initialization-only invocations
+  on boot 4f5152d1 / driver 580.178.04: driver-bound ce80 control first, then the
+  driver-bound quarantined 070f4b51 candidate only after a complete control pass.
+  Use a fresh non-NVML declaration and direct-child host guard. Stop on any
+  failure; no retry, automatic successor, acting, training or host recovery.
+  Memory, utilization and recovery-action telemetry remain unmeasured. This is
+  a limited diagnostic exception, not candidate adoption, full qualification or
+  a change to historical gates. All old writers/results and Pong hold remain.
+  Blade main advances to bbf5bf5 with an optional timestamp API fix; Meganeura
+  stays 5a570099. Timing is disabled in these matched historical fixtures.
+  Keep the diagnostic runtimes fixed and reconsider the fix for later throughput
+  qualification; do not call the frozen candidate the latest Blade runtime.
+- Both approved non-NVML initializations are now complete in
+  `runs/driver580-host-init-20260916.bT2bAx`: ce80 control PID 40606, then candidate
+  PID 41120, each exit zero and reaped after separate invocation/result review.
+  Both exact 632/9,439-slot plans, 10,081 buffer/allocation pairs, all 14,645
+  uploads, 143,121 trace records and checked waits independently reverify.
+  The control/candidate have 235/240 passing host checks, maximum gaps below
+  0.289 seconds, plus passing post-audit kernel checks. These are
+  host checks, not GPU-health samples. No fault is recorded, NVML calls and
+  actions/updates are zero, and no child remains. GPU recovery/utilization/free
+  memory remain unmeasured. All 10,125 declared inputs and the 48-test CPU review
+  re-audit; preserve completed writers and both invocations, with no retry.
+  The new candidate fixture eebbf7c is byte-identical to f7b1914 and changes no
+  production code/dependencies. ITVpsF passes 84 Kindle CPU tests, formatting,
+  release Clippy and eight commands with 5,023 input/five artifact pins; its CPU
+  suite leaves 23 GPU tests ignored. Preserve fHY59j's pre-compilation checker failure.
+  Both authorizations are consumed. No further GPU job, query, game training,
+  recovery or automatic successor is declared. A single candidate pass is not
+  reliability, a driver/NVML causal fix or full runtime qualification. Keep the
+  historical 3O90H9 sampling-gap failure, all quarantines and qualification gates,
+  main ce80 and Pong hold unchanged. Further work needs a bounded non-NVML
+  declaration and approval; use only documented read-only audits. See
+  `docs/experiments/2026-09-16-host-only-initialization.md`.
 - User direction on driver 580: stop NVML calls, including `nvidia-smi`, Python
   bindings and the isolated persistent reader. The proposed cadence/parity test
   is withdrawn; do not request approval for it again. Preserve its CPU evidence,
