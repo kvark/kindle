@@ -560,7 +560,7 @@ impl DreamerCore {
         &mut self,
         directory: impl AsRef<Path>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        use meganeura::profiler::{CaptureOptions, ProfileError, capture_session_profile};
+        use meganeura::profiler::{CaptureOptions, capture_session_profile};
 
         assert!(self.learner_step > 0, "learn once before profiling");
         fs::create_dir_all(directory.as_ref())?;
@@ -585,8 +585,7 @@ impl DreamerCore {
                 session.step();
                 session.wait();
                 let wall_ms = started.elapsed().as_secs_f64() * 1_000.0;
-                // Advance the command-buffer ring before retaining timestamps
-                // from these fixed-input, optimizer-free normal executions.
+                // Warm up these fixed-input, optimizer-free executions.
                 if iteration >= 2 {
                     durations.push(wall_ms);
                     let timings = session.gpu_timings();
@@ -611,22 +610,9 @@ impl DreamerCore {
                     unprofiled_median_ms: Some(unprofiled_median_ms),
                     ..CaptureOptions::default()
                 },
-            );
+            )?;
             let path = directory.as_ref().join(format!("{name}.json"));
-            let mut data = match profile {
-                Ok(profile) => serde_json::to_value(profile)?,
-                Err(ProfileError::TooManyDispatches { count, limit }) => {
-                    // Keep the wall measurement and the reason no GPU trace
-                    // exists. A truncated timestamp stream is not a profile.
-                    serde_json::json!({
-                        "unprofiled_median_ms": unprofiled_median_ms,
-                        "dispatch_count": count,
-                        "timestamp_pass_limit": limit,
-                        "per_dispatch_timing_unavailable": "dispatch count exceeds timestamp capacity",
-                    })
-                }
-                Err(error) => return Err(error.into()),
-            };
+            let mut data = serde_json::to_value(profile)?;
             data["ordinary_gpu_median_ms"] =
                 serde_json::json!(gpu_durations.get(gpu_durations.len() / 2));
             data["ordinary_gpu_samples_ms"] = serde_json::json!(gpu_durations);

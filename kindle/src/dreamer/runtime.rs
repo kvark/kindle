@@ -21,6 +21,10 @@ pub(crate) fn build_session(
             mode,
             gpu: Some(Arc::clone(gpu)),
             skip_full_optimize: mode == Mode::Training && skip_full_optimize,
+            runtime: meganeura::SessionOptions {
+                gpu_timing: meganeura::GpuOptions::from_env().timing,
+                ..Default::default()
+            },
             ..SessionConfig::default()
         },
     )

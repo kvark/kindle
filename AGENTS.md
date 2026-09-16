@@ -4,8 +4,11 @@ September 16 latest-timing candidate supersedes historical preparation stops.
 The user explicitly resumes GPU work with NVML disabled and prefers clean native
 code to CPU-only workarounds. The completed P34QyD gradient control/candidate
 passes remain immutable. Carry the current Blade timestamp fixes and minimal
-Meganeura API adaptation into this separate candidate, retaining observability,
-initialization ordering, learning arithmetic and exact numerical gates.
+Meganeura upstream 986f49a implementation into this separate candidate (589d73ab
+with observations/checked waits, shared Blade 2accfeee). Drop the superseded
+local timing adapter and TooManyDispatches fallback: upstream windows now cover
+large graphs. Carry the context's explicit timing option to every session while
+retaining initialization ordering, learning arithmetic and exact numerical gates.
 Build in a fresh private target (one CPU / 2 GiB / zero swap). First test timing
 disabled/enabled directly on the selected GPU under the existing host-only guard;
 then continue remaining hardware/state/pixel and same-backend throughput checks.

@@ -252,6 +252,10 @@ impl DinoPerception {
                 mode: Mode::Inference,
                 gpu: Some(gpu),
                 cache: plan_cache,
+                runtime: meganeura::SessionOptions {
+                    gpu_timing: meganeura::GpuOptions::from_env().timing,
+                    ..Default::default()
+                },
                 ..SessionConfig::default()
             },
         );
@@ -394,6 +398,10 @@ impl DinoEncoder {
                 mode: Mode::Inference,
                 gpu: Some(gpu),
                 cache: plan_cache,
+                runtime: meganeura::SessionOptions {
+                    gpu_timing: meganeura::GpuOptions::from_env().timing,
+                    ..Default::default()
+                },
                 ..SessionConfig::default()
             },
         );
