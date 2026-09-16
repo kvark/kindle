@@ -17,6 +17,28 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 current-upstream qualification uses Kindle 9ec96cf / Meganeura
+  589d73ab / shared Blade 2accfeee, carrying upstream 986f49a/92553493. Use the
+  upstream timestamp/windowing implementation; the local timing adapter and
+  Blade accessor are superseded, not new production infrastructure. Retain
+  initialization observations/order and fail-fast GPU waits, with unchanged
+  learning arithmetic. VPMDem binds 868 inputs and separately declares four
+  upstream timing tests followed by the original nineteen hardware tests.
+  All 23 native GPU tests now pass, with 237 session initializations, complete
+  production gradients, causal LeVJEPA reference/batch parity, no recorded fault
+  and no NVML. The separate 4I6PMB reader reverifies the entire group and fresh
+  post-audit kernel evidence. Every child is reaped. VPMDem is terminal: only
+  its audit/verify modes remain reusable, never a run mode or retry.
+  The user has resumed ordinary bounded GPU work; do not
+  reinstate old blanket approval stops. Main stays ce80 and Pong stays held.
+  Preserve both completed builds, the NxDACz foreign-package build failure,
+  its two superseded timing passes and every new invocation. Completed entries
+  permit only retained-file audits. The unchanged canary is CPU-built in CICPt6
+  (native 497fd147), ready for a fresh state/profile GPU declaration, not yet a
+  canary GPU result. Preserve that writer/private cache. See
+  `docs/experiments/2026-09-16-current-upstream-timing.md`. Full state/moments,
+  N6 pixels/restore/overrides, explicitly declared non-NVML memory measurement
+  and same-backend block throughput remain required. No host recovery.
 - September 16 explicit approval permits two new initialization-only invocations
   on boot 4f5152d1 / driver 580.178.04: driver-bound ce80 control first, then the
   driver-bound quarantined 070f4b51 candidate only after a complete control pass.

@@ -29,8 +29,9 @@ actions/sec, updates/sec and stage times, with absent telemetry represented as
 does not query the GPU. The profiler is a scheduler, so do not wrap it in the
 direct-child guard; guard the actual native-bearing process in new experiments.
 
-For a future separately authorized job, declare host-only kernel/boot/driver
-checks, native device assertions/errors and bounded child lifetimes. Kernel
+For each bounded job under the user's resumed GPU direction, declare host-only
+kernel/boot/driver checks, native device assertions/errors and bounded child
+lifetimes. Kernel
 reports can lag a fault; these checks are containment, not wedge prevention.
 Live recovery-action, utilization and directly free VRAM are no longer measured
 by NVML. Mark them unmeasured, never zero or healthy. Any replacement measurement
@@ -83,8 +84,8 @@ python/.venv/bin/python -B runs/host-only-guard-cpu-20260916.YZtTha/prepare.py -
 
 Preserve that completed CPU writer/sentinel; do not rerun them. This preparation
 starts no GPU diagnostic or learning campaign, changes no old acceptance gate
-and lifts no candidate quarantine or Pong hold. A future GPU invocation still
-requires its own explicit authorization and non-NVML experiment declaration.
+and lifts no candidate quarantine or Pong hold. New GPU invocations use the
+user's resumed authorization and their own non-NVML experiment declarations.
 
 The separately approved **bT2bAx** diagnostic subsequently completes one ce80
 control and one historical candidate initialization. Both direct children exit
@@ -93,7 +94,9 @@ The 235/240 host checks and both post-audit kernel checks pass, with no recorded
 fault and zero NVML calls. This is actual containment-path execution, not evidence
 of stopping a new wedge, directly free memory, long-run reliability or a causal
 driver fix. Preserve the old 3O90H9 sampling-gap failure. Both authorizations are
-consumed; no retry, subsequent GPU session, game training or host recovery follows.
+consumed; do not retry either invocation. Later qualification follows the user's
+separate resumed direction, not those consumed approvals. No host recovery is
+authorized and Pong remains held for throughput qualification.
 
 ## Capture before recovery
 

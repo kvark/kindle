@@ -64,6 +64,10 @@ with worst relative L2 0.00074561 against the unchanged .003 limit. Complete
 initialization traces and host guards pass without recorded faults or NVML calls.
 Continue bounded GPU qualification/performance work under the resumed direction;
 reuse native tests and the existing guard, avoiding CPU-only workaround detours.
+The [current-upstream timing candidate](experiments/2026-09-16-current-upstream-timing.md)
+now passes all 23 native GPU tests: four profiling tests and the nineteen
+hardware requirements, including production gradients and causal/batched
+LeVJEPA parity. Full-state, pixel, memory and throughput qualification remain.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
@@ -72,7 +76,7 @@ Recovery action, utilization and directly free/reserved GPU memory remain
 **unmeasured**, not zero or healthy. The [earlier control's failed 1.5 s sampling
 gate](experiments/2026-09-16-driver580-control-preparation.md) remains unchanged.
 The [four prior matching faults](experiments/2026-09-15-interleaved-initialization-incident.md)
-remain unexplained; one passing candidate execution does not lift quarantine.
+remain unexplained; short diagnostic passes do not establish long-run reliability.
 Full dependency/state/pixel/memory and same-backend throughput gates still precede
 unstarted Pong work.
 
@@ -216,9 +220,9 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Qbert paired pilot [complete; competence failed]
   -> Freeway three-root confirmation [complete; all three competence gates fail]
   -> Pong root 1009 training + frozen evaluation + untrained control [complete; paired gate passes]
-  -> latest Meganeura/Blade qualification [blocked by repeated initialization PMU halts]
-  -> operator-approved recovery and driver/runtime investigation [no GPU job declared]
-  -> separately qualified dependency hardware/state/pixels/memory/timing [still required]
+  -> external recovery to driver 580; non-NVML init/gradient control pairs [pass]
+  -> current Meganeura/Blade native GPU tests [23 pass; NVML disabled]
+  -> complete dependency state/pixels/memory/timing gates [still required]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]
@@ -245,10 +249,11 @@ retain the source, driver, clock and allocator evidence. Passing isolated hardwa
 complete state, or one combined initialization does not establish reliable safety.
 The [guard and runbook](gpu_incident_response.md) contain the direct child and
 preserve evidence; they do not prevent a first wedge or authorize recovery.
-No further GPU query, failed-job retry or automatic successor is permitted.
-After operator-approved recovery, select a distinct, bounded driver/runtime
-diagnostic before resuming full qualification. A changed driver needs explicit
-compatibility checks and a matched declaration, not a silent host change.
+The user has resumed GPU work on externally installed driver 580 with NVML
+temporarily disabled. Continue bounded native qualification under the host-only
+guard, reviewing each result before the next job. Do not retry failed jobs or
+perform host recovery. A changed driver needs explicit compatibility checks and
+a matched declaration, not a silent host change.
 Keep each pinned native/Python package together; main's dependency update does
 not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
@@ -360,18 +365,23 @@ batched without removing recurrence or mixing histories.
 ### Meganeura: current source and pinned runtimes
 
 Main pins historically qualified upstream `ce80e9cd`; it is not fully requalified
-on driver 580. The September 16 source check finds Meganeura **5a570099** and
-Blade **bbf5bf5**. Blade's new **1c2e06bd** fixes optional timestamp collection and
-changes the API to resolve the submission just waited on. Pick up that fix with
-a compatible Meganeura integration before future timing qualification.
+on driver 580. The latest September 16 source check finds Meganeura **986f49a**
+and Blade **92553493**. These include completed-submission timestamps, signed
+calibration-delta handling and windowed profiling for large graphs. The separate
+current-upstream candidate uses that implementation, removes Kindle's obsolete
+timestamp-capacity fallback and carries explicit timing options to its sessions.
+It retains initialization observations and checks GPU waits; learning math is
+unchanged. GPU qualification is in progress, not an adopted speedup.
+See the [current-source report](experiments/2026-09-16-current-upstream-timing.md)
+for pins, completed native results and the superseded local adapter.
 
 The [driver diagnostic](experiments/2026-09-16-host-only-initialization.md) freezes
 the historical candidate's 070f4b51/100bb813 runtime, including packed-weight fixes,
-shader validation and immediate Shared zeroing. Timing is disabled in both arms;
-the new timing fix is not tested or claimed adopted. This candidate's
+shader validation and immediate Shared zeroing. Timing is disabled in those arms;
+their passes do not test the new profiler. This candidate's
 [595 initialization fault](experiments/2026-09-15-interleaved-initialization-incident.md)
-and its single passing 580/no-NVML initialization remain distinct evidence.
-Neither proves the fault's cause or licenses a retry/automatic successor.
+and its passing 580/no-NVML initialization and production-gradient comparison
+remain distinct evidence. Neither proves the fault's cause or licenses a retry.
 
 Recheck upstream before new backend diagnosis. Keep dependency qualification
 separate from same-backend block-matmul correctness and throughput. Both remain
@@ -605,8 +615,10 @@ Breakout and Qbert have complete paired pilots, but both fail competence.
 Preserve their checkpoints, controls and videos;
 do not spend fresh three-root confirmations on these unchanged failed recipes.
 Freeway's complete fresh confirmation also fails competence. Pong root 1009's
-complete pair passes. The fourth GPU fault now requires operator-approved
-recovery and a driver/runtime investigation before further GPU qualification.
+complete pair passes. After external recovery to driver 580, both bounded
+initialization and production-gradient pairs pass without NVML. Continue
+current-upstream GPU qualification under the user's resumed direction; the four
+historical faults remain unexplained and host recovery is not authorized.
 Latest-dependency and matched block-matmul throughput gates still precede
 re-declaring remaining Pong work. Preserve all stopped attempts. Breakout's
 action-width candidate remains staged; its old idle follower is retired.
