@@ -17,6 +17,18 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- This worktree is the isolated CPU-only persistent-health prototype, not an
+  adopted guard or GPU launcher. `gpu_health.py` opens NVML only on an explicit
+  request; `gpu_health_client.py` bounds responses and retains the <=1.5 s gap.
+  The original guard is unchanged. The completed preparation in
+  `runs/persistent-health-cpu-20260916.Yn3D4H` passes 173 CPU tests and independently
+  audits eight commands/38 inputs, including C-header ABI layout without NVML
+  linkage and the unchanged failed control result. Preserve the first pytest
+  collection failure and both archived development test sources. Only
+  `capture_cpu.py --audit` is reusable. No real NVML library was loaded; symbol
+  reads and CPU fakes establish neither field parity nor cadence or safety.
+  The one-job control approval is consumed. New GPU queries, any worker hardware
+  use, candidates, training and host changes still require operator approval.
 - September 16's explicitly approved driver-580 control is now terminal in
   `runs/driver580-control-20260916.3O90H9`. Native initialization and the unchanged
   guard pass; direct child 7873 exits zero and is reaped. Both complete plans,
