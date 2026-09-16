@@ -56,10 +56,12 @@ finishes both sessions without a recorded fault, with zero training. Its complet
 traces pass, but two teardown/final-query health gaps (1.756/1.656 s) exceed the
 unchanged 1.5 s coverage limit. Preserve this failed declared gate; no retry or
 automatic successor. The [CPU-only monitoring follow-up](experiments/2026-09-16-persistent-health-cpu.md)
-isolates slow startup/teardown queries and prepares a request-driven persistent
-reader with 173 passing CPU tests. Hardware cadence/parity is untested; no guard
-adoption or new GPU query is authorized. This control does not prove the new
-driver fixes the candidate fault, and no candidate or learning job follows.
+isolates slow startup/teardown queries, but the user has now stopped NVML calls
+on driver 580. The proposed cadence/parity test is withdrawn; its CPU-tested
+persistent reader stays unused. Future diagnostics must use host kernel logs,
+native device/error checks and timeouts, with non-NVML measurement requirements
+declared explicitly. NVML is not part of the learner or inference path. This
+control does not prove a driver fix; no candidate or learning job follows.
 
 The latest upstream candidate previously produced a
 [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).
@@ -415,6 +417,9 @@ not a speedup. N8 fails the **2,048 MiB directly measured free-memory gate**.
 Total minus used omits driver reservations and cannot substitute for memory.free.
 Record memory.reserved and coverage too; changed packages/configurations require
 their own matching runtime evidence.
+These are historical NVML measurements. With NVML now stopped, a new memory
+gate needs an explicitly declared non-NVML measurement; do not substitute old
+readings, estimates or fabricated zeros for directly measured free memory.
 
 Prioritize world-training kernels/layout and recurrent handoffs, then perception.
 [Device-resident imagination](experiments/2026-09-08-device-imagination.md) already

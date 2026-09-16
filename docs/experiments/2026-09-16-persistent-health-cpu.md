@@ -1,5 +1,9 @@
 # Monitoring cadence: CPU-only persistent-reader preparation
 
+**Superseded by the user's no-NVML direction on driver 580.** The proposed
+hardware cadence/parity test is withdrawn, not awaiting approval. Preserve the
+CPU prototype and evidence; neither is adopted or to be executed against NVML.
+
 Status: **173 CPU tests pass; no new GPU query or hardware test occurs.**
 The [approved ce80 control](2026-09-16-driver580-control-preparation.md)
 initialized correctly on 580.178.04, but its declared monitoring-coverage gate
@@ -89,8 +93,9 @@ completed capture writer. The final reusable CPU-only audit is:
 python/.venv/bin/python -B runs/persistent-health-cpu-20260916.Yn3D4H/capture_cpu.py --audit
 ```
 
-The next useful decision is approval for one separately declared, bounded
-**NVML-only cadence/field-parity diagnostic** on 580.178.04. No Vulkan/native
-initialization, candidate, training, persistence setting or host recovery belongs
-in that diagnostic. It is not currently authorized or scheduled. All candidate
-quarantines, full qualification gates and the Pong hold remain.
+The proposed NVML-only hardware diagnostic is now withdrawn at the user's
+request. Do not keep seeking approval for it. Future diagnostics must use
+non-NVML monitoring with their requirements declared explicitly; absence of
+memory/utilization telemetry is not a healthy measurement. Historical failures
+and CPU results remain unchanged. This change starts no GPU job and lifts no
+candidate quarantine, qualification gate or Pong hold.

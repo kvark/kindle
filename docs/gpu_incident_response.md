@@ -11,6 +11,22 @@ also faults after restoring immediate zeroing and including current upstream.
 GPU work is stopped; both interleaved candidates and the earlier failed bundle
 and its block carry are quarantined.
 
+## Current policy: no NVML on driver 580
+
+The user has stopped NVML calls, including `nvidia-smi` polling and the proposed
+persistent-reader experiment. That experiment is withdrawn, not awaiting
+approval. NVML is monitoring infrastructure, not part of Kindle's learning or
+inference path. Keep the historical guard and captures unchanged for auditing,
+but do not invoke its NVML-based `run` mode or the old vector profiler.
+
+For a future separately authorized job, declare host-only kernel/boot/driver
+checks, native device assertions/errors and bounded child lifetimes. Kernel
+reports can lag a fault; these checks are containment, not wedge prevention.
+Live recovery-action, utilization and directly free VRAM are no longer measured
+by NVML. Mark them unmeasured, never zero or healthy. Any replacement measurement
+and acceptance rule must be explicit in a new declaration; historical gates and
+results are not rewritten. No new GPU job or host recovery is authorized here.
+
 ## Capture before recovery
 
 Stop scheduling new GPU work. Do not relaunch a failed experiment or remove a
@@ -64,20 +80,12 @@ sharing; nothing uploads automatically. NVIDIA requests full logs, configuration
 reproduction details and its bug-report output for investigation.
 [NVIDIA reporting guidance](https://docs.nvidia.com/deploy/gpu-debug-guidelines/gpu-node-triage.html#reporting-a-gpu-issue)
 
-## Guard a new direct native job
+## Historical NVML guard (not a current launcher)
 
-Pin the guard, declaration, executable, environment and predecessor proof in a
-new experiment. Substitute those paths below; this example is not a new GPU
-declaration or authorization to run the quarantined candidate:
-
-```bash
-python3 /x/Code/kindle/python/examples/gpu_guard.py run /absolute/path/to/NEW-guard-output \
-  --uuid GPU-6869e50d-83aa-bec7-6169-adc413f49b32 --driver 595.91.07 \
-  --declaration /absolute/path/to/declaration.json --timeout 1800 \
-  -- /absolute/path/to/pinned-kindle-test \
-  dreamer::world::tests::temporal_batching_matches_serial_losses_and_gradients \
-  --exact --ignored --nocapture --test-threads=1
-```
+The original `gpu_guard.py run` invokes NVML and is not permitted under the
+current policy. Its implementation and historical declarations remain intact
+for evidence readers. The following describes that historical mechanism and
+its observed limits, not permission to execute it again.
 
 Use a **direct native executable**, or a separately declared Python process
 that executes the native extension in that same process. The latter requires
@@ -156,10 +164,11 @@ reset may not recover all components and recommends power cycling when
 post-reset health fails.
 [NVIDIA reset guidance](https://docs.nvidia.com/deploy/nvidia-smi/#-r---gpu-reset)
 
-After recovery, freshly bind the boot, loaded/on-disk/userspace driver, GPU UUID
-and native executing adapter; require readable numeric health, no recovery
-action, clean kernel evidence and the direct free-memory margin. Recovery is
-not runtime qualification. Keep the original failing candidate quarantined;
+After recovery, freshly bind the boot, loaded/on-disk/userspace driver and native
+executing adapter. Under the no-NVML policy, a future declaration must specify
+non-NVML evidence rather than silently claiming the historical numeric-health,
+recovery-action and free-memory checks passed. Recovery is not runtime
+qualification. Keep the original failing candidate quarantined;
 test changes only through separately declared guarded diagnostics. Inspect
 each result before continuing, and do not resume old queues or training
 automatically.

@@ -17,6 +17,17 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- User direction on driver 580: stop NVML calls, including `nvidia-smi`, Python
+  bindings and the isolated persistent reader. The proposed cadence/parity test
+  is withdrawn; do not request approval for it again. Preserve its CPU evidence,
+  but do not adopt or execute the prototype. Historical `gpu_guard.py run` and
+  `profile_atari_vector.py` invoke NVML and must not launch under this policy;
+  host-only snapshot/audit modes remain usable. Future diagnostics need an
+  explicit non-NVML declaration using kernel logs, host driver/boot identity,
+  native device/error checks and bounded process lifetimes. Unavailable memory
+  and utilization telemetry is unmeasured, not zero or proof of health; old
+  gates/results remain unchanged. This monitoring change does not authorize a
+  GPU job, host recovery, quarantined candidate or held Pong work.
 - September 16 monitoring follow-up is CPU-only: isolated prototype 3ebdf2e in
   `exp/persistent-health-cpu-20260916` leaves the original guard/main runtime
   unchanged. Yn3D4H passes 173 CPU tests and independently audits eight commands/
