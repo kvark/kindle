@@ -33,11 +33,27 @@ reliable learning.
   reinstate old blanket approval stops. Main stays ce80 and Pong stays held.
   Preserve both completed builds, the NxDACz foreign-package build failure,
   its two superseded timing passes and every new invocation. Completed entries
-  permit only retained-file audits. The unchanged canary is CPU-built in CICPt6
-  (native 497fd147), ready for a fresh state/profile GPU declaration, not yet a
-  canary GPU result. Preserve that writer/private cache. See
-  `docs/experiments/2026-09-16-current-upstream-timing.md`. Full state/moments,
-  N6 pixels/restore/overrides, explicitly declared non-NVML memory measurement
+  permit only retained-file audits. The unchanged canary from CICPt6 (497fd147)
+  now passes three exact same-driver state pairs in QJKcT5: all 241 tensors,
+  146 optimizer moments, non-timing reports and both eight-update repeats.
+  Preserve T8qQhs's failed historical-anchor comparison: the identical ce80
+  binary on 580 differs from its 595 checkpoint in ninety moment tensors, not
+  weights/reports. No candidate ran in T8qQhs and it has no top-level success.
+  QJKcT5 reuses its completed 580 control under a distinct same-driver protocol;
+  it does not repair the cross-driver gate. The actor-momentum outlier exists
+  in both historical and fresh controls; retain it for a separate optimizer
+  numerical investigation, not an unannounced learning-rule change.
+  The separately declared 814vSr GPU profile now passes all seven sessions,
+  56,096 dispatches sampled three times and exact post-profile complete state.
+  World gradients have 55,245 dispatches (29,020 splits/concats), with ordinary
+  wall/GPU-pass medians 171.012/121.903 ms. Prioritize the staged block-matmul
+  comparison after remaining backend pixel/memory qualification. Windowed
+  profiles perturb timing and are not utilization or end-to-end speedups.
+  All seven new native children (six state windows plus profiling) exit zero
+  and are reaped, with no recorded fault or NVML query. Completed writers,
+  targets and invocations are terminal; use only audit/verify modes. See
+  `docs/experiments/2026-09-16-current-upstream-timing.md`. N6 pixels/restore/
+  overrides, explicitly declared non-NVML memory measurement
   and same-backend block throughput remain required. No host recovery.
 - September 16 explicit approval permits two new initialization-only invocations
   on boot 4f5152d1 / driver 580.178.04: driver-bound ce80 control first, then the

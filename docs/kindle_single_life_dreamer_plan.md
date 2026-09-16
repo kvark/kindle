@@ -67,7 +67,14 @@ reuse native tests and the existing guard, avoiding CPU-only workaround detours.
 The [current-upstream timing candidate](experiments/2026-09-16-current-upstream-timing.md)
 now passes all 23 native GPU tests: four profiling tests and the nineteen
 hardware requirements, including production gradients and causal/batched
-LeVJEPA parity. Full-state, pixel, memory and throughput qualification remain.
+LeVJEPA parity. Three same-driver full-state pairs now match exactly, including
+all optimizer moments and repeatability. The older cross-driver checkpoint
+comparison fails and remains preserved; it is not a backend regression result.
+Native profiling also preserves complete state and identifies **55,245 world
+gradient dispatches, including 29,020 splits/concatenations**, supporting the
+staged block-matmul test after remaining pixel/memory qualification. No speedup
+is established. Keep execution on the GPU; no CPU fallback or actor/learner
+separation is needed for this next optimization.
 
 NVML calls are stopped, including the withdrawn persistent-reader experiment.
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
@@ -222,7 +229,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> Pong root 1009 training + frozen evaluation + untrained control [complete; paired gate passes]
   -> external recovery to driver 580; non-NVML init/gradient control pairs [pass]
   -> current Meganeura/Blade native GPU tests [23 pass; NVML disabled]
-  -> complete dependency state/pixels/memory/timing gates [still required]
+  -> same-driver complete state/repeatability + native kernel profiles [pass]
+  -> dependency pixels/restore/overrides/memory/timing gates [still required]
   -> same-backend block-matmul correctness + N6 AB/BA throughput [unrun; old follower terminal]
   -> remaining Pong roots [held; new declaration required]
   -> Breakout action-width qualification [staged; old idle follower retired]

@@ -2,7 +2,10 @@
 
 The latest Meganeura candidate passes **all 23 native GPU tests**: four upstream
 profiling tests and all nineteen original hardware tests, on the RTX 5080 /
-driver 580.178.04, without NVML. No throughput improvement,
+driver 580.178.04, without NVML. It now also passes all three exact same-driver
+full-state pairs and completes a seven-session native kernel profile without
+changing the checkpoint. The older cross-driver anchor fails and is preserved
+separately below. No throughput improvement,
 complete dependency qualification, driver/NVML causal fix or Atari win is claimed.
 Main remains ce80; throughput qualification still precedes the held Pong roots.
 
@@ -118,18 +121,19 @@ remaining checks. The old writer's `complete: false` remains unchanged.
 
 ## Next decisions
 
-Complete full-state/moment, N6 pixel/restore/override and matched throughput
-qualification. Use the new
-profiler to identify expensive kernels, retaining ordinary untraced timing as
-the speed benchmark. A windowed replay profile is not itself GPU utilization or
-a whole-Atari idle-gap measurement.
+Complete N6 pixel/restore/override and matched throughput qualification after
+the same-driver state diagnostic below. The completed profile identifies a
+large split/concat dispatch burden, supporting the already staged block-matmul
+comparison on this same backend. Retain ordinary untraced end-to-end timing as
+the speed benchmark. A windowed replay profile is not GPU utilization or a
+whole-Atari idle-gap measurement. Do not introduce a CPU execution fallback,
+actor/learner separation or new monitoring infrastructure for this work.
 
 The unchanged canary is freshly built in
 `runs/current-timing-canary-cpu-20260916.CICPt6`, native SHA256
 `497fd1475a7e532bce4f40e61edd2bdd4ac992af003115f75a0f9f56cd3da0c5`.
 Its three-command CPU build completes in a copied private target; preserve the
-writer/cache. It has not run on GPU. Use a new bounded declaration for state
-and profiling work under the resumed GPU direction, not another approval wait.
+writer/cache. Its GPU state comparisons now complete as described below.
 
 GPU recovery action, utilization and directly free/reserved VRAM remain
 unmeasured. Existing native Vulkan allocation-budget checks remain enabled;
@@ -138,3 +142,118 @@ measurement explicitly for the new full-runtime comparison rather than calling
 old readings current. Keep the same-backend block-matmul comparison ahead of
 Pong, with unchanged game budgets and competence gates. Stop on a new fault;
 no reset, reload, reboot or driver change is authorized.
+
+## Same-driver complete state; historical anchor fails
+
+The first [historical-anchor declaration](../../runs/current-timing-state-20260916.T8qQhs/declaration.md)
+stops after its sole ce80 control, PID **64349**. The unchanged native executable
+exits zero, its host guard passes, reports/checkpoint are complete and finite,
+and no kernel fault is recorded. The exact comparison against its September 11
+checkpoint fails: **90 optimizer-moment tensors differ**. All 95 non-moment
+tensors, shapes, metadata and non-timing reports match. No candidate or later
+window runs in T8qQhs; preserve its absent top-level success result and unused
+declarations. Never rerun it.
+
+This compares the same executable across driver **595.91.07 → 580.178.04**,
+not two backends on the same driver. That distinction does not make the old
+gate pass or prove the driver caused every difference. The separate
+[terminal interpretation](../../runs/current-driver-state-20260916.QJKcT5/historical-result.json)
+retains the full exact comparison and per-tensor errors. Most differences are
+small, but do not describe all of them as insignificant rounding: the actor's
+first-layer weight momentum at flat index 463568 is **19.5791378 versus
+20.0183926**, absolute difference **0.4392548**. Both corresponding second-moment
+entries are zero. This outlier already exists in the historical control;
+its cause and effect on learning are not established. Keep it for a focused
+optimizer numerical/stability investigation, not an unannounced epsilon or
+learning-rule change during throughput qualification.
+
+The new [same-driver diagnostic](../../runs/current-driver-state-20260916.QJKcT5/declaration.md)
+pins **2,278 inputs**, reuses the completed 580 control after a fresh raw audit,
+and performs five separately reviewed native invocations:
+
+| Window | ce80 PID | Current candidate PID | Result |
+| --- | --- | --- | --- |
+| Update 1, control first | 64349, reused | 65643 | Exact complete state/reports |
+| Update 8, control first | 66348 | 66880 | Exact complete state/reports |
+| Update 8, candidate first | 67866 | 67351 | Exact pair and both same-backend repeats |
+
+All comparisons retain **241 tensor entries and all 146 optimizer moments**,
+complete checkpoint metadata except the declared backend identity, all
+non-timing reports and the original 12M/B16/T64/full-BPTT64/R256 settings.
+No numeric tolerance or tensor exclusion is introduced. The three candidate
+runs have **33 complete initialization sessions / 439,227 trace records**.
+Every native child exits zero and is reaped. Across the six windows, **1,472
+host checks** pass, maximum gap **0.288709 s**, with no recorded kernel fault
+or NVML query.
+
+Both unchanged canaries expose Vulkan memory-budget snapshots. The new
+declarations explicitly require at least 2 GiB of budget-minus-usage headroom
+at four ordered snapshots. The minimum observed headroom is **10,021,634,048
+bytes (9.33 GiB)**. This is not NVML directly free memory, a peak measurement
+or combined N6 perception/learner qualification.
+
+The short untraced update-3–8 medians are **360.402 / 361.393 ms** in the first
+control/candidate pair and **362.438 / 360.104 ms** in candidate/control order.
+These tiny synthetic windows do not establish a speedup or Atari throughput.
+They motivate kernel profiling rather than longer learning runs on an assumed
+improvement. Same-driver parity is established; the failed historical-anchor
+gate remains failed, and full runtime/adoption and Pong gates remain open.
+
+All QJKcT5 invocations are terminal. Reuse only `run.py audit NAME` or `verify`.
+The separate profile preparation rechecks every raw state result before any
+profiling execution; it does not rerun these canaries.
+
+## Native kernel profile: reduce dispatch fragmentation
+
+The separately declared [814vSr profile](../../runs/current-learner-profile-20260916.814vSr/declaration.md)
+pins **2,430 inputs** and completes its sole native invocation, PID **68485**,
+using the unchanged canary with GPU timestamps enabled. Five reader fixtures
+pass; the independent retained-file audit reverifies all inputs, the raw guard,
+all seven profiles, 11 complete initialization sessions and the final checkpoint.
+Every one of **56,096 dispatches** has three attributed samples. All **241
+tensors / 146 optimizer moments**, metadata and non-timing learner reports
+remain exactly equal to the unprofiled candidate at update 1.
+
+The helper retains eleven ordinary executions after two warmups per session.
+It disables optimizer, gradient accumulation and clipping for these fixed-input
+profiles; they are **not whole learner updates**. Ordinary GPU-pass and wall
+medians are:
+
+| Session | Dispatches | Profile windows/sample | Ordinary wall ms | Ordinary GPU-pass ms |
+| --- | ---: | ---: | ---: | ---: |
+| [Posterior](../../runs/current-learner-profile-20260916.814vSr/profiles/posterior.json) | 302 | 1 | 0.839 | 0.644 |
+| [Actor/value](../../runs/current-learner-profile-20260916.814vSr/profiles/actor_value.json) | 27 | 1 | 0.322 | 0.259 |
+| [Slow value](../../runs/current-learner-profile-20260916.814vSr/profiles/slow_value.json) | 14 | 1 | 0.274 | 0.232 |
+| [World heads](../../runs/current-learner-profile-20260916.814vSr/profiles/world_heads.json) | 13 | 1 | 0.242 | 0.203 |
+| [Transition](../../runs/current-learner-profile-20260916.814vSr/profiles/transition.json) | 284 | 1 | 2.439 | 2.083 |
+| [World gradient](../../runs/current-learner-profile-20260916.814vSr/profiles/world_gradient.json) | 55,245 | 45 | 171.012 | 121.903 |
+| [Behavior gradient](../../runs/current-learner-profile-20260916.814vSr/profiles/behavior_gradient.json) | 211 | 1 | 18.597 | 17.776 |
+
+The world plan has **8,618 barrier groups** and **29,020 SplitA/SplitB/Concat
+dispatches**. The posterior has 158 splits plus 39 concatenations out of 302
+dispatches. This is a concrete reason to prioritize the staged small-batch
+block-matmul graph: remove repeated slicing/concatenation without changing
+recurrence, data, replay ratio or precision. Actual speed and complete-state
+parity must still be measured; dispatch counts are not a speedup.
+
+The world pass's ordinary wall/GPU median gap is approximately **49.1 ms**.
+It includes work outside the timed GPU pass, such as command preparation,
+submission and synchronization; it is not a calibrated 49.1 ms GPU-idle
+measurement. The seven sessions also run at different frequencies in a learner
+update, so summing their per-call medians is not total learner cost.
+
+Instrumentation is substantial. The world capture uses **45 full replays per
+sample**, giving **7,929.526 ms** of summed replay wall time versus 171.012 ms
+for one ordinary execution. The stitched timestamp total is **336.282 ms**,
+not the ordinary 121.903 ms GPU pass. Posterior instrumentation increases wall
+time by **2.61×**. Per-dispatch family shares are diagnostic, not an unperturbed
+cost breakdown or GPU utilization. No pipeline register/spill statistics are
+returned; do not infer them from empty arrays.
+
+The native child exits zero and is reaped. All **341 host checks** pass,
+maximum gap **0.289187 s**, with no recorded kernel fault or NVML query.
+Vulkan snapshot headroom remains at least **10,076,160,000 bytes**; snapshots
+do not measure profile peak allocation or directly free memory. The complete
+[result](../../runs/current-learner-profile-20260916.814vSr/result.json) retains
+profile/checkpoint hashes. `run.py audit` and `verify` are read-only; the
+preparation and sole GPU invocation are terminal and must never be rerun.
