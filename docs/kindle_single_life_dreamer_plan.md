@@ -288,12 +288,14 @@ Freeway and Qbert's next hypotheses are separately declared continuous
 753 Python tests and real historical/current checkpoint checks without changing
 the native learner or runner. Keep each game's existing exploration and frozen
 protocol, including untrained controls and unchanged competence thresholds.
-The midpoint and final are one training history, not independent roots. The bound
-incremental observer and complete-study artifact reader are also prepared, with
-902 passing Python tests and unchanged native code. The reader preserves both
-games' frozen protocols and rejects historical 200k runs as new 400k results.
-Direct-child guard integration and a source-matched GPU declaration remain future
-work; no additional game is launched while the fixed Pong campaign continues.
+The midpoint and final are one training history, not independent roots. The
+artifact readers preserve both frozen protocols and reject historical 200k runs
+as new 400k results. Prefer the staged runner-owned `--checkpoint-history` option:
+save each checkpoint in a fresh action-numbered directory, then retain/analyze
+after successful training exit. The unused observer is retired, with its evidence
+preserved. The small history option changes no native code, but still needs a
+bounded default/history/restore GPU check after Pong and the Breakout gates,
+then a source-matched dose declaration. It is not adopted or a new live job.
 
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the

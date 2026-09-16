@@ -83,17 +83,18 @@ match exactly. This is native graph optimization, not reduced training.
   Preserve old sources/followers. Finish the declared Pong campaign before a
   separate action-width GPU declaration. See
   `docs/experiments/2026-09-16-breakout-current-runtime.md`.
-- The external snapshot helper is recovered from `4032063` with Freeway's
-  .5/hold64 contract: 753 Python tests, two exact historical archives and current-
-  backend complete-state inspection pass. No native/runner change or new GPU job.
-  Main's exact carry also passes 753 tests in hfoYkE. Preserve both one-shot
-  writers and teQLiJ's archives; the 400k dose pilots remain undeclared.
-  The separate bound midpoint observer `462702b` and exact main carry pass 812
-  Python tests in eYU7Cx/O4CMVU, with native code unchanged. Preserve both checks;
-  guard failure propagation/stage integration remain undeclared. No live follower.
-  The complete-study reader `f467014` and exact main carry pass 902 tests in
-  dIT4dM/WyDKOL. Historical component reads preserve both failed 200k results;
-  neither becomes a 400k study. Preserve these checks too; no new GPU job.
+- The Freeway/Qbert snapshot and complete-study readers are prepared; historical
+  component reads preserve both failed 200k results, not a new 400k study.
+  Prefer runner-owned `--checkpoint-history` in isolated `0a83c58`: fresh numbered
+  save slots, the same native save call, and retention/analysis after exit. Its
+  856 CPU tests pass with the unchanged native package in x3QpxQ. The flag is
+  not on main or GPU-qualified. Require bounded default/history/restore checks
+  after Pong and the Breakout gates, then a separate dose declaration.
+  The unused observer/test module is retired from main (412 lines); the remaining
+  843 tests pass in DK4f6a with runner/native bytes unchanged. No new guard hook,
+  watcher, follower or GPU job. Preserve all completed sources and evidence:
+  teQLiJ/hfoYkE, eYU7Cx/O4CMVU, dIT4dM/WyDKOL and x3QpxQ/DK4f6a. Preserve the
+  two development path-comparison failures; no native or numerical gate changed.
   See `docs/experiments/2026-09-16-atari-dose-retention.md`.
 
 ## GPU operation

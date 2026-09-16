@@ -44,9 +44,9 @@ The independent audit passes. Preserve the completed writer and both historical
 archives; only its `audit`/actual-import readers are reusable. No NVML, agent,
 GPU job, follower or 400k learning experiment starts in this preparation.
 
-## Incremental midpoint observer
+## Retired incremental midpoint observer
 
-The [observer](../../python/examples/observe_atari_checkpoint.py) carries the
+The [preserved observer](https://github.com/kvark/kindle/blob/462702b21f3a39dc933b0ee5c51a088f0b43db39/python/examples/observe_atari_checkpoint.py) carried the
 earlier Qbert incremental reader onto this shared helper, without its historical
 source or recipe bindings. Source `462702b` changes only that module and its
 tests. It binds an explicitly supplied child command, parent and process-start
@@ -64,10 +64,12 @@ process fixture is a harmless stdin-waiting child and its checkpoint state is
 explicitly synthetic—not a new GPU integration result. Active Pong pins remain
 unchanged. Preserve both completed checks and the isolated source.
 
-The caller must still propagate observer failure through its direct-child guard.
-A valid copied archive may survive a later observer failure, but without the
-observer's success event it does not satisfy that future experiment. The observer
-has no controller hook or automatic follower, and is not attached to live Pong.
+Its design required a caller to propagate observer failure through the direct-child
+guard. That integration was never implemented or attached to Pong. The simpler
+runner-owned approach below removes this requirement. Main retires the unused
+module and its tests (412 lines); source `462702b`, commit `027e49f` and all
+completed evidence remain recoverable. The [remaining main suite](../../runs/atari-observer-retirement-20260916.DK4f6a/tests.xml)
+passes 843 tests with the runner/native bytes unchanged.
 
 ## Complete-study artifact reader
 
@@ -95,16 +97,40 @@ replays, video identities and untrained moments verify. Both remain failed
 **historical 200,004-action** experiments on their original backend. The new
 complete-study reader rejects their old budgets; no header or result is relabelled.
 
-This reader does not certify GPU execution, command lifecycles or midpoint-observer
-success. Those are explicit separate prerequisites for a future controller. A
+This reader does not certify GPU execution or command lifecycles. The future
+declaration must bind separate raw guard results for those prerequisites. A
 successful pilot would still be one root, not three-root or five-game reliability.
+
+## Preferred storage path: staged, not adopted
+
+The runner already owns scheduled native saves. Isolated source
+[`0a83c58`](https://github.com/kvark/kindle/blob/0a83c585898a625cafcdd30b0155bfd1bb229156/python/examples/atari_vector.py)
+adds `--checkpoint-history`: save to `CHECKPOINT/<run-actions>` with exclusive
+directory creation and the same native save call. Earlier slots remain intact;
+the default still replaces its last save. No observer, thread, process signal,
+pause/restart, extra native save or guard modification is needed. Retain and
+analyze the two settled slots only after successful training exit.
+
+The [CPU preparation](../../runs/atari-checkpoint-history-cpu-20260916.x3QpxQ/capture/result.json)
+and audit pass: 856 tests, 178 input pins and eleven commands; all 32 native/build
+inputs and six packaged modules remain unchanged. Thirteen explicit fake-agent
+cases cover cadence, final saves, unchanged interaction/accounting, memory hooks,
+existing-slot refusal and failed-save preservation. Preserve the initial two
+test failures comparing different output paths; the corrected test verifies each
+path separately and compares all remaining accounting exactly. No native failure
+or numerical acceptance rule changed.
+
+This flag is **not on main or GPU-qualified**. After the declared Pong campaign
+and Breakout gates, require a small source-matched native default/history/restore
+comparison before adoption and any dose study. Reuse the unchanged binary and
+component results; no backend rebuild or broad requalification is implied.
 
 ## Next learning comparison, still undeclared
 
-Use one fresh uninterrupted **400,008-action** history per proposed pilot, with
-`--checkpoint-every 200004`. Retain the midpoint before the final save replaces
-the live checkpoint, then evaluate both snapshots with the same frozen protocol
-and separately restored untrained control. Do not interrupt/restart at 200k:
+After storage qualification, use one fresh uninterrupted **400,008-action** history
+per proposed pilot, with `--checkpoint-every 200004 --checkpoint-history`. Retain
+the immutable midpoint/final slots after exit, then evaluate both snapshots with
+the same frozen protocol and separately restored untrained control. Do not interrupt/restart at 200k:
 checkpoints do not preserve live replay or belief equivalently.
 
 Keep Qbert unassisted, with four complete frozen episodes per stream and cap
@@ -114,12 +140,12 @@ action vocabulary, rewards and competence criteria fixed. The midpoint and final
 are one root, not two independent seeds or a historical-backend comparison.
 
 A new declaration must still bind the actual GPU child, current immutable native/
-adapter bundle, the prepared midpoint observer and failure propagation, complete
-training and frozen/control evidence, native memory budget and whole-rollout replays/videos.
+adapter bundle, qualified history layout, complete training and frozen/control
+evidence, native memory budget and whole-rollout replays/videos.
 The previous Qbert stage/execution readers retain their historical source/recipe
 bindings and must not be invoked as a current-runtime launcher. Preserve their
-completed tests. Bind the prepared current-source observer and complete-study
-reader explicitly in that future declaration; neither is a GPU launcher or
-proof that the guard propagates observer failure.
+completed tests. Bind the source-matched storage and complete-study reader
+explicitly in that future declaration. The existing guard owns the direct native
+child and propagates save/runtime failures; the artifact reader is not a launcher.
 Finish scheduled Pong and the Breakout action-width gates before launching more
 game work. A successful pilot still needs fresh-root reliability confirmation.
