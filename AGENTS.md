@@ -83,6 +83,12 @@ match exactly. This is native graph optimization, not reduced training.
   Preserve old sources/followers. Finish the declared Pong campaign before a
   separate action-width GPU declaration. See
   `docs/experiments/2026-09-16-breakout-current-runtime.md`.
+- The external snapshot helper is recovered from `4032063` with Freeway's
+  .5/hold64 contract: 753 Python tests, two exact historical archives and current-
+  backend complete-state inspection pass. No native/runner change or new GPU job.
+  Main's exact carry also passes 753 tests in hfoYkE. Preserve both one-shot
+  writers and teQLiJ's archives; the 400k dose pilots remain undeclared.
+  See `docs/experiments/2026-09-16-atari-dose-retention.md`.
 
 ## GPU operation
 

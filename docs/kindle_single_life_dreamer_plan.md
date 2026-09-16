@@ -282,6 +282,16 @@ that gate. Keep comparisons within each action width exact; do not add explorati
 assistance or a longer budget in the same comparison. Completed pilots and
 scheduling never establish five-game success.
 
+Freeway and Qbert's next hypotheses are separately declared continuous
+400,008-action pilots with retained 200,004-action midpoints. The
+[recovered snapshot helper](experiments/2026-09-16-atari-dose-retention.md) passes
+753 Python tests and real historical/current checkpoint checks without changing
+the native learner or runner. Keep each game's existing exploration and frozen
+protocol, including untrained controls and unchanged competence thresholds.
+The midpoint and final are one training history, not independent roots. The
+live observer, current-source stage auditor and GPU declaration remain future work;
+no additional game is launched while the fixed Pong campaign continues.
+
 Count executed interactions, not vector ticks. Episode-reset observations can
 advance replay warmup without earning action credit, so derive updates from the
 complete source-matched ledger rather than copying Boxing's 49,651 everywhere.
