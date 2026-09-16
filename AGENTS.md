@@ -2,7 +2,7 @@
 
 ## This candidate worktree
 
-`exp/breakout-current-20260916` carries the existing explicit four-action
+Parent `exp/breakout-current-20260916` carries the existing explicit four-action
 Breakout replay/checkpoint checks onto the qualified September 16 block runtime.
 Its native/build inputs and six packaged Python modules are unchanged from
 `8dc0b98`; use that exact qualified package, not the default editable extension.
@@ -10,6 +10,14 @@ Only replay/scoring verification and their tests change. This is not an adopted
 four-action protocol or GPU/learning result. Keep Pong's live bundle untouched.
 Four-action production gradients, state/restore and N6 pixel gates still precede
 the matched eighteen/four-action learning comparison. No automatic GPU successor.
+
+This `exp/breakout-current-gates-20260916` worktree additionally prepares the
+existing four-action world/behavior gradient fixtures and canary option on that
+parent. Production library code/dependencies and Python remain unchanged; do not
+use this fixture build as a replacement Python package. Retain all current-driver
+checks and initialization observations. Additional native Vulkan budget samples
+require >=2 GiB estimated headroom; no NVML. All GPU tests remain ignored until a
+separate post-Pong declaration. Preserve the old ce80 fixtures and retired follower.
 
 Kindle is a Rust agent that learns while acting. Games are the first testbed;
 explicit game rewards and human guidance are allowed. Intrinsic motivation and
