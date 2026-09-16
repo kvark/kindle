@@ -126,6 +126,10 @@ def verify_checkpoint(path, training, evaluation, schema):
     require(metadata['architecture'] == template_metadata['architecture'] == 'dreamerv3-visual-features',
             'wrong checkpoint architecture')
     require(metadata['config'] == start['config'] == frozen['config'], 'changed checkpoint config')
+    action_count = metadata['config'].get('action_count')
+    schema_action_count = template_metadata['config'].get('action_count')
+    require(type(action_count) is type(schema_action_count) is int and action_count > 0
+            and action_count == schema_action_count, 'changed checkpoint action schema')
     require(metadata['collection_streams'] == start['num_envs'], 'changed training stream count')
     require(metadata['perception'] == start['model_provenance']['perception']
             == frozen['model_provenance']['perception'], 'changed perception')

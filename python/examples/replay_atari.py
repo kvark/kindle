@@ -3,6 +3,8 @@
 Replays every recorded action in fresh environments. It does not construct or
 train Kindle. A movie shows every episode of the chosen stream, not selected
 successes. RAM is used only by the post-hoc Qbert completion observer.
+Published full-action runs retain replay v1. Minimal-action Breakout requires
+an explicit matching declaration and replay v2; it does not change task gates.
 """
 
 import argparse
@@ -41,20 +43,40 @@ class TaskMonitor(gym.Wrapper):
         return result
 
 
+def replay_protocol(header):
+    profile = header['atari_protocol']
+    require(profile in ('published', 'published-minimal'), 'unsupported replay preprocessing')
+    if profile == 'published-minimal':
+        require(header['environment'] == 'ALE/Breakout-v5', 'minimal replay is Breakout only')
+        return 'kindle-atari-task-replay-v2'
+    return 'kindle-atari-task-replay-v1'
+
+
 def verify_replay_identity(header, manifest, rom):
+    protocol = replay_protocol(header)
     require(header['environment'] == manifest['environment']
             and header['environment'] in ROM_SHA256, 'wrong declared replay game')
     require(rom['sha256'] == ROM_SHA256[header['environment']], 'unsupported replay ROM')
     require(header['ale_py_version'] == ale_py.__version__ == '0.12.1', 'changed ALE version')
     require(header['wrapper_sha256'] == sha256(atari.__file__), 'changed source wrapper')
-    require(header['atari_protocol'] == 'published' and header['action_repeat'] == 4
+    require(manifest.get('atari_protocol', 'published') == header['atari_protocol'],
+            'changed declared action protocol')
+    full_actions = header['atari_protocol'] == 'published'
+    require(header['action_repeat'] == 4
             and header['sticky_actions'] == 0 and header['noop_max'] == 0
-            and header['full_action_space'] and header['max_episode_frames'] == 100000,
+            and header['full_action_space'] is full_actions and header['max_episode_frames'] == 100000,
             'unsupported replay preprocessing')
+    if not full_actions:
+        actions = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
+        require(type(header['config'].get('action_count')) is int and header['config']['action_count'] == 4
+                and header['action_meanings'] == actions, 'changed minimal action vocabulary')
+        require(type(manifest.get('action_count')) is int and manifest['action_count'] == 4
+                and manifest.get('action_meanings') == actions, 'missing declared minimal action vocabulary')
     for path in (Path(rom['path']), Path(ale_native.__file__), Path(atari.__file__)):
         # The source wrapper may live in another checkout, with identical bytes.
         expected = header['wrapper_sha256'] if path == Path(atari.__file__) else manifest['pins'].get(str(path))
         require(expected is not None and sha256(path) == expected, f'changed replay input: {path}')
+    return protocol
 
 
 def replay_rows(source, environments, monitors):
@@ -105,13 +127,14 @@ def main():
     manifest = json.loads(args.source_manifest.read_text())
     gym.register_envs(ale_py)
     rom = rom_identity(header['environment'])
-    verify_replay_identity(header, manifest, rom)
+    protocol = verify_replay_identity(header, manifest, rom)
     environments, monitors = [], []
     recorder = None
     with ExitStack() as stack:
         for stream, seed in enumerate(header['environment_seeds']):
             raw = stack.enter_context(closing(gym.make(header['environment'], frameskip=1,
-                                                       repeat_action_probability=0.0, full_action_space=True)))
+                                                       repeat_action_probability=0.0,
+                                                       full_action_space=header['full_action_space'])))
             if args.video and stream == args.video_stream:
                 recorder = AtariVideo(raw, args.video, ffmpeg)
                 stack.callback(recorder.close)
@@ -137,7 +160,7 @@ def main():
         video = dict(path=str(args.video.resolve()), sha256=sha256(args.video), stream=args.video_stream,
                      frames=recorder.frame_count, fps=60, raw_frames_sha256=recorder.frame_sha256.hexdigest(),
                      ffmpeg_version=subprocess.check_output([ffmpeg, '-version'], text=True).splitlines()[0])
-    result = dict(protocol='kindle-atari-task-replay-v1', source_log=str(args.log.resolve()),
+    result = dict(protocol=protocol, source_log=str(args.log.resolve()),
                   source_log_sha256=run['sha256'], source_header=header, source_accounting=run['accounting'],
                   source_manifest=str(args.source_manifest.resolve()), source_manifest_sha256=sha256(args.source_manifest),
                   rom=rom, ale_native_sha256=sha256(ale_native.__file__),
