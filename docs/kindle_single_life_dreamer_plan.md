@@ -264,13 +264,15 @@ not switch these experiments. Do not silently mix backends across roots when
 assessing reliability. Each entrypoint requires actual predecessor exit and
 complete raw evidence before GPU work. Valid competence failures remain failures;
 integrity, incomplete-data or runtime-safety failures stop without retries.
-Breakout's isolated [four-action candidate](experiments/2026-09-11-breakout-minimal.md)
-has CPU-tested explicit replay/checkpoint schemas. Both future arms
-must use its same qualified upstream backend; the old eighteen-action pilot is
-historical context, not the matched control. Its compiled full-gradient/state
-fixtures support a separately pinned, one-shot hardware/synthetic diagnostic
-after throughput qualification and the rescheduled learning work. No diagnostic GPU result
-exists yet. Even a pass leaves native four-action initialization/restore, N6 pixel
+Breakout's [four-action candidate](experiments/2026-09-16-breakout-current-runtime.md)
+now carries explicit replay/checkpoint checks onto the qualified block runtime:
+742 Python tests pass with the unchanged native package. Its separate current-
+backend gradient/canary fixture source changes no production library arithmetic.
+Both future learning arms must use one source-matched bundle; the old eighteen-
+action pilot is historical context, not the matched control. Full-gradient/state
+fixtures precede a separately pinned hardware/synthetic diagnostic after the
+declared Pong campaign. No four-action diagnostic GPU result exists yet.
+Even a pass leaves native four-action initialization/restore, N6 pixel
 replay and combined-memory checks before a paired learning declaration and then
 fresh-root confirmation. The state/capture/ledger matrix, measured controller and
 ten complete replay bindings are CPU-prepared, including real-ALE fixtures with

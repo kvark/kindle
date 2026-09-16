@@ -74,6 +74,15 @@ match exactly. This is native graph optimization, not reduced training.
   `pong/seed2017-train.stdout` remain terminal. Never remove the hold or restart
   that queue or any retired follower. Throughput qualification precedes Pong;
   it is now complete, not a reason for another open-ended qualification loop.
+- Breakout's action-width checks are carried onto this runtime in `8092790`:
+  742 Python tests, 32 identical native/build inputs and the unchanged qualified
+  package. The separate `3c4f87f` fixtures pass 109 CPU tests, fmt and release
+  Clippy, with production library code unchanged and all 27 GPU tests ignored.
+  Preserve KA1kRO's depfile-name reader failure; the pzWbk8 completion independently
+  verifies the unchanged binaries and compiler chains. No GPU result or learning follows.
+  Preserve old sources/followers. Finish the declared Pong campaign before a
+  separate action-width GPU declaration. See
+  `docs/experiments/2026-09-16-breakout-current-runtime.md`.
 
 ## GPU operation
 
