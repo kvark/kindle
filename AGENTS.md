@@ -1,5 +1,22 @@
 # Kindle working direction
 
+September 16 driver diagnostic takes precedence over the historical stages below.
+The user explicitly approves one newly declared ce80 initialization-only control,
+then one driver-bound 070f4b51 candidate only after the control's complete pass.
+No NVML calls, training, recovery, retries or automatic successors are allowed.
+This worktree changes only the ignored fixture to the exact f7b1914 control bytes
+and these instructions. Production code, dependencies and learning are unchanged.
+Prepare CPU evidence in a new private target; preserve HEURED and all old writers.
+The fixture selection contains "control" for byte equality, not the runtime role.
+Require a fresh host-only declaration with boot/driver/native/source binding,
+complete allocation/zero/upload/wait traces, checked device and direct-child guard.
+GPU recovery, utilization and directly free memory remain unmeasured; this narrow
+approval does not satisfy original hardware/memory/throughput gates or lift the
+candidate's ongoing quarantine. Stop the sequence on any failure; Pong stays held.
+Blade main bbf5bf5 contains a new optional-timing API fix. Timing is disabled here:
+retain historical 100bb813 for the driver comparison, not as latest qualification.
+Future throughput work must reconsider that upstream fix with matching Meganeura.
+
 September 15 interleaved initialization hypothesis supersedes historical stages.
 The 51ba190c / 7db0d05c / 100bb813 candidate passes the combined initialization
 diagnostic in WeUPsV. Preserve it and its completed CPU target. Full-hardware

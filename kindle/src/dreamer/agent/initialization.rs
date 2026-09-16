@@ -6,7 +6,7 @@ use std::io::Write;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const STREAMS: usize = 6;
-const SELECTION: &str = "combined-control-20260915";
+const SELECTION: &str = "combined-driver-control-20260916";
 
 fn config() -> DreamerConfig {
     let config: DreamerConfig =
@@ -35,11 +35,19 @@ fn mark(phase: &str, data: serde_json::Value) {
         .expect("initialization fixture trace could not be flushed");
 }
 
-fn check_device(info: &crate::GpuDeviceInfo) {
+fn declared_driver(value: Option<&str>) -> &'static str {
+    match value {
+        Some("580.178.04") => "580.178.04",
+        Some("595.91.07") => "595.91.07",
+        _ => panic!("a declared driver version is required"),
+    }
+}
+
+fn check_device(info: &crate::GpuDeviceInfo, expected_driver: &str) {
     assert!(!info.is_software_emulated, "software adapter refused");
     assert_eq!(info.device_name, "NVIDIA GeForce RTX 5080");
     assert_eq!(info.driver_name, "NVIDIA");
-    assert_eq!(info.driver_info, "595.91.07");
+    assert_eq!(info.driver_info, expected_driver);
     assert_eq!(info.requested_device_id.as_deref(), Some("0x2c02"));
 }
 
@@ -85,6 +93,7 @@ fn combined_frontend_world_initialization_only() {
         std::env::var("KINDLE_INIT_DIAGNOSTIC").as_deref(),
         Ok(SELECTION)
     );
+    let driver = declared_driver(std::env::var("KINDLE_INIT_EXPECTED_DRIVER").ok().as_deref());
     let checkpoint = std::env::var_os("KINDLE_INIT_ENCODER").expect("pinned encoder path required");
     let checkpoint = Path::new(&checkpoint);
     let identity = PerceptionKind::LeVJepa.identity(levjepa::CHECKPOINT_SHA256.into());
@@ -97,12 +106,12 @@ fn combined_frontend_world_initialization_only() {
 
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     let device = crate::gpu_device_info(gpu.device_information());
-    check_device(&device);
+    check_device(&device, driver);
     mark("device", serde_json::to_value(&device).unwrap());
     mark("frontend.before", serde_json::json!({}));
     let perception =
         LeVJepaPerception::load_batched(checkpoint, STREAMS, Some(Arc::clone(&gpu)), None).unwrap();
-    check_device(&perception.gpu_device());
+    check_device(&perception.gpu_device(), driver);
     mark("frontend.ready", serde_json::json!({}));
 
     mark("graphs.before", serde_json::json!({}));
@@ -115,7 +124,7 @@ fn combined_frontend_world_initialization_only() {
     );
     mark("world.before", serde_json::json!({}));
     let world = build_session(&graphs[0], &gpu, Mode::Training, config.skip_full_optimize);
-    check_device(&crate::gpu_device_info(world.device_information()));
+    check_device(&crate::gpu_device_info(world.device_information()), driver);
     mark("world.ready", serde_json::json!({}));
 
     // Explicit drops retain the frontend and all CPU graphs through world build.
@@ -199,23 +208,41 @@ fn fixture_records_propagate_write_failure() {
 
 #[test]
 fn device_gate_rejects_software_and_other_drivers() {
-    let good = crate::GpuDeviceInfo {
-        device_name: "NVIDIA GeForce RTX 5080".into(),
-        driver_name: "NVIDIA".into(),
-        driver_info: "595.91.07".into(),
-        is_software_emulated: false,
-        requested_device_id: Some("0x2c02".into()),
-    };
-    check_device(&good);
-    for field in 0..5 {
-        let mut wrong = good.clone();
-        match field {
-            0 => wrong.device_name = "another device".into(),
-            1 => wrong.driver_name = "another driver".into(),
-            2 => wrong.driver_info = "595.71.05".into(),
-            3 => wrong.is_software_emulated = true,
-            _ => wrong.requested_device_id = None,
+    for driver in ["580.178.04", "595.91.07"] {
+        let good = crate::GpuDeviceInfo {
+            device_name: "NVIDIA GeForce RTX 5080".into(),
+            driver_name: "NVIDIA".into(),
+            driver_info: driver.into(),
+            is_software_emulated: false,
+            requested_device_id: Some("0x2c02".into()),
+        };
+        check_device(&good, driver);
+        for field in 0..5 {
+            let mut wrong = good.clone();
+            match field {
+                0 => wrong.device_name = "another device".into(),
+                1 => wrong.driver_name = "another driver".into(),
+                2 => {
+                    wrong.driver_info = if driver == "580.178.04" {
+                        "595.91.07".into()
+                    } else {
+                        "580.178.04".into()
+                    };
+                }
+                3 => wrong.is_software_emulated = true,
+                _ => wrong.requested_device_id = None,
+            }
+            assert!(std::panic::catch_unwind(|| check_device(&wrong, driver)).is_err());
         }
-        assert!(std::panic::catch_unwind(|| check_device(&wrong)).is_err());
+    }
+}
+
+#[test]
+fn driver_declaration_rejects_missing_or_unlisted_versions() {
+    for driver in ["580.178.04", "595.91.07"] {
+        assert_eq!(declared_driver(Some(driver)), driver);
+    }
+    for value in [None, Some(""), Some("595.71.05"), Some("latest")] {
+        assert!(std::panic::catch_unwind(|| declared_driver(value)).is_err());
     }
 }
