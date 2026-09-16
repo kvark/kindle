@@ -1,5 +1,18 @@
 # Kindle working direction
 
+September 16 latest-timing candidate supersedes historical preparation stops.
+The user explicitly resumes GPU work with NVML disabled and prefers clean native
+code to CPU-only workarounds. The completed P34QyD gradient control/candidate
+passes remain immutable. Carry the current Blade timestamp fixes and minimal
+Meganeura API adaptation into this separate candidate, retaining observability,
+initialization ordering, learning arithmetic and exact numerical gates.
+Build in a fresh private target (one CPU / 2 GiB / zero swap). First test timing
+disabled/enabled directly on the selected GPU under the existing host-only guard;
+then continue remaining hardware/state/pixel and same-backend throughput checks.
+Review results before each successor; no NVML, blind retries or host recovery.
+Main ce80 and the Pong hold remain until qualification; these source changes
+are not adoption or five-game competence. No extra blanket GPU approval wait.
+
 September 16: CPU-only production-gradient fixture preparation takes precedence.
 The approved bT2bAx control/candidate initializations are complete; preserve
 both source trees, targets and results. Their two-job authorization is consumed.
