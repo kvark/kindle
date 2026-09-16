@@ -1,5 +1,19 @@
 # Kindle working direction
 
+- September 16 staged block-matmul carry: this worktree starts at the complete
+  current pixel source e2a1d53, using unchanged Meganeura 589d73ab and shared
+  Blade 2accfeee. Only networks.rs changes native behavior: the small-batch
+  block-linear implementation and tests are byte-identical to 7b190f88.
+  Batches 2–16 use upstream block products; batch-one and larger cooperative
+  batches retain the serial graph. No learning recipe, optimizer, precision,
+  parameter layout, backend or Python source changes. This is staged source,
+  not built, GPU-qualified, adopted or a speedup. Keep the active cDLhXG N6
+  windows fixed; do not compile during their matched measurement. Require
+  a fresh private source-matched build, block component/world correctness,
+  complete state and N6 AB/BA throughput after the backend comparison passes.
+  No NVML, CPU fallback, actor/learner separation, old follower or GPU recovery.
+  Keep all quarantines, terminal attempts and Pong hold intact.
+
 September 16 pixel-package preparation supersedes historical stage stops below.
 The user resumes bounded GPU work with NVML disabled. This fresh branch adds
 only the shared native GPU memory-budget accessor and opt-in per-stage Atari
