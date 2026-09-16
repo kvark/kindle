@@ -1,10 +1,35 @@
-"""CPU-only accounting checks for kindle-vector-v1 logs, not a competence gate."""
+"""CPU-only vector accounting with descriptive episode counts, not game wins."""
 
 from collections import deque
+import hashlib
 import json
 import math
 from pathlib import Path
 import struct
+
+from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
+
+
+VECTOR_PROTOCOL = "kindle-vector-v2"
+EPISODE_EVALUATION_PROTOCOL = "kindle-vector-v4"
+
+
+def episode_summary(episodes):
+    for episode in episodes:
+        if type(episode["episode_return"]) not in (int, float):
+            raise ValueError("episode return must be a finite scalar")
+        require_numbers(episode["episode_return"])
+        if (type(episode["terminated"]) is not bool or type(episode["truncated"]) is not bool
+                or not (episode["terminated"] or episode["truncated"])):
+            raise ValueError("invalid completed episode boundary")
+    mean = sum(episode["episode_return"] for episode in episodes) / len(episodes) if episodes else None
+    if mean is not None:
+        require_numbers(mean)
+    return dict(completed_episodes=len(episodes),
+                natural_episodes=sum(ep["terminated"] and not ep["truncated"] for ep in episodes),
+                truncated_episodes=sum(ep["truncated"] for ep in episodes),
+                positive_return_natural_episodes=sum(ep["terminated"] and not ep["truncated"] and ep["episode_return"] > 0 for ep in episodes),
+                mean_completed_return=mean)
 
 
 def require_numbers(value):
@@ -28,16 +53,35 @@ def audit(path):
 
     with Path(path).open() as source:
         header = json.loads(next(source))
-        check(header["event"] == "run_start" and header["protocol"] == "kindle-vector-v1", "unknown vector protocol")
+        check(header["event"] == "run_start" and header["protocol"] in (
+            "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, EPISODE_EVALUATION_PROTOCOL), "unknown vector protocol")
         count, config = header["num_envs"], header["config"]
         check(type(count) is int and count > 0, "invalid stream count")
-        check(header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
+        check(type(header["steps"]) is int and header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
         check(len(header["environment_seeds"]) == count and len(set(header["environment_seeds"])) == count, "environment seeds must be independent")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        episode_target = None
+        if header["protocol"] == EPISODE_EVALUATION_PROTOCOL:
+            episode_target = header["evaluation_episodes_per_stream"]
+            check(type(episode_target) is int and episode_target > 0, "invalid episode budget")
+            check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
+                  "episode budget requires frozen restore")
+        else:
+            check("evaluation_episodes_per_stream" not in header, "undeclared episode budget")
         for field in ("batch_size", "batch_length", "replay_context", "replay_capacity", "action_count"):
             check(type(config[field]) is int and config[field] > 0, f"invalid {field}")
         require_numbers(config["train_ratio"])
         check(config["train_ratio"] >= 0, "invalid train ratio")
+        exploration = None
+        if header["protocol"] == EXPLORATION_PROTOCOL:
+            check(header["mode"] == "train", "frozen evaluation cannot contain exploration overrides")
+            exploration = PersistentExploration(header["exploration"], count, config["action_count"])
+            check(exploration.config["seed"] == config["seed"] == header["seed"], "exploration seed differs")
+            from . import _exploration
+            expected_hash = hashlib.sha256(Path(_exploration.__file__).read_bytes()).hexdigest()
+            check(header["exploration_sha256"] == expected_hash, "exploration implementation differs")
+        else:
+            check(not {"exploration", "exploration_sha256"}.intersection(header), "undeclared exploration protocol")
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
@@ -74,13 +118,25 @@ def audit(path):
             kind = event["event"]
             if kind == "transition":
                 settled()
+                check(episode_target is None or min(episode_counts) < episode_target,
+                      "actions after episode budget was reached")
                 actions += count
                 check(event["run_step"] == actions and event["vector_tick"] == actions // count, "vector/action counter mismatch")
                 for field in ("actions", "rewards", "stored_rewards", "terminated", "truncated", "executed_action_frames"):
                     check(len(event[field]) == count, f"wrong {field} batch length")
+                if exploration:
+                    expected_overrides = exploration.actions()
+                    overrides = event["action_overrides"]
+                    check(isinstance(overrides, list) and len(overrides) == count, "wrong action override batch")
+                    check(all(action is None or type(action) is int for action in overrides), "invalid action override type")
+                    check(overrides == expected_overrides, "exploration action history differs")
+                else:
+                    check("action_overrides" not in event, "undeclared action overrides")
                 for stream in range(count):
                     action = event["actions"][stream]
                     check(type(action) is int and 0 <= action < config["action_count"], "invalid executed action")
+                    if exploration and overrides[stream] is not None:
+                        check(action == overrides[stream], "executed action ignores exploration override")
                     reward = event["rewards"][stream]
                     require_numbers(reward)
                     require_numbers(event["stored_rewards"][stream])
@@ -134,6 +190,8 @@ def audit(path):
                 check(event["run_step"] == actions and len(ids) == len(set(ids)) and set(ids) == pending_resets, "wrong stream reset")
                 for stream in ids:
                     push(stream)
+                if exploration:
+                    exploration.reset(ids)
                 pending_resets.clear()
             elif kind in ("progress", "run_end"):
                 settled()
@@ -145,6 +203,11 @@ def audit(path):
                 for field, expected in (("executed_action_frames", last_frames), ("total_rewards", total_rewards), ("episode_counts", episode_counts), ("partial_returns", episode_returns), ("partial_lengths", episode_lengths)):
                     check(event[field] == expected, f"{field} ledger mismatch")
                 require_numbers(event["stage_seconds"])
+                if exploration:
+                    check(event["overridden_actions"] == exploration.overridden_actions
+                          and all(type(value) is int for value in event["overridden_actions"]), "exploration action counts differ")
+                else:
+                    check("overridden_actions" not in event, "undeclared exploration counts")
                 check(event["elapsed_seconds"] > 0 and math.isfinite(event["elapsed_seconds"]), "invalid clock")
                 elapsed = event["elapsed_seconds"]
                 check(event["actions_per_second"] == actions / elapsed, "invalid action throughput")
@@ -152,21 +215,49 @@ def audit(path):
                 check(event["per_stream_simulated_wall_ratio"] == [frames / 60 / elapsed for frames in last_frames], "invalid per-stream game clocks")
                 if kind == "run_end":
                     final = event
-                    check(final["reason"] in ("budget_complete", "interrupted"), "unknown stop reason")
-                    check(actions <= header["steps"] and (final["reason"] != "budget_complete" or actions == header["steps"]), "incomplete declared budget")
-                    check(final["learner_updates"] == updates and final["completed_games"] == len(completed), "final counts mismatch")
+                    if episode_target is not None:
+                        expected_reason = ("episode_budget_complete" if min(episode_counts) >= episode_target
+                                           else "action_cap_reached")
+                        check(final["reason"] in (expected_reason, "interrupted"), "wrong episode-budget stop reason")
+                        check(actions <= header["steps"] and (final["reason"] != "action_cap_reached"
+                                                             or actions == header["steps"]), "incomplete action cap")
+                    else:
+                        check(final["reason"] in ("budget_complete", "interrupted"), "unknown stop reason")
+                        check(actions <= header["steps"] and (final["reason"] != "budget_complete" or actions == header["steps"]), "incomplete declared budget")
+                    check(final["learner_updates"] == updates, "final counts mismatch")
             elif kind == "checkpoint":
                 settled()
+                check(episode_target is None, "episode-budget evaluation wrote a checkpoint")
                 check(event["run_step"] == actions and event["learner_step"] == header["starting_learner_step"] + updates, "checkpoint counters mismatch")
             else:
                 raise ValueError(f"unknown event {kind}")
         check(final is not None, "missing run_end")
-        wins = sum(e["terminated"] and not e["truncated"] and e["episode_return"] > 0 for e in completed)
-        mean = sum(e["episode_return"] for e in completed) / len(completed) if completed else None
-        check(final["natural_wins"] == wins and final["mean_completed_return"] == mean, "final score mismatch")
-        return dict(path=str(path), actions=actions, updates=updates, num_envs=count,
-                    completed_games=len(completed), natural_wins=wins, mean_completed_return=mean,
-                    budget_complete=final["reason"] == "budget_complete", accounting_valid=True)
+        scores = episode_summary(completed)
+        if header["protocol"] == "kindle-vector-v1":
+            expected = dict(completed_games=scores["completed_episodes"],
+                            natural_wins=scores["positive_return_natural_episodes"],
+                            mean_completed_return=scores["mean_completed_return"])
+            forbidden = set(scores) - {"mean_completed_return"}
+        else:
+            expected = scores
+            forbidden = {"completed_games", "natural_wins"}
+        check(not forbidden.intersection(final), "mixed vector episode-summary versions")
+        for field, value in expected.items():
+            check(field in final, f"missing final score field: {field}")
+            if value is not None:
+                require_numbers(final[field])
+            check(final[field] == value and (field == "mean_completed_return" or type(final[field]) is int), "final score mismatch")
+        exploration_result = (dict(exploration=exploration.config,
+            exploration_sha256=header["exploration_sha256"],
+            overridden_actions=exploration.overridden_actions, exploration_ledger_verified=True)
+            if exploration else {})
+        evaluation_result = (dict(evaluation_episodes_per_stream=episode_target,
+            episode_budget_complete=final["reason"] == "episode_budget_complete",
+            action_cap_reached=actions == header["steps"]) if episode_target is not None else {})
+        return dict(path=str(path), protocol=header["protocol"], actions=actions, updates=updates, num_envs=count,
+                    **scores,
+                    budget_complete=final["reason"] in ("budget_complete", "episode_budget_complete"), accounting_valid=True,
+                    **exploration_result, **evaluation_result)
 
 
 if __name__ == "__main__":

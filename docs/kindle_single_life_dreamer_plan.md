@@ -39,7 +39,7 @@ frontend. Neither the five-game objective nor consistent Pong mastery is complet
 
 | Game | Completed frozen evidence | Reliability / next decision |
 | --- | --- | --- |
-| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. Throughput now qualifies; roots 2017/3019 await source integration and a new matched declaration. The old 200k-action recipe still failed on roots 0/1; its root 2 alone passed. |
+| Pong | Fresh 400,008-action root 1009: 24/24 frozen wins, mean +20.5833; untrained control 0/24, mean −20.5417. Complete state, replays and paired gate verified. | One fresh pair passes, not three-root reliability. The faster episode-capable runtime is adopted; roots 2017/3019 and a fresh 1009 are prepared on that same bundle. Do not mix the older successful 1009 into a new-backend claim. The old 200k recipe still failed on roots 0/1; root 2 alone passed. |
 | Boxing | Fresh roots 1009/2017/3019: 123/123, 207/207 and 51/51 wins; means +83.8699 / +90.5845 / +83.5294. Untrained means −0.7222 / +0.8056 / +1.25. | Complete: all three paired learning gates pass at the declared recipe and budget. Full state, distinct initial parameters, replays and runtime evidence verified. |
 | Freeway | Complete fresh roots 1009/2017/3019 all fail: means 24.5833 / 22.7778 / 22.4722, with 16/36, 3/36 and 5/36 qualifying rounds. All three complete untrained controls return 0. The seed-0 hold64/hold1 pilots passed, means 31.0556 / 29.0278. | The [complete confirmation](experiments/2026-09-11-recovered-confirmations.md#completed-freeway-confirmation-and-pong-handoff) verifies learning above controls but not the declared competence gate. The successful pilot's late change motivates a separately declared continuous 400,008-action comparison with a retained 200,004 midpoint after this queue. This remains a hypothesis, not an adopted budget or relaxed gate. |
 | Breakout | Seed-0 frozen mean 58.4583 versus untrained 0.9655; 0/24 trained and 0/29 control two-wall completions | Learned improvement, not competence. The [diagnostic](experiments/2026-09-11-breakout-diagnostic.md) finds ample reward coverage and a late return plateau. Stage a minimal-action comparison after the existing queue; retain the control and gate. |
@@ -64,9 +64,12 @@ all ten N6 windows. **Throughput is 27.3% higher in both Boxing orders:**
 All 241 tensors / 146 optimizer moments, reports and training/frozen traces
 remain exact. This is a small native graph change, not reduced training or CPU
 offload. Freeway integration and the complete raw audit also pass.
-Main stays ce80; the old Pong queue and its hold remain terminal. Re-declare
-learning on one qualified package without mixing backends across fresh roots.
-No game competence is established by these short runtime windows.
+The [source integration](experiments/2026-09-16-block-runtime-adoption.md) is
+complete, including episode-budgeted frozen evaluation on that unchanged native.
+All six default/fixed/episode/cap GPU checks pass, followed by exact main-source
+verification and 702 Python tests. New matched Pong work is the next step.
+The old queue and its hold remain terminal. No game competence is established by
+these short runtime windows.
 
 The [host-only guard](gpu_incident_response.md#prepared-host-only-guard) uses kernel
 logs, boot/driver identity, native assertions and bounded direct-child lifetimes.
@@ -224,8 +227,8 @@ Boxing: three fresh roots + final evaluations + untrained controls [complete]
   -> same-driver complete state/repeatability + native kernel profiles [pass]
   -> same-driver dependency pixels/restore/overrides/native-budget/timing [pass; throughput neutral]
   -> same-backend block-matmul [qualified; 27.3% higher N6 throughput, exact state/traces]
-  -> source adoption + new matched learning declaration [next]
-  -> remaining Pong roots [held; new declaration required]
+  -> episode-budget integration + source adoption [complete]
+  -> new matched Pong roots 2017/3019/1009 [prepared; not started]
   -> Breakout action-width qualification [staged; old idle follower retired]
 ~~~
 
@@ -365,49 +368,30 @@ batched without removing recurrence or mixing histories.
 
 ### Meganeura: current source and pinned runtimes
 
-Main pins historically qualified upstream `ce80e9cd`; it is not fully requalified
-on driver 580. The latest September 16 source check finds Meganeura **986f49a**
-and Blade **92553493**. These include completed-submission timestamps, signed
-calibration-delta handling and windowed profiling for large graphs. The separate
-current-upstream candidate uses that implementation, removes Kindle's obsolete
-timestamp-capacity fallback and carries explicit timing options to its sessions.
-It retains initialization observations and checks GPU waits; learning math is
-unchanged. Its declared same-driver hardware/state/N6 checks now pass, including
-the new non-NVML budget measurement. This is not adoption or a speedup, and
-historical cross-driver/NVML gates remain unchanged.
-See the [current-source report](experiments/2026-09-16-current-upstream-timing.md)
-for pins, completed native results and the superseded local adapter.
+Main now adopts Meganeura **589d73ab** and shared Blade
+**2accfeee**, matching the qualified native `886bae68`. They include checked
+upstream **986f49a / 92553493**: completed-submission timestamps, signed calibration
+deltas and windowed profiling for large graphs. Kindle uses that upstream
+implementation, removes its obsolete timestamp-capacity fallback and supplies
+explicit timing options. Initialization observations/order and checked waits stay.
+See the [current-source qualification](experiments/2026-09-16-current-upstream-timing.md)
+and [source-integration check](experiments/2026-09-16-block-runtime-adoption.md).
 
-The [driver diagnostic](experiments/2026-09-16-host-only-initialization.md) freezes
-the historical candidate's 070f4b51/100bb813 runtime, including packed-weight fixes,
-shader validation and immediate Shared zeroing. Timing is disabled in those arms;
-their passes do not test the new profiler. This candidate's
-[595 initialization fault](experiments/2026-09-15-interleaved-initialization-incident.md)
-and its passing 580/no-NVML initialization and production-gradient comparison
-remain distinct evidence. Neither proves the fault's cause or licenses a retry.
+The dependency update is throughput-neutral; the separately qualified small-batch
+block products provide the measured 27.3% gain. Preserve that separation. The
+episode-capable Python carry changes stopping/accounting, not native learning.
+Recheck upstream before new backend diagnosis, but freeze one qualified bundle
+across a declared learning campaign. New source does not change an active package.
 
-Recheck upstream before new backend diagnosis. Keep dependency qualification
-separate from same-backend block-matmul correctness and throughput. The latter
-now passes both N6 Boxing orders and every declared integration gate. Source
-adoption and newly declared Pong roots are next. Existing packages, seeds and gates stay pinned.
-The qualified ce80e9cd runtime fixes generated matmul epilogues and includes the required LeVJEPA
-frame-prefix attention/cache-alias corrections. Its Blade stays registry 0.9.0; minimum Rust
-is 1.92. The [recovered-driver and backend qualification](experiments/2026-09-11-meganeura-runtime.md)
-passes full production gradients, cache parity, complete optimizer/state/report/
-trace comparisons and memory checks. Main's separate source-matched integration
-also passes. No block-matmul or experimental tuning is enabled by this update.
-
-The historical pixel-qualified Atari package is native `abf4ae5d`, with matching
-source `1e00e818`. Both warmed N6/R256 orders show only **0.6–0.9%** higher
-throughput, still **0.573× aggregate real time** and about **0.0955× per stream**.
-At least 3,303 MiB stays directly free. These short exact-state comparisons do
-not establish training reliability or solve the runtime bottleneck.
-
-The historical [Atari control](experiments/2026-09-09-meganeura-update.md#use-the-qualified-package)
-remains `f6a2b6ad` / source `90b4763` / backend `4d45ba3a`; its prior update had
-no measured speedup. It also reproduces archived old-driver results on the
-recovered driver. Existing declarations and old checkpoints retain their pinned
-packages and source-matched Python bundles; this source update does not switch them.
+Historical ce80/registry-Blade and earlier `f6a2b6ad` packages remain required for
+their own checkpoints and controls. Their exact pins, measurements and completed
+checks remain in the [recovered-backend report](experiments/2026-09-11-meganeura-runtime.md)
+and [earlier control report](experiments/2026-09-09-meganeura-update.md#use-the-qualified-package).
+The default editable extension is historical: select the documented actual
+source-matched package, not whichever binary happens to be on the import path.
+Source integration does not qualify a fresh rebuild. Historical cross-driver
+state failures, NVML gates and incident evidence remain unchanged; no passing
+driver-580 test establishes a causal driver/NVML fix.
 
 Main's Python accounting interface differs from the isolated Atari package.
 Keep source-matched runners/auditors with each package; don't mix them. Historical
@@ -466,21 +450,22 @@ improved exact paired throughput by 12.9–13.3%; preserve its completed control
 The [grouped-GRU candidate](experiments/2026-09-08-grouped-rssm-gates.md) fails exact
 full learning from report 3 and is not adopted. The
 [current small-batch block-matmul](experiments/2026-09-16-current-block-matmul.md)
-passes all GPU component/hardware and complete-state tests; N6 timing remains. The
+passes all native, complete-state and N6 AB/BA timing gates, with a measured
+27.3% end-to-end throughput gain. The
 [world-sync fan-out](experiments/2026-09-09-world-sync-fanout.md) candidate still
 has CPU evidence only. The
 [old block hardware/state/timing handoff](experiments/2026-09-13-block-matmul-runtime.md)
 is terminal, not a live waiter. Its later 0a98775-based carry remains quarantined
 after the dependency pixel fault. The current dependency-only comparison now
 passes under its new non-NVML protocol. The exact block source is carried at
-`dee38b2` on that same backend, with fresh native fixtures and a separate GPU
-declaration. Do not restart old followers or change game budgets/competence gates.
-Block-matmul correctness and throughput now take priority over unstarted Pong
-roots. Neither candidate has a verified end-to-end Atari speedup; world-sync remains secondary.
+`dee38b2` on that same backend and is now qualified. Do not restart old followers
+or change game budgets/competence gates. The user's throughput-before-Pong gate
+is satisfied; finish source integration and resume matched learning. World-sync
+remains secondary, not another prerequisite for Pong.
 
 For every optimization, require production losses/all gradients, reset causality,
 complete weights and optimizer moments from update 1, exact state/action traces,
-direct-memory headroom and untraced AB/BA timing. Readback waits include unfinished
+the explicitly declared memory-headroom measure and untraced AB/BA timing. Readback waits include unfinished
 producer compute and transfers; they are not automatically GPU idle. Current
 external captures resolve queue submissions, not individual kernels or calibrated
 idle gaps. Serialize GPU work and avoid large CPU graph builds during training.
@@ -636,8 +621,8 @@ Freeway's complete fresh confirmation also fails competence. Pong root 1009's
 complete pair passes. After external recovery to driver 580, both bounded
 initialization and production-gradient pairs pass without NVML. Current-upstream
 hardware, same-driver state, N6 runtime and same-backend block correctness/
-throughput gates now all pass. Integrate the qualified source and explicitly
-re-declare matched Pong work. The four historical faults remain unexplained;
+throughput gates now all pass. Source and episode-budget integration also pass;
+start the separately declared matched Pong work. The four historical faults remain unexplained;
 NVML stays disabled and host recovery is not authorized. Preserve all stopped
 attempts and the original queue hold. Breakout's
 action-width candidate remains staged; its old idle follower is retired.

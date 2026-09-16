@@ -73,13 +73,24 @@ impl PyVectorAgent {
         Ok(())
     }
 
-    #[pyo3(signature = (greedy = false))]
-    fn act(&mut self, greedy: bool) -> Vec<usize> {
-        self.inner.act(if greedy {
+    #[pyo3(signature = (greedy = false, action_overrides = None))]
+    fn act(
+        &mut self,
+        greedy: bool,
+        action_overrides: Option<Vec<Option<usize>>>,
+    ) -> PyResult<Vec<usize>> {
+        let mode = if greedy {
             ActionMode::Greedy
         } else {
             ActionMode::Sample
-        })
+        };
+        match action_overrides {
+            Some(actions) => self
+                .inner
+                .act_with_overrides(mode, &actions)
+                .map_err(PyValueError::new_err),
+            None => Ok(self.inner.act(mode)),
+        }
     }
 
     fn observe(
@@ -154,6 +165,10 @@ impl PyVectorAgent {
     #[getter]
     fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, &self.inner.gpu_device())
+    }
+    #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_memory_budget())
     }
     #[getter]
     fn trainable_parameter_counts(&self) -> (usize, usize) {

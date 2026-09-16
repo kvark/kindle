@@ -2,7 +2,9 @@
 
 Status: qualified. All fourteen new GPU tests, six complete-state canaries and
 ten N6 windows pass. Throughput improves 27.3% with exact learning state;
-Freeway integration and the complete raw audit also pass. No adoption.
+Freeway integration and the complete raw audit also pass. Source adoption is
+completed separately in the [integration report](2026-09-16-block-runtime-adoption.md).
+The original qualification artifacts still record no automatic adoption.
 NVML stays disabled.
 
 ## Change and fixed inputs
@@ -156,11 +158,10 @@ python/.venv/bin/python -B runs/current-block-completion-20260916.oVOgnU/audit.p
 
 ## Next decision
 
-The source-matched `dee38b2` / native `886bae68` bundle is now runtime-qualified.
-Source integration and an explicit matched learning declaration are next;
-main remains ce80 and the original Pong queue/hold stays terminal. Reuse the
-qualified package with its matching adapters; do not relabel a rebuild as the
-same tested artifact. A new matched learning declaration must use one package;
-do not silently mix the old Pong root 1009 with new-backend roots as a three-root
-reliability result. No game budget, seed, competence threshold or historical
-result changes.
+The source-matched `dee38b2` / native `886bae68` bundle is runtime-qualified.
+The separate [integration](2026-09-16-block-runtime-adoption.md) adds the recovered
+episode-budget adapter, passes its six GPU checks and adopts the source without
+rebuilding the native binary. The original Pong queue/hold stays terminal.
+New matched learning must use one declared package; do not mix the old Pong root
+1009 with new-backend roots as a three-root reliability result. No game budget,
+seed, competence threshold or historical result changes.

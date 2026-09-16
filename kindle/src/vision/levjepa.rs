@@ -81,6 +81,7 @@ impl LeVJepaPerception {
                 cache: plan_cache,
                 runtime: meganeura::SessionOptions {
                     coop: meganeura::CoopPolicy::Disabled,
+                    gpu_timing: meganeura::GpuOptions::from_env().timing,
                     ..Default::default()
                 },
                 ..SessionConfig::default()
