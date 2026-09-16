@@ -55,9 +55,11 @@ The [single approved control](experiments/2026-09-16-driver580-control-preparati
 finishes both sessions without a recorded fault, with zero training. Its complete
 traces pass, but two teardown/final-query health gaps (1.756/1.656 s) exceed the
 unchanged 1.5 s coverage limit. Preserve this failed declared gate; no retry or
-automatic successor. Monitoring cadence needs investigation before another
-hardware declaration. This control does not prove the new driver fixes the
-candidate fault, and no candidate or learning job follows.
+automatic successor. The [CPU-only monitoring follow-up](experiments/2026-09-16-persistent-health-cpu.md)
+isolates slow startup/teardown queries and prepares a request-driven persistent
+reader with 173 passing CPU tests. Hardware cadence/parity is untested; no guard
+adoption or new GPU query is authorized. This control does not prove the new
+driver fixes the candidate fault, and no candidate or learning job follows.
 
 The latest upstream candidate previously produced a
 [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).

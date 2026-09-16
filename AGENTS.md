@@ -17,6 +17,17 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16 monitoring follow-up is CPU-only: isolated prototype 3ebdf2e in
+  `exp/persistent-health-cpu-20260916` leaves the original guard/main runtime
+  unchanged. Yn3D4H passes 173 CPU tests and independently audits eight commands/
+  38 inputs; only `capture_cpu.py --audit` is reusable. Preserve its failed first
+  pytest collection and both archived development sources. Raw retained queries
+  take median 40.5 ms during initialization but about 1.4 s at startup/teardown;
+  persistent NVML client lifetime is a hypothesis, not a demonstrated fix.
+  No real NVML session or new GPU query occurs. No launcher adopts the prototype.
+  New hardware use still needs explicit approval; the previous one-job approval
+  is consumed. Keep the failed 1.5 s control gate, quarantines and Pong hold.
+  See `docs/experiments/2026-09-16-persistent-health-cpu.md`.
 - September 16's explicitly approved driver-580 control is now terminal in
   `runs/driver580-control-20260916.3O90H9`. Native initialization and the unchanged
   guard pass; direct child 7873 exits zero and is reaped. Both complete plans,

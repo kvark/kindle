@@ -119,3 +119,6 @@ the current guard and the unchanged coverage limit. This ce80 control also
 initialized successfully on 595, so its success on 580 does not distinguish the
 candidate fault's cause or prove a driver fix. Candidates stay quarantined,
 Pong stays held, and full dependency/state/pixel/memory/throughput gates remain.
+The subsequent [CPU-only monitoring investigation](2026-09-16-persistent-health-cpu.md)
+retains this failure and prepares an isolated persistent-reader hypothesis;
+it makes no new GPU query and authorizes no hardware successor.
