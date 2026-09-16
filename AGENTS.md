@@ -17,6 +17,24 @@ reliable learning.
   game-status table and direct video/world-report links. Put checkpoint-level
   chronology and repeated validation details in the linked experiment reports;
   a documentation update never changes a pinned declaration or acceptance gate.
+- September 16's explicitly approved driver-580 control is now terminal in
+  `runs/driver580-control-20260916.3O90H9`. Native initialization and the unchanged
+  guard pass; direct child 7873 exits zero and is reaped. Both complete plans,
+  632/9,439 physical buffers, all 14,645 constant uploads, 143,121 trace records
+  and checked waits verify, with zero actions/updates. The controller correctly
+  fails its <=1.5-second health-gap gate: gaps are 1.756196 and 1.656448 seconds
+  after world.ready, with corresponding NVML calls taking 1.485066/1.405500 s.
+  All 210 sampled health rows report recovery None and >=4,975 MiB directly free;
+  no kernel fault is recorded. This is not a new wedge, but it is not a complete
+  passing control, driver fix or candidate qualification. Preserve the failed
+  controller, absent top-level result and original 40-test declaration; never
+  rerun it or relax the gap limit. A separate six-test terminal reader verifies
+  all 5,024 declared inputs and 57 terminal pins without GPU queries. Only
+  `terminal.py --audit` is the complete terminal interpretation. The one-job
+  approval is consumed; no follow-up GPU job/query, candidate, training or host
+  recovery is declared. Quarantines, all qualification gates and Pong hold stay.
+  Investigate monitoring cadence before requesting a new hardware declaration.
+  See `docs/experiments/2026-09-16-driver580-control-preparation.md`.
 - September 16 host-only reads observe external boot 4f5152d1 and an externally
   installed 580.178.04 server-open stack. Loaded/on-disk module and NVML library
   versions match; all 1,444 captured current-boot kernel records contain no
@@ -28,8 +46,8 @@ reliable learning.
   Its eight commands, 4,914 inputs and five artifacts independently re-audit.
   Preserve this writer/private cache and Yz0Vmu's host capture; only their
   documented --audit modes are reusable. No GPU declaration, execution, driver
-  fix or adoption follows. Explicit approval is still requested for health
-  queries and one newly declared guarded control-only initialization. All
+  fix or adoption follows from preparation. The subsequently approved health
+  checks and sole control initialization have the terminal result above. All
   quarantines, full qualification gates and Pong hold remain. See
   `docs/experiments/2026-09-16-driver580-control-preparation.md`.
 - September 15 15:30 UTC safety stop supersedes pending qualification work:

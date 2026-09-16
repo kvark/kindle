@@ -50,12 +50,14 @@ completed both paired pilots; the [serial queue](experiments/2026-09-11-recovere
 then completed Freeway and Pong root 1009 and stopped before root 2017 as requested.
 Never restart that terminal queue or remove its hold.
 
-**GPU work remains stopped pending an approved new-driver control.** Host records
-now show externally installed 580.178.04 and a new boot. The
-[driver-bound historical control](experiments/2026-09-16-driver580-control-preparation.md)
-passes CPU preparation, but GPU health and initialization on this driver remain
-unverified. Approval is requested for health queries and one guarded control-only
-initialization; no GPU declaration or training follows from this preparation.
+**Control initialization works on 580.178.04; qualification is still incomplete.**
+The [single approved control](experiments/2026-09-16-driver580-control-preparation.md)
+finishes both sessions without a recorded fault, with zero training. Its complete
+traces pass, but two teardown/final-query health gaps (1.756/1.656 s) exceed the
+unchanged 1.5 s coverage limit. Preserve this failed declared gate; no retry or
+automatic successor. Monitoring cadence needs investigation before another
+hardware declaration. This control does not prove the new driver fixes the
+candidate fault, and no candidate or learning job follows.
 
 The latest upstream candidate previously produced a
 [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).
