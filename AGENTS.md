@@ -1,5 +1,16 @@
 # Kindle working direction
 
+## This retention candidate
+
+`exp/atari-dose-retention-20260916` recovers the tested external Qbert checkpoint
+archiver as a standalone helper and extends it to the unchanged Freeway .5/hold64
+training protocol. Native/build inputs, packaged Python and the acting/training
+runner stay identical to qualified 8dc0b98. The helper copies completed saves and
+their exact ledger prefix; it never constructs, pauses, restores or restarts an
+agent. Midpoint and final saves are one continuous root, not independent seeds.
+Keep the original final-only auditor strict. This prepares the future dose
+comparisons; it declares no GPU work, follower, budget adoption or game win.
+
 Kindle is a Rust agent that learns while acting. Games are the first testbed;
 explicit game rewards and human guidance are allowed. Intrinsic motivation and
 experience sharing between independent Kindles remain longer-term goals.
