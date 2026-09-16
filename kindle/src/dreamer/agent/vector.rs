@@ -393,6 +393,9 @@ impl VectorDreamerAgent {
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
         self.core.learner.gpu_device()
     }
+    pub fn gpu_memory_budget(&self) -> crate::GpuMemoryBudget {
+        self.core.learner.gpu_memory_budget()
+    }
     pub fn trainable_parameter_counts(&self) -> (usize, usize) {
         self.core.learner.trainable_parameter_counts()
     }

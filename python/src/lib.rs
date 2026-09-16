@@ -500,6 +500,11 @@ impl PyAgent {
     }
 
     #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.core().gpu_memory_budget())
+    }
+
+    #[getter]
     fn config<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, self.inner.core().config())
     }

@@ -26,6 +26,14 @@ pub struct GpuDeviceInfo {
     pub requested_device_id: Option<String>,
 }
 
+/// Backend estimates across device-local heaps, not physically free or peak VRAM.
+/// A zero budget means that the backend does not support this query.
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub struct GpuMemoryBudget {
+    pub usage_bytes: u64,
+    pub budget_bytes: u64,
+}
+
 /// Initialize the GPU selected by Meganeura's explicit environment options.
 ///
 /// In particular, `MEGANEURA_DEVICE_ID` selects a backend-reported numeric

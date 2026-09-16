@@ -1,4 +1,4 @@
-"""Serial, fixed-ratio throughput matrix with a per-job 1 Hz GPU trace.
+"""Serial, fixed-ratio throughput matrix without NVML polling.
 
 Measures the new vector implementation at N=1/2/4, not independent learners.
 Reports the final 1024-action window, excluding construction and replay prefill.
@@ -8,14 +8,13 @@ import argparse
 import csv
 import datetime
 import json
-import os
 from pathlib import Path
 import statistics
 import subprocess
 import sys
 
 
-def summarize(log, gpu_trace):
+def summarize(log, gpu_trace=None):
     events = [json.loads(line) for line in log.open()]
     header, final = events[0], events[-1]
     if final["event"] != "run_end" or final["reason"] != "budget_complete":
@@ -29,12 +28,15 @@ def summarize(log, gpu_trace):
     if len(reports) != expected_updates or final["training_debt"] >= 1:
         raise ValueError("benchmark did not sustain its declared train ratio")
     gpu = []
-    for row in csv.DictReader(gpu_trace.open()):
-        timestamp = datetime.datetime.strptime(row["timestamp"], "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=datetime.timezone.utc).timestamp()
-        if start["unix_time"] <= timestamp <= final["unix_time"]:
-            gpu.append(row)
-    if not gpu or len({r[" uuid"] for r in gpu}) != 1:
-        raise ValueError("expected samples from exactly one selected GPU")
+    # Retain read-only support for historical traces; new runs do not collect them.
+    if gpu_trace is not None:
+        with gpu_trace.open() as source:
+            for row in csv.DictReader(source):
+                timestamp = datetime.datetime.strptime(row["timestamp"], "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=datetime.timezone.utc).timestamp()
+                if start["unix_time"] <= timestamp <= final["unix_time"]:
+                    gpu.append(row)
+        if not gpu or len({r[" uuid"] for r in gpu}) != 1:
+            raise ValueError("expected samples from exactly one selected GPU")
 
     def values(key):
         return [float(r[key].split()[0]) for r in gpu]
@@ -43,9 +45,10 @@ def summarize(log, gpu_trace):
                 window_actions=1024, window_seconds=elapsed, actions_per_second=1024 / elapsed,
                 updates=len(reports), updates_per_second=len(reports) / elapsed,
                 mean_update_seconds=statistics.mean(r["timing"]["total_seconds"] for r in reports) if reports else None,
-                mean_gpu_activity=statistics.mean(values(" utilization.gpu [%]")),
-                mean_power_watts=statistics.mean(values(" power.draw [W]")),
-                peak_vram_mib=max(values(" memory.used [MiB]")), gpu_samples=len(gpu),
+                mean_gpu_activity=statistics.mean(values(" utilization.gpu [%]")) if gpu else None,
+                mean_power_watts=statistics.mean(values(" power.draw [W]")) if gpu else None,
+                peak_vram_mib=max(values(" memory.used [MiB]")) if gpu else None, gpu_samples=len(gpu),
+                gpu_telemetry="historical_trace" if gpu else "unmeasured",
                 stage_seconds={k: final["stage_seconds"][k] - start["stage_seconds"][k] for k in final["stage_seconds"]},
                 construction_seconds=header["agent_construction_seconds"],
                 native_extension_sha256=header["native_extension_sha256"],
@@ -60,7 +63,6 @@ def main():
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--steps", type=int, default=3072)
     parser.add_argument("--evaluate", action="store_true")
-    parser.add_argument("--gpu", default="GPU-6869e50d-83aa-bec7-6169-adc413f49b32")
     args = parser.parse_args()
     if args.steps < 3072 or args.steps % 512 or any(n <= 0 or 512 % n for n in args.num_envs):
         parser.error("steps must be >=3072 and divisible by 512; env counts must divide 512")
@@ -76,25 +78,18 @@ def main():
     results = []
     for count in args.num_envs:
         path = args.directory / f"n{count}"
-        log, trace = path.with_suffix(".jsonl"), path.with_suffix(".gpu.csv")
+        log = path.with_suffix(".jsonl")
         command = [sys.executable, str(runner), args.encoder_checkpoint,
                    "--num-envs", str(count), "--steps", str(args.steps),
                    "--batch-size", str(args.batch_size), "--output", str(log), "--report-every", "512"]
         if args.evaluate:
             command += ["--evaluate", "--train-ratio", "0"]
         print("Starting", " ".join(command), flush=True)
-        with trace.open("x") as gpu_output, path.with_suffix(".log").open("x") as run_output:
-            monitor = subprocess.Popen(["nvidia-smi", "-i", args.gpu,
-                "--query-gpu=timestamp,uuid,utilization.gpu,memory.used,power.draw", "--format=csv", "-l", "1"],
-                stdout=gpu_output, env={**os.environ, "TZ": "UTC"})
-            try:
-                process = subprocess.run(command, stdout=run_output, stderr=subprocess.STDOUT, check=False)
-            finally:
-                monitor.terminate()
-                monitor.wait(timeout=10)
+        with path.with_suffix(".log").open("x") as run_output:
+            process = subprocess.run(command, stdout=run_output, stderr=subprocess.STDOUT, check=False)
         result = (dict(status="failed", num_envs=count, batch_size=args.batch_size,
                        exit_code=process.returncode, command=command, log=str(path.with_suffix(".log")))
-                  if process.returncode else dict(status="complete", **summarize(log, trace)))
+                  if process.returncode else dict(status="complete", **summarize(log)))
         results.append(result)
         with path.with_suffix(".summary.json").open("x") as output:
             json.dump(result, output, indent=2, allow_nan=False)

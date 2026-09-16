@@ -9,6 +9,7 @@ import argparse
 import inspect
 import json
 import math
+import os
 import signal
 import sys
 import time
@@ -25,6 +26,16 @@ from atari import (
     ATARI_ACTION_REPEAT, ATARI_PROTOCOLS, DreamerAtariPreprocessing,
     checkpoint_identity, sha256_file,
 )
+
+
+def require_gpu_budget(snapshot, minimum_bytes):
+    if (not isinstance(snapshot, dict) or set(snapshot) != {"usage_bytes", "budget_bytes"}
+            or any(type(value) is not int or value < 0 for value in snapshot.values())):
+        raise ValueError("invalid native GPU memory budget")
+    if snapshot["budget_bytes"] == 0:
+        raise ValueError("native GPU memory budget is unsupported")
+    if snapshot["budget_bytes"] - snapshot["usage_bytes"] < minimum_bytes:
+        raise ValueError("native GPU memory budget headroom below declared minimum")
 
 
 def main():
@@ -48,6 +59,8 @@ def main():
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--min-gpu-budget-headroom-mib", type=int,
+                        help="check native budget after each GPU stage; write OUTPUT.gpu-memory.jsonl")
     parser.add_argument("--exploration-probability", type=float, default=0.0)
     parser.add_argument("--exploration-hold", type=int, default=16)
     args = parser.parse_args()
@@ -57,6 +70,8 @@ def main():
         parser.error("report/checkpoint intervals must be positive")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
+    if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
+        parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
     if not math.isfinite(args.exploration_probability) or not 0 <= args.exploration_probability <= 1:
@@ -72,6 +87,9 @@ def main():
         parser.error("seed must fit an unsigned 32-bit integer")
     if args.output.exists() or (args.checkpoint and args.checkpoint.exists()):
         parser.error("output and checkpoint must be fresh paths")
+    memory_path = args.output.with_suffix(".gpu-memory.jsonl")
+    if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
+        parser.error("GPU memory output must be a fresh path")
     if args.exploration_probability and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -79,12 +97,32 @@ def main():
     gym.register_envs(ale_py)
     environments = []
     output = args.output.open("x")
+    memory_output = None
 
     def emit(event):
         event["unix_time"] = time.time()
         print(json.dumps(event, separators=(",", ":"), allow_nan=False), file=output, flush=True)
 
     try:
+        if args.min_gpu_budget_headroom_mib is not None:
+            memory_output = memory_path.open("x")
+
+        def check_memory(stage, run_step):
+            if memory_output is None:
+                return
+            before = time.perf_counter()
+            snapshot = agent.gpu_memory_budget
+            elapsed = time.perf_counter() - before
+            record = dict(stage=stage, run_step=run_step, learner_step=agent.learner_step,
+                          pid=os.getpid(), unix_time=time.time(), query_seconds=elapsed,
+                          minimum_headroom_bytes=args.min_gpu_budget_headroom_mib * 1024**2,
+                          memory=snapshot)
+            if stage == "constructed":
+                record.update(protocol="kindle-native-memory-budget-v1", device=agent.gpu_device)
+            print(json.dumps(record, separators=(",", ":"), allow_nan=False),
+                  file=memory_output, flush=True)
+            require_gpu_budget(snapshot, record["minimum_headroom_bytes"])
+
         env_seeds = [(args.seed + stream * 1_000_003) % 2**32 for stream in range(args.num_envs)]
         initial = []
         for seed in env_seeds:
@@ -112,10 +150,12 @@ def main():
         if agent.config["action_count"] != actions:
             raise ValueError("checkpoint action vocabulary differs from environment")
         construction = time.perf_counter() - construction
+        check_memory("constructed", 0)
         ids = list(range(args.num_envs))
         starting_actions, starting_updates = agent.environment_step, agent.learner_step
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
+        check_memory("initialized", 0)
         exploration_header = (dict(exploration=exploration.config,
             exploration_sha256=sha256_file(exploration_module.__file__)) if exploration else {})
         emit(dict(event="run_start", protocol=EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL, environment=args.environment,
@@ -153,6 +193,7 @@ def main():
         def save():
             before = time.perf_counter()
             agent.save_checkpoint(str(args.checkpoint))
+            check_memory("checkpoint", run_actions)
             emit(dict(event="checkpoint", run_step=run_actions, learner_step=agent.learner_step,
                       identity=checkpoint_identity(args.checkpoint)))
             timing["checkpoint"] += time.perf_counter() - before
@@ -187,6 +228,7 @@ def main():
                                                 for stream, forced in enumerate(overrides)):
                     raise ValueError("native action override was not honored")
                 timing["act"] += time.perf_counter() - before
+                check_memory("act", run_actions)
                 before = time.perf_counter()
                 results = [env.step(action) for env, action in zip(environments, selected)]
                 timing["environment"] += time.perf_counter() - before
@@ -194,6 +236,7 @@ def main():
                 before = time.perf_counter()
                 stored_rewards = agent.observe(ids, frames, rewards, terminated, truncated)
                 timing["observe"] += time.perf_counter() - before
+                check_memory("observe", run_actions + args.num_envs)
                 run_actions += args.num_envs
                 emit(dict(event="transition", vector_tick=tick, run_step=run_actions,
                           actions=selected, rewards=rewards, stored_rewards=stored_rewards,
@@ -203,6 +246,7 @@ def main():
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()
                 timing["learn"] += time.perf_counter() - before
+                check_memory("learn", run_actions)
                 for report in reports:
                     emit(dict(event="learner", run_step=run_actions, report=report))
                 resets = []
@@ -225,6 +269,7 @@ def main():
                 if resets:
                     reset_frames = [environments[stream].reset()[0] for stream in resets]
                     agent.begin_episodes(resets, reset_frames)
+                    check_memory("reset", run_actions)
                     if exploration:
                         exploration.reset(resets)
                     emit(dict(event="reset", run_step=run_actions, streams=resets))
@@ -241,6 +286,7 @@ def main():
             if args.checkpoint and run_actions != last_checkpoint:
                 save()
             event = progress("run_end")
+            check_memory("finished", run_actions)
             event.update(reason="interrupted" if stop else "budget_complete",
                          **episode_summary(completed),
                          learner_updates=agent.learner_step - starting_updates)
@@ -251,6 +297,8 @@ def main():
                 signal.signal(sig, handler)
     finally:
         output.close()
+        if memory_output is not None:
+            memory_output.close()
         for env in environments:
             env.close()
 

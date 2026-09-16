@@ -1,5 +1,25 @@
 # Kindle working direction
 
+September 16 pixel-package preparation supersedes historical stage stops below.
+The user resumes bounded GPU work with NVML disabled. This fresh branch adds
+only the shared native GPU memory-budget accessor and opt-in per-stage Atari
+budget reporting, carrying the already tested non-NVML vector profiler. Keep
+learning, inference, dependencies, checkpoints and action/replay histories fixed.
+The current backend's 23 native tests, three exact same-driver state pairs and
+seven-session profile are complete in VPMDem/QJKcT5/814vSr; preserve all old
+writers, sources and targets. The cross-driver T8qQhs anchor remains failed.
+Build each source-matched control/candidate package into its own fresh copied
+target with one CPU / 2 GiB / zero swap. Do not execute historical NVML guards.
+Native budget-minus-usage is an estimate, not physically free VRAM or peak use.
+Declare matching budget sampling and thresholds explicitly for new N6 pixel,
+restore, override and timing checks. Run direct native Python children one at a
+time under the existing host-only guard; review each result before continuing.
+No blind retry, host recovery, old queue restart or automatic successor.
+Require all remaining dependency and same-backend block throughput gates before
+held Pong. Main ce80 and all game competence/seed/budget gates remain unchanged.
+Use the authoritative plan and current constraints in /x/Code/kindle; no extra
+blanket approval wait or CPU execution fallback is needed.
+
 Kindle is a Rust agent that learns while acting. Each environment contributes
 its own continuing stream of experience; vector collection shares one learner
 and policy without joining causal histories. Games are the first testbed.

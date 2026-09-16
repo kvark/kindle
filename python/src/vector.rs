@@ -167,6 +167,10 @@ impl PyVectorAgent {
         json_to_python(py, &self.inner.gpu_device())
     }
     #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_memory_budget())
+    }
+    #[getter]
     fn trainable_parameter_counts(&self) -> (usize, usize) {
         self.inner.trainable_parameter_counts()
     }

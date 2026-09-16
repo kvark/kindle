@@ -57,8 +57,9 @@ def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, cap
 def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path):
     directory = tmp_path / "matrix"
     monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), "--num-envs", "2"])
-    monitor = SimpleNamespace(terminate=lambda: None, wait=lambda **_: None)
-    monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", lambda *_, **__: monitor)
+    def no_monitor(*_args, **_kwargs):
+        pytest.fail("profiler must not spawn an NVML monitor")
+    monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", no_monitor)
     monkeypatch.setattr(profile_atari_vector.subprocess, "run", lambda *_, **__: SimpleNamespace(returncode=1))
     with pytest.raises(SystemExit) as error:
         profile_atari_vector.main()
@@ -67,6 +68,7 @@ def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkey
     assert results[0]["status"] == "failed"
     assert results[0]["num_envs"] == 2 and results[0]["exit_code"] == 1
     assert "actions_per_second" not in results[0]
+    assert not list(directory.glob("*.gpu.csv"))
 
 
 @pytest.mark.parametrize("bad", [None, float("nan"), float("inf"), "0.0", True])
@@ -185,7 +187,8 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 
 
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
-def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior):
+@pytest.mark.parametrize("memory_enabled", [False, True])
+def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled):
     created = []
 
     class Environment:
@@ -215,6 +218,11 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         gpu_device = {"fixture": True}
         cpu_worker_threads = 1
         trainable_parameter_counts = {"world": 0, "behavior": 0}
+
+        @property
+        def gpu_memory_budget(self):
+            assert memory_enabled, "disabled reporting must not query GPU memory"
+            return dict(usage_bytes=1024**3, budget_bytes=3*1024**3)
 
         def __init__(self, weights, streams, config):
             self.streams, self.config = streams, config
@@ -252,6 +260,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "ALE/Seaquest-v5",
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
+        *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
     if behavior == "ignored_override":
         with pytest.raises(ValueError, match="override was not honored"):
@@ -259,6 +268,17 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         assert len(created) == 2 and all(env.closed and env.executed_action_frames == 0 for env in created)
         return
     atari_vector.main()
+    memory_path = output.with_suffix(".gpu-memory.jsonl")
+    assert memory_path.exists() == memory_enabled
+    if memory_enabled:
+        memory = [json.loads(line) for line in memory_path.read_text().splitlines()]
+        assert [row["stage"] for row in memory] == [
+            "constructed", "initialized", "act", "observe", "learn",
+            "act", "observe", "learn", "reset", "act", "observe", "learn", "finished"]
+        assert memory[0]["protocol"] == "kindle-native-memory-budget-v1"
+        assert memory[-1]["run_step"] == 6
+        assert all(row["minimum_headroom_bytes"] == 2*1024**3 and row["query_seconds"] >= 0
+                   for row in memory)
     rows = [json.loads(line) for line in output.read_text().splitlines()]
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)
     assert "natural_wins" not in rows[-1] and "completed_games" not in rows[-1]
