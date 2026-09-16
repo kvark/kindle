@@ -775,11 +775,17 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "compares temporal batching losses and every parameter gradient on GPU"]
+    #[ignore = "requires a separately declared driver-bound production-gradient GPU diagnostic"]
     fn temporal_batching_matches_serial_losses_and_gradients() {
         use super::super::runtime::{build_session, initialize_d3};
         use meganeura::{Mode, Session};
         use std::sync::Arc;
+
+        let driver = gradient_driver(
+            std::env::var("KINDLE_GRADIENT_DIAGNOSTIC").ok().as_deref(),
+            std::env::var("KINDLE_INIT_EXPECTED_DRIVER").ok().as_deref(),
+            std::env::var("KINDLE_FULL_WORLD_PARITY").ok().as_deref(),
+        );
 
         fn fill_inputs(session: &mut Session, config: &DreamerConfig) {
             let batch = config.batch_size;
@@ -884,13 +890,22 @@ mod tests {
         };
         let loss_tolerance = if full { 3e-4 } else { 3e-5 };
         let gradient_tolerance = if full { 3e-3 } else { 3e-4 };
+        gradient_mark("device.before", 0, serde_json::json!({}));
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let device = crate::gpu_device_info(gpu.device_information());
+        gradient_device(&device, driver);
+        gradient_mark("device.ready", 0, serde_json::to_value(&device).unwrap());
         for config in configs {
             let length = config.batch_length;
+            gradient_mark("config", 0, serde_json::to_value(&config).unwrap());
             let mut sessions = [1, length].map(|group| {
+                gradient_mark("graph.before", group, serde_json::json!({}));
                 let graph = build_training_graph_grouped(&config, length, group);
+                gradient_mark("graph.ready", group, serde_json::json!({}));
                 let mut session = build_session(&graph, &gpu, Mode::Training, false);
+                gradient_mark("session.ready", group, serde_json::json!({}));
                 initialize_d3(&mut session, &graph, config.seed);
+                gradient_mark("parameters.initialized", group, serde_json::json!({}));
                 // Exercise the input gradients of heads that D3 initializes to zero.
                 for name in ["world.reward.out.weight", "behavior.value.out.weight"] {
                     let values = (0..session.param_size(name).unwrap())
@@ -899,11 +914,16 @@ mod tests {
                     session.set_parameter(name, &values);
                 }
                 fill_inputs(&mut session, &config);
+                gradient_mark("inputs.ready", group, serde_json::json!({}));
                 session.clear_optimizer();
+                gradient_mark("optimizer.cleared", group, serde_json::json!({}));
                 session.step();
+                gradient_mark("step.submitted", group, serde_json::json!({}));
                 session.wait();
+                gradient_mark("step.wait_returned", group, serde_json::json!({}));
                 session
             });
+            gradient_mark("comparisons.before", 0, serde_json::json!({}));
             let [serial, grouped] = &mut sessions;
             for metric in 0..9 {
                 let mut left = [0.0];
@@ -911,6 +931,11 @@ mod tests {
                 serial.read_output_by_index(metric, &mut left);
                 grouped.read_output_by_index(metric, &mut right);
                 let tolerance = loss_tolerance * left[0].abs().max(1.0);
+                gradient_mark(
+                    "metric",
+                    0,
+                    serde_json::json!({"index": metric, "serial": left[0], "grouped": right[0]}),
+                );
                 assert!(
                     (left[0] - right[0]).abs() <= tolerance,
                     "T={length}, metric {metric}: {left:?} vs {right:?}"
@@ -921,10 +946,21 @@ mod tests {
             names.sort_unstable();
             grouped_names.sort_unstable();
             assert_eq!(names, grouped_names);
+            let parameter_count = names.len();
+            let mut compared_gradients = 0;
+            let mut nonzero_gradients = 0;
             let mut worst_relative = 0.0_f64;
             for name in names {
                 assert_eq!(serial.param_size(name), grouped.param_size(name));
                 assert_eq!(serial.has_param_grad(name), grouped.has_param_grad(name));
+                gradient_mark(
+                    "parameter",
+                    0,
+                    serde_json::json!({
+                        "name": name, "elements": serial.param_size(name).unwrap(),
+                        "has_gradient": serial.has_param_grad(name),
+                    }),
+                );
                 if name.starts_with("behavior.") {
                     assert!(!serial.has_param_grad(name), "replay critic remains frozen");
                 }
@@ -950,6 +986,15 @@ mod tests {
                     .sqrt();
                 let norm = squared(&left).max(squared(&right)).sqrt();
                 let relative = difference / norm.max(1e-12);
+                compared_gradients += 1;
+                nonzero_gradients += usize::from(norm > 0.0);
+                gradient_mark(
+                    "gradient",
+                    0,
+                    serde_json::json!({
+                        "name": name, "norm": norm, "difference": difference, "relative": relative,
+                    }),
+                );
                 worst_relative = worst_relative.max(relative);
                 assert!(
                     difference <= gradient_tolerance * norm + 1e-7,
@@ -957,6 +1002,94 @@ mod tests {
                 );
             }
             eprintln!("T={length}, worst per-parameter gradient relative L2={worst_relative}");
+            assert!(
+                nonzero_gradients > 0,
+                "all-zero gradients do not establish execution"
+            );
+            gradient_mark(
+                "complete",
+                0,
+                serde_json::json!({
+                    "metrics": 9, "parameters": parameter_count,
+                    "compared_gradients": compared_gradients,
+                    "nonzero_gradients": nonzero_gradients, "worst_relative": worst_relative,
+                }),
+            );
+        }
+    }
+
+    fn gradient_driver(
+        selection: Option<&str>,
+        driver: Option<&str>,
+        full: Option<&str>,
+    ) -> &'static str {
+        assert_eq!(selection, Some("production-world-driver-20260916"));
+        assert_eq!(full, Some("1"), "production B16/T64 is required");
+        match driver {
+            Some("580.178.04") => "580.178.04",
+            Some("595.91.07") => "595.91.07",
+            _ => panic!("an explicit listed driver is required"),
+        }
+    }
+
+    fn gradient_device(info: &crate::GpuDeviceInfo, driver: &str) {
+        assert_eq!(info.device_name, "NVIDIA GeForce RTX 5080");
+        assert_eq!(info.driver_name, "NVIDIA");
+        assert_eq!(info.driver_info, driver);
+        assert_eq!(info.requested_device_id.as_deref(), Some("0x2c02"));
+        assert!(!info.is_software_emulated);
+    }
+
+    fn gradient_mark(phase: &str, group: usize, data: serde_json::Value) {
+        use std::io::Write;
+        let mut writer = std::io::stderr().lock();
+        serde_json::to_writer(&mut writer, &serde_json::json!({
+            "kindle_gradient": 1, "pid": std::process::id(), "phase": phase, "group": group,
+            "unix_ns": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos(),
+            "data": data,
+        })).unwrap();
+        writer.write_all(b"\n").unwrap();
+        writer.flush().unwrap();
+    }
+
+    #[test]
+    fn gradient_declaration_requires_full_explicit_driver() {
+        let selection = Some("production-world-driver-20260916");
+        for driver in ["580.178.04", "595.91.07"] {
+            assert_eq!(gradient_driver(selection, Some(driver), Some("1")), driver);
+        }
+        for (tag, driver, full) in [
+            (None, Some("580.178.04"), Some("1")),
+            (Some("other"), Some("580.178.04"), Some("1")),
+            (selection, None, Some("1")),
+            (selection, Some("595.71.05"), Some("1")),
+            (selection, Some("580.178.04"), None),
+            (selection, Some("580.178.04"), Some("0")),
+        ] {
+            assert!(std::panic::catch_unwind(|| gradient_driver(tag, driver, full)).is_err());
+        }
+    }
+
+    #[test]
+    fn gradient_device_rejects_mismatches() {
+        let good = crate::GpuDeviceInfo {
+            device_name: "NVIDIA GeForce RTX 5080".into(),
+            driver_name: "NVIDIA".into(),
+            driver_info: "580.178.04".into(),
+            requested_device_id: Some("0x2c02".into()),
+            is_software_emulated: false,
+        };
+        gradient_device(&good, "580.178.04");
+        for field in 0..5 {
+            let mut wrong = good.clone();
+            match field {
+                0 => wrong.device_name = "other".into(),
+                1 => wrong.driver_name = "other".into(),
+                2 => wrong.driver_info = "595.91.07".into(),
+                3 => wrong.requested_device_id = None,
+                _ => wrong.is_software_emulated = true,
+            }
+            assert!(std::panic::catch_unwind(|| gradient_device(&wrong, "580.178.04")).is_err());
         }
     }
 }
