@@ -60,8 +60,10 @@ isolates slow startup/teardown queries, but the user has now stopped NVML calls
 on driver 580. The proposed cadence/parity test is withdrawn; its CPU-tested
 persistent reader stays unused. Future diagnostics must use host kernel logs,
 native device/error checks and timeouts, with non-NVML measurement requirements
-declared explicitly. NVML is not part of the learner or inference path. This
-control does not prove a driver fix; no candidate or learning job follows.
+declared explicitly. The [host-only guard](gpu_incident_response.md#prepared-host-only-guard)
+passes 105 CPU tests and a real-host CPU print check, not GPU qualification.
+NVML is not part of the learner or inference path. This control does not prove
+a driver fix; no candidate or learning job follows.
 
 The latest upstream candidate previously produced a
 [fourth matching PMU-halt fault](experiments/2026-09-15-interleaved-initialization-incident.md).

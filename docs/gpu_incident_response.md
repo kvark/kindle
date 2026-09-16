@@ -27,6 +27,54 @@ by NVML. Mark them unmeasured, never zero or healthy. Any replacement measuremen
 and acceptance rule must be explicit in a new declaration; historical gates and
 results are not rewritten. No new GPU job or host recovery is authorized here.
 
+### Prepared host-only guard
+
+[`gpu_host_guard.py`](../python/examples/gpu_host_guard.py) reuses the original
+guard's host journal, evidence and direct-child cleanup helpers without changing
+that historical file. Its own probes allow only `journalctl`, `lspci`, `lsmod`,
+`modinfo` and `ps`. It never calls the legacy run/health path, loads NVML or starts
+a telemetry worker. Snapshot mode remains available through the original tool.
+
+Every new execution needs an explicit `host_guard` declaration block containing
+`monitoring: "host-only"`, the exact boot ID and loaded driver, an absolute
+direct-child command and executable SHA256, plus bounded `timeout_seconds` and
+`poll_seconds`. Legacy or ambiguous declarations refuse before probes or output
+creation. The outer experiment must still pin the guard/helpers, all actual
+native/interpreter/source inputs, environment and acceptance requirements. A
+declaration file is not operator approval.
+
+The guard checks identity before and after journal reads, rejects a faulted or
+unreadable baseline, tracks the kernel cursor, checks after child exit and stops
+only its own direct child on failure/timeout/interruption. TERM/KILL waits and
+host probes are bounded, but an uninterruptible child can remain unfinished;
+retain that result and its growing logs. There is no retry or successor.
+Probe and cleanup time can extend elapsed time beyond the child time budget;
+this is not a hard real-time deadline or prevention of driver faults.
+
+Results use **`host_guard_passed`**, not the old `guard_passed`, and explicitly
+record GPU telemetry as **unmeasured** and hardware qualification as false.
+Audit verifies retained bytes, host identities and preflight/child/postflight
+records. It does not prove a native adapter, numerical correctness, GPU health
+or memory headroom. The helper is not a sandbox: separately review the payload
+to exclude NVML and descendant GPU work. Do not wrap a scheduler or controller.
+
+The [YZtTha CPU preparation](../runs/host-only-guard-cpu-20260916.YZtTha/commands/result.json)
+passes **40 new tests and all 65 unchanged historical guard tests**. Fault and
+legacy telemetry paths in those tests are CPU fakes. The separate isolated
+Python `-I -S` print sentinel exits zero and is reaped as PID 17424 on the real
+4f5152d1 boot / loaded 580.178.04, with three successful host checks and no GPU
+queries, initialization or workload. The original guard hash is unchanged.
+Seven input pins and all three command lifecycles independently re-audit:
+
+```bash
+python/.venv/bin/python -B runs/host-only-guard-cpu-20260916.YZtTha/prepare.py --audit
+```
+
+Preserve that completed CPU writer/sentinel; do not rerun them. This preparation
+starts no GPU diagnostic or learning campaign, changes no old acceptance gate
+and lifts no candidate quarantine or Pong hold. A future GPU invocation still
+requires its own explicit authorization and non-NVML experiment declaration.
+
 ## Capture before recovery
 
 Stop scheduling new GPU work. Do not relaunch a failed experiment or remove a

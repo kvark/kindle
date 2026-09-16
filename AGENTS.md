@@ -28,6 +28,16 @@ reliable learning.
   and utilization telemetry is unmeasured, not zero or proof of health; old
   gates/results remain unchanged. This monitoring change does not authorize a
   GPU job, host recovery, quarantined candidate or held Pong work.
+- The new `python/examples/gpu_host_guard.py` is CPU-tested for the non-NVML
+  direction. YZtTha passes 40 new and 65 unchanged guard tests; its isolated
+  Python print sentinel exits zero on boot 4f5152d1 / loaded 580.178.04 with three
+  real host checks. Seven inputs and all three command lifecycles re-audit via
+  `runs/host-only-guard-cpu-20260916.YZtTha/prepare.py --audit`; preserve the
+  completed writer. The original guard is byte-identical. New results use
+  `host_guard_passed` and explicitly unmeasured GPU telemetry; they are not the
+  old guard's health/memory proof. The helper owns only its direct child and
+  restricts its own host probes, not arbitrary payload behavior. No GPU fixture,
+  candidate, training, successor or hardware qualification is declared here.
 - September 16 monitoring follow-up is CPU-only: isolated prototype 3ebdf2e in
   `exp/persistent-health-cpu-20260916` leaves the original guard/main runtime
   unchanged. Yn3D4H passes 173 CPU tests and independently audits eight commands/
