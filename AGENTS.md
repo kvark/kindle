@@ -1,5 +1,23 @@
 # Kindle working direction
 
+September 16: CPU-only production-gradient fixture preparation takes precedence.
+The approved bT2bAx control/candidate initializations are complete; preserve
+both source trees, targets and results. Their two-job authorization is consumed.
+No NVML, new GPU query/execution, training, recovery, retry or follower is allowed
+here. Approval for a separate bounded production-gradient pair remains pending.
+This fresh branch changes only world-test diagnostics and these instructions:
+explicit full B16/T64/driver binding, flushed progress and numerical evidence.
+Keep all original inputs, graph/learning arithmetic and tolerances unchanged.
+Keep ce80/control and 070f4b51/candidate dependencies fixed. New Blade bbf5bf5
+changes optional timestamps; timing is disabled here. Carry that API fix into
+a separate future timing candidate, not this historical driver comparison.
+Build only into a new private cache copy with one CPU / 2 GiB / zero swap;
+keep all GPU tests ignored except CPU-only test enumeration. A new executable
+is not qualified by its parent's initialization pass. Future execution requires
+its own approval and non-NVML declaration, exact device/traces, raw numerics and
+direct-child containment. GPU telemetry is unmeasured; main ce80/Pong hold and
+all original adoption, memory, state, pixel and throughput gates remain.
+
 ## September 16: isolated CPU-only driver-bound control
 
 This worktree starts at ae7699ad, the historical ce80/published-Blade control.
