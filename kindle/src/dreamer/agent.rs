@@ -550,6 +550,15 @@ impl DreamerCore {
         crate::gpu_device_info(self.gpu.device_information())
     }
 
+    /// Query the shared perception/learner context without NVML or a worker.
+    pub fn gpu_memory_budget(&self) -> crate::GpuMemoryBudget {
+        let stats = self.gpu.memory_stats();
+        crate::GpuMemoryBudget {
+            usage_bytes: stats.usage,
+            budget_bytes: stats.budget,
+        }
+    }
+
     /// Profile sessions on inputs left by a completed learner update. Requires
     /// a context created with `MEGANEURA_GPU_TIMING=1`. Training captures only
     /// forward/backward work on the final row microbatch, without optimizer,
