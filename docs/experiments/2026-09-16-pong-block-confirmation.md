@@ -53,3 +53,24 @@ stream-zero matches are preselected for later H1 world diagnostics, without scor
 filtering. Extraction is not GPU forecast validation. The roadmap remains the
 single current game-status table and video index; five-game reliability is not
 established by this campaign declaration or by short runtime checks.
+
+## First-quarter online learning — September 17
+
+Root 2017 reaches the 100,020-action save at about 00:51 UTC. The first five
+fixed 20,004-action blocks show the following **online training** results from
+the linked raw log. Counts include every match ending in each block, including
+matches that began earlier; none ends by cutoff.
+
+| Block ends at action | Completed matches | Natural wins | Mean return |
+| --- | --- | --- | --- |
+| 20,004 | 19 | 0 | -20.6842 |
+| 40,008 | 20 | 0 | -20.6000 |
+| 60,012 | 12 | 0 | -18.9167 |
+| 80,016 | 9 | 2 | -10.4444 |
+| 100,020 | 11 | 11 | +15.2727 |
+
+All 24,655 learner reports through that save contain finite values. These matches
+span an updating policy, not a frozen final policy or an independent control.
+The training budget remains 400,008 actions; final evaluation, the untrained
+control and the other fresh roots remain pending. No competence gate, source,
+recipe or declaration changes because of this interim improvement.
