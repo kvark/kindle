@@ -74,3 +74,33 @@ span an updating policy, not a frozen final policy or an independent control.
 The training budget remains 400,008 actions; final evaluation, the untrained
 control and the other fresh roots remain pending. No competence gate, source,
 recipe or declaration changes because of this interim improvement.
+
+## Session handoff — September 17, 03:36 UTC
+
+The session ends with root 2017 still running at approximately 200,000 of
+400,008 actions and 10.18 actions/s. Controller 130967 and direct native child
+131029 remain alive; no terminal training result exists yet. Leave this guarded,
+bounded invocation uninterrupted. NVML remains disabled, and no evaluation or
+successor launches automatically.
+
+The last separately checked checkpoint was at 180,036 actions / 44,659 updates:
+all learner reports and complete state/moments were finite. Its preceding
+20,004-action block contained 12 natural wins in 12 completed matches, mean
++20.0833, with no cutoffs. This remains online learning evidence, not frozen
+competence. Checkpoints overwrite the same path; that intermediate state was
+checked in place, not archived as a frozen-evaluation artifact.
+
+On resumption, inspect the existing process and terminal results before any
+launch. After training completes, verify the declaration and audit its result:
+
+```sh
+python/.venv/bin/python -B runs/pong-block-confirmation-20260916.rBwdGF/run.py verify
+python/.venv/bin/python -B runs/pong-block-confirmation-20260916.rBwdGF/run.py audit seed2017-training
+```
+
+Only after both pass and the guard/native result is reviewed, individually
+launch `run.py run seed2017-evaluation`, followed by the declared initial and
+untrained phases with the same review boundaries. Do not rerun training or
+`prepare`. Roots 3019 and fresh 1009 remain pending; the five-game reliability
+goal is not complete. Breakout action-width gates and later checkpoint-history /
+Freeway/Qbert dose experiments remain separate, after the declared Pong work.
