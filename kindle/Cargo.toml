@@ -4,16 +4,18 @@ version = "0.1.0"
 authors = ["Dzmitry Malyshau"]
 repository = "https://github.com/kvark/kindle"
 edition = "2024"
-rust-version = "1.88"
-description = "A DreamerV3 agent with frozen DINOv3 visual perception."
+rust-version = "1.92"
+description = "A live-learning Dreamer agent with frozen causal visual perception."
 license = "MIT"
 
 [dependencies]
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "3f2b91d95288d625a7616179604c33bba6472aaf" }
-# Pinned to the same Blade revision as Meganeura so their GPU context types
-# remain identical at the perception/learner boundary.
-blade-graphics = { git = "https://github.com/kvark/blade", rev = "95f5004fb02785a792c883a5312ca5ac37872a75" }
+# Upstream includes LeVJEPA frame-prefix attention and cache-write aliases.
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "589d73abf2535581f9e73a28c59f48c57c6246a7" }
+# Match the instrumented upstream candidate dependency in Meganeura exactly.
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "2accfeee594397685146dff23dc4f604bf5d0867" }
 rand = "0.9"
+rayon = "1.12"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
+sha2 = "0.10"

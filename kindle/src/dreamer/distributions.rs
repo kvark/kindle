@@ -66,13 +66,22 @@ impl TwoHotBins {
         output[upper] = low_distance / total;
     }
 
-    pub fn decode_logits(&self, logits: &[f32]) -> f32 {
+    #[cfg(test)]
+    fn decode_logits(&self, logits: &[f32]) -> f32 {
+        self.decode_logits_with_scratch(logits, &mut vec![0.0; self.len()])
+    }
+
+    pub(crate) fn decode_logits_with_scratch(
+        &self,
+        logits: &[f32],
+        exponentials: &mut [f64],
+    ) -> f32 {
         assert_eq!(logits.len(), self.len());
+        assert_eq!(exponentials.len(), self.len());
         let maximum = logits.iter().copied().fold(f32::NEG_INFINITY, f32::max);
-        let exponentials = logits
-            .iter()
-            .map(|logit| ((*logit - maximum) as f64).exp())
-            .collect::<Vec<_>>();
+        for (exponential, logit) in exponentials.iter_mut().zip(logits) {
+            *exponential = ((*logit - maximum) as f64).exp();
+        }
         let normalizer = exponentials.iter().sum::<f64>();
         let middle = self.len() / 2;
         let mut value = exponentials[middle] / normalizer * self.values[middle] as f64;
@@ -90,17 +99,22 @@ pub fn softmax_unimix(logits: &[f32], unimix: f32, output: &mut [f32]) {
     assert_eq!(logits.len(), output.len());
     assert!(!logits.is_empty());
     let maximum = logits.iter().copied().fold(f32::NEG_INFINITY, f32::max);
-    let normalizer = logits
-        .iter()
-        .map(|value| (*value - maximum).exp())
-        .sum::<f32>();
-    let uniform = unimix / logits.len() as f32;
     for (probability, logit) in output.iter_mut().zip(logits) {
-        *probability = (1.0 - unimix) * (*logit - maximum).exp() / normalizer + uniform;
+        *probability = (*logit - maximum).exp();
+    }
+    let normalizer = output.iter().sum::<f32>();
+    let uniform = unimix / logits.len() as f32;
+    for probability in output {
+        *probability = (1.0 - unimix) * *probability / normalizer + uniform;
     }
 }
 
 pub fn sample_probabilities(probabilities: &[f32], rng: &mut impl Rng) -> usize {
+    sample_probabilities_at(probabilities, rng.random::<f32>())
+}
+
+pub(crate) fn sample_probabilities_at(probabilities: &[f32], uniform: f32) -> usize {
+    assert!((0.0..1.0).contains(&uniform));
     assert!(!probabilities.is_empty());
     assert!(
         probabilities
@@ -109,7 +123,7 @@ pub fn sample_probabilities(probabilities: &[f32], rng: &mut impl Rng) -> usize 
     );
     let total = probabilities.iter().sum::<f32>();
     assert!(total > 0.0);
-    let draw = rng.random::<f32>() * total;
+    let draw = uniform * total;
     let mut cumulative = 0.0;
     for (index, probability) in probabilities.iter().enumerate() {
         cumulative += *probability;
@@ -121,12 +135,6 @@ pub fn sample_probabilities(probabilities: &[f32], rng: &mut impl Rng) -> usize 
         .iter()
         .rposition(|probability| *probability > 0.0)
         .expect("positive probability mass")
-}
-
-pub fn sample_logits(logits: &[f32], unimix: f32, rng: &mut impl Rng) -> usize {
-    let mut probabilities = vec![0.0; logits.len()];
-    softmax_unimix(logits, unimix, &mut probabilities);
-    sample_probabilities(&probabilities, rng)
 }
 
 /// Exact alignment used by the pinned D3 `lambda_return` helper.
@@ -162,6 +170,20 @@ pub fn lambda_returns(
     // accidental one-step shifts at call sites.
     let _ = value;
     result
+}
+
+/// D3 weights imagined losses by the cumulative predicted continuation,
+/// including the continuation predicted at the posterior start state.
+pub fn continuation_weights(continuation: &[f32]) -> Vec<f32> {
+    let mut cumulative = 1.0;
+    continuation
+        .iter()
+        .map(|value| {
+            assert!(value.is_finite());
+            cumulative *= value.clamp(0.0, 1.0);
+            cumulative
+        })
+        .collect()
 }
 
 #[derive(Clone, Debug)]
@@ -220,6 +242,29 @@ impl PercentileNormalizer {
 mod tests {
     use super::*;
     use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn cached_exponentials_are_bit_exact_with_the_original_sampler() {
+        let mut rng = StdRng::seed_from_u64(923);
+        for count in [2, 3, 18, 32, 64, 255] {
+            for _ in 0..100 {
+                let mut logits: Vec<f32> =
+                    (0..count).map(|_| rng.random_range(-20.0..20.0)).collect();
+                logits[0] = f32::NEG_INFINITY;
+                for unimix in [0.0, 0.01, 0.1, 1.0] {
+                    let max = logits.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+                    let sum = logits.iter().map(|v| (*v - max).exp()).sum::<f32>();
+                    let expected: Vec<_> = logits
+                        .iter()
+                        .map(|v| (1.0 - unimix) * (*v - max).exp() / sum + unimix / count as f32)
+                        .collect();
+                    let mut actual = vec![0.0; count];
+                    softmax_unimix(&logits, unimix, &mut actual);
+                    assert_eq!(actual, expected);
+                }
+            }
+        }
+    }
 
     #[test]
     fn two_hot_uses_exponential_raw_value_bins() {
@@ -287,5 +332,23 @@ mod tests {
 
         assert_eq!(timeout, vec![3.5, 7.0]);
         assert_eq!(terminal, vec![1.0, 2.0]);
+    }
+
+    #[test]
+    fn imagination_weights_include_the_start_state_continuation() {
+        let weights = continuation_weights(&[0.8, 0.5, 0.25]);
+        assert_eq!(weights, vec![0.8, 0.4, 0.1]);
+    }
+
+    #[test]
+    fn percentile_normalizer_matches_d3_linear_percentiles_and_ema() {
+        let mut normalizer = PercentileNormalizer::new(0.5, 1.0);
+        normalizer.update(&(0..=20).map(|value| value as f32).collect::<Vec<_>>());
+        assert_eq!(normalizer.state(), (0.5, 9.5));
+        assert_eq!(normalizer.scale(), 9.0);
+
+        normalizer.update(&[4.0; 21]);
+        assert_eq!(normalizer.state(), (2.25, 6.75));
+        assert_eq!(normalizer.scale(), 4.5);
     }
 }

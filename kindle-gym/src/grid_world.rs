@@ -19,6 +19,8 @@ pub struct GridWorld {
     energy: f32,
     food_index: usize,
     steps: usize,
+    persistent: bool,
+    deaths: usize,
 }
 
 impl Default for GridWorld {
@@ -36,11 +38,24 @@ impl GridWorld {
             energy: 1.0,
             food_index: 0,
             steps: 0,
+            persistent: false,
+            deaths: 0,
         }
     }
 
     pub fn position(&self) -> (usize, usize) {
         self.position
+    }
+
+    pub fn persistent() -> Self {
+        Self {
+            persistent: true,
+            ..Self::new()
+        }
+    }
+
+    pub fn deaths(&self) -> usize {
+        self.deaths
     }
 
     /// Move the agent without advancing time. This is used by visual
@@ -126,6 +141,7 @@ impl Environment for GridWorld {
         self.energy = 1.0;
         self.food_index = 0;
         self.steps = 0;
+        self.deaths = 0;
         self.render()
     }
 
@@ -154,14 +170,20 @@ impl Environment for GridWorld {
             self.energy = (self.energy + 0.35).min(1.0);
             self.food_index = (self.food_index + 1) % Self::FOOD.len();
         }
+        let exhausted = self.energy == 0.0;
+        if exhausted && self.persistent {
+            self.position = (0, 0);
+            self.energy = 1.0;
+            self.deaths += 1;
+        }
         Transition {
             frame: self.render(),
             reward: Reward {
-                extrinsic: if found_food { 1.0 } else { 0.0 },
+                extrinsic: f32::from(found_food) - f32::from(exhausted && self.persistent),
                 intrinsic: 0.0,
             },
-            terminated: self.energy == 0.0,
-            truncated: self.steps >= EPISODE_LIMIT,
+            terminated: exhausted && !self.persistent,
+            truncated: self.steps >= EPISODE_LIMIT && !self.persistent,
         }
     }
 }
@@ -200,6 +222,29 @@ mod tests {
             assert_eq!(world.step(action).reward.extrinsic, 0.0);
         }
         assert_eq!(world.step(1).reward.extrinsic, 1.0);
+    }
+
+    #[test]
+    fn persistent_exhaustion_respawns_without_erasing_food_progress() {
+        let mut world = GridWorld::persistent();
+        world.reset();
+        for action in [3, 1, 1, 1] {
+            world.step(action);
+        }
+        assert_eq!(world.food_index(), 1);
+        let mut deaths = 0;
+        for _ in 0..400 {
+            let transition = world.step(2);
+            assert!(!transition.terminated && !transition.truncated);
+            if transition.reward.extrinsic == -1.0 {
+                deaths += 1;
+                assert_eq!(world.position(), (0, 0));
+                assert_eq!(world.energy(), 1.0);
+            }
+            assert_eq!(world.food_index(), 1);
+        }
+        assert!(deaths >= 3);
+        assert_eq!(world.deaths(), deaths);
     }
 
     #[test]
