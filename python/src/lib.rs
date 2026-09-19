@@ -1,8 +1,13 @@
 //! Python bindings for the pixel-first Dreamer baseline.
 
+mod vector;
+
 use std::path::Path;
 
-use kindle::vision::{DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use kindle::vision::{
+    DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
+    levjepa::LeVJepaPerception,
+};
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
 };
@@ -24,6 +29,62 @@ struct PyDinoPerception {
     inner: DinoPerception,
 }
 
+#[pyclass(name = "LeVJepaPerception", module = "kindle._native", unsendable)]
+struct PyLeVJepaPerception {
+    inner: LeVJepaPerception,
+}
+
+#[pymethods]
+impl PyLeVJepaPerception {
+    #[new]
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None))]
+    fn new(encoder_checkpoint: &str, encoder_plan_cache: Option<&str>) -> PyResult<Self> {
+        let inner =
+            LeVJepaPerception::load(encoder_checkpoint, None, encoder_plan_cache.map(Path::new))
+                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        let frame = parse_rgb_frame(frame)?;
+        let pooled = self
+            .inner
+            .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
+        Ok((
+            self.inner.projected_patches().to_vec(),
+            pooled.as_slice().to_vec(),
+        ))
+    }
+
+    fn reset(&mut self) {
+        self.inner.reset();
+    }
+
+    #[getter]
+    fn next_frame_in_chunk(&self) -> usize {
+        self.inner.next_frame_in_chunk()
+    }
+
+    #[getter]
+    fn projected_shape(&self) -> (usize, usize, usize) {
+        (
+            kindle::vision::levjepa::GRID,
+            kindle::vision::levjepa::GRID,
+            OBSERVATION_CHANNELS,
+        )
+    }
+
+    #[getter]
+    fn pooled_shape(&self) -> (usize, usize, usize) {
+        (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
+    }
+
+    #[getter]
+    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_device())
+    }
+}
+
 #[pymethods]
 impl PyDinoPerception {
     #[new]
@@ -34,6 +95,8 @@ impl PyDinoPerception {
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
+
+    fn reset(&mut self) {}
 
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
         let frame = parse_rgb_frame(frame)?;
@@ -65,9 +128,14 @@ impl PyDinoPerception {
 
 #[pymethods]
 impl PyAgent {
+    #[getter]
+    fn provenance<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.core().provenance())
+    }
+
     #[new]
     #[pyo3(signature = (
-        dino_checkpoint,
+        encoder_checkpoint,
         num_actions,
         model_size = "12m",
         observation_decoder_depth = None,
@@ -76,10 +144,12 @@ impl PyAgent {
         batch_size = None,
         batch_length = None,
         world_backprop_length = None,
+        world_microbatch_size = None,
         train_ratio = None,
         imagination_length = None,
         intrinsic_reward_scale = 0.0,
         extrinsic_reward_scale = 1.0,
+        visitation_bonus = false,
         learning_rate = None,
         behavior_learning_rate = None,
         actor_learning_starts = None,
@@ -88,13 +158,16 @@ impl PyAgent {
         dynamics_free_nats = None,
         dynamics_loss_scale = None,
         reconstruction_loss_scale = None,
+        future_prediction_loss_scale = None,
+        agc = None,
         replay_value_gradient = None,
-        dino_plan_cache = None,
+        encoder_plan_cache = None,
         skip_full_optimize = false,
+        encoder = "dinov3",
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
-        dino_checkpoint: &str,
+        encoder_checkpoint: &str,
         num_actions: usize,
         model_size: &str,
         observation_decoder_depth: Option<usize>,
@@ -103,10 +176,12 @@ impl PyAgent {
         batch_size: Option<usize>,
         batch_length: Option<usize>,
         world_backprop_length: Option<usize>,
+        world_microbatch_size: Option<usize>,
         train_ratio: Option<f32>,
         imagination_length: Option<usize>,
         intrinsic_reward_scale: f32,
         extrinsic_reward_scale: f32,
+        visitation_bonus: bool,
         learning_rate: Option<f32>,
         behavior_learning_rate: Option<f32>,
         actor_learning_starts: Option<u64>,
@@ -115,11 +190,15 @@ impl PyAgent {
         dynamics_free_nats: Option<f32>,
         dynamics_loss_scale: Option<f32>,
         reconstruction_loss_scale: Option<f32>,
+        future_prediction_loss_scale: Option<f32>,
+        agc: Option<f32>,
         replay_value_gradient: Option<bool>,
-        dino_plan_cache: Option<&str>,
+        encoder_plan_cache: Option<&str>,
         skip_full_optimize: bool,
+        encoder: &str,
     ) -> PyResult<Self> {
         validate_action_count(num_actions)?;
+        let kind = parse_perception_kind(encoder)?;
         let mut config = DreamerConfig::new(num_actions);
         config.model_size = parse_model_size(model_size)?;
         if let Some(value) = observation_decoder_depth {
@@ -128,6 +207,7 @@ impl PyAgent {
         config.seed = seed;
         config.intrinsic_reward_scale = intrinsic_reward_scale;
         config.extrinsic_reward_scale = extrinsic_reward_scale;
+        config.visitation_bonus = visitation_bonus;
         config.skip_full_optimize = skip_full_optimize;
         if let Some(value) = replay_capacity {
             config.replay_capacity = value;
@@ -140,6 +220,9 @@ impl PyAgent {
         }
         if let Some(value) = world_backprop_length {
             config.world_backprop_length = value;
+        }
+        if let Some(value) = world_microbatch_size {
+            config.world_microbatch_size = Some(value);
         }
         if let Some(value) = train_ratio {
             config.train_ratio = value;
@@ -171,28 +254,34 @@ impl PyAgent {
         if let Some(value) = reconstruction_loss_scale {
             config.loss_scales.reconstruction = value;
         }
+        if let Some(value) = future_prediction_loss_scale {
+            config.loss_scales.future_prediction = value;
+        }
+        if let Some(value) = agc {
+            config.agc = value;
+        }
         if let Some(value) = replay_value_gradient {
             config.replay_value_gradient = value;
         }
         config
             .check()
             .map_err(|error| PyValueError::new_err(format!("invalid Dreamer config: {error}")))?;
-        let cache = dino_plan_cache.map(Path::new);
-        let inner = DreamerAgent::new(config, dino_checkpoint, cache)
+        let cache = encoder_plan_cache.map(Path::new);
+        let inner = DreamerAgent::with_perception(config, kind, encoder_checkpoint, cache)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
 
     #[classmethod]
-    #[pyo3(signature = (dreamer_checkpoint, dino_checkpoint, dino_plan_cache = None))]
+    #[pyo3(signature = (dreamer_checkpoint, encoder_checkpoint, encoder_plan_cache = None))]
     fn restore(
         _class: &Bound<'_, PyType>,
         dreamer_checkpoint: &str,
-        dino_checkpoint: &str,
-        dino_plan_cache: Option<&str>,
+        encoder_checkpoint: &str,
+        encoder_plan_cache: Option<&str>,
     ) -> PyResult<Self> {
-        let cache = dino_plan_cache.map(Path::new);
-        let inner = DreamerAgent::restore(dreamer_checkpoint, dino_checkpoint, cache)
+        let cache = encoder_plan_cache.map(Path::new);
+        let inner = DreamerAgent::restore(dreamer_checkpoint, encoder_checkpoint, cache)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
@@ -249,19 +338,25 @@ impl PyAgent {
         self.inner.posterior_action_probabilities(None)
     }
 
-    /// Current frozen-DINO observation consumed by the world model.
+    /// Current frozen visual observation consumed by the world model.
     ///
     /// The returned copy is read-only and does not change recurrent state.
     #[getter]
-    fn dino_observation(&self) -> Vec<f32> {
-        self.inner.dino_observation().to_vec()
+    fn visual_observation(&self) -> Vec<f32> {
+        self.inner.visual_observation().to_vec()
     }
 
-    /// Frozen-DINO observation reconstructed from the current posterior.
+    /// The recurrent policy input, without an additional GPU execution.
+    #[getter]
+    fn latent_feature(&self) -> Vec<f32> {
+        self.inner.latent_feature().to_vec()
+    }
+
+    /// Deterministic forecast when enabled, otherwise posterior reconstruction.
     ///
     /// This diagnostic does not change recurrent state or random streams.
-    fn posterior_observation_prediction(&mut self) -> Vec<f32> {
-        self.inner.posterior_observation_prediction()
+    fn observation_prediction(&mut self) -> Vec<f32> {
+        self.inner.observation_prediction()
     }
 
     /// Reward predicted after applying one action to the current latent state.
@@ -277,7 +372,7 @@ impl PyAgent {
         Ok(self.inner.prior_reward_prediction(action))
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     ///
     /// This diagnostic clones its categorical random stream and leaves the
     /// live posterior, policy, and all training state unchanged.
@@ -317,7 +412,8 @@ impl PyAgent {
         Ok(self.inner.prior_behavior_rollout(&actions))
     }
 
-    /// Record the frame and rewards produced by the preceding action.
+    /// Record an arrival and return (extrinsic, intrinsic), including configured
+    /// novelty. These channels are unscaled, as stored in replay.
     #[pyo3(signature = (
         frame,
         extrinsic_reward = 0.0,
@@ -332,7 +428,7 @@ impl PyAgent {
         intrinsic_reward: f32,
         terminated: bool,
         truncated: bool,
-    ) -> PyResult<()> {
+    ) -> PyResult<(f32, f32)> {
         if !extrinsic_reward.is_finite() || !intrinsic_reward.is_finite() {
             return Err(PyValueError::new_err("rewards must be finite"));
         }
@@ -345,8 +441,8 @@ impl PyAgent {
             terminated,
             truncated,
         };
-        self.inner.observe(&transition);
-        Ok(())
+        let reward = self.inner.observe(&transition);
+        Ok((reward.extrinsic, reward.intrinsic))
     }
 
     #[pyo3(signature = (updates = 1))]
@@ -384,6 +480,11 @@ impl PyAgent {
     }
 
     #[getter]
+    fn cpu_worker_threads(&self) -> usize {
+        self.inner.core().cpu_worker_threads()
+    }
+
+    #[getter]
     fn replay_len(&self) -> usize {
         self.inner.core().replay_len()
     }
@@ -396,6 +497,11 @@ impl PyAgent {
     #[getter]
     fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, &self.inner.core().gpu_device())
+    }
+
+    #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.core().gpu_memory_budget())
     }
 
     #[getter]
@@ -439,6 +545,14 @@ fn parse_model_size(value: &str) -> PyResult<ModelSize> {
         _ => Err(PyValueError::new_err(format!(
             "unknown model_size {value:?}; expected tiny, 1m, 12m, 25m, 50m, 100m, or 200m"
         ))),
+    }
+}
+
+fn parse_perception_kind(value: &str) -> PyResult<PerceptionKind> {
+    match value {
+        "dinov3" => Ok(PerceptionKind::DinoV3),
+        "levjepa" => Ok(PerceptionKind::LeVJepa),
+        _ => Err(PyValueError::new_err("encoder must be dinov3 or levjepa")),
     }
 }
 
@@ -490,9 +604,16 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 #[pymodule]
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
+    module.add_class::<vector::PyVectorAgent>()?;
     module.add_class::<PyDinoPerception>()?;
+    module.add_class::<PyLeVJepaPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("DINO_MODEL_ID", kindle::vision::VITS16_MODEL_ID)?;
+    module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;
+    module.add(
+        "LEVJEPA_CHECKPOINT_REVISION",
+        kindle::vision::levjepa::CHECKPOINT_REV,
+    )?;
     module.add(
         "DINO_CHECKPOINT_REVISION",
         kindle::vision::VITS16_CHECKPOINT_REV,

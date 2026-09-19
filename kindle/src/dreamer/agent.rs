@@ -1,19 +1,35 @@
 //! Online acting, replay learning, and latent imagination.
 
+mod vector;
+pub use vector::VectorDreamerAgent;
+
+#[cfg(test)]
+mod initialization;
+
 use std::fs;
 use std::io;
 use std::path::Path;
 use std::sync::Arc;
+use std::time::Instant;
 
-use meganeura::{Mode, Session};
-use rand::{SeedableRng, rngs::StdRng};
+use meganeura::{Mode, Session, runtime::ExternalSlot};
+use rand::{Rng, SeedableRng, rngs::StdRng};
+use rayon::prelude::*;
 
 use super::behavior;
-use super::config::DreamerConfig;
-use super::distributions::{
-    PercentileNormalizer, TwoHotBins, lambda_returns, sample_logits, sample_probabilities,
-    softmax_unimix,
+use super::checkpoint::{self, TensorFingerprints};
+use super::checkpoint::{
+    BEHAVIOR as CHECKPOINT_BEHAVIOR, SLOW_VALUE as CHECKPOINT_SLOW_VALUE, WORLD as CHECKPOINT_WORLD,
 };
+use super::config::DreamerConfig;
+use super::cpu;
+use super::device_copy::{DeviceCopies, DeviceCopy};
+use super::distributions::{
+    PercentileNormalizer, TwoHotBins, continuation_weights, lambda_returns, sample_probabilities,
+    sample_probabilities_at, softmax_unimix,
+};
+use super::intrinsic::{VisitationBonus, VisitationState};
+use super::readback::Readback;
 use super::replay::{FrameFlags, ReplayFrame, Reward, SequenceBatch, SequenceReplay};
 use super::runtime::{
     build_session, configure_d3_optimizer, ema_matching, initialize_d3, sync_matching,
@@ -22,17 +38,13 @@ use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
 use crate::vision::{
-    DINOV3_UPSTREAM_REV, DINOVISION_SOURCE_REV, DinoObservation, DinoPerception,
-    OBSERVATION_CHANNELS, OBSERVATION_GRID, PROJECTION_SEED, VITS16_CHECKPOINT_REV,
-    VITS16_MODEL_ID,
+    OBSERVATION_CHANNELS, OBSERVATION_GRID, Observation, PROJECTION_SEED, Perception,
+    PerceptionIdentity, PerceptionKind,
 };
 
-const CHECKPOINT_FORMAT: u32 = 2;
-const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-dinov3-vits16";
+const CHECKPOINT_FORMAT: u32 = 3;
+const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-visual-features";
 const CHECKPOINT_METADATA: &str = "metadata.json";
-const CHECKPOINT_WORLD: &str = "world.safetensors";
-const CHECKPOINT_BEHAVIOR: &str = "behavior.safetensors";
-const CHECKPOINT_SLOW_VALUE: &str = "slow_value.safetensors";
 const RNG_POLICY: u64 = 0x706f_6c69_6379_0001;
 const RNG_LIVE_POSTERIOR: u64 = 0x6c69_7665_706f_7374;
 const RNG_REPLAY: u64 = 0x7265_706c_6179_0001;
@@ -48,18 +60,28 @@ struct CheckpointMetadata {
     dreamerv3_revision: String,
     meganeura_revision: String,
     blade_revision: String,
-    dinov3_revision: String,
-    dinovision_revision: String,
-    dino_model_id: String,
-    dino_checkpoint_revision: String,
     projection_seed: u64,
+    #[serde(default)]
+    perception: Option<PerceptionIdentity>,
     observation_grid: usize,
     observation_channels: usize,
     config: DreamerConfig,
     learner_step: u64,
     environment_step: u64,
+    #[serde(default = "single_stream")]
+    collection_streams: usize,
     return_low: f32,
     return_high: f32,
+    #[serde(default)]
+    visitation: Option<VisitationState>,
+    #[serde(default)]
+    future_head_revision: Option<String>,
+    #[serde(default)]
+    tensor_sha256: Option<TensorFingerprints>,
+}
+
+fn single_stream() -> usize {
+    1
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
@@ -69,10 +91,23 @@ pub enum ActionMode {
     Greedy,
 }
 
+/// Executable graph and reward identities, separate from run hyperparameters.
+#[derive(Clone, Debug, PartialEq, serde::Serialize)]
+pub struct ModelProvenance {
+    pub dreamerv3_revision: &'static str,
+    pub meganeura_revision: &'static str,
+    pub blade_revision: &'static str,
+    pub future_head_revision: Option<&'static str>,
+    pub visitation_hash_version: Option<u32>,
+    /// Bound by the pixel agent; absent for a core fed precomputed features.
+    pub perception: Option<PerceptionIdentity>,
+}
+
 #[derive(Clone, Debug, Default, serde::Serialize)]
 pub struct WorldMetrics {
     pub total_loss: f32,
     pub reconstruction_loss: f32,
+    pub future_prediction_loss: f32,
     /// Unclipped posterior-to-prior KL before either free-nat floor.
     pub raw_kl: f32,
     pub dynamics_kl: f32,
@@ -128,6 +163,21 @@ pub struct LearnReport {
     pub replay_len: usize,
     pub world: WorldMetrics,
     pub behavior: BehaviorMetrics,
+    pub timing: LearnTiming,
+}
+
+/// Wall time includes the GPU waits and host transfers performed by each stage.
+#[derive(Clone, Debug, Default, serde::Serialize)]
+pub struct LearnTiming {
+    pub replay_seconds: f64,
+    pub posterior_seconds: f64,
+    pub imagination_seconds: f64,
+    pub world_train_seconds: f64,
+    pub replay_refresh_seconds: f64,
+    pub world_sync_seconds: f64,
+    pub behavior_train_seconds: f64,
+    pub behavior_sync_seconds: f64,
+    pub total_seconds: f64,
 }
 
 struct PosteriorBatch {
@@ -136,7 +186,6 @@ struct PosteriorBatch {
 }
 
 struct BehaviorTrainingBatch {
-    imagined_feature: Vec<f32>,
     action_target: Vec<f32>,
     imagined_weight: Vec<f32>,
     imagined_value_target: Vec<f32>,
@@ -241,16 +290,20 @@ impl D3TrainScheduler {
     }
 }
 
-/// DreamerV3 learner over precomputed frozen-DINO observations.
+/// DreamerV3 learner over precomputed frozen visual observations.
 ///
 /// Acting never trains implicitly. Call [`Self::learn`] explicitly, or use
 /// [`Self::learn_scheduled`] to honor D3's replay-samples-per-environment-step
 /// ratio without putting learner work on the control deadline.
 pub struct DreamerCore {
     gpu: Arc<blade_graphics::Context>,
+    readback: Readback,
+    device_copies: DeviceCopies,
     config: DreamerConfig,
+    perception_identity: Option<PerceptionIdentity>,
     bins: TwoHotBins,
     replay: SequenceReplay,
+    visitation: Option<VisitationBonus>,
     rngs: DreamerRngs,
     return_normalizer: PercentileNormalizer,
     world_train: Session,
@@ -260,7 +313,7 @@ pub struct DreamerCore {
     world_transition_live: Session,
     world_heads: Session,
     world_heads_live: Session,
-    world_decoder_live: Option<Session>,
+    world_prediction_live: Option<Session>,
     behavior_train: Session,
     behavior_online: Session,
     behavior_slow: Session,
@@ -277,6 +330,7 @@ pub struct DreamerCore {
     learner_step: u64,
     environment_step: u64,
     train_scheduler: D3TrainScheduler,
+    collection_streams: usize,
 }
 
 impl DreamerCore {
@@ -292,27 +346,34 @@ impl DreamerCore {
     /// optimizer moments, the slow critic, counters, and return normalization
     /// continue exactly from the saved learner state.
     pub fn restore(checkpoint: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        Self::restore_with_gpu(checkpoint.as_ref(), gpu)
+        Self::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)
     }
 
     fn restore_with_gpu(
         checkpoint: &Path,
         gpu: Arc<blade_graphics::Context>,
+        metadata: CheckpointMetadata,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let metadata = read_checkpoint_metadata(checkpoint)?;
-        validate_checkpoint_metadata(&metadata)?;
         let mut core = Self::with_gpu(metadata.config.clone(), gpu);
-        core.world_train
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_WORLD))?;
-        core.behavior_train
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_BEHAVIOR))?;
-        core.behavior_slow
-            .load_checkpoint(&checkpoint.join(CHECKPOINT_SLOW_VALUE))?;
+        core.perception_identity = metadata.perception;
+        checkpoint::load_session(&mut core.world_train, &checkpoint.join(CHECKPOINT_WORLD))?;
+        checkpoint::load_session(
+            &mut core.behavior_train,
+            &checkpoint.join(CHECKPOINT_BEHAVIOR),
+        )?;
+        checkpoint::load_session(
+            &mut core.behavior_slow,
+            &checkpoint.join(CHECKPOINT_SLOW_VALUE),
+        )?;
         core.learner_step = metadata.learner_step;
         core.environment_step = metadata.environment_step;
         core.return_normalizer
             .restore(metadata.return_low, metadata.return_high);
+        if let (Some(bonus), Some(state)) = (&mut core.visitation, metadata.visitation) {
+            bonus.restore(state);
+        }
         core.rngs =
             DreamerRngs::resumed(core.config.seed, core.learner_step, core.environment_step);
         core.sync_world_inference();
@@ -336,12 +397,14 @@ impl DreamerCore {
         let imagined_rows = starts * config.imagination_length;
         let replay_rows = config.batch_size * (config.batch_length - 1);
 
-        let world_train_graph = world::build_training_graph(&config, config.world_backprop_length);
+        let world_train_config = world_training_config(&config);
+        let world_train_graph =
+            world::build_training_graph(&world_train_config, config.world_backprop_length);
         let world_observe_batch_graph = world::build_observe_graph(&config, config.batch_size);
         let world_observe_live_graph = world::build_observe_graph(&config, 1);
         let world_transition_graph = world::build_transition_graph(&config, starts);
         let world_transition_live_graph = world::build_transition_graph(&config, 1);
-        let world_head_graph = world::build_head_graph(&config, starts);
+        let world_head_graph = world::build_imagination_head_graph(&config, starts);
         let world_head_live_graph = world::build_head_graph(&config, 1);
         let behavior_train_graph =
             behavior::build_training_graph(&config, imagined_rows, replay_rows);
@@ -400,14 +463,17 @@ impl DreamerCore {
 
         let size = config.network();
         Self {
+            readback: Readback::new(Arc::clone(&gpu)),
+            device_copies: DeviceCopies::new(Arc::clone(&gpu)),
             gpu,
             bins: TwoHotBins::new(config.value_bins),
             replay: SequenceReplay::new(config.replay_capacity),
+            visitation: config.visitation_bonus.then(VisitationBonus::new),
             rngs: DreamerRngs::new(config.seed),
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
-            observation: vec![0.0; DinoObservation::LEN],
+            observation: vec![0.0; Observation::LEN],
             encoded_observation: vec![0.0; OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth],
             feature: vec![0.0; config.feature_dim()],
             pending_action: None,
@@ -416,7 +482,9 @@ impl DreamerCore {
             learner_step: 0,
             environment_step: 0,
             train_scheduler: D3TrainScheduler::default(),
+            collection_streams: 1,
             config,
+            perception_identity: None,
             world_train,
             world_observe_batch,
             world_observe_live,
@@ -424,7 +492,7 @@ impl DreamerCore {
             world_transition_live,
             world_heads,
             world_heads_live,
-            world_decoder_live: None,
+            world_prediction_live: None,
             behavior_train,
             behavior_online,
             behavior_slow,
@@ -435,6 +503,21 @@ impl DreamerCore {
 
     pub fn config(&self) -> &DreamerConfig {
         &self.config
+    }
+
+    pub fn provenance(&self) -> ModelProvenance {
+        ModelProvenance {
+            dreamerv3_revision: DREAMERV3_UPSTREAM_REV,
+            meganeura_revision: MEGANEURA_REV,
+            blade_revision: BLADE_REV,
+            future_head_revision: (self.config.loss_scales.future_prediction > 0.0)
+                .then_some(world::FUTURE_HEAD_REVISION),
+            visitation_hash_version: self
+                .config
+                .visitation_bonus
+                .then_some(super::intrinsic::VERSION),
+            perception: self.perception_identity.clone(),
+        }
     }
 
     pub fn replay_len(&self) -> usize {
@@ -449,7 +532,11 @@ impl DreamerCore {
         self.environment_step
     }
 
-    /// Trainable world and behavior parameter counts, excluding frozen DINO,
+    pub fn cpu_worker_threads(&self) -> usize {
+        cpu::threads()
+    }
+
+    /// Trainable world and behavior parameter counts, excluding frozen perception,
     /// inference-session copies, and the EMA value model.
     pub fn trainable_parameter_counts(&self) -> (usize, usize) {
         (
@@ -463,6 +550,87 @@ impl DreamerCore {
         crate::gpu_device_info(self.gpu.device_information())
     }
 
+    /// Query the shared perception/learner context without NVML or a worker.
+    pub fn gpu_memory_budget(&self) -> crate::GpuMemoryBudget {
+        let stats = self.gpu.memory_stats();
+        crate::GpuMemoryBudget {
+            usage_bytes: stats.usage,
+            budget_bytes: stats.budget,
+        }
+    }
+
+    /// Profile sessions on inputs left by a completed learner update. Requires
+    /// a context created with `MEGANEURA_GPU_TIMING=1`. Training captures only
+    /// forward/backward work on the final row microbatch, without optimizer,
+    /// clipping or accumulation passes. Parameters, optimizer moments, replay,
+    /// counters and RNG streams are unchanged. The next learner update installs
+    /// its ordinary optimizer settings and overwrites scratch gradients.
+    pub fn profile_sessions(
+        &mut self,
+        directory: impl AsRef<Path>,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        use meganeura::profiler::{CaptureOptions, capture_session_profile};
+
+        assert!(self.learner_step > 0, "learn once before profiling");
+        fs::create_dir_all(directory.as_ref())?;
+        for session in [&mut self.world_train, &mut self.behavior_train] {
+            session.clear_optimizer();
+            session.clear_grad_accumulate();
+            session.disable_grad_clip();
+        }
+        for (name, session) in [
+            ("posterior", &mut self.world_observe_batch),
+            ("actor_value", &mut self.behavior_online),
+            ("slow_value", &mut self.behavior_slow),
+            ("world_heads", &mut self.world_heads),
+            ("transition", &mut self.world_transition),
+            ("world_gradient", &mut self.world_train),
+            ("behavior_gradient", &mut self.behavior_train),
+        ] {
+            let mut durations = Vec::new();
+            let mut gpu_durations = Vec::new();
+            for iteration in 0..13 {
+                let started = Instant::now();
+                session.step();
+                session.wait();
+                let wall_ms = started.elapsed().as_secs_f64() * 1_000.0;
+                // Warm up these fixed-input, optimizer-free executions.
+                if iteration >= 2 {
+                    durations.push(wall_ms);
+                    let timings = session.gpu_timings();
+                    if !timings.is_empty() {
+                        gpu_durations.push(
+                            timings
+                                .iter()
+                                .map(|(_, duration)| duration.as_secs_f64())
+                                .sum::<f64>()
+                                * 1_000.0,
+                        );
+                    }
+                }
+            }
+            durations.sort_by(f64::total_cmp);
+            gpu_durations.sort_by(f64::total_cmp);
+            let unprofiled_median_ms = durations[durations.len() / 2];
+            let profile = capture_session_profile(
+                session,
+                |_| {},
+                CaptureOptions {
+                    unprofiled_median_ms: Some(unprofiled_median_ms),
+                    ..CaptureOptions::default()
+                },
+            )?;
+            let path = directory.as_ref().join(format!("{name}.json"));
+            let mut data = serde_json::to_value(profile)?;
+            data["ordinary_gpu_median_ms"] =
+                serde_json::json!(gpu_durations.get(gpu_durations.len() / 2));
+            data["ordinary_gpu_samples_ms"] = serde_json::json!(gpu_durations);
+            data["ordinary_wall_samples_ms"] = serde_json::json!(durations);
+            fs::write(path, serde_json::to_vec_pretty(&data)?)?;
+        }
+        Ok(())
+    }
+
     /// Current posterior feature (`deter` followed by flattened categoricals).
     ///
     /// This read-only view is useful for representation probes. It must not be
@@ -471,28 +639,30 @@ impl DreamerCore {
         &self.feature
     }
 
-    /// Current output of the trainable adapter between DINO and the RSSM.
+    /// Current output of the trainable adapter between perception and the RSSM.
     pub fn encoded_observation(&self) -> &[f32] {
         &self.encoded_observation
     }
 
-    /// Current frozen-DINO observation before the trainable adapter.
-    pub fn dino_observation(&self) -> &[f32] {
+    /// Current frozen visual observation before the trainable adapter.
+    pub fn visual_observation(&self) -> &[f32] {
         &self.observation
     }
 
-    /// Frozen-DINO observation decoded from the current posterior state.
-    pub fn posterior_observation_prediction(&mut self) -> Vec<f32> {
-        self.ensure_world_decoder_live();
+    /// Forecast made before this observation when future prediction is enabled,
+    /// otherwise posterior reconstruction. Reset observations have no forecast
+    /// target and should be excluded from diagnostic error summaries.
+    pub fn observation_prediction(&mut self) -> Vec<f32> {
+        self.ensure_world_prediction_live();
         let decoder = self
-            .world_decoder_live
+            .world_prediction_live
             .as_mut()
             .expect("diagnostic decoder initialized");
         decoder.set_input("deter", &self.deter);
         decoder.set_input("stoch", &self.stoch);
         decoder.step();
         decoder.wait();
-        let mut observation = vec![0.0; DinoObservation::LEN];
+        let mut observation = vec![0.0; Observation::LEN];
         decoder.read_output_by_index(0, &mut observation);
         observation
     }
@@ -532,8 +702,8 @@ impl DreamerCore {
 
     /// Reward predicted after one prior transition from the current state.
     ///
-    /// This read-only diagnostic clones the categorical RNG, so probing does
-    /// not perturb subsequent acting or posterior sampling.
+    /// This read-only diagnostic uses an independent categorical RNG, so
+    /// probing does not perturb subsequent acting or posterior sampling.
     pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
         self.prior_reward_rollout(&[action])[0]
     }
@@ -544,7 +714,7 @@ impl DreamerCore {
         self.prior_rollout(actions, false, false).rewards
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     /// This diagnostic leaves the live posterior and all RNG streams intact.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         let rollout = self.prior_rollout(actions, true, false);
@@ -589,7 +759,7 @@ impl DreamerCore {
             }),
         };
         if decode_observations {
-            self.ensure_world_decoder_live();
+            self.ensure_world_prediction_live();
         }
         if decode_behavior {
             self.ensure_behavior_value_live();
@@ -647,14 +817,14 @@ impl DreamerCore {
             }
             if decode_observations {
                 let decoder = self
-                    .world_decoder_live
+                    .world_prediction_live
                     .as_mut()
                     .expect("diagnostic decoder initialized");
                 decoder.set_input("deter", &deter);
                 decoder.set_input("stoch", &stoch);
                 decoder.step();
                 decoder.wait();
-                let mut observation = vec![0.0; DinoObservation::LEN];
+                let mut observation = vec![0.0; Observation::LEN];
                 decoder.read_output_by_index(0, &mut observation);
                 rollout.observations.push(observation);
             }
@@ -662,14 +832,14 @@ impl DreamerCore {
         rollout
     }
 
-    fn ensure_world_decoder_live(&mut self) {
-        if self.world_decoder_live.is_some() {
+    fn ensure_world_prediction_live(&mut self) {
+        if self.world_prediction_live.is_some() {
             return;
         }
-        let graph = world::build_decoder_graph(&self.config, 1);
+        let graph = world::build_observation_prediction_graph(&self.config, 1);
         let mut decoder = build_session(&graph, &self.gpu, Mode::Inference, false);
-        sync_matching(&self.world_train, &mut decoder, "world.decoder.");
-        self.world_decoder_live = Some(decoder);
+        sync_matching(&self.world_train, &mut decoder, "world.");
+        self.world_prediction_live = Some(decoder);
     }
 
     fn ensure_behavior_value_live(&mut self) {
@@ -687,6 +857,19 @@ impl DreamerCore {
     pub fn save_checkpoint(&mut self, checkpoint: impl AsRef<Path>) -> io::Result<()> {
         let checkpoint = checkpoint.as_ref();
         fs::create_dir_all(checkpoint)?;
+        for session in [&mut self.world_train, &mut self.behavior_train] {
+            if session.memory_summary().adam_state_bytes == 0 {
+                if session.adam_step_count() != 0 {
+                    return Err(io::Error::new(
+                        io::ErrorKind::InvalidData,
+                        "cannot save a stepped optimizer without its moments",
+                    ));
+                }
+                // Materialize the lazy zero state without taking an optimizer step.
+                configure_d3_optimizer(session, &self.config, 0, 0.0);
+                session.clear_optimizer();
+            }
+        }
         let world_temporary = checkpoint.join(format!("{CHECKPOINT_WORLD}.tmp"));
         let behavior_temporary = checkpoint.join(format!("{CHECKPOINT_BEHAVIOR}.tmp"));
         let slow_temporary = checkpoint.join(format!("{CHECKPOINT_SLOW_VALUE}.tmp"));
@@ -704,18 +887,19 @@ impl DreamerCore {
             dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
             meganeura_revision: MEGANEURA_REV.to_owned(),
             blade_revision: BLADE_REV.to_owned(),
-            dinov3_revision: DINOV3_UPSTREAM_REV.to_owned(),
-            dinovision_revision: DINOVISION_SOURCE_REV.to_owned(),
-            dino_model_id: VITS16_MODEL_ID.to_owned(),
-            dino_checkpoint_revision: VITS16_CHECKPOINT_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
+            perception: self.perception_identity.clone(),
             observation_grid: OBSERVATION_GRID,
             observation_channels: OBSERVATION_CHANNELS,
             config: self.config.clone(),
             learner_step: self.learner_step,
             environment_step: self.environment_step,
+            collection_streams: self.collection_streams,
             return_low,
             return_high,
+            visitation: self.visitation.as_ref().map(VisitationBonus::state),
+            future_head_revision: self.provenance().future_head_revision.map(str::to_owned),
+            tensor_sha256: Some(TensorFingerprints::read(checkpoint)?),
         };
         let encoded = serde_json::to_vec_pretty(&metadata).map_err(io::Error::other)?;
         let metadata_temporary = checkpoint.join(format!("{CHECKPOINT_METADATA}.tmp"));
@@ -726,17 +910,19 @@ impl DreamerCore {
 
     /// Begin the first episode or the next episode after `is_last`.
     /// Replay and all optimizer/model state survive this recurrent reset.
-    pub fn begin_episode(&mut self, observation: DinoObservation) {
-        assert!(
-            self.pending_action.is_none(),
-            "cannot reset with a pending action"
-        );
-        assert!(
-            !self.active || self.needs_reset,
-            "begin_episode is only legal initially or after an is_last frame"
-        );
+    ///
+    /// The reset observation enters replay but does not advance
+    /// `environment_step` or earn scheduler credit. Kindle's environment
+    /// budget counts executed actions; upstream D3's driver counter also
+    /// counts these action-free reset records, a small disclosed accounting
+    /// difference in episode-based environments.
+    pub fn begin_episode(&mut self, observation: Observation) {
+        self.check_episode_boundary();
         self.deter.fill(0.0);
         self.stoch.fill(0.0);
+        if let Some(bonus) = &mut self.visitation {
+            bonus.observe(&observation);
+        }
         self.posterior_live(observation.as_slice(), None, true);
         self.replay.push(
             ReplayFrame {
@@ -755,6 +941,17 @@ impl DreamerCore {
         );
         self.active = true;
         self.needs_reset = false;
+    }
+
+    fn check_episode_boundary(&self) {
+        assert!(
+            self.pending_action.is_none(),
+            "cannot reset with a pending action"
+        );
+        assert!(
+            !self.active || self.needs_reset,
+            "begin_episode is only legal initially or after an is_last frame"
+        );
     }
 
     pub fn act(&mut self, mode: ActionMode, action_mask: Option<&[bool]>) -> usize {
@@ -814,7 +1011,14 @@ impl DreamerCore {
         probabilities
     }
 
-    pub fn observe(&mut self, observation: DinoObservation, reward: Reward, flags: FrameFlags) {
+    /// Ingest an arrival and return both reward channels as stored in replay,
+    /// including optional visitation novelty. Scales apply only during learning.
+    pub fn observe(
+        &mut self,
+        observation: Observation,
+        mut reward: Reward,
+        flags: FrameFlags,
+    ) -> Reward {
         assert!(!flags.is_first, "use begin_episode for an is_first frame");
         if flags.is_terminal {
             assert!(flags.is_last);
@@ -823,6 +1027,9 @@ impl DreamerCore {
             .pending_action
             .take()
             .expect("act must precede observe");
+        if let Some(bonus) = &mut self.visitation {
+            reward.intrinsic += bonus.observe(&observation);
+        }
         self.posterior_live(observation.as_slice(), Some(action), false);
         self.replay.push(
             ReplayFrame {
@@ -840,11 +1047,16 @@ impl DreamerCore {
             self.config.train_ratio / (self.config.batch_size * self.config.batch_length) as f32,
         );
         self.needs_reset = flags.is_last;
+        reward
     }
 
-    /// Execute at most `maximum_updates` updates due under D3's train ratio.
+    /// Execute at most `maximum_updates` updates due under D3's numeric train
+    /// ratio, clocked by Kindle's executed-action environment steps.
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         let mut reports = Vec::new();
+        if self.config.train_ratio == 0.0 {
+            return reports;
+        }
         let replay_ready =
             self.replay.valid_sequence_count(&self.config) >= self.config.replay_warmup_sequences();
         while reports.len() < maximum_updates && self.train_scheduler.update_due(replay_ready) {
@@ -859,23 +1071,46 @@ impl DreamerCore {
 
     /// Perform one D3 learner update, independent of scheduler credit.
     pub fn learn(&mut self) -> Option<LearnReport> {
+        let started = Instant::now();
+        let stage = Instant::now();
         let batch = self.replay.sample(&self.config, &mut self.rngs.replay)?;
+        let mut timing = LearnTiming {
+            replay_seconds: stage.elapsed().as_secs_f64(),
+            ..LearnTiming::default()
+        };
+        let stage = Instant::now();
         let posterior = self.sample_posterior_batch(&batch);
+        timing.posterior_seconds = stage.elapsed().as_secs_f64();
         // D3 forms all targets from the same pre-update parameters. Keeping
         // this ordering also gives the world graph replay-value targets while
         // its frozen critic routes that auxiliary gradient into the RSSM.
+        let stage = Instant::now();
         let behavior_batch = self.imagine_and_target(&batch, &posterior);
+        timing.imagination_seconds = stage.elapsed().as_secs_f64();
+        let stage = Instant::now();
         let world = self.train_world(&batch, &posterior, &behavior_batch);
+        timing.world_train_seconds = stage.elapsed().as_secs_f64();
+        let stage = Instant::now();
         self.replay
             .update_context(&batch, &posterior.deter, &posterior.stoch, &self.config);
+        timing.replay_refresh_seconds = stage.elapsed().as_secs_f64();
+        let stage = Instant::now();
         self.sync_world_inference();
+        timing.world_sync_seconds = stage.elapsed().as_secs_f64();
+        let stage = Instant::now();
         let behavior = self.train_behavior(&behavior_batch);
+        timing.behavior_train_seconds = stage.elapsed().as_secs_f64();
+        let stage = Instant::now();
+        self.sync_behavior_inference();
+        timing.behavior_sync_seconds = stage.elapsed().as_secs_f64();
         self.learner_step += 1;
+        timing.total_seconds = started.elapsed().as_secs_f64();
         Some(LearnReport {
             learner_step: self.learner_step,
             replay_len: self.replay.len(),
             world,
             behavior,
+            timing,
         })
     }
 
@@ -902,13 +1137,15 @@ impl DreamerCore {
         self.world_observe_live
             .set_input("keep_action", &vec![keep; self.config.action_count]);
         self.world_observe_live.step();
-        self.world_observe_live.wait();
-        self.world_observe_live
-            .read_output_by_index(0, &mut self.deter);
         let mut logits = vec![0.0; size.stoch * size.classes];
-        self.world_observe_live.read_output_by_index(1, &mut logits);
-        self.world_observe_live
-            .read_output_by_index(3, &mut self.encoded_observation);
+        self.readback.read(
+            &self.world_observe_live,
+            &mut [
+                (0, &mut self.deter),
+                (1, &mut logits),
+                (3, &mut self.encoded_observation),
+            ],
+        );
         self.stoch = sample_latents(
             &logits,
             1,
@@ -945,12 +1182,12 @@ impl DreamerCore {
             self.world_observe_batch
                 .set_input("keep_action", &keep_action);
             self.world_observe_batch.step();
-            self.world_observe_batch.wait();
             let mut deter = vec![0.0; rows * size.deter];
             let mut logits = vec![0.0; rows * size.stoch * size.classes];
-            self.world_observe_batch.read_output_by_index(0, &mut deter);
-            self.world_observe_batch
-                .read_output_by_index(1, &mut logits);
+            self.readback.read(
+                &self.world_observe_batch,
+                &mut [(0, &mut deter), (1, &mut logits)],
+            );
             let stoch = sample_latents(
                 &logits,
                 rows,
@@ -977,135 +1214,177 @@ impl DreamerCore {
         behavior: &BehaviorTrainingBatch,
     ) -> WorldMetrics {
         let rows = self.config.batch_size;
+        let network = self.config.network();
+        let stochastic_width = network.stoch * network.classes;
+        let observation_width = self.config.observation_dim();
+        let microbatch_rows = self.config.world_microbatch_size();
+        let microbatch_count = rows / microbatch_rows;
         let chunk_length = self.config.world_backprop_length;
         let chunk_count = self.config.batch_length / chunk_length;
+        let pass_count = chunk_count * microbatch_count;
         self.world_train
-            .set_grad_accumulate(chunk_count.try_into().unwrap());
+            .set_grad_accumulate(pass_count.try_into().unwrap());
         self.world_train.zero_grad();
         let mut metrics = WorldMetrics::default();
 
         for chunk in 0..chunk_count {
             let start = chunk * chunk_length;
-            if start == 0 {
-                self.world_train
-                    .set_input("initial_deter", &batch.initial_deter);
-                self.world_train
-                    .set_input("initial_stoch", &batch.initial_stoch);
-            } else {
-                self.world_train
-                    .set_input("initial_deter", &posterior.deter[start - 1]);
-                self.world_train
-                    .set_input("initial_stoch", &posterior.stoch[start - 1]);
-            }
+            for microbatch in 0..microbatch_count {
+                let first_row = microbatch * microbatch_rows;
+                let initial_deter = if start == 0 {
+                    &batch.initial_deter
+                } else {
+                    &posterior.deter[start - 1]
+                };
+                let initial_stoch = if start == 0 {
+                    &batch.initial_stoch
+                } else {
+                    &posterior.stoch[start - 1]
+                };
+                self.world_train.set_input(
+                    "initial_deter",
+                    row_slice(initial_deter, first_row, microbatch_rows, network.deter),
+                );
+                self.world_train.set_input(
+                    "initial_stoch",
+                    row_slice(initial_stoch, first_row, microbatch_rows, stochastic_width),
+                );
 
-            for local_time in 0..chunk_length {
-                let time = start + local_time;
-                let (keep_deter, keep_stoch, keep_action) = keep_masks(batch, time, &self.config);
-                self.world_train.set_input(
-                    &format!("observation_{local_time}"),
-                    &batch.observations[time],
-                );
-                self.world_train.set_input(
-                    &format!("previous_action_{local_time}"),
-                    &batch.previous_actions[time],
-                );
-                self.world_train
-                    .set_input(&format!("keep_deter_{local_time}"), &keep_deter);
-                self.world_train
-                    .set_input(&format!("keep_stoch_{local_time}"), &keep_stoch);
-                self.world_train
-                    .set_input(&format!("keep_action_{local_time}"), &keep_action);
-                self.world_train.set_input(
-                    &format!("posterior_sample_{local_time}"),
-                    &posterior.stoch[time],
-                );
-                let mut reward_target = vec![0.0; rows * self.config.value_bins];
-                for row in 0..rows {
-                    self.bins.encode(
-                        batch.rewards[time][row],
-                        &mut reward_target
-                            [row * self.config.value_bins..(row + 1) * self.config.value_bins],
+                for local_time in 0..chunk_length {
+                    let time = start + local_time;
+                    let (keep_deter, keep_stoch, keep_action) =
+                        keep_masks_range(batch, time, first_row, microbatch_rows, &self.config);
+                    self.world_train.set_input(
+                        &format!("observation_{local_time}"),
+                        row_slice(
+                            &batch.observations[time],
+                            first_row,
+                            microbatch_rows,
+                            observation_width,
+                        ),
+                    );
+                    self.world_train.set_input(
+                        &format!("previous_action_{local_time}"),
+                        row_slice(
+                            &batch.previous_actions[time],
+                            first_row,
+                            microbatch_rows,
+                            self.config.action_count,
+                        ),
+                    );
+                    self.world_train
+                        .set_input(&format!("keep_deter_{local_time}"), &keep_deter);
+                    self.world_train
+                        .set_input(&format!("keep_stoch_{local_time}"), &keep_stoch);
+                    self.world_train
+                        .set_input(&format!("keep_action_{local_time}"), &keep_action);
+                    self.world_train.set_input(
+                        &format!("posterior_sample_{local_time}"),
+                        row_slice(
+                            &posterior.stoch[time],
+                            first_row,
+                            microbatch_rows,
+                            stochastic_width,
+                        ),
+                    );
+                    let mut reward_target = vec![0.0; microbatch_rows * self.config.value_bins];
+                    for local_row in 0..microbatch_rows {
+                        self.bins.encode(
+                            batch.rewards[time][first_row + local_row],
+                            &mut reward_target[local_row * self.config.value_bins
+                                ..(local_row + 1) * self.config.value_bins],
+                        );
+                    }
+                    self.world_train
+                        .set_input(&format!("reward_target_{local_time}"), &reward_target);
+                    let continuation_target = batch.flags[time]
+                        [first_row..first_row + microbatch_rows]
+                        .iter()
+                        .map(|flags| {
+                            if flags.is_terminal {
+                                0.0
+                            } else {
+                                self.config.continuation_discount()
+                            }
+                        })
+                        .collect::<Vec<_>>();
+                    self.world_train.set_input(
+                        &format!("continuation_target_{local_time}"),
+                        &continuation_target,
+                    );
+                    let mut replay_value_target =
+                        vec![0.0; microbatch_rows * self.config.value_bins];
+                    let mut replay_slow_target =
+                        vec![0.0; microbatch_rows * self.config.value_bins];
+                    let mut replay_value_weight = vec![0.0; microbatch_rows];
+                    if time + 1 < self.config.batch_length {
+                        let replay_row = time * rows + first_row;
+                        let value_start = replay_row * self.config.value_bins;
+                        let value_end = value_start + microbatch_rows * self.config.value_bins;
+                        replay_value_target
+                            .copy_from_slice(&behavior.replay_value_target[value_start..value_end]);
+                        replay_slow_target
+                            .copy_from_slice(&behavior.replay_slow_target[value_start..value_end]);
+                        // This graph averages across all T states, whereas D3's
+                        // replay-value loss contains T-1 targets. Correct that
+                        // denominator while keeping the final state's weight 0.
+                        let denominator_correction =
+                            self.config.batch_length as f32 / (self.config.batch_length - 1) as f32;
+                        for (target, source) in replay_value_weight
+                            .iter_mut()
+                            .zip(&behavior.replay_weight[replay_row..replay_row + microbatch_rows])
+                        {
+                            *target = *source * denominator_correction;
+                        }
+                    }
+                    self.world_train.set_input(
+                        &format!("replay_value_target_{local_time}"),
+                        &replay_value_target,
+                    );
+                    self.world_train.set_input(
+                        &format!("replay_slow_target_{local_time}"),
+                        &replay_slow_target,
+                    );
+                    self.world_train.set_input(
+                        &format!("replay_value_weight_{local_time}"),
+                        &replay_value_weight,
                     );
                 }
-                self.world_train
-                    .set_input(&format!("reward_target_{local_time}"), &reward_target);
-                let continuation_target = batch.flags[time]
-                    .iter()
-                    .map(|flags| {
-                        if flags.is_terminal {
-                            0.0
-                        } else {
-                            self.config.continuation_discount()
-                        }
-                    })
-                    .collect::<Vec<_>>();
-                self.world_train.set_input(
-                    &format!("continuation_target_{local_time}"),
-                    &continuation_target,
-                );
-                let mut replay_value_target = vec![0.0; rows * self.config.value_bins];
-                let mut replay_slow_target = vec![0.0; rows * self.config.value_bins];
-                let mut replay_value_weight = vec![0.0; rows];
-                if time + 1 < self.config.batch_length {
-                    let row_start = time * rows;
-                    let value_start = row_start * self.config.value_bins;
-                    let value_end = value_start + rows * self.config.value_bins;
-                    replay_value_target
-                        .copy_from_slice(&behavior.replay_value_target[value_start..value_end]);
-                    replay_slow_target
-                        .copy_from_slice(&behavior.replay_slow_target[value_start..value_end]);
-                    // This graph averages across all T states, whereas D3's
-                    // replay-value loss contains T-1 targets. Correct that
-                    // denominator while keeping the final state's weight 0.
-                    let denominator_correction =
-                        self.config.batch_length as f32 / (self.config.batch_length - 1) as f32;
-                    for (target, source) in replay_value_weight
-                        .iter_mut()
-                        .zip(&behavior.replay_weight[row_start..row_start + rows])
-                    {
-                        *target = *source * denominator_correction;
-                    }
-                }
-                self.world_train.set_input(
-                    &format!("replay_value_target_{local_time}"),
-                    &replay_value_target,
-                );
-                self.world_train.set_input(
-                    &format!("replay_slow_target_{local_time}"),
-                    &replay_slow_target,
-                );
-                self.world_train.set_input(
-                    &format!("replay_value_weight_{local_time}"),
-                    &replay_value_weight,
-                );
-            }
 
-            if chunk + 1 == chunk_count {
-                configure_d3_optimizer(
-                    &mut self.world_train,
-                    &self.config,
-                    self.learner_step,
-                    self.config.learning_rate,
-                );
-            } else {
-                self.world_train.clear_optimizer();
+                let pass = chunk * microbatch_count + microbatch;
+                if pass + 1 == pass_count {
+                    configure_d3_optimizer(
+                        &mut self.world_train,
+                        &self.config,
+                        self.learner_step,
+                        self.config.learning_rate,
+                    );
+                } else {
+                    self.world_train.clear_optimizer();
+                }
+                self.world_train.step();
+                self.world_train.wait();
+                metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
+                metrics.reconstruction_loss +=
+                    read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
+                metrics.future_prediction_loss +=
+                    read_scalar(&self.world_train, world::LOSS_FUTURE_PREDICTION);
+                metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
+                metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
+                metrics.representation_kl +=
+                    read_scalar(&self.world_train, world::LOSS_REPRESENTATION);
+                metrics.reward_loss += read_scalar(&self.world_train, world::LOSS_REWARD);
+                metrics.continuation_loss +=
+                    read_scalar(&self.world_train, world::LOSS_CONTINUATION);
+                metrics.replay_value_loss +=
+                    read_scalar(&self.world_train, world::LOSS_REPLAY_VALUE);
             }
-            self.world_train.step();
-            self.world_train.wait();
-            metrics.total_loss += read_scalar(&self.world_train, world::LOSS_TOTAL);
-            metrics.reconstruction_loss +=
-                read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
-            metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
-            metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
-            metrics.representation_kl += read_scalar(&self.world_train, world::LOSS_REPRESENTATION);
-            metrics.reward_loss += read_scalar(&self.world_train, world::LOSS_REWARD);
-            metrics.continuation_loss += read_scalar(&self.world_train, world::LOSS_CONTINUATION);
-            metrics.replay_value_loss += read_scalar(&self.world_train, world::LOSS_REPLAY_VALUE);
         }
         self.world_train.clear_grad_accumulate();
-        let scale = 1.0 / chunk_count as f32;
+        let scale = 1.0 / pass_count as f32;
         metrics.total_loss *= scale;
         metrics.reconstruction_loss *= scale;
+        metrics.future_prediction_loss *= scale;
         metrics.raw_kl *= scale;
         metrics.dynamics_kl *= scale;
         metrics.representation_kl *= scale;
@@ -1130,6 +1409,7 @@ impl DreamerCore {
         assert!(all_finite(&[
             metrics.total_loss,
             metrics.reconstruction_loss,
+            metrics.future_prediction_loss,
             metrics.raw_kl,
             metrics.dynamics_kl,
             metrics.representation_kl,
@@ -1162,8 +1442,8 @@ impl DreamerCore {
         ] {
             sync_matching(&self.world_train, target, "world.");
         }
-        if let Some(decoder) = &mut self.world_decoder_live {
-            sync_matching(&self.world_train, decoder, "world.decoder.");
+        if let Some(decoder) = &mut self.world_prediction_live {
+            sync_matching(&self.world_train, decoder, "world.");
         }
     }
 
@@ -1175,9 +1455,11 @@ impl DreamerCore {
         let size = self.config.network();
         let starts = self.config.batch_size * self.config.batch_length;
         let horizon = self.config.imagination_length;
-        let mut deter = flatten_time(&posterior.deter);
+        let deter = flatten_time(&posterior.deter);
         let mut stoch = flatten_time(&posterior.stoch);
-        let mut features = Vec::with_capacity(horizon + 1);
+        let replay_start_feature = join_features(&deter, &stoch, starts, &self.config);
+        let feature_bytes = starts * self.config.feature_dim() * size_of::<f32>();
+        self.world_heads.set_input("deter", &deter);
         let mut actions = Vec::with_capacity(horizon);
         let mut rewards = Vec::with_capacity(horizon + 1);
         let mut continuations = Vec::with_capacity(horizon + 1);
@@ -1185,36 +1467,60 @@ impl DreamerCore {
         let mut slow_values = Vec::with_capacity(horizon + 1);
 
         for time in 0..=horizon {
-            let state_feature = join_features(&deter, &stoch, starts, &self.config);
-            self.behavior_online.set_input("feature", &state_feature);
-            self.behavior_online.step();
-            self.behavior_online.wait();
-            let mut actor_logits = vec![0.0; starts * self.config.action_count];
-            let mut value_logits = vec![0.0; starts * self.config.value_bins];
-            self.behavior_online
-                .read_output_by_index(0, &mut actor_logits);
-            self.behavior_online
-                .read_output_by_index(1, &mut value_logits);
-
-            self.behavior_slow.set_input("feature", &state_feature);
-            self.behavior_slow.step();
-            self.behavior_slow.wait();
-            let mut slow_logits = vec![0.0; starts * self.config.value_bins];
-            self.behavior_slow.read_output_by_index(0, &mut slow_logits);
-
-            self.world_heads.set_input("deter", &deter);
             self.world_heads.set_input("stoch", &stoch);
             self.world_heads.step();
-            self.world_heads.wait();
+            let mut copies = vec![
+                DeviceCopy {
+                    source: (&self.world_heads, ExternalSlot::Output(2)),
+                    target: (&self.behavior_online, "feature"),
+                    target_offset_bytes: 0,
+                },
+                DeviceCopy {
+                    source: (&self.world_heads, ExternalSlot::Output(2)),
+                    target: (&self.behavior_slow, "feature"),
+                    target_offset_bytes: 0,
+                },
+            ];
+            if time < horizon {
+                copies.extend([
+                    DeviceCopy {
+                        source: (&self.world_heads, ExternalSlot::Output(2)),
+                        target: (&self.behavior_train, "imagined_feature"),
+                        target_offset_bytes: time * feature_bytes,
+                    },
+                    DeviceCopy {
+                        source: (&self.world_heads, ExternalSlot::Input("deter")),
+                        target: (&self.world_transition, "deter"),
+                        target_offset_bytes: 0,
+                    },
+                    DeviceCopy {
+                        source: (&self.world_heads, ExternalSlot::Input("stoch")),
+                        target: (&self.world_transition, "stoch"),
+                        target_offset_bytes: 0,
+                    },
+                ]);
+            }
+            self.device_copies.copy(&copies);
+            self.behavior_online.step();
+            let mut actor_logits = vec![0.0; starts * self.config.action_count];
+            let mut value_logits = vec![0.0; starts * self.config.value_bins];
+
+            self.behavior_slow.step();
+            let mut slow_logits = vec![0.0; starts * self.config.value_bins];
+
             let mut reward_logits = vec![0.0; starts * self.config.value_bins];
             let mut continuation = vec![0.0; starts];
-            self.world_heads.read_output_by_index(0, &mut reward_logits);
-            self.world_heads.read_output_by_index(1, &mut continuation);
+            self.readback.read_many(&mut [
+                (&self.behavior_online, 0, &mut actor_logits),
+                (&self.behavior_online, 1, &mut value_logits),
+                (&self.behavior_slow, 0, &mut slow_logits),
+                (&self.world_heads, 0, &mut reward_logits),
+                (&self.world_heads, 1, &mut continuation),
+            ]);
 
             let decoded_reward = decode_rows(&reward_logits, starts, &self.bins);
             let decoded_value = decode_rows(&value_logits, starts, &self.bins);
             let decoded_slow = decode_rows(&slow_logits, starts, &self.bins);
-            features.push(state_feature);
             rewards.push(decoded_reward);
             continuations.push(continuation);
             values.push(decoded_value);
@@ -1225,26 +1531,26 @@ impl DreamerCore {
             }
             let mut action_indices = vec![0; starts];
             let mut action_one_hot = vec![0.0; starts * self.config.action_count];
+            let mut probabilities = vec![0.0; self.config.action_count];
             for row in 0..starts {
                 let logits = &actor_logits
                     [row * self.config.action_count..(row + 1) * self.config.action_count];
-                let action =
-                    sample_logits(logits, self.config.actor_unimix, &mut self.rngs.imagination);
+                softmax_unimix(logits, self.config.actor_unimix, &mut probabilities);
+                let action = sample_probabilities(&probabilities, &mut self.rngs.imagination);
                 action_indices[row] = action;
                 action_one_hot[row * self.config.action_count + action] = 1.0;
             }
             actions.push(action_indices);
-            self.world_transition.set_input("deter", &deter);
-            self.world_transition.set_input("stoch", &stoch);
             self.world_transition.set_input("action", &action_one_hot);
             self.world_transition.step();
-            self.world_transition.wait();
-            let mut next_deter = vec![0.0; starts * size.deter];
+            self.device_copies.copy(&[DeviceCopy {
+                source: (&self.world_transition, ExternalSlot::Output(0)),
+                target: (&self.world_heads, "deter"),
+                target_offset_bytes: 0,
+            }]);
             let mut prior_logits = vec![0.0; starts * size.stoch * size.classes];
-            self.world_transition
-                .read_output_by_index(0, &mut next_deter);
-            self.world_transition
-                .read_output_by_index(1, &mut prior_logits);
+            self.readback
+                .read(&self.world_transition, &mut [(1, &mut prior_logits)]);
             let next_stoch = sample_latents(
                 &prior_logits,
                 starts,
@@ -1253,7 +1559,6 @@ impl DreamerCore {
                 self.config.unimix,
                 &mut self.rngs.imagination,
             );
-            deter = next_deter;
             stoch = next_stoch;
         }
 
@@ -1282,11 +1587,10 @@ impl DreamerCore {
                 1.0,
                 self.config.lambda,
             );
-            let mut weight = 1.0;
+            let trajectory_weights = continuation_weights(&continuation[..horizon]);
             for time in 0..horizon {
                 returns[time][start] = trajectory[time];
-                weight *= continuation[time];
-                weights[time][start] = weight;
+                weights[time][start] = trajectory_weights[time];
             }
         }
         let all_returns = flatten_time(&returns);
@@ -1294,7 +1598,6 @@ impl DreamerCore {
         let return_scale = self.return_normalizer.scale();
 
         let imagined_rows = starts * horizon;
-        let mut imagined_feature = Vec::with_capacity(imagined_rows * self.config.feature_dim());
         let mut action_target = vec![0.0; imagined_rows * self.config.action_count];
         let mut imagined_weight = vec![0.0; imagined_rows];
         let mut imagined_value_target = vec![0.0; imagined_rows * self.config.value_bins];
@@ -1302,7 +1605,6 @@ impl DreamerCore {
         let mut advantage_abs_sum = 0.0;
         let mut weighted_advantage_abs_sum = 0.0;
         for time in 0..horizon {
-            imagined_feature.extend_from_slice(&features[time]);
             for start in 0..starts {
                 let row = time * starts + start;
                 let advantage = (returns[time][start] - values[time][start]) / return_scale;
@@ -1382,7 +1684,7 @@ impl DreamerCore {
                 replay_feature
                     [row * self.config.feature_dim()..(row + 1) * self.config.feature_dim()]
                     .copy_from_slice(
-                        &features[0][start * self.config.feature_dim()
+                        &replay_start_feature[start * self.config.feature_dim()
                             ..(start + 1) * self.config.feature_dim()],
                     );
                 replay_weight[row] = 1.0 - last[time];
@@ -1400,7 +1702,6 @@ impl DreamerCore {
         }
 
         BehaviorTrainingBatch {
-            imagined_feature,
             action_target,
             imagined_weight,
             imagined_value_target,
@@ -1438,8 +1739,6 @@ impl DreamerCore {
 
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
         let actor_update_scale = self.config.actor_update_scale(self.learner_step);
-        self.behavior_train
-            .set_input("imagined_feature", &batch.imagined_feature);
         self.behavior_train
             .set_input("action_target", &batch.action_target);
         self.behavior_train
@@ -1503,6 +1802,10 @@ impl DreamerCore {
             metrics.advantage_abs_mean,
             metrics.weighted_advantage_abs_mean,
         ]));
+        metrics
+    }
+
+    fn sync_behavior_inference(&mut self) {
         sync_matching(&self.behavior_train, &mut self.behavior_online, "behavior.");
         if let Some(value) = &mut self.behavior_value_live {
             sync_matching(&self.behavior_train, value, "behavior.value.");
@@ -1525,13 +1828,12 @@ impl DreamerCore {
             &mut self.world_train,
             "behavior.value.",
         );
-        metrics
     }
 }
 
-/// Pixel-facing agent combining the frozen DINO frontend and Dreamer core.
+/// Pixel-facing agent combining frozen visual perception and the Dreamer core.
 pub struct DreamerAgent {
-    perception: DinoPerception,
+    perception: Perception,
     core: DreamerCore,
 }
 
@@ -1541,21 +1843,51 @@ impl DreamerAgent {
         dino_checkpoint: impl AsRef<Path>,
         dino_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::with_perception(
+            config,
+            PerceptionKind::DinoV3,
+            dino_checkpoint,
+            dino_plan_cache,
+        )
+    }
+
+    pub fn with_perception(
+        config: DreamerConfig,
+        kind: PerceptionKind,
+        encoder_checkpoint: impl AsRef<Path>,
+        encoder_plan_cache: Option<&Path>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let fingerprint = crate::vision::checkpoint_sha256(encoder_checkpoint.as_ref())?;
+        let identity = kind.identity(fingerprint);
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception =
-            DinoPerception::load_vits16(dino_checkpoint, Some(Arc::clone(&gpu)), dino_plan_cache)?;
-        let core = DreamerCore::with_gpu(config, gpu);
+        let perception = Perception::load(
+            kind,
+            encoder_checkpoint.as_ref(),
+            Arc::clone(&gpu),
+            encoder_plan_cache,
+        )?;
+        let mut core = DreamerCore::with_gpu(config, gpu);
+        core.perception_identity = Some(identity);
         Ok(Self { perception, core })
     }
 
     pub fn restore(
         dreamer_checkpoint: impl AsRef<Path>,
-        dino_checkpoint: impl AsRef<Path>,
-        dino_plan_cache: Option<&Path>,
+        encoder_checkpoint: impl AsRef<Path>,
+        encoder_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(dreamer_checkpoint.as_ref())?;
+        let identity = metadata
+            .perception
+            .as_ref()
+            .ok_or("pixel restore requires a recorded perception identity")?;
+        identity.verify_file(encoder_checkpoint.as_ref())?;
+        let kind = identity.kind;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let core = DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu))?;
-        let perception = DinoPerception::load_vits16(dino_checkpoint, Some(gpu), dino_plan_cache)?;
+        let core =
+            DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu), metadata)?;
+        let perception =
+            Perception::load(kind, encoder_checkpoint.as_ref(), gpu, encoder_plan_cache)?;
         Ok(Self { perception, core })
     }
 
@@ -1572,19 +1904,19 @@ impl DreamerAgent {
         self.core.latent_feature()
     }
 
-    /// Current output of the trainable adapter between DINO and the RSSM.
+    /// Current output of the trainable adapter between perception and the RSSM.
     pub fn encoded_observation(&self) -> &[f32] {
         self.core.encoded_observation()
     }
 
-    /// Current frozen-DINO observation before the trainable adapter.
-    pub fn dino_observation(&self) -> &[f32] {
-        self.core.dino_observation()
+    /// Current frozen visual observation before the trainable adapter.
+    pub fn visual_observation(&self) -> &[f32] {
+        self.core.visual_observation()
     }
 
-    /// Frozen-DINO observation decoded from the current posterior state.
-    pub fn posterior_observation_prediction(&mut self) -> Vec<f32> {
-        self.core.posterior_observation_prediction()
+    /// Current configured observation-head output; see [`DreamerCore::observation_prediction`].
+    pub fn observation_prediction(&mut self) -> Vec<f32> {
+        self.core.observation_prediction()
     }
 
     /// Reward predicted from the current posterior state.
@@ -1607,7 +1939,7 @@ impl DreamerAgent {
         self.core.prior_reward_rollout(actions)
     }
 
-    /// Open-loop prior rewards and decoded frozen-DINO observations.
+    /// Open-loop prior rewards and decoded visual observations.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         self.core.prior_diagnostic_rollout(actions)
     }
@@ -1624,6 +1956,8 @@ impl DreamerAgent {
     }
 
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
+        self.core.check_episode_boundary();
+        self.perception.reset();
         let observation =
             self.perception
                 .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
@@ -1634,14 +1968,19 @@ impl DreamerAgent {
         self.core.act(mode, action_mask)
     }
 
-    pub fn observe(&mut self, transition: &Transition) {
+    /// Return the unscaled reward channels, including configured novelty.
+    pub fn observe(&mut self, transition: &Transition) -> Reward {
+        assert!(
+            self.core.pending_action.is_some(),
+            "act must precede observe"
+        );
         let observation = self.perception.encode_frame_rgb8(
             transition.frame.pixels(),
             transition.frame.width(),
             transition.frame.height(),
         );
         self.core
-            .observe(observation, transition.reward, transition.flags());
+            .observe(observation, transition.reward, transition.flags())
     }
 
     pub fn learn(&mut self) -> Option<LearnReport> {
@@ -1659,11 +1998,25 @@ impl DreamerAgent {
 
 fn read_checkpoint_metadata(checkpoint: &Path) -> io::Result<CheckpointMetadata> {
     let encoded = fs::read(checkpoint.join(CHECKPOINT_METADATA))?;
-    serde_json::from_slice(&encoded)
-        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+    let metadata = serde_json::from_slice(&encoded)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+    validate_checkpoint_metadata(&metadata)?;
+    if let Some(fingerprints) = &metadata.tensor_sha256 {
+        fingerprints.verify(checkpoint)?;
+    }
+    Ok(metadata)
 }
 
 fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()> {
+    if metadata.collection_streams == 0 {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "checkpoint collection stream count must be positive",
+        ));
+    }
+    if let Some(perception) = &metadata.perception {
+        perception.validate()?;
+    }
     let expected = [
         (
             "architecture",
@@ -1684,26 +2037,6 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             "Blade revision",
             BLADE_REV,
             metadata.blade_revision.as_str(),
-        ),
-        (
-            "DINOv3 revision",
-            DINOV3_UPSTREAM_REV,
-            metadata.dinov3_revision.as_str(),
-        ),
-        (
-            "DINO transcription revision",
-            DINOVISION_SOURCE_REV,
-            metadata.dinovision_revision.as_str(),
-        ),
-        (
-            "DINO model",
-            VITS16_MODEL_ID,
-            metadata.dino_model_id.as_str(),
-        ),
-        (
-            "DINO checkpoint revision",
-            VITS16_CHECKPOINT_REV,
-            metadata.dino_checkpoint_revision.as_str(),
         ),
     ];
     if metadata.format != CHECKPOINT_FORMAT {
@@ -1744,6 +2077,25 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             ));
         }
     }
+    let expected_future_head = (metadata.config.loss_scales.future_prediction > 0.0)
+        .then_some(world::FUTURE_HEAD_REVISION);
+    if metadata.future_head_revision.as_deref() != expected_future_head {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "incompatible future-prediction head; use the original source revision",
+        ));
+    }
+    if metadata.config.visitation_bonus != metadata.visitation.is_some()
+        || metadata
+            .visitation
+            .as_ref()
+            .is_some_and(|state| !state.is_valid())
+    {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "incompatible or missing visitation state",
+        ));
+    }
     metadata
         .config
         .check()
@@ -1755,18 +2107,52 @@ fn keep_masks(
     time: usize,
     config: &DreamerConfig,
 ) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+    keep_masks_range(batch, time, 0, config.batch_size, config)
+}
+
+fn keep_masks_range(
+    batch: &SequenceBatch,
+    time: usize,
+    first_row: usize,
+    row_count: usize,
+    config: &DreamerConfig,
+) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
+    let end_row = first_row
+        .checked_add(row_count)
+        .expect("keep-mask row range overflowed");
+    assert!(end_row <= config.batch_size);
     let size = config.network();
-    let mut deter = vec![0.0; config.batch_size * size.deter];
-    let mut stoch = vec![0.0; config.batch_size * size.stoch * size.classes];
-    let mut action = vec![0.0; config.batch_size * config.action_count];
-    for row in 0..config.batch_size {
-        let keep = batch.keep(time, row);
-        deter[row * size.deter..(row + 1) * size.deter].fill(keep);
+    let mut deter = vec![0.0; row_count * size.deter];
+    let mut stoch = vec![0.0; row_count * size.stoch * size.classes];
+    let mut action = vec![0.0; row_count * config.action_count];
+    for local_row in 0..row_count {
+        let keep = batch.keep(time, first_row + local_row);
+        deter[local_row * size.deter..(local_row + 1) * size.deter].fill(keep);
         let width = size.stoch * size.classes;
-        stoch[row * width..(row + 1) * width].fill(keep);
-        action[row * config.action_count..(row + 1) * config.action_count].fill(keep);
+        stoch[local_row * width..(local_row + 1) * width].fill(keep);
+        action[local_row * config.action_count..(local_row + 1) * config.action_count].fill(keep);
     }
     (deter, stoch, action)
+}
+
+fn row_slice(values: &[f32], first_row: usize, row_count: usize, row_width: usize) -> &[f32] {
+    assert!(row_width > 0);
+    let start = first_row
+        .checked_mul(row_width)
+        .expect("row slice start overflowed");
+    let end_row = first_row
+        .checked_add(row_count)
+        .expect("row slice range overflowed");
+    let end = end_row
+        .checked_mul(row_width)
+        .expect("row slice end overflowed");
+    &values[start..end]
+}
+
+fn world_training_config(config: &DreamerConfig) -> DreamerConfig {
+    let mut world = config.clone();
+    world.batch_size = config.world_microbatch_size();
+    world
 }
 
 fn sample_latents(
@@ -1779,9 +2165,30 @@ fn sample_latents(
 ) -> Vec<f32> {
     assert_eq!(logits.len(), batch * stoch * classes);
     let mut output = vec![0.0; logits.len()];
+    if batch * stoch >= 4096 {
+        // Draw in the original flat order before distributing independent rows.
+        // Neither thread scheduling nor worker count changes the RNG stream.
+        let draws: Vec<f32> = (0..batch * stoch).map(|_| rng.random()).collect();
+        cpu::parallel(|| {
+            output
+                .par_chunks_exact_mut(classes)
+                .zip(logits.par_chunks_exact(classes))
+                .zip(draws.par_iter())
+                .for_each_init(
+                    || vec![0.0; classes],
+                    |probabilities, ((output, logits), &draw)| {
+                        softmax_unimix(logits, unimix, probabilities);
+                        output[sample_probabilities_at(probabilities, draw)] = 1.0;
+                    },
+                );
+        });
+        return output;
+    }
+    let mut probabilities = vec![0.0; classes];
     for row in 0..batch * stoch {
         let start = row * classes;
-        let class = sample_logits(&logits[start..start + classes], unimix, rng);
+        softmax_unimix(&logits[start..start + classes], unimix, &mut probabilities);
+        let class = sample_probabilities(&probabilities, rng);
         output[start + class] = 1.0;
     }
     output
@@ -1812,8 +2219,25 @@ fn flatten_time(values: &[Vec<f32>]) -> Vec<f32> {
 
 fn decode_rows(logits: &[f32], rows: usize, bins: &TwoHotBins) -> Vec<f32> {
     assert_eq!(logits.len(), rows * bins.len());
+    if rows >= 256 {
+        return cpu::parallel(|| {
+            logits
+                .par_chunks_exact(bins.len())
+                .map_init(
+                    || vec![0.0; bins.len()],
+                    |scratch, row| bins.decode_logits_with_scratch(row, scratch),
+                )
+                .collect()
+        });
+    }
+    let mut scratch = vec![0.0; bins.len()];
     (0..rows)
-        .map(|row| bins.decode_logits(&logits[row * bins.len()..(row + 1) * bins.len()]))
+        .map(|row| {
+            bins.decode_logits_with_scratch(
+                &logits[row * bins.len()..(row + 1) * bins.len()],
+                &mut scratch,
+            )
+        })
         .collect()
 }
 
@@ -1918,6 +2342,165 @@ mod tests {
     use super::*;
     use rand::Rng;
 
+    fn valid_checkpoint_metadata() -> CheckpointMetadata {
+        CheckpointMetadata {
+            format: CHECKPOINT_FORMAT,
+            architecture: CHECKPOINT_ARCHITECTURE.to_owned(),
+            dreamerv3_revision: DREAMERV3_UPSTREAM_REV.to_owned(),
+            meganeura_revision: MEGANEURA_REV.to_owned(),
+            blade_revision: BLADE_REV.to_owned(),
+            projection_seed: PROJECTION_SEED,
+            observation_grid: OBSERVATION_GRID,
+            observation_channels: OBSERVATION_CHANNELS,
+            config: DreamerConfig::tiny(3),
+            learner_step: 1,
+            environment_step: 8,
+            collection_streams: 1,
+            return_low: 0.0,
+            return_high: 1.0,
+            visitation: None,
+            future_head_revision: None,
+            perception: Some(
+                PerceptionKind::DinoV3.identity(crate::vision::VITS16_CHECKPOINT_SHA256.to_owned()),
+            ),
+            tensor_sha256: None,
+        }
+    }
+
+    #[test]
+    fn checkpoint_metadata_rejects_backend_revision_mismatch() {
+        validate_checkpoint_metadata(&valid_checkpoint_metadata()).unwrap();
+
+        let mut old_meganeura = valid_checkpoint_metadata();
+        old_meganeura.meganeura_revision = "d904e12e52af6910b041873cd203a5d5e5fd3b3c".to_owned();
+        let error = validate_checkpoint_metadata(&old_meganeura).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("checkpoint Meganeura revision"));
+
+        let mut wrong_blade = valid_checkpoint_metadata();
+        wrong_blade.blade_revision = "wrong-revision".to_owned();
+        let error = validate_checkpoint_metadata(&wrong_blade).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("checkpoint Blade revision"));
+    }
+
+    #[test]
+    fn perception_identity_rejects_changed_kind_semantics_and_malformed_hashes() {
+        let mut metadata = valid_checkpoint_metadata();
+        for malformed in ["", "xyz", &"A".repeat(64)] {
+            metadata.perception.as_mut().unwrap().checkpoint_sha256 = malformed.to_owned();
+            assert!(validate_checkpoint_metadata(&metadata).is_err());
+        }
+        metadata.perception = Some(
+            PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
+        );
+        validate_checkpoint_metadata(&metadata).unwrap();
+        metadata.perception.as_mut().unwrap().kind = PerceptionKind::DinoV3;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.perception = Some(
+            PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
+        );
+        metadata.perception.as_mut().unwrap().encoding_revision = "full-attention".to_owned();
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.perception = None;
+        validate_checkpoint_metadata(&metadata).unwrap(); // feature-only core
+        metadata.format = 2;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+    }
+
+    #[test]
+    fn pixel_restore_rejects_wrong_weights_before_gpu_construction() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "kindle-fingerprint-{}-{unique}",
+            std::process::id(),
+        ));
+        fs::create_dir(&directory).unwrap();
+        fs::write(
+            directory.join(CHECKPOINT_METADATA),
+            serde_json::to_vec(&valid_checkpoint_metadata()).unwrap(),
+        )
+        .unwrap();
+        let weights = directory.join("wrong-weights.safetensors");
+        fs::write(&weights, b"not the pinned encoder").unwrap();
+        let error = DreamerAgent::restore(&directory, weights, None)
+            .err()
+            .expect("different encoder must be rejected");
+        fs::remove_dir_all(directory).unwrap();
+        assert!(error.to_string().contains("perception checkpoint SHA-256"));
+    }
+
+    #[test]
+    fn checkpoint_restore_rejects_mixed_tensor_files_before_gpu_construction() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let directory = std::env::temp_dir().join(format!(
+            "kindle-checkpoint-integrity-{}-{unique}",
+            std::process::id(),
+        ));
+        fs::create_dir(&directory).unwrap();
+        let files = [CHECKPOINT_WORLD, CHECKPOINT_BEHAVIOR, CHECKPOINT_SLOW_VALUE];
+        for name in files {
+            fs::write(directory.join(name), b"original tensor file").unwrap();
+        }
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.tensor_sha256 = Some(TensorFingerprints::read(&directory).unwrap());
+        fs::write(
+            directory.join(CHECKPOINT_METADATA),
+            serde_json::to_vec(&metadata).unwrap(),
+        )
+        .unwrap();
+        read_checkpoint_metadata(&directory).unwrap();
+        for name in files {
+            fs::write(directory.join(name), b"different learner generation").unwrap();
+            let error = DreamerCore::restore(&directory)
+                .err()
+                .expect("a mixed save must be rejected");
+            assert!(error.to_string().contains(name));
+            assert!(error.to_string().contains("SHA-256 mismatch"));
+            fs::write(directory.join(name), b"original tensor file").unwrap();
+        }
+        fs::remove_file(directory.join(CHECKPOINT_WORLD)).unwrap();
+        assert!(read_checkpoint_metadata(&directory).is_err());
+        fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn historical_metadata_may_lack_tensor_fingerprints() {
+        let mut encoded = serde_json::to_value(valid_checkpoint_metadata()).unwrap();
+        encoded.as_object_mut().unwrap().remove("tensor_sha256");
+        let metadata: CheckpointMetadata = serde_json::from_value(encoded).unwrap();
+        assert!(metadata.tensor_sha256.is_none());
+        validate_checkpoint_metadata(&metadata).unwrap();
+    }
+
+    #[test]
+    fn checkpoint_metadata_requires_matching_visitation_state() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.config.visitation_bonus = true;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.visitation = Some(VisitationBonus::new().state());
+        validate_checkpoint_metadata(&metadata).unwrap();
+        metadata.config.visitation_bonus = false;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+    }
+
+    #[test]
+    fn checkpoint_metadata_rejects_the_retired_global_future_head() {
+        let mut metadata = valid_checkpoint_metadata();
+        metadata.config.loss_scales.future_prediction = 0.25;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+        metadata.future_head_revision = Some(world::FUTURE_HEAD_REVISION.to_owned());
+        validate_checkpoint_metadata(&metadata).unwrap();
+        metadata.config.loss_scales.future_prediction = 0.0;
+        assert!(validate_checkpoint_metadata(&metadata).is_err());
+    }
+
     #[test]
     fn categorical_latents_are_one_hot_per_variable() {
         let mut rng = StdRng::seed_from_u64(3);
@@ -1926,6 +2509,43 @@ mod tests {
             assert_eq!(row.iter().sum::<f32>(), 1.0);
             assert_eq!(row.iter().filter(|value| **value == 1.0).count(), 1);
         }
+    }
+
+    #[test]
+    fn parallel_categorical_rows_preserve_samples_and_rng_position() {
+        let (batch, stoch, classes) = (256, 32, 32);
+        let logits: Vec<_> = (0..batch * stoch * classes)
+            .map(|i| ((i * 137) % 1019) as f32 / 50.0 - 10.0)
+            .collect();
+        let mut serial_rng = StdRng::seed_from_u64(141);
+        let mut parallel_rng = serial_rng.clone();
+        let mut expected = vec![0.0; logits.len()];
+        let mut probabilities = vec![0.0; classes];
+        for (row, output) in logits
+            .chunks_exact(classes)
+            .zip(expected.chunks_exact_mut(classes))
+        {
+            softmax_unimix(row, 0.01, &mut probabilities);
+            output[sample_probabilities(&probabilities, &mut serial_rng)] = 1.0;
+        }
+        let actual = sample_latents(&logits, batch, stoch, classes, 0.01, &mut parallel_rng);
+        assert_eq!(actual, expected);
+        assert_eq!(serial_rng.random::<u64>(), parallel_rng.random::<u64>());
+    }
+
+    #[test]
+    fn parallel_scalar_decoding_preserves_row_order_and_bits() {
+        let bins = TwoHotBins::new(255);
+        let rows = 512;
+        let logits: Vec<_> = (0..rows * bins.len())
+            .map(|i| ((i * 137) % 1019) as f32 / 50.0 - 10.0)
+            .collect();
+        let mut scratch = vec![0.0; bins.len()];
+        let expected: Vec<_> = logits
+            .chunks_exact(bins.len())
+            .map(|row| bins.decode_logits_with_scratch(row, &mut scratch))
+            .collect();
+        assert_eq!(decode_rows(&logits, rows, &bins), expected);
     }
 
     #[test]
@@ -1991,6 +2611,32 @@ mod tests {
     }
 
     #[test]
+    fn dreamer_rng_streams_change_with_experiment_seed() {
+        let mut seed_zero = DreamerRngs::new(0);
+        let mut seed_one = DreamerRngs::new(1);
+        assert_ne!(
+            seed_zero.policy.random::<u64>(),
+            seed_one.policy.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.live_posterior.random::<u64>(),
+            seed_one.live_posterior.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.replay.random::<u64>(),
+            seed_one.replay.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.train_posterior.random::<u64>(),
+            seed_one.train_posterior.random::<u64>()
+        );
+        assert_ne!(
+            seed_zero.imagination.random::<u64>(),
+            seed_one.imagination.random::<u64>()
+        );
+    }
+
+    #[test]
     fn state_features_concatenate_deter_and_flat_categoricals() {
         let config = DreamerConfig::tiny(3);
         let size = config.network();
@@ -2007,6 +2653,227 @@ mod tests {
     }
 
     #[test]
+    fn world_microbatch_changes_only_the_training_graph_batch() {
+        let mut config = DreamerConfig::tiny(3);
+        config.world_microbatch_size = Some(1);
+        let world = world_training_config(&config);
+        assert_eq!(config.batch_size, 2);
+        assert_eq!(world.batch_size, 1);
+        assert_eq!(world.batch_length, config.batch_length);
+        assert_eq!(world.world_backprop_length, config.world_backprop_length);
+        assert_eq!(world.network(), config.network());
+    }
+
+    #[test]
+    fn row_slice_selects_complete_contiguous_rows() {
+        let values = (0..15).map(|value| value as f32).collect::<Vec<_>>();
+        assert_eq!(row_slice(&values, 1, 3, 3), &values[3..12]);
+        assert!(row_slice(&values, 5, 0, 3).is_empty());
+    }
+
+    #[test]
+    #[ignore = "builds and runs all Dreamer GPU sessions"]
+    fn tiny_world_microbatch_matches_the_effective_batch_update() {
+        check_world_microbatch(0.0);
+    }
+
+    #[test]
+    #[ignore = "builds and runs all Dreamer GPU sessions"]
+    fn tiny_predictive_microbatch_matches_the_effective_batch_update() {
+        check_world_microbatch(0.25);
+    }
+
+    fn check_world_microbatch(future_prediction_scale: f32) {
+        struct ParameterSnapshot {
+            name: String,
+            initial: Vec<f32>,
+            updated: Vec<f32>,
+            second_moment: Vec<f32>,
+        }
+
+        #[derive(Debug, Default)]
+        struct VectorComparison {
+            difference_square_sum: f64,
+            left_square_sum: f64,
+            right_square_sum: f64,
+            dot_product: f64,
+        }
+
+        impl VectorComparison {
+            fn add(&mut self, left: f32, right: f32) {
+                self.difference_square_sum += f64::from(left - right).powi(2);
+                self.left_square_sum += f64::from(left).powi(2);
+                self.right_square_sum += f64::from(right).powi(2);
+                self.dot_product += f64::from(left) * f64::from(right);
+            }
+
+            fn relative_difference(&self) -> f64 {
+                self.difference_square_sum.sqrt()
+                    / self
+                        .left_square_sum
+                        .sqrt()
+                        .max(self.right_square_sum.sqrt())
+            }
+
+            fn cosine(&self) -> f64 {
+                self.dot_product / (self.left_square_sum * self.right_square_sum).sqrt()
+            }
+        }
+
+        fn run(
+            gpu: Arc<blade_graphics::Context>,
+            world_microbatch_size: Option<usize>,
+            future_prediction_scale: f32,
+        ) -> (WorldMetrics, Vec<ParameterSnapshot>) {
+            let mut config = DreamerConfig::tiny(3);
+            config.batch_size = 4;
+            config.batch_length = 4;
+            config.world_backprop_length = 4;
+            config.world_microbatch_size = world_microbatch_size;
+            config.loss_scales.future_prediction = future_prediction_scale;
+            config.learning_rate_warmup = 0;
+            config.skip_full_optimize = true;
+            let mut agent = DreamerCore::with_gpu(config, gpu);
+            let names = agent
+                .world_train
+                .param_names()
+                .into_iter()
+                .filter(|name| name.starts_with("world.") && agent.world_train.has_param_grad(name))
+                .map(str::to_owned)
+                .collect::<Vec<_>>();
+            let initial = names
+                .iter()
+                .map(|name| {
+                    let mut values = vec![0.0; agent.world_train.param_size(name).unwrap()];
+                    agent.world_train.read_param(name, &mut values);
+                    values
+                })
+                .collect::<Vec<_>>();
+            let observation =
+                |step: usize| Observation::from_vec(vec![step as f32 / 10.0; Observation::LEN]);
+
+            agent.begin_episode(observation(0));
+            for step in 1..=16 {
+                let action = agent.act(ActionMode::Greedy, None);
+                assert!(action < 3);
+                agent.observe(
+                    observation(step),
+                    Reward {
+                        extrinsic: if step.is_multiple_of(3) { 1.0 } else { 0.0 },
+                        intrinsic: 0.0,
+                    },
+                    FrameFlags::default(),
+                );
+            }
+            let report = agent
+                .learn()
+                .expect("seventeen frames fill four tiny sequences");
+            let parameters = names
+                .into_iter()
+                .zip(initial)
+                .map(|(name, initial)| {
+                    let size = agent.world_train.param_size(&name).unwrap();
+                    let mut updated = vec![0.0; size];
+                    let mut second_moment = vec![0.0; size];
+                    agent.world_train.read_param(&name, &mut updated);
+                    agent.world_train.read_adam_v(&name, &mut second_moment);
+                    ParameterSnapshot {
+                        name,
+                        initial,
+                        updated,
+                        second_moment,
+                    }
+                })
+                .collect();
+            (report.world, parameters)
+        }
+
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let (full_metrics, full_parameters) = run(Arc::clone(&gpu), None, future_prediction_scale);
+        let (micro_metrics, micro_parameters) = run(gpu, Some(1), future_prediction_scale);
+        let metric_pairs = [
+            (full_metrics.total_loss, micro_metrics.total_loss),
+            (
+                full_metrics.future_prediction_loss,
+                micro_metrics.future_prediction_loss,
+            ),
+            (
+                full_metrics.reconstruction_loss,
+                micro_metrics.reconstruction_loss,
+            ),
+            (full_metrics.raw_kl, micro_metrics.raw_kl),
+            (full_metrics.reward_loss, micro_metrics.reward_loss),
+            (
+                full_metrics.continuation_loss,
+                micro_metrics.continuation_loss,
+            ),
+            (
+                full_metrics.replay_value_loss,
+                micro_metrics.replay_value_loss,
+            ),
+        ];
+        for (full, micro) in metric_pairs {
+            let tolerance = 1e-4 * full.abs().max(1.0);
+            assert!(
+                (full - micro).abs() <= tolerance,
+                "full-batch metric {full} != microbatch metric {micro}"
+            );
+        }
+        assert!(!full_parameters.is_empty());
+        assert_eq!(full_parameters.len(), micro_parameters.len());
+        let mut maximum_parameter_difference = (0.0f32, String::new(), 0usize, 0.0f32, 0.0f32);
+        let mut update_comparison = VectorComparison::default();
+        let mut second_moment_comparison = VectorComparison::default();
+        for (full, micro) in full_parameters.iter().zip(&micro_parameters) {
+            assert_eq!(full.name, micro.name);
+            assert_eq!(full.initial, micro.initial);
+            assert_eq!(full.updated.len(), micro.updated.len());
+            assert_eq!(full.second_moment.len(), micro.second_moment.len());
+            for (index, (&full_value, &micro_value)) in
+                full.updated.iter().zip(&micro.updated).enumerate()
+            {
+                let difference = (full_value - micro_value).abs();
+                if difference > maximum_parameter_difference.0 {
+                    maximum_parameter_difference = (
+                        difference,
+                        full.name.clone(),
+                        index,
+                        full_value,
+                        micro_value,
+                    );
+                }
+                update_comparison.add(
+                    full_value - full.initial[index],
+                    micro_value - micro.initial[index],
+                );
+            }
+            for (&full_value, &micro_value) in full.second_moment.iter().zip(&micro.second_moment) {
+                second_moment_comparison.add(full_value, micro_value);
+            }
+        }
+
+        // Equal row partitions reorder f32 reductions. At coordinates where
+        // gradients nearly cancel, first-step LaProp can therefore turn an
+        // infinitesimal sign change into opposite one-learning-rate updates.
+        // Bound that pointwise effect while requiring the complete update and
+        // RMS state to remain aligned.
+        let learning_rate = f64::from(DreamerConfig::tiny(3).learning_rate);
+        assert!(
+            f64::from(maximum_parameter_difference.0) <= 2.1 * learning_rate,
+            "microbatch update exceeded the reduction-order bound: {maximum_parameter_difference:?}"
+        );
+        assert!(
+            update_comparison.relative_difference() < 0.025 && update_comparison.cosine() > 0.999,
+            "microbatch changed the aggregate world update: {update_comparison:?}"
+        );
+        assert!(
+            second_moment_comparison.relative_difference() < 0.001
+                && second_moment_comparison.cosine() > 0.99999,
+            "microbatch changed LaProp's RMS state: {second_moment_comparison:?}"
+        );
+    }
+
+    #[test]
     #[ignore = "builds and runs all Dreamer GPU sessions"]
     fn tiny_agent_completes_an_act_and_learn_cycle() {
         let mut config = DreamerConfig::tiny(3);
@@ -2014,6 +2881,8 @@ mod tests {
         config.world_backprop_length = 4;
         config.dynamics_free_nats = Some(0.0);
         config.actor_learning_starts = 1;
+        config.visitation_bonus = true;
+        config.train_ratio = 0.0;
         config.skip_full_optimize = true;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, Arc::clone(&gpu));
@@ -2031,21 +2900,21 @@ mod tests {
                 .has_param_grad("world.dynamics.core.dynin0.weight"),
             "replay value must retain a gradient path into the world model"
         );
-        let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+        let observation = || Observation::from_vec(vec![0.0; Observation::LEN]);
 
         agent.begin_episode(observation());
-        assert_eq!(agent.dino_observation(), vec![0.0; DinoObservation::LEN]);
+        assert_eq!(agent.visual_observation(), vec![0.0; Observation::LEN]);
         assert!(agent.posterior_reward_prediction().is_finite());
         assert!(agent.posterior_value_prediction().is_finite());
-        let posterior_observation = agent.posterior_observation_prediction();
-        assert_eq!(posterior_observation.len(), DinoObservation::LEN);
+        let posterior_observation = agent.observation_prediction();
+        assert_eq!(posterior_observation.len(), Observation::LEN);
         assert!(posterior_observation.iter().all(|value| value.is_finite()));
         let (prior_rewards, prior_observations) = agent.prior_diagnostic_rollout(&[0, 1]);
         assert_eq!(prior_rewards.len(), 2);
         assert_eq!(prior_observations.len(), 2);
         assert!(prior_rewards.iter().all(|value| value.is_finite()));
         assert!(prior_observations.iter().all(|observation| {
-            observation.len() == DinoObservation::LEN
+            observation.len() == Observation::LEN
                 && observation.iter().all(|value| value.is_finite())
         }));
         let (rewards, continuations, values) = agent.prior_behavior_rollout(&[0, 1]);
@@ -2068,7 +2937,7 @@ mod tests {
         for step in 0..8 {
             let action = agent.act(ActionMode::Greedy, None);
             assert!(action < 3);
-            agent.observe(
+            let reward = agent.observe(
                 observation(),
                 Reward {
                     extrinsic: step as f32,
@@ -2080,13 +2949,31 @@ mod tests {
                     ..FrameFlags::default()
                 },
             );
+            assert_eq!(reward.extrinsic, step as f32);
+            assert!((reward.intrinsic - 1.0 / ((step + 2) as f32).sqrt()).abs() < 1e-7);
         }
 
+        assert!(
+            agent.learn_scheduled(3).is_empty(),
+            "zero ratio disables even the initial scheduled update"
+        );
         let mut initial_actor_parameter = vec![0.0; 3];
         agent
             .behavior_train
             .read_param("behavior.actor.out.bias", &mut initial_actor_parameter);
         let report = agent.learn().expect("nine frames fill one tiny sequence");
+        assert_eq!(
+            agent
+                .behavior_train
+                .slot_size(ExternalSlot::Input("imagined_feature")),
+            Some(
+                agent.config.batch_size
+                    * agent.config.batch_length
+                    * agent.config.imagination_length
+                    * agent.config.feature_dim()
+                    * size_of::<f32>()
+            )
+        );
         assert_eq!(report.learner_step, 1);
         assert_eq!(report.replay_len, 9);
         assert!(report.world.total_loss.is_finite());
@@ -2131,6 +3018,8 @@ mod tests {
             .behavior_slow
             .read_param("behavior.value.out.bias", &mut slow_parameter);
         let return_state = agent.return_normalizer.state();
+        let visitation_state =
+            serde_json::to_vec(&agent.visitation.as_ref().unwrap().state()).unwrap();
 
         let checkpoint = std::env::temp_dir().join(format!(
             "kindle-dreamer-checkpoint-test-{}",
@@ -2142,7 +3031,8 @@ mod tests {
         agent.save_checkpoint(&checkpoint).unwrap();
         drop(agent);
 
-        let mut restored = DreamerCore::restore_with_gpu(&checkpoint, gpu).unwrap();
+        let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+        let mut restored = DreamerCore::restore_with_gpu(&checkpoint, gpu, metadata).unwrap();
         assert_eq!(restored.learner_step(), 1);
         assert_eq!(restored.environment_step(), 8);
         assert_eq!(restored.replay_len(), 0);
@@ -2167,6 +3057,10 @@ mod tests {
         assert_eq!(restored_behavior, behavior_parameter);
         assert_eq!(restored_slow, slow_parameter);
         assert_eq!(restored.return_normalizer.state(), return_state);
+        assert_eq!(
+            serde_json::to_vec(&restored.visitation.as_ref().unwrap().state()).unwrap(),
+            visitation_state
+        );
 
         restored.begin_episode(observation());
         for step in 0..8 {
@@ -2184,7 +3078,194 @@ mod tests {
         let report = restored.learn().expect("refilled replay learns");
         assert_eq!(report.learner_step, 2);
         assert_eq!(report.behavior.actor_update_scale, 1.0);
+        let report = restored
+            .learn()
+            .expect("a second update replaces the device feature rows");
+        assert_eq!(report.learner_step, 3);
+        assert!(report.world.total_loss.is_finite() && report.behavior.total_loss.is_finite());
         drop(restored);
+        fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    #[test]
+    #[ignore = "requires GPU; saves complete optimizer state before any update"]
+    fn untrained_checkpoints_roundtrip_before_and_after_acting() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        for steps in [0, 8] {
+            let mut source = DreamerCore::with_gpu(DreamerConfig::tiny(3), Arc::clone(&gpu));
+            let snapshots = [
+                &source.world_train,
+                &source.behavior_train,
+                &source.behavior_slow,
+            ]
+            .map(|session| {
+                let names = session
+                    .param_names()
+                    .into_iter()
+                    .map(str::to_owned)
+                    .collect::<Vec<_>>();
+                let values =
+                    session.read_params(&names.iter().map(String::as_str).collect::<Vec<_>>());
+                (names, values)
+            });
+            assert_eq!(source.world_train.memory_summary().adam_state_bytes, 0);
+            assert_eq!(source.behavior_train.memory_summary().adam_state_bytes, 0);
+            let observation = || Observation::from_vec(vec![0.25; Observation::LEN]);
+            if steps != 0 {
+                source.begin_episode(observation());
+                for _ in 0..steps {
+                    source.act(ActionMode::Sample, None);
+                    source.observe(observation(), Reward::default(), FrameFlags::default());
+                }
+            }
+            let checkpoint = std::env::temp_dir().join(format!(
+                "kindle-untrained-checkpoint-{}-{steps}",
+                std::process::id()
+            ));
+            assert!(!checkpoint.exists());
+            source.save_checkpoint(&checkpoint).unwrap();
+            assert_eq!(source.learner_step(), 0);
+            assert_eq!(source.environment_step(), steps);
+            drop(source);
+
+            let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+            let restored =
+                DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&gpu), metadata).unwrap();
+            assert_eq!(restored.learner_step(), 0);
+            assert_eq!(restored.environment_step(), steps);
+            assert_eq!(restored.replay_len(), 0);
+            for ((names, expected), session) in snapshots.into_iter().zip([
+                &restored.world_train,
+                &restored.behavior_train,
+                &restored.behavior_slow,
+            ]) {
+                let names = names.iter().map(String::as_str).collect::<Vec<_>>();
+                assert_eq!(session.read_params(&names), expected);
+                assert_eq!(session.adam_step_count(), 0);
+                for name in names
+                    .into_iter()
+                    .filter(|name| session.has_param_grad(name))
+                {
+                    let mut moment = vec![f32::NAN; session.param_size(name).unwrap()];
+                    session.read_adam_m(name, &mut moment);
+                    assert!(moment.iter().all(|value| *value == 0.0));
+                    session.read_adam_v(name, &mut moment);
+                    assert!(moment.iter().all(|value| *value == 0.0));
+                }
+            }
+            drop(restored);
+            fs::remove_dir_all(checkpoint).unwrap();
+        }
+    }
+
+    #[test]
+    #[ignore = "builds and runs all Dreamer GPU sessions"]
+    fn tiny_future_prediction_is_causal_and_trains_through_previous_observations() {
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales = super::super::config::LossScales {
+            reconstruction: 0.0,
+            future_prediction: 0.25,
+            reward: 0.0,
+            continuation: 0.0,
+            dynamics: 0.0,
+            representation: 0.0,
+            policy: 0.0,
+            value: 0.0,
+            replay_value: 0.0,
+        };
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let mut left = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
+        let mut right = DreamerCore::with_gpu(config.clone(), gpu);
+        let mut control_config = config.clone();
+        control_config.loss_scales.future_prediction = 0.0;
+        control_config.loss_scales.reconstruction = 0.25;
+        let control_graph = world::build_observation_prediction_graph(&control_config, 1);
+        let mut control = build_session(&control_graph, &left.gpu, Mode::Inference, false);
+        initialize_d3(&mut control, &control_graph, config.seed);
+        for name in control.param_names() {
+            if name == "world.decoder.trunk.weight" {
+                continue;
+            }
+            let future_name = name.replacen("world.decoder.", "world.future_predictor.", 1);
+            assert_eq!(
+                control.read_params(&[name]),
+                left.world_train.read_params(&[&future_name]),
+                "matched downstream initialization for {name}"
+            );
+        }
+        let observation = |value| Observation::from_vec(vec![value; Observation::LEN]);
+        for agent in [&mut left, &mut right] {
+            agent.begin_episode(observation(0.2));
+            assert_eq!(
+                agent.act(ActionMode::Greedy, Some(&[true, false, false])),
+                0
+            );
+        }
+        left.observe(observation(0.4), Reward::default(), FrameFlags::default());
+        right.observe(observation(-0.4), Reward::default(), FrameFlags::default());
+        assert_eq!(left.deter, right.deter);
+        assert_ne!(left.encoded_observation, right.encoded_observation);
+        assert_eq!(
+            left.observation_prediction(),
+            right.observation_prediction()
+        );
+        let (_, first_action) = left.prior_diagnostic_rollout(&[0]);
+        let (_, second_action) = left.prior_diagnostic_rollout(&[1]);
+        assert_ne!(first_action, second_action);
+
+        for step in 2..=config.batch_length {
+            left.act(ActionMode::Sample, None);
+            left.observe(
+                observation(step as f32 * 0.2),
+                Reward::default(),
+                FrameFlags::default(),
+            );
+        }
+        let mut batch = left.replay.sample(&config, &mut left.rngs.replay).unwrap();
+        let posterior = left.sample_posterior_batch(&batch);
+        let behavior = left.imagine_and_target(&batch, &posterior);
+        let metrics = left.train_world(&batch, &posterior, &behavior);
+        assert!(metrics.future_prediction_loss > 0.0);
+        assert_eq!(metrics.reconstruction_loss, 0.0);
+        let name = "world.representation.encoder.patch0.weight";
+        let mut gradient = vec![0.0; left.world_train.param_size(name).unwrap()];
+        left.world_train.read_param_grad(name, &mut gradient);
+        assert!(gradient.iter().all(|value| value.is_finite()));
+        assert!(
+            gradient.iter().any(|value| value.abs() > 1e-7),
+            "future loss must train the earlier encoder"
+        );
+
+        for flags in batch.flags.iter_mut().flatten() {
+            flags.is_first = true;
+        }
+        let posterior = left.sample_posterior_batch(&batch);
+        let behavior = left.imagine_and_target(&batch, &posterior);
+        let reset = left.train_world(&batch, &posterior, &behavior);
+        assert_eq!(reset.future_prediction_loss, 0.0);
+        assert_eq!(reset.total_loss, 0.0);
+        left.world_train.read_param_grad(name, &mut gradient);
+        assert!(gradient.iter().all(|value| *value == 0.0));
+
+        let checkpoint = std::env::temp_dir().join(format!(
+            "kindle-future-checkpoint-test-{}",
+            std::process::id()
+        ));
+        left.save_checkpoint(&checkpoint).unwrap();
+        let parameter = "world.future_predictor.trunk.weight";
+        let expected = left.world_train.read_params(&[parameter]);
+        let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+        let restored =
+            DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&left.gpu), metadata).unwrap();
+        assert_eq!(restored.config(), &config);
+        assert_eq!(restored.world_train.read_params(&[parameter]), expected);
+        assert!(
+            restored
+                .world_train
+                .param_names()
+                .iter()
+                .all(|name| !name.starts_with("world.decoder."))
+        );
         fs::remove_dir_all(checkpoint).unwrap();
     }
 
@@ -2196,7 +3277,7 @@ mod tests {
         config.learning_rate_warmup = 0;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
-        let observation = || DinoObservation::from_vec(vec![0.0; DinoObservation::LEN]);
+        let observation = || Observation::from_vec(vec![0.0; Observation::LEN]);
 
         for _ in 0..512 {
             agent.begin_episode(observation());
@@ -2260,13 +3341,13 @@ mod tests {
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut agent = DreamerCore::with_gpu(config, gpu);
         let observation = |class: usize| {
-            let mut values = vec![0.0; DinoObservation::LEN];
+            let mut values = vec![0.0; Observation::LEN];
             for (index, value) in values.iter_mut().enumerate() {
                 if index % 2 == class {
                     *value = 1.0;
                 }
             }
-            DinoObservation::from_vec(values)
+            Observation::from_vec(values)
         };
 
         let size = agent.config.network();
