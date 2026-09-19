@@ -42,7 +42,7 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
 
       - name: Unit tests
-        run: cargo test --workspace --lib
+        run: cargo test --workspace --all-targets
 
       # DINO weights are separately licensed and unavailable in CI. This
       # synthetic observation canary still executes the complete Dreamer

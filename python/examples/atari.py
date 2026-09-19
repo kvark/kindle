@@ -11,6 +11,7 @@ import random
 import sys
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 import ale_py
 import gymnasium as gym
@@ -22,7 +23,7 @@ from kindle._reward_probe import RewardProbe
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
-DINO_RECONSTRUCTION_SCALE = 0.25
+FEATURE_RECONSTRUCTION_SCALE = 0.25
 ATARI_ACTION_REPEAT = 4
 ATARI_NOOP_MAX = 30
 ATARI_SCREEN_SIZE = 64
@@ -50,12 +51,24 @@ ATARI_PROTOCOLS = {
 }
 
 
-def sha256_file(path: str) -> str:
+def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as source:
         while chunk := source.read(1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def checkpoint_identity(path: str | Path) -> dict:
+    checkpoint = Path(path)
+    return {
+        "path": str(checkpoint.resolve()),
+        "metadata_sha256": sha256_file(checkpoint / "metadata.json"),
+        "tensor_sha256": {
+            name: sha256_file(checkpoint / f"{name}.safetensors")
+            for name in ("world", "behavior", "slow_value")
+        },
+    }
 
 
 class DreamerAtariPreprocessing(gym.Wrapper):
@@ -93,18 +106,26 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         )
         self._frames: list[np.ndarray] = []
         self._episode_frames = 0
+        # Exact emulator step() calls, separate from the conventional action×4
+        # score coordinates. Early terminals need not execute all four repeats.
+        self.executed_action_frames = 0
+        self.reset_noop_frames = 0
+        self.emulator_resets = 0
         self._noop_max = noop_max
         self._max_episode_frames = max_episode_frames
 
     def reset(self, *, seed=None, options=None):
         observation, info = self.env.reset(seed=seed, options=options)
+        self.emulator_resets += 1
         info = dict(info)
         noops = int(self.env.unwrapped.np_random.integers(self._noop_max + 1))
         for _ in range(noops):
             observation, _, terminated, truncated, step_info = self.env.step(0)
+            self.reset_noop_frames += 1
             info.update(step_info)
             if terminated or truncated:
                 observation, reset_info = self.env.reset(options=options)
+                self.emulator_resets += 1
                 info.update(reset_info)
         frame = np.asarray(observation, dtype=np.uint8)
         self._frames = [frame.copy(), frame.copy()]
@@ -123,6 +144,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
             )
             total_reward += float(reward)
             self._episode_frames += 1
+            self.executed_action_frames += 1
 
             # D3 captures before checking game-over, so a terminal frame in
             # either of the last two repeats remains visible to the agent.
@@ -156,7 +178,9 @@ class DreamerAtariPreprocessing(gym.Wrapper):
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default=None,
+                        help="fresh-run frontend (default: dinov3); restore reads its saved identity")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=0)
@@ -190,7 +214,30 @@ def main() -> None:
         type=int,
         help="truncated world-model BPTT length (D3-equivalent: 64)",
     )
+    parser.add_argument(
+        "--world-microbatch-size",
+        type=int,
+        help=(
+            "world-model rows per gradient-accumulation pass; defaults to the "
+            "full effective batch"
+        ),
+    )
+    parser.add_argument(
+        "--skip-full-optimize",
+        action="store_true",
+        help=(
+            "skip Meganeura's post-autodiff rewrite pass; preserves graph "
+            "semantics but may reduce training throughput"
+        ),
+    )
     parser.add_argument("--learning-rate", type=float)
+    parser.add_argument("--agc", type=float, help="adaptive gradient clipping ratio; zero disables it")
+    parser.add_argument("--visitation-bonus", action="store_true",
+                        help="bounded novelty in frozen visual features")
+    parser.add_argument("--intrinsic-reward-scale", type=float, default=0.0)
+    parser.add_argument("--extrinsic-reward-scale", type=float, default=1.0)
+    parser.add_argument("--future-prediction-loss-scale", type=float, default=0.0,
+                        help="predict the next frozen features before observing them")
     parser.add_argument(
         "--actor-learning-starts",
         type=int,
@@ -211,7 +258,7 @@ def main() -> None:
     parser.add_argument(
         "--reconstruction-loss-scale",
         type=float,
-        default=DINO_RECONSTRUCTION_SCALE,
+        default=FEATURE_RECONSTRUCTION_SCALE,
         help="frozen-DINO scale calibrated to D3's summed-pixel loss magnitude",
     )
     parser.add_argument(
@@ -286,6 +333,19 @@ def main() -> None:
         parser.error("--append-output requires --restore")
     if args.random_policy and (args.restore or args.evaluate or args.checkpoint):
         parser.error("--random-policy cannot use Dreamer checkpoints or evaluation")
+    training_flags = {
+        "--model-size", "--observation-decoder-depth", "--train-ratio",
+        "--replay-capacity", "--batch-size", "--batch-length",
+        "--world-backprop-length", "--world-microbatch-size", "--skip-full-optimize",
+        "--learning-rate", "--learning-rate-warmup", "--actor-learning-starts",
+        "--free-nats", "--dynamics-free-nats", "--dynamics-loss-scale",
+        "--reconstruction-loss-scale", "--future-prediction-loss-scale", "--agc",
+        "--replay-value-gradient", "--no-replay-value-gradient", "--visitation-bonus",
+        "--intrinsic-reward-scale", "--extrinsic-reward-scale",
+    }
+    explicit_training = training_flags.intersection(arg.split("=", 1)[0] for arg in sys.argv[1:])
+    if (args.restore or args.random_policy) and explicit_training:
+        parser.error("training overrides require a fresh Dreamer run: " + ", ".join(sorted(explicit_training)))
 
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     # Both D3 Atari-100k profiles use repeat 4, max-pool 2, non-sticky
@@ -312,14 +372,17 @@ def main() -> None:
             f"environment exposes {action_count} actions but "
             f"{len(action_meanings)} action meanings"
         )
-    dino_checkpoint_sha256 = (
-        None if args.random_policy else sha256_file(args.dino_checkpoint)
+    encoder_checkpoint_sha256 = (
+        None if args.random_policy else sha256_file(args.encoder_checkpoint)
     )
+    restored_checkpoint = checkpoint_identity(args.restore) if args.restore else None
     construction_started = time.perf_counter()
     if args.random_policy:
         agent = None
     elif args.restore:
-        agent = kindle.Agent.restore(args.restore, args.dino_checkpoint)
+        agent = kindle.Agent.restore(args.restore, args.encoder_checkpoint)
+        if args.encoder and agent.provenance["perception"]["kind"] != args.encoder:
+            raise ValueError("--encoder does not match the restored perception identity")
         restored_actions = int(agent.config["action_count"])
         if restored_actions != action_count:
             raise ValueError(
@@ -327,8 +390,9 @@ def main() -> None:
             )
     else:
         agent = kindle.Agent(
-            args.dino_checkpoint,
+            args.encoder_checkpoint,
             action_count,
+            encoder=args.encoder or "dinov3",
             model_size=args.model_size,
             observation_decoder_depth=args.observation_decoder_depth,
             seed=args.seed,
@@ -336,6 +400,7 @@ def main() -> None:
             batch_size=args.batch_size,
             batch_length=args.batch_length,
             world_backprop_length=args.world_backprop_length,
+            world_microbatch_size=args.world_microbatch_size,
             train_ratio=args.train_ratio,
             learning_rate=args.learning_rate,
             actor_learning_starts=args.actor_learning_starts,
@@ -344,11 +409,18 @@ def main() -> None:
             dynamics_free_nats=args.dynamics_free_nats,
             dynamics_loss_scale=args.dynamics_loss_scale,
             reconstruction_loss_scale=args.reconstruction_loss_scale,
+            future_prediction_loss_scale=args.future_prediction_loss_scale,
+            agc=args.agc,
+            visitation_bonus=args.visitation_bonus,
+            intrinsic_reward_scale=args.intrinsic_reward_scale,
+            extrinsic_reward_scale=args.extrinsic_reward_scale,
             replay_value_gradient=args.replay_value_gradient,
+            skip_full_optimize=args.skip_full_optimize,
         )
     agent_construction_seconds = (
         time.perf_counter() - construction_started if agent is not None else None
     )
+    agent_config = agent.config if agent is not None else None
     if agent is not None:
         agent.begin_episode(frame)
     random_actions = random.Random(args.seed ^ 0xA7A2_1000)
@@ -414,11 +486,18 @@ def main() -> None:
                     agent.environment_step * ATARI_ACTION_REPEAT
                 ),
                 "learner_step": agent.learner_step,
+                "identity": checkpoint_identity(args.checkpoint),
             }
         )
 
     started = time.perf_counter()
     total_reward = 0.0
+    total_intrinsic_reward = 0.0
+    interval_intrinsic_reward = 0.0
+    positive_reward_events = 0
+    negative_reward_events = 0
+    interval_positive_reward_events = 0
+    interval_negative_reward_events = 0
     episode_return = 0.0
     episode_length = 0
     completed_return_sum = 0.0
@@ -435,6 +514,7 @@ def main() -> None:
         {
             "event": "run_start",
             "environment": args.environment,
+            "ale_py_version": ale_py.__version__,
             "steps": args.steps,
             "atari_protocol": args.atari_protocol,
             "action_repeat": ATARI_ACTION_REPEAT,
@@ -453,19 +533,20 @@ def main() -> None:
             "reward_probe": args.reward_probe,
             "random_action_steps": args.random_action_steps,
             "output_appended": args.append_output,
-            "dino_model_id": (
-                kindle.DINO_MODEL_ID if agent is not None else None
-            ),
-            "dino_checkpoint_revision": (
-                kindle.DINO_CHECKPOINT_REVISION if agent is not None else None
-            ),
-            "dino_checkpoint_sha256": dino_checkpoint_sha256,
+            "restored_checkpoint": restored_checkpoint,
+            "perception": agent.provenance["perception"] if agent is not None else None,
+            "encoder_checkpoint_sha256": encoder_checkpoint_sha256,
             "starting_environment_step": starting_environment_step,
             "starting_learner_step": starting_learner_step,
             "agent_construction_seconds": agent_construction_seconds,
             "gpu_device": agent.gpu_device if agent is not None else None,
             "trainable_parameters": trainable_parameters,
-            "config": agent.config if agent is not None else None,
+            "config": agent_config,
+            "model_provenance": agent.provenance if agent is not None else None,
+            "native_extension_sha256": (
+                sha256_file(kindle._native.__file__) if agent is not None else None
+            ),
+            "runner_sha256": sha256_file(__file__),
         }
     )
 
@@ -492,8 +573,9 @@ def main() -> None:
             reward = float(reward)
             terminated = bool(terminated)
             truncated = bool(truncated)
+            intrinsic_reward = 0.0
             if agent is not None:
-                agent.observe(
+                _, intrinsic_reward = agent.observe(
                     frame,
                     extrinsic_reward=reward,
                     terminated=terminated,
@@ -503,7 +585,8 @@ def main() -> None:
                 assert agent is not None
                 assert one_step_prior_reward is not None
                 reward_probe.record(
-                    reward,
+                    (agent_config["extrinsic_reward_scale"] * reward
+                     + agent_config["intrinsic_reward_scale"] * intrinsic_reward),
                     one_step_prior_reward,
                     agent.posterior_reward_prediction(),
                 )
@@ -523,6 +606,12 @@ def main() -> None:
 
             total_reward += reward
             interval_reward += reward
+            total_intrinsic_reward += intrinsic_reward
+            interval_intrinsic_reward += intrinsic_reward
+            positive_reward_events += int(reward > 0.0)
+            negative_reward_events += int(reward < 0.0)
+            interval_positive_reward_events += int(reward > 0.0)
+            interval_negative_reward_events += int(reward < 0.0)
             episode_return += reward
             episode_length += 1
             action_counts[action] += 1
@@ -566,7 +655,13 @@ def main() -> None:
                         "environment_step": absolute_environment_step(run_step),
                         "environment_frames": absolute_environment_frames(run_step),
                         "interval_steps": args.report_every,
+                        "executed_action_frames": environment.executed_action_frames,
+                        "reset_noop_frames": environment.reset_noop_frames,
+                        "emulator_resets": environment.emulator_resets,
                         "reward": interval_reward,
+                        "intrinsic_reward": interval_intrinsic_reward,
+                        "positive_reward_events": interval_positive_reward_events,
+                        "negative_reward_events": interval_negative_reward_events,
                         "completed_episodes": interval_episodes,
                         "learner_updates": interval_updates,
                         "action_counts": interval_action_counts,
@@ -574,6 +669,9 @@ def main() -> None:
                     }
                 )
                 interval_reward = 0.0
+                interval_intrinsic_reward = 0.0
+                interval_positive_reward_events = 0
+                interval_negative_reward_events = 0
                 interval_episodes = 0
                 interval_updates = 0
                 interval_action_counts = [0] * action_count
@@ -605,6 +703,7 @@ def main() -> None:
             emit(
                 {
                     "event": "reward_probe",
+                    "target": "scaled_extrinsic_plus_intrinsic",
                     "run_step": args.steps,
                     "environment_step": absolute_environment_step(args.steps),
                     "environment_frames": absolute_environment_frames(args.steps),
@@ -621,9 +720,15 @@ def main() -> None:
                 "environment_step": absolute_environment_step(args.steps),
                 "environment_frames": ending_environment_frames,
                 "environment_frame_delta": args.steps * ATARI_ACTION_REPEAT,
+                "executed_action_frames": environment.executed_action_frames,
+                "reset_noop_frames": environment.reset_noop_frames,
+                "emulator_resets": environment.emulator_resets,
                 "seed": args.seed,
                 "mode": run_mode,
                 "total_reward": total_reward,
+                "total_intrinsic_reward": total_intrinsic_reward,
+                "positive_reward_events": positive_reward_events,
+                "negative_reward_events": negative_reward_events,
                 "completed_episodes": episodes,
                 "mean_completed_return": (
                     completed_return_sum / episodes if episodes else 0.0

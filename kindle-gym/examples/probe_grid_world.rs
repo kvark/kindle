@@ -68,6 +68,7 @@ struct SampleCollection {
     samples: Vec<Sample>,
     dino_patch_statistics: DinoPatchStatistics,
     observation_decoder_depth: Option<usize>,
+    observation_prediction_source: Option<&'static str>,
     gpu_device: kindle::GpuDeviceInfo,
 }
 
@@ -203,12 +204,14 @@ fn symmetric_eigenvalues(mut matrix: Vec<f64>, size: usize) -> Vec<f64> {
 struct ObservationPredictionError {
     model_mse: f32,
     persistence_mse: f32,
+    unrelated_action_mse: f32,
 }
 
 struct PendingObservationRollout {
     sample_index: usize,
     next_horizon: usize,
     predictions: Vec<Vec<f32>>,
+    unrelated_predictions: Vec<Vec<f32>>,
     persistence: Vec<f32>,
 }
 
@@ -254,6 +257,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         samples,
         dino_patch_statistics,
         observation_decoder_depth,
+        observation_prediction_source,
         gpu_device,
     } = collection;
     let dino_patch_affine_rank_floor = dino_patch_statistics.metrics();
@@ -275,7 +279,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ),
         })
     });
-    let posterior_dino_reconstruction = posterior_observation_prediction_metrics(&samples);
+    let observed_state_prediction = observation_prediction_metrics(&samples);
     let one_step_prior_reward = samples
         .iter()
         .any(|sample| sample.prior_reward_prediction.is_some())
@@ -290,7 +294,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
         })
         .collect::<Vec<_>>();
-    let open_loop_dino_reconstruction = (0..arguments.rollout_horizon)
+    let open_loop_observation_prediction = (0..arguments.rollout_horizon)
         .filter_map(|horizon| {
             rollout_observation_prediction_metrics(&samples, horizon).map(|metrics| {
                 json!({
@@ -309,16 +313,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "seed": arguments.seed,
         "randomize_position": arguments.randomize_position,
         "all_actions": arguments.all_actions,
+        "unrelated_action_control": "independent_uniform_full_action_space",
         "feature_dims": feature_dims,
         "observation_decoder_depth": observation_decoder_depth,
+        "observation_prediction_source": observation_prediction_source,
         "gpu_device": gpu_device,
         "representations": representations,
         "reward_head": reward_head,
         "dino_patch_affine_rank_floor": dino_patch_affine_rank_floor,
-        "posterior_dino_reconstruction": posterior_dino_reconstruction,
+        "observed_state_prediction": observed_state_prediction,
         "one_step_prior_reward": one_step_prior_reward,
         "open_loop_prior_reward": open_loop_prior_reward,
-        "open_loop_dino_reconstruction": open_loop_dino_reconstruction,
+        "open_loop_observation_prediction": open_loop_observation_prediction,
         "posterior_policy_action_mask": posterior_policy_action_mask,
         "posterior_policy_reward_alignment": posterior_policy_reward_alignment,
     }))?;
@@ -389,6 +395,7 @@ fn collect_perception_samples(
         samples,
         dino_patch_statistics,
         observation_decoder_depth: None,
+        observation_prediction_source: None,
         gpu_device,
     })
 }
@@ -398,8 +405,19 @@ fn collect_latent_samples(
     checkpoint: &Path,
 ) -> Result<SampleCollection, Box<dyn std::error::Error>> {
     let mut agent = DreamerAgent::restore(checkpoint, &arguments.dino_checkpoint, None)?;
+    if agent.core().config().extrinsic_reward_scale != 1.0
+        || agent.core().config().intrinsic_reward_scale != 0.0
+    {
+        return Err("this probe's reward labels require unscaled extrinsic-only training".into());
+    }
     let gpu_device = agent.core().gpu_device();
     let observation_decoder_depth = agent.core().config().observation_decoder_depth();
+    let observation_prediction_source = if agent.core().config().loss_scales.future_prediction > 0.0
+    {
+        "deterministic_forecast"
+    } else {
+        "posterior_reconstruction"
+    };
     let mut environment = GridWorld::new();
     let mut rng = StdRng::seed_from_u64(arguments.seed);
     let mut position_rng = StdRng::seed_from_u64(arguments.seed ^ POSITION_RANDOMIZATION_SEED_XOR);
@@ -408,21 +426,19 @@ fn collect_latent_samples(
     let mut samples = Vec::with_capacity(arguments.samples);
     let mut dino_patch_statistics = DinoPatchStatistics::new();
     let mut pending_observations = Vec::<PendingObservationRollout>::new();
+    let mut unrelated_rng = StdRng::seed_from_u64(arguments.seed ^ 0x6b69_6e64_6c65_6163);
     let mut rewarded = false;
+    let mut is_first = true;
 
     while samples.len() < arguments.samples {
-        dino_patch_statistics.add_observation(agent.dino_observation());
-        score_pending_observations(
-            &mut pending_observations,
-            &mut samples,
-            agent.dino_observation(),
-        );
+        dino_patch_statistics.add_observation(agent.visual_observation());
         push_latent_sample(
             &mut samples,
             &mut agent,
             &environment,
             rewarded,
             arguments.all_actions,
+            is_first,
         );
         if samples.len() == arguments.samples {
             break;
@@ -451,6 +467,10 @@ fn collect_latent_samples(
         let (rollout_predictions, rollout_observations) =
             agent.prior_diagnostic_rollout(&rollout_actions);
         assert_eq!(rollout_predictions.len(), rollout_observations.len());
+        let unrelated_actions = (0..rollout_actions.len())
+            .map(|_| unrelated_rng.random_range(0..ACTION_COUNT))
+            .collect::<Vec<_>>();
+        let (_, unrelated_observations) = agent.prior_diagnostic_rollout(&unrelated_actions);
         let sample_index = samples.len() - 1;
         let sample = samples.last_mut().expect("current latent sample");
         sample.prior_reward_prediction = Some(rollout_predictions[0]);
@@ -463,7 +483,8 @@ fn collect_latent_samples(
             sample_index,
             next_horizon: 0,
             predictions: rollout_observations,
-            persistence: agent.dino_observation().to_vec(),
+            unrelated_predictions: unrelated_observations,
+            persistence: agent.visual_observation().to_vec(),
         });
 
         let action = random_action(&environment, arguments.all_actions, &mut rng);
@@ -479,8 +500,14 @@ fn collect_latent_samples(
         assert_eq!(usize::from(rewarded), sample.next_rewarded.unwrap());
         let ended = transition.terminated || transition.truncated;
         agent.observe(&transition);
+        score_observation_arrival(
+            &mut pending_observations,
+            &mut samples,
+            agent.visual_observation(),
+            ended,
+        );
+        is_first = ended;
         if ended {
-            pending_observations.clear();
             agent.begin_episode(&environment.reset());
             rewarded = false;
         }
@@ -489,6 +516,7 @@ fn collect_latent_samples(
         samples,
         dino_patch_statistics,
         observation_decoder_depth: Some(observation_decoder_depth),
+        observation_prediction_source: Some(observation_prediction_source),
         gpu_device,
     })
 }
@@ -499,6 +527,7 @@ fn push_latent_sample(
     environment: &GridWorld,
     rewarded: bool,
     all_actions: bool,
+    is_first: bool,
 ) {
     let (x, y) = environment.position();
     let deter_dim = agent.core().config().network().deter;
@@ -510,8 +539,8 @@ fn push_latent_sample(
         latent[deter_dim..].to_vec(),
     ];
     let reward_prediction = agent.posterior_reward_prediction();
-    let observation = agent.dino_observation().to_vec();
-    let posterior_observation = agent.posterior_observation_prediction();
+    let observation = agent.visual_observation().to_vec();
+    let posterior_observation = agent.observation_prediction();
     let posterior_observation_mse = mean_squared_error(&posterior_observation, &observation);
     let probabilities = agent.posterior_action_probabilities(None);
     let action_mask = environment.action_mask().expect("GridWorld action mask");
@@ -592,7 +621,9 @@ fn push_latent_sample(
         food: environment.food_index(),
         rewarded: usize::from(rewarded),
         reward_prediction: Some(reward_prediction),
-        posterior_observation_mse: Some(posterior_observation_mse),
+        posterior_observation_mse: (!is_first
+            || agent.core().config().loss_scales.future_prediction == 0.0)
+            .then_some(posterior_observation_mse),
         next_rewarded: None,
         prior_reward_prediction: None,
         prior_reward_rollout: Vec::new(),
@@ -603,10 +634,11 @@ fn push_latent_sample(
     });
 }
 
-fn score_pending_observations(
+fn score_observation_arrival(
     pending: &mut Vec<PendingObservationRollout>,
     samples: &mut [Sample],
     actual: &[f32],
+    is_last: bool,
 ) {
     for rollout in pending.iter_mut() {
         let predicted = &rollout.predictions[rollout.next_horizon];
@@ -615,10 +647,20 @@ fn score_pending_observations(
             .push(ObservationPredictionError {
                 model_mse: mean_squared_error(predicted, actual),
                 persistence_mse: mean_squared_error(&rollout.persistence, actual),
+                unrelated_action_mse: mean_squared_error(
+                    &rollout.unrelated_predictions[rollout.next_horizon],
+                    actual,
+                ),
             });
         rollout.next_horizon += 1;
     }
-    pending.retain(|rollout| rollout.next_horizon < rollout.predictions.len());
+    // The terminal arrival is predictable from the preceding action. Only
+    // forecasts crossing into the following reset must be discarded.
+    if is_last {
+        pending.clear();
+    } else {
+        pending.retain(|rollout| rollout.next_horizon < rollout.predictions.len());
+    }
 }
 
 fn mean_squared_error(prediction: &[f32], target: &[f32]) -> f32 {
@@ -828,6 +870,13 @@ fn rollout_observation_prediction_metrics(
         .sum::<f32>()
         / count as f32;
     let relative_mse_reduction = (persistence_mse > 0.0).then(|| 1.0 - model_mse / persistence_mse);
+    let unrelated_action_mse = scored
+        .iter()
+        .map(|error| error.unrelated_action_mse)
+        .sum::<f32>()
+        / count as f32;
+    let action_relative_mse_reduction =
+        (unrelated_action_mse > 0.0).then(|| 1.0 - model_mse / unrelated_action_mse);
     let model_better_count = scored
         .iter()
         .filter(|error| error.model_mse < error.persistence_mse)
@@ -839,11 +888,17 @@ fn rollout_observation_prediction_metrics(
         "persistence_root_mean_squared_error": persistence_mse.sqrt(),
         "relative_mse_reduction": relative_mse_reduction,
         "model_better_rate": model_better_count as f32 / count as f32,
+        "unrelated_action_mean_squared_error": unrelated_action_mse,
+        "action_relative_mse_reduction": action_relative_mse_reduction,
+        "model_beats_unrelated_action_rate": scored
+            .iter()
+            .filter(|error| error.model_mse < error.unrelated_action_mse)
+            .count() as f32 / count as f32,
         "sample_count": count,
     }))
 }
 
-fn posterior_observation_prediction_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
+fn observation_prediction_metrics(samples: &[Sample]) -> Option<serde_json::Value> {
     let errors = samples
         .iter()
         .filter_map(|sample| sample.posterior_observation_mse)
@@ -1132,7 +1187,7 @@ mod tests {
     }
 
     #[test]
-    fn observation_rollout_metrics_compare_against_persistence() {
+    fn observation_rollout_metrics_compare_against_persistence_and_unrelated_actions() {
         let mut first = sample(0, 0.0);
         first.posterior_observation_mse = Some(1.0);
         first
@@ -1140,6 +1195,7 @@ mod tests {
             .push(ObservationPredictionError {
                 model_mse: 1.0,
                 persistence_mse: 2.0,
+                unrelated_action_mse: 1.0,
             });
         let mut second = sample(0, 0.0);
         second.posterior_observation_mse = Some(3.0);
@@ -1148,6 +1204,7 @@ mod tests {
             .push(ObservationPredictionError {
                 model_mse: 3.0,
                 persistence_mse: 6.0,
+                unrelated_action_mse: 7.0,
             });
         let samples = [first, second];
         let metrics = rollout_observation_prediction_metrics(&samples, 0).unwrap();
@@ -1155,8 +1212,35 @@ mod tests {
         assert_eq!(metrics["persistence_mean_squared_error"], 4.0);
         assert_eq!(metrics["relative_mse_reduction"], 0.5);
         assert_eq!(metrics["model_better_rate"], 1.0);
-        let posterior = posterior_observation_prediction_metrics(&samples).unwrap();
+        assert_eq!(metrics["unrelated_action_mean_squared_error"], 4.0);
+        assert_eq!(metrics["action_relative_mse_reduction"], 0.5);
+        assert_eq!(metrics["model_beats_unrelated_action_rate"], 0.5);
+        let posterior = observation_prediction_metrics(&samples).unwrap();
         assert_eq!(posterior["mean_squared_error"], 2.0);
+    }
+
+    #[test]
+    fn terminal_arrivals_are_scored_before_discarding_future_forecasts() {
+        for is_last in [false, true] {
+            let mut samples = [sample(0, 0.0)];
+            let mut pending = vec![PendingObservationRollout {
+                sample_index: 0,
+                next_horizon: 0,
+                predictions: vec![vec![1.0], vec![2.0]],
+                unrelated_predictions: vec![vec![3.0], vec![4.0]],
+                persistence: vec![0.0],
+            }];
+            score_observation_arrival(&mut pending, &mut samples, &[1.0], is_last);
+            assert_eq!(samples[0].prior_observation_rollout.len(), 1);
+            let error = samples[0].prior_observation_rollout[0];
+            assert_eq!(error.model_mse, 0.0);
+            assert_eq!(error.persistence_mse, 1.0);
+            assert_eq!(error.unrelated_action_mse, 4.0);
+            assert_eq!(pending.is_empty(), is_last);
+            if !is_last {
+                assert_eq!(pending[0].next_horizon, 1);
+            }
+        }
     }
 
     #[test]
