@@ -1,10 +1,10 @@
 #![warn(trivial_numeric_casts, unused_extern_crates)]
 
-//! Kindle's DreamerV3 baseline with frozen DINOv3 perception.
+//! Dreamer learning with causal feature prediction and native visual perception.
 //!
-//! The first implementation deliberately exposes a small surface: visual
-//! environment types, a discrete-action Dreamer agent, its configuration and
-//! metrics, and the frozen DINO encoder used at the perception boundary.
+//! One shared learner can collect independent environments through batched
+//! LeVJEPA inference. The single-stream DINOv3 path remains a measured control.
+//! Environment types, configuration, metrics and encoder boundaries stay explicit.
 
 pub mod dreamer;
 pub mod env;
@@ -12,7 +12,7 @@ pub mod vision;
 
 pub use dreamer::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerConfig, DreamerCore, FrameFlags, LearnReport,
-    LossScales, ModelSize, Reward, WorldMetrics,
+    LearnTiming, LossScales, ModelProvenance, ModelSize, Reward, VectorDreamerAgent, WorldMetrics,
 };
 pub use env::{Environment, RgbFrame, Transition};
 
@@ -24,6 +24,14 @@ pub struct GpuDeviceInfo {
     pub driver_info: String,
     pub is_software_emulated: bool,
     pub requested_device_id: Option<String>,
+}
+
+/// Backend estimates across device-local heaps, not physically free or peak VRAM.
+/// A zero budget means that the backend does not support this query.
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+pub struct GpuMemoryBudget {
+    pub usage_bytes: u64,
+    pub budget_bytes: u64,
 }
 
 /// Initialize the GPU selected by Meganeura's explicit environment options.

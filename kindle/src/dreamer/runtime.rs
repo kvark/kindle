@@ -21,6 +21,10 @@ pub(crate) fn build_session(
             mode,
             gpu: Some(Arc::clone(gpu)),
             skip_full_optimize: mode == Mode::Training && skip_full_optimize,
+            runtime: meganeura::SessionOptions {
+                gpu_timing: meganeura::GpuOptions::from_env().timing,
+                ..Default::default()
+            },
             ..SessionConfig::default()
         },
     )
@@ -63,7 +67,13 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
                 1.0
             };
             let fan_in = d3_fan_in(shape);
-            truncated_normal(&name, size, fan_in, output_scale, seed)
+            // Match reconstruction's spatial-head initialization in the causal
+            // ablation. Only the trunk's smaller deterministic input differs.
+            let initialization_name = match name.strip_prefix("world.future_predictor.") {
+                Some(suffix) => format!("world.decoder.{suffix}"),
+                None => name.clone(),
+            };
+            truncated_normal(&initialization_name, size, fan_in, output_scale, seed)
         };
         session.set_parameter(&name, &values);
     }
@@ -114,18 +124,11 @@ pub(crate) fn sync_matching(source: &Session, target: &mut Session, prefix: &str
         .param_names()
         .into_iter()
         .filter(|name| name.starts_with(prefix))
-        .map(str::to_owned)
+        .filter(|name| source.param_size(name) == target.param_size(name))
         .collect::<Vec<_>>();
-    for name in names {
-        let Some(size) = source.param_size(&name) else {
-            continue;
-        };
-        if target.param_size(&name) != Some(size) {
-            continue;
-        }
-        let mut values = vec![0.0; size];
-        source.read_param(&name, &mut values);
-        target.set_parameter(&name, &values);
+    let values = source.read_params(&names);
+    for (name, values) in names.into_iter().zip(values) {
+        target.set_parameter(name, &values);
     }
 }
 
@@ -135,23 +138,17 @@ pub(crate) fn ema_matching(source: &Session, target: &mut Session, prefix: &str,
         .param_names()
         .into_iter()
         .filter(|name| name.starts_with(prefix))
-        .map(str::to_owned)
+        .filter(|name| source.param_size(name) == target.param_size(name))
         .collect::<Vec<_>>();
-    for name in names {
-        let Some(size) = source.param_size(&name) else {
-            continue;
-        };
-        if target.param_size(&name) != Some(size) {
-            continue;
-        }
-        let mut source_values = vec![0.0; size];
-        let mut target_values = vec![0.0; size];
-        source.read_param(&name, &mut source_values);
-        target.read_param(&name, &mut target_values);
+    let source_values = source.read_params(&names);
+    let target_values = target.read_params(&names);
+    for ((name, source_values), mut target_values) in
+        names.into_iter().zip(source_values).zip(target_values)
+    {
         for (target, source) in target_values.iter_mut().zip(source_values) {
             *target = rate * source + (1.0 - rate) * *target;
         }
-        target.set_parameter(&name, &target_values);
+        target.set_parameter(name, &target_values);
     }
 }
 
@@ -190,6 +187,13 @@ mod tests {
         assert_eq!(left, right);
         let bound = 2.0 * 1.1368 / 10.0;
         assert!(left.iter().all(|value| value.abs() <= bound));
+    }
+
+    #[test]
+    fn truncation_changes_with_experiment_seed() {
+        let seed_zero = truncated_normal("weight", 10_000, 100, 1.0, 0);
+        let seed_one = truncated_normal("weight", 10_000, 100, 1.0, 1);
+        assert_ne!(seed_zero, seed_one);
     }
 
     #[test]

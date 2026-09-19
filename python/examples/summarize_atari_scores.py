@@ -9,6 +9,7 @@ from pathlib import Path
 
 from kindle._atari_scores import (
     AtariScoreError,
+    compare_runtime_scores,
     load_segments,
     load_upstream_d3_segments,
     summarize_scores,
@@ -25,29 +26,60 @@ def main() -> None:
         type=Path,
         help=(
             "score a completed provenance-pinned upstream D3 log directory; "
-            "may be repeated for multiple seeds"
+            "may be repeated for multiple seeds and combined with Kindle logs "
+            "for a random-floor-adjusted comparison"
         ),
     )
     parser.add_argument("--atari-protocol", default="published")
     parser.add_argument("--mode", default="train")
+    parser.add_argument(
+        "--minimum-kindle-seeds",
+        type=int,
+        default=1,
+        help="require this many independent seeds in the Kindle JSONL logs",
+    )
+    parser.add_argument(
+        "--minimum-upstream-seeds",
+        type=int,
+        default=1,
+        help="require this many independent seeds in the upstream D3 logs",
+    )
+    parser.add_argument(
+        "--require-uninterrupted-kindle",
+        action="store_true",
+        help=(
+            "reject Kindle seeds resumed from model-only checkpoints because "
+            "their replay state was not restored"
+        ),
+    )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    if bool(args.logs) == bool(args.upstream_d3_logdir):
-        parser.error(
-            "provide either Kindle JSONL logs or --upstream-d3-logdir, "
-            "but not both"
-        )
+    if not args.logs and not args.upstream_d3_logdir:
+        parser.error("provide Kindle JSONL logs and/or --upstream-d3-logdir")
 
     try:
-        segments = (
-            load_upstream_d3_segments(args.upstream_d3_logdir)
-            if args.upstream_d3_logdir
-            else load_segments(args.logs)
-        )
-        summary = summarize_scores(
-            segments,
-            expected_protocol=args.atari_protocol,
-            expected_mode=args.mode,
+        summaries = []
+        if args.logs:
+            summaries.append(
+                summarize_scores(
+                    load_segments(args.logs),
+                    expected_protocol=args.atari_protocol,
+                    expected_mode=args.mode,
+                    minimum_seeds=args.minimum_kindle_seeds,
+                    require_uninterrupted=args.require_uninterrupted_kindle,
+                )
+            )
+        if args.upstream_d3_logdir:
+            summaries.append(
+                summarize_scores(
+                    load_upstream_d3_segments(args.upstream_d3_logdir),
+                    expected_protocol=args.atari_protocol,
+                    expected_mode=args.mode,
+                    minimum_seeds=args.minimum_upstream_seeds,
+                )
+            )
+        summary = (
+            compare_runtime_scores(*summaries) if len(summaries) == 2 else summaries[0]
         )
     except (AtariScoreError, KeyError, TypeError, ValueError) as error:
         parser.error(str(error))
