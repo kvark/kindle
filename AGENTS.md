@@ -23,6 +23,12 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Current gameplay uses native causal LeVJEPA, not DINO. The frozen frontend's
   16-arrival chunks reset perception only; episode boundaries also reset belief.
   The prediction head reads the deterministic prior before observing its target.
+- September 20 model-sizing decision: retain causal-video JEPA and train a
+  ViT-Tiny/16 frontend (12 layers, width 192, three heads; 5,486,592 parameters).
+  Keep the Dreamer12M RSSM and 7×7×64 observation contract initially. Do not
+  substitute a plain RGB/DINO encoder or truncate Large weights. Tiny requires
+  its own native pretraining, held-out validation, checkpoint identity and GPU
+  numerical/timing checks; shape support is not a trained or qualified encoder.
 - Vector collection shares one learner/policy, not causal histories. Preserve
   independent visual caches, belief, RNG and replay streams. Count actual
   interactions and retain replay-ratio credit; report aggregate/per-stream time.
@@ -55,8 +61,8 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - The original xPz5ud queue and its reserved `pong/seed2017-train.stdout` stay
   terminal. Never remove the hold, restart old followers or count historical
   root 1009 as a root in the new matched campaign.
-- Next test Breakout's prepared minimal-action hypothesis, then separately
-  declared Freeway/Qbert exposure comparisons. Do not replicate unchanged failed
+- Next qualify/pretrain the compact causal encoder, then return to separately
+  declared game comparisons. Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
   world/behavior gradient checks at eighteen/four actions. The twelve canaries in
@@ -72,12 +78,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   terminal writers and use only its `audit NAME` readers. The five replay/schema/
   test files are adopted byte-identically from 8092790, with 742 passing main CPU
   tests; native and default full-action behavior are unchanged. The minimal-action
-  learning recipe is not proven better. The paired seed-zero, 200,004-action-per-
-  width pilot in `runs/breakout-action-pilot-20260920.kNeotb` passes nine CPU checks
-  and binds 105 inputs. Its eighteen-action training is running; review its
-  complete result before frozen evaluation, fresh untrained control and the
-  four-action arm. Preparation is terminal. Keep controls, videos and the two-wall
-  gate; `audit NAME`, `pair WIDTH` and `summary` are read-only. Do not repeat the
+  learning recipe is not proven better. The seed-zero, 200,004-action eighteen-
+  action Large pilot in `runs/breakout-action-pilot-20260920.kNeotb` is running;
+  finish its training/frozen/fresh-control/untrained quartet unchanged, reviewing
+  each phase. The new `a4-train/HOLD.md` reserves the unstarted four-action guard
+  directory before native launch. Never remove it to resume the original queue.
+  The two-width pilot is now incomplete by scheduling decision, not native failure.
+  Preparation and its 105 inputs stay unchanged. Keep controls, videos and the
+  two-wall gate; use `audit NAME` and `pair 18`, not the unfinished two-arm summary.
+  Sizing evidence: `runs/model-sizing-20260920.kPIOWC/README.md`. Do not repeat the
   memory-heavy allocation-plan qualification on this unchanged runtime.
 - Preserve completed/failed `runs/` writers, source worktrees, packages and
   artifacts. Only documented audit modes are reusable. Correct reader failures

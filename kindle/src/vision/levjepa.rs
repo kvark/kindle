@@ -1,4 +1,4 @@
-//! Frozen LeVJEPA ViT-L/16 with exact block-causal, 16-frame chunk semantics.
+//! Frozen LeVJEPA with exact block-causal, 16-frame chunk semantics.
 //!
 //! Each call processes one frame and appends its keys/values on the GPU. Patch
 //! features equal the corresponding causal prefix of the released encoder:
@@ -27,13 +27,50 @@ pub const PATCH_SIZE: usize = 16;
 pub const GRID: usize = IMAGE_SIZE / PATCH_SIZE;
 pub const PATCHES: usize = GRID * GRID;
 pub const HIDDEN: usize = 1024;
-const LAYERS: usize = 24;
-const HEADS: usize = 16;
-const HEAD_DIM: usize = HIDDEN / HEADS;
+const HEAD_DIM: usize = 64;
 const PATCH_DIM: usize = 3 * PATCH_SIZE * PATCH_SIZE;
 type Error = Box<dyn std::error::Error>;
 
+/// Independently trained encoder sizes; Large weights cannot initialize Tiny.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Architecture {
+    Tiny,
+    Large,
+}
+
+impl Architecture {
+    pub const fn hidden(self) -> usize {
+        match self {
+            Self::Tiny => 192,
+            Self::Large => HIDDEN,
+        }
+    }
+
+    pub const fn layers(self) -> usize {
+        match self {
+            Self::Tiny => 12,
+            Self::Large => 24,
+        }
+    }
+
+    pub const fn heads(self) -> usize {
+        self.hidden() / HEAD_DIM
+    }
+
+    /// Encoder weights including the pretraining-only CLS readout token.
+    pub const fn parameter_count(self) -> usize {
+        let hidden = self.hidden();
+        self.layers() * (12 * hidden * hidden + 13 * hidden) + (PATCH_DIM + 4) * hidden
+    }
+
+    /// Logical F32 key/value elements for one stream, excluding allocator overhead.
+    pub const fn cache_elements_per_stream(self) -> usize {
+        2 * self.layers() * FRAMES * PATCHES * self.hidden()
+    }
+}
+
 pub struct LeVJepaPerception {
+    architecture: Architecture,
     session: Session,
     frames: Vec<usize>,
     projected: Vec<f32>,
@@ -56,20 +93,38 @@ impl LeVJepaPerception {
         gpu: Option<Arc<blade_graphics::Context>>,
         plan_cache: Option<&Path>,
     ) -> Result<Self, Error> {
+        Self::load_batched_with_architecture(
+            Architecture::Large,
+            checkpoint,
+            streams,
+            gpu,
+            plan_cache,
+        )
+    }
+
+    /// Load a complete checkpoint for the explicitly selected architecture.
+    /// Tiny is not a truncation of the released Large encoder.
+    pub fn load_batched_with_architecture(
+        architecture: Architecture,
+        checkpoint: impl AsRef<Path>,
+        streams: usize,
+        gpu: Option<Arc<blade_graphics::Context>>,
+        plan_cache: Option<&Path>,
+    ) -> Result<Self, Error> {
         if streams == 0 {
             return Err("LeVJEPA needs at least one stream".into());
         }
         let model = SafeTensorsModel::load(checkpoint.as_ref().to_path_buf())?;
-        validate_weights(&model)?;
+        validate_weights(&model, architecture)?;
         let gpu = match gpu {
             Some(gpu) => gpu,
             None => Arc::new(crate::init_gpu_context()?),
         };
         let mut graph = Graph::new();
-        let tokens = build_encoder(&mut graph, streams);
+        let tokens = build_encoder(&mut graph, streams, architecture);
         let projection = graph.constant(
-            fixed_projection(HIDDEN, OBSERVATION_CHANNELS, PROJECTION_SEED),
-            &[HIDDEN, OBSERVATION_CHANNELS],
+            fixed_projection(architecture.hidden(), OBSERVATION_CHANNELS, PROJECTION_SEED),
+            &[architecture.hidden(), OBSERVATION_CHANNELS],
         );
         let projected = graph.matmul(tokens, projection);
         graph.set_outputs(vec![projected, tokens]);
@@ -87,8 +142,9 @@ impl LeVJepaPerception {
                 ..SessionConfig::default()
             },
         );
-        load_weights(&mut session, &model, streams)?;
+        load_weights(&mut session, &model, streams, architecture)?;
         Ok(Self {
+            architecture,
             session,
             frames: vec![0; streams],
             projected: vec![0.0; streams * PATCHES * OBSERVATION_CHANNELS],
@@ -128,9 +184,9 @@ impl LeVJepaPerception {
     }
 
     /// Dense current-frame features for numerical verification. Production
-    /// reads only the much smaller projected output, not these 200,704 floats.
+    /// reads only the much smaller projected output.
     pub fn patch_tokens(&self) -> Vec<f32> {
-        let mut tokens = vec![0.0; self.frames.len() * PATCHES * HIDDEN];
+        let mut tokens = vec![0.0; self.frames.len() * PATCHES * self.architecture.hidden()];
         self.session.read_output_by_index(1, &mut tokens);
         tokens
     }
@@ -216,9 +272,9 @@ fn linear(g: &mut Graph, x: NodeId, name: &str, input: usize, output: usize) -> 
     g.bias_add(y, bias)
 }
 
-fn norm(g: &mut Graph, x: NodeId, name: &str) -> NodeId {
-    let weight = g.parameter(&format!("{name}.weight"), &[HIDDEN]);
-    let bias = g.parameter(&format!("{name}.bias"), &[HIDDEN]);
+fn norm(g: &mut Graph, x: NodeId, name: &str, hidden: usize) -> NodeId {
+    let weight = g.parameter(&format!("{name}.weight"), &[hidden]);
+    let bias = g.parameter(&format!("{name}.bias"), &[hidden]);
     g.layer_norm(x, weight, bias, 1e-6)
 }
 
@@ -283,21 +339,22 @@ fn rope(g: &mut Graph, x: NodeId, cos: NodeId, sin: NodeId) -> NodeId {
     g.add(a, b)
 }
 
-fn rope_tables() -> (Vec<f32>, Vec<f32>) {
+fn rope_tables(architecture: Architecture) -> (Vec<f32>, Vec<f32>) {
+    let hidden = architecture.hidden();
     let axis_dim = 2 * ((HEAD_DIM / 3) / 2);
-    let mut cos = vec![1.0; FRAMES * PATCHES * HIDDEN];
+    let mut cos = vec![1.0; FRAMES * PATCHES * hidden];
     let mut sin = vec![0.0; cos.len()];
     for frame in 0..FRAMES {
         for patch in 0..PATCHES {
             let positions = [frame, patch / GRID, patch % GRID];
-            for head in 0..HEADS {
+            for head in 0..architecture.heads() {
                 for (axis, position) in positions.into_iter().enumerate() {
                     for d in 0..axis_dim {
                         let frequency = 1.0
                             / 10_000.0_f32
                                 .powf((d % (axis_dim / 2)) as f32 / (axis_dim / 2) as f32);
                         let angle = position as f32 * frequency;
-                        let index = (frame * PATCHES + patch) * HIDDEN
+                        let index = (frame * PATCHES + patch) * hidden
                             + head * HEAD_DIM
                             + axis * axis_dim
                             + d;
@@ -330,7 +387,9 @@ fn stack_streams(g: &mut Graph, rows: &[NodeId], width: usize) -> NodeId {
     x
 }
 
-fn build_encoder(g: &mut Graph, streams: usize) -> NodeId {
+fn build_encoder(g: &mut Graph, streams: usize, architecture: Architecture) -> NodeId {
+    let hidden = architecture.hidden();
+    let heads = architecture.heads();
     let rows = streams * PATCHES;
     let input = g.input("patches", &[rows, PATCH_DIM]);
     let frames: Vec<_> = (0..streams)
@@ -339,95 +398,96 @@ fn build_encoder(g: &mut Graph, streams: usize) -> NodeId {
     let last_tokens: Vec<_> = (0..streams)
         .map(|s| g.input_u32(&format!("last_token.{s}"), &[1]))
         .collect();
-    let (cos, sin) = rope_tables();
-    let cos = g.constant(cos, &[FRAMES, PATCHES * HIDDEN]);
-    let sin = g.constant(sin, &[FRAMES, PATCHES * HIDDEN]);
+    let (cos, sin) = rope_tables(architecture);
+    let cos = g.constant(cos, &[FRAMES, PATCHES * hidden]);
+    let sin = g.constant(sin, &[FRAMES, PATCHES * hidden]);
     let cos: Vec<_> = frames.iter().map(|&f| g.embedding(f, cos)).collect();
     let sin: Vec<_> = frames.iter().map(|&f| g.embedding(f, sin)).collect();
-    let cos = stack_streams(g, &cos, PATCHES * HIDDEN);
-    let sin = stack_streams(g, &sin, PATCHES * HIDDEN);
-    let cos = g.reshape(cos, &[rows, HIDDEN]);
-    let sin = g.reshape(sin, &[rows, HIDDEN]);
-    let mut x = linear(g, input, "encoder.patch_embed.proj", PATCH_DIM, HIDDEN);
-    for layer in 0..LAYERS {
+    let cos = stack_streams(g, &cos, PATCHES * hidden);
+    let sin = stack_streams(g, &sin, PATCHES * hidden);
+    let cos = g.reshape(cos, &[rows, hidden]);
+    let sin = g.reshape(sin, &[rows, hidden]);
+    let mut x = linear(g, input, "encoder.patch_embed.proj", PATCH_DIM, hidden);
+    for layer in 0..architecture.layers() {
         let name = format!("encoder.blocks.{layer}");
-        let n = norm(g, x, &format!("{name}.norm1"));
-        let qkv = linear(g, n, &format!("{name}.attn.qkv"), HIDDEN, 3 * HIDDEN);
-        let q = g.split_a(qkv, rows as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
-        let kv = g.split_b(qkv, rows as u32, HIDDEN as u32, (2 * HIDDEN) as u32, 1);
-        let k = g.split_a(kv, rows as u32, HIDDEN as u32, HIDDEN as u32, 1);
-        let v = g.split_b(kv, rows as u32, HIDDEN as u32, HIDDEN as u32, 1);
-        let q = g.reshape(q, &[rows, HIDDEN]);
-        let k = g.reshape(k, &[rows, HIDDEN]);
+        let n = norm(g, x, &format!("{name}.norm1"), hidden);
+        let qkv = linear(g, n, &format!("{name}.attn.qkv"), hidden, 3 * hidden);
+        let q = g.split_a(qkv, rows as u32, hidden as u32, (2 * hidden) as u32, 1);
+        let kv = g.split_b(qkv, rows as u32, hidden as u32, (2 * hidden) as u32, 1);
+        let k = g.split_a(kv, rows as u32, hidden as u32, hidden as u32, 1);
+        let v = g.split_b(kv, rows as u32, hidden as u32, hidden as u32, 1);
+        let q = g.reshape(q, &[rows, hidden]);
+        let k = g.reshape(k, &[rows, hidden]);
         let q = rope(g, q, cos, sin);
         let k = rope(g, k, cos, sin);
         let attention: Vec<_> = (0..streams)
             .map(|stream| {
-                let q = stream_rows(g, q, stream, streams, PATCHES * HIDDEN);
-                let k = stream_rows(g, k, stream, streams, PATCHES * HIDDEN);
-                let v = stream_rows(g, v, stream, streams, PATCHES * HIDDEN);
-                let q = g.reshape(q, &[PATCHES, HIDDEN]);
-                let k = g.reshape(k, &[1, PATCHES * HIDDEN]);
-                let v = g.reshape(v, &[1, PATCHES * HIDDEN]);
+                let q = stream_rows(g, q, stream, streams, PATCHES * hidden);
+                let k = stream_rows(g, k, stream, streams, PATCHES * hidden);
+                let v = stream_rows(g, v, stream, streams, PATCHES * hidden);
+                let q = g.reshape(q, &[PATCHES, hidden]);
+                let k = g.reshape(k, &[1, PATCHES * hidden]);
+                let v = g.reshape(v, &[1, PATCHES * hidden]);
                 let k_cache = g.parameter(
                     &format!("cache.{layer}.{stream}.k"),
-                    &[FRAMES, PATCHES * HIDDEN],
+                    &[FRAMES, PATCHES * hidden],
                 );
                 let v_cache = g.parameter(
                     &format!("cache.{layer}.{stream}.v"),
-                    &[FRAMES, PATCHES * HIDDEN],
+                    &[FRAMES, PATCHES * hidden],
                 );
                 let k = g.cache_write(k, k_cache, frames[stream]);
                 let v = g.cache_write(v, v_cache, frames[stream]);
-                let k = g.reshape(k, &[FRAMES * PATCHES, HIDDEN]);
-                let v = g.reshape(v, &[FRAMES * PATCHES, HIDDEN]);
+                let k = g.reshape(k, &[FRAMES * PATCHES, hidden]);
+                let v = g.reshape(v, &[FRAMES * PATCHES, hidden]);
                 g.cached_attention(
                     q,
                     k,
                     v,
                     last_tokens[stream],
-                    HEADS as u32,
-                    HEADS as u32,
+                    heads as u32,
+                    heads as u32,
                     HEAD_DIM as u32,
                 )
             })
             .collect();
-        let attention = stack_streams(g, &attention, PATCHES * HIDDEN);
-        let attention = g.reshape(attention, &[rows, HIDDEN]);
-        let attention = linear(g, attention, &format!("{name}.attn.proj"), HIDDEN, HIDDEN);
+        let attention = stack_streams(g, &attention, PATCHES * hidden);
+        let attention = g.reshape(attention, &[rows, hidden]);
+        let attention = linear(g, attention, &format!("{name}.attn.proj"), hidden, hidden);
         x = g.add(x, attention);
-        let n = norm(g, x, &format!("{name}.norm2"));
-        let mlp = linear(g, n, &format!("{name}.mlp.fc1"), HIDDEN, 4 * HIDDEN);
+        let n = norm(g, x, &format!("{name}.norm2"), hidden);
+        let mlp = linear(g, n, &format!("{name}.mlp.fc1"), hidden, 4 * hidden);
         let mlp = gelu_erf(g, mlp);
-        let mlp = linear(g, mlp, &format!("{name}.mlp.fc2"), 4 * HIDDEN, HIDDEN);
+        let mlp = linear(g, mlp, &format!("{name}.mlp.fc2"), 4 * hidden, hidden);
         x = g.add(x, mlp);
     }
-    norm(g, x, "encoder.norm")
+    norm(g, x, "encoder.norm", hidden)
 }
 
-fn weight_shapes() -> Vec<(String, Vec<usize>)> {
+fn weight_shapes(architecture: Architecture) -> Vec<(String, Vec<usize>)> {
+    let hidden = architecture.hidden();
     let mut shapes = vec![
-        ("encoder.cls_token".to_owned(), vec![1, 1, HIDDEN]),
+        ("encoder.cls_token".to_owned(), vec![1, 1, hidden]),
         (
             "encoder.patch_embed.proj.weight".to_owned(),
-            vec![HIDDEN, 3, 1, PATCH_SIZE, PATCH_SIZE],
+            vec![hidden, 3, 1, PATCH_SIZE, PATCH_SIZE],
         ),
-        ("encoder.patch_embed.proj.bias".to_owned(), vec![HIDDEN]),
-        ("encoder.norm.weight".to_owned(), vec![HIDDEN]),
-        ("encoder.norm.bias".to_owned(), vec![HIDDEN]),
+        ("encoder.patch_embed.proj.bias".to_owned(), vec![hidden]),
+        ("encoder.norm.weight".to_owned(), vec![hidden]),
+        ("encoder.norm.bias".to_owned(), vec![hidden]),
     ];
-    for layer in 0..LAYERS {
+    for layer in 0..architecture.layers() {
         let name = format!("encoder.blocks.{layer}");
         for norm in ["norm1", "norm2"] {
             for part in ["weight", "bias"] {
-                shapes.push((format!("{name}.{norm}.{part}"), vec![HIDDEN]));
+                shapes.push((format!("{name}.{norm}.{part}"), vec![hidden]));
             }
         }
         for (part, input, output) in [
-            ("attn.qkv", HIDDEN, 3 * HIDDEN),
-            ("attn.proj", HIDDEN, HIDDEN),
-            ("mlp.fc1", HIDDEN, 4 * HIDDEN),
-            ("mlp.fc2", 4 * HIDDEN, HIDDEN),
+            ("attn.qkv", hidden, 3 * hidden),
+            ("attn.proj", hidden, hidden),
+            ("mlp.fc1", hidden, 4 * hidden),
+            ("mlp.fc2", 4 * hidden, hidden),
         ] {
             shapes.push((format!("{name}.{part}.weight"), vec![output, input]));
             shapes.push((format!("{name}.{part}.bias"), vec![output]));
@@ -436,8 +496,8 @@ fn weight_shapes() -> Vec<(String, Vec<usize>)> {
     shapes
 }
 
-fn validate_weights(model: &SafeTensorsModel) -> Result<(), Error> {
-    let shapes = weight_shapes();
+fn validate_weights(model: &SafeTensorsModel, architecture: Architecture) -> Result<(), Error> {
+    let shapes = weight_shapes(architecture);
     if model.tensor_info().len() != shapes.len() {
         return Err(format!(
             "LeVJEPA expects {} tensors, got {}",
@@ -462,8 +522,9 @@ fn load_weights(
     session: &mut Session,
     model: &SafeTensorsModel,
     streams: usize,
+    architecture: Architecture,
 ) -> Result<(), Error> {
-    for (name, shape) in weight_shapes() {
+    for (name, shape) in weight_shapes(architecture) {
         if name == "encoder.cls_token" {
             continue;
         }
@@ -478,8 +539,8 @@ fn load_weights(
         }
         session.set_parameter(&name, &values);
     }
-    let zeros = vec![0.0; FRAMES * PATCHES * HIDDEN];
-    for layer in 0..LAYERS {
+    let zeros = vec![0.0; FRAMES * PATCHES * architecture.hidden()];
+    for layer in 0..architecture.layers() {
         for stream in 0..streams {
             session.set_parameter(&format!("cache.{layer}.{stream}.k"), &zeros);
             session.set_parameter(&format!("cache.{layer}.{stream}.v"), &zeros);
@@ -494,7 +555,7 @@ mod tests {
 
     #[test]
     fn released_architecture_and_rope_layout() {
-        let shapes = weight_shapes();
+        let shapes = weight_shapes(Architecture::Large);
         assert_eq!(shapes.len(), 293);
         assert_eq!(
             shapes
@@ -503,7 +564,7 @@ mod tests {
                 .sum::<usize>(),
             303_099_904
         );
-        let (cos, sin) = rope_tables();
+        let (cos, sin) = rope_tables(Architecture::Large);
         let at = |frame, patch, head, d| (frame * PATCHES + patch) * HIDDEN + head * HEAD_DIM + d;
         assert_eq!(cos[at(0, 0, 0, 0)], 1.0);
         assert_eq!(sin[at(0, 0, 0, 0)], 0.0);
@@ -518,7 +579,7 @@ mod tests {
     #[test]
     fn streaming_graph_builds_without_cls() {
         let mut graph = Graph::new();
-        let output = build_encoder(&mut graph, 1);
+        let output = build_encoder(&mut graph, 1, Architecture::Large);
         assert_eq!(graph.node(output).ty.shape, [PATCHES, HIDDEN]);
         assert!(!graph.nodes().iter().any(
             |node| matches!(&node.op, meganeura::graph::Op::Parameter {name} if name.contains("cls"))
@@ -527,10 +588,11 @@ mod tests {
 
     #[test]
     fn vector_graph_shares_weights_but_not_history() {
+        let layers = Architecture::Large.layers();
         let mut expected_weights = None;
         for streams in [1, 2, 3, 4, 6, 8] {
             let mut graph = Graph::new();
-            let output = build_encoder(&mut graph, streams);
+            let output = build_encoder(&mut graph, streams, Architecture::Large);
             assert_eq!(graph.node(output).ty.shape, [streams * PATCHES, HIDDEN]);
             let parameters: Vec<_> = graph
                 .nodes()
@@ -556,9 +618,9 @@ mod tests {
                 .filter(|(name, _)| name.starts_with("cache."))
                 .map(|(name, node)| ((*name).clone(), *node))
                 .collect::<std::collections::BTreeMap<_, _>>();
-            assert_eq!(parameters.len(), 292 + streams * LAYERS * 2);
-            assert_eq!(caches.len(), streams * LAYERS * 2);
-            for layer in 0..LAYERS {
+            assert_eq!(parameters.len(), 292 + streams * layers * 2);
+            assert_eq!(caches.len(), streams * layers * 2);
+            for layer in 0..layers {
                 for stream in 0..streams {
                     for kind in ["k", "v"] {
                         let cache = caches[&format!("cache.{layer}.{stream}.{kind}")];
@@ -576,6 +638,85 @@ mod tests {
                 "streams={streams} logical_cache_mib={}",
                 cache_bytes / 1024 / 1024
             );
+        }
+    }
+
+    #[test]
+    fn tiny_size_is_independent_and_keeps_the_observation_contract() {
+        let architecture = Architecture::Tiny;
+        assert_eq!(
+            (
+                architecture.hidden(),
+                architecture.layers(),
+                architecture.heads()
+            ),
+            (192, 12, 3)
+        );
+        assert_eq!(architecture.parameter_count(), 5_486_592);
+        assert_eq!(Architecture::Large.parameter_count(), 303_099_904);
+        assert_eq!(architecture.cache_elements_per_stream() * 4, 57_802_752);
+        for model in [architecture, Architecture::Large] {
+            let shapes = weight_shapes(model);
+            assert_eq!(shapes.len(), 5 + 12 * model.layers());
+            assert_eq!(
+                shapes
+                    .iter()
+                    .map(|(_, shape)| shape.iter().product::<usize>())
+                    .sum::<usize>(),
+                model.parameter_count()
+            );
+        }
+        for streams in [1, 6] {
+            let mut graph = Graph::new();
+            let output = build_encoder(&mut graph, streams, architecture);
+            assert_eq!(
+                graph.node(output).ty.shape,
+                [streams * PATCHES, architecture.hidden()]
+            );
+            let mut weights = 0;
+            let mut caches = 0;
+            for node in graph.nodes() {
+                if let meganeura::graph::Op::Parameter { name } = &node.op {
+                    if name.starts_with("cache.") {
+                        assert_eq!(node.ty.shape, [FRAMES, PATCHES * architecture.hidden()]);
+                        caches += node.ty.num_elements();
+                    } else {
+                        assert!(name.starts_with("encoder.") && !name.contains("cls"));
+                        weights += node.ty.num_elements();
+                    }
+                }
+            }
+            assert_eq!(
+                weights,
+                architecture.parameter_count() - architecture.hidden()
+            );
+            assert_eq!(caches, streams * architecture.cache_elements_per_stream());
+            let projection = graph.constant(
+                fixed_projection(architecture.hidden(), OBSERVATION_CHANNELS, PROJECTION_SEED),
+                &[architecture.hidden(), OBSERVATION_CHANNELS],
+            );
+            let projected = graph.matmul(output, projection);
+            assert_eq!(
+                graph.node(projected).ty.shape,
+                [streams * PATCHES, OBSERVATION_CHANNELS]
+            );
+        }
+    }
+
+    #[test]
+    fn tiny_rope_keeps_each_head_and_causal_position_identical() {
+        let architecture = Architecture::Tiny;
+        let (small_cos, small_sin) = rope_tables(architecture);
+        let (large_cos, large_sin) = rope_tables(Architecture::Large);
+        for token in 0..FRAMES * PATCHES {
+            for head in 0..architecture.heads() {
+                for channel in 0..HEAD_DIM {
+                    let small = token * architecture.hidden() + head * HEAD_DIM + channel;
+                    let large = token * HIDDEN + head * HEAD_DIM + channel;
+                    assert_eq!(small_cos[small], large_cos[large]);
+                    assert_eq!(small_sin[small], large_sin[large]);
+                }
+            }
         }
     }
 

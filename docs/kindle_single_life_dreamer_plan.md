@@ -11,7 +11,9 @@ start with the [status dashboard](../STATUS.md).
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
 imagined actor/critic training and causal **LeVJEPA** perception. The current
 303M video frontend is frozen, not end-to-end JEPA training and not DINO. DINO
-remains a historical control, not an automatic fallback.
+remains a historical control, not an automatic fallback. The selected next
+frontend is a separately pretrained **5.49M causal ViT-Tiny/16**; it is not yet
+trained, GPU-qualified or used by a gameplay campaign.
 
 ```text
 previous belief + executed action -> deterministic prior -> predicted features
@@ -53,7 +55,7 @@ Full multi-stream evaluations determine results.
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Assisted seed 0 pilots pass unassisted evaluation; three fresh roots fail: means 24.58/22.78/22.47, only 16/36, 3/36, 5/36 qualifying rounds | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Test exposure, not unchanged failed replicas. | [Successful pilot](../runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4), [failed confirmation](../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-evaluation.mp4) |
-| Breakout | Pilot mean 58.4583 versus .9655 control, but 0/24 two-wall completions | ≥20 completed episodes, ≥90% clear both walls / reach 864 points. Test minimal action vocabulary; retain reward and competence gates. | [Trained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4) |
+| Breakout | Pilot mean 58.4583 versus .9655 control, but 0/24 two-wall completions; new eighteen-action Large reference running | ≥20 completed episodes, ≥90% clear both walls / reach 864 points. Finish active reference; four-action arm held for compact encoder work. | [Trained](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/breakout-untrained-evaluation.mp4) |
 | Qbert | Pilot completes first pyramid in 17/24 episodes, mean 3,754.17; control 0/24, mean 125 | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Test longer exposure and post-bonus coverage. | [Trained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
@@ -66,21 +68,25 @@ The [matched Pong campaign](../runs/pong-block-confirmation-20260916.rBwdGF/comp
 is complete. Together with Boxing this satisfies **two of five** game gates,
 not general Atari competence. Preserve all completed writers and the fixed recipe.
 
-1. Complete the [matched Breakout action-vocabulary pilot](../runs/breakout-action-pilot-20260920.kNeotb/declaration.md):
-   200,004 fresh actions per width, seed zero, with matched frozen and untrained
-   controls. Commands/readers are pinned and eighteen-action training has started;
-   review each phase before individually launching its successor. All gradient/state/initialization/
-   restore and N6 pixel/replay/refusal/memory gates now pass. Optional minimal
-   replay support is retained; full eighteen-action remains the default. This
-   qualifies the comparison, not a better learning recipe. Do not repeat the
-   completed runtime qualification.
-2. Separately test Freeway and Qbert with continuous 400,008-action pilots and
+1. Finish only the active [Breakout Large reference](../runs/breakout-action-pilot-20260920.kNeotb/declaration.md):
+   seed zero, eighteen actions, 200,004 fresh interactions, frozen evaluation,
+   fresh initialization and frozen untrained control. Review each phase before
+   individually launching its successor. The [four-action hold](../runs/breakout-action-pilot-20260920.kNeotb/a4-train/HOLD.md)
+   supersedes the unstarted half of the original pilot; do not remove it or
+   claim a complete two-width comparison. All existing runtime checks and fixed
+   inputs remain valid. No repeated qualification for unchanged binaries.
+2. Pretrain and qualify the compact causal-video JEPA encoder below. Keep native
+   training/inference, the 12M RSSM and existing feature contract. First compare
+   the complete pretrained Tiny package with Large at matched game budgets,
+   replay ratio and action vocabulary; measure both learning and elapsed time.
+3. Then separately test Freeway and Qbert with continuous 400,008-action pilots and
    retained 200,004-action midpoints. Prefer runner-owned numbered saves, not a
    watcher. The staged history option needs bounded default/history/restore
    checks. Keep Freeway's probability .5 / hold64 training assistance and 75,000
    unassisted frozen actions; Qbert remains unassisted with four episodes per
    stream and cap 600,000. Midpoint/final are one history, not independent roots.
-3. Confirm successful changed recipes on all three fresh roots with controls.
+4. Revisit Breakout's prepared four-action comparison if still needed. Confirm
+   successful changed recipes on all three fresh roots with controls.
    Do not replicate failures merely to keep the device occupied.
 
 Pong's fixed recipe is N6, 12M/F32, B16×T64, full BPTT64, world microbatch 16,
@@ -104,7 +110,7 @@ compact evidence for decisions. Test coverage is not cruft merely because it
 is larger than the implementation it protects.
 
 This implementation also tests a costly departure from vanilla Dreamer: a frozen
-303M video encoder beside the 12M learner. Selected ratio 256 consumes about
+303M video encoder beside the nominal 12M learner. Selected ratio 256 consumes about
 102 million replay positions during a 400k-action run. Repeated learning and
 frontend cost must earn their place through sample-efficiency comparisons.
 
@@ -114,8 +120,8 @@ exact full-state/action parity. Root 2017's 400,008-action training takes **10.9
 Wall time is 65.6% learning, 33.7% observing and .45% emulator stepping. These
 stage wall times are not GPU utilization or calibrated idle intervals.
 
-Keep the active recipe fixed. Next, prioritize a matched replay-ratio ablation
-and cheaper representation control before a larger model or more orchestration.
+Keep the active recipe fixed. The user-selected next change is the compact
+causal encoder, followed separately by a matched replay-ratio ablation.
 Historical R64 Boxing exceeds aggregate real time, but has only one successful
 root and less score margin; it is not an adopted replacement. Retain AGC/full
 recurrence unless an ablation supports changing them. Reconstruction/future
@@ -126,6 +132,39 @@ Uncapped step-driven playing/learning is supported; current R256 training is not
 super-real-time. Free-running native gameplay without time control is required
 but not validated by Atari. Measure arrival order, observation gaps, executed
 action durations and training debt before introducing concurrency.
+
+### Right-size the causal encoder
+
+The [checkpoint accounting](../runs/model-sizing-20260920.kPIOWC/README.md)
+finds **303,099,904** frontend parameters, **5,921,280** RSSM dynamics/prior/
+posterior parameters and **10,281,233** optimizer-owned world+behavior parameters.
+Our deterministic width 2048, hidden width 256 and 32×16 categorical state match
+[DreamerV3's 12M preset](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml).
+Its size labels refer to whole-agent presets, not RSSM counts. The disproportionate
+component is the frontend, not an undersized accidental RSSM configuration.
+
+Use **ViT-Tiny/16: 12 layers, width 192, three heads, MLP 768**, totaling
+**5,486,592** encoder parameters. Preserve 224px inputs, 16-frame block-causal
+chunks, independent stream histories and JL64/2×2 pooling to 7×7×64. Logical F32
+KV storage falls from 588 to 55.125 MiB per stream (330.75 MiB for N6); these are
+tensor sizes, not measured device peaks. Keep RSSM capacity and R256 fixed first.
+Do not slice Large weights, substitute DINO/RGB or claim proportional speedup.
+
+Tiny requires its own self-supervised video pretraining. Use the original
+LeVJEPA multi-view invariance + SIGReg objective with causal token dropping and
+an evaluation EMA, not an undisclosed teacher-distillation substitute. Declare
+the corpus, train/held-out split, frame sampling, views, step budget, projector,
+normalization and exported weight identity before training. Preserve original
+token positions in masks/RoPE; patches cannot read the CLS sink or future frames.
+Train on Meganeura/Blade; Python may prepare video batches and reference checks.
+
+The [upstream recipe](https://github.com/MLO-lab/LeVJEPA) demonstrates Tiny
+pretraining on unlabeled video; the inspected official released checkpoint is
+Large. Native Tiny graph/shape checks currently pass; pretraining and GPU checks
+remain. Gate adoption on numerical/causal and streaming/reset checks, held-out
+feature variance/quality, measured N6 memory/time and frozen downstream learning
+against its untrained control. Report all offline experience. If Tiny and Large
+use different corpora, compare pretrained packages, not a pure size ablation.
 
 ## World-model evaluation and pretraining
 
