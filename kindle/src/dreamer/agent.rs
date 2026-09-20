@@ -2426,11 +2426,30 @@ mod tests {
         .unwrap();
         let weights = directory.join("wrong-weights.safetensors");
         fs::write(&weights, b"not the pinned encoder").unwrap();
-        let error = DreamerAgent::restore(&directory, weights, None)
+        let error = DreamerAgent::restore(&directory, &weights, None)
             .err()
             .expect("different encoder must be rejected");
-        fs::remove_dir_all(directory).unwrap();
         assert!(error.to_string().contains("perception checkpoint SHA-256"));
+        for kind in [PerceptionKind::LeVJepa, PerceptionKind::LeVJepaTiny] {
+            let mut metadata = valid_checkpoint_metadata();
+            metadata.perception = Some(kind.identity("1".repeat(64)));
+            fs::write(
+                directory.join(CHECKPOINT_METADATA),
+                serde_json::to_vec(&metadata).unwrap(),
+            )
+            .unwrap();
+            for error in [
+                DreamerAgent::restore(&directory, &weights, None)
+                    .err()
+                    .unwrap(),
+                crate::VectorDreamerAgent::restore(&directory, 6, &weights)
+                    .err()
+                    .unwrap(),
+            ] {
+                assert!(error.to_string().contains("perception checkpoint SHA-256"));
+            }
+        }
+        fs::remove_dir_all(directory).unwrap();
     }
 
     #[test]
