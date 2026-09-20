@@ -71,6 +71,13 @@ The vector runner uses LeVJEPA. On multi-adapter hosts, set `MEGANEURA_DEVICE_ID
 and check the reported executing device. Current experiments require the exact
 declared source-matched package; a checkout is not the identity of an old binary.
 
+The compact causal-video encoder is **ViT-Tiny/16, 5.49M parameters**. Opt in with
+`encoder="levjepa-tiny"` in Python agents or `--encoder levjepa-tiny` in the vector
+runner, using an exported Tiny checkpoint—not the Large weights. Restore selects
+the recorded architecture and verifies the weight hash. Large remains the fresh
+default. Native pretraining and the first candidate's results are linked from
+[STATUS.md](STATUS.md); mixed motion-probe results still require downstream testing.
+
 ## Acting, learning and evaluation
 
 Native agents expose `begin_episode`, `act`, `observe` and `learn_scheduled`.

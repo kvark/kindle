@@ -41,6 +41,8 @@ def require_gpu_budget(snapshot, minimum_bytes):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
+                        help="fresh default: levjepa Large; restore default: recorded checkpoint kind")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)
@@ -99,6 +101,10 @@ def main():
         parser.error("GPU memory output must be a fresh path")
     if args.exploration_probability and "action_overrides" not in inspect.signature(kindle.VectorAgent.act).parameters:
         parser.error("persistent exploration requires native vector action overrides")
+    if args.restore and args.encoder:
+        metadata = json.loads((args.restore / "metadata.json").read_text())
+        if (metadata.get("perception") or {}).get("kind") != args.encoder:
+            parser.error("encoder selection differs from restored checkpoint")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
@@ -153,7 +159,8 @@ def main():
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
         agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
-                 if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config))
+                 if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
+                     **(dict(encoder=args.encoder) if args.encoder else {})))
         if agent.config["action_count"] != actions:
             raise ValueError("checkpoint action vocabulary differs from environment")
         construction = time.perf_counter() - construction

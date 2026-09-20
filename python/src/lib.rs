@@ -6,7 +6,7 @@ use std::path::Path;
 
 use kindle::vision::{
     DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
-    levjepa::LeVJepaPerception,
+    levjepa::{Architecture, LeVJepaPerception},
 };
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
@@ -37,12 +37,45 @@ struct PyLeVJepaPerception {
 #[pymethods]
 impl PyLeVJepaPerception {
     #[new]
-    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None))]
-    fn new(encoder_checkpoint: &str, encoder_plan_cache: Option<&str>) -> PyResult<Self> {
-        let inner =
-            LeVJepaPerception::load(encoder_checkpoint, None, encoder_plan_cache.map(Path::new))
-                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "large"))]
+    fn new(
+        encoder_checkpoint: &str,
+        encoder_plan_cache: Option<&str>,
+        architecture: &str,
+    ) -> PyResult<Self> {
+        let architecture = match architecture {
+            "tiny" => Architecture::Tiny,
+            "large" => Architecture::Large,
+            _ => {
+                return Err(PyValueError::new_err(
+                    "LeVJEPA architecture must be tiny or large",
+                ));
+            }
+        };
+        let inner = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
+            encoder_checkpoint,
+            1,
+            None,
+            encoder_plan_cache.map(Path::new),
+        )
+        .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
+    }
+
+    #[getter]
+    fn architecture(&self) -> &'static str {
+        self.inner.architecture().name()
+    }
+
+    #[getter]
+    fn encoding_revision(&self) -> &'static str {
+        self.inner.architecture().encoding_revision()
+    }
+
+    #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_memory_budget())
     }
 
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
@@ -552,7 +585,10 @@ fn parse_perception_kind(value: &str) -> PyResult<PerceptionKind> {
     match value {
         "dinov3" => Ok(PerceptionKind::DinoV3),
         "levjepa" => Ok(PerceptionKind::LeVJepa),
-        _ => Err(PyValueError::new_err("encoder must be dinov3 or levjepa")),
+        "levjepa-tiny" => Ok(PerceptionKind::LeVJepaTiny),
+        _ => Err(PyValueError::new_err(
+            "encoder must be dinov3 or levjepa or levjepa-tiny",
+        )),
     }
 }
 

@@ -332,13 +332,26 @@ impl VectorDreamerAgent {
         streams: usize,
         encoder_checkpoint: impl AsRef<Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
+        Self::with_perception(config, streams, PerceptionKind::LeVJepa, encoder_checkpoint)
+    }
+
+    pub fn with_perception(
+        config: DreamerConfig,
+        streams: usize,
+        kind: PerceptionKind,
+        encoder_checkpoint: impl AsRef<Path>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
-        let identity = PerceptionKind::LeVJepa.identity(crate::vision::checkpoint_sha256(
+        let architecture = kind
+            .levjepa_architecture()
+            .ok_or("vector perception requires LeVJEPA")?;
+        let identity = kind.identity(crate::vision::checkpoint_sha256(
             encoder_checkpoint.as_ref(),
         )?);
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched(
+        let perception = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
             encoder_checkpoint,
             streams,
             Some(Arc::clone(&gpu)),
@@ -366,12 +379,14 @@ impl VectorDreamerAgent {
             .perception
             .as_ref()
             .ok_or("missing perception identity")?;
-        if identity.kind != PerceptionKind::LeVJepa {
-            return Err("vector perception requires LeVJEPA".into());
-        }
+        let architecture = identity
+            .kind
+            .levjepa_architecture()
+            .ok_or("vector perception requires LeVJEPA")?;
         identity.verify_file(encoder_checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched(
+        let perception = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
             encoder_checkpoint,
             streams,
             Some(Arc::clone(&gpu)),
