@@ -93,7 +93,7 @@ def score_tasks(environment, episodes):
 
 def check_replay(evaluation, replay):
     header = evaluation['start']
-    require(replay['protocol'] == 'kindle-atari-task-replay-v1', 'unsupported replay protocol')
+    require(replay['protocol'] == replay_atari.replay_protocol(header), 'unsupported replay protocol')
     require(Path(replay['source_log']).resolve() == Path(evaluation['path']).resolve()
             and replay['source_log_sha256'] == evaluation['sha256']
             and replay['source_header'] == header

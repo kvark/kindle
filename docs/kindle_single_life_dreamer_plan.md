@@ -66,11 +66,14 @@ The [matched Pong campaign](../runs/pong-block-confirmation-20260916.rBwdGF/comp
 is complete. Together with Boxing this satisfies **two of five** game gates,
 not general Atari competence. Preserve all completed writers and the fixed recipe.
 
-1. Finish qualifying the prepared Breakout four-action adapter against the same
-   eighteen-action runtime. Gradient and same-width complete-state checks pass;
-   zero-update initialization/restore, N6 pixels, replay and memory remain. Then
-   declare a matched learning pilot changing only action vocabulary. Do not
-   repeat old backend qualification unchanged.
+1. Complete the [matched Breakout action-vocabulary pilot](../runs/breakout-action-pilot-20260920.kNeotb/declaration.md):
+   200,004 fresh actions per width, seed zero, with matched frozen and untrained
+   controls. Commands/readers are pinned and eighteen-action training has started;
+   review each phase before individually launching its successor. All gradient/state/initialization/
+   restore and N6 pixel/replay/refusal/memory gates now pass. Optional minimal
+   replay support is retained; full eighteen-action remains the default. This
+   qualifies the comparison, not a better learning recipe. Do not repeat the
+   completed runtime qualification.
 2. Separately test Freeway and Qbert with continuous 400,008-action pilots and
    retained 200,004-action midpoints. Prefer runner-owned numbered saves, not a
    watcher. The staged history option needs bounded default/history/restore

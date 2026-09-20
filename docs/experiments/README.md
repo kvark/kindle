@@ -42,8 +42,17 @@ Breakout's [four-test gradient group](../../runs/breakout-gradients-20260920.dtz
 passes both world/behavior tests at eighteen/four actions. The
 [twelve complete-state canaries](../../runs/breakout-state-20260920.iuGWoA/results.md)
 also pass: all six same-width pairs, six retained-anchor comparisons and four
-fresh-process repeats are exact. Zero-update initialization/restore and pixel
-qualification remain; the [status dashboard](../../STATUS.md) tracks current work.
+fresh-process repeats are exact. [Zero-update initialization and restore](../../runs/breakout-initial-completion-20260920.DAvUch/results.md)
+also pass at both widths, with exact common parameters and moments. The separate
+reader preserves an original serialized-header hash failure without repeating
+native work. The [eight-phase pixel integration](../../runs/breakout-pixels-20260920.YrLIfy/results.md)
+also passes, including complete six-stream replays, frozen state, valid incomplete
+caps and both vocabulary refusals. Main's five replay/schema/test files match the
+qualified adapter, with 742 CPU tests passing and no native rebuild. These are
+runtime results, not evidence that four actions learn better. The
+[paired learning pilot](../../runs/breakout-action-pilot-20260920.kNeotb/declaration.md)
+is declared with nine CPU checks and 105 input pins; the
+[status dashboard](../../STATUS.md) tracks its active phase and later results.
 The [CPU readiness review](../../runs/breakout-current-readiness-20260919.ntvDer/README.md)
 locates the existing source-matched fixtures and evidence; it is not a GPU result.
 Future experiments should use bounded diagnostics and compact records, without
