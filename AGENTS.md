@@ -13,6 +13,9 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   work, active phase, next actions, results and known limitations. Update it at
   meaningful phase boundaries, not every poll. Keep detailed gates in the plan
   and raw chronology in runs; link the dashboard prominently from README.
+  Distinguish prepared, running and completed experiments; distinguish runtime
+  correctness from gameplay success. State the next decision and keep measured
+  bottlenecks separate from untested explanations.
 - Prioritize a reliable single actor: Atari, accelerated playing plus learning,
   video/world pretraining, mind-games vkQuake2/TMNF, GOG/Wine, then held-out
   cross-game adaptation and retention. Strong GOG/transfer results precede swarms.
@@ -59,9 +62,23 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   world/behavior gradient checks at eighteen/four actions. The twelve canaries in
   `runs/breakout-state-20260920.iuGWoA` also pass: all six same-width pairs,
   retained eighteen-action anchors and fresh-process repeats are exact. Preserve
-  both terminal groups; zero-update/common-shape initialization, restore/schema
-  and N6 pixel/replay/episode/memory gates still precede learning.
-  Prepared branches are not adopted features.
+  both terminal groups. Zero-update/common-shape initialization and restore also
+  pass in `runs/breakout-initial-completion-20260920.DAvUch`: all shared parameters
+  and moments are exact. Preserve ARoQmX's original serialized-hash reader failure;
+  the separate completion verifies identical parsed headers and payload bytes
+  without repeating native work. Both groups are terminal; use only completion
+  `audit 18`/`audit 4`. All eight N6 pixel/replay/episode/memory and vocabulary-
+  refusal checks in `runs/breakout-pixels-20260920.YrLIfy` now pass; preserve all
+  terminal writers and use only its `audit NAME` readers. The five replay/schema/
+  test files are adopted byte-identically from 8092790, with 742 passing main CPU
+  tests; native and default full-action behavior are unchanged. The minimal-action
+  learning recipe is not proven better. The paired seed-zero, 200,004-action-per-
+  width pilot in `runs/breakout-action-pilot-20260920.kNeotb` passes nine CPU checks
+  and binds 105 inputs. Its eighteen-action training is running; review its
+  complete result before frozen evaluation, fresh untrained control and the
+  four-action arm. Preparation is terminal. Keep controls, videos and the two-wall
+  gate; `audit NAME`, `pair WIDTH` and `summary` are read-only. Do not repeat the
+  memory-heavy allocation-plan qualification on this unchanged runtime.
 - Preserve completed/failed `runs/` writers, source worktrees, packages and
   artifacts. Only documented audit modes are reusable. Correct reader failures
   separately; never overwrite failed evidence or rerun native work to repair it.
