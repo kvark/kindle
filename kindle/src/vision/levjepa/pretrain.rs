@@ -10,14 +10,16 @@ use std::collections::BTreeMap;
 
 use meganeura::{Graph, NodeId};
 
-use super::{
-    Architecture, FRAMES, GRID, HEAD_DIM, PATCH_DIM, gelu_erf, rope, rope_tables_for_grid,
-};
+mod trainer;
+pub use trainer::{Batch, Metrics, Trainer, TrainingConfig};
+
+use super::{Architecture, FRAMES, GRID, HEAD_DIM, PATCH_DIM, rope, rope_tables_for_grid};
 
 const ARCHITECTURE: Architecture = Architecture::Tiny;
 const KNOTS: usize = 17;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Config {
     pub batch: usize,
     pub local_views: usize,
@@ -245,7 +247,7 @@ fn encode(g: &mut Graph, weights: &Weights, prefix: &str, view: View) -> NodeId 
         x = g.add(x, output);
         let normalized = norm(g, x, weights, &format!("{name}.norm2"));
         let hidden = dense(g, normalized, weights, &format!("{name}.mlp.fc1"));
-        let hidden = gelu_erf(g, hidden);
+        let hidden = g.gelu_erf(hidden);
         let output = dense(g, hidden, weights, &format!("{name}.mlp.fc2"));
         x = g.add(x, output);
     }
@@ -268,7 +270,7 @@ fn projector(g: &mut Graph, cls: NodeId, config: Config) -> NodeId {
     let bias = g.parameter("projector.norm.bias", &[hidden]);
     let x = g.bias_mul(x, weight);
     let x = g.bias_add(x, bias);
-    let x = gelu_erf(g, x);
+    let x = g.gelu_erf(x);
     super::linear(g, x, "projector.fc2", hidden, config.projector_output)
 }
 
@@ -358,6 +360,219 @@ pub fn graph(config: Config) -> Result<Graph, &'static str> {
 mod tests {
     use super::*;
     use meganeura::graph::Op;
+
+    struct Reference {
+        graph: Graph,
+        tensors: meganeura::data::safetensors::SafeTensorsModel,
+        positions: Vec<(String, Vec<u32>)>,
+    }
+
+    impl Reference {
+        fn load() -> Self {
+            use sha2::{Digest, Sha256};
+            let root = std::path::PathBuf::from(
+                std::env::var_os("KINDLE_TINY_REFERENCE").expect("reference directory required"),
+            );
+            let manifest: serde_json::Value =
+                serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap())
+                    .unwrap();
+            let bytes = std::fs::read(root.join("reference.safetensors")).unwrap();
+            assert_eq!(
+                format!("{:x}", Sha256::digest(&bytes)),
+                manifest["tensors_sha256"].as_str().unwrap()
+            );
+            assert_eq!(
+                format!(
+                    "{:x}",
+                    Sha256::digest(include_bytes!(
+                        "../../../../python/examples/levjepa_tiny_reference.py"
+                    ))
+                ),
+                manifest["generator_sha256"].as_str().unwrap()
+            );
+            let config: Config = serde_json::from_value(manifest["config"].clone()).unwrap();
+            assert_eq!(
+                (config.batch, config.local_views, config.directions),
+                (3, 2, 7)
+            );
+            let graph = graph(config).unwrap();
+            let tensors =
+                meganeura::data::safetensors::SafeTensorsModel::from_bytes(bytes).unwrap();
+            let mut positions = Vec::new();
+            for (name, view) in [("global", config.global()), ("local", config.local())] {
+                let ids: Vec<u32> =
+                    serde_json::from_value(manifest["patch_ids"][name].clone()).unwrap();
+                let (ids, mask) = view.attention_inputs(&ids).unwrap();
+                assert_eq!(mask, tensors.tensor_f32(&format!("{name}.mask")).unwrap());
+                positions.push((format!("{name}.positions"), ids));
+            }
+            let mut parameters = 0;
+            for node in graph.nodes() {
+                let names = match &node.op {
+                    Op::Parameter { name } => {
+                        parameters += 1;
+                        vec![format!("weight.{name}"), format!("gradient.{name}")]
+                    }
+                    Op::Input { name } if !name.ends_with(".positions") => vec![name.clone()],
+                    _ => continue,
+                };
+                for name in names {
+                    assert_eq!(tensors.tensor_info()[&name].shape, node.ty.shape, "{name}");
+                    let data = tensors.tensor_f32(&name).unwrap();
+                    if !name.ends_with(".mask") {
+                        assert!(data.iter().all(|v| v.is_finite()), "{name}");
+                    }
+                }
+            }
+            assert_eq!(parameters, 155);
+            for (index, name) in ["loss", "invariance", "sigreg", "embeddings"]
+                .into_iter()
+                .enumerate()
+            {
+                let expected = tensors.tensor_f32(&format!("expected.{name}")).unwrap();
+                assert_eq!(
+                    expected.len(),
+                    graph.node(graph.outputs()[index]).ty.num_elements()
+                );
+                assert!(expected.iter().all(|v| v.is_finite()));
+            }
+            Self {
+                graph,
+                tensors,
+                positions,
+            }
+        }
+    }
+
+    fn compare_reference(name: &str, actual: &[f32], expected: &[f32]) {
+        assert_eq!(actual.len(), expected.len(), "{name}");
+        let (mut error_sq, mut reference_sq, mut max_error, mut max_reference) =
+            (0.0_f64, 0.0_f64, 0.0_f64, 0.0_f64);
+        for (&a, &b) in actual.iter().zip(expected) {
+            assert!(a.is_finite() && b.is_finite(), "{name}: non-finite value");
+            let error = (f64::from(a) - f64::from(b)).abs();
+            error_sq += error * error;
+            reference_sq += f64::from(b).powi(2);
+            max_error = max_error.max(error);
+            max_reference = max_reference.max(f64::from(b).abs());
+        }
+        // Fixed before GPU execution, also written in the CPU fixture manifest.
+        assert!(
+            error_sq.sqrt() <= 0.003 * reference_sq.sqrt() + 1e-5 * (actual.len() as f64).sqrt(),
+            "{name}: L2 error {} / {}",
+            error_sq.sqrt(),
+            reference_sq.sqrt()
+        );
+        assert!(
+            max_error <= 0.01 * max_reference + 3e-5,
+            "{name}: max error {max_error} / {max_reference}"
+        );
+        eprintln!(
+            "tiny_reference {name}: l2_error={} reference_l2={} max_error={max_error}",
+            error_sq.sqrt(),
+            reference_sq.sqrt()
+        );
+    }
+
+    #[test]
+    #[ignore = "requires KINDLE_TINY_REFERENCE fixture; CPU only"]
+    fn cpu_reference_fixture_is_complete() {
+        Reference::load();
+    }
+
+    #[test]
+    #[ignore = "requires separately declared exclusive GPU and CPU reference fixture"]
+    fn native_losses_and_all_gradients_match_independent_reference() {
+        let reference = Reference::load(); // all fixture checks precede GPU access
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let (mut session, _) = meganeura::build(
+            &reference.graph,
+            meganeura::SessionConfig {
+                runtime: meganeura::runtime::SessionOptions {
+                    coop: meganeura::runtime::CoopPolicy::Disabled,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        );
+        let device = session.device_information();
+        assert_eq!(device.device_name, "NVIDIA GeForce RTX 5080");
+        assert_eq!(device.driver_name, "NVIDIA");
+        assert_eq!(device.driver_info, "580.178.04");
+        assert!(!device.is_software_emulated);
+        let check_memory = |session: &meganeura::Session| {
+            let memory = session
+                .device_memory_stats()
+                .expect("Vulkan memory budget required");
+            assert!(
+                memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 * 1024 * 1024 * 1024
+            );
+            eprintln!(
+                "tiny_reference Vulkan estimated usage={} budget={}",
+                memory.usage_bytes, memory.budget_bytes
+            );
+        };
+        check_memory(&session);
+        for node in reference.graph.nodes() {
+            match &node.op {
+                Op::Parameter { name } => session.set_parameter(
+                    name,
+                    &reference
+                        .tensors
+                        .tensor_f32(&format!("weight.{name}"))
+                        .unwrap(),
+                ),
+                Op::Input { name } if !name.ends_with(".positions") => {
+                    session.set_input(name, &reference.tensors.tensor_f32(name).unwrap())
+                }
+                _ => (),
+            }
+        }
+        for (name, ids) in &reference.positions {
+            session.set_input_u32(name, ids);
+        }
+        // Compute backward without updating weights or creating Adam moments.
+        session.set_learning_rate(0.0);
+        session.step();
+        session.wait();
+        check_memory(&session);
+        for (index, name) in ["loss", "invariance", "sigreg", "embeddings"]
+            .into_iter()
+            .enumerate()
+        {
+            let expected = reference
+                .tensors
+                .tensor_f32(&format!("expected.{name}"))
+                .unwrap();
+            let mut actual = vec![0.0; expected.len()];
+            session.read_output_by_index(index, &mut actual);
+            compare_reference(name, &actual, &expected);
+        }
+        let mut gradients = 0;
+        for node in reference.graph.nodes() {
+            if let Op::Parameter { name } = &node.op {
+                let expected = reference
+                    .tensors
+                    .tensor_f32(&format!("gradient.{name}"))
+                    .unwrap();
+                let mut actual = vec![0.0; expected.len()];
+                session.read_param_grad(name, &mut actual);
+                compare_reference(name, &actual, &expected);
+                session.read_param(name, &mut actual);
+                assert_eq!(
+                    actual,
+                    reference
+                        .tensors
+                        .tensor_f32(&format!("weight.{name}"))
+                        .unwrap()
+                );
+                gradients += 1;
+            }
+        }
+        assert_eq!(gradients, 155);
+        check_memory(&session);
+    }
 
     #[test]
     fn default_views_keep_original_video_grid_and_declared_token_drop() {

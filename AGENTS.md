@@ -49,13 +49,23 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current work
 
-- This is the CPU-only Tiny pretraining staging branch, not the active package.
-  Meganeura `723b6c6f` carries current upstream `71c202cb` plus sine/cosine and
-  scalar gradient broadcasts; Blade is `eaff5092`. The native training graph
-  exists, but the data/optimizer/export loop and GPU numerical checks do not.
+- This is the unqualified Tiny pretraining staging branch, not the active package.
+  Meganeura `f2af861d` carries current upstream `71c202cb` plus sine/cosine,
+  scalar gradient broadcasts, shared CPU dispatch planning and register-local
+  erf GELU/backward; Blade is `eaff5092`. Native graph, AdamW, GPU EMA,
+  complete-state save/restore and encoder export are implemented. Independent
+  CPU losses/gradients and a guarded-GPU test are prepared. Video adapter/data
+  declaration, GPU numerics, restore equivalence and streaming checks remain.
+  The B128/V4 CPU plan falls from 25.3 to 9.4 GiB including Adam; driver/staging/
+  EMA allocations are extra. This is not measured VRAM or throughput.
   No pretraining run or trained Tiny checkpoint is declared by this branch.
   Active Large work continues only through its immutable package in the main
   workspace. See `/x/Code/kindle/runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md`.
+  The ~22:49 UTC module-filter mistake created shader pipelines during Large
+  Breakout (no model execution); see that directory's `test-selection-20260920.md`.
+  The process exited; host-only checks found no kernel fault. Preserve the
+  deviation and do not use the overlap as uncontended timing. The upstream
+  GPU-only library test is now explicitly ignored; use exact reviewed CPU names.
 - Qualified block runtime: native `886bae68`, Meganeura `589d73ab`, Blade
   `2accfeee`; immutable episode adapter `8dc0b98`. Block products improved fixed-
   recipe throughput by 27.3%. Source cleanup does not rebuild or relabel it.

@@ -1082,6 +1082,7 @@ dependencies = [
  "meganeura",
  "rand",
  "rayon",
+ "safetensors",
  "serde",
  "serde_json",
  "sha2",
@@ -1157,7 +1158,7 @@ dependencies = [
 [[package]]
 name = "meganeura"
 version = "0.3.0"
-source = "git+https://github.com/kvark/meganeura?rev=723b6c6f4a6d675e99ff8e11f20675c9ae52f931#723b6c6f4a6d675e99ff8e11f20675c9ae52f931"
+source = "git+https://github.com/kvark/meganeura?rev=f2af861dfd3b9af760534241f80d1cd0e6e44cb4#f2af861dfd3b9af760534241f80d1cd0e6e44cb4"
 dependencies = [
  "blade-graphics",
  "blade-macros",
