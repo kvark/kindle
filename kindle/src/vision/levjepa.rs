@@ -41,6 +41,20 @@ pub enum Architecture {
 }
 
 impl Architecture {
+    pub const fn name(self) -> &'static str {
+        match self {
+            Self::Tiny => "tiny",
+            Self::Large => "large",
+        }
+    }
+
+    pub const fn encoding_revision(self) -> &'static str {
+        match self {
+            Self::Tiny => "levjepa-tiny-f32-chunk16-letterbox224-jl64-pool2-v1",
+            Self::Large => ENCODING_REV,
+        }
+    }
+
     pub const fn hidden(self) -> usize {
         match self {
             Self::Tiny => 192,
@@ -80,6 +94,10 @@ pub struct LeVJepaPerception {
 }
 
 impl LeVJepaPerception {
+    pub fn architecture(&self) -> Architecture {
+        self.architecture
+    }
+
     pub fn load(
         checkpoint: impl AsRef<Path>,
         gpu: Option<Arc<blade_graphics::Context>>,
@@ -647,6 +665,9 @@ mod tests {
     #[test]
     fn tiny_size_is_independent_and_keeps_the_observation_contract() {
         let architecture = Architecture::Tiny;
+        assert_eq!(architecture.name(), "tiny");
+        assert_ne!(architecture.encoding_revision(), ENCODING_REV);
+        assert_eq!(Architecture::Large.encoding_revision(), ENCODING_REV);
         assert_eq!(
             (
                 architecture.hidden(),

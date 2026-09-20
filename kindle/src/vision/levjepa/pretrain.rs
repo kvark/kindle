@@ -361,14 +361,14 @@ mod tests {
     use super::*;
     use meganeura::graph::Op;
 
-    struct Reference {
-        graph: Graph,
-        tensors: meganeura::data::safetensors::SafeTensorsModel,
+    pub(super) struct Reference {
+        pub(super) graph: Graph,
+        pub(super) tensors: meganeura::data::safetensors::SafeTensorsModel,
         positions: Vec<(String, Vec<u32>)>,
     }
 
     impl Reference {
-        fn load() -> Self {
+        pub(super) fn load() -> Self {
             use sha2::{Digest, Sha256};
             let root = std::path::PathBuf::from(
                 std::env::var_os("KINDLE_TINY_REFERENCE").expect("reference directory required"),

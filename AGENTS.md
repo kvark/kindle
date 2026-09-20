@@ -50,12 +50,19 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 ## Current work
 
 - This is the unqualified Tiny pretraining staging branch, not the active package.
-  Meganeura `f2af861d` carries current upstream `71c202cb` plus sine/cosine,
+  Meganeura `cc5fea74` carries current upstream `dbb43648` plus sine/cosine,
   scalar gradient broadcasts, shared CPU dispatch planning and register-local
   erf GELU/backward; Blade is `eaff5092`. Native graph, AdamW, GPU EMA,
   complete-state save/restore and encoder export are implemented. Independent
-  CPU losses/gradients and a guarded-GPU test are prepared. Video adapter/data
-  declaration, GPU numerics, restore equivalence and streaming checks remain.
+  CPU losses/gradients and guarded numerical/Adam/EMA/restore/export tests are
+  prepared. The borrowed-array Python API and deterministic video adapter have
+  CPU checks; explicit Tiny standalone loading/probing is not agent adoption.
+  A fresh random-policy five-game corpus completes in
+  `/x/Code/kindle/runs/levjepa-tiny-atari-corpus-20260920.oTjdon`: 250,000 RGB64
+  observations, 999,112 emulator frames, whole-recording train/validation split.
+  B128/V4 batch preparation measures 0.82–0.93 seconds on one CPU. Count this
+  additional offline experience in downstream comparisons. Native numerics,
+  restore equivalence, streaming checks and actual pretraining remain.
   The B128/V4 CPU plan falls from 25.3 to 9.4 GiB including Adam; driver/staging/
   EMA allocations are extra. This is not measured VRAM or throughput.
   No pretraining run or trained Tiny checkpoint is declared by this branch.
@@ -153,5 +160,5 @@ the native guard or authorize automatic successors.
 Preserve unrelated user work. Only the user merges PRs; commits/pushes are allowed.
 Keep history linear. Use one CPU, 2 GiB and zero swap for heavy CPU preparation,
 with private targets/packages; do not compile during matched timings. Meganeura
-has an unignored GPU library test: CPU-only checks require reviewed module filters.
+has historically included unignored GPU library tests: use reviewed CPU filters.
 Use relevant tests, formatting, Clippy and native numerical checks.

@@ -318,6 +318,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("encoder_checkpoint")
     parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default="dinov3")
+    parser.add_argument("--levjepa-architecture", choices=("large", "tiny"), default="large")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--samples-per-seed", type=int, default=512)
     parser.add_argument("--seeds", type=int, nargs=4, default=(0, 1, 2, 3))
@@ -335,8 +336,11 @@ def main() -> None:
         parser.error("train, validation and test seeds must be distinct")
     if args.environment != "ALE/Pong-v5":
         parser.error("this color/object probe is specific to ALE/Pong-v5")
+    if args.levjepa_architecture == "tiny" and (args.encoder != "levjepa" or args.agent_checkpoint):
+        parser.error("Tiny is currently a standalone LeVJEPA probe, not an adopted agent frontend")
     encoder_type = _native.LeVJepaPerception if args.encoder == "levjepa" else _native.DinoPerception
-    encoder = encoder_type(args.encoder_checkpoint, args.encoder_plan_cache)
+    options = dict(architecture=args.levjepa_architecture) if args.encoder == "levjepa" else {}
+    encoder = encoder_type(args.encoder_checkpoint, args.encoder_plan_cache, **options)
     agent_metadata = None
     if args.agent_checkpoint:
         agent_metadata = json.loads((args.agent_checkpoint / "metadata.json").read_text())
@@ -383,6 +387,8 @@ def main() -> None:
         "encoder": args.encoder,
         "encoder_checkpoint_sha256": sha256_file(args.encoder_checkpoint),
         "encoder_history": "causal nonoverlapping chunks of 16 arrivals" if args.encoder == "levjepa" else "current frame",
+        "encoder_architecture": encoder.architecture if args.encoder == "levjepa" else "dinov3-vits16",
+        "encoding_revision": encoder.encoding_revision if args.encoder == "levjepa" else None,
         "native_extension_sha256": sha256_file(_native.__file__),
         "runner_sha256": sha256_file(__file__),
         "target": "displacement_t_minus_1_to_t" if args.motion else "position_t",

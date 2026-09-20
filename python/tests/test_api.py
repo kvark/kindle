@@ -69,3 +69,23 @@ def test_encoder_selection_is_explicit_and_rejects_typos_before_gpu() -> None:
     assert hasattr(kindle._native.LeVJepaPerception, "next_frame_in_chunk")
     with pytest.raises(ValueError, match="encoder must be dinov3 or levjepa"):
         kindle.Agent("unused", 18, encoder="lev-jepa?")
+
+
+def test_tiny_pretraining_refuses_invalid_inputs_before_gpu(tmp_path) -> None:
+    import json
+    import pytest
+
+    with pytest.raises(ValueError):
+        kindle.LeVJepaTrainer("{}")
+    config = dict(model=dict(batch=1, local_views=4, projector_hidden=1024,
+                             projector_output=128, directions=1024),
+                  seed=7, steps=100, warmup_steps=10, learning_rate=1e-4,
+                  weight_decay=0.04, ema_decay=0.999)
+    with pytest.raises(ValueError, match="batch"):
+        kindle.LeVJepaTrainer(json.dumps(config))
+    with pytest.raises(RuntimeError):
+        kindle.LeVJepaTrainer.restore(str(tmp_path))
+    with pytest.raises(ValueError, match="architecture"):
+        kindle._native.LeVJepaPerception("unused", architecture="tiny-ish")
+    with pytest.raises(RuntimeError):
+        kindle._native.LeVJepaPerception("unused", architecture="tiny")

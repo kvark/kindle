@@ -203,9 +203,16 @@ fn check_saved_tensors(
 
 impl Trainer {
     /// Builds native sessions; call only inside a declared direct-process GPU guard.
-    pub fn new(config: TrainingConfig, gpu: Arc<blade_graphics::Context>) -> Result<Self, Error> {
+    pub fn new(
+        config: TrainingConfig,
+        gpu: Option<Arc<blade_graphics::Context>>,
+    ) -> Result<Self, Error> {
         config.validate()?;
         let model = graph(config.model)?;
+        let gpu = match gpu {
+            Some(gpu) => gpu,
+            None => Arc::new(crate::init_gpu_context()?),
+        };
         let options = || SessionOptions {
             coop: CoopPolicy::Disabled,
             ..Default::default()
@@ -342,6 +349,14 @@ impl Trainer {
         crate::gpu_device_info(self.session.device_information())
     }
 
+    pub fn config(&self) -> TrainingConfig {
+        self.config
+    }
+
+    pub fn completed_steps(&self) -> u32 {
+        self.step
+    }
+
     /// Export only the averaged encoder, in the Tiny loader's published tensor
     /// layout. No projector, optimizer moments or live perception caches.
     pub fn export_encoder(&mut self, path: &Path) -> Result<(), Error> {
@@ -388,7 +403,10 @@ impl Trainer {
 
     /// Restore all 155 parameters, 310 moments, EMA and step counter. External
     /// batch selection must resume at the same declared seed/step separately.
-    pub fn restore(directory: &Path, gpu: Arc<blade_graphics::Context>) -> Result<Self, Error> {
+    pub fn restore(
+        directory: &Path,
+        gpu: Option<Arc<blade_graphics::Context>>,
+    ) -> Result<Self, Error> {
         let metadata: serde_json::Value =
             serde_json::from_slice(&std::fs::read(directory.join("training.json"))?)?;
         if metadata["format"] != 1
@@ -484,6 +502,157 @@ impl Trainer {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires separately declared exclusive GPU and numerical reference"]
+    fn adam_ema_export_and_complete_restore_continuation() {
+        use meganeura::data::safetensors::SafeTensorsModel;
+        let reference = super::super::tests::Reference::load();
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let root = std::path::PathBuf::from(std::env::var_os("KINDLE_TINY_CANARY_OUTPUT").unwrap());
+        std::fs::create_dir(&root).unwrap();
+        let manifest: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(
+                std::path::PathBuf::from(std::env::var_os("KINDLE_TINY_REFERENCE").unwrap())
+                    .join("manifest.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        let config = TrainingConfig {
+            model: serde_json::from_value(manifest["config"].clone()).unwrap(),
+            seed: 731,
+            steps: 3,
+            warmup_steps: 1,
+            learning_rate: 1e-4,
+            weight_decay: 0.04,
+            ema_decay: 0.99,
+        };
+        let global = reference.tensors.tensor_f32("global.patches").unwrap();
+        let local = reference.tensors.tensor_f32("local.patches").unwrap();
+        let directions = reference.tensors.tensor_f32("sigreg.directions").unwrap();
+        let global_ids: Vec<u32> =
+            serde_json::from_value(manifest["patch_ids"]["global"].clone()).unwrap();
+        let local_ids: Vec<u32> =
+            serde_json::from_value(manifest["patch_ids"]["local"].clone()).unwrap();
+        let batch = || Batch {
+            global_patches: &global,
+            global_ids: &global_ids,
+            local_patches: &local,
+            local_ids: &local_ids,
+            directions: &directions,
+        };
+        let assert_device = |trainer: &Trainer| {
+            let device = trainer.device_info();
+            assert_eq!(device.device_name, "NVIDIA GeForce RTX 5080");
+            assert_eq!(device.driver_name, "NVIDIA");
+            assert_eq!(device.driver_info, "580.178.04");
+            assert!(!device.is_software_emulated);
+            check_memory(&trainer.session).unwrap();
+        };
+        let mut trainer = Trainer::new(config, None).unwrap();
+        assert_device(&trainer);
+        for node in reference.graph.nodes() {
+            if let Op::Parameter { name } = &node.op {
+                let values = reference
+                    .tensors
+                    .tensor_f32(&format!("weight.{name}"))
+                    .unwrap();
+                trainer.session.set_parameter(name, &values);
+                if name.starts_with("encoder.") {
+                    trainer.ema.set_parameter(&format!("ema.{name}"), &values);
+                }
+            }
+        }
+        let first = trainer.step(batch()).unwrap();
+        assert_eq!(first.step, 1);
+        assert_eq!(trainer.session.adam_step_count(), 1);
+        let close = |name: &str, actual: f32, expected: f64| {
+            assert!(actual.is_finite() && expected.is_finite(), "{name}");
+            assert!(
+                (f64::from(actual) - expected).abs() <= 2e-7 + 2e-5 * expected.abs(),
+                "{name}: {actual} != {expected}"
+            );
+        };
+        for node in reference.graph.nodes() {
+            let Op::Parameter { name } = &node.op else {
+                continue;
+            };
+            let old = reference
+                .tensors
+                .tensor_f32(&format!("weight.{name}"))
+                .unwrap();
+            let mut gradient = vec![0.0; old.len()];
+            let mut parameter = gradient.clone();
+            let mut m = gradient.clone();
+            let mut v = gradient.clone();
+            trainer.session.read_param_grad(name, &mut gradient);
+            trainer.session.read_param(name, &mut parameter);
+            trainer.session.read_adam_m(name, &mut m);
+            trainer.session.read_adam_v(name, &mut v);
+            for i in 0..old.len() {
+                let g = f64::from(gradient[i]);
+                close("adam_m", m[i], f64::from(1.0 - 0.9_f32) * g);
+                close("adam_v", v[i], f64::from(1.0 - 0.999_f32) * g * g);
+                let expected = f64::from(old[i])
+                    * (1.0 - f64::from(config.learning_rate * config.weight_decay))
+                    - f64::from(config.learning_rate) * g / (g.abs() + f64::from(1e-8_f32));
+                close(name, parameter[i], expected);
+            }
+            if name.starts_with("encoder.") {
+                let mut average = gradient.clone();
+                trainer.ema.read_param(&format!("ema.{name}"), &mut average);
+                for i in 0..old.len() {
+                    close(
+                        "EMA",
+                        average[i],
+                        f64::from(config.ema_decay) * f64::from(old[i])
+                            + f64::from(1.0 - config.ema_decay) * f64::from(parameter[i]),
+                    );
+                }
+            }
+        }
+        trainer.save(&root.join("step1")).unwrap();
+        trainer
+            .export_encoder(&root.join("encoder.safetensors"))
+            .unwrap();
+        let exported = SafeTensorsModel::load(root.join("encoder.safetensors")).unwrap();
+        super::super::super::validate_weights(&exported, ARCHITECTURE).unwrap();
+        assert_eq!(exported.tensor_info().len(), 149);
+        let continuous = trainer.step(batch()).unwrap();
+        trainer.save(&root.join("continuous-step2")).unwrap();
+        assert_device(&trainer);
+        drop(trainer);
+        let mut restored = Trainer::restore(&root.join("step1"), None).unwrap();
+        assert_device(&restored);
+        let continued = restored.step(batch()).unwrap();
+        assert_eq!(
+            serde_json::to_value(continuous).unwrap(),
+            serde_json::to_value(continued).unwrap()
+        );
+        restored.save(&root.join("restored-step2")).unwrap();
+        for filename in ["training.safetensors", "ema.safetensors"] {
+            let a = SafeTensorsModel::load(root.join("continuous-step2").join(filename)).unwrap();
+            let b = SafeTensorsModel::load(root.join("restored-step2").join(filename)).unwrap();
+            assert_eq!(a.tensor_info().len(), b.tensor_info().len());
+            for (name, info) in a.tensor_info() {
+                assert_eq!(info.shape, b.tensor_info()[name].shape);
+                for (x, y) in a
+                    .tensor_f32(name)
+                    .unwrap()
+                    .iter()
+                    .zip(b.tensor_f32(name).unwrap())
+                {
+                    assert_eq!(x.to_bits(), y.to_bits(), "{filename}/{name}");
+                }
+            }
+        }
+        assert_device(&restored);
+        eprintln!(
+            "tiny_training_canary: all 155 Adam updates, 149 EMA tensors, encoder export and 763 restored state tensors pass"
+        );
+    }
 
     #[test]
     fn schedule_reaches_peak_and_final_rate_and_refuses_invalid_budget() {

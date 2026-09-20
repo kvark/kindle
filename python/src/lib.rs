@@ -1,12 +1,13 @@
 //! Python bindings for the pixel-first Dreamer baseline.
 
+mod pretrain;
 mod vector;
 
 use std::path::Path;
 
 use kindle::vision::{
     DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
-    levjepa::LeVJepaPerception,
+    levjepa::{Architecture, LeVJepaPerception},
 };
 use kindle::{
     ActionMode, DreamerAgent, DreamerConfig, LearnReport, ModelSize, Reward, RgbFrame, Transition,
@@ -37,12 +38,40 @@ struct PyLeVJepaPerception {
 #[pymethods]
 impl PyLeVJepaPerception {
     #[new]
-    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None))]
-    fn new(encoder_checkpoint: &str, encoder_plan_cache: Option<&str>) -> PyResult<Self> {
-        let inner =
-            LeVJepaPerception::load(encoder_checkpoint, None, encoder_plan_cache.map(Path::new))
-                .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "large"))]
+    fn new(
+        encoder_checkpoint: &str,
+        encoder_plan_cache: Option<&str>,
+        architecture: &str,
+    ) -> PyResult<Self> {
+        let architecture = match architecture {
+            "tiny" => Architecture::Tiny,
+            "large" => Architecture::Large,
+            _ => {
+                return Err(PyValueError::new_err(
+                    "LeVJEPA architecture must be tiny or large",
+                ));
+            }
+        };
+        let inner = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
+            encoder_checkpoint,
+            1,
+            None,
+            encoder_plan_cache.map(Path::new),
+        )
+        .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
+    }
+
+    #[getter]
+    fn architecture(&self) -> &'static str {
+        self.inner.architecture().name()
+    }
+
+    #[getter]
+    fn encoding_revision(&self) -> &'static str {
+        self.inner.architecture().encoding_revision()
     }
 
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
@@ -605,6 +634,7 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<vector::PyVectorAgent>()?;
+    module.add_class::<pretrain::PyLeVJepaTrainer>()?;
     module.add_class::<PyDinoPerception>()?;
     module.add_class::<PyLeVJepaPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
