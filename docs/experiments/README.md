@@ -53,6 +53,15 @@ runtime results, not evidence that four actions learn better. The
 [paired learning pilot](../../runs/breakout-action-pilot-20260920.kNeotb/declaration.md)
 is declared with nine CPU checks and 105 input pins; the
 [status dashboard](../../STATUS.md) tracks its active phase and later results.
+The September 20 [model-sizing decision](../../runs/model-sizing-20260920.kPIOWC/README.md)
+now prioritizes a separately pretrained 5.49M causal-video JEPA frontend. The
+[eighteen-action Large quartet](../../runs/breakout-action-pilot-20260920.kNeotb/results.md)
+is complete: 200,004 actions / 49,652 updates, frozen mean 30.7917 versus .9655,
+but two-wall successes 0/24 versus 0/29. Complete state/replay/video and both
+zero-update frozen checks pass; the competence gate fails. The explicit
+[four-action hold](../../runs/breakout-action-pilot-20260920.kNeotb/a4-train/HOLD.md)
+prevents its unstarted arm. This is not a complete two-width pilot or a Tiny
+training result. Original pinned declarations and completed evidence are unchanged.
 The [CPU readiness review](../../runs/breakout-current-readiness-20260919.ntvDer/README.md)
 locates the existing source-matched fixtures and evidence; it is not a GPU result.
 Future experiments should use bounded diagnostics and compact records, without

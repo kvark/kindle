@@ -23,6 +23,50 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Current gameplay uses native causal LeVJEPA, not DINO. The frozen frontend's
   16-arrival chunks reset perception only; episode boundaries also reset belief.
   The prediction head reads the deterministic prior before observing its target.
+- September 20 model-sizing decision: retain causal-video JEPA and train a
+  ViT-Tiny/16 frontend (12 layers, width 192, three heads; 5,486,592 parameters).
+  Keep the Dreamer12M RSSM and 7×7×64 observation contract initially. Do not
+  substitute a plain RGB/DINO encoder or truncate Large weights. Tiny requires
+  its own native pretraining, held-out validation, checkpoint identity and GPU
+  numerical/timing checks; shape support is not a trained or qualified encoder.
+  Native pretraining is staged separately at `exp/levjepa-tiny-pretrain-20260920`
+  (`b30b9c69`; package source `cf95966b`), on Meganeura `cc5fea74` / Blade
+  `eaff5092`; the new upstream
+  `dbb43648` scheduled-RMSNorm fix is carried intact before GPU qualification.
+  Native AdamW, GPU EMA, complete-state save/restore and encoder export exist;
+  100 CPU tests and both independent reference-fixture checks pass. The native
+  Python interface, deterministic video sampler/restore contract and explicit
+  standalone Tiny probing are implemented; this is not agent adoption. Fresh
+  corpus `runs/levjepa-tiny-atari-corpus-20260920.oTjdon` completes with 250,000
+  observations / 999,112 emulator frames and whole-recording held-out splits.
+  B128/V4 batches measure 0.82–0.93s on one CPU; include all offline experience in
+  comparisons. Private package build `runs/levjepa-tiny-package-20260920.rDhKjm`
+  is built (native `60f7060b`); all 751 Python CPU tests pass against its actual
+  import, and wheel/install/source module identities match. The dense causal
+  reference completes in `runs/levjepa-tiny-streaming-reference-20260920.4xgb5h`;
+  its weights are untrained numerical fixtures, not learned Tiny weights.
+  The seven checks in `runs/levjepa-tiny-accuracy-20260921.qa3GqK` now pass:
+  all 155 gradients, AdamW/EMA/export, exact 763-tensor continuation, dense
+  causality/reset and N6/serial parity. Preserve the earlier AMD-selection and
+  strict-trig failures; the latter's new primitive accuracy bound is explicit,
+  not a pass of its old gate. No full-model or game gate changed. Use the
+  NVIDIA-only Vulkan loader selection for environment-independent test contexts.
+  The actual package's 32-update B128/V4 pilot completes in
+  `runs/levjepa-tiny-fit-20260921.oDmZVn`: .45s native plus .80s data per step,
+  all complete state/export checks pass. The held-out noncollapse screen in
+  `runs/levjepa-tiny-feature-check-20260921.wSQUJj` also passes; not model quality.
+  Its observation-only package cfa1749a / source 1d9f0e96 exposes Vulkan budget.
+  Fresh seed 743's 4,096-update pretraining is running in
+  `runs/levjepa-tiny-pretrain-20260921.JaPZpW`, using unchanged 60f7060b, checkpoints
+  every 512 updates. Review completion before frozen feature/position/motion checks
+  against its own untrained export. No gameplay adoption or automatic successor.
+  Pretraining-only
+  backend extensions do not automatically update the gameplay backend; use
+  the same qualified runtime for both sides of a later size comparison. The
+  B128/V4 static allocation estimate falls 25.3→9.4 GiB with native erf GELU;
+  this includes Adam, not driver/staging/EMA costs or measured runtime usage.
+  Continue from `runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md`; do not rebuild
+  that graph from scratch or relabel staging as an adopted runtime.
 - Vector collection shares one learner/policy, not causal histories. Preserve
   independent visual caches, belief, RNG and replay streams. Count actual
   interactions and retain replay-ratio credit; report aggregate/per-stream time.
@@ -55,8 +99,8 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - The original xPz5ud queue and its reserved `pong/seed2017-train.stdout` stay
   terminal. Never remove the hold, restart old followers or count historical
   root 1009 as a root in the new matched campaign.
-- Next test Breakout's prepared minimal-action hypothesis, then separately
-  declared Freeway/Qbert exposure comparisons. Do not replicate unchanged failed
+- Next qualify/pretrain the compact causal encoder, then return to separately
+  declared game comparisons. Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
   world/behavior gradient checks at eighteen/four actions. The twelve canaries in
@@ -72,13 +116,24 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   terminal writers and use only its `audit NAME` readers. The five replay/schema/
   test files are adopted byte-identically from 8092790, with 742 passing main CPU
   tests; native and default full-action behavior are unchanged. The minimal-action
-  learning recipe is not proven better. The paired seed-zero, 200,004-action-per-
-  width pilot in `runs/breakout-action-pilot-20260920.kNeotb` passes nine CPU checks
-  and binds 105 inputs. Its eighteen-action training is running; review its
-  complete result before frozen evaluation, fresh untrained control and the
-  four-action arm. Preparation is terminal. Keep controls, videos and the two-wall
-  gate; `audit NAME`, `pair WIDTH` and `summary` are read-only. Do not repeat the
+  learning recipe is not proven better. The seed-zero, 200,004-action eighteen-
+  action Large pilot in `runs/breakout-action-pilot-20260920.kNeotb` completes
+  all four phases: 49,652 training updates, frozen mean 30.7917 versus .9655
+  untrained, two-wall successes 0/24 versus 0/29. Complete state, replays, videos
+  and guards pass; this is learning, not a win. All four writers are terminal.
+  Its `results.md` records the pair. The `a4-train/HOLD.md` reserves the four-action guard
+  directory before native launch. Never remove it to resume the original queue.
+  The two-width pilot is now incomplete by scheduling decision, not native failure.
+  Preparation and its 105 inputs stay unchanged. Keep controls, videos and the
+  two-wall gate; use `audit NAME` and `pair 18`, not the unfinished two-arm summary.
+  Sizing evidence: `runs/model-sizing-20260920.kPIOWC/README.md`. Do not repeat the
   memory-heavy allocation-plan qualification on this unchanged runtime.
+  Preserve the ~22:49 UTC unintended pipeline-test overlap documented in
+  `runs/levjepa-tiny-cpu-20260920.e4QkQH/test-selection-20260920.md`: the process
+  exited without model execution or an observed kernel fault. Do not treat that
+  interval as uncontended timing. The staged GPU-only library test is now ignored;
+  future CPU checks still require exact reviewed test names, not assumed-safe
+  module filters.
 - Preserve completed/failed `runs/` writers, source worktrees, packages and
   artifacts. Only documented audit modes are reusable. Correct reader failures
   separately; never overwrite failed evidence or rerun native work to repair it.
