@@ -9,6 +9,8 @@
 
 use std::{path::Path, sync::Arc};
 
+pub mod pretrain;
+
 use meganeura::{Graph, Mode, NodeId, Session, SessionConfig, data::safetensors::SafeTensorsModel};
 
 use super::{
@@ -307,20 +309,15 @@ fn gelu_erf(g: &mut Graph, x: NodeId) -> NodeId {
 }
 
 fn scale(g: &mut Graph, x: NodeId, value: f32) -> NodeId {
-    let shape = g.node(x).ty.shape.clone();
-    let len = g.node(x).ty.num_elements();
-    let x = g.reshape(x, &[len]);
-    let scalar = g.scalar(value);
-    let result = g.mul_per_channel(x, scalar, 1, len as u32);
-    g.reshape(result, &shape)
+    g.scale(x, value)
 }
 
 fn shift(g: &mut Graph, x: NodeId, value: f32) -> NodeId {
     let shape = g.node(x).ty.shape.clone();
     let len = g.node(x).ty.num_elements();
-    let x = g.reshape(x, &[len]);
+    let x = g.reshape(x, &[len, 1]);
     let scalar = g.scalar(value);
-    let result = g.add_per_channel(x, scalar, 1, len as u32);
+    let result = g.bias_add(x, scalar);
     g.reshape(result, &shape)
 }
 
@@ -329,8 +326,9 @@ fn rope(g: &mut Graph, x: NodeId, cos: NodeId, sin: NodeId) -> NodeId {
     // vector in two halves. Do not substitute standard interleaved RoPE.
     let shape = g.node(x).ty.shape.clone();
     let pairs = (g.node(x).ty.num_elements() / 2) as u32;
-    let even = g.split_a(x, pairs, 1, 1, 1);
-    let odd = g.split_b(x, pairs, 1, 1, 1);
+    let flat = g.reshape(x, &[pairs as usize * 2]);
+    let even = g.split_a(flat, pairs, 1, 1, 1);
+    let odd = g.split_b(flat, pairs, 1, 1, 1);
     let negative_odd = g.neg(odd);
     let rotated = g.concat(negative_odd, even, pairs, 1, 1, 1);
     let rotated = g.reshape(rotated, &shape);
@@ -340,13 +338,18 @@ fn rope(g: &mut Graph, x: NodeId, cos: NodeId, sin: NodeId) -> NodeId {
 }
 
 fn rope_tables(architecture: Architecture) -> (Vec<f32>, Vec<f32>) {
+    rope_tables_for_grid(architecture, GRID)
+}
+
+fn rope_tables_for_grid(architecture: Architecture, grid: usize) -> (Vec<f32>, Vec<f32>) {
     let hidden = architecture.hidden();
     let axis_dim = 2 * ((HEAD_DIM / 3) / 2);
-    let mut cos = vec![1.0; FRAMES * PATCHES * hidden];
+    let patches = grid * grid;
+    let mut cos = vec![1.0; FRAMES * patches * hidden];
     let mut sin = vec![0.0; cos.len()];
     for frame in 0..FRAMES {
-        for patch in 0..PATCHES {
-            let positions = [frame, patch / GRID, patch % GRID];
+        for patch in 0..patches {
+            let positions = [frame, patch / grid, patch % grid];
             for head in 0..architecture.heads() {
                 for (axis, position) in positions.into_iter().enumerate() {
                     for d in 0..axis_dim {
@@ -354,7 +357,7 @@ fn rope_tables(architecture: Architecture) -> (Vec<f32>, Vec<f32>) {
                             / 10_000.0_f32
                                 .powf((d % (axis_dim / 2)) as f32 / (axis_dim / 2) as f32);
                         let angle = position as f32 * frequency;
-                        let index = (frame * PATCHES + patch) * hidden
+                        let index = (frame * patches + patch) * hidden
                             + head * HEAD_DIM
                             + axis * axis_dim
                             + d;

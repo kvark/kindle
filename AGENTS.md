@@ -49,6 +49,13 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current work
 
+- This is the CPU-only Tiny pretraining staging branch, not the active package.
+  Meganeura `723b6c6f` carries current upstream `71c202cb` plus sine/cosine and
+  scalar gradient broadcasts; Blade is `eaff5092`. The native training graph
+  exists, but the data/optimizer/export loop and GPU numerical checks do not.
+  No pretraining run or trained Tiny checkpoint is declared by this branch.
+  Active Large work continues only through its immutable package in the main
+  workspace. See `/x/Code/kindle/runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md`.
 - Qualified block runtime: native `886bae68`, Meganeura `589d73ab`, Blade
   `2accfeee`; immutable episode adapter `8dc0b98`. Block products improved fixed-
   recipe throughput by 27.3%. Source cleanup does not rebuild or relabel it.
