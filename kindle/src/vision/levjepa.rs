@@ -765,6 +765,30 @@ mod tests {
             super::super::checkpoint_sha256(Path::new(&checkpoint)).unwrap(),
             CHECKPOINT_SHA256
         );
+        check_batched_streams(streams, Architecture::Large, Path::new(&checkpoint));
+    }
+
+    fn check_tiny_device(perception: &LeVJepaPerception) {
+        if perception.architecture != Architecture::Tiny {
+            return;
+        }
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let device = perception.gpu_device();
+        assert_eq!(device.device_name, "NVIDIA GeForce RTX 5080");
+        assert_eq!(device.driver_name, "NVIDIA");
+        assert_eq!(device.driver_info, "580.178.04");
+        assert!(!device.is_software_emulated);
+        let memory = perception.session.device_memory_stats().unwrap();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 * 1024 * 1024 * 1024);
+        eprintln!(
+            "tiny_stream_memory: usage={} budget={}",
+            memory.usage_bytes, memory.budget_bytes
+        );
+    }
+
+    fn check_batched_streams(streams: usize, architecture: Architecture, checkpoint: &Path) {
+        let hidden = architecture.hidden();
         let frame = |stream: usize, tick: usize| {
             crate::RgbFrame::new(
                 64,
@@ -779,7 +803,15 @@ mod tests {
         let ticks = (7 * streams).max(36);
         let mut expected = Vec::new();
         {
-            let mut serial = LeVJepaPerception::load(&checkpoint, None, None).unwrap();
+            let mut serial = LeVJepaPerception::load_batched_with_architecture(
+                architecture,
+                checkpoint,
+                1,
+                None,
+                None,
+            )
+            .unwrap();
+            check_tiny_device(&serial);
             for stream in 0..streams {
                 serial.reset();
                 let mut values = Vec::new();
@@ -797,9 +829,18 @@ mod tests {
                     values.push(Some((observation, serial.patch_tokens())));
                 }
                 expected.push(values);
+                check_tiny_device(&serial);
             }
         }
-        let mut batch = LeVJepaPerception::load_batched(&checkpoint, streams, None, None).unwrap();
+        let mut batch = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
+            checkpoint,
+            streams,
+            None,
+            None,
+        )
+        .unwrap();
+        check_tiny_device(&batch);
         let mut worst = 0.0_f32;
         for tick in 0..ticks {
             let frames = (0..streams)
@@ -814,18 +855,18 @@ mod tests {
             let observations = batch.encode_frames_rgb8(&arrivals);
             let tokens = batch.patch_tokens();
             assert_eq!(observations.len(), arrivals.len());
-            assert_eq!(tokens.len(), streams * PATCHES * HIDDEN);
+            assert_eq!(tokens.len(), streams * PATCHES * hidden);
             for ((stream, _, _), observation) in arrivals.iter().zip(observations) {
                 let (reference, reference_tokens) = expected[*stream][tick].as_ref().unwrap();
                 assert_eq!(observation.as_slice().len(), reference.as_slice().len());
-                assert_eq!(reference_tokens.len(), PATCHES * HIDDEN);
+                assert_eq!(reference_tokens.len(), PATCHES * hidden);
                 for (actual, expected) in observation.as_slice().iter().zip(reference.as_slice()) {
                     assert!(
                         (actual - expected).abs() < 0.005,
                         "pooled N{streams} stream {stream} tick {tick}"
                     );
                 }
-                let actual = &tokens[stream * PATCHES * HIDDEN..(stream + 1) * PATCHES * HIDDEN];
+                let actual = &tokens[stream * PATCHES * hidden..(stream + 1) * PATCHES * hidden];
                 let mut error = 0.0_f64;
                 let mut energy = 0.0_f64;
                 for (&actual, &expected) in actual.iter().zip(reference_tokens) {
@@ -838,12 +879,93 @@ mod tests {
                     "dense N{streams} stream {stream} tick {tick}"
                 );
             }
+            check_tiny_device(&batch);
         }
         assert!(
             worst < 0.005,
             "N{streams} batched maximum absolute error {worst}"
         );
         eprintln!("LeVJEPA N{streams} batched/serial maximum absolute error {worst}");
+    }
+
+    fn tiny_reference() -> (std::path::PathBuf, SafeTensorsModel) {
+        use sha2::{Digest, Sha256};
+        let root =
+            std::path::PathBuf::from(std::env::var_os("KINDLE_TINY_STREAM_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        assert_eq!(manifest["format"], 1);
+        assert_eq!(manifest["architecture"], "tiny");
+        for (name, source) in [
+            (
+                "levjepa_tiny_streaming_reference.py",
+                &include_bytes!("../../../python/examples/levjepa_tiny_streaming_reference.py")[..],
+            ),
+            (
+                "levjepa_tiny_reference.py",
+                &include_bytes!("../../../python/examples/levjepa_tiny_reference.py")[..],
+            ),
+            (
+                "levjepa_reference.py",
+                &include_bytes!("../../../python/examples/levjepa_reference.py")[..],
+            ),
+        ] {
+            assert_eq!(
+                format!("{:x}", Sha256::digest(source)),
+                manifest["sources"][name].as_str().unwrap()
+            );
+        }
+        for name in ["encoder.safetensors", "reference.safetensors"] {
+            assert_eq!(
+                super::super::checkpoint_sha256(&root.join(name)).unwrap(),
+                manifest["files"][name].as_str().unwrap()
+            );
+        }
+        let checkpoint = root.join("encoder.safetensors");
+        let weights = SafeTensorsModel::load(checkpoint.clone()).unwrap();
+        validate_weights(&weights, Architecture::Tiny).unwrap();
+        let fixture = SafeTensorsModel::load(root.join("reference.safetensors")).unwrap();
+        for (name, shape) in [
+            ("rgb", vec![2, 16, 64, 80, 3]),
+            ("pixels", vec![2, 16, 3, 224, 224]),
+            ("tokens", vec![2, 16, 196, 192]),
+            ("projected", vec![2, 16, 196, 64]),
+            ("pooled", vec![2, 16, 49, 64]),
+        ] {
+            assert_eq!(fixture.tensor_info()[name].shape, shape);
+            assert!(
+                fixture
+                    .tensor_f32(name)
+                    .unwrap()
+                    .iter()
+                    .all(|v| v.is_finite())
+            );
+        }
+        (checkpoint, fixture)
+    }
+
+    #[test]
+    #[ignore = "requires KINDLE_TINY_STREAM_REFERENCE; CPU only"]
+    fn tiny_streaming_reference_is_complete() {
+        tiny_reference();
+    }
+
+    #[test]
+    #[ignore = "requires separately declared exclusive GPU and Tiny streaming reference"]
+    fn tiny_six_streams_match_serial_with_resets_and_gaps() {
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let (checkpoint, _) = tiny_reference();
+        check_batched_streams(6, Architecture::Tiny, &checkpoint);
+    }
+
+    #[test]
+    #[ignore = "requires separately declared exclusive GPU and Tiny streaming reference"]
+    fn tiny_checkpoint_matches_dense_causal_reference_and_resets() {
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let (checkpoint, fixture) = tiny_reference();
+        check_causal_reference(Architecture::Tiny, &checkpoint, fixture);
     }
 
     #[test]
@@ -858,13 +980,22 @@ mod tests {
             CHECKPOINT_SHA256
         );
         let fixture = SafeTensorsModel::load(reference.into()).unwrap();
+        check_causal_reference(Architecture::Large, Path::new(&checkpoint), fixture);
+    }
+
+    fn check_causal_reference(
+        architecture: Architecture,
+        checkpoint: &Path,
+        fixture: SafeTensorsModel,
+    ) {
+        let hidden = architecture.hidden();
         assert_eq!(
             fixture.tensor_info()["pixels"].shape,
             [2, FRAMES, 3, IMAGE_SIZE, IMAGE_SIZE]
         );
         assert_eq!(
             fixture.tensor_info()["tokens"].shape,
-            [2, FRAMES, PATCHES, HIDDEN]
+            [2, FRAMES, PATCHES, hidden]
         );
         let pixels = fixture.tensor_f32("pixels").unwrap();
         let rgb_shape = &fixture.tensor_info()["rgb"].shape;
@@ -886,9 +1017,17 @@ mod tests {
         let expected = fixture.tensor_f32("tokens").unwrap();
         let expected_projected = fixture.tensor_f32("projected").unwrap();
         let expected_pooled = fixture.tensor_f32("pooled").unwrap();
-        let mut perception = LeVJepaPerception::load(checkpoint, None, None).unwrap();
+        let mut perception = LeVJepaPerception::load_batched_with_architecture(
+            architecture,
+            checkpoint,
+            1,
+            None,
+            None,
+        )
+        .unwrap();
+        check_tiny_device(&perception);
         let pixel_len = 3 * IMAGE_SIZE * IMAGE_SIZE;
-        let token_len = PATCHES * HIDDEN;
+        let token_len = PATCHES * hidden;
         let rgb_len = width * height * 3;
         // Two full chunks verify the automatic boundary. Rewind only this
         // synthetic fixture, not an environment, to exercise explicit reset.
@@ -948,6 +1087,7 @@ mod tests {
                     .fold(0.0_f32, f32::max);
                 assert!(worst < 0.005, "{label} step {step}, max error {worst}");
             }
+            check_tiny_device(&perception);
         }
     }
 }

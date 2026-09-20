@@ -61,8 +61,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   `/x/Code/kindle/runs/levjepa-tiny-atari-corpus-20260920.oTjdon`: 250,000 RGB64
   observations, 999,112 emulator frames, whole-recording train/validation split.
   B128/V4 batch preparation measures 0.82–0.93 seconds on one CPU. Count this
-  additional offline experience in downstream comparisons. Native numerics,
-  restore equivalence, streaming checks and actual pretraining remain.
+  additional offline experience in downstream comparisons. Isolated package
+  `/x/Code/kindle/runs/levjepa-tiny-package-20260920.rDhKjm` is native `60f7060b`
+  from cf95966b and passes 751 Python CPU tests. Later source changes add only
+  test fixtures: all 100 Rust CPU tests, both independent CPU reference readers,
+  formatting and release Clippy pass. The dense reference in
+  `/x/Code/kindle/runs/levjepa-tiny-streaming-reference-20260920.4xgb5h` has exact
+  early-frame causality under future perturbation. Its weights are untrained
+  numerical fixtures. All 28 GPU tests stay ignored. Native numerics, restore
+  equivalence, streaming checks and actual pretraining remain.
   The B128/V4 CPU plan falls from 25.3 to 9.4 GiB including Adam; driver/staging/
   EMA allocations are extra. This is not measured VRAM or throughput.
   No pretraining run or trained Tiny checkpoint is declared by this branch.
