@@ -68,13 +68,21 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   formatting and release Clippy pass. The dense reference in
   `/x/Code/kindle/runs/levjepa-tiny-streaming-reference-20260920.4xgb5h` has exact
   early-frame causality under future perturbation. Its weights are untrained
-  numerical fixtures. All 28 GPU tests stay ignored. Native numerics, restore
-  equivalence, streaming checks and actual pretraining remain.
+  numerical fixtures. All seven individually guarded GPU checks now pass in
+  `/x/Code/kindle/runs/levjepa-tiny-accuracy-20260921.qa3GqK`, including all155
+  gradients and exact763-tensor continuation. Preserve the earlier AMD-selection
+  and strict-trig failures; the primitive's bound revision is explicit, not a
+  pass of its old criterion. Full-model and game gates are unchanged. B128/V4
+  fit pilot `levjepa-tiny-fit-20260921.oDmZVn` completes32updates, .45s native plus
+  .80s data per step. These are stage times, not utilization or model quality.
+  The next addition exposes read-only Vulkan budget through standalone perception
+  for held-out feature checks. Pretraining runtime/arithmetic are unchanged.
   The B128/V4 CPU plan falls from 25.3 to 9.4 GiB including Adam; driver/staging/
   EMA allocations are extra. This is not measured VRAM or throughput.
-  No pretraining run or trained Tiny checkpoint is declared by this branch.
-  Active Large work continues only through its immutable package in the main
-  workspace. See `/x/Code/kindle/runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md`.
+  No sustained budget or Tiny gameplay adoption is declared by this branch.
+  Large Breakout's18-action quartet is complete, mean30.79vs.97, zero two-wall
+  completions; its4-action arm remains held. See the main workspace STATUS.md
+  and `/x/Code/kindle/runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md`.
   The ~22:49 UTC module-filter mistake created shader pipelines during Large
   Breakout (no model execution); see that directory's `test-selection-20260920.md`.
   The process exited; host-only checks found no kernel fault. Preserve the

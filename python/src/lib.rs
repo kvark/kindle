@@ -74,6 +74,11 @@ impl PyLeVJepaPerception {
         self.inner.architecture().encoding_revision()
     }
 
+    #[getter]
+    fn gpu_memory_budget<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        json_to_python(py, &self.inner.gpu_memory_budget())
+    }
+
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
         let frame = parse_rgb_frame(frame)?;
         let pooled = self

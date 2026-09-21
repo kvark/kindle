@@ -67,6 +67,7 @@ def test_encoder_selection_is_explicit_and_rejects_typos_before_gpu() -> None:
     assert kindle.LEVJEPA_MODEL_ID == "galilai-group/LeVJEPA-VideoMix-Large"
     assert hasattr(kindle._native.LeVJepaPerception, "reset")
     assert hasattr(kindle._native.LeVJepaPerception, "next_frame_in_chunk")
+    assert hasattr(kindle._native.LeVJepaPerception, "gpu_memory_budget")
     with pytest.raises(ValueError, match="encoder must be dinov3 or levjepa"):
         kindle.Agent("unused", 18, encoder="lev-jepa?")
 

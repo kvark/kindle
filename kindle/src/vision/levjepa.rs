@@ -188,6 +188,15 @@ impl LeVJepaPerception {
         crate::gpu_device_info(self.session.device_information())
     }
 
+    pub fn gpu_memory_budget(&self) -> Option<crate::GpuMemoryBudget> {
+        self.session
+            .device_memory_stats()
+            .map(|stats| crate::GpuMemoryBudget {
+                usage_bytes: stats.usage_bytes,
+                budget_bytes: stats.budget_bytes,
+            })
+    }
+
     pub fn encode_frame_rgb8(&mut self, rgb: &[u8], width: usize, height: usize) -> Observation {
         let rgb = preprocess::resize_letterbox_rgb8(rgb, width, height, IMAGE_SIZE);
         self.run(&preprocess::patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE))
