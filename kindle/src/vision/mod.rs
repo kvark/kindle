@@ -39,6 +39,8 @@ pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
 pub enum PerceptionKind {
     DinoV3,
     LeVJepa,
+    #[serde(rename = "levjepa-tiny")]
+    LeVJepaTiny,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -63,6 +65,11 @@ impl PerceptionKind {
                 levjepa::CHECKPOINT_REV,
                 levjepa::ENCODING_REV,
             ),
+            Self::LeVJepaTiny => (
+                "kindle/LeVJEPA-Tiny",
+                "local-sha256",
+                levjepa::Architecture::Tiny.encoding_revision(),
+            ),
         };
         PerceptionIdentity {
             kind: self,
@@ -70,6 +77,14 @@ impl PerceptionKind {
             checkpoint_revision: checkpoint_revision.to_owned(),
             encoding_revision: encoding_revision.to_owned(),
             checkpoint_sha256: fingerprint,
+        }
+    }
+
+    pub(crate) fn levjepa_architecture(self) -> Option<levjepa::Architecture> {
+        match self {
+            Self::DinoV3 => None,
+            Self::LeVJepa => Some(levjepa::Architecture::Large),
+            Self::LeVJepaTiny => Some(levjepa::Architecture::Tiny),
         }
     }
 }
@@ -135,6 +150,15 @@ impl Perception {
                 Some(gpu),
                 cache,
             )?)),
+            PerceptionKind::LeVJepaTiny => Ok(Self::LeVJepa(
+                levjepa::LeVJepaPerception::load_batched_with_architecture(
+                    levjepa::Architecture::Tiny,
+                    checkpoint,
+                    1,
+                    Some(gpu),
+                    cache,
+                )?,
+            )),
         }
     }
 
@@ -466,6 +490,38 @@ impl DinoEncoder {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn perception_sizes_have_distinct_stable_checkpoint_identities() {
+        for (kind, encoded, architecture) in [
+            (PerceptionKind::DinoV3, "dinov3", None),
+            (
+                PerceptionKind::LeVJepa,
+                "levjepa",
+                Some(levjepa::Architecture::Large),
+            ),
+            (
+                PerceptionKind::LeVJepaTiny,
+                "levjepa-tiny",
+                Some(levjepa::Architecture::Tiny),
+            ),
+        ] {
+            assert_eq!(serde_json::to_value(kind).unwrap(), encoded);
+            assert_eq!(kind.levjepa_architecture(), architecture);
+            let identity = kind.identity("1".repeat(64));
+            identity.validate().unwrap();
+            let restored: PerceptionIdentity =
+                serde_json::from_value(serde_json::to_value(&identity).unwrap()).unwrap();
+            assert_eq!(restored, identity);
+        }
+        let mut tiny = PerceptionKind::LeVJepaTiny.identity("2".repeat(64));
+        tiny.kind = PerceptionKind::LeVJepa;
+        assert!(tiny.validate().is_err());
+        let large = PerceptionKind::LeVJepa.identity(levjepa::CHECKPOINT_SHA256.into());
+        assert_eq!(large.model_id, levjepa::MODEL_ID);
+        assert_eq!(large.checkpoint_revision, levjepa::CHECKPOINT_REV);
+        assert_eq!(large.encoding_revision, levjepa::ENCODING_REV);
+    }
 
     #[test]
     fn fingerprint_matches_sha256_known_vectors_and_chunked_reads() {

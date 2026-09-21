@@ -47,11 +47,12 @@ jobs:
       # DINO weights are separately licensed and unavailable in CI. This
       # synthetic observation canary still executes the complete Dreamer
       # acting, learning, optimizer, checkpoint, and restore path.
+      # Vision fixtures require external checkpoints/reference data.
       - name: Dreamer GPU canaries
         if: runner.os == 'Linux'
         run: >-
           cargo test -p kindle tiny_
-          --lib -- --ignored --test-threads=1
+          --lib -- --ignored --skip vision:: --test-threads=1
 
   python:
     name: Python bindings

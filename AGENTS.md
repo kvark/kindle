@@ -87,6 +87,12 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current work
 
+- This branch prepares explicit Tiny gameplay selection on the unchanged
+  qualified Meganeura 589d73ab / Blade 2accfeee backend. Large remains the default;
+  Tiny gets a distinct checkpoint identity and restore dispatch. CPU preparation
+  only while pretraining JaPZpW owns the GPU. No game launch, backend adoption,
+  automatic successor or change to RSSM/R256/competence gates is declared here.
+  Current pretraining status and artifacts remain in the main workspace STATUS.md.
 - Qualified block runtime: native `886bae68`, Meganeura `589d73ab`, Blade
   `2accfeee`; immutable episode adapter `8dc0b98`. Block products improved fixed-
   recipe throughput by 27.3%. Source cleanup does not rebuild or relabel it.

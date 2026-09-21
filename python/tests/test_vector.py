@@ -22,6 +22,42 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
     config["batch_size"] = 0
     with pytest.raises(ValueError, match="batch_size"):
         kindle.VectorAgent("unused", 4, config)
+    with pytest.raises(ValueError, match="batch_size"):
+        kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
+
+
+@pytest.mark.parametrize("encoder", ["levjepa-tiny-ish", "dinov3"])
+def test_vector_rejects_unsupported_encoder_before_gpu(encoder):
+    with pytest.raises(ValueError, match="encoder"):
+        kindle.VectorAgent("unused", 4, {}, encoder=encoder)
+
+
+def test_tiny_pixel_constructors_check_file_before_gpu(tmp_path):
+    missing = str(tmp_path / "missing.safetensors")
+    with pytest.raises(RuntimeError, match="No such file"):
+        kindle.VectorAgent(missing, 6, kindle.default_config(18), encoder="levjepa-tiny")
+    with pytest.raises(RuntimeError, match="No such file"):
+        kindle.Agent(missing, 18, encoder="levjepa-tiny")
+    with pytest.raises(RuntimeError, match="No such file"):
+        kindle._native.LeVJepaPerception(missing, architecture="tiny")
+    with pytest.raises(ValueError, match="architecture"):
+        kindle._native.LeVJepaPerception(missing, architecture="tiny-ish")
+
+
+@pytest.mark.parametrize("recorded, requested", [
+    ("levjepa", "levjepa-tiny"), ("levjepa-tiny", "levjepa"), (None, "levjepa-tiny"),
+])
+def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, capsys, recorded, requested):
+    checkpoint = tmp_path / "checkpoint"
+    checkpoint.mkdir()
+    (checkpoint / "metadata.json").write_text(json.dumps({"perception": {"kind": recorded}}))
+    output = tmp_path / "unused.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+                                    "--restore", str(checkpoint), "--encoder", requested])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert "encoder selection differs" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize("args, message", [
@@ -188,7 +224,8 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
-def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled):
+@pytest.mark.parametrize("encoder_kind", [None, "levjepa-tiny"])
+def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind):
     created = []
 
     class Environment:
@@ -224,7 +261,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
             assert memory_enabled, "disabled reporting must not query GPU memory"
             return dict(usage_bytes=1024**3, budget_bytes=3*1024**3)
 
-        def __init__(self, weights, streams, config):
+        def __init__(self, weights, streams, config, *, encoder="levjepa"):
+            assert encoder == (encoder_kind or "levjepa")
             self.streams, self.config = streams, config
 
         def begin_episodes(self, ids, frames):
@@ -260,6 +298,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "ALE/Seaquest-v5",
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
+        *(["--encoder", encoder_kind] if encoder_kind else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
     if behavior == "ignored_override":
