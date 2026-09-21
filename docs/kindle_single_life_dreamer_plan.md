@@ -9,14 +9,16 @@ start with the [status dashboard](../STATUS.md).
 ## What exists
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
-imagined actor/critic training and causal **LeVJEPA** perception. The current
-303M video frontend is frozen, not end-to-end JEPA training and not DINO. DINO
-remains a historical control, not an automatic fallback. The selected next
-frontend is a separately pretrained **5.49M causal ViT-Tiny/16**. Native numerical,
+imagined actor/critic training and causal **LeVJEPA** perception. The frontend is
+frozen during gameplay, not end-to-end JEPA training and not DINO. DINO remains
+a historical control, not an automatic fallback. The new experiments use a
+separately pretrained **5.49M causal ViT-Tiny/16**. Native numerical,
 optimizer/restore, streaming, fit and noncollapse checks pass; the first bounded
 4,096-update pretraining run completes with verified state and encoder exports.
 Frozen probes retain useful position features but mixed motion results. Bounded
-actor integration passes; Tiny is opt-in, not a proven gameplay replacement.
+actor integration and matched-order throughput pass. The Tiny Freeway pilot
+passes, but Breakout regresses and fresh-root reliability is untested. Tiny stays
+opt-in; the 303M frontend remains the default pending broader evidence.
 
 ```text
 previous belief + executed action -> deterministic prior -> predicted features
@@ -57,7 +59,7 @@ Full multi-stream evaluations determine results.
 | --- | --- | --- | --- |
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
-| Freeway | Assisted seed 0 pilots pass unassisted evaluation; three fresh roots fail: means 24.58/22.78/22.47, only 16/36, 3/36, 5/36 qualifying rounds | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Test exposure, not unchanged failed replicas. | [Successful pilot](../runs/freeway-persistence-learning-20260909.C0GoqT/hold64-evaluation.mp4), [failed confirmation](../runs/atari-recovered-confirmations-20260911.xPz5ud/freeway/seed1009-evaluation.mp4) |
+| Freeway | Tiny seed0 passes: midpoint/final means 30.50/33.03, both 36/36 qualifying rounds; untrained control 0/36, mean 0. Historical Large fresh roots fail: means 24.58/22.78/22.47, successes 16/36, 3/36, 5/36. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Confirm the fixed Tiny recipe on fresh roots 1009/2017/3019; seed0 is not reliability. | [Tiny final](../runs/tiny-freeway-exposure-20260921.ejKgSH/final.mp4), [midpoint](../runs/tiny-freeway-exposure-20260921.ejKgSH/midpoint.mp4), [control](../runs/tiny-freeway-exposure-20260921.ejKgSH/untrained.mp4), [complete evidence](../runs/tiny-freeway-exposure-20260921.ejKgSH/results.md) |
 | Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Inspect forecasts and improve the small-encoder recipe; no pretraining benefit demonstrated in one seed. Four-action arm remains held. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
 | Qbert | Pilot completes first pyramid in 17/24 episodes, mean 3,754.17; control 0/24, mean 125 | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Test longer exposure and post-bonus coverage. | [Trained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4) |
 
@@ -93,21 +95,28 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    The [15-step world check](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
    now completes with exact one-step overlap: feature/reward forecasts beat their
    baselines, continuation does not. Four own-policy matches do not explain the
-   score gap. Keep the pretrained Tiny frontend fixed for the next exposure test,
+   score gap. Keep the pretrained Tiny frontend fixed for Freeway confirmation,
    with native learning, 12M RSSM, R256, feature contract and vocabulary unchanged.
    Include offline experience; do not infer a capacity limit from different
    pretrained packages or reliability from one paired seed.
-3. Next test Tiny Freeway, then Qbert, with continuous 400,008-action pilots and
-   retained 200,004-action midpoints. Prefer runner-owned numbered saves, not a
-   watcher. The [history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
+3. The [fixed-Tiny Freeway pilot](../runs/tiny-freeway-exposure-20260921.ejKgSH/results.md)
+   completes: seed0, 400,008 actions/99,652 updates in 7.969h. Frozen midpoint and
+   final both pass, with means 30.50/33.03 and 36/36 qualifying rounds each;
+   the untrained-policy control has mean 0 and 0/36. All complete state, replay
+   and video checks pass. Both checkpoints already pass, so extra exposure is
+   not shown necessary; they are one history, not independent roots.
+   **Next confirm fresh roots 1009/2017/3019**, holding the encoder/runtime and
+   400,008-action primary budget fixed, with retained 200,004-action midpoints.
+   Keep Freeway's probability .5/hold64 training assistance and 75,000 unassisted
+   frozen actions per arm, plus separately restored untrained-policy controls.
+   Every native phase needs a separate declaration and review; none is started.
+   Historical Large pilots also passed before fresh roots failed. The
+   [runner-owned history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
    passes default/history/restore checks with exact full state and trajectories,
    all-stream replay and 768 Python CPU tests; the native package is unchanged.
-   The [fixed-Tiny Freeway pilot](../runs/tiny-freeway-exposure-20260921.ejKgSH/README.md)
-   starts fresh seed0 training at14:58 UTC on September21. Keep Freeway's
-   probability .5 / hold64 training assistance and 75,000
-   unassisted frozen actions; Qbert remains unassisted with four episodes per
-   stream and cap 600,000. Midpoint/final are one history, not independent roots.
-4. Revisit Breakout's prepared four-action comparison if still needed. Confirm
+4. Then test Qbert with a continuous 400,008-action pilot and 200,004 midpoint;
+   it remains unassisted, with four frozen episodes per stream and cap 600,000.
+   Revisit Breakout's prepared four-action comparison if still needed. Confirm
    successful changed recipes on all three fresh roots with controls.
    Do not replicate failures merely to keep the device occupied.
 
@@ -286,8 +295,8 @@ Continuation MSE remains worse (.005106 versus .003716). There are only22
 positive rewards and four terminal targets at each horizon, not independent
 new events. Recorded future actions condition these prior forecasts; this is
 not counterfactual or imagined-policy validation. Preserve both terminal checks.
-No current evidence justifies another encoder redesign before the fixed-Tiny
-Freeway exposure test; a continuation ablation remains a distinct later option.
+No current evidence justifies another encoder redesign before fresh-seed
+Freeway confirmation; a continuation ablation remains a distinct later option.
 
 Pretrained visual weights are supported; a video-dataset world-pretraining
 workflow is not adopted. Start with aligned RGB, executed actions/durations and
