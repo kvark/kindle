@@ -76,8 +76,33 @@ Frozen position decoding improves over its own initialization, but motion
 readouts have significant outliers; [retain the complete mixed result](../../runs/levjepa-tiny-quality-20260921.ojeZgt/results.md).
 [Gameplay-backend inference](../../runs/levjepa-tiny-gameplay-gpu-20260921.X6TnAI/results.md)
 and [bounded N6 learning/restore/replay](../../runs/levjepa-tiny-gameplay-pixels-20260921.NQLh0I/results.md)
-pass. Large's state and trajectories remain exact. Tiny is opt-in, not a proven
-replacement; matched-order cost and full-budget downstream comparison are next.
+pass. Large's state and trajectories remain exact. The
+[matched-order cost check](../../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md)
+cuts total time 26–27% and observation time 74–75%, with exact same-arm state and
+trajectory repeats. The [Breakout package comparison](../../runs/levjepa-tiny-breakout-20260921.ghJPWG/results.md)
+regresses: Tiny mean 10.92 versus Large 30.79; neither passes the two-wall gate.
+The [own-initial-encoder ablation](../../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
+shows no pretraining benefit in one paired seed. Tiny remains opt-in.
+
+The [complete Tiny Freeway pilot](../../runs/tiny-freeway-exposure-20260921.ejKgSH/results.md)
+passes: 400,008 actions /99,652 updates, 7.969h. Frozen final mean **33.03** with
+**36/36** qualifying rounds, midpoint mean **30.50** with **36/36**, restored
+untrained-policy mean **0** with **0/36**. Each frozen arm has 75,000 unassisted
+actions, zero updates/cutoffs; complete states, all-stream replays and decoded
+videos pass. [Final video](../../runs/tiny-freeway-exposure-20260921.ejKgSH/final.mp4),
+[control video](../../runs/tiny-freeway-exposure-20260921.ejKgSH/untrained.mp4),
+[combined audit](../../runs/tiny-freeway-exposure-20260921.ejKgSH/pair.json).
+Both checkpoints pass, so the extra exposure is not shown necessary. Seed0 is
+not a reliability root: next confirm the fixed recipe on 1009/2017/3019.
+All five native phases are terminal; only unrecorded readers are reusable.
+No automatic successor, default adoption or third reliable game follows.
+
+The [15-step world-model report](../../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
+retains 16,470 prior forecast targets from four Tiny Breakout matches. Feature
+and reward predictions beat simple baselines throughout; continuation does not.
+Exact one-step overlap and complete frozen state pass. Recorded future actions
+condition the forecasts; this is not imagined-policy validation or a diagnosed
+cause of the gameplay regression.
 
 ## Qualified runtime
 
@@ -107,6 +132,13 @@ passes Python bindings/tests, Linux/lavapipe canaries and macOS checks. The lear
 locks, native bindings, active runner and pinned guards are byte-identical to
 the pre-cleanup source. Research-history removal changes neither the runtime
 nor the campaign's 5,329 verified inputs.
+
+The current implementation at ed16e19 passes
+[CI run156](https://github.com/kvark/kindle/actions/runs/35615868079) and all 768
+local Python CPU tests, including the 13-line checkpoint-history port. The native
+Rust/Cargo inputs are unchanged by that port. Later result/dashboard updates are
+documentation-only; consult the [live PR checks](https://github.com/kvark/kindle/pull/29/checks)
+for the current documentation head.
 
 ## Archive, not deleted evidence
 

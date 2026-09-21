@@ -145,23 +145,28 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   positive rewards/four terminals. Recorded future actions condition forecasts;
   this is not counterfactual validation or a cause of policy failure. Preserve
   all terminal writers; use only unrecorded readers. See both results.md files.
-  Next hold pretrained Tiny fixed and test longer Freeway exposure with immutable
-  midpoint/final saves, then frozen evaluations and an untrained-policy control.
   The runner-only history port bf0c5c0 passes all three native windows in
   `runs/tiny-checkpoint-history-20260921.kVSoYg`: original/history3,840 actions and
   610 updates, exact final full state/trajectories, historical1,920-action restore
   96 actions/zero updates, all six streams replayed. Both staged and main CPU
   suites pass768 tests; source/tests are adopted byte-identically. Preserve the
   three terminal writers; use only unrecorded audit readers.
-  `runs/tiny-freeway-exposure-20260921.ejKgSH` separately declares fresh seed0
-  training at14:58 UTC:400,008 uninterrupted actions, pretrained Tiny7fe9b252,
+  `runs/tiny-freeway-exposure-20260921.ejKgSH` completes all five native phases:
+  fresh seed0,400,008 uninterrupted actions/99,652 updates, pretrained Tiny7fe9b252,
   unchanged native998078ca/12M/R256/full18/N6, probability.5/hold64 assistance.
-  Immutable200,004/400,008 saves precede individually reviewed75,000-action
-  unassisted frozen midpoint/final and fresh/restored untrained-control phases.
-  Only training is launched; its unchanged host guard has an18h bound. No native
-  rebuild, changed game gate, encoder default adoption, retry or automatic GPU
-  successor. This is one exposure pilot, not three independent roots or a pure
-  Tiny/Large comparison. Check training about every30min or at completion.
+  Frozen midpoint/final/control each complete75,000 unassisted actions,36 natural
+  rounds,zero updates/cutoffs: means30.50/33.0278/0 and successes36/36,36/36,0/36.
+  Complete241-entry/146-moment states,common initial learner state,all six replay
+  streams and decoded whole-stream videos pass; pair.json binds the full result.
+  Training takes7.969h,.929x aggregate/.155x per-stream realtime,89.4% learning;
+  these are wall times,not utilization. All guards pass; no child remains.
+  Preserve all terminal writers; only unrecorded audit/pair readers are reusable.
+  Both checkpoints pass,so extra exposure is not shown necessary. Next separately
+  declare fresh roots1009/2017/3019 on the same Tiny/runtime/assistance recipe,
+  fixed400,008-action primary budget,200,004 midpoints and matched untrained
+  controls. No fresh-root phase is declared yet. Seed0 is not reliability;
+  historical Large pilots also passed before fresh roots failed. Five-game status
+  remains2/5. No default adoption,pure-size claim,retry or automatic successor.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
