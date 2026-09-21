@@ -90,15 +90,21 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    completes the same learner seed/budget with Tiny's own original encoder weights:
    frozen12.4583 versus1.10 control, still no two-wall completion. It shows no
    pretraining benefit in this pilot; the target remains trained causal-video JEPA.
-   Inspect separately qualified current-checkpoint world forecasts before choosing
-   the next training change. Keep native learning, 12M RSSM, R256, feature contract
-   and vocabulary while isolating that change. Include offline experience; do not
-   infer a capacity limit from different pretrained packages or reliability from
-   one paired seed.
-3. Then separately test Freeway and Qbert with continuous 400,008-action pilots and
+   The [15-step world check](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
+   now completes with exact one-step overlap: feature/reward forecasts beat their
+   baselines, continuation does not. Four own-policy matches do not explain the
+   score gap. Keep the pretrained Tiny frontend fixed for the next exposure test,
+   with native learning, 12M RSSM, R256, feature contract and vocabulary unchanged.
+   Include offline experience; do not infer a capacity limit from different
+   pretrained packages or reliability from one paired seed.
+3. Next test Tiny Freeway, then Qbert, with continuous 400,008-action pilots and
    retained 200,004-action midpoints. Prefer runner-owned numbered saves, not a
-   watcher. The staged history option needs bounded default/history/restore
-   checks. Keep Freeway's probability .5 / hold64 training assistance and 75,000
+   watcher. The [history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
+   passes default/history/restore checks with exact full state and trajectories,
+   all-stream replay and 768 Python CPU tests; the native package is unchanged.
+   The [fixed-Tiny Freeway pilot](../runs/tiny-freeway-exposure-20260921.ejKgSH/README.md)
+   starts fresh seed0 training at14:58 UTC on September21. Keep Freeway's
+   probability .5 / hold64 training assistance and 75,000
    unassisted frozen actions; Qbert remains unassisted with four episodes per
    stream and cap 600,000. Midpoint/final are one history, not independent roots.
 4. Revisit Breakout's prepared four-action comparison if still needed. Confirm
@@ -259,7 +265,7 @@ and [common-recording report](../runs/common-world-report-20260909.O7nqqe/report
 show action sensitivity but limited cross-trajectory generalization. This is not
 a proven explanation for failed policies. For new Pong roots, preselect the first
 four complete stream-zero matches without score filtering. The staged multi-match
-probe still needs current-source GPU forecast checks; CPU extraction is not that.
+probe needs current-source GPU forecast checks; CPU extraction alone is not that.
 The [current-package readiness check](../runs/current-world-probe-cpu-20260921.KlMyMe/README.md)
 passes 74 CPU tests and selects the first four Tiny trained/control matches.
 Its [run-local wrapper](../runs/current-world-probe-wrapper-cpu-20260921.r8GrmS/README.md)
@@ -271,9 +277,17 @@ Scalar restore explicitly changes only collection-stream metadata6->1 and the
 executed-action counter. Feature MSE .0001665 beats persistence .0002863; reward
 MAE .00892 beats zero .03819. Continuation MSE .00439 is worse than always-continue
 .00353, with only four terminals and22 positive rewards. These are useful
-one-step measurements, not a causal explanation of the score gap. Next declare
-a separate horizon15/all-origin check with episode boundaries, event counts and
-exact one-step overlap before choosing another training change; none is active.
+one-step measurements, not a causal explanation of the score gap. The separate
+[15-step/all-origin check](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
+also passes, with 16,470 forecast targets, exact one-step overlap and unchanged
+complete state. At horizon15, feature MSE is .0001860 versus .0010262 persistence;
+reward MAE/MSE are .008938/.019244 versus .040187/.118692 zero prediction.
+Continuation MSE remains worse (.005106 versus .003716). There are only22
+positive rewards and four terminal targets at each horizon, not independent
+new events. Recorded future actions condition these prior forecasts; this is
+not counterfactual or imagined-policy validation. Preserve both terminal checks.
+No current evidence justifies another encoder redesign before the fixed-Tiny
+Freeway exposure test; a continuation ablation remains a distinct later option.
 
 Pretrained visual weights are supported; a video-dataset world-pretraining
 workflow is not adopted. Start with aligned RGB, executed actions/durations and

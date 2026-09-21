@@ -135,19 +135,33 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   terminal. Never remove the hold, restart old followers or count historical
   root 1009 as a root in the new matched campaign.
 - Compact-encoder cost passes, but its first Breakout package regresses and the
-  completed pretraining ablation shows no benefit in one seed. Current world-
-  forecast instrumentation is separately declared in
-  `runs/tiny-world-one-step-20260921.U7yHOa`: first four pretrained Tiny trained-
-  policy matches, horizon1/stride1. Both strict and separately declared forced
-  replay now pass:1,126 actions, exact sampled actions/transitions/common forecasts
-  and complete241-entry/146-moment frozen state. Scalar restore explicitly changes
-  collection_streams6->1. Feature/reward forecasts beat persistence/zero controls;
-  continuation MSE is worse than always-continue, with only four terminals.
-  Preserve both terminal writers/parity.json; use unrecorded readers only. This
-  is one-step evidence, not a cause of policy failure. Next consider a separately
-  declared horizon15/all-origin check with exact one-step overlap before choosing
-  a training change. No such job, retry, NVML, concurrent work or automatic
-  longer-horizon/learning successor is declared. See its results.md.
+  completed pretraining ablation shows no benefit in one seed. Current world
+  checks complete in `runs/tiny-world-one-step-20260921.U7yHOa` and
+  `runs/tiny-world-horizon15-20260921.bKmiUF`: first four pretrained Tiny matches,
+  1,126 actions, exact strict/forced one-step replay and exact H1 overlap in the
+  16,470-target horizon15/all-origin diagnostic. Complete241-entry/146-moment
+  frozen state passes; scalar collection metadata6->1 is explicit. Feature/reward
+  forecasts beat controls at every horizon, continuation is worse, with only22
+  positive rewards/four terminals. Recorded future actions condition forecasts;
+  this is not counterfactual validation or a cause of policy failure. Preserve
+  all terminal writers; use only unrecorded readers. See both results.md files.
+  Next hold pretrained Tiny fixed and test longer Freeway exposure with immutable
+  midpoint/final saves, then frozen evaluations and an untrained-policy control.
+  The runner-only history port bf0c5c0 passes all three native windows in
+  `runs/tiny-checkpoint-history-20260921.kVSoYg`: original/history3,840 actions and
+  610 updates, exact final full state/trajectories, historical1,920-action restore
+  96 actions/zero updates, all six streams replayed. Both staged and main CPU
+  suites pass768 tests; source/tests are adopted byte-identically. Preserve the
+  three terminal writers; use only unrecorded audit readers.
+  `runs/tiny-freeway-exposure-20260921.ejKgSH` separately declares fresh seed0
+  training at14:58 UTC:400,008 uninterrupted actions, pretrained Tiny7fe9b252,
+  unchanged native998078ca/12M/R256/full18/N6, probability.5/hold64 assistance.
+  Immutable200,004/400,008 saves precede individually reviewed75,000-action
+  unassisted frozen midpoint/final and fresh/restored untrained-control phases.
+  Only training is launched; its unchanged host guard has an18h bound. No native
+  rebuild, changed game gate, encoder default adoption, retry or automatic GPU
+  successor. This is one exposure pilot, not three independent roots or a pure
+  Tiny/Large comparison. Check training about every30min or at completion.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
