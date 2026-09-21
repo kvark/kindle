@@ -58,6 +58,8 @@ def main():
     parser.add_argument("--report-every", type=int, default=1000)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--checkpoint-every", type=int, default=20000)
+    parser.add_argument("--checkpoint-history", action="store_true",
+                        help="preserve each save in CHECKPOINT/<run-actions> instead of replacing the last save")
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
@@ -72,6 +74,8 @@ def main():
         parser.error("steps must be a positive multiple of num-envs")
     if args.report_every <= 0 or args.checkpoint_every <= 0:
         parser.error("report/checkpoint intervals must be positive")
+    if args.checkpoint_history and args.checkpoint is None:
+        parser.error("checkpoint-history requires --checkpoint")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
@@ -176,6 +180,7 @@ def main():
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
+                  **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),
                   policy_seed_rule="config.seed + stream (wrapping u64)",
                   atari_protocol=args.atari_protocol, action_repeat=ATARI_ACTION_REPEAT,
@@ -209,10 +214,14 @@ def main():
 
         def save():
             before = time.perf_counter()
-            agent.save_checkpoint(str(args.checkpoint))
+            checkpoint = args.checkpoint
+            if args.checkpoint_history:
+                checkpoint = checkpoint / str(run_actions)
+                checkpoint.mkdir(parents=True)
+            agent.save_checkpoint(str(checkpoint))
             check_memory("checkpoint", run_actions)
             emit(dict(event="checkpoint", run_step=run_actions, learner_step=agent.learner_step,
-                      identity=checkpoint_identity(args.checkpoint)))
+                      identity=checkpoint_identity(checkpoint)))
             timing["checkpoint"] += time.perf_counter() - before
 
         def progress(event):
