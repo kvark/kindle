@@ -1,6 +1,6 @@
 # Kindle status
 
-Updated: **2026-09-21, 14:04 UTC**. This is the short operational dashboard,
+Updated: **2026-09-21, 14:58 UTC**. This is the short operational dashboard,
 updated at meaningful phase boundaries, not a live log. The
 [research plan](docs/kindle_single_life_dreamer_plan.md) remains authoritative
 for architecture, budgets and acceptance gates.
@@ -29,11 +29,15 @@ moments, controls and replays pass. **The pretraining ablation also completes**:
 using the same Tiny encoder's original weights yields **12.46 vs1.10** control,
 still **0/24 two-wall completions**. This single seed shows no downstream benefit
 from the first pretraining recipe, not a capacity limit or a random-encoder
-product direction. **One-step world-forecast replay also passes**: strict and
-forced actions reproduce all 1,126 targets exactly, with complete frozen state.
-Feature/reward forecasts beat simple baselines on these four matches, but
-continuation prediction is worse than always-continue. No GPU job is active.
-The target remains trained causal-video JEPA.
+product direction. **World-forecast replay through horizon 15 passes**: 16,470
+targets, exact one-step overlap and complete frozen state. Feature/reward
+forecasts beat simple baselines at every horizon on these four matches, but
+continuation prediction is worse than always-continue. This does not explain the
+policy's weak score. **Running: longer Freeway exposure with pretrained Tiny
+fixed**, retaining midpoint/final checkpoints. Its small runner-only history
+option passes exact state/trajectory and midpoint-restore checks. Training starts
+at14:58 UTC; expected roughly eight hours, hard limit18h. The target remains
+trained causal-video JEPA.
 The Breakout Large reference is complete: frozen mean **30.79 versus 0.97**
 untrained, but **0/24 two-wall completions**. Its unstarted four-action arm is held.
 
@@ -44,7 +48,7 @@ untrained, but **0/24 two-wall completions**. Its unstarted four-action arm is h
 | Done | Native Dreamer + causal LeVJEPA, vector collection | Rust/Meganeura/Blade; six independent streams share batched inference and one learner. No concurrent learner service. |
 | Done | Boxing and Pong reliability | Three fresh seeds pass each game's gate. Pong: **71/72 trained wins vs 0/76 untrained**, zero evaluation updates/cutoffs; all six videos and complete state verify. |
 | Done | Qualify block-matmul optimization | **27.3% higher throughput**, exact same-state/moment/action checks. Still below real-time training. |
-| Done | Clean PR history and fix CI | Old 286-commit history archived; four linear review commits. [Tiny implementation passes CI #154](https://github.com/kvark/kindle/actions/runs/35584786485); subsequent updates are documentation-only. Qualified Rust sources pass 92 ordinary CPU tests plus the independent fixture reader. [Live PR status/checks](https://github.com/kvark/kindle/pull/29/checks). |
+| Done; new helper CI pending | Clean PR history and fix CI | Old 286-commit history archived; linear review commits, no merges. [Tiny head passes CI #155](https://github.com/kvark/kindle/actions/runs/35609861487). The new 13-line checkpoint-history option passes768 local Python tests and exact native state/trajectory/restore checks; native Rust/Cargo inputs are unchanged. [Live PR status/checks](https://github.com/kvark/kindle/pull/29/checks). |
 | Done | Breakout four-action runtime qualification | Gradients, full state, initialization/restore and all eight N6 pixel/replay/refusal checks pass. Optional replay/schema support is in the main tree; full eighteen-action remains the default. No new gameplay result. |
 | Done, with caveats | First compact causal-video JEPA pretraining candidate | **5,486,592 parameters**; **250,000 observations** with whole-recording held-out splits. **Fresh seed 743, 4,096 updates complete**, numerical/optimizer/restore/streaming/state/export checks pass. Native step .45s plus .78s data preparation. Frozen noncollapse passes; position decoding improves, motion is not uniformly better. [Pretraining](runs/levjepa-tiny-pretrain-20260921.JaPZpW/results.md), [all frozen probe results and caveats](runs/levjepa-tiny-quality-20260921.ojeZgt/results.md). |
 | Done | Finish active Breakout Large reference | **200,004 actions / 49,652 updates**. Frozen mean **30.79 vs 0.97**, two-wall successes **0/24 vs 0/29**; both zero updates/cutoffs. Complete state/replays/videos pass. Learning, not a win. Four-action arm held. [Results and videos](runs/breakout-action-pilot-20260920.kNeotb/results.md). |
@@ -52,19 +56,20 @@ untrained, but **0/24 two-wall completions**. Its unstarted four-action arm is h
 | Done | Confirm cost in both orders | All four **Tiny/Large/Large/Tiny** runs pass, **10,008 actions / 2,153 updates each**. Post-warmup windows: **26.0–26.9% less total time**, **73.6–74.8% less observation time**; exact state/moment/report/trajectory repeats. Tiny **.897–.902× aggregate / ~.150× per stream**. [Complete comparison](runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md). |
 | Complete; quality regresses | Full-budget Tiny/Large learning comparison | Fresh seed0 Tiny: **200,004 actions / 49,652 updates, 4.108h**. Frozen **10.92 vs .93** control, **0/24 vs 0/29** two-wall successes, zero updates/cutoffs. Complete state, common initial learner state and all-stream replays pass. Large scores **30.79** at the same budget; different corpora mean a package comparison, not a pure size ablation. [Results and both videos](runs/levjepa-tiny-breakout-20260921.ghJPWG/results.md). |
 | Complete; no demonstrated benefit | Isolate the effect of Tiny pretraining | Own initial encoder: **200,004 actions /49,652 updates, 4.081h**. Frozen **12.46 vs1.10** control, **0/24 vs0/30** two-wall successes; complete state/common initialization/replays pass. Trained-policy mean is **+1.54** versus pretrained Tiny, with one seed only. No random-encoder product switch or default adoption. [Results and videos](runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md). |
-| Deferred | Freeway/Qbert exposure and Breakout action vocabulary | Resume with separate declarations after the compact frontend decision. Confirm successful recipes on three seeds; existing gates unchanged. |
+| Running: training | Longer Freeway exposure with fixed pretrained Tiny | Fresh seed0, **400,008 uninterrupted actions**; immutable 200,004/400,008 saves, then separately reviewed75,000-action unassisted evaluations and an untrained control. Only training is launched. One pilot is not reliability. [Protocol](runs/tiny-freeway-exposure-20260921.ejKgSH/README.md), [completed history qualification](runs/tiny-checkpoint-history-20260921.kVSoYg/results.md). |
+| Next | Qbert exposure and Breakout action vocabulary | Separate declarations; confirm successful recipes on three seeds. Existing gates unchanged. |
 | Open | Lower learner cost / justify representation | Replay-ratio and objective ablations remain needed. Current wins do **not** establish a JEPA advantage. |
-| One-step complete; longer horizon next | World-model forecasts on current checkpoints | Both strict/forced GPU replays and complete frozen-state checks pass: **1,126 actions /four matches**, exact forecasts/input/reset identities, zero updates. Feature MSE **.0001665 vs .0002863** persistence; reward MAE **.00892 vs .03819** zero; continuation MSE **.00439 vs .00353** always-continue (worse). Only22 positive rewards/four terminals. Horizon15 is not yet declared. [World report and raw predictions](runs/tiny-world-one-step-20260921.U7yHOa/results.md). |
+| Done, with caveats | World-model forecasts through the actor's 15-step horizon | **1,126 actions /four matches /16,470 targets**, exact one-step overlap and complete frozen state, zero updates. H15 feature MSE **.0001860 vs .0010262** persistence; reward MAE **.00894 vs .04019** zero; continuation MSE **.00511 vs .00372** always-continue (worse). Only22 positive rewards/four terminals; recorded future actions condition forecasts. [15-step report and raw predictions](runs/tiny-world-horizon15-20260921.bKmiUF/results.md), [strict/forced one-step comparison](runs/tiny-world-one-step-20260921.U7yHOa/results.md). |
 | Later | Native games, transfer, intrinsic motivation, swarms | Single-actor reliability first. Not current work. |
 
-**Next decision:** extend the separately qualified world check to the actor's
-15-step imagination horizon before choosing the next small-encoder training
-change. The first pretraining recipe has not demonstrated a
-gameplay benefit over its own initialization; that does not establish that
-5.49M is too small. Keep the causal-video JEPA target and isolate one change
-at a time. One-step forecasts show useful signal and a continuation weakness;
-they do not explain policy failure. Neither a single paired seed nor good replay
-instrumentation is reliability evidence.
+**Next decision:** test whether more online exposure helps Freeway while the
+pretrained Tiny encoder stays fixed. Compare midpoint and final policy with the
+same unassisted protocol and an untrained control; confirm a passing recipe on
+three fresh roots before claiming reliability. The first pretraining recipe has
+not demonstrated a Breakout benefit over its own initialization, but that does
+not establish that 5.49M is too small. The 15-step forecasts show useful signal
+and a continuation weakness, not a cause of policy failure. Keep the causal-video
+JEPA target; no evidence yet justifies another encoder redesign or default switch.
 [Exact parameter accounting and selected design](runs/model-sizing-20260920.kPIOWC/README.md).
 [Native pretraining readiness and next steps](runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md).
 [Independent reference and memory results](runs/levjepa-tiny-reference-20260920.XhB8T8/README.md).
