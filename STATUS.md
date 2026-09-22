@@ -1,6 +1,6 @@
 # Kindle status
 
-Updated: **2026-09-21, 23:57 UTC**. This is the short operational dashboard,
+Updated: **2026-09-22, 00:04 UTC**. This is the short operational dashboard,
 updated at meaningful phase boundaries, not a live log. The
 [research plan](docs/kindle_single_life_dreamer_plan.md) remains authoritative
 for architecture, budgets and acceptance gates.
@@ -10,7 +10,7 @@ Boxing and Pong pass their three-seed gates. **The small-encoder Freeway pilot
 now passes:** final policy **36/36** qualifying rounds, mean **33.03 crossings**,
 versus **0/36**, mean **0**, for its untrained-policy control. Its midpoint also
 passes, mean **30.50**. All five phases, complete state/moments, six-stream replays
-and videos verify. **No GPU job is active; fresh-seed confirmation is next.**
+and videos verify. **Fresh-seed confirmation is running: seed 1009 training.**
 Freeway is not reliable yet; Breakout and Qbert remain below their gates.
 
 The selected frontend is a separately trained **5.49M causal-video JEPA**, not
@@ -37,7 +37,7 @@ trained causal-video encoder, not random features.
 | Complete; quality regresses | Full-budget Tiny/Large learning comparison | Fresh seed0 Tiny: **200,004 actions / 49,652 updates, 4.108h**. Frozen **10.92 vs .93** control, **0/24 vs 0/29** two-wall successes, zero updates/cutoffs. Complete state, common initial learner state and all-stream replays pass. Large scores **30.79** at the same budget; different corpora mean a package comparison, not a pure size ablation. [Results and both videos](runs/levjepa-tiny-breakout-20260921.ghJPWG/results.md). |
 | Complete; no demonstrated benefit | Isolate the effect of Tiny pretraining | Own initial encoder: **200,004 actions /49,652 updates, 4.081h**. Frozen **12.46 vs1.10** control, **0/24 vs0/30** two-wall successes; complete state/common initialization/replays pass. Trained-policy mean is **+1.54** versus pretrained Tiny, with one seed only. No random-encoder product switch or default adoption. [Results and videos](runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md). |
 | Pilot passes | Freeway with fixed pretrained Tiny | Fresh seed0: **400,008 actions /99,652 updates, 7.969h**. Frozen final **33.03 crossings, 36/36** qualifying rounds; midpoint **30.50, 36/36**; untrained policy **0, 0/36**. Each has 75,000 unassisted actions, zero updates/cutoffs. Complete state, all six streams and decoded videos pass. [Results and videos](runs/tiny-freeway-exposure-20260921.ejKgSH/results.md), [combined audit](runs/tiny-freeway-exposure-20260921.ejKgSH/pair.json). |
-| Next; not started | Freeway stability on fresh roots 1009/2017/3019 | Hold Tiny/runtime/assistance and 400,008-action primary budget fixed; retain 200,004-action midpoints and matched untrained controls. Individually declare/review each phase. Seed0 is not a reliability root. |
+| Running: seed1009 training | Freeway stability on fresh roots 1009/2017/3019 | Same Tiny/runtime/assistance, 400,008-action primary budget and immutable 200,004 midpoint. Seed1009 starts at 00:04 UTC; approximately eight hours expected, 18h bound. Frozen midpoint/final and matched controls follow separately; roots2017/3019 are unstarted. [Fixed protocol](runs/tiny-freeway-confirmation-20260922.tij9QW/README.md), [current declaration](runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/train-declaration.json). |
 | Later | Qbert exposure and Breakout action vocabulary | Separate declarations; confirm successful recipes on three seeds. Existing gates unchanged. |
 | Open | Lower learner cost / justify representation | Replay-ratio and objective ablations remain needed. Current wins do **not** establish a JEPA advantage. |
 | Done, with caveats | World-model forecasts through the actor's 15-step horizon | **1,126 actions /four matches /16,470 targets**, exact one-step overlap and complete frozen state, zero updates. H15 feature MSE **.0001860 vs .0010262** persistence; reward MAE **.00894 vs .04019** zero; continuation MSE **.00511 vs .00372** always-continue (worse). Only22 positive rewards/four terminals; recorded future actions condition forecasts. [15-step report and raw predictions](runs/tiny-world-horizon15-20260921.bKmiUF/results.md), [strict/forced one-step comparison](runs/tiny-world-one-step-20260921.U7yHOa/results.md). |

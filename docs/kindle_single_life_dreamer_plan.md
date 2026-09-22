@@ -109,7 +109,10 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    400,008-action primary budget fixed, with retained 200,004-action midpoints.
    Keep Freeway's probability .5/hold64 training assistance and 75,000 unassisted
    frozen actions per arm, plus separately restored untrained-policy controls.
-   Every native phase needs a separate declaration and review; none is started.
+   Every native phase needs a separate declaration and review. The
+   [fresh-root confirmation](../runs/tiny-freeway-confirmation-20260922.tij9QW/README.md)
+   starts only seed1009 training at00:04 UTC September22; later phases/roots are
+   unstarted. It reuses the qualified package without a rebuild.
    Historical Large pilots also passed before fresh roots failed. The
    [runner-owned history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
    passes default/history/restore checks with exact full state and trajectories,
