@@ -1,6 +1,6 @@
 # Kindle status
 
-Updated: **2026-09-22, 21:37 UTC**. This is the short operational dashboard,
+Updated: **2026-09-22, 22:36 UTC**. This is the short operational dashboard,
 updated at meaningful phase boundaries, not a live log. The
 [research plan](docs/kindle_single_life_dreamer_plan.md) remains authoritative
 for architecture, budgets and acceptance gates.
@@ -11,7 +11,8 @@ now passes:** final policy **36/36** qualifying rounds, mean **33.03 crossings**
 versus **0/36**, mean **0**, for its untrained-policy control. Its midpoint also
 passes, mean **30.50**. All five phases, complete state/moments, six-stream replays
 and videos verify. **Fresh-seed confirmation: seed1009 passes the complete pair, final36/36
-versus control0/36. Seed2017 training is running; one of three roots passes.**
+versus control0/36. Seed2017 was stopped after its host guard disappeared;
+one of three roots passes. A fresh replacement is prepared, awaiting a no-retry exception.**
 Freeway is not reliable yet; Breakout and Qbert remain below their gates.
 
 The selected frontend is a separately trained **5.49M causal-video JEPA**, not
@@ -38,14 +39,16 @@ trained causal-video encoder, not random features.
 | Complete; quality regresses | Full-budget Tiny/Large learning comparison | Fresh seed0 Tiny: **200,004 actions / 49,652 updates, 4.108h**. Frozen **10.92 vs .93** control, **0/24 vs 0/29** two-wall successes, zero updates/cutoffs. Complete state, common initial learner state and all-stream replays pass. Large scores **30.79** at the same budget; different corpora mean a package comparison, not a pure size ablation. [Results and both videos](runs/levjepa-tiny-breakout-20260921.ghJPWG/results.md). |
 | Complete; no demonstrated benefit | Isolate the effect of Tiny pretraining | Own initial encoder: **200,004 actions /49,652 updates, 4.081h**. Frozen **12.46 vs1.10** control, **0/24 vs0/30** two-wall successes; complete state/common initialization/replays pass. Trained-policy mean is **+1.54** versus pretrained Tiny, with one seed only. No random-encoder product switch or default adoption. [Results and videos](runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md). |
 | Pilot passes | Freeway with fixed pretrained Tiny | Fresh seed0: **400,008 actions /99,652 updates, 7.969h**. Frozen final **33.03 crossings, 36/36** qualifying rounds; midpoint **30.50, 36/36**; untrained policy **0, 0/36**. Each has 75,000 unassisted actions, zero updates/cutoffs. Complete state, all six streams and decoded videos pass. [Results and videos](runs/tiny-freeway-exposure-20260921.ejKgSH/results.md), [combined audit](runs/tiny-freeway-exposure-20260921.ejKgSH/pair.json). |
-| Running: seed2017 training; seed1009 passes | Freeway stability on fresh roots 1009/2017/3019 | Seed1009:400,008 actions/99,652 updates,8.013h. Midpoint/final **36/36** each, means **31.33/32.92**, control **0/36, mean0**; zero frozen updates/cutoffs. Complete pair/state/replays/videos pass. Seed2017 starts21:37 UTC, same400,008-action budget and18h bound; seed3019 unstarted. **1/3 fresh roots passes.** [Results/videos](runs/tiny-freeway-confirmation-20260922.tij9QW/results.md), [complete pair](runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/pair.json), [current declaration](runs/tiny-freeway-confirmation-20260922.tij9QW/seed2017/train-declaration.json). |
+| Seed1009 passes; seed2017 interrupted | Freeway stability on fresh roots 1009/2017/3019 | Seed1009 final **36/36, mean32.92** versus control **0/36, mean0**; complete pair/state/replays/videos pass. Seed2017 stopped at45,714/400,008 actions after guard loss; no valid result or live child remains. A fresh full-budget replacement under a tested systemd service is prepared, not launched; explicit no-retry exception requested. Seed3019 unstarted. **1/3 fresh roots passes.** [Results/videos](runs/tiny-freeway-confirmation-20260922.tij9QW/results.md), [interruption and prepared replacement](runs/freeway-guard-interruption-20260922.2xt6tnn_/README.md). |
 | Later | Qbert exposure and Breakout action vocabulary | Separate declarations; confirm successful recipes on three seeds. Existing gates unchanged. |
 | Open | Lower learner cost / justify representation | Replay-ratio and objective ablations remain needed. Current wins do **not** establish a JEPA advantage. |
 | Done, with caveats | World-model forecasts through the actor's 15-step horizon | **1,126 actions /four matches /16,470 targets**, exact one-step overlap and complete frozen state, zero updates. H15 feature MSE **.0001860 vs .0010262** persistence; reward MAE **.00894 vs .04019** zero; continuation MSE **.00511 vs .00372** always-continue (worse). Only22 positive rewards/four terminals; recorded future actions condition forecasts. [15-step report and raw predictions](runs/tiny-world-horizon15-20260921.bKmiUF/results.md), [strict/forced one-step comparison](runs/tiny-world-one-step-20260921.U7yHOa/results.md). |
 | Later | Native games, transfer, intrinsic motivation, swarms | Single-actor reliability first. Not current work. |
 
-**Next decision:** can the passing Tiny Freeway recipe survive fresh training
-seeds? Both pilot checkpoints pass, so the additional exposure improves this
+**Next decision:** approve or decline the prepared replacement for the interrupted
+seed2017 run; the explicit no-retry instruction currently prevents launch.
+The scientific question remains whether the passing Tiny Freeway recipe survives
+fresh training seeds. Both pilot checkpoints pass, so the additional exposure improves this
 seed's mean by 2.53 crossings but is not shown necessary. Keep the 400,008-action
 primary budget fixed for confirmation. Historical Large Freeway pilots also
 passed before fresh roots failed; do not infer stability from seed0. The Tiny
