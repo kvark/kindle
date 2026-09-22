@@ -136,6 +136,10 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    all-stream replay and 768 Python CPU tests; the native package is unchanged.
 4. Then test Qbert with a continuous 400,008-action pilot and 200,004 midpoint;
    it remains unassisted, with four frozen episodes per stream and cap 600,000.
+   The [Tiny Qbert protocol and CPU input checks](../runs/tiny-qbert-exposure-preparation-20260922.9c53nmwp/README.md)
+   are prepared; no GPU phase is declared or queued. Keep the trained Tiny
+   frontend, unchanged runtime and full Qbert gate. Compare added exposure within
+   this pilot; the older Large result is historical context, not a matched arm.
    Revisit Breakout's prepared four-action comparison if still needed. Confirm
    successful changed recipes on all three fresh roots with controls.
    Do not replicate failures merely to keep the device occupied.
