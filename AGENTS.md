@@ -164,7 +164,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Both checkpoints pass,so extra exposure is not shown necessary. Next separately
   declare fresh roots1009/2017/3019 on the same Tiny/runtime/assistance recipe,
   fixed400,008-action primary budget,200,004 midpoints and matched untrained
-  controls. No fresh-root phase is declared yet. Seed0 is not reliability;
+  controls. The separate confirmation in
+  `runs/tiny-freeway-confirmation-20260922.tij9QW` now starts only seed1009
+  training at00:04 UTC September22. Eleven CPU routing/refusal tests pass; its
+  declaration binds51 inputs and reuses unchanged qualified phase/state functions
+  under new output routing. Native998078ca and all gates stay fixed. Direct child
+  939693 is owned by unchanged host guard939675,18h bound; session6845 performs
+  only a CPU audit after completion. No frozen phase or later root is declared.
+  Check about every30min or at completion; never restart a terminal writer.
+  Seed0 is not reliability;
   historical Large pilots also passed before fresh roots failed. Five-game status
   remains2/5. No default adoption,pure-size claim,retry or automatic successor.
   Do not replicate unchanged failed
