@@ -52,7 +52,7 @@ qualified adapter, with 742 CPU tests passing and no native rebuild. These are
 runtime results, not evidence that four actions learn better. The
 [paired learning pilot](../../runs/breakout-action-pilot-20260920.kNeotb/declaration.md)
 is declared with nine CPU checks and 105 input pins; the
-[status dashboard](../../STATUS.md) tracks its active phase and later results.
+[PR status dashboard](https://github.com/kvark/kindle/pull/29) tracks its active phase and later results.
 The September 20 [model-sizing decision](../../runs/model-sizing-20260920.kPIOWC/README.md)
 now prioritizes a separately pretrained 5.49M causal-video JEPA frontend. The
 [eighteen-action Large quartet](../../runs/breakout-action-pilot-20260920.kNeotb/results.md)

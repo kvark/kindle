@@ -1,6 +1,6 @@
 # Kindle
 
-**[Project status: done, in progress, next, results and videos](STATUS.md)**
+**[Project status: done, in progress, next, results and videos](https://github.com/kvark/kindle/pull/29)**
 
 Kindle is an experimental Rust agent that learns while acting. It combines a
 Dreamer recurrent world model and imagined actor/critic with frozen causal
@@ -11,7 +11,7 @@ second learner.
 
 Six Atari streams share batched inference and one learner, with independent
 causal histories. This is not yet a general gameplay policy; the
-[status dashboard](STATUS.md) tracks completed game gates and current work.
+[PR status dashboard](https://github.com/kvark/kindle/pull/29) tracks completed game gates and current work.
 
 See the [single project plan](docs/kindle_single_life_dreamer_plan.md) for current
 scores, whole-rollout **videos**, world-model reports and next experiments;
@@ -76,7 +76,7 @@ The compact causal-video encoder is **ViT-Tiny/16, 5.49M parameters**. Opt in wi
 runner, using an exported Tiny checkpoint—not the Large weights. Restore selects
 the recorded architecture and verifies the weight hash. Large remains the fresh
 default. Native pretraining and the first candidate's results are linked from
-[STATUS.md](STATUS.md); mixed motion-probe results still require downstream testing.
+[the PR status](https://github.com/kvark/kindle/pull/29); mixed motion-probe results still require downstream testing.
 
 ## Acting, learning and evaluation
 
