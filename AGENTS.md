@@ -173,12 +173,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   `runs/freeway-guard-interruption-20260922.2xt6tnn_`; do not resume it or combine
   its experience with another run. The user explicitly approved one fresh
   replacement in `runs/tiny-freeway-seed2017-replacement-20260922.12z27y72`.
-  Replacement training completes400,008 actions/99,652 updates; its frozen
-  midpoint also completes75,000 actions,zero updates/cutoffs,mean31.8056.
-  Both guards and complete midpoint state/replay/video checks pass,36/36 successes.
+  Replacement training completes400,008 actions/99,652 updates. Its complete
+  pair passes: midpoint/final36/36,means31.8056/31.6944 versus control0/36,mean0.
+  All five guards,complete state/moments,replays and decoded videos pass.
   The separate CPU training-replay completion also passes all400,008 actions;
-  the prior CPU scope's absent result is not relabeled as a pass. Final/control phases
-  remain required before claiming that root's competence; seed3019 is unstarted.
+  the prior CPU scope's absent result is not relabeled as a pass. Fresh seed3019
+  starts September23 at16:34 UTC in the original confirmation root under systemd
+  service `kindle-freeway-seed3019-train-20260923.service`: same fixed recipe,
+  400,008 actions,200,004 midpoint,18h guard bound. Two fresh-root pairs pass;
+  third-root training/evaluation/control and cross-root state proof remain.
   Reuse the prepared helpers; preserve terminal writers and the interrupted CPU
   replay attempt separately. Check long training about every30min or at completion.
   Seed0 is not reliability;
