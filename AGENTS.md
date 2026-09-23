@@ -9,10 +9,11 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - Keep one authoritative plan: `docs/kindle_single_life_dreamer_plan.md`, with
   one current game-status table and direct rollout/world-report links.
-- Maintain `STATUS.md` as the short user-facing dashboard: timestamp, completed
-  work, active phase, next actions, results and known limitations. Update it at
-  meaningful phase boundaries, not every poll. Keep detailed gates in the plan
-  and raw chronology in runs; link the dashboard prominently from README.
+- Maintain the current PR description (currently `https://github.com/kvark/kindle/pull/29`)
+  as the user-facing status dashboard: timestamp, completed work, active phase,
+  next actions, results and known limitations. Do not maintain a separate STATUS.md.
+  Update at meaningful phase boundaries, not every poll. Keep detailed gates in
+  the plan and raw chronology in runs; link the PR prominently from README.
   Distinguish prepared, running and completed experiments; distinguish runtime
   correctness from gameplay success. State the next decision and keep measured
   bottlenecks separate from untested explanations.
@@ -34,7 +35,7 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   fix. Qualified trainer package 60f7060b stays unchanged; observation-only
   package cfa1749a adds a Vulkan budget getter. Readiness, source/package identity,
   full-gradient/AdamW/EMA/763-tensor restore and independent causal/N6 checks are
-  linked from `runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md` and STATUS.md.
+  linked from `runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md` and the research plan.
   Preserve the earlier AMD-selection/strict-trig failures and explicit primitive
   accuracy-bound revision; no full-model/game gate changed. Use NVIDIA-only
   Vulkan loader selection for environment-independent test contexts.
@@ -165,13 +166,21 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   declare fresh roots1009/2017/3019 on the same Tiny/runtime/assistance recipe,
   fixed400,008-action primary budget,200,004 midpoints and matched untrained
   controls. The separate confirmation in
-  `runs/tiny-freeway-confirmation-20260922.tij9QW` now starts only seed1009
-  training at00:04 UTC September22. Eleven CPU routing/refusal tests pass; its
-  declaration binds51 inputs and reuses unchanged qualified phase/state functions
-  under new output routing. Native998078ca and all gates stay fixed. Direct child
-  939693 is owned by unchanged host guard939675,18h bound; session6845 performs
-  only a CPU audit after completion. No frozen phase or later root is declared.
-  Check about every30min or at completion; never restart a terminal writer.
+  `runs/tiny-freeway-confirmation-20260922.tij9QW` completes seed1009's full pair:
+  final36/36,mean32.9167 versus untrained0/36,mean0; all state/replay/video checks
+  pass. Its first seed2017 attempt loses its host guard and is stopped incomplete
+  at45,714 actions/11,078 updates. Preserve it and the ownership incident in
+  `runs/freeway-guard-interruption-20260922.2xt6tnn_`; do not resume it or combine
+  its experience with another run. The user explicitly approved one fresh
+  replacement in `runs/tiny-freeway-seed2017-replacement-20260922.12z27y72`.
+  Replacement training completes400,008 actions/99,652 updates; its frozen
+  midpoint also completes75,000 actions,zero updates/cutoffs,mean31.8056.
+  Both guards and complete midpoint state/replay/video checks pass,36/36 successes.
+  The separate CPU training-replay completion also passes all400,008 actions;
+  the prior CPU scope's absent result is not relabeled as a pass. Final/control phases
+  remain required before claiming that root's competence; seed3019 is unstarted.
+  Reuse the prepared helpers; preserve terminal writers and the interrupted CPU
+  replay attempt separately. Check long training about every30min or at completion.
   Seed0 is not reliability;
   historical Large pilots also passed before fresh roots failed. Five-game status
   remains2/5. No default adoption,pure-size claim,retry or automatic successor.
@@ -223,6 +232,11 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   direct native-bearing process, not a scheduler/Cargo/process tree. Bind the
   boot, driver, executable and fixed experiment inputs; review each result before
   individually starting its successor. No retries or automatic followers.
+- Own each new guard with a persistent systemd user service, as tested in the
+  September22 ownership incident: `Restart=no`, `KillMode=control-group`, and a
+  service deadline slightly beyond the guard deadline. The guard still owns
+  only its direct native-bearing child. Do not rely on a tool session to keep
+  the guard alive; service cleanup prevents an orphan if the guard disappears.
 - Retain native device assertions and >=2 GiB Vulkan estimated budget headroom
   after GPU stages. Budget-minus-usage is not physically free or peak VRAM.
   Current declarations bind boot `4f5152d1-e5fd-46cf-a0c4-06534c430d26`; a changed
