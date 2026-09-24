@@ -9,10 +9,9 @@ description = "A live-learning Dreamer agent with frozen causal visual perceptio
 license = "MIT"
 
 [dependencies]
-# Upstream includes LeVJEPA frame-prefix attention and cache-write aliases.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "589d73abf2535581f9e73a28c59f48c57c6246a7" }
-# Match the instrumented upstream candidate dependency in Meganeura exactly.
-blade-graphics = { git = "https://github.com/kvark/blade", rev = "2accfeee594397685146dff23dc4f604bf5d0867" }
+# Keep training correctness fixes and the shared Blade context on one pinned stack.
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "9746c9acbb7a41956f3c11d24d22a214dfef69f6" }
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "fbb4f28c4869e81ae15de58925945b423b9c1ac5" }
 rand = "0.9"
 rayon = "1.12"
 serde = { version = "1", features = ["derive"] }
