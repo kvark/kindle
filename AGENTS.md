@@ -227,9 +227,23 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Adopt the exact six-file8be26783 production delta: nativea761ee5c,
   Meganeura9746c9ac/Bladefbb4f28c. No model/loss/encoder/recipe changes or native
   rebuild. Full learning improvement remains unproven. The fresh backend-only
-  Qbert seed0 comparison uses
-  `runs/correctness-qbert-comparison-20260924.Q4NZyO`,same400,008 actions/99,652
-  updates,trainedTiny7fe9b252,midpoint/final/untrained budgets and full game gate.
+  Qbert seed0 comparison completes in
+  `runs/correctness-qbert-comparison-20260924.Q4NZyO`:400,008 actions/99,652 updates,
+  7.536h,midpoint2/24 pyramids/mean1,144.79,final16/25/3,414,control0/24/120.83.
+  All full states,replays,videos and guards pass; the game gate fails. Preserve
+  the original old-backend schema-reader failure/absent pair.json. The separate
+  eight-test `pair_completion.py` uses the already-qualified same-backend schema
+  with the unchanged strict validator; its31-pin completion passes. No native retry.
+  The new `runs/qbert-replay-exposure-20260924.AEyDRM` tests R64 against R256 at
+  400,008 actions,then a predeclared1,600,032-action primary final/99,915 updates.
+  Keep nativea761ee5c,Tiny7fe9b252,seed0 and all other settings. Four immutable
+  checkpoints,full Qbert gate and restored controls remain required. Twenty-five
+  CPU declaration/ledger checks pass; training is separately launched. Its tested
+  CPU completion helper cannot launch GPU successors. Preserve the predeclaration
+  restore-CLI fixture correction. The20:31 upstream check finds0dbfcc00 (optimizer
+  arenas/batching,egglog3,Windows GEMV); Blade staysfbb4f28c. Retain qualified9746
+  for this one-variable learning comparison; the substantial new runtime rewrite
+  needs a separate later qualification. Do not call9746 latest or silently switch.
   Declare/review every phase separately. Never mix backends within a campaign.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
