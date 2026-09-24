@@ -117,6 +117,13 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   not NOOP/zero. Privileged game observers are never policy inputs.
 - Before backend diagnosis, inspect latest upstream fixes. Keep a qualified
   package fixed across an active campaign; updates need a separate comparison.
+  September24 inspection finds relevant BCE/LogSoftmax, gradient-buffer and
+  RMSNorm fusion fixes after gameplay589d73ab. Qualify current upstream before
+  new learner roots; finish Qbert seed0's already-declared pair unchanged.
+  The isolated9746c9ac/Bladefbb4f28c preparation and applicability audit are in
+  `runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md`.
+  It is not GPU qualification or a diagnosed cause of weak learning. Include
+  independent value/gradient references: same-backend parity can share a bug.
   Profile dominant stages before optimizing. Readback waits are not GPU idle.
   Preserve gradients, complete state/moments and action traces; use untraced
   matched-order timing. A lower replay ratio is a learning ablation, not parity.
