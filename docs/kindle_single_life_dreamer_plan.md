@@ -133,6 +133,17 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    Revisit Breakout's prepared four-action comparison if still needed. Confirm
    successful changed recipes on all three fresh roots with controls.
    Do not replicate failures merely to keep the device occupied.
+5. Before another fresh learning run, qualify the
+   [September24 upstream correctness refresh](../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md).
+   Meganeura9746c9ac includes relevant BCE/LogSoftmax stability, gradient-buffer
+   protection and RMSNorm fusion fixes missing from gameplay589d73ab, plus
+   parallel AGC. Source applicability is not proof of a historical failure or
+   measured speedup. Finish Qbert seed0's declared pair on its fixed package;
+   prepare the candidate separately. Use independent value/gradient references,
+   full native state/restore, causal frontend checks and matched timing before
+   adoption. Same-backend serial/grouped parity can share a compiler bug.
+   Re-declare subsequent learning with matched controls; never silently switch
+   an active run or combine confirmation seeds across backends.
 
 Pong's fixed recipe is N6, 12M/F32, B16×T64, full BPTT64, world microbatch 16,
 replay ratio 256, learning rate 4e-5 / warmup 1000, AGC .3, reconstruction 0/future .25,
