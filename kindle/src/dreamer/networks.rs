@@ -731,6 +731,70 @@ mod block_matmul_tests {
     use super::*;
     use meganeura::{Mode, SessionConfig, graph::Op};
 
+    #[test]
+    #[ignore = "requires a separately declared independent learner-block GPU reference"]
+    fn linear_norm_silu_matches_independent_reference() {
+        use meganeura::reference::{Feeds, Tolerance, gpu, gradients};
+
+        assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
+        assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
+        let device = crate::init_gpu_context().unwrap();
+        let info = crate::gpu_device_info(device.device_information());
+        assert_eq!(info.device_name, "NVIDIA GeForce RTX 5080");
+        assert_eq!(info.driver_name, "NVIDIA");
+        assert_eq!(info.driver_info, "580.178.04");
+        assert!(!info.is_software_emulated);
+        eprintln!(
+            "linear_reference_device={}",
+            serde_json::to_string(&info).unwrap()
+        );
+        let memory = |phase: &str| {
+            let stats = device.memory_stats();
+            assert!(stats.budget.saturating_sub(stats.usage) >= 2 * 1024 * 1024 * 1024);
+            eprintln!(
+                "linear_reference_memory={}",
+                serde_json::json!({
+                    "phase": phase, "budget_bytes": stats.budget, "usage_bytes": stats.usage,
+                })
+            );
+        };
+        memory("before");
+        for batch in [1, 5, 16] {
+            for exposed in [false, true] {
+                let mut graph = Graph::new();
+                let input = graph.parameter("input", &[batch, 17]);
+                let first = LinearNorm::new(&mut graph, "first", 17, 96);
+                let second = LinearNorm::new(&mut graph, "second", 96, 40);
+                let head = nn::Linear::new(&mut graph, "head", 40, 7);
+                let hidden = first.forward(&mut graph, input);
+                let value = second.forward(&mut graph, hidden);
+                let value = head.forward(&mut graph, value);
+                let loss = gradients::weighted_loss(&mut graph, value, 7319, -0.7);
+                graph.set_outputs(if exposed {
+                    vec![loss, hidden, value]
+                } else {
+                    vec![loss]
+                });
+                let mut feeds = Feeds::new();
+                feeds.fill_random(&graph, 7301, 0.8);
+                gradients::check(&graph, &feeds, &gradients::Options::default())
+                    .unwrap()
+                    .assert_passed("actual LinearNorm/SiLU finite differences");
+                for (lowering, mut options) in gpu::Options::lowerings() {
+                    options.tolerance = Tolerance {
+                        rtol: 1e-3,
+                        floor: 1e-3,
+                    };
+                    gpu::check_training(&graph, &feeds, &options)
+                        .unwrap()
+                        .assert_passed(&format!("batch={batch} exposed={exposed} {lowering}"));
+                }
+                memory("case.complete");
+            }
+        }
+        memory("after");
+    }
+
     fn graph(
         batch: usize,
         input_width: usize,
