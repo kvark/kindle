@@ -128,7 +128,7 @@ pub fn load_encoder(
         ] {
             session.set_parameter(
                 &format!("{dst}.attention.{proj}.weight"),
-                &model.tensor_f32_auto_transposed(&format!("{src}.attention.{proj}.weight"))?,
+                &model.tensor_f32_auto_transposed(&format!("{src}.attention.{proj}.weight"), 0)?,
             );
             if has_bias {
                 session.set_parameter(
@@ -141,7 +141,7 @@ pub fn load_encoder(
         for proj in ["up_proj", "down_proj"] {
             session.set_parameter(
                 &format!("{dst}.mlp.{proj}.weight"),
-                &model.tensor_f32_auto_transposed(&format!("{src}.mlp.{proj}.weight"))?,
+                &model.tensor_f32_auto_transposed(&format!("{src}.mlp.{proj}.weight"), 0)?,
             );
             session.set_parameter(
                 &format!("{dst}.mlp.{proj}.bias"),

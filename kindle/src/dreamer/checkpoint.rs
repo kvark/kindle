@@ -49,27 +49,11 @@ pub(super) fn load_session(
     path: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Even logical-format checkpoints may omit optimizer moments. A training
-    // restore must not silently keep their initialized values. Winograd caches
-    // are derived execution storage, not saved parameters; identify them from
-    // the plan, never from a user parameter's name.
+    // restore must not silently keep their initialized values. Execution scratch
+    // (including transformed convolution weights) is not in param_buffers.
     let model = SafeTensorsModel::load(path.to_path_buf())?;
-    let caches: HashSet<_> = session
-        .plan()
-        .derived_params
-        .iter()
-        .filter_map(|(buffer, _, transform)| {
-            matches!(
-                transform,
-                meganeura::graph::ParamTransform::Winograd3x3 { .. }
-            )
-            .then_some(*buffer)
-        })
-        .collect();
     let mut required = Vec::new();
-    for (name, buffer) in &session.plan().param_buffers {
-        if caches.contains(buffer) {
-            continue;
-        }
+    for (name, _) in &session.plan().param_buffers {
         required.push(name.to_owned());
         if session.has_param_grad(name) {
             required.push(format!("adam_m.{name}"));
@@ -141,7 +125,10 @@ mod tests {
         let second = graph.conv2d(other, kernel, 1, 64, 8, 8, 64, 3, 3, 1, 1);
         graph.set_outputs(vec![first, second]);
         let mut source = build_session(&graph, &gpu, Mode::Inference, false);
-        assert_eq!(source.plan().derived_params.len(), 1);
+        assert!(source.plan().derived_params.is_empty());
+        assert!(source.plan().dispatches.iter().any(|dispatch| {
+            dispatch.shader == meganeura::compile::ShaderEntry::WinogradWeightTransform
+        }));
         let weights: Vec<_> = (0..64 * 64 * 9)
             .map(|i| ((i * 13 % 29) as f32 - 14.0) * 0.0005)
             .collect();

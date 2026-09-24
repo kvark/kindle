@@ -134,20 +134,33 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    Revisit Breakout's prepared four-action comparison if still needed. Confirm
    successful changed recipes on all three fresh roots with controls.
    Do not replicate failures merely to keep the device occupied.
-5. Before another fresh learning run, qualify the
+5. Adopt the qualified
    [September24 upstream correctness refresh](../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md).
    Meganeura9746c9ac includes relevant BCE/LogSoftmax stability, gradient-buffer
    protection and RMSNorm fusion fixes missing from gameplay589d73ab, plus
    parallel AGC. Source applicability is not proof of a historical failure or
-   measured speedup. Qbert seed0's fixed-package pair is now complete.
+   measured learning improvement. Qbert seed0's fixed-package pair is complete.
    Candidate8be26783 passes92 Rust/768 Python CPU checks,formatting,Clippy and
-   source/build/wheel/import identity; it is not adopted. Its separately guarded
-   [GPU qualification](../runs/meganeura-correctness-gpu-20260924.y1vWOG/README.md)
-   starts with the retained independent causal reference. Use value/gradient references,
-   full native state/restore, causal frontend checks and matched timing before
-   adoption. Same-backend serial/grouped parity can share a compiler bug.
-   Re-declare subsequent learning with matched controls; never silently switch
-   an active run or combine confirmation seeds across backends.
+   source/build/wheel/import identity. Its separately guarded
+   [GPU qualification](../runs/meganeura-correctness-gpu-20260924.y1vWOG/results.md)
+   now passes both Tiny frontend checks,eleven independent primitive regressions
+   and the production world/behavior gradient fixtures,with original bounds.
+   The [pixel/state/restore check](../runs/meganeura-correctness-pixels-20260924.u3ISw0/results.md)
+   also passes all241 state entries/146 moments and complete replays/video.
+   [Matched backend timing](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
+   passes:7.5–7.8% less total time,exact same-backend state/trajectory repeats.
+   [Default compatibility](../runs/meganeura-correctness-defaults-20260924.M6s2on/results.md)
+   also passes independent actual LinearNorm/SiLU gradients,Large dense/N6
+   references and combined frozen acting with exact complete state. Adopt only
+   the six-file production delta,byte-identical to the qualified source; reuse
+   nativea761ee5c. No model/loss/encoder changes or native rebuild.
+   Same-backend serial/grouped parity alone can share a compiler bug; these
+   correctness passes still do not establish a cause of historical weak learning.
+   The [fresh backend-only Qbert comparison](../runs/correctness-qbert-comparison-20260924.Q4NZyO/README.md)
+   keeps seed0,trainedTiny7fe9b252,400,008 actions/99,652 updates,the midpoint,
+   frozen evaluations and untrained control fixed. No new learning result is
+   established yet. Never silently switch an active run or combine confirmation
+   seeds across backends; review each GPU phase before its separate successor.
 
 Pong's fixed recipe is N6, 12M/F32, B16×T64, full BPTT64, world microbatch 16,
 replay ratio 256, learning rate 4e-5 / warmup 1000, AGC .3, reconstruction 0/future .25,
@@ -187,9 +200,12 @@ learning now accounts for about 87% of wall time. Mean learner step .257s includ
 .092s world training and .086s imagination. More environment workers do not
 directly remove this cost. [All four windows and stage clocks](../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md).
 
-Keep the comparison recipe and pretrained Tiny encoder fixed while qualifying
-the upstream correctness refresh. A matched replay-ratio ablation is separate,
-after backend correctness and timing are established.
+The latest-backend [matched comparison](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
+further reduces total time7.5–7.8% at the same recipe. Aggregate realtime reaches
+.974–.975x;learning still occupies91.8% of wall time,improving only2.6–2.9%.
+Observation time falls42.8–45.6%. These are stage clocks,not utilization.
+Keep recipe and pretrained Tiny fixed for the first backend learning comparison.
+A matched replay-ratio ablation is separate,not a parity optimization.
 Historical R64 Boxing exceeds aggregate real time, but has only one successful
 root and less score margin; it is not an adopted replacement. Retain AGC/full
 recurrence unless an ablation supports changing them. Reconstruction/future
