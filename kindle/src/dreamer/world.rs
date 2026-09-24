@@ -895,6 +895,7 @@ mod tests {
         let device = crate::gpu_device_info(gpu.device_information());
         gradient_device(&device, driver);
         gradient_mark("device.ready", 0, serde_json::to_value(&device).unwrap());
+        gradient_memory(&gpu, "memory.device.ready", 0);
         for config in configs {
             let length = config.batch_length;
             gradient_mark("config", 0, serde_json::to_value(&config).unwrap());
@@ -904,6 +905,7 @@ mod tests {
                 gradient_mark("graph.ready", group, serde_json::json!({}));
                 let mut session = build_session(&graph, &gpu, Mode::Training, false);
                 gradient_mark("session.ready", group, serde_json::json!({}));
+                gradient_memory(&gpu, "memory.session.ready", group);
                 initialize_d3(&mut session, &graph, config.seed);
                 gradient_mark("parameters.initialized", group, serde_json::json!({}));
                 // Exercise the input gradients of heads that D3 initializes to zero.
@@ -921,6 +923,7 @@ mod tests {
                 gradient_mark("step.submitted", group, serde_json::json!({}));
                 session.wait();
                 gradient_mark("step.wait_returned", group, serde_json::json!({}));
+                gradient_memory(&gpu, "memory.step.wait_returned", group);
                 session
             });
             gradient_mark("comparisons.before", 0, serde_json::json!({}));
@@ -1016,6 +1019,16 @@ mod tests {
                 }),
             );
         }
+    }
+
+    fn gradient_memory(gpu: &blade_graphics::Context, phase: &str, group: usize) {
+        let stats = gpu.memory_stats();
+        gradient_mark(
+            phase,
+            group,
+            serde_json::json!({"usage_bytes": stats.usage, "budget_bytes": stats.budget}),
+        );
+        assert!(stats.budget.saturating_sub(stats.usage) >= 2 * 1024 * 1024 * 1024);
     }
 
     fn gradient_driver(
