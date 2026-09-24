@@ -112,7 +112,19 @@ cause of the gameplay regression.
 
 ## Qualified runtime
 
-The current backend passes 23 native tests and same-driver complete-state/pixel
+Current production uses native `a761ee5c`, Meganeura `9746c9ac` and Blade
+`fbb4f28c`. The [correctness refresh](../../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md)
+passes independent primitive/world/behavior references, Tiny/Large frontend
+checks, complete state/restore and [matched timing](../../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md):
+7.5–7.8% less wall time. The [Qbert backend-only pair](../../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
+does not improve learning in seed0: final16/25 pyramids,mean3,414 versus the old
+22/24 and4,811.46. Both controls score120.83 with no pyramids. Full state/replays/
+videos pass; preserve the separate schema-reader correction and original failure.
+The [R64/exposure experiment](../../runs/qbert-replay-exposure-20260924.AEyDRM/README.md)
+keeps that package fixed while testing more experience per learner update.
+See the [plan](../kindle_single_life_dreamer_plan.md) and PR dashboard for status.
+
+The historical block backend passes 23 native tests and same-driver complete-state/pixel
 checks. Block products improve fixed-recipe N6 throughput **27.3% in both orders**,
 retaining all 241 tensors/146 moments, non-timing reports and action traces exactly.
 Episode-budgeted evaluation passes six integration phases on the unchanged binary.
@@ -139,7 +151,7 @@ locks, native bindings, active runner and pinned guards are byte-identical to
 the pre-cleanup source. Research-history removal changes neither the runtime
 nor the campaign's 5,329 verified inputs.
 
-The current implementation at ed16e19 passes
+The history-runner implementation at ed16e19 passes
 [CI run156](https://github.com/kvark/kindle/actions/runs/35615868079) and all 768
 local Python CPU tests, including the 13-line checkpoint-history port. The native
 Rust/Cargo inputs are unchanged by that port. Later result/dashboard updates are

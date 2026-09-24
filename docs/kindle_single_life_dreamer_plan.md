@@ -61,7 +61,7 @@ Full multi-stream evaluations determine results.
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Inspect forecasts and improve the small-encoder recipe; no pretraining benefit demonstrated in one seed. Four-action arm remains held. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Tiny seed0 final:22/24 first pyramids, mean4,811.46 versus0/24 and120.83 control; midpoint2/24 and1,156.25. All phases/state/replays/videos complete,zero frozen updates/cutoffs. | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Pyramid fraction passes; full gate fails. Qualify latest backend before more learning. | [Final](../runs/tiny-qbert-exposure-20260924.3aGHUA/seed0/final.mp4), [control](../runs/tiny-qbert-exposure-20260924.3aGHUA/seed0/untrained.mp4), [midpoint/report](../runs/tiny-qbert-exposure-20260924.3aGHUA/results.md) |
+| Qbert | Qualified-backend Tiny seed0:16/25 first pyramids,mean3,414 versus0/24 and120.83 control. Old backend:22/24 and4,811.46. Complete state/replay/video checks pass; neither recipe passes the game gate. | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Test R64 at matched400k actions,then a fixed1.6M-action final at approximately the old learner-update budget. | [Final](../runs/correctness-qbert-comparison-20260924.Q4NZyO/seed0/final.mp4), [control](../runs/correctness-qbert-comparison-20260924.Q4NZyO/seed0/untrained.mp4), [comparison](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
@@ -158,9 +158,28 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    correctness passes still do not establish a cause of historical weak learning.
    The [fresh backend-only Qbert comparison](../runs/correctness-qbert-comparison-20260924.Q4NZyO/README.md)
    keeps seed0,trainedTiny7fe9b252,400,008 actions/99,652 updates,the midpoint,
-   frozen evaluations and untrained control fixed. No new learning result is
-   established yet. Never silently switch an active run or combine confirmation
-   seeds across backends; review each GPU phase before its separate successor.
+   frozen evaluations and untrained control fixed. The complete pair now fails:
+   final16/25 pyramids,mean3,414 versus0/24 and120.83 control; midpoint2/24 and1,144.79.
+   Full state,replays,videos and guards pass. The separate eight-test reader
+   completion uses the already-qualified same-backend schema; preserve the
+   original schema-anchor mismatch and absent original pair result. This one
+   seed shows no learning improvement from the fixes,not a general regression.
+6. Test [less replay and more exposure](../runs/qbert-replay-exposure-20260924.AEyDRM/README.md)
+   on the same qualified runtime and trained Tiny. Fresh seed0 changes only
+   replay ratio256→64 at400,008 actions. Compare that frozen checkpoint with the
+   completed same-package R256 final. Predeclare uninterrupted training through
+   1,600,032 actions,with that final policy primary regardless of intermediate
+   scores. It expects99,915 learner updates versus99,652 in the R256 reference:
+   four times experience at approximately the same learner work,not equal wall
+   time or a throughput-parity claim. The extension is a same-history exposure
+   diagnostic,not another independent root. Preserve all four checkpoints and
+   the unchanged frozen/control/game gates. No confirmation roots before a pass.
+   The pinned upstream [configuration](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml)
+   uses R256 for Atari100k and R32 for long-budget Atari; R64 is our experiment,
+   not a published guarantee. New upstream0dbfcc00 adds optimizer arenas/batching,
+   egglog3 and Windows GEMV changes. Inspect them separately; retain9746c9ac for
+   this isolated learning comparison. Never silently switch an active run or
+   combine confirmation seeds across backends. Review every GPU successor.
 
 Pong's fixed recipe is N6, 12M/F32, B16×T64, full BPTT64, world microbatch 16,
 replay ratio 256, learning rate 4e-5 / warmup 1000, AGC .3, reconstruction 0/future .25,
