@@ -122,7 +122,7 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   new learner roots; preserve Qbert seed0's completed old-runtime pair unchanged.
   The isolated9746c9ac/Bladefbb4f28c preparation and applicability audit are in
   `runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md`.
-  It is not GPU qualification or a diagnosed cause of weak learning. Include
+  The source audit alone is not qualification or a diagnosed cause. Include
   independent value/gradient references: same-backend parity can share a bug.
   Profile dominant stages before optimizing. Readback waits are not GPU idle.
   Preserve gradients, complete state/moments and action traces; use untraced
@@ -130,7 +130,7 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current work
 
-- Qualified block runtime: native `886bae68`, Meganeura `589d73ab`, Blade
+- Historical qualified block runtime: native `886bae68`, Meganeura `589d73ab`, Blade
   `2accfeee`; immutable episode adapter `8dc0b98`. Block products improved fixed-
   recipe throughput by 27.3%. Source cleanup does not rebuild or relabel it.
 - `runs/pong-block-confirmation-20260916.rBwdGF` is complete: fresh roots
@@ -200,10 +200,37 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   twelve-test `protocol_completion.py` changes only that expected header field
   for its exact pinned declaration; no native work or gate is changed/repeated.
   Use its unrecorded `audit PHASE`/`pair` readers; all writers are terminal.
-  Qualify current upstream before new learning; keep this old-runtime pair and
-  trained encoder fixed for comparison. Candidate GPU evidence is in
-  `runs/meganeura-correctness-gpu-20260924.y1vWOG`,separate from CPU preparation
-  and not adoption. Review each declared phase before follow-up; no automatic queue.
+  Keep this old-runtime pair and trained encoder fixed for comparison.
+  Current-upstream GPU evidence is in
+  `runs/meganeura-correctness-gpu-20260924.y1vWOG`,separate from CPU preparation.
+  Review each declared phase before follow-up;
+  no automatic queue.
+  Both Tiny frontend checks,eleven independent primitive regressions and both
+  production world/behavior gradient fixtures now pass with unchanged bounds.
+  The separate pixel/state/restore group in
+  `runs/meganeura-correctness-pixels-20260924.u3ISw0` also completes3,840 actions/
+  611 updates,exact241-entry/146-moment frozen restore and all-stream replays/video.
+  All those writers are terminal; only unrecorded readers are reusable.
+  Matched backend-only timing completes in
+  `runs/meganeura-correctness-timing-20260924.mYGvjj`:control A,candidate A,
+  candidate B,control B. Keep encoder7fe9b252,recipe,per-arm10,008 actions/2,153
+  updates and all predeclared exact-state/trajectory/drift gates. No heavy CPU work
+  during timing. All four windows pass: total time falls7.5–7.8%,with exact
+  same-backend complete state/moments/non-timing reports/trajectories. Candidate
+  aggregate realtime is.974–.975x,about91.8% learning by wall time,not utilization.
+  Default compatibility also passes in
+  `runs/meganeura-correctness-defaults-20260924.M6s2on`: actual LinearNorm/SiLU
+  independent gradients,Large dense causal and N6/serial references,and102
+  combined frozen actions with exact241-entry/146-moment state. Preserve the
+  original CPU service-state refusal; separate CPUv2 passes94 tests,fmt and
+  Clippy without production changes. All native writers are terminal.
+  Adopt the exact six-file8be26783 production delta: nativea761ee5c,
+  Meganeura9746c9ac/Bladefbb4f28c. No model/loss/encoder/recipe changes or native
+  rebuild. Full learning improvement remains unproven. The fresh backend-only
+  Qbert seed0 comparison uses
+  `runs/correctness-qbert-comparison-20260924.Q4NZyO`,same400,008 actions/99,652
+  updates,trainedTiny7fe9b252,midpoint/final/untrained budgets and full game gate.
+  Declare/review every phase separately. Never mix backends within a campaign.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
