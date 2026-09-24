@@ -774,10 +774,7 @@ mod tests {
         check_batched_streams(streams, Architecture::Large, Path::new(&checkpoint));
     }
 
-    fn check_tiny_device(perception: &LeVJepaPerception) {
-        if perception.architecture != Architecture::Tiny {
-            return;
-        }
+    fn check_reference_device(perception: &LeVJepaPerception) {
         assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
         assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
         let device = perception.gpu_device();
@@ -788,7 +785,7 @@ mod tests {
         let memory = perception.session.device_memory_stats().unwrap();
         assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 * 1024 * 1024 * 1024);
         eprintln!(
-            "tiny_stream_memory: usage={} budget={}",
+            "levjepa_reference_memory: usage={} budget={}",
             memory.usage_bytes, memory.budget_bytes
         );
     }
@@ -817,7 +814,7 @@ mod tests {
                 None,
             )
             .unwrap();
-            check_tiny_device(&serial);
+            check_reference_device(&serial);
             for stream in 0..streams {
                 serial.reset();
                 let mut values = Vec::new();
@@ -835,7 +832,7 @@ mod tests {
                     values.push(Some((observation, serial.patch_tokens())));
                 }
                 expected.push(values);
-                check_tiny_device(&serial);
+                check_reference_device(&serial);
             }
         }
         let mut batch = LeVJepaPerception::load_batched_with_architecture(
@@ -846,7 +843,7 @@ mod tests {
             None,
         )
         .unwrap();
-        check_tiny_device(&batch);
+        check_reference_device(&batch);
         let mut worst = 0.0_f32;
         for tick in 0..ticks {
             let frames = (0..streams)
@@ -885,13 +882,19 @@ mod tests {
                     "dense N{streams} stream {stream} tick {tick}"
                 );
             }
-            check_tiny_device(&batch);
+            check_reference_device(&batch);
         }
         assert!(
             worst < 0.005,
             "N{streams} batched maximum absolute error {worst}"
         );
         eprintln!("LeVJEPA N{streams} batched/serial maximum absolute error {worst}");
+    }
+
+    #[test]
+    #[ignore = "requires a separately declared exclusive Large N6 GPU comparison"]
+    fn large_six_streams_match_serial_with_resets_and_gaps() {
+        check_batched_streams_match_serial(6);
     }
 
     fn tiny_reference() -> (std::path::PathBuf, SafeTensorsModel) {
@@ -1031,7 +1034,7 @@ mod tests {
             None,
         )
         .unwrap();
-        check_tiny_device(&perception);
+        check_reference_device(&perception);
         let pixel_len = 3 * IMAGE_SIZE * IMAGE_SIZE;
         let token_len = PATCHES * hidden;
         let rgb_len = width * height * 3;
@@ -1093,7 +1096,7 @@ mod tests {
                     .fold(0.0_f32, f32::max);
                 assert!(worst < 0.005, "{label} step {step}, max error {worst}");
             }
-            check_tiny_device(&perception);
+            check_reference_device(&perception);
         }
     }
 }
