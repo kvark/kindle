@@ -162,31 +162,32 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Training takes7.969h,.929x aggregate/.155x per-stream realtime,89.4% learning;
   these are wall times,not utilization. All guards pass; no child remains.
   Preserve all terminal writers; only unrecorded audit/pair readers are reusable.
-  Both checkpoints pass,so extra exposure is not shown necessary. Next separately
-  declare fresh roots1009/2017/3019 on the same Tiny/runtime/assistance recipe,
-  fixed400,008-action primary budget,200,004 midpoints and matched untrained
-  controls. The separate confirmation in
-  `runs/tiny-freeway-confirmation-20260922.tij9QW` completes seed1009's full pair:
-  final36/36,mean32.9167 versus untrained0/36,mean0; all state/replay/video checks
-  pass. Its first seed2017 attempt loses its host guard and is stopped incomplete
-  at45,714 actions/11,078 updates. Preserve it and the ownership incident in
+  Both checkpoints pass,so extra exposure is not shown necessary. The separate
+  confirmation `runs/tiny-freeway-confirmation-20260922.tij9QW/completed.json`
+  now verifies all fresh roots1009/2017/3019: final36/36 each,means32.9167/31.6944/
+  33.25,versus controls0/36 each,mean0. All midpoints also pass36/36. Each root
+  completes400,008 actions/99,652 updates in about8h; all frozen arms have75,000
+  unassisted actions,zero updates/cutoffs. Full241-entry/146-moment state,all
+  replays,decoded videos and guards pass. The360-pin cross-root reader verifies
+  the same complete recipe/runtime/encoder and31 distinct initial parameter
+  tensors per pair,covering world/behavior/slow value,with zero initial moments.
+  Its nine CPU fixtures pass. This is learner-seed reliability conditional on one
+  pretrained encoder,not pretraining reliability or an isolated size advantage.
+  Preserve the first seed2017 attempt,incomplete at45,714 actions/11,078 updates
+  after loss of its host guard,and the ownership incident in
   `runs/freeway-guard-interruption-20260922.2xt6tnn_`; do not resume it or combine
   its experience with another run. The user explicitly approved one fresh
   replacement in `runs/tiny-freeway-seed2017-replacement-20260922.12z27y72`.
-  Replacement training completes400,008 actions/99,652 updates. Its complete
-  pair passes: midpoint/final36/36,means31.8056/31.6944 versus control0/36,mean0.
-  All five guards,complete state/moments,replays and decoded videos pass.
   The separate CPU training-replay completion also passes all400,008 actions;
-  the prior CPU scope's absent result is not relabeled as a pass. Fresh seed3019
-  starts September23 at16:34 UTC in the original confirmation root under systemd
-  service `kindle-freeway-seed3019-train-20260923.service`: same fixed recipe,
-  400,008 actions,200,004 midpoint,18h guard bound. Two fresh-root pairs pass;
-  third-root training/evaluation/control and cross-root state proof remain.
-  Reuse the prepared helpers; preserve terminal writers and the interrupted CPU
-  replay attempt separately. Check long training about every30min or at completion.
-  Seed0 is not reliability;
-  historical Large pilots also passed before fresh roots failed. Five-game status
-  remains2/5. No default adoption,pure-size claim,retry or automatic successor.
+  the prior CPU scope's absent result is not relabeled as a pass. All native
+  phases,pair writers and `complete.py --record` are terminal; only unrecorded
+  audit/pair/complete readers are reusable. All Freeway guards/learners are terminal.
+  Boxing,Pong and Freeway satisfy their fixed gates: five-game status is3/5.
+  Next execute the prepared Tiny Qbert exposure protocol in
+  `runs/tiny-qbert-exposure-preparation-20260922.9c53nmwp`: seed0,unassisted,
+  400,008 actions with200,004 midpoint,full Qbert gate and matched control.
+  No Qbert GPU phase is yet declared. No default adoption,retry or automatic
+  successor follows. Check long training about every30min or at completion.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
