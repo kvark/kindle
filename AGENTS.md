@@ -119,7 +119,7 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   package fixed across an active campaign; updates need a separate comparison.
   September24 inspection finds relevant BCE/LogSoftmax, gradient-buffer and
   RMSNorm fusion fixes after gameplay589d73ab. Qualify current upstream before
-  new learner roots; finish Qbert seed0's already-declared pair unchanged.
+  new learner roots; preserve Qbert seed0's completed old-runtime pair unchanged.
   The isolated9746c9ac/Bladefbb4f28c preparation and applicability audit are in
   `runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md`.
   It is not GPU qualification or a diagnosed cause of weak learning. Include
@@ -190,16 +190,20 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   phases,pair writers and `complete.py --record` are terminal; only unrecorded
   audit/pair/complete readers are reusable. All Freeway guards/learners are terminal.
   Boxing,Pong and Freeway satisfy their fixed gates: five-game status is3/5.
-  The prepared Tiny Qbert protocol now runs in
-  `runs/tiny-qbert-exposure-20260924.3aGHUA`: fresh seed0,unassisted,400,008
-  actions with200,004 midpoint,same trained Tiny/native/runtime. Training starts
-  September24 at01:37 UTC under persistent service
-  `kindle-qbert-seed0-train-20260924.service`; its complete live header matches.
-  Eighteen CPU declaration/episode-budget refusal checks and60 input pins pass.
-  Review completed training before individually declaring frozen midpoint/final
-  and fresh/restored controls. Keep Qbert's four episodes per stream,600,000 cap,
-  full90% pyramid/mean15,000 gate; seed0 is not three-root reliability. No rebuild,
-  default adoption,retry or automatic successor. Check long training about every30min.
+  The Tiny Qbert pair completes in `runs/tiny-qbert-exposure-20260924.3aGHUA`:
+  fresh unassisted seed0,400,008 actions/99,652 updates in8.283h,same trained
+  Tiny/native/runtime. Frozen midpoint/final/control score2/24,22/24,0/24 first
+  pyramids with means1,156.25/4,811.4583/120.8333. Final passes the pyramid fraction
+  but fails mean15,000; five-game status stays3/5. Full state/moments,all-stream
+  replay,videos and all five guards pass,zero frozen updates/cutoffs. Preserve
+  the original midpoint v2/v4 declaration-label audit failure. The separate
+  twelve-test `protocol_completion.py` changes only that expected header field
+  for its exact pinned declaration; no native work or gate is changed/repeated.
+  Use its unrecorded `audit PHASE`/`pair` readers; all writers are terminal.
+  Qualify current upstream before new learning; keep this old-runtime pair and
+  trained encoder fixed for comparison. Candidate GPU evidence is in
+  `runs/meganeura-correctness-gpu-20260924.y1vWOG`,separate from CPU preparation
+  and not adoption. Review each declared phase before follow-up; no automatic queue.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed
