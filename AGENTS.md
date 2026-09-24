@@ -183,11 +183,16 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   phases,pair writers and `complete.py --record` are terminal; only unrecorded
   audit/pair/complete readers are reusable. All Freeway guards/learners are terminal.
   Boxing,Pong and Freeway satisfy their fixed gates: five-game status is3/5.
-  Next execute the prepared Tiny Qbert exposure protocol in
-  `runs/tiny-qbert-exposure-preparation-20260922.9c53nmwp`: seed0,unassisted,
-  400,008 actions with200,004 midpoint,full Qbert gate and matched control.
-  No Qbert GPU phase is yet declared. No default adoption,retry or automatic
-  successor follows. Check long training about every30min or at completion.
+  The prepared Tiny Qbert protocol now runs in
+  `runs/tiny-qbert-exposure-20260924.3aGHUA`: fresh seed0,unassisted,400,008
+  actions with200,004 midpoint,same trained Tiny/native/runtime. Training starts
+  September24 at01:37 UTC under persistent service
+  `kindle-qbert-seed0-train-20260924.service`; its complete live header matches.
+  Eighteen CPU declaration/episode-budget refusal checks and60 input pins pass.
+  Review completed training before individually declaring frozen midpoint/final
+  and fresh/restored controls. Keep Qbert's four episodes per stream,600,000 cap,
+  full90% pyramid/mean15,000 gate; seed0 is not three-root reliability. No rebuild,
+  default adoption,retry or automatic successor. Check long training about every30min.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;
   `runs/breakout-gradients-20260920.dtzN0w` completes all four individually reviewed

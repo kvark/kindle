@@ -61,7 +61,7 @@ Full multi-stream evaluations determine results.
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Inspect forecasts and improve the small-encoder recipe; no pretraining benefit demonstrated in one seed. Four-action arm remains held. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Pilot completes first pyramid in 17/24 episodes, mean 3,754.17; control 0/24, mean 125 | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Test longer exposure and post-bonus coverage. | [Trained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4) |
+| Qbert | Historical Large pilot completes first pyramid in17/24 episodes, mean3,754.17 versus control125. Fresh Tiny seed0 training is running on the prepared400,008-action recipe; no new competence result. | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Review training, then frozen midpoint/final and matched control. | [Current pilot](../runs/tiny-qbert-exposure-20260924.3aGHUA/results.md), [historical trained](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-evaluation.mp4), [control](../runs/atari-driver-continuation-20260911.LR9yT3/qbert-untrained-evaluation.mp4) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
@@ -123,10 +123,11 @@ not general Atari competence. Preserve all completed writers and the fixed recip
    [runner-owned history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
    passes default/history/restore checks with exact full state and trajectories,
    all-stream replay and 768 Python CPU tests; the native package is unchanged.
-4. Next test Qbert with a continuous 400,008-action pilot and 200,004 midpoint;
+4. The [Tiny Qbert pilot](../runs/tiny-qbert-exposure-20260924.3aGHUA/results.md)
+   is training for400,008 uninterrupted actions with a200,004 midpoint;
    it remains unassisted, with four frozen episodes per stream and cap 600,000.
    The [Tiny Qbert protocol and CPU input checks](../runs/tiny-qbert-exposure-preparation-20260922.9c53nmwp/README.md)
-   are prepared; no GPU phase is declared or queued. Keep the trained Tiny
+   are reused unchanged; frozen/control phases remain separately declared. Keep the trained Tiny
    frontend, unchanged runtime and full Qbert gate. Compare added exposure within
    this pilot; the older Large result is historical context, not a matched arm.
    Revisit Breakout's prepared four-action comparison if still needed. Confirm
