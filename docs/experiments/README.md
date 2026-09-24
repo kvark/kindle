@@ -92,10 +92,16 @@ actions, zero updates/cutoffs; complete states, all-stream replays and decoded
 videos pass. [Final video](../../runs/tiny-freeway-exposure-20260921.ejKgSH/final.mp4),
 [control video](../../runs/tiny-freeway-exposure-20260921.ejKgSH/untrained.mp4),
 [combined audit](../../runs/tiny-freeway-exposure-20260921.ejKgSH/pair.json).
-Both checkpoints pass, so the extra exposure is not shown necessary. Seed0 is
-not a reliability root: next confirm the fixed recipe on 1009/2017/3019.
-All five native phases are terminal; only unrecorded readers are reusable.
-No automatic successor, default adoption or third reliable game follows.
+The subsequent [fresh-root confirmation](../../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md)
+now passes all1009/2017/3019 pairs: **108/108** qualifying final rounds versus
+**0/108** controls, means32.9167/31.6944/33.25. All midpoints also pass; added
+exposure is not shown necessary. The [cross-root certificate](../../runs/tiny-freeway-confirmation-20260922.tij9QW/completed.json)
+verifies complete state, replays, videos, distinct parsed initial weights and
+the same trained encoder/runtime. Freeway is the **third reliable game** under
+the fixed gates, conditional on one pretrained encoder. The interrupted2017
+attempt stays separate; its one user-approved replacement is explicit in the
+report. All writers are terminal; only unrecorded readers are reusable.
+No automatic successor, default adoption or isolated size advantage follows.
 
 The [15-step world-model report](../../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
 retains 16,470 prior forecast targets from four Tiny Breakout matches. Feature
