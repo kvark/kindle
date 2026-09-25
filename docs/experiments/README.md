@@ -120,8 +120,12 @@ checks, complete state/restore and [matched timing](../../runs/meganeura-correct
 does not improve learning in seed0: final16/25 pyramids,mean3,414 versus the old
 22/24 and4,811.46. Both controls score120.83 with no pyramids. Full state/replays/
 videos pass; preserve the separate schema-reader correction and original failure.
-The [R64/exposure experiment](../../runs/qbert-replay-exposure-20260924.AEyDRM/README.md)
-keeps that package fixed while testing more experience per learner update.
+The completed [R64/exposure pair](../../runs/qbert-replay-exposure-20260924.AEyDRM/results.md)
+keeps that package fixed: matched400k scores1/24 pyramids,mean1,139.58; primary1.6M
+scores24/24,mean8,673.96; untrained0/24,mean120.83. Full state/replays/videos pass,
+but the15,000 score gate still fails. Training takes9.368h at3.161x aggregate
+realtime,not throughput parity. A fresh [3.2M exposure-only trial](../../runs/qbert-r64-3m2-20260925.FrriIH/README.md)
+is running with the same R64 recipe and unchanged gates; confirmation remains pending.
 See the [plan](../kindle_single_life_dreamer_plan.md) and PR dashboard for status.
 
 The historical block backend passes 23 native tests and same-driver complete-state/pixel
