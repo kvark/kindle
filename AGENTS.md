@@ -234,13 +234,21 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   the original old-backend schema-reader failure/absent pair.json. The separate
   eight-test `pair_completion.py` uses the already-qualified same-backend schema
   with the unchanged strict validator; its31-pin completion passes. No native retry.
-  The new `runs/qbert-replay-exposure-20260924.AEyDRM` tests R64 against R256 at
-  400,008 actions,then a predeclared1,600,032-action primary final/99,915 updates.
-  Keep nativea761ee5c,Tiny7fe9b252,seed0 and all other settings. Four immutable
-  checkpoints,full Qbert gate and restored controls remain required. Twenty-five
-  CPU declaration/ledger checks pass; training is separately launched. Its tested
-  CPU completion helper cannot launch GPU successors. Preserve the predeclaration
-  restore-CLI fixture correction. The20:31 upstream check finds0dbfcc00 (optimizer
+  The complete `runs/qbert-replay-exposure-20260924.AEyDRM` pair tests R64:
+  matched400,008 actions/24,913 updates score1/24 pyramids,mean1,139.58;
+  primary1,600,032/99,915 scores24/24,mean8,673.96; control0/24,mean120.83.
+  All state/moments,replays,videos and guards pass,zero frozen updates/cutoffs.
+  Training takes9.368h,3.161x aggregate/.527x per-stream realtime,not utilization.
+  Initial241-entry state exactly matches R256. More exposure helps this history,
+  but the mean15,000 gate still fails. Preserve all terminal writers and the
+  predeclaration restore-CLI fixture correction. No confirmation roots yet.
+  Fresh `runs/qbert-r64-3m2-20260925.FrriIH` tests only doubled exposure at R64:
+  3,200,064 actions/199,917 updates,immutable1,600,032/3,200,064 checkpoints,
+  same nativea761ee5c,Tiny7fe9b252,seed0 and full gate. Twenty-six CPU checks pass;
+  GPU training starts September25 at06:46 UTC. The30h guard bounds an estimated
+  18.7h run. No equivalent warm resume: checkpoints omit replay/live belief/RNG.
+  Its seven-test CPU completion helper audits/replays only; no GPU successors.
+  The06:37 upstream check finds0dbfcc00 (optimizer
   arenas/batching,egglog3,Windows GEMV); Blade staysfbb4f28c. Retain qualified9746
   for this one-variable learning comparison; the substantial new runtime rewrite
   needs a separate later qualification. Do not call9746 latest or silently switch.
