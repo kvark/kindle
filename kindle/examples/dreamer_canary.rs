@@ -89,17 +89,20 @@ fn main() {
         "constructing model={model_size:?} bptt={world_backprop_length} microbatch={world_microbatch_size}"
     );
     let gpu = Arc::new(kindle::init_gpu_context().expect("GPU initialization failed"));
-    if trace.is_some() {
+    if trace.is_some() || env::var_os("KINDLE_GPU_DRIVER").is_some() {
         let device = gpu.device_information();
-        assert!(!device.is_software_emulated && gpu.capabilities().timing);
+        assert!(!device.is_software_emulated);
         assert_eq!(
             device.driver_info,
-            env::var("KINDLE_GPU_DRIVER").expect("declare trace driver")
+            env::var("KINDLE_GPU_DRIVER").expect("declare canary driver")
         );
         assert_eq!(
             device.device_name,
-            env::var("KINDLE_GPU_DEVICE").expect("declare trace device")
+            env::var("KINDLE_GPU_DEVICE").expect("declare canary device")
         );
+    }
+    if trace.is_some() {
+        assert!(gpu.capabilities().timing);
     }
     report_memory("before construction", &gpu);
 
