@@ -8,6 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 import kindle
+import numpy as np
 from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, audit
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'examples'))
@@ -34,7 +35,7 @@ def frozen_run(monkeypatch, tmp_path):
         def reset(self, *, seed=None):
             self.length = 0
             self.emulator_resets += 1
-            return None, {}
+            return np.zeros((64, 64, 3), dtype=np.uint8), {}
 
         def step(self, action):
             assert action == 0
@@ -97,7 +98,8 @@ def frozen_run(monkeypatch, tmp_path):
         interrupt = interrupted
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
         args = ['atari_vector.py', 'unused', '--output', str(output), '--num-envs', '2',
-                '--steps', str(cap), '--evaluate', '--restore', 'fixture', '--report-every', '2']
+                '--steps', str(cap), '--evaluate', '--restore', 'fixture', '--report-every', '2',
+                '--observation-size', '64']
         if target is not None:
             args += ['--episodes-per-env', str(target)]
         if memory:

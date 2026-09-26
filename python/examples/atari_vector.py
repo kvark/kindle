@@ -49,6 +49,10 @@ def main():
     parser.add_argument("--steps", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--atari-protocol", choices=ATARI_PROTOCOLS, default="published")
+    parser.add_argument("--observation-size", choices=("native", "64"),
+                        help="fresh default: native max-pooled RGB; restore requires an explicit choice")
+    parser.add_argument("--sticky-actions", type=float, choices=(0.0, 0.25), default=0.0,
+                        help="ALE action repeat probability; declare .25 separately for robustness evaluation")
     parser.add_argument("--model-size", default="12m")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
@@ -109,6 +113,9 @@ def main():
         metadata = json.loads((args.restore / "metadata.json").read_text())
         if (metadata.get("perception") or {}).get("kind") != args.encoder:
             parser.error("encoder selection differs from restored checkpoint")
+    if args.restore and args.observation_size is None:
+        parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
+    args.observation_size = args.observation_size or "native"
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
@@ -144,9 +151,10 @@ def main():
         initial = []
         for seed in env_seeds:
             env = DreamerAtariPreprocessing(gym.make(
-                args.environment, frameskip=1, repeat_action_probability=0.0,
+                args.environment, frameskip=1, repeat_action_probability=args.sticky_actions,
                 full_action_space=protocol.full_action_space,
-            ), noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames)
+            ), noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
+                screen_size=None if args.observation_size == "native" else 64)
             environments.append(env)
             initial.append(env.reset(seed=seed)[0])
         actions = int(environments[0].action_space.n)
@@ -185,7 +193,8 @@ def main():
                   policy_seed_rule="config.seed + stream (wrapping u64)",
                   atari_protocol=args.atari_protocol, action_repeat=ATARI_ACTION_REPEAT,
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
-                  full_action_space=protocol.full_action_space, sticky_actions=0.0,
+                  full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
+                  observation_size=args.observation_size, observation_shape=list(initial[0].shape),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,

@@ -86,6 +86,13 @@ JEPA, compute or architectural comparison.
 
 ## Compact causal-video encoder
 
+The [native-pixel adapter checks](../../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
+pass836 Python tests, including five-game raw/RGB64 interaction parity and
+declared sticky-action replay. Fresh vector input now avoids64→224 down/upscaling;
+old results remain RGB64/non-sticky. GPU integration and robustness results are
+separate. Fine-detail preservation before encoding does not prove lossless
+encoder/projection/pooling representations.
+
 The first **5.49M Tiny** candidate completes native video pretraining: 4,096
 updates in 84 minutes, all nine full checkpoints and encoder exports verified.
 [Pretraining result](../../runs/levjepa-tiny-pretrain-20260921.JaPZpW/results.md).
@@ -100,6 +107,10 @@ trajectory repeats. The [Breakout package comparison](../../runs/levjepa-tiny-br
 regresses: Tiny mean 10.92 versus Large 30.79; neither passes the two-wall gate.
 The [own-initial-encoder ablation](../../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
 shows no pretraining benefit in one paired seed. Tiny remains opt-in.
+The [corpus](../../runs/levjepa-tiny-atari-corpus-20260920.oTjdon/result.md)
+contains45k training and5k validation random-policy RGB64 observations from each
+target game. This is same-title offline experience. The native pretrainer and
+collector remain on [the preserved source branch](https://github.com/kvark/kindle/tree/exp/levjepa-tiny-pretrain-20260920).
 
 The [complete Tiny Freeway pilot](../../runs/tiny-freeway-exposure-20260921.ejKgSH/results.md)
 passes: 400,008 actions /99,652 updates, 7.969h. Frozen final mean **33.03** with
@@ -119,6 +130,9 @@ the fixed gates, conditional on one pretrained encoder. The interrupted2017
 attempt stays separate; its one user-approved replacement is explicit in the
 report. All writers are terminal; only unrecorded readers are reusable.
 No automatic successor, default adoption or isolated size advantage follows.
+Both pilot and confirmation train with probability .5 / hold64 random-action
+assistance. Frozen evaluation is unassisted; the exploration qualification is
+part of the result, not optional historical detail.
 
 The [15-step world-model report](../../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
 retains 16,470 prior forecast targets from four Tiny Breakout matches. Feature
@@ -158,8 +172,13 @@ replays the first complete stream-zero episode exactly:1,272 actions/18,975
 targets, zero updates, unchanged241-entry state/146 moments. Feature/reward
 forecasts beat controls; continuation misses the sole terminal (.99734 versus0).
 During the last281 zero-reward actions, mean posterior value remains2,119.43.
-One trajectory is not critic calibration or a diagnosis of JEPA. Next check
-held-out life-count information in frozen features before another long recipe.
+One trajectory is not critic calibration or a diagnosis of JEPA. The completed
+[life-count probe](../../runs/qbert-life-representation-20260926.F1lTAq/results.md)
+encodes39,953 arrivals from27 complete episodes and matches1,272 prior anchors.
+Its786 held-out examples give96.56% pre-pooling versus78.37% pooled accuracy.
+Every-16-action sampling covers phase zero only, not all visual-cache phases.
+Next test all-phase coverage and a fixed same-size pooling variant on a separate
+recording; do not tune on this exposed test or claim a gameplay cause.
 The historical checkpoint uses its own a761/9746 runtime for this diagnostic;
 main remains b00ce7be/ee3aea. Preserve ACLJca's original CPU failure and the sole
 completed GnWOvb invocation; no GPU successor is declared.

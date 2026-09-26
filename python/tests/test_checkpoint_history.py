@@ -7,6 +7,7 @@ from types import SimpleNamespace
 
 import kindle
 import pytest
+import numpy as np
 from kindle._vector_audit import audit
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'examples'))
@@ -34,7 +35,7 @@ def fake_runner(tmp_path, monkeypatch):
             def reset(self, *, seed=None):
                 self.length = 0
                 self.emulator_resets += 1
-                return None, {}
+                return np.zeros((210, 160, 3), dtype=np.uint8), {}
 
             def step(self, action):
                 self.length += 1

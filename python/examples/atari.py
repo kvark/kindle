@@ -85,12 +85,15 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         *,
         noop_max: int = ATARI_NOOP_MAX,
         max_episode_frames: int = ATARI_MAX_EPISODE_FRAMES,
+        screen_size: int | None = ATARI_SCREEN_SIZE,
     ):
         super().__init__(environment)
         if noop_max < 0:
             raise ValueError("noop_max must be non-negative")
         if max_episode_frames <= 0:
             raise ValueError("max_episode_frames must be positive")
+        if screen_size is not None and (type(screen_size) is not int or screen_size <= 0):
+            raise ValueError("screen_size must be a positive integer or None for native RGB")
         action_meanings = environment.unwrapped.get_action_meanings()
         if not action_meanings or action_meanings[0] != "NOOP":
             raise ValueError("Atari action 0 must be NOOP")
@@ -101,7 +104,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         self.observation_space = gym.spaces.Box(
             low=0,
             high=255,
-            shape=(ATARI_SCREEN_SIZE, ATARI_SCREEN_SIZE, 3),
+            shape=raw_space.shape if screen_size is None else (screen_size, screen_size, 3),
             dtype=np.uint8,
         )
         self._frames: list[np.ndarray] = []
@@ -113,6 +116,7 @@ class DreamerAtariPreprocessing(gym.Wrapper):
         self.emulator_resets = 0
         self._noop_max = noop_max
         self._max_episode_frames = max_episode_frames
+        self._screen_size = screen_size
 
     def reset(self, *, seed=None, options=None):
         observation, info = self.env.reset(seed=seed, options=options)
@@ -169,8 +173,10 @@ class DreamerAtariPreprocessing(gym.Wrapper):
 
     def _observation(self) -> np.ndarray:
         image = np.maximum(self._frames[0], self._frames[1])
+        if self._screen_size is None:
+            return image
         image = Image.fromarray(image).resize(
-            (ATARI_SCREEN_SIZE, ATARI_SCREEN_SIZE), Image.Resampling.BILINEAR
+            (self._screen_size, self._screen_size), Image.Resampling.BILINEAR
         )
         return np.asarray(image, dtype=np.uint8)
 
