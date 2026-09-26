@@ -74,11 +74,14 @@ single-device client. Reading the installed binary confirms its fabric helper
 calls `InitNvml`; no CUDA client or NVML query was executed in this inspection.
 Disabling Dreamer's logging therefore does **not** qualify this stock plugin.
 
-Keep that JAX/CUDA control unlaunched until an NVML-free initialization path is
-verified in an isolated package. Do not install a telemetry shim, change drivers,
-enable NVML or substitute CPU learning. This does not stop ordinary native
-Meganeura/Blade GPU work. Separately measured native optimizations can proceed
-while preparing the clean control, without claiming a JEPA architectural gain.
+The user's subsequent September26 direction lifts the need for an NVML-free
+initialization path. Ordinary JAX/CUDA initialization is permitted for a bounded
+Dreamer sanity check; application polling stays disabled. No historical evidence
+established NVML as the fault's cause. Do not fork the backend or install a shim
+to avoid its normal initialization. Host recovery remains unauthorized.
+A sanity check can verify real GPU learning before resolving every matched-budget
+comparison detail, but must disclose actual action/update accounting and cannot
+establish a JEPA architectural gain.
 
 Require a separate bounded hardware/memory/accounting declaration. Match actual
 interactions, N6/full18/F32/12M/B16/T64/R256 and replay

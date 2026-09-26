@@ -13,6 +13,12 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   against Dreamer12M. Preserve native image detail before the encoder. Reassess
   old reliability claims when a better evaluation protocol contradicts them;
   keep original evidence and gates as historical, never silently relabel them.
+- `TASK.md` is the user's high-level intent. The acting hot path should become
+  GPU capture -> GPU preprocessing -> encoder -> belief/policy -> action readback.
+  Rewards, checkpoints and explicit diagnostics may cross the host boundary.
+  Reuse one pixel kernel for CPU-uploaded Atari frames and resident capture
+  buffers; preserve aspect ratio/detail and explicit ownership/synchronization.
+  A buffer entry point alone does not establish external capture integration.
 - Keep one authoritative plan: `docs/kindle_single_life_dreamer_plan.md`, with
   one current game-status table and direct rollout/world-report links.
 - Maintain [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
@@ -149,9 +155,21 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   the original Large encoder and native886bae68/589d73ab/2accfeee to isolate .25
   stickiness. Four episodes per stream, original600k cap, zero learning, complete
   before/after state and replay/video; report first4 per stream and all episodes.
-  Check its terminal guard/result before any new GPU work. Roots2017/3019 require
-  separate declarations and review. One root establishes no learner uncertainty;
+  It is now complete and fully audited:76,464 actions/zero updates; equal first4
+  cohort2/24 wins, mean−7.1667; all3/31, mean−8.3871. No cutoffs; full241-entry/
+  146-moment state, replay/video and38,266 memory samples pass. Robustness fails.
+  Preserve the old non-sticky wins without claiming general Pong mastery.
+  Roots2017/3019 require separate declarations and review. One root establishes no learner uncertainty;
   do not substitute current backend or relabel this as Tiny/new-learning evidence.
+- GPU pixel preprocessing is implemented with explicit encoding v2: float
+  interpolation without RGB8 requantization, normalized-zero padding and direct
+  writes to the Meganeura patches input. Raw CPU upload and borrowed resident
+  RGB/RGBA/BGRA use one Blade kernel. F6sEvQ passes40 independent F64/layout/queue
+  comparisons; ODQsqs passes the full synthetic Tiny dense/stream checks.
+  Preserve the old rounding-gate failure5xk0z7 and CPU failures. This is not
+  capture integration or a speed claim. V1 checkpoints require their old package;
+  b00ce7be stays the qualified historical runtime pending new package/gameplay
+  validation. See the September26 GPU-pixels/robustness report.
 - The isolated world-sync candidate in
   `runs/world-sync-batch-20260926.RzSMMT` passes92 CPU tests, fmt/Clippy and release
   build. It downloads the union of world parameters once for core inference
@@ -182,10 +200,11 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The stock JAX0.6.2 plugin also calls NVML from its compute-capability>=9 device
   initialization path, independently of Dreamer's disabled telemetry. Source and
   CPU ELF inspection establish this; no CUDA client/query was run. Keep that
-  control unlaunched until an isolated NVML-free path is verified. Native
-  Meganeura/Blade GPU work remains authorized. No telemetry shim, driver change,
-  NVML exception or CPU-learning replacement follows; native optimization can
-  proceed separately without an architectural speed claim.
+  historical inspection distinct from the September26 user decision: ordinary
+  JAX/CUDA initialization, including internal NVML use, is now permitted for a
+  separately declared bounded Dreamer sanity control. Do not build an NVML-free
+  fork or shim. Keep application polling disabled; the incidents do not establish
+  NVML causality. A sanity run need not claim matched learning or JEPA benefit.
   Separate CPU fixtures in `runs/upstream-accounting-cpu-20260926.PjQxR0` also
   demonstrate reset-record counting/block overshoot and false terminal labels at
   artificial cutoffs. Correct or explicitly account for these before a matched
@@ -222,9 +241,11 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## GPU operation
 
-- Ordinary bounded GPU work is authorized on driver **580.178.04**. **No NVML**:
-  no nvidia-smi, bindings, legacy health logger or vendor diagnostics. Use the GPU;
-  do not add CPU learning fallbacks. Unavailable telemetry is unmeasured, not zero.
+- Ordinary bounded GPU work is authorized on driver **580.178.04**. September26
+  permits normal JAX/CUDA initialization with its internal NVML calls for the
+  Dreamer sanity control. Separate NVML polling, legacy health loggers and vendor
+  diagnostics remain off; no NVML-free backend workaround is needed. Use the GPU,
+  not CPU learning fallbacks. Unavailable telemetry is unmeasured, not zero.
 - Serialize GPU-heavy jobs. Use `python/examples/gpu_host_guard.py` around the
   direct native-bearing child, not a scheduler/Cargo/process tree. Bind boot,
   driver, executable and fixed inputs; review each result before starting its

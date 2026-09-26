@@ -18,6 +18,14 @@
 pub const IMAGE_MEAN: [f32; 3] = [0.485, 0.456, 0.406];
 pub const IMAGE_STD: [f32; 3] = [0.229, 0.224, 0.225];
 
+pub(crate) fn letterbox_geometry(width: usize, height: usize, target: usize) -> [usize; 4] {
+    assert!(width > 0 && height > 0 && target > 0);
+    let scale = (target as f32 / width as f32).min(target as f32 / height as f32);
+    let w = (width as f32 * scale).round().clamp(1.0, target as f32) as usize;
+    let h = (height as f32 * scale).round().clamp(1.0, target as f32) as usize;
+    [w, h, (target - w) / 2, (target - h) / 2]
+}
+
 /// Resize an arbitrary interleaved RGB8 frame into a square without
 /// distorting its aspect ratio. Unused pixels are filled with the ImageNet
 /// mean, which becomes approximately zero after DINO normalization.
@@ -32,11 +40,8 @@ pub fn resize_letterbox_rgb8(rgb: &[u8], width: usize, height: usize, target: us
         return rgb.to_vec();
     }
 
-    let scale = (target as f32 / width as f32).min(target as f32 / height as f32);
-    let scaled_width = (width as f32 * scale).round().clamp(1.0, target as f32) as usize;
-    let scaled_height = (height as f32 * scale).round().clamp(1.0, target as f32) as usize;
-    let offset_x = (target - scaled_width) / 2;
-    let offset_y = (target - scaled_height) / 2;
+    let [scaled_width, scaled_height, offset_x, offset_y] =
+        letterbox_geometry(width, height, target);
     let fill = IMAGE_MEAN.map(|value| (value * 255.0).round() as u8);
     let target_len = target
         .checked_mul(target)

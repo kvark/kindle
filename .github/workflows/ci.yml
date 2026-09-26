@@ -51,6 +51,12 @@ jobs:
           cargo test -p kindle tiny_
           --lib -- --ignored --skip vision:: --test-threads=1
 
+      - name: GPU pixel preprocessing and resident-buffer parity
+        run: >-
+          cargo test -p kindle --lib
+          vision::preprocess_gpu::tests::gpu_pixels_match_cpu_reference_and_resident_buffers
+          -- --exact --ignored --test-threads=1
+
       - uses: actions/setup-python@v5
         if: runner.os == 'Linux'
         with:

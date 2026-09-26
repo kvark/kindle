@@ -68,7 +68,7 @@ Full multi-stream evaluations determine results.
 | Game | Measured result | Unchanged gate / next decision | Rollout |
 | --- | --- | --- | --- |
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
-| Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
+| Pong | Historical non-sticky roots pass71/72 wins versus0/76 controls. But root1009 with25% sticky actions wins only2/24 equal-cohort matches, mean−7.1667; all3/31, mean−8.3871. State/replay/video audit passes. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Fixed-recipe pass; **robustness fails**. One stochastic-evaluation root, no new control pair. | [Sticky video](../runs/pong-sticky-evaluation-20260926.SxeHCw/seed1009.mp4), [new report](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md), [historical videos/controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Complete matched Tiny comparison: four actions mean10.9167 versus .875 control; eighteen mean11.625 versus .93103. Both trained arms0/24 two-wall completions. Historical Large mean30.7917 also fails; no demonstrated pretraining benefit in one Tiny seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Fewer actions did not repair this seed. Keep eighteen as reference; diagnose before another recipe. Historical Large four-action arm stays held. | [Complete comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md), [four-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/evaluate.mp4), [eighteen-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a18/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
 | Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; the first-episode probe misses its terminal and retains high values through a scoreless ending. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md), [world/policy diagnostic](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md) |
@@ -121,10 +121,11 @@ robustness under a changed protocol.
    episodes/tails. Publish compact results and selected videos for external
    reviewers. New outcomes may invalidate broad reliability claims; preserve
    original cohorts and their gates.
-   The first frozen Pong root1009 is separately declared in
+   The first frozen Pong root1009 completes in
    `runs/pong-sticky-evaluation-20260926.SxeHCw`: historical Large/runtime/RGB64,
-   .25 sticky, four matches per stream. Its result and complete-state/replay
-   audit must finish before another GPU phase. Subsequent roots remain undeclared.
+   .25 sticky, four matches per stream. **2/24 wins, mean−7.1667** fails robust
+   competence; complete state/replay/video verifies. Preserve the old fixed-
+   protocol results with that qualification. Subsequent roots remain undeclared.
 3. **Synthetic encoder CI — passed.** The
    [full-Tiny fixture](../runs/encoder-ci-20260926.GTcKXz/results.md) passes local
    dense-reference, projection/pooling, chunk-wrap and batched reset/gap checks.
@@ -136,13 +137,16 @@ robustness under a changed protocol.
    collection. Keep RGB64 as the explicit historical comparison; native-input
    JEPA is a separate intervention. Report world/whole-agent cost, memory and
    learning, including offline pretraining cost. The control must run directly
-   under the host guard with NVML disabled. The [protocol audit](experiments/2026-09-26-upstream-control-protocol.md)
+   under the host guard with application GPU polling disabled. The [protocol audit](experiments/2026-09-26-upstream-control-protocol.md)
    finds the old control accidentally retained25% sticky actions. Correcting its
    initialization and using ALE0.12.1 yields exact20,480-action wrapper parity.
    The old control is not matched non-sticky evidence. Resolve reset-record
    accounting and artificial cutoff semantics before claiming equal experience.
-   Stock JAX0.6.2 also invokes NVML inside client initialization; disabling its
-   logger is insufficient. Verify an NVML-free control package before launch.
+   Stock JAX0.6.2 also invokes NVML inside client initialization. The September26
+   user direction permits that normal initialization; do not fork JAX to avoid it.
+   Start with a bounded sanity run that counts actual actions/updates and checks
+   finite learning/device/memory. Resolve the remaining protocol differences
+   before presenting it as a matched architecture comparison.
    Native GPU optimization can proceed separately while this is prepared;
    do not replace the control with CPU learning or imply a JEPA advantage.
 5. **Reduce measured learner overhead.** The adopted four-submission package
@@ -154,6 +158,12 @@ robustness under a changed protocol.
    A small isolated candidate in `runs/world-sync-batch-20260926.RzSMMT` batches
    repeated world-weight downloads while retaining derived-weight updates.
    Its92 CPU tests/build/fmt/Clippy pass; no GPU result or adoption exists.
+   GPU preprocessing now has [kernel and full-Tiny checks](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md):
+   native raw-byte upload or resident RGB/RGBA/BGRA -> one Blade pass -> encoder
+   patches. Encoding v2 removes intermediate RGB8 quantization and uses exact
+   normalized-zero padding. V1 checkpoints need their pinned package. Gameplay/
+   restore qualification and end-to-end timing remain separate; no speedup is
+   claimed yet. External capture import and projected-feature readbacks remain.
 6. **Then change perception or learning, one variable at a time.** Neither the
    [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
    nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)
@@ -243,7 +253,19 @@ It is **not SM utilization**; readback waits include computation and pass gaps
 are not automatically hardware idle. World command recording alone takes
 26.09ms before GPU execution; optimizer passes take only .44ms. Imagination
 host work and GPU→CPU→GPU parameter synchronization are separate follow-ups;
-derived weights must remain coherent. **NVML stays disabled.**
+derived weights must remain coherent. Application NVML polling stays disabled;
+normal JAX backend initialization is permitted for the bounded upstream control.
+
+The capture-to-action target is GPU-resident: capture -> letterbox/normalize/
+patch layout -> causal encoder -> belief/policy -> action readback. Only the
+acting hot path has the action-only boundary; sparse rewards, checkpoints and
+explicit diagnostics remain legitimate host traffic. First move preprocessing
+into one Blade kernel writing the encoder's input, shared by raw CPU images and
+resident RGB/RGBA/BGRA buffers. Next eliminate projected-feature/belief handoffs,
+then connect mind-games capture with explicit producer ownership and semaphore
+synchronization. Do not call a CPU-ready flag GPU synchronization, or a buffer
+API an integrated zero-readback capture path. Track frame-to-action latency as
+well as training throughput; no end-to-end speedup is assumed from fewer copies.
 
 Keep AGC/full recurrence unless an ablation supports changing them.
 Reconstruction/future controls remain .25/0, .25/.25 and 0/.25. Qualify backend
@@ -375,7 +397,8 @@ controls, with extrinsic-only comparisons before adoption.
 
 ## Execution and evidence
 
-Use the GPU; **NVML is temporarily disabled**. Serialize bounded direct native
+Use the GPU; application NVML polling remains disabled, while normal JAX/CUDA
+initialization is permitted by the September26 user direction. Serialize bounded direct native
 jobs under the [host-only guard](gpu_incident_response.md), with actual device
 assertions and >=2 GiB sampled Vulkan budget headroom. No recovery operation,
 blind retry or quarantined candidate reuse. The four old Xid incidents remain

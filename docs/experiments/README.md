@@ -4,6 +4,12 @@ The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+The [GPU pixels and Pong robustness report](2026-09-26-gpu-pixels-and-pong-robustness.md)
+records the latest important correction: root1009 wins only2/24 equal-cohort
+matches under25% sticky actions. Its complete state/replay/video audit passes;
+robust competence does not. It also links the new GPU preprocessing checks and
+explicit v2 visual semantics; old checkpoint results are not relabeled.
+
 The [September26 upstream-control protocol audit](2026-09-26-upstream-control-protocol.md)
 finds that the old local control retained25% sticky actions despite requesting0.
 Two ALE versions reproduce the construction-order bug on all five games.
@@ -21,7 +27,8 @@ Every phase is individually invoked/reviewed; no automatic successor.
 The [complete cross-seed audit](../../runs/pong-block-confirmation-20260916.rBwdGF/completed.json)
 passes all three independent fresh roots: **71/72 trained wins versus 0/76 controls**.
 Historical root 1009 is not included. This completes Pong's declared reliability
-gate, not the five-game goal.
+fixed non-sticky gate, not robust Pong competence or the five-game goal. The
+later sticky-action failure linked above qualifies the scope of these wins.
 
 | Fresh root | Frozen trained wins / mean | Restored untrained wins / mean | Evidence and whole-stream videos |
 | --- | --- | --- | --- |
