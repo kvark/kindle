@@ -9,6 +9,8 @@ pub(crate) struct Readback {
     encoder: blade_graphics::CommandEncoder,
     buffer: Option<blade_graphics::Buffer>,
     capacity: usize,
+    #[cfg(feature = "profiler")]
+    gpu_timing: bool,
 }
 
 impl Readback {
@@ -23,6 +25,8 @@ impl Readback {
             encoder,
             buffer: None,
             capacity: 0,
+            #[cfg(feature = "profiler")]
+            gpu_timing: meganeura::GpuOptions::from_env().timing,
         }
     }
 
@@ -38,6 +42,8 @@ impl Readback {
 
     /// Read independent, already-submitted producers with one transfer/wait.
     pub fn read_many(&mut self, outputs: &mut [(&Session, usize, &mut [f32])]) {
+        #[cfg(feature = "profiler")]
+        let _span = tracing::info_span!("kindle_readback").entered();
         let mut bytes = 0usize;
         for (session, index, output) in outputs.iter() {
             assert!(Arc::ptr_eq(&self.gpu, &session.context()));
@@ -86,6 +92,8 @@ impl Readback {
                 .expect("GPU readback wait failed"),
             "readback did not complete"
         );
+        #[cfg(feature = "profiler")]
+        record_transfer_timing(&self.gpu, &self.encoder, self.gpu_timing);
         let mut offset = 0;
         for (_, _, output) in outputs {
             // The completed transfer initialized these aligned f32 regions in
@@ -100,6 +108,25 @@ impl Readback {
             }
             offset += std::mem::size_of_val(*output);
         }
+    }
+}
+
+#[cfg(feature = "profiler")]
+pub(super) fn record_transfer_timing(
+    gpu: &blade_graphics::Context,
+    encoder: &blade_graphics::CommandEncoder,
+    enabled: bool,
+) {
+    if enabled && gpu.capabilities().timing {
+        let timing = encoder.last_timing();
+        meganeura::profiler::record_gpu_timings(&meganeura::profiler::GpuTimings {
+            passes: timing
+                .passes
+                .iter()
+                .map(|&(name, at)| (name.to_owned(), at))
+                .collect(),
+            done: Some(timing.done),
+        });
     }
 }
 

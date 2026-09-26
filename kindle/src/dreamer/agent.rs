@@ -1070,6 +1070,7 @@ impl DreamerCore {
     }
 
     /// Perform one D3 learner update, independent of scheduler credit.
+    #[cfg_attr(feature = "profiler", tracing::instrument(name = "learn", skip_all, fields(step = self.learner_step + 1)))]
     pub fn learn(&mut self) -> Option<LearnReport> {
         let started = Instant::now();
         let stage = Instant::now();
@@ -1158,6 +1159,7 @@ impl DreamerCore {
         assert!(self.feature.iter().all(|value| value.is_finite()));
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn sample_posterior_batch(&mut self, batch: &SequenceBatch) -> PosteriorBatch {
         let size = self.config.network();
         let rows = self.config.batch_size;
@@ -1207,6 +1209,7 @@ impl DreamerCore {
         }
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn train_world(
         &mut self,
         batch: &SequenceBatch,
@@ -1431,6 +1434,7 @@ impl DreamerCore {
         metrics
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn sync_world_inference(&mut self) {
         for target in [
             &mut self.world_observe_batch,
@@ -1447,6 +1451,7 @@ impl DreamerCore {
         }
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn imagine_and_target(
         &mut self,
         batch: &SequenceBatch,
@@ -1737,6 +1742,7 @@ impl DreamerCore {
         }
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn train_behavior(&mut self, batch: &BehaviorTrainingBatch) -> BehaviorMetrics {
         let actor_update_scale = self.config.actor_update_scale(self.learner_step);
         self.behavior_train
@@ -1805,6 +1811,7 @@ impl DreamerCore {
         metrics
     }
 
+    #[cfg_attr(feature = "profiler", tracing::instrument(skip_all))]
     fn sync_behavior_inference(&mut self) {
         sync_matching(&self.behavior_train, &mut self.behavior_online, "behavior.");
         if let Some(value) = &mut self.behavior_value_live {

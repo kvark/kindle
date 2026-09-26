@@ -14,6 +14,8 @@ pub(crate) struct DeviceCopies {
     gpu: Arc<blade_graphics::Context>,
     encoder: blade_graphics::CommandEncoder,
     completion: Option<blade_graphics::SyncPoint>,
+    #[cfg(feature = "profiler")]
+    gpu_timing: bool,
 }
 
 impl DeviceCopies {
@@ -27,6 +29,8 @@ impl DeviceCopies {
             gpu,
             encoder,
             completion: None,
+            #[cfg(feature = "profiler")]
+            gpu_timing: meganeura::GpuOptions::from_env().timing,
         }
     }
 
@@ -34,6 +38,8 @@ impl DeviceCopies {
     /// caller must complete these copies before overwriting inputs from the CPU
     /// or destroying sessions. No host wait is needed before a consumer step.
     pub fn copy(&mut self, copies: &[DeviceCopy<'_>]) {
+        #[cfg(feature = "profiler")]
+        let _span = tracing::info_span!("kindle_device_copy").entered();
         let regions: Vec<_> = copies
             .iter()
             .map(|copy| {
@@ -88,6 +94,8 @@ impl DeviceCopies {
                     .expect("GPU device copy wait failed"),
                 "device copy did not complete"
             );
+            #[cfg(feature = "profiler")]
+            super::readback::record_transfer_timing(&self.gpu, &self.encoder, self.gpu_timing);
         }
     }
 }

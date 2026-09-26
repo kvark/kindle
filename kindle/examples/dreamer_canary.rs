@@ -33,6 +33,7 @@ fn main() {
     let mut repetitions = 1usize;
     let mut updates = 1usize;
     let mut profile_directory = None;
+    let mut trace = None;
     let mut checkpoint = None;
     let mut prediction_only = false;
     while let Some(option) = args.next() {
@@ -45,8 +46,9 @@ fn main() {
                 profile_directory = Some(args.next().expect("missing profile directory"))
             }
             "--checkpoint" => checkpoint = Some(args.next().expect("missing checkpoint path")),
+            "--trace" => trace = Some(args.next().expect("missing trace path")),
             other => panic!(
-                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH or --checkpoint PATH"
+                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH, --checkpoint PATH or --trace PATH"
             ),
         }
     }
@@ -69,12 +71,38 @@ fn main() {
         checkpoint.is_none() || (run_learner && repetitions == 1),
         "saving requires --learn and one repetition"
     );
+    if let Some(path) = &trace {
+        assert!(
+            cfg!(feature = "profiler"),
+            "--trace requires --features profiler"
+        );
+        assert!(run_learner && repetitions == 1 && profile_directory.is_none());
+        assert!(!std::path::Path::new(path).exists(), "trace already exists");
+        let options = meganeura::GpuOptions::from_env();
+        assert!(
+            options.timing && !options.capture,
+            "--trace requires MEGANEURA_GPU_TIMING=1 without GPU capture"
+        );
+        meganeura::profiler::init_with_targets(&["kindle"]);
+    }
     eprintln!("config={}", serde_json::to_string(&config).unwrap());
 
     eprintln!(
         "constructing model={model_size:?} bptt={world_backprop_length} microbatch={world_microbatch_size}"
     );
     let gpu = Arc::new(kindle::init_gpu_context().expect("GPU initialization failed"));
+    if trace.is_some() {
+        let device = gpu.device_information();
+        assert!(!device.is_software_emulated && gpu.capabilities().timing);
+        assert_eq!(
+            device.driver_info,
+            env::var("KINDLE_GPU_DRIVER").expect("declare trace driver")
+        );
+        assert_eq!(
+            device.device_name,
+            env::var("KINDLE_GPU_DEVICE").expect("declare trace device")
+        );
+    }
     report_memory("before construction", &gpu);
 
     for iteration in 0..repetitions {
@@ -116,6 +144,9 @@ fn main() {
 
     drop(gpu);
     eprintln!("GPU context dropped");
+    if let Some(path) = trace {
+        meganeura::profiler::save(path).expect("save full learner trace");
+    }
 }
 
 fn fill_synthetic_replay(core: &mut DreamerCore, config: &DreamerConfig) {
@@ -141,4 +172,10 @@ fn report_memory(stage: &str, gpu: &blade_graphics::Context) {
         "device memory {stage}: usage={} budget={}",
         stats.usage, stats.budget
     );
+    if let Ok(value) = env::var("KINDLE_MIN_GPU_HEADROOM_MIB") {
+        let minimum: u64 = value.parse().expect("invalid minimum GPU headroom");
+        assert!(
+            stats.budget.saturating_sub(stats.usage) >= minimum.checked_mul(1024 * 1024).unwrap()
+        );
+    }
 }
