@@ -121,6 +121,10 @@ robustness under a changed protocol.
    episodes/tails. Publish compact results and selected videos for external
    reviewers. New outcomes may invalidate broad reliability claims; preserve
    original cohorts and their gates.
+   The first frozen Pong root1009 is separately declared in
+   `runs/pong-sticky-evaluation-20260926.SxeHCw`: historical Large/runtime/RGB64,
+   .25 sticky, four matches per stream. Its result and complete-state/replay
+   audit must finish before another GPU phase. Subsequent roots remain undeclared.
 3. **Synthetic encoder CI — passed.** The
    [full-Tiny fixture](../runs/encoder-ci-20260926.GTcKXz/results.md) passes local
    dense-reference, projection/pooling, chunk-wrap and batched reset/gap checks.
@@ -147,6 +151,9 @@ robustness under a changed protocol.
    readbacks and redundant parameter transfers. Preserve sampling semantics,
    derived weights, complete state/moments and actions where claiming parity;
    use untraced matched-order timing. No concurrent learner service.
+   A small isolated candidate in `runs/world-sync-batch-20260926.RzSMMT` batches
+   repeated world-weight downloads while retaining derived-weight updates.
+   Its92 CPU tests/build/fmt/Clippy pass; no GPU result or adoption exists.
 6. **Then change perception or learning, one variable at a time.** Neither the
    [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
    nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)

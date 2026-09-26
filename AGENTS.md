@@ -144,6 +144,22 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   frozen restore and sticky .25 replay, all241 state entries/146 moments and3,571
   native memory samples. Preserve all three completed invocations; only unrecorded
   audits are reusable. This is plumbing, not improved learning or robustness.
+- Historical Pong sticky evaluation is separately declared in
+  `runs/pong-sticky-evaluation-20260926.SxeHCw`, root1009 only. It retains RGB64,
+  the original Large encoder and native886bae68/589d73ab/2accfeee to isolate .25
+  stickiness. Four episodes per stream, original600k cap, zero learning, complete
+  before/after state and replay/video; report first4 per stream and all episodes.
+  Check its terminal guard/result before any new GPU work. Roots2017/3019 require
+  separate declarations and review. One root establishes no learner uncertainty;
+  do not substitute current backend or relabel this as Tiny/new-learning evidence.
+- The isolated world-sync candidate in
+  `runs/world-sync-batch-20260926.RzSMMT` passes92 CPU tests, fmt/Clippy and release
+  build. It downloads the union of world parameters once for core inference
+  sessions, retaining per-target set_parameter and derived-weight updates.
+  No math/RNG change, raw alias or production adoption. Preserve its completed
+  writer/private target; only `prepare.py --audit` is reusable. No GPU invocation
+  is declared. After Pong, require exact32-update state/reports before separately
+  declared AB/BA timing; the2% synthetic gate is not Atari adoption.
 - Synthetic full-Tiny CI coverage is implemented in b17cab3; the local hardware
   test in `runs/encoder-ci-20260926.GTcKXz` passes37 dense comparisons and two-stream
   chunk/reset/gap parity with unchanged bounds. Its92 CPU tests, formatting and
@@ -170,6 +186,10 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Meganeura/Blade GPU work remains authorized. No telemetry shim, driver change,
   NVML exception or CPU-learning replacement follows; native optimization can
   proceed separately without an architectural speed claim.
+  Separate CPU fixtures in `runs/upstream-accounting-cpu-20260926.PjQxR0` also
+  demonstrate reset-record counting/block overshoot and false terminal labels at
+  artificial cutoffs. Correct or explicitly account for these before a matched
+  learning comparison; toy accounting fractions are not Atari measurements.
 
 ## Evidence and immutable boundaries
 
