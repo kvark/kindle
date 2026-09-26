@@ -59,10 +59,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   early failures and a later 8–9k plateau despite a 16,850 median. Exact CPU
   life-event replay in `runs/qbert-life-events-20260926.5rlCmF/results.md` finds
   repeated zero-progress deaths and two inspected edge falls. Most life losses
-  are not terminals. The historical-checkpoint strict forecast probe is CPU-ready
-  in `runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb`, not GPU-declared; preserve
-  ACLJca's lazy-import preparation failure. Diagnose reward/value/policy alignment
-  as well as continuation before another budget increase. Keep every episode/gate.
+  are not terminals. The completed historical-checkpoint strict forecast probe
+  in `runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md` exactly replays
+  1,272 actions/18,975 targets with unchanged state. Features/rewards beat controls;
+  terminal continuation is .99734 versus 0 and mean posterior value stays 2,119
+  during 281 zero-reward ending actions. This one trajectory does not establish
+  critic calibration or a JEPA cause. Next test life-count information in frozen
+  features, with whole-episode splits, RGB/constant controls and explicit history,
+  before choosing a loss/representation change or another long budget. Preserve
+  ACLJca's failure and every completed writer/episode/gate; no GPU follower exists.
 - Throughput qualification is complete. Current production is native
   `b00ce7be` / Meganeura `ee3aea42` / Blade `fbb4f28c`, the exact five-file
   production delta from `30bfa1a`, adopted without rebuilding its package.
@@ -91,18 +96,19 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Aggregate real time is 1.0405–1.0415×, about .174× per stream. Preserve all
   terminal writers; only unrecorded audit/compare modes are reusable.
   **No heavy CPU work during future matched timing.**
-- The fresh Breakout comparison is declared in
+- The fresh Breakout comparison is complete in
   `runs/breakout-minimal-comparison-20260926.xsQCaK`: four versus eighteen actions,
   fixed Tiny7fe9/native b00ce7be, seed0, 200,004 actions /49,652 updates each.
-  Latest four-action gradients and exact N6 repeat/restore/replay checks pass.
-  The complete four-action pair fails: trained mean10.9167 versus .875 control,
-  both0/24 two-wall completions; all full-state/initial/replay/video checks pass.
-  Its report is `a4/results.md`. Eighteen-action training started September26
-  at12:49 UTC; review its full result before frozen evaluation and control.
-  Both arms remain required even though the first fails.
-  Preserve zero-update initial snapshots, every episode, full state/replays and
-  the original two-wall gate. Each GPU phase is individually reviewed; no queue.
-- Next, complete that comparison and Qbert failure diagnostics.
+  Four actions score 10.9167 versus .875 control; eighteen score 11.625 versus
+  .93103. Both trained arms have 0/24 two-wall completions. All eight native
+  phases, full-state/own-initial/replay/video checks and 232 common initial tensors
+  pass. Keep eighteen actions as the reference; this single seed does not justify
+  adopting four actions or confirming either failed recipe. Preserve every
+  terminal writer, snapshot, episode and the original two-wall gate.
+- Next, extend Qbert failure diagnostics and choose a separate evidence-led
+  Breakout intervention. The retained upstream Atari-100k score artifact in
+  `runs/breakout-reference-context-20260926.kGfmtw/results.md` provides low-budget
+  context, not a matched JEPA comparison or permission to relax mastery gates.
   Preserve the old four-action hold. Do not repeat
   unchanged failed recipes merely to occupy the GPU. Imagination host work and
   GPU-resident parameter sync are separate optimizations; raw aliases must account

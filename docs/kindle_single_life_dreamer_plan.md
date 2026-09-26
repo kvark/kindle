@@ -60,8 +60,8 @@ Full multi-stream evaluations determine results.
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
-| Breakout | Latest four-action Tiny: mean10.9167 versus .875 control, 0/24 two-wall completions. Historical eighteen-action Tiny/Large means10.9167/30.7917 also fail; no demonstrated pretraining benefit in one seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. The fresh matched eighteen-action arm is running; older backend results cannot settle action-width effects. Historical Large four-action arm stays held. | [Latest four-action report/videos](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md), [historical Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; inspect early hazards and later progression. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
+| Breakout | Complete matched Tiny comparison: four actions mean10.9167 versus .875 control; eighteen mean11.625 versus .93103. Both trained arms0/24 two-wall completions. Historical Large mean30.7917 also fails; no demonstrated pretraining benefit in one Tiny seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Fewer actions did not repair this seed. Keep eighteen as reference; diagnose before another recipe. Historical Large four-action arm stays held. | [Complete comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md), [four-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/evaluate.mp4), [eighteen-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a18/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
+| Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; the first-episode probe misses its terminal and retains high values through a scoreless ending. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md), [world/policy diagnostic](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
@@ -86,24 +86,19 @@ primary; do not select the better-looking midpoint or relax the gate.
    [Pixel/state/restore](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
    and [latest-runtime compatibility](../runs/chunks-compatibility-20260926.opVUiI/results.md)
    pass. Different backend arithmetic means old/new campaign roots stay separate.
-2. **Repair failing game recipes with bounded comparisons.** The fresh
-   [Breakout four/eighteen-action comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/README.md)
-   keeps trained causal Tiny7fe9, native b00ce7be, seed0 and 200,004 actions /
-   49,652 updates per arm fixed. Latest four-action gradients and
-   [exact N6 repeat/restore/replay checks](../runs/breakout-width-latest-pixels-20260926.idNbRS/results.md)
-   pass. The [complete four-action pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md)
-   fails: mean10.9167 versus .875 control, both0/24 two-wall completions.
-   Eighteen-action training is running; review it before frozen evaluation
-   and a restored untrained control, then compare both complete arms.
-   Preserve the old hold and all original competence gates. Qbert's
-   [retained episode analysis](../runs/qbert-tail-analysis-20260926.m0P7ZI/results.md)
-   finds a16,850 median but five early first-pyramid failures and a later8–9k
-   plateau. [Exact life-event replay](../runs/qbert-life-events-20260926.5rlCmF/results.md)
-   locates repeated zero-progress deaths and two inspected edge falls; most
-   lost lives are nonterminal. Inspect prior reward/continuation/value forecasts
-   and actor alignment before another budget increase. Retain every episode and
-   the original mean/success gates;
-   change one scientific variable at a time.
+2. **Repair failing game recipes with bounded comparisons.** The complete
+   [Breakout four/eighteen-action comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
+   does not justify changing the reference to four actions or confirming either
+   failed recipe. Preserve the old hold and original gates. Qbert's
+   [life-event replay](../runs/qbert-life-events-20260926.5rlCmF/results.md)
+   locates repeated zero-progress deaths and two inspected edge falls. Its
+   [strict forecast/policy probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
+   finds useful feature/reward forecasts but a missed terminal and high values
+   during a zero-score ending. Next test whether frozen features retain life
+   count using held-out whole episodes, RGB/constant controls and explicit
+   history. This distinguishes a possible perceptual omission from downstream
+   world/value learning before another long run; it is not a causal verdict.
+   Retain every episode and original gate; change one scientific variable at a time.
 3. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
    fixed final-policy gate and a restored untrained control. Do not replicate
    unchanged failures just to occupy the device. Native games, transfer and
@@ -128,6 +123,14 @@ Dreamer's interacting networks and recurrent learner are real complexity;
 hundreds of investigation commits and chronological reports are not architectural
 requirements. Keep production code for exercised features and evidence in linked
 reports. Tests are not cruft simply because they exceed implementation size.
+
+Learning a game is not the same target as mastering it. The
+[retained DreamerV3 Atari-100k curves](../runs/breakout-reference-context-20260926.kGfmtw/results.md)
+give a five-seed Breakout score-window mean8.89, far below our two-wall threshold.
+That historical 200M/100k-action online benchmark is not matched to our 12M+Tiny/
+200k-action frozen evaluation. It neither diagnoses JEPA nor predicts the budget
+needed for mastery; retain the stronger gate and test causes rather than assuming
+every modest score means an implementation or representation failure.
 
 The initial 303M frontend was disproportionate to the nominal 12M learner.
 Tiny reduces that cost, but R256 still consumes about 102 million replay
@@ -236,7 +239,18 @@ The older [own-policy](../runs/world-evaluation-20260908.Xzx3pN/report.html) and
 [common-recording](../runs/common-world-report-20260909.O7nqqe/report.html)
 reports likewise show limited cross-trajectory generalization.
 
-Next diagnostics should target Qbert's early hazards/later plateau and Breakout's
+Qbert's [first complete episode probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
+exactly replays 1,272 actions and 18,975 targets with unchanged full state. At H15,
+feature MSE .000666 beats persistence .011081/unrelated actions .001886; reward
+MAE/MSE 4.124/421.67 beat zero 7.194/992.65. Continuation is slightly worse than
+always-continue, with only one terminal. At that terminal, H1 continuation is
+.99734 versus 0. The last 281 actions yield no reward while mean posterior value
+remains 2,119.43. This is one realized trajectory, not unbiased critic calibration
+or proof of an encoder defect. Check held-out life-count information before
+choosing representation versus downstream learning changes; nonterminal deaths
+must not silently become terminal labels.
+
+Further diagnostics should retain early hazards/later plateaus and Breakout's
 failures without changing evaluation gates. Retain preselected first-four
 complete stream-zero matches for new Pong diagnostics, without score filtering.
 A continuation ablation is separate from throughput qualification.
