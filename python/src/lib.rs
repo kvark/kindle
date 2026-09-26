@@ -5,7 +5,7 @@ mod vector;
 use std::path::Path;
 
 use kindle::vision::{
-    DinoPerception, OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
+    OBSERVATION_CHANNELS, OBSERVATION_GRID, PerceptionKind,
     levjepa::{Architecture, LeVJepaPerception},
 };
 use kindle::{
@@ -20,15 +20,6 @@ struct PyAgent {
     inner: DreamerAgent,
 }
 
-/// Frozen perception-only session for representation probes.
-///
-/// The first element returned by `encode` is the projected 14x14 patch grid;
-/// the second is the exact pooled 7x7 observation consumed by Dreamer.
-#[pyclass(name = "DinoPerception", module = "kindle._native", unsendable)]
-struct PyDinoPerception {
-    inner: DinoPerception,
-}
-
 #[pyclass(name = "LeVJepaPerception", module = "kindle._native", unsendable)]
 struct PyLeVJepaPerception {
     inner: LeVJepaPerception,
@@ -37,7 +28,7 @@ struct PyLeVJepaPerception {
 #[pymethods]
 impl PyLeVJepaPerception {
     #[new]
-    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "large"))]
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "tiny"))]
     fn new(
         encoder_checkpoint: &str,
         encoder_plan_cache: Option<&str>,
@@ -119,47 +110,6 @@ impl PyLeVJepaPerception {
 }
 
 #[pymethods]
-impl PyDinoPerception {
-    #[new]
-    #[pyo3(signature = (dino_checkpoint, dino_plan_cache = None))]
-    fn new(dino_checkpoint: &str, dino_plan_cache: Option<&str>) -> PyResult<Self> {
-        let cache = dino_plan_cache.map(Path::new);
-        let inner = DinoPerception::load_vits16(dino_checkpoint, None, cache)
-            .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
-        Ok(Self { inner })
-    }
-
-    fn reset(&mut self) {}
-
-    fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
-        let frame = parse_rgb_frame(frame)?;
-        let pooled = self
-            .inner
-            .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
-        Ok((
-            self.inner.projected_patches().to_vec(),
-            pooled.as_slice().to_vec(),
-        ))
-    }
-
-    #[getter]
-    fn projected_shape(&self) -> (usize, usize, usize) {
-        let grid = self.inner.projected_grid();
-        (grid, grid, OBSERVATION_CHANNELS)
-    }
-
-    #[getter]
-    fn pooled_shape(&self) -> (usize, usize, usize) {
-        (OBSERVATION_GRID, OBSERVATION_GRID, OBSERVATION_CHANNELS)
-    }
-
-    #[getter]
-    fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
-        json_to_python(py, &self.inner.gpu_device())
-    }
-}
-
-#[pymethods]
 impl PyAgent {
     #[getter]
     fn provenance<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -194,9 +144,8 @@ impl PyAgent {
         future_prediction_loss_scale = None,
         agc = None,
         replay_value_gradient = None,
-        encoder_plan_cache = None,
         skip_full_optimize = false,
-        encoder = "dinov3",
+        encoder = "levjepa-tiny",
     ))]
     #[allow(clippy::too_many_arguments)]
     fn new(
@@ -226,7 +175,6 @@ impl PyAgent {
         future_prediction_loss_scale: Option<f32>,
         agc: Option<f32>,
         replay_value_gradient: Option<bool>,
-        encoder_plan_cache: Option<&str>,
         skip_full_optimize: bool,
         encoder: &str,
     ) -> PyResult<Self> {
@@ -299,22 +247,19 @@ impl PyAgent {
         config
             .check()
             .map_err(|error| PyValueError::new_err(format!("invalid Dreamer config: {error}")))?;
-        let cache = encoder_plan_cache.map(Path::new);
-        let inner = DreamerAgent::with_perception(config, kind, encoder_checkpoint, cache)
+        let inner = DreamerAgent::with_perception(config, kind, encoder_checkpoint)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
 
     #[classmethod]
-    #[pyo3(signature = (dreamer_checkpoint, encoder_checkpoint, encoder_plan_cache = None))]
+    #[pyo3(signature = (dreamer_checkpoint, encoder_checkpoint))]
     fn restore(
         _class: &Bound<'_, PyType>,
         dreamer_checkpoint: &str,
         encoder_checkpoint: &str,
-        encoder_plan_cache: Option<&str>,
     ) -> PyResult<Self> {
-        let cache = encoder_plan_cache.map(Path::new);
-        let inner = DreamerAgent::restore(dreamer_checkpoint, encoder_checkpoint, cache)
+        let inner = DreamerAgent::restore(dreamer_checkpoint, encoder_checkpoint)
             .map_err(|error| PyRuntimeError::new_err(error.to_string()))?;
         Ok(Self { inner })
     }
@@ -375,13 +320,13 @@ impl PyAgent {
     ///
     /// The returned copy is read-only and does not change recurrent state.
     #[getter]
-    fn visual_observation(&self) -> Vec<f32> {
+    fn visual_observation(&mut self) -> Vec<f32> {
         self.inner.visual_observation().to_vec()
     }
 
-    /// The recurrent policy input, without an additional GPU execution.
+    /// Explicit readback of the resident recurrent policy input.
     #[getter]
-    fn latent_feature(&self) -> Vec<f32> {
+    fn latent_feature(&mut self) -> Vec<f32> {
         self.inner.latent_feature().to_vec()
     }
 
@@ -583,11 +528,10 @@ fn parse_model_size(value: &str) -> PyResult<ModelSize> {
 
 fn parse_perception_kind(value: &str) -> PyResult<PerceptionKind> {
     match value {
-        "dinov3" => Ok(PerceptionKind::DinoV3),
         "levjepa" => Ok(PerceptionKind::LeVJepa),
         "levjepa-tiny" => Ok(PerceptionKind::LeVJepaTiny),
         _ => Err(PyValueError::new_err(
-            "encoder must be dinov3 or levjepa or levjepa-tiny",
+            "encoder must be levjepa or levjepa-tiny",
         )),
     }
 }
@@ -641,18 +585,12 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<vector::PyVectorAgent>()?;
-    module.add_class::<PyDinoPerception>()?;
     module.add_class::<PyLeVJepaPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
-    module.add("DINO_MODEL_ID", kindle::vision::VITS16_MODEL_ID)?;
     module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;
     module.add(
         "LEVJEPA_CHECKPOINT_REVISION",
         kindle::vision::levjepa::CHECKPOINT_REV,
-    )?;
-    module.add(
-        "DINO_CHECKPOINT_REVISION",
-        kindle::vision::VITS16_CHECKPOINT_REV,
     )?;
     module.add(
         "DREAMERV3_REVISION",

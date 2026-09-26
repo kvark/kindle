@@ -6,31 +6,16 @@
 //! temporal semantics are checkpointed; equal shapes do not mean equal features.
 
 use std::path::Path;
-use std::sync::Arc;
 
-use meganeura::data::safetensors::SafeTensorsModel;
-use meganeura::{Graph, Mode, Session, SessionConfig};
-
-pub mod dinov3;
+#[cfg(target_os = "linux")]
+pub mod capture;
 pub mod levjepa;
 pub mod preprocess;
 pub mod preprocess_gpu;
-mod weights;
 
-/// Meta's upstream DINOv3 source revision used to validate this port.
-pub const DINOV3_UPSTREAM_REV: &str = "6876159a11b4df116f30f667f8c9888617df0751";
-/// Source revision of the native Meganeura transcription adapted here.
-pub const DINOVISION_SOURCE_REV: &str = "dc35cdf1c7c910cdd93c5b5362846842ae469a21";
-/// Hugging Face model repository expected by [`DinoEncoder::load_vits16`].
-pub const VITS16_MODEL_ID: &str = "facebook/dinov3-vits16-pretrain-lvd1689m";
-/// Immutable Hugging Face snapshot used for the numerical golden values.
-pub const VITS16_CHECKPOINT_REV: &str = "114c1379950215c8b35dfcd4e90a5c251dde0d32";
-/// SHA-256/LFS object ID of the pinned reference weight file.
-pub const VITS16_CHECKPOINT_SHA256: &str =
-    "4610ad75edef83e75afdebf162d148dc628045ea6cbb83d67d4708c709c4f91d";
 /// Channels retained by the fixed Johnson–Lindenstrauss projection.
 pub const OBSERVATION_CHANNELS: usize = 64;
-/// Spatial side after fixed 2×2 pooling of DINO's 14×14 patch grid.
+/// Spatial side after fixed 2×2 pooling of LeVJEPA's 14×14 patch grid.
 pub const OBSERVATION_GRID: usize = 7;
 /// Stable seed for the non-trainable projection matrix.
 pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
@@ -38,7 +23,6 @@ pub const PROJECTION_SEED: u64 = 0xd1_30_00_03_00_00_00_01;
 #[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum PerceptionKind {
-    DinoV3,
     LeVJepa,
     #[serde(rename = "levjepa-tiny")]
     LeVJepaTiny,
@@ -56,11 +40,6 @@ pub struct PerceptionIdentity {
 impl PerceptionKind {
     pub fn identity(self, fingerprint: String) -> PerceptionIdentity {
         let (model_id, checkpoint_revision, encoding_revision) = match self {
-            Self::DinoV3 => (
-                VITS16_MODEL_ID,
-                VITS16_CHECKPOINT_REV,
-                "dinov3-vits16-letterbox224-jl64-pool2-v1",
-            ),
             Self::LeVJepa => (
                 levjepa::MODEL_ID,
                 levjepa::CHECKPOINT_REV,
@@ -83,7 +62,6 @@ impl PerceptionKind {
 
     pub(crate) fn levjepa_architecture(self) -> Option<levjepa::Architecture> {
         match self {
-            Self::DinoV3 => None,
             Self::LeVJepa => Some(levjepa::Architecture::Large),
             Self::LeVJepaTiny => Some(levjepa::Architecture::Tiny),
         }
@@ -125,60 +103,6 @@ impl PerceptionIdentity {
             ));
         }
         Ok(())
-    }
-}
-
-pub(crate) enum Perception {
-    Dino(DinoPerception),
-    LeVJepa(levjepa::LeVJepaPerception),
-}
-
-impl Perception {
-    pub(crate) fn load(
-        kind: PerceptionKind,
-        checkpoint: &Path,
-        gpu: Arc<blade_graphics::Context>,
-        cache: Option<&Path>,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        match kind {
-            PerceptionKind::DinoV3 => Ok(Self::Dino(DinoPerception::load_vits16(
-                checkpoint,
-                Some(gpu),
-                cache,
-            )?)),
-            PerceptionKind::LeVJepa => Ok(Self::LeVJepa(levjepa::LeVJepaPerception::load(
-                checkpoint,
-                Some(gpu),
-                cache,
-            )?)),
-            PerceptionKind::LeVJepaTiny => Ok(Self::LeVJepa(
-                levjepa::LeVJepaPerception::load_batched_with_architecture(
-                    levjepa::Architecture::Tiny,
-                    checkpoint,
-                    1,
-                    Some(gpu),
-                    cache,
-                )?,
-            )),
-        }
-    }
-
-    pub(crate) fn reset(&mut self) {
-        if let Self::LeVJepa(encoder) = self {
-            encoder.reset();
-        }
-    }
-
-    pub(crate) fn encode_frame_rgb8(
-        &mut self,
-        rgb: &[u8],
-        width: usize,
-        height: usize,
-    ) -> Observation {
-        match self {
-            Self::Dino(encoder) => encoder.encode_frame_rgb8(rgb, width, height),
-            Self::LeVJepa(encoder) => encoder.encode_frame_rgb8(rgb, width, height),
-        }
     }
 }
 
@@ -226,131 +150,6 @@ impl Observation {
     }
 }
 
-/// Frozen DINOv3 ViT-S/16 inference session.
-pub struct DinoEncoder {
-    config: dinov3::Config,
-    session: Session,
-    input: Vec<f32>,
-    tokens: Vec<f32>,
-}
-
-/// Production perception path: full frozen ViT-S/16 followed by a frozen
-/// random projection and fixed spatial pooling.
-///
-/// The projection is embedded as a graph constant. It has no optimizer state
-/// and never changes, so cached replay observations remain valid forever.
-pub struct DinoPerception {
-    config: dinov3::Config,
-    session: Session,
-    input: Vec<f32>,
-    projected: Vec<f32>,
-    pooled: Vec<f32>,
-}
-
-impl DinoPerception {
-    pub fn load_vits16(
-        checkpoint: impl AsRef<Path>,
-        gpu: Option<Arc<blade_graphics::Context>>,
-        plan_cache: Option<&Path>,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        let gpu = match gpu {
-            Some(gpu) => gpu,
-            None => Arc::new(crate::init_gpu_context()?),
-        };
-        let config = dinov3::Config::vits16();
-        let mut graph = Graph::new();
-        let tokens = dinov3::build_encoder(&mut graph, &config);
-        let prefix_values = config.num_prefix_tokens() * config.hidden_size;
-        let patch_values = config.num_patches() * config.hidden_size;
-        let patches = graph.split_b(tokens, 1, prefix_values as u32, patch_values as u32, 1);
-        let patches = graph.reshape(patches, &[config.num_patches(), config.hidden_size]);
-        let projection = graph.constant(
-            fixed_projection(config.hidden_size, OBSERVATION_CHANNELS, PROJECTION_SEED),
-            &[config.hidden_size, OBSERVATION_CHANNELS],
-        );
-        let projected = graph.matmul(patches, projection);
-        graph.set_outputs(vec![projected]);
-
-        let (mut session, _) = meganeura::build(
-            &graph,
-            SessionConfig {
-                mode: Mode::Inference,
-                gpu: Some(gpu),
-                cache: plan_cache,
-                runtime: meganeura::SessionOptions {
-                    gpu_timing: meganeura::GpuOptions::from_env().timing,
-                    ..Default::default()
-                },
-                ..SessionConfig::default()
-            },
-        );
-        let model = SafeTensorsModel::load(checkpoint.as_ref().to_path_buf())?;
-        weights::load_encoder(&mut session, &model, &config)?;
-
-        Ok(Self {
-            input: vec![0.0; config.num_patches() * config.patch_dim()],
-            projected: vec![0.0; config.num_patches() * OBSERVATION_CHANNELS],
-            pooled: vec![0.0; Observation::LEN],
-            config,
-            session,
-        })
-    }
-
-    pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
-        crate::gpu_device_info(self.session.device_information())
-    }
-
-    pub fn encode_rgb8(&mut self, rgb: &[u8]) -> Observation {
-        self.input =
-            preprocess::patches_from_rgb8(rgb, self.config.image_size, self.config.patch_size);
-        self.run()
-    }
-
-    /// Encode any non-empty RGB8 frame using deterministic, aspect-preserving
-    /// letterboxing to DINO's fixed 224×224 input.
-    pub fn encode_frame_rgb8(&mut self, rgb: &[u8], width: usize, height: usize) -> Observation {
-        let resized = preprocess::resize_letterbox_rgb8(rgb, width, height, self.config.image_size);
-        self.encode_rgb8(&resized)
-    }
-
-    pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> Observation {
-        self.input = preprocess::patches_from_pixels_chw(
-            pixels,
-            self.config.image_size,
-            self.config.patch_size,
-        );
-        self.run()
-    }
-
-    /// Projected patch tokens before the production 2x2 spatial pooling.
-    ///
-    /// This is exposed for representation diagnostics. Dreamer continues to
-    /// consume only the pooled [`Observation`], so reading these values
-    /// cannot change training or replay compatibility.
-    pub fn projected_patches(&self) -> &[f32] {
-        &self.projected
-    }
-
-    /// Side length of the square grid returned by [`Self::projected_patches`].
-    pub fn projected_grid(&self) -> usize {
-        self.config.grid()
-    }
-
-    fn run(&mut self) -> Observation {
-        self.session.set_input("patches", &self.input);
-        self.session.step();
-        self.session.wait();
-        self.session.read_output_by_index(0, &mut self.projected);
-        pool_2x2_token_major(
-            &self.projected,
-            self.config.grid(),
-            OBSERVATION_CHANNELS,
-            &mut self.pooled,
-        );
-        Observation::from_vec(self.pooled.clone())
-    }
-}
-
 pub(crate) fn fixed_projection(input: usize, output: usize, seed: u64) -> Vec<f32> {
     assert!(input > 0 && output > 0);
     let scale = 1.0 / (output as f32).sqrt();
@@ -367,6 +166,7 @@ pub(crate) fn fixed_projection(input: usize, output: usize, seed: u64) -> Vec<f3
         .collect()
 }
 
+#[cfg(test)]
 fn pool_2x2_token_major(input: &[f32], grid: usize, channels: usize, output: &mut [f32]) {
     assert_eq!(grid % 2, 0);
     assert_eq!(input.len(), grid * grid * channels);
@@ -388,106 +188,6 @@ fn pool_2x2_token_major(input: &[f32], grid: usize, channels: usize, output: &mu
     }
 }
 
-impl DinoEncoder {
-    /// Build the full 12-layer ViT-S/16 and load a local safetensors file.
-    ///
-    /// The checkpoint is deliberately external: DINOv3 weights are covered
-    /// by Meta's DINOv3 license and must not be committed to this repository.
-    /// `plan_cache` is optional but strongly recommended after the first run.
-    pub fn load_vits16(
-        checkpoint: impl AsRef<Path>,
-        gpu: Option<Arc<blade_graphics::Context>>,
-        plan_cache: Option<&Path>,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        Self::load(dinov3::Config::vits16(), checkpoint, gpu, plan_cache)
-    }
-
-    /// Build a frozen encoder with an explicit DINO configuration.
-    pub fn load(
-        config: dinov3::Config,
-        checkpoint: impl AsRef<Path>,
-        gpu: Option<Arc<blade_graphics::Context>>,
-        plan_cache: Option<&Path>,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
-        let gpu = match gpu {
-            Some(gpu) => gpu,
-            None => Arc::new(crate::init_gpu_context()?),
-        };
-        let mut graph = Graph::new();
-        let output = dinov3::build_encoder(&mut graph, &config);
-        graph.set_outputs(vec![output]);
-
-        let (mut session, _) = meganeura::build(
-            &graph,
-            SessionConfig {
-                mode: Mode::Inference,
-                gpu: Some(gpu),
-                cache: plan_cache,
-                runtime: meganeura::SessionOptions {
-                    gpu_timing: meganeura::GpuOptions::from_env().timing,
-                    ..Default::default()
-                },
-                ..SessionConfig::default()
-            },
-        );
-        let model = SafeTensorsModel::load(checkpoint.as_ref().to_path_buf())?;
-        weights::load_encoder(&mut session, &model, &config)?;
-
-        Ok(Self {
-            input: vec![0.0; config.num_patches() * config.patch_dim()],
-            tokens: vec![0.0; config.num_tokens() * config.hidden_size],
-            config,
-            session,
-        })
-    }
-
-    pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
-        crate::gpu_device_info(self.session.device_information())
-    }
-
-    pub fn config(&self) -> &dinov3::Config {
-        &self.config
-    }
-
-    /// Encode an exact-size interleaved RGB8 frame and return a row-major
-    /// `[grid * grid, hidden]` patch-token matrix.
-    ///
-    /// This method does not resize. The caller must provide
-    /// `image_size × image_size × 3` bytes, currently 224×224 RGB.
-    pub fn encode_rgb8(&mut self, rgb: &[u8]) -> &[f32] {
-        self.input =
-            preprocess::patches_from_rgb8(rgb, self.config.image_size, self.config.patch_size);
-        self.run()
-    }
-
-    /// Encode normalized CHW pixels using the same tensor convention as the
-    /// Hugging Face reference processor.
-    pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> &[f32] {
-        self.input = preprocess::patches_from_pixels_chw(
-            pixels,
-            self.config.image_size,
-            self.config.patch_size,
-        );
-        self.run()
-    }
-
-    /// Encode an already patchified, ImageNet-normalized frame.
-    pub fn encode_patches(&mut self, patches: &[f32]) -> &[f32] {
-        assert_eq!(patches.len(), self.input.len());
-        self.input.copy_from_slice(patches);
-        self.run()
-    }
-
-    fn run(&mut self) -> &[f32] {
-        self.session.set_input("patches", &self.input);
-        self.session.step();
-        self.session.wait();
-        self.session.read_output_by_index(0, &mut self.tokens);
-        let offset = self.config.num_prefix_tokens() * self.config.hidden_size;
-        &self.tokens[offset..]
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -495,7 +195,6 @@ mod tests {
     #[test]
     fn perception_sizes_have_distinct_stable_checkpoint_identities() {
         for (kind, encoded, architecture) in [
-            (PerceptionKind::DinoV3, "dinov3", None),
             (
                 PerceptionKind::LeVJepa,
                 "levjepa",
@@ -544,17 +243,6 @@ mod tests {
     }
 
     #[test]
-    fn baseline_is_full_vits16_with_dense_patch_output() {
-        let config = dinov3::Config::vits16();
-        assert_eq!(config.num_hidden_layers, 12);
-        assert_eq!(config.image_size, 224);
-        assert_eq!(config.grid(), 14);
-        assert_eq!(config.num_patches(), 196);
-        assert_eq!(config.hidden_size, 384);
-        assert_eq!(config.num_patches() * config.hidden_size, 75_264);
-    }
-
-    #[test]
     fn projection_and_pooling_are_fixed_and_spatial() {
         assert_eq!(
             fixed_projection(384, 64, PROJECTION_SEED),
@@ -566,98 +254,5 @@ mod tests {
         let expected = (input[0] + input[2] + input[28] + input[30]) / 4.0;
         assert_eq!(output[0], expected);
         assert_eq!(output.len(), 98);
-    }
-
-    /// Full-checkpoint parity against Transformers 5.15.0 / PyTorch 2.13.
-    ///
-    /// Run with:
-    /// `KINDLE_DINOV3_WEIGHTS=/path/model.safetensors cargo test -p kindle
-    /// vision::tests::vits16_checkpoint_matches_hugging_face -- --ignored`
-    #[test]
-    #[ignore = "requires a GPU and the separately licensed DINOv3 checkpoint"]
-    fn vits16_checkpoint_matches_hugging_face() {
-        let checkpoint = std::env::var_os("KINDLE_DINOV3_WEIGHTS")
-            .expect("set KINDLE_DINOV3_WEIGHTS to the ViT-S/16 safetensors file");
-        assert_eq!(
-            checkpoint_sha256(Path::new(&checkpoint)).unwrap(),
-            VITS16_CHECKPOINT_SHA256
-        );
-        let mut encoder =
-            DinoEncoder::load_vits16(&checkpoint, None, None).expect("load DINOv3 ViT-S/16");
-        let rgb: Vec<u8> = (0..224 * 224 * 3)
-            .map(|index| ((index * 37 + 13) % 251) as u8)
-            .collect();
-        let actual = encoder.encode_rgb8(&rgb);
-
-        // Dense patch tokens from facebook/dinov3-vits16-pretrain-lvd1689m
-        // snapshot 114c137..., with the prefix tokens removed.
-        let expected = [
-            (0, -0.057_838_768_f32),
-            (1, -0.493_787_35),
-            (2, -0.066_303_96),
-            (3, 0.386_416_6),
-            (7, 0.100_504_76),
-            (31, 0.167_517_4),
-            (127, -0.292_504_4),
-            (383, -0.389_186_32),
-            (384, 0.038_286_045),
-            (385, -0.489_355_62),
-            (767, -0.390_894_17),
-            (1_023, 0.072_687_8),
-            (4_095, -0.063_992_37),
-            (8_191, -0.234_296_11),
-            (16_383, 0.103_825_44),
-            (32_767, -0.341_246_3),
-            (49_151, -0.098_256_67),
-            (65_535, 0.098_528_79),
-            (75_263, -0.465_510_22),
-        ];
-        let worst = expected
-            .iter()
-            .map(|&(index, reference)| (actual[index] - reference).abs())
-            .fold(0.0_f32, f32::max);
-        assert!(worst < 0.01, "DINOv3 sample max error {worst}");
-
-        let mean = actual.iter().sum::<f32>() / actual.len() as f32;
-        let norm = actual.iter().map(|value| value * value).sum::<f32>().sqrt();
-        assert!((mean - -0.003_444_944).abs() < 5e-4, "mean {mean}");
-        assert!((norm - 116.004_425).abs() < 0.5, "L2 norm {norm}");
-
-        // Verify the production projection graph and CPU pooling boundary
-        // against a direct projection of the already validated patch tokens.
-        let patches = actual.to_vec();
-        let projection = fixed_projection(384, OBSERVATION_CHANNELS, PROJECTION_SEED);
-        let mut projected = vec![0.0; 196 * OBSERVATION_CHANNELS];
-        for patch in 0..196 {
-            for output in 0..OBSERVATION_CHANNELS {
-                projected[patch * OBSERVATION_CHANNELS + output] = (0..384)
-                    .map(|input| {
-                        patches[patch * 384 + input]
-                            * projection[input * OBSERVATION_CHANNELS + output]
-                    })
-                    .sum();
-            }
-        }
-        let mut expected_observation = vec![0.0; Observation::LEN];
-        pool_2x2_token_major(
-            &projected,
-            14,
-            OBSERVATION_CHANNELS,
-            &mut expected_observation,
-        );
-        drop(encoder);
-        let mut perception = DinoPerception::load_vits16(checkpoint, None, None)
-            .expect("load production DINO perception");
-        let observation = perception.encode_rgb8(&rgb);
-        let projection_error = observation
-            .as_slice()
-            .iter()
-            .zip(expected_observation)
-            .map(|(value, expected)| (*value - expected).abs())
-            .fold(0.0_f32, f32::max);
-        assert!(
-            projection_error < 0.01,
-            "production DINO projection max error {projection_error}"
-        );
     }
 }

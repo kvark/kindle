@@ -20,15 +20,17 @@ useful world model does not establish an efficiency advantage.
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
 imagined actor/critic training and causal **LeVJEPA** perception. The frontend is
-frozen during gameplay, not end-to-end JEPA training and not DINO. DINO remains
-a historical control, not an automatic fallback. The new experiments use a
+frozen during gameplay, not end-to-end JEPA training. The obsolete DINO path has
+been removed; its results remain historical. New agents default to a
 separately pretrained **5.49M causal ViT-Tiny/16**. Native numerical,
 optimizer/restore, streaming, fit and noncollapse checks pass; the first bounded
 4,096-update pretraining run completes with verified state and encoder exports.
 Frozen probes retain useful position features but mixed motion results. Bounded
 actor integration and matched-order throughput pass. Tiny Freeway now passes
 all three fresh learner roots, but Breakout regresses and broader Tiny reliability
-is unproven. Tiny stays opt-in; the 303M frontend remains the default.
+is unproven. Tiny is now the default; Large is an explicit comparison only.
+Old checkpoint/backend pinning must not delay this implementation. Keep current
+architecture/encoder integrity checks, not migration machinery.
 
 ```text
 previous belief + executed action -> deterministic prior -> predicted features
@@ -45,6 +47,16 @@ uses causal prefixes of 16-arrival chunks, projected to 7×7×64 features. Chunk
 boundaries reset perception only; episode boundaries also reset belief. Six
 streams share batched inference and one learner while retaining separate visual
 caches, recurrent state, RNG and causal replay histories.
+
+Single and vector pixel actors now share a resident acting path: GPU pixels ->
+preprocessing -> encoder -> pooling -> belief/policy -> selected actions. Replay
+collection also stays on GPU. Linux Vulkan capture is integrated through
+Dullahan's fenced ownership protocol and exercised in real vkQuake at 640x480:
+full 12M frozen, 256 actions in 2.758 s, plus a separate small-world 105-update
+plumbing test. This is not Quake competence or 12M training throughput.
+Explicit diagnostics/checkpoints and sampled learner batches still read back
+data. See the
+[implementation and validation report](experiments/2026-09-26-gpu-resident-acting.md).
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
 [vector collection](../kindle/src/dreamer/agent/vector.rs),
@@ -162,14 +174,16 @@ robustness under a changed protocol.
    A small isolated candidate in `runs/world-sync-batch-20260926.RzSMMT` batches
    repeated world-weight downloads while retaining derived-weight updates.
    Its92 CPU tests/build/fmt/Clippy pass; no GPU result or adoption exists.
-   GPU preprocessing now has [kernel and full-Tiny checks](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md):
-   native raw-byte upload or resident RGB/RGBA/BGRA -> one Blade pass -> encoder
-   patches. Encoding v2 removes intermediate RGB8 quantization and uses exact
-   normalized-zero padding. V1 checkpoints need their pinned package. New native
-   bfcb5cec passes N6 training/frozen/sticky restore with exact saved-state and
-   full replay checks; CI181 is green. End-to-end timing remains separate; no
-   speedup is claimed yet. External capture import and projected-feature
-   readbacks remain. Do not silently mix v1/v2 in a learning campaign.
+   GPU preprocessing, encoder pooling, live belief, categorical sampling and
+   collection replay are now resident. Single and vector actors use the same
+   implementation, including action masks and independent RNG streams. Real
+   vkQuake capture uses exact Vulkan allocation metadata and completed producer/
+   consumer ownership transfers; it never relies on a CPU-ready flag. The
+   [new report](experiments/2026-09-26-gpu-resident-acting.md) records parity and
+   native integration. V2 preserves F32 interpolation and normalized-zero
+   padding; the old DINO path is removed. Next optimize the still-host-side
+   learner targets/imagination and weight synchronization, measured separately
+   from acting. No end-to-end training speedup is assumed from removed copies.
 6. **Then change perception or learning, one variable at a time.** Neither the
    [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
    nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)
@@ -265,13 +279,15 @@ normal JAX backend initialization is permitted for the bounded upstream control.
 The capture-to-action target is GPU-resident: capture -> letterbox/normalize/
 patch layout -> causal encoder -> belief/policy -> action readback. Only the
 acting hot path has the action-only boundary; sparse rewards, checkpoints and
-explicit diagnostics remain legitimate host traffic. First move preprocessing
-into one Blade kernel writing the encoder's input, shared by raw CPU images and
-resident RGB/RGBA/BGRA buffers. Next eliminate projected-feature/belief handoffs,
-then connect mind-games capture with explicit producer ownership and semaphore
-synchronization. Do not call a CPU-ready flag GPU synchronization, or a buffer
-API an integrated zero-readback capture path. Track frame-to-action latency as
-well as training throughput; no end-to-end speedup is assumed from fewer copies.
+explicit diagnostics remain legitimate host traffic. This path now exists for
+uploaded RGB and resident RGB/RGBA/BGRA, with real Dullahan capture integration.
+Producer/consumer fence completion plus EXTERNAL queue-ownership barriers make
+ring reuse explicit. The conservative socket handshake serializes game frames;
+it is not yet pipelined external-semaphore execution. Paged device replay avoids
+collection readback, but the learner still downloads sampled feature/context
+batches. Track capture-to-action latency separately from update throughput.
+Port the lease contract into mind-games GameSession before vector native games;
+the old structured-state KindleActor and multi-frame freezer are not that path.
 
 Keep AGC/full recurrence unless an ablation supports changing them.
 Reconstruction/future controls remain .25/0, .25/.25 and 0/.25. Qualify backend

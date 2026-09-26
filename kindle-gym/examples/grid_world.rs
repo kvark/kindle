@@ -69,9 +69,9 @@ impl RewardMode {
 #[derive(Debug, Parser)]
 #[command(about = "Run a measured Dreamer or random-policy GridWorld baseline")]
 struct Arguments {
-    /// DINOv3 ViT-S/16 model.safetensors; omitted with --random.
-    #[arg(value_name = "DINO_CHECKPOINT")]
-    dino_checkpoint: Option<PathBuf>,
+    /// LeVJEPA-Tiny encoder.safetensors; omitted with --random.
+    #[arg(value_name = "ENCODER_CHECKPOINT")]
+    encoder_checkpoint: Option<PathBuf>,
 
     /// Run a uniform random valid-action control without constructing Dreamer.
     #[arg(long)]
@@ -109,8 +109,8 @@ struct Arguments {
     #[arg(long, value_enum)]
     model_size: Option<Size>,
 
-    /// Override the per-patch hidden width of the 64-channel DINO decoder.
-    /// Zero restores the legacy preset width for checkpoint compatibility.
+    /// Override the per-patch hidden width of the 64-channel feature decoder.
+    /// Zero uses the model preset width.
     #[arg(long)]
     observation_decoder_depth: Option<usize>,
 
@@ -162,7 +162,7 @@ struct Arguments {
     #[arg(long)]
     dynamics_loss_scale: Option<f32>,
 
-    /// Override the DINO-feature reconstruction loss weight.
+    /// Override the visual-feature reconstruction loss weight.
     #[arg(long)]
     reconstruction_loss_scale: Option<f32>,
 
@@ -303,7 +303,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
     if arguments.random {
-        if arguments.dino_checkpoint.is_some()
+        if arguments.encoder_checkpoint.is_some()
             || arguments.restore.is_some()
             || arguments.checkpoint.is_some()
             || arguments.has_training_config_override()
@@ -317,10 +317,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         run_random(&arguments)
     } else {
-        let dino_checkpoint = arguments
-            .dino_checkpoint
+        let encoder_checkpoint = arguments
+            .encoder_checkpoint
             .as_ref()
-            .ok_or("DINO_CHECKPOINT is required unless --random is used")?;
+            .ok_or("ENCODER_CHECKPOINT is required unless --random is used")?;
         if arguments.restore.is_some() && arguments.has_training_config_override() {
             return Err("training overrides cannot change restored configuration".into());
         }
@@ -340,7 +340,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         {
             return Err("--reward-only already fixes all loss weights".into());
         }
-        run_dreamer(&arguments, dino_checkpoint)
+        run_dreamer(&arguments, encoder_checkpoint)
     }
 }
 
@@ -411,7 +411,7 @@ fn run_random(arguments: &Arguments) -> Result<(), Box<dyn std::error::Error>> {
 
 fn run_dreamer(
     arguments: &Arguments,
-    dino_checkpoint: &PathBuf,
+    encoder_checkpoint: &PathBuf,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut config = DreamerConfig::new(ACTION_COUNT);
     if let Some(model_size) = arguments.model_size {
@@ -484,9 +484,9 @@ fn run_dreamer(
     }
     let construction_started = Instant::now();
     let mut agent = if let Some(checkpoint) = &arguments.restore {
-        DreamerAgent::restore(checkpoint, dino_checkpoint, None)?
+        DreamerAgent::restore(checkpoint, encoder_checkpoint)?
     } else {
-        DreamerAgent::new(config, dino_checkpoint, None)?
+        DreamerAgent::new(config, encoder_checkpoint)?
     };
     let agent_construction_seconds = construction_started.elapsed().as_secs_f64();
 

@@ -52,7 +52,7 @@ def pairwise_ranking_accuracy(probabilities, targets):
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
     parser.add_argument("checkpoint")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=5_000)
@@ -83,7 +83,7 @@ def main() -> None:
     frame, _ = environment.reset(seed=args.seed)
     action_count = int(environment.action_space.n)
     action_meanings = list(environment.unwrapped.get_action_meanings())
-    agent = kindle.Agent.restore(args.checkpoint, args.dino_checkpoint)
+    agent = kindle.Agent.restore(args.checkpoint, args.encoder_checkpoint)
     if int(agent.config["action_count"]) != action_count:
         raise ValueError("checkpoint and environment action counts differ")
     agent.begin_episode(frame)

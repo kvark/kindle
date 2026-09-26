@@ -38,8 +38,8 @@ use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
 use crate::vision::{
-    OBSERVATION_CHANNELS, OBSERVATION_GRID, Observation, PROJECTION_SEED, Perception,
-    PerceptionIdentity, PerceptionKind,
+    OBSERVATION_CHANNELS, OBSERVATION_GRID, Observation, PROJECTION_SEED, PerceptionIdentity,
+    PerceptionKind,
 };
 
 const CHECKPOINT_FORMAT: u32 = 3;
@@ -1832,168 +1832,111 @@ impl DreamerCore {
     }
 }
 
-/// Pixel-facing agent combining frozen visual perception and the Dreamer core.
+/// One environment using the same GPU-resident path as vector collection.
 pub struct DreamerAgent {
-    perception: Perception,
-    core: DreamerCore,
+    inner: VectorDreamerAgent,
 }
 
 impl DreamerAgent {
     pub fn new(
         config: DreamerConfig,
-        dino_checkpoint: impl AsRef<Path>,
-        dino_plan_cache: Option<&Path>,
+        encoder_checkpoint: impl AsRef<Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        Self::with_perception(
-            config,
-            PerceptionKind::DinoV3,
-            dino_checkpoint,
-            dino_plan_cache,
-        )
+        Ok(Self {
+            inner: VectorDreamerAgent::new(config, 1, encoder_checkpoint)?,
+        })
     }
-
     pub fn with_perception(
         config: DreamerConfig,
         kind: PerceptionKind,
         encoder_checkpoint: impl AsRef<Path>,
-        encoder_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let fingerprint = crate::vision::checkpoint_sha256(encoder_checkpoint.as_ref())?;
-        let identity = kind.identity(fingerprint);
-        let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = Perception::load(
-            kind,
-            encoder_checkpoint.as_ref(),
-            Arc::clone(&gpu),
-            encoder_plan_cache,
-        )?;
-        let mut core = DreamerCore::with_gpu(config, gpu);
-        core.perception_identity = Some(identity);
-        Ok(Self { perception, core })
+        Ok(Self {
+            inner: VectorDreamerAgent::with_perception(config, 1, kind, encoder_checkpoint)?,
+        })
     }
-
     pub fn restore(
-        dreamer_checkpoint: impl AsRef<Path>,
+        checkpoint: impl AsRef<Path>,
         encoder_checkpoint: impl AsRef<Path>,
-        encoder_plan_cache: Option<&Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        let metadata = read_checkpoint_metadata(dreamer_checkpoint.as_ref())?;
-        let identity = metadata
-            .perception
-            .as_ref()
-            .ok_or("pixel restore requires a recorded perception identity")?;
-        identity.verify_file(encoder_checkpoint.as_ref())?;
-        let kind = identity.kind;
-        let gpu = Arc::new(crate::init_gpu_context()?);
-        let core =
-            DreamerCore::restore_with_gpu(dreamer_checkpoint.as_ref(), Arc::clone(&gpu), metadata)?;
-        let perception =
-            Perception::load(kind, encoder_checkpoint.as_ref(), gpu, encoder_plan_cache)?;
-        Ok(Self { perception, core })
+        Ok(Self {
+            inner: VectorDreamerAgent::restore(checkpoint, 1, encoder_checkpoint)?,
+        })
     }
 
+    /// Learner metadata; live collection state is resident on the GPU.
     pub fn core(&self) -> &DreamerCore {
-        &self.core
+        &self.inner.core.learner
+    }
+    fn diagnostics(&mut self) -> &mut DreamerCore {
+        self.inner.core.read_diagnostics();
+        &mut self.inner.core.learner
     }
 
-    pub fn core_mut(&mut self) -> &mut DreamerCore {
-        &mut self.core
+    /// Explicit diagnostic readback; not part of acting.
+    pub fn latent_feature(&mut self) -> &[f32] {
+        self.diagnostics().latent_feature()
     }
-
-    /// Current posterior feature for representation diagnostics.
-    pub fn latent_feature(&self) -> &[f32] {
-        self.core.latent_feature()
+    pub fn encoded_observation(&mut self) -> &[f32] {
+        self.diagnostics().encoded_observation()
     }
-
-    /// Current output of the trainable adapter between perception and the RSSM.
-    pub fn encoded_observation(&self) -> &[f32] {
-        self.core.encoded_observation()
+    pub fn visual_observation(&mut self) -> &[f32] {
+        self.diagnostics().visual_observation()
     }
-
-    /// Current frozen visual observation before the trainable adapter.
-    pub fn visual_observation(&self) -> &[f32] {
-        self.core.visual_observation()
-    }
-
-    /// Current configured observation-head output; see [`DreamerCore::observation_prediction`].
     pub fn observation_prediction(&mut self) -> Vec<f32> {
-        self.core.observation_prediction()
+        self.diagnostics().observation_prediction()
     }
-
-    /// Reward predicted from the current posterior state.
     pub fn posterior_reward_prediction(&mut self) -> f32 {
-        self.core.posterior_reward_prediction()
+        self.diagnostics().posterior_reward_prediction()
     }
-
-    /// Value predicted from the current posterior state.
     pub fn posterior_value_prediction(&mut self) -> f32 {
-        self.core.posterior_value_prediction()
+        self.diagnostics().posterior_value_prediction()
     }
-
-    /// One-step prior reward prediction for a proposed categorical action.
     pub fn prior_reward_prediction(&mut self, action: usize) -> f32 {
-        self.core.prior_reward_prediction(action)
+        self.diagnostics().prior_reward_prediction(action)
     }
-
-    /// Open-loop prior reward predictions for a proposed action sequence.
     pub fn prior_reward_rollout(&mut self, actions: &[usize]) -> Vec<f32> {
-        self.core.prior_reward_rollout(actions)
+        self.diagnostics().prior_reward_rollout(actions)
     }
-
-    /// Open-loop prior rewards and decoded visual observations.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
-        self.core.prior_diagnostic_rollout(actions)
+        self.diagnostics().prior_diagnostic_rollout(actions)
     }
-
-    /// Open-loop reward, continuation, and value predictions.
     pub fn prior_behavior_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
-        self.core.prior_behavior_rollout(actions)
+        self.diagnostics().prior_behavior_rollout(actions)
     }
-
-    /// Current posterior policy after optional action masking and actor
-    /// unimix. This does not sample or alter the live recurrent state.
     pub fn posterior_action_probabilities(&mut self, action_mask: Option<&[bool]>) -> Vec<f32> {
-        self.core.posterior_action_probabilities(action_mask)
+        self.diagnostics()
+            .posterior_action_probabilities(action_mask)
     }
 
     pub fn begin_episode(&mut self, frame: &RgbFrame) {
-        self.core.check_episode_boundary();
-        self.perception.reset();
-        let observation =
-            self.perception
-                .encode_frame_rgb8(frame.pixels(), frame.width(), frame.height());
-        self.core.begin_episode(observation);
+        self.inner.begin_refs(&[(0, frame)]);
     }
-
     pub fn act(&mut self, mode: ActionMode, action_mask: Option<&[bool]>) -> usize {
-        self.core.act(mode, action_mask)
+        self.inner.core.act_inner(mode, None, action_mask)[0]
     }
-
-    /// Return the unscaled reward channels, including configured novelty.
     pub fn observe(&mut self, transition: &Transition) -> Reward {
-        assert!(
-            self.core.pending_action.is_some(),
-            "act must precede observe"
-        );
-        let observation = self.perception.encode_frame_rgb8(
-            transition.frame.pixels(),
-            transition.frame.width(),
-            transition.frame.height(),
-        );
-        self.core
-            .observe(observation, transition.reward, transition.flags())
+        self.inner.observe_refs(&[(0, transition)])[0]
     }
-
+    pub fn gpu_context(&self) -> Arc<blade_graphics::Context> {
+        self.inner.gpu_context()
+    }
+    pub fn observe_gpu(
+        &mut self,
+        frame: crate::vision::preprocess_gpu::GpuFrame<'_>,
+        flags: FrameFlags,
+        reward: Reward,
+    ) -> Reward {
+        self.inner.observe_gpu(&[(0, frame, flags, reward)])[0]
+    }
     pub fn learn(&mut self) -> Option<LearnReport> {
-        self.core.learn()
+        self.inner.core.learn()
     }
-
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
-        self.core.learn_scheduled(maximum_updates)
+        self.inner.learn_scheduled(maximum_updates)
     }
-
     pub fn save_checkpoint(&mut self, checkpoint: impl AsRef<Path>) -> io::Result<()> {
-        self.core.save_checkpoint(checkpoint)
+        self.inner.save_checkpoint(checkpoint)
     }
 }
 
@@ -2028,16 +1971,6 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             "DreamerV3 revision",
             DREAMERV3_UPSTREAM_REV,
             metadata.dreamerv3_revision.as_str(),
-        ),
-        (
-            "Meganeura revision",
-            MEGANEURA_REV,
-            metadata.meganeura_revision.as_str(),
-        ),
-        (
-            "Blade revision",
-            BLADE_REV,
-            metadata.blade_revision.as_str(),
         ),
     ];
     if metadata.format != CHECKPOINT_FORMAT {
@@ -2361,28 +2294,22 @@ mod tests {
             return_high: 1.0,
             visitation: None,
             future_head_revision: None,
-            perception: Some(
-                PerceptionKind::DinoV3.identity(crate::vision::VITS16_CHECKPOINT_SHA256.to_owned()),
-            ),
+            perception: Some(PerceptionKind::LeVJepaTiny.identity("1".repeat(64))),
             tensor_sha256: None,
         }
     }
 
     #[test]
-    fn checkpoint_metadata_rejects_backend_revision_mismatch() {
+    fn checkpoint_backend_revisions_are_provenance_not_architecture() {
         validate_checkpoint_metadata(&valid_checkpoint_metadata()).unwrap();
 
         let mut old_meganeura = valid_checkpoint_metadata();
         old_meganeura.meganeura_revision = "d904e12e52af6910b041873cd203a5d5e5fd3b3c".to_owned();
-        let error = validate_checkpoint_metadata(&old_meganeura).unwrap_err();
-        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-        assert!(error.to_string().contains("checkpoint Meganeura revision"));
+        validate_checkpoint_metadata(&old_meganeura).unwrap();
 
         let mut wrong_blade = valid_checkpoint_metadata();
         wrong_blade.blade_revision = "wrong-revision".to_owned();
-        let error = validate_checkpoint_metadata(&wrong_blade).unwrap_err();
-        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
-        assert!(error.to_string().contains("checkpoint Blade revision"));
+        validate_checkpoint_metadata(&wrong_blade).unwrap();
     }
 
     #[test]
@@ -2396,7 +2323,7 @@ mod tests {
             PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
         );
         validate_checkpoint_metadata(&metadata).unwrap();
-        metadata.perception.as_mut().unwrap().kind = PerceptionKind::DinoV3;
+        metadata.perception.as_mut().unwrap().kind = PerceptionKind::LeVJepaTiny;
         assert!(validate_checkpoint_metadata(&metadata).is_err());
         metadata.perception = Some(
             PerceptionKind::LeVJepa.identity(crate::vision::levjepa::CHECKPOINT_SHA256.to_owned()),
@@ -2427,7 +2354,7 @@ mod tests {
         .unwrap();
         let weights = directory.join("wrong-weights.safetensors");
         fs::write(&weights, b"not the pinned encoder").unwrap();
-        let error = DreamerAgent::restore(&directory, &weights, None)
+        let error = DreamerAgent::restore(&directory, &weights)
             .err()
             .expect("different encoder must be rejected");
         assert!(error.to_string().contains("perception checkpoint SHA-256"));
@@ -2440,9 +2367,7 @@ mod tests {
             )
             .unwrap();
             for error in [
-                DreamerAgent::restore(&directory, &weights, None)
-                    .err()
-                    .unwrap(),
+                DreamerAgent::restore(&directory, &weights).err().unwrap(),
                 crate::VectorDreamerAgent::restore(&directory, 6, &weights)
                     .err()
                     .unwrap(),

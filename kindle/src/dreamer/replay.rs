@@ -5,6 +5,7 @@ use std::collections::VecDeque;
 use rand::Rng;
 
 use super::config::DreamerConfig;
+use super::replay_gpu::DeviceReplay;
 use crate::vision::Observation;
 
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
@@ -70,11 +71,37 @@ pub struct SequenceReplay {
     streams: Vec<ReplayStream>,
     arrival_order: VecDeque<usize>,
     fresh_starts: VecDeque<(usize, u64)>,
+    device: Option<DeviceReplay>,
+    next_device_slot: usize,
+}
+
+struct StoredFrame {
+    values: FrameValues,
+    previous_action: Option<usize>,
+    reward: Reward,
+    flags: FrameFlags,
+}
+
+struct ReplayContext {
+    deter: Box<[f32]>,
+    stoch: Box<[f32]>,
+}
+
+enum FrameValues {
+    Host {
+        observation: Observation,
+        deter: Box<[f32]>,
+        stoch: Box<[f32]>,
+    },
+    Device {
+        slot: usize,
+        refreshed: Option<ReplayContext>,
+    },
 }
 
 #[derive(Default)]
 struct ReplayStream {
-    frames: VecDeque<ReplayFrame>,
+    frames: VecDeque<StoredFrame>,
     total_frames: u64,
 }
 
@@ -97,6 +124,8 @@ impl SequenceReplay {
             streams: (0..streams).map(|_| ReplayStream::default()).collect(),
             arrival_order: VecDeque::with_capacity(capacity.min(65_536)),
             fresh_starts: VecDeque::new(),
+            device: None,
+            next_device_slot: 0,
         }
     }
 
@@ -120,8 +149,79 @@ impl SequenceReplay {
     }
 
     pub fn push_stream(&mut self, stream: usize, frame: ReplayFrame, config: &DreamerConfig) {
-        assert!(stream < self.streams.len());
+        assert!(
+            self.device.is_none(),
+            "cannot mix host and device replay storage"
+        );
         frame.validate(config);
+        self.push_stored(
+            stream,
+            StoredFrame {
+                values: FrameValues::Host {
+                    observation: frame.observation,
+                    deter: frame.deter,
+                    stoch: frame.stoch,
+                },
+                previous_action: frame.previous_action,
+                reward: frame.reward,
+                flags: frame.flags,
+            },
+            config,
+        );
+    }
+
+    pub(super) fn enable_device(
+        &mut self,
+        gpu: std::sync::Arc<blade_graphics::Context>,
+        config: &DreamerConfig,
+    ) {
+        assert_eq!(self.len(), 0);
+        self.device = Some(DeviceReplay::new(gpu, config));
+    }
+
+    pub(super) fn wait_device(&mut self) {
+        if let Some(device) = &mut self.device {
+            device.wait();
+        }
+    }
+
+    /// Called after posterior commit, before overwriting observation/state inputs.
+    pub(super) fn push_device(
+        &mut self,
+        session: &meganeura::Session,
+        arrivals: &[(usize, Option<usize>, Reward, FrameFlags)],
+        config: &DreamerConfig,
+    ) {
+        assert!(arrivals.len() <= self.capacity);
+        let slots: Vec<_> = arrivals
+            .iter()
+            .enumerate()
+            .map(|(i, a)| (a.0, (self.next_device_slot + i) % self.capacity))
+            .collect();
+        self.device
+            .as_mut()
+            .expect("device replay enabled")
+            .store(session, &slots);
+        for (&(stream, previous_action, reward, flags), &(_, slot)) in arrivals.iter().zip(&slots) {
+            self.push_stored(
+                stream,
+                StoredFrame {
+                    values: FrameValues::Device {
+                        slot,
+                        refreshed: None,
+                    },
+                    previous_action,
+                    reward,
+                    flags,
+                },
+                config,
+            );
+        }
+        self.next_device_slot = (self.next_device_slot + arrivals.len()) % self.capacity;
+    }
+
+    fn push_stored(&mut self, stream: usize, frame: StoredFrame, config: &DreamerConfig) {
+        assert!(stream < self.streams.len());
         if self.len() == self.capacity {
             let oldest = self.arrival_order.pop_front().unwrap();
             self.streams[oldest].frames.pop_front();
@@ -181,6 +281,7 @@ impl SequenceReplay {
             .map(|_| vec![FrameFlags::default(); batch])
             .collect::<Vec<_>>();
         let mut frame_indices = (0..length).map(|_| vec![(0, 0); batch]).collect::<Vec<_>>();
+        let mut device_copies = Vec::new();
 
         for row in 0..batch {
             let fresh = loop {
@@ -215,23 +316,81 @@ impl SequenceReplay {
             assert!(start < counts[stream], "fresh replay start is invalid");
             let frames = &self.streams[stream].frames;
             let context = &frames[start + config.replay_context - 1];
-            initial_deter[row * size.deter..(row + 1) * size.deter].copy_from_slice(&context.deter);
             let stoch_width = size.stoch * size.classes;
-            initial_stoch[row * stoch_width..(row + 1) * stoch_width]
-                .copy_from_slice(&context.stoch);
+            let deter_target = &mut initial_deter[row * size.deter..(row + 1) * size.deter];
+            let stoch_target = &mut initial_stoch[row * stoch_width..(row + 1) * stoch_width];
+            match &context.values {
+                FrameValues::Host { deter, stoch, .. }
+                | FrameValues::Device {
+                    refreshed: Some(ReplayContext { deter, stoch }),
+                    ..
+                } => {
+                    deter_target.copy_from_slice(deter);
+                    stoch_target.copy_from_slice(stoch);
+                }
+                FrameValues::Device {
+                    slot,
+                    refreshed: None,
+                } => {
+                    device_copies.push((
+                        *slot,
+                        config.observation_dim(),
+                        0,
+                        row * size.deter,
+                        size.deter,
+                    ));
+                    device_copies.push((
+                        *slot,
+                        config.observation_dim() + size.deter,
+                        1,
+                        row * stoch_width,
+                        stoch_width,
+                    ));
+                }
+            }
 
             for time in 0..length {
                 let index = start + config.replay_context + time;
                 let frame = &frames[index];
-                observations[time]
-                    [row * config.observation_dim()..(row + 1) * config.observation_dim()]
-                    .copy_from_slice(frame.observation.as_slice());
+                match &frame.values {
+                    FrameValues::Host { observation, .. } => observations[time]
+                        [row * config.observation_dim()..(row + 1) * config.observation_dim()]
+                        .copy_from_slice(observation.as_slice()),
+                    FrameValues::Device { slot, .. } => device_copies.push((
+                        *slot,
+                        0,
+                        time + 2,
+                        row * config.observation_dim(),
+                        config.observation_dim(),
+                    )),
+                }
                 if let Some(action) = frame.previous_action {
                     previous_actions[time][row * config.action_count + action] = 1.0;
                 }
                 rewards[time][row] = frame.reward.combined(config);
                 flags[time][row] = frame.flags;
                 frame_indices[time][row] = (stream, index);
+            }
+        }
+
+        if !device_copies.is_empty() {
+            let device = self.device.as_mut().unwrap();
+            let mut downloaded: Vec<Vec<f32>> =
+                device_copies.iter().map(|row| vec![0.0; row.4]).collect();
+            let mut regions: Vec<_> = device_copies
+                .iter()
+                .zip(&mut downloaded)
+                .map(|(row, values)| (device.region(row.0, row.1), values.as_mut_slice()))
+                .collect();
+            device.readback.read_regions(&mut regions);
+            for ((_, _, target, offset, width), values) in device_copies.into_iter().zip(downloaded)
+            {
+                let target = match target {
+                    0 => &mut initial_deter,
+                    1 => &mut initial_stoch,
+                    time => &mut observations[time - 2],
+                };
+                target[offset..offset + width].copy_from_slice(&values);
             }
         }
 
@@ -265,13 +424,21 @@ impl SequenceReplay {
             for row in 0..config.batch_size {
                 let (stream, index) = batch.frame_indices[time][row];
                 let frame = &mut self.streams[stream].frames[index];
-                frame
-                    .deter
-                    .copy_from_slice(&deter[time][row * size.deter..(row + 1) * size.deter]);
                 let width = size.stoch * size.classes;
-                frame
-                    .stoch
-                    .copy_from_slice(&stoch[time][row * width..(row + 1) * width]);
+                let next_deter = &deter[time][row * size.deter..(row + 1) * size.deter];
+                let next_stoch = &stoch[time][row * width..(row + 1) * width];
+                match &mut frame.values {
+                    FrameValues::Host { deter, stoch, .. } => {
+                        deter.copy_from_slice(next_deter);
+                        stoch.copy_from_slice(next_stoch);
+                    }
+                    FrameValues::Device { refreshed, .. } => {
+                        *refreshed = Some(ReplayContext {
+                            deter: next_deter.into(),
+                            stoch: next_stoch.into(),
+                        });
+                    }
+                }
             }
         }
     }
@@ -470,8 +637,13 @@ mod tests {
             replay.update_context(&batch, &deter, &stoch, &config);
             for indices in &batch.frame_indices {
                 for &(stream, index) in indices {
-                    assert_eq!(replay.streams[stream].frames[index].deter[0], 123.0);
-                    assert_eq!(replay.streams[stream].frames[index].stoch[0], 456.0);
+                    let FrameValues::Host { deter, stoch, .. } =
+                        &replay.streams[stream].frames[index].values
+                    else {
+                        panic!("expected host fixture")
+                    };
+                    assert_eq!(deter[0], 123.0);
+                    assert_eq!(stoch[0], 456.0);
                 }
             }
         }

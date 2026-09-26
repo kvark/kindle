@@ -1,7 +1,7 @@
 """Record raw Atari frames while the unchanged runner evaluates a policy.
 
 Example:
-    python examples/record_atari.py DINO ALE/Pong-v5 --restore CHECKPOINT \
+    python examples/record_atari.py ENCODER ALE/Pong-v5 --restore CHECKPOINT \
         --evaluate --steps 10000 --atari-protocol published \
         --output runs/pong-video.jsonl --video runs/pong.mp4
 

@@ -168,7 +168,7 @@ dependencies = [
 [[package]]
 name = "blade-graphics"
 version = "0.9.0"
-source = "git+https://github.com/kvark/blade?rev=fbb4f28c4869e81ae15de58925945b423b9c1ac5#fbb4f28c4869e81ae15de58925945b423b9c1ac5"
+source = "git+https://github.com/kvark/blade?rev=7cca637791a57d9cacf4e99c10a87211f3c11b6a#7cca637791a57d9cacf4e99c10a87211f3c11b6a"
 dependencies = [
  "ash",
  "ash-window",
@@ -1081,6 +1081,8 @@ dependencies = [
  "blade-graphics",
  "log",
  "meganeura",
+ "naga",
+ "nix",
  "rand",
  "rayon",
  "serde",
@@ -1095,6 +1097,7 @@ dependencies = [
  "clap",
  "env_logger",
  "kindle",
+ "libc",
  "rand",
  "serde_json",
 ]
@@ -1158,7 +1161,7 @@ dependencies = [
 [[package]]
 name = "meganeura"
 version = "0.3.0"
-source = "git+https://github.com/kvark/meganeura?rev=ee3aea42da8e3e7b63d4083d0ea35b09848872ad#ee3aea42da8e3e7b63d4083d0ea35b09848872ad"
+source = "git+https://github.com/kvark/meganeura?rev=367e53d4de73aea6432afd40aa6fd69b5fcd4e8e#367e53d4de73aea6432afd40aa6fd69b5fcd4e8e"
 dependencies = [
  "blade-graphics",
  "blade-macros",
@@ -1182,6 +1185,15 @@ name = "memchr"
 version = "2.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88904434abc2901f197fe8cc55f0445e7ded921dba5911dad2e2b39b48e663c4"
+
+[[package]]
+name = "memoffset"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
+dependencies = [
+ "autocfg",
+]
 
 [[package]]
 name = "miniz_oxide"
@@ -1240,6 +1252,18 @@ name = "ndk-context"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27b02d87554356db9e9a873add8782d4ea6e3e58ea071a9adb9a2e8ddb884a8b"
+
+[[package]]
+name = "nix"
+version = "0.27.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2eb04e9c688eff1c89d72b407f168cf79bb9e867a9d3323ed6c01519eb9cc053"
+dependencies = [
+ "bitflags 2.13.0",
+ "cfg-if",
+ "libc",
+ "memoffset",
+]
 
 [[package]]
 name = "num"

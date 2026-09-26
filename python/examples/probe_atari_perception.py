@@ -317,7 +317,7 @@ def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
     parser.add_argument("encoder_checkpoint")
-    parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default="dinov3")
+    parser.add_argument("--encoder", choices=("levjepa-tiny", "levjepa"), default="levjepa-tiny")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--samples-per-seed", type=int, default=512)
     parser.add_argument("--seeds", type=int, nargs=4, default=(0, 1, 2, 3))
@@ -335,8 +335,8 @@ def main() -> None:
         parser.error("train, validation and test seeds must be distinct")
     if args.environment != "ALE/Pong-v5":
         parser.error("this color/object probe is specific to ALE/Pong-v5")
-    encoder_type = _native.LeVJepaPerception if args.encoder == "levjepa" else _native.DinoPerception
-    encoder = encoder_type(args.encoder_checkpoint, args.encoder_plan_cache)
+    encoder = _native.LeVJepaPerception(args.encoder_checkpoint, args.encoder_plan_cache,
+                                       architecture="large" if args.encoder == "levjepa" else "tiny")
     agent_metadata = None
     if args.agent_checkpoint:
         agent_metadata = json.loads((args.agent_checkpoint / "metadata.json").read_text())

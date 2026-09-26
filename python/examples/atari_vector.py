@@ -42,7 +42,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("encoder_checkpoint")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
-                        help="fresh default: levjepa Large; restore default: recorded checkpoint kind")
+                        help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)

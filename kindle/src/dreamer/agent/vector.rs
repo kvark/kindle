@@ -1,12 +1,10 @@
 //! Synchronous vector collection for one learner. No independent model replicas.
 
+use super::super::acting_gpu::ActingGpu;
 use super::*;
-use crate::vision::levjepa::LeVJepaPerception;
+use crate::vision::{levjepa::LeVJepaPerception, preprocess_gpu::GpuFrame};
 
 struct LiveStream {
-    deter: Vec<f32>,
-    stoch: Vec<f32>,
-    feature: Vec<f32>,
     policy_rng: StdRng,
     posterior_rng: StdRng,
     active: bool,
@@ -14,14 +12,21 @@ struct LiveStream {
     pending_action: Option<usize>,
 }
 
-struct VectorCore {
-    learner: DreamerCore,
+pub(super) struct VectorCore {
+    acting: ActingGpu,
+    copies: DeviceCopies,
+    pub(super) learner: DreamerCore,
     streams: Vec<LiveStream>,
     observe: Session,
     policy: Session,
 }
 
 fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static str> {
+    if config.visitation_bonus {
+        return Err(
+            "GPU collection does not support host hash visitation; supply adapter intrinsic rewards instead",
+        );
+    }
     if streams == 0 {
         return Err("at least one environment is required");
     }
@@ -52,6 +57,7 @@ fn check_action_overrides(
     Ok(())
 }
 
+#[cfg(test)]
 fn select_action(
     logits: &[f32],
     unimix: f32,
@@ -74,6 +80,13 @@ impl VectorCore {
         assert_eq!(learner.replay_len(), 0);
         learner.collection_streams = streams;
         learner.replay = SequenceReplay::with_streams(learner.config.replay_capacity, streams);
+        learner
+            .replay
+            .enable_device(Arc::clone(&learner.gpu), &learner.config);
+        assert!(
+            learner.visitation.is_none(),
+            "GPU collection does not support host hash visitation"
+        );
         let config = &learner.config;
         let mut observe = build_session(
             &world::build_observe_graph(config, streams),
@@ -89,7 +102,14 @@ impl VectorCore {
         );
         sync_matching(&learner.world_train, &mut observe, "world.");
         sync_matching(&learner.behavior_train, &mut policy, "behavior.actor.");
+        let acting = ActingGpu::new(Arc::clone(&learner.gpu), config, streams);
+        let copies = DeviceCopies::new(Arc::clone(&learner.gpu));
         let size = config.network();
+        observe.set_input("previous_deter", &vec![0.0; streams * size.deter]);
+        observe.set_input(
+            "previous_stoch",
+            &vec![0.0; streams * size.stoch * size.classes],
+        );
         let streams = (0..streams)
             .map(|stream| {
                 let seed = config.seed.wrapping_add(stream as u64);
@@ -99,9 +119,6 @@ impl VectorCore {
                     DreamerRngs::resumed(seed, learner.learner_step, learner.environment_step)
                 };
                 LiveStream {
-                    deter: vec![0.0; size.deter],
-                    stoch: vec![0.0; size.stoch * size.classes],
-                    feature: vec![0.0; config.feature_dim()],
                     policy_rng: rngs.policy,
                     posterior_rng: rngs.live_posterior,
                     active: false,
@@ -111,6 +128,8 @@ impl VectorCore {
             })
             .collect();
         Self {
+            acting,
+            copies,
             learner,
             streams,
             observe,
@@ -142,45 +161,87 @@ impl VectorCore {
         }
     }
 
+    #[cfg(test)]
     fn ingest(&mut self, arrivals: Vec<(usize, Observation, FrameFlags, Reward)>) -> Vec<Reward> {
         self.check_arrivals(arrivals.iter().map(|a| (a.0, a.2, a.3)));
         if arrivals.is_empty() {
             return Vec::new();
         }
+        self.acting.wait();
+        self.learner.replay.wait_device();
+        let mut observations =
+            vec![0.0; self.streams.len() * self.learner.config.observation_dim()];
+        for (id, observation, _, _) in &arrivals {
+            observations[id * Observation::LEN..(id + 1) * Observation::LEN]
+                .copy_from_slice(observation.as_slice());
+        }
+        self.observe.set_input("observation", &observations);
+        self.ingest_prepared(&arrivals.iter().map(|a| (a.0, a.2, a.3)).collect::<Vec<_>>())
+    }
+
+    #[cfg(test)]
+    fn feature(&mut self, stream: usize) -> Vec<f32> {
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            let device = self.learner.gpu_device();
+            assert!(!device.is_software_emulated);
+            assert_eq!(device.device_name, expected);
+            let memory = self.learner.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+            eprintln!("device={} memory={memory:?}", device.device_name);
+        }
+        let width = self.learner.config.feature_dim();
+        let mut source = self.policy.input_buffer("feature").unwrap();
+        source.offset += (stream * width * 4) as u64;
+        let mut values = vec![0.0; width];
+        self.learner
+            .readback
+            .read_regions(&mut [(source, &mut values)]);
+        values
+    }
+
+    fn ingest_encoded(
+        &mut self,
+        perception: &LeVJepaPerception,
+        arrivals: &[(usize, FrameFlags, Reward)],
+    ) -> Vec<Reward> {
+        if arrivals.is_empty() {
+            return Vec::new();
+        }
+        self.copies.copy(&[DeviceCopy {
+            source: (perception.session(), ExternalSlot::Output(0)),
+            target: (&self.observe, "observation"),
+            target_offset_bytes: 0,
+        }]);
+        self.ingest_prepared(arrivals)
+    }
+
+    fn ingest_prepared(&mut self, arrivals: &[(usize, FrameFlags, Reward)]) -> Vec<Reward> {
+        self.check_arrivals(arrivals.iter().copied());
         let config = &self.learner.config;
         let size = config.network();
         let rows = self.streams.len();
-        let stochastic_width = size.stoch * size.classes;
-        let mut observations = vec![0.0; rows * config.observation_dim()];
         let mut actions = vec![0.0; rows * config.action_count];
         let mut keep_deter = vec![0.0; rows * size.deter];
-        let mut keep_stoch = vec![0.0; rows * stochastic_width];
+        let mut keep_stoch = vec![0.0; rows * size.stoch * size.classes];
         let mut keep_action = vec![0.0; rows * config.action_count];
-        for (id, observation, flags, _) in &arrivals {
-            observations[id * config.observation_dim()..(id + 1) * config.observation_dim()]
-                .copy_from_slice(observation.as_slice());
+        let mut active = vec![0; rows];
+        let mut draws = vec![0.0; rows * size.stoch];
+        for &(id, flags, _) in arrivals {
+            active[id] = 1;
+            for draw in &mut draws[id * size.stoch..(id + 1) * size.stoch] {
+                *draw = self.streams[id].posterior_rng.random();
+            }
             if !flags.is_first {
-                actions[id * config.action_count + self.streams[*id].pending_action.unwrap()] = 1.0;
+                actions[id * config.action_count + self.streams[id].pending_action.unwrap()] = 1.0;
                 keep_deter[id * size.deter..(id + 1) * size.deter].fill(1.0);
-                keep_stoch[id * stochastic_width..(id + 1) * stochastic_width].fill(1.0);
+                keep_stoch[id * size.stoch * size.classes..(id + 1) * size.stoch * size.classes]
+                    .fill(1.0);
                 keep_action[id * config.action_count..(id + 1) * config.action_count].fill(1.0);
             }
         }
-        let previous_deter: Vec<_> = self
-            .streams
-            .iter()
-            .flat_map(|s| s.deter.iter().copied())
-            .collect();
-        let previous_stoch: Vec<_> = self
-            .streams
-            .iter()
-            .flat_map(|s| s.stoch.iter().copied())
-            .collect();
+        self.observe.wait();
         for (name, values) in [
-            ("previous_deter", &previous_deter),
-            ("previous_stoch", &previous_stoch),
             ("previous_action", &actions),
-            ("observation", &observations),
             ("keep_deter", &keep_deter),
             ("keep_stoch", &keep_stoch),
             ("keep_action", &keep_action),
@@ -188,61 +249,32 @@ impl VectorCore {
             self.observe.set_input(name, values);
         }
         self.observe.step();
-        let mut deter = vec![0.0; rows * size.deter];
-        let mut logits = vec![0.0; rows * stochastic_width];
-        self.learner
-            .readback
-            .read(&self.observe, &mut [(0, &mut deter), (1, &mut logits)]);
-        let mut rewards = Vec::with_capacity(arrivals.len());
-        for (id, observation, flags, mut reward) in arrivals {
-            let stream = &mut self.streams[id];
-            stream
-                .deter
-                .copy_from_slice(&deter[id * size.deter..(id + 1) * size.deter]);
-            stream.stoch = sample_latents(
-                &logits[id * stochastic_width..(id + 1) * stochastic_width],
-                1,
-                size.stoch,
-                size.classes,
-                config.unimix,
-                &mut stream.posterior_rng,
-            );
-            stream.feature = join_features(&stream.deter, &stream.stoch, 1, config);
-            assert!(stream.feature.iter().all(|v| v.is_finite()));
-            if let Some(bonus) = &mut self.learner.visitation {
-                let intrinsic = bonus.observe(&observation);
+        self.acting
+            .posterior(&self.observe, &self.policy, &active, &draws);
+        let frames: Vec<_> = arrivals
+            .iter()
+            .map(|&(id, flags, reward)| {
+                let stream = &mut self.streams[id];
+                let previous_action = stream.pending_action.take();
+                stream.active = true;
+                stream.needs_reset = flags.is_last;
                 if !flags.is_first {
-                    reward.intrinsic += intrinsic;
+                    self.learner.environment_step += 1;
+                    self.learner.train_scheduler.observe(
+                        config.train_ratio / (config.batch_size * config.batch_length) as f32,
+                    );
                 }
-            }
-            let previous_action = stream.pending_action.take();
-            self.learner.replay.push_stream(
-                id,
-                ReplayFrame {
-                    observation,
-                    previous_action,
-                    reward,
-                    flags,
-                    deter: stream.deter.clone().into_boxed_slice(),
-                    stoch: stream.stoch.clone().into_boxed_slice(),
-                },
-                config,
-            );
-            if !flags.is_first {
-                self.learner.environment_step += 1;
-                self.learner
-                    .train_scheduler
-                    .observe(config.train_ratio / (config.batch_size * config.batch_length) as f32);
-            }
-            stream.active = true;
-            stream.needs_reset = flags.is_last;
-            rewards.push(reward);
-        }
-        rewards
+                (id, previous_action, reward, flags)
+            })
+            .collect();
+        self.learner
+            .replay
+            .push_device(&self.observe, &frames, config);
+        arrivals.iter().map(|a| a.2).collect()
     }
 
     fn act(&mut self, mode: ActionMode) -> Vec<usize> {
-        self.act_inner(mode, None)
+        self.act_inner(mode, None, None)
     }
 
     fn act_with_overrides(
@@ -255,10 +287,25 @@ impl VectorCore {
             self.streams.len(),
             self.learner.config.action_count,
         )?;
-        Ok(self.act_inner(mode, Some(overrides)))
+        Ok(self.act_inner(mode, Some(overrides), None))
     }
 
-    fn act_inner(&mut self, mode: ActionMode, overrides: Option<&[Option<usize>]>) -> Vec<usize> {
+    pub(super) fn act_inner(
+        &mut self,
+        mode: ActionMode,
+        overrides: Option<&[Option<usize>]>,
+        mask: Option<&[bool]>,
+    ) -> Vec<usize> {
+        if let Some(mask) = mask {
+            assert_eq!(
+                mask.len(),
+                self.streams.len() * self.learner.config.action_count
+            );
+            assert!(
+                mask.chunks(self.learner.config.action_count)
+                    .all(|row| row.iter().any(|&v| v))
+            );
+        }
         for stream in &self.streams {
             assert!(
                 stream.active && !stream.needs_reset,
@@ -269,53 +316,94 @@ impl VectorCore {
                 "observe every pending action first"
             );
         }
-        let features: Vec<_> = self
-            .streams
-            .iter()
-            .flat_map(|s| s.feature.iter().copied())
-            .collect();
-        self.policy.set_input("feature", &features);
         self.policy.step();
-        self.policy.wait();
-        let config = &self.learner.config;
-        let mut logits = vec![0.0; self.streams.len() * config.action_count];
-        self.policy.read_output_by_index(0, &mut logits);
-        self.streams
+        let draws: Vec<f32> = self
+            .streams
             .iter_mut()
-            .zip(logits.chunks_exact(config.action_count))
+            .map(|stream| match mode {
+                ActionMode::Sample => stream.policy_rng.random(),
+                ActionMode::Greedy => 0.0,
+            })
+            .collect();
+        let selected = self.acting.actions(&self.policy, &draws, mode, mask);
+        let mut actions = vec![0.0; self.streams.len()];
+        self.learner
+            .readback
+            .read_regions(&mut [(selected, &mut actions)]);
+        actions
+            .iter()
             .enumerate()
-            .map(|(id, (stream, logits))| {
-                let action = select_action(
-                    logits,
-                    config.actor_unimix,
-                    mode,
-                    &mut stream.policy_rng,
-                    overrides.and_then(|actions| actions[id]),
+            .map(|(id, &proposed)| {
+                assert!(
+                    proposed.is_finite()
+                        && proposed >= 0.0
+                        && proposed < self.learner.config.action_count as f32
+                        && proposed.fract() == 0.0,
+                    "invalid GPU policy action: {proposed}"
                 );
-                stream.pending_action = Some(action);
+                let action = overrides.and_then(|a| a[id]).unwrap_or(proposed as usize);
+                self.streams[id].pending_action = Some(action);
                 action
             })
             .collect()
     }
 
+    pub(super) fn learn(&mut self) -> Option<LearnReport> {
+        let mut report = self.learner.learn()?;
+        self.sync_live(&mut report);
+        Some(report)
+    }
+
+    pub(super) fn read_diagnostics(&mut self) {
+        assert_eq!(self.streams.len(), 1);
+        let learner = &mut self.learner;
+        learner.readback.read_regions(&mut [
+            (
+                self.policy.input_buffer("feature").unwrap(),
+                &mut learner.feature,
+            ),
+            (
+                self.observe.input_buffer("previous_deter").unwrap(),
+                &mut learner.deter,
+            ),
+            (
+                self.observe.input_buffer("previous_stoch").unwrap(),
+                &mut learner.stoch,
+            ),
+            (
+                self.observe.input_buffer("observation").unwrap(),
+                &mut learner.observation,
+            ),
+            (
+                self.observe.output_buffer(3).unwrap(),
+                &mut learner.encoded_observation,
+            ),
+        ]);
+        learner.active = self.streams[0].active;
+    }
+
     fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         let mut reports = self.learner.learn_scheduled(maximum_updates);
         if let Some(last) = reports.last_mut() {
-            let started = Instant::now();
-            sync_matching(&self.learner.world_train, &mut self.observe, "world.");
-            let world = started.elapsed().as_secs_f64();
-            let started = Instant::now();
-            sync_matching(
-                &self.learner.behavior_train,
-                &mut self.policy,
-                "behavior.actor.",
-            );
-            let behavior = started.elapsed().as_secs_f64();
-            last.timing.world_sync_seconds += world;
-            last.timing.behavior_sync_seconds += behavior;
-            last.timing.total_seconds += world + behavior;
+            self.sync_live(last);
         }
         reports
+    }
+
+    fn sync_live(&mut self, last: &mut LearnReport) {
+        let started = Instant::now();
+        sync_matching(&self.learner.world_train, &mut self.observe, "world.");
+        let world = started.elapsed().as_secs_f64();
+        let started = Instant::now();
+        sync_matching(
+            &self.learner.behavior_train,
+            &mut self.policy,
+            "behavior.actor.",
+        );
+        let behavior = started.elapsed().as_secs_f64();
+        last.timing.world_sync_seconds += world;
+        last.timing.behavior_sync_seconds += behavior;
+        last.timing.total_seconds += world + behavior;
     }
 }
 
@@ -323,7 +411,7 @@ impl VectorCore {
 /// Dense perception, posterior and policy inference are batched on the GPU.
 pub struct VectorDreamerAgent {
     perception: LeVJepaPerception,
-    core: VectorCore,
+    pub(super) core: VectorCore,
 }
 
 impl VectorDreamerAgent {
@@ -332,7 +420,12 @@ impl VectorDreamerAgent {
         streams: usize,
         encoder_checkpoint: impl AsRef<Path>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        Self::with_perception(config, streams, PerceptionKind::LeVJepa, encoder_checkpoint)
+        Self::with_perception(
+            config,
+            streams,
+            PerceptionKind::LeVJepaTiny,
+            encoder_checkpoint,
+        )
     }
 
     pub fn with_perception(
@@ -434,6 +527,15 @@ impl VectorDreamerAgent {
     }
 
     pub fn begin_episodes(&mut self, frames: &[(usize, RgbFrame)]) {
+        self.begin_refs(
+            &frames
+                .iter()
+                .map(|(id, frame)| (*id, frame))
+                .collect::<Vec<_>>(),
+        );
+    }
+
+    pub(super) fn begin_refs(&mut self, frames: &[(usize, &RgbFrame)]) {
         let flags = FrameFlags {
             is_first: true,
             ..Default::default()
@@ -442,15 +544,15 @@ impl VectorDreamerAgent {
             .check_arrivals(frames.iter().map(|(id, _)| (*id, flags, Reward::default())));
         let arrivals: Vec<_> = frames
             .iter()
-            .map(|(id, frame)| (*id, frame, true))
+            .map(|(id, frame)| (*id, *frame, true))
             .collect();
-        let observations = self.perception.encode_frames_rgb8(&arrivals);
-        self.core.ingest(
-            frames
+        self.perception.submit_frames_rgb8(&arrivals);
+        self.core.ingest_encoded(
+            &self.perception,
+            &frames
                 .iter()
-                .zip(observations)
-                .map(|((id, _), observation)| (*id, observation, flags, Reward::default()))
-                .collect(),
+                .map(|(id, _)| (*id, flags, Reward::default()))
+                .collect::<Vec<_>>(),
         );
     }
 
@@ -469,20 +571,55 @@ impl VectorDreamerAgent {
     }
 
     pub fn observe(&mut self, transitions: &[(usize, Transition)]) -> Vec<Reward> {
+        self.observe_refs(
+            &transitions
+                .iter()
+                .map(|(id, t)| (*id, t))
+                .collect::<Vec<_>>(),
+        )
+    }
+
+    pub(super) fn observe_refs(&mut self, transitions: &[(usize, &Transition)]) -> Vec<Reward> {
         self.core
             .check_arrivals(transitions.iter().map(|(id, t)| (*id, t.flags(), t.reward)));
         let arrivals: Vec<_> = transitions
             .iter()
             .map(|(id, t)| (*id, &t.frame, false))
             .collect();
-        let observations = self.perception.encode_frames_rgb8(&arrivals);
-        self.core.ingest(
-            transitions
+        self.perception.submit_frames_rgb8(&arrivals);
+        self.core.ingest_encoded(
+            &self.perception,
+            &transitions
                 .iter()
-                .zip(observations)
-                .map(|((id, t), observation)| (*id, observation, t.flags(), t.reward))
-                .collect(),
+                .map(|(id, t)| (*id, t.flags(), t.reward))
+                .collect::<Vec<_>>(),
         )
+    }
+
+    /// Context used by the complete perception/belief/policy pipeline.
+    pub fn gpu_context(&self) -> Arc<blade_graphics::Context> {
+        Arc::clone(&self.core.learner.gpu)
+    }
+
+    /// Consume already synchronized resident frames; reset and transition
+    /// metadata have the same contract as begin_episodes/observe.
+    /// This waits for the GPU to finish reading capture buffers before returning.
+    pub fn observe_gpu(
+        &mut self,
+        arrivals: &[(usize, GpuFrame<'_>, FrameFlags, Reward)],
+    ) -> Vec<Reward> {
+        let metadata: Vec<_> = arrivals.iter().map(|a| (a.0, a.2, a.3)).collect();
+        self.core.check_arrivals(metadata.iter().copied());
+        self.perception.submit_frames_gpu8(
+            &arrivals
+                .iter()
+                .map(|a| (a.0, a.1, a.2.is_first))
+                .collect::<Vec<_>>(),
+        );
+        let rewards = self.core.ingest_encoded(&self.perception, &metadata);
+        // GpuFrame's borrowed capture ownership ends on return. No data readback.
+        self.core.acting.wait();
+        rewards
     }
 
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
@@ -490,6 +627,14 @@ impl VectorDreamerAgent {
     }
     pub fn save_checkpoint(&mut self, path: impl AsRef<Path>) -> io::Result<()> {
         self.core.learner.save_checkpoint(path)
+    }
+}
+
+impl Drop for VectorDreamerAgent {
+    fn drop(&mut self) {
+        self.core.acting.wait();
+        self.core.copies.wait();
+        self.core.learner.replay.wait_device();
     }
 }
 
@@ -645,7 +790,7 @@ mod tests {
             vector.ingest(arrivals);
             let mut resets = Vec::new();
             for (id, core) in serial.iter_mut().enumerate() {
-                assert_close(&core.feature, &vector.streams[id].feature);
+                assert_close(&core.feature, &vector.feature(id));
                 assert_eq!(
                     core.rngs.policy.clone().random::<u64>(),
                     vector.streams[id].policy_rng.clone().random::<u64>()
@@ -678,7 +823,8 @@ mod tests {
     #[test]
     #[ignore = "requires GPU; compares batched live states to independent serial streams"]
     fn vector_live_beliefs_and_policy_match_serial() {
-        let config = config();
+        let mut config = config();
+        config.replay_capacity = 32;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let learner = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         let mut vector = VectorCore::new(learner, 3);
@@ -703,10 +849,21 @@ mod tests {
             core.begin_episode(observation(id, 0));
         }
         for time in 1..20 {
-            let actions = vector.act(ActionMode::Sample);
+            let mask: Vec<_> = (0..9)
+                .map(|i| time % 3 == 0 || i % 3 != (time + i / 3) % 3)
+                .collect();
+            let mode = if time % 4 == 0 {
+                ActionMode::Greedy
+            } else {
+                ActionMode::Sample
+            };
+            let actions = vector.act_inner(mode, None, Some(&mask));
             let mut arrivals = Vec::new();
             for (id, core) in serial.iter_mut().enumerate() {
-                assert_eq!(actions[id], core.act(ActionMode::Sample, None));
+                assert_eq!(
+                    actions[id],
+                    core.act(mode, Some(&mask[id * 3..(id + 1) * 3]))
+                );
                 let last = time % (3 + id) == 0;
                 let flags = FrameFlags {
                     is_last: last,
@@ -723,7 +880,7 @@ mod tests {
             vector.ingest(arrivals);
             let mut resets = Vec::new();
             for (id, core) in serial.iter_mut().enumerate() {
-                assert_close(core.latent_feature(), &vector.streams[id].feature);
+                assert_close(core.latent_feature(), &vector.feature(id));
                 if core.needs_reset {
                     core.begin_episode(observation(id, 100 + time));
                     resets.push((id, observation(id, 100 + time), first, Reward::default()));
@@ -731,7 +888,7 @@ mod tests {
             }
             vector.ingest(resets);
             for (id, core) in serial.iter().enumerate() {
-                assert_close(core.latent_feature(), &vector.streams[id].feature);
+                assert_close(core.latent_feature(), &vector.feature(id));
             }
             assert_eq!(vector.learner.environment_step, 3 * time as u64);
         }
@@ -740,7 +897,8 @@ mod tests {
     #[test]
     #[ignore = "requires GPU; includes scheduled updates and checkpoint restore"]
     fn vector_one_matches_serial_learning_and_checkpoint() {
-        let config = config();
+        let mut config = config();
+        config.replay_capacity = 20;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         let mut serial = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         let learner = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
@@ -774,7 +932,7 @@ mod tests {
                 assert_eq!(a.world.total_loss, b.world.total_loss);
                 assert_eq!(a.behavior.total_loss, b.behavior.total_loss);
             }
-            assert_close(&serial.feature, &vector.streams[0].feature);
+            assert_close(&serial.feature, &vector.feature(0));
             if flags.is_last {
                 serial.begin_episode(observation(0, time + 100));
                 vector.ingest(vec![(

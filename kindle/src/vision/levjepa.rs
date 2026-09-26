@@ -12,8 +12,7 @@ use std::{path::Path, sync::Arc};
 use meganeura::{Graph, Mode, NodeId, Session, SessionConfig, data::safetensors::SafeTensorsModel};
 
 use super::{
-    OBSERVATION_CHANNELS, Observation, PROJECTION_SEED, fixed_projection, pool_2x2_token_major,
-    preprocess,
+    OBSERVATION_CHANNELS, Observation, PROJECTION_SEED, fixed_projection, preprocess,
     preprocess_gpu::{GpuFrame, GpuPreprocessor},
 };
 
@@ -148,7 +147,8 @@ impl LeVJepaPerception {
             &[architecture.hidden(), OBSERVATION_CHANNELS],
         );
         let projected = graph.matmul(tokens, projection);
-        graph.set_outputs(vec![projected, tokens]);
+        let pooled = pool_patches(&mut graph, projected, streams);
+        graph.set_outputs(vec![pooled, tokens, projected]);
         let (mut session, _) = meganeura::build(
             &graph,
             SessionConfig {
@@ -235,6 +235,17 @@ impl LeVJepaPerception {
         &mut self,
         arrivals: &[(usize, &crate::RgbFrame, bool)],
     ) -> Vec<Observation> {
+        self.submit_frames_rgb8(arrivals);
+        self.read_observations(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+    }
+
+    pub(crate) fn session(&self) -> &Session {
+        &self.session
+    }
+
+    /// Submit perception without a feature readback. The next consumer runs on
+    /// the same queue and must finish before these outputs are overwritten.
+    pub(crate) fn submit_frames_rgb8(&mut self, arrivals: &[(usize, &crate::RgbFrame, bool)]) {
         let mut present = vec![false; self.frames.len()];
         for &(stream, _, _) in arrivals {
             assert!(
@@ -244,7 +255,7 @@ impl LeVJepaPerception {
             present[stream] = true;
         }
         if arrivals.is_empty() {
-            return Vec::new();
+            return;
         }
         let frames = arrivals
             .iter()
@@ -256,7 +267,7 @@ impl LeVJepaPerception {
                 self.frames[stream] = 0;
             }
         }
-        self.run_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+        self.submit_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>());
     }
 
     /// Resident RGB/RGBA/BGRA arrivals. No image or patch tensor is downloaded.
@@ -266,20 +277,25 @@ impl LeVJepaPerception {
         &mut self,
         arrivals: &[(usize, GpuFrame<'_>, bool)],
     ) -> Vec<Observation> {
+        self.submit_frames_gpu8(arrivals);
+        self.read_observations(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+    }
+
+    pub(crate) fn submit_frames_gpu8(&mut self, arrivals: &[(usize, GpuFrame<'_>, bool)]) {
         let frames = arrivals
             .iter()
             .map(|&(stream, frame, _)| (stream, frame))
             .collect::<Vec<_>>();
         self.pixels.gpu_frames(&mut self.session, &frames);
         if arrivals.is_empty() {
-            return Vec::new();
+            return;
         }
         for &(stream, _, reset) in arrivals {
             if reset {
                 self.frames[stream] = 0;
             }
         }
-        self.run_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+        self.submit_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>());
     }
 
     fn run_batch(&mut self, patches: &[f32], active: &[usize]) -> Vec<Observation> {
@@ -288,6 +304,11 @@ impl LeVJepaPerception {
     }
 
     fn run_prepared(&mut self, active: &[usize]) -> Vec<Observation> {
+        self.submit_prepared(active);
+        self.read_observations(active)
+    }
+
+    fn submit_prepared(&mut self, active: &[usize]) {
         for (stream, &frame) in self.frames.iter().enumerate() {
             self.session
                 .set_input_u32(&format!("frame.{stream}"), &[frame as u32]);
@@ -297,27 +318,52 @@ impl LeVJepaPerception {
             );
         }
         self.session.step();
+        for &stream in active {
+            self.frames[stream] = (self.frames[stream] + 1) % FRAMES;
+        }
+    }
+
+    fn read_observations(&mut self, active: &[usize]) -> Vec<Observation> {
+        if active.is_empty() {
+            return Vec::new();
+        }
         self.session.wait();
-        self.session.read_output_by_index(0, &mut self.projected);
+        self.session.read_output_by_index(0, &mut self.pooled);
+        self.session.read_output_by_index(2, &mut self.projected);
         // Inactive rows write only their next, unused cache slot. Before that
         // stream consumes it, a real arrival overwrites it at the same position.
         active
             .iter()
             .map(|&stream| {
-                let projected_width = PATCHES * OBSERVATION_CHANNELS;
-                let pooled =
-                    &mut self.pooled[stream * Observation::LEN..(stream + 1) * Observation::LEN];
-                pool_2x2_token_major(
-                    &self.projected[stream * projected_width..(stream + 1) * projected_width],
-                    GRID,
-                    OBSERVATION_CHANNELS,
-                    pooled,
-                );
-                self.frames[stream] = (self.frames[stream] + 1) % FRAMES;
-                Observation::from_vec(pooled.to_vec())
+                Observation::from_vec(
+                    self.pooled[stream * Observation::LEN..(stream + 1) * Observation::LEN]
+                        .to_vec(),
+                )
             })
             .collect()
     }
+}
+
+fn pool_patches(g: &mut Graph, patches: NodeId, streams: usize) -> NodeId {
+    let channels = OBSERVATION_CHANNELS;
+    let rows = g.reshape(patches, &[streams * GRID / 2, 2 * GRID * channels]);
+    let mut corners = Vec::with_capacity(4);
+    let batch = (streams * GRID / 2) as u32;
+    let width = (GRID * channels) as u32;
+    for row in [
+        g.split_a(rows, batch, width, width, 1),
+        g.split_b(rows, batch, width, width, 1),
+    ] {
+        let pairs = g.reshape(row, &[streams * GRID * GRID / 4, 2 * channels]);
+        let batch = (streams * GRID * GRID / 4) as u32;
+        corners.push(g.split_a(pairs, batch, channels as u32, channels as u32, 1));
+        corners.push(g.split_b(pairs, batch, channels as u32, channels as u32, 1));
+    }
+    let mut sum = g.add(corners[0], corners[1]);
+    sum = g.add(sum, corners[2]);
+    sum = g.add(sum, corners[3]);
+    let pooled = g.scale(sum, 0.25);
+    g.reshape(pooled, &[streams * GRID * GRID / 4, channels])
 }
 
 fn linear(g: &mut Graph, x: NodeId, name: &str, input: usize, output: usize) -> NodeId {
@@ -607,6 +653,22 @@ fn load_weights(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pooled_graph_preserves_every_row_for_single_and_vector_streams() {
+        for streams in [1, 6] {
+            let mut graph = Graph::new();
+            let patches = graph.input("patches", &[streams * PATCHES, OBSERVATION_CHANNELS]);
+            let pooled = pool_patches(&mut graph, patches, streams);
+            assert_eq!(
+                graph.node(pooled).ty.shape,
+                [
+                    streams * Observation::LEN / OBSERVATION_CHANNELS,
+                    OBSERVATION_CHANNELS
+                ]
+            );
+        }
+    }
 
     #[test]
     fn released_architecture_and_rope_layout() {

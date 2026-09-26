@@ -1,7 +1,7 @@
 // Adapted from kvark/dinovision at dc35cdf1c7c910cdd93c5b5362846842ae469a21 (MIT).
 //! Turning an image into the `"patches"` tensor the encoder graph wants.
 //!
-//! The graph folds DINOv3's patch-embedding Conv2d into a single matmul,
+//! The graph folds the encoder's patch-embedding Conv2d into a single matmul,
 //! which means the flattening order here has to agree exactly with the
 //! order the convolution weight was flattened in. PyTorch stores that
 //! weight as `[out_channels, in_channels, kh, kw]`, so within one patch
@@ -28,7 +28,7 @@ pub(crate) fn letterbox_geometry(width: usize, height: usize, target: usize) -> 
 
 /// Resize an arbitrary interleaved RGB8 frame into a square without
 /// distorting its aspect ratio. Unused pixels are filled with the ImageNet
-/// mean, which becomes approximately zero after DINO normalization.
+/// mean, which becomes approximately zero after encoder normalization.
 pub fn resize_letterbox_rgb8(rgb: &[u8], width: usize, height: usize, target: usize) -> Vec<u8> {
     assert!(width > 0 && height > 0 && target > 0);
     let source_len = width
@@ -183,30 +183,29 @@ pub fn conv_weight_to_matmul(weight: &[f32], out_channels: usize, patch_dim: usi
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vision::dinov3::Config;
+    use crate::vision::levjepa::{GRID, IMAGE_SIZE, PATCH_SIZE};
 
     #[test]
     fn chw_patch_layout_is_channel_major() {
-        let c = Config::vits16();
         // Encode each pixel's identity as its flat CHW index so the
         // mapping is checkable by arithmetic.
-        let size = c.image_size;
+        let size = IMAGE_SIZE;
         let pixels: Vec<f32> = (0..3 * size * size).map(|i| i as f32).collect();
-        let patches = patches_from_pixels_chw(&pixels, c.image_size, c.patch_size);
+        let patches = patches_from_pixels_chw(&pixels, IMAGE_SIZE, PATCH_SIZE);
 
-        let ps = c.patch_size;
+        let ps = PATCH_SIZE;
         let plane = size * size;
         // Patch (gy=3, gx=5), channel 2, offset (ky=7, kx=11).
         let (gy, gx, ch, ky, kx) = (3, 5, 2, 7, 11);
-        let got = patches[(gy * c.grid() + gx) * c.patch_dim() + ch * ps * ps + ky * ps + kx];
+        let got =
+            patches[(gy * GRID + gx) * (3 * PATCH_SIZE * PATCH_SIZE) + ch * ps * ps + ky * ps + kx];
         let want = (ch * plane + (gy * ps + ky) * size + gx * ps + kx) as f32;
         assert_eq!(got, want);
     }
 
     #[test]
     fn rgb8_and_chw_paths_agree() {
-        let c = Config::vits16();
-        let size = c.image_size;
+        let size = IMAGE_SIZE;
         // Build an arbitrary but reproducible RGB image, then the
         // equivalent normalized CHW tensor, and check both flatteners
         // land on the same patch tensor.
@@ -221,8 +220,8 @@ mod tests {
             }
         }
 
-        let from_rgb = patches_from_rgb8(&rgb, c.image_size, c.patch_size);
-        let from_chw = patches_from_pixels_chw(&chw, c.image_size, c.patch_size);
+        let from_rgb = patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE);
+        let from_chw = patches_from_pixels_chw(&chw, IMAGE_SIZE, PATCH_SIZE);
         assert_eq!(from_rgb.len(), from_chw.len());
         let worst = from_rgb
             .iter()
@@ -234,10 +233,9 @@ mod tests {
 
     #[test]
     fn normalization_maps_midgray_near_zero() {
-        let c = Config::vits16();
         // 0.485*255 ≈ 124 is the red-channel mean, so red lands near 0.
-        let rgb = vec![124u8; 3 * c.image_size * c.image_size];
-        let patches = patches_from_rgb8(&rgb, c.image_size, c.patch_size);
+        let rgb = vec![124u8; 3 * IMAGE_SIZE * IMAGE_SIZE];
+        let patches = patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE);
         assert!(
             patches[0].abs() < 0.02,
             "red channel not centred: {}",
