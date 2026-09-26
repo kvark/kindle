@@ -4,6 +4,12 @@ The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+The [September26 upstream-control protocol audit](2026-09-26-upstream-control-protocol.md)
+finds that the old local control retained25% sticky actions despite requesting0.
+Two ALE versions reproduce the construction-order bug on all five games.
+The corrected wrapper matches20,480 forced actions exactly; this repairs
+comparison readiness, not a trained control or a JEPA advantage.
+
 ## Current Pong confirmation
 
 [Declaration](../../runs/pong-block-confirmation-20260916.rBwdGF/declaration.md):

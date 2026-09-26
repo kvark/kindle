@@ -149,11 +149,20 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   chunk/reset/gap parity with unchanged bounds. Its92 CPU tests, formatting and
   release Clippy pass. Production Rust is unchanged; reuse nativeb00ce7be.
   CI generates its own untrained weights/reference and needs an absolute fixture
-  path. Keep remote CI execution distinct from the completed local hardware test.
+  path. CI177 passes the generated fixture on lavapipe; keep that result distinct
+  from the completed local hardware test and trained representation quality.
 - The upstream-control entry point runs in-process with synchronous environments
   and both NVIDIA telemetry collectors disabled. CPU launcher tests do not
   qualify JAX/CUDA or declare a new control run; hardware/memory/accounting gates
   still need a separate bounded declaration. Never run the old NVML-enabled helper.
+  The old wrapper set stickiness after ROM loading, leaving25% active: do not
+  call the historical local control a matched non-sticky comparison. Separate
+  ALE0.9/0.12 CPU probes reproduce this on all five games. The helper now requires
+  the exact seed-API/early-stickiness corrections. An isolated ALE0.12 overlay
+  then matches20,480 actions/20,523 records exactly against Kindle RGB64.
+  Preserve both failed captures and all corrected evidence in
+  `runs/upstream-control-readiness-20260926.6FFIhm`; no GPU job follows. Reset-record
+  accounting and artificial-cutoff semantics remain separate comparison gaps.
 
 ## Evidence and immutable boundaries
 

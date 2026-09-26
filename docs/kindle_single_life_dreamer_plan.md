@@ -121,19 +121,22 @@ robustness under a changed protocol.
    episodes/tails. Publish compact results and selected videos for external
    reviewers. New outcomes may invalidate broad reliability claims; preserve
    original cohorts and their gates.
-3. **Synthetic encoder CI — implemented; remote execution pending.** The
+3. **Synthetic encoder CI — passed.** The
    [full-Tiny fixture](../runs/encoder-ci-20260926.GTcKXz/results.md) passes local
    dense-reference, projection/pooling, chunk-wrap and batched reset/gap checks.
    CI generates deterministic untrained weights and an independent dense
-   PyTorch reference; no local pretrained checkpoint is needed.
+   PyTorch reference; no local pretrained checkpoint is needed. [CI177](https://github.com/kvark/kindle/actions/runs/36261118686)
+   passes the full test on lavapipe, alongside the existing Linux/Metal/binding checks.
 4. **Run a bounded pinned Dreamer12M control.** Match the game, action vocabulary,
    emulator version, actual interactions, replay settings, precision and N6
    collection. Keep RGB64 as the explicit historical comparison; native-input
    JEPA is a separate intervention. Report world/whole-agent cost, memory and
    learning, including offline pretraining cost. The control must run directly
-   under the host guard with NVML disabled. Its old environment uses ALE0.9,
-   versus Kindle's0.12.1, and upstream driver records include action-free resets:
-   resolve those mismatches before claiming equal experience.
+   under the host guard with NVML disabled. The [protocol audit](experiments/2026-09-26-upstream-control-protocol.md)
+   finds the old control accidentally retained25% sticky actions. Correcting its
+   initialization and using ALE0.12.1 yields exact20,480-action wrapper parity.
+   The old control is not matched non-sticky evidence. Resolve reset-record
+   accounting and artificial cutoff semantics before claiming equal experience.
 5. **Reduce measured learner overhead.** The adopted four-submission package
    cuts Atari wall time6.5–6.6%, but only reaches ~1.041× aggregate / .174×
    per-stream real time at R256. Next target posterior/imagination host

@@ -1,7 +1,7 @@
 """Run a pinned, locally installed DreamerV3 Atari control with provenance.
 
 Invoke with the upstream Python environment, not Kindle's extension environment.
-The source checkout must be clean except for the declared wrapper config below.
+The source checkout must match the declared wrapper config and ALE corrections.
 No packages, weights or games are downloaded by this runner.
 The upstream learner runs in this process so the host-only guard owns it.
 GPU telemetry is disabled; hardware and memory gates belong to the declaration.
@@ -51,19 +51,33 @@ def configured_source(original: str) -> str:
     raise ValueError("missing pinned Atari defaults")
 
 
+def compatible_atari_source(original: str) -> str:
+    seed = "self.ale.setInt(b'random_seed', self.rng.integers(0, 2 ** 31))"
+    sticky = "    self.ale.setFloat('repeat_action_probability', 0.25 if sticky else 0.0)\n"
+    initialized = "      self.ale.setLoggerMode(ale_py.LoggerMode.Error)\n"
+    if any(original.count(line) != 1 for line in (seed, sticky, initialized)):
+        raise ValueError("unrecognized pinned ALE initialization")
+    source = original.replace(seed, "self.ale.setInt('random_seed', int(self.rng.integers(0, 2 ** 31)))")
+    # ALE caches the sticky probability when loadROM constructs the environment.
+    return source.replace(sticky, "").replace(initialized, initialized + "  " + sticky)
+
+
 def validate_source(source: Path) -> str:
     if git(source, "rev-parse", "HEAD").strip() != REVISION:
         raise ValueError(f"upstream must be at {REVISION}")
     if git(source, "ls-files", "--others", "--exclude-standard").strip():
         raise ValueError("upstream must not contain untracked source files")
     changed = git(source, "diff", "--name-only", "HEAD").splitlines()
-    if changed != ["dreamerv3/configs.yaml"]:
-        raise ValueError("only the declared published-wrapper config may differ from upstream")
+    if changed != ["dreamerv3/configs.yaml", "embodied/envs/atari.py"]:
+        raise ValueError("require exactly the declared wrapper config and ALE corrections")
     original = git(source, "show", f"{REVISION}:dreamerv3/configs.yaml")
     actual = (source / "dreamerv3/configs.yaml").read_text()
     if actual != configured_source(original):
         raise ValueError("configs.yaml must match configured_source and PUBLISHED_CONFIG from this runner")
-    return git(source, "diff", "HEAD", "--", "dreamerv3/configs.yaml")
+    original = git(source, "show", f"{REVISION}:embodied/envs/atari.py")
+    if (source / "embodied/envs/atari.py").read_text() != compatible_atari_source(original):
+        raise ValueError("Atari source must match the exact ALE corrections")
+    return git(source, "diff", "HEAD", "--", *changed)
 
 
 def main() -> None:
@@ -119,6 +133,7 @@ def main() -> None:
         "environment": {name: environment.get(name) for name in
                         ("XLA_FLAGS", "CUDA_VISIBLE_DEVICES", "XLA_PYTHON_CLIENT_MEM_FRACTION")},
         "protocol": "published",
+        "wrapper_corrections": ["ALE seed API types", "sticky probability set before ROM load"],
         "step_accounting": "upstream driver records include action-free reset observations",
         "model_input": "learned 64x64 RGB encoder; no DINO or Kindle model code",
         "process_scope": "direct native-bearing process; synchronous environments",
