@@ -51,8 +51,22 @@ action-free reset records; equal configured steps do not mean equal experience.
 
 The launcher now runs the native-bearing learner in-process with synchronous
 environments, explicit precision and both NVIDIA telemetry collectors disabled.
-Require a separate bounded hardware/memory/accounting declaration before JAX/CUDA
-execution. Match actual interactions, N6/full18/F32/12M/B16/T64/R256 and replay
+That disables **application telemetry**, not every internal backend use of NVML.
+The installed JAX0.6.2 CUDA plugin contains the NVML initialization/fabric-query
+path. Its [pinned XLA client](https://github.com/openxla/xla/blob/3d5ece64321630dade7ff733ae1353fc3c83d9cc/xla/pjrt/gpu/se_gpu_pjrt_client.cc#L1390)
+calls it for compute capability≥9 while constructing devices, including a
+single-device client. Reading the installed binary confirms its fabric helper
+calls `InitNvml`; no CUDA client or NVML query was executed in this inspection.
+Disabling Dreamer's logging therefore does **not** qualify this stock plugin.
+
+Keep that JAX/CUDA control unlaunched until an NVML-free initialization path is
+verified in an isolated package. Do not install a telemetry shim, change drivers,
+enable NVML or substitute CPU learning. This does not stop ordinary native
+Meganeura/Blade GPU work. Separately measured native optimizations can proceed
+while preparing the clean control, without claiming a JEPA architectural gain.
+
+Require a separate bounded hardware/memory/accounting declaration. Match actual
+interactions, N6/full18/F32/12M/B16/T64/R256 and replay
 settings. Preserve RGB64 for the historical comparison; native-resolution JEPA
 is a separate intervention. Report offline pretraining experience/cost as well.
 
