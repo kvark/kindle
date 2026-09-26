@@ -5,8 +5,18 @@ retain experiments and failures; [AGENTS.md](../AGENTS.md) gives working rules.
 Keep the runtime small, comparisons controlled and results reproducible.
 For a quick overview of done/in-progress/next work and why progress is costly,
 start with the [PR status dashboard](https://github.com/kvark/kindle/pull/29).
+Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
+The numerical summaries here are public; publish compact result data and selected
+videos before relying on those links for external review.
 
 ## What exists
+
+The central hypothesis is that learning to predict useful compact representations
+is cheaper than reconstructing pixels, while retaining the information needed to
+learn arbitrary games from sparse rewards. Frozen video pretraining is one part
+of that design, not the entire bet. Test world-update cost, end-to-end cost and
+learning curves against a matched Dreamer12M RGB control. A cheaper but less
+useful world model does not establish an efficiency advantage.
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
 imagined actor/critic training and causal **LeVJEPA** perception. The frontend is
@@ -67,6 +77,24 @@ For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
 Task observers are post-hoc evaluation, not privileged policy inputs or rewards.
 
+**Freeway training is exploration-assisted:** probability .5 selects a random
+action held for64 agent actions; frozen evaluation is unassisted. Its pass is
+not a demonstration of unaided sparse-reward exploration. Tiny also receives
+same-title offline video, detailed below. Keep both qualifications visible.
+
+These evaluations use non-sticky `published` Atari with no reset no-ops. A
+September26 check reproduces identical observations/rewards/boundaries for the
+same512 actions across environment seeds1009/2017/100000 in all five games.
+Learner roots and sampled policies vary, but environment seeds do not establish
+varied starts. Add separately declared sticky-action evaluation, equal first-N
+per-stream summaries and learner-level uncertainty; preserve original cohorts
+and gates. Frozen episode counts are not independent learner replicates.
+The [new adapter's CPU checks](../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
+pass836 tests: native RGB is the fresh vector default, RGB64 is explicit, restore
+requires an input choice, and sticky .25 is opt-in. Pixel-detail retention and
+real ALE replay pass; native GPU integration and robust policy results are not
+established by these CPU tests. The table above is historical RGB64/non-sticky.
+
 ## Immediate sequence
 
 Boxing, Pong and Freeway satisfy **three of five** game gates. Qbert's completed
@@ -94,15 +122,31 @@ primary; do not select the better-looking midpoint or relax the gate.
    locates repeated zero-progress deaths and two inspected edge falls. Its
    [strict forecast/policy probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
    finds useful feature/reward forecasts but a missed terminal and high values
-   during a zero-score ending. Next test whether frozen features retain life
-   count using held-out whole episodes, RGB/constant controls and explicit
-   history. This distinguishes a possible perceptual omission from downstream
-   world/value learning before another long run; it is not a causal verdict.
+   during a zero-score ending. The completed [life-count readout](../runs/qbert-life-representation-20260926.F1lTAq/results.md)
+   scores96.56% before pooling versus78.37% after, with64/77 versus0/77 one-life
+   examples correct. RGB/time/history controls and complete replay pass. However,
+   every-16-action sampling covers **phase zero only**, and pre-pooling has four
+   times the dimensions. Any later fixed same-size pooling test needs a separate
+   recording covering all chunk phases. Do not tune on the exposed test split
+   or treat linear decodability as a gameplay verdict. First address the reviewed
+   input/evaluation gaps and measured learner overhead below.
    Retain every episode and original gate; change one scientific variable at a time.
 3. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
    fixed final-policy gate and a restored untrained control. Do not replicate
    unchanged failures just to occupy the device. Native games, transfer and
-   swarms remain downstream of reliable single-actor results.
+  swarms remain downstream of reliable single-actor results.
+
+The user-approved review priority is transparent reporting and evaluation,
+synthetic encoder CI, a bounded matched Dreamer control and GPU round-trip
+reduction, then individual representation comparisons. Remove Atari's64→224
+information bottleneck for new Kindle runs: preserve max-pooled native frames
+and let the encoder perform its single aspect-preserving resize. Keep explicit
+RGB64 controls and record the input protocol. Tiny was pretrained on RGB64;
+native-resolution inference changes its distribution and must be measured,
+with a matched native-resolution pretraining comparison if needed. Old results
+remain evidence of the old protocol, not automatic qualification of the new one.
+New stochastic evaluation may invalidate broader reliability claims; preserve
+both outcomes and do not equate the historical3/5 with validated robustness.
 
 The runtime gain is real but modest: **1.0405–1.0415× aggregate / ~.174× per-stream
 real time** at R256, with learning still dominant. A concurrent learner service
@@ -131,6 +175,16 @@ That historical 200M/100k-action online benchmark is not matched to our 12M+Tiny
 200k-action frozen evaluation. It neither diagnoses JEPA nor predicts the budget
 needed for mastery; retain the stronger gate and test causes rather than assuming
 every modest score means an implementation or representation failure.
+
+Report conventional learning curves and human-normalized scores beside mastery.
+Using the [pinned upstream references](https://github.com/danijar/dreamerv3/blob/e3f02248/baselines.yaml),
+Qbert's final score is .935 human-normalized; Breakout's864-point gate is29.94.
+Protocol differences make these descriptive, not matched benchmark claims.
+The gate stays fixed, but missing mastery must not be called absence of learning.
+A bounded matched upstream Dreamer12M control remains necessary to assess the
+frozen-JEPA design; the single pretraining ablation settles neither benefit nor
+harm. Encoder streaming parity also needs a synthetic automated CI fixture;
+the existing checkpoint-specific GPU tests are not run by CI.
 
 The initial 303M frontend was disproportionate to the nominal 12M learner.
 Tiny reduces that cost, but R256 still consumes about 102 million replay
@@ -195,8 +249,13 @@ masks/RoPE; patches cannot read the CLS sink or future frames. Full-gradient/
 AdamW/EMA/restore and causal/N6 [numerical checks pass](../runs/levjepa-tiny-accuracy-20260921.qa3GqK/results.md).
 The [first training run](../runs/levjepa-tiny-pretrain-20260921.JaPZpW/results.md)
 completes 4,096 updates in 84.18 minutes on 250,000 observations / 999,112 emulator
-frames, with whole-recording splits and verified checkpoints/exports. Declare
-all offline experience and lineage in later comparisons.
+frames, with whole-recording splits and verified checkpoints/exports. The
+[random-policy corpus](../runs/levjepa-tiny-atari-corpus-20260920.oTjdon/result.md)
+contains **all five target games**, each45,000 training plus5,000 validation
+RGB64 observations. This is additional same-title offline experience, not
+held-out-title transfer. Native pretraining and the collector are preserved on
+[`exp/levjepa-tiny-pretrain-20260920`](https://github.com/kvark/kindle/tree/exp/levjepa-tiny-pretrain-20260920).
+Declare this lineage in every downstream comparison.
 
 The [frozen quality comparison](../runs/levjepa-tiny-quality-20260921.ojeZgt/results.md)
 passes five noncollapse screens, but is mixed: Pong position R² .904→.938;

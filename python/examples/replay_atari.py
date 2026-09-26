@@ -48,8 +48,9 @@ def replay_protocol(header):
     require(profile in ('published', 'published-minimal'), 'unsupported replay preprocessing')
     if profile == 'published-minimal':
         require(header['environment'] == 'ALE/Breakout-v5', 'minimal replay is Breakout only')
-        return 'kindle-atari-task-replay-v2'
-    return 'kindle-atari-task-replay-v1'
+    if header.get('observation_size', '64') != '64' or header.get('sticky_actions', 0) != 0:
+        return 'kindle-atari-task-replay-v3'
+    return 'kindle-atari-task-replay-v2' if profile == 'published-minimal' else 'kindle-atari-task-replay-v1'
 
 
 def verify_replay_identity(header, manifest, rom):
@@ -63,9 +64,15 @@ def verify_replay_identity(header, manifest, rom):
             'changed declared action protocol')
     full_actions = header['atari_protocol'] == 'published'
     require(header['action_repeat'] == 4
-            and header['sticky_actions'] == 0 and header['noop_max'] == 0
+            and type(header['sticky_actions']) in (int, float)
+            and header['sticky_actions'] in (0.0, 0.25) and header['noop_max'] == 0
             and header['full_action_space'] is full_actions and header['max_episode_frames'] == 100000,
             'unsupported replay preprocessing')
+    observation_size = header.get('observation_size', '64')
+    require(observation_size in ('native', '64'), 'unsupported observation size')
+    require(manifest.get('observation_size', '64') == observation_size
+            and manifest.get('sticky_actions', 0.0) == header['sticky_actions'],
+            'changed declared pixel or sticky-action preprocessing')
     if not full_actions:
         actions = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
         require(type(header['config'].get('action_count')) is int and header['config']['action_count'] == 4
@@ -133,16 +140,19 @@ def main():
     with ExitStack() as stack:
         for stream, seed in enumerate(header['environment_seeds']):
             raw = stack.enter_context(closing(gym.make(header['environment'], frameskip=1,
-                                                       repeat_action_probability=0.0,
+                                                       repeat_action_probability=header['sticky_actions'],
                                                        full_action_space=header['full_action_space'])))
             if args.video and stream == args.video_stream:
                 recorder = AtariVideo(raw, args.video, ffmpeg)
                 stack.callback(recorder.close)
                 raw = recorder
             monitor = TaskMonitor(raw, header['environment'], rom['sha256'])
-            environment = atari.DreamerAtariPreprocessing(monitor, noop_max=0, max_episode_frames=100000)
+            environment = atari.DreamerAtariPreprocessing(monitor, noop_max=0, max_episode_frames=100000,
+                screen_size=None if header.get('observation_size', '64') == 'native' else 64)
             require(list(environment.action_meanings) == header['action_meanings'], 'changed action vocabulary')
-            environment.reset(seed=seed)
+            initial, _ = environment.reset(seed=seed)
+            require(list(initial.shape) == header.get('observation_shape', [64, 64, 3]),
+                    'changed replay observation shape')
             environments.append(environment)
             monitors.append(monitor)
         with args.log.open() as source:

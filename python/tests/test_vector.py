@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import numpy as np
 import kindle
 from kindle._vector_audit import VECTOR_PROTOCOL, audit, episode_summary, require_numbers
 from kindle._exploration import EXPLORATION_PROTOCOL
@@ -225,7 +226,9 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
 @pytest.mark.parametrize("encoder_kind", [None, "levjepa-tiny"])
-def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind):
+@pytest.mark.parametrize("observation_size", [None, "64"])
+@pytest.mark.parametrize("sticky_actions", [0.0, 0.25])
+def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions):
     created = []
 
     class Environment:
@@ -237,7 +240,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         def reset(self, *, seed=None):
             self.length = 0
             self.emulator_resets += 1
-            return None, {}
+            shape = (64, 64, 3) if observation_size == "64" else (210, 160, 3)
+            return np.zeros(shape, dtype=np.uint8), {}
 
         def step(self, action):
             self.last_action = action
@@ -287,17 +291,24 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         def learn_scheduled(self):
             return []
 
-    def make(*_, **__):
+    def make(*_, **kwargs):
+        assert kwargs["repeat_action_probability"] == sticky_actions
         env = Environment()
         created.append(env)
         return env
 
+    def wrap(env, **kwargs):
+        assert kwargs["screen_size"] == (64 if observation_size == "64" else None)
+        return env
+
     output = tmp_path / "vector.jsonl"
     monkeypatch.setattr(atari_vector.gym, "make", make)
-    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", wrap)
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "ALE/Seaquest-v5",
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
+        "--sticky-actions", str(sticky_actions),
+        *(["--observation-size", observation_size] if observation_size else []),
         *(["--encoder", encoder_kind] if encoder_kind else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
@@ -319,6 +330,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         assert all(row["minimum_headroom_bytes"] == 2*1024**3 and row["query_seconds"] >= 0
                    for row in memory)
     rows = [json.loads(line) for line in output.read_text().splitlines()]
+    assert rows[0]["observation_size"] == (observation_size or "native")
+    assert rows[0]["sticky_actions"] == sticky_actions
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)
     assert "natural_wins" not in rows[-1] and "completed_games" not in rows[-1]
     result = audit(output)
@@ -329,6 +342,29 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     assert result["mean_completed_return"] == 40
     assert rows[-1]["partial_returns"] == [20, 20] and rows[-1]["partial_lengths"] == [1, 1]
     assert len(created) == 2 and all(env.closed for env in created)
+
+
+def test_restore_requires_explicit_pixel_protocol_before_outputs(monkeypatch, tmp_path, capsys):
+    output = tmp_path / "log.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+                                    "--restore", "unused"])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert "restore requires --observation-size" in capsys.readouterr().err
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("size,shape,sticky", [
+    ("unknown", [210, 160, 3], 0), ("64", [210, 160, 3], 0),
+    ("native", [210, 160, 4], 0), ("native", [True, 160, 3], 0),
+    ("native", [210, 160, 3], float("nan")), ("native", [210, 160, 3], True),
+])
+def test_vector_audit_rejects_inconsistent_pixel_protocol(tmp_path, size, shape, sticky):
+    rows = fixture_events()
+    rows[0].update(observation_size=size, observation_shape=shape, sticky_actions=sticky)
+    with pytest.raises(ValueError):
+        audit(write_log(tmp_path, rows))
 
 
 @pytest.mark.parametrize("mutation", ["lost_update", "wrong_reset", "null_loss", "wrong_reward", "ticks_as_actions", "aggregate_as_per_stream", "missing_end"])

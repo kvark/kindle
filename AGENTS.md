@@ -7,6 +7,12 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Product and research
 
+- The central JEPA bet is cheaper, useful latent world prediction than pixel
+  reconstruction, not merely a pretrained-encoder score advantage. Measure
+  world/whole-agent time, memory and learning at matched interaction budgets
+  against Dreamer12M. Preserve native image detail before the encoder. Reassess
+  old reliability claims when a better evaluation protocol contradicts them;
+  keep original evidence and gates as historical, never silently relabel them.
 - Keep one authoritative plan: `docs/kindle_single_life_dreamer_plan.md`, with
   one current game-status table and direct rollout/world-report links.
 - Maintain [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
@@ -24,6 +30,8 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Do not slice Large weights or substitute an untrained encoder as the product.
   Tiny is frozen during gameplay and opt-in; Large remains default pending
   broader evidence. Pretraining and its mixed probes are linked from the plan.
+  Disclose same-title offline experience: 45k training + 5k validation RGB64
+  observations per target game. Link the preserved pretraining source branch.
 - Perception's 16-arrival chunks reset visual history only; episode boundaries
   also reset belief. Prediction reads the deterministic prior before its target.
   Six streams share batched inference and one learner, not causal histories:
@@ -34,6 +42,9 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Change one scientific variable per comparison. Declare budgets, seeds, controls
   and final-policy gates beforehand. Retain failures, every completed episode and
   unfinished tails. Online wins and adapter fixtures are not frozen competence.
+  Published Atari is non-sticky with no reset no-ops; environment seeds alone
+  do not establish varied starts. Disclose assistance and learner-level
+  uncertainty. New robustness evaluations do not rewrite historical cohorts.
 - Verify complete saved state, optimizer moments and encoder identity. Frozen
   evaluation never updates weights. Restore omits replay, RNG and live belief:
   it is not an equivalent uninterrupted training resume.
@@ -49,6 +60,8 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   three-root gates. Qbert and Breakout fail. See the plan's single table for
   results, controls, gates and videos. Confirm only passing recipes on fresh
   roots 1009/2017/3019.
+  Freeway uses probability .5 / hold64 training assistance; frozen evaluation
+  is unassisted. Same-title video pretraining is additional experience.
 - Keep trained Tiny encoder `7fe9b252` fixed for the next bounded comparison.
   The first Breakout pretraining ablation shows no benefit in one seed, not a
   diagnosed capacity limit. Existing world forecasts beat feature/reward
@@ -64,14 +77,18 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   1,272 actions/18,975 targets with unchanged state. Features/rewards beat controls;
   terminal continuation is .99734 versus 0 and mean posterior value stays 2,119
   during 281 zero-reward ending actions. This one trajectory does not establish
-  critic calibration or a JEPA cause. Next test life-count information in frozen
-  features, with whole-episode splits, RGB/constant controls and explicit history,
-  before choosing a loss/representation change or another long budget. Preserve
+  critic calibration or a JEPA cause. The completed life-count readout in
+  `runs/qbert-life-representation-20260926.F1lTAq/results.md` scores96.56% before
+  pooling versus78.37% after, with64/77 versus0/77 one-life examples correct.
+  Every-16-action sampling covers phase zero only. A later same-size pooling
+  comparison needs a separate recording and all-phase coverage; never tune on
+  the exposed test split. Native-resolution inputs, review gaps and measured
+  learner optimization take priority over this additional pooling probe. Preserve
   ACLJca's failure and every completed writer/episode/gate; no GPU follower exists.
 - Throughput qualification is complete. Current production is native
   `b00ce7be` / Meganeura `ee3aea42` / Blade `fbb4f28c`, the exact five-file
   production delta from `30bfa1a`, adopted without rebuilding its package.
-  All compiled Rust/Cargo/Python inputs match that qualified source. The optimizer-only
+  All compiled Rust/Cargo/binding inputs match that qualified source. The optimizer-only
   0db candidate is 0.8–0.9% slower; its nonregression pass is not a speedup.
   Backend correctness alone has not improved Qbert learning.
 - Full-learner profiling in `runs/learner-timeline-20260926.6FJAqf` finds 62.4%
@@ -113,6 +130,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   unchanged failed recipes merely to occupy the GPU. Imagination host work and
   GPU-resident parameter sync are separate optimizations; raw aliases must account
   for derived weights. No concurrent learner service.
+- Address PR review gaps: synthetic encoder parity in CI, a bounded matched
+  upstream control, learner-root uncertainty and separately declared stochastic
+  evaluation. Human-normalized scores contextualize learning, not replacement
+  gates or proof of JEPA benefit.
+- The native-pixel adapter in `runs/native-pixel-protocol-cpu-20260926.WNenAu`
+  passes836 Python tests, including all five ALE games and explicit .25 sticky
+  controls. New vector runs default to native RGB; legacy RGB64 remains explicit
+  and restore requires choosing the input format. Native GPU integration and
+  fresh robustness/learning comparisons remain separate; old results use RGB64.
 
 ## Evidence and immutable boundaries
 

@@ -98,7 +98,9 @@ def test_existing_current_preprocessing_is_not_a_published_minimal_replay():
 
 
 @pytest.mark.parametrize('minimal', [False, True])
-def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monkeypatch, minimal):
+@pytest.mark.parametrize('observation_size', ['64', 'native'])
+@pytest.mark.parametrize('sticky_actions', [0.0, 0.25])
+def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monkeypatch, minimal, observation_size, sticky_actions):
     """Replay a CPU-generated fixture; read_run is stubbed, not a native run certificate."""
     header, manifest, _ = identity_fixture()
     if not minimal:
@@ -107,15 +109,20 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
         del manifest['action_count']
         del manifest['action_meanings']
     header.update(num_envs=2, environment_seeds=[9001, 1009004], mode='evaluate_sample')
+    header.update(observation_size=observation_size, sticky_actions=sticky_actions,
+                  observation_shape=[210, 160, 3] if observation_size == 'native' else [64, 64, 3])
+    manifest.update(observation_size=observation_size, sticky_actions=sticky_actions)
     replay.gym.register_envs(replay.ale_py)
     rows, episodes, returns, counts = [], [], [0.0, 0.0], [0, 0]
     with ExitStack() as stack:
         environments = []
         for seed in header['environment_seeds']:
             raw = stack.enter_context(closing(replay.gym.make(header['environment'], frameskip=1,
-                repeat_action_probability=0.0, full_action_space=not minimal)))
-            env = replay.atari.DreamerAtariPreprocessing(raw, noop_max=0, max_episode_frames=100000)
-            env.reset(seed=seed)
+                repeat_action_probability=sticky_actions, full_action_space=not minimal)))
+            env = replay.atari.DreamerAtariPreprocessing(raw, noop_max=0, max_episode_frames=100000,
+                screen_size=None if observation_size == 'native' else 64)
+            initial, _ = env.reset(seed=seed)
+            assert list(initial.shape) == header['observation_shape']
             environments.append(env)
         header['action_meanings'] = list(environments[0].action_meanings)
         header['config']['action_count'] = len(header['action_meanings'])
@@ -155,10 +162,21 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
                                     '--output', str(output)])
     replay.main()
     result = json.loads(output.read_text())
-    assert result['protocol'] == f'kindle-atari-task-replay-v{2 if minimal else 1}'
+    version = 3 if observation_size == 'native' or sticky_actions else 2 if minimal else 1
+    assert result['protocol'] == f'kindle-atari-task-replay-v{version}'
     assert result['source_header']['action_meanings'] == header['action_meanings']
     scorer.check_replay(run, result)
     assert not scorer.score_tasks(header['environment'], result['episodes'])['task_gate_passed']
-    result['protocol'] = f'kindle-atari-task-replay-v{1 if minimal else 2}'
+    result['protocol'] = f'kindle-atari-task-replay-v{1 if version != 1 else 2}'
     with pytest.raises(ValueError, match='unsupported replay protocol'):
         scorer.check_replay(run, result)
+
+
+@pytest.mark.parametrize('field,value', [('observation_size', 'native'), ('sticky_actions', .25)])
+def test_new_pixel_and_sticky_protocols_require_explicit_manifest_fields(field, value):
+    header, manifest, rom = identity_fixture()
+    header[field] = value
+    with pytest.raises(ValueError, match='declared pixel or sticky-action'):
+        replay.verify_replay_identity(header, manifest, rom)
+    manifest[field] = value
+    assert replay.verify_replay_identity(header, manifest, rom) == 'kindle-atari-task-replay-v3'

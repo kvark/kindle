@@ -58,7 +58,17 @@ def audit(path):
         count, config = header["num_envs"], header["config"]
         check(type(count) is int and count > 0, "invalid stream count")
         check(type(header["steps"]) is int and header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
-        check(len(header["environment_seeds"]) == count and len(set(header["environment_seeds"])) == count, "environment seeds must be independent")
+        check(len(header["environment_seeds"]) == count and len(set(header["environment_seeds"])) == count, "environment seed identifiers must be distinct")
+        if "observation_size" in header:
+            check(header["observation_size"] in ("native", "64"), "unknown observation size")
+            shape = header.get("observation_shape")
+            check(isinstance(shape, list) and len(shape) == 3
+                  and all(type(n) is int and n > 0 for n in shape) and shape[2] == 3,
+                  "invalid RGB observation shape")
+            check(header["observation_size"] != "64" or shape == [64, 64, 3],
+                  "RGB64 observation shape differs")
+            check(type(header.get("sticky_actions")) in (int, float)
+                  and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
         episode_target = None
         if header["protocol"] == EPISODE_EVALUATION_PROTOCOL:
