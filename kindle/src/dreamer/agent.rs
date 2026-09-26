@@ -460,6 +460,7 @@ impl DreamerCore {
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
         sync_matching(&behavior_train, &mut policy_live, "behavior.actor.");
         sync_matching(&behavior_train, &mut world_train, "behavior.value.");
+        world_train.set_submission_chunks(4);
 
         let size = config.network();
         Self {
