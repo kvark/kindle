@@ -112,8 +112,12 @@ cause of the gameplay regression.
 
 ## Qualified runtime
 
-Current production uses native `a761ee5c`, Meganeura `9746c9ac` and Blade
-`fbb4f28c`. The [correctness refresh](../../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md)
+Current production uses native `b00ce7be`, Meganeura `ee3aea42` and Blade
+`fbb4f28c`: the [completed four-submission Atari comparison](../../runs/chunks-atari-timing-20260926.e2OEhn/results.md)
+cuts wall time 6.5–6.6% in both orders, with exact same-arm state/moments/reports/
+trajectories and <0.1% total repeat drift. The exact five-file source delta from
+30bfa1a is adopted without rebuilding the qualified package. The earlier
+9746c9ac/a761ee5c [correctness refresh](../../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md)
 passes independent primitive/world/behavior references, Tiny/Large frontend
 checks, complete state/restore and [matched timing](../../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md):
 7.5–7.8% less wall time. The [Qbert backend-only pair](../../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
@@ -129,10 +133,13 @@ keeps that R64 recipe: midpoint24/24 pyramids/mean8,673.96,primary final22/27/
 12,595.37,control0/24/120.83. All state/replay/video checks pass,zero frozen
 updates/cutoffs. Training takes18.799h at3.151x aggregate/.525x per-stream realtime.
 The final fails both fixed thresholds; more exposure does not establish reliability.
+Its [retained episode analysis](../../runs/qbert-tail-analysis-20260926.m0P7ZI/results.md)
+finds five early failures and six later 8–9k episodes despite a 16,850 median.
+This motivates hazard/forecast diagnostics, not dropping episodes or relaxing gates.
 The separate [optimizer comparison](../../runs/meganeura-optimizer-20260926.TfWlJI/results.md)
 passes thirteen component checks and full pixel/state/restore/default-Large
 integration, but [four matched timing windows](../../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
-find0dbfcc00 is0.8–0.9% slower. Production stays9746. The
+find0dbfcc00 is0.8–0.9% slower; that update alone was not adopted for speed. The
 [complete learner trace](../../runs/learner-timeline-20260926.6FJAqf/results.md)
 finds62.4% GPU pass coverage (not SM utilization),26.09ms world command recording
 and only.44ms optimizer passes per250.86ms update. Exact state/reports pass;
@@ -141,8 +148,11 @@ on latestee3aea now completes one/four/four/one windows:7.4–7.5% less core tim
 exact full state/moments/reports. Minimal30bfa1a carries one scheduling call plus
 dependency pins; its [N6 pixel/restore check](../../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
 matches3,840 training actions/611 updates, complete state and six frozen episodes
-exactly. Remaining latest-runtime compatibility and matched Atari timing still
-precede adoption. NVML remains disabled; no new long learner root.
+exactly. [Latest-runtime compatibility](../../runs/chunks-compatibility-20260926.opVUiI/results.md)
+and all four actual Atari timing windows now pass. Preserve the separate Tiny
+memory-label reader correction; no native rerun. Candidate aggregate real time
+is 1.0405–1.0415×, about .174× per stream: a modest runtime gain, not game competence.
+NVML remains disabled; no new long learner root is declared by qualification.
 See the [plan](../kindle_single_life_dreamer_plan.md) and PR dashboard for status.
 
 The historical block backend passes 23 native tests and same-driver complete-state/pixel
