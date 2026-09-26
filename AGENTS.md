@@ -168,8 +168,15 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   comparisons; ODQsqs passes the full synthetic Tiny dense/stream checks.
   Preserve the old rounding-gate failure5xk0z7 and CPU failures. This is not
   capture integration or a speed claim. V1 checkpoints require their old package;
-  b00ce7be stays the qualified historical runtime pending new package/gameplay
-  validation. See the September26 GPU-pixels/robustness report.
+  b00ce7be stays the qualified historical v1 runtime. New v2 nativebfcb5cec from
+  0e40c3c passes95 Rust/846 Python tests and CI181. Its separately declared
+  N6/native-RGB train/frozen/sticky integration in
+  `runs/gpu-pixels-gameplay-20260926.uKjOf4` now completes:3,840/611 training,
+  1,590/0 frozen and1,626/0 sticky actions/updates, exact full state/moments and
+  six-stream replay, all3,568 memory samples. Preserve the completed writers;
+  unrecorded audits only. No GPU follower or campaign remains. New v2 learning
+  needs a fresh declaration; do not combine historical v1 policies or claim
+  comparative speed/learning from these plumbing checks. See the report.
 - The isolated world-sync candidate in
   `runs/world-sync-batch-20260926.RzSMMT` passes92 CPU tests, fmt/Clippy and release
   build. It downloads the union of world parameters once for core inference
@@ -209,6 +216,14 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   demonstrate reset-record counting/block overshoot and false terminal labels at
   artificial cutoffs. Correct or explicitly account for these before a matched
   learning comparison; toy accounting fractions are not Atari measurements.
+- The bounded upstream GPU sanity in `runs/upstream-sanity-20260926.8rbt0x`
+  now completes and independently audits:6,000 records/5,990 actual actions,
+  1,149 updates, finite changed288-entry saved state, zero native/guard failures.
+  Stock JAX0.6.2/CUDA12 on580 initializes normally; application collectors and
+  optional profiler remain disabled. Preserve the completed invocation; no retry
+  or automatic successor. This is not competent Pong, matched learning/throughput
+  or proof about NVML causality. Reconcile actual updates,5M versus100k replay
+  capacity and cutoff semantics before a full matched control.
 
 ## Evidence and immutable boundaries
 

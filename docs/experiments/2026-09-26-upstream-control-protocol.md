@@ -92,5 +92,37 @@ Local raw evidence: [readiness root](../../runs/upstream-control-readiness-20260
 [ALE0.9 probe](../../runs/upstream-control-readiness-20260926.6FFIhm/sticky-order-0.9.0.json),
 [ALE0.12 probe](../../runs/upstream-control-readiness-20260926.6FFIhm/sticky-order-0.12.1.json),
 [corrected wrapper replay](../../runs/upstream-control-readiness-20260926.6FFIhm/nonsticky/wrapper-result.json).
-These paths are local, not public artifact hosting. No new control GPU job or
-automatic successor is declared.
+These paths are local, not public artifact hosting. Those CPU readiness captures
+did not declare a control GPU job or automatic successor; the later sanity
+check below has its own declaration.
+
+## Completed GPU sanity check
+
+Following the user's revised NVML direction, the separately declared
+[stock JAX/CUDA run](../../runs/upstream-sanity-20260926.8rbt0x/README.md)
+completes on the RTX5080/580.178.04. DreamerV3e3f02248, N6/F32/12M/B16/T64/R256,
+Pong RGB64/full18/nonsticky/no-noops, seed0; original model/loss/optimizer and
+default5M replay capacity. Application NVIDIA collectors and the optional
+JAX profiler are disabled; normal backend initialization is permitted.
+
+The [independent raw audit](../../runs/upstream-sanity-20260926.8rbt0x/result.json)
+verifies6,000 driver records = **5,990 actual actions +10 reset observations**,
+**1,149 updates**,1,148 finite metric rows, all288 saved parameter/state entries
+finite and changed, including dynamics weights. The native-bearing worker takes
+290.04 seconds including initialization/compilation. All four completed episodes
+are poor early policies (−21,−21,−21,−20), not learned Pong competence.
+
+Eleven memory checkpoints pass: minimum Vulkan estimated budget headroom
+6,703,939,584 bytes and minimum CUDA allocator limit-minus-use8,837,849,183 bytes.
+These are distinct estimates, not physical free/peak VRAM. Guard exit is zero,
+the child is reaped and no kernel fault is recorded. All106 declared inputs and
+the final saved payload independently reverify. No host recovery or automatic
+successor occurred. The first CPU test invocation lacked pytest in the preserved
+reference environment; four standard-library unittest checks pass without
+installing anything into it.
+
+This establishes a working upstream GPU baseline path, **not** matched learning,
+an isolated throughput comparison, NVML causality/safety or JEPA benefit. Resolve
+actual-action/update scheduling, replay capacity and cutoff targets before a
+long equal-budget comparison. The corrected environment protocol and normal
+backend are ready; an NVML-free fork is unnecessary.

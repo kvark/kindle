@@ -66,11 +66,19 @@ and36 ticks of independent-stream reset/gap/chunk tests. Batched/serial output
 matches exactly. Dense numerical parity uses the exact normalized reference
 input, separately from the independently checked preprocessing semantics.
 All device/memory/guard assertions pass. CPU preparation passes95 Rust tests,
-formatting and release Clippy. CI now also exercises resident preprocessing on
-lavapipe and Metal; its outcome is separate from these local hardware results.
+formatting and release Clippy. [CI181](https://github.com/kvark/kindle/actions/runs/36267350757)
+is green at implementation commit0e40c3c, including resident preprocessing on
+lavapipe and Metal and the full synthetic encoder check on lavapipe.
+
+The [source-matched package and gameplay integration](../../runs/gpu-pixels-gameplay-20260926.uKjOf4/results.md)
+also pass: nativebfcb5cec,95 Rust/846 Python tests, then N6/native RGB training
+for3,840 actions/611 updates,1,590 frozen actions and1,626 sticky frozen actions.
+All241 state entries/146 moments, exact frozen-state invariance, full six-stream
+replay and3,568 memory samples verify. Minimum estimated headroom is
+13,461,815,296 bytes. No GPU job remains and no learning campaign follows.
 
 This is not yet a complete GPU-capture-to-action pipeline. Projected features
-still cross the host boundary, capture import/semaphore ownership is not wired
-to mind-games, and the new package still needs gameplay/restore qualification.
-The old b00ce7be package remains the qualified historical gameplay runtime.
+still cross the host boundary and capture import/semaphore ownership is not
+wired to mind-games. New Tiny v2 gameplay/restore is checked; the old b00ce7be
+package remains the qualified v1 historical gameplay/throughput runtime.
 Measure end-to-end latency/throughput before claiming a speedup.
