@@ -47,6 +47,21 @@ are not covered: upstream reports `is_terminal=is_last`, so any future compariso
 must separately resolve or exclude artificial cutoffs. Its driver also counts
 action-free reset records; equal configured steps do not mean equal experience.
 
+Separate [CPU fixtures](../../runs/upstream-accounting-cpu-20260926.PjQxR0/result.json)
+now reproduce both gaps using the actual corrected wrapper and pinned Driver:
+
+- With toy three-action episodes, a1,000-step request yields1,000 records but
+  only750 actions at N1. At N6, the ten-record driver blocks yield1,008 records,
+  756 actions and252 action-free resets. Those fractions describe the toy,
+  not Atari; they expose both reset counting and vector-block overshoot.
+- At an eight-frame Pong cutoff, pixels and reward still match, but upstream
+  reports terminal despite `ALE.game_over()==false`; Kindle reports truncation
+  without termination. Equal pixels alone do not establish equal learning targets.
+
+These fixtures construct no agent and do not even import JAX. The control still
+needs corrected or explicitly reconciled action/update accounting and cutoff
+targets before claiming matched learning. Retain the existing captures unchanged.
+
 ## Next control
 
 The launcher now runs the native-bearing learner in-process with synchronous
