@@ -73,10 +73,16 @@ uses the adopted b00ce7be runtime and trained Tiny7fe9, with 200,004 actions /
 and [exact pixel repeat/restore/replays](../../runs/breakout-width-latest-pixels-20260926.idNbRS/results.md)
 pass; 34 CPU campaign checks pass. The [complete four-action pair](../../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md)
 fails its game gate: mean10.9167 versus .875 control, both0/24 two-wall completions.
-Training/state/own-initial/frozen/replay/video checks pass. Fresh eighteen-action
-training started September26 at12:49 UTC; its frozen final/control phases follow
-only after individual review. One paired seed is not three-root reliability;
-the old Large four-action hold and two-wall competence gate remain unchanged.
+The [complete eighteen-action pair](../../runs/breakout-minimal-comparison-20260926.xsQCaK/a18/results.md)
+scores11.625 versus .93103, with0/24 trained completions. The
+[finished comparison](../../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
+verifies all eight phases, state/own-initial/frozen/replay/video checks and232
+common initial tensors. Fewer actions did not repair this seed; retain eighteen
+as reference and do not confirm either unchanged failed recipe. One paired seed
+is not three-root reliability. The old Large hold and two-wall gate stay fixed.
+The [retained upstream score context](../../runs/breakout-reference-context-20260926.kGfmtw/results.md)
+distinguishes low-budget learning from mastery without claiming an apples-to-apples
+JEPA, compute or architectural comparison.
 
 ## Compact causal-video encoder
 
@@ -147,6 +153,16 @@ The final fails both fixed thresholds; more exposure does not establish reliabil
 Its [retained episode analysis](../../runs/qbert-tail-analysis-20260926.m0P7ZI/results.md)
 finds five early failures and six later 8–9k episodes despite a 16,850 median.
 This motivates hazard/forecast diagnostics, not dropping episodes or relaxing gates.
+The [completed strict Qbert world/policy probe](../../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
+replays the first complete stream-zero episode exactly:1,272 actions/18,975
+targets, zero updates, unchanged241-entry state/146 moments. Feature/reward
+forecasts beat controls; continuation misses the sole terminal (.99734 versus0).
+During the last281 zero-reward actions, mean posterior value remains2,119.43.
+One trajectory is not critic calibration or a diagnosis of JEPA. Next check
+held-out life-count information in frozen features before another long recipe.
+The historical checkpoint uses its own a761/9746 runtime for this diagnostic;
+main remains b00ce7be/ee3aea. Preserve ACLJca's original CPU failure and the sole
+completed GnWOvb invocation; no GPU successor is declared.
 The separate [optimizer comparison](../../runs/meganeura-optimizer-20260926.TfWlJI/results.md)
 passes thirteen component checks and full pixel/state/restore/default-Large
 integration, but [four matched timing windows](../../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
