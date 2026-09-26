@@ -85,9 +85,18 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   total time, <0.1% total repeat drift, exact same-arm state/moments/reports/actions.
   Aggregate real time is 1.0405–1.0415×, about .174× per stream. Preserve all
   terminal writers; only unrecorded audit/compare modes are reusable.
-  **No heavy CPU work during future matched timing.** No long learner is declared.
-- Next, return to a fresh matched Breakout minimal-action trial
-  and Qbert failure diagnostics. Preserve the old four-action hold. Do not repeat
+  **No heavy CPU work during future matched timing.**
+- The fresh Breakout comparison is declared in
+  `runs/breakout-minimal-comparison-20260926.xsQCaK`: four versus eighteen actions,
+  fixed Tiny7fe9/native b00ce7be, seed0, 200,004 actions /49,652 updates each.
+  Latest four-action gradients and exact N6 repeat/restore/replay checks pass.
+  Four-action training started September26 at09:10 UTC; review its complete
+  result before frozen evaluation and restored untrained control, then the
+  eighteen-action arm. Both arms remain required even if the first fails.
+  Preserve zero-update initial snapshots, every episode, full state/replays and
+  the original two-wall gate. Each GPU phase is individually reviewed; no queue.
+- Next, complete that comparison and Qbert failure diagnostics.
+  Preserve the old four-action hold. Do not repeat
   unchanged failed recipes merely to occupy the GPU. Imagination host work and
   GPU-resident parameter sync are separate optimizations; raw aliases must account
   for derived weights. No concurrent learner service.

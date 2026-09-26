@@ -67,6 +67,15 @@ locates the existing source-matched fixtures and evidence; it is not a GPU resul
 Future experiments should use bounded diagnostics and compact records, without
 changing existing declarations.
 
+The fresh [Tiny four/eighteen-action comparison](../../runs/breakout-minimal-comparison-20260926.xsQCaK/README.md)
+uses the adopted b00ce7be runtime and trained Tiny7fe9, with 200,004 actions /
+49,652 updates per arm. [Latest four-action gradients](../../runs/breakout-width-latest-gpu-20260926.VG1oDc/results.md)
+and [exact pixel repeat/restore/replays](../../runs/breakout-width-latest-pixels-20260926.idNbRS/results.md)
+pass; 34 CPU campaign checks pass. Four-action training started September26
+at09:10 UTC. Frozen final/control phases and the fresh eighteen-action arm follow
+only after individual review. One paired seed is not three-root reliability;
+the old Large four-action hold and two-wall competence gate remain unchanged.
+
 ## Compact causal-video encoder
 
 The first **5.49M Tiny** candidate completes native video pretraining: 4,096
