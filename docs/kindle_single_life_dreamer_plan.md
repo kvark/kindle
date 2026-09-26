@@ -76,20 +76,26 @@ untrained. Its 1.6M midpoint reaches24/24 and8,673.96. More exposure raises mean
 score but does not reliably complete even the first pyramid. Keep the predeclared
 final primary; do not select the better-looking checkpoint or relax the gate.
 
-1. **Throughput before another long learner root.** Qualify current Meganeura
-   0dbfcc00's optimizer arenas/batched dispatches, separately from the adopted
-   9746c9ac control. The [isolated preparation](../runs/meganeura-optimizer-20260926.TfWlJI/README.md)
-   keeps Bladefbb4f28c, causal Tiny7fe9b252 and the full learning recipe fixed.
-   Require independent optimizer references, production world/behavior gradients,
-   Tiny/Large causal/N6 checks, complete state/moments/restore and short pixel
-   integration before matched old/new/new/old timing. CPU builds are preparation,
-   not GPU qualification. Do not silently change completed campaigns.
-2. **Measure the complete learner, then remove measured waste.** Use calibrated
-   Vulkan timestamps with optimizers and transfers included, plus host-stage
-   spans. Do not report old optimizer-free profiles or blocked-readback time as
-   GPU utilization. Separately test GPU-resident parameter synchronization after
-   the upstream-only comparison. Retain full state, gradients, action traces and
-   untraced matched-order measurements; no concurrent learner service.
+1. **Throughput before another long learner root.** The pinned Meganeura0dbfcc00
+   optimizer candidate passes [numerical/state/pixel compatibility](../runs/meganeura-optimizer-20260926.TfWlJI/results.md),
+   but [all four matched timing windows](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
+   find it0.8–0.9% slower than9746c9ac. Same-backend states, moments, reports and
+   trajectories repeat exactly. Keep production unchanged; do not present the
+   <=10% nonregression pass as a speedup. Newer ee3aea parameter-sharing changes
+   are inspected, not included or qualified by that result.
+2. **Qualify command-recording overlap in the complete actor.** The
+   [complete learner trace](../runs/learner-timeline-20260926.6FJAqf/results.md)
+   finds 26.09 ms recording the world's 35,221 dispatches before execution.
+   The [one/four/four/one submission probe](../runs/world-submissions-20260926.9nJMTy/results.md)
+   on latest ee3aea cuts core update time7.4–7.5%, with exact full state/reports.
+   The minimal30bfa1a gameplay candidate adds one scheduling call plus dependency
+   pins. Its [N6 pixel/state/restore check](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
+   matches all3,840 training actions/611 updates, full state/moments and six
+   frozen episodes exactly. Remaining latest-runtime compatibility and untraced
+   matched-order Atari timing precede adoption. GPU pass coverage is62.4%,
+   not SM utilization. Imagination's host work and GPU-resident parameter sync
+   remain separate follow-ups; account for derived weights before aliasing.
+   No concurrent learner service or changed learning settings.
 3. **Repair the failing game recipes with bounded comparisons.** Keep trained
    causal Tiny fixed initially. Revisit Breakout's minimal action space with a
    fresh declaration, preserving the old four-action hold. For Qbert, inspect
@@ -168,7 +174,14 @@ imagination85.15ms, posterior34.47ms, behavior22.15ms and parameter sync20.90ms.
 Current synchronization reads parameters to CPU and writes inference copies back
 to GPU. Posterior/imagination make95 blocking readback batches per update.
 Neither those waits nor these wall clocks measure GPU idle time or SM occupancy.
-Full-learner Vulkan traces are the next measurement; **NVML stays disabled**.
+The [full-learner Vulkan trace](../runs/learner-timeline-20260926.6FJAqf/results.md)
+now covers optimizers and transfers: GPU pass union156.50ms of250.86ms (62.4%),
+with94.36ms uncovered. Exact state/reports pass; trace overhead is0.9%. This
+synthetic early-update core probe excludes frontend/ALE/N6 synchronization and
+does not measure SM occupancy. World command recording alone takes26.09ms,
+entirely outside GPU passes; optimizer passes take only.44ms. Existing submission
+chunking now cuts synthetic core time7.4–7.5% in both orders with exact state;
+whole-actor throughput qualification remains. **NVML stays disabled**.
 
 ### Right-size the causal encoder
 

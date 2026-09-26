@@ -129,10 +129,20 @@ keeps that R64 recipe: midpoint24/24 pyramids/mean8,673.96,primary final22/27/
 12,595.37,control0/24/120.83. All state/replay/video checks pass,zero frozen
 updates/cutoffs. Training takes18.799h at3.151x aggregate/.525x per-stream realtime.
 The final fails both fixed thresholds; more exposure does not establish reliability.
-The separate [optimizer-throughput preparation](../../runs/meganeura-optimizer-20260926.TfWlJI/README.md)
-stages current0dbfcc00 without changing production or completed comparisons.
-Full numerical/restore and matched timing gates precede adoption and further long
-training. Vulkan full-learner profiling follows; NVML remains disabled.
+The separate [optimizer comparison](../../runs/meganeura-optimizer-20260926.TfWlJI/results.md)
+passes thirteen component checks and full pixel/state/restore/default-Large
+integration, but [four matched timing windows](../../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
+find0dbfcc00 is0.8–0.9% slower. Production stays9746. The
+[complete learner trace](../../runs/learner-timeline-20260926.6FJAqf/results.md)
+finds62.4% GPU pass coverage (not SM utilization),26.09ms world command recording
+and only.44ms optimizer passes per250.86ms update. Exact state/reports pass;
+tracing adds0.9%. The [submission comparison](../../runs/world-submissions-20260926.9nJMTy/results.md)
+on latestee3aea now completes one/four/four/one windows:7.4–7.5% less core time,
+exact full state/moments/reports. Minimal30bfa1a carries one scheduling call plus
+dependency pins; its [N6 pixel/restore check](../../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
+matches3,840 training actions/611 updates, complete state and six frozen episodes
+exactly. Remaining latest-runtime compatibility and matched Atari timing still
+precede adoption. NVML remains disabled; no new long learner root.
 See the [plan](../kindle_single_life_dreamer_plan.md) and PR dashboard for status.
 
 The historical block backend passes 23 native tests and same-driver complete-state/pixel
