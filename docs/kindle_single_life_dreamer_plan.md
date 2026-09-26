@@ -137,6 +137,10 @@ robustness under a changed protocol.
    initialization and using ALE0.12.1 yields exact20,480-action wrapper parity.
    The old control is not matched non-sticky evidence. Resolve reset-record
    accounting and artificial cutoff semantics before claiming equal experience.
+   Stock JAX0.6.2 also invokes NVML inside client initialization; disabling its
+   logger is insufficient. Verify an NVML-free control package before launch.
+   Native GPU optimization can proceed separately while this is prepared;
+   do not replace the control with CPU learning or imply a JEPA advantage.
 5. **Reduce measured learner overhead.** The adopted four-submission package
    cuts Atari wall time6.5–6.6%, but only reaches ~1.041× aggregate / .174×
    per-stream real time at R256. Next target posterior/imagination host

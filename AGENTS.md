@@ -163,6 +163,13 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Preserve both failed captures and all corrected evidence in
   `runs/upstream-control-readiness-20260926.6FFIhm`; no GPU job follows. Reset-record
   accounting and artificial-cutoff semantics remain separate comparison gaps.
+  The stock JAX0.6.2 plugin also calls NVML from its compute-capability>=9 device
+  initialization path, independently of Dreamer's disabled telemetry. Source and
+  CPU ELF inspection establish this; no CUDA client/query was run. Keep that
+  control unlaunched until an isolated NVML-free path is verified. Native
+  Meganeura/Blade GPU work remains authorized. No telemetry shim, driver change,
+  NVML exception or CPU-learning replacement follows; native optimization can
+  proceed separately without an architectural speed claim.
 
 ## Evidence and immutable boundaries
 
