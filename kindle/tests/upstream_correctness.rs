@@ -76,3 +76,12 @@ mod losses;
 
 #[path = "/x/Code/kindle/runs/meganeura-correctness-gpu-20260924.y1vWOG/observed-upstream/shader_audit.rs"]
 mod shader_audit;
+
+#[path = "/x/Code/kindle/runs/meganeura-optimizer-20260926.TfWlJI/observed-upstream/optimizer_memory.rs"]
+mod optimizer_memory;
+
+#[path = "/x/Code/kindle/runs/meganeura-optimizer-20260926.TfWlJI/observed-upstream/laprop.rs"]
+mod laprop;
+
+#[path = "/x/Code/kindle/runs/meganeura-optimizer-20260926.TfWlJI/observed-upstream/shared_parameters.rs"]
+mod shared_parameters;
