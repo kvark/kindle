@@ -255,13 +255,39 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   September26 user priority is throughput before another long learner root.
   Isolated4c988a0 in `runs/meganeura-optimizer-20260926.TfWlJI` stages current
   Meganeura0dbfcc00 (optimizer arenas/batching,egglog3,Windows GEMV),sameBladefbb.
-  CPU preparation and source audit are not qualification. Preserve the original
-  packaging PATH failure; the separate completion keeps its evidence unchanged.
-  Require independent optimizer references,full world/behavior gradients,Tiny/
-  Large compatibility,state/moments/restore,pixels and untraced matched timing
-  before adoption. Main and completed packages remain9746. Then separately
-  profile the complete learner with Vulkan timestamps and test GPU-resident
-  synchronization. Existing profiles disable optimizers and are insufficient.
+  Its thirteen declared optimizer/gradient/Tiny/Large component checks and
+  pixel/state/restore/replay/default-Large integration now pass. Preserve the
+  packaging PATH and pre-declaration CPU/upstream failures and their separate
+  completions. All four matched timing windows in
+  `runs/meganeura-optimizer-timing-20260926.A6u3AI` also complete: candidate is
+  0.8–0.9% slower,not a speedup; the <=10% nonregression gate passes. Complete
+  same-backend states/moments/reports/trajectories are exact. Cross-backend bits
+  and actions differ; AGC's reduction order changed. Never mix campaign packages.
+  Keep production9746 unchanged. Newer ee3aea donation/storage checks were read
+  and remain separate,not qualified or present in the0db binary. Include current
+  upstream fixes before a synchronization candidate; account for derived weights,
+  not just raw parameter aliases. Full-learner profiling completes at
+  `runs/learner-timeline-20260926.6FJAqf`,source6cb50ad: three32-update probes
+  match all241 state entries/146 moments and non-timing reports exactly. Complete
+  pass coverage is62.4%,with94.36ms uncovered per250.86ms update; tracing adds0.9%.
+  This is synthetic early-update core timing,not SM occupancy or full Atari.
+  World command recording costs26.09ms for35,221 dispatches/6,058 groups before
+  GPU execution; optimizer passes cost only.44ms. The existing submission-chunk
+  comparison in `runs/world-submissions-20260926.9nJMTy` now completes all four
+  one/four/four/one windows on latestee3aea/source d59b12f:7.4–7.5% less core time,
+  exact241-entry/146-moment state and all32 non-timing reports. The latest one-chunk
+  control also exactly matches retained0db. All guards/budgets pass,zero NVML.
+  Preserve those terminal writers/source/build. Minimal gameplay candidate30bfa1a
+  in `runs/world-chunks-gameplay-20260926.q4iNnd` adds one scheduling call plus
+  latest dependency/identity locks,no profiler or new API. Its92 Rust/768 Python
+  CPU tests,fmt/Clippy and wheel/import identity pass. Nativeb00ce7be completes
+  N6 pixel training3,840 actions/611 updates and frozen restore1,590 actions/six
+  natural episodes/zero updates or cutoffs: complete state/moments,reports and
+  trajectories exactly match retained0db. All six training/frozen streams replay
+  and the complete video decodes; every writer is terminal. Remaining latest-
+  runtime compatibility and matched Atari timing still precede adoption. No
+  automatic successor,new long learner root or concurrent learner service.
+  Preserve every terminal writer and source/package; no retries.
   Measured3.2M wall costs:74.19% learning,22.77% observation,2.24% environment;
   mean update251.00ms includes20.90ms GPU->CPU->GPU parameter sync. Six environments
   already batch inference; trainingB16/T64 imagines1024 starts. The95 posterior/
