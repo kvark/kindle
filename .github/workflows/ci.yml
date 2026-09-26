@@ -63,7 +63,7 @@ jobs:
         run: |
           python -m venv .reference-venv
           .reference-venv/bin/pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
-          .reference-venv/bin/pip install numpy==2.3.3 safetensors==0.6.2
+          .reference-venv/bin/pip install numpy==2.3.3 safetensors==0.6.2 packaging==25.0
           .reference-venv/bin/python python/examples/levjepa_tiny_reference.py target/tiny-training-reference
           .reference-venv/bin/python python/examples/levjepa_tiny_streaming_reference.py target/tiny-training-reference target/tiny-stream-reference
 
