@@ -44,15 +44,38 @@ jobs:
       - name: Unit tests
         run: cargo test --workspace --all-targets
 
-      # DINO weights are separately licensed and unavailable in CI. This
-      # synthetic observation canary still executes the complete Dreamer
-      # acting, learning, optimizer, checkpoint, and restore path.
-      # Vision fixtures require external checkpoints/reference data.
+      # Synthetic observations exercise the learner without pretrained weights.
       - name: Dreamer GPU canaries
         if: runner.os == 'Linux'
         run: >-
           cargo test -p kindle tiny_
           --lib -- --ignored --skip vision:: --test-threads=1
+
+      - uses: actions/setup-python@v5
+        if: runner.os == 'Linux'
+        with:
+          python-version: "3.11"
+
+      - name: Generate synthetic causal encoder reference
+        if: runner.os == 'Linux'
+        env:
+          CUDA_VISIBLE_DEVICES: ""
+        run: |
+          python -m venv .reference-venv
+          .reference-venv/bin/pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          .reference-venv/bin/pip install numpy==2.3.3 safetensors==0.6.2
+          .reference-venv/bin/python python/examples/levjepa_tiny_reference.py target/tiny-training-reference
+          .reference-venv/bin/python python/examples/levjepa_tiny_streaming_reference.py target/tiny-training-reference target/tiny-stream-reference
+
+      - name: Causal encoder parity, chunk wrap and independent stream resets
+        if: runner.os == 'Linux'
+        timeout-minutes: 20
+        env:
+          KINDLE_TINY_STREAM_REFERENCE: target/tiny-stream-reference
+        run: >-
+          cargo test -p kindle --lib
+          vision::levjepa::tests::tiny_synthetic_streaming_matches_dense_reference
+          -- --exact --ignored --test-threads=1
 
   python:
     name: Python bindings

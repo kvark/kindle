@@ -771,7 +771,12 @@ mod tests {
             super::super::checkpoint_sha256(Path::new(&checkpoint)).unwrap(),
             CHECKPOINT_SHA256
         );
-        check_batched_streams(streams, Architecture::Large, Path::new(&checkpoint));
+        check_batched_streams(
+            streams,
+            Architecture::Large,
+            Path::new(&checkpoint),
+            check_tiny_device,
+        );
     }
 
     fn check_tiny_device(perception: &LeVJepaPerception) {
@@ -793,7 +798,12 @@ mod tests {
         );
     }
 
-    fn check_batched_streams(streams: usize, architecture: Architecture, checkpoint: &Path) {
+    fn check_batched_streams(
+        streams: usize,
+        architecture: Architecture,
+        checkpoint: &Path,
+        check_device: fn(&LeVJepaPerception),
+    ) {
         let hidden = architecture.hidden();
         let frame = |stream: usize, tick: usize| {
             crate::RgbFrame::new(
@@ -817,7 +827,7 @@ mod tests {
                 None,
             )
             .unwrap();
-            check_tiny_device(&serial);
+            check_device(&serial);
             for stream in 0..streams {
                 serial.reset();
                 let mut values = Vec::new();
@@ -835,7 +845,7 @@ mod tests {
                     values.push(Some((observation, serial.patch_tokens())));
                 }
                 expected.push(values);
-                check_tiny_device(&serial);
+                check_device(&serial);
             }
         }
         let mut batch = LeVJepaPerception::load_batched_with_architecture(
@@ -846,7 +856,7 @@ mod tests {
             None,
         )
         .unwrap();
-        check_tiny_device(&batch);
+        check_device(&batch);
         let mut worst = 0.0_f32;
         for tick in 0..ticks {
             let frames = (0..streams)
@@ -885,7 +895,7 @@ mod tests {
                     "dense N{streams} stream {stream} tick {tick}"
                 );
             }
-            check_tiny_device(&batch);
+            check_device(&batch);
         }
         assert!(
             worst < 0.005,
@@ -962,7 +972,7 @@ mod tests {
         assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
         assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
         let (checkpoint, _) = tiny_reference();
-        check_batched_streams(6, Architecture::Tiny, &checkpoint);
+        check_batched_streams(6, Architecture::Tiny, &checkpoint, check_tiny_device);
     }
 
     #[test]
@@ -971,7 +981,22 @@ mod tests {
         assert_eq!(std::env::var("MEGANEURA_DEVICE_ID").unwrap(), "0x2c02");
         assert_eq!(std::env::var("KINDLE_GPU_DRIVER").unwrap(), "580.178.04");
         let (checkpoint, fixture) = tiny_reference();
-        check_causal_reference(Architecture::Tiny, &checkpoint, fixture);
+        check_causal_reference(Architecture::Tiny, &checkpoint, fixture, check_tiny_device);
+    }
+
+    #[test]
+    #[ignore = "requires GPU and generated KINDLE_TINY_STREAM_REFERENCE; runs in CI"]
+    fn tiny_synthetic_streaming_matches_dense_reference() {
+        let (checkpoint, fixture) = tiny_reference();
+        let report_device = |perception: &LeVJepaPerception| {
+            if std::env::var_os("KINDLE_GPU_DRIVER").is_some() {
+                check_tiny_device(perception);
+            } else {
+                eprintln!("synthetic encoder device: {:?}", perception.gpu_device());
+            }
+        };
+        check_causal_reference(Architecture::Tiny, &checkpoint, fixture, report_device);
+        check_batched_streams(2, Architecture::Tiny, &checkpoint, report_device);
     }
 
     #[test]
@@ -986,13 +1011,19 @@ mod tests {
             CHECKPOINT_SHA256
         );
         let fixture = SafeTensorsModel::load(reference.into()).unwrap();
-        check_causal_reference(Architecture::Large, Path::new(&checkpoint), fixture);
+        check_causal_reference(
+            Architecture::Large,
+            Path::new(&checkpoint),
+            fixture,
+            check_tiny_device,
+        );
     }
 
     fn check_causal_reference(
         architecture: Architecture,
         checkpoint: &Path,
         fixture: SafeTensorsModel,
+        check_device: fn(&LeVJepaPerception),
     ) {
         let hidden = architecture.hidden();
         assert_eq!(
@@ -1031,7 +1062,7 @@ mod tests {
             None,
         )
         .unwrap();
-        check_tiny_device(&perception);
+        check_device(&perception);
         let pixel_len = 3 * IMAGE_SIZE * IMAGE_SIZE;
         let token_len = PATCHES * hidden;
         let rgb_len = width * height * 3;
@@ -1093,7 +1124,7 @@ mod tests {
                     .fold(0.0_f32, f32::max);
                 assert!(worst < 0.005, "{label} step {step}, max error {worst}");
             }
-            check_tiny_device(&perception);
+            check_device(&perception);
         }
     }
 }
