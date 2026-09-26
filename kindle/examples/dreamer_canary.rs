@@ -32,6 +32,7 @@ fn main() {
     let mut run_learner = false;
     let mut repetitions = 1usize;
     let mut updates = 1usize;
+    let mut world_submission_chunks = 1usize;
     let mut profile_directory = None;
     let mut trace = None;
     let mut checkpoint = None;
@@ -42,13 +43,16 @@ fn main() {
             "--prediction-only" => prediction_only = true,
             "--repeat" => repetitions = parse_usize("repetition count", args.next()),
             "--updates" => updates = parse_usize("learner update count", args.next()),
+            "--world-submission-chunks" => {
+                world_submission_chunks = parse_usize("world submission chunks", args.next())
+            }
             "--profile-dir" => {
                 profile_directory = Some(args.next().expect("missing profile directory"))
             }
             "--checkpoint" => checkpoint = Some(args.next().expect("missing checkpoint path")),
             "--trace" => trace = Some(args.next().expect("missing trace path")),
             other => panic!(
-                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --repeat N, --profile-dir PATH, --checkpoint PATH or --trace PATH"
+                "unknown option {other:?}; use --learn, --prediction-only, --updates N, --world-submission-chunks N, --repeat N, --profile-dir PATH, --checkpoint PATH or --trace PATH"
             ),
         }
     }
@@ -67,6 +71,14 @@ fn main() {
     }
     config.validate();
     assert!(repetitions > 0 && updates > 0);
+    assert!(
+        (1..=16).contains(&world_submission_chunks),
+        "world submission chunks must be in 1..=16"
+    );
+    assert!(
+        world_submission_chunks == 1 || (trace.is_none() && profile_directory.is_none()),
+        "chunked timing is not a complete multi-submission GPU trace"
+    );
     assert!(
         checkpoint.is_none() || (run_learner && repetitions == 1),
         "saving requires --learn and one repetition"
@@ -108,6 +120,8 @@ fn main() {
 
     for iteration in 0..repetitions {
         let mut core = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
+        core.set_world_submission_chunks(world_submission_chunks);
+        eprintln!("world_submission_chunks={world_submission_chunks}");
         let device = core.gpu_device();
         eprintln!(
             "iteration {iteration} constructed on {} ({}, {})",

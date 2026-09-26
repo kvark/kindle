@@ -339,6 +339,13 @@ impl DreamerCore {
         Ok(Self::with_gpu(config, gpu))
     }
 
+    /// Split world training into ordered GPU submissions so execution can overlap
+    /// command recording. This changes scheduling, not the model or learner.
+    /// Call after construction or restore; the setting is not checkpointed.
+    pub fn set_world_submission_chunks(&mut self, chunks: usize) {
+        self.world_train.set_submission_chunks(chunks);
+    }
+
     /// Restore a model-sized training checkpoint into a fresh runtime.
     ///
     /// Replay and the in-flight episode are deliberately not checkpointed.
