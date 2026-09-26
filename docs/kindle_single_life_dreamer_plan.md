@@ -92,75 +92,82 @@ and gates. Frozen episode counts are not independent learner replicates.
 The [new adapter's CPU checks](../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
 pass836 tests: native RGB is the fresh vector default, RGB64 is explicit, restore
 requires an input choice, and sticky .25 is opt-in. Pixel-detail retention and
-real ALE replay pass; native GPU integration and robust policy results are not
-established by these CPU tests. The table above is historical RGB64/non-sticky.
+real ALE replay pass. The separately declared [native integration](../runs/native-pixel-integration-20260926.z2mimo/results.md)
+also passes training, frozen restore and sticky replay with unchanged complete
+state during evaluation. Robust policy results are not established by these
+plumbing checks. The table above is historical RGB64/non-sticky.
 
 ## Immediate sequence
 
-Boxing, Pong and Freeway satisfy **three of five** game gates. Qbert's completed
-[3.2M R64 pair](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) fails both final
-thresholds: 22/27 first pyramids and mean12,595.37. More exposure raises score but
-does not reliably complete even the first pyramid. Keep the predeclared final
-primary; do not select the better-looking midpoint or relax the gate.
+The user-approved order is evaluation/reporting, synthetic encoder CI, a bounded
+matched Dreamer control, GPU round-trip reduction, then individual perception
+experiments. Keep the historical three-of-five gate results separate from
+robustness under a changed protocol.
 
-1. **Throughput qualification completed; adopt the minimal runtime change.**
-   The [four-window Atari comparison](../runs/chunks-atari-timing-20260926.e2OEhn/results.md)
-   cuts wall time **6.5–6.6% in both orders**, with <0.1% total repeat drift and
-   exact same-arm complete state, moments, reports and trajectories. It retains
-   N6/full18/12M/B16/T64/full BPTT/M16/R256 and the trained causal Tiny encoder.
-   Native `b00ce7be` / Meganeura `ee3aea42` / Blade `fbb4f28c` is now the
-   production package: exact source `30bfa1a`, one scheduling call plus dependency
-   pins, no profiler or tuning API. Reuse the qualified package without rebuilding.
-   [Pixel/state/restore](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
-   and [latest-runtime compatibility](../runs/chunks-compatibility-20260926.opVUiI/results.md)
-   pass. Different backend arithmetic means old/new campaign roots stay separate.
-2. **Repair failing game recipes with bounded comparisons.** The complete
-   [Breakout four/eighteen-action comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
-   does not justify changing the reference to four actions or confirming either
-   failed recipe. Preserve the old hold and original gates. Qbert's
-   [life-event replay](../runs/qbert-life-events-20260926.5rlCmF/results.md)
-   locates repeated zero-progress deaths and two inspected edge falls. Its
-   [strict forecast/policy probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
-   finds useful feature/reward forecasts but a missed terminal and high values
-   during a zero-score ending. The completed [life-count readout](../runs/qbert-life-representation-20260926.F1lTAq/results.md)
-   scores96.56% before pooling versus78.37% after, with64/77 versus0/77 one-life
-   examples correct. RGB/time/history controls and complete replay pass. However,
-   every-16-action sampling covers **phase zero only**, and pre-pooling has four
-   times the dimensions. Any later fixed same-size pooling test needs a separate
-   recording covering all chunk phases. Do not tune on the exposed test split
-   or treat linear decodability as a gameplay verdict. First address the reviewed
-   input/evaluation gaps and measured learner overhead below.
-   Retain every episode and original gate; change one scientific variable at a time.
-3. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
-   fixed final-policy gate and a restored untrained control. Do not replicate
-   unchanged failures just to occupy the device. Native games, transfer and
-  swarms remain downstream of reliable single-actor results.
+1. **Preserve visual input — implemented and integrated.** Fresh vector runs
+   use native max-pooled RGB, then one aspect-preserving encoder resize. RGB64
+   remains explicit, restore requires choosing its input format, and sticky
+   .25 is opt-in. The [836-test adapter suite](../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
+   and [N6 training/frozen/sticky integration](../runs/native-pixel-integration-20260926.z2mimo/results.md)
+   pass with exact state/replays and unchanged native b00ce7be. This removes the
+   64→224 bottleneck before encoding, not compression inside the encoder.
+   Tiny was pretrained on RGB64; measure the changed input distribution before
+   declaring learning improvement.
+2. **Make evidence reproducible and test robustness.** Assistance, same-title
+   pretraining and deterministic-start limitations are now disclosed. Add
+   separately declared sticky evaluations of the historical final policies,
+   retaining their RGB64 input to isolate environmental stochasticity. Report
+   equal first-N episodes per stream and learner-root uncertainty, alongside all
+   episodes/tails. Publish compact results and selected videos for external
+   reviewers. New outcomes may invalidate broad reliability claims; preserve
+   original cohorts and their gates.
+3. **Synthetic encoder CI — implemented; remote execution pending.** The
+   [full-Tiny fixture](../runs/encoder-ci-20260926.GTcKXz/results.md) passes local
+   dense-reference, projection/pooling, chunk-wrap and batched reset/gap checks.
+   CI generates deterministic untrained weights and an independent dense
+   PyTorch reference; no local pretrained checkpoint is needed.
+4. **Run a bounded pinned Dreamer12M control.** Match the game, action vocabulary,
+   emulator version, actual interactions, replay settings, precision and N6
+   collection. Keep RGB64 as the explicit historical comparison; native-input
+   JEPA is a separate intervention. Report world/whole-agent cost, memory and
+   learning, including offline pretraining cost. The control must run directly
+   under the host guard with NVML disabled. Its old environment uses ALE0.9,
+   versus Kindle's0.12.1, and upstream driver records include action-free resets:
+   resolve those mismatches before claiming equal experience.
+5. **Reduce measured learner overhead.** The adopted four-submission package
+   cuts Atari wall time6.5–6.6%, but only reaches ~1.041× aggregate / .174×
+   per-stream real time at R256. Next target posterior/imagination host
+   readbacks and redundant parameter transfers. Preserve sampling semantics,
+   derived weights, complete state/moments and actions where claiming parity;
+   use untraced matched-order timing. No concurrent learner service.
+6. **Then change perception or learning, one variable at a time.** Neither the
+   [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
+   nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)
+   passes its gate. Do not confirm either unchanged failed recipe. The Qbert
+   [forecast probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
+   misses the terminal and retains high values through a scoreless ending.
+   Its [life-count readout](../runs/qbert-life-representation-20260926.F1lTAq/results.md)
+   is stronger before pooling, but covers phase zero only and uses four times
+   the dimensions. A same-size pooling test needs a separate recording across
+   all chunk phases; never tune on the exposed test split or equate linear
+   decodability with gameplay competence.
+7. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
+   original final-policy gate and a restored untrained control. Native games,
+   transfer and swarms remain downstream of reliable single-actor results.
 
-The user-approved review priority is transparent reporting and evaluation,
-synthetic encoder CI, a bounded matched Dreamer control and GPU round-trip
-reduction, then individual representation comparisons. Remove Atari's64→224
-information bottleneck for new Kindle runs: preserve max-pooled native frames
-and let the encoder perform its single aspect-preserving resize. Keep explicit
-RGB64 controls and record the input protocol. Tiny was pretrained on RGB64;
-native-resolution inference changes its distribution and must be measured,
-with a matched native-resolution pretraining comparison if needed. Old results
-remain evidence of the old protocol, not automatic qualification of the new one.
-New stochastic evaluation may invalidate broader reliability claims; preserve
-both outcomes and do not equate the historical3/5 with validated robustness.
-
-The runtime gain is real but modest: **1.0405–1.0415× aggregate / ~.174× per-stream
-real time** at R256, with learning still dominant. A concurrent learner service
-is not the next step. Imagination host work and GPU-resident parameter sync are
-separate future optimizations; account for derived weights before aliasing.
-The optimizer-only update's [negative speed result](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
-and the earlier refresh's [negative Qbert learning result](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
-remain; correctness and throughput do not imply gameplay competence.
+The qualified package remains native b00ce7be / Meganeura ee3aea42 / Blade
+fbb4f28c: [pixel/state/restore](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md),
+[runtime compatibility](../runs/chunks-compatibility-20260926.opVUiI/results.md)
+and [matched-order timing](../runs/chunks-atari-timing-20260926.e2OEhn/results.md)
+pass. Reuse it without rebuilding for adapter/test/documentation-only changes.
+Keep the [negative optimizer timing result](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
+and [negative Qbert correctness-refresh result](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md);
+correctness, speed and learning are distinct outcomes.
 
 All completed writers, failed-reader evidence, interrupted Freeway2017 attempt
 and historical holds remain immutable. Checkpoints preserve weights/moments,
 not replay/live belief/RNG. Review each GPU successor individually. Detailed
 chronology belongs in [the experiment index](experiments/README.md).
-
 ## Complexity and compute
 
 Dreamer's interacting networks and recurrent learner are real complexity;
@@ -183,8 +190,8 @@ Protocol differences make these descriptive, not matched benchmark claims.
 The gate stays fixed, but missing mastery must not be called absence of learning.
 A bounded matched upstream Dreamer12M control remains necessary to assess the
 frozen-JEPA design; the single pretraining ablation settles neither benefit nor
-harm. Encoder streaming parity also needs a synthetic automated CI fixture;
-the existing checkpoint-specific GPU tests are not run by CI.
+harm. Synthetic full-encoder streaming parity is now wired into CI and passes
+locally; the checkpoint-specific production hardware tests remain separate.
 
 The initial 303M frontend was disproportionate to the nominal 12M learner.
 Tiny reduces that cost, but R256 still consumes about 102 million replay
