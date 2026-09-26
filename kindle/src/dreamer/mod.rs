@@ -29,7 +29,7 @@ pub use replay::{FrameFlags, Reward};
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
 /// Meganeura revision used to compile and optimize the baseline graphs.
-pub const MEGANEURA_REV: &str = "9746c9acbb7a41956f3c11d24d22a214dfef69f6";
+pub const MEGANEURA_REV: &str = "ee3aea42da8e3e7b63d4083d0ea35b09848872ad";
 /// Exact Blade revision providing the shared graphics runtime.
 pub const BLADE_REV: &str = "fbb4f28c4869e81ae15de58925945b423b9c1ac5";
 
