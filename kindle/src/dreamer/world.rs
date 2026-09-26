@@ -917,6 +917,10 @@ mod tests {
                 }
                 fill_inputs(&mut session, &config);
                 gradient_mark("inputs.ready", group, serde_json::json!({}));
+                if group == length {
+                    session.set_submission_chunks(4);
+                    eprintln!("world_gradient_submission_chunks=4");
+                }
                 session.clear_optimizer();
                 gradient_mark("optimizer.cleared", group, serde_json::json!({}));
                 session.step();
