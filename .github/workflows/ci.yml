@@ -71,7 +71,7 @@ jobs:
         if: runner.os == 'Linux'
         timeout-minutes: 20
         env:
-          KINDLE_TINY_STREAM_REFERENCE: target/tiny-stream-reference
+          KINDLE_TINY_STREAM_REFERENCE: ${{ github.workspace }}/target/tiny-stream-reference
         run: >-
           cargo test -p kindle --lib
           vision::levjepa::tests::tiny_synthetic_streaming_matches_dense_reference

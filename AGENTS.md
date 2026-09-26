@@ -56,7 +56,7 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current decisions
 
-- Five-game reliability is **3/5**: Boxing, Pong and Freeway pass their fixed
+- Historical fixed-protocol reliability is **3/5**: Boxing, Pong and Freeway pass their fixed
   three-root gates. Qbert and Breakout fail. See the plan's single table for
   results, controls, gates and videos. Confirm only passing recipes on fresh
   roots 1009/2017/3019.
@@ -130,15 +130,30 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   unchanged failed recipes merely to occupy the GPU. Imagination host work and
   GPU-resident parameter sync are separate optimizations; raw aliases must account
   for derived weights. No concurrent learner service.
-- Address PR review gaps: synthetic encoder parity in CI, a bounded matched
-  upstream control, learner-root uncertainty and separately declared stochastic
-  evaluation. Human-normalized scores contextualize learning, not replacement
-  gates or proof of JEPA benefit.
+- Follow the user-approved review order: evaluation/reporting, synthetic encoder
+  CI, a bounded matched upstream control, GPU round-trip reduction, then separate
+  representation comparisons. Human-normalized scores contextualize learning,
+  not replacement gates or proof of JEPA benefit. Historical-policy stochastic
+  evaluations retain RGB64 to isolate the environment change. Resolve upstream
+  ALE/version/reset-record accounting before claiming equal experience.
 - The native-pixel adapter in `runs/native-pixel-protocol-cpu-20260926.WNenAu`
   passes836 Python tests, including all five ALE games and explicit .25 sticky
   controls. New vector runs default to native RGB; legacy RGB64 remains explicit
-  and restore requires choosing the input format. Native GPU integration and
-  fresh robustness/learning comparisons remain separate; old results use RGB64.
+  and restore requires choosing the input format. The separate native integration
+  in `runs/native-pixel-integration-20260926.z2mimo` passes3,840 actions/611 updates,
+  frozen restore and sticky .25 replay, all241 state entries/146 moments and3,571
+  native memory samples. Preserve all three completed invocations; only unrecorded
+  audits are reusable. This is plumbing, not improved learning or robustness.
+- Synthetic full-Tiny CI coverage is implemented in b17cab3; the local hardware
+  test in `runs/encoder-ci-20260926.GTcKXz` passes37 dense comparisons and two-stream
+  chunk/reset/gap parity with unchanged bounds. Its92 CPU tests, formatting and
+  release Clippy pass. Production Rust is unchanged; reuse nativeb00ce7be.
+  CI generates its own untrained weights/reference and needs an absolute fixture
+  path. Keep remote CI execution distinct from the completed local hardware test.
+- The upstream-control entry point runs in-process with synchronous environments
+  and both NVIDIA telemetry collectors disabled. CPU launcher tests do not
+  qualify JAX/CUDA or declare a new control run; hardware/memory/accounting gates
+  still need a separate bounded declaration. Never run the old NVML-enabled helper.
 
 ## Evidence and immutable boundaries
 

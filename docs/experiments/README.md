@@ -89,9 +89,13 @@ JEPA, compute or architectural comparison.
 The [native-pixel adapter checks](../../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
 pass836 Python tests, including five-game raw/RGB64 interaction parity and
 declared sticky-action replay. Fresh vector input now avoids64→224 down/upscaling;
-old results remain RGB64/non-sticky. GPU integration and robustness results are
-separate. Fine-detail preservation before encoding does not prove lossless
-encoder/projection/pooling representations.
+old results remain RGB64/non-sticky. The separate [native integration](../../runs/native-pixel-integration-20260926.z2mimo/results.md)
+passes3,840 actions/611 updates, exact frozen state and both non-sticky/sticky
+six-stream replay. Fine-detail preservation before encoding does not prove
+lossless encoder/projection/pooling representations or improved learning.
+The [full-Tiny synthetic test](../../runs/encoder-ci-20260926.GTcKXz/results.md)
+passes dense reference, chunk/reset and batched stream checks locally. CI now
+generates untrained weights and reference tensors itself, without local weights.
 
 The first **5.49M Tiny** candidate completes native video pretraining: 4,096
 updates in 84 minutes, all nine full checkpoints and encoder exports verified.
