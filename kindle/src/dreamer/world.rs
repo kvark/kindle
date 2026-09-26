@@ -777,6 +777,36 @@ mod tests {
     #[test]
     #[ignore = "requires a separately declared driver-bound production-gradient GPU diagnostic"]
     fn temporal_batching_matches_serial_losses_and_gradients() {
+        check_temporal_batching_losses_and_gradients(18);
+    }
+
+    #[test]
+    #[ignore = "checks four-action production B16/T64 losses and every parameter gradient on GPU"]
+    fn minimal_actions_temporal_batching_matches_serial_losses_and_gradients() {
+        check_temporal_batching_losses_and_gradients(4);
+    }
+
+    fn production_parity_config(action_count: usize) -> DreamerConfig {
+        let mut config = DreamerConfig::new(action_count);
+        config.world_backprop_length = config.batch_length;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config
+    }
+
+    #[test]
+    fn minimal_world_parity_keeps_the_production_recipe() {
+        let full = production_parity_config(18);
+        let mut minimal = production_parity_config(4);
+        minimal.validate();
+        assert_eq!(minimal.action_count, 4);
+        assert_eq!((minimal.batch_size, minimal.batch_length), (16, 64));
+        assert_eq!(minimal.world_backprop_length, 64);
+        minimal.action_count = 18;
+        assert_eq!(minimal, full);
+    }
+
+    fn check_temporal_batching_losses_and_gradients(action_count: usize) {
         use super::super::runtime::{build_session, initialize_d3};
         use meganeura::{Mode, Session};
         use std::sync::Arc;
@@ -866,11 +896,7 @@ mod tests {
         // different forward kernels; derivative operands remain F32.
         let full = std::env::var_os("KINDLE_FULL_WORLD_PARITY").is_some();
         let configs = if full {
-            let mut config = DreamerConfig::new(18);
-            config.world_backprop_length = config.batch_length;
-            config.loss_scales.reconstruction = 0.0;
-            config.loss_scales.future_prediction = 0.25;
-            vec![config]
+            vec![production_parity_config(action_count)]
         } else {
             [(3, 0.0, true, 1.0), (4, 0.75, false, 0.0)]
                 .map(
