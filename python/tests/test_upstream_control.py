@@ -9,27 +9,40 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 import run_upstream_control as control  # noqa: E402
 
 
-def test_upstream_accepts_only_the_declared_config_patch(tmp_path, monkeypatch) -> None:
+@pytest.fixture
+def configured_upstream(tmp_path, monkeypatch):
     original = "defaults:\n  env:\n    atari100k: {clip_reward: False}\n"
-    directory = tmp_path / "dreamerv3"
-    directory.mkdir()
-    config = directory / "configs.yaml"
-    config.write_text(control.configured_source(original))
+    atari = ("    with self.LOCK:\n"
+             "      self.ale.setLoggerMode(ale_py.LoggerMode.Error)\n"
+             "      self.ale.setInt(b'random_seed', self.rng.integers(0, 2 ** 31))\n"
+             "      self.ale.loadROM(path)\n\n"
+             "    self.ale.setFloat('repeat_action_probability', 0.25 if sticky else 0.0)\n")
+    changed = ["dreamerv3/configs.yaml", "embodied/envs/atari.py"]
+    for name, value in zip(changed, (control.configured_source(original), control.compatible_atari_source(atari))):
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(value)
 
     def git(source, *args):
         return {
             ("rev-parse", "HEAD"): control.REVISION + "\n",
             ("ls-files", "--others", "--exclude-standard"): "",
-            ("diff", "--name-only", "HEAD"): "dreamerv3/configs.yaml\n",
+            ("diff", "--name-only", "HEAD"): "\n".join(changed),
             ("show", f"{control.REVISION}:dreamerv3/configs.yaml"): original,
-            ("diff", "HEAD", "--", "dreamerv3/configs.yaml"): "declared diff",
+            ("show", f"{control.REVISION}:embodied/envs/atari.py"): atari,
+            ("diff", "HEAD", "--", *changed): "declared diff",
         }[args]
 
     monkeypatch.setattr(control, "git", git)
-    assert control.validate_source(tmp_path) == "declared diff"
-    config.write_text(control.configured_source(original).replace("noops: 0", "noops: 30"))
+    return tmp_path
+
+
+def test_upstream_accepts_only_the_declared_config_patch(configured_upstream):
+    assert control.validate_source(configured_upstream) == "declared diff"
+    config = configured_upstream / "dreamerv3/configs.yaml"
+    config.write_text(config.read_text().replace("noops: 0", "noops: 30"))
     with pytest.raises(ValueError, match="PUBLISHED_CONFIG"):
-        control.validate_source(tmp_path)
+        control.validate_source(configured_upstream)
 
 
 def test_upstream_rejects_a_different_revision(monkeypatch) -> None:
@@ -48,6 +61,73 @@ def test_upstream_rejects_untracked_source(monkeypatch) -> None:
     monkeypatch.setattr(control, "git", git)
     with pytest.raises(ValueError, match="untracked source"):
         control.validate_source(Path("/unused"))
+
+
+def test_upstream_accepts_only_exact_ale_corrections(configured_upstream):
+    assert control.validate_source(configured_upstream) == "declared diff"
+    path = configured_upstream / "embodied/envs/atari.py"
+    source = path.read_text()
+    assert source.index("setFloat") < source.index("loadROM")
+    for changed in (source.replace("2 ** 31", "2 ** 30"), source.replace("0.25", "0.50")):
+        path.write_text(changed)
+        with pytest.raises(ValueError, match="exact ALE corrections"):
+            control.validate_source(configured_upstream)
+
+
+def test_upstream_rejects_uncorrected_legacy_wrapper(monkeypatch):
+    def git(source, *args):
+        return {
+            ("rev-parse", "HEAD"): control.REVISION,
+            ("ls-files", "--others", "--exclude-standard"): "",
+            ("diff", "--name-only", "HEAD"): "dreamerv3/configs.yaml\n",
+        }[args]
+    monkeypatch.setattr(control, "git", git)
+    with pytest.raises(ValueError, match="require exactly"):
+        control.validate_source(Path("/unused"))
+
+
+def test_seed_compatibility_refuses_an_unknown_or_repeated_initialization():
+    old = "self.ale.setInt(b'random_seed', self.rng.integers(0, 2 ** 31))"
+    for source in ("", old + old):
+        with pytest.raises(ValueError, match="unrecognized pinned ALE"):
+            control.compatible_atari_source(source)
+
+
+@pytest.mark.parametrize("sticky", [False, True])
+def test_corrected_wrapper_materializes_requested_stickiness(sticky):
+    ale_py = pytest.importorskip("ale_py")
+    import numpy as np
+    import random
+    import threading
+    from ale_py import roms
+
+    # Same initialization order as the pinned wrapper; no learner/imported source.
+    source = """class Probe:
+  LOCK = threading.Lock()
+  def __init__(self, path, sticky):
+    self.ale = ale_py.ALEInterface()
+    self.rng = np.random.default_rng(7301)
+    with self.LOCK:
+      self.ale.setLoggerMode(ale_py.LoggerMode.Error)
+      self.ale.setInt(b'random_seed', self.rng.integers(0, 2 ** 31))
+      self.ale.loadROM(path)
+    self.ale.setFloat('repeat_action_probability', 0.25 if sticky else 0.0)
+"""
+    namespace = dict(ale_py=ale_py, np=np, threading=threading)
+    exec(control.compatible_atari_source(source), namespace)
+    actual = namespace["Probe"](roms.get_rom_path("pong"), sticky).ale
+    reference = ale_py.ALEInterface()
+    reference.setLoggerMode(ale_py.LoggerMode.Error)
+    reference.setInt("random_seed", int(np.random.default_rng(7301).integers(0, 2**31)))
+    reference.setFloat("repeat_action_probability", .25 if sticky else 0)
+    reference.loadROM(roms.get_rom_path("pong"))
+    actual.reset_game()
+    reference.reset_game()
+    rng = random.Random(7301)
+    for _ in range(64):
+        action = rng.randrange(18)
+        assert actual.act(action) == reference.act(action)
+        np.testing.assert_array_equal(actual.getScreenRGB(), reference.getScreenRGB())
 
 
 @pytest.mark.parametrize("outcome,expected", [(None, 0), (0, 0), (7, 7), ("failure", 1)])
