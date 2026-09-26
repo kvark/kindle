@@ -4,8 +4,9 @@ Invoke with the upstream Python environment, not Kindle's extension environment.
 The source checkout must match the declared wrapper config and ALE corrections.
 No packages, weights or games are downloaded by this runner.
 The upstream learner runs in this process so the host-only guard owns it.
-Application GPU telemetry is disabled. Backend NVML use, hardware and memory
-gates require separate qualification before launch; stock JAX0.6.2 uses NVML.
+Application GPU telemetry is disabled. Stock JAX0.6.2 uses NVML internally;
+normal backend initialization is allowed by the September 26 user direction.
+Hardware and memory gates still require a separate bounded declaration.
 """
 
 from __future__ import annotations
@@ -139,7 +140,7 @@ def main() -> None:
         "model_input": "learned 64x64 RGB encoder; no DINO or Kindle model code",
         "process_scope": "direct native-bearing process; synchronous environments",
         "gpu_telemetry": "application collectors disabled",
-        "backend_nvml": "requires separate runtime qualification before launch",
+        "backend_nvml": "normal initialization permitted; application telemetry disabled",
         "status": "running",
     }
     manifest_path = logdir / "reference-manifest.json"

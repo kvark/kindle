@@ -14,6 +14,7 @@ use meganeura::{Graph, Mode, Session, SessionConfig};
 pub mod dinov3;
 pub mod levjepa;
 pub mod preprocess;
+pub mod preprocess_gpu;
 mod weights;
 
 /// Meta's upstream DINOv3 source revision used to validate this port.

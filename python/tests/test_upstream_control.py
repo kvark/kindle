@@ -164,7 +164,7 @@ def test_control_runs_in_guarded_process_without_gpu_telemetry(tmp_path, monkeyp
     assert manifest["exit_code"] == expected
     assert manifest["status"] == ("complete" if expected == 0 else "failed")
     assert manifest["gpu_telemetry"] == "application collectors disabled"
-    assert manifest["backend_nvml"] == "requires separate runtime qualification before launch"
+    assert manifest["backend_nvml"] == "normal initialization permitted; application telemetry disabled"
     assert (logdir / "RUN_COMPLETE").exists() == (expected == 0)
     assert "native stdout\nnative stderr\n" in (logdir / "console.log").read_text()
 

@@ -14,13 +14,14 @@ use meganeura::{Graph, Mode, NodeId, Session, SessionConfig, data::safetensors::
 use super::{
     OBSERVATION_CHANNELS, Observation, PROJECTION_SEED, fixed_projection, pool_2x2_token_major,
     preprocess,
+    preprocess_gpu::{GpuFrame, GpuPreprocessor},
 };
 
 pub const MODEL_ID: &str = "galilai-group/LeVJEPA-VideoMix-Large";
 pub const CHECKPOINT_REV: &str = "e831a0347737fcaa660b39c57d41c109de399845";
 pub const CHECKPOINT_SHA256: &str =
     "da8bd836ce6532e1b0074ee5a6a46c65b67103f96323529ec4195be1538edc7d";
-pub const ENCODING_REV: &str = "levjepa-large-f32-chunk16-letterbox224-jl64-pool2-v1";
+pub const ENCODING_REV: &str = "levjepa-large-f32-chunk16-gpu-letterbox224-jl64-pool2-v2";
 pub const FRAMES: usize = 16;
 pub const IMAGE_SIZE: usize = 224;
 pub const PATCH_SIZE: usize = 16;
@@ -48,7 +49,7 @@ impl Architecture {
 
     pub const fn encoding_revision(self) -> &'static str {
         match self {
-            Self::Tiny => "levjepa-tiny-f32-chunk16-letterbox224-jl64-pool2-v1",
+            Self::Tiny => "levjepa-tiny-f32-chunk16-gpu-letterbox224-jl64-pool2-v2",
             Self::Large => ENCODING_REV,
         }
     }
@@ -85,6 +86,8 @@ impl Architecture {
 
 pub struct LeVJepaPerception {
     architecture: Architecture,
+    // Finish preprocessing before destroying its session-owned destination.
+    pixels: Box<GpuPreprocessor>,
     session: Session,
     frames: Vec<usize>,
     projected: Vec<f32>,
@@ -150,7 +153,7 @@ impl LeVJepaPerception {
             &graph,
             SessionConfig {
                 mode: Mode::Inference,
-                gpu: Some(gpu),
+                gpu: Some(Arc::clone(&gpu)),
                 cache: plan_cache,
                 runtime: meganeura::SessionOptions {
                     coop: meganeura::CoopPolicy::Disabled,
@@ -164,6 +167,7 @@ impl LeVJepaPerception {
         Ok(Self {
             architecture,
             session,
+            pixels: Box::new(GpuPreprocessor::new(gpu, streams, IMAGE_SIZE, PATCH_SIZE)),
             frames: vec![0; streams],
             projected: vec![0.0; streams * PATCHES * OBSERVATION_CHANNELS],
             pooled: vec![0.0; streams * Observation::LEN],
@@ -196,8 +200,10 @@ impl LeVJepaPerception {
     }
 
     pub fn encode_frame_rgb8(&mut self, rgb: &[u8], width: usize, height: usize) -> Observation {
-        let rgb = preprocess::resize_letterbox_rgb8(rgb, width, height, IMAGE_SIZE);
-        self.run(&preprocess::patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE))
+        assert_eq!(self.frames.len(), 1);
+        self.pixels
+            .cpu_frames(&mut self.session, &[(0, rgb, width, height)]);
+        self.run_prepared(&[0]).pop().unwrap()
     }
 
     pub fn encode_normalized_chw(&mut self, pixels: &[f32]) -> Observation {
@@ -240,26 +246,48 @@ impl LeVJepaPerception {
         if arrivals.is_empty() {
             return Vec::new();
         }
-        let width = PATCHES * PATCH_DIM;
-        let mut patches = vec![0.0; self.frames.len() * width];
-        for &(stream, frame, reset) in arrivals {
-            let rgb = preprocess::resize_letterbox_rgb8(
-                frame.pixels(),
-                frame.width(),
-                frame.height(),
-                IMAGE_SIZE,
-            );
-            patches[stream * width..(stream + 1) * width]
-                .copy_from_slice(&preprocess::patches_from_rgb8(&rgb, IMAGE_SIZE, PATCH_SIZE));
+        let frames = arrivals
+            .iter()
+            .map(|&(stream, frame, _)| (stream, frame.pixels(), frame.width(), frame.height()))
+            .collect::<Vec<_>>();
+        self.pixels.cpu_frames(&mut self.session, &frames);
+        for &(stream, _, reset) in arrivals {
             if reset {
                 self.frames[stream] = 0;
             }
         }
-        self.run_batch(&patches, &arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+        self.run_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
+    }
+
+    /// Resident RGB/RGBA/BGRA arrivals. No image or patch tensor is downloaded.
+    /// Encoding completes before returning, so capture buffers may then be released.
+    /// Projected features still use the existing host Observation boundary.
+    pub fn encode_frames_gpu8(
+        &mut self,
+        arrivals: &[(usize, GpuFrame<'_>, bool)],
+    ) -> Vec<Observation> {
+        let frames = arrivals
+            .iter()
+            .map(|&(stream, frame, _)| (stream, frame))
+            .collect::<Vec<_>>();
+        self.pixels.gpu_frames(&mut self.session, &frames);
+        if arrivals.is_empty() {
+            return Vec::new();
+        }
+        for &(stream, _, reset) in arrivals {
+            if reset {
+                self.frames[stream] = 0;
+            }
+        }
+        self.run_prepared(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>())
     }
 
     fn run_batch(&mut self, patches: &[f32], active: &[usize]) -> Vec<Observation> {
         self.session.set_input("patches", patches);
+        self.run_prepared(active)
+    }
+
+    fn run_prepared(&mut self, active: &[usize]) -> Vec<Observation> {
         for (stream, &frame) in self.frames.iter().enumerate() {
             self.session
                 .set_input_u32(&format!("frame.{stream}"), &[frame as u32]);
@@ -1085,7 +1113,10 @@ mod tests {
                 "RGB preprocessing differs at step {step}"
             );
             let started = std::time::Instant::now();
-            let observation = perception.encode_frame_rgb8(frame, width, height);
+            // Dense encoder parity uses the exact reference input, independently
+            // of GPU interpolation (bounded by preprocess_gpu's own tests).
+            let observation = perception
+                .encode_normalized_chw(&pixels[source * pixel_len..(source + 1) * pixel_len]);
             let elapsed = started.elapsed().as_secs_f64();
             let actual = perception.patch_tokens();
             let reference = &expected[source * token_len..(source + 1) * token_len];
