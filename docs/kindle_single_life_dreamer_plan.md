@@ -61,7 +61,7 @@ Full multi-stream evaluations determine results.
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Inspect forecasts and improve the small-encoder recipe; no pretraining benefit demonstrated in one seed. Four-action arm remains held. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; throughput work precedes another learning trial. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
+| Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; inspect early hazards and later progression. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
@@ -71,251 +71,172 @@ Task observers are post-hoc evaluation, not privileged policy inputs or rewards.
 
 Boxing, Pong and Freeway satisfy **three of five** game gates. Qbert's completed
 [3.2M R64 pair](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) fails both final
-thresholds: 22/27 first pyramids (81.5%) and mean12,595.37, versus0/24 and120.83
-untrained. Its 1.6M midpoint reaches24/24 and8,673.96. More exposure raises mean
-score but does not reliably complete even the first pyramid. Keep the predeclared
-final primary; do not select the better-looking checkpoint or relax the gate.
+thresholds: 22/27 first pyramids and mean12,595.37. More exposure raises score but
+does not reliably complete even the first pyramid. Keep the predeclared final
+primary; do not select the better-looking midpoint or relax the gate.
 
-1. **Throughput before another long learner root.** The pinned Meganeura0dbfcc00
-   optimizer candidate passes [numerical/state/pixel compatibility](../runs/meganeura-optimizer-20260926.TfWlJI/results.md),
-   but [all four matched timing windows](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
-   find it0.8–0.9% slower than9746c9ac. Same-backend states, moments, reports and
-   trajectories repeat exactly. Keep production unchanged; do not present the
-   <=10% nonregression pass as a speedup. Newer ee3aea parameter-sharing changes
-   are inspected, not included or qualified by that result.
-2. **Qualify command-recording overlap in the complete actor.** The
-   [complete learner trace](../runs/learner-timeline-20260926.6FJAqf/results.md)
-   finds 26.09 ms recording the world's 35,221 dispatches before execution.
-   The [one/four/four/one submission probe](../runs/world-submissions-20260926.9nJMTy/results.md)
-   on latest ee3aea cuts core update time7.4–7.5%, with exact full state/reports.
-   The minimal30bfa1a gameplay candidate adds one scheduling call plus dependency
-   pins. Its [N6 pixel/state/restore check](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
-   matches all3,840 training actions/611 updates, full state/moments and six
-   frozen episodes exactly. Remaining latest-runtime compatibility and untraced
-   matched-order Atari timing precede adoption. GPU pass coverage is62.4%,
-   not SM utilization. Imagination's host work and GPU-resident parameter sync
-   remain separate follow-ups; account for derived weights before aliasing.
-   No concurrent learner service or changed learning settings.
-3. **Repair the failing game recipes with bounded comparisons.** Keep trained
-   causal Tiny fixed initially. Revisit Breakout's minimal action space with a
-   fresh declaration, preserving the old four-action hold. For Qbert, inspect
-   failure trajectories and reward/continuation forecasts before simply doubling
-   the budget again. Compare one change at a time against its qualified control.
-   Lower replay ratio is a learning tradeoff, not a parity speedup.
-4. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
-   fixed final-policy gate and a restored untrained control. Do not replicate an
-   unchanged failure merely to occupy the device. Native games, transfer and
+1. **Throughput qualification completed; adopt the minimal runtime change.**
+   The [four-window Atari comparison](../runs/chunks-atari-timing-20260926.e2OEhn/results.md)
+   cuts wall time **6.5–6.6% in both orders**, with <0.1% total repeat drift and
+   exact same-arm complete state, moments, reports and trajectories. It retains
+   N6/full18/12M/B16/T64/full BPTT/M16/R256 and the trained causal Tiny encoder.
+   Native `b00ce7be` / Meganeura `ee3aea42` / Blade `fbb4f28c` is now the
+   production package: exact source `30bfa1a`, one scheduling call plus dependency
+   pins, no profiler or tuning API. Reuse the qualified package without rebuilding.
+   [Pixel/state/restore](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md)
+   and [latest-runtime compatibility](../runs/chunks-compatibility-20260926.opVUiI/results.md)
+   pass. Different backend arithmetic means old/new campaign roots stay separate.
+2. **Repair failing game recipes with bounded comparisons.** Keep trained causal
+   Tiny fixed initially. Revisit Breakout's minimal action space with a fresh,
+   same-runtime declaration, preserving the old four-action hold. Qbert's
+   [retained episode analysis](../runs/qbert-tail-analysis-20260926.m0P7ZI/results.md)
+   finds a16,850 median but five early first-pyramid failures and a later8–9k
+   plateau. Inspect hazards and reward/continuation forecasts before another
+   budget increase. Retain every episode and the original mean/success gates;
+   change one scientific variable at a time.
+3. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
+   fixed final-policy gate and a restored untrained control. Do not replicate
+   unchanged failures just to occupy the device. Native games, transfer and
    swarms remain downstream of reliable single-actor results.
 
-Current production is nativea761ee5c / Meganeura9746c9ac / Bladefbb4f28c.
-The [completed correctness refresh](../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md)
-passes independent references, full gradients/state/restore and default Large
-compatibility. [Matched timing](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
-cuts total time7.5–7.8%; the [paired Qbert control](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
-does not improve learning in its one seed. Preserve both findings.
+The runtime gain is real but modest: **1.0405–1.0415× aggregate / ~.174× per-stream
+real time** at R256, with learning still dominant. A concurrent learner service
+is not the next step. Imagination host work and GPU-resident parameter sync are
+separate future optimizations; account for derived weights before aliasing.
+The optimizer-only update's [negative speed result](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
+and the earlier refresh's [negative Qbert learning result](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
+remain; correctness and throughput do not imply gameplay competence.
 
 All completed writers, failed-reader evidence, interrupted Freeway2017 attempt
-and historical holds remain immutable. Details and checkpoint chronology belong
-in [the experiment index](experiments/README.md), not the active decision list.
-Checkpoints preserve weights/moments, not replay/live belief/RNG; a fresh run is
-required for an equivalent uninterrupted history. Review every GPU successor.
+and historical holds remain immutable. Checkpoints preserve weights/moments,
+not replay/live belief/RNG. Review each GPU successor individually. Detailed
+chronology belongs in [the experiment index](experiments/README.md).
 
-## Complexity and compute: what to change
+## Complexity and compute
 
-Dreamer needs several interacting networks and a recurrent training loop, but
-286 commits and 13K lines of experiment reports are not architectural necessities.
-Keep investigations in the archive, production code for exercised features, and
-compact evidence for decisions. Test coverage is not cruft merely because it
-is larger than the implementation it protects.
+Dreamer's interacting networks and recurrent learner are real complexity;
+hundreds of investigation commits and chronological reports are not architectural
+requirements. Keep production code for exercised features and evidence in linked
+reports. Tests are not cruft simply because they exceed implementation size.
 
-This implementation also tests a costly departure from vanilla Dreamer: a frozen
-303M video encoder beside the nominal 12M learner. Selected ratio 256 consumes about
-102 million replay positions during a 400k-action run. Repeated learning and
-frontend cost must earn their place through sample-efficiency comparisons.
+The initial 303M frontend was disproportionate to the nominal 12M learner.
+Tiny reduces that cost, but R256 still consumes about 102 million replay
+positions per 400k-action run. Repeated learning must earn its cost through
+sample-efficiency comparisons. Six environments already batch encoder/belief/
+policy inference. Training uses B16×T64 replay states and 1,024 imagination
+starts for 15 steps; serial emulator stepping is not the main bottleneck.
 
-Qualified small-batch block products deliver **27.3% higher throughput** with
-exact full-state/action parity. Root 2017's 400,008-action training takes **10.94h**,
-10.155 actions/s, **.677× aggregate real time** (about .113× per stream).
-Wall time is 65.6% learning, 33.7% observing and .45% emulator stepping. These
-stage wall times are not GPU utilization or calibrated idle intervals.
+Completed fixed-recipe optimizations:
 
-The new matched Tiny/Large AB/BA comparison reduces total time **26.0–26.9%**
-and observation time **73.6–74.8%**, with exact same-arm state/trajectory repeats.
-Tiny reaches only **.897–.902× aggregate real time** (~.150× per stream) at R256;
-learning now accounts for about 87% of wall time. Mean learner step .257s includes
-.092s world training and .086s imagination. More environment workers do not
-directly remove this cost. [All four windows and stage clocks](../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md).
+| Comparison | Measured result | Scope |
+| --- | --- | --- |
+| Small-batch block products | 27.3% higher throughput | Exact full-state/action parity; historical Large recipe |
+| [Tiny versus Large](../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md) | 26.0–26.9% less total time; 73.6–74.8% less observation time | Exact same-arm repeats; pretrained packages, not a pure size ablation |
+| [Correctness refresh](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md) | 7.5–7.8% less total time; .974–.975× aggregate real time | Fixed Tiny/R256; learning still 91.8% of wall time |
+| [Optimizer-only update](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md) | 0.8–0.9% slower | Negative speed result; compatibility passes |
+| [Four world submissions + latest runtime](../runs/chunks-atari-timing-20260926.e2OEhn/results.md) | 6.5–6.6% less Atari wall time; ~1.041× aggregate real time | Exact same-arm state/reports/actions; isolated core scheduling gain 7.4–7.5% |
 
-The latest-backend [matched comparison](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
-further reduces total time7.5–7.8% at the same recipe. Aggregate realtime reaches
-.974–.975x;learning still occupies91.8% of wall time,improving only2.6–2.9%.
-Observation time falls42.8–45.6%. These are stage clocks,not utilization.
-Keep recipe and pretrained Tiny fixed for the first backend learning comparison.
-A matched replay-ratio ablation is separate,not a parity optimization.
-Historical R64 Boxing exceeds aggregate real time, but has only one successful
-root and less score margin; it is not an adopted replacement. Retain AGC/full
-recurrence unless an ablation supports changing them. Reconstruction/future
-controls remain .25/0, .25/.25 and 0/.25. Backend fixes need numerical checks,
-not weeks of blind training. Recheck upstream before diagnosing old bugs.
+These are separate comparisons, not percentages to add. Uncapped, step-driven
+playing/learning works; sustained per-stream super-real-time learning is not
+established. Free-running native games without time control remain a separate
+requirement. Measure arrival order, observation gaps, action durations and
+training debt before introducing concurrency.
 
-Uncapped step-driven playing/learning is supported; current R256 training is not
-super-real-time. Free-running native gameplay without time control is required
-but not validated by Atari. Measure arrival order, observation gaps, executed
-action durations and training debt before introducing concurrency.
+The completed Qbert R64 trial takes 18.799h at **3.151× aggregate / .525×
+per-stream real time**: learning 74.19%, observation 22.77%, emulator 2.24%.
+Mean update is 251.00ms: world 86.62, imagination 85.15, posterior 34.47,
+behavior 22.15 and parameter synchronization 20.90. R64 changes the learning
+schedule; it is not a parity speedup over R256.
 
-The completed3.2M-action R64 trial takes18.799h: **3.151× aggregate / .525×
-per-stream realtime**. Wall time is74.19% learning,22.77% observation and2.24%
-environment stepping. Six environments already use batched encoder/belief/policy
-inference; training batches16×64 replay states and imagines1024 starts for15 steps.
-Serial emulator stepping is not the dominant cost.
+The [full-learner trace](../runs/learner-timeline-20260926.6FJAqf/results.md)
+measures a GPU-pass union of 156.50ms per 250.86ms update (62.4%), with 94.36ms
+uncovered. This synthetic early-update probe excludes frontend/ALE/N6 live sync.
+It is **not SM utilization**; readback waits include computation and pass gaps
+are not automatically hardware idle. World command recording alone takes
+26.09ms before GPU execution; optimizer passes take only .44ms. Imagination
+host work and GPU→CPU→GPU parameter synchronization are separate follow-ups;
+derived weights must remain coherent. **NVML stays disabled.**
 
-Across all199,917 updates, mean learner time is251.00ms: world training86.62ms,
-imagination85.15ms, posterior34.47ms, behavior22.15ms and parameter sync20.90ms.
-Current synchronization reads parameters to CPU and writes inference copies back
-to GPU. Posterior/imagination make95 blocking readback batches per update.
-Neither those waits nor these wall clocks measure GPU idle time or SM occupancy.
-The [full-learner Vulkan trace](../runs/learner-timeline-20260926.6FJAqf/results.md)
-now covers optimizers and transfers: GPU pass union156.50ms of250.86ms (62.4%),
-with94.36ms uncovered. Exact state/reports pass; trace overhead is0.9%. This
-synthetic early-update core probe excludes frontend/ALE/N6 synchronization and
-does not measure SM occupancy. World command recording alone takes26.09ms,
-entirely outside GPU passes; optimizer passes take only.44ms. Existing submission
-chunking now cuts synthetic core time7.4–7.5% in both orders with exact state;
-whole-actor throughput qualification remains. **NVML stays disabled**.
+Keep AGC/full recurrence unless an ablation supports changing them.
+Reconstruction/future controls remain .25/0, .25/.25 and 0/.25. Qualify backend
+fixes before long training; do not repeatedly replicate unchanged failed recipes.
 
 ### Right-size the causal encoder
 
-The [checkpoint accounting](../runs/model-sizing-20260920.kPIOWC/README.md)
-finds **303,099,904** frontend parameters, **5,921,280** RSSM dynamics/prior/
-posterior parameters and **10,281,233** optimizer-owned world+behavior parameters.
-Our deterministic width 2048, hidden width 256 and 32×16 categorical state match
-[DreamerV3's 12M preset](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml).
-Its size labels refer to whole-agent presets, not RSSM counts. The disproportionate
-component is the frontend, not an undersized accidental RSSM configuration.
+[Checkpoint accounting](../runs/model-sizing-20260920.kPIOWC/README.md) finds
+303,099,904 Large frontend parameters, 5,921,280 RSSM parameters and 10,281,233
+optimizer-owned world+behavior parameters. Deterministic width 2048, hidden
+width 256 and 32×16 categorical state match
+[DreamerV3's 12M preset](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml);
+its name denotes the whole-agent preset, not the RSSM alone.
 
-Use **ViT-Tiny/16: 12 layers, width 192, three heads, MLP 768**, totaling
-**5,486,592** encoder parameters. Preserve 224px inputs, 16-frame block-causal
-chunks, independent stream histories and JL64/2×2 pooling to 7×7×64. Logical F32
-KV storage falls from 588 to 55.125 MiB per stream (330.75 MiB for N6); these are
-tensor sizes, not measured device peaks. Keep RSSM capacity and R256 fixed first.
-Do not slice Large weights, substitute DINO/RGB or claim proportional speedup.
+Keep **causal ViT-Tiny/16: 12 layers, width 192, three heads, MLP 768,
+5,486,592 encoder parameters**. Preserve 224px inputs, 16-arrival block-causal
+chunks, independent histories and JL64/2×2 pooling to 7×7×64. Logical F32 KV
+storage is 55.125 MiB per stream versus Large's 588 MiB; these are tensor sizes,
+not measured device peaks. Do not slice Large weights or substitute DINO/RGB.
 
-Tiny requires its own self-supervised video pretraining. Use the original
-LeVJEPA multi-view invariance + SIGReg objective with causal token dropping and
-an evaluation EMA, not an undisclosed teacher-distillation substitute. Declare
-the corpus, train/held-out split, frame sampling, views, step budget, projector,
-normalization and exported weight identity before training. Preserve original
-token positions in masks/RoPE; patches cannot read the CLS sink or future frames.
-Train on Meganeura/Blade; Python may prepare video batches and reference checks.
+The native pretrainer uses multi-view invariance + SIGReg, causal token dropping
+and evaluation EMA, not undisclosed distillation. Preserve token positions in
+masks/RoPE; patches cannot read the CLS sink or future frames. Full-gradient/
+AdamW/EMA/restore and causal/N6 [numerical checks pass](../runs/levjepa-tiny-accuracy-20260921.qa3GqK/results.md).
+The [first training run](../runs/levjepa-tiny-pretrain-20260921.JaPZpW/results.md)
+completes 4,096 updates in 84.18 minutes on 250,000 observations / 999,112 emulator
+frames, with whole-recording splits and verified checkpoints/exports. Declare
+all offline experience and lineage in later comparisons.
 
-The [upstream recipe](https://github.com/MLO-lab/LeVJEPA) demonstrates Tiny
-pretraining on unlabeled video; the inspected official released checkpoint is
-Large. Native Tiny inference support passes CI. A separate
-[native pretraining graph](../runs/levjepa-tiny-cpu-20260920.e4QkQH/README.md)
-and native AdamW/GPU-EMA/save/restore/export paths pass 100 CPU tests. The
-[independent reference and allocation preflight](../runs/levjepa-tiny-reference-20260920.XhB8T8/README.md)
-cover every gradient and identify a 25.3→9.4 GiB B128 plan reduction from native
-erf GELU. These are prepared numerical expectations and static allocations,
-not GPU correctness, runtime fit, throughput or trained features. The native
-Python interface and deterministic video adapter are staged. A separately
-declared [fresh random-policy corpus](../runs/levjepa-tiny-atari-corpus-20260920.oTjdon/result.md)
-contains 250,000 RGB64 observations / 999,112 emulator frames from the five games,
-with whole-recording training/validation splits and no clips crossing resets.
-The actual B128/V4 pilot measures **.45s native training + .80s batch preparation**
-per step: data preparation is the measured bottleneck in this serial pipeline.
-These are stage wall times, not GPU utilization. This is additional offline
-experience, not reused evaluation
-footage or an untrained gameplay control. Latest upstream RMSNorm fusion fixes
-are included in staging. The [seven native GPU checks](../runs/levjepa-tiny-accuracy-20260921.qa3GqK/results.md)
-now pass, including all 155 gradients and bitwise exact 763-tensor continuation.
-Preserve the original device-selection/strict-trig failures and documented
-primitive-bound revision; full-model and gameplay gates are unchanged. A
-[32-update B128/V4 fit/timing pilot](../runs/levjepa-tiny-fit-20260921.oDmZVn/results.md)
-and [frozen held-out noncollapse screen](../runs/levjepa-tiny-feature-check-20260921.wSQUJj/results.md)
-complete. The first [fresh 4,096-update candidate](../runs/levjepa-tiny-pretrain-20260921.JaPZpW/results.md)
-completes in 84.18 minutes: seed 743, B128/V4, peak LR 1e-4/warmup 128/cosine,
-weight decay .04, EMA .99. All nine complete checkpoints and both encoder exports
-verify. The separately declared [frozen quality comparison](../runs/levjepa-tiny-quality-20260921.ojeZgt/results.md)
-completes against its own untrained export, with RGB/constant controls. All five
-noncollapse screens pass; pooled Pong position mean R² improves .904→.938.
-Motion is mixed: explicit-history mean R² falls .508→.333, with severe paddle
-readout outliers despite lower median error. Preserve every target and the fixed
-test split; do not retune this result away. These probes justify a bounded
-downstream test, not adoption or a general JEPA advantage.
-Gate adoption on numerical/causal and streaming/reset checks, held-out
-feature variance/quality, measured N6 memory/time and frozen downstream learning
-against its untrained control. Report all offline experience. If Tiny and Large
-use different corpora, compare pretrained packages, not a pure size ablation.
-Pretraining-only backend extensions do not automatically change the gameplay
-runtime: Tiny exports use the existing frozen encoder operations. Prefer the
-qualified gameplay backend for the first size comparison; if a newer runtime
-is needed, qualify it separately and use it for both Large and Tiny controls.
-The [prepared gameplay package](../runs/levjepa-tiny-gameplay-cpu-20260921.YF4BKS/README.md)
-adds explicit Tiny selection and checkpoint identity on that unchanged backend.
-All 754 Python and 93 Rust CPU checks pass. Its own
-[dense-reference and exact N6/serial inference checks](../runs/levjepa-tiny-gameplay-gpu-20260921.X6TnAI/results.md)
-now pass. [Bounded N6 pixel/save/restore](../runs/levjepa-tiny-gameplay-pixels-20260921.NQLh0I/results.md)
-also passes: 3,840 actions / 611 updates per arm, exact frozen state and complete
-replays; the new Large path matches its retained state and trajectories exactly.
-Tiny selection is opt-in; Large remains the default until downstream evidence
-supports replacement. Initial short-loop times are 194s Tiny versus 289s Large,
-with observation cost 33s versus 125s and similar learner cost. These include
-replay warmup and are not matched-order or steady-state throughput qualification.
-The [post-warmup AB/BA check](../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md)
-now passes all cost and exact repeatability gates. Its terminal writers stay
-unchanged. The full-budget Breakout pair completes, but Tiny's frozen mean
-10.9167 regresses against Large's 30.7917. Keep Large as the default. A separate
-same-architecture [encoder-initialization control](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
-now completes: frozen mean12.4583 versus1.10 control, two-wall successes0/24
-versus0/30. It exceeds pretrained Tiny by1.5417 points in this single paired
-seed; no downstream pretraining benefit is demonstrated. This does not prove
-a capacity limit, a reliable negative effect, or justify replacing the trained
-causal-video JEPA target with random features.
+The [frozen quality comparison](../runs/levjepa-tiny-quality-20260921.ojeZgt/results.md)
+passes five noncollapse screens, but is mixed: Pong position R² .904→.938;
+explicit-history motion R² .508→.333 with severe paddle outliers. Keep all
+targets, RGB/constant controls and whole-seed splits; no test-driven retuning.
+[Gameplay integration](../runs/levjepa-tiny-gameplay-pixels-20260921.NQLh0I/results.md)
+and matched cost pass. Freeway now passes three learner roots, conditional on
+one encoder. Breakout regresses versus Large, and its
+[own-initial-encoder comparison](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
+shows no pretraining benefit in one seed. Neither establishes a capacity limit
+or justifies random features as the product. **Tiny stays opt-in; Large remains
+default** pending broader downstream evidence.
+
+Keep numerical/causal/streaming checks, held-out quality, N6 memory/time and
+frozen downstream controls as adoption gates. Different pretraining corpora
+compare packages, not size alone. Pretraining-only runtime changes do not
+automatically update gameplay; use the same qualified runtime across each pair.
 
 ## World-model evaluation and pretraining
 
-Predict before each target observation in a recorded frozen match, then compare
-features, reward and continuation with reality. Keep posterior estimates separate.
-Use persistence, unrelated-action and zero-reward controls; report MAE **and** MSE,
-positive/negative/terminal counts, and visual-cache/reset strata. Sparse all-frame
-MAE or AUC alone cannot establish calibration. Another policy's logged return
-is not an unbiased critic target.
+Predict before observing each target, then compare features, reward and
+continuation with reality. Keep posterior estimates separate. Use persistence,
+unrelated-action and zero-reward controls; report MAE **and** MSE, event counts,
+visual-cache resets and episode boundaries. Sparse all-frame MAE/AUC is not
+calibration; another policy's return is not an unbiased critic target.
 
-Existing [own-policy forecasts](../runs/world-evaluation-20260908.Xzx3pN/report.html)
-and [common-recording report](../runs/common-world-report-20260909.O7nqqe/report.html)
-show action sensitivity but limited cross-trajectory generalization. This is not
-a proven explanation for failed policies. For new Pong roots, preselect the first
-four complete stream-zero matches without score filtering. The staged multi-match
-probe needs current-source GPU forecast checks; CPU extraction alone is not that.
-The [current-package readiness check](../runs/current-world-probe-cpu-20260921.KlMyMe/README.md)
-passes 74 CPU tests and selects the first four Tiny trained/control matches.
-Its [run-local wrapper](../runs/current-world-probe-wrapper-cpu-20260921.r8GrmS/README.md)
-adds per-stage Vulkan memory checks and complete frozen-state comparison, with
-39 CPU tests. The separate [one-step GPU report](../runs/tiny-world-one-step-20260921.U7yHOa/results.md)
-now completes strict and forced replay: all1,126 actions/four matches, common
-forecasts and input/reset identities match exactly; complete frozen state passes.
-Scalar restore explicitly changes only collection-stream metadata6->1 and the
-executed-action counter. Feature MSE .0001665 beats persistence .0002863; reward
-MAE .00892 beats zero .03819. Continuation MSE .00439 is worse than always-continue
-.00353, with only four terminals and22 positive rewards. These are useful
-one-step measurements, not a causal explanation of the score gap. The separate
-[15-step/all-origin check](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
-also passes, with 16,470 forecast targets, exact one-step overlap and unchanged
-complete state. At horizon15, feature MSE is .0001860 versus .0010262 persistence;
-reward MAE/MSE are .008938/.019244 versus .040187/.118692 zero prediction.
-Continuation MSE remains worse (.005106 versus .003716). There are only22
-positive rewards and four terminal targets at each horizon, not independent
-new events. Recorded future actions condition these prior forecasts; this is
-not counterfactual or imagined-policy validation. Preserve both terminal checks.
-Freeway confirmation now passes. Qbert/Breakout still need targeted diagnostics;
-a continuation ablation remains separate from throughput qualification.
+The [one-step check](../runs/tiny-world-one-step-20260921.U7yHOa/results.md) and
+[15-step report](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md) replay
+the first four complete Tiny Breakout matches: 1,126 actions and 16,470 correlated
+forecast targets. Strict/forced replay, exact horizon-one overlap and complete
+frozen state pass. Scalar restore explicitly changes collection metadata 6→1
+and the action counter, not learning state.
 
-Pretrained visual weights are supported; a video-dataset world-pretraining
-workflow is not adopted. Start with aligned RGB, executed actions/durations and
-boundaries from mind-games. Missing actions/rewards are missing labels, not
-NOOP/zero. Compare fresh, encoder-only and encoder+world initialization at equal
-target budgets. Keep actor/critic unchanged in world-only updates; declare resets
-and offline lineage. Useful pretraining means faster retained gameplay learning,
+At horizon15, feature MSE .0001860 beats persistence .0010262; reward MAE/MSE
+.008938/.019244 beat zero .040187/.118692. Continuation is worse than
+always-continue (.005106 versus .003716). There are only 22 positive rewards
+and four terminals at each horizon. Recorded future actions condition forecasts:
+this is not counterfactual validation or a cause of policy failure.
+The older [own-policy](../runs/world-evaluation-20260908.Xzx3pN/report.html) and
+[common-recording](../runs/common-world-report-20260909.O7nqqe/report.html)
+reports likewise show limited cross-trajectory generalization.
+
+Next diagnostics should target Qbert's early hazards/later plateau and Breakout's
+failures without changing evaluation gates. Retain preselected first-four
+complete stream-zero matches for new Pong diagnostics, without score filtering.
+A continuation ablation is separate from throughput qualification.
+
+Visual video pretraining works; a video-dataset **world-pretraining** workflow is
+not adopted. Start with aligned RGB, executed actions/durations and boundaries
+from mind-games. Missing actions/rewards are missing labels, not NOOP/zero.
+Compare fresh, encoder-only and encoder+world initialization at equal target
+budgets. Keep actor/critic unchanged in world-only updates; declare resets and
+offline lineage. Useful pretraining means faster retained gameplay learning,
 not just lower feature error. No perception expansion before calibration/coverage.
 
 ## Beyond five Atari games
