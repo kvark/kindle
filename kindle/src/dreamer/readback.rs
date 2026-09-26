@@ -38,7 +38,6 @@ impl Readback {
 
     /// Read independent, already-submitted producers with one transfer/wait.
     pub fn read_many(&mut self, outputs: &mut [(&Session, usize, &mut [f32])]) {
-        let mut bytes = 0usize;
         for (session, index, output) in outputs.iter() {
             assert!(Arc::ptr_eq(&self.gpu, &session.context()));
             let size = std::mem::size_of_val(*output);
@@ -46,6 +45,31 @@ impl Readback {
                 .slot_size(ExternalSlot::Output(*index))
                 .expect("known output slot");
             assert!(size <= available, "readback exceeds output size");
+        }
+        let mut regions: Vec<_> = outputs
+            .iter_mut()
+            .map(|(session, index, output)| {
+                (
+                    session.output_buffer(*index).expect("known output slot"),
+                    &mut **output,
+                )
+            })
+            .collect();
+        self.read_regions(&mut regions);
+    }
+
+    /// Internal callers retain ownership of same-context buffers until this
+    /// synchronous read completes. Every byte range is checked before submission.
+    pub fn read_regions(&mut self, outputs: &mut [(blade_graphics::BufferPiece, &mut [f32])]) {
+        let mut bytes = 0usize;
+        for (source, output) in outputs.iter() {
+            let size = std::mem::size_of_val(*output);
+            assert!(
+                source
+                    .offset
+                    .checked_add(size as u64)
+                    .is_some_and(|end| end <= source.buffer.size())
+            );
             bytes = bytes.checked_add(size).expect("readback size overflow");
         }
         if bytes == 0 {
@@ -67,14 +91,10 @@ impl Readback {
         let mut offset = 0;
         {
             let mut transfer = self.encoder.transfer("kindle_readback");
-            for (session, index, output) in outputs.iter() {
+            for (source, output) in outputs.iter() {
                 let size = std::mem::size_of_val(*output);
                 if size > 0 {
-                    transfer.copy_buffer_to_buffer(
-                        session.output_buffer(*index).expect("known output slot"),
-                        buffer.at(offset as u64),
-                        size as u64,
-                    );
+                    transfer.copy_buffer_to_buffer(*source, buffer.at(offset as u64), size as u64);
                 }
                 offset += size;
             }
@@ -87,7 +107,7 @@ impl Readback {
             "readback did not complete"
         );
         let mut offset = 0;
-        for (_, _, output) in outputs {
+        for (_, output) in outputs {
             // The completed transfer initialized these aligned f32 regions in
             // CPU-visible memory. Neither allocation can be freed or mutated
             // while this method holds their exclusive borrows.

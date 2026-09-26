@@ -1,4 +1,4 @@
-"""Pixel-first Dreamer agent with frozen DINOv3 or causal LeVJEPA perception."""
+"""Pixel-first Dreamer agent with causal LeVJEPA perception."""
 
 from importlib import import_module
 from typing import TYPE_CHECKING, Any
@@ -7,8 +7,6 @@ if TYPE_CHECKING:
     from ._native import (  # type: ignore[attr-defined]
         Agent,
         VectorAgent,
-        DINO_CHECKPOINT_REVISION,
-        DINO_MODEL_ID,
         DREAMERV3_REVISION,
         LEVJEPA_MODEL_ID,
         LEVJEPA_CHECKPOINT_REVISION,
@@ -18,8 +16,6 @@ if TYPE_CHECKING:
 __all__ = [
     "Agent",
     "VectorAgent",
-    "DINO_CHECKPOINT_REVISION",
-    "DINO_MODEL_ID",
     "DREAMERV3_REVISION",
     "LEVJEPA_MODEL_ID",
     "LEVJEPA_CHECKPOINT_REVISION",

@@ -5,6 +5,7 @@
 //! reward/value heads, and imagined actor-critic learning. The deliberate
 //! perception exception lives in [`crate::vision`].
 
+mod acting_gpu;
 mod agent;
 mod behavior;
 mod checkpoint;
@@ -16,6 +17,7 @@ mod intrinsic;
 mod networks;
 mod readback;
 mod replay;
+mod replay_gpu;
 mod runtime;
 mod world;
 
@@ -29,9 +31,9 @@ pub use replay::{FrameFlags, Reward};
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
 /// Meganeura revision used to compile and optimize the baseline graphs.
-pub const MEGANEURA_REV: &str = "ee3aea42da8e3e7b63d4083d0ea35b09848872ad";
+pub const MEGANEURA_REV: &str = "367e53d4de73aea6432afd40aa6fd69b5fcd4e8e";
 /// Exact Blade revision providing the shared graphics runtime.
-pub const BLADE_REV: &str = "fbb4f28c4869e81ae15de58925945b423b9c1ac5";
+pub const BLADE_REV: &str = "7cca637791a57d9cacf4e99c10a87211f3c11b6a";
 
 #[cfg(test)]
 mod tests {

@@ -4,6 +4,11 @@ The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
+shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default
+selection and real vkQuake capture through Dullahan's fenced Vulkan protocol.
+Transport success is not a Quake competence result or a GPU-only learner.
+
 The [GPU pixels and Pong robustness report](2026-09-26-gpu-pixels-and-pong-robustness.md)
 records the latest important correction: root1009 wins only2/24 equal-cohort
 matches under25% sticky actions. Its complete state/replay/video audit passes;

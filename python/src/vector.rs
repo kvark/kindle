@@ -26,7 +26,7 @@ fn validate_streams(streams: &[usize], count: usize, items: usize) -> PyResult<(
 impl PyVectorAgent {
     /// The config is the complete dictionary returned by kindle.default_config.
     #[new]
-    #[pyo3(signature = (encoder_checkpoint, num_envs, config, *, encoder = "levjepa"))]
+    #[pyo3(signature = (encoder_checkpoint, num_envs, config, *, encoder = "levjepa-tiny"))]
     fn new(
         encoder_checkpoint: &str,
         num_envs: usize,
@@ -34,11 +34,6 @@ impl PyVectorAgent {
         encoder: &str,
     ) -> PyResult<Self> {
         let kind = parse_perception_kind(encoder)?;
-        if kind == PerceptionKind::DinoV3 {
-            return Err(PyValueError::new_err(
-                "vector encoder requires levjepa or levjepa-tiny",
-            ));
-        }
         if num_envs == 0 {
             return Err(PyValueError::new_err("num_envs must be positive"));
         }

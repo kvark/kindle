@@ -21,7 +21,7 @@ def test_pinned_baseline_and_d3_defaults() -> None:
     assert config["behavior_learning_rate"] is None
     assert config["actor_learning_starts"] == 0
     assert config["dynamics_free_nats"] is None
-    assert kindle.DINO_MODEL_ID.startswith("facebook/dinov3-vits16")
+    assert not hasattr(kindle, "DINO_MODEL_ID")
 
 
 def test_unknown_size_is_rejected() -> None:
@@ -70,5 +70,5 @@ def test_encoder_selection_is_explicit_and_rejects_typos_before_gpu() -> None:
     assert hasattr(kindle._native.LeVJepaPerception, "architecture")
     assert hasattr(kindle._native.LeVJepaPerception, "encoding_revision")
     assert hasattr(kindle._native.LeVJepaPerception, "gpu_memory_budget")
-    with pytest.raises(ValueError, match="encoder must be dinov3 or levjepa"):
+    with pytest.raises(ValueError, match="encoder must be levjepa"):
         kindle.Agent("unused", 18, encoder="lev-jepa?")

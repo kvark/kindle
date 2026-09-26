@@ -5,9 +5,9 @@
 Kindle is an experimental Rust agent that learns while acting. It combines a
 Dreamer recurrent world model and imagined actor/critic with frozen causal
 LeVJEPA perception, using [Meganeura](https://github.com/kvark/meganeura) and
-[Blade](https://github.com/kvark/blade) for native GPU computation. DINOv3 remains
-an explicit control. Python supplies environment adapters and analysis, not a
-second learner.
+[Blade](https://github.com/kvark/blade) for native GPU computation. The obsolete
+DINO implementation has been removed. Python supplies environment adapters and
+analysis, not a second learner.
 
 Six Atari streams share batched inference and one learner, with independent
 causal histories. This is not yet a general gameplay policy; the
@@ -28,7 +28,7 @@ replay, 15-step imagination, a two-hot critic and LaProp/AGC optimizer ordering.
 
 LeVJEPA consumes each arrival through bounded 16-frame causal chunk prefixes,
 projected to 7×7×64 features. Chunk boundaries reset perception only; episode
-boundaries also reset recurrent belief. Its 303M pretrained encoder is frozen.
+boundaries also reset recurrent belief. Its 5.49M Tiny encoder is frozen.
 The selected 12M learner uses F32, full BPTT64 and replay ratio 256. Library
 defaults still use BPTT 8 / ratio 32; pass experiment settings explicitly.
 
@@ -40,9 +40,9 @@ defaults still use BPTT 8 / ratio 32; pass experiment settings explicitly.
 
 A zero scale removes that head. Future targets are stop-gradient frozen features;
 reset observations are not predictable transitions. Row microbatching accumulates
-gradients before one update, without truncating recurrence. A bounded visitation
-bonus is available behind a separate intrinsic-reward channel and is off by
-default; it is not a demonstrated solution to sparse-reward exploration.
+gradients before one update, without truncating recurrence. Adapters can supply
+a separate intrinsic-reward channel; the old CPU hash-visitation experiment is
+not part of GPU collection. Intrinsic exploration remains unproven.
 
 ## Build and weights
 
@@ -58,25 +58,24 @@ cd python
 maturin develop --release --extras test,atari
 ```
 
-Weights are separately licensed and not committed:
+The default frontend is **causal ViT-Tiny/16, 5.49M parameters**, independently
+pretrained on video, not truncated Large weights. The current exported checkpoint
+and pretraining recipe are linked from [the plan](docs/kindle_single_life_dreamer_plan.md).
+Both Python agents and Rust constructors select Tiny. `encoder="levjepa"` is an
+explicit Large control using separately licensed
+[LeVJEPA-VideoMix-Large](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)
+weights (CC-BY-NC-4.0). Restore checks architecture, encoding semantics and weights;
+backend revision fields record provenance rather than forbidding backend updates.
+On multi-adapter hosts, set `MEGANEURA_DEVICE_ID` and check the executing device.
 
-- LeVJEPA: [galilai-group/LeVJEPA-VideoMix-Large](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large),
-  snapshot `e831a0347737fcaa660b39c57d41c109de399845`, CC-BY-NC-4.0.
-- DINO: [facebook/dinov3-vits16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m),
-  snapshot `114c1379950215c8b35dfcd4e90a5c251dde0d32`; see its model license.
-
-Select the single-agent frontend with `encoder="levjepa"` in Python,
-`--encoder levjepa` in `atari.py`, or `DreamerAgent::with_perception` in Rust.
-The vector runner uses LeVJEPA. On multi-adapter hosts, set `MEGANEURA_DEVICE_ID`
-and check the reported executing device. Current experiments require the exact
-declared source-matched package; a checkout is not the identity of an old binary.
-
-The compact causal-video encoder is **ViT-Tiny/16, 5.49M parameters**. Opt in with
-`encoder="levjepa-tiny"` in Python agents or `--encoder levjepa-tiny` in the vector
-runner, using an exported Tiny checkpoint—not the Large weights. Restore selects
-the recorded architecture and verifies the weight hash. Large remains the fresh
-default. Native pretraining and the first candidate's results are linked from
-[the PR status](https://github.com/kvark/kindle/pull/29); mixed motion-probe results still require downstream testing.
+The single and vector actors share one GPU path: raw pixels -> preprocessing ->
+causal encoder -> pooling -> RSSM -> categorical policy sampling. Only selected
+actions are read back during acting. Replay collection stays on GPU; sampled
+training batches still cross the learner's existing host target-building path.
+Explicit probes and checkpoints may read back data. Linux Vulkan capture uses
+`CaptureStream` with Dullahan's fenced external-memory handoff; see
+[the native vkQuake example](kindle-gym/examples/vkquake_gpu.rs). Legacy SHM ready
+flags are not accepted as GPU synchronization.
 
 ## Acting, learning and evaluation
 
@@ -118,8 +117,9 @@ and `run_upstream_control.py` for the pinned upstream comparison. Use `--help`.
 
 Checkpoints contain world/behavior parameters, optimizer moments, slow critic,
 configuration, counters, normalizers and backend/frontend identity. Format 3
-restore checks actual encoder bytes and complete tensors. Old checkpoints need
-their original executable; never edit provenance to make a restore pass.
+restore checks actual encoder bytes and complete tensors. Backend revisions are
+recorded provenance, not restore gates. There is no compatibility or migration
+layer for obsolete encoding semantics; historical results remain historical.
 
 Replay, exact RNG, scheduler credit and live environment/belief are absent.
 Restore is recovery into a fresh data segment, **not equivalent interrupted
@@ -144,8 +144,9 @@ python -m pytest python/tests -q
 ```
 
 Native GPU tests are explicitly ignored in ordinary unit testing; run declared
-hardware checks serially. Actual learning stays on the GPU. **NVML is temporarily
-disabled** on the development host; see the incident runbook before GPU work.
+hardware checks serially. Learning kernels run on GPU. Separate NVML polling is
+temporarily disabled on the development host; see the incident runbook before
+GPU work.
 
 `LearnReport.timing` separates replay, posterior, imagination, training and
 synchronization wall time. `dreamer_canary` isolates learner work and exposes

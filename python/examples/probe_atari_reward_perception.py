@@ -1,9 +1,9 @@
-"""Probe whether frozen DINO features retain Atari reward events.
+"""Probe whether frozen causal LeVJEPA-Tiny features retain Atari reward events.
 
 The probe collects independent random trajectories for two training seeds, one
 validation seed, and one held-out test seed. Every nonzero-reward frame is kept
 along with a deterministic sample of zero-reward frames. Ridge probes compare
-raw 64x64 RGB, projected 14x14 DINO patches, and Kindle's pooled 7x7 input.
+native RGB, projected 14x14 patches, and Kindle's pooled 7x7 input.
 """
 
 from __future__ import annotations
@@ -51,6 +51,8 @@ def collect_split(
         max_episode_frames=protocol.max_episode_frames,
     )
     frame, _ = environment.reset(seed=seed)
+    encoder.reset()
+    encoder.encode(frame)
     actions = random.Random(seed ^ 0xD1_30_A7A2)
     zero_selection = random.Random(seed ^ 0xA7A2_D1_30)
     features: dict[str, list[np.ndarray]] = {
@@ -63,8 +65,8 @@ def collect_split(
             action = actions.randrange(environment.action_space.n)
             frame, reward, terminated, truncated, _ = environment.step(action)
             reward = float(reward)
+            projected, pooled = encoder.encode(frame)
             if reward != 0.0 or zero_selection.random() < zero_keep_probability:
-                projected, pooled = encoder.encode(frame)
                 features["rgb64"].append(
                     np.asarray(frame, dtype=np.float32).reshape(-1) / 255.0
                 )
@@ -84,6 +86,8 @@ def collect_split(
                 )
             if terminated or truncated:
                 frame, _ = environment.reset()
+                encoder.reset()
+                encoder.encode(frame)
     finally:
         environment.close()
 
@@ -197,7 +201,7 @@ def evaluate_representation(
 def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
-    parser.add_argument("dino_checkpoint")
+    parser.add_argument("encoder_checkpoint")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--decisions-per-seed", type=int, default=5_000)
     parser.add_argument("--seeds", type=int, nargs=4, default=(10, 11, 12, 13))
@@ -205,20 +209,15 @@ def main() -> None:
         "--atari-protocol", choices=tuple(ATARI_PROTOCOLS), default="published"
     )
     parser.add_argument("--zero-keep-probability", type=float, default=0.05)
-    parser.add_argument("--dino-plan-cache")
+    parser.add_argument("--encoder-plan-cache")
     parser.add_argument("--output")
     args = parser.parse_args()
     if args.decisions_per_seed <= 0:
         parser.error("--decisions-per-seed must be positive")
     if not 0.0 < args.zero_keep_probability <= 1.0:
         parser.error("--zero-keep-probability must be in (0, 1]")
-    if not hasattr(_native, "DinoPerception"):
-        parser.error("rebuild the Kindle extension to enable the DINO probe")
-
-    encoder = _native.DinoPerception(
-        args.dino_checkpoint,
-        dino_plan_cache=args.dino_plan_cache,
-    )
+    encoder = _native.LeVJepaPerception(args.encoder_checkpoint, args.encoder_plan_cache,
+                                       architecture="tiny")
     splits = [
         collect_split(
             encoder,

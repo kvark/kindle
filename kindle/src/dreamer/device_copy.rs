@@ -66,6 +66,33 @@ impl DeviceCopies {
                 (source_buffer, target_buffer, bytes)
             })
             .collect();
+        self.copy_regions(&regions);
+    }
+
+    /// The caller owns all same-context buffers through completion. Check the
+    /// physical extents before recording; source and target may not overlap.
+    pub fn copy_regions(
+        &mut self,
+        regions: &[(
+            blade_graphics::BufferPiece,
+            blade_graphics::BufferPiece,
+            usize,
+        )],
+    ) {
+        for &(source, target, bytes) in regions {
+            assert!(
+                source
+                    .offset
+                    .checked_add(bytes as u64)
+                    .is_some_and(|end| end <= source.buffer.size())
+            );
+            assert!(
+                target
+                    .offset
+                    .checked_add(bytes as u64)
+                    .is_some_and(|end| end <= target.buffer.size())
+            );
+        }
         if regions.is_empty() {
             return;
         }
@@ -73,14 +100,14 @@ impl DeviceCopies {
         self.encoder.start();
         {
             let mut transfer = self.encoder.transfer("kindle_device_copy");
-            for (source, target, bytes) in regions {
+            for &(source, target, bytes) in regions {
                 transfer.copy_buffer_to_buffer(source, target, bytes as u64);
             }
         }
         self.completion = Some(self.gpu.submit(&mut self.encoder));
     }
 
-    fn wait(&mut self) {
+    pub fn wait(&mut self) {
         if let Some(completion) = self.completion.take() {
             assert!(
                 self.gpu

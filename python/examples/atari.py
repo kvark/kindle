@@ -185,8 +185,8 @@ def main() -> None:
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
     parser.add_argument("encoder_checkpoint")
-    parser.add_argument("--encoder", choices=("dinov3", "levjepa"), default=None,
-                        help="fresh-run frontend (default: dinov3); restore reads its saved identity")
+    parser.add_argument("--encoder", choices=("levjepa-tiny", "levjepa"), default=None,
+                        help="fresh-run frontend (default: levjepa-tiny); restore reads its saved identity")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=0)
@@ -204,7 +204,7 @@ def main() -> None:
     parser.add_argument(
         "--observation-decoder-depth",
         type=int,
-        help="per-patch DINO decoder width (default: 64; 0 restores legacy preset width)",
+        help="per-patch feature decoder width (default: 64; 0 restores legacy preset width)",
     )
     parser.add_argument(
         "--train-ratio",
@@ -265,7 +265,7 @@ def main() -> None:
         "--reconstruction-loss-scale",
         type=float,
         default=FEATURE_RECONSTRUCTION_SCALE,
-        help="frozen-DINO scale calibrated to D3's summed-pixel loss magnitude",
+        help="frozen-feature scale calibrated to D3's summed-pixel loss magnitude",
     )
     parser.add_argument(
         "--replay-value-gradient",
@@ -398,7 +398,7 @@ def main() -> None:
         agent = kindle.Agent(
             args.encoder_checkpoint,
             action_count,
-            encoder=args.encoder or "dinov3",
+            encoder=args.encoder or "levjepa-tiny",
             model_size=args.model_size,
             observation_decoder_depth=args.observation_decoder_depth,
             seed=args.seed,

@@ -57,6 +57,12 @@ jobs:
           vision::preprocess_gpu::tests::gpu_pixels_match_cpu_reference_and_resident_buffers
           -- --exact --ignored --test-threads=1
 
+      - name: GPU acting, masks, independent streams and replay parity
+        if: runner.os == 'Linux'
+        run: >-
+          cargo test -p kindle --lib dreamer::agent::vector::tests::
+          -- --ignored --test-threads=1
+
       - uses: actions/setup-python@v5
         if: runner.os == 'Linux'
         with:

@@ -3,7 +3,7 @@
 //! Dreamer learning with causal feature prediction and native visual perception.
 //!
 //! One shared learner can collect independent environments through batched
-//! LeVJEPA inference. The single-stream DINOv3 path remains a measured control.
+//! LeVJEPA inference with independent per-stream histories.
 //! Environment types, configuration, metrics and encoder boundaries stay explicit.
 
 pub mod dreamer;
