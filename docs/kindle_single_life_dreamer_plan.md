@@ -147,6 +147,10 @@ robustness under a changed protocol.
    Start with a bounded sanity run that counts actual actions/updates and checks
    finite learning/device/memory. Resolve the remaining protocol differences
    before presenting it as a matched architecture comparison.
+   That [sanity run now passes](experiments/2026-09-26-upstream-control-protocol.md#completed-gpu-sanity-check):
+   5,990 actions/1,149 updates, all saved values finite and dynamics weights
+   changed, in290.04s including compilation. It verifies the upstream GPU path,
+   not Pong competence, comparative throughput or a JEPA efficiency advantage.
    Native GPU optimization can proceed separately while this is prepared;
    do not replace the control with CPU learning or imply a JEPA advantage.
 5. **Reduce measured learner overhead.** The adopted four-submission package
@@ -161,9 +165,11 @@ robustness under a changed protocol.
    GPU preprocessing now has [kernel and full-Tiny checks](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md):
    native raw-byte upload or resident RGB/RGBA/BGRA -> one Blade pass -> encoder
    patches. Encoding v2 removes intermediate RGB8 quantization and uses exact
-   normalized-zero padding. V1 checkpoints need their pinned package. Gameplay/
-   restore qualification and end-to-end timing remain separate; no speedup is
-   claimed yet. External capture import and projected-feature readbacks remain.
+   normalized-zero padding. V1 checkpoints need their pinned package. New native
+   bfcb5cec passes N6 training/frozen/sticky restore with exact saved-state and
+   full replay checks; CI181 is green. End-to-end timing remains separate; no
+   speedup is claimed yet. External capture import and projected-feature
+   readbacks remain. Do not silently mix v1/v2 in a learning campaign.
 6. **Then change perception or learning, one variable at a time.** Neither the
    [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
    nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)

@@ -1,8 +1,11 @@
 # GPU operation and incident response
 
-Use the GPU for learning and inference. On driver **580.178.04**, the user has
-temporarily prohibited **all NVML calls**: no `nvidia-smi`, bindings, legacy health
-logger, recovery-action polling or vendor diagnostic tools. No CPU learning fallback.
+Use the GPU for learning and inference on driver **580.178.04**. The September26
+user direction permits normal JAX/CUDA initialization, including its internal
+NVML calls, for the bounded Dreamer control. The earlier blanket restriction
+does not require an NVML-free backend fork. Separate `nvidia-smi`/binding polling,
+legacy health loggers and vendor diagnostics remain off for current declarations.
+No CPU learning fallback. The retained incidents never established NVML causality.
 
 ## Bounded execution
 
