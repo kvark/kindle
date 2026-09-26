@@ -60,7 +60,7 @@ Full multi-stream evaluations determine results.
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
-| Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Fresh matched four/eighteen-action comparison is running on the adopted runtime; historical Large four-action arm stays held. No pretraining benefit demonstrated in one seed. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
+| Breakout | Latest four-action Tiny: mean10.9167 versus .875 control, 0/24 two-wall completions. Historical eighteen-action Tiny/Large means10.9167/30.7917 also fail; no demonstrated pretraining benefit in one seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. The fresh matched eighteen-action arm is running; older backend results cannot settle action-width effects. Historical Large four-action arm stays held. | [Latest four-action report/videos](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md), [historical Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
 | Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; inspect early hazards and later progression. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
@@ -91,13 +91,18 @@ primary; do not select the better-looking midpoint or relax the gate.
    keeps trained causal Tiny7fe9, native b00ce7be, seed0 and 200,004 actions /
    49,652 updates per arm fixed. Latest four-action gradients and
    [exact N6 repeat/restore/replay checks](../runs/breakout-width-latest-pixels-20260926.idNbRS/results.md)
-   pass. Four-action training is running; review it before frozen evaluation
-   and a restored untrained control, then complete the eighteen-action arm.
+   pass. The [complete four-action pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md)
+   fails: mean10.9167 versus .875 control, both0/24 two-wall completions.
+   Eighteen-action training is running; review it before frozen evaluation
+   and a restored untrained control, then compare both complete arms.
    Preserve the old hold and all original competence gates. Qbert's
    [retained episode analysis](../runs/qbert-tail-analysis-20260926.m0P7ZI/results.md)
    finds a16,850 median but five early first-pyramid failures and a later8–9k
-   plateau. Inspect hazards and reward/continuation forecasts before another
-   budget increase. Retain every episode and the original mean/success gates;
+   plateau. [Exact life-event replay](../runs/qbert-life-events-20260926.5rlCmF/results.md)
+   locates repeated zero-progress deaths and two inspected edge falls; most
+   lost lives are nonterminal. Inspect prior reward/continuation/value forecasts
+   and actor alignment before another budget increase. Retain every episode and
+   the original mean/success gates;
    change one scientific variable at a time.
 3. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
    fixed final-policy gate and a restored untrained control. Do not replicate

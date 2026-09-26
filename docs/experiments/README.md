@@ -71,8 +71,10 @@ The fresh [Tiny four/eighteen-action comparison](../../runs/breakout-minimal-com
 uses the adopted b00ce7be runtime and trained Tiny7fe9, with 200,004 actions /
 49,652 updates per arm. [Latest four-action gradients](../../runs/breakout-width-latest-gpu-20260926.VG1oDc/results.md)
 and [exact pixel repeat/restore/replays](../../runs/breakout-width-latest-pixels-20260926.idNbRS/results.md)
-pass; 34 CPU campaign checks pass. Four-action training started September26
-at09:10 UTC. Frozen final/control phases and the fresh eighteen-action arm follow
+pass; 34 CPU campaign checks pass. The [complete four-action pair](../../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/results.md)
+fails its game gate: mean10.9167 versus .875 control, both0/24 two-wall completions.
+Training/state/own-initial/frozen/replay/video checks pass. Fresh eighteen-action
+training started September26 at12:49 UTC; its frozen final/control phases follow
 only after individual review. One paired seed is not three-root reliability;
 the old Large four-action hold and two-wall competence gate remain unchanged.
 
