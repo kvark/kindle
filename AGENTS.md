@@ -56,8 +56,13 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Qbert's completed R64 3.2M pair in `runs/qbert-r64-3m2-20260925.FrriIH` scores
   22/27 pyramids and mean 12,595.37: both final gates fail. Do not promote the
   midpoint. `runs/qbert-tail-analysis-20260926.m0P7ZI/results.md` locates five
-  early failures and a later 8–9k plateau despite a 16,850 median. Diagnose
-  hazards/forecasts before another budget increase; retain every episode/gate.
+  early failures and a later 8–9k plateau despite a 16,850 median. Exact CPU
+  life-event replay in `runs/qbert-life-events-20260926.5rlCmF/results.md` finds
+  repeated zero-progress deaths and two inspected edge falls. Most life losses
+  are not terminals. The historical-checkpoint strict forecast probe is CPU-ready
+  in `runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb`, not GPU-declared; preserve
+  ACLJca's lazy-import preparation failure. Diagnose reward/value/policy alignment
+  as well as continuation before another budget increase. Keep every episode/gate.
 - Throughput qualification is complete. Current production is native
   `b00ce7be` / Meganeura `ee3aea42` / Blade `fbb4f28c`, the exact five-file
   production delta from `30bfa1a`, adopted without rebuilding its package.
@@ -90,9 +95,11 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   `runs/breakout-minimal-comparison-20260926.xsQCaK`: four versus eighteen actions,
   fixed Tiny7fe9/native b00ce7be, seed0, 200,004 actions /49,652 updates each.
   Latest four-action gradients and exact N6 repeat/restore/replay checks pass.
-  Four-action training started September26 at09:10 UTC; review its complete
-  result before frozen evaluation and restored untrained control, then the
-  eighteen-action arm. Both arms remain required even if the first fails.
+  The complete four-action pair fails: trained mean10.9167 versus .875 control,
+  both0/24 two-wall completions; all full-state/initial/replay/video checks pass.
+  Its report is `a4/results.md`. Eighteen-action training started September26
+  at12:49 UTC; review its full result before frozen evaluation and control.
+  Both arms remain required even though the first fails.
   Preserve zero-update initial snapshots, every episode, full state/replays and
   the original two-wall gate. Each GPU phase is individually reviewed; no queue.
 - Next, complete that comparison and Qbert failure diagnostics.
