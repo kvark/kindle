@@ -245,13 +245,28 @@ adapters, controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Fresh `runs/qbert-r64-3m2-20260925.FrriIH` tests only doubled exposure at R64:
   3,200,064 actions/199,917 updates,immutable1,600,032/3,200,064 checkpoints,
   same nativea761ee5c,Tiny7fe9b252,seed0 and full gate. Twenty-six CPU checks pass;
-  GPU training starts September25 at06:46 UTC. The30h guard bounds an estimated
-  18.7h run. No equivalent warm resume: checkpoints omit replay/live belief/RNG.
-  Its seven-test CPU completion helper audits/replays only; no GPU successors.
-  The06:37 upstream check finds0dbfcc00 (optimizer
-  arenas/batching,egglog3,Windows GEMV); Blade staysfbb4f28c. Retain qualified9746
-  for this one-variable learning comparison; the substantial new runtime rewrite
-  needs a separate later qualification. Do not call9746 latest or silently switch.
+  All five phases now complete: training18.799h,3.151x aggregate/.525x per-stream
+  realtime; midpoint24/24 pyramids/mean8,673.96,primary final22/27/12,595.37,
+  control0/24/120.83. Final fails both90% pyramids and15,000 mean. Full241-entry/
+  146-moment states,exact prior initial state,all3.2M training actions and frozen
+  replays/decoded videos pass,zero frozen updates/cutoffs. All guards and CPU
+  writers are terminal; preserve them. No confirmation roots or budget doubling.
+  No equivalent warm resume: checkpoints omit replay/live belief/RNG.
+  September26 user priority is throughput before another long learner root.
+  Isolated4c988a0 in `runs/meganeura-optimizer-20260926.TfWlJI` stages current
+  Meganeura0dbfcc00 (optimizer arenas/batching,egglog3,Windows GEMV),sameBladefbb.
+  CPU preparation and source audit are not qualification. Preserve the original
+  packaging PATH failure; the separate completion keeps its evidence unchanged.
+  Require independent optimizer references,full world/behavior gradients,Tiny/
+  Large compatibility,state/moments/restore,pixels and untraced matched timing
+  before adoption. Main and completed packages remain9746. Then separately
+  profile the complete learner with Vulkan timestamps and test GPU-resident
+  synchronization. Existing profiles disable optimizers and are insufficient.
+  Measured3.2M wall costs:74.19% learning,22.77% observation,2.24% environment;
+  mean update251.00ms includes20.90ms GPU->CPU->GPU parameter sync. Six environments
+  already batch inference; trainingB16/T64 imagines1024 starts. The95 posterior/
+  imagination readback batches per update include computation waits,not measured
+  idle time. No NVML,concurrent learner service or undeclared recipe change.
   Declare/review every phase separately. Never mix backends within a campaign.
   Do not replicate unchanged failed
   recipes merely to occupy the GPU. Reuse the prepared fixtures and CPU evidence;

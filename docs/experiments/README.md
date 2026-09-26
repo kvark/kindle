@@ -124,8 +124,15 @@ The completed [R64/exposure pair](../../runs/qbert-replay-exposure-20260924.AEyD
 keeps that package fixed: matched400k scores1/24 pyramids,mean1,139.58; primary1.6M
 scores24/24,mean8,673.96; untrained0/24,mean120.83. Full state/replays/videos pass,
 but the15,000 score gate still fails. Training takes9.368h at3.161x aggregate
-realtime,not throughput parity. A fresh [3.2M exposure-only trial](../../runs/qbert-r64-3m2-20260925.FrriIH/README.md)
-is running with the same R64 recipe and unchanged gates; confirmation remains pending.
+realtime,not throughput parity. The completed [3.2M exposure-only pair](../../runs/qbert-r64-3m2-20260925.FrriIH/results.md)
+keeps that R64 recipe: midpoint24/24 pyramids/mean8,673.96,primary final22/27/
+12,595.37,control0/24/120.83. All state/replay/video checks pass,zero frozen
+updates/cutoffs. Training takes18.799h at3.151x aggregate/.525x per-stream realtime.
+The final fails both fixed thresholds; more exposure does not establish reliability.
+The separate [optimizer-throughput preparation](../../runs/meganeura-optimizer-20260926.TfWlJI/README.md)
+stages current0dbfcc00 without changing production or completed comparisons.
+Full numerical/restore and matched timing gates precede adoption and further long
+training. Vulkan full-learner profiling follows; NVML remains disabled.
 See the [plan](../kindle_single_life_dreamer_plan.md) and PR dashboard for status.
 
 The historical block backend passes 23 native tests and same-driver complete-state/pixel

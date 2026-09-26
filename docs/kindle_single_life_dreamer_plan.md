@@ -61,7 +61,7 @@ Full multi-stream evaluations determine results.
 | Pong | Three fresh roots 2017/3019/1009 pass: 24/24, 23/24, 24/24 frozen wins; means +20.5417/+17.4583/+20.0833. Controls 0/76 combined; zero updates/cutoffs. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Complete on the fixed recipe; cross-root state/replay/video audit passes. | [2017](../runs/pong-block-confirmation-20260916.rBwdGF/seed2017-evaluation.mp4), [3019](../runs/pong-block-confirmation-20260916.rBwdGF/seed3019-evaluation.mp4), [1009](../runs/pong-block-confirmation-20260916.rBwdGF/seed1009-evaluation.mp4), [controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Pretrained Tiny: mean10.9167 versus .9310 control. Own initial Tiny:12.4583 versus1.10. Large:30.7917 versus .9655. All trained evaluations have0/24 two-wall completions; zero frozen updates/cutoffs. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Inspect forecasts and improve the small-encoder recipe; no pretraining benefit demonstrated in one seed. Four-action arm remains held. | [Pretrained Tiny](../runs/levjepa-tiny-breakout-20260921.ghJPWG/evaluate.mp4), [its control](../runs/levjepa-tiny-breakout-20260921.ghJPWG/untrained.mp4), [pretraining ablation and videos](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Tiny R64 seed0 at1.6M actions:24/24 first pyramids,mean8,673.96 versus0/24 and120.83 control. Matched400k:1/24 and1,139.58; R256 reference16/25 and3,414. Complete state/replay/video checks pass; score gate unmet. | ≥20 episodes, ≥90% first-pyramid completion **and** mean ≥15,000. Fresh fixed3.2M-action R64 exposure trial is running; no confirmation roots before a pass. | [Final](../runs/qbert-replay-exposure-20260924.AEyDRM/seed0/final.mp4), [control](../runs/qbert-replay-exposure-20260924.AEyDRM/seed0/untrained.mp4), [comparison](../runs/qbert-replay-exposure-20260924.AEyDRM/results.md) |
+| Qbert | Completed Tiny R64 seed0: 3.2M final22/27 first pyramids (81.5%), mean12,595.37; 1.6M midpoint24/24, mean8,673.96; control0/24, mean120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; throughput work precedes another learning trial. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
 
 For Breakout/Qbert, a task completed before a later cutoff counts as achieved,
 without relabeling that episode natural. Retain all episodes and partial tails.
@@ -69,132 +69,50 @@ Task observers are post-hoc evaluation, not privileged policy inputs or rewards.
 
 ## Immediate sequence
 
-The [matched Pong campaign](../runs/pong-block-confirmation-20260916.rBwdGF/completed.json)
-is complete. Together with Boxing and the
-[Tiny Freeway confirmation](../runs/tiny-freeway-confirmation-20260922.tij9QW/completed.json),
-this satisfies **three of five** game gates,
-not general Atari competence. Preserve all completed writers and the fixed recipe.
+Boxing, Pong and Freeway satisfy **three of five** game gates. Qbert's completed
+[3.2M R64 pair](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) fails both final
+thresholds: 22/27 first pyramids (81.5%) and mean12,595.37, versus0/24 and120.83
+untrained. Its 1.6M midpoint reaches24/24 and8,673.96. More exposure raises mean
+score but does not reliably complete even the first pyramid. Keep the predeclared
+final primary; do not select the better-looking checkpoint or relax the gate.
 
-1. Preserve the completed [Breakout Large reference](../runs/breakout-action-pilot-20260920.kNeotb/results.md):
-   seed zero, eighteen actions, 200,004 fresh interactions, frozen evaluation,
-   fresh initialization and frozen untrained control. All four phases and their
-   audits complete; the competence gate fails. The [four-action hold](../runs/breakout-action-pilot-20260920.kNeotb/a4-train/HOLD.md)
-   supersedes the unstarted half of the original pilot; do not remove it or
-   claim a complete two-width comparison. All existing runtime checks and fixed
-   inputs remain valid. No repeated qualification for unchanged binaries.
-2. The compact causal-video JEPA candidate is pretrained and its bounded actor
-   integration passes. The [matched-order cost check](../runs/levjepa-tiny-throughput-20260921.cY1QjK/results.md)
-   passes: 26–27% less total time, with exact same-arm state/trace repeats.
-   The [full-budget Tiny comparison](../runs/levjepa-tiny-breakout-20260921.ghJPWG/README.md)
-   completes all phases: 200,004 actions / 49,652 updates in 4.108h, frozen mean
-   10.9167 versus .9310 control, no two-wall completions. Complete state/moments,
-   common initialization and all replays pass. Large's matched-budget mean is
-   30.7917: the smaller package is faster but weaker, not an adopted replacement.
-   The [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
-   completes the same learner seed/budget with Tiny's own original encoder weights:
-   frozen12.4583 versus1.10 control, still no two-wall completion. It shows no
-   pretraining benefit in this pilot; the target remains trained causal-video JEPA.
-   The [15-step world check](../runs/tiny-world-horizon15-20260921.bKmiUF/results.md)
-   now completes with exact one-step overlap: feature/reward forecasts beat their
-   baselines, continuation does not. Four own-policy matches do not explain the
-   score gap. Keep the pretrained Tiny frontend fixed for Freeway confirmation,
-   with native learning, 12M RSSM, R256, feature contract and vocabulary unchanged.
-   Include offline experience; do not infer a capacity limit from different
-   pretrained packages or reliability from one paired seed.
-3. The [fresh-root Tiny Freeway confirmation](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md)
-   passes all three roots1009/2017/3019, after the separate successful seed0 pilot.
-   Each completes400,008 actions/99,652 updates in about8h, retaining200,004
-   midpoints. Training uses probability.5/hold64 assistance; each frozen arm
-   has75,000 unassisted actions. All final policies beat their restored untrained
-   controls. Every midpoint also passes, so extra exposure is not shown necessary.
-   The complete cross-root audit verifies distinct parsed initial weights,
-   zero initial moments and the same recipe/runtime/pretrained encoder. This
-   establishes the declared learner-root gate, not encoder-pretraining reliability,
-   a pure size advantage or superiority to upstream Dreamer.
-   Preserve the [interrupted seed2017 attempt](../runs/freeway-guard-interruption-20260922.2xt6tnn_/README.md)
-   at45,714 actions after loss of its host guard. The user approved one fresh
-   full-budget [replacement](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/results.md);
-   none of the interrupted experience is restored or counted in its budget.
-   All native phases and writers are terminal; only documented readers may be
-   reused. Each new guard is owned by a persistent systemd user service with group cleanup,
-   bounded lifetime and no automatic restart. Keep the qualified package fixed;
-   no rebuild, automatic successor or undeclared retry.
-   The
-   [runner-owned history option](../runs/tiny-checkpoint-history-20260921.kVSoYg/results.md)
-   passes default/history/restore checks with exact full state and trajectories,
-   all-stream replay and 768 Python CPU tests; the native package is unchanged.
-4. The [Tiny Qbert pilot](../runs/tiny-qbert-exposure-20260924.3aGHUA/results.md)
-   completes400,008 uninterrupted actions/99,652 updates in8.283h,unassisted.
-   Final improves substantially over midpoint and the matched untrained control,
-   but fails the full gate. Preserve the complete old-runtime pair,including its
-   explicit midpoint protocol-label reader correction; no native work or gate
-   was changed. Keep the trained Tiny frontend and full Qbert gate. Extra
-   exposure helps within this history,not an independent confirmation; the older
-   Large result is historical context,not a matched arm.
-   Revisit Breakout's prepared four-action comparison if still needed. Confirm
-   successful changed recipes on all three fresh roots with controls.
-   Do not replicate failures merely to keep the device occupied.
-5. Adopt the qualified
-   [September24 upstream correctness refresh](../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md).
-   Meganeura9746c9ac includes relevant BCE/LogSoftmax stability, gradient-buffer
-   protection and RMSNorm fusion fixes missing from gameplay589d73ab, plus
-   parallel AGC. Source applicability is not proof of a historical failure or
-   measured learning improvement. Qbert seed0's fixed-package pair is complete.
-   Candidate8be26783 passes92 Rust/768 Python CPU checks,formatting,Clippy and
-   source/build/wheel/import identity. Its separately guarded
-   [GPU qualification](../runs/meganeura-correctness-gpu-20260924.y1vWOG/results.md)
-   now passes both Tiny frontend checks,eleven independent primitive regressions
-   and the production world/behavior gradient fixtures,with original bounds.
-   The [pixel/state/restore check](../runs/meganeura-correctness-pixels-20260924.u3ISw0/results.md)
-   also passes all241 state entries/146 moments and complete replays/video.
-   [Matched backend timing](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
-   passes:7.5–7.8% less total time,exact same-backend state/trajectory repeats.
-   [Default compatibility](../runs/meganeura-correctness-defaults-20260924.M6s2on/results.md)
-   also passes independent actual LinearNorm/SiLU gradients,Large dense/N6
-   references and combined frozen acting with exact complete state. Adopt only
-   the six-file production delta,byte-identical to the qualified source; reuse
-   nativea761ee5c. No model/loss/encoder changes or native rebuild.
-   Same-backend serial/grouped parity alone can share a compiler bug; these
-   correctness passes still do not establish a cause of historical weak learning.
-   The [fresh backend-only Qbert comparison](../runs/correctness-qbert-comparison-20260924.Q4NZyO/README.md)
-   keeps seed0,trainedTiny7fe9b252,400,008 actions/99,652 updates,the midpoint,
-   frozen evaluations and untrained control fixed. The complete pair now fails:
-   final16/25 pyramids,mean3,414 versus0/24 and120.83 control; midpoint2/24 and1,144.79.
-   Full state,replays,videos and guards pass. The separate eight-test reader
-   completion uses the already-qualified same-backend schema; preserve the
-   original schema-anchor mismatch and absent original pair result. This one
-   seed shows no learning improvement from the fixes,not a general regression.
-6. The [R64/exposure pair](../runs/qbert-replay-exposure-20260924.AEyDRM/results.md)
-   is complete. At matched400,008 actions, R64 is worse than R256 in seed0.
-   The predeclared1,600,032-action final reaches24/24 first pyramids and mean8,673.96,
-   versus0/24 and120.83 untrained, but still fails the15,000 score gate. All state,
-   replays,videos and guards pass. Four times experience at approximately the
-   R256 learner-update budget helps this history; it is not equal wall time,
-   throughput parity or independent-root reliability. Training takes9.368h.
-   Test [doubled exposure at fixed R64](../runs/qbert-r64-3m2-20260925.FrriIH/README.md):
-   fresh seed0,3,200,064 actions/199,917 updates,unchanged runtime/encoder/recipe.
-   Save immutable1.6M/3.2M checkpoints; the final remains primary regardless of
-   midpoint score. Training is running,estimated18.7h with a30h guard. Restart
-   fresh because checkpoints lack replay/live belief/RNG for an equivalent resume.
-   Preserve frozen/control/game gates; no confirmation roots before a pass.
-   The pinned upstream [configuration](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml)
-   uses R256 for Atari100k and R32 for long-budget Atari; R64 is our experiment,
-   not a published guarantee. New upstream0dbfcc00 adds optimizer arenas/batching,
-   egglog3 and Windows GEMV changes. Inspect them separately; retain9746c9ac for
-   this isolated learning comparison. Never silently switch an active run or
-   combine confirmation seeds across backends. Review every GPU successor.
+1. **Throughput before another long learner root.** Qualify current Meganeura
+   0dbfcc00's optimizer arenas/batched dispatches, separately from the adopted
+   9746c9ac control. The [isolated preparation](../runs/meganeura-optimizer-20260926.TfWlJI/README.md)
+   keeps Bladefbb4f28c, causal Tiny7fe9b252 and the full learning recipe fixed.
+   Require independent optimizer references, production world/behavior gradients,
+   Tiny/Large causal/N6 checks, complete state/moments/restore and short pixel
+   integration before matched old/new/new/old timing. CPU builds are preparation,
+   not GPU qualification. Do not silently change completed campaigns.
+2. **Measure the complete learner, then remove measured waste.** Use calibrated
+   Vulkan timestamps with optimizers and transfers included, plus host-stage
+   spans. Do not report old optimizer-free profiles or blocked-readback time as
+   GPU utilization. Separately test GPU-resident parameter synchronization after
+   the upstream-only comparison. Retain full state, gradients, action traces and
+   untraced matched-order measurements; no concurrent learner service.
+3. **Repair the failing game recipes with bounded comparisons.** Keep trained
+   causal Tiny fixed initially. Revisit Breakout's minimal action space with a
+   fresh declaration, preserving the old four-action hold. For Qbert, inspect
+   failure trajectories and reward/continuation forecasts before simply doubling
+   the budget again. Compare one change at a time against its qualified control.
+   Lower replay ratio is a learning tradeoff, not a parity speedup.
+4. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
+   fixed final-policy gate and a restored untrained control. Do not replicate an
+   unchanged failure merely to occupy the device. Native games, transfer and
+   swarms remain downstream of reliable single-actor results.
 
-Pong's fixed recipe is N6, 12M/F32, B16×T64, full BPTT64, world microbatch 16,
-replay ratio 256, learning rate 4e-5 / warmup 1000, AGC .3, reconstruction 0/future .25,
-extrinsic rewards only, no exploration overrides, 400,008 actions. Both frozen
-arms use sampled actions, environment root 100000, four complete episodes per
-stream, hard cap 600,000, zero updates. Cap exhaustion is incomplete, not success.
-Derive update counts from the ledger, not another run's counters.
+Current production is nativea761ee5c / Meganeura9746c9ac / Bladefbb4f28c.
+The [completed correctness refresh](../runs/meganeura-correctness-refresh-20260924.Be6kq9/README.md)
+passes independent references, full gradients/state/restore and default Large
+compatibility. [Matched timing](../runs/meganeura-correctness-timing-20260924.mYGvjj/results.md)
+cuts total time7.5–7.8%; the [paired Qbert control](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md)
+does not improve learning in its one seed. Preserve both findings.
 
-The terminal xPz5ud queue and its reserved output stay untouched. Qualified native
-`886bae68`, Meganeura `589d73ab`, Blade `2accfeee` and adapter `8dc0b98` stay fixed
-for the completed campaign. The default editable extension is historical: select
-the declared source-matched package. Cleanup does not change an active binary.
+All completed writers, failed-reader evidence, interrupted Freeway2017 attempt
+and historical holds remain immutable. Details and checkpoint chronology belong
+in [the experiment index](experiments/README.md), not the active decision list.
+Checkpoints preserve weights/moments, not replay/live belief/RNG; a fresh run is
+required for an equivalent uninterrupted history. Review every GPU successor.
 
 ## Complexity and compute: what to change
 
@@ -238,6 +156,19 @@ Uncapped step-driven playing/learning is supported; current R256 training is not
 super-real-time. Free-running native gameplay without time control is required
 but not validated by Atari. Measure arrival order, observation gaps, executed
 action durations and training debt before introducing concurrency.
+
+The completed3.2M-action R64 trial takes18.799h: **3.151× aggregate / .525×
+per-stream realtime**. Wall time is74.19% learning,22.77% observation and2.24%
+environment stepping. Six environments already use batched encoder/belief/policy
+inference; training batches16×64 replay states and imagines1024 starts for15 steps.
+Serial emulator stepping is not the dominant cost.
+
+Across all199,917 updates, mean learner time is251.00ms: world training86.62ms,
+imagination85.15ms, posterior34.47ms, behavior22.15ms and parameter sync20.90ms.
+Current synchronization reads parameters to CPU and writes inference copies back
+to GPU. Posterior/imagination make95 blocking readback batches per update.
+Neither those waits nor these wall clocks measure GPU idle time or SM occupancy.
+Full-learner Vulkan traces are the next measurement; **NVML stays disabled**.
 
 ### Right-size the causal encoder
 
@@ -363,8 +294,8 @@ Continuation MSE remains worse (.005106 versus .003716). There are only22
 positive rewards and four terminal targets at each horizon, not independent
 new events. Recorded future actions condition these prior forecasts; this is
 not counterfactual or imagined-policy validation. Preserve both terminal checks.
-No current evidence justifies another encoder redesign before fresh-seed
-Freeway confirmation; a continuation ablation remains a distinct later option.
+Freeway confirmation now passes. Qbert/Breakout still need targeted diagnostics;
+a continuation ablation remains separate from throughput qualification.
 
 Pretrained visual weights are supported; a video-dataset world-pretraining
 workflow is not adopted. Start with aligned RGB, executed actions/durations and
