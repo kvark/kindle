@@ -1079,6 +1079,7 @@ name = "kindle"
 version = "0.1.0"
 dependencies = [
  "blade-graphics",
+ "bytemuck",
  "log",
  "meganeura",
  "rand",
