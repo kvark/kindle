@@ -71,11 +71,9 @@ fn main() {
         checkpoint.is_none() || (run_learner && repetitions == 1),
         "saving requires --learn and one repetition"
     );
+    #[cfg(not(feature = "profiler"))]
+    assert!(trace.is_none(), "--trace requires --features profiler");
     if let Some(path) = &trace {
-        assert!(
-            cfg!(feature = "profiler"),
-            "--trace requires --features profiler"
-        );
         assert!(run_learner && repetitions == 1 && profile_directory.is_none());
         assert!(!std::path::Path::new(path).exists(), "trace already exists");
         let options = meganeura::GpuOptions::from_env();
