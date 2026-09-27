@@ -179,3 +179,12 @@ pooling/projection/input change is adopted separately after a learning check.
 Raw preparation: `runs/representation-probes-20260927.POCnif`. Completed results
 will be committed as self-contained JSON + Markdown under `docs/results/`.
 No learning or representation advantage has yet been measured in this phase.
+
+The [four integration smokes](../results/2026-09-27-matched-integration.md)
+now pass: each executes 6,144 actions / 1,186 updates, starts updates at 1,404,
+and finishes with zero debt. Final native checkpoints are finite with nonzero
+world/behavior moments; upstream RSSM/encoder/actor parameters change. Tiny,
+initial Tiny, Large and upstream run at 25.64 / 25.60 / 16.94 / 25.01 actions/s
+over these short, warmup-containing windows. These are not steady-state rates
+or learning results. All direct-child guards pass; no kernel GPU fault. Keep
+the earlier failed carry-layout invocation separate from the passing correction.
