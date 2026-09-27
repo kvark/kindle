@@ -166,16 +166,18 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
    now has 6,144 Pong/Breakout/Seaquest clips, split by whole trajectories.
    Native batched token diagnostics compare identical frames; privileged labels
-   never enter the agent. Full pretrained/initial-Tiny extraction and linear
-   controls complete; Large, the reconstruction CNN and MLP comparisons remain.
-   Probe infrastructure/data collection alone do not close Phase 2.
+   never enter the agent. All five ridge/corrected-MLP controls complete:
+   Large decodes best, Tiny pretraining is mixed, and the 173k reconstruction
+   CNN is competitive enough to justify a joint-trained RGB learning arm.
+   [Full probe results](results/2026-09-27-representation-probes.md) are not RL.
    Held-out motion/
    small-object probes, then a three-seed learning comparison against random
    Tiny and a learned-encoder Dreamer control. Include a title absent from the
    video corpus. Native input is current; RGB64 is an explicit ablation.
-   The matched upstream collector now passes cross-interpreter CPU traces and
-   action/update/cutoff tests; its GPU smoke and 200,004-action-per-seed campaign
-   remain required. The historical ~15.6 versus ~59 actions/s is not a matched
+   Matched upstream/native smokes pass: all four complete 6,144 actions and
+   1,186 updates. Full upstream Pong seed1009 is running; the three-seed,
+   three-game, 200,004-action-per-run comparison remains unfinished.
+   The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.
    If frozen JEPA offers no probe/learning benefit, change the 2D frontend;
    retain JEPA as a testable 3D candidate, not an architectural obligation.

@@ -19,7 +19,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   then matched three-seed learning controls. The protocol is in
   `docs/experiments/2026-09-27-representation-comparison.md`; its offline corpus
   has whole-trajectory splits and privileged RAM labels confined to evaluation.
-  No representation advantage or Phase 2 completion is established yet.
+  Offline ridge/corrected-MLP controls and all four integration smokes complete.
+  Large decodes best; Tiny pretraining is mixed. The conditional joint-trained
+  CNN arm is justified, not yet implemented. Its explicit RGB64 GPU resize is
+  a learned-RGB control, never a return to RGB64-upscaled JEPA. Replay pixels,
+  not stale CNN features. Full matched learning is underway; no gameplay
+  representation advantage or Phase 2 completion is established yet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.

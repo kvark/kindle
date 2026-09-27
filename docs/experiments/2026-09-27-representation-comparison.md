@@ -59,11 +59,11 @@ target-standardized MSE. Both fit only training trajectories, with training-only
 feature/target normalization; neither refits on validation or selects on test.
 Head seeds describe probe-fit variability, not independent RL experiments.
 
-The [linear results](../results/2026-09-27-representation-probes.md) now cover all
-five controls, every target/variant and both held-out trajectories. Trained
+The [complete offline results](../results/2026-09-27-representation-probes.md) cover
+ridge and corrected MLP fits for all five controls, every target/variant and both held-out trajectories. Trained
 versus initial Tiny remains mixed. Large improves primary position/motion
 decoding substantially; the 173k CNN roughly matches Tiny's position decoding
-at much lower capacity. MLP fits and gameplay remain required. Large extraction
+at much lower capacity. Gameplay remains required. Large extraction
 took 4,976.55s versus 678.06/682.03s for trained/initial Tiny; this includes
 offline projection/compression, not isolated actor inference. CNN reconstruction
 completed 16,384 updates in 47.17s, validation MSE 1.68956 -> .00614619,
@@ -91,7 +91,10 @@ normalized inputs to F32 for native learning. This is a numerical correction,
 not a test-selected scale floor, changed fit budget or CPU learner. Preserve the
 original fits; the report reader refuses their missing corrected-normalization
 marker. Ridge already used F64 statistics and is unaffected. Corrected MLP
-outputs use fresh `*-mlp-f64` directories.
+outputs use fresh `*-mlp-f64` directories; all five now complete. Even corrected,
+the fixed-budget MLP generalizes poorly, especially on raw pixels. The ridge
+positive control decodes positions from the same inputs; MLP failure is not
+evidence that pixels lack the target information. Do not tune again on test scores.
 The [normalization report](../results/2026-09-27-probe-normalization.md) records
 the training-only diagnosis and all five superseded result identities.
 
@@ -131,7 +134,14 @@ only trained versus initial Tiny isolates that pretraining intervention.
 
 Pong, Breakout and Seaquest; learner seeds **1009/2017/3019** per variant. Include upstream
 DreamerV3 12M, Kindle Large, pretrained Tiny and initial Tiny, plus a jointly
-learned CNN if the offline comparison supports it. Fix the budget before the
+learned CNN: its competitive position probes justify this conditional arm.
+The online CNN starts fresh, not from the offline reconstruction checkpoint.
+It will use one explicitly declared native-to-RGB64 GPU resize, with no upscale
+back to 224. This is a learned-RGB research control, not a downgrade of the
+native-detail JEPA path. Replay must store pixels and re-encode them with current
+weights; stale frozen feature replay is not joint learning. Record the final CNN
+recipe and pass its integration smoke before launching that arm.
+Fix the budget before the
 first RL launch: **200,004 actual actions** per run (the nearest full N6 batch
 above the 200k reference), B16/T64/context1/full BPTT/H15/R256, F32, lr4e-5,
 warmup1000, AGC .3. Six independent environments use seeds
@@ -168,8 +178,11 @@ bootstrap resamples (RNG seed0). Interpolate wall-time curves only inside common
 measured support; do not extrapolate slow runs or fill absent early episodes
 with zero. Initial policy/encoder compilation and final checkpoint writes count
 in run time; report agent construction separately. The shared reader is
-`python/examples/summarize_representation_learning.py`. No full learning run
-has begun at this reporting declaration.
+`python/examples/summarize_representation_learning.py`.
+The first full run, upstream Pong seed1009, is now declared and launched in
+`/mnt/data/kindle-representation-learning-20260927.I1MQPA`. It retains this
+200,004-action protocol. The other arms are not yet launched. No local compilation
+overlaps its timing; final checkpoints/logs use this task-specific NAS directory.
 
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise
