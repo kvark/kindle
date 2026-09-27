@@ -230,7 +230,9 @@ retains all 100 completed episodes and unfinished tails. Matched pretrained
 Tiny seed1009 also completes, with the same action/update counts, finite state
 and a passing guard: 9,990.64s, last-50 score -17.34. This first paired seed
 favors upstream at nearly equal throughput, not a multi-seed frontend decision.
-The initial-Tiny control follows; other methods, seeds and games remain required.
+Initial Tiny also completes at the same budget: 9,969.86s, last-50 score -14.28,
+with finite state and a passing guard. This seed does not show a pretraining
+benefit; other methods, seeds and games remain required before deciding.
 Its `learning-remainder.json` declares the other 44 entries behind positive
 completion of both the active native guard and its controller. The complete
 matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
