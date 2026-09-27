@@ -32,7 +32,8 @@ use super::intrinsic::{VisitationBonus, VisitationState};
 use super::readback::Readback;
 use super::replay::{FrameFlags, ReplayFrame, Reward, SequenceBatch, SequenceReplay};
 use super::runtime::{
-    build_session, configure_d3_optimizer, ema_matching, initialize_d3, sync_matching,
+    build_session, configure_d3_optimizer, ema_matching, initialize_d3, share_matching,
+    sync_matching, sync_matching_many,
 };
 use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
@@ -454,12 +455,12 @@ impl DreamerCore {
             &mut world_heads,
             &mut world_heads_live,
         ] {
-            sync_matching(&world_train, target, "world.");
+            share_matching(&mut world_train, target, "world.");
         }
-        sync_matching(&behavior_train, &mut behavior_online, "behavior.");
+        share_matching(&mut behavior_train, &mut behavior_online, "behavior.");
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
-        sync_matching(&behavior_train, &mut policy_live, "behavior.actor.");
-        sync_matching(&behavior_train, &mut world_train, "behavior.value.");
+        share_matching(&mut behavior_train, &mut policy_live, "behavior.actor.");
+        share_matching(&mut behavior_train, &mut world_train, "behavior.value.");
         world_train.set_submission_chunks(4);
 
         let size = config.network();
@@ -839,7 +840,7 @@ impl DreamerCore {
         }
         let graph = world::build_observation_prediction_graph(&self.config, 1);
         let mut decoder = build_session(&graph, &self.gpu, Mode::Inference, false);
-        sync_matching(&self.world_train, &mut decoder, "world.");
+        share_matching(&mut self.world_train, &mut decoder, "world.");
         self.world_prediction_live = Some(decoder);
     }
 
@@ -849,7 +850,7 @@ impl DreamerCore {
         }
         let graph = behavior::build_value_inference_graph(&self.config, 1);
         let mut value = build_session(&graph, &self.gpu, Mode::Inference, false);
-        sync_matching(&self.behavior_train, &mut value, "behavior.value.");
+        share_matching(&mut self.behavior_train, &mut value, "behavior.value.");
         self.behavior_value_live = Some(value);
     }
 
@@ -1433,19 +1434,18 @@ impl DreamerCore {
     }
 
     fn sync_world_inference(&mut self) {
-        for target in [
+        let mut targets = vec![
             &mut self.world_observe_batch,
             &mut self.world_observe_live,
             &mut self.world_transition,
             &mut self.world_transition_live,
             &mut self.world_heads,
             &mut self.world_heads_live,
-        ] {
-            sync_matching(&self.world_train, target, "world.");
-        }
+        ];
         if let Some(decoder) = &mut self.world_prediction_live {
-            sync_matching(&self.world_train, decoder, "world.");
+            targets.push(decoder);
         }
+        sync_matching_many(&self.world_train, &mut targets, "world.");
     }
 
     fn imagine_and_target(

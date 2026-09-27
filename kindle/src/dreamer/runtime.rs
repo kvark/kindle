@@ -120,15 +120,71 @@ fn truncated_normal(
 }
 
 pub(crate) fn sync_matching(source: &Session, target: &mut Session, prefix: &str) {
+    sync_matching_many(source, &mut [target], prefix);
+}
+
+/// Share only direct, identically stored weights. Fused parameter images are
+/// separate allocations; keep their inputs private and refresh via set_parameter.
+pub(crate) fn share_matching(source: &mut Session, target: &mut Session, prefix: &str) {
     let names = source
         .param_names()
         .into_iter()
         .filter(|name| name.starts_with(prefix))
-        .filter(|name| source.param_size(name) == target.param_size(name))
+        .map(str::to_owned)
         .collect::<Vec<_>>();
+    for name in names {
+        let (Some(source_buffer), Some(target_buffer)) =
+            (source.param_buffer(&name), target.param_buffer(&name))
+        else {
+            continue;
+        };
+        let source_plan = source.plan();
+        let target_plan = target.plan();
+        let derived = target_plan
+            .derived_params
+            .iter()
+            .any(|(buffer, inputs, _)| {
+                *buffer == target_buffer || inputs.iter().any(|(input, _)| input == &name)
+            });
+        if !derived
+            && source.param_size(&name) == target.param_size(&name)
+            && source_plan.param_types.get(&source_buffer)
+                == target_plan.param_types.get(&target_buffer)
+            && source_plan.weight_buffers.get(&source_buffer)
+                == target_plan.weight_buffers.get(&target_buffer)
+        {
+            target
+                .share_parameter_from(source, &name)
+                .expect("matching parameters must share one GPU context");
+        }
+    }
+    sync_matching(source, target, prefix);
+}
+
+pub(crate) fn sync_matching_many(source: &Session, targets: &mut [&mut Session], prefix: &str) {
+    let names = source
+        .param_names()
+        .into_iter()
+        .filter(|name| name.starts_with(prefix))
+        .filter(|name| {
+            targets.iter().any(|target| {
+                source.param_size(name) == target.param_size(name)
+                    && !target.shares_parameter(source, name)
+            })
+        })
+        .collect::<Vec<_>>();
+    if names.is_empty() {
+        return;
+    }
     let values = source.read_params(&names);
-    for (name, values) in names.into_iter().zip(values) {
-        target.set_parameter(name, &values);
+    for target in targets {
+        for (name, values) in names.iter().zip(&values) {
+            if target.param_size(name) == Some(values.len())
+                && !target.shares_parameter(source, name)
+            {
+                target.set_parameter(name, values);
+            }
+        }
     }
 }
 
@@ -179,6 +235,78 @@ fn d3_learning_rate(learning_rate: f32, warmup: u64, learner_step: u64) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires a GPU"]
+    fn tiny_shared_parameters_preserve_refreshed_inference() {
+        use crate::dreamer::{readback::Readback, world};
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let config = DreamerConfig::tiny(3);
+        let graph = world::build_training_graph(&config, config.world_backprop_length);
+        let mut source = build_session(&graph, &gpu, Mode::Training, false);
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            let device = crate::gpu_device_info(source.device_information());
+            assert!(!device.is_software_emulated);
+            assert_eq!(device.device_name, expected);
+            let memory = gpu.memory_stats();
+            assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        }
+        let inference = world::build_observe_graph(&config, 2);
+        let mut shared = build_session(&inference, &gpu, Mode::Inference, false);
+        let mut control = build_session(&inference, &gpu, Mode::Inference, false);
+        initialize_d3(&mut source, &graph, 7);
+        share_matching(&mut source, &mut shared, "world.");
+        assert!(
+            shared
+                .param_names()
+                .iter()
+                .any(|name| { shared.shares_parameter(&source, name) })
+        );
+        for (derived, inputs, _) in &shared.plan().derived_params {
+            for (name, _) in inputs {
+                assert!(!shared.shares_parameter(&source, name));
+            }
+            for (name, buffer) in &shared.plan().param_buffers {
+                if buffer == derived {
+                    assert!(!shared.shares_parameter(&source, name));
+                }
+            }
+        }
+        let mut readback = Readback::new(gpu);
+        for seed in [7, 19, 37] {
+            shared.wait();
+            control.wait();
+            initialize_d3(&mut source, &graph, seed);
+            sync_matching_many(&source, &mut [&mut shared, &mut control], "world.");
+            let inputs = shared
+                .plan()
+                .input_buffers
+                .iter()
+                .map(|(name, buffer)| (name.clone(), shared.plan().buffers[buffer.0 as usize] / 4))
+                .collect::<Vec<_>>();
+            for (name, count) in inputs {
+                let values = vec![0.125; count];
+                shared.set_input(&name, &values);
+                control.set_input(&name, &values);
+            }
+            shared.step();
+            control.step();
+            for index in 0..shared.num_outputs() {
+                let count = shared
+                    .slot_size(meganeura::ExternalSlot::Output(index))
+                    .unwrap()
+                    / 4;
+                let mut actual = vec![0.0; count];
+                let mut expected = vec![0.0; count];
+                readback.read_many(&mut [
+                    (&shared, index, &mut actual),
+                    (&control, index, &mut expected),
+                ]);
+                assert!(actual.iter().all(|v| v.is_finite()));
+                assert_eq!(actual, expected, "refreshed output {index}, seed {seed}");
+            }
+        }
+    }
 
     #[test]
     fn truncation_is_deterministic_and_bounded() {

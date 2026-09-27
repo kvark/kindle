@@ -5,6 +5,17 @@
 **Code base:** branch `dreamer-jepa-kickoff` (PR #29), head `16afaa7`. All file
 paths below refer to that branch, not `main`.
 
+**Adopted September 27.** Current execution/evidence is maintained in
+[the project roadmap](kindle_single_life_dreamer_plan.md#current-execution-order--strategy-reset)
+and PR #29. Some initial premises below are historical: Tiny is now default,
+native-detail GPU acting/capture is integrated, and sticky Pong fails its
+robustness check. The historical upstream speed numbers are not a reconciled
+comparison. Phase 0 encoder CI/disclosures pass; compact human-normalized data
+is in [docs/results](results/2026-09-27-historical-scores.md). Phase 1a is current.
+The 864-point gate is unsupported at the tested budget, not mathematically
+impossible. Current GPU pixel collection does not support the old host-based
+visitation bonus; any intrinsic mechanism must honor the GPU path.
+
 ## 1. Goal and why the plan changes
 
 Kindle's goal: *learn to play any game by naturally playing with sparse rewards,

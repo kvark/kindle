@@ -80,6 +80,10 @@ fn main() {
     for iteration in 0..repetitions {
         let mut core = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         let device = core.gpu_device();
+        if let Ok(expected) = env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            assert!(!device.is_software_emulated);
+            assert_eq!(device.device_name, expected);
+        }
         eprintln!(
             "iteration {iteration} constructed on {} ({}, {})",
             device.device_name, device.driver_name, device.driver_info
@@ -137,6 +141,9 @@ fn fill_synthetic_replay(core: &mut DreamerCore, config: &DreamerConfig) {
 
 fn report_memory(stage: &str, gpu: &blade_graphics::Context) {
     let stats = gpu.memory_stats();
+    if env::var_os("KINDLE_EXPECT_DEVICE_NAME").is_some() {
+        assert!(stats.budget.saturating_sub(stats.usage) >= 2 << 30);
+    }
     eprintln!(
         "device memory {stage}: usage={} budget={}",
         stats.usage, stats.budget

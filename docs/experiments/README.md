@@ -1,6 +1,9 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+The September 27 strategy reset stops unchanged mastery campaigns. New compact
+results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
+and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 

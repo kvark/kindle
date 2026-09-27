@@ -72,10 +72,15 @@ never update weights. No concurrent learner service is needed for this phase.
 
 ## Current game status
 
-The five-game goal requires each of fresh model roots **1009/2017/3019** to pass
-its final-policy gate and beat a separately restored untrained control. Videos
+The historical five-game campaign required roots **1009/2017/3019** to pass
+their final-policy gates and beat separately restored untrained controls. These
+gates are retained to interpret old results, not as the development queue. Videos
 are whole stream-zero evaluations, including unfinished tails, not selected wins.
 Full multi-stream evaluations determine results.
+
+The [human-normalized snapshot](results/2026-09-27-historical-scores.md)
+publishes raw learner-seed means, score anchors and protocol qualifications in
+compact JSON. It is descriptive historical evidence, not a matched benchmark.
 
 | Game | Measured result | Unchanged gate / next decision | Rollout |
 | --- | --- | --- | --- |
@@ -109,109 +114,82 @@ also passes training, frozen restore and sticky replay with unchanged complete
 state during evaluation. Robust policy results are not established by these
 plumbing checks. The table above is historical RGB64/non-sticky.
 
-## Immediate sequence
+## Current execution order — strategy reset
 
-The user-approved order is evaluation/reporting, synthetic encoder CI, a bounded
-matched Dreamer control, GPU round-trip reduction, then individual perception
-experiments. Keep the historical three-of-five gate results separate from
-robustness under a changed protocol.
+The September 27 user direction adopts
+[strategy_reset_plan.md](strategy_reset_plan.md). This document remains the
+current evidence/roadmap; the strategy proposal records the rationale and phase
+details. The new order supersedes historical queue, package-adoption and
+five-game confirmation work. Do not rerun unchanged failed recipes.
 
-1. **Preserve visual input — implemented and integrated.** Fresh vector runs
-   use native max-pooled RGB, then one aspect-preserving encoder resize. RGB64
-   remains explicit, restore requires choosing its input format, and sticky
-   .25 is opt-in. The [836-test adapter suite](../runs/native-pixel-protocol-cpu-20260926.WNenAu/results.md)
-   and [N6 training/frozen/sticky integration](../runs/native-pixel-integration-20260926.z2mimo/results.md)
-   pass with exact state/replays and unchanged native b00ce7be. This removes the
-   64→224 bottleneck before encoding, not compression inside the encoder.
-   Tiny was pretrained on RGB64; measure the changed input distribution before
-   declaring learning improvement.
-2. **Make evidence reproducible and test robustness.** Assistance, same-title
-   pretraining and deterministic-start limitations are now disclosed. Add
-   separately declared sticky evaluations of the historical final policies,
-   retaining their RGB64 input to isolate environmental stochasticity. Report
-   equal first-N episodes per stream and learner-root uncertainty, alongside all
-   episodes/tails. Publish compact results and selected videos for external
-   reviewers. New outcomes may invalidate broad reliability claims; preserve
-   original cohorts and their gates.
-   The first frozen Pong root1009 completes in
-   `runs/pong-sticky-evaluation-20260926.SxeHCw`: historical Large/runtime/RGB64,
-   .25 sticky, four matches per stream. **2/24 wins, mean−7.1667** fails robust
-   competence; complete state/replay/video verifies. Preserve the old fixed-
-   protocol results with that qualification. Subsequent roots remain undeclared.
-3. **Synthetic encoder CI — passed.** The
-   [full-Tiny fixture](../runs/encoder-ci-20260926.GTcKXz/results.md) passes local
-   dense-reference, projection/pooling, chunk-wrap and batched reset/gap checks.
-   CI generates deterministic untrained weights and an independent dense
-   PyTorch reference; no local pretrained checkpoint is needed. [CI177](https://github.com/kvark/kindle/actions/runs/36261118686)
-   passes the full test on lavapipe, alongside the existing Linux/Metal/binding checks.
-4. **Run a bounded pinned Dreamer12M control.** Match the game, action vocabulary,
-   emulator version, actual interactions, replay settings, precision and N6
-   collection. Keep RGB64 as the explicit historical comparison; native-input
-   JEPA is a separate intervention. Report world/whole-agent cost, memory and
-   learning, including offline pretraining cost. The control must run directly
-   under the host guard with application GPU polling disabled. The [protocol audit](experiments/2026-09-26-upstream-control-protocol.md)
-   finds the old control accidentally retained25% sticky actions. Correcting its
-   initialization and using ALE0.12.1 yields exact20,480-action wrapper parity.
-   The old control is not matched non-sticky evidence. Resolve reset-record
-   accounting and artificial cutoff semantics before claiming equal experience.
-   Stock JAX0.6.2 also invokes NVML inside client initialization. The September26
-   user direction permits that normal initialization; do not fork JAX to avoid it.
-   Start with a bounded sanity run that counts actual actions/updates and checks
-   finite learning/device/memory. Resolve the remaining protocol differences
-   before presenting it as a matched architecture comparison.
-   That [sanity run now passes](experiments/2026-09-26-upstream-control-protocol.md#completed-gpu-sanity-check):
-   5,990 actions/1,149 updates, all saved values finite and dynamics weights
-   changed, in290.04s including compilation. It verifies the upstream GPU path,
-   not Pong competence, comparative throughput or a JEPA efficiency advantage.
-   Native GPU optimization can proceed separately while this is prepared;
-   do not replace the control with CPU learning or imply a JEPA advantage.
-5. **Reduce measured learner overhead.** The adopted four-submission package
-   cuts Atari wall time6.5–6.6%, but only reaches ~1.041× aggregate / .174×
-   per-stream real time at R256. Next target posterior/imagination host
-   readbacks and redundant parameter transfers. Preserve sampling semantics,
-   derived weights, complete state/moments and actions where claiming parity;
-   use untraced matched-order timing. No concurrent learner service.
-   A small isolated candidate in `runs/world-sync-batch-20260926.RzSMMT` batches
-   repeated world-weight downloads while retaining derived-weight updates.
-   Its92 CPU tests/build/fmt/Clippy pass; no GPU result or adoption exists.
-   GPU preprocessing, encoder pooling, live belief, categorical sampling and
-   collection replay are now resident. Single and vector actors use the same
-   implementation, including action masks and independent RNG streams. Real
-   vkQuake capture uses exact Vulkan allocation metadata and completed producer/
-   consumer ownership transfers; it never relies on a CPU-ready flag. The
-   [new report](experiments/2026-09-26-gpu-resident-acting.md) records parity and
-   native integration. V2 preserves F32 interpolation and normalized-zero
-   padding; the old DINO path is removed. Next optimize the still-host-side
-   learner targets/imagination and weight synchronization, measured separately
-   from acting. No end-to-end training speedup is assumed from removed copies.
-6. **Then change perception or learning, one variable at a time.** Neither the
-   [Breakout action-width pair](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md)
-   nor [Qbert's final R64 policy](../runs/qbert-r64-3m2-20260925.FrriIH/results.md)
-   passes its gate. Do not confirm either unchanged failed recipe. The Qbert
-   [forecast probe](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md)
-   misses the terminal and retains high values through a scoreless ending.
-   Its [life-count readout](../runs/qbert-life-representation-20260926.F1lTAq/results.md)
-   is stronger before pooling, but covers phase zero only and uses four times
-   the dimensions. A same-size pooling test needs a separate recording across
-   all chunk phases; never tune on the exposed test split or equate linear
-   decodability with gameplay competence.
-7. **Confirm only a passing recipe.** Fresh roots1009/2017/3019 each need the
-   original final-policy gate and a restored untrained control. Native games,
-   transfer and swarms remain downstream of reliable single-actor results.
+1. **Phase 0: close the reporting gaps.** Assistance and same-title pretraining
+   are disclosed below and in the PR. Synthetic causal Tiny parity runs in CI
+   without pretrained files; Linux/lavapipe, Metal and Python checks pass.
+   Publish compact raw scores, human-normalized values and limitations in
+   `docs/results/`. The old 864-point Breakout requirement is a historical
+   mastery definition, not an appropriate 200k-action development target.
+   There is no evidence that this recipe can reach it at that budget; stop gate
+   runs. This is not a proof that no algorithm could reach it.
+2. **Phase 1a, current: shorten learner iterations without changing learning.**
+   Acting/capture and replay collection are already resident. First share
+   compatible direct parameters and batch remaining derived-weight transfers,
+   comparing complete saved state and update timings with the unchanged
+   implementation. This [first step now passes](results/2026-09-27-shared-parameters.md):
+   227.03 -> 212.78 ms/update (6.28% less time) in one fixed synthetic pair,
+   exact complete state/reports and short N6 Pong integration. This is not
+   sustained game throughput. Keep the EMA critic independent. Next remove recurrent
+   posterior/imagination readbacks using GPU sampling and fused/queued
+   recurrence. Existing CDF sampling may preserve RNG semantics more closely
+   than changing to Gumbel-max; a sampling change is not required for GPU
+   residency. Keep F32, replay ratio, batch/BPTT lengths, objectives and optimizer
+   fixed in each speed comparison. One numerical/learning check plus matched
+   timing suffices for development; no qualification campaign. The 3x update
+   target is an aspiration, not a measured promise.
+3. **Phase 1b: establish a <=1-hour, three-seed screening recipe.** Use a small
+   learner and a fast sparse-reward environment. Assess Craftax interop first;
+   Crafter or MinAtar is an acceptable adapter stopgap, not a CPU learner.
+   Do not combine a new environment, encoder and speed change into one claim.
+   Record curves against actual actions and elapsed time; promote only useful
+   changes to 12M and longer Atari confirmation.
+4. **Phase 2: test whether the representation earns its cost.** Held-out motion/
+   small-object probes, then a three-seed learning comparison against random
+   Tiny and a learned-encoder Dreamer control. Include a title absent from the
+   video corpus. Native input is current; RGB64 is an explicit ablation.
+   The upstream GPU sanity succeeds, but reset/update accounting, replay and
+   cutoff semantics still need reconciliation before a matched efficiency
+   claim. The historical ~15.6 versus ~59 actions/s is not such a comparison.
+   If frozen JEPA offers no probe/learning benefit, change the 2D frontend;
+   retain JEPA as a testable 3D candidate, not an architectural obligation.
+5. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
+   without Freeway's random-action assistance, three learner seeds and curves.
+   Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation
+   experiment is not supported by current pixel collection; do not silently
+   enable it or add host feature readback. Disclose shaped rewards, overrides,
+   privileged reward observers and every pretraining source.
+6. **Phase 4: video priors for dynamics and behavior.** Compare action-free
+   dynamics pretraining, inferred actions and behavior priors at equal online
+   experience; disclose offline cost and target-game exposure.
+7. **Phase 5, later: asynchronous real-time deployment.** Only after the
+   single-actor learner is effective, introduce a separately measured async
+   actor/learner, learner debt and latency percentiles. Native GPU capture
+   already works, but reward/terminal adapters and mind-games controller
+   integration remain. Swarm experience sharing comes after useful real-time
+   single-actor operation, not before it.
 
-The qualified package remains native b00ce7be / Meganeura ee3aea42 / Blade
-fbb4f28c: [pixel/state/restore](../runs/world-chunks-gameplay-20260926.q4iNnd/results.md),
-[runtime compatibility](../runs/chunks-compatibility-20260926.opVUiI/results.md)
-and [matched-order timing](../runs/chunks-atari-timing-20260926.e2OEhn/results.md)
-pass. Reuse it without rebuilding for adapter/test/documentation-only changes.
-Keep the [negative optimizer timing result](../runs/meganeura-optimizer-timing-20260926.A6u3AI/results.md)
-and [negative Qbert correctness-refresh result](../runs/correctness-qbert-comparison-20260924.Q4NZyO/results.md);
-correctness, speed and learning are distinct outcomes.
+Development results use one changed factor, at least three seeds for learning
+comparisons, curves and learner-seed uncertainty (bootstrap intervals/IQM where
+appropriate), not pass/fail mastery gates. Numerical/parity smoke checks are
+not three-seed learning experiments. Each new result gets a compact JSON and
+Markdown summary in `docs/results/`; include configuration, seeds, aids,
+curves when available, and limits. Historical summaries may lack curves; say
+so rather than inventing them. Large raw artifacts remain in `runs/`.
+Keep GPU containment and stop-on-fault rules unchanged.
 
-All completed writers, failed-reader evidence, interrupted Freeway2017 attempt
-and historical holds remain immutable. Checkpoints preserve weights/moments,
-not replay/live belief/RNG. Review each GPU successor individually. Detailed
-chronology belongs in [the experiment index](experiments/README.md).
+The earlier production timing package (b00ce7be / ee3aea42 / fbb4f28c) and its
+6.5–6.6% gain are historical controls, not the current source identity or a
+barrier to new development. Current resident-actor implementation is described
+in the [GPU report](experiments/2026-09-26-gpu-resident-acting.md).
+Preserve old results/failures without recursively revalidating their archives.
 ## Complexity and compute
 
 Dreamer's interacting networks and recurrent learner are real complexity;
@@ -224,7 +202,7 @@ Learning a game is not the same target as mastering it. The
 give a five-seed Breakout score-window mean8.89, far below our two-wall threshold.
 That historical 200M/100k-action online benchmark is not matched to our 12M+Tiny/
 200k-action frozen evaluation. It neither diagnoses JEPA nor predicts the budget
-needed for mastery; retain the stronger gate and test causes rather than assuming
+needed for mastery; retain the historical definition and test causes rather than assuming
 every modest score means an implementation or representation failure.
 
 Report conventional learning curves and human-normalized scores beside mastery.
@@ -302,11 +280,13 @@ width 256 and 32×16 categorical state match
 [DreamerV3's 12M preset](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml);
 its name denotes the whole-agent preset, not the RSSM alone.
 
-Keep **causal ViT-Tiny/16: 12 layers, width 192, three heads, MLP 768,
-5,486,592 encoder parameters**. Preserve 224px inputs, 16-arrival block-causal
+The current reference is **causal ViT-Tiny/16: 12 layers, width 192, three heads,
+MLP 768, 5,486,592 encoder parameters**. Preserve 224px inputs, 16-arrival block-causal
 chunks, independent histories and JL64/2×2 pooling to 7×7×64. Logical F32 KV
 storage is 55.125 MiB per stream versus Large's 588 MiB; these are tensor sizes,
-not measured device peaks. Do not slice Large weights or substitute DINO/RGB.
+not measured device peaks. Do not slice Large weights or silently substitute
+features during a speed comparison. Phase 2 may replace the frozen frontend
+after controlled probes and learning experiments.
 
 The native pretrainer uses multi-view invariance + SIGReg, causal token dropping
 and evaluation EMA, not undisclosed distillation. Preserve token positions in
@@ -331,11 +311,11 @@ and matched cost pass. Freeway now passes three learner roots, conditional on
 one encoder. Breakout regresses versus Large, and its
 [own-initial-encoder comparison](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
 shows no pretraining benefit in one seed. Neither establishes a capacity limit
-or justifies random features as the product. **Tiny stays opt-in; Large remains
-default** pending broader downstream evidence.
+or justifies random features as the product. **Tiny is the current default;
+Large is explicit.** Phase 2 must establish a benefit over random/learned features.
 
 Keep numerical/causal/streaming checks, held-out quality, N6 memory/time and
-frozen downstream controls as adoption gates. Different pretraining corpora
+frozen downstream controls for final adoption. Different pretraining corpora
 compare packages, not size alone. Pretraining-only runtime changes do not
 automatically update gameplay; use the same qualified runtime across each pair.
 
@@ -385,15 +365,16 @@ from mind-games. Missing actions/rewards are missing labels, not NOOP/zero.
 Compare fresh, encoder-only and encoder+world initialization at equal target
 budgets. Keep actor/critic unchanged in world-only updates; declare resets and
 offline lineage. Useful pretraining means faster retained gameplay learning,
-not just lower feature error. No perception expansion before calibration/coverage.
+not just lower feature error. Representation expansion is a separate experiment.
 
 ## Beyond five Atari games
 
 Beating most of a predeclared Atari suite is an ambition, not a consequence of
 using Dreamer. Our variant does not inherit published DreamerV3 scores. Extend
-to Seaquest/Frostbite/Private Eye, then Atari-26 with explicit gates, budgets and
-seed distributions. Independent per-game training tests algorithm breadth, not
-one transferable policy. Keep the pinned local upstream control and disclose
+to held-out Seaquest/Frostbite/Private Eye for representation/exploration tests,
+then a broader suite with curves, budgets and learner-seed distributions.
+Independent per-game training tests algorithm breadth, not
+one transferable policy. Keep a matched local upstream control and disclose
 representation/precision/protocol differences.
 
 Use `/x/Code/mind-games` for launch, time control, capture and input; recheck its
@@ -410,12 +391,12 @@ dynamics/policy, transferred dynamics with fresh policy, and transferred dynamic
 normalizer, replay and belief resets. Measure zero-shot play, fixed-budget
 adaptation and source-game forgetting; a held-out map is not a held-out title.
 
-Only after strong multi-seed results on at least three GOG titles across two
-genres and held-out cross-title adaptation/retention should two independent
-Kindles share immutable experience chunks. Natural deaths/respawns are allowed;
-cloning/rewinding a live game for training is not. Swarms and shared optimizers
-remain later work. Intrinsic reward stays behind its existing seam, off in
-controls, with extrinsic-only comparisons before adoption.
+Useful real-time single-actor learning and held-out adaptation/retention precede
+swarm work. Phase 5 can then test immutable experience sharing or several actors
+feeding one learner, with explicit ownership and causal histories. Do not turn
+the old GOG milestone into another unchanged-gate queue. Natural deaths/respawns
+are allowed; cloning/rewinding a live game for training is not. Intrinsic reward
+stays in its separate channel, off in controls, with extrinsic-only comparisons.
 
 ## Execution and evidence
 
