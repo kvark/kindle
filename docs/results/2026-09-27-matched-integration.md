@@ -25,6 +25,8 @@ native world/behavior optimizer moments are nonzero, and upstream RSSM, encoder
 and actor parameters change. All five direct-child guards pass and reap their
 workers, with no kernel GPU fault. No application NVML telemetry is collected.
 Headroom is sampled Vulkan budget minus usage, not physical free or peak VRAM.
+Upstream reserves an 80% CUDA pool; that reservation must not be mistaken for
+its live-array memory requirement or a native-comparable peak-memory measure.
 
 Frozen Kindle arms use native-RGB features and latent prediction. Upstream and
 the new native CNN jointly learn RGB64 encoding and reconstruction, with
@@ -37,3 +39,11 @@ corrected test drains that queue before comparing identical seeded samples.
 Its failed result is retained; no learner arithmetic changed for the correction.
 See the [exact recipe](../experiments/2026-09-27-representation-comparison.md).
 Full matched learning curves are still required for Phase 2.
+
+“12M” denotes the common RSSM preset, not identical total capacity. Upstream
+has **10,498,772 trainable parameters**, native frozen-feature arms 10,281,233,
+and the joint RGB CNN control 12,906,641. Frozen encoder weights add 5,486,400
+for Tiny or 303,098,880 for Large, excluding the unused class token. These
+counts exclude slow-critic targets, optimizer state and runtime copies; they
+are not VRAM estimates. The RGB control's larger decoder remains part of the
+whole-package comparison, not evidence about encoder pretraining alone.

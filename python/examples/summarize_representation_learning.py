@@ -176,11 +176,16 @@ def markdown(result, name):
     lines = ["# Phase 2 matched learning comparison", "", f"[All curves, episodes, tails and configurations]({name}).", "",
              "Online training scores, not frozen competence. Final scores use the last 50 completed",
              "episodes per seed (or all if fewer); 95% intervals resample learner seeds, not episodes.", "",
+             "Partial groups list individual seeds; no aggregate or uncertainty is reported until all three finish.", "",
              "| Method | Game | Seeds | Final score [95% CI] | Human-normalized |", "| --- | --- | ---: | ---: | ---: |"]
     for row in result["results"]:
         a = row["aggregate"]
-        score = (f"{a['final_score']['mean']:.3f} [{a['final_score']['ci95'][0]:.3f}, {a['final_score']['ci95'][1]:.3f}]"
-                 if a else "incomplete seed group")
+        if a:
+            score = f"{a['final_score']['mean']:.3f} [{a['final_score']['ci95'][0]:.3f}, {a['final_score']['ci95'][1]:.3f}]"
+        else:
+            score = "; ".join(f"{r['seed']}: {r['curve'][-1]['score']:.3f}"
+                              if r['curve'][-1]['score'] is not None else f"{r['seed']}: no completed episode"
+                              for r in row['runs'])
         hns = f"{a['final_hns']['mean']:.4f}" if a else "—"
         lines.append(f"| {row['method']} | {row['game']} | {len(row['runs'])} | {score} | {hns} |")
     lines += ["", f"Human normalization uses [pinned upstream anchors]({REFERENCE}); 1 is the reference human, not mastery.",

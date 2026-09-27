@@ -164,7 +164,11 @@ actor/critic, replay ratio, update scheduling and optimizer stay unchanged.
 The resize is bilinear, no antialiasing, CHW /255-0.5; upstream uses Pillow's
 resize and its own CNN encoder/decoder. This is a whole-package native learned
 baseline, not an exact upstream encoder/decoder port or a pretraining ablation
-of the offline 173k reconstruction CNN. GPU tests cover independent scalar
+of the offline 173k reconstruction CNN. The common 12M RSSM preset does not
+equalize total trainable capacity: upstream has 10,498,772 parameters, native
+frozen-feature arms 10,281,233 plus their frozen encoder, and joint RGB CNN
+12,906,641. Include this difference when interpreting learning and cost.
+GPU tests cover independent scalar
 values/gradients, CPU/resident preprocessing, unchanged pixel replay across
 encoder updates, per-stream resets and optimizer-preserving checkpoint restore.
 Those tests and the new arm's integration smoke now pass. The first replay
@@ -217,7 +221,13 @@ guard's deadline; that capture PID is now absent. No native failure or new
 kernel GPU fault was recorded. Preserve the failed attempt. Use local storage
 for live guards/logs, and archive completed artifacts separately; no guard
 timeout or acceptance threshold is relaxed. The fresh local upstream Pong
-seed1009 control has launched in `runs/representation-learning-20260927.bTE8iK`.
+seed1009 control now completes in `runs/representation-learning-20260927.bTE8iK`:
+200,004 actual actions / 49,651 updates in 10,111.10s, zero debt, all 288 saved
+tensors finite, RSSM/encoder/policy weights changed, and a passing/reaped guard.
+Its last-50 online score is -3.04, not frozen competence. The
+[partial learning report](../results/2026-09-27-representation-learning.md)
+retains all 100 completed episodes and unfinished tails. One control seed
+does not establish a representation advantage; pretrained Tiny seed1009 is next.
 Its `learning-remainder.json` declares the other 44 entries behind positive
 completion of both the active native guard and its controller. The complete
 matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
@@ -238,7 +248,7 @@ pooling/projection/input change is adopted separately after a learning check.
 
 Raw preparation: `runs/representation-probes-20260927.POCnif`. Completed results
 will be committed as self-contained JSON + Markdown under `docs/results/`.
-No learning or representation advantage has yet been measured in this phase.
+No representation advantage has yet been measured in this phase.
 
 The [five integration smokes](../results/2026-09-27-matched-integration.md)
 now pass: each executes 6,144 actions / 1,186 updates, starts updates at 1,404,

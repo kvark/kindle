@@ -25,10 +25,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   a learned-RGB control, never a return to RGB64-upscaled JEPA. Replay pixels,
   not stale CNN features. GPU pixel/gradient/replay/restore checks pass; all five
   smokes execute 6,144 actions and 1,186 updates. The first full RL declaration
-  stopped before GPU work on a NAS-backed log-capture timeout. Its fresh local
-  upstream Pong seed1009 control has launched; keep live logs/guards local.
-  The other 44 entries wait for positive controller completion, then run serially
-  with fixed inputs and stop on failure. No local compilation during timing. No gameplay
+  stopped before GPU work on a NAS-backed log-capture timeout; keep live
+  logs/guards local. The fresh local upstream Pong seed1009 control completes
+  200,004 actions / 49,651 updates, with finite state and a passing guard. The
+  remaining matrix runs serially with fixed inputs and stops on failure. Track
+  completed curves in `docs/results/2026-09-27-representation-learning.md` and
+  current execution in PR31. No local compilation during timing. No gameplay
   representation advantage or Phase 2 completion is established yet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report

@@ -180,7 +180,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
    not a return to upscaled JEPA or the offline reconstruction checkpoint.
    The first full declaration stopped in host-log capture before launching a
-   GPU worker; a fresh local upstream Pong seed1009 control has launched. The three-seed,
+   GPU worker; the fresh local upstream Pong seed1009 control now completes
+   200,004 actions / 49,651 updates at 19.78 actions/s, with a last-50 online
+   score of -3.04. [Complete curves and limits](results/2026-09-27-representation-learning.md)
+   retain all 100 episodes and unfinished tails; one seed is not competence
+   or an architecture comparison. The remaining matrix is running serially. The three-seed,
    three-game, 200,004-action-per-run comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.

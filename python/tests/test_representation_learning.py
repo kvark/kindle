@@ -119,10 +119,17 @@ def test_learning_summary_uses_seed_not_episode_bootstrap_and_keeps_failures(tmp
     assert "Human-normalized" in markdown(result, "data.json")
     partial = summarize(inputs[:2], budget=24)
     assert partial["results"][0]["aggregate"] is None
+    assert "1009: -3.000; 2017: 0.000" in markdown(partial, "partial.json")
+    assert "no aggregate or uncertainty" in markdown(partial, "partial.json")
     with pytest.raises(ValueError, match="duplicate"):
         summarize(inputs + inputs[:1], budget=24)
     with pytest.raises(ValueError, match="budget"):
         summarize(inputs)
+
+
+def test_partial_learning_report_does_not_fabricate_a_score_before_any_episode(tmp_path):
+    result = summarize([("upstream", write(tmp_path, fixture(upstream=True, ticks=2)))], budget=12)
+    assert "1009: no completed episode" in markdown(result, "partial.json")
 
 
 def test_learning_curve_keeps_all_episodes_but_scores_only_last_fifty(tmp_path):

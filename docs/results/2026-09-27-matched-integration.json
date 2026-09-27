@@ -2384,5 +2384,49 @@
         "adam_m.world.representation.encoder.stem.weight"
       ]
     }
+  ],
+  "parameter_counts": {
+    "pretrained_tiny": {
+      "trainable": 10281233,
+      "components": {
+        "world": 8635136,
+        "behavior": 1646097
+      },
+      "frozen_encoder": 5486400
+    },
+    "initial_tiny": {
+      "trainable": 10281233,
+      "components": {
+        "world": 8635136,
+        "behavior": 1646097
+      },
+      "frozen_encoder": 5486400
+    },
+    "large": {
+      "trainable": 10281233,
+      "components": {
+        "world": 8635136,
+        "behavior": 1646097
+      },
+      "frozen_encoder": 303098880
+    },
+    "learned_cnn": {
+      "trainable": 12906641,
+      "components": {
+        "world": 11260544,
+        "behavior": 1646097
+      },
+      "frozen_encoder": 0
+    },
+    "upstream": {
+      "trainable": 10498772,
+      "frozen_encoder": 0
+    }
+  },
+  "parameter_count_limits": [
+    "12M denotes the RSSM preset, not matched total trainable capacity",
+    "native counts use optimizer membership, excluding frozen critic copies in the world session",
+    "frozen encoder counts exclude the unused cls_token, which the native loader skips",
+    "counts exclude slow-critic targets, optimizer state, derived weights and runtime copies; not VRAM estimates"
   ]
 }
