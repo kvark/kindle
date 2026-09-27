@@ -162,7 +162,12 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Do not combine this new environment/recipe and speed change into one claim.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
-4. **Phase 2: test whether the representation earns its cost.** Held-out motion/
+4. **Phase 2, in progress: test whether the representation earns its cost.**
+   The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
+   starts with independent Pong/Breakout/Seaquest RGB/RAM clips. Native batched
+   token diagnostics compare identical frames; privileged labels never enter
+   the agent. Probe infrastructure/data collection alone do not close Phase 2.
+   Held-out motion/
    small-object probes, then a three-seed learning comparison against random
    Tiny and a learned-encoder Dreamer control. Include a title absent from the
    video corpus. Native input is current; RGB64 is an explicit ablation.

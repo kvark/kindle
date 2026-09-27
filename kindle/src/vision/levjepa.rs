@@ -94,6 +94,10 @@ pub struct LeVJepaPerception {
 }
 
 impl LeVJepaPerception {
+    pub fn stream_count(&self) -> usize {
+        self.frames.len()
+    }
+
     pub fn architecture(&self) -> Architecture {
         self.architecture
     }

@@ -20,7 +20,9 @@ gives 1.15× updates / 1.16× short Pong throughput; the **3× target remains un
 Do not confuse completed engineering deliverables with achieving that speed
 target or demonstrating the value of JEPA. The user explicitly accepts **3× as
 a stretch target, not a Phase 1 exit gate**; these completed implementation and
-screening deliverables close Phase 1. Phase 2 is next.
+screening deliverables close Phase 1. Phase 2 is now in progress; its
+[comparison protocol](experiments/2026-09-27-representation-comparison.md)
+retains both offline probes and the matched learning comparison.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.

@@ -15,7 +15,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
   RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
   target is unmet; the user explicitly accepts it as a stretch target, not a
-  Phase 1 exit gate. Phase 2 is next.
+  Phase 1 exit gate. Phase 2 is active: held-out Pong/Breakout/Seaquest probes,
+  then matched three-seed learning controls. The protocol is in
+  `docs/experiments/2026-09-27-representation-comparison.md`; its offline corpus
+  has whole-trajectory splits and privileged RAM labels confined to evaluation.
+  No representation advantage or Phase 2 completion is established yet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
@@ -70,9 +74,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - One authoritative plan: `docs/kindle_single_life_dreamer_plan.md`. Keep it
   decision-focused with one game-status table and direct rollout/world-report
   links. Detailed results belong in experiment reports and `runs/`.
-- Use [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
+- Use the active phase's PR description as the status dashboard:
   dated done/running/next items, results and limitations. No STATUS.md. Update
-  at meaningful boundaries, not each poll.
+  at meaningful boundaries, not each poll. PR29 is merged and remains the
+  historical Phase 0/1 dashboard; Phase 2 uses `phase2-levjepa-evaluation`.
 - The JEPA bet is cheaper useful latent world prediction than pixel
   reconstruction. Measure whole-agent and world-model time/memory/learning
   against Dreamer12M at matched actual interactions. Backend parity alone can
@@ -112,7 +117,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   smoke tests are not multi-seed learning experiments. One matched timing plus
   numerical/learning parity check suffices for a speed change; no micro-campaign.
   Commit each new result as compact JSON + Markdown in `docs/results/`, including
-  config, seeds, aids, curves and limits. PR29 remains the status dashboard.
+  config, seeds, aids, curves and limits. The active PR remains the dashboard.
   Keep original competence gates for final confirmed claims. Retain failures
   and all completed episodes/unfinished tails.
   Plumbing tests and online wins are not frozen competence. Report aggregate
