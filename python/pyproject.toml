@@ -16,6 +16,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+screening = ["minatar==1.0.15", "numpy>=1.26"]
 gym = ["gymnasium>=1.1,<2"]
 atari = [
   "gymnasium[atari]>=1.1,<2",

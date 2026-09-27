@@ -137,18 +137,26 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    implementation. This [first step now passes](results/2026-09-27-shared-parameters.md):
    227.03 -> 212.78 ms/update (6.28% less time) in one fixed synthetic pair,
    exact complete state/reports and short N6 Pong integration. This is not
-   sustained game throughput. Keep the EMA critic independent. Next remove recurrent
-   posterior/imagination readbacks using GPU sampling and fused/queued
-   recurrence. Existing CDF sampling may preserve RNG semantics more closely
-   than changing to Gumbel-max; a sampling change is not required for GPU
-   residency. Keep F32, replay ratio, batch/BPTT lengths, objectives and optimizer
-   fixed in each speed comparison. One numerical/learning check plus matched
-   timing suffices for development; no qualification campaign. The 3x update
-   target is an aspiration, not a measured promise.
+   sustained game throughput. The [next measured step](results/2026-09-27-fused-learner.md)
+   implements GPU Gumbel sampling, complete T64/H15 recurrence and grouped RSSM
+   arithmetic: shared-control synthetic **212.70 -> 184.43 ms/update**, native
+   N6 Pong **17.36 -> 20.16 steady actions/s at R256**. Independent sampling,
+   output/gradient references and short Pong learning statistics pass. Sampling
+   draws changed; state/trajectories are not bitwise equivalent. CPU targets and
+   independent slow-critic EMA remain. **The 3x target is not achieved.** F32,
+   replay ratio, batch/BPTT, losses and optimizer stay fixed. BF16 is not a
+   compute option in the current backend; F16 relaxation needs a separate test.
+   One numerical/learning check plus matched timing suffices for development;
+   no qualification campaign. The 3x target remains an aspiration, not a gate
+   for testing whether the representation or exploration method works.
 3. **Phase 1b: establish a <=1-hour, three-seed screening recipe.** Use a small
-   learner and a fast sparse-reward environment. Assess Craftax interop first;
-   Crafter or MinAtar is an acceptable adapter stopgap, not a CPU learner.
-   Do not combine a new environment, encoder and speed change into one claim.
+   learner and a fast sparse-reward environment. [MinAtar recipe/curve contract](screening.md)
+   is implemented and its tiny integration passes; the three Size1M seeds are
+   running. JAX/Craftax buffers need an additional CUDA/Vulkan interop bridge;
+   MinAtar is the permitted CPU-environment fallback, not a CPU learner. Its
+   small public observations are packed losslessly and use the existing jointly
+   learned encoder; no frozen frontend, pretraining or action/reward aid.
+   Do not combine this new environment/recipe and speed change into one claim.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
 4. **Phase 2: test whether the representation earns its cost.** Held-out motion/

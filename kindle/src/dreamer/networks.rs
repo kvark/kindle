@@ -61,6 +61,101 @@ pub(crate) fn slice_columns(
     graph.reshape(result, &[batch, length])
 }
 
+fn repeat_columns(
+    graph: &mut Graph,
+    input: NodeId,
+    batch: usize,
+    width: usize,
+    copies: usize,
+) -> NodeId {
+    assert!(copies > 0);
+    if copies == 1 {
+        return input;
+    }
+    let half = repeat_columns(graph, input, batch, width, copies / 2);
+    let repeated = concat_columns(
+        graph,
+        half,
+        half,
+        batch,
+        width * (copies / 2),
+        width * (copies / 2),
+    );
+    if copies % 2 == 1 {
+        concat_columns(graph, repeated, input, batch, width * (copies - 1), width)
+    } else {
+        repeated
+    }
+}
+
+fn grouped_rssm_input(
+    graph: &mut Graph,
+    deter: NodeId,
+    shared: NodeId,
+    batch: usize,
+    blocks: usize,
+) -> NodeId {
+    let deter_width = graph.node(deter).ty.shape[1];
+    let shared_width = graph.node(shared).ty.shape[1];
+    let block_deter = deter_width / blocks;
+    let repeated = repeat_columns(graph, shared, batch, shared_width, blocks);
+    let repeated = graph.reshape(repeated, &[batch * blocks, shared_width]);
+    let deter = graph.reshape(deter, &[batch * blocks, block_deter]);
+    let grouped = concat_columns(
+        graph,
+        deter,
+        repeated,
+        batch * blocks,
+        block_deter,
+        shared_width,
+    );
+    graph.reshape(grouped, &[batch, deter_width + blocks * shared_width])
+}
+
+fn grouped_gru_update(
+    graph: &mut Graph,
+    deter: NodeId,
+    gates: NodeId,
+    batch: usize,
+    blocks: usize,
+) -> NodeId {
+    let deter_width = graph.node(deter).ty.shape[1];
+    let block_deter = deter_width / blocks;
+    let rows = batch * blocks;
+    let gates = graph.reshape(gates, &[rows, 3 * block_deter]);
+    let reset = slice_columns(graph, gates, rows, 3 * block_deter, 0, block_deter);
+    let candidate = slice_columns(
+        graph,
+        gates,
+        rows,
+        3 * block_deter,
+        block_deter,
+        block_deter,
+    );
+    let update = slice_columns(
+        graph,
+        gates,
+        rows,
+        3 * block_deter,
+        2 * block_deter,
+        block_deter,
+    );
+    let reset = graph.sigmoid(reset);
+    let candidate = graph.mul(reset, candidate);
+    let candidate = graph.tanh(candidate);
+    let minus_one = graph.constant(vec![-1.0; batch * deter_width], &[rows, block_deter]);
+    let update = graph.add(update, minus_one);
+    let update = graph.sigmoid(update);
+    let updated = graph.mul(update, candidate);
+    let ones = graph.constant(vec![1.0; batch * deter_width], &[rows, block_deter]);
+    let negative_update = graph.neg(update);
+    let keep = graph.add(ones, negative_update);
+    let deter = graph.reshape(deter, &[rows, block_deter]);
+    let kept = graph.mul(keep, deter);
+    let result = graph.add(updated, kept);
+    graph.reshape(result, &[batch, deter_width])
+}
+
 pub(crate) fn scale(graph: &mut Graph, value: NodeId, coefficient: f32) -> NodeId {
     let coefficient = graph.scalar(coefficient);
     graph.mul(value, coefficient)
@@ -310,83 +405,16 @@ impl RssmCore {
             self.hidden_width,
         );
 
-        let block_deter = self.deter / self.blocks;
-        let block_input = block_deter + 3 * self.hidden_width;
-        let mut grouped = Vec::with_capacity(self.blocks);
-        for block in 0..self.blocks {
-            let old = slice_columns(
-                graph,
-                deter,
-                batch,
-                self.deter,
-                block * block_deter,
-                block_deter,
-            );
-            grouped.push(concat_columns(
-                graph,
-                old,
-                shared,
-                batch,
-                block_deter,
-                3 * self.hidden_width,
-            ));
-        }
-        let mut input = grouped[0];
-        let mut width = block_input;
-        for block in &grouped[1..] {
-            input = concat_columns(graph, input, *block, batch, width, block_input);
-            width += block_input;
-        }
-
+        let input = grouped_rssm_input(graph, deter, shared, batch, self.blocks);
         let hidden = self.hidden.forward(graph, input, batch);
         let hidden = self.hidden_norm.forward(graph, hidden);
         let hidden = graph.silu(hidden);
         let gates = self.gru.forward(graph, hidden, batch);
 
-        // BlockLinear emits [block0(reset,candidate,update), block1(...), ...].
-        let gate_width = 3 * block_deter;
-        let mut outputs = Vec::with_capacity(self.blocks);
-        for block in 0..self.blocks {
-            let gate = slice_columns(
-                graph,
-                gates,
-                batch,
-                self.blocks * gate_width,
-                block * gate_width,
-                gate_width,
-            );
-            let reset = slice_columns(graph, gate, batch, gate_width, 0, block_deter);
-            let candidate = slice_columns(graph, gate, batch, gate_width, block_deter, block_deter);
-            let update =
-                slice_columns(graph, gate, batch, gate_width, 2 * block_deter, block_deter);
-            let reset = graph.sigmoid(reset);
-            let candidate = graph.mul(reset, candidate);
-            let candidate = graph.tanh(candidate);
-            let minus_one = graph.constant(vec![-1.0; batch * block_deter], &[batch, block_deter]);
-            let update = graph.add(update, minus_one);
-            let update = graph.sigmoid(update);
-            let old = slice_columns(
-                graph,
-                deter,
-                batch,
-                self.deter,
-                block * block_deter,
-                block_deter,
-            );
-            let updated = graph.mul(update, candidate);
-            let ones = graph.constant(vec![1.0; batch * block_deter], &[batch, block_deter]);
-            let negative_update = graph.neg(update);
-            let keep = graph.add(ones, negative_update);
-            let kept = graph.mul(keep, old);
-            outputs.push(graph.add(updated, kept));
-        }
-        let mut result = outputs[0];
-        let mut width = block_deter;
-        for output in &outputs[1..] {
-            result = concat_columns(graph, result, *output, batch, width, block_deter);
-            width += block_deter;
-        }
-        debug_assert_eq!(width, self.deter);
+        // BlockLinear's [batch, block, reset/candidate/update, lane] layout
+        // becomes a larger row axis, without copying individual block slices.
+        let result = grouped_gru_update(graph, deter, gates, batch, self.blocks);
+        debug_assert_eq!(graph.node(result).ty.shape[1], self.deter);
         debug_assert_eq!(self.action_count, config_action_width(graph, action));
         result
     }
@@ -537,6 +565,46 @@ pub(crate) fn mixed_probabilities(
         &[rows, classes],
     );
     graph.add(probabilities, uniform)
+}
+
+/// Hard categorical sample with CPU-owned uniform draws. The row maximum uses
+/// an existing reduction; the prefix mask breaks exact ties at the first class.
+pub(crate) fn gumbel_sample(
+    graph: &mut Graph,
+    logits: NodeId,
+    uniforms: NodeId,
+    rows: usize,
+    classes: usize,
+    unimix: f32,
+) -> NodeId {
+    let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
+    let log_probabilities = graph.log(probabilities);
+    let uniforms = graph.clamp(uniforms, f32::MIN_POSITIVE, 1.0 - f32::EPSILON);
+    let log_uniforms = graph.log(uniforms);
+    let negative_log_uniforms = graph.neg(log_uniforms);
+    let log_negative_log_uniforms = graph.log(negative_log_uniforms);
+    let noise = graph.neg(log_negative_log_uniforms);
+    let perturbed = graph.add(log_probabilities, noise);
+    let flat = graph.reshape(perturbed, &[rows * classes]);
+    let maximum = graph.max_pool_2d(
+        flat,
+        rows.try_into().unwrap(),
+        1,
+        1,
+        classes.try_into().unwrap(),
+        1,
+        classes.try_into().unwrap(),
+        1,
+        0,
+    );
+    let maximum = graph.reshape(maximum, &[rows, 1]);
+    let maximum = graph.broadcast_inner(maximum, classes);
+    let below_maximum = graph.greater(maximum, perturbed);
+    let negative = graph.neg(below_maximum);
+    let one = graph.constant(vec![1.0; rows * classes], &[rows, classes]);
+    let at_maximum = graph.add(negative, one);
+    let preceding = graph.exclusive_cumsum(at_maximum, false);
+    graph.greater(at_maximum, preceding)
 }
 
 pub(crate) fn straight_through_sample(
@@ -725,6 +793,9 @@ impl ObservationDecoder {
         self.output.forward(graph, value)
     }
 }
+
+#[cfg(test)]
+mod layout_tests;
 
 #[cfg(test)]
 mod block_matmul_tests {

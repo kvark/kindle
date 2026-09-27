@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from ._native import (  # type: ignore[attr-defined]
         Agent,
         VectorAgent,
+        FeatureVectorAgent,
         DREAMERV3_REVISION,
         LEVJEPA_MODEL_ID,
         LEVJEPA_CHECKPOINT_REVISION,
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 __all__ = [
     "Agent",
     "VectorAgent",
+    "FeatureVectorAgent",
     "DREAMERV3_REVISION",
     "LEVJEPA_MODEL_ID",
     "LEVJEPA_CHECKPOINT_REVISION",

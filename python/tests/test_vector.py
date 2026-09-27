@@ -27,6 +27,15 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
 
 
+def test_feature_vector_rejects_invalid_config_before_gpu():
+    config = kindle.default_config(6, "tiny")
+    with pytest.raises(ValueError, match="at least one"):
+        kindle.FeatureVectorAgent(0, config)
+    config["batch_size"] = 0
+    with pytest.raises(ValueError, match="batch_size"):
+        kindle.FeatureVectorAgent(4, config)
+
+
 @pytest.mark.parametrize("encoder", ["levjepa-tiny-ish", "dinov3"])
 def test_vector_rejects_unsupported_encoder_before_gpu(encoder):
     with pytest.raises(ValueError, match="encoder"):

@@ -127,8 +127,9 @@ fn hash_reader(mut reader: impl std::io::Read) -> std::io::Result<String> {
     }
 }
 
-/// One frozen, compressed visual observation in token-major `[7 * 7, 64]`
-/// order. Replay retains the exact features observed at collection time.
+/// One visual observation in token-major `[7 * 7, 64]` order: frozen visual
+/// features, or losslessly packed small images for a learned frontend. Replay
+/// retains exactly the values observed at collection time.
 #[derive(Clone, Debug)]
 pub struct Observation {
     values: Box<[f32]>,

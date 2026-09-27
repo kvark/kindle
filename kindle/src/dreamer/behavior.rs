@@ -148,6 +148,7 @@ pub fn build_training_graph(
 
 /// Current actor and value prediction. Slow-value and live-policy sessions
 /// use this same graph and differ only in how parameters are synchronized.
+#[cfg(test)]
 pub fn build_inference_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);

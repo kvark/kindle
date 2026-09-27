@@ -1,5 +1,6 @@
 //! Python bindings for the pixel-first Dreamer baseline.
 
+mod features;
 mod vector;
 
 use std::path::Path;
@@ -585,6 +586,7 @@ fn json_to_python<'py, T: serde::Serialize + ?Sized>(
 fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<vector::PyVectorAgent>()?;
+    module.add_class::<features::PyFeatureVectorAgent>()?;
     module.add_class::<PyLeVJepaPerception>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;

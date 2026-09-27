@@ -161,7 +161,6 @@ impl VectorCore {
         }
     }
 
-    #[cfg(test)]
     fn ingest(&mut self, arrivals: Vec<(usize, Observation, FrameFlags, Reward)>) -> Vec<Reward> {
         self.check_arrivals(arrivals.iter().map(|a| (a.0, a.2, a.3)));
         if arrivals.is_empty() {
@@ -404,6 +403,84 @@ impl VectorCore {
         last.timing.world_sync_seconds += world;
         last.timing.behavior_sync_seconds += behavior;
         last.timing.total_seconds += world + behavior;
+    }
+}
+
+/// Small-image or symbolic observations with a jointly learned encoder.
+///
+/// The adapter supplies losslessly packed `[7 * 7, 64]` observations. It does
+/// not supply pretrained features, privileged reward information or an RSSM
+/// state. Batched belief/policy, replay and learning use the same GPU path as
+/// the pixel agent; only the frozen LeVJEPA frontend is bypassed.
+pub struct FeatureVectorAgent {
+    core: VectorCore,
+}
+
+impl FeatureVectorAgent {
+    pub fn new(config: DreamerConfig, streams: usize) -> Result<Self, Box<dyn std::error::Error>> {
+        config.check()?;
+        check_capacity(&config, streams)?;
+        Ok(Self {
+            core: VectorCore::new(DreamerCore::new(config)?, streams),
+        })
+    }
+
+    pub fn learner(&self) -> &DreamerCore {
+        &self.core.learner
+    }
+
+    pub fn stream_count(&self) -> usize {
+        self.core.streams.len()
+    }
+
+    pub fn training_debt(&self) -> f32 {
+        self.core.learner.train_scheduler.credit
+    }
+
+    pub fn begin_episodes(&mut self, observations: Vec<(usize, Observation)>) {
+        self.core.ingest(
+            observations
+                .into_iter()
+                .map(|(id, observation)| {
+                    (
+                        id,
+                        observation,
+                        FrameFlags {
+                            is_first: true,
+                            ..Default::default()
+                        },
+                        Reward::default(),
+                    )
+                })
+                .collect(),
+        );
+    }
+
+    pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
+        self.core.act(mode)
+    }
+
+    pub fn observe(
+        &mut self,
+        arrivals: Vec<(usize, Observation, FrameFlags, Reward)>,
+    ) -> Vec<Reward> {
+        self.core.ingest(arrivals)
+    }
+
+    pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
+        self.core.learn_scheduled(maximum_updates)
+    }
+
+    pub fn save_checkpoint(&mut self, path: impl AsRef<Path>) -> io::Result<()> {
+        self.core.learner.save_checkpoint(path)
+    }
+}
+
+impl Drop for FeatureVectorAgent {
+    fn drop(&mut self) {
+        self.core.acting.wait();
+        self.core.copies.wait();
+        self.core.learner.replay.wait_device();
     }
 }
 

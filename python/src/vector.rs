@@ -6,7 +6,7 @@ pub(crate) struct PyVectorAgent {
     inner: VectorDreamerAgent,
 }
 
-fn validate_streams(streams: &[usize], count: usize, items: usize) -> PyResult<()> {
+pub(super) fn validate_streams(streams: &[usize], count: usize, items: usize) -> PyResult<()> {
     if streams.len() != items {
         return Err(PyValueError::new_err(
             "streams and frames must have equal lengths",
