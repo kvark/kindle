@@ -70,6 +70,17 @@ completed 16,384 updates in 47.17s, validation MSE 1.68956 -> .00614619,
 selecting the final checkpoint `ff05e413`. Different training corpora and
 temporal inputs still prevent attributing all differences to architecture.
 
+The fixed ridge contrasts also argue against changing several factors at once:
+Large's history increases mean motion R² by .364 on Pong and .430 on Breakout;
+trained Tiny's corresponding changes are -.042 and +.073. These are backward
+velocity labels, not successful future forecasts. JL16 space-to-depth reduces
+trained Tiny's mean position R² by .119/.226/.318 on Pong/Breakout/Seaquest;
+PCA has no consistent advantage. Native versus RGB64-upscaled inputs is mixed,
+not proof of a universal resolution benefit. Tiny's prior RGB64 corpus is a
+distribution difference, not a reason to restore destructive preprocessing.
+Keep native/JL64/mean unchanged in the declared learning matrix. Seaquest
+motion remains weak across all controls, with the retained visibility limits.
+
 The first MLP sweep stopped after three recorded variants when another device
 construction returned `no supported device found`. No kernel GPU fault was
 recorded; the cause is not established. Preserve `offline-queue/tiny-mlp` and
