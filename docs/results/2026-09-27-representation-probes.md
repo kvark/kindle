@@ -11,12 +11,18 @@ Undefined constant-target R² is excluded, not turned into zero. All variants re
 | --- | --- | --- | ---: | ---: |
 | pretrained_tiny | ridge | Breakout | 0.827 | 0.372 |
 | initial_tiny | ridge | Breakout | 0.805 | 0.332 |
+| large | ridge | Breakout | 0.984 | 0.703 |
+| reconstruction_cnn | ridge | Breakout | 0.830 | 0.205 |
 | raw_rgb56 | ridge | Breakout | 0.716 | -0.025 |
 | pretrained_tiny | ridge | Pong | 0.923 | 0.246 |
 | initial_tiny | ridge | Pong | 0.927 | 0.340 |
+| large | ridge | Pong | 0.981 | 0.719 |
+| reconstruction_cnn | ridge | Pong | 0.943 | 0.311 |
 | raw_rgb56 | ridge | Pong | 0.780 | 0.110 |
 | pretrained_tiny | ridge | Seaquest | 0.529 | 0.006 |
 | initial_tiny | ridge | Seaquest | 0.526 | 0.032 |
+| large | ridge | Seaquest | 0.751 | 0.045 |
+| reconstruction_cnn | ridge | Seaquest | 0.578 | 0.028 |
 | raw_rgb56 | ridge | Seaquest | 0.274 | -0.089 |
 
 Whole trajectories are held out: four train, two validation and two test seeds/game.

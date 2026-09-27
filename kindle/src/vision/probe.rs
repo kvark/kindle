@@ -7,8 +7,29 @@ pub struct RegressionProbe {
     session: Session,
     batch: usize,
     inputs: usize,
+    hidden: usize,
     targets: usize,
     parameters: Vec<String>,
+}
+
+fn validate_dimensions(
+    batch: usize,
+    inputs: usize,
+    hidden: usize,
+    targets: usize,
+) -> Result<(), &'static str> {
+    if batch == 0
+        || batch > 1024
+        || inputs == 0
+        || inputs > 65536
+        || hidden == 0
+        || hidden > 256
+        || targets == 0
+        || targets > 64
+    {
+        return Err("invalid offline probe dimensions");
+    }
+    Ok(())
 }
 
 fn graph(batch: usize, inputs: usize, hidden: usize, targets: usize) -> Graph {
@@ -46,19 +67,20 @@ impl RegressionProbe {
         targets: usize,
         seed: u64,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        if batch == 0
-            || batch > 1024
-            || inputs == 0
-            || inputs > 65536
-            || hidden == 0
-            || hidden > 256
-            || targets == 0
-            || targets > 64
-        {
-            return Err("invalid offline probe dimensions".into());
-        }
-        let graph = graph(batch, inputs, hidden, targets);
+        validate_dimensions(batch, inputs, hidden, targets)?;
         let gpu = std::sync::Arc::new(crate::init_gpu_context()?);
+        Ok(Self::build(batch, inputs, hidden, targets, seed, gpu))
+    }
+
+    fn build(
+        batch: usize,
+        inputs: usize,
+        hidden: usize,
+        targets: usize,
+        seed: u64,
+        gpu: std::sync::Arc<blade_graphics::Context>,
+    ) -> Self {
+        let graph = graph(batch, inputs, hidden, targets);
         let mut session = meganeura::build(
             &graph,
             SessionConfig {
@@ -83,13 +105,29 @@ impl RegressionProbe {
             .map(str::to_owned)
             .collect::<Vec<_>>();
         parameters.sort();
-        Ok(Self {
+        Self {
             session,
             batch,
             inputs,
+            hidden,
             targets,
             parameters,
-        })
+        }
+    }
+
+    /// Independent weights and optimizer state on the same caller-owned device.
+    /// Probe sweeps need many fresh models, not many Vulkan device lifetimes.
+    pub fn reset(&mut self, inputs: usize, targets: usize, seed: u64) -> Result<(), &'static str> {
+        validate_dimensions(self.batch, inputs, self.hidden, targets)?;
+        *self = Self::build(
+            self.batch,
+            inputs,
+            self.hidden,
+            targets,
+            seed,
+            self.session.context(),
+        );
+        Ok(())
     }
 
     pub fn gpu_device(&self) -> crate::GpuDeviceInfo {
@@ -211,6 +249,8 @@ mod tests {
     #[ignore = "requires GPU; tiny independent offline regression check"]
     fn tiny_probe_matches_scalar_formula_and_learns_without_eval_updates() {
         let mut probe = RegressionProbe::new(4, 2, 2, 1, 43).unwrap();
+        let initial = probe.parameters();
+        let device = probe.session.context();
         let hardware_check = |probe: &RegressionProbe| {
             if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
                 assert_eq!(probe.gpu_device().device_name, expected);
@@ -300,6 +340,25 @@ mod tests {
         assert_eq!(trained, probe.parameters());
         assert_eq!(moments, probe.session.read_adam_states(&names));
         assert_eq!(age, probe.session.adam_step_count());
+        probe.reset(2, 1, 43).unwrap();
+        assert_eq!(initial, probe.parameters());
+        assert_eq!(probe.session.adam_step_count(), 0);
+        probe.learn(&x, &targets, &[1.0; 4], 0.01, 0.0).unwrap();
+        let fresh_step = probe.parameters();
+        let fresh_moments = probe.session.read_adam_states(&names);
+        // More complete model lifetimes than the failed nine-head sweep, but
+        // a single physical device. Each reset is a genuinely fresh learner.
+        for _ in 0..16 {
+            probe.reset(3, 2, 7).unwrap();
+            assert_eq!(probe.predict(&[0.0; 12]).unwrap().len(), 8);
+            probe.reset(2, 1, 43).unwrap();
+            assert!(std::sync::Arc::ptr_eq(&device, &probe.session.context()));
+            assert_eq!(initial, probe.parameters());
+            assert_eq!(probe.session.adam_step_count(), 0);
+            probe.learn(&x, &targets, &[1.0; 4], 0.01, 0.0).unwrap();
+            assert_eq!(fresh_step, probe.parameters());
+            assert_eq!(fresh_moments, probe.session.read_adam_states(&names));
+        }
         hardware_check(&probe);
     }
 }

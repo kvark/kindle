@@ -35,7 +35,7 @@ def feature_identity(*arrays):
     return tuple((x.shape, x.dtype.str, hashlib.sha256(x.tobytes()).digest()) for x in arrays)
 
 
-def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512):
+def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512, model=None):
     batch, hidden, interval = 64, 128, 32
     mean, scale = train_x.mean(0), train_x.std(0)
     scale = np.where(scale > 1e-6, scale, 1.0)
@@ -48,7 +48,10 @@ def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, ste
     y = np.asarray(np.where(mask, (train_y-y_mean)/y_scale, 0), dtype=np.float32)
     # Equal target weighting in expectation despite different missingness.
     weights = mask.astype(np.float32) / mask.mean(0)
-    model = _native.RegressionProbe(xs[0].shape[1], y.shape[1], hidden=hidden, batch=batch, seed=seed)
+    if model is None:
+        model = _native.RegressionProbe(xs[0].shape[1], y.shape[1], hidden=hidden, batch=batch, seed=seed)
+    else:
+        model.reset(xs[0].shape[1], y.shape[1], seed)
     memory = [checked_memory(model)]
     rng = np.random.default_rng(seed ^ 0xA72A)
 
@@ -137,6 +140,7 @@ def main():
                   native_sha256=sha256_file(_native.__file__), limit_clips=feature_manifest["limit_clips"],
                   visibility_sha256=sha256_file(args.visibility),
                   limits=["offline diagnostic, not gameplay or forecasts", "head seeds are fit variability, not RL seeds"])
+    model = None
     for game in dict.fromkeys(r["game"] for r in feature_manifest["files"]):
         rows = [r for r in feature_manifest["files"] if r["game"] == game]
         fitted = {}
@@ -160,7 +164,10 @@ def main():
                     if seed is None:
                         prediction, info = ridge_probe(train_x, train_y, val_x, val_y, test_x)
                     else:
-                        prediction, info = mlp_probe(train_x, train_y, val_x, val_y, test_x, seed, steps=args.mlp_steps)
+                        if model is None:
+                            model = _native.RegressionProbe(train_x.shape[1], train_y.shape[1], hidden=128, batch=64)
+                        prediction, info = mlp_probe(train_x, train_y, val_x, val_y, test_x, seed,
+                                                     steps=args.mlp_steps, model=model)
                     fits.append(dict(fit=info, test=evaluate(prediction, test_y, test_seeds, names, visible)))
                 fitted[identity] = (variant, fits)
             constant = np.broadcast_to(np.nanmean(train_y, axis=0), test_y.shape)

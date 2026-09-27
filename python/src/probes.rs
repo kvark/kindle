@@ -121,6 +121,12 @@ impl PyRegressionProbe {
             .map_err(PyValueError::new_err)
     }
 
+    fn reset(&mut self, inputs: usize, targets: usize, seed: u64) -> PyResult<()> {
+        self.inner
+            .reset(inputs, targets, seed)
+            .map_err(PyValueError::new_err)
+    }
+
     fn learn(
         &mut self,
         features: &[u8],

@@ -211,6 +211,37 @@ def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch):
     np.testing.assert_array_equal(prediction, [[32]])
 
 
+def test_mlp_reuses_device_but_resets_every_fit():
+    class Model:
+        gpu_device = dict(device_name="NVIDIA GeForce RTX 5080", driver_info="580.178.04")
+        gpu_memory_budget = dict(budget_bytes=4 << 30, usage_bytes=0)
+        resets = []
+
+        def reset(self, inputs, targets, seed):
+            self.resets.append((inputs, targets, seed))
+            self.value = 0.
+
+        def learn(self, *args, **kwargs):
+            self.value += 1
+            return 1.
+
+        def predict(self, x):
+            return [self.value]*64
+
+        def parameters(self):
+            return [[self.value]]
+
+        def set_parameters(self, values):
+            self.value = values[0][0]
+
+    model = Model()
+    data = np.array([[0.], [1.]])
+    first, _ = fit_atari_probes.mlp_probe(data, data, data, data, data, 1009, steps=32, model=model)
+    second, _ = fit_atari_probes.mlp_probe(data, data, data, data, data, 2017, steps=32, model=model)
+    assert model.resets == [(1, 1, 1009), (1, 1, 2017)]
+    np.testing.assert_array_equal(first, second)
+
+
 def test_secondary_visible_metrics_require_current_and_previous_sprite_for_velocity():
     frames = np.zeros((16, 210, 160, 3), dtype=np.uint8)
     ram = np.zeros((16, 128), dtype=np.uint8)

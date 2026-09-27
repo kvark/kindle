@@ -59,9 +59,28 @@ target-standardized MSE. Both fit only training trajectories, with training-only
 feature/target normalization; neither refits on validation or selects on test.
 Head seeds describe probe-fit variability, not independent RL experiments.
 
-The [partial linear results](../results/2026-09-27-representation-probes.md)
-include every target/variant and both held-out trajectories. They show mixed
-trained-versus-initial Tiny differences, not an established pretraining gain.
+The [linear results](../results/2026-09-27-representation-probes.md) now cover all
+five controls, every target/variant and both held-out trajectories. Trained
+versus initial Tiny remains mixed. Large improves primary position/motion
+decoding substantially; the 173k CNN roughly matches Tiny's position decoding
+at much lower capacity. MLP fits and gameplay remain required. Large extraction
+took 4,976.55s versus 678.06/682.03s for trained/initial Tiny; this includes
+offline projection/compression, not isolated actor inference. CNN reconstruction
+completed 16,384 updates in 47.17s, validation MSE 1.68956 -> .00614619,
+selecting the final checkpoint `ff05e413`. Different training corpora and
+temporal inputs still prevent attributing all differences to architecture.
+
+The first MLP sweep stopped after three recorded variants when another device
+construction returned `no supported device found`. No kernel GPU fault was
+recorded; the cause is not established. Preserve `offline-queue/tiny-mlp` and
+its partial `tiny-mlp/progress.jsonl`. The continuation uses one device per
+sweep, with fresh sessions/weights/optimizer state for each head. The native
+independent value/gradient test plus 33 resets (including shape changes) passes
+on RTX5080, preserving initial weights and exact first-update moments/weights;
+897 Python tests, 97 Rust CPU tests, formatting and release Clippy pass.
+`offline-queue-v2` contains only uncompleted probes/smokes and a fresh
+`tiny-mlp-v2` output, not a restart of the stopped writer. This is GPU device
+reuse, not a CPU learner, changed fit budget or established historical root cause.
 
 The reconstruction control is a **172,864-parameter stateless patch CNN**:
 stride16/kernel16 RGB stem (64 channels), two padded 3x3 convolutions at 14x14,
