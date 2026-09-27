@@ -1,0 +1,170 @@
+{
+  "date": "2026-09-27",
+  "kind": "historical_snapshot_not_new_training",
+  "normalization": "(score - random) / (human - random); ratio, not percent",
+  "references": "https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml",
+  "aggregation": "equal weight per learner seed; no suite aggregate because budgets/protocols differ",
+  "limitations": [
+    "Frozen terminal summaries only; curves and learner-seed confidence intervals are not reconstructed here.",
+    "Single-seed rows do not establish reliability; episode counts are not independent training replicates.",
+    "All inputs are historical RGB64/non-sticky except the separately labelled sticky Pong evaluation; not current native-input results.",
+    "Large and Tiny encoders, backends, budgets, action spaces and replay ratios differ across rows.",
+    "Freeway training assistance is absent from frozen evaluation.",
+    "Tiny received 250000 random-play RGB64 observations from Boxing, Pong, Freeway, Breakout and Qbert; 45000 training and 5000 validation per game."
+  ],
+  "results": [
+    {
+      "game": "Boxing",
+      "variant": "historical frozen non-sticky",
+      "encoder": "Large",
+      "sticky_probability": 0,
+      "seeds": [
+        {
+          "seed": 1009,
+          "mean_score": 83.869918699187,
+          "episodes": 123,
+          "source": "runs/boxing-confirmation-20260910.hTEDcu/seed1009-result.json"
+        },
+        {
+          "seed": 2017,
+          "mean_score": 90.58454106280193,
+          "episodes": 207,
+          "source": "runs/boxing-confirmation-20260910.hTEDcu/seed2017-result.json"
+        },
+        {
+          "seed": 3019,
+          "mean_score": 83.52941176470588,
+          "episodes": 51,
+          "source": "runs/boxing-confirmation-20260910.hTEDcu/seed3019-result.json"
+        }
+      ],
+      "exploration": null,
+      "random_reference": 0.1,
+      "human_reference": 12.1,
+      "mean_score": 85.9946238422316,
+      "human_normalized_score": 7.157885320185968,
+      "curves": null,
+      "uncertainty": null
+    },
+    {
+      "game": "Freeway",
+      "variant": "historical frozen non-sticky",
+      "encoder": "Tiny",
+      "sticky_probability": 0,
+      "seeds": [
+        {
+          "seed": 1009,
+          "mean_score": 32.916666666666664,
+          "episodes": 36,
+          "source": "runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final-score.json"
+        },
+        {
+          "seed": 2017,
+          "mean_score": 31.694444444444443,
+          "episodes": 36,
+          "source": "runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final-score.json"
+        },
+        {
+          "seed": 3019,
+          "mean_score": 33.25,
+          "episodes": 36,
+          "source": "runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final-score.json"
+        }
+      ],
+      "exploration": {
+        "probability": 0.5,
+        "hold": 64
+      },
+      "random_reference": 0,
+      "human_reference": 29.6,
+      "mean_score": 32.62037037037037,
+      "human_normalized_score": 1.1020395395395393,
+      "curves": null,
+      "uncertainty": null
+    },
+    {
+      "game": "Pong",
+      "variant": "sticky, equal first 4 episodes per stream",
+      "encoder": "Large",
+      "sticky_probability": 0.25,
+      "seeds": [
+        {
+          "seed": 1009,
+          "mean_score": -7.166666666666667,
+          "episodes": 24,
+          "source": "runs/pong-sticky-evaluation-20260926.SxeHCw/seed1009-result.json"
+        }
+      ],
+      "exploration": null,
+      "random_reference": -20.7,
+      "human_reference": 14.6,
+      "mean_score": -7.166666666666667,
+      "human_normalized_score": 0.38338054768649665,
+      "curves": null,
+      "uncertainty": null
+    },
+    {
+      "game": "Breakout",
+      "variant": "four actions",
+      "encoder": "Tiny",
+      "sticky_probability": 0,
+      "seeds": [
+        {
+          "seed": 0,
+          "mean_score": 10.916666666666666,
+          "episodes": 24,
+          "source": "runs/breakout-minimal-comparison-20260926.xsQCaK/a4/evaluate-result.json"
+        }
+      ],
+      "exploration": null,
+      "random_reference": 1.7,
+      "human_reference": 30.5,
+      "mean_score": 10.916666666666666,
+      "human_normalized_score": 0.32002314814814814,
+      "curves": null,
+      "uncertainty": null
+    },
+    {
+      "game": "Breakout",
+      "variant": "eighteen actions",
+      "encoder": "Tiny",
+      "sticky_probability": 0,
+      "seeds": [
+        {
+          "seed": 0,
+          "mean_score": 11.625,
+          "episodes": 24,
+          "source": "runs/breakout-minimal-comparison-20260926.xsQCaK/a18/evaluate-result.json"
+        }
+      ],
+      "exploration": null,
+      "random_reference": 1.7,
+      "human_reference": 30.5,
+      "mean_score": 11.625,
+      "human_normalized_score": 0.3446180555555556,
+      "curves": null,
+      "uncertainty": null
+    },
+    {
+      "game": "Qbert",
+      "variant": "3.2M actions, R64 final",
+      "encoder": "Tiny",
+      "sticky_probability": 0,
+      "seeds": [
+        {
+          "seed": 0,
+          "mean_score": 12595.37037037037,
+          "episodes": 27,
+          "source": "runs/qbert-r64-3m2-20260925.FrriIH/seed0/final-result.json"
+        }
+      ],
+      "exploration": null,
+      "random_reference": 163.9,
+      "human_reference": 13455,
+      "mean_score": 12595.37037037037,
+      "human_normalized_score": 0.935322913105038,
+      "curves": null,
+      "uncertainty": null
+    }
+  ]
+}

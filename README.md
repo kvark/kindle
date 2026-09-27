@@ -19,6 +19,18 @@ scores, whole-rollout **videos**, world-model reports and next experiments;
 [AGENTS.md](AGENTS.md) for working directions. Swarms follow strong single-actor
 learning and cross-game transfer, not the other way around.
 
+Current priority follows the [strategy reset](docs/strategy_reset_plan.md):
+shorten learner iterations, establish fast small-model screening, test whether
+LeVJEPA improves learning, then tackle sparse-reward exploration and video priors.
+Do not repeat unchanged mastery-gate runs. New compact evidence belongs in
+`docs/results/`; the PR remains the live status dashboard.
+
+Historical Freeway training used random-action assistance (probability .5,
+hold 64); frozen evaluation was unassisted. Tiny encoder `7fe9b252` received
+250,000 random-play RGB64 observations from **Boxing, Pong, Freeway, Breakout
+and Qbert** (45k train + 5k validation per game), additional same-title offline
+experience. [Native pretraining source](https://github.com/kvark/kindle/tree/exp/levjepa-tiny-pretrain-20260920).
+
 ## Architecture
 
 The deterministic prior predicts frozen visual features **before** the current

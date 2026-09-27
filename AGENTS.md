@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- The September 27 user direction adopts `docs/strategy_reset_plan.md`:
+  iteration speed -> test LeVJEPA's value -> exploration/reward -> video priors
+  for dynamics/behavior -> later asynchronous real-time deployment. Stop
+  unchanged five-game/mastery confirmations and Atari-only gate tuning.
+  The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
+  Phase 1a learner synchronization/readbacks are the implementation priority;
+  GPU acting/capture is already integrated. Do not mix speed and learning changes.
+- The first shared-parameter step passes exact 241-tensor/146-moment and report
+  parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
+  Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
+  throughput or the 3x target. See `docs/results/2026-09-27-shared-parameters.md`.
+  Next target posterior/imagination readbacks; leave slow-critic EMA independent.
+  Shared mutable weights require serialized actor/learner access.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or
@@ -17,13 +30,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   checkpoints and requested diagnostics may cross the host boundary. A buffer
   entry point alone is not capture integration. Validate ownership, producer
   completion and GPU memory visibility, including ring-buffer reuse.
-- Use the independently pretrained ~5.5M-parameter causal-video Tiny frontend,
+- The current reference uses the independently pretrained ~5.5M causal Tiny frontend,
   not DINO or the 303M Large default. Keep Dreamer12M and the 7x7x64 observation
-  contract until separately measured representation experiments justify change.
+  contract for speed comparisons. Small learners/learned encoders are allowed in
+  explicitly separate screening/representation experiments. JEPA must earn its
+  place on probes and learning curves; it is not an obligation for 2D games.
   Preserve native image detail; no downscale-then-upscale adapter pipeline.
 - Prioritize one reliable actor before swarms: Atari, accelerated playing plus
   learning, video/world pretraining, mind-games vkQuake2/TMNF, GOG/Wine, then
-  held-out cross-game adaptation and retention. No concurrent learner service.
+  held-out cross-game adaptation and retention. No concurrent learner service
+  now; the strategy's later deployment phase may introduce one after measuring
+  effective single-actor learning, actor latency and learner debt.
 - Six environments share batched perception/policy and one learner, not causal
   histories. Preserve per-stream recurrent state, RNG, replay and resets. The
   encoder's 16-arrival chunk reset is not an environment/RSSM reset.
@@ -68,8 +85,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   These are short plumbing tests, not 12M training speed or competence. Keep its
   sparse reward/terminal adapter and full mind-games GameSession integration distinct
   from transport success. See `docs/experiments/2026-09-26-gpu-resident-acting.md`.
-- Declare budgets, seeds, controls and competence gates before learning
-  comparisons. Retain failures and all completed episodes/unfinished tails.
+- Screen small, confirm big. Use one changed factor, >=3 learner seeds and
+  score-vs-actions/time curves for development learning comparisons, with
+  bootstrap uncertainty or suite IQM; no development mastery gates. Numerical
+  smoke tests are not multi-seed learning experiments. One matched timing plus
+  numerical/learning parity check suffices for a speed change; no micro-campaign.
+  Commit each new result as compact JSON + Markdown in `docs/results/`, including
+  config, seeds, aids, curves and limits. PR29 remains the status dashboard.
+  Keep original competence gates for final confirmed claims. Retain failures
+  and all completed episodes/unfinished tails.
   Plumbing tests and online wins are not frozen competence. Report aggregate
   and per-stream real time. A lower replay ratio is a learning tradeoff.
 - Frozen evaluation never updates weights. Restore without replay/RNG/live

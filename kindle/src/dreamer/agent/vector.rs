@@ -100,8 +100,8 @@ impl VectorCore {
             Mode::Inference,
             false,
         );
-        sync_matching(&learner.world_train, &mut observe, "world.");
-        sync_matching(&learner.behavior_train, &mut policy, "behavior.actor.");
+        share_matching(&mut learner.world_train, &mut observe, "world.");
+        share_matching(&mut learner.behavior_train, &mut policy, "behavior.actor.");
         let acting = ActingGpu::new(Arc::clone(&learner.gpu), config, streams);
         let copies = DeviceCopies::new(Arc::clone(&learner.gpu));
         let size = config.network();

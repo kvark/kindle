@@ -1,0 +1,260 @@
+{
+  "kind": "synthetic_fixed_recipe_speed_screen",
+  "seed": 0,
+  "updates": 36,
+  "timing_warmup_updates": 4,
+  "config": {
+    "action_count": 18,
+    "model_size": "size12_m",
+    "observation_decoder_depth": 64,
+    "replay_capacity": 2048,
+    "batch_size": 16,
+    "batch_length": 64,
+    "world_backprop_length": 64,
+    "world_microbatch_size": 16,
+    "replay_context": 1,
+    "train_ratio": 256,
+    "imagination_length": 15,
+    "horizon": 333,
+    "lambda": 0.95,
+    "free_nats": 1,
+    "dynamics_free_nats": null,
+    "unimix": 0.01,
+    "value_bins": 255,
+    "actor_unimix": 0.01,
+    "actor_entropy": 0.0003,
+    "slow_value_rate": 0.02,
+    "return_norm_rate": 0.01,
+    "learning_rate": 0.00004,
+    "behavior_learning_rate": null,
+    "actor_learning_starts": 0,
+    "learning_rate_warmup": 1000,
+    "optimizer_beta1": 0.9,
+    "optimizer_beta2": 0.999,
+    "optimizer_epsilon": 1e-20,
+    "agc": 0.3,
+    "agc_pmin": 0.001,
+    "loss_scales": {
+      "reconstruction": 0,
+      "future_prediction": 0.25,
+      "reward": 1,
+      "continuation": 1,
+      "dynamics": 1,
+      "representation": 0.1,
+      "policy": 1,
+      "value": 1,
+      "replay_value": 0.3
+    },
+    "replay_value_gradient": true,
+    "extrinsic_reward_scale": 1,
+    "intrinsic_reward_scale": 0,
+    "visitation_bonus": false,
+    "seed": 0,
+    "skip_full_optimize": false
+  },
+  "state_exact": true,
+  "non_timing_reports_exact": true,
+  "state": {
+    "world.safetensors": {
+      "entries": 164,
+      "moments": 102
+    },
+    "behavior.safetensors": {
+      "entries": 66,
+      "moments": 44
+    },
+    "slow_value.safetensors": {
+      "entries": 11,
+      "moments": 0
+    }
+  },
+  "mean_update_speedup": 1.06695337808275,
+  "time_reduction_percent": 6.275192474019919,
+  "timing": {
+    "control": {
+      "replay_seconds": {
+        "mean_ms": 0.7025005,
+        "median_ms": 0.684434
+      },
+      "posterior_seconds": {
+        "mean_ms": 33.3370726875,
+        "median_ms": 33.3723265
+      },
+      "imagination_seconds": {
+        "mean_ms": 84.62603503125,
+        "median_ms": 84.5609615
+      },
+      "world_train_seconds": {
+        "mean_ms": 69.3575408125,
+        "median_ms": 69.27728499999999
+      },
+      "replay_refresh_seconds": {
+        "mean_ms": 0.45907709375,
+        "median_ms": 0.468243
+      },
+      "world_sync_seconds": {
+        "mean_ms": 13.837656625,
+        "median_ms": 13.683955500000001
+      },
+      "behavior_train_seconds": {
+        "mean_ms": 21.8950964375,
+        "median_ms": 21.861006
+      },
+      "behavior_sync_seconds": {
+        "mean_ms": 2.814456125,
+        "median_ms": 2.7697279999999997
+      },
+      "total_seconds": {
+        "mean_ms": 227.03104221875,
+        "median_ms": 227.4219205
+      }
+    },
+    "candidate": {
+      "replay_seconds": {
+        "mean_ms": 0.6702459375,
+        "median_ms": 0.6700545
+      },
+      "posterior_seconds": {
+        "mean_ms": 33.3347650625,
+        "median_ms": 33.410122
+      },
+      "imagination_seconds": {
+        "mean_ms": 84.209485375,
+        "median_ms": 84.0385885
+      },
+      "world_train_seconds": {
+        "mean_ms": 69.53363093749999,
+        "median_ms": 69.5945265
+      },
+      "replay_refresh_seconds": {
+        "mean_ms": 0.3829396875,
+        "median_ms": 0.37847749999999997
+      },
+      "world_sync_seconds": {
+        "mean_ms": 0.06852896875,
+        "median_ms": 0.066386
+      },
+      "behavior_train_seconds": {
+        "mean_ms": 21.6076619375,
+        "median_ms": 21.5895535
+      },
+      "behavior_sync_seconds": {
+        "mean_ms": 2.976145375,
+        "median_ms": 2.9849
+      },
+      "total_seconds": {
+        "mean_ms": 212.78440734375002,
+        "median_ms": 212.83517899999998
+      }
+    }
+  },
+  "curves_ms": {
+    "control": {
+      "total_ms": [
+        236.299159, 230.22039, 231.515618, 230.141439, 228.038545, 227.465341,
+        227.935205, 227.414961, 227.42888, 227.908784, 228.8981, 229.645315,
+        228.890481, 229.506835, 229.377453, 227.642633, 223.693126, 227.498932,
+        227.773503, 228.582578, 219.939421, 225.726019, 225.195816, 224.070718,
+        224.564062, 225.002265, 223.266453, 224.643372, 224.34327, 225.884591,
+        224.720783, 247.410623, 224.21023, 227.887364, 226.288513, 224.139179
+      ],
+      "world_sync_ms": [
+        15.691865, 16.324028, 14.234815, 14.685957, 13.53353, 13.152077,
+        13.151248, 12.892836, 13.413039, 13.70477, 13.078557, 14.521897,
+        13.178668, 13.348978, 13.663141, 13.450989, 13.277779, 13.343079,
+        13.439469, 14.181705, 13.46041, 14.707707, 14.471136, 14.391965,
+        14.733368, 14.322735, 13.935622, 13.936073, 13.5998, 13.875502,
+        13.660401, 13.977373, 14.466866, 15.08156, 13.869822, 14.98291
+      ],
+      "behavior_sync_ms": [
+        2.924929, 2.758159, 2.99547, 2.711858, 2.818329, 2.860909,
+        2.738619, 2.756188, 2.683497, 2.736758, 2.661147, 2.741168,
+        2.775249, 2.773618, 2.644467, 2.819719, 2.782958, 2.726539,
+        2.685658, 2.889749, 2.760128, 2.765838, 2.9595, 2.923939,
+        4.047037, 2.809438, 2.642397, 2.778228, 2.659597, 3.023311,
+        2.656928, 2.672967, 2.86602, 2.854559, 2.894049, 2.654088
+      ]
+    },
+    "candidate": {
+      "total_ms": [
+        220.406394, 219.300397, 217.038482, 215.741753, 213.484758, 213.639629,
+        215.22438, 214.006892, 215.883273, 215.269341, 214.892538, 212.876344,
+        214.006832, 213.910911, 216.927572, 212.821634, 212.848724, 212.486082,
+        214.159042, 212.018008, 211.054012, 211.628865, 214.227433, 213.475628,
+        211.278763, 209.22704, 212.28724, 211.520045, 210.589379, 209.632083,
+        211.285055, 209.14325, 209.412292, 212.23021, 212.33621, 215.31757
+      ],
+      "world_sync_ms": [
+        0.06073, 0.066161, 0.06586, 0.065221, 0.06459, 0.065,
+        0.062531, 0.06586, 0.066411, 0.065641, 0.082651, 0.06799,
+        0.07934, 0.066281, 0.082641, 0.066561, 0.07729, 0.065001,
+        0.05908, 0.06636, 0.07758, 0.06335, 0.06657, 0.0702,
+        0.065611, 0.067071, 0.066791, 0.06625, 0.066331, 0.066931,
+        0.0677, 0.068221, 0.066361, 0.06436, 0.065331, 0.081041
+      ],
+      "behavior_sync_ms": [
+        3.889426, 3.200551, 2.96283, 3.451963, 3.03915, 2.969149,
+        2.92835, 2.861529, 3.03044, 3.071681, 3.03374, 3.360652,
+        3.257852, 3.00701, 3.210802, 3.04307, 3.03844, 3.07919,
+        3.00887, 2.95882, 3.02327, 2.943119, 2.97831, 3.01,
+        2.99149, 2.902339, 3.00664, 2.865199, 2.798338, 2.815869,
+        2.811549, 2.89061, 2.721098, 2.875259, 2.900129, 2.804688
+      ]
+    }
+  },
+  "limitations": [
+    "One control/candidate order, not sustained Atari throughput or a multi-seed learning experiment.",
+    "Synthetic replay excludes the encoder, environment and vector collection.",
+    "Direct parameters share GPU storage; derived weights and slow-critic EMA still use the host.",
+    "The 3x target is not established by this comparison."
+  ],
+  "date": "2026-09-27",
+  "control_source": "093a7bf (same native source as 0dacfe1), plus canary device/budget assertions",
+  "candidate": "Compatible direct weights shared; private/derived residual transfers batched; slow critic independent",
+  "device": {
+    "name": "NVIDIA GeForce RTX 5080",
+    "driver": "580.178.04",
+    "meganeura": "367e53d4",
+    "blade": "7cca6377"
+  },
+  "artifacts": "runs/strategy-sync-20260927.jfYyDI",
+  "container_note": "Each saved file passes its own SHA-256. Parsed headers and individual tensor bytes match; serialized file bytes need not match.",
+  "integration": {
+    "complete": true,
+    "actions": 1536,
+    "updates": 34,
+    "streams": 6,
+    "seed": 7301,
+    "native_observation_shape": [
+      210,
+      160,
+      3
+    ],
+    "state_entries_exact": 241,
+    "moments_exact": 146,
+    "actions_rewards_boundaries_reports_exact": true,
+    "minimum_estimated_headroom_bytes": {
+      "control": 13386317824,
+      "candidate": 13419937792
+    },
+    "competence_claim": false,
+    "throughput_claim": false,
+    "encoder": {
+      "sha256": "7fe9b25287b2bff6e0555a74ad2fc7ee9f0e5513fc465475040b082ad2907c5b",
+      "architecture": "causal LeVJEPA Tiny",
+      "offline_observations": 250000,
+      "corpus": [
+        "Boxing",
+        "Pong",
+        "Freeway",
+        "Breakout",
+        "Qbert"
+      ],
+      "per_game_split": {
+        "train": 45000,
+        "validation": 5000
+      }
+    },
+    "exploration_assistance": false
+  }
+}
