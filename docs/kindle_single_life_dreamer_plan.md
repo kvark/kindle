@@ -179,17 +179,18 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    GPU pixels, independent gradients, current-weight replay encoding and exact
    checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
    not a return to upscaled JEPA or the offline reconstruction checkpoint.
-   The first full declaration stopped in host-log capture before launching a
-   GPU worker; fresh local upstream, pretrained-Tiny and initial-Tiny Pong seed1009 runs now
-   complete 200,004 actions / 49,651 updates each. Last-50 online scores are
-   **-3.04 upstream, -17.34 pretrained Tiny, -14.28 initial Tiny**, at
-   19.78 / 20.02 / 20.06 actions/s respectively.
+   The first five-arm Pong seed1009 comparison completes **200,004 actions /
+   49,651 updates per arm**, with finite checkpoints and passing guards.
+   Last-50 online scores are **-3.04 upstream, -11.56 Large, -14.28 initial
+   Tiny, -15.78 joint RGB CNN and -17.34 pretrained Tiny**. Large runs at
+   14.31 actions/s versus 18.70-20.06 for the other arms.
    [Complete curves and limits](results/2026-09-27-representation-learning.md)
-   retain every episode and unfinished tail. The native RGB CNN also completes
-   at -15.78 / 18.70 actions/s; its different encoder/decoder is not an isolated
-   frontend swap. This early seed favors upstream and shows no Tiny pretraining
-   benefit, but is not competence or a multi-seed frontend decision. The remaining matrix runs serially. The three-seed,
-   three-game, 200,004-action-per-run comparison remains unfinished.
+   retain every episode and unfinished tail. This one seed favors upstream
+   and shows no Tiny pretraining benefit; Large is the strongest native arm
+   here, but costs more time. The native RGB control changes the encoder and
+   decoder, not just the frontend. None of these online results establishes
+   competence or a multi-seed architecture decision. The remaining fixed matrix
+   runs serially; the three-seed, three-game comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.
    If frozen JEPA offers no probe/learning benefit, change the 2D frontend;

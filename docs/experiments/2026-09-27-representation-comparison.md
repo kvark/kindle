@@ -220,26 +220,19 @@ Its NAS-backed kernel-log capture timed out and was not reaped within the
 guard's deadline; that capture PID is now absent. No native failure or new
 kernel GPU fault was recorded. Preserve the failed attempt. Use local storage
 for live guards/logs, and archive completed artifacts separately; no guard
-timeout or acceptance threshold is relaxed. The fresh local upstream Pong
-seed1009 control now completes in `runs/representation-learning-20260927.bTE8iK`:
-200,004 actual actions / 49,651 updates in 10,111.10s, zero debt, all 288 saved
-tensors finite, RSSM/encoder/policy weights changed, and a passing/reaped guard.
-Its last-50 online score is -3.04, not frozen competence. The
-[partial learning report](../results/2026-09-27-representation-learning.md)
-retains all 100 completed episodes and unfinished tails. Matched pretrained
-Tiny seed1009 also completes, with the same action/update counts, finite state
-and a passing guard: 9,990.64s, last-50 score -17.34. This first paired seed
-favors upstream at nearly equal throughput, not a multi-seed frontend decision.
-Initial Tiny also completes at the same budget: 9,969.86s, last-50 score -14.28,
-with finite state and a passing guard. This seed does not show a pretraining
-benefit; other methods, seeds and games remain required before deciding.
-The fresh joint RGB CNN also completes at the same budget, with finite state
-and a passing guard: 10,695.02s, last-50 score -15.78. Full-replay sampled
-headroom remains at least 4.56 GiB. It also trails upstream in this seed;
-native/upstream architectural differences prevent attributing the gap solely
-to the frozen encoder or reconstruction choice.
-Its `learning-remainder.json` declares the other 44 entries behind positive
-completion of both the active native guard and its controller. The complete
+timeout or acceptance threshold is relaxed. The local matrix lives in
+`runs/representation-learning-20260927.bTE8iK`. All five Pong seed1009 arms
+complete 200,004 actual actions / 49,651 updates, with zero debt, finite
+checkpoints and passing/reaped guards. The
+[rolling learning report](../results/2026-09-27-representation-learning.md)
+holds scores, timings, memory audits, all episodes and unfinished tails.
+Upstream leads this first seed; Large is the strongest native arm but slower,
+and Tiny shows no pretraining benefit. This is not frozen competence or a
+multi-seed frontend decision. Native/upstream architectural differences prevent
+attributing the gap solely to the frozen encoder or reconstruction choice.
+
+`learning-remainder.json` declares the other 44 entries behind positive
+completion of both the first native guard and its controller. The complete
 matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
 learner seed, game order is Pong/Seaquest/Breakout; method order rotates by
 game and seed. Each direct worker has an eight-hour limit, with no overlap,
@@ -258,7 +251,7 @@ pooling/projection/input change is adopted separately after a learning check.
 
 Raw preparation: `runs/representation-probes-20260927.POCnif`. Completed results
 will be committed as self-contained JSON + Markdown under `docs/results/`.
-No representation advantage has yet been measured in this phase.
+No multi-seed gameplay representation advantage has yet been established.
 
 The [five integration smokes](../results/2026-09-27-matched-integration.md)
 now pass: each executes 6,144 actions / 1,186 updates, starts updates at 1,404,
