@@ -296,6 +296,43 @@
       "instrumentation_wall_ratio": 0.9780127554190999
     }
   },
+  "post_layout_profile": {
+    "posterior": {
+      "dispatches": 3459,
+      "barrier_groups": 2310,
+      "ordinary_wall_median_ms": 17.075713999999998,
+      "ordinary_gpu_ms": 13.864736,
+      "instrumentation_wall_ratio": 3.770478235932038
+    },
+    "imagination": {
+      "dispatches": 3024,
+      "barrier_groups": 1189,
+      "ordinary_wall_median_ms": 42.018105,
+      "ordinary_gpu_ms": 39.382048000000005,
+      "instrumentation_wall_ratio": 3.35529134405276
+    },
+    "slow_value": {
+      "dispatches": 14,
+      "barrier_groups": 14,
+      "ordinary_wall_median_ms": 2.888631,
+      "ordinary_gpu_ms": 2.74896,
+      "instrumentation_wall_ratio": 0.9817387544480413
+    },
+    "world_gradient": {
+      "dispatches": 14863,
+      "barrier_groups": 4330,
+      "ordinary_wall_median_ms": 53.313458000000004,
+      "ordinary_gpu_ms": null,
+      "instrumentation_wall_ratio": 16.0995315104115
+    },
+    "behavior_gradient": {
+      "dispatches": 229,
+      "barrier_groups": 34,
+      "ordinary_wall_median_ms": 19.432291,
+      "ordinary_gpu_ms": 18.961408,
+      "instrumentation_wall_ratio": 0.9887295327143876
+    }
+  },
   "profile_limits": "Dispatch timestamps perturb runtime by 4-39x. Not runtime shares or SM utilization. World ordinary GPU timing covers only last of four chunks and is deliberately omitted.",
   "pong_config": {
     "action_count": 18,
