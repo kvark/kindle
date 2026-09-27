@@ -9,6 +9,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 
 | Method | Game | Seeds | Final score [95% CI] | Human-normalized |
 | --- | --- | ---: | ---: | ---: |
+| pretrained_tiny | Pong | 1 | 1009: -17.340 | — |
 | upstream | Pong | 1 | 1009: -3.040 | — |
 
 Human normalization uses [pinned upstream anchors](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml); 1 is the reference human, not mastery.
@@ -27,6 +28,7 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 
 | Method | Game | Seed | Run seconds | Actions/s | Estimated headroom |
 | --- | --- | ---: | ---: | ---: | ---: |
+| pretrained_tiny | Pong | 1009 | 9990.64 | 20.02 | 7.89 GiB |
 | upstream | Pong | 1009 | 10111.10 | 19.78 | 2.37 GiB |
 
 All listed workers exited zero and were reaped; final checkpoints are finite.
@@ -34,4 +36,4 @@ Run time includes initial policy/encoding and final save; construction remains s
 Vulkan budget headroom is estimated, not physical free or peak VRAM. JAX reserves an 80% CUDA pool;
 its separate live-array and reserved-pool peaks are recorded, not treated as native-comparable peak memory.
 
-**1/45 runs complete.** No frontend decision or Phase 2 completion yet.
+**2/45 runs complete.** No frontend decision or Phase 2 completion yet.

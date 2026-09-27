@@ -226,8 +226,11 @@ seed1009 control now completes in `runs/representation-learning-20260927.bTE8iK`
 tensors finite, RSSM/encoder/policy weights changed, and a passing/reaped guard.
 Its last-50 online score is -3.04, not frozen competence. The
 [partial learning report](../results/2026-09-27-representation-learning.md)
-retains all 100 completed episodes and unfinished tails. One control seed
-does not establish a representation advantage; pretrained Tiny seed1009 is next.
+retains all 100 completed episodes and unfinished tails. Matched pretrained
+Tiny seed1009 also completes, with the same action/update counts, finite state
+and a passing guard: 9,990.64s, last-50 score -17.34. This first paired seed
+favors upstream at nearly equal throughput, not a multi-seed frontend decision.
+The initial-Tiny control follows; other methods, seeds and games remain required.
 Its `learning-remainder.json` declares the other 44 entries behind positive
 completion of both the active native guard and its controller. The complete
 matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
