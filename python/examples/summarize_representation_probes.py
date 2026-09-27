@@ -39,6 +39,8 @@ def summarize(inputs):
         if (result["status"] != "complete" or result["limit_clips"] is not None or
                 method not in ("ridge", "mlp") or result["protocol"] != "kindle-representation-probes-v1"):
             raise ValueError("only complete full-corpus fits may enter this report")
+        if method == "mlp" and not result.get("normalization", "").startswith("training-only F64"):
+            raise ValueError("superseded MLP F32 normalization; corrected fits required")
         variants = ({"rgb56/single_frame", "rgb56/two_frames"} if model == "raw_rgb56" else
                     {f"{size}/phase{phase}/{projection}/{pooling}" for size in ("native", "rgb64")
                      for phase in (0, 15) for projection in ("random", "pca") for pooling in ("mean", "space_to_depth")})
@@ -50,6 +52,7 @@ def summarize(inputs):
             raise ValueError("duplicate model/probe result")
         seen.add((model, method))
         sources.append(dict(model=model, probe=method, result_sha256=hashlib.sha256(raw).hexdigest(),
+                            normalization=result.get("normalization", "training-only F64 ridge statistics"),
                             **{key: result[key] for key in ("protocol", "encoder_sha256", "feature_manifest_sha256", "visibility_sha256")},
                             seconds=result["seconds"]))
         for row in result["results"]:

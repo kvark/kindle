@@ -35,13 +35,19 @@ def feature_identity(*arrays):
     return tuple((x.shape, x.dtype.str, hashlib.sha256(x.tobytes()).digest()) for x in arrays)
 
 
+def standardized_features(training, *others):
+    # Float32 axis-0 accumulation can invent >1e-6 variance in a constant
+    # column. Compute training statistics in F64, then upload F32 features.
+    mean, scale = training.mean(0, dtype=np.float64), training.std(0, dtype=np.float64)
+    scale = np.where(scale > 1e-6, scale, 1.0)
+    return [np.asarray((x-mean)/scale, dtype=np.float32) for x in (training, *others)]
+
+
 def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512, model=None):
     batch, hidden, interval = 64, 128, 32
-    mean, scale = train_x.mean(0), train_x.std(0)
-    scale = np.where(scale > 1e-6, scale, 1.0)
-    xs = [np.asarray((x-mean)/scale, dtype=np.float32) for x in (train_x, validation_x, test_x)]
+    xs = standardized_features(train_x, validation_x, test_x)
     mask = np.isfinite(train_y)
-    y_mean, y_scale = np.nanmean(train_y, 0), np.nanstd(train_y, 0)
+    y_mean, y_scale = np.nanmean(train_y, 0, dtype=np.float64), np.nanstd(train_y, 0, dtype=np.float64)
     y_scale = np.where(y_scale > 1e-6, y_scale, 1.0)
     if not np.isfinite(y_mean).all() or np.any(mask.sum(0) < 2):
         raise ValueError("insufficient MLP training targets")
@@ -135,6 +141,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     result = dict(protocol=PROTOCOL, method=args.method, status="running", results=[],
+                  normalization=("training-only F64 statistics; std<=1e-6 uses scale1; F32 GPU inputs"
+                                 if args.method == "mlp" else "training-only F64 ridge statistics"),
                   encoder_sha256=feature_manifest["encoder_sha256"],
                   feature_manifest_sha256=sha256_file(args.features / "manifest.json"),
                   native_sha256=sha256_file(_native.__file__), limit_clips=feature_manifest["limit_clips"],

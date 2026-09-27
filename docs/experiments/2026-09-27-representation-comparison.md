@@ -82,6 +82,29 @@ on RTX5080, preserving initial weights and exact first-update moments/weights;
 `tiny-mlp-v2` output, not a restart of the stopped writer. This is GPU device
 reuse, not a CPU learner, changed fit budget or established historical root cause.
 
+All five initial MLP sweeps then complete, but their normalization is superseded:
+F32 training-statistic accumulation reports false nonzero variance for 7,498 /
+3,136 / 4,104 truly constant raw-feature columns in Pong / Breakout / Seaquest.
+This amplifies held-out variation and invalidates the raw-pixel positive control.
+Use F64 training-only means/standard deviations for **every** MLP, then cast
+normalized inputs to F32 for native learning. This is a numerical correction,
+not a test-selected scale floor, changed fit budget or CPU learner. Preserve the
+original fits; the report reader refuses their missing corrected-normalization
+marker. Ridge already used F64 statistics and is unaffected. Corrected MLP
+outputs use fresh `*-mlp-f64` directories.
+The [normalization report](../results/2026-09-27-probe-normalization.md) records
+the training-only diagnosis and all five superseded result identities.
+
+The first matched upstream smoke stops before any action because the collector
+indexed the outer carry tuple as streams. The pinned JAX wrapper instead returns
+dict/tuple structure with per-stream **list leaves**. Gather/commit those leaves
+without reading device arrays; a CPU fixture checks reordered partial resets and
+untouched streams. Preserve the failed `upstream-smoke`; `upstream-smoke-v2`
+is a fresh corrected invocation. No model, replay budget or optimizer changes.
+The corrected carry/normalization/queue checks pass in the full 901-test Python
+suite. Corrected MLP work waits for the smoke controller's positive completion,
+not just a native exit, and remains serialized with all learning work.
+
 The reconstruction control is a **172,864-parameter stateless patch CNN**:
 stride16/kernel16 RGB stem (64 channels), two padded 3x3 convolutions at 14x14,
 and a patchwise linear RGB decoder. Native GPU letterboxing preserves the

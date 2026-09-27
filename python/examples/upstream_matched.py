@@ -53,6 +53,26 @@ def parameter_fingerprints(parameters):
     return result
 
 
+def map_carry(function, *trees):
+    """Pinned JAX agent carry: dict/tuple structure with per-stream LIST leaves.
+
+    Keep device arrays opaque; selecting/resetting streams must not read their
+    recurrent state back to the CPU or confuse tuple components with streams.
+    """
+    first = trees[0]
+    if isinstance(first, dict):
+        if any(not isinstance(t, dict) or t.keys() != first.keys() for t in trees):
+            raise ValueError("policy carry structure changed")
+        return {key: map_carry(function, *(t[key] for t in trees)) for key in first}
+    if isinstance(first, tuple):
+        if any(not isinstance(t, tuple) or len(t) != len(first) for t in trees):
+            raise ValueError("policy carry structure changed")
+        return tuple(map_carry(function, *(t[i] for t in trees)) for i in range(len(first)))
+    if not all(isinstance(t, list) for t in trees):
+        raise ValueError("expected per-stream list leaves from upstream Agent._split")
+    return function(*trees)
+
+
 def make_environments(game, seed, streams):
     import ale_py
     import gymnasium as gym
@@ -163,11 +183,20 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
 
         def policy_and_store(streams, observations):
             obs = {key: np.stack([o[key] for o in observations]) for key in observations[0]}
-            carry, actions, extras = agent.policy([carries[i] for i in streams], obs, mode="train")
+            selected_carry = map_carry(lambda rows: [rows[i] for i in streams], carries)
+            carry, actions, extras = agent.policy(selected_carry, obs, mode="train")
+
+            def commit(rows, updated):
+                if len(updated) != len(streams):
+                    raise ValueError("upstream policy returned the wrong stream count")
+                for stream, value in zip(streams, updated):
+                    rows[stream] = value
+                return rows
+
+            map_carry(commit, carries, carry)
             selected = actions["action"].copy()
             selected[obs["is_last"]] = 0
             for row, stream in enumerate(streams):
-                carries[stream] = carry[row]
                 replay.add(dict(**observations[row], action=selected[row],
                                 **{k: v[row] for k, v in extras.items()}), stream)
             return selected

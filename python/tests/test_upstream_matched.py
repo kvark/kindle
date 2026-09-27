@@ -4,6 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 import upstream_matched as matched
@@ -76,12 +77,23 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
 
         def stream(self, stream): return stream
         def init_train(self, batch): return 0
-        def init_policy(self, batch): return list(range(batch))
+        def init_policy(self, batch):
+            # Exact container layout of the pinned JAX wrapper: model tuple,
+            # dictionaries and per-stream lists, not a list of model tuples.
+            return ((), dict(deter=[np.array([i, 0]) for i in range(batch)]),
+                    dict(action=[np.array(0) for _ in range(batch)]))
 
         def policy(self, carry, obs, mode):
             assert mode == "train"
             assert set(obs) == {"image", "reward", "is_first", "is_last", "is_terminal"}
-            return carry, dict(action=np.ones(len(carry), dtype=np.int32)), {}
+            empty, state, previous = carry
+            assert empty == ()
+            size = len(obs["reward"])
+            assert len(state["deter"]) == len(previous["action"]) == size
+            for i in range(size):
+                stream, steps = state["deter"][i]
+                state["deter"][i] = np.array([stream, 0 if obs["is_first"][i] else steps+1])
+            return carry, dict(action=np.ones(size, dtype=np.int32)), {}
 
         def train(self, carry, data):
             self.updates += 1
@@ -128,3 +140,26 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
     assert all(e.closed for e in environments)
     for records in created[0].records:
         assert len(records) == 304 and sum(not r["is_first"] for r in records) == 300
+
+
+def test_policy_carry_subsets_preserve_opaque_arrays_and_unselected_streams():
+    values = [object() for _ in range(6)]
+    carry = ((), dict(deter=values.copy(), stoch=values.copy()), dict(action=values.copy()))
+    subset = matched.map_carry(lambda rows: [rows[i] for i in [5, 2]], carry)
+    assert subset[0] == () and subset[1]["deter"] == [values[5], values[2]]
+    assert subset[1]["deter"] is not carry[1]["deter"]
+    replacements = [object(), object()]
+    updated = matched.map_carry(lambda _: replacements.copy(), subset)
+
+    def commit(rows, new):
+        for stream, value in zip([5, 2], new):
+            rows[stream] = value
+        return rows
+
+    matched.map_carry(commit, carry, updated)
+    expected = [values[0], values[1], replacements[1], values[3], values[4], replacements[0]]
+    assert carry[1]["deter"] == carry[1]["stoch"] == carry[2]["action"] == expected
+    with pytest.raises(ValueError):
+        matched.map_carry(lambda x: x, np.zeros((6, 2)))
+    with pytest.raises(ValueError):
+        matched.map_carry(lambda *x: x, carry, ((), {}, {}))

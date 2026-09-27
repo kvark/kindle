@@ -242,6 +242,17 @@ def test_mlp_reuses_device_but_resets_every_fit():
     np.testing.assert_array_equal(first, second)
 
 
+def test_mlp_constant_training_columns_do_not_gain_false_variance():
+    training = np.full((1024, 4), .8, dtype=np.float32)
+    training[:, 0] = np.arange(1024) % 2
+    validation = np.array([[1., .5, 1.1, .8]], dtype=np.float32)
+    train, valid = fit_atari_probes.standardized_features(training, validation)
+    np.testing.assert_array_equal(train[:, 1:], 0.)
+    np.testing.assert_allclose(train[:, 0], 2*training[:, 0]-1)
+    np.testing.assert_allclose(valid, [[1., -.3, .3, 0.]], atol=1e-7)
+    assert train.dtype == valid.dtype == np.float32
+
+
 def test_secondary_visible_metrics_require_current_and_previous_sprite_for_velocity():
     frames = np.zeros((16, 210, 160, 3), dtype=np.uint8)
     ram = np.zeros((16, 128), dtype=np.uint8)

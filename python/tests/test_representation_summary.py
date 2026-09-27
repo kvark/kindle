@@ -1,10 +1,11 @@
 from pathlib import Path
 import sys
+import json
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
-from summarize_representation_probes import aggregate, columns
+from summarize_representation_probes import aggregate, columns, summarize
 
 
 def test_report_separates_motion_and_preserves_negative_or_undefined_r2():
@@ -19,3 +20,11 @@ def test_report_column_packing_preserves_target_order_and_counts():
     metrics = dict(second=dict(count=2, r2=None, mae=3., rmse=4.),
                    first=dict(count=10, r2=.5, mae=1., rmse=2.))
     assert columns(metrics, ["first", "second"]) == dict(count=[10, 2], r2=[.5, None], mae=[1., 3.], rmse=[2., 4.])
+
+
+def test_report_refuses_superseded_float32_mlp_normalization(tmp_path):
+    path = tmp_path / "old.json"
+    path.write_text(json.dumps(dict(status="complete", method="mlp", limit_clips=None,
+                                    protocol="kindle-representation-probes-v1")))
+    with pytest.raises(ValueError, match="superseded MLP F32 normalization"):
+        summarize([("pretrained_tiny", path)])

@@ -16,6 +16,13 @@ import sys
 import time
 
 
+def wait_file(path, deadline):
+    while not path.exists():
+        if time.monotonic() >= deadline:
+            raise TimeoutError(f"prerequisite did not finish: {path}")
+        time.sleep(min(30, max(0, deadline - time.monotonic())))
+
+
 def run(specification, output, *, execute=subprocess.run):
     output.mkdir(parents=True, exist_ok=False)
     host = specification["host"]
@@ -27,14 +34,13 @@ def run(specification, output, *, execute=subprocess.run):
         path = Path(prerequisite["guard_result"])
         deadline = time.monotonic() + prerequisite["wait_seconds"]
         print(f"Waiting for {path}", flush=True)
-        while not path.exists():
-            if time.monotonic() >= deadline:
-                raise TimeoutError(f"prerequisite did not finish: {path}")
-            time.sleep(min(30, max(0, deadline - time.monotonic())))
+        wait_file(path, deadline)
         state = json.loads(path.read_text())
         if not state["host_guard_passed"] or state["child_exit_code"] != 0 or state["unfinished_children"]:
             raise RuntimeError(f"failed prerequisite: {path}")
-        result = json.loads(Path(prerequisite["result"]).read_text())
+        result_path = Path(prerequisite["result"])
+        wait_file(result_path, deadline)
+        result = json.loads(result_path.read_text())
         if any(result.get(key) != value for key, value in prerequisite["expected"].items()):
             raise RuntimeError(f"incomplete prerequisite result: {path}")
     completed = []

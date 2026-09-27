@@ -8,6 +8,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 from run_gpu_queue import run
+import run_gpu_queue
 
 
 def specification(tmp_path):
@@ -77,4 +78,15 @@ def test_queue_never_follows_a_failed_prerequisite(tmp_path):
     state.write_text('{"host_guard_passed":false,"child_exit_code":101,"unfinished_children":[]}')
     spec["prerequisites"] = [dict(guard_result=str(state), result="not-read", wait_seconds=1, expected={})]
     with pytest.raises(RuntimeError, match="failed prerequisite"):
+        run(spec, tmp_path / "queue", execute=lambda *a, **kw: pytest.fail("spawned"))
+
+
+def test_queue_waits_for_controller_result_after_native_guard_finishes(tmp_path, monkeypatch):
+    spec = specification(tmp_path)
+    state, result = tmp_path / "guard.json", tmp_path / "controller.json"
+    state.write_text('{"host_guard_passed":true,"child_exit_code":0,"unfinished_children":[]}')
+    spec["prerequisites"] = [dict(guard_result=str(state), result=str(result), wait_seconds=60,
+                                  expected=dict(status="complete"))]
+    monkeypatch.setattr(run_gpu_queue.time, "sleep", lambda _: result.write_text('{"status":"failed"}'))
+    with pytest.raises(RuntimeError, match="incomplete prerequisite result"):
         run(spec, tmp_path / "queue", execute=lambda *a, **kw: pytest.fail("spawned"))
