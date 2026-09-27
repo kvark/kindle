@@ -33,6 +33,15 @@ def test_pixel_controls_preserve_order_and_current_frame():
     np.testing.assert_array_equal(features["rgb56/two_frames"][:, 9408:], features["rgb56/single_frame"])
 
 
+def test_fit_reuse_requires_identical_shapes_dtypes_and_all_splits():
+    a = np.arange(12, dtype=np.float32).reshape(3, 4)
+    key = fit_atari_probes.feature_identity(a, a, a)
+    assert key == fit_atari_probes.feature_identity(a.copy(), a.copy(), a.copy())
+    assert key != fit_atari_probes.feature_identity(a, a, a+1)
+    assert key != fit_atari_probes.feature_identity(a, a.reshape(4, 3), a)
+    assert key != fit_atari_probes.feature_identity(a.astype(np.float64), a, a)
+
+
 def test_reconstruction_loader_only_reads_declared_split_and_arrivals(tmp_path):
     from atari import sha256_file
     frames = np.zeros((2, 16, 210, 160, 3), dtype=np.uint8)

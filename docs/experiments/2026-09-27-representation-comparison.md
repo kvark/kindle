@@ -59,6 +59,10 @@ target-standardized MSE. Both fit only training trajectories, with training-only
 feature/target normalization; neither refits on validation or selects on test.
 Head seeds describe probe-fit variability, not independent RL experiments.
 
+The [partial linear results](../results/2026-09-27-representation-probes.md)
+include every target/variant and both held-out trajectories. They show mixed
+trained-versus-initial Tiny differences, not an established pretraining gain.
+
 The reconstruction control is a **172,864-parameter stateless patch CNN**:
 stride16/kernel16 RGB stem (64 channels), two padded 3x3 convolutions at 14x14,
 and a patchwise linear RGB decoder. Native GPU letterboxing preserves the

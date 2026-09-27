@@ -6,6 +6,7 @@ head seeds measure fit variability, not independent RL agents or test datasets.
 """
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import time
@@ -28,6 +29,10 @@ def checked_memory(model):
 
 def bytes32(values):
     return np.asarray(values, dtype="<f4").tobytes()
+
+
+def feature_identity(*arrays):
+    return tuple((x.shape, x.dtype.str, hashlib.sha256(x.tobytes()).digest()) for x in arrays)
 
 
 def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512):
@@ -134,6 +139,7 @@ def main():
                   limits=["offline diagnostic, not gameplay or forecasts", "head seeds are fit variability, not RL seeds"])
     for game in dict.fromkeys(r["game"] for r in feature_manifest["files"]):
         rows = [r for r in feature_manifest["files"] if r["game"] == game]
+        fitted = {}
         with np.load(args.visibility) as visibility:
             visible = np.concatenate([visibility[r["file"]][:r["count"]] for r in rows if r["split"] == "test"])
         for variant in rows[0]["variants"]:
@@ -141,15 +147,24 @@ def main():
             val_x, val_y, _ = load_split(args.dataset, args.features, rows, "validation", variant)
             test_x, test_y, test_seeds = load_split(args.dataset, args.features, rows, "test", variant)
             names = target_names(game)
-            fits = []
-            for seed in ((None,) if args.method == "ridge" else args.head_seeds):
-                if seed is None:
-                    prediction, info = ridge_probe(train_x, train_y, val_x, val_y, test_x)
-                else:
-                    prediction, info = mlp_probe(train_x, train_y, val_x, val_y, test_x, seed, steps=args.mlp_steps)
-                fits.append(dict(fit=info, test=evaluate(prediction, test_y, test_seeds, names, visible)))
+            identity = feature_identity(train_x, val_x, test_x)
+            reused = fitted.get(identity)
+            if reused is not None:
+                # The stateless CNN has identical phase0/15 inputs. Reuse only
+                # byte-identical complete splits, never "similar" features or
+                # favorable labels. Same initialization, data and training budget.
+                fits = reused[1]
+            else:
+                fits = []
+                for seed in ((None,) if args.method == "ridge" else args.head_seeds):
+                    if seed is None:
+                        prediction, info = ridge_probe(train_x, train_y, val_x, val_y, test_x)
+                    else:
+                        prediction, info = mlp_probe(train_x, train_y, val_x, val_y, test_x, seed, steps=args.mlp_steps)
+                    fits.append(dict(fit=info, test=evaluate(prediction, test_y, test_seeds, names, visible)))
+                fitted[identity] = (variant, fits)
             constant = np.broadcast_to(np.nanmean(train_y, axis=0), test_y.shape)
-            row = dict(game=game, variant=variant, fits=fits,
+            row = dict(game=game, variant=variant, fits=fits, reuses_fit_from=reused[0] if reused else None,
                        constant=evaluate(constant, test_y, test_seeds, names, visible), seconds=time.monotonic()-started)
             result["results"].append(row)
             with (args.output / "progress.jsonl").open("a") as stream:
