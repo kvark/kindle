@@ -118,6 +118,17 @@ elapsed time, with final checkpoints and three-seed uncertainty. No development
 mastery gates or favorable-episode filtering. A bounded shared-protocol smoke
 precedes the campaign, but is not one of its learner seeds.
 
+Use the same 3,072-action reporting interval in both runners, plus the exact
+final budget. Scores are the last 50 completed episodes per learner seed (all
+if fewer), including artificial cutoffs; every raw episode remains in the
+published JSON. Aggregate with equal learner-seed weight and 10,000 percentile
+bootstrap resamples (RNG seed0). Interpolate wall-time curves only inside common
+measured support; do not extrapolate slow runs or fill absent early episodes
+with zero. Initial policy/encoder compilation and final checkpoint writes count
+in run time; report agent construction separately. The shared reader is
+`python/examples/summarize_representation_learning.py`. No full learning run
+has begun at this reporting declaration.
+
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise
 remove it as the 2D default and retain it as a 3D hypothesis. Any useful

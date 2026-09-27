@@ -147,7 +147,7 @@ def test_history_changes_only_storage_not_interactions(fake_runner, exploration)
     run, _ = fake_runner
     default, history = run(exploration=exploration), run(history=True, exploration=exploration)
     def transitions(case):
-        return [{key: value for key, value in row.items() if key != 'unix_time'} for row in case['rows']
+        return [{key: value for key, value in row.items() if key not in ('unix_time', 'elapsed_seconds')} for row in case['rows']
                 if row['event'] in ('transition', 'learner', 'episode', 'reset')]
     assert transitions(default) == transitions(history)
     left, right = audit(default['output']), audit(history['output'])

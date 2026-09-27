@@ -350,6 +350,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     assert result["completed_episodes"] == result["positive_return_natural_episodes"] == 2
     assert result["mean_completed_return"] == 40
     assert rows[-1]["partial_returns"] == [20, 20] and rows[-1]["partial_lengths"] == [1, 1]
+    assert all(0 < row["elapsed_seconds"] <= rows[-1]["elapsed_seconds"]
+               for row in rows if row["event"] == "episode")
     assert len(created) == 2 and all(env.closed for env in created)
 
 

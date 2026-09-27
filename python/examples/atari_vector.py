@@ -300,6 +300,7 @@ def main():
                         result = dict(event="episode", stream=stream, run_step=run_actions,
                                       stream_step=tick, episode=episode_counts[stream],
                                       episode_return=episode_returns[stream], episode_length=episode_lengths[stream],
+                                      elapsed_seconds=time.perf_counter() - started,
                                       terminated=bool(terminated[stream]), truncated=bool(truncated[stream]))
                         emit(result)
                         completed.append(result)
