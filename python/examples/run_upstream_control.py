@@ -121,8 +121,7 @@ def main() -> None:
         "--run.usage.nvsmi", "False", "--run.usage.gputil", "False",
     ]
     if args.matched_actions:
-        command += ["--env.atari100k.sticky", "True", "--replay.size", "100000",
-                    "--jax.profiler", "False"]
+        command += ["--env.atari100k.sticky", "True", "--replay.size", "100000"]
     environment = os.environ.copy()
     if args.cuda_root:
         cuda_root = args.cuda_root.resolve()
@@ -132,17 +131,20 @@ def main() -> None:
         environment["XLA_FLAGS"] = (
             environment.get("XLA_FLAGS", "") + f" --xla_gpu_cuda_data_dir={cuda_root}"
         ).strip()
-    packages = {distribution.metadata["Name"]: distribution.version
-                for distribution in importlib.metadata.distributions()}
+    # An overlay may shadow a base distribution. Record the first resolved
+    # distribution, not whichever duplicate happened to be iterated last.
+    packages = {name: importlib.metadata.version(name) for name in
+                {distribution.metadata["Name"] for distribution in importlib.metadata.distributions()}}
     manifest = {
         "source_revision": REVISION,
         "source_config_diff": patch,
         "source_config_diff_sha256": hashlib.sha256(patch.encode()).hexdigest(),
+        "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "command": command,
         "python": platform.python_version(),
         "packages": dict(sorted(packages.items())),
         "environment": {name: environment.get(name) for name in
-                        ("XLA_FLAGS", "CUDA_VISIBLE_DEVICES", "XLA_PYTHON_CLIENT_MEM_FRACTION")},
+                        ("XLA_FLAGS", "CUDA_VISIBLE_DEVICES", "XLA_PYTHON_CLIENT_MEM_FRACTION", "PYTHONPATH")},
         "protocol": "phase2-matched-actions-v1" if args.matched_actions else "published",
         "wrapper_corrections": ["ALE seed API types", "sticky probability set before ROM load"],
         "step_accounting": ("exact actual actions; resets earn no updates" if args.matched_actions else
@@ -153,6 +155,10 @@ def main() -> None:
         "backend_nvml": "normal initialization permitted; application telemetry disabled",
         "status": "running",
     }
+    if args.matched_actions:
+        manifest["matched_adapter_sha256"] = {
+            name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+            for name in ("upstream_matched.py", "atari.py")}
     manifest_path = logdir / "reference-manifest.json"
 
     def save_manifest() -> None:
@@ -191,6 +197,10 @@ def main() -> None:
             embodied.run.train = restore_train
         manifest.update(status="complete" if exit_code == 0 else "failed",
                         exit_code=exit_code, elapsed_seconds=time.perf_counter() - started)
+        manifest["imported_modules"] = {name: dict(version=getattr(sys.modules[name], "__version__", None),
+                                                  path=getattr(sys.modules[name], "__file__", None))
+                                        for name in ("jax", "jaxlib", "numpy", "ale_py", "gymnasium", "PIL")
+                                        if name in sys.modules}
         save_manifest()
     if exit_code == 0:
         (logdir / "RUN_COMPLETE").write_text("upstream exited with status zero\n")

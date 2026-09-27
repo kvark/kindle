@@ -72,6 +72,7 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
 
     class Agent:
         updates = 0
+        jaxcfg = SimpleNamespace(profiler=True)
 
         def stream(self, stream): return stream
         def init_train(self, batch): return 0
@@ -87,7 +88,8 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
             return carry, {}, dict(loss=1.0)
 
         def save(self):
-            return dict(counters=dict(updates=self.updates), params=dict(weight=np.array([self.updates], dtype=float)))
+            return dict(counters=dict(updates=self.updates), params={
+                name: np.array([self.updates], dtype=float) for name in ("dyn/weight", "enc/weight", "pol/weight")})
 
     class Budget:
         minimum_headroom = 3 << 30
@@ -114,7 +116,7 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
     monkeypatch.setattr(matched, "make_environments", lambda *a: (environments,
                        [matched.observation((frame, {}), first=True) for _ in environments]))
     args = SimpleNamespace(logdir=tmp_path, batch_size=16, batch_length=64, replay_context=1,
-                           consec_train=1, train_ratio=256, steps=1800, envs=6)
+                           consec_train=1, train_ratio=256, steps=1800.0, envs=6)
     matched.train(lambda: agent, None, None, stream, None, args, game="pong", seed=1009)
     result = json.loads((tmp_path / "comparison-result.json").read_text())
     assert result["run_step"] == 1800

@@ -38,6 +38,11 @@ def require_gpu_budget(snapshot, minimum_bytes):
         raise ValueError("native GPU memory budget headroom below declared minimum")
 
 
+def require_gpu_device(snapshot, expected):
+    if snapshot.get("device_name") != expected or snapshot.get("is_software_emulated") is not False:
+        raise ValueError(f"expected native device {expected}, got {snapshot}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("encoder_checkpoint")
@@ -173,6 +178,8 @@ def main():
         agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
                  if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
                      **(dict(encoder=args.encoder) if args.encoder else {})))
+        if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
+            require_gpu_device(agent.gpu_device, expected)
         if agent.config["action_count"] != actions:
             raise ValueError("checkpoint action vocabulary differs from environment")
         construction = time.perf_counter() - construction

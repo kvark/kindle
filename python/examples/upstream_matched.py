@@ -5,6 +5,7 @@ actions and artificial time-limit bootstrapping. This is an experiment adapter,
 not a second agent implementation. Imports never initialize CUDA or Vulkan.
 """
 
+import hashlib
 import json
 from pathlib import Path
 import time
@@ -40,6 +41,16 @@ def observation(result, *, first=False):
         image, reward, terminated, truncated, _ = result
     return dict(image=image, reward=np.float32(reward), is_first=np.bool_(first),
                 is_last=np.bool_(terminated or truncated), is_terminal=np.bool_(terminated))
+
+
+def parameter_fingerprints(parameters):
+    result = {}
+    for name, values in parameters.items():
+        values = np.asarray(values)
+        if not np.isfinite(values).all():
+            raise RuntimeError(f"nonfinite upstream state: {name}")
+        result[name] = hashlib.sha256(values.tobytes()).hexdigest()
+    return result
 
 
 def make_environments(game, seed, streams):
@@ -114,6 +125,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
         raise ValueError("matched comparison requires B16/T64/context1/R256")
     if args.steps <= 0 or args.steps % args.envs:
         raise ValueError("exact full-batch action budget required")
+    steps = int(args.steps)
     logdir = Path(str(args.logdir))
     budget = GpuBudget(logdir / "gpu-memory.jsonl")
     environments = []
@@ -128,6 +140,8 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
         budget.check("before_agent")
         construction = time.monotonic()
         agent = make_agent()
+        agent.jaxcfg.profiler = False
+        initial_parameters = parameter_fingerprints(agent.save()["params"])
         budget.check("constructed", agent)
         construction = time.monotonic() - construction
         environments, initial = make_environments(game, seed, args.envs)
@@ -182,7 +196,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
                         emulator_resets=[e.emulator_resets for e in environments],
                         replay_sequences=len(replay), training_debt=schedule.credit)
 
-        for tick in range(1, args.steps // args.envs + 1):
+        for tick in range(1, steps // args.envs + 1):
             results = [env.step(int(action)) for env, action in zip(environments, selected)]
             obs = [observation(result) for result in results]
             emit(dict(event="transition", run_step=actual+args.envs, actions=selected.tolist(),
@@ -232,14 +246,19 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
                 print(f"{actual}/{args.steps} actions; {updates} updates", flush=True)
 
         state = agent.save()  # Completes outstanding device work before final timing/validation.
-        if state["counters"]["updates"] != updates or any(not np.isfinite(x).all() for x in state["params"].values()):
+        final_parameters = parameter_fingerprints(state["params"])
+        if state["counters"]["updates"] != updates or set(final_parameters) != set(initial_parameters):
             raise RuntimeError("invalid final upstream state or update accounting")
+        changed = [name for name in final_parameters if final_parameters[name] != initial_parameters[name]]
+        if updates and any(not any(name.startswith(prefix) for name in changed) for prefix in ("dyn/", "enc/", "pol/")):
+            raise RuntimeError("RSSM, encoder and actor must all change during training")
         np.savez(logdir / "final-state.npz", **state["params"])
         (logdir / "final-counters.json").write_text(json.dumps(state["counters"]) + "\n")
         budget.check("finished", agent)
         final = progress("run_end")
         final.update(reason="budget_complete", learner_updates=updates, first_training_action=first_training_action,
-                     completed_episodes=len(completed), minimum_vulkan_estimated_headroom_bytes=budget.minimum_headroom)
+                     completed_episodes=len(completed), changed_parameters=changed,
+                     minimum_vulkan_estimated_headroom_bytes=budget.minimum_headroom)
         emit(final)
         (logdir / "comparison-result.json").write_text(json.dumps(final, indent=2) + "\n")
     finally:

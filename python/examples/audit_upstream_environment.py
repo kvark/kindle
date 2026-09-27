@@ -19,6 +19,7 @@ from upstream_matched import make_environments, observation
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--natural", action="store_true", help="1536 ticks with the real 100000-frame cutoff")
     args = parser.parse_args()
     records = []
     for game in ("pong", "breakout", "seaquest"):
@@ -33,9 +34,10 @@ def main():
 
         try:
             for stream, (env, row) in enumerate(zip(envs, initial)):
-                env._max_episode_frames = 256
+                if not args.natural:
+                    env._max_episode_frames = 256
                 observe(row, stream)
-            for step in range(160):
+            for step in range(1536 if args.natural else 160):
                 for stream, env in enumerate(envs):
                     result = env.step((step * 7 + stream * 5) % 18)
                     row = observation(result)
@@ -52,7 +54,7 @@ def main():
             for env in envs:
                 env.close()
     result = dict(protocol="phase2-shared-ale-trace-v1", seed=1009, streams=6,
-                  forced_cutoff_frames=256, records=records,
+                  forced_cutoff_frames=None if args.natural else 256, records=records,
                   versions={name: importlib.metadata.version(name) for name in ("gymnasium", "ale-py", "numpy", "pillow")})
     with args.output.open("x") as output:
         json.dump(result, output, indent=2)

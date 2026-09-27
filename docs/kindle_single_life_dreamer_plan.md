@@ -4,7 +4,7 @@ This is the authoritative plan. [Current evidence and archive](experiments/READM
 retain experiments and failures; [AGENTS.md](../AGENTS.md) gives working rules.
 Keep the runtime small, comparisons controlled and results reproducible.
 For a quick overview of done/in-progress/next work and why progress is costly,
-start with the [PR status dashboard](https://github.com/kvark/kindle/pull/29).
+start with the [Phase 2 PR status dashboard](https://github.com/kvark/kindle/pull/31).
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.
@@ -164,16 +164,19 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    changes to 12M and longer Atari confirmation.
 4. **Phase 2, in progress: test whether the representation earns its cost.**
    The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
-   starts with independent Pong/Breakout/Seaquest RGB/RAM clips. Native batched
-   token diagnostics compare identical frames; privileged labels never enter
-   the agent. Probe infrastructure/data collection alone do not close Phase 2.
+   now has 6,144 Pong/Breakout/Seaquest clips, split by whole trajectories.
+   Native batched token diagnostics compare identical frames; privileged labels
+   never enter the agent. Full pretrained/initial-Tiny extraction and linear
+   controls complete; Large, the reconstruction CNN and MLP comparisons remain.
+   Probe infrastructure/data collection alone do not close Phase 2.
    Held-out motion/
    small-object probes, then a three-seed learning comparison against random
    Tiny and a learned-encoder Dreamer control. Include a title absent from the
    video corpus. Native input is current; RGB64 is an explicit ablation.
-   The upstream GPU sanity succeeds, but reset/update accounting, replay and
-   cutoff semantics still need reconciliation before a matched efficiency
-   claim. The historical ~15.6 versus ~59 actions/s is not such a comparison.
+   The matched upstream collector now passes cross-interpreter CPU traces and
+   action/update/cutoff tests; its GPU smoke and 200,004-action-per-seed campaign
+   remain required. The historical ~15.6 versus ~59 actions/s is not a matched
+   efficiency comparison.
    If frozen JEPA offers no probe/learning benefit, change the 2D frontend;
    retain JEPA as a testable 3D candidate, not an architectural obligation.
 5. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
