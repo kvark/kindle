@@ -174,9 +174,13 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    small-object probes, then a three-seed learning comparison against random
    Tiny and a learned-encoder Dreamer control. Include a title absent from the
    video corpus. Native input is current; RGB64 is an explicit ablation.
-   Matched upstream/native smokes pass: all four complete 6,144 actions and
-   1,186 updates. The first full declaration stopped in host-log capture before
-   launching a GPU worker; use local live logs for the fresh attempt. The three-seed,
+   Matched upstream/native smokes pass: all five complete 6,144 actions and
+   1,186 updates, including the fresh joint RGB CNN (86,400 encoder parameters).
+   GPU pixels, independent gradients, current-weight replay encoding and exact
+   checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
+   not a return to upscaled JEPA or the offline reconstruction checkpoint.
+   The first full declaration stopped in host-log capture before launching a
+   GPU worker; a fresh local upstream Pong seed1009 control has launched. The three-seed,
    three-game, 200,004-action-per-run comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.

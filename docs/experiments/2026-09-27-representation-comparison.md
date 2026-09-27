@@ -147,7 +147,7 @@ Pong, Breakout and Seaquest; learner seeds **1009/2017/3019** per variant. Inclu
 DreamerV3 12M, Kindle Large, pretrained Tiny and initial Tiny, plus a jointly
 learned CNN: its competitive position probes justify this conditional arm.
 The online CNN starts fresh, not from the offline reconstruction checkpoint.
-It will use one explicitly declared native-to-RGB64 GPU resize, with no upscale
+It uses one explicitly declared native-to-RGB64 GPU resize, with no upscale
 back to 224. This is a learned-RGB research control, not a downgrade of the
 native-detail JEPA path. Replay must store pixels and re-encode them with current
 weights; stale frozen feature replay is not joint learning. Record the final CNN
@@ -167,7 +167,11 @@ baseline, not an exact upstream encoder/decoder port or a pretraining ablation
 of the offline 173k reconstruction CNN. GPU tests cover independent scalar
 values/gradients, CPU/resident preprocessing, unchanged pixel replay across
 encoder updates, per-stream resets and optimizer-preserving checkpoint restore.
-Those tests and the new arm's integration smoke must pass before its RL launch.
+Those tests and the new arm's integration smoke now pass. The first replay
+fixture compared different windows because fresh-arrival samples take priority
+over seeded RNG draws; draining that queue fixes the test without changing the
+learner. Preserve the original failed fixture. All nine CNN first-moment
+tensors are nonzero after the smoke; checkpoints are finite and restore exactly.
 Fix the budget before the
 first RL launch: **200,004 actual actions** per run (the nearest full N6 batch
 above the 200k reference), B16/T64/context1/full BPTT/H15/R256, F32, lr4e-5,
@@ -212,7 +216,20 @@ Its NAS-backed kernel-log capture timed out and was not reaped within the
 guard's deadline; that capture PID is now absent. No native failure or new
 kernel GPU fault was recorded. Preserve the failed attempt. Use local storage
 for live guards/logs, and archive completed artifacts separately; no guard
-timeout or acceptance threshold is relaxed. No full RL run has started yet.
+timeout or acceptance threshold is relaxed. The fresh local upstream Pong
+seed1009 control has launched in `runs/representation-learning-20260927.bTE8iK`.
+Its `learning-remainder.json` declares the other 44 entries behind positive
+completion of both the active native guard and its controller. The complete
+matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
+learner seed, game order is Pong/Seaquest/Breakout; method order rotates by
+game and seed. Each direct worker has an eight-hour limit, with no overlap,
+retry or successor after failure. This is a multi-day comparison, not a fast
+screen. All native full runs use the same RGB-capable package (native SHA256
+`da7e9cd03d9cda5a1d1d2569d4745ee4ea965d792a540d8822024984ece0b7d4`);
+adding the RGB arm does not change frozen-feature learning arithmetic.
+Keep runners/package/configurations fixed through the matrix; do not compile
+locally during timing. Guarded short-test memory headroom does not guarantee
+headroom at full replay capacity, so every run retains its native memory checks.
 
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise
@@ -223,11 +240,12 @@ Raw preparation: `runs/representation-probes-20260927.POCnif`. Completed results
 will be committed as self-contained JSON + Markdown under `docs/results/`.
 No learning or representation advantage has yet been measured in this phase.
 
-The [four integration smokes](../results/2026-09-27-matched-integration.md)
+The [five integration smokes](../results/2026-09-27-matched-integration.md)
 now pass: each executes 6,144 actions / 1,186 updates, starts updates at 1,404,
 and finishes with zero debt. Final native checkpoints are finite with nonzero
 world/behavior moments; upstream RSSM/encoder/actor parameters change. Tiny,
-initial Tiny, Large and upstream run at 25.64 / 25.60 / 16.94 / 25.01 actions/s
+initial Tiny, Large, upstream and the joint CNN run at 25.64 / 25.60 / 16.94 /
+25.01 / 23.17 actions/s
 over these short, warmup-containing windows. These are not steady-state rates
 or learning results. All direct-child guards pass; no kernel GPU fault. Keep
 the earlier failed carry-layout invocation separate from the passing correction.

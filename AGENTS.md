@@ -19,12 +19,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   then matched three-seed learning controls. The protocol is in
   `docs/experiments/2026-09-27-representation-comparison.md`; its offline corpus
   has whole-trajectory splits and privileged RAM labels confined to evaluation.
-  Offline ridge/corrected-MLP controls and all four integration smokes complete.
+  Offline ridge/corrected-MLP controls and all five integration smokes complete.
   Large decodes best; Tiny pretraining is mixed. The conditional joint-trained
-  CNN arm is justified, not yet implemented. Its explicit RGB64 GPU resize is
+  CNN arm is implemented and validated. Its explicit RGB64 GPU resize is
   a learned-RGB control, never a return to RGB64-upscaled JEPA. Replay pixels,
-  not stale CNN features. The first full RL declaration stopped before GPU work
-  on a NAS-backed log-capture timeout; keep live logs/guards local. No gameplay
+  not stale CNN features. GPU pixel/gradient/replay/restore checks pass; all five
+  smokes execute 6,144 actions and 1,186 updates. The first full RL declaration
+  stopped before GPU work on a NAS-backed log-capture timeout. Its fresh local
+  upstream Pong seed1009 control has launched; keep live logs/guards local.
+  The other 44 entries wait for positive controller completion, then run serially
+  with fixed inputs and stop on failure. No local compilation during timing. No gameplay
   representation advantage or Phase 2 completion is established yet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
@@ -103,8 +107,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   do not delay implementation to preserve obsolete runtime/checkpoint identities.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
   upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
-  not a matched learning comparison. Reset/update accounting, replay capacity
-  and artificial-cutoff semantics still need alignment for that claim. See
+  not a matched learning comparison. Phase 2 now independently aligns
+  reset/update accounting, replay capacity and artificial-cutoff semantics;
+  matched learning results are still required. See
   `docs/experiments/2026-09-26-gpu-pixels-and-pong-robustness.md` and
   `docs/experiments/2026-09-26-upstream-control-protocol.md`.
 - Single and vector pixel actors now share resident encoder/pooling/belief/
