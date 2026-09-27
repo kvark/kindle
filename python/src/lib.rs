@@ -659,6 +659,7 @@ fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<features::PyFeatureVectorAgent>()?;
     module.add_class::<PyLeVJepaPerception>()?;
     module.add_class::<probes::PyRegressionProbe>()?;
+    module.add_class::<probes::PyReconstructionEncoder>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;
     module.add(

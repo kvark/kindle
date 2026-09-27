@@ -91,14 +91,20 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--num-envs", type=int, default=1)
+    parser.add_argument("--matched-actions", action="store_true",
+                        help="Phase 2 shared Atari wrapper and exact actual-action/update accounting")
     parser.add_argument("--compute-dtype", choices=("float32", "bfloat16"), default="float32")
     parser.add_argument("--cuda-root", type=Path,
                         help="optional CUDA nvcc package directory containing bin/ptxas")
     args = parser.parse_args()
-    if args.steps <= 0 or args.steps % 10:
+    if not args.matched_actions and (args.steps <= 0 or args.steps % 10):
         parser.error("--steps must be a positive multiple of the upstream 10-step driver block")
     if args.num_envs <= 0:
         parser.error("--num-envs must be positive")
+    if args.matched_actions and (args.steps <= 0 or args.steps % args.num_envs):
+        parser.error("matched steps must be a positive multiple of num-envs")
+    if args.matched_actions and (args.size != "12m" or args.compute_dtype != "float32"):
+        parser.error("Phase 2 matched control requires size12m and float32")
     source = args.source.resolve()
     patch = validate_source(source)
     logdir = args.logdir.resolve()
@@ -114,6 +120,9 @@ def main() -> None:
         "--jax.compute_dtype", args.compute_dtype,
         "--run.usage.nvsmi", "False", "--run.usage.gputil", "False",
     ]
+    if args.matched_actions:
+        command += ["--env.atari100k.sticky", "True", "--replay.size", "100000",
+                    "--jax.profiler", "False"]
     environment = os.environ.copy()
     if args.cuda_root:
         cuda_root = args.cuda_root.resolve()
@@ -134,9 +143,10 @@ def main() -> None:
         "packages": dict(sorted(packages.items())),
         "environment": {name: environment.get(name) for name in
                         ("XLA_FLAGS", "CUDA_VISIBLE_DEVICES", "XLA_PYTHON_CLIENT_MEM_FRACTION")},
-        "protocol": "published",
+        "protocol": "phase2-matched-actions-v1" if args.matched_actions else "published",
         "wrapper_corrections": ["ALE seed API types", "sticky probability set before ROM load"],
-        "step_accounting": "upstream driver records include action-free reset observations",
+        "step_accounting": ("exact actual actions; resets earn no updates" if args.matched_actions else
+                            "upstream driver records include action-free reset observations"),
         "model_input": "learned 64x64 RGB encoder; no DINO or Kindle model code",
         "process_scope": "direct native-bearing process; synchronous environments",
         "gpu_telemetry": "application collectors disabled",
@@ -153,8 +163,18 @@ def main() -> None:
     save_manifest()
     started = time.perf_counter()
     exit_code = 1
+    restore_train = None
     try:
         os.environ.update(environment)
+        if args.matched_actions:
+            # Keep the pinned agent/math untouched; replace only the collection
+            # harness whose stock step counter includes action-free resets.
+            from functools import partial
+            sys.path.insert(0, str(source))
+            import embodied
+            from upstream_matched import train
+            restore_train = embodied.run.train
+            embodied.run.train = partial(train, game=args.game, seed=args.seed)
         os.chdir(source)
         sys.argv = command[1:]
         with (logdir / "console.log").open("x") as output, redirect_stdout(output), redirect_stderr(output):
@@ -167,6 +187,8 @@ def main() -> None:
                     print(exit_code, file=sys.stderr)
                     exit_code = 1
     finally:
+        if args.matched_actions and restore_train is not None:
+            embodied.run.train = restore_train
         manifest.update(status="complete" if exit_code == 0 else "failed",
                         exit_code=exit_code, elapsed_seconds=time.perf_counter() - started)
         save_manifest()

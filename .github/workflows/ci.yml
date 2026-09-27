@@ -63,6 +63,12 @@ jobs:
           vision::probe::tests::tiny_probe_matches_scalar_formula_and_learns_without_eval_updates
           -- --exact --ignored --test-threads=1
 
+      - name: Reconstruction CNN values and gradients
+        run: >-
+          cargo test -p kindle --lib
+          vision::reconstruction::tests::patch_convolutions_match_scalar_reference
+          -- --exact --ignored --test-threads=1
+
       - name: GPU acting, masks, independent streams and replay parity
         if: runner.os == 'Linux'
         run: >-

@@ -28,6 +28,15 @@ def memory(encoder):
 
 def token_batch(encoder, clips, input_size, *, phase, parity):
     streams = list(range(len(clips)))
+    if getattr(encoder, "architecture", None) == "cnn":
+        frames = [clip[-1] for clip in clips]
+        if input_size == "rgb64":
+            frames = [np.asarray(Image.fromarray(frame).resize((64, 64), Image.Resampling.BILINEAR)) for frame in frames]
+        encoder.process(frames + [frames[-1]] * (encoder.patch_token_shape[0] - len(frames)))
+        tokens = np.frombuffer(encoder.patch_tokens(), dtype="<f4").reshape(encoder.patch_token_shape)[:len(clips)]
+        if not np.isfinite(tokens).all():
+            raise RuntimeError("nonfinite CNN tokens")
+        return tokens
     for arrival in (range(16) if phase == 15 else (15,)):
         frames = [clip[arrival] for clip in clips]
         if input_size == "rgb64":
@@ -52,7 +61,7 @@ def main():
     parser.add_argument("dataset", type=Path)
     parser.add_argument("encoder", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--architecture", choices=("tiny", "large"), default="tiny")
+    parser.add_argument("--architecture", choices=("tiny", "large", "cnn"), default="tiny")
     parser.add_argument("--num-streams", type=int, default=6)
     parser.add_argument("--limit-clips", type=int, help="explicit smoke-only cap per recording")
     parser.add_argument("--plan-cache", type=Path)
@@ -67,8 +76,12 @@ def main():
             raise ValueError(f"dataset bytes changed: {row['file']}")
     args.output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    encoder = _native.LeVJepaPerception(str(args.encoder), str(args.plan_cache) if args.plan_cache else None,
-                                        architecture=args.architecture, num_streams=args.num_streams)
+    if args.architecture == "cnn":
+        encoder = _native.ReconstructionEncoder(batch=args.num_streams)
+        encoder.load(str(args.encoder))
+    else:
+        encoder = _native.LeVJepaPerception(str(args.encoder), str(args.plan_cache) if args.plan_cache else None,
+                                            architecture=args.architecture, num_streams=args.num_streams)
     device = encoder.gpu_device
     if device["device_name"] != "NVIDIA GeForce RTX 5080" or device["driver_info"] != "580.178.04" or device["is_software_emulated"]:
         raise RuntimeError(f"unexpected native device: {device}")
@@ -133,7 +146,7 @@ def main():
         manifest["files"].append(record)
         print(json.dumps(dict(event="recording_complete", **record, seconds=time.monotonic() - started)), flush=True)
     manifest.update(status="complete", seconds=time.monotonic() - started,
-                    native_projection_max_relative_l2=max(parity))
+                    native_projection_max_relative_l2=max(parity, default=None))
     (args.output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 

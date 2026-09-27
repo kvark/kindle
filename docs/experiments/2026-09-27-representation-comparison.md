@@ -59,6 +59,21 @@ target-standardized MSE. Both fit only training trajectories, with training-only
 feature/target normalization; neither refits on validation or selects on test.
 Head seeds describe probe-fit variability, not independent RL experiments.
 
+The reconstruction control is a **172,864-parameter stateless patch CNN**:
+stride16/kernel16 RGB stem (64 channels), two padded 3x3 convolutions at 14x14,
+and a patchwise linear RGB decoder. Native GPU letterboxing preserves the
+input detail; this is not the exact DreamerV3 encoder. Train on arrivals
+3/7/11/15 of TRAIN clips (12,288 frames across all three games), with no RAM,
+actions or rewards. Fixed 16,384 updates, batch16, Adam lr3e-4/.9/.999/1e-8;
+select by validation reconstruction MSE every512 updates, including step0.
+Its extra in-corpus Seaquest reconstruction experience and lack of temporal
+history must remain explicit. Phase0/15 features are identical by construction.
+
+Raw RGB56 one-/two-frame probes are label-decodability controls, not production
+inputs or size-matched encoders: they expose 9,408/18,816 values versus 3,136.
+The two-frame input orders previous then current arrivals; it receives neither
+actions nor RAM. Constant predictors use training-target means.
+
 Tiny's prior experience remains 250k random-play RGB64 frames from Boxing,
 Pong, Freeway, Breakout and Qbert (45k train +5k validation each). Large's
 [model card](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large/blob/e831a0347737fcaa660b39c57d41c109de399845/README.md)
@@ -68,14 +83,36 @@ only trained versus initial Tiny isolates that pretraining intervention.
 
 ## Learning comparison — still required
 
-Pong, Breakout and Seaquest; three learner seeds per variant. Include upstream
+Pong, Breakout and Seaquest; learner seeds **1009/2017/3019** per variant. Include upstream
 DreamerV3 12M, Kindle Large, pretrained Tiny and initial Tiny, plus a jointly
-learned CNN if the offline comparison supports it. Set the equal actual-action
-budget before launching the campaign (200k is the strategy's reference).
-First align reset/action/update accounting, replay capacity, sticky actions,
-time-limit targets and score/time curves. A stock-upstream sanity run is not
-this comparison. Keep architecture/corpus/input differences explicit; do not
-attribute a whole-package difference solely to JEPA.
+learned CNN if the offline comparison supports it. Fix the budget before the
+first RL launch: **200,004 actual actions** per run (the nearest full N6 batch
+above the 200k reference), B16/T64/context1/full BPTT/H15/R256, F32, lr4e-5,
+warmup1000, AGC .3. Six independent environments use seeds
+`(learner_seed + stream*1,000,003) mod 2^32`, full18/repeat4/sticky .25,
+no reset no-ops or action/reward aids, 100,000-frame artificial cutoffs that
+bootstrap. Resets add replay context but earn neither action budget nor update
+credit. Discard prefill debt; first eligible replay batch earns one update,
+then one update per four actual actions. Record the actual warmup boundary and
+fractional debt; episode-dependent reset counts can move that boundary.
+
+The Phase 2 upstream mode is `run_upstream_control.py --matched-actions`.
+It retains the pinned agent, losses, optimizer and native policy-sync delay;
+only collection/accounting uses the shared Kindle Gym/ALE wrapper. Both
+interpreters must agree on RGB/reward/RAM/reset/cutoff traces before a GPU
+smoke. Upstream uses its learned RGB64 encoder/decoder; Kindle uses native
+RGB -> frozen features and its prediction-only latent objective (.25 scale).
+These are whole packages, not a claim to isolate the world-loss choice.
+
+Replay retains 100,000 arrivals: upstream's sequence-start capacity is
+`100000 - 6*64 = 99616`, since each stream also retains 64 context/tail rows.
+The capacity and warmup match; sampling RNG, chunk storage and eviction
+implementations do not become identical. A stock-upstream sanity run is not
+this comparison. Keep input, corpus and architecture differences explicit.
+Report every completed online episode and unfinished tail against actions and
+elapsed time, with final checkpoints and three-seed uncertainty. No development
+mastery gates or favorable-episode filtering. A bounded shared-protocol smoke
+precedes the campaign, but is not one of its learner seeds.
 
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise

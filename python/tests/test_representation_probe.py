@@ -12,11 +12,63 @@ from collect_atari_probes import collect
 from extract_atari_probe_features import token_batch
 from audit_atari_probes import visible_targets
 import fit_atari_probes
+from prepare_atari_pixel_probes import pixel_features
+import train_atari_reconstruction
 
 
 def test_split_seeds_are_disjoint():
     seeds = [seed for group in SPLITS.values() for seed in group]
     assert len(seeds) == len(set(seeds))
+
+
+def test_pixel_controls_preserve_order_and_current_frame():
+    frames = np.zeros((2, 16, 8, 8, 3), dtype=np.uint8)
+    frames[:, -2] = 51
+    frames[:, -1] = 204
+    features = pixel_features(frames)
+    assert features["rgb56/single_frame"].shape == (2, 9408)
+    assert features["rgb56/two_frames"].shape == (2, 18816)
+    np.testing.assert_allclose(features["rgb56/single_frame"], .8)
+    np.testing.assert_allclose(features["rgb56/two_frames"][:, :9408], .2)
+    np.testing.assert_array_equal(features["rgb56/two_frames"][:, 9408:], features["rgb56/single_frame"])
+
+
+def test_reconstruction_loader_only_reads_declared_split_and_arrivals(tmp_path):
+    from atari import sha256_file
+    frames = np.zeros((2, 16, 210, 160, 3), dtype=np.uint8)
+    for index in range(16):
+        frames[:, index] = index
+    path = tmp_path / "train.npz"
+    np.savez_compressed(path, rgb=frames)
+    manifest = dict(clips_per_seed=2, files=[dict(split="train", file=path.name, sha256=sha256_file(path)),
+                                            dict(split="test", file="absent-test.npz", sha256="unused")])
+    loaded = train_atari_reconstruction.load_frames(tmp_path, manifest, "train", [3, 7, 11, 15])
+    assert loaded.shape == (8, 210, 160, 3)
+    np.testing.assert_array_equal(loaded[:, 0, 0, 0], [3, 7, 11, 15, 3, 7, 11, 15])
+
+
+def test_reconstruction_checkpoint_uses_validation_only(tmp_path, monkeypatch):
+    class Model:
+        step = 0
+        saved = []
+
+        def process(self, frames, *, learning_rate=None):
+            if learning_rate is not None:
+                assert set(frames) <= {0, 1}
+                self.step += 1
+                return 1
+            assert frames == [3]
+            return {0: 2, 512: 1, 1024: 3}[self.step]
+
+        def save(self, path):
+            self.saved.append((Path(path).name, self.step))
+
+    model = Model()
+    monkeypatch.setattr(train_atari_reconstruction, "checked_memory", lambda _: {})
+    result = train_atari_reconstruction.train(model, np.array([0, 1]), np.array([3]), tmp_path,
+                                              steps=1024, seed=1, batch=1)
+    assert result["selected_step"] == 512 and model.step == 1024
+    assert model.saved[-1] == ("encoder.safetensors", 512)
 
 
 def test_probe_constructor_rejects_invalid_batch_before_loading_or_gpu():
