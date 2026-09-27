@@ -57,6 +57,12 @@ jobs:
           vision::preprocess_gpu::tests::gpu_pixels_match_cpu_reference_and_resident_buffers
           -- --exact --ignored --test-threads=1
 
+      - name: Offline probe values, masked gradients and frozen evaluation
+        run: >-
+          cargo test -p kindle --lib
+          vision::probe::tests::tiny_probe_matches_scalar_formula_and_learns_without_eval_updates
+          -- --exact --ignored --test-threads=1
+
       - name: GPU acting, masks, independent streams and replay parity
         if: runner.os == 'Linux'
         run: >-

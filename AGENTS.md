@@ -77,7 +77,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Use the active phase's PR description as the status dashboard:
   dated done/running/next items, results and limitations. No STATUS.md. Update
   at meaningful boundaries, not each poll. PR29 is merged and remains the
-  historical Phase 0/1 dashboard; Phase 2 uses `phase2-levjepa-evaluation`.
+  historical Phase 0/1 dashboard; Phase 2 uses
+  [PR31](https://github.com/kvark/kindle/pull/31), `phase2-levjepa-evaluation`.
 - The JEPA bet is cheaper useful latent world prediction than pixel
   reconstruction. Measure whole-agent and world-model time/memory/learning
   against Dreamer12M at matched actual interactions. Backend parity alone can

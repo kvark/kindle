@@ -12,6 +12,7 @@ pub mod capture;
 pub mod levjepa;
 pub mod preprocess;
 pub mod preprocess_gpu;
+pub mod probe;
 
 /// Channels retained by the fixed Johnson–Lindenstrauss projection.
 pub const OBSERVATION_CHANNELS: usize = 64;

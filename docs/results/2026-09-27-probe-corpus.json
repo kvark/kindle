@@ -1,0 +1,122 @@
+{
+  "protocol": "kindle-representation-probes-v1",
+  "status": "collected; label visibility limitations under investigation; no probe quality result yet",
+  "clips_per_seed": 256,
+  "clip_length": 16,
+  "splits": {
+    "train": [6101,
+      6113,
+      6121,
+      6131],
+    "validation": [7103,
+      7109],
+    "test": [8101,
+      8111]
+  },
+  "games": ["Pong",
+    "Breakout",
+    "Seaquest"],
+  "observation": "native last-two-frame max-pooled RGB; no resizing",
+  "action_repeat": 4,
+  "sticky_probability": 0.25,
+  "full_actions": true,
+  "reset_noops": 0,
+  "max_episode_frames": 100000,
+  "policy": "uniform random over all 18 actions",
+  "label_source": "https://github.com/k4ntz/OC_Atari/tree/99c874675df6b76a33a80b57776c123fbcd051af/ocatari/ram",
+  "label_use": "offline probes only; never agent input",
+  "packages": {
+    "ale-py": "0.12.1",
+    "gymnasium": "1.3.0",
+    "numpy": "2.5.2"
+  },
+  "files": [{"game":"Pong","split":"train","seed":6101,"file":"pong-train-6101.npz","sha256":"c97207eddb2db38b91616846032be9d3ad8768a29f853b39e49bf4579fceac3f","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4133,"executed_action_frames":16528,"completed_episodes":4,"discarded_tail_actions":37,"target_counts":[167,167,256,240,158,158,256,233]},
+    {"game":"Pong","split":"train","seed":6113,"file":"pong-train-6113.npz","sha256":"ba2ea10c6fb86970b95e24567aafbbceb2040c5b55a9b8e5feca1b4b1dbd8919","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4126,"executed_action_frames":16500,"completed_episodes":4,"discarded_tail_actions":30,"target_counts":[177,177,256,222,167,167,256,213]},
+    {"game":"Pong","split":"train","seed":6121,"file":"pong-train-6121.npz","sha256":"26e451b2dec92481cb7364b09b91e0f55e8661bba15de5e5e0ad68b71bd510c4","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4145,"executed_action_frames":16572,"completed_episodes":4,"discarded_tail_actions":49,"target_counts":[177,177,256,226,165,165,256,216]},
+    {"game":"Pong","split":"train","seed":6131,"file":"pong-train-6131.npz","sha256":"e0946878eab4d79dc52726dba8be49f250c2aac3377b60f9a4dec014c0152e73","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4136,"executed_action_frames":16543,"completed_episodes":4,"discarded_tail_actions":40,"target_counts":[177,177,256,224,167,167,256,216]},
+    {"game":"Pong","split":"validation","seed":7103,"file":"pong-validation-7103.npz","sha256":"08ad34d9ba85aa75efa0c188cc68a1151dc0fd46801b8f76524ca2629bcaeeb2","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4133,"executed_action_frames":16525,"completed_episodes":4,"discarded_tail_actions":37,"target_counts":[170,170,256,235,161,161,256,230]},
+    {"game":"Pong","split":"validation","seed":7109,"file":"pong-validation-7109.npz","sha256":"41a81ae5f8b53207c5fd57e9459fe8bed19c8a7338def04163ee8c2cb010fd5c","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4126,"executed_action_frames":16503,"completed_episodes":4,"discarded_tail_actions":30,"target_counts":[172,172,256,219,164,164,256,212]},
+    {"game":"Pong","split":"test","seed":8101,"file":"pong-test-8101.npz","sha256":"f8630456b0dbff092e71a2151758caee5afc58a277e4da659657432b694a451f","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4125,"executed_action_frames":16496,"completed_episodes":4,"discarded_tail_actions":29,"target_counts":[171,171,256,233,163,163,256,226]},
+    {"game":"Pong","split":"test","seed":8111,"file":"pong-test-8111.npz","sha256":"2b6a52cdcb838b64fe41aeb395751c9a4d845ed582c6c2de2edeb745b4d17f94","targets":["ball_x","ball_y","player_y","enemy_y","ball_x_velocity","ball_y_velocity","player_y_velocity","enemy_y_velocity"],"actions":4139,"executed_action_frames":16553,"completed_episodes":4,"discarded_tail_actions":43,"target_counts":[170,170,256,228,159,159,256,218]},
+    {"game":"Breakout","split":"train","seed":6101,"file":"breakout-train-6101.npz","sha256":"eb78c70c97fc0155e30d7a6edbd2a73785493d7886ffd6a02d99d9c5662f8e50","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4346,"executed_action_frames":17337,"completed_episodes":24,"discarded_tail_actions":250,"target_counts":[213,213,256,212,212,256]},
+    {"game":"Breakout","split":"train","seed":6113,"file":"breakout-train-6113.npz","sha256":"9e34f554ef2a6f1ea70e618bcdf98fd4c2452536014a5b8938f155287b9ae6de","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4309,"executed_action_frames":17196,"completed_episodes":21,"discarded_tail_actions":213,"target_counts":[221,221,256,218,218,256]},
+    {"game":"Breakout","split":"train","seed":6121,"file":"breakout-train-6121.npz","sha256":"8d4369412b93045235d707c610f123f04e8912c011b82257a24784c01de9fb52","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4322,"executed_action_frames":17237,"completed_episodes":25,"discarded_tail_actions":226,"target_counts":[208,208,256,205,205,256]},
+    {"game":"Breakout","split":"train","seed":6131,"file":"breakout-train-6131.npz","sha256":"24b6cadd5e1a21bf79f09e60a304b9754211a2199e6d387eddf9a0abc12e318c","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4349,"executed_action_frames":17350,"completed_episodes":25,"discarded_tail_actions":253,"target_counts":[210,210,256,206,206,256]},
+    {"game":"Breakout","split":"validation","seed":7103,"file":"breakout-validation-7103.npz","sha256":"b63a2b6f8e2a72ed99b38cc395b955c263354cb6a8f3969b56011192a8c88ebf","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4340,"executed_action_frames":17314,"completed_episodes":22,"discarded_tail_actions":244,"target_counts":[219,219,256,215,215,256]},
+    {"game":"Breakout","split":"validation","seed":7109,"file":"breakout-validation-7109.npz","sha256":"6bf769fbec398556a287971e4694109bd0fbdc93435fdf935c2820e6f3ab6ab4","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4303,"executed_action_frames":17165,"completed_episodes":21,"discarded_tail_actions":207,"target_counts":[221,221,256,215,215,256]},
+    {"game":"Breakout","split":"test","seed":8101,"file":"breakout-test-8101.npz","sha256":"81b9bcf47ffeaa702b0c7550b240e148293bc1339f9c51c8f8872054839368ec","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4364,"executed_action_frames":17409,"completed_episodes":24,"discarded_tail_actions":268,"target_counts":[213,213,256,210,210,256]},
+    {"game":"Breakout","split":"test","seed":8111,"file":"breakout-test-8111.npz","sha256":"d60e9512e41bd1241e429fb7e988cb07a71027a14b8e3ad37802dd9991f888a4","targets":["ball_x","ball_y","player_x","ball_x_velocity","ball_y_velocity","player_x_velocity"],"actions":4336,"executed_action_frames":17305,"completed_episodes":23,"discarded_tail_actions":240,"target_counts":[213,213,256,211,211,256]},
+    {"game":"Seaquest","split":"train","seed":6101,"file":"seaquest-train-6101.npz","sha256":"b4c6bd839bafedf514e2b23b23bccbe85d46e492e9b0a0fe55e5e6fdaec3c4ab","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4143,"executed_action_frames":16557,"completed_episodes":6,"discarded_tail_actions":47,"target_counts":[231,231,90,28,34,28,231,231,88,27,34,27]},
+    {"game":"Seaquest","split":"train","seed":6113,"file":"seaquest-train-6113.npz","sha256":"10ebcaf34d4d8cf4c3b2fbe02c553f8c74cd7c591d084e98b656e19fe3aa9085","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4183,"executed_action_frames":16713,"completed_episodes":8,"discarded_tail_actions":87,"target_counts":[226,226,65,25,32,27,224,224,64,24,32,26]},
+    {"game":"Seaquest","split":"train","seed":6121,"file":"seaquest-train-6121.npz","sha256":"57ce7059c812115ad18b127395ab82ceaf3f2982386864dcd7a8503f94320510","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4152,"executed_action_frames":16591,"completed_episodes":7,"discarded_tail_actions":56,"target_counts":[228,228,65,29,27,46,227,227,65,29,27,46]},
+    {"game":"Seaquest","split":"train","seed":6131,"file":"seaquest-train-6131.npz","sha256":"4e4ad89506cf770cc28fe0993f629ed13ad2f4c3180838af3414a3a0492fe03d","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4146,"executed_action_frames":16567,"completed_episodes":7,"discarded_tail_actions":50,"target_counts":[225,225,63,48,40,33,225,225,62,48,40,33]},
+    {"game":"Seaquest","split":"validation","seed":7103,"file":"seaquest-validation-7103.npz","sha256":"0933a7919e1635ee03f0b68c7bd778816dd636474c984a4ad7e7dc2e976674c1","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4147,"executed_action_frames":16571,"completed_episodes":7,"discarded_tail_actions":51,"target_counts":[231,231,43,49,22,28,230,230,42,46,21,25]},
+    {"game":"Seaquest","split":"validation","seed":7109,"file":"seaquest-validation-7109.npz","sha256":"7a3fabba1f042e5d1d5b40582ea8f348ebc8e19a80b52176d9b4251a50cebfb3","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4160,"executed_action_frames":16623,"completed_episodes":7,"discarded_tail_actions":64,"target_counts":[234,234,60,27,34,21,231,231,58,26,34,20]},
+    {"game":"Seaquest","split":"test","seed":8101,"file":"seaquest-test-8101.npz","sha256":"d7f4fc1fc8d34ca67b19e8df4edcb0f9c9d3c6f06ab68cab0235454f0f500123","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4137,"executed_action_frames":16531,"completed_episodes":7,"discarded_tail_actions":41,"target_counts":[227,227,74,37,19,40,226,226,74,37,19,39]},
+    {"game":"Seaquest","split":"test","seed":8111,"file":"seaquest-test-8111.npz","sha256":"a96cd8128c7980d25e85176553e112134b923622d93efae8403ccf3171652eda","targets":["player_x","player_y","enemy_lane0_x","enemy_lane1_x","enemy_lane2_x","enemy_lane3_x","player_x_velocity","player_y_velocity","enemy_lane0_x_velocity","enemy_lane1_x_velocity","enemy_lane2_x_velocity","enemy_lane3_x_velocity"],"actions":4159,"executed_action_frames":16619,"completed_episodes":7,"discarded_tail_actions":63,"target_counts":[227,227,59,41,48,41,227,227,59,41,47,40]}],
+  "seconds": 44.63519969896879,
+  "audit": {
+    "protocol": "kindle-representation-probes-v1",
+    "files": 24,
+    "clips": 6144,
+    "actions": 100959,
+    "seconds": 44.63519969896879,
+    "hashes_and_targets_verified": true,
+    "sprite_color_coverage": {
+      "Pong/ball": {
+        "hits": 1381,
+        "count": 1381,
+        "fraction": 1
+      },
+      "Pong/player": {
+        "hits": 2048,
+        "count": 2048,
+        "fraction": 1
+      },
+      "Pong/enemy": {
+        "hits": 1827,
+        "count": 1827,
+        "fraction": 1
+      },
+      "Breakout/ball": {
+        "hits": 1707,
+        "count": 1718,
+        "fraction": 0.9935972060535506
+      },
+      "Breakout/player": {
+        "hits": 2048,
+        "count": 2048,
+        "fraction": 1
+      },
+      "Seaquest/player": {
+        "hits": 1680,
+        "count": 1829,
+        "fraction": 0.918534718425369
+      },
+      "Seaquest/enemy_lane0": {
+        "hits": 477,
+        "count": 519,
+        "fraction": 0.9190751445086706
+      },
+      "Seaquest/enemy_lane2": {
+        "hits": 227,
+        "count": 256,
+        "fraction": 0.88671875
+      },
+      "Seaquest/enemy_lane1": {
+        "hits": 254,
+        "count": 284,
+        "fraction": 0.8943661971830986
+      },
+      "Seaquest/enemy_lane3": {
+        "hits": 222,
+        "count": 264,
+        "fraction": 0.8409090909090909
+      }
+    },
+    "limits": ["color coverage validates coarse spatial alignment, not exact subpixel labels",
+      "occlusion/blinking and conditional missing targets remain visible in target counts",
+      "RAM is privileged evaluation data, never agent input"]
+  },
+  "raw_root": "runs/representation-probes-20260927.POCnif/dataset"
+}

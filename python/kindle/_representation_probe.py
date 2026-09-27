@@ -119,3 +119,68 @@ def fit_pca(tokens, channels=64):
     signs = np.sign(axes[np.argmax(np.abs(axes), axis=0), np.arange(channels)])
     axes *= signs
     return mean.astype(np.float32), axes.astype(np.float32), eigenvalues[::-1]
+
+
+def regression_metrics(prediction, target):
+    """Per-target metrics; missing/constant targets do not manufacture R²."""
+    prediction, target = np.asarray(prediction), np.asarray(target)
+    if prediction.shape != target.shape or prediction.ndim != 2 or not np.isfinite(prediction).all():
+        raise ValueError("expected equally shaped finite predictions and masked targets")
+    result = []
+    for index in range(target.shape[1]):
+        valid = np.isfinite(target[:, index])
+        y, p = target[valid, index], prediction[valid, index]
+        if not len(y):
+            result.append(dict(count=0, r2=None, mae=None, rmse=None))
+            continue
+        squared = np.square(p.astype(np.float64)-y)
+        variation = float(np.square(y.astype(np.float64)-y.mean()).sum())
+        result.append(dict(count=int(len(y)), r2=1-float(squared.sum())/variation if variation > 1e-12 else None,
+                           mae=float(np.abs(p-y).mean()), rmse=float(np.sqrt(squared.mean()))))
+    return result
+
+
+def ridge_probe(train_x, train_y, validation_x, validation_y, test_x,
+                alphas=(1e-4, 1e-3, 1e-2, 1e-1, 1.0, 10.0, 100.0)):
+    """Independent dual ridge, per-target missingness and validation-only alpha.
+
+    Reuse eigendecompositions for targets with identical training masks. Do not
+    refit on validation data after selection: linear and MLP use the same data.
+    Test labels are deliberately absent from this API.
+    """
+    if not alphas or any(a <= 0 or not np.isfinite(a) for a in alphas):
+        raise ValueError("ridge penalties must be finite and positive")
+    xs = [np.asarray(x, dtype=np.float64) for x in (train_x, validation_x, test_x)]
+    if any(x.ndim != 2 or x.shape[1] != xs[0].shape[1] or not np.isfinite(x).all() for x in xs):
+        raise ValueError("incompatible/nonfinite probe features")
+    if train_y.shape != (len(xs[0]), validation_y.shape[1]) or len(validation_y) != len(xs[1]):
+        raise ValueError("incompatible probe targets")
+    predictions = np.zeros((len(test_x), train_y.shape[1]), dtype=np.float64)
+    cache, selections = {}, []
+    for target in range(train_y.shape[1]):
+        valid = np.isfinite(train_y[:, target])
+        val_valid = np.isfinite(validation_y[:, target])
+        if valid.sum() < 2 or val_valid.sum() < 2:
+            raise ValueError(f"insufficient train/validation labels for target {target}")
+        key = valid.tobytes()
+        if key not in cache:
+            x = xs[0][valid]
+            mean, scale = x.mean(0), x.std(0)
+            scale = np.where(scale > 1e-6, scale, 1.0) * np.sqrt(x.shape[1])
+            x = (x-mean)/scale
+            gram = x @ x.T
+            values, vectors = np.linalg.eigh(gram)
+            cache[key] = (np.maximum(values, 0), vectors,
+                          ((xs[1]-mean)/scale) @ x.T, ((xs[2]-mean)/scale) @ x.T)
+        eigenvalues, eigenvectors, val_kernel, test_kernel = cache[key]
+        y = train_y[valid, target].astype(np.float64)
+        mean_y = y.mean()
+        basis = eigenvectors.T @ (y-mean_y)
+        coefficients = eigenvectors @ (basis[:, None] / (eigenvalues[:, None] + np.asarray(alphas)[None]))
+        val_predictions = val_kernel @ coefficients + mean_y
+        errors = np.square(val_predictions[val_valid] - validation_y[val_valid, target, None]).mean(0)
+        selected = int(np.argmin(errors))
+        predictions[:, target] = test_kernel @ coefficients[:, selected] + mean_y
+        selections.append(dict(alpha=alphas[selected], train_count=int(valid.sum()),
+                               validation_count=int(val_valid.sum()), validation_mse=errors.tolist()))
+    return predictions, selections

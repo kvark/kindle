@@ -21,6 +21,13 @@ RAM coordinate maps follow [OCAtari's pinned source](https://github.com/k4ntz/OC
 Check their alignment independently against sprite colors before interpreting
 probe scores. Seaquest uses fixed enemy-lane slots, not a changing nearest enemy.
 Constant targets have undefined R², not fabricated zero/perfect scores.
+The [completed corpus audit](../results/2026-09-27-probe-corpus.md) finds
+unmatched Seaquest sprites. Inspecting one training trajectory shows most
+player misses have no expected-color pixels at all and death/blink RAM105
+values 15–22. Do not silently redefine or discard those targets. Report both
+all-valid-RAM and secondary visibly aligned R²; a velocity is visibly aligned
+only if both endpoint sprites pass. Visibility never selects training examples,
+regularization, stopping or a model. Preserve the original dataset unchanged.
 
 Compare released Large, pretrained Tiny `7fe9b252`, its own initial Tiny
 `7bc344f3`, and a small reconstruction-trained CNN. For every frozen encoder:
@@ -44,6 +51,13 @@ Fit linear ridge and a small MLP; choose regularization/stopping only on
 validation trajectories. Report every target's held-out R², error and valid
 count, with position and motion separate, plus raw-pixel/constant controls.
 Do not use test scores to tune the model or select a favorable subset.
+Ridge penalties are 1e-4 through 100 in powers of ten, independently selected
+per target by validation MSE. The MLP is 128 ReLU units, batch64, 512 Adam
+updates (lr1e-3, .9/.999/1e-8, weight penalty1e-4/N), with head seeds
+1009/2017/3019. Select among every32-update checkpoints by validation
+target-standardized MSE. Both fit only training trajectories, with training-only
+feature/target normalization; neither refits on validation or selects on test.
+Head seeds describe probe-fit variability, not independent RL experiments.
 
 Tiny's prior experience remains 250k random-play RGB64 frames from Boxing,
 Pong, Freeway, Breakout and Qbert (45k train +5k validation each). Large's

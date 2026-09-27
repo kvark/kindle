@@ -7,7 +7,8 @@ paths below refer to that branch, not `main`.
 
 **Adopted September 27.** Current execution/evidence is maintained in
 [the project roadmap](kindle_single_life_dreamer_plan.md#current-execution-order--strategy-reset)
-and PR #29. Some initial premises below are historical: Tiny is now default,
+and the active phase's PR (Phase 0/1: merged #29; Phase 2: #31). Some initial
+premises below are historical: Tiny is now default,
 native-detail GPU acting/capture is integrated, and sticky Pong fails its
 robustness check. The historical upstream speed numbers are not a reconciled
 comparison. Phase 0 encoder CI/disclosures pass; compact human-normalized data

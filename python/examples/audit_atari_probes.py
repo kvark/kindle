@@ -29,10 +29,29 @@ def sprite_boxes(game, ram):
     return boxes
 
 
-def audit(root):
+def object_visible(image, box):
+    _, x, y, w, h, color = box
+    if not np.isfinite(x) or not np.isfinite(y):
+        return False
+    x, y = int(x), int(y)
+    window = image[max(y-2, 0):min(y+h+2, 210), max(x-2, 0):min(x+w+2, 160)]
+    return bool(np.any(np.all(window == color, axis=-1)))
+
+
+def visible_targets(game, frames, memory):
+    masks = []
+    for index in [-2, -1]:
+        objects = [object_visible(frames[index], box) for box in sprite_boxes(game, memory[index])]
+        # First object has x/y targets; remaining objects have one coordinate.
+        objects = [objects[0], *objects]
+        masks.append(np.asarray(objects, dtype=bool))
+    return np.concatenate((masks[1], masks[0] & masks[1]))
+
+
+def audit(root, visibility_output=None):
     manifest = json.loads((root / "manifest.json").read_text())
     assert manifest["status"] == "complete" and manifest["protocol"] == PROTOCOL
-    seen, counts = set(), defaultdict(lambda: [0, 0])
+    seen, counts, visibility = set(), defaultdict(lambda: [0, 0]), {}
     for row in manifest["files"]:
         identity = (row["game"], row["seed"])
         assert identity not in seen
@@ -45,6 +64,7 @@ def audit(root):
             assert rgb.shape == (manifest["clips_per_seed"], CLIP_LENGTH, 210, 160, 3)
             assert rgb.dtype == np.uint8 and ram.shape == (len(rgb), CLIP_LENGTH, 128)
             assert row["actions"] == len(rgb)*CLIP_LENGTH + row["discarded_tail_actions"]
+            visibility[row["file"]] = np.stack([visible_targets(row["game"], p, r) for p,r in zip(rgb, ram)])
             for pixels, memory, elapsed, target in zip(rgb, ram, frames, targets):
                 np.testing.assert_array_equal(clip_targets(row["game"], memory, elapsed), target)
                 for name, x, y, w, h, color in sprite_boxes(row["game"], memory[-1]):
@@ -52,11 +72,12 @@ def audit(root):
                         continue
                     # Two-pixel margin covers raster edge conventions and the
                     # max pool's one-frame-old tail; no image-derived label fit.
-                    x, y = int(x), int(y)
-                    window = pixels[-1, max(y-2, 0):min(y+h+2, 210), max(x-2, 0):min(x+w+2, 160)]
-                    hit = bool(np.any(np.all(window == color, axis=-1)))
+                    hit = object_visible(pixels[-1], (name,x,y,w,h,color))
                     counts[f"{row['game']}/{name}"][0] += hit
                     counts[f"{row['game']}/{name}"][1] += 1
+    if visibility_output is not None:
+        with visibility_output.open("xb") as stream:
+            np.savez_compressed(stream, **visibility)
     return dict(protocol=PROTOCOL, files=len(seen), clips=len(seen)*manifest["clips_per_seed"],
                 actions=sum(r["actions"] for r in manifest["files"]),
                 seconds=manifest["seconds"], hashes_and_targets_verified=True,
@@ -69,5 +90,6 @@ def audit(root):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("dataset", type=Path)
+    parser.add_argument("--visibility-output", type=Path)
     args = parser.parse_args()
-    print(json.dumps(audit(args.dataset), indent=2, allow_nan=False))
+    print(json.dumps(audit(args.dataset, args.visibility_output), indent=2, allow_nan=False))

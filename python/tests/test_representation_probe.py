@@ -5,11 +5,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from kindle._representation_probe import CLIP_LENGTH, SPLITS, clip_targets, fit_pca, fixed_projection, positions, spatial_features, target_names
+from kindle._representation_probe import CLIP_LENGTH, SPLITS, clip_targets, fit_pca, fixed_projection, positions, regression_metrics, ridge_probe, spatial_features, target_names
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
 from collect_atari_probes import collect
 from extract_atari_probe_features import token_batch
+from audit_atari_probes import visible_targets
+import fit_atari_probes
 
 
 def test_split_seeds_are_disjoint():
@@ -87,6 +89,76 @@ def test_fixed_projection_and_pca():
     assert np.linalg.norm((train-center) @ axes) <= np.linalg.norm(train-center)
     with pytest.raises(ValueError):
         fit_pca(train, 12)
+
+
+def test_ridge_matches_independent_primal_solve_with_missing_targets():
+    rng = np.random.default_rng(902)
+    x, val, test = [rng.normal(size=(n, 5)) for n in (23, 9, 11)]
+    weight = rng.normal(size=(5, 2))
+    y, vy = x @ weight + 3, val @ weight + 3
+    y[::4, 1] = np.nan
+    predicted, selection = ridge_probe(x, y, val, vy, test, alphas=(0.1,))
+    for column in range(2):
+        mask = np.isfinite(y[:, column])
+        tx = x[mask]
+        mean, scale = tx.mean(0), tx.std(0)*np.sqrt(5)
+        tx = (tx-mean)/scale
+        target = y[mask, column]
+        weights = np.linalg.solve(tx.T @ tx + 0.1*np.eye(5), tx.T @ (target-target.mean()))
+        expected = (test-mean)/scale @ weights + target.mean()
+        np.testing.assert_allclose(predicted[:, column], expected, atol=1e-10)
+        assert selection[column]["train_count"] == mask.sum()
+
+
+def test_regression_metrics_keep_missing_and_constant_targets_explicit():
+    target = np.array([[1, 3, np.nan], [2, 3, np.nan], [3, 3, np.nan]], dtype=float)
+    prediction = np.array([[1, 3, 0], [2, 3, 0], [3, 3, 0]], dtype=float)
+    metrics = regression_metrics(prediction, target)
+    assert metrics[0]["r2"] == 1
+    assert metrics[1] == dict(count=3, r2=None, mae=0, rmse=0)
+    assert metrics[2] == dict(count=0, r2=None, mae=None, rmse=None)
+
+
+def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch):
+    class Model:
+        gpu_device = dict(device_name="NVIDIA GeForce RTX 5080", driver_info="580.178.04")
+        gpu_memory_budget = dict(budget_bytes=4 << 30, usage_bytes=0)
+        step = 0
+        learns = 0
+
+        def learn(self, x, y, mask, **kwargs):
+            assert set(np.frombuffer(y, dtype="<f4")) <= {-1, 1}
+            self.step += 1
+            self.learns += 1
+            return 1.0
+
+        def predict(self, x):
+            return [float(self.step)] * 64
+
+        def parameters(self):
+            return [[float(self.step)]]
+
+        def set_parameters(self, values):
+            self.step = values[0][0]
+
+    model = Model()
+    monkeypatch.setattr(fit_atari_probes._native, "RegressionProbe", lambda *a, **kw: model, raising=False)
+    prediction, info = fit_atari_probes.mlp_probe(
+        np.array([[0.0], [1.0]]), np.array([[-1.0], [1.0]]),
+        np.array([[2.0]]), np.array([[32.0]]), np.array([[100.0]]), 92, steps=64)
+    assert info["selected_step"] == 32 and model.learns == 64
+    np.testing.assert_array_equal(prediction, [[32]])
+
+
+def test_secondary_visible_metrics_require_current_and_previous_sprite_for_velocity():
+    frames = np.zeros((16, 210, 160, 3), dtype=np.uint8)
+    ram = np.zeros((16, 128), dtype=np.uint8)
+    ram[:, [49, 54, 51, 50]] = [100, 80, 100, 120]
+    frames[-1, 66:70, 51:53] = (236, 236, 236)
+    masks = visible_targets("Pong", frames, ram)
+    np.testing.assert_array_equal(masks, [True, True, False, False, False, False, False, False])
+    frames[-2] = frames[-1]
+    np.testing.assert_array_equal(visible_targets("Pong", frames, ram)[4:6], [True, True])
 
 
 def test_phase_contrast_uses_same_final_frame_with_correct_causal_prefix():
