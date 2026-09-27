@@ -76,14 +76,15 @@ jobs:
           python -m venv .reference-venv
           .reference-venv/bin/pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
           .reference-venv/bin/pip install numpy==2.3.3 safetensors==0.6.2 packaging==25.0
-          .reference-venv/bin/python python/examples/levjepa_tiny_reference.py target/tiny-training-reference
-          .reference-venv/bin/python python/examples/levjepa_tiny_streaming_reference.py target/tiny-training-reference target/tiny-stream-reference
+          # Generated references are inputs, not reusable Cargo cache artifacts.
+          reference_root=$(mktemp -d "$RUNNER_TEMP/kindle-reference.XXXXXX")
+          .reference-venv/bin/python python/examples/levjepa_tiny_reference.py "$reference_root/training"
+          .reference-venv/bin/python python/examples/levjepa_tiny_streaming_reference.py "$reference_root/training" "$reference_root/stream"
+          echo "KINDLE_TINY_STREAM_REFERENCE=$reference_root/stream" >> "$GITHUB_ENV"
 
       - name: Causal encoder parity, chunk wrap and independent stream resets
         if: runner.os == 'Linux'
         timeout-minutes: 20
-        env:
-          KINDLE_TINY_STREAM_REFERENCE: ${{ github.workspace }}/target/tiny-stream-reference
         run: >-
           cargo test -p kindle --lib
           vision::levjepa::tests::tiny_synthetic_streaming_matches_dense_reference
