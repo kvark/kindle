@@ -11,7 +11,14 @@ and PR #29. Some initial premises below are historical: Tiny is now default,
 native-detail GPU acting/capture is integrated, and sticky Pong fails its
 robustness check. The historical upstream speed numbers are not a reconciled
 comparison. Phase 0 encoder CI/disclosures pass; compact human-normalized data
-is in [docs/results](results/2026-09-27-historical-scores.md). Phase 1a is current.
+is in [docs/results](results/2026-09-27-historical-scores.md).
+Phase 1's implementation and fast-screening work is now measured:
+[GPU sampling/fused recurrence/grouped RSSM](results/2026-09-27-fused-learner.md)
+gives 1.15× updates / 1.16× short Pong throughput; the **3× target remains unmet**.
+[Three Size1M MinAtar seeds](results/2026-09-27-minatar-screen.md) complete in
+8m18s with committed curves; the low scores do not establish strong learning.
+Do not confuse completed engineering deliverables with achieving that speed
+target or demonstrating the value of JEPA.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.

@@ -81,6 +81,12 @@ wall time by **4–39×**: its kernel shares are not ordinary runtime shares or 
 utilization. World training uses four submissions, so its ordinary GPU timestamp
 covers only the last chunk, not the full update. **SM utilization is unmeasured**.
 
+A separate post-change profile confirms dispatch counts fall to **3,459
+posterior / 3,024 imagination / 14,863 world gradient**. Optimizer-free ordinary
+session wall medians are 17.08 / 42.02 / 53.31 ms, with behavior gradients
+19.43 ms. These diagnostic sessions are not the end-to-end update benchmark.
+The remaining gap is not explained solely by recurrent readbacks.
+
 Imagination/CPU target construction is still expensive. F32 remains: the current
 backend exposes F16 cooperative relaxation, **not a BF16 compute switch**.
 BF16 weight loading is not BF16 training. Reduced precision needs a separate

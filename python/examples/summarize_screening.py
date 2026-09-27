@@ -6,7 +6,7 @@ Usage: summarize_screening.py seed1009.jsonl seed2017.jsonl seed3019.jsonl
 import argparse
 import json
 
-from kindle._screening import PROTOCOL, summarize_curves
+from kindle._screening import PROTOCOL, mean_ci, summarize_curves
 
 
 def summarize(paths):
@@ -45,6 +45,8 @@ def summarize(paths):
                          minimum_sampled_headroom_bytes=min(p["memory"]["budget_bytes"] - p["memory"]["usage_bytes"]
                                                            for p in [start, *end["curve"], end])))
     result = summarize_curves(runs)
+    result["early_to_final_score_change"] = mean_ci([
+        r["curve"][-1]["score"] - r["curve"][0]["score"] for r in runs])
     result.update(recipe={k: v for k, v in starts[0].items() if k not in
                           ("event", "seed", "environment_seeds", "construction_seconds", "memory")},
                   runs=runs, total_run_seconds=sum(r["seconds"] for r in runs),

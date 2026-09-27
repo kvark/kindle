@@ -13,7 +13,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   unchanged five-game/mastery confirmations and Atari-only gate tuning.
   The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
   GPU acting/capture is integrated. Phase 1a fused learner and grouped RSSM
-  pass; Phase 1b's three-seed MinAtar screen is the current measurement.
+  pass; Phase 1b's three-seed MinAtar screen completes in 8m18s. The Phase 1
+  implementation/screening deliverables are in place, but 3x updates is unmet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
@@ -31,6 +32,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pretraining or reward/action aid. CPU environment/upload is the allowed
   temporary fallback, not GPU-resident simulation or a CPU learner. Never
   compare its R32 speed with the R256 Atari control as an optimization gain.
+  All three 32,768-action / 8,135-update runs pass. Final online scores are
+  .44/.40/.68; mean .507 with seed-bootstrap 95% CI [.400,.680]. This does not
+  establish reliable improvement or frozen competence. See
+  `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
+  distinct from completed implementation; no unchanged mastery queue resumes.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or

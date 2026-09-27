@@ -151,8 +151,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    for testing whether the representation or exploration method works.
 3. **Phase 1b: establish a <=1-hour, three-seed screening recipe.** Use a small
    learner and a fast sparse-reward environment. [MinAtar recipe/curve contract](screening.md)
-   is implemented and its tiny integration passes; the three Size1M seeds are
-   running. JAX/Craftax buffers need an additional CUDA/Vulkan interop bridge;
+   now [completes in 8m18s for all three seeds](results/2026-09-27-minatar-screen.md):
+   each 32,768 actions / 8,135 updates in 164 seconds. Final online scores
+   .44/.40/.68 give mean .507, seed-bootstrap 95% CI [.400,.680]. This is a
+   working iteration loop, not reliable improvement or competence. JAX/Craftax
+   buffers need an additional CUDA/Vulkan interop bridge;
    MinAtar is the permitted CPU-environment fallback, not a CPU learner. Its
    small public observations are packed losslessly and use the existing jointly
    learned encoder; no frozen frontend, pretraining or action/reward aid.
