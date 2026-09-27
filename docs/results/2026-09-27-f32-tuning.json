@@ -1,0 +1,294 @@
+{
+  "date": "2026-09-27",
+  "source_base": "d995835",
+  "source_patch": "candidate.patch",
+  "executable_sha256": "be1f1196ee0aa8e67173af708b566e21734da4cb8f6f574c632fbf291ff02dda",
+  "patch_sha256": "34e612ea497387eb62fa3d01f36c705ccc2c9d0ba3bb8de7d09158195c27887b",
+  "runtime": {
+    "device": "RTX 5080",
+    "driver": "580.178.04",
+    "meganeura": "367e53d4",
+    "blade": "7cca6377",
+    "precision": "F32",
+    "separate_nvml": false,
+    "sm_utilization": null
+  },
+  "config": {
+    "action_count": 18,
+    "model_size": "size12_m",
+    "observation_decoder_depth": 64,
+    "replay_capacity": 2048,
+    "batch_size": 16,
+    "batch_length": 64,
+    "world_backprop_length": 64,
+    "world_microbatch_size": 16,
+    "replay_context": 1,
+    "train_ratio": 256,
+    "imagination_length": 15,
+    "horizon": 333,
+    "lambda": 0.95,
+    "free_nats": 1,
+    "dynamics_free_nats": null,
+    "unimix": 0.01,
+    "value_bins": 255,
+    "actor_unimix": 0.01,
+    "actor_entropy": 0.0003,
+    "slow_value_rate": 0.02,
+    "return_norm_rate": 0.01,
+    "learning_rate": 0.00004,
+    "behavior_learning_rate": null,
+    "actor_learning_starts": 0,
+    "learning_rate_warmup": 1000,
+    "optimizer_beta1": 0.9,
+    "optimizer_beta2": 0.999,
+    "optimizer_epsilon": 1e-20,
+    "agc": 0.3,
+    "agc_pmin": 0.001,
+    "loss_scales": {
+      "reconstruction": 0,
+      "future_prediction": 0.25,
+      "reward": 1,
+      "continuation": 1,
+      "dynamics": 1,
+      "representation": 0.1,
+      "policy": 1,
+      "value": 1,
+      "replay_value": 0.3
+    },
+    "replay_value_gradient": true,
+    "extrinsic_reward_scale": 1,
+    "intrinsic_reward_scale": 0,
+    "visitation_bonus": false,
+    "seed": 0,
+    "skip_full_optimize": false
+  },
+  "updates": 36,
+  "timing_warmups": 4,
+  "arms": {
+    "control": {
+      "timing_mean_ms": {
+        "replay_seconds": 0.60218584375,
+        "posterior_seconds": 20.530697593750002,
+        "imagination_seconds": 86.30198784375,
+        "world_train_seconds": 55.24507315625,
+        "replay_refresh_seconds": 0.3845870625,
+        "world_sync_seconds": 0.0610255625,
+        "behavior_train_seconds": 21.6641606875,
+        "behavior_sync_seconds": 1.1048944374999998,
+        "total_seconds": 185.895791875
+      },
+      "metrics": {
+        "world": {
+          "total_loss": 285.4808863888889,
+          "reconstruction_loss": 0,
+          "future_prediction_loss": 1059.9529305555557,
+          "raw_kl": 10.021525458333333,
+          "dynamics_kl": 10.021525458333333,
+          "representation_kl": 10.021525458333333,
+          "reward_loss": 5.5399260083333335,
+          "continuation_loss": 0.6050982155555555,
+          "replay_value_loss": 11.079820111111111,
+          "replay_reward_prediction_mean": 0.000010679135195166667,
+          "replay_reward_target_mean": 0.046875,
+          "replay_reward_mae": 0.046884610888888886,
+          "rewarded_prediction_mean": 0.000010962099053138888,
+          "unrewarded_prediction_mean": 0.000010665218609611111,
+          "rewarded_count": 48,
+          "positive_reward_prediction_mean": 0.000010962099053138888,
+          "zero_reward_prediction_mean": 0.000010665218609611111,
+          "negative_reward_prediction_mean": 0,
+          "positive_reward_count": 48,
+          "zero_reward_count": 976,
+          "negative_reward_count": 0,
+          "replay_continuation_prediction_mean": 0.558492195,
+          "replay_continuation_target_mean": 0.99700564,
+          "replay_continuation_mae": 0.43850491555555554
+        },
+        "behavior": {
+          "total_loss": 4.231637475,
+          "policy_loss": -0.00007117105397222223,
+          "actor_update_scale": 1,
+          "value_loss": 0.9077624372222222,
+          "replay_value_loss": 11.07982013888889,
+          "policy_entropy": 2.890354325,
+          "weighted_policy_entropy": 0.23680620638888888,
+          "imagined_reward_mean": 0.000010378087967416667,
+          "imagined_continuation_mean": 0.5592681088888889,
+          "return_mean": 0.000024110710237222222,
+          "return_scale": 1,
+          "advantage_abs_mean": 0.0000034081242439444447,
+          "weighted_advantage_abs_mean": 2.965631291722222e-7
+        }
+      },
+      "update_ms": [182.341285,179.101171,180.751723,181.18830599999998,182.675448,186.954429,185.65348,186.9819,186.219324,186.433665,185.691179,187.405652,186.743827,186.058283,186.30945300000002,186.043601,184.886214,186.377785,186.31805400000002,185.637729,184.774412,185.048674,186.808017,187.220091,185.646808,185.170836,184.48215100000002,185.115445,186.10390199999998,185.69088,185.91200999999998,186.661417,186.340614,186.932619,184.38993000000002,185.97751100000002],
+      "world_loss": [298.61447,297.7341,298.8929,297.95724,297.84845,298.16113,296.83072,297.0142,295.9677,295.98627,295.85403,294.46542,293.41507,293.5592,292.439,291.8718,290.6218,289.76062,287.86188,287.4676,285.97272,284.24142,283.61813,281.9756,280.54587,278.3808,277.7512,275.19452,273.26648,271.67462,270.1156,267.9553,265.88882,264.76566,263.00604,260.63553],
+      "behavior_loss": [4.2083087,4.1852746,4.196096,4.1818047,4.203988,4.192425,4.2098427,4.1916656,4.1828475,4.1854224,4.209564,4.1835375,4.2008357,4.2243485,4.216015,4.2292004,4.225219,4.2042193,4.211516,4.230387,4.2202682,4.236716,4.2420387,4.231887,4.258183,4.256182,4.2704167,4.2577143,4.2531543,4.264121,4.286652,4.292206,4.2907624,4.272379,4.3150234,4.3187275],
+      "checkpoint_hashes": {
+        "world": "47168c48a96c7d7851d3fcf20178da2480ebe56cb7e97b99c6c67a144bee26ae",
+        "behavior": "1463551059811d4ed9422d10010e1c9c9f695a0f4a30402f84e2f345e40a2ffe",
+        "slow_value": "6dd0787e58e25ce223786ebb1c08557a98ac993338ab89e62eb88c20fe275f1b"
+      },
+      "minimum_sampled_headroom_bytes": 12553814016
+    },
+    "tuned": {
+      "timing_mean_ms": {
+        "replay_seconds": 0.56684215625,
+        "posterior_seconds": 20.439698,
+        "imagination_seconds": 85.49631128125,
+        "world_train_seconds": 53.26880690625,
+        "replay_refresh_seconds": 0.39035821875,
+        "world_sync_seconds": 0.06227815625,
+        "behavior_train_seconds": 22.1494560625,
+        "behavior_sync_seconds": 1.1149580000000001,
+        "total_seconds": 183.48997253124998
+      },
+      "metrics": {
+        "world": {
+          "total_loss": 285.4808863888889,
+          "reconstruction_loss": 0,
+          "future_prediction_loss": 1059.9529305555557,
+          "raw_kl": 10.021525458333333,
+          "dynamics_kl": 10.021525458333333,
+          "representation_kl": 10.021525458333333,
+          "reward_loss": 5.5399260083333335,
+          "continuation_loss": 0.6050982155555555,
+          "replay_value_loss": 11.079820111111111,
+          "replay_reward_prediction_mean": 0.000010679135195166667,
+          "replay_reward_target_mean": 0.046875,
+          "replay_reward_mae": 0.046884610888888886,
+          "rewarded_prediction_mean": 0.000010962099053138888,
+          "unrewarded_prediction_mean": 0.000010665218609611111,
+          "rewarded_count": 48,
+          "positive_reward_prediction_mean": 0.000010962099053138888,
+          "zero_reward_prediction_mean": 0.000010665218609611111,
+          "negative_reward_prediction_mean": 0,
+          "positive_reward_count": 48,
+          "zero_reward_count": 976,
+          "negative_reward_count": 0,
+          "replay_continuation_prediction_mean": 0.558492195,
+          "replay_continuation_target_mean": 0.99700564,
+          "replay_continuation_mae": 0.43850491555555554
+        },
+        "behavior": {
+          "total_loss": 4.231637475,
+          "policy_loss": -0.00007117105397222223,
+          "actor_update_scale": 1,
+          "value_loss": 0.9077624372222222,
+          "replay_value_loss": 11.07982013888889,
+          "policy_entropy": 2.890354325,
+          "weighted_policy_entropy": 0.23680620638888888,
+          "imagined_reward_mean": 0.000010378087967416667,
+          "imagined_continuation_mean": 0.5592681088888889,
+          "return_mean": 0.000024110710237222222,
+          "return_scale": 1,
+          "advantage_abs_mean": 0.0000034081242439444447,
+          "weighted_advantage_abs_mean": 2.965631291722222e-7
+        }
+      },
+      "update_ms": [173.906085,174.212076,173.517731,176.71435499999998,174.129725,177.346089,178.97265000000002,183.05305099999998,184.879644,185.045915,184.35267,183.867647,186.01368200000002,184.900243,185.07622400000002,184.037898,184.35030899999998,184.59705100000002,184.740703,186.202643,185.589709,184.63831199999998,185.015745,185.391298,179.654415,180.451772,182.521598,184.42955999999998,181.106436,183.48515300000003,184.692702,183.883916,184.34722,184.99010299999998,185.059105,184.855933],
+      "world_loss": [298.61447,297.7341,298.8929,297.95724,297.84845,298.16113,296.83072,297.0142,295.9677,295.98627,295.85403,294.46542,293.41507,293.5592,292.439,291.8718,290.6218,289.76062,287.86188,287.4676,285.97272,284.24142,283.61813,281.9756,280.54587,278.3808,277.7512,275.19452,273.26648,271.67462,270.1156,267.9553,265.88882,264.76566,263.00604,260.63553],
+      "behavior_loss": [4.2083087,4.1852746,4.196096,4.1818047,4.203988,4.192425,4.2098427,4.1916656,4.1828475,4.1854224,4.209564,4.1835375,4.2008357,4.2243485,4.216015,4.2292004,4.225219,4.2042193,4.211516,4.230387,4.2202682,4.236716,4.2420387,4.231887,4.258183,4.256182,4.2704167,4.2577143,4.2531543,4.264121,4.286652,4.292206,4.2907624,4.272379,4.3150234,4.3187275],
+      "checkpoint_hashes": {
+        "world": "bd4871c10738c305fb8e74b0ea5a64b2f51e88952a90cd6a7840a34208b91ae5",
+        "behavior": "23938ff3d5decbb0271abbe5c0676f45cd948f4612ace2c9d33b52443d16afae",
+        "slow_value": "bc37282dd66fd55cff7be9a6154779e326f9a38219ef49e6d406bc5b59bb6909"
+      },
+      "minimum_sampled_headroom_bytes": 12553748480
+    }
+  },
+  "speedup": 1.0131114486015866,
+  "state": {
+    "entries": 241,
+    "moments": 146,
+    "all_finite": true,
+    "exact_entries": 241,
+    "worst_relative_l2": {
+      "tensor": "world/adam_m.world.continuation.layer0.bias",
+      "exact": true,
+      "max_abs": 0,
+      "relative_l2": 0
+    },
+    "worst_absolute": {
+      "tensor": "world/adam_m.world.continuation.layer0.bias",
+      "exact": true,
+      "max_abs": 0,
+      "relative_l2": 0
+    }
+  },
+  "non_timing_reports_exact": true,
+  "tuning_options": {
+    "scope": "All",
+    "max_classes": 16,
+    "max_scratch_bytes": 67108864,
+    "staging": "Download",
+    "staging_reuse": "SameSize",
+    "max_time": {
+      "secs": 10,
+      "nanos": 0
+    },
+    "warmup_runs": 1,
+    "sample_pairs": 6,
+    "dispatches_per_sample": 16,
+    "min_improvement": 0.05
+  },
+  "tuning": {
+    "posterior": {
+      "elapsed_seconds": 0.783848368,
+      "decisions": {
+        "KeepBaseline": 55
+      },
+      "failures": {
+
+      }
+    },
+    "imagination": {
+      "elapsed_seconds": 0.976216635,
+      "decisions": {
+        "KeepBaseline": 30,
+        "FasterCandidate": 3
+      },
+      "failures": {
+
+      }
+    },
+    "slow_value": {
+      "elapsed_seconds": 0.743991847,
+      "decisions": {
+        "KeepBaseline": 10,
+        "FasterCandidate": 1
+      },
+      "failures": {
+
+      }
+    },
+    "world_gradient": {
+      "elapsed_seconds": 4.476797595,
+      "decisions": {
+        "KeepBaseline": 162,
+        "FasterCandidate": 14
+      },
+      "failures": {
+
+      }
+    },
+    "behavior_gradient": {
+      "elapsed_seconds": 6.484633256,
+      "decisions": {
+        "ScratchLimit": 11,
+        "KeepBaseline": 128,
+        "FasterCandidate": 15,
+        "InvalidOutput": 11
+      },
+      "failures": {
+        "variant 0, Tile32, input pattern 0: reference or cross-variant mismatch": 11
+      }
+    }
+  },
+  "aids": {
+    "pretraining": null,
+    "action_reward_aids": null
+  },
+  "decision": "Not adopted: no convincing whole-learner gain; experimental hooks removed, patch/binary retained locally",
+  "limits": ["one short synthetic pair, fixed order, not a game/learning comparison","no predeclared state-deviation acceptance threshold; not adoption evidence","tuning startup excluded from update timings","bounded search, not exhaustive tuning"],
+  "raw_root": "runs/f32-tuning-20260927.6utTAH"
+}

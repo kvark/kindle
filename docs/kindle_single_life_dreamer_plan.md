@@ -130,7 +130,7 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    mastery definition, not an appropriate 200k-action development target.
    There is no evidence that this recipe can reach it at that budget; stop gate
    runs. This is not a proof that no algorithm could reach it.
-2. **Phase 1a, current: shorten learner iterations without changing learning.**
+2. **Phase 1a, complete: shorten learner iterations without changing learning.**
    Acting/capture and replay collection are already resident. First share
    compatible direct parameters and batch remaining derived-weight transfers,
    comparing complete saved state and update timings with the unchanged
@@ -147,9 +147,9 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    replay ratio, batch/BPTT, losses and optimizer stay fixed. BF16 is not a
    compute option in the current backend; F16 relaxation needs a separate test.
    One numerical/learning check plus matched timing suffices for development;
-   no qualification campaign. The 3x target remains an aspiration, not a gate
-   for testing whether the representation or exploration method works.
-3. **Phase 1b: establish a <=1-hour, three-seed screening recipe.** Use a small
+   no qualification campaign. The user explicitly accepts 3x as a stretch
+   target, not a Phase 1 exit gate. Phase 1 closes with that miss disclosed.
+3. **Phase 1b, complete: establish a <=1-hour, three-seed screening recipe.** Use a small
    learner and a fast sparse-reward environment. [MinAtar recipe/curve contract](screening.md)
    now [completes in 8m18s for all three seeds](results/2026-09-27-minatar-screen.md):
    each 32,768 actions / 8,135 updates in 164 seconds. Final online scores

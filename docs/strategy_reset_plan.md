@@ -18,7 +18,9 @@ gives 1.15× updates / 1.16× short Pong throughput; the **3× target remains un
 [Three Size1M MinAtar seeds](results/2026-09-27-minatar-screen.md) complete in
 8m18s with committed curves; the low scores do not establish strong learning.
 Do not confuse completed engineering deliverables with achieving that speed
-target or demonstrating the value of JEPA.
+target or demonstrating the value of JEPA. The user explicitly accepts **3× as
+a stretch target, not a Phase 1 exit gate**; these completed implementation and
+screening deliverables close Phase 1. Phase 2 is next.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.
@@ -120,7 +122,8 @@ copies through the host (~21 ms/update).
 
 **Acceptance:** learning statistics match the current implementation within
 tolerance on the tiny canaries and a short Pong run (same seed, distributions
-compared, not bit-exact since sampling changes). Target ≥3× faster updates.
+compared, not bit-exact since sampling changes). **Stretch target:** ≥3× faster
+updates, explicitly not a Phase 1 exit gate (user decision, September 27).
 Report actions/s at replay ratio 256 vs. the current ~15.6.
 
 ### 1b. A fast development environment

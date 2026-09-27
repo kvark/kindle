@@ -12,9 +12,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   for dynamics/behavior -> later asynchronous real-time deployment. Stop
   unchanged five-game/mastery confirmations and Atari-only gate tuning.
   The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
-  GPU acting/capture is integrated. Phase 1a fused learner and grouped RSSM
-  pass; Phase 1b's three-seed MinAtar screen completes in 8m18s. The Phase 1
-  implementation/screening deliverables are in place, but 3x updates is unmet.
+  GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
+  RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
+  target is unmet; the user explicitly accepts it as a stretch target, not a
+  Phase 1 exit gate. Phase 2 is next.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
@@ -37,6 +38,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   establish reliable improvement or frozen competence. See
   `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
   distinct from completed implementation; no unchanged mastery queue resumes.
+  Next: Phase 2 representation probes and matched learning controls; a frozen
+  JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or

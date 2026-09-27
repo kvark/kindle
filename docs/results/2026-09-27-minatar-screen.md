@@ -61,5 +61,7 @@ updates; it is excluded from the three-seed statistics.
 The workflow is now ready for controlled representation/exploration experiments.
 The separate [12M speed work](2026-09-27-fused-learner.md) reaches **1.15×**, not
 the strategy's **3× target**; completing this screen does not erase that miss.
+The user accepts 3× as a stretch target, so Phase 1 is complete and Phase 2's
+representation comparison is next.
 Raw runs, checkpoints and serial controller:
 [local evidence](../../runs/minatar-screen-20260927.9pnoFC/).

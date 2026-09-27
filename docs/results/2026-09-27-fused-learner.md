@@ -91,8 +91,13 @@ Imagination/CPU target construction is still expensive. F32 remains: the current
 backend exposes F16 cooperative relaxation, **not a BF16 compute switch**.
 BF16 weight loading is not BF16 training. Reduced precision needs a separate
 numerical/learning comparison; it is not silently enabled to claim this target.
-The fast screening recipe is the next iteration-speed deliverable, rather than
-another unchanged long Pong campaign.
+The [three-seed fast screening recipe](2026-09-27-minatar-screen.md) also
+completes. The user accepts 3× as a stretch target, not an exit gate: Phase 1
+closes with the speed shortfall disclosed. Representation probes and matched
+learning controls are next; no unchanged long Pong campaign resumes.
+An additional [bounded F32 tuner check](2026-09-27-f32-tuning.md) finds only a
+1.3% timing difference with exact state/reports. It is not adopted; its optional
+hooks are removed and evidence retained.
 
 All completed guarded jobs exit cleanly and reap their children on RTX 5080 /
 580.178.04, without separate NVML polling or recovery. Meganeura upstream
