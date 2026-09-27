@@ -885,6 +885,11 @@ mod tests {
                 .sample(&config, &mut StdRng::seed_from_u64(773))
                 .unwrap()
         };
+        // Fresh-arrival sampling is a consumable queue, independent of RNG.
+        // Exhaust it before comparing the same seeded random replay windows.
+        for _ in 0..agent.replay_len() {
+            sample(&mut agent);
+        }
         let before = sample(&mut agent);
         assert!(
             before
