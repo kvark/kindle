@@ -496,7 +496,7 @@ impl Drop for FeatureVectorAgent {
 
 enum VectorPerception {
     Frozen(Box<LeVJepaPerception>),
-    Learned(GpuPreprocessor),
+    Learned(Box<GpuPreprocessor>),
 }
 
 impl VectorPerception {
@@ -550,7 +550,7 @@ impl VectorDreamerAgent {
         let learner = DreamerCore::new(config)?;
         let pixels = GpuPreprocessor::rgb64(Arc::clone(&learner.gpu), streams);
         Ok(Self {
-            perception: VectorPerception::Learned(pixels),
+            perception: VectorPerception::Learned(Box::new(pixels)),
             core: VectorCore::new(learner, streams),
         })
     }
@@ -570,7 +570,7 @@ impl VectorDreamerAgent {
         let pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), streams);
         let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
         Ok(Self {
-            perception: VectorPerception::Learned(pixels),
+            perception: VectorPerception::Learned(Box::new(pixels)),
             core: VectorCore::new(learner, streams),
         })
     }

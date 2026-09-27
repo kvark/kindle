@@ -23,7 +23,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Large decodes best; Tiny pretraining is mixed. The conditional joint-trained
   CNN arm is justified, not yet implemented. Its explicit RGB64 GPU resize is
   a learned-RGB control, never a return to RGB64-upscaled JEPA. Replay pixels,
-  not stale CNN features. Full matched learning is underway; no gameplay
+  not stale CNN features. The first full RL declaration stopped before GPU work
+  on a NAS-backed log-capture timeout; keep live logs/guards local. No gameplay
   representation advantage or Phase 2 completion is established yet.
   Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report

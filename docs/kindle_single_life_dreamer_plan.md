@@ -175,7 +175,8 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Tiny and a learned-encoder Dreamer control. Include a title absent from the
    video corpus. Native input is current; RGB64 is an explicit ablation.
    Matched upstream/native smokes pass: all four complete 6,144 actions and
-   1,186 updates. Full upstream Pong seed1009 is running; the three-seed,
+   1,186 updates. The first full declaration stopped in host-log capture before
+   launching a GPU worker; use local live logs for the fresh attempt. The three-seed,
    three-game, 200,004-action-per-run comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.

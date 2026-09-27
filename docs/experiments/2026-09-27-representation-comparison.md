@@ -195,10 +195,13 @@ measured support; do not extrapolate slow runs or fill absent early episodes
 with zero. Initial policy/encoder compilation and final checkpoint writes count
 in run time; report agent construction separately. The shared reader is
 `python/examples/summarize_representation_learning.py`.
-The first full run, upstream Pong seed1009, is now declared and launched in
-`/mnt/data/kindle-representation-learning-20260927.I1MQPA`. It retains this
-200,004-action protocol. The other arms are not yet launched. No local compilation
-overlaps its timing; final checkpoints/logs use this task-specific NAS directory.
+The first full declaration, upstream Pong seed1009, stopped **before spawning
+its GPU worker** in `/mnt/data/kindle-representation-learning-20260927.I1MQPA`.
+Its NAS-backed kernel-log capture timed out and was not reaped within the
+guard's deadline; that capture PID is now absent. No native failure or new
+kernel GPU fault was recorded. Preserve the failed attempt. Use local storage
+for live guards/logs, and archive completed artifacts separately; no guard
+timeout or acceptance threshold is relaxed. No full RL run has started yet.
 
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise
