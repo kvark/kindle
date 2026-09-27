@@ -35,10 +35,9 @@ use super::runtime::{
 use super::world;
 use super::{BLADE_REV, DREAMERV3_UPSTREAM_REV, MEGANEURA_REV};
 use crate::env::{RgbFrame, Transition};
-use crate::vision::{
-    OBSERVATION_CHANNELS, OBSERVATION_GRID, Observation, PROJECTION_SEED, PerceptionIdentity,
-    PerceptionKind,
-};
+#[cfg(test)]
+use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
+use crate::vision::{Observation, PROJECTION_SEED, PerceptionIdentity, PerceptionKind};
 
 const CHECKPOINT_FORMAT: u32 = 3;
 const CHECKPOINT_ARCHITECTURE: &str = "dreamerv3-visual-features";
@@ -466,8 +465,8 @@ impl DreamerCore {
             return_normalizer: PercentileNormalizer::new(config.return_norm_rate, 1.0),
             deter: vec![0.0; size.deter],
             stoch: vec![0.0; size.stoch * size.classes],
-            observation: vec![0.0; Observation::LEN],
-            encoded_observation: vec![0.0; OBSERVATION_GRID * OBSERVATION_GRID * size.vision_depth],
+            observation: vec![0.0; config.observation_dim()],
+            encoded_observation: vec![0.0; config.encoded_observation_dim()],
             feature: vec![0.0; config.feature_dim()],
             pending_action: None,
             active: false,
@@ -651,7 +650,7 @@ impl DreamerCore {
         decoder.set_input("stoch", &self.stoch);
         decoder.step();
         decoder.wait();
-        let mut observation = vec![0.0; Observation::LEN];
+        let mut observation = vec![0.0; self.config.observation_dim()];
         decoder.read_output_by_index(0, &mut observation);
         observation
     }
@@ -813,7 +812,7 @@ impl DreamerCore {
                 decoder.set_input("stoch", &stoch);
                 decoder.step();
                 decoder.wait();
-                let mut observation = vec![0.0; Observation::LEN];
+                let mut observation = vec![0.0; self.config.observation_dim()];
                 decoder.read_output_by_index(0, &mut observation);
                 rollout.observations.push(observation);
             }
@@ -878,8 +877,8 @@ impl DreamerCore {
             blade_revision: BLADE_REV.to_owned(),
             projection_seed: PROJECTION_SEED,
             perception: self.perception_identity.clone(),
-            observation_grid: OBSERVATION_GRID,
-            observation_channels: OBSERVATION_CHANNELS,
+            observation_grid: self.config.observation_grid(),
+            observation_channels: self.config.observation_channels(),
             config: self.config.clone(),
             learner_step: self.learner_step,
             environment_step: self.environment_step,
@@ -1932,6 +1931,12 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
         ));
     }
     if let Some(perception) = &metadata.perception {
+        if metadata.config.observation_kind != super::ObservationKind::Features {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "frozen perception requires feature replay",
+            ));
+        }
         perception.validate()?;
     }
     let expected = [
@@ -1967,12 +1972,12 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
         ("projection seed", PROJECTION_SEED, metadata.projection_seed),
         (
             "observation grid",
-            OBSERVATION_GRID as u64,
+            metadata.config.observation_grid() as u64,
             metadata.observation_grid as u64,
         ),
         (
             "observation channels",
-            OBSERVATION_CHANNELS as u64,
+            metadata.config.observation_channels() as u64,
             metadata.observation_channels as u64,
         ),
     ];

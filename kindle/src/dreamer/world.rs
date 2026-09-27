@@ -8,6 +8,7 @@ use super::networks::{
     gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
     weighted_cross_entropy,
 };
+#[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
 pub const LOSS_TOTAL: usize = 0;
@@ -145,8 +146,6 @@ fn build_training_graph_grouped(
     assert!(time_batch_length > 0 && length.is_multiple_of(time_batch_length));
     let batch = config.batch_size;
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
-
     let mut graph = Graph::new();
     let model = WorldModel::new(&mut graph, config);
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
@@ -156,7 +155,7 @@ fn build_training_graph_grouped(
         .map(|time| {
             graph.input(
                 &format!("observation_{time}"),
-                &[batch * patches, OBSERVATION_CHANNELS],
+                &config.observation_shape(batch),
             )
         })
         .collect::<Vec<_>>();
@@ -506,10 +505,7 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
         .map(|time| {
             graph.input(
                 &format!("observation_{time}"),
-                &[
-                    batch * OBSERVATION_GRID * OBSERVATION_GRID,
-                    OBSERVATION_CHANNELS,
-                ],
+                &config.observation_shape(batch),
             )
         })
         .collect::<Vec<_>>();
@@ -652,14 +648,13 @@ pub fn build_observe_graph(config: &DreamerConfig, batch: usize) -> Graph {
     config.validate();
     assert!(batch > 0);
     let size = config.network();
-    let patches = OBSERVATION_GRID * OBSERVATION_GRID;
     let mut graph = Graph::new();
     let dynamics = Dynamics::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
     let previous_deter = graph.input("previous_deter", &[batch, size.deter]);
     let previous_stoch = graph.input("previous_stoch", &[batch * size.stoch, size.classes]);
     let previous_action = graph.input("previous_action", &[batch, config.action_count]);
-    let observation = graph.input("observation", &[batch * patches, OBSERVATION_CHANNELS]);
+    let observation = graph.input("observation", &config.observation_shape(batch));
     let keep_deter = graph.input("keep_deter", &[batch, size.deter]);
     let keep_stoch = graph.input("keep_stoch", &[batch * size.stoch, size.classes]);
     let keep_action = graph.input("keep_action", &[batch, config.action_count]);

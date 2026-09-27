@@ -65,6 +65,21 @@ def test_learning_reader_reconciles_complete_episodes_and_partial_tails(tmp_path
     assert len(run["source_sha256"]) == 64 and run["first_training_action"] == 6
 
 
+def test_learning_summary_requires_pixels_and_joint_loss_for_cnn_label(tmp_path):
+    rows = fixture()
+    with pytest.raises(ValueError, match="jointly learned"):
+        summarize([("learned_cnn", write(tmp_path, rows))], budget=24)
+    rows[0]["config"].update(observation_kind="rgb64", loss_scales=dict(reconstruction=1., future_prediction=0.))
+    rows[0].update(model_provenance=dict(perception=None), learned_rgb_preprocessing="single GPU resize")
+    path = write(tmp_path, rows)
+    assert summarize([("learned_cnn", path)], budget=24)["results"][0]["method"] == "learned_cnn"
+    with pytest.raises(ValueError, match="labelled frozen"):
+        summarize([("pretrained_tiny", path)], budget=24)
+    rows[0]["model_provenance"]["perception"] = dict(kind="levjepa-tiny")
+    with pytest.raises(ValueError, match="jointly learned"):
+        summarize([("learned_cnn", write(tmp_path, rows))], budget=24)
+
+
 @pytest.mark.parametrize("corruption", ["missing_end", "missing_transition", "missing_episode", "reward", "count", "time", "updates", "nan", "extra_end"])
 def test_learning_reader_rejects_incomplete_or_inconsistent_logs(tmp_path, corruption):
     rows = fixture()

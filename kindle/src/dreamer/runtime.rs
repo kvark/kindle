@@ -32,6 +32,24 @@ pub(crate) fn build_session(
 }
 
 pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
+    // Conv2d's flat OIHW storage does not encode fan-in in its parameter shape.
+    let convolution_fans = graph
+        .nodes()
+        .iter()
+        .filter_map(|node| {
+            if let Op::Conv2d {
+                in_channels,
+                kernel_h,
+                kernel_w,
+                ..
+            } = node.op
+                && let Op::Parameter { ref name } = graph.node(node.inputs[1]).op
+            {
+                return Some((name.as_str(), (in_channels * kernel_h * kernel_w) as usize));
+            }
+            None
+        })
+        .collect::<HashMap<_, _>>();
     let shapes = graph
         .nodes()
         .iter()
@@ -66,7 +84,10 @@ pub(crate) fn initialize_d3(session: &mut Session, graph: &Graph, seed: u64) {
             } else {
                 1.0
             };
-            let fan_in = d3_fan_in(shape);
+            let fan_in = convolution_fans
+                .get(name.as_str())
+                .copied()
+                .unwrap_or_else(|| d3_fan_in(shape));
             // Match reconstruction's spatial-head initialization in the causal
             // ablation. Only the trunk's smaller deterministic input differs.
             let initialization_name = match name.strip_prefix("world.future_predictor.") {

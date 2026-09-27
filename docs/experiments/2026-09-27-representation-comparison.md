@@ -141,6 +141,22 @@ back to 224. This is a learned-RGB research control, not a downgrade of the
 native-detail JEPA path. Replay must store pixels and re-encode them with current
 weights; stale frozen feature replay is not joint learning. Record the final CNN
 recipe and pass its integration smoke before launching that arm.
+
+The implemented native RGB control uses a kernel8/stride8 RGB stem, two padded
+3x3 spatial convolutions at 8x8, group normalization (eight groups, epsilon1e-4)
+and SiLU after each convolution, then 2x2 max pooling. Width is four times the
+preset vision depth: 64 for 12M, yielding 4x4x64 posterior input. The encoder
+has 86,400 parameters. The decoder is a normalized 256-unit SiLU hidden layer
+and a dense 12,288-value RGB output. Pixel reconstruction uses summed squared
+error, scale1; the frozen-feature future-prediction head is disabled. RSSM,
+actor/critic, replay ratio, update scheduling and optimizer stay unchanged.
+The resize is bilinear, no antialiasing, CHW /255-0.5; upstream uses Pillow's
+resize and its own CNN encoder/decoder. This is a whole-package native learned
+baseline, not an exact upstream encoder/decoder port or a pretraining ablation
+of the offline 173k reconstruction CNN. GPU tests cover independent scalar
+values/gradients, CPU/resident preprocessing, unchanged pixel replay across
+encoder updates, per-stream resets and optimizer-preserving checkpoint restore.
+Those tests and the new arm's integration smoke must pass before its RL launch.
 Fix the budget before the
 first RL launch: **200,004 actual actions** per run (the nearest full N6 batch
 above the 200k reference), B16/T64/context1/full BPTT/H15/R256, F32, lr4e-5,

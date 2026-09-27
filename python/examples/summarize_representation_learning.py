@@ -131,6 +131,14 @@ def summarize(inputs, *, budget=200004):
                     h["restored_checkpoint"] is not None or h.get("exploration") or h["observation_size"] != "native"):
                 raise ValueError("not fresh unassisted native training")
             config = {k: v for k, v in h["config"].items() if k != "seed"}
+            if method == "learned_cnn":
+                if (config.get("observation_kind") != "rgb64" or
+                        h.get("model_provenance", {}).get("perception") is not None or
+                        not h.get("learned_rgb_preprocessing") or
+                        config["loss_scales"]["reconstruction"] != 1 or config["loss_scales"]["future_prediction"] != 0):
+                    raise ValueError("not the jointly learned RGB control")
+            elif config.get("observation_kind", "features") != "features":
+                raise ValueError("RGB control cannot be labelled frozen JEPA")
         if any(config[k] != v for k, v in dict(batch_size=16, batch_length=64, train_ratio=256).items()):
             raise ValueError("mismatched learning schedule")
         if config != recipes.setdefault(method, config):
@@ -150,8 +158,8 @@ def summarize(inputs, *, budget=200004):
             aggregate["final_hns"] = mean_ci([(r["curve"][-1]["score"]-random)/(human-random) for r in runs])
             aggregate["run_seconds"] = mean_ci([r["final"]["elapsed_seconds"] for r in runs])
         results.append(dict(method=method, game=game, aggregate=aggregate, runs=runs))
-    required = {(method, game, seed) for method in METHODS[:4] for game in BASELINES for seed in SEEDS}
-    return dict(status="base_matrix_complete" if required <= seen else "partial_learning_comparison",
+    required = {(method, game, seed) for method in METHODS for game in BASELINES for seed in SEEDS}
+    return dict(status="learning_matrix_complete" if required <= seen else "partial_learning_comparison",
                 phase2_complete=False, action_budget=budget, recipes=recipes, results=results,
                 normalization=dict(formula="(score-random)/(human-random)", anchors=BASELINES, source=REFERENCE),
                 limits=["online last-50 completed episode means, not frozen competence",
@@ -159,8 +167,9 @@ def summarize(inputs, *, budget=200004):
                         "equal learner-seed weighting, 10000 percentile bootstrap samples; only three seeds",
                         "time starts before initial policy/encoding; construction is reported separately",
                         "time curves interpolate only within common measured support, never extrapolate",
-                        "upstream RGB reconstruction versus native frozen features changes the whole package",
-                        "a complete base matrix still needs offline evidence and an explicit architecture decision"])
+                        "upstream/native RGB reconstruction versus frozen features changes the whole package",
+                        "native RGB uses one GPU bilinear resize and a patch CNN/dense decoder, not the exact upstream CNN",
+                        "a complete learning matrix still needs offline evidence and an explicit architecture decision"])
 
 
 def markdown(result, name):

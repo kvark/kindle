@@ -134,6 +134,8 @@ pub(crate) struct GpuPreprocessor {
     streams: usize,
     size: u32,
     patch: u32,
+    input: &'static str,
+    centered_rgb: bool,
 }
 
 impl GpuPreprocessor {
@@ -162,7 +164,18 @@ impl GpuPreprocessor {
             streams,
             size: size.try_into().expect("image size overflow"),
             patch: patch.try_into().expect("patch size overflow"),
+            input: "patches",
+            centered_rgb: false,
         }
+    }
+
+    /// Learned RGB control: one full-frame resize, channel-major values in
+    /// [-0.5, 0.5]. No letterbox, ImageNet statistics or second upscale.
+    pub fn rgb64(gpu: Arc<gpu::Context>, streams: usize) -> Self {
+        let mut pixels = Self::new(gpu, streams, 64, 64);
+        pixels.input = "observation";
+        pixels.centered_rgb = true;
+        pixels
     }
 
     pub fn cpu_frames(&mut self, session: &mut Session, frames: &[(usize, &[u8], usize, usize)]) {
@@ -261,12 +274,12 @@ impl GpuPreprocessor {
             "different GPU context"
         );
         assert_eq!(
-            session.slot_size(ExternalSlot::Input("patches")),
+            session.slot_size(ExternalSlot::Input(self.input)),
             Some(self.streams * self.elements() as usize * size_of::<f32>())
         );
         session.wait();
         session
-            .input_buffer("patches")
+            .input_buffer(self.input)
             .expect("encoder patches input")
     }
 
@@ -278,11 +291,15 @@ impl GpuPreprocessor {
         offset: u32,
         layout: FrameLayout,
     ) -> Bindings {
-        let [width, height, x, y] = super::preprocess::letterbox_geometry(
-            layout.width as usize,
-            layout.height as usize,
-            self.size as usize,
-        );
+        let [width, height, x, y] = if self.centered_rgb {
+            [self.size as usize, self.size as usize, 0, 0]
+        } else {
+            super::preprocess::letterbox_geometry(
+                layout.width as usize,
+                layout.height as usize,
+                self.size as usize,
+            )
+        };
         Bindings {
             pixels,
             patches,
@@ -303,7 +320,7 @@ impl GpuPreprocessor {
                     .unwrap()
                     .checked_mul(self.elements())
                     .expect("patch offset overflow"),
-                0,
+                u32::from(self.centered_rgb),
                 0,
                 0,
             ],
@@ -503,6 +520,79 @@ mod tests {
         );
         check_device(session);
         actual
+    }
+
+    #[test]
+    #[ignore = "requires GPU; also exercised on lavapipe in CI"]
+    fn gpu_rgb64_resize_matches_scalar_reference() {
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let mut graph = meganeura::Graph::new();
+        let input = graph.input("observation", &[2, 12288]);
+        let output = graph.neg(input);
+        graph.set_outputs(vec![output]);
+        let mut session = meganeura::build(
+            &graph,
+            meganeura::SessionConfig {
+                mode: meganeura::Mode::Inference,
+                gpu: Some(Arc::clone(&gpu)),
+                ..Default::default()
+            },
+        )
+        .0;
+        let mut pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), 2);
+        for (width, height) in [(160, 210), (64, 64), (13, 7), (1, 19)] {
+            let rgb = (0..width * height * 3)
+                .map(|i| ((i * 37 + i / 43) % 256) as u8)
+                .collect::<Vec<_>>();
+            let mut expected = vec![0.0; 2 * 12288];
+            for y in 0..64 {
+                for x in 0..64 {
+                    let sx = ((x as f64 + 0.5) * width as f64 / 64.0 - 0.5)
+                        .clamp(0.0, (width - 1) as f64);
+                    let sy = ((y as f64 + 0.5) * height as f64 / 64.0 - 0.5)
+                        .clamp(0.0, (height - 1) as f64);
+                    let (x0, y0) = (sx.floor() as usize, sy.floor() as usize);
+                    let (mx, my) = (sx - x0 as f64, sy - y0 as f64);
+                    for c in 0..3 {
+                        let at = |x, y| f64::from(rgb[(y * width + x) * 3 + c]);
+                        let x1 = (x0 + 1).min(width - 1);
+                        let y1 = (y0 + 1).min(height - 1);
+                        let value = (at(x0, y0) * (1.0 - mx) + at(x1, y0) * mx) * (1.0 - my)
+                            + (at(x0, y1) * (1.0 - mx) + at(x1, y1) * mx) * my;
+                        expected[12288 + c * 4096 + y * 64 + x] = (value / 255.0 - 0.5) as f32;
+                    }
+                }
+            }
+            pixels.cpu_frames(&mut session, &[(1, &rgb, width, height)]);
+            let uploaded = check_patches(&mut session, &expected, "RGB64 CPU source");
+            let buffer = gpu.create_buffer(gpu::BufferDesc {
+                name: "rgb64_test_source",
+                size: rgb.len().next_multiple_of(4) as u64,
+                memory: gpu::Memory::Shared,
+            });
+            unsafe {
+                std::ptr::write_bytes(buffer.data(), 0, buffer.size() as usize);
+                std::ptr::copy_nonoverlapping(rgb.as_ptr(), buffer.data(), rgb.len());
+            }
+            let frame = unsafe {
+                GpuFrame::from_buffer(
+                    &gpu,
+                    &buffer,
+                    0,
+                    FrameLayout::new(
+                        width as u32,
+                        height as u32,
+                        (width * 3) as u32,
+                        PixelFormat::Rgb8,
+                    ),
+                )
+            };
+            pixels.gpu_frames(&mut session, &[(1, frame)]);
+            let resident = check_patches(&mut session, &expected, "RGB64 GPU source");
+            assert_eq!(resident, uploaded);
+            pixels.wait();
+            gpu.destroy_buffer(buffer);
+        }
     }
 
     #[test]

@@ -142,6 +142,16 @@ impl Observation {
 
     pub fn from_vec(values: Vec<f32>) -> Self {
         assert_eq!(values.len(), Self::LEN);
+        Self::checked(values)
+    }
+
+    /// Resized channel-major pixels, not frozen features.
+    pub fn rgb64(values: Vec<f32>) -> Self {
+        assert_eq!(values.len(), 3 * 64 * 64);
+        Self::checked(values)
+    }
+
+    fn checked(values: Vec<f32>) -> Self {
         assert!(values.iter().all(|value| value.is_finite()));
         Self {
             values: values.into_boxed_slice(),

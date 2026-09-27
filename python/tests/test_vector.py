@@ -36,6 +36,30 @@ def test_feature_vector_rejects_invalid_config_before_gpu():
         kindle.FeatureVectorAgent(4, config)
 
 
+def test_learned_rgb_api_checks_kind_and_capacity_before_gpu():
+    config = kindle.default_config(6, "tiny")
+    with pytest.raises(RuntimeError, match="observation_kind"):
+        kindle.VectorAgent.learned_rgb(2, config)
+    config["observation_kind"] = "rgb64"
+    with pytest.raises(RuntimeError, match="at least one"):
+        kindle.VectorAgent.learned_rgb(0, config)
+    with pytest.raises(ValueError, match="FeatureVectorAgent"):
+        kindle.FeatureVectorAgent(2, config)
+    config["loss_scales"]["future_prediction"] = .25
+    with pytest.raises(RuntimeError, match="RGB learning"):
+        kindle.VectorAgent.learned_rgb(2, config)
+
+
+@pytest.mark.parametrize("args", [["--observation-size", "64"], ["--encoder", "levjepa-tiny"]])
+def test_learned_rgb_rejects_double_resize_or_frozen_encoder(monkeypatch, tmp_path, capsys, args):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "learned-cnn", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2 and not output.exists()
+    assert "one GPU resize" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize("encoder", ["levjepa-tiny-ish", "dinov3"])
 def test_vector_rejects_unsupported_encoder_before_gpu(encoder):
     with pytest.raises(ValueError, match="encoder"):
@@ -234,8 +258,8 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
-@pytest.mark.parametrize("encoder_kind", [None, "levjepa-tiny"])
-@pytest.mark.parametrize("observation_size", [None, "64"])
+@pytest.mark.parametrize("encoder_kind,observation_size", [
+    (None, None), (None, "64"), ("levjepa-tiny", None), ("levjepa-tiny", "64"), ("learned-cnn", None)])
 @pytest.mark.parametrize("sticky_actions", [0.0, 0.25])
 def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions):
     created = []
@@ -278,6 +302,14 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
             assert encoder == (encoder_kind or "levjepa")
             self.streams, self.config = streams, config
 
+        @classmethod
+        def learned_rgb(cls, streams, config):
+            assert encoder_kind == "learned-cnn"
+            assert config["observation_kind"] == "rgb64"
+            assert config["loss_scales"]["reconstruction"] == 1
+            assert config["loss_scales"]["future_prediction"] == 0
+            return cls(None, streams, config, encoder="learned-cnn")
+
         def begin_episodes(self, ids, frames):
             self.replay_len += len(ids)
 
@@ -314,11 +346,11 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     monkeypatch.setattr(atari_vector.gym, "make", make)
     monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", wrap)
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "ALE/Seaquest-v5",
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "learned-cnn" if encoder_kind == "learned-cnn" else "unused", "ALE/Seaquest-v5",
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
         "--sticky-actions", str(sticky_actions),
         *(["--observation-size", observation_size] if observation_size else []),
-        *(["--encoder", encoder_kind] if encoder_kind else []),
+        *(["--encoder", encoder_kind] if encoder_kind and encoder_kind != "learned-cnn" else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
     if behavior == "ignored_override":
@@ -341,6 +373,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     rows = [json.loads(line) for line in output.read_text().splitlines()]
     assert rows[0]["observation_size"] == (observation_size or "native")
     assert rows[0]["sticky_actions"] == sticky_actions
+    assert ("learned_rgb_preprocessing" in rows[0]) == (encoder_kind == "learned-cnn")
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)
     assert "natural_wins" not in rows[-1] and "completed_games" not in rows[-1]
     result = audit(output)

@@ -2,7 +2,7 @@ struct Params {
     image: vec4<u32>, // width, height, byte stride, channels
     source: vec4<u32>, // byte offset, BGR flag, output size, patch size
     region: vec4<u32>, // resized width/height, letterbox x/y
-    output: vec4<u32>, // stream output offset
+    output: vec4<u32>, // stream output offset, centered-RGB mode
 }
 
 var<storage, read> pixels: array<u32>;
@@ -46,6 +46,9 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
             let bottom = channel(x0, y1, c) * (1.0 - mx) + channel(x1, y1, c) * mx;
             let value = top * (1.0 - my) + bottom * my;
             normalized = (value / 255.0 - means[c]) / stds[c];
+            if params.output.y != 0u {
+                normalized = value / 255.0 - 0.5;
+            }
         }
         let destination = params.output.x + patch_index * (3u * ps * ps) + c * ps * ps + local;
         patches[destination] = normalized;

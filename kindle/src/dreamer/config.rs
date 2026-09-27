@@ -1,4 +1,14 @@
-use crate::vision::{OBSERVATION_CHANNELS, Observation};
+use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
+
+/// Values retained in replay and re-encoded by the current world model.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ObservationKind {
+    #[default]
+    Features,
+    /// One GPU resize to 64x64, channel-major RGB in [-0.5, 0.5].
+    Rgb64,
+}
 
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -138,6 +148,8 @@ impl Default for LossScales {
 pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
+    #[serde(default)]
+    pub observation_kind: ObservationKind,
     /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -212,6 +224,7 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            observation_kind: ObservationKind::Features,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
@@ -278,7 +291,40 @@ impl DreamerConfig {
     }
 
     pub const fn observation_dim(&self) -> usize {
-        Observation::LEN
+        self.observation_grid() * self.observation_grid() * self.observation_channels()
+    }
+
+    pub const fn observation_grid(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => OBSERVATION_GRID,
+            ObservationKind::Rgb64 => 64,
+        }
+    }
+
+    pub const fn observation_channels(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => OBSERVATION_CHANNELS,
+            ObservationKind::Rgb64 => 3,
+        }
+    }
+
+    pub(crate) const fn observation_shape(&self, batch: usize) -> [usize; 2] {
+        match self.observation_kind {
+            ObservationKind::Features => [
+                batch * OBSERVATION_GRID * OBSERVATION_GRID,
+                OBSERVATION_CHANNELS,
+            ],
+            ObservationKind::Rgb64 => [batch, 3 * 64 * 64],
+        }
+    }
+
+    pub(crate) fn encoded_observation_dim(&self) -> usize {
+        match self.observation_kind {
+            ObservationKind::Features => {
+                OBSERVATION_GRID * OBSERVATION_GRID * self.network().vision_depth
+            }
+            ObservationKind::Rgb64 => 4 * 4 * self.network().vision_depth * 4,
+        }
     }
 
     pub fn observation_decoder_depth(&self) -> usize {
@@ -332,6 +378,13 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if self.observation_kind == ObservationKind::Rgb64
+            && (self.visitation_bonus
+                || self.loss_scales.future_prediction != 0.0
+                || self.loss_scales.reconstruction <= 0.0)
+        {
+            return Err("RGB learning requires pixel reconstruction, not frozen-feature prediction or host visitation".into());
+        }
         if self.action_count <= 1 {
             return Err("action_count must be greater than one".into());
         }

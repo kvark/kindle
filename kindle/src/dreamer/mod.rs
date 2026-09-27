@@ -25,7 +25,7 @@ pub use agent::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, FeatureVectorAgent, LearnReport,
     LearnTiming, ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
-pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize};
+pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize, ObservationKind};
 pub use replay::{FrameFlags, Reward};
 
 /// Upstream DreamerV3 revision used as the behavioral contract.

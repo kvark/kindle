@@ -45,7 +45,7 @@ def require_gpu_device(snapshot, expected):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("encoder_checkpoint", help="frozen encoder checkpoint, or learned-cnn for a fresh joint RGB model")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
@@ -121,6 +121,9 @@ def main():
     if args.restore and args.observation_size is None:
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
+    learned_rgb = args.encoder_checkpoint == "learned-cnn"
+    if learned_rgb and (args.encoder is not None or args.observation_size != "native"):
+        parser.error("learned-cnn consumes native frames for one GPU resize; no frozen --encoder or adapter resize")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
@@ -169,15 +172,23 @@ def main():
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,
                       learning_rate_warmup=1000, agc=0.3)
-        config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
+        if learned_rgb:
+            config["observation_kind"] = "rgb64"
+            config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
+        else:
+            config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
             probability=args.exploration_probability, hold_actions=args.exploration_hold,
             seed=args.seed), args.num_envs, actions) if args.exploration_probability else None)
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
-        agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
-                 if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
-                     **(dict(encoder=args.encoder) if args.encoder else {})))
+        if learned_rgb:
+            agent = (kindle.VectorAgent.restore_rgb(str(args.restore), args.num_envs) if args.restore
+                     else kindle.VectorAgent.learned_rgb(args.num_envs, config))
+        else:
+            agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
+                     if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
+                         **(dict(encoder=args.encoder) if args.encoder else {})))
         if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
             require_gpu_device(agent.gpu_device, expected)
         if agent.config["action_count"] != actions:
@@ -202,6 +213,7 @@ def main():
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
+                  **(dict(learned_rgb_preprocessing="single GPU bilinear resize to 64x64, no antialias; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,

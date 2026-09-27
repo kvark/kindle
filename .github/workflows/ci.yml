@@ -54,7 +54,13 @@ jobs:
       - name: GPU pixel preprocessing and resident-buffer parity
         run: >-
           cargo test -p kindle --lib
-          vision::preprocess_gpu::tests::gpu_pixels_match_cpu_reference_and_resident_buffers
+          vision::preprocess_gpu::tests::gpu_
+          -- --ignored --test-threads=1
+
+      - name: Joint RGB CNN values and gradients
+        run: >-
+          cargo test -p kindle --lib
+          dreamer::networks::rgb::tests::tiny_rgb_encoder_matches_independent_reference
           -- --exact --ignored --test-threads=1
 
       - name: Offline probe values, masked gradients and frozen evaluation
