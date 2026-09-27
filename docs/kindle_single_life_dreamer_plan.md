@@ -185,9 +185,10 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    **-3.04 upstream, -17.34 pretrained Tiny, -14.28 initial Tiny**, at
    19.78 / 20.02 / 20.06 actions/s respectively.
    [Complete curves and limits](results/2026-09-27-representation-learning.md)
-   retain every episode and unfinished tail. This early seed favors upstream
-   and shows no Tiny pretraining benefit, but is not competence or a multi-seed
-   frontend decision. The remaining matrix runs serially. The three-seed,
+   retain every episode and unfinished tail. The native RGB CNN also completes
+   at -15.78 / 18.70 actions/s; its different encoder/decoder is not an isolated
+   frontend swap. This early seed favors upstream and shows no Tiny pretraining
+   benefit, but is not competence or a multi-seed frontend decision. The remaining matrix runs serially. The three-seed,
    three-game, 200,004-action-per-run comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.

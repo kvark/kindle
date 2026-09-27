@@ -233,6 +233,11 @@ favors upstream at nearly equal throughput, not a multi-seed frontend decision.
 Initial Tiny also completes at the same budget: 9,969.86s, last-50 score -14.28,
 with finite state and a passing guard. This seed does not show a pretraining
 benefit; other methods, seeds and games remain required before deciding.
+The fresh joint RGB CNN also completes at the same budget, with finite state
+and a passing guard: 10,695.02s, last-50 score -15.78. Full-replay sampled
+headroom remains at least 4.56 GiB. It also trails upstream in this seed;
+native/upstream architectural differences prevent attributing the gap solely
+to the frozen encoder or reconstruction choice.
 Its `learning-remainder.json` declares the other 44 entries behind positive
 completion of both the active native guard and its controller. The complete
 matrix is 45 runs / 9,000,180 actions, with unchanged budgets. Within each
