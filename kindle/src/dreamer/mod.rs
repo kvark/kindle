@@ -22,8 +22,8 @@ mod runtime;
 mod world;
 
 pub use agent::{
-    ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, LearnReport, LearnTiming,
-    ModelProvenance, VectorDreamerAgent, WorldMetrics,
+    ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, FeatureVectorAgent, LearnReport,
+    LearnTiming, ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
 pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize};
 pub use replay::{FrameFlags, Reward};

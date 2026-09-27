@@ -1,10 +1,7 @@
 //! Online acting, replay learning, and latent imagination.
 
 mod vector;
-pub use vector::VectorDreamerAgent;
-
-#[cfg(test)]
-mod initialization;
+pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
 
 use std::fs;
 use std::io;
@@ -308,15 +305,13 @@ pub struct DreamerCore {
     rngs: DreamerRngs,
     return_normalizer: PercentileNormalizer,
     world_train: Session,
-    world_observe_batch: Session,
+    world_posterior: Session,
     world_observe_live: Session,
-    world_transition: Session,
+    imagination: Session,
     world_transition_live: Session,
-    world_heads: Session,
     world_heads_live: Session,
     world_prediction_live: Option<Session>,
     behavior_train: Session,
-    behavior_online: Session,
     behavior_slow: Session,
     policy_live: Session,
     behavior_value_live: Option<Session>,
@@ -378,7 +373,7 @@ impl DreamerCore {
         core.rngs =
             DreamerRngs::resumed(core.config.seed, core.learner_step, core.environment_step);
         core.sync_world_inference();
-        sync_matching(&core.behavior_train, &mut core.behavior_online, "behavior.");
+        sync_matching(&core.behavior_train, &mut core.imagination, "behavior.");
         sync_matching(
             &core.behavior_train,
             &mut core.policy_live,
@@ -401,16 +396,17 @@ impl DreamerCore {
         let world_train_config = world_training_config(&config);
         let world_train_graph =
             world::build_training_graph(&world_train_config, config.world_backprop_length);
-        let world_observe_batch_graph = world::build_observe_graph(&config, config.batch_size);
+        let world_posterior_graph = world::build_posterior_graph(&config);
         let world_observe_live_graph = world::build_observe_graph(&config, 1);
-        let world_transition_graph = world::build_transition_graph(&config, starts);
+        let imagination_graph = world::build_imagination_graph(&config);
         let world_transition_live_graph = world::build_transition_graph(&config, 1);
-        let world_head_graph = world::build_imagination_head_graph(&config, starts);
         let world_head_live_graph = world::build_head_graph(&config, 1);
         let behavior_train_graph =
             behavior::build_training_graph(&config, imagined_rows, replay_rows);
-        let behavior_online_graph = behavior::build_inference_graph(&config, starts);
-        let behavior_slow_graph = behavior::build_value_inference_graph(&config, starts);
+        let behavior_slow_graph = behavior::build_value_inference_graph(
+            &config,
+            starts * (config.imagination_length + 1),
+        );
         let policy_live_graph = behavior::build_actor_inference_graph(&config, 1);
 
         let mut world_train = build_session(
@@ -419,15 +415,13 @@ impl DreamerCore {
             Mode::Training,
             config.skip_full_optimize,
         );
-        let mut world_observe_batch =
-            build_session(&world_observe_batch_graph, &gpu, Mode::Inference, false);
+        let mut world_posterior =
+            build_session(&world_posterior_graph, &gpu, Mode::Inference, false);
         let mut world_observe_live =
             build_session(&world_observe_live_graph, &gpu, Mode::Inference, false);
-        let mut world_transition =
-            build_session(&world_transition_graph, &gpu, Mode::Inference, false);
+        let mut imagination = build_session(&imagination_graph, &gpu, Mode::Inference, false);
         let mut world_transition_live =
             build_session(&world_transition_live_graph, &gpu, Mode::Inference, false);
-        let mut world_heads = build_session(&world_head_graph, &gpu, Mode::Inference, false);
         let mut world_heads_live =
             build_session(&world_head_live_graph, &gpu, Mode::Inference, false);
         let mut behavior_train = build_session(
@@ -436,8 +430,6 @@ impl DreamerCore {
             Mode::Training,
             config.skip_full_optimize,
         );
-        let mut behavior_online =
-            build_session(&behavior_online_graph, &gpu, Mode::Inference, false);
         let mut behavior_slow = build_session(&behavior_slow_graph, &gpu, Mode::Inference, false);
         let mut policy_live = build_session(&policy_live_graph, &gpu, Mode::Inference, false);
 
@@ -448,16 +440,15 @@ impl DreamerCore {
             config.seed ^ 0x5eed_0000_0000_0001,
         );
         for target in [
-            &mut world_observe_batch,
+            &mut world_posterior,
             &mut world_observe_live,
-            &mut world_transition,
+            &mut imagination,
             &mut world_transition_live,
-            &mut world_heads,
             &mut world_heads_live,
         ] {
             share_matching(&mut world_train, target, "world.");
         }
-        share_matching(&mut behavior_train, &mut behavior_online, "behavior.");
+        share_matching(&mut behavior_train, &mut imagination, "behavior.");
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
         share_matching(&mut behavior_train, &mut policy_live, "behavior.actor.");
         share_matching(&mut behavior_train, &mut world_train, "behavior.value.");
@@ -488,15 +479,13 @@ impl DreamerCore {
             config,
             perception_identity: None,
             world_train,
-            world_observe_batch,
+            world_posterior,
             world_observe_live,
-            world_transition,
+            imagination,
             world_transition_live,
-            world_heads,
             world_heads_live,
             world_prediction_live: None,
             behavior_train,
-            behavior_online,
             behavior_slow,
             policy_live,
             behavior_value_live: None,
@@ -581,11 +570,9 @@ impl DreamerCore {
             session.disable_grad_clip();
         }
         for (name, session) in [
-            ("posterior", &mut self.world_observe_batch),
-            ("actor_value", &mut self.behavior_online),
+            ("posterior", &mut self.world_posterior),
+            ("imagination", &mut self.imagination),
             ("slow_value", &mut self.behavior_slow),
-            ("world_heads", &mut self.world_heads),
-            ("transition", &mut self.world_transition),
             ("world_gradient", &mut self.world_train),
             ("behavior_gradient", &mut self.behavior_train),
         ] {
@@ -1163,49 +1150,45 @@ impl DreamerCore {
     fn sample_posterior_batch(&mut self, batch: &SequenceBatch) -> PosteriorBatch {
         let size = self.config.network();
         let rows = self.config.batch_size;
-        let mut previous_deter = batch.initial_deter.clone();
-        let mut previous_stoch = batch.initial_stoch.clone();
-        let mut deters = Vec::with_capacity(self.config.batch_length);
-        let mut stochs = Vec::with_capacity(self.config.batch_length);
+        let length = self.config.batch_length;
+        self.world_posterior
+            .set_input("initial_deter", &batch.initial_deter);
+        self.world_posterior
+            .set_input("initial_stoch", &batch.initial_stoch);
         for time in 0..self.config.batch_length {
             let (keep_deter, keep_stoch, keep_action) = keep_masks(batch, time, &self.config);
-            self.world_observe_batch
-                .set_input("previous_deter", &previous_deter);
-            self.world_observe_batch
-                .set_input("previous_stoch", &previous_stoch);
-            self.world_observe_batch
-                .set_input("previous_action", &batch.previous_actions[time]);
-            self.world_observe_batch
-                .set_input("observation", &batch.observations[time]);
-            self.world_observe_batch
-                .set_input("keep_deter", &keep_deter);
-            self.world_observe_batch
-                .set_input("keep_stoch", &keep_stoch);
-            self.world_observe_batch
-                .set_input("keep_action", &keep_action);
-            self.world_observe_batch.step();
-            let mut deter = vec![0.0; rows * size.deter];
-            let mut logits = vec![0.0; rows * size.stoch * size.classes];
-            self.readback.read(
-                &self.world_observe_batch,
-                &mut [(0, &mut deter), (1, &mut logits)],
-            );
-            let stoch = sample_latents(
-                &logits,
-                rows,
-                size.stoch,
-                size.classes,
-                self.config.unimix,
-                &mut self.rngs.train_posterior,
-            );
-            previous_deter = deter.clone();
-            previous_stoch = stoch.clone();
-            deters.push(deter);
-            stochs.push(stoch);
+            for (name, data) in [
+                ("previous_action", &batch.previous_actions[time]),
+                ("observation", &batch.observations[time]),
+                ("keep_deter", &keep_deter),
+                ("keep_stoch", &keep_stoch),
+                ("keep_action", &keep_action),
+            ] {
+                self.world_posterior
+                    .set_input(&format!("{name}_{time}"), data);
+            }
+            let uniforms = (0..rows * size.stoch * size.classes)
+                .map(|_| self.rngs.train_posterior.random::<f32>())
+                .collect::<Vec<_>>();
+            self.world_posterior
+                .set_input(&format!("uniforms_{time}"), &uniforms);
         }
+        self.world_posterior.step();
+        let mut deter = vec![0.0; length * rows * size.deter];
+        let mut stoch = vec![0.0; length * rows * size.stoch * size.classes];
+        self.readback.read(
+            &self.world_posterior,
+            &mut [(0, &mut deter), (1, &mut stoch)],
+        );
         PosteriorBatch {
-            deter: deters,
-            stoch: stochs,
+            deter: deter
+                .chunks_exact(rows * size.deter)
+                .map(<[f32]>::to_vec)
+                .collect(),
+            stoch: stoch
+                .chunks_exact(rows * size.stoch * size.classes)
+                .map(<[f32]>::to_vec)
+                .collect(),
         }
     }
 
@@ -1435,11 +1418,10 @@ impl DreamerCore {
 
     fn sync_world_inference(&mut self) {
         let mut targets = vec![
-            &mut self.world_observe_batch,
+            &mut self.world_posterior,
             &mut self.world_observe_live,
-            &mut self.world_transition,
+            &mut self.imagination,
             &mut self.world_transition_live,
-            &mut self.world_heads,
             &mut self.world_heads_live,
         ];
         if let Some(decoder) = &mut self.world_prediction_live {
@@ -1457,111 +1439,102 @@ impl DreamerCore {
         let starts = self.config.batch_size * self.config.batch_length;
         let horizon = self.config.imagination_length;
         let deter = flatten_time(&posterior.deter);
-        let mut stoch = flatten_time(&posterior.stoch);
+        let stoch = flatten_time(&posterior.stoch);
         let replay_start_feature = join_features(&deter, &stoch, starts, &self.config);
-        let feature_bytes = starts * self.config.feature_dim() * size_of::<f32>();
-        self.world_heads.set_input("deter", &deter);
-        let mut actions = Vec::with_capacity(horizon);
-        let mut rewards = Vec::with_capacity(horizon + 1);
-        let mut continuations = Vec::with_capacity(horizon + 1);
-        let mut values = Vec::with_capacity(horizon + 1);
-        let mut slow_values = Vec::with_capacity(horizon + 1);
-
-        for time in 0..=horizon {
-            self.world_heads.set_input("stoch", &stoch);
-            self.world_heads.step();
-            let mut copies = vec![
-                DeviceCopy {
-                    source: (&self.world_heads, ExternalSlot::Output(2)),
-                    target: (&self.behavior_online, "feature"),
-                    target_offset_bytes: 0,
-                },
-                DeviceCopy {
-                    source: (&self.world_heads, ExternalSlot::Output(2)),
-                    target: (&self.behavior_slow, "feature"),
-                    target_offset_bytes: 0,
-                },
-            ];
-            if time < horizon {
-                copies.extend([
-                    DeviceCopy {
-                        source: (&self.world_heads, ExternalSlot::Output(2)),
-                        target: (&self.behavior_train, "imagined_feature"),
-                        target_offset_bytes: time * feature_bytes,
-                    },
-                    DeviceCopy {
-                        source: (&self.world_heads, ExternalSlot::Input("deter")),
-                        target: (&self.world_transition, "deter"),
-                        target_offset_bytes: 0,
-                    },
-                    DeviceCopy {
-                        source: (&self.world_heads, ExternalSlot::Input("stoch")),
-                        target: (&self.world_transition, "stoch"),
-                        target_offset_bytes: 0,
-                    },
-                ]);
+        for time in 0..horizon {
+            for (name, count) in [
+                ("action_uniforms", starts * self.config.action_count),
+                ("latent_uniforms", starts * size.stoch * size.classes),
+            ] {
+                let uniforms = (0..count)
+                    .map(|_| self.rngs.imagination.random::<f32>())
+                    .collect::<Vec<_>>();
+                self.imagination
+                    .set_input(&format!("{name}_{time}"), &uniforms);
             }
-            self.device_copies.copy(&copies);
-            self.behavior_online.step();
-            let mut actor_logits = vec![0.0; starts * self.config.action_count];
-            let mut value_logits = vec![0.0; starts * self.config.value_bins];
-
-            self.behavior_slow.step();
-            let mut slow_logits = vec![0.0; starts * self.config.value_bins];
-
-            let mut reward_logits = vec![0.0; starts * self.config.value_bins];
-            let mut continuation = vec![0.0; starts];
-            self.readback.read_many(&mut [
-                (&self.behavior_online, 0, &mut actor_logits),
-                (&self.behavior_online, 1, &mut value_logits),
-                (&self.behavior_slow, 0, &mut slow_logits),
-                (&self.world_heads, 0, &mut reward_logits),
-                (&self.world_heads, 1, &mut continuation),
-            ]);
-
-            let decoded_reward = decode_rows(&reward_logits, starts, &self.bins);
-            let decoded_value = decode_rows(&value_logits, starts, &self.bins);
-            let decoded_slow = decode_rows(&slow_logits, starts, &self.bins);
-            rewards.push(decoded_reward);
-            continuations.push(continuation);
-            values.push(decoded_value);
-            slow_values.push(decoded_slow);
-
-            if time == horizon {
-                break;
-            }
-            let mut action_indices = vec![0; starts];
-            let mut action_one_hot = vec![0.0; starts * self.config.action_count];
-            let mut probabilities = vec![0.0; self.config.action_count];
-            for row in 0..starts {
-                let logits = &actor_logits
-                    [row * self.config.action_count..(row + 1) * self.config.action_count];
-                softmax_unimix(logits, self.config.actor_unimix, &mut probabilities);
-                let action = sample_probabilities(&probabilities, &mut self.rngs.imagination);
-                action_indices[row] = action;
-                action_one_hot[row * self.config.action_count + action] = 1.0;
-            }
-            actions.push(action_indices);
-            self.world_transition.set_input("action", &action_one_hot);
-            self.world_transition.step();
-            self.device_copies.copy(&[DeviceCopy {
-                source: (&self.world_transition, ExternalSlot::Output(0)),
-                target: (&self.world_heads, "deter"),
-                target_offset_bytes: 0,
-            }]);
-            let mut prior_logits = vec![0.0; starts * size.stoch * size.classes];
-            self.readback
-                .read(&self.world_transition, &mut [(1, &mut prior_logits)]);
-            let next_stoch = sample_latents(
-                &prior_logits,
-                starts,
-                size.stoch,
-                size.classes,
-                self.config.unimix,
-                &mut self.rngs.imagination,
-            );
-            stoch = next_stoch;
         }
+        self.device_copies.copy(&[
+            DeviceCopy {
+                source: (&self.world_posterior, ExternalSlot::Output(0)),
+                target: (&self.imagination, "deter"),
+                target_offset_bytes: 0,
+            },
+            DeviceCopy {
+                source: (&self.world_posterior, ExternalSlot::Output(1)),
+                target: (&self.imagination, "stoch"),
+                target_offset_bytes: 0,
+            },
+        ]);
+        self.imagination.step();
+        self.device_copies.copy(&[
+            DeviceCopy {
+                source: (
+                    &self.imagination,
+                    ExternalSlot::Output(world::IMAGINATION_FEATURE),
+                ),
+                target: (&self.behavior_train, "imagined_feature"),
+                target_offset_bytes: 0,
+            },
+            DeviceCopy {
+                source: (
+                    &self.imagination,
+                    ExternalSlot::Output(world::IMAGINATION_ALL_FEATURES),
+                ),
+                target: (&self.behavior_slow, "feature"),
+                target_offset_bytes: 0,
+            },
+        ]);
+        self.behavior_slow.step();
+        let all_rows = starts * (horizon + 1);
+        let mut action_samples = vec![0.0; starts * horizon * self.config.action_count];
+        let mut reward_logits = vec![0.0; all_rows * self.config.value_bins];
+        let mut continuation = vec![0.0; all_rows];
+        let mut value_logits = vec![0.0; all_rows * self.config.value_bins];
+        let mut slow_logits = vec![0.0; all_rows * self.config.value_bins];
+        self.readback.read_many(&mut [
+            (
+                &self.imagination,
+                world::IMAGINATION_ACTION,
+                &mut action_samples,
+            ),
+            (
+                &self.imagination,
+                world::IMAGINATION_REWARD,
+                &mut reward_logits,
+            ),
+            (
+                &self.imagination,
+                world::IMAGINATION_CONTINUATION,
+                &mut continuation,
+            ),
+            (
+                &self.imagination,
+                world::IMAGINATION_VALUE,
+                &mut value_logits,
+            ),
+            (&self.behavior_slow, 0, &mut slow_logits),
+        ]);
+        let decode = |logits: &[f32]| {
+            decode_rows(logits, all_rows, &self.bins)
+                .chunks_exact(starts)
+                .map(<[f32]>::to_vec)
+                .collect::<Vec<_>>()
+        };
+        let rewards = decode(&reward_logits);
+        let values = decode(&value_logits);
+        let slow_values = decode(&slow_logits);
+        let continuations = continuation
+            .chunks_exact(starts)
+            .map(<[f32]>::to_vec)
+            .collect::<Vec<_>>();
+        let actions = action_samples
+            .chunks_exact(self.config.action_count)
+            .map(|row| {
+                row.iter()
+                    .position(|&v| v == 1.0)
+                    .expect("categorical sample must select one action")
+            })
+            .collect::<Vec<_>>();
 
         let mut returns = (0..horizon).map(|_| vec![0.0; starts]).collect::<Vec<_>>();
         let mut weights = (0..horizon).map(|_| vec![0.0; starts]).collect::<Vec<_>>();
@@ -1611,7 +1584,7 @@ impl DreamerCore {
                 let advantage = (returns[time][start] - values[time][start]) / return_scale;
                 advantage_abs_sum += advantage.abs();
                 weighted_advantage_abs_sum += (weights[time][start] * advantage).abs();
-                action_target[row * self.config.action_count + actions[time][start]] =
+                action_target[row * self.config.action_count + actions[row]] =
                     weights[time][start] * advantage;
                 imagined_weight[row] = weights[time][start];
                 self.bins.encode(
@@ -1807,7 +1780,7 @@ impl DreamerCore {
     }
 
     fn sync_behavior_inference(&mut self) {
-        sync_matching(&self.behavior_train, &mut self.behavior_online, "behavior.");
+        sync_matching(&self.behavior_train, &mut self.imagination, "behavior.");
         if let Some(value) = &mut self.behavior_value_live {
             sync_matching(&self.behavior_train, value, "behavior.value.");
         }

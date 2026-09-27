@@ -25,6 +25,11 @@ LeVJEPA improves learning, then tackle sparse-reward exploration and video prior
 Do not repeat unchanged mastery-gate runs. New compact evidence belongs in
 `docs/results/`; the PR remains the live status dashboard.
 
+[Fused learner results](docs/results/2026-09-27-fused-learner.md): 1.15× faster
+12M synthetic updates, 1.16× short Pong throughput; the 3× target remains unmet.
+The separate [MinAtar screening recipe](docs/screening.md) uses Size1M and a
+jointly learned small-observation encoder, without pretrained weights.
+
 Historical Freeway training used random-action assistance (probability .5,
 hold 64); frozen evaluation was unassisted. Tiny encoder `7fe9b252` received
 250,000 random-play RGB64 observations from **Boxing, Pong, Freeway, Breakout
@@ -73,7 +78,7 @@ maturin develop --release --extras test,atari
 The default frontend is **causal ViT-Tiny/16, 5.49M parameters**, independently
 pretrained on video, not truncated Large weights. The current exported checkpoint
 and pretraining recipe are linked from [the plan](docs/kindle_single_life_dreamer_plan.md).
-Both Python agents and Rust constructors select Tiny. `encoder="levjepa"` is an
+Pixel-agent Python and Rust constructors select Tiny. `encoder="levjepa"` is an
 explicit Large control using separately licensed
 [LeVJEPA-VideoMix-Large](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)
 weights (CC-BY-NC-4.0). Restore checks architecture, encoding semantics and weights;

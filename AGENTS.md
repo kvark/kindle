@@ -12,14 +12,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   for dynamics/behavior -> later asynchronous real-time deployment. Stop
   unchanged five-game/mastery confirmations and Atari-only gate tuning.
   The current roadmap/evidence stays in `docs/kindle_single_life_dreamer_plan.md`.
-  Phase 1a learner synchronization/readbacks are the implementation priority;
-  GPU acting/capture is already integrated. Do not mix speed and learning changes.
+  GPU acting/capture is integrated. Phase 1a fused learner and grouped RSSM
+  pass; Phase 1b's three-seed MinAtar screen is the current measurement.
+  Do not mix speed and learning changes.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
   Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
   throughput or the 3x target. See `docs/results/2026-09-27-shared-parameters.md`.
-  Next target posterior/imagination readbacks; leave slow-critic EMA independent.
-  Shared mutable weights require serialized actor/learner access.
+  Fused T64/H15 recurrence now uses GPU Gumbel sampling with CPU-owned draws;
+  outputs/gradients have independent references. Grouped RSSM layout improves
+  the shared-control synthetic update 212.70 -> 184.43 ms and short native N6
+  Pong R256 throughput 17.36 -> 20.16 actions/s. The 3x target is not met.
+  See `docs/results/2026-09-27-fused-learner.md`. CPU targets/slow-critic EMA
+  remain; shared mutable weights require serialized actor/learner access.
+- `docs/screening.md` defines the separate Size1M/B8/T16/H15/R32 MinAtar recipe,
+  eight streams and seeds 1009/2017/3019. Public 10x10 observations are packed
+  losslessly into 7x7x64 and use a jointly learned encoder; no frozen frontend,
+  pretraining or reward/action aid. CPU environment/upload is the allowed
+  temporary fallback, not GPU-resident simulation or a CPU learner. Never
+  compare its R32 speed with the R256 Atari control as an optimization gain.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or
@@ -78,7 +89,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Single and vector pixel actors now share resident encoder/pooling/belief/
   categorical sampling and paged GPU replay collection. Only selected actions
   leave the acting path. Explicit probes/checkpoints and sampled learner batches
-  may read back; host imagination/target construction is not yet eliminated.
+  may read back. Imagined recurrence is resident; scalar target construction
+  still uses the host.
   Dullahan GPU_SYNC supplies a fenced EXTERNAL ownership lease, not a SHM flag.
   vkQuake capture-to-keyboard plumbing passes at native 640x480: 12M frozen
   256 actions/2.758s; a separate tiny learner completes 105 finite updates.

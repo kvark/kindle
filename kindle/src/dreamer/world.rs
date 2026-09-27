@@ -5,7 +5,7 @@ use meganeura::{Graph, graph::NodeId};
 use super::config::DreamerConfig;
 use super::networks::{
     MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
-    mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
+    gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
     weighted_cross_entropy,
 };
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
@@ -20,6 +20,13 @@ pub const LOSS_REPLAY_VALUE: usize = 6;
 pub const RAW_KL: usize = 7;
 pub const LOSS_FUTURE_PREDICTION: usize = 8;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
+
+pub const IMAGINATION_FEATURE: usize = 0;
+pub const IMAGINATION_ALL_FEATURES: usize = 1;
+pub const IMAGINATION_ACTION: usize = 2;
+pub const IMAGINATION_REWARD: usize = 3;
+pub const IMAGINATION_CONTINUATION: usize = 4;
+pub const IMAGINATION_VALUE: usize = 5;
 
 struct Dynamics {
     core: RssmCore,
@@ -483,8 +490,161 @@ fn sum_or_zero(graph: &mut Graph, values: &[NodeId]) -> NodeId {
     }
 }
 
-/// One posterior update used both by the live actor and the pre-training
-/// categorical sampling pass.
+/// Unrolled posterior sampling. CPU draws and sequence inputs are installed
+/// before submission; recurrence and categorical sampling never visit the host.
+pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
+    config.validate();
+    let batch = config.batch_size;
+    let length = config.batch_length;
+    let size = config.network();
+    let mut graph = Graph::new();
+    let core = RssmCore::new(&mut graph, config);
+    let representation = Representation::new(&mut graph, config);
+    let mut deter = graph.input("initial_deter", &[batch, size.deter]);
+    let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
+    let observations = (0..length)
+        .map(|time| {
+            graph.input(
+                &format!("observation_{time}"),
+                &[
+                    batch * OBSERVATION_GRID * OBSERVATION_GRID,
+                    OBSERVATION_CHANNELS,
+                ],
+            )
+        })
+        .collect::<Vec<_>>();
+    let observations = stack_time(&mut graph, &observations, batch, config.observation_dim());
+    let encoded = representation
+        .encoder
+        .forward(&mut graph, observations, batch * length);
+    let mut encodings = Vec::with_capacity(length);
+    split_time(
+        &mut graph,
+        encoded,
+        length,
+        batch,
+        representation.encoder.output_dim(),
+        &mut encodings,
+    );
+    let mut deters = Vec::with_capacity(length);
+    let mut stochs = Vec::with_capacity(length);
+    for (time, encoded) in encodings.into_iter().enumerate() {
+        let action = graph.input(
+            &format!("previous_action_{time}"),
+            &[batch, config.action_count],
+        );
+        let keep_deter = graph.input(&format!("keep_deter_{time}"), &[batch, size.deter]);
+        let keep_stoch = graph.input(
+            &format!("keep_stoch_{time}"),
+            &[batch * size.stoch, size.classes],
+        );
+        let keep_action = graph.input(
+            &format!("keep_action_{time}"),
+            &[batch, config.action_count],
+        );
+        let uniforms = graph.input(
+            &format!("uniforms_{time}"),
+            &[batch * size.stoch, size.classes],
+        );
+        let previous_deter = graph.mul(deter, keep_deter);
+        let previous_stoch = graph.mul(stoch, keep_stoch);
+        let action = graph.mul(action, keep_action);
+        deter = core.forward(&mut graph, previous_deter, previous_stoch, action, batch);
+        let logits = representation
+            .posterior
+            .forward(&mut graph, deter, encoded, batch);
+        stoch = gumbel_sample(
+            &mut graph,
+            logits,
+            uniforms,
+            batch * size.stoch,
+            size.classes,
+            config.unimix,
+        );
+        deters.push(deter);
+        stochs.push(stoch);
+    }
+    let deter = stack_time(&mut graph, &deters, batch, size.deter);
+    let stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
+    graph.set_outputs(vec![deter, stoch]);
+    graph
+}
+
+/// Unrolled prior/actor recurrence, followed by time-batched reward/value heads.
+/// The independent slow critic consumes ALL_FEATURES in a separate GPU session.
+pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
+    config.validate();
+    let rows = config.batch_size * config.batch_length;
+    let horizon = config.imagination_length;
+    let size = config.network();
+    let mut graph = Graph::new();
+    let dynamics = Dynamics::new(&mut graph, config);
+    let heads = WorldHeads::new(&mut graph, config);
+    let actor = MlpHead::new(
+        &mut graph,
+        "behavior.actor",
+        config.feature_dim(),
+        size.units,
+        3,
+        config.action_count,
+    );
+    let value = MlpHead::new(
+        &mut graph,
+        "behavior.value",
+        config.feature_dim(),
+        size.units,
+        3,
+        config.value_bins,
+    );
+    let mut deter = graph.input("deter", &[rows, size.deter]);
+    let mut stoch = graph.input("stoch", &[rows * size.stoch, size.classes]);
+    let mut features = Vec::with_capacity(horizon + 1);
+    let mut actions = Vec::with_capacity(horizon);
+    for time in 0..horizon {
+        let state = feature(&mut graph, deter, stoch, rows, config);
+        features.push(state);
+        let logits = actor.forward(&mut graph, state);
+        let uniforms = graph.input(
+            &format!("action_uniforms_{time}"),
+            &[rows, config.action_count],
+        );
+        let action = gumbel_sample(
+            &mut graph,
+            logits,
+            uniforms,
+            rows,
+            config.action_count,
+            config.actor_unimix,
+        );
+        actions.push(action);
+        deter = dynamics
+            .core
+            .forward(&mut graph, deter, stoch, action, rows);
+        let logits = dynamics.prior.forward(&mut graph, deter, rows);
+        let uniforms = graph.input(
+            &format!("latent_uniforms_{time}"),
+            &[rows * size.stoch, size.classes],
+        );
+        stoch = gumbel_sample(
+            &mut graph,
+            logits,
+            uniforms,
+            rows * size.stoch,
+            size.classes,
+            config.unimix,
+        );
+    }
+    features.push(feature(&mut graph, deter, stoch, rows, config));
+    let imagined = stack_time(&mut graph, &features[..horizon], rows, config.feature_dim());
+    let all = stack_time(&mut graph, &features, rows, config.feature_dim());
+    let actions = stack_time(&mut graph, &actions, rows, config.action_count);
+    let (reward, continuation) = heads.forward(&mut graph, all);
+    let values = value.forward(&mut graph, all);
+    graph.set_outputs(vec![imagined, all, actions, reward, continuation, values]);
+    graph
+}
+
+/// One posterior update used by the live actor and the sequential test reference.
 ///
 /// Outputs: next deterministic state, posterior logits, prior logits, and the
 /// trainable observation-encoder output used by the posterior.
@@ -551,6 +711,7 @@ pub fn build_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
 }
 
 /// Also expose the pinned state feature for device-side imagination handoffs.
+#[cfg(test)]
 pub fn build_imagination_head_graph(config: &DreamerConfig, batch: usize) -> Graph {
     head_graph(config, batch, true)
 }
@@ -602,6 +763,9 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
     graph.set_outputs(vec![observation]);
     graph
 }
+
+#[cfg(test)]
+mod rollout_tests;
 
 #[cfg(test)]
 mod tests {
