@@ -18,6 +18,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 | pretrained_tiny | Pong | 1 | 1009: -17.340 | — |
 | pretrained_tiny | Seaquest | 1 | 1009: 370.400 | — |
 | upstream | Pong | 1 | 1009: -3.040 | — |
+| upstream | Seaquest | 1 | 1009: 411.600 | — |
 
 Human normalization uses [pinned upstream anchors](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml); 1 is the reference human, not mastery.
 
@@ -45,6 +46,7 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | pretrained_tiny | Pong | 1009 | 9990.64 | 20.02 | 7.89 GiB |
 | pretrained_tiny | Seaquest | 1009 | 10001.80 | 20.00 | 7.89 GiB |
 | upstream | Pong | 1009 | 10111.10 | 19.78 | 2.37 GiB |
+| upstream | Seaquest | 1009 | 10115.07 | 19.77 | 2.37 GiB |
 
 All listed workers exited zero and were reaped; final checkpoints are finite.
 Run time includes initial policy/encoding and final save; construction remains separate in JSON.
@@ -54,4 +56,4 @@ its separate live-array and reserved-pool peaks are recorded, not treated as nat
 [September 28 external interruption](2026-09-28-learning-interruption.md): eight completed runs survive unchanged;
 the interrupted Large Seaquest attempt is retained separately and its replacement starts fresh.
 
-**9/45 runs complete.** No frontend decision or Phase 2 completion yet.
+**10/45 runs complete.** No frontend decision or Phase 2 completion yet.

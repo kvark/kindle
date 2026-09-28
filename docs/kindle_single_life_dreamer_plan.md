@@ -179,16 +179,18 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    GPU pixels, independent gradients, current-weight replay encoding and exact
    checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
    not a return to upscaled JEPA or the offline reconstruction checkpoint.
-   The first five-arm Pong seed1009 comparison completes **200,004 actions /
-   49,651 updates per arm**, with finite checkpoints and passing guards.
-   Last-50 online scores are **-3.04 upstream, -11.56 Large, -14.28 initial
-   Tiny, -15.78 joint RGB CNN and -17.34 pretrained Tiny**. Large runs at
-   14.31 actions/s versus 18.70-20.06 for the other arms.
+   All five arms complete Pong and Seaquest seed1009 at **200,004 actions /
+   49,651 updates per run**, with finite checkpoints and passing guards.
+   Rankings depend on the game: upstream leads Pong (-3.04 versus -11.56 for
+   the best native arm, Large); Large leads Seaquest (600.4 versus joint RGB
+   441.6 and upstream 411.6). Tiny pretraining loses to its initial encoder on
+   Pong but wins on Seaquest in this seed. Large runs at about 14.3 actions/s
+   versus 18.7-20.1 for the other arms.
    [Complete curves and limits](results/2026-09-27-representation-learning.md)
-   retain every episode and unfinished tail. This one seed favors upstream
-   and shows no Tiny pretraining benefit; Large is the strongest native arm
-   here, but costs more time. The native RGB control changes the encoder and
-   decoder, not just the frontend. None of these online results establishes
+   retain every episode and unfinished tail. One seed cannot establish a
+   representation benefit, and Large changes capacity and pretraining corpus
+   as well as costing more time. The native RGB control changes the encoder
+   and decoder, not just the frontend. None of these online results establishes
    competence or a multi-seed architecture decision. The remaining fixed matrix
    runs serially; the three-seed, three-game comparison remains unfinished.
    The historical ~15.6 versus ~59 actions/s is not a matched
