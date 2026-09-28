@@ -13,6 +13,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 | initial_tiny | Seaquest | 1 | 1009: 318.800 | — |
 | large | Pong | 1 | 1009: -11.560 | — |
 | learned_cnn | Pong | 1 | 1009: -15.780 | — |
+| learned_cnn | Seaquest | 1 | 1009: 441.600 | — |
 | pretrained_tiny | Pong | 1 | 1009: -17.340 | — |
 | pretrained_tiny | Seaquest | 1 | 1009: 370.400 | — |
 | upstream | Pong | 1 | 1009: -3.040 | — |
@@ -37,6 +38,7 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | initial_tiny | Seaquest | 1009 | 9988.98 | 20.02 | 7.89 GiB |
 | large | Pong | 1009 | 13981.16 | 14.31 | 2.56 GiB |
 | learned_cnn | Pong | 1009 | 10695.02 | 18.70 | 4.56 GiB |
+| learned_cnn | Seaquest | 1009 | 10703.58 | 18.69 | 4.56 GiB |
 | pretrained_tiny | Pong | 1009 | 9990.64 | 20.02 | 7.89 GiB |
 | pretrained_tiny | Seaquest | 1009 | 10001.80 | 20.00 | 7.89 GiB |
 | upstream | Pong | 1009 | 10111.10 | 19.78 | 2.37 GiB |
@@ -46,4 +48,4 @@ Run time includes initial policy/encoding and final save; construction remains s
 Vulkan budget headroom is estimated, not physical free or peak VRAM. JAX reserves an 80% CUDA pool;
 its separate live-array and reserved-pool peaks are recorded, not treated as native-comparable peak memory.
 
-**7/45 runs complete.** No frontend decision or Phase 2 completion yet.
+**8/45 runs complete.** No frontend decision or Phase 2 completion yet.
