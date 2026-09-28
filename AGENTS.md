@@ -28,7 +28,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   stopped before GPU work on a NAS-backed log-capture timeout; keep live
   logs/guards local. The fresh local upstream Pong seed1009 control completes
   200,004 actions / 49,651 updates, with finite state and a passing guard. The
-  remaining matrix runs serially with fixed inputs and stops on failure. Track
+  remaining matrix runs serially with fixed inputs and stops on failure. After
+  the user-confirmed September 28 external accident, eight completed runs pass
+  post-reboot audits. A fresh declaration restarts only interrupted Large
+  Seaquest seed1009, then the original 36 unstarted entries; preserve the old
+  partial logs and disclose their extra compute. See
+  `docs/results/2026-09-28-learning-interruption.md`. Track
   completed curves in `docs/results/2026-09-27-representation-learning.md` and
   current execution in PR31. No local compilation during timing. No gameplay
   representation advantage or Phase 2 completion is established yet.
@@ -102,9 +107,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `367e53d4` carries only the Blade dependency update
-  over latest upstream `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
-  imports/ownership over `fbb4f28c`. Both branches are pushed. Check upstream
+- Current comparison backend: Meganeura `367e53d4` carries only the Blade dependency
+  update over `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
+  imports/ownership over `fbb4f28c`. Both branches are pushed. September 28's
+  upstream check finds `7c29497` adding caller-owned submission APIs, not a new
+  fix for the existing step path; consider that API after the fixed matrix.
+  Check upstream
   before diagnosing already-fixed issues. Keep dependencies reproducible, but
   do not delay implementation to preserve obsolete runtime/checkpoint identities.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
@@ -154,7 +162,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   ownership/cleanup of its game process too. Review failures before any follow-up.
 - Require the expected native device and >=2GiB sampled Vulkan estimated
   budget headroom. Budget-minus-usage is not physical free or peak VRAM.
-  Last observed boot: `4f5152d1-e5fd-46cf-a0c4-06534c430d26`.
+  Last observed boot: `3e89d55c-a9e5-472f-a18a-06508c5bafa7`.
 - Stop on kernel faults/native failures. No reset, driver reload/change, reboot
   or power-cycle without new user approval. Historical Xid62/154 incidents remain
   unexplained; successful no-NVML runs prove neither causality nor safety. Never

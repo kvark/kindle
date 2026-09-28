@@ -244,6 +244,13 @@ Keep runners/package/configurations fixed through the matrix; do not compile
 locally during timing. Guarded short-test memory headroom does not guarantee
 headroom at full replay capacity, so every run retains its native memory checks.
 
+The [September 28 external interruption](../results/2026-09-28-learning-interruption.md)
+preserves eight completed results. A new-boot declaration restarts interrupted
+Large Seaquest seed1009 from scratch, then continues the same 36 unstarted
+entries. The package, protocol and budgets stay fixed; only output paths and
+boot identity change. Preserve the incomplete attempt and disclose its extra
+compute instead of counting it as a completed seed or an equivalent resume.
+
 The decision rule is unchanged: frozen LeVJEPA must beat the random/learned
 baseline on both probes and learning curves to justify its 2D cost. Otherwise
 remove it as the 2D default and retain it as a 3D hypothesis. Any useful
