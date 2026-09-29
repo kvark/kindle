@@ -2,11 +2,12 @@ import copy
 import json
 from pathlib import Path
 import sys
+import xml.etree.ElementTree as ET
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "examples"))
-from summarize_representation_learning import markdown, read_run, summarize
+from summarize_representation_learning import markdown, plot_svg, read_run, summarize
 
 
 def fixture(seed=1009, *, upstream=False, ticks=4, reward=1.):
@@ -157,3 +158,41 @@ def test_upstream_delayed_metrics_do_not_shift_first_update_accounting(tmp_path)
     rows[-1]["first_training_action"] = 6
     run = read_run(write(tmp_path, rows))
     assert run["first_training_action"] == 6
+
+
+def test_learning_plot_shows_partial_seed_traces_without_fabricated_zeros(tmp_path):
+    result = summarize([("upstream", write(tmp_path, fixture(upstream=True)))], budget=24)
+    root = ET.fromstring(plot_svg(result))
+    ns = {"s": "http://www.w3.org/2000/svg"}
+    assert not root.findall(".//s:polygon", ns)
+    traces = root.findall(".//s:g", ns)
+    assert len(traces) == 2 and all(g.attrib["data-seed"] == "1009" for g in traces)
+    for trace in traces:
+        line = trace.find("s:polyline", ns)
+        assert line.attrib["stroke-dasharray"] == "8 3"
+        assert len(line.attrib["points"].split()) == 2  # The first two scores are missing, not zero.
+    # Even an entirely unscored report is a valid, explicitly empty chart.
+    result["results"][0]["runs"][0]["curve"] = [dict(actions=6, seconds=1., score=None)]
+    empty = ET.fromstring(plot_svg(result))
+    assert not empty.findall(".//s:polyline", ns)
+    assert "No completed-episode scores yet" in " ".join(empty.itertext())
+
+
+def test_learning_plot_uses_aggregate_values_and_common_time_support(tmp_path):
+    inputs = [("pretrained_tiny", write(tmp_path, fixture(seed, reward=i), f"{seed}.jsonl"))
+              for i, seed in enumerate((1009, 2017, 3019))]
+    result = summarize(inputs, budget=24)
+    aggregate = result["results"][0]["aggregate"]
+    aggregate["by_time"] = aggregate["by_time"][:5]  # Renderer must not extend to the individual tails.
+    root = ET.fromstring(plot_svg(result))
+    ns = {"s": "http://www.w3.org/2000/svg"}
+    traces = root.findall(".//s:g", ns)
+    assert len(traces) == 2 and all(g.attrib["data-seed"] == "aggregate" for g in traces)
+    for trace, points in zip(traces, (aggregate["by_actions"], aggregate["by_time"])):
+        line = trace.find("s:polyline", ns)
+        assert line.attrib["stroke-dasharray"] == "none"
+        assert len(line.attrib["points"].split()) == len(points)
+        assert len(trace.find("s:polygon", ns).attrib["points"].split()) == 2*len(points)
+    aggregate["by_time"][0]["score"]["mean"] = float("nan")
+    with pytest.raises(ValueError, match="nonfinite"):
+        plot_svg(result)

@@ -37,6 +37,8 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 - JAX reserves an 80% CUDA pool; Vulkan headroom is not comparable live-array memory or peak VRAM.
 - The externally interrupted Large Seaquest attempt adds at least 136722 discarded actions and extra compute; its replacement starts fresh.
 
+![Online learning curves](2026-09-27-representation-learning.svg)
+
 ## Completed run timing and safety
 
 | Method | Game | Seed | Run seconds | Actions/s | Estimated headroom |

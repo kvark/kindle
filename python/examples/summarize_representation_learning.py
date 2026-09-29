@@ -9,8 +9,10 @@ import argparse
 from collections import defaultdict
 import hashlib
 import json
+import math
 from pathlib import Path
 from statistics import fmean
+import xml.etree.ElementTree as ET
 
 from kindle._screening import mean_ci, summarize_curves
 
@@ -193,6 +195,95 @@ def markdown(result, name):
     return "\n".join(lines)
 
 
+def plot_svg(result):
+    """Render audited online curves, using only the summary's measured support."""
+    colors = dict(zip(METHODS, ("#0072b2", "#cc79a7", "#009e73", "#e69f00", "#d55e00")))
+    labels = dict(zip(METHODS, ("Upstream Dreamer", "Large JEPA", "Pretrained Tiny", "Initial Tiny", "Joint RGB CNN")))
+    root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height="875", viewBox="0 0 1160 875",
+                      role="img", attrib={"aria-labelledby": "title description"})
+
+    def add(tag, *, parent=root, text=None, **attrs):
+        element = ET.SubElement(parent, tag, {k.rstrip("_").replace("_", "-"): str(v) for k, v in attrs.items()})
+        element.text = text
+        return element
+
+    add("title", id="title", text="Phase 2 online learning: scores versus actions and wall time")
+    add("desc", id="description", text="Last-50 completed episode means, not frozen competence. "
+        "Partial groups show individual learner seeds; complete three-seed groups show means and 95% bootstrap bands. "
+        "No extrapolation beyond measured support. Missing scores are not zero.")
+    add("rect", width=1160, height=875, fill="white")
+    add("style", text="text{font-family:sans-serif;font-size:12px;fill:#222} .heading{font-size:16px;font-weight:bold}")
+    add("text", x=25, y=27, class_="heading", text="Phase 2 · online training scores (not frozen competence)")
+    add("text", x=25, y=48, text="Last-50 episode mean. Dashed: seed 1009 / 2017 / 3019. Solid + band: three-seed mean and 95% bootstrap CI.")
+    for i, method in enumerate(METHODS):
+        x = 25 + i * 225
+        add("line", x1=x, x2=x+22, y1=71, y2=71, stroke=colors[method], stroke_width=3)
+        add("text", x=x+28, y=75, text=labels[method])
+
+    for row_index, game in enumerate(BASELINES):
+        groups = [g for g in result["results"] if g["game"] == game]
+        panels = []
+        for axis in ("actions", "time"):
+            key = "actions" if axis == "actions" else "seconds"
+            divisor = 1000 if axis == "actions" else 3600
+            traces = []
+            for group in groups:
+                if group["aggregate"] is not None:
+                    points = group["aggregate"][f"by_{axis}"]
+                    traces.append((group["method"], None, [
+                        (p[key]/divisor, p["score"]["mean"], *p["score"]["ci95"]) for p in points]))
+                else:
+                    for run in group["runs"]:
+                        traces.append((group["method"], run["seed"], [
+                            (p[key]/divisor, p["score"], p["score"], p["score"])
+                            for p in run["curve"] if p["score"] is not None]))
+            panels.append(traces)
+        all_points = [p for panel in panels for _, _, points in panel for p in points]
+        if any(not math.isfinite(v) for point in all_points for v in point):
+            raise ValueError("nonfinite learning curve")
+        low = min((p[2] for p in all_points), default=0)
+        high = max((p[3] for p in all_points), default=1)
+        margin = max(1., (high-low)*.06)
+        low, high = low-margin, high+margin
+        count = sum(len(g["runs"]) for g in groups)
+        for column, traces in enumerate(panels):
+            left, top, width, height = 70 + column*575, 120 + row_index*250, 460, 170
+            xmax = result["action_budget"]/1000 if column == 0 else max(
+                (p[0] for _, _, points in traces for p in points), default=1)
+            xmax = max(xmax, 1e-9)
+
+            def xy(x, y):
+                return f"{left+width*x/xmax:.2f},{top+height*(high-y)/(high-low):.2f}"
+
+            add("text", x=left, y=top-13, class_="heading", text=f"{game} · {count}/15 runs")
+            for tick in range(5):
+                fraction = tick/4
+                x, y = left+width*fraction, top+height*(1-fraction)
+                add("line", x1=left, x2=left+width, y1=y, y2=y, stroke="#ddd")
+                add("text", x=left-8, y=y+4, text_anchor="end", text=f"{low+(high-low)*fraction:.3g}")
+                add("text", x=x, y=top+height+19, text_anchor="middle", text=f"{xmax*fraction:.3g}")
+            add("text", x=left+width/2, y=top+height+39, text_anchor="middle",
+                text="Actual actions (thousands, six streams combined)" if column == 0 else "Run wall time (hours, construction excluded)")
+            for method, seed, points in traces:
+                if not points:
+                    continue
+                trace = add("g", data_method=method, data_seed=seed if seed is not None else "aggregate")
+                add("title", parent=trace, text=f"{labels[method]} · " + (f"seed {seed}" if seed is not None else "three-seed mean and 95% CI"))
+                if seed is None:
+                    band = [xy(p[0], p[2]) for p in points] + [xy(p[0], p[3]) for p in reversed(points)]
+                    add("polygon", parent=trace, points=" ".join(band), fill=colors[method], fill_opacity=.12)
+                dash = "none" if seed is None else ("8 3", "3 3", "9 3 2 3")[SEEDS.index(seed)]
+                add("polyline", parent=trace, points=" ".join(xy(p[0], p[1]) for p in points),
+                    fill="none", stroke=colors[method], stroke_width=2, stroke_dasharray=dash)
+                if len(points) == 1:
+                    x, y = xy(*points[0][:2]).split(",")
+                    add("circle", parent=trace, cx=x, cy=y, r=3, fill=colors[method])
+            if not any(points for _, _, points in traces):
+                add("text", x=left+width/2, y=top+height/2, text_anchor="middle", text="No completed-episode scores yet")
+    add("text", x=25, y=864, text="All episodes (including cutoffs) and unfinished tails remain in JSON. Time means use common measured seed support.")
+    return ET.tostring(root, encoding="unicode") + "\n"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", nargs=2, action="append", required=True, metavar=("METHOD", "LOG"))
@@ -200,8 +291,10 @@ def main():
     args = parser.parse_args()
     result = summarize([(method, Path(path)) for method, path in args.input])
     path = args.output_prefix.with_suffix(".json")
-    path.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
-    args.output_prefix.with_suffix(".md").write_text(markdown(result, path.name))
+    path.write_text(json.dumps(result, separators=(",", ":"), allow_nan=False) + "\n")
+    svg = args.output_prefix.with_suffix(".svg")
+    svg.write_text(plot_svg(result))
+    args.output_prefix.with_suffix(".md").write_text(markdown(result, path.name) + f"\n![Online learning curves]({svg.name})\n")
 
 
 if __name__ == "__main__":
