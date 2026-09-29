@@ -12,6 +12,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 | initial_tiny | Breakout | 1 | 1009: 7.420 | — |
 | initial_tiny | Pong | 1 | 1009: -14.280 | — |
 | initial_tiny | Seaquest | 1 | 1009: 318.800 | — |
+| large | Breakout | 1 | 1009: 18.960 | — |
 | large | Pong | 1 | 1009: -11.560 | — |
 | large | Seaquest | 1 | 1009: 600.400 | — |
 | learned_cnn | Breakout | 1 | 1009: 7.820 | — |
@@ -42,6 +43,7 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | initial_tiny | Breakout | 1009 | 10020.90 | 19.96 | 7.89 GiB |
 | initial_tiny | Pong | 1009 | 9969.86 | 20.06 | 7.89 GiB |
 | initial_tiny | Seaquest | 1009 | 9988.98 | 20.02 | 7.89 GiB |
+| large | Breakout | 1009 | 14047.17 | 14.24 | 2.56 GiB |
 | large | Pong | 1009 | 13981.16 | 14.31 | 2.56 GiB |
 | large | Seaquest | 1009 | 13945.69 | 14.34 | 2.56 GiB |
 | learned_cnn | Breakout | 1009 | 10726.42 | 18.65 | 4.56 GiB |
@@ -60,4 +62,4 @@ its separate live-array and reserved-pool peaks are recorded, not treated as nat
 [September 28 external interruption](2026-09-28-learning-interruption.md): eight completed runs survive unchanged;
 the interrupted Large Seaquest attempt is retained separately and its replacement starts fresh.
 
-**12/45 runs complete.** No frontend decision or Phase 2 completion yet.
+**13/45 runs complete.** No frontend decision or Phase 2 completion yet.
