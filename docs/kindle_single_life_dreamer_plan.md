@@ -179,13 +179,16 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    GPU pixels, independent gradients, current-weight replay encoding and exact
    checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
    not a return to upscaled JEPA or the offline reconstruction checkpoint.
-   All five arms complete Pong and Seaquest seed1009 at **200,004 actions /
-   49,651 updates per run**, with finite checkpoints and passing guards.
+   All five arms complete all three games for seed1009: **15/45 runs**, each
+   **200,004 actions**, with finite checkpoints and passing guards. The declared
+   reset-sensitive warmup yields 49,651 updates for Pong/Seaquest and 49,652
+   for Breakout (0.5 fractional credit, no whole update outstanding).
    Rankings depend on the game: upstream leads Pong (-3.04 versus -11.56 for
    the best native arm, Large); Large leads Seaquest (600.4 versus joint RGB
-   441.6 and upstream 411.6). Tiny pretraining loses to its initial encoder on
-   Pong but wins on Seaquest in this seed. Large runs at about 14.3 actions/s
-   versus 18.7-20.1 for the other arms.
+   441.6 and upstream 411.6) and Breakout (18.96 versus upstream 13.92 and
+   7.42-7.92 for the other native arms). Against its initial encoder, pretrained
+   Tiny scores lower on Pong, higher on Seaquest and 0.50 higher on Breakout in
+   this seed. Large runs at about 14.2-14.3 actions/s versus 18.6-20.1 for the others.
    [Complete curves and limits](results/2026-09-27-representation-learning.md)
    retain every episode and unfinished tail. One seed cannot establish a
    representation benefit, and Large changes capacity and pretraining corpus
