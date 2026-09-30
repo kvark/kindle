@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-30",
+  "status": "bottleneck_identified_not_optimized",
+  "config": {"model_size": "Size1M", "observation_kind": "rgb64", "batch_size": 8, "batch_length": 16, "world_backprop_length": 16, "world_microbatch_size": 8, "imagination_length": 15, "precision": "F32", "synthetic_fixture_seed": 701},
+  "runtime": {"device": "RTX5080", "driver": "580.178.04", "meganeura": "22c31b94", "blade": "7cca6377", "separate_nvml": false, "sm_utilization": null},
+  "guard_passed": true,
+  "complete_saved_tensors_unchanged_by_profile": true,
+  "gameplay_interactions": 0,
+  "learning_attempts_used": 2,
+  "ordinary_sessions_ms": {
+    "world_gradient": {"wall_median": 54.682535, "gpu_timestamp_median": 26.86992},
+    "imagination": {"wall_median": 7.367026, "gpu_timestamp_median": 4.89664},
+    "posterior": {"wall_median": 3.506442, "gpu_timestamp_median": 2.741984},
+    "behavior_gradient": {"wall_median": 0.875078, "gpu_timestamp_median": 0.68544},
+    "slow_value": {"wall_median": 0.145991, "gpu_timestamp_median": 0.097376}
+  },
+  "world_plan": {"dispatches": 4039, "barrier_groups": 1191, "logical_buffer_bytes": 522620208, "allocated_buffer_bytes": 190251452, "resident_buffer_bytes": 194834344},
+  "world_profile_overhead": {"wall_ratio": 4.510954000212317, "wall_median_ms": 246.6704, "window_count": 4, "sample_count": 3},
+  "top_weight_gradients": [
+    {"batch": 128, "input_channels": 3, "output_channels": 8, "side": 64, "kernel": 5, "workgroups": [5,1,1], "profiled_median_ms": 18.551808},
+    {"batch": 128, "input_channels": 8, "output_channels": 3, "side": 64, "kernel": 5, "workgroups": [13,1,1], "profiled_median_ms": 13.173728},
+    {"batch": 128, "input_channels": 8, "output_channels": 12, "side": 32, "kernel": 5, "workgroups": [13,1,1], "profiled_median_ms": 5.001248},
+    {"batch": 128, "input_channels": 12, "output_channels": 8, "side": 32, "kernel": 5, "workgroups": [19,1,1], "profiled_median_ms": 4.458464}
+  ],
+  "artifact_root": "runs/small-dreamer-replication-20260930.vRE7ag/world-profile-8lcscp1o",
+  "limits": ["synthetic resident inputs, not gameplay", "no optimizer/AGC passes in captured training sessions", "instrumented intervals are not additive ordinary execution time", "GPU timestamps are not SM utilization", "no speedup or Phase2 completion claimed"]
+}
