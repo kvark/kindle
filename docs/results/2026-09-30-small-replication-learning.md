@@ -9,7 +9,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 
 | Method | Game | Seeds | Final score [95% CI] | Human-normalized |
 | --- | --- | ---: | ---: | ---: |
-| learned_cnn | Seaquest | 2 | 1009: 328.800; 2017: 334.800 | — |
+| learned_cnn | Seaquest | 3 | 368.000 [328.800, 440.400] | 0.0071 |
 | upstream | Seaquest | 1 | 1009: 292.400 | — |
 
 Human normalization uses [pinned upstream anchors](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml); 1 is the reference human, not mastery.
@@ -32,9 +32,10 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | learned_cnn | 1009 | 83.00 | 328.80 | 1569.60 + 5.36 | 127.42 | 1.06x |
 | learned_cnn | 2017 | 75.00 | 334.80 | 1622.18 + 5.29 | 123.29 | 1.03x |
+| learned_cnn | 3019 | 77.00 | 440.40 | 1582.24 + 5.28 | 126.40 | 1.05x |
 | upstream | 1009 | 57.00 | 292.40 | 516.71 + 39.70 | 387.06 | 3.22x |
 
-**3 completed; 4/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
+**4 completed; 5/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
 First20 versus last50 is descriptive within a changing policy, not an independent-seed significance test.
 All completed guards/checkpoints/counters pass. Vulkan headroom is estimated; JAX reserves a 50% pool.
 GPU utilization is unmeasured. Lower replay ratio/model size/BPTT is a new recipe, not a port optimization gain.

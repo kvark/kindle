@@ -79,3 +79,11 @@ in 26m10s, at 127.42 actions/s. Its online first20/last50 means rise from 83.0 t
 29 minutes remain extra compute and a counted attempt: **3/10 used**. This
 qualifies the recipe for additional seeds, not frozen competence or a native
 performance advantage. [Curves and audits](../results/2026-09-30-small-replication-learning.md).
+
+**Three native seeds complete:** 1009/2017/3019 each pass 200,000 actions /
+49,939 updates and all completion audits in 26–27 minutes. Last50 online scores
+are 328.8/334.8/440.4; mean 368.0 with learner-seed bootstrap 95% CI
+[328.8,440.4]. **5/10 attempts used.** Upstream remains one seed; no matched
+three-seed replication conclusion yet. The proposed compact JEPA allocation
+(three pretrained / two initial Tiny in the remaining five slots) awaits the
+user's choice and does not silently replace this protocol's paired-seed target.
