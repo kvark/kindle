@@ -1,8 +1,16 @@
-# Phase 2: representation comparison (in progress)
+# Phase 2: original representation comparison (large matrix stopped)
 
-The objective remains all of strategy Phase 2: offline probes plus a matched
-three-seed learning comparison, then an architecture decision. A passing probe
-or implemented harness alone does not close this phase.
+**September 30 user-approved change:** finish active upstream Seaquest seed2017
+and cancel the 21 unstarted 12M entries. Preserve this protocol and every result
+as a partial study, not a completed benchmark. The dispatcher is held; the
+independent guard finishes its worker before the drain service stops the queue.
+See `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
+
+Phase 2 remains open, but now follows the
+[replication-first small-screen plan](../strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).
+Offline probes below are complete. The learning section records the **historical
+recipe**, not authorization to resume the cancelled queue. Numerical/learning
+replication, a cheap JEPA comparison and an architecture decision are still required.
 
 ## Offline protocol
 
@@ -141,7 +149,7 @@ reports 1,806,869 VideoMix clips from Kinetics-710, Something-Something v2,
 Walking Tours and PE-Video. Large versus Tiny changes capacity and corpus;
 only trained versus initial Tiny isolates that pretraining intervention.
 
-## Learning comparison — still required
+## Historical 12M learning protocol — do not resume
 
 Pong, Breakout and Seaquest; learner seeds **1009/2017/3019** per variant. Include upstream
 DreamerV3 12M, Kindle Large, pretrained Tiny and initial Tiny, plus a jointly

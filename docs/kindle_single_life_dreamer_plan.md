@@ -163,6 +163,19 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
 4. **Phase 2, in progress: test whether the representation earns its cost.**
+   **September 30 reset, approved by the user:** finish active upstream Seaquest
+   seed2017 and cancel the 21 unstarted 12M entries. Preserve the completed
+   study; do not restart it. It is not a clean stack-replication benchmark:
+   the native learned-RGB arm changes the encoder/decoder as well as backend.
+   First implement the faithful upstream RGB baseline and compare fixed-batch
+   values, gradients and optimizer updates. Qualify a batched Size1M learning
+   screen (sub-hour target, with upstream learning evidence), then run the
+   focused >=3-seed representation comparison there. Use published Dreamer
+   scores as references; do not recreate its full benchmark. Larger runs are
+   confirmation of promising results, not the development default. See the
+   [revised acceptance criteria](strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).
+
+   **Evidence retained from the original study:**
    The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
    now has 6,144 Pong/Breakout/Seaquest clips, split by whole trajectories.
    Native batched token diagnostics compare identical frames; privileged labels
@@ -197,8 +210,8 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    representation benefit, and Large changes capacity and pretraining corpus
    as well as costing more time. The native RGB control changes the encoder
    and decoder, not just the frontend. None of these online results establishes
-   competence or a multi-seed architecture decision. The remaining fixed matrix
-   runs serially; the three-seed, three-game comparison remains unfinished.
+   competence or a multi-seed architecture decision. The original three-seed,
+   three-game matrix remains incomplete; its unstarted work is cancelled.
    The historical ~15.6 versus ~59 actions/s is not a matched
    efficiency comparison.
    If frozen JEPA offers no probe/learning benefit, change the 2D frontend;

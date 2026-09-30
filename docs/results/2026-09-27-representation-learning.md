@@ -11,13 +11,13 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 | --- | --- | ---: | ---: | ---: |
 | initial_tiny | Breakout | 1 | 1009: 7.420 | — |
 | initial_tiny | Pong | 2 | 1009: -14.280; 2017: -13.260 | — |
-| initial_tiny | Seaquest | 1 | 1009: 318.800 | — |
+| initial_tiny | Seaquest | 2 | 1009: 318.800; 2017: 511.600 | — |
 | large | Breakout | 1 | 1009: 18.960 | — |
 | large | Pong | 2 | 1009: -11.560; 2017: -7.600 | — |
-| large | Seaquest | 1 | 1009: 600.400 | — |
+| large | Seaquest | 2 | 1009: 600.400; 2017: 605.600 | — |
 | learned_cnn | Breakout | 1 | 1009: 7.820 | — |
 | learned_cnn | Pong | 2 | 1009: -15.780; 2017: -15.720 | — |
-| learned_cnn | Seaquest | 1 | 1009: 441.600 | — |
+| learned_cnn | Seaquest | 2 | 1009: 441.600; 2017: 590.400 | — |
 | pretrained_tiny | Breakout | 1 | 1009: 7.920 | — |
 | pretrained_tiny | Pong | 2 | 1009: -17.340; 2017: -13.560 | — |
 | pretrained_tiny | Seaquest | 1 | 1009: 370.400 | — |
@@ -37,6 +37,7 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 - a complete learning matrix still needs offline evidence and an explicit architecture decision.
 - JAX reserves an 80% CUDA pool; Vulkan headroom is not comparable live-array memory or peak VRAM.
 - The externally interrupted Large Seaquest attempt adds at least 136722 discarded actions and extra compute; its replacement starts fresh.
+- September 30: user approved finishing active upstream Seaquest seed2017 and cancelling the 21 unstarted matrix entries; replication-first small screening replaces the remaining campaign.
 
 ![Online learning curves](2026-09-27-representation-learning.svg)
 
@@ -48,14 +49,17 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | initial_tiny | Pong | 1009 | 9969.86 | 20.06 | 7.89 GiB |
 | initial_tiny | Pong | 2017 | 10006.43 | 19.99 | 7.89 GiB |
 | initial_tiny | Seaquest | 1009 | 9988.98 | 20.02 | 7.89 GiB |
+| initial_tiny | Seaquest | 2017 | 10028.40 | 19.94 | 7.89 GiB |
 | large | Breakout | 1009 | 14047.17 | 14.24 | 2.56 GiB |
 | large | Pong | 1009 | 13981.16 | 14.31 | 2.56 GiB |
 | large | Pong | 2017 | 14016.65 | 14.27 | 2.56 GiB |
 | large | Seaquest | 1009 | 13945.69 | 14.34 | 2.56 GiB |
+| large | Seaquest | 2017 | 13996.11 | 14.29 | 2.56 GiB |
 | learned_cnn | Breakout | 1009 | 10726.42 | 18.65 | 4.56 GiB |
 | learned_cnn | Pong | 1009 | 10695.02 | 18.70 | 4.56 GiB |
 | learned_cnn | Pong | 2017 | 10706.33 | 18.68 | 4.56 GiB |
 | learned_cnn | Seaquest | 1009 | 10703.58 | 18.69 | 4.56 GiB |
+| learned_cnn | Seaquest | 2017 | 10718.81 | 18.66 | 4.56 GiB |
 | pretrained_tiny | Breakout | 1009 | 10021.41 | 19.96 | 7.89 GiB |
 | pretrained_tiny | Pong | 1009 | 9990.64 | 20.02 | 7.89 GiB |
 | pretrained_tiny | Pong | 2017 | 10017.15 | 19.97 | 7.89 GiB |
@@ -73,4 +77,8 @@ its separate live-array and reserved-pool peaks are recorded, not treated as nat
 [September 28 external interruption](2026-09-28-learning-interruption.md): eight completed runs survive unchanged;
 the interrupted Large Seaquest attempt is retained separately and its replacement starts fresh.
 
-**20/45 runs complete.** No frontend decision or Phase 2 completion yet.
+**23/45 runs complete.** No frontend decision or Phase 2 completion yet.
+
+The 21 unstarted entries are cancelled by the September 30 user decision. The active upstream Seaquest seed2017 run is allowed to finish;
+its guard/drain state is retained in JSON. The stopped matrix remains a partial study.
+[Replication-first replacement plan](../strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).

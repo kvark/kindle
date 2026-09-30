@@ -23,7 +23,12 @@ target or demonstrating the value of JEPA. The user explicitly accepts **3× as
 a stretch target, not a Phase 1 exit gate**; these completed implementation and
 screening deliverables close Phase 1. Phase 2 is now in progress; its
 [comparison protocol](experiments/2026-09-27-representation-comparison.md)
-retains both offline probes and the matched learning comparison.
+records completed offline probes and the historical large-model comparison.
+**September 30 revision, approved by the user:** finish active upstream
+Seaquest seed2017, cancel the 21 unstarted matrix entries, and preserve all
+completed evidence. Validate a faithful small Dreamer implementation first,
+qualify a fast learning screen, then test JEPA on that recipe. The 45-run 12M
+matrix is no longer a Phase 2 exit requirement; Phase 2 itself is not complete.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.
@@ -164,20 +169,69 @@ finishes in ≤1 hour with a committed curve summary.
    - chunk phase 0 vs. 15 for the same frame (quantify the phase effect).
 3. Report R² per target, especially small fast objects (ball) and velocities.
 
-### 2b. One matched learning comparison
+### 2b. Replication first, then qualify the cheap learning screen
 
-3 seeds each, same protocol, same budget (e.g. 200k actions), 2–3 games
-(Pong, Breakout, and one non-corpus game):
+The initial execution selected the largest proposed matrix: five methods ×
+three games × three seeds, 200,004 actions each, Size12M/B16/T64/H15/R256/F32.
+That is roughly 140 GPU-hours, not a fast engineering check. Six environments
+and GPU inference/learning are already batched; the native learner calls/waits
+account for about 98–99% of measured run time and emulation about 0.6%.
+These stage timings are not GPU utilization measurements. More emulator
+parallelism alone cannot remove the dominant cost.
 
-- upstream DreamerV3 12M (`python/examples/run_upstream_control.py`);
-- Kindle + Large; Kindle + pretrained Tiny; Kindle + random-init Tiny;
-- Kindle + a learned CNN encoder, if Phase 2a shows it helps.
+The user approves replacing its unstarted work with this order:
 
-**Decision rule:** if no LeVJEPA variant beats the random-init or learned-encoder
-baseline on probes *and* learning curves, stop using a frozen encoder for 2D
-games. Keep LeVJEPA only as a candidate for 3D titles and re-test there.
-If the best probe variants (native input, space-to-depth, PCA) help, adopt them
-one at a time with a learning comparison each.
+1. **Faithful RGB baseline.** Replace the research patch CNN/dense decoder with
+   the pinned upstream multiscale CNN/convolutional decoder for the baseline.
+   Keep the GPU pixel path. Match normalization, output transform, losses,
+   replay/reset semantics, optimizer and slow targets—not just the RSSM size.
+   Do not preserve the research CNN as a checkpoint-compatibility branch.
+2. **Fixed-batch numerical comparisons.** Use common weights, observations,
+   flags/actions and explicit stochastic draws. Compare forward values, loss
+   components, gradients and optimizer/EMA updates on small shapes, including
+   reset/terminal/truncation boundaries and more than one update. Retain
+   independent scalar/finite-difference references where useful. Passing native
+   versus native execution variants is not a full upstream reproduction.
+3. **Qualify a fast recipe before queuing seeds.** Start with the Size1M preset,
+   batched environments and a declared short action budget. Time one bounded
+   upstream/native pilot and check that upstream actually learns. Small capacity
+   is a hypothesis, not guaranteed sufficient because the game looks simple.
+   Target a sub-hour development comparison; increase capacity/budget only for
+   a demonstrated limitation. The existing three-seed MinAtar screen finishes
+   in 8m18s but has weak learning, so speed alone is not qualification.
+4. **Matched learning regression.** Fix the selected recipe, then compare at
+   least three learner seeds with score-vs-actions/time and uncertainty. A lower
+   replay ratio or shorter sequence is a different screening recipe, not an
+   optimization speedup at unchanged learning. No five-game mastery campaign.
+
+Use the authors' [published Atari scores](https://github.com/danijar/dreamerv3/tree/main/scores)
+and [configuration presets](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml)
+as reference evidence. A local upstream control establishes the smaller/custom
+recipe and native replication; it need not recreate the full published suite.
+Published scores from other model sizes, interaction budgets or Atari protocols
+are not directly matched targets for our short pilot.
+
+### 2c. Test the JEPA hypothesis on the qualified recipe
+
+Keep the completed offline probes and all historical learning curves. After
+2b, declare a focused comparison of the faithful learned encoder, pretrained
+Tiny and its own initial weights, with >=3 learner seeds and a held-out title.
+Include Large only within the measured iteration budget or as a separately
+justified confirmation. Fix methods, budgets and score summaries before running;
+do not select a favorable completed seed from the stopped matrix.
+
+**Decision rule:** a frozen encoder must earn its whole-agent cost through
+useful probes *and* learning curves versus random/learned controls. Prefer the
+simpler learned 2D frontend if a useful benefit is not established; do not call
+an inconclusive small study proof that JEPA cannot work. Retain LeVJEPA as a
+3D hypothesis. Native/JL64/mean remains the frozen-feature reference; existing
+probes do not justify more pooling/PCA variants. Promote only promising changes
+to larger confirmation, one factor at a time.
+
+**Done when:** the native control has numerical and learning evidence against
+upstream, the cheap representation comparison is published with its costs,
+uncertainty and limitations, and the resulting frontend decision is implemented
+and verified. Cancelling the expensive matrix does not by itself close Phase 2.
 
 ## 6. Phase 3 — Exploration and reward
 

@@ -15,29 +15,33 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
   RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
   target is unmet; the user explicitly accepts it as a stretch target, not a
-  Phase 1 exit gate. Phase 2 is active: held-out Pong/Breakout/Seaquest probes,
-  then matched three-seed learning controls. The protocol is in
-  `docs/experiments/2026-09-27-representation-comparison.md`; its offline corpus
-  has whole-trajectory splits and privileged RAM labels confined to evaluation.
-  Offline ridge/corrected-MLP controls and all five integration smokes complete.
-  Large decodes best; Tiny pretraining is mixed. The conditional joint-trained
-  CNN arm is implemented and validated. Its explicit RGB64 GPU resize is
-  a learned-RGB control, never a return to RGB64-upscaled JEPA. Replay pixels,
-  not stale CNN features. GPU pixel/gradient/replay/restore checks pass; all five
-  smokes execute 6,144 actions and 1,186 updates. The first full RL declaration
-  stopped before GPU work on a NAS-backed log-capture timeout; keep live
-  logs/guards local. The fresh local upstream Pong seed1009 control completes
-  200,004 actions / 49,651 updates, with finite state and a passing guard. The
-  remaining matrix runs serially with fixed inputs and stops on failure. After
-  the user-confirmed September 28 external accident, eight completed runs pass
-  post-reboot audits. A fresh declaration restarts only interrupted Large
-  Seaquest seed1009, then the original 36 unstarted entries; preserve the old
-  partial logs and disclose their extra compute. See
-  `docs/results/2026-09-28-learning-interruption.md`. Track
-  completed curves in `docs/results/2026-09-27-representation-learning.md` and
-  current execution in PR31. No local compilation during timing. No gameplay
-  representation advantage or Phase 2 completion is established yet.
-  Do not mix speed and learning changes.
+  Phase 1 exit gate. Phase 2's offline probes and five integration smokes pass;
+  Large decodes best, Tiny pretraining is mixed. The native learned-RGB control
+  is a patch CNN/dense decoder, not an exact upstream visual model.
+- **September 30 user-approved reset: replication first, screen small.** Finish
+  active upstream Seaquest seed2017, cancel all 21 unstarted 12M matrix entries,
+  and retain the completed runs as a partial study. Do not restart that queue.
+  Its dispatcher PID8456 is intentionally stopped while the independent guard
+  and native worker continue. `kindle-phase2-matrix-drain-20260930.service`
+  stops the original service after the guard finishes and reaps its worker;
+  evidence is `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
+  No local compilation or additional GPU job until that active run finishes.
+  First implement a faithful small Dreamer RGB control and compare fixed-batch
+  losses, gradients and optimizer updates against upstream. Then qualify a
+  Size1M batched learning screen, targeting a sub-hour comparison; establish
+  that upstream actually learns at the selected capacity/budget. Published
+  Dreamer Atari scores are reference evidence, not something to rediscover.
+  Local controls need only establish the smaller/custom protocol and our port.
+  Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
+  promote only promising results to larger confirmation. Preserve native JEPA
+  input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.
+  Keep Phase 2 open until learning evidence supports an explicit frontend
+  decision. Do not turn the cancelled matrix into a completed benchmark or
+  attribute its architectural differences solely to backend correctness.
+  Track evidence in `docs/results/2026-09-27-representation-learning.md`, the
+  revised `docs/strategy_reset_plan.md`, and PR31. Do not mix speed and learning
+  changes. Historical protocols and the September 28 interrupted attempt remain
+  preserved, including their extra compute and pretraining disclosures.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
   Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
@@ -59,8 +63,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   establish reliable improvement or frozen competence. See
   `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
   distinct from completed implementation; no unchanged mastery queue resumes.
-  Next: Phase 2 representation probes and matched learning controls; a frozen
-  JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
+  Next: the faithful small RGB control and matched learning screen above; a
+  frozen JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or
@@ -98,7 +102,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   [PR31](https://github.com/kvark/kindle/pull/31), `phase2-levjepa-evaluation`.
 - The JEPA bet is cheaper useful latent world prediction than pixel
   reconstruction. Measure whole-agent and world-model time/memory/learning
-  against Dreamer12M at matched actual interactions. Backend parity alone can
+  against a faithful Dreamer control at matched actual interactions, screening
+  small before larger confirmation. Backend parity alone can
   share bugs: retain independent value/gradient references.
 - Historical non-sticky fixed-protocol reliability is 3/5 (Boxing, Pong,
   assisted-training Freeway). Qbert and Breakout fail their gates. Pong's one-root
@@ -111,8 +116,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   update over `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
   imports/ownership over `fbb4f28c`. Both branches are pushed. September 28's
   upstream check finds `7c29497` adding caller-owned submission APIs, not a new
-  fix for the existing step path; consider that API after the fixed matrix.
-  Check upstream
+  fix for the existing step path. September 30 rechecks that same Meganeura
+  head; Blade `1da9ccb` changes Rapier/physics, not GPU execution. No new
+  training correctness fix is identified. Check upstream
   before diagnosing already-fixed issues. Keep dependencies reproducible, but
   do not delay implementation to preserve obsolete runtime/checkpoint identities.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
