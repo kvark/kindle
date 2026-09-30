@@ -21,6 +21,10 @@ METHODS = ("upstream", "large", "pretrained_tiny", "initial_tiny", "learned_cnn"
 SEEDS = (1009, 2017, 3019)
 BASELINES = {"Pong": (-20.7, 14.6), "Breakout": (1.7, 30.5), "Seaquest": (68.4, 42054.7)}
 REFERENCE = "https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml"
+TINY_CHECKPOINTS = {
+    "pretrained_tiny": "7fe9b25287b2bff6e0555a74ad2fc7ee9f0e5513fc465475040b082ad2907c5b",
+    "initial_tiny": "7bc344f316d2258bfd429728da26cd26cc36814aedca620c72719ba6bd8cceda",
+}
 
 
 def reject_constant(value):
@@ -107,13 +111,19 @@ def read_run(path, *, allow_interrupted=False):
                 first_training_action=first_update, curve=curve, episodes=episodes)
 
 
-def summarize(inputs, *, budget=200004, replication=False):
-    methods = ("upstream", "learned_cnn") if replication else METHODS
-    games = ("Seaquest",) if replication else tuple(BASELINES)
-    streams = 8 if replication else 6
-    schedule = dict(batch_size=8, batch_length=16, train_ratio=32) if replication else dict(
+def summarize(inputs, *, budget=200004, replication=False, small_representation=False):
+    if replication and small_representation:
+        raise ValueError("choose replication or representation, not both")
+    small = replication or small_representation
+    methods = (("learned_cnn", "pretrained_tiny", "initial_tiny") if small_representation else
+               ("upstream", "learned_cnn") if replication else METHODS)
+    comparison = "small_representation" if small_representation else "small_replication" if replication else "representation"
+    games = ("Seaquest",) if small else tuple(BASELINES)
+    streams = 8 if small else 6
+    schedule = dict(batch_size=8, batch_length=16, train_ratio=32) if small else dict(
         batch_size=16, batch_length=64, train_ratio=256)
     groups, seen, recipes = defaultdict(list), set(), {}
+    shared_native = None
     for method, path in inputs:
         if method not in methods:
             raise ValueError(f"unknown method: {method}")
@@ -150,9 +160,16 @@ def summarize(inputs, *, budget=200004, replication=False):
                     raise ValueError("not the jointly learned RGB control")
             elif config.get("observation_kind", "features") != "features":
                 raise ValueError("RGB control cannot be labelled frozen JEPA")
+            elif small_representation:
+                identity = h.get("model_provenance", {}).get("perception") or {}
+                if (identity.get("kind") != "levjepa-tiny" or
+                        identity.get("checkpoint_sha256") != TINY_CHECKPOINTS[method] or
+                        config["loss_scales"]["reconstruction"] != 0 or
+                        config["loss_scales"]["future_prediction"] != .25):
+                    raise ValueError("not the declared Tiny checkpoint and causal prediction loss")
         if any(config[k] != v for k, v in schedule.items()):
             raise ValueError("mismatched learning schedule")
-        if replication:
+        if small:
             if method == "upstream":
                 valid = (h.get("model_size") == "1m" and h.get("replay_context") == 1 and
                          h.get("replay_arrival_capacity") == 100000)
@@ -162,7 +179,14 @@ def summarize(inputs, *, budget=200004, replication=False):
                     replay_capacity=100000, replay_context=1, actor_unimix=0,
                     intrinsic_reward_scale=0, visitation_bonus=False).items())
             if not valid:
-                raise ValueError("not the declared Size1M replication recipe")
+                raise ValueError("not the declared Size1M screening recipe")
+        if small_representation:
+            core = {k: v for k, v in config.items() if k != "observation_kind"}
+            core["loss_scales"] = {k: v for k, v in config["loss_scales"].items()
+                                   if k not in ("reconstruction", "future_prediction")}
+            if shared_native is not None and core != shared_native:
+                raise ValueError("shared learner settings differ between frontends")
+            shared_native = core
         if config != recipes.setdefault(method, config):
             raise ValueError("learner configuration changed within a method")
         groups[method, game].append(run)
@@ -172,7 +196,8 @@ def summarize(inputs, *, budget=200004, replication=False):
         aggregate = None
         if len(runs) == 3:
             aggregate = summarize_curves(runs)
-            aggregate["protocol"] = "small-replication-learning-v1" if replication else "phase2-matched-learning-v1"
+            aggregate["protocol"] = (f"{comparison.replace('_', '-')}-learning-v1" if small else
+                                     "phase2-matched-learning-v1")
             random, human = BASELINES[game]
             for point in aggregate["by_actions"] + aggregate["by_time"]:
                 point["human_normalized_score"] = mean_ci([(v-random)/(human-random) for v in point["score"]["seeds"]])
@@ -181,9 +206,9 @@ def summarize(inputs, *, budget=200004, replication=False):
             aggregate["run_seconds"] = mean_ci([r["final"]["elapsed_seconds"] for r in runs])
         results.append(dict(method=method, game=game, aggregate=aggregate, runs=runs))
     required = {(method, game, seed) for method in methods for game in games for seed in SEEDS}
-    complete_status = "replication_complete" if replication else "learning_matrix_complete"
+    complete_status = "replication_complete" if replication else "learning_comparison_complete" if small_representation else "learning_matrix_complete"
     return dict(status=complete_status if required <= seen else "partial_learning_comparison",
-                comparison="small_replication" if replication else "representation",
+                comparison=comparison,
                 methods=methods, games=games, num_envs=streams,
                 phase2_complete=False, action_budget=budget, recipes=recipes, results=results,
                 normalization=dict(formula="(score-random)/(human-random)", anchors=BASELINES, source=REFERENCE),
@@ -192,7 +217,12 @@ def summarize(inputs, *, budget=200004, replication=False):
                         "equal learner-seed weighting, 10000 percentile bootstrap samples; only three seeds",
                         "time starts before initial policy/encoding; construction is reported separately",
                         "time curves interpolate only within common measured support, never extrapolate",
-                        *(["faithful RGB64 control; shared recipe, not identical RNG/replay or policy synchronization",
+                        *(["faithful learned RGB versus frozen causal-video features compares whole packages, not just pretraining",
+                            "pretrained Tiny saw 250k random-play RGB64 frames from Boxing/Pong/Freeway/Breakout/Qbert; Seaquest is held out",
+                            "pretrained versus its own initial Tiny weights isolates that pretraining intervention",
+                            "JEPA uses native-detail GPU preprocessing; no RGB64-upscaled adapter",
+                            "smaller capacity/replay ratio/BPTT is not an unchanged-learning speedup"] if small_representation else
+                          ["faithful RGB64 control; shared recipe, not identical RNG/replay or policy synchronization",
                             "smaller capacity/replay ratio/BPTT is not an unchanged-learning speedup",
                             "this comparison does not test JEPA"] if replication else [
                             "upstream/native RGB reconstruction versus frozen features changes the whole package",
@@ -229,7 +259,7 @@ def plot_svg(result):
     games = result.get("games", BASELINES)
     streams = result.get("num_envs", 6)
     height = 145 + 250 * len(games)
-    if result.get("comparison") == "small_replication":
+    if result.get("comparison") in ("small_replication", "small_representation"):
         labels["learned_cnn"] = "Native Dreamer"
     root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height=str(height), viewBox=f"0 0 1160 {height}",
                       role="img", attrib={"aria-labelledby": "title description"})
@@ -329,10 +359,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", nargs=2, action="append", required=True, metavar=("METHOD", "LOG"))
     parser.add_argument("--output-prefix", required=True, type=Path)
-    parser.add_argument("--replication", action="store_true", help="declared Size1M Seaquest pair; not the cancelled 12M matrix")
+    study = parser.add_mutually_exclusive_group()
+    study.add_argument("--replication", action="store_true", help="declared Size1M Seaquest pair; not the cancelled 12M matrix")
+    study.add_argument("--small-representation", action="store_true", help="Size1M Seaquest learned RGB versus pretrained/initial Tiny")
     args = parser.parse_args()
     result = summarize([(method, Path(path)) for method, path in args.input],
-                       budget=200000 if args.replication else 200004, replication=args.replication)
+                       budget=200000 if args.replication or args.small_representation else 200004,
+                       replication=args.replication, small_representation=args.small_representation)
     path = args.output_prefix.with_suffix(".json")
     path.write_text(json.dumps(result, separators=(",", ":"), allow_nan=False) + "\n")
     svg = args.output_prefix.with_suffix(".svg")

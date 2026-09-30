@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "examples"))
-from summarize_representation_learning import markdown, plot_svg, read_run, summarize
+from summarize_representation_learning import TINY_CHECKPOINTS, markdown, plot_svg, read_run, summarize
 
 
 def fixture(seed=1009, *, upstream=False, ticks=4, reward=1., replication=False):
@@ -266,3 +266,58 @@ def test_interrupted_prefix_is_audited_but_never_counted_as_a_complete_run(tmp_p
     rows[-1]["total_rewards"][0] = -999
     with pytest.raises(ValueError, match="transitions"):
         read_run(write(tmp_path, rows), allow_interrupted=True)
+
+
+def tiny_fixture(seed, method):
+    rows = fixture(seed, replication=True)
+    rows[0]["config"].update(observation_kind="features", loss_scales=dict(reconstruction=0., future_prediction=.25))
+    rows[0]["model_provenance"]["perception"] = dict(kind="levjepa-tiny", checkpoint_sha256=TINY_CHECKPOINTS[method])
+    del rows[0]["learned_rgb_preprocessing"]
+    return rows
+
+
+def test_small_representation_reuses_curves_without_claiming_replication(tmp_path):
+    inputs = []
+    for seed in (1009, 2017, 3019):
+        for method in ("learned_cnn", *TINY_CHECKPOINTS):
+            rows = fixture(seed, replication=True) if method == "learned_cnn" else tiny_fixture(seed, method)
+            inputs.append((method, write(tmp_path, rows, f"{method}-{seed}.jsonl")))
+    result = summarize(inputs, budget=32, small_representation=True)
+    assert result["status"] == "learning_comparison_complete" and not result["phase2_complete"]
+    assert result["num_envs"] == 8 and len(result["results"]) == 3
+    assert all(r["aggregate"] for r in result["results"])
+    assert "Seaquest · 9/9 runs" in plot_svg(result)
+    assert "250k" in markdown(result, "data.json") and "whole packages" in " ".join(result["limits"])
+    partial = summarize(inputs[:-1], budget=32, small_representation=True)
+    assert partial["status"] == "partial_learning_comparison"
+    assert next(r for r in partial["results"] if r["method"] == "initial_tiny")["aggregate"] is None
+    with pytest.raises(ValueError, match="choose replication"):
+        summarize(inputs, budget=32, replication=True, small_representation=True)
+
+
+@pytest.mark.parametrize("corruption", ["checkpoint", "kind", "loss", "pixels", "schedule"])
+def test_small_representation_rejects_frontend_and_recipe_mislabeling(tmp_path, corruption):
+    rows = tiny_fixture(1009, "pretrained_tiny")
+    if corruption == "checkpoint":
+        rows[0]["model_provenance"]["perception"]["checkpoint_sha256"] = TINY_CHECKPOINTS["initial_tiny"]
+    elif corruption == "kind":
+        rows[0]["model_provenance"]["perception"]["kind"] = "levjepa"
+    elif corruption == "loss":
+        rows[0]["config"]["loss_scales"]["reconstruction"] = 1.
+    elif corruption == "pixels":
+        rows[0]["observation_size"] = "64"
+    else:
+        rows[0]["config"]["batch_length"] = 64
+    with pytest.raises(ValueError):
+        summarize([("pretrained_tiny", write(tmp_path, rows))], budget=32, small_representation=True)
+
+
+def test_small_representation_matches_optimizer_settings_across_frontends(tmp_path):
+    rgb = fixture(replication=True)
+    tiny = tiny_fixture(1009, "pretrained_tiny")
+    rgb[0]["config"]["learning_rate"] = 4e-5
+    tiny[0]["config"]["learning_rate"] = 3e-4
+    inputs = [("learned_cnn", write(tmp_path, rgb, "rgb.jsonl")),
+              ("pretrained_tiny", write(tmp_path, tiny, "tiny.jsonl"))]
+    with pytest.raises(ValueError, match="shared learner"):
+        summarize(inputs, budget=32, small_representation=True)
