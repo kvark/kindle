@@ -32,6 +32,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   that upstream actually learns at the selected capacity/budget. Published
   Dreamer Atari scores are reference evidence, not something to rediscover.
   Local controls need only establish the smaller/custom protocol and our port.
+  The user caps the new replication round at **10 training runs total**, across
+  upstream and native, including failed/interrupted attempts. Target three
+  paired learner seeds (six runs); at most four additional pilot/debug runs.
+  Reuse qualifying pilot results when the recipe is unchanged. Do not silently
+  extend the cap or follow it with another large JEPA matrix.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

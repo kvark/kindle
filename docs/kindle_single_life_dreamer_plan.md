@@ -168,7 +168,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    study; do not restart it. It is not a clean stack-replication benchmark:
    the native learned-RGB arm changes the encoder/decoder as well as backend.
    First implement the faithful upstream RGB baseline and compare fixed-batch
-   values, gradients and optimizer updates. Qualify a batched Size1M learning
+   values, losses, gradients and optimizer updates. The new replication round
+   is capped at **10 training
+   runs total** (upstream/native combined, failed attempts included): target
+   three paired seeds, with at most four pilot/debug attempts. Reuse unchanged
+   qualifying pilots; no automatic follow-on large JEPA matrix. Qualify a batched Size1M learning
    screen (sub-hour target, with upstream learning evidence), then run the
    focused >=3-seed representation comparison there. Use published Dreamer
    scores as references; do not recreate its full benchmark. Larger runs are

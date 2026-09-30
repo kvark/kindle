@@ -181,6 +181,15 @@ parallelism alone cannot remove the dominant cost.
 
 The user approves replacing its unstarted work with this order:
 
+**Budget cap (September 30): at most 10 new replication training runs total,**
+counting upstream and native together and including failed/interrupted attempts.
+Target three paired learner seeds (six runs), with at most four pilot/debug
+attempts. A qualifying pilot can count toward the paired comparison if its
+recipe is unchanged. Numerical unit/gradient checks remain small and bounded;
+they are not additional learning campaigns. Report a remaining limitation when
+the cap is reached instead of extending the queue. The subsequent JEPA comparison
+needs an explicit compact allocation, not an automatic return to a large matrix.
+
 1. **Faithful RGB baseline.** Replace the research patch CNN/dense decoder with
    the pinned upstream multiscale CNN/convolutional decoder for the baseline.
    Keep the GPU pixel path. Match normalization, output transform, losses,
