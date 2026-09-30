@@ -24,8 +24,8 @@ a stretch target, not a Phase 1 exit gate**; these completed implementation and
 screening deliverables close Phase 1. Phase 2 is now in progress; its
 [comparison protocol](experiments/2026-09-27-representation-comparison.md)
 records completed offline probes and the historical large-model comparison.
-**September 30 revision, approved by the user:** finish active upstream
-Seaquest seed2017, cancel the 21 unstarted matrix entries, and preserve all
+**September 30 revision, approved by the user:** the final active upstream
+Seaquest seed2017 finished and the 21 unstarted matrix entries are cancelled. Preserve all
 completed evidence. Validate a faithful small Dreamer implementation first,
 qualify a fast learning screen, then test JEPA on that recipe. The 45-run 12M
 matrix is no longer a Phase 2 exit requirement; Phase 2 itself is not complete.

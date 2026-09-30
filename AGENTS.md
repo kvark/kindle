@@ -18,14 +18,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Phase 1 exit gate. Phase 2's offline probes and five integration smokes pass;
   Large decodes best, Tiny pretraining is mixed. The native learned-RGB control
   is a patch CNN/dense decoder, not an exact upstream visual model.
-- **September 30 user-approved reset: replication first, screen small.** Finish
-  active upstream Seaquest seed2017, cancel all 21 unstarted 12M matrix entries,
-  and retain the completed runs as a partial study. Do not restart that queue.
-  Its dispatcher PID8456 is intentionally stopped while the independent guard
-  and native worker continue. `kindle-phase2-matrix-drain-20260930.service`
-  stops the original service after the guard finishes and reaps its worker;
-  evidence is `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
-  No local compilation or additional GPU job until that active run finishes.
+- **September 30 user-approved reset: replication first, screen small.** The
+  final active upstream Seaquest seed2017 finished at 16:43 UTC: 200,004 actions,
+  49,651 updates, online last-50 score 454.0, finite checkpoint and passing guard.
+  All 24 completed runs pass their audits; all 21 unstarted entries are cancelled.
+  The original queue and drain services are inactive, with workers reaped. Never
+  restart that queue. Evidence:
+  `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
+  Deferred CPU preparation now runs; new GPU checks remain serial and guarded.
   First implement a faithful small Dreamer RGB control and compare fixed-batch
   losses, gradients and optimizer updates against upstream. Then qualify a
   Size1M batched learning screen, targeting a sub-hour comparison; establish

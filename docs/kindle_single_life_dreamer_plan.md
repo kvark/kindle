@@ -15,7 +15,8 @@ The central hypothesis is that learning to predict useful compact representation
 is cheaper than reconstructing pixels, while retaining the information needed to
 learn arbitrary games from sparse rewards. Frozen video pretraining is one part
 of that design, not the entire bet. Test world-update cost, end-to-end cost and
-learning curves against a matched Dreamer12M RGB control. A cheaper but less
+learning curves against a faithful Dreamer RGB control, screening at Size1M
+before larger confirmation. A cheaper but less
 useful world model does not establish an efficiency advantage.
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
@@ -163,9 +164,10 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
 4. **Phase 2, in progress: test whether the representation earns its cost.**
-   **September 30 reset, approved by the user:** finish active upstream Seaquest
-   seed2017 and cancel the 21 unstarted 12M entries. Preserve the completed
-   study; do not restart it. It is not a clean stack-replication benchmark:
+   **September 30 reset, approved by the user:** the final active upstream
+   Seaquest seed2017 finished; all 24 completed runs pass their audits and all 21
+   unstarted 12M entries are cancelled. Preserve this partial study; never restart
+   its stopped queue. It is not a clean stack-replication benchmark:
    the native learned-RGB arm changes the encoder/decoder as well as backend.
    First implement the faithful upstream RGB baseline and compare fixed-batch
    values, losses, gradients and optimizer updates. The new replication round
