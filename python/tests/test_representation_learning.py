@@ -10,10 +10,12 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "examples"))
 from summarize_representation_learning import markdown, plot_svg, read_run, summarize
 
 
-def fixture(seed=1009, *, upstream=False, ticks=4, reward=1.):
-    config = dict(batch_size=16, batch_length=64, train_ratio=256)
-    start = dict(event="run_start", seed=seed, num_envs=6, steps=6*ticks,
-                 environment_seeds=[seed+i*1000003 for i in range(6)], full_action_space=True,
+def fixture(seed=1009, *, upstream=False, ticks=4, reward=1., replication=False):
+    n = 8 if replication else 6
+    config = (dict(batch_size=8, batch_length=16, train_ratio=32) if replication else
+              dict(batch_size=16, batch_length=64, train_ratio=256))
+    start = dict(event="run_start", seed=seed, num_envs=n, steps=n*ticks,
+                 environment_seeds=[seed+i*1000003 for i in range(n)], full_action_space=True,
                  sticky_actions=.25, action_repeat=4, noop_max=0, max_episode_frames=100000)
     if upstream:
         start.update(game="pong", protocol="phase2-matched-actions-v1", observation_size=64,
@@ -22,24 +24,35 @@ def fixture(seed=1009, *, upstream=False, ticks=4, reward=1.):
         start.update(environment="ALE/Pong-v5", config=dict(seed=seed, **config), mode="train",
                      starting_environment_step=0, starting_learner_step=0, restored_checkpoint=None,
                      observation_size="native")
-    rows, returns, lengths, counts = [start], [0.] * 6, [0] * 6, [0] * 6
+    if replication:
+        if upstream:
+            start.update(game="seaquest", protocol="replication-matched-actions-v2",
+                         model_size="1m", replay_context=1, replay_arrival_capacity=100000)
+        else:
+            start.update(environment="ALE/Seaquest-v5", learned_rgb_preprocessing="GPU Pillow-equivalent",
+                         model_provenance=dict(perception=None))
+            start["config"].update(model_size="size1_m", observation_kind="rgb64", actor_unimix=0,
+                world_backprop_length=16, world_microbatch_size=8, imagination_length=15,
+                replay_capacity=100000, replay_context=1, intrinsic_reward_scale=0, visitation_bonus=False,
+                loss_scales=dict(reconstruction=1., future_prediction=0.))
+    rows, returns, lengths, counts = [start], [0.] * n, [0] * n, [0] * n
     for tick in range(1, ticks+1):
         done = tick % 3 == 0
-        rows.append(dict(event="transition", run_step=6*tick, actions=[0]*6, rewards=[reward]*6,
-                         terminated=[done]*6, truncated=[False]*6))
-        updates = 1 + (6*tick-6)//4
-        rows.append(dict(event="learner", run_step=6*tick))
-        for i in range(6):
+        rows.append(dict(event="transition", run_step=n*tick, actions=[0]*n, rewards=[reward]*n,
+                         terminated=[done]*n, truncated=[False]*n))
+        updates = 1 + (n*tick-n)//4
+        rows.append(dict(event="learner", run_step=n*tick))
+        for i in range(n):
             returns[i] += reward
             lengths[i] += 1
             if done:
-                rows.append(dict(event="episode", stream=i, episode=counts[i], run_step=6*tick,
+                rows.append(dict(event="episode", stream=i, episode=counts[i], run_step=n*tick,
                                  episode_return=returns[i], episode_length=lengths[i],
                                  terminated=True, truncated=False, elapsed_seconds=float(tick)))
                 counts[i] += 1
                 returns[i], lengths[i] = 0., 0
-        rows.append(dict(event="progress", run_step=6*tick, learner_step=updates, elapsed_seconds=float(tick),
-                         total_rewards=[reward*tick]*6, episode_counts=counts.copy(),
+        rows.append(dict(event="progress", run_step=n*tick, learner_step=updates, elapsed_seconds=float(tick),
+                         total_rewards=[reward*tick]*n, episode_counts=counts.copy(),
                          partial_returns=returns.copy(), partial_lengths=lengths.copy()))
     rows.append(rows[-1] | dict(event="run_end", reason="budget_complete", learner_updates=updates,
                                 elapsed_seconds=float(ticks)+.5))
@@ -196,3 +209,39 @@ def test_learning_plot_uses_aggregate_values_and_common_time_support(tmp_path):
     aggregate["by_time"][0]["score"]["mean"] = float("nan")
     with pytest.raises(ValueError, match="nonfinite"):
         plot_svg(result)
+
+
+@pytest.mark.parametrize("upstream", [False, True])
+def test_small_replication_is_explicit_and_keeps_stream_and_recipe_identity(tmp_path, upstream):
+    rows = fixture(upstream=upstream, replication=True)
+    method = "upstream" if upstream else "learned_cnn"
+    path = write(tmp_path, rows)
+    result = summarize([(method, path)], budget=32, replication=True)
+    assert result["num_envs"] == 8 and result["games"] == ("Seaquest",)
+    assert result["status"] == "partial_learning_comparison" and not result["phase2_complete"]
+    assert len(result["results"][0]["runs"][0]["episodes"]) == 8
+    svg = plot_svg(result)
+    assert "8 streams combined" in svg and "Seaquest · 1/6 runs" in svg and "Native Dreamer" in svg
+    assert "Pong" not in svg and "Breakout" not in svg
+    with pytest.raises(ValueError, match="budget"):
+        summarize([(method, path)], budget=32)
+    if upstream:
+        rows[0]["model_size"] = "12m"
+    else:
+        rows[0]["config"]["actor_unimix"] = .01
+    with pytest.raises(ValueError, match="Size1M"):
+        summarize([(method, write(tmp_path, rows))], budget=32, replication=True)
+
+
+def test_small_replication_requires_six_runs_not_the_cancelled_matrix(tmp_path):
+    inputs = []
+    for seed in (1009, 2017, 3019):
+        for upstream, method in [(True, "upstream"), (False, "learned_cnn")]:
+            rows = fixture(seed, upstream=upstream, replication=True)
+            inputs.append((method, write(tmp_path, rows, f"{method}-{seed}.jsonl")))
+    result = summarize(inputs, budget=32, replication=True)
+    assert result["status"] == "replication_complete" and not result["phase2_complete"]
+    assert len(result["results"]) == 2 and all(r["aggregate"] for r in result["results"])
+    assert "does not test JEPA" in " ".join(result["limits"])
+    with pytest.raises(ValueError, match="unknown method"):
+        summarize([("large", inputs[0][1])], budget=32, replication=True)

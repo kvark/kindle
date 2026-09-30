@@ -104,27 +104,33 @@ def read_run(path):
                 first_training_action=first_update, curve=curve, episodes=episodes)
 
 
-def summarize(inputs, *, budget=200004):
+def summarize(inputs, *, budget=200004, replication=False):
+    methods = ("upstream", "learned_cnn") if replication else METHODS
+    games = ("Seaquest",) if replication else tuple(BASELINES)
+    streams = 8 if replication else 6
+    schedule = dict(batch_size=8, batch_length=16, train_ratio=32) if replication else dict(
+        batch_size=16, batch_length=64, train_ratio=256)
     groups, seen, recipes = defaultdict(list), set(), {}
     for method, path in inputs:
-        if method not in METHODS:
+        if method not in methods:
             raise ValueError(f"unknown method: {method}")
         run = read_run(path)
         h = run["header"]
         game = h.get("game") or h["environment"].removeprefix("ALE/").removesuffix("-v5")
         game = game.capitalize()
         key = (method, game, run["seed"])
-        if game not in BASELINES or run["seed"] not in SEEDS or key in seen:
+        if game not in games or run["seed"] not in SEEDS or key in seen:
             raise ValueError("unexpected or duplicate game/learner seed")
         seen.add(key)
-        common = dict(steps=budget, num_envs=6, full_action_space=True, sticky_actions=.25,
+        common = dict(steps=budget, num_envs=streams, full_action_space=True, sticky_actions=.25,
                       action_repeat=4, noop_max=0, max_episode_frames=100000)
         if any(h.get(k) != v for k, v in common.items()):
             raise ValueError("mismatched Phase 2 environment/budget")
-        if h["environment_seeds"] != [(run["seed"] + i * 1000003) % 2**32 for i in range(6)]:
+        if h["environment_seeds"] != [(run["seed"] + i * 1000003) % 2**32 for i in range(streams)]:
             raise ValueError("mismatched environment seeds")
         if method == "upstream":
-            if (h["protocol"] != "phase2-matched-actions-v1" or h["reward_action_aids"] != "none" or
+            protocol = "replication-matched-actions-v2" if replication else "phase2-matched-actions-v1"
+            if (h["protocol"] != protocol or h["reward_action_aids"] != "none" or
                     h["observation_size"] != 64 or h["compute_dtype"] != "float32"):
                 raise ValueError("not the matched upstream control")
             config = {k: h[k] for k in ("batch_size", "batch_length", "train_ratio")}
@@ -141,8 +147,19 @@ def summarize(inputs, *, budget=200004):
                     raise ValueError("not the jointly learned RGB control")
             elif config.get("observation_kind", "features") != "features":
                 raise ValueError("RGB control cannot be labelled frozen JEPA")
-        if any(config[k] != v for k, v in dict(batch_size=16, batch_length=64, train_ratio=256).items()):
+        if any(config[k] != v for k, v in schedule.items()):
             raise ValueError("mismatched learning schedule")
+        if replication:
+            if method == "upstream":
+                valid = (h.get("model_size") == "1m" and h.get("replay_context") == 1 and
+                         h.get("replay_arrival_capacity") == 100000)
+            else:
+                valid = all(config.get(k) == v for k, v in dict(model_size="size1_m",
+                    world_backprop_length=16, world_microbatch_size=8, imagination_length=15,
+                    replay_capacity=100000, replay_context=1, actor_unimix=0,
+                    intrinsic_reward_scale=0, visitation_bonus=False).items())
+            if not valid:
+                raise ValueError("not the declared Size1M replication recipe")
         if config != recipes.setdefault(method, config):
             raise ValueError("learner configuration changed within a method")
         groups[method, game].append(run)
@@ -152,7 +169,7 @@ def summarize(inputs, *, budget=200004):
         aggregate = None
         if len(runs) == 3:
             aggregate = summarize_curves(runs)
-            aggregate["protocol"] = "phase2-matched-learning-v1"
+            aggregate["protocol"] = "small-replication-learning-v1" if replication else "phase2-matched-learning-v1"
             random, human = BASELINES[game]
             for point in aggregate["by_actions"] + aggregate["by_time"]:
                 point["human_normalized_score"] = mean_ci([(v-random)/(human-random) for v in point["score"]["seeds"]])
@@ -160,8 +177,11 @@ def summarize(inputs, *, budget=200004):
             aggregate["final_hns"] = mean_ci([(r["curve"][-1]["score"]-random)/(human-random) for r in runs])
             aggregate["run_seconds"] = mean_ci([r["final"]["elapsed_seconds"] for r in runs])
         results.append(dict(method=method, game=game, aggregate=aggregate, runs=runs))
-    required = {(method, game, seed) for method in METHODS for game in BASELINES for seed in SEEDS}
-    return dict(status="learning_matrix_complete" if required <= seen else "partial_learning_comparison",
+    required = {(method, game, seed) for method in methods for game in games for seed in SEEDS}
+    complete_status = "replication_complete" if replication else "learning_matrix_complete"
+    return dict(status=complete_status if required <= seen else "partial_learning_comparison",
+                comparison="small_replication" if replication else "representation",
+                methods=methods, games=games, num_envs=streams,
                 phase2_complete=False, action_budget=budget, recipes=recipes, results=results,
                 normalization=dict(formula="(score-random)/(human-random)", anchors=BASELINES, source=REFERENCE),
                 limits=["online last-50 completed episode means, not frozen competence",
@@ -169,8 +189,11 @@ def summarize(inputs, *, budget=200004):
                         "equal learner-seed weighting, 10000 percentile bootstrap samples; only three seeds",
                         "time starts before initial policy/encoding; construction is reported separately",
                         "time curves interpolate only within common measured support, never extrapolate",
-                        "upstream/native RGB reconstruction versus frozen features changes the whole package",
-                        "native RGB uses one GPU bilinear resize and a patch CNN/dense decoder, not the exact upstream CNN",
+                        *(["faithful RGB64 control; shared recipe, not identical RNG/replay or policy synchronization",
+                            "smaller capacity/replay ratio/BPTT is not an unchanged-learning speedup",
+                            "this comparison does not test JEPA"] if replication else [
+                            "upstream/native RGB reconstruction versus frozen features changes the whole package",
+                            "native RGB uses one GPU bilinear resize and a patch CNN/dense decoder, not the exact upstream CNN"]),
                         "a complete learning matrix still needs offline evidence and an explicit architecture decision"])
 
 
@@ -199,7 +222,13 @@ def plot_svg(result):
     """Render audited online curves, using only the summary's measured support."""
     colors = dict(zip(METHODS, ("#0072b2", "#cc79a7", "#009e73", "#e69f00", "#d55e00")))
     labels = dict(zip(METHODS, ("Upstream Dreamer", "Large JEPA", "Pretrained Tiny", "Initial Tiny", "Joint RGB CNN")))
-    root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height="895", viewBox="0 0 1160 895",
+    methods = result.get("methods", METHODS)
+    games = result.get("games", BASELINES)
+    streams = result.get("num_envs", 6)
+    height = 145 + 250 * len(games)
+    if result.get("comparison") == "small_replication":
+        labels["learned_cnn"] = "Native Dreamer"
+    root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height=str(height), viewBox=f"0 0 1160 {height}",
                       role="img", attrib={"aria-labelledby": "title description"})
 
     def add(tag, *, parent=root, text=None, **attrs):
@@ -211,11 +240,11 @@ def plot_svg(result):
     add("desc", id="description", text="Last-50 completed episode means, not frozen competence. "
         "Partial groups show individual learner seeds; complete three-seed groups show means and 95% bootstrap bands. "
         "No extrapolation beyond measured support. Missing scores are not zero.")
-    add("rect", width=1160, height=895, fill="white")
+    add("rect", width=1160, height=height, fill="white")
     add("style", text="text{font-family:sans-serif;font-size:12px;fill:#222} .heading{font-size:16px;font-weight:bold}")
     add("text", x=25, y=27, class_="heading", text="Phase 2 · online training scores (not frozen competence)")
     add("text", x=25, y=48, text="Last-50 episode mean. Dashed: individual learner seed. Solid + band: three-seed mean and 95% bootstrap CI.")
-    for i, method in enumerate(METHODS):
+    for i, method in enumerate(methods):
         x = 25 + i * 225
         add("line", x1=x, x2=x+22, y1=71, y2=71, stroke=colors[method], stroke_width=3)
         add("text", x=x+28, y=75, text=labels[method])
@@ -225,7 +254,7 @@ def plot_svg(result):
         add("line", x1=x, x2=x+35, y1=95, y2=95, stroke="#444", stroke_width=2, stroke_dasharray=dashes[seed])
         add("text", x=x+42, y=99, text=f"seed {seed}")
 
-    for row_index, game in enumerate(BASELINES):
+    for row_index, game in enumerate(games):
         groups = [g for g in result["results"] if g["game"] == game]
         panels = []
         for axis in ("actions", "time"):
@@ -260,7 +289,7 @@ def plot_svg(result):
             def xy(x, y):
                 return f"{left+width*x/xmax:.2f},{top+height*(high-y)/(high-low):.2f}"
 
-            add("text", x=left, y=top-13, class_="heading", text=f"{game} · {count}/15 runs")
+            add("text", x=left, y=top-13, class_="heading", text=f"{game} · {count}/{3*len(methods)} runs")
             for tick in range(5):
                 fraction = tick/4
                 x, y = left+width*fraction, top+height*(1-fraction)
@@ -268,7 +297,7 @@ def plot_svg(result):
                 add("text", x=left-8, y=y+4, text_anchor="end", text=f"{low+(high-low)*fraction:.3g}")
                 add("text", x=x, y=top+height+19, text_anchor="middle", text=f"{xmax*fraction:.3g}")
             add("text", x=left+width/2, y=top+height+39, text_anchor="middle",
-                text="Actual actions (thousands, six streams combined)" if column == 0 else "Run wall time (hours, construction excluded)")
+                text=f"Actual actions (thousands, {streams} streams combined)" if column == 0 else "Run wall time (hours, construction excluded)")
             for method, seed, points in traces:
                 if not points:
                     continue
@@ -285,7 +314,7 @@ def plot_svg(result):
                     add("circle", parent=trace, cx=x, cy=y, r=3, fill=colors[method])
             if not any(points for _, _, points in traces):
                 add("text", x=left+width/2, y=top+height/2, text_anchor="middle", text="No completed-episode scores yet")
-    add("text", x=25, y=884, text="All episodes (including cutoffs) and unfinished tails remain in JSON. Time means use common measured seed support.")
+    add("text", x=25, y=134+250*len(games), text="All episodes (including cutoffs) and unfinished tails remain in JSON. Time means use common measured seed support.")
     return ET.tostring(root, encoding="unicode") + "\n"
 
 
@@ -293,8 +322,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", nargs=2, action="append", required=True, metavar=("METHOD", "LOG"))
     parser.add_argument("--output-prefix", required=True, type=Path)
+    parser.add_argument("--replication", action="store_true", help="declared Size1M Seaquest pair; not the cancelled 12M matrix")
     args = parser.parse_args()
-    result = summarize([(method, Path(path)) for method, path in args.input])
+    result = summarize([(method, Path(path)) for method, path in args.input],
+                       budget=200000 if args.replication else 200004, replication=args.replication)
     path = args.output_prefix.with_suffix(".json")
     path.write_text(json.dumps(result, separators=(",", ":"), allow_nan=False) + "\n")
     svg = args.output_prefix.with_suffix(".svg")
