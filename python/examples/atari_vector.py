@@ -213,7 +213,7 @@ def main():
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
-                  **(dict(learned_rgb_preprocessing="single GPU bilinear resize to 64x64, no antialias; CHW /255-0.5") if learned_rgb else {}),
+                  **(dict(learned_rgb_preprocessing="single GPU Pillow-equivalent antialiased bilinear resize to 64x64, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,

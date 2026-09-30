@@ -43,7 +43,7 @@
     "momentum_atol": 0.00003,
     "other_atol": 0.000003
   },
-  "cpu_checks": {"native_passed": 93, "native_ignored": 39, "targeted_python_passed": 56, "clippy": "passed", "format": "passed"},
+  "cpu_checks": {"native_passed": 93, "native_ignored": 39, "targeted_python_passed": 56, "full_python_passed": 941, "clippy": "passed", "format": "passed"},
   "artifacts": {
     "root": "runs/small-dreamer-replication-20260930.vRE7ag",
     "passing_guard_directories": ["transpose-_2xgg_iu", "pixels-dhxn1uyr", "encoder-wtdjdxvb", "rgb-reference-xzoiqmkv", "rgb-native-ln9t0jdg", "rgb-optimizer-byjki4pp", "step-native-vtha66mk", "step-reference-4907gudr"],

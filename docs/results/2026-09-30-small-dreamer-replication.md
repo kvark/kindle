@@ -43,7 +43,7 @@ only scan unrolling and random-number supply differ from its model code.
 | Upstream optimizer on identical RGB raw gradients | Pass; maximum parameter error 1.19e−7 |
 | Full learner states, eight losses, raw gradients, optimizer and EMA | **1,524 comparisons pass** |
 | Diagnostic raw-gradient capture leaves production execution unchanged | All **1,280 saved tensors**, batches and reports identical |
-| Native CPU tests / targeted Python tests / release Clippy / formatting | 93 / 56 pass; Clippy and formatting pass |
+| Native CPU tests / full Python tests / release Clippy / formatting | 93 / 941 pass; Clippy and formatting pass |
 
 Full-learner maximum relative L2 error is 1.03e−6 across losses and 3.24e−4
 across raw-gradient tensors. Maximum absolute parameter error is 1.19e−7 and
@@ -71,8 +71,8 @@ claim bitwise-equivalent independently evolving CUDA/Vulkan training.
 
 Synthetic checks do not cover long-horizon learning, replay sampling, environment
 collection or competence. No rewards, pretraining or gameplay aids are involved;
-there are no learning curves yet. The next step is one bounded paired small-model
-learning pilot, then unchanged qualifying pilots plus additional seeds within
+there are no learning curves yet. The next step is the [bounded Seaquest pair](../experiments/2026-09-30-small-replication.md),
+then unchanged qualifying pilots plus additional seeds within
 the **10-attempt total cap**. Reduced replay ratio/BPTT/capacity defines a new
 screening recipe, not an unchanged-learning optimization gain.
 
