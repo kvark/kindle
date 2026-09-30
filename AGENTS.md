@@ -57,8 +57,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   First20/last50 online means 83.0/328.8; 236 episodes, finite state, zero debt,
   guard/seal/counter audits pass. The successful pair takes 35m31s including
   construction (the interrupted 29 minutes remain extra). This qualifies the
-  cheap recipe, not seed-level superiority or frozen competence. Three attempts
-  used. Native seeds2017/3019 are needed under either proposed budget allocation;
+  cheap recipe, not seed-level superiority or frozen competence. Native seed2017
+  also passes: 200,000 actions / 49,939 updates in 27m02s, online scores 75.0→334.8.
+  Four attempts used. Native seed3019 is next under either proposed allocation;
   further upstream/JEPA allocation awaits the user's pending choice. See
   `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.

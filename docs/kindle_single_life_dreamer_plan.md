@@ -195,10 +195,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Fresh native attempt3 completes 200,000 actions / 49,939 updates in **26m10s**,
    **127.42 actions/s (1.06× real time per stream)**, with first20/last50 scores
    83.0/328.8. All audits pass; the successful pair takes 35m31s including
-   construction, plus the separately retained 29-minute interruption. **3/10
-   attempts used.** This qualifies the cheap recipe, not a statistically
-   established native advantage or frozen competence. Native seeds2017/3019
-   are next; the combined replication/JEPA budget allocation is awaiting the
+   construction, plus the separately retained 29-minute interruption. Native
+   seed2017 also passes in 27m02s, online scores 75.0→334.8. **4/10 attempts used.**
+   This qualifies the cheap recipe, not a statistically established native
+   advantage or frozen competence. Native seed3019 is next; the combined
+   replication/JEPA budget allocation is awaiting the
    user's choice. Multi-seed reliability and the frontend decision remain
    pending. The smaller recipe changes capacity/BPTT/replay
    ratio; it is not an unchanged-learning backend speedup.
