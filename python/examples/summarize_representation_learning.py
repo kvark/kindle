@@ -205,12 +205,24 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
             aggregate["final_hns"] = mean_ci([(r["curve"][-1]["score"]-random)/(human-random) for r in runs])
             aggregate["run_seconds"] = mean_ci([r["final"]["elapsed_seconds"] for r in runs])
         results.append(dict(method=method, game=game, aggregate=aggregate, runs=runs))
+    pairs = (("learned_cnn", "upstream"),) if replication else (
+        (("pretrained_tiny", "learned_cnn"), ("pretrained_tiny", "initial_tiny")) if small_representation else ())
+    paired_scores = []
+    for candidate, control in pairs:
+        for game in games:
+            candidates = {r["seed"]: r for r in groups.get((candidate, game), [])}
+            controls = {r["seed"]: r for r in groups.get((control, game), [])}
+            if set(candidates) == set(controls) == set(SEEDS):
+                paired_scores.append(dict(candidate=candidate, control=control, game=game, seeds=SEEDS,
+                    difference=mean_ci([candidates[s]["curve"][-1]["score"] - controls[s]["curve"][-1]["score"]
+                                        for s in SEEDS])))
     required = {(method, game, seed) for method in methods for game in games for seed in SEEDS}
     complete_status = "replication_complete" if replication else "learning_comparison_complete" if small_representation else "learning_matrix_complete"
     return dict(status=complete_status if required <= seen else "partial_learning_comparison",
                 comparison=comparison,
                 methods=methods, games=games, num_envs=streams,
                 phase2_complete=False, action_budget=budget, recipes=recipes, results=results,
+                paired_scores=paired_scores,
                 normalization=dict(formula="(score-random)/(human-random)", anchors=BASELINES, source=REFERENCE),
                 limits=["online last-50 completed episode means, not frozen competence",
                         "every episode and unfinished tail is retained; cutoffs are not silently removed",
@@ -246,6 +258,14 @@ def markdown(result, name):
                               for r in row['runs'])
         hns = f"{a['final_hns']['mean']:.4f}" if a else "—"
         lines.append(f"| {row['method']} | {row['game']} | {len(row['runs'])} | {score} | {hns} |")
+    if result.get("paired_scores"):
+        lines += ["", "Paired final-score differences (candidate minus control): resample the three learner-seed pairs,",
+                  "not episodes or independent method means. Small-seed intervals remain coarse.", "",
+                  "| Candidate − control | Game | Difference [95% CI] |", "| --- | --- | ---: |"]
+        for row in result["paired_scores"]:
+            d = row["difference"]
+            lines.append(f"| {row['candidate']} − {row['control']} | {row['game']} | "
+                         f"{d['mean']:.3f} [{d['ci95'][0]:.3f}, {d['ci95'][1]:.3f}] |")
     lines += ["", f"Human normalization uses [pinned upstream anchors]({REFERENCE}); 1 is the reference human, not mastery.",
               "", *[f"- {limit}." for limit in result["limits"]], ""]
     return "\n".join(lines)

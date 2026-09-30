@@ -69,7 +69,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
   Fresh split-kernel package Python tests pass (945); the expanded small JEPA
-  curve auditor passes 29 focused tests. CI234/235 pass on all platforms.
+  curve auditor passes 30 focused tests, including paired-seed score differences
+  that require all three pairs. CI237 passes for the completed learning report;
+  the subsequent analysis-only update is checked locally, CI pending.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

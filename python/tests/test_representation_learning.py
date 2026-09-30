@@ -242,6 +242,7 @@ def test_small_replication_requires_six_runs_not_the_cancelled_matrix(tmp_path):
     result = summarize(inputs, budget=32, replication=True)
     assert result["status"] == "replication_complete" and not result["phase2_complete"]
     assert len(result["results"]) == 2 and all(r["aggregate"] for r in result["results"])
+    assert result["paired_scores"][0]["difference"] == dict(mean=0., ci95=[0., 0.], seeds=[0., 0., 0.])
     assert "does not test JEPA" in " ".join(result["limits"])
     with pytest.raises(ValueError, match="unknown method"):
         summarize([("large", inputs[0][1])], budget=32, replication=True)
@@ -268,8 +269,8 @@ def test_interrupted_prefix_is_audited_but_never_counted_as_a_complete_run(tmp_p
         read_run(write(tmp_path, rows), allow_interrupted=True)
 
 
-def tiny_fixture(seed, method):
-    rows = fixture(seed, replication=True)
+def tiny_fixture(seed, method, *, reward=1.):
+    rows = fixture(seed, replication=True, reward=reward)
     rows[0]["config"].update(observation_kind="features", loss_scales=dict(reconstruction=0., future_prediction=.25))
     rows[0]["model_provenance"]["perception"] = dict(kind="levjepa-tiny", checkpoint_sha256=TINY_CHECKPOINTS[method])
     del rows[0]["learned_rgb_preprocessing"]
@@ -321,3 +322,18 @@ def test_small_representation_matches_optimizer_settings_across_frontends(tmp_pa
               ("pretrained_tiny", write(tmp_path, tiny, "tiny.jsonl"))]
     with pytest.raises(ValueError, match="shared learner"):
         summarize(inputs, budget=32, small_representation=True)
+
+
+def test_small_comparison_pairs_seeds_before_bootstrap_and_omits_incomplete_pairs(tmp_path):
+    inputs = []
+    for seed, baseline, gain in ((1009, 10., 1.), (2017, 100., 2.), (3019, 1000., 3.)):
+        for method, rows in (
+            ("learned_cnn", fixture(seed, replication=True, reward=baseline)),
+            ("pretrained_tiny", tiny_fixture(seed, "pretrained_tiny", reward=baseline + gain)),
+        ):
+            inputs.append((method, write(tmp_path, rows, f"{method}-{seed}.jsonl")))
+    result = summarize(list(reversed(inputs)), budget=32, small_representation=True)
+    assert result["paired_scores"] == [dict(candidate="pretrained_tiny", control="learned_cnn",
+        game="Seaquest", seeds=(1009, 2017, 3019), difference=dict(mean=6., ci95=[3., 9.], seeds=[3., 6., 9.]))]
+    assert "6.000 [3.000, 9.000]" in markdown(result, "data.json")
+    assert summarize(inputs[:-1], budget=32, small_representation=True)["paired_scores"] == []

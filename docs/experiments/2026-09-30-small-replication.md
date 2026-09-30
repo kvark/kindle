@@ -48,7 +48,9 @@ comparison. If learning is weak or cost excessive, diagnose/revise within the
 remaining ten attempts instead of blindly launching more identical runs.
 
 After three seeds, report per-seed curves and learner-seed bootstrap uncertainty
-using the existing curve format. Published Dreamer scores remain reference
+using the existing curve format. Final-score differences bootstrap the matched
+learner-seed pairs, not episodes or independently resampled method means; fewer
+than three complete pairs receive no comparison interval. Published Dreamer scores remain reference
 evidence under their own protocols, not expected scores for this smaller recipe.
 Lower replay ratio/BPTT/capacity is a changed recipe, **not** an optimization
 speedup over the cancelled 12M study. This pilot cannot settle JEPA's value.
