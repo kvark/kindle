@@ -199,7 +199,7 @@ def plot_svg(result):
     """Render audited online curves, using only the summary's measured support."""
     colors = dict(zip(METHODS, ("#0072b2", "#cc79a7", "#009e73", "#e69f00", "#d55e00")))
     labels = dict(zip(METHODS, ("Upstream Dreamer", "Large JEPA", "Pretrained Tiny", "Initial Tiny", "Joint RGB CNN")))
-    root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height="875", viewBox="0 0 1160 875",
+    root = ET.Element("svg", xmlns="http://www.w3.org/2000/svg", width="1160", height="895", viewBox="0 0 1160 895",
                       role="img", attrib={"aria-labelledby": "title description"})
 
     def add(tag, *, parent=root, text=None, **attrs):
@@ -211,14 +211,19 @@ def plot_svg(result):
     add("desc", id="description", text="Last-50 completed episode means, not frozen competence. "
         "Partial groups show individual learner seeds; complete three-seed groups show means and 95% bootstrap bands. "
         "No extrapolation beyond measured support. Missing scores are not zero.")
-    add("rect", width=1160, height=875, fill="white")
+    add("rect", width=1160, height=895, fill="white")
     add("style", text="text{font-family:sans-serif;font-size:12px;fill:#222} .heading{font-size:16px;font-weight:bold}")
     add("text", x=25, y=27, class_="heading", text="Phase 2 · online training scores (not frozen competence)")
-    add("text", x=25, y=48, text="Last-50 episode mean. Dashed: seed 1009 / 2017 / 3019. Solid + band: three-seed mean and 95% bootstrap CI.")
+    add("text", x=25, y=48, text="Last-50 episode mean. Dashed: individual learner seed. Solid + band: three-seed mean and 95% bootstrap CI.")
     for i, method in enumerate(METHODS):
         x = 25 + i * 225
         add("line", x1=x, x2=x+22, y1=71, y2=71, stroke=colors[method], stroke_width=3)
         add("text", x=x+28, y=75, text=labels[method])
+    dashes = dict(zip(SEEDS, ("8 3", "3 3", "9 3 2 3")))
+    for i, seed in enumerate(SEEDS):
+        x = 25 + i * 140
+        add("line", x1=x, x2=x+35, y1=95, y2=95, stroke="#444", stroke_width=2, stroke_dasharray=dashes[seed])
+        add("text", x=x+42, y=99, text=f"seed {seed}")
 
     for row_index, game in enumerate(BASELINES):
         groups = [g for g in result["results"] if g["game"] == game]
@@ -247,7 +252,7 @@ def plot_svg(result):
         low, high = low-margin, high+margin
         count = sum(len(g["runs"]) for g in groups)
         for column, traces in enumerate(panels):
-            left, top, width, height = 70 + column*575, 120 + row_index*250, 460, 170
+            left, top, width, height = 70 + column*575, 140 + row_index*250, 460, 170
             xmax = result["action_budget"]/1000 if column == 0 else max(
                 (p[0] for _, _, points in traces for p in points), default=1)
             xmax = max(xmax, 1e-9)
@@ -272,7 +277,7 @@ def plot_svg(result):
                 if seed is None:
                     band = [xy(p[0], p[2]) for p in points] + [xy(p[0], p[3]) for p in reversed(points)]
                     add("polygon", parent=trace, points=" ".join(band), fill=colors[method], fill_opacity=.12)
-                dash = "none" if seed is None else ("8 3", "3 3", "9 3 2 3")[SEEDS.index(seed)]
+                dash = "none" if seed is None else dashes[seed]
                 add("polyline", parent=trace, points=" ".join(xy(p[0], p[1]) for p in points),
                     fill="none", stroke=colors[method], stroke_width=2, stroke_dasharray=dash)
                 if len(points) == 1:
@@ -280,7 +285,7 @@ def plot_svg(result):
                     add("circle", parent=trace, cx=x, cy=y, r=3, fill=colors[method])
             if not any(points for _, _, points in traces):
                 add("text", x=left+width/2, y=top+height/2, text_anchor="middle", text="No completed-episode scores yet")
-    add("text", x=25, y=864, text="All episodes (including cutoffs) and unfinished tails remain in JSON. Time means use common measured seed support.")
+    add("text", x=25, y=884, text="All episodes (including cutoffs) and unfinished tails remain in JSON. Time means use common measured seed support.")
     return ET.tostring(root, encoding="unicode") + "\n"
 
 
