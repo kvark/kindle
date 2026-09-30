@@ -41,6 +41,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   paired learner seeds (six runs); at most four additional pilot/debug runs.
   Reuse qualifying pilot results when the recipe is unchanged. Do not silently
   extend the cap or follow it with another large JEPA matrix.
+  The first small upstream Seaquest pilot completes 200,000 actions / 49,939
+  updates in 516.71s plus 39.70s construction; first20/last50 online scores
+  57.0/292.4. This is provisional one-seed learning evidence. The native pair
+  is attempt2/10; see `docs/results/2026-09-30-small-replication-learning.md`
+  and PR31 for live state. Full fresh-package Python tests pass (941).
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

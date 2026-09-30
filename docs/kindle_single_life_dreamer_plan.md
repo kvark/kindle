@@ -184,6 +184,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    scores as references; do not recreate its full benchmark. Larger runs are
    confirmation of promising results, not the development default. See the
    [revised acceptance criteria](strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).
+   The [first small upstream Seaquest pilot](results/2026-09-30-small-replication-learning.md)
+   completes 200,000 actions / 49,939 updates in **8m37s**, plus40s construction.
+   First20/last50 online means are57.0/292.4. Native replication and multi-seed
+   reliability remain pending. This faster recipe changes capacity/BPTT/replay
+   ratio; it is not an unchanged-learning backend speedup.
 
    **Evidence retained from the original study:**
    The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
