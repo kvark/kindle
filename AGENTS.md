@@ -31,9 +31,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Raw-gradient diagnostic capture preserves all 1,280 saved production tensors.
   See `docs/results/2026-09-30-small-dreamer-replication.md` for methodology and
   retained near-zero-gradient sensitivity. These are synthetic tests, not
-  learning. New GPU work remains serial and guarded. Next qualify a
-  Size1M batched learning screen, targeting a sub-hour comparison; establish
-  that upstream actually learns at the selected capacity/budget. Published
+  learning. New GPU work remains serial and guarded. The Size1M batched
+  learning pilot below now meets the sub-hour comparison target and shows
+  useful upstream learning at the selected capacity/budget. Published
   Dreamer Atari scores are reference evidence, not something to rediscover.
   Local controls need only establish the smaller/custom protocol and our port.
   The user caps the new replication round at **10 training runs total**, across
@@ -52,12 +52,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   72.62→30.58ms (2.37x) at unchanged learning settings. Independent F64 checks,
   68 raw-gradient and 292 saved-state comparisons pass. Unsplit long reductions
   match sequential F32 exactly but fail the stricter F64 gate; the chosen splits
-  pass without relaxing it. This is not yet gameplay speed or learning parity.
-  Next run a fresh native seed1009 pilot, not a checkpoint resume; the cap stands
-  at2/10 until launch. See `docs/results/2026-09-30-small-rgb-profile.md`,
+  pass without relaxing it. Fresh native attempt3 completes 200,000 actions /
+  49,939 updates in 1,569.60s: 127.42 actions/s, 1.06x real time per stream.
+  First20/last50 online means 83.0/328.8; 236 episodes, finite state, zero debt,
+  guard/seal/counter audits pass. The successful pair takes 35m31s including
+  construction (the interrupted 29 minutes remain extra). This qualifies the
+  cheap recipe, not seed-level superiority or frozen competence. Three attempts
+  used. Native seeds2017/3019 are needed under either proposed budget allocation;
+  further upstream/JEPA allocation awaits the user's pending choice. See
+  `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
-  Fresh split-kernel package Python tests pass (945); CI230 passes all platforms
-  for the earlier replication implementation. Split-kernel CI is pending.
+  Fresh split-kernel package Python tests pass (945); the expanded small JEPA
+  curve auditor passes 29 focused tests. CI234/235 pass on all platforms.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

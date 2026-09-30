@@ -84,8 +84,16 @@ Meganeura `75d08173` exposes opt-in, budgeted lowering using existing kernels.
 Kindle enables it for low-parallelism training convolutions: eight gradients
 split in this fixture, at most512 reduction positions per partition and64MiB
 logical partial storage. This changes summation order, not pixels, model
-capacity, losses or replay ratio. A **fresh** gameplay pilot must now establish
-actual throughput and learning; the interrupted checkpoint is not resumed.
+capacity, losses or replay ratio. The gameplay pilot starts **fresh**;
+the interrupted checkpoint is not resumed.
+
+That [fresh gameplay pilot](2026-09-30-small-replication-learning.md) now passes:
+200,000 actions / 49,939 updates in 26m10s, 127.42 actions/s. At the common 90,112-action
+prefix, the old/new runs each complete 22,467 updates in 1,756.32/705.40s: **2.49×
+actual throughput** at the same recipe and seed. Floating summation changes
+later trajectories; this is not a claim of identical learning. The new run's
+first20/last50 online means are 83.0/328.8, with all 236 episodes/tails retained,
+finite checkpoints, zero debt and passing guard/seal/counter audits.
 
 [Compact data](2026-09-30-small-rgb-profile.json) ·
 [Raw profiles](../../runs/small-dreamer-replication-20260930.vRE7ag/world-profile-8lcscp1o/profile/profiles).

@@ -71,3 +71,11 @@ medians improve72.62→30.58ms. The summation order changes, not model capacity,
 pixel processing, optimizer, loss or replay ratio. The fresh gameplay pilot
 must verify actual throughput and learning before more seeds are scheduled.
 [Evidence and retained diagnostic failures](../results/2026-09-30-small-rgb-profile.md).
+
+**Pilot outcome:** the fresh native run completes 200,000 actions / 49,939 updates
+in 26m10s, at 127.42 actions/s. Its online first20/last50 means rise from 83.0 to
+328.8; all completion audits pass. The successful upstream/native pair takes
+35m31s including construction, meeting the sub-hour target. The interrupted
+29 minutes remain extra compute and a counted attempt: **3/10 used**. This
+qualifies the recipe for additional seeds, not frozen competence or a native
+performance advantage. [Curves and audits](../results/2026-09-30-small-replication-learning.md).

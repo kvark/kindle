@@ -9,6 +9,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 
 | Method | Game | Seeds | Final score [95% CI] | Human-normalized |
 | --- | --- | ---: | ---: | ---: |
+| learned_cnn | Seaquest | 1 | 1009: 328.800 | — |
 | upstream | Seaquest | 1 | 1009: 292.400 | — |
 
 Human normalization uses [pinned upstream anchors](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml); 1 is the reference human, not mastery.
@@ -29,19 +30,24 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 
 | Method | Seed | First20 score | Last50 score | Run + construction seconds | Actions/s | Per-stream real time |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| upstream | 1009 | 57.00 | 292.40 | 516.71 + 39.70 | 387.06 | 3.23x |
+| learned_cnn | 1009 | 83.00 | 328.80 | 1569.60 + 5.36 | 127.42 | 1.06x |
+| upstream | 1009 | 57.00 | 292.40 | 516.71 + 39.70 | 387.06 | 3.22x |
 
-**1 completed; 2/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
+**2 completed; 3/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
 First20 versus last50 is descriptive within a changing policy, not an independent-seed significance test.
 All completed guards/checkpoints/counters pass. Vulkan headroom is estimated; JAX reserves a 50% pool.
 GPU utilization is unmeasured. Lower replay ratio/model size/BPTT is a new recipe, not a port optimization gain.
 [Protocol](../experiments/2026-09-30-small-replication.md) · [Numerical checks](2026-09-30-small-dreamer-replication.md).
 
-## Native pilot: throughput qualification failed
+The successful seed1009 pair takes **35m31s including construction**, meeting the sub-hour screening target.
+The interrupted pilot adds29 minutes separately. Both successful runs complete200,000 actions /49,939 updates with zero debt.
+These rising online curves qualify the recipe for further seeds, not a statistically established native advantage.
+
+## Retained attempt2: throughput qualification failed
 
 Stopped early at **90,264 actions / 22,505 updates** after **1759.31s**: sustained **51.31 actions/s** projects beyond the declared one-hour deadline.
 The direct worker handled SIGTERM, saved its checkpoint and exited zero. Guard/seal, complete-prefix trajectories/counters and finite-checkpoint audits pass.
 The controller correctly fails its200,000-action completion check. This is an operator stop, not a GPU/kernel fault or a completed matched learning run.
 All120 completed episodes and unfinished tails remain in JSON; final online last50 score is257.60 at this **smaller interaction budget**.
 The interrupted prefix is shown separately and excluded from completed-run aggregates. Its29 minutes and one attempt still count.
-World updates dominate the recorded cost; profile them before any further training. No deadline or action budget was relaxed.
+The subsequent [profile and split-reduction qualification](2026-09-30-small-rgb-profile.md) addresses that bottleneck. Any replacement starts fresh; no deadline or action budget was relaxed.

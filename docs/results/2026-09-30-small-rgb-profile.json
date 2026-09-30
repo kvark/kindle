@@ -1,6 +1,6 @@
 {
   "date": "2026-09-30",
-  "status": "split_reductions_qualified_for_fresh_gameplay_pilot",
+  "status": "split_reductions_pass_fresh_gameplay_pilot",
   "config": {"model_size": "Size1M", "observation_kind": "rgb64", "batch_size": 8, "batch_length": 16, "world_backprop_length": 16, "world_microbatch_size": 8, "imagination_length": 15, "precision": "F32", "synthetic_fixture_seed": 701},
   "runtime": {"device": "RTX5080", "driver": "580.178.04", "meganeura": "22c31b94", "blade": "7cca6377", "separate_nvml": false, "sm_utilization": null},
   "guard_passed": true,
@@ -61,5 +61,15 @@
     "superseded_timing": {"artifact": "runs/small-dreamer-replication-20260930.vRE7ag/split-update-yzb97w77", "guard_passed": true, "reason": "candidate harvested timestamps while rebuilt world control did not; numerical checks retained, timing superseded"},
     "limits": "synthetic resident batches, no replay sampling or gameplay; first-step parity does not claim bitwise subsequent learning"
   },
-  "limits": ["synthetic resident inputs, not gameplay", "initial dispatch profile excludes optimizer/AGC; whole-update comparison includes them", "instrumented intervals are not additive ordinary execution time", "GPU timestamps are not SM utilization", "no gameplay speedup or Phase2 completion claimed"]
+  "gameplay_check": {
+    "artifact": "runs/small-dreamer-replication-20260930.vRE7ag/learning-03-native-seaquest-1009",
+    "actions": 200000, "updates": 49939, "seconds": 1569.6032897229888, "actions_per_second": 127.42073191965402,
+    "guard_passed": true, "counter_and_finite_checkpoint_audits_passed": true,
+    "online_first20_last50": [83.0,328.8],
+    "matched_prefix_actions": 90112, "matched_prefix_updates": 22467,
+    "unsplit_prefix_seconds": 1756.3199871629768, "split_prefix_seconds": 705.4010521019809,
+    "matched_prefix_throughput_ratio": 2.4898176461878356,
+    "limits": "same recipe/seed and actual-action prefix; changed summation order changes later trajectories; one seed, not learning superiority"
+  },
+  "limits": ["synthetic profile separated from fresh gameplay check", "initial dispatch profile excludes optimizer/AGC; whole-update comparison includes them", "instrumented intervals are not additive ordinary execution time", "GPU timestamps are not SM utilization", "one-seed learning check, not Phase2 completion"]
 }
