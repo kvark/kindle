@@ -245,3 +245,52 @@ fn export_upstream_fixed_batch_reference() {
         check_device(&core);
     }
 }
+
+#[test]
+#[ignore = "requires GPU timestamps; synthetic batch only, no environment or replay resume"]
+fn profile_fixed_batch_checkpoint() {
+    use meganeura::data::safetensors::SafeTensorsModel;
+    let source = std::env::var_os("KINDLE_DREAMER_PROFILE_SOURCE").unwrap();
+    let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_DIR").unwrap());
+    std::fs::create_dir(&root).unwrap();
+    let mut core = DreamerCore::restore(source).unwrap();
+    let config = core.config.clone();
+    assert_eq!(config.observation_kind, crate::ObservationKind::Rgb64);
+    let memory = core.gpu_memory_budget();
+    assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+    if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+        assert_eq!(core.gpu_device().device_name, expected);
+        assert!(!core.gpu_device().is_software_emulated);
+    }
+    let mut rng = StdRng::seed_from_u64(701);
+    let batch = fixture(&config, &mut rng);
+    let posterior = core.sample_posterior_batch(&batch);
+    let targets = core.imagine_and_target(&batch, &posterior);
+    core.train_world(&batch, &posterior, &targets);
+    core.sync_world_inference();
+    core.train_behavior(&targets);
+    core.sync_behavior_inference();
+    core.learner_step += 1;
+    checkpoint(&mut core, &root.join("before"));
+    core.profile_sessions(root.join("profiles")).unwrap();
+    checkpoint(&mut core, &root.join("after"));
+    for component in ["world", "behavior", "slow"] {
+        let before =
+            SafeTensorsModel::load(root.join("before").join(format!("{component}.safetensors")))
+                .unwrap();
+        let after =
+            SafeTensorsModel::load(root.join("after").join(format!("{component}.safetensors")))
+                .unwrap();
+        assert_eq!(before.tensor_info().len(), after.tensor_info().len());
+        for name in before.tensor_info().keys() {
+            assert_eq!(
+                before.tensor_f32(name).unwrap(),
+                after.tensor_f32(name).unwrap(),
+                "{name}"
+            );
+        }
+    }
+    let memory = core.gpu_memory_budget();
+    assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+    save_json(&root.join("config.json"), &config);
+}

@@ -43,9 +43,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   extend the cap or follow it with another large JEPA matrix.
   The first small upstream Seaquest pilot completes 200,000 actions / 49,939
   updates in 516.71s plus 39.70s construction; first20/last50 online scores
-  57.0/292.4. This is provisional one-seed learning evidence. The native pair
-  is attempt2/10; see `docs/results/2026-09-30-small-replication-learning.md`
-  and PR31 for live state. Full fresh-package Python tests pass (941).
+  57.0/292.4. This is provisional one-seed learning evidence. Native attempt2
+  was stopped cleanly at90,264 actions /22,505 updates:51.31 actions/s projects
+  beyond the declared one-hour deadline. Guard, complete-prefix counters and
+  finite checkpoint pass; this is not a native/kernel fault or a completed
+  matched run. World updates dominate (~55/74ms). Profile that bottleneck with
+  synthetic batches before more gameplay; the cap stands at2/10. See
+  `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
+  Full fresh-package Python tests pass (941); CI230 passes all platforms.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

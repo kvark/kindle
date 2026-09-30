@@ -27,7 +27,7 @@ def reject_constant(value):
     raise ValueError(f"nonfinite JSON: {value}")
 
 
-def read_run(path):
+def read_run(path, *, allow_interrupted=False):
     """Stream raw transitions to independently reconcile returns and boundaries."""
     episodes, curve, pending = [], [], {}
     header, final, actual, first_update = None, None, 0, None
@@ -94,13 +94,16 @@ def read_run(path):
                 if seconds < previous_seconds:
                     raise ValueError("elapsed time moved backward")
                 previous_seconds = seconds
-    if (final is None or final["reason"] != "budget_complete" or actual != header["steps"] or
+    complete = final is not None and final["reason"] == "budget_complete" and actual == header["steps"]
+    interrupted = (allow_interrupted and final is not None and final["reason"] == "interrupted" and
+                   0 < actual < header["steps"])
+    if (not (complete or interrupted) or
             final["learner_updates"] != final["learner_step"] or first_update is None):
         raise ValueError("incomplete fresh training run")
     first_update = final.get("first_training_action", first_update)
     if final["learner_updates"] != 1 + (actual - first_update) // 4:
         raise ValueError("updates disagree with actual-action credit")
-    return dict(seed=header["seed"], header=header, final=final, source_sha256=digest.hexdigest(),
+    return dict(seed=header["seed"], complete=complete, header=header, final=final, source_sha256=digest.hexdigest(),
                 first_training_action=first_update, curve=curve, episodes=episodes)
 
 
@@ -256,6 +259,8 @@ def plot_svg(result):
 
     for row_index, game in enumerate(games):
         groups = [g for g in result["results"] if g["game"] == game]
+        partials = [p for p in result.get("interrupted_runs", []) if p["game"] == game]
+        groups += [dict(method=p["method"], aggregate=None, runs=[p["run"]]) for p in partials]
         panels = []
         for axis in ("actions", "time"):
             key = "actions" if axis == "actions" else "seconds"
@@ -289,7 +294,9 @@ def plot_svg(result):
             def xy(x, y):
                 return f"{left+width*x/xmax:.2f},{top+height*(high-y)/(high-low):.2f}"
 
-            add("text", x=left, y=top-13, class_="heading", text=f"{game} · {count}/{3*len(methods)} runs")
+            count_label = (f"{count-len(partials)}/{3*len(methods)} complete + {len(partials)} interrupted" if partials else
+                           f"{count}/{3*len(methods)} runs")
+            add("text", x=left, y=top-13, class_="heading", text=f"{game} · {count_label}")
             for tick in range(5):
                 fraction = tick/4
                 x, y = left+width*fraction, top+height*(1-fraction)

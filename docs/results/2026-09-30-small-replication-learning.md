@@ -36,3 +36,12 @@ First20 versus last50 is descriptive within a changing policy, not an independen
 All completed guards/checkpoints/counters pass. Vulkan headroom is estimated; JAX reserves a 50% pool.
 GPU utilization is unmeasured. Lower replay ratio/model size/BPTT is a new recipe, not a port optimization gain.
 [Protocol](../experiments/2026-09-30-small-replication.md) · [Numerical checks](2026-09-30-small-dreamer-replication.md).
+
+## Native pilot: throughput qualification failed
+
+Stopped early at **90,264 actions / 22,505 updates** after **1759.31s**: sustained **51.31 actions/s** projects beyond the declared one-hour deadline.
+The direct worker handled SIGTERM, saved its checkpoint and exited zero. Guard/seal, complete-prefix trajectories/counters and finite-checkpoint audits pass.
+The controller correctly fails its200,000-action completion check. This is an operator stop, not a GPU/kernel fault or a completed matched learning run.
+All120 completed episodes and unfinished tails remain in JSON; final online last50 score is257.60 at this **smaller interaction budget**.
+The interrupted prefix is shown separately and excluded from completed-run aggregates. Its29 minutes and one attempt still count.
+World updates dominate the recorded cost; profile them before any further training. No deadline or action budget was relaxed.

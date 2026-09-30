@@ -245,3 +245,24 @@ def test_small_replication_requires_six_runs_not_the_cancelled_matrix(tmp_path):
     assert "does not test JEPA" in " ".join(result["limits"])
     with pytest.raises(ValueError, match="unknown method"):
         summarize([("large", inputs[0][1])], budget=32, replication=True)
+
+
+def test_interrupted_prefix_is_audited_but_never_counted_as_a_complete_run(tmp_path):
+    rows = fixture(replication=True)
+    rows[0]["steps"] = 200000
+    rows[-1]["reason"] = "interrupted"
+    path = write(tmp_path, rows)
+    with pytest.raises(ValueError, match="incomplete"):
+        read_run(path)
+    run = read_run(path, allow_interrupted=True)
+    assert not run["complete"] and run["final"]["run_step"] == 32
+    assert len(run["episodes"]) == 8 and run["final"]["partial_lengths"] == [1]*8
+    plot = dict(results=[], interrupted_runs=[dict(method="learned_cnn", game="Seaquest", run=run)],
+                methods=("upstream", "learned_cnn"), games=("Seaquest",), num_envs=8,
+                comparison="small_replication", action_budget=200000)
+    assert "0/6 complete + 1 interrupted" in plot_svg(plot)
+    with pytest.raises(ValueError, match="incomplete"):
+        summarize([("learned_cnn", path)], budget=200000, replication=True)
+    rows[-1]["total_rewards"][0] = -999
+    with pytest.raises(ValueError, match="transitions"):
+        read_run(write(tmp_path, rows), allow_interrupted=True)

@@ -186,8 +186,12 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    [revised acceptance criteria](strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).
    The [first small upstream Seaquest pilot](results/2026-09-30-small-replication-learning.md)
    completes 200,000 actions / 49,939 updates in **8m37s**, plus40s construction.
-   First20/last50 online means are57.0/292.4. Native replication and multi-seed
-   reliability remain pending. This faster recipe changes capacity/BPTT/replay
+   First20/last50 online means are57.0/292.4. Native attempt2 was stopped at
+   90,264 actions:51.31 actions/s projects beyond its one-hour deadline. Its
+   guard, complete-prefix ledger and finite checkpoint pass, but it is not a
+   completed matched run. Profile world updates (~55 of74ms) before spending
+   more gameplay attempts;2/10 are used. Native replication and multi-seed
+   reliability remain pending. The smaller recipe changes capacity/BPTT/replay
    ratio; it is not an unchanged-learning backend speedup.
 
    **Evidence retained from the original study:**
