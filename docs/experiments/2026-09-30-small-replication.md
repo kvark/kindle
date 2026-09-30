@@ -55,3 +55,19 @@ speedup over the cancelled 12M study. This pilot cannot settle JEPA's value.
 
 Execution/artifacts: `runs/small-dreamer-replication-20260930.vRE7ag/learning-*`.
 Current done/running/next and attempt count stay in [PR31](https://github.com/kvark/kindle/pull/31).
+
+## Reviewed throughput replacement (September 30)
+
+Attempt1's upstream control completes in8m37s. Attempt2's native control is
+retained as an operator interruption at90,264 actions; its51.31 actions/s
+projected beyond the unchanged one-hour deadline. It still consumes an attempt.
+The replacement starts fresh at seed1009 with **identical learning settings**,
+not replay/checkpoint continuation. Upstream attempt1 remains the paired control.
+
+Meganeura `75d08173` uses existing split-reduction kernels for low-parallelism
+convolution gradients, with512-position partitions and64MiB logical partial
+budget. Independent F64 and full-update checks pass; matched synthetic update
+medians improve72.62→30.58ms. The summation order changes, not model capacity,
+pixel processing, optimizer, loss or replay ratio. The fresh gameplay pilot
+must verify actual throughput and learning before more seeds are scheduled.
+[Evidence and retained diagnostic failures](../results/2026-09-30-small-rgb-profile.md).

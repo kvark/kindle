@@ -1,6 +1,6 @@
 {
   "date": "2026-09-30",
-  "status": "bottleneck_identified_not_optimized",
+  "status": "split_reductions_qualified_for_fresh_gameplay_pilot",
   "config": {"model_size": "Size1M", "observation_kind": "rgb64", "batch_size": 8, "batch_length": 16, "world_backprop_length": 16, "world_microbatch_size": 8, "imagination_length": 15, "precision": "F32", "synthetic_fixture_seed": 701},
   "runtime": {"device": "RTX5080", "driver": "580.178.04", "meganeura": "22c31b94", "blade": "7cca6377", "separate_nvml": false, "sm_utilization": null},
   "guard_passed": true,
@@ -23,5 +23,43 @@
     {"batch": 128, "input_channels": 12, "output_channels": 8, "side": 32, "kernel": 5, "workgroups": [19,1,1], "profiled_median_ms": 4.458464}
   ],
   "artifact_root": "runs/small-dreamer-replication-20260930.vRE7ag/world-profile-8lcscp1o",
-  "limits": ["synthetic resident inputs, not gameplay", "no optimizer/AGC passes in captured training sessions", "instrumented intervals are not additive ordinary execution time", "GPU timestamps are not SM utilization", "no speedup or Phase2 completion claimed"]
+  "split_diagnostics": [
+    {"artifact": "runs/small-dreamer-replication-20260930.vRE7ag/world-splits-xxgm4ccn", "status": "cpu_pipeline_lookup_panic", "guard_passed": false, "child_exit_code": 101, "unfinished_children": [], "kernel_fault_observed": false, "snapshot_output_capped": true},
+    {"artifact": "runs/small-dreamer-replication-20260930.vRE7ag/world-splits-_9lhy099", "meganeura": "101443fc", "status": "both_unsplit_controls_rejected_by_strict_f64_gate", "guard_passed": true, "complete_saved_tensors_unchanged": true, "candidate_qualified": false, "candidate_timing_available": false},
+    {"artifact": "runs/small-dreamer-replication-20260930.vRE7ag/split-regression-r7zlw7rm", "status": "passed", "guard_passed": true, "tiles": [16,32,64], "splits": [2,3,7,8], "checks": "independent F64 outputs/partials, optimizer updates, unchanged live state/plan, aliasing and scratch limits"}
+  ],
+  "independent_long_reduction_check": {
+    "artifact": "runs/small-dreamer-replication-20260930.vRE7ag/split-oracle-8pi02mg8",
+    "guard_passed": true, "test_seconds": 5.31,
+    "inputs": "independent LCG: x seed7, dy seed37; ordinary and 1e-12 gradient scales",
+    "reference": "independent nested NCHW loops, F64 whole/partial sums plus sequential separate/FMA F32 whole sums",
+    "all_unsplit_outputs_match_sequential_f32_exactly": true,
+    "original_gate": "every final/partial element: abs <= scale*1e-5 + abs(reference)*2e-4; relative L2 <= 2e-4",
+    "split_counts": [1,64,1024], "both_shapes_qualified": [false,false,true],
+    "relative_l2_unsplit_range": [0.000012482020207322457,0.000014725103142844313],
+    "relative_l2_split1024_range": [0.00000043207860939096015,0.00000046000782581478174],
+    "sequence_wall_median_ms": [
+      {"channels": [3,8], "unsplit": 18.678239, "split64": 0.647021, "split1024": 0.5436595},
+      {"channels": [8,3], "unsplit": 18.755954, "split64": 1.2649065, "split1024": 1.196961}
+    ],
+    "limits": "isolated resident sequences, not whole-update or gameplay speed; unsplit/64 fail the strict numerical gate; no gate relaxed"
+  },
+  "whole_update_comparison": {
+    "artifact": "runs/small-dreamer-replication-20260930.vRE7ag/split-update-sef9lobf",
+    "meganeura": "75d0817313660ff9783bd7cb97c1b93660ca2231", "guard_passed": true,
+    "extra_reduction_dispatches": 8, "reduction_chunk": 512, "max_partial_bytes": 67108864,
+    "gpu_timestamps": false, "cpu_equivalents": 2,
+    "warmup_updates_per_arm": 2, "paired_samples": 8, "alternating_order": true,
+    "unsplit_wall_ms": [72.824098,72.620026,72.588026,72.613447,71.803259,71.777859,73.162641,72.814919],
+    "split_wall_ms": [31.313803,31.300333,29.441437,29.694958,30.254783,29.512147,32.066061,30.91036],
+    "unsplit_median_ms": 72.6167365, "split_median_ms": 30.5825715, "speedup": 2.3744483520622195,
+    "first_step_reports_exact": true, "raw_gradient_tensors_checked": 68,
+    "raw_gradients_max_abs": 0.022613525390625, "raw_gradients_max_relative_l2": 0.00005264195233151926,
+    "first_step_saved_tensors_checked": 292, "state_max_abs": 0.000020563602447509766, "state_max_relative_l2": 0.000016257369737480572,
+    "tensor_gate": "max_abs <= 1e-6 OR relative L2 <= 2e-4, finite values and matching shapes/names",
+    "final_optimizer_steps": [22515,22515], "final_checkpoints_finite": true,
+    "superseded_timing": {"artifact": "runs/small-dreamer-replication-20260930.vRE7ag/split-update-yzb97w77", "guard_passed": true, "reason": "candidate harvested timestamps while rebuilt world control did not; numerical checks retained, timing superseded"},
+    "limits": "synthetic resident batches, no replay sampling or gameplay; first-step parity does not claim bitwise subsequent learning"
+  },
+  "limits": ["synthetic resident inputs, not gameplay", "initial dispatch profile excludes optimizer/AGC; whole-update comparison includes them", "instrumented intervals are not additive ordinary execution time", "GPU timestamps are not SM utilization", "no gameplay speedup or Phase2 completion claimed"]
 }

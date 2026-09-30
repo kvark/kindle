@@ -189,8 +189,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    First20/last50 online means are57.0/292.4. Native attempt2 was stopped at
    90,264 actions:51.31 actions/s projects beyond its one-hour deadline. Its
    guard, complete-prefix ledger and finite checkpoint pass, but it is not a
-   completed matched run. Profile world updates (~55 of74ms) before spending
-   more gameplay attempts;2/10 are used. Native replication and multi-seed
+   completed matched run. The [profile and qualified split reductions](results/2026-09-30-small-rgb-profile.md)
+   reduce synthetic full updates **72.62→30.58ms (2.37×)** without changing the
+   learning recipe; independent F64, raw-gradient and saved-state checks pass.
+   Fresh native seed1009 is next, not a checkpoint resume;2/10 attempts are used.
+   Actual gameplay speed, native learning replication and multi-seed
    reliability remain pending. The smaller recipe changes capacity/BPTT/replay
    ratio; it is not an unchanged-learning backend speedup.
 

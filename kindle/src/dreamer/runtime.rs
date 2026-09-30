@@ -20,6 +20,16 @@ pub(crate) fn build_session(
         SessionConfig {
             mode,
             gpu: Some(Arc::clone(gpu)),
+            options: meganeura::CompileOptions {
+                conv_weight_splits: (mode == Mode::Training).then_some(
+                    meganeura::compile::ConvWeightSplits {
+                        workgroup_threshold: 48,
+                        reduction_chunk: 512,
+                        max_partial_bytes: 64 << 20,
+                    },
+                ),
+                ..Default::default()
+            },
             skip_full_optimize: mode == Mode::Training && skip_full_optimize,
             runtime: meganeura::SessionOptions {
                 gpu_timing: meganeura::GpuOptions::from_env().timing,

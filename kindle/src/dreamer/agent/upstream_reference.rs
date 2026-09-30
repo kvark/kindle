@@ -294,3 +294,188 @@ fn profile_fixed_batch_checkpoint() {
     assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
     save_json(&root.join("config.json"), &config);
 }
+
+#[test]
+#[ignore = "paired synthetic full-update timing and split-reduction parity; no gameplay"]
+fn compare_split_world_updates() {
+    let source =
+        std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_SOURCE").unwrap());
+    let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_DIR").unwrap());
+    std::fs::create_dir(&root).unwrap();
+    let mut control = DreamerCore::restore(&source).unwrap();
+    let mut candidate = DreamerCore::restore(&source).unwrap();
+    let graph = world::build_training_graph(
+        &world_training_config(&control.config),
+        control.config.world_backprop_length,
+    );
+    let mut unsplit = meganeura::build(
+        &graph,
+        meganeura::SessionConfig {
+            gpu: Some(Arc::clone(&control.gpu)),
+            skip_full_optimize: control.config.skip_full_optimize,
+            ..Default::default()
+        },
+    )
+    .0;
+    checkpoint::load_session(&mut unsplit, &source.join(CHECKPOINT_WORLD)).unwrap();
+    for target in [
+        &mut control.world_posterior,
+        &mut control.world_observe_live,
+        &mut control.imagination,
+        &mut control.world_transition_live,
+        &mut control.world_heads_live,
+    ] {
+        share_matching(&mut unsplit, target, "world.");
+    }
+    share_matching(&mut control.behavior_train, &mut unsplit, "behavior.value.");
+    unsplit.set_submission_chunks(4);
+    control.world_train = unsplit;
+    let extra_dispatches =
+        candidate.world_train.plan().dispatches.len() - control.world_train.plan().dispatches.len();
+    assert!(extra_dispatches >= 2);
+    let check_device = |core: &DreamerCore| {
+        assert_eq!(
+            core.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!core.gpu_device().is_software_emulated);
+        let memory = core.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+    };
+    check_device(&control);
+    check_device(&candidate);
+    let mut rng = StdRng::seed_from_u64(701);
+    let mut timing = [Vec::new(), Vec::new()];
+    let mut numerical = Vec::new();
+    for step in 0..10 {
+        let batch = fixture(&control.config, &mut rng);
+        let mut reports = [serde_json::Value::Null, serde_json::Value::Null];
+        let mut raw = Vec::new();
+        let mut cores = [(0, &mut control), (1, &mut candidate)];
+        if step % 2 != 0 {
+            cores.swap(0, 1);
+        }
+        for (index, core) in cores {
+            let before = (step == 0).then(|| weights(&core.world_train));
+            let start = std::time::Instant::now();
+            let posterior = core.sample_posterior_batch(&batch);
+            let targets = core.imagine_and_target(&batch, &posterior);
+            let world = core.train_world(&batch, &posterior, &targets);
+            core.sync_world_inference();
+            let behavior = core.train_behavior(&targets);
+            core.sync_behavior_inference();
+            core.learner_step += 1;
+            let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+            if step >= 2 {
+                timing[index].push(elapsed_ms);
+            }
+            reports[index] = serde_json::json!({"world": world, "behavior": behavior});
+            if let Some(before) = before {
+                raw.push(raw_world_gradients(core, before));
+            }
+        }
+        if step == 0 {
+            assert_eq!(
+                reports[0], reports[1],
+                "forward losses/targets before the first update"
+            );
+            assert_eq!(
+                raw[0].keys().collect::<Vec<_>>(),
+                raw[1].keys().collect::<Vec<_>>()
+            );
+            for (name, a) in &raw[0] {
+                let b = &raw[1][name];
+                assert_eq!(a.len(), b.len(), "{name}");
+                let max_abs = a
+                    .iter()
+                    .zip(b)
+                    .map(|(a, b)| (a - b).abs())
+                    .fold(0.0f32, f32::max);
+                let error = a
+                    .iter()
+                    .zip(b)
+                    .map(|(&a, &b)| (f64::from(a) - f64::from(b)).powi(2))
+                    .sum::<f64>()
+                    .sqrt();
+                let norm = a.iter().map(|&x| f64::from(x).powi(2)).sum::<f64>().sqrt();
+                assert!(b.iter().all(|x| x.is_finite()));
+                assert!(
+                    max_abs <= 1e-6 || error <= 2e-4 * norm,
+                    "{name}: max_abs={max_abs:e}, relative_l2={:e}",
+                    error / norm
+                );
+                numerical.push(serde_json::json!({"name": name, "max_abs": max_abs, "relative_l2": error / norm.max(1e-30)}));
+            }
+            checkpoint(&mut control, &root.join("control-first"));
+            checkpoint(&mut candidate, &root.join("candidate-first"));
+        }
+        save_json(&root.join(format!("step{step}.json")), &reports);
+    }
+    checkpoint(&mut control, &root.join("control-final"));
+    checkpoint(&mut candidate, &root.join("candidate-final"));
+    let mut state_checks = 0;
+    for component in ["world", "behavior", "slow"] {
+        use meganeura::data::safetensors::SafeTensorsModel;
+        let load = |arm: &str, stage: &str| {
+            SafeTensorsModel::load(root.join(format!("{arm}-{stage}/{component}.safetensors")))
+                .unwrap()
+        };
+        let a = load("control", "first");
+        let b = load("candidate", "first");
+        assert_eq!(
+            a.tensor_info()
+                .keys()
+                .collect::<std::collections::BTreeSet<_>>(),
+            b.tensor_info()
+                .keys()
+                .collect::<std::collections::BTreeSet<_>>()
+        );
+        for name in a.tensor_info().keys() {
+            let a = a.tensor_f32(name).unwrap();
+            let b = b.tensor_f32(name).unwrap();
+            assert_eq!(a.len(), b.len(), "{component}.{name}");
+            let max_abs = a
+                .iter()
+                .zip(b.iter())
+                .map(|(a, b)| (a - b).abs())
+                .fold(0.0f32, f32::max);
+            let error = a
+                .iter()
+                .zip(b.iter())
+                .map(|(&a, &b)| (f64::from(a) - f64::from(b)).powi(2))
+                .sum::<f64>()
+                .sqrt();
+            let norm = a.iter().map(|&x| f64::from(x).powi(2)).sum::<f64>().sqrt();
+            assert!(
+                max_abs <= 1e-6 || error <= 2e-4 * norm,
+                "{component}.{name}: {max_abs:e}"
+            );
+            assert!(b.iter().all(|x| x.is_finite()));
+            state_checks += 1;
+        }
+        for arm in ["control", "candidate"] {
+            let state = load(arm, "final");
+            for name in state.tensor_info().keys() {
+                assert!(
+                    state
+                        .tensor_f32(name)
+                        .unwrap()
+                        .iter()
+                        .all(|x| x.is_finite())
+                );
+            }
+        }
+    }
+    check_device(&control);
+    check_device(&candidate);
+    save_json(
+        &root.join("comparison.json"),
+        &serde_json::json!({
+            "config": control.config, "extra_dispatches": extra_dispatches, "whole_update_wall_ms": timing,
+        "raw_gradients": numerical, "first_step_state_tensors_checked": state_checks,
+        "control_optimizer_step": control.world_train.adam_step_count(),
+            "candidate_optimizer_step": candidate.world_train.adam_step_count(),
+            "limits": "resident synthetic batches; replay sampling excluded; first-step numerical check, not bitwise subsequent trajectories or learning parity"
+        }),
+    );
+}

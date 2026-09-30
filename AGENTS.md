@@ -47,10 +47,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   was stopped cleanly at90,264 actions /22,505 updates:51.31 actions/s projects
   beyond the declared one-hour deadline. Guard, complete-prefix counters and
   finite checkpoint pass; this is not a native/kernel fault or a completed
-  matched run. World updates dominate (~55/74ms). Profile that bottleneck with
-  synthetic batches before more gameplay; the cap stands at2/10. See
+  matched run. World updates dominate (~55/74ms). The bottleneck is now
+  qualified: bounded split convolution gradients reduce synthetic full updates
+  72.62→30.58ms (2.37x) at unchanged learning settings. Independent F64 checks,
+  68 raw-gradient and 292 saved-state comparisons pass. Unsplit long reductions
+  match sequential F32 exactly but fail the stricter F64 gate; the chosen splits
+  pass without relaxing it. This is not yet gameplay speed or learning parity.
+  Next run a fresh native seed1009 pilot, not a checkpoint resume; the cap stands
+  at2/10 until launch. See `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
-  Full fresh-package Python tests pass (941); CI230 passes all platforms.
+  Fresh split-kernel package Python tests pass (945); CI230 passes all platforms
+  for the earlier replication implementation. Split-kernel CI is pending.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.
@@ -131,8 +138,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `22c31b94` adds tested batched last-two-axis
-  transpose over the old matrix's `367e53d4` (Blade dependency update over
+- Current backend: Meganeura `75d08173` adds opt-in, bounded split convolution
+  gradients and fixes split-measurement pipeline selection over `22c31b94`
+  (tested batched last-two-axis transpose). Kindle uses512-position partitions
+  on low-parallelism training convolutions; no new kernel or learning setting.
+  The old matrix used `367e53d4` (Blade dependency update over
   `ee3aea42`); Blade `7cca6377` adds checked external Vulkan
   imports/ownership over `fbb4f28c`. Both branches are pushed. September 28's
   upstream check finds `7c29497` adding caller-owned submission APIs, not a new
