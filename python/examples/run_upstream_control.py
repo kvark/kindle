@@ -92,7 +92,10 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=100_000)
     parser.add_argument("--num-envs", type=int, default=1)
     parser.add_argument("--matched-actions", action="store_true",
-                        help="Phase 2 shared Atari wrapper and exact actual-action/update accounting")
+                        help="shared Atari wrapper and exact actual-action/update accounting")
+    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--batch-length", type=int, default=64)
+    parser.add_argument("--train-ratio", type=int, default=256)
     parser.add_argument("--compute-dtype", choices=("float32", "bfloat16"), default="float32")
     parser.add_argument("--cuda-root", type=Path,
                         help="optional CUDA nvcc package directory containing bin/ptxas")
@@ -103,8 +106,10 @@ def main() -> None:
         parser.error("--num-envs must be positive")
     if args.matched_actions and (args.steps <= 0 or args.steps % args.num_envs):
         parser.error("matched steps must be a positive multiple of num-envs")
-    if args.matched_actions and (args.size != "12m" or args.compute_dtype != "float32"):
-        parser.error("Phase 2 matched control requires size12m and float32")
+    if min(args.batch_size, args.batch_length, args.train_ratio) <= 0:
+        parser.error("batch size, batch length and train ratio must be positive")
+    if args.matched_actions and args.compute_dtype != "float32":
+        parser.error("matched control requires float32")
     source = args.source.resolve()
     patch = validate_source(source)
     logdir = args.logdir.resolve()
@@ -118,6 +123,8 @@ def main() -> None:
         "--logger.outputs", "jsonl", "--run.log_every", "60",
         "--run.envs", str(args.num_envs), "--run.debug", "True",
         "--jax.compute_dtype", args.compute_dtype,
+        "--batch_size", str(args.batch_size), "--batch_length", str(args.batch_length),
+        "--run.train_ratio", str(args.train_ratio),
         "--run.usage.nvsmi", "False", "--run.usage.gputil", "False",
     ]
     if args.matched_actions:
@@ -145,7 +152,9 @@ def main() -> None:
         "packages": dict(sorted(packages.items())),
         "environment": {name: environment.get(name) for name in
                         ("XLA_FLAGS", "CUDA_VISIBLE_DEVICES", "XLA_PYTHON_CLIENT_MEM_FRACTION", "PYTHONPATH")},
-        "protocol": "phase2-matched-actions-v1" if args.matched_actions else "published",
+        "protocol": "replication-matched-actions-v2" if args.matched_actions else "published",
+        "recipe": dict(model_size=args.size, batch_size=args.batch_size,
+                       batch_length=args.batch_length, train_ratio=args.train_ratio),
         "wrapper_corrections": ["ALE seed API types", "sticky probability set before ROM load"],
         "step_accounting": ("exact actual actions; resets earn no updates" if args.matched_actions else
                             "upstream driver records include action-free reset observations"),
@@ -180,7 +189,7 @@ def main() -> None:
             import embodied
             from upstream_matched import train
             restore_train = embodied.run.train
-            embodied.run.train = partial(train, game=args.game, seed=args.seed)
+            embodied.run.train = partial(train, game=args.game, seed=args.seed, model_size=args.size)
         os.chdir(source)
         sys.argv = command[1:]
         with (logdir / "console.log").open("x") as output, redirect_stdout(output), redirect_stderr(output):

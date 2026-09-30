@@ -31,7 +31,12 @@ def test_cutoff_bootstraps_and_true_terminal_does_not():
     assert reset["is_first"] and not reset["is_last"] and reset["reward"] == 0
 
 
-def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path, monkeypatch):
+@pytest.mark.parametrize("batch,length,ratio,streams,first,updates", [
+    (16, 64, 256, 6, 1392, 103),
+    (8, 16, 32, 8, 248, 539),
+])
+def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(
+        tmp_path, monkeypatch, batch, length, ratio, streams, first, updates):
     frame = np.zeros((4, 4, 3), dtype=np.uint8)
 
     class Env:
@@ -56,9 +61,9 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
             self.closed = True
 
     class Replay:
-        def __init__(self, length, capacity, seed):
-            assert (length, capacity, seed) == (65, 99616, 1009)
-            self.records = [[] for _ in range(6)]
+        def __init__(self, **kwargs):
+            assert kwargs == dict(length=length+1, capacity=100000-streams*length, seed=1009)
+            self.records = [[] for _ in range(streams)]
 
         def add(self, record, stream):
             rows = self.records[stream]
@@ -69,7 +74,7 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
             rows.append(record)
 
         def __len__(self):
-            return sum(max(0, len(rows)-64) for rows in self.records)
+            return sum(max(0, len(rows)-length) for rows in self.records)
 
     class Agent:
         updates = 0
@@ -109,7 +114,7 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
         def check(self, *args): pass
         def close(self): pass
 
-    environments = [Env() for _ in range(6)]
+    environments = [Env() for _ in range(streams)]
     agent = Agent()
     created = []
 
@@ -120,26 +125,40 @@ def test_matched_loop_counts_only_actions_and_keeps_terminal_then_reset(tmp_path
     def stream(replay, mode):
         assert mode == "train"
         while True:
-            assert len(replay) >= 1024
+            assert len(replay) >= batch * length
             yield {}
 
     monkeypatch.setitem(sys.modules, "embodied", SimpleNamespace(replay=SimpleNamespace(Replay=replay)))
     monkeypatch.setattr(matched, "GpuBudget", Budget)
     monkeypatch.setattr(matched, "make_environments", lambda *a: (environments,
                        [matched.observation((frame, {}), first=True) for _ in environments]))
-    args = SimpleNamespace(logdir=tmp_path, batch_size=16, batch_length=64, replay_context=1,
-                           consec_train=1, train_ratio=256, steps=1800.0, envs=6)
+    args = SimpleNamespace(logdir=tmp_path, batch_size=batch, batch_length=length, replay_context=1,
+                           consec_train=1, train_ratio=ratio, steps=float(streams*300), envs=streams)
     matched.train(lambda: agent, None, None, stream, None, args, game="pong", seed=1009)
     result = json.loads((tmp_path / "comparison-result.json").read_text())
-    assert result["run_step"] == 1800
-    assert result["first_training_action"] == 1392
-    assert result["learner_updates"] == 103  # One at 1392, then 408 / 4.
-    assert result["emulator_resets"] == [4]*6
-    assert result["executed_action_frames"] == [1200]*6
-    assert result["completed_episodes"] == 18
+    assert result["run_step"] == streams*300
+    assert result["first_training_action"] == first
+    assert result["learner_updates"] == updates
+    assert result["emulator_resets"] == [4]*streams
+    assert result["executed_action_frames"] == [1200]*streams
+    assert result["completed_episodes"] == 3*streams
+    start = json.loads((tmp_path / "comparison.jsonl").read_text().splitlines()[0])
+    assert (start["batch_size"], start["batch_length"], start["train_ratio"]) == (batch, length, ratio)
     assert all(e.closed for e in environments)
     for records in created[0].records:
         assert len(records) == 304 and sum(not r["is_first"] for r in records) == 300
+
+
+@pytest.mark.parametrize("overrides", [dict(replay_context=0), dict(consec_train=2),
+                                     dict(batch_length=0), dict(envs=0), dict(batch_size=100000)])
+def test_invalid_recipe_is_rejected_before_gpu_initialization(monkeypatch, overrides):
+    monkeypatch.setitem(sys.modules, "embodied", SimpleNamespace())
+    monkeypatch.setattr(matched, "GpuBudget", lambda *a: pytest.fail("created GPU budget"))
+    values = dict(batch_size=8, batch_length=16, replay_context=1, consec_train=1,
+                  train_ratio=32, steps=2400, envs=8)
+    values.update(overrides)
+    with pytest.raises(ValueError):
+        matched.train(None, None, None, None, None, SimpleNamespace(**values), game="pong", seed=1009)
 
 
 def test_policy_carry_subsets_preserve_opaque_arrays_and_unselected_streams():

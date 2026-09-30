@@ -597,6 +597,21 @@ pub(crate) fn mixed_probabilities(
     graph.add(probabilities, uniform)
 }
 
+pub(crate) fn mixed_log_probabilities(
+    graph: &mut Graph,
+    logits: NodeId,
+    rows: usize,
+    classes: usize,
+    unimix: f32,
+) -> NodeId {
+    if unimix == 0.0 {
+        graph.log_softmax(logits)
+    } else {
+        let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
+        graph.log(probabilities)
+    }
+}
+
 /// Hard categorical sample with CPU-owned uniform draws. The row maximum uses
 /// an existing reduction; the prefix mask breaks exact ties at the first class.
 pub(crate) fn gumbel_sample(
@@ -607,8 +622,7 @@ pub(crate) fn gumbel_sample(
     classes: usize,
     unimix: f32,
 ) -> NodeId {
-    let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
-    let log_probabilities = graph.log(probabilities);
+    let log_probabilities = mixed_log_probabilities(graph, logits, rows, classes, unimix);
     let uniforms = graph.clamp(uniforms, f32::MIN_POSITIVE, 1.0 - f32::EPSILON);
     let log_uniforms = graph.log(uniforms);
     let negative_log_uniforms = graph.neg(log_uniforms);
@@ -799,7 +813,7 @@ impl ObservationDecoder {
     pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
         match self {
             Self::Features(decoder) => decoder.forward(graph, input, batch),
-            Self::Rgb(decoder) => decoder.forward(graph, input),
+            Self::Rgb(decoder) => decoder.forward(graph, input, batch),
         }
     }
 }

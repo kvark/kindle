@@ -1,301 +1,301 @@
-//! Small jointly learned RGB control. Replay keeps pixels, not encoder outputs.
-//! This patch CNN and dense decoder are deliberately not the upstream CNN pair.
+//! DreamerV3's RGB64 encoder and decoder. Replay retains centered CHW pixels.
+//! Convolutions use NCHW; normalization and encoder tokens use upstream's NHWC.
 
 use super::*;
 
-struct ConvNorm {
-    convolution: nn::Conv2d,
-    weight: NodeId,
+const SIDE: usize = 64;
+const BOTTLENECK: usize = 4;
+const DECODER_BLOCKS: usize = 8;
+
+struct Convolution {
+    layer: nn::Conv2d,
     bias: NodeId,
-    channels: usize,
 }
 
-impl ConvNorm {
-    fn new(graph: &mut Graph, name: &str, input: usize, output: usize, stem: bool) -> Self {
+impl Convolution {
+    fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
         Self {
-            convolution: nn::Conv2d::new(
+            layer: nn::Conv2d::new(
                 graph,
                 name,
                 input as u32,
                 output as u32,
-                if stem { 8 } else { 3 },
-                if stem { 64 } else { 8 },
-                if stem { 64 } else { 8 },
-                if stem { 8 } else { 1 },
-                if stem { 0 } else { 1 },
+                5,
+                side as u32,
+                side as u32,
+                1,
+                2,
             ),
-            weight: graph.parameter(&format!("{name}.norm.weight"), &[output]),
-            bias: graph.parameter(&format!("{name}.norm.bias"), &[output]),
-            channels: output,
+            bias: graph.parameter(&format!("{name}.bias"), &[output]),
         }
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let value = self.convolution.forward(graph, input, batch as u32);
-        let value = graph.group_norm(
+        let value = self.layer.forward(graph, input, batch as u32);
+        graph.add_per_channel(
             value,
-            self.weight,
             self.bias,
-            batch as u32,
-            self.channels as u32,
-            8 * 8,
-            8,
-            DREAMER_NORM_EPSILON,
-        );
-        graph.silu(value)
+            self.layer.out_channels,
+            self.layer.in_h * self.layer.in_w,
+        )
+    }
+}
+
+fn transpose_spatial(
+    graph: &mut Graph,
+    value: NodeId,
+    batch: usize,
+    rows: usize,
+    columns: usize,
+) -> NodeId {
+    let value = graph.reshape(value, &[batch, rows, columns]);
+    graph.transpose(value)
+}
+
+fn normalize_image(
+    graph: &mut Graph,
+    value: NodeId,
+    norm: &nn::RmsNorm,
+    batch: usize,
+    channels: usize,
+    side: usize,
+) -> NodeId {
+    let value = transpose_spatial(graph, value, batch, channels, side * side);
+    let value = graph.reshape(value, &[batch * side * side, channels]);
+    let value = norm.forward(graph, value);
+    let value = graph.silu(value);
+    let value = transpose_spatial(graph, value, batch, side * side, channels);
+    graph.reshape(value, &[batch * channels * side * side])
+}
+
+struct ConvNorm {
+    convolution: Convolution,
+    norm: nn::RmsNorm,
+}
+
+impl ConvNorm {
+    fn new(graph: &mut Graph, name: &str, input: usize, output: usize, side: usize) -> Self {
+        Self {
+            convolution: Convolution::new(graph, name, input, output, side),
+            norm: nn::RmsNorm::new(
+                graph,
+                &format!("{name}.norm.weight"),
+                output,
+                DREAMER_NORM_EPSILON,
+            ),
+        }
+    }
+
+    fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize, pool: bool) -> NodeId {
+        let layer = &self.convolution.layer;
+        let mut value = self.convolution.forward(graph, input, batch);
+        let mut side = layer.in_h;
+        if pool {
+            value = graph.max_pool_2d(
+                value,
+                batch as u32,
+                layer.out_channels,
+                side,
+                side,
+                2,
+                2,
+                2,
+                0,
+            );
+            side /= 2;
+        }
+        normalize_image(
+            graph,
+            value,
+            &self.norm,
+            batch,
+            layer.out_channels as usize,
+            side as usize,
+        )
     }
 }
 
 pub(crate) struct Encoder {
-    layers: [ConvNorm; 3],
+    layers: Vec<ConvNorm>,
     channels: usize,
 }
 
 impl Encoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
-        let channels = 4 * config.network().vision_depth;
-        let prefix = "world.representation.encoder";
-        Self {
-            layers: [
-                ConvNorm::new(graph, &format!("{prefix}.stem"), 3, channels, true),
-                ConvNorm::new(
+        let depth = config.network().vision_depth;
+        let mut channels = 3;
+        let layers = [2, 3, 4, 4]
+            .into_iter()
+            .enumerate()
+            .map(|(i, mult)| {
+                let output = depth * mult;
+                let layer = ConvNorm::new(
                     graph,
-                    &format!("{prefix}.spatial0"),
+                    &format!("world.representation.encoder.cnn{i}"),
                     channels,
-                    channels,
-                    false,
-                ),
-                ConvNorm::new(
-                    graph,
-                    &format!("{prefix}.spatial1"),
-                    channels,
-                    channels,
-                    false,
-                ),
-            ],
-            channels,
-        }
+                    output,
+                    SIDE >> i,
+                );
+                channels = output;
+                layer
+            })
+            .collect();
+        Self { layers, channels }
     }
 
     pub(super) fn output_dim(&self) -> usize {
-        4 * 4 * self.channels
+        BOTTLENECK * BOTTLENECK * self.channels
     }
 
     pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        let mut value = graph.reshape(input, &[batch * 3 * 64 * 64]);
+        let mut value = graph.reshape(input, &[batch * 3 * SIDE * SIDE]);
         for layer in &self.layers {
-            value = layer.forward(graph, value, batch);
+            value = layer.forward(graph, value, batch, true);
         }
-        let value = graph.max_pool_2d(value, batch as u32, self.channels as u32, 8, 8, 2, 2, 2, 0);
+        let value = transpose_spatial(graph, value, batch, self.channels, BOTTLENECK * BOTTLENECK);
         graph.reshape(value, &[batch, self.output_dim()])
     }
 }
 
 pub(crate) struct Decoder {
-    hidden: LinearNorm,
-    output: nn::Linear,
+    deterministic: BlockLinear,
+    stochastic_hidden: LinearNorm,
+    stochastic_output: nn::Linear,
+    spatial_norm: nn::RmsNorm,
+    layers: Vec<ConvNorm>,
+    output: Convolution,
+    deter: usize,
+    stoch: usize,
+    channels: usize,
 }
 
 impl Decoder {
     pub(super) fn new(graph: &mut Graph, config: &DreamerConfig, name: &str, input: usize) -> Self {
-        let units = config.network().units;
+        assert_eq!(input, config.feature_dim());
+        let size = config.network();
+        let channels = 4 * size.vision_depth;
+        let spatial = BOTTLENECK * BOTTLENECK * channels;
+        let mut input_channels = channels;
         Self {
-            hidden: LinearNorm::new(graph, &format!("{name}.trunk"), input, units),
-            output: nn::Linear::new(graph, &format!("{name}.out"), units, 3 * 64 * 64),
+            deterministic: BlockLinear::new(
+                graph,
+                &format!("{name}.sp0"),
+                DECODER_BLOCKS,
+                size.deter / DECODER_BLOCKS,
+                spatial / DECODER_BLOCKS,
+            ),
+            stochastic_hidden: LinearNorm::new(
+                graph,
+                &format!("{name}.sp1"),
+                size.stoch * size.classes,
+                2 * size.units,
+            ),
+            stochastic_output: nn::Linear::new(
+                graph,
+                &format!("{name}.sp2"),
+                2 * size.units,
+                spatial,
+            ),
+            spatial_norm: nn::RmsNorm::new(
+                graph,
+                &format!("{name}.spatial.norm.weight"),
+                channels,
+                DREAMER_NORM_EPSILON,
+            ),
+            layers: [2, 3, 4]
+                .into_iter()
+                .enumerate()
+                .rev()
+                .map(|(i, mult)| {
+                    let output_channels = mult * size.vision_depth;
+                    let layer = ConvNorm::new(
+                        graph,
+                        &format!("{name}.conv{i}"),
+                        input_channels,
+                        output_channels,
+                        SIDE >> (i + 1),
+                    );
+                    input_channels = output_channels;
+                    layer
+                })
+                .collect(),
+            output: Convolution::new(
+                graph,
+                &format!("{name}.imgout"),
+                2 * size.vision_depth,
+                3,
+                SIDE,
+            ),
+            deter: size.deter,
+            stoch: size.stoch * size.classes,
+            channels,
         }
     }
 
-    pub(super) fn forward(&self, graph: &mut Graph, input: NodeId) -> NodeId {
-        let hidden = self.hidden.forward(graph, input);
-        self.output.forward(graph, hidden)
+    pub(super) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        let deter = slice_columns(graph, input, batch, self.deter + self.stoch, 0, self.deter);
+        let stoch = slice_columns(
+            graph,
+            input,
+            batch,
+            self.deter + self.stoch,
+            self.deter,
+            self.stoch,
+        );
+        let deter = self.deterministic.forward(graph, deter, batch);
+        // Upstream's (group, h, w, channel) output becomes NCHW directly.
+        let deter = transpose_spatial(
+            graph,
+            deter,
+            batch * DECODER_BLOCKS,
+            BOTTLENECK * BOTTLENECK,
+            self.channels / DECODER_BLOCKS,
+        );
+        let deter = graph.reshape(deter, &[batch * self.channels * BOTTLENECK * BOTTLENECK]);
+        let stoch = self.stochastic_hidden.forward(graph, stoch);
+        let stoch = self.stochastic_output.forward(graph, stoch);
+        let stoch = transpose_spatial(graph, stoch, batch, BOTTLENECK * BOTTLENECK, self.channels);
+        let stoch = graph.reshape(stoch, &[batch * self.channels * BOTTLENECK * BOTTLENECK]);
+        let value = graph.add(deter, stoch);
+        let mut value = normalize_image(
+            graph,
+            value,
+            &self.spatial_norm,
+            batch,
+            self.channels,
+            BOTTLENECK,
+        );
+        let mut side = BOTTLENECK;
+        let mut channels = self.channels;
+        for layer in &self.layers {
+            value = graph.upsample_2x(
+                value,
+                batch as u32,
+                channels as u32,
+                side as u32,
+                side as u32,
+            );
+            value = layer.forward(graph, value, batch, false);
+            side *= 2;
+            channels = layer.convolution.layer.out_channels as usize;
+        }
+        value = graph.upsample_2x(
+            value,
+            batch as u32,
+            channels as u32,
+            side as u32,
+            side as u32,
+        );
+        value = self.output.forward(graph, value, batch);
+        value = graph.sigmoid(value);
+        // Both replay and diagnostic outputs are centered. This is the same
+        // summed pixel MSE as sigmoid prediction versus upstream's RGB / 255.
+        value = graph.reshape(value, &[batch * 3 * SIDE * SIDE, 1]);
+        let offset = graph.scalar(-0.5);
+        value = graph.bias_add(value, offset);
+        graph.reshape(value, &[batch, 3 * SIDE * SIDE])
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::dreamer::runtime::{build_session, initialize_d3};
-    use std::{collections::HashMap, sync::Arc};
-
-    #[test]
-    fn rgb_graphs_keep_pixels_and_joint_encoder_parameters() {
-        for size in [crate::ModelSize::Tiny, crate::ModelSize::Size12M] {
-            let mut config = DreamerConfig::tiny(3);
-            config.model_size = size;
-            config.observation_kind = ObservationKind::Rgb64;
-            let graph = crate::dreamer::world::build_training_graph(&config, 4);
-            let backward = meganeura::autodiff::differentiate(&graph);
-            assert!(backward.nodes().len() > graph.nodes().len());
-            let mut graph = Graph::new();
-            let encoder = Encoder::new(&mut graph, &config);
-            assert_eq!(encoder.output_dim(), config.encoded_observation_dim());
-            let input = graph.input("pixels", &config.observation_shape(2));
-            let encoded = encoder.forward(&mut graph, input, 2);
-            assert_eq!(
-                graph.node(encoded).ty.shape,
-                [2, config.encoded_observation_dim()]
-            );
-            assert_eq!(config.observation_dim(), 12288);
-            assert!(graph.nodes().iter().any(|n| matches!(&n.op, meganeura::graph::Op::Parameter { name } if name == "world.representation.encoder.stem.weight")));
-        }
-    }
-
-    // Independent scalar NCHW convolution, group normalization, SiLU and pooling.
-    fn reference(input: &[f32], parameters: &HashMap<String, Vec<f32>>) -> Vec<f64> {
-        let mut values = input.iter().map(|&x| f64::from(x)).collect::<Vec<_>>();
-        let (mut width, mut channels) = (64, 3);
-        for (layer, kernel, stride, padding) in [
-            ("stem", 8, 8, 0),
-            ("spatial0", 3, 1, 1),
-            ("spatial1", 3, 1, 1),
-        ] {
-            let weights = &parameters[&format!("world.representation.encoder.{layer}.weight")];
-            let scales = &parameters[&format!("world.representation.encoder.{layer}.norm.weight")];
-            let biases = &parameters[&format!("world.representation.encoder.{layer}.norm.bias")];
-            let mut next = vec![0.0; 2 * 16 * 8 * 8];
-            for b in 0..2 {
-                for output in 0..16 {
-                    for y in 0..8 {
-                        for x in 0..8 {
-                            let mut sum = 0.0;
-                            for c in 0..channels {
-                                for ky in 0..kernel {
-                                    for kx in 0..kernel {
-                                        let iy = (y * stride + ky) as isize - padding;
-                                        let ix = (x * stride + kx) as isize - padding;
-                                        if (0..width as isize).contains(&iy)
-                                            && (0..width as isize).contains(&ix)
-                                        {
-                                            sum += values[((b * channels + c) * width
-                                                + iy as usize)
-                                                * width
-                                                + ix as usize]
-                                                * f64::from(
-                                                    weights[((output * channels + c) * kernel
-                                                        + ky)
-                                                        * kernel
-                                                        + kx],
-                                                );
-                                        }
-                                    }
-                                }
-                            }
-                            next[((b * 16 + output) * 8 + y) * 8 + x] = sum;
-                        }
-                    }
-                }
-                for group in 0..8 {
-                    let start = (b * 16 + group * 2) * 64;
-                    let data = &mut next[start..start + 128];
-                    let mean = data.iter().sum::<f64>() / 128.0;
-                    let variance = data.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / 128.0;
-                    for (i, x) in data.iter_mut().enumerate() {
-                        let c = group * 2 + i / 64;
-                        let norm =
-                            (*x - mean) / (variance + f64::from(DREAMER_NORM_EPSILON)).sqrt();
-                        let affine = norm * f64::from(scales[c]) + f64::from(biases[c]);
-                        *x = affine / (1.0 + (-affine).exp());
-                    }
-                }
-            }
-            values = next;
-            width = 8;
-            channels = 16;
-        }
-        let mut output = Vec::new();
-        for bc in 0..32 {
-            for y in 0..4 {
-                for x in 0..4 {
-                    let offset = bc * 64 + y * 16 + x * 2;
-                    output.push(
-                        [offset, offset + 1, offset + 8, offset + 9]
-                            .into_iter()
-                            .map(|i| values[i])
-                            .fold(f64::NEG_INFINITY, f64::max),
-                    );
-                }
-            }
-        }
-        output
-    }
-
-    #[test]
-    #[ignore = "requires GPU; scalar CNN values and independent finite-difference gradients"]
-    fn tiny_rgb_encoder_matches_independent_reference() {
-        let mut config = DreamerConfig::tiny(3);
-        config.observation_kind = ObservationKind::Rgb64;
-        let mut graph = Graph::new();
-        let encoder = Encoder::new(&mut graph, &config);
-        let input = graph.input("pixels", &[2, 12288]);
-        let output = encoder.forward(&mut graph, input, 2);
-        let squared = graph.mul(output, output);
-        let loss = graph.mean_all(squared);
-        graph.set_outputs(vec![loss, output]);
-        let gpu = Arc::new(crate::init_gpu_context().unwrap());
-        let mut session = build_session(&graph, &gpu, meganeura::Mode::Training, false);
-        initialize_d3(&mut session, &graph, 103);
-        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
-            assert_eq!(session.device_information().device_name, expected);
-            assert!(!session.device_information().is_software_emulated);
-            let memory = session.device_memory_stats().unwrap();
-            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
-        }
-        let names = session
-            .param_names()
-            .into_iter()
-            .map(str::to_owned)
-            .collect::<Vec<_>>();
-        let mut parameters = HashMap::new();
-        for name in &names {
-            let mut values = vec![0.0; session.param_size(name).unwrap()];
-            session.read_param(name, &mut values);
-            if name.ends_with("stem.weight") {
-                assert!(
-                    values
-                        .iter()
-                        .all(|x| x.abs() <= 2.0 * 1.1368 / 192_f32.sqrt())
-                );
-            }
-            parameters.insert(name.clone(), values);
-        }
-        let pixels = (0..2 * 12288)
-            .map(|i| ((i * 37 + i / 43) % 256) as f32 / 255.0 - 0.5)
-            .collect::<Vec<_>>();
-        session.set_input("pixels", &pixels);
-        session.step();
-        session.wait();
-        let expected = reference(&pixels, &parameters);
-        let mut actual = vec![0.0; expected.len()];
-        session.read_output_by_index(1, &mut actual);
-        for (&a, &b) in actual.iter().zip(&expected) {
-            assert!((f64::from(a) - b).abs() < 3e-4, "{a} != {b}");
-        }
-        let scalar_loss = |p: &HashMap<String, Vec<f32>>| {
-            let values = reference(&pixels, p);
-            values.iter().map(|x| x * x).sum::<f64>() / values.len() as f64
-        };
-        assert!((f64::from(session.read_loss()) - scalar_loss(&parameters)).abs() < 3e-4);
-        for name in &names {
-            let mut gradient = vec![0.0; parameters[name].len()];
-            session.read_param_grad(name, &mut gradient);
-            let lane = (0..gradient.len())
-                .max_by(|&a, &b| gradient[a].abs().total_cmp(&gradient[b].abs()))
-                .unwrap();
-            assert!(gradient[lane].is_finite() && gradient[lane].abs() > 1e-6);
-            let original = parameters[name][lane];
-            parameters.get_mut(name).unwrap()[lane] = original + 1e-4;
-            let plus = scalar_loss(&parameters);
-            let high = parameters[name][lane];
-            parameters.get_mut(name).unwrap()[lane] = original - 1e-4;
-            let minus = scalar_loss(&parameters);
-            let low = parameters[name][lane];
-            parameters.get_mut(name).unwrap()[lane] = original;
-            let expected = (plus - minus) / f64::from(high - low);
-            assert!(
-                (f64::from(gradient[lane]) - expected).abs() < 3e-4 + expected.abs() * 0.003,
-                "{name}: {} != {expected}",
-                gradient[lane]
-            );
-        }
-    }
-}
+mod tests;

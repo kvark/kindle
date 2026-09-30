@@ -444,6 +444,7 @@ impl SequenceReplay {
     }
 }
 
+#[cfg_attr(test, derive(Default))]
 pub struct SequenceBatch {
     pub initial_deter: Vec<f32>,
     pub initial_stoch: Vec<f32>,

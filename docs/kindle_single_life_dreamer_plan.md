@@ -169,8 +169,12 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    unstarted 12M entries are cancelled. Preserve this partial study; never restart
    its stopped queue. It is not a clean stack-replication benchmark:
    the native learned-RGB arm changes the encoder/decoder as well as backend.
-   First implement the faithful upstream RGB baseline and compare fixed-batch
-   values, losses, gradients and optimizer updates. The new replication round
+   The faithful upstream RGB replacement now passes [four-update numerical
+   comparisons](results/2026-09-30-small-dreamer-replication.md): 1,524 checks of
+   states, losses, raw gradients and common-gradient optimizer/EMA updates.
+   RGB64 antialiasing/rounding now matches Pillow on GPU; JEPA pixels are unchanged.
+   Near-zero cross-backend gradient sensitivity is disclosed; gameplay replication
+   remains untested. The new replication round
    is capped at **10 training
    runs total** (upstream/native combined, failed attempts included): target
    three paired seeds, with at most four pilot/debug attempts. Reuse unchanged

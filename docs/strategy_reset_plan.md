@@ -29,6 +29,9 @@ Seaquest seed2017 finished and the 21 unstarted matrix entries are cancelled. Pr
 completed evidence. Validate a faithful small Dreamer implementation first,
 qualify a fast learning screen, then test JEPA on that recipe. The 45-run 12M
 matrix is no longer a Phase 2 exit requirement; Phase 2 itself is not complete.
+The faithful RGB replacement and four-update upstream numerical checks now
+[pass](results/2026-09-30-small-dreamer-replication.md); qualify the smaller
+learning recipe next, within the ten-attempt cap below.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.

@@ -3,7 +3,7 @@
 use meganeura::{Graph, graph::NodeId};
 
 use super::config::DreamerConfig;
-use super::networks::{MlpHead, scale, sum, weighted_cross_entropy};
+use super::networks::{MlpHead, mixed_log_probabilities, scale, sum, weighted_cross_entropy};
 
 pub const LOSS_TOTAL: usize = 0;
 pub const LOSS_POLICY: usize = 1;
@@ -78,26 +78,21 @@ pub fn build_training_graph(
 
     let actor_logits = model.actor.forward(&mut graph, imagined_feature);
     let value_logits = model.value.forward(&mut graph, imagined_feature);
-    let probabilities = graph.softmax(actor_logits);
-    let retained = graph.constant(
-        vec![1.0 - config.actor_unimix; imagined_rows * config.action_count],
-        &[imagined_rows, config.action_count],
+    let log_probabilities = mixed_log_probabilities(
+        &mut graph,
+        actor_logits,
+        imagined_rows,
+        config.action_count,
+        config.actor_unimix,
     );
-    let probabilities = graph.mul(probabilities, retained);
-    let uniform = graph.constant(
-        vec![config.actor_unimix / config.action_count as f32; imagined_rows * config.action_count],
-        &[imagined_rows, config.action_count],
-    );
-    let probabilities = graph.add(probabilities, uniform);
-    let mixed_logits = graph.log(probabilities);
+    let probabilities = graph.exp(log_probabilities);
     // Keep this reduction explicit. Meganeura's fused cross-entropy stores
     // per-row partials for terminal losses, whereas this loss is composed with
     // entropy and value terms and must remain a true scalar metric.
-    let score_terms = graph.mul(action_target, mixed_logits);
+    let score_terms = graph.mul(action_target, log_probabilities);
     let score_loss = graph.sum_inner(score_terms);
     let score_loss = graph.mean_all(score_loss);
     let score_loss = graph.neg(score_loss);
-    let log_probabilities = graph.log(probabilities);
     let p_log_p = graph.mul(probabilities, log_probabilities);
     let entropy = graph.sum_inner(p_log_p);
     let entropy = graph.neg(entropy);

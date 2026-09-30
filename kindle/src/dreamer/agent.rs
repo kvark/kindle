@@ -1,6 +1,9 @@
 //! Online acting, replay learning, and latent imagination.
 
 mod vector;
+
+#[cfg(test)]
+mod upstream_reference;
 pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
 
 use std::fs;
@@ -287,7 +290,7 @@ impl D3TrainScheduler {
     }
 }
 
-/// DreamerV3 learner over precomputed frozen visual observations.
+/// DreamerV3 learner over replayed frozen features or jointly encoded pixels.
 ///
 /// Acting never trains implicitly. Call [`Self::learn`] explicitly, or use
 /// [`Self::learn_scheduled`] to honor D3's replay-samples-per-environment-step

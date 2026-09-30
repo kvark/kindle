@@ -1,12 +1,15 @@
 //! GPU letterboxing, RGB normalization and channel-major patch packing.
 //! CPU images upload their original bytes; resident images use the same kernel.
-//! Interpolation stays in F32, without an intermediate RGB8 quantization.
+//! JEPA interpolation stays in F32. The RGB64 control matches Pillow's
+//! antialiased bilinear filter and per-axis RGB8 rounding on the GPU.
 //! Padding is exactly zero in normalized space.
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use blade_graphics::{self as gpu, ShaderBindable as _, ShaderData as _};
 use meganeura::{Session, runtime::ExternalSlot};
+
+mod rgb_filter;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum PixelFormat {
@@ -104,6 +107,7 @@ impl<'a> GpuFrame<'a> {
 struct Bindings {
     pixels: gpu::BufferPiece,
     patches: gpu::BufferPiece,
+    filter: gpu::BufferPiece,
     params: [u32; 16],
 }
 
@@ -113,6 +117,7 @@ impl gpu::ShaderData for Bindings {
             bindings: vec![
                 ("pixels", gpu::ShaderBinding::Buffer),
                 ("patches", gpu::ShaderBinding::Buffer),
+                ("rgb_coefficients", gpu::ShaderBinding::Buffer),
                 ("params", gpu::ShaderBinding::Plain { size: 64 }),
             ],
         }
@@ -121,7 +126,8 @@ impl gpu::ShaderData for Bindings {
     fn fill(&self, mut context: gpu::PipelineContext) {
         self.pixels.bind_to(&mut context, 0);
         self.patches.bind_to(&mut context, 1);
-        self.params.bind_to(&mut context, 2);
+        self.filter.bind_to(&mut context, 2);
+        self.params.bind_to(&mut context, 3);
     }
 }
 
@@ -131,6 +137,7 @@ pub(crate) struct GpuPreprocessor {
     encoder: gpu::CommandEncoder,
     completion: Option<gpu::SyncPoint>,
     upload: Option<gpu::Buffer>,
+    rgb_filters: HashMap<(u32, u32), gpu::Buffer>,
     streams: usize,
     size: u32,
     patch: u32,
@@ -161,6 +168,7 @@ impl GpuPreprocessor {
             encoder,
             completion: None,
             upload: None,
+            rgb_filters: HashMap::new(),
             streams,
             size: size.try_into().expect("image size overflow"),
             patch: patch.try_into().expect("patch size overflow"),
@@ -169,7 +177,7 @@ impl GpuPreprocessor {
         }
     }
 
-    /// Learned RGB control: one full-frame resize, channel-major values in
+    /// Learned RGB control: one antialiased full-frame resize, channel-major values in
     /// [-0.5, 0.5]. No letterbox, ImageNet statistics or second upscale.
     pub fn rgb64(gpu: Arc<gpu::Context>, streams: usize) -> Self {
         let mut pixels = Self::new(gpu, streams, 64, 64);
@@ -284,7 +292,7 @@ impl GpuPreprocessor {
     }
 
     fn bindings(
-        &self,
+        &mut self,
         pixels: gpu::BufferPiece,
         patches: gpu::BufferPiece,
         stream: usize,
@@ -300,9 +308,35 @@ impl GpuPreprocessor {
                 self.size as usize,
             )
         };
+        // Geometry coefficients only; image data never crosses the host boundary.
+        let filter = if self.centered_rgb {
+            (*self
+                .rgb_filters
+                .entry((layout.width, layout.height))
+                .or_insert_with(|| {
+                    let coefficients = rgb_filter::coefficients(layout.width, layout.height);
+                    let buffer = self.gpu.create_buffer(gpu::BufferDesc {
+                        name: "rgb64_filter",
+                        size: (coefficients.len() * size_of::<u32>()) as u64,
+                        memory: gpu::Memory::Shared,
+                    });
+                    unsafe {
+                        std::ptr::copy_nonoverlapping(
+                            coefficients.as_ptr().cast::<u8>(),
+                            buffer.data(),
+                            coefficients.len() * size_of::<u32>(),
+                        );
+                    }
+                    buffer
+                }))
+            .into()
+        } else {
+            pixels
+        };
         Bindings {
             pixels,
             patches,
+            filter,
             params: [
                 layout.width,
                 layout.height,
@@ -364,6 +398,9 @@ impl Drop for GpuPreprocessor {
     fn drop(&mut self) {
         self.wait();
         if let Some(buffer) = self.upload.take() {
+            self.gpu.destroy_buffer(buffer);
+        }
+        for (_, buffer) in self.rgb_filters.drain() {
             self.gpu.destroy_buffer(buffer);
         }
         self.gpu.destroy_compute_pipeline(&mut self.pipeline);
@@ -540,26 +577,25 @@ mod tests {
         )
         .0;
         let mut pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), 2);
-        for (width, height) in [(160, 210), (64, 64), (13, 7), (1, 19)] {
+        for (width, height) in [
+            (160, 210),
+            (64, 64),
+            (13, 7),
+            (1, 19),
+            (640, 480),
+            (641, 479),
+            (1, 1),
+        ] {
             let rgb = (0..width * height * 3)
                 .map(|i| ((i * 37 + i / 43) % 256) as u8)
                 .collect::<Vec<_>>();
             let mut expected = vec![0.0; 2 * 12288];
+            let resized = rgb_filter::reference(&rgb, width, height);
             for y in 0..64 {
                 for x in 0..64 {
-                    let sx = ((x as f64 + 0.5) * width as f64 / 64.0 - 0.5)
-                        .clamp(0.0, (width - 1) as f64);
-                    let sy = ((y as f64 + 0.5) * height as f64 / 64.0 - 0.5)
-                        .clamp(0.0, (height - 1) as f64);
-                    let (x0, y0) = (sx.floor() as usize, sy.floor() as usize);
-                    let (mx, my) = (sx - x0 as f64, sy - y0 as f64);
                     for c in 0..3 {
-                        let at = |x, y| f64::from(rgb[(y * width + x) * 3 + c]);
-                        let x1 = (x0 + 1).min(width - 1);
-                        let y1 = (y0 + 1).min(height - 1);
-                        let value = (at(x0, y0) * (1.0 - mx) + at(x1, y0) * mx) * (1.0 - my)
-                            + (at(x0, y1) * (1.0 - mx) + at(x1, y1) * mx) * my;
-                        expected[12288 + c * 4096 + y * 64 + x] = (value / 255.0 - 0.5) as f32;
+                        expected[12288 + c * 4096 + y * 64 + x] =
+                            f32::from(resized[(y * 64 + x) * 3 + c]) / 255.0 - 0.5;
                     }
                 }
             }

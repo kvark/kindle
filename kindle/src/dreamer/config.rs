@@ -242,7 +242,9 @@ impl DreamerConfig {
             dynamics_free_nats: None,
             unimix: 0.01,
             value_bins: 255,
-            actor_unimix: 0.01,
+            // Upstream's discrete Head.categorical constructs Categorical
+            // without unimix. Only the RSSM's OneHot uses the 1% mixture.
+            actor_unimix: 0.0,
             actor_entropy: 3e-4,
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
@@ -576,7 +578,7 @@ mod tests {
         assert_eq!(config.lambda, 0.95);
         assert_eq!(config.free_nats, 1.0);
         assert_eq!(config.unimix, 0.01);
-        assert_eq!(config.actor_unimix, 0.01);
+        assert_eq!(config.actor_unimix, 0.0);
         assert_eq!(config.actor_entropy, 3e-4);
         assert_eq!(config.slow_value_rate, 0.02);
         assert_eq!(config.return_norm_rate, 0.01);

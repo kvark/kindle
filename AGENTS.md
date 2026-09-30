@@ -16,8 +16,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
   target is unmet; the user explicitly accepts it as a stretch target, not a
   Phase 1 exit gate. Phase 2's offline probes and five integration smokes pass;
-  Large decodes best, Tiny pretraining is mixed. The native learned-RGB control
-  is a patch CNN/dense decoder, not an exact upstream visual model.
+  Large decodes best, Tiny pretraining is mixed. The old native learned-RGB arm
+  used a patch CNN/dense decoder; it was not an exact upstream visual model.
 - **September 30 user-approved reset: replication first, screen small.** The
   final active upstream Seaquest seed2017 finished at 16:43 UTC: 200,004 actions,
   49,651 updates, online last-50 score 454.0, finite checkpoint and passing guard.
@@ -25,9 +25,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The original queue and drain services are inactive, with workers reaped. Never
   restart that queue. Evidence:
   `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
-  Deferred CPU preparation now runs; new GPU checks remain serial and guarded.
-  First implement a faithful small Dreamer RGB control and compare fixed-batch
-  losses, gradients and optimizer updates against upstream. Then qualify a
+  The faithful small Dreamer RGB replacement now passes four-update upstream
+  values/losses/raw-gradients and common-gradient optimizer/EMA checks: 1,524
+  comparisons. GPU RGB64 filtering matches Pillow; JEPA pixels are unchanged.
+  Raw-gradient diagnostic capture preserves all 1,280 saved production tensors.
+  See `docs/results/2026-09-30-small-dreamer-replication.md` for methodology and
+  retained near-zero-gradient sensitivity. These are synthetic tests, not
+  learning. New GPU work remains serial and guarded. Next qualify a
   Size1M batched learning screen, targeting a sub-hour comparison; establish
   that upstream actually learns at the selected capacity/budget. Published
   Dreamer Atari scores are reference evidence, not something to rediscover.
@@ -117,8 +121,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current comparison backend: Meganeura `367e53d4` carries only the Blade dependency
-  update over `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
+- Current backend: Meganeura `22c31b94` adds tested batched last-two-axis
+  transpose over the old matrix's `367e53d4` (Blade dependency update over
+  `ee3aea42`); Blade `7cca6377` adds checked external Vulkan
   imports/ownership over `fbb4f28c`. Both branches are pushed. September 28's
   upstream check finds `7c29497` adding caller-owned submission APIs, not a new
   fix for the existing step path. September 30 rechecks that same Meganeura

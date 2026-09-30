@@ -138,11 +138,17 @@ class GpuBudget:
         self.vk.vkDestroyInstance(self.instance, None)
 
 
-def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, game, seed):
+def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, game, seed, model_size="12m"):
     import embodied
 
-    if (args.batch_size, args.batch_length, args.replay_context, args.consec_train, args.train_ratio) != (16, 64, 1, 1, 256):
-        raise ValueError("matched comparison requires B16/T64/context1/R256")
+    if args.replay_context != 1 or args.consec_train != 1:
+        raise ValueError("matched comparison requires context1/consec1")
+    if min(args.batch_size, args.batch_length, args.train_ratio, args.envs) <= 0:
+        raise ValueError("matched recipe dimensions and ratio must be positive")
+    batch_steps = args.batch_size * args.batch_length
+    capacity = 100000 - args.envs * args.batch_length
+    if capacity < batch_steps:
+        raise ValueError("replay capacity must hold a complete batch of eligible starts")
     if args.steps <= 0 or args.steps % args.envs:
         raise ValueError("exact full-batch action budget required")
     steps = int(args.steps)
@@ -166,13 +172,12 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
         construction = time.monotonic() - construction
         environments, initial = make_environments(game, seed, args.envs)
         # Upstream capacity counts eligible sequence starts, Kindle counts
-        # stored arrivals. Each independent stream retains 64 context/tail rows.
-        capacity = 100000 - args.envs * args.batch_length
-        replay = embodied.replay.Replay(length=65, capacity=capacity, seed=seed)
+        # stored arrivals. Each stream retains batch_length context/tail rows.
+        replay = embodied.replay.Replay(length=args.batch_length + 1, capacity=capacity, seed=seed)
         training = None
         train_carry = agent.init_train(args.batch_size)
         carries = agent.init_policy(args.envs)
-        schedule = UpdateSchedule(args.train_ratio, args.batch_size * args.batch_length)
+        schedule = UpdateSchedule(args.train_ratio, batch_steps)
         actual, updates = 0, 0
         returns, lengths, counts = [0.0] * args.envs, [0] * args.envs, [0] * args.envs
         total_rewards = [0.0] * args.envs
@@ -203,12 +208,13 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
 
         selected = policy_and_store(ids, initial)
         budget.check("initialized", agent)
-        emit(dict(event="run_start", protocol="phase2-matched-actions-v1", game=game,
+        emit(dict(event="run_start", protocol="replication-matched-actions-v2", game=game,
                   steps=args.steps, num_envs=args.envs, seed=seed,
                   environment_seeds=[(seed+i*1000003) % 2**32 for i in ids],
                   full_action_space=True, sticky_actions=.25, action_repeat=4, noop_max=0,
                   max_episode_frames=100000, observation_size=64, compute_dtype="float32",
-                  batch_size=16, batch_length=64, replay_context=1, train_ratio=256,
+                  model_size=model_size, batch_size=args.batch_size, batch_length=args.batch_length,
+                  replay_context=1, train_ratio=args.train_ratio,
                   replay_arrival_capacity=100000, replay_sequence_capacity=capacity,
                   agent_construction_seconds=construction, reward_action_aids="none",
                   limits=["pinned upstream agent/math; custom matched collector",
@@ -233,7 +239,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args, *, 
                       truncated=[bool(r[3]) for r in results]))
             selected = policy_and_store(ids, obs)
             actual += args.envs
-            for _ in range(schedule.observe(args.envs, len(replay) >= 1024)):
+            for _ in range(schedule.observe(args.envs, len(replay) >= batch_steps)):
                 if first_training_action is None:
                     first_training_action = actual
                     # Starting upstream prefetch before warmup could sample its

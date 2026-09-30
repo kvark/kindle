@@ -7,6 +7,7 @@ struct Params {
 
 var<storage, read> pixels: array<u32>;
 var<storage, read_write> patches: array<f32>;
+var<storage, read> rgb_coefficients: array<u32>;
 var<uniform> params: Params;
 
 fn channel(x: u32, y: u32, c: u32) -> f32 {
@@ -15,12 +16,34 @@ fn channel(x: u32, y: u32, c: u32) -> f32 {
     return f32((pixels[byte / 4u] >> ((byte % 4u) * 8u)) & 255u);
 }
 
+fn rgb64(x: u32, y: u32, c: u32) -> f32 {
+    let horizontal = 3u * x;
+    let vertical = 3u * (64u + y);
+    var sum_y = 1u << 21u;
+    for (var j = 0u; j < rgb_coefficients[vertical + 2u]; j += 1u) {
+        var sum_x = 1u << 21u;
+        for (var i = 0u; i < rgb_coefficients[horizontal + 2u]; i += 1u) {
+            let value = u32(channel(rgb_coefficients[horizontal + 1u] + i, rgb_coefficients[vertical + 1u] + j, c));
+            sum_x += value * rgb_coefficients[rgb_coefficients[horizontal] + i];
+        }
+        let rounded = min(sum_x >> 22u, 255u);
+        sum_y += rounded * rgb_coefficients[rgb_coefficients[vertical] + j];
+    }
+    return f32(min(sum_y >> 22u, 255u)) / 255.0 - 0.5;
+}
+
 @compute @workgroup_size(64)
 fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     let size = params.source.z;
     if id.x >= size * size { return; }
     let x = id.x % size;
     let y = id.x / size;
+    if params.output.y != 0u {
+        for (var c = 0u; c < 3u; c += 1u) {
+            patches[params.output.x + c * size * size + id.x] = rgb64(x, y, c);
+        }
+        return;
+    }
     let ps = params.source.w;
     let grid = size / ps;
     let patch_index = (y / ps) * grid + x / ps;
@@ -46,9 +69,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
             let bottom = channel(x0, y1, c) * (1.0 - mx) + channel(x1, y1, c) * mx;
             let value = top * (1.0 - my) + bottom * my;
             normalized = (value / 255.0 - means[c]) / stds[c];
-            if params.output.y != 0u {
-                normalized = value / 255.0 - 0.5;
-            }
         }
         let destination = params.output.x + patch_index * (3u * ps * ps) + c * ps * ps + local;
         patches[destination] = normalized;
