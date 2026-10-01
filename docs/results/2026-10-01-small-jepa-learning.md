@@ -9,7 +9,7 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 
 | Method | Game | Seeds | Final score [95% CI] | Human-normalized |
 | --- | --- | ---: | ---: | ---: |
-| initial_tiny | Seaquest | 1 | 1009: 239.200 | — |
+| initial_tiny | Seaquest | 2 | 1009: 239.200; 2017: 234.000 | — |
 | learned_cnn | Seaquest | 3 | 368.000 [328.800, 440.400] | 0.0071 |
 | pretrained_tiny | Seaquest | 1 | 1009: 206.800 | — |
 
@@ -34,12 +34,13 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | Method | Seed | First20 | Last50 | Run + construction s | Actions/s | Per-stream real time | World train ms/update |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | initial_tiny | 1009 | 87.00 | 239.20 | 1875.05 + 5.42 | 106.66 | 0.89x | 6.216 |
+| initial_tiny | 2017 | 103.00 | 234.00 | 1882.43 + 5.38 | 106.25 | 0.88x | 6.222 |
 | learned_cnn | 1009 | 83.00 | 328.80 | 1569.60 + 5.36 | 127.42 | 1.06x | 12.765 |
 | learned_cnn | 2017 | 75.00 | 334.80 | 1622.18 + 5.29 | 123.29 | 1.03x | 12.741 |
 | learned_cnn | 3019 | 77.00 | 440.40 | 1582.24 + 5.28 | 126.40 | 1.05x | 12.800 |
 | pretrained_tiny | 1009 | 75.00 | 206.80 | 1880.03 + 5.46 | 106.38 | 0.89x | 6.202 |
 
-**2/6 new JEPA runs complete; 2/6 attempts used.** Three RGB controls are reused.
+**3/6 new JEPA runs complete; 3/6 attempts used.** Three RGB controls are reused.
 World training excludes posterior and imagined rollouts; all measured learner stages are in JSON.
 Stage wall times are not GPU utilization. Actual executed frames determine real-time ratios.
 All episodes/tails and sampled Vulkan estimated headroom remain in JSON. No frozen competence claim.
@@ -50,6 +51,7 @@ All episodes/tails and sampled Vulkan estimated headroom remain in JSON. No froz
 | Method | Seed | World train ms | Replay ms | Total learner ms | Trainable / frozen encoder parameters |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | initial_tiny | 1009 | 6.216 | 13.576 | 35.535 | 830,513 / 5,486,592 |
+| initial_tiny | 2017 | 6.222 | 13.687 | 35.673 | 830,513 / 5,486,592 |
 | learned_cnn | 1009 | 12.765 | 0.751 | 30.081 | 688,004 / 0 |
 | learned_cnn | 2017 | 12.741 | 1.172 | 30.919 | 688,004 / 0 |
 | learned_cnn | 3019 | 12.800 | 0.813 | 30.294 | 688,004 / 0 |
