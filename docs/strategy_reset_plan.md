@@ -2,14 +2,15 @@
 
 **Audience:** an engineering agent picking up Kindle.
 **Date written:** 2026-09-26.
-**Code base:** branch `dreamer-jepa-kickoff` (PR #29), head `16afaa7`. All file
-paths below refer to that branch, not `main`.
+**Initial code base:** branch `dreamer-jepa-kickoff` (PR #29), head `16afaa7`.
+Current execution is on `phase2-levjepa-evaluation` (PR #31); original phase
+proposals below remain historical rationale where superseded by dated results.
 
 **Adopted September 27.** Current execution/evidence is maintained in
 [the project roadmap](kindle_single_life_dreamer_plan.md#current-execution-order--strategy-reset)
 and the active phase's PR (Phase 0/1: merged #29; Phase 2: #31). Some initial
-premises below are historical: Tiny is now default,
-native-detail GPU acting/capture is integrated, and sticky Pong fails its
+premises below are historical: native-detail GPU acting/capture is integrated,
+learned RGB is now the 2D default, and sticky Pong fails its
 robustness check. The historical upstream speed numbers are not a reconciled
 comparison. Phase 0 encoder CI/disclosures pass; compact human-normalized data
 is in [docs/results](results/2026-09-27-historical-scores.md).
@@ -21,20 +22,25 @@ gives 1.15× updates / 1.16× short Pong throughput; the **3× target remains un
 Do not confuse completed engineering deliverables with achieving that speed
 target or demonstrating the value of JEPA. The user explicitly accepts **3× as
 a stretch target, not a Phase 1 exit gate**; these completed implementation and
-screening deliverables close Phase 1. Phase 2 is now in progress; its
+screening deliverables close Phase 1. **Phase 2 completes October 1**; its
 [comparison protocol](experiments/2026-09-27-representation-comparison.md)
 records completed offline probes and the historical large-model comparison.
 **September 30 revision, approved by the user:** the final active upstream
 Seaquest seed2017 finished and the 21 unstarted matrix entries are cancelled. Preserve all
 completed evidence. Validate a faithful small Dreamer implementation first,
 qualify a fast learning screen, then test JEPA on that recipe. The 45-run 12M
-matrix is no longer a Phase 2 exit requirement; Phase 2 itself is not complete.
+matrix is no longer a Phase 2 exit requirement; cancellation alone did not close it.
 The faithful RGB replacement and four-update upstream numerical checks now
 [pass](results/2026-09-30-small-dreamer-replication.md). All three
 [small learning pairs](results/2026-09-30-small-replication-learning.md) now pass
 within seven replication attempts, each pair under an hour. The separate
-[six-run Tiny comparison](experiments/2026-10-01-small-jepa-comparison.md) is
-declared; its learning evidence and the frontend decision remain outstanding.
+[six-run Tiny comparison](results/2026-10-01-small-jepa-learning.md) is complete.
+The [implemented and verified decision](results/2026-10-01-frontend-decision.md)
+selects learned RGB for 2D screening: final online mean 368.0 versus pretrained
+Tiny 225.3 and initial Tiny 230.7. Tiny halves world-training time but takes 18%
+longer end to end; the curves cross mid-training and no pretraining benefit
+is established. Retain causal Tiny as an explicit video/3D hypothesis.
+No further allocation is needed for Phase 2; Phase 3 is next, not yet started.
 The 864-point gate is unsupported at the tested budget, not mathematically
 impossible. Current GPU pixel collection does not support the old host-based
 visitation bonus; any intrinsic mechanism must honor the GPU path.
@@ -257,6 +263,11 @@ upstream, the cheap representation comparison is published with its costs,
 uncertainty and limitations, and the resulting frontend decision is implemented
 and verified. Cancelling the expensive matrix does not by itself close Phase 2.
 
+**Completed October 1:** all criteria above are met; [decision and verification](results/2026-10-01-frontend-decision.md).
+The ten-attempt replication cap used seven attempts; the separate compact
+JEPA study used its six declared runs and reused all three native RGB controls.
+Do not extend either allocation or restart the cancelled matrix.
+
 ## 6. Phase 3 — Exploration and reward
 
 All experiments here: extrinsic-only control vs. one added mechanism, 3 seeds,
@@ -264,9 +275,10 @@ on sparse-reward tasks **without** the random-action aid. Development on the
 fast environment; confirmation on Atari hard-exploration games (Freeway
 unassisted, Private Eye, Venture; Montezuma's Revenge as a stretch).
 
-1. **Visitation bonus (already implemented, never used).** Enable
-   `visitation_bonus` with a nonzero `intrinsic_reward_scale`
-   (`kindle/src/dreamer/intrinsic.rs`). Cheapest first test: unassisted Freeway.
+1. **GPU-compatible exploration bonus.** The old CPU hash-visitation experiment
+   is not supported by resident pixel collection; do not enable it by reading
+   features back. First select one bounded GPU-compatible mechanism and declare
+   a small extrinsic-only comparison. Cheapest target: unassisted Freeway.
 2. **Latent disagreement (Plan2Explore-style).** Add an ensemble of K small
    one-step predictors of the next latent (or next frozen feature) from
    (deter, stoch, action); intrinsic reward = ensemble variance, computed in

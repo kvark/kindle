@@ -66,13 +66,14 @@ not a completed three-seed benchmark.
   independent streams, failure cleanup and both frozen restore routes with
   zero learner updates. The chosen native constructor/loss path already has
   the three complete learning runs above; this interface change needs no new
-  training campaign or unchanged Rust rebuild. CI is pending this commit.
+  training campaign or unchanged Rust rebuild. [CI250](https://github.com/kvark/kindle/actions/runs/36835906681)
+  passes on Linux/lavapipe, macOS/Metal and Python for implementation `f84d9b6`.
 - Weight-taking pixel-agent constructors and native capture integration keep
   causal Tiny for video/3D research. This is a scoped 2D default, not removal of
   the latent world-model hypothesis or a change to existing checkpoints.
 
 RGB versus Tiny compares complete observation/objective packages, not solely
-encoder pretraining. Tiny previously saw250k RGB64 random-play frames from
+encoder pretraining. Tiny previously saw 250k RGB64 random-play frames from
 Boxing/Pong/Freeway/Breakout/Qbert, additional experience. Only pretrained versus
 its own initial Tiny isolates that intervention. One short held-out game cannot
 settle generalization, asymptotic performance or arbitrary-video learning.

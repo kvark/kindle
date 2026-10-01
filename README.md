@@ -21,8 +21,8 @@ learning and cross-game transfer, not the other way around.
 
 Current priority follows the [strategy reset](docs/strategy_reset_plan.md).
 Phase 2 selects **learned RGB for 2D Atari screening**: three-seed Seaquest final
-online means are368.0 for RGB,225.3 for pretrained Tiny and230.7 for initial Tiny.
-Tiny halves world-training time but takes18% longer end to end. Pretraining does
+online means are 368.0 for RGB, 225.3 for pretrained Tiny and 230.7 for initial Tiny.
+Tiny halves world-training time but takes 18% longer end to end. Pretraining does
 not establish a benefit; these short curves are not frozen competence or a
 general rejection of JEPA. [Decision, costs and limits](docs/results/2026-10-01-frontend-decision.md).
 Next is sparse-reward exploration, then video priors; causal Tiny remains an
@@ -133,10 +133,10 @@ For causal Tiny, add `--encoder-checkpoint /models/tiny/encoder.safetensors`
 to both commands (and use separate fresh outputs). `--encoder levjepa` explicitly
 selects Large. The old positional checkpoint/`learned-cnn` CLI is removed.
 
-`published` uses18 actions, no reset no-ops, repeat4, max-pooling and a100k-frame
-episode cap. Sticky actions are explicit above; the wrapper default is still0.
-Native frames enter the GPU: learned RGB resizes once to64×64 with Pillow-equivalent
-filtering, while JEPA retains native detail for its224px preprocessing.
+`published` uses 18 actions, no reset no-ops, repeat 4, max-pooling and a 100k-frame
+episode cap. Sticky actions are explicit above; the wrapper default is still 0.
+Native frames enter the GPU: learned RGB resizes once to 64×64 with Pillow-equivalent
+filtering, while JEPA retains native detail for its 224px preprocessing.
 No RGB64→224 detour. Do not mix wrapper protocols.
 Frozen evaluation samples actions with **zero updates**; greedy evaluation is a
 different diagnostic. Retain every completed episode, faster-stream extra and

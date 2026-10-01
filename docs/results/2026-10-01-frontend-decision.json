@@ -142,7 +142,13 @@
     "native_runtime_changed": false,
     "new_learning_runs_for_cli_change": 0,
     "selected_native_path_evidence": "The same learned_rgb constructor/objectives completed all three retained native RGB runs; fresh/default and frozen restore CLI routes are covered by CPU mock tests.",
-    "ci": "pending"
+    "ci": {
+      "run": 250,
+      "url": "https://github.com/kvark/kindle/actions/runs/36835906681",
+      "source_commit": "f84d9b6cb1e11ec03b02fd916950a1c8507ef79a",
+      "conclusion": "success",
+      "platforms": ["Linux/lavapipe", "macOS/Metal", "Python bindings"]
+    }
   },
   "limits": [
     "Three learner seeds and one short held-out title, not Atari-wide superiority or frozen competence.",

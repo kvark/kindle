@@ -20,16 +20,19 @@ before larger confirmation. A cheaper but less
 useful world model does not establish an efficiency advantage.
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
-imagined actor/critic training and causal **LeVJEPA** perception. The frontend is
-frozen during gameplay, not end-to-end JEPA training. The obsolete DINO path has
-been removed; its results remain historical. New agents default to a
-separately pretrained **5.49M causal ViT-Tiny/16**. Native numerical,
-optimizer/restore, streaming, fit and noncollapse checks pass; the first bounded
-4,096-update pretraining run completes with verified state and encoder exports.
-Frozen probes retain useful position features but mixed motion results. Bounded
-actor integration and matched-order throughput pass. Tiny Freeway now passes
-all three fresh learner roots, but Breakout regresses and broader Tiny reliability
-is unproven. Tiny is now the default; Large is an explicit comparison only.
+imagined actor/critic training, jointly learned RGB and causal **LeVJEPA** perception.
+The October 1 [Phase 2 decision](results/2026-10-01-frontend-decision.md) selects
+**learned RGB for 2D Atari screening**, with no external encoder checkpoint.
+Frozen causal **5.49M ViT-Tiny/16** remains an explicit video/3D option; it is
+not end-to-end JEPA training during gameplay. Large is comparison-only; DINO
+is removed. Weight-taking pixel-agent constructors keep Tiny, while the Atari
+runner requires `--encoder-checkpoint` to opt in.
+
+Numerical, optimizer/restore, streaming and noncollapse checks pass. Tiny's
+4,096-update pretraining export and historical assisted Freeway wins remain
+valid evidence, but held-out probes and learning do not establish a benefit
+over its initial weights. The learned RGB path uses Dreamer's multiscale CNN
+and posterior pixel reconstruction; the causal-JEPA path below predicts latents.
 Old checkpoint/backend pinning must not delay this implementation. Keep current
 architecture/encoder integrity checks, not migration machinery.
 
@@ -45,8 +48,9 @@ RGB history through now -> frozen encoder -> posterior
 
 The predictor sees the prior, never the posterior containing its target. LeVJEPA
 uses causal prefixes of 16-arrival chunks, projected to 7×7×64 features. Chunk
-boundaries reset perception only; episode boundaries also reset belief. Six
-streams share batched inference and one learner while retaining separate visual
+boundaries reset perception only; episode boundaries also reset belief. Eight
+streams in the small screen (six in the historical reference) share batched
+inference and one learner while retaining separate visual
 caches, recurrent state, RNG and causal replay histories.
 
 Single and vector pixel actors now share a resident acting path: GPU pixels ->
@@ -163,98 +167,36 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Do not combine this new environment/recipe and speed change into one claim.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
-4. **Phase 2, in progress: test whether the representation earns its cost.**
-   **September 30 reset, approved by the user:** the final active upstream
-   Seaquest seed2017 finished; all 24 completed runs pass their audits and all 21
-   unstarted 12M entries are cancelled. Preserve this partial study; never restart
-   its stopped queue. It is not a clean stack-replication benchmark:
-   the native learned-RGB arm changes the encoder/decoder as well as backend.
-   The faithful upstream RGB replacement now passes [four-update numerical
-   comparisons](results/2026-09-30-small-dreamer-replication.md): 1,524 checks of
-   states, losses, raw gradients and common-gradient optimizer/EMA updates.
-   RGB64 antialiasing/rounding now matches Pillow on GPU; JEPA pixels are unchanged.
-   Near-zero cross-backend gradient sensitivity is disclosed; the small
-   gameplay replication below now completes. The replication round
-   is capped at **10 training
-   runs total** (upstream/native combined, failed attempts included): target
-   three paired seeds, with at most four pilot/debug attempts. Reuse unchanged
-   qualifying pilots; no automatic follow-on large JEPA matrix. Qualify a batched Size1M learning
-   screen (sub-hour target, with upstream learning evidence), then run the
-   focused >=3-seed representation comparison there. Use published Dreamer
-   scores as references; do not recreate its full benchmark. Larger runs are
-   confirmation of promising results, not the development default. See the
-   [revised acceptance criteria](strategy_reset_plan.md#2b-replication-first-then-qualify-the-cheap-learning-screen).
-   The [first small upstream Seaquest pilot](results/2026-09-30-small-replication-learning.md)
-   completes 200,000 actions / 49,939 updates in **8m37s**, plus40s construction.
-   First20/last50 online means are57.0/292.4. Native attempt2 was stopped at
-   90,264 actions:51.31 actions/s projects beyond its one-hour deadline. Its
-   guard, complete-prefix ledger and finite checkpoint pass, but it is not a
-   completed matched run. The [profile and qualified split reductions](results/2026-09-30-small-rgb-profile.md)
-   reduce synthetic full updates **72.62→30.58ms (2.37×)** without changing the
-   learning recipe; independent F64, raw-gradient and saved-state checks pass.
-   Fresh native attempt3 completes 200,000 actions / 49,939 updates in **26m10s**,
-   **127.42 actions/s (1.06× real time per stream)**, with first20/last50 scores
-   83.0/328.8. All audits pass; the successful pair takes 35m31s including
-   construction, plus the separately retained 29-minute interruption. All three
-   native seeds now pass in 26–27 minutes each: final online scores
-   **328.8/334.8/440.4**, mean **368.0 [328.8,440.4]** (seed-bootstrap 95% CI).
-   **Replication complete at 7/10 attempts:** all three upstream/native pairs
-   pass their audits. Upstream's final scores are **292.4/287.2/343.6**, mean
-   **307.733 [287.2,343.6]**. Paired native-minus-upstream mean is
-   **+60.267 [36.4,96.8]**; native takes about **3.08× longer**. This small online
-   learning screen qualifies the local port/recipe, not the full authors'
-   benchmark, frozen competence or a general native superiority claim.
-   **October 1 correction:** the ten-attempt cap is for replication; applying it
-   to the later JEPA study unnecessarily blocked authorized work. The remaining
-   two upstream seeds completed within it. The separate
-   [compact JEPA declaration](experiments/2026-10-01-small-jepa-comparison.md)
-   retains three pretrained Tiny and three initial Tiny runs, reusing the RGB
-   controls. [Learning and cost report](results/2026-10-01-small-jepa-learning.md).
-   The frontend decision remains
-   pending. The smaller recipe changes capacity/BPTT/replay
-   ratio; it is not an unchanged-learning backend speedup.
-
-   **Evidence retained from the original study:**
-   The [offline/learning protocol](experiments/2026-09-27-representation-comparison.md)
-   now has 6,144 Pong/Breakout/Seaquest clips, split by whole trajectories.
-   Native batched token diagnostics compare identical frames; privileged labels
-   never enter the agent. All five ridge/corrected-MLP controls complete:
-   Large decodes best, Tiny pretraining is mixed, and the 173k reconstruction
-   CNN is competitive enough to justify a joint-trained RGB learning arm.
-   [Full probe results](results/2026-09-27-representation-probes.md) are not RL.
-   Held-out motion/
-   small-object probes, then a three-seed learning comparison against random
-   Tiny and a learned-encoder Dreamer control. Include a title absent from the
-   video corpus. Native input is current; RGB64 is an explicit ablation.
-   Matched upstream/native smokes pass: all five complete 6,144 actions and
-   1,186 updates, including the fresh joint RGB CNN (86,400 encoder parameters).
-   GPU pixels, independent gradients, current-weight replay encoding and exact
-   checkpoint/optimizer restore pass. This CNN is an explicit RGB64 control,
-   not a return to upscaled JEPA or the offline reconstruction checkpoint.
-   All five arms complete all three games for seed1009: **15 runs**, each
-   **200,004 actions**, with finite checkpoints and passing guards. The declared
-   reset-sensitive warmup yields 49,651 updates for Pong/Seaquest and 49,652
-   for Breakout (0.5 fractional credit, no whole update outstanding).
-   Rankings depend on the game: upstream leads Pong (-3.04 versus -11.56 for
-   the best native arm, Large); Large leads Seaquest (600.4 versus joint RGB
-   441.6 and upstream 411.6) and Breakout (18.96 versus upstream 13.92 and
-   7.42-7.92 for the other native arms). Against its initial encoder, pretrained
-   Tiny scores lower on Pong, higher on Seaquest and 0.50 higher on Breakout in
-   this seed. Large runs at about 14.2-14.3 actions/s versus 18.6-20.1 for the others.
-   The second Pong seed reverses the Large/upstream score ordering (-7.60 /
-   -8.24), while Large still takes about 39% more time. Initial Tiny again
-   scores above pretrained Tiny (-13.26 / -13.56). No third seed is complete.
-   [Complete curves and limits](results/2026-09-27-representation-learning.md)
-   retain every episode and unfinished tail. These partial results cannot establish a
-   representation benefit, and Large changes capacity and pretraining corpus
-   as well as costing more time. The native RGB control changes the encoder
-   and decoder, not just the frontend. None of these online results establishes
-   competence or a multi-seed architecture decision. The original three-seed,
-   three-game matrix remains incomplete; its unstarted work is cancelled.
-   The historical ~15.6 versus ~59 actions/s is not a matched
-   efficiency comparison.
-   If frozen JEPA offers no probe/learning benefit, change the 2D frontend;
-   retain JEPA as a testable 3D candidate, not an architectural obligation.
+4. **Phase 2, complete: learned RGB for 2D screening.**
+   The faithful native RGB replacement passes1,524 four-update upstream
+   value/loss/raw-gradient/common-gradient optimizer checks. Independent F64
+   checks qualify split convolution gradients: full updates72.62→30.58ms,
+   without changing learning. [Numerical evidence](results/2026-09-30-small-dreamer-replication.md)
+   and [timing qualification](results/2026-09-30-small-rgb-profile.md).
+   Three small upstream/native learning pairs finish in **7/10 replication
+   attempts**, including the retained 29-minute interruption, each successful
+   pair under an hour. Native/upstream final online means368.0/307.733;
+   native takes about3.08× longer. [Replication](results/2026-09-30-small-replication-learning.md)
+   qualifies the local port/recipe, not the full published benchmark or mastery.
+   The separate **six-run JEPA comparison** reuses all three RGB controls:
+   Seaquest, seeds1009/2017/3019, Size1M/N8/B8/T16/H15/R32, 200,000 actions.
+   RGB/pretrained Tiny/initial Tiny final online means are368.0/225.3/230.7.
+   Paired pretrained-minus-RGB is−142.7 [−229.2,−76.8]; versus initial Tiny
+   it is−5.3 [−32.4,+24.0]. Tiny roughly halves world-training time but takes18%
+   longer end to end. Curves cross mid-training; this is not uniform RGB
+   dominance or proof against JEPA. Offline probes also show mixed Tiny
+   pretraining benefit; Large's stronger decoding changes capacity and corpus.
+   **Decision implemented:** the Atari vector runner defaults to the existing
+   learned RGB path; `--encoder-checkpoint` explicitly selects causal Tiny.
+   Native-detail JEPA and video/3D constructors are unchanged. Fresh/default
+   and frozen restore routes pass976 Python tests; no new learner or campaign.
+   [Complete decision, cost and curve analysis](results/2026-10-01-frontend-decision.md).
+   All study guards/checkpoints/counters pass and workers are reaped.
+   The old 12M matrix remains a [24-run partial study](results/2026-09-27-representation-learning.md):
+   all21 unstarted entries are cancelled, no three-seed group completed, and
+   its old patch-CNN arm was not an exact upstream visual control. Never restart
+   that queue or turn it into a completed benchmark. The ten-run cap applies
+   to replication; no additional allocation question remains for Phase 2.
 5. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation
@@ -305,9 +247,10 @@ Using the [pinned upstream references](https://github.com/danijar/dreamerv3/blob
 Qbert's final score is .935 human-normalized; Breakout's864-point gate is29.94.
 Protocol differences make these descriptive, not matched benchmark claims.
 The gate stays fixed, but missing mastery must not be called absence of learning.
-A bounded matched upstream Dreamer12M control remains necessary to assess the
-frozen-JEPA design; the single pretraining ablation settles neither benefit nor
-harm. Synthetic full-encoder streaming parity is now wired into CI and passes
+A [small matched upstream control](results/2026-09-30-small-replication-learning.md)
+now qualifies the native port; the [three-seed representation study](results/2026-10-01-small-jepa-learning.md)
+settles the current 2D default, not the general latent-prediction hypothesis.
+Synthetic full-encoder streaming parity is wired into CI and passes
 locally; the checkpoint-specific production hardware tests remain separate.
 
 The initial 303M frontend was disproportionate to the nominal 12M learner.
@@ -328,8 +271,9 @@ Completed fixed-recipe optimizations:
 | [Four world submissions + latest runtime](../runs/chunks-atari-timing-20260926.e2OEhn/results.md) | 6.5–6.6% less Atari wall time; ~1.041× aggregate real time | Exact same-arm state/reports/actions; isolated core scheduling gain 7.4–7.5% |
 
 These are separate comparisons, not percentages to add. Uncapped, step-driven
-playing/learning works; sustained per-stream super-real-time learning is not
-established. Free-running native games without time control remain a separate
+playing/learning works. The new small RGB screen achieves 1.03–1.06× real time
+per stream over each full run; Tiny achieves about .89×. This does not qualify
+the historical 12M/R256 recipe. Free-running native games without time control remain a separate
 requirement. Measure arrival order, observation gaps, action durations and
 training debt before introducing concurrency.
 
@@ -380,8 +324,8 @@ MLP 768, 5,486,592 encoder parameters**. Preserve 224px inputs, 16-arrival block
 chunks, independent histories and JL64/2×2 pooling to 7×7×64. Logical F32 KV
 storage is 55.125 MiB per stream versus Large's 588 MiB; these are tensor sizes,
 not measured device peaks. Do not slice Large weights or silently substitute
-features during a speed comparison. Phase 2 may replace the frozen frontend
-after controlled probes and learning experiments.
+features during a speed comparison. Phase 2 selected learned RGB for 2D;
+these Tiny settings remain the explicit frozen video/3D reference.
 
 The native pretrainer uses multi-view invariance + SIGReg, causal token dropping
 and evaluation EMA, not undisclosed distillation. Preserve token positions in
@@ -406,8 +350,9 @@ and matched cost pass. Freeway now passes three learner roots, conditional on
 one encoder. Breakout regresses versus Large, and its
 [own-initial-encoder comparison](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
 shows no pretraining benefit in one seed. Neither establishes a capacity limit
-or justifies random features as the product. **Tiny is the current default;
-Large is explicit.** Phase 2 must establish a benefit over random/learned features.
+or justifies random features as the product. The completed three-seed Phase 2
+study does not establish a Tiny pretraining benefit and selects learned RGB for
+2D. Tiny remains the explicit video/3D candidate; Large is comparison-only.
 
 Keep numerical/causal/streaming checks, held-out quality, N6 memory/time and
 frozen downstream controls for final adoption. Different pretraining corpora
