@@ -1,5 +1,9 @@
 # Phase 2 matched learning comparison
 
+All six new runs are complete. The [frontend decision](2026-10-01-frontend-decision.md)
+combines these results with offline probes and verified implementation; the
+learning auditor alone does not declare Phase 2 complete.
+
 [All curves, episodes, tails and configurations](2026-10-01-small-jepa-learning.json).
 
 Online training scores, not frozen competence. Final scores use the last 50 completed

@@ -53,7 +53,7 @@ def test_learned_rgb_api_checks_kind_and_capacity_before_gpu():
 @pytest.mark.parametrize("args", [["--observation-size", "64"], ["--encoder", "levjepa-tiny"]])
 def test_learned_rgb_rejects_double_resize_or_frozen_encoder(monkeypatch, tmp_path, capsys, args):
     output = tmp_path / "never.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "learned-cnn", "--output", str(output), *args])
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2 and not output.exists()
@@ -86,7 +86,7 @@ def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, c
     checkpoint.mkdir()
     (checkpoint / "metadata.json").write_text(json.dumps({"perception": {"kind": recorded}}))
     output = tmp_path / "unused.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--encoder-checkpoint", "unused", "--output", str(output),
                                     "--restore", str(checkpoint), "--encoder", requested])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
@@ -102,7 +102,7 @@ def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, c
     (["--restore", "unused", "--batch-size", "32"], "overrides require a fresh run"),
 ])
 def test_runner_rejects_ambiguous_budgets_before_gpu(monkeypatch, capsys, tmp_path, args, message):
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(tmp_path / "log.jsonl"), *args])
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "log.jsonl"), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2
@@ -116,7 +116,7 @@ def test_runner_rejects_ambiguous_budgets_before_gpu(monkeypatch, capsys, tmp_pa
 ])
 def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, capsys, tmp_path, args, message):
     directory = tmp_path / "matrix"
-    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), *args])
+    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", str(directory), *args])
     with pytest.raises(SystemExit) as error:
         profile_atari_vector.main()
     assert error.value.code == 2
@@ -124,9 +124,11 @@ def test_profiler_rejects_unusable_windows_before_starting_jobs(monkeypatch, cap
     assert not directory.exists()
 
 
-def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path):
+@pytest.mark.parametrize("weights", [None, "unused"])
+def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkeypatch, tmp_path, weights):
     directory = tmp_path / "matrix"
-    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", "unused", str(directory), "--num-envs", "2"])
+    monkeypatch.setattr(sys, "argv", ["profile_atari_vector.py", str(directory), "--num-envs", "2",
+                                    *(["--encoder-checkpoint", weights] if weights else [])])
     def no_monitor(*_args, **_kwargs):
         pytest.fail("profiler must not spawn an NVML monitor")
     monkeypatch.setattr(profile_atari_vector.subprocess, "Popen", no_monitor)
@@ -137,6 +139,9 @@ def test_profiler_retains_failed_jobs_without_claiming_a_completed_matrix(monkey
     results = json.loads((directory / "summary.json").read_text())
     assert results[0]["status"] == "failed"
     assert results[0]["num_envs"] == 2 and results[0]["exit_code"] == 1
+    assert ("--encoder-checkpoint" in results[0]["command"]) == (weights is not None)
+    if weights:
+        assert results[0]["command"][-2:] == ["--encoder-checkpoint", weights]
     assert "actions_per_second" not in results[0]
     assert not list(directory.glob("*.gpu.csv"))
 
@@ -346,7 +351,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     monkeypatch.setattr(atari_vector.gym, "make", make)
     monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", wrap)
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "learned-cnn" if encoder_kind == "learned-cnn" else "unused", "ALE/Seaquest-v5",
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Seaquest-v5",
+        *([] if encoder_kind == "learned-cnn" else ["--encoder-checkpoint", "unused"]),
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
         "--sticky-actions", str(sticky_actions),
         *(["--observation-size", observation_size] if observation_size else []),
@@ -390,7 +396,7 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
 
 def test_restore_requires_explicit_pixel_protocol_before_outputs(monkeypatch, tmp_path, capsys):
     output = tmp_path / "log.jsonl"
-    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "unused", "--output", str(output),
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output),
                                     "--restore", "unused"])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()

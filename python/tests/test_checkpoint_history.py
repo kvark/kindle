@@ -100,7 +100,7 @@ def fake_runner(tmp_path, monkeypatch):
         monkeypatch.setattr(atari_vector.gym, 'make', make)
         monkeypatch.setattr(atari_vector, 'DreamerAtariPreprocessing', lambda env, **_: env)
         monkeypatch.setattr(kindle, 'VectorAgent', Agent)
-        monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'unused', 'ALE/Freeway-v5',
+        monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'ALE/Freeway-v5', '--encoder-checkpoint', 'unused',
             '--output', str(output), '--steps', str(steps), '--num-envs', '2', '--train-ratio', '0',
             '--checkpoint', str(checkpoint), '--checkpoint-every', str(every),
             '--min-gpu-budget-headroom-mib', '2048',
@@ -192,7 +192,7 @@ def test_history_requires_a_destination_before_constructing_anything(tmp_path, m
     monkeypatch.setattr(atari_vector.gym, 'make', unexpected)
     monkeypatch.setattr(kindle, 'VectorAgent', unexpected)
     output = tmp_path / 'absent.jsonl'
-    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'unused', '--output', str(output), '--checkpoint-history'])
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), '--checkpoint-history'])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2 and not output.exists()

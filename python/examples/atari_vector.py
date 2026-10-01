@@ -1,8 +1,9 @@
-"""Independent Atari streams, one native batched LeVJEPA/Dreamer learner.
+"""Independent Atari streams, one native batched Dreamer learner.
 
 --steps counts aggregate executed actions, not vector ticks or per-env actions.
 CPU environment stepping is synchronous; GPU inference is batched. Terminal
 observations are consumed before individually resetting completed environments.
+Learned RGB is the 2D default; --encoder-checkpoint selects frozen causal JEPA.
 """
 
 import argparse
@@ -45,7 +46,7 @@ def require_gpu_device(snapshot, expected):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("encoder_checkpoint", help="frozen encoder checkpoint, or learned-cnn for a fresh joint RGB model")
+    parser.add_argument("--encoder-checkpoint", help="opt into frozen causal JEPA; omitted: jointly learned RGB")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
@@ -121,9 +122,9 @@ def main():
     if args.restore and args.observation_size is None:
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
-    learned_rgb = args.encoder_checkpoint == "learned-cnn"
+    learned_rgb = args.encoder_checkpoint is None
     if learned_rgb and (args.encoder is not None or args.observation_size != "native"):
-        parser.error("learned-cnn consumes native frames for one GPU resize; no frozen --encoder or adapter resize")
+        parser.error("learned RGB consumes native frames for one GPU resize; frozen --encoder requires --encoder-checkpoint")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)

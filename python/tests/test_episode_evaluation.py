@@ -18,8 +18,8 @@ import audit_atari_campaign
 from test_atari_campaign import declaration_fixture, run_fixture
 
 
-@pytest.fixture
-def frozen_run(monkeypatch, tmp_path):
+@pytest.fixture(params=['rgb', 'tiny'])
+def frozen_run(monkeypatch, tmp_path, request):
     created = []
     interrupt = False
 
@@ -35,7 +35,7 @@ def frozen_run(monkeypatch, tmp_path):
         def reset(self, *, seed=None):
             self.length = 0
             self.emulator_resets += 1
-            return np.zeros((64, 64, 3), dtype=np.uint8), {}
+            return np.zeros((210, 160, 3), dtype=np.uint8), {}
 
         def step(self, action):
             assert action == 0
@@ -59,9 +59,20 @@ def frozen_run(monkeypatch, tmp_path):
 
         @classmethod
         def restore(cls, checkpoint, encoder, streams):
+            assert request.param == 'tiny'
             instance = cls()
             instance.streams = streams
             instance.config = kindle.default_config(2)
+            return instance
+
+        @classmethod
+        def restore_rgb(cls, checkpoint, streams):
+            assert request.param == 'rgb'
+            instance = cls()
+            instance.streams = streams
+            instance.config = kindle.default_config(2)
+            instance.config['observation_kind'] = 'rgb64'
+            instance.config['loss_scales'].update(reconstruction=1.0, future_prediction=0.0)
             return instance
 
         def begin_episodes(self, ids, frames):
@@ -97,9 +108,10 @@ def frozen_run(monkeypatch, tmp_path):
         nonlocal interrupt
         interrupt = interrupted
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
-        args = ['atari_vector.py', 'unused', '--output', str(output), '--num-envs', '2',
+        args = ['atari_vector.py', '--output', str(output), '--num-envs', '2',
                 '--steps', str(cap), '--evaluate', '--restore', 'fixture', '--report-every', '2',
-                '--observation-size', '64']
+                '--observation-size', 'native',
+                *(['--encoder-checkpoint', 'unused'] if request.param == 'tiny' else [])]
         if target is not None:
             args += ['--episodes-per-env', str(target)]
         if memory:
@@ -180,7 +192,7 @@ def test_interrupt_does_not_complete_episode_budget(frozen_run):
 ])
 def test_cli_rejects_ambiguous_episode_budget_before_gpu(monkeypatch, tmp_path, args):
     output = tmp_path / 'never-created.jsonl'
-    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', 'unused', '--output', str(output), *args])
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(output), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2 and not output.exists()

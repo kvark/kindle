@@ -1,17 +1,17 @@
 # Kindle
 
-**[Project status: done, in progress, next, results and videos](https://github.com/kvark/kindle/pull/29)**
+**[Project status: done, in progress, next, results and videos](https://github.com/kvark/kindle/pull/31)**
 
 Kindle is an experimental Rust agent that learns while acting. It combines a
-Dreamer recurrent world model and imagined actor/critic with frozen causal
-LeVJEPA perception, using [Meganeura](https://github.com/kvark/meganeura) and
+Dreamer recurrent world model and imagined actor/critic with learned RGB or
+frozen causal LeVJEPA perception, using [Meganeura](https://github.com/kvark/meganeura) and
 [Blade](https://github.com/kvark/blade) for native GPU computation. The obsolete
 DINO implementation has been removed. Python supplies environment adapters and
 analysis, not a second learner.
 
-Six Atari streams share batched inference and one learner, with independent
+Atari streams share batched inference and one learner, with independent
 causal histories. This is not yet a general gameplay policy; the
-[PR status dashboard](https://github.com/kvark/kindle/pull/29) tracks completed game gates and current work.
+[PR status dashboard](https://github.com/kvark/kindle/pull/31) tracks results and current work.
 
 See the [single project plan](docs/kindle_single_life_dreamer_plan.md) for current
 scores, whole-rollout **videos**, world-model reports and next experiments;
@@ -19,9 +19,14 @@ scores, whole-rollout **videos**, world-model reports and next experiments;
 [AGENTS.md](AGENTS.md) for working directions. Swarms follow strong single-actor
 learning and cross-game transfer, not the other way around.
 
-Current priority follows the [strategy reset](docs/strategy_reset_plan.md):
-shorten learner iterations, establish fast small-model screening, test whether
-LeVJEPA improves learning, then tackle sparse-reward exploration and video priors.
+Current priority follows the [strategy reset](docs/strategy_reset_plan.md).
+Phase 2 selects **learned RGB for 2D Atari screening**: three-seed Seaquest final
+online means are368.0 for RGB,225.3 for pretrained Tiny and230.7 for initial Tiny.
+Tiny halves world-training time but takes18% longer end to end. Pretraining does
+not establish a benefit; these short curves are not frozen competence or a
+general rejection of JEPA. [Decision, costs and limits](docs/results/2026-10-01-frontend-decision.md).
+Next is sparse-reward exploration, then video priors; causal Tiny remains an
+explicit video/3D hypothesis, not a required cost for every 2D experiment.
 Do not repeat unchanged mastery-gate runs. New compact evidence belongs in
 `docs/results/`; the PR remains the live status dashboard.
 
@@ -38,19 +43,21 @@ experience. [Native pretraining source](https://github.com/kvark/kindle/tree/exp
 
 ## Architecture
 
-The deterministic prior predicts frozen visual features **before** the current
-frame enters the posterior. The optional reconstruction control reads the
-posterior instead. Both retain categorical RSSM state, balanced KL, sequence
+The learned-RGB path uses Dreamer's multiscale CNN and posterior pixel decoder.
+The causal-JEPA path instead predicts frozen visual features from the deterministic
+prior **before** the current frame enters the posterior. Both retain categorical RSSM state, balanced KL, sequence
 replay, 15-step imagination, a two-hot critic and LaProp/AGC optimizer ordering.
 
 LeVJEPA consumes each arrival through bounded 16-frame causal chunk prefixes,
 projected to 7×7×64 features. Chunk boundaries reset perception only; episode
 boundaries also reset recurrent belief. Its 5.49M Tiny encoder is frozen.
-The selected 12M learner uses F32, full BPTT64 and replay ratio 256. Library
-defaults still use BPTT 8 / ratio 32; pass experiment settings explicitly.
+The qualified small Atari recipe uses F32, Size1M/N8/B8/T16/H15/R32. The historical
+12M speed reference uses full BPTT64/R256. Library defaults still use BPTT8/R32;
+pass experiment settings explicitly. They are different learning recipes.
 
 | Objective control | Reconstruction scale | Future-prediction scale |
 | --- | ---: | ---: |
+| Learned RGB | 1 | 0 |
 | Reconstruction | .25 | 0 |
 | Auxiliary prediction | .25 | .25 |
 | Prediction only | 0 | .25 |
@@ -75,10 +82,13 @@ cd python
 maturin develop --release --extras test,atari
 ```
 
-The default frontend is **causal ViT-Tiny/16, 5.49M parameters**, independently
-pretrained on video, not truncated Large weights. The current exported checkpoint
+The Atari vector runner defaults to **jointly learned RGB**, with no external
+encoder weights. For frozen JEPA, use `--encoder-checkpoint PATH` with
+**causal ViT-Tiny/16, 5.49M parameters**, independently pretrained on video, not
+truncated Large weights. The current exported checkpoint
 and pretraining recipe are linked from [the plan](docs/kindle_single_life_dreamer_plan.md).
-Pixel-agent Python and Rust constructors select Tiny. `encoder="levjepa"` is an
+Weight-taking pixel-agent Python and Rust constructors still select Tiny; their
+video/3D API is unchanged. `encoder="levjepa"` is an
 explicit Large control using separately licensed
 [LeVJEPA-VideoMix-Large](https://huggingface.co/galilai-group/LeVJEPA-VideoMix-Large)
 weights (CC-BY-NC-4.0). Restore checks architecture, encoding semantics and weights;
@@ -86,7 +96,7 @@ backend revision fields record provenance rather than forbidding backend updates
 On multi-adapter hosts, set `MEGANEURA_DEVICE_ID` and check the executing device.
 
 The single and vector actors share one GPU path: raw pixels -> preprocessing ->
-causal encoder -> pooling -> RSSM -> categorical policy sampling. Only selected
+learned encoder or causal encoder/pooling -> RSSM -> categorical policy sampling. Only selected
 actions are read back during acting. Replay collection stays on GPU; sampled
 training batches still cross the learner's existing host target-building path.
 Explicit probes and checkpoints may read back data. Linux Vulkan capture uses
@@ -107,20 +117,27 @@ from the repository root (use fresh outputs; experiment jobs must use the
 [bounded host guard](docs/gpu_incident_response.md)):
 
 ```sh
-python python/examples/atari_vector.py /models/levjepa/model.safetensors ALE/Pong-v5 \
-  --atari-protocol published --num-envs 6 --seed 2017 --steps 400008 \
-  --model-size 12m --batch-size 16 --batch-length 64 \
-  --world-microbatch-size 16 --train-ratio 256 --learning-rate 0.00004 \
-  --checkpoint checkpoints/pong --output runs/pong-train.jsonl
+python python/examples/atari_vector.py ALE/Seaquest-v5 \
+  --atari-protocol published --sticky-actions .25 --num-envs 8 --seed 1009 --steps 200000 \
+  --model-size 1m --batch-size 8 --batch-length 16 \
+  --world-microbatch-size 8 --train-ratio 32 --learning-rate 0.00004 \
+  --checkpoint checkpoints/seaquest --output runs/seaquest-train.jsonl
 
-python python/examples/atari_vector.py /models/levjepa/model.safetensors ALE/Pong-v5 \
-  --atari-protocol published --num-envs 6 --seed 100000 --steps 600000 \
-  --restore checkpoints/pong --evaluate --episodes-per-env 4 \
-  --output runs/pong-eval.jsonl
+python python/examples/atari_vector.py ALE/Seaquest-v5 \
+  --atari-protocol published --sticky-actions .25 --num-envs 8 --seed 100000 --steps 600000 \
+  --restore checkpoints/seaquest --observation-size native --evaluate --episodes-per-env 4 \
+  --output runs/seaquest-eval.jsonl
 ```
 
-`published` uses 18 actions, no reset no-ops, repeat 4, max-pooling, non-sticky
-actions, a 100k-frame episode cap and Pillow 64×64 RGB. Do not mix wrapper protocols.
+For causal Tiny, add `--encoder-checkpoint /models/tiny/encoder.safetensors`
+to both commands (and use separate fresh outputs). `--encoder levjepa` explicitly
+selects Large. The old positional checkpoint/`learned-cnn` CLI is removed.
+
+`published` uses18 actions, no reset no-ops, repeat4, max-pooling and a100k-frame
+episode cap. Sticky actions are explicit above; the wrapper default is still0.
+Native frames enter the GPU: learned RGB resizes once to64×64 with Pillow-equivalent
+filtering, while JEPA retains native detail for its224px preprocessing.
+No RGB64→224 detour. Do not mix wrapper protocols.
 Frozen evaluation samples actions with **zero updates**; greedy evaluation is a
 different diagnostic. Retain every completed episode, faster-stream extra and
 unfinished tail. Training-window returns are not final-policy competence.
