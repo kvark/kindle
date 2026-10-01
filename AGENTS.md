@@ -60,14 +60,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   cheap recipe, not seed-level superiority or frozen competence. All three
   native seeds now pass: 200,000 actions / 49,939 updates each in 26–27 minutes,
   final online scores 328.8/334.8/440.4, mean 368.0, seed-bootstrap 95% CI
-  [328.8,440.4]. Five replication attempts used, including the interruption.
+  [328.8,440.4]. Replication now completes all three upstream/native pairs in
+  **seven attempts including the interruption**, within the ten-attempt cap.
+  Upstream final scores are 292.4/287.2/343.6, mean 307.733 [287.2,343.6]. The
+  paired native-minus-upstream mean is +60.267 [36.4,96.8] in this small online
+  screen; native run time is about3.08x longer. All audits pass. This is local
+  numerical/learning qualification, not the authors' full benchmark or mastery.
   **October 1 correction:** the ten-attempt cap applies to replication; treating
   it as an implicit cap for all Phase 2 created an unnecessary allocation block.
-  Finish upstream seeds2017/3019, bringing replication to seven attempts if both
-  pass. Keep all three paired seeds. Then declare the separate compact JEPA
-  comparison: three pretrained Tiny and three initial Tiny runs, reusing the
-  three native RGB controls. Do not return to the old matrix or silently weaken
-  the three-seed requirement. See
+  The separate compact JEPA comparison is now declared: three pretrained Tiny
+  and three initial Tiny runs, reusing the three native RGB controls. Same
+  Size1M/N8/B8/T16/H15/R32 recipe and backend, held-out Seaquest, no pixel-detail
+  reduction. See `docs/experiments/2026-10-01-small-jepa-comparison.md` and
+  `docs/results/2026-10-01-small-jepa-learning.md`. Do not return to the old matrix
+  or silently weaken the three-seed requirement. Replication evidence:
   `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
   Fresh split-kernel package Python tests pass (945); the expanded small JEPA

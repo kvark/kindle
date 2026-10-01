@@ -10,7 +10,14 @@ Partial groups list individual seeds; no aggregate or uncertainty is reported un
 | Method | Game | Seeds | Final score [95% CI] | Human-normalized |
 | --- | --- | ---: | ---: | ---: |
 | learned_cnn | Seaquest | 3 | 368.000 [328.800, 440.400] | 0.0071 |
-| upstream | Seaquest | 2 | 1009: 292.400; 2017: 287.200 | — |
+| upstream | Seaquest | 3 | 307.733 [287.200, 343.600] | 0.0057 |
+
+Paired final-score differences (candidate minus control): resample the three learner-seed pairs,
+not episodes or independent method means. Small-seed intervals remain coarse.
+
+| Candidate − control | Game | Difference [95% CI] |
+| --- | --- | ---: |
+| learned_cnn − upstream | Seaquest | 60.267 [36.400, 96.800] |
 
 Human normalization uses [pinned upstream anchors](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml); 1 is the reference human, not mastery.
 
@@ -35,8 +42,9 @@ Human normalization uses [pinned upstream anchors](https://github.com/danijar/dr
 | learned_cnn | 3019 | 77.00 | 440.40 | 1582.24 + 5.28 | 126.40 | 1.05x |
 | upstream | 1009 | 57.00 | 292.40 | 516.71 + 39.70 | 387.06 | 3.22x |
 | upstream | 2017 | 74.00 | 287.20 | 517.65 + 40.07 | 386.36 | 3.22x |
+| upstream | 3019 | 92.00 | 343.60 | 517.14 + 40.25 | 386.74 | 3.22x |
 
-**5 completed; 6/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
+**6 completed; 7/10 attempts used.** Incomplete attempts are not inferred to be running; the PR records live execution.
 First20 versus last50 is descriptive within a changing policy, not an independent-seed significance test.
 All completed guards/checkpoints/counters pass. Vulkan headroom is estimated; JAX reserves a 50% pool.
 GPU utilization is unmeasured. Lower replay ratio/model size/BPTT is a new recipe, not a port optimization gain.

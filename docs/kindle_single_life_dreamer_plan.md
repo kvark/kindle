@@ -173,8 +173,8 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    comparisons](results/2026-09-30-small-dreamer-replication.md): 1,524 checks of
    states, losses, raw gradients and common-gradient optimizer/EMA updates.
    RGB64 antialiasing/rounding now matches Pillow on GPU; JEPA pixels are unchanged.
-   Near-zero cross-backend gradient sensitivity is disclosed; gameplay replication
-   remains untested. The new replication round
+   Near-zero cross-backend gradient sensitivity is disclosed; the small
+   gameplay replication below now completes. The replication round
    is capped at **10 training
    runs total** (upstream/native combined, failed attempts included): target
    three paired seeds, with at most four pilot/debug attempts. Reuse unchanged
@@ -198,13 +198,18 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    construction, plus the separately retained 29-minute interruption. All three
    native seeds now pass in 26–27 minutes each: final online scores
    **328.8/334.8/440.4**, mean **368.0 [328.8,440.4]** (seed-bootstrap 95% CI).
-   **5/10 replication attempts used.** Upstream still has one completed seed,
-   so no statistically established native advantage or frozen competence.
+   **Replication complete at 7/10 attempts:** all three upstream/native pairs
+   pass their audits. Upstream's final scores are **292.4/287.2/343.6**, mean
+   **307.733 [287.2,343.6]**. Paired native-minus-upstream mean is
+   **+60.267 [36.4,96.8]**; native takes about **3.08× longer**. This small online
+   learning screen qualifies the local port/recipe, not the full authors'
+   benchmark, frozen competence or a general native superiority claim.
    **October 1 correction:** the ten-attempt cap is for replication; applying it
    to the later JEPA study unnecessarily blocked authorized work. Finish the
-   two upstream seeds (seven replication attempts including the interruption),
-   then separately declare three pretrained Tiny and three initial Tiny runs,
-   reusing the three RGB controls. Keep the original three-seed requirements.
+   two upstream seeds completed within it. The separate
+   [compact JEPA declaration](experiments/2026-10-01-small-jepa-comparison.md)
+   retains three pretrained Tiny and three initial Tiny runs, reusing the RGB
+   controls. [Learning and cost report](results/2026-10-01-small-jepa-learning.md).
    The frontend decision remains
    pending. The smaller recipe changes capacity/BPTT/replay
    ratio; it is not an unchanged-learning backend speedup.

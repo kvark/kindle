@@ -94,3 +94,12 @@ adopted. Finish upstream seeds2017/3019 within this cap (seven attempts total if
 both pass); retain three paired seeds. The later JEPA comparison gets its own
 compact declaration and retains three pretrained / three initial Tiny seeds,
 reusing the completed native RGB controls. No old matrix restarts.
+
+**Replication complete, October 1:** upstream2017/3019 pass all audits with
+final online scores 287.2/343.6 and run times 517.65/517.14s. All six completed
+runs perform 200,000 actions /49,939 updates with zero debt. Native/upstream
+three-seed means are 368.0/307.733; paired difference +60.267 [36.4,96.8]. Native
+is about3.08× slower. Seven attempts were used, including the retained
+interruption; the three unused slots are not a requirement to run more seeds.
+This meets the local numerical/learning prerequisite, not the authors' full
+benchmark or frozen mastery. Continue to the [separate compact JEPA study](2026-10-01-small-jepa-comparison.md).

@@ -225,10 +225,19 @@ recipe and native replication; it need not recreate the full published suite.
 Published scores from other model sizes, interaction budgets or Atari protocols
 are not directly matched targets for our short pilot.
 
+**Completed October 1:** all three small upstream/native seed pairs pass,
+using seven replication attempts including the interruption. Native/upstream
+final online means are 368.0/307.733; native takes about3.08× longer. This
+[local qualification](results/2026-09-30-small-replication-learning.md) is not
+the full published benchmark or frozen competence. The ten-attempt cap applies
+to replication; it does not silently replace Phase 2c's separate declaration.
+
 ### 2c. Test the JEPA hypothesis on the qualified recipe
 
-Keep the completed offline probes and all historical learning curves. After
-2b, declare a focused comparison of the faithful learned encoder, pretrained
+Keep the completed offline probes and all historical learning curves. The
+[October 1 compact declaration](experiments/2026-10-01-small-jepa-comparison.md)
+adds six Seaquest runs, reusing the three completed native RGB controls.
+After 2b, declare a focused comparison of the faithful learned encoder, pretrained
 Tiny and its own initial weights, with >=3 learner seeds and a held-out title.
 Include Large only within the measured iteration budget or as a separately
 justified confirmation. Fix methods, budgets and score summaries before running;
