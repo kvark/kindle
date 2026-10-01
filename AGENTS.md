@@ -60,18 +60,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   cheap recipe, not seed-level superiority or frozen competence. All three
   native seeds now pass: 200,000 actions / 49,939 updates each in 26–27 minutes,
   final online scores 328.8/334.8/440.4, mean 368.0, seed-bootstrap 95% CI
-  [328.8,440.4]. Five attempts used, including the interruption. No GPU job is
-  running. Further upstream/JEPA allocation awaits the user's pending choice:
-  retain three paired upstream/native seeds, or use the remaining five attempts
-  for three pretrained Tiny and two initial Tiny controls (weaker secondary
-  controls, but three-seed primary RGB/JEPA comparison). Do not silently relax
-  the documented three-seed requirement or extend the cap. See
+  [328.8,440.4]. Five replication attempts used, including the interruption.
+  **October 1 correction:** the ten-attempt cap applies to replication; treating
+  it as an implicit cap for all Phase 2 created an unnecessary allocation block.
+  Finish upstream seeds2017/3019, bringing replication to seven attempts if both
+  pass. Keep all three paired seeds. Then declare the separate compact JEPA
+  comparison: three pretrained Tiny and three initial Tiny runs, reusing the
+  three native RGB controls. Do not return to the old matrix or silently weaken
+  the three-seed requirement. See
   `docs/results/2026-09-30-small-rgb-profile.md`,
   `docs/results/2026-09-30-small-replication-learning.md` and PR31 for live state.
   Fresh split-kernel package Python tests pass (945); the expanded small JEPA
   curve auditor passes 30 focused tests, including paired-seed score differences
-  that require all three pairs. CI237 passes for the completed learning report;
-  the subsequent analysis-only update is checked locally, CI pending.
+  that require all three pairs. CI239 passes on all platforms for `8228818`.
   Return to >=3-seed JEPA comparisons on the qualified inexpensive recipe;
   promote only promising results to larger confirmation. Preserve native JEPA
   input detail; an explicit RGB64 Dreamer control is not RGB64-upscaled JEPA.

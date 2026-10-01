@@ -198,12 +198,14 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    construction, plus the separately retained 29-minute interruption. All three
    native seeds now pass in 26–27 minutes each: final online scores
    **328.8/334.8/440.4**, mean **368.0 [328.8,440.4]** (seed-bootstrap 95% CI).
-   **5/10 attempts used; no GPU job running.** Upstream still has one completed
-   seed, so no statistically established native advantage or frozen competence.
-   Allocation awaits the user's choice: finish three paired upstream/native
-   seeds, or use the remaining five for three pretrained Tiny and two initial
-   Tiny runs. The latter keeps a three-seed primary RGB/JEPA comparison but
-   explicitly weakens secondary controls. The frontend decision remains
+   **5/10 replication attempts used.** Upstream still has one completed seed,
+   so no statistically established native advantage or frozen competence.
+   **October 1 correction:** the ten-attempt cap is for replication; applying it
+   to the later JEPA study unnecessarily blocked authorized work. Finish the
+   two upstream seeds (seven replication attempts including the interruption),
+   then separately declare three pretrained Tiny and three initial Tiny runs,
+   reusing the three RGB controls. Keep the original three-seed requirements.
+   The frontend decision remains
    pending. The smaller recipe changes capacity/BPTT/replay
    ratio; it is not an unchanged-learning backend speedup.
 

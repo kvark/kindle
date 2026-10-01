@@ -86,6 +86,11 @@ performance advantage. [Curves and audits](../results/2026-09-30-small-replicati
 49,939 updates and all completion audits in 26–27 minutes. Last50 online scores
 are 328.8/334.8/440.4; mean 368.0 with learner-seed bootstrap 95% CI
 [328.8,440.4]. **5/10 attempts used.** Upstream remains one seed; no matched
-three-seed replication conclusion yet. The proposed compact JEPA allocation
-(three pretrained / two initial Tiny in the remaining five slots) awaits the
-user's choice and does not silently replace this protocol's paired-seed target.
+three-seed replication conclusion yet.
+
+**October 1 allocation correction:** the cap is for replication, not implicitly
+the entire subsequent Phase 2 study. The proposed three/two Tiny split was not
+adopted. Finish upstream seeds2017/3019 within this cap (seven attempts total if
+both pass); retain three paired seeds. The later JEPA comparison gets its own
+compact declaration and retains three pretrained / three initial Tiny seeds,
+reusing the completed native RGB controls. No old matrix restarts.
