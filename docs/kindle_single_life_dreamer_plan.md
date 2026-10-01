@@ -205,7 +205,7 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    learning screen qualifies the local port/recipe, not the full authors'
    benchmark, frozen competence or a general native superiority claim.
    **October 1 correction:** the ten-attempt cap is for replication; applying it
-   to the later JEPA study unnecessarily blocked authorized work. Finish the
+   to the later JEPA study unnecessarily blocked authorized work. The remaining
    two upstream seeds completed within it. The separate
    [compact JEPA declaration](experiments/2026-10-01-small-jepa-comparison.md)
    retains three pretrained Tiny and three initial Tiny runs, reusing the RGB
