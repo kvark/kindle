@@ -30,7 +30,8 @@ pub struct CaptureInfo {
     pub stride: u64,
     pub data_offset: u64,
     pub format: PixelFormat,
-    import: gpu::VulkanBufferImport,
+    buffer_size: u64,
+    allocation: gpu::ExternalMemoryAllocation,
 }
 
 impl CaptureInfo {
@@ -49,10 +50,10 @@ impl CaptureInfo {
             stride: u64_at(20),
             data_offset: u64_at(36),
             format,
-            import: gpu::VulkanBufferImport {
-                buffer_size: u64_at(48),
-                allocation_size: u64_at(28),
-                memory_offset: 0,
+            buffer_size: u64_at(48),
+            allocation: gpu::ExternalMemoryAllocation {
+                size: u64_at(28),
+                offset: 0,
                 memory_type_index: u32_at(44),
                 device_uuid: bytes[56..72].try_into().unwrap(),
                 driver_uuid: bytes[72..88].try_into().unwrap(),
@@ -72,9 +73,9 @@ impl CaptureInfo {
             || !info.data_offset.is_multiple_of(4)
             || !info.stride.is_multiple_of(4)
             || frame_bytes.is_none_or(|n| n != info.stride)
-            || end.is_none_or(|n| n > info.import.buffer_size || n > u64::from(u32::MAX))
-            || info.import.buffer_size > info.import.allocation_size
-            || info.import.memory_type_index >= 32
+            || end.is_none_or(|n| n > info.buffer_size || n > u64::from(u32::MAX))
+            || info.buffer_size > info.allocation.size
+            || info.allocation.memory_type_index >= 32
         {
             return Err(io::Error::other("invalid capture allocation geometry"));
         }
@@ -164,14 +165,14 @@ impl CaptureStream {
                     }
                     self.stream.read_exact(&mut packet[4..])?;
                     let info = CaptureInfo::parse(&packet)?;
-                    let buffer = unsafe {
-                        self.gpu.import_vulkan_buffer_fd(
-                            "kindle_capture",
-                            info.import,
-                            handles.pop().unwrap(),
-                        )
-                    }
-                    .map_err(io::Error::other)?;
+                    let buffer = self.gpu.create_buffer(gpu::BufferDesc {
+                        name: "kindle_capture",
+                        size: info.buffer_size,
+                        memory: gpu::Memory::External(gpu::ExternalMemorySource::Fd(Some((
+                            handles[0].as_raw_fd(),
+                            info.allocation,
+                        )))),
+                    });
                     if let Some((old, _)) = self.imported.replace((buffer, info)) {
                         self.gpu.destroy_buffer(old);
                     }
@@ -344,8 +345,13 @@ mod tests {
                 size: 2048,
                 memory: gpu::Memory::Shared,
             });
-            let info = gpu.exported_vulkan_buffer_info(ring);
-            assert_eq!(info.memory_offset, 0);
+            let Some(gpu::ExternalMemorySource::Fd(Some((fd, info)))) =
+                gpu.get_external_buffer_source(ring)
+            else {
+                panic!("missing export FD")
+            };
+            let fd = unsafe { OwnedFd::from_raw_fd(fd) };
+            assert_eq!(info.offset, 0);
             let mut encoder = gpu.create_command_encoder(gpu::CommandEncoderDesc {
                 name: "test_producer",
                 buffer_count: 1,
@@ -366,27 +372,17 @@ mod tests {
             ] {
                 metadata[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
             }
-            for (offset, value) in [
-                (20, 2048),
-                (28, info.allocation_size),
-                (36, 64),
-                (48, info.buffer_size),
-            ] {
+            for (offset, value) in [(20, 2048), (28, info.size), (36, 64), (48, 64 + 3 * 2048)] {
                 metadata[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
             }
             metadata[56..72].copy_from_slice(&info.device_uuid);
             metadata[72..88].copy_from_slice(&info.driver_uuid);
-            let Some(gpu::ExternalMemorySource::Fd(Some(fd))) =
-                gpu.get_external_buffer_source(ring)
-            else {
-                panic!("missing export FD")
-            };
             // Split the tag and metadata deliberately, including the SCM_RIGHTS packet.
             assert_eq!(
                 sendmsg::<()>(
                     socket.as_raw_fd(),
                     &[IoSlice::new(&metadata[..2])],
-                    &[ControlMessage::ScmRights(&[fd])],
+                    &[ControlMessage::ScmRights(&[fd.as_raw_fd()])],
                     MsgFlags::MSG_NOSIGNAL,
                     None
                 )
@@ -455,6 +451,7 @@ mod tests {
             let frame = stream.next_frame().unwrap();
             assert_eq!((frame.info().width, frame.info().height), (32, 16));
             let (buffer, _) = frame.capture.imported.unwrap();
+            assert!(gpu.get_external_buffer_source(buffer).is_none());
             let offset = frame.capture.pending.as_ref().unwrap().1;
             encoder.start();
             encoder.transfer("capture_oracle").copy_buffer_to_buffer(

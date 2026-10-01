@@ -131,7 +131,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `75d08173` adds opt-in, bounded split convolution
+- Current backend: Meganeura `2c3130fb` / Blade `f54a55c3` rework
+  [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
+  `Memory::External` -> `create_buffer` path. `Fd(Some((fd, allocation)))`
+  carries exporter metadata; imports borrow/duplicate FDs, and ownership barriers
+  remain separate synchronization. No parallel Vulkan import constructor or
+  export-metadata accessor. Keep the single public import path. Meganeura's
+  numerical code is unchanged; its PR221 only repins Blade. Current capture
+  validation is separate from historical Phase 2 learning evidence.
+- Phase 2 used Meganeura `75d08173`, which adds opt-in, bounded split convolution
   gradients and fixes split-measurement pipeline selection over `22c31b94`
   (tested batched last-two-axis transpose). Kindle uses512-position partitions
   on low-parallelism training convolutions; no new kernel or learning setting.
