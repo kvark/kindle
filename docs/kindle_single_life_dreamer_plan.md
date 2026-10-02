@@ -65,9 +65,15 @@ data. See the
 The October 2 [matching-allocation rework](results/2026-10-02-matching-external-allocations.md)
 uses Blade's existing `Memory::External(Fd(Some(fd)))` resource path. Identical
 buffer/allocation recipes derive the memory type and Vulkan allocation size;
-there is no exporter metadata API. Dullahan GPU_SYNC v3 uses the same recipe,
-and queue ownership stays a separate `CommandEncoder` synchronization operation.
+there is no exporter metadata API. Dullahan GPU_SYNC v4 uses the same recipe
+and hands off the whole ring buffer. Queue ownership stays a separate, safe
+whole-buffer `CommandEncoder` operation; first-use state belongs to the buffer,
+not each slot.
 It changes capture integration, not the Phase 2 learning evidence above.
+The v4 ring passes functionally but logs an NVIDIA `NV_ERR_NO_MEMORY` warning;
+further local GPU work stopped for review, with the v4 real-producer test still
+unrun. No Xid/hang or recovery is recorded; cause remains unresolved. See the
+matching-allocation report for the retained logs and host-only snapshot.
 Before the next learner experiment, qualify the newly landed Meganeura
 `b947950` optimizer update (host-computed Adam/LaProp bias correction).
 It was found in October 2's final upstream recheck, not bundled into this

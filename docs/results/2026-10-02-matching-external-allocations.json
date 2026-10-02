@@ -37,6 +37,37 @@
     "layer_sha256": "d90f37d4bebf57daf39e8211e37933ce6c59cc5202147ac2c554203b2dc92ca9",
     "passed": true
   },
+  "whole_buffer_review": {
+    "blade": "a78618069780a653d443cb0ddf61e207cb226043",
+    "meganeura": "4cbcd69b9bf892288e695e7341c583ec16c813a6",
+    "dullahan": "30aa6d3efd0f2511e06c9b60bd1fc2cff2398705",
+    "mind_games": "589ed04",
+    "protocol_version": 4,
+    "root": "runs/external-whole-buffer-20261002.yVEMhc",
+    "cpu": {"blade_passed": 9, "dullahan_passed": 4, "kindle_workspace_passed": 100, "kindle_ignored": 42},
+    "allocation": {"guard": "blade-guard", "seconds": 2.57, "passed": true},
+    "ring": {
+      "guard": "ring-guard",
+      "slots": 3,
+      "generations": 12,
+      "seconds": 1.99,
+      "exact_bytes": true,
+      "functional_test_passed": true,
+      "host_guard_passed": true,
+      "accepted_as_clean_gpu_qualification": false,
+      "warning": "NVRM nvCheckOkFailedNoLog: NV_ERR_NO_MEMORY from _memdescAllocInternal",
+      "kernel_source_monotonic_seconds": 317192.876721,
+      "journal_receipt_monotonic_seconds": 317197.270103,
+      "systemd_memory_peak_mib": 128
+    },
+    "producer": {"status": "not_run_after_kernel_warning"},
+    "host_snapshot": "runs/gpu-incident-whole-buffer-ae74xvpv/host",
+    "snapshot_verified_files": 21,
+    "new_xid_reported": false,
+    "cause": null,
+    "nvml_polling": false,
+    "host_recovery_performed": false
+  },
   "retained_rejection": {
     "guard": "producer-guard",
     "host_guard_passed": true,

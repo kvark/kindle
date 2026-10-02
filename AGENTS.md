@@ -131,19 +131,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `089031ae` / Blade `74c407a1` rework
+- Current backend: Meganeura `4cbcd69b` / Blade `a7861806` rework
   [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
   `Memory::External` -> `create_buffer` path. `Fd(Some(fd))` borrows/duplicates
   the FD; matching resource/allocation recipes derive the same memory type and
   Vulkan requirement size at binding offset zero. Device/driver compatibility
   is the caller's responsibility; no UUID/allocation metadata API. Acquire/release
-  belong to `CommandEncoder`, separate from import. Dullahan `2721a8d3` GPU_SYNC
-  v3 matches the recipe and rejects older protocol tags. No parallel Vulkan
+  are safe whole-buffer `CommandEncoder` methods, separate from import.
+  Dullahan `30aa6d3e` GPU_SYNC v4 matches the recipe, hands off the whole ring
+  buffer and rejects older protocol tags. First-use ownership is tracked once
+  per buffer, not per slot. No parallel Vulkan
   import constructor or export-metadata accessor. Meganeura's
   numerical code is unchanged; its PR221 only repins Blade. Current capture
   validation is separate from historical Phase 2 learning evidence. Matching
-  padded allocations, the exact-byte capture ring, and actual Dullahan/vkcube
-  capture pass on RTX5080. The producer test found and fixed missing external-
+  padded allocations pass on RTX5080. The v4 exact-byte ring passes functionally
+  but logs a new `NV_ERR_NO_MEMORY` kernel warning missed by the host guard;
+  local native work is stopped pending review. The v4 real-producer test is
+  unrun; the earlier v3 producer success is not v4 qualification. No Xid/hang
+  or host recovery is recorded. The earlier producer test fixed missing external-
   memory instance dependencies for Vulkan1.0; the original validation failure
   is retained. See `docs/results/2026-10-02-matching-external-allocations.md`.
 - Phase 2 used Meganeura `75d08173`, which adds opt-in, bounded split convolution

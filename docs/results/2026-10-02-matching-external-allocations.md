@@ -67,7 +67,9 @@ Mind-games `a177872` updates its Dullahan gitlink. The active
 dashboard. Only the maintainer merges; repin chosen merged revisions when landing.
 Blade CI1149 initially reports a Windows ray-tracing-test access violation;
 Linux/macOS GPU checks pass. It is tracked separately, not hidden by the local
-Linux validation. Phase 2 remains complete. No new training, performance claim,
+Linux validation. Its one Windows retry subsequently passes, making CI1149
+green; this does not erase the initial failure. Phase 2 remains complete.
+No new training, performance claim,
 utilization measurement, CPU learner workaround or Phase 3 campaign.
 
 A final upstream check found new Meganeura main `b947950` (`f05c1a0` moves
@@ -75,3 +77,43 @@ Adam/LaProp bias correction to the host; `b947950` adjusts optimizer-padding
 test tolerance). That optimizer arithmetic change is a separate qualification
 before the next learner experiment, not part of this capture-only backend
 repin. A read-only merge-tree check finds no conflict with the current PR.
+
+## Second review: whole-buffer ownership
+
+The October 2 review is implemented in Blade `a7861806`: allocation failure
+panics where it happens; one match constructs the import descriptor and
+duplicates its FD; ownership methods are safe and take a whole `Buffer`.
+Their barriers use `VK_WHOLE_SIZE`. Meganeura `4cbcd69b` only repins Blade.
+
+Dullahan `30aa6d3e` and Kindle now use GPU_SYNC v4, rejecting v3's per-slot
+ownership contract. Both release/acquire the whole ring buffer; the producer
+skips its initial acquire once per **buffer**, not once per slot. Copy offsets
+and the 44-byte geometry packet remain unchanged. Mind-games `589ed04` updates
+its producer gitlink. There is no compatibility shim or new import path.
+
+- Blade: 9 CPU tests, strict Clippy, formatting, GLES and wasm32 pass. Its
+  [guarded allocation/ownership regression](../../runs/external-whole-buffer-20261002.yVEMhc/blade-guard/)
+  passes in 2.57s with no new reported validation error or kernel warning.
+- Dullahan: 4 CPU tests, strict Clippy and release build pass, including a new
+  regression for first-use ownership across different ring slots. CI60 passes.
+- Kindle: 100 workspace CPU tests (42 ignored), formatting and strict
+  workspace/Python-binding Clippy pass with the new pins.
+- The [whole-buffer ring test](../../runs/external-whole-buffer-20261002.yVEMhc/ring-guard/)
+  passes its exact-byte/three-slot/twelve-generation checks in 1.99s, but is
+  **not accepted as a clean GPU qualification**: its journal delta contains an
+  NVIDIA `nvCheckOkFailedNoLog` / `NV_ERR_NO_MEMORY` warning from
+  `_memdescAllocInternal`, received at 06:48:19.753 UTC. The guard returned true
+  because its fault matcher does not include this warning. Preserve that raw
+  result; do not equate it to clean hardware qualification.
+- Further native work stopped. The declared v4 real-Dullahan-producer test
+  **has not run**. The earlier v3 producer success is not evidence for v4.
+
+The [host-only snapshot](../../runs/gpu-incident-whole-buffer-ae74xvpv/host/)
+is sealed (21 files verified). No new Xid, hang or OOM-kill is recorded; the
+test exited zero and its systemd service reports a 128MiB memory peak. The
+same warning appears twice earlier in this boot. Its kernel source monotonic
+time is 317192.876721s, journal receipt time 317197.270103s; those timestamps
+do not establish the triggering process. Cause and severity are unresolved,
+not proof of a new wedge or of harmlessness. No NVML polling, recovery, retry
+or new training was performed. Review the warning before another local native
+run; the producer qualification remains pending.

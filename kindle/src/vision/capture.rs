@@ -18,7 +18,7 @@ use nix::sys::socket::{ControlMessageOwned, MsgFlags, recvmsg};
 
 use super::preprocess_gpu::{FrameLayout, GpuFrame, PixelFormat};
 
-const METADATA: u32 = 0x33505347;
+const METADATA: u32 = 0x34505347;
 const FRAME: u32 = 0x32465247;
 const STOP: u32 = 0x32544f53;
 
@@ -85,10 +85,11 @@ pub struct CaptureStream {
 
 impl CaptureStream {
     /// # Safety
-    /// The trusted local producer must implement Dullahan GPU_SYNC v3 on the
+    /// The trusted local producer must implement Dullahan GPU_SYNC v4 on the
     /// same physical device and driver, using Blade's matching external-buffer
-    /// allocation recipe. It must release to EXTERNAL and complete its fence
-    /// before FRAME, and prevent reuse until ACK. Older protocols are refused.
+    /// allocation recipe. It must release the whole buffer to EXTERNAL and
+    /// complete its fence before FRAME, and prevent reuse until ACK. Older
+    /// protocols are refused.
     pub unsafe fn connect(
         context: Arc<gpu::Context>,
         path: impl AsRef<Path>,
@@ -184,10 +185,7 @@ impl CaptureStream {
                     self.generation = generation;
                     let offset = info.data_offset + u64::from(slot) * info.stride;
                     self.encoder.start();
-                    unsafe {
-                        self.encoder
-                            .acquire_external_buffer(buffer.at(offset), info.stride);
-                    }
+                    self.encoder.acquire_external_buffer(buffer);
                     let acquired = self.gpu.submit(&mut self.encoder);
                     self.pending = Some((packet[..16].try_into().unwrap(), offset, acquired));
                     return Ok(CapturedFrame { capture: self });
@@ -202,7 +200,7 @@ impl CaptureStream {
     }
 
     fn release(&mut self, stop: bool) -> io::Result<()> {
-        let Some((mut packet, offset, acquired)) = self.pending.take() else {
+        let Some((mut packet, _, acquired)) = self.pending.take() else {
             return Ok(());
         };
         assert!(
@@ -210,12 +208,9 @@ impl CaptureStream {
                 .wait_for(&acquired, !0)
                 .expect("capture acquire wait failed")
         );
-        let (buffer, info) = self.imported.unwrap();
+        let (buffer, _) = self.imported.unwrap();
         self.encoder.start();
-        unsafe {
-            self.encoder
-                .release_external_buffer(buffer.at(offset), info.stride);
-        }
+        self.encoder.release_external_buffer(buffer);
         let released = self.gpu.submit(&mut self.encoder);
         assert!(
             self.gpu
@@ -314,7 +309,7 @@ mod tests {
     use super::*;
 
     #[test]
-    #[ignore = "requires native Vulkan, Xvfb, vkcube and a built Dullahan GPU_SYNC v3 layer"]
+    #[ignore = "requires native Vulkan, Xvfb, vkcube and a built Dullahan GPU_SYNC v4 layer"]
     fn dullahan_producer_imports_matching_allocation() {
         use nix::libc;
         use std::{
@@ -507,17 +502,13 @@ mod tests {
                     std::slice::from_raw_parts_mut(upload.data(), 2048).fill(generation as u8);
                 }
                 encoder.start();
-                if generation > 3 {
-                    unsafe {
-                        encoder.acquire_external_buffer(range, 2048);
-                    }
+                if generation > 1 {
+                    encoder.acquire_external_buffer(ring);
                 }
                 encoder
                     .transfer("write_pattern")
                     .copy_buffer_to_buffer(upload.into(), range, 2048);
-                unsafe {
-                    encoder.release_external_buffer(range, 2048);
-                }
+                encoder.release_external_buffer(ring);
                 assert!(gpu.wait_for(&gpu.submit(&mut encoder), !0).unwrap());
                 let mut packet = [0u8; 16];
                 packet[..4].copy_from_slice(&FRAME.to_le_bytes());
@@ -605,7 +596,7 @@ mod tests {
             CaptureInfo::parse(&header()).unwrap().format,
             PixelFormat::Bgra8
         );
-        for magic in [0x32505347u32, 0x554e5347] {
+        for magic in [0x32505347u32, 0x33505347, 0x554e5347] {
             let mut data = header();
             data[..4].copy_from_slice(&magic.to_le_bytes());
             assert!(CaptureInfo::parse(&data).is_err());

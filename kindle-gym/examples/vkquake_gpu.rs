@@ -32,7 +32,7 @@ mod native {
         /// Directory containing id1/pak0.pak. Existing configs are not copied.
         #[arg(long)]
         data: PathBuf,
-        /// Dullahan checkout with a release library and GPU_SYNC v3 support.
+        /// Dullahan checkout with a release library and GPU_SYNC v4 support.
         #[arg(long)]
         dullahan: PathBuf,
         #[arg(long)]
