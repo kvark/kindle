@@ -131,14 +131,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `2c3130fb` / Blade `f54a55c3` rework
+- Current backend: Meganeura `089031ae` / Blade `74c407a1` rework
   [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
-  `Memory::External` -> `create_buffer` path. `Fd(Some((fd, allocation)))`
-  carries exporter metadata; imports borrow/duplicate FDs, and ownership barriers
-  remain separate synchronization. No parallel Vulkan import constructor or
-  export-metadata accessor. Keep the single public import path. Meganeura's
+  `Memory::External` -> `create_buffer` path. `Fd(Some(fd))` borrows/duplicates
+  the FD; matching resource/allocation recipes derive the same memory type and
+  Vulkan requirement size at binding offset zero. Device/driver compatibility
+  is the caller's responsibility; no UUID/allocation metadata API. Acquire/release
+  belong to `CommandEncoder`, separate from import. Dullahan `2721a8d3` GPU_SYNC
+  v3 matches the recipe and rejects older protocol tags. No parallel Vulkan
+  import constructor or export-metadata accessor. Meganeura's
   numerical code is unchanged; its PR221 only repins Blade. Current capture
-  validation is separate from historical Phase 2 learning evidence.
+  validation is separate from historical Phase 2 learning evidence. Matching
+  padded allocations, the exact-byte capture ring, and actual Dullahan/vkcube
+  capture pass on RTX5080. The producer test found and fixed missing external-
+  memory instance dependencies for Vulkan1.0; the original validation failure
+  is retained. See `docs/results/2026-10-02-matching-external-allocations.md`.
 - Phase 2 used Meganeura `75d08173`, which adds opt-in, bounded split convolution
   gradients and fixes split-measurement pipeline selection over `22c31b94`
   (tested batched last-two-axis transpose). Kindle uses512-position partitions

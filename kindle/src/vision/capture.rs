@@ -18,7 +18,7 @@ use nix::sys::socket::{ControlMessageOwned, MsgFlags, recvmsg};
 
 use super::preprocess_gpu::{FrameLayout, GpuFrame, PixelFormat};
 
-const METADATA: u32 = 0x32505347;
+const METADATA: u32 = 0x33505347;
 const FRAME: u32 = 0x32465247;
 const STOP: u32 = 0x32544f53;
 
@@ -31,11 +31,10 @@ pub struct CaptureInfo {
     pub data_offset: u64,
     pub format: PixelFormat,
     buffer_size: u64,
-    allocation: gpu::ExternalMemoryAllocation,
 }
 
 impl CaptureInfo {
-    fn parse(bytes: &[u8; 88]) -> io::Result<Self> {
+    fn parse(bytes: &[u8; 44]) -> io::Result<Self> {
         let u32_at = |offset| u32::from_le_bytes(bytes[offset..offset + 4].try_into().unwrap());
         let u64_at = |offset| u64::from_le_bytes(bytes[offset..offset + 8].try_into().unwrap());
         let format = match u32_at(12) {
@@ -50,14 +49,7 @@ impl CaptureInfo {
             stride: u64_at(20),
             data_offset: u64_at(36),
             format,
-            buffer_size: u64_at(48),
-            allocation: gpu::ExternalMemoryAllocation {
-                size: u64_at(28),
-                offset: 0,
-                memory_type_index: u32_at(44),
-                device_uuid: bytes[56..72].try_into().unwrap(),
-                driver_uuid: bytes[72..88].try_into().unwrap(),
-            },
+            buffer_size: u64_at(28),
         };
         let frame_bytes = u64::from(info.width)
             .checked_mul(u64::from(info.height))
@@ -74,8 +66,7 @@ impl CaptureInfo {
             || !info.stride.is_multiple_of(4)
             || frame_bytes.is_none_or(|n| n != info.stride)
             || end.is_none_or(|n| n > info.buffer_size || n > u64::from(u32::MAX))
-            || info.buffer_size > info.allocation.size
-            || info.allocation.memory_type_index >= 32
+            || info.buffer_size > u64::from(u32::MAX)
         {
             return Err(io::Error::other("invalid capture allocation geometry"));
         }
@@ -94,9 +85,10 @@ pub struct CaptureStream {
 
 impl CaptureStream {
     /// # Safety
-    /// The trusted local producer must implement Dullahan GPU_SYNC: truthful
-    /// allocation metadata, release-to-EXTERNAL plus a completed producer fence
-    /// before FRAME, and no reuse until ACK. Legacy SHM-ready captures are refused.
+    /// The trusted local producer must implement Dullahan GPU_SYNC v3 on the
+    /// same physical device and driver, using Blade's matching external-buffer
+    /// allocation recipe. It must release to EXTERNAL and complete its fence
+    /// before FRAME, and prevent reuse until ACK. Older protocols are refused.
     pub unsafe fn connect(
         context: Arc<gpu::Context>,
         path: impl AsRef<Path>,
@@ -127,7 +119,7 @@ impl CaptureStream {
         loop {
             // Read just the packet tag with recvmsg so metadata FDs cannot be
             // consumed unnoticed by a buffered read. Unix streams may split it.
-            let mut packet = [0u8; 88];
+            let mut packet = [0u8; 44];
             let mut iov = [IoSliceMut::new(&mut packet[..4])];
             let mut ancillary = nix::cmsg_space!([RawFd; 4]);
             let message = recvmsg::<()>(
@@ -168,10 +160,9 @@ impl CaptureStream {
                     let buffer = self.gpu.create_buffer(gpu::BufferDesc {
                         name: "kindle_capture",
                         size: info.buffer_size,
-                        memory: gpu::Memory::External(gpu::ExternalMemorySource::Fd(Some((
+                        memory: gpu::Memory::External(gpu::ExternalMemorySource::Fd(Some(
                             handles[0].as_raw_fd(),
-                            info.allocation,
-                        )))),
+                        ))),
                     });
                     if let Some((old, _)) = self.imported.replace((buffer, info)) {
                         self.gpu.destroy_buffer(old);
@@ -194,11 +185,8 @@ impl CaptureStream {
                     let offset = info.data_offset + u64::from(slot) * info.stride;
                     self.encoder.start();
                     unsafe {
-                        self.gpu.acquire_external_buffer(
-                            &mut self.encoder,
-                            buffer.at(offset),
-                            info.stride,
-                        );
+                        self.encoder
+                            .acquire_external_buffer(buffer.at(offset), info.stride);
                     }
                     let acquired = self.gpu.submit(&mut self.encoder);
                     self.pending = Some((packet[..16].try_into().unwrap(), offset, acquired));
@@ -225,8 +213,8 @@ impl CaptureStream {
         let (buffer, info) = self.imported.unwrap();
         self.encoder.start();
         unsafe {
-            self.gpu
-                .release_external_buffer(&mut self.encoder, buffer.at(offset), info.stride);
+            self.encoder
+                .release_external_buffer(buffer.at(offset), info.stride);
         }
         let released = self.gpu.submit(&mut self.encoder);
         assert!(
@@ -326,6 +314,138 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "requires native Vulkan, Xvfb, vkcube and a built Dullahan GPU_SYNC v3 layer"]
+    fn dullahan_producer_imports_matching_allocation() {
+        use nix::libc;
+        use std::{
+            fs::{self, File},
+            io::{BufRead, BufReader},
+            os::unix::process::CommandExt,
+            process::{Child, Command, Stdio},
+            thread,
+            time::Instant,
+        };
+
+        struct OwnedChild(Child);
+        impl OwnedChild {
+            fn spawn(command: &mut Command) -> Self {
+                let parent = std::process::id();
+                unsafe {
+                    command.pre_exec(move || {
+                        if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0 {
+                            return Err(io::Error::last_os_error());
+                        }
+                        if libc::getppid() as u32 != parent {
+                            return Err(io::Error::other("parent exited"));
+                        }
+                        Ok(())
+                    });
+                }
+                Self(command.spawn().unwrap())
+            }
+        }
+        impl Drop for OwnedChild {
+            fn drop(&mut self) {
+                let _ = self.0.kill();
+                let _ = self.0.wait();
+            }
+        }
+
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_CAPTURE_TEST_OUTPUT").unwrap());
+        fs::create_dir_all(&root).unwrap();
+        let layer = std::path::PathBuf::from(std::env::var("KINDLE_DULLAHAN").unwrap());
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let device = gpu.device_information();
+        assert!(!device.is_software_emulated);
+        assert_eq!(
+            device.device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let memory = gpu.memory_stats();
+        assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        let mut display = OwnedChild::spawn(
+            Command::new("Xvfb")
+                .args([
+                    "-displayfd",
+                    "1",
+                    "-screen",
+                    "0",
+                    "160x120x24",
+                    "-nolisten",
+                    "tcp",
+                ])
+                .stdout(Stdio::piped())
+                .stderr(File::create_new(root.join("xvfb.log")).unwrap()),
+        );
+        let mut number = String::new();
+        BufReader::new(display.0.stdout.take().unwrap())
+            .read_line(&mut number)
+            .unwrap();
+        let number: u16 = number.trim().parse().unwrap();
+        let socket = root.join("capture.sock");
+        let shm = format!("kindle-capture-test-{}", std::process::id());
+        let mut producer = OwnedChild::spawn(
+            Command::new("vkcube")
+                .args(["--width", "160", "--height", "120"])
+                .env("DISPLAY", format!(":{number}"))
+                .env("VK_ADD_LAYER_PATH", &layer)
+                .env("LD_LIBRARY_PATH", layer.join("target/release"))
+                .env(
+                    "VK_INSTANCE_LAYERS",
+                    "VK_LAYER_PRIVATE_dullahan:VK_LAYER_KHRONOS_validation",
+                )
+                .env("VK_LAYER_DULLAHAN_MODE", "opaque")
+                .env("VK_LAYER_DULLAHAN_SHM_NAME", &shm)
+                .env("VK_LAYER_DULLAHAN_GPU_SOCKET", &socket)
+                .env("VK_LAYER_DULLAHAN_GPU_SYNC", "1")
+                .env("RUST_LOG", "info")
+                .stdout(File::create_new(root.join("producer.stdout")).unwrap())
+                .stderr(File::create_new(root.join("producer.stderr")).unwrap()),
+        );
+        let deadline = Instant::now() + Duration::from_secs(30);
+        while !socket.exists() {
+            assert!(producer.0.try_wait().unwrap().is_none(), "producer exited");
+            assert!(Instant::now() < deadline, "producer startup timed out");
+            thread::sleep(Duration::from_millis(20));
+        }
+        let mut capture =
+            unsafe { CaptureStream::connect(gpu, &socket, Duration::from_secs(30)).unwrap() };
+        let mut slots = std::collections::BTreeSet::new();
+        for index in 0..12 {
+            let frame = capture.next_frame().unwrap();
+            let info = frame.info();
+            assert_eq!((info.width, info.height), (160, 120));
+            let offset = frame.capture.pending.as_ref().unwrap().1;
+            slots.insert((offset - info.data_offset) / info.stride);
+            let pixels = frame.read_rgb8();
+            assert!(
+                pixels
+                    .pixels()
+                    .iter()
+                    .any(|&value| value != pixels.pixels()[0])
+            );
+            frame.finish(index == 11).unwrap();
+        }
+        assert!(slots.len() > 1, "capture did not rotate ring slots");
+        eprintln!(
+            "Dullahan capture: 12 frames, {} slots, 160x120",
+            slots.len()
+        );
+        drop(capture);
+        drop(producer);
+        // The owned producer is killed after STOP; clean its private IPC names.
+        fs::remove_file(format!("/dev/shm/{shm}")).unwrap();
+        fs::remove_file(socket).unwrap();
+        for name in ["producer.stdout", "producer.stderr"] {
+            let log = fs::read_to_string(root.join(name)).unwrap();
+            assert!(
+                !log.contains("Validation Error") && !log.contains("SYNC-HAZARD"),
+                "producer validation failed; inspect {name}"
+            );
+        }
+    }
+
+    #[test]
     #[ignore = "requires two native Vulkan devices/queues with OPAQUE_FD support"]
     fn fenced_external_ring_roundtrips_without_stale_frames() {
         use nix::sys::socket::{ControlMessage, sendmsg};
@@ -345,13 +465,12 @@ mod tests {
                 size: 2048,
                 memory: gpu::Memory::Shared,
             });
-            let Some(gpu::ExternalMemorySource::Fd(Some((fd, info)))) =
+            let Some(gpu::ExternalMemorySource::Fd(Some(fd))) =
                 gpu.get_external_buffer_source(ring)
             else {
                 panic!("missing export FD")
             };
             let fd = unsafe { OwnedFd::from_raw_fd(fd) };
-            assert_eq!(info.offset, 0);
             let mut encoder = gpu.create_command_encoder(gpu::CommandEncoderDesc {
                 name: "test_producer",
                 buffer_count: 1,
@@ -361,22 +480,13 @@ mod tests {
             socket
                 .set_read_timeout(Some(Duration::from_secs(30)))
                 .unwrap();
-            let mut metadata = [0u8; 88];
-            for (offset, value) in [
-                (0, METADATA),
-                (4, 32),
-                (8, 16),
-                (12, 37),
-                (16, 3),
-                (44, info.memory_type_index),
-            ] {
+            let mut metadata = [0u8; 44];
+            for (offset, value) in [(0, METADATA), (4, 32), (8, 16), (12, 37), (16, 3)] {
                 metadata[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
             }
-            for (offset, value) in [(20, 2048), (28, info.size), (36, 64), (48, 64 + 3 * 2048)] {
+            for (offset, value) in [(20, 2048u64), (28, 64 + 3 * 2048), (36, 64)] {
                 metadata[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
             }
-            metadata[56..72].copy_from_slice(&info.device_uuid);
-            metadata[72..88].copy_from_slice(&info.driver_uuid);
             // Split the tag and metadata deliberately, including the SCM_RIGHTS packet.
             assert_eq!(
                 sendmsg::<()>(
@@ -399,14 +509,14 @@ mod tests {
                 encoder.start();
                 if generation > 3 {
                     unsafe {
-                        gpu.acquire_external_buffer(&mut encoder, range, 2048);
+                        encoder.acquire_external_buffer(range, 2048);
                     }
                 }
                 encoder
                     .transfer("write_pattern")
                     .copy_buffer_to_buffer(upload.into(), range, 2048);
                 unsafe {
-                    gpu.release_external_buffer(&mut encoder, range, 2048);
+                    encoder.release_external_buffer(range, 2048);
                 }
                 assert!(gpu.wait_for(&gpu.submit(&mut encoder), !0).unwrap());
                 let mut packet = [0u8; 16];
@@ -478,12 +588,12 @@ mod tests {
         std::fs::remove_file(path).unwrap();
     }
 
-    fn header() -> [u8; 88] {
-        let mut data = [0; 88];
-        for (offset, value) in [(0, METADATA), (4, 17), (8, 11), (12, 44), (16, 3), (44, 2)] {
+    fn header() -> [u8; 44] {
+        let mut data = [0; 44];
+        for (offset, value) in [(0, METADATA), (4, 17), (8, 11), (12, 44), (16, 3)] {
             data[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
         }
-        for (offset, value) in [(20, 17u64 * 11 * 4), (28, 4096), (36, 64), (48, 4096)] {
+        for (offset, value) in [(20, 17u64 * 11 * 4), (28, 4096), (36, 64)] {
             data[offset..offset + 8].copy_from_slice(&value.to_le_bytes());
         }
         data
@@ -495,7 +605,12 @@ mod tests {
             CaptureInfo::parse(&header()).unwrap().format,
             PixelFormat::Bgra8
         );
-        for offset in [0, 4, 8, 12, 16, 20, 28, 36, 44, 48] {
+        for magic in [0x32505347u32, 0x554e5347] {
+            let mut data = header();
+            data[..4].copy_from_slice(&magic.to_le_bytes());
+            assert!(CaptureInfo::parse(&data).is_err());
+        }
+        for offset in [0, 4, 8, 12, 16, 20, 28, 36] {
             let mut data = header();
             let value = if offset == 28 { 0 } else { u32::MAX };
             data[offset..offset + 4].copy_from_slice(&value.to_le_bytes());

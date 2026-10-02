@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-02",
+  "kind": "external-memory integration, not a learning experiment",
+  "blade": "74c407a1eaf7f076dbe5af1c600acb0afa27c3ab",
+  "meganeura": "089031ae28cba0bf07b66de3ffb4f2a69b164033",
+  "dullahan": "2721a8d3353c28931d1396591ba0040ffce18622",
+  "mind_games": "a177872",
+  "native_numerical_changes": false,
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "driver": "580.178.04",
+  "boot_id": "3e89d55c-a9e5-472f-a18a-06508c5bafa7",
+  "estimated_budget_headroom_min_bytes": 2147483648,
+  "synchronization_validation": true,
+  "nvml_polling": false,
+  "host_recovery_performed": false,
+  "gpu_utilization": null,
+  "learner_seeds": [],
+  "training_actions": 0,
+  "root": "runs/external-memory-contract-20261002.t2K3Nz",
+  "cpu": {"blade_passed": 9, "dullahan_passed": 3, "kindle_workspace_passed": 100, "kindle_ignored": 42},
+  "allocation": {
+    "guard": "blade-guard",
+    "logical_sizes": [257, 6208, 16384],
+    "allocation_sizes": [320, 6208, 16384],
+    "memory_type": 3,
+    "seconds": 3.06,
+    "passed": true
+  },
+  "ring": {"guard": "ring-guard", "slots": 3, "generations": 12, "seconds": 3.26, "exact_bytes": true, "passed": true},
+  "producer": {
+    "guard": "producer-fixed-guard",
+    "frames": 12,
+    "slots": 3,
+    "width": 160,
+    "height": 120,
+    "seconds": 3.23,
+    "layer_sha256": "d90f37d4bebf57daf39e8211e37933ce6c59cc5202147ac2c554203b2dc92ca9",
+    "passed": true
+  },
+  "retained_rejection": {
+    "guard": "producer-guard",
+    "host_guard_passed": true,
+    "accepted": false,
+    "reason": "Vulkan 1.0 external-memory instance dependency omitted; three producer validation errors despite exit 0",
+    "original_layer": "a51f17b93b86e5d4b26ce7e38d628b542884ffda",
+    "original_layer_sha256": "e40a1d7c7f59918f897eb6b675dc5d1f40b50706a9b5e8fc0509d6963abf5363"
+  }
+}

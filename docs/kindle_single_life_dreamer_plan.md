@@ -62,9 +62,11 @@ plumbing test. This is not Quake competence or 12M training throughput.
 Explicit diagnostics/checkpoints and sampled learner batches still read back
 data. See the
 [implementation and validation report](experiments/2026-09-26-gpu-resident-acting.md).
-The October 1 [external-memory API rework](results/2026-10-01-external-memory-api.md)
-uses Blade's existing `Memory::External` resource path with exporter metadata
-and borrowed FDs; queue ownership stays a separate synchronization operation.
+The October 2 [matching-allocation rework](results/2026-10-02-matching-external-allocations.md)
+uses Blade's existing `Memory::External(Fd(Some(fd)))` resource path. Identical
+buffer/allocation recipes derive the memory type and Vulkan allocation size;
+there is no exporter metadata API. Dullahan GPU_SYNC v3 uses the same recipe,
+and queue ownership stays a separate `CommandEncoder` synchronization operation.
 It changes capture integration, not the Phase 2 learning evidence above.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
