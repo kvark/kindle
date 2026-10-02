@@ -38,6 +38,13 @@ pass. Python tests use a freshly rebuilt binding. GPU tests remain ignored;
 these counts do not imply GPU numerical or learning parity. The CPU oracle ran
 with CUDA devices hidden, one thread and no GPU execution.
 
+CI256's 13 existing Linux/lavapipe Dreamer canaries pass, as do Python and
+macOS. That run still fails: its broad `tiny_` filter accidentally selects the
+new native-fixture cache test, which refuses on a missing environment variable
+before device initialization. Rename that test out of the broad filter, retaining
+its explicit native qualification requirement; no existing CI gate is removed.
+This remote software-Vulkan evidence is not local NVIDIA qualification.
+
 The implementation uses sampled pixel-batch readback/upload at the existing
 learner boundary, not a fully device-resident learner. Pixels/encoder weights
 are much larger than the old frozen-feature replay. 8,192 F32 patch frames alone

@@ -998,7 +998,7 @@ mod tests {
 
     #[test]
     #[ignore = "requires separately declared GPU and KINDLE_JOINT_TINY_REFERENCE oracle directory"]
-    fn updated_tiny_cache_matches_fresh_encoding_of_live_prefixes() {
+    fn joint_encoder_cache_matches_fresh_encoding_of_live_prefixes() {
         let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
         let manifest: serde_json::Value =
             serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();

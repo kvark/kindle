@@ -3,6 +3,7 @@
   "learning_runs_started": 0,
   "learning_runs_maximum": 6,
   "cpu_validation": {"rust_tests": 103, "python_tests": 992, "guard_tests_included": 113, "strict_clippy": true, "gpu_tests_run": false},
+  "ci256": {"linux_existing_canaries_passed": 13, "python": "pass", "macos": "pass", "failure": "broad tiny_ filter selected native-fixture cache test; missing environment variable before device initialization", "fix": "rename new test out of generic CI filter"},
   "oracle": {"torch": "2.13.0+cu130", "precision": "float64", "device": "cpu", "sha256": "81551fd2282a38fd431125290bf11def8abb0065232832b98aa71c55a16b7f85"},
   "backend": {"meganeura": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e", "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72"},
   "canary": {
