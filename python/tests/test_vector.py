@@ -16,6 +16,28 @@ import audit_pong
 import profile_atari_vector
 
 
+@pytest.mark.parametrize("args,message", [
+    (["--encoder-training", "joint"], "encoder-training requires a Tiny"),
+    (["--encoder-training", "frozen", "--encoder-checkpoint", "unused"], "batch-length16"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16"], "explicit replay-capacity"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16",
+      "--encoder", "levjepa"], "requires a Tiny"),
+    (["--encoder-training", "joint", "--encoder-checkpoint", "unused", "--batch-length", "16",
+      "--observation-size", "64"], "native frames"),
+    (["--replay-capacity", "0"], "replay-capacity must be positive"),
+    (["--restore", "unused", "--encoder-training", "joint"], "training overrides"),
+    (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
+])
+def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
+    output = tmp_path / "never.jsonl"
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
+    with pytest.raises(SystemExit) as error:
+        atari_vector.main()
+    assert error.value.code == 2
+    assert message in capsys.readouterr().err
+    assert not output.exists()
+
+
 def test_vector_api_rejects_invalid_config_before_loading_weights():
     with pytest.raises(ValueError, match="positive"):
         kindle.VectorAgent("unused", 0, {})

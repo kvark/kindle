@@ -28,7 +28,16 @@ not end-to-end JEPA training during gameplay. Large is comparison-only; DINO
 is removed. Weight-taking pixel-agent constructors keep Tiny, while the Atari
 runner requires `--encoder-checkpoint` to opt in.
 
-Numerical, optimizer/restore, streaming and noncollapse checks pass. Tiny's
+The October 2 [joint Tiny experiment](experiments/2026-10-02-joint-tiny.md) now
+has an optional implementation: task gradients through all used Tiny parameters,
+native-detail pixel replay and live causal-cache refresh. It is **not GPU-qualified**
+and has no learning results. The previous initial-Tiny arm was also frozen;
+it did not test this hypothesis. The
+[qualification report](results/2026-10-02-joint-tiny-qualification.md) records the
+CPU checks and the stopped backend canary. This follow-up precedes Phase 3.
+
+For the previously qualified frozen path, numerical, optimizer/restore,
+streaming and noncollapse checks pass. Tiny's
 4,096-update pretraining export and historical assisted Freeway wins remain
 valid evidence, but held-out probes and learning do not establish a benefit
 over its initial weights. The learned RGB path uses Dreamer's multiscale CNN
@@ -74,10 +83,11 @@ The v4 ring passes functionally but logs an NVIDIA `NV_ERR_NO_MEMORY` warning;
 further local GPU work stopped for review, with the v4 real-producer test still
 unrun. No Xid/hang or recovery is recorded; cause remains unresolved. See the
 matching-allocation report for the retained logs and host-only snapshot.
-Before the next learner experiment, qualify the newly landed Meganeura
-`b947950` optimizer update (host-computed Adam/LaProp bias correction).
-It was found in October 2's final upstream recheck, not bundled into this
-capture-only API change or retrospectively assigned to historical results.
+Merged Meganeura `6268ea5` / Blade `e349cddf` are now pinned, including the
+host-computed Adam/LaProp bias correction. Their ordinary RGB canary stopped
+on another allocation warning and SPIR-V validation errors. No native Tiny
+test or learning followed; fix/review these blockers before qualification.
+Historical evidence keeps its original backend and numerical identities.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
 [vector collection](../kindle/src/dreamer/agent/vector.rs),
@@ -213,16 +223,24 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    its old patch-CNN arm was not an exact upstream visual control. Never restart
    that queue or turn it into a completed benchmark. The ten-run cap applies
    to replication; no additional allocation question remains for Phase 2.
-5. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
+5. **October 2 user-authorized follow-up: joint causal Tiny.** Before Phase 3,
+   compare task-adaptive Tiny with frozen pretrained Tiny, three paired seeds.
+   Earlier initial-weight Tiny was frozen, not trained from scratch online.
+   [Protocol](experiments/2026-10-02-joint-tiny.md): current-weight causal replay,
+   native-detail pixels, explicit noncollapse regularization, and refreshed
+   acting caches. Qualify gradients/backend/time/memory before six bounded
+   learning runs. Historical Phase 2 conclusions remain scoped to frozen vision;
+   no new learning result is available yet.
+6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation
    experiment is not supported by current pixel collection; do not silently
    enable it or add host feature readback. Disclose shaped rewards, overrides,
    privileged reward observers and every pretraining source.
-6. **Phase 4: video priors for dynamics and behavior.** Compare action-free
+7. **Phase 4: video priors for dynamics and behavior.** Compare action-free
    dynamics pretraining, inferred actions and behavior priors at equal online
    experience; disclose offline cost and target-game exposure.
-7. **Phase 5, later: asynchronous real-time deployment.** Only after the
+8. **Phase 5, later: asynchronous real-time deployment.** Only after the
    single-actor learner is effective, introduce a separately measured async
    actor/learner, learner debt and latency percentiles. Native GPU capture
    already works, but reward/terminal adapters and mind-games controller

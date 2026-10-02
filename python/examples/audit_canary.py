@@ -14,7 +14,7 @@ from pathlib import Path
 
 METRICS = {
     "world": set("""
-        total_loss reconstruction_loss future_prediction_loss raw_kl dynamics_kl
+        total_loss reconstruction_loss future_prediction_loss encoder_regularization encoder_spread raw_kl dynamics_kl
         representation_kl reward_loss continuation_loss replay_value_loss
         replay_reward_prediction_mean replay_reward_target_mean replay_reward_mae
         rewarded_prediction_mean unrewarded_prediction_mean rewarded_count

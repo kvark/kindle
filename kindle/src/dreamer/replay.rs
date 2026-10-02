@@ -103,6 +103,8 @@ enum FrameValues {
 struct ReplayStream {
     frames: VecDeque<StoredFrame>,
     total_frames: u64,
+    next_encoder_phase: usize,
+    video_starts: VecDeque<u64>,
 }
 
 impl ReplayStream {
@@ -140,7 +142,13 @@ impl SequenceReplay {
         let required = config.replay_context + config.batch_length;
         self.streams
             .iter()
-            .map(|stream| stream.frames.len().saturating_sub(required - 1))
+            .map(|stream| {
+                if config.video_encoder.is_some() {
+                    stream.video_starts.len()
+                } else {
+                    stream.frames.len().saturating_sub(required - 1)
+                }
+            })
             .sum()
     }
 
@@ -149,6 +157,10 @@ impl SequenceReplay {
     }
 
     pub fn push_stream(&mut self, stream: usize, frame: ReplayFrame, config: &DreamerConfig) {
+        assert!(
+            config.video_encoder.is_none(),
+            "causal video replay requires GPU pixel arrivals"
+        );
         assert!(
             self.device.is_none(),
             "cannot mix host and device replay storage"
@@ -183,6 +195,18 @@ impl SequenceReplay {
         if let Some(device) = &mut self.device {
             device.wait();
         }
+    }
+
+    pub(super) fn store_pixels(&mut self, perception: &meganeura::Session, streams: &[usize]) {
+        let slots = streams
+            .iter()
+            .enumerate()
+            .map(|(i, &stream)| (stream, (self.next_device_slot + i) % self.capacity))
+            .collect::<Vec<_>>();
+        self.device
+            .as_mut()
+            .unwrap()
+            .store_pixels(perception, &slots);
     }
 
     /// Called after posterior commit, before overwriting observation/state inputs.
@@ -225,9 +249,22 @@ impl SequenceReplay {
         if self.len() == self.capacity {
             let oldest = self.arrival_order.pop_front().unwrap();
             self.streams[oldest].frames.pop_front();
+            let oldest_frame = self.streams[oldest].oldest_frame();
+            while self.streams[oldest]
+                .video_starts
+                .front()
+                .is_some_and(|&start| start < oldest_frame)
+            {
+                self.streams[oldest].video_starts.pop_front();
+            }
         }
         self.arrival_order.push_back(stream);
         let history = &mut self.streams[stream];
+        if frame.flags.is_first {
+            history.next_encoder_phase = 0;
+        }
+        let phase = history.next_encoder_phase;
+        history.next_encoder_phase = (phase + 1) % crate::vision::levjepa::FRAMES;
         history.frames.push_back(frame);
 
         history.total_frames = history
@@ -238,7 +275,17 @@ impl SequenceReplay {
         // D3's online counter is checked before it is incremented, so it skips
         // start zero and queues fresh non-overlapping starts 1, 1 + required,
         // and so on. Learner batches drain this queue before sampling uniformly.
-        if history.total_frames > required && (history.total_frames - 1).is_multiple_of(required) {
+        if config.video_encoder.is_some() {
+            if phase + 1 == crate::vision::levjepa::FRAMES && history.total_frames >= required {
+                let start = history.total_frames - required;
+                if start >= history.oldest_frame() {
+                    history.video_starts.push_back(start);
+                    self.fresh_starts.push_back((stream, start));
+                }
+            }
+        } else if history.total_frames > required
+            && (history.total_frames - 1).is_multiple_of(required)
+        {
             self.fresh_starts
                 .push_back((stream, history.total_frames - required));
         }
@@ -259,7 +306,13 @@ impl SequenceReplay {
         let counts: Vec<_> = self
             .streams
             .iter()
-            .map(|stream| stream.frames.len().saturating_sub(required - 1))
+            .map(|stream| {
+                if config.video_encoder.is_some() {
+                    stream.video_starts.len()
+                } else {
+                    stream.frames.len().saturating_sub(required - 1)
+                }
+            })
             .collect();
         let valid_count: usize = counts.iter().sum();
         if valid_count == 0 {
@@ -273,6 +326,11 @@ impl SequenceReplay {
         let mut observations = (0..length)
             .map(|_| vec![0.0; batch * config.observation_dim()])
             .collect::<Vec<_>>();
+        let mut pixels = config.video_encoder.map(|_| {
+            (0..length)
+                .map(|_| vec![0.0; batch * crate::vision::levjepa::joint::PIXELS])
+                .collect::<Vec<_>>()
+        });
         let mut previous_actions = (0..length)
             .map(|_| vec![0.0; batch * config.action_count])
             .collect::<Vec<_>>();
@@ -311,9 +369,16 @@ impl SequenceReplay {
                         }
                     })
                     .unwrap();
+                if config.video_encoder.is_some() {
+                    start = (self.streams[stream].video_starts[start]
+                        - self.streams[stream].oldest_frame()) as usize;
+                }
                 (stream, start)
             };
-            assert!(start < counts[stream], "fresh replay start is invalid");
+            assert!(
+                start + required <= self.streams[stream].frames.len(),
+                "fresh replay start is invalid"
+            );
             let frames = &self.streams[stream].frames;
             let context = &frames[start + config.replay_context - 1];
             let stoch_width = size.stoch * size.classes;
@@ -356,13 +421,26 @@ impl SequenceReplay {
                     FrameValues::Host { observation, .. } => observations[time]
                         [row * config.observation_dim()..(row + 1) * config.observation_dim()]
                         .copy_from_slice(observation.as_slice()),
-                    FrameValues::Device { slot, .. } => device_copies.push((
-                        *slot,
-                        0,
-                        time + 2,
-                        row * config.observation_dim(),
-                        config.observation_dim(),
-                    )),
+                    FrameValues::Device { slot, .. } => {
+                        if pixels.is_some() {
+                            let width = crate::vision::levjepa::joint::PIXELS;
+                            device_copies.push((
+                                *slot,
+                                config.observation_dim() + config.feature_dim(),
+                                time + length + 2,
+                                row * width,
+                                width,
+                            ));
+                        } else {
+                            device_copies.push((
+                                *slot,
+                                0,
+                                time + 2,
+                                row * config.observation_dim(),
+                                config.observation_dim(),
+                            ));
+                        }
+                    }
                 }
                 if let Some(action) = frame.previous_action {
                     previous_actions[time][row * config.action_count + action] = 1.0;
@@ -388,6 +466,7 @@ impl SequenceReplay {
                 let target = match target {
                     0 => &mut initial_deter,
                     1 => &mut initial_stoch,
+                    time if time >= length + 2 => &mut pixels.as_mut().unwrap()[time - length - 2],
                     time => &mut observations[time - 2],
                 };
                 target[offset..offset + width].copy_from_slice(&values);
@@ -398,6 +477,7 @@ impl SequenceReplay {
             initial_deter,
             initial_stoch,
             observations,
+            pixels,
             previous_actions,
             rewards,
             flags,
@@ -449,6 +529,7 @@ pub struct SequenceBatch {
     pub initial_deter: Vec<f32>,
     pub initial_stoch: Vec<f32>,
     pub observations: Vec<Vec<f32>>,
+    pub pixels: Option<Vec<Vec<f32>>>,
     pub previous_actions: Vec<Vec<f32>>,
     pub rewards: Vec<Vec<f32>>,
     pub flags: Vec<Vec<FrameFlags>>,
@@ -469,6 +550,93 @@ impl SequenceBatch {
 mod tests {
     use super::*;
     use rand::{SeedableRng, rngs::StdRng};
+
+    #[test]
+    fn video_replay_chunks_follow_arrivals_resets_and_eviction() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 2;
+        config.batch_length = crate::vision::levjepa::FRAMES;
+        config.world_backprop_length = config.batch_length;
+        config.video_encoder = Some(super::super::VideoEncoder::Joint);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        let mut replay = SequenceReplay::with_streams(100, 2);
+        let mut expected = [Vec::new(), Vec::new()];
+        let mut positions = [0, 0];
+        let mut totals = [0, 0];
+        for tick in 0..120 {
+            for stream in 0..2 {
+                // Different arrival rates, real resets and wraparound.
+                if stream == 1 && tick % 3 == 0 {
+                    continue;
+                }
+                let first = totals[stream] == 0 || (stream == 1 && tick == 43);
+                if first {
+                    positions[stream] = 0;
+                }
+                if positions[stream] == 15 && totals[stream] >= 16 {
+                    expected[stream].push(totals[stream] - 16);
+                }
+                positions[stream] = (positions[stream] + 1) % 16;
+                totals[stream] += 1;
+                // Exercise metadata only; production host pushes are rejected
+                // because ReplayFrame intentionally cannot fabricate pixels.
+                replay.push_stored(
+                    stream,
+                    StoredFrame {
+                        values: FrameValues::Host {
+                            observation: Observation::from_vec(vec![0.0; config.observation_dim()]),
+                            deter: Box::new([]),
+                            stoch: Box::new([]),
+                        },
+                        previous_action: (!first).then_some(0),
+                        reward: Reward::default(),
+                        flags: FrameFlags {
+                            is_first: first,
+                            ..Default::default()
+                        },
+                    },
+                    &config,
+                );
+                for (id, starts) in expected.iter().enumerate() {
+                    let history = &replay.streams[id];
+                    let retained = starts
+                        .iter()
+                        .copied()
+                        .filter(|&start| start >= history.oldest_frame())
+                        .collect::<VecDeque<_>>();
+                    assert_eq!(history.video_starts, retained);
+                    for &start in &history.video_starts {
+                        let offset = (start - history.oldest_frame()) as usize;
+                        assert_eq!(
+                            history
+                                .frames
+                                .range(offset + 2..offset + 17)
+                                .filter(|f| f.flags.is_first)
+                                .count(),
+                            0
+                        );
+                    }
+                }
+                assert_eq!(
+                    replay.valid_sequence_count(&config),
+                    replay
+                        .streams
+                        .iter()
+                        .map(|s| s.video_starts.len())
+                        .sum::<usize>()
+                );
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "requires GPU pixel arrivals")]
+    fn video_replay_cannot_silently_train_on_missing_pixels() {
+        let mut config = DreamerConfig::tiny(3);
+        config.video_encoder = Some(super::super::VideoEncoder::Joint);
+        SequenceReplay::new(32).push(frame(0, &config), &config);
+    }
 
     fn frame(index: usize, config: &DreamerConfig) -> ReplayFrame {
         let size = config.network();

@@ -1,0 +1,28 @@
+{
+  "status": "implementation_not_gpu_qualified",
+  "learning_runs_started": 0,
+  "learning_runs_maximum": 6,
+  "cpu_validation": {"rust_tests": 103, "python_tests": 992, "guard_tests_included": 113, "strict_clippy": true, "gpu_tests_run": false},
+  "oracle": {"torch": "2.13.0+cu130", "precision": "float64", "device": "cpu", "sha256": "81551fd2282a38fd431125290bf11def8abb0065232832b98aa71c55a16b7f85"},
+  "backend": {"meganeura": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e", "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72"},
+  "canary": {
+    "test": "dreamer::agent::upstream_reference::export_upstream_fixed_batch_reference",
+    "boot_id": "3e89d55c-a9e5-472f-a18a-06508c5bafa7",
+    "driver": "580.178.04",
+    "executable_sha256": "ee8073411a0aa69bf0df6a133b71fc6e294cff095d0159721768cd197e3d21ce",
+    "exit_code": -15,
+    "stop_reason": "unreviewed NVIDIA allocation warning",
+    "warning_source_monotonic": 355753.044395,
+    "child_spawn_monotonic": 355757.493785673,
+    "warning_receipt_monotonic": 355757.944116,
+    "new_xid_recorded": false,
+    "hang_recorded": false,
+    "host_recovery_performed": false,
+    "unfinished_children": [],
+    "validation_error": "VUID-StandaloneSpirv-None-10684",
+    "causal_attribution": "unresolved"
+  },
+  "cpu_shader_reproducer": {"naga": "323acfb729a00c3030e362faa27252afe6368792", "spirv_sha256": "7c16f87a53ce690f69441d7800b3fb0d065ebc4b24c12e45df5eae8b22fa9a06", "gpu_execution": false},
+  "evidence": "runs/joint-tiny-20261002.6BaPBD",
+  "unrun": ["merged backend numerical qualification", "native Tiny output/gradient/parameter update comparison", "native regularizer comparison", "cache refresh/restore integration", "complete-agent timing and memory", "paired learning"]
+}

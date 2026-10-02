@@ -108,6 +108,8 @@ pub struct WorldMetrics {
     pub total_loss: f32,
     pub reconstruction_loss: f32,
     pub future_prediction_loss: f32,
+    pub encoder_regularization: f32,
+    pub encoder_spread: f32,
     /// Unclipped posterior-to-prior KL before either free-nat floor.
     pub raw_kl: f32,
     pub dynamics_kl: f32,
@@ -450,6 +452,7 @@ impl DreamerCore {
         ] {
             share_matching(&mut world_train, target, "world.");
         }
+        share_matching(&mut world_train, &mut world_posterior, "encoder.");
         share_matching(&mut behavior_train, &mut imagination, "behavior.");
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
         share_matching(&mut behavior_train, &mut policy_live, "behavior.actor.");
@@ -1161,7 +1164,6 @@ impl DreamerCore {
             let (keep_deter, keep_stoch, keep_action) = keep_masks(batch, time, &self.config);
             for (name, data) in [
                 ("previous_action", &batch.previous_actions[time]),
-                ("observation", &batch.observations[time]),
                 ("keep_deter", &keep_deter),
                 ("keep_stoch", &keep_stoch),
                 ("keep_action", &keep_action),
@@ -1169,6 +1171,12 @@ impl DreamerCore {
                 self.world_posterior
                     .set_input(&format!("{name}_{time}"), data);
             }
+            let (name, values) = match &batch.pixels {
+                Some(pixels) => ("pixels", &pixels[time]),
+                None => ("observation", &batch.observations[time]),
+            };
+            self.world_posterior
+                .set_input(&format!("{name}_{time}"), values);
             let uniforms = (0..rows * size.stoch * size.classes)
                 .map(|_| self.rngs.train_posterior.random::<f32>())
                 .collect::<Vec<_>>();
@@ -1241,14 +1249,17 @@ impl DreamerCore {
                     let time = start + local_time;
                     let (keep_deter, keep_stoch, keep_action) =
                         keep_masks_range(batch, time, first_row, microbatch_rows, &self.config);
-                    self.world_train.set_input(
-                        &format!("observation_{local_time}"),
-                        row_slice(
-                            &batch.observations[time],
-                            first_row,
-                            microbatch_rows,
-                            observation_width,
+                    let (input, values, width) = match &batch.pixels {
+                        Some(pixels) => (
+                            "pixels",
+                            &pixels[time],
+                            crate::vision::levjepa::joint::PIXELS,
                         ),
+                        None => ("observation", &batch.observations[time], observation_width),
+                    };
+                    self.world_train.set_input(
+                        &format!("{input}_{local_time}"),
+                        row_slice(values, first_row, microbatch_rows, width),
                     );
                     self.world_train.set_input(
                         &format!("previous_action_{local_time}"),
@@ -1356,6 +1367,11 @@ impl DreamerCore {
                     read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
                 metrics.future_prediction_loss +=
                     read_scalar(&self.world_train, world::LOSS_FUTURE_PREDICTION);
+                if self.config.video_encoder.is_some() {
+                    metrics.encoder_regularization +=
+                        read_scalar(&self.world_train, world::LOSS_ENCODER_REGULARIZATION);
+                    metrics.encoder_spread += read_scalar(&self.world_train, world::ENCODER_SPREAD);
+                }
                 metrics.raw_kl += read_scalar(&self.world_train, world::RAW_KL);
                 metrics.dynamics_kl += read_scalar(&self.world_train, world::LOSS_DYNAMICS);
                 metrics.representation_kl +=
@@ -1372,6 +1388,8 @@ impl DreamerCore {
         metrics.total_loss *= scale;
         metrics.reconstruction_loss *= scale;
         metrics.future_prediction_loss *= scale;
+        metrics.encoder_regularization *= scale;
+        metrics.encoder_spread *= scale;
         metrics.raw_kl *= scale;
         metrics.dynamics_kl *= scale;
         metrics.representation_kl *= scale;
@@ -1397,6 +1415,8 @@ impl DreamerCore {
             metrics.total_loss,
             metrics.reconstruction_loss,
             metrics.future_prediction_loss,
+            metrics.encoder_regularization,
+            metrics.encoder_spread,
             metrics.raw_kl,
             metrics.dynamics_kl,
             metrics.representation_kl,
@@ -1430,6 +1450,7 @@ impl DreamerCore {
             targets.push(decoder);
         }
         sync_matching_many(&self.world_train, &mut targets, "world.");
+        sync_matching_many(&self.world_train, &mut targets, "encoder.");
     }
 
     fn imagine_and_target(
@@ -1905,7 +1926,7 @@ impl DreamerAgent {
         self.inner.observe_gpu(&[(0, frame, flags, reward)])[0]
     }
     pub fn learn(&mut self) -> Option<LearnReport> {
-        self.inner.core.learn()
+        self.inner.learn()
     }
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
         self.inner.learn_scheduled(maximum_updates)

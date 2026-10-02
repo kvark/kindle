@@ -31,7 +31,8 @@ def environment(tmp_path, monkeypatch):
     monkeypatch.setattr(retained, "run", forbidden)
     monkeypatch.setattr(ctypes, "CDLL", forbidden)
     calls = dict(kernel=0, snapshot=0)
-    controls = dict(fault_at=None, change_at=None, empty=False, unreadable=False, interrupted=False)
+    controls = dict(fault_at=None, change_at=None, empty=False, unreadable=False,
+                    interrupted=False, warning_at=None)
     def probe(evidence, name, command, **_kwargs):
         assert command[0] == "journalctl" and name.startswith("kernel")
         calls["kernel"] += 1
@@ -42,6 +43,8 @@ def environment(tmp_path, monkeypatch):
         if controls["change_at"] == calls["kernel"]:
             driver.write_text("changed")
         message = "NVRM: Xid (PCI:0000:01:00): 62, CPU fixture" if controls["fault_at"] == calls["kernel"] else "CPU fixture ordinary record"
+        if controls["warning_at"] == calls["kernel"]:
+            message = "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]"
         row = dict(_BOOT_ID=BOOT.replace("-", ""), __CURSOR=f'cursor-{calls["kernel"]}',
                    __MONOTONIC_TIMESTAMP="100000", MESSAGE=message)
         text = "" if controls["empty"] else json.dumps(row) + "\n"
@@ -77,6 +80,18 @@ def test_cpu_child_passes_without_telemetry_or_legacy_guard(environment):
     assert "guard_passed" not in result  # Cannot masquerade as the historical telemetry guard.
     with pytest.raises(FileExistsError):
         host.run(path / "evidence", path / "declaration.json")
+
+
+@pytest.mark.parametrize("destination", ["stdout", "stderr"])
+@pytest.mark.parametrize("sleep", [False, True])
+def test_validation_errors_fail_even_if_native_exit_is_zero(environment, destination, sleep):
+    code = (f"import sys,time; print('Validation Error: [ VUID-StandaloneSpirv-None-10684 ]', "
+            f"file=sys.{destination}, flush=True); time.sleep({1 if sleep else 0})")
+    result = execute(environment, code=code)
+    assert not result["host_guard_passed"]
+    assert result["reason"] == "Vulkan validation error in native output"
+    assert not result["unfinished_children"]
+    assert not host.audit(environment[0] / "evidence")["host_guard_passed"]
 
 
 @pytest.mark.parametrize("control,value", [("fault_at", 1), ("empty", True), ("unreadable", True),
@@ -124,6 +139,35 @@ def test_cpu_timeout_is_bounded_and_not_retried(environment):
     assert result["reason"] == "job time budget exceeded" and result["child_exit_code"] is not None
     assert calls["snapshot"] == 1 and not result["unfinished_children"]
     assert (path / "evidence/events.jsonl").read_text().count('"event": "child_spawned"') == 1
+
+
+@pytest.mark.parametrize("when", [1, 2])
+def test_allocation_warning_stops_before_or_during_child(environment, when):
+    _path, _calls, controls = environment
+    controls["warning_at"] = when
+    result = execute(environment, code="import time; time.sleep(1)")
+    assert not result["host_guard_passed"]
+    assert result["child_spawned"] is (when == 2)
+    assert result["reason"] == "unreviewed NVIDIA allocation warning"
+
+
+def test_exact_reviewed_baseline_warning_is_not_a_blanket_exception(environment):
+    _path, _calls, controls = environment
+    controls["warning_at"] = 1
+    reviewed = [{"cursor": "cursor-1",
+                 "message": "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]"}]
+    result = execute(environment, reviewed_kernel_warnings=reviewed)
+    assert result["host_guard_passed"]
+
+
+def test_reviewed_warning_does_not_allow_a_new_occurrence(environment):
+    _path, _calls, controls = environment
+    controls["warning_at"] = 2
+    reviewed = [{"cursor": "cursor-1",
+                 "message": "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]"}]
+    result = execute(environment, code="import time; time.sleep(1)",
+                     reviewed_kernel_warnings=reviewed)
+    assert not result["host_guard_passed"] and result["child_exit_code"] is not None
 
 
 def test_native_failure_remains_a_failure(environment):

@@ -10,6 +10,15 @@ pub enum ObservationKind {
     Rgb64,
 }
 
+/// Native-detail, phase-aligned causal replay. Both modes re-encode pixels;
+/// only Joint allows world/task gradients into the pretrained Tiny weights.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VideoEncoder {
+    Frozen,
+    Joint,
+}
+
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -150,6 +159,8 @@ pub struct DreamerConfig {
     pub model_size: ModelSize,
     #[serde(default)]
     pub observation_kind: ObservationKind,
+    #[serde(default)]
+    pub video_encoder: Option<VideoEncoder>,
     /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -225,6 +236,7 @@ impl DreamerConfig {
             action_count,
             model_size: ModelSize::Size12M,
             observation_kind: ObservationKind::Features,
+            video_encoder: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
@@ -359,13 +371,22 @@ impl DreamerConfig {
 
     /// Eligible replay items required before scheduled learning begins.
     pub fn replay_warmup_sequences(&self) -> usize {
-        self.batch_size * self.batch_length
+        if self.video_encoder.is_some() {
+            self.batch_size
+        } else {
+            self.batch_size * self.batch_length
+        }
     }
 
     /// Frames needed to expose [`Self::replay_warmup_sequences`] complete
     /// context-plus-training sequences.
     pub fn replay_warmup_frames(&self) -> usize {
-        self.replay_warmup_sequences() + self.replay_context + self.batch_length - 1
+        let stride = if self.video_encoder.is_some() {
+            self.batch_length
+        } else {
+            1
+        };
+        self.replay_warmup_sequences() * stride + self.replay_context + self.batch_length - 1
     }
 
     pub fn continuation_discount(&self) -> f32 {
@@ -380,6 +401,19 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if self.video_encoder.is_some()
+            && (self.observation_kind != ObservationKind::Features
+                || self.batch_length != crate::vision::levjepa::FRAMES
+                || self.world_backprop_length != self.batch_length
+                || self.replay_context != 1
+                || self.loss_scales.reconstruction != 0.0
+                || self.loss_scales.future_prediction <= 0.0)
+        {
+            return Err(
+                "causal pixel replay requires feature prediction, full T16 BPTT and context1"
+                    .into(),
+            );
+        }
         if self.observation_kind == ObservationKind::Rgb64
             && (self.visitation_bonus
                 || self.loss_scales.future_prediction != 0.0

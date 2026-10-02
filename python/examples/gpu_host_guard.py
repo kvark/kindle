@@ -36,8 +36,17 @@ def declaration(path):
         return result
     config = json.loads(Path(path).read_text(), object_pairs_hook=unique)["host_guard"]
     fields = {"monitoring", "boot_id", "driver", "command", "executable_sha256", "timeout_seconds", "poll_seconds"}
-    if not isinstance(config, dict) or set(config) != fields or config["monitoring"] != "host-only":
+    if (not isinstance(config, dict) or not fields <= set(config)
+            or set(config) - fields - {"reviewed_kernel_warnings"}
+            or config["monitoring"] != "host-only"):
         raise ValueError("require an explicit host-only declaration")
+    warnings = config.get("reviewed_kernel_warnings", [])
+    if (not isinstance(warnings, list) or any(
+            not isinstance(row, dict) or set(row) != {"cursor", "message"}
+            or any(not isinstance(value, str) or not value for value in row.values())
+            or not retained.ALLOCATION_WARNING.search(row["message"])
+            or retained.FAULT.search(row["message"]) for row in warnings)):
+        raise ValueError("reviewed warnings require exact journal cursors and allocation messages")
     if str(uuid.UUID(config["boot_id"])) != config["boot_id"] or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", config["driver"]):
         raise ValueError("invalid boot or driver identity")
     for name, maximum in (("timeout_seconds", 172800), ("poll_seconds", 5)):
@@ -64,11 +73,27 @@ def check_host(evidence, config, cursor=None):
                 or retained.DRIVER.read_text().strip() != config["driver"]):
             raise retained.GuardError("boot or loaded driver changed")
     identity()
-    cursor = retained.check_kernel(evidence, config["boot_id"], cursor)
+    cursor = retained.check_kernel(evidence, config["boot_id"], cursor,
+                                   config.get("reviewed_kernel_warnings", ()))
     identity()
     evidence.event("host_check", boot_id=config["boot_id"], driver=config["driver"],
                    kernel_cursor=cursor, started_monotonic=started)
     return cursor
+
+
+def check_validation_logs(evidence, positions):
+    for name in ("child.stdout", "child.stderr"):
+        with (evidence.root / name).open("rb") as stream:
+            # Overlap catches a diagnostic split across writes or read blocks.
+            stream.seek(max(0, positions.get(name, 0) - 128))
+            tail = b""
+            while data := stream.read(65536):
+                block = tail + data
+                if re.search(rb"Validation Error:.*?VUID-", block):
+                    evidence.event("native_validation_error", file=name, offset=stream.tell())
+                    raise retained.GuardError("Vulkan validation error in native output")
+                tail = block[-128:]
+            positions[name] = stream.tell()
 
 
 def run(root, declaration_path):
@@ -97,10 +122,12 @@ def run(root, declaration_path):
             result.update(child_spawned=True, child_pid=process.pid)
             evidence.event("child_spawned", pid=process.pid)
             deadline = time.monotonic() + config["timeout_seconds"]
+            positions = {}
             while process.poll() is None:
                 if time.monotonic() >= deadline:
                     raise retained.GuardError("job time budget exceeded")
                 cursor = check_host(evidence, config, cursor)
+                check_validation_logs(evidence, positions)
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise retained.GuardError("job time budget exceeded")
@@ -109,6 +136,7 @@ def run(root, declaration_path):
             result["child_exit_code"] = process.returncode
             if process.returncode != 0:
                 raise retained.GuardError(f"native job exited {process.returncode}")
+            check_validation_logs(evidence, positions)
         check_host(evidence, config, cursor)
         result["host_guard_passed"] = True
     except (Exception, KeyboardInterrupt) as error:
@@ -151,7 +179,7 @@ def audit(root):
     for event in events:
         if event["event"] == "health":
             raise retained.GuardError("GPU telemetry in host-only evidence")
-        if event["event"] in {"kernel_fault", "guard_stop"} and result["host_guard_passed"]:
+        if event["event"] in {"kernel_fault", "guard_stop", "native_validation_error"} and result["host_guard_passed"]:
             raise retained.GuardError("host guard pass contradicts retained events")
         if event["event"] == "probe":
             receipt = event["receipt"]

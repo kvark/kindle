@@ -7,6 +7,11 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
+task-adaptive representation hypothesis. Its
+[qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
+the implementation/CPU checks and native blockers; no learning run has started.
+
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default
 selection and real vkQuake capture through Dullahan's fenced Vulkan protocol.

@@ -1,4 +1,4 @@
-//! Frozen LeVJEPA with exact block-causal, 16-frame chunk semantics.
+//! Streaming LeVJEPA with exact block-causal, 16-frame chunk semantics.
 //!
 //! Each call processes one frame and appends its keys/values on the GPU. Patch
 //! features equal the corresponding causal prefix of the released encoder:
@@ -10,6 +10,8 @@
 use std::{path::Path, sync::Arc};
 
 use meganeura::{Graph, Mode, NodeId, Session, SessionConfig, data::safetensors::SafeTensorsModel};
+
+pub(crate) mod joint;
 
 use super::{
     OBSERVATION_CHANNELS, Observation, PROJECTION_SEED, fixed_projection, preprocess,
@@ -247,6 +249,14 @@ impl LeVJepaPerception {
         &self.session
     }
 
+    pub(crate) fn session_mut(&mut self) -> &mut Session {
+        &mut self.session
+    }
+
+    pub(crate) fn chunk_positions(&self) -> &[usize] {
+        &self.frames
+    }
+
     /// Submit perception without a feature readback. The next consumer runs on
     /// the same queue and must finish before these outputs are overwritten.
     pub(crate) fn submit_frames_rgb8(&mut self, arrivals: &[(usize, &crate::RgbFrame, bool)]) {
@@ -350,7 +360,7 @@ impl LeVJepaPerception {
 
 fn pool_patches(g: &mut Graph, patches: NodeId, streams: usize) -> NodeId {
     let channels = OBSERVATION_CHANNELS;
-    let rows = g.reshape(patches, &[streams * GRID / 2, 2 * GRID * channels]);
+    let rows = g.reshape(patches, &[streams * GRID * GRID * channels]);
     let mut corners = Vec::with_capacity(4);
     let batch = (streams * GRID / 2) as u32;
     let width = (GRID * channels) as u32;
@@ -358,7 +368,7 @@ fn pool_patches(g: &mut Graph, patches: NodeId, streams: usize) -> NodeId {
         g.split_a(rows, batch, width, width, 1),
         g.split_b(rows, batch, width, width, 1),
     ] {
-        let pairs = g.reshape(row, &[streams * GRID * GRID / 4, 2 * channels]);
+        let pairs = g.reshape(row, &[streams * GRID * GRID / 2 * channels]);
         let batch = (streams * GRID * GRID / 4) as u32;
         corners.push(g.split_a(pairs, batch, channels as u32, channels as u32, 1));
         corners.push(g.split_b(pairs, batch, channels as u32, channels as u32, 1));
@@ -412,12 +422,7 @@ fn gelu_erf(g: &mut Graph, x: NodeId) -> NodeId {
 }
 
 fn scale(g: &mut Graph, x: NodeId, value: f32) -> NodeId {
-    let shape = g.node(x).ty.shape.clone();
-    let len = g.node(x).ty.num_elements();
-    let x = g.reshape(x, &[len]);
-    let scalar = g.scalar(value);
-    let result = g.mul_per_channel(x, scalar, 1, len as u32);
-    g.reshape(result, &shape)
+    g.scale(x, value)
 }
 
 fn shift(g: &mut Graph, x: NodeId, value: f32) -> NodeId {
@@ -434,8 +439,9 @@ fn rope(g: &mut Graph, x: NodeId, cos: NodeId, sin: NodeId) -> NodeId {
     // vector in two halves. Do not substitute standard interleaved RoPE.
     let shape = g.node(x).ty.shape.clone();
     let pairs = (g.node(x).ty.num_elements() / 2) as u32;
-    let even = g.split_a(x, pairs, 1, 1, 1);
-    let odd = g.split_b(x, pairs, 1, 1, 1);
+    let flat = g.reshape(x, &[2 * pairs as usize]);
+    let even = g.split_a(flat, pairs, 1, 1, 1);
+    let odd = g.split_b(flat, pairs, 1, 1, 1);
     let negative_odd = g.neg(odd);
     let rotated = g.concat(negative_odd, even, pairs, 1, 1, 1);
     let rotated = g.reshape(rotated, &shape);
@@ -623,7 +629,7 @@ fn validate_weights(model: &SafeTensorsModel, architecture: Architecture) -> Res
     Ok(())
 }
 
-fn load_weights(
+pub(crate) fn load_weights(
     session: &mut Session,
     model: &SafeTensorsModel,
     streams: usize,

@@ -47,7 +47,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Causal Tiny remains an explicit video/3D hypothesis, not an obligation for 2D.
   Native-detail JEPA preprocessing is unchanged; RGB64 is a separate learned
   Dreamer path, never an RGB64-upscaled JEPA input.
-- **Next: Phase 3, exploration/reward.** Declare one small GPU-compatible
+- **October 2 follow-up, explicitly authorized:** test jointly trained causal
+  Tiny against frozen pretrained Tiny, three paired learner seeds. This takes
+  priority over Phase 3. The previous random-initialized Tiny was also frozen;
+  it did not test online representation learning. Preserve the Phase 2 decision
+  and historical evidence. First qualify the merged backend, encoder gradients,
+  causal replay/cache semantics, noncollapse and full-update time/memory; declare
+  the finite learning budget before gameplay. Do not silently substitute partial
+  fine-tuning, frame-only encoding or cached stale embeddings. See
+  `docs/experiments/2026-10-02-joint-tiny.md`. No representation matrix or swarms.
+  Implementation and CPU autodiff/replay checks exist; native Tiny qualification
+  and all learning are unrun. The merged-backend RGB canary stopped at17:31 UTC
+  on a fourth allocation warning, and logged workgroup-array SPIR-V validation
+  errors. Child reaped; no new Xid/hang or recovery recorded. GPU work remains
+  stopped: do not whitelist the new record and retry. See
+  `docs/results/2026-10-02-joint-tiny-qualification.md`.
+- **Following this experiment: Phase 3, exploration/reward.** Declare one small GPU-compatible
   mechanism versus extrinsic-only, three seeds, without Freeway's action aid.
   No old CPU feature-readback visitation workaround, new representation matrix,
   unchanged mastery queue, asynchronous learner or swarms. Phase 2 completion
@@ -131,7 +146,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `4cbcd69b` / Blade `a7861806` rework
+- Current pins are merged Meganeura `6268ea5` / Blade `e349cddf`, including the
+  host optimizer correction. These pins are not yet numerically qualified;
+  the ordinary-compute canary above stopped before Tiny testing.
+  Capture evidence used Meganeura `4cbcd69b` / Blade `a7861806` to rework
   [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
   `Memory::External` -> `create_buffer` path. `Fd(Some(fd))` borrows/duplicates
   the FD; matching resource/allocation recipes derive the same memory type and
@@ -141,8 +159,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Dullahan `30aa6d3e` GPU_SYNC v4 matches the recipe, hands off the whole ring
   buffer and rejects older protocol tags. First-use ownership is tracked once
   per buffer, not per slot. No parallel Vulkan
-  import constructor or export-metadata accessor. Meganeura's
-  numerical code is unchanged; its PR221 only repins Blade. Current capture
+  import constructor or export-metadata accessor. That capture-only follow-up
+  left Meganeura's numerical code unchanged; its PR221 follow-up only repinned Blade. Capture
   validation is separate from historical Phase 2 learning evidence. Matching
   padded allocations pass on RTX5080. The v4 exact-byte ring passes functionally
   but logs a new `NV_ERR_NO_MEMORY` kernel warning missed by the host guard;
@@ -169,8 +187,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   optimizer-padding comparisons from exact equality to numerical tolerance.
   This changes optimizer arithmetic and arrived during the capture review.
   It is not bundled into the numerically unchanged external-memory repin above;
-  qualify/adopt it before the next learner experiment. No learning campaign is
-  authorized merely by this dependency follow-up.
+  It is now included in the merged pins above, but still needs qualification
+  before learning. No learning campaign is authorized merely by a dependency update.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
   upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
   not a matched learning comparison. Phase 2 now independently aligns

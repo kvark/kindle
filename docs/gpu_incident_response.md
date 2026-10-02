@@ -15,6 +15,14 @@ Its declaration binds boot ID, driver, absolute command, executable SHA256,
 timeout and polling interval. Review each result before the next individual
 invocation. There is no automatic retry or successor.
 
+NVIDIA allocation warnings now stop the guard, as do emitted Vulkan validation
+errors even if the child exits zero. A declaration may identify exact reviewed
+historical allocation-warning cursor/message pairs for its baseline only;
+new occurrences and hard faults remain stops. This is not a warning-class
+waiver or proof of hardware health. The October 2
+[ordinary-compute canary](results/2026-10-02-joint-tiny-qualification.md) stopped;
+do not add its new warning to an exception list and automatically retry.
+
 The guard checks kernel logs and boot/driver identity before, during and after
 execution. It stops/reaps only its own direct child on faults or timeout. An
 uninterruptible child may remain unfinished; preserve that result and its logs.

@@ -3,11 +3,13 @@
 use meganeura::{Graph, graph::NodeId};
 
 use super::config::DreamerConfig;
+use super::config::VideoEncoder;
 use super::networks::{
     MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
     gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
     weighted_cross_entropy,
 };
+use crate::vision::levjepa::joint;
 #[cfg(test)]
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
@@ -20,6 +22,8 @@ pub const LOSS_CONTINUATION: usize = 5;
 pub const LOSS_REPLAY_VALUE: usize = 6;
 pub const RAW_KL: usize = 7;
 pub const LOSS_FUTURE_PREDICTION: usize = 8;
+pub const LOSS_ENCODER_REGULARIZATION: usize = 9;
+pub const ENCODER_SPREAD: usize = 10;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 pub const IMAGINATION_FEATURE: usize = 0;
@@ -28,6 +32,33 @@ pub const IMAGINATION_ACTION: usize = 2;
 pub const IMAGINATION_REWARD: usize = 3;
 pub const IMAGINATION_CONTINUATION: usize = 4;
 pub const IMAGINATION_VALUE: usize = 5;
+
+fn replay_observations(graph: &mut Graph, config: &DreamerConfig, length: usize) -> Vec<NodeId> {
+    let batch = config.batch_size;
+    if let Some(mode) = config.video_encoder {
+        let pixels = (0..length)
+            .map(|time| graph.input(&format!("pixels_{time}"), &[batch, joint::PIXELS]))
+            .collect::<Vec<_>>();
+        let features = joint::encode(graph, &pixels, batch);
+        if mode == VideoEncoder::Frozen {
+            features
+                .into_iter()
+                .map(|x| graph.stop_gradient(x))
+                .collect()
+        } else {
+            features
+        }
+    } else {
+        (0..length)
+            .map(|time| {
+                graph.input(
+                    &format!("observation_{time}"),
+                    &config.observation_shape(batch),
+                )
+            })
+            .collect()
+    }
+}
 
 struct Dynamics {
     core: RssmCore,
@@ -151,14 +182,12 @@ fn build_training_graph_grouped(
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
 
-    let observations = (0..length)
-        .map(|time| {
-            graph.input(
-                &format!("observation_{time}"),
-                &config.observation_shape(batch),
-            )
-        })
-        .collect::<Vec<_>>();
+    let observations = replay_observations(&mut graph, config, length);
+    let (encoder_regularization, encoder_spread) = if config.video_encoder.is_some() {
+        joint::regularization(&mut graph, &observations, batch)
+    } else {
+        (graph.scalar(0.0), graph.scalar(0.0))
+    };
     let mut encodings = Vec::with_capacity(length);
     for chunk in observations.chunks(time_batch_length) {
         let observation = stack_time(&mut graph, chunk, batch, config.observation_dim());
@@ -378,7 +407,17 @@ fn build_training_graph_grouped(
         scale(&mut graph, replay_value, scales.replay_value),
     ];
     let total = sum(&mut graph, &weighted);
-    graph.set_outputs(vec![
+    let total = if config.video_encoder.is_some() {
+        let regularizer = scale(
+            &mut graph,
+            encoder_regularization,
+            joint::REGULARIZATION_WEIGHT,
+        );
+        graph.add(total, regularizer)
+    } else {
+        total
+    };
+    let mut outputs = vec![
         total,
         reconstruction,
         dynamics,
@@ -388,7 +427,11 @@ fn build_training_graph_grouped(
         replay_value,
         raw_kl,
         future_prediction,
-    ]);
+    ];
+    if config.video_encoder.is_some() {
+        outputs.extend([encoder_regularization, encoder_spread]);
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -501,14 +544,7 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
     let representation = Representation::new(&mut graph, config);
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
-    let observations = (0..length)
-        .map(|time| {
-            graph.input(
-                &format!("observation_{time}"),
-                &config.observation_shape(batch),
-            )
-        })
-        .collect::<Vec<_>>();
+    let observations = replay_observations(&mut graph, config, length);
     let observations = stack_time(&mut graph, &observations, batch, config.observation_dim());
     let encoded = representation
         .encoder
@@ -765,6 +801,53 @@ mod rollout_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn task_losses_reach_every_joint_tiny_parameter_but_not_frozen_tiny() {
+        for mode in [VideoEncoder::Frozen, VideoEncoder::Joint] {
+            let mut config = DreamerConfig::tiny(3);
+            config.batch_size = 1;
+            config.batch_length = 16;
+            config.world_backprop_length = 16;
+            config.video_encoder = Some(mode);
+            config.loss_scales.reconstruction = 0.0;
+            config.loss_scales.future_prediction = 0.25;
+            let mut graph = build_training_graph(&config, 16);
+            let losses = graph.outputs().to_vec();
+            // Test task supervision alone, not a regularizer disguising a
+            // detached world/task path. This checks graph connectivity only.
+            for loss in [
+                LOSS_REWARD,
+                LOSS_CONTINUATION,
+                LOSS_REPLAY_VALUE,
+                LOSS_FUTURE_PREDICTION,
+                LOSS_ENCODER_REGULARIZATION,
+            ] {
+                graph.set_outputs(vec![losses[loss]]);
+                let backward = meganeura::autodiff::differentiate(&graph);
+                let mut checked = 0;
+                for (parameter, &gradient) in graph
+                    .nodes()
+                    .iter()
+                    .filter(|n| matches!(n.op, meganeura::graph::Op::Parameter { .. }))
+                    .zip(&backward.outputs()[1..])
+                {
+                    if let meganeura::graph::Op::Parameter { ref name } = parameter.op
+                        && name.starts_with("encoder.")
+                    {
+                        let connected = backward.node(gradient).ty == parameter.ty;
+                        assert_eq!(
+                            connected,
+                            mode == VideoEncoder::Joint,
+                            "{mode:?} loss{loss} {name}"
+                        );
+                        checked += 1;
+                    }
+                }
+                assert_eq!(checked, 148);
+            }
+        }
+    }
 
     #[test]
     fn tiny_graphs_expose_d3_shapes() {

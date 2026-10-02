@@ -46,9 +46,12 @@ def require_gpu_device(snapshot, expected):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--encoder-checkpoint", help="opt into frozen causal JEPA; omitted: jointly learned RGB")
+    parser.add_argument("--encoder-checkpoint", help="opt into causal JEPA (frozen unless encoder-training=joint); omitted: jointly learned RGB")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
+    parser.add_argument("--encoder-training", choices=("frozen", "joint"),
+                        help="Tiny-only experiment: native pixel replay with phase-aligned causal re-encoding")
+    parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)
@@ -103,7 +106,7 @@ def main():
         parser.error("exploration hold must be positive")
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
-    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold"}
+    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--replay-capacity"}
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -123,6 +126,13 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.replay_capacity <= 0:
+        parser.error("replay-capacity must be positive")
+    if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
+                                 or args.observation_size != "native" or args.batch_length != 16):
+        parser.error("encoder-training requires a Tiny checkpoint, native frames and batch-length16")
+    if args.encoder_training and not any(arg.split("=", 1)[0] == "--replay-capacity" for arg in sys.argv[1:]):
+        parser.error("encoder-training requires explicit replay-capacity; native pixel replay is large")
     if learned_rgb and (args.encoder is not None or args.observation_size != "native"):
         parser.error("learned RGB consumes native frames for one GPU resize; frozen --encoder requires --encoder-checkpoint")
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -169,6 +179,7 @@ def main():
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
+                      video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,
