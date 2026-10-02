@@ -69,3 +69,9 @@ Blade CI1149 initially reports a Windows ray-tracing-test access violation;
 Linux/macOS GPU checks pass. It is tracked separately, not hidden by the local
 Linux validation. Phase 2 remains complete. No new training, performance claim,
 utilization measurement, CPU learner workaround or Phase 3 campaign.
+
+A final upstream check found new Meganeura main `b947950` (`f05c1a0` moves
+Adam/LaProp bias correction to the host; `b947950` adjusts optimizer-padding
+test tolerance). That optimizer arithmetic change is a separate qualification
+before the next learner experiment, not part of this capture-only backend
+repin. A read-only merge-tree check finds no conflict with the current PR.

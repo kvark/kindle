@@ -159,6 +159,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   training correctness fix is identified. Check upstream
   before diagnosing already-fixed issues. Keep dependencies reproducible, but
   do not delay implementation to preserve obsolete runtime/checkpoint identities.
+- October 2's final upstream recheck finds Meganeura main `b947950`:
+  `f05c1a0` moves Adam/LaProp bias correction to the host; `b947950` changes
+  optimizer-padding comparisons from exact equality to numerical tolerance.
+  This changes optimizer arithmetic and arrived during the capture review.
+  It is not bundled into the numerically unchanged external-memory repin above;
+  qualify/adopt it before the next learner experiment. No learning campaign is
+  authorized merely by this dependency follow-up.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
   upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
   not a matched learning comparison. Phase 2 now independently aligns

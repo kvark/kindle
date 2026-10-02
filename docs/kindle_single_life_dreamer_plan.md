@@ -68,6 +68,10 @@ buffer/allocation recipes derive the memory type and Vulkan allocation size;
 there is no exporter metadata API. Dullahan GPU_SYNC v3 uses the same recipe,
 and queue ownership stays a separate `CommandEncoder` synchronization operation.
 It changes capture integration, not the Phase 2 learning evidence above.
+Before the next learner experiment, qualify the newly landed Meganeura
+`b947950` optimizer update (host-computed Adam/LaProp bias correction).
+It was found in October 2's final upstream recheck, not bundled into this
+capture-only API change or retrospectively assigned to historical results.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
 [vector collection](../kindle/src/dreamer/agent/vector.rs),
