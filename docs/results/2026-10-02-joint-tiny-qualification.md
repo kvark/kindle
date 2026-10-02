@@ -32,7 +32,7 @@ Phase 2's frozen-frontend evidence and the learned-RGB screening default remain.
   gradients, and regularizer values/gradients. Native comparison tests are
   implemented but **ignored/unrun** pending native qualification.
 
-Validation: **103 workspace CPU tests and 992 Python tests pass**, including
+Validation: **105 workspace/all-target CPU tests and 992 Python tests pass**, including
 113 host-guard tests. Workspace and Python-binding strict Clippy and formatting
 pass. Python tests use a freshly rebuilt binding. GPU tests remain ignored;
 these counts do not imply GPU numerical or learning parity. The CPU oracle ran
@@ -44,6 +44,10 @@ new native-fixture cache test, which refuses on a missing environment variable
 before device initialization. Rename that test out of the broad filter, retaining
 its explicit native qualification requirement; no existing CI gate is removed.
 This remote software-Vulkan evidence is not local NVIDIA qualification.
+CI257 also selects it through the separate `vector::tests::` filter; all four
+existing vector tests pass before that fixture refusal is reported. The test
+now lives in `vector::joint_qualification`, outside both generic selectors.
+Both failures are retained; the existing 13/4-test groups are unchanged.
 
 The implementation uses sampled pixel-batch readback/upload at the existing
 learner boundary, not a fully device-resident learner. Pixels/encoder weights

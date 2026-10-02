@@ -993,7 +993,7 @@ impl Drop for VectorDreamerAgent {
 }
 
 #[cfg(test)]
-mod tests {
+mod joint_qualification {
     use super::*;
 
     #[test]
@@ -1089,6 +1089,11 @@ mod tests {
         // History must complete before its session-owned sources are dropped.
         history.copies.wait();
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn video_capacity_accounts_for_nonoverlapping_chunks() {
