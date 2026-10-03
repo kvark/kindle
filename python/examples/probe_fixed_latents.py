@@ -51,7 +51,10 @@ def collect_trace(agent, environment, seed, steps, check_memory):
         if agent.act(action_mask=mask) != action:
             raise RuntimeError("forced action not honored")
         frame, reward, terminal, cutoff, _ = environment.step(action)
-        agent.observe(frame, extrinsic_reward=float(reward), terminated=terminal, truncated=cutoff)
+        # Ending the declared recording is an actor boundary, not an ALE
+        # terminal/truncation label. Preserve the real flags below.
+        agent.observe(frame, extrinsic_reward=float(reward), terminated=terminal,
+                      truncated=cutoff or step + 1 == steps)
         chunk_phase = (chunk_phase + 1) % 16
         next_index = arrival()
         current.append(index)
@@ -80,6 +83,7 @@ def collect_trace(agent, environment, seed, steps, check_memory):
                 current=np.asarray(current, np.int32), following=np.asarray(following, np.int32),
                 actions=np.asarray(actions, np.int32), rewards=np.asarray(rewards, np.float32),
                 terminated=np.asarray(terminated, bool), truncated=np.asarray(truncated, bool),
+                collection_cut=np.arange(steps) == steps - 1,
                 episodes=np.asarray(episodes, np.int32))
 
 

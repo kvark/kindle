@@ -36,16 +36,21 @@ class Environment:
 class Agent:
     learner_step = 1987
     environment_step = 8192
+    active = False
 
     def begin_episode(self, frame):
+        assert not self.active, "reset requires an episode boundary"
+        self.active = True
         self.visual_observation = [frame, -frame]
 
     def act(self, *, action_mask):
         return action_mask.index(True)
 
     def observe(self, frame, **kwargs):
+        assert self.active
         self.environment_step += 1
-        self.begin_episode(frame)
+        self.visual_observation = [frame, -frame]
+        self.active = not (kwargs["terminated"] or kwargs["truncated"])
 
 
 def test_collection_keeps_terminal_targets_and_separate_reset_arrivals():
@@ -57,6 +62,8 @@ def test_collection_keeps_terminal_targets_and_separate_reset_arrivals():
     np.testing.assert_array_equal(data["positions"][data["following"], 0], np.arange(1, 9))
     np.testing.assert_array_equal(data["phase"][data["current"]], [0, 1, 2, 0, 1, 0, 1, 0])
     assert len(data["features"]) == 12 and len(checks) == 2
+    assert data["collection_cut"].tolist() == [False] * 7 + [True]
+    assert not data["truncated"][-1] and not data["terminated"][-1] and not actor.active
     rng = random.Random(123 ^ probe.ACTION_SEED_XOR)
     assert data["actions"].tolist() == [rng.randrange(3) for _ in range(8)]
     for i in range(7):
@@ -94,3 +101,13 @@ def test_collection_rejects_invalid_actor(failure):
 def test_trajectory_split_is_disjoint_and_test_has_three_seeds():
     seeds = [seed for group in probe.SPLITS.values() for seed in group]
     assert len(seeds) == len(set(seeds)) and len(probe.SPLITS["test"]) == 3
+
+
+def test_recording_cutoff_is_not_an_environment_truncation():
+    actor, env = Agent(), Environment()
+    first = probe.collect_trace(actor, env, 123, 2, lambda: None)
+    second = probe.collect_trace(actor, env, 456, 2, lambda: None)
+    for data in (first, second):
+        assert not data["truncated"].any() and not data["terminated"].any()
+        assert data["collection_cut"].tolist() == [False, True]
+    assert actor.environment_step == 8196 and actor.learner_step == 1987
