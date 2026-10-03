@@ -220,6 +220,10 @@ pub struct DreamerConfig {
     /// The behavior critic is trained regardless of this switch.
     #[serde(default = "default_replay_value_gradient")]
     pub replay_value_gradient: bool,
+    /// Dreamer's optional `ac_grads`: actor and imagined-value losses shape
+    /// their initial posterior states. Future imagined states remain detached.
+    #[serde(default)]
+    pub actor_critic_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
     /// Add bounded fixed-feature visitation novelty to the intrinsic channel.
@@ -271,6 +275,7 @@ impl DreamerConfig {
             agc_pmin: 1e-3,
             loss_scales: LossScales::default(),
             replay_value_gradient: true,
+            actor_critic_gradient: false,
             extrinsic_reward_scale: 1.0,
             intrinsic_reward_scale: 0.0,
             visitation_bonus: false,
@@ -698,6 +703,7 @@ mod tests {
         let mut value = serde_json::to_value(DreamerConfig::tiny(3)).unwrap();
         let object = value.as_object_mut().unwrap();
         object.remove("replay_value_gradient");
+        object.remove("actor_critic_gradient");
         object.remove("behavior_learning_rate");
         object.remove("dynamics_free_nats");
         object.remove("actor_learning_starts");
@@ -705,6 +711,7 @@ mod tests {
         object.remove("world_microbatch_size");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
+        assert!(!restored.actor_critic_gradient);
         assert_eq!(restored.behavior_learning_rate, None);
         assert_eq!(restored.behavior_learning_rate(), restored.learning_rate);
         assert_eq!(restored.dynamics_free_nats, None);

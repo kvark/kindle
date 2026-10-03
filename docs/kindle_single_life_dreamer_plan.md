@@ -47,6 +47,9 @@ frozen, with live cache refresh; attention backward dominates the instrumented
 profile. The matched early-learning screen is six8,192-action Seaquest runs,
 three paired seeds—not a multi-day200k replication or a mastery gate.
 World/task/value gradients reach Tiny; actor loss remains separate.
+An optional upstream-style `actor_critic_gradient` candidate now closes that
+last path through the initial posterior state; it is not yet qualified or
+enabled in the running screen. Later imagined states remain detached.
 This follow-up precedes Phase 3.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

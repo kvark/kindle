@@ -1023,6 +1023,7 @@ mod joint_qualification {
         config.replay_capacity = 8192;
         config.seed = 1009;
         config.video_encoder = Some(mode);
+        config.actor_critic_gradient = std::env::var_os("KINDLE_AC_GRADS").is_some();
         config.loss_scales.reconstruction = 0.0;
         config.loss_scales.future_prediction = 0.25;
         config.validate();

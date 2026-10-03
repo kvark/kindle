@@ -119,6 +119,10 @@ pub struct WorldMetrics {
     /// Replay-value loss as seen by the frozen critic inside the world graph.
     /// Its gradient updates RSSM/representation parameters, not critic weights.
     pub replay_value_loss: f32,
+    /// Imagination t=0 contributions, divided by the full imagined horizon.
+    /// Their frozen actor/critic heads route gradients into the posterior only.
+    pub initial_policy_loss: f32,
+    pub initial_value_loss: f32,
     pub replay_reward_prediction_mean: f32,
     pub replay_reward_target_mean: f32,
     pub replay_reward_mae: f32,
@@ -383,11 +387,7 @@ impl DreamerCore {
             &mut core.policy_live,
             "behavior.actor.",
         );
-        sync_matching(
-            &core.behavior_train,
-            &mut core.world_train,
-            "behavior.value.",
-        );
+        sync_matching(&core.behavior_train, &mut core.world_train, "behavior.");
         Ok(core)
     }
 
@@ -456,7 +456,7 @@ impl DreamerCore {
         share_matching(&mut behavior_train, &mut imagination, "behavior.");
         sync_matching(&behavior_train, &mut behavior_slow, "behavior.value.");
         share_matching(&mut behavior_train, &mut policy_live, "behavior.actor.");
-        share_matching(&mut behavior_train, &mut world_train, "behavior.value.");
+        share_matching(&mut behavior_train, &mut world_train, "behavior.");
         world_train.set_submission_chunks(4);
 
         let size = config.network();
@@ -1208,6 +1208,12 @@ impl DreamerCore {
         posterior: &PosteriorBatch,
         behavior: &BehaviorTrainingBatch,
     ) -> WorldMetrics {
+        if self.config.actor_critic_gradient {
+            self.world_train.set_input(
+                "actor_update_scale",
+                &[self.config.actor_update_scale(self.learner_step)],
+            );
+        }
         let rows = self.config.batch_size;
         let network = self.config.network();
         let stochastic_width = network.stoch * network.classes;
@@ -1347,6 +1353,34 @@ impl DreamerCore {
                         &format!("replay_value_weight_{local_time}"),
                         &replay_value_weight,
                     );
+                    if self.config.actor_critic_gradient {
+                        // Imagination is time-major; its first B*T rows are
+                        // the posterior starts, with already-stopped targets.
+                        let start = time * rows + first_row;
+                        for (name, values, width) in [
+                            (
+                                "initial_action_target",
+                                &behavior.action_target,
+                                self.config.action_count,
+                            ),
+                            ("initial_weight", &behavior.imagined_weight, 1),
+                            (
+                                "initial_value_target",
+                                &behavior.imagined_value_target,
+                                self.config.value_bins,
+                            ),
+                            (
+                                "initial_slow_target",
+                                &behavior.imagined_slow_target,
+                                self.config.value_bins,
+                            ),
+                        ] {
+                            self.world_train.set_input(
+                                &format!("{name}_{local_time}"),
+                                row_slice(values, start, microbatch_rows, width),
+                            );
+                        }
+                    }
                 }
 
                 let pass = chunk * microbatch_count + microbatch;
@@ -1381,6 +1415,12 @@ impl DreamerCore {
                     read_scalar(&self.world_train, world::LOSS_CONTINUATION);
                 metrics.replay_value_loss +=
                     read_scalar(&self.world_train, world::LOSS_REPLAY_VALUE);
+                if self.config.actor_critic_gradient {
+                    metrics.initial_policy_loss +=
+                        read_scalar(&self.world_train, world::LOSS_INITIAL_POLICY);
+                    metrics.initial_value_loss +=
+                        read_scalar(&self.world_train, world::LOSS_INITIAL_VALUE);
+                }
             }
         }
         self.world_train.clear_grad_accumulate();
@@ -1396,6 +1436,8 @@ impl DreamerCore {
         metrics.reward_loss *= scale;
         metrics.continuation_loss *= scale;
         metrics.replay_value_loss *= scale;
+        metrics.initial_policy_loss *= scale;
+        metrics.initial_value_loss *= scale;
         metrics.replay_reward_prediction_mean = behavior.replay_reward_prediction_mean;
         metrics.replay_reward_target_mean = behavior.replay_reward_target_mean;
         metrics.replay_reward_mae = behavior.replay_reward_mae;
@@ -1415,6 +1457,8 @@ impl DreamerCore {
             metrics.total_loss,
             metrics.reconstruction_loss,
             metrics.future_prediction_loss,
+            metrics.initial_policy_loss,
+            metrics.initial_value_loss,
             metrics.encoder_regularization,
             metrics.encoder_spread,
             metrics.raw_kl,
@@ -1818,13 +1862,9 @@ impl DreamerCore {
             &mut self.policy_live,
             "behavior.actor.",
         );
-        // Keep the world graph's fixed critic copy ready for the next replay
-        // update and consistent in checkpoints.
-        sync_matching(
-            &self.behavior_train,
-            &mut self.world_train,
-            "behavior.value.",
-        );
+        // Keep the world's frozen behavior heads ready for representation
+        // supervision and consistent in checkpoints.
+        sync_matching(&self.behavior_train, &mut self.world_train, "behavior.");
     }
 }
 

@@ -103,6 +103,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   with `summarize_representation_learning.py --joint-tiny`; its chunk-aware
   auditor replaces overlapping-window assumptions for this recipe. Prior
   probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
+  The explicit policy-to-JEPA goal also requires the optional upstream-style
+  `actor_critic_gradient` route (initial posterior states only). It is a new
+  qualification candidate, default-off, not part of the running six-run binary.
+  Require isolated policy-only Tiny gradients and upstream numerical parity;
+  no local compile or additional GPU work alongside timed learning.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not

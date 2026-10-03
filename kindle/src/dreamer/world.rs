@@ -2,6 +2,7 @@
 
 use meganeura::{Graph, graph::NodeId};
 
+use super::behavior;
 use super::config::DreamerConfig;
 use super::config::VideoEncoder;
 use super::networks::{
@@ -24,6 +25,8 @@ pub const RAW_KL: usize = 7;
 pub const LOSS_FUTURE_PREDICTION: usize = 8;
 pub const LOSS_ENCODER_REGULARIZATION: usize = 9;
 pub const ENCODER_SPREAD: usize = 10;
+pub const LOSS_INITIAL_POLICY: usize = 11;
+pub const LOSS_INITIAL_VALUE: usize = 12;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 pub const IMAGINATION_FEATURE: usize = 0;
@@ -119,6 +122,7 @@ struct WorldModel {
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
     replay_value: MlpHead,
+    actor: Option<MlpHead>,
 }
 
 impl WorldModel {
@@ -141,6 +145,16 @@ impl WorldModel {
                 3,
                 config.value_bins,
             ),
+            actor: config.actor_critic_gradient.then(|| {
+                MlpHead::new(
+                    graph,
+                    "behavior.actor",
+                    config.feature_dim(),
+                    units,
+                    3,
+                    config.action_count,
+                )
+            }),
         }
     }
 }
@@ -215,6 +229,8 @@ fn build_training_graph_grouped(
     let mut reward_losses = Vec::with_capacity(length);
     let mut continuation_losses = Vec::with_capacity(length);
     let mut replay_value_losses = Vec::with_capacity(length);
+    let mut initial_policy_losses = Vec::new();
+    let mut initial_value_losses = Vec::new();
 
     for time in 0..length {
         let action = graph.input(
@@ -315,6 +331,14 @@ fn build_training_graph_grouped(
         let replay_value_target = target("replay_value_target", config.value_bins);
         let replay_slow_target = target("replay_slow_target", config.value_bins);
         let replay_value_weight = target("replay_value_weight", 1);
+        let initial_targets = config.actor_critic_gradient.then(|| {
+            (
+                target("initial_action_target", config.action_count),
+                target("initial_weight", 1),
+                target("initial_value_target", config.value_bins),
+                target("initial_slow_target", config.value_bins),
+            )
+        });
         let reward_weight = graph.constant(vec![1.0; rows], &[rows, 1]);
 
         if let Some(predictor) = &model.future_predictor {
@@ -375,6 +399,24 @@ fn build_training_graph_grouped(
         let slow_target =
             weighted_cross_entropy(&mut graph, value, replay_slow_target, replay_value_weight);
         replay_value_losses.push(graph.add(value_target, slow_target));
+        if let (Some(actor), Some((action_target, weight, value_target, slow_target))) =
+            (&model.actor, initial_targets)
+        {
+            // Same stopped targets and frozen heads as behavior training. Only
+            // imagination t=0 is a posterior state; later states are detached.
+            let logits = actor.forward_frozen(&mut graph, state);
+            let (policy, _, _) =
+                behavior::policy_loss(&mut graph, config, logits, action_target, weight, rows);
+            let value = model.replay_value.forward_frozen(&mut graph, state);
+            initial_policy_losses.push(policy);
+            initial_value_losses.push(behavior::value_loss(
+                &mut graph,
+                value,
+                value_target,
+                slow_target,
+                weight,
+            ));
+        }
     }
 
     let average = 1.0 / length as f32;
@@ -407,6 +449,24 @@ fn build_training_graph_grouped(
         scale(&mut graph, replay_value, scales.replay_value),
     ];
     let total = sum(&mut graph, &weighted);
+    let mut initial_losses = None;
+    let total = if config.actor_critic_gradient {
+        // Upstream averages over H imagined losses. The other H-1 states
+        // contribute behavior gradients but no world/encoder gradients.
+        let average = head_average / config.imagination_length as f32;
+        let policy = sum(&mut graph, &initial_policy_losses);
+        let policy = scale(&mut graph, policy, average);
+        let value = sum(&mut graph, &initial_value_losses);
+        let value = scale(&mut graph, value, average);
+        initial_losses = Some((policy, value));
+        let policy = scale(&mut graph, policy, scales.policy);
+        let actor_scale = graph.input("actor_update_scale", &[1]);
+        let policy = graph.mul(policy, actor_scale);
+        let value = scale(&mut graph, value, scales.value);
+        sum(&mut graph, &[total, policy, value])
+    } else {
+        total
+    };
     let total = if config.video_encoder.is_some() {
         let regularizer = scale(
             &mut graph,
@@ -428,8 +488,11 @@ fn build_training_graph_grouped(
         raw_kl,
         future_prediction,
     ];
-    if config.video_encoder.is_some() {
+    if config.video_encoder.is_some() || config.actor_critic_gradient {
         outputs.extend([encoder_regularization, encoder_spread]);
+    }
+    if let Some((policy, value)) = initial_losses {
+        outputs.extend([policy, value]);
     }
     graph.set_outputs(outputs);
     graph
@@ -810,6 +873,7 @@ mod tests {
             config.batch_length = 16;
             config.world_backprop_length = 16;
             config.video_encoder = Some(mode);
+            config.actor_critic_gradient = true;
             config.loss_scales.reconstruction = 0.0;
             config.loss_scales.future_prediction = 0.25;
             let mut graph = build_training_graph(&config, 16);
@@ -822,6 +886,8 @@ mod tests {
                 LOSS_REPLAY_VALUE,
                 LOSS_FUTURE_PREDICTION,
                 LOSS_ENCODER_REGULARIZATION,
+                LOSS_INITIAL_POLICY,
+                LOSS_INITIAL_VALUE,
             ] {
                 graph.set_outputs(vec![losses[loss]]);
                 let backward = meganeura::autodiff::differentiate(&graph);
@@ -832,16 +898,18 @@ mod tests {
                     .filter(|n| matches!(n.op, meganeura::graph::Op::Parameter { .. }))
                     .zip(&backward.outputs()[1..])
                 {
-                    if let meganeura::graph::Op::Parameter { ref name } = parameter.op
-                        && name.starts_with("encoder.")
-                    {
+                    if let meganeura::graph::Op::Parameter { ref name } = parameter.op {
                         let connected = backward.node(gradient).ty == parameter.ty;
-                        assert_eq!(
-                            connected,
-                            mode == VideoEncoder::Joint,
-                            "{mode:?} loss{loss} {name}"
-                        );
-                        checked += 1;
+                        if name.starts_with("encoder.") {
+                            assert_eq!(
+                                connected,
+                                mode == VideoEncoder::Joint,
+                                "{mode:?} loss{loss} {name}"
+                            );
+                            checked += 1;
+                        } else if name.starts_with("behavior.") {
+                            assert!(!connected, "world loss trained frozen behavior head {name}");
+                        }
                     }
                 }
                 assert_eq!(checked, 148);
@@ -850,11 +918,160 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "requires separately guarded GPU and KINDLE_JOINT_TINY_REFERENCE"]
+    fn isolated_policy_loss_updates_tiny_without_training_behavior_heads() {
+        use super::super::runtime::{build_session, configure_d3_optimizer, initialize_d3};
+        use meganeura::{Mode, data::safetensors::SafeTensorsModel, graph::Op};
+        use std::{path::PathBuf, sync::Arc};
+
+        let root = PathBuf::from(std::env::var_os("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = PathBuf::from(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(&checkpoint).unwrap(),
+            manifest["checkpoint_sha256"]
+        );
+        let weights = SafeTensorsModel::load(checkpoint).unwrap();
+        let reference = SafeTensorsModel::load(root.join("reference.safetensors")).unwrap();
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 1;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.video_encoder = Some(VideoEncoder::Joint);
+        config.actor_critic_gradient = true;
+        config.learning_rate_warmup = 0;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        let mut graph = build_training_graph(&config, 16);
+        // No reward, value, KL, latent prediction or variance objective can
+        // supply an encoder gradient in this test.
+        graph.set_outputs(vec![graph.outputs()[LOSS_INITIAL_POLICY]]);
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let check_device = || {
+            let info = gpu.device_information();
+            assert_eq!(
+                info.device_name,
+                std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+            );
+            assert!(!info.is_software_emulated);
+            let memory = gpu.memory_stats();
+            assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        };
+        check_device();
+        let mut session = build_session(&graph, &gpu, Mode::Training, false);
+        initialize_d3(&mut session, &graph, 103);
+        crate::vision::levjepa::load_weights(
+            &mut session,
+            &weights,
+            0,
+            crate::vision::levjepa::Architecture::Tiny,
+        )
+        .unwrap();
+        for node in graph.nodes() {
+            let Op::Input { name } = &node.op else {
+                continue;
+            };
+            if session.input_buffer(name).is_none() {
+                continue;
+            }
+            let count = node.ty.num_elements();
+            let time = name
+                .rsplit('_')
+                .next()
+                .unwrap()
+                .parse::<usize>()
+                .unwrap_or(0);
+            let values = if name.starts_with("pixels_") {
+                reference
+                    .tensor_f32_auto(&format!("pixels_{}", time % 2))
+                    .unwrap()[..count]
+                    .to_vec()
+            } else if name.starts_with("keep_")
+                || name.starts_with("initial_weight_")
+                || name == "actor_update_scale"
+                || name.starts_with("continuation_target_")
+            {
+                vec![1.0; count]
+            } else if name == "initial_deter" {
+                (0..count).map(|i| (i as f32 * 0.13).sin() * 0.2).collect()
+            } else {
+                let width = *node.ty.shape.last().unwrap();
+                let signed = if name.starts_with("initial_action_target_") && time % 2 == 1 {
+                    -0.8
+                } else {
+                    1.0
+                };
+                (0..count)
+                    .map(|i| {
+                        if i % width == (i / width + time) % width {
+                            signed
+                        } else {
+                            0.0
+                        }
+                    })
+                    .collect()
+            };
+            session.set_input(name, &values);
+        }
+        let names = session
+            .param_names()
+            .iter()
+            .filter(|n| n.starts_with("encoder.") || n.starts_with("behavior."))
+            .map(|n| n.to_string())
+            .collect::<Vec<_>>();
+        let refs = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let before = session.read_params(&refs);
+        session.clear_optimizer();
+        session.step();
+        session.wait();
+        check_device();
+        let mut nonzero = 0;
+        for name in &names {
+            if !name.starts_with("encoder.") {
+                assert!(!session.has_param_grad(name), "unfrozen behavior {name}");
+                continue;
+            }
+            let mut gradient = vec![0.0; session.param_size(name).unwrap()];
+            session.read_param_grad(name, &mut gradient);
+            assert!(gradient.iter().all(|x| x.is_finite()), "{name}");
+            assert!(
+                gradient.iter().any(|&x| x != 0.0),
+                "zero policy gradient {name}"
+            );
+            nonzero += 1;
+        }
+        assert_eq!(nonzero, 148);
+        configure_d3_optimizer(&mut session, &config, 0, config.learning_rate);
+        session.step();
+        session.wait();
+        check_device();
+        let after = session.read_params(&refs);
+        let mut changed = 0;
+        for ((name, before), after) in names.iter().zip(before).zip(after) {
+            assert!(after.iter().all(|x| x.is_finite()), "{name}");
+            if name.starts_with("encoder.") {
+                changed += usize::from(before != after);
+            } else {
+                assert_eq!(before, after, "behavior head was updated {name}");
+            }
+        }
+        assert!(changed > 0);
+        eprintln!(
+            "isolated_policy_tiny: {}",
+            serde_json::json!({"encoder_nonzero_gradients": nonzero, "encoder_changed_tensors": changed, "behavior_heads_unchanged": true})
+        );
+    }
+
+    #[test]
     fn tiny_graphs_expose_d3_shapes() {
         let config = DreamerConfig::tiny(3);
         let size = config.network();
         let training = build_training_graph(&config, config.world_backprop_length);
         assert_eq!(training.outputs().len(), 9);
+        assert!(!training.nodes().iter().any(|n| matches!(
+            &n.op, meganeura::graph::Op::Parameter { name } if name.starts_with("behavior.actor.")
+        )));
         let grouped_weight = training
             .nodes()
             .iter()

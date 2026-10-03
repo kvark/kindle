@@ -27,13 +27,22 @@ No RGB reconstruction, privileged policy inputs, action aids or intrinsic reward
 Control and treatment share the new replay/interaction recipe. Historical RGB
 and frozen-Tiny curves remain context, not matched new-backend controls.
 
-This is task-adaptive representation learning, **not direct actor-to-encoder
-autodiff**. The pinned upstream Dreamer also defaults to `ac_grads: False`.
-Its optional `ac_grads` path allows actor/imagined-value gradients through the
-initial posterior state only; future imagined states stay detached. That is a
-separate, clean follow-up if direct policy supervision is required, not a change
-to the running comparison. Do not equate either nonzero task gradients or this
-early screen with proof that the latent state is sufficient for control.
+The running screen is task-adaptive representation learning, **not direct
+actor-to-encoder autodiff**. The pinned upstream Dreamer also defaults to
+`ac_grads: False`. To satisfy the user's explicit policy-to-JEPA objective, the
+optional `actor_critic_gradient` path is now under implementation/qualification.
+It matches upstream `ac_grads`: actor/imagined-value gradients reach the initial
+posterior state only; future imagined states and return/action targets stay
+detached. It uses the existing actor/critic weights, stopped in the world graph,
+and divides the initial-state contribution by the full imagination horizon.
+The behavior optimizer still owns those heads; the world optimizer owns the
+encoder/RSSM. No extra optimizer or service. The option defaults off and the
+running six-run binary stays unchanged. Local builds and GPU qualification wait
+until timed learning releases the device. Check CPU graph connectivity, an
+isolated policy-only Tiny update, full update/restore and pinned upstream raw
+gradient/state parity with the option enabled before any direct-policy learning.
+Do not equate nonzero gradients or this early screen with proof that the latent
+state is sufficient for control.
 
 ## Qualification before gameplay
 

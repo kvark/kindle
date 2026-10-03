@@ -158,6 +158,7 @@ fn export_upstream_fixed_batch_reference() {
         world_backprop_length: 4,
         imagination_length: 3,
         learning_rate_warmup: 2,
+        actor_critic_gradient: std::env::var_os("KINDLE_AC_GRADS").is_some(),
         seed: 103,
         ..DreamerConfig::new(18)
     };

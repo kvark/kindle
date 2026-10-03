@@ -107,7 +107,8 @@ def main():
         raise ValueError(f"unexpected JAX device: {device}")
     source = subprocess.check_output(["git", "-C", str(args.upstream), "show", f"{REVISION}:dreamerv3/configs.yaml"], text=True)
     configs = ruamel.yaml.YAML(typ="safe").load(source)
-    config = elements.Config(configs["defaults"]).update(configs["size1m"]).agent.update({"imag_length": horizon})
+    config = elements.Config(configs["defaults"]).update(configs["size1m"]).agent.update({
+        "imag_length": horizon, "ac_grads": native_config.get("actor_critic_gradient", False)})
     obs_space = {"image": elements.Space(np.uint8, (64, 64, 3)),
                  "reward": elements.Space(np.float32),
                  **{key: elements.Space(bool) for key in ("is_first", "is_last", "is_terminal")}}
@@ -273,6 +274,7 @@ def main():
                         compare(f"step{step}/ema/{name}", slow[native_name], expected, atol=3e-6, rtol=3e-5)
                 budget.check(f"step{step}")
         result = dict(status="passed", upstream=revision, updates=4, comparisons=reports,
+                      actor_critic_gradient=native_config.get("actor_critic_gradient", False),
                       limits=["fixed synthetic batches; not replay sampling or gameplay competence",
                               "raw gradients compared first; optimizer receives identical gradients to isolate its math"])
     except Exception as error:
