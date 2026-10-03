@@ -120,14 +120,15 @@ def read_run(path, *, allow_interrupted=False, diagnostics=False):
                 first_training_action=first_update, curve=curve, episodes=episodes)
 
 
-def summarize(inputs, *, budget=200004, replication=False, small_representation=False, joint_tiny=False):
-    if sum((replication, small_representation, joint_tiny)) > 1:
+def summarize(inputs, *, budget=200004, replication=False, small_representation=False, joint_tiny=False, policy_tiny=False):
+    if sum((replication, small_representation, joint_tiny, policy_tiny)) > 1:
         raise ValueError("choose one learning comparison")
-    small = replication or small_representation or joint_tiny
-    methods = (("frozen_tiny", "joint_tiny") if joint_tiny else
+    tiny_screen = joint_tiny or policy_tiny
+    small = replication or small_representation or tiny_screen
+    methods = (("joint_tiny", "policy_tiny") if policy_tiny else ("frozen_tiny", "joint_tiny") if joint_tiny else
                ("learned_cnn", "pretrained_tiny", "initial_tiny") if small_representation else
                ("upstream", "learned_cnn") if replication else METHODS)
-    comparison = ("joint_tiny" if joint_tiny else "small_representation" if small_representation else
+    comparison = ("policy_tiny" if policy_tiny else "joint_tiny" if joint_tiny else "small_representation" if small_representation else
                   "small_replication" if replication else "representation")
     games = ("Seaquest",) if small else tuple(BASELINES)
     streams = 8 if small else 6
@@ -139,8 +140,8 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
     for method, path in inputs:
         if method not in methods:
             raise ValueError(f"unknown method: {method}")
-        run = read_run(path, diagnostics=joint_tiny)
-        if joint_tiny:
+        run = read_run(path, diagnostics=tiny_screen)
+        if tiny_screen:
             from kindle._vector_audit import audit
             run["accounting_audit"] = audit(path)
         h = run["header"]
@@ -175,16 +176,20 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
                     raise ValueError("not the jointly learned RGB control")
             elif config.get("observation_kind", "features") != "features":
                 raise ValueError("RGB control cannot be labelled frozen JEPA")
-            elif small_representation or joint_tiny:
+            elif small_representation or tiny_screen:
                 identity = h.get("model_provenance", {}).get("perception") or {}
                 if (identity.get("kind") != "levjepa-tiny" or
-                        identity.get("checkpoint_sha256") != TINY_CHECKPOINTS["pretrained_tiny" if joint_tiny else method] or
+                        identity.get("checkpoint_sha256") != TINY_CHECKPOINTS["pretrained_tiny" if tiny_screen else method] or
                         config["loss_scales"]["reconstruction"] != 0 or
                         config["loss_scales"]["future_prediction"] != .25):
                     raise ValueError("not the declared Tiny checkpoint and causal prediction loss")
-                if joint_tiny:
-                    if config.get("video_encoder") != method.removesuffix("_tiny"):
+                if tiny_screen:
+                    expected_mode = "joint" if policy_tiny else method.removesuffix("_tiny")
+                    if config.get("video_encoder") != expected_mode:
                         raise ValueError("joint/frozen encoder label differs from configuration")
+                    config["actor_critic_gradient"] = config.get("actor_critic_gradient", False)
+                    if config["actor_critic_gradient"] is not (method == "policy_tiny"):
+                        raise ValueError("policy gradient label differs from configuration")
                     if any(config.get(k) != v for k, v in dict(learning_rate=4e-5,
                             learning_rate_warmup=1000, agc=.3, replay_value_gradient=True).items()):
                         raise ValueError("not the declared joint Tiny optimizer/task recipe")
@@ -200,13 +205,14 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
                          h.get("replay_arrival_capacity") == 100000)
             else:
                 valid = all(config.get(k) == v for k, v in dict(model_size="size1_m",
-                    world_backprop_length=16, world_microbatch_size=1 if joint_tiny else 8, imagination_length=15,
-                    replay_capacity=8192 if joint_tiny else 100000, replay_context=1, actor_unimix=0,
+                    world_backprop_length=16, world_microbatch_size=1 if tiny_screen else 8, imagination_length=15,
+                    replay_capacity=8192 if tiny_screen else 100000, replay_context=1, actor_unimix=0,
                     intrinsic_reward_scale=0, visitation_bonus=False).items())
             if not valid:
                 raise ValueError("not the declared Size1M screening recipe")
-        if small_representation or joint_tiny:
-            excluded = ("observation_kind", "video_encoder") if joint_tiny else ("observation_kind",)
+        if small_representation or tiny_screen:
+            excluded = (("observation_kind", "actor_critic_gradient") if policy_tiny else
+                        ("observation_kind", "video_encoder") if joint_tiny else ("observation_kind",))
             core = {k: v for k, v in config.items() if k not in excluded}
             core["loss_scales"] = {k: v for k, v in config["loss_scales"].items()
                                    if k not in ("reconstruction", "future_prediction")}
@@ -231,7 +237,7 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
             aggregate["final_hns"] = mean_ci([(r["curve"][-1]["score"]-random)/(human-random) for r in runs])
             aggregate["run_seconds"] = mean_ci([r["final"]["elapsed_seconds"] for r in runs])
         results.append(dict(method=method, game=game, aggregate=aggregate, runs=runs))
-    pairs = (("joint_tiny", "frozen_tiny"),) if joint_tiny else (("learned_cnn", "upstream"),) if replication else (
+    pairs = (("policy_tiny", "joint_tiny"),) if policy_tiny else (("joint_tiny", "frozen_tiny"),) if joint_tiny else (("learned_cnn", "upstream"),) if replication else (
         (("pretrained_tiny", "learned_cnn"), ("pretrained_tiny", "initial_tiny")) if small_representation else ())
     paired_scores = []
     for candidate, control in pairs:
@@ -244,7 +250,7 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
                                         for s in SEEDS])))
     required = {(method, game, seed) for method in methods for game in games for seed in SEEDS}
     complete_status = ("replication_complete" if replication else "learning_comparison_complete"
-                       if small_representation or joint_tiny else "learning_matrix_complete")
+                       if small_representation or tiny_screen else "learning_matrix_complete")
     return dict(status=complete_status if required <= seen else "partial_learning_comparison",
                 comparison=comparison,
                 methods=methods, games=games, num_envs=streams,
@@ -257,12 +263,14 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
                         "time starts before initial policy/encoding; construction is reported separately",
                         "time curves interpolate only within common measured support, never extrapolate",
                         *(["early learning/collapse screen, not a powered superiority or world-model sufficiency claim",
-                            "joint updates Tiny through world/reward/continuation/replay-value losses, not direct actor-loss gradients",
-                            "frozen refers only to Tiny; both arms train their world model and policy",
+                            *(["both arms update Tiny; policy_tiny additionally uses actor/imagined-value gradients at initial posterior states only",
+                                "task-only controls are reused from the completed joint Tiny screen"] if policy_tiny else
+                              ["joint updates Tiny through world/reward/continuation/replay-value losses, not direct actor-loss gradients",
+                               "frozen refers only to Tiny; both arms train their world model and policy"]),
                             "both arms re-encode complete causal chunks from native-detail pixel replay",
                             "learner_mean contains update-window means, including sampled replay counts, not unique event counts",
                             "latent spread is an online batch statistic, not an independent held-out collapse test",
-                            "historical cached-feature and learned-RGB results are not matched controls for this recipe"] if joint_tiny else
+                            "historical cached-feature and learned-RGB results are not matched controls for this recipe"] if tiny_screen else
                           ["faithful learned RGB versus frozen causal-video features compares whole packages, not just pretraining",
                             "pretrained Tiny saw 250k random-play RGB64 frames from Boxing/Pong/Freeway/Breakout/Qbert; Seaquest is held out",
                             "pretrained versus its own initial Tiny weights isolates that pretraining intervention",
@@ -277,7 +285,8 @@ def summarize(inputs, *, budget=200004, replication=False, small_representation=
 
 
 def markdown(result, name):
-    title = "Joint Tiny early learning screen" if result["comparison"] == "joint_tiny" else "Phase 2 matched learning comparison"
+    title = ("Direct-policy Tiny early learning screen" if result["comparison"] == "policy_tiny" else
+             "Joint Tiny early learning screen" if result["comparison"] == "joint_tiny" else "Phase 2 matched learning comparison")
     lines = [f"# {title}", "", f"[All curves, episodes, tails and configurations]({name}).", "",
              "Online training scores, not frozen competence. Final scores use the last 50 completed",
              "episodes per seed (or all if fewer); 95% intervals resample learner seeds, not episodes.", "",
@@ -310,8 +319,8 @@ def plot_svg(result):
     """Render audited online curves, using only the summary's measured support."""
     colors = dict(zip(METHODS, ("#0072b2", "#cc79a7", "#009e73", "#e69f00", "#d55e00")))
     labels = dict(zip(METHODS, ("Upstream Dreamer", "Large JEPA", "Pretrained Tiny", "Initial Tiny", "Joint RGB CNN")))
-    colors.update(frozen_tiny="#0072b2", joint_tiny="#d55e00")
-    labels.update(frozen_tiny="Frozen Tiny encoder", joint_tiny="Joint task-adaptive Tiny")
+    colors.update(frozen_tiny="#0072b2", joint_tiny="#d55e00", policy_tiny="#009e73")
+    labels.update(frozen_tiny="Frozen Tiny encoder", joint_tiny="Joint task-adaptive Tiny", policy_tiny="Direct-policy Tiny")
     methods = result.get("methods", METHODS)
     games = result.get("games", BASELINES)
     streams = result.get("num_envs", 6)
@@ -326,7 +335,8 @@ def plot_svg(result):
         element.text = text
         return element
 
-    study = "Joint Tiny" if result.get("comparison") == "joint_tiny" else "Phase 2"
+    study = ("Direct-policy Tiny" if result.get("comparison") == "policy_tiny" else
+             "Joint Tiny" if result.get("comparison") == "joint_tiny" else "Phase 2")
     add("title", id="title", text=f"{study} online learning: scores versus actions and wall time")
     add("desc", id="description", text="Last-50 completed episode means, not frozen competence. "
         "Partial groups show individual learner seeds; complete three-seed groups show means and 95% bootstrap bands. "
@@ -421,10 +431,12 @@ def main():
     study.add_argument("--replication", action="store_true", help="declared Size1M Seaquest pair; not the cancelled 12M matrix")
     study.add_argument("--small-representation", action="store_true", help="Size1M Seaquest learned RGB versus pretrained/initial Tiny")
     study.add_argument("--joint-tiny", action="store_true", help="8192-action frozen versus task-adaptive causal Tiny screen")
+    study.add_argument("--policy-tiny", action="store_true", help="8192-action direct-policy versus task-only joint Tiny screen")
     args = parser.parse_args()
     result = summarize([(method, Path(path)) for method, path in args.input],
-                       budget=8192 if args.joint_tiny else 200000 if args.replication or args.small_representation else 200004,
-                       replication=args.replication, small_representation=args.small_representation, joint_tiny=args.joint_tiny)
+                       budget=8192 if args.joint_tiny or args.policy_tiny else 200000 if args.replication or args.small_representation else 200004,
+                       replication=args.replication, small_representation=args.small_representation,
+                       joint_tiny=args.joint_tiny, policy_tiny=args.policy_tiny)
     path = args.output_prefix.with_suffix(".json")
     path.write_text(json.dumps(result, separators=(",", ":"), allow_nan=False) + "\n")
     svg = args.output_prefix.with_suffix(".svg")

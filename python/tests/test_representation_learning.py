@@ -309,7 +309,7 @@ def test_joint_tiny_summary_pairs_audited_seeds_and_keeps_diagnostics(tmp_path, 
     assert summarize(inputs[:-1], budget=32, joint_tiny=True)["paired_scores"] == []
 
 
-@pytest.mark.parametrize("corruption", ["mode", "microbatch", "rate", "provenance", "shared"])
+@pytest.mark.parametrize("corruption", ["mode", "microbatch", "rate", "provenance", "shared", "policy"])
 def test_joint_tiny_rejects_unmatched_arms(tmp_path, monkeypatch, corruption):
     monkeypatch.setattr("kindle._vector_audit.audit", lambda _: dict(accounting_valid=True))
     frozen, joint = joint_fixture(1009, "frozen"), joint_fixture(1009, "joint")
@@ -317,12 +317,37 @@ def test_joint_tiny_rejects_unmatched_arms(tmp_path, monkeypatch, corruption):
         joint[0]["model_provenance"]["meganeura_revision"] = "changed"
     else:
         field, value = dict(mode=("video_encoder", "frozen"), microbatch=("world_microbatch_size", 8),
-                            rate=("learning_rate", 3e-4), shared=("horizon", 42))[corruption]
+                            rate=("learning_rate", 3e-4), shared=("horizon", 42),
+                            policy=("actor_critic_gradient", True))[corruption]
         joint[0]["config"][field] = value
     inputs = [("frozen_tiny", write(tmp_path, frozen, "frozen.jsonl")),
               ("joint_tiny", write(tmp_path, joint, "joint.jsonl"))]
     with pytest.raises(ValueError):
         summarize(inputs, budget=32, joint_tiny=True)
+
+
+def test_policy_tiny_reuses_task_controls_but_requires_the_direct_gradient_flag(tmp_path, monkeypatch):
+    monkeypatch.setattr("kindle._vector_audit.audit", lambda _: dict(accounting_valid=True))
+    inputs = []
+    for seed in (1009, 2017, 3019):
+        for enabled in (False, True):
+            method = "policy_tiny" if enabled else "joint_tiny"
+            rows = joint_fixture(seed, "joint", reward=1 + enabled)
+            # Earlier task-only controls have no field; absent is default-off.
+            if enabled:
+                rows[0]["config"]["actor_critic_gradient"] = True
+            inputs.append((method, write(tmp_path, rows, f"{method}-{seed}.jsonl")))
+    result = summarize(inputs, budget=32, policy_tiny=True)
+    assert result["status"] == "learning_comparison_complete"
+    assert result["paired_scores"][0]["difference"] == dict(mean=3., ci95=[3., 3.], seeds=[3.]*3)
+    assert "Direct-policy Tiny · online" in plot_svg(result)
+    assert "initial posterior states only" in markdown(result, "data.json")
+    assert summarize(inputs[:-1], budget=32, policy_tiny=True)["paired_scores"] == []
+    for field, value in (("actor_critic_gradient", False), ("video_encoder", "frozen")):
+        broken = copy.deepcopy(rows)
+        broken[0]["config"][field] = value
+        with pytest.raises(ValueError, match="label differs"):
+            summarize([("policy_tiny", write(tmp_path, broken, "broken.jsonl"))], budget=32, policy_tiny=True)
 
 
 def test_small_representation_reuses_curves_without_claiming_replication(tmp_path):

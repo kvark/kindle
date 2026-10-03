@@ -11,7 +11,9 @@ with4.64x wall cost does not establish a benefit; forecasts do not beat
 persistence. See the [results](../results/2026-10-03-joint-tiny-learning.md).
 The direct-policy candidate passes Kindle263 and Meganeura856; its isolated
 policy-only GPU test changes all148 Tiny tensors without updating the heads.
-Combined-update/upstream qualification remains in progress. PR31 is the dashboard.
+Combined-update/restore and1,524 upstream comparisons now pass; see the
+[direct-policy qualification](../results/2026-10-03-policy-tiny-qualification.md).
+PR31 is the dashboard.
 The [initial qualification stop](../results/2026-10-02-joint-tiny-qualification.md)
 is retained. October 3's explicitly authorized
 [initialization diagnostics](../results/2026-10-03-allocation-initialization.md)
@@ -110,7 +112,7 @@ Keep live encoder prefixes in cost measurements, not only empty chunk boundaries
 
 ## Allocation and decision
 
-At most **six complete learning runs**: frozen versus joint, Seaquest,
+First allocation: at most **six complete learning runs**: frozen versus joint, Seaquest,
 seeds1009/2017/3019. No automatic retries or successors after failures.
 
 **Declared October3, after optimized synthetic timing and before gameplay:**
@@ -150,3 +152,29 @@ reports held-out temporal latent spread alongside persistence/unrelated-action
 and reward/continuation controls. Never compare raw feature MSE across encoders
 without their scale and collapse diagnostics. Run those frozen probes serially
 after reviewing the learning guards, not alongside timed learning.
+
+### Direct policy follow-up — declared October3 at17:34 UTC
+
+The explicit policy-to-JEPA objective requires a separate test; the completed
+six runs only trained Tiny from world/task/replay-value losses. After the
+qualification above, run **three new joint Tiny seeds1009/2017/3019**, with
+`actor_critic_gradient=true` as the sole learning change. Reuse the three
+completed task-only joint controls; do not repeat the frozen arm or relabel it.
+
+Keep exactly the8,192-action/1,987-update recipe, initial checkpoint, replay,
+optimizer, native pixels, rewards, sticky actions and reporting/checkpoints
+declared above. No resume from an8k checkpoint: each new seed starts fresh.
+Order1009,2017,3019;2h deadline each, no retry or automatic larger successor.
+Expected cost about3h50m from the qualified2.207s synthetic and2.30s observed
+task-only updates. Guards stop on every new allocation warning.
+
+Report paired policy-minus-task score/time curves, all episodes/tails, latent
+spread, initial policy/value losses and finite/changed encoder tensors. Reuse
+`summarize_representation_learning.py --policy-tiny`, which requires the option
+on for `policy_tiny` and off for `joint_tiny`; other settings and provenance must
+match. After reviewing completion, compare the three new checkpoints on the
+same frozen seed8781/1,024-action/horizon15/stride16 forecast protocol. These
+3,072 diagnostic interactions are additional, not learner experience.
+This remains an early feasibility screen, not competence or a powered claim
+that an absent advantage proves JEPA cannot work. No Phase3 or new representation
+matrix starts automatically.

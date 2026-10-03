@@ -52,10 +52,12 @@ profile. The matched early-learning screen is six8,192-action Seaquest runs,
 three paired seeds—not a multi-day200k replication or a mastery gate.
 World/task/value gradients reach Tiny; actor loss remains separate.
 An optional upstream-style `actor_critic_gradient` candidate now closes that
-last path through the initial posterior state; it is not yet qualified or
-enabled in the completed screen. Its isolated policy-only GPU test now changes
-all148 encoder tensors while leaving behavior heads frozen; combined native
-updates and upstream comparison are next. Later imagined states remain detached.
+last path through the initial posterior state; it was not enabled in the
+completed screen. Its isolated policy-only GPU test changes all148 encoder
+tensors while leaving behavior heads frozen; full updates/restore and1,524
+upstream comparisons now pass. The [qualification report](results/2026-10-03-policy-tiny-qualification.md)
+links a separate three-seed/8k-action follow-up against reused task-only controls.
+Later imagined states remain detached.
 This follow-up precedes Phase 3.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

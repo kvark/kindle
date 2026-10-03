@@ -112,9 +112,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
   The explicit policy-to-JEPA goal also requires the optional upstream-style
   `actor_critic_gradient` route (initial posterior states only). It is a new
-  qualification candidate, default-off, not part of the completed six-run binary.
-  Require isolated policy-only Tiny gradients and upstream numerical parity;
-  no local compile or additional GPU work alongside timed learning.
+  default-off and not part of the completed six-run binary. It now passes an
+  isolated policy-only GPU test (all148 Tiny tensors change, frozen heads stay
+  fixed), full updates/restore and1,524 upstream comparisons with ac_grads=true.
+  See `docs/results/2026-10-03-policy-tiny-qualification.md`. Declare three new
+  8,192-action seeds1009/2017/3019 with only this option changed, reusing the
+  completed task-only joint controls. No local compile or other GPU work
+  alongside timed learning; this is not a new representation matrix.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not
