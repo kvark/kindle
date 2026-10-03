@@ -55,10 +55,15 @@ An optional upstream-style `actor_critic_gradient` candidate now closes that
 last path through the initial posterior state; it was not enabled in the
 completed screen. Its isolated policy-only GPU test changes all148 encoder
 tensors while leaving behavior heads frozen; full updates/restore and1,524
-upstream comparisons now pass. The [qualification report](results/2026-10-03-policy-tiny-qualification.md)
-links a separate three-seed/8k-action follow-up against reused task-only controls.
-Later imagined states remain detached.
-This follow-up precedes Phase 3.
+upstream comparisons now pass. The separate three-seed/8k-action follow-up is
+also [complete](results/2026-10-03-policy-tiny-learning.md): online mean67.27
+versus68.74 task-only, paired−1.46 [−8.33,7.27], at essentially the same~76m/seed.
+All six new checkpoints and three frozen forecast probes pass their audits,
+but forecasts still lose to persistence and barely distinguish actions. Keep
+the option off by default. Later imagined states remain detached.
+The connection is correct; useful latent world modeling remains unconfirmed.
+Next, isolate encoder information from predictor fitting/target drift on fixed
+trajectories before another RL campaign. This feasibility work precedes Phase3.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
 streaming and noncollapse checks pass. Tiny's
@@ -262,9 +267,11 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    [Protocol](experiments/2026-10-02-joint-tiny.md): current-weight causal replay,
    native-detail pixels, explicit noncollapse regularization, and refreshed
    acting caches. Six bounded learning runs and frozen forecast probes complete:
-   no clear early benefit and4.64x wall cost. Qualify/test the direct policy route
-   separately; it was off in these runs. Historical Phase 2 conclusions remain
-   scoped to frozen vision.
+   no clear early benefit and4.64x wall cost. The three direct-policy runs and
+   frozen forecast probes also complete without a clear benefit. A fixed-target
+   predictive-sufficiency diagnostic is next; the useful-latent question remains
+   open. Historical Phase2 conclusions remain scoped to frozen vision. No
+   unchanged RL queue resumes.
 6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation

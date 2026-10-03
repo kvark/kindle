@@ -111,14 +111,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   auditor replaces overlapping-window assumptions for this recipe. Prior
   probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
   The explicit policy-to-JEPA goal also requires the optional upstream-style
-  `actor_critic_gradient` route (initial posterior states only). It is a new
-  default-off and not part of the completed six-run binary. It now passes an
+  `actor_critic_gradient` route (initial posterior states only). It defaults off
+  and is not part of the completed six-run binary. It now passes an
   isolated policy-only GPU test (all148 Tiny tensors change, frozen heads stay
   fixed), full updates/restore and1,524 upstream comparisons with ac_grads=true.
-  See `docs/results/2026-10-03-policy-tiny-qualification.md`. Declare three new
-  8,192-action seeds1009/2017/3019 with only this option changed, reusing the
-  completed task-only joint controls. No local compile or other GPU work
-  alongside timed learning; this is not a new representation matrix.
+  See `docs/results/2026-10-03-policy-tiny-qualification.md`. All three additional
+  8,192-action seeds1009/2017/3019 and frozen forecast probes now complete,
+  reusing the task-only joint controls. Actor/value gradients give mean67.273
+  versus68.737, paired−1.465 [−8.333,7.273], with unchanged~76m/seed cost.
+  All6 new checkpoints are finite and all148 encoder tensors change. Every
+  prior still loses to persistence; action discrimination is negligible and
+  reward MAE loses to zero. All learning/probe guards and seals pass. See
+  `docs/results/2026-10-03-policy-tiny-learning.md`. Keep the option off by
+  default; this screen does not establish useful latent world modeling.
+  **Next for the active feasibility goal:** a small fixed-trajectory test to
+  separate encoder information from predictor fit and moving targets. Do not
+  substitute another unchanged RL campaign, a representation matrix or Phase3
+  for this unresolved question. New diagnostic work must be bounded/declared;
+  no GPU queue is currently active and no new learning campaign is implied.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not

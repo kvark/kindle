@@ -13,7 +13,11 @@ The direct-policy candidate passes Kindle263 and Meganeura856; its isolated
 policy-only GPU test changes all148 Tiny tensors without updating the heads.
 Combined-update/restore and1,524 upstream comparisons now pass; see the
 [direct-policy qualification](../results/2026-10-03-policy-tiny-qualification.md).
-PR31 is the dashboard.
+All three direct-policy follow-up runs and frozen forecast probes also complete:
+paired score−1.465 [−8.333,7.273], unchanged~76m/seed, and no model beats
+persistence. [Results and decision](../results/2026-10-03-policy-tiny-learning.md).
+The declared nine-run learning work is complete; the broader useful-latent
+question remains open. PR31 is the dashboard.
 The [initial qualification stop](../results/2026-10-02-joint-tiny-qualification.md)
 is retained. October 3's explicitly authorized
 [initialization diagnostics](../results/2026-10-03-allocation-initialization.md)
@@ -36,17 +40,16 @@ and frozen-Tiny curves remain context, not matched new-backend controls.
 The completed screen is task-adaptive representation learning, **not direct
 actor-to-encoder autodiff**. The pinned upstream Dreamer also defaults to
 `ac_grads: False`. To satisfy the user's explicit policy-to-JEPA objective, the
-optional `actor_critic_gradient` path is now implemented and under qualification.
+optional `actor_critic_gradient` path is now implemented, qualified and screened.
 It matches upstream `ac_grads`: actor/imagined-value gradients reach the initial
 posterior state only; future imagined states and return/action targets stay
 detached. It uses the existing actor/critic weights, stopped in the world graph,
 and divides the initial-state contribution by the full imagination horizon.
 The behavior optimizer still owns those heads; the world optimizer owns the
 encoder/RSSM. No extra optimizer or service. The option defaults off and the
-completed six-run binary stays unchanged. Timed learning has released the device;
-the rebuilt candidate passes103 Rust and1,018 Python CPU tests. Check graph connectivity, an
-isolated policy-only Tiny update, full update/restore and pinned upstream raw
-gradient/state parity with the option enabled before any direct-policy learning.
+completed six-run binary stays unchanged. CPU graph connectivity, an isolated
+policy-only Tiny update, full update/restore and pinned upstream raw gradient/
+state parity all passed before direct-policy learning. CI265 passes for7d1cab0.
 Do not equate nonzero gradients or this early screen with proof that the latent
 state is sufficient for control.
 
