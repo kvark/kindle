@@ -919,7 +919,7 @@ mod tests {
 
     #[test]
     #[ignore = "requires separately guarded GPU and KINDLE_JOINT_TINY_REFERENCE"]
-    fn isolated_policy_loss_updates_tiny_without_training_behavior_heads() {
+    fn isolated_policy_loss_updates_encoder_without_training_behavior_heads() {
         use super::super::runtime::{build_session, configure_d3_optimizer, initialize_d3};
         use meganeura::{Mode, data::safetensors::SafeTensorsModel, graph::Op};
         use std::{path::PathBuf, sync::Arc};
