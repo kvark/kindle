@@ -219,6 +219,52 @@ def test_vector_accounting_keeps_reset_records_out_of_action_credit(tmp_path):
     assert "natural_wins" not in result
 
 
+@pytest.mark.parametrize("mode", ["frozen", "joint"])
+@pytest.mark.parametrize("capacity,reset,ready_ticks", [
+    (160, False, set(range(31, 65))),
+    (160, True, set(range(25, 65))),
+    (48, False, set(range(31, 39)) | set(range(47, 55)) | {63, 64}),
+])
+def test_video_audit_uses_complete_chunks_context_resets_and_eviction(tmp_path, mode, capacity, reset, ready_ticks):
+    rows = fixture_events()[:1]
+    rows[0]["steps"] = 128
+    rows[0]["config"].update(video_encoder=mode, batch_length=16, train_ratio=4., replay_capacity=capacity)
+    updates, credit, started = 0, 0., False
+    for tick in range(1, 65):
+        done = reset and tick == 10
+        rows.append(dict(event="transition", run_step=2*tick, vector_tick=tick,
+                         actions=[0, 0], rewards=[0., 0.], stored_rewards=[[0., 0.], [0., 0.]],
+                         terminated=[done, False], truncated=[False, False], executed_action_frames=[4*tick]*2))
+        length = min(capacity, 2+2*tick+int(reset and tick > 10))
+        if started:
+            credit += .5
+        if tick in ready_ticks:
+            if not started:
+                started, credit = True, 1.
+            while credit >= 1:
+                updates += 1
+                credit -= 1
+                rows.append(dict(event="learner", run_step=2*tick,
+                                 report=dict(learner_step=updates, replay_len=length)))
+        if done:
+            rows.extend([dict(event="episode", run_step=20, stream_step=10, stream=0, episode=0,
+                              episode_return=0., episode_length=10, terminated=True, truncated=False),
+                         dict(event="reset", run_step=20, streams=[0])])
+    rows.append(dict(event="run_end", run_step=128, vector_ticks=64, environment_step=128,
+                     learner_step=updates, learner_updates=updates, replay_len=min(capacity, 130+int(reset)),
+                     training_debt=credit, executed_action_frames=[256]*2, total_rewards=[0., 0.],
+                     episode_counts=[int(reset), 0], partial_returns=[0., 0.], partial_lengths=[54 if reset else 64, 64],
+                     stage_seconds={}, elapsed_seconds=128., actions_per_second=1.,
+                     aggregate_simulated_wall_ratio=512/60/128, per_stream_simulated_wall_ratio=[256/60/128]*2,
+                     reason="budget_complete", completed_games=int(reset), natural_wins=0,
+                     mean_completed_return=0. if reset else None))
+    assert audit(write_log(tmp_path, rows))["updates"] == (20 if reset else 17)
+    # A false overlapping-window interpretation must not accept this ledger.
+    rows[0]["config"]["video_encoder"] = None
+    with pytest.raises(ValueError, match="incomplete vector round|unexpected learner"):
+        audit(write_log(tmp_path, rows))
+
+
 def version_two_events():
     rows = fixture_events()
     rows[0]["protocol"] = VECTOR_PROTOCOL

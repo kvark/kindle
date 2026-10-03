@@ -31,8 +31,9 @@ runner requires `--encoder-checkpoint` to opt in.
 The October 2 [joint Tiny experiment](experiments/2026-10-02-joint-tiny.md) now
 has an optional implementation: task gradients through all used Tiny parameters,
 native-detail pixel replay and live causal-cache refresh. Its **isolated GPU
-numerical checks pass**, but full qualification is incomplete and there are no
-learning results. The previous initial-Tiny arm was also frozen;
+numerical and full-update/restore checks pass**. The six-run early learning
+screen is running; there are no completed paired learning results yet.
+The previous initial-Tiny arm was also frozen;
 it did not test this hypothesis. The
 [qualification report](results/2026-10-02-joint-tiny-qualification.md) records the
 CPU checks and the stopped backend canary. October 3's

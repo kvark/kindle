@@ -95,9 +95,18 @@ def audit(path):
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
+        video = config.get("video_encoder")
+        check(video in (None, "frozen", "joint"), "unknown video encoder mode")
+        if video:
+            check(config["batch_length"] == 16 and config["replay_context"] == 1,
+                  "causal video replay requires T16/context1")
         credit_per_action = f32(f32(config["train_ratio"]) / samples)
         replay = deque(range(count))
         replay_lengths = [1] * count
+        # Reconstruct retained frame phases, independently of native slot/start
+        # bookkeeping. A phase-15 arrival needs all 16 frames and its context.
+        phases = [deque([0]) for _ in range(count)] if video else None
+        next_phase = [1] * count
         actions = updates = 0
         credit = 0.0
         started = False
@@ -113,11 +122,18 @@ def audit(path):
         final = None
         completed = []
 
-        def push(stream):
+        def push(stream, *, reset=False):
             if len(replay) == config["replay_capacity"]:
-                replay_lengths[replay.popleft()] -= 1
+                oldest = replay.popleft()
+                replay_lengths[oldest] -= 1
+                if phases is not None:
+                    phases[oldest].popleft()
             replay.append(stream)
             replay_lengths[stream] += 1
+            if phases is not None:
+                phase = 0 if reset else next_phase[stream]
+                phases[stream].append(phase)
+                next_phase[stream] = (phase + 1) % 16
 
         def settled():
             check(not pending_updates and not pending_episodes and not pending_resets, "incomplete vector round")
@@ -168,6 +184,9 @@ def audit(path):
                         pending_resets.add(stream)
                 last_flags = event["terminated"], event["truncated"]
                 ready = sum(max(0, length - required + 1) for length in replay_lengths) >= samples
+                if phases is not None:
+                    ready = sum(phase == 15 and index >= required - 1
+                                for history in phases for index, phase in enumerate(history)) >= config["batch_size"]
                 if training and ready:
                     if not started:
                         started, credit = True, 1.0
@@ -199,7 +218,7 @@ def audit(path):
                 ids = event["streams"]
                 check(event["run_step"] == actions and len(ids) == len(set(ids)) and set(ids) == pending_resets, "wrong stream reset")
                 for stream in ids:
-                    push(stream)
+                    push(stream, reset=True)
                 if exploration:
                     exploration.reset(ids)
                 pending_resets.clear()

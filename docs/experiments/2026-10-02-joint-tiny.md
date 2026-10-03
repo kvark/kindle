@@ -5,7 +5,9 @@ exploration/reward, without reopening the completed Phase 2 allocation.
 
 **Current boundary:** isolated native Tiny gradients, regularizer and causal
 cache refresh pass after the [attention backward fix](../results/2026-10-03-joint-tiny-backward.md).
-Full update/restore/cost qualification is in progress; no learning runs.
+Full update/restore/cost qualification passes. The six-run early learning screen
+started October3 at07:28 UTC; results remain pending. Both implementation PRs
+pass CI (Kindle260, Meganeura856). The active status dashboard remains PR31.
 The [initial qualification stop](../results/2026-10-02-joint-tiny-qualification.md)
 is retained. October 3's explicitly authorized
 [initialization diagnostics](../results/2026-10-03-allocation-initialization.md)
@@ -24,6 +26,14 @@ continuation and replay-value supervision; the actor remains separately trained.
 No RGB reconstruction, privileged policy inputs, action aids or intrinsic reward.
 Control and treatment share the new replay/interaction recipe. Historical RGB
 and frozen-Tiny curves remain context, not matched new-backend controls.
+
+This is task-adaptive representation learning, **not direct actor-to-encoder
+autodiff**. The pinned upstream Dreamer also defaults to `ac_grads: False`.
+Its optional `ac_grads` path allows actor/imagined-value gradients through the
+initial posterior state only; future imagined states stay detached. That is a
+separate, clean follow-up if direct policy supervision is required, not a change
+to the running comparison. Do not equate either nonzero task gradients or this
+early screen with proof that the latent state is sufficient for control.
 
 ## Qualification before gameplay
 
@@ -117,3 +127,13 @@ spread, task losses, prior forecast diagnostics and complete-agent cost. A
 finite checkpoint or nonzero gradient is not learning evidence. Preserve failed
 qualifications and extra compute. Do not claim frozen competence or a universal
 JEPA result from this one held-out title. Status remains in PR31, not STATUS.md.
+
+Use `summarize_representation_learning.py --joint-tiny` with completed logs.
+It audits causal-chunk eligibility, reset arrivals, eviction and training credit;
+partial groups get no three-seed aggregate. Update-window latent/task/timing
+means remain beside the action/time curves. The existing dynamics probe now
+accepts native pixels and sticky actions, samples Vulkan budget headroom and
+reports held-out temporal latent spread alongside persistence/unrelated-action
+and reward/continuation controls. Never compare raw feature MSE across encoders
+without their scale and collapse diagnostics. Run those frozen probes serially
+after reviewing the learning guards, not alongside timed learning.

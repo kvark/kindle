@@ -277,6 +277,54 @@ def tiny_fixture(seed, method, *, reward=1.):
     return rows
 
 
+def joint_fixture(seed, mode, *, reward=1.):
+    rows = tiny_fixture(seed, "pretrained_tiny", reward=reward)
+    rows[0]["config"].update(video_encoder=mode, world_microbatch_size=1, replay_capacity=8192,
+                            learning_rate=4e-5, learning_rate_warmup=1000, agc=.3, replay_value_gradient=True)
+    for row in rows:
+        if row["event"] == "learner":
+            row["report"] = dict(world=dict(encoder_spread=.2, future_prediction_loss=3.),
+                                 behavior=dict(policy_entropy=2.), timing=dict(total_seconds=1.))
+    return rows
+
+
+def test_joint_tiny_summary_pairs_audited_seeds_and_keeps_diagnostics(tmp_path, monkeypatch):
+    # Scheduler/phase/reset/eviction auditing is exercised with complete ledgers
+    # in test_vector.py; these compact fixtures isolate summary validation.
+    checked = []
+    monkeypatch.setattr("kindle._vector_audit.audit", lambda path: checked.append(path) or dict(accounting_valid=True))
+    inputs = [(f"{mode}_tiny", write(tmp_path, joint_fixture(seed, mode, reward=i + (mode == "joint")), f"{mode}-{seed}.jsonl"))
+              for i, seed in enumerate((1009, 2017, 3019)) for mode in ("frozen", "joint")]
+    result = summarize(inputs, budget=32, joint_tiny=True)
+    assert len(checked) == 6 and result["status"] == "learning_comparison_complete"
+    assert result["paired_scores"][0]["difference"] == dict(mean=3., ci95=[3., 3.], seeds=[3.]*3)
+    for group in result["results"]:
+        for run in group["runs"]:
+            assert run["accounting_audit"]["accounting_valid"]
+            point = run["curve"][-1]
+            assert point["reported_updates"] == 1 and point["seconds"] == 4.5
+            assert point["learner_mean"]["world"]["encoder_spread"] == .2
+    assert "Joint Tiny · online" in plot_svg(result)
+    assert "not direct actor-loss gradients" in markdown(result, "data.json")
+    assert summarize(inputs[:-1], budget=32, joint_tiny=True)["paired_scores"] == []
+
+
+@pytest.mark.parametrize("corruption", ["mode", "microbatch", "rate", "provenance", "shared"])
+def test_joint_tiny_rejects_unmatched_arms(tmp_path, monkeypatch, corruption):
+    monkeypatch.setattr("kindle._vector_audit.audit", lambda _: dict(accounting_valid=True))
+    frozen, joint = joint_fixture(1009, "frozen"), joint_fixture(1009, "joint")
+    if corruption == "provenance":
+        joint[0]["model_provenance"]["meganeura_revision"] = "changed"
+    else:
+        field, value = dict(mode=("video_encoder", "frozen"), microbatch=("world_microbatch_size", 8),
+                            rate=("learning_rate", 3e-4), shared=("horizon", 42))[corruption]
+        joint[0]["config"][field] = value
+    inputs = [("frozen_tiny", write(tmp_path, frozen, "frozen.jsonl")),
+              ("joint_tiny", write(tmp_path, joint, "joint.jsonl"))]
+    with pytest.raises(ValueError):
+        summarize(inputs, budget=32, joint_tiny=True)
+
+
 def test_small_representation_reuses_curves_without_claiming_replication(tmp_path):
     inputs = []
     for seed in (1009, 2017, 3019):
@@ -292,7 +340,7 @@ def test_small_representation_reuses_curves_without_claiming_replication(tmp_pat
     partial = summarize(inputs[:-1], budget=32, small_representation=True)
     assert partial["status"] == "partial_learning_comparison"
     assert next(r for r in partial["results"] if r["method"] == "initial_tiny")["aggregate"] is None
-    with pytest.raises(ValueError, match="choose replication"):
+    with pytest.raises(ValueError, match="choose one learning comparison"):
         summarize(inputs, budget=32, replication=True, small_representation=True)
 
 

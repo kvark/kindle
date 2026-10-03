@@ -99,6 +99,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   full18 actions. This is early learning/collapse screening, not competence.
   Direct actor gradients remain separate; task/value/
   world losses train Tiny. See `docs/results/2026-10-03-joint-tiny-backward.md`.
+  The six-run screen is active; PR31 tracks progress. Analyze completed logs
+  with `summarize_representation_learning.py --joint-tiny`; its chunk-aware
+  auditor replaces overlapping-window assumptions for this recipe. Prior
+  probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not
