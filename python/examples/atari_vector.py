@@ -51,6 +51,8 @@ def main():
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
     parser.add_argument("--encoder-training", choices=("frozen", "joint"),
                         help="Tiny-only experiment: native pixel replay with phase-aligned causal re-encoding")
+    parser.add_argument("--actor-critic-gradient", action="store_true",
+                        help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
     parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
@@ -106,7 +108,7 @@ def main():
         parser.error("exploration hold must be positive")
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
-    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--replay-capacity"}
+    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -180,6 +182,7 @@ def main():
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
                       video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
+                      actor_critic_gradient=args.actor_critic_gradient,
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,

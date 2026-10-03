@@ -32,7 +32,11 @@ The October 2 [joint Tiny experiment](experiments/2026-10-02-joint-tiny.md) now
 has an optional implementation: task gradients through all used Tiny parameters,
 native-detail pixel replay and live causal-cache refresh. Its **isolated GPU
 numerical and full-update/restore checks pass**. The six-run early learning
-screen is running; there are no completed paired learning results yet.
+screen and frozen forecast probes are complete: online means64.1 frozen versus
+68.7 joint, paired+4.6 [−15.1,21.7], with4.64x wall cost. All148 encoder tensors
+update, but forecasts do not beat persistence and barely distinguish actions.
+This8k-action result is early/noisy, not proof of latent-state infeasibility.
+See the [learning and forecast report](results/2026-10-03-joint-tiny-learning.md).
 The previous initial-Tiny arm was also frozen;
 it did not test this hypothesis. The
 [qualification report](results/2026-10-02-joint-tiny-qualification.md) records the
@@ -49,7 +53,9 @@ three paired seeds—not a multi-day200k replication or a mastery gate.
 World/task/value gradients reach Tiny; actor loss remains separate.
 An optional upstream-style `actor_critic_gradient` candidate now closes that
 last path through the initial posterior state; it is not yet qualified or
-enabled in the running screen. Later imagined states remain detached.
+enabled in the completed screen. Its isolated policy-only GPU test now changes
+all148 encoder tensors while leaving behavior heads frozen; combined native
+updates and upstream comparison are next. Later imagined states remain detached.
 This follow-up precedes Phase 3.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
@@ -64,7 +70,7 @@ architecture/encoder integrity checks, not migration machinery.
 ```text
 previous belief + executed action -> deterministic prior -> predicted features
                                              |
-RGB history through now -> frozen encoder -> posterior
+RGB history through now -> frozen or task-trained encoder -> posterior
                                              |
                               reward / continuation / imagination
                                              |
@@ -111,7 +117,7 @@ Xid/hang/device loss or recovery; the warning's precise cause remains unknown,
 but it is not itself evidence that GPU work cannot proceed. Kindle now pins
 Meganeura `13b19d33` ([PR223](https://github.com/kvark/meganeura/pull/223)) for the
 attention-value gradient fix above. New upstream comparisons pass1,524 checks;
-the matched learning screen is next. Diagnostic exceptions remain scoped.
+the matched task-only learning screen is complete. Diagnostic exceptions remain scoped.
 Historical evidence keeps its original backend and numerical identities.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
@@ -253,9 +259,10 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Earlier initial-weight Tiny was frozen, not trained from scratch online.
    [Protocol](experiments/2026-10-02-joint-tiny.md): current-weight causal replay,
    native-detail pixels, explicit noncollapse regularization, and refreshed
-   acting caches. Qualify gradients/backend/time/memory before six bounded
-   learning runs. Historical Phase 2 conclusions remain scoped to frozen vision;
-   no new learning result is available yet.
+   acting caches. Six bounded learning runs and frozen forecast probes complete:
+   no clear early benefit and4.64x wall cost. Qualify/test the direct policy route
+   separately; it was off in these runs. Historical Phase 2 conclusions remain
+   scoped to frozen vision.
 6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation

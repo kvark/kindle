@@ -5,9 +5,13 @@ exploration/reward, without reopening the completed Phase 2 allocation.
 
 **Current boundary:** isolated native Tiny gradients, regularizer and causal
 cache refresh pass after the [attention backward fix](../results/2026-10-03-joint-tiny-backward.md).
-Full update/restore/cost qualification passes. The six-run early learning screen
-started October3 at07:28 UTC; results remain pending. Both implementation PRs
-pass CI (Kindle260, Meganeura856). The active status dashboard remains PR31.
+Full update/restore/cost qualification passes. All six early learning runs and
+six frozen forecast probes complete October3. Paired score+4.604 [−15.128,21.667]
+with4.64x wall cost does not establish a benefit; forecasts do not beat
+persistence. See the [results](../results/2026-10-03-joint-tiny-learning.md).
+The direct-policy candidate passes Kindle263 and Meganeura856; its isolated
+policy-only GPU test changes all148 Tiny tensors without updating the heads.
+Combined-update/upstream qualification remains in progress. PR31 is the dashboard.
 The [initial qualification stop](../results/2026-10-02-joint-tiny-qualification.md)
 is retained. October 3's explicitly authorized
 [initialization diagnostics](../results/2026-10-03-allocation-initialization.md)
@@ -27,18 +31,18 @@ No RGB reconstruction, privileged policy inputs, action aids or intrinsic reward
 Control and treatment share the new replay/interaction recipe. Historical RGB
 and frozen-Tiny curves remain context, not matched new-backend controls.
 
-The running screen is task-adaptive representation learning, **not direct
+The completed screen is task-adaptive representation learning, **not direct
 actor-to-encoder autodiff**. The pinned upstream Dreamer also defaults to
 `ac_grads: False`. To satisfy the user's explicit policy-to-JEPA objective, the
-optional `actor_critic_gradient` path is now under implementation/qualification.
+optional `actor_critic_gradient` path is now implemented and under qualification.
 It matches upstream `ac_grads`: actor/imagined-value gradients reach the initial
 posterior state only; future imagined states and return/action targets stay
 detached. It uses the existing actor/critic weights, stopped in the world graph,
 and divides the initial-state contribution by the full imagination horizon.
 The behavior optimizer still owns those heads; the world optimizer owns the
 encoder/RSSM. No extra optimizer or service. The option defaults off and the
-running six-run binary stays unchanged. Local builds and GPU qualification wait
-until timed learning releases the device. Check CPU graph connectivity, an
+completed six-run binary stays unchanged. Timed learning has released the device;
+the rebuilt candidate passes103 Rust and1,018 Python CPU tests. Check graph connectivity, an
 isolated policy-only Tiny update, full update/restore and pinned upstream raw
 gradient/state parity with the option enabled before any direct-policy learning.
 Do not equate nonzero gradients or this early screen with proof that the latent

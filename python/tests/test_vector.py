@@ -27,6 +27,7 @@ import profile_atari_vector
     (["--replay-capacity", "0"], "replay-capacity must be positive"),
     (["--restore", "unused", "--encoder-training", "joint"], "training overrides"),
     (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
+    (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
 ])
 def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
     output = tmp_path / "never.jsonl"
@@ -47,6 +48,24 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
         kindle.VectorAgent("unused", 4, config)
     with pytest.raises(ValueError, match="batch_size"):
         kindle.VectorAgent("unused", 4, config, encoder="levjepa-tiny")
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path, enabled):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config["actor_critic_gradient"] is enabled
+        raise RuntimeError("checked before GPU initialization")
+
+    monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
+                                    *(["--actor-critic-gradient"] if enabled else [])])
+    with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
 
 
 def test_feature_vector_rejects_invalid_config_before_gpu():

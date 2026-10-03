@@ -99,13 +99,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   full18 actions. This is early learning/collapse screening, not competence.
   Direct actor gradients remain separate; task/value/
   world losses train Tiny. See `docs/results/2026-10-03-joint-tiny-backward.md`.
-  The six-run screen is active; PR31 tracks progress. Analyze completed logs
+  **All six runs and six frozen forecast probes complete.** Online means64.134
+  frozen versus68.737 joint; paired+4.604 [−15.128,21.667], with4.64x wall cost.
+  All12 checkpoints are finite; all148 encoder tensors stay unchanged frozen
+  and change joint. Forecasts beat neither persistence nor zero-reward MAE;
+  unrelated-action forecasts are nearly identical. Four rewards/two terminals
+  limit the diagnostic. This is an8k-action early screen, not infeasibility or
+  competence. See `docs/results/2026-10-03-joint-tiny-learning.md`.
+  PR31 tracks progress. Analyze completed logs
   with `summarize_representation_learning.py --joint-tiny`; its chunk-aware
   auditor replaces overlapping-window assumptions for this recipe. Prior
   probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
   The explicit policy-to-JEPA goal also requires the optional upstream-style
   `actor_critic_gradient` route (initial posterior states only). It is a new
-  qualification candidate, default-off, not part of the running six-run binary.
+  qualification candidate, default-off, not part of the completed six-run binary.
   Require isolated policy-only Tiny gradients and upstream numerical parity;
   no local compile or additional GPU work alongside timed learning.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
@@ -196,9 +203,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current pins are merged Meganeura `6268ea5` / Blade `e349cddf`, including the
-  host optimizer correction. These pins are not yet numerically qualified;
-  the ordinary-compute canary above stopped before Tiny testing.
+- Current pins are Meganeura `13b19d33` over merged `6268ea5` / Blade `e349cddf`,
+  including the host optimizer correction and qualified attention-value fix.
+  The earlier canary stop remains retained; later independent Tiny references
+  and1,524 upstream RGB comparisons pass before the completed learning screen.
   Capture evidence used Meganeura `4cbcd69b` / Blade `a7861806` to rework
   [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
   `Memory::External` -> `create_buffer` path. `Fd(Some(fd))` borrows/duplicates
@@ -214,7 +222,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   validation is separate from historical Phase 2 learning evidence. Matching
   padded allocations pass on RTX5080. The v4 exact-byte ring passes functionally
   but logs a new `NV_ERR_NO_MEMORY` kernel warning missed by the host guard;
-  local native work is stopped pending review. The v4 real-producer test is
+  native work initially stopped for review. Ordinary compute subsequently
+  qualified as described above; this does not qualify capture. The v4 real-producer test is
   unrun; the earlier v3 producer success is not v4 qualification. No Xid/hang
   or host recovery is recorded. The earlier producer test fixed missing external-
   memory instance dependencies for Vulkan1.0; the original validation failure
@@ -237,8 +246,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   optimizer-padding comparisons from exact equality to numerical tolerance.
   This changes optimizer arithmetic and arrived during the capture review.
   It is not bundled into the numerically unchanged external-memory repin above;
-  It is now included in the merged pins above, but still needs qualification
-  before learning. No learning campaign is authorized merely by a dependency update.
+  it is now included and numerically qualified in the pins above. No learning
+  campaign is authorized merely by a dependency update.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
   upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
   not a matched learning comparison. Phase 2 now independently aligns
