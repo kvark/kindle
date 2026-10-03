@@ -36,6 +36,38 @@ pub const IMAGINATION_REWARD: usize = 3;
 pub const IMAGINATION_CONTINUATION: usize = 4;
 pub const IMAGINATION_VALUE: usize = 5;
 
+fn standardized_target(graph: &mut Graph, target: NodeId, config: &DreamerConfig) -> NodeId {
+    let Some(stats) = &config.future_target_standardization else {
+        return target;
+    };
+    let rows = graph.node(target).ty.shape.iter().product::<usize>() / config.observation_dim();
+    let target = graph.reshape(target, &[rows, config.observation_dim()]);
+    let negative_mean = graph.constant(
+        stats.mean.iter().map(|x| -x).collect(),
+        &[config.observation_dim()],
+    );
+    let inverse_scale = graph.constant(
+        stats.scale.iter().map(|x| x.recip()).collect(),
+        &[config.observation_dim()],
+    );
+    let centered = graph.bias_add(target, negative_mean);
+    graph.bias_mul(centered, inverse_scale)
+}
+
+fn raw_prediction(graph: &mut Graph, prediction: NodeId, config: &DreamerConfig) -> NodeId {
+    let Some(stats) = &config.future_target_standardization else {
+        return prediction;
+    };
+    let shape = graph.node(prediction).ty.shape.clone();
+    let rows = shape.iter().product::<usize>() / config.observation_dim();
+    let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
+    let scale = graph.constant(stats.scale.clone(), &[config.observation_dim()]);
+    let mean = graph.constant(stats.mean.clone(), &[config.observation_dim()]);
+    let scaled = graph.bias_mul(prediction, scale);
+    let raw = graph.bias_add(scaled, mean);
+    graph.reshape(raw, &shape)
+}
+
 fn replay_observations(graph: &mut Graph, config: &DreamerConfig, length: usize) -> Vec<NodeId> {
     let batch = config.batch_size;
     if let Some(mode) = config.video_encoder {
@@ -346,6 +378,7 @@ fn build_training_graph_grouped(
             let prediction = predictor.forward(&mut graph, deter, rows);
             let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
             let target = graph.stop_gradient(observation);
+            let target = standardized_target(&mut graph, target, config);
             let negative_target = graph.neg(target);
             let residual = graph.add(prediction, negative_target);
             let squared = graph.mul(residual, residual);
@@ -841,6 +874,7 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
         let deter = graph.input("deter", &[batch, size.deter]);
         graph.input("stoch", &[batch * size.stoch, size.classes]);
         let observation = predictor.forward(&mut graph, deter, batch);
+        let observation = raw_prediction(&mut graph, observation, config);
         graph.set_outputs(vec![observation]);
         return graph;
     }
@@ -864,6 +898,88 @@ mod rollout_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn absent_standardization_preserves_graph_nodes() {
+        let config = DreamerConfig::tiny(3);
+        let mut graph = Graph::new();
+        let x = graph.input("x", &[2, config.observation_dim()]);
+        assert_eq!(standardized_target(&mut graph, x, &config), x);
+        assert_eq!(raw_prediction(&mut graph, x, &config), x);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; independent full-width target standardization"]
+    fn standardized_targets_match_f64_values_and_gradients() {
+        use super::super::{config::FeatureStandardization, runtime::build_session};
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.future_prediction = 0.25;
+        let width = config.observation_dim();
+        let stats = FeatureStandardization {
+            mean: (0..width).map(|i| 1.0 + (i % 17) as f32 * 0.1).collect(),
+            scale: (0..width).map(|i| 0.03 + (i % 11) as f32 * 0.01).collect(),
+        };
+        config.future_target_standardization = Some(stats.clone());
+        let mut graph = Graph::new();
+        let p = graph.parameter("prediction", &[2, width]);
+        let target = graph.input("target", &[2, width]);
+        let target = graph.stop_gradient(target);
+        let normalized = standardized_target(&mut graph, target, &config);
+        let neg = graph.neg(normalized);
+        let delta = graph.add(p, neg);
+        let square = graph.mul(delta, delta);
+        let loss = graph.sum_all(square);
+        let loss = graph.scale(loss, 0.5);
+        let raw = raw_prediction(&mut graph, p, &config);
+        graph.set_outputs(vec![loss, normalized, raw]);
+        let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut session = build_session(&graph, &gpu, meganeura::Mode::Training, false);
+        let memory = session.device_memory_stats().unwrap();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        let predictions = (0..2 * width)
+            .map(|i| (i % 29) as f32 * 0.02 - 0.3)
+            .collect::<Vec<_>>();
+        let targets = (0..2 * width)
+            .map(|i| 1.9 + (i % 37) as f32 / 23.0)
+            .collect::<Vec<_>>();
+        session.set_parameter("prediction", &predictions);
+        session.set_input("target", &targets);
+        session.step();
+        session.wait();
+        let mut normalized = vec![0.0; 2 * width];
+        let mut raw = normalized.clone();
+        let mut gradients = normalized.clone();
+        session.read_output_by_index(1, &mut normalized);
+        session.read_output_by_index(2, &mut raw);
+        session.read_param_grad("prediction", &mut gradients);
+        let mut loss = 0.0_f64;
+        let mut gradient_error = 0.0_f64;
+        let mut gradient_norm = 0.0_f64;
+        for i in 0..2 * width {
+            let mean = f64::from(stats.mean[i % width]);
+            let scale = f64::from(stats.scale[i % width]);
+            let target = (f64::from(targets[i]) - mean) / scale;
+            let p = f64::from(predictions[i]);
+            assert!((f64::from(normalized[i]) - target).abs() < 2e-5);
+            assert!((f64::from(raw[i]) - (p * scale + mean)).abs() < 1e-6);
+            loss += 0.5 * (p - target).powi(2);
+            gradient_error += (f64::from(gradients[i]) - (p - target)).powi(2);
+            gradient_norm += (p - target).powi(2);
+        }
+        assert!((f64::from(session.read_loss()) / loss - 1.0).abs() < 1e-5);
+        assert!((gradient_error / gradient_norm).sqrt() < 3e-6);
+        assert_eq!(session.read_params(&["prediction"])[0], predictions);
+        let memory = session.device_memory_stats().unwrap();
+        assert!(memory.budget_bytes - memory.usage_bytes >= 2 << 30);
+        eprintln!(
+            "standardized full-width F64 values/gradients pass; relative-gradient-L2={}; memory={memory:?}",
+            (gradient_error / gradient_norm).sqrt()
+        );
+    }
 
     #[test]
     fn task_losses_reach_every_joint_tiny_parameter_but_not_frozen_tiny() {

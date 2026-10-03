@@ -68,12 +68,16 @@ and nine small GPU heads fitted in59.6s. Player-position R² is.775–.854; late
 forecast error / persistence is.840 [.679,.927] at h1 and.489 [.456,.530] at h15.
 Tiny retains readable/predictable state, but decoded player-x loses to persistence
 and reward/action-sensitive forecasting remains weak. This is conditional latent
-predictability, not a useful online world model or JEPA advantage. No job remains
-active. The two collector failures and2,176 excluded smoke actions are retained.
-The next proposed JEPA test is one frozen-encoder RSSM target-standardization
-ablation on the saved corpus, with unchanged recurrence/data/budget and action/
-event controls. Large static feature offsets motivate this conditioning test;
-the current head also changes architecture/inputs and does not prove the cause.
+predictability, not a useful online world model or JEPA advantage. The two
+collector failures and2,176 excluded smoke actions are retained.
+The authorized [target-standardization ablation](experiments/2026-10-03-rssm-target-standardization.md)
+uses the saved frozen-encoder corpus: three paired raw/standardized RSSMs,
+2,048 full updates each, no gameplay. Only future-target units change; RSSM
+inputs remain raw. Independent F64 gradients, identity-update parity,
+restore/frozen tensors and the2-update production-size smoke pass. Persistence,
+constant training mean, unrelated actions and decoded state/reward controls
+will distinguish latent conditioning from useful dynamics. Large static feature
+offsets motivate the test; the earlier auxiliary heads do not prove the cause.
 No fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

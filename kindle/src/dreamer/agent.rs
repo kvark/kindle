@@ -1044,6 +1044,28 @@ impl DreamerCore {
         reward
     }
 
+    /// Ingest a recorded off-policy transition without running or sampling the
+    /// policy. The usual observation, replay and recurrent-state path is shared.
+    pub fn observe_recorded(
+        &mut self,
+        action: usize,
+        observation: Observation,
+        reward: Reward,
+        flags: FrameFlags,
+    ) -> Reward {
+        assert!(
+            self.active && !self.needs_reset,
+            "begin the recorded episode first"
+        );
+        assert!(
+            self.pending_action.is_none(),
+            "cannot replace a pending policy action"
+        );
+        assert!(action < self.config.action_count);
+        self.pending_action = Some(action);
+        self.observe(observation, reward, flags)
+    }
+
     /// Execute at most `maximum_updates` updates due under D3's numeric train
     /// ratio, clocked by Kindle's executed-action environment steps.
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
@@ -2317,6 +2339,118 @@ fn all_finite(values: &[f32]) -> bool {
 mod tests {
     use super::*;
     use rand::Rng;
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; standardization identity and exact restore"]
+    fn standardized_core_identity_and_restore() {
+        use super::super::config::FeatureStandardization;
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config.actor_critic_gradient = true;
+        let mut plain = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
+        let memory = plain.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        config.future_target_standardization = Some(FeatureStandardization {
+            mean: vec![0.0; Observation::LEN],
+            scale: vec![1.0; Observation::LEN],
+        });
+        let mut identity = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
+        for core in [&mut plain, &mut identity] {
+            core.begin_episode(Observation::from_vec(vec![0.2; Observation::LEN]));
+            for step in 0..16 {
+                core.observe_recorded(
+                    step % 3,
+                    Observation::from_vec(vec![0.1 * step as f32; Observation::LEN]),
+                    Reward {
+                        extrinsic: (step % 3) as f32,
+                        intrinsic: 0.0,
+                    },
+                    FrameFlags {
+                        is_last: step == 15,
+                        ..FrameFlags::default()
+                    },
+                );
+            }
+        }
+        let names = plain
+            .world_train
+            .param_names()
+            .into_iter()
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        let names = names.iter().map(String::as_str).collect::<Vec<_>>();
+        assert_eq!(
+            plain.world_train.read_params(&names),
+            identity.world_train.read_params(&names)
+        );
+        for _ in 0..3 {
+            let a = plain.learn().unwrap();
+            let b = identity.learn().unwrap();
+            assert!((a.world.total_loss - b.world.total_loss).abs() < 1e-5);
+            assert_eq!(
+                plain.world_train.read_params(&names),
+                identity.world_train.read_params(&names)
+            );
+        }
+        drop(plain);
+        drop(identity);
+        config.future_target_standardization = Some(FeatureStandardization {
+            mean: vec![2.0; Observation::LEN],
+            scale: vec![0.1; Observation::LEN],
+        });
+        let mut core = DreamerCore::with_gpu(config, Arc::clone(&gpu));
+        core.begin_episode(Observation::from_vec(vec![2.0; Observation::LEN]));
+        for step in 0..16 {
+            core.observe_recorded(
+                step % 3,
+                Observation::from_vec(vec![2.0 + 0.01 * step as f32; Observation::LEN]),
+                Reward::default(),
+                FrameFlags {
+                    is_last: step == 15,
+                    ..FrameFlags::default()
+                },
+            );
+        }
+        for _ in 0..3 {
+            assert!(core.learn().unwrap().world.total_loss.is_finite());
+        }
+        let checkpoint =
+            std::path::PathBuf::from(std::env::var("KINDLE_STANDARDIZATION_CHECKPOINT").unwrap());
+        assert!(!checkpoint.exists());
+        core.save_checkpoint(&checkpoint).unwrap();
+        let metadata = read_checkpoint_metadata(&checkpoint).unwrap();
+        let mut restored =
+            DreamerCore::restore_with_gpu(&checkpoint, Arc::clone(&gpu), metadata).unwrap();
+        assert_eq!(restored.config, core.config);
+        for (a, b) in [
+            (&core.world_train, &restored.world_train),
+            (&core.behavior_train, &restored.behavior_train),
+            (&core.behavior_slow, &restored.behavior_slow),
+        ] {
+            let names = a.param_names();
+            assert_eq!(a.read_params(&names), b.read_params(&names));
+        }
+        restored.begin_episode(Observation::from_vec(vec![2.0; Observation::LEN]));
+        let first = restored.prior_diagnostic_rollout(&[0, 1, 2]);
+        assert_eq!(first, restored.prior_diagnostic_rollout(&[0, 1, 2]));
+        assert_eq!(restored.learner_step, 3);
+        restored
+            .save_checkpoint(checkpoint.with_extension("after-forecast"))
+            .unwrap();
+        assert!(
+            restored.gpu_memory_budget().budget_bytes - restored.gpu_memory_budget().usage_bytes
+                >= 2 << 30
+        );
+        eprintln!(
+            "identity3updates exact; standardized3updates finite; exact restore/frozen forecasts pass"
+        );
+    }
 
     fn valid_checkpoint_metadata() -> CheckpointMetadata {
         CheckpointMetadata {

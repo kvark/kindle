@@ -133,12 +133,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   JEPA advantage. See `docs/results/2026-10-03-fixed-latent-sufficiency.md`.
   All guards/seals and independent full-width GPU references pass; CI268 passes.
   Two collector failures (recording boundary, serialization-hash false alarm)
-  and2,176 excluded smoke actions remain disclosed. No GPU job is active.
-  **Proposed next JEPA test:** one matched frozen-encoder RSSM target-standardization
-  ablation on this saved corpus, retaining action/event controls. The observed
-  static feature offset makes conditioning worth testing, not a proven cause.
-  This needs a fresh bounded declaration; no unchanged RL queue, representation
-  matrix or Phase3 campaign starts automatically. Keep RGB/default ac_grads=false.
+  and2,176 excluded smoke actions remain disclosed.
+  **Authorized follow-up:** frozen-encoder RSSM target standardization on the
+  saved corpus, raw/standardized pairs1009/2017/3019,2,048 full production
+  updates each; no new gameplay. Only future-target units change; inputs stay
+  raw. Training-only statistics, final-budget selection, persistence/constant-
+  mean/unrelated-action and state/reward controls. Independent F64 gradients,
+  identity-update parity, restore/frozen tensors and the2-update Size1M smoke
+  pass. See `docs/experiments/2026-10-03-rssm-target-standardization.md`.
+  The static feature offset motivates testing, not a proven cause. No unchanged
+  RL queue, representation matrix or Phase3 campaign starts automatically.
+  Keep RGB/default ac_grads=false; target standardization defaults off.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not

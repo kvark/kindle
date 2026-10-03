@@ -657,6 +657,7 @@ fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<vector::PyVectorAgent>()?;
     module.add_class::<features::PyFeatureVectorAgent>()?;
+    module.add_class::<features::PyFeatureCore>()?;
     module.add_class::<PyLeVJepaPerception>()?;
     module.add_class::<probes::PyRegressionProbe>()?;
     module.add_class::<probes::PyReconstructionEncoder>()?;

@@ -147,12 +147,15 @@ impl Default for LossScales {
     }
 }
 
-/// Configuration of the D3 baseline.
-///
-/// Defaults mirror the pinned DreamerV3 configuration where the stack can
-/// express it directly. Kindle uses the upstream 12M preset for rapid local
-/// iteration; the pinned D3 default is 200M. Larger presets remain one enum
-/// change.
+/// Fixed statistics for predicting each visual feature in standardized units.
+#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
+pub struct FeatureStandardization {
+    pub mean: Vec<f32>,
+    pub scale: Vec<f32>,
+}
+
+/// Configuration of the D3 baseline. Defaults use the upstream 12M preset;
+/// the pinned upstream default is 200M. Larger presets remain one enum change.
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct DreamerConfig {
     pub action_count: usize,
@@ -161,6 +164,10 @@ pub struct DreamerConfig {
     pub observation_kind: ObservationKind,
     #[serde(default)]
     pub video_encoder: Option<VideoEncoder>,
+    /// Fixed, training-only statistics for future-prediction targets. Does not
+    /// transform encoder/RSSM inputs. Diagnostics decode back to raw features.
+    #[serde(default)]
+    pub future_target_standardization: Option<FeatureStandardization>,
     /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -241,6 +248,7 @@ impl DreamerConfig {
             model_size: ModelSize::Size12M,
             observation_kind: ObservationKind::Features,
             video_encoder: None,
+            future_target_standardization: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
@@ -406,6 +414,22 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if let Some(stats) = &self.future_target_standardization
+            && (self.observation_kind != ObservationKind::Features
+                || self.loss_scales.future_prediction <= 0.0
+                || stats.mean.len() != self.observation_dim()
+                || stats.scale.len() != self.observation_dim()
+                || stats.mean.iter().any(|x| !x.is_finite())
+                || stats
+                    .scale
+                    .iter()
+                    .any(|x| !x.is_finite() || *x <= 0.0 || !x.recip().is_finite()))
+        {
+            return Err(
+                "future target standardization requires finite feature means and positive scales"
+                    .into(),
+            );
+        }
         if self.video_encoder.is_some()
             && (self.observation_kind != ObservationKind::Features
                 || self.batch_length != crate::vision::levjepa::FRAMES
@@ -552,6 +576,35 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn feature_standardization_is_optional_validated_and_serialized() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(config.future_target_standardization.is_none());
+        config.loss_scales.future_prediction = 0.25;
+        config.future_target_standardization = Some(FeatureStandardization {
+            mean: vec![2.0; config.observation_dim()],
+            scale: vec![0.1; config.observation_dim()],
+        });
+        assert!(config.check().is_ok());
+        let roundtrip: DreamerConfig =
+            serde_json::from_str(&serde_json::to_string(&config).unwrap()).unwrap();
+        assert_eq!(roundtrip, config);
+        for invalid in [0.0, -1.0, f32::NAN, f32::INFINITY, f32::from_bits(1)] {
+            let mut bad = config.clone();
+            bad.future_target_standardization.as_mut().unwrap().scale[0] = invalid;
+            assert!(bad.check().is_err());
+        }
+        let mut bad = config.clone();
+        bad.future_target_standardization
+            .as_mut()
+            .unwrap()
+            .mean
+            .pop();
+        assert!(bad.check().is_err());
+        config.loss_scales.future_prediction = 0.0;
+        assert!(config.check().is_err());
+    }
 
     #[test]
     fn upstream_size_presets_are_pinned() {
