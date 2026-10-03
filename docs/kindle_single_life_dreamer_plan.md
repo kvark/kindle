@@ -62,8 +62,14 @@ All six new checkpoints and three frozen forecast probes pass their audits,
 but forecasts still lose to persistence and barely distinguish actions. Keep
 the option off by default. Later imagined states remain detached.
 The connection is correct; useful latent world modeling remains unconfirmed.
-Next, isolate encoder information from predictor fitting/target drift on fixed
-trajectories before another RL campaign. This feasibility work precedes Phase3.
+The [fixed-target diagnostic](experiments/2026-10-03-fixed-latent-sufficiency.md)
+now collects98,304 additional random actions across the three frozen trained
+encoders, then fits small state readouts and action-conditioned latent predictors.
+The corrected collector smoke preserves all696 saved tensors and zero updates;
+full collection is active, GPU-head qualification/fitting pending. This isolates
+encoder information from predictor fitting/target drift before another RL
+campaign and precedes Phase3. The two original collector failures and2,176
+excluded smoke actions remain disclosed.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
 streaming and noncollapse checks pass. Tiny's

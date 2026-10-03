@@ -180,7 +180,8 @@ def test_regression_metrics_keep_missing_and_constant_targets_explicit():
     assert metrics[2] == dict(count=0, r2=None, mae=None, rmse=None)
 
 
-def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch):
+@pytest.mark.parametrize("interval", [32, 128])
+def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch, interval):
     class Model:
         gpu_device = dict(device_name="NVIDIA GeForce RTX 5080", driver_info="580.178.04")
         gpu_memory_budget = dict(budget_bytes=4 << 30, usage_bytes=0)
@@ -206,9 +207,10 @@ def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch):
     monkeypatch.setattr(fit_atari_probes._native, "RegressionProbe", lambda *a, **kw: model, raising=False)
     prediction, info = fit_atari_probes.mlp_probe(
         np.array([[0.0], [1.0]]), np.array([[-1.0], [1.0]]),
-        np.array([[2.0]]), np.array([[32.0]]), np.array([[100.0]]), 92, steps=64)
-    assert info["selected_step"] == 32 and model.learns == 64
-    np.testing.assert_array_equal(prediction, [[32]])
+        np.array([[2.0]]), np.array([[float(interval)]]), np.array([[100.0]]), 92,
+        steps=2 * interval, validation_interval=interval)
+    assert info["selected_step"] == interval and model.learns == 2 * interval
+    np.testing.assert_array_equal(prediction, [[interval]])
 
 
 def test_mlp_reuses_device_but_resets_every_fit():

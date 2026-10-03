@@ -43,8 +43,11 @@ def standardized_features(training, *others):
     return [np.asarray((x-mean)/scale, dtype=np.float32) for x in (training, *others)]
 
 
-def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512, model=None):
-    batch, hidden, interval = 64, 128, 32
+def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512, model=None,
+              validation_interval=32):
+    if steps <= 0 or validation_interval <= 0:
+        raise ValueError("positive fit and validation intervals required")
+    batch, hidden, interval = 64, 128, validation_interval
     xs = standardized_features(train_x, validation_x, test_x)
     mask = np.isfinite(train_y)
     y_mean, y_scale = np.nanmean(train_y, 0, dtype=np.float64), np.nanstd(train_y, 0, dtype=np.float64)
@@ -90,7 +93,7 @@ def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, ste
     prediction = predict(xs[2])
     memory.append(checked_memory(model))
     return prediction, dict(seed=seed, selected_step=selected_step, curve=curve,
-                            batch=batch, hidden=hidden, steps=steps, learning_rate=1e-3,
+                            batch=batch, hidden=hidden, steps=steps, validation_interval=interval, learning_rate=1e-3,
                             weight_penalty=1e-4/len(train_x), optimizer="Adam .9/.999/1e-8",
                             memory=memory, selection="validation normalized MSE; no refit or test selection")
 

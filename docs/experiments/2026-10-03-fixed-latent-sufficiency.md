@@ -25,7 +25,7 @@ No downscale/upscale preprocessing or teacher substitution.
 
 An initial128-action/trajectory plumbing test on checkpoint1009 adds1,024
 diagnostic interactions, excluded from fitting. It must preserve every checkpoint
-tensor hash and learner counter before full collection. Full collection has a
+tensor's bytes (keys, shapes, dtypes, values) and learner counter before full collection. Full collection has a
 15-minute deadline per checkpoint and no automatic retry. Expected retained
 corpus size~1.2GiB, plus frozen-after checkpoint checks; current disk headroom
 is7.8GiB. No unrelated history is deleted to make room.
@@ -47,6 +47,10 @@ current-state readouts retain every observed action outcome. Use2,048 updates
 per head, seed20261003, validation-only checkpoint selection every128 updates.
 Three encoders × three heads is9 diagnostic fits, not9 RL runs. Fitting is
 conditional on successful collection and wide-output qualification.
+The serial fitting queue has a30-minute deadline per encoder and stops on the
+first failure without retry. The wide-output numerical test has a120-second
+deadline. GPU fitting never overlaps collection; CPU preparation may overlap
+frozen collection, whose wall time is not a matched throughput measurement.
 
 Compare held-out prediction against persistence and unrelated-action controls,
 report raw and training-scale-normalized errors by trajectory and chunk-boundary
@@ -66,3 +70,24 @@ Ordinary host guards, expected RTX5080/driver580.178.04 and ≥2GiB sampled Vulk
 estimated headroom remain mandatory. Every new allocation warning stops work.
 No NVML polling, driver recovery or concurrent GPU job. Latest Meganeura main
 was rechecked October3 at21:40:6268ea5, unchanged; current13b19d33 includes dV fix.
+
+## Retained collection smoke failures
+
+The first smoke stopped after128 actions: a new collection trajectory reset the
+actor without closing the previous one. Artificial recording cutoffs are now
+passed to the actor and saved separately from real ALE terminal/truncation labels.
+The second collected all1,024 actions with zero updates, then rejected unequal
+safetensors file hashes. A CPU audit confirms every world/behavior/slow-value
+tensor is bitwise unchanged; serialization/header identity was the wrong check.
+The corrected check compares all tensor bytes and retains before/after file
+hashes as provenance. Neither failure recorded a GPU/kernel fault or recovery.
+Both outputs remain under `runs/fixed-tiny-latents-20261003.5uHqSE` and neither
+is fitting data. A fresh corrected1,024-action smoke is declared separately;
+these extra interactions are not silently folded into the fitting corpus.
+The corrected smoke passes in18.885s: all696 saved tensors unchanged, zero
+updates, eight complete trajectories, ≥8.736GiB sampled estimated headroom.
+Total excluded smoke interactions are2,176 (128+1,024+1,024).
+
+CPU dimension tests, strict workspace Clippy and1,042 Python tests pass. The
+first CPU-build service exited before compilation because its PATH lacked Cargo;
+the explicit build PATH succeeds. This is not a native/GPU failure.

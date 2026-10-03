@@ -25,7 +25,7 @@ fn validate_dimensions(
         || hidden == 0
         || hidden > 256
         || targets == 0
-        || targets > 64
+        || targets > 8192
     {
         return Err("invalid offline probe dimensions");
     }
@@ -239,10 +239,131 @@ mod tests {
     #[test]
     fn invalid_dimensions_precede_gpu_initialization() {
         for (batch, inputs, hidden, targets) in
-            [(0, 2, 2, 2), (2, 0, 2, 2), (2, 2, 0, 2), (2, 2, 2, 65)]
+            [(0, 2, 2, 2), (2, 0, 2, 2), (2, 2, 0, 2), (2, 2, 2, 8193)]
         {
             assert!(RegressionProbe::new(batch, inputs, hidden, targets, 0).is_err());
         }
+    }
+
+    #[test]
+    fn full_visual_target_dimensions_are_supported() {
+        assert!(validate_dimensions(64, 2 * 3136 + 15 * 18 + 16, 128, 3136).is_ok());
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded native GPU; full-latent F64 reference"]
+    fn wide_probe_matches_f64_and_fits_fixed_targets() {
+        let width = 3136;
+        let mut probe = RegressionProbe::new(4, 2, 2, width, 43).unwrap();
+        assert_eq!(
+            probe.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!probe.gpu_device().is_software_emulated);
+        let memory = probe.gpu_memory_budget().unwrap();
+        assert!(memory.budget_bytes - memory.usage_bytes >= 2 << 30);
+        let parameters = vec![
+            vec![0.5, -0.25],
+            vec![1.0, -1.0, 0.5, 2.0],
+            (0..width).map(|i| (i % 7) as f32 * 0.03).collect(),
+            (0..2 * width)
+                .map(|i| (i % 11) as f32 * 0.02 - 0.1)
+                .collect(),
+        ];
+        probe.set_parameters(&parameters).unwrap();
+        let x = [0.5, 1.0, -0.5, 0.2, 1.0, -1.0, 0.0, 0.0];
+        let mut expected = vec![0.0_f64; 4 * width];
+        for row in 0..4 {
+            let a = f64::from(x[2 * row]);
+            let b = f64::from(x[2 * row + 1]);
+            let hidden = [(a + 0.5 * b + 0.5).max(0.0), (-a + 2.0 * b - 0.25).max(0.0)];
+            for column in 0..width {
+                expected[row * width + column] = f64::from(parameters[2][column])
+                    + hidden[0] * f64::from(parameters[3][column])
+                    + hidden[1] * f64::from(parameters[3][width + column]);
+            }
+        }
+        for (actual, expected) in probe.predict(&x).unwrap().iter().zip(&expected) {
+            assert!((f64::from(*actual) - expected).abs() < 1e-6);
+        }
+        assert_eq!(parameters, probe.parameters());
+        let y = expected
+            .iter()
+            .map(|v| (1.5 * v + 0.03) as f32)
+            .collect::<Vec<_>>();
+        let mask = (0..4 * width)
+            .map(|i| (i % 3) as f32 * 0.5)
+            .collect::<Vec<_>>();
+        let penalty = 0.001_f32;
+        let mut reference = [
+            vec![0.0_f64; 2],
+            vec![0.0; 4],
+            vec![0.0; width],
+            vec![0.0; 2 * width],
+        ];
+        let mut loss = 0.0;
+        for row in 0..4 {
+            let a = f64::from(x[2 * row]);
+            let b = f64::from(x[2 * row + 1]);
+            let hidden = [a + 0.5 * b + 0.5, -a + 2.0 * b - 0.25];
+            for column in 0..width {
+                let index = row * width + column;
+                let error = expected[index] - f64::from(y[index]);
+                let weight = f64::from(mask[index]) / (4 * width) as f64;
+                loss += error * error * weight;
+                let delta = 2.0 * error * weight;
+                reference[2][column] += delta;
+                for lane in 0..2 {
+                    reference[3][lane * width + column] += delta * hidden[lane].max(0.0);
+                    if hidden[lane] > 0.0 {
+                        let gradient = delta * f64::from(parameters[3][lane * width + column]);
+                        reference[0][lane] += gradient;
+                        reference[1][lane] += a * gradient;
+                        reference[1][2 + lane] += b * gradient;
+                    }
+                }
+            }
+        }
+        for index in [1, 3] {
+            for (gradient, value) in reference[index].iter_mut().zip(&parameters[index]) {
+                let value = f64::from(*value);
+                *gradient += 2.0 * f64::from(penalty) * value;
+                loss += f64::from(penalty) * value * value;
+            }
+        }
+        probe.inputs(&x, &y, &mask, penalty).unwrap();
+        probe.session.step();
+        probe.session.wait();
+        assert!((f64::from(probe.session.read_loss()) - loss).abs() < 1e-6);
+        for (name, expected) in probe.parameters.iter().zip(reference) {
+            let mut actual = vec![0.0; expected.len()];
+            probe.session.read_param_grad(name, &mut actual);
+            let error = actual
+                .iter()
+                .zip(&expected)
+                .map(|(a, b)| (f64::from(*a) - b).powi(2))
+                .sum::<f64>();
+            let norm = expected.iter().map(|x| x * x).sum::<f64>();
+            assert!((error / norm).sqrt() < 2e-4, "{name}");
+        }
+        let first = probe
+            .learn(&x, &y, &vec![1.0; 4 * width], 0.01, 0.0)
+            .unwrap();
+        let mut last = first;
+        for _ in 0..64 {
+            last = probe
+                .learn(&x, &y, &vec![1.0; 4 * width], 0.01, 0.0)
+                .unwrap();
+        }
+        assert!(last < 0.1 * first, "{first} -> {last}");
+        let trained = probe.parameters();
+        probe.predict(&x).unwrap();
+        assert_eq!(trained, probe.parameters());
+        let memory = probe.gpu_memory_budget().unwrap();
+        assert!(memory.budget_bytes - memory.usage_bytes >= 2 << 30);
+        eprintln!(
+            "wide probe: {width} outputs, F64 values/raw gradients pass; loss {first} -> {last}; memory={memory:?}"
+        );
     }
 
     #[test]

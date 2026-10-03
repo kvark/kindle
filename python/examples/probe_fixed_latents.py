@@ -15,6 +15,7 @@ import time
 import ale_py
 import gymnasium as gym
 import numpy as np
+from safetensors import safe_open
 
 import kindle
 from atari import DreamerAtariPreprocessing, checkpoint_identity, sha256_file
@@ -26,6 +27,22 @@ from probe_atari_dynamics import ACTION_SEED_XOR
 SPLITS = {"train": (9101, 9109, 9127), "validation": (10103, 10111),
           "test": (11113, 11117, 11131)}
 PROTOCOL = "kindle-fixed-latent-trajectories-v1"
+
+
+def assert_frozen_tensors(before, after):
+    """Compare tensor bytes, not nondeterministic safetensors header ordering."""
+    counts = {}
+    for name in ("world", "behavior", "slow_value"):
+        with safe_open(before / f"{name}.safetensors", framework="np") as left, \
+                safe_open(after / f"{name}.safetensors", framework="np") as right:
+            if set(left.keys()) != set(right.keys()):
+                raise RuntimeError(f"frozen collection changed {name} tensor keys")
+            for key in left.keys():
+                a, b = left.get_tensor(key), right.get_tensor(key)
+                if a.shape != b.shape or a.dtype != b.dtype or a.tobytes() != b.tobytes():
+                    raise RuntimeError(f"frozen collection changed {name}/{key}")
+            counts[name] = len(left.keys())
+    return counts
 
 
 def collect_trace(agent, environment, seed, steps, check_memory):
@@ -141,11 +158,11 @@ def collect(args):
         environment.close()
     after = args.output / "frozen-after"
     agent.save_checkpoint(str(after))
-    if checkpoint_identity(after)["tensor_sha256"] != identity["tensor_sha256"]:
-        raise RuntimeError("frozen collection changed checkpoint tensors")
+    unchanged = assert_frozen_tensors(args.checkpoint, after)
     if agent.learner_step != before_steps:
         raise RuntimeError("collection updated the learner")
-    manifest.update(status="complete", learner_updates=0, tensor_hashes_unchanged=True,
+    manifest.update(status="complete", learner_updates=0, tensor_bytes_unchanged=True,
+                    unchanged_tensor_counts=unchanged, frozen_after=checkpoint_identity(after),
                     sampled_gpu_budget=memory, seconds=time.monotonic() - started)
     (args.output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(json.dumps(dict(status="complete", learner_updates=0, trajectories=len(manifest["files"]))), flush=True)

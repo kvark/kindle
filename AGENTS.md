@@ -128,7 +128,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   separate encoder information from predictor fit and moving targets. Do not
   substitute another unchanged RL campaign, a representation matrix or Phase3
   for this unresolved question. New diagnostic work must be bounded/declared;
-  no GPU queue is currently active and no new learning campaign is implied.
+  the [fixed-target protocol](docs/experiments/2026-10-03-fixed-latent-sufficiency.md)
+  now declares98,304 random diagnostic actions across all three frozen trained
+  encoders, then nine small GPU readout/prediction heads. The corrected1,024-action
+  collector smoke passes: zero updates, all696 saved tensors bitwise unchanged.
+  Two earlier script/check failures are retained (recording boundary and file
+  serialization identity);2,176 smoke actions are excluded. Full collection is
+  active; wide-output qualification and fitting remain pending. No new RL
+  campaign or Phase3 is implied.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not
