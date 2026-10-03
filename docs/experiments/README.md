@@ -11,6 +11,10 @@ October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its
 [qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
 the implementation/CPU checks and native blockers; no learning run has started.
+October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
+shows native allocation and compute succeeding despite the startup warning;
+numerical Tiny qualification still remains. The known shader VUID is non-blocking
+by user direction, not silently removed from the evidence.
 
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default

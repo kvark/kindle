@@ -59,9 +59,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Implementation and CPU autodiff/replay checks exist; native Tiny qualification
   and all learning are unrun. The merged-backend RGB canary stopped at17:31 UTC
   on a fourth allocation warning, and logged workgroup-array SPIR-V validation
-  errors. Child reaped; no new Xid/hang or recovery recorded. GPU work remains
-  stopped: do not whitelist the new record and retry. See
+  errors. Child reaped; no new Xid/hang or recovery recorded. That stop is retained;
+  October 3's explicit diagnostic authorization below supersedes the blanket stop. See
   `docs/results/2026-10-02-joint-tiny-qualification.md`.
+- **October 3 allocation diagnostic, explicitly authorized:** the user treats
+  the known `VUID-StandaloneSpirv-None-10684` as non-blocking and authorizes a
+  short instrumented initialization probe. Keep its output; other validation
+  errors remain fatal. A fresh host-guard declaration may observe at most two
+  exact `_memdescAllocInternal` warnings for at most 120 seconds, retaining
+  their records. This is not a training waiver or hardware-health claim.
+  Native initialization, three 4KiB allocations and one checked 256-element
+  dispatch distinguish API failure from a recovered/internal allocation attempt.
+  No reset, driver change, root tracing, old queue or learning run is authorized
+  by this diagnostic. Review the result before another launch.
+  **Result:** native initialization/allocations/256 exact outputs pass in2.207s
+  despite one warning received during context creation, before explicit buffers.
+  Minimum sampled estimated headroom is15.423GiB. Separate CUDA initialization
+  passes without a warning. The first CUDA helper failed on a Python logging
+  typo after successful `cuInit`; retain it alongside the corrected result.
+  No new Xid, hang, device loss or recovery. The warning alone is not evidence
+  of a wedge; its internal allocation/caller remains unidentified. Next is
+  bounded backend/Tiny numerical qualification, not reboot or shader work.
+  See `docs/results/2026-10-03-allocation-initialization.md`.
 - **Following this experiment: Phase 3, exploration/reward.** Declare one small GPU-compatible
   mechanism versus extrinsic-only, three seeds, without Freeway's action aid.
   No old CPU feature-readback visitation workaround, new representation matrix,

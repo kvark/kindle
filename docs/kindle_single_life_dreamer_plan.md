@@ -85,8 +85,16 @@ unrun. No Xid/hang or recovery is recorded; cause remains unresolved. See the
 matching-allocation report for the retained logs and host-only snapshot.
 Merged Meganeura `6268ea5` / Blade `e349cddf` are now pinned, including the
 host-computed Adam/LaProp bias correction. Their ordinary RGB canary stopped
-on another allocation warning and SPIR-V validation errors. No native Tiny
-test or learning followed; fix/review these blockers before qualification.
+on another allocation warning and SPIR-V validation errors. October 3's
+[user-authorized initialization diagnostic](results/2026-10-03-allocation-initialization.md)
+now completes native context creation, three small allocations and 256 exact
+GPU outputs despite the same startup warning (2.207s, >=15.423GiB sampled
+estimated headroom). Separate CUDA initialization passes without a warning.
+The user treats the known shader-layout diagnostic as non-blocking. No new
+Xid/hang/device loss or recovery; the warning's precise cause remains unknown,
+but it is not itself evidence that GPU work cannot proceed. Backend/Tiny
+numerical qualification and the learning comparison are still unrun; they are
+next, not a reset or shader-compiler detour. Diagnostic exceptions remain scoped.
 Historical evidence keeps its original backend and numerical identities.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),

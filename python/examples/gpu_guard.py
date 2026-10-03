@@ -210,7 +210,7 @@ def parse_journal(text, boot, limit):
     return records
 
 
-def check_kernel(evidence, boot, cursor=None, reviewed_warnings=()):
+def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_diagnostic=None):
     limit = 4096 if cursor else 50001
     command = ["journalctl", "--no-pager", "--quiet", "-o", "json", f"--boot={boot.replace('-', '')}",
                "-n", str(limit), "_TRANSPORT=kernel"]
@@ -228,6 +228,13 @@ def check_kernel(evidence, boot, cursor=None, reviewed_warnings=()):
             identity = {"cursor": row["__CURSOR"], "message": row["MESSAGE"]}
             if cursor is None and identity in reviewed_warnings:
                 evidence.event("reviewed_kernel_warning", record=row)
+            elif (cursor is not None and allocation_diagnostic
+                  and row["MESSAGE"] == allocation_diagnostic["message"]):
+                count = getattr(evidence, "allocation_warning_count", 0) + 1
+                evidence.allocation_warning_count = count
+                evidence.event("diagnostic_allocation_warning", record=row, count=count)
+                if count > allocation_diagnostic["max_occurrences"]:
+                    raise GuardError("allocation diagnostic warning limit exceeded")
             else:
                 evidence.event("kernel_fault", record=row)
                 raise GuardError("unreviewed NVIDIA allocation warning")

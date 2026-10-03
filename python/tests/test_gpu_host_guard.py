@@ -43,8 +43,8 @@ def environment(tmp_path, monkeypatch):
         if controls["change_at"] == calls["kernel"]:
             driver.write_text("changed")
         message = "NVRM: Xid (PCI:0000:01:00): 62, CPU fixture" if controls["fault_at"] == calls["kernel"] else "CPU fixture ordinary record"
-        if controls["warning_at"] == calls["kernel"]:
-            message = "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]"
+        if controls["warning_at"] == calls["kernel"] or calls["kernel"] in controls.get("warnings_at", ()):
+            message = controls.get("warning_message", "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]")
         row = dict(_BOOT_ID=BOOT.replace("-", ""), __CURSOR=f'cursor-{calls["kernel"]}',
                    __MONOTONIC_TIMESTAMP="100000", MESSAGE=message)
         text = "" if controls["empty"] else json.dumps(row) + "\n"
@@ -168,6 +168,55 @@ def test_reviewed_warning_does_not_allow_a_new_occurrence(environment):
     result = execute(environment, code="import time; time.sleep(1)",
                      reviewed_kernel_warnings=reviewed)
     assert not result["host_guard_passed"] and result["child_exit_code"] is not None
+
+
+DIAGNOSTIC = {"message": "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]", "max_occurrences": 1}
+
+
+def test_explicit_allocation_diagnostic_records_a_live_warning(environment):
+    path, _calls, controls = environment
+    controls["warning_at"] = 2
+    result = execute(environment, code="import time; time.sleep(.08)", allocation_diagnostic=DIAGNOSTIC)
+    assert result["host_guard_passed"] and not result["hardware_qualified"]
+    assert '"event": "diagnostic_allocation_warning"' in (path / "evidence/events.jsonl").read_text()
+    assert host.audit(path / "evidence")["host_guard_passed"]
+
+
+@pytest.mark.parametrize("case", ["baseline", "repeat", "different", "fault"])
+def test_allocation_diagnostic_does_not_waive_other_stops(environment, case):
+    _path, _calls, controls = environment
+    if case == "baseline":
+        controls["warning_at"] = 1
+    elif case == "repeat":
+        controls["warnings_at"] = (2, 3)
+    elif case == "different":
+        controls["warning_at"] = 2
+        controls["warning_message"] = DIAGNOSTIC["message"] + " another allocation site"
+    else:
+        controls["fault_at"] = 2
+    result = execute(environment, code="import time; time.sleep(.2)", allocation_diagnostic=DIAGNOSTIC)
+    assert not result["host_guard_passed"] and not result["unfinished_children"]
+    assert not host.audit(environment[0] / "evidence")["host_guard_passed"]
+
+
+@pytest.mark.parametrize("diagnostic,seconds", [
+    (DIAGNOSTIC, 121), ({**DIAGNOSTIC, "max_occurrences": 3}, 2),
+    ({**DIAGNOSTIC, "max_occurrences": True}, 2), ({**DIAGNOSTIC, "message": ".*"}, 2),
+    ({**DIAGNOSTIC, "message": DIAGNOSTIC["message"] + " NVRM: Xid 62"}, 2),
+])
+def test_invalid_allocation_diagnostic_never_launches(environment, diagnostic, seconds):
+    with pytest.raises(ValueError):
+        execute(environment, allocation_diagnostic=diagnostic, timeout_seconds=seconds)
+
+
+@pytest.mark.parametrize("other_error", [False, True])
+def test_reviewed_vuid_keeps_other_validation_errors_fatal(environment, other_error):
+    code = "print('Validation Error: [ VUID-StandaloneSpirv-None-10684 ]')"
+    if other_error:
+        code += "; print('Validation Error: [ VUID-vkQueueSubmit-pWaitSemaphores-03238 ]')"
+    result = execute(environment, code=code, reviewed_validation_vuids=["VUID-StandaloneSpirv-None-10684"])
+    assert result["host_guard_passed"] is not other_error
+    assert host.audit(environment[0] / "evidence")["host_guard_passed"] is not other_error
 
 
 def test_native_failure_remains_a_failure(environment):

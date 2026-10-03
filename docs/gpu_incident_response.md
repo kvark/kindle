@@ -23,6 +23,17 @@ waiver or proof of hardware health. The October 2
 [ordinary-compute canary](results/2026-10-02-joint-tiny-qualification.md) stopped;
 do not add its new warning to an exception list and automatically retry.
 
+On October 3 the user explicitly authorized an instrumented initialization
+diagnostic and classified `VUID-StandaloneSpirv-None-10684` as non-blocking.
+Fresh declarations may list that exact VUID in `reviewed_validation_vuids`;
+its output and events remain retained. Other validation errors still stop.
+For the authorized short probe only, `allocation_diagnostic` names one exact
+allocation-warning message and a maximum of one or two new occurrences.
+The guard enforces a 120-second maximum; baseline records still require exact
+review, and other messages, excess occurrences, native failures and hard faults
+still stop. A successful diagnostic is not a clean-warning result, proof of
+GPU health or authorization for a training campaign. No recovery is involved.
+
 The guard checks kernel logs and boot/driver identity before, during and after
 execution. It stops/reaps only its own direct child on faults or timeout. An
 uninterruptible child may remain unfinished; preserve that result and its logs.
