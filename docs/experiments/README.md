@@ -10,12 +10,17 @@ overwrite completed/failed experiments or change their acceptance gates.
 October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its
 [qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
-the implementation/CPU checks and native blockers; no learning run has started.
+the implementation/CPU checks and original native blockers.
 October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
 shows native allocation and compute succeeding despite the startup warning;
 the [Tiny backward follow-up](../results/2026-10-03-joint-tiny-backward.md) fixes
 stale attention-gradient aliases and passes all148 independent gradient checks.
-Full-update/restore/cost qualification remains in progress; no learning result.
+Full-update/restore/cost qualification and all nine online runs now complete.
+The [task-only](../results/2026-10-03-joint-tiny-learning.md) and
+[direct-policy](../results/2026-10-03-policy-tiny-learning.md) comparisons find no
+clear early benefit. The [fixed-target diagnostic](../results/2026-10-03-fixed-latent-sufficiency.md)
+finds readable positions and better-than-persistence latent forecasts, but no
+established action/reward-sensitive world modeling. No GPU queue remains active.
 The known shader VUID is non-blocking by user direction, not silently removed
 from the evidence.
 

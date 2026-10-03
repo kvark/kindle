@@ -62,14 +62,19 @@ All six new checkpoints and three frozen forecast probes pass their audits,
 but forecasts still lose to persistence and barely distinguish actions. Keep
 the option off by default. Later imagined states remain detached.
 The connection is correct; useful latent world modeling remains unconfirmed.
-The [fixed-target diagnostic](experiments/2026-10-03-fixed-latent-sufficiency.md)
-now collects98,304 additional random actions across the three frozen trained
-encoders, then fits small state readouts and action-conditioned latent predictors.
-The corrected collector smoke preserves all696 saved tensors and zero updates;
-full collection is active, GPU-head qualification/fitting pending. This isolates
-encoder information from predictor fitting/target drift before another RL
-campaign and precedes Phase3. The two original collector failures and2,176
-excluded smoke actions remain disclosed.
+The [fixed-target evaluation](results/2026-10-03-fixed-latent-sufficiency.md) is
+also complete:98,304 additional diagnostic actions, all696 saved tensors frozen,
+and nine small GPU heads fitted in59.6s. Player-position R² is.775–.854; latent
+forecast error / persistence is.840 [.679,.927] at h1 and.489 [.456,.530] at h15.
+Tiny retains readable/predictable state, but decoded player-x loses to persistence
+and reward/action-sensitive forecasting remains weak. This is conditional latent
+predictability, not a useful online world model or JEPA advantage. No job remains
+active. The two collector failures and2,176 excluded smoke actions are retained.
+The next proposed JEPA test is one frozen-encoder RSSM target-standardization
+ablation on the saved corpus, with unchanged recurrence/data/budget and action/
+event controls. Large static feature offsets motivate this conditioning test;
+the current head also changes architecture/inputs and does not prove the cause.
+No fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
 streaming and noncollapse checks pass. Tiny's
@@ -274,10 +279,13 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    native-detail pixels, explicit noncollapse regularization, and refreshed
    acting caches. Six bounded learning runs and frozen forecast probes complete:
    no clear early benefit and4.64x wall cost. The three direct-policy runs and
-   frozen forecast probes also complete without a clear benefit. A fixed-target
-   predictive-sufficiency diagnostic is next; the useful-latent question remains
-   open. Historical Phase2 conclusions remain scoped to frozen vision. No
-   unchanged RL queue resumes.
+   frozen forecast probes also complete without a clear benefit. The fixed-target
+   diagnostic now finds readable positions and forecasts beating latent
+   persistence, but not reliable action/reward-sensitive prediction. Before
+   more joint gameplay, propose one frozen-RSSM target-standardization ablation
+   on the saved corpus. Useful online JEPA dynamics remain unconfirmed;
+   historical Phase2 conclusions remain scoped to frozen vision. No unchanged
+   RL queue resumes.
 6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation

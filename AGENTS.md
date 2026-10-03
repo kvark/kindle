@@ -124,18 +124,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   reward MAE loses to zero. All learning/probe guards and seals pass. See
   `docs/results/2026-10-03-policy-tiny-learning.md`. Keep the option off by
   default; this screen does not establish useful latent world modeling.
-  **Next for the active feasibility goal:** a small fixed-trajectory test to
-  separate encoder information from predictor fit and moving targets. Do not
-  substitute another unchanged RL campaign, a representation matrix or Phase3
-  for this unresolved question. New diagnostic work must be bounded/declared;
-  the [fixed-target protocol](docs/experiments/2026-10-03-fixed-latent-sufficiency.md)
-  now declares98,304 random diagnostic actions across all three frozen trained
-  encoders, then nine small GPU readout/prediction heads. The corrected1,024-action
-  collector smoke passes: zero updates, all696 saved tensors bitwise unchanged.
-  Two earlier script/check failures are retained (recording boundary and file
-  serialization identity);2,176 smoke actions are excluded. Full collection is
-  active; wide-output qualification and fitting remain pending. No new RL
-  campaign or Phase3 is implied.
+  **Fixed-latent evaluation complete:**98,304 additional random actions across
+  three frozen encoders, all696 saved tensors unchanged, and nine GPU heads
+  (59.6s including guards). Player-position R² is.775–.854; raw forecast MSE /
+  persistence is.840 [.679,.927] at h1 and.489 [.456,.530] at h15. Tiny contains
+  readable/predictable state, but decoded player-x loses to persistence and
+  reward/action-sensitive prediction is not established. This is not an online
+  JEPA advantage. See `docs/results/2026-10-03-fixed-latent-sufficiency.md`.
+  All guards/seals and independent full-width GPU references pass; CI268 passes.
+  Two collector failures (recording boundary, serialization-hash false alarm)
+  and2,176 excluded smoke actions remain disclosed. No GPU job is active.
+  **Proposed next JEPA test:** one matched frozen-encoder RSSM target-standardization
+  ablation on this saved corpus, retaining action/event controls. The observed
+  static feature offset makes conditioning worth testing, not a proven cause.
+  This needs a fresh bounded declaration; no unchanged RL queue, representation
+  matrix or Phase3 campaign starts automatically. Keep RGB/default ac_grads=false.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not

@@ -6,6 +6,12 @@ This diagnostic addresses that distinction; it does not replace online learning
 evidence or add another representation family. The active feasibility goal stays
 open until its evidence supports a scoped conclusion.
 
+**Completed October3 at22:27 UTC.** All three corpora, independent wide-output
+GPU qualification and nine heads pass. The [result report](../results/2026-10-03-fixed-latent-sufficiency.md)
+finds coarse state decodability and better-than-persistence latent prediction,
+but no established action/reward-sensitive world model. The bounded evaluation
+is complete; no new campaign is queued. Original declarations remain below.
+
 ## Frozen collection — declared before execution
 
 Use all three final direct-policy Tiny checkpoints, seeds1009/2017/3019, without

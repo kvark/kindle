@@ -110,6 +110,11 @@ claim follows. The probes finish21:29 UTC without training or faults.
 
 ## Interpretation and next direction
 
+Later October3 follow-up: the [fixed-target diagnostic](2026-10-03-fixed-latent-sufficiency.md)
+is now complete. Tiny retains readable/predictable state, but useful
+action/reward-sensitive forecasting is still unconfirmed. The original
+screen-time interpretation below is retained.
+
 The earlier failure was not only a disconnected gradient: that backend bug is
 fixed and the direct policy route independently qualifies, yet this budget still
 does not produce useful forecasts or a clear learning advantage. The assumption
