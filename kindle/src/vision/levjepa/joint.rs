@@ -333,7 +333,8 @@ mod tests {
         session.step();
         session.wait();
         check_device(&gpu);
-        let check = |name: &str, actual: &[f32], expected: &[f32], tolerance: f64| {
+        let mut checks = Vec::new();
+        let mut check = |name: &str, actual: &[f32], expected: &[f32], tolerance: f64| {
             assert_eq!(actual.len(), expected.len(), "{name}");
             assert!(actual.iter().all(|x| x.is_finite()), "{name}");
             let error = actual
@@ -347,12 +348,24 @@ mod tests {
                 .map(|&b| f64::from(b).powi(2))
                 .sum::<f64>()
                 .sqrt();
-            assert!(
-                error <= tolerance * norm + 2e-5,
-                "{name}: error={error}, norm={norm}"
-            );
+            let actual_norm = actual
+                .iter()
+                .map(|&a| f64::from(a).powi(2))
+                .sum::<f64>()
+                .sqrt();
+            let dot = actual
+                .iter()
+                .zip(expected)
+                .map(|(&a, &b)| f64::from(a) * f64::from(b))
+                .sum::<f64>();
+            let pass = error <= tolerance * norm + 2e-5;
+            checks.push(serde_json::json!({
+                "name": name, "pass": pass, "l2_error": error, "expected_norm": norm,
+                "actual_norm": actual_norm, "dot": dot, "tolerance": tolerance,
+            }));
+            pass
         };
-        check(
+        let mut pass = check(
             "loss",
             &session.read_output(1),
             &reference.tensor_f32_auto("loss").unwrap(),
@@ -361,8 +374,8 @@ mod tests {
         for time in 0..2 {
             let mut actual = vec![0.0; 2 * Observation::LEN];
             session.read_output_by_index(time + 1, &mut actual);
-            check(
-                "features",
+            pass &= check(
+                &format!("features_{time}"),
                 &actual,
                 &reference
                     .tensor_f32_auto(&format!("features_{time}"))
@@ -376,11 +389,12 @@ mod tests {
             .map(str::to_owned)
             .collect::<Vec<_>>();
         assert_eq!(names.len(), 148);
+        let mut gradients = std::collections::BTreeMap::new();
         for name in names {
             assert!(session.has_param_grad(&name));
             let mut actual = vec![0.0; session.param_size(&name).unwrap()];
             session.read_param_grad(&name, &mut actual);
-            check(
+            pass &= check(
                 &name,
                 &actual,
                 &reference
@@ -388,7 +402,19 @@ mod tests {
                     .unwrap(),
                 5e-3,
             );
+            gradients.insert(name, actual);
         }
+        if let Some(output) = std::env::var_os("KINDLE_JOINT_TINY_ACTUAL") {
+            let output = std::path::PathBuf::from(output);
+            std::fs::create_dir(&output).unwrap();
+            for (name, data) in [
+                ("checks.json", serde_json::to_vec_pretty(&checks).unwrap()),
+                ("gradients.json", serde_json::to_vec(&gradients).unwrap()),
+            ] {
+                std::fs::write(output.join(name), data).unwrap();
+            }
+        }
+        assert!(pass, "independent Tiny comparisons failed: {checks:?}");
         let name = "encoder.patch_embed.proj.weight";
         let mut before = vec![0.0; session.param_size(name).unwrap()];
         session.read_param(name, &mut before);

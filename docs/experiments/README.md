@@ -13,8 +13,11 @@ task-adaptive representation hypothesis. Its
 the implementation/CPU checks and native blockers; no learning run has started.
 October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
 shows native allocation and compute succeeding despite the startup warning;
-numerical Tiny qualification still remains. The known shader VUID is non-blocking
-by user direction, not silently removed from the evidence.
+the [Tiny backward follow-up](../results/2026-10-03-joint-tiny-backward.md) fixes
+stale attention-gradient aliases and passes all148 independent gradient checks.
+Full-update/restore/cost qualification remains in progress; no learning result.
+The known shader VUID is non-blocking by user direction, not silently removed
+from the evidence.
 
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default

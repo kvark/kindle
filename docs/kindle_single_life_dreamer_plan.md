@@ -30,11 +30,23 @@ runner requires `--encoder-checkpoint` to opt in.
 
 The October 2 [joint Tiny experiment](experiments/2026-10-02-joint-tiny.md) now
 has an optional implementation: task gradients through all used Tiny parameters,
-native-detail pixel replay and live causal-cache refresh. It is **not GPU-qualified**
-and has no learning results. The previous initial-Tiny arm was also frozen;
+native-detail pixel replay and live causal-cache refresh. Its **isolated GPU
+numerical checks pass**, but full qualification is incomplete and there are no
+learning results. The previous initial-Tiny arm was also frozen;
 it did not test this hypothesis. The
 [qualification report](results/2026-10-02-joint-tiny-qualification.md) records the
-CPU checks and the stopped backend canary. This follow-up precedes Phase 3.
+CPU checks and the stopped backend canary. October 3's
+[backward report](results/2026-10-03-joint-tiny-backward.md) identifies and fixes
+a backend aliasing defect: all148 encoder gradients now match independent F64,
+as do forward features and the regularizer; live-cache refresh also passes.
+Three debug-build synthetic updates take3.466s each, followed by a retained
+timeout during restore. Restore-only now passes all148 encoder tensors exactly
+and frozen acting. Optimized full-update probes pass at2.211s joint versus.487s
+frozen, with live cache refresh; attention backward dominates the instrumented
+profile. The matched early-learning screen is six8,192-action Seaquest runs,
+three paired seeds—not a multi-day200k replication or a mastery gate.
+World/task/value gradients reach Tiny; actor loss remains separate.
+This follow-up precedes Phase 3.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
 streaming and noncollapse checks pass. Tiny's
@@ -83,7 +95,7 @@ The v4 ring passes functionally but logs an NVIDIA `NV_ERR_NO_MEMORY` warning;
 further local GPU work stopped for review, with the v4 real-producer test still
 unrun. No Xid/hang or recovery is recorded; cause remains unresolved. See the
 matching-allocation report for the retained logs and host-only snapshot.
-Merged Meganeura `6268ea5` / Blade `e349cddf` are now pinned, including the
+Merged Meganeura `6268ea5` / Blade `e349cddf` were adopted, including the
 host-computed Adam/LaProp bias correction. Their ordinary RGB canary stopped
 on another allocation warning and SPIR-V validation errors. October 3's
 [user-authorized initialization diagnostic](results/2026-10-03-allocation-initialization.md)
@@ -92,9 +104,10 @@ GPU outputs despite the same startup warning (2.207s, >=15.423GiB sampled
 estimated headroom). Separate CUDA initialization passes without a warning.
 The user treats the known shader-layout diagnostic as non-blocking. No new
 Xid/hang/device loss or recovery; the warning's precise cause remains unknown,
-but it is not itself evidence that GPU work cannot proceed. Backend/Tiny
-numerical qualification and the learning comparison are still unrun; they are
-next, not a reset or shader-compiler detour. Diagnostic exceptions remain scoped.
+but it is not itself evidence that GPU work cannot proceed. Kindle now pins
+Meganeura `13b19d33` ([PR223](https://github.com/kvark/meganeura/pull/223)) for the
+attention-value gradient fix above. New upstream comparisons pass1,524 checks;
+the matched learning screen is next. Diagnostic exceptions remain scoped.
 Historical evidence keeps its original backend and numerical identities.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),

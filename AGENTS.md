@@ -56,8 +56,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   the finite learning budget before gameplay. Do not silently substitute partial
   fine-tuning, frame-only encoding or cached stale embeddings. See
   `docs/experiments/2026-10-02-joint-tiny.md`. No representation matrix or swarms.
-  Implementation and CPU autodiff/replay checks exist; native Tiny qualification
-  and all learning are unrun. The merged-backend RGB canary stopped at17:31 UTC
+  Implementation and CPU autodiff/replay checks exist. The merged-backend RGB canary stopped at17:31 UTC
   on a fourth allocation warning, and logged workgroup-array SPIR-V validation
   errors. Child reaped; no new Xid/hang or recovery recorded. That stop is retained;
   October 3's explicit diagnostic authorization below supersedes the blanket stop. See
@@ -81,6 +80,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   of a wedge; its internal allocation/caller remains unidentified. Next is
   bounded backend/Tiny numerical qualification, not reboot or shader work.
   See `docs/results/2026-10-03-allocation-initialization.md`.
+- **October 3 joint-Tiny backward:** independent native checks found zero
+  attention-value gradients despite correct Q/K and forward values. Meganeura
+  `13b19d33` ([PR223](https://github.com/kvark/meganeura/pull/223), based on current
+  upstream6268ea5) fixes stale reshape aliases of the fused dV output. All148
+  Tiny gradients now match F64 (maximum relative L2 1.111e-6); finite optimizer
+  movement, regularizer and live-cache refresh pass. Historical frozen-Tiny
+  evidence is unaffected. Three full Size1M/N8/B8/T16/microbatch1 synthetic
+  debug-build updates completed at3.466s/update, then the120s guard stopped
+  during restore; no new warning/fault. A separate guarded restore passes all148
+  encoder tensors exactly and acts without updating. Optimized matched probes
+  pass: joint2.211s/update versus frozen.487s, live-prefix refresh included.
+  Attention backward dominates the intrusive profile; GPU pass/wall is87% for
+  one ordinary world microbatch, not device utilization. New upstream RGB
+  value/gradient/common-gradient optimizer/EMA comparison passes1,524 checks.
+  The learning screen is declared: six runs, Seaquest8,192 actual actions/arm,
+  seeds1009/2017/3019, N8/B8/T16/H15/R32/microbatch1/replay8192; no aids, .25sticky,
+  full18 actions. This is early learning/collapse screening, not competence.
+  Direct actor gradients remain separate; task/value/
+  world losses train Tiny. See `docs/results/2026-10-03-joint-tiny-backward.md`.
+  A mistakenly unfiltered backend library suite executed unguarded GPU tests;
+  its startup warning and raw-pipeline cleanup errors are retained, not accepted
+  as clean qualification. Select GPU tests explicitly and guard them; do not
+  assume Meganeura `--lib` is CPU-only.
 - **Following this experiment: Phase 3, exploration/reward.** Declare one small GPU-compatible
   mechanism versus extrinsic-only, three seeds, without Freeway's action aid.
   No old CPU feature-readback visitation workaround, new representation matrix,

@@ -997,6 +997,200 @@ mod joint_qualification {
     use super::*;
 
     #[test]
+    #[ignore = "requires declared GPU, oracle directory, KINDLE_JOINT_PROBE_MODE and fresh KINDLE_JOINT_PROBE_OUTPUT"]
+    fn full_video_updates() {
+        let mode = match std::env::var("KINDLE_JOINT_PROBE_MODE").unwrap().as_str() {
+            "joint" => crate::dreamer::VideoEncoder::Joint,
+            "frozen" => crate::dreamer::VideoEncoder::Frozen,
+            other => panic!("unknown probe mode {other}"),
+        };
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = Path::new(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(checkpoint).unwrap(),
+            manifest["checkpoint_sha256"].as_str().unwrap()
+        );
+        let output = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_PROBE_OUTPUT").unwrap());
+        std::fs::create_dir(&output).unwrap();
+        let mut config = DreamerConfig::new(18);
+        config.model_size = crate::dreamer::ModelSize::Size1M;
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.world_microbatch_size = Some(1);
+        config.replay_capacity = 8192;
+        config.seed = 1009;
+        config.video_encoder = Some(mode);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config.validate();
+        eprintln!("full video probe: constructing {mode:?}");
+        let start = Instant::now();
+        let mut agent = VectorDreamerAgent::new(config.clone(), 8, checkpoint).unwrap();
+        let construction_seconds = start.elapsed().as_secs_f64();
+        let inspect = |agent: &VectorDreamerAgent| {
+            assert_eq!(
+                agent.gpu_device().device_name,
+                std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+            );
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+            serde_json::to_value(memory).unwrap()
+        };
+        let constructed_memory = inspect(&agent);
+        eprintln!("constructed in {construction_seconds:.3}s; memory={constructed_memory}");
+        let parameter = |agent: &mut VectorDreamerAgent| {
+            let name = "encoder.patch_embed.proj.weight";
+            let session = &mut agent.core.learner.world_train;
+            let mut values = vec![0.0; session.param_size(name).unwrap()];
+            session.read_param(name, &mut values);
+            values
+        };
+        let before = parameter(&mut agent);
+        let frame = |stream: usize, tick: usize| {
+            RgbFrame::new(
+                224,
+                224,
+                (0..224 * 224 * 3)
+                    .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                    .collect(),
+            )
+        };
+        agent.begin_episodes(&(0..8).map(|s| (s, frame(s, 0))).collect::<Vec<_>>());
+        // Leave a live prefix so the timing includes actual cache refresh.
+        for tick in 1..35 {
+            assert!(agent.act(ActionMode::Sample).iter().all(|&a| a < 18));
+            agent.observe(
+                &(0..8)
+                    .map(|s| {
+                        (
+                            s,
+                            Transition {
+                                frame: frame(s, tick),
+                                reward: Reward {
+                                    extrinsic: if (tick + s).is_multiple_of(7) {
+                                        1.0
+                                    } else {
+                                        0.0
+                                    },
+                                    intrinsic: 0.0,
+                                },
+                                terminated: false,
+                                truncated: false,
+                            },
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let mut reports = Vec::new();
+        eprintln!("replay populated; starting three full updates");
+        for _ in 0..3 {
+            let report = agent.learn().expect("eight complete causal replay chunks");
+            assert!(report.world.total_loss.is_finite());
+            assert!(report.world.encoder_spread.is_finite() && report.world.encoder_spread > 0.0);
+            assert!(report.behavior.total_loss.is_finite());
+            println!("{}", serde_json::to_string(&report).unwrap());
+            reports.push(report);
+            inspect(&agent);
+        }
+        let after = parameter(&mut agent);
+        assert!(after.iter().all(|x| x.is_finite()));
+        assert_eq!(before != after, mode == crate::dreamer::VideoEncoder::Joint);
+        let updated_memory = inspect(&agent);
+        let saved = output.join("checkpoint");
+        agent.save_checkpoint(&saved).unwrap();
+        let last_session_gpu_timings = [
+            ("posterior", &agent.core.learner.world_posterior),
+            ("world", &agent.core.learner.world_train),
+            ("imagination", &agent.core.learner.imagination),
+            ("behavior", &agent.core.learner.behavior_train),
+        ]
+        .map(|(name, session)| {
+            (
+                name,
+                session
+                    .gpu_timings()
+                    .into_iter()
+                    .map(|(label, time)| (label, time.as_secs_f64()))
+                    .collect::<Vec<_>>(),
+            )
+        });
+        std::fs::write(output.join("result.json"), serde_json::to_vec_pretty(&serde_json::json!({
+            "config": config, "streams": 8, "synthetic_actions": 272, "game_actions": 0,
+            "construction_seconds": construction_seconds, "reports": reports,
+            "constructed_memory": constructed_memory, "updated_memory": updated_memory,
+            "encoder_moved": before != after,
+            "last_session_gpu_timings": last_session_gpu_timings,
+            "limitations": ["three synthetic updates, not learning or steady-state throughput", "replay only partly populated", "restore is separately qualified", "last session timings are not whole-update or device utilization"]
+        })).unwrap()).unwrap();
+        if std::env::var_os("KINDLE_JOINT_PROBE_PROFILE").is_some() {
+            agent
+                .core
+                .learner
+                .profile_sessions(output.join("profiles"))
+                .unwrap();
+        }
+    }
+
+    #[test]
+    #[ignore = "requires declared GPU, oracle directory and KINDLE_JOINT_RESTORE_CHECKPOINT"]
+    fn video_checkpoint_restore_is_frozen() {
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let saved =
+            std::path::PathBuf::from(std::env::var("KINDLE_JOINT_RESTORE_CHECKPOINT").unwrap());
+        let metadata = read_checkpoint_metadata(&saved).unwrap();
+        let tensors =
+            meganeura::data::safetensors::SafeTensorsModel::load(saved.join("world.safetensors"))
+                .unwrap();
+        let mut agent =
+            VectorDreamerAgent::restore(&saved, 8, manifest["checkpoint"].as_str().unwrap())
+                .unwrap();
+        assert_eq!(
+            agent.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!agent.gpu_device().is_software_emulated);
+        let memory = agent.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        assert_eq!(agent.environment_step(), metadata.environment_step);
+        let session = &mut agent.core.learner.world_train;
+        let names = session
+            .param_names()
+            .iter()
+            .filter(|n| n.starts_with("encoder."))
+            .map(|n| n.to_string())
+            .collect::<Vec<_>>();
+        assert_eq!(names.len(), 148);
+        for name in names {
+            let mut actual = vec![0.0; session.param_size(&name).unwrap()];
+            session.read_param(&name, &mut actual);
+            assert_eq!(actual, tensors.tensor_f32_auto(&name).unwrap(), "{name}");
+        }
+        agent.begin_episodes(
+            &(0..8)
+                .map(|s| {
+                    (
+                        s,
+                        RgbFrame::new(224, 224, vec![s as u8 * 17; 224 * 224 * 3]),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        );
+        assert!(agent.act(ActionMode::Greedy).iter().all(|&a| a < 18));
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        println!(
+            "148 encoder tensors restored exactly; frozen action has zero updates; memory={memory:?}"
+        );
+    }
+
+    #[test]
     #[ignore = "requires separately declared GPU and KINDLE_JOINT_TINY_REFERENCE oracle directory"]
     fn joint_encoder_cache_matches_fresh_encoding_of_live_prefixes() {
         let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());

@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-03",
+  "kind": "native_joint_tiny_backward_qualification",
+  "training_runs": 0,
+  "game_actions": 0,
+  "meganeura": "13b19d33c811ac6eb59b2d64d9d28645b2ca2edc",
+  "base_meganeura": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e",
+  "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72",
+  "backend_pr": "https://github.com/kvark/meganeura/pull/223",
+  "evidence": "runs/joint-tiny-native-20261003.06z9Gp",
+  "before": {
+    "parameter_comparisons": 148,
+    "failed": 138,
+    "patch_projection_relative_l2": 0.60438,
+    "last_block_value_gradient_norm": 0,
+    "last_block_query_key_match": true,
+    "forward_matches": true
+  },
+  "after": {
+    "parameter_gradients_passed": 148,
+    "loss_and_outputs_passed": 3,
+    "maximum_relative_l2": 0.000001110847174483591,
+    "regularizer_value_and_gradients_passed": true,
+    "finite_adam_parameter_movement": true,
+    "independent_adam_value_comparison": false,
+    "live_cache_refresh_passed": true,
+    "selected_tests_passed": 3,
+    "seconds": 13.10,
+    "host_guard_passed": true,
+    "seal_verified_files": 9,
+    "new_allocation_warnings": 0
+  },
+  "standalone_backend_regression": {
+    "gpu_f64_passed": true,
+    "finite_differences_passed": true,
+    "seconds": 4.16,
+    "host_guard_passed": true,
+    "seal_verified_files": 9,
+    "new_exact_startup_warnings": 1
+  },
+  "full_update_diagnostic": {
+    "build": "debug",
+    "synthetic_actions": 248,
+    "updates_completed": 3,
+    "mean_update_seconds": 3.4658645986666667,
+    "construction_seconds": 71.348,
+    "checkpoint_saved": true,
+    "encoder_moved": true,
+    "host_guard_passed": false,
+    "reason": "120-second deadline during a second model construction for restore",
+    "new_allocation_warnings": 0,
+    "production_throughput": false,
+    "live_prefix_refresh_cost_measured": false
+  },
+  "restore_only": {
+    "encoder_tensors_exact": 148,
+    "frozen_acting_updates": 0,
+    "seconds": 78.88,
+    "host_guard_passed": true,
+    "new_allocation_warnings": 0,
+    "seal_verified_files": 9
+  },
+  "matched_release_cost": {
+    "configuration": "Size1M/N8/B8/T16/H15/R32, microbatch1, replay8192, native Tiny pixels",
+    "synthetic_actions_per_arm": 272,
+    "updates_per_arm": 3,
+    "live_prefix_frames_per_stream": 3,
+    "joint": {
+      "mean_update_seconds": 2.2113608906666666,
+      "mean_world_seconds": 1.9416439893333333,
+      "mean_world_sync_seconds": 0.028413296333333334,
+      "construction_seconds": 12.956444867,
+      "sampled_used_bytes_after_updates": 7618428928,
+      "encoder_moved": true,
+      "host_guard_passed": true
+    },
+    "frozen": {
+      "mean_update_seconds": 0.48713168133333334,
+      "mean_world_seconds": 0.244099064,
+      "construction_seconds": 9.345874838,
+      "sampled_used_bytes_after_updates": 4924112896,
+      "encoder_moved": false,
+      "host_guard_passed": true
+    },
+    "new_allocation_warnings": 0,
+    "joint_world_gradient_microbatch": {
+      "ordinary_wall_median_ms": 242.042168,
+      "ordinary_gpu_pass_median_ms": 210.630912,
+      "instrumented_attention_backward_share_percent": 70.3874842865669,
+      "instrumentation_wall_ratio": 12.04721232706856,
+      "is_device_utilization": false
+    },
+    "frozen_world_gradient_microbatch": {
+      "ordinary_wall_median_ms": 30.182453,
+      "ordinary_gpu_pass_median_ms": 2.00752
+    }
+  },
+  "upstream_optimizer_reference": {
+    "status": "passed",
+    "updates": 4,
+    "comparisons": 1524,
+    "native_fixture_backend": "6268ea54416810a9c97d7f4511cf6f6b1cd1700e",
+    "scope": "RGB path unchanged by13b19d3; common raw gradients for optimizer/EMA, not Tiny optimizer values",
+    "host_guard_passed": true,
+    "new_allocation_warnings": 0,
+    "seal_verified_files": 9
+  },
+  "validation": {
+    "workspace_cpu_tests_passed": 103,
+    "python_tests_passed": 1004,
+    "workspace_and_python_strict_clippy": true,
+    "formatting": true,
+    "backend_ci": "https://github.com/kvark/meganeura/actions/runs/37104148521"
+  },
+  "retained_failed_qualifications": ["tiny-guard", "gradient-report-guard", "full-joint-guard"],
+  "procedure_deviation": {
+    "service": "meganeura-dv-fix-cpu",
+    "evidence": "unfiltered-backend-suite.log",
+    "unguarded_gpu_tests_in_library_suite": true,
+    "accepted_as_clean_gpu_qualification": false,
+    "service_exited": true,
+    "new_exact_startup_warnings": 1,
+    "cleanup_vuid": "VUID-vkDestroyDevice-device-05137",
+    "recovery_performed": false
+  },
+  "limits": [
+    "Isolated numerical and cache qualification, not learning evidence",
+    "Three synthetic updates per arm, not sustained gameplay; partly populated replay",
+    "Intrusive dispatch profiling changes timing and is for bottleneck localization",
+    "Task/value/world losses train Tiny; actor loss is separate",
+    "Historical frozen-Tiny evidence does not use this backward path",
+    "Estimated headroom is not physical free or peak VRAM",
+    "GPU utilization unmeasured; no NVML polling"
+  ]
+}

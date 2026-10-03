@@ -3,10 +3,13 @@
 The user explicitly authorizes this experiment on October 2. It precedes
 exploration/reward, without reopening the completed Phase 2 allocation.
 
-**Current boundary:** implementation and CPU checks only; no learning runs.
-The backend canary stopped on a new NVIDIA allocation warning and also logged
-shader validation errors. See the [qualification report](../results/2026-10-02-joint-tiny-qualification.md).
-No follow-up GPU launch, automatic retry or recovery is authorized by this report.
+**Current boundary:** isolated native Tiny gradients, regularizer and causal
+cache refresh pass after the [attention backward fix](../results/2026-10-03-joint-tiny-backward.md).
+Full update/restore/cost qualification is in progress; no learning runs.
+The [initial qualification stop](../results/2026-10-02-joint-tiny-qualification.md)
+is retained. October 3's explicitly authorized
+[initialization diagnostics](../results/2026-10-03-allocation-initialization.md)
+supersede that blanket stop, not the fault/review rules. No recovery implied.
 
 ## Question
 
@@ -25,7 +28,8 @@ and frozen-Tiny curves remain context, not matched new-backend controls.
 ## Qualification before gameplay
 
 1. Adopt merged Meganeura `6268ea5` / Blade `e349cddf`, including main's optimizer
-   fix. Check optimizer/reference tests before learning. Preserve adjacent dirty
+   fix, plus the now-qualified dV alias fix `13b19d33` (PR223).
+   Check optimizer/reference tests before learning. Preserve adjacent dirty
    backend worktrees; do not pull their unmerged experimental changes.
 2. Review the retained allocation warning and strengthen the host-only guard.
    No recovery, external-memory retry or NVML polling is implied by this task.
@@ -59,7 +63,7 @@ a new combined objective, with no theoretical guarantee of control sufficiency.
 Statistics use one microbatch's frames; fix the same microbatch size in both arms.
 An independently generated F64 oracle checks this objective separately from Tiny.
 
-### Host review before ordinary-compute qualification
+### Historical host review before ordinary-compute qualification
 
 The same boot (`3e89d55c-a9e5-472f-a18a-06508c5bafa7`, driver580.178.04) has
 three retained `_memdescAllocInternal` allocation warnings. No new Xid, hung
@@ -72,13 +76,40 @@ the child; Xids and other hard faults cannot be excepted. The new guard passes
 109 CPU tests. Historical evidence and its false-negative guard result remain
 unchanged. External-capture v4 producer qualification remains separate/unrun.
 
+October3 update: bounded numerical diagnostics may retain at most two new
+occurrences of the one reviewed allocation message for at most120s; other faults,
+validation errors and deadlines stop. The known workgroup-layout VUID alone is
+non-blocking by user direction. This is not a blanket long-training exception.
+The first full probe completed three synthetic updates and saved a checkpoint,
+then hit its deadline during a second model construction for restore. Split
+training and restore into separately declared tests; reuse that checkpoint.
+Keep live encoder prefixes in cost measurements, not only empty chunk boundaries.
+
 ## Allocation and decision
 
-One bounded numerical/throughput qualification, then at most **six complete
-learning runs**: frozen versus joint, Seaquest, seeds1009/2017/3019. No automatic
-retries or successors after failures. Set the common interaction/update budget,
-replay capacity and deadline here after timing and before any learning results;
-the selected recipe must fit the fast-screening intent. Alternate arm order.
+At most **six complete learning runs**: frozen versus joint, Seaquest,
+seeds1009/2017/3019. No automatic retries or successors after failures.
+
+**Declared October3, after optimized synthetic timing and before gameplay:**
+8,192 actual actions per run; Size1M/N8/B8/T16/H15/R32, world microbatch1,
+replay capacity8,192, learning rate4e-5 with1,000-update warmup, AGC.3.
+Keep the upstream default optimizer/return settings. Full18 actions, sticky.25,
+repeat4, published Atari protocol, native-detail Tiny input, no reward/action
+aid. Pretrained Tiny and all objectives above are identical between arms; only
+encoder updates differ. Order: frozen1009, joint1009, joint2017, frozen2017,
+frozen3019, joint3019. Deadlines are2h per joint run and1h per frozen run.
+The existing scheduler retains R32 after replay eligibility; report actual
+updates and initial eligibility, not an assumed count or added prefill credit.
+Report every1,024 actions; retain checkpoints at4,096 and8,192 actions.
+
+Optimized synthetic full updates measure2.211s joint versus.487s frozen,
+about4.54x more time. Three paired8k screens should cost roughly4–5GPU hours,
+not the multi-day200k-action repetition. This is an **early learning/collapse
+screen**, not competence or a sufficiently powered claim of superiority.
+The new frozen control deliberately shares pixel replay/current encoding; it
+is not the faster historical cached-feature path. Compare against it honestly,
+and keep old results as context only. New allocation warnings remain fatal
+under ordinary long-run guards; do not extend the120s diagnostic exception.
 
 Report all episodes/tails, score versus actual actions and wall time, paired
 seed differences and bootstrap uncertainty. Record encoder movement, latent
