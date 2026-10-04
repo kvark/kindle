@@ -2,10 +2,12 @@
 
 use meganeura::{Graph, graph::NodeId, nn};
 
-use super::config::DreamerConfig;
+use super::config::{DreamerConfig, ObservationKind};
 use crate::vision::{OBSERVATION_CHANNELS, OBSERVATION_GRID};
 
 const DREAMER_NORM_EPSILON: f32 = 1e-4;
+
+mod rgb;
 
 pub(crate) fn concat_columns(
     graph: &mut Graph,
@@ -457,13 +459,41 @@ impl Prior {
     }
 }
 
-pub(crate) struct ObservationEncoder {
+pub(crate) enum ObservationEncoder {
+    Features(FeatureEncoder),
+    Rgb(rgb::Encoder),
+}
+
+impl ObservationEncoder {
+    pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
+        match config.observation_kind {
+            ObservationKind::Features => Self::Features(FeatureEncoder::new(graph, config)),
+            ObservationKind::Rgb64 => Self::Rgb(rgb::Encoder::new(graph, config)),
+        }
+    }
+
+    pub(crate) fn output_dim(&self) -> usize {
+        match self {
+            Self::Features(encoder) => encoder.output_dim(),
+            Self::Rgb(encoder) => encoder.output_dim(),
+        }
+    }
+
+    pub(crate) fn forward(&self, graph: &mut Graph, observation: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(encoder) => encoder.forward(graph, observation, batch),
+            Self::Rgb(encoder) => encoder.forward(graph, observation, batch),
+        }
+    }
+}
+
+pub(crate) struct FeatureEncoder {
     patch0: LinearNorm,
     patch1: LinearNorm,
     depth: usize,
 }
 
-impl ObservationEncoder {
+impl FeatureEncoder {
     pub(crate) fn new(graph: &mut Graph, config: &DreamerConfig) -> Self {
         let depth = config.network().vision_depth;
         Self {
@@ -567,6 +597,21 @@ pub(crate) fn mixed_probabilities(
     graph.add(probabilities, uniform)
 }
 
+pub(crate) fn mixed_log_probabilities(
+    graph: &mut Graph,
+    logits: NodeId,
+    rows: usize,
+    classes: usize,
+    unimix: f32,
+) -> NodeId {
+    if unimix == 0.0 {
+        graph.log_softmax(logits)
+    } else {
+        let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
+        graph.log(probabilities)
+    }
+}
+
 /// Hard categorical sample with CPU-owned uniform draws. The row maximum uses
 /// an existing reduction; the prefix mask breaks exact ties at the first class.
 pub(crate) fn gumbel_sample(
@@ -577,8 +622,7 @@ pub(crate) fn gumbel_sample(
     classes: usize,
     unimix: f32,
 ) -> NodeId {
-    let probabilities = mixed_probabilities(graph, logits, rows, classes, unimix);
-    let log_probabilities = graph.log(probabilities);
+    let log_probabilities = mixed_log_probabilities(graph, logits, rows, classes, unimix);
     let uniforms = graph.clamp(uniforms, f32::MIN_POSITIVE, 1.0 - f32::EPSILON);
     let log_uniforms = graph.log(uniforms);
     let negative_log_uniforms = graph.neg(log_uniforms);
@@ -746,7 +790,35 @@ impl MlpHead {
     }
 }
 
-pub(crate) struct ObservationDecoder {
+pub(crate) enum ObservationDecoder {
+    Features(FeatureDecoder),
+    Rgb(rgb::Decoder),
+}
+
+impl ObservationDecoder {
+    pub(crate) fn new(
+        graph: &mut Graph,
+        config: &DreamerConfig,
+        name: &str,
+        input_dim: usize,
+    ) -> Self {
+        match config.observation_kind {
+            ObservationKind::Features => {
+                Self::Features(FeatureDecoder::new(graph, config, name, input_dim))
+            }
+            ObservationKind::Rgb64 => Self::Rgb(rgb::Decoder::new(graph, config, name, input_dim)),
+        }
+    }
+
+    pub(crate) fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(decoder) => decoder.forward(graph, input, batch),
+            Self::Rgb(decoder) => decoder.forward(graph, input, batch),
+        }
+    }
+}
+
+pub(crate) struct FeatureDecoder {
     trunk: LinearNorm,
     spatial: nn::Linear,
     patch_norm: nn::RmsNorm,
@@ -754,7 +826,7 @@ pub(crate) struct ObservationDecoder {
     depth: usize,
 }
 
-impl ObservationDecoder {
+impl FeatureDecoder {
     pub(crate) fn new(
         graph: &mut Graph,
         config: &DreamerConfig,

@@ -25,15 +25,18 @@ pub use agent::{
     ActionMode, BehaviorMetrics, DreamerAgent, DreamerCore, FeatureVectorAgent, LearnReport,
     LearnTiming, ModelProvenance, VectorDreamerAgent, WorldMetrics,
 };
-pub use config::{DreamerConfig, LossScales, ModelSize, NetworkSize};
+pub use config::{
+    DreamerConfig, FeatureStandardization, LossScales, ModelSize, NetworkSize, ObservationKind,
+    VideoEncoder,
+};
 pub use replay::{FrameFlags, Reward};
 
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
 /// Meganeura revision used to compile and optimize the baseline graphs.
-pub const MEGANEURA_REV: &str = "367e53d4de73aea6432afd40aa6fd69b5fcd4e8e";
+pub const MEGANEURA_REV: &str = "13b19d33c811ac6eb59b2d64d9d28645b2ca2edc";
 /// Exact Blade revision providing the shared graphics runtime.
-pub const BLADE_REV: &str = "7cca637791a57d9cacf4e99c10a87211f3c11b6a";
+pub const BLADE_REV: &str = "e349cddf7a9bf181a362507e640b3d576b1aac72";
 
 #[cfg(test)]
 mod tests {

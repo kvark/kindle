@@ -7,6 +7,37 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
+task-adaptive representation hypothesis. Its
+[qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
+the implementation/CPU checks and original native blockers.
+October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
+shows native allocation and compute succeeding despite the startup warning;
+the [Tiny backward follow-up](../results/2026-10-03-joint-tiny-backward.md) fixes
+stale attention-gradient aliases and passes all148 independent gradient checks.
+Full-update/restore/cost qualification and all nine online runs now complete.
+The [task-only](../results/2026-10-03-joint-tiny-learning.md) and
+[direct-policy](../results/2026-10-03-policy-tiny-learning.md) comparisons find no
+clear early benefit. The [fixed-target diagnostic](../results/2026-10-03-fixed-latent-sufficiency.md)
+finds readable positions and better-than-persistence latent forecasts, but no
+established action/reward-sensitive world modeling. The October4
+[RSSM target-scaling test](../results/2026-10-04-rssm-target-standardization.md)
+cuts raw-target forecast errors substantially, but state/reward/action controls
+still do not establish useful dynamics. All six offline arms and audits pass
+in21m35s without new gameplay. The subsequent
+[frozen-belief diagnostic](../results/2026-10-04-rssm-belief-probes.md) locates
+poor held-out horizontal-position readability between adapter and posterior.
+Stage-fitted heads recover vertical information missed by transferred heads;
+some action signal survives, but forecasts still lose to persistence. All three
+frozen replays and24 GPU readouts complete in6m39s, with no actor updates or
+new gameplay. No GPU queue remains active.
+The authorized [posterior-target ablation](2026-10-04-posterior-latent-targets.md)
+is implemented, but its [native qualification](../results/2026-10-04-posterior-latent-qualification.md)
+stopped on a new allocation warning before learning. CPU checks pass; no new
+learning result is available, and GPU work remains stopped pending review.
+The known shader VUID is non-blocking by user direction, not silently removed
+from the evidence.
+
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default
 selection and real vkQuake capture through Dullahan's fenced Vulkan protocol.

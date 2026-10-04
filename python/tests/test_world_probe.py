@@ -157,6 +157,22 @@ def test_feature_errors_reject_invalid_shapes_and_values(left, right):
         probe.feature_mse(left, right)
 
 
+def test_feature_spread_matches_independent_batch_variance():
+    spread = probe.FeatureSpread()
+    assert spread.summary()["mean_coordinate_std"] is None
+    samples = np.array([[1e6, 2., 0.], [1e6+1, 2., 2.], [1e6+2, 2., -1.]])
+    for row in samples:
+        spread.record(row)
+    result = spread.summary()
+    assert result["count"] == 3
+    assert result["mean_coordinate_std"] == pytest.approx(samples.std(axis=0, ddof=1).mean())
+    assert result["rms_coordinate_std"] == pytest.approx(np.sqrt(samples.var(axis=0, ddof=1).mean()))
+    with pytest.raises(ValueError, match="shape changed"):
+        spread.record([1.])
+    with pytest.raises(ValueError, match="invalid latent"):
+        spread.record([1., np.nan, 2.])
+
+
 @pytest.fixture
 def replay(tmp_path, monkeypatch):
     rows = recorded_rows()
@@ -295,6 +311,32 @@ def test_policy_divergence_stops_without_forcing_the_recorded_action(replay):
         probe.main()
     assert environment.closed and not events
     assert not output.exists()
+
+
+def test_current_probe_preserves_native_pixels_sticky_actions_and_checks_budget(replay, monkeypatch):
+    environment, agent, events, output, trace = replay
+    log = Path(sys.argv[sys.argv.index("--recorded-run") + 1])
+    rows = recorded_rows()
+    rows[0].update(protocol="kindle-vector-v2", observation_size="native", sticky_actions=.25)
+    rows[0]["config"]["video_encoder"] = "joint"
+    agent.config = rows[0]["config"]
+    write_rows(log, rows)
+    agent.gpu_device = dict(device_name="test GPU", is_software_emulated=False)
+    agent.gpu_memory_budget = dict(budget_bytes=4*1024**3, usage_bytes=1024**3)
+    monkeypatch.setenv("KINDLE_EXPECT_DEVICE_NAME", "test GPU")
+    monkeypatch.setattr(sys, "argv", [*sys.argv, "--min-gpu-budget-headroom-mib", "2048"])
+    seen = {}
+    monkeypatch.setattr(probe.gym, "make", lambda *a, **kw: seen.update(game=kw) or environment)
+    monkeypatch.setattr(probe, "DreamerAtariPreprocessing", lambda env, **kw: seen.update(wrapper=kw) or env)
+    probe.main()
+    result = json.loads(output.read_text())
+    assert seen["game"]["repeat_action_probability"] == .25
+    assert seen["wrapper"]["screen_size"] is None
+    assert result["protocol"] == "kindle-world-probe-v3"
+    assert result["observation_size"] == "native" and result["sticky_actions"] == .25
+    assert result["encoder_weights_source"] == "restored world checkpoint"
+    assert result["sampled_gpu_budget"] == dict(samples=6, minimum_headroom_bytes=3*1024**3, maximum_usage_bytes=1024**3)
+    assert result["target_feature_spread"]["mean_coordinate_std"] == pytest.approx(np.sqrt(.5))
 
 
 def test_outputs_are_not_overwritten(replay):

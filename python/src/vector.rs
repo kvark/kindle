@@ -24,6 +24,35 @@ pub(super) fn validate_streams(streams: &[usize], count: usize, items: usize) ->
 
 #[pymethods]
 impl PyVectorAgent {
+    #[classmethod]
+    fn learned_rgb(
+        _class: &Bound<'_, PyType>,
+        num_envs: usize,
+        config: &Bound<'_, PyAny>,
+    ) -> PyResult<Self> {
+        let encoded: String = config
+            .py()
+            .import("json")?
+            .call_method1("dumps", (config,))?
+            .extract()?;
+        let config: DreamerConfig =
+            serde_json::from_str(&encoded).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        let inner = VectorDreamerAgent::learned_rgb(config, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
+    #[classmethod]
+    fn restore_rgb(
+        _class: &Bound<'_, PyType>,
+        dreamer_checkpoint: &str,
+        num_envs: usize,
+    ) -> PyResult<Self> {
+        let inner = VectorDreamerAgent::restore_rgb(dreamer_checkpoint, num_envs)
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        Ok(Self { inner })
+    }
+
     /// The config is the complete dictionary returned by kindle.default_config.
     #[new]
     #[pyo3(signature = (encoder_checkpoint, num_envs, config, *, encoder = "levjepa-tiny"))]

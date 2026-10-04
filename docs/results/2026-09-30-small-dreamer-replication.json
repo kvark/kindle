@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-30",
+  "status": "numerical_prerequisite_passed",
+  "phase2_complete": false,
+  "training_attempts_used_at_publication": 0,
+  "training_attempt_cap": 10,
+  "upstream": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+  "meganeura": "22c31b94c03fc0f081e35c2ecec3edd7dee97c5f",
+  "blade": "7cca637791a57d9cacf4e99c10a87211f3c11b6a",
+  "runtime": {"device": "NVIDIA GeForce RTX 5080", "driver": "580.178.04", "precision": "F32", "separate_nvml": false, "utilization": null},
+  "fixture": {"model_size": "Size1M", "batch_size": 2, "batch_length": 4, "imagination_length": 3, "actions": 18, "learner_seed": 103, "data_seed": 701, "updates": 4, "warmup": 2, "learning_rate": 0.00004, "actor_unimix": 0, "rssm_unimix": 0.01, "common_weights_and_draws": true, "reset_terminal_truncation": true},
+  "rgb_parameters": {"encoder": 14304, "decoder": 80595},
+  "full_learner": {
+    "comparisons": 1524,
+    "categories": {
+      "deter": {"count": 4, "max_absolute": 2.682209014892578e-7, "max_relative_l2": 4.886324689273174e-7},
+      "stoch": {"count": 4, "max_absolute": 0, "max_relative_l2": 0},
+      "loss": {"count": 32, "max_absolute": 0.000244140625, "max_relative_l2": 1.0245234319485923e-6},
+      "gradient": {"count": 360, "max_absolute": 0.043534765625054206, "max_relative_l2": 0.00032346627943598613},
+      "parameter": {"count": 360, "max_absolute": 1.1920928955078125e-7, "max_relative_l2": 2.5019089199513548e-5},
+      "momentum": {"count": 360, "max_absolute": 1.1801719665527344e-5, "max_relative_l2": 2.630543804880865e-5},
+      "variance": {"count": 360, "max_absolute": 1.5273690223693848e-7, "max_relative_l2": 6.132995292088198e-5},
+      "ema": {"count": 44, "max_absolute": 1.4901161193847656e-8, "max_relative_l2": 2.4490533127217273e-5}
+    },
+    "tolerances": {
+      "default": {"atol": 0.0002, "rtol": 0.002},
+      "stoch": {"atol": 0, "rtol": 0},
+      "gradient": {"atol": 0.003, "rtol": 0.003, "additional_l2": "norm(error) <= .003 * norm(reference) + 1e-7 * sqrt(elements)"},
+      "parameter_and_variance": {"atol": 0.000003, "rtol": 0.003},
+      "momentum": {"atol": 0.003, "rtol": 0.003},
+      "ema": {"atol": 0.000003, "rtol": 0.00003}
+    },
+    "optimizer_inputs": "identical native raw gradients after independent upstream raw-gradient comparison",
+    "unchanged_capture_tensors": 1280,
+    "unchanged_capture_batches_and_reports": true
+  },
+  "isolated_rgb_optimizer": {
+    "updates": 4,
+    "max_parameter_error": 1.1920928955078125e-7,
+    "max_momentum_error": 1.0907649993896484e-5,
+    "max_variance_error": 8.568167686462402e-8,
+    "rtol": 0.0003,
+    "momentum_atol": 0.00003,
+    "other_atol": 0.000003
+  },
+  "cpu_checks": {"native_passed": 93, "native_ignored": 39, "targeted_python_passed": 56, "full_python_passed": 941, "clippy": "passed", "format": "passed"},
+  "artifacts": {
+    "root": "runs/small-dreamer-replication-20260930.vRE7ag",
+    "passing_guard_directories": ["transpose-_2xgg_iu", "pixels-dhxn1uyr", "encoder-wtdjdxvb", "rgb-reference-xzoiqmkv", "rgb-native-ln9t0jdg", "rgb-optimizer-byjki4pp", "step-native-vtha66mk", "step-reference-4907gudr"],
+    "retained_failed_guard_directories": ["rgb-reference-ovx754dp", "rgb-native-xy68kyi0", "rgb-native-gua057wo", "rgb-native-0zaza083", "step-reference-51aja7sz"],
+    "full_result": "step-reference-4907gudr/reference/upstream-result.json",
+    "native_fixture": "step-reference-v2",
+    "rgb_optimizer": "rgb-optimizer-reference/result.json"
+  },
+  "aids": {"pretraining": false, "reward_or_action_assistance": false, "gameplay": false},
+  "learning_curves": null,
+  "limits": ["synthetic small shapes, not gameplay or replay sampling", "optimizer is checked with common gradients, not bitwise independent training trajectories", "near-zero cross-backend gradient signs can diverge through first-step LaProp", "sampled Vulkan estimated headroom is not physical free or peak VRAM", "no JEPA advantage or Phase 2 completion established"]
+}

@@ -15,8 +15,182 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   GPU acting/capture is integrated. Phase 1 is complete: fused learner/grouped
   RSSM pass, and the three-seed MinAtar screen completes in 8m18s. The 3x update
   target is unmet; the user explicitly accepts it as a stretch target, not a
-  Phase 1 exit gate. Phase 2 is next.
-  Do not mix speed and learning changes.
+  Phase 1 exit gate. Phase 2's offline probes and five integration smokes pass;
+  Large decodes best, Tiny pretraining is mixed. The old native learned-RGB arm
+  used a patch CNN/dense decoder; it was not an exact upstream visual model.
+- **October 1: Phase 2 complete; learned RGB is the 2D screening default.**
+  Three upstream/native RGB pairs finish in **7/10 replication attempts**,
+  including the retained interruption. The ten-attempt cap applies to replication,
+  not an implicit cap on all Phase 2. The separately declared **six JEPA runs**
+  also complete, reusing all three native RGB controls; no more allocation is needed.
+  Seaquest Size1M/N8/B8/T16/H15/R32, seeds1009/2017/3019, 200,000 actions /
+  49,939 updates each. Final online means: RGB368.0 [328.8,440.4],
+  pretrained Tiny225.333 [206.8,258.0], initial Tiny230.667 [218.8,239.2].
+  Paired pretrained-minus-RGB is−142.667 [−229.2,−76.8];
+  pretrained-minus-initial is−5.333 [−32.4,24.0]. No frozen competence claim.
+  Curves cross mid-training; RGB does not uniformly dominate. Tiny halves world
+  training (12.77→6.21ms) but takes18% longer end to end (26m31s→31m17s).
+  Its first replay wait includes earlier shared-queue perception work, not just
+  copying; readback is already batched. GPU utilization remains unmeasured.
+  The native RGB port passes1,524 upstream numerical comparisons and all three
+  learning pairs; upstream mean307.733 and about3.08x faster remain disclosed.
+  The chosen split convolution gradients pass independent F64/raw-gradient/state
+  checks and improve synthetic full updates72.62→30.58ms without learning changes.
+  All learning guards, counter/trajectory and finite-checkpoint audits pass.
+  `atari_vector.py ENV --output PATH` now selects learned RGB; frozen causal
+  Tiny requires `--encoder-checkpoint PATH`. No old positional/sentinel shim.
+  Fresh/default and frozen restore routes pass976 Python tests. The native
+  learner is unchanged; no redundant training or Rust rebuild for this CLI change.
+  See `docs/results/2026-10-01-frontend-decision.md` for the decision, costs,
+  implementation, validation and limitations. CI250 passes on all platforms
+  for the implementation at `f84d9b6`; PR31 tracks final status.
+  Causal Tiny remains an explicit video/3D hypothesis, not an obligation for 2D.
+  Native-detail JEPA preprocessing is unchanged; RGB64 is a separate learned
+  Dreamer path, never an RGB64-upscaled JEPA input.
+- **October 2 follow-up, explicitly authorized:** test jointly trained causal
+  Tiny against frozen pretrained Tiny, three paired learner seeds. This takes
+  priority over Phase 3. The previous random-initialized Tiny was also frozen;
+  it did not test online representation learning. Preserve the Phase 2 decision
+  and historical evidence. First qualify the merged backend, encoder gradients,
+  causal replay/cache semantics, noncollapse and full-update time/memory; declare
+  the finite learning budget before gameplay. Do not silently substitute partial
+  fine-tuning, frame-only encoding or cached stale embeddings. See
+  `docs/experiments/2026-10-02-joint-tiny.md`. No representation matrix or swarms.
+  Implementation and CPU autodiff/replay checks exist. The merged-backend RGB canary stopped at17:31 UTC
+  on a fourth allocation warning, and logged workgroup-array SPIR-V validation
+  errors. Child reaped; no new Xid/hang or recovery recorded. That stop is retained;
+  October 3's explicit diagnostic authorization below supersedes the blanket stop. See
+  `docs/results/2026-10-02-joint-tiny-qualification.md`.
+- **October 3 allocation diagnostic, explicitly authorized:** the user treats
+  the known `VUID-StandaloneSpirv-None-10684` as non-blocking and authorizes a
+  short instrumented initialization probe. Keep its output; other validation
+  errors remain fatal. A fresh host-guard declaration may observe at most two
+  exact `_memdescAllocInternal` warnings for at most 120 seconds, retaining
+  their records. This is not a training waiver or hardware-health claim.
+  Native initialization, three 4KiB allocations and one checked 256-element
+  dispatch distinguish API failure from a recovered/internal allocation attempt.
+  No reset, driver change, root tracing, old queue or learning run is authorized
+  by this diagnostic. Review the result before another launch.
+  **Result:** native initialization/allocations/256 exact outputs pass in2.207s
+  despite one warning received during context creation, before explicit buffers.
+  Minimum sampled estimated headroom is15.423GiB. Separate CUDA initialization
+  passes without a warning. The first CUDA helper failed on a Python logging
+  typo after successful `cuInit`; retain it alongside the corrected result.
+  No new Xid, hang, device loss or recovery. The warning alone is not evidence
+  of a wedge; its internal allocation/caller remains unidentified. Next is
+  bounded backend/Tiny numerical qualification, not reboot or shader work.
+  See `docs/results/2026-10-03-allocation-initialization.md`.
+- **October 3 joint-Tiny backward:** independent native checks found zero
+  attention-value gradients despite correct Q/K and forward values. Meganeura
+  `13b19d33` ([PR223](https://github.com/kvark/meganeura/pull/223), based on current
+  upstream6268ea5) fixes stale reshape aliases of the fused dV output. All148
+  Tiny gradients now match F64 (maximum relative L2 1.111e-6); finite optimizer
+  movement, regularizer and live-cache refresh pass. Historical frozen-Tiny
+  evidence is unaffected. Three full Size1M/N8/B8/T16/microbatch1 synthetic
+  debug-build updates completed at3.466s/update, then the120s guard stopped
+  during restore; no new warning/fault. A separate guarded restore passes all148
+  encoder tensors exactly and acts without updating. Optimized matched probes
+  pass: joint2.211s/update versus frozen.487s, live-prefix refresh included.
+  Attention backward dominates the intrusive profile; GPU pass/wall is87% for
+  one ordinary world microbatch, not device utilization. New upstream RGB
+  value/gradient/common-gradient optimizer/EMA comparison passes1,524 checks.
+  The learning screen is declared: six runs, Seaquest8,192 actual actions/arm,
+  seeds1009/2017/3019, N8/B8/T16/H15/R32/microbatch1/replay8192; no aids, .25sticky,
+  full18 actions. This is early learning/collapse screening, not competence.
+  Direct actor gradients remain separate; task/value/
+  world losses train Tiny. See `docs/results/2026-10-03-joint-tiny-backward.md`.
+  **All six runs and six frozen forecast probes complete.** Online means64.134
+  frozen versus68.737 joint; paired+4.604 [−15.128,21.667], with4.64x wall cost.
+  All12 checkpoints are finite; all148 encoder tensors stay unchanged frozen
+  and change joint. Forecasts beat neither persistence nor zero-reward MAE;
+  unrelated-action forecasts are nearly identical. Four rewards/two terminals
+  limit the diagnostic. This is an8k-action early screen, not infeasibility or
+  competence. See `docs/results/2026-10-03-joint-tiny-learning.md`.
+  PR31 tracks progress. Analyze completed logs
+  with `summarize_representation_learning.py --joint-tiny`; its chunk-aware
+  auditor replaces overlapping-window assumptions for this recipe. Prior
+  probes must keep native pixels/sticky.25 and disclose latent scale/collapse.
+  The explicit policy-to-JEPA goal also requires the optional upstream-style
+  `actor_critic_gradient` route (initial posterior states only). It defaults off
+  and is not part of the completed six-run binary. It now passes an
+  isolated policy-only GPU test (all148 Tiny tensors change, frozen heads stay
+  fixed), full updates/restore and1,524 upstream comparisons with ac_grads=true.
+  See `docs/results/2026-10-03-policy-tiny-qualification.md`. All three additional
+  8,192-action seeds1009/2017/3019 and frozen forecast probes now complete,
+  reusing the task-only joint controls. Actor/value gradients give mean67.273
+  versus68.737, paired−1.465 [−8.333,7.273], with unchanged~76m/seed cost.
+  All6 new checkpoints are finite and all148 encoder tensors change. Every
+  prior still loses to persistence; action discrimination is negligible and
+  reward MAE loses to zero. All learning/probe guards and seals pass. See
+  `docs/results/2026-10-03-policy-tiny-learning.md`. Keep the option off by
+  default; this screen does not establish useful latent world modeling.
+  **Fixed-latent evaluation complete:**98,304 additional random actions across
+  three frozen encoders, all696 saved tensors unchanged, and nine GPU heads
+  (59.6s including guards). Player-position R² is.775–.854; raw forecast MSE /
+  persistence is.840 [.679,.927] at h1 and.489 [.456,.530] at h15. Tiny contains
+  readable/predictable state, but decoded player-x loses to persistence and
+  reward/action-sensitive prediction is not established. This is not an online
+  JEPA advantage. See `docs/results/2026-10-03-fixed-latent-sufficiency.md`.
+  All guards/seals and independent full-width GPU references pass; CI268 passes.
+  Two collector failures (recording boundary, serialization-hash false alarm)
+  and2,176 excluded smoke actions remain disclosed.
+  **October4 target-scaling follow-up complete:** raw/standardized frozen-RSSM
+  pairs1009/2017/3019,2,048 full production updates each,21m35s and zero new
+  gameplay. Standardized/raw held-out MSE is.109 at h1 and.289 at h15. This
+  improves fitting but not useful dynamics: standardized/persistence is2.137
+  at h1 and.848 at h15; the latter still loses to the constant training mean
+  (1.048). Player-state forecasts remain near constant quality; reward MAE
+  loses to zero and actual/unrelated actions show no favorable advantage.
+  All initial pairs are exact; all252 saved tensors stay frozen in evaluation;
+  finite checkpoints, all guards/seals, independent gradients,1,047 Python
+  tests and CI270 pass. See `docs/results/2026-10-04-rssm-target-standardization.md`.
+  **October4 frozen-belief follow-up complete:** three frozen RSSMs, 24 GPU
+  readouts, 6m39s, zero actor updates or new gameplay. Current player-x R² is
+  .784 in Tiny, .585 at the196-value adapter and .003 in the640-value posterior;
+  y is .833/.765/.554. The largest horizontal-readability gap is inside the
+  RSSM, not proof of information absence: training fit exceeds held-out fit.
+  Refitting predicted-feature readouts raises h1 y R² from .046 to .507;
+  the earlier transferred head understated surviving vertical information.
+  Actual actions beat unrelated actions, but h15 position errors still exceed
+  Tiny persistence by2.56x/2.14x. Posterior estimates are not forecasts.
+  All252 saved tensors/model stay frozen, h1 causal alignment is exact, all
+  guards/seals and1,051 Python/108 Rust CPU tests pass; CI272 passes `ed61028`.
+  See `docs/results/2026-10-04-rssm-belief-probes.md`. No job remains active.
+  **Current authorized follow-up:** one saved-corpus ablation predicting normalized
+  current Tiny features from the full posterior alongside future prediction,
+  no RGB reconstruction or extra gameplay. Three fresh candidates reuse the
+  three standardized controls; coefficient .25, 2,048 updates per seed, then
+  frozen readouts. Exact shared initialization and unchanged-path qualification
+  precede learning. See `docs/experiments/2026-10-04-posterior-latent-targets.md`.
+  Implementation `e34ac5d` passes109 Rust CPU/1,053 Python tests and strict
+  Clippy. Native qualification stopped: corrected RTX launch records a new
+  allocation warning at05:35:17 UTC; no numerical result, training or gameplay.
+  No recorded Xid/hang/OOM-kill, child reaped. The first attempt's missing
+  device override selected AMD and hit the device assertion. Both failures
+  are retained. See `docs/results/2026-10-04-posterior-latent-qualification.md`.
+  Native work is stopped; a bounded initialization-only diagnostic is awaiting
+  user approval. Do not automatically whitelist the warning or retry.
+  No unchanged RL queue,
+  representation matrix or Phase3 starts automatically. Keep RGB/default ac_grads=false;
+  target standardization stays opt-in. Its centering/scaling also changes loss
+  weighting; do not call it an identical-objective speedup or online JEPA win.
+  A mistakenly unfiltered backend library suite executed unguarded GPU tests;
+  its startup warning and raw-pipeline cleanup errors are retained, not accepted
+  as clean qualification. Select GPU tests explicitly and guard them; do not
+  assume Meganeura `--lib` is CPU-only.
+- **Following this experiment: Phase 3, exploration/reward.** Declare one small GPU-compatible
+  mechanism versus extrinsic-only, three seeds, without Freeway's action aid.
+  No old CPU feature-readback visitation workaround, new representation matrix,
+  unchanged mastery queue, asynchronous learner or swarms. Phase 2 completion
+  does not start a new training campaign automatically.
+- **Cancelled historical 12M matrix:** retain all24 completed/audited runs and
+  the21 cancelled unstarted entries. The final upstream Seaquest seed2017
+  finished September30 at16:43 UTC; old queue/drain services and workers are
+  inactive/reaped. Never restart them. Evidence:
+  `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
+  The old learned-RGB arm was a patch CNN/dense decoder, not exact upstream;
+  it cannot isolate backend correctness. Preserve failures and extra pretraining/
+  interrupted compute disclosures. Numerical smokes are not learning evidence.
 - The first shared-parameter step passes exact 241-tensor/146-moment and report
   parity over 36 synthetic updates, plus 1,536-action/34-update N6 Pong per arm.
   Mean 12M update falls 227.03 -> 212.78 ms (6.28% less time), not yet game
@@ -38,8 +212,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   establish reliable improvement or frozen competence. See
   `docs/results/2026-09-27-minatar-screen.md`. Keep the unresolved 3x target
   distinct from completed implementation; no unchanged mastery queue resumes.
-  Next: Phase 2 representation probes and matched learning controls; a frozen
-  JEPA frontend must demonstrate its value. No asynchronous learner or swarms.
+  The faithful small RGB and representation screens above now supersede this
+  weak-learning development baseline. No asynchronous learner or swarms.
 - The user's September 26 direction supersedes historical checkpoint/pinning
   requirements: finish the new GPU encoding/acting path and remove obsolete
   implementations freely. Do not build migration layers for old checkpoints or
@@ -50,19 +224,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   checkpoints and requested diagnostics may cross the host boundary. A buffer
   entry point alone is not capture integration. Validate ownership, producer
   completion and GPU memory visibility, including ring-buffer reuse.
-- The current reference uses the independently pretrained ~5.5M causal Tiny frontend,
-  not DINO or the 303M Large default. Keep Dreamer12M and the 7x7x64 observation
-  contract for speed comparisons. Small learners/learned encoders are allowed in
-  explicitly separate screening/representation experiments. JEPA must earn its
-  place on probes and learning curves; it is not an obligation for 2D games.
+- The 2D Atari default is learned RGB on the qualified small recipe. The frozen
+  video/3D reference uses independently pretrained ~5.5M causal Tiny, not DINO
+  or 303M Large. Keep Dreamer12M and 7x7x64 for unchanged historical speed
+  comparisons; do not label the small recipe an unchanged-learning speedup.
+  JEPA must earn its place on probes and learning curves.
   Preserve native image detail; no downscale-then-upscale adapter pipeline.
 - Prioritize one reliable actor before swarms: Atari, accelerated playing plus
   learning, video/world pretraining, mind-games vkQuake2/TMNF, GOG/Wine, then
   held-out cross-game adaptation and retention. No concurrent learner service
   now; the strategy's later deployment phase may introduce one after measuring
   effective single-actor learning, actor latency and learner debt.
-- Six environments share batched perception/policy and one learner, not causal
-  histories. Preserve per-stream recurrent state, RNG, replay and resets. The
+- Environments share batched perception/policy and one learner, not causal
+  histories (N8 small screen; N6 historical reference). Preserve per-stream
+  recurrent state, RNG, replay and resets. The
   encoder's 16-arrival chunk reset is not an environment/RSSM reset.
 
 ## Research and status
@@ -70,12 +245,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - One authoritative plan: `docs/kindle_single_life_dreamer_plan.md`. Keep it
   decision-focused with one game-status table and direct rollout/world-report
   links. Detailed results belong in experiment reports and `runs/`.
-- Use [PR29](https://github.com/kvark/kindle/pull/29) as the status dashboard:
+- Use the active phase's PR description as the status dashboard:
   dated done/running/next items, results and limitations. No STATUS.md. Update
-  at meaningful boundaries, not each poll.
+  at meaningful boundaries, not each poll. PR29 is merged and remains the
+  historical Phase 0/1 dashboard; Phase 2 uses
+  [PR31](https://github.com/kvark/kindle/pull/31), `phase2-levjepa-evaluation`.
 - The JEPA bet is cheaper useful latent world prediction than pixel
   reconstruction. Measure whole-agent and world-model time/memory/learning
-  against Dreamer12M at matched actual interactions. Backend parity alone can
+  against a faithful Dreamer control at matched actual interactions, screening
+  small before larger confirmation. Backend parity alone can
   share bugs: retain independent value/gradient references.
 - Historical non-sticky fixed-protocol reliability is 3/5 (Boxing, Pong,
   assisted-training Freeway). Qbert and Breakout fail their gates. Pong's one-root
@@ -84,15 +262,56 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   experience (45k train + 5k validation frames/game), not online-only learning.
 - Current trained Tiny encoder: `7fe9b252`, full path linked in the plan. Do not
   truncate Large weights or silently substitute an untrained product encoder.
-- Current backend: Meganeura `367e53d4` carries only the Blade dependency update
-  over latest upstream `ee3aea42`; Blade `7cca6377` adds checked external Vulkan
-  imports/ownership over `fbb4f28c`. Both branches are pushed. Check upstream
+- Current pins are Meganeura `13b19d33` over merged `6268ea5` / Blade `e349cddf`,
+  including the host optimizer correction and qualified attention-value fix.
+  The earlier canary stop remains retained; later independent Tiny references
+  and1,524 upstream RGB comparisons pass before the completed learning screen.
+  Capture evidence used Meganeura `4cbcd69b` / Blade `a7861806` to rework
+  [Blade PR402](https://github.com/kvark/blade/pull/402) around the existing
+  `Memory::External` -> `create_buffer` path. `Fd(Some(fd))` borrows/duplicates
+  the FD; matching resource/allocation recipes derive the same memory type and
+  Vulkan requirement size at binding offset zero. Device/driver compatibility
+  is the caller's responsibility; no UUID/allocation metadata API. Acquire/release
+  are safe whole-buffer `CommandEncoder` methods, separate from import.
+  Dullahan `30aa6d3e` GPU_SYNC v4 matches the recipe, hands off the whole ring
+  buffer and rejects older protocol tags. First-use ownership is tracked once
+  per buffer, not per slot. No parallel Vulkan
+  import constructor or export-metadata accessor. That capture-only follow-up
+  left Meganeura's numerical code unchanged; its PR221 follow-up only repinned Blade. Capture
+  validation is separate from historical Phase 2 learning evidence. Matching
+  padded allocations pass on RTX5080. The v4 exact-byte ring passes functionally
+  but logs a new `NV_ERR_NO_MEMORY` kernel warning missed by the host guard;
+  native work initially stopped for review. Ordinary compute subsequently
+  qualified as described above; this does not qualify capture. The v4 real-producer test is
+  unrun; the earlier v3 producer success is not v4 qualification. No Xid/hang
+  or host recovery is recorded. The earlier producer test fixed missing external-
+  memory instance dependencies for Vulkan1.0; the original validation failure
+  is retained. See `docs/results/2026-10-02-matching-external-allocations.md`.
+- Phase 2 used Meganeura `75d08173`, which adds opt-in, bounded split convolution
+  gradients and fixes split-measurement pipeline selection over `22c31b94`
+  (tested batched last-two-axis transpose). Kindle uses512-position partitions
+  on low-parallelism training convolutions; no new kernel or learning setting.
+  The old matrix used `367e53d4` (Blade dependency update over
+  `ee3aea42`); Blade `7cca6377` adds checked external Vulkan
+  imports/ownership over `fbb4f28c`. Both branches are pushed. September 28's
+  upstream check finds `7c29497` adding caller-owned submission APIs, not a new
+  fix for the existing step path. September 30 rechecks that same Meganeura
+  head; Blade `1da9ccb` changes Rapier/physics, not GPU execution. No new
+  training correctness fix is identified. Check upstream
   before diagnosing already-fixed issues. Keep dependencies reproducible, but
   do not delay implementation to preserve obsolete runtime/checkpoint identities.
+- October 2's final upstream recheck finds Meganeura main `b947950`:
+  `f05c1a0` moves Adam/LaProp bias correction to the host; `b947950` changes
+  optimizer-padding comparisons from exact equality to numerical tolerance.
+  This changes optimizer arithmetic and arrived during the capture review.
+  It is not bundled into the numerically unchanged external-memory repin above;
+  it is now included and numerically qualified in the pins above. No learning
+  campaign is authorized merely by a dependency update.
 - GPU pixel v2 and its N6 train/frozen/sticky plumbing tests pass. The stock
   upstream Dreamer/JAX sanity also passes (5,990 actions, 1,149 updates); this is
-  not a matched learning comparison. Reset/update accounting, replay capacity
-  and artificial-cutoff semantics still need alignment for that claim. See
+  not a matched learning comparison. Phase 2 now independently aligns
+  reset/update accounting, replay capacity and artificial-cutoff semantics;
+  matched learning results are still required. See
   `docs/experiments/2026-09-26-gpu-pixels-and-pong-robustness.md` and
   `docs/experiments/2026-09-26-upstream-control-protocol.md`.
 - Single and vector pixel actors now share resident encoder/pooling/belief/
@@ -112,7 +331,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   smoke tests are not multi-seed learning experiments. One matched timing plus
   numerical/learning parity check suffices for a speed change; no micro-campaign.
   Commit each new result as compact JSON + Markdown in `docs/results/`, including
-  config, seeds, aids, curves and limits. PR29 remains the status dashboard.
+  config, seeds, aids, curves and limits. The active PR remains the dashboard.
   Keep original competence gates for final confirmed claims. Retain failures
   and all completed episodes/unfinished tails.
   Plumbing tests and online wins are not frozen competence. Report aggregate
@@ -135,7 +354,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   ownership/cleanup of its game process too. Review failures before any follow-up.
 - Require the expected native device and >=2GiB sampled Vulkan estimated
   budget headroom. Budget-minus-usage is not physical free or peak VRAM.
-  Last observed boot: `4f5152d1-e5fd-46cf-a0c4-06534c430d26`.
+  Last observed boot: `3e89d55c-a9e5-472f-a18a-06508c5bafa7`.
 - Stop on kernel faults/native failures. No reset, driver reload/change, reboot
   or power-cycle without new user approval. Historical Xid62/154 incidents remain
   unexplained; successful no-NVML runs prove neither causality nor safety. Never

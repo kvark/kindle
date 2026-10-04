@@ -12,6 +12,8 @@ pub mod capture;
 pub mod levjepa;
 pub mod preprocess;
 pub mod preprocess_gpu;
+pub mod probe;
+pub mod reconstruction;
 
 /// Channels retained by the fixed Johnson–Lindenstrauss projection.
 pub const OBSERVATION_CHANNELS: usize = 64;
@@ -140,6 +142,16 @@ impl Observation {
 
     pub fn from_vec(values: Vec<f32>) -> Self {
         assert_eq!(values.len(), Self::LEN);
+        Self::checked(values)
+    }
+
+    /// Resized channel-major pixels, not frozen features.
+    pub fn rgb64(values: Vec<f32>) -> Self {
+        assert_eq!(values.len(), 3 * 64 * 64);
+        Self::checked(values)
+    }
+
+    fn checked(values: Vec<f32>) -> Self {
         assert!(values.iter().all(|value| value.is_finite()));
         Self {
             values: values.into_boxed_slice(),

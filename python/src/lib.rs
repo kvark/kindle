@@ -1,6 +1,7 @@
 //! Python bindings for the pixel-first Dreamer baseline.
 
 mod features;
+mod probes;
 mod vector;
 
 use std::path::Path;
@@ -29,12 +30,16 @@ struct PyLeVJepaPerception {
 #[pymethods]
 impl PyLeVJepaPerception {
     #[new]
-    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "tiny"))]
+    #[pyo3(signature = (encoder_checkpoint, encoder_plan_cache = None, *, architecture = "tiny", num_streams = 1))]
     fn new(
         encoder_checkpoint: &str,
         encoder_plan_cache: Option<&str>,
         architecture: &str,
+        num_streams: usize,
     ) -> PyResult<Self> {
+        if num_streams == 0 {
+            return Err(PyValueError::new_err("num_streams must be positive"));
+        }
         let architecture = match architecture {
             "tiny" => Architecture::Tiny,
             "large" => Architecture::Large,
@@ -47,7 +52,7 @@ impl PyLeVJepaPerception {
         let inner = LeVJepaPerception::load_batched_with_architecture(
             architecture,
             encoder_checkpoint,
-            1,
+            num_streams,
             None,
             encoder_plan_cache.map(Path::new),
         )
@@ -71,6 +76,7 @@ impl PyLeVJepaPerception {
     }
 
     fn encode(&mut self, frame: &Bound<'_, PyAny>) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.require_single_stream()?;
         let frame = parse_rgb_frame(frame)?;
         let pooled = self
             .inner
@@ -81,13 +87,66 @@ impl PyLeVJepaPerception {
         ))
     }
 
-    fn reset(&mut self) {
-        self.inner.reset();
+    /// Offline diagnostic readback: little-endian F32 [streams, 14, 14, hidden].
+    fn patch_tokens<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        let tokens = self.inner.patch_tokens();
+        PyBytes::new_with(py, tokens.len() * 4, |output| {
+            for (bytes, value) in output.as_chunks_mut::<4>().0.iter_mut().zip(tokens) {
+                bytes.copy_from_slice(&value.to_le_bytes());
+            }
+            Ok(())
+        })
     }
 
     #[getter]
-    fn next_frame_in_chunk(&self) -> usize {
-        self.inner.next_frame_in_chunk()
+    fn patch_token_shape(&self) -> (usize, usize, usize, usize) {
+        (
+            self.inner.stream_count(),
+            kindle::vision::levjepa::GRID,
+            kindle::vision::levjepa::GRID,
+            self.inner.architecture().hidden(),
+        )
+    }
+
+    /// Batched diagnostic encoding, with independent histories and resets.
+    fn encode_batch(
+        &mut self,
+        streams: Vec<usize>,
+        frames: Vec<Bound<'_, PyAny>>,
+        resets: Vec<bool>,
+    ) -> PyResult<Vec<Vec<f32>>> {
+        vector::validate_streams(&streams, self.inner.stream_count(), frames.len())?;
+        if resets.len() != frames.len() {
+            return Err(PyValueError::new_err("each frame needs a reset flag"));
+        }
+        let frames = frames
+            .iter()
+            .map(parse_rgb_frame)
+            .collect::<PyResult<Vec<_>>>()?;
+        let arrivals = streams
+            .into_iter()
+            .zip(&frames)
+            .zip(resets)
+            .map(|((stream, frame), reset)| (stream, frame, reset))
+            .collect::<Vec<_>>();
+        Ok(self
+            .inner
+            .encode_frames_rgb8(&arrivals)
+            .into_iter()
+            .map(|observation| observation.as_slice().to_vec())
+            .collect())
+    }
+
+    fn reset(&mut self) -> PyResult<()> {
+        self.require_single_stream()?;
+        self.inner.reset();
+        Ok(())
+    }
+
+    #[getter]
+    fn next_frame_in_chunk(&self) -> PyResult<usize> {
+        self.require_single_stream()?;
+        Ok(self.inner.next_frame_in_chunk())
     }
 
     #[getter]
@@ -107,6 +166,17 @@ impl PyLeVJepaPerception {
     #[getter]
     fn gpu_device<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, &self.inner.gpu_device())
+    }
+}
+
+impl PyLeVJepaPerception {
+    fn require_single_stream(&self) -> PyResult<()> {
+        if self.inner.stream_count() != 1 {
+            return Err(PyValueError::new_err(
+                "use encode_batch and per-stream reset flags",
+            ));
+        }
+        Ok(())
     }
 }
 
@@ -587,7 +657,10 @@ fn _native(_py: Python<'_>, module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<PyAgent>()?;
     module.add_class::<vector::PyVectorAgent>()?;
     module.add_class::<features::PyFeatureVectorAgent>()?;
+    module.add_class::<features::PyFeatureCore>()?;
     module.add_class::<PyLeVJepaPerception>()?;
+    module.add_class::<probes::PyRegressionProbe>()?;
+    module.add_class::<probes::PyReconstructionEncoder>()?;
     module.add_function(wrap_pyfunction!(default_config, module)?)?;
     module.add("LEVJEPA_MODEL_ID", kindle::vision::levjepa::MODEL_ID)?;
     module.add(

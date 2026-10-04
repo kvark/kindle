@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -186,3 +187,34 @@ def test_control_records_unhandled_failure_without_success_marker(tmp_path, monk
     manifest = json.loads((logdir / "reference-manifest.json").read_text())
     assert manifest["status"] == "failed" and manifest["exit_code"] == 1
     assert not (logdir / "RUN_COMPLETE").exists()
+
+
+def test_matched_small_recipe_is_forwarded_and_recorded(tmp_path, monkeypatch):
+    source, logdir = tmp_path / "source", tmp_path / "result"
+    source.mkdir()
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(sys, "argv", ["runner", "--source", str(source), "--logdir", str(logdir),
+                                    "--matched-actions", "--size", "1m", "--num-envs", "8",
+                                    "--steps", "2400", "--batch-size", "8", "--batch-length", "16",
+                                    "--train-ratio", "32"])
+    monkeypatch.setattr(control, "validate_source", lambda _: "declared diff")
+    monkeypatch.setattr(control.importlib.metadata, "distributions", lambda: [])
+    original = object()
+    embodied = SimpleNamespace(run=SimpleNamespace(train=original))
+    monkeypatch.setitem(sys.modules, "embodied", embodied)
+
+    def run(*args, **kwargs):
+        command = sys.argv
+        for key, value in (("--batch_size", "8"), ("--batch_length", "16"),
+                           ("--run.train_ratio", "32")):
+            assert command[command.index(key)+1] == value
+        assert "size1m" in command
+        assert embodied.run.train.keywords["model_size"] == "1m"
+
+    monkeypatch.setattr(control.runpy, "run_path", run)
+    with pytest.raises(SystemExit) as result:
+        control.main()
+    assert result.value.code == 0 and embodied.run.train is original
+    manifest = json.loads((logdir / "reference-manifest.json").read_text())
+    assert manifest["recipe"] == dict(model_size="1m", batch_size=8, batch_length=16, train_ratio=32)
+    assert manifest["protocol"] == "replication-matched-actions-v2"

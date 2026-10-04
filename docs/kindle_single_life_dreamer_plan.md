@@ -4,7 +4,7 @@ This is the authoritative plan. [Current evidence and archive](experiments/READM
 retain experiments and failures; [AGENTS.md](../AGENTS.md) gives working rules.
 Keep the runtime small, comparisons controlled and results reproducible.
 For a quick overview of done/in-progress/next work and why progress is costly,
-start with the [PR status dashboard](https://github.com/kvark/kindle/pull/29).
+start with the [Phase 2 PR status dashboard](https://github.com/kvark/kindle/pull/31).
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.
@@ -15,27 +15,103 @@ The central hypothesis is that learning to predict useful compact representation
 is cheaper than reconstructing pixels, while retaining the information needed to
 learn arbitrary games from sparse rewards. Frozen video pretraining is one part
 of that design, not the entire bet. Test world-update cost, end-to-end cost and
-learning curves against a matched Dreamer12M RGB control. A cheaper but less
+learning curves against a faithful Dreamer RGB control, screening at Size1M
+before larger confirmation. A cheaper but less
 useful world model does not establish an efficiency advantage.
 
 Native Rust/Meganeura/Blade implements a categorical Dreamer RSSM, sequence replay,
-imagined actor/critic training and causal **LeVJEPA** perception. The frontend is
-frozen during gameplay, not end-to-end JEPA training. The obsolete DINO path has
-been removed; its results remain historical. New agents default to a
-separately pretrained **5.49M causal ViT-Tiny/16**. Native numerical,
-optimizer/restore, streaming, fit and noncollapse checks pass; the first bounded
-4,096-update pretraining run completes with verified state and encoder exports.
-Frozen probes retain useful position features but mixed motion results. Bounded
-actor integration and matched-order throughput pass. Tiny Freeway now passes
-all three fresh learner roots, but Breakout regresses and broader Tiny reliability
-is unproven. Tiny is now the default; Large is an explicit comparison only.
+imagined actor/critic training, jointly learned RGB and causal **LeVJEPA** perception.
+The October 1 [Phase 2 decision](results/2026-10-01-frontend-decision.md) selects
+**learned RGB for 2D Atari screening**, with no external encoder checkpoint.
+Frozen causal **5.49M ViT-Tiny/16** remains an explicit video/3D option; it is
+not end-to-end JEPA training during gameplay. Large is comparison-only; DINO
+is removed. Weight-taking pixel-agent constructors keep Tiny, while the Atari
+runner requires `--encoder-checkpoint` to opt in.
+
+The October 2 [joint Tiny experiment](experiments/2026-10-02-joint-tiny.md) now
+has an optional implementation: task gradients through all used Tiny parameters,
+native-detail pixel replay and live causal-cache refresh. Its **isolated GPU
+numerical and full-update/restore checks pass**. The six-run early learning
+screen and frozen forecast probes are complete: online means64.1 frozen versus
+68.7 joint, paired+4.6 [−15.1,21.7], with4.64x wall cost. All148 encoder tensors
+update, but forecasts do not beat persistence and barely distinguish actions.
+This8k-action result is early/noisy, not proof of latent-state infeasibility.
+See the [learning and forecast report](results/2026-10-03-joint-tiny-learning.md).
+The previous initial-Tiny arm was also frozen;
+it did not test this hypothesis. The
+[qualification report](results/2026-10-02-joint-tiny-qualification.md) records the
+CPU checks and the stopped backend canary. October 3's
+[backward report](results/2026-10-03-joint-tiny-backward.md) identifies and fixes
+a backend aliasing defect: all148 encoder gradients now match independent F64,
+as do forward features and the regularizer; live-cache refresh also passes.
+Three debug-build synthetic updates take3.466s each, followed by a retained
+timeout during restore. Restore-only now passes all148 encoder tensors exactly
+and frozen acting. Optimized full-update probes pass at2.211s joint versus.487s
+frozen, with live cache refresh; attention backward dominates the instrumented
+profile. The matched early-learning screen is six8,192-action Seaquest runs,
+three paired seeds—not a multi-day200k replication or a mastery gate.
+World/task/value gradients reach Tiny; actor loss remains separate.
+An optional upstream-style `actor_critic_gradient` candidate now closes that
+last path through the initial posterior state; it was not enabled in the
+completed screen. Its isolated policy-only GPU test changes all148 encoder
+tensors while leaving behavior heads frozen; full updates/restore and1,524
+upstream comparisons now pass. The separate three-seed/8k-action follow-up is
+also [complete](results/2026-10-03-policy-tiny-learning.md): online mean67.27
+versus68.74 task-only, paired−1.46 [−8.33,7.27], at essentially the same~76m/seed.
+All six new checkpoints and three frozen forecast probes pass their audits,
+but forecasts still lose to persistence and barely distinguish actions. Keep
+the option off by default. Later imagined states remain detached.
+The connection is correct; useful latent world modeling remains unconfirmed.
+The [fixed-target evaluation](results/2026-10-03-fixed-latent-sufficiency.md) is
+also complete:98,304 additional diagnostic actions, all696 saved tensors frozen,
+and nine small GPU heads fitted in59.6s. Player-position R² is.775–.854; latent
+forecast error / persistence is.840 [.679,.927] at h1 and.489 [.456,.530] at h15.
+Tiny retains readable/predictable state, but decoded player-x loses to persistence
+and reward/action-sensitive forecasting remains weak. This is conditional latent
+predictability, not a useful online world model or JEPA advantage. The two
+collector failures and2,176 excluded smoke actions are retained.
+The [target-standardization ablation](results/2026-10-04-rssm-target-standardization.md)
+is also complete: three paired raw/standardized RSSMs,2,048 full updates each,
+21m35s and zero new gameplay. Standardized/raw latent error is.109 at h1 and.289
+at h15, but one-step forecasts still lose to persistence. At15 steps they beat
+persistence (.848 ratio) but lose to the constant training mean (1.048).
+Player-state/reward/action controls still fail to establish useful dynamics.
+All paired initial/frozen tensor audits, numerical checks and CI270 pass.
+Keep standardization opt-in and RGB as the2D default. The completed
+[frozen-belief diagnostic](results/2026-10-04-rssm-belief-probes.md) finds the
+largest horizontal-readability gap inside the RSSM: current player-x R² is
+.784 in Tiny, .585 at the adapter and .003 in the full posterior; y is
+.833/.765/.554. This is poor held-out readability, not proof of information
+absence. Fitting a readout directly on predicted features raises h1 y R²
+from .046 to .507, qualifying the earlier transferred-head interpretation.
+Some action signal survives, but h15 position errors still lose to Tiny
+persistence by2.56x/2.14x. Three frozen replays and24 GPU readouts take6m39s,
+with zero actor updates/gameplay; all frozen/causal audits and CI272 pass.
+The user now authorizes one [saved-corpus ablation](experiments/2026-10-04-posterior-latent-targets.md)
+adding normalized current-Tiny prediction from the full posterior alongside
+future prediction: three candidates, coefficient .25 and2,048 updates each,
+reusing all three standardized controls. Qualify gradients/shared initial
+tensors and the unchanged control before learning; then repeat frozen readouts.
+The [implementation/qualification report](results/2026-10-04-posterior-latent-qualification.md)
+records passing CPU checks but a stopped native canary: a new allocation
+warning at05:35:17 UTC, no completed numerical check or learner update.
+No Xid/hang is recorded. Native work remains stopped pending approval/review
+of a bounded initialization-only diagnostic; the three candidates are unstarted.
+No RGB reconstruction, fresh campaign or Phase3 starts automatically.
+
+For the previously qualified frozen path, numerical, optimizer/restore,
+streaming and noncollapse checks pass. Tiny's
+4,096-update pretraining export and historical assisted Freeway wins remain
+valid evidence, but held-out probes and learning do not establish a benefit
+over its initial weights. The learned RGB path uses Dreamer's multiscale CNN
+and posterior pixel reconstruction; the causal-JEPA path below predicts latents.
 Old checkpoint/backend pinning must not delay this implementation. Keep current
 architecture/encoder integrity checks, not migration machinery.
 
 ```text
 previous belief + executed action -> deterministic prior -> predicted features
                                              |
-RGB history through now -> frozen encoder -> posterior
+RGB history through now -> frozen or task-trained encoder -> posterior
                                              |
                               reward / continuation / imagination
                                              |
@@ -44,8 +120,9 @@ RGB history through now -> frozen encoder -> posterior
 
 The predictor sees the prior, never the posterior containing its target. LeVJEPA
 uses causal prefixes of 16-arrival chunks, projected to 7×7×64 features. Chunk
-boundaries reset perception only; episode boundaries also reset belief. Six
-streams share batched inference and one learner while retaining separate visual
+boundaries reset perception only; episode boundaries also reset belief. Eight
+streams in the small screen (six in the historical reference) share batched
+inference and one learner while retaining separate visual
 caches, recurrent state, RNG and causal replay histories.
 
 Single and vector pixel actors now share a resident acting path: GPU pixels ->
@@ -57,6 +134,32 @@ plumbing test. This is not Quake competence or 12M training throughput.
 Explicit diagnostics/checkpoints and sampled learner batches still read back
 data. See the
 [implementation and validation report](experiments/2026-09-26-gpu-resident-acting.md).
+The October 2 [matching-allocation rework](results/2026-10-02-matching-external-allocations.md)
+uses Blade's existing `Memory::External(Fd(Some(fd)))` resource path. Identical
+buffer/allocation recipes derive the memory type and Vulkan allocation size;
+there is no exporter metadata API. Dullahan GPU_SYNC v4 uses the same recipe
+and hands off the whole ring buffer. Queue ownership stays a separate, safe
+whole-buffer `CommandEncoder` operation; first-use state belongs to the buffer,
+not each slot.
+It changes capture integration, not the Phase 2 learning evidence above.
+The v4 ring passes functionally but logs an NVIDIA `NV_ERR_NO_MEMORY` warning;
+further local GPU work stopped for review, with the v4 real-producer test still
+unrun. No Xid/hang or recovery is recorded; cause remains unresolved. See the
+matching-allocation report for the retained logs and host-only snapshot.
+Merged Meganeura `6268ea5` / Blade `e349cddf` were adopted, including the
+host-computed Adam/LaProp bias correction. Their ordinary RGB canary stopped
+on another allocation warning and SPIR-V validation errors. October 3's
+[user-authorized initialization diagnostic](results/2026-10-03-allocation-initialization.md)
+now completes native context creation, three small allocations and 256 exact
+GPU outputs despite the same startup warning (2.207s, >=15.423GiB sampled
+estimated headroom). Separate CUDA initialization passes without a warning.
+The user treats the known shader-layout diagnostic as non-blocking. No new
+Xid/hang/device loss or recovery; the warning's precise cause remains unknown,
+but it is not itself evidence that GPU work cannot proceed. Kindle now pins
+Meganeura `13b19d33` ([PR223](https://github.com/kvark/meganeura/pull/223)) for the
+attention-value gradient fix above. New upstream comparisons pass1,524 checks;
+the matched task-only learning screen is complete. Diagnostic exceptions remain scoped.
+Historical evidence keeps its original backend and numerical identities.
 
 Core code: [agent](../kindle/src/dreamer/agent.rs),
 [vector collection](../kindle/src/dreamer/agent/vector.rs),
@@ -162,25 +265,63 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    Do not combine this new environment/recipe and speed change into one claim.
    Record curves against actual actions and elapsed time; promote only useful
    changes to 12M and longer Atari confirmation.
-4. **Phase 2: test whether the representation earns its cost.** Held-out motion/
-   small-object probes, then a three-seed learning comparison against random
-   Tiny and a learned-encoder Dreamer control. Include a title absent from the
-   video corpus. Native input is current; RGB64 is an explicit ablation.
-   The upstream GPU sanity succeeds, but reset/update accounting, replay and
-   cutoff semantics still need reconciliation before a matched efficiency
-   claim. The historical ~15.6 versus ~59 actions/s is not such a comparison.
-   If frozen JEPA offers no probe/learning benefit, change the 2D frontend;
-   retain JEPA as a testable 3D candidate, not an architectural obligation.
-5. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
+4. **Phase 2, complete: learned RGB for 2D screening.**
+   The faithful native RGB replacement passes1,524 four-update upstream
+   value/loss/raw-gradient/common-gradient optimizer checks. Independent F64
+   checks qualify split convolution gradients: full updates72.62→30.58ms,
+   without changing learning. [Numerical evidence](results/2026-09-30-small-dreamer-replication.md)
+   and [timing qualification](results/2026-09-30-small-rgb-profile.md).
+   Three small upstream/native learning pairs finish in **7/10 replication
+   attempts**, including the retained 29-minute interruption, each successful
+   pair under an hour. Native/upstream final online means368.0/307.733;
+   native takes about3.08× longer. [Replication](results/2026-09-30-small-replication-learning.md)
+   qualifies the local port/recipe, not the full published benchmark or mastery.
+   The separate **six-run JEPA comparison** reuses all three RGB controls:
+   Seaquest, seeds1009/2017/3019, Size1M/N8/B8/T16/H15/R32, 200,000 actions.
+   RGB/pretrained Tiny/initial Tiny final online means are368.0/225.3/230.7.
+   Paired pretrained-minus-RGB is−142.7 [−229.2,−76.8]; versus initial Tiny
+   it is−5.3 [−32.4,+24.0]. Tiny roughly halves world-training time but takes18%
+   longer end to end. Curves cross mid-training; this is not uniform RGB
+   dominance or proof against JEPA. Offline probes also show mixed Tiny
+   pretraining benefit; Large's stronger decoding changes capacity and corpus.
+   **Decision implemented:** the Atari vector runner defaults to the existing
+   learned RGB path; `--encoder-checkpoint` explicitly selects causal Tiny.
+   Native-detail JEPA and video/3D constructors are unchanged. Fresh/default
+   and frozen restore routes pass976 Python tests; no new learner or campaign.
+   [Complete decision, cost and curve analysis](results/2026-10-01-frontend-decision.md).
+   All study guards/checkpoints/counters pass and workers are reaped.
+   The old 12M matrix remains a [24-run partial study](results/2026-09-27-representation-learning.md):
+   all21 unstarted entries are cancelled, no three-seed group completed, and
+   its old patch-CNN arm was not an exact upstream visual control. Never restart
+   that queue or turn it into a completed benchmark. The ten-run cap applies
+   to replication; no additional allocation question remains for Phase 2.
+5. **October 2 user-authorized follow-up: joint causal Tiny.** Before Phase 3,
+   compare task-adaptive Tiny with frozen pretrained Tiny, three paired seeds.
+   Earlier initial-weight Tiny was frozen, not trained from scratch online.
+   [Protocol](experiments/2026-10-02-joint-tiny.md): current-weight causal replay,
+   native-detail pixels, explicit noncollapse regularization, and refreshed
+   acting caches. Six bounded learning runs and frozen forecast probes complete:
+   no clear early benefit and4.64x wall cost. The three direct-policy runs and
+   frozen forecast probes also complete without a clear benefit. The fixed-target
+   diagnostic now finds readable positions and forecasts beating latent
+   persistence, but not reliable action/reward-sensitive prediction. Before
+   more joint gameplay, target standardization and frozen-belief diagnostics
+   now complete on the saved corpus. Scaling improves fitting; the posterior
+   has weak held-out horizontal-state readability. Proposed next: test a
+   direct posterior-to-current-latent learning signal, retaining future
+   prediction and existing controls, without new gameplay. Useful online JEPA
+   dynamics remain unconfirmed; historical Phase2 conclusions remain scoped
+   to frozen vision. No unchanged RL queue resumes.
+6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation
    experiment is not supported by current pixel collection; do not silently
    enable it or add host feature readback. Disclose shaped rewards, overrides,
    privileged reward observers and every pretraining source.
-6. **Phase 4: video priors for dynamics and behavior.** Compare action-free
+7. **Phase 4: video priors for dynamics and behavior.** Compare action-free
    dynamics pretraining, inferred actions and behavior priors at equal online
    experience; disclose offline cost and target-game exposure.
-7. **Phase 5, later: asynchronous real-time deployment.** Only after the
+8. **Phase 5, later: asynchronous real-time deployment.** Only after the
    single-actor learner is effective, introduce a separately measured async
    actor/learner, learner debt and latency percentiles. Native GPU capture
    already works, but reward/terminal adapters and mind-games controller
@@ -221,9 +362,10 @@ Using the [pinned upstream references](https://github.com/danijar/dreamerv3/blob
 Qbert's final score is .935 human-normalized; Breakout's864-point gate is29.94.
 Protocol differences make these descriptive, not matched benchmark claims.
 The gate stays fixed, but missing mastery must not be called absence of learning.
-A bounded matched upstream Dreamer12M control remains necessary to assess the
-frozen-JEPA design; the single pretraining ablation settles neither benefit nor
-harm. Synthetic full-encoder streaming parity is now wired into CI and passes
+A [small matched upstream control](results/2026-09-30-small-replication-learning.md)
+now qualifies the native port; the [three-seed representation study](results/2026-10-01-small-jepa-learning.md)
+settles the current 2D default, not the general latent-prediction hypothesis.
+Synthetic full-encoder streaming parity is wired into CI and passes
 locally; the checkpoint-specific production hardware tests remain separate.
 
 The initial 303M frontend was disproportionate to the nominal 12M learner.
@@ -244,8 +386,9 @@ Completed fixed-recipe optimizations:
 | [Four world submissions + latest runtime](../runs/chunks-atari-timing-20260926.e2OEhn/results.md) | 6.5–6.6% less Atari wall time; ~1.041× aggregate real time | Exact same-arm state/reports/actions; isolated core scheduling gain 7.4–7.5% |
 
 These are separate comparisons, not percentages to add. Uncapped, step-driven
-playing/learning works; sustained per-stream super-real-time learning is not
-established. Free-running native games without time control remain a separate
+playing/learning works. The new small RGB screen achieves 1.03–1.06× real time
+per stream over each full run; Tiny achieves about .89×. This does not qualify
+the historical 12M/R256 recipe. Free-running native games without time control remain a separate
 requirement. Measure arrival order, observation gaps, action durations and
 training debt before introducing concurrency.
 
@@ -296,8 +439,8 @@ MLP 768, 5,486,592 encoder parameters**. Preserve 224px inputs, 16-arrival block
 chunks, independent histories and JL64/2×2 pooling to 7×7×64. Logical F32 KV
 storage is 55.125 MiB per stream versus Large's 588 MiB; these are tensor sizes,
 not measured device peaks. Do not slice Large weights or silently substitute
-features during a speed comparison. Phase 2 may replace the frozen frontend
-after controlled probes and learning experiments.
+features during a speed comparison. Phase 2 selected learned RGB for 2D;
+these Tiny settings remain the explicit frozen video/3D reference.
 
 The native pretrainer uses multi-view invariance + SIGReg, causal token dropping
 and evaluation EMA, not undisclosed distillation. Preserve token positions in
@@ -322,8 +465,9 @@ and matched cost pass. Freeway now passes three learner roots, conditional on
 one encoder. Breakout regresses versus Large, and its
 [own-initial-encoder comparison](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md)
 shows no pretraining benefit in one seed. Neither establishes a capacity limit
-or justifies random features as the product. **Tiny is the current default;
-Large is explicit.** Phase 2 must establish a benefit over random/learned features.
+or justifies random features as the product. The completed three-seed Phase 2
+study does not establish a Tiny pretraining benefit and selects learned RGB for
+2D. Tiny remains the explicit video/3D candidate; Large is comparison-only.
 
 Keep numerical/causal/streaming checks, held-out quality, N6 memory/time and
 frozen downstream controls for final adoption. Different pretraining corpora

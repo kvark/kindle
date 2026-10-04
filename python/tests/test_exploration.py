@@ -200,7 +200,7 @@ def test_legacy_protocol_cannot_silently_admit_overrides(tmp_path, field):
     (['--restore', 'unused', '--exploration-probability', '0.1'], 'fresh run'),
 ])
 def test_runner_rejects_invalid_exploration_before_gpu(tmp_path, monkeypatch, capsys, args, message):
-    monkeypatch.setattr(sys, 'argv', ['atari_vector', 'unused', '--output', str(tmp_path / 'run.jsonl'), *args])
+    monkeypatch.setattr(sys, 'argv', ['atari_vector', '--output', str(tmp_path / 'run.jsonl'), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
     assert error.value.code == 2
@@ -218,7 +218,7 @@ def test_runner_rejects_an_old_native_api_before_constructing_anything(tmp_path,
 
     monkeypatch.setattr(kindle, 'VectorAgent', OldAgent)
     monkeypatch.setattr(atari_vector.gym, 'make', lambda *args, **kwargs: pytest.fail('environment constructed'))
-    monkeypatch.setattr(sys, 'argv', ['atari_vector', 'unused', '--output', str(tmp_path / 'run.jsonl'),
+    monkeypatch.setattr(sys, 'argv', ['atari_vector', '--output', str(tmp_path / 'run.jsonl'),
                                      '--exploration-probability', '0.25'])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
