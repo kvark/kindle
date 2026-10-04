@@ -20,7 +20,11 @@ The [task-only](../results/2026-10-03-joint-tiny-learning.md) and
 [direct-policy](../results/2026-10-03-policy-tiny-learning.md) comparisons find no
 clear early benefit. The [fixed-target diagnostic](../results/2026-10-03-fixed-latent-sufficiency.md)
 finds readable positions and better-than-persistence latent forecasts, but no
-established action/reward-sensitive world modeling. No GPU queue remains active.
+established action/reward-sensitive world modeling. The October4
+[RSSM target-scaling test](../results/2026-10-04-rssm-target-standardization.md)
+cuts raw-target forecast errors substantially, but state/reward/action controls
+still do not establish useful dynamics. All six offline arms and audits pass
+in21m35s without new gameplay. No GPU queue remains active.
 The known shader VUID is non-blocking by user direction, not silently removed
 from the evidence.
 

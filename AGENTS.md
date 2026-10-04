@@ -134,16 +134,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   All guards/seals and independent full-width GPU references pass; CI268 passes.
   Two collector failures (recording boundary, serialization-hash false alarm)
   and2,176 excluded smoke actions remain disclosed.
-  **Authorized follow-up:** frozen-encoder RSSM target standardization on the
-  saved corpus, raw/standardized pairs1009/2017/3019,2,048 full production
-  updates each; no new gameplay. Only future-target units change; inputs stay
-  raw. Training-only statistics, final-budget selection, persistence/constant-
-  mean/unrelated-action and state/reward controls. Independent F64 gradients,
-  identity-update parity, restore/frozen tensors and the2-update Size1M smoke
-  pass. See `docs/experiments/2026-10-03-rssm-target-standardization.md`.
-  The static feature offset motivates testing, not a proven cause. No unchanged
-  RL queue, representation matrix or Phase3 campaign starts automatically.
-  Keep RGB/default ac_grads=false; target standardization defaults off.
+  **October4 target-scaling follow-up complete:** raw/standardized frozen-RSSM
+  pairs1009/2017/3019,2,048 full production updates each,21m35s and zero new
+  gameplay. Standardized/raw held-out MSE is.109 at h1 and.289 at h15. This
+  improves fitting but not useful dynamics: standardized/persistence is2.137
+  at h1 and.848 at h15; the latter still loses to the constant training mean
+  (1.048). Player-state forecasts remain near constant quality; reward MAE
+  loses to zero and actual/unrelated actions show no favorable advantage.
+  All initial pairs are exact; all252 saved tensors stay frozen in evaluation;
+  finite checkpoints, all guards/seals, independent gradients,1,047 Python
+  tests and CI270 pass. See `docs/results/2026-10-04-rssm-target-standardization.md`.
+  Proposed next diagnostic: locate readable state across Tiny, RSSM posterior/
+  prior and predicted features using this saved corpus, not more gameplay.
+  No GPU job remains active; no unchanged RL queue, representation matrix or
+  Phase3 campaign starts automatically. Keep RGB/default ac_grads=false;
+  target standardization stays opt-in. Its centering/scaling also changes loss
+  weighting; do not call it an identical-objective speedup or online JEPA win.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
   its startup warning and raw-pipeline cleanup errors are retained, not accepted
   as clean qualification. Select GPU tests explicitly and guard them; do not

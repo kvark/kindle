@@ -70,14 +70,17 @@ Tiny retains readable/predictable state, but decoded player-x loses to persisten
 and reward/action-sensitive forecasting remains weak. This is conditional latent
 predictability, not a useful online world model or JEPA advantage. The two
 collector failures and2,176 excluded smoke actions are retained.
-The authorized [target-standardization ablation](experiments/2026-10-03-rssm-target-standardization.md)
-uses the saved frozen-encoder corpus: three paired raw/standardized RSSMs,
-2,048 full updates each, no gameplay. Only future-target units change; RSSM
-inputs remain raw. Independent F64 gradients, identity-update parity,
-restore/frozen tensors and the2-update production-size smoke pass. Persistence,
-constant training mean, unrelated actions and decoded state/reward controls
-will distinguish latent conditioning from useful dynamics. Large static feature
-offsets motivate the test; the earlier auxiliary heads do not prove the cause.
+The [target-standardization ablation](results/2026-10-04-rssm-target-standardization.md)
+is also complete: three paired raw/standardized RSSMs,2,048 full updates each,
+21m35s and zero new gameplay. Standardized/raw latent error is.109 at h1 and.289
+at h15, but one-step forecasts still lose to persistence. At15 steps they beat
+persistence (.848 ratio) but lose to the constant training mean (1.048).
+Player-state/reward/action controls still fail to establish useful dynamics.
+All paired initial/frozen tensor audits, numerical checks and CI270 pass.
+Keep standardization opt-in and RGB as the2D default. No GPU job remains active.
+The proposed next cheap diagnostic is to locate readable state across Tiny,
+RSSM posterior/prior and predicted features on these same saved traces; this
+test cannot distinguish the belief bottleneck from transition/head failures.
 No fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

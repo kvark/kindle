@@ -69,4 +69,9 @@ October3 at23:24:6268ea5, unchanged;13b19d33 includes the qualified dV fix.
 This ablation can identify a benefit of fixed target conditioning on a frozen
 corpus. It cannot establish stable joint representation learning, a JEPA
 efficiency advantage, or that every important visual detail is represented.
+Centering changes initial raw forecasts; per-coordinate scaling also changes
+error weighting relative to other losses. It is one defined target transform,
+not a mathematically identical objective or an isolation of centering from
+variance scaling. The constant-mean control helps distinguish these effects
+from learned dynamics; neither arm's training loss is in comparable raw units.
 No larger gameplay queue, Phase3 or swarm starts automatically.
