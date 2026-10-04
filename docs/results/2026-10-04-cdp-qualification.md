@@ -1,4 +1,4 @@
-# CDP qualification: initialization passes, full comparison unfinished
+# CDP qualification: isolated upstream comparisons pass
 
 October 4, 2026. [Protocol](../experiments/2026-10-04-cdp.md) ·
 [Machine-readable results](2026-10-04-cdp-qualification.json).
@@ -6,6 +6,12 @@ October 4, 2026. [Protocol](../experiments/2026-10-04-cdp.md) ·
 **Learning remains stopped; numerical qualification is approved to resume.**
 No CDP gameplay or learning-efficiency result exists.
 Learned RGB remains the default. The posterior-Tiny queue remains deferred.
+The authorized follow-up passes all1,300 CDP and1,524 RGB comparisons across
+four updates per arm, including raw gradients, learning-rate groups, optimizer
+moments and EMA. Raw gradients use identical pre-step weights; the independent
+optimizer's maximum parameter error is2.38e-7 CDP and1.19e-7 RGB. This is
+component parity, not bitwise stochastic-trajectory equivalence. Tolerances
+are unchanged; the failed sequential-weight comparison below remains retained.
 
 | Check | Result |
 | --- | --- |
@@ -14,9 +20,9 @@ Learned RGB remains the default. The posterior-Tiny queue remains deferred.
 | CDP cosine | Pass: four values and 1,024 raw derivatives against independent F64; target detached |
 | Native full updates | Four synthetic updates per arm complete; not upstream parity or gameplay |
 | Shared initialization | 60 world, 22 behavior and 11 slow-critic shared tensors exactly equal |
-| Upstream CDP | First two updates pass 650 comparisons; third update fails a raw-gradient component gate |
-| Subsequent isolation check | Stopped on a new allocation warning before producing comparisons |
-| Upstream RGB, replay/restore, production smokes | Unfinished |
+| Upstream CDP/RGB | Isolated four-step checks pass1,300/1,524 comparisons; earlier failure retained |
+| Replay/restore | RGB passes; CDP follow-up in progress |
+| Production smokes | Unstarted |
 | Six-run learning comparison and frozen probes | Unstarted |
 
 The small CDP model has 804,785 unique parameters versus RGB's 688,004. Its dense
@@ -44,7 +50,8 @@ L2 error 6.07e-6. The latter is small, but does not override the per-component
 gate. The cause is **unresolved**, not an accepted rounding explanation.
 The next adapter revision compares gradients at identical native pre-step
 weights while independently advancing reference optimizer weights/moments/EMA;
-it changes no numerical tolerance. That isolation check has not completed.
+it changes no numerical tolerance. The first isolation invocation stopped on
+the warning below. The newly authorized follow-up completes all four updates.
 
 ## Warning stop and evidence
 
@@ -73,11 +80,14 @@ and two exact-warning occurrences per process. Other failures remain fatal;
 training stays stopped until qualification is reviewed. This is not another
 initialization-only loop or a training warning waiver.
 
-CI276 passed macOS/Python but exposed a debug test-stack overflow in the expanded
-three-model replay/restore test. Its measured local frame was972,360 bytes before
-nested constructors. The test now separates vector and single-actor phases so
-their stack frames do not accumulate; no production layout, learner, stack-limit
-override or CPU fallback changes. CI revalidation is pending.
+CI276/277 passed macOS/Python but exposed a debug stack overflow in replay/restore.
+Separating test phases reduced the local frame from972,360 to649,672 bytes but
+did not fix nested construction. The vector actor now heap-owns its learner
+(three changed lines), reducing large runtime stack copies without changing
+learning math or stack limits. The next check caught a test-only host/device
+replay mix; forecast assertions now use the real GPU actor route. All failures
+remain retained. RGB now passes on the native debug build; CDP and CI follow-up
+are in progress. No CPU learner fallback was introduced.
 
 Resolve full-update parity and the remaining qualification gates
 before the already declared six learning runs. No CPU learner workaround,

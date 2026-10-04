@@ -19,7 +19,7 @@ struct LiveStream {
 pub(super) struct VectorCore {
     acting: ActingGpu,
     copies: DeviceCopies,
-    pub(super) learner: DreamerCore,
+    pub(super) learner: Box<DreamerCore>,
     streams: Vec<LiveStream>,
     observe: Session,
     policy: Session,
@@ -144,7 +144,7 @@ impl VectorCore {
         Self {
             acting,
             copies,
-            learner,
+            learner: Box::new(learner),
             streams,
             observe,
             policy,
@@ -375,7 +375,7 @@ impl VectorCore {
 
     pub(super) fn read_diagnostics(&mut self) {
         assert_eq!(self.streams.len(), 1);
-        let learner = &mut self.learner;
+        let learner = &mut *self.learner;
         learner.readback.read_regions(&mut [
             (
                 self.policy.input_buffer("feature").unwrap(),
@@ -1493,22 +1493,6 @@ mod tests {
         );
         restored.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
         restored.act(ActionMode::Greedy);
-        if cdp {
-            let core = &mut restored.core.learner;
-            core.begin_episode(Observation::rgb64(vec![0.1; config.observation_dim()]));
-            let prediction = core.observation_prediction();
-            assert_eq!(prediction.len(), config.prediction_dim());
-            assert!(prediction.iter().all(|x| x.is_finite()));
-            let first = core.prior_state_rollout(&[1, 2]);
-            assert_eq!(first, core.prior_state_rollout(&[1, 2]));
-            assert!(
-                first
-                    .1
-                    .iter()
-                    .all(|row| row.len() == config.prediction_dim())
-            );
-            assert_eq!(core.learner_step, 1);
-        }
         assert_eq!(
             updated,
             restored.core.learner.world_train.read_params(&names)
@@ -1526,8 +1510,13 @@ mod tests {
         single.begin_episode(&RgbFrame::new(19, 13, vec![127; 19 * 13 * 3]));
         let width = single.core().config().encoded_observation_dim();
         assert_eq!(single.encoded_observation().len(), width);
+        let prediction_width = single.core().config().prediction_dim();
+        let prediction = single.observation_prediction();
+        assert_eq!(prediction.len(), prediction_width);
+        assert!(prediction.iter().all(|x| x.is_finite()));
         let before = single.latent_feature().to_vec();
         let forecast = single.prior_state_rollout(&[1, 2]);
+        assert!(forecast.1.iter().all(|row| row.len() == prediction_width));
         assert_eq!(forecast, single.prior_state_rollout(&[1, 2]));
         assert_eq!(before, single.latent_feature());
         assert_eq!(single.core().learner_step(), 1);
