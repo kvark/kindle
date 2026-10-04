@@ -76,10 +76,22 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Next: Atari learning and exploration with CDP (Phase 3)
 
-**Active follow-up:** the user now requests training CDP on the selected Atari
+**Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
+before further zero-score runs. Seven Freeway pairs complete; CDP3019 is retained
+as interrupted. The [diagnosis](results/2026-10-04-freeway-zero-reward-diagnosis.md)
+finds zero reward discovery and zero policy advantages, while raw-ALE controls,
+a bounded GPU reward pulse and the existing Seaquest positive control pass.
+Published DreamerV3 Atari-100k Freeway traces also score zero. Do not infer a
+CDP-specific regression or continue the matrix unchanged. First select a small
+generic exploration experiment with first-reward/replay-coverage/advantage
+diagnostics; reward-bearing Boxing can separately test representation learning.
+No new campaign is launched by this decision. The full requested comparison
+below remains unfinished, not replaced by a single easier game.
+
+**Retained scope:** the user requests training CDP on the selected Atari
 games and evaluating against Dreamer RGB and Tiny JEPA. This bounded
-[three-method comparison](experiments/2026-10-04-cdp-atari-comparison.md) precedes
-the intrinsic-reward experiment below. The user confirms **Boxing, Pong, Freeway,
+[three-method comparison](experiments/2026-10-04-cdp-atari-comparison.md) was started
+before the intrinsic-reward experiment below. The user confirms **Boxing, Pong, Freeway,
 Breakout and Qbert**: 45 small runs (three methods x three seeds per game),
 each with frozen evaluation. Freeway runs first. Keep all methods extrinsic-only and
 use fresh matched controls, not the old aided/non-sticky/large-model results.
@@ -90,7 +102,7 @@ the PR remains the running-status dashboard.
 learning from sparse rewards, not to reopen the unchanged five-game mastery
 queue or spend more days establishing the RGB baseline.
 
-After the five-game comparison, the planned exploration experiment is
+The planned exploration experiment, now reconsidered before resuming the matrix, is
 **unassisted Freeway**:
 
 - Control: extrinsic-only CDP. Candidate: the same CDP agent plus **one**

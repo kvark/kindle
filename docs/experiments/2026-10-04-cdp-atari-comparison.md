@@ -137,3 +137,19 @@ boundaries emit aggregate JSON/curves; partial individual pairs remain available
 The controller has a48-hour overall deadline, with the original60/30-minute
 native deadlines unchanged. CPU analysis/replay uses one CPU, a2GiB address-space
 limit and inherited zero swap. No local compilation or native/acting-code change.
+
+## October4, 20:42 UTC: user-directed stop and diagnosis
+
+The user redirects work to investigating the zero scores. Seven Freeway pairs
+are complete; CDP seed3019 is interrupted at126,408 actions/31,541 updates.
+The partial checkpoint and accounting pass CPU audits but do not complete its
+training budget. The remaining37 entries are unstarted. The controller and
+native workers are stopped; its interrupted exit is not a GPU fault. No matrix
+restart, replacement seed or budget extension is automatic.
+
+The [diagnosis](../results/2026-10-04-freeway-zero-reward-diagnosis.md) finds
+zero discovered rewards and zero policy advantages. Independent raw-ALE
+controls and an excluded, bounded1,024-action/195-update GPU reward pulse pass.
+Keep all completed/interrupted evidence and the original protocol; decide a
+small exploration experiment before more large-scale comparisons. The five-game
+objective remains incomplete.

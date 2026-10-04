@@ -1,10 +1,24 @@
-# Five-game CDP / RGB / Tiny comparison — in progress
+# Five-game CDP / RGB / Tiny comparison — stopped for diagnosis
 
-**3/45 train/evaluation pairs audited.** The selected games are Boxing, Pong,
+**7/45 train/evaluation pairs audited; the study is stopped.** The selected games are Boxing, Pong,
 Freeway, Breakout and Qbert, with CDP, faithful Dreamer RGB and pretrained
 frozen Tiny, seeds1009/2017/3019. The [fixed declaration](../experiments/2026-10-04-cdp-atari-comparison.md)
 keeps all methods unassisted and extrinsic-only. Current activity stays in
 [PR31](https://github.com/kvark/kindle/pull/31); this report records completed evidence.
+
+The user requested investigation of the zero scores on October4 at20:42 UTC.
+CDP seed3019 is retained as an interrupted126,408-action/31,541-update run,
+not a completed pair. No worker remains and no automatic restart is planned.
+The [diagnosis](2026-10-04-freeway-zero-reward-diagnosis.md) identifies zero
+reward discovery, zero advantages and nearly uniform policies; independent ALE
+controls and a bounded positive-reward GPU probe pass. This is an exploration
+failure, not evidence of a CDP-specific learning regression.
+
+Completed RGB/CDP/Tiny seeds1009/2017 and Tiny3019 all score0 online and frozen.
+All seven pairs' configs, full learning curves, episode counts/tails, timings
+and video links are in the compact data below. Fourteen native guards pass with
+zero new allocation warnings. The table below is the first matched seed, not
+an unbalanced aggregate of two CDP/RGB seeds and three Tiny seeds.
 
 ## First matched group: Freeway seed 1009
 
@@ -40,7 +54,7 @@ utilization remains unmeasured. CPU video replay is outside the native timings.
 
 This seed demonstrates no unassisted Freeway learning at the declared budget
 with any method. It does not establish a CDP learning advantage or an Atari-wide
-conclusion; the other two seeds and four games remain required. Do not extend
+conclusion; the balanced three-seed comparison and four other games remain unfinished. Do not extend
 the budget, add action assistance or drop this negative result. Historical aided
 Freeway wins are not matched controls. Tiny's 250k same-title pretraining
 observations remain additional experience, not online-only learning.

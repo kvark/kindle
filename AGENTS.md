@@ -7,9 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Active user goal: train CDP on the selected Atari games and compare with
-  Dreamer RGB and Tiny JEPA.** This takes priority over the unstarted intrinsic
-  reward experiment below. The [new declaration](docs/experiments/2026-10-04-cdp-atari-comparison.md)
+- **October 4, 20:42 UTC: investigate zero-reward learning before more runs.**
+  The user redirects the active comparison to diagnosis. The serial study is
+  stopped: seven Freeway pairs are audited; CDP seed3019 is interrupted at
+  126,408 actions/31,541 updates and retained. No GPU worker remains. Do not
+  restart the matrix automatically. Trace actions, raw/stored rewards, policy
+  advantages and optimizer activity; distinguish sparse exploration failure
+  from adapter/learner bugs before choosing the next learning experiment.
+  [Diagnosis](docs/results/2026-10-04-freeway-zero-reward-diagnosis.md): all
+  1,526,408 collected training actions yield zero rewards/advantages. Uniform
+  random ALE controls score0, scripted UP21–23; rewards/state match raw ALE.
+  One excluded1024-action/195-update GPU reward-pulse probe passes: real rewards
+  reach replay and produce nonzero advantages. Same-code Seaquest learns, and
+  published DreamerV3 Atari-100k Freeway scores are also zero across five seeds.
+  No learner fix or larger comparison is justified by this floor result alone.
+  Next, decide a small generic exploration test; do not repeat the pulse or
+  silently restart/extend the matrix. All five-game work remains incomplete.
+- **Retained user goal: train CDP on the selected Atari games and compare with
+  Dreamer RGB and Tiny JEPA.** Diagnose reward discovery before deciding how
+  this comparison and the exploration experiment below proceed. The
+  [declaration](docs/experiments/2026-10-04-cdp-atari-comparison.md)
   uses the qualified small recipe, three learner seeds and fresh matched
   controls; Tiny is pretrained/frozen, with its extra experience disclosed.
   The user confirms Boxing, Pong, Freeway, Breakout and Qbert: 45 fresh small
@@ -27,7 +44,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Dreamer agent. No frozen Tiny/DINO/Large requirement or RGB visualization
   decoder. RGB remains the reference/fallback; LeVJEPA is a later video/3D
   hypothesis, not an obligation for 2D.
-- **After the active comparison: exploration/reward with CDP (Phase 3).** Plan unassisted
+- **Proposed next, before resuming the matrix: exploration/reward with CDP (Phase 3).** Plan unassisted
   Freeway: extrinsic-only CDP versus one GPU-compatible intrinsic mechanism,
   three learner seeds 1009/2017/3019. Start planning at 200k actual aggregate
   actions/seed on Size1M/N8/B8/T16/H15/R32/microbatch 8/replay 100000, sticky 0.25,
