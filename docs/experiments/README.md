@@ -24,7 +24,13 @@ established action/reward-sensitive world modeling. The October4
 [RSSM target-scaling test](../results/2026-10-04-rssm-target-standardization.md)
 cuts raw-target forecast errors substantially, but state/reward/action controls
 still do not establish useful dynamics. All six offline arms and audits pass
-in21m35s without new gameplay. No GPU queue remains active.
+in21m35s without new gameplay. The subsequent
+[frozen-belief diagnostic](../results/2026-10-04-rssm-belief-probes.md) locates
+poor held-out horizontal-position readability between adapter and posterior.
+Stage-fitted heads recover vertical information missed by transferred heads;
+some action signal survives, but forecasts still lose to persistence. All three
+frozen replays and24 GPU readouts complete in6m39s, with no actor updates or
+new gameplay. No GPU queue remains active.
 The known shader VUID is non-blocking by user direction, not silently removed
 from the evidence.
 

@@ -21,6 +21,16 @@ RSSM posterior/prior states and predicted features on these same traces. That
 would distinguish a belief/transition problem from a prediction-head problem;
 this experiment does not isolate them. No follow-up GPU queue is started here.
 
+**October4 follow-up:** the completed
+[frozen-belief diagnostic](2026-10-04-rssm-belief-probes.md) qualifies the
+state-readout interpretation below. A head fitted directly to predicted
+features recovers h1 player-y R² .507 versus .046 for the transferred Tiny
+head; horizontal readability remains weak already at the posterior. Some
+action signal also survives in prior-state readouts, though absolute position
+forecasts still lose to persistence. The original transferred-head and raw
+latent-error results below are unchanged; they do not prove all state or
+action information is absent.
+
 ## Matched forecasts
 
 Six fresh production RSSMs, raw/standardized pairs1009/2017/3019, each use the

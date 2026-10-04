@@ -77,14 +77,19 @@ at h15, but one-step forecasts still lose to persistence. At15 steps they beat
 persistence (.848 ratio) but lose to the constant training mean (1.048).
 Player-state/reward/action controls still fail to establish useful dynamics.
 All paired initial/frozen tensor audits, numerical checks and CI270 pass.
-Keep standardization opt-in and RGB as the2D default. The authorized
-[frozen-belief diagnostic](experiments/2026-10-04-rssm-belief-probes.md) now
-locates readable state across the196-value adapter, RSSM posterior/prior and
-predicted features on these saved traces: three replays,24 small GPU readouts,
-zero actor updates or gameplay. Read-only/RNG/causal-alignment checks and the
-short pipeline smoke pass. Fitted and transferred readouts distinguish poor
-readability from distribution shift; the prior scaling test could not do so.
-No fresh campaign or Phase3 starts automatically.
+Keep standardization opt-in and RGB as the2D default. The completed
+[frozen-belief diagnostic](results/2026-10-04-rssm-belief-probes.md) finds the
+largest horizontal-readability gap inside the RSSM: current player-x R² is
+.784 in Tiny, .585 at the adapter and .003 in the full posterior; y is
+.833/.765/.554. This is poor held-out readability, not proof of information
+absence. Fitting a readout directly on predicted features raises h1 y R²
+from .046 to .507, qualifying the earlier transferred-head interpretation.
+Some action signal survives, but h15 position errors still lose to Tiny
+persistence by2.56x/2.14x. Three frozen replays and24 GPU readouts take6m39s,
+with zero actor updates/gameplay; all frozen/causal audits and CI272 pass.
+Next proposed, not launched: one saved-corpus ablation adding normalized
+current-Tiny prediction from the full posterior alongside future prediction.
+No RGB reconstruction, fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,
 streaming and noncollapse checks pass. Tiny's
@@ -292,10 +297,13 @@ five-game confirmation work. Do not rerun unchanged failed recipes.
    frozen forecast probes also complete without a clear benefit. The fixed-target
    diagnostic now finds readable positions and forecasts beating latent
    persistence, but not reliable action/reward-sensitive prediction. Before
-   more joint gameplay, propose one frozen-RSSM target-standardization ablation
-   on the saved corpus. Useful online JEPA dynamics remain unconfirmed;
-   historical Phase2 conclusions remain scoped to frozen vision. No unchanged
-   RL queue resumes.
+   more joint gameplay, target standardization and frozen-belief diagnostics
+   now complete on the saved corpus. Scaling improves fitting; the posterior
+   has weak held-out horizontal-state readability. Proposed next: test a
+   direct posterior-to-current-latent learning signal, retaining future
+   prediction and existing controls, without new gameplay. Useful online JEPA
+   dynamics remain unconfirmed; historical Phase2 conclusions remain scoped
+   to frozen vision. No unchanged RL queue resumes.
 6. **Phase 3: exploration and reward.** Extrinsic-only versus one mechanism,
    without Freeway's random-action assistance, three learner seeds and curves.
    Prefer a GPU-compatible intrinsic mechanism. The old CPU hash-visitation

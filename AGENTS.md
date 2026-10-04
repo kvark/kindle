@@ -144,15 +144,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   All initial pairs are exact; all252 saved tensors stay frozen in evaluation;
   finite checkpoints, all guards/seals, independent gradients,1,047 Python
   tests and CI270 pass. See `docs/results/2026-10-04-rssm-target-standardization.md`.
-  **Authorized October4 follow-up:** locate readable state across the196-value
-  adapter, full RSSM posterior, h1/h15 deterministic/full priors and predicted
-  features, using all three frozen standardized RSSMs and the saved corpus.
-  Three replays,24 small diagnostic GPU readouts, zero actor updates/gameplay.
-  Native read-only/legacy-output/RNG and h1 alignment canary and384-recorded-
-  action smoke pass; see `docs/experiments/2026-10-04-rssm-belief-probes.md`.
-  Fitted versus transferred readouts separate readability from distribution
-  shift; posterior estimates are not forecasts. No unchanged RL queue, representation matrix or
-  Phase3 campaign starts automatically. Keep RGB/default ac_grads=false;
+  **October4 frozen-belief follow-up complete:** three frozen RSSMs, 24 GPU
+  readouts, 6m39s, zero actor updates or new gameplay. Current player-x R² is
+  .784 in Tiny, .585 at the196-value adapter and .003 in the640-value posterior;
+  y is .833/.765/.554. The largest horizontal-readability gap is inside the
+  RSSM, not proof of information absence: training fit exceeds held-out fit.
+  Refitting predicted-feature readouts raises h1 y R² from .046 to .507;
+  the earlier transferred head understated surviving vertical information.
+  Actual actions beat unrelated actions, but h15 position errors still exceed
+  Tiny persistence by2.56x/2.14x. Posterior estimates are not forecasts.
+  All252 saved tensors/model stay frozen, h1 causal alignment is exact, all
+  guards/seals and1,051 Python/108 Rust CPU tests pass; CI272 passes `ed61028`.
+  See `docs/results/2026-10-04-rssm-belief-probes.md`. No job remains active.
+  Next proposed, not launched: one saved-corpus ablation predicting normalized
+  current Tiny features from the full posterior alongside future prediction,
+  no RGB reconstruction or extra gameplay. No unchanged RL queue,
+  representation matrix or Phase3 starts automatically. Keep RGB/default ac_grads=false;
   target standardization stays opt-in. Its centering/scaling also changes loss
   weighting; do not call it an identical-objective speedup or online JEPA win.
   A mistakenly unfiltered backend library suite executed unguarded GPU tests;
