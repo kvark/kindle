@@ -16,9 +16,11 @@ favors CDP on all three pairs:543.6 versus318.1 online mean,13.6% less wall time
 All learning and frozen state/forecast audits pass. CDP's RSSM retains much more
 readable player state; h15 latent forecasts beat persistence, a constant mean
 and unrelated actions. One-step persistence, zero-reward MAE and matched
-privileged position persistence still win. Recommend CDP for the next small
-2D experiment, with RGB retained as control. CLI default stays RGB; `--cdp`
-opts in. All services have exited; no next campaign starts automatically.
+privileged position persistence still win. The user now adopts CDP on the main
+path: next is unassisted Atari exploration/reward, then video priors and native
+games. RGB remains the reference; the CLI still requires explicit `--cdp`.
+All services have exited; the [revised roadmap](../kindle_single_life_dreamer_plan.md)
+does not launch a campaign or revive the deferred Tiny ablation.
 
 October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its
