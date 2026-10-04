@@ -12,13 +12,25 @@ No CPU learning fallback. The retained incidents never established NVML causalit
 Use [gpu_host_guard.py](../python/examples/gpu_host_guard.py) around the direct
 process hosting native GPU work, never Cargo, a scheduler or a process tree.
 Its declaration binds boot ID, driver, absolute command, executable SHA256,
-timeout and polling interval. Review each result before the next individual
-invocation. There is no automatic retry or successor.
+timeout and polling interval. Audit each result before the next invocation.
+Successful stages may advance within a declared serial study; failed stages
+stop for review, without automatic retry.
 
-NVIDIA allocation warnings now stop the guard, as do emitted Vulkan validation
-errors even if the child exits zero. A declaration may identify exact reviewed
+**October4 user direction supersedes the warning-only GPU stop:** proceed
+unless the GPU is wedged. Fresh declarations set `record_allocation_warnings`
+to true. Standalone allocation warnings are retained as `allocation_warning`
+events, including baseline records, but do not abort work or require another
+approval. No first10-second window or occurrence cap is required. Actual API/
+numerical failures, hard GPU faults and deadlines still fail the affected job;
+review and fix ordinary job failures without treating them as a wedged driver.
+A hang/unreaped native process or wedge remains a recovery boundary.
+
+The known `VUID-StandaloneSpirv-None-10684` remains explicitly non-blocking.
+Other emitted Vulkan validation errors still fail a job even if it exits zero.
+The following older mechanisms remain for auditing historical declarations;
+they are not requirements for fresh training. A declaration may identify exact reviewed
 historical allocation-warning cursor/message pairs for its baseline only;
-new occurrences and hard faults remain stops. This is not a warning-class
+new occurrences and hard faults remained stops. This was not a warning-class
 waiver or proof of hardware health. The October 2
 [ordinary-compute canary](results/2026-10-02-joint-tiny-qualification.md) stopped;
 do not add its new warning to an exception list and automatically retry.

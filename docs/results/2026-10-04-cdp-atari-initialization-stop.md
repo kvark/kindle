@@ -40,6 +40,12 @@ no automatic retries or recovery. This proposed startup-only allowance is
 **not implemented or enabled**. Existing ordinary guards still stop on any new
 occurrence; historical120-second numerical permission does not cover training.
 
+**Subsequent user direction:** proceed with GPU use unless wedged. The pending
+startup-only proposal above is superseded: fresh declarations record standalone
+allocation warnings without treating them as approval gates. The original
+failure/evidence and this report's incident-time JSON remain unchanged. Actual
+job failures and hard faults are still reviewed; no GPU recovery is authorized.
+
 [Compact evidence](2026-10-04-cdp-atari-initialization-stop.json) ·
 [Failed guard](../../runs/cdp-atari-comparison-20261004.KnROnx/freeway-cdp-1009-queue/freeway-cdp-1009) ·
 [Scoped host review](../../runs/cdp-atari-comparison-20261004.KnROnx/initialization-stop-review)

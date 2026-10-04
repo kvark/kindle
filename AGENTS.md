@@ -15,10 +15,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The user confirms Boxing, Pong, Freeway, Breakout and Qbert: 45 fresh small
   runs (five games x three methods x three seeds), with frozen evaluation.
   Execute Freeway first; both excluded Tiny qualification smokes pass.
-  The first CDP launch stops before training on a new exact allocation warning;
-  0/45 complete. See the October4 initialization-stop report. GPU work remains
-  stopped; a proposed two-warning/first10-second startup allowance needs new
-  user approval and is not implemented. No automatic retry or successor.
+  The first CDP launch stopped before training on an allocation warning; retain
+  that failure. The user subsequently authorizes proceeding unless the GPU is
+  wedged: standalone allocation warnings are logged, not approval gates. The
+  proposed two-warning/first10-second restriction is superseded, not required.
   Do not reopen the cancelled historical queue or add an intrinsic-reward arm.
 - **October 4: the user adopts CDP on the main path.** The authoritative roadmap
   is [docs/kindle_single_life_dreamer_plan.md](docs/kindle_single_life_dreamer_plan.md).
@@ -39,7 +39,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   New main-path declarations must pass `--cdp`. A documentation edit does not
   change runtime defaults or launch a campaign. Keep qualified split rates,
   cosine loss and `ac_grads=false` until a separate comparison supports changes.
-  No old CPU feature-readback visitation workaround, new representation matrix,
+  No old CPU feature-readback visitation workaround, additional representation matrix,
   unchanged mastery queue or automatic budget extension.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then TMNF,
   a small GOG/Wine panel, held-out cross-game adaptation/retention, then swarms.
@@ -163,11 +163,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - Require the expected native device and >=2 GiB sampled Vulkan estimated budget
   headroom. Budget-minus-usage is not physical free or peak VRAM. Last observed
   boot: `3e89d55c-a9e5-472f-a18a-06508c5bafa7`.
-- The user's bounded two-exact-warning/120-second numerical permission has ended.
-  Ordinary jobs stop on new allocation warnings, API failures, numerical
-  mismatches, Xids or other kernel/native faults. The known
+- **October4 user permission: proceed with GPU use unless it is wedged.**
+  New declarations set `record_allocation_warnings=true`: retain standalone
+  allocation warnings without aborting or requesting approval for each one.
+  This supersedes the earlier120-second and proposed startup-only restrictions.
+  API/numerical failures, hard faults and deadlines still stop the affected job
+  for review; do not confuse a failed job with a wedged GPU or an approval gate.
+  No blind retries. A wedge needs recovery review. The known
   `VUID-StandaloneSpirv-None-10684` is non-blocking by explicit user direction;
-  other validation errors remain fatal. Do not silently broaden exceptions.
+  other validation errors remain job failures, not evidence of a wedge by themselves.
 - No GPU reset, driver reload/change, reboot or power-cycle without new user
   approval. Historical Xid62/154 incidents remain unexplained; successful
   no-NVML jobs prove neither causality nor safety. Never retry quarantined

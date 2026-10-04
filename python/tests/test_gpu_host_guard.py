@@ -170,6 +170,37 @@ def test_reviewed_warning_does_not_allow_a_new_occurrence(environment):
     assert not result["host_guard_passed"] and result["child_exit_code"] is not None
 
 
+def test_authorized_warning_recording_retains_baseline_and_live_occurrences(environment):
+    path, _calls, controls = environment
+    controls['warnings_at'] = (1, 2, 3, 4)
+    result = execute(environment, code='import time; time.sleep(.1)', timeout_seconds=3600,
+                     record_allocation_warnings=True)
+    assert result['host_guard_passed'] and result['child_exit_code'] == 0
+    rows = [json.loads(line) for line in (path / 'evidence/events.jsonl').read_text().splitlines()]
+    warnings = [row for row in rows if row['event'] == 'allocation_warning']
+    assert len(warnings) == 4 and [row['baseline'] for row in warnings] == [True, False, False, False]
+    assert host.audit(path / 'evidence')['host_guard_passed']
+
+
+@pytest.mark.parametrize('fault_at', [1, 2])
+def test_warning_recording_never_waives_hard_faults(environment, fault_at):
+    _path, _calls, controls = environment
+    controls['fault_at'] = fault_at
+    result = execute(environment, code='import time; time.sleep(.1)', record_allocation_warnings=True)
+    assert not result['host_guard_passed'] and not result['unfinished_children']
+
+
+def test_warning_recording_never_waives_native_failure(environment):
+    result = execute(environment, code='raise RuntimeError("CPU fixture")', record_allocation_warnings=True)
+    assert not result['host_guard_passed'] and result['child_exit_code'] != 0
+
+
+@pytest.mark.parametrize('recording', [1, 'true', None])
+def test_warning_recording_requires_a_boolean(environment, recording):
+    with pytest.raises(ValueError):
+        execute(environment, record_allocation_warnings=recording)
+
+
 DIAGNOSTIC = {"message": "NVRM: nvCheckOkFailedNoLog: Out of memory [NV_ERR_NO_MEMORY]", "max_occurrences": 1}
 
 

@@ -270,8 +270,10 @@ negative results; do not select only successful trajectories.
   in persistent systemd user services. Require the expected device and >=2 GiB
   sampled Vulkan budget headroom; this is not physical free or peak VRAM.
   Ordinary GPU/JAX initialization is allowed; separate NVML polling stays off.
-  Reviewed short warning allowances have ended. Stop on new faults/warnings;
-  no blind retry, reset, driver change or host recovery.
+  October4 permission allows GPU use unless wedged: record standalone allocation
+  warnings without an approval gate. Actual API/numerical failures, hard faults
+  and deadlines still stop the affected job for review. No blind retry, reset,
+  driver change or host recovery.
 - Preserve failures and compact JSON/Markdown reports; leave large artifacts in
   `runs/`. Keep current status in the PR, not in chronological roadmap appendices.
   Do not rebuild unchanged native code for docs or create a new pin/framework

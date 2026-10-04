@@ -37,7 +37,8 @@ def declaration(path):
     config = json.loads(Path(path).read_text(), object_pairs_hook=unique)["host_guard"]
     fields = {"monitoring", "boot_id", "driver", "command", "executable_sha256", "timeout_seconds", "poll_seconds"}
     if (not isinstance(config, dict) or not fields <= set(config)
-            or set(config) - fields - {"reviewed_kernel_warnings", "allocation_diagnostic", "reviewed_validation_vuids"}
+            or set(config) - fields - {"reviewed_kernel_warnings", "allocation_diagnostic", "reviewed_validation_vuids",
+                                      "record_allocation_warnings"}
             or config["monitoring"] != "host-only"):
         raise ValueError("require an explicit host-only declaration")
     warnings = config.get("reviewed_kernel_warnings", [])
@@ -48,6 +49,9 @@ def declaration(path):
             or retained.FAULT.search(row["message"]) for row in warnings)):
         raise ValueError("reviewed warnings require exact journal cursors and allocation messages")
     diagnostic = config.get("allocation_diagnostic")
+    if (type(config.get("record_allocation_warnings", False)) is not bool
+            or (config.get("record_allocation_warnings") and diagnostic is not None)):
+        raise ValueError("recorded allocation warnings require an explicit boolean, not a diagnostic waiver")
     if diagnostic is not None and (
             not isinstance(diagnostic, dict) or set(diagnostic) != {"message", "max_occurrences"}
             or not isinstance(diagnostic["message"], str)
@@ -89,7 +93,8 @@ def check_host(evidence, config, cursor=None):
     identity()
     cursor = retained.check_kernel(evidence, config["boot_id"], cursor,
                                    config.get("reviewed_kernel_warnings", ()),
-                                   config.get("allocation_diagnostic"))
+                                   config.get("allocation_diagnostic"),
+                                   record_allocation_warnings=config.get("record_allocation_warnings", False))
     identity()
     evidence.event("host_check", boot_id=config["boot_id"], driver=config["driver"],
                    kernel_cursor=cursor, started_monotonic=started)
@@ -208,6 +213,12 @@ def audit(root):
             if (not diagnostic or event["record"]["MESSAGE"] != diagnostic["message"]
                     or (result["host_guard_passed"] and event["count"] > diagnostic["max_occurrences"])):
                 raise retained.GuardError("allocation diagnostic differs from declaration")
+        if event["event"] == "allocation_warning":
+            message = event["record"]["MESSAGE"]
+            if (job["host_guard"].get("record_allocation_warnings") is not True
+                    or not retained.ALLOCATION_WARNING.search(message) or retained.FAULT.search(message)
+                    or type(event.get("baseline")) is not bool):
+                raise retained.GuardError("recorded allocation warning differs from declaration")
         if (event["event"] == "reviewed_validation_warning"
                 and event["vuid"] not in job["host_guard"].get("reviewed_validation_vuids", ())):
             raise retained.GuardError("validation exception differs from declaration")

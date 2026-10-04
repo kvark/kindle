@@ -116,3 +116,12 @@ exact NVIDIA allocation warning. No successor/retry is launched; **0/45 runs
 complete**. The declaration and all budgets remain unchanged. The scoped
 host-only review, retained incomplete broad snapshot and pending startup-only
 warning-policy request are in the [incident report](../results/2026-10-04-cdp-atari-initialization-stop.md).
+
+The user subsequently authorizes proceeding unless the GPU is wedged. This
+supersedes the proposed startup-only/count-limited exception. New ordinary
+declarations record standalone allocation warnings without aborting; hard
+faults, failed native calls, numerical errors and deadlines still fail the job.
+Resume in fresh `runs/cdp-atari-learning-20261004.XLgCAlkq/`, preserving the
+failed initialization and two excluded smokes above. Learning/evaluation
+budgets, methods, seeds, native library and acting code are unchanged. Successful
+stages can advance after the existing CPU audits; failed stages stop for review.

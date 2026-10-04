@@ -210,7 +210,8 @@ def parse_journal(text, boot, limit):
     return records
 
 
-def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_diagnostic=None):
+def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_diagnostic=None,
+                 *, record_allocation_warnings=False):
     limit = 4096 if cursor else 50001
     command = ["journalctl", "--no-pager", "--quiet", "-o", "json", f"--boot={boot.replace('-', '')}",
                "-n", str(limit), "_TRANSPORT=kernel"]
@@ -225,6 +226,9 @@ def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_d
             evidence.event("kernel_fault", record=row)
             raise GuardError("NVIDIA kernel fault; this boot requires explicit recovery review")
         if ALLOCATION_WARNING.search(row["MESSAGE"]):
+            if record_allocation_warnings:
+                evidence.event("allocation_warning", record=row, baseline=cursor is None)
+                continue
             identity = {"cursor": row["__CURSOR"], "message": row["MESSAGE"]}
             if cursor is None and identity in reviewed_warnings:
                 evidence.event("reviewed_kernel_warning", record=row)
