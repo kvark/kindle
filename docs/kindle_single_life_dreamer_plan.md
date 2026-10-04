@@ -87,8 +87,11 @@ from .046 to .507, qualifying the earlier transferred-head interpretation.
 Some action signal survives, but h15 position errors still lose to Tiny
 persistence by2.56x/2.14x. Three frozen replays and24 GPU readouts take6m39s,
 with zero actor updates/gameplay; all frozen/causal audits and CI272 pass.
-Next proposed, not launched: one saved-corpus ablation adding normalized
-current-Tiny prediction from the full posterior alongside future prediction.
+The user now authorizes one [saved-corpus ablation](experiments/2026-10-04-posterior-latent-targets.md)
+adding normalized current-Tiny prediction from the full posterior alongside
+future prediction: three candidates, coefficient .25 and2,048 updates each,
+reusing all three standardized controls. Qualify gradients/shared initial
+tensors and the unchanged control before learning; then repeat frozen readouts.
 No RGB reconstruction, fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

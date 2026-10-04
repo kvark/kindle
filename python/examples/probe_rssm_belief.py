@@ -220,7 +220,7 @@ def run(corpus, checkpoint, tiny_readout, output, smoke):
             data = prefix(data, 128)
         states, error = collect(core, data, row['seed'])
         file = output / row['file']
-        np.savez(file, **states)
+        np.savez_compressed(file, **states)
         result['files'].append(dict(file=row['file'], seed=row['seed'], split=row['split'], sha256=sha256_file(file),
                                     actions=len(data['actions']), arrivals=len(data['features']), max_h1_deter_error=error))
         result['memory'].append(checked_memory(core))

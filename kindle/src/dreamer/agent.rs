@@ -2437,6 +2437,16 @@ mod tests {
     #[test]
     #[ignore = "requires separately guarded GPU; standardization identity and exact restore"]
     fn standardized_core_identity_and_restore() {
+        check_standardized_core(false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; posterior targets and exact restore"]
+    fn standardized_reconstruction_core_identity_and_restore() {
+        check_standardized_core(true);
+    }
+
+    fn check_standardized_core(reconstruction: bool) {
         use super::super::config::FeatureStandardization;
         let gpu = Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(
@@ -2444,16 +2454,34 @@ mod tests {
             std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
         );
         let mut config = DreamerConfig::tiny(3);
-        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.reconstruction = if reconstruction { 0.25 } else { 0.0 };
         config.loss_scales.future_prediction = 0.25;
         config.actor_critic_gradient = true;
+        if reconstruction {
+            config.loss_scales = super::super::config::LossScales {
+                reconstruction: 0.25,
+                future_prediction: 0.0,
+                reward: 0.0,
+                continuation: 0.0,
+                dynamics: 0.0,
+                representation: 0.0,
+                policy: 0.0,
+                value: 0.0,
+                replay_value: 0.0,
+            };
+        }
         let mut plain = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         let memory = plain.gpu_memory_budget();
         assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
-        config.future_target_standardization = Some(FeatureStandardization {
+        let statistics = Some(FeatureStandardization {
             mean: vec![0.0; Observation::LEN],
             scale: vec![1.0; Observation::LEN],
         });
+        if reconstruction {
+            config.reconstruction_target_standardization = statistics;
+        } else {
+            config.future_target_standardization = statistics;
+        }
         let mut identity = DreamerCore::with_gpu(config.clone(), Arc::clone(&gpu));
         for core in [&mut plain, &mut identity] {
             core.begin_episode(Observation::from_vec(vec![0.2; Observation::LEN]));
@@ -2486,6 +2514,26 @@ mod tests {
         for _ in 0..3 {
             let a = plain.learn().unwrap();
             let b = identity.learn().unwrap();
+            assert!(a.world.reconstruction_loss > 0.0 || !reconstruction);
+            if reconstruction {
+                assert!((a.world.total_loss - 0.25 * a.world.reconstruction_loss).abs() < 1e-5);
+                for name in [
+                    "world.representation.encoder.patch0.weight",
+                    "world.representation.posterior.obslogit.weight",
+                ] {
+                    if let Some(size) = plain.world_train.param_size(name) {
+                        let mut gradient = vec![0.0; size];
+                        plain.world_train.read_param_grad(name, &mut gradient);
+                        assert!(gradient.iter().all(|x| x.is_finite()));
+                        assert!(
+                            gradient.iter().any(|x| x.abs() > 1e-7),
+                            "missing posterior reconstruction gradient: {name}"
+                        );
+                    } else {
+                        panic!("missing reconstruction-path parameter: {name}");
+                    }
+                }
+            }
             assert!((a.world.total_loss - b.world.total_loss).abs() < 1e-5);
             assert_eq!(
                 plain.world_train.read_params(&names),
@@ -2494,10 +2542,15 @@ mod tests {
         }
         drop(plain);
         drop(identity);
-        config.future_target_standardization = Some(FeatureStandardization {
+        let statistics = Some(FeatureStandardization {
             mean: vec![2.0; Observation::LEN],
             scale: vec![0.1; Observation::LEN],
         });
+        if reconstruction {
+            config.reconstruction_target_standardization = statistics;
+        } else {
+            config.future_target_standardization = statistics;
+        }
         let mut core = DreamerCore::with_gpu(config, Arc::clone(&gpu));
         core.begin_episode(Observation::from_vec(vec![2.0; Observation::LEN]));
         for step in 0..16 {

@@ -168,6 +168,10 @@ pub struct DreamerConfig {
     /// transform encoder/RSSM inputs. Diagnostics decode back to raw features.
     #[serde(default)]
     pub future_target_standardization: Option<FeatureStandardization>,
+    /// Optional feature targets for the full-posterior reconstruction head.
+    /// Separate from future targets; RGB reconstruction never uses these.
+    #[serde(default)]
+    pub reconstruction_target_standardization: Option<FeatureStandardization>,
     /// Per-patch hidden width immediately before the 64-channel feature decoder
     /// output. Fresh configs use 64 to avoid a hard affine rank bottleneck.
     /// Zero preserves the preset vision depth for legacy checkpoints.
@@ -249,6 +253,7 @@ impl DreamerConfig {
             observation_kind: ObservationKind::Features,
             video_encoder: None,
             future_target_standardization: None,
+            reconstruction_target_standardization: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
             // fixed 7x7x64 map. 100k entries are ~1.25 GB before RSSM context.
@@ -414,21 +419,29 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
-        if let Some(stats) = &self.future_target_standardization
-            && (self.observation_kind != ObservationKind::Features
-                || self.loss_scales.future_prediction <= 0.0
-                || stats.mean.len() != self.observation_dim()
-                || stats.scale.len() != self.observation_dim()
-                || stats.mean.iter().any(|x| !x.is_finite())
-                || stats
-                    .scale
-                    .iter()
-                    .any(|x| !x.is_finite() || *x <= 0.0 || !x.recip().is_finite()))
-        {
-            return Err(
-                "future target standardization requires finite feature means and positive scales"
-                    .into(),
-            );
+        for (statistics, enabled) in [
+            (
+                &self.future_target_standardization,
+                self.loss_scales.future_prediction > 0.0,
+            ),
+            (
+                &self.reconstruction_target_standardization,
+                self.loss_scales.reconstruction > 0.0,
+            ),
+        ] {
+            if let Some(stats) = statistics
+                && (self.observation_kind != ObservationKind::Features
+                    || !enabled
+                    || stats.mean.len() != self.observation_dim()
+                    || stats.scale.len() != self.observation_dim()
+                    || stats.mean.iter().any(|x| !x.is_finite())
+                    || stats
+                        .scale
+                        .iter()
+                        .any(|x| !x.is_finite() || *x <= 0.0 || !x.recip().is_finite()))
+            {
+                return Err("target standardization requires an enabled feature head, finite means and positive scales".into());
+            }
         }
         if self.video_encoder.is_some()
             && (self.observation_kind != ObservationKind::Features
@@ -603,6 +616,36 @@ mod tests {
             .pop();
         assert!(bad.check().is_err());
         config.loss_scales.future_prediction = 0.0;
+        assert!(config.check().is_err());
+    }
+
+    #[test]
+    fn posterior_target_statistics_require_feature_reconstruction() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(config.reconstruction_target_standardization.is_none());
+        config.reconstruction_target_standardization = Some(FeatureStandardization {
+            mean: vec![2.0; config.observation_dim()],
+            scale: vec![0.1; config.observation_dim()],
+        });
+        assert!(config.check().is_ok());
+        let restored: DreamerConfig =
+            serde_json::from_str(&serde_json::to_string(&config).unwrap()).unwrap();
+        assert_eq!(config, restored);
+        config
+            .reconstruction_target_standardization
+            .as_mut()
+            .unwrap()
+            .scale[0] = 0.0;
+        assert!(config.check().is_err());
+        config
+            .reconstruction_target_standardization
+            .as_mut()
+            .unwrap()
+            .scale[0] = 0.1;
+        config.loss_scales.reconstruction = 0.0;
+        assert!(config.check().is_err());
+        config.loss_scales.reconstruction = 1.0;
+        config.observation_kind = ObservationKind::Rgb64;
         assert!(config.check().is_err());
     }
 

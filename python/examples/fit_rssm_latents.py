@@ -11,6 +11,7 @@ from pathlib import Path
 import time
 
 import numpy as np
+from safetensors import safe_open
 
 from atari import sha256_file
 from fit_atari_probes import bytes32, checked_memory
@@ -35,11 +36,17 @@ def training_statistics(root, manifest):
     return mean, scale, float(np.concatenate(rewards).mean(dtype=np.float64))
 
 
-def learner_config(base, mean, scale, standardize):
+def learner_config(base, mean, scale, standardize, posterior_targets=False):
+    if posterior_targets and not standardize:
+        raise ValueError("posterior-target screen requires standardized future targets")
     config = copy.deepcopy(base)
     config.update(video_encoder=None, replay_capacity=16384, train_ratio=0.,
                   future_target_standardization=(dict(mean=mean.tolist(), scale=scale.tolist())
                                                  if standardize else None))
+    config['reconstruction_target_standardization'] = None
+    if posterior_targets:
+        config['loss_scales']['reconstruction'] = .25
+        config['reconstruction_target_standardization'] = copy.deepcopy(config['future_target_standardization'])
     return config
 
 
@@ -58,6 +65,22 @@ def replay_trace(core, data, limit=None, before=None):
                      bool(data["truncated"][i] or i == count - 1))
         arrivals += 1
     return count, arrivals
+
+
+def compare_initial(reference, candidate):
+    counts = {}
+    for group in ('world', 'behavior', 'slow_value'):
+        with safe_open(reference / f'{group}.safetensors', framework='np') as old, \
+                safe_open(candidate / f'{group}.safetensors', framework='np') as new:
+            extra = set(new.keys()) - set(old.keys())
+            if not set(old.keys()) <= set(new.keys()) or any('world.decoder.' not in k for k in extra):
+                raise RuntimeError('unexpected initial tensor keys')
+            for key in old.keys():
+                a, b = old.get_tensor(key), new.get_tensor(key)
+                if a.shape != b.shape or a.dtype != b.dtype or a.tobytes() != b.tobytes():
+                    raise RuntimeError(f'initial control mismatch: {group}/{key}')
+            counts[group] = dict(shared=len(old.keys()), added=len(extra))
+    return counts
 
 
 def forecast_trace(core, data, seed, stride, limit=None):
@@ -169,7 +192,7 @@ def evaluate(core, root, manifest, output, mean, scale, reward_mean, readout_pat
     return result
 
 
-def run(root, readout_path, output, standardize, smoke):
+def run(root, readout_path, output, standardize, smoke, posterior_targets=False, initial_reference=None):
     started = time.monotonic()
     manifest = json.loads((root / "manifest.json").read_text())
     validate_corpus(root, manifest)
@@ -181,11 +204,12 @@ def run(root, readout_path, output, standardize, smoke):
             or head_result["heads"][0]["head_sha256"] != sha256_file(readout_path)):
         raise ValueError("readout does not match corpus")
     mean, scale, reward_mean = training_statistics(root, manifest)
-    config = learner_config(json.loads(checkpoint.read_text())["config"], mean, scale, standardize)
+    config = learner_config(json.loads(checkpoint.read_text())["config"], mean, scale, standardize, posterior_targets)
     output.mkdir(parents=True, exist_ok=False)
     np.savez(output / "training-statistics.npz", mean=mean, scale=scale, reward_mean=reward_mean)
     result = dict(protocol="kindle-rssm-target-standardization-v1", status="running", smoke=smoke,
-                  standardize=standardize, seed=config["seed"], config=config, new_game_actions=0,
+                  standardize=standardize, posterior_targets=posterior_targets,
+                  seed=config["seed"], config=config, new_game_actions=0,
                   corpus=str(root.resolve()), corpus_manifest_sha256=sha256_file(root / "manifest.json"),
                   readout=str(readout_path.resolve()), readout_sha256=sha256_file(readout_path),
                   source_sha256=sha256_file(__file__), native_sha256=sha256_file(_native.__file__),
@@ -198,6 +222,10 @@ def run(root, readout_path, output, standardize, smoke):
     core = _native.FeatureCore(config)
     result.update(gpu_device=core.gpu_device, memory=[checked_memory(core)])
     core.save_checkpoint(str(output / "initial"))
+    if initial_reference is not None:
+        result['initial_reference'] = str(initial_reference.resolve())
+        result['initial_tensor_comparison'] = compare_initial(initial_reference, output / 'initial')
+        save()
     files = [row for row in manifest["files"] if row["split"] == "train"]
     actions = arrivals = 0
     for row in files[:1] if smoke else files:
@@ -252,8 +280,11 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--standardize", action="store_true")
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--posterior-targets", action="store_true",
+                        help="add standardized current-feature prediction from the full posterior (weight .25)")
+    parser.add_argument("--initial-reference", type=Path, help="require exact shared initial control tensors before learning")
     args = parser.parse_args()
-    run(args.corpus, args.readout, args.output, args.standardize, args.smoke)
+    run(args.corpus, args.readout, args.output, args.standardize, args.smoke, args.posterior_targets, args.initial_reference)
 
 
 if __name__ == "__main__":

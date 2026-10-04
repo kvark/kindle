@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
+from safetensors.numpy import save_file
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "examples"))
 import fit_rssm_latents as fit
@@ -97,3 +99,33 @@ def test_config_changes_only_declared_settings_and_target_factor():
     raw.pop("future_target_standardization")
     assert raw == standardized
     assert raw["video_encoder"] is None and raw["replay_capacity"] == 16384 and raw["train_ratio"] == 0.
+
+
+def test_posterior_targets_change_only_the_optional_current_feature_head():
+    base = dict(seed=2017, video_encoder='joint', loss_scales=dict(reconstruction=0., future_prediction=.25))
+    mean, scale = np.ones(3, np.float32), np.full(3, .1, np.float32)
+    control = fit.learner_config(base, mean, scale, True)
+    candidate = fit.learner_config(base, mean, scale, True, True)
+    assert candidate.pop('reconstruction_target_standardization') == candidate['future_target_standardization']
+    assert control.pop('reconstruction_target_standardization') is None
+    assert candidate['loss_scales'].pop('reconstruction') == .25
+    assert control['loss_scales'].pop('reconstruction') == 0.
+    assert candidate == control and base['loss_scales']['reconstruction'] == 0.
+    with pytest.raises(ValueError, match='standardized future'):
+        fit.learner_config(base, mean, scale, False, True)
+
+
+def test_initial_comparison_allows_only_the_added_decoder_and_exact_shared_tensors(tmp_path):
+    left, right = tmp_path / 'left', tmp_path / 'right'
+    left.mkdir()
+    right.mkdir()
+    for group in ('world', 'behavior', 'slow_value'):
+        values = {'weight': np.array([1.], np.float32)}
+        save_file(values, left / f'{group}.safetensors')
+        if group == 'world':
+            values['world.decoder.trunk.weight'] = np.array([2.], np.float32)
+        save_file(values, right / f'{group}.safetensors')
+    assert fit.compare_initial(left, right)['world'] == dict(shared=1, added=1)
+    save_file({'weight': np.array([3.], np.float32)}, right / 'behavior.safetensors')
+    with pytest.raises(RuntimeError, match='initial control mismatch'):
+        fit.compare_initial(left, right)

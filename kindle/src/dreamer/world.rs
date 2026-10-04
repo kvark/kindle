@@ -3,8 +3,8 @@
 use meganeura::{Graph, graph::NodeId};
 
 use super::behavior;
-use super::config::DreamerConfig;
 use super::config::VideoEncoder;
+use super::config::{DreamerConfig, FeatureStandardization};
 use super::networks::{
     MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
     gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
@@ -36,33 +36,37 @@ pub const IMAGINATION_REWARD: usize = 3;
 pub const IMAGINATION_CONTINUATION: usize = 4;
 pub const IMAGINATION_VALUE: usize = 5;
 
-fn standardized_target(graph: &mut Graph, target: NodeId, config: &DreamerConfig) -> NodeId {
-    let Some(stats) = &config.future_target_standardization else {
+fn standardized_target(
+    graph: &mut Graph,
+    target: NodeId,
+    statistics: Option<&FeatureStandardization>,
+) -> NodeId {
+    let Some(stats) = statistics else {
         return target;
     };
-    let rows = graph.node(target).ty.shape.iter().product::<usize>() / config.observation_dim();
-    let target = graph.reshape(target, &[rows, config.observation_dim()]);
-    let negative_mean = graph.constant(
-        stats.mean.iter().map(|x| -x).collect(),
-        &[config.observation_dim()],
-    );
-    let inverse_scale = graph.constant(
-        stats.scale.iter().map(|x| x.recip()).collect(),
-        &[config.observation_dim()],
-    );
+    let width = stats.mean.len();
+    let rows = graph.node(target).ty.shape.iter().product::<usize>() / width;
+    let target = graph.reshape(target, &[rows, width]);
+    let negative_mean = graph.constant(stats.mean.iter().map(|x| -x).collect(), &[width]);
+    let inverse_scale = graph.constant(stats.scale.iter().map(|x| x.recip()).collect(), &[width]);
     let centered = graph.bias_add(target, negative_mean);
     graph.bias_mul(centered, inverse_scale)
 }
 
-fn raw_prediction(graph: &mut Graph, prediction: NodeId, config: &DreamerConfig) -> NodeId {
-    let Some(stats) = &config.future_target_standardization else {
+fn raw_prediction(
+    graph: &mut Graph,
+    prediction: NodeId,
+    statistics: Option<&FeatureStandardization>,
+) -> NodeId {
+    let Some(stats) = statistics else {
         return prediction;
     };
     let shape = graph.node(prediction).ty.shape.clone();
-    let rows = shape.iter().product::<usize>() / config.observation_dim();
-    let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
-    let scale = graph.constant(stats.scale.clone(), &[config.observation_dim()]);
-    let mean = graph.constant(stats.mean.clone(), &[config.observation_dim()]);
+    let width = stats.mean.len();
+    let rows = shape.iter().product::<usize>() / width;
+    let prediction = graph.reshape(prediction, &[rows, width]);
+    let scale = graph.constant(stats.scale.clone(), &[width]);
+    let mean = graph.constant(stats.mean.clone(), &[width]);
     let scaled = graph.bias_mul(prediction, scale);
     let raw = graph.bias_add(scaled, mean);
     graph.reshape(raw, &shape)
@@ -378,7 +382,11 @@ fn build_training_graph_grouped(
             let prediction = predictor.forward(&mut graph, deter, rows);
             let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
             let target = graph.stop_gradient(observation);
-            let target = standardized_target(&mut graph, target, config);
+            let target = standardized_target(
+                &mut graph,
+                target,
+                config.future_target_standardization.as_ref(),
+            );
             let negative_target = graph.neg(target);
             let residual = graph.add(prediction, negative_target);
             let squared = graph.mul(residual, residual);
@@ -395,7 +403,13 @@ fn build_training_graph_grouped(
         if let Some(decoder) = &model.decoder {
             let reconstruction = decoder.forward(&mut graph, state, rows);
             let reconstruction = graph.reshape(reconstruction, &[rows, config.observation_dim()]);
-            let negative_target = graph.neg(observation);
+            let target = graph.stop_gradient(observation);
+            let target = standardized_target(
+                &mut graph,
+                target,
+                config.reconstruction_target_standardization.as_ref(),
+            );
+            let negative_target = graph.neg(target);
             let residual = graph.add(reconstruction, negative_target);
             let squared = graph.mul(residual, residual);
             let reconstruction_loss = graph.sum_all(squared);
@@ -874,7 +888,11 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
         let deter = graph.input("deter", &[batch, size.deter]);
         graph.input("stoch", &[batch * size.stoch, size.classes]);
         let observation = predictor.forward(&mut graph, deter, batch);
-        let observation = raw_prediction(&mut graph, observation, config);
+        let observation = raw_prediction(
+            &mut graph,
+            observation,
+            config.future_target_standardization.as_ref(),
+        );
         graph.set_outputs(vec![observation]);
         return graph;
     }
@@ -888,6 +906,11 @@ pub fn build_observation_prediction_graph(config: &DreamerConfig, batch: usize) 
     let stoch = graph.input("stoch", &[batch * size.stoch, size.classes]);
     let state = feature(&mut graph, deter, stoch, batch, config);
     let observation = decoder.forward(&mut graph, state, batch);
+    let observation = raw_prediction(
+        &mut graph,
+        observation,
+        config.reconstruction_target_standardization.as_ref(),
+    );
     graph.set_outputs(vec![observation]);
     graph
 }
@@ -904,8 +927,8 @@ mod tests {
         let config = DreamerConfig::tiny(3);
         let mut graph = Graph::new();
         let x = graph.input("x", &[2, config.observation_dim()]);
-        assert_eq!(standardized_target(&mut graph, x, &config), x);
-        assert_eq!(raw_prediction(&mut graph, x, &config), x);
+        assert_eq!(standardized_target(&mut graph, x, None), x);
+        assert_eq!(raw_prediction(&mut graph, x, None), x);
     }
 
     #[test]
@@ -924,13 +947,17 @@ mod tests {
         let p = graph.parameter("prediction", &[2, width]);
         let target = graph.input("target", &[2, width]);
         let target = graph.stop_gradient(target);
-        let normalized = standardized_target(&mut graph, target, &config);
+        let normalized = standardized_target(
+            &mut graph,
+            target,
+            config.future_target_standardization.as_ref(),
+        );
         let neg = graph.neg(normalized);
         let delta = graph.add(p, neg);
         let square = graph.mul(delta, delta);
         let loss = graph.sum_all(square);
         let loss = graph.scale(loss, 0.5);
-        let raw = raw_prediction(&mut graph, p, &config);
+        let raw = raw_prediction(&mut graph, p, config.future_target_standardization.as_ref());
         graph.set_outputs(vec![loss, normalized, raw]);
         let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
         assert_eq!(

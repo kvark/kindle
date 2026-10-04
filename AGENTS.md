@@ -156,9 +156,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   All252 saved tensors/model stay frozen, h1 causal alignment is exact, all
   guards/seals and1,051 Python/108 Rust CPU tests pass; CI272 passes `ed61028`.
   See `docs/results/2026-10-04-rssm-belief-probes.md`. No job remains active.
-  Next proposed, not launched: one saved-corpus ablation predicting normalized
+  **Current authorized follow-up:** one saved-corpus ablation predicting normalized
   current Tiny features from the full posterior alongside future prediction,
-  no RGB reconstruction or extra gameplay. No unchanged RL queue,
+  no RGB reconstruction or extra gameplay. Three fresh candidates reuse the
+  three standardized controls; coefficient .25, 2,048 updates per seed, then
+  frozen readouts. Exact shared initialization and unchanged-path qualification
+  precede learning. See `docs/experiments/2026-10-04-posterior-latent-targets.md`.
+  No unchanged RL queue,
   representation matrix or Phase3 starts automatically. Keep RGB/default ac_grads=false;
   target standardization stays opt-in. Its centering/scaling also changes loss
   weighting; do not call it an identical-objective speedup or online JEPA win.
