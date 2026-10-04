@@ -92,6 +92,11 @@ adding normalized current-Tiny prediction from the full posterior alongside
 future prediction: three candidates, coefficient .25 and2,048 updates each,
 reusing all three standardized controls. Qualify gradients/shared initial
 tensors and the unchanged control before learning; then repeat frozen readouts.
+The [implementation/qualification report](results/2026-10-04-posterior-latent-qualification.md)
+records passing CPU checks but a stopped native canary: a new allocation
+warning at05:35:17 UTC, no completed numerical check or learner update.
+No Xid/hang is recorded. Native work remains stopped pending approval/review
+of a bounded initialization-only diagnostic; the three candidates are unstarted.
 No RGB reconstruction, fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

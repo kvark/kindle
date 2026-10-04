@@ -31,6 +31,10 @@ Stage-fitted heads recover vertical information missed by transferred heads;
 some action signal survives, but forecasts still lose to persistence. All three
 frozen replays and24 GPU readouts complete in6m39s, with no actor updates or
 new gameplay. No GPU queue remains active.
+The authorized [posterior-target ablation](2026-10-04-posterior-latent-targets.md)
+is implemented, but its [native qualification](../results/2026-10-04-posterior-latent-qualification.md)
+stopped on a new allocation warning before learning. CPU checks pass; no new
+learning result is available, and GPU work remains stopped pending review.
 The known shader VUID is non-blocking by user direction, not silently removed
 from the evidence.
 

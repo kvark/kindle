@@ -162,6 +162,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   three standardized controls; coefficient .25, 2,048 updates per seed, then
   frozen readouts. Exact shared initialization and unchanged-path qualification
   precede learning. See `docs/experiments/2026-10-04-posterior-latent-targets.md`.
+  Implementation `e34ac5d` passes109 Rust CPU/1,053 Python tests and strict
+  Clippy. Native qualification stopped: corrected RTX launch records a new
+  allocation warning at05:35:17 UTC; no numerical result, training or gameplay.
+  No recorded Xid/hang/OOM-kill, child reaped. The first attempt's missing
+  device override selected AMD and hit the device assertion. Both failures
+  are retained. See `docs/results/2026-10-04-posterior-latent-qualification.md`.
+  Native work is stopped; a bounded initialization-only diagnostic is awaiting
+  user approval. Do not automatically whitelist the warning or retry.
   No unchanged RL queue,
   representation matrix or Phase3 starts automatically. Keep RGB/default ac_grads=false;
   target standardization stays opt-in. Its centering/scaling also changes loss
