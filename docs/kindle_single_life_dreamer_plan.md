@@ -105,6 +105,20 @@ queue or spend more days establishing the RGB baseline.
 The planned exploration experiment, now reconsidered before resuming the matrix, is
 **unassisted Freeway**:
 
+- **Mechanism recommendation, not implemented or launched:** small
+  action-conditioned latent-disagreement heads, inspired by
+  [Plan2Explore](https://proceedings.mlr.press/v119/sekar20a.html). Reward
+  uncertainty during imagined rollouts, with detached predictor inputs/targets,
+  one existing actor and no second pixel encoder. This would be a small
+  adaptation, not a reproduction of Plan2Explore's separate exploration actor.
+  The [reference implementation](https://github.com/danijar/dreamerv2/blob/main/dreamerv2/expl.py)
+  computes its bonus from current ensemble predictions during imagination.
+  Compute the current bonus for replay-value targets too; do not train one
+  critic against incompatible imagined and cached-replay reward definitions.
+  This is a research change requiring a new declaration, not a switch already
+  supported by the vector actor: the existing visitation bonus is CPU-only and
+  explicitly rejected by GPU collection. Keep it disabled. Do not substitute
+  raw CDP prediction error, a feature-readback workaround or scripted UP.
 - Control: extrinsic-only CDP. Candidate: the same CDP agent plus **one**
   GPU-compatible intrinsic reward mechanism, kept in a separate reward channel.
 - Use learner seeds 1009/2017/3019 and independent per-stream histories. No
@@ -119,6 +133,15 @@ The planned exploration experiment, now reconsidered before resuming the matrix,
   time, seed variation, update cost and learner debt. Intrinsic return is never
   the game-performance metric. Evaluate predeclared frozen policies without
   updates and retain whole rollout videos, not selected successful episodes.
+
+Before allocating six full200k-action runs, propose a32,768-action/8,135-update
+screen per arm/seed using the same N8 small recipe, with reward discovery and
+nonzero advantages as diagnostics. Qualify reset-safe action/target alignment,
+detached gradients, zero-coefficient baseline equivalence, repeat-versus-novel
+state behavior and whole-update overhead first. A completed screen is a decision
+point, not an automatic extension or a mastery claim. The alternative immediate
+next step is the unchanged three-method Boxing comparison, keeping exploration
+implementation separate. Resolve that research order before launching either.
 
 Six learning runs are the initial comparison design, **not launched by this
 documentation change**. The Seaquest CDP runs average 25m22s/seed; that is a
