@@ -271,6 +271,22 @@ def test_match_replay_binding_and_partial_tail_checks(tmp_path):
     campaign.check_match_replay(evaluation, replay)
 
 
+def test_match_replay_supports_explicit_native_pixels_and_sticky_actions(tmp_path):
+    evaluation, replay = match_replay_fixture(tmp_path)
+    evaluation['start'].update(observation_size='native', sticky_actions=.25)
+    replay['source_header'] = copy.deepcopy(evaluation['start'])
+    replay['protocol'] = 'kindle-atari-task-replay-v3'
+    path = Path(replay['source_manifest'])
+    manifest = json.loads(path.read_text())
+    manifest.update(observation_size='native', sticky_actions=.25)
+    path.write_text(json.dumps(manifest))
+    replay['source_manifest_sha256'] = campaign.sha256(path)
+    campaign.check_match_replay(evaluation, replay)
+    replay['protocol'] = 'kindle-atari-task-replay-v1'
+    with pytest.raises(ValueError, match='source differs'):
+        campaign.check_match_replay(evaluation, replay)
+
+
 @pytest.mark.parametrize('mutation, message', [
     (lambda replay: replay.update(source_log_sha256='wrong'), 'source differs'),
     (lambda replay: replay['source_header'].update(seed=0), 'source differs'),

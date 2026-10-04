@@ -130,7 +130,7 @@ def verify_run_declaration(declaration, row, training, evaluation):
 def check_match_replay(evaluation, replay):
     """Bind a completed match replay; task check_replay is deliberately task-only."""
     header = evaluation['start']
-    require(replay['protocol'] == 'kindle-atari-task-replay-v1'
+    require(replay['protocol'] == replay_atari.replay_protocol(header)
             and replay['source_log_sha256'] == evaluation['sha256']
             and Path(replay['source_log']).resolve() == Path(evaluation['path']).resolve()
             and replay['source_header'] == header

@@ -125,3 +125,15 @@ Resume in fresh `runs/cdp-atari-learning-20261004.XLgCAlkq/`, preserving the
 failed initialization and two excluded smokes above. Learning/evaluation
 budgets, methods, seeds, native library and acting code are unchanged. Successful
 stages can advance after the existing CPU audits; failed stages stop for review.
+
+`run_atari_comparison.py` executes the declared45 pairs in that order. Its
+explicit `--first-training-service` handoff waits for the already-running
+Freeway CDP1009 service to finish, then requires its full training audit; it
+does not restore/resume training or run another GPU job concurrently. Each
+subsequent stage is train -> audit -> frozen evaluation -> whole-stream video/
+exact replay -> full pair audit. Only successful audited pairs advance. Failed
+stages stop the controller with a retained result and no retry. Per-game
+boundaries emit aggregate JSON/curves; partial individual pairs remain available.
+The controller has a48-hour overall deadline, with the original60/30-minute
+native deadlines unchanged. CPU analysis/replay uses one CPU, a2GiB address-space
+limit and inherited zero swap. No local compilation or native/acting-code change.

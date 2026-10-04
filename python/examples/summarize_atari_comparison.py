@@ -84,7 +84,7 @@ def cohort(episodes, streams=8, target=3):
                 natural=episode_summary(natural), truncated=episode_summary(truncated))
 
 
-def pair(root, game, method, seed):
+def pair(root, game, method, seed, *, require_replay=False):
     result = training(root, game, method, seed)
     name = result['name']
     evaluation_name = f'{name}-frozen'
@@ -110,6 +110,19 @@ def pair(root, game, method, seed):
     frozen['cohort'] = cohort(frozen['episodes'])
     require(frozen['cohort']['complete'] == frozen['accounting']['budget_complete'], 'cohort status differs')
     frozen['guard'] = checked_guard
+    if require_replay:
+        import replay_atari
+        from audit_atari_campaign import check_match_replay
+        from audit_atari_tasks import check_replay
+        replay_atari.gym.register_envs(replay_atari.ale_py)
+        path = root / f'{evaluation_name}-replay.json'
+        replay = json.loads(path.read_text())
+        (check_match_replay if game in ('Boxing', 'Pong') else check_replay)(frozen, replay)
+        video = replay['video']
+        require(video is not None and video['stream'] == 0 and video['fps'] == 60
+                and video['frames'] == frozen['end']['executed_action_frames'][0]
+                and sha256_file(video['path']) == video['sha256'], 'missing or changed whole-stream video')
+        frozen['replay'] = dict(path=str(path), sha256=sha256_file(path), video=video)
     result['evaluation'] = frozen
     return result
 
@@ -160,13 +173,17 @@ def main():
     parser.add_argument('--method', choices=METHODS)
     parser.add_argument('--seed', type=int, choices=SEEDS)
     parser.add_argument('--training-only', action='store_true')
+    parser.add_argument('--require-replay', action='store_true')
     parser.add_argument('--plot', type=Path)
     args = parser.parse_args()
     selection = (args.game, args.method, args.seed)
     if any(v is not None for v in selection):
         if not all(v is not None for v in selection) or args.plot:
             parser.error('a single-run audit needs game, method and seed, without plot')
-        result = (training if args.training_only else pair)(args.root, *selection)
+        if args.training_only and args.require_replay:
+            parser.error('replay is a frozen-evaluation audit')
+        result = (training(args.root, *selection) if args.training_only else
+                  pair(args.root, *selection, require_replay=args.require_replay))
     else:
         if args.training_only:
             parser.error('training-only needs a single run')
@@ -177,7 +194,7 @@ def main():
                     name = run_name(game, method, seed) + '-frozen'
                     if not (args.root / f'{name}-queue' / name / 'result.json').exists():
                         continue
-                    row = pair(args.root, game, method, seed)
+                    row = pair(args.root, game, method, seed, require_replay=args.require_replay)
                     require(shared is None or shared == row['shared_recipe'], 'changed shared recipe')
                     shared = row['shared_recipe']
                     pairs.append(row)
