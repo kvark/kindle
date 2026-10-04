@@ -89,9 +89,8 @@ def score_matches(environment, episodes):
                 mastery_passed=passed, reliability_assessed=False)
 
 
-def read_run(path):
+def read_run(path, *, allow_capped_evaluation=False):
     accounting = audit(path)
-    require(accounting['budget_complete'], 'incomplete declared run budget')
     episodes = []
     checkpoint = None
     with Path(path).open() as source:
@@ -106,6 +105,10 @@ def read_run(path):
                 require(all(pair[1] == 0 for pair in event['stored_rewards']),
                         'intrinsic reward in extrinsic-only experiment')
             end = event
+    capped = (allow_capped_evaluation and start['protocol'] == EPISODE_EVALUATION_PROTOCOL
+              and start['mode'] in ('evaluate_sample', 'evaluate_greedy')
+              and end['reason'] == 'action_cap_reached' and accounting['updates'] == 0)
+    require(accounting['budget_complete'] or capped, 'incomplete declared run budget')
     require(start['config']['extrinsic_reward_scale'] == 1
             and start['config']['intrinsic_reward_scale'] == 0
             and not start['config']['visitation_bonus'], 'changed reward recipe')

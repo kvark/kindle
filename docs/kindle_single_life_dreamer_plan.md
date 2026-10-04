@@ -88,7 +88,8 @@ use fresh matched controls, not the old aided/non-sticky/large-model results.
 learning from sparse rewards, not to reopen the unchanged five-game mastery
 queue or spend more days establishing the RGB baseline.
 
-The first planned comparison is **unassisted Freeway**:
+After the five-game comparison, the planned exploration experiment is
+**unassisted Freeway**:
 
 - Control: extrinsic-only CDP. Candidate: the same CDP agent plus **one**
   GPU-compatible intrinsic reward mechanism, kept in a separate reward channel.
@@ -122,9 +123,10 @@ A negative result identifies the next limitation; it does not authorize a
 bigger queue. Investigate exploration, reward prediction, dynamics or capacity
 according to the observed failure rather than changing all of them together.
 
-A broader, predeclared Atari panel can then assess learning breadth and
-stability. Breakout and sticky Pong remain useful diagnostic checks, not
-perpetual release gates. Strong learning on many games is the ambition; neither
+Use the five-game comparison above to assess learning breadth and stability,
+without repeating it unchanged. Breakout and sticky Pong remain useful
+diagnostic checks, not perpetual release gates. Strong learning on many games
+is the ambition; neither
 a simple-looking game nor the name Dreamer guarantees mastery at 200k actions.
 Separate per-game training measures algorithm breadth, not one transferable
 multi-game policy.
@@ -183,9 +185,11 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-The Seaquest row is the current CDP development result. The other five rows are
-historical recipes, **not CDP results**. Their original gates remain unchanged
-for interpreting those claims; they are not the current work queue. Videos are
+The Seaquest row is the completed CDP development result. The other five rows
+below retain historical recipes, **not CDP results**. Fresh small CDP/RGB/Tiny
+training and frozen evaluation on those five games is now the active comparison;
+see the PR for progress. Historical gates remain unchanged for interpreting
+old claims, not as exit gates for this study. Videos are
 whole stream-zero evaluations with tails, while full multi-stream cohorts
 determine the result. Links into `runs/` require this workspace; committed
 [results](experiments/README.md) are the public summaries.
@@ -277,8 +281,9 @@ negative results; do not select only successful trajectories.
   Natural game deaths/respawns are allowed; cloning/rewinding a live game for
   training is not. Full-lifetime recovery remains later work.
 
-The current roadmap revision changes documentation and direction only. It does
-not launch training, alter CLI defaults, merge a PR or requalify old artifacts.
+The initial CDP roadmap adoption was documentation-only. The user's subsequent
+five-game comparison goal authorizes the separately declared training/evaluation.
+CLI defaults remain unchanged; old artifacts retain their original scope.
 
 Core implementation: [agent](../kindle/src/dreamer/agent.rs),
 [vector collection](../kindle/src/dreamer/agent/vector.rs),

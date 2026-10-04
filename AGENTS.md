@@ -23,7 +23,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Dreamer agent. No frozen Tiny/DINO/Large requirement or RGB visualization
   decoder. RGB remains the reference/fallback; LeVJEPA is a later video/3D
   hypothesis, not an obligation for 2D.
-- **Next is Atari learning/exploration with CDP (Phase 3).** Plan unassisted
+- **After the active comparison: exploration/reward with CDP (Phase 3).** Plan unassisted
   Freeway: extrinsic-only CDP versus one GPU-compatible intrinsic mechanism,
   three learner seeds 1009/2017/3019. Start planning at 200k actual aggregate
   actions/seed on Size1M/N8/B8/T16/H15/R32/microbatch 8/replay 100000, sticky 0.25,

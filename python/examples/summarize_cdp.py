@@ -11,18 +11,19 @@ from safetensors import safe_open
 from atari import sha256_file
 from kindle._screening import mean_ci, summarize_curves
 from kindle._vector_audit import audit
-from summarize_representation_learning import SEEDS, plot_svg, read_run
+from summarize_representation_learning import SEEDS, TINY_CHECKPOINTS, plot_svg, read_run
 
 
-def recipe(header, method, *, budget=200000):
-    expected = dict(environment='ALE/Seaquest-v5', num_envs=8, steps=budget, full_action_space=True,
+def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5'):
+    expected = dict(environment=environment, num_envs=8, steps=budget, full_action_space=True,
                     sticky_actions=.25, action_repeat=4, noop_max=0, max_episode_frames=100000,
                     mode='train', observation_size='native', starting_environment_step=0,
                     starting_learner_step=0, restored_checkpoint=None)
     if any(header.get(k) != v for k, v in expected.items()) or header.get('exploration'):
-        raise ValueError('not the declared fresh Seaquest run')
+        raise ValueError('not the declared fresh Atari run')
     c = header['config']
-    common = dict(model_size='size1_m', observation_kind='rgb64', video_encoder=None, action_count=18,
+    tiny = method == 'pretrained_tiny'
+    common = dict(model_size='size1_m', observation_kind='features' if tiny else 'rgb64', video_encoder=None, action_count=18,
                   batch_size=8, batch_length=16, world_backprop_length=16, world_microbatch_size=8,
                   replay_context=1, replay_capacity=100000, train_ratio=32., imagination_length=15,
                   learning_rate=4e-5, learning_rate_warmup=1000, agc=.3, actor_unimix=0,
@@ -30,23 +31,30 @@ def recipe(header, method, *, budget=200000):
                   extrinsic_reward_scale=1, visitation_bonus=False)
     if any(c.get(k) != v for k, v in common.items()):
         raise ValueError('changed common learner recipe')
-    if method not in ('rgb', 'cdp'):
+    if method not in ('rgb', 'cdp', 'pretrained_tiny'):
         raise ValueError('unknown arm')
     cdp = method == 'cdp'
     if (c['encoder_learning_rate'] != (6e-6 if cdp else None)
             or c['dynamics_learning_rate'] != (4e-4 if cdp else None)
-            or c['loss_scales']['future_prediction'] != (500 if cdp else 0)
-            or c['loss_scales']['reconstruction'] != (0 if cdp else 1)):
-        raise ValueError('CDP/RGB label disagrees with objective or rates')
+            or c['loss_scales']['future_prediction'] != (500 if cdp else .25 if tiny else 0)
+            or c['loss_scales']['reconstruction'] != (0 if cdp or tiny else 1)):
+        raise ValueError('frontend label disagrees with objective or rates')
+    perception = header['model_provenance'].get('perception')
+    if tiny:
+        if (not perception or perception.get('kind') != 'levjepa-tiny'
+                or perception.get('checkpoint_sha256') != TINY_CHECKPOINTS['pretrained_tiny']
+                or header.get('learned_rgb_preprocessing') is not None):
+            raise ValueError('not the declared frozen pretrained Tiny')
+    elif perception is not None or not header.get('learned_rgb_preprocessing'):
+        raise ValueError('not the jointly learned CNN')
     if header['environment_seeds'] != [(header['seed'] + i * 1000003) % 2**32 for i in range(8)]:
         raise ValueError('changed environment seeds')
-    shared = {k: v for k, v in c.items() if k not in ('seed', 'encoder_learning_rate', 'dynamics_learning_rate', 'loss_scales')}
+    shared = {k: v for k, v in c.items() if k not in ('seed', 'observation_kind', 'encoder_learning_rate', 'dynamics_learning_rate', 'loss_scales')}
     shared['loss_scales'] = {k: v for k, v in c['loss_scales'].items() if k not in ('reconstruction', 'future_prediction')}
     shared['native_sha256'] = header['native_extension_sha256']
     shared['wrapper_sha256'] = header['wrapper_sha256']
     shared['runner_sha256'] = header['runner_sha256']
-    shared['preprocessing'] = header['learned_rgb_preprocessing']
-    shared['provenance'] = {k: v for k, v in header['model_provenance'].items() if k != 'future_head_revision'}
+    shared['provenance'] = {k: v for k, v in header['model_provenance'].items() if k not in ('future_head_revision', 'perception')}
     return shared
 
 

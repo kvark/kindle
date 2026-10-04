@@ -81,6 +81,13 @@ Retain complete stream-zero videos by exact CPU environment replay after GPU
 evaluation; recording is not a GPU throughput measurement. Audit real actions,
 rewards, boundaries, resets, frame counts, source identities and zero updates.
 
+`summarize_atari_comparison.py ROOT --game GAME --method METHOD --seed SEED
+--training-only --output PATH` audits the training result; omit `--training-only`
+for its frozen pair. With no game/method/seed, it aggregates finished pairs and
+optionally writes `--plot PATH`. It launches no GPU work. Capped frozen replays
+require explicit `replay_atari.py --allow-capped-evaluation`; their incomplete
+cohort status remains unchanged. Summaries resample learner seeds, not episodes.
+
 Report all attempts and failures. The older ten-run cap applied
 to upstream replication, not an implicit limit on this newly requested study.
 No upstream/JAX replication, exploration experiment or swarm is added here.
@@ -92,6 +99,10 @@ zero updates with all241 saved tensors unchanged. Both ordinary guards/seals,
 counter ledgers and checkpoint-finiteness checks pass; no new kernel warning.
 The2,048 extra diagnostic actions are excluded from learning/evaluation results.
 All1,093 CPU Python tests pass, including complete and capped frozen exports.
+The subsequent completion-audit/replay tooling passes1,104 tests. Its first test
+run exposed eight old CLI test stubs that did not accept the new explicit capped
+evaluation keyword; updating those stubs resolves the failures. No native code,
+learner math, training budget or GPU qualification changed.
 
 Before the study the local disk had1.1GB free. Approved cleanup removed only
 the two git-ignored Rust incremental-build caches under target/debug and

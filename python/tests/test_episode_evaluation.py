@@ -181,6 +181,7 @@ def test_runner_stops_at_first_settled_target_or_cap(frozen_run, target, cap, ex
     else:
         with pytest.raises(ValueError, match='incomplete declared run budget'):
             audit_atari.read_run(path)
+        assert audit_atari.read_run(path, allow_capped_evaluation=True)['accounting'] == result
 
 
 def test_interrupt_does_not_complete_episode_budget(frozen_run):
@@ -188,6 +189,8 @@ def test_interrupt_does_not_complete_episode_budget(frozen_run):
     result = audit(path)
     assert rows[-1]['reason'] == 'interrupted'
     assert result['actions'] == 2 and not result['budget_complete']
+    with pytest.raises(ValueError, match='incomplete declared run budget'):
+        audit_atari.read_run(path, allow_capped_evaluation=True)
 
 
 @pytest.mark.parametrize('cap', [10, 100])
