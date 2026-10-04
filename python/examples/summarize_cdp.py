@@ -145,6 +145,16 @@ def audit_trace(data, steps, *, deter=512):
     return error
 
 
+def matched_privileged_control(data, predictions):
+    from probe_cdp import report
+    visible = np.isfinite(data['current_positions']).all(1)
+    targets = {key: data[key][visible] for key in ('labels', 'seeds')}
+    values = {key: report(prediction[visible], targets) for key, prediction in predictions.items()}
+    values['position_persistence'] = report(data['current_positions'][visible], targets)
+    return dict(cohort='same origins with visible current player; future missingness remains masked',
+                origin_count=int(visible.sum()), readouts=values)
+
+
 def summarize_probes(root):
     import random
     from probe_cdp import (PROTOCOL, SPLITS, ACTION_SEED_XOR, HEAD_SEED, assert_frozen_tensors,
@@ -211,16 +221,50 @@ def summarize_probes(root):
                     for key in head['readouts']:
                         if report(saved[key], test) != head['readouts'][key]:
                             raise ValueError('saved readout predictions disagree with reported scores')
+                    if head['horizon']:
+                        # Raw coordinate persistence excludes missing current
+                        # positions; compare fitted heads on that SAME subset.
+                        head['matched_privileged_control'] = matched_privileged_control(test,
+                            {key: saved[key] for key in ('fitted', 'unrelated_actions', 'posterior_persistence')})
                 if head['stage'] == 'cnn':
                     train_mean = train['x'].mean(0, dtype=np.float64)
                 if head['horizon'] and forecast_report(test, train_mean) != head['forecasts']:
                     raise ValueError('saved causal forecasts disagree with reported scores')
             results.append(result)
-    return dict(status='complete', models=results, matching_trace_count=len(identities),
+    aggregate = {}
+    for method in ('rgb', 'cdp'):
+        models = [r for r in results if r['method'] == method]
+        heads = []
+        for i in range(4):
+            rows = [r['heads'][i] for r in models]
+            row = dict(stage=rows[0]['stage'], horizon=rows[0]['horizon'],
+                       fitted_r2={axis: mean_ci([r['readouts']['fitted']['all'][axis]['r2'] for r in rows])
+                                  for axis in ('player_x', 'player_y')})
+            if row['horizon']:
+                row['rmse_ratios'] = {control: {axis: mean_ci([
+                    r['readouts']['fitted']['all'][axis]['rmse'] / r['readouts'][control]['all'][axis]['rmse']
+                    for r in rows]) for axis in ('player_x', 'player_y')}
+                    for control in ('unrelated_actions', 'posterior_persistence')}
+                row['privileged_rmse_ratio'] = {axis: mean_ci([
+                    r['matched_privileged_control']['readouts']['fitted']['all'][axis]['rmse'] /
+                    r['matched_privileged_control']['readouts']['position_persistence']['all'][axis]['rmse']
+                    for r in rows]) for axis in ('player_x', 'player_y')}
+                row['forecast_event_counts'] = {key: rows[0]['forecasts']['all'][key]
+                                                for key in ('count', 'positive_rewards', 'terminals')}
+                row['reward_mae_ratio_to_zero'] = mean_ci([
+                    r['forecasts']['all']['reward']['prior']['mae'] / r['forecasts']['all']['reward']['zero']['mae'] for r in rows])
+                if method == 'cdp':
+                    row['cosine_ratios'] = {control: mean_ci([
+                        r['forecasts']['all']['cosine_distance']['prior'] / r['forecasts']['all']['cosine_distance'][control]
+                        for r in rows]) for control in ('persistence', 'training_mean', 'unrelated_actions')}
+            heads.append(row)
+        aggregate[method] = dict(heads=heads, test_effective_rank=mean_ci([
+            r['representation_spread']['test']['effective_rank'] for r in models]))
+    return dict(status='complete', models=results, aggregate=aggregate, matching_trace_count=len(identities),
                 new_game_actions=sum(r['new_game_actions'] for r in results), actor_updates=0,
                 independent_audits=['tensor bytes', 'action/reset accounting', 'split/frame/trace identities',
                                     'h1 causal alignment', 'training-only normalization', 'validation selection',
-                                    'saved readout/forecast metrics'])
+                                    'saved readout/forecast metrics', 'matched visibility cohort for privileged persistence'])
 
 
 def main():

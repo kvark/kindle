@@ -7,11 +7,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October4 current user goal: evaluate the CDP path.** The bounded
+- **October4 CDP evaluation complete.** The bounded
   [CDP comparison](docs/experiments/2026-10-04-cdp.md) supersedes the unstarted
-  posterior-Tiny ablation. Keep RGB as the default. Qualify a small learned-CNN
-  CDP predictor/cosine loss and split learning rates, then six fresh Seaquest
-  runs (three paired seeds,200k actions/arm) and frozen state/forecast probes.
+  posterior-Tiny ablation. RGB remains the default. The small learned-CNN
+  CDP predictor/cosine loss and split learning rates are qualified; six fresh
+  Seaquest runs (three paired seeds,200k actions/arm) and frozen probes complete.
   No Tiny pretraining, detached visualization decoder, posterior auxiliary
   head, new representation matrix or automatic Phase3 campaign. Published
   Crafter/XL evidence is not small-Atari or wall-clock evidence.
@@ -34,10 +34,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass. No frozen competence claim. Both short frozen-collector smokes pass;
   their initial09:53 allocation-warning stop is retained. The existing bounded
   numerical permission covered the remaining short checks, not full probes.
-  **Frozen diagnostics active:** `kindle-cdp-frozen-probes-20261004.service`,
-  six models,32,768 random actions and four readouts/model, zero actor updates.
-  Ordinary guards, no warning allowance/retry. Review before an architecture
-  decision; no extra learning campaign. [Results](docs/results/2026-10-04-cdp-learning.md).
+  **Frozen diagnostics complete:**196,608 additional random actions,24 GPU
+  readouts, all1,626 saved tensors unchanged and zero actor updates. All ordinary
+  guards/seals and independent audits pass, with no new warnings. Posterior
+  player-x R² is.864 CDP versus.113 RGB; h15 latent cosine error is.580x
+  persistence,.615x constant mean and.616x unrelated actions. One-step persistence,
+  zero-reward MAE and matched privileged coordinate persistence still win.
+  **Recommend CDP for the next small 2D experiment, retaining RGB as control.**
+  CLI default remains learned RGB; `--cdp` opts in. This is a learned Dreamer
+  CNN, not LeVJEPA/DINO or video pretraining. All services have exited; no new
+  campaign starts automatically. Next is separately declared exploration/reward
+  versus extrinsic-only CDP, not more representation sweeps or old queues.
+  [Results](docs/results/2026-10-04-cdp-learning.md).
   [Evidence](docs/results/2026-10-04-cdp-qualification.md).
 
 - The September 27 user direction adopts `docs/strategy_reset_plan.md`:

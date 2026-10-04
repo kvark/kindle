@@ -7,9 +7,14 @@ October 4, 2026. [Protocol](../experiments/2026-10-04-cdp.md) ·
 **All three paired Seaquest seeds favor CDP.** Its final online score is70.9%
 higher, with13.6% less wall time and35.9% less world-training time. This supports
 the small CDP candidate on this development screen, not Atari-wide superiority,
-frozen competence or the published Crafter/XL result. The declared frozen
-state/forecast diagnostics are still running; the architecture decision follows
-their review. Learned RGB remains the default for now.
+frozen competence or the published Crafter/XL result. All declared frozen
+state/forecast diagnostics and independent audits are complete.
+
+**Recommendation: use CDP for the next small 2D experiment, retaining RGB as
+the control.** It combines Dreamer's imagined policy learning with task-adaptive
+latent prediction, without an RGB decoder or a large frozen encoder. The CLI
+default remains learned RGB; CDP is explicitly selected with `--cdp`. This
+recommendation does not start a new campaign or establish the video/3D case.
 
 ## Learning and cost
 
@@ -34,7 +39,10 @@ stream tails remain in the JSON/raw logs. No selected seed or episode was remove
 ![Three-seed online learning versus actual actions and wall time](2026-10-04-cdp-learning.svg)
 
 CDP uses86.35% of paired RGB run time [85.85%,86.87%], or about1.16x throughput.
-Construction adds5.35s RGB /5.30s CDP, separately from these run times. The smaller
+Construction adds5.35s RGB /5.30s CDP, separately from these run times. This
+recipe sustains7.52–7.61x aggregate real time for RGB and8.74–8.76x for CDP;
+with eight streams, that is.940–.952x and1.093–1.096x per stream respectively.
+These include scheduled training and are not GPU utilization measurements. The
 world objective does not remove other costs: imagined behavior still takes
 about14.1ms/update, roughly half of CDP's update time. This is a changed-learning
 comparison, not a pure unchanged-objective kernel speedup.
@@ -66,12 +74,60 @@ all250 CDP /292 RGB saved tensors unchanged, three matching real frame/transitio
 traces and exact h1 deterministic-prior alignment. These768 actions are excluded
 diagnostic experience, not online training or competence evidence.
 
-The six full frozen jobs use ordinary guards, with no allocation-warning
-exception:32,768 random actions/model, fixed trajectory splits and four GPU
-readouts/model. Their results and independent saved-array audits are pending.
-Current/predicted player coordinates, action controls, persistence, reward
-events and latent spread address different questions; none alone proves a
-complete or useful game-state model. No bullet/readable-full-state claim is made.
+All six full frozen jobs pass ordinary guards and seals, without a warning
+exception or new allocation warning. They collect196,608 additional diagnostic
+actions: eight fixed random trajectories replayed across six models, not six
+independent datasets. All1,626 saved model/optimizer tensors remain unchanged;
+actor updates are zero. The24 GPU readouts each train for2,048 updates with
+training-only normalization and validation-only selection. These49,152 updates
+train diagnostic heads, not the actor/world model. Full probes take9m31s including
+guards, with minimum sampled estimated headroom13,838,581,760 bytes.
+
+### Readable state and causal forecasts
+
+Held-out player-position R², averaged over three independently trained actors:
+
+| Representation | RGB x / y | CDP x / y |
+| --- | ---: | ---: |
+| Current CNN | .771 / .885 | .874 / .919 |
+| Current full posterior | .113 / .722 | .864 / .859 |
+| One-step full prior | −.080 / .596 | .772 / .748 |
+| Fifteen-step full prior | −.096 / .398 | .671 / .689 |
+
+The largest readability gain is inside the RSSM. Readout quality does not prove
+information is absent from RGB: generalization still limits the fitted heads
+(CDP h15 x training R² is about.99 versus.67 held out). Posterior estimates are
+not forecasts. Test encoder effective rank is24.27 for CDP versus9.17 for RGB,
+with nonzero spread in every seed; rank alone is not representation quality.
+
+CDP's15-step embedding cosine error is **.580x persistence, .615x the constant
+training mean and .616x unrelated actions**. One-step prediction still loses
+to persistence (1.546x). Ratios are means of per-model ratios, not ratios of
+pooled errors; per-seed values and bootstrap intervals are in the JSON.
+
+At15 steps, fitted CDP player-position RMSE is .692x/.771x unrelated actions
+for x/y. Against persistence through the learned posterior readout it is
+.917x/.956x: x improves in all three seeds, y in only two, with y's interval
+crossing1. Both methods lose to one-step posterior persistence.
+Against **privileged coordinate persistence on the same current-player-visible
+origins**, CDP's15-step ratios are1.082x/1.297x: it loses on both coordinates.
+This last matched-visibility comparison is post-hoc CPU analysis of saved
+predictions, without refitting or test-based selection. The original raw
+coordinate-persistence report excludes missing current labels; its cohort
+must not be compared directly with all-origin fitted metrics.
+
+Reward MAE still loses to predicting zero: CDP/zero is1.354x at h1 and1.647x at
+h15. Some reward-ranking signal remains, but favorable action-conditioned reward
+prediction is not consistent. Forecast samples contain only7 positive reward
+endpoints/768 at h1 and4/749 at h15, with one terminal endpoint at each horizon.
+The three complete held-out traces contain95 positive reward transitions and
+21 terminals; replaying them across models does not multiply independent events.
+There are no bullet labels, full-game-state sufficiency or imagined-RGB claims.
+
+Independent audits pass tensor bytes, action/reset accounting, split/frame/trace
+identity, exact h1 causal alignment, training-only normalization, validation
+selection and recomputation of saved readout/forecast metrics. All learning,
+probe and audit services have exited successfully; no GPU work remains active.
 
 ## Reproducibility and limits
 
@@ -84,8 +140,20 @@ trajectory equivalence. Historical Phase2 RGB/Tiny runs are not reused controls
 for this changed backend. The authors' Crafter/XL result and unmeasured speed
 claims are not reproduced by this small Seaquest experiment.
 
+The10:21 UTC upstream recheck finds Meganeura main6268ea5 and Blade maine349cddf
+unchanged. Local validation passes111 Rust CPU and1,090 Python tests, plus
+workspace/binding Clippy for the unchanged native implementation. CI282 passes
+on all platforms at `448a10b`; the PR dashboard tracks final-head CI. No native
+rebuild was needed for the final analysis/report.
+
+The evidence supports the broad bet on cheaper useful latent prediction, not
+an isolated causal claim about cosine loss versus the split learning rates.
+The next research step is a separately declared exploration/reward mechanism
+against extrinsic-only CDP. Video/3D priors remain a separate hypothesis; no
+new representation matrix, asynchronous learner or swarm is launched here.
+
 Raw local evidence: [experiment directory](../../runs/cdp-evaluation-20261004.olfQrV),
-[complete learning summary](../../runs/cdp-evaluation-20261004.olfQrV/learning-summary.json),
+[complete independently audited summary](../../runs/cdp-evaluation-20261004.olfQrV/complete-audited-summary.json),
 [six successful guards](../../runs/cdp-evaluation-20261004.olfQrV/learning-queue/result.json).
 Those workspace artifacts are not public downloads. The compact JSON and SVG
 above are committed. No new learning campaign, Phase3 or swarms start here.

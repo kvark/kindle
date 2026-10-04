@@ -6,10 +6,10 @@ Keep the runtime small, comparisons controlled and results reproducible.
 For a quick overview of done/in-progress/next work and why progress is costly,
 start with the [Phase 2 PR status dashboard](https://github.com/kvark/kindle/pull/31).
 
-**Current user goal (October4): evaluate Dreamer-CDP.** Qualify a small
-jointly learned CNN with continuous deterministic prediction, then compare
-three fresh CDP/RGB seed pairs on Seaquest at200k actions/arm and audit frozen
-state/forecast quality. Keep learned RGB as the default pending evidence.
+**October4: Dreamer-CDP evaluation complete.** Recommend CDP for the next
+small 2D experiment, retaining RGB as the control. Three fresh CDP/RGB seed
+pairs on Seaquest at200k actions/arm and all frozen state/forecast audits pass.
+The CLI default remains learned RGB; select CDP explicitly with `--cdp`.
 The [fixed protocol](experiments/2026-10-04-cdp.md) specifies the cosine loss,
 separate learning rates, controls, budgets and stop rules. This is a simpler
 JEPA-style Dreamer candidate, not a new pretrained encoder. The unstarted
@@ -21,8 +21,13 @@ component/configuration/stack failures and the06:31 warning stop remain retained
 no numerical tolerance was relaxed. The [six-run comparison](results/2026-10-04-cdp-learning.md)
 is complete: CDP543.6 versus RGB318.1 mean online score, all three pairs positive,
 13.6% less wall time and35.9% less world-training time. Every learning audit passes.
-The fixed frozen state/forecast probes are active under ordinary guards; no
-more actor training is scheduled. RGB remains the default pending that review.
+Frozen probes find much more readable player state in CDP's RSSM, with h15
+latent forecasts beating persistence, the constant mean and unrelated actions.
+One-step persistence and zero-reward MAE still win; matched privileged position
+persistence also remains stronger. This is a useful small-agent result, not
+frozen competence or a solved world model. All services have exited. Next is a
+separately declared exploration/reward comparison against extrinsic-only CDP;
+no further training, old queue, video or swarm campaign starts automatically.
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.
@@ -207,6 +212,7 @@ compact JSON. It is descriptive historical evidence, not a matched benchmark.
 
 | Game | Measured result | Unchanged gate / next decision | Rollout |
 | --- | --- | --- | --- |
+| Seaquest (current development screen) | Three fresh small CDP/RGB pairs: online543.6 versus318.1, paired+225.5 [62.8,330.4]; CDP uses13.6% less wall time. Frozen world diagnostics complete. | Recommend explicit CDP for the next small 2D experiment. No frozen policy competence or mastery gate claim. | [Learning curves and world report](results/2026-10-04-cdp-learning.md); no new policy-evaluation video |
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Historical non-sticky roots pass71/72 wins versus0/76 controls. But root1009 with25% sticky actions wins only2/24 equal-cohort matches, mean−7.1667; all3/31, mean−8.3871. State/replay/video audit passes. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Fixed-recipe pass; **robustness fails**. One stochastic-evaluation root, no new control pair. | [Sticky video](../runs/pong-sticky-evaluation-20260926.SxeHCw/seed1009.mp4), [new report](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md), [historical videos/controls](experiments/README.md#current-pong-confirmation) |
 | Freeway | Three fresh Tiny roots1009/2017/3019 pass: final36/36 each, means32.9167/31.6944/33.25, versus controls0/108 combined, mean0. Complete pairs, cross-root state, replays and videos pass; zero frozen updates/cutoffs. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Complete on the fixed Tiny recipe, conditional on one pretrained encoder. | [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls and complete report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
@@ -222,7 +228,7 @@ action held for64 agent actions; frozen evaluation is unassisted. Its pass is
 not a demonstration of unaided sparse-reward exploration. Tiny also receives
 same-title offline video, detailed below. Keep both qualifications visible.
 
-These evaluations use non-sticky `published` Atari with no reset no-ops. A
+The five historical evaluations use non-sticky `published` Atari with no reset no-ops. A
 September26 check reproduces identical observations/rewards/boundaries for the
 same512 actions across environment seeds1009/2017/100000 in all five games.
 Learner roots and sampled policies vary, but environment seeds do not establish

@@ -13,8 +13,12 @@ passes independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons,
 native replay/restore and both production smokes. CI278 passes. Earlier failures
 and the06:31 warning stop remain retained. The [six-run learning result](../results/2026-10-04-cdp-learning.md)
 favors CDP on all three pairs:543.6 versus318.1 online mean,13.6% less wall time.
-All learning audits pass; frozen state/forecast diagnostics are active under
-ordinary guards, without a warning allowance. RGB stays default pending review.
+All learning and frozen state/forecast audits pass. CDP's RSSM retains much more
+readable player state; h15 latent forecasts beat persistence, a constant mean
+and unrelated actions. One-step persistence, zero-reward MAE and matched
+privileged position persistence still win. Recommend CDP for the next small
+2D experiment, with RGB retained as control. CLI default stays RGB; `--cdp`
+opts in. All services have exited; no next campaign starts automatically.
 
 October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its

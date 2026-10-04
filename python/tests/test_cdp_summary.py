@@ -114,3 +114,16 @@ def test_saved_trace_audit_reconstructs_boundaries_and_alignment(failure):
             summary.audit_trace(data, 65, deter=2)
     else:
         assert summary.audit_trace(data, 65, deter=2) == 0
+
+
+def test_privileged_control_and_predictions_use_the_same_visibility_cohort():
+    data = dict(current_positions=np.array([[0., 0.], [np.nan, np.nan], [2., 2.]]),
+                labels=np.array([[1., 1.], [50., 50.], [3., 3.]]), seeds=np.array([1, 1, 2]))
+    predictions = dict(fitted=np.array([[1., 1.], [100., 100.], [3., 3.]]))
+    result = summary.matched_privileged_control(data, predictions)
+    assert result['origin_count'] == 2
+    for axis in ('player_x', 'player_y'):
+        assert result['readouts']['fitted']['all'][axis]['count'] == 2
+        assert result['readouts']['fitted']['all'][axis]['rmse'] == 0
+        assert result['readouts']['position_persistence']['all'][axis]['count'] == 2
+        assert result['readouts']['position_persistence']['all'][axis]['rmse'] == 1
