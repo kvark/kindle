@@ -28,10 +28,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   no tolerance was relaxed. The approved120-second numerical allowance is over.
   CI278 passes on all platforms at `bee4e64`. The vector learner is heap-owned,
   fixing debug stack copies without a CPU fallback or learning change.
-  **Six-run learning queue active:** `kindle-cdp-learning-20261004.service`,
-  RGB/CDP1009, CDP/RGB2017, RGB/CDP3019,200k actions each. Ordinary guards:
-  no allocation-warning allowance, no retry. No compiling during matched timing.
-  Review completed runs, then the declared frozen diagnostics; no extra campaign.
+  **Six learning runs complete:** CDP543.6 versus RGB318.133 mean online score;
+  paired+225.467 [62.8,330.4],13.6% less wall time and35.9% less world-training
+  time. All three pairs favor CDP; all guards/seals/counters/finite checkpoints
+  pass. No frozen competence claim. Both short frozen-collector smokes pass;
+  their initial09:53 allocation-warning stop is retained. The existing bounded
+  numerical permission covered the remaining short checks, not full probes.
+  **Frozen diagnostics active:** `kindle-cdp-frozen-probes-20261004.service`,
+  six models,32,768 random actions and four readouts/model, zero actor updates.
+  Ordinary guards, no warning allowance/retry. Review before an architecture
+  decision; no extra learning campaign. [Results](docs/results/2026-10-04-cdp-learning.md).
   [Evidence](docs/results/2026-10-04-cdp-qualification.md).
 
 - The September 27 user direction adopts `docs/strategy_reset_plan.md`:

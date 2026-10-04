@@ -93,3 +93,24 @@ def test_partial_summary_never_reads_active_or_failed_jobs(tmp_path):
     (path / 'result.json').write_text(json.dumps(dict(host_guard_passed=False)))
     with pytest.raises(ValueError, match='failed guard'):
         summary.summarize(tmp_path)
+
+
+@pytest.mark.parametrize('failure', [None, 'reset', 'origin', 'cut', 'alignment', 'nonfinite'])
+def test_saved_trace_audit_reconstructs_boundaries_and_alignment(failure):
+    from test_cdp_probes import trace
+    data = trace()
+    if failure == 'reset':
+        data['episodes'][20] = 0
+    elif failure == 'origin':
+        data['origins_h15'][0] = 16
+    elif failure == 'cut':
+        data['collection_cut'][-1] = False
+    elif failure == 'alignment':
+        data['prior_h1'][0, 0] += 1
+    elif failure == 'nonfinite':
+        data['cnn'][0, 0] = np.nan
+    if failure:
+        with pytest.raises(ValueError):
+            summary.audit_trace(data, 65, deter=2)
+    else:
+        assert summary.audit_trace(data, 65, deter=2) == 0

@@ -120,12 +120,118 @@ def summarize(root):
                              'construction reported separately; no GPU utilization or physical/peak VRAM claim'])
 
 
+def audit_trace(data, steps, *, deter=512):
+    endings = data['terminated'] | data['truncated']
+    episodes = np.cumsum(np.r_[0, endings[:-1]])
+    current = np.arange(steps) + episodes
+    if (len(data['actions']) != steps or not np.array_equal(data['episodes'], episodes)
+            or not np.array_equal(data['current'], current) or not np.array_equal(data['following'], current + 1)
+            or len(data['cnn']) != steps + 1 + episodes[-1]
+            or len(data['posterior']) != len(data['cnn']) or len(data['positions']) != len(data['cnn'])
+            or not np.array_equal(data['collection_cut'], np.arange(steps) == steps - 1)):
+        raise ValueError('incomplete/reset-crossing diagnostic trajectory')
+    if any(not np.isfinite(value).all() for key, value in data.items() if key != 'positions'):
+        raise ValueError('nonfinite diagnostic state')
+    for horizon in (1, 15):
+        origins = np.arange(0, steps, 16)
+        origins = origins[origins + horizon <= steps]
+        origins = origins[episodes[origins] == episodes[origins + horizon - 1]]
+        if not np.array_equal(data[f'origins_h{horizon}'], origins):
+            raise ValueError('missing or reset-crossing forecasts')
+    origins = data['origins_h1']
+    error = float(np.abs(data['prior_h1'][:, :deter] - data['posterior'][data['following'][origins], :deter]).max())
+    if error > 2e-5:
+        raise ValueError('causal one-step alignment failed')
+    return error
+
+
+def summarize_probes(root):
+    import random
+    from probe_cdp import (PROTOCOL, SPLITS, ACTION_SEED_XOR, HEAD_SEED, assert_frozen_tensors,
+                           trace_identity, load_split, report, forecast_report)
+    from fit_fixed_latents import normalization
+
+    identities, results = {}, []
+    expected = {(split, seed) for split, seeds in SPLITS.items() for seed in seeds}
+    for method in ('rgb', 'cdp'):
+        for seed in SEEDS:
+            name = f'probe-{method}-{seed}'
+            directory = root / name
+            guard = json.loads((root / 'probe-full-queue' / name / 'result.json').read_text())
+            result = json.loads((directory / 'result.json').read_text())
+            required = dict(protocol=PROTOCOL, status='complete', smoke=False, method=method, seed=seed,
+                            actor_updates=0, actor_learner_step=49939, new_game_actions=32768,
+                            frozen_tensor_bytes_unchanged=True, steps_per_trajectory=4096)
+            if not guard['host_guard_passed'] or guard['unfinished_children'] or any(result.get(k) != v for k, v in required.items()):
+                raise ValueError(f'incomplete frozen diagnostic: {name}')
+            checkpoint = root / f'seaquest-{method}-{seed}-checkpoint'
+            counts = assert_frozen_tensors(checkpoint, directory / 'frozen-after')
+            if counts != result['unchanged_tensor_counts']:
+                raise ValueError('changed frozen tensor count')
+            if len(result['files']) != 8 or {(r['split'], r['seed']) for r in result['files']} != expected:
+                raise ValueError('changed diagnostic split')
+            for row in result['files']:
+                path = directory / row['file']
+                if sha256_file(path) != row['sha256']:
+                    raise ValueError('changed diagnostic capture')
+                with np.load(path) as values:
+                    data = dict(values)
+                error = audit_trace(data, 4096)
+                rng = random.Random(row['seed'] ^ ACTION_SEED_XOR)
+                if (error != row['max_h1_deter_error'] or trace_identity(data) != row['trace_sha256']
+                        or not np.array_equal(data['actions'], [rng.randrange(18) for _ in range(4096)])):
+                    raise ValueError('changed action trace or alignment report')
+                identity = (row['trace_sha256'], row['frames_sha256'])
+                key = row['split'], row['seed']
+                if identities.setdefault(key, identity) != identity:
+                    raise ValueError('models received different game traces')
+            if [(h['stage'], h['horizon']) for h in result['heads']] != [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]:
+                raise ValueError('changed readout plan')
+            train_mean = None
+            for head in result['heads']:
+                fit = head['fit']
+                if any(fit.get(k) != v for k, v in dict(seed=HEAD_SEED, steps=2048, batch=64, hidden=128, validation_interval=128).items()):
+                    raise ValueError('changed readout fit recipe')
+                if ([r['step'] for r in fit['curve']] != list(range(128, 2049, 128))
+                        or fit['selected_step'] != min(fit['curve'], key=lambda r: r['validation_normalized_mse'])['step']):
+                    raise ValueError('head was not selected on the declared validation curve')
+                train, test = [load_split(directory, result['files'], split, head['stage'], head['horizon'])
+                               for split in ('train', 'test')]
+                for field in ('head', 'evidence'):
+                    if sha256_file(directory / head[f'{field}_file']) != head[f'{field}_sha256']:
+                        raise ValueError('changed readout artifact')
+                with np.load(directory / head['head_file']) as saved:
+                    for key, expected_value in normalization(train['x'], train['labels']).items():
+                        if not np.array_equal(saved[key], expected_value):
+                            raise ValueError('readout normalization differs from training-only statistics')
+                with np.load(directory / head['evidence_file']) as saved:
+                    for key in ('labels', 'origins', 'seeds'):
+                        if not np.array_equal(saved[key], test[key], equal_nan=True):
+                            raise ValueError('readout evaluated different targets/origins')
+                    for key in head['readouts']:
+                        if report(saved[key], test) != head['readouts'][key]:
+                            raise ValueError('saved readout predictions disagree with reported scores')
+                if head['stage'] == 'cnn':
+                    train_mean = train['x'].mean(0, dtype=np.float64)
+                if head['horizon'] and forecast_report(test, train_mean) != head['forecasts']:
+                    raise ValueError('saved causal forecasts disagree with reported scores')
+            results.append(result)
+    return dict(status='complete', models=results, matching_trace_count=len(identities),
+                new_game_actions=sum(r['new_game_actions'] for r in results), actor_updates=0,
+                independent_audits=['tensor bytes', 'action/reset accounting', 'split/frame/trace identities',
+                                    'h1 causal alignment', 'training-only normalization', 'validation selection',
+                                    'saved readout/forecast metrics'])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('root', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--probes', action='store_true', help='also audit all six completed frozen diagnostics')
     args = parser.parse_args()
     result = summarize(args.root)
+    if args.probes:
+        result['probes'] = summarize_probes(args.root)
     args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + '\n')
     plot = dict(comparison='cdp', methods=('rgb', 'cdp'), games=('Seaquest',), num_envs=8, action_budget=200000,
                 results=[dict(method=method, game='Seaquest', runs=runs,

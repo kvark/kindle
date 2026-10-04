@@ -18,9 +18,11 @@ The [qualification report](results/2026-10-04-cdp-qualification.md) now passes
 independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons, native
 replay/restore and both excluded production smokes. CI278 passes. Earlier
 component/configuration/stack failures and the06:31 warning stop remain retained;
-no numerical tolerance was relaxed. The fixed six-run learning queue is active
-under ordinary guards: the numerical warning allowance does not extend to
-training. Frozen state/forecast probes follow the reviewed learning runs.
+no numerical tolerance was relaxed. The [six-run comparison](results/2026-10-04-cdp-learning.md)
+is complete: CDP543.6 versus RGB318.1 mean online score, all three pairs positive,
+13.6% less wall time and35.9% less world-training time. Every learning audit passes.
+The fixed frozen state/forecast probes are active under ordinary guards; no
+more actor training is scheduled. RGB remains the default pending that review.
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.
