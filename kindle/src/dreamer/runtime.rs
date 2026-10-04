@@ -253,6 +253,7 @@ pub(crate) fn configure_d3_optimizer(
             "world.dynamics.",
             "world.representation.posterior.",
             "world.future_predictor.",
+            "world.exploration.",
         ] {
             session.set_lr_multiplier(prefix, rate / config.learning_rate);
         }

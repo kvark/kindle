@@ -76,16 +76,21 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Next: Atari learning and exploration with CDP (Phase 3)
 
+**Current user decision:** focus on exploration and unlock Freeway for CDP.
+The small disagreement mechanism below is implemented and
+[qualified](results/2026-10-04-cdp-exploration-qualification.md); the declared
+three-seed screen against extrinsic-only CDP is running. The research-order question is
+resolved; neither Boxing nor the stopped five-game matrix resumes now.
+
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
 before further zero-score runs. Seven Freeway pairs complete; CDP3019 is retained
 as interrupted. The [diagnosis](results/2026-10-04-freeway-zero-reward-diagnosis.md)
 finds zero reward discovery and zero policy advantages, while raw-ALE controls,
 a bounded GPU reward pulse and the existing Seaquest positive control pass.
 Published DreamerV3 Atari-100k Freeway traces also score zero. Do not infer a
-CDP-specific regression or continue the matrix unchanged. First select a small
-generic exploration experiment with first-reward/replay-coverage/advantage
-diagnostics; reward-bearing Boxing can separately test representation learning.
-No new campaign is launched by this decision. The full requested comparison
+CDP-specific regression or continue the matrix unchanged. The selected generic
+exploration experiment measures first reward, replay coverage and advantages;
+reward-bearing Boxing can separately test representation learning later. The full requested comparison
 below remains unfinished, not replaced by a single easier game.
 
 **Retained scope:** the user requests training CDP on the selected Atari
@@ -102,22 +107,22 @@ the PR remains the running-status dashboard.
 learning from sparse rewards, not to reopen the unchanged five-game mastery
 queue or spend more days establishing the RGB baseline.
 
-The planned exploration experiment, now reconsidered before resuming the matrix, is
+The authorized exploration experiment, before resuming the matrix, is
 **unassisted Freeway**:
 
-- **Mechanism recommendation, not implemented or launched:** small
+- **Selected mechanism, qualified:** small
   action-conditioned latent-disagreement heads, inspired by
   [Plan2Explore](https://proceedings.mlr.press/v119/sekar20a.html). Reward
   uncertainty during imagined rollouts, with detached predictor inputs/targets,
-  one existing actor and no second pixel encoder. This would be a small
+  one existing actor and no second pixel encoder. This is a small
   adaptation, not a reproduction of Plan2Explore's separate exploration actor.
   The [reference implementation](https://github.com/danijar/dreamerv2/blob/main/dreamerv2/expl.py)
   computes its bonus from current ensemble predictions during imagination.
   Compute the current bonus for replay-value targets too; do not train one
   critic against incompatible imagined and cached-replay reward definitions.
-  This is a research change requiring a new declaration, not a switch already
-  supported by the vector actor: the existing visitation bonus is CPU-only and
-  explicitly rejected by GPU collection. Keep it disabled. Do not substitute
+  The [new declaration](experiments/2026-10-04-cdp-freeway-exploration.md) uses
+  four heads and coefficient1 through `--disagreement-scale 1`. The older
+  visitation bonus is CPU-only and rejected by GPU collection; keep it disabled. Do not substitute
   raw CDP prediction error, a feature-readback workaround or scripted UP.
 - Control: extrinsic-only CDP. Candidate: the same CDP agent plus **one**
   GPU-compatible intrinsic reward mechanism, kept in a separate reward channel.
@@ -125,8 +130,8 @@ The planned exploration experiment, now reconsidered before resuming the matrix,
   persistent random-action override, game-specific action aid, video pretraining
   or newly shaped external reward in this comparison.
 - Keep the qualified sticky 0.25/full-action Atari protocol and small learning
-  recipe. Use 200k aggregate actions/seed as the initial planning budget, not a
-  mastery promise. Select the mechanism and declare its exact settings, finite
+  recipe. Start with32,768 aggregate actions/seed, not a
+  mastery promise. Declare its exact settings, finite
   budgets and stop conditions before launching; qualify its numerical and cost
   behavior without a new training matrix.
 - Measure first reward, extrinsic-return curves versus actual actions and wall
@@ -134,18 +139,17 @@ The planned exploration experiment, now reconsidered before resuming the matrix,
   the game-performance metric. Evaluate predeclared frozen policies without
   updates and retain whole rollout videos, not selected successful episodes.
 
-Before allocating six full200k-action runs, propose a32,768-action/8,135-update
+Before considering six full200k-action runs, use a32,768-action/8,135-update
 screen per arm/seed using the same N8 small recipe, with reward discovery and
 nonzero advantages as diagnostics. Qualify reset-safe action/target alignment,
 detached gradients, zero-coefficient baseline equivalence, repeat-versus-novel
 state behavior and whole-update overhead first. A completed screen is a decision
-point, not an automatic extension or a mastery claim. The alternative immediate
-next step is the unchanged three-method Boxing comparison, keeping exploration
-implementation separate. Resolve that research order before launching either.
+point, not an automatic extension or a mastery claim. The user selected this
+exploration work before the unchanged three-method Boxing comparison.
 
-Six learning runs are the initial comparison design, **not launched by this
-documentation change**. The Seaquest CDP runs average 25m22s/seed; that is a
-planning reference, not a measured Freeway or intrinsic-mechanism runtime.
+Six learning runs are now running serially under the host guard, with a full
+counter/checkpoint audit before advancing. Qualification smokes are excluded;
+nonzero intrinsic reward and advantages are not Freeway reward discovery.
 Do not extend a weak run automatically or add a hyperparameter sweep.
 
 After that decision, test the selected recipe on **one predeclared held-out

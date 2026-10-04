@@ -13,6 +13,7 @@ mod config;
 mod cpu;
 mod device_copy;
 mod distributions;
+mod exploration;
 mod intrinsic;
 mod networks;
 mod readback;

@@ -42,6 +42,17 @@ def test_shared_recipe_excludes_only_declared_loss_rate_differences():
     assert summary.recipe(header('cdp'), 'cdp') != summary.recipe(changed, 'rgb')
 
 
+def test_disagreement_is_only_accepted_when_explicitly_declared():
+    value = header('cdp')
+    value['config'].update(disagreement_bonus=True, intrinsic_reward_scale=1)
+    assert summary.recipe(value, 'cdp', disagreement_scale=1)['intrinsic_reward_scale'] == 1
+    with pytest.raises(ValueError):
+        summary.recipe(value, 'cdp')
+    value['config']['disagreement_bonus'] = False
+    with pytest.raises(ValueError, match='undeclared disagreement'):
+        summary.recipe(value, 'cdp', disagreement_scale=1)
+
+
 @pytest.mark.parametrize('change', ['label', 'budget', 'sticky', 'aid', 'rate', 'schedule'])
 def test_recipe_refuses_mismatches(change):
     value = header('cdp')

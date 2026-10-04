@@ -243,6 +243,10 @@ pub struct DreamerConfig {
     pub actor_critic_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
+    /// Recompute action-conditioned latent disagreement in imagination and
+    /// replay returns. Zero intrinsic scale removes the ensemble entirely.
+    #[serde(default)]
+    pub disagreement_bonus: bool,
     /// Add bounded fixed-feature visitation novelty to the intrinsic channel.
     /// Counts persist across episode boundaries and model checkpoints.
     #[serde(default)]
@@ -299,6 +303,7 @@ impl DreamerConfig {
             actor_critic_gradient: false,
             extrinsic_reward_scale: 1.0,
             intrinsic_reward_scale: 0.0,
+            disagreement_bonus: false,
             visitation_bonus: false,
             seed: 0,
             skip_full_optimize: false,
@@ -323,6 +328,10 @@ impl DreamerConfig {
 
     pub fn network(&self) -> NetworkSize {
         self.model_size.network()
+    }
+
+    pub fn uses_disagreement(&self) -> bool {
+        self.disagreement_bonus && self.intrinsic_reward_scale > 0.0
     }
 
     pub fn feature_dim(&self) -> usize {
@@ -605,6 +614,12 @@ impl DreamerConfig {
         }
         if !self.extrinsic_reward_scale.is_finite() || !self.intrinsic_reward_scale.is_finite() {
             return Err("reward scales must be finite".into());
+        }
+        if self.disagreement_bonus && (self.intrinsic_reward_scale < 0.0 || self.visitation_bonus) {
+            return Err(
+                "disagreement requires a non-negative intrinsic scale and no host visitation"
+                    .into(),
+            );
         }
         Ok(())
     }

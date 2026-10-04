@@ -32,6 +32,12 @@ import profile_atari_vector
     (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
     (["--cdp", "--actor-critic-gradient"], "CDP requires"),
     (["--cdp", "--learning-rate", ".001"], "CDP requires"),
+    (["--restore", "unused", "--disagreement-scale", "1"], "training overrides"),
+    (["--disagreement-scale", "-1"], "finite and non-negative"),
+    (["--disagreement-scale", "nan"], "finite and non-negative"),
+    (["--disagreement-scale", "inf"], "finite and non-negative"),
+    (["--disagreement-scale", "1"], "requires fresh CDP"),
+    (["--cdp", "--disagreement-scale", "1", "--exploration-probability", ".5"], "without action overrides"),
 ])
 def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
     output = tmp_path / "never.jsonl"
@@ -72,7 +78,8 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
         atari_vector.main()
 
 
-def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path):
+@pytest.mark.parametrize("scale", [0, 1])
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -86,10 +93,13 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path):
         assert config['dynamics_learning_rate'] == 4e-4
         assert config['learning_rate'] == 4e-5
         assert config['actor_critic_gradient'] is False
+        assert config['disagreement_bonus'] is (scale > 0)
+        assert config['intrinsic_reward_scale'] == scale
         raise RuntimeError('CDP recipe checked before GPU')
 
     monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
-    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'), '--cdp'])
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'),
+                                    '--cdp', '--disagreement-scale', str(scale)])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
 

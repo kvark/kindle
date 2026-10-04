@@ -3,6 +3,8 @@
 mod vector;
 
 #[cfg(test)]
+mod exploration;
+#[cfg(test)]
 mod upstream_reference;
 pub use vector::{FeatureVectorAgent, VectorDreamerAgent};
 
@@ -108,6 +110,7 @@ pub struct WorldMetrics {
     pub total_loss: f32,
     pub reconstruction_loss: f32,
     pub future_prediction_loss: f32,
+    pub exploration_loss: f32,
     pub encoder_regularization: f32,
     pub encoder_spread: f32,
     /// Unclipped posterior-to-prior KL before either free-nat floor.
@@ -156,6 +159,8 @@ pub struct BehaviorMetrics {
     /// Entropy after the same continuation weighting used by the actor loss.
     pub weighted_policy_entropy: f32,
     pub imagined_reward_mean: f32,
+    pub imagined_intrinsic_reward_mean: f32,
+    pub replay_intrinsic_reward_mean: f32,
     pub imagined_continuation_mean: f32,
     pub return_mean: f32,
     pub return_scale: f32,
@@ -201,6 +206,8 @@ struct BehaviorTrainingBatch {
     replay_value_target: Vec<f32>,
     replay_slow_target: Vec<f32>,
     imagined_reward_mean: f32,
+    imagined_intrinsic_reward_mean: f32,
+    replay_intrinsic_reward_mean: f32,
     imagined_continuation_mean: f32,
     return_mean: f32,
     return_scale: f32,
@@ -1439,6 +1446,10 @@ impl DreamerCore {
                     read_scalar(&self.world_train, world::LOSS_RECONSTRUCTION);
                 metrics.future_prediction_loss +=
                     read_scalar(&self.world_train, world::LOSS_FUTURE_PREDICTION);
+                if self.config.uses_disagreement() {
+                    metrics.exploration_loss +=
+                        read_scalar(&self.world_train, world::LOSS_EXPLORATION);
+                }
                 if self.config.video_encoder.is_some() {
                     metrics.encoder_regularization +=
                         read_scalar(&self.world_train, world::LOSS_ENCODER_REGULARIZATION);
@@ -1466,6 +1477,7 @@ impl DreamerCore {
         metrics.total_loss *= scale;
         metrics.reconstruction_loss *= scale;
         metrics.future_prediction_loss *= scale;
+        metrics.exploration_loss *= scale;
         metrics.encoder_regularization *= scale;
         metrics.encoder_spread *= scale;
         metrics.raw_kl *= scale;
@@ -1495,6 +1507,7 @@ impl DreamerCore {
             metrics.total_loss,
             metrics.reconstruction_loss,
             metrics.future_prediction_loss,
+            metrics.exploration_loss,
             metrics.initial_policy_loss,
             metrics.initial_value_loss,
             metrics.encoder_regularization,
@@ -1596,7 +1609,23 @@ impl DreamerCore {
         let mut continuation = vec![0.0; all_rows];
         let mut value_logits = vec![0.0; all_rows * self.config.value_bins];
         let mut slow_logits = vec![0.0; all_rows * self.config.value_bins];
-        self.readback.read_many(&mut [
+        let mut imagined_bonus = vec![
+            0.0;
+            if self.config.uses_disagreement() {
+                starts * horizon
+            } else {
+                0
+            }
+        ];
+        let mut replay_bonus = vec![
+            0.0;
+            if self.config.uses_disagreement() {
+                starts
+            } else {
+                0
+            }
+        ];
+        let mut readbacks: Vec<(&Session, usize, &mut [f32])> = vec![
             (
                 &self.imagination,
                 world::IMAGINATION_ACTION,
@@ -1618,14 +1647,43 @@ impl DreamerCore {
                 &mut value_logits,
             ),
             (&self.behavior_slow, 0, &mut slow_logits),
-        ]);
+        ];
+        if self.config.uses_disagreement() {
+            readbacks.push((
+                &self.imagination,
+                world::IMAGINATION_BONUS,
+                &mut imagined_bonus,
+            ));
+            readbacks.push((
+                &self.world_posterior,
+                world::POSTERIOR_BONUS,
+                &mut replay_bonus,
+            ));
+        }
+        self.readback.read_many(&mut readbacks);
         let decode = |logits: &[f32]| {
             decode_rows(logits, all_rows, &self.bins)
                 .chunks_exact(starts)
                 .map(<[f32]>::to_vec)
                 .collect::<Vec<_>>()
         };
-        let rewards = decode(&reward_logits);
+        let mut rewards = decode(&reward_logits);
+        let (imagined_intrinsic_reward_mean, replay_intrinsic_reward_mean) =
+            if self.config.uses_disagreement() {
+                for value in imagined_bonus.iter_mut().chain(&mut replay_bonus) {
+                    *value *= self.config.intrinsic_reward_scale;
+                    assert!(value.is_finite() && *value >= 0.0);
+                }
+                for time in 0..horizon {
+                    for start in 0..starts {
+                        // Bonus(s_t, a_t) belongs to the arrival reward r_{t+1}.
+                        rewards[time + 1][start] += imagined_bonus[time * starts + start];
+                    }
+                }
+                (mean(&imagined_bonus), mean(&replay_bonus))
+            } else {
+                (0.0, 0.0)
+            };
         let values = decode(&value_logits);
         let slow_values = decode(&slow_logits);
         let continuations = continuation
@@ -1740,7 +1798,14 @@ impl DreamerCore {
                 .map(|time| f32::from(batch.flags[time][batch_row].is_terminal))
                 .collect::<Vec<_>>();
             let reward = (0..self.config.batch_length)
-                .map(|time| batch.rewards[time][batch_row])
+                .map(|time| {
+                    batch.rewards[time][batch_row]
+                        + if self.config.uses_disagreement() {
+                            replay_bonus[time * self.config.batch_size + batch_row]
+                        } else {
+                            0.0
+                        }
+                })
                 .collect::<Vec<_>>();
             let value = (0..self.config.batch_length)
                 .map(|time| values[0][time * self.config.batch_size + batch_row])
@@ -1790,6 +1855,8 @@ impl DreamerCore {
             replay_value_target,
             replay_slow_target,
             imagined_reward_mean: mean_nested(&rewards[1..]),
+            imagined_intrinsic_reward_mean,
+            replay_intrinsic_reward_mean,
             imagined_continuation_mean: mean_nested(&continuations),
             return_mean: mean_nested(&returns),
             return_scale,
@@ -1860,6 +1927,8 @@ impl DreamerCore {
                 behavior::WEIGHTED_POLICY_ENTROPY,
             ),
             imagined_reward_mean: batch.imagined_reward_mean,
+            imagined_intrinsic_reward_mean: batch.imagined_intrinsic_reward_mean,
+            replay_intrinsic_reward_mean: batch.replay_intrinsic_reward_mean,
             imagined_continuation_mean: batch.imagined_continuation_mean,
             return_mean: batch.return_mean,
             return_scale: batch.return_scale,
@@ -1875,6 +1944,8 @@ impl DreamerCore {
             metrics.policy_entropy,
             metrics.weighted_policy_entropy,
             metrics.imagined_reward_mean,
+            metrics.imagined_intrinsic_reward_mean,
+            metrics.replay_intrinsic_reward_mean,
             metrics.imagined_continuation_mean,
             metrics.return_mean,
             metrics.return_scale,

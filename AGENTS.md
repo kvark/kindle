@@ -7,6 +7,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
+  The research-order question is resolved. Implemented and qualified the roadmap's
+  small GPU-native action-conditioned latent-disagreement bonus against fresh
+  extrinsic-only CDP, seeds1009/2017/3019. Start with32,768 aggregate actions per
+  arm/seed; the six-run screen is running serially. Alignment, detached gradients,
+  zero-scale equivalence, restore and short overhead checks pass; see
+  `docs/results/2026-10-04-cdp-exploration-qualification.md`. Diagnose the result
+  before declaring any larger budget. No Freeway reward-discovery claim yet.
+  No scripted UP, persistent action overrides, new pixel encoder or CPU feature
+  readback. The five-game representation comparison is deferred, not completed
+  or automatically restarted. Keep PR31 as the dashboard.
 - **October 4, 20:42 UTC: investigate zero-reward learning before more runs.**
   The user redirects the active comparison to diagnosis. The serial study is
   stopped: seven Freeway pairs are audited; CDP seed3019 is interrupted at
@@ -21,7 +32,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   reach replay and produce nonzero advantages. Same-code Seaquest learns, and
   published DreamerV3 Atari-100k Freeway scores are also zero across five seeds.
   No learner fix or larger comparison is justified by this floor result alone.
-  Next, decide a small generic exploration test; do not repeat the pulse or
+  The user now selects the exploration test above; do not repeat the pulse or
   silently restart/extend the matrix. All five-game work remains incomplete.
 - **Retained user goal: train CDP on the selected Atari games and compare with
   Dreamer RGB and Tiny JEPA.** Diagnose reward discovery before deciding how
@@ -36,7 +47,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   that failure. The user subsequently authorizes proceeding unless the GPU is
   wedged: standalone allocation warnings are logged, not approval gates. The
   proposed two-warning/first10-second restriction is superseded, not required.
-  Do not reopen the cancelled historical queue or add an intrinsic-reward arm.
+  Do not reopen the cancelled historical queue. The newly authorized CDP
+  exploration study is separate from this stopped extrinsic-only comparison.
 - **October 4: the user adopts CDP on the main path.** The authoritative roadmap
   is [docs/kindle_single_life_dreamer_plan.md](docs/kindle_single_life_dreamer_plan.md).
   Fast iteration, a faithful RGB control and the CDP evaluation are complete.
@@ -44,9 +56,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Dreamer agent. No frozen Tiny/DINO/Large requirement or RGB visualization
   decoder. RGB remains the reference/fallback; LeVJEPA is a later video/3D
   hypothesis, not an obligation for 2D.
-- **Proposed next, before resuming the matrix: exploration/reward with CDP (Phase 3).** Plan unassisted
+- **Current: exploration/reward with CDP (Phase 3).** Test unassisted
   Freeway: extrinsic-only CDP versus one GPU-compatible intrinsic mechanism,
-  three learner seeds 1009/2017/3019. Start planning at 200k actual aggregate
+  three learner seeds 1009/2017/3019. Start at32,768 actual aggregate
   actions/seed on Size1M/N8/B8/T16/H15/R32/microbatch 8/replay 100000, sticky 0.25,
   full actions. Select the mechanism and declare exact finite budgets/settings
   before launching. No random-action aid, new reward shaping or pretraining.

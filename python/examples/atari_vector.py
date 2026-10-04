@@ -55,6 +55,8 @@ def main():
                         help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
     parser.add_argument("--cdp", action="store_true",
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
+    parser.add_argument("--disagreement-scale", type=float, default=0.0,
+                        help="CDP exploration: current latent disagreement in imagined and replay returns; zero disables the ensemble")
     parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
@@ -112,6 +114,7 @@ def main():
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--cdp")
+    training_options.add("--disagreement-scale")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -133,6 +136,10 @@ def main():
     learned_rgb = args.encoder_checkpoint is None
     if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
         parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
+    if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
+        parser.error("disagreement-scale must be finite and non-negative")
+    if args.disagreement_scale and (not args.cdp or args.exploration_probability):
+        parser.error("disagreement requires fresh CDP without action overrides")
     if args.replay_capacity <= 0:
         parser.error("replay-capacity must be positive")
     if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
@@ -191,6 +198,8 @@ def main():
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,
+                      disagreement_bonus=args.disagreement_scale > 0,
+                      intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
         if learned_rgb:
             config["observation_kind"] = "rgb64"

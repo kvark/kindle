@@ -1340,26 +1340,34 @@ mod tests {
     #[test]
     #[ignore = "requires GPU; joint RGB learning, pixel replay, stream isolation and restore"]
     fn tiny_rgb_replay_is_reencoded_and_checkpoint_restores() {
-        check_rgb_replay_and_restore(false);
+        check_rgb_replay_and_restore(false, false);
     }
 
     #[test]
     #[ignore = "requires separately guarded GPU; CDP encoder learning, pixel replay, stream isolation and restore"]
     fn tiny_cdp_replay_is_reencoded_and_checkpoint_restores() {
-        check_rgb_replay_and_restore(true);
+        check_rgb_replay_and_restore(true, false);
     }
 
-    fn check_rgb_replay_and_restore(cdp: bool) {
-        let checkpoint = check_rgb_vector_replay_and_restore(cdp);
+    #[test]
+    #[ignore = "requires GPU; CDP disagreement weights, replay and frozen restore"]
+    fn tiny_cdp_disagreement_checkpoint_restores() {
+        check_rgb_replay_and_restore(true, true);
+    }
+
+    fn check_rgb_replay_and_restore(cdp: bool, exploration: bool) {
+        let checkpoint = check_rgb_vector_replay_and_restore(cdp, exploration);
         check_rgb_single_restore(&checkpoint);
         fs::remove_dir_all(checkpoint).unwrap();
     }
 
-    fn check_rgb_vector_replay_and_restore(cdp: bool) -> std::path::PathBuf {
+    fn check_rgb_vector_replay_and_restore(cdp: bool, exploration: bool) -> std::path::PathBuf {
         let mut config = DreamerConfig::tiny(3);
         config.observation_kind = ObservationKind::Rgb64;
         config.replay_capacity = 32;
         config.train_ratio = 0.0;
+        config.disagreement_bonus = exploration;
+        config.intrinsic_reward_scale = f32::from(exploration);
         if cdp {
             config.loss_scales.reconstruction = 0.0;
             config.loss_scales.future_prediction = 500.0;

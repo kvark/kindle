@@ -14,7 +14,7 @@ from kindle._vector_audit import audit
 from summarize_representation_learning import SEEDS, TINY_CHECKPOINTS, plot_svg, read_run
 
 
-def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5'):
+def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disagreement_scale=0):
     expected = dict(environment=environment, num_envs=8, steps=budget, full_action_space=True,
                     sticky_actions=.25, action_repeat=4, noop_max=0, max_episode_frames=100000,
                     mode='train', observation_size='native', starting_environment_step=0,
@@ -27,10 +27,13 @@ def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5'):
                   batch_size=8, batch_length=16, world_backprop_length=16, world_microbatch_size=8,
                   replay_context=1, replay_capacity=100000, train_ratio=32., imagination_length=15,
                   learning_rate=4e-5, learning_rate_warmup=1000, agc=.3, actor_unimix=0,
-                  replay_value_gradient=True, actor_critic_gradient=False, intrinsic_reward_scale=0,
+                  replay_value_gradient=True, actor_critic_gradient=False, intrinsic_reward_scale=disagreement_scale,
                   extrinsic_reward_scale=1, visitation_bonus=False)
     if any(c.get(k) != v for k, v in common.items()):
         raise ValueError('changed common learner recipe')
+    if (disagreement_scale not in (0, 1) or (disagreement_scale and method != 'cdp')
+            or c.get('disagreement_bonus', False) is not (disagreement_scale > 0)):
+        raise ValueError('undeclared disagreement mechanism')
     if method not in ('rgb', 'cdp', 'pretrained_tiny'):
         raise ValueError('unknown arm')
     cdp = method == 'cdp'

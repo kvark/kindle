@@ -5,6 +5,7 @@ use meganeura::{Graph, graph::NodeId};
 use super::behavior;
 use super::config::VideoEncoder;
 use super::config::{DreamerConfig, FeatureStandardization, ObservationKind};
+use super::exploration::Disagreement;
 use super::networks::{
     FeatureDecoder, MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl,
     feature, gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample,
@@ -27,6 +28,7 @@ pub const LOSS_ENCODER_REGULARIZATION: usize = 9;
 pub const ENCODER_SPREAD: usize = 10;
 pub const LOSS_INITIAL_POLICY: usize = 11;
 pub const LOSS_INITIAL_VALUE: usize = 12;
+pub const LOSS_EXPLORATION: usize = 13;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 
 mod cdp;
@@ -45,6 +47,8 @@ pub const IMAGINATION_ACTION: usize = 2;
 pub const IMAGINATION_REWARD: usize = 3;
 pub const IMAGINATION_CONTINUATION: usize = 4;
 pub const IMAGINATION_VALUE: usize = 5;
+pub const IMAGINATION_BONUS: usize = 6;
+pub const POSTERIOR_BONUS: usize = 2;
 
 fn standardized_target(
     graph: &mut Graph,
@@ -169,6 +173,7 @@ struct WorldModel {
     /// graph so replay-value gradients only shape the posterior/RSSM path.
     replay_value: MlpHead,
     actor: Option<MlpHead>,
+    exploration: Option<Disagreement>,
 }
 
 impl WorldModel {
@@ -183,6 +188,9 @@ impl WorldModel {
             future_predictor: (config.loss_scales.future_prediction > 0.0)
                 .then(|| future_predictor(graph, config)),
             heads: WorldHeads::new(graph, config),
+            exploration: config
+                .uses_disagreement()
+                .then(|| Disagreement::new(graph, config)),
             replay_value: MlpHead::new(
                 graph,
                 "behavior.value",
@@ -285,6 +293,10 @@ fn build_training_graph_grouped(
         );
     }
     let mut head_inputs = Vec::with_capacity(length);
+    let mut exploration_states = Vec::new();
+    let mut exploration_actions = Vec::new();
+    let mut exploration_targets = Vec::new();
+    let mut exploration_weights = Vec::new();
 
     let mut reconstruction_losses = Vec::with_capacity(length);
     let mut future_prediction_losses = Vec::with_capacity(length);
@@ -318,6 +330,18 @@ fn build_training_graph_grouped(
         let masked_deter = graph.mul(deter, keep_deter);
         let masked_stoch = graph.mul(stoch, keep_stoch);
         let masked_action = graph.mul(action, keep_action);
+        if model.exploration.is_some() {
+            exploration_states.push(feature(
+                &mut graph,
+                masked_deter,
+                masked_stoch,
+                batch,
+                config,
+            ));
+            exploration_actions.push(masked_action);
+            let keep = graph.sum_inner(keep_action);
+            exploration_weights.push(graph.scale(keep, 1.0 / config.action_count as f32));
+        }
         deter = model.dynamics.core.forward(
             &mut graph,
             masked_deter,
@@ -339,6 +363,9 @@ fn build_training_graph_grouped(
             config.unimix,
         );
         stoch = straight_through_sample(&mut graph, hard_sample, probabilities);
+        if model.exploration.is_some() {
+            exploration_targets.push(graph.reshape(stoch, &[batch, size.stoch * size.classes]));
+        }
 
         let state = feature(&mut graph, deter, stoch, batch, config);
         head_inputs.push(HeadInputs {
@@ -380,6 +407,21 @@ fn build_training_graph_grouped(
         );
         representation_losses.push(representation_kl.loss);
     }
+
+    let exploration_loss = if let Some(ensemble) = &model.exploration {
+        let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());
+        let action = stack_time(&mut graph, &exploration_actions, batch, config.action_count);
+        let target = stack_time(
+            &mut graph,
+            &exploration_targets,
+            batch,
+            size.stoch * size.classes,
+        );
+        let weight = stack_time(&mut graph, &exploration_weights, batch, 1);
+        ensemble.loss(&mut graph, state, action, target, weight)
+    } else {
+        graph.scalar(0.0)
+    };
 
     for (group, chunk) in head_inputs.chunks(time_batch_length).enumerate() {
         let rows = batch * chunk.len();
@@ -534,6 +576,11 @@ fn build_training_graph_grouped(
         scale(&mut graph, replay_value, scales.replay_value),
     ];
     let total = sum(&mut graph, &weighted);
+    let total = if model.exploration.is_some() {
+        graph.add(total, exploration_loss)
+    } else {
+        total
+    };
     let mut initial_losses = None;
     let total = if config.actor_critic_gradient {
         // Upstream averages over H imagined losses. The other H-1 states
@@ -573,11 +620,17 @@ fn build_training_graph_grouped(
         raw_kl,
         future_prediction,
     ];
-    if config.video_encoder.is_some() || config.actor_critic_gradient {
+    if config.video_encoder.is_some() || config.actor_critic_gradient || config.uses_disagreement()
+    {
         outputs.extend([encoder_regularization, encoder_spread]);
     }
     if let Some((policy, value)) = initial_losses {
         outputs.extend([policy, value]);
+    } else if config.uses_disagreement() {
+        outputs.extend([graph.scalar(0.0), graph.scalar(0.0)]);
+    }
+    if config.uses_disagreement() {
+        outputs.push(exploration_loss);
     }
     graph.set_outputs(outputs);
     graph
@@ -690,6 +743,9 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
     let mut graph = Graph::new();
     let core = RssmCore::new(&mut graph, config);
     let representation = Representation::new(&mut graph, config);
+    let exploration = config
+        .uses_disagreement()
+        .then(|| Disagreement::new(&mut graph, config));
     let mut deter = graph.input("initial_deter", &[batch, size.deter]);
     let mut stoch = graph.input("initial_stoch", &[batch * size.stoch, size.classes]);
     let observations = replay_observations(&mut graph, config, length);
@@ -708,6 +764,9 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
     );
     let mut deters = Vec::with_capacity(length);
     let mut stochs = Vec::with_capacity(length);
+    let mut exploration_states = Vec::new();
+    let mut exploration_actions = Vec::new();
+    let mut exploration_weights = Vec::new();
     for (time, encoded) in encodings.into_iter().enumerate() {
         let action = graph.input(
             &format!("previous_action_{time}"),
@@ -729,6 +788,18 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
         let previous_deter = graph.mul(deter, keep_deter);
         let previous_stoch = graph.mul(stoch, keep_stoch);
         let action = graph.mul(action, keep_action);
+        if exploration.is_some() {
+            exploration_states.push(feature(
+                &mut graph,
+                previous_deter,
+                previous_stoch,
+                batch,
+                config,
+            ));
+            exploration_actions.push(action);
+            let keep = graph.sum_inner(keep_action);
+            exploration_weights.push(graph.scale(keep, 1.0 / config.action_count as f32));
+        }
         deter = core.forward(&mut graph, previous_deter, previous_stoch, action, batch);
         let logits = representation
             .posterior
@@ -746,7 +817,15 @@ pub fn build_posterior_graph(config: &DreamerConfig) -> Graph {
     }
     let deter = stack_time(&mut graph, &deters, batch, size.deter);
     let stoch = stack_time(&mut graph, &stochs, batch, size.stoch * size.classes);
-    graph.set_outputs(vec![deter, stoch]);
+    let mut outputs = vec![deter, stoch];
+    if let Some(ensemble) = exploration {
+        let state = stack_time(&mut graph, &exploration_states, batch, config.feature_dim());
+        let action = stack_time(&mut graph, &exploration_actions, batch, config.action_count);
+        let weight = stack_time(&mut graph, &exploration_weights, batch, 1);
+        let bonus = ensemble.bonus(&mut graph, state, action);
+        outputs.push(graph.mul(bonus, weight));
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
@@ -820,7 +899,12 @@ pub fn build_imagination_graph(config: &DreamerConfig) -> Graph {
     let actions = stack_time(&mut graph, &actions, rows, config.action_count);
     let (reward, continuation) = heads.forward(&mut graph, all);
     let values = value.forward(&mut graph, all);
-    graph.set_outputs(vec![imagined, all, actions, reward, continuation, values]);
+    let mut outputs = vec![imagined, all, actions, reward, continuation, values];
+    if config.uses_disagreement() {
+        let ensemble = Disagreement::new(&mut graph, config);
+        outputs.push(ensemble.bonus(&mut graph, imagined, actions));
+    }
+    graph.set_outputs(outputs);
     graph
 }
 
