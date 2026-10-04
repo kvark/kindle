@@ -53,6 +53,8 @@ def main():
                         help="Tiny-only experiment: native pixel replay with phase-aligned causal re-encoding")
     parser.add_argument("--actor-critic-gradient", action="store_true",
                         help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
+    parser.add_argument("--cdp", action="store_true",
+                        help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
     parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
@@ -109,6 +111,7 @@ def main():
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
+    training_options.add("--cdp")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -128,6 +131,8 @@ def main():
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
     learned_rgb = args.encoder_checkpoint is None
+    if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
+        parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
     if args.replay_capacity <= 0:
         parser.error("replay-capacity must be positive")
     if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
@@ -190,6 +195,9 @@ def main():
         if learned_rgb:
             config["observation_kind"] = "rgb64"
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
+            if args.cdp:
+                config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
+                config.update(encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4)
         else:
             config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,

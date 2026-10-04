@@ -28,6 +28,10 @@ import profile_atari_vector
     (["--restore", "unused", "--encoder-training", "joint"], "training overrides"),
     (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
     (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
+    (["--restore", "unused", "--cdp"], "training overrides"),
+    (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
+    (["--cdp", "--actor-critic-gradient"], "CDP requires"),
+    (["--cdp", "--learning-rate", ".001"], "CDP requires"),
 ])
 def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
     output = tmp_path / "never.jsonl"
@@ -65,6 +69,28 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
                                     *(["--actor-critic-gradient"] if enabled else [])])
     with pytest.raises(RuntimeError, match="checked before GPU"):
+        atari_vector.main()
+
+
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path):
+    environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
+                                  reset=lambda **_: (None, {}), close=lambda: None)
+    monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
+    monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", lambda env, **_: env)
+
+    def construct(streams, config):
+        assert config['observation_kind'] == 'rgb64'
+        assert config['loss_scales']['reconstruction'] == 0
+        assert config['loss_scales']['future_prediction'] == 500
+        assert config['encoder_learning_rate'] == 6e-6
+        assert config['dynamics_learning_rate'] == 4e-4
+        assert config['learning_rate'] == 4e-5
+        assert config['actor_critic_gradient'] is False
+        raise RuntimeError('CDP recipe checked before GPU')
+
+    monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
+    monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'), '--cdp'])
+    with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
 
 

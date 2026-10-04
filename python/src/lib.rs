@@ -17,6 +17,8 @@ use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyBytes, PyModule, PyType};
 
+type ForecastEndpoints = (Vec<Vec<f32>>, Vec<Vec<f32>>);
+
 #[pyclass(name = "Agent", module = "kindle", unsendable)]
 struct PyAgent {
     inner: DreamerAgent,
@@ -182,6 +184,14 @@ impl PyLeVJepaPerception {
 
 #[pymethods]
 impl PyAgent {
+    #[classmethod]
+    fn restore_rgb(_class: &Bound<'_, PyType>, checkpoint: &str) -> PyResult<Self> {
+        Ok(Self {
+            inner: DreamerAgent::restore_rgb(checkpoint)
+                .map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
+        })
+    }
+
     #[getter]
     fn provenance<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         json_to_python(py, &self.inner.core().provenance())
@@ -399,6 +409,31 @@ impl PyAgent {
     #[getter]
     fn latent_feature(&mut self) -> Vec<f32> {
         self.inner.latent_feature().to_vec()
+    }
+
+    #[getter]
+    fn encoded_observation(&mut self) -> Vec<f32> {
+        self.inner.encoded_observation().to_vec()
+    }
+
+    /// First/final causal prior states and predicted observations. CDP outputs
+    /// CNN tokens, RGB Dreamer outputs pixels; neither consumes future frames.
+    fn forecast_states(&mut self, actions: Vec<usize>) -> PyResult<ForecastEndpoints> {
+        if actions.is_empty()
+            || actions
+                .iter()
+                .any(|&a| a >= self.inner.core().config().action_count)
+        {
+            return Err(PyValueError::new_err(
+                "nonempty valid action sequence required",
+            ));
+        }
+        let (states, observations) = self.inner.prior_state_rollout(&actions);
+        let last = actions.len() - 1;
+        Ok((
+            vec![states[0].clone(), states[last].clone()],
+            vec![observations[0].clone(), observations[last].clone()],
+        ))
     }
 
     /// Deterministic forecast when enabled, otherwise posterior reconstruction.

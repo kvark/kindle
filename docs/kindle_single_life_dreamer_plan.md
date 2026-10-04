@@ -5,6 +5,15 @@ retain experiments and failures; [AGENTS.md](../AGENTS.md) gives working rules.
 Keep the runtime small, comparisons controlled and results reproducible.
 For a quick overview of done/in-progress/next work and why progress is costly,
 start with the [Phase 2 PR status dashboard](https://github.com/kvark/kindle/pull/31).
+
+**Current user goal (October4): evaluate Dreamer-CDP.** Qualify a small
+jointly learned CNN with continuous deterministic prediction, then compare
+three fresh CDP/RGB seed pairs on Seaquest at200k actions/arm and audit frozen
+state/forecast quality. Keep learned RGB as the default pending evidence.
+The [fixed protocol](experiments/2026-10-04-cdp.md) specifies the cosine loss,
+separate learning rates, controls, budgets and stop rules. This is a simpler
+JEPA-style Dreamer candidate, not a new pretrained encoder. The unstarted
+posterior-Tiny ablation below is deferred; no old queue resumes.
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.
@@ -95,8 +104,10 @@ tensors and the unchanged control before learning; then repeat frozen readouts.
 The [implementation/qualification report](results/2026-10-04-posterior-latent-qualification.md)
 records passing CPU checks but a stopped native canary: a new allocation
 warning at05:35:17 UTC, no completed numerical check or learner update.
-No Xid/hang is recorded. Native work remains stopped pending approval/review
-of a bounded initialization-only diagnostic; the three candidates are unstarted.
+No Xid/hang is recorded. A subsequently approved initialization check passes
+at05:57 UTC with one allowed startup warning, three allocations and256 exact
+outputs; no recovery. After review, CDP numerical qualification is next under
+ordinary fault/warning guards; the three Tiny candidates remain unstarted.
 No RGB reconstruction, fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

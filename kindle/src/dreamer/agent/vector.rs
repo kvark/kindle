@@ -1340,11 +1340,33 @@ mod tests {
     #[test]
     #[ignore = "requires GPU; joint RGB learning, pixel replay, stream isolation and restore"]
     fn tiny_rgb_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; CDP encoder learning, pixel replay, stream isolation and restore"]
+    fn tiny_cdp_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(true);
+    }
+
+    fn check_rgb_replay_and_restore(cdp: bool) {
         let mut config = DreamerConfig::tiny(3);
         config.observation_kind = ObservationKind::Rgb64;
         config.replay_capacity = 32;
         config.train_ratio = 0.0;
+        if cdp {
+            config.loss_scales.reconstruction = 0.0;
+            config.loss_scales.future_prediction = 500.0;
+            config.encoder_learning_rate = Some(6e-6);
+            config.dynamics_learning_rate = Some(4e-4);
+        }
         let mut agent = VectorDreamerAgent::learned_rgb(config.clone(), 2).unwrap();
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            assert_eq!(agent.gpu_device().device_name, expected);
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        }
         let frame = |id: usize, time: usize| {
             RgbFrame::new(
                 19,
@@ -1421,7 +1443,21 @@ mod tests {
         let encoded_before = encoder_output(&mut agent);
         let report = agent.core.learn().unwrap();
         assert!(report.world.total_loss.is_finite());
-        assert!(report.world.reconstruction_loss > 0.0);
+        if cdp {
+            assert_eq!(report.world.reconstruction_loss, 0.0);
+            assert!(report.world.future_prediction_loss > 0.0);
+            assert!(
+                !agent
+                    .core
+                    .learner
+                    .world_train
+                    .param_names()
+                    .iter()
+                    .any(|n| n.starts_with("world.decoder."))
+            );
+        } else {
+            assert!(report.world.reconstruction_loss > 0.0);
+        }
         let updated = agent.core.learner.world_train.read_params(&names);
         assert!(
             weights
@@ -1451,6 +1487,22 @@ mod tests {
         );
         restored.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
         restored.act(ActionMode::Greedy);
+        if cdp {
+            let core = &mut restored.core.learner;
+            core.begin_episode(Observation::rgb64(vec![0.1; config.observation_dim()]));
+            let prediction = core.observation_prediction();
+            assert_eq!(prediction.len(), config.prediction_dim());
+            assert!(prediction.iter().all(|x| x.is_finite()));
+            let first = core.prior_state_rollout(&[1, 2]);
+            assert_eq!(first, core.prior_state_rollout(&[1, 2]));
+            assert!(
+                first
+                    .1
+                    .iter()
+                    .all(|row| row.len() == config.prediction_dim())
+            );
+            assert_eq!(core.learner_step, 1);
+        }
         assert_eq!(
             updated,
             restored.core.learner.world_train.read_params(&names)
@@ -1459,6 +1511,19 @@ mod tests {
             moments,
             restored.core.learner.world_train.read_adam_states(&names)
         );
+        drop(restored);
+        let mut single = DreamerAgent::restore_rgb(&checkpoint).unwrap();
+        single.begin_episode(&frame(0, 0));
+        assert_eq!(
+            single.encoded_observation().len(),
+            config.encoded_observation_dim()
+        );
+        let before = single.latent_feature().to_vec();
+        let forecast = single.prior_state_rollout(&[1, 2]);
+        assert_eq!(forecast, single.prior_state_rollout(&[1, 2]));
+        assert_eq!(before, single.latent_feature());
+        assert_eq!(single.core().learner_step(), 1);
+        drop(single);
         fs::remove_dir_all(checkpoint).unwrap();
     }
 

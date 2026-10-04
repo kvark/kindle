@@ -507,8 +507,7 @@ impl DreamerCore {
             dreamerv3_revision: DREAMERV3_UPSTREAM_REV,
             meganeura_revision: MEGANEURA_REV,
             blade_revision: BLADE_REV,
-            future_head_revision: (self.config.loss_scales.future_prediction > 0.0)
-                .then_some(world::FUTURE_HEAD_REVISION),
+            future_head_revision: world::future_head_revision(&self.config),
             visitation_hash_version: self
                 .config
                 .visitation_bonus
@@ -647,6 +646,7 @@ impl DreamerCore {
     /// Forecast made before this observation when future prediction is enabled,
     /// otherwise posterior reconstruction. Reset observations have no forecast
     /// target and should be excluded from diagnostic error summaries.
+    /// CDP returns CNN embeddings, not pixels; see `prediction_dim()`.
     pub fn observation_prediction(&mut self) -> Vec<f32> {
         self.ensure_world_prediction_live();
         let decoder = self
@@ -657,7 +657,7 @@ impl DreamerCore {
         decoder.set_input("stoch", &self.stoch);
         decoder.step();
         decoder.wait();
-        let mut observation = vec![0.0; self.config.observation_dim()];
+        let mut observation = vec![0.0; self.config.prediction_dim()];
         decoder.read_output_by_index(0, &mut observation);
         observation
     }
@@ -834,7 +834,7 @@ impl DreamerCore {
                 decoder.set_input("stoch", &stoch);
                 decoder.step();
                 decoder.wait();
-                let mut observation = vec![0.0; self.config.observation_dim()];
+                let mut observation = vec![0.0; self.config.prediction_dim()];
                 decoder.read_output_by_index(0, &mut observation);
                 rollout.observations.push(observation);
             }
@@ -1912,6 +1912,12 @@ pub struct DreamerAgent {
 }
 
 impl DreamerAgent {
+    pub fn restore_rgb(checkpoint: impl AsRef<Path>) -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(Self {
+            inner: VectorDreamerAgent::restore_rgb(checkpoint, 1)?,
+        })
+    }
+
     pub fn new(
         config: DreamerConfig,
         encoder_checkpoint: impl AsRef<Path>,
@@ -1974,6 +1980,9 @@ impl DreamerAgent {
     }
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
         self.diagnostics().prior_diagnostic_rollout(actions)
+    }
+    pub fn prior_state_rollout(&mut self, actions: &[usize]) -> (Vec<Vec<f32>>, Vec<Vec<f32>>) {
+        self.diagnostics().prior_state_rollout(actions)
     }
     pub fn prior_behavior_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
         self.diagnostics().prior_behavior_rollout(actions)
@@ -2091,8 +2100,7 @@ fn validate_checkpoint_metadata(metadata: &CheckpointMetadata) -> io::Result<()>
             ));
         }
     }
-    let expected_future_head = (metadata.config.loss_scales.future_prediction > 0.0)
-        .then_some(world::FUTURE_HEAD_REVISION);
+    let expected_future_head = world::future_head_revision(&metadata.config);
     if metadata.future_head_revision.as_deref() != expected_future_head {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,

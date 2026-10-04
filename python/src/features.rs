@@ -1,8 +1,6 @@
 use super::*;
 use kindle::{DreamerCore, FeatureVectorAgent, FrameFlags, vision::Observation};
 
-type ForecastEndpoints = (Vec<Vec<f32>>, Vec<Vec<f32>>);
-
 /// Saved-feature diagnostics and offline learning use the production core;
 /// no separate world-model optimizer or CPU learning implementation.
 #[pyclass(name = "FeatureCore", module = "kindle._native", unsendable)]

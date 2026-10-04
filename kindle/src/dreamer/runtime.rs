@@ -245,6 +245,18 @@ pub(crate) fn configure_d3_optimizer(
     learner_step: u64,
     learning_rate: f32,
 ) {
+    if let Some(rate) = config.encoder_learning_rate {
+        session.set_lr_multiplier("world.representation.encoder.", rate / config.learning_rate);
+    }
+    if let Some(rate) = config.dynamics_learning_rate {
+        for prefix in [
+            "world.dynamics.",
+            "world.representation.posterior.",
+            "world.future_predictor.",
+        ] {
+            session.set_lr_multiplier(prefix, rate / config.learning_rate);
+        }
+    }
     session.set_laprop(
         d3_learning_rate(learning_rate, config.learning_rate_warmup, learner_step),
         config.optimizer_beta1,

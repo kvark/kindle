@@ -150,7 +150,7 @@ fn fixture(config: &DreamerConfig, rng: &mut StdRng) -> SequenceBatch {
 fn export_upstream_fixed_batch_reference() {
     let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_STEP_REFERENCE").unwrap());
     std::fs::create_dir(&root).unwrap();
-    let config = DreamerConfig {
+    let mut config = DreamerConfig {
         model_size: crate::ModelSize::Size1M,
         observation_kind: crate::ObservationKind::Rgb64,
         batch_size: 2,
@@ -162,6 +162,12 @@ fn export_upstream_fixed_batch_reference() {
         seed: 103,
         ..DreamerConfig::new(18)
     };
+    if std::env::var_os("KINDLE_CDP").is_some() {
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.encoder_learning_rate = Some(6e-6);
+        config.dynamics_learning_rate = Some(4e-4);
+    }
     save_json(&root.join("config.json"), &config);
     let mut core = DreamerCore::new(config.clone()).unwrap();
     let check_device = |core: &DreamerCore| {

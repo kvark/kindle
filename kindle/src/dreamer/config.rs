@@ -118,8 +118,8 @@ impl ModelSize {
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LossScales {
     pub reconstruction: f32,
-    /// Predict frozen observation features from the deterministic state before
-    /// the current observation enters the posterior. Zero disables the head.
+    /// Predict features from the deterministic prior. Feature observations use
+    /// squared error; RGB uses CDP cosine distance to detached CNN embeddings.
     #[serde(default)]
     pub future_prediction: f32,
     pub reward: f32,
@@ -209,6 +209,12 @@ pub struct DreamerConfig {
     pub slow_value_rate: f32,
     pub return_norm_rate: f32,
     pub learning_rate: f32,
+    /// Optional CNN/feature-adapter rate; defaults to the world learning rate.
+    #[serde(default)]
+    pub encoder_learning_rate: Option<f32>,
+    /// Optional RSSM (including posterior) and future-predictor learning rate.
+    #[serde(default)]
+    pub dynamics_learning_rate: Option<f32>,
     /// Optional actor/critic rate for optimization diagnostics. `None` keeps
     /// D3's shared world/behavior learning rate.
     #[serde(default)]
@@ -278,6 +284,8 @@ impl DreamerConfig {
             slow_value_rate: 0.02,
             return_norm_rate: 0.01,
             learning_rate: 4e-5,
+            encoder_learning_rate: None,
+            dynamics_learning_rate: None,
             behavior_learning_rate: None,
             actor_learning_starts: 0,
             learning_rate_warmup: 1_000,
@@ -371,6 +379,19 @@ impl DreamerConfig {
         self.behavior_learning_rate.unwrap_or(self.learning_rate)
     }
 
+    pub fn is_cdp(&self) -> bool {
+        self.observation_kind == ObservationKind::Rgb64 && self.loss_scales.future_prediction > 0.0
+    }
+
+    /// CDP forecasts CNN embeddings, not RGB images or reconstructed features.
+    pub fn prediction_dim(&self) -> usize {
+        if self.is_cdp() {
+            self.encoded_observation_dim()
+        } else {
+            self.observation_dim()
+        }
+    }
+
     pub fn world_microbatch_size(&self) -> usize {
         self.world_microbatch_size.unwrap_or(self.batch_size)
     }
@@ -458,10 +479,10 @@ impl DreamerConfig {
         }
         if self.observation_kind == ObservationKind::Rgb64
             && (self.visitation_bonus
-                || self.loss_scales.future_prediction != 0.0
-                || self.loss_scales.reconstruction <= 0.0)
+                || (self.loss_scales.future_prediction > 0.0)
+                    == (self.loss_scales.reconstruction > 0.0))
         {
-            return Err("RGB learning requires pixel reconstruction, not frozen-feature prediction or host visitation".into());
+            return Err("RGB learning requires exactly one of reconstruction or CDP, without host visitation".into());
         }
         if self.action_count <= 1 {
             return Err("action_count must be greater than one".into());
@@ -536,11 +557,18 @@ impl DreamerConfig {
         if !self.learning_rate.is_finite() || self.learning_rate <= 0.0 {
             return Err("learning_rate must be finite and positive".into());
         }
-        if self
-            .behavior_learning_rate
-            .is_some_and(|rate| !rate.is_finite() || rate <= 0.0)
-        {
-            return Err("behavior_learning_rate must be finite and positive".into());
+        for (name, rate) in [
+            ("behavior_learning_rate", self.behavior_learning_rate),
+            ("encoder_learning_rate", self.encoder_learning_rate),
+            ("dynamics_learning_rate", self.dynamics_learning_rate),
+        ] {
+            if rate.is_some_and(|rate| {
+                !rate.is_finite() || rate <= 0.0 || !(rate / self.learning_rate).is_finite()
+            }) {
+                return Err(format!(
+                    "{name} must be finite and positive with a finite rate ratio"
+                ));
+            }
         }
         if !self.optimizer_beta1.is_finite()
             || !self.optimizer_beta2.is_finite()
@@ -589,6 +617,40 @@ const fn default_replay_value_gradient() -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cdp_configuration_and_split_rates_roundtrip() {
+        let mut config = DreamerConfig::new(18);
+        config.model_size = ModelSize::Size1M;
+        config.observation_kind = ObservationKind::Rgb64;
+        assert!(!config.is_cdp());
+        assert_eq!(config.prediction_dim(), 12288);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        config.encoder_learning_rate = Some(6e-6);
+        config.dynamics_learning_rate = Some(4e-4);
+        assert!(config.check().is_ok());
+        assert!(config.is_cdp());
+        assert_eq!(config.prediction_dim(), 256);
+        let json = serde_json::to_vec(&config).unwrap();
+        assert_eq!(
+            config,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        for rate in [0.0, -1.0, f32::INFINITY, f32::NAN] {
+            let mut invalid = config.clone();
+            invalid.encoder_learning_rate = Some(rate);
+            assert!(invalid.check().is_err());
+            invalid = config.clone();
+            invalid.dynamics_learning_rate = Some(rate);
+            assert!(invalid.check().is_err());
+        }
+        config.loss_scales.reconstruction = 1.0;
+        assert!(
+            config.check().is_err(),
+            "no undeclared hybrid RGB/CDP objective"
+        );
+    }
 
     #[test]
     fn feature_standardization_is_optional_validated_and_serialized() {

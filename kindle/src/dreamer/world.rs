@@ -4,11 +4,11 @@ use meganeura::{Graph, graph::NodeId};
 
 use super::behavior;
 use super::config::VideoEncoder;
-use super::config::{DreamerConfig, FeatureStandardization};
+use super::config::{DreamerConfig, FeatureStandardization, ObservationKind};
 use super::networks::{
-    MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl, feature,
-    gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample, sum,
-    weighted_cross_entropy,
+    FeatureDecoder, MlpHead, ObservationDecoder, Prior, Representation, RssmCore, categorical_kl,
+    feature, gumbel_sample, mixed_probabilities, scale, slice_columns, straight_through_sample,
+    sum, weighted_cross_entropy,
 };
 use crate::vision::levjepa::joint;
 #[cfg(test)]
@@ -28,6 +28,16 @@ pub const ENCODER_SPREAD: usize = 10;
 pub const LOSS_INITIAL_POLICY: usize = 11;
 pub const LOSS_INITIAL_VALUE: usize = 12;
 pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
+
+mod cdp;
+
+pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
+    (config.loss_scales.future_prediction > 0.0).then_some(if config.is_cdp() {
+        "continuous-cosine-v1"
+    } else {
+        FUTURE_HEAD_REVISION
+    })
+}
 
 pub const IMAGINATION_FEATURE: usize = 0;
 pub const IMAGINATION_ALL_FEATURES: usize = 1;
@@ -153,7 +163,7 @@ struct WorldModel {
     dynamics: Dynamics,
     representation: Representation,
     decoder: Option<ObservationDecoder>,
-    future_predictor: Option<ObservationDecoder>,
+    future_predictor: Option<FuturePredictor>,
     heads: WorldHeads,
     /// The behavior optimizer owns these parameters. They are frozen in this
     /// graph so replay-value gradients only shape the posterior/RSSM path.
@@ -195,13 +205,32 @@ impl WorldModel {
     }
 }
 
-fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> ObservationDecoder {
-    ObservationDecoder::new(
-        graph,
-        config,
-        "world.future_predictor",
-        config.network().deter,
-    )
+enum FuturePredictor {
+    Features(FeatureDecoder),
+    Cdp(MlpHead),
+}
+
+impl FuturePredictor {
+    fn forward(&self, graph: &mut Graph, deter: NodeId, batch: usize) -> NodeId {
+        match self {
+            Self::Features(head) => head.forward(graph, deter, batch),
+            Self::Cdp(head) => head.forward(graph, deter),
+        }
+    }
+}
+
+fn future_predictor(graph: &mut Graph, config: &DreamerConfig) -> FuturePredictor {
+    let name = "world.future_predictor";
+    let input = config.network().deter;
+    match config.observation_kind {
+        ObservationKind::Features => {
+            FuturePredictor::Features(FeatureDecoder::new(graph, config, name, input))
+        }
+        ObservationKind::Rgb64 => {
+            let width = config.encoded_observation_dim();
+            FuturePredictor::Cdp(MlpHead::new(graph, name, input, width, 1, width))
+        }
+    }
 }
 
 /// Full sequence loss with externally sampled hard posterior states.
@@ -313,7 +342,11 @@ fn build_training_graph_grouped(
 
         let state = feature(&mut graph, deter, stoch, batch, config);
         head_inputs.push(HeadInputs {
-            observation: observations[time],
+            observation: if config.is_cdp() {
+                encodings[time]
+            } else {
+                observations[time]
+            },
             deter,
             state,
             keep_action,
@@ -380,25 +413,30 @@ fn build_training_graph_grouped(
         if let Some(predictor) = &model.future_predictor {
             // Each row uses deter_t, before posterior_t consumes observation_t.
             let prediction = predictor.forward(&mut graph, deter, rows);
-            let prediction = graph.reshape(prediction, &[rows, config.observation_dim()]);
+            let prediction = graph.reshape(prediction, &[rows, config.prediction_dim()]);
             let target = graph.stop_gradient(observation);
-            let target = standardized_target(
-                &mut graph,
-                target,
-                config.future_target_standardization.as_ref(),
-            );
-            let negative_target = graph.neg(target);
-            let residual = graph.add(prediction, negative_target);
-            let squared = graph.mul(residual, residual);
-            let per_row = graph.sum_inner(squared);
-            // Reset observations have no preceding action-conditioned state.
-            // Keep valid sequence/microbatch boundaries and normalize over B*T.
-            let keep = graph.sum_inner(keep_action);
-            let normalization =
-                graph.constant(vec![1.0 / config.action_count as f32; rows], &[rows, 1]);
-            let keep = graph.mul(keep, normalization);
-            let masked = graph.mul(per_row, keep);
-            future_prediction_losses.push(graph.mean_all(masked));
+            let per_row = if config.is_cdp() {
+                // Upstream CDP includes episode starts, predicting their
+                // embeddings from the reset recurrent state (without pixels).
+                cdp::cosine_distance(&mut graph, prediction, target)
+            } else {
+                let target = standardized_target(
+                    &mut graph,
+                    target,
+                    config.future_target_standardization.as_ref(),
+                );
+                let negative_target = graph.neg(target);
+                let residual = graph.add(prediction, negative_target);
+                let squared = graph.mul(residual, residual);
+                let per_row = graph.sum_inner(squared);
+                // Reset observations have no preceding action-conditioned state.
+                let keep = graph.sum_inner(keep_action);
+                let normalization =
+                    graph.constant(vec![1.0 / config.action_count as f32; rows], &[rows, 1]);
+                let keep = graph.mul(keep, normalization);
+                graph.mul(per_row, keep)
+            };
+            future_prediction_losses.push(graph.mean_all(per_row));
         }
         if let Some(decoder) = &model.decoder {
             let reconstruction = decoder.forward(&mut graph, state, rows);
@@ -578,7 +616,7 @@ impl HeadInputs {
             stack_time(graph, &values, config.batch_size, width)
         };
         Self {
-            observation: stack(|step| step.observation, config.observation_dim()),
+            observation: stack(|step| step.observation, config.prediction_dim()),
             deter: stack(|step| step.deter, config.network().deter),
             state: stack(|step| step.state, config.feature_dim()),
             keep_action: stack(|step| step.keep_action, config.action_count),

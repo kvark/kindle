@@ -19,6 +19,8 @@ from unittest.mock import patch
 
 from dreamer_rgb_reference import REVISION, native_parameter
 
+CDP_REVISION = "a851fa3e3d70b624b094ee1810ad4bb602346092"
+
 
 def parameter_layout(name, value):
     """Map upstream leaves into native checkpoint names and storage."""
@@ -30,6 +32,11 @@ def parameter_layout(name, value):
     module, leaf = parts[0], parts[-1]
     if module == "dyn":
         layer = parts[1]
+        if layer.startswith("pred"):
+            prefix = "world.future_predictor"
+            suffix = ("layer0.norm.weight" if layer == "pred0norm" else
+                      f"{'out' if layer == 'pred_out' else 'layer0'}.{'weight' if leaf == 'kernel' else 'bias'}")
+            return f"{prefix}.{suffix}", np.asarray(value, np.float32).reshape(-1)
         prefix = ("world.dynamics.core" if layer.startswith("dyn") else
                   "world.representation.posterior" if layer.startswith("obs") else "world.dynamics")
         if leaf == "scale":
@@ -68,12 +75,14 @@ def upstream_parameter(name, value, shape):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--upstream", required=True, type=Path)
+    parser.add_argument("--cdp", action="store_true", help="use pinned CDP reference; omit its detached visualization decoder")
     parser.add_argument("--output", type=Path, help="fresh result directory; native fixture remains read-only")
     parser.add_argument("root", type=Path)
     args = parser.parse_args()
     revision = subprocess.check_output(["git", "-C", str(args.upstream), "rev-parse", "HEAD"], text=True).strip()
-    if revision != REVISION:
-        raise ValueError(f"expected upstream {REVISION}, found {revision}")
+    expected_revision = CDP_REVISION if args.cdp else REVISION
+    if revision != expected_revision:
+        raise ValueError(f"expected upstream {expected_revision}, found {revision}")
     subprocess.run(["git", "-C", str(args.upstream), "diff", "--exit-code", "HEAD", "--",
                     "dreamerv3/rssm.py", "dreamerv3/agent.py", "embodied/jax"], check=True)
     sys.path.insert(0, str(args.upstream))
@@ -105,7 +114,7 @@ def main():
     device = jax.devices()[0]
     if device.platform != "gpu" or device.device_kind != "NVIDIA GeForce RTX 5080":
         raise ValueError(f"unexpected JAX device: {device}")
-    source = subprocess.check_output(["git", "-C", str(args.upstream), "show", f"{REVISION}:dreamerv3/configs.yaml"], text=True)
+    source = subprocess.check_output(["git", "-C", str(args.upstream), "show", f"{revision}:dreamerv3/configs.yaml"], text=True)
     configs = ruamel.yaml.YAML(typ="safe").load(source)
     config = elements.Config(configs["defaults"]).update(configs["size1m"]).agent.update({
         "imag_length": horizon, "ac_grads": native_config.get("actor_critic_gradient", False)})
@@ -116,6 +125,15 @@ def main():
     # Bypass only the device/sharding/runner wrapper, not the agent definition.
     model = object.__new__(agent.Agent)
     agent.Agent.__init__(model, obs_space, act_space, config)
+    if args.cdp:
+        assert native_config['loss_scales']['reconstruction'] == 0
+        assert native_config['loss_scales']['future_prediction'] == 500
+        assert native_config['encoder_learning_rate'] == config.enc_lr
+        assert native_config['dynamics_learning_rate'] == config.dyn_lr
+        # The released decoder is detached from the world/encoder and used
+        # only for visualization. Excluding it cannot change their gradients.
+        model.dec = lambda carry, *a, **kw: (carry, {}, {})
+        model.scales.pop('image')
     current = {}
     observe = rssm.RSSM.observe
     imagine = rssm.RSSM.imagine
@@ -123,15 +141,14 @@ def main():
     def sequence_observe(self, carry, tokens, actions, reset, training, single=False):
         if single:
             return observe(self, carry, tokens, actions, reset, training, single=True)
-        entries, features = [], []
+        outputs = []
         for time in range(length):
             current.update(phase="posterior", time=time)
-            carry, entry, feature = observe(self, carry, tokens[:, time],
+            carry, *parts = observe(self, carry, tokens[:, time],
                 jax.tree.map(lambda x: x[:, time], actions), reset[:, time], training, single=True)
-            entries.append(entry)
-            features.append(feature)
+            outputs.append(tuple(parts))
         stack = lambda *xs: jnp.stack(xs, 1)
-        return carry, jax.tree.map(stack, *entries), jax.tree.map(stack, *features)
+        return (carry, *jax.tree.map(stack, *outputs))
 
     def sequence_imagine(self, carry, policy, steps, training, single=False):
         if single:
@@ -175,7 +192,8 @@ def main():
             actions = {"action": data["actions"].reshape(length, batch, 18).argmax(-1).T.astype(jnp.int32)}
             carry = ({}, dict(deter=data["initial_deter"].reshape(batch, 512),
                               stoch=data["initial_stoch"].reshape(batch, 32, 4)), {})
-            loss, (_, _, output, metrics) = model.loss(carry, obs, actions, training=True)
+            loss, auxiliary = model.loss(carry, obs, actions, training=True)
+            _, _, output, metrics, *_ = auxiliary
             return loss, (output["repfeat"], metrics)
         finally:
             current.clear()
@@ -227,6 +245,13 @@ def main():
             assert mapped == native_names, (mapped ^ native_names)
             params = {k: v for k, v in state.items() if k.startswith(parameter_prefixes)}
             optimizer = model._make_opt(lr=native_config["learning_rate"], warmup=native_config["learning_rate_warmup"])
+            labels = {name: 'enc' if name.startswith('enc/') else 'dyn' if name.startswith('dyn/') else 'other'
+                      for name in params}
+            if args.cdp:
+                optimizer = optax.multi_transform({
+                    group: model._make_opt(lr=rate, warmup=native_config['learning_rate_warmup'])
+                    for group, rate in [('enc', config.enc_lr), ('dyn', config.dyn_lr),
+                                        ('other', native_config['learning_rate'])]}, labels)
             optimizer_state = optimizer.init(params)
 
             def loss_fn(params, extras, data):
@@ -249,6 +274,8 @@ def main():
                                           ("rep", "world", "representation_kl"), ("rew", "world", "reward_loss"),
                                           ("con", "world", "continuation_loss"), ("repval", "world", "replay_value_loss"),
                                           ("policy", "behavior", "policy_loss"), ("value", "behavior", "value_loss")]:
+                    if args.cdp and key == 'image':
+                        key, field = 'dyn_deter', 'future_prediction_loss'
                     compare(f"step{step}/loss/{key}", native[group][field], metrics[f"loss/{key}"])
                 native_grads = json.loads((path / "gradients.json").read_text())
                 common_grads = {}
@@ -261,8 +288,13 @@ def main():
                 state.update(params)
                 state, _ = ema(state)
                 after = native_checkpoint(path)
-                for kind, values, prefix in [("parameter", params, ""), ("momentum", optimizer_state[2][1], "adam_m."),
-                                             ("variance", optimizer_state[1][1], "adam_v.")]:
+                def moments(index):
+                    if not args.cdp:
+                        return optimizer_state[index][1]
+                    return {name: optimizer_state.inner_states[labels[name]].inner_state[index][1][name]
+                            for name in params}
+                for kind, values, prefix in [("parameter", params, ""), ("momentum", moments(2), "adam_m."),
+                                             ("variance", moments(1), "adam_v.")]:
                     for name, value in values.items():
                         native_name, expected = parameter_layout(name, value)
                         compare(f"step{step}/{kind}/{name}", after[prefix + native_name], expected,
@@ -274,6 +306,7 @@ def main():
                         compare(f"step{step}/ema/{name}", slow[native_name], expected, atol=3e-6, rtol=3e-5)
                 budget.check(f"step{step}")
         result = dict(status="passed", upstream=revision, updates=4, comparisons=reports,
+                      cdp=args.cdp, detached_visualization_decoder_omitted=args.cdp,
                       actor_critic_gradient=native_config.get("actor_critic_gradient", False),
                       limits=["fixed synthetic batches; not replay sampling or gameplay competence",
                               "raw gradients compared first; optimizer receives identical gradients to isolate its math"])

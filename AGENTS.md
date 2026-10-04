@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October4 current user goal: evaluate the CDP path.** The bounded
+  [CDP comparison](docs/experiments/2026-10-04-cdp.md) supersedes the unstarted
+  posterior-Tiny ablation. Keep RGB as the default. Qualify a small learned-CNN
+  CDP predictor/cosine loss and split learning rates, then six fresh Seaquest
+  runs (three paired seeds,200k actions/arm) and frozen state/forecast probes.
+  No Tiny pretraining, detached visualization decoder, posterior auxiliary
+  head, new representation matrix or automatic Phase3 campaign. Published
+  Crafter/XL evidence is not small-Atari or wall-clock evidence.
+  The explicitly approved initialization-only check passes at05:57 UTC with
+  one exact startup allocation warning, three4KiB allocations and256 exact
+  outputs; teardown completes, no recorded Xid/hang or recovery. Its result is
+  reviewed before new CDP numerical work. Ordinary guards still stop on new
+  warnings/faults; this is not a warning-class waiver or training qualification.
+
 - The September 27 user direction adopts `docs/strategy_reset_plan.md`:
   iteration speed -> test LeVJEPA's value -> exploration/reward -> video priors
   for dynamics/behavior -> later asynchronous real-time deployment. Stop
@@ -168,8 +182,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   No recorded Xid/hang/OOM-kill, child reaped. The first attempt's missing
   device override selected AMD and hit the device assertion. Both failures
   are retained. See `docs/results/2026-10-04-posterior-latent-qualification.md`.
-  Native work is stopped; a bounded initialization-only diagnostic is awaiting
-  user approval. Do not automatically whitelist the warning or retry.
+  That ablation remains unstarted. The subsequently approved initialization
+  diagnostic above passes; CDP now has priority. No automatic retry of this
+  stopped qualification and no warning-class whitelist.
   No unchanged RL queue,
   representation matrix or Phase3 starts automatically. Keep RGB/default ac_grads=false;
   target standardization stays opt-in. Its centering/scaling also changes loss
