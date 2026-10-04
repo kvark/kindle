@@ -9,9 +9,10 @@ overwrite completed/failed experiments or change their acceptance gates.
 
 October4's [CDP protocol](2026-10-04-cdp.md) supersedes the unstarted
 posterior-Tiny ablation. Its [qualification report](../results/2026-10-04-cdp-qualification.md)
-records passing initialization/cosine checks, four native updates per arm,
-an unresolved upstream gradient discrepancy and the06:31 allocation-warning
-stop. No learning run has started; RGB remains the default.
+passes independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons,
+native replay/restore and both production smokes. CI278 passes. Earlier failures
+and the06:31 warning stop remain retained. The declared six-run learning queue
+is active under ordinary guards, without a warning allowance; RGB stays default.
 
 October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its

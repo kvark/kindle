@@ -14,12 +14,13 @@ The [fixed protocol](experiments/2026-10-04-cdp.md) specifies the cosine loss,
 separate learning rates, controls, budgets and stop rules. This is a simpler
 JEPA-style Dreamer candidate, not a new pretrained encoder. The unstarted
 posterior-Tiny ablation below is deferred; no old queue resumes.
-The [qualification report](results/2026-10-04-cdp-qualification.md) records a
-passing initialization/cosine check and native synthetic updates, but incomplete
-upstream parity. A third-step gradient discrepancy is unresolved; a new
-allocation warning stopped the next check at06:31 UTC. No CDP learning has
-started. The user subsequently approves numerical checks capped at120 seconds
-and two exact-warning occurrences per process; training stays stopped until review.
+The [qualification report](results/2026-10-04-cdp-qualification.md) now passes
+independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons, native
+replay/restore and both excluded production smokes. CI278 passes. Earlier
+component/configuration/stack failures and the06:31 warning stop remain retained;
+no numerical tolerance was relaxed. The fixed six-run learning queue is active
+under ordinary guards: the numerical warning allowance does not extend to
+training. Frozen state/forecast probes follow the reviewed learning runs.
 Links into `runs/` are local workspace evidence, not publicly hosted artifacts.
 The numerical summaries here are public; publish compact result data and selected
 videos before relying on those links for external review.

@@ -1,10 +1,12 @@
-# CDP qualification: isolated upstream comparisons pass
+# CDP qualification complete; paired learning started
 
 October 4, 2026. [Protocol](../experiments/2026-10-04-cdp.md) ·
 [Machine-readable results](2026-10-04-cdp-qualification.json).
 
-**Learning remains stopped; numerical qualification is approved to resume.**
-No CDP gameplay or learning-efficiency result exists.
+**Qualification is complete and reviewed; the declared six-run queue is active.**
+No learning-efficiency result exists yet. The two short production smokes below
+are excluded from learning evidence. Ordinary learning guards have no warning
+allowance and stop the serial queue on any new warning or failure.
 Learned RGB remains the default. The posterior-Tiny queue remains deferred.
 The authorized follow-up passes all1,300 CDP and1,524 RGB comparisons across
 four updates per arm, including raw gradients, learning-rate groups, optimizer
@@ -21,15 +23,17 @@ are unchanged; the failed sequential-weight comparison below remains retained.
 | Native full updates | Four synthetic updates per arm complete; not upstream parity or gameplay |
 | Shared initialization | 60 world, 22 behavior and 11 slow-critic shared tensors exactly equal |
 | Upstream CDP/RGB | Isolated four-step checks pass1,300/1,524 comparisons; earlier failure retained |
-| Replay/restore | RGB passes; CDP follow-up in progress |
-| Production smokes | Unstarted |
-| Six-run learning comparison and frozen probes | Unstarted |
+| Replay/restore | Both native debug tests pass, including resident frozen diagnostics |
+| Production smokes | Both pass: 1,024 actions /195 updates, zero debt, finite checkpoints |
+| CI278 | Linux, macOS and Python bindings pass at `bee4e64` |
+| Six-run learning comparison | Started; fixed order/budget, ordinary guards |
+| Frozen probes | Await reviewed learning checkpoints |
 
 The small CDP model has 804,785 unique parameters versus RGB's 688,004. Its dense
 embedding predictor has more parameters than this small RGB decoder; it can
 still require less arithmetic, but no whole-agent speed claim is available.
 
-## Corrections and unresolved numerical result
+## Corrections and retained numerical failure
 
 The first native cosine test rejected an inference-only clamp during autodiff.
 The replacement expresses the norm floor through differentiable ReLU; a CPU
@@ -57,8 +61,8 @@ the warning below. The newly authorized follow-up completes all four updates.
 
 The next check was stopped at 06:31 UTC on a fresh occurrence of the exact
 `_memdescAllocInternal / NV_ERR_NO_MEMORY` message. Child542471 was reaped with
-SIGTERM; no new Xid/hang, unfinished child or recovery is recorded. No local GPU
-queue remains active. The initialization-only allowance does not cover this
+SIGTERM; no new Xid/hang, unfinished child or recovery is recorded. At that stop,
+no GPU queue remained active. The initialization-only allowance does not cover this
 ordinary qualification invocation; no new warning was silently whitelisted.
 
 The kernel source timestamp predates the child-spawn timestamp, while journal
@@ -76,8 +80,8 @@ Raw evidence: [experiment directory](../../runs/cdp-evaluation-20261004.olfQrV),
 These are local artifacts, not public downloads.
 
 The user subsequently approved remaining numerical checks capped at120 seconds
-and two exact-warning occurrences per process. Other failures remain fatal;
-training stays stopped until qualification is reviewed. This is not another
+and two exact-warning occurrences per process. Other failures remained fatal;
+training stayed stopped until qualification was reviewed. This is not another
 initialization-only loop or a training warning waiver.
 
 CI276/277 passed macOS/Python but exposed a debug stack overflow in replay/restore.
@@ -86,9 +90,27 @@ did not fix nested construction. The vector actor now heap-owns its learner
 (three changed lines), reducing large runtime stack copies without changing
 learning math or stack limits. The next check caught a test-only host/device
 replay mix; forecast assertions now use the real GPU actor route. All failures
-remain retained. RGB now passes on the native debug build; CDP and CI follow-up
-are in progress. No CPU learner fallback was introduced.
+remain retained. Both native debug checks now pass (CDP22.82s, RGB23.57s),
+as does CI278 on all platforms. No CPU learner fallback was introduced.
 
-Resolve full-update parity and the remaining qualification gates
-before the already declared six learning runs. No CPU learner workaround,
-driver recovery, old queue, Phase3 or swarm campaign is introduced.
+## Reviewed qualification and learning launch
+
+The successful upstream CDP follow-up records one allowed exact allocation
+warning; RGB records none. Both replay checks and both production smokes record
+none. All16 guard evidence audits pass, including the retained failed results.
+No new recorded Xid/hang, driver recovery or separate NVML polling.
+
+The excluded smokes use seed103, N8/B8/T16/H15/R32 and complete1,024 actions,
+195 updates and zero debt each. Both have zero completed episodes and eight
+unfinished tails, so supply no competence evidence. Every saved tensor is
+finite (CDP173 world /66 behavior /11 slow-value; RGB215/66/11). Across776
+samples, minimum estimated headroom is15,900,344,320 bytes; maximum estimated
+usage647,102,464 bytes. These are Vulkan estimates, not physical/peak VRAM.
+
+Production library SHA256:
+`32353ffb5d4516aa9281e94004f7b7ca2f126c9d29bfd62e33c36f78c44f502a`.
+The six-job queue `kindle-cdp-learning-20261004.service` starts with RGB1009,
+then CDP1009, CDP2017, RGB2017, RGB3019 and CDP3019. Each run has200k actual
+actions,49,939 updates and a60-minute deadline. No automatic retry, numerical
+warning allowance, compile during timing or extra learning allocation. The
+frozen diagnostics remain to be run after learning and guard review.

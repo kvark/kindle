@@ -1,7 +1,7 @@
 {
   "protocol": "kindle-cdp-qualification-v1",
   "date": "2026-10-04",
-  "status": "stopped-before-learning",
+  "status": "qualification-complete-learning-started",
   "root": "/x/Code/kindle/runs/cdp-evaluation-20261004.olfQrV",
   "implementation_commit": "8bc17d39eef74844da795c1ec4faa68e2c159df6",
   "backend": {
@@ -75,7 +75,14 @@
   "upstream": {
     "cdp_revision": "a851fa3e3d70b624b094ee1810ad4bb602346092",
     "rgb_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
-    "rgb_comparison": "unrun",
+    "rgb_comparison": {
+      "status": "passed",
+      "comparisons": 1524,
+      "updates": 4,
+      "guard": "rgb-upstream-queue/rgb-upstream-reference",
+      "maximum_parameter_error": 1.1920928955078125e-7,
+      "new_allocation_warnings": 0
+    },
     "cdp_attempts": [
       {
         "guard": "cdp-upstream-queue/cdp-upstream-reference",
@@ -113,6 +120,18 @@
         "reason": "new allocation warning before comparison",
         "change": "isolate raw gradient comparison at exact native pre-step parameters; reference optimizer/EMA remains independent; tolerances unchanged",
         "numerical_result": null
+      },
+      {
+        "guard": "cdp-upstream-v4-queue/cdp-upstream-reference",
+        "status": "passed",
+        "comparisons": 1300,
+        "updates": 4,
+        "maximum_parameter_error": 2.384185791015625e-7,
+        "maximum_gradient_relative_l2": 0.00045674313588525754,
+        "new_allowed_allocation_warnings": 1,
+        "raw_gradients": "exact native pre-step weights",
+        "optimizer_ema": "independent common-gradient trajectory",
+        "tolerances_changed": false
       }
     ]
   },
@@ -133,13 +152,25 @@
     "causal_attribution": "unresolved; source and receipt timestamps differ"
   },
   "learning": {
-    "started_runs": 0,
-    "gameplay_actions": 0,
+    "status": "started-after-qualification-review",
+    "service": "kindle-cdp-learning-20261004.service",
+    "spec": "learning-spec.json",
+    "queue": "learning-queue",
+    "order": [
+      "rgb-1009",
+      "cdp-1009",
+      "cdp-2017",
+      "rgb-2017",
+      "rgb-3019",
+      "cdp-3019"
+    ],
+    "actions_per_run": 200000,
+    "updates_per_run": 49939,
+    "timeout_seconds_per_run": 3600,
+    "allocation_warning_allowance": 0,
+    "automatic_retry": false,
     "remaining": [
-      "upstream CDP/RGB comparisons",
-      "CDP/RGB replay/checkpoint/forecast tests",
-      "two excluded 1024-action production smokes",
-      "six 200000-action learning runs",
+      "six-run learning comparison and audits",
       "frozen diagnostics"
     ]
   },
@@ -207,13 +238,150 @@
       "unsealed_files": [],
       "host_guard_passed": false,
       "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-upstream-v4-queue/cdp-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-upstream-queue/rgb-upstream-reference",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-v2-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 27,
+      "unsealed_files": [],
+      "host_guard_passed": false,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-replay-v3-queue/cdp-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-replay-queue/rgb-replay-debug",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "cdp-smoke-queue/cdp-smoke",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    {
+      "guard": "rgb-smoke-queue/rgb-smoke",
+      "audit_exit_code": 0,
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
     }
   ],
   "limitations": [
     "initialization success with an allowed warning is not hardware-health qualification",
-    "no complete upstream CDP parity or CDP learning advantage established",
-    "full-update exports are synthetic, not gameplay evidence",
+    "isolated raw-gradient and independent common-gradient optimizer parity is not bitwise stochastic-trajectory equivalence",
+    "no CDP learning advantage established yet; smokes excluded",
     "GPU utilization and physical/peak VRAM unmeasured",
-    "no new warning waiver or automatic retry"
-  ]
+    "numerical exact-warning allowance does not extend to training"
+  ],
+  "production": {
+    "commit": "bee4e64c477ccc5161239bafa0153ee358f2dd7d",
+    "native_sha256": "32353ffb5d4516aa9281e94004f7b7ca2f126c9d29bfd62e33c36f78c44f502a",
+    "debug_test_sha256": "2988bc5f8659c9818365efcd6419bc929fcfcdecc1807453fb538727e8ee8821",
+    "ci": {
+      "run": 37184358740,
+      "number": 278,
+      "linux": "success",
+      "macos": "success",
+      "python": "success"
+    }
+  },
+  "replay_restore": {
+    "rgb": {
+      "passed": true,
+      "seconds": 23.57,
+      "guard": "rgb-replay-queue/rgb-replay-debug"
+    },
+    "cdp": {
+      "passed": true,
+      "seconds": 22.82,
+      "guard": "cdp-replay-v3-queue/cdp-replay-debug"
+    },
+    "new_allocation_warnings": 0,
+    "retained_failures": [
+      {
+        "guard": "cdp-replay-queue/cdp-replay-debug",
+        "reason": "debug nested construction stack overflow; vector learner now heap-owned"
+      },
+      {
+        "guard": "cdp-replay-v2-queue/cdp-replay-debug",
+        "reason": "test mixed host/device replay; now exercises resident Agent API"
+      }
+    ]
+  },
+  "production_smokes": {
+    "seed": 103,
+    "actions_per_arm": 1024,
+    "updates_per_arm": 195,
+    "training_debt": 0,
+    "completed_episodes_per_arm": 0,
+    "partial_returns_per_arm": [
+      40,
+      0,
+      20,
+      20,
+      0,
+      40,
+      0,
+      0
+    ],
+    "actions_per_stream": 128,
+    "new_allocation_warnings": 0,
+    "excluded_from_learning": true,
+    "all_saved_tensors_finite": true,
+    "tensor_counts": {
+      "cdp": {
+        "world": 173,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "rgb": {
+        "world": 215,
+        "behavior": 66,
+        "slow_value": 11
+      }
+    },
+    "sampled_gpu_memory": {
+      "samples": 776,
+      "minimum_estimated_headroom_bytes": 15900344320,
+      "maximum_estimated_usage_bytes": 647102464
+    }
+  }
 }
