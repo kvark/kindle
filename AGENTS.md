@@ -137,11 +137,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified learning backend: Meganeura `13b19d33` over main `6268ea5`,
-  Blade `e349cddf`. This includes host optimizer correction and the attention-
-  value alias fix; all 148 Tiny gradients match independent F64. Check upstream
-  before diagnosing already-fixed issues. Historical Phase 2/capture results
-  retain their original pins; no recursive repinning or checkpoint migration.
+- Current qualified runtime backend: Meganeura main `592a2f5a`, Blade `e349cddf`.
+  The [October4 refresh](docs/results/2026-10-04-meganeura-main-qualification.md)
+  passes 2,824 upstream CDP/RGB comparisons, causal Tiny streaming and all three
+  production/frozen-restore smokes; 14 guards pass with no new warnings. No
+  learning campaign resumes. The previous `13b19d33` already included the
+  attention-value alias fix and passed all 148 independent F64 Tiny gradients;
+  do not relabel that historical joint-Tiny result as new-backend qualification.
+  Check upstream before diagnosing already-fixed issues. Historical Phase 2/
+  capture results retain their original pins; no recursive repinning or migration.
   The [capture report](docs/results/2026-10-02-matching-external-allocations.md)
   is separate from ordinary learner qualification.
 

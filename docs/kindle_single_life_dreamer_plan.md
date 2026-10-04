@@ -300,8 +300,10 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified learning pins are Meganeura13b19d33/Bladee349cddf; retain
-  independent numerical references and original identities for old results.
+  Current qualified runtime pins are Meganeura592a2f5a/Bladee349cddf; the
+  [backend refresh](results/2026-10-04-meganeura-main-qualification.md) passes
+  independent numerical and short production/restore checks, not a new learning
+  comparison. Retain original backend identities for old results.
   No repeated upstream learning replication without a relevant change.
 - Serialize bounded native jobs under the [host guard](gpu_incident_response.md)
   in persistent systemd user services. Require the expected device and >=2 GiB
