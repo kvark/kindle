@@ -15,6 +15,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The user confirms Boxing, Pong, Freeway, Breakout and Qbert: 45 fresh small
   runs (five games x three methods x three seeds), with frozen evaluation.
   Execute Freeway first; both excluded Tiny qualification smokes pass.
+  The first CDP launch stops before training on a new exact allocation warning;
+  0/45 complete. See the October4 initialization-stop report. GPU work remains
+  stopped; a proposed two-warning/first10-second startup allowance needs new
+  user approval and is not implemented. No automatic retry or successor.
   Do not reopen the cancelled historical queue or add an intrinsic-reward arm.
 - **October 4: the user adopts CDP on the main path.** The authoritative roadmap
   is [docs/kindle_single_life_dreamer_plan.md](docs/kindle_single_life_dreamer_plan.md).

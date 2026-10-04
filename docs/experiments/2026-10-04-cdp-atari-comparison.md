@@ -108,3 +108,11 @@ Before the study the local disk had1.1GB free. Approved cleanup removed only
 the two git-ignored Rust incremental-build caches under target/debug and
 python/target/debug; free space is now51GB. Source, binaries, checkpoints,
 logs and other experiment evidence were not removed. The caches are rebuildable.
+
+## First launch: stopped during initialization
+
+Freeway CDP seed1009 stops before recording any actions or updates on another
+exact NVIDIA allocation warning. No successor/retry is launched; **0/45 runs
+complete**. The declaration and all budgets remain unchanged. The scoped
+host-only review, retained incomplete broad snapshot and pending startup-only
+warning-policy request are in the [incident report](../results/2026-10-04-cdp-atari-initialization-stop.md).
