@@ -1,0 +1,705 @@
+{
+  "protocol": "kindle-cdp-atari-comparison-v1",
+  "status": "partial",
+  "completed_pairs": 1,
+  "planned_pairs": 45,
+  "games": [
+    "Freeway",
+    "Boxing",
+    "Pong",
+    "Breakout",
+    "Qbert"
+  ],
+  "methods": [
+    "cdp",
+    "rgb",
+    "pretrained_tiny"
+  ],
+  "seeds": [
+    1009,
+    2017,
+    3019
+  ],
+  "root": "/x/Code/kindle/runs/cdp-atari-learning-20261004.XLgCAlkq",
+  "excluded_preparation_root": "/x/Code/kindle/runs/cdp-atari-comparison-20261004.KnROnx",
+  "aids": "none",
+  "tiny_pretraining": "250000 same-title random-play observations; frozen encoder 7fe9b252; extra experience",
+  "failed_initialization_attempts": 1,
+  "runs": [
+    {
+      "name": "freeway-cdp-1009",
+      "game": "Freeway",
+      "method": "cdp",
+      "seed": 1009,
+      "config": {
+        "action_count": 18,
+        "model_size": "size1_m",
+        "observation_kind": "rgb64",
+        "video_encoder": null,
+        "future_target_standardization": null,
+        "reconstruction_target_standardization": null,
+        "observation_decoder_depth": 64,
+        "replay_capacity": 100000,
+        "batch_size": 8,
+        "batch_length": 16,
+        "world_backprop_length": 16,
+        "world_microbatch_size": 8,
+        "replay_context": 1,
+        "train_ratio": 32,
+        "imagination_length": 15,
+        "horizon": 333,
+        "lambda": 0.95,
+        "free_nats": 1,
+        "dynamics_free_nats": null,
+        "unimix": 0.01,
+        "value_bins": 255,
+        "actor_unimix": 0,
+        "actor_entropy": 0.0003,
+        "slow_value_rate": 0.02,
+        "return_norm_rate": 0.01,
+        "learning_rate": 0.00004,
+        "encoder_learning_rate": 0.000006,
+        "dynamics_learning_rate": 0.0004,
+        "behavior_learning_rate": null,
+        "actor_learning_starts": 0,
+        "learning_rate_warmup": 1000,
+        "optimizer_beta1": 0.9,
+        "optimizer_beta2": 0.999,
+        "optimizer_epsilon": 1e-20,
+        "agc": 0.3,
+        "agc_pmin": 0.001,
+        "loss_scales": {
+          "reconstruction": 0,
+          "future_prediction": 500,
+          "reward": 1,
+          "continuation": 1,
+          "dynamics": 1,
+          "representation": 0.1,
+          "policy": 1,
+          "value": 1,
+          "replay_value": 0.3
+        },
+        "replay_value_gradient": true,
+        "actor_critic_gradient": false,
+        "extrinsic_reward_scale": 1,
+        "intrinsic_reward_scale": 0,
+        "visitation_bonus": false,
+        "seed": 1009,
+        "skip_full_optimize": false
+      },
+      "native_sha256": "32353ffb5d4516aa9281e94004f7b7ca2f126c9d29bfd62e33c36f78c44f502a",
+      "source_sha256": "7a78afc7cedcbba0f0488c30985d959118fba1b53e2c88aa22369488f11c75ed",
+      "training": {
+        "actions": 200000,
+        "updates": 49939,
+        "seconds": 1422.8853650949895,
+        "online_last50_mean": 0,
+        "completed_episodes": 96,
+        "partial_returns": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "partial_lengths": [
+          424,
+          424,
+          424,
+          424,
+          424,
+          424,
+          424,
+          424
+        ],
+        "per_stream_realtime": [
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064,
+          1.1713171284805064
+        ],
+        "learner_timing": {
+          "replay_seconds": 0.0012182624072969023,
+          "posterior_seconds": 0.003892871757444082,
+          "imagination_seconds": 0.01171742080091712,
+          "world_train_seconds": 0.008235970629167585,
+          "replay_refresh_seconds": 0.00006165207547207593,
+          "world_sync_seconds": 0.000049694481126974906,
+          "behavior_train_seconds": 0.0012147571526462285,
+          "behavior_sync_seconds": 0.00019592880604337291,
+          "total_seconds": 0.026586928494323075
+        },
+        "curve_columns": [
+          "actions",
+          "seconds",
+          "online_last50_mean"
+        ],
+        "curve": [
+          [
+            2000,
+            12.648233299027197,
+            null
+          ],
+          [
+            4000,
+            26.937128036050126,
+            null
+          ],
+          [
+            6000,
+            41.186564503004774,
+            null
+          ],
+          [
+            8000,
+            55.43778222508263,
+            null
+          ],
+          [
+            10000,
+            69.52186440199148,
+            null
+          ],
+          [
+            12000,
+            83.78538246208336,
+            null
+          ],
+          [
+            14000,
+            97.84285142400768,
+            null
+          ],
+          [
+            16000,
+            111.88919093203731,
+            null
+          ],
+          [
+            18000,
+            126.11958504305221,
+            0
+          ],
+          [
+            20000,
+            140.38978885102551,
+            0
+          ],
+          [
+            22000,
+            154.49252586904913,
+            0
+          ],
+          [
+            24000,
+            168.73368177306838,
+            0
+          ],
+          [
+            26000,
+            183.0336618720321,
+            0
+          ],
+          [
+            28000,
+            197.2879842040129,
+            0
+          ],
+          [
+            30000,
+            211.54567092109937,
+            0
+          ],
+          [
+            32000,
+            225.68651521706488,
+            0
+          ],
+          [
+            34000,
+            239.9675638451008,
+            0
+          ],
+          [
+            36000,
+            254.33529300102964,
+            0
+          ],
+          [
+            38000,
+            268.64238405402284,
+            0
+          ],
+          [
+            40000,
+            282.92559764906764,
+            0
+          ],
+          [
+            42000,
+            297.1340027070837,
+            0
+          ],
+          [
+            44000,
+            311.50379465008155,
+            0
+          ],
+          [
+            46000,
+            325.9405725650722,
+            0
+          ],
+          [
+            48000,
+            340.46548654907383,
+            0
+          ],
+          [
+            50000,
+            354.82269423804246,
+            0
+          ],
+          [
+            52000,
+            369.1672537510749,
+            0
+          ],
+          [
+            54000,
+            383.3753651500447,
+            0
+          ],
+          [
+            56000,
+            397.4633872010745,
+            0
+          ],
+          [
+            58000,
+            411.4244983610697,
+            0
+          ],
+          [
+            60000,
+            425.4940171680646,
+            0
+          ],
+          [
+            62000,
+            439.66419041506015,
+            0
+          ],
+          [
+            64000,
+            453.73944804503117,
+            0
+          ],
+          [
+            66000,
+            468.04302946303505,
+            0
+          ],
+          [
+            68000,
+            482.280922427075,
+            0
+          ],
+          [
+            70000,
+            496.57263656903524,
+            0
+          ],
+          [
+            72000,
+            510.9428098590579,
+            0
+          ],
+          [
+            74000,
+            525.3717609060695,
+            0
+          ],
+          [
+            76000,
+            539.7273296480998,
+            0
+          ],
+          [
+            78000,
+            553.8647363290656,
+            0
+          ],
+          [
+            80000,
+            568.1911640760954,
+            0
+          ],
+          [
+            82000,
+            582.5352677430492,
+            0
+          ],
+          [
+            84000,
+            596.9496482650284,
+            0
+          ],
+          [
+            86000,
+            611.2448013430694,
+            0
+          ],
+          [
+            88000,
+            625.4814972850727,
+            0
+          ],
+          [
+            90000,
+            639.8300865880447,
+            0
+          ],
+          [
+            92000,
+            654.1627031690441,
+            0
+          ],
+          [
+            94000,
+            668.5209570780862,
+            0
+          ],
+          [
+            96000,
+            682.6975177190034,
+            0
+          ],
+          [
+            98000,
+            696.9145543590421,
+            0
+          ],
+          [
+            100000,
+            711.4902462080354,
+            0
+          ],
+          [
+            102000,
+            725.834599882015,
+            0
+          ],
+          [
+            104000,
+            739.8619790320517,
+            0
+          ],
+          [
+            106000,
+            754.139908940997,
+            0
+          ],
+          [
+            108000,
+            768.3830981770298,
+            0
+          ],
+          [
+            110000,
+            782.4810199930798,
+            0
+          ],
+          [
+            112000,
+            796.6843997150427,
+            0
+          ],
+          [
+            114000,
+            810.8619590700837,
+            0
+          ],
+          [
+            116000,
+            825.0429904960329,
+            0
+          ],
+          [
+            118000,
+            839.2725603610743,
+            0
+          ],
+          [
+            120000,
+            853.62938411301,
+            0
+          ],
+          [
+            122000,
+            867.8277936610393,
+            0
+          ],
+          [
+            124000,
+            882.0074349810602,
+            0
+          ],
+          [
+            126000,
+            896.2483537790831,
+            0
+          ],
+          [
+            128000,
+            910.4211632140214,
+            0
+          ],
+          [
+            130000,
+            924.6253662800882,
+            0
+          ],
+          [
+            132000,
+            938.9336151980096,
+            0
+          ],
+          [
+            134000,
+            953.225299561047,
+            0
+          ],
+          [
+            136000,
+            967.3598808310926,
+            0
+          ],
+          [
+            138000,
+            981.495752706076,
+            0
+          ],
+          [
+            140000,
+            995.7776964050718,
+            0
+          ],
+          [
+            142000,
+            1009.902930752025,
+            0
+          ],
+          [
+            144000,
+            1024.022729161079,
+            0
+          ],
+          [
+            146000,
+            1038.2952530561015,
+            0
+          ],
+          [
+            148000,
+            1052.5197438240284,
+            0
+          ],
+          [
+            150000,
+            1066.613823686028,
+            0
+          ],
+          [
+            152000,
+            1080.7942419830943,
+            0
+          ],
+          [
+            154000,
+            1095.0625321740517,
+            0
+          ],
+          [
+            156000,
+            1109.3843304170296,
+            0
+          ],
+          [
+            158000,
+            1123.5337193480227,
+            0
+          ],
+          [
+            160000,
+            1137.7249439390143,
+            0
+          ],
+          [
+            162000,
+            1151.9400483480422,
+            0
+          ],
+          [
+            164000,
+            1166.1754908090224,
+            0
+          ],
+          [
+            166000,
+            1180.2014483030653,
+            0
+          ],
+          [
+            168000,
+            1194.382659621071,
+            0
+          ],
+          [
+            170000,
+            1208.6936929500662,
+            0
+          ],
+          [
+            172000,
+            1223.0193608960835,
+            0
+          ],
+          [
+            174000,
+            1237.6495769070461,
+            0
+          ],
+          [
+            176000,
+            1252.0833681389922,
+            0
+          ],
+          [
+            178000,
+            1266.3800170820905,
+            0
+          ],
+          [
+            180000,
+            1280.6023502669996,
+            0
+          ],
+          [
+            182000,
+            1294.737381580053,
+            0
+          ],
+          [
+            184000,
+            1308.813880737056,
+            0
+          ],
+          [
+            186000,
+            1323.0705760440324,
+            0
+          ],
+          [
+            188000,
+            1337.2723566250643,
+            0
+          ],
+          [
+            190000,
+            1351.3968231230974,
+            0
+          ],
+          [
+            192000,
+            1365.564886540058,
+            0
+          ],
+          [
+            194000,
+            1379.7756037230138,
+            0
+          ],
+          [
+            196000,
+            1394.2512053659884,
+            0
+          ],
+          [
+            198000,
+            1408.6493475910975,
+            0
+          ],
+          [
+            200000,
+            1422.8853650949895,
+            0
+          ]
+        ]
+      },
+      "frozen": {
+        "score": 0,
+        "cohort_complete": true,
+        "selected_episodes": 24,
+        "excess_episodes": 0,
+        "actions": 49152,
+        "updates": 0,
+        "seconds": 18.333410333027132,
+        "partial_returns": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "partial_lengths": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unchanged_tensor_counts": {
+          "world": 173,
+          "behavior": 66,
+          "slow_value": 11
+        },
+        "video": {
+          "path": "/x/Code/kindle/runs/cdp-atari-learning-20261004.XLgCAlkq/freeway-cdp-1009-frozen.mp4",
+          "sha256": "1a5c687430bfd0ec9c69dd60c2651fc6ecd9700151fd54197e5a870285f49fa0",
+          "stream": 0,
+          "frames": 24575,
+          "fps": 60,
+          "raw_frames_sha256": "2ecbdf8de7140fc826ee87560fd4b9087f8daa86ae44ae311e6ca2e029b713e7",
+          "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+        }
+      },
+      "guard_audits_passed": true,
+      "training_live_allocation_warnings": 0,
+      "evaluation_live_allocation_warnings": 0,
+      "baseline_allocation_warnings_per_process": 16,
+      "raw_pair_audit": "/x/Code/kindle/runs/cdp-atari-learning-20261004.XLgCAlkq/freeway-cdp-1009-pair-audit.json"
+    }
+  ],
+  "limits": [
+    "one learner seed/method/game so far; no CDP-versus-control claim",
+    "200000 training actions, not a mastery guarantee",
+    "frozen sampled-policy first three episodes per stream; all excess episodes and tails retained",
+    "no untrained-control competence claim",
+    "whole-agent timing includes checkpoint save; GPU utilization unmeasured",
+    "warning recording is authorized; historical warnings are not new faults"
+  ]
+}

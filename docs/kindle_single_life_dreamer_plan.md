@@ -83,6 +83,8 @@ the intrinsic-reward experiment below. The user confirms **Boxing, Pong, Freeway
 Breakout and Qbert**: 45 small runs (three methods x three seeds per game),
 each with frozen evaluation. Freeway runs first. Keep all methods extrinsic-only and
 use fresh matched controls, not the old aided/non-sticky/large-model results.
+Completed evidence and new rollout links are in the [five-game report](results/2026-10-04-cdp-atari-comparison.md);
+the PR remains the running-status dashboard.
 
 **Yes, Atari training is next.** Use the qualified small CDP agent to test
 learning from sparse rewards, not to reopen the unchanged five-game mastery
