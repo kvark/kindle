@@ -77,10 +77,13 @@ at h15, but one-step forecasts still lose to persistence. At15 steps they beat
 persistence (.848 ratio) but lose to the constant training mean (1.048).
 Player-state/reward/action controls still fail to establish useful dynamics.
 All paired initial/frozen tensor audits, numerical checks and CI270 pass.
-Keep standardization opt-in and RGB as the2D default. No GPU job remains active.
-The proposed next cheap diagnostic is to locate readable state across Tiny,
-RSSM posterior/prior and predicted features on these same saved traces; this
-test cannot distinguish the belief bottleneck from transition/head failures.
+Keep standardization opt-in and RGB as the2D default. The authorized
+[frozen-belief diagnostic](experiments/2026-10-04-rssm-belief-probes.md) now
+locates readable state across the196-value adapter, RSSM posterior/prior and
+predicted features on these saved traces: three replays,24 small GPU readouts,
+zero actor updates or gameplay. Read-only/RNG/causal-alignment checks and the
+short pipeline smoke pass. Fitted and transferred readouts distinguish poor
+readability from distribution shift; the prior scaling test could not do so.
 No fresh campaign or Phase3 starts automatically.
 
 For the previously qualified frozen path, numerical, optimizer/restore,

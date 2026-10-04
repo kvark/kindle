@@ -229,6 +229,7 @@ struct PriorRollout {
     continuations: Vec<f32>,
     values: Vec<f32>,
     observations: Vec<Vec<f32>>,
+    features: Vec<Vec<f32>>,
 }
 
 /// D3's runner does not call its ratio scheduler before replay is ready. The
@@ -705,14 +706,22 @@ impl DreamerCore {
     /// Open-loop prior reward predictions for a proposed action sequence.
     /// The live posterior state and RNG are left unchanged.
     pub fn prior_reward_rollout(&mut self, actions: &[usize]) -> Vec<f32> {
-        self.prior_rollout(actions, false, false).rewards
+        self.prior_rollout(actions, false, false, false).rewards
     }
 
     /// Open-loop prior rewards and decoded visual observations.
     /// This diagnostic leaves the live posterior and all RNG streams intact.
     pub fn prior_diagnostic_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<Vec<f32>>) {
-        let rollout = self.prior_rollout(actions, true, false);
+        let rollout = self.prior_rollout(actions, true, false, false);
         (rollout.rewards, rollout.observations)
+    }
+
+    /// Open-loop belief and predicted observations, without touching live state
+    /// or RNG. Each belief is deterministic state followed by sampled latents,
+    /// exactly the feature layout consumed by the policy.
+    pub fn prior_state_rollout(&mut self, actions: &[usize]) -> (Vec<Vec<f32>>, Vec<Vec<f32>>) {
+        let rollout = self.prior_rollout(actions, true, false, true);
+        (rollout.features, rollout.observations)
     }
 
     /// Open-loop reward, continuation, and value predictions.
@@ -720,7 +729,7 @@ impl DreamerCore {
     /// Calling this independently for candidate actions reuses identical
     /// categorical draws, making one-step counterfactual comparisons paired.
     pub fn prior_behavior_rollout(&mut self, actions: &[usize]) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
-        let rollout = self.prior_rollout(actions, false, true);
+        let rollout = self.prior_rollout(actions, false, true, false);
         (rollout.rewards, rollout.continuations, rollout.values)
     }
 
@@ -729,6 +738,7 @@ impl DreamerCore {
         actions: &[usize],
         decode_observations: bool,
         decode_behavior: bool,
+        collect_features: bool,
     ) -> PriorRollout {
         assert!(self.active, "call begin_episode before probing the prior");
         assert!(!actions.is_empty());
@@ -751,6 +761,7 @@ impl DreamerCore {
             } else {
                 0
             }),
+            features: Vec::with_capacity(if collect_features { actions.len() } else { 0 }),
         };
         if decode_observations {
             self.ensure_world_prediction_live();
@@ -780,6 +791,11 @@ impl DreamerCore {
                 self.config.unimix,
                 &mut rng,
             );
+            if collect_features {
+                rollout
+                    .features
+                    .push(join_features(&deter, &stoch, 1, &self.config));
+            }
             self.world_heads_live.set_input("deter", &deter);
             self.world_heads_live.set_input("stoch", &stoch);
             self.world_heads_live.step();
@@ -2339,6 +2355,84 @@ fn all_finite(values: &[f32]) -> bool {
 mod tests {
     use super::*;
     use rand::Rng;
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; frozen belief readback and causal alignment"]
+    fn prior_state_readback_preserves_live_state_and_rng() {
+        let mut config = DreamerConfig::tiny(3);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        let mut core = DreamerCore::new(config).unwrap();
+        assert_eq!(
+            core.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        let memory = core.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        core.begin_episode(Observation::from_vec(vec![0.2; Observation::LEN]));
+        let feature = core.latent_feature().to_vec();
+        let encoding = core.encoded_observation().to_vec();
+        let rng_draws = |core: &DreamerCore| {
+            [
+                &core.rngs.policy,
+                &core.rngs.live_posterior,
+                &core.rngs.replay,
+                &core.rngs.train_posterior,
+                &core.rngs.imagination,
+            ]
+            .map(|rng| rng.clone().random::<u64>())
+        };
+        let before_rng = rng_draws(&core);
+        let checkpoint =
+            std::path::PathBuf::from(std::env::var("KINDLE_BELIEF_CHECKPOINT_DIR").unwrap());
+        assert!(!checkpoint.exists());
+        core.save_checkpoint(checkpoint.join("before")).unwrap();
+        let actions = [0, 1, 2];
+        let legacy = core.prior_diagnostic_rollout(&actions);
+        let (states, observations) = core.prior_state_rollout(&actions);
+        assert_eq!(observations, legacy.1);
+        assert_eq!(
+            (states.clone(), observations.clone()),
+            core.prior_state_rollout(&actions)
+        );
+        assert_eq!(core.latent_feature(), feature);
+        assert_eq!(core.encoded_observation(), encoding);
+        assert_eq!(rng_draws(&core), before_rng);
+        assert_eq!(
+            (core.learner_step, core.environment_step, core.replay.len()),
+            (0, 0, 1)
+        );
+        let size = core.config.network();
+        for state in &states {
+            assert_eq!(state.len(), core.config.feature_dim());
+            assert!(state.iter().all(|v| v.is_finite()));
+            for categorical in state[size.deter..].chunks_exact(size.classes) {
+                assert_eq!(categorical.iter().sum::<f32>(), 1.0);
+                assert!(categorical.iter().all(|v| *v == 0.0 || *v == 1.0));
+            }
+        }
+        core.save_checkpoint(checkpoint.join("after")).unwrap();
+        core.observe_recorded(
+            0,
+            Observation::from_vec(vec![-0.4; Observation::LEN]),
+            Reward::default(),
+            FrameFlags::default(),
+        );
+        for (prior, posterior) in states[0][..size.deter].iter().zip(core.latent_feature()) {
+            assert!((prior - posterior).abs() < 2e-5);
+        }
+        for (prior, after_observation) in observations[0].iter().zip(core.observation_prediction())
+        {
+            assert!((prior - after_observation).abs() < 2e-5);
+        }
+        assert_eq!(core.environment_step, 1);
+        assert_eq!(core.learner_step, 0);
+        let memory = core.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        eprintln!(
+            "prior state layout, legacy outputs, live state/RNG and h1 causal alignment pass"
+        );
+    }
 
     #[test]
     #[ignore = "requires separately guarded GPU; standardization identity and exact restore"]

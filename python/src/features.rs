@@ -1,6 +1,8 @@
 use super::*;
 use kindle::{DreamerCore, FeatureVectorAgent, FrameFlags, vision::Observation};
 
+type ForecastEndpoints = (Vec<Vec<f32>>, Vec<Vec<f32>>);
+
 /// Saved-feature diagnostics and offline learning use the production core;
 /// no separate world-model optimizer or CPU learning implementation.
 #[pyclass(name = "FeatureCore", module = "kindle._native", unsendable)]
@@ -48,6 +50,33 @@ impl PyFeatureCore {
         Ok(Self {
             inner: DreamerCore::new(config).map_err(|e| PyRuntimeError::new_err(e.to_string()))?,
         })
+    }
+
+    #[classmethod]
+    fn restore(_class: &Bound<'_, PyType>, checkpoint: &str) -> PyResult<Self> {
+        let inner =
+            DreamerCore::restore(checkpoint).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        if inner.config().video_encoder.is_some()
+            || inner.config().observation_kind != kindle::ObservationKind::Features
+        {
+            return Err(PyValueError::new_err("expected a saved-feature core"));
+        }
+        Ok(Self { inner })
+    }
+
+    #[getter]
+    fn latent_feature(&self) -> Vec<f32> {
+        self.inner.latent_feature().to_vec()
+    }
+
+    #[getter]
+    fn encoded_observation(&self) -> Vec<f32> {
+        self.inner.encoded_observation().to_vec()
+    }
+
+    #[getter]
+    fn deterministic_size(&self) -> usize {
+        self.inner.config().network().deter
     }
 
     fn begin_episode(&mut self, features: &[u8]) -> PyResult<()> {
@@ -103,6 +132,25 @@ impl PyFeatureCore {
         // materializing every intermediate feature map as Python floats.
         Ok((
             vec![rewards[0], rewards[last]],
+            vec![observations[0].clone(), observations[last].clone()],
+        ))
+    }
+
+    /// Read-only first/final prior belief and predicted-feature endpoints.
+    fn forecast_states(&mut self, actions: Vec<usize>) -> PyResult<ForecastEndpoints> {
+        if actions.is_empty()
+            || actions
+                .iter()
+                .any(|a| *a >= self.inner.config().action_count)
+        {
+            return Err(PyValueError::new_err(
+                "nonempty valid action sequence required",
+            ));
+        }
+        let (states, observations) = self.inner.prior_state_rollout(&actions);
+        let last = actions.len() - 1;
+        Ok((
+            vec![states[0].clone(), states[last].clone()],
             vec![observations[0].clone(), observations[last].clone()],
         ))
     }

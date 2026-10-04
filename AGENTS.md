@@ -144,9 +144,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   All initial pairs are exact; all252 saved tensors stay frozen in evaluation;
   finite checkpoints, all guards/seals, independent gradients,1,047 Python
   tests and CI270 pass. See `docs/results/2026-10-04-rssm-target-standardization.md`.
-  Proposed next diagnostic: locate readable state across Tiny, RSSM posterior/
-  prior and predicted features using this saved corpus, not more gameplay.
-  No GPU job remains active; no unchanged RL queue, representation matrix or
+  **Authorized October4 follow-up:** locate readable state across the196-value
+  adapter, full RSSM posterior, h1/h15 deterministic/full priors and predicted
+  features, using all three frozen standardized RSSMs and the saved corpus.
+  Three replays,24 small diagnostic GPU readouts, zero actor updates/gameplay.
+  Native read-only/legacy-output/RNG and h1 alignment canary and384-recorded-
+  action smoke pass; see `docs/experiments/2026-10-04-rssm-belief-probes.md`.
+  Fitted versus transferred readouts separate readability from distribution
+  shift; posterior estimates are not forecasts. No unchanged RL queue, representation matrix or
   Phase3 campaign starts automatically. Keep RGB/default ac_grads=false;
   target standardization stays opt-in. Its centering/scaling also changes loss
   weighting; do not call it an identical-objective speedup or online JEPA win.
