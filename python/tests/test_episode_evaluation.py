@@ -22,6 +22,8 @@ from test_atari_campaign import declaration_fixture, run_fixture
 def frozen_run(monkeypatch, tmp_path, request):
     created = []
     interrupt = False
+    export_checkpoint = False
+    exports = []
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -92,7 +94,9 @@ def frozen_run(monkeypatch, tmp_path, request):
             raise AssertionError('frozen evaluation learned')
 
         def save_checkpoint(self, path):
-            raise AssertionError('frozen evaluation wrote a checkpoint')
+            assert export_checkpoint, 'undeclared frozen checkpoint write'
+            assert self.learner_step == 7
+            exports.append(path)
 
     def make(*_, **__):
         env = Environment(len(created))
@@ -104,9 +108,10 @@ def frozen_run(monkeypatch, tmp_path, request):
     monkeypatch.setattr(atari_vector, 'checkpoint_identity', lambda path: {'fixture': True})
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
 
-    def run(target=2, cap=100, interrupted=False, memory=False):
-        nonlocal interrupt
+    def run(target=2, cap=100, interrupted=False, memory=False, export=False):
+        nonlocal interrupt, export_checkpoint
         interrupt = interrupted
+        export_checkpoint = export
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
         args = ['atari_vector.py', '--output', str(output), '--num-envs', '2',
                 '--steps', str(cap), '--evaluate', '--restore', 'fixture', '--report-every', '2',
@@ -116,9 +121,12 @@ def frozen_run(monkeypatch, tmp_path, request):
             args += ['--episodes-per-env', str(target)]
         if memory:
             args += ['--min-gpu-budget-headroom-mib', '2048']
+        if export:
+            args += ['--checkpoint', str(tmp_path / 'frozen-after'), '--checkpoint-every', str(cap)]
         monkeypatch.setattr(sys, 'argv', args)
         atari_vector.main()
         assert len(created) == 2 and all(env.closed for env in created)
+        assert len(exports) == int(export)
         return output, [json.loads(line) for line in output.read_text().splitlines()]
 
     return run
@@ -182,13 +190,24 @@ def test_interrupt_does_not_complete_episode_budget(frozen_run):
     assert result['actions'] == 2 and not result['budget_complete']
 
 
+@pytest.mark.parametrize('cap', [10, 100])
+def test_explicit_frozen_export_preserves_episode_budget_and_zero_updates(frozen_run, cap):
+    path, rows = frozen_run(cap=cap, export=True)
+    result = audit(path)
+    assert rows[0]['frozen_checkpoint_export'] is True
+    assert result['updates'] == 0
+    exported = [row for row in rows if row['event'] == 'checkpoint']
+    assert len(exported) == 1
+    assert exported[0]['run_step'] == result['actions']
+    assert exported[0]['learner_step'] == 7
+
+
 @pytest.mark.parametrize('args', [
     ['--episodes-per-env', '0', '--evaluate', '--restore', 'unused'],
     ['--episodes-per-env', '-1', '--evaluate', '--restore', 'unused'],
     ['--episodes-per-env', '1'],
     ['--episodes-per-env', '1', '--evaluate'],
     ['--episodes-per-env', '1', '--restore', 'unused'],
-    ['--episodes-per-env', '1', '--evaluate', '--restore', 'unused', '--checkpoint', 'unused'],
 ])
 def test_cli_rejects_ambiguous_episode_budget_before_gpu(monkeypatch, tmp_path, args):
     output = tmp_path / 'never-created.jsonl'

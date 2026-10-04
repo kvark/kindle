@@ -7,6 +7,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Active user goal: train CDP on the selected Atari games and compare with
+  Dreamer RGB and Tiny JEPA.** This takes priority over the unstarted intrinsic
+  reward experiment below. The [new declaration](docs/experiments/2026-10-04-cdp-atari-comparison.md)
+  uses the qualified small recipe, three learner seeds and fresh matched
+  controls; Tiny is pretrained/frozen, with its extra experience disclosed.
+  The user confirms Boxing, Pong, Freeway, Breakout and Qbert: 45 fresh small
+  runs (five games x three methods x three seeds), with frozen evaluation.
+  Execute Freeway first; both excluded Tiny qualification smokes pass.
+  Do not reopen the cancelled historical queue or add an intrinsic-reward arm.
 - **October 4: the user adopts CDP on the main path.** The authoritative roadmap
   is [docs/kindle_single_life_dreamer_plan.md](docs/kindle_single_life_dreamer_plan.md).
   Fast iteration, a faithful RGB control and the CDP evaluation are complete.

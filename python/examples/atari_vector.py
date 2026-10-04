@@ -102,8 +102,8 @@ def main():
     if args.episodes_per_env is not None:
         if args.episodes_per_env <= 0:
             parser.error("episodes-per-env must be positive")
-        if not args.evaluate or not args.restore or args.checkpoint:
-            parser.error("episodes-per-env requires frozen restore without checkpoint writes")
+        if not args.evaluate or not args.restore:
+            parser.error("episodes-per-env requires frozen restore")
     if not math.isfinite(args.exploration_probability) or not 0 <= args.exploration_probability <= 1:
         parser.error("exploration probability must be in [0, 1]")
     if args.exploration_hold <= 0:
@@ -231,6 +231,7 @@ def main():
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
                   **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),
+                  **(dict(frozen_checkpoint_export=True) if args.evaluate and args.checkpoint else {}),
                   policy_seed_rule="config.seed + stream (wrapping u64)",
                   atari_protocol=args.atari_protocol, action_repeat=ATARI_ACTION_REPEAT,
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,

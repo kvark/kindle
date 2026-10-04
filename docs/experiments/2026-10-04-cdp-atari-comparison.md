@@ -1,0 +1,99 @@
+# CDP, Dreamer RGB and Tiny JEPA on the selected Atari games
+
+The active user goal is to train CDP on the selected Atari games and evaluate
+against Dreamer RGB and Tiny JEPA. This takes priority over the unstarted
+intrinsic-reward comparison. CDP remains the main architecture. This is a new
+small-model comparison, never a restart of the cancelled historical12M queue.
+
+## Scope and preparation
+
+The user confirms the original five: **Boxing, Pong, Freeway, Breakout and
+Qbert**. Execute Freeway first, then Boxing, Pong, Breakout and Qbert. Venture
+and intrinsic-reward work are deferred. This is45 fresh training runs:
+five games x three methods x three seeds, not just the initial Freeway block.
+
+Use three learner seeds1009/2017/3019 and three methods: learned-CNN CDP,
+learned-CNN RGB Dreamer, and pretrained causal Tiny JEPA with a frozen encoder.
+No joint-Tiny/direct-policy arm, intrinsic reward, action aid, reward shaping,
+new pretraining or hyperparameter sweep. Tiny means the qualified5.5M pretrained
+encoder, not random initialization or303M Large. It received250k same-title
+random-play observations from the original five games (45k train +5k validation
+per game); disclose this extra experience. Venture was not in that corpus.
+
+All methods use native-detail observations and the qualified Size1M/N8/B8/T16/
+H15/R32/microbatch8/replay100000 recipe, full18 actions, sticky.25, repeat4,
+no reset no-ops and100000-frame artificial cutoffs. The existing CDP split rates
+and cosine loss, RGB reconstruction, and Tiny future-feature MSE are distinct
+packages, not one-factor objective or pretraining ablations. Per-stream causal
+histories remain independent. No RGB64-upscaled JEPA input.
+
+The new study uses the unchanged native library
+`32353ffb5d4516aa9281e94004f7b7ca2f126c9d29bfd62e33c36f78c44f502a`,
+Meganeura13b19d33/Bladee349cddf. October4 upstream recheck finds main6268ea5/
+e349cddf unchanged. Old five-game checkpoints, Phase2 Tiny/RGB and the current
+Seaquest result retain their original scope; they are not fresh matched controls
+for these new games. No repeated CDP/RGB numerical qualification is needed for
+unchanged code; their independent references and completed learning already pass.
+
+## Bounded Tiny qualification, declared before launch
+
+One excluded Freeway production smoke: pretrained frozen Tiny, seed1009,
+1,024 actions /195 updates, then a separate frozen restore smoke after review.
+Each native process has a120-second deadline and ordinary host guards, with
+**no new allocation-warning allowance**. Assert RTX5080 and >=2GiB sampled
+Vulkan budget headroom. Verify complete counters, finite checkpoint, zero debt,
+the exact pretrained encoder identity and no encoder training. Restore must
+act without learner updates; saved model/optimizer tensors must stay unchanged.
+These are extra diagnostic actions, not part of any learning curve.
+
+Runtime root: `runs/cdp-atari-comparison-20261004.KnROnx/`.
+Guarded persistent services use Restart=no, KillMode=control-group and a hard
+deadline. Serialize all GPU work; review any failure before another launch.
+No NVML polling, automatic retry, driver recovery or local native rebuild.
+
+## Fixed learning and evaluation declaration
+
+The small comparison is200,000 actual actions /49,939 updates per
+game/method/seed, with a60-minute hard deadline per training process. Final
+checkpoint only; no test-selected checkpoint or automatic budget extension.
+Method order is CDP/RGB/Tiny for1009, RGB/Tiny/CDP for2017 and Tiny/CDP/RGB for3019
+within each game. Train and audit each final checkpoint before evaluating it;
+review the complete pair before proceeding. Publish complete online score-vs-actions/time
+curves, final last50 completed-episode means, all tails, paired seed-bootstrap
+intervals, total/world-update time and aggregate/per-stream real time.
+
+Each final model receives frozen sampled-policy evaluation on eight streams,
+with environment seed=1,000,000,000+learner seed+stream*1,000,003 modulo2^32.
+Use the same pixel/sticky/action protocol. Stop once every stream completes
+three episodes, or at200,000 actual actions, with a30-minute wall deadline.
+Primary frozen scores use the first three completed episodes per stream;
+report natural versus truncated episodes separately and retain excess episodes
+and tails. A capped incomplete cohort has no complete-cohort score; do not hide
+it or silently extend the budget. This is a learning comparison, not a historical
+mastery/competence gate or an untrained-policy comparison.
+
+Export frozen final state separately and compare all saved model/optimizer
+tensors against the source checkpoint. The runner now explicitly declares this
+diagnostic checkpoint export for episode-limited evaluation; it still makes
+zero learner calls/updates. This Python-only change does not change learning
+or require a native rebuild. CPU tests cover full and capped frozen exports.
+Retain complete stream-zero videos by exact CPU environment replay after GPU
+evaluation; recording is not a GPU throughput measurement. Audit real actions,
+rewards, boundaries, resets, frame counts, source identities and zero updates.
+
+Report all attempts and failures. The older ten-run cap applied
+to upstream replication, not an implicit limit on this newly requested study.
+No upstream/JAX replication, exploration experiment or swarm is added here.
+
+## Preparation result
+
+Both Tiny smokes pass:1,024 training actions/195 updates, then1,024 frozen actions/
+zero updates with all241 saved tensors unchanged. Both ordinary guards/seals,
+counter ledgers and checkpoint-finiteness checks pass; no new kernel warning.
+The2,048 extra diagnostic actions are excluded from learning/evaluation results.
+All1,093 CPU Python tests pass, including complete and capped frozen exports.
+
+Before the study the local disk had1.1GB free. Approved cleanup removed only
+the two git-ignored Rust incremental-build caches under target/debug and
+python/target/debug; free space is now51GB. Source, binaries, checkpoints,
+logs and other experiment evidence were not removed. The caches are rebuildable.

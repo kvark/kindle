@@ -256,7 +256,8 @@ def audit(path):
                     check(final["learner_updates"] == updates, "final counts mismatch")
             elif kind == "checkpoint":
                 settled()
-                check(episode_target is None, "episode-budget evaluation wrote a checkpoint")
+                check(episode_target is None or header.get("frozen_checkpoint_export") is True,
+                      "undeclared episode-budget checkpoint export")
                 check(event["run_step"] == actions and event["learner_step"] == header["starting_learner_step"] + updates, "checkpoint counters mismatch")
             else:
                 raise ValueError(f"unknown event {kind}")

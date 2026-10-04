@@ -76,6 +76,14 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Next: Atari learning and exploration with CDP (Phase 3)
 
+**Active follow-up:** the user now requests training CDP on the selected Atari
+games and evaluating against Dreamer RGB and Tiny JEPA. This bounded
+[three-method comparison](experiments/2026-10-04-cdp-atari-comparison.md) precedes
+the intrinsic-reward experiment below. The user confirms **Boxing, Pong, Freeway,
+Breakout and Qbert**: 45 small runs (three methods x three seeds per game),
+each with frozen evaluation. Freeway runs first. Keep all methods extrinsic-only and
+use fresh matched controls, not the old aided/non-sticky/large-model results.
+
 **Yes, Atari training is next.** Use the qualified small CDP agent to test
 learning from sparse rewards, not to reopen the unchanged five-game mastery
 queue or spend more days establishing the RGB baseline.
