@@ -10,7 +10,11 @@ pub(super) fn cosine_distance(graph: &mut Graph, prediction: NodeId, target: Nod
     let mut normalize = |value| {
         let squared = graph.mul(value, value);
         let norm_squared = graph.sum_inner(squared);
-        let bounded = graph.clamp(norm_squared, 1e-8, f32::MAX);
+        let floor = graph.constant(vec![1e-8; shape[0]], &[shape[0], 1]);
+        let negative_floor = graph.neg(floor);
+        let above_floor = graph.add(norm_squared, negative_floor);
+        let above_floor = graph.relu(above_floor);
+        let bounded = graph.add(above_floor, floor);
         let log = graph.log(bounded);
         let log_inverse_root = graph.scale(log, -0.5);
         let inverse_root = graph.exp(log_inverse_root);
@@ -57,6 +61,8 @@ mod tests {
         assert!(parameters.contains(&"world.future_predictor.layer0.weight"));
         assert!(parameters.contains(&"world.representation.encoder.cnn0.weight"));
         assert_eq!(future_head_revision(&config), Some("continuous-cosine-v1"));
+        let backward = meganeura::autodiff::differentiate(&graph);
+        assert!(!backward.outputs().is_empty());
     }
 
     #[test]

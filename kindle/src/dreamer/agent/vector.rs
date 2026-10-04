@@ -1350,6 +1350,12 @@ mod tests {
     }
 
     fn check_rgb_replay_and_restore(cdp: bool) {
+        let checkpoint = check_rgb_vector_replay_and_restore(cdp);
+        check_rgb_single_restore(&checkpoint);
+        fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    fn check_rgb_vector_replay_and_restore(cdp: bool) -> std::path::PathBuf {
         let mut config = DreamerConfig::tiny(3);
         config.observation_kind = ObservationKind::Rgb64;
         config.replay_capacity = 32;
@@ -1512,19 +1518,19 @@ mod tests {
             restored.core.learner.world_train.read_adam_states(&names)
         );
         drop(restored);
-        let mut single = DreamerAgent::restore_rgb(&checkpoint).unwrap();
-        single.begin_episode(&frame(0, 0));
-        assert_eq!(
-            single.encoded_observation().len(),
-            config.encoded_observation_dim()
-        );
+        checkpoint
+    }
+
+    fn check_rgb_single_restore(checkpoint: &Path) {
+        let mut single = DreamerAgent::restore_rgb(checkpoint).unwrap();
+        single.begin_episode(&RgbFrame::new(19, 13, vec![127; 19 * 13 * 3]));
+        let width = single.core().config().encoded_observation_dim();
+        assert_eq!(single.encoded_observation().len(), width);
         let before = single.latent_feature().to_vec();
         let forecast = single.prior_state_rollout(&[1, 2]);
         assert_eq!(forecast, single.prior_state_rollout(&[1, 2]));
         assert_eq!(before, single.latent_feature());
         assert_eq!(single.core().learner_step(), 1);
-        drop(single);
-        fs::remove_dir_all(checkpoint).unwrap();
     }
 
     #[test]

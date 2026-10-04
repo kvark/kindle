@@ -3,14 +3,17 @@
 
 The native ignored test exports actual production posterior/imagination/targets,
 gradients and checkpoints. This verifier uses common initial weights and draws,
-checks raw model gradients, then supplies identical raw gradients to upstream's
-own optimizer and EMA. This avoids amplifying near-zero cross-backend gradient
-rounding through LaProp's first-step sign normalization. Only scan unrolling
-and random-number supply change in the model reference; loss math is upstream.
+checks raw model gradients at each native pre-step checkpoint, then supplies
+identical raw gradients to upstream's own optimizer and EMA. The optimizer runs
+continuously; it does not resynchronize its weights or moments. This separates
+gradient arithmetic from optimizer roundoff and LaProp sign normalization.
+Scan unrolling, random-number supply and the documented CDP construction fixes
+adapt the model reference; loss math is upstream.
 Replay sampling, environment collection and gameplay competence are out of scope.
 """
 
 import argparse
+from contextlib import nullcontext
 import json
 from pathlib import Path
 import subprocess
@@ -124,12 +127,22 @@ def main():
     act_space = {"action": elements.Space(np.int32, (), 0, 18)}
     # Bypass only the device/sharding/runner wrapper, not the agent definition.
     model = object.__new__(agent.Agent)
-    agent.Agent.__init__(model, obs_space, act_space, config)
+    if args.cdp:
+        # Upstream passes the outer {typ, simple} config to a helper expecting
+        # {depth, mults}; its default depth64 accidentally only fits Size200M.
+        calculate_width = rssm.Encoder.calculate_encoder_output_dim
+        dimension_fix = patch.object(rssm.Encoder, 'calculate_encoder_output_dim',
+            lambda self, spaces, cfg: calculate_width(self, spaces, cfg[cfg.typ]))
+    else:
+        dimension_fix = nullcontext()
+    with dimension_fix:
+        agent.Agent.__init__(model, obs_space, act_space, config)
     if args.cdp:
         assert native_config['loss_scales']['reconstruction'] == 0
         assert native_config['loss_scales']['future_prediction'] == 500
         assert native_config['encoder_learning_rate'] == config.enc_lr
         assert native_config['dynamics_learning_rate'] == config.dyn_lr
+        assert model.enc_output_dim == 256
         # The released decoder is detached from the world/encoder and used
         # only for visualization. Excluding it cannot change their gradients.
         model.dec = lambda carry, *a, **kw: (carry, {}, {})
@@ -211,6 +224,10 @@ def main():
         record = dict(name=name, maximum=float(error.max(initial=0)), relative_l2=relative)
         reports.append(record)
         if np.any(error > atol + rtol * np.abs(expected)):
+            worst = int(np.argmax(error / (atol + rtol * np.abs(expected) + 1e-30)))
+            record.update(worst_index=worst, actual=float(actual[worst]), expected=float(expected[worst]),
+                          expected_rms=float(np.sqrt(np.mean(expected ** 2))))
+            np.savez_compressed(output / 'failed-comparison.npz', actual=actual, expected=expected)
             raise AssertionError(record)
         if gradient and np.linalg.norm(error) > rtol * np.linalg.norm(expected) + 1e-7 * np.sqrt(len(actual)):
             raise AssertionError(record)
@@ -266,7 +283,10 @@ def main():
                 path = args.root / f"step{step}"
                 native = json.loads((path / "outputs.json").read_text())
                 extras = {k: v for k, v in state.items() if not k.startswith(parameter_prefixes)}
-                (_, (state, (feat, metrics))), grads = evaluate(params, extras, data)
+                before = native_checkpoint(args.root / (f'step{step - 1}' if step else 'initial'))
+                gradient_params = {name: jnp.asarray(upstream_parameter(name,
+                    before[parameter_layout(name, value)[0]], value.shape)) for name, value in params.items()}
+                (_, (state, (feat, metrics))), grads = evaluate(gradient_params, extras, data)
                 for key in ("deter", "stoch"):
                     compare(f"step{step}/{key}", native[key], np.asarray(feat[key]).swapaxes(0, 1),
                             atol=0 if key == "stoch" else 2e-4, rtol=0 if key == "stoch" else 2e-3)
@@ -307,8 +327,10 @@ def main():
                 budget.check(f"step{step}")
         result = dict(status="passed", upstream=revision, updates=4, comparisons=reports,
                       cdp=args.cdp, detached_visualization_decoder_omitted=args.cdp,
+                      cdp_encoder_config_nesting_fixed=args.cdp,
                       actor_critic_gradient=native_config.get("actor_critic_gradient", False),
                       limits=["fixed synthetic batches; not replay sampling or gameplay competence",
+                              "raw gradients use exact native pre-step weights; optimizer weights/moments remain independent",
                               "raw gradients compared first; optimizer receives identical gradients to isolate its math"])
     except Exception as error:
         result = dict(status="failed", upstream=revision, error=str(error), comparisons=reports)

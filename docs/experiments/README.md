@@ -7,6 +7,12 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October4's [CDP protocol](2026-10-04-cdp.md) supersedes the unstarted
+posterior-Tiny ablation. Its [qualification report](../results/2026-10-04-cdp-qualification.md)
+records passing initialization/cosine checks, four native updates per arm,
+an unresolved upstream gradient discrepancy and the06:31 allocation-warning
+stop. No learning run has started; RGB remains the default.
+
 October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
 task-adaptive representation hypothesis. Its
 [qualification report](../results/2026-10-02-joint-tiny-qualification.md) records

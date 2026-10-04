@@ -20,6 +20,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   outputs; teardown completes, no recorded Xid/hang or recovery. Its result is
   reviewed before new CDP numerical work. Ordinary guards still stop on new
   warnings/faults; this is not a warning-class waiver or training qualification.
+  **06:31 qualification stop:** cosine values/1,024 independent gradients pass;
+  four native updates per arm complete. CDP upstream passes two full updates
+  but fails a third-step gradient component despite6e-6 relative L2 error;
+  cause unresolved. The exact-native-weight isolation check stops before results
+  on a new allocation warning. Child reaped, no new Xid/hang or recovery recorded.
+  No learning run has started. The user subsequently approves remaining
+  numerical qualification with at most two occurrences of that exact warning
+  per process, each capped at120 seconds. Review each result; other faults,
+  numerical failures and excess warnings remain fatal. Training stays stopped
+  until qualification is reviewed. This is not a training warning waiver.
+  [Evidence](docs/results/2026-10-04-cdp-qualification.md).
 
 - The September 27 user direction adopts `docs/strategy_reset_plan.md`:
   iteration speed -> test LeVJEPA's value -> exploration/reward -> video priors
