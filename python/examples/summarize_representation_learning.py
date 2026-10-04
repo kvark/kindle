@@ -319,8 +319,9 @@ def plot_svg(result):
     """Render audited online curves, using only the summary's measured support."""
     colors = dict(zip(METHODS, ("#0072b2", "#cc79a7", "#009e73", "#e69f00", "#d55e00")))
     labels = dict(zip(METHODS, ("Upstream Dreamer", "Large JEPA", "Pretrained Tiny", "Initial Tiny", "Joint RGB CNN")))
-    colors.update(frozen_tiny="#0072b2", joint_tiny="#d55e00", policy_tiny="#009e73")
-    labels.update(frozen_tiny="Frozen Tiny encoder", joint_tiny="Joint task-adaptive Tiny", policy_tiny="Direct-policy Tiny")
+    colors.update(frozen_tiny="#0072b2", joint_tiny="#d55e00", policy_tiny="#009e73", rgb="#0072b2", cdp="#d55e00")
+    labels.update(frozen_tiny="Frozen Tiny encoder", joint_tiny="Joint task-adaptive Tiny", policy_tiny="Direct-policy Tiny",
+                  rgb="RGB Dreamer", cdp="Dreamer-CDP")
     methods = result.get("methods", METHODS)
     games = result.get("games", BASELINES)
     streams = result.get("num_envs", 6)
@@ -335,7 +336,8 @@ def plot_svg(result):
         element.text = text
         return element
 
-    study = ("Direct-policy Tiny" if result.get("comparison") == "policy_tiny" else
+    study = ("Dreamer-CDP" if result.get("comparison") == "cdp" else
+             "Direct-policy Tiny" if result.get("comparison") == "policy_tiny" else
              "Joint Tiny" if result.get("comparison") == "joint_tiny" else "Phase 2")
     add("title", id="title", text=f"{study} online learning: scores versus actions and wall time")
     add("desc", id="description", text="Last-50 completed episode means, not frozen competence. "
