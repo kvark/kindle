@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October5: exploration diagnosis complete; test lower-noise targets next.**
+  All196,608 logged actions replay with matching accounting; coverage barely
+  changes. Nine frozen GPU diagnostics pass: action-dependent bonus variation
+  is small, and mean UP-minus-DOWN bonus is negative in all three seeds.
+  The tight F64 discrepancy is isolated to cooperative reduced-input math;
+  native-F32 GPU readout agrees within2.65e-8. All768 UP/DOWN preferences agree
+  between paths; production precision stays unchanged. Retain failed checks.
+  [Evidence](docs/results/2026-10-05-freeway-disagreement-diagnosis.md).
+  Next one-factor test: detached posterior probabilities replace sampled
+  one-hot ensemble targets, preserving expected gradients but removing target
+  sampling noise. No coefficient/budget change, scripted aid, new encoder or
+  broad matrix. Qualify and declare before launch; Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh

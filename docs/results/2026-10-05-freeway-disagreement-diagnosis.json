@@ -1,0 +1,598 @@
+{
+  "status": "complete",
+  "artifact_root": "/x/Code/kindle/runs/freeway-disagreement-diagnosis-20261005.IJdvatPP",
+  "learner_updates": 0,
+  "new_policy_actions": 0,
+  "replayed_logged_actions": 196608,
+  "frozen_stream_zero_reencodings": 12288,
+  "guards": {
+    "collection/collect-1009": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "collection/collect-2017": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "collection/collect-3019": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "readout/bonus-1009": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "readout/bonus-2017": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "readout/bonus-3019": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "precision-v2/precision-1009": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "precision-v2/precision-2017": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "precision-v2/precision-3019": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    }
+  },
+  "failed_precision_guard": {
+    "verified_pins": 27,
+    "unsealed_files": [],
+    "host_guard_passed": false,
+    "monitoring": "host-only"
+  },
+  "source_sha256": {
+    "probe.py": "9ddec7ce30360ffbee66a8e1eab001434409f15ec613309a71ebc315fd075b13",
+    "analyse.py": "462d825d37515cdb6c3dcb1e0e4c0c273557f4406e2fbc7b93eaeb4961e1ef80",
+    "coverage.json": "2fe12dff0b48ed15327d6a5f625b56480417cfb7602895296c687b7b8e438c71",
+    "contrast.json": "763924f2d7eacf8996bd881dc36face1f69a0b7475ef245508b8437c8b88c5cc"
+  },
+  "coverage": [
+    {
+      "name": "train-control-1009",
+      "height_max_by_stream": [
+        87,
+        139,
+        80,
+        118,
+        89,
+        83,
+        104,
+        87
+      ],
+      "height_quantiles": [
+        6.0,
+        18.0,
+        47.0,
+        78.0,
+        139.0
+      ],
+      "height_ge_counts": {
+        "32": 8108,
+        "64": 1121,
+        "96": 126,
+        "128": 21,
+        "160": 0
+      },
+      "fraction_up": 0.333404541015625,
+      "fraction_down": 0.331787109375,
+      "longest_up_streak_by_stream": [
+        7,
+        7,
+        6,
+        7,
+        8,
+        8,
+        9,
+        6
+      ],
+      "validated_pixel_samples": 512,
+      "invisible_pixel_samples": 0
+    },
+    {
+      "name": "train-disagreement-1009",
+      "height_max_by_stream": [
+        87,
+        112,
+        80,
+        77,
+        83,
+        73,
+        95,
+        110
+      ],
+      "height_quantiles": [
+        6.0,
+        18.0,
+        46.0,
+        79.0,
+        112.0
+      ],
+      "height_ge_counts": {
+        "32": 7587,
+        "64": 1228,
+        "96": 90,
+        "128": 0,
+        "160": 0
+      },
+      "fraction_up": 0.333465576171875,
+      "fraction_down": 0.332183837890625,
+      "longest_up_streak_by_stream": [
+        7,
+        7,
+        6,
+        7,
+        7,
+        7,
+        8,
+        9
+      ],
+      "validated_pixel_samples": 510,
+      "invisible_pixel_samples": 2
+    },
+    {
+      "name": "train-disagreement-2017",
+      "height_max_by_stream": [
+        88,
+        76,
+        84,
+        85,
+        135,
+        89,
+        120,
+        104
+      ],
+      "height_quantiles": [
+        6.0,
+        19.0,
+        50.0,
+        82.0,
+        135.0
+      ],
+      "height_ge_counts": {
+        "32": 8708,
+        "64": 1318,
+        "96": 132,
+        "128": 13,
+        "160": 0
+      },
+      "fraction_up": 0.33038330078125,
+      "fraction_down": 0.33062744140625,
+      "longest_up_streak_by_stream": [
+        7,
+        6,
+        6,
+        9,
+        6,
+        6,
+        7,
+        6
+      ],
+      "validated_pixel_samples": 509,
+      "invisible_pixel_samples": 3
+    },
+    {
+      "name": "train-control-2017",
+      "height_max_by_stream": [
+        92,
+        76,
+        94,
+        80,
+        136,
+        77,
+        121,
+        105
+      ],
+      "height_quantiles": [
+        6.0,
+        19.0,
+        51.0,
+        86.0,
+        136.0
+      ],
+      "height_ge_counts": {
+        "32": 8775,
+        "64": 1654,
+        "96": 184,
+        "128": 5,
+        "160": 0
+      },
+      "fraction_up": 0.3309326171875,
+      "fraction_down": 0.332550048828125,
+      "longest_up_streak_by_stream": [
+        7,
+        6,
+        6,
+        9,
+        6,
+        6,
+        7,
+        6
+      ],
+      "validated_pixel_samples": 512,
+      "invisible_pixel_samples": 0
+    },
+    {
+      "name": "train-control-3019",
+      "height_max_by_stream": [
+        104,
+        99,
+        99,
+        81,
+        95,
+        74,
+        93,
+        81
+      ],
+      "height_quantiles": [
+        6.0,
+        19.0,
+        47.0,
+        75.0,
+        104.0
+      ],
+      "height_ge_counts": {
+        "32": 8586,
+        "64": 963,
+        "96": 20,
+        "128": 0,
+        "160": 0
+      },
+      "fraction_up": 0.335540771484375,
+      "fraction_down": 0.332855224609375,
+      "longest_up_streak_by_stream": [
+        7,
+        7,
+        7,
+        7,
+        6,
+        6,
+        8,
+        7
+      ],
+      "validated_pixel_samples": 509,
+      "invisible_pixel_samples": 3
+    },
+    {
+      "name": "train-disagreement-3019",
+      "height_max_by_stream": [
+        77,
+        90,
+        75,
+        87,
+        91,
+        74,
+        120,
+        81
+      ],
+      "height_quantiles": [
+        6.0,
+        16.0,
+        42.0,
+        73.0,
+        120.0
+      ],
+      "height_ge_counts": {
+        "32": 6692,
+        "64": 721,
+        "96": 59,
+        "128": 0,
+        "160": 0
+      },
+      "fraction_up": 0.3221435546875,
+      "fraction_down": 0.34161376953125,
+      "longest_up_streak_by_stream": [
+        7,
+        7,
+        7,
+        5,
+        6,
+        7,
+        8,
+        6
+      ],
+      "validated_pixel_samples": 510,
+      "invisible_pixel_samples": 2
+    }
+  ],
+  "contrast": [
+    {
+      "seed": 1009,
+      "samples": 256,
+      "default_independent_max_error": 1.463214502699095e-05,
+      "native_f32_independent_max_error": 1.6200132096910735e-08,
+      "default_meets_original_3e6_bound": false,
+      "default_vs_reference_argmax_agreement": 0.984375,
+      "default_vs_reference_up_down_agreement": 1.0,
+      "bonus_mean": 0.009934189579224848,
+      "between_state_std": 0.0019121010273824902,
+      "within_state_action_std": 0.00018604853557822225,
+      "relative_action_range_quantiles": [
+        0.02738355047109287,
+        0.04133773130041453,
+        0.062005990842842064,
+        0.09364636837801155,
+        0.17368517713192383
+      ],
+      "intrinsic_up_minus_down_mean": -0.00011367847552416302,
+      "up_preferred_fraction": 0.3359375,
+      "best_direction_fractions": {
+        "up": 0.2734375,
+        "down": 0.5703125,
+        "neutral": 0.15625
+      },
+      "bonus_mean_by_action": [
+        0.009995161790357088,
+        0.009919701120452373,
+        0.009842822993959999,
+        0.009900700462821987,
+        0.009855771753791487,
+        0.009960213134036167,
+        0.00984419735505071,
+        0.00982207244305755,
+        0.00990968753467314,
+        0.009871883821688243,
+        0.010009729585362948,
+        0.009933346607795102,
+        0.009975155213396647,
+        0.010052136725789751,
+        0.009825460450883838,
+        0.009932469483828754,
+        0.01005692465332686,
+        0.010107977295774617
+      ],
+      "policy_mean_by_action": [
+        0.05545756162609905,
+        0.055052306604920886,
+        0.052391158416867256,
+        0.056220918908366,
+        0.052418004197534174,
+        0.05248008323542308,
+        0.05447125721548218,
+        0.057424967279075645,
+        0.05438910594966728,
+        0.05395025132747833,
+        0.06221627052582335,
+        0.05595643630658742,
+        0.05663467878184747,
+        0.05568361596670002,
+        0.056434497877489775,
+        0.05744348160806112,
+        0.05327526413020678,
+        0.05810013752488885
+      ],
+      "current_actor_expected_bonus": 0.009937213980582548,
+      "uniform_expected_bonus": 0.009934189579224848,
+      "greedy_one_step_expected_bonus": 0.010283391282428056,
+      "policy_entropy_quantiles": [
+        2.887217986326885,
+        2.8880060824100235,
+        2.889020644977293,
+        2.889574630310159,
+        2.8900550715071374
+      ],
+      "player_height_quantiles": [
+        6.0,
+        6.0,
+        17.0,
+        40.0,
+        83.0
+      ],
+      "bonus_height_correlation": -0.05595167689844423,
+      "action_preference_height_correlation": 0.5223346964190597,
+      "next_stoch_mse": 0.13969700802482166,
+      "same_cohort_constant_stoch_mse": 0.14629507064819336,
+      "one_step_bonus_contrast_vs_last_mean_abs_advantage": 0.005658830225633195
+    },
+    {
+      "seed": 2017,
+      "samples": 256,
+      "default_independent_max_error": 2.194125470903613e-05,
+      "native_f32_independent_max_error": 2.646656695540206e-08,
+      "default_meets_original_3e6_bound": false,
+      "default_vs_reference_argmax_agreement": 1.0,
+      "default_vs_reference_up_down_agreement": 1.0,
+      "bonus_mean": 0.012126909454814773,
+      "between_state_std": 0.002994758552983905,
+      "within_state_action_std": 0.0001704707760431749,
+      "relative_action_range_quantiles": [
+        0.026542786051871572,
+        0.03801288170464343,
+        0.05169235854994066,
+        0.06756192909073486,
+        0.09432299726421182
+      ],
+      "intrinsic_up_minus_down_mean": -7.607766504709916e-05,
+      "up_preferred_fraction": 0.38671875,
+      "best_direction_fractions": {
+        "up": 0.21484375,
+        "down": 0.3203125,
+        "neutral": 0.46484375
+      },
+      "bonus_mean_by_action": [
+        0.012049036269672797,
+        0.01227598067089275,
+        0.011934001588087995,
+        0.012211311148348614,
+        0.012096983777155401,
+        0.012119382452510763,
+        0.012032558923237957,
+        0.012148383611929603,
+        0.01223640312491625,
+        0.012151436787462444,
+        0.012179753201053245,
+        0.012252046843059361,
+        0.0121079028249369,
+        0.012150428006862057,
+        0.012008098858132144,
+        0.012114525148717803,
+        0.012182827442302369,
+        0.012033309507387457
+      ],
+      "policy_mean_by_action": [
+        0.05423494236310944,
+        0.05780189200595487,
+        0.04815386417612899,
+        0.05891012030770071,
+        0.05826721480116248,
+        0.05193829887139145,
+        0.059664822969352826,
+        0.05871704615128692,
+        0.04794252529973164,
+        0.052477035627816804,
+        0.06281747455068398,
+        0.05397496350633446,
+        0.058785923436516896,
+        0.05632753479585517,
+        0.05183781341474969,
+        0.054069221747340634,
+        0.06433195456338581,
+        0.049747350756661035
+      ],
+      "current_actor_expected_bonus": 0.012129537236945643,
+      "uniform_expected_bonus": 0.012126909454814773,
+      "greedy_one_step_expected_bonus": 0.012436533350410173,
+      "policy_entropy_quantiles": [
+        2.885442320142178,
+        2.886029149661677,
+        2.8867124847571626,
+        2.8877348088808956,
+        2.889257418942738
+      ],
+      "player_height_quantiles": [
+        6.0,
+        6.0,
+        18.0,
+        45.0,
+        82.0
+      ],
+      "bonus_height_correlation": -0.06372002610052023,
+      "action_preference_height_correlation": 0.14022298795228139,
+      "next_stoch_mse": 0.13499970346157086,
+      "same_cohort_constant_stoch_mse": 0.15070891380310059,
+      "one_step_bonus_contrast_vs_last_mean_abs_advantage": 0.003787008829139603
+    },
+    {
+      "seed": 3019,
+      "samples": 256,
+      "default_independent_max_error": 1.485052609262287e-05,
+      "native_f32_independent_max_error": 1.7342765045239017e-08,
+      "default_meets_original_3e6_bound": false,
+      "default_vs_reference_argmax_agreement": 0.98046875,
+      "default_vs_reference_up_down_agreement": 1.0,
+      "bonus_mean": 0.010625016758846565,
+      "between_state_std": 0.0015419818263849852,
+      "within_state_action_std": 0.00015917646520314973,
+      "relative_action_range_quantiles": [
+        0.026598657794829953,
+        0.038354029151936475,
+        0.054698890339456324,
+        0.0738846427213252,
+        0.10072144803741533
+      ],
+      "intrinsic_up_minus_down_mean": -4.445785634743509e-05,
+      "up_preferred_fraction": 0.38671875,
+      "best_direction_fractions": {
+        "up": 0.234375,
+        "down": 0.41796875,
+        "neutral": 0.34765625
+      },
+      "bonus_mean_by_action": [
+        0.010605520008539315,
+        0.01056477604288375,
+        0.010570653905233485,
+        0.010682868736694218,
+        0.01065884539639228,
+        0.010592558050120715,
+        0.010643840847478714,
+        0.010596343299766886,
+        0.010644869549651048,
+        0.010662516055162996,
+        0.01058964285584807,
+        0.010665543011782574,
+        0.0107405599210324,
+        0.01065845604352944,
+        0.01056884076569986,
+        0.010563399027887499,
+        0.010544052140176063,
+        0.010697016001358861
+      ],
+      "policy_mean_by_action": [
+        0.0572751053259708,
+        0.05819068739947397,
+        0.049738277069991454,
+        0.06505637547525112,
+        0.049751275291782804,
+        0.062219017345341854,
+        0.0501319638278801,
+        0.04603200418932829,
+        0.05765205580973998,
+        0.05780357445473783,
+        0.05463493517891038,
+        0.058671884587965906,
+        0.05595573372556828,
+        0.06251313097891398,
+        0.04297720632166602,
+        0.04848174116341397,
+        0.056257311851368286,
+        0.0666577155207051
+      ],
+      "current_actor_expected_bonus": 0.010628148794357053,
+      "uniform_expected_bonus": 0.010625016758846565,
+      "greedy_one_step_expected_bonus": 0.010927773193543544,
+      "policy_entropy_quantiles": [
+        2.880273371273861,
+        2.881876203595807,
+        2.883372382723749,
+        2.8854246197765026,
+        2.888495488188167
+      ],
+      "player_height_quantiles": [
+        6.0,
+        6.0,
+        17.0,
+        38.0,
+        72.0
+      ],
+      "bonus_height_correlation": -0.15019631299583572,
+      "action_preference_height_correlation": 0.3706250333842453,
+      "next_stoch_mse": 0.14857334134444186,
+      "same_cohort_constant_stoch_mse": 0.1581125259399414,
+      "one_step_bonus_contrast_vs_last_mean_abs_advantage": 0.004770871496497966
+    }
+  ],
+  "limitations": [
+    "current restored posterior, not original online beliefs",
+    "one recorded stream per seed for bonus contrasts; all eight for coverage",
+    "no original pixel hashes, no image equality claim",
+    "default reduced-input GPU math fails original 3e-6 absolute diagnostic bound; full-F32 passes without relaxing it",
+    "no evidence the precision difference explains zero rewards",
+    "diagnostic labels never entered the policy or bonus"
+  ]
+}

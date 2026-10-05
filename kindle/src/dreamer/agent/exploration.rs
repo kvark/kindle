@@ -60,6 +60,15 @@ fn check_device(core: &DreamerCore) {
 }
 
 fn direct_bonus(core: &mut DreamerCore, states: &[f32], actions: &[f32]) -> Vec<f32> {
+    direct_bonus_precision(core, states, actions, meganeura::CoopPolicy::Auto).0
+}
+
+fn direct_bonus_precision(
+    core: &mut DreamerCore,
+    states: &[f32],
+    actions: &[f32],
+    coop: meganeura::CoopPolicy,
+) -> (Vec<f32>, Vec<String>) {
     let rows = actions.len() / core.config.action_count;
     let mut graph = meganeura::Graph::new();
     let head = Disagreement::new(&mut graph, &core.config);
@@ -67,7 +76,20 @@ fn direct_bonus(core: &mut DreamerCore, states: &[f32], actions: &[f32]) -> Vec<
     let action = graph.input("action", &[rows, core.config.action_count]);
     let bonus = head.bonus(&mut graph, state, action);
     graph.set_outputs(vec![bonus]);
-    let mut session = build_session(&graph, &core.gpu, Mode::Inference, false);
+    let mut session = meganeura::build(
+        &graph,
+        meganeura::SessionConfig {
+            mode: Mode::Inference,
+            gpu: Some(Arc::clone(&core.gpu)),
+            runtime: meganeura::SessionOptions {
+                coop,
+                gpu_timing: meganeura::GpuOptions::from_env().timing,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .0;
     share_matching(&mut core.world_train, &mut session, "world.exploration.");
     session.set_input("state", states);
     session.set_input("action", actions);
@@ -75,7 +97,69 @@ fn direct_bonus(core: &mut DreamerCore, states: &[f32], actions: &[f32]) -> Vec<
     session.wait();
     let mut result = vec![0.0; rows];
     session.read_output_by_index(0, &mut result);
-    result
+    (result, session.dispatch_pipeline_keys())
+}
+
+#[test]
+#[ignore = "read-only GPU diagnostic; all-action bonus on saved real posterior features"]
+fn probe_disagreement_checkpoint() {
+    use meganeura::data::safetensors::SafeTensorsModel;
+    let source = Path::new(&std::env::var("KINDLE_DISAG_PROBE_SOURCE").unwrap()).to_owned();
+    let states =
+        SafeTensorsModel::load(std::env::var("KINDLE_DISAG_PROBE_STATES").unwrap().into()).unwrap();
+    let output = Path::new(&std::env::var("KINDLE_DISAG_PROBE_OUTPUT").unwrap()).to_owned();
+    assert!(!output.exists());
+    let mut core = DreamerCore::restore(&source).unwrap();
+    check_device(&core);
+    assert!(core.config.uses_disagreement());
+    let shape = &states.tensor_info()["states"].shape;
+    assert_eq!(shape.len(), 2);
+    assert_eq!(shape[1], core.config.feature_dim());
+    let samples = states.tensor_f32("states").unwrap();
+    let mut expanded = Vec::new();
+    let mut actions = Vec::new();
+    for state in samples.chunks_exact(shape[1]) {
+        for action in 0..core.config.action_count {
+            expanded.extend_from_slice(state);
+            actions.extend((0..core.config.action_count).map(|index| f32::from(index == action)));
+        }
+    }
+    let (bonus, pipelines) =
+        direct_bonus_precision(&mut core, &expanded, &actions, meganeura::CoopPolicy::Auto);
+    let (bonus_native_f32, pipelines_native_f32) = direct_bonus_precision(
+        &mut core,
+        &expanded,
+        &actions,
+        meganeura::CoopPolicy::NativeF32,
+    );
+    assert!(
+        bonus
+            .iter()
+            .chain(&bonus_native_f32)
+            .all(|v| v.is_finite() && *v >= 0.0)
+    );
+    let after = output.with_extension("checkpoint");
+    core.save_checkpoint(&after).unwrap();
+    let mut tensors = 0;
+    for component in [CHECKPOINT_WORLD, CHECKPOINT_BEHAVIOR, CHECKPOINT_SLOW_VALUE] {
+        let before = SafeTensorsModel::load(source.join(component)).unwrap();
+        let after = SafeTensorsModel::load(after.join(component)).unwrap();
+        assert_eq!(before.tensor_info().len(), after.tensor_info().len());
+        for name in before.tensor_info().keys() {
+            assert_eq!(
+                before.tensor_f32(name).unwrap(),
+                after.tensor_f32(name).unwrap(),
+                "{name}"
+            );
+            tensors += 1;
+        }
+    }
+    check_device(&core);
+    let result = serde_json::json!({"status":"complete", "samples":shape[0],
+        "actions":core.config.action_count, "bonus":bonus, "unchanged_tensors":tensors,
+        "learner_updates":0, "bonus_native_f32":bonus_native_f32,
+        "pipelines":pipelines, "pipelines_native_f32":pipelines_native_f32});
+    fs::write(output, serde_json::to_vec(&result).unwrap()).unwrap();
 }
 
 #[test]

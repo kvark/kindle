@@ -81,8 +81,13 @@ The small disagreement mechanism below is implemented and
 [qualified](results/2026-10-04-cdp-exploration-qualification.md); the declared
 three-seed screen against extrinsic-only CDP is complete with zero real rewards
 in both arms. The [result](results/2026-10-05-cdp-freeway-exploration.md) shows
-nonzero intrinsic advantages but near-uniform policy entropy. Diagnose bonus
-action contrast and actual coverage before any larger run. The research-order question is
+nonzero intrinsic advantages but near-uniform policy entropy. The completed
+[coverage/bonus diagnosis](results/2026-10-05-freeway-disagreement-diagnosis.md)
+finds little coverage change, weak action contrast and no upward bonus preference.
+Next test detached posterior probabilities instead of sampled one-hot ensemble
+targets: the same expected regression gradient with less sampling noise. Keep
+the coefficient, model and32,768-action budget fixed; qualify and declare before
+launch. No larger run or precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
