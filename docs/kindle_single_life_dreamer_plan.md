@@ -86,10 +86,12 @@ nonzero intrinsic advantages but near-uniform policy entropy. The completed
 finds little coverage change, weak action contrast and no upward bonus preference.
 The [soft-target test](experiments/2026-10-05-freeway-soft-disagreement.md) replaces
 sampled one-hot ensemble targets with detached posterior probabilities: the
-same expected regression gradient with less sampling noise. Qualification passes;
-three fresh seeds started October5 at02:15 UTC, with coefficient, model and
-32,768-action budget fixed and the completed controls reused. No larger run or
-precision workaround is justified yet. The research-order question is
+same expected regression gradient with less sampling noise. Qualification and
+all three fresh seeds finish; [all still score zero](results/2026-10-05-freeway-soft-learning.md),
+with almost unchanged bonus/coverage. Next predict the existing detached CNN
+embedding, where player position is more readable; no new encoder. Declare its
+changed output width/natural scale and qualify before the same-budget screen.
+No larger run or precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation

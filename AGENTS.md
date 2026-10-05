@@ -17,13 +17,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   [Evidence](docs/results/2026-10-05-freeway-disagreement-diagnosis.md).
   The [soft-target test](docs/experiments/2026-10-05-freeway-soft-disagreement.md)
   is qualified:114 Rust/1,137 Python tests, four GPU checks and production/frozen
-  smokes pass; all346 tensors stay unchanged during frozen restore. Three fresh
-  seeds started October5 at02:15 UTC,32,768 actions each, reusing the six completed
-  controls. Detached posterior probabilities replace sampled one-hot targets,
-  preserving expected gradients but removing target sampling noise. No coefficient/
-  budget change, scripted aid, new encoder or broad matrix. The guarded service
-  audits each run and then automatically replays CPU coverage. Review before any
-  extension or frozen evaluation; Freeway remains unsolved.
+  smokes pass; all346 tensors stay unchanged during frozen restore. All three
+  fresh32,768-action seeds complete: still zero rewards, almost unchanged bonus,
+  near-uniform policy and coverage. Guards/counters/checkpoints and CPU replays
+  pass; no frozen evaluation or automatic extension. [Result](docs/results/2026-10-05-freeway-soft-learning.md).
+  Removing target sampling noise is insufficient. Next test predicts the
+  existing detached CNN embedding: position is more readable there than in the
+  categorical target. No coefficient/budget change, scripted aid, new encoder or
+  broad matrix. Qualify and declare the changed target width/scale before launch.
+  Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh
