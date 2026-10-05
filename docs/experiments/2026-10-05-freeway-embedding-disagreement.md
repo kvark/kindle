@@ -65,3 +65,15 @@ sentinels; an unused scalar continuation bias can therefore have a zero buffer.
 Check the autodiff zero sentinel for every non-ensemble parameter and read back
 any scalar gradient as exactly zero. The target/model code is unchanged by this
 test correction. No training or host recovery preceded review.
+
+All three learning seeds complete with zero rewards and almost unchanged
+coverage; [result](../results/2026-10-05-freeway-embedding-learning.md). Frozen
+competence evaluation is skipped. The follow-up read-only diagnosis uses the
+existing qualified collection/probe:4096 recorded stream0 actions/seed,
+256 sampled posterior states and all18 candidate actions, zero learner updates,
+exact equality of346 checkpoint tensors. Three300-second collection jobs then
+three120-second bonus readouts, serialized under the same guard settings with a
+1800-second service deadline. Independent F64 comparison uses the existing
+native-F32 probe path and unchanged3e-6 bound; production precision is unchanged.
+Report action/position contrast, not a new policy evaluation or causal advantage.
+No new native build, environment experience for learning, or training extension.

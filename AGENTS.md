@@ -28,7 +28,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   sentinel test failure is retained. Three fresh seeds are declared at the same
   budget, reusing soft/extrinsic controls. Output width128→256 adds33,280 head
   parameters and changes natural target scale, not the encoder. No coefficient/
-  budget change, scripted aid or broad matrix. Freeway remains unsolved.
+  budget change, scripted aid or broad matrix. All three finish with zero
+  rewards; larger bonus does not improve coverage. Three guards and full CPU
+  replays pass; frozen competence evaluation is skipped. The bounded frozen
+  action-contrast diagnosis is next, not a training extension. See the
+  [embedding result](docs/results/2026-10-05-freeway-embedding-learning.md).
+  Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh

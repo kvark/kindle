@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 4, 2026. This is the authoritative roadmap.
+Updated October 5, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -92,7 +92,10 @@ with almost unchanged bonus/coverage. The existing detached CNN embedding target
 where player position is more readable, is now [qualified](results/2026-10-05-freeway-embedding-qualification.md).
 No new encoder: the wider256-output ensemble adds33,280 parameters and changes
 natural target scale. Its [same-budget three-seed screen](experiments/2026-10-05-freeway-embedding-disagreement.md)
-reuses completed soft/extrinsic controls.
+reuses completed soft/extrinsic controls. All three finish with
+[zero rewards and unchanged coverage](results/2026-10-05-freeway-embedding-learning.md);
+the larger bonus does not produce useful action selection. Skip frozen
+competence evaluation; inspect frozen all-action bonus contrasts next.
 No larger run or precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 
