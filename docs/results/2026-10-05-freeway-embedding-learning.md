@@ -30,15 +30,39 @@ not evidence of better exploration. The excluded qualification collected3,072
 additional actions and451 updates; its original scalar-sentinel test failure
 remains in the [qualification report](2026-10-05-freeway-embedding-qualification.md).
 
-## Decision
+## Read-only diagnosis and decision
 
 Skip frozen competence evaluation under the declared all-zero rule; no automatic
-training extension or coefficient sweep. Re-encode each saved stream0 with the
-frozen final model and measure all18-action bonus contrast on256 states/seed.
-This bounded read-only diagnosis retains all model/optimizer tensors, uses the
-existing qualified GPU probe and independent F64 reference, and performs no new
-learning. Inspect action contrast and position dependence before choosing another
-mechanism or larger budget. Freeway remains unsolved.
+training extension or coefficient sweep. The bounded read-only diagnosis now
+finishes:12,288 recorded stream0 actions re-encoded,256 states/seed, all18 actions.
+All six guards and exact equality of346 tensors/model pass; zero learner updates.
+These are current restored states, not original online beliefs or new rollouts.
+
+| Seed | State/action bonus SD ratio | Actor's available one-step gain captured | UP beats DOWN | Best action is UP after centering |
+| --- | ---: | ---: | ---: | ---: |
+|1009|19.95|0.27%|50.4%|95.7%|
+|2017|20.13|0.99%|37.9%|96.1%|
+|3019|17.73|1.48%|39.5%|99.6%|
+
+Independent F64 posterior resampling contributes2.8–3.0 times the within-state
+action variation. Removing sampling noise from the target did not remove this
+input uncertainty. Cooperative bonus values differ from F64 by at most4.87e-5;
+native-F32 agrees within4.48e-8. Default/reference UP–DOWN preferences agree
+99.2/97.7/99.6%, with the numerical differences retained, not hidden. Production
+precision is unchanged. A one-step preference is not a causal return estimate.
+
+Offline, subtracting each predictor's average across all actions cancels its
+action-independent component. It preserves roughly the same action contrast
+while reducing between-state variation by24–29 times. All768 sampled states
+then favor UP over DOWN; best-action fractions are above. No direction or player
+position enters this transform. A cheaper off-manifold uniform-action reference
+gives similar numbers but is not selected: exact action averaging stays on the
+supported discrete actions. These development observations justify a fresh test,
+not a learning claim. [Diagnostic evidence](2026-10-05-freeway-embedding-diagnosis.json).
+
+Next: the [action-effects experiment](../experiments/2026-10-05-freeway-action-effects.md),
+same model, coefficient and32,768-action budget; only the bonus changes.
+Freeway remains unsolved.
 
 [Declaration](../experiments/2026-10-05-freeway-embedding-disagreement.md) ·
 [Compact evidence](2026-10-05-freeway-embedding-learning.json).

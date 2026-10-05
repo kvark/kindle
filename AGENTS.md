@@ -33,6 +33,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   replays pass; frozen competence evaluation is skipped. The bounded frozen
   action-contrast diagnosis is next, not a training extension. See the
   [embedding result](docs/results/2026-10-05-freeway-embedding-learning.md).
+  Its six frozen diagnostic guards pass: state variation overwhelms action
+  contrast18–20x. Subtracting each predictor's all-action average in offline
+  probes makes UP the best-bonus action on96–100% of sampled states, without
+  game labels in the transform. This is not new policy evidence. Qualify/test
+  [action-effects disagreement](docs/experiments/2026-10-05-freeway-action-effects.md)
+  at the same three-seed budget; no coefficient/encoder/aid change or extension.
+  The [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
+  passes four GPU tests, three independent frozen readouts and production/frozen
+  smokes; nine guards pass. The short update cost rises25.32→31.66ms, not a speed
+  improvement. CPU114/Python1,137/Clippy pass. Fresh learning is the next test.
   Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's

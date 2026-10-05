@@ -95,7 +95,11 @@ natural target scale. Its [same-budget three-seed screen](experiments/2026-10-05
 reuses completed soft/extrinsic controls. All three finish with
 [zero rewards and unchanged coverage](results/2026-10-05-freeway-embedding-learning.md);
 the larger bonus does not produce useful action selection. Skip frozen
-competence evaluation; inspect frozen all-action bonus contrasts next.
+competence evaluation. Six frozen diagnostic checks pass; state variation
+overwhelms action contrast18–20x. An offline transform that removes each
+predictor's all-action mean produces much clearer action preferences without
+game-specific inputs. Test this [action-effects bonus](experiments/2026-10-05-freeway-action-effects.md)
+at the same budget next, not a further target/encoder change.
 No larger run or precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 

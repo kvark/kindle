@@ -228,6 +228,98 @@ fn tiny_disagreement_matches_scalar_values_and_gradients() {
 }
 
 #[test]
+#[ignore = "requires GPU; independent action centering, state-offset and permutation invariance"]
+fn tiny_action_effect_disagreement_matches_reference() {
+    const ROWS: usize = 3;
+    const ACTIONS: usize = 3;
+    const WIDTH: usize = 5;
+    let gpu = gpu();
+    let predictions = (0..MEMBERS)
+        .map(|member| {
+            (0..ROWS * ACTIONS * WIDTH)
+                .map(|i| {
+                    let row = i / (ACTIONS * WIDTH);
+                    let action = i / WIDTH % ACTIONS;
+                    let column = i % WIDTH;
+                    let effect = match row {
+                        0 => 0.0,
+                        1 => action as f32 * 0.03,
+                        _ => (member * (action + 1) * (column + 1)) as f32 * 0.007,
+                    };
+                    (member * 7 + row * 3 + column) as f32 * 0.1 + effect
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    let mut graph = Graph::new();
+    let inputs = (0..MEMBERS)
+        .map(|i| graph.input(&format!("head{i}"), &[ROWS * ACTIONS, WIDTH]))
+        .collect::<Vec<_>>();
+    let bonus = action_effect_disagreement(&mut graph, &inputs, ACTIONS);
+    graph.set_outputs(vec![bonus]);
+    let mut session = build_session(&graph, &gpu, Mode::Inference, false);
+    let read = |session: &mut meganeura::Session, values: &[Vec<f32>]| {
+        for (i, value) in values.iter().enumerate() {
+            session.set_input(&format!("head{i}"), value);
+        }
+        session.step();
+        session.wait();
+        let mut output = vec![0.0; ROWS * ACTIONS];
+        session.read_output_by_index(0, &mut output);
+        output
+    };
+    let actual = read(&mut session, &predictions);
+    for row in 0..ROWS {
+        for action in 0..ACTIONS {
+            let mut expected = 0.0;
+            for column in 0..WIDTH {
+                let effects = predictions
+                    .iter()
+                    .map(|p| {
+                        let mean = (0..ACTIONS)
+                            .map(|a| f64::from(p[(row * ACTIONS + a) * WIDTH + column]))
+                            .sum::<f64>()
+                            / ACTIONS as f64;
+                        f64::from(p[(row * ACTIONS + action) * WIDTH + column]) - mean
+                    })
+                    .collect::<Vec<_>>();
+                let mean = effects.iter().sum::<f64>() / MEMBERS as f64;
+                let variance =
+                    effects.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / MEMBERS as f64;
+                expected += ((variance + 1e-8).sqrt() - 1e-4) / WIDTH as f64;
+            }
+            assert!((f64::from(actual[row * ACTIONS + action]) - expected).abs() < 2e-6);
+        }
+    }
+    assert!(actual[..2 * ACTIONS].iter().all(|v| v.abs() < 2e-6));
+    let permutation = [2, 0, 1];
+    let shifted = predictions
+        .iter()
+        .enumerate()
+        .map(|(member, p)| {
+            (0..p.len())
+                .map(|i| {
+                    let row = i / (ACTIONS * WIDTH);
+                    let action = permutation[i / WIDTH % ACTIONS];
+                    p[(row * ACTIONS + action) * WIDTH + i % WIDTH]
+                        + (member + row + 1) as f32 * 0.2
+                })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+    let shifted = read(&mut session, &shifted);
+    for row in 0..ROWS {
+        for action in 0..ACTIONS {
+            assert!(
+                (shifted[row * ACTIONS + action] - actual[row * ACTIONS + permutation[action]])
+                    .abs()
+                    < 2e-6
+            );
+        }
+    }
+}
+
+#[test]
 #[ignore = "requires GPU; detached ensemble learning and repeated/novel states"]
 fn tiny_disagreement_learns_repeated_states_without_world_gradients() {
     let gpu = gpu();
@@ -236,10 +328,10 @@ fn tiny_disagreement_learns_repeated_states_without_world_gradients() {
     let width = config.encoded_observation_dim();
     let mut graph = Graph::new();
     let ensemble = Disagreement::new(&mut graph, &config);
-    let state = graph.parameter("state", &[1, config.feature_dim()]);
-    let action = graph.parameter("action", &[1, 3]);
-    let target = graph.parameter("target", &[1, width]);
-    let weight = graph.constant(vec![1.0], &[1, 1]);
+    let state = graph.parameter("state", &[3, config.feature_dim()]);
+    let action = graph.parameter("action", &[3, 3]);
+    let target = graph.parameter("target", &[3, width]);
+    let weight = graph.constant(vec![1.0; 3], &[3, 1]);
     let loss = ensemble.loss(&mut graph, state, action, target, weight);
     graph.set_outputs(vec![loss]);
     let mut training = build_session(&graph, &gpu, Mode::Training, false);
@@ -258,11 +350,11 @@ fn tiny_disagreement_learns_repeated_states_without_world_gradients() {
     let novel = (0..config.feature_dim())
         .map(|i| (i * 7 % 13) as f32 * 0.1 - 0.6)
         .collect::<Vec<_>>();
-    training.set_parameter("state", &repeated);
-    training.set_parameter("action", &[0.0, 1.0, 0.0]);
+    training.set_parameter("state", &repeated.repeat(3));
+    training.set_parameter("action", &[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
     training.set_parameter(
         "target",
-        &(0..width)
+        &(0..3 * width)
             .map(|i| f32::from(i % 4 == 0))
             .collect::<Vec<_>>(),
     );

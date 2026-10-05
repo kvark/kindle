@@ -1,4 +1,4 @@
-//! Action-conditioned disagreement over detached observation encodings.
+//! Disagreement about action effects on detached observation encodings.
 
 use meganeura::{Graph, graph::NodeId};
 
@@ -61,9 +61,50 @@ impl Disagreement {
     }
 
     pub(super) fn bonus(&self, graph: &mut Graph, state: NodeId, action: NodeId) -> NodeId {
-        let predictions = self.predict(graph, state, action);
-        disagreement(graph, &predictions)
+        let rows = graph.node(state).ty.shape[0];
+        let states = repeat_rows(graph, state, self.actions);
+        let actions = graph.constant(
+            (0..rows * self.actions * self.actions)
+                .map(|i| f32::from(i / self.actions % self.actions == i % self.actions))
+                .collect(),
+            &[rows * self.actions, self.actions],
+        );
+        let predictions = self.predict(graph, states, actions);
+        let bonus = action_effect_disagreement(graph, &predictions, self.actions);
+        let bonus = graph.reshape(bonus, &[rows, self.actions]);
+        let action = graph.stop_gradient(action);
+        let selected = graph.mul(bonus, action);
+        graph.sum_inner(selected)
     }
+}
+
+fn repeat_rows(graph: &mut Graph, input: NodeId, repeats: usize) -> NodeId {
+    let shape = graph.node(input).ty.shape.clone();
+    let input = graph.reshape(input, &[shape[0] * shape[1], 1]);
+    let input = graph.broadcast_inner(input, repeats);
+    let input = graph.reshape(input, &[shape[0], shape[1], repeats]);
+    let input = graph.transpose(input);
+    graph.reshape(input, &[shape[0] * repeats, shape[1]])
+}
+
+fn action_effect_disagreement(graph: &mut Graph, predictions: &[NodeId], actions: usize) -> NodeId {
+    let shape = graph.node(predictions[0]).ty.shape.clone();
+    assert_eq!(shape[0] % actions, 0);
+    let (rows, width) = (shape[0] / actions, shape[1]);
+    let effects = predictions
+        .iter()
+        .map(|&prediction| {
+            let by_action = graph.reshape(prediction, &[rows, actions, width]);
+            let by_coordinate = graph.transpose(by_action);
+            let by_coordinate = graph.reshape(by_coordinate, &[rows * width, actions]);
+            let sum = graph.sum_inner(by_coordinate);
+            let negative_mean = graph.scale(sum, -1.0 / actions as f32);
+            let negative_mean = graph.reshape(negative_mean, &[rows, width]);
+            let negative_mean = repeat_rows(graph, negative_mean, actions);
+            graph.add(prediction, negative_mean)
+        })
+        .collect::<Vec<_>>();
+    disagreement(graph, &effects)
 }
 
 fn masked_loss(

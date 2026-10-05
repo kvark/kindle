@@ -243,7 +243,7 @@ pub struct DreamerConfig {
     pub actor_critic_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
-    /// Recompute action-conditioned observation-encoding disagreement in
+    /// Recompute disagreement about action effects on observation encodings in
     /// imagination and replay. Zero intrinsic scale removes the ensemble.
     #[serde(default)]
     pub disagreement_bonus: bool,
