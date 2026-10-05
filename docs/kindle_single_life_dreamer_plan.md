@@ -76,6 +76,19 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Next: Atari learning and exploration with CDP (Phase 3)
 
+**New October5 user goal:** unlock Boxing, Pong, Freeway, Breakout and Qbert
+with CDP, and see whether DreamerV3 scores are reachable with less budget.
+The [five-game budget study](experiments/2026-10-05-cdp-five-game-budget.md)
+reuses all three Freeway200k cohorts and adds twelve fixed200k-action runs on
+the other four games. Keep the qualified CDP/action-effects package unchanged;
+frozen final/initial-control pairs and full videos measure retained learning.
+Compare full Atari57/200M-frame and Atari100k/400k-frame references separately:
+our200k actions are about800k frames. Published curve/protocol differences are
+explicit, and compute savings need matched same-hardware controls. No claim
+from simply being smaller. All five and the budget comparison remain in scope;
+this screen is the first decision point, not presumed goal completion. Venture
+is deferred. Neither historical queue nor the stopped45-run matrix restarts.
+
 **Current result: Freeway's exploration blocker is resolved.** Three fresh
 200k-action CDP seeds reach frozen means22.21/23.21/27.00; all72 candidate rounds
 score19–30 versus zero in all72 initial-control rounds. [Results, curves and
@@ -83,8 +96,8 @@ whole videos](results/2026-10-05-freeway-effects-200k.md) pass nine guards, exac
 frozen tensors, full replays and zero updates/cutoffs. Only one seed passes the
 unchanged historical mastery gate; this is useful retained learning across all
 three seeds, not full mastery or completed Phase3. Do not start a Freeway-only
-gate-tuning campaign. Next is review/declaration of the planned second-task
-comparison, not an automatic launch or revival of the stopped five-game matrix.
+gate-tuning campaign. The newly declared five-game screen above takes priority
+over the previously proposed Venture comparison.
 
 **Path to this result:** the user's October4 decision focused exploration on
 unassisted Freeway.
@@ -273,8 +286,9 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 Seaquest and Freeway include current CDP development results. The other four
-rows retain historical recipes, **not CDP results**. The five-game CDP/RGB/Tiny
-comparison remains deferred; it is not the active queue. Historical gates remain
+rows retain historical recipes, **not CDP results**. New CDP-only200k screens
+on those four are now declared; the old CDP/RGB/Tiny matrix stays deferred.
+Historical gates remain
 unchanged for interpreting old claims, not as exit gates for this development
 study. Videos are
 whole stream-zero evaluations with tails, while full multi-stream cohorts

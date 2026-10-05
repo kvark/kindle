@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October5 new goal: unlock the original five Atari games with CDP and test
+  whether DreamerV3 scores are reachable with less budget.** This supersedes
+  immediate Venture work, not the prohibition on restarting old queues.
+  [Current declaration](docs/experiments/2026-10-05-cdp-five-game-budget.md):
+  reuse all three completed Freeway200k cohorts; twelve new200k-action/49,939-
+  update CDP+action-effects runs on Boxing/Pong/Breakout/Qbert, three seeds each,
+  unchanged qualified native/recipe. Frozen final policies and actual initial
+  controls, whole videos and per-stage audits; no Tiny/RGB representation matrix.
+  Compare published Atari57/200M-frame and Atari100k/400k-frame references
+  separately. Our200k actions are~800k frames, not less than Atari100k. Published
+  online curves and our frozen scores differ; disclose protocol/model changes.
+  No same-hardware compute-saving claim without a matched RGB control.
+  Review all five, including failures, before any new allocation or algorithm
+  change. Completing this screen or learning a subset is not the whole goal.
+  Meganeura upstream6288f885 has only docs/paper changes over592a2f5a; Blade
+  e349cddf is unchanged at this recheck. No unchanged native rebuild.
 - **October5: Freeway exploration is unlocked with unassisted CDP.** Three fresh
   200k-action/49,939-update seeds1009/2017/3019 retain frozen scores22.2083/
   23.2083/27.0000 versus0/0/0 initial controls. All72 candidate natural episodes
@@ -17,9 +33,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   This resolves the zero-reward blocker, **not three-seed mastery or Phase3**.
   Only3019 passes the unchanged historical25-crossing/90% gate. Keep that
   limitation; the strategy reset prohibits turning development into gate tuning.
-  Next is review/declaration of one held-out exploration task (planned Venture)
-  with fresh same-game extrinsic controls, not an automatic launch or return to
-  the stopped matrix. No matched200k extrinsic-superiority claim.
+  The proposed next held-out task (Venture) is deferred by the new five-game
+  goal above. No old-matrix restart or matched200k extrinsic-superiority claim.
   The changed GPU-native bonus subtracts each predictor's all-action mean before
   ensemble disagreement. No new encoder, parameters, coefficient, action aid or
   reward shaping. Its [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
