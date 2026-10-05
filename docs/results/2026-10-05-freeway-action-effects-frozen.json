@@ -1,0 +1,206 @@
+{
+  "status": "complete",
+  "artifact_root": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation",
+  "training_actions_per_seed": 32768,
+  "seeds": [
+    1009,
+    2017,
+    3019
+  ],
+  "evaluation": {
+    "held_out_seed_base": 1000000000,
+    "episodes_per_stream": 3,
+    "streams": 8,
+    "actions": 442368,
+    "updates": 0,
+    "natural_episodes": 216,
+    "cutoffs": 0,
+    "guard_jobs": 12,
+    "all_guards_passed": true
+  },
+  "scores": {
+    "effects": {
+      "mean": 0.19444444444444445,
+      "ci95": [
+        0.08333333333333333,
+        0.3333333333333333
+      ],
+      "seeds": [
+        0.16666666666666666,
+        0.3333333333333333,
+        0.08333333333333333
+      ]
+    },
+    "extrinsic": {
+      "mean": 0.013888888888888888,
+      "ci95": [
+        0,
+        0.041666666666666664
+      ],
+      "seeds": [
+        0,
+        0,
+        0.041666666666666664
+      ]
+    },
+    "untrained": {
+      "mean": 0,
+      "ci95": [
+        0,
+        0
+      ],
+      "seeds": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "paired_effects_minus_extrinsic": {
+    "mean": 0.18055555555555555,
+    "ci95": [
+      0.041666666666666664,
+      0.3333333333333333
+    ],
+    "seeds": [
+      0.16666666666666666,
+      0.3333333333333333,
+      0.041666666666666664
+    ]
+  },
+  "paired_effects_minus_untrained": {
+    "mean": 0.19444444444444445,
+    "ci95": [
+      0.08333333333333333,
+      0.3333333333333333
+    ],
+    "seeds": [
+      0.16666666666666666,
+      0.3333333333333333,
+      0.08333333333333333
+    ]
+  },
+  "groups": {
+    "effects": [
+      {
+        "seed": 1009,
+        "crossings": 4,
+        "positive_episodes": 4,
+        "mastery_episodes": 0,
+        "source_sha256": "5d720bb8e8f4c9f0bde962fd7e0d42bef1e3379225f86656728890dd631f4769",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/effects-1009-frozen.mp4",
+        "video_sha256": "36976b9c2da9bbf3b6471e8f7754031b404db6c20e2ab6dfa107d424134eabd1"
+      },
+      {
+        "seed": 2017,
+        "crossings": 8,
+        "positive_episodes": 7,
+        "mastery_episodes": 0,
+        "source_sha256": "43f6f66fd614187c679383772ee3f3b87c80d20733e6b93ac387004fda3547b5",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/effects-2017-frozen.mp4",
+        "video_sha256": "9fd5bd1ac49a3c4e70ebf63801df9418ef943ea49f83b33628774bf4d91c92c7"
+      },
+      {
+        "seed": 3019,
+        "crossings": 2,
+        "positive_episodes": 2,
+        "mastery_episodes": 0,
+        "source_sha256": "fc13d4d68f2dd6eb6af3757f8a0e2b8028acacca1ffab64c69c93e318b1267b9",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/effects-3019-frozen.mp4",
+        "video_sha256": "5038b4a32f38d09e5e12575e12e888f1e0c4f2c31fa96a81104ee1c7817e3ce8"
+      }
+    ],
+    "extrinsic": [
+      {
+        "seed": 1009,
+        "crossings": 0,
+        "positive_episodes": 0,
+        "mastery_episodes": 0,
+        "source_sha256": "9518cb55de08672611241abad73110e6c5afb1f8728285cc89c2568590319ad9",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/extrinsic-1009-frozen.mp4",
+        "video_sha256": "08a9f472c99a8cac5351a296faab67d4f727c972c52f99765b3d148fcedf0af4"
+      },
+      {
+        "seed": 2017,
+        "crossings": 0,
+        "positive_episodes": 0,
+        "mastery_episodes": 0,
+        "source_sha256": "f3feb37051cd7d1e884dd70211604164b004ba68d4718a6e1082871201db5f52",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/extrinsic-2017-frozen.mp4",
+        "video_sha256": "eab6439d46c3c37ded7a6803a21bc4824afd3929476d6753daa52339559bf099"
+      },
+      {
+        "seed": 3019,
+        "crossings": 1,
+        "positive_episodes": 1,
+        "mastery_episodes": 0,
+        "source_sha256": "69c9babd0b26646f0d4045a0909a6692b532da71e9b67642b9d9c5f3510a03e1",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/extrinsic-3019-frozen.mp4",
+        "video_sha256": "88d66d051f1ca4dde0e6dfcaa51a9026e698436be9cc3f70797d8998083d764b"
+      }
+    ],
+    "untrained": [
+      {
+        "seed": 1009,
+        "crossings": 0,
+        "positive_episodes": 0,
+        "mastery_episodes": 0,
+        "source_sha256": "1e445bd1f8b98ed64dcab4e709bdd7f4415e1079802162d105d1013fb8def3da",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/untrained-1009-frozen.mp4",
+        "video_sha256": "d85bda88b6cdec94ee694a2e43737cd84eac79e144914c7f67c5f82a22259b26"
+      },
+      {
+        "seed": 2017,
+        "crossings": 0,
+        "positive_episodes": 0,
+        "mastery_episodes": 0,
+        "source_sha256": "eff47f7288d95e85cd7ab416088f08396afaab92cbe740a42abd5217ee9e5693",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/untrained-2017-frozen.mp4",
+        "video_sha256": "5a4d76e2b060a28d6dd4108df4b0f12ac1c36b3c748c2a42fe6324da2a0e7edf"
+      },
+      {
+        "seed": 3019,
+        "crossings": 0,
+        "positive_episodes": 0,
+        "mastery_episodes": 0,
+        "source_sha256": "db12dc228b95b93068f5db42d908c8dac2da6cbce89604b809b7816994e73fcc",
+        "video": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/untrained-3019-frozen.mp4",
+        "video_sha256": "62ab977b179e4de009564a980df1b67fb593a872bd81830decdede2ee814034f"
+      }
+    ]
+  },
+  "illustrative_video": {
+    "path": "/x/Code/kindle/runs/freeway-action-effects-20261005.z9KUOhCS/evaluation/effects-2017-stream2.mp4",
+    "sha256": "e00b136755afee97dc8fb8490026a32ffae95f54016077ccbcaf74307ef39385",
+    "selected_after_results": true,
+    "stream": 2,
+    "frames": 24575,
+    "fps": 60,
+    "reward_times_seconds": [
+      162.6,
+      256.4
+    ],
+    "adds_evaluation_experience": false
+  },
+  "goal_unlocked": false,
+  "mastery_passed": false,
+  "decision": "One fresh200k-action run per seed, unchanged mechanism, new held-out seed base2b, no automatic extension.",
+  "limitations": [
+    "three reused development learner seeds; coarse seed-bootstrap uncertainty",
+    "retained extrinsic controls evaluated with changed binary and qualified zero-ensemble path",
+    "14 candidate crossings across72 episodes are a small retained improvement, not competence",
+    "most candidate episodes score zero; seed3019 regressed during training",
+    "original online pixel hashes unavailable; videos are audited deterministic replays",
+    "GPU utilization unmeasured"
+  ],
+  "tensor_checks": {
+    "candidate_and_untrained": 346,
+    "extrinsic": 250,
+    "all_exact": true
+  },
+  "runtime": {
+    "candidate_train_and_evaluation": "f4b6a5c716769875f7aa61510d03862d733926657670d52c3996ca8e02f732c9",
+    "extrinsic_training": "ecc935a7813f896f8e5f5c15543c4de4a7a8f26340fd46ec88b63addb721a065",
+    "extrinsic_evaluation": "f4b6a5c716769875f7aa61510d03862d733926657670d52c3996ca8e02f732c9"
+  }
+}

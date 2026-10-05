@@ -20,12 +20,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   native-F32 matches F64 within3.28e-8, cooperative differences are disclosed.
   CPU114/Python1,161/Clippy pass, including the narrow frozen-score-reader fix.
   Mean update31.70ms and wall273.25s/run cost~25% more; utilization is unmeasured.
-  **Running:** the declared frozen cohort for three candidates, three retained
-  extrinsic controls and three actual initial-weight controls,24 episodes each,
-  held-out seeds, zero updates, exact tensors and whole stream0 videos. Retained
-  extrinsic controls use the current runtime, with that change explicitly
-  disclosed; never alter their original binary identity. No training extension
-  until retention is reviewed. Freeway remains unsolved.
+  [Frozen retention](docs/results/2026-10-05-freeway-action-effects-frozen.md)
+  completes:14 crossings/72 candidate episodes versus1/72 retained extrinsic and
+  0/72 actual initial-weight controls. All216 natural episodes,12 guards, exact
+  tensors, zero updates and full replays/videos pass. Most episodes still score
+  zero; no mastery. Retained extrinsic controls use the current runtime, with
+  that change disclosed; never alter their original binary identity.
+  **Next declared:** one [fresh200k-action follow-up](docs/experiments/2026-10-05-freeway-effects-200k.md)
+  per seed,49,939 updates, unchanged mechanism, no checkpoint resume. Then all
+  three frozen candidates and initial controls use new held-out seed base2b.
+  No200k matched-extrinsic superiority claim, automatic extension or stopped
+  matrix restart. Freeway remains unsolved.
   Earlier sampled/soft/visual targets all failed; see the
   [visual-target diagnosis](docs/results/2026-10-05-freeway-embedding-learning.md)
   for why removing action-independent disagreement was selected. Diagnostic

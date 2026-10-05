@@ -39,15 +39,15 @@ All eight streams execute16,384 real emulator frames each: throughput is
 frame-clock ratios, not GPU utilization; utilization is unmeasured. No separate
 NVML polling or recovery.
 
-## Next: retention, not a longer run yet
+## Retention complete; next is a fixed longer test
 
-The declared positive branch is running: all three frozen candidates, three
-retained extrinsic-only controls and three actual initial-weight controls.
-Each uses the same held-out environment seeds, first3 natural episodes/stream
-(24), cap200k actions/30min, sampled policy, zero updates, exact checkpoint tensor
-equality and complete stream0 videos. Retained controls are evaluated on the
-current runtime; their original training binary identity is preserved and the
-zero-ensemble equivalence qualification applies. No training extension yet.
+The [frozen comparison and videos](2026-10-05-freeway-action-effects-frozen.md)
+are complete:14 crossings/72 candidate episodes,1/72 extrinsic-trained and0/72
+initial-weight controls. All216 natural episodes finish with zero updates and
+exact saved tensors. Most candidate episodes still score zero; no mastery claim.
+The reviewed positive result supports one separately declared
+[fresh200k-action follow-up](../experiments/2026-10-05-freeway-effects-200k.md)
+per seed, with unchanged mechanism and new held-out evaluation seeds.
 
 [Declaration](../experiments/2026-10-05-freeway-action-effects.md) ·
 [Qualification](2026-10-05-freeway-action-effects-qualification.md) ·
