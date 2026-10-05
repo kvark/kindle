@@ -7,130 +7,68 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October5 new goal: unlock the original five Atari games with CDP and test
-  whether DreamerV3 scores are reachable with less budget.** This supersedes
-  immediate Venture work, not the prohibition on restarting old queues.
-  [Current declaration](docs/experiments/2026-10-05-cdp-five-game-budget.md):
-  reuse all three completed Freeway200k cohorts; twelve new200k-action/49,939-
-  update CDP+action-effects runs on Boxing/Pong/Breakout/Qbert, three seeds each,
-  unchanged qualified native/recipe. Frozen final policies and actual initial
-  controls, whole videos and per-stage audits; no Tiny/RGB representation matrix.
-  Compare published Atari57/200M-frame and Atari100k/400k-frame references
-  separately. Our200k actions are~800k frames, not less than Atari100k. Published
-  online curves and our frozen scores differ; disclose protocol/model changes.
-  No same-hardware compute-saving claim without a matched RGB control.
-  Review all five, including failures, before any new allocation or algorithm
-  change. Completing this screen or learning a subset is not the whole goal.
-  Meganeura upstream6288f885 has only docs/paper changes over592a2f5a; Blade
-  e349cddf is unchanged at this recheck. No unchanged native rebuild.
-- **October5: Freeway exploration is unlocked with unassisted CDP.** Three fresh
-  200k-action/49,939-update seeds1009/2017/3019 retain frozen scores22.2083/
-  23.2083/27.0000 versus0/0/0 initial controls. All72 candidate natural episodes
-  score19–30; all72 control episodes score0. [Result, curves and whole videos](docs/results/2026-10-05-freeway-effects-200k.md).
-  Nine guards, finite checkpoints/counters, exact frozen tensors and full
-  trajectory/video audits pass.600k training actions,294,912 frozen actions,
-  zero frozen updates/cutoffs;1h28m49s including audits. All jobs are stopped.
-  This resolves the zero-reward blocker, **not three-seed mastery or Phase3**.
-  Only3019 passes the unchanged historical25-crossing/90% gate. Keep that
-  limitation; the strategy reset prohibits turning development into gate tuning.
-  The proposed next held-out task (Venture) is deferred by the new five-game
-  goal above. No old-matrix restart or matched200k extrinsic-superiority claim.
-  The changed GPU-native bonus subtracts each predictor's all-action mean before
-  ensemble disagreement. No new encoder, parameters, coefficient, action aid or
-  reward shaping. Its [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
-  passes four GPU tests, three independent readouts and production/frozen smokes;
-  native-F32 matches F64 within3.28e-8, cooperative differences are disclosed.
-  CPU114/Python1,161/Clippy pass, including the narrow frozen-score-reader fix.
-  Mean200k update31.54ms; about8x aggregate /1x per-stream realtime. The32k
-  overhead versus prior visual-target disagreement was~25%; utilization remains
-  unmeasured. [Earlier32k retention](docs/results/2026-10-05-freeway-action-effects-frozen.md)
-  was14/72 crossings versus1/72 extrinsic and0/72 untrained; preserve its failures,
-  seed3019 regression and runtime-change disclosure for retained controls.
-  The200k follow-up changed only the finite interaction budget and used fresh
-  learners/new held-out seeds, not an equivalent checkpoint continuation.
-  Earlier sampled/soft/visual targets all failed; see the
-  [visual-target diagnosis](docs/results/2026-10-05-freeway-embedding-learning.md)
-  for why removing action-independent disagreement was selected. Diagnostic
-  labels never enter the policy. No precision workaround or stopped matrix restart.
-- **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
-  The research-order question is resolved. Implemented and qualified the roadmap's
-  small GPU-native action-conditioned latent-disagreement bonus against fresh
-  extrinsic-only CDP, seeds1009/2017/3019. Start with32,768 aggregate actions per
-  arm/seed; all six runs finished October4 at23:00 UTC. All rewards are zero;
-  the exploration channel is active but policy entropy remains near uniform.
-  Six guards/counter audits/finite checkpoints and CI295 pass. No frozen
-  evaluation or new GPU job follows the predeclared all-zero branch. Diagnose
-  action-dependent bonus contrast and coverage before changing the budget or
-  mechanism. See `docs/results/2026-10-05-cdp-freeway-exploration.md`.
-  Actual updates are8,131/run; earlier8,135 prose was a planning error.
-  Alignment, detached gradients,
-  zero-scale equivalence, restore and short overhead checks pass; see
-  `docs/results/2026-10-04-cdp-exploration-qualification.md`. Diagnose the result
-  before declaring any larger budget. Freeway remains unsolved by this recipe.
-  No scripted UP, persistent action overrides, new pixel encoder or CPU feature
-  readback. The five-game representation comparison is deferred, not completed
-  or automatically restarted. Keep PR31 as the dashboard.
-- **October 4, 20:42 UTC: investigate zero-reward learning before more runs.**
-  The user redirects the active comparison to diagnosis. The serial study is
-  stopped: seven Freeway pairs are audited; CDP seed3019 is interrupted at
-  126,408 actions/31,541 updates and retained. No GPU worker remains. Do not
-  restart the matrix automatically. Trace actions, raw/stored rewards, policy
-  advantages and optimizer activity; distinguish sparse exploration failure
-  from adapter/learner bugs before choosing the next learning experiment.
-  [Diagnosis](docs/results/2026-10-04-freeway-zero-reward-diagnosis.md): all
-  1,526,408 collected training actions yield zero rewards/advantages. Uniform
-  random ALE controls score0, scripted UP21–23; rewards/state match raw ALE.
-  One excluded1024-action/195-update GPU reward-pulse probe passes: real rewards
-  reach replay and produce nonzero advantages. Same-code Seaquest learns, and
-  published DreamerV3 Atari-100k Freeway scores are also zero across five seeds.
-  No learner fix or larger comparison is justified by this floor result alone.
-  The user now selects the exploration test above; do not repeat the pulse or
-  silently restart/extend the matrix. All five-game work remains incomplete.
-- **Retained user goal: train CDP on the selected Atari games and compare with
-  Dreamer RGB and Tiny JEPA.** Diagnose reward discovery before deciding how
-  this comparison and the exploration experiment below proceed. The
-  [declaration](docs/experiments/2026-10-04-cdp-atari-comparison.md)
-  uses the qualified small recipe, three learner seeds and fresh matched
-  controls; Tiny is pretrained/frozen, with its extra experience disclosed.
-  The user confirms Boxing, Pong, Freeway, Breakout and Qbert: 45 fresh small
-  runs (five games x three methods x three seeds), with frozen evaluation.
-  Execute Freeway first; both excluded Tiny qualification smokes pass.
-  The first CDP launch stopped before training on an allocation warning; retain
-  that failure. The user subsequently authorizes proceeding unless the GPU is
-  wedged: standalone allocation warnings are logged, not approval gates. The
-  proposed two-warning/first10-second restriction is superseded, not required.
-  Do not reopen the cancelled historical queue. The newly authorized CDP
-  exploration study is separate from this stopped extrinsic-only comparison.
-- **October 4: the user adopts CDP on the main path.** The authoritative roadmap
-  is [docs/kindle_single_life_dreamer_plan.md](docs/kindle_single_life_dreamer_plan.md).
-  Fast iteration, a faithful RGB control and the CDP evaluation are complete.
-  Develop the small jointly learned CNN + deterministic latent-prediction
-  Dreamer agent. No frozen Tiny/DINO/Large requirement or RGB visualization
-  decoder. RGB remains the reference/fallback; LeVJEPA is a later video/3D
-  hypothesis, not an obligation for 2D.
-- **Current: exploration/reward with CDP (Phase 3).** Test unassisted
-  Freeway: extrinsic-only CDP versus one GPU-compatible intrinsic mechanism,
-  three learner seeds 1009/2017/3019. Start at32,768 actual aggregate
-  actions/seed on Size1M/N8/B8/T16/H15/R32/microbatch 8/replay 100000, sticky 0.25,
-  full actions. Select the mechanism and declare exact finite budgets/settings
-  before launching. No random-action aid, new reward shaping or pretraining.
-  Then confirm on one predeclared second exploration game, planned as Venture.
-  Do not repeat the completed Seaquest comparison unchanged.
-- **CDP is the roadmap baseline; the CLI default is still learned RGB.**
-  New main-path declarations must pass `--cdp`. A documentation edit does not
-  change runtime defaults or launch a campaign. Keep qualified split rates,
-  cosine loss and `ac_grads=false` until a separate comparison supports changes.
-  No old CPU feature-readback visitation workaround, additional representation matrix,
-  unchanged mastery queue or automatic budget extension.
-- After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then TMNF,
-  a small GOG/Wine panel, held-out cross-game adaptation/retention, then swarms.
-  One effective actor comes first. An asynchronous actor/learner is a later
-  measured response to real-time latency/debt, not the next engineering project.
-- The unstarted posterior-Tiny ablation is deferred. The historical 45-run12M
-  matrix remains cancelled: 24 completed/audited and 21 unstarted cancelled.
-  Never restart its queue/drain services or workers. Preserve
-  `runs/representation-learning-20260928.kjidlR/queue-cancellation.json`.
-  The ten-attempt cap applied to RGB replication, not every subsequent study.
+- **October5 goal: unlock Boxing, Pong, Freeway, Breakout and Qbert with CDP,
+  and test whether DreamerV3 scores are reachable with less budget.** All five
+  and the budget question remain open. A completed screen, learned subset or
+  smaller model does not complete this goal.
+- **Five-game200k screen complete:** twelve new learners plus all three retained
+  Freeway cohorts, seeds1009/2017/3019,49,939 updates each. Frozen means:
+  Boxing69.74 vs.39 initial, Pong−18.53 vs−20.31, Freeway24.14 vs0,
+  Breakout4.36 vs1.61, Qbert403.13 vs152.43. Four games improve in every seed;
+  Pong improves in only one. All45 guards,720 selected natural frozen episodes,
+  zero updates/cutoffs, exact346 saved tensors/model, full replay/video checks
+  pass. New screen finishes12:36 UTC in5h43m45s; no worker remains. [Result,
+  curves and whole videos](docs/results/2026-10-05-cdp-five-game-screen.md).
+  Fifteen learners cost3M actions/749,085 updates/6h56m28s training, excluding
+  earlier development work. None reaches the predeclared long-run reference.
+- **Next reviewed allocation:** [three fresh500k-action Pong seeds](docs/experiments/2026-10-05-cdp-pong-budget.md),
+  exact same model/recipe; only the finite learning budget changes.124,939
+  updates/run,1.5M new actions total. Frozen final/actual-initial controls use
+  new held-out base3,000,000,000, first3 episodes/stream,200k-action cap and full
+  audits/videos. Expected3.5–4h;6h service bound,100min training processes.
+  The published Atari57 Pong mean is−20.50 at800k frames,−7.16 at2M. Test an
+  early-learning floor before changing capacity/loss/exploration. Two current
+  Pong seeds have weak reward separation and KL~.57; posterior diagnostics are
+  not prior forecasts or proof of feature collapse. No automatic extension;
+  persistent weak prediction calls for state/forecast diagnosis before more
+  training. Current native is unchanged; no rebuild or duplicate qualification.
+- **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
+  400k but less than Atari57's200M. Compare published online curves and our
+  frozen controls separately. Retain all released seeds and the declared
+  last10% long-run target, not convenient bins. Protocol/model/averaging windows
+  differ; no exact parity or same-hardware compute-saving claim without a
+  matched RGB control. At~800k frames the current means are similar to published
+  Atari57 on Boxing/Pong/Breakout, ahead on Freeway, somewhat behind on Qbert.
+- CDP is the roadmap main path, while the CLI still defaults to learned RGB:
+  main-path declarations must pass `--cdp`. Joint small CNN + deterministic
+  latent prediction, Dreamer RSSM/replay/imagined policy, qualified split rates,
+  cosine loss and ac_grads=false. No frozen Tiny/DINO/Large requirement or
+  visualization decoder. RGB remains the reference/fallback; causal Tiny is
+  an optional later video/3D hypothesis, not a2D obligation.
+- Freeway exploration is unlocked across all three unassisted200k seeds;
+  only3019 passes its original mastery gate. No Freeway-only gate tuning.
+  [Result and limitations](docs/results/2026-10-05-freeway-effects-200k.md).
+  Action-effects disagreement subtracts each predictor's all-action mean before
+  measuring ensemble variance; no new action hint, coefficient, encoder or
+  externally shaped reward. Retain earlier all-zero/weak32k screens and their
+  additional compute. There is no matched200k extrinsic-only superiority claim.
+- The strategy reset remains iteration speed -> useful representation ->
+  exploration/reward -> video priors -> native deployment. Phases0–2 and the
+  Seaquest CDP/RGB comparison are complete. The3x12M speed target is an unmet,
+  user-accepted stretch target. Current mean31.62ms updates spend51% in
+  imagination,27% world training; about8x aggregate /1x per-stream realtime.
+  GPU utilization remains unmeasured. Optimize measured whole-agent cost.
+- No old queue restarts. The stopped45-run small CDP/RGB/Tiny comparison retains
+  seven completed Freeway pairs plus interrupted CDP3019 at126,408 actions.
+  The historical12M matrix retains24 completed and21 cancelled unstarted entries.
+  Their controls/protocols are not the current intrinsic study. Venture, Tiny
+  comparisons and new representation matrices are deferred by the five-game goal.
+- Backend rechecked October5 after the screen: Meganeura upstream6288f885 has
+  only docs/paper/artifact changes over qualified592a2f5a; Bladee349cddf is
+  unchanged. No missing runtime fix or reason to rebuild unchanged native.
+- After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
+  TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
+  swarms. One effective actor first; no concurrent learner service now.
 
 ## Architecture and invariants
 

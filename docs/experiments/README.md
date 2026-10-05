@@ -7,6 +7,16 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
+is complete: twelve new200k-action learners plus all three retained Freeway
+cohorts. Boxing and Freeway learn strongly, Breakout/Qbert improve modestly,
+and Pong improves in only one of three seeds. All45 guards and720 selected
+natural frozen episodes pass; none reaches the predeclared long-run DreamerV3
+reference. Early published curves are similarly weak on Pong/Breakout, so the
+next reviewed [three-seed Pong budget test](2026-10-05-cdp-pong-budget.md)
+changes only fresh training length to500k actions. Full five-game mastery and
+the lower-budget claim remain open; no old matrix resumes.
+
 October5's [unassisted Freeway result](../results/2026-10-05-freeway-effects-200k.md)
 resolves the CDP exploration blocker: three200k-action learners retain frozen
 means22.21/23.21/27.00; all72 candidate rounds score19–30 versus0 in all72 initial

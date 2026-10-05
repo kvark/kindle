@@ -20,7 +20,8 @@ video encoder, DINO or a detached visualization decoder.
 
 The selected small recipe is Size1M, eight environments, B8/T16/H15/R32,
 microbatch 8, replay 100000 and full BPTT. CDP has 804,785 trainable parameters,
-including its CNN; there is no extra 5.5M or 303M frontend. Retain the
+including its CNN; the current exploration ensemble brings the whole learner to
+1,057,201 parameters. There is no extra5.5M or303M frontend. Retain the
 [qualified CDP loss and split learning rates](experiments/2026-10-04-cdp.md),
 AGC and `ac_grads=false`. Change one factor at a time.
 
@@ -63,9 +64,10 @@ Posterior state estimates are not forecasts.
   remain stronger. Sparse reward/terminal counts limit conclusions; there is no
   bullet/full-state sufficiency claim.
 
-This is one short game and three learner seeds, not Atari-wide superiority,
-frozen policy competence or a reproduction of the authors' full benchmark.
-The next step is learning with CDP, not another encoder-selection matrix.
+The controlled CDP/RGB comparison is one short game and three learner seeds,
+not Atari-wide superiority or a reproduction of the authors' full benchmark.
+The completed five-game exploration screen below now measures broader retained
+learning, with important failures still unresolved.
 
 ## Current execution order — strategy reset
 
@@ -74,162 +76,64 @@ iteration speed, useful representations, exploration/reward, video priors, then
 real-time deployment. Phases 0–2 and the CDP follow-up are complete. The user's
 October 4 direction puts CDP on the main path through the remaining stages.
 
-### 1. Next: Atari learning and exploration with CDP (Phase 3)
+### 1. Atari learning, exploration and budget (Phase 3)
 
-**New October5 user goal:** unlock Boxing, Pong, Freeway, Breakout and Qbert
-with CDP, and see whether DreamerV3 scores are reachable with less budget.
-The [five-game budget study](experiments/2026-10-05-cdp-five-game-budget.md)
-reuses all three Freeway200k cohorts and adds twelve fixed200k-action runs on
-the other four games. Keep the qualified CDP/action-effects package unchanged;
-frozen final/initial-control pairs and full videos measure retained learning.
-Compare full Atari57/200M-frame and Atari100k/400k-frame references separately:
-our200k actions are about800k frames. Published curve/protocol differences are
-explicit, and compute savings need matched same-hardware controls. No claim
-from simply being smaller. All five and the budget comparison remain in scope;
-this screen is the first decision point, not presumed goal completion. Venture
-is deferred. Neither historical queue nor the stopped45-run matrix restarts.
+The October5 goal is to unlock **Boxing, Pong, Freeway, Breakout and Qbert
+with CDP**, and determine whether DreamerV3 scores are reachable with less
+budget. All five remain in scope. Neither learning a subset nor completing a
+queue establishes this goal.
 
-**Current result: Freeway's exploration blocker is resolved.** Three fresh
-200k-action CDP seeds reach frozen means22.21/23.21/27.00; all72 candidate rounds
-score19–30 versus zero in all72 initial-control rounds. [Results, curves and
-whole videos](results/2026-10-05-freeway-effects-200k.md) pass nine guards, exact
-frozen tensors, full replays and zero updates/cutoffs. Only one seed passes the
-unchanged historical mastery gate; this is useful retained learning across all
-three seeds, not full mastery or completed Phase3. Do not start a Freeway-only
-gate-tuning campaign. The newly declared five-game screen above takes priority
-over the previously proposed Venture comparison.
+**The first breadth screen is complete:** fifteen200k-action learners, including
+all three retained Freeway cohorts. Frozen means are Boxing69.74, Pong−18.53,
+Freeway24.14, Breakout4.36 and Qbert403.13. Four games improve over actual initial
+controls in every seed; Pong improves in only one of three. All45 guards,720
+selected natural frozen episodes, zero updates/cutoffs, exact saved tensors,
+full trajectory replays and whole videos pass. [Results, curves and videos](results/2026-10-05-cdp-five-game-screen.md).
 
-**Path to this result:** the user's October4 decision focused exploration on
-unassisted Freeway.
-The small disagreement mechanism below is implemented and
-[qualified](results/2026-10-04-cdp-exploration-qualification.md); the declared
-three-seed screen against extrinsic-only CDP is complete with zero real rewards
-in both arms. The [result](results/2026-10-05-cdp-freeway-exploration.md) shows
-nonzero intrinsic advantages but near-uniform policy entropy. The completed
-[coverage/bonus diagnosis](results/2026-10-05-freeway-disagreement-diagnosis.md)
-finds little coverage change, weak action contrast and no upward bonus preference.
-The [soft-target test](experiments/2026-10-05-freeway-soft-disagreement.md) replaces
-sampled one-hot ensemble targets with detached posterior probabilities: the
-same expected regression gradient with less sampling noise. Qualification and
-all three fresh seeds finish; [all still score zero](results/2026-10-05-freeway-soft-learning.md),
-with almost unchanged bonus/coverage. The existing detached CNN embedding target,
-where player position is more readable, is now [qualified](results/2026-10-05-freeway-embedding-qualification.md).
-No new encoder: the wider256-output ensemble adds33,280 parameters and changes
-natural target scale. Its [same-budget three-seed screen](experiments/2026-10-05-freeway-embedding-disagreement.md)
-reuses completed soft/extrinsic controls. All three finish with
-[zero rewards and unchanged coverage](results/2026-10-05-freeway-embedding-learning.md);
-the larger bonus does not produce useful action selection. Skip frozen
-competence evaluation. Six frozen diagnostic checks pass; state variation
-overwhelms action contrast18–20x. An offline transform that removes each
-predictor's all-action mean produces much clearer action preferences without
-game-specific inputs. Test this [action-effects bonus](experiments/2026-10-05-freeway-action-effects.md)
-at the same budget, not a further target/encoder change. That screen now finds
-[2/1/1 real crossings](results/2026-10-05-freeway-action-effects-learning.md)
-across the three seeds, versus zero in retained controls. Two seeds improve
-late; the third loses early progress. Mean update cost rises to31.70ms (~25%
-more). The [frozen comparison and videos](results/2026-10-05-freeway-action-effects-frozen.md)
-now complete:14 crossings/72 candidate episodes versus1/72 extrinsic-trained
-and0/72 untrained. All216 natural episodes have zero updates and exact saved
-tensors. This small retained improvement supports one
-[fresh200k-action follow-up](experiments/2026-10-05-freeway-effects-200k.md) per
-seed, unchanged mechanism and new held-out evaluation seeds. That follow-up is
-now complete with the strong retained result above. The32k cohort alone did not
-unlock Freeway; all-zero controls and that weak result remain in the record.
-No matched200k extrinsic superiority claim or automatic extension. Neither
-Boxing nor the stopped matrix resumes now.
+**No long-run DreamerV3 target is reached.** Keep the
+[published references](results/2026-10-05-dreamerv3-five-game-reference.json)
+separate: Atari57 uses200M frames; Atari100k uses400k frames and a different
+nonsticky/minimal-action protocol. Our200k actions are about800k frames, not
+less experience than Atari100k. At approximately the same early frame count,
+published Atari57 is also weak on Pong/Breakout; our means are similar on
+Boxing/Pong/Breakout, Freeway is ahead and Qbert somewhat behind. Different
+online averaging windows and protocols prevent an exact parity claim.
+Same-hardware/protocol RGB controls are required for a compute-saving claim.
 
-**Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
-before further zero-score runs. Seven Freeway pairs complete; CDP3019 is retained
-as interrupted. The [diagnosis](results/2026-10-04-freeway-zero-reward-diagnosis.md)
-finds zero reward discovery and zero policy advantages, while raw-ALE controls,
-a bounded GPU reward pulse and the existing Seaquest positive control pass.
-Published DreamerV3 Atari-100k Freeway traces also score zero. Do not infer a
-CDP-specific regression or continue the matrix unchanged. The selected generic
-exploration experiment measures first reward, replay coverage and advantages;
-reward-bearing Boxing can separately test representation learning later. The full requested comparison
-below remains unfinished, not replaced by a single easier game.
+**Next reviewed experiment:** [three fresh500k-action Pong seeds](experiments/2026-10-05-cdp-pong-budget.md)
+with the exact same model and learning settings, testing an early-learning
+floor against persistent weak prediction. The two poor seeds show weak reward
+event separation and low raw KL; these posterior diagnostics alone do not
+prove feature collapse. Published Pong improves from−20.50 at800k frames to
+−7.16 at2M. Use new held-out frozen/initial-control pairs and stop at the
+declared budget. No automatic further extension, precision/capacity change or
+full-suite rerun. If prediction/control stays weak, examine task-state
+readability and prior forecasts before more training.
 
-**Retained scope:** the user requests training CDP on the selected Atari
-games and evaluating against Dreamer RGB and Tiny JEPA. This bounded
-[three-method comparison](experiments/2026-10-04-cdp-atari-comparison.md) was started
-before the intrinsic-reward experiment below. The user confirms **Boxing, Pong, Freeway,
-Breakout and Qbert**: 45 small runs (three methods x three seeds per game),
-each with frozen evaluation. Freeway runs first. Keep all methods extrinsic-only and
-use fresh matched controls, not the old aided/non-sticky/large-model results.
-Completed evidence and new rollout links are in the [five-game report](results/2026-10-04-cdp-atari-comparison.md);
-the PR remains the running-status dashboard.
+The exploration mechanism is a small GPU-native action-conditioned ensemble.
+It predicts detached CNN embeddings and subtracts each head's all-action mean
+before disagreement, removing action-independent uncertainty. One actor uses
+the bonus in imagination and replay-value targets; the world reward head stays
+extrinsic-only. No second encoder, scripted action, game label, CPU feature
+readback or external reward shaping enters learning. This is an adaptation
+inspired by [Plan2Explore](https://proceedings.mlr.press/v119/sekar20a.html), not
+a reproduction of its separate exploration actor.
 
-**Yes, Atari training is next.** Use the qualified small CDP agent to test
-learning from sparse rewards, not to reopen the unchanged five-game mastery
-queue or spend more days establishing the RGB baseline.
+Freeway's zero-reward blocker is resolved across all three seeds without action
+aids. [Its full200k result](results/2026-10-05-freeway-effects-200k.md) preserves
+the stricter mastery limitation: only3019 passes. The earlier
+[all-zero baseline](results/2026-10-05-cdp-freeway-exploration.md),
+[soft/visual-target failures](results/2026-10-05-freeway-embedding-learning.md)
+and [weak32k frozen result](results/2026-10-05-freeway-action-effects-frozen.md)
+remain additional development compute. The200k result is not a matched
+extrinsic-only ablation, and Freeway was used to develop the mechanism.
 
-The authorized exploration experiment, before resuming the matrix, is
-**unassisted Freeway**:
-
-- **Selected mechanism, qualified:** small
-  action-conditioned latent-disagreement heads, inspired by
-  [Plan2Explore](https://proceedings.mlr.press/v119/sekar20a.html). Reward
-  uncertainty during imagined rollouts, with detached predictor inputs/targets,
-  one existing actor and no second pixel encoder. This is a small
-  adaptation, not a reproduction of Plan2Explore's separate exploration actor.
-  The [reference implementation](https://github.com/danijar/dreamerv2/blob/main/dreamerv2/expl.py)
-  computes its bonus from current ensemble predictions during imagination.
-  Compute the current bonus for replay-value targets too; do not train one
-  critic against incompatible imagined and cached-replay reward definitions.
-  The [new declaration](experiments/2026-10-04-cdp-freeway-exploration.md) uses
-  four heads and coefficient1 through `--disagreement-scale 1`. The older
-  visitation bonus is CPU-only and rejected by GPU collection; keep it disabled. Do not substitute
-  raw CDP prediction error, a feature-readback workaround or scripted UP.
-- Control: extrinsic-only CDP. Candidate: the same CDP agent plus **one**
-  GPU-compatible intrinsic reward mechanism, kept in a separate reward channel.
-- Use learner seeds 1009/2017/3019 and independent per-stream histories. No
-  persistent random-action override, game-specific action aid, video pretraining
-  or newly shaped external reward in this comparison.
-- Keep the qualified sticky 0.25/full-action Atari protocol and small learning
-  recipe. Start with32,768 aggregate actions/seed, not a
-  mastery promise. Declare its exact settings, finite
-  budgets and stop conditions before launching; qualify its numerical and cost
-  behavior without a new training matrix.
-- Measure first reward, extrinsic-return curves versus actual actions and wall
-  time, seed variation, update cost and learner debt. Intrinsic return is never
-  the game-performance metric. Evaluate predeclared frozen policies without
-  updates and retain whole rollout videos, not selected successful episodes.
-
-Before considering six full200k-action runs, use a32,768-action/8,131-update
-screen per arm/seed using the same N8 small recipe, with reward discovery and
-nonzero advantages as diagnostics. Qualify reset-safe action/target alignment,
-detached gradients, zero-coefficient baseline equivalence, repeat-versus-novel
-state behavior and whole-update overhead first. A completed screen is a decision
-point, not an automatic extension or a mastery claim. The user selected this
-exploration work before the unchanged three-method Boxing comparison.
-
-Six learning runs completed at23:00 UTC on October4; all guard/counter/checkpoint
-audits pass. Its predeclared all-zero branch skips frozen evaluation; the later
-soft-target screen is a separately declared change, not its continuation.
-Qualification smokes are excluded; nonzero intrinsic reward and
-advantages are not Freeway reward discovery. The earlier8,135-update prose
-was corrected to the launched/audited8,131; the action budget is unchanged.
-Do not extend a weak run automatically or add a hyperparameter sweep.
-
-After that decision, test the selected recipe on **one predeclared held-out
-exploration game, planned as Venture**, at a matched finite budget. Seaquest
-provides the existing learning reference; it need not be retrained unchanged.
-Use fresh same-game extrinsic-only controls where required, not historical Tiny
-controls. Keep RGB comparisons for an actual representation/backend question.
-
-**Phase outcome:** evidence of unassisted sparse-reward learning across three
-seeds and an improvement on a second task, with acceptable whole-agent cost.
-A negative result identifies the next limitation; it does not authorize a
-bigger queue. Investigate exploration, reward prediction, dynamics or capacity
-according to the observed failure rather than changing all of them together.
-
-Use the five-game comparison above to assess learning breadth and stability,
-without repeating it unchanged. Breakout and sticky Pong remain useful
-diagnostic checks, not perpetual release gates. Strong learning on many games
-is the ambition; neither
-a simple-looking game nor the name Dreamer guarantees mastery at 200k actions.
-Separate per-game training measures algorithm breadth, not one transferable
-multi-game policy.
+The stopped45-run CDP/RGB/Tiny comparison and cancelled historical12M matrix
+remain stopped, with all completed/interrupted evidence retained. Venture,
+Tiny comparisons and new representation matrices are deferred by the current
+five-game goal. After breadth is established, a separately declared held-out
+exploration task with fresh extrinsic controls can test generalization of the
+bonus. Do not repeat Seaquest or tune old mastery gates merely to fill a queue.
 
 ### 2. Video priors for dynamics and behavior (Phase 4)
 
@@ -285,48 +189,40 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-Seaquest and Freeway include current CDP development results. The other four
-rows retain historical recipes, **not CDP results**. New CDP-only200k screens
-on those four are now declared; the old CDP/RGB/Tiny matrix stays deferred.
-Historical gates remain
-unchanged for interpreting old claims, not as exit gates for this development
-study. Videos are
-whole stream-zero evaluations with tails, while full multi-stream cohorts
-determine the result. Links into `runs/` require this workspace; committed
-[results](experiments/README.md) are the public summaries.
+These are current sticky/full-action CDP results unless explicitly marked
+historical. Frozen cohort means cover three learner seeds and24 natural
+episodes/model; streams/episodes are not independent learner replicates.
+The [five-game report](results/2026-10-05-cdp-five-game-screen.md) links every
+trained/initial-control whole stream-zero video and all score/action/time curves.
+Links into `runs/` require this workspace.
 
-| Game | Measured result | Unchanged gate / next decision | Rollout |
+| Game | Current measured result | Unresolved question / historical gate | Evidence and whole videos |
 | --- | --- | --- | --- |
-| Seaquest (current development screen) | Three fresh small CDP/RGB pairs: online543.6 versus 318.1, paired+225.5 [62.8,330.4]; CDP uses13.6% less wall time. Frozen world diagnostics complete. | CDP is the main development path. No frozen policy competence or mastery gate claim. | [Learning curves and world report](results/2026-10-04-cdp-learning.md); no new policy-evaluation video |
-| Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
-| Pong | Historical non-sticky roots pass 71/72 wins versus 0/76 controls. But root1009 with 25% sticky actions wins only2/24 equal-cohort matches, mean−7.1667; all 3/31, mean−8.3871. State/replay/video audit passes. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Fixed-recipe pass; **robustness fails**. One stochastic-evaluation root, no new control pair. | [Sticky video](../runs/pong-sticky-evaluation-20260926.SxeHCw/seed1009.mp4), [new report](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md), [historical videos/controls](experiments/README.md#current-pong-confirmation) |
-| Freeway | **Current unassisted CDP:**200k-action seeds1009/2017/3019 frozen means22.2083/23.2083/27.0000. All72 rounds score19–30 versus0/72 initial controls: exploration unlocked. Historical aided Tiny means32.9167/31.6944/33.25. | ≥20 natural rounds, ≥90% reach25 crossings, mean≥25, no cutoffs. Current CDP passes only3019; not three-seed mastery. Historical Tiny passes only its aided/pretrained recipe. Next development decision is a held-out exploration task, not gate tuning. | [Current CDP and all videos](results/2026-10-05-freeway-effects-200k.md), [32k controls](results/2026-10-05-freeway-action-effects-frozen.md), [historical Tiny report/videos](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
-| Breakout | Complete matched Tiny comparison: four actions mean 10.9167 versus .875 control; eighteen mean 11.625 versus .93103. Both trained arms0/24 two-wall completions. Historical Large mean 30.7917 also fails; no demonstrated pretraining benefit in one Tiny seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Fewer actions did not repair this seed. Keep eighteen as reference; diagnose before another recipe. Historical Large four-action arm stays held. | [Complete comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md), [four-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/evaluate.mp4), [eighteen-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a18/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
-| Qbert | Completed Tiny R64 seed 0: 3.2M final22/27 first pyramids (81.5%), mean 12,595.37; 1.6M midpoint24/24, mean 8,673.96; control0/24, mean 120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; the first-episode probe misses its terminal and retains high values through a scoreless ending. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md), [world/policy diagnostic](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md) |
+| Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
+| Boxing | CDP frozen69.74 vs.39 initial; seeds72.71/64.92/71.58. Strong learning in all three. | Published long-run99.61 not reached. Historical gate:>=20 natural matches,>=90% wins, mean>=50, no cutoffs. | [Current CDP and all videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical nonsticky evidence](experiments/README.md) |
+| Pong | CDP frozen−18.53 vs−20.31 initial; seeds−20.83/−14.08/−20.67. Two seeds fail to improve. | Longer-budget diagnosis next. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; earlier nonsticky success did not survive the sticky check. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [older sticky failure](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md) |
+| Freeway | Unassisted CDP frozen24.14 vs0; seeds22.21/23.21/27.00, every candidate round19–30. Exploration unlocked. | Published33.40 not reached. Only3019 passes the original>=90% rounds with25 crossings /mean>=25 gate. No Freeway-only gate tuning. | [Current CDP and videos](results/2026-10-05-freeway-effects-200k.md); [32k controls](results/2026-10-05-freeway-action-effects-frozen.md) |
+| Breakout | CDP frozen4.36 vs1.61; seeds3.42/2.63/7.04. Modest improvement in all three, poor control. | Published381.81 far away. Historical two-wall/864-point gate remains unmet; no action-subset workaround. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical Tiny comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md) |
+| Qbert | CDP frozen403.13 vs152.43; seeds312.50/235.42/661.46. Modest improvement with large seed variation. | Published193,220.77 far away. Historical>=90% first pyramids and mean>=15,000 remain unmet. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical3.2M Tiny result](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
 
-For Breakout/Qbert, an achievement before a later cutoff remains an achievement
-without relabeling the episode natural. Retain every completed episode and tail.
-Historical Freeway training used a .5-probability random action held for64 actions;
-evaluation was unassisted. Its wins are not unaided exploration. Tiny also had
-250k same-title random-play observations from Boxing/Pong/Freeway/Breakout/Qbert
-(45k train +5k validation/game), unlike the fresh CDP/RGB comparison.
-
-The five historical protocols were non-sticky with no reset no-ops; environment
-seeds did not create varied starts in the checked action traces. Sticky Pong
-already exposes that limitation. Do not relabel historical wins as robust
-mastery or count episodes/streams as independent learner seeds.
-[Human-normalized historical scores](results/2026-09-27-historical-scores.md)
-are descriptive, not a matched modern benchmark.
+Historical Tiny results used nonsticky protocols and250k same-title video
+observations (45k train+5k validation/game). Freeway also used a.5-probability
+random action held for64 steps in training. Preserve them as historical, not
+fresh/unassisted CDP or matched controls. Their gates are unchanged for interpreting
+old claims, not perpetual development exit gates. Achievements before a cutoff
+remain achievements without relabeling the episode natural; retain all tails.
 
 ## Runtime, speed and world-model checks
 
 Eight small-recipe environments share batched perception/policy and one learner;
 their recurrent states, resets, RNG and replay histories remain independent.
-Uncapped, step-driven playing plus training already works. The CDP Seaquest runs
-achieve8.74–8.76x aggregate real time, **1.093–1.096x per stream**. Full updates
-average 28.91 ms, including 8.19 ms world training and 14.14 ms imagination. GPU
-utilization is still unmeasured; these timings are not utilization percentages.
-Optimize measured whole-agent bottlenecks, not just the now-cheaper world loss.
+Uncapped, step-driven playing plus training already works. The current five-game
+CDP+exploration recipe achieves about8x aggregate /1x per-stream realtime.
+Mean update31.62ms includes16.19ms imagination (51%),8.45ms world training (27%)
+and4.33ms posterior work (14%). The older extrinsic-only CDP Seaquest comparison
+used28.91ms updates; keep its settings distinct. GPU utilization is unmeasured,
+not inferred from frame-clock ratios. Target measured whole-agent bottlenecks,
+especially imagination, not just the now-cheaper world loss.
 
 Atari emulation/frame upload is a CPU-environment fallback; GPU preprocessing,
 batched acting and resident replay collection are implemented. Native GPU
