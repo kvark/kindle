@@ -35,10 +35,11 @@ fn zero_scale_has_no_exploration_graph_or_parameters() {
 }
 
 #[test]
-fn ensemble_target_marginalizes_the_current_categorical_draw() {
+fn ensemble_target_uses_the_encoding_not_the_posterior() {
     use meganeura::graph::Op;
 
     let mut config = DreamerConfig::tiny(3);
+    config.observation_kind = crate::ObservationKind::Rgb64;
     config.disagreement_bonus = true;
     config.intrinsic_reward_scale = 1.0;
     // One transition isolates its target from earlier sampled input states.
@@ -46,11 +47,18 @@ fn ensemble_target_marginalizes_the_current_categorical_draw() {
     let mut pending = vec![graph.outputs()[crate::dreamer::world::LOSS_EXPLORATION]];
     let mut visited = std::collections::HashSet::new();
     let mut inputs = std::collections::HashSet::new();
+    let mut parameters = std::collections::HashSet::new();
     while let Some(id) = pending.pop() {
         if visited.insert(id) {
             let node = graph.node(id);
             if let Op::Input { name } = &node.op {
                 inputs.insert(name.as_str());
+            }
+            if let Op::Parameter { name } = &node.op {
+                parameters.insert(name.as_str());
+                if name.starts_with("world.exploration.") && name.ends_with(".out.bias") {
+                    assert_eq!(node.ty.shape, [config.encoded_observation_dim()]);
+                }
             }
             pending.extend_from_slice(&node.inputs);
         }
@@ -58,17 +66,65 @@ fn ensemble_target_marginalizes_the_current_categorical_draw() {
     assert!(inputs.contains("observation_0"));
     assert!(inputs.contains("initial_stoch"));
     assert!(!inputs.contains("posterior_sample_0"));
-
-    let probabilities = [0.1_f64, 0.3, 0.6];
-    let prediction = [-0.3_f64, 0.1, 0.7];
-    for (coordinate, (&p, &x)) in probabilities.iter().zip(&prediction).enumerate() {
-        let expected_gradient = probabilities
+    assert!(parameters.contains("world.representation.encoder.cnn0.weight"));
+    assert!(
+        !parameters
             .iter()
-            .enumerate()
-            .map(|(sample, &weight)| weight * 2.0 * (x - f64::from(sample == coordinate)))
-            .sum::<f64>();
-        assert!((expected_gradient - 2.0 * (x - p)).abs() < 1e-12);
+            .any(|name| name.starts_with("world.representation.posterior."))
+    );
+}
+
+#[test]
+#[ignore = "requires GPU; full embedding-target graph keeps world parameters detached"]
+fn tiny_embedding_disagreement_has_no_world_parameter_gradients() {
+    use meganeura::graph::Op;
+
+    let gpu = gpu();
+    let mut config = DreamerConfig::tiny(3);
+    config.observation_kind = crate::ObservationKind::Rgb64;
+    config.disagreement_bonus = true;
+    config.intrinsic_reward_scale = 1.0;
+    let mut graph = crate::dreamer::world::build_training_graph(&config, 1);
+    graph.set_outputs(vec![
+        graph.outputs()[crate::dreamer::world::LOSS_EXPLORATION],
+    ]);
+    let backward = meganeura::autodiff::differentiate(&graph);
+    for (parameter, &gradient) in graph
+        .nodes()
+        .iter()
+        .filter(|node| matches!(node.op, Op::Parameter { .. }))
+        .zip(&backward.outputs()[1..])
+    {
+        if let Op::Parameter { name } = &parameter.op
+            && !name.starts_with("world.exploration.")
+        {
+            assert!(
+                matches!(&backward.node(gradient).op,
+                Op::Constant { data } if data == &[0.0]),
+                "{name}"
+            );
+        }
     }
+    let session = build_session(&graph, &gpu, Mode::Training, false);
+    let mut encoder = 0;
+    let mut ensemble = 0;
+    for name in session.param_names() {
+        if name.starts_with("world.exploration.") {
+            assert!(session.has_param_grad(name), "{name}");
+            ensemble += 1;
+        } else {
+            // Autodiff's dead-parameter zero sentinel can have the same shape
+            // as an unused scalar parameter, hence still own a gradient buffer.
+            if session.has_param_grad(name) {
+                assert_eq!(session.param_size(name), Some(1), "{name}");
+                let mut value = [f32::NAN];
+                session.read_param_grad(name, &mut value);
+                assert_eq!(value, [0.0], "{name}");
+            }
+            encoder += usize::from(name.starts_with("world.representation.encoder."));
+        }
+    }
+    assert!(encoder > 0 && ensemble > 0);
 }
 
 #[test]
@@ -175,8 +231,9 @@ fn tiny_disagreement_matches_scalar_values_and_gradients() {
 #[ignore = "requires GPU; detached ensemble learning and repeated/novel states"]
 fn tiny_disagreement_learns_repeated_states_without_world_gradients() {
     let gpu = gpu();
-    let config = DreamerConfig::tiny(3);
-    let width = config.network().stoch * config.network().classes;
+    let mut config = DreamerConfig::tiny(3);
+    config.observation_kind = crate::ObservationKind::Rgb64;
+    let width = config.encoded_observation_dim();
     let mut graph = Graph::new();
     let ensemble = Disagreement::new(&mut graph, &config);
     let state = graph.parameter("state", &[1, config.feature_dim()]);

@@ -23,9 +23,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass; no frozen evaluation or automatic extension. [Result](docs/results/2026-10-05-freeway-soft-learning.md).
   Removing target sampling noise is insufficient. Next test predicts the
   existing detached CNN embedding: position is more readable there than in the
-  categorical target. No coefficient/budget change, scripted aid, new encoder or
-  broad matrix. Qualify and declare the changed target width/scale before launch.
-  Freeway remains unsolved.
+  categorical target. The [embedding-target qualification](docs/results/2026-10-05-freeway-embedding-qualification.md)
+  passes five GPU checks and production/frozen smokes; the first scalar-gradient
+  sentinel test failure is retained. Three fresh seeds are declared at the same
+  budget, reusing soft/extrinsic controls. Output width128→256 adds33,280 head
+  parameters and changes natural target scale, not the encoder. No coefficient/
+  budget change, scripted aid or broad matrix. Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh

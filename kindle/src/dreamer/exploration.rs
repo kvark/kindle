@@ -1,4 +1,4 @@
-//! Action-conditioned disagreement over detached posterior probabilities.
+//! Action-conditioned disagreement over detached observation encodings.
 
 use meganeura::{Graph, graph::NodeId};
 
@@ -28,7 +28,7 @@ impl Disagreement {
                         config.feature_dim() + config.action_count,
                         size.units,
                         2,
-                        size.stoch * size.classes,
+                        config.encoded_observation_dim(),
                     )
                 })
                 .collect(),
