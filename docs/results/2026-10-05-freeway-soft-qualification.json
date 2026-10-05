@@ -1,0 +1,72 @@
+{
+  "status": "complete",
+  "guards": {
+    "qualification/values-gradients": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "qualification/repeated-detached": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "qualification/alignment": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "qualification/zero-scale": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "smoke-soft-9001-queue/smoke-soft-9001": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    },
+    "smoke-soft-9001-frozen-queue/smoke-soft-9001-frozen": {
+      "verified_pins": 9,
+      "unsealed_files": [],
+      "host_guard_passed": true,
+      "monitoring": "host-only"
+    }
+  },
+  "new_allocation_warnings": 0,
+  "rust_tests": 114,
+  "python_tests": 1137,
+  "excluded_actions": 3072,
+  "excluded_learner_updates": 451,
+  "frozen_unchanged_tensors": {
+    "world": 269,
+    "behavior": 66,
+    "slow_value": 11
+  },
+  "native_sha256": "bffc0b55bc9df9299fa4f34d4f78f3a7b609f32987c6de353af0dd0c3f5c3141",
+  "smoke_seconds": 12.284691439010203,
+  "smoke_mean_update_seconds": 0.025193589299334813,
+  "smoke_mean_behavior": {
+    "total_loss": 7.326133219512195,
+    "policy_loss": 0.5038438310643015,
+    "actor_update_scale": 1,
+    "value_loss": 3.6283987088248333,
+    "replay_value_loss": 10.646301814855876,
+    "policy_entropy": 2.8903496436807097,
+    "weighted_policy_entropy": 1.0146996231929046,
+    "imagined_reward_mean": 0.20508038414855873,
+    "imagined_intrinsic_reward_mean": 0.20508038414855873,
+    "replay_intrinsic_reward_mean": 0.19866479466297118,
+    "imagined_continuation_mean": 0.7632787674944568,
+    "return_mean": 0.5523949503547672,
+    "return_scale": 1,
+    "advantage_abs_mean": 0.539563229512195,
+    "weighted_advantage_abs_mean": 0.17442635343902438
+  },
+  "artifact_root": "runs/freeway-soft-disagreement-20261005.NeU4KJoy"
+}

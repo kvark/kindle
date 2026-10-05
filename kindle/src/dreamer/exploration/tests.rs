@@ -35,6 +35,43 @@ fn zero_scale_has_no_exploration_graph_or_parameters() {
 }
 
 #[test]
+fn ensemble_target_marginalizes_the_current_categorical_draw() {
+    use meganeura::graph::Op;
+
+    let mut config = DreamerConfig::tiny(3);
+    config.disagreement_bonus = true;
+    config.intrinsic_reward_scale = 1.0;
+    // One transition isolates its target from earlier sampled input states.
+    let graph = crate::dreamer::world::build_training_graph(&config, 1);
+    let mut pending = vec![graph.outputs()[crate::dreamer::world::LOSS_EXPLORATION]];
+    let mut visited = std::collections::HashSet::new();
+    let mut inputs = std::collections::HashSet::new();
+    while let Some(id) = pending.pop() {
+        if visited.insert(id) {
+            let node = graph.node(id);
+            if let Op::Input { name } = &node.op {
+                inputs.insert(name.as_str());
+            }
+            pending.extend_from_slice(&node.inputs);
+        }
+    }
+    assert!(inputs.contains("observation_0"));
+    assert!(inputs.contains("initial_stoch"));
+    assert!(!inputs.contains("posterior_sample_0"));
+
+    let probabilities = [0.1_f64, 0.3, 0.6];
+    let prediction = [-0.3_f64, 0.1, 0.7];
+    for (coordinate, (&p, &x)) in probabilities.iter().zip(&prediction).enumerate() {
+        let expected_gradient = probabilities
+            .iter()
+            .enumerate()
+            .map(|(sample, &weight)| weight * 2.0 * (x - f64::from(sample == coordinate)))
+            .sum::<f64>();
+        assert!((expected_gradient - 2.0 * (x - p)).abs() < 1e-12);
+    }
+}
+
+#[test]
 fn enabled_graphs_have_exploration_heads() {
     let mut config = DreamerConfig::tiny(3);
     config.observation_kind = crate::ObservationKind::Rgb64;

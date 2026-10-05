@@ -243,8 +243,8 @@ pub struct DreamerConfig {
     pub actor_critic_gradient: bool,
     pub extrinsic_reward_scale: f32,
     pub intrinsic_reward_scale: f32,
-    /// Recompute action-conditioned latent disagreement in imagination and
-    /// replay returns. Zero intrinsic scale removes the ensemble entirely.
+    /// Recompute action-conditioned posterior-probability disagreement in
+    /// imagination and replay. Zero intrinsic scale removes the ensemble.
     #[serde(default)]
     pub disagreement_bonus: bool,
     /// Add bounded fixed-feature visitation novelty to the intrinsic channel.

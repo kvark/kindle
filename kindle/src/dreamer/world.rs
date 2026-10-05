@@ -364,7 +364,10 @@ fn build_training_graph_grouped(
         );
         stoch = straight_through_sample(&mut graph, hard_sample, probabilities);
         if model.exploration.is_some() {
-            exploration_targets.push(graph.reshape(stoch, &[batch, size.stoch * size.classes]));
+            // The conditional mean preserves the ensemble's expected MSE
+            // gradient without making it fit fresh categorical sampling noise.
+            exploration_targets
+                .push(graph.reshape(probabilities, &[batch, size.stoch * size.classes]));
         }
 
         let state = feature(&mut graph, deter, stoch, batch, config);

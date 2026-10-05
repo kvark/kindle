@@ -1,4 +1,4 @@
-//! Action-conditioned latent disagreement, evaluated with current parameters.
+//! Action-conditioned disagreement over detached posterior probabilities.
 
 use meganeura::{Graph, graph::NodeId};
 
