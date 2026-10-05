@@ -7,6 +7,14 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October5's [unassisted Freeway result](../results/2026-10-05-freeway-effects-200k.md)
+resolves the CDP exploration blocker: three200k-action learners retain frozen
+means22.21/23.21/27.00; all72 candidate rounds score19–30 versus0 in all72 initial
+controls. Full guards, tensors, replays and whole videos pass. Only one seed
+passes the unchanged historical mastery gate; Phase3 and the deferred five-game
+comparison are not complete. All new runs are finished; no automatic extension.
+The report links earlier negative screens, the32k matched controls and limitations.
+
 October4's [CDP protocol](2026-10-04-cdp.md) supersedes the unstarted
 posterior-Tiny ablation. Its [qualification report](../results/2026-10-04-cdp-qualification.md)
 passes independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons,

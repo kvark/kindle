@@ -7,30 +7,32 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October5: action-effects disagreement finds Freeway rewards in3/3 seeds.**
-  Same32,768-action/8,131-update recipe, seeds1009/2017/3019:2/1/1 real crossings
-  versus zero in all retained visual-target/extrinsic controls. All48 episodes,
-  tails and failures remain retained; three guards and exact CPU replays pass.
-  Online mean .0833 is not mastery. Seeds1009/2017 improve late;3019 finds an
-  early reward then loses coverage. [Learning result](docs/results/2026-10-05-freeway-action-effects-learning.md).
+- **October5: Freeway exploration is unlocked with unassisted CDP.** Three fresh
+  200k-action/49,939-update seeds1009/2017/3019 retain frozen scores22.2083/
+  23.2083/27.0000 versus0/0/0 initial controls. All72 candidate natural episodes
+  score19–30; all72 control episodes score0. [Result, curves and whole videos](docs/results/2026-10-05-freeway-effects-200k.md).
+  Nine guards, finite checkpoints/counters, exact frozen tensors and full
+  trajectory/video audits pass.600k training actions,294,912 frozen actions,
+  zero frozen updates/cutoffs;1h28m49s including audits. All jobs are stopped.
+  This resolves the zero-reward blocker, **not three-seed mastery or Phase3**.
+  Only3019 passes the unchanged historical25-crossing/90% gate. Keep that
+  limitation; the strategy reset prohibits turning development into gate tuning.
+  Next is review/declaration of one held-out exploration task (planned Venture)
+  with fresh same-game extrinsic controls, not an automatic launch or return to
+  the stopped matrix. No matched200k extrinsic-superiority claim.
   The changed GPU-native bonus subtracts each predictor's all-action mean before
   ensemble disagreement. No new encoder, parameters, coefficient, action aid or
   reward shaping. Its [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
   passes four GPU tests, three independent readouts and production/frozen smokes;
   native-F32 matches F64 within3.28e-8, cooperative differences are disclosed.
   CPU114/Python1,161/Clippy pass, including the narrow frozen-score-reader fix.
-  Mean update31.70ms and wall273.25s/run cost~25% more; utilization is unmeasured.
-  [Frozen retention](docs/results/2026-10-05-freeway-action-effects-frozen.md)
-  completes:14 crossings/72 candidate episodes versus1/72 retained extrinsic and
-  0/72 actual initial-weight controls. All216 natural episodes,12 guards, exact
-  tensors, zero updates and full replays/videos pass. Most episodes still score
-  zero; no mastery. Retained extrinsic controls use the current runtime, with
-  that change disclosed; never alter their original binary identity.
-  **Next declared:** one [fresh200k-action follow-up](docs/experiments/2026-10-05-freeway-effects-200k.md)
-  per seed,49,939 updates, unchanged mechanism, no checkpoint resume. Then all
-  three frozen candidates and initial controls use new held-out seed base2b.
-  No200k matched-extrinsic superiority claim, automatic extension or stopped
-  matrix restart. Freeway remains unsolved.
+  Mean200k update31.54ms; about8x aggregate /1x per-stream realtime. The32k
+  overhead versus prior visual-target disagreement was~25%; utilization remains
+  unmeasured. [Earlier32k retention](docs/results/2026-10-05-freeway-action-effects-frozen.md)
+  was14/72 crossings versus1/72 extrinsic and0/72 untrained; preserve its failures,
+  seed3019 regression and runtime-change disclosure for retained controls.
+  The200k follow-up changed only the finite interaction budget and used fresh
+  learners/new held-out seeds, not an equivalent checkpoint continuation.
   Earlier sampled/soft/visual targets all failed; see the
   [visual-target diagnosis](docs/results/2026-10-05-freeway-embedding-learning.md)
   for why removing action-independent disagreement was selected. Diagnostic

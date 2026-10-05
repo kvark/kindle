@@ -1,0 +1,345 @@
+{
+  "status": "complete",
+  "artifact_root": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq",
+  "seeds": [1009,2017,3019],
+  "native_sha256": "f4b6a5c716769875f7aa61510d03862d733926657670d52c3996ca8e02f732c9",
+  "config": {
+    "action_count": 18,
+    "model_size": "size1_m",
+    "observation_kind": "rgb64",
+    "video_encoder": null,
+    "future_target_standardization": null,
+    "reconstruction_target_standardization": null,
+    "observation_decoder_depth": 64,
+    "replay_capacity": 100000,
+    "batch_size": 8,
+    "batch_length": 16,
+    "world_backprop_length": 16,
+    "world_microbatch_size": 8,
+    "replay_context": 1,
+    "train_ratio": 32,
+    "imagination_length": 15,
+    "horizon": 333,
+    "lambda": 0.95,
+    "free_nats": 1,
+    "dynamics_free_nats": null,
+    "unimix": 0.01,
+    "value_bins": 255,
+    "actor_unimix": 0,
+    "actor_entropy": 0.0003,
+    "slow_value_rate": 0.02,
+    "return_norm_rate": 0.01,
+    "learning_rate": 0.00004,
+    "encoder_learning_rate": 0.000006,
+    "dynamics_learning_rate": 0.0004,
+    "behavior_learning_rate": null,
+    "actor_learning_starts": 0,
+    "learning_rate_warmup": 1000,
+    "optimizer_beta1": 0.9,
+    "optimizer_beta2": 0.999,
+    "optimizer_epsilon": 1e-20,
+    "agc": 0.3,
+    "agc_pmin": 0.001,
+    "loss_scales": {
+      "reconstruction": 0,
+      "future_prediction": 500,
+      "reward": 1,
+      "continuation": 1,
+      "dynamics": 1,
+      "representation": 0.1,
+      "policy": 1,
+      "value": 1,
+      "replay_value": 0.3
+    },
+    "replay_value_gradient": true,
+    "actor_critic_gradient": false,
+    "extrinsic_reward_scale": 1,
+    "intrinsic_reward_scale": 1,
+    "disagreement_bonus": true,
+    "visitation_bonus": false,
+    "seed": 1009,
+    "skip_full_optimize": false
+  },
+  "protocol": {
+    "environment": "ALE/Freeway-v5",
+    "streams": 8,
+    "full_action_space": true,
+    "sticky_actions": 0.25,
+    "action_repeat": 4,
+    "observation_size": "native",
+    "reset_noops": 0,
+    "action_aid": false,
+    "pretraining": false,
+    "external_reward_shaping": false
+  },
+  "training": {
+    "actions": 600000,
+    "updates": 149817,
+    "seconds": 5007.572912086034,
+    "last50_online_mean": {
+      "mean": 19.146666666666665,
+      "ci95": [13.88,22.48],
+      "seeds": [13.88,21.08,22.48]
+    },
+    "runs": [
+      {
+        "seed": 1009,
+        "crossings": 742,
+        "first_reward_action_batch": 28504,
+        "last50_online_mean": 13.88,
+        "all_episode_mean": 7.25,
+        "completed_episodes": 96,
+        "partial_returns": [5,6,5,6,6,6,6,6],
+        "seconds": 1678.7965251399437,
+        "mean_update_ms": 31.693817568593687,
+        "aggregate_realtime": 7.942117940045504,
+        "per_stream_realtime": 0.992764742505688,
+        "source_sha256": "b68c86126146a7fa0fd8e57a7d6186c7b665c448e7410cf4282bff1ddbbec25e",
+        "curves": [
+          {"actions":16384,"seconds":135.06956918898504,"mean":0},
+          {"actions":32768,"seconds":272.55486365093384,"mean":0.25},
+          {"actions":49152,"seconds":410.88562318100594,"mean":0},
+          {"actions":65536,"seconds":549.3009343289305,"mean":0},
+          {"actions":81920,"seconds":687.3575264979154,"mean":0},
+          {"actions":98304,"seconds":825.7002487030113,"mean":0},
+          {"actions":114688,"seconds":962.9885232539382,"mean":0.125},
+          {"actions":131072,"seconds":1100.474964964902,"mean":1.5},
+          {"actions":147456,"seconds":1237.6251079649664,"mean":16.875},
+          {"actions":163840,"seconds":1375.0835368299158,"mean":23.125},
+          {"actions":180224,"seconds":1512.685150368954,"mean":22.25},
+          {"actions":196608,"seconds":1650.2660010899417,"mean":22.875}
+        ],
+        "final_entropy": 1.7866177225000002,
+        "final_intrinsic_reward": 0.001273620785
+      },
+      {
+        "seed": 2017,
+        "crossings": 1125,
+        "first_reward_action_batch": 32416,
+        "last50_online_mean": 21.08,
+        "all_episode_mean": 11.260416666666666,
+        "completed_episodes": 96,
+        "partial_returns": [5,6,6,6,6,5,5,5],
+        "seconds": 1638.6172411030857,
+        "mean_update_ms": 31.047760842668055,
+        "aggregate_realtime": 8.136860558738139,
+        "per_stream_realtime": 1.0171075698422674,
+        "source_sha256": "2faf610648b051795339fd4f2a4a3ae06de4bfd8ef8285a1e37281da0ecd9f46",
+        "curves": [
+          {"actions":16384,"seconds":132.0667902660789,"mean":0},
+          {"actions":32768,"seconds":265.84092110802885,"mean":0.125},
+          {"actions":49152,"seconds":400.1525892360369,"mean":0.375},
+          {"actions":65536,"seconds":534.5534177779919,"mean":0},
+          {"actions":81920,"seconds":669.2251670100959,"mean":0.125},
+          {"actions":98304,"seconds":804.3804609350627,"mean":3.75},
+          {"actions":114688,"seconds":938.4843024810543,"mean":19.75},
+          {"actions":131072,"seconds":1073.063755988027,"mean":21.75},
+          {"actions":147456,"seconds":1207.2695540570421,"mean":22.875},
+          {"actions":163840,"seconds":1341.533390604076,"mean":22.75},
+          {"actions":180224,"seconds":1476.075966289034,"mean":21.75},
+          {"actions":196608,"seconds":1610.9062288020505,"mean":21.875}
+        ],
+        "final_entropy": 1.79699755,
+        "final_intrinsic_reward": 0.0009881154703750001
+      },
+      {
+        "seed": 3019,
+        "crossings": 1249,
+        "first_reward_action_batch": 6240,
+        "last50_online_mean": 22.48,
+        "all_episode_mean": 12.510416666666666,
+        "completed_episodes": 96,
+        "partial_returns": [6,6,6,6,6,6,6,6],
+        "seconds": 1690.1591458430048,
+        "mean_update_ms": 31.88990186046977,
+        "aggregate_realtime": 7.888724581228573,
+        "per_stream_realtime": 0.9860905726535716,
+        "source_sha256": "813cce5c78147b638f083a658d302bdd344697f2e841680dda8c6d15eb8a81c5",
+        "curves": [
+          {"actions":16384,"seconds":135.6669983540196,"mean":0.125},
+          {"actions":32768,"seconds":273.3235482480377,"mean":0},
+          {"actions":49152,"seconds":411.1249073869549,"mean":0.375},
+          {"actions":65536,"seconds":548.8982083500596,"mean":0.625},
+          {"actions":81920,"seconds":687.1304993040394,"mean":0.125},
+          {"actions":98304,"seconds":825.4522104470525,"mean":10.625},
+          {"actions":114688,"seconds":963.7584756090073,"mean":22},
+          {"actions":131072,"seconds":1101.4600909099681,"mean":21.25},
+          {"actions":147456,"seconds":1238.7660623439588,"mean":22},
+          {"actions":163840,"seconds":1377.5864539539907,"mean":22.875},
+          {"actions":180224,"seconds":1524.0506163840182,"mean":23.25},
+          {"actions":196608,"seconds":1661.5863263340434,"mean":26.875}
+        ],
+        "final_entropy": 1.9081532724999999,
+        "final_intrinsic_reward": 0.00112062002125
+      }
+    ]
+  },
+  "frozen": {
+    "actions": 294912,
+    "updates": 0,
+    "held_out_seed_base": 2000000000,
+    "episodes": 144,
+    "cutoffs": 0,
+    "scores": {
+      "effects": {
+        "mean": 24.138888888888886,
+        "ci95": [22.208333333333332,27],
+        "seeds": [22.208333333333332,23.208333333333332,27]
+      },
+      "untrained": {
+        "mean": 0,
+        "ci95": [0,0],
+        "seeds": [0,0,0]
+      }
+    },
+    "paired_effects_minus_untrained": {
+      "mean": 24.138888888888886,
+      "ci95": [22.208333333333332,27],
+      "seeds": [22.208333333333332,23.208333333333332,27]
+    },
+    "groups": {
+      "effects": [
+        {
+          "seed": 1009,
+          "score": 22.208333333333332,
+          "returns": [19,21,21,21,23,26,23,21,21,21,25,22,23,21,19,23,25,22,24,23,23,22,23,21],
+          "positive_episodes": 24,
+          "mastery_episodes": 3,
+          "mastery_gate_passed": false,
+          "source_sha256": "f62f87e986fc8783044d2deb4782846e7d717f16f6fdb2325872da0ef9ea386f",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/effects-1009-frozen.mp4",
+          "video_sha256": "cd9e44e558304938ebe358921999beada9546a3aed507a0f65f3fb29b1028a84"
+        },
+        {
+          "seed": 2017,
+          "score": 23.208333333333332,
+          "returns": [23,22,22,24,22,23,23,24,23,21,22,24,24,25,26,24,23,23,25,23,23,22,24,22],
+          "positive_episodes": 24,
+          "mastery_episodes": 3,
+          "mastery_gate_passed": false,
+          "source_sha256": "a0420f3ca1a150cff3a27e6e910c58a805098ce30499b278fa4f9e89fff493bc",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/effects-2017-frozen.mp4",
+          "video_sha256": "7fb56f031bbfcf6f2390604b39282d449dffc2b16a94555459a2f50d83e2c938"
+        },
+        {
+          "seed": 3019,
+          "score": 27,
+          "returns": [27,26,27,28,25,28,27,29,26,25,27,29,30,27,26,26,27,27,29,28,26,26,27,25],
+          "positive_episodes": 24,
+          "mastery_episodes": 24,
+          "mastery_gate_passed": true,
+          "source_sha256": "76f37812808995b3bc2ae9d7cb01e1be7184517dd1b093fa0d9db7e3d4f3eade",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/effects-3019-frozen.mp4",
+          "video_sha256": "e3e130c792b5b6c3531d24b391d3a42f9e02eae4d31cb21dfdb18e1e783bffa2"
+        }
+      ],
+      "untrained": [
+        {
+          "seed": 1009,
+          "score": 0,
+          "returns": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+          "positive_episodes": 0,
+          "mastery_episodes": 0,
+          "mastery_gate_passed": false,
+          "source_sha256": "719b06bbea5d33db9e18b8d926ffa2295cabc9ae9eaa07426e3846bb4e95e1a2",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/untrained-1009-frozen.mp4",
+          "video_sha256": "cf84900c0b876f664f6f4b5239f591f84157cdc2944aafcc9b887a8a8e9f79db"
+        },
+        {
+          "seed": 2017,
+          "score": 0,
+          "returns": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+          "positive_episodes": 0,
+          "mastery_episodes": 0,
+          "mastery_gate_passed": false,
+          "source_sha256": "08c8cfc64649adfcde095398760c305c768c531b4a340dd85c1979ee8c1d5a69",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/untrained-2017-frozen.mp4",
+          "video_sha256": "47383ca9d3826ad77c9e90ab8e13891bbf38e6963a37e38758723a57f63a5984"
+        },
+        {
+          "seed": 3019,
+          "score": 0,
+          "returns": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+          "positive_episodes": 0,
+          "mastery_episodes": 0,
+          "mastery_gate_passed": false,
+          "source_sha256": "7a5528892aa6487be7a7adc772c0386ce253e44579ad13969b018b922b15c14f",
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": "/x/Code/kindle/runs/freeway-effects-200k-20261005.cK3FhKKq/evaluation/untrained-3019-frozen.mp4",
+          "video_sha256": "21f263e58a07f39d29615267fd798ae7483480089082b9c8907de5cf90c6960b"
+        }
+      ]
+    }
+  },
+  "human_normalization": {
+    "formula": "(score-random)/(human-random)",
+    "random": 0,
+    "human": 29.6,
+    "reference": "https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/baselines.yaml",
+    "frozen_mean": 0.8155030030030028,
+    "frozen_ci95": [
+      0.7502815315315314,
+      0.9121621621621622
+    ],
+    "frozen_seeds": [
+      0.7502815315315314,
+      0.7840653153153152,
+      0.9121621621621622
+    ],
+    "limitation": "Descriptive reference scale; not protocol-matched human evaluation or a mastery threshold."
+  },
+  "audits": {
+    "guard_jobs": 9,
+    "all_guards_passed": true,
+    "frozen_tensors_exact": true,
+    "full_frozen_replays_verified": true,
+    "videos_hashes_and_containers_verified": true,
+    "gpu_utilization": "unmeasured"
+  },
+  "decision": {
+    "freeway_exploration_unblocked": true,
+    "reliable_mastery_across_seeds": false,
+    "mastery_seeds": 1,
+    "automatic_extension": false,
+    "phase3_complete": false,
+    "next": "Review one held-out exploration task (planned Venture) with fresh same-game extrinsic controls; no automatic launch."
+  },
+  "limitations": [
+    "same three development learner seeds; streams/episodes are not independent models",
+    "no budget-matched200k extrinsic control; only the32k comparison was matched",
+    "fresh training, not equivalent checkpoint continuation; earlier screens remain additional compute",
+    "original pixel hashes unavailable; full videos are audited deterministic replays",
+    "passing a numerical checker is not a broader competence proof",
+    "Not an Atari-wide or transferable-skill claim.",
+    "Only one seed passes the unchanged historical mastery gate; no threshold was lowered."
+  ]
+}

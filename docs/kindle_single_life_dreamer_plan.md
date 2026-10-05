@@ -76,7 +76,18 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Next: Atari learning and exploration with CDP (Phase 3)
 
-**Current user decision:** focus on exploration and unlock Freeway for CDP.
+**Current result: Freeway's exploration blocker is resolved.** Three fresh
+200k-action CDP seeds reach frozen means22.21/23.21/27.00; all72 candidate rounds
+score19–30 versus zero in all72 initial-control rounds. [Results, curves and
+whole videos](results/2026-10-05-freeway-effects-200k.md) pass nine guards, exact
+frozen tensors, full replays and zero updates/cutoffs. Only one seed passes the
+unchanged historical mastery gate; this is useful retained learning across all
+three seeds, not full mastery or completed Phase3. Do not start a Freeway-only
+gate-tuning campaign. Next is review/declaration of the planned second-task
+comparison, not an automatic launch or revival of the stopped five-game matrix.
+
+**Path to this result:** the user's October4 decision focused exploration on
+unassisted Freeway.
 The small disagreement mechanism below is implemented and
 [qualified](results/2026-10-04-cdp-exploration-qualification.md); the declared
 three-seed screen against extrinsic-only CDP is complete with zero real rewards
@@ -108,9 +119,11 @@ now complete:14 crossings/72 candidate episodes versus1/72 extrinsic-trained
 and0/72 untrained. All216 natural episodes have zero updates and exact saved
 tensors. This small retained improvement supports one
 [fresh200k-action follow-up](experiments/2026-10-05-freeway-effects-200k.md) per
-seed, unchanged mechanism and new held-out evaluation seeds. Most episodes still
-score zero; Freeway is not unlocked. No matched200k extrinsic superiority claim
-or automatic extension. Neither Boxing nor the stopped matrix resumes now.
+seed, unchanged mechanism and new held-out evaluation seeds. That follow-up is
+now complete with the strong retained result above. The32k cohort alone did not
+unlock Freeway; all-zero controls and that weak result remain in the record.
+No matched200k extrinsic superiority claim or automatic extension. Neither
+Boxing nor the stopped matrix resumes now.
 
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
 before further zero-score runs. Seven Freeway pairs complete; CDP3019 is retained
@@ -259,11 +272,11 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-The Seaquest row is the completed CDP development result. The other five rows
-below retain historical recipes, **not CDP results**. Fresh small CDP/RGB/Tiny
-training and frozen evaluation on those five games is now the active comparison;
-see the PR for progress. Historical gates remain unchanged for interpreting
-old claims, not as exit gates for this study. Videos are
+Seaquest and Freeway include current CDP development results. The other four
+rows retain historical recipes, **not CDP results**. The five-game CDP/RGB/Tiny
+comparison remains deferred; it is not the active queue. Historical gates remain
+unchanged for interpreting old claims, not as exit gates for this development
+study. Videos are
 whole stream-zero evaluations with tails, while full multi-stream cohorts
 determine the result. Links into `runs/` require this workspace; committed
 [results](experiments/README.md) are the public summaries.
@@ -273,7 +286,7 @@ determine the result. Links into `runs/` require this workspace; committed
 | Seaquest (current development screen) | Three fresh small CDP/RGB pairs: online543.6 versus 318.1, paired+225.5 [62.8,330.4]; CDP uses13.6% less wall time. Frozen world diagnostics complete. | CDP is the main development path. No frozen policy competence or mastery gate claim. | [Learning curves and world report](results/2026-10-04-cdp-learning.md); no new policy-evaluation video |
 | Boxing | Three roots pass: 123/123, 207/207, 51/51 wins; means +83.87/+90.58/+83.53; controls near zero | ≥20 natural matches, ≥90% wins, mean ≥+50, no cutoffs. Complete. | [1009](../runs/boxing-confirmation-20260910.hTEDcu/seed1009-evaluation.mp4), [2017](../runs/boxing-confirmation-20260910.hTEDcu/seed2017-evaluation.mp4), [3019](../runs/boxing-confirmation-20260910.hTEDcu/seed3019-evaluation.mp4) |
 | Pong | Historical non-sticky roots pass 71/72 wins versus 0/76 controls. But root1009 with 25% sticky actions wins only2/24 equal-cohort matches, mean−7.1667; all 3/31, mean−8.3871. State/replay/video audit passes. | ≥20 natural matches, ≥90% wins, mean ≥+15, no cutoffs. Fixed-recipe pass; **robustness fails**. One stochastic-evaluation root, no new control pair. | [Sticky video](../runs/pong-sticky-evaluation-20260926.SxeHCw/seed1009.mp4), [new report](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md), [historical videos/controls](experiments/README.md#current-pong-confirmation) |
-| Freeway | **Current unassisted CDP:** frozen14 crossings/72 episodes versus1/72 extrinsic and0/72 untrained; small improvement, not competence. Historical aided Tiny roots1009/2017/3019 pass36/36 each, means32.9167/31.6944/33.25, versus controls0/108. | ≥20 natural rounds, ≥90% reach 25 crossings, mean ≥25, no cutoffs. Current CDP fails; historical Tiny passes only its fixed aided/pretrained recipe. | [CDP report and all videos](results/2026-10-05-freeway-action-effects-frozen.md), historical [1009](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed1009/final.mp4), [2017](../runs/tiny-freeway-seed2017-replacement-20260922.12z27y72/seed2017/final.mp4), [3019](../runs/tiny-freeway-confirmation-20260922.tij9QW/seed3019/final.mp4), [controls/report](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
+| Freeway | **Current unassisted CDP:**200k-action seeds1009/2017/3019 frozen means22.2083/23.2083/27.0000. All72 rounds score19–30 versus0/72 initial controls: exploration unlocked. Historical aided Tiny means32.9167/31.6944/33.25. | ≥20 natural rounds, ≥90% reach25 crossings, mean≥25, no cutoffs. Current CDP passes only3019; not three-seed mastery. Historical Tiny passes only its aided/pretrained recipe. Next development decision is a held-out exploration task, not gate tuning. | [Current CDP and all videos](results/2026-10-05-freeway-effects-200k.md), [32k controls](results/2026-10-05-freeway-action-effects-frozen.md), [historical Tiny report/videos](../runs/tiny-freeway-confirmation-20260922.tij9QW/results.md) |
 | Breakout | Complete matched Tiny comparison: four actions mean 10.9167 versus .875 control; eighteen mean 11.625 versus .93103. Both trained arms0/24 two-wall completions. Historical Large mean 30.7917 also fails; no demonstrated pretraining benefit in one Tiny seed. | ≥20 completed episodes, ≥90% clear both walls / reach864 points. Fewer actions did not repair this seed. Keep eighteen as reference; diagnose before another recipe. Historical Large four-action arm stays held. | [Complete comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md), [four-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a4/evaluate.mp4), [eighteen-action video](../runs/breakout-minimal-comparison-20260926.xsQCaK/a18/evaluate.mp4), [pretraining ablation](../runs/levjepa-tiny-pretraining-ablation-20260921.lrjxlN/results.md), [Large](../runs/breakout-action-pilot-20260920.kNeotb/results.md) |
 | Qbert | Completed Tiny R64 seed 0: 3.2M final22/27 first pyramids (81.5%), mean 12,595.37; 1.6M midpoint24/24, mean 8,673.96; control0/24, mean 120.83. Complete state/replay/video checks pass. | ≥20 episodes, ≥90% first pyramids **and** mean ≥15,000. Final fails both thresholds; the first-episode probe misses its terminal and retains high values through a scoreless ending. | [Final](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/final.mp4), [midpoint](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/midpoint.mp4), [control](../runs/qbert-r64-3m2-20260925.FrriIH/seed0/untrained.mp4), [report](../runs/qbert-r64-3m2-20260925.FrriIH/results.md), [world/policy diagnostic](../runs/qbert-hazard-probe-cpu-v2-20260926.GnWOvb/results.md) |
 
