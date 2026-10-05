@@ -109,8 +109,16 @@ def read_run(path, *, allow_capped_evaluation=False):
               and start['mode'] in ('evaluate_sample', 'evaluate_greedy')
               and end['reason'] == 'action_cap_reached' and accounting['updates'] == 0)
     require(accounting['budget_complete'] or capped, 'incomplete declared run budget')
+    intrinsic = start['config']['intrinsic_reward_scale']
+    frozen_disagreement = (start['mode'] in ('evaluate_sample', 'evaluate_greedy')
+                           and accounting['updates'] == 0
+                           and start['config'].get('disagreement_bonus') is True
+                           and type(intrinsic) in (int, float)
+                           and math.isfinite(intrinsic) and intrinsic >= 0)
+    # Frozen actors retain their training config; the intrinsic channel above
+    # must still be exactly zero. Training comparisons stay extrinsic-only.
     require(start['config']['extrinsic_reward_scale'] == 1
-            and start['config']['intrinsic_reward_scale'] == 0
+            and (intrinsic == 0 or frozen_disagreement)
             and not start['config']['visitation_bonus'], 'changed reward recipe')
     require(end['reset_noop_frames'] == [0] * start['num_envs']
             and end['emulator_resets'] == [count + 1 for count in end['episode_counts']],

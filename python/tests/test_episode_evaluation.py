@@ -194,6 +194,38 @@ def test_interrupt_does_not_complete_episode_budget(frozen_run):
 
 
 @pytest.mark.parametrize('cap', [10, 100])
+def test_frozen_disagreement_config_retains_zero_update_and_reward_checks(frozen_run, cap):
+    path, rows = frozen_run(cap=cap)
+    rows[0]['config'].update(intrinsic_reward_scale=1.0, disagreement_bonus=True)
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    result = audit_atari.read_run(path, allow_capped_evaluation=True)
+    assert result['accounting']['updates'] == 0
+    assert result['accounting']['budget_complete'] == (cap == 100)
+    assert result['start']['config']['intrinsic_reward_scale'] == 1.0
+
+
+@pytest.mark.parametrize('mutate', [
+    lambda rows: rows[0]['config'].update(disagreement_bonus=False),
+    lambda rows: rows[0]['config'].update(intrinsic_reward_scale=-1),
+    lambda rows: rows[0]['config'].update(intrinsic_reward_scale=float('nan')),
+    lambda rows: rows[0]['config'].update(intrinsic_reward_scale=float('inf')),
+    lambda rows: rows[0]['config'].update(intrinsic_reward_scale=True),
+    lambda rows: rows[0]['config'].update(extrinsic_reward_scale=2),
+    lambda rows: rows[0]['config'].update(visitation_bonus=True),
+    lambda rows: rows[0].update(mode='train'),
+    lambda rows: rows[-1].update(learner_updates=1),
+    lambda rows: next(r for r in rows if r['event'] == 'transition')['stored_rewards'][0].__setitem__(1, .5),
+])
+def test_frozen_disagreement_does_not_allow_training_or_shaped_scores(frozen_run, mutate):
+    path, rows = frozen_run()
+    rows[0]['config'].update(intrinsic_reward_scale=1.0, disagreement_bonus=True)
+    mutate(rows)
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    with pytest.raises(ValueError):
+        audit_atari.read_run(path, allow_capped_evaluation=True)
+
+
+@pytest.mark.parametrize('cap', [10, 100])
 def test_explicit_frozen_export_preserves_episode_budget_and_zero_updates(frozen_run, cap):
     path, rows = frozen_run(cap=cap, export=True)
     result = audit(path)

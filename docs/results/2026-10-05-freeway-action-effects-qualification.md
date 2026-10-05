@@ -35,5 +35,13 @@ bonus has much clearer action contrast, not because it is a speed optimization.
 Next: the [declared three-seed32,768-action screen](../experiments/2026-10-05-freeway-action-effects.md).
 Do not extend automatically. Freeway remains unsolved.
 
+Evaluation-tooling follow-up: the score/replay reader now accepts a frozen
+disagreement-trained configuration only with zero updates and zero stored
+intrinsic rewards. Negative/nonfinite scales, host visitation, shaped scores
+and training-mode exceptions remain rejected; extrinsic-only training audits
+are unchanged.1,161 Python tests pass, including24 new cases. The existing
+1,024-action frozen smoke replays exactly on CPU, with no new GPU context or
+learning. No native rebuild, runner/wrapper change or active-run setting change.
+
 [Compact evidence](2026-10-05-freeway-action-effects-qualification.json).
 Artifacts: `runs/freeway-action-effects-20261005.z9KUOhCS`.
