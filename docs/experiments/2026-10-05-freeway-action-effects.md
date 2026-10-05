@@ -72,3 +72,15 @@ Serialize guarded native jobs in bounded persistent systemd services. Record
 standalone allocation warnings; API/numerical/fault/deadline failures stop for
 review. No NVML polling, recovery, blind retries or automatic extensions.
 Raw new work: `runs/freeway-action-effects-20261005.z9KUOhCS`.
+
+The three-seed screen completes with2/1/1 real rewards; the positive branch
+applies. Alongside the declared three candidates and three retained extrinsic
+controls, evaluate three actual fresh initial-weight controls with the same
+configuration/seeds and held-out environments. Each initialization is limited
+to120 seconds, zero game actions and zero updates. All nine frozen evaluations
+use the same24-episode cohort/cap and whole stream0 videos. Aggregate service
+deadline2 hours; no training extension. Retained extrinsic checkpoints are
+evaluated on the current native binary: disclose that change and require exact
+source/restored/exported tensors, configuration, protocol and other identities,
+plus the already-qualified zero-ensemble path. Do not falsify their original
+training binary hash or relax the generic same-runtime pair verifier.

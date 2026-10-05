@@ -99,7 +99,12 @@ competence evaluation. Six frozen diagnostic checks pass; state variation
 overwhelms action contrast18–20x. An offline transform that removes each
 predictor's all-action mean produces much clearer action preferences without
 game-specific inputs. Test this [action-effects bonus](experiments/2026-10-05-freeway-action-effects.md)
-at the same budget next, not a further target/encoder change.
+at the same budget, not a further target/encoder change. That screen now finds
+[2/1/1 real crossings](results/2026-10-05-freeway-action-effects-learning.md)
+across the three seeds, versus zero in retained controls. Two seeds improve
+late; the third loses early progress. Mean update cost rises to31.70ms (~25%
+more). The declared frozen comparison with retained extrinsic and actual
+untrained controls/videos is running; no larger budget or competence claim yet.
 No larger run or precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 

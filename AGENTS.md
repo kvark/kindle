@@ -7,43 +7,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October5: exploration diagnosis complete; test lower-noise targets next.**
-  All196,608 logged actions replay with matching accounting; coverage barely
-  changes. Nine frozen GPU diagnostics pass: action-dependent bonus variation
-  is small, and mean UP-minus-DOWN bonus is negative in all three seeds.
-  The tight F64 discrepancy is isolated to cooperative reduced-input math;
-  native-F32 GPU readout agrees within2.65e-8. All768 UP/DOWN preferences agree
-  between paths; production precision stays unchanged. Retain failed checks.
-  [Evidence](docs/results/2026-10-05-freeway-disagreement-diagnosis.md).
-  The [soft-target test](docs/experiments/2026-10-05-freeway-soft-disagreement.md)
-  is qualified:114 Rust/1,137 Python tests, four GPU checks and production/frozen
-  smokes pass; all346 tensors stay unchanged during frozen restore. All three
-  fresh32,768-action seeds complete: still zero rewards, almost unchanged bonus,
-  near-uniform policy and coverage. Guards/counters/checkpoints and CPU replays
-  pass; no frozen evaluation or automatic extension. [Result](docs/results/2026-10-05-freeway-soft-learning.md).
-  Removing target sampling noise is insufficient. Next test predicts the
-  existing detached CNN embedding: position is more readable there than in the
-  categorical target. The [embedding-target qualification](docs/results/2026-10-05-freeway-embedding-qualification.md)
-  passes five GPU checks and production/frozen smokes; the first scalar-gradient
-  sentinel test failure is retained. Three fresh seeds are declared at the same
-  budget, reusing soft/extrinsic controls. Output width128→256 adds33,280 head
-  parameters and changes natural target scale, not the encoder. No coefficient/
-  budget change, scripted aid or broad matrix. All three finish with zero
-  rewards; larger bonus does not improve coverage. Three guards and full CPU
-  replays pass; frozen competence evaluation is skipped. The bounded frozen
-  action-contrast diagnosis is next, not a training extension. See the
-  [embedding result](docs/results/2026-10-05-freeway-embedding-learning.md).
-  Its six frozen diagnostic guards pass: state variation overwhelms action
-  contrast18–20x. Subtracting each predictor's all-action average in offline
-  probes makes UP the best-bonus action on96–100% of sampled states, without
-  game labels in the transform. This is not new policy evidence. Qualify/test
-  [action-effects disagreement](docs/experiments/2026-10-05-freeway-action-effects.md)
-  at the same three-seed budget; no coefficient/encoder/aid change or extension.
-  The [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
-  passes four GPU tests, three independent frozen readouts and production/frozen
-  smokes; nine guards pass. The short update cost rises25.32→31.66ms, not a speed
-  improvement. CPU114/Python1,137/Clippy pass. Fresh learning is the next test.
-  Freeway remains unsolved.
+- **October5: action-effects disagreement finds Freeway rewards in3/3 seeds.**
+  Same32,768-action/8,131-update recipe, seeds1009/2017/3019:2/1/1 real crossings
+  versus zero in all retained visual-target/extrinsic controls. All48 episodes,
+  tails and failures remain retained; three guards and exact CPU replays pass.
+  Online mean .0833 is not mastery. Seeds1009/2017 improve late;3019 finds an
+  early reward then loses coverage. [Learning result](docs/results/2026-10-05-freeway-action-effects-learning.md).
+  The changed GPU-native bonus subtracts each predictor's all-action mean before
+  ensemble disagreement. No new encoder, parameters, coefficient, action aid or
+  reward shaping. Its [qualification](docs/results/2026-10-05-freeway-action-effects-qualification.md)
+  passes four GPU tests, three independent readouts and production/frozen smokes;
+  native-F32 matches F64 within3.28e-8, cooperative differences are disclosed.
+  CPU114/Python1,161/Clippy pass, including the narrow frozen-score-reader fix.
+  Mean update31.70ms and wall273.25s/run cost~25% more; utilization is unmeasured.
+  **Running:** the declared frozen cohort for three candidates, three retained
+  extrinsic controls and three actual initial-weight controls,24 episodes each,
+  held-out seeds, zero updates, exact tensors and whole stream0 videos. Retained
+  extrinsic controls use the current runtime, with that change explicitly
+  disclosed; never alter their original binary identity. No training extension
+  until retention is reviewed. Freeway remains unsolved.
+  Earlier sampled/soft/visual targets all failed; see the
+  [visual-target diagnosis](docs/results/2026-10-05-freeway-embedding-learning.md)
+  for why removing action-independent disagreement was selected. Diagnostic
+  labels never enter the policy. No precision workaround or stopped matrix restart.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh
