@@ -49,6 +49,16 @@ polling; GPU utilization remains unmeasured. This is not new learning evidence.
 
 ## Next decision
 
+A follow-up CPU-only ridge probe uses the already saved features: first192
+states/seed fit, last64 states test, training-only centering/scaling and fixed
+unit L2 penalty, no holdout tuning. CNN features reduce held-out player-height
+MSE versus a training-mean baseline by48.4%/27.9%/77.6%; sampled stochastic
+features give13.6%/9.6%/−4.9%. Deterministic RSSM results are mixed
+(68.5%/2.4%/74.4%). Thus some position information survives the learned visual
+path, but is much less readable from the sampled ensemble target. This small
+same-trajectory linear probe does not prove policy use, causal controllability
+or that soft targets will solve exploration. No new GPU work or game experience.
+
 Test one change: ensemble targets become detached posterior categorical
 probabilities, replacing fresh one-hot latent draws. For squared error, this
 preserves the expected predictor gradient while removing categorical sampling

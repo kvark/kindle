@@ -84,10 +84,12 @@ in both arms. The [result](results/2026-10-05-cdp-freeway-exploration.md) shows
 nonzero intrinsic advantages but near-uniform policy entropy. The completed
 [coverage/bonus diagnosis](results/2026-10-05-freeway-disagreement-diagnosis.md)
 finds little coverage change, weak action contrast and no upward bonus preference.
-Next test detached posterior probabilities instead of sampled one-hot ensemble
-targets: the same expected regression gradient with less sampling noise. Keep
-the coefficient, model and32,768-action budget fixed; qualify and declare before
-launch. No larger run or precision workaround is justified yet. The research-order question is
+The [soft-target test](experiments/2026-10-05-freeway-soft-disagreement.md) replaces
+sampled one-hot ensemble targets with detached posterior probabilities: the
+same expected regression gradient with less sampling noise. Qualification passes;
+three fresh seeds started October5 at02:15 UTC, with coefficient, model and
+32,768-action budget fixed and the completed controls reused. No larger run or
+precision workaround is justified yet. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
@@ -156,8 +158,9 @@ point, not an automatic extension or a mastery claim. The user selected this
 exploration work before the unchanged three-method Boxing comparison.
 
 Six learning runs completed at23:00 UTC on October4; all guard/counter/checkpoint
-audits pass. The predeclared all-zero branch skips frozen evaluation. No GPU job
-is running. Qualification smokes are excluded; nonzero intrinsic reward and
+audits pass. Its predeclared all-zero branch skips frozen evaluation; the later
+soft-target screen is a separately declared change, not its continuation.
+Qualification smokes are excluded; nonzero intrinsic reward and
 advantages are not Freeway reward discovery. The earlier8,135-update prose
 was corrected to the launched/audited8,131; the action budget is unchanged.
 Do not extend a weak run automatically or add a hyperparameter sweep.

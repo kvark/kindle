@@ -15,10 +15,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   native-F32 GPU readout agrees within2.65e-8. All768 UP/DOWN preferences agree
   between paths; production precision stays unchanged. Retain failed checks.
   [Evidence](docs/results/2026-10-05-freeway-disagreement-diagnosis.md).
-  Next one-factor test: detached posterior probabilities replace sampled
-  one-hot ensemble targets, preserving expected gradients but removing target
-  sampling noise. No coefficient/budget change, scripted aid, new encoder or
-  broad matrix. Qualify and declare before launch; Freeway remains unsolved.
+  The [soft-target test](docs/experiments/2026-10-05-freeway-soft-disagreement.md)
+  is qualified:114 Rust/1,137 Python tests, four GPU checks and production/frozen
+  smokes pass; all346 tensors stay unchanged during frozen restore. Three fresh
+  seeds started October5 at02:15 UTC,32,768 actions each, reusing the six completed
+  controls. Detached posterior probabilities replace sampled one-hot targets,
+  preserving expected gradients but removing target sampling noise. No coefficient/
+  budget change, scripted aid, new encoder or broad matrix. The guarded service
+  audits each run and then automatically replays CPU coverage. Review before any
+  extension or frozen evaluation; Freeway remains unsolved.
 - **October 4 user decision: focus exploration on unlocking Freeway for CDP.**
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh

@@ -87,11 +87,11 @@
         87
       ],
       "height_quantiles": [
-        6.0,
-        18.0,
-        47.0,
-        78.0,
-        139.0
+        6,
+        18,
+        47,
+        78,
+        139
       ],
       "height_ge_counts": {
         "32": 8108,
@@ -128,11 +128,11 @@
         110
       ],
       "height_quantiles": [
-        6.0,
-        18.0,
-        46.0,
-        79.0,
-        112.0
+        6,
+        18,
+        46,
+        79,
+        112
       ],
       "height_ge_counts": {
         "32": 7587,
@@ -169,11 +169,11 @@
         104
       ],
       "height_quantiles": [
-        6.0,
-        19.0,
-        50.0,
-        82.0,
-        135.0
+        6,
+        19,
+        50,
+        82,
+        135
       ],
       "height_ge_counts": {
         "32": 8708,
@@ -210,11 +210,11 @@
         105
       ],
       "height_quantiles": [
-        6.0,
-        19.0,
-        51.0,
-        86.0,
-        136.0
+        6,
+        19,
+        51,
+        86,
+        136
       ],
       "height_ge_counts": {
         "32": 8775,
@@ -251,11 +251,11 @@
         81
       ],
       "height_quantiles": [
-        6.0,
-        19.0,
-        47.0,
-        75.0,
-        104.0
+        6,
+        19,
+        47,
+        75,
+        104
       ],
       "height_ge_counts": {
         "32": 8586,
@@ -292,11 +292,11 @@
         81
       ],
       "height_quantiles": [
-        6.0,
-        16.0,
-        42.0,
-        73.0,
-        120.0
+        6,
+        16,
+        42,
+        73,
+        120
       ],
       "height_ge_counts": {
         "32": 6692,
@@ -325,11 +325,11 @@
     {
       "seed": 1009,
       "samples": 256,
-      "default_independent_max_error": 1.463214502699095e-05,
-      "native_f32_independent_max_error": 1.6200132096910735e-08,
+      "default_independent_max_error": 0.00001463214502699095,
+      "native_f32_independent_max_error": 1.6200132096910735e-8,
       "default_meets_original_3e6_bound": false,
       "default_vs_reference_argmax_agreement": 0.984375,
-      "default_vs_reference_up_down_agreement": 1.0,
+      "default_vs_reference_up_down_agreement": 1,
       "bonus_mean": 0.009934189579224848,
       "between_state_std": 0.0019121010273824902,
       "within_state_action_std": 0.00018604853557822225,
@@ -398,11 +398,11 @@
         2.8900550715071374
       ],
       "player_height_quantiles": [
-        6.0,
-        6.0,
-        17.0,
-        40.0,
-        83.0
+        6,
+        6,
+        17,
+        40,
+        83
       ],
       "bonus_height_correlation": -0.05595167689844423,
       "action_preference_height_correlation": 0.5223346964190597,
@@ -413,11 +413,11 @@
     {
       "seed": 2017,
       "samples": 256,
-      "default_independent_max_error": 2.194125470903613e-05,
-      "native_f32_independent_max_error": 2.646656695540206e-08,
+      "default_independent_max_error": 0.00002194125470903613,
+      "native_f32_independent_max_error": 2.646656695540206e-8,
       "default_meets_original_3e6_bound": false,
-      "default_vs_reference_argmax_agreement": 1.0,
-      "default_vs_reference_up_down_agreement": 1.0,
+      "default_vs_reference_argmax_agreement": 1,
+      "default_vs_reference_up_down_agreement": 1,
       "bonus_mean": 0.012126909454814773,
       "between_state_std": 0.002994758552983905,
       "within_state_action_std": 0.0001704707760431749,
@@ -428,7 +428,7 @@
         0.06756192909073486,
         0.09432299726421182
       ],
-      "intrinsic_up_minus_down_mean": -7.607766504709916e-05,
+      "intrinsic_up_minus_down_mean": -0.00007607766504709916,
       "up_preferred_fraction": 0.38671875,
       "best_direction_fractions": {
         "up": 0.21484375,
@@ -486,11 +486,11 @@
         2.889257418942738
       ],
       "player_height_quantiles": [
-        6.0,
-        6.0,
-        18.0,
-        45.0,
-        82.0
+        6,
+        6,
+        18,
+        45,
+        82
       ],
       "bonus_height_correlation": -0.06372002610052023,
       "action_preference_height_correlation": 0.14022298795228139,
@@ -501,11 +501,11 @@
     {
       "seed": 3019,
       "samples": 256,
-      "default_independent_max_error": 1.485052609262287e-05,
-      "native_f32_independent_max_error": 1.7342765045239017e-08,
+      "default_independent_max_error": 0.00001485052609262287,
+      "native_f32_independent_max_error": 1.7342765045239017e-8,
       "default_meets_original_3e6_bound": false,
       "default_vs_reference_argmax_agreement": 0.98046875,
-      "default_vs_reference_up_down_agreement": 1.0,
+      "default_vs_reference_up_down_agreement": 1,
       "bonus_mean": 0.010625016758846565,
       "between_state_std": 0.0015419818263849852,
       "within_state_action_std": 0.00015917646520314973,
@@ -516,7 +516,7 @@
         0.0738846427213252,
         0.10072144803741533
       ],
-      "intrinsic_up_minus_down_mean": -4.445785634743509e-05,
+      "intrinsic_up_minus_down_mean": -0.00004445785634743509,
       "up_preferred_fraction": 0.38671875,
       "best_direction_fractions": {
         "up": 0.234375,
@@ -574,11 +574,11 @@
         2.888495488188167
       ],
       "player_height_quantiles": [
-        6.0,
-        6.0,
-        17.0,
-        38.0,
-        72.0
+        6,
+        6,
+        17,
+        38,
+        72
       ],
       "bonus_height_correlation": -0.15019631299583572,
       "action_preference_height_correlation": 0.3706250333842453,
@@ -594,5 +594,153 @@
     "default reduced-input GPU math fails original 3e-6 absolute diagnostic bound; full-F32 passes without relaxing it",
     "no evidence the precision difference explains zero rewards",
     "diagnostic labels never entered the policy or bonus"
-  ]
+  ],
+  "position_probe": {
+    "status": "complete",
+    "results": [
+      {
+        "seed": 1009,
+        "train_samples": 192,
+        "test_samples": 64,
+        "train_height_range": [
+          6,
+          83
+        ],
+        "test_height_range": [
+          6,
+          77
+        ],
+        "constant_mae": 14.6337890625,
+        "constant_mse": 380.712646484375,
+        "representations": {
+          "cnn": {
+            "features": 256,
+            "mse": 196.49478177009462,
+            "mae": 9.042627401619418,
+            "improvement_over_training_mean": 0.4838763997345724,
+            "r2": 0.3834433065772209
+          },
+          "deter": {
+            "features": 512,
+            "mse": 119.80254021423956,
+            "mae": 6.8202285667745315,
+            "improvement_over_training_mean": 0.6853203030670629,
+            "r2": 0.6240864139355842
+          },
+          "stoch": {
+            "features": 128,
+            "mse": 328.82871019047104,
+            "mae": 12.522220402508784,
+            "improvement_over_training_mean": 0.13628109487041518,
+            "r2": -0.031790973944175294
+          },
+          "feature": {
+            "features": 640,
+            "mse": 126.52894998507625,
+            "mae": 7.172328271507344,
+            "improvement_over_training_mean": 0.6676523589287461,
+            "r2": 0.6029804439472
+          }
+        }
+      },
+      {
+        "seed": 2017,
+        "train_samples": 192,
+        "test_samples": 64,
+        "train_height_range": [
+          6,
+          82
+        ],
+        "test_height_range": [
+          6,
+          79
+        ],
+        "constant_mae": 12.484375,
+        "constant_mse": 240.875,
+        "representations": {
+          "cnn": {
+            "features": 256,
+            "mse": 173.6956888175954,
+            "mae": 9.879169549230928,
+            "improvement_over_training_mean": 0.2788969846700762,
+            "r2": 0.26748107445588487
+          },
+          "deter": {
+            "features": 512,
+            "mse": 235.01979548598453,
+            "mae": 11.316466098088636,
+            "improvement_over_training_mean": 0.024308062331148794,
+            "r2": 0.00886170956275567
+          },
+          "stoch": {
+            "features": 128,
+            "mse": 217.63268027396074,
+            "mae": 11.628643671850229,
+            "improvement_over_training_mean": 0.09649120799601141,
+            "r2": 0.08218759945745757
+          },
+          "feature": {
+            "features": 640,
+            "mse": 247.73318121617356,
+            "mae": 12.196282354365536,
+            "improvement_over_training_mean": -0.028471951079080737,
+            "r2": -0.04475387363623606
+          }
+        }
+      },
+      {
+        "seed": 3019,
+        "train_samples": 192,
+        "test_samples": 64,
+        "train_height_range": [
+          6,
+          72
+        ],
+        "test_height_range": [
+          6,
+          49
+        ],
+        "constant_mae": 9.389485677083334,
+        "constant_mse": 131.66783311631946,
+        "representations": {
+          "cnn": {
+            "features": 256,
+            "mse": 29.46614686469604,
+            "mae": 4.214577137878117,
+            "improvement_over_training_mean": 0.7762084621027769,
+            "r2": 0.7759556981160398
+          },
+          "deter": {
+            "features": 512,
+            "mse": 33.75518567697188,
+            "mae": 4.620692906291756,
+            "improvement_over_training_mean": 0.7436337723644962,
+            "r2": 0.7433442165109962
+          },
+          "stoch": {
+            "features": 128,
+            "mse": 138.08615472332102,
+            "mae": 9.681339005679874,
+            "improvement_over_training_mean": -0.048746314533264945,
+            "r2": -0.04993083340304927
+          },
+          "feature": {
+            "features": 640,
+            "mse": 44.7626425980673,
+            "mae": 5.482195360369238,
+            "improvement_over_training_mean": 0.6600335743467229,
+            "r2": 0.6596495952655106
+          }
+        }
+      }
+    ],
+    "ridge": 1,
+    "split": "first192 train, last64 test in original temporal order",
+    "limitations": [
+      "small same-title same-trajectory holdout, not transfer",
+      "current restored features, not original live beliefs",
+      "linear readability does not prove policy use or causal controllability",
+      "RAM labels never enter actor training"
+    ]
+  }
 }
