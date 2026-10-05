@@ -79,7 +79,10 @@ October 4 direction puts CDP on the main path through the remaining stages.
 **Current user decision:** focus on exploration and unlock Freeway for CDP.
 The small disagreement mechanism below is implemented and
 [qualified](results/2026-10-04-cdp-exploration-qualification.md); the declared
-three-seed screen against extrinsic-only CDP is running. The research-order question is
+three-seed screen against extrinsic-only CDP is complete with zero real rewards
+in both arms. The [result](results/2026-10-05-cdp-freeway-exploration.md) shows
+nonzero intrinsic advantages but near-uniform policy entropy. Diagnose bonus
+action contrast and actual coverage before any larger run. The research-order question is
 resolved; neither Boxing nor the stopped five-game matrix resumes now.
 
 **Stopped for diagnosis, October4 at20:42 UTC:** the user requests investigation
@@ -139,7 +142,7 @@ The authorized exploration experiment, before resuming the matrix, is
   the game-performance metric. Evaluate predeclared frozen policies without
   updates and retain whole rollout videos, not selected successful episodes.
 
-Before considering six full200k-action runs, use a32,768-action/8,135-update
+Before considering six full200k-action runs, use a32,768-action/8,131-update
 screen per arm/seed using the same N8 small recipe, with reward discovery and
 nonzero advantages as diagnostics. Qualify reset-safe action/target alignment,
 detached gradients, zero-coefficient baseline equivalence, repeat-versus-novel
@@ -147,9 +150,11 @@ state behavior and whole-update overhead first. A completed screen is a decision
 point, not an automatic extension or a mastery claim. The user selected this
 exploration work before the unchanged three-method Boxing comparison.
 
-Six learning runs are now running serially under the host guard, with a full
-counter/checkpoint audit before advancing. Qualification smokes are excluded;
-nonzero intrinsic reward and advantages are not Freeway reward discovery.
+Six learning runs completed at23:00 UTC on October4; all guard/counter/checkpoint
+audits pass. The predeclared all-zero branch skips frozen evaluation. No GPU job
+is running. Qualification smokes are excluded; nonzero intrinsic reward and
+advantages are not Freeway reward discovery. The earlier8,135-update prose
+was corrected to the launched/audited8,131; the action budget is unchanged.
 Do not extend a weak run automatically or add a hyperparameter sweep.
 
 After that decision, test the selected recipe on **one predeclared held-out

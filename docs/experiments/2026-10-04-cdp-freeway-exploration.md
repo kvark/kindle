@@ -58,11 +58,16 @@ CDP cosine coefficient500, encoder6e-6/dynamics4e-4/base4e-5, warmup1000,
 AGC.3, `ac_grads=false`, external reward coefficient1. No action aid, video
 pretraining, new reward shaping or shared histories between streams.
 
-Learner seeds1009/2017/3019, **32,768 actual aggregate actions /8,135 updates per
+Learner seeds1009/2017/3019, **32,768 actual aggregate actions /8,131 updates per
 run**, six runs total. Order: control1009, candidate1009, candidate2017,
 control2017, control3019, candidate3019. Each run has a30-minute deadline;
 no running job survives a failed guard/audit and no automatic resume/extension.
 Audit each run before the next. Preserve every transition, episode and tail.
+
+October5 accounting erratum: earlier prose said8,135. The launch controller and
+audits required8,131 (first update at action248); settings and the32,768-action
+budget were unchanged. [All six results](../results/2026-10-05-cdp-freeway-exploration.md)
+are zero-reward, so the frozen-evaluation branch below is skipped.
 
 Measure first positive extrinsic reward, real/replayed positive-event counts,
 extrinsic return versus actions/time, intrinsic magnitudes, advantages, entropy,

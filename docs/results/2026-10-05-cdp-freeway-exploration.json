@@ -1,0 +1,597 @@
+{
+  "date": "2026-10-05",
+  "completed_at": "2026-10-04T23:00:06.901Z",
+  "status": "complete_negative_screen",
+  "artifacts": "/x/Code/kindle/runs/cdp-exploration-20261004.mE26yV2V",
+  "implementation_commit": "11059fb",
+  "native_sha256": "ecc935a7813f896f8e5f5c15543c4de4a7a8f26340fd46ec88b63addb721a065",
+  "environment": "ALE/Freeway-v5",
+  "seeds": [
+    1009,
+    2017,
+    3019
+  ],
+  "actions_per_run": 32768,
+  "updates_per_run": 8131,
+  "aggregate_actions": 196608,
+  "aggregate_updates": 48786,
+  "total_completed_episodes": 96,
+  "config": {
+    "model_size": "size1_m",
+    "streams": 8,
+    "batch_size": 8,
+    "batch_length": 16,
+    "imagination_length": 15,
+    "train_ratio": 32,
+    "microbatch": 8,
+    "replay_capacity": 100000,
+    "action_count": 18,
+    "sticky_actions": 0.25,
+    "action_repeat": 4,
+    "disagreement_coefficient": 1,
+    "pretraining": false,
+    "action_aid": false
+  },
+  "result": {
+    "positive_events_control": [
+      0,
+      0,
+      0
+    ],
+    "positive_events_candidate": [
+      0,
+      0,
+      0
+    ],
+    "online_score_control": [
+      0,
+      0,
+      0
+    ],
+    "online_score_candidate": [
+      0,
+      0,
+      0
+    ],
+    "paired_score_mean": 0,
+    "paired_score_seed_bootstrap_95": [
+      0,
+      0
+    ],
+    "mean_run_seconds": {
+      "control": 213.95593266231785,
+      "disagreement": 220.95304414672623
+    },
+    "mean_update_ms": {
+      "control": 24.521408898495466,
+      "disagreement": 25.293703394498422
+    },
+    "paired_wall_time_increase": 0.03311514792072767,
+    "paired_wall_time_increase_seed_bootstrap_95": [
+      0.01628369429486387,
+      0.06264684297428524
+    ],
+    "bootstrap_method": "Exact equal-probability empirical distribution of all 27 ordered three-seed resamples; inverse-CDF 2.5%/97.5% quantiles.",
+    "candidate_final_policy_entropy_range": [
+      2.88378378828125,
+      2.88899153984375
+    ],
+    "uniform_policy_entropy": 2.8903717578961645
+  },
+  "validation": {
+    "guards_passed": 6,
+    "training_audits_passed": 6,
+    "finite_checkpoints": 6,
+    "new_allocation_warnings": 0,
+    "host_recovery": false,
+    "nvml_polling_queries": 0,
+    "ci295": "all three jobs passed"
+  },
+  "decision": {
+    "frozen_evaluation": "skipped by predeclared all-zero branch",
+    "new_training": "not launched",
+    "next": "Diagnose action-dependent bonus contrast and spatial/temporal coverage before changing the mechanism or budget."
+  },
+  "accounting_note": "Earlier prose said 8135 updates. The launch controller and audits required 8131 = 32768/4 - 61, consistent with first update at action248. The 32768-action budget/settings were unchanged.",
+  "runs": [
+    {
+      "name": "train-control-1009",
+      "seed": 1009,
+      "scale": 0,
+      "positive_reward_events": 0,
+      "seconds": 217.1720780999167,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.02484759602644201,
+      "mean_world_seconds": 0.008218198132579018,
+      "mean_intrinsic": 0,
+      "mean_advantage": 0,
+      "final_entropy": 2.89037182578125,
+      "final_intrinsic": 0,
+      "final_advantage": 0,
+      "first_intrinsic": 0,
+      "final_exploration_loss": 0,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 173,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.8794711099471897,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890356423880597
+        },
+        {
+          "actions": 4096,
+          "seconds": 25.755292521906085,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890371803125
+        },
+        {
+          "actions": 8192,
+          "seconds": 53.05975558992941,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037181796875
+        },
+        {
+          "actions": 16384,
+          "seconds": 107.63319442491047,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037181328125
+        },
+        {
+          "actions": 24576,
+          "seconds": 162.4519551739795,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037181015625
+        },
+        {
+          "actions": 32768,
+          "seconds": 217.1720780999167,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037182578125
+        }
+      ]
+    },
+    {
+      "name": "train-control-2017",
+      "seed": 2017,
+      "scale": 0,
+      "positive_reward_events": 0,
+      "seconds": 216.68140544800553,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.02478303125027672,
+      "mean_world_seconds": 0.008195591091255687,
+      "mean_intrinsic": 0,
+      "mean_advantage": 0,
+      "final_entropy": 2.8903718078125,
+      "final_intrinsic": 0,
+      "final_advantage": 0,
+      "first_intrinsic": 0,
+      "final_exploration_loss": 0,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 173,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.8983059310121462,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.8903546268656717
+        },
+        {
+          "actions": 4096,
+          "seconds": 25.798387395916507,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890371803125
+        },
+        {
+          "actions": 8192,
+          "seconds": 52.999038578011096,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037182578125
+        },
+        {
+          "actions": 16384,
+          "seconds": 107.3905550079653,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037181015625
+        },
+        {
+          "actions": 24576,
+          "seconds": 161.82834634394385,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890371821875
+        },
+        {
+          "actions": 32768,
+          "seconds": 216.68140544800553,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.8903718078125
+        }
+      ]
+    },
+    {
+      "name": "train-control-3019",
+      "seed": 3019,
+      "scale": 0,
+      "positive_reward_events": 0,
+      "seconds": 208.0143144390313,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.023933599418767677,
+      "mean_world_seconds": 0.0082085610769893,
+      "mean_intrinsic": 0,
+      "mean_advantage": 0,
+      "final_entropy": 2.890371825,
+      "final_intrinsic": 0,
+      "final_advantage": 0,
+      "first_intrinsic": 0,
+      "final_exploration_loss": 0,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 173,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.8216923710424453,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.8903555716417912
+        },
+        {
+          "actions": 4096,
+          "seconds": 24.76346221496351,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.8903718
+        },
+        {
+          "actions": 8192,
+          "seconds": 50.86842200101819,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890371821875
+        },
+        {
+          "actions": 16384,
+          "seconds": 103.2786688299384,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037183359375
+        },
+        {
+          "actions": 24576,
+          "seconds": 155.58362040796783,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.89037181171875
+        },
+        {
+          "actions": 32768,
+          "seconds": 208.0143144390313,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0,
+          "advantage": 0,
+          "entropy": 2.890371825
+        }
+      ]
+    },
+    {
+      "name": "train-disagreement-1009",
+      "seed": 1009,
+      "scale": 1,
+      "positive_reward_events": 0,
+      "seconds": 220.70844182907604,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.02525802291169598,
+      "mean_world_seconds": 0.008309958052146108,
+      "mean_intrinsic": 0.027774012181281515,
+      "mean_advantage": 0.1118254473822408,
+      "final_entropy": 2.88899153984375,
+      "final_intrinsic": 0.00936591805859375,
+      "final_advantage": 0.0328775609375,
+      "first_intrinsic": 0.4769148435820896,
+      "final_exploration_loss": 0.139617401015625,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.9235494990134612,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.4769148435820896,
+          "advantage": 0.7940907179104477,
+          "entropy": 2.890354367164179
+        },
+        {
+          "actions": 4096,
+          "seconds": 26.073614554014057,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.0260290026015625,
+          "advantage": 0.151183169296875,
+          "entropy": 2.8902510140625
+        },
+        {
+          "actions": 8192,
+          "seconds": 53.84987989405636,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.0288639755078125,
+          "advantage": 0.157327684609375,
+          "entropy": 2.88964232109375
+        },
+        {
+          "actions": 16384,
+          "seconds": 109.38685817306396,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.013470695183593749,
+          "advantage": 0.062569087859375,
+          "entropy": 2.88937614375
+        },
+        {
+          "actions": 24576,
+          "seconds": 164.9156897070352,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.010908894578125,
+          "advantage": 0.03977462346875,
+          "entropy": 2.88917909375
+        },
+        {
+          "actions": 32768,
+          "seconds": 220.70844182907604,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0.00936591805859375,
+          "advantage": 0.0328775609375,
+          "entropy": 2.88899153984375
+        }
+      ]
+    },
+    {
+      "name": "train-disagreement-2017",
+      "seed": 2017,
+      "scale": 1,
+      "positive_reward_events": 0,
+      "seconds": 221.1049360790057,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.025320782931004798,
+      "mean_world_seconds": 0.008313361309801993,
+      "mean_intrinsic": 0.02859144900811708,
+      "mean_advantage": 0.11006882123564138,
+      "final_entropy": 2.88678440546875,
+      "final_intrinsic": 0.01169317307421875,
+      "final_advantage": 0.04501462334375,
+      "first_intrinsic": 0.4624088728358209,
+      "final_exploration_loss": 0.13649223546875,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.9142282559769228,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.4624088728358209,
+          "advantage": 0.7585541664179104,
+          "entropy": 2.8903525074626866
+        },
+        {
+          "actions": 4096,
+          "seconds": 26.247057444998063,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.0315038873671875,
+          "advantage": 0.1730549984375,
+          "entropy": 2.89031582109375
+        },
+        {
+          "actions": 8192,
+          "seconds": 54.037641571019776,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.0261903083984375,
+          "advantage": 0.1270895128125,
+          "entropy": 2.890137503125
+        },
+        {
+          "actions": 16384,
+          "seconds": 109.7410676550353,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.015832494796875,
+          "advantage": 0.0743203007578125,
+          "entropy": 2.8896176578125
+        },
+        {
+          "actions": 24576,
+          "seconds": 165.41026208607946,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.012564891203125,
+          "advantage": 0.0487235365625,
+          "entropy": 2.88835184609375
+        },
+        {
+          "actions": 32768,
+          "seconds": 221.1049360790057,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0.01169317307421875,
+          "advantage": 0.04501462334375,
+          "entropy": 2.88678440546875
+        }
+      ]
+    },
+    {
+      "name": "train-disagreement-3019",
+      "seed": 3019,
+      "scale": 1,
+      "positive_reward_events": 0,
+      "seconds": 221.0457545320969,
+      "actions": 32768,
+      "updates": 8131,
+      "episodes": 16,
+      "score": 0,
+      "mean_update_seconds": 0.025302304340794488,
+      "mean_world_seconds": 0.00831153416664617,
+      "mean_intrinsic": 0.02974157732068626,
+      "mean_advantage": 0.12123344397282007,
+      "final_entropy": 2.88378378828125,
+      "final_intrinsic": 0.010492773453125,
+      "final_advantage": 0.0333642323671875,
+      "first_intrinsic": 0.43730554119402987,
+      "final_exploration_loss": 0.14769053890625,
+      "guard_passed": true,
+      "checkpoint": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "curve": [
+        {
+          "actions": 512,
+          "seconds": 1.905681999051012,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.43730554119402987,
+          "advantage": 0.8412488340298507,
+          "entropy": 2.890353304477612
+        },
+        {
+          "actions": 4096,
+          "seconds": 26.191215989994816,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.03298173046875,
+          "advantage": 0.184992768125,
+          "entropy": 2.8902933625
+        },
+        {
+          "actions": 8192,
+          "seconds": 53.89632060506847,
+          "score": null,
+          "completed_episodes": 0,
+          "intrinsic": 0.030913039875,
+          "advantage": 0.15936309390625,
+          "entropy": 2.89013007265625
+        },
+        {
+          "actions": 16384,
+          "seconds": 109.45941917109303,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.0169276754765625,
+          "advantage": 0.0802391422421875,
+          "entropy": 2.88937445703125
+        },
+        {
+          "actions": 24576,
+          "seconds": 165.18676240905188,
+          "score": 0,
+          "completed_episodes": 8,
+          "intrinsic": 0.013508125640625,
+          "advantage": 0.05354358028125,
+          "entropy": 2.888334971875
+        },
+        {
+          "actions": 32768,
+          "seconds": 221.0457545320969,
+          "score": 0,
+          "completed_episodes": 16,
+          "intrinsic": 0.010492773453125,
+          "advantage": 0.0333642323671875,
+          "entropy": 2.88378378828125
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Three short learner seeds; negative result at this budget, not proof intrinsic exploration cannot work.",
+    "Near-uniform imagined policy entropy and shrinking bonus do not by themselves prove why spatial exploration failed.",
+    "No frozen competence or newly successful rollout video.",
+    "Full logs preserve all episodes, transitions and unfinished tails.",
+    "Previous 5120 qualification actions remain excluded; GPU utilization unmeasured."
+  ]
+}

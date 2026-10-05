@@ -11,10 +11,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The research-order question is resolved. Implemented and qualified the roadmap's
   small GPU-native action-conditioned latent-disagreement bonus against fresh
   extrinsic-only CDP, seeds1009/2017/3019. Start with32,768 aggregate actions per
-  arm/seed; the six-run screen is running serially. Alignment, detached gradients,
+  arm/seed; all six runs finished October4 at23:00 UTC. All rewards are zero;
+  the exploration channel is active but policy entropy remains near uniform.
+  Six guards/counter audits/finite checkpoints and CI295 pass. No frozen
+  evaluation or new GPU job follows the predeclared all-zero branch. Diagnose
+  action-dependent bonus contrast and coverage before changing the budget or
+  mechanism. See `docs/results/2026-10-05-cdp-freeway-exploration.md`.
+  Actual updates are8,131/run; earlier8,135 prose was a planning error.
+  Alignment, detached gradients,
   zero-scale equivalence, restore and short overhead checks pass; see
   `docs/results/2026-10-04-cdp-exploration-qualification.md`. Diagnose the result
-  before declaring any larger budget. No Freeway reward-discovery claim yet.
+  before declaring any larger budget. Freeway remains unsolved by this recipe.
   No scripted UP, persistent action overrides, new pixel encoder or CPU feature
   readback. The five-game representation comparison is deferred, not completed
   or automatically restarted. Keep PR31 as the dashboard.
