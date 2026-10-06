@@ -70,6 +70,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   resume, game-specific recipe, raw-cosine retry or automatic extension.
   This is longer centered-package learning, not a new five-game loss ablation
   or a completed quality goal. Review every failure or capped cohort.
+  The first two completed Breakout seeds remain weak. The declaration now
+  prepares a bounded initial/final frozen-state/forecast check for all three
+  seeds after the full campaign audit. It is not launched; do not interrupt
+  this allocation or add training budget before diagnosis. Breakout probes
+  are CPU-tested in7e5df42; their GPU path is still unrun.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -115,6 +120,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   throughput trial; completed probes retain their training native. Tiny's
   attention path is not newly qualified by these CDP/RGB checks. Neighboring
   user work stays untouched.
+  Rechecked19:50 UTC: new Meganeurafc3a2fb adds f32 cooperative acceleration
+  and checked geometry; Blade49ec60a changes presentation-damage hints. No
+  relevant fix for the current small-CDP learning weakness was identified.
+  Keep active jobs/frozen diagnosis on the qualified runtime; review a refresh
+  before the next learner change, without repinning completed evidence.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
