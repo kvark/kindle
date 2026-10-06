@@ -231,8 +231,8 @@ impl LinearNorm {
 }
 
 /// D3 BlockLinear expressed with one grouped weight and bias parameter.
-/// Individual block views feed ordinary matmuls, preserving upstream's
-/// parameter leaves for initialization, AGC, and checkpointing.
+/// Grouped products preserve upstream's parameter leaves for initialization,
+/// AGC, and checkpointing; batch-one and large-batch paths retain serial views.
 struct BlockLinear {
     weight: NodeId,
     bias: NodeId,
@@ -262,9 +262,9 @@ impl BlockLinear {
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        // Keep batch-one GEMV and large-batch cooperative imagination on
-        // their original arithmetic. This candidate targets small F32 batches.
-        if (2..=16).contains(&batch) {
+        // Cover both collection/training and the small recipe's B128 imagination.
+        // Keep batch-one GEMV and larger cooperative batches unchanged.
+        if (2..=128).contains(&batch) {
             assert_eq!(
                 graph.node(input).ty.shape,
                 [batch, self.blocks * self.input_per_block]
@@ -901,9 +901,9 @@ mod block_matmul_tests {
     }
 
     #[test]
-    fn small_batch_blocks_preserve_parameters_and_reduce_dispatches() {
-        for batch in [2, 4, 6, 8, 16] {
-            for (input, output) in [(1024, 256), (256, 768)] {
+    fn grouped_blocks_preserve_parameters_and_reduce_dispatches() {
+        for batch in [2, 4, 6, 8, 16, 17, 64, 128] {
+            for (input, output) in [(1024, 256), (256, 768), (256, 64), (64, 192)] {
                 let candidate = graph(batch, input, output, true, false);
                 let control = graph(batch, input, output, false, false);
                 let parameters = |g: &Graph| {
@@ -956,7 +956,7 @@ mod block_matmul_tests {
 
     #[test]
     fn gemv_and_large_batch_graphs_remain_exact() {
-        for batch in [1, 17, 64, 1024] {
+        for batch in [1, 129, 1024] {
             let candidate = graph(batch, 5, 7, true, false);
             let control = graph(batch, 5, 7, false, false);
             assert_eq!(
@@ -979,6 +979,81 @@ mod block_matmul_tests {
         assert!(block_gradients.iter().all(|n| n.requires_full_precision));
         let (plan, _) = meganeura::compile_training_graph(&graph);
         assert_eq!(plan.param_grad_pairs.len(), 3);
+    }
+
+    #[test]
+    #[ignore = "requires exclusive GPU; independent F64 reference at imagination batch sizes"]
+    fn imagination_blocks_match_f64_forward() {
+        use rand::{Rng, SeedableRng, rngs::StdRng};
+        let gpu = std::sync::Arc::new(crate::init_gpu_context().unwrap());
+        assert_eq!(
+            gpu.device_information().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!gpu.device_information().is_software_emulated);
+        let mut rng = StdRng::seed_from_u64(7301);
+        for batch in [17, 64, 128] {
+            for (input_width, output_width) in [(256, 64), (64, 192)] {
+                let graph = graph(batch, input_width, output_width, true, false);
+                let mut session =
+                    crate::dreamer::runtime::build_session(&graph, &gpu, Mode::Inference, false);
+                let memory = gpu.memory_stats();
+                assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+                let input = (0..batch * 8 * input_width)
+                    .map(|_| rng.random_range(-1.0f32..1.0))
+                    .collect::<Vec<_>>();
+                let scale = (input_width as f32).sqrt().recip();
+                let weight = (0..8 * input_width * output_width)
+                    .map(|_| rng.random_range(-scale..scale))
+                    .collect::<Vec<_>>();
+                let bias = (0..8 * output_width)
+                    .map(|_| rng.random_range(-0.1f32..0.1))
+                    .collect::<Vec<_>>();
+                for (name, data) in [
+                    ("probe.input", &input),
+                    ("probe.block.weight", &weight),
+                    ("probe.block.bias", &bias),
+                ] {
+                    session.set_parameter(name, data);
+                }
+                session.step();
+                session.wait();
+                let actual = session.read_output(batch * 8 * output_width);
+                let (mut squared_error, mut squared_norm, mut max_error) = (0.0f64, 0.0f64, 0.0f64);
+                for row in 0..batch {
+                    for block in 0..8 {
+                        for col in 0..output_width {
+                            let mut expected = f64::from(bias[block * output_width + col]);
+                            for inner in 0..input_width {
+                                expected +=
+                                    f64::from(input[(row * 8 + block) * input_width + inner])
+                                        * f64::from(
+                                            weight[(block * input_width + inner) * output_width
+                                                + col],
+                                        );
+                            }
+                            let index = (row * 8 + block) * output_width + col;
+                            let error = (f64::from(actual[index]) - expected).abs();
+                            assert!(actual[index].is_finite());
+                            assert!(
+                                error <= 2e-6 * (1.0 + expected.abs()),
+                                "B{batch}/{input_width}/{output_width}[{index}]: {} != {expected}",
+                                actual[index]
+                            );
+                            squared_error += error * error;
+                            squared_norm += expected * expected;
+                            max_error = max_error.max(error);
+                        }
+                    }
+                }
+                let relative_l2 = (squared_error / squared_norm.max(1e-30)).sqrt();
+                assert!(relative_l2 <= 2e-5);
+                eprintln!(
+                    "F64 B{batch}/{input_width}/{output_width}: outputs={} max_abs={max_error:e} relative_l2={relative_l2:e}",
+                    actual.len()
+                );
+            }
+        }
     }
 
     #[test]

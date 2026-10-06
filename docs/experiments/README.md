@@ -7,6 +7,13 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
+with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
+but only4/72 wins. The [single grouped-imagination trial](../results/2026-10-06-cdp-imagination-throughput.md)
+passes numerical checks and reduces synthetic full-update time by8.12%.
+Next is the separately declared [five-game500k centered allocation](2026-10-06-cdp-centered-five-game-budget.md),
+not a closed quality goal or restarted historical queue.
+
 October6: the [500k-action Pong follow-up](../results/2026-10-06-cdp-pong-budget.md)
 is complete, but two seeds remain near a complete loss; only2017 improves.
 The [latest Meganeura refresh](../results/2026-10-06-meganeura-refresh.md)

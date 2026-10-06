@@ -303,6 +303,87 @@ fn profile_fixed_batch_checkpoint() {
 }
 
 #[test]
+#[ignore = "ordinary synthetic full-update timing; no environment or replay resume"]
+fn time_fixed_batch_checkpoint() {
+    let source = std::env::var_os("KINDLE_DREAMER_PROFILE_SOURCE").unwrap();
+    let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_DIR").unwrap());
+    std::fs::create_dir(&root).unwrap();
+    assert!(std::env::var_os("MEGANEURA_GPU_TIMING").is_none());
+    let mut core = DreamerCore::restore(source).unwrap();
+    let config = core.config.clone();
+    assert_eq!(config.observation_kind, crate::ObservationKind::Rgb64);
+    let check_device = |core: &DreamerCore| {
+        let memory = core.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        assert_eq!(
+            core.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!core.gpu_device().is_software_emulated);
+    };
+    check_device(&core);
+    save_json(&root.join("config.json"), &config);
+    checkpoint(&mut core, &root.join("initial"));
+    let initial_step = core.learner_step;
+    let mut rng = StdRng::seed_from_u64(701);
+    const WARMUP: usize = 16;
+    const MEASURED: usize = 256;
+    let mut reports = Vec::with_capacity(WARMUP + MEASURED);
+    for step in 0..WARMUP + MEASURED {
+        // Fixture generation and diagnostic exports are outside the timer.
+        // All production update stages, parameter syncs and slow EMA are inside.
+        let batch = fixture(&config, &mut rng);
+        let start = std::time::Instant::now();
+        let posterior = core.sample_posterior_batch(&batch);
+        let targets = core.imagine_and_target(&batch, &posterior);
+        let world = core.train_world(&batch, &posterior, &targets);
+        core.sync_world_inference();
+        let behavior = core.train_behavior(&targets);
+        core.sync_behavior_inference();
+        core.learner_step += 1;
+        let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+        reports.push(serde_json::json!({
+            "step": step, "elapsed_ms": elapsed_ms, "world": world, "behavior": behavior,
+        }));
+        if step == 0 {
+            save_json(
+                &root.join("first-outputs.json"),
+                &serde_json::json!({
+                    "deter": posterior.deter, "stoch": posterior.stoch,
+                    "action_target": targets.action_target,
+                    "imagined_weight": targets.imagined_weight,
+                    "imagined_value_target": targets.imagined_value_target,
+                    "imagined_slow_target": targets.imagined_slow_target,
+                    "replay_value_target": targets.replay_value_target,
+                    "replay_slow_target": targets.replay_slow_target,
+                    "replay_weight": targets.replay_weight,
+                }),
+            );
+            checkpoint(&mut core, &root.join("first"));
+        }
+    }
+    assert_eq!(core.learner_step - initial_step, (WARMUP + MEASURED) as u64);
+    checkpoint(&mut core, &root.join("final"));
+    check_device(&core);
+    let mean_ms = reports[WARMUP..]
+        .iter()
+        .map(|row| row["elapsed_ms"].as_f64().unwrap())
+        .sum::<f64>()
+        / MEASURED as f64;
+    save_json(
+        &root.join("result.json"),
+        &serde_json::json!({
+            "status": "complete", "warmup_updates": WARMUP, "measured_updates": MEASURED,
+            "initial_step": initial_step, "final_step": core.learner_step,
+            "mean_update_ms": mean_ms, "reports": reports,
+            "meganeura_revision": super::super::MEGANEURA_REV,
+            "imagination_dispatches": core.imagination.plan().dispatches.len(),
+        }),
+    );
+    eprintln!("ordinary full updates: {MEASURED} measured, {WARMUP} warmup, {mean_ms:.3}ms mean");
+}
+
+#[test]
 #[ignore = "paired synthetic full-update timing and split-reduction parity; no gameplay"]
 fn compare_split_world_updates() {
     let source =

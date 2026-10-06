@@ -27,7 +27,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   frames (protocol differences retained). Two weak seeds do not recover.
   All nine guards,144 natural frozen episodes, zero updates/cutoffs, exact
   tensors and full replays/videos pass. [Result and curves](docs/results/2026-10-06-cdp-pong-budget.md).
-  No further training-budget extension or automatic queue is declared.
+  That raw-cosine allocation stays closed; the new centered allocation below
+  is a separately reviewed study, not an automatic extension.
 - **Frozen Pong diagnosis complete:** all four guards/exact346 tensors pass,
   131,072 diagnostic actions and zero actor updates. Ball/paddle information is
   readable from every CNN, including initial weights, but ball state/reward
@@ -51,14 +52,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   seed has readable recurrent ball state and useful h15 negative-event
   forecasts. Raw2017 remains stronger on some coordinate probes; positive /
   terminal evidence is sparse. [Result](docs/results/2026-10-06-cdp-centered-world.md).
-  No GPU worker remains. Next is [one bounded throughput trial](docs/experiments/2026-10-06-cdp-imagination-throughput.md):
-  same-backend controls, extend existing grouped block products to B128,
-  preserve parameters/recipe, keep only after numerical checks and>=5% whole-
-  update gain. Otherwise discard and return to learning; no optimization sweep.
-  One separately guarded synthetic profile completes: imagination3,100
-  dispatches,10.91ms ordinary GPU/13.28ms wall; instrumentation perturbs kernel
-  shares. The next learning allocation must advance all five games, not turn
-  this positive Pong screen into the final objective.
+  **Throughput trial passes:** grouped B128 imagination reduces ordinary full
+  synthetic updates30.49->28.01ms (8.12%), dispatches3,100->1,210. Same upstream
+  backend/control, exact first targets and272 metric reports,428,032 F64 block
+  outputs,2,824 upstream comparisons, raw/centered train/frozen smokes and all
+  14 guards pass. [Result](docs/results/2026-10-06-cdp-imagination-throughput.md).
+  Keep it; no optimization sweep. This is not measured whole-game throughput
+  or GPU utilization. Previous per-dispatch instrumentation perturbs timing.
+- **Next reviewed learning allocation:** [three fresh500k seeds on each of the
+  five games](docs/experiments/2026-10-06-cdp-centered-five-game-budget.md),
+  centered CDP on native6d38eea2/c6376542. Fifteen learners,7.5M actions /
+  1,874,085 updates; seed-major Pong/Boxing/Freeway/Breakout/Qbert. Actual saved
+  initial and frozen final controls use new held-out base4,000,000,000, first3
+  natural episodes/stream,600k-action ceiling, full audits/videos. Expected
+  16–18h,24h service bound,100min training processes. The controller's smoke
+  audit rehearsal and all45 job declarations pass. No checkpoint lifetime
+  resume, game-specific recipe, raw-cosine retry or automatic extension.
+  This is longer centered-package learning, not a new five-game loss ablation
+  or a completed quality goal. Review every failure or capped cohort.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -99,10 +110,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   smokes. [Qualification](docs/results/2026-10-06-meganeura-refresh.md).
   Completed learning retains nativef4b6a5c7/592a2f5a; diagnostics disclose their
   new runtime separately. No claim that these fixes caused the old failures.
-  Upstream rechecked after centered learning: c6376542 adds attention-backward
-  batching/layout search, not an identified CDP fix. Keep current frozen probes
-  on their training native; adopt/recheck upstream with the next native change,
-  not by relabeling finished experiments. Neighboring user work stays untouched.
+  Upstreamc6376542 adds attention-backward batching/layout search, not an
+  identified CDP fix. It is now adopted/qualified for CDP/RGB with the grouped
+  throughput trial; completed probes retain their training native. Tiny's
+  attention path is not newly qualified by these CDP/RGB checks. Neighboring
+  user work stays untouched.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
@@ -176,9 +188,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified runtime backend: Meganeura main `b684ffd9`, Blade `e349cddf`.
+- Current qualified CDP/RGB backend: Meganeura main `c6376542`, Blade `e349cddf`,
+  native `6d38eea2`; the grouped imagination trial qualifies the new build.
   The [October6 refresh](docs/results/2026-10-06-meganeura-refresh.md) qualifies
-  the current CDP/exploration, RGB and frozen Tiny paths. The historical
+  CDP/exploration, RGB and frozen Tiny on its historical `b684ffd9`. The historical
   [October4 refresh](docs/results/2026-10-04-meganeura-main-qualification.md)
   passes 2,824 upstream CDP/RGB comparisons, causal Tiny streaming and all three
   production/frozen-restore smokes; 14 guards pass with no new warnings. No

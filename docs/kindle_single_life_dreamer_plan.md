@@ -105,7 +105,7 @@ the two failed seeds' KL drops further while reward separation stays weak.
 Nine guards,144 selected natural episodes, unchanged tensors and full
 replays/videos pass. [Result and curves](results/2026-10-06-cdp-pong-budget.md).
 The online mean−15.27 is below the published−7.16 near2M frames, with protocol
-differences retained. No further budget extension is declared.
+differences retained. No further raw-cosine budget extension is declared.
 
 **Frozen diagnosis is complete:** all four models preserve their346 tensors
 over131,072 diagnostic actions. Every CNN retains readable ball/paddle state;
@@ -135,12 +135,20 @@ One bounded
 synthetic profile has completed; imagination alone has3,100 dispatches and
 10.91ms ordinary GPU /13.28ms synchronized wall time. Kernel instrumentation
 perturbs timing; do not turn its family shares into whole-agent percentages.
-Next is [one bounded throughput trial](experiments/2026-10-06-cdp-imagination-throughput.md):
-extend existing grouped block products to B128, with same-backend controls and
-unchanged learning settings. Retain only after numerical qualification and a
->=5% full-update gain, otherwise discard it and resume learning. No optimization
-sweep or automatic raw-cosine retry. Then declare the next finite centered
-learning allocation toward all five games, keeping the original quality targets.
+**The bounded throughput trial passes:** existing grouped B128 products reduce
+ordinary synthetic network updates30.49->28.01ms (8.12%) and imagination
+dispatches3,100->1,210 on the same updated Meganeurac6376542 backend. All14
+guards, independent arithmetic/upstream checks and raw/centered production plus
+frozen smokes pass. [Result and limits](results/2026-10-06-cdp-imagination-throughput.md).
+Keep the change, without claiming a measured whole-game speedup or utilization.
+
+**Next reviewed allocation:** [three fresh500k-action seeds per original game](experiments/2026-10-06-cdp-centered-five-game-budget.md),
+centered CDP with unchanged capacity/rates/replay/exploration and qualified
+grouped execution. Fifteen learners,7.5M actions/1,874,085 updates, actual saved
+initial controls, new held-out frozen seeds, whole videos and full audits.
+Expected16–18h,24h service bound; no automatic extension or raw-cosine retry.
+This tests longer useful learning and the centered package beyond Pong, not
+five-game causal centering superiority or completion of the quality goal.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -260,6 +268,10 @@ especially imagination, not just the now-cheaper world loss.
 The October6 matched Pong comparison on Meganeurab684ffd9 averages32.11ms
 raw /32.13ms centered updates and about28min per200k learner. Centering has no
 material observed cost increase; it is not itself a throughput optimization.
+The subsequent [grouped B128 trial](results/2026-10-06-cdp-imagination-throughput.md)
+on Meganeurac6376542 reduces matched synthetic network updates30.49->28.01ms.
+Whole-game cost for that changed native will be measured in the declared
+five-game allocation; do not substitute the synthetic number for production.
 
 Atari emulation/frame upload is a CPU-environment fallback; GPU preprocessing,
 batched acting and resident replay collection are implemented. Native GPU
@@ -297,10 +309,11 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified runtime pins are Meganeurab684ffd9/Bladee349cddf; the
-  [October6 refresh](results/2026-10-06-meganeura-refresh.md) passes
-  independent numerical and short production/restore checks, not a new learning
-  comparison. Retain original backend identities for old results.
+  Current qualified CDP/RGB pins are Meganeurac6376542/Bladee349cddf; the
+  [grouped throughput qualification](results/2026-10-06-cdp-imagination-throughput.md)
+  passes independent numerical and short production/restore checks, not a new
+  learning comparison. Tiny retains its historicalb684ffd9 qualification.
+  Retain original backend identities for old results.
   No repeated upstream learning replication without a relevant change.
 - Serialize bounded native jobs under the [host guard](gpu_incident_response.md)
   in persistent systemd user services. Require the expected device and >=2 GiB

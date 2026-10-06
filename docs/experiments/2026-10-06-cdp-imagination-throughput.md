@@ -43,6 +43,18 @@ session/kernel time separate from ordinary full-update timing. No overlapping
 build or GPU work. One short real Pong learning/frozen check suffices; no new
 multi-seed speed campaign.
 
+The runner fixes16 warmup and256 measured synthetic updates per executable,
+fixture RNG701, no GPU timestamp instrumentation. Initial, first and final
+checkpoints plus first-step posterior/behavior targets and every loss/timing
+report are retained. Fixture construction, exports and replay bookkeeping are
+outside this synthetic timer; posterior, imagination/targets, both training
+stages, synchronization and slow-critic EMA are inside. It is a full network
+update measurement, not an environment-throughput measurement. Both binaries
+must restore identical tensors/configuration. Existing small-batch exact and
+independent F64 gates qualify the arithmetic; first-step stochastic targets are
+reported separately, not asserted to be bitwise learning-trajectory parity.
+Artifact root:`runs/cdp-imagination-20261006.e8agRpD0`.
+
 Retain the grouped path only if qualification passes and ordinary full updates
 are at least5% faster without lost updates/debt or a numerical failure. Otherwise
 discard it and return to the qualified centered recipe; no optimization sweep.
