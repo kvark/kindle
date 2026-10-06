@@ -1,0 +1,260 @@
+{
+  "status": "passed",
+  "backend": {
+    "meganeura": "b684ffd90501e5cb2f49a918ce54b88016783118",
+    "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72"
+  },
+  "native_sha256": "683ccd223a49b5b246ae04c315ff2f7e452fc267668177e3aca82155fb7dcdfa",
+  "source_result": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/audit.json",
+  "cpu_rust_tests": 114,
+  "cpu_python_tests_at_build": 1161,
+  "cpu_python_tests_after_probe_extension": 1163,
+  "subsequent_targeted_probe_tests": 37,
+  "guards": [
+    {
+      "name": "cosine-f64",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "action-effect-values",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "repeated-detached",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "alignment",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "zero-scale",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "cdp-native-reference",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "cdp-upstream-reference",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "rgb-native-reference",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "rgb-upstream-reference",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "cdp-replay",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "rgb-replay",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "tiny-streaming-reference",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "cdp-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "rgb-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "tiny-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "tiny-frozen-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "cdp-frozen-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    },
+    {
+      "name": "rgb-frozen-smoke",
+      "passed": true,
+      "new_allocation_warnings": 0,
+      "validation_warnings": 0
+    }
+  ],
+  "references": {
+    "cdp": {
+      "comparisons": 1300,
+      "updates": 4,
+      "upstream": "a851fa3e3d70b624b094ee1810ad4bb602346092",
+      "maximum_parameter_error": 2.384185791015625e-7,
+      "limits": [
+        "fixed synthetic batches; not replay sampling or gameplay competence",
+        "raw gradients use exact native pre-step weights; optimizer weights/moments remain independent",
+        "raw gradients compared first; optimizer receives identical gradients to isolate its math"
+      ]
+    },
+    "rgb": {
+      "comparisons": 1524,
+      "updates": 4,
+      "upstream": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+      "maximum_parameter_error": 1.1920928955078125e-7,
+      "limits": [
+        "fixed synthetic batches; not replay sampling or gameplay competence",
+        "raw gradients use exact native pre-step weights; optimizer weights/moments remain independent",
+        "raw gradients compared first; optimizer receives identical gradients to isolate its math"
+      ]
+    }
+  },
+  "excluded_smoke_training_actions": 3072,
+  "excluded_smoke_evaluation_actions": 3072,
+  "smokes": {
+    "cdp": {
+      "training": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/cdp-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 195,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "frozen": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/cdp-frozen-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 0,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "unchanged_tensors": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "minimum_sampled_estimated_headroom_bytes": 15342632960
+    },
+    "rgb": {
+      "training": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/rgb-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 195,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "frozen": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/rgb-frozen-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 0,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "unchanged_tensors": {
+        "world": 215,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "minimum_sampled_estimated_headroom_bytes": 15900344320
+    },
+    "tiny": {
+      "training": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/tiny-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 195,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "frozen": {
+        "path": "/x/Code/kindle/runs/meganeura-refresh-20261006.7Edzu5C4/tiny-frozen-smoke.jsonl",
+        "protocol": "kindle-vector-v2",
+        "actions": 1024,
+        "updates": 0,
+        "num_envs": 8,
+        "completed_episodes": 0,
+        "natural_episodes": 0,
+        "truncated_episodes": 0,
+        "positive_return_natural_episodes": 0,
+        "mean_completed_return": null,
+        "budget_complete": true,
+        "accounting_valid": true
+      },
+      "unchanged_tensors": {
+        "world": 164,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "minimum_sampled_estimated_headroom_bytes": 15269101568
+    }
+  },
+  "qualification_not_learning": true
+}

@@ -20,6 +20,7 @@ class Environment:
     def ram(self):
         ram = np.zeros(128, np.uint8)
         ram[70], ram[97] = self.tick % 150, self.tick % 100
+        ram[49], ram[54], ram[51], ram[50] = 60+self.tick, 70+self.tick, 80+self.tick, 90+self.tick
         return ram
 
     def reset(self, *, seed=None):
@@ -74,9 +75,16 @@ class Agent:
     def prior_behavior_rollout(self, actions):
         return [0.] * len(actions), [1.] * len(actions), [0.] * len(actions)
 
+    def posterior_reward_prediction(self):
+        return 0.
 
-def trace(*, cdp=True, steps=65):
-    return probe.collect_trace(Agent(), Environment(), 9101, steps, lambda: None, cdp=cdp, deter=2)[0]
+    @property
+    def visual_observation(self):
+        return self.encoded_observation
+
+
+def trace(*, cdp=True, steps=65, game='Seaquest'):
+    return probe.collect_trace(Agent(), Environment(), 9101, steps, lambda: None, cdp=cdp, deter=2, game=game)[0]
 
 
 def test_collection_is_causal_keeps_boundaries_and_filters_crossings():
@@ -165,27 +173,30 @@ def test_cosine_and_spread_handle_zero_constant_and_antiparallel():
     assert sum(row['count'] for row in result.get('by_trajectory', {}).values()) == result['all']['count']
 
 
-def test_readout_pipeline_uses_four_heads_fixed_split_and_frozen_controls(tmp_path, monkeypatch):
-    result = dict(files=[], heads=[], memory=[])
+@pytest.mark.parametrize('game', ['Seaquest', 'Pong'])
+def test_readout_pipeline_uses_four_heads_fixed_split_and_frozen_controls(tmp_path, monkeypatch, game):
+    result = dict(files=[], heads=[], memory=[], labels=probe.POSITION_TARGETS[game],
+                  environment=dict(name=f'ALE/{game}-v5'))
     for split, seeds in probe.SPLITS.items():
         for seed in seeds:
             path = tmp_path / f'{split}-{seed}.npz'
-            np.savez_compressed(path, **trace())
+            np.savez_compressed(path, **trace(game=game))
             result['files'].append(dict(file=path.name, split=split, seed=seed))
 
     class Model:
         gpu_device = dict(device_name='NVIDIA GeForce RTX 5080', driver_info='580.178.04')
         gpu_memory_budget = dict(budget_bytes=4 << 30, usage_bytes=0)
         updates = 0
+        targets = len(result['labels'])
 
         def __init__(self, *args, **kwargs):
             pass
 
-        def reset(self, *args):
-            pass
+        def reset(self, width, targets, seed):
+            self.targets = targets
 
         def predict(self, _):
-            return [0.] * 128
+            return [0.] * (64*self.targets)
 
         def learn(self, *args, **kwargs):
             self.updates += 1
@@ -200,12 +211,43 @@ def test_readout_pipeline_uses_four_heads_fixed_split_and_frozen_controls(tmp_pa
     model = Model()
     monkeypatch.setattr(probe.kindle._native, 'RegressionProbe', lambda *args, **kwargs: model)
     probe.fit_readouts(tmp_path, result, lambda: None, steps=2)
-    assert model.updates == 8
-    assert [(row['stage'], row['horizon']) for row in result['heads']] == [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]
+    expected = [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]
+    if game == 'Pong':
+        expected.insert(0, ('pixels', 0))
+    assert model.updates == 2*len(expected)
+    assert [(row['stage'], row['horizon']) for row in result['heads']] == expected
     for row in result['heads']:
+        assert set(row['readouts']['fitted']['all']) == set(result['labels'])
         assert row['fit']['selection'] == 'validation normalized MSE; no refit or test selection'
         with np.load(tmp_path / row['evidence_file']) as data:
             assert set(data['seeds']) == set(probe.SPLITS['test'])
         if row['horizon']:
             assert set(row['readouts']) == {'fitted', 'training_mean', 'unrelated_actions', 'posterior_persistence'}
     json.dumps(result, allow_nan=False)
+
+
+def test_pong_labels_remain_diagnostic_and_reward_calibration_is_event_weighted(monkeypatch):
+    data = trace(game='Pong')
+    assert data['positions'].shape == (len(data['cnn']), 4)
+    for stage in ('pixels', 'cnn', 'posterior'):
+        state = probe.examples(data, stage, 0)
+        np.testing.assert_array_equal(state['origins'], data['pixel_arrivals'])
+        np.testing.assert_array_equal(state['labels'], data['positions'][data['pixel_arrivals']])
+    monkeypatch.setattr(probe, 'positions', lambda *args: np.zeros(4))
+    changed = trace(game='Pong')
+    for key in data:
+        if key != 'positions':
+            np.testing.assert_array_equal(data[key], changed[key])
+    future = probe.examples(data, 'prior', 15)
+    future['seeds'] = np.full(len(future['x']), 9101)
+    future['reward'] = np.array([-1., 0.])
+    future['forecast_reward'] = np.array([-.8, -.1])
+    future['posterior_reward'] = np.array([-1., 0.])
+    result = probe.forecast_report(future, np.zeros(2))['all']
+    assert result['negative_rewards'] == 1 and result['positive_rewards'] == 0
+    assert result['reward']['prior']['negative_auc'] == 1
+    assert result['reward']['prior']['positive_auc'] is None
+    calibration = result['reward_calibration']
+    assert calibration['by_reward_sign']['negative']['count'] == 1
+    assert calibration['by_reward_sign']['negative']['prior_prediction_mean'] == -.8
+    assert calibration['posterior_mae'] == 0

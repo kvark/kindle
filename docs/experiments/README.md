@@ -7,6 +7,16 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October6: the [500k-action Pong follow-up](../results/2026-10-06-cdp-pong-budget.md)
+is complete, but two seeds remain near a complete loss; only2017 improves.
+The [latest Meganeura refresh](../results/2026-10-06-meganeura-refresh.md)
+passes18 guards and2,824 upstream comparisons. The
+[frozen Pong result](../results/2026-10-06-cdp-pong-world.md) finds readable CNN
+features but weak recurrent ball/reward state in the two failed seeds. All four
+guards/exact tensors pass;131,072 diagnostic actions, no actor updates. Next:
+qualify centered CDP cosine and test three fresh pairs against unchanged CDP.
+No further unchanged training-budget extension is declared.
+
 October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
 is complete: twelve new200k-action learners plus all three retained Freeway
 cohorts. Boxing and Freeway learn strongly, Breakout/Qbert improve modestly,

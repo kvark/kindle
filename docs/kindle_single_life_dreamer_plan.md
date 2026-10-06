@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 5, 2026. This is the authoritative roadmap.
+Updated October 6, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -78,9 +78,8 @@ October 4 direction puts CDP on the main path through the remaining stages.
 
 ### 1. Atari learning, exploration and budget (Phase 3)
 
-The October5 goal is to unlock **Boxing, Pong, Freeway, Breakout and Qbert
-with CDP**, and determine whether DreamerV3 scores are reachable with less
-budget. All five remain in scope. Neither learning a subset nor completing a
+The October6 goal is to reach **DreamerV3 quality on Boxing, Pong, Freeway,
+Breakout and Qbert with CDP**, retaining the earlier budget comparison. All five remain in scope. Neither learning a subset nor completing a
 queue establishes this goal.
 
 **The first breadth screen is complete:** fifteen200k-action learners, including
@@ -100,15 +99,27 @@ Boxing/Pong/Breakout, Freeway is ahead and Qbert somewhat behind. Different
 online averaging windows and protocols prevent an exact parity claim.
 Same-hardware/protocol RGB controls are required for a compute-saving claim.
 
-**Next reviewed experiment:** [three fresh500k-action Pong seeds](experiments/2026-10-05-cdp-pong-budget.md)
-with the exact same model and learning settings, testing an early-learning
-floor against persistent weak prediction. The two poor seeds show weak reward
-event separation and low raw KL; these posterior diagnostics alone do not
-prove feature collapse. Published Pong improves from−20.50 at800k frames to
-−7.16 at2M. Use new held-out frozen/initial-control pairs and stop at the
-declared budget. No automatic further extension, precision/capacity change or
-full-suite rerun. If prediction/control stays weak, examine task-state
-readability and prior forecasts before more training.
+**The longer Pong test is now complete:** three fresh500k-action learners
+retain frozen scores−21.00/−2.375/−20.9167,7/72 wins. Only2017 improves;
+the two failed seeds' KL drops further while reward separation stays weak.
+Nine guards,144 selected natural episodes, unchanged tensors and full
+replays/videos pass. [Result and curves](results/2026-10-06-cdp-pong-budget.md).
+The online mean−15.27 is below the published−7.16 near2M frames, with protocol
+differences retained. No further budget extension is declared.
+
+**Frozen diagnosis is complete:** all four models preserve their346 tensors
+over131,072 diagnostic actions. Every CNN retains readable ball/paddle state;
+the two failed seeds' RSSMs do not reliably retain ball state or predict reward
+events. Constant means nearly match their tiny cosine losses. Seed2017 retains
+useful state and h15 forecasts. [Results and all controls](results/2026-10-06-cdp-pong-world.md).
+This is not proof of complete encoder collapse. No privileged labels enter
+learning; old-trained models are probed on newly qualified Meganeurab684ffd9.
+
+**Next:** qualify batch-centered CDP cosine, then compare three fresh paired
+seeds against unchanged CDP on the same backend. Centering tests whether the
+shared embedding component obscures useful visual variation. Keep capacity,
+source gradients, rates, replay and exploration fixed; no pixel decoder or
+new encoder. Promote only on retained gameplay, not low diagnostic loss.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -190,7 +201,7 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 These are current sticky/full-action CDP results unless explicitly marked
-historical. Frozen cohort means cover three learner seeds and24 natural
+historical: Pong now uses500k actions/learner, the other four200k. Frozen cohort means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
 The [five-game report](results/2026-10-05-cdp-five-game-screen.md) links every
 trained/initial-control whole stream-zero video and all score/action/time curves.
@@ -200,7 +211,7 @@ Links into `runs/` require this workspace.
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing | CDP frozen69.74 vs.39 initial; seeds72.71/64.92/71.58. Strong learning in all three. | Published long-run99.61 not reached. Historical gate:>=20 natural matches,>=90% wins, mean>=50, no cutoffs. | [Current CDP and all videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical nonsticky evidence](experiments/README.md) |
-| Pong | CDP frozen−18.53 vs−20.31 initial; seeds−20.83/−14.08/−20.67. Two seeds fail to improve. | Longer-budget diagnosis next. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; earlier nonsticky success did not survive the sticky check. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [older sticky failure](experiments/2026-09-26-gpu-pixels-and-pong-robustness.md) |
+| Pong |500k-action CDP frozen−14.76 vs−20.38 initial; seeds−21.00/−2.375/−20.92,7/72 wins. Two seeds still fail to improve. | State/forecast diagnosis next, not another budget extension. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; old nonsticky success did not survive sticky evaluation. | [Current CDP and videos](results/2026-10-06-cdp-pong-budget.md); [world-probe declaration](experiments/2026-10-06-cdp-pong-world.md) |
 | Freeway | Unassisted CDP frozen24.14 vs0; seeds22.21/23.21/27.00, every candidate round19–30. Exploration unlocked. | Published33.40 not reached. Only3019 passes the original>=90% rounds with25 crossings /mean>=25 gate. No Freeway-only gate tuning. | [Current CDP and videos](results/2026-10-05-freeway-effects-200k.md); [32k controls](results/2026-10-05-freeway-action-effects-frozen.md) |
 | Breakout | CDP frozen4.36 vs1.61; seeds3.42/2.63/7.04. Modest improvement in all three, poor control. | Published381.81 far away. Historical two-wall/864-point gate remains unmet; no action-subset workaround. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical Tiny comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md) |
 | Qbert | CDP frozen403.13 vs152.43; seeds312.50/235.42/661.46. Modest improvement with large seed variation. | Published193,220.77 far away. Historical>=90% first pyramids and mean>=15,000 remain unmet. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical3.2M Tiny result](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
@@ -216,8 +227,8 @@ remain achievements without relabeling the episode natural; retain all tails.
 
 Eight small-recipe environments share batched perception/policy and one learner;
 their recurrent states, resets, RNG and replay histories remain independent.
-Uncapped, step-driven playing plus training already works. The current five-game
-CDP+exploration recipe achieves about8x aggregate /1x per-stream realtime.
+Uncapped, step-driven playing plus training already works. The completed five-game
+CDP+exploration recipe on Meganeura592a2f5a achieves about8x aggregate /1x per-stream realtime.
 Mean update31.62ms includes16.19ms imagination (51%),8.45ms world training (27%)
 and4.33ms posterior work (14%). The older extrinsic-only CDP Seaquest comparison
 used28.91ms updates; keep its settings distinct. GPU utilization is unmeasured,
@@ -260,8 +271,8 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified runtime pins are Meganeura592a2f5a/Bladee349cddf; the
-  [backend refresh](results/2026-10-04-meganeura-main-qualification.md) passes
+  Current qualified runtime pins are Meganeurab684ffd9/Bladee349cddf; the
+  [October6 refresh](results/2026-10-06-meganeura-refresh.md) passes
   independent numerical and short production/restore checks, not a new learning
   comparison. Retain original backend identities for old results.
   No repeated upstream learning replication without a relevant change.

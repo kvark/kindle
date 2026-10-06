@@ -7,8 +7,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October5 goal: unlock Boxing, Pong, Freeway, Breakout and Qbert with CDP,
-  and test whether DreamerV3 scores are reachable with less budget.** All five
+- **October6 goal: reach DreamerV3 quality on Boxing, Pong, Freeway,
+  Breakout and Qbert with CDP; retain the budget comparison.** All five
   and the budget question remain open. A completed screen, learned subset or
   smaller model does not complete this goal.
 - **Five-game200k screen complete:** twelve new learners plus all three retained
@@ -21,17 +21,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   curves and whole videos](docs/results/2026-10-05-cdp-five-game-screen.md).
   Fifteen learners cost3M actions/749,085 updates/6h56m28s training, excluding
   earlier development work. None reaches the predeclared long-run reference.
-- **Next reviewed allocation:** [three fresh500k-action Pong seeds](docs/experiments/2026-10-05-cdp-pong-budget.md),
-  exact same model/recipe; only the finite learning budget changes.124,939
-  updates/run,1.5M new actions total. Frozen final/actual-initial controls use
-  new held-out base3,000,000,000, first3 episodes/stream,200k-action cap and full
-  audits/videos. Expected3.5–4h;6h service bound,100min training processes.
-  The published Atari57 Pong mean is−20.50 at800k frames,−7.16 at2M. Test an
-  early-learning floor before changing capacity/loss/exploration. Two current
-  Pong seeds have weak reward separation and KL~.57; posterior diagnostics are
-  not prior forecasts or proof of feature collapse. No automatic extension;
-  persistent weak prediction calls for state/forecast diagnosis before more
-  training. Current native is unchanged; no rebuild or duplicate qualification.
+- **Pong500k follow-up complete:** three fresh124,939-update learners finish
+  October5 at17:42 UTC in3h32m29s. Frozen−21.00/−2.375/−20.9167 versus initial
+  mean−20.375,7/72 wins. Online mean−15.2667 versus published−7.1622 near2M
+  frames (protocol differences retained). Two weak seeds do not recover.
+  All nine guards,144 natural frozen episodes, zero updates/cutoffs, exact
+  tensors and full replays/videos pass. [Result and curves](docs/results/2026-10-06-cdp-pong-budget.md).
+  No further training-budget extension or automatic queue is declared.
+- **Frozen Pong diagnosis complete:** all four guards/exact346 tensors pass,
+  131,072 diagnostic actions and zero actor updates. Ball/paddle information is
+  readable from every CNN, including initial weights, but ball state/reward
+  prediction is weak in1009/3019's RSSM. Their tiny cosine errors mostly match
+  a constant-mean prediction;2017 retains useful state and h15 forecasts.
+  [Result and controls](docs/results/2026-10-06-cdp-pong-world.md).
+  This is not complete encoder collapse. Next qualify batch-centered CDP
+  cosine, then one three-seed paired comparison against unchanged CDP on the
+  same new backend. No new encoder/capacity/decoder or blind budget extension.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -55,17 +60,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - The strategy reset remains iteration speed -> useful representation ->
   exploration/reward -> video priors -> native deployment. Phases0–2 and the
   Seaquest CDP/RGB comparison are complete. The3x12M speed target is an unmet,
-  user-accepted stretch target. Current mean31.62ms updates spend51% in
-  imagination,27% world training; about8x aggregate /1x per-stream realtime.
+  user-accepted stretch target. The completed five-game screen's31.62ms
+  updates spend51% in imagination,27% world training; about8x aggregate /1x
+  per-stream realtime. New-backend learning throughput is not yet measured.
   GPU utilization remains unmeasured. Optimize measured whole-agent cost.
 - No old queue restarts. The stopped45-run small CDP/RGB/Tiny comparison retains
   seven completed Freeway pairs plus interrupted CDP3019 at126,408 actions.
   The historical12M matrix retains24 completed and21 cancelled unstarted entries.
   Their controls/protocols are not the current intrinsic study. Venture, Tiny
   comparisons and new representation matrices are deferred by the five-game goal.
-- Backend rechecked October5 after the screen: Meganeura upstream6288f885 has
-  only docs/paper/artifact changes over qualified592a2f5a; Bladee349cddf is
-  unchanged. No missing runtime fix or reason to rebuild unchanged native.
+- **October6 backend refresh qualified:** Meganeura mainb684ffd9 adds bounded
+  shader reads and primitive/composite gradient/recognition fixes over592a2f5a;
+  Bladee349cddf unchanged. Native683ccd22 passes18 guards,2,824 upstream CDP/RGB
+  comparisons, independent cosine/action-effects checks and train/frozen
+  smokes. [Qualification](docs/results/2026-10-06-meganeura-refresh.md).
+  Completed learning retains nativef4b6a5c7/592a2f5a; diagnostics disclose their
+  new runtime separately. No claim that these fixes caused the old failures.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
@@ -139,8 +149,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified runtime backend: Meganeura main `592a2f5a`, Blade `e349cddf`.
-  The [October4 refresh](docs/results/2026-10-04-meganeura-main-qualification.md)
+- Current qualified runtime backend: Meganeura main `b684ffd9`, Blade `e349cddf`.
+  The [October6 refresh](docs/results/2026-10-06-meganeura-refresh.md) qualifies
+  the current CDP/exploration, RGB and frozen Tiny paths. The historical
+  [October4 refresh](docs/results/2026-10-04-meganeura-main-qualification.md)
   passes 2,824 upstream CDP/RGB comparisons, causal Tiny streaming and all three
   production/frozen-restore smokes; 14 guards pass with no new warnings. No
   learning campaign resumes. The previous `13b19d33` already included the

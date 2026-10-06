@@ -20,12 +20,14 @@ from atari import DreamerAtariPreprocessing, checkpoint_identity, sha256_file
 from fit_atari_probes import checked_memory, mlp_probe
 from fit_fixed_latents import HEAD_SEED, normalization, predict
 from kindle._representation_probe import LABEL_SOURCE, positions, regression_metrics
-from kindle._reward_probe import roc_auc
+from kindle._reward_probe import RewardProbe, roc_auc
 from probe_atari_dynamics import ACTION_SEED_XOR, CONTROL_ACTION_SEED_XOR
 from probe_fixed_latents import SPLITS, assert_frozen_tensors
 
 
 PROTOCOL = 'kindle-cdp-frozen-probes-v1'
+POSITION_TARGETS = {'Seaquest': ('player_x', 'player_y'),
+                    'Pong': ('ball_x', 'ball_y', 'player_y', 'enemy_y')}
 TRACE_FIELDS = ('current', 'following', 'actions', 'rewards', 'terminated', 'truncated',
                 'collection_cut', 'episodes', 'positions')
 
@@ -39,11 +41,12 @@ def trace_identity(data):
     return digest.hexdigest()
 
 
-def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=512):
+def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=512, game='Seaquest'):
     rng = random.Random(seed ^ ACTION_SEED_XOR)
     controls = random.Random(seed ^ CONTROL_ACTION_SEED_XOR)
     actions = [rng.randrange(environment.action_space.n) for _ in range(steps)]
-    cnn, posterior, labels = [], [], []
+    cnn, posterior, labels, posterior_rewards = [], [], [], []
+    pixels, pixel_arrivals = [], []
     current, following, rewards, terminated, truncated, episodes = [], [], [], [], [], []
     forecasts = {h: dict(origins=[], prior=[], unrelated_prior=[], reward=[], unrelated_reward=[],
                         continuation=[], unrelated_continuation=[], predicted=[], unrelated_predicted=[])
@@ -56,7 +59,8 @@ def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=5
         frames.update(np.asarray(frame).tobytes())
         cnn.append(np.asarray(agent.encoded_observation, np.float32))
         posterior.append(np.asarray(agent.latent_feature, np.float32))
-        labels.append(positions('Seaquest', environment.unwrapped.ale.getRAM())[:2])
+        labels.append(positions(game, environment.unwrapped.ale.getRAM())[:len(POSITION_TARGETS[game])])
+        posterior_rewards.append(float(agent.posterior_reward_prediction()))
         return len(cnn) - 1
 
     frame, _ = environment.reset(seed=seed)
@@ -66,6 +70,10 @@ def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=5
     for step, action in enumerate(actions):
         first_prior = None
         if step % 16 == 0:
+            if game == 'Pong':
+                # Explicit diagnostic readback of the actual GPU-resized input.
+                pixels.append(np.asarray(agent.visual_observation, np.float32))
+                pixel_arrivals.append(index)
             horizon = min(15, steps - step)
             sequence = actions[step:step + horizon]
             unrelated = [controls.randrange(environment.action_space.n) for _ in sequence]
@@ -116,10 +124,13 @@ def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=5
     if agent.learner_step != start_updates or agent.environment_step - start_actions != steps:
         raise RuntimeError('collection changed learner or action accounting')
     data = dict(cnn=np.stack(cnn), posterior=np.stack(posterior), positions=np.stack(labels),
+                posterior_reward=np.asarray(posterior_rewards, np.float32),
                 current=np.asarray(current, np.int32), following=np.asarray(following, np.int32),
                 actions=np.asarray(actions, np.int32), rewards=np.asarray(rewards, np.float32),
                 terminated=np.asarray(terminated, bool), truncated=np.asarray(truncated, bool),
                 collection_cut=np.arange(steps) == steps - 1, episodes=np.asarray(episodes, np.int32))
+    if pixels:
+        data.update(pixels=np.stack(pixels), pixel_arrivals=np.asarray(pixel_arrivals, np.int32))
     for horizon, row in forecasts.items():
         origins = np.asarray(row['origins'], np.int32)
         # Only the real trajectory can determine whether a speculative rollout
@@ -135,11 +146,16 @@ def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=5
     return data, dict(trace_sha256=trace_identity(data), frames_sha256=frames.hexdigest(),
                       max_h1_deter_error=max_error, actions=steps, arrivals=len(cnn),
                       positive_rewards=int(np.count_nonzero(data['rewards'] > 0)),
+                      negative_rewards=int(np.count_nonzero(data['rewards'] < 0)),
                       terminals=int(data['terminated'].sum()), truncations=int(data['truncated'].sum()))
 
 
 def examples(data, stage, horizon):
     if horizon == 0:
+        if 'pixel_arrivals' in data:
+            arrivals = data['pixel_arrivals']
+            x = data['pixels'] if stage == 'pixels' else data[stage][arrivals]
+            return dict(x=x, labels=data['positions'][arrivals], origins=arrivals)
         origins = np.arange(len(data['actions']))
         following = data['following']
         controls = {}
@@ -154,6 +170,8 @@ def examples(data, stage, horizon):
                         future_cnn=data['cnn'][following], current_positions=data['positions'][current],
                         reward=data['rewards'][origins + horizon - 1],
                         terminated=data['terminated'][origins + horizon - 1])
+        if 'posterior_reward' in data:
+            controls['posterior_reward'] = data['posterior_reward'][following]
         for key in ('reward', 'continuation', 'predicted'):
             if f'{key}_h{horizon}' in data:
                 controls[f'forecast_{key}'] = data[f'{key}_h{horizon}']
@@ -173,9 +191,9 @@ def load_split(root, files, split, stage, horizon):
     return {key: np.concatenate([part[key] for part in pieces]) for key in pieces[0]}
 
 
-def report(prediction, data):
+def report(prediction, data, names=POSITION_TARGETS['Seaquest']):
     def metrics(p, y):
-        return dict(zip(('player_x', 'player_y'), regression_metrics(p, y)))
+        return dict(zip(names, regression_metrics(p, y)))
     return dict(all=metrics(prediction, data['labels']), by_trajectory={str(seed): metrics(
         prediction[data['seeds'] == seed], data['labels'][data['seeds'] == seed]) for seed in np.unique(data['seeds'])})
 
@@ -200,12 +218,22 @@ def forecast_report(data, train_mean):
     def metrics(mask):
         reward = data['reward'][mask]
         result = dict(count=len(reward), positive_rewards=int((reward > 0).sum()),
+                      negative_rewards=int((reward < 0).sum()),
                       terminals=int(data['terminated'][mask].sum()), reward={})
         for key, prediction in (('prior', data['forecast_reward'][mask]),
                                 ('unrelated_actions', data['unrelated_reward'][mask]), ('zero', np.zeros(len(reward)))):
             result['reward'][key] = dict(mae=float(np.abs(prediction - reward).mean()),
                 rmse=float(np.sqrt(np.square(prediction - reward).mean())),
-                positive_auc=roc_auc((reward > 0).tolist(), prediction.tolist()))
+                positive_auc=roc_auc((reward > 0).tolist(), prediction.tolist()),
+                negative_auc=roc_auc((reward < 0).tolist(), (-prediction).tolist()))
+        if 'posterior_reward' in data:
+            calibration = RewardProbe()
+            for target, prior, posterior in zip(reward, data['forecast_reward'][mask], data['posterior_reward'][mask]):
+                calibration.record(float(target), float(prior), float(posterior))
+            summary = {key.replace('one_step_prior', 'prior'): value for key, value in calibration.summary().items()}
+            summary['by_reward_sign'] = {sign: {key.replace('one_step_prior', 'prior'): value
+                for key, value in row.items()} for sign, row in summary['by_reward_sign'].items()}
+            result['reward_calibration'] = summary
         if 'forecast_predicted' in data:
             target = data['future_cnn'][mask]
             result['cosine_distance'] = {key: float(cosine_error(prediction, target).mean()) for key, prediction in (
@@ -217,10 +245,14 @@ def forecast_report(data, train_mean):
 
 
 def fit_readouts(root, result, save, *, steps):
-    model = kindle._native.RegressionProbe(256, 2, hidden=128, batch=64, seed=HEAD_SEED)
+    names = result.get('labels', POSITION_TARGETS['Seaquest'])
+    model = kindle._native.RegressionProbe(256, len(names), hidden=128, batch=64, seed=HEAD_SEED)
     checked_memory(model)
     posterior_parameters = posterior_norm = train_mean = None
-    for stage, horizon in (('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)):
+    stages = [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]
+    if result.get('environment', {}).get('name') == 'ALE/Pong-v5':
+        stages.insert(0, ('pixels', 0))
+    for stage, horizon in stages:
         started = time.monotonic()
         train, val, test = [load_split(root, result['files'], split, stage, horizon) for split in SPLITS]
         norm = normalization(train['x'], train['labels'])
@@ -241,7 +273,7 @@ def fit_readouts(root, result, save, *, steps):
         if stage == 'posterior':
             posterior_parameters, posterior_norm = parameters, norm
         if horizon:
-            model.reset(test['current_posterior'].shape[1], 2, HEAD_SEED)
+            model.reset(test['current_posterior'].shape[1], len(names), HEAD_SEED)
             model.set_parameters(posterior_parameters)
             readouts['posterior_persistence'] = predict(model, test['current_posterior'], posterior_norm)
             if model.parameters() != posterior_parameters:
@@ -249,8 +281,10 @@ def fit_readouts(root, result, save, *, steps):
         evidence = root / f'evidence-{stage}-h{horizon}.npz'
         np.savez_compressed(evidence, labels=test['labels'], origins=test['origins'], seeds=test['seeds'], **readouts)
         row = dict(stage=stage, horizon=horizon, fit=info, input_width=train['x'].shape[1],
+                   origin_kind='arrival index' if not horizon and len(names) == 4 else 'action index',
                    train_examples=len(train['x']), validation_examples=len(val['x']), test_examples=len(test['x']),
-                   training=report(training, train), readouts={key: report(value, test) for key, value in readouts.items()},
+                   training=report(training, train, names),
+                   readouts={key: report(value, test, names) for key, value in readouts.items()},
                    training_normalized_mse=float(np.nanmean(np.nanmean(
                        np.square((training - train['labels']) / norm['y_scale']), axis=0))),
                    head_file=head.name, head_sha256=sha256_file(head), evidence_file=evidence.name,
@@ -259,7 +293,7 @@ def fit_readouts(root, result, save, *, steps):
             row['forecasts'] = forecast_report(test, train_mean)
             # Privileged persistence is a diagnostic ceiling, not an actor readout.
             valid = np.isfinite(test['current_positions']).all(1)
-            row['privileged_position_persistence'] = dict(zip(('player_x', 'player_y'),
+            row['privileged_position_persistence'] = dict(zip(names,
                 regression_metrics(test['current_positions'][valid], test['labels'][valid])))
         result['heads'].append(row)
         save()
@@ -267,23 +301,23 @@ def fit_readouts(root, result, save, *, steps):
     result['memory'].append(checked_memory(model))
 
 
-def run(checkpoint, output, smoke):
+def run(checkpoint, output, smoke, game='Seaquest'):
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
     config = agent.config
     if (config['model_size'] != 'size1_m' or config['observation_kind'] != 'rgb64' or config['video_encoder'] is not None
-            or config['action_count'] != 18 or config['intrinsic_reward_scale'] != 0 or config['actor_critic_gradient']):
-        raise ValueError('requires unassisted Size1M RGB/CDP actor with ac_grads=false')
+            or config['action_count'] != 18 or config['visitation_bonus'] or config['actor_critic_gradient']):
+        raise ValueError('requires Size1M RGB/CDP actor with ac_grads=false and no visitation bonus')
     cdp = config['loss_scales']['future_prediction'] > 0
     result = dict(protocol=PROTOCOL, status='running', smoke=smoke, method='cdp' if cdp else 'rgb',
                   seed=config['seed'], checkpoint=checkpoint_identity(checkpoint), config=config,
                   source_sha256=sha256_file(__file__), native_sha256=sha256_file(kindle._native.__file__),
                   wrapper_sha256=sha256_file(Path(__file__).with_name('atari.py')), ale_py_version=ale_py.__version__,
-                  environment=dict(name='ALE/Seaquest-v5', observation_size='native', sticky_actions=.25,
+                  environment=dict(name=f'ALE/{game}-v5', observation_size='native', sticky_actions=.25,
                                    full_action_space=True, action_repeat=4, noop_max=0, max_episode_frames=100000),
-                  gpu_device=agent.gpu_device, label_source=LABEL_SOURCE, labels=['player_x', 'player_y'],
-                  labels_limitation='RAM diagnostic coordinates only; no bullet, enemy or full-state claim',
+                  gpu_device=agent.gpu_device, label_source=LABEL_SOURCE, labels=list(POSITION_TARGETS[game]),
+                  labels_limitation='RAM diagnostic sprite coordinates only; no full-state sufficiency claim',
                   steps_per_trajectory=128 if smoke else 4096, files=[], heads=[], memory=[], actor_updates=0)
 
     def save():
@@ -300,16 +334,18 @@ def run(checkpoint, output, smoke):
     check_memory()
     before = agent.learner_step
     gym.register_envs(ale_py)
-    env = DreamerAtariPreprocessing(gym.make('ALE/Seaquest-v5', frameskip=1,
+    env = DreamerAtariPreprocessing(gym.make(f'ALE/{game}-v5', frameskip=1,
         repeat_action_probability=.25, full_action_space=True), noop_max=0,
         max_episode_frames=100000, screen_size=None)
     save()
     try:
         for split, seeds in SPLITS.items():
             for seed in seeds[:1] if smoke else seeds:
-                data, row = collect_trace(agent, env, seed, result['steps_per_trajectory'], check_memory, cdp=cdp)
+                data, row = collect_trace(agent, env, seed, result['steps_per_trajectory'], check_memory, cdp=cdp, game=game)
                 if data['cnn'].shape[1] != 256 or data['posterior'].shape[1] != 640:
                     raise RuntimeError('unexpected Size1M representation dimensions')
+                if game == 'Pong' and data['pixels'].shape[1] != 3*64*64:
+                    raise RuntimeError('unexpected learned-RGB input dimensions')
                 path = output / f'{split}-{seed}.npz'
                 with path.open('xb') as stream:
                     np.savez_compressed(stream, **data)
@@ -338,8 +374,9 @@ def main():
     parser.add_argument('checkpoint', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--game', choices=POSITION_TARGETS, default='Seaquest')
     args = parser.parse_args()
-    run(args.checkpoint, args.output, args.smoke)
+    run(args.checkpoint, args.output, args.smoke, args.game)
 
 
 if __name__ == '__main__':
