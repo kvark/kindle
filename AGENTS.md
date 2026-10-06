@@ -34,9 +34,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   prediction is weak in1009/3019's RSSM. Their tiny cosine errors mostly match
   a constant-mean prediction;2017 retains useful state and h15 forecasts.
   [Result and controls](docs/results/2026-10-06-cdp-pong-world.md).
-  This is not complete encoder collapse. Next qualify batch-centered CDP
-  cosine, then one three-seed paired comparison against unchanged CDP on the
-  same new backend. No new encoder/capacity/decoder or blind budget extension.
+  This is not complete encoder collapse. Batch-centered CDP cosine now
+  [qualifies](docs/results/2026-10-06-cdp-centered-qualification.md): eight
+  guards,32,768 independent centered derivatives,1,300 unchanged-CDP upstream
+  comparisons and both production/frozen smokes pass. Natived32f3dc8.
+  Next: [six fresh200k Pong runs](docs/experiments/2026-10-06-cdp-centered.md),
+  three centered/control pairs on the same backend, actual initial weights,
+  held-out base3,500,000,000 and full frozen/replay/video audits. Centering is
+  the only changed learning mechanism. No new encoder/capacity/decoder or
+  blind budget extension; only gameplay can promote it.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

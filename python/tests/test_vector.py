@@ -29,6 +29,12 @@ import profile_atari_vector
     (["--restore", "unused", "--replay-capacity", "512"], "training overrides"),
     (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
     (["--restore", "unused", "--cdp"], "training overrides"),
+    (["--restore", "unused", "--cdp-centered"], "training overrides"),
+    (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
+    (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
+    (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),
+    (["--cdp-centered"], "centered CDP requires"),
+    (["--cdp", "--cdp-centered", "--world-microbatch-size", "1"], "full-batch world training"),
     (["--cdp", "--encoder-checkpoint", "unused"], "CDP requires"),
     (["--cdp", "--actor-critic-gradient"], "CDP requires"),
     (["--cdp", "--learning-rate", ".001"], "CDP requires"),
@@ -79,7 +85,8 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
 
 
 @pytest.mark.parametrize("scale", [0, 1])
-def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale):
+@pytest.mark.parametrize("centered", [False, True])
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -95,11 +102,13 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale):
         assert config['actor_critic_gradient'] is False
         assert config['disagreement_bonus'] is (scale > 0)
         assert config['intrinsic_reward_scale'] == scale
+        assert config['cdp_centered'] is centered
         raise RuntimeError('CDP recipe checked before GPU')
 
     monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'),
-                                    '--cdp', '--disagreement-scale', str(scale)])
+                                    '--cdp', '--disagreement-scale', str(scale),
+                                    *(['--cdp-centered'] if centered else [])])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
 

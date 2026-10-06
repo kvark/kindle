@@ -14,7 +14,8 @@ from kindle._vector_audit import audit
 from summarize_representation_learning import SEEDS, TINY_CHECKPOINTS, plot_svg, read_run
 
 
-def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disagreement_scale=0):
+def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disagreement_scale=0,
+           cdp_centered=False):
     expected = dict(environment=environment, num_envs=8, steps=budget, full_action_space=True,
                     sticky_actions=.25, action_repeat=4, noop_max=0, max_episode_frames=100000,
                     mode='train', observation_size='native', starting_environment_step=0,
@@ -37,6 +38,8 @@ def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disa
     if method not in ('rgb', 'cdp', 'pretrained_tiny'):
         raise ValueError('unknown arm')
     cdp = method == 'cdp'
+    if c.get('cdp_centered', False) is not cdp_centered or (cdp_centered and not cdp):
+        raise ValueError('undeclared CDP centering')
     if (c['encoder_learning_rate'] != (6e-6 if cdp else None)
             or c['dynamics_learning_rate'] != (4e-4 if cdp else None)
             or c['loss_scales']['future_prediction'] != (500 if cdp else .25 if tiny else 0)
@@ -52,7 +55,7 @@ def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disa
         raise ValueError('not the jointly learned CNN')
     if header['environment_seeds'] != [(header['seed'] + i * 1000003) % 2**32 for i in range(8)]:
         raise ValueError('changed environment seeds')
-    shared = {k: v for k, v in c.items() if k not in ('seed', 'observation_kind', 'encoder_learning_rate', 'dynamics_learning_rate', 'loss_scales')}
+    shared = {k: v for k, v in c.items() if k not in ('seed', 'observation_kind', 'encoder_learning_rate', 'dynamics_learning_rate', 'loss_scales', 'cdp_centered')}
     shared['loss_scales'] = {k: v for k, v in c['loss_scales'].items() if k not in ('reconstruction', 'future_prediction')}
     shared['native_sha256'] = header['native_extension_sha256']
     shared['wrapper_sha256'] = header['wrapper_sha256']

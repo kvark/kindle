@@ -34,7 +34,9 @@ pub const FUTURE_HEAD_REVISION: &str = "spatial-deterministic-v1";
 mod cdp;
 
 pub(crate) fn future_head_revision(config: &DreamerConfig) -> Option<&'static str> {
-    (config.loss_scales.future_prediction > 0.0).then_some(if config.is_cdp() {
+    (config.loss_scales.future_prediction > 0.0).then_some(if config.cdp_centered {
+        "continuous-centered-cosine-v1"
+    } else if config.is_cdp() {
         "continuous-cosine-v1"
     } else {
         FUTURE_HEAD_REVISION
@@ -292,6 +294,10 @@ fn build_training_graph_grouped(
             &mut encodings,
         );
     }
+    let cdp_center = config.cdp_centered.then(|| {
+        let targets = stack_time(&mut graph, &encodings, batch, config.prediction_dim());
+        cdp::negative_target_mean(&mut graph, targets)
+    });
     let mut head_inputs = Vec::with_capacity(length);
     let mut exploration_states = Vec::new();
     let mut exploration_actions = Vec::new();
@@ -460,6 +466,14 @@ fn build_training_graph_grouped(
             let per_row = if config.is_cdp() {
                 // Upstream CDP includes episode starts, predicting their
                 // embeddings from the reset recurrent state (without pixels).
+                let (prediction, target) = if let Some(center) = cdp_center {
+                    (
+                        graph.bias_add(prediction, center),
+                        graph.bias_add(target, center),
+                    )
+                } else {
+                    (prediction, target)
+                };
                 cdp::cosine_distance(&mut graph, prediction, target)
             } else {
                 let target = standardized_target(

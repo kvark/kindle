@@ -13,8 +13,10 @@ The [latest Meganeura refresh](../results/2026-10-06-meganeura-refresh.md)
 passes18 guards and2,824 upstream comparisons. The
 [frozen Pong result](../results/2026-10-06-cdp-pong-world.md) finds readable CNN
 features but weak recurrent ball/reward state in the two failed seeds. All four
-guards/exact tensors pass;131,072 diagnostic actions, no actor updates. Next:
-qualify centered CDP cosine and test three fresh pairs against unchanged CDP.
+guards/exact tensors pass;131,072 diagnostic actions, no actor updates.
+[Centered CDP qualifies](../results/2026-10-06-cdp-centered-qualification.md);
+the [next learning test](2026-10-06-cdp-centered.md) is three fresh paired200k
+Pong seeds against unchanged CDP, not a second representation sweep.
 No further unchanged training-budget extension is declared.
 
 October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)

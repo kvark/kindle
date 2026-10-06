@@ -53,6 +53,18 @@ def test_disagreement_is_only_accepted_when_explicitly_declared():
         summary.recipe(value, 'cdp', disagreement_scale=1)
 
 
+def test_centering_cannot_be_reported_as_unchanged_cdp():
+    value = header('cdp')
+    value['config']['cdp_centered'] = True
+    with pytest.raises(ValueError, match='undeclared CDP centering'):
+        summary.recipe(value, 'cdp')
+    assert summary.recipe(value, 'cdp', cdp_centered=True) == summary.recipe(header('cdp'), 'cdp')
+    value = header('rgb')
+    value['config']['cdp_centered'] = True
+    with pytest.raises(ValueError, match='undeclared CDP centering'):
+        summary.recipe(value, 'rgb', cdp_centered=True)
+
+
 @pytest.mark.parametrize('change', ['label', 'budget', 'sticky', 'aid', 'rate', 'schedule'])
 def test_recipe_refuses_mismatches(change):
     value = header('cdp')

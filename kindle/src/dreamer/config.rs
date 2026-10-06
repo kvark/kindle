@@ -168,6 +168,10 @@ pub struct DreamerConfig {
     /// transform encoder/RSSM inputs. Diagnostics decode back to raw features.
     #[serde(default)]
     pub future_target_standardization: Option<FeatureStandardization>,
+    /// CDP ablation: center predictions and detached targets using the current
+    /// full replay batch's target mean. Acting/forecast outputs stay raw.
+    #[serde(default)]
+    pub cdp_centered: bool,
     /// Optional feature targets for the full-posterior reconstruction head.
     /// Separate from future targets; RGB reconstruction never uses these.
     #[serde(default)]
@@ -263,6 +267,7 @@ impl DreamerConfig {
             observation_kind: ObservationKind::Features,
             video_encoder: None,
             future_target_standardization: None,
+            cdp_centered: false,
             reconstruction_target_standardization: None,
             observation_decoder_depth: OBSERVATION_CHANNELS,
             // Full visual replay entries are intentionally compressed to a
@@ -449,6 +454,16 @@ impl DreamerConfig {
 
     pub fn check(&self) -> Result<(), String> {
         let size = self.network();
+        if self.cdp_centered
+            && (!self.is_cdp()
+                || self.world_backprop_length != self.batch_length
+                || self.world_microbatch_size() != self.batch_size
+                || self.batch_size.saturating_mul(self.batch_length) < 2)
+        {
+            return Err(
+                "centered CDP requires CDP with full-batch BPTT and at least two targets".into(),
+            );
+        }
         for (statistics, enabled) in [
             (
                 &self.future_target_standardization,
@@ -665,6 +680,28 @@ mod tests {
             config.check().is_err(),
             "no undeclared hybrid RGB/CDP objective"
         );
+    }
+
+    #[test]
+    fn centered_cdp_requires_one_full_target_batch() {
+        let mut config = DreamerConfig::tiny(3);
+        assert!(!config.cdp_centered);
+        config.cdp_centered = true;
+        assert!(config.check().is_err());
+        config.observation_kind = ObservationKind::Rgb64;
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 500.0;
+        assert!(config.check().is_ok());
+        let json = serde_json::to_vec(&config).unwrap();
+        assert_eq!(
+            config,
+            serde_json::from_slice::<DreamerConfig>(&json).unwrap()
+        );
+        config.world_microbatch_size = Some(1);
+        assert!(config.check().is_err());
+        config.world_microbatch_size = None;
+        config.world_backprop_length = 1;
+        assert!(config.check().is_err());
     }
 
     #[test]

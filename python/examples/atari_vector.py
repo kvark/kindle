@@ -55,6 +55,8 @@ def main():
                         help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
     parser.add_argument("--cdp", action="store_true",
                         help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
+    parser.add_argument("--cdp-centered", action="store_true",
+                        help="CDP ablation: center cosine predictions/targets over the full replay batch")
     parser.add_argument("--disagreement-scale", type=float, default=0.0,
                         help="CDP exploration: current latent disagreement in imagined and replay returns; zero disables the ensemble")
     parser.add_argument("--replay-capacity", type=int, default=100000)
@@ -76,6 +78,8 @@ def main():
     parser.add_argument("--learning-rate", type=float, default=0.00004)
     parser.add_argument("--report-every", type=int, default=1000)
     parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--initial-checkpoint", type=Path,
+                        help="fresh training only: save the actual zero-experience weights for frozen controls")
     parser.add_argument("--checkpoint-every", type=int, default=20000)
     parser.add_argument("--checkpoint-history", action="store_true",
                         help="preserve each save in CHECKPOINT/<run-actions> instead of replacing the last save")
@@ -95,6 +99,8 @@ def main():
         parser.error("report/checkpoint intervals must be positive")
     if args.checkpoint_history and args.checkpoint is None:
         parser.error("checkpoint-history requires --checkpoint")
+    if args.initial_checkpoint and (args.restore or args.evaluate):
+        parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
@@ -114,6 +120,7 @@ def main():
         parser.error("frozen evaluation must not use exploration overrides")
     training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
     training_options.add("--cdp")
+    training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
@@ -121,6 +128,8 @@ def main():
         parser.error("seed must fit an unsigned 32-bit integer")
     if args.output.exists() or (args.checkpoint and args.checkpoint.exists()):
         parser.error("output and checkpoint must be fresh paths")
+    if args.initial_checkpoint and (args.initial_checkpoint.exists() or args.initial_checkpoint == args.checkpoint):
+        parser.error("initial-checkpoint must be a separate fresh path")
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
@@ -136,6 +145,8 @@ def main():
     learned_rgb = args.encoder_checkpoint is None
     if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
         parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
+    if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
+        parser.error("centered CDP requires --cdp and full-batch world training")
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
         parser.error("disagreement-scale must be finite and non-negative")
     if args.disagreement_scale and (not args.cdp or args.exploration_probability):
@@ -206,7 +217,8 @@ def main():
             config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
             if args.cdp:
                 config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
-                config.update(encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4)
+                config.update(encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4,
+                              cdp_centered=args.cdp_centered)
         else:
             config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
@@ -232,11 +244,16 @@ def main():
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
+        initial_checkpoint = None
+        if args.initial_checkpoint:
+            agent.save_checkpoint(str(args.initial_checkpoint))
+            initial_checkpoint = checkpoint_identity(args.initial_checkpoint)
         exploration_header = (dict(exploration=exploration.config,
             exploration_sha256=sha256_file(exploration_module.__file__)) if exploration else {})
         vector_protocol = (EPISODE_EVALUATION_PROTOCOL if args.episodes_per_env else
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
+                  **(dict(initial_checkpoint=initial_checkpoint) if initial_checkpoint else {}),
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
                   **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),

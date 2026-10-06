@@ -115,8 +115,9 @@ useful state and h15 forecasts. [Results and all controls](results/2026-10-06-cd
 This is not proof of complete encoder collapse. No privileged labels enter
 learning; old-trained models are probed on newly qualified Meganeurab684ffd9.
 
-**Next:** qualify batch-centered CDP cosine, then compare three fresh paired
-seeds against unchanged CDP on the same backend. Centering tests whether the
+**Next:** batch-centered CDP cosine has [passed qualification](results/2026-10-06-cdp-centered-qualification.md).
+Compare [three fresh200k-action paired seeds](experiments/2026-10-06-cdp-centered.md)
+against unchanged CDP on the same backend. Centering tests whether the
 shared embedding component obscures useful visual variation. Keep capacity,
 source gradients, rates, replay and exploration fixed; no pixel decoder or
 new encoder. Promote only on retained gameplay, not low diagnostic loss.
