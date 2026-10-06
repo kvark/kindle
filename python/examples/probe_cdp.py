@@ -27,7 +27,8 @@ from probe_fixed_latents import SPLITS, assert_frozen_tensors
 
 PROTOCOL = 'kindle-cdp-frozen-probes-v1'
 POSITION_TARGETS = {'Seaquest': ('player_x', 'player_y'),
-                    'Pong': ('ball_x', 'ball_y', 'player_y', 'enemy_y')}
+                    'Pong': ('ball_x', 'ball_y', 'player_y', 'enemy_y'),
+                    'Breakout': ('ball_x', 'ball_y', 'player_x')}
 TRACE_FIELDS = ('current', 'following', 'actions', 'rewards', 'terminated', 'truncated',
                 'collection_cut', 'episodes', 'positions')
 
@@ -70,7 +71,7 @@ def collect_trace(agent, environment, seed, steps, check_memory, *, cdp, deter=5
     for step, action in enumerate(actions):
         first_prior = None
         if step % 16 == 0:
-            if game == 'Pong':
+            if game in ('Pong', 'Breakout'):
                 # Explicit diagnostic readback of the actual GPU-resized input.
                 pixels.append(np.asarray(agent.visual_observation, np.float32))
                 pixel_arrivals.append(index)
@@ -250,7 +251,8 @@ def fit_readouts(root, result, save, *, steps):
     checked_memory(model)
     posterior_parameters = posterior_norm = train_mean = None
     stages = [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]
-    if result.get('environment', {}).get('name') == 'ALE/Pong-v5':
+    pixel_readout = result.get('environment', {}).get('name') in ('ALE/Pong-v5', 'ALE/Breakout-v5')
+    if pixel_readout:
         stages.insert(0, ('pixels', 0))
     for stage, horizon in stages:
         started = time.monotonic()
@@ -281,7 +283,7 @@ def fit_readouts(root, result, save, *, steps):
         evidence = root / f'evidence-{stage}-h{horizon}.npz'
         np.savez_compressed(evidence, labels=test['labels'], origins=test['origins'], seeds=test['seeds'], **readouts)
         row = dict(stage=stage, horizon=horizon, fit=info, input_width=train['x'].shape[1],
-                   origin_kind='arrival index' if not horizon and len(names) == 4 else 'action index',
+                   origin_kind='arrival index' if not horizon and pixel_readout else 'action index',
                    train_examples=len(train['x']), validation_examples=len(val['x']), test_examples=len(test['x']),
                    training=report(training, train, names),
                    readouts={key: report(value, test, names) for key, value in readouts.items()},
@@ -344,7 +346,7 @@ def run(checkpoint, output, smoke, game='Seaquest'):
                 data, row = collect_trace(agent, env, seed, result['steps_per_trajectory'], check_memory, cdp=cdp, game=game)
                 if data['cnn'].shape[1] != 256 or data['posterior'].shape[1] != 640:
                     raise RuntimeError('unexpected Size1M representation dimensions')
-                if game == 'Pong' and data['pixels'].shape[1] != 3*64*64:
+                if game in ('Pong', 'Breakout') and data['pixels'].shape[1] != 3*64*64:
                     raise RuntimeError('unexpected learned-RGB input dimensions')
                 path = output / f'{split}-{seed}.npz'
                 with path.open('xb') as stream:

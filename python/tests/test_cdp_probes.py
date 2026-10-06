@@ -21,6 +21,7 @@ class Environment:
         ram = np.zeros(128, np.uint8)
         ram[70], ram[97] = self.tick % 150, self.tick % 100
         ram[49], ram[54], ram[51], ram[50] = 60+self.tick, 70+self.tick, 80+self.tick, 90+self.tick
+        ram[99], ram[101], ram[72] = 70+self.tick, 0 if self.tick % 13 == 0 else 80+self.tick, 90+self.tick
         return ram
 
     def reset(self, *, seed=None):
@@ -173,8 +174,8 @@ def test_cosine_and_spread_handle_zero_constant_and_antiparallel():
     assert sum(row['count'] for row in result.get('by_trajectory', {}).values()) == result['all']['count']
 
 
-@pytest.mark.parametrize('game', ['Seaquest', 'Pong'])
-def test_readout_pipeline_uses_four_heads_fixed_split_and_frozen_controls(tmp_path, monkeypatch, game):
+@pytest.mark.parametrize('game', ['Seaquest', 'Pong', 'Breakout'])
+def test_readout_pipeline_uses_fixed_split_and_frozen_controls(tmp_path, monkeypatch, game):
     result = dict(files=[], heads=[], memory=[], labels=probe.POSITION_TARGETS[game],
                   environment=dict(name=f'ALE/{game}-v5'))
     for split, seeds in probe.SPLITS.items():
@@ -212,18 +213,36 @@ def test_readout_pipeline_uses_four_heads_fixed_split_and_frozen_controls(tmp_pa
     monkeypatch.setattr(probe.kindle._native, 'RegressionProbe', lambda *args, **kwargs: model)
     probe.fit_readouts(tmp_path, result, lambda: None, steps=2)
     expected = [('cnn', 0), ('posterior', 0), ('prior', 1), ('prior', 15)]
-    if game == 'Pong':
+    if game in ('Pong', 'Breakout'):
         expected.insert(0, ('pixels', 0))
     assert model.updates == 2*len(expected)
     assert [(row['stage'], row['horizon']) for row in result['heads']] == expected
     for row in result['heads']:
         assert set(row['readouts']['fitted']['all']) == set(result['labels'])
+        assert row['origin_kind'] == ('arrival index' if not row['horizon'] and game != 'Seaquest'
+                                      else 'action index')
         assert row['fit']['selection'] == 'validation normalized MSE; no refit or test selection'
         with np.load(tmp_path / row['evidence_file']) as data:
             assert set(data['seeds']) == set(probe.SPLITS['test'])
         if row['horizon']:
             assert set(row['readouts']) == {'fitted', 'training_mean', 'unrelated_actions', 'posterior_persistence'}
     json.dumps(result, allow_nan=False)
+
+
+def test_breakout_pixel_cnn_and_belief_probes_share_arrivals_and_mask_absent_ball(monkeypatch):
+    data = trace(game='Breakout')
+    assert data['positions'].shape[1] == 3
+    assert np.isnan(data['positions'][:, :2]).any()
+    assert np.isfinite(data['positions'][:, 2]).all()
+    for stage in ('pixels', 'cnn', 'posterior'):
+        examples = probe.examples(data, stage, 0)
+        np.testing.assert_array_equal(examples['origins'], data['pixel_arrivals'])
+        np.testing.assert_array_equal(examples['labels'], data['positions'][data['pixel_arrivals']])
+    monkeypatch.setattr(probe, 'positions', lambda *args: np.zeros(3))
+    changed = trace(game='Breakout')
+    for key in data:
+        if key != 'positions':
+            np.testing.assert_array_equal(data[key], changed[key])
 
 
 def test_pong_labels_remain_diagnostic_and_reward_calibration_is_event_weighted(monkeypatch):
