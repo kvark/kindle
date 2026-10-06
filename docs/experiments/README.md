@@ -14,10 +14,14 @@ passes18 guards and2,824 upstream comparisons. The
 [frozen Pong result](../results/2026-10-06-cdp-pong-world.md) finds readable CNN
 features but weak recurrent ball/reward state in the two failed seeds. All four
 guards/exact tensors pass;131,072 diagnostic actions, no actor updates.
-[Centered CDP qualifies](../results/2026-10-06-cdp-centered-qualification.md);
-the [next learning test](2026-10-06-cdp-centered.md) is three fresh paired200k
-Pong seeds against unchanged CDP, not a second representation sweep.
-No further unchanged training-budget extension is declared.
+[Centered CDP qualifies](../results/2026-10-06-cdp-centered-qualification.md) and
+its [three-seed200k learning screen passes](../results/2026-10-06-cdp-centered-learning.md):
+frozen−8.4583 versus−18.6528 raw CDP, paired+10.1944 [7.5,12.375]. All six
+learners and18 guards/288 natural frozen episodes finish08:41 UTC. Only4/72
+centered matches are wins, not mastery. A separately guarded profile completes;
+six paired frozen state/forecast probes are now running under the
+[follow-up declaration](2026-10-06-cdp-centered.md#reviewed-follow-up-october6).
+No further learning-budget extension is declared.
 
 October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
 is complete: twelve new200k-action learners plus all three retained Freeway

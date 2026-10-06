@@ -84,3 +84,26 @@ five-game restart. The full goal remains DreamerV3 quality on Boxing, Pong,
 Freeway, Breakout and Qbert with CDP.
 
 Artifacts: `runs/cdp-centered-20261006.n6XuQXmE`.
+
+## Reviewed follow-up, October6
+
+The [completed learning comparison](../results/2026-10-06-cdp-centered-learning.md)
+passes its declared screen, but only4/72 centered matches are wins. Before a
+larger allocation, apply the unchanged [frozen Pong probe](2026-10-06-cdp-pong-world.md)
+to all six200k checkpoints, ordered control/centered for1009/2017/3019.
+Same native/runner and fixed development trajectories:196,608 extra diagnostic
+actions,30 GPU readouts/61,440 readout updates, zero actor updates. Keep every
+control, event count, matched visible cohort, pixel check and exact346 tensors.
+These reuse development probe trajectories, not a new unseen-game test. No
+duplicate smoke or qualification for unchanged native.900s/model and45min
+service bound; audit before any follow-up, no retries. Artifacts:
+`runs/cdp-centered-world-20261006.EYV6C9au`.
+
+One existing synthetic fixed-batch profiler has also completed under a separate
+120s guard, using centered1009 without mutating its source checkpoint. It
+measures session/kernel costs, not GPU utilization or gameplay. Artifacts:
+`runs/cdp-centered-profile-20261006.EvJjduZZ`. Imagination has3,100 dispatches;
+ordinary GPU timestamp median10.91ms versus13.28ms synchronized wall time.
+Per-dispatch instrumentation inflates execution substantially, so its family
+shares are diagnostic, not uninstrumented whole-agent fractions. No larger
+learning allocation or optimization candidate is launched by this follow-up.

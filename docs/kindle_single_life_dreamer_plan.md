@@ -115,13 +115,26 @@ useful state and h15 forecasts. [Results and all controls](results/2026-10-06-cd
 This is not proof of complete encoder collapse. No privileged labels enter
 learning; old-trained models are probed on newly qualified Meganeurab684ffd9.
 
-**Running since October6 05:45 UTC:** batch-centered CDP cosine has
-[passed qualification](results/2026-10-06-cdp-centered-qualification.md).
-Compare [three fresh200k-action paired seeds](experiments/2026-10-06-cdp-centered.md)
-against unchanged CDP on the same backend. Centering tests whether the
-shared embedding component obscures useful visual variation. Keep capacity,
-source gradients, rates, replay and exploration fixed; no pixel decoder or
-new encoder. Promote only on retained gameplay, not low diagnostic loss.
+**Centered CDP passes its three-seed early-learning screen:** the
+[six fresh200k-action runs](results/2026-10-06-cdp-centered-learning.md) finish
+October6 08:41 UTC. Frozen mean−8.4583 versus−18.6528 unchanged CDP; paired
+gain+10.1944 [7.5,12.375]. Every centered seed improves over its actual initial
+and matched control. All18 guards/288 selected natural episodes, exact tensors
+and full replay/videos pass. Only4/72 centered matches are wins: not mastery.
+Centering the training objective is the only changed mechanism; source CNN
+gradients, capacity, rates, replay and exploration remain fixed. Promote
+`--cdp --cdp-centered` as the next candidate, not the unchanged paper objective.
+The ordinary `--cdp` control and CLI default remain unchanged.
+
+**Next, before allocating more training:** six paired frozen state/forecast
+probes are running on the same native, with196,608 diagnostic actions and zero
+actor updates. The [follow-up declaration](experiments/2026-10-06-cdp-centered.md#reviewed-follow-up-october6)
+retains all controls, event counts, shared traces and exact tensors. One bounded
+synthetic profile has completed; imagination alone has3,100 dispatches and
+10.91ms ordinary GPU /13.28ms synchronized wall time. Kernel instrumentation
+perturbs timing; do not turn its family shares into whole-agent percentages.
+Use the diagnosis and measured costs to select the next finite allocation.
+Do not automatically restart raw-cosine training or the whole suite.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -203,7 +216,9 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 These are current sticky/full-action CDP results unless explicitly marked
-historical: Pong now uses500k actions/learner, the other four200k. Frozen cohort means cover three learner seeds and24 natural
+historical: Pong's selected candidate is centered CDP at200k actions/learner;
+the other four retain the original CDP200k results. They are not a single
+matched five-game comparison of the new loss. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
 The [five-game report](results/2026-10-05-cdp-five-game-screen.md) links every
 trained/initial-control whole stream-zero video and all score/action/time curves.
@@ -213,7 +228,7 @@ Links into `runs/` require this workspace.
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing | CDP frozen69.74 vs.39 initial; seeds72.71/64.92/71.58. Strong learning in all three. | Published long-run99.61 not reached. Historical gate:>=20 natural matches,>=90% wins, mean>=50, no cutoffs. | [Current CDP and all videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical nonsticky evidence](experiments/README.md) |
-| Pong |500k-action CDP frozen−14.76 vs−20.38 initial; seeds−21.00/−2.375/−20.92,7/72 wins. Useful CNN state but weak recurrent ball state in two seeds. | Centered-loss/control pairs running; no further unchanged budget extension. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; old nonsticky success did not survive sticky evaluation. | [Current CDP and videos](results/2026-10-06-cdp-pong-budget.md); [world report](results/2026-10-06-cdp-pong-world.md) |
+| Pong | Centered CDP200k frozen−8.46 vs−18.65 matched raw CDP and−20.33 initial; seeds−8.25/−3.875/−13.25,4/72 wins. Every centered seed improves. | Early-learning screen passes, not mastery. Paired world probes running. Published20.45 and historical>=90% wins/mean>=15 remain unmet; old nonsticky success did not survive sticky evaluation. | [Current result and videos](results/2026-10-06-cdp-centered-learning.md); [raw500k failure](results/2026-10-06-cdp-pong-budget.md); [earlier world report](results/2026-10-06-cdp-pong-world.md) |
 | Freeway | Unassisted CDP frozen24.14 vs0; seeds22.21/23.21/27.00, every candidate round19–30. Exploration unlocked. | Published33.40 not reached. Only3019 passes the original>=90% rounds with25 crossings /mean>=25 gate. No Freeway-only gate tuning. | [Current CDP and videos](results/2026-10-05-freeway-effects-200k.md); [32k controls](results/2026-10-05-freeway-action-effects-frozen.md) |
 | Breakout | CDP frozen4.36 vs1.61; seeds3.42/2.63/7.04. Modest improvement in all three, poor control. | Published381.81 far away. Historical two-wall/864-point gate remains unmet; no action-subset workaround. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical Tiny comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md) |
 | Qbert | CDP frozen403.13 vs152.43; seeds312.50/235.42/661.46. Modest improvement with large seed variation. | Published193,220.77 far away. Historical>=90% first pyramids and mean>=15,000 remain unmet. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical3.2M Tiny result](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
@@ -236,6 +251,9 @@ and4.33ms posterior work (14%). The older extrinsic-only CDP Seaquest comparison
 used28.91ms updates; keep its settings distinct. GPU utilization is unmeasured,
 not inferred from frame-clock ratios. Target measured whole-agent bottlenecks,
 especially imagination, not just the now-cheaper world loss.
+The October6 matched Pong comparison on Meganeurab684ffd9 averages32.11ms
+raw /32.13ms centered updates and about28min per200k learner. Centering has no
+material observed cost increase; it is not itself a throughput optimization.
 
 Atari emulation/frame upload is a CPU-environment fallback; GPU preprocessing,
 batched acting and resident replay collection are implemented. Native GPU

@@ -38,13 +38,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   [qualifies](docs/results/2026-10-06-cdp-centered-qualification.md): eight
   guards,32,768 independent centered derivatives,1,300 unchanged-CDP upstream
   comparisons and both production/frozen smokes pass. Natived32f3dc8.
-  **Running since October6 05:45 UTC:** [six fresh200k Pong runs](docs/experiments/2026-10-06-cdp-centered.md),
-  three centered/control pairs on the same backend, actual initial weights,
-  held-out base3,500,000,000 and full frozen/replay/video audits. Centering is
-  the only changed learning mechanism. No new encoder/capacity/decoder or
-  blind budget extension; only gameplay can promote it. Persistent service
-  `kindle-cdp-centered-learning-20261006`,5h bound, automatic audits between
-  stages; inspect about every30min or on completion, never duplicate it.
+  **Centered CDP's three-seed screen passes:** six fresh200k runs finish
+  October6 08:41 UTC in2h55m56s. Frozen centered/control−8.4583/−18.6528,
+  paired+10.1944 [7.5,12.375]; every centered seed improves over its actual
+  initial and matched control. All18 guards/288 selected natural episodes,
+  exact346 tensors/model and full replay/videos pass. Only4/72 centered wins,
+  not mastery. [Result and all videos](docs/results/2026-10-06-cdp-centered-learning.md).
+  Promote centered loss as the next candidate (`--cdp --cdp-centered`), not
+  a solved architecture. No new encoder/capacity/decoder or blind extension.
+  **Running:** six paired frozen state/forecast probes under
+  `kindle-cdp-centered-world-20261006`,45min bound;196,608 diagnostic actions,
+  zero actor updates. [Declaration](docs/experiments/2026-10-06-cdp-centered.md#reviewed-follow-up-october6).
+  One separately guarded synthetic profile completes: imagination3,100
+  dispatches,10.91ms ordinary GPU/13.28ms wall; instrumentation perturbs kernel
+  shares. Review diagnosis and whole-agent cost before the next allocation.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -70,7 +77,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Seaquest CDP/RGB comparison are complete. The3x12M speed target is an unmet,
   user-accepted stretch target. The completed five-game screen's31.62ms
   updates spend51% in imagination,27% world training; about8x aggregate /1x
-  per-stream realtime. New-backend learning throughput is not yet measured.
+  per-stream realtime. The new-backend Pong comparison measures32.11ms raw /
+  32.13ms centered updates, about28min per200k learner; no new speed claim.
   GPU utilization remains unmeasured. Optimize measured whole-agent cost.
 - No old queue restarts. The stopped45-run small CDP/RGB/Tiny comparison retains
   seven completed Freeway pairs plus interrupted CDP3019 at126,408 actions.
@@ -84,6 +92,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   smokes. [Qualification](docs/results/2026-10-06-meganeura-refresh.md).
   Completed learning retains nativef4b6a5c7/592a2f5a; diagnostics disclose their
   new runtime separately. No claim that these fixes caused the old failures.
+  Upstream rechecked after centered learning: c6376542 adds attention-backward
+  batching/layout search, not an identified CDP fix. Keep current frozen probes
+  on their training native; adopt/recheck upstream with the next native change,
+  not by relabeling finished experiments. Neighboring user work stays untouched.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
