@@ -21,6 +21,8 @@ exercised loss and runtime path, not improved Pong or five-game competence.
   function is rehearsed on both production smokes. The first CPU build
   service stops at exit127 because Cargo is absent from its PATH, before
   compilation/GPU work; an explicit PATH corrects it. That failed log remains.
+  CPU declaration preparation also corrects a lazy-module attribute lookup
+  before native construction; the repeated check validates all18 planned jobs.
 
 Native`d32f3dc88f39c4d3e5341b396443db789b41cad5ef6f06304e1e2e2c365b5f08`,
 Meganeura`b684ffd9`, Blade`e349cddf`, RTX5080/580.178.04. The only learner

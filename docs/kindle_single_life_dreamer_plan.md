@@ -115,7 +115,8 @@ useful state and h15 forecasts. [Results and all controls](results/2026-10-06-cd
 This is not proof of complete encoder collapse. No privileged labels enter
 learning; old-trained models are probed on newly qualified Meganeurab684ffd9.
 
-**Next:** batch-centered CDP cosine has [passed qualification](results/2026-10-06-cdp-centered-qualification.md).
+**Running since October6 05:45 UTC:** batch-centered CDP cosine has
+[passed qualification](results/2026-10-06-cdp-centered-qualification.md).
 Compare [three fresh200k-action paired seeds](experiments/2026-10-06-cdp-centered.md)
 against unchanged CDP on the same backend. Centering tests whether the
 shared embedding component obscures useful visual variation. Keep capacity,
@@ -212,7 +213,7 @@ Links into `runs/` require this workspace.
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing | CDP frozen69.74 vs.39 initial; seeds72.71/64.92/71.58. Strong learning in all three. | Published long-run99.61 not reached. Historical gate:>=20 natural matches,>=90% wins, mean>=50, no cutoffs. | [Current CDP and all videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical nonsticky evidence](experiments/README.md) |
-| Pong |500k-action CDP frozen−14.76 vs−20.38 initial; seeds−21.00/−2.375/−20.92,7/72 wins. Two seeds still fail to improve. | State/forecast diagnosis next, not another budget extension. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; old nonsticky success did not survive sticky evaluation. | [Current CDP and videos](results/2026-10-06-cdp-pong-budget.md); [world-probe declaration](experiments/2026-10-06-cdp-pong-world.md) |
+| Pong |500k-action CDP frozen−14.76 vs−20.38 initial; seeds−21.00/−2.375/−20.92,7/72 wins. Useful CNN state but weak recurrent ball state in two seeds. | Centered-loss/control pairs running; no further unchanged budget extension. Published20.45 not reached. Historical>=90% wins/mean>=15 gate remains unchanged; old nonsticky success did not survive sticky evaluation. | [Current CDP and videos](results/2026-10-06-cdp-pong-budget.md); [world report](results/2026-10-06-cdp-pong-world.md) |
 | Freeway | Unassisted CDP frozen24.14 vs0; seeds22.21/23.21/27.00, every candidate round19–30. Exploration unlocked. | Published33.40 not reached. Only3019 passes the original>=90% rounds with25 crossings /mean>=25 gate. No Freeway-only gate tuning. | [Current CDP and videos](results/2026-10-05-freeway-effects-200k.md); [32k controls](results/2026-10-05-freeway-action-effects-frozen.md) |
 | Breakout | CDP frozen4.36 vs1.61; seeds3.42/2.63/7.04. Modest improvement in all three, poor control. | Published381.81 far away. Historical two-wall/864-point gate remains unmet; no action-subset workaround. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical Tiny comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md) |
 | Qbert | CDP frozen403.13 vs152.43; seeds312.50/235.42/661.46. Modest improvement with large seed variation. | Published193,220.77 far away. Historical>=90% first pyramids and mean>=15,000 remain unmet. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical3.2M Tiny result](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |

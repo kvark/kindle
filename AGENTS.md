@@ -38,11 +38,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   [qualifies](docs/results/2026-10-06-cdp-centered-qualification.md): eight
   guards,32,768 independent centered derivatives,1,300 unchanged-CDP upstream
   comparisons and both production/frozen smokes pass. Natived32f3dc8.
-  Next: [six fresh200k Pong runs](docs/experiments/2026-10-06-cdp-centered.md),
+  **Running since October6 05:45 UTC:** [six fresh200k Pong runs](docs/experiments/2026-10-06-cdp-centered.md),
   three centered/control pairs on the same backend, actual initial weights,
   held-out base3,500,000,000 and full frozen/replay/video audits. Centering is
   the only changed learning mechanism. No new encoder/capacity/decoder or
-  blind budget extension; only gameplay can promote it.
+  blind budget extension; only gameplay can promote it. Persistent service
+  `kindle-cdp-centered-learning-20261006`,5h bound, automatic audits between
+  stages; inspect about every30min or on completion, never duplicate it.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
