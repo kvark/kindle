@@ -70,7 +70,9 @@ in replay, alongside improved gameplay. These are update-weighted minibatch
 means, not pooled event calibration or held-out prior forecasts. Raw cosine
 losses are different objectives and cannot be compared as prediction accuracy.
 The earlier [frozen diagnosis](2026-10-06-cdp-pong-world.md) motivated this
-change; new centered state/forecast sufficiency still needs its own check.
+change. The [paired frozen follow-up](2026-10-06-cdp-centered-world.md) now
+confirms useful recurrent ball state and negative-event forecasts in all three
+centered seeds, while preserving coordinate/persistence and sparse-event limits.
 
 ## Audit, cost and decision
 
@@ -91,8 +93,9 @@ speedup. GPU utilization remains unmeasured.
 Promote centered CDP as the next learning candidate, not as a solved agent.
 Four wins out of72, mean-8.46 and only one winning seed are far short of the
 unchanged Pong target20.4455 and the full **Boxing/Pong/Freeway/Breakout/Qbert**
-goal. Check state/forecast quality and the measured runtime bottleneck before
-the next finite training allocation. Do not repeat failed raw-cosine budgets or
+goal. The paired state/forecast check now passes with limitations; review the
+measured runtime bottleneck before the next finite training allocation.
+Do not repeat failed raw-cosine budgets or
 automatically restart the suite. Cross-game transfer of this improvement and
 same-hardware RGB compute savings remain untested.
 

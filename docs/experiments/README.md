@@ -18,10 +18,12 @@ guards/exact tensors pass;131,072 diagnostic actions, no actor updates.
 its [three-seed200k learning screen passes](../results/2026-10-06-cdp-centered-learning.md):
 frozen−8.4583 versus−18.6528 raw CDP, paired+10.1944 [7.5,12.375]. All six
 learners and18 guards/288 natural frozen episodes finish08:41 UTC. Only4/72
-centered matches are wins, not mastery. A separately guarded profile completes;
-six paired frozen state/forecast probes are now running under the
-[follow-up declaration](2026-10-06-cdp-centered.md#reviewed-follow-up-october6).
-No further learning-budget extension is declared.
+centered matches are wins, not mastery. The separately guarded profile and
+[six paired frozen state/forecast probes](../results/2026-10-06-cdp-centered-world.md)
+now complete. Every centered seed retains useful recurrent ball state and h15
+negative-event forecasts, with sparse-positive and coordinate-control limits.
+[One bounded throughput trial](2026-10-06-cdp-imagination-throughput.md) is next,
+not an optimization sweep. No further learning-budget extension is declared.
 
 October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
 is complete: twelve new200k-action learners plus all three retained Freeway

@@ -46,12 +46,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   not mastery. [Result and all videos](docs/results/2026-10-06-cdp-centered-learning.md).
   Promote centered loss as the next candidate (`--cdp --cdp-centered`), not
   a solved architecture. No new encoder/capacity/decoder or blind extension.
-  **Running:** six paired frozen state/forecast probes under
-  `kindle-cdp-centered-world-20261006`,45min bound;196,608 diagnostic actions,
-  zero actor updates. [Declaration](docs/experiments/2026-10-06-cdp-centered.md#reviewed-follow-up-october6).
+  **Paired world probes complete:** six guards/exact346 tensors pass at09:02
+  UTC in9m40s;196,608 diagnostic actions, zero actor updates. Every centered
+  seed has readable recurrent ball state and useful h15 negative-event
+  forecasts. Raw2017 remains stronger on some coordinate probes; positive /
+  terminal evidence is sparse. [Result](docs/results/2026-10-06-cdp-centered-world.md).
+  No GPU worker remains. Next is [one bounded throughput trial](docs/experiments/2026-10-06-cdp-imagination-throughput.md):
+  same-backend controls, extend existing grouped block products to B128,
+  preserve parameters/recipe, keep only after numerical checks and>=5% whole-
+  update gain. Otherwise discard and return to learning; no optimization sweep.
   One separately guarded synthetic profile completes: imagination3,100
   dispatches,10.91ms ordinary GPU/13.28ms wall; instrumentation perturbs kernel
-  shares. Review diagnosis and whole-agent cost before the next allocation.
+  shares. The next learning allocation must advance all five games, not turn
+  this positive Pong screen into the final objective.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
