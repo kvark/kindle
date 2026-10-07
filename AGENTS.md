@@ -98,24 +98,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   **12M preflight passes:**1,024 training/195 finite updates in22.23s, then
   1,024 frozen actions/zero updates/exact346 tensors; two guards, no new
   warnings. Last128 updates average108.98ms. [Evidence](docs/results/2026-10-07-cdp-12m-preflight.json).
-  **Next reviewed allocation:** [three fresh12M Breakout seeds1009/2017/3019](docs/experiments/2026-10-07-cdp-capacity.md),
-  500k actions/124,939 updates each, about12h total;5h per training process,
-  24h service bound. Same centered loss/rates/exploration/N8/B8/T16/H15/R32;
-  only model preset changes against retained1M500k controls.12M expands CNN,
-  recurrent and policy capacity together (16.33M actual parameters including
-  CDP/exploration), not an isolated encoder test. Native6d38eea2 unchanged.
-  Final/actual-initial controls reuse base4,000,000,000+seed and first3 natural
-  episodes/stream,600k cap, exact tensors/full replay/video; disclose reused
-  development seeds, v4/v5 repair and old3019's8->1 host-worker difference.
-  Audit each complete pair before the next learner; no larger queue/new loss
-  or automatic extension. Root `runs/cdp-12m-breakout-20261007.3msA0ITD`.
-  All five quality targets remain open.
-- **Deferred throughput candidate:** exploration repeats each state projection
+- **12M capacity comparison complete:** [results, curves and whole videos](docs/results/2026-10-07-cdp-capacity.md).
+  Three fresh500k Breakout seeds score48.17/15.88/50.58, mean38.21 versus
+  retained1M5.14; paired+33.07 [12.38,44.17]. Every seed improves, none reaches
+  the381.81 long-run reference.1.5M actions/374,817 updates/11h39m37s training,
+  3.58x the retained1M wall time. Service finishes15:39:48 UTC in11h42m14s;
+  all nine guards/144 natural frozen episodes/exact346 tensors and six whole
+  replays/videos pass. Three allocation warnings,18 excess episodes and all
+  tails remain;88,120 frozen actions. CPU review passes; no worker remains.
+  Only whole-model capacity changes (16.33M actual parameters including
+  CDP/exploration), not an isolated encoder/RSSM/ensemble test. Native6d38eea2
+  unchanged. Reused development seeds and old3019's8->1 host-worker repair
+  remain disclosed.12M is the next Atari quality candidate,1M the fast control;
+  other games and12M prior forecasts remain untested. No automatic extension.
+  All five quality targets and the budget question remain open.
+- **Next throughput candidate:** exploration repeats each state projection
   over18 actions. Factoring only its first affine layer removes about63% of
   ensemble dense MACs, not whole-update time. A10-case CPU check with saved
   weights/states agrees numerically; no GPU implementation/speedup claim.
   [Evidence and post-allocation review](docs/experiments/2026-10-07-cdp-capacity.md#deferred-compute-candidate-reuse-the-exploration-state-projection).
-  Keep the active capacity study/native unchanged; qualify after its review.
+  Capacity review is complete. Qualify before a larger learning allocation;
+  both timing arms must use the same backend.12M updates average110.03ms,
+  55.4% imagination/29.9% world training; utilization remains unmeasured.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

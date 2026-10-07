@@ -114,6 +114,20 @@ cost before any extension; all five original quality targets remain open.
 
 Learning artifacts:`runs/cdp-12m-breakout-20261007.3msA0ITD`.
 
+## Three-seed outcome, October7
+
+[All results, curves and whole videos](../results/2026-10-07-cdp-capacity.md).
+The service completes15:39:48 UTC in11h42m14s; the independent CPU review passes.
+Frozen48.17/15.88/50.58, mean38.21 versus retained1M5.14; paired+33.07
+[12.38,44.17]. Every seed improves. The1.5M-action/374,817-update allocation
+costs11h39m37s training,3.58x the retained control. All nine guards,144 selected
+natural frozen episodes, exact tensors and six whole replays/videos pass.
+Three allocation warnings and all excess/tails remain. No worker or automatic
+extension remains; all five quality targets and the budget question stay open.
+Keep12M as the next quality candidate, and qualify the compute reuse below
+before committing a larger learning budget. This does not isolate which of
+encoder/RSSM/policy/ensemble capacity matters or prove better12M forecasts.
+
 ## Deferred compute candidate: reuse the exploration state projection
 
 Read-only inspection during the allocation finds that each of four exploration
