@@ -7,7 +7,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October6 goal: reach DreamerV3 quality on Boxing, Pong, Freeway,
+- **October7 goal: reach DreamerV3 quality on Boxing, Pong, Freeway,
   Breakout and Qbert with CDP; retain the budget comparison.** All five
   and the budget question remain open. A completed screen, learned subset or
   smaller model does not complete this goal.
@@ -59,31 +59,40 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   14 guards pass. [Result](docs/results/2026-10-06-cdp-imagination-throughput.md).
   Keep it; no optimization sweep. This is not measured whole-game throughput
   or GPU utilization. Previous per-dispatch instrumentation perturbs timing.
-- **Next reviewed learning allocation:** [three fresh500k seeds on each of the
-  five games](docs/experiments/2026-10-06-cdp-centered-five-game-budget.md),
-  centered CDP on native6d38eea2/c6376542. Fifteen learners,7.5M actions /
-  1,874,085 updates; seed-major Pong/Boxing/Freeway/Breakout/Qbert. Actual saved
-  initial and frozen final controls use new held-out base4,000,000,000, first3
-  natural episodes/stream,600k-action ceiling, full audits/videos. Expected
-  16–18h,24h service bound,100min training processes. The controller's smoke
-  audit rehearsal and all45 job declarations pass. No checkpoint lifetime
-  resume, game-specific recipe, raw-cosine retry or automatic extension.
-  This is longer centered-package learning, not a new five-game loss ablation
-  or a completed quality goal. Review every failure or capped cohort.
-  The first two completed Breakout seeds remain weak. The declaration now
-  prepares a bounded initial/final frozen-state/forecast check for all three
-  seeds after the full campaign audit. It is not launched; do not interrupt
-  this allocation or add training budget before diagnosis. Breakout probes
-  are CPU-tested in7e5df42; their GPU path is still unrun.
-  **October7 independent audit caught a natural-cohort bug:** Breakout3019's
-  selected24 completed episodes include one timeout; its8.0833 score and
-  three-seed5.1944 summary are not valid complete natural-cohort results.
-  Finish active Qbert unchanged, then repair stopping/selection and rerun only
-  that frozen final on the same checkpoint/seeds/caps, requiring exact agreement
-  with the original207,288-action prefix. Retain all old evidence and extra
-  compute. Vector v5 uses natural quotas; v4 artifacts retain completed quotas.
-  No learner retraining or budget extension. Reconcile before final campaign
-  acceptance and the declared Breakout diagnosis; see the allocation's review.
+- **Five-game centered500k allocation complete after evaluation repair:**
+  [results, curves and whole videos](docs/results/2026-10-07-cdp-centered-five-game-budget.md).
+  Fifteen learners,7.5M actions/1,874,085 updates/16h24m7s training; original
+  service finishes October7 at02:30 UTC in16h45m23s. Frozen means Boxing77.69,
+  Pong4.54, Freeway30.26, Breakout5.14, Qbert993.75; every seed beats its actual
+  initial. Boxing/Freeway pass historical gates in all three seeds; Pong54/72
+  wins remains unstable, Breakout/Qbert remain weak. None reaches its long-run
+  reference. This is not a matched five-game centering/RGB ablation.
+  All720 selected natural episodes, exact346 tensors/model, zero frozen updates,
+  full replay/video checks and46 GPU guards pass;31 whole videos and all tails
+  remain. Breakout3019's original8.0833 cutoff-containing cohort stays invalid.
+  The corrected7.9167 reproduces its exact207,288-action prefix; extra209,504
+  evaluation actions and the original timeout are retained. Host workers8->1
+  in that rerun are disclosed; no unchanged-runtime speed claim. Vector v5
+  counts natural episodes; v4 keeps its exact completed-episode receipt schema.
+  Both CPU audit failures and pre-fix source snapshots remain. No learner retry.
+- **Frozen Breakout diagnosis complete, interpretation limited:**
+  [result and next bounded check](docs/results/2026-10-07-cdp-breakout-world.md).
+  All six initial/final models finish in9m40s after a12.29s smoke. Seven guards,
+  exact346 actor tensors/model and identical action/frame/pixel traces pass;
+  196,992 diagnostic actions/61,600 readout updates/zero actor updates. No worker
+  remains. Ball state is weakly readable and all three h15 ball readouts lose
+  to constant mean; reward evidence is only7/8 positive events at h1/h15.
+  The shared pixel control overfits: per-pixel whitening turns bounded RGB
+  values into validation/test magnitudes up to4,021. F64 reproduces saved GPU
+  predictions at9e-7 relative L2, implicating diagnostic conditioning, not an
+  observed GPU prediction fault or proof of lost image information.
+  **Next:** one shared native-GPU pixel readout on the saved corpus, fixed RGB
+  range instead of variance whitening, same seed/2,048 updates/validation-only
+  selection,120s bound, zero new game actions/actor updates. Keep all failed
+  controls and report this head even if weak; no sweep or automatic learner
+  extension. Artifacts `runs/cdp-breakout-world-20261007.A9GKTNfK`.
+  Native6d38eea2/c6376542 stays unchanged. Resolve the control before capacity,
+  loss or representation changes; all five quality targets remain open.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -129,7 +138,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   throughput trial; completed probes retain their training native. Tiny's
   attention path is not newly qualified by these CDP/RGB checks. Neighboring
   user work stays untouched.
-  Rechecked19:50 UTC: new Meganeurafc3a2fb adds f32 cooperative acceleration
+  Rechecked October7 at02:44 UTC: Meganeurafc3a2fb adds f32 cooperative acceleration
   and checked geometry; Blade49ec60a changes presentation-damage hints. No
   relevant fix for the current small-CDP learning weakness was identified.
   Keep active jobs/frozen diagnosis on the qualified runtime; review a refresh
@@ -238,6 +247,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   learning check suffices for a speed change; no micro-campaign.
 - Frozen evaluation never updates model/optimizer tensors. Predeclare cohorts,
   retain unfinished tails and compare untrained controls for competence claims.
+  New controllers must select `cohort(..., natural_only=True)` explicitly; its
+  completed-episode default is retained only for historical reports. Do not
+  reuse an old controller's complete flag as proof of a natural cohort.
   Separately evaluate prior forecasts with persistence/constant/unrelated-action/
   reward controls and event counts. Posterior estimates are not forecasts,
   features are not imagined RGB, and privileged observers never enter policy.
@@ -282,5 +294,7 @@ source for docs, or compile during matched timings.
 
 Automate routine validation; inspect long training about every 30 minutes or on
 completion, not counters on every poll. Heavy preparation uses one CPU,2 GiB and
-zero swap. Review CPU test filters: Meganeura has unignored GPU tests.
+zero swap. Apply CPU limits to preparation/analysis, not GPU workers in matched
+runs: the native host-worker count follows the available CPU quota. Review CPU
+test filters: Meganeura has unignored GPU tests.
 Only the user merges; commits/pushes are allowed. Keep history linear.

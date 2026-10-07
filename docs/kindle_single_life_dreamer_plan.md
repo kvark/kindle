@@ -142,13 +142,25 @@ guards, independent arithmetic/upstream checks and raw/centered production plus
 frozen smokes pass. [Result and limits](results/2026-10-06-cdp-imagination-throughput.md).
 Keep the change, without claiming a measured whole-game speedup or utilization.
 
-**Next reviewed allocation:** [three fresh500k-action seeds per original game](experiments/2026-10-06-cdp-centered-five-game-budget.md),
-centered CDP with unchanged capacity/rates/replay/exploration and qualified
-grouped execution. Fifteen learners,7.5M actions/1,874,085 updates, actual saved
-initial controls, new held-out frozen seeds, whole videos and full audits.
-Expected16–18h,24h service bound; no automatic extension or raw-cosine retry.
-This tests longer useful learning and the centered package beyond Pong, not
-five-game causal centering superiority or completion of the quality goal.
+**The five-game centered500k allocation is complete after evaluation repair:**
+[result, curves and every whole video](results/2026-10-07-cdp-centered-five-game-budget.md).
+All15 learners improve over actual initial controls; Boxing/Freeway pass the
+historical gates in every seed, Pong remains unstable, Breakout/Qbert remain
+weak. No long-run quality target is reached. Cost7.5M actions/1,874,085 updates /
+16h24m7s training, plus all evaluation and earlier development compute. This is
+longer centered-package learning, not a matched five-game loss/RGB ablation.
+The repaired Breakout3019 natural cohort preserves its original cutoff and
+exact207,288-action prefix; both CPU audit failures and extra collection remain
+disclosed. All720 selected natural episodes and46 GPU guards pass.
+
+**The frozen Breakout diagnosis now completes:** [result and limits](results/2026-10-07-cdp-breakout-world.md).
+All six models remain exactly frozen. Ball state and h15 forecasts are weak,
+but the pixel control is ill-conditioned: per-pixel whitening amplifies rare
+changes to4,021 despite bounded RGB input. An F64 replay agrees with its saved
+GPU predictions. Next, one shared2,048-update GPU readout on saved pixels with
+fixed RGB scaling, no new actions or actor updates. Retain the original failed
+control; resolve it before a capacity/loss/representation decision or more
+training. No automatic extension.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -229,23 +241,22 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-These are current sticky/full-action CDP results unless explicitly marked
-historical: Pong's selected candidate is centered CDP at200k actions/learner;
-the other four retain the original CDP200k results. They are not a single
-matched five-game comparison of the new loss. Frozen means cover three learner seeds and24 natural
+These are current sticky/full-action centered CDP500k results unless explicitly
+marked historical. The common recipe is not a matched five-game comparison
+against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
-The [five-game report](results/2026-10-05-cdp-five-game-screen.md) links every
+The [five-game report](results/2026-10-07-cdp-centered-five-game-budget.md) links every
 trained/initial-control whole stream-zero video and all score/action/time curves.
 Links into `runs/` require this workspace.
 
 | Game | Current measured result | Unresolved question / historical gate | Evidence and whole videos |
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
-| Boxing | CDP frozen69.74 vs.39 initial; seeds72.71/64.92/71.58. Strong learning in all three. | Published long-run99.61 not reached. Historical gate:>=20 natural matches,>=90% wins, mean>=50, no cutoffs. | [Current CDP and all videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical nonsticky evidence](experiments/README.md) |
-| Pong | Centered CDP200k frozen−8.46 vs−18.65 matched raw CDP and−20.33 initial; seeds−8.25/−3.875/−13.25,4/72 wins. Every centered seed improves; paired world probes support the diagnosis. | Early-learning screen passes, not mastery. Published20.45 and historical>=90% wins/mean>=15 remain unmet; old nonsticky success did not survive sticky evaluation. | [Current result and videos](results/2026-10-06-cdp-centered-learning.md); [paired world report](results/2026-10-06-cdp-centered-world.md); [raw500k failure](results/2026-10-06-cdp-pong-budget.md) |
-| Freeway | Unassisted CDP frozen24.14 vs0; seeds22.21/23.21/27.00, every candidate round19–30. Exploration unlocked. | Published33.40 not reached. Only3019 passes the original>=90% rounds with25 crossings /mean>=25 gate. No Freeway-only gate tuning. | [Current CDP and videos](results/2026-10-05-freeway-effects-200k.md); [32k controls](results/2026-10-05-freeway-action-effects-frozen.md) |
-| Breakout | CDP frozen4.36 vs1.61; seeds3.42/2.63/7.04. Modest improvement in all three, poor control. | Published381.81 far away. Historical two-wall/864-point gate remains unmet; no action-subset workaround. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical Tiny comparison](../runs/breakout-minimal-comparison-20260926.xsQCaK/results.md) |
-| Qbert | CDP frozen403.13 vs152.43; seeds312.50/235.42/661.46. Modest improvement with large seed variation. | Published193,220.77 far away. Historical>=90% first pyramids and mean>=15,000 remain unmet. | [Current CDP and videos](results/2026-10-05-cdp-five-game-screen.md#whole-rollout-videos); [historical3.2M Tiny result](../runs/qbert-r64-3m2-20260925.FrriIH/results.md) |
+| Boxing | Frozen77.69 vs1.00 initial; seeds74.46/71.63/87.00,72/72 wins. | All three pass the historical>=90% wins/mean>=50 gate. Published99.61 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos) |
+| Pong | Frozen+4.54 vs−20.40; seeds+2.92/+11.92/−1.21,54/72 wins. Every seed improves. | Still seed-sensitive. Published20.45 and historical>=90% wins/mean>=15 remain unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [earlier paired world report](results/2026-10-06-cdp-centered-world.md) |
+| Freeway | Frozen30.26 vs0; seeds29.50/30.54/30.75. All72 rounds score27–32. | All three pass the original25-crossing gate, without action hints. Published33.40 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
+| Breakout | Frozen5.14 vs1.57; seeds4.00/3.50/7.92 after reviewed natural-cohort repair. Poor control; timeout retained. | Published381.81 and historical two-wall/864-point gate far away. Weak ball forecasts; fix the pixel diagnostic before architecture changes. | [Current results, repair and videos](results/2026-10-07-cdp-centered-five-game-budget.md); [world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
+| Qbert | Frozen993.75 vs191.32; seeds1057.29/892.71/1031.25. Only2/72 first pyramids. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain far away. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [historical Tiny evidence](experiments/README.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
 observations (45k train+5k validation/game). Freeway also used a.5-probability

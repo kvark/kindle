@@ -107,6 +107,13 @@ bookkeeping failure, not a GPU fault or a reason to retrain learners.
   cohorts complete. Then run the already-declared Breakout diagnosis below;
   no learning extension or changed quality target follows from this repair.
 
+**October7 outcome:** the corrected final scores7.9167 at209,504 actions, with
+the entire original207,288-action prefix exact. All346 tensors and full replay /
+video pass. Its service CPU quota changed host workers8->1; that strict audit
+failure and the scoped CPU-only acceptance remain disclosed. A further auditor
+schema fix preserves exact v4 receipts. [Final results and retained failures](../results/2026-10-07-cdp-centered-five-game-budget.md).
+No learner was retrained; no old record was replaced.
+
 ## Prepared follow-up: frozen Breakout diagnosis
 
 October6 review, **not launched**: the first two completed Breakout learners
@@ -163,3 +170,10 @@ matmul/attention-backward acceleration and checked dispatch/padding; Blade
 learning weakness was identified. The active allocation and its frozen probes
 retain their qualified runtime. Review refresh/qualification before the next
 learning change; do not modify neighboring user work or silently relabel runs.
+
+**October7 outcome:** [all six frozen probes and their limits](../results/2026-10-07-cdp-breakout-world.md)
+complete in9m40s after a12.29s smoke, with exact actor tensors and all seven
+guards passing. The weak pixel control needs a bounded normalization check on
+saved data before interpreting the weak ball forecasts as an architecture
+failure; that next2,048-update readout is declared in the result. No new actor
+training or game collection follows automatically.
