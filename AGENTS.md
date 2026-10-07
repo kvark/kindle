@@ -110,6 +110,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Audit each complete pair before the next learner; no larger queue/new loss
   or automatic extension. Root `runs/cdp-12m-breakout-20261007.3msA0ITD`.
   All five quality targets remain open.
+- **Deferred throughput candidate:** exploration repeats each state projection
+  over18 actions. Factoring only its first affine layer removes about63% of
+  ensemble dense MACs, not whole-update time. A10-case CPU check with saved
+  weights/states agrees numerically; no GPU implementation/speedup claim.
+  [Evidence and post-allocation review](docs/experiments/2026-10-07-cdp-capacity.md#deferred-compute-candidate-reuse-the-exploration-state-projection).
+  Keep the active capacity study/native unchanged; qualify after its review.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

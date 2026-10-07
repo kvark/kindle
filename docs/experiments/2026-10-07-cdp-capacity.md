@@ -113,3 +113,32 @@ automatically. At the finite end review score improvement and its additional
 cost before any extension; all five original quality targets remain open.
 
 Learning artifacts:`runs/cdp-12m-breakout-20261007.3msA0ITD`.
+
+## Deferred compute candidate: reuse the exploration state projection
+
+Read-only inspection during the allocation finds that each of four exploration
+heads repeats the same state projection for all 18 actions. Its first affine
+layer can compute `state @ W_state` once, broadcast it over actions, then add
+the selected `W_action` row and bias before the unchanged RMSNorm/SiLU. Keep
+the later layers, all-action centering, ensemble variance and selected-action
+bonus unchanged. The observed-action training loss need not change at all.
+
+For B8/T16/H15, dense ensemble arithmetic drops from 8.653G to 3.146G MACs for
+1M and 136.532G to 50.332G for 12M: about 63% of **ensemble dense arithmetic**,
+not 63% of whole-update time. Norm/activation, memory traffic and dispatch are
+excluded; compiler behavior and actual GPU savings remain unmeasured.
+
+A 1.11s CPU-only check uses all three completed 1M Breakout ensembles with 288
+saved posterior/prior states, plus 64 synthetic states with the 12M preflight
+weights. F64 original/factored equations agree; factored F32 bonuses differ
+from the F64 reference by at most 3.77e-8 absolute and 6.15e-6 case-relative L2. Original F32
+errors are retained too. [Compact evidence](../results/2026-10-07-action-affine-check.json),
+[full report](../../runs/cdp-action-affine-20261007.MxoGA64/result.json) and
+[reproduction script](../../runs/cdp-action-affine-20261007.MxoGA64/check.py).
+No actor updates, game actions, GPU jobs, production edits or active-study
+changes. This is not GPU qualification or bitwise trajectory equivalence.
+
+Review after the current capacity allocation: a minimal graph rewrite would
+need independent GPU output/bonus checks, a production numerical/learning
+check and one matched whole-update timing before adoption. Preserve parameter
+leaves, losses and stop-gradients; do not add this to the running queue.
