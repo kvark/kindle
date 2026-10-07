@@ -315,7 +315,7 @@ def test_legacy_v4_counts_completed_episodes_without_reinterpreting_evidence(fro
     path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
     result = audit_atari.read_run(path)['accounting']
     assert result['episode_budget_complete'] and result['actions'] == 12
-    assert result['evaluation_episode_kind'] == 'completed'
+    assert 'evaluation_episode_kind' not in result  # Retained replay receipts compare exact v4 schemas.
     assert result['natural_episodes'] == 4 and result['truncated_episodes'] == 1
 
 

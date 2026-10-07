@@ -110,7 +110,7 @@ def pair(root, game, method, seed, *, require_replay=False):
     frozen['checkpoint_audit'] = checkpoint_audit(after, h, UPDATES)
     frozen['unchanged_tensor_counts'] = assert_frozen_tensors(source, after)
     frozen['cohort'] = cohort(frozen['episodes'],
-                              natural_only=frozen['accounting']['evaluation_episode_kind'] == 'natural')
+                              natural_only=frozen['accounting'].get('evaluation_episode_kind') == 'natural')
     require(frozen['cohort']['complete'] == frozen['accounting']['budget_complete'], 'cohort status differs')
     frozen['guard'] = checked_guard
     if require_replay:

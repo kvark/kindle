@@ -290,7 +290,7 @@ def audit(path):
             overridden_actions=exploration.overridden_actions, exploration_ledger_verified=True)
             if exploration else {})
         evaluation_result = (dict(evaluation_episodes_per_stream=episode_target,
-            evaluation_episode_kind="natural" if natural_budget else "completed",
+            **(dict(evaluation_episode_kind="natural") if natural_budget else {}),
             episode_budget_complete=final["reason"] == "episode_budget_complete",
             action_cap_reached=actions == header["steps"]) if episode_target is not None else {})
         return dict(path=str(path), protocol=header["protocol"], actions=actions, updates=updates, num_envs=count,
