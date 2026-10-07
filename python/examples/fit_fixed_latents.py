@@ -13,7 +13,7 @@ import time
 import numpy as np
 
 from atari import sha256_file
-from fit_atari_probes import bytes32, checked_memory, mlp_probe
+from fit_atari_probes import bytes32, checked_memory, input_normalization, mlp_probe
 from kindle import _native
 from kindle._representation_probe import regression_metrics, target_names
 from kindle._reward_probe import roc_auc
@@ -60,11 +60,11 @@ def load_split(root, manifest, split, horizon):
             "seeds": np.asarray(seeds)}
 
 
-def normalization(x, y):
-    mean, scale = x.mean(0, dtype=np.float64), x.std(0, dtype=np.float64)
+def normalization(x, y, *, standardize_inputs=True):
+    mean, scale = input_normalization(x, standardize=standardize_inputs)
     target_mean = np.nanmean(y, 0, dtype=np.float64)
     target_scale = np.nanstd(y, 0, dtype=np.float64)
-    return dict(x_mean=mean, x_scale=np.where(scale > 1e-6, scale, 1.), y_mean=target_mean,
+    return dict(x_mean=mean, x_scale=scale, y_mean=target_mean,
                 y_scale=np.where(target_scale > 1e-6, target_scale, 1.))
 
 

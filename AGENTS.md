@@ -86,13 +86,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   values into validation/test magnitudes up to4,021. F64 reproduces saved GPU
   predictions at9e-7 relative L2, implicating diagnostic conditioning, not an
   observed GPU prediction fault or proof of lost image information.
-  **Next:** one shared native-GPU pixel readout on the saved corpus, fixed RGB
-  range instead of variance whitening, same seed/2,048 updates/validation-only
-  selection,120s bound, zero new game actions/actor updates. Keep all failed
-  controls and report this head even if weak; no sweep or automatic learner
-  extension. Artifacts `runs/cdp-breakout-world-20261007.A9GKTNfK`.
-  Native6d38eea2/c6376542 stays unchanged. Resolve the control before capacity,
-  loss or representation changes; all five quality targets remain open.
+  The declared fixed-range follow-up finishes in5.01s:2,048 readout updates,
+  selected1,792 by validation, one passing guard, zero new actions/actor updates.
+  Paddle test R².979; ball near zero even in training, so this head is not an
+  information ceiling. An independent fixed color centroid locates483/483
+  eligible held-out open-playfield balls at.628/.542 source-pixel x/y RMSE.
+  RGB64 retains those balls; no full-frame guarantee or actor-side detector/RAM.
+  Keep original failed heads and source snapshots; no readout sweep.
+  [Follow-up data](docs/results/2026-10-07-breakout-pixel-control.json), artifacts
+  `runs/cdp-breakout-pixel-range-20261007.kQHipWpq`.
+  **Next:** [bounded existing12M capacity preflight](docs/experiments/2026-10-07-cdp-capacity.md),
+  1,024 training/195 updates then reviewed1,024 frozen actions,300s/process.
+  Same centered loss, rates, exploration and N8/B8/T16/H15/R32; only model preset
+  changes. Current1M has4 initial CNN channels;12M has16. This changes encoder,
+  recurrent and policy capacity together, not an isolated encoder hypothesis.
+  Native6d38eea2/c6376542 stays unchanged. Review cost/finite state before
+  declaring three fresh learning seeds; no automatic large queue or new loss.
+  All five quality targets remain open.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

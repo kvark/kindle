@@ -1,7 +1,8 @@
 """Frozen RGB/CDP state and causal forecast probes; run under gpu_host_guard.py.
 
-Random actions and RAM labels are diagnostics, never policy training. Four native
-GPU readouts use training-only normalization and validation-only selection.
+Random actions and RAM labels are diagnostics, never policy training. Native GPU
+readouts use validation-only selection; pixels retain their bounded native range,
+while other inputs and all targets use training-only normalization.
 """
 
 import argparse
@@ -257,9 +258,11 @@ def fit_readouts(root, result, save, *, steps):
     for stage, horizon in stages:
         started = time.monotonic()
         train, val, test = [load_split(root, result['files'], split, stage, horizon) for split in SPLITS]
-        norm = normalization(train['x'], train['labels'])
+        standardize_inputs = stage != 'pixels'
+        norm = normalization(train['x'], train['labels'], standardize_inputs=standardize_inputs)
         fitted, info = mlp_probe(train['x'], train['labels'], val['x'], val['labels'], test['x'], HEAD_SEED,
-                                 steps=steps, model=model, validation_interval=128)
+                                 steps=steps, model=model, validation_interval=128,
+                                 standardize_inputs=standardize_inputs)
         parameters = model.parameters()
         training = predict(model, train['x'], norm)
         readouts = dict(fitted=fitted, training_mean=np.broadcast_to(norm['y_mean'], fitted.shape))

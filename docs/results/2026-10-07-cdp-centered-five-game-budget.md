@@ -123,10 +123,12 @@ Reconciliation root:`runs/cdp-natural-cohort-20261007.wa2cc3ZS`.
 ## Next decision
 
 The [frozen Breakout diagnosis](2026-10-07-cdp-breakout-world.md) now completes
-across all three initial/final pairs. Ball forecasts are weak, but its pixel
-control is ill-conditioned. Next, one shared GPU readout with fixed RGB scaling
-on saved pixels, no new actions or actor updates, before a capacity/loss decision
-or more training. Keep the other four quality targets open.
+across all three initial/final pairs. Its fixed-range pixel follow-up removes
+the outlier failure; an independent open-playfield check finds the ball in all
+483 eligible held-out RGB64 frames. Learned ball state/forecasts remain weak.
+Next, [bound the cost and check the existing12M preset](../experiments/2026-10-07-cdp-capacity.md)
+before declaring a three-seed capacity comparison. Keep all five quality targets
+open; no automatic budget extension.
 
 This is a longer centered-package study, **not** a fresh five-game raw/centered/
 RGB ablation. The controlled centering evidence remains

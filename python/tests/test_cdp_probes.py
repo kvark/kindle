@@ -222,6 +222,12 @@ def test_readout_pipeline_uses_fixed_split_and_frozen_controls(tmp_path, monkeyp
         assert row['origin_kind'] == ('arrival index' if not row['horizon'] and game != 'Seaquest'
                                       else 'action index')
         assert row['fit']['selection'] == 'validation normalized MSE; no refit or test selection'
+        assert row['fit']['input_normalization'] == ('identity' if row['stage'] == 'pixels'
+                                                     else 'training_mean_std')
+        with np.load(tmp_path / row['head_file']) as data:
+            if row['stage'] == 'pixels':
+                np.testing.assert_array_equal(data['x_mean'], 0.)
+                np.testing.assert_array_equal(data['x_scale'], 1.)
         with np.load(tmp_path / row['evidence_file']) as data:
             assert set(data['seeds']) == set(probe.SPLITS['test'])
         if row['horizon']:

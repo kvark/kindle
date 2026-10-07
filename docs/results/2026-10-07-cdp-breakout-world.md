@@ -1,4 +1,4 @@
-# Frozen Breakout diagnosis: weak ball forecasts, an ill-conditioned pixel control
+# Frozen Breakout diagnosis: visible ball, weak learned state and forecasts
 
 The six declared initial/final probes complete in9m40s. All seven guards
 including smoke, identical action/frame/pixel traces, exact346 tensors/model
@@ -53,7 +53,7 @@ An independent F64 forward pass reproduces the saved GPU predictions to
 This implicates diagnostic conditioning, not an observed GPU prediction fault.
 No weights, pixels, targets, normalization or original evidence were changed.
 
-**Next bounded check:** fit one shared pixel head on the already saved corpus,
+**Declared bounded check (completed below):** fit one shared pixel head on the already saved corpus,
 using its fixed native RGB range instead of per-pixel whitening. Keep the same
 head seed20261003, hidden128/batch64,2,048 updates, Adam rate.001, regularization,
 training-label normalization and validation-only checkpoint selection every128
@@ -62,6 +62,54 @@ identical inputs, so do not repeat the same fit six times. Retain the failed
 original control and report the new head even if it remains weak; no parameter
 sweep, test selection or actor-training extension. Native6d38eea2 remains fixed,
 one host-guarded GPU job limited to120s with the usual device/headroom checks.
+
+### Fixed-range follow-up: complete October7
+
+The declared head finishes in**5.01s**, selecting update1,792 by validation from
+all2,048 updates. One guard passes without new warnings; no actor is constructed,
+no actor updates and no new game actions. F64 reproduces saved predictions on
+all three splits within7.4e-7 relative L2. All six source corpora/labels and the
+failed original heads remain unchanged; pre-fix Python sources are retained.
+[Compact follow-up evidence](2026-10-07-breakout-pixel-control.json).
+
+| Fixed-range readout | Ball x R² | Ball y R² | Paddle x R² |
+| --- | ---: | ---: | ---: |
+| Training | .0008 | .0070 | .9792 |
+| Validation | .0006 | .0097 | .9781 |
+| Test | −.0005 | .0096 | .9794 |
+
+The outlier failure disappears and paddle decoding generalizes. Ball decoding
+does not even fit the training data; this small fully connected pixel head is
+not an information ceiling. Do not tune it further or use it to blame resizing.
+
+A separate **post-hoc, read-only visibility check** uses a fixed red-chroma
+centroid in the open playfield (source x8–152/y96–180), excluding bricks and
+paddle. RAM defines only the reporting subset/errors, never the detection.
+It finds all483 eligible held-out balls with x/y RMSE**.628/.542 source pixels**
+and R²**.9997/.9993**; training484/484 and validation331/331 also pass this
+visibility check. Thus the actual saved GPU RGB64 input retains the ball in
+these unobstructed frames and the diagnostic coordinates align. This is not a
+full-frame/occlusion guarantee, a learned policy, or an actor-side game hint.
+No actor code receives this detector. All masks/predictions remain in
+`runs/cdp-breakout-pixel-range-20261007.kQHipWpq/visibility.npz`.
+
+## Next decision: test existing capacity, not another loss
+
+Keep centered CDP and its rewards. The current Size1M preset has only4 initial
+CNN channels,256 embedding dimensions,512 deterministic units and32x4
+categorical state. Small-object information reaches the pixels, but trained
+CNN/state readouts are weak. This justifies a **capacity hypothesis**, not a
+claim that capacity is proven to be the cause. Intrinsic reward is only a small
+part of late imagined reward in Breakout1009 and Qbert3019, but substantial in
+Breakout2017; a universal exploration-dominance explanation is unsupported.
+
+First run a bounded construction/train/frozen-restore smoke of the **existing
+Size12M preset**, keeping the loss, rates, replay ratio, sequence length and
+exploration unchanged. It raises encoder and recurrent/policy capacity together;
+it cannot isolate which module matters. Use measured cost/headroom to declare
+three fresh Breakout learning seeds at a fixed interaction budget before launch.
+No new encoder knobs, pixel decoder, privileged loss or automatic long queue.
+See the [preflight declaration](../experiments/2026-10-07-cdp-capacity.md).
 
 ## Accounting and limits
 
@@ -77,5 +125,6 @@ These are development trajectories, not a competence evaluation or a new
 three-seed learning comparison. Readout failure does not prove absent
 information; readable coordinates do not prove sufficient control state.
 Raw cosine diagnostics are not the centered minibatch training objective.
-Resolve the pixel control before choosing capacity, loss or representation
-changes. All five original quality targets remain open.
+The corrected pixel control and independent visibility check resolve the input
+question only on their stated subsets. All five original quality targets remain
+open; no broader training allocation is completed by these diagnostics.

@@ -157,10 +157,14 @@ disclosed. All720 selected natural episodes and46 GPU guards pass.
 All six models remain exactly frozen. Ball state and h15 forecasts are weak,
 but the pixel control is ill-conditioned: per-pixel whitening amplifies rare
 changes to4,021 despite bounded RGB input. An F64 replay agrees with its saved
-GPU predictions. Next, one shared2,048-update GPU readout on saved pixels with
-fixed RGB scaling, no new actions or actor updates. Retain the original failed
-control; resolve it before a capacity/loss/representation decision or more
-training. No automatic extension.
+GPU predictions. The fixed-range2,048-update follow-up completes in5.01s with
+no new actions/actor updates: paddle R².979, ball still near zero even in
+training. This head is not an information ceiling. A fixed diagnostic color
+centroid finds all483 eligible held-out open-playfield balls within.63/.55
+source-pixel x/y RMSE; the GPU input retains those balls. No detector or RAM
+enters the actor. Next, [a bounded existing12M capacity preflight](experiments/2026-10-07-cdp-capacity.md)
+before declaring three fresh learning seeds. Keep losses/exploration fixed;
+no encoder redesign or automatic training extension.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -255,7 +259,7 @@ Links into `runs/` require this workspace.
 | Boxing | Frozen77.69 vs1.00 initial; seeds74.46/71.63/87.00,72/72 wins. | All three pass the historical>=90% wins/mean>=50 gate. Published99.61 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos) |
 | Pong | Frozen+4.54 vs−20.40; seeds+2.92/+11.92/−1.21,54/72 wins. Every seed improves. | Still seed-sensitive. Published20.45 and historical>=90% wins/mean>=15 remain unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [earlier paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway | Frozen30.26 vs0; seeds29.50/30.54/30.75. All72 rounds score27–32. | All three pass the original25-crossing gate, without action hints. Published33.40 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
-| Breakout | Frozen5.14 vs1.57; seeds4.00/3.50/7.92 after reviewed natural-cohort repair. Poor control; timeout retained. | Published381.81 and historical two-wall/864-point gate far away. Weak ball forecasts; fix the pixel diagnostic before architecture changes. | [Current results, repair and videos](results/2026-10-07-cdp-centered-five-game-budget.md); [world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
+| Breakout | Frozen5.14 vs1.57; seeds4.00/3.50/7.92 after reviewed natural-cohort repair. Poor control; timeout retained. | Published381.81 and historical two-wall/864-point gate far away. Ball survives RGB64 on checked open-playfield frames; learned state/forecasts remain weak. Existing12M capacity preflight next. | [Current results, repair and videos](results/2026-10-07-cdp-centered-five-game-budget.md); [world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
 | Qbert | Frozen993.75 vs191.32; seeds1057.29/892.71/1031.25. Only2/72 first pyramids. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain far away. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [historical Tiny evidence](experiments/README.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video

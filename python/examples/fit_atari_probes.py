@@ -35,20 +35,26 @@ def feature_identity(*arrays):
     return tuple((x.shape, x.dtype.str, hashlib.sha256(x.tobytes()).digest()) for x in arrays)
 
 
-def standardized_features(training, *others):
+def input_normalization(training, *, standardize=True):
+    if not standardize:
+        return np.zeros(training.shape[1]), np.ones(training.shape[1])
     # Float32 axis-0 accumulation can invent >1e-6 variance in a constant
     # column. Compute training statistics in F64, then upload F32 features.
     mean, scale = training.mean(0, dtype=np.float64), training.std(0, dtype=np.float64)
-    scale = np.where(scale > 1e-6, scale, 1.0)
+    return mean, np.where(scale > 1e-6, scale, 1.0)
+
+
+def standardized_features(training, *others, standardize=True):
+    mean, scale = input_normalization(training, standardize=standardize)
     return [np.asarray((x-mean)/scale, dtype=np.float32) for x in (training, *others)]
 
 
 def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, steps=512, model=None,
-              validation_interval=32):
+              validation_interval=32, standardize_inputs=True):
     if steps <= 0 or validation_interval <= 0:
         raise ValueError("positive fit and validation intervals required")
     batch, hidden, interval = 64, 128, validation_interval
-    xs = standardized_features(train_x, validation_x, test_x)
+    xs = standardized_features(train_x, validation_x, test_x, standardize=standardize_inputs)
     mask = np.isfinite(train_y)
     y_mean, y_scale = np.nanmean(train_y, 0, dtype=np.float64), np.nanstd(train_y, 0, dtype=np.float64)
     y_scale = np.where(y_scale > 1e-6, y_scale, 1.0)
@@ -93,6 +99,7 @@ def mlp_probe(train_x, train_y, validation_x, validation_y, test_x, seed, *, ste
     prediction = predict(xs[2])
     memory.append(checked_memory(model))
     return prediction, dict(seed=seed, selected_step=selected_step, curve=curve,
+                            input_normalization="training_mean_std" if standardize_inputs else "identity",
                             batch=batch, hidden=hidden, steps=steps, validation_interval=interval, learning_rate=1e-3,
                             weight_penalty=1e-4/len(train_x), optimizer="Adam .9/.999/1e-8",
                             memory=memory, selection="validation normalized MSE; no refit or test selection")

@@ -200,6 +200,11 @@ def test_fixed_normalization_and_error_metrics_use_all_dimensions():
     np.testing.assert_array_equal(norm["x_mean"], [2, 5])
     np.testing.assert_array_equal(norm["x_scale"], [1, 1])
     np.testing.assert_array_equal(norm["y_mean"], [4, 7])
+    fixed = fit.normalization(x, y, standardize_inputs=False)
+    np.testing.assert_array_equal(fixed["x_mean"], [0, 0])
+    np.testing.assert_array_equal(fixed["x_scale"], [1, 1])
+    for key in ("y_mean", "y_scale"):
+        np.testing.assert_array_equal(fixed[key], norm[key])
     expected = np.zeros((4, 3136), np.float32)
     prediction = expected.copy()
     prediction[:, -1] = 2

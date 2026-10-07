@@ -181,7 +181,8 @@ def test_regression_metrics_keep_missing_and_constant_targets_explicit():
 
 
 @pytest.mark.parametrize("interval", [32, 128])
-def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch, interval):
+@pytest.mark.parametrize("standardize", [False, True])
+def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch, interval, standardize):
     class Model:
         gpu_device = dict(device_name="NVIDIA GeForce RTX 5080", driver_info="580.178.04")
         gpu_memory_budget = dict(budget_bytes=4 << 30, usage_bytes=0)
@@ -189,6 +190,7 @@ def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch, interval
         learns = 0
 
         def learn(self, x, y, mask, **kwargs):
+            assert set(np.frombuffer(x, dtype="<f4")) <= ({-1, 1} if standardize else {0, 1})
             assert set(np.frombuffer(y, dtype="<f4")) <= {-1, 1}
             self.step += 1
             self.learns += 1
@@ -208,8 +210,9 @@ def test_mlp_checkpoint_selection_uses_validation_not_test(monkeypatch, interval
     prediction, info = fit_atari_probes.mlp_probe(
         np.array([[0.0], [1.0]]), np.array([[-1.0], [1.0]]),
         np.array([[2.0]]), np.array([[float(interval)]]), np.array([[100.0]]), 92,
-        steps=2 * interval, validation_interval=interval)
+        steps=2 * interval, validation_interval=interval, standardize_inputs=standardize)
     assert info["selected_step"] == interval and model.learns == 2 * interval
+    assert info["input_normalization"] == ("training_mean_std" if standardize else "identity")
     np.testing.assert_array_equal(prediction, [[interval]])
 
 
@@ -253,6 +256,18 @@ def test_mlp_constant_training_columns_do_not_gain_false_variance():
     np.testing.assert_allclose(train[:, 0], 2*training[:, 0]-1)
     np.testing.assert_allclose(valid, [[1., -.3, .3, 0.]], atol=1e-7)
     assert train.dtype == valid.dtype == np.float32
+
+
+def test_fixed_pixel_range_does_not_amplify_rare_training_variation():
+    training = np.full((768, 2), -.5, dtype=np.float32)
+    training[0, 0] += 1 / 255
+    held_out = np.array([[.1, .2]], dtype=np.float32)
+    _, whitened = fit_atari_probes.standardized_features(training, held_out)
+    assert whitened[0, 0] > 4000
+    actual = fit_atari_probes.standardized_features(training, held_out, standardize=False)
+    for original, normalized in zip((training, held_out), actual):
+        np.testing.assert_array_equal(normalized, original)
+        assert normalized.dtype == np.float32
 
 
 def test_secondary_visible_metrics_require_current_and_previous_sprite_for_velocity():
