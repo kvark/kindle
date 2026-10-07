@@ -112,14 +112,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   remain disclosed.12M is the next Atari quality candidate,1M the fast control;
   other games and12M prior forecasts remain untested. No automatic extension.
   All five quality targets and the budget question remain open.
-- **Next throughput candidate:** exploration repeats each state projection
-  over18 actions. Factoring only its first affine layer removes about63% of
-  ensemble dense MACs, not whole-update time. A10-case CPU check with saved
-  weights/states agrees numerically; no GPU implementation/speedup claim.
-  [Evidence and post-allocation review](docs/experiments/2026-10-07-cdp-capacity.md#deferred-compute-candidate-reuse-the-exploration-state-projection).
-  Capacity review is complete. Qualify before a larger learning allocation;
-  both timing arms must use the same backend.12M updates average110.03ms,
-  55.4% imagination/29.9% world training; utilization remains unmeasured.
+- **Projection-reuse throughput trial rejected:** [two numerical failures](docs/results/2026-10-07-cdp-exploration-throughput.md).
+  Tiny/1M B3 F64 checks pass;12M head0 exceeds the pointwise gate with identical
+  expanded/factored outputs. A reviewed unstarted1M B128 check then differs by
+  4.909e-4 relative L2 versus2e-5. No tolerance relaxation, timing, game actions
+  or actor updates; candidate source/binaries/failures retained, original graph
+  restored. Precision-path selection is a hypothesis, not proven causality.
+  No optimization sweep. [Latest-backend control refresh](docs/results/2026-10-07-meganeura-control-refresh.md)
+  qualifies f104f35 on unchanged graphs:20 guards/2,824 upstream comparisons,
+  three train/frozen smokes,13 retained allocation warnings. Native83be73bf.
+  Paired12M timing107.85->108.00ms;272 metric reports/first outputs/final346
+  tensors match exactly in this fixture. No speedup or universal parity claim.
+  These scoped checks do not erase the failed stronger F64 check.
+  12M updates previously averaged110.03ms,55.4% imagination/29.9% world training;
+  utilization remains unmeasured.
+- **Next reviewed allocation:** [remaining four12M capacity cohorts](docs/experiments/2026-10-07-cdp-12m-four-game-capacity.md),
+  Pong, Qbert, Boxing, Freeway; three fresh500k-action seeds each, same centered
+  CDP/action-effects recipe.6M actions/1,499,268 updates total, expected47–48h,
+  72h service/5h learner bounds. Final and actual-initial frozen natural cohorts,
+  exact tensors/full replay/videos follow each learner before the next.
+  Keep completed12M Breakout and all retained1M controls with their original
+  backend pins; no exact same-binary capacity ablation claim. No automatic
+  budget extension; all five quality targets and the budget question stay open.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -243,8 +257,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified CDP/RGB backend: Meganeura main `c6376542`, Blade `e349cddf`,
-  native `6d38eea2`; the grouped imagination trial qualifies the new build.
+- Current qualified CDP/RGB backend: Meganeura main `f104f354`, Blade `e349cddf`,
+  native `83be73bf`; the [October7 control refresh](docs/results/2026-10-07-meganeura-control-refresh.md)
+  qualifies unchanged graphs. Previous `c6376542`/`6d38eea2` remains the historical
+  grouped-imagination and completed capacity-study runtime.
   The [October6 refresh](docs/results/2026-10-06-meganeura-refresh.md) qualifies
   CDP/exploration, RGB and frozen Tiny on its historical `b684ffd9`. The historical
   [October4 refresh](docs/results/2026-10-04-meganeura-main-qualification.md)

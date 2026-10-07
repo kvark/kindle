@@ -175,11 +175,22 @@ extension remains. This tests whole-model capacity, not isolated CNN capacity;
 12M forecast quality and the other four games in this recipe remain untested.
 
 Use12M as the next quality candidate and1M as a fast engineering control.
-Before a larger learning allocation, qualify the
-[exploration projection reuse candidate](experiments/2026-10-07-cdp-capacity.md#deferred-compute-candidate-reuse-the-exploration-state-projection)
-and review the latest backend with the same runtime in both timing arms. No
-new encoder/loss/exploration change or automatic five-game queue. All five
-quality targets and the budget question remain open.
+The [projection-reuse trial](results/2026-10-07-cdp-exploration-throughput.md)
+fails fixed numerical gates before timing and is not adopted. Original graphs
+are restored; no tolerance relaxation or optimization sweep. The
+[latest-backend control refresh](results/2026-10-07-meganeura-control-refresh.md)
+passes20 guards/2,824 upstream comparisons and three train/frozen smokes.
+Paired12M updates107.85->108.00ms, with exact first outputs,272 metric reports
+and346 final tensors in the fixture. Adopt upstreamf104/native83be without a
+speedup claim; this does not erase the stronger full-head failure.
+
+Next is the [remaining four12M capacity cohorts](experiments/2026-10-07-cdp-12m-four-game-capacity.md):
+Pong, Qbert, Boxing and Freeway, three fresh500k seeds each. Same learning
+recipe;6M new actions/1,499,268 updates, expected47–48h. Final/actual-initial
+natural frozen cohorts and full videos follow each learner. Retain completed
+Breakout and1M controls with their original backends; no exact same-binary
+ablation or automatic budget extension. All five quality targets and the
+budget question remain open.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
