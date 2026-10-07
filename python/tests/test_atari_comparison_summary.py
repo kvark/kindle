@@ -70,6 +70,22 @@ def test_capped_cohort_never_fabricates_a_complete_score():
     assert result['per_stream_counts'] == [1, 0] and len(result['selected']) == 1
 
 
+def test_natural_cohort_waits_for_natural_episodes_and_retains_every_cutoff():
+    rows = [episode(0, 1), episode(0, 300, truncated=True), episode(0, 3),
+            episode(0, 100), episode(1, -1), episode(1, 500, truncated=True)]
+    partial = summary.cohort(rows, streams=2, target=2, natural_only=True)
+    assert not partial['complete'] and partial['score'] is None
+    assert partial['per_stream_counts'] == [3, 1]
+    assert partial['excess'] == [rows[1], rows[3], rows[5]]
+    rows.append(episode(1, 5))
+    result = summary.cohort(rows, streams=2, target=2, natural_only=True)
+    assert result['complete'] and result['score'] == 2
+    assert result['natural']['natural_episodes'] == 4
+    assert result['truncated']['truncated_episodes'] == 0
+    assert result['excess'] == partial['excess']
+    assert len(result['selected']) + len(result['excess']) == len(rows)
+
+
 def pair(method, seed, score, *, complete=True):
     return dict(name=f'freeway-{method}-{seed}', game='Freeway', method=method,
                 training=dict(seed=seed, curve=[dict(actions=2000, seconds=1, score=score),

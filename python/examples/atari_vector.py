@@ -87,7 +87,7 @@ def main():
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
     parser.add_argument("--episodes-per-env", type=int,
-                        help="frozen restore only: stop when every stream completes this many episodes; steps is a hard action cap")
+                        help="frozen restore only: stop after this many natural episodes per stream; timeouts do not count, steps is a hard cap")
     parser.add_argument("--min-gpu-budget-headroom-mib", type=int,
                         help="check native budget after each GPU stage; write OUTPUT.gpu-memory.jsonl")
     parser.add_argument("--exploration-probability", type=float, default=0.0)
@@ -284,6 +284,7 @@ def main():
         episode_returns = [0.0] * args.num_envs
         episode_lengths = [0] * args.num_envs
         episode_counts = [0] * args.num_envs
+        natural_episode_counts = [0] * args.num_envs
         total_rewards = [0.0] * args.num_envs
         completed = []
         timing = dict(act=0.0, environment=0.0, observe=0.0, learn=0.0, reset=0.0, checkpoint=0.0)
@@ -316,6 +317,7 @@ def main():
                         aggregate_simulated_wall_ratio=sum(frames) / 60 / elapsed,
                         per_stream_simulated_wall_ratio=[n / 60 / elapsed for n in frames],
                         total_rewards=total_rewards, episode_counts=episode_counts,
+                        **(dict(natural_episode_counts=natural_episode_counts) if args.episodes_per_env else {}),
                         partial_returns=episode_returns, partial_lengths=episode_lengths,
                         replay_len=agent.replay_len, training_debt=agent.training_debt,
                         stage_seconds=timing, **exploration_counts)
@@ -367,6 +369,7 @@ def main():
                         emit(result)
                         completed.append(result)
                         episode_counts[stream] += 1
+                        natural_episode_counts[stream] += bool(terminated[stream] and not truncated[stream])
                         episode_returns[stream] = 0.0
                         episode_lengths[stream] = 0
                         resets.append(stream)
@@ -388,7 +391,7 @@ def main():
                     print(f"{run_actions}/{args.steps} actions; {event['actions_per_second']:.2f} actions/s; "
                           f"{agent.learner_step - starting_updates} updates; debt={agent.training_debt:.3f}", flush=True)
                     last_report = run_actions
-                if args.episodes_per_env and min(episode_counts) >= args.episodes_per_env:
+                if args.episodes_per_env and min(natural_episode_counts) >= args.episodes_per_env:
                     break
             if args.checkpoint and run_actions != last_checkpoint:
                 save()
@@ -396,7 +399,7 @@ def main():
             check_memory("finished", run_actions)
             reason = "budget_complete"
             if args.episodes_per_env:
-                reason = "episode_budget_complete" if min(episode_counts) >= args.episodes_per_env else "action_cap_reached"
+                reason = "episode_budget_complete" if min(natural_episode_counts) >= args.episodes_per_env else "action_cap_reached"
             event.update(reason="interrupted" if stop else reason,
                          **episode_summary(completed),
                          learner_updates=agent.learner_step - starting_updates)

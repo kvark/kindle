@@ -23,6 +23,7 @@ def frozen_run(monkeypatch, tmp_path, request):
     created = []
     interrupt = False
     export_checkpoint = False
+    all_timeouts = terminal_timeout = False
     exports = []
 
     class Environment:
@@ -44,7 +45,9 @@ def frozen_run(monkeypatch, tmp_path, request):
             self.length += 1
             self.executed_action_frames += 4
             ended = self.length == 2 + self.stream
-            return None, -1.0 - self.stream, ended and self.stream == 0, ended and self.stream == 1, {}
+            truncated = ended and self.stream == 1 and (all_timeouts or self.emulator_resets == 1)
+            terminated = ended and (not truncated or terminal_timeout)
+            return None, -1.0 - self.stream, terminated, truncated, {}
 
         def close(self):
             self.closed = True
@@ -108,10 +111,12 @@ def frozen_run(monkeypatch, tmp_path, request):
     monkeypatch.setattr(atari_vector, 'checkpoint_identity', lambda path: {'fixture': True})
     monkeypatch.setattr(kindle, 'VectorAgent', Agent)
 
-    def run(target=2, cap=100, interrupted=False, memory=False, export=False):
-        nonlocal interrupt, export_checkpoint
+    def run(target=2, cap=100, interrupted=False, memory=False, export=False,
+            timeouts_forever=False, both_flags=False):
+        nonlocal interrupt, export_checkpoint, all_timeouts, terminal_timeout
         interrupt = interrupted
         export_checkpoint = export
+        all_timeouts, terminal_timeout = timeouts_forever, both_flags
         output = tmp_path / f'vector-{target}-{cap}.jsonl'
         args = ['atari_vector.py', '--output', str(output), '--num-envs', '2',
                 '--steps', str(cap), '--evaluate', '--restore', 'fixture', '--report-every', '2',
@@ -150,26 +155,29 @@ def test_episode_budget_retains_native_memory_coverage(frozen_run, target, cap, 
     assert sum(sample['stage'] == 'reset' for sample in samples) == sum(row['event'] == 'reset' for row in rows)
 
 
-@pytest.mark.parametrize('target, cap, expected_actions, expected_counts, reason', [
-    (1, 100, 6, [1, 1], 'episode_budget_complete'),
-    (2, 100, 12, [3, 2], 'episode_budget_complete'),
-    (2, 12, 12, [3, 2], 'episode_budget_complete'),
-    (2, 10, 10, [2, 1], 'action_cap_reached'),
-    (None, 14, 14, [3, 2], 'budget_complete'),
+@pytest.mark.parametrize('target, cap, expected_actions, expected_counts, natural_counts, reason', [
+    (1, 100, 12, [3, 2], [3, 1], 'episode_budget_complete'),
+    (2, 100, 18, [4, 3], [4, 2], 'episode_budget_complete'),
+    (2, 18, 18, [4, 3], [4, 2], 'episode_budget_complete'),
+    (2, 12, 12, [3, 2], [3, 1], 'action_cap_reached'),
+    (2, 10, 10, [2, 1], [2, 0], 'action_cap_reached'),
+    (None, 14, 14, [3, 2], [3, 1], 'budget_complete'),
 ])
-def test_runner_stops_at_first_settled_target_or_cap(frozen_run, target, cap, expected_actions, expected_counts, reason):
+def test_runner_stops_at_first_settled_target_or_cap(frozen_run, target, cap, expected_actions, expected_counts, natural_counts, reason):
     path, rows = frozen_run(target, cap)
     result = audit(path)
     assert rows[0]['protocol'] == (EPISODE_EVALUATION_PROTOCOL if target else VECTOR_PROTOCOL)
     assert rows[-1]['reason'] == reason and rows[-1]['episode_counts'] == expected_counts
     assert result['actions'] == expected_actions and result['updates'] == 0
     assert result['completed_episodes'] == sum(expected_counts)
-    assert result['natural_episodes'] == expected_counts[0]
-    assert result['truncated_episodes'] == expected_counts[1]
+    assert result['natural_episodes'] == sum(natural_counts)
+    assert result['truncated_episodes'] == 1
     assert result['positive_return_natural_episodes'] == 0
     assert result['budget_complete'] == (reason != 'action_cap_reached')
     assert len([row for row in rows if row['event'] == 'episode']) == sum(expected_counts)
     if target:
+        assert rows[-1]['natural_episode_counts'] == natural_counts
+        assert result['evaluation_episode_kind'] == 'natural'
         assert result['episode_budget_complete'] == result['budget_complete']
         assert result['action_cap_reached'] == (expected_actions == cap)
         assert result['evaluation_episodes_per_stream'] == target
@@ -263,6 +271,7 @@ def test_cli_rejects_ambiguous_episode_budget_before_gpu(monkeypatch, tmp_path, 
     lambda rows: rows[-1].update(reason='budget_complete'),
     lambda rows: rows[-1].update(reason='action_cap_reached'),
     lambda rows: rows[-1].update(episode_counts=[2, 2]),
+    lambda rows: rows[-1].update(natural_episode_counts=[4, 3]),
     lambda rows: rows[0].update(steps=10),
     lambda rows: rows[0].update(steps=True),
     lambda rows: rows.insert(-1, dict(event='checkpoint')),
@@ -281,6 +290,33 @@ def test_action_cap_without_all_stream_targets_cannot_claim_completion(frozen_ru
     path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
     with pytest.raises(ValueError, match='wrong episode-budget stop reason'):
         audit(path)
+
+
+@pytest.mark.parametrize('both_flags', [False, True])
+def test_timeouts_never_satisfy_natural_quota_or_hide_reset_history(frozen_run, both_flags):
+    path, rows = frozen_run(target=1, cap=12, timeouts_forever=True, both_flags=both_flags)
+    result = audit_atari.read_run(path, allow_capped_evaluation=True)
+    end = result['end']
+    assert end['reason'] == 'action_cap_reached' and not result['accounting']['budget_complete']
+    assert end['episode_counts'] == [3, 2] and end['natural_episode_counts'] == [3, 0]
+    assert end['emulator_resets'] == [4, 3]
+    assert result['accounting']['truncated_episodes'] == 2
+    rows[-1]['reason'] = 'episode_budget_complete'
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    with pytest.raises(ValueError, match='wrong episode-budget stop reason'):
+        audit(path)
+
+
+def test_legacy_v4_counts_completed_episodes_without_reinterpreting_evidence(frozen_run):
+    path, rows = frozen_run(target=1)
+    rows[0].update(protocol='kindle-vector-v4', evaluation_episodes_per_stream=2)
+    for row in rows:
+        row.pop('natural_episode_counts', None)
+    path.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+    result = audit_atari.read_run(path)['accounting']
+    assert result['episode_budget_complete'] and result['actions'] == 12
+    assert result['evaluation_episode_kind'] == 'completed'
+    assert result['natural_episodes'] == 4 and result['truncated_episodes'] == 1
 
 
 def test_final_pair_support_does_not_rewrite_existing_campaigns(tmp_path):

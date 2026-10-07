@@ -72,6 +72,41 @@ Keep all five and their original quality targets in scope.
 
 Artifacts:`runs/cdp-centered-five-20261006.ODmbym7M`.
 
+## October7 review: repair natural-episode accounting
+
+The independent audit failed at01:23 UTC on Breakout3019's frozen final:
+the selected24 completed episodes contain23 natural episodes and one timeout
+(stream6, episode2, score8,25,000 actions/100,000 frames). The runner and
+controller counted this cutoff toward the declared natural quota. Preserve
+their original8.0833 score and5.1944 three-seed summary as **invalid complete
+natural-cohort results**, not accepted campaign evidence. Training is valid;
+the other13 independently reviewed pairs have complete natural cohorts.
+
+Finish already-started Qbert3019 unchanged, then review its pair before changing
+the active sources. The final-report watcher is stopped. This is an evaluation
+bookkeeping failure, not a GPU fault or a reason to retrain learners.
+
+- New evaluations use vector protocol v5: separate natural episode counts from
+  total boundaries/reset indices; timeouts never satisfy the quota. Audit both
+  ledgers and retain every cutoff, excess episode and unfinished tail. Historical
+  v4 logs keep their original completed-episode semantics.
+- Rerun only Breakout3019's frozen final with the **same checkpoint, native,
+  sampled policy, eight streams, seed4,000,003,019,600k-action and30min caps**.
+  Compare its original207,288-action prefix exactly: actions, rewards, boundary
+  flags, episode/reset histories and executed-frame counters. Timing and the
+  new natural-count ledger may differ. A divergence or another capped cohort
+  stops acceptance for review, not an automatic retry/seed substitution.
+- Select the first3 natural episodes per stream, not the best or first3
+  completed episodes. Keep the valid actual-initial evaluation. Recheck zero
+  updates, all346 saved tensors, full replay and whole stream-zero video.
+  Retain the original263 completed episodes (262 natural/one cutoff), old
+  video, failed audit and incorrect summary; explicitly supersede only the
+  affected accepted score. Account for the replayed prefix as extra evaluation
+  compute, not uninterrupted checkpoint resume or new learning experience.
+- Final campaign reporting must reconcile this repair before claiming all
+  cohorts complete. Then run the already-declared Breakout diagnosis below;
+  no learning extension or changed quality target follows from this repair.
+
 ## Prepared follow-up: frozen Breakout diagnosis
 
 October6 review, **not launched**: the first two completed Breakout learners

@@ -17,7 +17,7 @@ import numpy as np
 from safetensors import safe_open
 
 from kindle._exploration import EXPLORATION_PROTOCOL
-from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, audit
+from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOLS, VECTOR_PROTOCOL, audit
 
 
 MATCH_CRITERIA = {
@@ -105,7 +105,7 @@ def read_run(path, *, allow_capped_evaluation=False):
                 require(all(pair[1] == 0 for pair in event['stored_rewards']),
                         'intrinsic reward in extrinsic-only experiment')
             end = event
-    capped = (allow_capped_evaluation and start['protocol'] == EPISODE_EVALUATION_PROTOCOL
+    capped = (allow_capped_evaluation and start['protocol'] in EPISODE_EVALUATION_PROTOCOLS
               and start['mode'] in ('evaluate_sample', 'evaluate_greedy')
               and end['reason'] == 'action_cap_reached' and accounting['updates'] == 0)
     require(accounting['budget_complete'] or capped, 'incomplete declared run budget')
@@ -181,12 +181,12 @@ def verify_final_pair(training, evaluation):
             and start['restored_checkpoint'] is None and training['accounting']['updates'] > 0,
             'training must be fresh and have updates')
     require(evaluation['accounting']['updates'] == 0, 'evaluation is not frozen')
-    require(start['protocol'] != EPISODE_EVALUATION_PROTOCOL, 'episode-budget protocol is frozen only')
+    require(start['protocol'] not in EPISODE_EVALUATION_PROTOCOLS, 'episode-budget protocol is frozen only')
     require(frozen['protocol'] != EXPLORATION_PROTOCOL and (
         start['protocol'] == frozen['protocol']
         or (start['protocol'], frozen['protocol']) == (EXPLORATION_PROTOCOL, VECTOR_PROTOCOL)
         or (start['protocol'] in (VECTOR_PROTOCOL, EXPLORATION_PROTOCOL)
-            and frozen['protocol'] == EPISODE_EVALUATION_PROTOCOL)),
+            and frozen['protocol'] in EPISODE_EVALUATION_PROTOCOLS)),
         'changed evaluation identity: protocol')
     for key in ('environment', 'atari_protocol', 'action_repeat', 'full_action_space',
                 'noop_max', 'max_episode_frames', 'sticky_actions', 'action_meanings', 'ale_py_version',

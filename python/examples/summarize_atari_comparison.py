@@ -68,14 +68,16 @@ def training(root, game, method, seed):
     return dict(name=name, game=game, method=method, shared_recipe=shared, training=run)
 
 
-def cohort(episodes, streams=8, target=3):
+def cohort(episodes, streams=8, target=3, *, natural_only=False):
+    """Retain legacy completed cohorts; new natural quotas exclude, but retain, cutoffs."""
     counts = [0] * streams
     selected, excess = [], []
     for episode in episodes:
         stream = episode['stream']
         require(type(stream) is int and 0 <= stream < streams, 'invalid cohort stream')
-        (selected if counts[stream] < target else excess).append(episode)
-        counts[stream] += 1
+        eligible = not natural_only or (episode['terminated'] and not episode['truncated'])
+        (selected if eligible and counts[stream] < target else excess).append(episode)
+        counts[stream] += eligible
     complete = min(counts) >= target
     natural = [e for e in selected if e['terminated'] and not e['truncated']]
     truncated = [e for e in selected if e['truncated']]
@@ -107,7 +109,8 @@ def pair(root, game, method, seed, *, require_replay=False):
             and frozen['checkpoint']['identity'] == checkpoint_identity(after), 'missing final frozen export')
     frozen['checkpoint_audit'] = checkpoint_audit(after, h, UPDATES)
     frozen['unchanged_tensor_counts'] = assert_frozen_tensors(source, after)
-    frozen['cohort'] = cohort(frozen['episodes'])
+    frozen['cohort'] = cohort(frozen['episodes'],
+                              natural_only=frozen['accounting']['evaluation_episode_kind'] == 'natural')
     require(frozen['cohort']['complete'] == frozen['accounting']['budget_complete'], 'cohort status differs')
     frozen['guard'] = checked_guard
     if require_replay:

@@ -75,6 +75,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   seeds after the full campaign audit. It is not launched; do not interrupt
   this allocation or add training budget before diagnosis. Breakout probes
   are CPU-tested in7e5df42; their GPU path is still unrun.
+  **October7 independent audit caught a natural-cohort bug:** Breakout3019's
+  selected24 completed episodes include one timeout; its8.0833 score and
+  three-seed5.1944 summary are not valid complete natural-cohort results.
+  Finish active Qbert unchanged, then repair stopping/selection and rerun only
+  that frozen final on the same checkpoint/seeds/caps, requiring exact agreement
+  with the original207,288-action prefix. Retain all old evidence and extra
+  compute. Vector v5 uses natural quotas; v4 artifacts retain completed quotas.
+  No learner retraining or budget extension. Reconcile before final campaign
+  acceptance and the declared Breakout diagnosis; see the allocation's review.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
