@@ -1,4 +1,4 @@
-# Centered CDP capacity: bounded existing12M preflight
+# Centered CDP capacity: existing12M versus retained1M Breakout
 
 The goal remains **DreamerV3 quality on Boxing, Pong, Freeway, Breakout and
 Qbert**, including the budget comparison. All five remain open. The completed
@@ -20,11 +20,11 @@ recurrent/policy hidden widths64->256. This is one **whole-model capacity**
 hypothesis, not an isolated encoder ablation or a known fix. Keep centered
 CDP, action-effects exploration, optimization and temporal recipe unchanged.
 
-This document initially authorizes only the following finite preflight, not
-three long learners. After cost/finite-state review, declare three fresh
-Breakout seeds1009/2017/3019 with a fixed interaction budget, exact frozen
-controls and action/time curves. Do not use an initialization smoke as learning
-evidence or launch all five games automatically.
+The initial declaration covered only the finite preflight below. Its reviewed
+success now permits the separately specified three-seed allocation at the end
+of this document. Do not use the smoke as learning evidence or launch all five
+games automatically. The preflight's original plan is retained in its run root
+as `preflight-plan.md` and in commit6d63d55.
 
 ## Preflight, excluded from learning evidence
 
@@ -56,3 +56,60 @@ numerical,hard-fault or deadline failures. No NVML polling, recovery or retry.
 The frozen check launches only after reviewing the training smoke. Additional
 cost:1,024 training plus1,024 frozen actions/195 learner updates, not part of a
 future learning comparison. Review before extending any budget.
+
+## Preflight outcome, October7
+
+Both guards and independent CPU audits pass without new warnings. Training
+finishes1,024 actions/195 finite updates in22.23s, zero debt. All12 CNN parameter
+arrays move. Frozen restore executes1,024 actions in.604s with zero updates
+and exact346 tensor equality (world269/behavior66/slow11). Eight host workers
+are retained. Native and all actor settings except model preset match the
+retained1M control. [Compact evidence](../results/2026-10-07-cdp-12m-preflight.json).
+
+Last128 updates average108.98ms: imagination60.63ms, world training32.45ms,
+posterior10.00ms. This projects about3h50m per500k learner; it is a short
+warmup-stage estimate, not sustained performance or a matched speed claim.
+Minimum sampled Vulkan budget-minus-usage is12,552,241,152bytes, not physical
+free/peak VRAM. The preset has16,334,353 actual trainable parameters here
+(world14,688,256 including CDP/exploration, behavior1,646,097), not exactly12M.
+Raw artifacts:`runs/cdp-12m-preflight-20261007.WrHwG8YN`.
+
+## Reviewed learning allocation
+
+- **Three fresh Size12M Breakout learners**, seeds1009/2017/3019,500,000 actual
+  actions/124,939 updates each:1.5M new actions/374,817 updates total. Do not
+  resume the smoke or reuse it as a fourth learning replicate.
+- Keep the preflight's qualified native and entire centered-CDP recipe above.
+  Only the model preset changes from the completed1M allocation. This is whole
+  model capacity, not isolated CNN capacity, loss, context or exploration.
+- Retain all three completed1M500k seeds as controls, using the reconciled
+  natural-cohort evidence—not the invalid old Breakout3019 summary. Compare
+  configurations exactly apart from model size. Acting-source changes since
+  that campaign only repaired natural-episode accounting; disclose v4/v5 and
+  the repaired control's8->1 host workers. No retroactive source repinning or
+  claim that models share initial tensors across incompatible shapes.
+- Save actual initial12M checkpoints before any experience. Audit each
+  completed learner, then final and actual-initial frozen controls before the
+  next learner. Same evaluation base4,000,000,000+seed as the retained1M
+  controls; same per-stream offsets, sampled policy, first3 **natural**
+  episodes/stream,600k-action/30min cap. These are reused development-evaluation
+  seeds for a paired capacity comparison, not a new untouched test suite.
+- Require explicit `cohort(..., natural_only=True)`, zero evaluation updates,
+  exact346 frozen tensors, all CPU action/reward/reset replays and full
+  stream-zero videos. Retain cutoffs, excess episodes and unfinished tails;
+  incomplete natural cohorts stop the controller for review, not seed removal.
+- Report all online last50 curves versus actual actions/time and the frozen
+  final/initial/control means with three-learner-seed bootstrap intervals.
+  Preserve every seed and failed/extra compute. Compare online windows near2M
+  frames separately from the unchanged381.811 long-run reference; no parity
+  or compute-saving claim from different budgets/protocols.
+
+Expected roughly**12hours** including evaluation. Each training process has a
+5h deadline; frozen processes30min. One24h-bounded persistent service with the
+same guards/ownership/warning policy and no retries; CPU audits/replay remain
+one CPU,2GiB,zero swap. This is three learners plus six frozen controls, not a
+new representation matrix. No other game, capacity, seed or budget is added
+automatically. At the finite end review score improvement and its additional
+cost before any extension; all five original quality targets remain open.
+
+Learning artifacts:`runs/cdp-12m-breakout-20261007.3msA0ITD`.

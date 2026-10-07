@@ -65,6 +65,23 @@ def test_centering_cannot_be_reported_as_unchanged_cdp():
         summary.recipe(value, 'rgb', cdp_centered=True)
 
 
+def test_capacity_must_be_declared_and_remains_a_comparison_difference():
+    small = header('cdp')
+    larger = copy.deepcopy(small)
+    larger['config']['model_size'] = 'size12_m'
+    with pytest.raises(ValueError, match='common learner recipe'):
+        summary.recipe(larger, 'cdp')
+    with pytest.raises(ValueError, match='common learner recipe'):
+        summary.recipe(small, 'cdp', model_size='size12_m')
+    before = summary.recipe(small, 'cdp')
+    after = summary.recipe(larger, 'cdp', model_size='size12_m')
+    assert after['model_size'] == 'size12_m'
+    assert {key for key in before if before[key] != after[key]} == {'model_size'}
+    larger['config']['batch_length'] = 64
+    with pytest.raises(ValueError, match='common learner recipe'):
+        summary.recipe(larger, 'cdp', model_size='size12_m')
+
+
 @pytest.mark.parametrize('change', ['label', 'budget', 'sticky', 'aid', 'rate', 'schedule'])
 def test_recipe_refuses_mismatches(change):
     value = header('cdp')

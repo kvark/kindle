@@ -103,13 +103,14 @@ claim that capacity is proven to be the cause. Intrinsic reward is only a small
 part of late imagined reward in Breakout1009 and Qbert3019, but substantial in
 Breakout2017; a universal exploration-dominance explanation is unsupported.
 
-First run a bounded construction/train/frozen-restore smoke of the **existing
-Size12M preset**, keeping the loss, rates, replay ratio, sequence length and
-exploration unchanged. It raises encoder and recurrent/policy capacity together;
-it cannot isolate which module matters. Use measured cost/headroom to declare
-three fresh Breakout learning seeds at a fixed interaction budget before launch.
-No new encoder knobs, pixel decoder, privileged loss or automatic long queue.
-See the [preflight declaration](../experiments/2026-10-07-cdp-capacity.md).
+The bounded construction/train/frozen-restore smoke of the **existing Size12M
+preset** now passes195 finite updates and exact frozen tensor checks, with no
+new warnings. Its108.98ms/update estimate supports a separately declared
+three-seed500k-action Breakout capacity test. Keep loss, rates, replay ratio,
+sequence length and exploration unchanged. It raises encoder and recurrent/
+policy capacity together; it cannot isolate which module matters. No new
+encoder knobs, pixel decoder, privileged loss or automatic long queue.
+See the [preflight evidence and finite allocation](../experiments/2026-10-07-cdp-capacity.md).
 
 ## Accounting and limits
 

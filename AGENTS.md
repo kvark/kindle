@@ -95,13 +95,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Keep original failed heads and source snapshots; no readout sweep.
   [Follow-up data](docs/results/2026-10-07-breakout-pixel-control.json), artifacts
   `runs/cdp-breakout-pixel-range-20261007.kQHipWpq`.
-  **Next:** [bounded existing12M capacity preflight](docs/experiments/2026-10-07-cdp-capacity.md),
-  1,024 training/195 updates then reviewed1,024 frozen actions,300s/process.
-  Same centered loss, rates, exploration and N8/B8/T16/H15/R32; only model preset
-  changes. Current1M has4 initial CNN channels;12M has16. This changes encoder,
-  recurrent and policy capacity together, not an isolated encoder hypothesis.
-  Native6d38eea2/c6376542 stays unchanged. Review cost/finite state before
-  declaring three fresh learning seeds; no automatic large queue or new loss.
+  **12M preflight passes:**1,024 training/195 finite updates in22.23s, then
+  1,024 frozen actions/zero updates/exact346 tensors; two guards, no new
+  warnings. Last128 updates average108.98ms. [Evidence](docs/results/2026-10-07-cdp-12m-preflight.json).
+  **Next reviewed allocation:** [three fresh12M Breakout seeds1009/2017/3019](docs/experiments/2026-10-07-cdp-capacity.md),
+  500k actions/124,939 updates each, about12h total;5h per training process,
+  24h service bound. Same centered loss/rates/exploration/N8/B8/T16/H15/R32;
+  only model preset changes against retained1M500k controls.12M expands CNN,
+  recurrent and policy capacity together (16.33M actual parameters including
+  CDP/exploration), not an isolated encoder test. Native6d38eea2 unchanged.
+  Final/actual-initial controls reuse base4,000,000,000+seed and first3 natural
+  episodes/stream,600k cap, exact tensors/full replay/video; disclose reused
+  development seeds, v4/v5 repair and old3019's8->1 host-worker difference.
+  Audit each complete pair before the next learner; no larger queue/new loss
+  or automatic extension. Root `runs/cdp-12m-breakout-20261007.3msA0ITD`.
   All five quality targets remain open.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our

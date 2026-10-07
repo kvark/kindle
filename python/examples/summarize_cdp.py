@@ -15,7 +15,7 @@ from summarize_representation_learning import SEEDS, TINY_CHECKPOINTS, plot_svg,
 
 
 def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disagreement_scale=0,
-           cdp_centered=False):
+           cdp_centered=False, model_size='size1_m'):
     expected = dict(environment=environment, num_envs=8, steps=budget, full_action_space=True,
                     sticky_actions=.25, action_repeat=4, noop_max=0, max_episode_frames=100000,
                     mode='train', observation_size='native', starting_environment_step=0,
@@ -24,7 +24,7 @@ def recipe(header, method, *, budget=200000, environment='ALE/Seaquest-v5', disa
         raise ValueError('not the declared fresh Atari run')
     c = header['config']
     tiny = method == 'pretrained_tiny'
-    common = dict(model_size='size1_m', observation_kind='features' if tiny else 'rgb64', video_encoder=None, action_count=18,
+    common = dict(model_size=model_size, observation_kind='features' if tiny else 'rgb64', video_encoder=None, action_count=18,
                   batch_size=8, batch_length=16, world_backprop_length=16, world_microbatch_size=8,
                   replay_context=1, replay_capacity=100000, train_ratio=32., imagination_length=15,
                   learning_rate=4e-5, learning_rate_warmup=1000, agc=.3, actor_unimix=0,
