@@ -355,10 +355,10 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified CDP/RGB pins are Meganeurac6376542/Bladee349cddf; the
-  [grouped throughput qualification](results/2026-10-06-cdp-imagination-throughput.md)
-  passes independent numerical and short production/restore checks, not a new
-  learning comparison. Tiny retains its historicalb684ffd9 qualification.
+  Current qualified CDP/RGB pins are Meganeuraf104f354/Bladee349cddf; the
+  [October7 control refresh](results/2026-10-07-meganeura-control-refresh.md)
+  passes scoped independent and production/restore checks, with no measured
+  speedup or new learning comparison. Tiny retains its historicalb684ffd9 qualification.
   Retain original backend identities for old results.
   No repeated upstream learning replication without a relevant change.
 - Serialize bounded native jobs under the [host guard](gpu_incident_response.md)
