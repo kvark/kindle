@@ -147,6 +147,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   A supplemental reporter's retained-control key error and failed source remain;
   its correction changes no runtime, cohort or actions. Native83be73bf versus
   historical controls6d38eea2 is disclosed. No Pong extension or mastery claim.
+- **12M Qbert capacity comparison complete:** [results, curves and whole videos](docs/results/2026-10-08-cdp-qbert-capacity.md).
+  Frozen1,790.63/1,328.13/4,855.21, mean2,657.99 versus retained1M993.75;
+  paired+1,664.24 [435.42,3,823.96]. All three reward means improve, but first
+  pyramids2/0/0 ->0/0/24:1009 loses its two completions; only3019 completes
+  reliably. No seed passes mean15,000 or long-run193,220.77.1.5M actions/
+  374,817 updates/11h39m35s training,3.51x retained1M cost. Cohort finishes
+  October8 at16:34 UTC; Boxing/Freeway continue in the unchanged allocation.
+  Nine guards/144 natural frozen episodes/exact346 tensors and all six replays/
+  videos pass;114,408 frozen actions, zero updates, two excess episodes and17
+  allocation warnings retained. CPU review passes in15.09s. Task completion
+  is selected from existing replay outcomes, not positive-return counts; the
+  old Pong reviewer source remains. Capacity helps three games' rewards, not
+  yet reliable suite competence. No new Qbert budget or representation sweep.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

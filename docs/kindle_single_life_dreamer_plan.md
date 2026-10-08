@@ -203,7 +203,20 @@ All nine guards/144 natural episodes/exact346 tensors and six full replays/video
 pass. Eight allocation warnings, eight excess episodes, all tails and the
 corrected supplemental CPU-reporting failure remain. The independent review
 passes; Qbert, Boxing and Freeway continue under the unchanged declaration.
-Capacity evidence now spans two games, not the full suite or prior forecasts.
+This extends capacity evidence from Breakout to Pong, without testing prior forecasts.
+
+**The12M Qbert cohort completes October8 at16:34 UTC:**
+[results, curves and whole videos](results/2026-10-08-cdp-qbert-capacity.md).
+Frozen1,790.63/1,328.13/4,855.21, mean2,657.99 versus retained1M993.75;
+paired+1,664.24 [435.42,3,823.96]. All scores improve, but first pyramids
+change2/0/0 ->0/0/24: only3019 reliably completes one, and no seed reaches
+the historical mean15,000 gate or193,220.77 reference. Same1.5M actions/
+374,817 updates cost11h39m35s,3.51x retained1M training. All nine guards,
+144 natural frozen episodes, exact tensors and full videos pass;17 allocation
+warnings and all tails remain. Independent review passes. Finish the declared
+Boxing/Freeway cohorts before choosing the next learning change; no blind
+Qbert extension. Capacity now improves rewards across three games, not yet
+suite competence or measured12M prior forecasts.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -285,7 +298,7 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 These are current sticky/full-action centered CDP500k results unless explicitly
-marked historical. Breakout and Pong now report12M; the other three use1M. The common
+marked historical. Breakout, Pong and Qbert report12M; Boxing/Freeway use1M. The common
 recipe is not a matched five-game capacity comparison or a comparison
 against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
@@ -300,7 +313,7 @@ Links into `runs/` require this workspace.
 | Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway | Frozen30.26 vs0; seeds29.50/30.54/30.75. All72 rounds score27–32. | All three pass the original25-crossing gate, without action hints. Published33.40 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
-| Qbert | Frozen993.75 vs191.32; seeds1057.29/892.71/1031.25. Only2/72 first pyramids. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain far away. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [historical Tiny evidence](experiments/README.md) |
+| Qbert |12M frozen2,657.99 vs200.69 initial; seeds1,790.63/1,328.13/4,855.21. All beat retained1M scores; first pyramids0/0/24 versus2/0/0, training costs3.51x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet. Only3019 reliably completes a first pyramid;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-qbert-capacity.md); [historical Tiny evidence](experiments/README.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
 observations (45k train+5k validation/game). Freeway also used a.5-probability
