@@ -110,7 +110,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   CDP/exploration), not an isolated encoder/RSSM/ensemble test. Native6d38eea2
   unchanged. Reused development seeds and old3019's8->1 host-worker repair
   remain disclosed.12M is the next Atari quality candidate,1M the fast control;
-  other games and12M prior forecasts remain untested. No automatic extension.
+  12M prior forecasts remain untested; the separately allocated Pong result
+  below extends policy evidence to a second game. No automatic extension.
   All five quality targets and the budget question remain open.
 - **Projection-reuse throughput trial rejected:** [two numerical failures](docs/results/2026-10-07-cdp-exploration-throughput.md).
   Tiny/1M B3 F64 checks pass;12M head0 exceeds the pointwise gate with identical
@@ -126,7 +127,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   These scoped checks do not erase the failed stronger F64 check.
   12M updates previously averaged110.03ms,55.4% imagination/29.9% world training;
   utilization remains unmeasured.
-- **Next reviewed allocation:** [remaining four12M capacity cohorts](docs/experiments/2026-10-07-cdp-12m-four-game-capacity.md),
+- **Active allocation:** [remaining four12M capacity cohorts](docs/experiments/2026-10-07-cdp-12m-four-game-capacity.md),
   Pong, Qbert, Boxing, Freeway; three fresh500k-action seeds each, same centered
   CDP/action-effects recipe.6M actions/1,499,268 updates total, expected47–48h,
   72h service/5h learner bounds. Final and actual-initial frozen natural cohorts,
@@ -134,6 +135,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Keep completed12M Breakout and all retained1M controls with their original
   backend pins; no exact same-binary capacity ablation claim. No automatic
   budget extension; all five quality targets and the budget question stay open.
+- **12M Pong capacity comparison complete:** [results, curves and whole videos](docs/results/2026-10-08-cdp-pong-capacity.md).
+  Three fresh500k seeds score7.21/12.96/17.04, mean12.40 versus retained1M4.54;
+  paired+7.86 [1.04,18.25],69/72 wins. Every seed improves, but only3019 passes
+  the historical mastery gate; long-run20.45 remains unmet.1.5M actions/
+  374,817 updates/11h40m7s training,3.57x retained1M cost. Cohort finishes
+  October8 at04:52 UTC; Qbert1009 starts next in the unchanged allocation.
+  Nine guards/144 natural frozen episodes/exact346 tensors/model and all six
+  replays/videos pass;359,456 frozen actions, zero updates, eight excess episodes
+  and eight allocation warnings retained. Independent CPU review passes in15.21s.
+  A supplemental reporter's retained-control key error and failed source remain;
+  its correction changes no runtime, cohort or actions. Native83be73bf versus
+  historical controls6d38eea2 is disclosed. No Pong extension or mastery claim.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared

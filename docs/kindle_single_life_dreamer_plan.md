@@ -171,8 +171,9 @@ paired+33.07 [12.38,44.17]. Every seed improves, but none reaches381.81.
 The same500k-action recipe costs3.58x the training wall time:11h39m37s total.
 All nine guards/144 natural frozen episodes/exact tensors/full videos pass;
 three allocation warnings and all tails remain. No worker or automatic
-extension remains. This tests whole-model capacity, not isolated CNN capacity;
-12M forecast quality and the other four games in this recipe remain untested.
+extension remains for that Breakout cohort. This tests whole-model capacity,
+not isolated CNN capacity;12M forecast quality remains untested. The other-game
+follow-up is separate, below.
 
 Use12M as the next quality candidate and1M as a fast engineering control.
 The [projection-reuse trial](results/2026-10-07-cdp-exploration-throughput.md)
@@ -184,13 +185,25 @@ Paired12M updates107.85->108.00ms, with exact first outputs,272 metric reports
 and346 final tensors in the fixture. Adopt upstreamf104/native83be without a
 speedup claim; this does not erase the stronger full-head failure.
 
-Next is the [remaining four12M capacity cohorts](experiments/2026-10-07-cdp-12m-four-game-capacity.md):
+Underway are the [remaining four12M capacity cohorts](experiments/2026-10-07-cdp-12m-four-game-capacity.md):
 Pong, Qbert, Boxing and Freeway, three fresh500k seeds each. Same learning
 recipe;6M new actions/1,499,268 updates, expected47–48h. Final/actual-initial
 natural frozen cohorts and full videos follow each learner. Retain completed
 Breakout and1M controls with their original backends; no exact same-binary
 ablation or automatic budget extension. All five quality targets and the
 budget question remain open.
+
+**The12M Pong cohort completes October8 at04:52 UTC:**
+[results, curves and whole videos](results/2026-10-08-cdp-pong-capacity.md).
+Frozen7.21/12.96/17.04, mean12.40 versus retained1M4.54; paired+7.86
+[1.04,18.25],69/72 wins. Every seed improves, including previously weak3019,
+but only3019 passes the historical mastery gate and no seed reaches20.45.
+Same1.5M actions/374,817 updates cost11h40m7s,3.57x the retained1M training time.
+All nine guards/144 natural episodes/exact346 tensors and six full replays/videos
+pass. Eight allocation warnings, eight excess episodes, all tails and the
+corrected supplemental CPU-reporting failure remain. The independent review
+passes; Qbert, Boxing and Freeway continue under the unchanged declaration.
+Capacity evidence now spans two games, not the full suite or prior forecasts.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -272,7 +285,7 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 These are current sticky/full-action centered CDP500k results unless explicitly
-marked historical. Breakout now reports12M; the other four use1M. The common
+marked historical. Breakout and Pong now report12M; the other three use1M. The common
 recipe is not a matched five-game capacity comparison or a comparison
 against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
@@ -284,7 +297,7 @@ Links into `runs/` require this workspace.
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing | Frozen77.69 vs1.00 initial; seeds74.46/71.63/87.00,72/72 wins. | All three pass the historical>=90% wins/mean>=50 gate. Published99.61 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos) |
-| Pong | Frozen+4.54 vs−20.40; seeds+2.92/+11.92/−1.21,54/72 wins. Every seed improves. | Still seed-sensitive. Published20.45 and historical>=90% wins/mean>=15 remain unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [earlier paired world report](results/2026-10-06-cdp-centered-world.md) |
+| Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway | Frozen30.26 vs0; seeds29.50/30.54/30.75. All72 rounds score27–32. | All three pass the original25-crossing gate, without action hints. Published33.40 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
 | Qbert | Frozen993.75 vs191.32; seeds1057.29/892.71/1031.25. Only2/72 first pyramids. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain far away. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [historical Tiny evidence](experiments/README.md) |
@@ -316,8 +329,9 @@ The completed1M five-game allocation measures29.70ms/update and127 actions/s,
 8.46x aggregate /1.06x per-stream realtime. The12M capacity follow-up measures
 110.03ms/update,55.4% imagination/29.9% world training/9.2% posterior, about
 2.38x aggregate /.30x per-stream realtime. This is a capacity/cost tradeoff,
-not an unchanged-learning slowdown or measured GPU utilization. Qualify the
-shared exploration state projection before spending a larger learning budget.
+not an unchanged-learning slowdown or measured GPU utilization. The shared
+exploration state-projection trial was rejected at its numerical gates before
+timing; the qualified latest-backend control retains the original graph.
 
 Atari emulation/frame upload is a CPU-environment fallback; GPU preprocessing,
 batched acting and resident replay collection are implemented. Native GPU
