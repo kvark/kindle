@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-04",
+  "status": "qualified",
+  "artifacts": "/x/Code/kindle/runs/cdp-exploration-20261004.mE26yV2V",
+  "meganeura": "592a2f5a31659b253aba468c2073462e95e9baf7",
+  "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72",
+  "native_sha256": "ecc935a7813f896f8e5f5c15543c4de4a7a8f26340fd46ec88b63addb721a065",
+  "test_binary_sha256": "4584cd3378ff5297c1af3c5a4e8cd3b451c01cdab7a1e29a3d4af38deaacf7e2",
+  "cpu": {
+    "rust_passed": 113,
+    "rust_ignored": 60,
+    "python_passed": 1137,
+    "formatting": "passed",
+    "strict_clippy": "passed"
+  },
+  "gpu": {
+    "passed_guards": 8,
+    "failed_initial_guards": 1,
+    "new_allocation_warnings": 0,
+    "validation_errors": 0,
+    "nvml_polling_queries": 0,
+    "host_recovery": false,
+    "scalar_reference": {
+      "bonus_rows": 3,
+      "raw_gradient_values": 60,
+      "bonus_atol": 0.000002,
+      "gradient_atol": 2e-7,
+      "loss_atol": 0.000002
+    },
+    "repeated_novel": {
+      "before": [
+        0.53027445,
+        0.5978211
+      ],
+      "after": [
+        2.996785e-10,
+        0.58086705
+      ],
+      "updates": 256
+    },
+    "alignment": {
+      "replay_previous_state_action_reset_masks": true,
+      "imagined_action_arrival_returns": true,
+      "replay_terminal_truncation_returns": true,
+      "action_targets": true,
+      "observed_reward_head_unmodified": true
+    },
+    "zero_scale": {
+      "updates": 4,
+      "exact_parameters_moments_reports_rng": true
+    },
+    "production": {
+      "environment": "ALE/Freeway-v5",
+      "seed": 1009,
+      "streams": 8,
+      "actions_per_arm": 2048,
+      "updates_per_arm": 451,
+      "candidate_frozen_actions": 1024,
+      "candidate_frozen_updates": 0,
+      "unchanged_tensor_counts": {
+        "world": 269,
+        "behavior": 66,
+        "slow_value": 11
+      },
+      "candidate_mean_ensemble_loss": 0.2895864143902439,
+      "candidate_mean_imagined_intrinsic_reward": 0.2047575957849224,
+      "candidate_mean_replay_intrinsic_reward": 0.20267130098004435,
+      "candidate_mean_abs_advantage": 0.5759164822394679,
+      "extrinsic_rewards_both_arms": 0
+    },
+    "timing": {
+      "window_actions": 1024,
+      "window_updates": 256,
+      "control_mean_update_seconds": 0.024938359578125,
+      "candidate_mean_update_seconds": 0.0244273747109375,
+      "control_seconds": 6.86332769296132,
+      "candidate_seconds": 6.676214589038864,
+      "control_actions_per_second": 149.19876272994546,
+      "candidate_actions_per_second": 153.380330476678,
+      "claim": "Short sequential windows: no observed slowdown, not an optimization or precise overhead estimate."
+    }
+  },
+  "excluded_game_actions": 5120,
+  "retained_failures": [
+    "CPU fixture used private SequenceBatch struct-update syntax; fixed fixture initialization.",
+    "Python report-schema audit caught three missing new metric names; updated required schema.",
+    "Initial GPU values test caught use of scalar-only scaling helper on a matrix before execution; use Graph::scale and add enabled CPU graph-construction regression."
+  ],
+  "limitations": [
+    "Qualification and excluded smokes, not evidence of Freeway reward discovery.",
+    "Ensemble disagreement is an exploration hypothesis, not a calibrated epistemic-uncertainty guarantee.",
+    "GPU utilization unmeasured; Vulkan sampled headroom is not physical/peak VRAM.",
+    "Old five-game comparison remains deferred."
+  ]
+}

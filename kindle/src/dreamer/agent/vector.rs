@@ -2,7 +2,11 @@
 
 use super::super::acting_gpu::ActingGpu;
 use super::*;
-use crate::vision::{levjepa::LeVJepaPerception, preprocess_gpu::GpuFrame};
+use crate::dreamer::ObservationKind;
+use crate::vision::{
+    levjepa::LeVJepaPerception,
+    preprocess_gpu::{GpuFrame, GpuPreprocessor},
+};
 
 struct LiveStream {
     policy_rng: StdRng,
@@ -15,7 +19,7 @@ struct LiveStream {
 pub(super) struct VectorCore {
     acting: ActingGpu,
     copies: DeviceCopies,
-    pub(super) learner: DreamerCore,
+    pub(super) learner: Box<DreamerCore>,
     streams: Vec<LiveStream>,
     observe: Session,
     policy: Session,
@@ -32,7 +36,17 @@ fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static
     }
     let needed = (config.replay_context + config.batch_length - 1)
         .checked_mul(streams)
-        .and_then(|context| context.checked_add(config.replay_warmup_sequences()));
+        .and_then(|context| {
+            let stride = if config.video_encoder.is_some() {
+                config.batch_length
+            } else {
+                1
+            };
+            config
+                .replay_warmup_sequences()
+                .checked_mul(stride)
+                .and_then(|items| context.checked_add(items))
+        });
     if needed.is_none_or(|needed| needed > config.replay_capacity) {
         return Err("replay capacity cannot warm up this many independent streams");
     }
@@ -130,7 +144,7 @@ impl VectorCore {
         Self {
             acting,
             copies,
-            learner,
+            learner: Box::new(learner),
             streams,
             observe,
             policy,
@@ -170,9 +184,9 @@ impl VectorCore {
         self.learner.replay.wait_device();
         let mut observations =
             vec![0.0; self.streams.len() * self.learner.config.observation_dim()];
+        let width = self.learner.config.observation_dim();
         for (id, observation, _, _) in &arrivals {
-            observations[id * Observation::LEN..(id + 1) * Observation::LEN]
-                .copy_from_slice(observation.as_slice());
+            observations[id * width..(id + 1) * width].copy_from_slice(observation.as_slice());
         }
         self.observe.set_input("observation", &observations);
         self.ingest_prepared(&arrivals.iter().map(|a| (a.0, a.2, a.3)).collect::<Vec<_>>())
@@ -205,6 +219,12 @@ impl VectorCore {
     ) -> Vec<Reward> {
         if arrivals.is_empty() {
             return Vec::new();
+        }
+        if self.learner.config.video_encoder.is_some() {
+            self.learner.replay.store_pixels(
+                perception.session(),
+                &arrivals.iter().map(|a| a.0).collect::<Vec<_>>(),
+            );
         }
         self.copies.copy(&[DeviceCopy {
             source: (perception.session(), ExternalSlot::Output(0)),
@@ -355,7 +375,7 @@ impl VectorCore {
 
     pub(super) fn read_diagnostics(&mut self) {
         assert_eq!(self.streams.len(), 1);
-        let learner = &mut self.learner;
+        let learner = &mut *self.learner;
         learner.readback.read_regions(&mut [
             (
                 self.policy.input_buffer("feature").unwrap(),
@@ -420,6 +440,11 @@ impl FeatureVectorAgent {
     pub fn new(config: DreamerConfig, streams: usize) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
+        if config.observation_kind != ObservationKind::Features || config.video_encoder.is_some() {
+            return Err(
+                "FeatureVectorAgent requires supplied features, not pixel/causal replay".into(),
+            );
+        }
         Ok(Self {
             core: VectorCore::new(DreamerCore::new(config)?, streams),
         })
@@ -484,14 +509,180 @@ impl Drop for FeatureVectorAgent {
     }
 }
 
-/// Multiple independent environments using one frozen LeVJEPA and Dreamer learner.
-/// Dense perception, posterior and policy inference are batched on the GPU.
+enum VectorPerception {
+    Causal(Box<LeVJepaPerception>),
+    Learned(Box<GpuPreprocessor>),
+}
+
+impl VectorPerception {
+    fn ingest(
+        &mut self,
+        core: &mut VectorCore,
+        frames: &[(usize, &RgbFrame)],
+        metadata: &[(usize, FrameFlags, Reward)],
+    ) -> Vec<Reward> {
+        match self {
+            Self::Causal(perception) => {
+                let frames = frames
+                    .iter()
+                    .zip(metadata)
+                    .map(|(&(id, frame), &(_, flags, _))| (id, frame, flags.is_first))
+                    .collect::<Vec<_>>();
+                perception.submit_frames_rgb8(&frames);
+                core.ingest_encoded(perception, metadata)
+            }
+            Self::Learned(pixels) => {
+                core.acting.wait();
+                core.learner.replay.wait_device();
+                let frames = frames
+                    .iter()
+                    .map(|&(id, frame)| (id, frame.pixels(), frame.width(), frame.height()))
+                    .collect::<Vec<_>>();
+                pixels.cpu_frames(&mut core.observe, &frames);
+                core.ingest_prepared(metadata)
+            }
+        }
+    }
+}
+
+/// Independent environments sharing one batched GPU perception/policy and learner.
+/// Frozen LeVJEPA retains features; the jointly learned CNN retains RGB pixels.
 pub struct VectorDreamerAgent {
-    perception: LeVJepaPerception,
+    perception: VectorPerception,
+    history: Option<PixelHistory>,
     pub(super) core: VectorCore,
 }
 
+/// Only current-chunk pixels, on GPU. Updating Tiny invalidates all its KVs;
+/// replaying these prefixes rebuilds them without resetting any RSSM stream.
+struct PixelHistory {
+    gpu: Arc<blade_graphics::Context>,
+    buffer: blade_graphics::Buffer,
+    copies: DeviceCopies,
+    streams: usize,
+}
+
+impl PixelHistory {
+    fn new(gpu: Arc<blade_graphics::Context>, streams: usize) -> Self {
+        use crate::vision::levjepa::{FRAMES, joint::PIXELS};
+        let buffer = gpu.create_buffer(blade_graphics::BufferDesc {
+            name: "kindle_live_pixel_history",
+            size: (streams * FRAMES * PIXELS * 4) as u64,
+            memory: blade_graphics::Memory::Device,
+        });
+        Self {
+            copies: DeviceCopies::new(Arc::clone(&gpu)),
+            gpu,
+            buffer,
+            streams,
+        }
+    }
+
+    fn store(&mut self, perception: &LeVJepaPerception, streams: &[usize]) {
+        use crate::vision::levjepa::{FRAMES, joint::PIXELS};
+        let source = perception.session().input_buffer("patches").unwrap();
+        let copies = streams
+            .iter()
+            .map(|&stream| {
+                let phase = (perception.chunk_positions()[stream] + FRAMES - 1) % FRAMES;
+                let mut source = source;
+                source.offset += (stream * PIXELS * 4) as u64;
+                (
+                    source,
+                    self.buffer
+                        .at(((stream * FRAMES + phase) * PIXELS * 4) as u64),
+                    PIXELS * 4,
+                )
+            })
+            .collect::<Vec<_>>();
+        self.copies.copy_regions(&copies);
+    }
+
+    fn refresh(&mut self, perception: &mut LeVJepaPerception) {
+        use crate::vision::levjepa::{FRAMES, PATCHES, joint::PIXELS};
+        let positions = perception.chunk_positions().to_vec();
+        let session = perception.session_mut();
+        session.wait();
+        self.copies.wait();
+        for phase in 0..positions.iter().copied().max().unwrap_or(0) {
+            let destination = session.input_buffer("patches").unwrap();
+            let copies = (0..self.streams)
+                .filter(|&stream| phase < positions[stream])
+                .map(|stream| {
+                    let mut destination = destination;
+                    destination.offset += (stream * PIXELS * 4) as u64;
+                    (
+                        self.buffer
+                            .at(((stream * FRAMES + phase) * PIXELS * 4) as u64),
+                        destination,
+                        PIXELS * 4,
+                    )
+                })
+                .collect::<Vec<_>>();
+            self.copies.copy_regions(&copies);
+            for (stream, &position) in positions.iter().enumerate() {
+                // An inactive stream's unused next slot may be overwritten;
+                // its valid prefix and arrival counter are untouched.
+                let frame = phase.min(position);
+                session.set_input_u32(&format!("frame.{stream}"), &[frame as u32]);
+                session.set_input_u32(
+                    &format!("last_token.{stream}"),
+                    &[((frame + 1) * PATCHES - 1) as u32],
+                );
+            }
+            session.step();
+            session.wait();
+        }
+    }
+}
+
+impl Drop for PixelHistory {
+    fn drop(&mut self) {
+        self.copies.wait();
+        self.gpu.destroy_buffer(self.buffer);
+    }
+}
+
 impl VectorDreamerAgent {
+    pub fn learned_rgb(
+        config: DreamerConfig,
+        streams: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        config.check()?;
+        check_capacity(&config, streams)?;
+        if config.observation_kind != ObservationKind::Rgb64 {
+            return Err("learned RGB requires observation_kind=rgb64".into());
+        }
+        let learner = DreamerCore::new(config)?;
+        let pixels = GpuPreprocessor::rgb64(Arc::clone(&learner.gpu), streams);
+        Ok(Self {
+            perception: VectorPerception::Learned(Box::new(pixels)),
+            history: None,
+            core: VectorCore::new(learner, streams),
+        })
+    }
+
+    pub fn restore_rgb(
+        checkpoint: impl AsRef<Path>,
+        streams: usize,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
+        let metadata = read_checkpoint_metadata(checkpoint.as_ref())?;
+        check_capacity(&metadata.config, streams)?;
+        if metadata.config.observation_kind != ObservationKind::Rgb64
+            || metadata.perception.is_some()
+        {
+            return Err("checkpoint is not a jointly learned RGB model".into());
+        }
+        let gpu = Arc::new(crate::init_gpu_context()?);
+        let pixels = GpuPreprocessor::rgb64(Arc::clone(&gpu), streams);
+        let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        Ok(Self {
+            perception: VectorPerception::Learned(Box::new(pixels)),
+            history: None,
+            core: VectorCore::new(learner, streams),
+        })
+    }
+
     pub fn new(
         config: DreamerConfig,
         streams: usize,
@@ -513,24 +704,52 @@ impl VectorDreamerAgent {
     ) -> Result<Self, Box<dyn std::error::Error>> {
         config.check()?;
         check_capacity(&config, streams)?;
+        if config.observation_kind != ObservationKind::Features {
+            return Err("frozen LeVJEPA requires feature observations".into());
+        }
         let architecture = kind
             .levjepa_architecture()
             .ok_or("vector perception requires LeVJEPA")?;
+        if config.video_encoder.is_some()
+            && architecture != crate::vision::levjepa::Architecture::Tiny
+        {
+            return Err("joint/re-encoded replay requires the complete Tiny encoder".into());
+        }
         let identity = kind.identity(crate::vision::checkpoint_sha256(
             encoder_checkpoint.as_ref(),
         )?);
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched_with_architecture(
+        let mut perception = LeVJepaPerception::load_batched_with_architecture(
             architecture,
-            encoder_checkpoint,
+            encoder_checkpoint.as_ref(),
             streams,
             Some(Arc::clone(&gpu)),
             None,
         )?;
         let mut learner = DreamerCore::with_gpu(config, gpu);
         learner.perception_identity = Some(identity);
+        if learner.config.video_encoder.is_some() {
+            let model = meganeura::data::safetensors::SafeTensorsModel::load(
+                encoder_checkpoint.as_ref().to_path_buf(),
+            )?;
+            crate::vision::levjepa::load_weights(
+                &mut learner.world_train,
+                &model,
+                0,
+                architecture,
+            )?;
+            learner.sync_world_inference();
+            share_matching(
+                &mut learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+        }
+        let history = (learner.config.video_encoder == Some(crate::dreamer::VideoEncoder::Joint))
+            .then(|| PixelHistory::new(Arc::clone(&learner.gpu), streams));
         Ok(Self {
-            perception,
+            perception: VectorPerception::Causal(Box::new(perception)),
+            history,
             core: VectorCore::new(learner, streams),
         })
     }
@@ -555,16 +774,26 @@ impl VectorDreamerAgent {
             .ok_or("vector perception requires LeVJEPA")?;
         identity.verify_file(encoder_checkpoint.as_ref())?;
         let gpu = Arc::new(crate::init_gpu_context()?);
-        let perception = LeVJepaPerception::load_batched_with_architecture(
+        let mut perception = LeVJepaPerception::load_batched_with_architecture(
             architecture,
             encoder_checkpoint,
             streams,
             Some(Arc::clone(&gpu)),
             None,
         )?;
-        let learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        let mut learner = DreamerCore::restore_with_gpu(checkpoint.as_ref(), gpu, metadata)?;
+        if learner.config.video_encoder.is_some() {
+            share_matching(
+                &mut learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+        }
+        let history = (learner.config.video_encoder == Some(crate::dreamer::VideoEncoder::Joint))
+            .then(|| PixelHistory::new(Arc::clone(&learner.gpu), streams));
         Ok(Self {
-            perception,
+            perception: VectorPerception::Causal(Box::new(perception)),
+            history,
             core: VectorCore::new(learner, streams),
         })
     }
@@ -619,18 +848,15 @@ impl VectorDreamerAgent {
         };
         self.core
             .check_arrivals(frames.iter().map(|(id, _)| (*id, flags, Reward::default())));
-        let arrivals: Vec<_> = frames
-            .iter()
-            .map(|(id, frame)| (*id, *frame, true))
-            .collect();
-        self.perception.submit_frames_rgb8(&arrivals);
-        self.core.ingest_encoded(
-            &self.perception,
+        self.perception.ingest(
+            &mut self.core,
+            frames,
             &frames
                 .iter()
                 .map(|(id, _)| (*id, flags, Reward::default()))
                 .collect::<Vec<_>>(),
         );
+        self.store_history(&frames.iter().map(|a| a.0).collect::<Vec<_>>());
     }
 
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
@@ -659,18 +885,19 @@ impl VectorDreamerAgent {
     pub(super) fn observe_refs(&mut self, transitions: &[(usize, &Transition)]) -> Vec<Reward> {
         self.core
             .check_arrivals(transitions.iter().map(|(id, t)| (*id, t.flags(), t.reward)));
-        let arrivals: Vec<_> = transitions
-            .iter()
-            .map(|(id, t)| (*id, &t.frame, false))
-            .collect();
-        self.perception.submit_frames_rgb8(&arrivals);
-        self.core.ingest_encoded(
-            &self.perception,
+        let rewards = self.perception.ingest(
+            &mut self.core,
+            &transitions
+                .iter()
+                .map(|(id, t)| (*id, &t.frame))
+                .collect::<Vec<_>>(),
             &transitions
                 .iter()
                 .map(|(id, t)| (*id, t.flags(), t.reward))
                 .collect::<Vec<_>>(),
-        )
+        );
+        self.store_history(&transitions.iter().map(|a| a.0).collect::<Vec<_>>());
+        rewards
     }
 
     /// Context used by the complete perception/belief/policy pipeline.
@@ -687,20 +914,67 @@ impl VectorDreamerAgent {
     ) -> Vec<Reward> {
         let metadata: Vec<_> = arrivals.iter().map(|a| (a.0, a.2, a.3)).collect();
         self.core.check_arrivals(metadata.iter().copied());
-        self.perception.submit_frames_gpu8(
-            &arrivals
-                .iter()
-                .map(|a| (a.0, a.1, a.2.is_first))
-                .collect::<Vec<_>>(),
-        );
-        let rewards = self.core.ingest_encoded(&self.perception, &metadata);
+        let frames = arrivals.iter().map(|a| (a.0, a.1)).collect::<Vec<_>>();
+        let rewards = match &mut self.perception {
+            VectorPerception::Causal(perception) => {
+                perception.submit_frames_gpu8(
+                    &arrivals
+                        .iter()
+                        .map(|a| (a.0, a.1, a.2.is_first))
+                        .collect::<Vec<_>>(),
+                );
+                self.core.ingest_encoded(perception, &metadata)
+            }
+            VectorPerception::Learned(pixels) => {
+                self.core.acting.wait();
+                self.core.learner.replay.wait_device();
+                pixels.gpu_frames(&mut self.core.observe, &frames);
+                self.core.ingest_prepared(&metadata)
+            }
+        };
         // GpuFrame's borrowed capture ownership ends on return. No data readback.
         self.core.acting.wait();
+        self.store_history(&arrivals.iter().map(|a| a.0).collect::<Vec<_>>());
         rewards
     }
 
     pub fn learn_scheduled(&mut self, maximum_updates: usize) -> Vec<LearnReport> {
-        self.core.learn_scheduled(maximum_updates)
+        let mut reports = self.core.learn_scheduled(maximum_updates);
+        if let Some(last) = reports.last_mut() {
+            self.refresh_encoder(last);
+        }
+        reports
+    }
+
+    pub fn learn(&mut self) -> Option<LearnReport> {
+        let mut report = self.core.learn()?;
+        self.refresh_encoder(&mut report);
+        Some(report)
+    }
+
+    fn refresh_encoder(&mut self, report: &mut LearnReport) {
+        if let (Some(history), VectorPerception::Causal(perception)) =
+            (&mut self.history, &mut self.perception)
+        {
+            let started = Instant::now();
+            sync_matching(
+                &self.core.learner.world_train,
+                perception.session_mut(),
+                "encoder.",
+            );
+            history.refresh(perception);
+            let elapsed = started.elapsed().as_secs_f64();
+            report.timing.world_sync_seconds += elapsed;
+            report.timing.total_seconds += elapsed;
+        }
+    }
+
+    fn store_history(&mut self, streams: &[usize]) {
+        if let (Some(history), VectorPerception::Causal(perception)) =
+            (&mut self.history, &self.perception)
+        {
+            history.store(perception, streams);
+        }
     }
     pub fn save_checkpoint(&mut self, path: impl AsRef<Path>) -> io::Result<()> {
         self.core.learner.save_checkpoint(path)
@@ -709,6 +983,9 @@ impl VectorDreamerAgent {
 
 impl Drop for VectorDreamerAgent {
     fn drop(&mut self) {
+        if let Some(history) = &mut self.history {
+            history.copies.wait();
+        }
         self.core.acting.wait();
         self.core.copies.wait();
         self.core.learner.replay.wait_device();
@@ -716,8 +993,542 @@ impl Drop for VectorDreamerAgent {
 }
 
 #[cfg(test)]
+mod joint_qualification {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires declared GPU, oracle directory, KINDLE_JOINT_PROBE_MODE and fresh KINDLE_JOINT_PROBE_OUTPUT"]
+    fn full_video_updates() {
+        let mode = match std::env::var("KINDLE_JOINT_PROBE_MODE").unwrap().as_str() {
+            "joint" => crate::dreamer::VideoEncoder::Joint,
+            "frozen" => crate::dreamer::VideoEncoder::Frozen,
+            other => panic!("unknown probe mode {other}"),
+        };
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = Path::new(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(checkpoint).unwrap(),
+            manifest["checkpoint_sha256"].as_str().unwrap()
+        );
+        let output = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_PROBE_OUTPUT").unwrap());
+        std::fs::create_dir(&output).unwrap();
+        let mut config = DreamerConfig::new(18);
+        config.model_size = crate::dreamer::ModelSize::Size1M;
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.world_microbatch_size = Some(1);
+        config.replay_capacity = 8192;
+        config.seed = 1009;
+        config.video_encoder = Some(mode);
+        config.actor_critic_gradient = std::env::var_os("KINDLE_AC_GRADS").is_some();
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        config.validate();
+        eprintln!("full video probe: constructing {mode:?}");
+        let start = Instant::now();
+        let mut agent = VectorDreamerAgent::new(config.clone(), 8, checkpoint).unwrap();
+        let construction_seconds = start.elapsed().as_secs_f64();
+        let inspect = |agent: &VectorDreamerAgent| {
+            assert_eq!(
+                agent.gpu_device().device_name,
+                std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+            );
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+            serde_json::to_value(memory).unwrap()
+        };
+        let constructed_memory = inspect(&agent);
+        eprintln!("constructed in {construction_seconds:.3}s; memory={constructed_memory}");
+        let parameter = |agent: &mut VectorDreamerAgent| {
+            let name = "encoder.patch_embed.proj.weight";
+            let session = &mut agent.core.learner.world_train;
+            let mut values = vec![0.0; session.param_size(name).unwrap()];
+            session.read_param(name, &mut values);
+            values
+        };
+        let before = parameter(&mut agent);
+        let frame = |stream: usize, tick: usize| {
+            RgbFrame::new(
+                224,
+                224,
+                (0..224 * 224 * 3)
+                    .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                    .collect(),
+            )
+        };
+        agent.begin_episodes(&(0..8).map(|s| (s, frame(s, 0))).collect::<Vec<_>>());
+        // Leave a live prefix so the timing includes actual cache refresh.
+        for tick in 1..35 {
+            assert!(agent.act(ActionMode::Sample).iter().all(|&a| a < 18));
+            agent.observe(
+                &(0..8)
+                    .map(|s| {
+                        (
+                            s,
+                            Transition {
+                                frame: frame(s, tick),
+                                reward: Reward {
+                                    extrinsic: if (tick + s).is_multiple_of(7) {
+                                        1.0
+                                    } else {
+                                        0.0
+                                    },
+                                    intrinsic: 0.0,
+                                },
+                                terminated: false,
+                                truncated: false,
+                            },
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let mut reports = Vec::new();
+        eprintln!("replay populated; starting three full updates");
+        for _ in 0..3 {
+            let report = agent.learn().expect("eight complete causal replay chunks");
+            assert!(report.world.total_loss.is_finite());
+            assert!(report.world.encoder_spread.is_finite() && report.world.encoder_spread > 0.0);
+            assert!(report.behavior.total_loss.is_finite());
+            println!("{}", serde_json::to_string(&report).unwrap());
+            reports.push(report);
+            inspect(&agent);
+        }
+        let after = parameter(&mut agent);
+        assert!(after.iter().all(|x| x.is_finite()));
+        assert_eq!(before != after, mode == crate::dreamer::VideoEncoder::Joint);
+        let updated_memory = inspect(&agent);
+        let saved = output.join("checkpoint");
+        agent.save_checkpoint(&saved).unwrap();
+        let last_session_gpu_timings = [
+            ("posterior", &agent.core.learner.world_posterior),
+            ("world", &agent.core.learner.world_train),
+            ("imagination", &agent.core.learner.imagination),
+            ("behavior", &agent.core.learner.behavior_train),
+        ]
+        .map(|(name, session)| {
+            (
+                name,
+                session
+                    .gpu_timings()
+                    .into_iter()
+                    .map(|(label, time)| (label, time.as_secs_f64()))
+                    .collect::<Vec<_>>(),
+            )
+        });
+        std::fs::write(output.join("result.json"), serde_json::to_vec_pretty(&serde_json::json!({
+            "config": config, "streams": 8, "synthetic_actions": 272, "game_actions": 0,
+            "construction_seconds": construction_seconds, "reports": reports,
+            "constructed_memory": constructed_memory, "updated_memory": updated_memory,
+            "encoder_moved": before != after,
+            "last_session_gpu_timings": last_session_gpu_timings,
+            "limitations": ["three synthetic updates, not learning or steady-state throughput", "replay only partly populated", "restore is separately qualified", "last session timings are not whole-update or device utilization"]
+        })).unwrap()).unwrap();
+        if std::env::var_os("KINDLE_JOINT_PROBE_PROFILE").is_some() {
+            agent
+                .core
+                .learner
+                .profile_sessions(output.join("profiles"))
+                .unwrap();
+        }
+    }
+
+    #[test]
+    #[ignore = "requires declared GPU, oracle directory and KINDLE_JOINT_RESTORE_CHECKPOINT"]
+    fn video_checkpoint_restore_is_frozen() {
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let saved =
+            std::path::PathBuf::from(std::env::var("KINDLE_JOINT_RESTORE_CHECKPOINT").unwrap());
+        let metadata = read_checkpoint_metadata(&saved).unwrap();
+        let tensors =
+            meganeura::data::safetensors::SafeTensorsModel::load(saved.join("world.safetensors"))
+                .unwrap();
+        let mut agent =
+            VectorDreamerAgent::restore(&saved, 8, manifest["checkpoint"].as_str().unwrap())
+                .unwrap();
+        assert_eq!(
+            agent.gpu_device().device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!agent.gpu_device().is_software_emulated);
+        let memory = agent.gpu_memory_budget();
+        assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        assert_eq!(agent.environment_step(), metadata.environment_step);
+        let session = &mut agent.core.learner.world_train;
+        let names = session
+            .param_names()
+            .iter()
+            .filter(|n| n.starts_with("encoder."))
+            .map(|n| n.to_string())
+            .collect::<Vec<_>>();
+        assert_eq!(names.len(), 148);
+        for name in names {
+            let mut actual = vec![0.0; session.param_size(&name).unwrap()];
+            session.read_param(&name, &mut actual);
+            assert_eq!(actual, tensors.tensor_f32_auto(&name).unwrap(), "{name}");
+        }
+        agent.begin_episodes(
+            &(0..8)
+                .map(|s| {
+                    (
+                        s,
+                        RgbFrame::new(224, 224, vec![s as u8 * 17; 224 * 224 * 3]),
+                    )
+                })
+                .collect::<Vec<_>>(),
+        );
+        assert!(agent.act(ActionMode::Greedy).iter().all(|&a| a < 18));
+        assert_eq!(agent.learner_step(), metadata.learner_step);
+        println!(
+            "148 encoder tensors restored exactly; frozen action has zero updates; memory={memory:?}"
+        );
+    }
+
+    #[test]
+    #[ignore = "requires separately declared GPU and KINDLE_JOINT_TINY_REFERENCE oracle directory"]
+    fn joint_encoder_cache_matches_fresh_encoding_of_live_prefixes() {
+        let root = std::path::PathBuf::from(std::env::var("KINDLE_JOINT_TINY_REFERENCE").unwrap());
+        let manifest: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(root.join("manifest.json")).unwrap()).unwrap();
+        let checkpoint = Path::new(manifest["checkpoint"].as_str().unwrap());
+        assert_eq!(
+            crate::vision::checkpoint_sha256(checkpoint).unwrap(),
+            manifest["checkpoint_sha256"].as_str().unwrap()
+        );
+        let gpu = Arc::new(crate::init_gpu_context().unwrap());
+        let device = gpu.device_information();
+        assert_eq!(
+            device.device_name,
+            std::env::var("KINDLE_EXPECT_DEVICE_NAME").unwrap()
+        );
+        assert!(!device.is_software_emulated);
+        let load = || {
+            LeVJepaPerception::load_batched_with_architecture(
+                crate::vision::levjepa::Architecture::Tiny,
+                checkpoint,
+                2,
+                Some(Arc::clone(&gpu)),
+                None,
+            )
+            .unwrap()
+        };
+        let mut actual = load();
+        let mut reference = load();
+        let mut history = PixelHistory::new(Arc::clone(&gpu), 2);
+        let memory = gpu.memory_stats();
+        assert!(memory.budget.saturating_sub(memory.usage) >= 2 << 30);
+        let frame = |stream: usize, tick: usize| {
+            RgbFrame::new(
+                224,
+                224,
+                (0..224 * 224 * 3)
+                    .map(|i| ((i * 37 + tick * 13 + stream * 71) % 256) as u8)
+                    .collect(),
+            )
+        };
+        let mut prefixes = [Vec::new(), Vec::new()];
+        for tick in 0..24 {
+            for (stream, prefix) in prefixes.iter_mut().enumerate() {
+                if stream == 1 && tick % 3 == 0 {
+                    continue;
+                }
+                let reset = prefix.is_empty() || (stream == 1 && tick == 11);
+                if reset || actual.chunk_positions()[stream] == 0 {
+                    prefix.clear();
+                }
+                prefix.push(frame(stream, tick));
+                actual.encode_frames_rgb8(&[(stream, prefix.last().unwrap(), reset)]);
+                history.store(&actual, &[stream]);
+            }
+        }
+        // Emulate an optimizer weight change; compare refresh to a separately
+        // rebuilt prefix using the original RGB, not PixelHistory's buffers.
+        let name = "encoder.patch_embed.proj.bias";
+        let mut bias = vec![0.0; 192];
+        actual.session().read_param(name, &mut bias);
+        for (i, value) in bias.iter_mut().enumerate() {
+            *value += (i % 5) as f32 * 0.007;
+        }
+        actual.session_mut().set_parameter(name, &bias);
+        reference.session_mut().set_parameter(name, &bias);
+        let positions = actual.chunk_positions().to_vec();
+        history.refresh(&mut actual);
+        assert_eq!(actual.chunk_positions(), positions);
+        for phase in 0..positions.iter().copied().max().unwrap() {
+            let arrivals = prefixes
+                .iter()
+                .enumerate()
+                .filter(|(stream, _)| phase < positions[*stream])
+                .map(|(stream, frames)| (stream, &frames[phase], phase == 0))
+                .collect::<Vec<_>>();
+            reference.encode_frames_rgb8(&arrivals);
+        }
+        for tick in 24..27 {
+            let next = [frame(0, tick), frame(1, tick)];
+            let arrivals = [(0, &next[0], false), (1, &next[1], tick == 26)];
+            let actual = actual.encode_frames_rgb8(&arrivals);
+            let reference = reference.encode_frames_rgb8(&arrivals);
+            for (a, b) in actual.iter().zip(&reference) {
+                for (&a, &b) in a.as_slice().iter().zip(b.as_slice()) {
+                    assert!((a - b).abs() < 1e-4 * b.abs() + 1e-5, "{a} != {b}");
+                }
+            }
+        }
+        // History must complete before its session-owned sources are dropped.
+        history.copies.wait();
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn video_capacity_accounts_for_nonoverlapping_chunks() {
+        let mut config = DreamerConfig::tiny(3);
+        config.batch_size = 8;
+        config.batch_length = 16;
+        config.world_backprop_length = 16;
+        config.video_encoder = Some(crate::dreamer::VideoEncoder::Joint);
+        config.loss_scales.reconstruction = 0.0;
+        config.loss_scales.future_prediction = 0.25;
+        assert_eq!(config.replay_warmup_sequences(), 8);
+        assert_eq!(config.replay_warmup_frames(), 144);
+        config.replay_capacity = 255;
+        assert!(check_capacity(&config, 8).is_err());
+        config.replay_capacity = 256;
+        assert!(check_capacity(&config, 8).is_ok());
+        config.check().unwrap();
+        assert!(FeatureVectorAgent::new(config.clone(), 8).is_err());
+        assert!(
+            VectorDreamerAgent::with_perception(config, 8, PerceptionKind::LeVJepa, "unused")
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn rgb_configuration_refusals_precede_device_initialization() {
+        let config = DreamerConfig::tiny(3);
+        assert!(VectorDreamerAgent::learned_rgb(config.clone(), 2).is_err());
+        let mut rgb = config.clone();
+        rgb.observation_kind = ObservationKind::Rgb64;
+        assert!(VectorDreamerAgent::learned_rgb(rgb.clone(), 0).is_err());
+        assert!(FeatureVectorAgent::new(rgb.clone(), 2).is_err());
+        assert!(
+            VectorDreamerAgent::with_perception(
+                rgb.clone(),
+                2,
+                PerceptionKind::LeVJepaTiny,
+                "unused"
+            )
+            .is_err()
+        );
+        rgb.loss_scales.future_prediction = 0.25;
+        assert!(rgb.check().is_err());
+        rgb.loss_scales.future_prediction = 0.0;
+        rgb.visitation_bonus = true;
+        assert!(rgb.check().is_err());
+    }
+
+    #[test]
+    #[ignore = "requires GPU; joint RGB learning, pixel replay, stream isolation and restore"]
+    fn tiny_rgb_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(false, false);
+    }
+
+    #[test]
+    #[ignore = "requires separately guarded GPU; CDP encoder learning, pixel replay, stream isolation and restore"]
+    fn tiny_cdp_replay_is_reencoded_and_checkpoint_restores() {
+        check_rgb_replay_and_restore(true, false);
+    }
+
+    #[test]
+    #[ignore = "requires GPU; CDP disagreement weights, replay and frozen restore"]
+    fn tiny_cdp_disagreement_checkpoint_restores() {
+        check_rgb_replay_and_restore(true, true);
+    }
+
+    fn check_rgb_replay_and_restore(cdp: bool, exploration: bool) {
+        let checkpoint = check_rgb_vector_replay_and_restore(cdp, exploration);
+        check_rgb_single_restore(&checkpoint);
+        fs::remove_dir_all(checkpoint).unwrap();
+    }
+
+    fn check_rgb_vector_replay_and_restore(cdp: bool, exploration: bool) -> std::path::PathBuf {
+        let mut config = DreamerConfig::tiny(3);
+        config.observation_kind = ObservationKind::Rgb64;
+        config.replay_capacity = 32;
+        config.train_ratio = 0.0;
+        config.disagreement_bonus = exploration;
+        config.intrinsic_reward_scale = f32::from(exploration);
+        if cdp {
+            config.loss_scales.reconstruction = 0.0;
+            config.loss_scales.future_prediction = 500.0;
+            config.encoder_learning_rate = Some(6e-6);
+            config.dynamics_learning_rate = Some(4e-4);
+        }
+        let mut agent = VectorDreamerAgent::learned_rgb(config.clone(), 2).unwrap();
+        if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {
+            assert_eq!(agent.gpu_device().device_name, expected);
+            assert!(!agent.gpu_device().is_software_emulated);
+            let memory = agent.gpu_memory_budget();
+            assert!(memory.budget_bytes.saturating_sub(memory.usage_bytes) >= 2 << 30);
+        }
+        let frame = |id: usize, time: usize| {
+            RgbFrame::new(
+                19,
+                13,
+                (0..19 * 13 * 3)
+                    .map(|i| ((i * 17 + time * 11 + id * 31) % 256) as u8)
+                    .collect(),
+            )
+        };
+        agent.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
+        for time in 1..12 {
+            agent.act(ActionMode::Sample);
+            agent.observe(
+                &(0..2)
+                    .map(|id| {
+                        (
+                            id,
+                            Transition {
+                                frame: frame(id, time),
+                                reward: Reward {
+                                    extrinsic: (time % 3) as f32,
+                                    intrinsic: 0.0,
+                                },
+                                terminated: time == 11 && id == 0,
+                                truncated: false,
+                            },
+                        )
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        let untouched = agent.core.feature(1);
+        agent.begin_episodes(&[(0, frame(0, 12))]);
+        assert_eq!(untouched, agent.core.feature(1));
+        let sample = |agent: &mut VectorDreamerAgent| {
+            agent
+                .core
+                .learner
+                .replay
+                .sample(&config, &mut StdRng::seed_from_u64(773))
+                .unwrap()
+        };
+        // Fresh-arrival sampling is a consumable queue, independent of RNG.
+        // Exhaust it before comparing the same seeded random replay windows.
+        for _ in 0..agent.replay_len() {
+            sample(&mut agent);
+        }
+        let before = sample(&mut agent);
+        assert!(
+            before
+                .observations
+                .iter()
+                .all(|row| row.len() == config.batch_size * 12288
+                    && row.iter().all(|x| (-0.5..=0.5).contains(x)))
+        );
+        let names = agent
+            .core
+            .learner
+            .world_train
+            .param_names()
+            .into_iter()
+            .filter(|name| name.starts_with("world.representation.encoder."))
+            .map(str::to_owned)
+            .collect::<Vec<_>>();
+        let names = names.iter().map(String::as_str).collect::<Vec<_>>();
+        let weights = agent.core.learner.world_train.read_params(&names);
+        let encoder_output = |agent: &mut VectorDreamerAgent| {
+            agent.core.observe.step();
+            agent.core.observe.wait();
+            let mut values = vec![0.0; 2 * config.encoded_observation_dim()];
+            agent.core.observe.read_output_by_index(3, &mut values);
+            values
+        };
+        let encoded_before = encoder_output(&mut agent);
+        let report = agent.core.learn().unwrap();
+        assert!(report.world.total_loss.is_finite());
+        if cdp {
+            assert_eq!(report.world.reconstruction_loss, 0.0);
+            assert!(report.world.future_prediction_loss > 0.0);
+            assert!(
+                !agent
+                    .core
+                    .learner
+                    .world_train
+                    .param_names()
+                    .iter()
+                    .any(|n| n.starts_with("world.decoder."))
+            );
+        } else {
+            assert!(report.world.reconstruction_loss > 0.0);
+        }
+        let updated = agent.core.learner.world_train.read_params(&names);
+        assert!(
+            weights
+                .iter()
+                .zip(&updated)
+                .all(|(a, b)| a != b && b.iter().all(|x| x.is_finite()))
+        );
+        assert_ne!(encoded_before, encoder_output(&mut agent));
+        assert_eq!(before.observations, sample(&mut agent).observations);
+        let moments = agent.core.learner.world_train.read_adam_states(&names);
+        let checkpoint =
+            std::env::temp_dir().join(format!("kindle-rgb-test-{}", std::process::id()));
+        assert!(!checkpoint.exists());
+        agent.save_checkpoint(&checkpoint).unwrap();
+        drop(agent);
+        let mut restored = VectorDreamerAgent::restore_rgb(&checkpoint, 2).unwrap();
+        assert_eq!(restored.config(), &config);
+        assert_eq!(restored.replay_len(), 0);
+        assert_eq!(restored.learner_step(), 1);
+        assert_eq!(
+            updated,
+            restored.core.learner.world_train.read_params(&names)
+        );
+        assert_eq!(
+            moments,
+            restored.core.learner.world_train.read_adam_states(&names)
+        );
+        restored.begin_episodes(&[(0, frame(0, 0)), (1, frame(1, 0))]);
+        restored.act(ActionMode::Greedy);
+        assert_eq!(
+            updated,
+            restored.core.learner.world_train.read_params(&names)
+        );
+        assert_eq!(
+            moments,
+            restored.core.learner.world_train.read_adam_states(&names)
+        );
+        drop(restored);
+        checkpoint
+    }
+
+    fn check_rgb_single_restore(checkpoint: &Path) {
+        let mut single = DreamerAgent::restore_rgb(checkpoint).unwrap();
+        single.begin_episode(&RgbFrame::new(19, 13, vec![127; 19 * 13 * 3]));
+        let width = single.core().config().encoded_observation_dim();
+        assert_eq!(single.encoded_observation().len(), width);
+        let prediction_width = single.core().config().prediction_dim();
+        let prediction = single.observation_prediction();
+        assert_eq!(prediction.len(), prediction_width);
+        assert!(prediction.iter().all(|x| x.is_finite()));
+        let before = single.latent_feature().to_vec();
+        let forecast = single.prior_state_rollout(&[1, 2]);
+        assert!(forecast.1.iter().all(|row| row.len() == prediction_width));
+        assert_eq!(forecast, single.prior_state_rollout(&[1, 2]));
+        assert_eq!(before, single.latent_feature());
+        assert_eq!(single.core().learner_step(), 1);
+    }
 
     #[test]
     fn action_overrides_validate_every_stream_before_mutation() {

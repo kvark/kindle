@@ -1,8 +1,9 @@
-"""Independent Atari streams, one native batched LeVJEPA/Dreamer learner.
+"""Independent Atari streams, one native batched Dreamer learner.
 
 --steps counts aggregate executed actions, not vector ticks or per-env actions.
 CPU environment stepping is synchronous; GPU inference is batched. Terminal
 observations are consumed before individually resetting completed environments.
+Learned RGB is the 2D default; --encoder-checkpoint selects frozen causal JEPA.
 """
 
 import argparse
@@ -38,11 +39,27 @@ def require_gpu_budget(snapshot, minimum_bytes):
         raise ValueError("native GPU memory budget headroom below declared minimum")
 
 
+def require_gpu_device(snapshot, expected):
+    if snapshot.get("device_name") != expected or snapshot.get("is_software_emulated") is not False:
+        raise ValueError(f"expected native device {expected}, got {snapshot}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("encoder_checkpoint")
+    parser.add_argument("--encoder-checkpoint", help="opt into causal JEPA (frozen unless encoder-training=joint); omitted: jointly learned RGB")
     parser.add_argument("--encoder", choices=("levjepa", "levjepa-tiny"),
                         help="fresh default: levjepa-tiny; restore default: recorded checkpoint kind")
+    parser.add_argument("--encoder-training", choices=("frozen", "joint"),
+                        help="Tiny-only experiment: native pixel replay with phase-aligned causal re-encoding")
+    parser.add_argument("--actor-critic-gradient", action="store_true",
+                        help="train posterior representations from initial imagined actor/value losses (upstream ac_grads)")
+    parser.add_argument("--cdp", action="store_true",
+                        help="learned CNN with cosine feature prediction instead of RGB reconstruction; CDP split learning rates")
+    parser.add_argument("--cdp-centered", action="store_true",
+                        help="CDP ablation: center cosine predictions/targets over the full replay batch")
+    parser.add_argument("--disagreement-scale", type=float, default=0.0,
+                        help="CDP exploration: current latent disagreement in imagined and replay returns; zero disables the ensemble")
+    parser.add_argument("--replay-capacity", type=int, default=100000)
     parser.add_argument("environment", nargs="?", default="ALE/Pong-v5")
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--num-envs", type=int, default=4)
@@ -61,6 +78,8 @@ def main():
     parser.add_argument("--learning-rate", type=float, default=0.00004)
     parser.add_argument("--report-every", type=int, default=1000)
     parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--initial-checkpoint", type=Path,
+                        help="fresh training only: save the actual zero-experience weights for frozen controls")
     parser.add_argument("--checkpoint-every", type=int, default=20000)
     parser.add_argument("--checkpoint-history", action="store_true",
                         help="preserve each save in CHECKPOINT/<run-actions> instead of replacing the last save")
@@ -68,7 +87,7 @@ def main():
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
     parser.add_argument("--episodes-per-env", type=int,
-                        help="frozen restore only: stop when every stream completes this many episodes; steps is a hard action cap")
+                        help="frozen restore only: stop after this many natural episodes per stream; timeouts do not count, steps is a hard cap")
     parser.add_argument("--min-gpu-budget-headroom-mib", type=int,
                         help="check native budget after each GPU stage; write OUTPUT.gpu-memory.jsonl")
     parser.add_argument("--exploration-probability", type=float, default=0.0)
@@ -80,6 +99,8 @@ def main():
         parser.error("report/checkpoint intervals must be positive")
     if args.checkpoint_history and args.checkpoint is None:
         parser.error("checkpoint-history requires --checkpoint")
+    if args.initial_checkpoint and (args.restore or args.evaluate):
+        parser.error("initial-checkpoint requires fresh training")
     if args.world_microbatch_size is not None and args.world_microbatch_size <= 0:
         parser.error("world-microbatch-size must be positive")
     if args.min_gpu_budget_headroom_mib is not None and args.min_gpu_budget_headroom_mib <= 0:
@@ -89,21 +110,26 @@ def main():
     if args.episodes_per_env is not None:
         if args.episodes_per_env <= 0:
             parser.error("episodes-per-env must be positive")
-        if not args.evaluate or not args.restore or args.checkpoint:
-            parser.error("episodes-per-env requires frozen restore without checkpoint writes")
+        if not args.evaluate or not args.restore:
+            parser.error("episodes-per-env requires frozen restore")
     if not math.isfinite(args.exploration_probability) or not 0 <= args.exploration_probability <= 1:
         parser.error("exploration probability must be in [0, 1]")
     if args.exploration_hold <= 0:
         parser.error("exploration hold must be positive")
     if args.evaluate and args.exploration_probability:
         parser.error("frozen evaluation must not use exploration overrides")
-    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold"}
+    training_options = {"--model-size", "--batch-size", "--batch-length", "--world-microbatch-size", "--train-ratio", "--learning-rate", "--exploration-probability", "--exploration-hold", "--encoder-training", "--actor-critic-gradient", "--replay-capacity"}
+    training_options.add("--cdp")
+    training_options.add("--cdp-centered")
+    training_options.add("--disagreement-scale")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
         parser.error("seed must fit an unsigned 32-bit integer")
     if args.output.exists() or (args.checkpoint and args.checkpoint.exists()):
         parser.error("output and checkpoint must be fresh paths")
+    if args.initial_checkpoint and (args.initial_checkpoint.exists() or args.initial_checkpoint == args.checkpoint):
+        parser.error("initial-checkpoint must be a separate fresh path")
     memory_path = args.output.with_suffix(".gpu-memory.jsonl")
     if args.min_gpu_budget_headroom_mib is not None and memory_path.exists():
         parser.error("GPU memory output must be a fresh path")
@@ -116,6 +142,24 @@ def main():
     if args.restore and args.observation_size is None:
         parser.error("restore requires --observation-size; checkpoints do not record Atari preprocessing")
     args.observation_size = args.observation_size or "native"
+    learned_rgb = args.encoder_checkpoint is None
+    if args.cdp and (not learned_rgb or args.actor_critic_gradient or args.learning_rate != 4e-5):
+        parser.error("CDP requires the learned CNN, ac_grads=false and base learning-rate4e-5")
+    if args.cdp_centered and (not args.cdp or args.world_microbatch_size not in (None, args.batch_size)):
+        parser.error("centered CDP requires --cdp and full-batch world training")
+    if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
+        parser.error("disagreement-scale must be finite and non-negative")
+    if args.disagreement_scale and (not args.cdp or args.exploration_probability):
+        parser.error("disagreement requires fresh CDP without action overrides")
+    if args.replay_capacity <= 0:
+        parser.error("replay-capacity must be positive")
+    if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
+                                 or args.observation_size != "native" or args.batch_length != 16):
+        parser.error("encoder-training requires a Tiny checkpoint, native frames and batch-length16")
+    if args.encoder_training and not any(arg.split("=", 1)[0] == "--replay-capacity" for arg in sys.argv[1:]):
+        parser.error("encoder-training requires explicit replay-capacity; native pixel replay is large")
+    if learned_rgb and (args.encoder is not None or args.observation_size != "native"):
+        parser.error("learned RGB consumes native frames for one GPU resize; frozen --encoder requires --encoder-checkpoint")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     protocol = ATARI_PROTOCOLS[args.atari_protocol]
     gym.register_envs(ale_py)
@@ -160,19 +204,37 @@ def main():
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
+                      video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
+                      actor_critic_gradient=args.actor_critic_gradient,
                       world_backprop_length=args.batch_length,
                       world_microbatch_size=(args.batch_size if args.world_microbatch_size is None else args.world_microbatch_size),
                       train_ratio=args.train_ratio, learning_rate=args.learning_rate,
+                      disagreement_bonus=args.disagreement_scale > 0,
+                      intrinsic_reward_scale=args.disagreement_scale,
                       learning_rate_warmup=1000, agc=0.3)
-        config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
+        if learned_rgb:
+            config["observation_kind"] = "rgb64"
+            config["loss_scales"].update(reconstruction=1.0, future_prediction=0.0)
+            if args.cdp:
+                config["loss_scales"].update(reconstruction=0.0, future_prediction=500.0)
+                config.update(encoder_learning_rate=6e-6, dynamics_learning_rate=4e-4,
+                              cdp_centered=args.cdp_centered)
+        else:
+            config["loss_scales"].update(reconstruction=0.0, future_prediction=0.25)
         exploration = (PersistentExploration(dict(kind=EXPLORATION_KIND,
             probability=args.exploration_probability, hold_actions=args.exploration_hold,
             seed=args.seed), args.num_envs, actions) if args.exploration_probability else None)
         construction = time.perf_counter()
         restored = checkpoint_identity(args.restore) if args.restore else None
-        agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
-                 if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
-                     **(dict(encoder=args.encoder) if args.encoder else {})))
+        if learned_rgb:
+            agent = (kindle.VectorAgent.restore_rgb(str(args.restore), args.num_envs) if args.restore
+                     else kindle.VectorAgent.learned_rgb(args.num_envs, config))
+        else:
+            agent = (kindle.VectorAgent.restore(str(args.restore), args.encoder_checkpoint, args.num_envs)
+                     if args.restore else kindle.VectorAgent(args.encoder_checkpoint, args.num_envs, config,
+                         **(dict(encoder=args.encoder) if args.encoder else {})))
+        if expected := os.environ.get("KINDLE_EXPECT_DEVICE_NAME"):
+            require_gpu_device(agent.gpu_device, expected)
         if agent.config["action_count"] != actions:
             raise ValueError("checkpoint action vocabulary differs from environment")
         construction = time.perf_counter() - construction
@@ -182,19 +244,26 @@ def main():
         started = time.perf_counter()
         agent.begin_episodes(ids, initial)
         check_memory("initialized", 0)
+        initial_checkpoint = None
+        if args.initial_checkpoint:
+            agent.save_checkpoint(str(args.initial_checkpoint))
+            initial_checkpoint = checkpoint_identity(args.initial_checkpoint)
         exploration_header = (dict(exploration=exploration.config,
             exploration_sha256=sha256_file(exploration_module.__file__)) if exploration else {})
         vector_protocol = (EPISODE_EVALUATION_PROTOCOL if args.episodes_per_env else
                            EXPLORATION_PROTOCOL if exploration else VECTOR_PROTOCOL)
         emit(dict(event="run_start", protocol=vector_protocol, environment=args.environment,
+                  **(dict(initial_checkpoint=initial_checkpoint) if initial_checkpoint else {}),
                   num_envs=args.num_envs, steps=args.steps, seed=args.seed, environment_seeds=env_seeds,
                   **(dict(checkpoint_history=True) if args.checkpoint_history else {}),
                   **(dict(evaluation_episodes_per_stream=args.episodes_per_env) if args.episodes_per_env else {}),
+                  **(dict(frozen_checkpoint_export=True) if args.evaluate and args.checkpoint else {}),
                   policy_seed_rule="config.seed + stream (wrapping u64)",
                   atari_protocol=args.atari_protocol, action_repeat=ATARI_ACTION_REPEAT,
                   noop_max=protocol.noop_max, max_episode_frames=protocol.max_episode_frames,
                   full_action_space=protocol.full_action_space, sticky_actions=args.sticky_actions,
                   observation_size=args.observation_size, observation_shape=list(initial[0].shape),
+                  **(dict(learned_rgb_preprocessing="single GPU Pillow-equivalent antialiased bilinear resize to 64x64, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
@@ -215,6 +284,7 @@ def main():
         episode_returns = [0.0] * args.num_envs
         episode_lengths = [0] * args.num_envs
         episode_counts = [0] * args.num_envs
+        natural_episode_counts = [0] * args.num_envs
         total_rewards = [0.0] * args.num_envs
         completed = []
         timing = dict(act=0.0, environment=0.0, observe=0.0, learn=0.0, reset=0.0, checkpoint=0.0)
@@ -247,6 +317,7 @@ def main():
                         aggregate_simulated_wall_ratio=sum(frames) / 60 / elapsed,
                         per_stream_simulated_wall_ratio=[n / 60 / elapsed for n in frames],
                         total_rewards=total_rewards, episode_counts=episode_counts,
+                        **(dict(natural_episode_counts=natural_episode_counts) if args.episodes_per_env else {}),
                         partial_returns=episode_returns, partial_lengths=episode_lengths,
                         replay_len=agent.replay_len, training_debt=agent.training_debt,
                         stage_seconds=timing, **exploration_counts)
@@ -293,10 +364,12 @@ def main():
                         result = dict(event="episode", stream=stream, run_step=run_actions,
                                       stream_step=tick, episode=episode_counts[stream],
                                       episode_return=episode_returns[stream], episode_length=episode_lengths[stream],
+                                      elapsed_seconds=time.perf_counter() - started,
                                       terminated=bool(terminated[stream]), truncated=bool(truncated[stream]))
                         emit(result)
                         completed.append(result)
                         episode_counts[stream] += 1
+                        natural_episode_counts[stream] += bool(terminated[stream] and not truncated[stream])
                         episode_returns[stream] = 0.0
                         episode_lengths[stream] = 0
                         resets.append(stream)
@@ -318,7 +391,7 @@ def main():
                     print(f"{run_actions}/{args.steps} actions; {event['actions_per_second']:.2f} actions/s; "
                           f"{agent.learner_step - starting_updates} updates; debt={agent.training_debt:.3f}", flush=True)
                     last_report = run_actions
-                if args.episodes_per_env and min(episode_counts) >= args.episodes_per_env:
+                if args.episodes_per_env and min(natural_episode_counts) >= args.episodes_per_env:
                     break
             if args.checkpoint and run_actions != last_checkpoint:
                 save()
@@ -326,7 +399,7 @@ def main():
             check_memory("finished", run_actions)
             reason = "budget_complete"
             if args.episodes_per_env:
-                reason = "episode_budget_complete" if min(episode_counts) >= args.episodes_per_env else "action_cap_reached"
+                reason = "episode_budget_complete" if min(natural_episode_counts) >= args.episodes_per_env else "action_cap_reached"
             event.update(reason="interrupted" if stop else reason,
                          **episode_summary(completed),
                          learner_updates=agent.learner_step - starting_updates)

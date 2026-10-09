@@ -11,7 +11,8 @@ from ._exploration import EXPLORATION_PROTOCOL, PersistentExploration
 
 
 VECTOR_PROTOCOL = "kindle-vector-v2"
-EPISODE_EVALUATION_PROTOCOL = "kindle-vector-v4"
+EPISODE_EVALUATION_PROTOCOL = "kindle-vector-v5"
+EPISODE_EVALUATION_PROTOCOLS = ("kindle-vector-v4", EPISODE_EVALUATION_PROTOCOL)
 
 
 def episode_summary(episodes):
@@ -54,7 +55,7 @@ def audit(path):
     with Path(path).open() as source:
         header = json.loads(next(source))
         check(header["event"] == "run_start" and header["protocol"] in (
-            "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, EPISODE_EVALUATION_PROTOCOL), "unknown vector protocol")
+            "kindle-vector-v1", VECTOR_PROTOCOL, EXPLORATION_PROTOCOL, *EPISODE_EVALUATION_PROTOCOLS), "unknown vector protocol")
         count, config = header["num_envs"], header["config"]
         check(type(count) is int and count > 0, "invalid stream count")
         check(type(header["steps"]) is int and header["steps"] > 0 and header["steps"] % count == 0, "invalid action budget")
@@ -71,7 +72,7 @@ def audit(path):
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
         episode_target = None
-        if header["protocol"] == EPISODE_EVALUATION_PROTOCOL:
+        if header["protocol"] in EPISODE_EVALUATION_PROTOCOLS:
             episode_target = header["evaluation_episodes_per_stream"]
             check(type(episode_target) is int and episode_target > 0, "invalid episode budget")
             check(header["mode"] != "train" and header.get("restored_checkpoint") is not None,
@@ -95,9 +96,18 @@ def audit(path):
         training = header["mode"] == "train" and config["train_ratio"] > 0
         required = config["replay_context"] + config["batch_length"]
         samples = config["batch_size"] * config["batch_length"]
+        video = config.get("video_encoder")
+        check(video in (None, "frozen", "joint"), "unknown video encoder mode")
+        if video:
+            check(config["batch_length"] == 16 and config["replay_context"] == 1,
+                  "causal video replay requires T16/context1")
         credit_per_action = f32(f32(config["train_ratio"]) / samples)
         replay = deque(range(count))
         replay_lengths = [1] * count
+        # Reconstruct retained frame phases, independently of native slot/start
+        # bookkeeping. A phase-15 arrival needs all 16 frames and its context.
+        phases = [deque([0]) for _ in range(count)] if video else None
+        next_phase = [1] * count
         actions = updates = 0
         credit = 0.0
         started = False
@@ -108,16 +118,26 @@ def audit(path):
         episode_returns = [0.0] * count
         total_rewards = [0.0] * count
         episode_counts = [0] * count
+        natural_episode_counts = [0] * count
+        natural_budget = header["protocol"] == EPISODE_EVALUATION_PROTOCOL
+        budget_counts = natural_episode_counts if natural_budget else episode_counts
         last_frames = [0] * count
         last_flags = None
         final = None
         completed = []
 
-        def push(stream):
+        def push(stream, *, reset=False):
             if len(replay) == config["replay_capacity"]:
-                replay_lengths[replay.popleft()] -= 1
+                oldest = replay.popleft()
+                replay_lengths[oldest] -= 1
+                if phases is not None:
+                    phases[oldest].popleft()
             replay.append(stream)
             replay_lengths[stream] += 1
+            if phases is not None:
+                phase = 0 if reset else next_phase[stream]
+                phases[stream].append(phase)
+                next_phase[stream] = (phase + 1) % 16
 
         def settled():
             check(not pending_updates and not pending_episodes and not pending_resets, "incomplete vector round")
@@ -128,7 +148,7 @@ def audit(path):
             kind = event["event"]
             if kind == "transition":
                 settled()
-                check(episode_target is None or min(episode_counts) < episode_target,
+                check(episode_target is None or min(budget_counts) < episode_target,
                       "actions after episode budget was reached")
                 actions += count
                 check(event["run_step"] == actions and event["vector_tick"] == actions // count, "vector/action counter mismatch")
@@ -168,6 +188,9 @@ def audit(path):
                         pending_resets.add(stream)
                 last_flags = event["terminated"], event["truncated"]
                 ready = sum(max(0, length - required + 1) for length in replay_lengths) >= samples
+                if phases is not None:
+                    ready = sum(phase == 15 and index >= required - 1
+                                for history in phases for index, phase in enumerate(history)) >= config["batch_size"]
                 if training and ready:
                     if not started:
                         started, credit = True, 1.0
@@ -191,6 +214,7 @@ def audit(path):
                 check((event["terminated"], event["truncated"]) == (last_flags[0][stream], last_flags[1][stream]), "episode flags mismatch")
                 pending_episodes.remove(stream)
                 episode_counts[stream] += 1
+                natural_episode_counts[stream] += event["terminated"] and not event["truncated"]
                 episode_lengths[stream] = 0
                 episode_returns[stream] = 0.0
                 completed.append(event)
@@ -199,7 +223,7 @@ def audit(path):
                 ids = event["streams"]
                 check(event["run_step"] == actions and len(ids) == len(set(ids)) and set(ids) == pending_resets, "wrong stream reset")
                 for stream in ids:
-                    push(stream)
+                    push(stream, reset=True)
                 if exploration:
                     exploration.reset(ids)
                 pending_resets.clear()
@@ -212,6 +236,9 @@ def audit(path):
                 check(event["training_debt"] == credit, "lost or invented training credit")
                 for field, expected in (("executed_action_frames", last_frames), ("total_rewards", total_rewards), ("episode_counts", episode_counts), ("partial_returns", episode_returns), ("partial_lengths", episode_lengths)):
                     check(event[field] == expected, f"{field} ledger mismatch")
+                if natural_budget:
+                    check(event["natural_episode_counts"] == natural_episode_counts,
+                          "natural episode ledger mismatch")
                 require_numbers(event["stage_seconds"])
                 if exploration:
                     check(event["overridden_actions"] == exploration.overridden_actions
@@ -226,7 +253,7 @@ def audit(path):
                 if kind == "run_end":
                     final = event
                     if episode_target is not None:
-                        expected_reason = ("episode_budget_complete" if min(episode_counts) >= episode_target
+                        expected_reason = ("episode_budget_complete" if min(budget_counts) >= episode_target
                                            else "action_cap_reached")
                         check(final["reason"] in (expected_reason, "interrupted"), "wrong episode-budget stop reason")
                         check(actions <= header["steps"] and (final["reason"] != "action_cap_reached"
@@ -237,7 +264,8 @@ def audit(path):
                     check(final["learner_updates"] == updates, "final counts mismatch")
             elif kind == "checkpoint":
                 settled()
-                check(episode_target is None, "episode-budget evaluation wrote a checkpoint")
+                check(episode_target is None or header.get("frozen_checkpoint_export") is True,
+                      "undeclared episode-budget checkpoint export")
                 check(event["run_step"] == actions and event["learner_step"] == header["starting_learner_step"] + updates, "checkpoint counters mismatch")
             else:
                 raise ValueError(f"unknown event {kind}")
@@ -262,6 +290,7 @@ def audit(path):
             overridden_actions=exploration.overridden_actions, exploration_ledger_verified=True)
             if exploration else {})
         evaluation_result = (dict(evaluation_episodes_per_stream=episode_target,
+            **(dict(evaluation_episode_kind="natural") if natural_budget else {}),
             episode_budget_complete=final["reason"] == "episode_budget_complete",
             action_cap_reached=actions == header["steps"]) if episode_target is not None else {})
         return dict(path=str(path), protocol=header["protocol"], actions=actions, updates=updates, num_envs=count,

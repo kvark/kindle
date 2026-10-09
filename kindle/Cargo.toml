@@ -5,13 +5,13 @@ authors = ["Dzmitry Malyshau"]
 repository = "https://github.com/kvark/kindle"
 edition = "2024"
 rust-version = "1.92"
-description = "A live-learning Dreamer agent with frozen causal visual perception."
+description = "A live-learning Dreamer agent with causal visual perception."
 license = "MIT"
 
 [dependencies]
 # Keep training correctness fixes and the shared Blade context on one pinned stack.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "367e53d4de73aea6432afd40aa6fd69b5fcd4e8e" }
-blade-graphics = { git = "https://github.com/kvark/blade", rev = "7cca637791a57d9cacf4e99c10a87211f3c11b6a" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "3102683311f3376026928364928a4aa966102311" }
+blade-graphics = { git = "https://github.com/kvark/blade", rev = "56f05651cca73659130e924e497dda633f839d40" }
 rand = "0.9"
 rayon = "1.12"
 serde = { version = "1", features = ["derive"] }

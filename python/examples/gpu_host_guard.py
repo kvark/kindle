@@ -36,14 +36,41 @@ def declaration(path):
         return result
     config = json.loads(Path(path).read_text(), object_pairs_hook=unique)["host_guard"]
     fields = {"monitoring", "boot_id", "driver", "command", "executable_sha256", "timeout_seconds", "poll_seconds"}
-    if not isinstance(config, dict) or set(config) != fields or config["monitoring"] != "host-only":
+    if (not isinstance(config, dict) or not fields <= set(config)
+            or set(config) - fields - {"reviewed_kernel_warnings", "allocation_diagnostic", "reviewed_validation_vuids",
+                                      "record_allocation_warnings"}
+            or config["monitoring"] != "host-only"):
         raise ValueError("require an explicit host-only declaration")
+    warnings = config.get("reviewed_kernel_warnings", [])
+    if (not isinstance(warnings, list) or any(
+            not isinstance(row, dict) or set(row) != {"cursor", "message"}
+            or any(not isinstance(value, str) or not value for value in row.values())
+            or not retained.ALLOCATION_WARNING.search(row["message"])
+            or retained.FAULT.search(row["message"]) for row in warnings)):
+        raise ValueError("reviewed warnings require exact journal cursors and allocation messages")
+    diagnostic = config.get("allocation_diagnostic")
+    if (type(config.get("record_allocation_warnings", False)) is not bool
+            or (config.get("record_allocation_warnings") and diagnostic is not None)):
+        raise ValueError("recorded allocation warnings require an explicit boolean, not a diagnostic waiver")
+    if diagnostic is not None and (
+            not isinstance(diagnostic, dict) or set(diagnostic) != {"message", "max_occurrences"}
+            or not isinstance(diagnostic["message"], str)
+            or not retained.ALLOCATION_WARNING.search(diagnostic["message"])
+            or retained.FAULT.search(diagnostic["message"])
+            or type(diagnostic["max_occurrences"]) is not int
+            or not 1 <= diagnostic["max_occurrences"] <= 2):
+        raise ValueError("allocation diagnostic requires one exact warning and a limit of one or two")
+    vuids = config.get("reviewed_validation_vuids", [])
+    if not isinstance(vuids, list) or any(vuid != "VUID-StandaloneSpirv-None-10684" for vuid in vuids):
+        raise ValueError("only the reviewed workgroup-layout VUID may be non-blocking")
     if str(uuid.UUID(config["boot_id"])) != config["boot_id"] or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", config["driver"]):
         raise ValueError("invalid boot or driver identity")
     for name, maximum in (("timeout_seconds", 172800), ("poll_seconds", 5)):
         value = config[name]
         if type(value) not in (float, int) or not math.isfinite(value) or not 0 < value <= maximum:
             raise ValueError("invalid host guard budget")
+    if diagnostic is not None and config["timeout_seconds"] > 120:
+        raise ValueError("allocation diagnostic is limited to 120 seconds, not a training waiver")
     command = config["command"]
     if (not isinstance(command, list) or not command or any(not isinstance(value, str) or not value or '\0' in value for value in command)
             or not Path(command[0]).is_absolute()):
@@ -64,11 +91,36 @@ def check_host(evidence, config, cursor=None):
                 or retained.DRIVER.read_text().strip() != config["driver"]):
             raise retained.GuardError("boot or loaded driver changed")
     identity()
-    cursor = retained.check_kernel(evidence, config["boot_id"], cursor)
+    cursor = retained.check_kernel(evidence, config["boot_id"], cursor,
+                                   config.get("reviewed_kernel_warnings", ()),
+                                   config.get("allocation_diagnostic"),
+                                   record_allocation_warnings=config.get("record_allocation_warnings", False))
     identity()
     evidence.event("host_check", boot_id=config["boot_id"], driver=config["driver"],
                    kernel_cursor=cursor, started_monotonic=started)
     return cursor
+
+
+def check_validation_logs(evidence, positions, reviewed=()):
+    for name in ("child.stdout", "child.stderr"):
+        with (evidence.root / name).open("rb") as stream:
+            # Overlap catches a diagnostic split across writes or read blocks.
+            stream.seek(max(0, positions.get(name, 0) - 128))
+            tail = b""
+            while data := stream.read(65536):
+                block = tail + data
+                for match in re.finditer(rb"Validation Error:[^\n]*?(VUID-[\w-]+)(?=[\s\]])", block):
+                    offset = stream.tell() - len(block) + match.end()
+                    if offset <= positions.get(name, 0):
+                        continue
+                    vuid = match[1].decode("ascii")
+                    if vuid in reviewed:
+                        evidence.event("reviewed_validation_warning", file=name, offset=offset, vuid=vuid)
+                    else:
+                        evidence.event("native_validation_error", file=name, offset=offset, vuid=vuid)
+                        raise retained.GuardError("Vulkan validation error in native output")
+                tail = block[-128:]
+            positions[name] = stream.tell()
 
 
 def run(root, declaration_path):
@@ -97,10 +149,12 @@ def run(root, declaration_path):
             result.update(child_spawned=True, child_pid=process.pid)
             evidence.event("child_spawned", pid=process.pid)
             deadline = time.monotonic() + config["timeout_seconds"]
+            positions = {}
             while process.poll() is None:
                 if time.monotonic() >= deadline:
                     raise retained.GuardError("job time budget exceeded")
                 cursor = check_host(evidence, config, cursor)
+                check_validation_logs(evidence, positions, config.get("reviewed_validation_vuids", ()))
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise retained.GuardError("job time budget exceeded")
@@ -109,6 +163,7 @@ def run(root, declaration_path):
             result["child_exit_code"] = process.returncode
             if process.returncode != 0:
                 raise retained.GuardError(f"native job exited {process.returncode}")
+            check_validation_logs(evidence, positions, config.get("reviewed_validation_vuids", ()))
         check_host(evidence, config, cursor)
         result["host_guard_passed"] = True
     except (Exception, KeyboardInterrupt) as error:
@@ -151,8 +206,22 @@ def audit(root):
     for event in events:
         if event["event"] == "health":
             raise retained.GuardError("GPU telemetry in host-only evidence")
-        if event["event"] in {"kernel_fault", "guard_stop"} and result["host_guard_passed"]:
+        if event["event"] in {"kernel_fault", "guard_stop", "native_validation_error"} and result["host_guard_passed"]:
             raise retained.GuardError("host guard pass contradicts retained events")
+        if event["event"] == "diagnostic_allocation_warning":
+            diagnostic = job["host_guard"].get("allocation_diagnostic")
+            if (not diagnostic or event["record"]["MESSAGE"] != diagnostic["message"]
+                    or (result["host_guard_passed"] and event["count"] > diagnostic["max_occurrences"])):
+                raise retained.GuardError("allocation diagnostic differs from declaration")
+        if event["event"] == "allocation_warning":
+            message = event["record"]["MESSAGE"]
+            if (job["host_guard"].get("record_allocation_warnings") is not True
+                    or not retained.ALLOCATION_WARNING.search(message) or retained.FAULT.search(message)
+                    or type(event.get("baseline")) is not bool):
+                raise retained.GuardError("recorded allocation warning differs from declaration")
+        if (event["event"] == "reviewed_validation_warning"
+                and event["vuid"] not in job["host_guard"].get("reviewed_validation_vuids", ())):
+            raise retained.GuardError("validation exception differs from declaration")
         if event["event"] == "probe":
             receipt = event["receipt"]
             receipt = receipt if isinstance(receipt, dict) else json.loads((root / receipt).read_text())

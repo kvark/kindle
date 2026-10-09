@@ -1,9 +1,11 @@
 """Independent CPU numerical fixture, not a pretraining implementation.
 
 Uses ordinary PyTorch attention/autograd with clip-major tensors; the native
-graph uses token-major block products. No CUDA, native extension or NVML calls.
-Run with a CPU-only device environment and one thread. Requires torch and
-safetensors in an analysis environment, not Kindle's runtime environment.
+graph uses token-major block products. All tensors and numerical work use CPU;
+CUDA-enabled PyTorch may still query the driver during autograd initialization.
+No explicit CUDA or NVML calls. Run with a CPU-only device environment and one
+thread. Requires torch and safetensors in an analysis environment, not Kindle's
+runtime environment.
 """
 
 import argparse

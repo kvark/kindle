@@ -7,6 +7,95 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
+with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
+but only4/72 wins. The [single grouped-imagination trial](../results/2026-10-06-cdp-imagination-throughput.md)
+passes numerical checks and reduces synthetic full-update time by8.12%.
+Next is the separately declared [five-game500k centered allocation](2026-10-06-cdp-centered-five-game-budget.md),
+not a closed quality goal or restarted historical queue.
+
+October6: the [500k-action Pong follow-up](../results/2026-10-06-cdp-pong-budget.md)
+is complete, but two seeds remain near a complete loss; only2017 improves.
+The [latest Meganeura refresh](../results/2026-10-06-meganeura-refresh.md)
+passes18 guards and2,824 upstream comparisons. The
+[frozen Pong result](../results/2026-10-06-cdp-pong-world.md) finds readable CNN
+features but weak recurrent ball/reward state in the two failed seeds. All four
+guards/exact tensors pass;131,072 diagnostic actions, no actor updates.
+[Centered CDP qualifies](../results/2026-10-06-cdp-centered-qualification.md) and
+its [three-seed200k learning screen passes](../results/2026-10-06-cdp-centered-learning.md):
+frozen−8.4583 versus−18.6528 raw CDP, paired+10.1944 [7.5,12.375]. All six
+learners and18 guards/288 natural frozen episodes finish08:41 UTC. Only4/72
+centered matches are wins, not mastery. The separately guarded profile and
+[six paired frozen state/forecast probes](../results/2026-10-06-cdp-centered-world.md)
+now complete. Every centered seed retains useful recurrent ball state and h15
+negative-event forecasts, with sparse-positive and coordinate-control limits.
+[One bounded throughput trial](2026-10-06-cdp-imagination-throughput.md) is next,
+not an optimization sweep. No further learning-budget extension is declared.
+
+October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
+is complete: twelve new200k-action learners plus all three retained Freeway
+cohorts. Boxing and Freeway learn strongly, Breakout/Qbert improve modestly,
+and Pong improves in only one of three seeds. All45 guards and720 selected
+natural frozen episodes pass; none reaches the predeclared long-run DreamerV3
+reference. Early published curves are similarly weak on Pong/Breakout, so the
+next reviewed [three-seed Pong budget test](2026-10-05-cdp-pong-budget.md)
+changes only fresh training length to500k actions. Full five-game mastery and
+the lower-budget claim remain open; no old matrix resumes.
+
+October5's [unassisted Freeway result](../results/2026-10-05-freeway-effects-200k.md)
+resolves the CDP exploration blocker: three200k-action learners retain frozen
+means22.21/23.21/27.00; all72 candidate rounds score19–30 versus0 in all72 initial
+controls. Full guards, tensors, replays and whole videos pass. Only one seed
+passes the unchanged historical mastery gate; Phase3 and the deferred five-game
+comparison are not complete. All new runs are finished; no automatic extension.
+The report links earlier negative screens, the32k matched controls and limitations.
+
+October4's [CDP protocol](2026-10-04-cdp.md) supersedes the unstarted
+posterior-Tiny ablation. Its [qualification report](../results/2026-10-04-cdp-qualification.md)
+passes independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons,
+native replay/restore and both production smokes. CI278 passes. Earlier failures
+and the06:31 warning stop remain retained. The [six-run learning result](../results/2026-10-04-cdp-learning.md)
+favors CDP on all three pairs:543.6 versus318.1 online mean,13.6% less wall time.
+All learning and frozen state/forecast audits pass. CDP's RSSM retains much more
+readable player state; h15 latent forecasts beat persistence, a constant mean
+and unrelated actions. One-step persistence, zero-reward MAE and matched
+privileged position persistence still win. The user now adopts CDP on the main
+path: next is unassisted Atari exploration/reward, then video priors and native
+games. RGB remains the reference; the CLI still requires explicit `--cdp`.
+All services have exited; the [revised roadmap](../kindle_single_life_dreamer_plan.md)
+does not launch a campaign or revive the deferred Tiny ablation.
+
+October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
+task-adaptive representation hypothesis. Its
+[qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
+the implementation/CPU checks and original native blockers.
+October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
+shows native allocation and compute succeeding despite the startup warning;
+the [Tiny backward follow-up](../results/2026-10-03-joint-tiny-backward.md) fixes
+stale attention-gradient aliases and passes all148 independent gradient checks.
+Full-update/restore/cost qualification and all nine online runs now complete.
+The [task-only](../results/2026-10-03-joint-tiny-learning.md) and
+[direct-policy](../results/2026-10-03-policy-tiny-learning.md) comparisons find no
+clear early benefit. The [fixed-target diagnostic](../results/2026-10-03-fixed-latent-sufficiency.md)
+finds readable positions and better-than-persistence latent forecasts, but no
+established action/reward-sensitive world modeling. The October4
+[RSSM target-scaling test](../results/2026-10-04-rssm-target-standardization.md)
+cuts raw-target forecast errors substantially, but state/reward/action controls
+still do not establish useful dynamics. All six offline arms and audits pass
+in21m35s without new gameplay. The subsequent
+[frozen-belief diagnostic](../results/2026-10-04-rssm-belief-probes.md) locates
+poor held-out horizontal-position readability between adapter and posterior.
+Stage-fitted heads recover vertical information missed by transferred heads;
+some action signal survives, but forecasts still lose to persistence. All three
+frozen replays and24 GPU readouts complete in6m39s, with no actor updates or
+new gameplay. No GPU queue remains active.
+The authorized [posterior-target ablation](2026-10-04-posterior-latent-targets.md)
+is implemented, but its [native qualification](../results/2026-10-04-posterior-latent-qualification.md)
+stopped on a new allocation warning before learning. CPU checks pass; no new
+learning result is available, and GPU work remains stopped pending review.
+The known shader VUID is non-blocking by user direction, not silently removed
+from the evidence.
+
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default
 selection and real vkQuake capture through Dullahan's fenced Vulkan protocol.

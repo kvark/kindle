@@ -1,0 +1,62 @@
+# Offline representation probes
+
+These are held-out supervised state probes, **not RL results or Phase 2 completion**.
+[All per-target R², errors, counts, trajectory splits and selections](2026-09-27-representation-probes.json).
+
+The table uses native phase15/JL64/mean features; raw RGB56 uses two frames.
+Values are unweighted means over position or motion targets and probe-head seeds.
+Undefined constant-target R² is excluded, not turned into zero. All variants remain in JSON.
+
+| Model | Probe | Game | Position R² | Motion R² |
+| --- | --- | --- | ---: | ---: |
+| pretrained_tiny | mlp | Breakout | 0.299 | -0.101 |
+| initial_tiny | mlp | Breakout | -0.347 | -1.074 |
+| large | mlp | Breakout | 0.832 | 0.547 |
+| reconstruction_cnn | mlp | Breakout | 0.518 | -0.211 |
+| raw_rgb56 | mlp | Breakout | -363.996 | -36.796 |
+| pretrained_tiny | mlp | Pong | 0.338 | -0.139 |
+| initial_tiny | mlp | Pong | 0.333 | -0.218 |
+| large | mlp | Pong | 0.862 | 0.586 |
+| reconstruction_cnn | mlp | Pong | 0.719 | 0.066 |
+| raw_rgb56 | mlp | Pong | -59.808 | -168.233 |
+| pretrained_tiny | mlp | Seaquest | 0.149 | -0.288 |
+| initial_tiny | mlp | Seaquest | 0.088 | -0.361 |
+| large | mlp | Seaquest | 0.272 | -0.155 |
+| reconstruction_cnn | mlp | Seaquest | 0.094 | -0.371 |
+| raw_rgb56 | mlp | Seaquest | -31.995 | -28.380 |
+| pretrained_tiny | ridge | Breakout | 0.827 | 0.372 |
+| initial_tiny | ridge | Breakout | 0.805 | 0.332 |
+| large | ridge | Breakout | 0.984 | 0.703 |
+| reconstruction_cnn | ridge | Breakout | 0.830 | 0.205 |
+| raw_rgb56 | ridge | Breakout | 0.716 | -0.025 |
+| pretrained_tiny | ridge | Pong | 0.923 | 0.246 |
+| initial_tiny | ridge | Pong | 0.927 | 0.340 |
+| large | ridge | Pong | 0.981 | 0.719 |
+| reconstruction_cnn | ridge | Pong | 0.943 | 0.311 |
+| raw_rgb56 | ridge | Pong | 0.780 | 0.110 |
+| pretrained_tiny | ridge | Seaquest | 0.529 | 0.006 |
+| initial_tiny | ridge | Seaquest | 0.526 | 0.032 |
+| large | ridge | Seaquest | 0.751 | 0.045 |
+| reconstruction_cnn | ridge | Seaquest | 0.578 | 0.028 |
+| raw_rgb56 | ridge | Seaquest | 0.274 | -0.089 |
+
+Whole trajectories are held out: four train, two validation and two test seeds/game.
+RAM is an offline target only. Hyperparameters and checkpoints are selected on validation;
+test labels never enter fitting. Secondary visibility scores retain the disclosed Seaquest
+sprite/mapping limitations; neither they nor test scores select examples or variants.
+
+The frozen encoders expose 7×7×64 values. The stateless reconstruction CNN has no history;
+identical phase0/15 fits may be reused only after byte equality of all three feature splits.
+Raw RGB56 controls have 3×/6× as many values and are not size-matched encoder baselines.
+
+All MLPs use corrected F64 training-only normalization. Their short fixed-budget fits
+still generalize poorly, especially raw RGB; do not interpret that failure as missing
+pixel information. Ridge decodes positions from those same pixels. No further tuning
+is selected from these test scores. Large is strongest here; Tiny pretraining is mixed.
+
+Tiny has 250k prior RGB64 frames from Boxing/Pong/Freeway/Breakout/Qbert. Large uses VideoMix.
+The reconstruction CNN trains on 12,288 native frames from this corpus's training split,
+including Seaquest. These different experiences must not be attributed solely to architecture.
+
+Matched three-seed learning curves remain required before deciding the 2D frontend.
+See the [comparison protocol](../experiments/2026-09-27-representation-comparison.md).
