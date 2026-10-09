@@ -249,11 +249,38 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   failure remain. Paired12M updates107.97->108.23ms: no speedup. First outputs,
   all272 metric reports and346 final tensors match exactly in this fixture.
   Qualification/timing finish16:38:45 UTC; no worker remains. No identified
-  cause of earlier learning failures or historical repin. Next declare one
-  B8/T64 versus T16 preflight at fixed N8/R32/H15, before a learning allocation.
+  cause of earlier learning failures or historical repin. The [B8/T64 versus
+  T16 preflight](docs/results/2026-10-09-cdp-sequence-preflight.md) completes:
+  four guards, identical initial346 tensors and both frozen restores pass,
+  zero warnings. Same65,536 replay positions cost.8580/.8185ms each:4.6% lower,
+  below the declared10% gate. T64 has only2.05GiB sampled headroom,56MiB above
+  the floor. Keep T16; no sequence sweep or T64 learning campaign.8,192 training
+  actions/1,156 updates plus2,048 frozen actions; final T64 debt.5 is reconciled.
   Longer BPTT changes learning/batch statistics/scheduling, not just speed;
   keep capacity/exploration fixed. No sweep or automatic budget extension.
   Neighboring user work stays untouched.
+- **Imagination cost attributed:** [one fixed-checkpoint capture](docs/results/2026-10-09-cdp-imagination-cost.md)
+  finds the four all-action ensemble first projections at20.50ms/38.7% of
+  instrumented imagination dispatch time,91.23G MACs. One guard, exact346 tensors
+  across profiling, zero warnings/game actions, one synthetic update; no worker
+  remains. Timestamp intervals are not ordinary latency or SM utilization.
+  No shader defect, weak-seed cause or new optimization is established; rejected
+  factorization stays rejected. Do not make optimization an indefinite learning
+  gate. Keep12M/T16; all five quality targets and the RGB budget question remain
+  open.
+- **Active Qbert budget study:** [fixed declaration](docs/experiments/2026-10-09-cdp-qbert-budget.md),
+  three fresh2M-action seeds1009/2017/3019 on the unchanged12M/T16 centered
+  CDP/action-effects recipe.6M actions/1,499,817 updates total, expected47–48h;
+  20h learner/30min frozen/72h service bounds. Seed1009 starts October9
+  at17:25:59 UTC; eight environments/host workers, native7311547d, no CPU quota
+  on GPU work. Upstream heads31026833/56f0565 still match the qualification.
+  Final/actual-initial natural cohorts, exact346 tensors, full CPU replays/videos
+  and independent task-outcome review run after each learner before the next.
+  Preparation/publication audit passes in.98s with no game actions. Retain12M500k
+  and1M controls with their historical pins; no exact same-binary budget-ablation
+  claim. This is a new experience-budget study, not an old lifetime resume or
+  automatic extension. No other new game allocation; all five quality targets,
+  12M prior forecasts and the RGB budget claim remain open.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.

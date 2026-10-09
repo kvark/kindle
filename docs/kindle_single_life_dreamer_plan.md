@@ -218,11 +218,23 @@ tensors in this fixture. Adopt the fixes without a speedup or learning-cause
 claim. Three allocation warnings and the corrected CPU provenance failure
 remain; historical learning identities are unchanged.
 
-**Next:** declare one B8/T64 versus T16 memory/correctness/timing preflight,
-at fixed N8/R32/H15 and capacity/exploration. Longer sequences may improve
-batching and temporal credit, but also change learning and scheduling; do not
-label this an unchanged-learning speedup. Review before a matched three-seed
-learning allocation. No capacity/representation sweep or blind extension.
+**T64 does not advance:** [preflight](results/2026-10-09-cdp-sequence-preflight.md)
+passes validity/frozen checks but saves only4.6% per replay position, below its
+10% gate, with2.05GiB minimum sampled headroom. Keep T16; no sequence sweep.
+The [one-shot cost capture](results/2026-10-09-cdp-imagination-cost.md) attributes
+38.7% of instrumented imagination time to the four all-action ensemble first
+projections. This is neither SM utilization nor a reason to retry the rejected
+factorization or relax numerical gates.
+
+**Active:** [three fresh2M-action Qbert learners](experiments/2026-10-09-cdp-qbert-budget.md)
+on the unchanged12M/T16 recipe. Seed1009 starts October9 at17:25:59 UTC;
+expected47–48h for all three, including actual-initial/final natural cohorts,
+independent CPU task/replay review and full videos. Test whether more experience
+improves the weakest multi-seed task completion before committing all games to
+longer budgets. The qualified backend refresh is disclosed against retained500k
+controls; this is not an exact same-binary budget ablation. No old lifetime
+resume, model sweep or automatic extension; all five long-run targets and the
+RGB budget claim stay open.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
