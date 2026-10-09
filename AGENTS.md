@@ -127,11 +127,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   These scoped checks do not erase the failed stronger F64 check.
   12M updates previously averaged110.03ms,55.4% imagination/29.9% world training;
   utilization remains unmeasured.
-- **Active allocation:** [remaining four12M capacity cohorts](docs/experiments/2026-10-07-cdp-12m-four-game-capacity.md),
+- **Four-game allocation complete:** [declaration](docs/experiments/2026-10-07-cdp-12m-four-game-capacity.md),
   Pong, Qbert, Boxing, Freeway; three fresh500k-action seeds each, same centered
-  CDP/action-effects recipe.6M actions/1,499,268 updates total, expected47–48h,
-  72h service/5h learner bounds. Final and actual-initial frozen natural cohorts,
-  exact tensors/full replay/videos follow each learner before the next.
+  CDP/action-effects recipe.6M actions/1,499,268 updates total; service finishes
+  October9 at16:08:01 UTC in47h1m32s. All final/actual-initial natural cohorts,
+  exact tensors/full replay/videos pass. CPU completion review finishes16:12:35;
+  no learner or review worker remains. No allocation restarts.
   Keep completed12M Breakout and all retained1M controls with their original
   backend pins; no exact same-binary capacity ablation claim. No automatic
   budget extension; all five quality targets and the budget question stay open.
@@ -169,8 +170,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   at04:20 UTC; only the declared three Freeway pairs remain. Nine guards/144
   natural frozen episodes/exact346 tensors and six whole replays/videos pass;
   212,288 frozen actions, zero updates, seven excess episodes and11 allocation
-  warnings retained. CPU review passes in15.17s. Keep both sizes and finish
-  Freeway before choosing another learning allocation; no Boxing extension.
+  warnings retained. CPU review passes in15.17s. Keep both sizes; the completed
+  Freeway comparison below closes this allocation, not the quality goal.
+- **12M Freeway and five-game capacity comparison complete:**
+  [results, combined comparison and whole videos](docs/results/2026-10-09-cdp-freeway-capacity.md).
+  Frozen33.58/17.25/31.79, mean27.54 versus retained1M30.26; paired−2.72
+  [−13.29,4.08]. Crossing gates72/72 ->48/72;2017 regresses, with slow learning
+  rather than an observed late collapse. All initials are0. The cohort costs
+  1.5M actions/374,817 updates/11h41m22s training,3.57x retained1M. Nine guards/144 natural
+  frozen episodes/exact346 tensors and six whole replay/videos pass;294,912
+  frozen actions, zero updates, no excess episodes, all tails and13 warnings.
+  All15 larger learners cost7.5M actions/1,874,085 updates/58h22m14s training,
+  3.56x retained1M16h24m7s. All45 guards/720 selected natural episodes/30 full
+  videos pass;1,069,184 frozen actions,35 excess episodes and52 warnings remain.
+  Capacity helps every paired reward mean in Breakout/Pong/Qbert, not every
+  title or task milestone. Keep12M as quality candidate and1M as fast control;
+  no universal promotion, capacity sweep or automatic extension. All five
+  long-run quality targets,12M prior forecasts and the RGB budget claim remain open.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
@@ -221,6 +237,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   relevant fix for the current small-CDP learning weakness was identified.
   Keep active jobs/frozen diagnosis on the qualified runtime; review a refresh
   before the next learner change, without repinning completed evidence.
+- **October9 next-step review:** at approximately2M frames the completed12M
+  online means are ahead of released DreamerV3 bins on Pong/Breakout and close
+  on Boxing/Qbert; the completed Freeway online mean is also ahead of that bin.
+  This is descriptive, not protocol-matched parity or a change to the five
+  long-run targets. Freeway and the CPU completion review are complete.
+  Next qualify the newly reviewed Meganeura6746aae/Blade56f0565 pair on unchanged
+  graphs with one old/new12M timing before the next learning allocation.
+  Vulkan descriptor reuse may reduce recording/allocation overhead; other new
+  native-f32 paths mainly target AMD. No measured NVIDIA speedup or identified
+  cause of earlier learning failures. Recheck upstream once before the new
+  declaration; no historical repin or automatic learning extension. Neighboring
+  user work stays untouched.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
