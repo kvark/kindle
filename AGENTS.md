@@ -242,13 +242,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   on Boxing/Qbert; the completed Freeway online mean is also ahead of that bin.
   This is descriptive, not protocol-matched parity or a change to the five
   long-run targets. Freeway and the CPU completion review are complete.
-  Next qualify the newly reviewed Meganeura6746aae/Blade56f0565 pair on unchanged
-  graphs with one old/new12M timing before the next learning allocation.
-  Vulkan descriptor reuse may reduce recording/allocation overhead; other new
-  native-f32 paths mainly target AMD. No measured NVIDIA speedup or identified
-  cause of earlier learning failures. Recheck upstream once before the new
-  declaration; no historical repin or automatic learning extension. Neighboring
-  user work stays untouched.
+  The final upstream recheck adds Meganeura31026833's native16 split-reduction
+  stability fix; Blade56f0565 is unchanged. The [refresh qualifies](docs/results/2026-10-09-meganeura-refresh.md):
+  20 guards,2,824 upstream comparisons and all three train/frozen smokes pass.
+  Native7311547d; three allocation warnings and the corrected CPU provenance
+  failure remain. Paired12M updates107.97->108.23ms: no speedup. First outputs,
+  all272 metric reports and346 final tensors match exactly in this fixture.
+  Qualification/timing finish16:38:45 UTC; no worker remains. No identified
+  cause of earlier learning failures or historical repin. Next declare one
+  B8/T64 versus T16 preflight at fixed N8/R32/H15, before a learning allocation.
+  Longer BPTT changes learning/batch statistics/scheduling, not just speed;
+  keep capacity/exploration fixed. No sweep or automatic budget extension.
+  Neighboring user work stays untouched.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
@@ -322,9 +327,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified CDP/RGB backend: Meganeura main `f104f354`, Blade `e349cddf`,
-  native `83be73bf`; the [October7 control refresh](docs/results/2026-10-07-meganeura-control-refresh.md)
-  qualifies unchanged graphs. Previous `c6376542`/`6d38eea2` remains the historical
+- Current qualified CDP/RGB backend: Meganeura main `31026833`, Blade `56f0565`,
+  native `7311547d`; the [October9 refresh](docs/results/2026-10-09-meganeura-refresh.md)
+  qualifies unchanged graphs with no speedup claim. Historical `f104f354`/
+  `e349cddf`/`83be73bf` retains the completed four-game learners and its
+  [October7 qualification](docs/results/2026-10-07-meganeura-control-refresh.md).
+  Previous `c6376542`/`6d38eea2` remains the historical
   grouped-imagination and completed capacity-study runtime.
   The [October6 refresh](docs/results/2026-10-06-meganeura-refresh.md) qualifies
   CDP/exploration, RGB and frozen Tiny on its historical `b684ffd9`. The historical

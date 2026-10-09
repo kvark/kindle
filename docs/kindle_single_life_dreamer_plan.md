@@ -210,11 +210,19 @@ and the original last10% of200M targets remain in the
 [combined data](results/2026-10-09-cdp-five-game-capacity.json).
 All five quality targets and the RGB compute-saving question remain open.
 
-**Next:** qualify the newly reviewed Meganeura/Blade backend on unchanged
-learning graphs, including one old/new12M full-update timing. Vulkan descriptor
-reuse may reduce overhead; it is not yet a measured speedup or the cause of a
-learning failure. Then choose a bounded learning allocation from the completed
-quality/cost evidence. No new capacity/representation sweep or blind extension.
+**Latest backend qualified:** [October9 refresh](results/2026-10-09-meganeura-refresh.md),
+Meganeura31026833/Blade56f0565/native7311547d. All20 guards,2,824 upstream
+comparisons and three train/frozen smokes pass. One paired12M timing measures
+107.97->108.23ms, with exact first outputs,272 metric reports and346 final
+tensors in this fixture. Adopt the fixes without a speedup or learning-cause
+claim. Three allocation warnings and the corrected CPU provenance failure
+remain; historical learning identities are unchanged.
+
+**Next:** declare one B8/T64 versus T16 memory/correctness/timing preflight,
+at fixed N8/R32/H15 and capacity/exploration. Longer sequences may improve
+batching and temporal credit, but also change learning and scheduling; do not
+label this an unchanged-learning speedup. Review before a matched three-seed
+learning allocation. No capacity/representation sweep or blind extension.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
