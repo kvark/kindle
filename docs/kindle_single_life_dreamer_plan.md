@@ -236,6 +236,13 @@ controls; this is not an exact same-binary budget ablation. No old lifetime
 resume, model sweep or automatic extension; all five long-run targets and the
 RGB budget claim stay open.
 
+[Seed1009's500k prefix](results/2026-10-09-cdp-qbert-prefix.md) now matches the
+retained run exactly: initial346 tensors,62,500 batched transitions,124,939
+non-timing learner reports and671 episodes, online last50 mean1,809. The
+CPU-only review does not establish universal backend parity, pixel equality,
+final500k tensor equality or later/frozen competence. Continue the declared
+2M budget unchanged; the other two seeds remain unstarted.
+
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
 before disagreement, removing action-independent uncertainty. One actor uses

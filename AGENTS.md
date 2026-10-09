@@ -281,6 +281,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   claim. This is a new experience-budget study, not an old lifetime resume or
   automatic extension. No other new game allocation; all five quality targets,
   12M prior forecasts and the RGB budget claim remain open.
+  **1009's recorded500k prefix matches exactly across runtimes:** [CPU comparison](docs/results/2026-10-09-cdp-qbert-prefix.md),
+  initial346 tensors,62,500 transition records,124,939 non-timing learner reports,
+  671 episodes and976 common progress reports; online last50 remains1,809.
+  Review completes21:30 UTC in6.62s, zero extra actions/updates/GPU work. This
+  supports prefix agreement for one seed, not universal parity, pixel identity,
+  final500k tensor equality or three-seed/final2M competence. The independent
+  end-of-seed reviewer also reproduces all three historical pairs in3.84s.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
