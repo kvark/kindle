@@ -218,6 +218,17 @@ Boxing/Freeway cohorts before choosing the next learning change; no blind
 Qbert extension. Capacity now improves rewards across three games, not yet
 suite competence or measured12M prior forecasts.
 
+**The12M Boxing cohort completes October9 at04:20 UTC:**
+[results, curves and whole videos](results/2026-10-09-cdp-boxing-capacity.md).
+Frozen73.17/92.33/90.29, mean85.26 versus retained1M77.69; paired+7.57
+[−1.29,20.71] includes zero.1009 declines slightly; both sizes win72/72 and
+all seeds pass historical gates, but none reaches99.6133. Same1.5M actions/
+374,817 updates cost11h41m33s,3.57x retained1M training. All nine guards,
+144 natural frozen episodes, exact tensors and six full replay/videos pass;
+11 allocation warnings and all tails remain. CPU review passes. Retain both
+sizes: Boxing alone does not establish a consistent advantage from the extra
+capacity. Finish the declared Freeway cohort before another learning allocation.
+
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
 before disagreement, removing action-independent uncertainty. One actor uses
@@ -298,7 +309,7 @@ Do not build swarm infrastructure or a concurrent learner service now.
 ## Current game status
 
 These are current sticky/full-action centered CDP500k results unless explicitly
-marked historical. Breakout, Pong and Qbert report12M; Boxing/Freeway use1M. The common
+marked historical. Boxing, Breakout, Pong and Qbert report12M; Freeway uses1M. The common
 recipe is not a matched five-game capacity comparison or a comparison
 against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
@@ -309,7 +320,7 @@ Links into `runs/` require this workspace.
 | Game | Current measured result | Unresolved question / historical gate | Evidence and whole videos |
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
-| Boxing | Frozen77.69 vs1.00 initial; seeds74.46/71.63/87.00,72/72 wins. | All three pass the historical>=90% wins/mean>=50 gate. Published99.61 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos) |
+| Boxing |12M frozen85.26 vs1.96 initial; seeds73.17/92.33/90.29,72/72 wins. Paired gain over1M+7.57 [−1.29,20.71]; training costs3.57x. | Both sizes pass historical gates in every seed; larger-model advantage is inconsistent. Published99.61 remains unmet. | [Capacity results and videos](results/2026-10-09-cdp-boxing-capacity.md) |
 | Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway | Frozen30.26 vs0; seeds29.50/30.54/30.75. All72 rounds score27–32. | All three pass the original25-crossing gate, without action hints. Published33.40 remains unmet. | [Current results and videos](results/2026-10-07-cdp-centered-five-game-budget.md#whole-rollout-videos); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |

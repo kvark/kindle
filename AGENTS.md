@@ -160,6 +160,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   is selected from existing replay outcomes, not positive-return counts; the
   old Pong reviewer source remains. Capacity helps three games' rewards, not
   yet reliable suite competence. No new Qbert budget or representation sweep.
+- **12M Boxing capacity comparison complete:** [results, curves and whole videos](docs/results/2026-10-09-cdp-boxing-capacity.md).
+  Frozen73.17/92.33/90.29, mean85.26 versus retained1M77.69; paired+7.57
+  [−1.29,20.71] includes zero.1009 declines slightly; both sizes win72/72 and
+  pass historical gates in all seeds. None reaches99.6133.1.5M actions/
+  374,817 updates/11h41m33s training,3.57x retained1M cost; this does not
+  establish a consistent larger-model advantage. Cohort finishes October9
+  at04:20 UTC; only the declared three Freeway pairs remain. Nine guards/144
+  natural frozen episodes/exact346 tensors and six whole replays/videos pass;
+  212,288 frozen actions, zero updates, seven excess episodes and11 allocation
+  warnings retained. CPU review passes in15.17s. Keep both sizes and finish
+  Freeway before choosing another learning allocation; no Boxing extension.
 - **Budget claims:**200k actions are~800k emulator frames, more than Atari100k's
   400k but less than Atari57's200M. Compare published online curves and our
   frozen controls separately. Retain all released seeds and the declared
