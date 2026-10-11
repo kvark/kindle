@@ -355,6 +355,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   wins and inconsistent mastery. Keep actual initials, natural cohorts and20.45
   long-run target; no automatic suite extension. All five quality/RGB goals open.
 
+- **Active Pong2M budget study:** [fixed declaration](docs/experiments/2026-10-11-cdp-pong-budget.md),
+  three fresh2M-action seeds1009/2017/3019 on unchanged12M/T16 centered CDP/
+  action-effects.6M actions/1,499,817 updates total; expected47–48h,20h learner/
+  30min frozen/72h service bounds. Seed1009 starts October11 at18:56:09 UTC
+  in `kindle-pong-2m-20261011.service`, root `runs/cdp-pong-2m-20261011.lb5DyI6h`.
+  Eight environments/host workers, native0f26ee63, no GPU CPU quota, zero swap.
+  Upstream2c42b448/56f0565 still match qualification. Final/actual-initial natural
+  cohorts, exact346 tensors, full CPU replays/videos and independent win reviews
+  follow each learner before the next; final budget/curve review is automated.
+  CPU rehearsal reproduces all retained500k scores and21/24/24 wins in4.07s,
+  29 source pins, zero new GPU jobs/actions/updates. Retain historical controls
+  and targets, not an exact same-binary ablation or resumed lifetime. No other
+  new game allocation or automatic extension; all five quality/RGB goals open.
+
 ## Architecture and invariants
 
 - CDP keeps Dreamer's categorical RSSM, replay and imagined actor/critic; it

@@ -26,8 +26,12 @@ targets remain open. The [bounded upstream measured-build check](../results/2026
 is complete: ordinary2c42b448 qualifies with exact fixture agreement and no
 speedup (107.93→108.30ms). The original logical-memory preflight fails; one
 declared correction reaches a numerical mismatch and stops. Both failures
-remain, with no tolerance relaxation or retained test hook. Next separately
-declare a three-seed Pong budget study, not another optimization sweep.
+remain, with no tolerance relaxation or retained test hook. The
+[three-seed Pong2M budget study](2026-10-11-cdp-pong-budget.md) starts October11
+at18:56:09 UTC, expected47–48h. Same12M/T16 centered recipe, qualified ordinary
+native0f26ee63; per-seed natural frozen controls/replay/videos/independent reviews
+and final budget summary are automatic. CPU rehearsal reproduces retained
+scores/wins with zero new actions. No other-game allocation or automatic extension.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),

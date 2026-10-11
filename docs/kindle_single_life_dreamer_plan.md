@@ -267,10 +267,17 @@ one declared correction stops at value/bonus numerical tolerances. Both failed
 guards/source bundles remain, with zero search optimizer updates/game actions;
 ten total warnings and no GPU recovery. The test-only hook is removed. No
 further search, tolerance relaxation or rejected-factorization retry.
-Next separately declare a three-seed Pong experience-budget study on the
-unchanged12M/T16 recipe, targeting its69/72 wins and inconsistent mastery.
-Keep the20.45 long-run target, actual initial controls and natural frozen
-evaluation. No representation/entropy/critic-loss sweep or indefinite speed gate.
+**Pong2M budget study is active:** [fixed declaration](experiments/2026-10-11-cdp-pong-budget.md).
+Three fresh seeds on unchanged12M/T16 centered CDP/action-effects;6M actions /
+1,499,817 updates total, targeting the retained69/72 wins and inconsistent
+mastery. Seed1009 starts October11 at18:56:09 UTC; expected47–48h including
+frozen evaluations. Eight environments/host workers, native0f26ee63, no GPU CPU
+quota. Actual-initial/final natural cohorts, exact tensors, full replay/videos,
+independent per-seed win reviews and final budget/curve review are automated.
+The CPU reviewer rehearsal reproduces all retained500k scores and21/24/24 wins
+in4.07s, with no new gameplay. Keep the20.45 long-run target and historical
+control pins; this is not an exact same-binary budget ablation or resumed
+lifetime. No representation/entropy/critic-loss sweep or indefinite speed gate.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.
