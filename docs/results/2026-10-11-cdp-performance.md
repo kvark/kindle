@@ -81,6 +81,11 @@ instrumentation strongly perturbs some native stages; GPU activity spans are
 not SM utilization. **SM utilization remains unmeasured**, with no separate
 NVML polling or CPU learner workaround.
 
+October11 backend follow-up: the historical ordinary GPU timing fields cover
+only the last submission of multi-submission world training, not its total.
+Complete wall timings above remain valid. See the [profiling correction and
+backend candidates](2026-10-11-backend-training-performance.md).
+
 ## Validation, scope and next decision
 
 GPU numerical checks cover state-projection reuse, selected/zero-reset action

@@ -14,6 +14,10 @@ BF16 where supported, then measured fusion/layout/dispatch improvements.
 The Freeway screen below is stopped at39,568 actions/9,831 updates on its first
 learner; the partial checkpoint remains. No completed learner, later arm or
 frozen cohort. Synthetic backend qualification continues, not game training.
+The [first backend round](results/2026-10-11-backend-training-performance.md)
+qualifies repeated-row addressing (2.54% lower CDP update latency and1.05 GiB
+less imagination allocation); the convolution candidate has no whole-update
+gain and stays draft. Native BF16 execution/storage is next, still unimplemented.
 
 The user has selected a wall-clock performance round on the5080. The stopped
 Pong queue stays cancelled. Optimize one useful learner before adding GPUs or

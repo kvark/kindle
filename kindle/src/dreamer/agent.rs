@@ -615,9 +615,12 @@ impl DreamerCore {
             )?;
             let path = directory.as_ref().join(format!("{name}.json"));
             let mut data = serde_json::to_value(profile)?;
-            data["ordinary_gpu_median_ms"] =
+            data["ordinary_gpu_last_submission_median_ms"] =
                 serde_json::json!(gpu_durations.get(gpu_durations.len() / 2));
-            data["ordinary_gpu_samples_ms"] = serde_json::json!(gpu_durations);
+            data["ordinary_gpu_last_submission_samples_ms"] = serde_json::json!(gpu_durations);
+            data["ordinary_gpu_timing_scope"] = serde_json::json!(
+                "Last submission only; world_gradient uses four submissions. Not total GPU time or SM utilization."
+            );
             data["ordinary_wall_samples_ms"] = serde_json::json!(durations);
             fs::write(path, serde_json::to_vec_pretty(&data)?)?;
         }

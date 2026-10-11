@@ -27,7 +27,30 @@ ended cleanly at 39,568 actions / 9,831 updates, with a partial checkpoint.
 No learner finished and no other arm or frozen cohort started. Preserve the
 declaration and artifacts; do not resume a checkpoint as the same lifetime.
 
-## Work in order
+## Current implementation state
+
+[First-round evidence](results/2026-10-11-backend-training-performance.md):
+
+- Convolution: [Meganeura PR248](https://github.com/kvark/meganeura/pull/248)
+  passes kernel checks and speeds isolated gradients, but not full updates.
+  CDP161.40→161.27 ms; RGB71.38→72.76 ms. Draft, not adopted.
+- Layout: [Meganeura PR249](https://github.com/kvark/meganeura/pull/249)
+  removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
+  imagination allocation, exact272 reports/final tensors. Ready for review;
+  not yet merged or pinned. Independent of PR248; RGB effectively unchanged.
+- Mixed precision: hardware capability check complete; native BF16 compiler /
+  storage execution remains to implement. This is the next work package.
+- Profiling: correct the ordinary GPU fields to say **last submission only**.
+  World training uses four submissions. Historical raw captures remain;
+  complete wall timings are valid, total GPU time/utilization is unmeasured.
+
+No game worker remains. Do not restart the interrupted Freeway comparison.
+
+## Work packages
+
+Start with convolution, then use the resulting profile to order independent
+work. The row-addressing improvement below runs before the larger BF16 compiler
+change; it does not depend on adopting the convolution candidate.
 
 ### 1 Accelerate convolution weight gradients
 
@@ -66,6 +89,27 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   cancellation; never silently demote strict F32 operations. Reduced-precision
   learning need not match the old F32 trajectory bit for bit.
 
+The implementation boundary is explicit:
+
+1. Naga: a distinct BF16 scalar encoding, validation, conversion and SPIR-V
+   emission. BF16 is not another name for IEEE FP16. Initially support storage,
+   conversions and cooperative products; widen ordinary elementwise arithmetic
+   to F32. The [SPIR-V BF16 extension](https://github.khronos.org/SPIRV-Registry/extensions/KHR/SPV_KHR_bfloat16.html)
+   restricts which instructions can consume BF16 values.
+2. Blade: update Vulkan bindings as needed, query/enable the exposed
+   [BF16 feature](https://docs.vulkan.org/refpages/latest/refpages/source/VK_KHR_shader_bfloat16.html)
+   and enumerate supported cooperative operand/accumulator combinations.
+   No requirement for the unsupported BF16 dot-product feature. Unsupported
+   devices retain the existing path; do not expose an unexecutable dtype.
+3. Meganeura: typed BF16 buffers and boundary conversions, F32-master training,
+   then connected reduced-storage regions through the actual convolution /
+   dense / activation / layout pipeline. First qualify conversion edge cases
+   and F64-referenced matrix gradients, then repeated complete updates.
+
+This compiler/backend work remains unimplemented. Capability discovery is
+complete, not mixed-precision qualification. Do not substitute a driver change,
+CPU emulation or an isolated cast benchmark for this deliverable.
+
 ### 3 Reduce intermediate traffic and dispatch overhead
 
 - Reprofile after the convolution change. Rank remaining costs across dense /
@@ -83,9 +127,11 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
 - [x] Preserve the old controls and stop the current learning service.
 - [x] Recheck both upstreams; use an isolated Meganeura worktree to preserve
   neighboring user changes. Only the user merges upstream PRs.
-- [ ] Implement and qualify convolution weight gradients.
+- [ ] Qualify a useful complete-update convolution improvement (draft implemented;
+  numerical checks pass, whole-update speed acceptance not met).
 - [ ] Establish BF16 capability and implement mixed-precision execution/storage.
-- [ ] Implement the highest-value remaining fusion/layout improvement.
+- [x] Implement and qualify the selected row-addressing layout improvement;
+  upstream merge/adoption remains separate.
 - [ ] Repeat the fixed native/JAX comparison and report remaining gaps.
 
 Use small reviewable upstream changes with portable fallbacks. Reuse the

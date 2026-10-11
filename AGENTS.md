@@ -17,6 +17,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   worktrees; only the user merges. The Freeway screen below was stopped cleanly
   at39,568 actions/9,831 updates, no completed learner or later arm. Partial
   checkpoint/declaration remain; no automatic restart or same-lifetime claim.
+- **Backend round partial:** [evidence](docs/results/2026-10-11-backend-training-performance.md).
+  Meganeura PR248/7553463 speeds isolated convolution gradients but not full
+  updates; draft, unadopted. Independent PR249/c0c7774 removes repeated action
+  copies: CDP B32 161.40->157.30ms and1.05GiB less imagination allocation,
+  exact272 reports/346 final tensors; RGB unchanged/exact292 tensors. Ready
+  for review, not yet merged/pinned. BF16 types/cooperative matrices are exposed
+  by the driver; Naga/Blade/Meganeura execution/storage remains unimplemented
+  and is next. Historical ordinary GPU profile fields describe only the last
+  submission (world uses four), not total GPU time; corrected labels preserve
+  raw evidence.18 guards pass/two warnings, zero game actions; training stays
+  stopped. No useful convolution win or native/JAX gap closure claim.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX
   profile and artifact cleanup. Optimize one5080 learner before concurrent seeds
