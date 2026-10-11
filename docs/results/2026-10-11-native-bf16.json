@@ -52,6 +52,9 @@
   },
   "connected_followup": {
     "meganeura": "f979fa9e48779d9718e88d976a9179f93a478a66",
+    "review_head_after_cache_version_fix": "431f9563c56e20da0f344ac015e08a9d8f9c523c",
+    "cache_format": 24,
+    "cache_cpu_tests": 13,
     "binary_sha256": "7fefe41650e54958cb3d2cf9dffe1fc32df679a5b521fc46deb950db64843b8d",
     "successful_guards": 1,
     "child_seconds": 9.76,
