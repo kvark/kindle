@@ -1,0 +1,53 @@
+{
+  "status": "user_stopped_for_pivot",
+  "service": "kindle-pong-2m-20261011.service",
+  "root": "runs/cdp-pong-2m-20261011.lb5DyI6h",
+  "declaration": "docs/experiments/2026-10-11-cdp-pong-budget.md",
+  "started_utc": "2026-10-11T18:56:09Z",
+  "stopped_utc": "2026-10-11T20:25:19Z",
+  "seed": 1009,
+  "actions": 189576,
+  "learner_updates": 47333,
+  "training_debt": 0.0,
+  "runner_elapsed_seconds": 5346.1921504600905,
+  "completed_learners": 0,
+  "frozen_evaluation_actions": 0,
+  "cancelled_unstarted_seeds": [2017, 3019],
+  "all_evaluation_jobs_cancelled": true,
+  "native_sha256": "0f26ee639aaa387c6dc8cc1b454897159e716724301860573cdd442b268d57ca",
+  "meganeura_revision": "2c42b4488310d83640c934c411202dde05b055e0",
+  "blade_revision": "56f05651cca73659130e924e497dda633f839d40",
+  "partial_checkpoint": "pong-centered-1009-checkpoint",
+  "initial_checkpoint": "pong-centered-1009-initial-checkpoint",
+  "partial_checkpoint_sha256": {
+    "metadata.json": "4e19a9035f6501759257d8aa259e70f59e0a4e4091bdba2b5214550251ab43e3",
+    "world.safetensors": "069753c4f69aa17ae245f29c10f2ddd2dfa940b6f82fd7650d0fb55d1315d623",
+    "behavior.safetensors": "38643dd3c27937577e34a3cbe10954c08f1fc8c89ae5c3e740eb4514de4f574a",
+    "slow_value.safetensors": "c8dc9fc446240822ced799d0c419a3e7973ef6f8562f8b9321edceffbeda84dc"
+  },
+  "partial_checkpoint_hashes_match_final_log": true,
+  "guard": {
+    "status": "interrupted_without_terminal_verdict",
+    "allocation_warning_baseline_records": 143,
+    "new_allocation_warning_records": 0
+  },
+  "shutdown": {
+    "main_pid": 0,
+    "control_group_empty": true,
+    "restart_policy": "no",
+    "restart_count": 0,
+    "active_kindle_services": 0,
+    "remaining_game_workers": 0,
+    "kindle_timers": 0,
+    "systemd_result": "exit-code",
+    "controller_exit_status": 1,
+    "controller_reason": "study interrupted; no retry"
+  },
+  "limits": [
+    "Stopped by user, not a completed allocation or new competence result.",
+    "Saved checkpoint hashes were checked on CPU; no post-stop GPU restore or evaluation.",
+    "Checkpoint restore lacks replay, RNG and live belief; not an uninterrupted lifetime.",
+    "Systemd failure records intentional interruption; no terminal guard pass is claimed.",
+    "Original declaration, partial logs, baseline warnings and unfinished episode tails remain."
+  ]
+}

@@ -5,7 +5,39 @@ Updated October 11, 2026. This is the authoritative roadmap.
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
 
-## Direction: CDP is the main path
+## Paused for a pivot
+
+**October11,20:25 UTC: training stopped at the user's request.** The existing
+five-game goal is paused, not achieved. No learner, evaluation or GPU experiment
+is queued to run automatically. The stages below describe the retained plan;
+they are not instructions to continue it before the new direction is agreed.
+
+- **Preserved boundary:** Pong1009 stops gracefully at189,576 actions /
+  47,333 updates after1h29m6s. Partial and actual-initial checkpoints, logs,
+  declaration and source pins remain; saved partial hashes match the final log.
+  Seeds2017/3019 and all evaluations are cancelled. There is no completed2M
+  learner or new frozen result. See the [stop receipt](results/2026-10-11-cdp-pong-stop.json).
+  A restore lacks replay/RNG/live belief and would not continue the same lifetime.
+- **Reusable baseline:** qualified native CDP/RGB, eight batched environments,
+  one GPU resize of native pixels,1M fast controls and12M quality candidates.
+  The [game table](#current-game-status) links completed seed results and videos;
+  Qbert's latest2M cohort and frozen diagnostics are complete. Preserve those
+  controls rather than deleting evidence or changing their historical gates.
+- **Unresolved:** reliable five-game quality, a matched RGB compute advantage,
+  and transfer to native games. The interrupted Pong run settles none of these.
+- **Decision to make for the pivot:** distinguish sample efficiency from wall
+  time. Use matched-frame learning comparisons and time-to-score for any new
+  study; keep the old long-run targets as historical references, not evidence
+  that short-budget learning is broken. Current12M updates take about110ms and
+  imagination, not world training alone, is the largest measured component.
+  A speed-focused pivot should target whole-agent cost. No new optimization,
+  numerical-gate change, concurrency or learning allocation is approved here.
+
+The immediate next step is to agree the pivot's objective and smallest useful
+experiment, not extend the Pong campaign. Keep the current implementation and
+user-owned files intact until that choice is made.
+
+## Retained direction: CDP is the main path
 
 Learn to play games through experience, using sparse explicit rewards and human
 guidance where needed, and eventually useful intrinsic motivation. Keep learning
@@ -267,17 +299,15 @@ one declared correction stops at value/bonus numerical tolerances. Both failed
 guards/source bundles remain, with zero search optimizer updates/game actions;
 ten total warnings and no GPU recovery. The test-only hook is removed. No
 further search, tolerance relaxation or rejected-factorization retry.
-**Pong2M budget study is active:** [fixed declaration](experiments/2026-10-11-cdp-pong-budget.md).
-Three fresh seeds on unchanged12M/T16 centered CDP/action-effects;6M actions /
-1,499,817 updates total, targeting the retained69/72 wins and inconsistent
-mastery. Seed1009 starts October11 at18:56:09 UTC; expected47–48h including
-frozen evaluations. Eight environments/host workers, native0f26ee63, no GPU CPU
-quota. Actual-initial/final natural cohorts, exact tensors, full replay/videos,
-independent per-seed win reviews and final budget/curve review are automated.
-The CPU reviewer rehearsal reproduces all retained500k scores and21/24/24 wins
-in4.07s, with no new gameplay. Keep the20.45 long-run target and historical
-control pins; this is not an exact same-binary budget ablation or resumed
-lifetime. No representation/entropy/critic-loss sweep or indefinite speed gate.
+**Pong2M budget study is stopped for the pivot:** the
+[fixed declaration](experiments/2026-10-11-cdp-pong-budget.md) remains unchanged,
+but its unstarted work is cancelled. Seed1009 runs October11 18:56:09–20:25:19
+UTC and saves a partial checkpoint at189,576 actions/47,333 updates, zero debt.
+No frozen evaluation runs;2017/3019 never start. The [stop receipt](results/2026-10-11-cdp-pong-stop.json)
+retains counters, checkpoint identity and interruption limits. The service has
+no workers or automatic restart. Its interrupted guard has no terminal verdict;
+no new allocation warnings are logged. Keep the20.45 historical target and
+completed500k controls; partial online progress is not a new competence result.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.

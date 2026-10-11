@@ -7,6 +7,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October11 user stop: prepare for a pivot.** Training is stopped; the existing
+  five-game goal is paused, not achieved. Do not start learners, frozen evaluations
+  or GPU experiments until the user sets the new direction. Historical “next”
+  entries below are evidence, not authorization to resume queues. Preserve the
+  implementation, checkpoints and results; see the roadmap's
+  [pivot handoff](docs/kindle_single_life_dreamer_plan.md#paused-for-a-pivot).
 - **October7 goal: reach DreamerV3 quality on Boxing, Pong, Freeway,
   Breakout and Qbert with CDP; retain the budget comparison.** All five
   and the budget question remain open. A completed screen, learned subset or
@@ -355,19 +361,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   wins and inconsistent mastery. Keep actual initials, natural cohorts and20.45
   long-run target; no automatic suite extension. All five quality/RGB goals open.
 
-- **Active Pong2M budget study:** [fixed declaration](docs/experiments/2026-10-11-cdp-pong-budget.md),
-  three fresh2M-action seeds1009/2017/3019 on unchanged12M/T16 centered CDP/
-  action-effects.6M actions/1,499,817 updates total; expected47–48h,20h learner/
-  30min frozen/72h service bounds. Seed1009 starts October11 at18:56:09 UTC
-  in `kindle-pong-2m-20261011.service`, root `runs/cdp-pong-2m-20261011.lb5DyI6h`.
-  Eight environments/host workers, native0f26ee63, no GPU CPU quota, zero swap.
-  Upstream2c42b448/56f0565 still match qualification. Final/actual-initial natural
-  cohorts, exact346 tensors, full CPU replays/videos and independent win reviews
-  follow each learner before the next; final budget/curve review is automated.
-  CPU rehearsal reproduces all retained500k scores and21/24/24 wins in4.07s,
-  29 source pins, zero new GPU jobs/actions/updates. Retain historical controls
-  and targets, not an exact same-binary ablation or resumed lifetime. No other
-  new game allocation or automatic extension; all five quality/RGB goals open.
+- **Pong2M study stopped by user for the pivot:** the
+  [fixed declaration](docs/experiments/2026-10-11-cdp-pong-budget.md) remains intact;
+  [stop receipt](docs/results/2026-10-11-cdp-pong-stop.json). Seed1009 runs
+  October11 18:56:09–20:25:19 UTC, ending gracefully at189,576 actions /
+  47,333 updates, zero debt,1h29m6s runner time. The partial and actual-initial
+  checkpoints remain under `runs/cdp-pong-2m-20261011.lb5DyI6h`; saved partial
+  hashes match the final log. Native0f26ee63/2c42b448/56f0565 unchanged. No frozen
+  evaluation or completed learner;2017/3019 and all evaluation jobs are cancelled.
+  Service/control-group and game workers are gone, Restart=no, no timer. Systemd's
+  failed exit records the intentional controller interruption, not a GPU fault;
+  the interrupted guard has no terminal verdict. Zero new allocation warnings;
+  143 baseline warning records remain. Do not restore this as an uninterrupted
+  lifetime or resume the queue. All five quality/RGB goals remain open.
 
 ## Architecture and invariants
 

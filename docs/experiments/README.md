@@ -27,11 +27,13 @@ is complete: ordinary2c42b448 qualifies with exact fixture agreement and no
 speedup (107.93→108.30ms). The original logical-memory preflight fails; one
 declared correction reaches a numerical mismatch and stops. Both failures
 remain, with no tolerance relaxation or retained test hook. The
-[three-seed Pong2M budget study](2026-10-11-cdp-pong-budget.md) starts October11
-at18:56:09 UTC, expected47–48h. Same12M/T16 centered recipe, qualified ordinary
-native0f26ee63; per-seed natural frozen controls/replay/videos/independent reviews
-and final budget summary are automatic. CPU rehearsal reproduces retained
-scores/wins with zero new actions. No other-game allocation or automatic extension.
+[three-seed Pong2M budget study](2026-10-11-cdp-pong-budget.md) is **stopped by
+the user for a pivot** at20:25:19 UTC. Only1009 starts, retaining189,576 actions /
+47,333 updates and a graceful partial checkpoint; no new frozen evaluation.
+Seeds2017/3019 and all evaluation jobs are cancelled, not queued for resumption.
+The [stop receipt](../results/2026-10-11-cdp-pong-stop.json) preserves the boundary;
+the [roadmap handoff](../kindle_single_life_dreamer_plan.md#paused-for-a-pivot)
+summarizes the usable baseline and open decisions. Historical goals remain open.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
