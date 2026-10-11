@@ -268,19 +268,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   factorization stays rejected. Do not make optimization an indefinite learning
   gate. Keep12M/T16; all five quality targets and the RGB budget question remain
   open.
-- **Active Qbert budget study:** [fixed declaration](docs/experiments/2026-10-09-cdp-qbert-budget.md),
-  three fresh2M-action seeds1009/2017/3019 on the unchanged12M/T16 centered
-  CDP/action-effects recipe.6M actions/1,499,817 updates total, expected47–48h;
-  20h learner/30min frozen/72h service bounds. Seed1009 starts October9
-  at17:25:59 UTC; eight environments/host workers, native7311547d, no CPU quota
-  on GPU work. Upstream heads31026833/56f0565 still match the qualification.
-  Final/actual-initial natural cohorts, exact346 tensors, full CPU replays/videos
-  and independent task-outcome review run after each learner before the next.
-  Preparation/publication audit passes in.98s with no game actions. Retain12M500k
-  and1M controls with their historical pins; no exact same-binary budget-ablation
-  claim. This is a new experience-budget study, not an old lifetime resume or
-  automatic extension. No other new game allocation; all five quality targets,
-  12M prior forecasts and the RGB budget claim remain open.
+- **Qbert 2M budget study complete:** [results, curves and whole videos](docs/results/2026-10-11-cdp-qbert-budget.md),
+  three fresh seeds1009/2017/3019 on unchanged12M/T16 centered CDP/action-effects.
+  Frozen5,172.92/5,812.50/11,115.63, mean7,367.01 versus retained500k2,657.99;
+  paired+4,709.03 [3,382.29,6,260.42]. First pyramids0/0/24 ->20/22/20:
+  both weak seeds improve, but3019 loses four successes. No seed passes the full
+  historical gate or long-run193,220.77. Online mean6,545.50 versus published
+  8M-frame14,607.50 is descriptive, not protocol-matched parity/inferiority.
+  Six million actions/1,499,817 updates/46h40m1s training,4.002x retained500k;
+  service finishes October11 at16:10:24 UTC in46h44m25s. All nine guards/144
+  natural frozen episodes/exact346 tensors/model and six whole replays/videos
+  pass;221,648 frozen actions, zero updates, nine excess episodes and ten warnings
+  remain. Final CPU review passes in52.02s; no worker remains. Native7311547d
+  versus retained83be73bf is disclosed; no exact same-binary budget-ablation
+  claim, historical repin, lifetime resume or automatic extension.
+  Next inspect action-conditioned reward/terminal forecasts along recorded
+  Qbert policy trajectories in a separately declared, bounded frozen diagnostic,
+  before another learning allocation. No capacity/representation sweep or new
+  five-game budget. All five quality targets,12M prior forecasts and the RGB
+  budget claim remain open.
   **1009's recorded500k prefix matches exactly across runtimes:** [CPU comparison](docs/results/2026-10-09-cdp-qbert-prefix.md),
   initial346 tensors,62,500 transition records,124,939 non-timing learner reports,
   671 episodes and976 common progress reports; online last50 remains1,809.

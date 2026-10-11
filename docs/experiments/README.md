@@ -7,6 +7,13 @@ and [shared-parameter timing/integration](../results/2026-09-27-shared-parameter
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
 
+October11: the [three-seed Qbert2M budget study](../results/2026-10-11-cdp-qbert-budget.md)
+is complete. Frozen mean7,367.01 versus retained500k2,657.99; first pyramids
+0/0/24 ->20/22/20. All scores improve, not every completion count. Nine guards,
+144 natural frozen episodes and six whole replay/videos pass, costing46h40m1s
+training. No full mastery gate passes or automatic budget extension follows.
+Next review frozen on-policy forecasts; all five quality targets remain open.
+
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
 but only4/72 wins. The [single grouped-imagination trial](../results/2026-10-06-cdp-imagination-throughput.md)

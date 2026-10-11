@@ -226,22 +226,31 @@ The [one-shot cost capture](results/2026-10-09-cdp-imagination-cost.md) attribut
 projections. This is neither SM utilization nor a reason to retry the rejected
 factorization or relax numerical gates.
 
-**Active:** [three fresh2M-action Qbert learners](experiments/2026-10-09-cdp-qbert-budget.md)
-on the unchanged12M/T16 recipe. Seed1009 starts October9 at17:25:59 UTC;
-expected47–48h for all three, including actual-initial/final natural cohorts,
-independent CPU task/replay review and full videos. Test whether more experience
-improves the weakest multi-seed task completion before committing all games to
-longer budgets. The qualified backend refresh is disclosed against retained500k
-controls; this is not an exact same-binary budget ablation. No old lifetime
-resume, model sweep or automatic extension; all five long-run targets and the
-RGB budget claim stay open.
+**Qbert budget study complete:** [three fresh2M-action learners](results/2026-10-11-cdp-qbert-budget.md)
+finish October11 at16:10:24 UTC on unchanged12M/T16. Frozen mean7,367.01
+versus retained500k2,657.99, paired+4,709.03 [3,382.29,6,260.42]; all three
+scores improve. First-pyramid completions0/0/24 ->20/22/20: more experience
+helps the weak seeds, but3019 loses four successes. No seed meets the full
+historical or long-run gate. Online6,545.50 is below the fixed published
+8M-frame bin14,607.50, with protocol/model/window differences retained.
+
+The cohort costs46h40m1s training,4.002x the retained500k cost. All nine guards,
+144 natural frozen episodes, exact tensors and six whole replays/videos pass;
+221,648 frozen actions, nine excess episodes, all tails and ten warnings remain.
+Final CPU review passes in52.02s; no worker remains. Historical controls retain
+their backend pins; this is not an exact same-binary budget ablation.
+Next inspect action-conditioned reward/terminal forecasts along the recorded
+Qbert policy trajectories in a separately declared bounded frozen diagnostic.
+Do not automatically extend all five games, resume an old lifetime or start a
+capacity/representation sweep. All five long-run targets and the RGB budget
+claim stay open.
 
 [Seed1009's500k prefix](results/2026-10-09-cdp-qbert-prefix.md) now matches the
 retained run exactly: initial346 tensors,62,500 batched transitions,124,939
 non-timing learner reports and671 episodes, online last50 mean1,809. The
 CPU-only review does not establish universal backend parity, pixel equality,
-final500k tensor equality or later/frozen competence. Continue the declared
-2M budget unchanged; the other two seeds remain unstarted.
+final500k tensor equality or later/frozen competence. The completed2M evidence
+above is separate from that earlier prefix check.
 
 The exploration mechanism is a small GPU-native action-conditioned ensemble.
 It predicts detached CNN embeddings and subtracts each head's all-action mean
@@ -322,8 +331,8 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-These are current sticky/full-action centered CDP500k results unless explicitly
-marked historical. All five titles report12M against retained1M controls;
+These are current sticky/full-action centered CDP500k results, except Qbert's
+separately allocated2M follow-up. All five titles retain12M/1M500k controls;
 the qualified backend refresh prevents an exact same-binary capacity ablation.
 This is not a comparison against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
@@ -338,7 +347,7 @@ Links into `runs/` require this workspace.
 | Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway |12M frozen27.54 vs0; seeds33.58/17.25/31.79. Retained1M30.26; paired−2.72 [−13.29,4.08], training costs3.57x. | Crossing gates fall72/72 ->48/72;2017 regresses. No universal capacity advantage. Published33.40 remains unmet by the cohort. | [Capacity results and videos](results/2026-10-09-cdp-freeway-capacity.md); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
-| Qbert |12M frozen2,657.99 vs200.69 initial; seeds1,790.63/1,328.13/4,855.21. All beat retained1M scores; first pyramids0/0/24 versus2/0/0, training costs3.51x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet. Only3019 reliably completes a first pyramid;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-qbert-capacity.md); [historical Tiny evidence](experiments/README.md) |
+| Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score.12M forecasts untested. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
 observations (45k train+5k validation/game). Freeway also used a.5-probability
