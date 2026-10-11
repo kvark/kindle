@@ -17,8 +17,13 @@ is complete: every2M seed has useful h15 reward forecasts; survival remains
 unresolved. Six guards/exact tensors pass; failed capture/source and the
 continuation-discount correction remain. The [greedy action-mode check](../results/2026-10-11-cdp-qbert-action-mode.md)
 also completes: first pyramids62/72→69/72, but mean score7,367.01→6,953.47;
-no consistent score gain. Keep sampled evaluation. All five quality targets
-remain open; next review value/credit assignment and measured learning cost.
+no consistent score gain. Keep sampled evaluation. The
+[live-value check](../results/2026-10-11-cdp-qbert-values.md) also completes:
+all critics beat constant/zero controls, with seed-specific bias and<.03%
+intrinsic contribution. Exact historical traces/tensors and all five guards pass;
+the CPU timestamp-review failure remains, with no GPU retry. All five quality
+targets remain open. Next one bounded upstream measured-build/whole-update
+check on the unchanged recipe, not a new representation or critic sweep.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),

@@ -86,6 +86,8 @@ def main():
     parser.add_argument("--restore", type=Path)
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--greedy", action="store_true")
+    parser.add_argument("--probe-behavior", action="store_true",
+                        help="frozen diagnostic: log live critic values and scaled action-effects bonuses")
     parser.add_argument("--episodes-per-env", type=int,
                         help="frozen restore only: stop after this many natural episodes per stream; timeouts do not count, steps is a hard cap")
     parser.add_argument("--min-gpu-budget-headroom-mib", type=int,
@@ -107,6 +109,8 @@ def main():
         parser.error("GPU budget headroom must be positive")
     if args.greedy and not args.evaluate:
         parser.error("greedy actions are only supported for frozen evaluation")
+    if args.probe_behavior and not args.evaluate:
+        parser.error("behavior probing requires frozen evaluation")
     if args.episodes_per_env is not None:
         if args.episodes_per_env <= 0:
             parser.error("episodes-per-env must be positive")
@@ -266,6 +270,7 @@ def main():
                   **(dict(learned_rgb_preprocessing="single GPU Pillow-equivalent antialiased bilinear resize to 64x64, per-axis RGB8 rounding; CHW /255-0.5") if learned_rgb else {}),
                   action_meanings=list(environments[0].action_meanings), ale_py_version=ale_py.__version__,
                   mode=("evaluate_greedy" if args.greedy else "evaluate_sample") if args.evaluate else "train",
+                  **(dict(behavior_probe="live-posterior-v1") if args.probe_behavior else {}),
                   config=agent.config, model_provenance=agent.provenance, gpu_device=agent.gpu_device,
                   cpu_worker_threads=agent.cpu_worker_threads,
                   trainable_parameter_counts=agent.trainable_parameter_counts,
@@ -335,6 +340,13 @@ def main():
                     raise ValueError("native action override was not honored")
                 timing["act"] += time.perf_counter() - before
                 check_memory("act", run_actions)
+                behavior = {}
+                if args.probe_behavior:
+                    before = time.perf_counter()
+                    values, bonuses = agent.behavior_predictions()
+                    behavior = dict(behavior_values=values, behavior_intrinsic=bonuses)
+                    timing["diagnostics"] = timing.get("diagnostics", 0.0) + time.perf_counter() - before
+                    check_memory("behavior_probe", run_actions)
                 before = time.perf_counter()
                 results = [env.step(action) for env, action in zip(environments, selected)]
                 timing["environment"] += time.perf_counter() - before
@@ -348,6 +360,7 @@ def main():
                           actions=selected, rewards=rewards, stored_rewards=stored_rewards,
                           terminated=terminated, truncated=truncated,
                           executed_action_frames=[env.executed_action_frames for env in environments],
+                          **behavior,
                           **(dict(action_overrides=overrides) if exploration else {})))
                 before = time.perf_counter()
                 reports = [] if args.evaluate else agent.learn_scheduled()

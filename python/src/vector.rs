@@ -129,6 +129,13 @@ impl PyVectorAgent {
         }
     }
 
+    /// Read-only values and scaled bonuses, after act and before observe.
+    fn behavior_predictions(&mut self) -> PyResult<(Vec<f32>, Vec<f32>)> {
+        self.inner
+            .behavior_predictions()
+            .map_err(PyValueError::new_err)
+    }
+
     fn observe(
         &mut self,
         streams: Vec<usize>,

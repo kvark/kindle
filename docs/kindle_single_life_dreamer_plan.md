@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 6, 2026. This is the authoritative roadmap.
+Updated October 11, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -250,10 +250,18 @@ The [six-evaluation action-mode check](results/2026-10-11-cdp-qbert-action-mode.
 is complete: greedy raises first-pyramid completions62/72→69/72, but mean
 score falls7,367.01→6,953.47; paired−413.54 [−2,092.71,580.21]. All six guards,
 144 natural episodes, exact tensors and whole videos pass;218,936 actions,
-zero updates,3m32.63s total. Keep sampled evaluation as standard. Next review
-longer-horizon value/credit assignment and measured learning cost, accounting
-for the critic's combined extrinsic/intrinsic target before interpreting real
-returns. No automatic training extension or entropy/representation sweep.
+zero updates,3m32.63s total. Keep sampled evaluation as standard.
+The [live-value check](results/2026-10-11-cdp-qbert-values.md) now compares
+exact batched beliefs with full real discounted returns, including intrinsic
+reward. Every critic beats zero/calibration mean; R².435/.927/.531. Bias differs
+by seed/stage, not a shared collapse; the measured intrinsic fraction is<.03%.
+Five guards/exact346 tensors/72 natural episodes/full traces and videos pass;
+193,248 actions plus1,024 smoke, zero updates,88.87s capture. CPU review repairs
+only wall-clock comparison; no GPU retry. No worker remains.
+Next assess one bounded upstream measured-build option on unchanged learning
+graphs, with numerical checks and ordinary full-update timing. Keep the recipe
+and rejected factorization's gates; no indefinite optimization gate, automatic
+training extension or representation/entropy/critic-loss sweep.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.
@@ -360,7 +368,7 @@ Links into `runs/` require this workspace.
 | Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway |12M frozen27.54 vs0; seeds33.58/17.25/31.79. Retained1M30.26; paired−2.72 [−13.29,4.08], training costs3.57x. | Crossing gates fall72/72 ->48/72;2017 regresses. No universal capacity advantage. Published33.40 remains unmet by the cohort. | [Capacity results and videos](results/2026-10-09-cdp-freeway-capacity.md); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
-| Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 reward forecasts in all seeds; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecast controls](results/2026-10-11-cdp-qbert-forecasts.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
+| Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 rewards and live values in all seeds, with calibration errors; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecasts](results/2026-10-11-cdp-qbert-forecasts.md); [values](results/2026-10-11-cdp-qbert-values.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
 observations (45k train+5k validation/game). Freeway also used a.5-probability
@@ -429,10 +437,12 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified CDP/RGB pins are Meganeuraf104f354/Bladee349cddf; the
-  [October7 control refresh](results/2026-10-07-meganeura-control-refresh.md)
+  Current qualified CDP/RGB backend pins are Meganeura31026833/Blade56f0565; the
+  [October9 control refresh](results/2026-10-09-meganeura-refresh.md)
   passes scoped independent and production/restore checks, with no measured
-  speedup or new learning comparison. Tiny retains its historicalb684ffd9 qualification.
+  speedup or new learning comparison. Nativee9ebbf5d adds only the qualified
+  read-only value probe; learning evidence retains7311547d. Tiny retains its
+  historicalb684ffd9 qualification.
   Retain original backend identities for old results.
   No repeated upstream learning replication without a relevant change.
 - Serialize bounded native jobs under the [host guard](gpu_incident_response.md)

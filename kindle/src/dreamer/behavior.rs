@@ -209,6 +209,32 @@ pub fn build_value_inference_graph(config: &DreamerConfig, batch: usize) -> Grap
     graph
 }
 
+/// Read-only critic and unscaled exploration bonus at the same live state/action.
+pub(crate) fn build_diagnostic_graph(config: &DreamerConfig, batch: usize) -> Graph {
+    config.validate();
+    assert!(batch > 0);
+    let mut graph = Graph::new();
+    let value = MlpHead::new(
+        &mut graph,
+        "behavior.value",
+        config.feature_dim(),
+        config.network().units,
+        3,
+        config.value_bins,
+    );
+    let state = graph.input("feature", &[batch, config.feature_dim()]);
+    let logits = value.forward(&mut graph, state);
+    let bonus = if config.uses_disagreement() {
+        let action = graph.input("action", &[batch, config.action_count]);
+        let ensemble = super::exploration::Disagreement::new(&mut graph, config);
+        ensemble.bonus(&mut graph, state, action)
+    } else {
+        graph.constant(vec![0.0; batch], &[batch, 1])
+    };
+    graph.set_outputs(vec![logits, bonus]);
+    graph
+}
+
 #[cfg(test)]
 mod tests {
     use std::sync::Arc;
@@ -217,6 +243,40 @@ mod tests {
 
     use super::*;
     use crate::dreamer::runtime::{build_session, configure_d3_optimizer, initialize_d3};
+
+    #[test]
+    fn diagnostic_graph_has_only_critic_and_enabled_ensemble_parameters() {
+        for enabled in [false, true] {
+            let mut config = DreamerConfig::tiny(3);
+            config.disagreement_bonus = enabled;
+            config.intrinsic_reward_scale = 0.7;
+            let graph = build_diagnostic_graph(&config, 3);
+            assert_eq!(
+                graph.node(graph.outputs()[0]).ty.shape,
+                [3, config.value_bins]
+            );
+            assert_eq!(
+                graph
+                    .node(graph.outputs()[1])
+                    .ty
+                    .shape
+                    .iter()
+                    .product::<usize>(),
+                3
+            );
+            let mut ensemble = 0;
+            for node in graph.nodes() {
+                if let meganeura::graph::Op::Parameter { name } = &node.op {
+                    assert!(
+                        name.starts_with("behavior.value.")
+                            || name.starts_with("world.exploration.")
+                    );
+                    ensemble += usize::from(name.starts_with("world.exploration."));
+                }
+            }
+            assert_eq!(ensemble > 0, enabled);
+        }
+    }
 
     #[test]
     fn behavior_graphs_have_d3_heads() {

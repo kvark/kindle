@@ -23,6 +23,7 @@ pub(super) struct VectorCore {
     streams: Vec<LiveStream>,
     observe: Session,
     policy: Session,
+    diagnostics: Option<Session>,
 }
 
 fn check_capacity(config: &DreamerConfig, streams: usize) -> Result<(), &'static str> {
@@ -148,6 +149,7 @@ impl VectorCore {
             streams,
             observe,
             policy,
+            diagnostics: None,
         }
     }
 
@@ -371,6 +373,54 @@ impl VectorCore {
         let mut report = self.learner.learn()?;
         self.sync_live(&mut report);
         Some(report)
+    }
+
+    fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        if self
+            .streams
+            .iter()
+            .any(|stream| !stream.active || stream.pending_action.is_none())
+        {
+            return Err("behavior predictions require a pending action in every stream");
+        }
+        let learner = &mut *self.learner;
+        let config = &learner.config;
+        let rows = self.streams.len();
+        let session = self.diagnostics.get_or_insert_with(|| {
+            let mut session = build_session(
+                &behavior::build_diagnostic_graph(config, rows),
+                &learner.gpu,
+                Mode::Inference,
+                false,
+            );
+            share_matching(&mut learner.behavior_train, &mut session, "behavior.value.");
+            share_matching(&mut learner.world_train, &mut session, "world.exploration.");
+            session
+        });
+        sync_matching(&learner.behavior_train, session, "behavior.value.");
+        sync_matching(&learner.world_train, session, "world.exploration.");
+        if config.uses_disagreement() {
+            let mut actions = vec![0.0; rows * config.action_count];
+            for (row, stream) in self.streams.iter().enumerate() {
+                actions[row * config.action_count + stream.pending_action.unwrap()] = 1.0;
+            }
+            session.set_input("action", &actions);
+        }
+        self.copies.copy(&[DeviceCopy {
+            source: (&self.policy, ExternalSlot::Input("feature")),
+            target: (session, "feature"),
+            target_offset_bytes: 0,
+        }]);
+        session.step();
+        let mut logits = vec![0.0; rows * config.value_bins];
+        let mut bonuses = vec![0.0; rows];
+        learner
+            .readback
+            .read_many(&mut [(session, 0, &mut logits), (session, 1, &mut bonuses)]);
+        for bonus in &mut bonuses {
+            *bonus *= config.intrinsic_reward_scale;
+        }
+        Ok((decode_rows(&logits, rows, &learner.bins), bonuses))
     }
 
     pub(super) fn read_diagnostics(&mut self) {
@@ -859,6 +909,12 @@ impl VectorDreamerAgent {
         self.store_history(&frames.iter().map(|a| a.0).collect::<Vec<_>>());
     }
 
+    /// Critic values and scaled intrinsic bonuses for the exact live beliefs and
+    /// selected actions. Call after act, before observe. No RNG or state update.
+    pub fn behavior_predictions(&mut self) -> Result<(Vec<f32>, Vec<f32>), &'static str> {
+        self.core.behavior_predictions()
+    }
+
     pub fn act(&mut self, mode: ActionMode) -> Vec<usize> {
         self.core.act(mode)
     }
@@ -1289,6 +1345,127 @@ mod joint_qualification {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    #[ignore = "requires GPU; batched read-only live values and action-aligned bonuses"]
+    fn tiny_live_behavior_predictions_match_existing_heads_without_state_changes() {
+        for exploration in [false, true] {
+            let mut config = DreamerConfig::tiny(3);
+            config.train_ratio = 0.0;
+            config.disagreement_bonus = exploration;
+            config.intrinsic_reward_scale = if exploration { 0.7 } else { 0.0 };
+            let mut agent = FeatureVectorAgent::new(config.clone(), 3).unwrap();
+            assert!(agent.core.behavior_predictions().is_err());
+            agent.begin_episodes((0..3).map(|id| (id, observation(id, 0))).collect());
+            assert!(agent.core.behavior_predictions().is_err());
+            let actions = agent.act(ActionMode::Sample);
+            let states = (0..3)
+                .flat_map(|id| agent.core.feature(id))
+                .collect::<Vec<_>>();
+            let rngs = |core: &VectorCore| {
+                core.streams
+                    .iter()
+                    .map(|s| {
+                        (
+                            s.policy_rng.clone().random::<u64>(),
+                            s.posterior_rng.clone().random::<u64>(),
+                            s.pending_action,
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            };
+            let before_rng = rngs(&agent.core);
+            let before_counters = (
+                agent.learner().environment_step(),
+                agent.learner().learner_step(),
+                agent.learner().replay_len(),
+            );
+            let mut value = build_session(
+                &behavior::build_value_inference_graph(&config, 3),
+                &agent.core.learner.gpu,
+                Mode::Inference,
+                false,
+            );
+            let mut one_hot = vec![0.0; 9];
+            for (row, &action) in actions.iter().enumerate() {
+                one_hot[row * 3 + action] = 1.0;
+            }
+            for round in 0..2 {
+                // Also exercise synchronization after critic parameters change.
+                let mut bias = vec![0.0; config.value_bins];
+                bias[config.value_bins / 2 + 1] = 0.2 + round as f32;
+                agent
+                    .core
+                    .learner
+                    .behavior_train
+                    .set_parameter("behavior.value.out.bias", &bias);
+                let expected_bonus = if exploration {
+                    super::super::exploration::direct_bonus(
+                        &mut agent.core.learner,
+                        &states,
+                        &one_hot,
+                    )
+                    .into_iter()
+                    .map(|v| v * config.intrinsic_reward_scale)
+                    .collect::<Vec<_>>()
+                } else {
+                    vec![0.0; 3]
+                };
+                sync_matching(
+                    &agent.core.learner.behavior_train,
+                    &mut value,
+                    "behavior.value.",
+                );
+                value.set_input("feature", &states);
+                value.step();
+                value.wait();
+                let mut logits = vec![0.0; 3 * config.value_bins];
+                value.read_output_by_index(0, &mut logits);
+                let expected_value = decode_rows(&logits, 3, &agent.core.learner.bins);
+                let actual = agent.core.behavior_predictions().unwrap();
+                for (actual, expected) in actual
+                    .0
+                    .iter()
+                    .zip(&expected_value)
+                    .chain(actual.1.iter().zip(&expected_bonus))
+                {
+                    assert!(
+                        (actual - expected).abs() <= 2e-5 * expected.abs().max(1.0),
+                        "{actual} != {expected}"
+                    );
+                }
+                assert_eq!(actual, agent.core.behavior_predictions().unwrap());
+                assert_eq!(before_rng, rngs(&agent.core));
+                assert_eq!(
+                    before_counters,
+                    (
+                        agent.learner().environment_step(),
+                        agent.learner().learner_step(),
+                        agent.learner().replay_len()
+                    )
+                );
+                assert_eq!(
+                    states,
+                    (0..3)
+                        .flat_map(|id| agent.core.feature(id))
+                        .collect::<Vec<_>>()
+                );
+            }
+            agent.observe(
+                (0..3)
+                    .map(|id| {
+                        (
+                            id,
+                            observation(id, 1),
+                            FrameFlags::default(),
+                            Reward::default(),
+                        )
+                    })
+                    .collect(),
+            );
+            assert!(agent.core.behavior_predictions().is_err());
+        }
+    }
 
     #[test]
     fn video_capacity_accounts_for_nonoverlapping_chunks() {

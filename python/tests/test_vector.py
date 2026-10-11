@@ -184,6 +184,7 @@ def test_restore_rejects_changed_encoder_before_outputs(monkeypatch, tmp_path, c
     (["--steps", "7", "--num-envs", "2"], "multiple"),
     (["--num-envs", "0"], "multiple"),
     (["--greedy"], "frozen evaluation"),
+    (["--probe-behavior"], "frozen evaluation"),
     (["--world-microbatch-size", "0"], "must be positive"),
     (["--restore", "unused", "--batch-size", "32"], "overrides require a fresh run"),
 ])

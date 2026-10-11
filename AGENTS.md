@@ -326,6 +326,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.
 
+- **Qbert live-value check complete:** [result and whole videos](docs/results/2026-10-11-cdp-qbert-values.md).
+  All three2M critics beat zero/calibration mean on held-out return MAE/RMSE;
+  R².435/.927/.531. Bias+236/−62/−152 is not shared collapse;1009's first-pyramid
+  optimism and3019's later underprediction remain. Intrinsic contributes<.03%
+  of measured on-policy returns, not proof it was unnecessary during learning.
+  Nativee9ebbf5d's lazy batched probe uses exact live features/actions; unchanged
+  learning graphs/backend31026833/56f0565, historical training native7311547d.
+  Five guards/exact346 tensors/72 natural episodes/full traces and videos pass.
+  193,248 diagnostic actions plus1,024 smoke, zero updates;88.87s capture, five
+  warnings, nine excess episodes/all tails. CPU timestamp-comparison failure
+  and source remain; no GPU retry. Final independent CPU review passes18:06:57
+  in2.11s; no worker remains. Next one bounded upstream measured-build check
+  of unchanged learning graphs and whole-update cost, not a representation/
+  entropy/critic sweep or indefinite optimization gate. Rejected factorization
+  stays rejected. No new learner budget; all five quality/RGB budget goals open.
+
 ## Architecture and invariants
 
 - CDP keeps Dreamer's categorical RSSM, replay and imagined actor/critic; it

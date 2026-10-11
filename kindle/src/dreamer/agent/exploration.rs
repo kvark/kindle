@@ -59,7 +59,7 @@ fn check_device(core: &DreamerCore) {
     }
 }
 
-fn direct_bonus(core: &mut DreamerCore, states: &[f32], actions: &[f32]) -> Vec<f32> {
+pub(super) fn direct_bonus(core: &mut DreamerCore, states: &[f32], actions: &[f32]) -> Vec<f32> {
     direct_bonus_precision(core, states, actions, meganeura::CoopPolicy::Auto).0
 }
 

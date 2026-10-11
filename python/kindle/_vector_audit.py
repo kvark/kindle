@@ -71,6 +71,10 @@ def audit(path):
             check(type(header.get("sticky_actions")) in (int, float)
                   and header["sticky_actions"] in (0.0, 0.25), "invalid sticky action probability")
         check(header["mode"] in ("train", "evaluate_sample", "evaluate_greedy"), "unknown action mode")
+        behavior_probe = header.get("behavior_probe")
+        if behavior_probe is not None:
+            check(behavior_probe == "live-posterior-v1" and header["mode"] != "train",
+                  "behavior probe requires declared frozen evaluation")
         episode_target = None
         if header["protocol"] in EPISODE_EVALUATION_PROTOCOLS:
             episode_target = header["evaluation_episodes_per_stream"]
@@ -154,6 +158,15 @@ def audit(path):
                 check(event["run_step"] == actions and event["vector_tick"] == actions // count, "vector/action counter mismatch")
                 for field in ("actions", "rewards", "stored_rewards", "terminated", "truncated", "executed_action_frames"):
                     check(len(event[field]) == count, f"wrong {field} batch length")
+                for field in ("behavior_values", "behavior_intrinsic"):
+                    if behavior_probe:
+                        check(isinstance(event.get(field), list) and len(event[field]) == count,
+                              f"wrong {field} batch length")
+                        require_numbers(event[field])
+                    else:
+                        check(field not in event, "undeclared behavior probe")
+                if behavior_probe:
+                    check(all(value >= 0 for value in event["behavior_intrinsic"]), "negative exploration bonus")
                 if exploration:
                     expected_overrides = exploration.actions()
                     overrides = event["action_overrides"]
