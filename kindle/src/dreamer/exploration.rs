@@ -3,6 +3,8 @@
 use meganeura::{Graph, graph::NodeId};
 
 use super::config::DreamerConfig;
+#[cfg(test)]
+use super::networks::repeat_rows;
 use super::networks::{MlpHead, concat_columns, sum};
 
 const MEMBERS: usize = 4;
@@ -61,32 +63,18 @@ impl Disagreement {
     }
 
     pub(super) fn bonus(&self, graph: &mut Graph, state: NodeId, action: NodeId) -> NodeId {
-        let rows = graph.node(state).ty.shape[0];
-        let states = repeat_rows(graph, state, self.actions);
-        let actions = graph.constant(
-            (0..rows * self.actions * self.actions)
-                .map(|i| f32::from(i / self.actions % self.actions == i % self.actions))
-                .collect(),
-            &[rows * self.actions, self.actions],
-        );
-        let predictions = self.predict(graph, states, actions);
-        let bonus = action_effect_disagreement(graph, &predictions, self.actions);
-        let bonus = graph.reshape(bonus, &[rows, self.actions]);
+        let state = graph.stop_gradient(state);
         let action = graph.stop_gradient(action);
-        let selected = graph.mul(bonus, action);
-        graph.sum_inner(selected)
+        let effects = self
+            .heads
+            .iter()
+            .map(|head| head.action_effect(graph, state, action, self.actions))
+            .collect::<Vec<_>>();
+        disagreement(graph, &effects)
     }
 }
 
-fn repeat_rows(graph: &mut Graph, input: NodeId, repeats: usize) -> NodeId {
-    let shape = graph.node(input).ty.shape.clone();
-    let input = graph.reshape(input, &[shape[0] * shape[1], 1]);
-    let input = graph.broadcast_inner(input, repeats);
-    let input = graph.reshape(input, &[shape[0], shape[1], repeats]);
-    let input = graph.transpose(input);
-    graph.reshape(input, &[shape[0] * repeats, shape[1]])
-}
-
+#[cfg(test)]
 fn action_effect_disagreement(graph: &mut Graph, predictions: &[NodeId], actions: usize) -> NodeId {
     let shape = graph.node(predictions[0]).ty.shape.clone();
     assert_eq!(shape[0] % actions, 0);

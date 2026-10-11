@@ -7,12 +7,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October11 user stop: prepare for a pivot.** Training is stopped; the existing
-  five-game goal is paused, not achieved. Do not start learners, frozen evaluations
-  or GPU experiments until the user sets the new direction. Historical “next”
-  entries below are evidence, not authorization to resume queues. Preserve the
-  implementation, checkpoints and results; see the roadmap's
-  [pivot handoff](docs/kindle_single_life_dreamer_plan.md#paused-for-a-pivot).
+- **October11 performance pivot:** the user authorizes upstream refresh,
+  reduced-precision training, cheaper exploration, wider batches, a native/JAX
+  profile and artifact cleanup. Optimize one5080 learner before concurrent seeds
+  or more GPUs. Old long training queues remain cancelled; the five-game goal
+  remains unachieved. The [current plan](docs/kindle_single_life_dreamer_plan.md#performance-pivot)
+  supersedes historical “next”, strict-parity-only and no-factorization-retry
+  directions for this new performance study, without rewriting their failures.
+  Use numerical checks appropriate to the selected arithmetic plus finite
+  training and three-seed learning/time evidence; reduced precision need not
+  match the legacy F32 trajectory. Keep F32 weights/optimizer/reductions and
+  record matrix precision explicitly. No blind retries or concurrent learners.
+  Remove regenerable build caches, not user files or unique experiment evidence.
+- **Performance candidate:** [report](docs/results/2026-10-11-cdp-performance.md).
+  Cheaper all-action exploration, wide grouped RSSM, broader convolution
+  splitting and explicit training precision. B32/F16 measures162.00ms per512
+  replay positions versus original B8/Auto107.92ms per128:2.66x throughput,
+  not learning quality. Latest Meganeurad7a7293/Blade56f0565; retain430f14b
+  profiles and older controls. Auto remains default pending the separately
+  declared, now running [three-seed Freeway comparison](docs/experiments/2026-10-11-cdp-performance-learning.md):
+  optimized B8/Auto versus B32/F16,200k actions each, no old queue resumes.
+  Half operands alone save little; cooperative convolution weight gradients
+  and reduced-precision/fusion coverage are measured backend opportunities.
+  No extraGPU or concurrent-seed assumption. SM utilization remains unmeasured.
 - **October7 goal: reach DreamerV3 quality on Boxing, Pong, Freeway,
   Breakout and Qbert with CDP; retain the budget comparison.** All five
   and the budget question remain open. A completed screen, learned subset or

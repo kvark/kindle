@@ -90,6 +90,15 @@ fn repeat_columns(
     }
 }
 
+pub(crate) fn repeat_rows(graph: &mut Graph, input: NodeId, repeats: usize) -> NodeId {
+    let shape = graph.node(input).ty.shape.clone();
+    let input = graph.reshape(input, &[shape[0] * shape[1], 1]);
+    let input = graph.broadcast_inner(input, repeats);
+    let input = graph.reshape(input, &[shape[0], shape[1], repeats]);
+    let input = graph.transpose(input);
+    graph.reshape(input, &[shape[0] * repeats, shape[1]])
+}
+
 fn grouped_rssm_input(
     graph: &mut Graph,
     deter: NodeId,
@@ -232,7 +241,7 @@ impl LinearNorm {
 
 /// D3 BlockLinear expressed with one grouped weight and bias parameter.
 /// Grouped products preserve upstream's parameter leaves for initialization,
-/// AGC, and checkpointing; batch-one and large-batch paths retain serial views.
+/// AGC, and checkpointing; batch-one keeps the serial GEMV path.
 struct BlockLinear {
     weight: NodeId,
     bias: NodeId,
@@ -262,9 +271,9 @@ impl BlockLinear {
     }
 
     fn forward(&self, graph: &mut Graph, input: NodeId, batch: usize) -> NodeId {
-        // Cover both collection/training and the small recipe's B128 imagination.
-        // Keep batch-one GEMV and larger cooperative batches unchanged.
-        if (2..=128).contains(&batch) {
+        // Replay batch width also multiplies the number of imagined starts.
+        // Do not silently return to sliced graphs when that width increases.
+        if batch > 1 {
             assert_eq!(
                 graph.node(input).ty.shape,
                 [batch, self.blocks * self.input_per_block]
@@ -773,6 +782,85 @@ impl MlpHead {
         self.output.forward(graph, value)
     }
 
+    fn all_action_hidden(&self, graph: &mut Graph, state: NodeId, actions: usize) -> NodeId {
+        let shape = graph.node(state).ty.shape.clone();
+        let (rows, features) = (shape[0], shape[1]);
+        let first = &self.layers[0];
+        let units = graph.node(first.linear.weight).ty.shape[1];
+        assert!(actions > 0);
+        assert_eq!(
+            graph.node(first.linear.weight).ty.shape,
+            [features + actions, units]
+        );
+        let total = (features + actions) * units;
+        let state_weight = slice_columns(graph, first.linear.weight, 1, total, 0, features * units);
+        let state_weight = graph.reshape(state_weight, &[features, units]);
+        let action_weight = slice_columns(
+            graph,
+            first.linear.weight,
+            1,
+            total,
+            features * units,
+            actions * units,
+        );
+        let action_weight = graph.reshape(action_weight, &[actions * units]);
+        let projected = graph.matmul(state, state_weight);
+        let expanded = repeat_rows(graph, projected, actions);
+        let expanded = graph.reshape(expanded, &[rows, actions * units]);
+        let value = graph.bias_add(expanded, action_weight);
+        let mut value = graph.reshape(value, &[rows * actions, units]);
+        if let Some(bias) = first.linear.bias {
+            value = graph.bias_add(value, bias);
+        }
+        let value = first.norm.forward(graph, value);
+        let mut value = graph.silu(value);
+        for layer in &self.layers[1..] {
+            value = layer.forward(graph, value);
+        }
+        value
+    }
+
+    #[cfg(test)]
+    pub(crate) fn forward_all_actions(
+        &self,
+        graph: &mut Graph,
+        state: NodeId,
+        actions: usize,
+    ) -> NodeId {
+        let hidden = self.all_action_hidden(graph, state, actions);
+        self.output.forward(graph, hidden)
+    }
+
+    /// Center in the smaller hidden space, then project only the selected
+    /// action's effect. The final affine bias cancels. Actions must be one-hot
+    /// (including NOOP) or all zero for reset rows, as in Dreamer's replay/policy.
+    pub(crate) fn action_effect(
+        &self,
+        graph: &mut Graph,
+        state: NodeId,
+        action: NodeId,
+        actions: usize,
+    ) -> NodeId {
+        let rows = graph.node(state).ty.shape[0];
+        let hidden = self.all_action_hidden(graph, state, actions);
+        let units = graph.node(hidden).ty.shape[1];
+        let hidden = graph.reshape(hidden, &[rows, actions, units]);
+        let hidden = graph.transpose(hidden);
+        let hidden = graph.reshape(hidden, &[rows * units, actions]);
+        let weights = repeat_rows(graph, action, units);
+        let selected = graph.mul(hidden, weights);
+        let selected = graph.sum_inner(selected);
+        let total = graph.sum_inner(hidden);
+        let negative_mean = graph.scale(total, -1.0 / actions as f32);
+        // A zero-action reset must have zero bonus, not minus the all-action mean.
+        let mass = graph.sum_inner(action);
+        let mass = repeat_rows(graph, mass, units);
+        let negative_mean = graph.mul(negative_mean, mass);
+        let centered = graph.add(selected, negative_mean);
+        let centered = graph.reshape(centered, &[rows, units]);
+        graph.matmul(centered, self.output.weight)
+    }
+
     /// Forward pass with frozen weights and an input gradient.
     pub(crate) fn forward_frozen(&self, graph: &mut Graph, input: NodeId) -> NodeId {
         let mut value = input;
@@ -902,7 +990,7 @@ mod block_matmul_tests {
 
     #[test]
     fn grouped_blocks_preserve_parameters_and_reduce_dispatches() {
-        for batch in [2, 4, 6, 8, 16, 17, 64, 128] {
+        for batch in [2, 4, 6, 8, 16, 17, 64, 128, 256, 512] {
             for (input, output) in [(1024, 256), (256, 768), (256, 64), (64, 192)] {
                 let candidate = graph(batch, input, output, true, false);
                 let control = graph(batch, input, output, false, false);
@@ -955,16 +1043,14 @@ mod block_matmul_tests {
     }
 
     #[test]
-    fn gemv_and_large_batch_graphs_remain_exact() {
-        for batch in [1, 129, 1024] {
-            let candidate = graph(batch, 5, 7, true, false);
-            let control = graph(batch, 5, 7, false, false);
-            assert_eq!(
-                serde_json::to_vec(candidate.nodes()).unwrap(),
-                serde_json::to_vec(control.nodes()).unwrap()
-            );
-            assert_eq!(candidate.outputs(), control.outputs());
-        }
+    fn gemv_graph_remains_exact() {
+        let candidate = graph(1, 5, 7, true, false);
+        let control = graph(1, 5, 7, false, false);
+        assert!(
+            serde_json::to_vec(candidate.nodes()).unwrap()
+                == serde_json::to_vec(control.nodes()).unwrap()
+        );
+        assert_eq!(candidate.outputs(), control.outputs());
     }
 
     #[test]
@@ -992,8 +1078,8 @@ mod block_matmul_tests {
         );
         assert!(!gpu.device_information().is_software_emulated);
         let mut rng = StdRng::seed_from_u64(7301);
-        for batch in [17, 64, 128] {
-            for (input_width, output_width) in [(256, 64), (64, 192)] {
+        for batch in [17, 64, 128, 256, 512] {
+            for (input_width, output_width) in [(256, 64), (64, 192), (1024, 256), (256, 768)] {
                 let graph = graph(batch, input_width, output_width, true, false);
                 let mut session =
                     crate::dreamer::runtime::build_session(&graph, &gpu, Mode::Inference, false);

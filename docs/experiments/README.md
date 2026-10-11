@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October11's new [performance pivot](../kindle_single_life_dreamer_plan.md#performance-pivot)
+authorizes reduced precision, cheaper exploration, wider batches and native/JAX
+profiling. The old Pong queue stays cancelled; no long-run extension is implied.
+The [performance result](../results/2026-10-11-cdp-performance.md) measures2.66x
+synthetic replay throughput and selects B32/F16 for a bounded
+[paired Freeway learning screen](2026-10-11-cdp-performance-learning.md).
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).
@@ -32,7 +38,7 @@ the user for a pivot** at20:25:19 UTC. Only1009 starts, retaining189,576 actions
 47,333 updates and a graceful partial checkpoint; no new frozen evaluation.
 Seeds2017/3019 and all evaluation jobs are cancelled, not queued for resumption.
 The [stop receipt](../results/2026-10-11-cdp-pong-stop.json) preserves the boundary;
-the [roadmap handoff](../kindle_single_life_dreamer_plan.md#paused-for-a-pivot)
+the [roadmap handoff](../kindle_single_life_dreamer_plan.md#preserved-pivot-boundary)
 summarizes the usable baseline and open decisions. Historical goals remain open.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),

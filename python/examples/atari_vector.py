@@ -71,6 +71,8 @@ def main():
     parser.add_argument("--sticky-actions", type=float, choices=(0.0, 0.25), default=0.0,
                         help="ALE action repeat probability; declare .25 separately for robustness evaluation")
     parser.add_argument("--model-size", default="12m")
+    parser.add_argument("--training-precision", choices=("auto", "f32", "f16"), default="auto",
+                        help="training matrix operands; f16 keeps f32 master weights, accumulators and optimizer state")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
     parser.add_argument("--world-microbatch-size", type=int)
@@ -126,6 +128,7 @@ def main():
     training_options.add("--cdp")
     training_options.add("--cdp-centered")
     training_options.add("--disagreement-scale")
+    training_options.add("--training-precision")
     if args.restore and any(arg.split("=", 1)[0] in training_options for arg in sys.argv[1:]):
         parser.error("training overrides require a fresh run; restore uses checkpoint config")
     if not 0 <= args.seed < 2**32:
@@ -208,6 +211,7 @@ def main():
         actions = int(environments[0].action_space.n)
         config = kindle.default_config(actions, args.model_size)
         config.update(seed=args.seed, batch_size=args.batch_size, batch_length=args.batch_length,
+                      training_precision=args.training_precision,
                       video_encoder=args.encoder_training, replay_capacity=args.replay_capacity,
                       actor_critic_gradient=args.actor_critic_gradient,
                       world_backprop_length=args.batch_length,

@@ -114,7 +114,13 @@ def read_run(path, *, allow_interrupted=False, diagnostics=False):
             final["learner_updates"] != final["learner_step"] or first_update is None):
         raise ValueError("incomplete fresh training run")
     first_update = final.get("first_training_action", first_update)
-    if final["learner_updates"] != 1 + (actual - first_update) // 4:
+    schedule = header.get("config", header)
+    positions = schedule["batch_size"] * schedule["batch_length"]
+    ratio = schedule["train_ratio"]
+    if positions <= 0 or not math.isfinite(ratio) or ratio <= 0:
+        raise ValueError("invalid learner schedule")
+    expected_updates = 1 + int((actual - first_update) * ratio / positions)
+    if final["learner_updates"] != expected_updates:
         raise ValueError("updates disagree with actual-action credit")
     return dict(seed=header["seed"], complete=complete, header=header, final=final, source_sha256=digest.hexdigest(),
                 first_training_action=first_update, curve=curve, episodes=episodes)

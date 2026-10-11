@@ -28,14 +28,14 @@ pub use agent::{
 };
 pub use config::{
     DreamerConfig, FeatureStandardization, LossScales, ModelSize, NetworkSize, ObservationKind,
-    VideoEncoder,
+    TrainingPrecision, VideoEncoder,
 };
 pub use replay::{FrameFlags, Reward};
 
 /// Upstream DreamerV3 revision used as the behavioral contract.
 pub const DREAMERV3_UPSTREAM_REV: &str = "e3f02248693a79dc8b0ebd62c93683888ddaccfe";
 /// Meganeura revision used to compile and optimize the baseline graphs.
-pub const MEGANEURA_REV: &str = "2c42b4488310d83640c934c411202dde05b055e0";
+pub const MEGANEURA_REV: &str = "d7a7293378db1b0e8ee3b94a1e6d73ef14a1a32c";
 /// Exact Blade revision providing the shared graphics runtime.
 pub const BLADE_REV: &str = "56f05651cca73659130e924e497dda633f839d40";
 

@@ -79,6 +79,23 @@ def test_learning_reader_reconciles_complete_episodes_and_partial_tails(tmp_path
     assert len(run["source_sha256"]) == 64 and run["first_training_action"] == 6
 
 
+@pytest.mark.parametrize("upstream", [False, True])
+@pytest.mark.parametrize("batch", [16, 32])
+def test_learning_reader_uses_declared_batch_for_update_credit(tmp_path, upstream, batch):
+    rows = fixture(upstream=upstream, replication=True, ticks=8)
+    schedule = rows[0] if upstream else rows[0]["config"]
+    schedule.update(batch_size=batch)
+    for row in rows:
+        if row["event"] in ("progress", "run_end"):
+            row["learner_step"] = 1 + (row["run_step"] - 8) * 32 // (batch * 16)
+            if row["event"] == "run_end":
+                row["learner_updates"] = row["learner_step"]
+    assert read_run(write(tmp_path, rows))["final"]["learner_updates"] == 1 + 56 * 32 // (batch * 16)
+    rows[-1].update(learner_step=15, learner_updates=15)
+    with pytest.raises(ValueError, match="actual-action credit"):
+        read_run(write(tmp_path, rows))
+
+
 def test_learning_summary_requires_pixels_and_joint_loss_for_cnn_label(tmp_path):
     rows = fixture()
     with pytest.raises(ValueError, match="jointly learned"):

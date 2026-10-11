@@ -3,6 +3,8 @@ use crate::dreamer::runtime::{build_session, initialize_d3, share_matching};
 use meganeura::Mode;
 use std::sync::Arc;
 
+mod projection;
+
 fn gpu() -> Arc<blade_graphics::Context> {
     let gpu = Arc::new(crate::init_gpu_context().unwrap());
     if let Ok(expected) = std::env::var("KINDLE_EXPECT_DEVICE_NAME") {

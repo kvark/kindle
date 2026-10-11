@@ -19,6 +19,28 @@ pub enum VideoEncoder {
     Joint,
 }
 
+/// Matrix-product policy for training graphs. Parameters, optimizer state,
+/// reductions and accumulators remain f32; F16 permits reduced input precision
+/// in both forward and backward products, not half-storage checkpoints.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum TrainingPrecision {
+    #[default]
+    Auto,
+    F32,
+    F16,
+}
+
+impl TrainingPrecision {
+    pub(crate) fn coop_policy(self) -> meganeura::CoopPolicy {
+        match self {
+            Self::Auto => meganeura::CoopPolicy::Auto,
+            Self::F32 => meganeura::CoopPolicy::NativeF32,
+            Self::F16 => meganeura::CoopPolicy::AllowF16,
+        }
+    }
+}
+
 /// DreamerV3 scaling presets from the pinned upstream configuration.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -161,6 +183,8 @@ pub struct DreamerConfig {
     pub action_count: usize,
     pub model_size: ModelSize,
     #[serde(default)]
+    pub training_precision: TrainingPrecision,
+    #[serde(default)]
     pub observation_kind: ObservationKind,
     #[serde(default)]
     pub video_encoder: Option<VideoEncoder>,
@@ -264,6 +288,7 @@ impl DreamerConfig {
         let config = Self {
             action_count,
             model_size: ModelSize::Size12M,
+            training_precision: TrainingPrecision::Auto,
             observation_kind: ObservationKind::Features,
             video_encoder: None,
             future_target_standardization: None,
@@ -919,6 +944,7 @@ mod tests {
         object.remove("actor_learning_starts");
         object.remove("observation_decoder_depth");
         object.remove("world_microbatch_size");
+        object.remove("training_precision");
         let restored: DreamerConfig = serde_json::from_value(value).unwrap();
         assert!(restored.replay_value_gradient);
         assert!(!restored.actor_critic_gradient);
@@ -935,5 +961,22 @@ mod tests {
         );
         assert_eq!(restored.world_microbatch_size, None);
         assert_eq!(restored.world_microbatch_size(), restored.batch_size);
+        assert_eq!(restored.training_precision, TrainingPrecision::Auto);
+    }
+
+    #[test]
+    fn training_precision_round_trips_and_selects_the_backend_policy() {
+        for (precision, policy) in [
+            (TrainingPrecision::Auto, meganeura::CoopPolicy::Auto),
+            (TrainingPrecision::F32, meganeura::CoopPolicy::NativeF32),
+            (TrainingPrecision::F16, meganeura::CoopPolicy::AllowF16),
+        ] {
+            let mut config = DreamerConfig::tiny(3);
+            config.training_precision = precision;
+            let restored: DreamerConfig =
+                serde_json::from_value(serde_json::to_value(&config).unwrap()).unwrap();
+            assert_eq!(restored, config);
+            assert_eq!(restored.training_precision.coop_policy(), policy);
+        }
     }
 }

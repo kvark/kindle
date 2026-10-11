@@ -30,6 +30,8 @@ import profile_atari_vector
     (["--restore", "unused", "--actor-critic-gradient"], "training overrides"),
     (["--restore", "unused", "--cdp"], "training overrides"),
     (["--restore", "unused", "--cdp-centered"], "training overrides"),
+    (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
+    (["--training-precision", "bf16"], "invalid choice"),
     (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),

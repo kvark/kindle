@@ -15,6 +15,36 @@ pub(crate) fn build_session(
     mode: Mode,
     skip_full_optimize: bool,
 ) -> Session {
+    build_session_with_policy(
+        graph,
+        gpu,
+        mode,
+        skip_full_optimize,
+        meganeura::CoopPolicy::Auto,
+    )
+}
+
+pub(crate) fn build_training_session(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    config: &DreamerConfig,
+) -> Session {
+    build_session_with_policy(
+        graph,
+        gpu,
+        Mode::Training,
+        config.skip_full_optimize,
+        config.training_precision.coop_policy(),
+    )
+}
+
+fn build_session_with_policy(
+    graph: &Graph,
+    gpu: &Arc<blade_graphics::Context>,
+    mode: Mode,
+    skip_full_optimize: bool,
+    coop: meganeura::CoopPolicy,
+) -> Session {
     meganeura::build(
         graph,
         SessionConfig {
@@ -23,8 +53,8 @@ pub(crate) fn build_session(
             options: meganeura::CompileOptions {
                 conv_weight_splits: (mode == Mode::Training).then_some(
                     meganeura::compile::ConvWeightSplits {
-                        workgroup_threshold: 48,
-                        reduction_chunk: 512,
+                        workgroup_threshold: 256,
+                        reduction_chunk: 4096,
                         max_partial_bytes: 64 << 20,
                     },
                 ),
@@ -32,6 +62,7 @@ pub(crate) fn build_session(
             },
             skip_full_optimize: mode == Mode::Training && skip_full_optimize,
             runtime: meganeura::SessionOptions {
+                coop,
                 gpu_timing: meganeura::GpuOptions::from_env().timing,
                 ..Default::default()
             },

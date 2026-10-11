@@ -5,12 +5,60 @@ Updated October 11, 2026. This is the authoritative roadmap.
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
 
-## Paused for a pivot
+## Performance pivot
+
+The user has selected a wall-clock performance round on the5080. The stopped
+Pong queue stays cancelled. Optimize one useful learner before adding GPUs or
+concurrent seeds; retain the current quality results as controls, not a mandate
+to repeat a long mastery campaign.
+
+1. Update Meganeura to latestd7a7293; Blade56f0565 is unchanged. The initial
+   430f14b refresh adds two compiler-search fixes; five more Vulkan/packed-F16/
+   convolution fixes land during this session. Preserve old runtime controls
+   and retain the revisions used by each completed measurement.
+2. Reuse each exploration head's state projection across all18 actions, then
+   center in hidden space and project only the selected effect. Keep all-action
+   centering, four heads, targets and coefficient unchanged. This is
+   a new candidate under the user's revised arithmetic contract, not retroactive
+   qualification of the rejected October7 result.
+3. Expose checkpointed training precision: Auto, F32, F16-input products with
+   F32 accumulators/master weights/optimizer/reductions. Do not describe this as
+   BF16 support or half-storage throughout the learner. Check finite gradients,
+   losses and checkpoints; judge adoption by learning and time-to-result, not
+   bitwise trajectories or the old2e-5 end-to-end gate.
+4. Compare B8, B16 and B32 at T16/R32, with full-batch centered CDP and no
+   world microbatching. B32 consumes512 replay positions per update and updates
+   every16 actions, versus128/every4 for B8. It reduces optimizer-step frequency
+   and changes centering statistics; equal replay ratio is not identical
+   learning. Stop sizes that violate the2GiB sampled headroom floor. Report
+   time per replay position and whole-agent actions/s, not just update latency.
+5. Profile matched native/JAX RGB work and native CDP/exploration separately,
+   including compile time, ordinary complete updates, CPU/GPU gaps and hot
+   kernels. Attribute differences in precision, model, exploration and batch;
+   the old1M RGB comparison is not a current12M CDP comparison. Separate
+   instrumented attribution from ordinary timing. Identify concrete Meganeura
+   work rather than assuming that wider matrices are free.
+6. The [performance result](results/2026-10-11-cdp-performance.md) selects
+   B32/F16 for a [three-seed paired Freeway screen](experiments/2026-10-11-cdp-performance-learning.md),
+   200k actions per arm/seed against optimized B8/Auto. The synthetic replay
+   throughput gain is2.66x; learning/time-to-score is not yet established.
+   Keep all failures; no new five-game campaign or automatic extension.
+
+Concurrent seeds can fill otherwise idle hardware without changing each seed's
+batch, but do not inherently speed one learner and may compete for bandwidth
+and memory. Wider batches are the first experiment. Neither idle capacity nor
+room for multiple12M workers follows from a sampled VRAM estimate.
+
+Cleanup so far: removed regenerable Rust debug builds from `target/debug` and
+`python/target/debug`; filesystem free space549→612GiB (rounded). Rebuilding
+restores them. Run evidence, checkpoints, videos and user-owned files remain.
+
+## Preserved pivot boundary
 
 **October11,20:25 UTC: training stopped at the user's request.** The existing
-five-game goal is paused, not achieved. No learner, evaluation or GPU experiment
-is queued to run automatically. The stages below describe the retained plan;
-they are not instructions to continue it before the new direction is agreed.
+five-game goal is paused, not achieved. Nothing in that allocation will restart
+automatically. The performance work above is newly authorized; the long-run
+stages below are retained context, not an active training queue.
 
 - **Preserved boundary:** Pong1009 stops gracefully at189,576 actions /
   47,333 updates after1h29m6s. Partial and actual-initial checkpoints, logs,
@@ -30,12 +78,10 @@ they are not instructions to continue it before the new direction is agreed.
   study; keep the old long-run targets as historical references, not evidence
   that short-budget learning is broken. Current12M updates take about110ms and
   imagination, not world training alone, is the largest measured component.
-  A speed-focused pivot should target whole-agent cost. No new optimization,
-  numerical-gate change, concurrency or learning allocation is approved here.
+  The performance round above supersedes this earlier stop boundary; the old
+  long-budget queue remains cancelled and does not authorize concurrency.
 
-The immediate next step is to agree the pivot's objective and smallest useful
-experiment, not extend the Pong campaign. Keep the current implementation and
-user-owned files intact until that choice is made.
+The next work is the bounded performance round above, not an extension of Pong.
 
 ## Retained direction: CDP is the main path
 

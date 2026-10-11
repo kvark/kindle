@@ -421,12 +421,8 @@ impl DreamerCore {
         );
         let policy_live_graph = behavior::build_actor_inference_graph(&config, 1);
 
-        let mut world_train = build_session(
-            &world_train_graph,
-            &gpu,
-            Mode::Training,
-            config.skip_full_optimize,
-        );
+        let mut world_train =
+            super::runtime::build_training_session(&world_train_graph, &gpu, &config);
         let mut world_posterior =
             build_session(&world_posterior_graph, &gpu, Mode::Inference, false);
         let mut world_observe_live =
@@ -436,12 +432,8 @@ impl DreamerCore {
             build_session(&world_transition_live_graph, &gpu, Mode::Inference, false);
         let mut world_heads_live =
             build_session(&world_head_live_graph, &gpu, Mode::Inference, false);
-        let mut behavior_train = build_session(
-            &behavior_train_graph,
-            &gpu,
-            Mode::Training,
-            config.skip_full_optimize,
-        );
+        let mut behavior_train =
+            super::runtime::build_training_session(&behavior_train_graph, &gpu, &config);
         let mut behavior_slow = build_session(&behavior_slow_graph, &gpu, Mode::Inference, false);
         let mut policy_live = build_session(&policy_live_graph, &gpu, Mode::Inference, false);
 
