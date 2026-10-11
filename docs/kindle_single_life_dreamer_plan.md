@@ -239,13 +239,18 @@ The cohort costs46h40m1s training,4.002x the retained500k cost. All nine guards,
 221,648 frozen actions, nine excess episodes, all tails and ten warnings remain.
 Final CPU review passes in52.02s; no worker remains. Historical controls retain
 their backend pins; this is not an exact same-binary budget ablation.
-The [bounded frozen forecast diagnostic](experiments/2026-10-11-cdp-qbert-forecasts.md)
-now compares retained500k and2M models on identical recorded Qbert trajectories.
-Its first capture fails on the new harness's final-reset lifecycle, not a
-reported GPU fault. Original source/data and40,789 extra actions remain.
-The repaired full1009 control passes all eight streams/exact346 tensors and
-reproduces that failed prefix exactly; the other five captures and automatic
-CPU review start October11 at16:55 UTC. No forecast-quality conclusion yet.
+The [completed frozen forecast comparison](results/2026-10-11-cdp-qbert-forecasts.md)
+finds useful h15 reward predictions in every2M seed: MAE/RMSE beat zero, mean,
+persistence and unrelated actions; positive-event AUC.951/.967/.973. Later-stage
+forecasting improves strongly over500k; survival remains unresolved with sparse
+terminal evidence. Six guards/exact346 tensors pass,386,496 replayed actions,
+zero updates,24m16.84s; original lifecycle failure/source and extra actions
+remain. This is not universal world-model quality or a new competence result.
+Next use the existing greedy action mode for one bounded three-seed frozen
+Qbert comparison, with actual initial controls. Keep sampled evaluation as the
+standard result; test action sampling before choosing another learning change.
+The [six-evaluation declaration](experiments/2026-10-11-cdp-qbert-action-mode.md)
+starts October11 at17:29 UTC with automatic per-stage replay/tensor/task review.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.
@@ -352,7 +357,7 @@ Links into `runs/` require this workspace.
 | Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
 | Freeway |12M frozen27.54 vs0; seeds33.58/17.25/31.79. Retained1M30.26; paired−2.72 [−13.29,4.08], training costs3.57x. | Crossing gates fall72/72 ->48/72;2017 regresses. No universal capacity advantage. Published33.40 remains unmet by the cohort. | [Capacity results and videos](results/2026-10-09-cdp-freeway-capacity.md); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
-| Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score.12M forecasts untested. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
+| Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 reward forecasts in all seeds; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecast controls](results/2026-10-11-cdp-qbert-forecasts.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
 observations (45k train+5k validation/game). Freeway also used a.5-probability

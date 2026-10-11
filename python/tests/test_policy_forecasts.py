@@ -74,7 +74,7 @@ def test_one_step_keeps_terminal_endpoint_and_resets_persistence():
 
 def test_calibration_is_not_fitted_to_test_and_sparse_terminal_evidence_is_explicit():
     data = example_data()
-    result = summarize([data])
+    result = summarize([data], continuation_discount=1.0)
     one = result['1']
     assert one['calibration_reward_mean'] == 7.5
     assert one['calibration_terminal_frequency'] == 1/16
@@ -98,7 +98,24 @@ def test_missing_calibration_or_test_stops_analysis():
     data = example_data()
     data['split'][:] = -1
     with pytest.raises(ValueError, match='support'):
-        summarize([data])
+        summarize([data], continuation_discount=1.0)
+
+
+def test_continuation_discount_is_removed_before_terminal_calibration():
+    data = example_data()
+    for key in ('actual_continue1', 'unrelated_continue1', 'actual_continue15', 'unrelated_continue15'):
+        data[key] *= .99
+    result = summarize([data], continuation_discount=.99)
+    assert result['1']['slices']['all']['terminal']['predictions']['actual']['brier'] == 0
+    data['actual_continue1'][~data['terminated']] = 1.0
+    result = summarize([data], continuation_discount=.99)
+    assert result['1']['slices']['all']['terminal']['predictions']['actual']['brier'] == 0
+
+
+@pytest.mark.parametrize('discount', [0, -.1, 1.1, np.nan, np.inf])
+def test_invalid_continuation_discount_fails(discount):
+    with pytest.raises(ValueError, match='discount'):
+        summarize([example_data()], continuation_discount=discount)
 
 
 @pytest.mark.parametrize('continuing', [False, True])

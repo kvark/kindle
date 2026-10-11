@@ -91,7 +91,9 @@ def reward_metrics(target, predictions):
     return result
 
 
-def summarize(files):
+def summarize(files, *, continuation_discount):
+    if not np.isfinite(continuation_discount) or not 0 < continuation_discount <= 1:
+        raise ValueError('continuation discount must be in (0, 1]')
     result = {}
     for horizon in (1, 15):
         parts = []
@@ -123,7 +125,8 @@ def summarize(files):
             predictions.update(zero=np.zeros(len(truth)), calibration_mean=np.full(len(truth), reward_mean),
                                persistence=joined['previous_reward'][selected])
             death = joined['terminal'][selected]
-            risks = dict(actual=1-joined['actual_continue'][selected], unrelated=1-joined['unrelated_continue'][selected],
+            risks = dict(actual=1-np.clip(joined['actual_continue'][selected]/continuation_discount, 0, 1),
+                         unrelated=1-np.clip(joined['unrelated_continue'][selected]/continuation_discount, 0, 1),
                          calibration_mean=np.full(len(death), terminal_mean), always_continuing=np.zeros(len(death)))
             row = dict(reward=reward_metrics(truth, predictions), terminal=dict(count=int(death.sum()),
                 examples=len(death), limited=int(death.sum()) < 20,
