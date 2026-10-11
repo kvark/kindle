@@ -12,7 +12,10 @@ is complete. Frozen mean7,367.01 versus retained500k2,657.99; first pyramids
 0/0/24 ->20/22/20. All scores improve, not every completion count. Nine guards,
 144 natural frozen episodes and six whole replay/videos pass, costing46h40m1s
 training. No full mastery gate passes or automatic budget extension follows.
-Next review frozen on-policy forecasts; all five quality targets remain open.
+The [paired frozen on-policy forecast diagnostic](2026-10-11-cdp-qbert-forecasts.md)
+is running after a reviewed stream-boundary repair; all five quality targets
+remain open. The failed capture/source remain, and the corrected first full
+capture reproduces its40,789-action prefix exactly without changing346 tensors.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),

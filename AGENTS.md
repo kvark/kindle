@@ -294,6 +294,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   supports prefix agreement for one seed, not universal parity, pixel identity,
   final500k tensor equality or three-seed/final2M competence. The independent
   end-of-seed reviewer also reproduces all three historical pairs in3.84s.
+- **Qbert frozen forecasts in progress:** [fixed declaration](docs/experiments/2026-10-11-cdp-qbert-forecasts.md),
+  retained500k versus2M checkpoints on identical recorded policy trajectories,
+  three seeds/386,496 diagnostic actions/zero learner updates. Native7311547d
+  unchanged. The first capture stops at16:44 UTC after40,789 actions: the new
+  harness opens an unused actor episode after a final natural reset. Failed
+  source/data/guard and128 smoke actions remain; no reported GPU fault.
+  The corrected retained1009 capture passes in173.55s:46,616 actions, all eight
+  streams/exact346 tensors and exact40,789-action failed prefix. Seventeen CPU
+  tests pass. Five remaining captures and automatic CPU review start16:55 UTC.
+  No training extension; forecasts and all five quality targets remain open.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.

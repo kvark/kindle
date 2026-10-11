@@ -239,8 +239,13 @@ The cohort costs46h40m1s training,4.002x the retained500k cost. All nine guards,
 221,648 frozen actions, nine excess episodes, all tails and ten warnings remain.
 Final CPU review passes in52.02s; no worker remains. Historical controls retain
 their backend pins; this is not an exact same-binary budget ablation.
-Next inspect action-conditioned reward/terminal forecasts along the recorded
-Qbert policy trajectories in a separately declared bounded frozen diagnostic.
+The [bounded frozen forecast diagnostic](experiments/2026-10-11-cdp-qbert-forecasts.md)
+now compares retained500k and2M models on identical recorded Qbert trajectories.
+Its first capture fails on the new harness's final-reset lifecycle, not a
+reported GPU fault. Original source/data and40,789 extra actions remain.
+The repaired full1009 control passes all eight streams/exact346 tensors and
+reproduces that failed prefix exactly; the other five captures and automatic
+CPU review start October11 at16:55 UTC. No forecast-quality conclusion yet.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.
