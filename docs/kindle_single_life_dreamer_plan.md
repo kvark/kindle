@@ -246,11 +246,14 @@ forecasting improves strongly over500k; survival remains unresolved with sparse
 terminal evidence. Six guards/exact346 tensors pass,386,496 replayed actions,
 zero updates,24m16.84s; original lifecycle failure/source and extra actions
 remain. This is not universal world-model quality or a new competence result.
-Next use the existing greedy action mode for one bounded three-seed frozen
-Qbert comparison, with actual initial controls. Keep sampled evaluation as the
-standard result; test action sampling before choosing another learning change.
-The [six-evaluation declaration](experiments/2026-10-11-cdp-qbert-action-mode.md)
-starts October11 at17:29 UTC with automatic per-stage replay/tensor/task review.
+The [six-evaluation action-mode check](results/2026-10-11-cdp-qbert-action-mode.md)
+is complete: greedy raises first-pyramid completions62/72→69/72, but mean
+score falls7,367.01→6,953.47; paired−413.54 [−2,092.71,580.21]. All six guards,
+144 natural episodes, exact tensors and whole videos pass;218,936 actions,
+zero updates,3m32.63s total. Keep sampled evaluation as standard. Next review
+longer-horizon value/credit assignment and measured learning cost, accounting
+for the critic's combined extrinsic/intrinsic target before interpreting real
+returns. No automatic training extension or entropy/representation sweep.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.

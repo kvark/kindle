@@ -310,13 +310,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   remains. Next a bounded greedy-versus-sampled Qbert check using existing action
   mode and actual initial controls; no new learner budget or representation
   sweep. All five quality targets and the RGB budget question remain open.
-- **Greedy Qbert check active:** [declaration](docs/experiments/2026-10-11-cdp-qbert-action-mode.md),
-  six frozen final/actual-initial evaluations on the completed2M checkpoints,
-  same native and eight host workers, existing `--greedy` mode only. Starts
-  October11 at17:29 UTC; natural24-episode cohorts, zero updates, exact tensors,
-  full replays/videos and task-outcome reviews before each next job. Sampled
-  results remain standard; no automatic learner extension. CPU preparation's
-  lazy-module-path error is retained and corrected before any GPU action.
+- **Greedy Qbert check complete:** [result and whole videos](docs/results/2026-10-11-cdp-qbert-action-mode.md).
+  Scores5,444.79/6,392.71/9,022.92, mean6,953.47 versus sampled7,367.01;
+  paired−413.54 [−2,092.71,580.21]. First pyramids20/22/20→22/24/23, so all
+  improve that fraction, but3019 loses2,092.71 points and none passes the full
+  mastery/long-run gate. Keep sampled evaluation. Six guards/144 natural
+  episodes/exact346 tensors and whole videos pass;218,936 actions/zero updates,
+  14 excess episodes/nine warnings retained. Finishes17:33:10 UTC in3m32.63s;
+  independent CPU review passes2.33s. No worker remains. Preparation's lazy
+  module error/source remain, before GPU work. Next review longer-horizon
+  value/credit assignment and measured learning cost; account for the critic's
+  combined extrinsic/intrinsic target. No entropy/representation sweep or
+  automatic learner extension; all five quality targets remain open.
 - After Atari: video priors for dynamics/behavior, mind-games vkQuake2 then
   TMNF, a small GOG/Wine panel, held-out cross-game adaptation/retention, then
   swarms. One effective actor first; no concurrent learner service now.

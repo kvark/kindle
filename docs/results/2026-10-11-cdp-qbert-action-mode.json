@@ -1,0 +1,147 @@
+{
+  "status": "review_passed",
+  "source_pins": 58,
+  "native_sha256": "7311547db9c002cbdf3b0ecea80de069bfb8ec872b8734ed0908cc13b288fe0f",
+  "original_result_sha256": "27ac4720938acf427e55768f368bb38f737fa9e9b0adbe3e46a8bc5d285066b8",
+  "groups": [
+    {
+      "seed": 1009,
+      "arm": "candidate",
+      "score": 5444.791666666667,
+      "sampled_score": 5172.916666666667,
+      "paired_gain": 271.875,
+      "first_pyramids": 22,
+      "sampled_first_pyramids": 20,
+      "full_mastery_gate": false,
+      "actions": 43352,
+      "seconds": 15.662223128136247,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-1009-candidate-frozen.mp4",
+      "video_sha256": "cbf8f9f3242481415a28b8b289661feadc82d181c3d76c804a1149e1c4d835b8"
+    },
+    {
+      "seed": 1009,
+      "arm": "untrained",
+      "score": 239.58333333333334,
+      "sampled_score": 175,
+      "paired_gain": 64.58333333333334,
+      "first_pyramids": 0,
+      "sampled_first_pyramids": 0,
+      "full_mastery_gate": false,
+      "actions": 11608,
+      "seconds": 4.68911047000438,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-1009-untrained-frozen.mp4",
+      "video_sha256": "05e4d0b6444a123053cd8bc767c743ed30898226022d467bf4a951281a0d21d8"
+    },
+    {
+      "seed": 2017,
+      "arm": "candidate",
+      "score": 6392.708333333333,
+      "sampled_score": 5812.5,
+      "paired_gain": 580.208333333333,
+      "first_pyramids": 24,
+      "sampled_first_pyramids": 22,
+      "full_mastery_gate": false,
+      "actions": 39216,
+      "seconds": 14.297179654007778,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-2017-candidate-frozen.mp4",
+      "video_sha256": "81a55243f5ba34fdd059ece7e39ba18e7fe2bfa719e76ca7f73a9458dbaac6f8"
+    },
+    {
+      "seed": 2017,
+      "arm": "untrained",
+      "score": 278.125,
+      "sampled_score": 273.9583333333333,
+      "paired_gain": 4.166666666666686,
+      "first_pyramids": 0,
+      "sampled_first_pyramids": 0,
+      "full_mastery_gate": false,
+      "actions": 10856,
+      "seconds": 4.077423010952771,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-2017-untrained-frozen.mp4",
+      "video_sha256": "13c846ef22975f67a596ba37c40f5548cc4e9aa9d514f85a08098f2904a4ed2f"
+    },
+    {
+      "seed": 3019,
+      "arm": "candidate",
+      "score": 9022.916666666666,
+      "sampled_score": 11115.625,
+      "paired_gain": -2092.708333333334,
+      "first_pyramids": 23,
+      "sampled_first_pyramids": 20,
+      "full_mastery_gate": false,
+      "actions": 103752,
+      "seconds": 36.951277144951746,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-3019-candidate-frozen.mp4",
+      "video_sha256": "3684911a689fdfc0a9ebdbba3ed627ee9f7ebb591f8a3603c844781f3daaa99e"
+    },
+    {
+      "seed": 3019,
+      "arm": "untrained",
+      "score": 251.04166666666666,
+      "sampled_score": 153.125,
+      "paired_gain": 97.91666666666666,
+      "first_pyramids": 0,
+      "sampled_first_pyramids": 0,
+      "full_mastery_gate": false,
+      "actions": 10152,
+      "seconds": 3.8715051729232073,
+      "video": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/qbert-centered-3019-untrained-frozen.mp4",
+      "video_sha256": "8278481e9f66bff97a17eea8b41a4e0558228cb5537b2f05eef3ea86eb8a81e0"
+    }
+  ],
+  "frozen": {
+    "mean": 6953.472222222222,
+    "ci95": [
+      5444.791666666667,
+      9022.916666666666
+    ],
+    "seeds": [
+      5444.791666666667,
+      6392.708333333333,
+      9022.916666666666
+    ]
+  },
+  "initial": {
+    "mean": 256.25,
+    "ci95": [
+      239.58333333333334,
+      278.125
+    ],
+    "seeds": [
+      239.58333333333334,
+      278.125,
+      251.04166666666666
+    ]
+  },
+  "paired_gain": {
+    "mean": -413.54166666666697,
+    "ci95": [
+      -2092.708333333334,
+      580.208333333333
+    ],
+    "seeds": [
+      271.875,
+      580.208333333333,
+      -2092.708333333334
+    ]
+  },
+  "sampled_first_pyramids": 62,
+  "greedy_first_pyramids": 69,
+  "actions": 218936,
+  "actor_updates": 0,
+  "selected_natural_episodes": 144,
+  "selected_cutoffs": 0,
+  "guards": 6,
+  "whole_videos": 6,
+  "exact_tensors_per_model": 346,
+  "warnings": 9,
+  "excess_episodes": 14,
+  "frozen_seconds": 79.54871858097613,
+  "review_seconds": 2.3325344228651375,
+  "standard_evaluation_remains": "sampled",
+  "quality_goal_complete": false,
+  "automatic_learning_extension": false,
+  "next": "review longer-horizon value/credit assignment and measured learning cost; no entropy or representation sweep",
+  "raw_review": "/x/Code/kindle/runs/cdp-qbert-greedy-20261011.5vPsrd3M/completion-review.json",
+  "raw_review_sha256": "c3454c5b9021008cbdf0d8ac33da01d8354b111b0fee72d8df43517048a95b11"
+}

@@ -15,8 +15,10 @@ training. No full mastery gate passes or automatic budget extension follows.
 The [paired frozen forecast diagnostic](../results/2026-10-11-cdp-qbert-forecasts.md)
 is complete: every2M seed has useful h15 reward forecasts; survival remains
 unresolved. Six guards/exact tensors pass; failed capture/source and the
-continuation-discount correction remain. Next test greedy versus sampled action
-selection without retraining. All five quality targets remain open.
+continuation-discount correction remain. The [greedy action-mode check](../results/2026-10-11-cdp-qbert-action-mode.md)
+also completes: first pyramids62/72→69/72, but mean score7,367.01→6,953.47;
+no consistent score gain. Keep sampled evaluation. All five quality targets
+remain open; next review value/credit assignment and measured learning cost.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
