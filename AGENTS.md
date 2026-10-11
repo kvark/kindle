@@ -342,6 +342,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   entropy/critic sweep or indefinite optimization gate. Rejected factorization
   stays rejected. No new learner budget; all five quality/RGB budget goals open.
 
+- **October11 measured-build check complete:** [result](docs/results/2026-10-11-cdp-measured-build.md).
+  Ordinary Meganeura2c42b448/Blade56f0565/native0f26ee63 qualifies:21 guards,
+  2,824 upstream comparisons, three train/frozen smokes and exact first outputs/
+  272 metric reports/346 final tensors.107.93→108.30ms: no speedup. Original
+  4GiB logical-memory preflight fails; one declared20GiB correction stops on
+  value/bonus numerical tolerances at the third callback. Both failed guards,
+  source/binaries and ten total warnings remain; zero search optimizer updates/
+  game actions, no GPU recovery. Test-only hook removed; no further search,
+  gate relaxation or rejected-factorization retry. Next separately declare a
+  three-seed Pong experience-budget study on unchanged12M/T16, targeting69/72
+  wins and inconsistent mastery. Keep actual initials, natural cohorts and20.45
+  long-run target; no automatic suite extension. All five quality/RGB goals open.
+
 ## Architecture and invariants
 
 - CDP keeps Dreamer's categorical RSSM, replay and imagined actor/critic; it
@@ -411,9 +424,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified CDP/RGB backend: Meganeura main `31026833`, Blade `56f0565`,
-  native `7311547d`; the [October9 refresh](docs/results/2026-10-09-meganeura-refresh.md)
-  qualifies unchanged graphs with no speedup claim. Historical `f104f354`/
+- Current qualified CDP/RGB backend: Meganeura main `2c42b448`, Blade `56f0565`,
+  native `0f26ee63`; the [October11 ordinary refresh](docs/results/2026-10-11-cdp-measured-build.md)
+  qualifies unchanged graphs without speedup. Its measured-construction trial
+  fails and is not adopted. Historical `31026833`/`7311547d` retains the Qbert2M
+  learners and [October9 qualification](docs/results/2026-10-09-meganeura-refresh.md).
+  Historical `f104f354`/
   `e349cddf`/`83be73bf` retains the completed four-game learners and its
   [October7 qualification](docs/results/2026-10-07-meganeura-control-refresh.md).
   Previous `c6376542`/`6d38eea2` remains the historical

@@ -22,8 +22,12 @@ no consistent score gain. Keep sampled evaluation. The
 all critics beat constant/zero controls, with seed-specific bias and<.03%
 intrinsic contribution. Exact historical traces/tensors and all five guards pass;
 the CPU timestamp-review failure remains, with no GPU retry. All five quality
-targets remain open. Next one bounded upstream measured-build/whole-update
-check on the unchanged recipe, not a new representation or critic sweep.
+targets remain open. The [bounded upstream measured-build check](../results/2026-10-11-cdp-measured-build.md)
+is complete: ordinary2c42b448 qualifies with exact fixture agreement and no
+speedup (107.93→108.30ms). The original logical-memory preflight fails; one
+declared correction reaches a numerical mismatch and stops. Both failures
+remain, with no tolerance relaxation or retained test hook. Next separately
+declare a three-seed Pong budget study, not another optimization sweep.
 
 October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
 with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),

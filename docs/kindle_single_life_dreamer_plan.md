@@ -210,7 +210,7 @@ and the original last10% of200M targets remain in the
 [combined data](results/2026-10-09-cdp-five-game-capacity.json).
 All five quality targets and the RGB compute-saving question remain open.
 
-**Latest backend qualified:** [October9 refresh](results/2026-10-09-meganeura-refresh.md),
+**October9 backend qualified:** [refresh](results/2026-10-09-meganeura-refresh.md),
 Meganeura31026833/Blade56f0565/native7311547d. All20 guards,2,824 upstream
 comparisons and three train/frozen smokes pass. One paired12M timing measures
 107.97->108.23ms, with exact first outputs,272 metric reports and346 final
@@ -258,10 +258,19 @@ by seed/stage, not a shared collapse; the measured intrinsic fraction is<.03%.
 Five guards/exact346 tensors/72 natural episodes/full traces and videos pass;
 193,248 actions plus1,024 smoke, zero updates,88.87s capture. CPU review repairs
 only wall-clock comparison; no GPU retry. No worker remains.
-Next assess one bounded upstream measured-build option on unchanged learning
-graphs, with numerical checks and ordinary full-update timing. Keep the recipe
-and rejected factorization's gates; no indefinite optimization gate, automatic
-training extension or representation/entropy/critic-loss sweep.
+The [bounded measured-build check](results/2026-10-11-cdp-measured-build.md)
+now completes. Adopt qualified ordinary Meganeura2c42b448/Blade56f0565/native
+0f26ee63:21 guards,2,824 upstream comparisons, three train/frozen smokes and
+exact first outputs/272 metric reports/346 final tensors pass. Updates remain
+107.93→108.30ms; no speedup. Search's original logical-memory preflight fails;
+one declared correction stops at value/bonus numerical tolerances. Both failed
+guards/source bundles remain, with zero search optimizer updates/game actions;
+ten total warnings and no GPU recovery. The test-only hook is removed. No
+further search, tolerance relaxation or rejected-factorization retry.
+Next separately declare a three-seed Pong experience-budget study on the
+unchanged12M/T16 recipe, targeting its69/72 wins and inconsistent mastery.
+Keep the20.45 long-run target, actual initial controls and natural frozen
+evaluation. No representation/entropy/critic-loss sweep or indefinite speed gate.
 Do not automatically extend all five games, resume an old lifetime or start a
 capacity/representation sweep. All five long-run targets and the RGB budget
 claim stay open.
