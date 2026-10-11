@@ -22,11 +22,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   updates; draft, unadopted. Independent PR249/c0c7774 removes repeated action
   copies: CDP B32 161.40->157.30ms and1.05GiB less imagination allocation,
   exact272 reports/346 final tensors; RGB unchanged/exact292 tensors. Ready
-  for review, not yet merged/pinned. BF16 types/cooperative matrices are exposed
-  by the driver; Naga/Blade/Meganeura execution/storage remains unimplemented
-  and is next. Historical ordinary GPU profile fields describe only the last
+  for review, CI947 passes, not yet merged/pinned. [BF16 primitives qualify](docs/results/2026-10-11-native-bf16.md):
+  Naga forkc9fd6a85a (explicit user commit permission), Blade PR407/b52965b,
+  Meganeura PR250/18be13c: RNE storage and18 native matrix/F32-gradient fixtures. Four guards
+  pass; initial odd-length buffer clear fails VUID00028 and is repaired within
+  existing padded allocations. Zero new allocation warnings/game actions.
+  Ordinary BF16 driver casts use RTZ; Meganeura rounds RNE on GPU. Connected
+  activation/convolution and reduced backward regions remain next, not a full
+  mixed-precision learner or speedup. Full wgpu xtask lacks cargo-nextest;
+  scoped Naga/Blade checks pass. Historical ordinary GPU profile fields describe only the last
   submission (world uses four), not total GPU time; corrected labels preserve
-  raw evidence.18 guards pass/two warnings, zero game actions; training stays
+  raw evidence. First round:18 guards pass/two warnings; BF16 totals above are
+  separate. Zero game actions; training stays
   stopped. No useful convolution win or native/JAX gap closure claim.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX

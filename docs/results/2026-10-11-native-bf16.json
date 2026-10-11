@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-11",
+  "status": "primitive_qualification_not_full_mixed_precision_training",
+  "artifact_root": "runs/backend-performance-20261011.JWRE5f2s",
+  "device": "NVIDIA GeForce RTX 5080",
+  "driver": "580.178.04",
+  "boot_id": "3e89d55c-a9e5-472f-a18a-06508c5bafa7",
+  "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+  "blade": "b52965b0360cee07bff6b17d2c2ea23d7455b8b1",
+  "blade_pr": "https://github.com/kvark/blade/pull/407",
+  "meganeura_base": "d7a7293378db1b0e8ee3b94a1e6d73ef14a1a32c",
+  "meganeura": "18be13c86d8fd50c5b61e9f43351d4b11ace4336",
+  "meganeura_pr": "https://github.com/kvark/meganeura/pull/250",
+  "game_actions": 0,
+  "kindle_full_updates": 0,
+  "successful_guards": 4,
+  "failed_guards": 1,
+  "new_allocation_warnings": 0,
+  "guard_nvml_queries": 0,
+  "minimum_required_sampled_budget_headroom_bytes": 2147483648,
+  "blade_test": {
+    "binary_sha256": "d9fff5e636a6da85dd6ef90990e90de17cbca735142b4a36895ccd6dabd28f8e",
+    "conversions": 8207,
+    "driver_rounding": "toward_zero",
+    "matrix_outputs": 1024,
+    "repetitions": 8,
+    "relative_l2_on_quantized_operands": 1.908923790e-8,
+    "maximum_absolute_error": 1.192092896e-6
+  },
+  "meganeura_storage": {
+    "binary_sha256": "ebd78a64dbfdd490a32a73f30829528eefa00bf372f73e51fee4a931abdfe8a1",
+    "exact_rne_conversions": 1035,
+    "f32_master_gradient_elements": 17,
+    "failed_predecessor_sha256": "089aa7318f991054a5197524ac09fa85d9dd402025a39f1dee70445d8c2312f6",
+    "failure": "VUID-vkCmdFillBuffer-size-00028",
+    "fix": "round GPU clear span to whole words inside existing padded allocation"
+  },
+  "meganeura_matrices": {
+    "binary_sha256": "174385266e9c05035ae765f861f38fdc50bad6ed6af8e8c3b9a1bfba27eb08ac",
+    "cases": 18,
+    "layouts": ["AB", "AtB", "ABt"],
+    "mnk": [[19, 23, 17], [32, 48, 64], [1, 7, 1]],
+    "addend": [false, true],
+    "backward": "F32 on widened quantized forward operands"
+  },
+  "pinned_repeat": {
+    "binary_sha256": "04c6b4bfd12b44511ac1fa9959673ffca2604359f5ad03422ee2c332f46202d4",
+    "focused_tests": 4,
+    "uses_git_dependencies_not_local_paths": true,
+    "same_fixtures_not_new_learning_evidence": true
+  },
+  "cpu": {
+    "naga_final_library_tests": 139,
+    "naga_final_integration_tests": 232,
+    "naga_final_snapshot_drivers_skipped": 3,
+    "naga_clippy_all_targets_all_features": "pass",
+    "wgpu_core_hal_bridge_all_features_check": "pass",
+    "blade_all_targets_clippy_pinned_compiler": "pass",
+    "meganeura_codegen_tests": 37,
+    "meganeura_graph_tests": 21,
+    "meganeura_autodiff_tests": 10,
+    "meganeura_all_targets_all_features_clippy": "pass",
+    "full_wgpu_xtask": "unavailable_missing_cargo_nextest"
+  },
+  "limits": [
+    "Experimental forks; no automatic merge or Kindle dependency adoption.",
+    "No complete reduced-storage learner, BF16 convolution/backward qualification, full-update speed or learning-quality claim.",
+    "Known VUID-StandaloneSpirv-None-10684 remains recorded and user-allowed.",
+    "Historical candidate archives retain local path dependencies; new review branches use explicit git pins.",
+    "No Atari training or frozen rollout resumed."
+  ]
+}

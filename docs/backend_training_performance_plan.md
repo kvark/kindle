@@ -38,8 +38,13 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
   imagination allocation, exact272 reports/final tensors. Ready for review;
   not yet merged or pinned. Independent of PR248; RGB effectively unchanged.
-- Mixed precision: hardware capability check complete; native BF16 compiler /
-  storage execution remains to implement. This is the next work package.
+- Mixed precision: [BF16 primitives qualify](results/2026-10-11-native-bf16.md).
+  Naga is committed to the user's fork; Blade PR407 and Meganeura PR250 are
+  draft. Meganeura passes
+  exact nearest-even storage and 18 BF16 matrix/F32-gradient fixtures after
+  repairing an odd-length buffer clear. Connected activation/convolution and
+  reduced-precision backward regions remain to implement; no learner speedup
+  or full mixed-precision qualification yet.
 - Profiling: correct the ordinary GPU fields to say **last submission only**.
   World training uses four submissions. Historical raw captures remain;
   complete wall timings are valid, total GPU time/utilization is unmeasured.
@@ -73,8 +78,8 @@ change; it does not depend on adopting the convolution candidate.
 
 - The bounded Vulkan check passes: driver580.178.04 exposes
   `VK_KHR_shader_bfloat16`, BF16 types and cooperative matrices on the5080
-  (not BF16 dot products). The pinned Naga shader compiler has no BF16 type
-  support; this needs proper compiler plumbing, not just a Blade feature bit.
+  (not BF16 dot products). Kindle's production Naga pin has no BF16 type
+  support; the qualified compiler fork adds it, not just a Blade feature bit.
   BF16 weight loading converted to F32 is not native BF16 execution.
   Do not change/reload the driver or emulate a CPU learner to claim support.
 - Add the smallest Blade capability/shader plumbing actually required, then
@@ -106,9 +111,11 @@ The implementation boundary is explicit:
    dense / activation / layout pipeline. First qualify conversion edge cases
    and F64-referenced matrix gradients, then repeated complete updates.
 
-This compiler/backend work remains unimplemented. Capability discovery is
-complete, not mixed-precision qualification. Do not substitute a driver change,
-CPU emulation or an isolated cast benchmark for this deliverable.
+The native compiler/Blade foundation and initial Meganeura storage/matrix
+consumers now pass scoped checks. See the [BF16 report](results/2026-10-11-native-bf16.md)
+for rounding, failures and limits. Connected regions and ordinary full-update
+acceptance remain unfinished. Do not substitute a driver change, CPU emulation
+or an isolated cast benchmark for this deliverable.
 
 ### 3 Reduce intermediate traffic and dispatch overhead
 
@@ -129,7 +136,8 @@ CPU emulation or an isolated cast benchmark for this deliverable.
   neighboring user changes. Only the user merges upstream PRs.
 - [ ] Qualify a useful complete-update convolution improvement (draft implemented;
   numerical checks pass, whole-update speed acceptance not met).
-- [ ] Establish BF16 capability and implement mixed-precision execution/storage.
+- [x] Establish BF16 capability and qualify native compiler/storage/matrix primitives.
+- [ ] Connect useful reduced-storage forward/backward regions and qualify complete updates.
 - [x] Implement and qualify the selected row-addressing layout improvement;
   upstream merge/adoption remains separate.
 - [ ] Repeat the fixed native/JAX comparison and report remaining gaps.

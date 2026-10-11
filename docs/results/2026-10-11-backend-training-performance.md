@@ -5,6 +5,10 @@ now has two independently tested upstream changes and a concrete BF16 dependency
 path. This does **not** complete mixed precision or close the native/JAX gap.
 [Machine-readable evidence](2026-10-11-backend-training-performance.json).
 
+Later follow-up: [native BF16 primitives qualify](2026-10-11-native-bf16.md).
+The implementation state below records this first round; full mixed-precision
+learner integration and end-to-end acceptance remain unfinished.
+
 ## Decisions
 
 | Mechanism | Complete CDP B32 update | Complete RGB B8 update | Decision |
