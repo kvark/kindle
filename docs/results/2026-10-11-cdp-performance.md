@@ -3,7 +3,10 @@
 **The selected B32/F16 candidate processes replay positions2.66× faster than
 the old B8 recipe.** This is measured synthetic-update throughput, not yet
 faster learning to a score. The [three-seed paired Freeway screen](../experiments/2026-10-11-cdp-performance-learning.md)
-is running to test that remaining question; the stopped Pong queue stays cancelled.
+was stopped by the user for the [backend performance round](../backend_training_performance_plan.md).
+Its first learner ends cleanly at39,568 actions/9,831 updates with a partial
+checkpoint; no learner or frozen cohort completes. Faster learning remains
+unestablished. The stopped Pong queue stays cancelled.
 
 ## Implemented and measured
 

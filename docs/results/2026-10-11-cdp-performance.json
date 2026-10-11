@@ -1,5 +1,5 @@
 {
-  "status": "performance_qualified_learning_running",
+  "status": "performance_qualified_learning_stopped_for_backend_work",
   "raw_root": "runs/cdp-performance-20261011.7SpyzGUa",
   "audits": {
     "first_round": {
@@ -106,6 +106,8 @@
     "unique_evidence_deleted": false
   },
   "learning": {
+    "status": "stopped_by_user",
+    "stop_receipt": "2026-10-11-performance-learning-stop.json",
     "seeds": [
       1009,
       2017,

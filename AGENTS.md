@@ -7,6 +7,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Backend performance before more Kindle training:** follow the
+  [implementation plan](docs/backend_training_performance_plan.md): cooperative
+  convolution weight gradients, actual mixed-precision storage/execution
+  (BF16 where Vulkan supports it), then measured fusion/layout/synchronization.
+  No Atari learning or frozen rollouts during this round; bounded synthetic
+  updates and backend GPU qualification are authorized. Preserve image detail,
+  CDP/exploration semantics and strict-F32 fallback. Use isolated upstream
+  worktrees; only the user merges. The Freeway screen below was stopped cleanly
+  at39,568 actions/9,831 updates, no completed learner or later arm. Partial
+  checkpoint/declaration remain; no automatic restart or same-lifetime claim.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX
   profile and artifact cleanup. Optimize one5080 learner before concurrent seeds
@@ -25,7 +35,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   replay positions versus original B8/Auto107.92ms per128:2.66x throughput,
   not learning quality. Latest Meganeurad7a7293/Blade56f0565; retain430f14b
   profiles and older controls. Auto remains default pending the separately
-  declared, now running [three-seed Freeway comparison](docs/experiments/2026-10-11-cdp-performance-learning.md):
+  declared, now stopped [three-seed Freeway comparison](docs/experiments/2026-10-11-cdp-performance-learning.md):
   optimized B8/Auto versus B32/F16,200k actions each, no old queue resumes.
   Half operands alone save little; cooperative convolution weight gradients
   and reduced-precision/fusion coverage are measured backend opportunities.

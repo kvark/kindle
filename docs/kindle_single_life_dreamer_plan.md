@@ -7,6 +7,14 @@ Updated October 11, 2026. This is the authoritative roadmap.
 
 ## Performance pivot
 
+**Current work: [backend training performance](backend_training_performance_plan.md).**
+The user prioritizes all three remaining opportunities before more Kindle
+training: cooperative convolution weight gradients, real mixed precision /
+BF16 where supported, then measured fusion/layout/dispatch improvements.
+The Freeway screen below is stopped at39,568 actions/9,831 updates on its first
+learner; the partial checkpoint remains. No completed learner, later arm or
+frozen cohort. Synthetic backend qualification continues, not game training.
+
 The user has selected a wall-clock performance round on the5080. The stopped
 Pong queue stays cancelled. Optimize one useful learner before adding GPUs or
 concurrent seeds; retain the current quality results as controls, not a mandate
@@ -39,7 +47,7 @@ to repeat a long mastery campaign.
    instrumented attribution from ordinary timing. Identify concrete Meganeura
    work rather than assuming that wider matrices are free.
 6. The [performance result](results/2026-10-11-cdp-performance.md) selects
-   B32/F16 for a [three-seed paired Freeway screen](experiments/2026-10-11-cdp-performance-learning.md),
+   B32/F16 for a now-stopped [three-seed paired Freeway screen](experiments/2026-10-11-cdp-performance-learning.md),
    200k actions per arm/seed against optimized B8/Auto. The synthetic replay
    throughput gain is2.66x; learning/time-to-score is not yet established.
    Keep all failures; no new five-game campaign or automatic extension.
