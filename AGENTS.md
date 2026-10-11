@@ -28,8 +28,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass; initial odd-length buffer clear fails VUID00028 and is repaired within
   existing padded allocations. Zero new allocation warnings/game actions.
   Ordinary BF16 driver casts use RTZ; Meganeura rounds RNE on GPU. Connected
-  activation/convolution and reduced backward regions remain next, not a full
-  mixed-precision learner or speedup. Full wgpu xtask lacks cargo-nextest;
+  follow-upf979fa9 qualifies explicit dense/pointwise storage and matrix backward:
+  18 reduced-gradient cases,32 finite synthetic Adam updates, one further guard,
+  zero allocation warnings. Whole-model selection/convolution/general layouts
+  and complete-update timing remain; no Kindle learner speedup. PR250's coverage
+  registry CI omission is fixed; expanded CI pending. Full wgpu xtask lacks cargo-nextest;
   scoped Naga/Blade checks pass. Historical ordinary GPU profile fields describe only the last
   submission (world uses four), not total GPU time; corrected labels preserve
   raw evidence. First round:18 guards pass/two warnings; BF16 totals above are

@@ -18,9 +18,10 @@ The [first backend round](results/2026-10-11-backend-training-performance.md)
 qualifies repeated-row addressing (2.54% lower CDP update latency and1.05 GiB
 less imagination allocation); the convolution candidate has no whole-update
 gain and stays draft. [Native BF16 primitives](results/2026-10-11-native-bf16.md)
-now qualify: compiler/Blade support, exact nearest-even storage and 18 matrix /
-F32-gradient fixtures. Connected reduced-storage training regions and complete
-update timing remain next; this is not yet a mixed-precision learner speedup.
+now qualify: compiler/Blade support, exact nearest-even storage, matrix gradients
+and explicit dense/pointwise forward/backward regions with32 finite synthetic
+Adam updates. Whole-model precision selection, convolution/general layouts and
+complete update timing remain; this is not yet a Kindle learner speedup.
 
 The user has selected a wall-clock performance round on the5080. The stopped
 Pong queue stays cancelled. Optimize one useful learner before adding GPUs or

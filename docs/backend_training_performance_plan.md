@@ -42,9 +42,10 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   Naga is committed to the user's fork; Blade PR407 and Meganeura PR250 are
   draft. Meganeura passes
   exact nearest-even storage and 18 BF16 matrix/F32-gradient fixtures after
-  repairing an odd-length buffer clear. Connected activation/convolution and
-  reduced-precision backward regions remain to implement; no learner speedup
-  or full mixed-precision qualification yet.
+  repairing an odd-length buffer clear. The follow-up qualifies explicit
+  dense/pointwise storage regions, 18 reduced-gradient fixtures and32 finite
+  synthetic Adam updates. Whole-model selection, convolution/general layouts
+  and complete-update timing remain; no Kindle learner speedup yet.
 - Profiling: correct the ordinary GPU fields to say **last submission only**.
   World training uses four submissions. Historical raw captures remain;
   complete wall timings are valid, total GPU time/utilization is unmeasured.
@@ -111,9 +112,10 @@ The implementation boundary is explicit:
    dense / activation / layout pipeline. First qualify conversion edge cases
    and F64-referenced matrix gradients, then repeated complete updates.
 
-The native compiler/Blade foundation and initial Meganeura storage/matrix
-consumers now pass scoped checks. See the [BF16 report](results/2026-10-11-native-bf16.md)
-for rounding, failures and limits. Connected regions and ordinary full-update
+The native compiler/Blade foundation, Meganeura storage/matrix consumers and
+explicit dense/pointwise forward/backward regions now pass scoped checks.
+See the [BF16 report](results/2026-10-11-native-bf16.md)
+for rounding, failures and limits. Whole-model integration and ordinary full-update
 acceptance remain unfinished. Do not substitute a driver change, CPU emulation
 or an isolated cast benchmark for this deliverable.
 

@@ -15,6 +15,7 @@
   "kindle_full_updates": 0,
   "successful_guards": 4,
   "failed_guards": 1,
+  "total_successful_guards_including_connected_followup": 5,
   "new_allocation_warnings": 0,
   "guard_nvml_queries": 0,
   "minimum_required_sampled_budget_headroom_bytes": 2147483648,
@@ -49,6 +50,28 @@
     "uses_git_dependencies_not_local_paths": true,
     "same_fixtures_not_new_learning_evidence": true
   },
+  "connected_followup": {
+    "meganeura": "f979fa9e48779d9718e88d976a9179f93a478a66",
+    "binary_sha256": "7fefe41650e54958cb3d2cf9dffe1fc32df679a5b521fc46deb950db64843b8d",
+    "successful_guards": 1,
+    "child_seconds": 9.76,
+    "focused_tests": 8,
+    "reduced_derivative_cases": 18,
+    "derivative_scales": [1e-20, 1, 1e20],
+    "connected_f64_checks": 2,
+    "small_synthetic_adam_updates": 32,
+    "first_loss": 0.16861932,
+    "final_loss": 0.03437764,
+    "kindle_full_updates": 0,
+    "all_fusion_disabled_enabled_dispatches": [28, 17],
+    "cpu_schedule_tests": 27,
+    "cpu_autodiff_tests": 10,
+    "matrix_shader_combinations": 12,
+    "pointwise_storage_combinations": 16,
+    "clippy_all_targets_all_features": "pass",
+    "automatic_precision_selection_and_convolution": "not_implemented",
+    "whole_update_performance": "unmeasured"
+  },
   "cpu": {
     "naga_final_library_tests": 139,
     "naga_final_integration_tests": 232,
@@ -64,7 +87,7 @@
   },
   "limits": [
     "Experimental forks; no automatic merge or Kindle dependency adoption.",
-    "No complete reduced-storage learner, BF16 convolution/backward qualification, full-update speed or learning-quality claim.",
+    "No complete reduced-storage learner, BF16 convolution/general-layout qualification, full-update speed or learning-quality claim.",
     "Known VUID-StandaloneSpirv-None-10684 remains recorded and user-allowed.",
     "Historical candidate archives retain local path dependencies; new review branches use explicit git pins.",
     "No Atari training or frozen rollout resumed."
