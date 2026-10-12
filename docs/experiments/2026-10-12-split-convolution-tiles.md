@@ -74,3 +74,12 @@ per process), with no injected profiler or GPU timestamps. Check their 24-report
 prefixes and initial/first tensors against the ordinary runs, plus exact short
 final tensors between control and candidate. Audit all ten exported plans.
 Retain the extra96 synthetic updates; do not replace or repeat ordinary timings.
+
+Upstream CI974 subsequently finds one stale shader-selection assertion in
+`vision::conv2d_grad_weight_selected_splits` on both Metal and lavapipe: the
+large split case now correctly selects32, while the low-occupancy case retains16.
+Retain both failed logs. Correct those exact expectations, with no numerical
+tolerance or runtime change. Build the oracle test and run that one check under
+the same device/headroom guard, bounded to180 seconds; let upstream CI cover
+the full portable suites. This test-only follow-up does not require repinning
+the qualified production runtime or repeating complete-update timings.

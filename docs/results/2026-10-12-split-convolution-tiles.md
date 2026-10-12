@@ -31,8 +31,10 @@ producer to 32 only when that grid fills the existing 64-workgroup target.
 Keep low-occupancy cases and existing 32/64-wide choices unchanged.
 
 No new shader, precision policy, partition count, temporary-buffer capacity
-or summation order. The standalone main-based patch `9d7caff` and integrated
-`5a49332` have the same patch ID. Existing cached plans remain safe but retain
+or summation order. The standalone main-based runtime patch `9d7caff` and
+integrated `5a49332` have the same patch ID; later standalone `8a9baad` corrects
+only an oracle test expectation and adds its local device/headroom assertion.
+Existing cached plans remain safe but retain
 their old selection until rebuilt. This is not proof that 32 is universally
 optimal or an implementation of Tensor Core weight gradients.
 
@@ -42,8 +44,9 @@ optimal or an implementation of Tensor Core weight gradients.
   The GPU F64 derivative test now exercises 16-wide inputs and verifies that
   widening actually occurs; every split partial keeps its original numerical
   gate. Optimizer/alias checks pass on standalone and integrated builds.
-- Refreshed BF16, convolution and row-addressing checks pass. All **16 GPU
-  guards** pass; three standalone allocation warnings remain. Expected RTX 5080,
+- Refreshed BF16, convolution and row-addressing checks pass. All **17 GPU
+  guards** pass, including the later oracle correction; four standalone
+  allocation warnings remain (three original plus one follow-up). Expected RTX 5080,
   driver 580.178.04 and sampled Vulkan headroom ≥2 GiB pass. This is not peak
   physical free memory or an SM-utilization reading.
 - Both pairs have **272 exact numerical reports**, exact first targets and
@@ -66,7 +69,7 @@ rejects the older BF16 cache27 parameter encoding. Blade `663afd2` remains based
 on published main `7909fc1`; Naga stays `c9fd6a85a`. Neighboring user work and
 historical pins are untouched. Only the user merges upstream PRs.
 
-## Retained preparation failures
+## Retained preparation and CI failures
 
 A reused packaging script tried to copy an executing backend binary. The OS
 refused with `Text file busy`; qualification completed using the unchanged
@@ -79,6 +82,16 @@ additional synthetic updates**, no injected profiler or replacement timing.
 All 24-report prefixes and initial/first tensors match ordinary runs; short
 final tensors match between control/candidate. Both failed logs/sources remain.
 Neither failure is a GPU fault or grounds to repeat the completed timing pairs.
+
+[Upstream CI974](https://github.com/kvark/meganeura/actions/runs/38265565595)
+fails one stale oracle shader-selection expectation on both Metal and lavapipe;
+the other163 oracle tests pass. The large selected-split fixture now correctly
+uses32, while the smaller fixture keeps16. Test-only `8a9baad` corrects those
+exact expectations without relaxing the F64 gates. The guarded5080 rerun
+passes in2.68 seconds, with one allocation warning and the already-reviewed
+VUID10684 retained. Both failed CI logs and the correction patch remain.
+Production pins and complete-update measurements are unchanged; fresh CI
+status is kept on the PR dashboard.
 
 ## Next
 

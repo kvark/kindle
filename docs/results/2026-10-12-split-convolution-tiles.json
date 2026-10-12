@@ -10,6 +10,19 @@
   },
   "upstream_base": "20af998",
   "standalone_candidate": "9d7caffd01a1f8d227e19f4b4f1ef144413541be",
+  "test_only_followup": {
+    "commit": "8a9baad73cbefee632768f3607452fe1aa0316e7",
+    "failed_ci": "https://github.com/kvark/meganeura/actions/runs/38265565595",
+    "failure": "Stale shader-selection expectation in vision::conv2d_grad_weight_selected_splits on both Metal and lavapipe",
+    "other_oracle_tests_passed_per_platform": 163,
+    "runtime_or_tolerances_changed": false,
+    "local_test": "vision::conv2d_grad_weight_selected_splits",
+    "status": "passed",
+    "test_seconds": 2.68,
+    "additional_allocation_warnings": 1,
+    "reviewed_validation_vuids": ["VUID-StandaloneSpirv-None-10684"],
+    "production_pin_unchanged": true
+  },
   "integrated_control": "62fd7dc52343c463421d52a50d1e7478e3e6b659",
   "integrated_candidate": "5a493322af7569a057f3c8db3ff73c1ca10680b2",
   "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
@@ -218,15 +231,17 @@
     "plan-queue/plan-cdp-candidate",
     "plan-queue/plan-cdp-control",
     "plan-queue/plan-rgb-candidate",
-    "plan-queue/plan-rgb-control"
+    "plan-queue/plan-rgb-control",
+    "oracle-qualification/selected-splits-oracle"
   ],
-  "allocation_warnings": 3,
+  "allocation_warnings": 4,
   "binaries": {
     "upstream-tests": "02b12c221611a157fc6044e712b5de5122743525c49262a272dc0d4df3dd39db",
     "control-backend-tests": "a6852d35e0b924600155baffe69c6a102e86a5017c1eab2416da4fb9aceda01b",
     "candidate-backend-tests": "5c4c8a4a0a31afd274df1d893ab10051ba300b02cffe46530ef1642b2da49f85",
     "control-labelled-kindle-tests": "569e4d9a8652d04e6e72a55094d9de9a89805a0771b8740bfd47782e67dacdaa",
-    "candidate-kindle-tests": "d17e85131455f5526bfddd736ae6901bfa5377224756bc52ed3a3d47d8f0a9ca"
+    "candidate-kindle-tests": "d17e85131455f5526bfddd736ae6901bfa5377224756bc52ed3a3d47d8f0a9ca",
+    "oracle-tests": "980acc5b7759fd2a1843141af0b3afc73944d6ac42852ca6178453e6494d1dea"
   },
   "game_actions": 0,
   "full_jax_gap_closed": false,
@@ -245,6 +260,7 @@
     "Existing cached scalar plans remain valid but retain their old tile selection",
     "Four short plan exports retain 96 extra synthetic updates, not new ordinary timings",
     "CPU packaging and missing-export audit failures retained",
+    "Upstream CI974 stale oracle expectation failure and test-only correction retained; no runtime repin",
     "Full JAX gap and ordinary SM utilization remain open"
   ]
 }

@@ -12,12 +12,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   RGB61.027->56.058ms/CDP135.070->126.739ms:8.14%/6.17% less complete-update time.
   All272 numerical reports/first targets and292/346 initial/first/final tensors
   match; refreshed controls also reproduce retained fixtures. Ten-plan audit
-  changes only four RGB/two CDP shader/grid fields. All16 guards pass, three
+  changes only four RGB/two CDP shader/grid fields. All17 guards pass, four
   allocation warnings retained. Extra96 short export updates and both CPU
   preparation failures remain; no repeated ordinary timing or game training.
   Main20af998 plus refreshed BF16/row addressing and the fix is5a493322;
   Blade663afd2/Naga c9fd6a85a unchanged. Combined cache28 rejects older BF16
   parameter encoding. Standalone9d7caff and integration have identical patch IDs.
+  CI974's stale oracle selection assertion fails on Metal/lavapipe; test-only
+  8a9baad corrects the exact16/32 expectations and passes the guarded5080
+  rerun in2.68s. No runtime/tolerance change or timing repeat; failed logs stay.
   Both locks, native configuration/pin checks, Clippy and193 installed-binding
   runner tests pass. CI is tracked on the PR dashboard; only the user merges.
   No tile sweep or new learning allocation. Next: reduced-precision derivatives
