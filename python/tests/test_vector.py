@@ -31,7 +31,7 @@ import profile_atari_vector
     (["--restore", "unused", "--cdp"], "training overrides"),
     (["--restore", "unused", "--cdp-centered"], "training overrides"),
     (["--restore", "unused", "--training-precision", "f16"], "training overrides"),
-    (["--training-precision", "bf16"], "invalid choice"),
+    (["--training-precision", "fp8"], "invalid choice"),
     (["--restore", "unused", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--evaluate", "--initial-checkpoint", "fresh"], "initial-checkpoint requires fresh training"),
     (["--checkpoint", "fresh", "--initial-checkpoint", "fresh"], "separate fresh path"),
@@ -49,6 +49,9 @@ import profile_atari_vector
 ])
 def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
     output = tmp_path / "never.jsonl"
+    def unexpected_environment(*_args, **_kwargs):
+        pytest.fail("invalid CLI must not construct an environment")
+    monkeypatch.setattr(atari_vector.gym, "make", unexpected_environment)
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(output), *args])
     with pytest.raises(SystemExit) as error:
         atari_vector.main()
@@ -69,7 +72,7 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
 
 
 @pytest.mark.parametrize("enabled", [False, True])
-@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16_dense"])
+@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16", "mixed"])
 def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path, enabled, precision):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
@@ -127,8 +130,10 @@ def test_feature_vector_rejects_invalid_config_before_gpu():
         kindle.FeatureVectorAgent(4, config)
 
 
-def test_learned_rgb_api_checks_kind_and_capacity_before_gpu():
+@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16", "mixed"])
+def test_learned_rgb_api_checks_kind_and_capacity_before_gpu(precision):
     config = kindle.default_config(6, "tiny")
+    config["training_precision"] = precision
     with pytest.raises(RuntimeError, match="observation_kind"):
         kindle.VectorAgent.learned_rgb(2, config)
     config["observation_kind"] = "rgb64"

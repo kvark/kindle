@@ -7,7 +7,7 @@ use meganeura::graph::Op;
 use meganeura::{Graph, Mode, Session, SessionConfig};
 use rand::{Rng, SeedableRng, rngs::StdRng};
 
-use super::config::DreamerConfig;
+use super::config::{DreamerConfig, TrainingPrecision};
 
 pub(crate) fn build_session(
     graph: &Graph,
@@ -21,7 +21,7 @@ pub(crate) fn build_session(
         mode,
         skip_full_optimize,
         meganeura::CoopPolicy::Auto,
-        false,
+        TrainingPrecision::Auto,
     )
 }
 
@@ -36,7 +36,7 @@ pub(crate) fn build_training_session(
         Mode::Training,
         config.skip_full_optimize,
         config.training_precision.coop_policy(),
-        config.training_precision == super::config::TrainingPrecision::Bf16Dense,
+        config.training_precision,
     )
 }
 
@@ -45,7 +45,7 @@ pub(crate) fn build_learner_inference_session(
     gpu: &Arc<blade_graphics::Context>,
     config: &DreamerConfig,
 ) -> Session {
-    let bf16 = config.training_precision == super::config::TrainingPrecision::Bf16Dense;
+    let bf16 = config.training_precision.uses_bf16();
     build_session_with_policy(
         graph,
         gpu,
@@ -56,7 +56,7 @@ pub(crate) fn build_learner_inference_session(
         } else {
             meganeura::CoopPolicy::Auto
         },
-        bf16,
+        config.training_precision,
     )
 }
 
@@ -66,10 +66,11 @@ fn build_session_with_policy(
     mode: Mode,
     skip_full_optimize: bool,
     coop: meganeura::CoopPolicy,
-    bf16_dense: bool,
+    precision: TrainingPrecision,
 ) -> Session {
+    let bf16 = precision.uses_bf16();
     let converted;
-    let graph = if bf16_dense {
+    let graph = if bf16 {
         assert!(
             gpu.capabilities().shader_bfloat16
                 && gpu
@@ -77,9 +78,12 @@ fn build_session_with_policy(
                     .cooperative_matrix
                     .bf16_f32_shapes
                     .contains(&[16, 16, 16]),
-            "BF16 dense training needs native 16x16x16 BF16/F32 products"
+            "BF16 training needs native 16x16x16 BF16/F32 products"
         );
-        converted = graph.deep_clone().into_bf16_matmuls();
+        converted = graph
+            .deep_clone()
+            .into_bf16_matmuls()
+            .into_bf16_convolutions();
         &converted
     } else {
         graph
@@ -90,7 +94,7 @@ fn build_session_with_policy(
             mode,
             gpu: Some(Arc::clone(gpu)),
             options: meganeura::CompileOptions {
-                bf16_matrix_gradients: bf16_dense,
+                bf16_matrix_gradients: bf16,
                 conv_weight_splits: (mode == Mode::Training).then_some(
                     meganeura::compile::ConvWeightSplits {
                         workgroup_threshold: 256,

@@ -350,8 +350,16 @@ fn time_fixed_batch_checkpoint() {
     let initial_memory = core.gpu_memory_budget();
     let precision_plan = |session: &meganeura::Session| {
         let plan = session.plan();
+        let mut shader_counts = BTreeMap::<String, usize>::new();
+        for dispatch in &plan.dispatches {
+            *shader_counts
+                .entry(format!("{:?}", dispatch.shader))
+                .or_default() += 1;
+        }
         serde_json::json!({
             "dispatches": plan.dispatches.len(),
+            "logical_buffer_bytes": plan.buffers.iter().sum::<usize>(),
+            "shader_counts": shader_counts,
             "bf16_matrices": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::MatMulBF16 { .. })).count(),
             "bf16_pointwise": plan.dispatches.iter().filter(|d| d.pointwise_storage.bf16_inputs != 0 || d.pointwise_storage.bf16_output).count(),
             "standalone_casts": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::ToBF16 | meganeura::compile::ShaderEntry::FromBF16)).count(),
@@ -364,16 +372,64 @@ fn time_fixed_batch_checkpoint() {
         "behavior_gradient": precision_plan(&core.behavior_train),
         "slow_value": precision_plan(&core.behavior_slow),
     });
-    if config.training_precision == super::super::config::TrainingPrecision::Bf16Dense {
+    if config.training_precision.uses_bf16() {
         assert!(
             precision_plans
                 .as_object()
                 .unwrap()
-                .values()
-                .all(|v| v["bf16_matrices"].as_u64().unwrap() > 0)
+                .iter()
+                .all(|(name, v)| {
+                    let selected = v["bf16_matrices"].as_u64().unwrap();
+                    if name == "world_gradient"
+                        && config.training_precision
+                            == super::super::config::TrainingPrecision::Mixed
+                    {
+                        selected == 0
+                    } else {
+                        selected > 0
+                    }
+                })
         );
     }
+    if config.training_precision == super::super::config::TrainingPrecision::Mixed {
+        assert!(
+            precision_plans["world_gradient"]["shader_counts"]
+                .as_object()
+                .unwrap()
+                .keys()
+                .any(|name| name.starts_with("Conv2dGemmCoopGen"))
+        );
+        assert!(
+            core.gpu
+                .capabilities()
+                .cooperative_matrix
+                .f32_shapes
+                .is_empty()
+        );
+    }
+    if config.training_precision == super::super::config::TrainingPrecision::Bf16 {
+        for name in ["posterior", "world_gradient"] {
+            assert!(
+                precision_plans[name]["shader_counts"]
+                    .as_object()
+                    .unwrap()
+                    .iter()
+                    .any(
+                        |(key, count)| key.starts_with("Conv2dBF16") && count.as_u64().unwrap() > 0
+                    )
+            );
+        }
+    }
     save_json(&root.join("precision-plans.json"), &precision_plans);
+    let matrices = &core.gpu.capabilities().cooperative_matrix;
+    save_json(
+        &root.join("matrix-capabilities.json"),
+        &serde_json::json!({
+            "f32": matrices.f32_shapes,
+            "f16_f32": matrices.f16_f32_shapes,
+            "bf16_f32": matrices.bf16_f32_shapes,
+        }),
+    );
     checkpoint(&mut core, &root.join("initial"));
     let initial_step = core.learner_step;
     let mut rng = StdRng::seed_from_u64(701);

@@ -422,7 +422,7 @@ impl DreamerCore {
         let policy_live_graph = behavior::build_actor_inference_graph(&config, 1);
 
         let mut world_train =
-            super::runtime::build_training_session(&world_train_graph, &gpu, &config);
+            super::runtime::build_training_session(&world_train_graph, &gpu, &world_train_config);
         let mut world_posterior =
             super::runtime::build_learner_inference_session(&world_posterior_graph, &gpu, &config);
         let mut world_observe_live =
@@ -2242,6 +2242,9 @@ fn row_slice(values: &[f32], first_row: usize, row_count: usize, row_width: usiz
 fn world_training_config(config: &DreamerConfig) -> DreamerConfig {
     let mut world = config.clone();
     world.batch_size = config.world_microbatch_size();
+    if config.training_precision == super::config::TrainingPrecision::Mixed {
+        world.training_precision = super::config::TrainingPrecision::F16;
+    }
     world
 }
 
@@ -3006,6 +3009,24 @@ mod tests {
         assert_eq!(world.batch_length, config.batch_length);
         assert_eq!(world.world_backprop_length, config.world_backprop_length);
         assert_eq!(world.network(), config.network());
+    }
+
+    #[test]
+    fn mixed_precision_changes_only_the_world_training_policy() {
+        let mut config = DreamerConfig::tiny(3);
+        config.training_precision = super::super::config::TrainingPrecision::Mixed;
+        let world = world_training_config(&config);
+        assert_eq!(
+            world.training_precision,
+            super::super::config::TrainingPrecision::F16
+        );
+        let mut expected = config.clone();
+        expected.training_precision = world.training_precision;
+        assert_eq!(world, expected);
+        assert_eq!(
+            config.training_precision,
+            super::super::config::TrainingPrecision::Mixed
+        );
     }
 
     #[test]
