@@ -8,6 +8,13 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [BF16 split-K optimization](results/2026-10-12-bf16-split-k.md) qualifies:
+RGB56.269→53.065ms / CDP126.880→125.432ms complete synthetic updates, independent
+matrix/gradient checks and ten passing guards. Pin9e05731 with unchanged
+Blade/Naga; two development failures remain. Summation order changes stochastic
+trajectories; game quality is untested. CDP's dominant54.21ms imagination stage
+is unchanged. Continue matrix/grouped efficiency and derivative precision work;
+no training restart or claim of JAX parity.
 The [full JAX gap audit](results/2026-10-12-jax-gap-accounting.md) confirms equal
 trainable model size and rules out input transfer as the main explanation.
 Both incomplete reduced-precision coverage and inefficient native BF16/F32
@@ -17,7 +24,7 @@ costs17.32ms convolution/14.04ms matrix/6.84ms remaining plus5.89ms zero-work
 command stream match complete-update passes within0.014ms. Host work and
 profiling/boundary adjustments remain explicit. This is root-cause closure,
 not JAX speed parity, pure per-kernel timing or independently achievable savings.
-Keep production pins/four-chunk scheduling and learning stopped; next address
+Keep four-chunk scheduling and learning stopped; next address
 matrix launch geometry/coalescing and grouped precision alongside convolution
 derivatives and command-stream reduction, then posterior reuse/device residency.
 No concurrent-seed workaround or indefinite profiling gate.

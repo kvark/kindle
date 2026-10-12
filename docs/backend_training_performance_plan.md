@@ -6,6 +6,17 @@ replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
+**First post-diagnosis optimization qualifies: [BF16 dense split-K](results/2026-10-12-bf16-split-k.md).**
+Complete RGB12M/B8 updates56.269→53.065ms (5.69% less time), CDP12M/B32
+126.880→125.432ms (1.14%). Independent859,216 F64 values, long gradients,
+ten passing guards and finite272-update fixtures pass; two corrected development
+failures remain. Pin Meganeura9e05731 (runtime identical to timed87a3236), with
+Blade/Naga unchanged. Different summation order changes stochastic trajectories,
+especially pretrained CDP; retained game quality is untested. Its54.21ms
+imagination stage is unchanged. Next address remaining dense/grouped efficiency
+and reduced-precision derivatives; no tile sweep, repeated profiler campaign
+or Atari restart. PR31 tracks installation and CI.
+
 **Root-cause accounting complete: [full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
 Model size matches exactly; a same-executable input-transfer control explains
 only.262ms of the~44ms gap. Host preparation/targets/EMA matter, but measured
@@ -21,8 +32,8 @@ host/transfer/optimizer and profiling-boundary accounting reconciles the44.04ms
 ordinary gap. These are operation-group allocations, not pure kernel timings or
 independent speedup promises. Single-dispatch timestamp sums are rejected; paired
 blocks retain0.434ms/0.98% excess. Include fusion/recording/safe barrier scheduling
-in the implementation work. Keep production pins/scheduling unchanged and learning
-stopped; next qualify a useful whole-update optimization, not another profile sweep.
+in the implementation work. Keep four production world submissions and learning
+stopped; continue useful whole-update optimizations, not another profile sweep.
 
 The [combined result](results/2026-10-12-backend-integration.md) reduces ordinary
 CDP12M/B32 updates **161.32→135.17ms (16.21%)** and RGB12M/B8

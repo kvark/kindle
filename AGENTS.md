@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **BF16 dense split-K qualifies:** [result](docs/results/2026-10-12-bf16-split-k.md),
+  [Meganeura PR256](https://github.com/kvark/meganeura/pull/256). Complete matched
+  RGB56.269→53.065ms (5.69% less time), CDP126.880→125.432ms (1.14%). One pair
+  each, unchanged model/batch/precision; no profiler or timing repeat.32 full
+  F64 cases/859,216 exact values,12 long-gradient cases and existing BF16 checks
+  pass. Ten guards pass/zero warnings; first uniform-binding and subsequent
+  test-topology failures remain. Initial292/346 tensors exact;272 reports and
+  saved tensors finite, but stochastic trajectories differ substantially.
+  No game-quality equivalence or SM-utilization claim. Pin9e05731, runtime
+  identical to timed87a3236; Blade663afd2/Naga c9fd6a85a unchanged. Cache29 rejects
+  older matrix uniforms. PR256 is stacked on qualified integration5a493322;
+  only the user merges. Installation/CI stay on PR31. CDP imagination54.21ms
+  is unchanged; next remaining dense/grouped efficiency and convolution
+  derivatives, then command-stream/posterior/device work. No Atari restart.
 - **Full JAX root-cause accounting complete at operation-group resolution:**
   [report and explicit bridge](docs/results/2026-10-12-jax-gap-accounting.md).
   Both RGB12M recipes have10,498,772 trainable parameters. Ordinary native56.46ms /
