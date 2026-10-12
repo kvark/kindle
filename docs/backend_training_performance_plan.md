@@ -6,6 +6,18 @@ replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
+**Current investigation: [root-cause the full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
+Model size matches exactly; a same-executable input-transfer control explains
+only.262ms of the~44ms gap. Host preparation/targets/EMA matter, but measured
+GPU work dominates. Matched matrix cases show native grouped F32 loses even
+to JAX F32, and native BF16 dense loses to BF16 library kernels. One matched
+convolution confirms backward precision coverage and forward kernel efficiency
+both need work. Prioritize dense launch geometry/split-K/coalescing and grouped
+precision alongside convolution derivatives, then posterior reuse and GPU
+targets/EMA. The complete native family-versus-dispatch/barrier attribution is
+still open; isolated speed ratios are not additive whole-agent improvements.
+Keep production scheduling/pins unchanged and learning stopped.
+
 The [combined result](results/2026-10-12-backend-integration.md) reduces ordinary
 CDP12M/B32 updates **161.32→135.17ms (16.21%)** and RGB12M/B8
 **72.69→61.15ms (15.88%)**. Native RGB is still2.52x/4.90x slower than the
@@ -17,7 +29,7 @@ This bounded round is complete; the wider performance target remains open.
 **Current decision: [adopt the qualified split-convolution tile fix](results/2026-10-12-split-convolution-tiles.md).**
 On refreshed main20af998, complete RGB updates61.027->56.058ms and
 CDP135.070->126.739ms save8.14%/6.17%, with exact272 numerical reports/tensors
-and ten full-plan comparisons. All16 guards pass; three allocation warnings
+and ten full-plan comparisons. All17 guards pass; four allocation warnings
 and extra96 short-export updates remain. Integrated5a493322 is pinned, with
 Blade663afd2/Naga c9fd6a85a unchanged. Both locks, native checks, Clippy and193
 installed-binding tests pass; CI status stays on the PR dashboard.
@@ -37,8 +49,8 @@ teardown crashes remain failed guards; Systems timestamps remain rejected.
 Profiled counters are not ordinary utilization or complete explanation of the
 JAX gap. No permission blocker, GPU wedge observed, or new learning allocation.
 
-Next: efficient reduced-precision convolution derivatives and
-matrix/grouped-RSSM kernels and layout/fusion, followed
+Next: efficient matrix/grouped-RSSM kernels, precision and layout/fusion,
+alongside reduced-precision convolution derivatives, followed
 by posterior reuse and device-resident inputs/targets/EMA. Use complete-update
 timing and numerical checks; do not revive PR248 from its isolated kernel result
 or launch a tile/batch sweep. Upstream now supports measuring per-step input

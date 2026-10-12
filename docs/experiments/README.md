@@ -18,8 +18,13 @@ Counter access is enabled; profiler teardown failures and invalid Systems
 timestamps remain explicit. Full JAX parity and learning quality remain open.
 The [qualified follow-up](../results/2026-10-12-split-convolution-tiles.md) adopts
 the upstream tile fix on refreshed main:8.14% RGB/6.17% CDP savings, exact
-numerical controls, all16 guards and193 installed-binding tests. PR255 is open;
+numerical controls, all17 guards and193 installed-binding tests. PR255 is open;
 training stays stopped and the remaining JAX gap is not closed.
+The [full gap accounting](../results/2026-10-12-jax-gap-accounting.md) confirms equal
+model size and only.262ms input-refresh cost. Matched matrices/convolution expose
+both missing backward/grouped BF16 coverage and inefficient BF16 kernels; native
+host preparation/targets and repeated posterior work add cost. Full native
+kernel-versus-dispatch/barrier decomposition stays open; no new production change.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

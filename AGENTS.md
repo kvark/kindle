@@ -7,6 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Full JAX gap investigation remains active:** [current accounting](docs/results/2026-10-12-jax-gap-accounting.md).
+  Both RGB12M recipes have exactly10,498,772 trainable parameters. Ordinary
+  native56.46ms/JAX12.42ms; identical-executable JAX input refresh adds only.262ms,
+  exact288 state tensors/272 reports. Native CPU-only markers preserve272 reports/
+  292 initial/first/final tensors at56.28ms; RNG/preparation2.33ms, CPU targets1.61ms,
+  slow-critic synchronization~1.04ms. Single-submission ordinary/coarse57.974/57.971ms
+  gives255 complete19-pass samples:45.282ms GPU-pass union+12.689ms uncovered.
+  Keep normal four chunks; single submission is diagnostic and~1.51ms slower.
+  Eight native/13 JAX matrix cases pass full F64 comparisons; scalar grouped
+  products lag even JAX F32, and native dense BF16 also lags. One actual convolution
+  shape passes BF16 comparison: native/JAX forward.728/.139ms, input1.550/.144ms,
+  weight1.545/.161ms. Isolated pass/kernel costs are not additive speedups.
+  Prioritize dense launch geometry/coalescing and grouped precision alongside
+  convolution derivatives, then posterior reuse/GPU targets/EMA. Current native
+  family-versus-dispatch/barrier decomposition remains open; do not close the goal
+  from these named buckets.16 guards pass, three diagnostic guards fail,15 warnings
+  retained;2,744 explicit synthetic learner updates, zero game actions. Current
+  CUDA-only capture has exact24 reports but startup overhead; retain all eight
+  samples. Old Graphics failures stay failed. Production pins unchanged, CI360
+  passes, upstream main20af998/7909fc1 unchanged. No worker at publication boundary.
 - **Split-convolution tile fix adopted:** [result](docs/results/2026-10-12-split-convolution-tiles.md),
   [Meganeura PR255](https://github.com/kvark/meganeura/pull/255). Refreshed control
   RGB61.027->56.058ms/CDP135.070->126.739ms:8.14%/6.17% less complete-update time.

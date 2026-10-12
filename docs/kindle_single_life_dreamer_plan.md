@@ -8,9 +8,17 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [full JAX gap audit](results/2026-10-12-jax-gap-accounting.md) confirms equal
+trainable model size and rules out input transfer as the main explanation.
+Both incomplete reduced-precision coverage and inefficient native BF16/F32
+kernels are measured; repeated posterior work and CPU targets/EMA add overhead.
+Current native family-versus-dispatch/barrier attribution remains unfinished.
+Keep production pins/four-chunk scheduling and learning stopped; next address
+matrix launch geometry/coalescing and grouped precision alongside convolution
+derivatives, then posterior reuse/device residency. No concurrent-seed workaround.
 The [upstream split-tile fix](results/2026-10-12-split-convolution-tiles.md) is
 qualified and pinned on refreshed main: RGB61.027->56.058ms/CDP135.070->126.739ms,
-exact numerical controls and all16 guards. Native checks, both locks, Clippy
+exact numerical controls and all17 guards. Native checks, both locks, Clippy
 and193 installed-binding tests pass. No training restart or learning-quality claim.
 The latest [Nsight investigation](results/2026-10-12-nsight-root-cause.md) identifies
 expensive convolution derivatives and matrix kernels, not just host overhead.
@@ -18,8 +26,8 @@ One isolated split-tile change reduces RGB60.98->55.97ms and CDP135.13->126.61ms
 with exact metrics/tensors; the qualified fix above supersedes that diagnostic
 variant. Counter access is
 enabled, but Graphics shutdown crashes limit captures to diagnostic evidence;
-Systems native timestamps stay rejected. Next are upstream tile selection and
-efficient backward precision, then recurrent kernels and device residency.
+Systems native timestamps stay rejected. Tile selection is now adopted;
+the new matched controls above refine the remaining execution work.
 The remaining JAX gap and learning quality remain open; no game training resumes.
 The user prioritizes all three remaining opportunities before more Kindle
 training: cooperative convolution weight gradients, real mixed precision /
