@@ -57,9 +57,13 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   RGB66.45→64.32 ms improves. Keep NativeF32 for the main path; no per-title
   precision branch or sweep. Native F32 cooperative shapes are absent on5080,
   but capability availability alone does not establish an end-to-end gain.
-  The next [bounded storage check](experiments/2026-10-12-bf16-convolution.md)
-  extends native BF16 to convolution forward operands/results using the shared
-  checked matrix loop. Convolution derivatives stay F32; qualify before timing.
+  [Convolution storage now qualifies](results/2026-10-12-bf16-convolution.md):
+  shared native BF16 loop,16 F64 cases, six guards. Full CDP149.27→146.31ms and
+  RGB66.51→61.02ms improve; only RGB world training improves. CDP world61.87ms
+  remains slower. Keep F32 derivatives; do not claim lower overall allocations.
+  A [single fixed mixed-stage check](experiments/2026-10-12-mixed-world-precision.md)
+  now tests BF16 perception/imagination/behavior with the measured faster
+  F16/F32 world-gradient path. This is a CDP decision, not a per-title branch.
 - Fresh JAX RGB12M/B8 control: FP32/highest24.35 ms, BF1612.42 ms. Native dense
   BF16 is still2.73x/5.35x slower, without identical graphs/weights/RNG. No
   time-to-score or gap-closure claim. Upstream review branches remain unmerged.
