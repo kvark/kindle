@@ -49,6 +49,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   raw evidence. First round:18 guards pass/two warnings; BF16 totals above are
   separate. Zero game actions; training stays
   stopped. No useful convolution win or native/JAX gap closure claim.
+- **Complete convolution attribution also rejects promotion:** [result](docs/results/2026-10-12-convolution-attribution.md).
+  Unchanged PR248 on7ba39d8 selects3/7 cooperative gradients but CDP161.31→161.48ms,
+  RGB71.11→72.82ms. Complete world GPU intervals52.93→52.81ms; no large saving
+  hidden by CPU overhead. All seven guards/finite reports/exact initial and
+  trace-versus-ordinary tensors pass, zero warnings/game actions. Kernel-level
+  discrepancy remains unresolved. BF16 Auto fallback check passes four guards
+  but CDP149.26→150.38ms regresses; RGB66.45→64.32ms improves. Keep NativeF32,
+  no per-game precision policy. The next declared convolution check fixes only
+  the overly conservative hardware-row alignment gate; no shader sweep.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX
   profile and artifact cleanup. Optimize one5080 learner before concurrent seeds

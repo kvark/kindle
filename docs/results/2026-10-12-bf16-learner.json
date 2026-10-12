@@ -86,6 +86,19 @@
     "scope": "Recorded pass intervals with diagnostic waits, not SM utilization or all device transfers"
   },
   "game_actions": 0,
+  "unconverted_auto_policy_check": {
+    "raw_root": "runs/bf16-policy-20261012.CQqG2VSN",
+    "cdp_full_ms": [149.26154110546875, 150.37791528125004],
+    "rgb_full_ms": [66.44560137109373, 64.32450236718745],
+    "cdp_world_ms": [61.5226036328125, 61.82468241015626],
+    "rgb_world_ms": [41.173068921875, 39.536616132812505],
+    "passing_guards": 4,
+    "allocation_warnings": 2,
+    "finite_reports_per_arm": 272,
+    "initial_tensors_exact": true,
+    "control_matches_pinned": true,
+    "decision": "Keep NativeF32 for CDP; no general promotion of Auto fallback"
+  },
   "limits": [
     "BF16 ordinary dense products only; convolution/grouped RSSM/sensitive reductions/master weights/optimizer remain F32.",
     "Live acting and Auto default unchanged; synthetic finite updates are not learning evidence.",

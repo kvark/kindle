@@ -34,6 +34,10 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
 - Convolution: [Meganeura PR248](https://github.com/kvark/meganeura/pull/248)
   passes kernel checks and speeds isolated gradients, but not full updates.
   CDP161.40→161.27 ms; RGB71.38→72.76 ms. Draft, not adopted.
+  [Complete-trace repeat](results/2026-10-12-convolution-attribution.md) confirms
+  this: CDP161.31→161.48, RGB71.11→72.82 ms; world GPU intervals52.93→52.81 ms.
+  Selection passes; the isolated gain is not hidden by CPU overhead. The
+  kernel-level cause remains unresolved; do not promote or sweep this candidate.
 - Layout: [Meganeura PR249](https://github.com/kvark/meganeura/pull/249)
   removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
   imagination allocation, exact272 reports/final tensors. Ready for review;
@@ -45,6 +49,10 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   partial-tile/gradient checks and272 finite complete updates per arm pass.
   World training regresses; reduced-storage coverage and its useful speed
   acceptance remain unfinished. Auto default and live acting stay unchanged.
+  Restoring Auto for unconverted operations does not fix CDP149.26→150.38 ms;
+  RGB66.45→64.32 ms improves. Keep NativeF32 for the main path; no per-title
+  precision branch or sweep. Native F32 cooperative shapes are absent on5080,
+  but capability availability alone does not establish an end-to-end gain.
 - Fresh JAX RGB12M/B8 control: FP32/highest24.35 ms, BF1612.42 ms. Native dense
   BF16 is still2.73x/5.35x slower, without identical graphs/weights/RNG. No
   time-to-score or gap-closure claim. Upstream review branches remain unmerged.
@@ -63,7 +71,7 @@ Start with convolution, then use the resulting profile to order independent
 work. The row-addressing improvement below runs before the larger BF16 compiler
 change; it does not depend on adopting the convolution candidate.
 
-### 1 Accelerate convolution weight gradients
+### 1 Accelerate convolution training
 
 - Add a cooperative-matrix weight-gradient path in Meganeura. Use existing
   FP16 operands / FP32 accumulation first, without waiting for BF16 support.
@@ -79,12 +87,17 @@ change; it does not depend on adopting the convolution candidate.
   FP16-rounded operands to isolate accumulation/indexing from input rounding.
   Check strict-policy fallback and shader bounds. Benchmark the actual hot
   shapes and then ordinary complete CDP/RGB updates, not only a fast kernel.
+- The weight-gradient candidate fails complete-update acceptance twice.
+  The [next bounded check](experiments/2026-10-12-convolution-subtiles.md) changes
+  only a conservative selection boundary:48-channel forward/input gradients
+  align with16-row hardware stores despite not aligning with32-row workgroups.
+  Qualify across image boundaries before timing; no new shader or shape sweep.
 
 ### 2 Implement useful mixed precision
 
 - The bounded Vulkan check passes: driver580.178.04 exposes
   `VK_KHR_shader_bfloat16`, BF16 types and cooperative matrices on the5080
-  (not BF16 dot products). Kindle's production Naga pin has no BF16 type
+  (not BF16 dot products). Kindle's original Naga pin had no BF16 type
   support; the qualified compiler fork adds it, not just a Blade feature bit.
   BF16 weight loading converted to F32 is not native BF16 execution.
   Do not change/reload the driver or emulate a CPU learner to claim support.

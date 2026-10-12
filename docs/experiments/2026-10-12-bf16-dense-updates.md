@@ -108,3 +108,24 @@ one120-second native check, then repeat the two CDP traces under600-second bound
 Require all four world-chunk labels and exact272 reports/first targets/final346
 tensors against their retained ordinary arms. Report added trace overhead;
 neither uncovered intervals nor recorded pass intervals establish SM utilization.
+
+## Unconverted-operation policy check
+
+The complete-submission repair passes. The subsequent capability export shows
+no native F32 cooperative shapes on the5080, versus16x16x16 BF16 and F16 shapes.
+The current BF16 option forces unconverted operations to NativeF32, disabling
+eligible forward acceleration that the control retains. Test one policy change:
+BF16 dense selection stays identical; unconverted operations use Auto. Auto
+still keeps explicit strict regions and unconverted derivatives F32, unlike
+AllowF16. No new kernel, convolution PR248 or row-layout PR249 is included.
+
+Compare both policies on CDP12M/B32 and RGB12M/B8, retained exact fixtures,
+16 warmup plus256 measured full updates each,600 seconds per process. Use
+Meganeura7ba39d8/Bladeb52965b/Naga forkc9fd6a85a and immutable binaries from
+the same diagnostic source except these policy lines. Require CPU precision
+tests, finite reports/targets/checkpoints, exact initial346/292 tensors, positive
+BF16 selection in all five sessions, actual cooperative convolution counts,
+native-device/headroom checks and passing guards. Preserve strict-control
+reports/tensors exactly against the preceding pinned fixture. Report stage and
+full-update costs; finite synthetic updates are not learning quality. Build
+only after the convolution attribution GPU queue ends; no game work resumes.
