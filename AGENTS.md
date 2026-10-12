@@ -30,9 +30,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Ordinary BF16 driver casts use RTZ; Meganeura rounds RNE on GPU. Connected
   follow-upf979fa9 qualifies explicit dense/pointwise storage and matrix backward:
   18 reduced-gradient cases,32 finite synthetic Adam updates, one further guard,
-  zero allocation warnings. Whole-model selection/convolution/general layouts
-  and complete-update timing remain; no Kindle learner speedup. PR250's coverage
-  registry CI omission is fixed; expanded CI pending. Full wgpu xtask lacks cargo-nextest;
+  zero allocation warnings. [Dense learner integration now qualifies](docs/results/2026-10-12-bf16-learner.md):
+  Meganeura679ea87/Bladeb52965b/Naga forkc9fd6a85a; explicit `bf16_dense` across
+  all five learner sessions, Auto default/live acting unchanged. Full CDP
+  161.49->149.55ms (7.40%), RGB71.33->66.47ms (6.81%); world training regresses.
+  Convolution/grouped products/general storage coverage remain F32 and unfinished.
+  Pinned repeat preserves272 reports/first targets/all346 or292 tensors from
+  the tiled fixture exactly; six guards/one warning. Fresh JAX RGB FP32/BF16
+  24.35/12.42ms leaves a2.73x/5.35x gap. Synthetic finite updates are not learning.
+  PR250 CI953 fails a Metal search-deadline assertion;955 is pending. Initial
+  complete-submission traces still miss intermediate chunks; a timing-only
+  harvesting repair is being checked and adds diagnostic waits, not ordinary
+  learner changes. Full wgpu xtask lacks cargo-nextest;
   scoped Naga/Blade checks pass. Historical ordinary GPU profile fields describe only the last
   submission (world uses four), not total GPU time; corrected labels preserve
   raw evidence. First round:18 guards pass/two warnings; BF16 totals above are

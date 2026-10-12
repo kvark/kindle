@@ -424,17 +424,19 @@ impl DreamerCore {
         let mut world_train =
             super::runtime::build_training_session(&world_train_graph, &gpu, &config);
         let mut world_posterior =
-            build_session(&world_posterior_graph, &gpu, Mode::Inference, false);
+            super::runtime::build_learner_inference_session(&world_posterior_graph, &gpu, &config);
         let mut world_observe_live =
             build_session(&world_observe_live_graph, &gpu, Mode::Inference, false);
-        let mut imagination = build_session(&imagination_graph, &gpu, Mode::Inference, false);
+        let mut imagination =
+            super::runtime::build_learner_inference_session(&imagination_graph, &gpu, &config);
         let mut world_transition_live =
             build_session(&world_transition_live_graph, &gpu, Mode::Inference, false);
         let mut world_heads_live =
             build_session(&world_head_live_graph, &gpu, Mode::Inference, false);
         let mut behavior_train =
             super::runtime::build_training_session(&behavior_train_graph, &gpu, &config);
-        let mut behavior_slow = build_session(&behavior_slow_graph, &gpu, Mode::Inference, false);
+        let mut behavior_slow =
+            super::runtime::build_learner_inference_session(&behavior_slow_graph, &gpu, &config);
         let mut policy_live = build_session(&policy_live_graph, &gpu, Mode::Inference, false);
 
         initialize_d3(&mut world_train, &world_train_graph, config.seed);

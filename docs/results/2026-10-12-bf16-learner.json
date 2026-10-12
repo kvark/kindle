@@ -1,0 +1,77 @@
+{
+  "pairs": [
+    {
+      "recipe": "cdp",
+      "percent_faster": 7.395989734793485,
+      "control_ms": 161.49098028124996,
+      "bf16_ms": 149.54712395703135,
+      "control_stage_ms": {
+        "behavior_train_and_sync": 15.381845953125,
+        "imagination_and_targets": 70.292261078125,
+        "posterior": 19.351405937499997,
+        "world_train_and_sync": 56.465467312499996
+      },
+      "bf16_stage_ms": {
+        "behavior_train_and_sync": 9.85030998828125,
+        "imagination_and_targets": 57.790972949218755,
+        "posterior": 20.20573626953125,
+        "world_train_and_sync": 61.700104749999994
+      },
+      "initial_tensors": 346,
+      "candidate_headroom_bytes": 10282270720
+    },
+    {
+      "recipe": "rgb",
+      "percent_faster": 6.813023411211249,
+      "control_ms": 71.33201117578126,
+      "bf16_ms": 66.47214455468746,
+      "control_stage_ms": {
+        "behavior_train_and_sync": 4.496400156250001,
+        "imagination_and_targets": 18.83653215234375,
+        "posterior": 8.325740707031251,
+        "world_train_and_sync": 39.67333816015625
+      },
+      "bf16_stage_ms": {
+        "behavior_train_and_sync": 3.5762419218749995,
+        "imagination_and_targets": 13.661319429687499,
+        "posterior": 8.033439273437502,
+        "world_train_and_sync": 41.201143929687504
+      },
+      "initial_tensors": 292,
+      "candidate_headroom_bytes": 14782627840
+    }
+  ],
+  "jax": {
+    "float32": {
+      "mean_update_ms": 24.35485724345199,
+      "median_update_ms": 24.145723436959088,
+      "upstream_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+      "jax_version": "0.6.2",
+      "minimum_sampled_headroom_bytes": 7930773504
+    },
+    "bfloat16": {
+      "mean_update_ms": 12.423885676071222,
+      "median_update_ms": 12.41157646290958,
+      "upstream_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+      "jax_version": "0.6.2",
+      "minimum_sampled_headroom_bytes": 7932870656
+    }
+  },
+  "passing_guards": 6,
+  "allocation_warnings": 1,
+  "pinned_matches_tiled": true,
+  "status": "dense_precision_qualified_backend_goal_incomplete",
+  "raw_root": "runs/bf16-whole-update-20261012.38E86FlS",
+  "kindle_source": "001077210b9ad7359d512a56079c666113772eb2",
+  "meganeura": "679ea87cdd788e72103f1fa50fb9cea2c7392a0c",
+  "blade": "b52965b0360cee07bff6b17d2c2ea23d7455b8b1",
+  "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+  "native_sha256": "ca20c5c25e0f87957f10809acd1c9f6ce957a24dfca929e89d9269c654fd78c2",
+  "game_actions": 0,
+  "limits": [
+    "BF16 ordinary dense products only; convolution/grouped RSSM/sensitive reductions/master weights/optimizer remain F32.",
+    "Live acting and Auto default unchanged; synthetic finite updates are not learning evidence.",
+    "JAX/native shapes match, graphs/weights/RNG do not; no numerical or learning parity claim.",
+    "First whole-submission trace attempt still misses intermediate chunks; no total GPU time, CPU overhead or SM utilization claim."
+  ]
+}

@@ -17,11 +17,14 @@ frozen cohort. Synthetic backend qualification continues, not game training.
 The [first backend round](results/2026-10-11-backend-training-performance.md)
 qualifies repeated-row addressing (2.54% lower CDP update latency and1.05 GiB
 less imagination allocation); the convolution candidate has no whole-update
-gain and stays draft. [Native BF16 primitives](results/2026-10-11-native-bf16.md)
-now qualify: compiler/Blade support, exact nearest-even storage, matrix gradients
-and explicit dense/pointwise forward/backward regions with32 finite synthetic
-Adam updates. Whole-model precision selection, convolution/general layouts and
-complete update timing remain; this is not yet a Kindle learner speedup.
+gain and stays draft. [Native BF16 dense learning](results/2026-10-12-bf16-learner.md)
+now qualifies complete updates: CDP161.49->149.55ms (7.40%),
+RGB71.33->66.47ms (6.81%). Auto remains default; convolution/grouped products,
+masters/optimizer and sensitive reductions stay F32. World training regresses,
+so mixed-precision coverage/performance is unfinished. Fresh JAX RGB FP32/BF16
+24.35/12.42ms leaves a large gap. Initial complete-submission traces still miss
+intermediate chunks; a timing-only repair is being qualified. No learning or
+SM-utilization claim, and no return to game training yet.
 
 The user has selected a wall-clock performance round on the5080. The stopped
 Pong queue stays cancelled. Optimize one useful learner before adding GPUs or

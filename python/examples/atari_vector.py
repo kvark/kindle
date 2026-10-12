@@ -71,8 +71,8 @@ def main():
     parser.add_argument("--sticky-actions", type=float, choices=(0.0, 0.25), default=0.0,
                         help="ALE action repeat probability; declare .25 separately for robustness evaluation")
     parser.add_argument("--model-size", default="12m")
-    parser.add_argument("--training-precision", choices=("auto", "f32", "f16"), default="auto",
-                        help="training matrix operands; f16 keeps f32 master weights, accumulators and optimizer state")
+    parser.add_argument("--training-precision", choices=("auto", "f32", "f16", "bf16_dense"), default="auto",
+                        help="learner precision; bf16_dense requires native BF16, uses reduced dense storage, and keeps other ops, master weights and optimizer state f32")
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--batch-length", type=int, default=64)
     parser.add_argument("--world-microbatch-size", type=int)

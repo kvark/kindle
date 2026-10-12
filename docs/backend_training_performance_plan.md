@@ -1,6 +1,6 @@
 # Backend training performance plan
 
-Updated October 11, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 12, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
@@ -38,16 +38,20 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
   imagination allocation, exact272 reports/final tensors. Ready for review;
   not yet merged or pinned. Independent of PR248; RGB effectively unchanged.
-- Mixed precision: [BF16 primitives qualify](results/2026-10-11-native-bf16.md).
-  Naga is committed to the user's fork; Blade PR407 and Meganeura PR250 are
-  draft. Meganeura passes
-  exact nearest-even storage and 18 BF16 matrix/F32-gradient fixtures after
-  repairing an odd-length buffer clear. The follow-up qualifies explicit
-  dense/pointwise storage regions, 18 reduced-gradient fixtures and32 finite
-  synthetic Adam updates. Whole-model selection, convolution/general layouts
-  and complete-update timing remain; no Kindle learner speedup yet.
+- Mixed precision: [BF16 dense learner updates qualify](results/2026-10-12-bf16-learner.md).
+  Explicit selection covers all five learner sessions; F32 masters/optimizer,
+  convolution/grouped products and sensitive reductions remain. Pinned full
+  CDP updates161.49->149.55 ms (7.40%); RGB71.33->66.47 ms (6.81%). Native
+  partial-tile/gradient checks and272 finite complete updates per arm pass.
+  World training regresses; reduced-storage coverage and its useful speed
+  acceptance remain unfinished. Auto default and live acting stay unchanged.
+- Fresh JAX RGB12M/B8 control: FP32/highest24.35 ms, BF1612.42 ms. Native dense
+  BF16 is still2.73x/5.35x slower, without identical graphs/weights/RNG. No
+  time-to-score or gap-closure claim. Upstream review branches remain unmerged.
 - Profiling: correct the ordinary GPU fields to say **last submission only**.
-  World training uses four submissions. Historical raw captures remain;
+  World training uses four submissions. Initial Perfetto captures also miss
+  intermediate query pools. A timing-only harvesting repair is being checked;
+  its extra waits must be disclosed. Historical raw captures remain; ordinary
   complete wall timings are valid, total GPU time/utilization is unmeasured.
 
 No game worker remains. Do not restart the interrupted Freeway comparison.
@@ -113,11 +117,11 @@ The implementation boundary is explicit:
    and F64-referenced matrix gradients, then repeated complete updates.
 
 The native compiler/Blade foundation, Meganeura storage/matrix consumers and
-explicit dense/pointwise forward/backward regions now pass scoped checks.
-See the [BF16 report](results/2026-10-11-native-bf16.md)
-for rounding, failures and limits. Whole-model integration and ordinary full-update
-acceptance remain unfinished. Do not substitute a driver change, CPU emulation
-or an isolated cast benchmark for this deliverable.
+explicit dense/pointwise forward/backward regions pass scoped checks. The
+[dense integration](results/2026-10-12-bf16-learner.md) also passes complete
+updates, but speeds policy/imagination rather than world training. Convolution,
+grouped products and broader useful storage coverage remain. Do not substitute
+a driver change, CPU emulation or an isolated cast benchmark for this deliverable.
 
 ### 3 Reduce intermediate traffic and dispatch overhead
 
@@ -139,10 +143,12 @@ or an isolated cast benchmark for this deliverable.
 - [ ] Qualify a useful complete-update convolution improvement (draft implemented;
   numerical checks pass, whole-update speed acceptance not met).
 - [x] Establish BF16 capability and qualify native compiler/storage/matrix primitives.
-- [ ] Connect useful reduced-storage forward/backward regions and qualify complete updates.
+- [x] Select BF16 dense regions across learner sessions and qualify complete updates.
+- [ ] Extend useful reduced storage through the measured world-training bottleneck;
+  dense integration alone regresses that stage and does not finish this package.
 - [x] Implement and qualify the selected row-addressing layout improvement;
   upstream merge/adoption remains separate.
-- [ ] Repeat the fixed native/JAX comparison and report remaining gaps.
+- [x] Repeat the fixed native/JAX comparison and report remaining gaps (October12).
 
 Use small reviewable upstream changes with portable fallbacks. Reuse the
 existing benchmark and guard rather than create another orchestration framework.
