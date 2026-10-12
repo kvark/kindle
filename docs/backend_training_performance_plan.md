@@ -14,14 +14,23 @@ integrated; no claim of reaching JAX, full-BF16 CDP world training, or faster
 learning to a score. The final CPU/GPU audit and all runtime CI355 jobs pass.
 This bounded round is complete; the wider performance target remains open.
 
-**Current work: [Nsight root-cause investigation](results/2026-10-12-nsight-root-cause.md).**
-JAX BF16 captures3,429 kernels/9.897ms summed GPU duration per update; native
-records6,570 pipeline binds and repeats posterior forward work. Backward
-precision and host/device residency differ. Native Systems GPU timestamps fail
-consistency checks, including2026.5.1; no native utilization/kernel attribution.
-Graphics attaches but needs admin counter access. A bounded privileged capture
-is prepared, not executed. Finish attribution before another optimization;
-no new learning allocation.
+**Current decision: [Nsight identifies a causal kernel bottleneck](results/2026-10-12-nsight-root-cause.md).**
+Counter access is enabled. RGB weight gradients cost12.62ms versus JAX1.44ms;
+matrix products15.03 versus2.37ms in diagnostic captures. Tiny scalar tiles
+retain poor register reuse after split-K supplies ample parallelism. One
+isolated16->32 tile check reduces ordinary RGB60.98->55.97ms and CDP135.13->126.61ms,
+with exact272 reports/tensors. It is not yet a production change. Graphics
+teardown crashes remain failed guards; Systems timestamps remain rejected.
+Profiled counters are not ordinary utilization or complete explanation of the
+JAX gap. No permission blocker, GPU wedge observed, or new learning allocation.
+
+Next: refresh the combined backend onto reviewed upstream07445e8; qualify a
+minimal split-K/tile-selection change and efficient reduced-precision convolution
+derivatives. Then address matrix/grouped-RSSM kernels and layout/fusion, followed
+by posterior reuse and device-resident inputs/targets/EMA. Use complete-update
+timing and numerical checks; do not revive PR248 from its isolated kernel result
+or launch a tile/batch sweep. Upstream now supports measuring per-step input
+refresh, which matters when comparing resident and repeatedly uploaded inputs.
 
 ## Starting point
 
@@ -109,9 +118,9 @@ No game worker remains. Do not restart the interrupted Freeway comparison.
 
 ## Work packages
 
-Start with convolution, then use the resulting profile to order independent
-work. The row-addressing improvement below runs before the larger BF16 compiler
-change; it does not depend on adopting the convolution candidate.
+The first round below is retained for provenance. The current ordering above
+comes from Nsight and the complete-update tile check; it supersedes this
+original implementation sequence without changing its recorded outcomes.
 
 ### 1 Accelerate convolution training
 
@@ -122,7 +131,7 @@ change; it does not depend on adopting the convolution candidate.
 - Cover the profiled encoder shapes first, then RGB decoder shapes, including
   batch reduction, padding, stride and partial tiles. Preserve scalar F32
   fallback and the explicit reduced-precision policy.
-- Current remaining costs: 13.48 ms of instrumented RGB weight gradients
+- Earlier per-dispatch costs: 13.48 ms of instrumented RGB weight gradients
   versus approximately 1.48 ms in the BF16 JAX trace; CDP B32's largest single
   dispatch is 12.29 ms (512 images, 32→48 channels, 32×32, 5×5).
 - Check outputs against independently indexed F64 derivatives, including

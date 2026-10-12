@@ -94,3 +94,149 @@ The first Graphics command rejects a nonexistent output directory before
 launching a target. Preserve that script/log, create a fresh output directory,
 and use submit480 (the Systems capture counted470 before the warmed range).
 This is a launcher correction, not a GPU/numerical retry.
+
+## Counter access enabled by the user
+
+At 04:42 UTC the user reports completing a normal driver reload after setting
+`NVreg_RestrictProfilingToAdminUsers=0`. Read-only checks confirm
+`RmProfilingAdminOnly: 0`, unchanged driver 580.178.04 and no active Kindle
+service. The agent did not reload the driver. The privileged launcher stays
+unexecuted. Resume one fresh, unprivileged Graphics capture with the retained
+short RGB binary: 16+8 updates, start after 480 submits, at most 100ms/14 submits,
+unaltered clocks, direct-native 180-second guard and 300-second user service.
+Validate the actual native result, exact short-control tensors/metrics and
+capture timestamps/coverage before interpreting counters. Keep the earlier
+permission failure and all invalid Systems traces; a successful export alone
+does not establish a root cause or repair historical evidence.
+
+The enabled capture exports a trace and the native 24-update result/test passes,
+but Graphics terminates its launcher before the guard's final receipt. The
+controller correctly fails after 30 seconds; no worker remains. Preserve this
+lifecycle failure and its merged-sample warning. Declare one repair using the
+documented detached launch followed by attachment to the actual native PID.
+Use the same binary's full 16+256 mode to leave attachment time, a 180-second
+native guard and 300-second service. Capture at most 400ms/14 submissions after
+480 submits, unaltered clocks, hardware-event timing and individual actions;
+reduce profiler bandwidth to 200MB/s after the merged-sample warning. This is
+instrumentation, not a learning or kernel change. Check target and guard exits
+independently; preserve a profiler-induced termination rather than treating it
+as a native correctness failure or silently passing it.
+
+The first detached attempt attaches before the injected RPC listener exists;
+it fails before any capture, then the bounded service cleans up. The observed
+native listener appears on port 49152 afterward. Retain that failed launcher.
+One corrected attempt waits for that exact native PID's listening socket before
+attachment and permits the target's existing 180-second guard to finish after
+capture. No model, shader, capture-setting or numerical-gate change.
+
+The ready attempt completes all 272 native updates, then exits with SIGSEGV.
+Kernel records place both this and the earlier enabled target's post-test fault
+at offset 0x7304bf in injected `libWarpVizTarget.so`; no Xid is observed. Preserve
+the NVRM reference-state warnings too. The exported reproduction metadata shows
+that launch-time defaults override attach-only settings: startup, base clocks,
+no hardware events, not the requested warmed trace. Reject that capture.
+Current Graphics 2026.3 requires driver 615+, so do not change the driver to
+try it. Declare one instrument-only correction: pass identical settings during
+both launch and attach, and preload the already-used `libnvToolsExt.so.1` to
+retain it for process lifetime. The harness otherwise dlcloses NVTX after its
+test, before the injected profiler's teardown; a stale callback table is a
+hypothesis, not established causality. Same full 272-update target/guard/bounds;
+require clean exit and actual reproduction metadata before interpreting data.
+
+The lifetime capture's metadata now matches the requested warmed/HES/unaltered
+settings, but NVTX preloading does not prevent the identical post-test SIGSEGV.
+That hypothesis is not supported. Before any further capture repair, declare
+one 16+8 loader-diagnostic target with the same settings and `LD_DEBUG=files`.
+Correlate the unmapped fault address with loader link maps/unload events. This
+adds CPU diagnostic logging only; no further driver action or algorithm change.
+
+The loader log locates fault address 0x75673772bce0 inside the former
+`libnvidia-eglcore.so.580.178.04` mapping (base 0x756735600000, size 0x218ac08,
+offset 0x212bce0), destroyed before profiler finalization. Declare one full
+272-update capture with only that userspace library preloaded for process
+lifetime, replacing the ineffective NVTX preload and removing loader logging.
+Keep the corrected launch/attach settings and exact numerical checks. This
+tests the observed profiler teardown lifetime bug, not a kernel-driver reload,
+shader optimization, CPU learner fallback or attribution of the training gap.
+
+Retaining EGL-core moves the post-test fault into `libnvperf_grfx_target.so`
+instead of fixing shutdown. The earlier loader trace also destroys the Vulkan
+loader and NVIDIA GLX ICD before profiler finalization. Declare one bounded
+capture retaining those entry-point libraries along with EGL-core, with loader
+logging to distinguish the remaining fault. Same 272 updates and capture bounds;
+do not relax clean-exit/numerical requirements or change installed libraries.
+
+The additional entry-point preload still faults in NVPerf at process shutdown;
+its fault address is not in a destroyed library link map. Stop preload trials.
+Graphics2025.5 is newer and its archived release notes require Linux580.105.08,
+which this host satisfies. Extract it locally for one unchanged full-target
+capture without preloads; keep the same guard/bounds/settings and require a
+clean exit. This does not require Graphics2026.3's driver615 or a system update.
+
+Before that capture, run one ordinary 16+256 RGB control after the user reload,
+then the existing fixed-batch session profiler once each for RGB/B8/BF16 and
+CDP/B32/mixed on the retained binary/backend. Each job has a300-second guard,
+the serial service900 seconds. These optimizer-free per-dispatch replays add
+timing/barriers: report their perturbation separately and never substitute them
+for ordinary update time or SM utilization. Require all before/after tensors
+unchanged and compare RGB's first-update checkpoint to the ordinary fixture.
+Zero game actions; retain every failed Nsight guard and teardown warning.
+
+The ordinary control and both fixed-session profiles pass. Graphics2025.5 still
+faults after test completion in WarpViz at the same dereference; no Xid. Stop
+profiler-version/lifetime trials. Its hardware captures remain diagnostic-only,
+not qualified clean-exit runs. Add opt-in compute-pipeline debug labels in an
+isolated Blade663afd2 worktree, without new passes, barriers, shader or scheduling
+changes. Build one test-only native, then ordinary RGB and CDP controls (16+256)
+and at most one Graphics2025.5 capture each. Same bounds/settings as above;
+CDP capture start is selected from its retained submission trace, not guessed
+from RGB initialization. Check exact metrics/tensors and record labels' overhead.
+Retain the expected profiler shutdown failure as a failed guard; do not suppress
+signals or mark it passing. Shader/counter data may corroborate independently
+passing controls, with the teardown limitation explicit. This does not qualify
+Nsight as a clean reusable capture tool or justify unqualified speed claims.
+
+## One causal tile-selection check
+
+Both labelled controls reproduce all272 reports and292/346 tensors exactly.
+The captures contain exactly every planned dispatch plus eight optimizer passes,
+and again fail only after test completion in WarpViz. RGB weight gradients cost
+12.62ms; the biggest16-wide kernels have96–97% sampled warp-slot occupancy,
+zero tensor activity and45–47% peak warp slots stalled on MIO, with low DRAM
+traffic. CDP's largest analogous kernel costs12.22ms by itself. Source chooses
+the16-wide low-occupancy tile before split-K, then retains it after splitting.
+This is a specific reuse/parallelism hypothesis, not evidence of too little batch.
+
+Declare one isolated diagnostic variant: widen only16-wide split convolution
+weight-gradient producers to the existing32-wide kernel. Keep split counts,
+K-stage16, F32 arithmetic/storage, all other graphs and backend pins unchanged;
+adjust only the producer's output workgroup grid. No parameter sweep or production
+adoption. Run RGB16+256 ordinary updates under a300-second guard; require exact
+first targets, all272 metric reports and all initial/first/final tensors against
+the retained control before the same single CDP timing. Any mismatch stops this
+check for review, without relaxing parity or automatically extending the study.
+Retain source/binary and both outcomes even if it is slower. No new Nsight capture
+is required for this causal wall-time comparison. Latest upstream07445e8 now adds
+convolution-layout search and per-step input-refresh measurement; ordinary layout
+is unchanged and the existing hardware-row fix is already in this control.
+Keep diagnosis on its fixed pins; refresh the combined stack before a later fix.
+
+The first tile build stops before compilation: this nested standalone Meganeura
+worktree is mistaken for a member of Kindle's workspace by `cargo fmt`. Retain
+the CPU-only failure; an empty local `[workspace]` isolates the diagnostic crate.
+No production manifest or shader change is involved in that preparation repair.
+
+Both tile checks pass exact272-report and tensor comparisons. Before publication,
+run one unlabelled CDP control on the retained binary,16+256 updates/300 seconds,
+to remove the labelled control's small instrumentation difference from the pair.
+The CPU structural-plan audit exceeds its2GiB cgroup while materializing two
+204MiB JSON graphs. Preserve that CPU-only failure/source; compare canonical
+streamed JSON hashes instead, within the same memory limit. Do not rerun a GPU
+job for an analysis failure.
+
+The first canonicalization attempt still materializes each graph inside `jq`
+and reaches the same2GiB limit. Preserve both failed sources/receipts. The
+replacement uses an event-stream parser, hashes arrays incrementally and sorts
+only map-key/digest pairs. It permits only the declared shader/grid transform,
+including unchanged split counts, and checks all five sessions per recipe.
+Keep this audit within one CPU/2GiB/zero swap; no GPU rerun.

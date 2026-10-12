@@ -7,19 +7,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Nsight root-cause investigation before further optimization:** follow the
-  [bounded study](docs/experiments/2026-10-12-nsight-root-cause.md). Compare warmed
-  native Vulkan and JAX CUDA timelines, capture overhead and actual work, not
-  another speculative kernel change. No game training. Keep the qualified
-  runtime and all earlier failures; ordinary timing remains separate from
-  instrumented intervals. [Partial result](docs/results/2026-10-12-nsight-root-cause.md):
-  JAX3,429 kernels/9.897ms summed GPU time; native6,570 pipeline binds and a
-  separately recomputed posterior. Native Systems2025.5/2026.5 timestamps are
-  stale/missing and rejected. Graphics connects but requires admin counter
-  access; bounded privileged capture prepared, not executed. Nine native/two
-  JAX targets complete with available prefix/tensor controls, no game actions.
-  Full attribution remains open; no GPU worker or recovery. Never change/reload
-  the driver to obtain counters without approval.
+- **Nsight identifies a causal kernel bottleneck:** [result](docs/results/2026-10-12-nsight-root-cause.md).
+  User enables counters on unchanged580.178.04. Exact complete native captures
+  contain6,570 RGB/6,916 CDP dispatches; RGB weight gradients12.62ms versus
+  JAX1.44ms, matrix products15.03 versus2.37ms. Graphs/residency differ, not an
+  additive explanation of the4.90x gap. Tiny scalar weight-gradient tiles have
+  high occupancy/MIO stalls, not tensor activity. One isolated16->32 split-tile
+  check reduces ordinary RGB60.98->55.97ms/CDP135.13->126.61ms, exact272 reports
+  and292/346 initial/first/final tensors; split counts/arithmetic unchanged.
+  Diagnostic only, no production adoption or sweep. Next: upstream split-K/tile
+  selection plus reduced-precision derivatives, matrix/recurrent work, then
+  posterior reuse/device residency. Rechecked Meganeura07445e8/Blade7909fc1;
+  refresh the combined branch before implementation, not historical evidence.
+  Graphics2025.4.1/2025.5 crash in injected userspace libraries after completed
+  tests; preserve failed guards/captures, no crash suppression. Counter results
+  are diagnostic windows, not ordinary utilization or clean-profiler qualification.
+  Systems native timestamps remain rejected. No Xid/wedge observed or game
+  training; no GPU worker remains. Do not reload/change drivers without approval.
 - **Backend performance before more Kindle training:** follow the
   [implementation plan](docs/backend_training_performance_plan.md): cooperative
   convolution weight gradients, actual mixed-precision storage/execution

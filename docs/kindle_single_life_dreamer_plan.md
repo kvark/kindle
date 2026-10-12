@@ -8,10 +8,14 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-The latest [Nsight investigation](results/2026-10-12-nsight-root-cause.md) has a
-valid JAX kernel capture, but native kernel/SM attribution remains open pending
-privileged Graphics counter access; Systems native timestamps are rejected.
-No new optimization or game training is started on that incomplete evidence.
+The latest [Nsight investigation](results/2026-10-12-nsight-root-cause.md) identifies
+expensive convolution derivatives and matrix kernels, not just host overhead.
+One isolated split-tile change reduces RGB60.98->55.97ms and CDP135.13->126.61ms
+with exact metrics/tensors; production pins remain unchanged. Counter access is
+enabled, but Graphics shutdown crashes limit captures to diagnostic evidence;
+Systems native timestamps stay rejected. Next are upstream tile selection and
+efficient backward precision, then recurrent kernels and device residency.
+The remaining JAX gap and learning quality remain open; no game training resumes.
 The user prioritizes all three remaining opportunities before more Kindle
 training: cooperative convolution weight gradients, real mixed precision /
 BF16 where supported, then measured fusion/layout/dispatch improvements.

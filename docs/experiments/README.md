@@ -11,6 +11,11 @@ is stopped at39,568 actions with no completed learner. October12's
 BF16 storage, row addressing and convolution selection: CDP161.32→135.17ms,
 RGB72.69→61.15ms. The large JAX gap and learning-quality check remain open;
 no game training or old lifetime resumes from these synthetic results.
+The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
+costly scalar convolution gradients and matrix kernels. One isolated split-tile
+check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.
+Counter access is enabled; profiler teardown failures and invalid Systems
+timestamps remain explicit. Full JAX parity and learning quality remain open.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

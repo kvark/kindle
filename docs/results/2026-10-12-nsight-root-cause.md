@@ -1,118 +1,145 @@
-# Nsight: JAX captured; native attribution still open
+# Nsight attribution: inefficient GPU kernels, not just CPU overhead
 
-October 12, 2026. [Declaration](../experiments/2026-10-12-nsight-root-cause.md)
+October12,2026. [Declaration](../experiments/2026-10-12-nsight-root-cause.md)
 · [Data](2026-10-12-nsight-root-cause.json)
 · [Backend plan](../backend_training_performance_plan.md).
 
-**This is not a completed explanation of the 4.90x gap.** JAX CUDA profiling
-works. Native Systems GPU timestamps fail consistency checks; Graphics connects
-but refuses hardware-counter collection without admin access. No driver change,
-recovery, production optimization or game training. Ordinary GPU work remains
-permitted; this is a profiling-privilege boundary, not evidence of a wedged GPU.
+**One bottleneck is now causally demonstrated.** An isolated change from16-wide
+to32-wide split convolution weight-gradient tiles reduces complete RGB updates
+**60.98→55.97ms (8.2%)**, preserving every metric and saved tensor exactly.
+CDP drops **135.13→126.61ms (6.3%)** in the same bounded check. This is diagnostic evidence, not
+a production backend update, a learning result or closure of the4.90x JAX gap.
 
-## Established evidence
+Counter access is enabled after the user's normal driver reload. Driver580.178.04
+and the boot are unchanged. Ordinary GPU controls pass; no Xid or wedge is
+observed. **Nsight Graphics crashes at process shutdown**, after the benchmark
+finishes. Its captures below remain diagnostic-only, not clean-exit qualification.
+No agent driver reload/reset, privileged capture or game training.
 
-The annotated native RGB12M/B8 BF16 control takes **61.165ms**, versus retained
-61.146ms. All 272 metric reports, first targets and 292 initial/first/final saved
-tensors match exactly. The 16+8 short control measures 61.142ms. Retain ordinary
-JAX BF16/FP32 **12.467/24.287ms**; profiler timings do not replace these.
+## Where the GPU time goes
 
-Eight warmed JAX BF16 updates contain **3,429 kernels/update**, CUDA graph
-execution, and cuDNN/CUTLASS tensor-product kernels. Summed kernel time is
-**9.897ms/update**, versus 20.687ms in the FP32/highest capture.
+Each native capture covers one warmed update: all **6,570 RGB /6,916 CDP
+dispatches** match the exported plans, including eight optimizer passes each.
+Diagnostic Blade labels add no pass, barrier or shader change. Ordinary labelled
+controls take61.127/135.180ms, versus unlabelled RGB60.980ms after reload and
+retained CDP135.168ms. Exact272 reports and292/346 initial/first/final tensors
+match. Labels are distinct from intrusive per-dispatch timestamps.
 
-| JAX BF16 kernel family | Summed GPU ms/update |
-| --- | ---: |
-| XLA fusion | 3.339 |
-| Matrix products | 2.372 |
-| Convolution forward/other | 1.861 |
-| Convolution weight gradients | 1.442 |
-| Convolution input gradients | 0.747 |
-| Other | 0.136 |
+| Summed kernel duration | Native RGB/B8 BF16 | JAX RGB/B8 BF16 |
+| --- | ---: | ---: |
+| Convolution weight gradients |12.622ms|1.442ms|
+| Convolution input gradients |4.669ms|0.747ms|
+| Convolution forward/other |5.478ms|1.861ms|
+| Matrix products |15.026ms|2.372ms|
+| Pointwise/fusion and remaining kernels |8.888ms|3.475ms|
+| Total |46.683ms|9.897ms|
 
-Families use demangled names, not learning-stage attribution. The enclosing
-NVTX range averages 15.790ms, including seed/metric handling outside the timer.
-Kernel/copy/memset interval union covers 10.376ms. Neither duration sum nor
-timeline coverage is SM utilization. Instrumentation overhead is not a native
-advantage or an unprofiled bubble measurement.
+JAX uses CUDA graphs, XLA fusion and cuDNN/CUTLASS BF16 tensor-product kernels:
+3,429 kernels/update across eight warmed updates. Native repeats the posterior
+forward pass; layouts, graph partitioning, weights and RNG differ. Families use
+kernel names, not one-to-one operation matching. These instrumented sums do not
+additively explain every millisecond of the ordinary61.15/12.47ms comparison,
+but host dispatch overhead alone cannot explain this kernel-duration gap.
 
-Native traces record **6,570 pipeline binds/update** (6,562 graph dispatches
-plus optimizer passes), 14 submissions and repeated command recording. JAX has
-158 graph launches/update, each potentially containing many kernels: do not
-compare graph launches directly with dispatches. The native API trace omits
-some dispatch/barrier calls; it cannot provide a trustworthy barrier count.
+CDP/B32's103.471ms kernel sum contains36.807ms matrix products,18.421ms weight
+gradients,3.582ms input gradients,9.732ms convolution forward,10.462ms fused
+pointwise and24.468ms other work. Its larger batch/exploration preclude direct
+comparison with RGB/JAX. Removing the decoder does not remove encoder backward
+or recurrent costs.
 
-Source/plan differences to quantify next:
+## Specific mechanism and causal check
 
-1. **Repeated forward work:** native runs posterior separately, then recomputes
-   the world forward pass for gradients. JAX's joint loss reuses the posterior.
-   Native posterior costs ~7.1ms ordinarily; eliminating that whole stage still
-   cannot explain the ~48.7ms gap.
-2. **Backward precision coverage:** JAX runs BF16 tensor-core convolution
-   derivatives. Native plans still contain F32 convolution derivatives and
-   grouped RSSM products. Forward BF16 support does not make these equivalent
-   arithmetic pipelines. The mechanism is identified, its native ms cost is not.
-3. **CPU round trips:** native reads posterior samples/imagined logits, builds
-   targets on CPU, and handles slow-critic EMA and some derived-weight sync on
-   host. JAX keeps these operations in compiled device work. Their critical-path
-   contribution still needs a valid native GPU trace.
-4. **Residency mismatch:** JAX's synthetic image batch is already on device;
-   warmed H2D is 8 bytes/update. Native production setters upload observations
-   and randomness each update, inside timing. JAX still transfers ~658KB D2H
-   and 48.9MB D2D per update; it is not zero-copy. Mapped native writes are not
-   CUDA memcpy events. Separate this protocol difference before calling the
-   entire gap a Meganeura kernel-efficiency deficit.
+Three RGB16-wide weight-gradient kernels cost10.23ms together, with96–97% sampled
+warp-slot occupancy, zero tensor activity, and45–47% of peak warp slots stalled
+on MIO. DRAM throughput is only0.8–2.6% of peak in these ranges. CDP's largest
+analogous kernel alone takes12.22ms:~100% warp slots,48% MIO-stalled slots and
+2.6% DRAM throughput. This does not suggest insufficient batch to fill those
+kernels or external-memory bandwidth as their primary limit.
 
-These findings motivate backward kernels/precision, recurrent fusion and
-whole-update residency, but do not yet rank native costs. Dispatch overhead
-is not established as dominant. Rejected PR248 stays rejected.
+The scalar16×16 kernel has one output accumulator per thread, repeated shared-
+memory operand loads and barriers. The compiler chooses that small tile from
+the **unsplit output grid**, then retains it when split-K adds parallelism.
+More parallelism does not restore the lost register reuse. MIO counters support
+staging pressure, not proof of a particular bank-conflict/SASS cause; see
+[NVIDIA's stall definitions](https://docs.nvidia.com/nsight-graphics/UserGuide/shader-profiler.html).
 
-## Rejected native timestamps and the remaining blocker
+The single declared test widens only these split producers to the existing32-wide
+F32 kernel. Split counts, K-stage16, arithmetic/storage and other graph work stay
+fixed. Four RGB and two CDP dispatches change shader/grid only. Each arm performs
+16+256 ordinary updates; all272 reports, first targets and292/346 initial/first/
+final tensors match exactly. RGB world training/sync drops36.60→31.56ms; other
+stages remain essentially unchanged. CDP world training drops54.37→45.92ms.
+The final CDP control is unlabelled, removing the diagnostic-label difference
+from its timing pair. Canonical full-plan checks constrain changes to the stated
+shader/grid fields; buffers, split counts and other sessions are unchanged.
+The ten-plan streaming audit passes in88.72s with151.3MiB peak memory.
+No tolerance relaxation, tile sweep or adoption of rejected cooperative PR248.
+This proves a useful effect of tile selection, not that32 is optimal or that
+efficient BF16 convolution backward is implemented. The variant stays isolated.
 
-System tools (Systems 2023.4/Compute 2024.1) predate the GPU. Locally extracted
-Systems 2025.5.1 captures JAX. Delayed NVTX Vulkan captures have no GPU-workload
-table, even with explicit layer insertion. Launch-time individual capture gets
-GPU events but exceeds 8,192 timestamps/frame. Its duration ends the profiler
-before the target result exists: retained failure, despite profiler exit 0.
+## Utilization and remaining host work
 
-Short batch captures finish without overflow. However, both 2025.5.1 and current
-2026.5.1 report stale/missing native timestamps. For example,2026.5 places the
-first warmed submission's GPU interval ~1.38s **before** CPU submission. Other
-intervals are missing or outlast synchronous completion. Automated checks reject
-them; missing/near-zero intervals do not prove GPU idleness.
+RGB/CDP compute-engine activity is74.46/79.30%, Nsight's SM-throughput metric
+23.98/25.69%, and tensor-pipe activity1.97/5.08% in these windows. An active engine
+or many resident warps need not mean efficient arithmetic. These are **profiled
+window counters**, not ordinary training utilization or peak-FLOP fractions.
+Capture windows span63.07/132.42ms; containing updates take66.16/137.35ms. Whole
+instrumented runs average69.99/146.90ms including capture handling. Keep ordinary
+timings separate. [Metric distinctions](https://docs.nvidia.com/nsight-graphics/UserGuide/gpu-trace-system-architecture.html).
 
-Graphics 2025.4.1 attaches to `kindle-tests-short`, then reports:
+Native reads posterior/imagined values, computes targets and slow-critic EMA
+partly on CPU, and uploads inputs inside the timer. JAX's synthetic image batch
+is device-resident; warmed H2D is8 bytes/update, but D2H is~658KB and D2D48.9MB.
+Native's separate posterior costs~7.1ms ordinarily; removing that whole stage
+cannot close the gap. Source differences/uncovered intervals are not an exact
+CPU-bubble budget or a reason to launch concurrent learners.
 
-> GPU Performance Counters unavailable. Please enable access to GPU performance counters.
+## Failures and evidence limits
 
-The host has `RmProfilingAdminOnly: 1`; sudo requires interactive authentication.
-No capture/complete target result exists for this attempt, and its processes
-are gone. An earlier Graphics missing-output-directory error occurred before
-target launch. Scripts/logs for both remain. All tools and one missing libxcb
-dependency were extracted locally, not installed over system libraries/driver.
+- Systems2025.5/2026.5 Vulkan timestamps remain rejected: GPU intervals can
+  precede CPU submission by~1.38s. Delayed capture misses GPU tables; an individual
+  capture overflows8,192 timestamps/frame and ends without a completed target.
+  Export success did not make these valid. JAX CUDA timestamps pass.
+- Graphics2025.4.1/2025.5 export counters, then fault in injected WarpViz after
+  test completion. Loader evidence maps the original dangling address to unloaded
+  NVIDIA EGL-core. Preloading it moves the fault into NVPerf rather than fixing
+  shutdown; NVTX/entry-point preload trials fail too. Stop those trials. This is
+  not an explanation of historical Xid62/154. Graphics2025.5 supports driver580;
+  the latest2026.3 requires615+, which was not installed.
+- Eight new ordinary/profile-control guards pass. Two standalone allocation
+  warnings are retained; no Xid appears in the reviewed kernel interval.
+  Nine injected benchmark results reproduce numerical controls. Eight guards
+  record SIGSEGV; the first launcher loses its guard receipt. Another detached
+  attempt fails before a complete benchmark. A startup/default-clock capture
+  remains rejected. Analysed labelled captures verify warmed boundaries,
+  unaltered clocks, hardware events and exact plan coverage. Nine reference-state
+  warnings and userspace faults remain. Failed guards stay failed, not suppressed.
+- Independent fixed-session profiles preserve tensors, but world profiling costs
+  4.1–4.3x ordinary session wall time. Do not substitute those per-dispatch timings
+  for complete updates. Exact-control audits are separate from profiler exits.
+- CPU preparation's nested-workspace error and two structural-audit2GiB cgroup
+  OOMs remain retained: Python and then `jq` materialize the large JSON graphs.
+  An event-stream parser replaces both. These are CPU analysis failures, not
+  GPU faults or grounds to repeat completed GPU work.
 
-NVIDIA documents [counter access](https://developer.nvidia.com/ERR_NVGPUCTRPERM),
-[GPU Trace](https://docs.nvidia.com/nsight-graphics/UserGuide/gpu-trace-overview.html)
-and [Systems Vulkan capture](https://docs.nvidia.com/nsight-systems/UserGuide/index.html).
-Successful export alone is not a validity test.
+## Next, in measured order
 
-## Next action and validation
+1. Turn the demonstrated split-K/tile interaction into a minimal upstream change
+   with shape/gradient tests, then efficient reduced-precision convolution
+   derivatives. BF16 forward alone is insufficient.
+2. Address matrix/recurrent cost: grouped RSSM products still use F32 kernels;
+   reduce layout movement/unfused work, checking complete updates each time.
+3. Reuse posterior work and keep inputs, targets and EMA on device. Match input
+   residency before attributing the entire cross-framework gap to shaders.
 
-`runs/nsight-root-cause-20261012.EyyOrUOP/admin-capture.sh` prepares one privileged
-Graphics capture, **not executed**. It uses a 300-second system service, direct
-native 180-second guard, 16+8 synthetic updates, 100ms/14-submit capture and
-unaltered clocks. No counter-setting change, reload/reset/reboot or game actions.
-Run only with administrator approval and no concurrent GPU worker. Then check
-warmup boundaries, target completion, numerical prefix, timestamp coverage and
-kernel/SM/memory evidence before attributing the remaining milliseconds.
+Rechecked upstream: Meganeura07445e8 adds convolution-layout search and per-step
+input-refresh measurement; its hardware-row fix is already in the pinned control.
+Blade main remains7909fc1. Refresh the combined branch before implementation,
+without repinning this evidence or starting an optimization sweep.
 
-Artifacts: `runs/nsight-root-cause-20261012.EyyOrUOP`. The native changes are
-optional test-only NVTX/plan exports and short capture mode; learner math and
-scheduling are unchanged. Workspace Clippy, release build, backend-pin check
-and Python syntax check pass. Nine completed native targets pass available
-controls (five 272-update, four 24-update), plus two complete JAX targets.
-Short RGB final tensors match its actual short control; short CDP has no matched
-final tensor control, but exact 24 reports/initial/first tensors and finite final
-tensors. Incomplete attempts remain additional work, not successful controls.
-Eleven completed-target guards pass; seven new allocation warnings are retained.
-No GPU worker remains. Full root-cause attribution is still unfinished.
+Artifacts: `runs/nsight-root-cause-20261012.EyyOrUOP`, including
+`label-attribution.json`, exact-control audits, source patches and failed receipts.
+Production pins remain Meganeurad68f1a5/Blade663afd2/Naga c9fd6a85a. Main-worktree
+changes are documentation only; diagnostic labels/tile variants stay isolated.
+Prior native source CI357 passes. Full JAX parity, clean profiler teardown and
+learning/time-to-score remain open.
