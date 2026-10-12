@@ -69,7 +69,8 @@ def test_vector_api_rejects_invalid_config_before_loading_weights():
 
 
 @pytest.mark.parametrize("enabled", [False, True])
-def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path, enabled):
+@pytest.mark.parametrize("precision", ["auto", "f32", "f16", "bf16_dense"])
+def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path, enabled, precision):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -77,10 +78,12 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
 
     def construct(streams, config):
         assert config["actor_critic_gradient"] is enabled
+        assert config["training_precision"] == precision
         raise RuntimeError("checked before GPU initialization")
 
     monkeypatch.setattr(kindle, "VectorAgent", SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "--output", str(tmp_path / "run.jsonl"),
+                                    "--training-precision", precision,
                                     *(["--actor-critic-gradient"] if enabled else [])])
     with pytest.raises(RuntimeError, match="checked before GPU"):
         atari_vector.main()

@@ -328,7 +328,11 @@ fn time_fixed_batch_checkpoint() {
     let source = std::env::var_os("KINDLE_DREAMER_PROFILE_SOURCE").unwrap();
     let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_DIR").unwrap());
     std::fs::create_dir(&root).unwrap();
-    assert!(std::env::var_os("MEGANEURA_GPU_TIMING").is_none());
+    let trace = std::env::var_os("KINDLE_DREAMER_TRACE").is_some();
+    assert_eq!(std::env::var_os("MEGANEURA_GPU_TIMING").is_some(), trace);
+    if trace {
+        meganeura::profiler::init();
+    }
     let mut core = restore_profile_core(std::path::Path::new(&source));
     let config = core.config.clone();
     assert_eq!(config.observation_kind, crate::ObservationKind::Rgb64);
@@ -344,6 +348,32 @@ fn time_fixed_batch_checkpoint() {
     check_device(&core);
     save_json(&root.join("config.json"), &config);
     let initial_memory = core.gpu_memory_budget();
+    let precision_plan = |session: &meganeura::Session| {
+        let plan = session.plan();
+        serde_json::json!({
+            "dispatches": plan.dispatches.len(),
+            "bf16_matrices": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::MatMulBF16 { .. })).count(),
+            "bf16_pointwise": plan.dispatches.iter().filter(|d| d.pointwise_storage.bf16_inputs != 0 || d.pointwise_storage.bf16_output).count(),
+            "standalone_casts": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::ToBF16 | meganeura::compile::ShaderEntry::FromBF16)).count(),
+        })
+    };
+    let precision_plans = serde_json::json!({
+        "posterior": precision_plan(&core.world_posterior),
+        "imagination": precision_plan(&core.imagination),
+        "world_gradient": precision_plan(&core.world_train),
+        "behavior_gradient": precision_plan(&core.behavior_train),
+        "slow_value": precision_plan(&core.behavior_slow),
+    });
+    if config.training_precision == super::super::config::TrainingPrecision::Bf16Dense {
+        assert!(
+            precision_plans
+                .as_object()
+                .unwrap()
+                .values()
+                .all(|v| v["bf16_matrices"].as_u64().unwrap() > 0)
+        );
+    }
+    save_json(&root.join("precision-plans.json"), &precision_plans);
     checkpoint(&mut core, &root.join("initial"));
     let initial_step = core.learner_step;
     let mut rng = StdRng::seed_from_u64(701);
@@ -354,18 +384,28 @@ fn time_fixed_batch_checkpoint() {
         // Fixture generation and diagnostic exports are outside the timer.
         // All production update stages, parameter syncs and slow EMA are inside.
         let batch = fixture(&config, &mut rng);
+        let mark = |stage: &str| {
+            if trace {
+                meganeura::profiler::record_instant(&format!("update{step}:{stage}"));
+            }
+        };
+        mark("start");
         let start = std::time::Instant::now();
         let posterior = core.sample_posterior_batch(&batch);
         let after_posterior = start.elapsed().as_secs_f64() * 1000.0;
+        mark("posterior");
         let targets = core.imagine_and_target(&batch, &posterior);
         let after_imagination = start.elapsed().as_secs_f64() * 1000.0;
+        mark("imagination");
         let world = core.train_world(&batch, &posterior, &targets);
         core.sync_world_inference();
         let after_world = start.elapsed().as_secs_f64() * 1000.0;
+        mark("world");
         let behavior = core.train_behavior(&targets);
         core.sync_behavior_inference();
         core.learner_step += 1;
         let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+        mark("end");
         assert!(world.total_loss.is_finite() && behavior.total_loss.is_finite());
         reports.push(serde_json::json!({
             "step": step, "elapsed_ms": elapsed_ms, "world": world, "behavior": behavior,
@@ -402,10 +442,14 @@ fn time_fixed_batch_checkpoint() {
         .map(|row| row["elapsed_ms"].as_f64().unwrap())
         .sum::<f64>()
         / MEASURED as f64;
+    if trace {
+        meganeura::profiler::save(root.join("update.pftrace")).unwrap();
+    }
     save_json(
         &root.join("result.json"),
         &serde_json::json!({
             "status": "complete", "warmup_updates": WARMUP, "measured_updates": MEASURED,
+            "gpu_trace": trace,
             "initial_step": initial_step, "final_step": core.learner_step,
             "mean_update_ms": mean_ms, "reports": reports,
             "meganeura_revision": super::super::MEGANEURA_REV,

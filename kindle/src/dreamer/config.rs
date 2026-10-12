@@ -29,6 +29,9 @@ pub enum TrainingPrecision {
     Auto,
     F32,
     F16,
+    /// Native BF16 dense forward/backward operands and activation boundaries.
+    /// Convolution and grouped products remain on the existing F32 path.
+    Bf16Dense,
 }
 
 impl TrainingPrecision {
@@ -37,6 +40,7 @@ impl TrainingPrecision {
             Self::Auto => meganeura::CoopPolicy::Auto,
             Self::F32 => meganeura::CoopPolicy::NativeF32,
             Self::F16 => meganeura::CoopPolicy::AllowF16,
+            Self::Bf16Dense => meganeura::CoopPolicy::NativeF32,
         }
     }
 }
@@ -970,6 +974,10 @@ mod tests {
             (TrainingPrecision::Auto, meganeura::CoopPolicy::Auto),
             (TrainingPrecision::F32, meganeura::CoopPolicy::NativeF32),
             (TrainingPrecision::F16, meganeura::CoopPolicy::AllowF16),
+            (
+                TrainingPrecision::Bf16Dense,
+                meganeura::CoopPolicy::NativeF32,
+            ),
         ] {
             let mut config = DreamerConfig::tiny(3);
             config.training_precision = precision;
