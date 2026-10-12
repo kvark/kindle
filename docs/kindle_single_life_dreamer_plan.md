@@ -23,7 +23,8 @@ RGB71.33->66.47ms (6.81%). Auto remains default; convolution/grouped products,
 masters/optimizer and sensitive reductions stay F32. World training regresses,
 so mixed-precision coverage/performance is unfinished. Fresh JAX RGB FP32/BF16
 24.35/12.42ms leaves a large gap. Initial complete-submission traces still miss
-intermediate chunks; a timing-only repair is being qualified. No learning or
+intermediate chunks; a timing-only repair now qualifies coverage with~2.7%
+diagnostic overhead and unchanged reports/tensors. No learning or
 SM-utilization claim, and no return to game training yet.
 
 The user has selected a wall-clock performance round on the5080. The stopped

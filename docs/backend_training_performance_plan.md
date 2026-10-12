@@ -50,9 +50,10 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   time-to-score or gap-closure claim. Upstream review branches remain unmerged.
 - Profiling: correct the ordinary GPU fields to say **last submission only**.
   World training uses four submissions. Initial Perfetto captures also miss
-  intermediate query pools. A timing-only harvesting repair is being checked;
-  its extra waits must be disclosed. Historical raw captures remain; ordinary
-  complete wall timings are valid, total GPU time/utilization is unmeasured.
+  intermediate query pools. A timing-only harvesting repair now qualifies all
+  four chunks with exact reports/tensors; its diagnostic waits add~2.7% wall
+  time. Recorded world intervals52.80/57.86 ms confirm a GPU-side BF16 regression.
+  Historical raw captures remain; these intervals are not SM utilization.
 
 No game worker remains. Do not restart the interrupted Freeway comparison.
 

@@ -38,10 +38,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Pinned repeat preserves272 reports/first targets/all346 or292 tensors from
   the tiled fixture exactly; six guards/one warning. Fresh JAX RGB FP32/BF16
   24.35/12.42ms leaves a2.73x/5.35x gap. Synthetic finite updates are not learning.
-  PR250 CI953 fails a Metal search-deadline assertion;955 is pending. Initial
-  complete-submission traces still miss intermediate chunks; a timing-only
-  harvesting repair is being checked and adds diagnostic waits, not ordinary
-  learner changes. Full wgpu xtask lacks cargo-nextest;
+  PR250 CI953 fails a Metal search-deadline assertion;955 for679ea87 passes.
+  Initial complete-submission traces still miss intermediate chunks; the
+  timing-only repair qualifies all four chunks, exact272 reports/346 tensors,
+  three guards/no warnings. Its waits add~2.7% diagnostic wall time; recorded
+  world GPU intervals52.80/57.86ms confirm the BF16 regression, not SM utilization.
+  Ordinary timing-disabled execution is unchanged. Full wgpu xtask lacks cargo-nextest;
   scoped Naga/Blade checks pass. Historical ordinary GPU profile fields describe only the last
   submission (world uses four), not total GPU time; corrected labels preserve
   raw evidence. First round:18 guards pass/two warnings; BF16 totals above are
