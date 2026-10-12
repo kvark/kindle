@@ -9,6 +9,9 @@ to32-wide split convolution weight-gradient tiles reduces complete RGB updates
 **60.98→55.97ms (8.2%)**, preserving every metric and saved tensor exactly.
 CDP drops **135.13→126.61ms (6.3%)** in the same bounded check. This is diagnostic evidence, not
 a production backend update, a learning result or closure of the4.90x JAX gap.
+The later [qualified upstream fix](2026-10-12-split-convolution-tiles.md) is now
+pinned after a refreshed control/candidate comparison; this initial evidence
+retains its original pins and profiler limitations.
 
 Counter access is enabled after the user's normal driver reload. Driver580.178.04
 and the boot are unchanged. Ordinary GPU controls pass; no Xid or wedge is

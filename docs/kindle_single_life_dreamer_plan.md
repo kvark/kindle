@@ -8,10 +8,15 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [upstream split-tile fix](results/2026-10-12-split-convolution-tiles.md) is
+qualified and pinned on refreshed main: RGB61.027->56.058ms/CDP135.070->126.739ms,
+exact numerical controls and all16 guards. Native checks, both locks, Clippy
+and193 installed-binding tests pass. No training restart or learning-quality claim.
 The latest [Nsight investigation](results/2026-10-12-nsight-root-cause.md) identifies
 expensive convolution derivatives and matrix kernels, not just host overhead.
 One isolated split-tile change reduces RGB60.98->55.97ms and CDP135.13->126.61ms
-with exact metrics/tensors; production pins remain unchanged. Counter access is
+with exact metrics/tensors; the qualified fix above supersedes that diagnostic
+variant. Counter access is
 enabled, but Graphics shutdown crashes limit captures to diagnostic evidence;
 Systems native timestamps stay rejected. Next are upstream tile selection and
 efficient backward precision, then recurrent kernels and device residency.

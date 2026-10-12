@@ -16,6 +16,10 @@ costly scalar convolution gradients and matrix kernels. One isolated split-tile
 check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.
 Counter access is enabled; profiler teardown failures and invalid Systems
 timestamps remain explicit. Full JAX parity and learning quality remain open.
+The [qualified follow-up](../results/2026-10-12-split-convolution-tiles.md) adopts
+the upstream tile fix on refreshed main:8.14% RGB/6.17% CDP savings, exact
+numerical controls, all16 guards and193 installed-binding tests. PR255 is open;
+training stays stopped and the remaining JAX gap is not closed.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

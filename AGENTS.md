@@ -7,6 +7,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Split-convolution tile fix adopted:** [result](docs/results/2026-10-12-split-convolution-tiles.md),
+  [Meganeura PR255](https://github.com/kvark/meganeura/pull/255). Refreshed control
+  RGB61.027->56.058ms/CDP135.070->126.739ms:8.14%/6.17% less complete-update time.
+  All272 numerical reports/first targets and292/346 initial/first/final tensors
+  match; refreshed controls also reproduce retained fixtures. Ten-plan audit
+  changes only four RGB/two CDP shader/grid fields. All16 guards pass, three
+  allocation warnings retained. Extra96 short export updates and both CPU
+  preparation failures remain; no repeated ordinary timing or game training.
+  Main20af998 plus refreshed BF16/row addressing and the fix is5a493322;
+  Blade663afd2/Naga c9fd6a85a unchanged. Combined cache28 rejects older BF16
+  parameter encoding. Standalone9d7caff and integration have identical patch IDs.
+  Both locks, native configuration/pin checks, Clippy and193 installed-binding
+  runner tests pass. CI is tracked on the PR dashboard; only the user merges.
+  No tile sweep or new learning allocation. Next: reduced-precision derivatives
+  and matrix/RSSM cost, then posterior reuse/device residency. CDP imagination
+  54.22ms now exceeds world45.94ms. Full JAX gap, ordinary utilization and
+  learning quality stay open.
 - **Nsight identifies a causal kernel bottleneck:** [result](docs/results/2026-10-12-nsight-root-cause.md).
   User enables counters on unchanged580.178.04. Exact complete native captures
   contain6,570 RGB/6,916 CDP dispatches; RGB weight gradients12.62ms versus
@@ -15,10 +32,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   high occupancy/MIO stalls, not tensor activity. One isolated16->32 split-tile
   check reduces ordinary RGB60.98->55.97ms/CDP135.13->126.61ms, exact272 reports
   and292/346 initial/first/final tensors; split counts/arithmetic unchanged.
-  Diagnostic only, no production adoption or sweep. Next: upstream split-K/tile
+  That initial variant was diagnostic only; the follow-up above adopts a
+  qualified fix. Original next steps: upstream split-K/tile
   selection plus reduced-precision derivatives, matrix/recurrent work, then
   posterior reuse/device residency. Rechecked Meganeura07445e8/Blade7909fc1;
-  refresh the combined branch before implementation, not historical evidence.
+  that initial refresh recommendation is completed by the follow-up above;
+  historical evidence retains its pins.
   Graphics2025.4.1/2025.5 crash in injected userspace libraries after completed
   tests; preserve failed guards/captures, no crash suppression. Counter results
   are diagnostic windows, not ordinary utilization or clean-profiler qualification.

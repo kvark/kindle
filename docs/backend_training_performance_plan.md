@@ -14,23 +14,37 @@ integrated; no claim of reaching JAX, full-BF16 CDP world training, or faster
 learning to a score. The final CPU/GPU audit and all runtime CI355 jobs pass.
 This bounded round is complete; the wider performance target remains open.
 
-**Current decision: [Nsight identifies a causal kernel bottleneck](results/2026-10-12-nsight-root-cause.md).**
+**Current decision: [adopt the qualified split-convolution tile fix](results/2026-10-12-split-convolution-tiles.md).**
+On refreshed main20af998, complete RGB updates61.027->56.058ms and
+CDP135.070->126.739ms save8.14%/6.17%, with exact272 numerical reports/tensors
+and ten full-plan comparisons. All16 guards pass; three allocation warnings
+and extra96 short-export updates remain. Integrated5a493322 is pinned, with
+Blade663afd2/Naga c9fd6a85a unchanged. Both locks, native checks, Clippy and193
+installed-binding tests pass; CI status stays on the PR dashboard.
+Standalone [PR255](https://github.com/kvark/meganeura/pull/255) reuses the existing
+occupancy rule and leaves low-occupancy cases and split counts unchanged.
+No new shader or precision change; the full JAX gap and learning quality stay open.
+
+The preceding [Nsight investigation](results/2026-10-12-nsight-root-cause.md)
+identified a causal kernel bottleneck.
 Counter access is enabled. RGB weight gradients cost12.62ms versus JAX1.44ms;
 matrix products15.03 versus2.37ms in diagnostic captures. Tiny scalar tiles
 retain poor register reuse after split-K supplies ample parallelism. One
 isolated16->32 tile check reduces ordinary RGB60.98->55.97ms and CDP135.13->126.61ms,
-with exact272 reports/tensors. It is not yet a production change. Graphics
+with exact272 reports/tensors. That was the diagnostic precursor to the
+qualified change above. Graphics
 teardown crashes remain failed guards; Systems timestamps remain rejected.
 Profiled counters are not ordinary utilization or complete explanation of the
 JAX gap. No permission blocker, GPU wedge observed, or new learning allocation.
 
-Next: refresh the combined backend onto reviewed upstream07445e8; qualify a
-minimal split-K/tile-selection change and efficient reduced-precision convolution
-derivatives. Then address matrix/grouped-RSSM kernels and layout/fusion, followed
+Next: efficient reduced-precision convolution derivatives and
+matrix/grouped-RSSM kernels and layout/fusion, followed
 by posterior reuse and device-resident inputs/targets/EMA. Use complete-update
 timing and numerical checks; do not revive PR248 from its isolated kernel result
 or launch a tile/batch sweep. Upstream now supports measuring per-step input
 refresh, which matters when comparing resident and repeatedly uploaded inputs.
+CDP imagination now costs54.22ms versus world training45.94ms; optimize total
+update cost, not only the world model.
 
 ## Starting point
 
@@ -221,6 +235,8 @@ benchmark substitutes for these complete-update measurements.
 - [x] Finish the combined pinned-stack comparison, audit and runtime CI review
   (CI355 passes). Do not add individual percentages or treat finite synthetic
   updates as learning.
+- [x] Attribute the native GPU bottleneck and qualify the minimal split-tile
+  fix on refreshed main, including exact full-update and plan comparisons.
 
 Use small reviewable upstream changes with portable fallbacks. Reuse the
 existing benchmark and guard rather than create another orchestration framework.
