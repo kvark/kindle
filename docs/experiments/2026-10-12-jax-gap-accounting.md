@@ -199,3 +199,83 @@ using the corrected public-wrapper/accounting harness and pinned recipe.
 Compare its first24 metric reports and initial state with retained controls;
 account CUDA kernels/copies and wrapper/seed/metric boundaries on one clock.
 No Nsight Graphics injection, native kernel change or learning allocation.
+
+## Inline timestamp attribution
+
+The completed accounting still leaves the current native GPU-pass union split
+between kernels and dispatch/barrier costs unresolved. The old per-dispatch
+profiler adds memory barriers; do not treat those durations as ordinary kernels.
+Declare one diagnostic-only native RGB fixed-input capture on isolated copies
+of the qualified Blade/Meganeura sources. Add two Vulkan COMPUTE_SHADER
+timestamps around one selected dispatch per replay, inside the existing pass;
+preserve every original dispatch, binding and barrier. No shader or arithmetic
+change. Retain three samples per dispatch, one complete optimizer-free session
+replay per sample. Use one submission per session, as in the reviewed accounting
+control; this is not a production scheduling recommendation.
+
+One synthetic learner update installs resident inputs. Then disable the existing
+optimizer/clipping/accumulation settings for capture, as in `profile_sessions`.
+Require exact model/optimizer checkpoint tensors before/after, stable complete
+session outputs, expected GPU and >=2GiB sampled headroom. Retain ordinary coarse
+baselines before/after each session and every sampled total-pass duration, so
+timestamp effects and drift can be measured. Timestamp intervals can still
+serialize otherwise independent dispatches; explicitly inspect that bias and
+the difference between summed dispatch intervals and whole-pass time. Do not
+assume that remainder is pure CPU overhead or silently normalize it away.
+
+The guarded process is limited to900 seconds; the service to1,200 seconds.
+No new JAX timing campaign, game actions, native production pin or driver change.
+Keep patches, immutable binary, raw timings, outputs and failures in the existing
+accounting artifact directory. Build/analysis use one CPU,2GiB and zero swap.
+
+The first completed sessions show a small whole-pass perturbation but an
+overcount when independently sampled dispatch intervals are summed. Preserve
+that as an attribution limitation, not a successful pure-kernel decomposition.
+After the full capture and independent state audit pass, allow one bounded
+calibration process: contiguous32-dispatch windows covering each entire session,
+three samples/window, paired with two adjacent timestamps at the same window
+start (empty interval). Alternate pair order and retain every sample, including
+negative corrected differences. This separates timer overhead from useful
+intervals and amortizes it across blocks; no per-dispatch rerun or kernel sweep.
+Use the same one synthetic update, fixed resident inputs, exact tensor/output
+checks and900-second guard. Empty windows still run the whole graph unchanged.
+Compare summed full-minus-empty intervals against the normal whole-pass baseline;
+report disagreement and uncertainty, never force totals to agree.
+
+The paired blocks pass their state/output audit and sum to44.539ms against a
+44.105ms baseline (0.434ms excess retained). This closes the gross sampled-interval
+overcount, but mixed blocks do not distinguish useful kernels from their command
+stream. Allow one final counterfactual attribution process, not an optimization:
+on the same resident, optimizer-free graphs, replace selected dispatch dimensions
+with zero workgroups while retaining all pipeline bindings and memory barriers.
+Classify all dispatches into convolution, matrix (including BlockMatMul), and
+remaining operations. Measure all eight subsets in three rotated orders,
+two warmup+16 measured replays/subset/session, with full-graph restoration before
+each subset. Include the all-zero command-stream floor and an unchanged all-work
+control; no new shader, input shape or parameter change.
+
+Masked outputs are deliberately not valid learner outputs and must never be
+used as learning or speedup evidence. Restore full execution and require exact
+full outputs after every round and292 unchanged checkpoint tensors. Save all
+raw measurements. Report marginal removals and an explicitly named three-family
+Shapley cost allocation, which distributes measured cache/overlap interactions;
+do not label it pure kernel timing or claim marginal savings add independently.
+The same900-second guard, device/headroom and failure-review rules apply. One
+synthetic setup update, zero game actions. No production adoption of masking.
+
+## Closure review
+
+All three follow-ups and independent CPU audits pass. Counterfactual all-work
+44.088ms matches44.104ms ordinary fixed-session control and44.101ms graph passes
+inside complete updates. The full traced difference reconciles with the ordinary
+44.038ms difference after explicitly accounting for measured scheduling/profiler/
+boundary changes; the more inclusive JAX host-input boundary leaves43.276ms.
+See the [report](../results/2026-10-12-jax-gap-accounting.md) for the operation-group
+allocation and its limits. Root-cause accounting closes; performance parity and
+learning do not. No further profiling campaign or training allocation is implied.
+
+Retain the rejected single-dispatch sums,0.434ms block excess, both old Graphics
+shutdown failures, nested-workspace and missing-import build failures, and the
+corrected CPU BlockMatMul classification. No tolerances or actual timings change.
+Production pins/binary remain unchanged. Next is a bounded, numerically qualified
+whole-update optimization, beginning with matrix execution and preserving CDP.

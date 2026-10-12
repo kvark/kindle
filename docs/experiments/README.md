@@ -23,8 +23,12 @@ training stays stopped and the remaining JAX gap is not closed.
 The [full gap accounting](../results/2026-10-12-jax-gap-accounting.md) confirms equal
 model size and only.262ms input-refresh cost. Matched matrices/convolution expose
 both missing backward/grouped BF16 coverage and inefficient BF16 kernels; native
-host preparation/targets and repeated posterior work add cost. Full native
-kernel-versus-dispatch/barrier decomposition stays open; no new production change.
+host preparation/targets and repeated posterior work add cost. Current native
+counterfactuals now close the operation-group accounting:17.32ms convolution,
+14.04ms matrix,6.84ms remaining and5.89ms zero-work command stream. Complete
+traces and explicit boundary adjustments reconcile the44.04ms ordinary gap;
+rejected per-dispatch sums and the0.434ms block residual remain. This is root-cause
+closure, not pure kernel timing, JAX speed parity or a new production change.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

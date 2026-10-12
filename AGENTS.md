@@ -7,26 +7,33 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Full JAX gap investigation remains active:** [current accounting](docs/results/2026-10-12-jax-gap-accounting.md).
-  Both RGB12M recipes have exactly10,498,772 trainable parameters. Ordinary
-  native56.46ms/JAX12.42ms; identical-executable JAX input refresh adds only.262ms,
-  exact288 state tensors/272 reports. Native CPU-only markers preserve272 reports/
-  292 initial/first/final tensors at56.28ms; RNG/preparation2.33ms, CPU targets1.61ms,
-  slow-critic synchronization~1.04ms. Single-submission ordinary/coarse57.974/57.971ms
-  gives255 complete19-pass samples:45.282ms GPU-pass union+12.689ms uncovered.
-  Keep normal four chunks; single submission is diagnostic and~1.51ms slower.
-  Eight native/13 JAX matrix cases pass full F64 comparisons; scalar grouped
-  products lag even JAX F32, and native dense BF16 also lags. One actual convolution
-  shape passes BF16 comparison: native/JAX forward.728/.139ms, input1.550/.144ms,
-  weight1.545/.161ms. Isolated pass/kernel costs are not additive speedups.
-  Prioritize dense launch geometry/coalescing and grouped precision alongside
-  convolution derivatives, then posterior reuse/GPU targets/EMA. Current native
-  family-versus-dispatch/barrier decomposition remains open; do not close the goal
-  from these named buckets.16 guards pass, three diagnostic guards fail,15 warnings
-  retained;2,744 explicit synthetic learner updates, zero game actions. Current
-  CUDA-only capture has exact24 reports but startup overhead; retain all eight
-  samples. Old Graphics failures stay failed. Production pins unchanged, CI360
-  passes, upstream main20af998/7909fc1 unchanged. No worker at publication boundary.
+- **Full JAX root-cause accounting complete at operation-group resolution:**
+  [report and explicit bridge](docs/results/2026-10-12-jax-gap-accounting.md).
+  Both RGB12M recipes have10,498,772 trainable parameters. Ordinary native56.46ms /
+  JAX12.42ms; same-executable input refresh adds only.262ms. Matched independent
+  controls show inefficient native F32/BF16 matrices and convolutions, not only
+  missing BF16 coverage. Source/phase accounting locates duplicate posterior work,
+  CPU RNG/preparation2.33ms, targets1.61ms and slow-critic sync~1.04ms.
+  Current eight-subset counterfactuals retain bindings/barriers but zero selected
+  workgroup counts:44.088ms full graph versus44.101ms in complete updates.
+  Shapley allocations17.320ms convolution/14.036ms matrix/6.839ms remaining plus
+  5.892ms zero-work command stream distribute measured interactions; **not pure
+  kernel times or independent optimization savings**. Masked outputs are invalid
+  learner outputs; restored full outputs and292 tensors remain exact. The full
+  profiled42.184ms difference plus explicit boundary/scheduling adjustments
+  reconciles44.038ms ordinary gap (43.276ms with inclusive JAX host inputs).
+  Single-dispatch timestamp sums62.069 versus44.287ms are rejected. Paired32-
+  dispatch blocks retain0.434ms/0.98% excess, not normalized. Keep four production
+  world submissions; the diagnostic single submission is~1.51ms slower.
+  Next implement dense launch geometry/coalescing and grouped precision alongside
+  convolution derivatives, command-stream reduction, then posterior reuse/GPU
+  targets/EMA. Qualify whole updates before learning; no more open-ended profiling
+  or automatic Atari restart.19 guards pass, three diagnostic guards fail,17
+  warnings retained;2,747 synthetic learner updates plus25,269 new optimizer-free
+  session replays, zero game actions. Old Graphics failures stay failed. No JAX
+  speed parity, learning-quality or ordinary SM-utilization claim. Production
+  pins unchanged, CI361 passes on preceding docs head, upstream20af998/7909fc1
+  unchanged; current-head CI stays on PR31. No worker at publication boundary.
 - **Split-convolution tile fix adopted:** [result](docs/results/2026-10-12-split-convolution-tiles.md),
   [Meganeura PR255](https://github.com/kvark/meganeura/pull/255). Refreshed control
   RGB61.027->56.058ms/CDP135.070->126.739ms:8.14%/6.17% less complete-update time.

@@ -6,7 +6,7 @@ replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
-**Current investigation: [root-cause the full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
+**Root-cause accounting complete: [full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
 Model size matches exactly; a same-executable input-transfer control explains
 only.262ms of the~44ms gap. Host preparation/targets/EMA matter, but measured
 GPU work dominates. Matched matrix cases show native grouped F32 loses even
@@ -14,9 +14,15 @@ to JAX F32, and native BF16 dense loses to BF16 library kernels. One matched
 convolution confirms backward precision coverage and forward kernel efficiency
 both need work. Prioritize dense launch geometry/split-K/coalescing and grouped
 precision alongside convolution derivatives, then posterior reuse and GPU
-targets/EMA. The complete native family-versus-dispatch/barrier attribution is
-still open; isolated speed ratios are not additive whole-agent improvements.
-Keep production scheduling/pins unchanged and learning stopped.
+targets/EMA. Current counterfactual graph costs are17.32ms convolution,14.04ms
+matrix,6.84ms remaining operations and5.89ms zero-work command stream. Full
+execution44.088ms matches44.101ms of complete-update graph passes; explicit
+host/transfer/optimizer and profiling-boundary accounting reconciles the44.04ms
+ordinary gap. These are operation-group allocations, not pure kernel timings or
+independent speedup promises. Single-dispatch timestamp sums are rejected; paired
+blocks retain0.434ms/0.98% excess. Include fusion/recording/safe barrier scheduling
+in the implementation work. Keep production pins/scheduling unchanged and learning
+stopped; next qualify a useful whole-update optimization, not another profile sweep.
 
 The [combined result](results/2026-10-12-backend-integration.md) reduces ordinary
 CDP12M/B32 updates **161.32→135.17ms (16.21%)** and RGB12M/B8

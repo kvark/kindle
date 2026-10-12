@@ -1,5 +1,5 @@
 {
-  "status": "progress_full_gap_not_closed",
+  "status": "root_cause_accounting_complete_not_performance_parity",
   "date": "2026-10-12",
   "artifacts": "/x/Code/kindle/runs/jax-gap-accounting-20261012.ji9zF4mj",
   "production_changed": false,
@@ -14,10 +14,10 @@
     "jax_reference": "e3f02248693a79dc8b0ebd62c93683888ddaccfe"
   },
   "guards": {
-    "passed": 16,
+    "passed": 19,
     "failed": 3
   },
-  "allocation_warning_count": 15,
+  "allocation_warning_count": 17,
   "workload": {
     "status": "complete",
     "trainable_parameters": 10498772,
@@ -427,14 +427,16 @@
     ]
   },
   "unresolved": [
-    "Non-perturbing current per-family native kernel/dispatch-barrier attribution is not complete.",
-    "Old pre-tile Nsight family costs cannot be subtracted from new ordinary timings as exact contributions.",
-    "Isolated kernel controls establish mechanisms, not additive end-to-end savings or learning quality."
+    "No claim of JAX speed parity or learning/time-to-score improvement from this diagnostic.",
+    "Counterfactual class costs include cache/overlap interactions and command issue effects; they are not pure kernel durations or independent optimization savings.",
+    "Per-dispatch timestamp sums are rejected; the paired32-dispatch block residual is retained, not normalized.",
+    "Different native/JAX weights, RNG, graphs and diagnostic input state remain; no bitwise cross-framework trajectory claim."
   ],
   "next": [
-    "BF16 dense launch geometry/split-K and coalesced transposed staging; grouped reduced-precision coverage.",
-    "Efficient reduced-precision convolution derivatives, retaining full-update qualification.",
-    "Posterior reuse and GPU RNG/targets/EMA; explicit actual CPU/queue-overlap accounting."
+    "Optimize dense BF16 launch geometry/split-K/coalescing and grouped products; qualify on complete RGB and CDP updates.",
+    "Reduce convolution derivative precision/storage and improve convolution kernels; isolated kernel gains are not sufficient.",
+    "Reduce the5.89ms zero-work command stream via fusion/recording/barrier scheduling, preserving numerical safety.",
+    "Reuse posterior forward and move RNG/targets/EMA onto the GPU; then separately qualify learning before Atari resumes."
   ],
   "failures": [
     "JAX diagnostic implicit host transfer before training loop.",
@@ -442,6 +444,114 @@
     "Matrix service wrong CLI before any child; corrected positional invocation.",
     "JAX dense BF16 narrowing/widening disappears from compiled output; corrected explicit BF16 boundary passes.",
     "Single-submission diagnostic local-variable scope compilation error; corrected before any GPU job.",
-    "JAX F32 convolution input derivative exact-equality failure at5.59e-9; remains unqualified, BF16-only follow-up passes."
-  ]
+    "JAX F32 convolution input derivative exact-equality failure at5.59e-9; remains unqualified, BF16-only follow-up passes.",
+    "Isolated inline timestamp intervals overcount62.069ms versus44.287ms whole-pass time despite small per-replay perturbation; rejected as additive kernel timing.",
+    "Nested-workspace formatting and a missing PathBuf import fail before GPU work; both sources/build receipts retained.",
+    "First inline CPU classifier places BlockMatMul under other; corrected v2 includes grouped matrices. No GPU rerun or numerical/timing-data change.",
+    "Publication initially compares compact matrix tables with expanded raw data; corrected to verify unchanged tables against the previous commit. No measurement changes."
+  ],
+  "closure": {
+    "status": "complete_at_counterfactual_operation_group_resolution",
+    "graph_dispatches": 6562,
+    "complete_update_dispatches": 6570,
+    "inline_timestamp_sum_ms": 62.068895999999995,
+    "inline_whole_pass_ms": 44.287452,
+    "block_samples": {
+      "windows": 208,
+      "sweeps": 3,
+      "paired_empty": true,
+      "whole_pass_ms": 44.1053115,
+      "corrected_interval_ms": 44.539328000000005,
+      "excess_ms": 0.4340165000000005
+    },
+    "native_complete_pass_means_ms": {
+      "posterior": 5.389671152941176,
+      "imagination": 7.620880941176471,
+      "slow_value": 0.24263717647058825,
+      "world_gradient": 29.00669954509804,
+      "behavior_gradient": 1.841412768627451,
+      "optimizer": 0.5069409882352941,
+      "transfers": 0.6741613176470588
+    },
+    "native_graph_ms": 44.101301584313724,
+    "counterfactual": {
+      "masks": 8,
+      "sweeps": 3,
+      "measured_per_mask_per_sweep": 16,
+      "baseline_ms": 44.104424,
+      "all_work_ms": 44.08776733333334,
+      "all_zero_ms": 5.892276,
+      "allocations_ms": {
+        "command_stream_floor": 5.892276,
+        "convolution": 17.320108333333334,
+        "matrix": 14.036480999999998,
+        "remaining": 6.838902
+      },
+      "mask_means_ms": {
+        "0": 5.892276,
+        "1": 23.06456133333333,
+        "2": 19.384084,
+        "3": 36.812092,
+        "4": 12.084674666666666,
+        "5": 29.716343333333334,
+        "6": 26.829566,
+        "7": 44.08776733333334
+      },
+      "family_counts": {
+        "remaining": 5707,
+        "matrix": 828,
+        "convolution": 27
+      },
+      "exact_model_optimizer_tensors": {
+        "initial": 292,
+        "before": 292,
+        "after": 292
+      },
+      "restored_outputs_equal": true,
+      "masked_outputs_valid_for_learning": false
+    },
+    "profiled_bridge_components_ms": {
+      "convolution": 13.287131083333335,
+      "matrix": 11.670304125000001,
+      "remaining_and_optimizer": 3.875635238235181,
+      "native_zero_work_command_stream": 5.892276,
+      "transfers": 0.24802656764705877,
+      "outside_profiled_intervals": 7.197317069117647,
+      "fixed_replay_vs_update_graph_residual": 0.013534250980384854
+    },
+    "profiled_gap_ms": 42.184224334313605,
+    "historical_boundary_adjustment_ms": 1.8538333521246972,
+    "historical_boundary_gap_ms": 44.0380576864383,
+    "more_inclusive_host_input_adjustment_ms": 1.0913487973267042,
+    "more_inclusive_host_input_gap_ms": 43.27557313164031,
+    "native_graph_residual_ms": 0.013534250980384854,
+    "new_guards": [
+      {
+        "path": "inline-queue/inline-dispatches",
+        "passed": true,
+        "new_allocation_warnings": 0
+      },
+      {
+        "path": "blocks-queue/inline-blocks",
+        "passed": true,
+        "new_allocation_warnings": 0
+      },
+      {
+        "path": "masks-queue/family-masks",
+        "passed": true,
+        "new_allocation_warnings": 2
+      }
+    ],
+    "new_unique_allocation_warnings": 2,
+    "new_synthetic_updates": 3,
+    "fixed_session_replays": {
+      "dispatch_sampling": 20366,
+      "paired_blocks": 1928,
+      "family_masks": 2975,
+      "total": 25269
+    },
+    "attribution_methods": "No added memory barriers in timestamp sampling. Counterfactual zero-workgroup masks retain all bindings/barriers. Three-family Shapley distributes measured interactions; no rescaling to match ordinary timings."
+  },
+  "synthetic_learner_updates_including_warmup": 2747,
+  "closure_raw": "/x/Code/kindle/runs/jax-gap-accounting-20261012.ji9zF4mj/final-accounting.json"
 }

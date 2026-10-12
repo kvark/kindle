@@ -12,10 +12,15 @@ The [full JAX gap audit](results/2026-10-12-jax-gap-accounting.md) confirms equa
 trainable model size and rules out input transfer as the main explanation.
 Both incomplete reduced-precision coverage and inefficient native BF16/F32
 kernels are measured; repeated posterior work and CPU targets/EMA add overhead.
-Current native family-versus-dispatch/barrier attribution remains unfinished.
+The current operation-group accounting closes the full measured gap: graph
+costs17.32ms convolution/14.04ms matrix/6.84ms remaining plus5.89ms zero-work
+command stream match complete-update passes within0.014ms. Host work and
+profiling/boundary adjustments remain explicit. This is root-cause closure,
+not JAX speed parity, pure per-kernel timing or independently achievable savings.
 Keep production pins/four-chunk scheduling and learning stopped; next address
 matrix launch geometry/coalescing and grouped precision alongside convolution
-derivatives, then posterior reuse/device residency. No concurrent-seed workaround.
+derivatives and command-stream reduction, then posterior reuse/device residency.
+No concurrent-seed workaround or indefinite profiling gate.
 The [upstream split-tile fix](results/2026-10-12-split-convolution-tiles.md) is
 qualified and pinned on refreshed main: RGB61.027->56.058ms/CDP135.070->126.739ms,
 exact numerical controls and all17 guards. Native checks, both locks, Clippy
