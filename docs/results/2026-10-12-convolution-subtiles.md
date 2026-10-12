@@ -45,6 +45,8 @@ unchanged-control diagnosis and standalone qualification; one failed original
 guard and one allocation warning remain. Zero game actions or GPU recovery.
 Preparation's private-method error and missing-spec controller failure started
 no GPU child; source/logs remain.
+Standalone [CI961](https://github.com/kvark/meganeura/actions/runs/38192173821)
+passes all jobs. The final seven-guard CPU audit passes in4.08s.
 
 ## Provenance and decision
 
