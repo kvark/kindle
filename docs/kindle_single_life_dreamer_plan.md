@@ -14,28 +14,27 @@ BF16 where supported, then measured fusion/layout/dispatch improvements.
 The Freeway screen below is stopped at39,568 actions/9,831 updates on its first
 learner; the partial checkpoint remains. No completed learner, later arm or
 frozen cohort. Synthetic backend qualification continues, not game training.
-The [first backend round](results/2026-10-11-backend-training-performance.md)
-qualifies repeated-row addressing (2.54% lower CDP update latency and1.05 GiB
-less imagination allocation); the weight-gradient candidate has no whole-update
-gain and stays draft. A separate [convolution selection correction](results/2026-10-12-convolution-subtiles.md)
-now lowers both CDP and RGB complete updates about2.1%, with no shader change.
-It qualifies forward/input gradients; a reproduced unchanged scalar weight-gradient
-oracle failure remains disclosed. [Native BF16 dense learning](results/2026-10-12-bf16-learner.md)
-now qualifies complete updates: CDP161.49->149.55ms (7.40%),
-RGB71.33->66.47ms (6.81%). Auto remains default; convolution/grouped products,
-masters/optimizer and sensitive reductions stay F32. World training regresses,
-so mixed-precision coverage/performance is unfinished. Fresh JAX RGB FP32/BF16
-24.35/12.42ms leaves a large gap. Initial complete-submission traces still miss
-intermediate chunks; a timing-only repair now qualifies coverage with~2.7%
-diagnostic overhead and unchanged reports/tensors. No learning or
-SM-utilization claim, and no return to game training yet.
+The [combined backend result](results/2026-10-12-backend-integration.md)
+qualifies native BF16 storage, repeated-row addressing and hardware-row
+convolution selection: CDP12M/B32 **161.32→135.17ms (16.21% less time)** and
+RGB12M/B8 **72.69→61.15ms (15.88%)**. CDP uses `mixed`: BF16 learner inference/
+behavior with the faster F16-input/F32-storage world-gradient path. RGB uses
+`bf16`, including forward convolution storage. Auto default/live acting,
+F32 masters/optimizer/reductions stay unchanged; no full-BF16 learner claim.
+Ten guards/three retained warnings and the independent CPU audit pass. JAX RGB
+FP32/BF16 **24.29/12.47ms** still leaves a2.52x/4.90x gap. The failed PR248
+weight-gradient kernel stays out; all earlier failures remain linked in the
+result. Current git pins include latest upstream baseseb8c90f/7909fc1; only
+the user merges the review PRs. No learning/time-to-score or SM-utilization
+claim, and no return to game training yet. Remaining performance work concerns
+world/backward and recurrent costs, not another precision-policy sweep.
 
 The user has selected a wall-clock performance round on the5080. The stopped
 Pong queue stays cancelled. Optimize one useful learner before adding GPUs or
 concurrent seeds; retain the current quality results as controls, not a mandate
 to repeat a long mastery campaign.
 
-1. Update Meganeura to latestd7a7293; Blade56f0565 is unchanged. The initial
+1. Initial October11 update: Meganeurad7a7293; Blade56f0565 unchanged. The initial
    430f14b refresh adds two compiler-search fixes; five more Vulkan/packed-F16/
    convolution fixes land during this session. Preserve old runtime controls
    and retain the revisions used by each completed measurement.
@@ -44,9 +43,9 @@ to repeat a long mastery campaign.
    centering, four heads, targets and coefficient unchanged. This is
    a new candidate under the user's revised arithmetic contract, not retroactive
    qualification of the rejected October7 result.
-3. Expose checkpointed training precision: Auto, F32, F16-input products with
-   F32 accumulators/master weights/optimizer/reductions. Do not describe this as
-   BF16 support or half-storage throughout the learner. Check finite gradients,
+3. Expose checkpointed training precision. The original F16-input permission
+   was not reduced storage; the newly qualified `bf16`/`mixed` paths above are.
+   Keep F32 accumulators/master weights/optimizer/reductions. Check finite gradients,
    losses and checkpoints; judge adoption by learning and time-to-result, not
    bitwise trajectories or the old2e-5 end-to-end gate.
 4. Compare B8, B16 and B32 at T16/R32, with full-batch centered CDP and no
@@ -552,7 +551,10 @@ negative results; do not select only successful trajectories.
   cohorts and report untrained controls when claiming competence. Development
   curves, numerical smokes and rollout videos alone are not mastery.
 - Use the GPU and keep Meganeura/Blade current before diagnosing old bugs.
-  Current qualified CDP/RGB backend pins are Meganeura31026833/Blade56f0565; the
+  The new synthetic-performance stack is Meganeurad68f1a5/Blade663afd2/Naga
+  forkc9fd6a85a; see the [combined qualification](results/2026-10-12-backend-integration.md).
+  It is not new game-learning evidence. Historical Qbert production pins are
+  Meganeura31026833/Blade56f0565; the
   [October9 control refresh](results/2026-10-09-meganeura-refresh.md)
   passes scoped independent and production/restore checks, with no measured
   speedup or new learning comparison. Nativee9ebbf5d adds only the qualified

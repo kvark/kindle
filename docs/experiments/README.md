@@ -5,8 +5,12 @@ October11's new [performance pivot](../kindle_single_life_dreamer_plan.md#perfor
 authorizes reduced precision, cheaper exploration, wider batches and native/JAX
 profiling. The old Pong queue stays cancelled; no long-run extension is implied.
 The [performance result](../results/2026-10-11-cdp-performance.md) measures2.66x
-synthetic replay throughput and selects B32/F16 for a bounded
-[paired Freeway learning screen](2026-10-11-cdp-performance-learning.md).
+synthetic replay throughput; its [paired Freeway learning screen](2026-10-11-cdp-performance-learning.md)
+is stopped at39,568 actions with no completed learner. October12's
+[combined backend result](../results/2026-10-12-backend-integration.md) integrates
+BF16 storage, row addressing and convolution selection: CDP161.32→135.17ms,
+RGB72.69→61.15ms. The large JAX gap and learning-quality check remain open;
+no game training or old lifetime resumes from these synthetic results.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

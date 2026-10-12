@@ -6,6 +6,14 @@ replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
+The [combined result](results/2026-10-12-backend-integration.md) reduces ordinary
+CDP12M/B32 updates **161.32→135.17ms (16.21%)** and RGB12M/B8
+**72.69→61.15ms (15.88%)**. Native RGB is still2.52x/4.90x slower than the
+fresh JAX FP32/BF16 controls. Useful changes from all three work packages are
+integrated; no claim of reaching JAX, full-BF16 CDP world training, or faster
+learning to a score. The final CPU/GPU audit and all runtime CI355 jobs pass.
+This bounded round is complete; the wider performance target remains open.
+
 ## Starting point
 
 The [measured baseline](results/2026-10-11-cdp-performance.md) uses Meganeura
@@ -44,15 +52,16 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   oracles pass. Its broader unchanged scalar weight-oracle failure stays explicit.
 - Layout: [Meganeura PR249](https://github.com/kvark/meganeura/pull/249)
   removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
-  imagination allocation, exact272 reports/final tensors. Ready for review;
-  not yet merged or pinned. Independent of PR248; RGB effectively unchanged.
+  imagination allocation, exact272 reports/final tensors. The isolated change
+  is now pinned in the combined stack, still unmerged. Independent of PR248;
+  RGB effectively unchanged in that isolated test.
 - Mixed precision: [BF16 dense learner updates qualify](results/2026-10-12-bf16-learner.md).
   Explicit selection covers all five learner sessions; F32 masters/optimizer,
   convolution/grouped products and sensitive reductions remain. Pinned full
   CDP updates161.49->149.55 ms (7.40%); RGB71.33->66.47 ms (6.81%). Native
   partial-tile/gradient checks and272 finite complete updates per arm pass.
-  World training regresses; reduced-storage coverage and its useful speed
-  acceptance remain unfinished. Auto default and live acting stay unchanged.
+  World training regresses in this dense-only version. Auto default and live
+  acting stay unchanged; the extensions below address useful storage coverage.
   Restoring Auto for unconverted operations does not fix CDP149.26→150.38 ms;
   RGB66.45→64.32 ms improves. Keep NativeF32 for the main path; no per-title
   precision branch or sweep. Native F32 cooperative shapes are absent on5080,
@@ -61,12 +70,15 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   shared native BF16 loop,16 F64 cases, six guards. Full CDP149.27→146.31ms and
   RGB66.51→61.02ms improve; only RGB world training improves. CDP world61.87ms
   remains slower. Keep F32 derivatives; do not claim lower overall allocations.
-  A [single fixed mixed-stage check](experiments/2026-10-12-mixed-world-precision.md)
-  now tests BF16 perception/imagination/behavior with the measured faster
-  F16/F32 world-gradient path. This is a CDP decision, not a per-title branch.
+  The [fixed mixed-stage check](results/2026-10-12-mixed-world-precision.md)
+  passes: CDP146.13→140.73ms, world61.78→56.53ms. Retain BF16 learner
+  perception/imagination/behavior with the faster F16-input/F32-storage
+  world-gradient path. RGB keeps its useful all-session BF16 candidate.
+  This is an explicit precision choice, not a hidden per-title branch.
 - Fresh JAX RGB12M/B8 control: FP32/highest24.35 ms, BF1612.42 ms. Native dense
-  BF16 is still2.73x/5.35x slower, without identical graphs/weights/RNG. No
-  time-to-score or gap-closure claim. Upstream review branches remain unmerged.
+  BF16 was still2.73x/5.35x slower, without identical graphs/weights/RNG. The
+  combined comparison above supersedes that timing, not its retained evidence.
+  No time-to-score claim. Upstream review branches remain unmerged.
 - Profiling: correct the ordinary GPU fields to say **last submission only**.
   World training uses four submissions. Initial Perfetto captures also miss
   intermediate query pools. A timing-only harvesting repair now qualifies all
@@ -74,6 +86,16 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   time. Recorded world intervals52.80/57.86 ms confirm a GPU-side BF16 regression.
   Historical raw captures remain; these intervals are not SM utilization.
 
+The [final integration check](experiments/2026-10-12-backend-integration.md)
+combines BF16, row addressing and hardware-row alignment, not rejected PR248.
+Meganeurad68f1a5 incorporates current maineb8c90f; Blade663afd2 incorporates
+main7909fc1; Naga forkc9fd6a85a remains pinned with the user's permission.
+Both dependency locks use git revisions, not path overrides. The four native
+qualification processes and all six fresh native/JAX timing guards pass; three
+allocation warnings remain. The independent CPU audit passes in4.767s.
+Meganeura BF16/row PRs and Blade BF16 CI pass after rebasing without merge commits.
+The installed Python binding supports `bf16` and `mixed`;193 runner tests pass.
+Remove `bf16_dense` from the current CLI, retaining its historical source/evidence.
 No game worker remains. Do not restart the interrupted Freeway comparison.
 
 ## Work packages
@@ -142,11 +164,13 @@ The implementation boundary is explicit:
    and F64-referenced matrix gradients, then repeated complete updates.
 
 The native compiler/Blade foundation, Meganeura storage/matrix consumers and
-explicit dense/pointwise forward/backward regions pass scoped checks. The
-[dense integration](results/2026-10-12-bf16-learner.md) also passes complete
-updates, but speeds policy/imagination rather than world training. Convolution,
-grouped products and broader useful storage coverage remain. Do not substitute
-a driver change, CPU emulation or an isolated cast benchmark for this deliverable.
+explicit dense/pointwise forward/backward regions pass scoped checks. Forward
+convolution storage is now native BF16 too; RGB world training benefits, CDP's
+full-BF16 world path does not. Keep the measured mixed-stage alternative for
+CDP. Convolution derivatives and grouped products retain F32; broader CDP
+world/backward reduced storage remains an optimization opportunity, not a reason
+to force the slower mode. No driver change, CPU emulation or isolated cast
+benchmark substitutes for these complete-update measurements.
 
 ### 3 Reduce intermediate traffic and dispatch overhead
 
@@ -170,11 +194,15 @@ a driver change, CPU emulation or an isolated cast benchmark for this deliverabl
   unadopted; the retained unrelated weight-oracle failure is not erased.
 - [x] Establish BF16 capability and qualify native compiler/storage/matrix primitives.
 - [x] Select BF16 dense regions across learner sessions and qualify complete updates.
-- [ ] Extend useful reduced storage through the measured world-training bottleneck;
-  dense integration alone regresses that stage and does not finish this package.
+- [x] Extend connected reduced storage through convolution and measure whole
+  world training: RGB benefits; CDP retains the faster F16 world path under
+  `mixed`. Full CDP world/backward BF16 coverage is not achieved.
 - [x] Implement and qualify the selected row-addressing layout improvement;
   upstream merge/adoption remains separate.
 - [x] Repeat the fixed native/JAX comparison and report remaining gaps (October12).
+- [x] Finish the combined pinned-stack comparison, audit and runtime CI review
+  (CI355 passes). Do not add individual percentages or treat finite synthetic
+  updates as learning.
 
 Use small reviewable upstream changes with portable fallbacks. Reuse the
 existing benchmark and guard rather than create another orchestration framework.

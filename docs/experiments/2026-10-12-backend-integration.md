@@ -48,3 +48,24 @@ Useful mixed precision need not mean BF16 everywhere: the measured CDP world
 gradient path retains F16 inputs/F32 storage. Broader CDP world/backward reduced
 storage and the JAX speed target remain future work, not achievements to infer
 from this round. Finish the integration review before considering fresh learning.
+
+## CPU preparation review
+
+The old negative CLI fixture still used `bf16` as an invalid value. Now accepted,
+it unexpectedly constructs/resets eight ALE environments before the installed
+older native module rejects that config. No actor/GPU construction or learner
+update occurs; reset/setup no-op frames were not recorded. Retain the failed
+log/source and do not count this as a rollout or zero environment activity.
+Use `fp8` for the invalid-value check and make every refusal fixture fail before
+any environment construction. All189 runner tests then pass. Rust source/locks,
+13 backend CPU checks,14 Kindle config/policy/pin checks and both Clippy targets
+pass; review completes before native GPU qualification. The installed Python
+extension is not claimed to have been refreshed by a Rust-library build.
+
+The subsequent extension build first stops because the systemd service PATH
+lacks rustc; it never compiles or starts GPU work. Preserve that script/log,
+add the explicit toolchain PATH and build with the same git pins. The refreshed
+CPython3.14 extension passes193 runner tests, including actual native parsing
+of all five precision modes followed by pre-GPU capacity rejection. Extension
+SHA256 `f2f7b999a322d687e19fde9467aab1a87165dddacd0ac1e47e5977bc615cf440`.
+All compilation finishes before the ordinary timing queue starts.

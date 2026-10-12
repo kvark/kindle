@@ -1,0 +1,220 @@
+{
+  "status": "integrated_backend_performance_qualified",
+  "raw_root": "runs/backend-integrated-20261012.xWfA9jYb",
+  "kindle_runtime_revision": "300363b0e0db1d9b99d46a779218c8c84a912fbc",
+  "candidate": {
+    "meganeura": "d68f1a52278747a4e7af147c36db36ca2ed59829",
+    "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
+    "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+    "meganeura_base": "eb8c90fceb2f065bed98c2d1c6cc4e419923e11d",
+    "blade_base": "7909fc17392f803b02be001041695127426e0fa3",
+    "native_sha256": "83a9227f3abeb72ee9fa8b936aa074f8ed10ce9b7c5d952c2d44888726d6f382",
+    "numerical_sha256": "aaaeebe14491b7ad482e5208df62417f20efe2e59ea2cc6166669956a93e7ce8",
+    "python_native_sha256": "f2f7b999a322d687e19fde9467aab1a87165dddacd0ac1e47e5977bc615cf440"
+  },
+  "control": {
+    "meganeura": "679ea87cdd788e72103f1fa50fb9cea2c7392a0c",
+    "blade": "b52965b0360cee07bff6b17d2c2ea23d7455b8b1",
+    "native_sha256": "ca20c5c25e0f87957f10809acd1c9f6ce957a24dfca929e89d9269c654fd78c2",
+    "training_precision": "f16"
+  },
+  "protocol": {
+    "device": "NVIDIA GeForce RTX 5080",
+    "driver": "580.178.04",
+    "warmup_updates": 16,
+    "measured_updates": 256,
+    "model_size": "12m",
+    "batch_length": 16,
+    "imagination_length": 15,
+    "cdp_batch_size": 32,
+    "rgb_batch_size": 8,
+    "gpu_trace": false,
+    "guard_nvml_queries": 0,
+    "no_compilation_during_timing": true
+  },
+  "pairs": {
+    "cdp": {
+      "percent_less_time": 16.209418837298763,
+      "exact_initial_tensors": 346,
+      "old_control_exact": true,
+      "preceding_candidate_comparison": {
+        "first_outputs_exact": true,
+        "first_changed_tensors": 228,
+        "final_changed_tensors": 346,
+        "exact_metric_reports": 0
+      },
+      "arms": {
+        "control": {
+          "mean_update_ms": 161.3161171328125,
+          "median_update_ms": 161.299933,
+          "stage_ms": {
+            "behavior_train_and_sync": 15.277760976562497,
+            "imagination_and_targets": 70.20085896484375,
+            "posterior": 19.346883078125,
+            "world_train_and_sync": 56.490614113281254
+          },
+          "minimum_sampled_headroom_bytes": 10377625600,
+          "dispatches": {
+            "behavior_gradient": 223,
+            "imagination": 1229,
+            "posterior": 1076,
+            "slow_value": 14,
+            "world_gradient": 4139
+          }
+        },
+        "mixed": {
+          "mean_update_ms": 135.16771205468746,
+          "median_update_ms": 135.094087,
+          "stage_ms": {
+            "behavior_train_and_sync": 9.93171869140625,
+            "imagination_and_targets": 54.181997140625,
+            "posterior": 16.632042839843752,
+            "world_train_and_sync": 54.421953382812504
+          },
+          "minimum_sampled_headroom_bytes": 11290017792,
+          "dispatches": {
+            "behavior_gradient": 246,
+            "imagination": 1338,
+            "posterior": 1166,
+            "slow_value": 19,
+            "world_gradient": 4139
+          }
+        }
+      }
+    },
+    "rgb": {
+      "percent_less_time": 15.87582089421743,
+      "exact_initial_tensors": 292,
+      "old_control_exact": true,
+      "preceding_candidate_comparison": {
+        "first_outputs_exact": true,
+        "first_changed_tensors": 0,
+        "final_changed_tensors": 0,
+        "exact_metric_reports": 272
+      },
+      "arms": {
+        "control": {
+          "mean_update_ms": 72.68502926171875,
+          "median_update_ms": 72.62233649999999,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.522926777343749,
+            "imagination_and_targets": 20.14170548046875,
+            "posterior": 8.341857632812498,
+            "world_train_and_sync": 39.67853937109375
+          },
+          "minimum_sampled_headroom_bytes": 14880145408,
+          "dispatches": {
+            "behavior_gradient": 223,
+            "imagination": 1134,
+            "posterior": 888,
+            "slow_value": 14,
+            "world_gradient": 3896
+          }
+        },
+        "bf16": {
+          "mean_update_ms": 61.145684199218756,
+          "median_update_ms": 61.0964175,
+          "stage_ms": {
+            "behavior_train_and_sync": 3.61762239453125,
+            "imagination_and_targets": 13.722192566406251,
+            "posterior": 7.12198291796875,
+            "world_train_and_sync": 36.683886320312496
+          },
+          "minimum_sampled_headroom_bytes": 14715518976,
+          "dispatches": {
+            "behavior_gradient": 246,
+            "imagination": 1230,
+            "posterior": 933,
+            "slow_value": 19,
+            "world_gradient": 4134
+          }
+        }
+      }
+    }
+  },
+  "jax": {
+    "float32": {
+      "mean_update_ms": 24.28665989464207,
+      "median_update_ms": 24.103862466290593,
+      "upstream_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+      "jax_version": "0.6.2",
+      "minimum_sampled_headroom_bytes": 7930773504
+    },
+    "bfloat16": {
+      "mean_update_ms": 12.466957623473718,
+      "median_update_ms": 12.387987459078431,
+      "upstream_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+      "jax_version": "0.6.2",
+      "minimum_sampled_headroom_bytes": 7932870656
+    }
+  },
+  "passing_guards": [
+    "qualification-queue/bf16",
+    "qualification-queue/bf16-convolution",
+    "qualification-queue/row-addressing",
+    "qualification-queue/subtile",
+    "timing-queue/cdp-control",
+    "timing-queue/cdp-mixed",
+    "timing-queue/jax-bfloat16",
+    "timing-queue/jax-float32",
+    "timing-queue/rgb-bf16",
+    "timing-queue/rgb-control"
+  ],
+  "allocation_warnings": 3,
+  "rgb_jax_time_ratio": {
+    "float32": 2.517665437094881,
+    "bfloat16": 4.904619558831988
+  },
+  "cpu_checks": {
+    "backend": 13,
+    "kindle": 14,
+    "python_runner": 193,
+    "strict_workspace_and_python_clippy": true,
+    "independent_audit_wall_seconds": 4.767
+  },
+  "game_actions_in_gpu_experiments": 0,
+  "preparation_environment_activity": "Failed pre-GPU CLI fixture reset eight ALE environments; setup frames unrecorded. No actor or learner update.",
+  "retained_failures": [
+    "Initial CPU CLI fixture used newly valid bf16 instead of invalid fp8; refusal tests now prohibit environment construction",
+    "First extension build service lacked rustc in PATH; source/log retained, no GPU work",
+    "First CPU audit requested absent blade_revision field; source/log retained, corrected check uses both frozen Cargo locks"
+  ],
+  "limits": [
+    "Not a learning-quality or time-to-score result; Auto/default/live acting unchanged",
+    "CDP world gradients retain F16 operands/F32 storage; convolution derivatives and grouped products are not all BF16",
+    "Native RGB is still 2.52x/4.90x slower than JAX FP32/BF16; graphs, weights, RNG and fixtures differ",
+    "CDP B32 is not directly comparable to RGB B8 or JAX RGB; individual speedups are not additive",
+    "Final CDP trajectory differs from preceding mixed candidate after hardware-row selection; exact initials/first imagined targets and finite updates, not stochastic parity",
+    "Sampled Vulkan headroom and logical buffer sums are not peak physical VRAM or measured traffic; GPU SM utilization unmeasured",
+    "Known VUID10684 and three allocation warnings retained; scoped hardware-row qualification does not erase prior scalar weight-oracle failure",
+    "Full wgpu xtask remains unrun without cargo-nextest; upstream PRs unmerged"
+  ],
+  "ci": {
+    "kindle_runtime": {
+      "commit": "300363b0e0db1d9b99d46a779218c8c84a912fbc",
+      "run": 38195552476,
+      "status": "success"
+    },
+    "meganeura_bf16": {
+      "run": 38194560994,
+      "status": "success"
+    },
+    "meganeura_rows": {
+      "run": 38194604386,
+      "status": "success"
+    },
+    "meganeura_alignment": {
+      "run": 38192173821,
+      "status": "success"
+    },
+    "blade_bf16": {
+      "run": 38194491591,
+      "status": "success"
+    }
+  },
+  "publication": {
+    "documents": 6,
+    "local_links": 255,
+    "result_matches_raw_audit": true
+  }
+}

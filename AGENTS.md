@@ -17,59 +17,48 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   worktrees; only the user merges. The Freeway screen below was stopped cleanly
   at39,568 actions/9,831 updates, no completed learner or later arm. Partial
   checkpoint/declaration remain; no automatic restart or same-lifetime claim.
-- **Backend round partial:** [evidence](docs/results/2026-10-11-backend-training-performance.md).
-  Meganeura PR248/7553463 speeds isolated convolution gradients but not full
-  updates; draft, unadopted. Independent PR249/c0c7774 removes repeated action
-  copies: CDP B32 161.40->157.30ms and1.05GiB less imagination allocation,
-  exact272 reports/346 final tensors; RGB unchanged/exact292 tensors. Ready
-  for review, CI947 passes, not yet merged/pinned. [BF16 primitives qualify](docs/results/2026-10-11-native-bf16.md):
-  Naga forkc9fd6a85a (explicit user commit permission), Blade PR407/b52965b,
-  Meganeura PR250/18be13c: RNE storage and18 native matrix/F32-gradient fixtures. Four guards
-  pass; initial odd-length buffer clear fails VUID00028 and is repaired within
-  existing padded allocations. Zero new allocation warnings/game actions.
-  Ordinary BF16 driver casts use RTZ; Meganeura rounds RNE on GPU. Connected
-  follow-upf979fa9 qualifies explicit dense/pointwise storage and matrix backward:
-  18 reduced-gradient cases,32 finite synthetic Adam updates, one further guard,
-  zero allocation warnings. [Dense learner integration now qualifies](docs/results/2026-10-12-bf16-learner.md):
-  Meganeura679ea87/Bladeb52965b/Naga forkc9fd6a85a; explicit `bf16_dense` across
-  all five learner sessions, Auto default/live acting unchanged. Full CDP
-  161.49->149.55ms (7.40%), RGB71.33->66.47ms (6.81%); world training regresses.
-  Convolution/grouped products/general storage coverage remain F32 and unfinished.
-  Pinned repeat preserves272 reports/first targets/all346 or292 tensors from
-  the tiled fixture exactly; six guards/one warning. Fresh JAX RGB FP32/BF16
-  24.35/12.42ms leaves a2.73x/5.35x gap. Synthetic finite updates are not learning.
-  PR250 CI953/958 fail a Metal search-deadline assertion;955 for679ea87 passes.
-  The behavior-equivalent deterministic test repairb0ba23c passes CI960.
-  Initial complete-submission traces still miss intermediate chunks; the
-  timing-only repair qualifies all four chunks, exact272 reports/346 tensors,
-  three guards/no warnings. Its waits add~2.7% diagnostic wall time; recorded
-  world GPU intervals52.80/57.86ms confirm the BF16 regression, not SM utilization.
-  Ordinary timing-disabled execution is unchanged. Full wgpu xtask lacks cargo-nextest;
-  scoped Naga/Blade checks pass. Historical ordinary GPU profile fields describe only the last
-  submission (world uses four), not total GPU time; corrected labels preserve
-  raw evidence. First round:18 guards pass/two warnings; BF16 totals above are
-  separate. Zero game actions; training stays
-  stopped. This first round has no useful convolution win or native/JAX gap closure claim;
-  the separate hardware-row result below subsequently qualifies a small win.
-- **Complete convolution attribution also rejects promotion:** [result](docs/results/2026-10-12-convolution-attribution.md).
-  Unchanged PR248 on7ba39d8 selects3/7 cooperative gradients but CDP161.31→161.48ms,
-  RGB71.11→72.82ms. Complete world GPU intervals52.93→52.81ms; no large saving
-  hidden by CPU overhead. All seven guards/finite reports/exact initial and
-  trace-versus-ordinary tensors pass, zero warnings/game actions. Kernel-level
-  discrepancy remains unresolved. BF16 Auto fallback check passes four guards
-  but CDP149.26→150.38ms regresses; RGB66.45→64.32ms improves. Keep NativeF32,
-  no per-game precision policy. The separate convolution check below fixes only
-  the overly conservative hardware-row alignment gate; no shader sweep.
-- **Hardware-row convolution improvement qualifies:** [result](docs/results/2026-10-12-convolution-subtiles.md),
-  PR252/9e02edd, integration6698592. Unchanged shaders admit48-channel batches:
-  CDP161.51→158.12ms/RGB71.58→70.06ms, about2.1%; CDP world56.54→54.49ms.
-  Independent forward/input F64 checks pass on integration and standalone main;
-  exact initials/finite272-report updates pass. Seven passing guards/one warning,
-  zero game actions. Original broader unsplit scalar weight-gradient pointwise
-  failure reproduces exactly on unchanged control and remains a failed guard;
-  no tolerance relaxation or universal gradient qualification. Keep for final
-  integration, not yet pinned; PR248 stays unadopted. Mixed world coverage/final
-  stack remain open. Only the user merges; games remain stopped.
+- **Combined backend qualifies:** [result](docs/results/2026-10-12-backend-integration.md).
+  CDP12M/B32 F16→mixed161.32→135.17ms (16.21% less time); RGB12M/B8
+  F16→BF1672.69→61.15ms (15.88%). Same native workloads/initials,16+256 updates,
+  not additive isolated gains or learning/time-to-score evidence. Fresh JAX
+  RGB FP32/highest24.29ms/BF1612.47ms leaves native2.52x/4.90x slower; different
+  weights/RNG/graphs. World training and imagination are now about40% each of
+  CDP. No SM-utilization or universal memory-saving claim.
+  Meganeurad68f1a5 combines BF16PR250/fd9608f, row addressingPR249 and
+  hardware-row selectionPR252 on current maineb8c90f; Blade663afd2 is on
+  main7909fc1; Naga forkc9fd6a85a was committed with explicit permission.
+  Git pins only, both locks agree, no merge commits or upstream wgpu PR.
+  All ten final guards pass/three allocation warnings retained; independent
+  CPU audit passes in4.767s. Exact initial346/292 tensors,272 finite reports/
+  targets/checkpoints; old controls exactly reproduce their previous fixtures.
+  New RGB retains exact preceding BF16 metrics/tensors; new CDP's first imagined
+  targets match, but its F16 alignment change alters the later trajectory.
+  Thirteen backend/14 Kindle CPU checks, Clippy and193 installed-binding
+  runner tests pass. Upstream CI965/966/961, Blade1172 and all Kindle runtime
+  CI355 jobs pass. Native83a9227f, Pythonf2f7b999. No GPU worker remains.
+- **Precision decision:** `mixed` keeps BF16 posterior/imagination/behavior and
+  the measured faster F16-input/F32-storage CDP world-gradient path. RGB's
+  `bf16` also reduces forward convolution storage. F32 masters/optimizer/
+  reductions remain; convolution derivatives/grouped products are not all BF16.
+  [Convolution storage](docs/results/2026-10-12-bf16-convolution.md) and
+  [fixed mixed-stage](docs/results/2026-10-12-mixed-world-precision.md) reports
+  preserve the isolated decisions. Auto default/live acting stay unchanged;
+  obsolete `bf16_dense` CLI support is removed, historical evidence retained.
+  Broader CDP world/backward reduced storage and JAX's speed remain open.
+  No new precision sweep or automatic learning campaign.
+- **Failures/limits retained:** [PR248 attribution](docs/results/2026-10-12-convolution-attribution.md)
+  rejects the isolated-fast convolution weight-gradient candidate twice on
+  complete updates; keep it unadopted. [Hardware-row checks](docs/results/2026-10-12-convolution-subtiles.md)
+  qualify forward/input gradients, not the unchanged scalar weight-oracle failure
+  reproduced on control. [BF16 foundations](docs/results/2026-10-11-native-bf16.md)
+  and [dense integration](docs/results/2026-10-12-bf16-learner.md) retain odd-clear,
+  coverage and CI timing-test failures. Timing-only harvesting now captures all
+  four world submissions with~2.7% diagnostic overhead; ordinary GPU fields
+  remain last-submission-only, not SM utilization. Full wgpu xtask lacks
+  cargo-nextest; scoped Naga checks pass. Final CPU preparation's invalid-CLI
+  fixture resets eight ALE environments before rejection, no actor/update,
+  setup frames unrecorded; repaired tests prohibit environment construction.
+  Missing service PATH and audit-field failures remain with their corrections.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX
   profile and artifact cleanup. Optimize one5080 learner before concurrent seeds
@@ -524,7 +513,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   user-accepted stretch target. MinAtar's three-seed screen takes 8m18s but weak
   scores do not establish competence. It is a separate CPU-environment/small
   public-observation recipe, not the CDP Atari control.
-- Current qualified CDP/RGB backend: Meganeura main `2c42b448`, Blade `56f0565`,
+- Historical pre-performance production backend: Meganeura main `2c42b448`, Blade `56f0565`,
   native `0f26ee63`; the [October11 ordinary refresh](docs/results/2026-10-11-cdp-measured-build.md)
   qualifies unchanged graphs without speedup. Its measured-construction trial
   fails and is not adopted. Historical `31026833`/`7311547d` retains the Qbert2M
