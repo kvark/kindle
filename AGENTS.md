@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Nsight root-cause investigation before further optimization:** follow the
+  [bounded study](docs/experiments/2026-10-12-nsight-root-cause.md). Compare warmed
+  native Vulkan and JAX CUDA timelines, capture overhead and actual work, not
+  another speculative kernel change. No game training. Keep the qualified
+  runtime and all earlier failures; ordinary timing remains separate from
+  instrumented intervals. [Partial result](docs/results/2026-10-12-nsight-root-cause.md):
+  JAX3,429 kernels/9.897ms summed GPU time; native6,570 pipeline binds and a
+  separately recomputed posterior. Native Systems2025.5/2026.5 timestamps are
+  stale/missing and rejected. Graphics connects but requires admin counter
+  access; bounded privileged capture prepared, not executed. Nine native/two
+  JAX targets complete with available prefix/tensor controls, no game actions.
+  Full attribution remains open; no GPU worker or recovery. Never change/reload
+  the driver to obtain counters without approval.
 - **Backend performance before more Kindle training:** follow the
   [implementation plan](docs/backend_training_performance_plan.md): cooperative
   convolution weight gradients, actual mixed-precision storage/execution

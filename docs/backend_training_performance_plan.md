@@ -14,6 +14,15 @@ integrated; no claim of reaching JAX, full-BF16 CDP world training, or faster
 learning to a score. The final CPU/GPU audit and all runtime CI355 jobs pass.
 This bounded round is complete; the wider performance target remains open.
 
+**Current work: [Nsight root-cause investigation](results/2026-10-12-nsight-root-cause.md).**
+JAX BF16 captures3,429 kernels/9.897ms summed GPU duration per update; native
+records6,570 pipeline binds and repeats posterior forward work. Backward
+precision and host/device residency differ. Native Systems GPU timestamps fail
+consistency checks, including2026.5.1; no native utilization/kernel attribution.
+Graphics attaches but needs admin counter access. A bounded privileged capture
+is prepared, not executed. Finish attribution before another optimization;
+no new learning allocation.
+
 ## Starting point
 
 The [measured baseline](results/2026-10-11-cdp-performance.md) uses Meganeura

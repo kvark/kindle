@@ -4,6 +4,50 @@
 use super::*;
 use std::collections::BTreeMap;
 
+/// Optional test-harness annotations, independent of GPU timestamps/barriers.
+struct Nvtx {
+    _library: libloading::Library,
+    push: unsafe extern "C" fn(*const std::ffi::c_char) -> i32,
+    pop: unsafe extern "C" fn() -> i32,
+}
+
+impl Nvtx {
+    fn from_env() -> Option<Self> {
+        std::env::var_os("KINDLE_DREAMER_NVTX")?;
+        // SAFETY: the requested NVIDIA library exports these documented C APIs.
+        // Retain it for the lifetime of every function pointer and range guard.
+        unsafe {
+            let library = libloading::Library::new("libnvToolsExt.so.1").unwrap();
+            let push = *library.get(b"nvtxRangePushA\0").unwrap();
+            let pop = *library.get(b"nvtxRangePop\0").unwrap();
+            Some(Self {
+                _library: library,
+                push,
+                pop,
+            })
+        }
+    }
+
+    fn range(&self, name: &std::ffi::CStr) -> NvtxRange<'_> {
+        // SAFETY: name is terminated and lives through this synchronous call.
+        unsafe {
+            (self.push)(name.as_ptr());
+        }
+        NvtxRange(self)
+    }
+}
+
+struct NvtxRange<'a>(&'a Nvtx);
+
+impl Drop for NvtxRange<'_> {
+    fn drop(&mut self) {
+        // SAFETY: every guard balances its own push, before the library closes.
+        unsafe {
+            (self.0.pop)();
+        }
+    }
+}
+
 fn save_json(path: &Path, value: &impl serde::Serialize) {
     let file = std::fs::OpenOptions::new()
         .write(true)
@@ -325,6 +369,8 @@ fn restore_profile_core(source: &std::path::Path) -> DreamerCore {
 #[test]
 #[ignore = "ordinary synthetic full-update timing; no environment or replay resume"]
 fn time_fixed_batch_checkpoint() {
+    let nvtx = Nvtx::from_env();
+    let range = |name| nvtx.as_ref().map(|nvtx| nvtx.range(name));
     let source = std::env::var_os("KINDLE_DREAMER_PROFILE_SOURCE").unwrap();
     let root = std::path::PathBuf::from(std::env::var_os("KINDLE_DREAMER_PROFILE_DIR").unwrap());
     std::fs::create_dir(&root).unwrap();
@@ -421,6 +467,21 @@ fn time_fixed_batch_checkpoint() {
         }
     }
     save_json(&root.join("precision-plans.json"), &precision_plans);
+    if nvtx.is_some() {
+        for (name, session) in [
+            ("posterior", &core.world_posterior),
+            ("imagination", &core.imagination),
+            ("world_gradient", &core.world_train),
+            ("behavior_gradient", &core.behavior_train),
+            ("slow_value", &core.behavior_slow),
+        ] {
+            save_json(&root.join(format!("{name}-plan.json")), session.plan());
+            save_json(
+                &root.join(format!("{name}-pipelines.json")),
+                &session.dispatch_pipeline_keys(),
+            );
+        }
+    }
     let matrices = &core.gpu.capabilities().cooperative_matrix;
     save_json(
         &root.join("matrix-capabilities.json"),
@@ -434,9 +495,18 @@ fn time_fixed_batch_checkpoint() {
     let initial_step = core.learner_step;
     let mut rng = StdRng::seed_from_u64(701);
     const WARMUP: usize = 16;
-    const MEASURED: usize = 256;
-    let mut reports = Vec::with_capacity(WARMUP + MEASURED);
-    for step in 0..WARMUP + MEASURED {
+    const CAPTURED: usize = 8;
+    let measured = if std::env::var_os("KINDLE_DREAMER_PROFILE_SHORT").is_some() {
+        CAPTURED
+    } else {
+        256
+    };
+    let mut capture = None;
+    let mut reports = Vec::with_capacity(WARMUP + measured);
+    for step in 0..WARMUP + measured {
+        if step == WARMUP {
+            capture = range(c"kindle-profile");
+        }
         // Fixture generation and diagnostic exports are outside the timer.
         // All production update stages, parameter syncs and slow EMA are inside.
         let batch = fixture(&config, &mut rng);
@@ -446,22 +516,35 @@ fn time_fixed_batch_checkpoint() {
             }
         };
         mark("start");
+        let update_range = range(c"update");
         let start = std::time::Instant::now();
+        let stage_range = range(c"posterior");
         let posterior = core.sample_posterior_batch(&batch);
+        drop(stage_range);
         let after_posterior = start.elapsed().as_secs_f64() * 1000.0;
         mark("posterior");
+        let stage_range = range(c"imagination_and_targets");
         let targets = core.imagine_and_target(&batch, &posterior);
+        drop(stage_range);
         let after_imagination = start.elapsed().as_secs_f64() * 1000.0;
         mark("imagination");
+        let stage_range = range(c"world_train_and_sync");
         let world = core.train_world(&batch, &posterior, &targets);
         core.sync_world_inference();
+        drop(stage_range);
         let after_world = start.elapsed().as_secs_f64() * 1000.0;
         mark("world");
+        let stage_range = range(c"behavior_train_and_sync");
         let behavior = core.train_behavior(&targets);
         core.sync_behavior_inference();
+        drop(stage_range);
         core.learner_step += 1;
         let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+        drop(update_range);
         mark("end");
+        if step + 1 == WARMUP + CAPTURED {
+            drop(capture.take());
+        }
         assert!(world.total_loss.is_finite() && behavior.total_loss.is_finite());
         reports.push(serde_json::json!({
             "step": step, "elapsed_ms": elapsed_ms, "world": world, "behavior": behavior,
@@ -489,7 +572,7 @@ fn time_fixed_batch_checkpoint() {
             checkpoint(&mut core, &root.join("first"));
         }
     }
-    assert_eq!(core.learner_step - initial_step, (WARMUP + MEASURED) as u64);
+    assert_eq!(core.learner_step - initial_step, (WARMUP + measured) as u64);
     checkpoint(&mut core, &root.join("final"));
     check_device(&core);
     let final_memory = core.gpu_memory_budget();
@@ -497,15 +580,16 @@ fn time_fixed_batch_checkpoint() {
         .iter()
         .map(|row| row["elapsed_ms"].as_f64().unwrap())
         .sum::<f64>()
-        / MEASURED as f64;
+        / measured as f64;
     if trace {
         meganeura::profiler::save(root.join("update.pftrace")).unwrap();
     }
     save_json(
         &root.join("result.json"),
         &serde_json::json!({
-            "status": "complete", "warmup_updates": WARMUP, "measured_updates": MEASURED,
+            "status": "complete", "warmup_updates": WARMUP, "measured_updates": measured,
             "gpu_trace": trace,
+            "nvtx_capture_updates": if nvtx.is_some() { CAPTURED } else { 0 },
             "initial_step": initial_step, "final_step": core.learner_step,
             "mean_update_ms": mean_ms, "reports": reports,
             "meganeura_revision": super::super::MEGANEURA_REV,
@@ -514,7 +598,7 @@ fn time_fixed_batch_checkpoint() {
                 .min(final_memory.budget_bytes - final_memory.usage_bytes),
         }),
     );
-    eprintln!("ordinary full updates: {MEASURED} measured, {WARMUP} warmup, {mean_ms:.3}ms mean");
+    eprintln!("full updates: {measured} measured, {WARMUP} warmup, {mean_ms:.3}ms mean");
 }
 
 #[test]

@@ -1,10 +1,12 @@
 """Bounded resident-batch DreamerV3 timing; no gameplay or learning-quality claim.
 
-Use the pinned upstream Python environment. Profiles are captured after ordinary
-timing, with explicit device completion so asynchronous dispatch is not speed.
+Use the pinned upstream Python environment, with explicit device completion so
+asynchronous dispatch is not speed. JAX profiles use extra updates; external
+Nsight capture instruments eight warmed updates and is not ordinary timing.
 """
 
 import argparse
+import ctypes
 import hashlib
 import json
 from pathlib import Path
@@ -24,9 +26,17 @@ def main():
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--compute-dtype", choices=("float32", "bfloat16"), default="float32")
     parser.add_argument("--profile", action="store_true")
+    parser.add_argument("--nvtx-profile", action="store_true",
+                        help="mark eight warmed updates for external Nsight capture")
     args = parser.parse_args()
     if args.batch_size not in (8, 16, 32):
         parser.error("bounded benchmark supports B8/B16/B32")
+    nvtx = ctypes.CDLL("libnvToolsExt.so.1") if args.nvtx_profile else None
+    if nvtx is not None:
+        nvtx.nvtxRangePushA.argtypes = [ctypes.c_char_p]
+        nvtx.nvtxRangePushA.restype = ctypes.c_int
+        nvtx.nvtxRangePop.argtypes = []
+        nvtx.nvtxRangePop.restype = ctypes.c_int
     validate_source(args.source)
     args.output.mkdir(parents=True, exist_ok=False)
     sys.path.insert(0, str(args.source))
@@ -90,7 +100,15 @@ def main():
 
     try:
         for index in range(16 + 256):
+            if nvtx is not None:
+                if index == 16:
+                    nvtx.nvtxRangePushA(b"kindle-profile")
+                nvtx.nvtxRangePushA(b"update")
             elapsed_ms = update(index)
+            if nvtx is not None:
+                nvtx.nvtxRangePop()
+                if index == 23:
+                    nvtx.nvtxRangePop()
             if index >= 16:
                 durations.append(elapsed_ms)
         budget.check("timed", agent)
@@ -101,11 +119,13 @@ def main():
             construction_seconds=construction_seconds, warmup_updates=16, measured_updates=256,
             consumes_policy_sync_each_update=True,
             profile_updates=0, mean_update_ms=statistics.mean(durations),
+            nvtx_capture_updates=8 if args.nvtx_profile else 0,
             median_update_ms=statistics.median(durations), update_ms=durations,
             minimum_sampled_headroom_bytes=budget.minimum_headroom, game_actions=0,
             limits=["RGB DreamerV3, no CDP or exploration ensemble", "resident synthetic batch; no replay sampling",
                     "not identical native weights, RNG or initial recurrent states; throughput, not numerical parity",
-                    "profile updates excluded from ordinary timing; not a learning result or SM-utilization metric"])
+                    "JAX profile updates excluded from timing; NVTX/Nsight captures instrument eight timed updates",
+                    "not a learning result or SM-utilization metric"])
         def save_result():
             (args.output / "result.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
         save_result()

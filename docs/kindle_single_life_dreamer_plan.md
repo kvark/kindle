@@ -8,6 +8,10 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The latest [Nsight investigation](results/2026-10-12-nsight-root-cause.md) has a
+valid JAX kernel capture, but native kernel/SM attribution remains open pending
+privileged Graphics counter access; Systems native timestamps are rejected.
+No new optimization or game training is started on that incomplete evidence.
 The user prioritizes all three remaining opportunities before more Kindle
 training: cooperative convolution weight gradients, real mixed precision /
 BF16 where supported, then measured fusion/layout/dispatch improvements.
