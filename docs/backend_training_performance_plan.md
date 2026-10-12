@@ -38,6 +38,10 @@ declaration and artifacts; do not resume a checkpoint as the same lifetime.
   this: CDP161.31→161.48, RGB71.11→72.82 ms; world GPU intervals52.93→52.81 ms.
   Selection passes; the isolated gain is not hidden by CPU overhead. The
   kernel-level cause remains unresolved; do not promote or sweep this candidate.
+  A separate [hardware-row alignment fix](results/2026-10-12-convolution-subtiles.md),
+  [PR252](https://github.com/kvark/meganeura/pull/252), now qualifies a useful
+  CDP161.51→158.12 ms/RGB71.58→70.06 ms improvement. No new shader; forward/input
+  oracles pass. Its broader unchanged scalar weight-oracle failure stays explicit.
 - Layout: [Meganeura PR249](https://github.com/kvark/meganeura/pull/249)
   removes repeated action copies. CDP161.40→157.30 ms, about1.05 GiB less
   imagination allocation, exact272 reports/final tensors. Ready for review;
@@ -154,8 +158,9 @@ a driver change, CPU emulation or an isolated cast benchmark for this deliverabl
 - [x] Preserve the old controls and stop the current learning service.
 - [x] Recheck both upstreams; use an isolated Meganeura worktree to preserve
   neighboring user changes. Only the user merges upstream PRs.
-- [ ] Qualify a useful complete-update convolution improvement (draft implemented;
-  numerical checks pass, whole-update speed acceptance not met).
+- [x] Qualify a useful complete-update convolution improvement: hardware-row
+  selectionPR252 passes scoped checks and both full-update timings. PR248 stays
+  unadopted; the retained unrelated weight-oracle failure is not erased.
 - [x] Establish BF16 capability and qualify native compiler/storage/matrix primitives.
 - [x] Select BF16 dense regions across learner sessions and qualify complete updates.
 - [ ] Extend useful reduced storage through the measured world-training bottleneck;

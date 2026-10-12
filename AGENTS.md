@@ -38,7 +38,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Pinned repeat preserves272 reports/first targets/all346 or292 tensors from
   the tiled fixture exactly; six guards/one warning. Fresh JAX RGB FP32/BF16
   24.35/12.42ms leaves a2.73x/5.35x gap. Synthetic finite updates are not learning.
-  PR250 CI953 fails a Metal search-deadline assertion;955 for679ea87 passes.
+  PR250 CI953/958 fail a Metal search-deadline assertion;955 for679ea87 passes.
+  The behavior-equivalent deterministic test repairb0ba23c passes CI960.
   Initial complete-submission traces still miss intermediate chunks; the
   timing-only repair qualifies all four chunks, exact272 reports/346 tensors,
   three guards/no warnings. Its waits add~2.7% diagnostic wall time; recorded
@@ -48,7 +49,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   submission (world uses four), not total GPU time; corrected labels preserve
   raw evidence. First round:18 guards pass/two warnings; BF16 totals above are
   separate. Zero game actions; training stays
-  stopped. No useful convolution win or native/JAX gap closure claim.
+  stopped. This first round has no useful convolution win or native/JAX gap closure claim;
+  the separate hardware-row result below subsequently qualifies a small win.
 - **Complete convolution attribution also rejects promotion:** [result](docs/results/2026-10-12-convolution-attribution.md).
   Unchanged PR248 on7ba39d8 selects3/7 cooperative gradients but CDP161.31→161.48ms,
   RGB71.11→72.82ms. Complete world GPU intervals52.93→52.81ms; no large saving
@@ -56,8 +58,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   trace-versus-ordinary tensors pass, zero warnings/game actions. Kernel-level
   discrepancy remains unresolved. BF16 Auto fallback check passes four guards
   but CDP149.26→150.38ms regresses; RGB66.45→64.32ms improves. Keep NativeF32,
-  no per-game precision policy. The next declared convolution check fixes only
+  no per-game precision policy. The separate convolution check below fixes only
   the overly conservative hardware-row alignment gate; no shader sweep.
+- **Hardware-row convolution improvement qualifies:** [result](docs/results/2026-10-12-convolution-subtiles.md),
+  PR252/9e02edd, integration6698592. Unchanged shaders admit48-channel batches:
+  CDP161.51→158.12ms/RGB71.58→70.06ms, about2.1%; CDP world56.54→54.49ms.
+  Independent forward/input F64 checks pass on integration and standalone main;
+  exact initials/finite272-report updates pass. Seven passing guards/one warning,
+  zero game actions. Original broader unsplit scalar weight-gradient pointwise
+  failure reproduces exactly on unchanged control and remains a failed guard;
+  no tolerance relaxation or universal gradient qualification. Keep for final
+  integration, not yet pinned; PR248 stays unadopted. Mixed world coverage/final
+  stack remain open. Only the user merges; games remain stopped.
 - **October11 performance pivot:** the user authorizes upstream refresh,
   reduced-precision training, cheaper exploration, wider batches, a native/JAX
   profile and artifact cleanup. Optimize one5080 learner before concurrent seeds

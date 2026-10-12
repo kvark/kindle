@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 11, 2026. This is the authoritative roadmap.
+Updated October 12, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -16,8 +16,11 @@ learner; the partial checkpoint remains. No completed learner, later arm or
 frozen cohort. Synthetic backend qualification continues, not game training.
 The [first backend round](results/2026-10-11-backend-training-performance.md)
 qualifies repeated-row addressing (2.54% lower CDP update latency and1.05 GiB
-less imagination allocation); the convolution candidate has no whole-update
-gain and stays draft. [Native BF16 dense learning](results/2026-10-12-bf16-learner.md)
+less imagination allocation); the weight-gradient candidate has no whole-update
+gain and stays draft. A separate [convolution selection correction](results/2026-10-12-convolution-subtiles.md)
+now lowers both CDP and RGB complete updates about2.1%, with no shader change.
+It qualifies forward/input gradients; a reproduced unchanged scalar weight-gradient
+oracle failure remains disclosed. [Native BF16 dense learning](results/2026-10-12-bf16-learner.md)
 now qualifies complete updates: CDP161.49->149.55ms (7.40%),
 RGB71.33->66.47ms (6.81%). Auto remains default; convolution/grouped products,
 masters/optimizer and sensitive reductions stay F32. World training regresses,
