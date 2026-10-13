@@ -33,6 +33,11 @@ layout/iterator and data-reuse causes directly: two controlled CUDA-twin pairs
 reach629→343µs, then348→211µs, including packing and exact outputs. Executed
 instructions fall84% and tensor activity rises while occupancy falls. Native
 integration/full updates, not more microbenchmarks, are now the next proof.
+That [native port](2026-10-13-native-conv-layout.md) improves complete RGB
+51.525→49.647ms and CDP118.212→115.548ms including packing: useful, but still
+4.00× JAX for RGB. Training derivatives/grouped work and connected graph
+execution remain; forward-only tuning ends. First categorical samples/later
+trajectories differ, and the separate backward prototype is not stacked here.
 
 ## 1. The same simple kernel stays slow under CUDA
 

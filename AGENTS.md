@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Native forward-layout transfer measured, wider goal active:** [result](docs/results/2026-10-13-native-conv-layout.md).
+  Shared typed tiled family now packs channels/hoists coordinates/reuses64×64
+  tiles; every activation/filter pack included. Complete RGB51.525→49.647ms
+  (3.65%), CDP118.212→115.548ms (2.25%); RGB still4.00× retained JAX. CDP's
+  mixed world stage46.92ms is unchanged. Eight guards, one retained numerical
+  failure, one warning;1,088 synthetic updates/zero game actions. The original
+  forward control reproduces both unsplit F32-gradient failures exactly;
+  existing eight-partition numerical tests pass unchanged F64 gates, no learner
+  split change. Exact initials/finite272 reports, but categorical samples and
+  later states differ; no learning parity. Candidate isolated, production pins
+  unchanged; no worker remains. Stop forward-only tuning. Next extend efficient
+  training/grouped layouts, then staged posterior→targets→backward reuse with
+  safe activation lifetimes; world loss needs imagination targets, so simply
+  reordering train_world is not equivalent. No Atari restart or goal closure.
+
 - **Convolution algorithm cause demonstrated:** [result](docs/results/2026-10-13-conv-kernel-cause.md).
   Matched CUDA-twin layout/iterator629.39→342.67µs and reuse347.64→211.16µs
   include packing every call; all6,291,456 native/F64-fixture outputs exact.

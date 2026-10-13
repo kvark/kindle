@@ -42,6 +42,18 @@ speedups. **End this micro-study; implement layout/iterator/reuse within the
 shared native type-aware family and verify complete updates.** Training-gradient
 and grouped layouts must benefit too; no additional tile sweep or CUDA backend.
 
+The [native forward-layout port](results/2026-10-13-native-conv-layout.md)
+now measures RGB51.525→49.647ms (3.65%) and CDP118.212→115.548ms (2.25%),
+including every activation/filter pack. Shared dense control, eight passing
+guards, exact initials and finite272-update fixtures; reordered forward sums
+change categorical samples and later trajectories. A retained unsplit strict-F32
+gradient failure is identical in the original control; existing partitioning
+passes unchanged F64 gates in both numerical-test arms, without learner changes.
+Production is unchanged. **Stop forward-only tuning:** RGB remains4.00× JAX;
+carry efficient layouts/reuse through derivatives and grouped products, then
+staged posterior/target/backward execution. CDP's46.92ms mixed world stage is
+untouched by this BF16-forward change. Do not add separate prototype savings.
+
 1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
    shared checked32×32 loop does not inherit the larger vector-loaded,
    padded/prefetched cooperative path, which is F32-specific and unavailable
@@ -61,6 +73,15 @@ and grouped layouts must benefit too; no additional tile sweep or CUDA backend.
    fuse layout/cast/pointwise intermediates. Keep safe lifetime/barrier rules
    and the current useful four-chunk scheduling until a measured replacement
    exists. Fewer submissions alone previously regressed.
+
+Posterior reuse is a graph-lifetime change, not a call-order tweak. The world
+loss consumes replay-value targets produced after imagination (and optionally
+actor/critic targets). Preserve forward activations across
+posterior → imagination/targets → world backward, with optimizer writes only
+after consumers of the old weights finish. The current whole-session API and
+separate compiled graphs cannot supply that reuse merely by moving
+`train_world` earlier. A staged execution boundary must also protect saved
+activations from buffer reuse and retain microbatch/BPTT semantics.
 
 The test contract is complete RGB/CDP updates plus format-appropriate independent
 numerics; use the retained same-algorithm/kernel controls to distinguish
