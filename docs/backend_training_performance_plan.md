@@ -9,9 +9,11 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 **The gap is fundamental execution design, not just a missing BF16 flag.**
-The [latest isolated candidate](results/2026-10-13-staged-world.md)
-reduces complete RGB12M/B8 updates39.392→33.681ms (14.50%), but is still2.71×
-retained JAX12.417ms. Production remains on its qualified~53ms runtime; the
+The [latest isolated candidate](results/2026-10-13-row-fusion.md) adds general
+typed row fusion to staged world execution: RGB33.684→32.848ms (2.48%) and
+Mixed CDP111.023→105.172ms (5.27%). RGB remains2.65× retained JAX12.417ms.
+All272 reports/first outputs/292 or346 saved tensors match in these fixtures.
+Production remains on its qualified~53ms runtime; the
 combined diagnostic has not changed installed pins/defaults or resumed Atari.
 
 The [current residual investigation](results/2026-10-13-residual-gap.md)
@@ -23,7 +25,7 @@ drop dependencies. Coarse complete-pass accounting is23.918ms GPU intervals+
 11.748ms uncovered, with a separately measured one-chunk schedule. Native still
 has convolution/matrix excess; full BF16 coverage is not execution efficiency.
 
-| Current RGB comparison | Control | Candidate |
+| Earlier posterior-reuse comparison | Control | Candidate |
 | --- | ---: | ---: |
 | Full update |39.392ms|33.681ms|
 | Posterior + world work |25.695ms|20.189ms|
@@ -66,11 +68,13 @@ What the [causal investigation](results/2026-10-13-execution-gap.md) establishes
    intervention. The full performance goal is not complete. Imagination's
    1,070 groups/1,367 dispatches identify a deeply serialized graph; generated
    RMSNorm already exists, so do not misdiagnose absent normalization kernels.
-2. Compile recurring RSSM normalization/activation/layout work into fewer
-   general typed kernels, preserving rounding and backward saved values. Measure
-   removed groups/materializations and a complete ordinary update. Start with
-   that mechanism, not more tile searches or unsafe real-work barrier removal.
-   Command replay only addresses recording, not the demonstrated device cost.
+2. General typed row fusion now qualifies: RGB imagination groups1,070→854,
+   dispatches1,367→1,087; world groups1,433 unchanged. The modest full-update
+   gain bounds this particular change, not the entire fusion opportunity.
+   Inspect remaining layout/broadcast/cast and saved-value boundaries before
+   choosing the next coherent compiler change. Preserve rounding/backward
+   lifetimes; no tile sweep or unsafe real-work barrier removal. Command replay
+   only addresses recording, not the demonstrated device cost.
 3. Keep diagnostic posterior readbacks out of the target hot path, move
    slow-critic EMA/targets/RNG device-side, and remove unnecessary layout/cast/
    pointwise materializations. Posterior-to-imagination copies already stay on

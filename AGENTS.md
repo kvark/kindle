@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **General typed row fusion qualifies; the gap remains structural:**
+  [result](docs/results/2026-10-13-row-fusion.md). Complete RGB33.684→32.848ms
+  (2.48%), Mixed CDP111.023→105.172ms (5.27%); RGB still2.65× retained JAX.
+  All272 reports/first outputs/292 or346 saved tensors match exactly; matrix/
+  convolution descriptors and geometry unchanged. RGB imagination groups
+  1,070→854, world1,433 unchanged: row-local fusion does not solve the full
+  materialization/backward/host-staging problem.84 GPU cases qualify with
+  explicit BF16 rounding-aware derivative checks, no tolerance-value changes;
+  both original ideal-F64 numerical failures reproduce unfused and remain.
+  Nine passing/two failed guards, two warnings,1,136 full synthetic updates,
+  zero actions/production changes/workers. CPU inventory OOM is repaired by
+  streaming, not a GPU issue. Next remaining layout/broadcast/cast/saved-value
+  boundaries and device targets/RNG/EMA; no tuning sweep, unsafe barrier
+  elision, Atari restart, additive savings promise or whole-goal completion.
+
 - **Residual gap attributed; synchronization is a substantial cause:**
   [result](docs/results/2026-10-13-residual-gap.md). Current staged RGB33.776ms
   versus retained JAX12.417ms,2.72×. Complete coarse trace23.918ms GPU-pass union/
