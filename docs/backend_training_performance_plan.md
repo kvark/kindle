@@ -54,6 +54,17 @@ carry efficient layouts/reuse through derivatives and grouped products, then
 staged posterior/target/backward execution. CDP's46.92ms mixed world stage is
 untouched by this BF16-forward change. Do not add separate prototype savings.
 
+The [grouped training path](results/2026-10-13-grouped-training.md) subsequently
+reduces complete RGB49.551→46.780ms (5.59%) and CDP115.519→111.105ms (3.82%).
+Both arms include the same dense/native-forward prototypes; the backward
+convolution candidate remains separate. Group-strided checked/tiled generation
+now covers explicit BF16 forward and both derivatives, with strict F32 retained.
+48 independent F64 cases/96 partials, production alias/poison checks and seven
+guards pass, zero warnings. Exact initials/finite updates, changed trajectories,
+no learning claim. RGB still3.77× JAX. **Next prioritize convolution training
+layouts/reuse, then staged graph/dataflow consolidation; no grouped tile sweep.**
+CDP's mixed world stage remains46.92ms. Production is unchanged.
+
 1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
    shared checked32×32 loop does not inherit the larger vector-loaded,
    padded/prefetched cooperative path, which is F32-specific and unavailable

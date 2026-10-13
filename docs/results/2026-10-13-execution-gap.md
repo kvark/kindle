@@ -38,6 +38,12 @@ That [native port](2026-10-13-native-conv-layout.md) improves complete RGB
 4.00× JAX for RGB. Training derivatives/grouped work and connected graph
 execution remain; forward-only tuning ends. First categorical samples/later
 trajectories differ, and the separate backward prototype is not stacked here.
+The subsequent [grouped training extension](2026-10-13-grouped-training.md)
+reaches RGB46.780ms/CDP111.105ms,5.59%/3.82% below its fresh native-forward
+control. All grouped shapes/convolution descriptors match;161 RGB grouped
+products now use BF16 and independent strict/reduced gradients pass. RGB is
+still3.77× JAX. Efficient convolution training and connected dataflow remain;
+these separate prototype savings must not be added.
 
 ## 1. The same simple kernel stays slow under CUDA
 

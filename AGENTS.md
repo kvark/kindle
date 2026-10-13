@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Grouped training path measured; full gap remains:** [result](docs/results/2026-10-13-grouped-training.md).
+  Existing block forward/derivatives now use shared typed checked/tiled kernels
+  under explicit BF16 policy; F32 masters/strict fallback retained. Complete
+  RGB49.551→46.780ms (5.59%), CDP115.519→111.105ms (3.82%). RGB still3.77× JAX.
+  Same dense/native-forward control; separate backward-convolution prototype
+  not stacked.48 F64 cases/96 partials, production alias/poison, seven guards
+  pass; zero warnings,1,088 synthetic updates/zero game actions. Group shapes
+  and convolution descriptors match; exact initials/finite states, changed
+  trajectories, no learning claim. CPU failures/cancelled patch retained.
+  No worker or production change. Next efficient convolution derivatives, then
+  staged posterior/targets/backward/device work; no grouped geometry sweep,
+  additive speed promise, Atari restart or whole-goal closure.
+
 - **Native forward-layout transfer measured, wider goal active:** [result](docs/results/2026-10-13-native-conv-layout.md).
   Shared typed tiled family now packs channels/hoists coordinates/reuses64×64
   tiles; every activation/filter pack included. Complete RGB51.525→49.647ms
