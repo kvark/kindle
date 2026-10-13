@@ -8,6 +8,19 @@ Updated October 13, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [execution-design diagnosis](results/2026-10-13-execution-gap.md) finds a
+fundamental implementation gap: basic kernels/incomplete training precision
+and fragmented learner dataflow versus optimized libraries/compiled device
+work. Directly translating our kernels to CUDA does not fix their substantial-
+kernel latency; matched cuBLAS products remain faster. JAX12.42ms becomes only
+22.78ms with our missing precision regions and command-buffer advantage removed,
+versus native~53ms. Current priority is efficient type-aware kernel families,
+grouped/backward reduced precision and connected learner dataflow—not a new
+dtype-specific shader, CUDA learner or more local tile tweaks. Latest compiler
+refresh brings no speedup; all changes remain diagnostic. No game restart or
+speed-parity claim. The earlier accounting located cost but did not establish
+complete causal closure; the new report retains its limitations and failures.
+
 The [typed cooperative matmul consolidation](results/2026-10-13-typed-matmul.md)
 qualifies: shared checked F32/F16/BF16 generation and typed partition tuning,
 with explicit storage/arithmetic and specialized algorithms retained. Complete
@@ -31,8 +44,8 @@ kernels are measured; repeated posterior work and CPU targets/EMA add overhead.
 The current operation-group accounting closes the full measured gap: graph
 costs17.32ms convolution/14.04ms matrix/6.84ms remaining plus5.89ms zero-work
 command stream match complete-update passes within0.014ms. Host work and
-profiling/boundary adjustments remain explicit. This is root-cause closure,
-not JAX speed parity, pure per-kernel timing or independently achievable savings.
+profiling/boundary adjustments remain explicit. This is cost accounting,
+not causal closure, JAX speed parity or independently achievable savings.
 Keep four-chunk scheduling and learning stopped; next address
 matrix launch geometry/coalescing and grouped precision alongside convolution
 derivatives and command-stream reduction, then posterior reuse/device residency.

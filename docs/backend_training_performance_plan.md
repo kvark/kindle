@@ -6,6 +6,50 @@ replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
+## Current diagnosis and implementation order
+
+The [execution-design investigation](results/2026-10-13-execution-gap.md)
+supersedes the earlier claim that operation-group accounting was sufficient
+root-cause closure. Native RGB remains~53ms versus JAX12.42ms. Handicapping
+JAX's backward/grouped precision and command buffers together raises it only
+to22.78ms. Translating our substantial BF16 kernels directly to CUDA leaves
+their times within roughly7% of Vulkan, while cuBLAS remains much faster on
+matched matrices. The issue is principally the algorithms and learner
+dataflow we implement, not model capacity or a blanket Vulkan limitation.
+
+1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
+   shared checked32×32 loop does not inherit the larger vector-loaded,
+   padded/prefetched cooperative path, which is F32-specific and unavailable
+   on5080's native-F32 capabilities. Use one type-aware algorithm family with
+   appropriate shape selection, data reuse and load/compute overlap. Retain
+   generic checked edges/fallbacks; do not assume one tile fits every shape.
+   Start with the actual dense/grouped workload, including CDP imagination.
+2. **Carry reduced precision through training.** Convolution derivatives and
+   grouped RSSM products still account for48.76% of nominal matrix/convolution
+   MACs in scalar F32. Extend efficient families to those operations and their
+   layouts; preserve F32 masters, accumulators/reductions and strict fallback.
+   A flag or a BF16 cast is not efficient execution. cuDNN's transformed
+   convolution algorithms explain part of its advantage, not a requirement
+   to add Winograd before a good direct tensor path.
+3. **Treat the learner as connected device work.** Reuse posterior outputs
+   during world differentiation, move RNG/targets/slow EMA onto device, and
+   fuse layout/cast/pointwise intermediates. Keep safe lifetime/barrier rules
+   and the current useful four-chunk scheduling until a measured replacement
+   exists. Fewer submissions alone previously regressed.
+
+The test contract is complete RGB/CDP updates plus format-appropriate independent
+numerics; use the retained same-algorithm/kernel controls to distinguish
+algorithm gains from compiler effects. Require a fresh declared learning/
+time-to-score comparison before training-default changes. No forecast made by
+adding isolated savings, no new Atari allocation or CUDA learner workaround.
+
+Negative evidence matters: K32→128 staging regressed7.48% RGB/6.79% CDP;
+coalescing alone saves only.70%/1.38%. Latest Blade/Naga changes are qualified
+in isolated controls with no speedup; production pins are unchanged. The
+implementation needs a better training path, not a prolonged local-tile sweep.
+
+## Retained qualified implementation boundaries
+
 **[Typed cooperative matmul consolidation qualifies](results/2026-10-13-typed-matmul.md).**
 One checked F32/F16/BF16 generator, explicit storage/multiply/output types and
 shared typed partition selection/search replace the BF16-only dense path.
@@ -31,7 +75,7 @@ imagination stage is unchanged. Next address remaining dense/grouped efficiency
 and reduced-precision derivatives; no tile sweep, repeated profiler campaign
 or Atari restart. PR31 tracks installation and CI.
 
-**Root-cause accounting complete: [full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
+**Historical operation-group accounting: [full JAX gap](results/2026-10-12-jax-gap-accounting.md).**
 Model size matches exactly; a same-executable input-transfer control explains
 only.262ms of the~44ms gap. Host preparation/targets/EMA matter, but measured
 GPU work dominates. Matched matrix cases show native grouped F32 loses even

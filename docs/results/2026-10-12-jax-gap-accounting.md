@@ -4,6 +4,11 @@ October12,2026. [Declaration](../experiments/2026-10-12-jax-gap-accounting.md)
 · [Data](2026-10-12-jax-gap-accounting.json)
 · [Backend plan](../backend_training_performance_plan.md).
 
+October13 clarification: this report closes operation-group **cost accounting**,
+not causal explanation of the kernel/algorithm gap. The user's follow-up
+[same-algorithm CUDA/Vulkan and JAX interventions](2026-10-13-execution-gap.md)
+establish that distinction without replacing the measurements below.
+
 **The model is not larger; our execution is less efficient.** Both RGB12M
 implementations have exactly **10,498,772 trainable parameters**, matching
 module totals, B8/T16/H15,2048 deterministic units,32×16 categorical state,

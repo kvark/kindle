@@ -11,6 +11,13 @@ is stopped at39,568 actions with no completed learner. October12's
 BF16 storage, row addressing and convolution selection: CDP161.32→135.17ms,
 RGB72.69→61.15ms. The large JAX gap and learning-quality check remain open;
 no game training or old lifetime resumes from these synthetic results.
+October13's [execution-design diagnosis](../results/2026-10-13-execution-gap.md)
+goes beyond cost buckets: same-algorithm CUDA/Vulkan controls, JAX precision/
+command-buffer interventions and matched library matrices locate algorithm and
+learner-dataflow differences. Native~53ms/JAX12.42ms remains open. New diagnostic
+code/pins are not adopted; negative staging/coalescing tests and all failures
+remain. Prioritize training-grade type-aware kernels and connected device work,
+not a CUDA rewrite or another local-tile sweep.
 The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
 costly scalar convolution gradients and matrix kernels. One isolated split-tile
 check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.
@@ -27,8 +34,8 @@ host preparation/targets and repeated posterior work add cost. Current native
 counterfactuals now close the operation-group accounting:17.32ms convolution,
 14.04ms matrix,6.84ms remaining and5.89ms zero-work command stream. Complete
 traces and explicit boundary adjustments reconcile the44.04ms ordinary gap;
-rejected per-dispatch sums and the0.434ms block residual remain. This is root-cause
-closure, not pure kernel timing, JAX speed parity or a new production change.
+rejected per-dispatch sums and the0.434ms block residual remain. This is cost
+accounting, not causal closure, JAX speed parity or a new production change.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).

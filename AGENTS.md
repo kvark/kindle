@@ -7,6 +7,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Execution-design diagnosis, not another cost bucket:**
+  [result](docs/results/2026-10-13-execution-gap.md). Native RGB~53ms/JAX12.42ms
+  remains open. JAX with F32 convolution derivatives/grouped products and no
+  command buffers takes22.78ms; both scheduling controls preserve all reports/
+  states.48.76% of nominal native matrix/convolution MACs remain scalar F32.
+  A direct same-algorithm CUDA translation reproduces substantial-kernel
+  slowness: native/CUDA convolution.668/.626ms, transposed matrix.168/.179ms
+  versus cuBLAS.070ms.6,981,632 exact outputs/512 F64 probes pass; this is not
+  identical instructions, timer boundaries or universal Vulkan qualification.
+  Library F32-output convolution promotes operands to F32 and is not a matched
+  BF16 control. The earlier operation-group accounting was not causal closure.
+  K128 staging regresses7.48%/6.79%; coalescing saves only.70%/1.38% RGB/CDP.
+  Latest Bladefe5f5b5/Nagaa4b4183 qualifies unchanged kernels with exact tensors
+  and no speedup; Meganeura main2214412's fix is already in056562b. Production
+  pins/defaults unchanged; all new code is isolated diagnostic work.
+  **Next:** generalize efficient tiled/prefetched algorithms across types and
+  training operations, not just the checked template; connect grouped/backward
+  reduced precision, then reuse posterior/device targets/EMA and fuse graph
+  materializations. No CUDA learner, local-tweak sweep or additive speed promise.
+  Thirty-five guards pass, two CPU graph-assertion guards fail, six allocation
+  warnings and corrected preparation/reporter failures remain.4,920 synthetic
+  updates, zero game actions; no worker or Atari restart. Whole-update speed
+  parity and learning/time-to-score remain unestablished.
 - **Typed cooperative matmul consolidation qualifies:**
   [result](docs/results/2026-10-13-typed-matmul.md),
   [Meganeura PR257](https://github.com/kvark/meganeura/pull/257), pin056562b.
