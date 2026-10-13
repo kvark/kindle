@@ -7,6 +7,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Residual gap attributed; synchronization is a substantial cause:**
+  [result](docs/results/2026-10-13-residual-gap.md). Current staged RGB33.776ms
+  versus retained JAX12.417ms,2.72×. Complete coarse trace23.918ms GPU-pass union/
+  11.748ms uncovered uses a separately timed single-chunk schedule, not ordinary
+  utilization. Six full272-update controls preserve every report/first output/
+  all292 saved tensors. Initial15-pass trace omitted four transfers; repaired
+  19-pass capture and all255 complete samples qualify, original/final tails stay.
+  Four-session masks restore exact outputs/states. Causal zero-work test keeps
+  all6,148 dispatches but removes2,551 dependency barriers:5.295→.274ms. This
+  5.021ms difference is not removable real-work latency; never remove dependency
+  barriers from real work. Eight guards, three warnings,1,634 synthetic updates,
+  zero actions/production changes/workers. Next general typed RSSM row-operation
+  fusion and device targets/RNG/EMA, not another tile sweep or mere command replay.
+  Imagination has1,070 groups/1,367 dispatches; generated RMSNorm is present.
+  Keep rounding/backward lifetimes and qualify full updates. Remaining algorithms
+  also matter; no additive savings, JAX parity or whole-goal closure.
+
 - **Staged world reuse measured; full performance goal stays active:**
   [result](docs/results/2026-10-13-staged-world.md). Single-pass BF16 retains
   posterior activations across imagination/late targets, then finishes backward.
@@ -16,8 +33,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   differences and later trajectories remain, not learning parity. Mixed CDP's
   differing forward precision prevents direct reuse: fallback111.040→111.212ms,
   exact272 reports/all346 saved tensors, no speedup. No staged video/truncated
-  qualification or production change. Next reattribute the current residual,
-  then device targets/RNG/EMA and materialization; no kernel sweep, additive
+  qualification or production change. Residual attribution above is complete;
+  next device targets/RNG/EMA and materialization; no kernel sweep, additive
   speedup forecast, Atari restart or whole-goal closure. Command-buffer replay
   alone is insufficient: retained JAX without it still takes16.163ms.
   Nine guards, four retained allocation warnings;1,136 full synthetic updates,

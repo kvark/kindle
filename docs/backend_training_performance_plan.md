@@ -14,6 +14,15 @@ reduces complete RGB12M/B8 updates39.392→33.681ms (14.50%), but is still2.71×
 retained JAX12.417ms. Production remains on its qualified~53ms runtime; the
 combined diagnostic has not changed installed pins/defaults or resumed Atari.
 
+The [current residual investigation](results/2026-10-13-residual-gap.md)
+refreshes ordinary timing at33.776ms,2.72× JAX. Its decisive new control keeps
+all6,148 zero-work dispatches but removes2,551 dependency barriers:
+5.295→.274ms. This5.021ms empty-work difference proves a substantial device-side
+synchronization cost; it is not removable real-work latency or permission to
+drop dependencies. Coarse complete-pass accounting is23.918ms GPU intervals+
+11.748ms uncovered, with a separately measured one-chunk schedule. Native still
+has convolution/matrix excess; full BF16 coverage is not execution efficiency.
+
 | Current RGB comparison | Control | Candidate |
 | --- | ---: | ---: |
 | Full update |39.392ms|33.681ms|
@@ -47,22 +56,29 @@ What the [causal investigation](results/2026-10-13-execution-gap.md) establishes
   behavior gradients. Redundant posterior work is now causally confirmed and
   removed on single-pass BF16. It still crosses the host for RNG, targets and
   EMA; thousands of dispatches/materializations remain. The retained
-  zero-work command stream costs5.89ms; this is not a removable pure-sync bucket
-  or an additive forecast for the new candidate.
+  old zero-work command stream cost5.89ms; the current5.295ms measurement above
+  supersedes it for the staged candidate. Neither is an additive savings forecast.
 
-**Next: attribute the residual and finish connected device execution.**
+**Next: reduce dependency/materialization boundaries and finish device execution.**
 
-1. Reattribute the remaining21.26ms against JAX on this actual candidate using
-   bounded nested host spans and safe Nsight capture paths. Old attribution
-   buckets are not current costs. Even the retained JAX no-command-buffer
-   control16.163ms is2.08× faster, so replaying command buffers alone cannot
-   explain the residual. No blanket Vulkan/compiler claim or kernel sweep.
-2. Keep diagnostic posterior readbacks out of the target hot path, move
+1. Residual attribution is complete at the declared scope: eight guards,
+   exact reports/states, full transfer coverage and a causal zero-work barrier
+   intervention. The full performance goal is not complete. Imagination's
+   1,070 groups/1,367 dispatches identify a deeply serialized graph; generated
+   RMSNorm already exists, so do not misdiagnose absent normalization kernels.
+2. Compile recurring RSSM normalization/activation/layout work into fewer
+   general typed kernels, preserving rounding and backward saved values. Measure
+   removed groups/materializations and a complete ordinary update. Start with
+   that mechanism, not more tile searches or unsafe real-work barrier removal.
+   Command replay only addresses recording, not the demonstrated device cost.
+3. Keep diagnostic posterior readbacks out of the target hot path, move
    slow-critic EMA/targets/RNG device-side, and remove unnecessary layout/cast/
    pointwise materializations. Posterior-to-imagination copies already stay on
    device; do not describe them as CPU copies. Preserve
    RNG streams and numerics first where possible, separating arithmetic changes.
-3. Qualify one bounded complete-update comparison, including all host/device
+   Current disjoint preparation/target/EMA intervals total5.248ms, including
+   EMA's device readback/wait; do not label the whole amount CPU computation.
+4. Qualify one bounded complete-update comparison, including all host/device
    costs and saved states. Keep useful four-chunk scheduling until a measured
    replacement exists; staged execution partitions that schedule proportionately.
    Fewer submissions alone previously regressed. Do not add
