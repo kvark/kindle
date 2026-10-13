@@ -7,20 +7,32 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **General typed row fusion qualifies; the gap remains structural:**
-  [result](docs/results/2026-10-13-row-fusion.md). Complete RGB33.684→32.848ms
-  (2.48%), Mixed CDP111.023→105.172ms (5.27%); RGB still2.65× retained JAX.
-  All272 reports/first outputs/292 or346 saved tensors match exactly; matrix/
-  convolution descriptors and geometry unchanged. RGB imagination groups
-  1,070→854, world1,433 unchanged: row-local fusion does not solve the full
-  materialization/backward/host-staging problem.84 GPU cases qualify with
-  explicit BF16 rounding-aware derivative checks, no tolerance-value changes;
-  both original ideal-F64 numerical failures reproduce unfused and remain.
-  Nine passing/two failed guards, two warnings,1,136 full synthetic updates,
-  zero actions/production changes/workers. CPU inventory OOM is repaired by
-  streaming, not a GPU issue. Next remaining layout/broadcast/cast/saved-value
-  boundaries and device targets/RNG/EMA; no tuning sweep, unsafe barrier
-  elision, Atari restart, additive savings promise or whole-goal completion.
+- **Device graph execution is a fundamental remaining advantage:**
+  [new causal controls](docs/results/2026-10-13-execution-boundaries.md).
+  Tiny dependent kernels cost~2.05µs on Vulkan and fully prequeued ordinary
+  CUDA,~.65µs on CUDA graphs. All3,168 completed counter checks pass; the first
+  large CUDA prequeue check hits its100ms CPU gate and stays failed, with a
+  separately reviewed shorter control passing the unchanged limit.
+  Graph execution accelerates device dependency processing, not merely CPU
+  recording; ordinary Vulkan command reuse has no demonstrated equivalent.
+  Current zero-work stream4.709ms is unchanged by access-mask weakening.
+  Real kernels always retain full barriers. Large kernels' near-API parity
+  does not contradict this small-dependent-work cost.
+  Latest wider-binding RGB32.864→32.103ms/CDP105.185→103.925ms saves only
+  2.32%/1.20%; RGB groups2,333→2,271.224 independent GPU cases pass, but full
+  trajectories change; near-zero LaProp moment sensitivity is retained, not
+  a proved driver fault or learning equivalence. Isolated, not promoted.
+  Fresh JAX core12.420ms/complete caller12.836ms leaves RGB2.50× slower.
+  Its metrics are returned one update late; the final pending metric record
+  was not drained, while all saved parameter/policy/carry receipts are finite.
+  Native CPU capture finds9.094ms on CPU/23.160ms off CPU, mostly sleeping
+  waits, with exact reports/states. Timings are not SM utilization.
+  Fourteen guards pass/two diagnostic failures/five allocation warnings remain;
+  1,953 full synthetic updates, zero actions/production changes/workers.
+  Upstream2214412/fe5f5b5 unchanged. Next general multi-output/backward row
+  fusion and safe views, then device RNG/targets/EMA; no tile/binding-cap sweep,
+  unsafe barrier elision, additive parity claim or Atari restart.
+  Broader root-cause/performance goal stays active.
 
 - **Residual gap attributed; synchronization is a substantial cause:**
   [result](docs/results/2026-10-13-residual-gap.md). Current staged RGB33.776ms

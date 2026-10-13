@@ -8,111 +8,89 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-**The gap is fundamental execution design, not just a missing BF16 flag.**
-The [latest isolated candidate](results/2026-10-13-row-fusion.md) adds general
-typed row fusion to staged world execution: RGB33.684→32.848ms (2.48%) and
-Mixed CDP111.023→105.172ms (5.27%). RGB remains2.65× retained JAX12.417ms.
-All272 reports/first outputs/292 or346 saved tensors match in these fixtures.
-Production remains on its qualified~53ms runtime; the
-combined diagnostic has not changed installed pins/defaults or resumed Atari.
+**The remaining gap includes a device-side execution-path difference, not
+merely CPU launch overhead.** The [new causal controls](results/2026-10-13-execution-boundaries.md)
+measure about 2.05µs per tiny dependent kernel on Vulkan **and ordinary
+prequeued CUDA**, versus 0.64–0.66µs on CUDA graphs. Same CUDA kernel/data,
+all work queued before GPU timing; 3,168 counters pass across the completed
+studies. The first large prequeue check fails its unchanged 100ms host-gate
+limit and remains failed; the reviewed shorter control passes.
 
-The [current residual investigation](results/2026-10-13-residual-gap.md)
-refreshes ordinary timing at33.776ms,2.72× JAX. Its decisive new control keeps
-all6,148 zero-work dispatches but removes2,551 dependency barriers:
-5.295→.274ms. This5.021ms empty-work difference proves a substantial device-side
-synchronization cost; it is not removable real-work latency or permission to
-drop dependencies. Coarse complete-pass accounting is23.918ms GPU intervals+
-11.748ms uncovered, with a separately measured one-chunk schedule. Native still
-has convolution/matrix excess; full BF16 coverage is not execution efficiency.
+CUDA graph execution therefore does more than avoid recording commands again.
+Ordinary Vulkan command-buffer reuse has not been shown to deliver its lower
+device dependency cost. Large-kernel CUDA translations previously stayed
+within roughly 7% of Vulkan: this is a small-dependent-work finding, not a
+blanket API penalty. No hardware mechanism or equivalent Vulkan extension
+has been established.
 
-| Earlier posterior-reuse comparison | Control | Candidate |
-| --- | ---: | ---: |
-| Full update |39.392ms|33.681ms|
-| Posterior + world work |25.695ms|20.189ms|
-| Nominal matrix/convolution MACs |95.074G|84.756G|
-| Dispatches |7,043|6,148|
+| Current whole-update boundary | Time |
+| --- | ---: |
+| Isolated native RGB12M/B8/BF16, wider fusion | 32.103ms |
+| Fresh JAX core, same model/batch size | 12.420ms |
+| JAX including caller seed/metric handling | 12.836ms |
+| Isolated native CDP12M/B32/mixed | 103.925ms |
 
-All nominal matrix/conv products remain BF16; scalar/optimizer/reduction work,
-packing/padding and utilization are not represented by these counts. The
-candidate retains the [qualified shared kernels](results/2026-10-13-conv-training-layout.md),
-but computes the posterior once and retains activations while imagination makes
-late targets. It removes10.319G duplicate MACs with unchanged remaining matrix/
-convolution descriptors. Initial tensors/first categoricals/world update match;
-deterministic states differ slightly and later trajectories diverge. No learning
-parity or time-to-score claim. Mixed CDP uses different inference/world precision
-and deliberately stays on the old path:111.040→111.212ms, exact272 reports/all346
-saved tensors, no speedup. Microbatch/truncated/video paths are not newly staged.
+RGB remains **2.50×** the complete JAX caller boundary. CDP is a different
+workload and is not compared directly to that JAX number. Production stays
+on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
+have not changed installed pins/defaults or restarted Atari.
 
-What the [causal investigation](results/2026-10-13-execution-gap.md) establishes:
+What is now causally established:
 
-- Handicapping JAX's backward/grouped precision and command buffers together
-  raises12.42→22.78ms, still well below the original native~53ms.
-- Translating substantial native kernels directly into CUDA leaves their times
-  within roughly7% of Vulkan. The [counter-controlled convolution test](results/2026-10-13-conv-kernel-cause.md)
-  identifies excess iterator/staging instructions and insufficient data reuse.
-  Efficient shared [dense](results/2026-10-13-tiled-gap.md),
-  [forward](results/2026-10-13-native-conv-layout.md),
-  [grouped](results/2026-10-13-grouped-training.md) and training paths now improve
-  complete updates, but do not yet match library algorithms.
-- Kindle separately executed posterior, imagination, slow value, world and
-  behavior gradients. Redundant posterior work is now causally confirmed and
-  removed on single-pass BF16. It still crosses the host for RNG, targets and
-  EMA; thousands of dispatches/materializations remain. The retained
-  old zero-work command stream cost5.89ms; the current5.295ms measurement above
-  supersedes it for the staged candidate. Neither is an additive savings forecast.
+- **Kernel algorithms matter.** Missing training precision coverage, excessive
+  convolution indexing/staging and weak data reuse were identified and improved
+  in [shared typed training kernels](results/2026-10-13-conv-training-layout.md).
+  Full BF16 coverage does not imply library-level execution efficiency.
+- **Duplicate work mattered.** [Staged posterior reuse](results/2026-10-13-staged-world.md)
+  removes 10.319G nominal MACs/895 dispatches and improves complete RGB
+  39.392→33.681ms. Mixed CDP's different forward/world precision intentionally
+  stays on its existing path.
+- **Fine-grained dependencies remain expensive.** The current 5,500-dispatch
+  graph has 2,267 inter-group barriers. Its empty stream takes 4.709ms with
+  full, partial or no memory-access masks, keeping compute execution ordering.
+  Access-mask weakening is not the fix; real dependencies must remain correct.
+- **Single-output fusion is insufficient.** General typed row fusion helped;
+  widening the pointwise input cap then reduces RGB dispatches 5,846→5,500 but
+  groups only 2,333→2,271, saving just 2.32%. Shared/saved values and opaque
+  backward operators block larger fusion. Independent primitives qualify,
+  but the wider candidate changes trajectories and exposes near-zero LaProp
+  sensitivity; no learning-equivalence claim or production promotion.
+- **Host boundaries also matter.** Nsight finds native main-thread
+  9.094ms on CPU/23.160ms off CPU per captured update; most poll time is
+  sleeping, not CPU computation. RNG, target construction and EMA still cross
+  the host. JAX pipelines metric readback inside its wrapper; the excluded
+  caller checking is only 0.177ms. Timing scope cannot explain the gap.
 
-**Next: reduce dependency/materialization boundaries and finish device execution.**
+**Next: change the compiled execution unit and connect device dataflow.**
 
-1. Residual attribution is complete at the declared scope: eight guards,
-   exact reports/states, full transfer coverage and a causal zero-work barrier
-   intervention. The full performance goal is not complete. Imagination's
-   1,070 groups/1,367 dispatches identify a deeply serialized graph; generated
-   RMSNorm already exists, so do not misdiagnose absent normalization kernels.
-2. General typed row fusion now qualifies: RGB imagination groups1,070→854,
-   dispatches1,367→1,087; world groups1,433 unchanged. The modest full-update
-   gain bounds this particular change, not the entire fusion opportunity.
-   Inspect remaining layout/broadcast/cast and saved-value boundaries before
-   choosing the next coherent compiler change. Preserve rounding/backward
-   lifetimes; no tile sweep or unsafe real-work barrier removal. Command replay
-   only addresses recording, not the demonstrated device cost.
-3. Keep diagnostic posterior readbacks out of the target hot path, move
-   slow-critic EMA/targets/RNG device-side, and remove unnecessary layout/cast/
-   pointwise materializations. Posterior-to-imagination copies already stay on
-   device; do not describe them as CPU copies. Preserve
-   RNG streams and numerics first where possible, separating arithmetic changes.
-   Current disjoint preparation/target/EMA intervals total5.248ms, including
-   EMA's device readback/wait; do not label the whole amount CPU computation.
-4. Qualify one bounded complete-update comparison, including all host/device
-   costs and saved states. Keep useful four-chunk scheduling until a measured
-   replacement exists; staged execution partitions that schedule proportionately.
-   Fewer submissions alone previously regressed. Do not add
-   earlier prototype savings or declare JAX parity from isolated kernels.
+1. Prioritize general multi-output row/pointwise/backward fusion and safe
+   view/layout propagation. Preserve shared outputs, explicitly rounded values
+   and backward activation lifetimes. Measure actual dependency-group reduction
+   and complete updates, not just kernel counts. No tile/binding-cap sweep.
+2. Move RNG, targets and slow-critic EMA onto device and keep diagnostic
+   posterior readback off the critical path. Preserve stream/RNG/update-order
+   contracts. Existing posterior/imagination handoffs already stay on device.
+3. Investigate a lower-overhead backend execution path only with a causal
+   control. Cached CPU recording and CUDA-style device graph execution are
+   distinct; do not promise that ordinary Vulkan command replay closes this gap.
+4. Qualify one bounded complete RGB/CDP comparison with independent numerics
+   and saved-state checks, then a separately declared learning/time-to-score
+   comparison before changing training defaults. No additive savings forecast,
+   unsafe barrier removal, CUDA learner or new Atari allocation.
 
-The first training-layout check found long-reduction cancellation in both old
-checked and new packed kernels. Shared256-position compensated F32 accumulation
-passes unchanged F64 gates; failed source/control stay retained. Eight guards
-pass (one numerical diagnosis), one numerical failure and one allocation warning
-remain;568 synthetic updates, zero game actions. Root-cause work stays active.
+Staged reuse must retain forward activations across posterior → imagination/
+targets → world backward; optimizer writes follow consumers of old weights.
+The world loss needs replay-value targets produced after imagination. Merely
+moving `train_world` earlier is not equivalent. Preserve microbatch/BPTT and
+mixed-precision fallbacks; keep useful submission overlap until a measured
+replacement exists.
 
-Posterior reuse is a graph-lifetime change, not a call-order tweak. The world
-loss consumes replay-value targets produced after imagination (and optionally
-actor/critic targets). Preserve forward activations across
-posterior → imagination/targets → world backward, with optimizer writes only
-after consumers of the old weights finish. The current whole-session API and
-separate compiled graphs cannot supply that reuse merely by moving
-`train_world` earlier. A staged execution boundary must also protect saved
-activations from buffer reuse and retain microbatch/BPTT semantics.
-
-The test contract is complete RGB/CDP updates plus format-appropriate independent
-numerics; use the retained same-algorithm/kernel controls to distinguish
-algorithm gains from compiler effects. Require a fresh declared learning/
-time-to-score comparison before training-default changes. No forecast made by
-adding isolated savings, no new Atari allocation or CUDA learner workaround.
-
-Negative evidence matters: K32→128 staging regressed7.48% RGB/6.79% CDP;
-coalescing alone saves only.70%/1.38%. Latest Blade/Naga changes are qualified
-in isolated controls with no speedup; production pins are unchanged. The
-implementation needs a better training path, not a prolonged local-tile sweep.
+The [residual GPU accounting](results/2026-10-13-residual-gap.md) and current
+CPU captures use different schedules/instrumentation. Do not add their intervals
+as independently removable budgets or label them ordinary SM utilization.
+Fourteen new guards pass, two diagnostic failures/five allocation warnings
+remain, 1,953 full synthetic updates and zero actions. No worker remains at
+publication. The full root-cause/performance goal stays active.
 
 ## Retained qualified implementation boundaries
 
