@@ -17,6 +17,15 @@ their times within roughly7% of Vulkan, while cuBLAS remains much faster on
 matched matrices. The issue is principally the algorithms and learner
 dataflow we implement, not model capacity or a blanket Vulkan limitation.
 
+The [shared-algorithm prototype](results/2026-10-13-tiled-gap.md) gives an actual
+transposed training product2.92× speedup with exact outputs, but complete
+RGB52.987→51.616ms/CDP126.203→118.089ms save only2.59%/6.43%. Both world-training
+stages stay unchanged. All272 reports and292/346 tensors match exactly;12 guards
+pass, one warning remains. This validates a useful algorithm path, not whole-gap
+closure. Production is unchanged. **Next isolate convolution backward precision/
+algorithm coverage, then grouped products; no further dense-geometry round.**
+The investigation remains active.
+
 1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
    shared checked32×32 loop does not inherit the larger vector-loaded,
    padded/prefetched cooperative path, which is F32-specific and unavailable

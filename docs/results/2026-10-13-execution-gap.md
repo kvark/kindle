@@ -17,6 +17,12 @@ kernel algorithms and compiler/API effects. It does **not** deliver JAX speed
 parity, a production optimization or game-quality evidence. Production pins
 and training defaults remain unchanged; no Atari work resumes.
 
+**Follow-up:** the [shared tiled prototype](2026-10-13-tiled-gap.md) reduces a
+real transposed product168.487→57.747µs, but complete RGB only52.987→51.616ms
+and CDP126.203→118.089ms. All reports/tensors remain exact; world training is
+unchanged. This validates one useful algorithm path, not whole-gap closure.
+The active investigation next targets convolution-backward/grouped coverage.
+
 ## 1. The same simple kernel stays slow under CUDA
 
 Translate our checked cooperative loop into standalone CUDA: same32×32 output

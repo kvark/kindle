@@ -18,6 +18,10 @@ learner-dataflow differences. Native~53ms/JAX12.42ms remains open. New diagnosti
 code/pins are not adopted; negative staging/coalescing tests and all failures
 remain. Prioritize training-grade type-aware kernels and connected device work,
 not a CUDA rewrite or another local-tile sweep.
+The [fixed shared-tiled prototype](../results/2026-10-13-tiled-gap.md) reaches
+2.92x on a real transposed matrix but only2.59% RGB/6.43% CDP whole-update savings,
+with exact reports/tensors and12 passing guards. World training remains unchanged;
+convolution-backward/grouped coverage is next. No production adoption or parity.
 The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
 costly scalar convolution gradients and matrix kernels. One isolated split-tile
 check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.

@@ -21,6 +21,13 @@ refresh brings no speedup; all changes remain diagnostic. No game restart or
 speed-parity claim. The earlier accounting located cost but did not establish
 complete causal closure; the new report retains its limitations and failures.
 
+The [shared tiled prototype](results/2026-10-13-tiled-gap.md) now makes one actual
+transposed product2.92x faster, but saves only2.59% RGB/6.43% CDP full-update time
+with exact reports/tensors. World training is untouched; RGB is still4.16x JAX.
+Next isolate convolution-backward coverage, then grouped products and connected
+learner dataflow. No production adoption or dense-tile sweep; investigation stays
+active and the complete performance target remains open.
+
 The [typed cooperative matmul consolidation](results/2026-10-13-typed-matmul.md)
 qualifies: shared checked F32/F16/BF16 generation and typed partition tuning,
 with explicit storage/arithmetic and specialized algorithms retained. Complete

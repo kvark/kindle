@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Shared tiled algorithm diagnostic passes, root-cause work continues:**
+  [result](docs/results/2026-10-13-tiled-gap.md). One actual transposed product
+  168.487→57.747µs (2.92x), all6,981,632 kernel outputs/512 F64 probes exact.
+  Complete RGB52.987→51.616ms/CDP126.203→118.089ms save2.59%/6.43%; world training
+  stays30.15/46.95ms. All272 reports/first outputs/292/346 initial/first/final
+  tensors match exactly.12 guards,18 new aligned typed F64 cases, one warning;
+  1,088 synthetic updates/1,152 kernel calls, zero game actions. Shared aligned
+  FP32/FP16/BF16 generator, fixed64x64/K32 prefetch, checked fallback; no sweep.
+  Production pins unchanged; portable selection/shared-memory review remains.
+  RGB is still4.16x retained JAX; this does not close the goal. **Next isolate
+  convolution backward precision/algorithm coverage, then grouped products,
+  posterior reuse/device targets/EMA.** No more dense geometry or Atari restart.
+  No worker remains at this publication boundary; investigation remains active.
+
 - **Execution-design diagnosis, not another cost bucket:**
   [result](docs/results/2026-10-13-execution-gap.md). Native RGB~53ms/JAX12.42ms
   remains open. JAX with F32 convolution derivatives/grouped products and no
