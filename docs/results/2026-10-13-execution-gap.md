@@ -47,6 +47,14 @@ these separate prototype savings must not be added.
 
 ## 1. The same simple kernel stays slow under CUDA
 
+Latest [training-layout integration](2026-10-13-conv-training-layout.md):
+complete RGB46.860→39.372ms,15.98% less time, still3.17× JAX. All95.074G nominal
+matrix/convolution MACs now select BF16, with exact initial/first outputs but
+changed later states. Independent F64 qualification includes a retained
+accumulation failure/correction. Missing dtype coverage is no longer the
+explanation in this fixture; connected learner dataflow and residual algorithm/
+materialization costs remain. End this kernel-layout round; no Atari restart.
+
 Translate our checked cooperative loop into standalone CUDA: same32×32 output
 tile, K32 staging, four16×16 warp products, shared arrays, two barriers/stage,
 coalesced transposed loads, split boundaries and resident BF16 operands.

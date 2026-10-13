@@ -8,82 +8,64 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-The [execution-design investigation](results/2026-10-13-execution-gap.md)
-supersedes the earlier claim that operation-group accounting was sufficient
-root-cause closure. Native RGB remains~53ms versus JAX12.42ms. Handicapping
-JAX's backward/grouped precision and command buffers together raises it only
-to22.78ms. Translating our substantial BF16 kernels directly to CUDA leaves
-their times within roughly7% of Vulkan, while cuBLAS remains much faster on
-matched matrices. The issue is principally the algorithms and learner
-dataflow we implement, not model capacity or a blanket Vulkan limitation.
+**The gap is fundamental execution design, not just a missing BF16 flag.**
+The [latest isolated candidate](results/2026-10-13-conv-training-layout.md)
+reduces complete RGB12M/B8 updates46.860→39.372ms (15.98%), but is still3.17×
+retained JAX12.417ms. Production remains on its qualified~53ms runtime; the
+combined diagnostic has not changed installed pins/defaults or resumed Atari.
 
-The [shared-algorithm prototype](results/2026-10-13-tiled-gap.md) gives an actual
-transposed training product2.92× speedup with exact outputs, but complete
-RGB52.987→51.616ms/CDP126.203→118.089ms save only2.59%/6.43%. Both world-training
-stages stay unchanged. All272 reports and292/346 tensors match exactly;12 guards
-pass, one warning remains. This validates a useful algorithm path, not whole-gap
-closure. Production is unchanged. The follow-ups below isolate convolution
-backward coverage and algorithm causes; no further dense-geometry round.
-The investigation remains active. The subsequent isolated
-[convolution-backward candidate](results/2026-10-13-conv-backward-gap.md) saves
-8.01% (53.157→48.901ms), still3.94x JAX, despite90.51% BF16 coverage of nominal
-matrix/convolution MACs. Five guards pass after a retained long-accumulation
-failure and bounded-partition correction; actual learner splits stay fixed.
-Changed derivatives are not bitwise trajectory-equivalent or learning-qualified.
-Next inspect convolution execution with the numerically matched CUDA twin;
-coverage is demonstrably insufficient. Candidates are separate, not stacked.
+| Current RGB comparison | Control | Candidate |
+| --- | ---: | ---: |
+| Full update |46.860ms|39.372ms|
+| World training + sync |27.679ms|20.413ms|
+| Nominal matrix/convolution work in BF16 |60.74%|100%|
 
-The [counter-guided convolution test](results/2026-10-13-conv-kernel-cause.md)
-now demonstrates the algorithm mechanism: layout/iterator changes629.39→342.67µs,
-then increased reuse347.64→211.16µs, including packing every call and all exact
-outputs. Instructions388.58M→61.24M and tensor active8.79→28.75%, despite lower
-occupancy. These are two controlled CUDA-twin kernel pairs, not native/learner
-speedups. **End this micro-study; implement layout/iterator/reuse within the
-shared native type-aware family and verify complete updates.** Training-gradient
-and grouped layouts must benefit too; no additional tile sweep or CUDA backend.
+The95.074G nominal MACs and logical operations match; the coverage percentage
+excludes scalar/optimizer/reduction work and extra packing/padding, and is not
+utilization. The candidate combines the shared dense/grouped/native-forward
+prototypes with explicit reduced convolution derivatives and efficient training
+layouts. All packing/compensation is timed. Exact initials/first outputs and
+independent F64 checks pass, but later RGB trajectories differ; no learning
+parity or time-to-score claim. CDP's24-update mixed-world control remains exact;
+its latest ordinary measurement is still111.105ms, not a new speed result here.
 
-The [native forward-layout port](results/2026-10-13-native-conv-layout.md)
-now measures RGB51.525→49.647ms (3.65%) and CDP118.212→115.548ms (2.25%),
-including every activation/filter pack. Shared dense control, eight passing
-guards, exact initials and finite272-update fixtures; reordered forward sums
-change categorical samples and later trajectories. A retained unsplit strict-F32
-gradient failure is identical in the original control; existing partitioning
-passes unchanged F64 gates in both numerical-test arms, without learner changes.
-Production is unchanged. **Stop forward-only tuning:** RGB remains4.00× JAX;
-carry efficient layouts/reuse through derivatives and grouped products, then
-staged posterior/target/backward execution. CDP's46.92ms mixed world stage is
-untouched by this BF16-forward change. Do not add separate prototype savings.
+What the [causal investigation](results/2026-10-13-execution-gap.md) establishes:
 
-The [grouped training path](results/2026-10-13-grouped-training.md) subsequently
-reduces complete RGB49.551→46.780ms (5.59%) and CDP115.519→111.105ms (3.82%).
-Both arms include the same dense/native-forward prototypes; the backward
-convolution candidate remains separate. Group-strided checked/tiled generation
-now covers explicit BF16 forward and both derivatives, with strict F32 retained.
-48 independent F64 cases/96 partials, production alias/poison checks and seven
-guards pass, zero warnings. Exact initials/finite updates, changed trajectories,
-no learning claim. RGB still3.77× JAX. **Next prioritize convolution training
-layouts/reuse, then staged graph/dataflow consolidation; no grouped tile sweep.**
-CDP's mixed world stage remains46.92ms. Production is unchanged.
+- Handicapping JAX's backward/grouped precision and command buffers together
+  raises12.42→22.78ms, still well below the original native~53ms.
+- Translating substantial native kernels directly into CUDA leaves their times
+  within roughly7% of Vulkan. The [counter-controlled convolution test](results/2026-10-13-conv-kernel-cause.md)
+  identifies excess iterator/staging instructions and insufficient data reuse.
+  Efficient shared [dense](results/2026-10-13-tiled-gap.md),
+  [forward](results/2026-10-13-native-conv-layout.md),
+  [grouped](results/2026-10-13-grouped-training.md) and training paths now improve
+  complete updates, but do not yet match library algorithms.
+- Kindle separately executes posterior, imagination, slow value, world and
+  behavior gradients. It recomputes the posterior and crosses the host for RNG,
+  targets and EMA. Thousands of dispatches/materializations remain. The retained
+  zero-work command stream costs5.89ms; this is not a removable pure-sync bucket
+  or an additive forecast for the new candidate.
 
-1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
-   shared checked32×32 loop does not inherit the larger vector-loaded,
-   padded/prefetched cooperative path, which is F32-specific and unavailable
-   on5080's native-F32 capabilities. Use one type-aware algorithm family with
-   appropriate shape selection, data reuse and load/compute overlap. Retain
-   generic checked edges/fallbacks; do not assume one tile fits every shape.
-   Start with the actual dense/grouped workload, including CDP imagination.
-2. **Carry reduced precision through training.** Convolution derivatives and
-   grouped RSSM products still account for48.76% of nominal matrix/convolution
-   MACs in scalar F32. Extend efficient families to those operations and their
-   layouts; preserve F32 masters, accumulators/reductions and strict fallback.
-   A flag or a BF16 cast is not efficient execution. cuDNN's transformed
-   convolution algorithms explain part of its advantage, not a requirement
-   to add Winograd before a good direct tensor path.
-3. **Treat the learner as connected device work.** Reuse posterior outputs
-   during world differentiation, move RNG/targets/slow EMA onto device, and
-   fuse layout/cast/pointwise intermediates. Keep safe lifetime/barrier rules
-   and the current useful four-chunk scheduling until a measured replacement
-   exists. Fewer submissions alone previously regressed.
+**Next: connected learner execution, not another kernel-layout sweep.**
+
+1. Make late-input dependencies explicit in the compiled graph. Run and retain
+   the posterior-producing work before imagination; consume replay-value targets
+   later without recomputing that forward pass. Preserve differentiable sampling,
+   reset/BPTT semantics and activation lifetimes; parameter updates remain after
+   every old-weight consumer.
+2. Keep posterior/features and slow-critic EMA device-side; then move target/RNG
+   work and remove unnecessary layout/cast/pointwise materializations. Preserve
+   RNG streams and numerics first where possible, separating arithmetic changes.
+3. Qualify one bounded complete-update comparison, including all host/device
+   costs and saved states. Keep useful four-chunk scheduling until a measured
+   replacement exists; fewer submissions alone previously regressed. Do not add
+   earlier prototype savings or declare JAX parity from isolated kernels.
+
+The first training-layout check found long-reduction cancellation in both old
+checked and new packed kernels. Shared256-position compensated F32 accumulation
+passes unchanged F64 gates; failed source/control stay retained. Eight guards
+pass (one numerical diagnosis), one numerical failure and one allocation warning
+remain;568 synthetic updates, zero game actions. Root-cause work stays active.
 
 Posterior reuse is a graph-lifetime change, not a call-order tweak. The world
 loss consumes replay-value targets produced after imagination (and optionally

@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Convolution training layout measured; connected execution is next:**
+  [result](docs/results/2026-10-13-conv-training-layout.md). Shared typed packed
+  dX/dW reduces complete RGB46.860→39.372ms (15.98%), world27.679→20.413ms.
+  All95.074G nominal matrix/conv MACs now multiply in BF16, still3.17× JAX;
+  coverage is not utilization. Same logical operations, exact initials/first
+  outputs, changed later trajectories.80 reduced F64 cases/24 conv partials,
+  strict/grouped controls and production alias/poison pass. A retained long-sum
+  failure reproduces in checked/packed controls; shared256-position compensated
+  F32 accumulation fixes the gate without extra global scratch or relaxed bounds.
+  Eight passing guards include one numerical diagnosis; one numerical failure,
+  one allocation warning and568 synthetic updates remain. CDP24-report/first-state
+  control exact; no new CDP timing, learning, production change or worker.
+  End layout tuning. Next staged late-input/posterior/target/backward reuse and
+  device dataflow, preserving activation lifetimes/old-weight consumers. No
+  additive savings promise, Atari restart or whole-goal closure.
+
 - **Grouped training path measured; full gap remains:** [result](docs/results/2026-10-13-grouped-training.md).
   Existing block forward/derivatives now use shared typed checked/tiled kernels
   under explicit BF16 policy; F32 masters/strict fallback retained. Complete
