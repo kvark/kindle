@@ -1,0 +1,308 @@
+{
+  "status": "complete",
+  "mode": "timing",
+  "guards": 9,
+  "allocation_warnings": 4,
+  "games": 0,
+  "comparisons": {
+    "rgb": {
+      "exact_reports": 0,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 292,
+          "exact": 292,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 292,
+          "exact": 266,
+          "relative_l2": 0.16313967276577016,
+          "max_abs": 32.215494602918625
+        },
+        "final": {
+          "tensors": 292,
+          "exact": 1,
+          "relative_l2": 0.08707610428290335,
+          "max_abs": 1.1896907091140747
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "deter": {
+          "exact": false,
+          "changed": 138158,
+          "relative_l2": 0.0005152757169573985,
+          "max_abs": 0.0008063316345214844
+        },
+        "imagined_slow_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "imagined_value_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "imagined_weight": {
+          "exact": false,
+          "changed": 399,
+          "relative_l2": 0.0030052555484731906,
+          "max_abs": 0.015376746654510498
+        },
+        "replay_slow_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "replay_value_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "replay_weight": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "stoch": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        }
+      },
+      "final_state_scope": "paired",
+      "prefix_dispatches": 1164,
+      "posterior_is_world_prefix": true,
+      "minimum_headroom_bytes": 15096152064,
+      "control_ms": 39.39169476953126,
+      "staged_ms": 33.680541914062466,
+      "less_time_percent": 14.498367965336357,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 2.63154153125,
+          "imagination_and_targets": 11.065308078125,
+          "posterior": 5.2527397578125,
+          "world_train_and_sync": 20.44210540234375
+        },
+        "staged": {
+          "behavior_train_and_sync": 2.57823375390625,
+          "imagination_and_targets": 10.9131898359375,
+          "posterior": 4.69370962109375,
+          "world_train_and_sync": 15.495408703125
+        }
+      }
+    },
+    "cdp": {
+      "exact_reports": 272,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 346,
+          "exact": 346,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 346,
+          "exact": 346,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "final": {
+          "tensors": 346,
+          "exact": 346,
+          "relative_l2": 0,
+          "max_abs": 0
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "deter": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "imagined_slow_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "imagined_value_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "imagined_weight": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "replay_slow_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "replay_value_target": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "replay_weight": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "stoch": {
+          "exact": true,
+          "changed": 0,
+          "relative_l2": 0,
+          "max_abs": 0
+        }
+      },
+      "final_state_scope": "paired",
+      "prefix_dispatches": 0,
+      "posterior_is_world_prefix": false,
+      "minimum_headroom_bytes": 11283726336,
+      "control_ms": 111.04021686718748,
+      "staged_ms": 111.21195347265629,
+      "less_time_percent": -0.15466162649360182,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 5.81403874609375,
+          "imagination_and_targets": 45.9109821015625,
+          "posterior": 12.46204071484375,
+          "world_train_and_sync": 46.8531553046875
+        },
+        "staged": {
+          "behavior_train_and_sync": 5.81354765625,
+          "imagination_and_targets": 45.98213169140625,
+          "posterior": 12.44852774609375,
+          "world_train_and_sync": 46.96774637890625
+        }
+      }
+    }
+  },
+  "arithmetic": {
+    "control": {
+      "stages": {
+        "posterior": 1053,
+        "imagination": 1367,
+        "world_gradient": 4350,
+        "behavior_gradient": 254,
+        "slow_value": 19
+      },
+      "dispatches": 7043,
+      "families": {
+        "bf16_dense": {
+          "dispatches": 667,
+          "nominal_macs": 19778050048
+        },
+        "bf16_convolution": {
+          "dispatches": 27,
+          "nominal_macs": 66270003200
+        },
+        "bf16_grouped": {
+          "dispatches": 161,
+          "nominal_macs": 9026142208
+        }
+      },
+      "nominal_macs": 95074195456
+    },
+    "staged": {
+      "stages": {
+        "imagination": 1367,
+        "world_gradient": 4508,
+        "behavior_gradient": 254,
+        "slow_value": 19
+      },
+      "dispatches": 6148,
+      "families": {
+        "bf16_dense": {
+          "dispatches": 587,
+          "nominal_macs": 19576133632
+        },
+        "bf16_grouped": {
+          "dispatches": 129,
+          "nominal_macs": 8556380160
+        },
+        "bf16_convolution": {
+          "dispatches": 23,
+          "nominal_macs": 56623104000
+        }
+      },
+      "nominal_macs": 84755617792
+    },
+    "removed_nominal_macs": 10318577664,
+    "removed_dispatches": 895,
+    "scope": "Nominal matrix/convolution MACs only, not hardware issued arithmetic or utilization. Staged posterior file repeats the world plan: counted once, not twice. Other stage matrix/conv descriptors are identical."
+  },
+  "first_world_tensors_exact": 215,
+  "first_behavior_moment_tensors_changed": 26,
+  "rgb_over_retained_jax": 2.7124605103792394,
+  "cpu": {
+    "dependency_tests": 3,
+    "graph_test": 1,
+    "clippy": "pass",
+    "retained_failures": [
+      "missing SessionOptions default field",
+      "Clippy pattern style",
+      "test-only helper lacked cfg(test)"
+    ],
+    "smoke_audit_seconds": 76.076,
+    "final_audit_active_cpu_seconds": 3.044
+  },
+  "full_synthetic_updates": 1136,
+  "small_graph_updates": 146,
+  "small_graph_backward_only_passes": 24,
+  "raw_gradient_qualification": {"cases":8,"backward_passes":24,"optimizer_updates":0,"exact":true},
+  "game_actions": 0,
+  "production_changed": false,
+  "artifacts": "runs/staged-world-20261013.djLV1cJT",
+  "revisions": {
+    "kindle": "0e0f915dca4c7bdd4fa139b33b349cc2601329fa",
+    "meganeura_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "meganeura_upstream_reviewed": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+    "naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8"
+  },
+  "sha256": {
+    "backend_patch": "732674789642aff6b35376c678ecdbe2570fb3cfdd28833098c95a82d8f4dc5d",
+    "kindle_patch": "421c6196da6989d13a25ce731dc189ea70832d4b8b4ad37be39f24aaf5c37ecb",
+    "backend_tests": "793c0bd174afa1bb53cf2e05c597817eece696260832770a1ae2d567eedd9ee4",
+    "kindle_tests": "78f5667b4f95a43eed56d2d99dd90aff997f8b681430ad6c804472939cd1ff03",
+    "backend_raw_tests": "6ef2bd660f37a31312575a6484dd29afe356542adffa8566d97ac1ce77ca7557",
+    "backend_raw_patch": "3edab68dedb70e79e547830a802a17124d063d15cd3acf561ec3f3cc519671c0"
+  },
+  "limits": [
+    "RGB first categoricals/world tensors exact; deterministic state differs and later trajectories diverge",
+    "Mixed CDP is deliberately unchanged fallback, not staged qualification",
+    "No learning/throughput/utilization or production promotion claim",
+    "Retained JAX is not a simultaneous matched-trajectory control"
+  ]
+}

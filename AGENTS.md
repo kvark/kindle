@@ -7,6 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Staged world reuse measured; full performance goal stays active:**
+  [result](docs/results/2026-10-13-staged-world.md). Single-pass BF16 retains
+  posterior activations across imagination/late targets, then finishes backward.
+  RGB39.392→33.681ms (14.50%), still2.71× retained JAX12.417ms. Duplicate10.319G
+  nominal MACs/895 dispatches removed; remaining matrix/conv descriptors match.
+  Exact initials/first categoricals/all215 first world tensors; small deterministic
+  differences and later trajectories remain, not learning parity. Mixed CDP's
+  differing forward precision prevents direct reuse: fallback111.040→111.212ms,
+  exact272 reports/all346 saved tensors, no speedup. No staged video/truncated
+  qualification or production change. Next reattribute the current residual,
+  then device targets/RNG/EMA and materialization; no kernel sweep, additive
+  speedup forecast, Atari restart or whole-goal closure. Command-buffer replay
+  alone is insufficient: retained JAX without it still takes16.163ms.
+  Nine guards, four retained allocation warnings;1,136 full synthetic updates,
+  146 small-graph optimizer updates and24 raw-gradient-only passes. Corrected
+  the initial post-clipping/raw-gradient scope with a separate exact check,
+  not relaxed tolerances. Publication audit passes; no worker remains.
+
 - **Convolution training layout measured; connected execution is next:**
   [result](docs/results/2026-10-13-conv-training-layout.md). Shared typed packed
   dX/dW reduces complete RGB46.860→39.372ms (15.98%), world27.679→20.413ms.

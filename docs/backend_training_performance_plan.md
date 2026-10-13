@@ -9,25 +9,28 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 **The gap is fundamental execution design, not just a missing BF16 flag.**
-The [latest isolated candidate](results/2026-10-13-conv-training-layout.md)
-reduces complete RGB12M/B8 updates46.860→39.372ms (15.98%), but is still3.17×
+The [latest isolated candidate](results/2026-10-13-staged-world.md)
+reduces complete RGB12M/B8 updates39.392→33.681ms (14.50%), but is still2.71×
 retained JAX12.417ms. Production remains on its qualified~53ms runtime; the
 combined diagnostic has not changed installed pins/defaults or resumed Atari.
 
 | Current RGB comparison | Control | Candidate |
 | --- | ---: | ---: |
-| Full update |46.860ms|39.372ms|
-| World training + sync |27.679ms|20.413ms|
-| Nominal matrix/convolution work in BF16 |60.74%|100%|
+| Full update |39.392ms|33.681ms|
+| Posterior + world work |25.695ms|20.189ms|
+| Nominal matrix/convolution MACs |95.074G|84.756G|
+| Dispatches |7,043|6,148|
 
-The95.074G nominal MACs and logical operations match; the coverage percentage
-excludes scalar/optimizer/reduction work and extra packing/padding, and is not
-utilization. The candidate combines the shared dense/grouped/native-forward
-prototypes with explicit reduced convolution derivatives and efficient training
-layouts. All packing/compensation is timed. Exact initials/first outputs and
-independent F64 checks pass, but later RGB trajectories differ; no learning
-parity or time-to-score claim. CDP's24-update mixed-world control remains exact;
-its latest ordinary measurement is still111.105ms, not a new speed result here.
+All nominal matrix/conv products remain BF16; scalar/optimizer/reduction work,
+packing/padding and utilization are not represented by these counts. The
+candidate retains the [qualified shared kernels](results/2026-10-13-conv-training-layout.md),
+but computes the posterior once and retains activations while imagination makes
+late targets. It removes10.319G duplicate MACs with unchanged remaining matrix/
+convolution descriptors. Initial tensors/first categoricals/world update match;
+deterministic states differ slightly and later trajectories diverge. No learning
+parity or time-to-score claim. Mixed CDP uses different inference/world precision
+and deliberately stays on the old path:111.040→111.212ms, exact272 reports/all346
+saved tensors, no speedup. Microbatch/truncated/video paths are not newly staged.
 
 What the [causal investigation](results/2026-10-13-execution-gap.md) establishes:
 
@@ -40,25 +43,29 @@ What the [causal investigation](results/2026-10-13-execution-gap.md) establishes
   [forward](results/2026-10-13-native-conv-layout.md),
   [grouped](results/2026-10-13-grouped-training.md) and training paths now improve
   complete updates, but do not yet match library algorithms.
-- Kindle separately executes posterior, imagination, slow value, world and
-  behavior gradients. It recomputes the posterior and crosses the host for RNG,
-  targets and EMA. Thousands of dispatches/materializations remain. The retained
+- Kindle separately executed posterior, imagination, slow value, world and
+  behavior gradients. Redundant posterior work is now causally confirmed and
+  removed on single-pass BF16. It still crosses the host for RNG, targets and
+  EMA; thousands of dispatches/materializations remain. The retained
   zero-work command stream costs5.89ms; this is not a removable pure-sync bucket
   or an additive forecast for the new candidate.
 
-**Next: connected learner execution, not another kernel-layout sweep.**
+**Next: attribute the residual and finish connected device execution.**
 
-1. Make late-input dependencies explicit in the compiled graph. Run and retain
-   the posterior-producing work before imagination; consume replay-value targets
-   later without recomputing that forward pass. Preserve differentiable sampling,
-   reset/BPTT semantics and activation lifetimes; parameter updates remain after
-   every old-weight consumer.
-2. Keep posterior/features and slow-critic EMA device-side; then move target/RNG
-   work and remove unnecessary layout/cast/pointwise materializations. Preserve
+1. Reattribute the remaining21.26ms against JAX on this actual candidate using
+   bounded nested host spans and safe Nsight capture paths. Old attribution
+   buckets are not current costs. Even the retained JAX no-command-buffer
+   control16.163ms is2.08× faster, so replaying command buffers alone cannot
+   explain the residual. No blanket Vulkan/compiler claim or kernel sweep.
+2. Keep diagnostic posterior readbacks out of the target hot path, move
+   slow-critic EMA/targets/RNG device-side, and remove unnecessary layout/cast/
+   pointwise materializations. Posterior-to-imagination copies already stay on
+   device; do not describe them as CPU copies. Preserve
    RNG streams and numerics first where possible, separating arithmetic changes.
 3. Qualify one bounded complete-update comparison, including all host/device
    costs and saved states. Keep useful four-chunk scheduling until a measured
-   replacement exists; fewer submissions alone previously regressed. Do not add
+   replacement exists; staged execution partitions that schedule proportionately.
+   Fewer submissions alone previously regressed. Do not add
    earlier prototype savings or declare JAX parity from isolated kernels.
 
 The first training-layout check found long-reduction cancellation in both old
