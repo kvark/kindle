@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Convolution-backward diagnostic passes after retained numerical failure:**
+  [result](docs/results/2026-10-13-conv-backward-gap.md). RGB53.157→48.901ms
+  saves8.01%, still3.94x JAX.90.51% nominal matrix/convolution MACs now select
+  BF16 kernels—not utilization.40 reduced F64 cases/17 partials, strict controls,
+  five guards pass;544 synthetic updates, zero game actions/new warnings.
+  Long unsplit accumulation failed; mandatory ≤4096-position partials fix it
+  without relaxed gates, with unchanged actual learner splits. Arithmetic/
+  final trajectories change; no learning-equivalence claim. Isolated candidate,
+  not combined with tiled changes or adopted. Next [bounded convolution kernel
+  counter diagnosis](docs/experiments/2026-10-13-conv-kernel-cause.md), then grouped
+  algorithms and connected learner work. Root-cause goal stays active.
+
 - **Shared tiled algorithm diagnostic passes, root-cause work continues:**
   [result](docs/results/2026-10-13-tiled-gap.md). One actual transposed product
   168.487→57.747µs (2.92x), all6,981,632 kernel outputs/512 F64 probes exact.

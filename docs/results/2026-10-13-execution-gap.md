@@ -22,6 +22,12 @@ real transposed product168.487→57.747µs, but complete RGB only52.987→51.616
 and CDP126.203→118.089ms. All reports/tensors remain exact; world training is
 unchanged. This validates one useful algorithm path, not whole-gap closure.
 The active investigation next targets convolution-backward/grouped coverage.
+The [subsequent isolated backward test](2026-10-13-conv-backward-gap.md) reaches
+48.90ms (8.01% less) with90.51% nominal matrix/convolution BF16 coverage, still
+3.94x JAX. This strengthens the algorithm/dataflow diagnosis; coverage is not
+efficient execution. The numerical failure/correction and changed trajectories
+remain explicit. Next inspect convolution execution counters, not more dtype
+flags or an additive forecast from separate prototypes.
 
 ## 1. The same simple kernel stays slow under CUDA
 

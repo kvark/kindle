@@ -28,6 +28,14 @@ Next isolate convolution-backward coverage, then grouped products and connected
 learner dataflow. No production adoption or dense-tile sweep; investigation stays
 active and the complete performance target remains open.
 
+The isolated [backward-coverage experiment](results/2026-10-13-conv-backward-gap.md)
+then saves8.01%, reaching48.90ms—not close to JAX12.42ms.90.51% of nominal
+matrix/convolution MACs select BF16 kernels, showing that dtype coverage alone
+does not supply efficient execution. Numerical checks pass after a retained
+long-reduction failure/correction; learning quality is untested. Next examine
+convolution kernel counters, grouped algorithms and connected learner dataflow.
+No production adoption, combined-candidate speed claim or game restart.
+
 The [typed cooperative matmul consolidation](results/2026-10-13-typed-matmul.md)
 qualifies: shared checked F32/F16/BF16 generation and typed partition tuning,
 with explicit storage/arithmetic and specialized algorithms retained. Complete

@@ -22,6 +22,11 @@ The [fixed shared-tiled prototype](../results/2026-10-13-tiled-gap.md) reaches
 2.92x on a real transposed matrix but only2.59% RGB/6.43% CDP whole-update savings,
 with exact reports/tensors and12 passing guards. World training remains unchanged;
 convolution-backward/grouped coverage is next. No production adoption or parity.
+The isolated [convolution-backward test](../results/2026-10-13-conv-backward-gap.md)
+reaches48.90ms (8.01% less), still3.94x JAX despite90.51% nominal BF16 arithmetic
+coverage. Five guards pass after a retained long-reduction failure/correction;
+changed trajectories are not learning-equivalent. Next convolution kernel
+counters, grouped algorithms and device dataflow; no candidate adoption.
 The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
 costly scalar convolution gradients and matrix kernels. One isolated split-tile
 check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.

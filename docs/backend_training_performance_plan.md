@@ -24,7 +24,14 @@ stages stay unchanged. All272 reports and292/346 tensors match exactly;12 guards
 pass, one warning remains. This validates a useful algorithm path, not whole-gap
 closure. Production is unchanged. **Next isolate convolution backward precision/
 algorithm coverage, then grouped products; no further dense-geometry round.**
-The investigation remains active.
+The investigation remains active. The subsequent isolated
+[convolution-backward candidate](results/2026-10-13-conv-backward-gap.md) saves
+8.01% (53.157→48.901ms), still3.94x JAX, despite90.51% BF16 coverage of nominal
+matrix/convolution MACs. Five guards pass after a retained long-accumulation
+failure and bounded-partition correction; actual learner splits stay fixed.
+Changed derivatives are not bitwise trajectory-equivalent or learning-qualified.
+Next inspect convolution execution with the numerically matched CUDA twin;
+coverage is demonstrably insufficient. Candidates are separate, not stacked.
 
 1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
    shared checked32×32 loop does not inherit the larger vector-loaded,
