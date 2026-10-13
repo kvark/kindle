@@ -22,8 +22,8 @@ transposed training product2.92× speedup with exact outputs, but complete
 RGB52.987→51.616ms/CDP126.203→118.089ms save only2.59%/6.43%. Both world-training
 stages stay unchanged. All272 reports and292/346 tensors match exactly;12 guards
 pass, one warning remains. This validates a useful algorithm path, not whole-gap
-closure. Production is unchanged. **Next isolate convolution backward precision/
-algorithm coverage, then grouped products; no further dense-geometry round.**
+closure. Production is unchanged. The follow-ups below isolate convolution
+backward coverage and algorithm causes; no further dense-geometry round.
 The investigation remains active. The subsequent isolated
 [convolution-backward candidate](results/2026-10-13-conv-backward-gap.md) saves
 8.01% (53.157→48.901ms), still3.94x JAX, despite90.51% BF16 coverage of nominal
@@ -32,6 +32,15 @@ failure and bounded-partition correction; actual learner splits stay fixed.
 Changed derivatives are not bitwise trajectory-equivalent or learning-qualified.
 Next inspect convolution execution with the numerically matched CUDA twin;
 coverage is demonstrably insufficient. Candidates are separate, not stacked.
+
+The [counter-guided convolution test](results/2026-10-13-conv-kernel-cause.md)
+now demonstrates the algorithm mechanism: layout/iterator changes629.39→342.67µs,
+then increased reuse347.64→211.16µs, including packing every call and all exact
+outputs. Instructions388.58M→61.24M and tensor active8.79→28.75%, despite lower
+occupancy. These are two controlled CUDA-twin kernel pairs, not native/learner
+speedups. **End this micro-study; implement layout/iterator/reuse within the
+shared native type-aware family and verify complete updates.** Training-gradient
+and grouped layouts must benefit too; no additional tile sweep or CUDA backend.
 
 1. **Generalize efficient kernel algorithms, not just dtype syntax.** Our
    shared checked32×32 loop does not inherit the larger vector-loaded,

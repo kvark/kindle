@@ -28,6 +28,11 @@ The [subsequent isolated backward test](2026-10-13-conv-backward-gap.md) reaches
 efficient execution. The numerical failure/correction and changed trajectories
 remain explicit. Next inspect convolution execution counters, not more dtype
 flags or an additive forecast from separate prototypes.
+The [counter-guided follow-up](2026-10-13-conv-kernel-cause.md) demonstrates
+layout/iterator and data-reuse causes directly: two controlled CUDA-twin pairs
+reach629→343µs, then348→211µs, including packing and exact outputs. Executed
+instructions fall84% and tensor activity rises while occupancy falls. Native
+integration/full updates, not more microbenchmarks, are now the next proof.
 
 ## 1. The same simple kernel stays slow under CUDA
 

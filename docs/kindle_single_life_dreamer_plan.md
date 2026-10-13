@@ -36,6 +36,13 @@ long-reduction failure/correction; learning quality is untested. Next examine
 convolution kernel counters, grouped algorithms and connected learner dataflow.
 No production adoption, combined-candidate speed claim or game restart.
 
+[Counter-guided convolution interventions](results/2026-10-13-conv-kernel-cause.md)
+give concrete algorithm evidence: layout/iterator and reuse improve a CUDA twin
+from~629 to211µs across two controlled pairs, including packing and exact outputs.
+Instructions fall84%, while occupancy also falls. Useful tensor work, not more
+resident threads, is the target. Port through shared native algorithm families
+and measure whole updates; this is not already a3x learner improvement.
+
 The [typed cooperative matmul consolidation](results/2026-10-13-typed-matmul.md)
 qualifies: shared checked F32/F16/BF16 generation and typed partition tuning,
 with explicit storage/arithmetic and specialized algorithms retained. Complete

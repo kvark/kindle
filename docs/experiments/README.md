@@ -27,6 +27,11 @@ reaches48.90ms (8.01% less), still3.94x JAX despite90.51% nominal BF16 arithmeti
 coverage. Five guards pass after a retained long-reduction failure/correction;
 changed trajectories are not learning-equivalent. Next convolution kernel
 counters, grouped algorithms and device dataflow; no candidate adoption.
+The [counter-guided convolution study](../results/2026-10-13-conv-kernel-cause.md)
+demonstrates layout/iterator and reuse savings with exact outputs and packing
+included:629→343µs, then348→211µs. Lower occupancy accompanies faster tensor
+execution; this is not a native/whole-learner claim. Micro-study closed; next
+shared native implementation and complete-update verification, not a tile sweep.
 The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
 costly scalar convolution gradients and matrix kernels. One isolated split-tile
 check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.

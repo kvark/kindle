@@ -7,6 +7,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Convolution algorithm cause demonstrated:** [result](docs/results/2026-10-13-conv-kernel-cause.md).
+  Matched CUDA-twin layout/iterator629.39→342.67µs and reuse347.64→211.16µs
+  include packing every call; all6,291,456 native/F64-fixture outputs exact.
+  Counter instructions388.58M→61.24M, tensor active8.79→28.75%, occupancy
+  87.92→31.75%: parallel occupancy is not useful tensor throughput.2.98x is
+  cross-pair, not native/whole-update speedup. Five guards, zero new warnings/
+  game actions; name-filter/controller/parser failures retained. Micro-study
+  closed, broader goal active: implement layout/iterator/reuse in shared native
+  type-aware forward/backward/grouped families, then complete-update checks and
+  connected learner work. No more CUDA/tile sweep or production/Atari restart.
+
 - **Convolution-backward diagnostic passes after retained numerical failure:**
   [result](docs/results/2026-10-13-conv-backward-gap.md). RGB53.157→48.901ms
   saves8.01%, still3.94x JAX.90.51% nominal matrix/convolution MACs now select
@@ -15,9 +26,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Long unsplit accumulation failed; mandatory ≤4096-position partials fix it
   without relaxed gates, with unchanged actual learner splits. Arithmetic/
   final trajectories change; no learning-equivalence claim. Isolated candidate,
-  not combined with tiled changes or adopted. Next [bounded convolution kernel
-  counter diagnosis](docs/experiments/2026-10-13-conv-kernel-cause.md), then grouped
-  algorithms and connected learner work. Root-cause goal stays active.
+  not combined with tiled changes or adopted. The [counter diagnosis](docs/results/2026-10-13-conv-kernel-cause.md)
+  above completes the next causal check; native algorithm integration and
+  connected learner work remain. Root-cause goal stays active.
 
 - **Shared tiled algorithm diagnostic passes, root-cause work continues:**
   [result](docs/results/2026-10-13-tiled-gap.md). One actual transposed product
@@ -28,9 +39,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   1,088 synthetic updates/1,152 kernel calls, zero game actions. Shared aligned
   FP32/FP16/BF16 generator, fixed64x64/K32 prefetch, checked fallback; no sweep.
   Production pins unchanged; portable selection/shared-memory review remains.
-  RGB is still4.16x retained JAX; this does not close the goal. **Next isolate
-  convolution backward precision/algorithm coverage, then grouped products,
-  posterior reuse/device targets/EMA.** No more dense geometry or Atari restart.
+  RGB is still4.16x retained JAX; this does not close the goal. The subsequent
+  convolution precision/algorithm checks above pass; native shared-family
+  integration, grouped products and posterior/device work remain. No more
+  dense geometry or Atari restart.
   No worker remains at this publication boundary; investigation remains active.
 
 - **Execution-design diagnosis, not another cost bucket:**
