@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 12, 2026. This is the authoritative roadmap.
+Updated October 13, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -8,9 +8,18 @@ Updated October 12, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [typed cooperative matmul consolidation](results/2026-10-13-typed-matmul.md)
+qualifies: shared checked F32/F16/BF16 generation and typed partition tuning,
+with explicit storage/arithmetic and specialized algorithms retained. Complete
+RGB52.803→53.047ms/CDP124.997→126.182ms updates are within the declared2%
+non-regression gate, not faster. All272 reports/targets and292/346 saved tensors
+match exactly;13 guards pass, two warnings and corrected development failures
+remain. Pin056562b, unchanged Blade/Naga. No native-F32 device qualification
+on5080, universal parity claim or game training. Both locks/native checks,
+Clippy and193 binding tests pass; CI stays on PR31.
 The [BF16 split-K optimization](results/2026-10-12-bf16-split-k.md) qualifies:
 RGB56.269→53.065ms / CDP126.880→125.432ms complete synthetic updates, independent
-matrix/gradient checks and ten passing guards. Pin9e05731 with unchanged
+matrix/gradient checks and ten passing guards. Historical pin9e05731 with unchanged
 Blade/Naga; two development failures remain. Summation order changes stochastic
 trajectories; game quality is untested. CDP's dominant54.21ms imagination stage
 is unchanged. Continue matrix/grouped efficiency and derivative precision work;

@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Typed cooperative matmul consolidation qualifies:**
+  [result](docs/results/2026-10-13-typed-matmul.md),
+  [Meganeura PR257](https://github.com/kvark/meganeura/pull/257), pin056562b.
+  Shared checked F32/F16/BF16 generation and typed partition selection/search;
+  no dedicated BF16 dense shader or implicit precision change. Specialized
+  fused/hardware-specific algorithms and legacy search exclusions remain.
+  RGB52.803→53.047ms/CDP124.997→126.182ms:0.46%/0.95% more time, within the
+  declared2% gate, not a speedup. All272 reports/first targets/292/346 tensors
+  match exactly in these fixtures. Six typed cases/probes, existing F64,
+  gradient/convolution/Adam checks and13 guards pass; two warnings retained.
+  Invalid test options and odd-halfword tuning exclusion are corrected and
+  retained, with the CPU source-spelling failure. Native F32 device execution
+  remains unqualified on5080; no universal parity or learning claim. Cache30/
+  memo3; Blade/Naga unchanged. Both locks/native checks, Clippy and193 binding
+  tests pass; CI stays on PR31. No Atari restart.
 - **BF16 dense split-K qualifies:** [result](docs/results/2026-10-12-bf16-split-k.md),
   [Meganeura PR256](https://github.com/kvark/meganeura/pull/256). Complete matched
   RGB56.269→53.065ms (5.69% less time), CDP126.880→125.432ms (1.14%). One pair

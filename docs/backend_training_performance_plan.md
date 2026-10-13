@@ -1,16 +1,30 @@
 # Backend training performance plan
 
-Updated October 12, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 13, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
+**[Typed cooperative matmul consolidation qualifies](results/2026-10-13-typed-matmul.md).**
+One checked F32/F16/BF16 generator, explicit storage/multiply/output types and
+shared typed partition selection/search replace the BF16-only dense path.
+Specialized fused/hardware-specific algorithms and legacy search exclusions
+remain. RGB52.803→53.047ms/CDP124.997→126.182ms are0.46%/0.95% slower in the
+single matched pair, within the declared2% gate; no speedup claim. All272
+reports, targets and292/346 tensors match exactly in these fixtures. Thirteen
+guards pass; two warnings and corrected development failures remain. Pin056562b,
+unchanged Blade/Naga, cache30/memo3. Both locks/native checks, Clippy and193
+binding tests pass. Native F32 device execution on5080 and game quality are
+not established. Next resume measured matrix/grouped efficiency, derivative
+precision and command-stream work, not another dtype-specific path or Atari
+campaign. CI stays on PR31.
+
 **First post-diagnosis optimization qualifies: [BF16 dense split-K](results/2026-10-12-bf16-split-k.md).**
 Complete RGB12M/B8 updates56.269→53.065ms (5.69% less time), CDP12M/B32
 126.880→125.432ms (1.14%). Independent859,216 F64 values, long gradients,
 ten passing guards and finite272-update fixtures pass; two corrected development
-failures remain. Pin Meganeura9e05731 (runtime identical to timed87a3236), with
+failures remain. Historical pin9e05731 (runtime identical to timed87a3236), with
 Blade/Naga unchanged. Different summation order changes stochastic trajectories,
 especially pretrained CDP; retained game quality is untested. Its54.21ms
 imagination stage is unchanged. Next address remaining dense/grouped efficiency

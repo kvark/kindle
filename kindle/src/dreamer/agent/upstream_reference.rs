@@ -406,7 +406,9 @@ fn time_fixed_batch_checkpoint() {
             "dispatches": plan.dispatches.len(),
             "logical_buffer_bytes": plan.buffers.iter().sum::<usize>(),
             "shader_counts": shader_counts,
-            "bf16_matrices": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::MatMulBF16 { .. })).count(),
+            "bf16_matrices": plan.dispatches.iter().filter(|d| matches!(d.shader,
+                meganeura::compile::ShaderEntry::MatMulTyped { types, .. }
+                    if types.multiply == meganeura::DType::BF16)).count(),
             "bf16_pointwise": plan.dispatches.iter().filter(|d| d.pointwise_storage.bf16_inputs != 0 || d.pointwise_storage.bf16_output).count(),
             "standalone_casts": plan.dispatches.iter().filter(|d| matches!(d.shader, meganeura::compile::ShaderEntry::ToBF16 | meganeura::compile::ShaderEntry::FromBF16)).count(),
         })

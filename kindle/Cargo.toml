@@ -10,7 +10,7 @@ license = "MIT"
 
 [dependencies]
 # Keep training correctness fixes and the shared Blade context on one pinned stack.
-meganeura = { git = "https://github.com/kvark/meganeura", rev = "9e05731ae12c1e7b73331c2591a13fa22ac9a74d" }
+meganeura = { git = "https://github.com/kvark/meganeura", rev = "056562b5adeb6b667a49e29869ab5d7db1871260" }
 blade-graphics = { git = "https://github.com/kvark/blade", rev = "663afd2194069af25c5be884e90c3d53e83a3973" }
 rand = "0.9"
 rayon = "1.12"
