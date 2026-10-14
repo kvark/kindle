@@ -61,18 +61,31 @@ storage-only or exact-native control. Eight independent cases/22,120 values/
 derivatives pass. Three guards pass/one allocation warning; two CPU process
 failures and two CPU report failures remain. Zero actions/workers/native change.
 
-**Next: connected image forward/backward lowering, retaining current precision.**
-Wide JAX still combines bias/pooling/statistics without materializing each
-logical F32 image. Native's qualified pool path already folds encoder bias,
-but normalization/activation/layout and corresponding backward work remain
-separate. Fuse the connected region, including decoder blocks; preserve
-rounding/pooling derivatives, F32 statistics/accumulators/master state and
-staged/output lifetimes. Independent numerical checks and a whole-update gate
-must decide it. No preceding dtype/layout/row/tile sweep, failed miniature-JAX
-retry or broad capture. Convolution algorithm/staging remains a measured gap.
-Keep the independently measured5.383ms host decode/target path as a separate
-GPU-residency opportunity, not an additive savings promise. No Atari restart
-or whole-goal closure.
+**[Connected image training now qualifies numerically](results/2026-10-14-image-training-region.md),
+but only barely clears its speed gate:**65.609→63.640ms,3.0015%, still2.39×
+retained original JAX. Eight encoder/decoder regions share forward tapes and
+backward reductions with unchanged precision/heavy descriptors.144 shader
+variants/168 CPU plans/42 GPU cases/1.27M values pass. Initial tensors/first
+targets/world loss match;96 first/289 final tensors change after reduction
+reassociation. Retain isolated e1a2407c, not robust speed/learning/production
+promotion. No timing repeat to manufacture a larger margin.
+
+**Its follow-up masked attribution is not a usable latency budget.** Image and
+remaining non-heavy classes strongly interact: heavy-only26.822ms,heavy+image
+48.419ms,heavy+other31.689ms,full38.238ms. The negative formal allocation to
+other work is retained, not treated as a cost. Exact plans/states/full-output
+restoration and all192 cache checks pass, but skipping producers changes the
+intermediate contents and execution context. The interaction's cause is not
+established. Four guards/zero warnings; all six CPU failures remain.
+
+**Next: sparse timing in the intact cached graph**, preserving real operands,
+producer execution, alias lifetimes and dependencies. Require exact reports/
+states and a bounded complete-update perturbation before attributing image and
+surrounding work. No new image/row/layout/dtype/tile optimization based on these
+masked rankings, failed miniature-JAX retry or broad capture. Convolution
+algorithm/staging remains a measured gap; host decode/targets remain a separate
+5.383ms opportunity, not additive savings. Production/Atari and the full goal
+remain unchanged/open.
 
 **Bigger batches expose another implementation limit, not parity.** The
 [matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures

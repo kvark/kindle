@@ -38,12 +38,20 @@ F64 comparisons. No shape sweep. The omitted [wide-image JAX control](results/20
 now measures26.632→26.876ms, only0.92%, with unchanged heavy multiplication
 work and exact288 initial tensors. All544 updates and22,120 independent
 image-tail values/derivatives pass; no new native kernel or learning claim.
-JAX stays fast with F32 image intermediates because it still combines their
-work. Next implement connected image forward/backward lowering on the existing
-precision contract, including decoder blocks, rather than another dtype tweak.
-Preserve pooling derivatives, statistics/master state and staged lifetimes;
-judge independent numerics and whole-update time. The separate convolution
-algorithm/staging gap remains open too.
+JAX stays fast with F32 image intermediates while still combining their work.
+The [connected image forward/backward candidate](results/2026-10-14-image-training-region.md)
+now passes independent numerical checks and barely clears its whole-update
+gate:65.609→63.640ms,3.0015%, still2.39× retained original JAX. It retains the
+existing precision/heavy arithmetic across eight encoder/decoder regions;
+reassociated reductions change subsequent tensors/trajectories. Keep it isolated,
+without robust-speed, learning-equivalence or production promotion claims.
+The subsequent exact-restoring masked diagnostic cannot rank the remainder:
+removing unrelated operations makes image-enabled execution slower, producing
+a negative formal allocation for other work. Do not interpret it as kernel
+latency. Next measure sparse regions in the intact cached graph, preserving
+real data flow and qualifying whole-update perturbation. No further optimization
+based on masked rankings. The separate convolution algorithm/staging gap remains
+open too.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
