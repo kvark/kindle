@@ -19,8 +19,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Retain the CPU lint failure and initially incomplete backend patch; corrected
   complete snapshot exactly matches the qualified wider source, no GPU retry.
   Native57a1a1a3 stays isolated; no production/default/learning change.
-  RGB remains2.34× retained complete JAX12.836ms, not a fresh JAX capture.
-  Keep GPU RNG; next device EMA/targets, then row/backward fusion and safe
+  RNG-only RGB remains2.34× retained complete JAX12.836ms.
+  **[Device EMA now qualifies in the isolated candidate](docs/results/2026-10-14-device-ema.md):**
+  fresh RGB30.260→29.169ms (3.61%), CDP95.473→94.059ms (1.48%), mostly in
+  behavior/sync. General dense-F32 blend preserves compiler-derived copies and
+  tracks both sessions' lifetimes.5,267,639 primitive values and853,503 first
+  blend values/workload pass F64 bounds; four CPU tests/both Clippy checks pass.
+  Initials/first non-EMA tensors/plans exact, later trajectories differ:
+  82/272 RGB and1/272 CDP reports exact; final relative L2.0724/.8690, finite.
+  No learning-equivalence or proven near-zero LaProp claim. Seven guards/six
+  warnings,1,136 full synthetic plus one small SGD update, zero actions/GPU
+  faults. The repaired offline audit's shadowed-handle failure remains.
+  Nativea1c366a5 stays isolated; RGB now2.27× retained JAX, no fresh JAX capture.
+  Keep GPU RNG/EMA; next device targets, then row/backward fusion and safe
   views/layout. No worker at publication; broader performance goal stays active.
 
 - **Remaining gap is structural; scalar fan-out is not the main limit:**

@@ -25,12 +25,12 @@ has been established.
 
 | Current whole-update boundary | Time |
 | --- | ---: |
-| Isolated native RGB12M/B8/BF16, wider fusion + GPU RNG | 30.053ms |
+| Isolated native RGB12M/B8/BF16, wider fusion + GPU RNG/EMA | 29.169ms |
 | Fresh JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
-| Isolated native CDP12M/B32/mixed + GPU RNG | 95.269ms |
+| Isolated native CDP12M/B32/mixed + GPU RNG/EMA | 94.059ms |
 
-RGB remains **2.34×** the retained complete JAX caller boundary. CDP is a different
+RGB remains **2.27×** the retained complete JAX caller boundary. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
@@ -43,6 +43,16 @@ It generates the exact original ChaCha12 streams directly into GPU inputs:
 46 small RNG dispatches/two submissions replace host generation/uploads.
 Seven guards/three retained warnings,1,136 synthetic updates, no game actions.
 Keep this isolated candidate; JAX is the retained comparison, not a fresh run.
+
+The subsequent [device EMA intervention](results/2026-10-14-device-ema.md)
+removes parameter readback/blending/upload: fresh RGB30.260→29.169ms (3.61%),
+CDP95.473→94.059ms (1.48%). Behavior/sync accounts for most of the difference.
+5,267,639 primitive values and853,503 first production blend values/workload
+pass the independent F64 bound; initial and first non-EMA state are exact.
+Later trajectories differ (82/272 RGB and1/272 CDP reports exact), with
+finite final states; no learning equivalence or proven LaProp causality.
+Seven guards/six warnings,1,136 synthetic plus one small SGD update, zero
+actions. Keep it isolated; installed runtime and training remain unchanged.
 
 The [multi-output scalar follow-up](results/2026-10-14-pointwise-regions.md)
 does not materially close this gap: fresh RGB32.384→32.312ms (0.22%),
@@ -81,13 +91,15 @@ What is now causally established:
   9.094ms on CPU/23.160ms off CPU per captured update; most poll time is
   sleeping, not CPU computation. Moving identical RNG streams onto the GPU
   saves2.194ms at B8 and8.779ms at B32, almost proportional to draw count.
-  Target construction and EMA still cross the host. JAX pipelines metric readback inside its wrapper; the excluded
+  Device EMA then saves1.091ms RGB /1.413ms CDP. Target construction still
+  crosses the host. These interventions measure complete replacements, not
+  separately additive CPU/transfer budgets. JAX pipelines metric readback inside its wrapper; the excluded
   caller checking is only 0.177ms. Timing scope cannot explain the gap.
 
 **Next: change the compiled execution unit and connect device dataflow.**
 
-1. GPU RNG now qualifies in the isolated candidate. Move targets and slow-critic
-   EMA onto device and keep diagnostic
+1. GPU RNG and EMA now qualify in the isolated candidate, with EMA's later
+   trajectory differences retained. Move target construction onto device and keep diagnostic
    posterior readback off the critical path. Preserve stream/RNG/update-order
    contracts. Existing posterior/imagination handoffs already stay on device.
    Qualify one connected device-side stage at a time; no CPU learner workaround.

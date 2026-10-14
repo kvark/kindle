@@ -8,11 +8,12 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Latest isolated candidate: [exact-sequence GPU RNG](results/2026-10-14-device-rng.md)
-reduces RGB32.246→30.053ms and larger-batch CDP104.048→95.269ms, with every
-metric and saved tensor identical. RGB remains2.34× retained complete JAX12.836ms;
-production stays on the earlier qualified~53ms runtime. Next connect device
-targets/slow-critic EMA, then row/backward and layout fusion. No Atari restart,
+Latest isolated candidate: [device EMA](results/2026-10-14-device-ema.md) reduces
+RGB30.260→29.169ms and larger-batch CDP95.473→94.059ms. Independent numerics
+pass; later trajectories differ. It builds on [exact-sequence GPU RNG](results/2026-10-14-device-rng.md),
+which separately reduced RGB32.246→30.053ms with exact reports/tensors.
+RGB remains2.27× retained complete JAX12.836ms; production stays on the earlier
+qualified~53ms runtime. Next connect device targets, then row/backward and layout fusion. No Atari restart,
 learning-quality claim or whole-goal closure.
 
 ### Retained causal findings
