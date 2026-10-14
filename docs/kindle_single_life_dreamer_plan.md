@@ -50,8 +50,14 @@ The [latest-main training-compiler check](results/2026-10-14-training-residuals.
 now proves forward-tape reuse in JAX and recomputation in native derivatives.
 Simply expanding primitives worsens the representative plan14->28/32 dispatches;
 all analytical derivatives pass. Connected lowering must handle shared outputs,
-broadcasts and recomposition together. No new GPU speed claim; Meganeura7574ad1
-is used for this CPU check, not adopted as a replacement learner runtime.
+broadcasts and recomposition together. The subsequent
+[connected-region prototype](results/2026-10-14-connected-row-region.md)
+measures35.5% lower complete block GPU time (12.841->8.280us), with all
+281,052 numerical values passing. Its general reduction extension saves
+forward values and emits both derivatives, but selection is still manual.
+Next qualify whole-graph integration with explicit BF16 rounding and staged
+lifetimes; no block sweep or whole-learner speed claim. Meganeura7574ad1
+is used for this narrow check, not adopted as a replacement learner runtime.
 No Atari restart, learning-quality claim or whole-goal closure.
 
 ### Retained causal findings

@@ -1,0 +1,136 @@
+{
+  "status": "complete",
+  "base": "7574ad187a2663a8e7c08a19d4b7c343d6065fa7",
+  "artifacts": "/x/Code/kindle/runs/row-region-gpu-20261014.bWeLa0Dl",
+  "scope": "Manually constructed connected F32 row-region plans; not automatic compiler selection, BF16 or whole-learner qualification.",
+  "cpu": {
+    "tests": 29,
+    "cases": [
+      {
+        "candidate_dispatches": 3,
+        "candidate_groups": 3,
+        "cols": 17,
+        "control_dispatches": 5,
+        "control_groups": 3,
+        "rows": 3,
+        "values": 119
+      },
+      {
+        "candidate_dispatches": 3,
+        "candidate_groups": 3,
+        "cols": 256,
+        "control_dispatches": 6,
+        "control_groups": 4,
+        "rows": 8,
+        "values": 4352
+      },
+      {
+        "candidate_dispatches": 3,
+        "candidate_groups": 3,
+        "cols": 256,
+        "control_dispatches": 6,
+        "control_groups": 4,
+        "rows": 128,
+        "values": 65792
+      }
+    ],
+    "analytical_values": 70263,
+    "legacy_wgsl_exact": true
+  },
+  "numerical": {
+    "cases": 12,
+    "values": 281052,
+    "maximum_relative_l2": 3.614483801489343e-07,
+    "alias_and_no_alias": true,
+    "poisoned": true,
+    "inputs_unchanged": true
+  },
+  "timing": {
+    "arms": [
+      {
+        "name": "control",
+        "dispatches": 6,
+        "groups": 4,
+        "gpu_us": 12.840750000000002,
+        "host_recording_us": 6.19860546875,
+        "host_submission_us_per_batch": 15.3855
+      },
+      {
+        "name": "candidate",
+        "dispatches": 3,
+        "groups": 3,
+        "gpu_us": 8.279875,
+        "host_recording_us": 3.5126875,
+        "host_submission_us_per_batch": 9.75
+      }
+    ],
+    "reduction_fraction": 0.3551875863948757,
+    "gate_fraction": 0.2,
+    "qualifies_for_reviewed_integration": true,
+    "repeat_outputs_exact": true,
+    "block_replays": 544,
+    "warmup_per_arm": 16,
+    "measured_per_arm": 256
+  },
+  "guards": [
+    {
+      "name": "numerical",
+      "passed": true,
+      "allocation_warnings": 2,
+      "baseline_warnings": 260
+    },
+    {
+      "name": "timing",
+      "passed": true,
+      "allocation_warnings": 0,
+      "baseline_warnings": 262
+    }
+  ],
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "retained_complete_update_ms": {
+    "native": 28.212816078125,
+    "jax": 12.836475229960342
+  },
+  "failures": [
+    "Clippy reference-pattern style",
+    "Moved test-oracle relative include",
+    "Small-row control has no SumRows dispatch; construct the existing reduction explicitly",
+    "CPU publication audit expected the oracle terminal blank line removed by cargo fmt",
+    "First audit counted historical baseline allocation warnings as new; corrected before publication"
+  ],
+  "hashes": {
+    "backend.patch": "8628cd223b216ebffb69dbac514bb97dbf040303b2a78f5cee738212ba1682d3",
+    "backend-Cargo.lock": "17a4b854c461fd92543791984128f2810c437c0fe2e1e89d5d456eb0ed713a9b",
+    "backend-tests": "d37507c1cf20c9eea088ca734cd1ac92cb050431cc60df5f87bdaa9f7bc34794",
+    "build.sh": "037e2bf3629086f3ab528c2aac67a8e4f7ad694696467b7e0af554f6b5ebfb4e",
+    "build-v4.log": "72e3efcdf97e7a62eacd4d71d82fc79ebb124d3dae83165c8b5c3d2c57d2a417",
+    "backend-lint-failed.patch": "b46b2bd259b42c547b7a06cc73e5aad78e468148d82dc7da1524acd7590a6ea7",
+    "backend-include-failed.patch": "22010baa06a9a2a187902429b2542dca9071dba95ad54908c277fd89afcd416f",
+    "backend-small-row-failed.patch": "d59942be5520cd1d920bf57afa8cd70ec5bf3469ea63fc797540b89d6be1b872",
+    "backend-small-row-failed-tests": "668f8d2083b2f67df94b066766216daff8cb11bd6f134633d49c39c8f32ec138",
+    "build.log": "a3d46e7e734f9c70c36a0910ebb38f7ed76a5a3984775c45f672f3ffa917dcfc",
+    "build-v2.log": "c17a2dcbf54016b7f1924f4b36f8e53f94eb6593a555c50731d5964df3360ffb",
+    "build-v3.log": "013719621cd26b6b1ed8c1b92e4e5486439ab928b901f7fd251e3e0cb9d732af",
+    "cpu/result.json": "90b47141e47c6147dd9da08e0d63fb2b3cd973a1a555214095bc15be64f3ffd8",
+    "numerical/result.json": "f987bf29571234948fd8fcb7d2a9b5713c804149955c03ba6096fbee139ba077",
+    "timing/result.json": "84449a7708a3d5c7d9f29e395c6220a62775a0700ed1ea81939e4bbd818d425c",
+    "declare.py": "acb86fe0cf47650f0ff2df451698767c9634188bc6c5658d066c879974271db7",
+    "audit.py": "282a976fbb362642c0c3772ccf55a1d41e6e5a521dea04ee0ae0ec5c86052136",
+    "audit-trailing-blank-failed.py": "740fc66299710b26ccbb757336783435ed9216d076847f2657100712d4d4556e",
+    "audit.log": "3881a27dedcbb4ebd4cbbc7a2dc089a769a2783a7f256b3859feb24723c2bcd2",
+    "audit-warning-count-failed.py": "4af105c3e24ada62183f6d2bc9b9b383534607efbd315db077356ff0057e434b",
+    "audit-including-baseline.json": "5ee751d85f1fed7298874be3239665264359962cd83b2f73fd76e9edf0b15fbc",
+    "audit-v2.log": "b25ccd1fbdb6174a4462e34f0623a82a756acc929716f5d7f6b6e64e9847fb51",
+    "numerical-queue/numerical/result.json": "ddf0240d70da71d3b88cb00a625b49dbcd02246c652aadd8a56b7c5178242f98",
+    "numerical-queue/numerical/events.jsonl": "c396e2447f3fdbf76e21a6e06e5abc9a9f11abe7d3def35b291db522dfdd815d",
+    "numerical-queue/numerical/child.stdout": "c56e86b9d9cb133b5d2c957bf7d7a933823cc891996efc5ebd0dfdce7d3b303c",
+    "numerical-queue/numerical/child.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timing-queue/timing/result.json": "0410d9a9830b7544df2cbe9c66acecf100334d6eec88cf696cc1ac587c1731d6",
+    "timing-queue/timing/events.jsonl": "a4d50d03dfcfd1dd4247fc691c4f6f267324dbce59d6ba3f757908e0f3c2121e",
+    "timing-queue/timing/child.stdout": "849e39baa9a62e8ac074f55c86858fd1b989e1a9877873d72519b688216b8856",
+    "timing-queue/timing/child.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "numerical-queue.json": "ba0e05c618d50b916793b233e5647332638733a4d64510a65978519ab9ae2e0b",
+    "timing-queue.json": "9abe146614e23fe4d507ae493008e700b2ff9af596ed592e1b68d1fba791de75"
+  }
+}

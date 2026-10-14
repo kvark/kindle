@@ -145,7 +145,18 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: design a connected row/backward region, not another local knob.**
+**Next: integrate the measured connected region, not another local knob.**
+
+The [general reduction prototype](results/2026-10-14-connected-row-region.md)
+passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives
+12.841->8.280us (35.5%). Additional row/element outputs retain forward values;
+column prologues combine backward work. All281,052 GPU values and70,263 CPU
+values pass, normal aliasing/no-alias with poison included. Two guards/two
+warnings; zero optimizer updates/actions. This is explicit plan construction,
+not yet automatic lowering or BF16 learner qualification. Review integration
+across actual rounding/live-output/staged-backward boundaries, then one complete
+update comparison. No block-size sweep or extrapolation to all135 regions.
+Retained full28.213/12.836ms remains2.20x; this alone cannot close the gap.
 
 The [CPU design control](results/2026-10-14-training-residuals.md) is complete
 on latest Meganeura7574ad1, including the upstream shared-widening fix.

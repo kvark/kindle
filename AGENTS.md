@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Connected training-region prototype passes:** [result](docs/results/2026-10-14-connected-row-region.md).
+  Existing general reduction gains column prologues and extra row/element
+  outputs; RMSNorm/SiLU saves forward values and emits both derivatives.
+  Same8x256 complete block12.841->8.280us (35.5%),6->3 dispatches/4->3 groups.
+  All281,052 GPU values/12 alias-poison cases and70,263 CPU values pass;
+  29 CPU tests/two guards, two allocation warnings,556 optimizer-free replays,
+  zero actions/updates/workers. Failures/source snapshots remain. Explicit plan
+  construction on main7574ad1, not automatic compiler or BF16 learner adoption.
+  The20% block gate passes; next reviewed whole-graph integration must preserve
+  rounding/live outputs/staged backward lifetimes and measure complete updates.
+  No block sweep, additive savings claim or Atari restart. Whole2.20x gap stays
+  open; production unchanged. CI386 passes on preceding1e71e74.
+
 - **Training compiler boundary diagnosed:** the [latest-main CPU control](docs/results/2026-10-14-training-residuals.md)
   proves JAX carries forward normalization/activation tapes into backward;
   native135 SiLU/norm derivative regions recompute them. Primitive expansion
