@@ -45,13 +45,23 @@ All independent typed-pack/connected F64 checks pass; one CPU fixture shape
 failure and its test-only repair remain. Keep3551bc53, not rejected212713c4.
 Static duplicate/byte counts did not predict a substantial saving.
 
-**Next: shape-specialize packed convolution indexing.** The shared cooperative
-kernel still receives fixed dimensions through uniforms/software division,
-unlike the existing specialized scalar path. The earlier counter study found
-excessive integer address work. Test this specific compiler boundary without
-changing arithmetic, precision, tiles, split counts or layouts; source inspection
-alone does not establish causality. Require independent numerical checks and
-one complete-update gate. No broad capture or row/grid/tile/dtype/layout sweep.
+**[Packed shape specialization also rejects](results/2026-10-14-packed-specialization.md):**
+65.684→65.207ms,0.726%, below3%. All14 packed kernels use constant dimensions/
+native division; all plans/reports/states remain exact.40 GPU cases/13,304,541
+F64 comparisons pass. The original CPU12/16-word binding failure stays retained;
+the corrected boundary reuses existing parameter binding. Keep3551bc53, not
+either sub1% candidate. Visible local inefficiency is not weighted attribution.
+
+**Next: one complete image-training reduced-storage/fusion contract.** Actual
+JAX fuses convolution+bias into BF16, then pooling+F32 statistics; first pooled
+values are32MiB BF16 versus native64MiB F32. Native rounds before F32 bias and
+retains wide intervening operations. JAX still has a comparison-mask tape.
+The previous wider-JAX policy left these image islands unchanged. Specify
+rounding and pooling subgradients before implementing one shared typed region;
+keep F32 statistics/accumulators/master state. Independent quantized forward/
+backward checks and full-update timing matter, not legacy bitwise identity
+after deliberate precision changes. Static extents do not prove a speedup.
+No dtype/layout/row/tile sweep, failed miniature-JAX retry or broad capture.
 Keep the independently measured5.383ms host decode/target path as a separate
 GPU-residency opportunity, not an additive savings promise. No Atari restart
 or whole-goal closure.

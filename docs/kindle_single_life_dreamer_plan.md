@@ -32,10 +32,15 @@ GPU retry. The subsequent [connected layout/reuse trial](results/2026-10-14-conn
 also rejects:65.651→65.593ms, only0.089%. It removes eight packs/ten casts/two
 transposes with exact reports/states and qualified staged backward lifetimes,
 but those static redundancies were not a major cost. Keep3551bc53, not rejected
-212713c4. Next isolate shape-specialized indexing in the shared packed convolution
-path: it still uses uniform dimensions/software division, unlike the scalar
-path. This is a hypothesis connected to the measured excess integer work,
-not a proven explanation or promise of parity. Require a complete-update gate.
+212713c4. [Packed shape specialization](results/2026-10-14-packed-specialization.md)
+also rejects:65.684→65.207ms,0.726%, with exact reports/states/plans and13.3M
+F64 comparisons. No shape sweep. Next address one complete image-training
+storage/fusion contract: JAX's first pooled values are32MiB BF16 versus native
+64MiB F32, with different bias/rounding/statistics boundaries. The previous
+wider-JAX experiment left these islands unchanged. This is static contract
+evidence, not promised savings; specify rounding/pooling derivatives, preserve
+F32 statistics/master state and judge independent numerics plus whole-update
+time. Deliberate precision changes need not preserve legacy trajectories.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.

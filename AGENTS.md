@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Packed shape specialization rejected:** [result](docs/results/2026-10-14-packed-specialization.md).
+  Complete RGB12M/B32 control/candidate65.684→65.207ms,0.726%, below3%;2.40×
+  retained JAX27.187ms. Keep3551bc53, not rejectedf8e6e663/212713c4. All14
+  packed-convolution keys change, five plans/cache counts/272 reports/first
+  outputs/three292-tensor boundaries stay exact.36 specialized/24 retained
+  shader variants and40 GPU cases/13,304,541 F64 values/seven partials pass.
+  Initial guard fails in CPU12→16-word parameter binding; fixed via existing
+  binding conversion, unchanged oracle/gates. Three guards pass/one warning,
+  544 synthetic updates/40 zero-rate numerical steps/zero actions/workers.
+  Earlier dispatch-route CPU preparation stop retained. Upstream99e3de27/
+  e7c3f7b unchanged. Both this and layout reuse have sub1% whole gains; no
+  shape/layout/tile sweep or promotion. Next one connected image-training
+  reduced-storage/fusion contract: actual JAX pooled values32MiB BF16 versus
+  native64MiB F32, plus different bias/rounding/statistics boundaries. Static
+  extents, not measured savings; JAX still retains a pooling mask. The earlier
+  wider-JAX control left these islands unchanged. Define rounding/pooling
+  subgradients and independent quantized forward/backward checks; deliberate
+  precision changes need not preserve legacy trajectories. No dtype sweep,
+  miniature-JAX retry, Atari restart or whole-goal closure.
 - **Connected layout reuse rejected:** [result](docs/results/2026-10-14-connected-layout.md).
   Complete RGB12M/B32 control/candidate65.651→65.593ms,0.089%, below3%; still
   2.41× retained JAX27.187ms. Keep3551bc53, not rejected212713c4. World4,089→

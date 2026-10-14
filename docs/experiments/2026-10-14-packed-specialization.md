@@ -34,3 +34,10 @@ workers or compilation during timing. Preparation/review use one CPU,2GiB,
 zero swap. No separate NVML polling, unsafe Vulkan capture, production repin,
 Atari allocation or whole-goal closure. Source inspection is a hypothesis,
 not proof that this omission causes the remaining gap.
+
+The first numerical process stops during CPU pipeline construction: the plan's
+12 raw shape words were passed instead of the16-word existing uniform-binding
+representation. No numerical case completes. Preserve that guard/source/binary;
+reuse `Conv2dParams::from(dispatch)` for constants, check the real12-word default
+dispatch path on CPU, then qualify the corrected candidate in a new bounded
+300-second process. No arithmetic/gate/budget change or successful-case repeat.
