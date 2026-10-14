@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Current cached execution attributed:** [result](docs/results/2026-10-14-cached-residual.md).
+  Profiling previously disabled the command cache; isolated primary-boundary
+  timestamps retain it. Ordinary/coarse23.039/23.154ms,0.50% overhead, all272
+  reports/plans/pipelines/first outputs/three292-tensor boundaries exact.
+  GPU-pass union19.697ms, uncovered3.458ms; not SM utilization. Fixed graph
+  18.733ms allocates4.295 empty stream/5.587 convolution/3.388 matrix/5.463 other.
+  All1,536 measured masks verify cache reuse; full outputs/tensors restore.
+  Four guards/one retained warning,569 synthetic updates/2,380 optimizer-free
+  replays/zero actions/failures/workers. Nativec3b7975b, production unchanged.
+  One-world-chunk diagnostics are not a new four-chunk speed result: retained
+  22.881ms/fresh JAX12.684ms remains1.80×. Next actual connected heavy-projection/
+  layout/rounding/backward regions against reachable JAX, then a general measured
+  lowering intervention. No row-only/dtype/tile/barrier sweep, additive savings
+  forecast, Atari restart or whole-goal closure. Upstream7574ad1/e7c3f7b unchanged.
+  CI397 passes on preceding9044f84; publication/source/link audit passes.
 - **Wider-intermediate JAX control completes below its follow-up gate:**
   [result](docs/results/2026-10-14-precision-flow.md). Complete12.684→13.469ms,
   +6.19%, below10%; no further precision capture/sweep. Actual obs0 contracts

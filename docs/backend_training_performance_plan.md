@@ -8,6 +8,25 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Current cached execution is predominantly device-side.** The
+[qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the
+command cache, which ordinary GPU profiling had disabled. One-chunk ordinary/
+coarse23.039/23.154ms has0.50% overhead and exact reports/plans/pipelines/states.
+GPU-pass union19.697ms versus3.458ms uncovered is not SM utilization. Fixed
+graph18.733ms allocates4.295ms empty command stream,5.587 convolution,3.388
+matrix and5.463 other operations. Cache reuse and exact restorations pass;
+these interacting allocations are not independent savings. Four guards pass,
+one warning retained, no game actions/production change/workers.
+
+This gives priority to a connected heavy-projection/training region, including
+layout, explicit rounding, multiple consumers and backward lifetimes. Compare
+its real native/JAX dataflow before a general lowering intervention, then check
+complete-update cost. Row-only integration already saved only~1%; do not repeat
+that local sweep or assume fewer dispatches guarantee a large gain. Host decode/
+targets cost1.522ms; useful work, but not the primary device-side gap. Keep
+library algorithms and dependency execution in scope. The ordinary four-chunk
+candidate remains22.881ms/1.80× fresh JAX; no new throughput or parity claim.
+
 **Wider intermediate precision does not supply the missing large multiplier.**
 The [qualified JAX control](results/2026-10-14-precision-flow.md) measures
 complete12.684→13.469ms (+6.19%), below the10% follow-up gate. Same288 initial
@@ -19,8 +38,8 @@ padding/scalar-lowering/packing differences reconcile exactly. Failures remain.
 No further precision capture/sweep, production change or learning claim.
 
 Retained native22.881ms is1.80× the fresh baseline; it was not retimed.
-Next refresh low-perturbation attribution on this current candidate, then trace
-the largest connected heavy-kernel/compiler regions against actual JAX work.
+The refreshed attribution above now directs the next connected heavy-kernel/
+compiler comparison against actual JAX work.
 Prior row-only fusion saved~1%, so do not repeat that local sweep or assume
 dispatch counts predict savings. Kernel efficiency and device execution remain
 structural costs; preserving F32 derivatives alone need not impose the gap.

@@ -56,8 +56,13 @@ library choices: not a storage-only ablation or exact native clone. No further
 precision sweep or conditional capture; changed trajectories are not learning
 equivalence. All failures remain.
 
-Next refresh low-perturbation attribution on the current native candidate,
-then pursue its largest connected heavy-kernel/compiler costs. The five checked
+The [current cached capture](results/2026-10-14-cached-residual.md) now attributes
+19.697ms to GPU-pass intervals versus3.458ms uncovered, with0.50% instrumentation
+overhead and exact reports/states. Fixed-graph costs include4.295ms empty command
+stream and5.463ms other-than-heavy work, alongside5.587ms convolution/3.388ms
+matrices. These are interacting allocations, not additive removable costs or
+SM utilization. Next compare an actual connected heavy-projection/training region
+with its JAX consumers, then measure a general lowering intervention. The five checked
 convolutions occupy only~2.50ms; prior row-only fusion saved~1%. Keep matrix
 efficiency, materialization and device execution in scope. No iterator/tile/
 vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
