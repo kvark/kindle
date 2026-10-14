@@ -24,10 +24,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current Naga hard-codes subgroup scope; Blade does not expose matrix2. Exact
   capability/source records remain. Query creates only an instance, no logical
   device/allocation/pipeline/dispatch; support is not numerical/performance
-  qualification. Next one bounded native compiler-managed matrix-load/staging
-  proof before Naga/Blade/Meganeura feature work; shared typed path, no tile/split
-  sweep or automatic adoption. This offers a concrete higher-level alternative
-  to manual staging, not proof of efficient convolution mapping or parity.
+  qualification. **The [native workgroup-convolution proof rejects](docs/results/2026-10-14-workgroup-convolution.md):**
+  actual dX2.14876→8.71198ms,4.05× slower, despite16.78M exact outputs and
+  independent F64 checks. Three guards/no warnings,33,625,600 total exact output
+  checks/265 F64 checks, zero updates/actions/workers. CPU encoding-name failure
+  retained; no GPU retry. No Naga/Blade feature work or tile tuning follows.
+  Retained full-JAX trace confirms256x32/64x256 output tiles and four stages
+  versus native32x32/one;2,048/624 blocks versus16,384/6,400, all128 threads.
+  dW has156 versus128 partitions, not fewer; library layout/vector/reuse/staging
+  differs substantially. Tile ratios are not speedups or native counters.
+  Next inspect the actual library derivative instruction/data-feeding contract
+  before one shared typed convolution lowering, including transforms/scratch.
+  Do not mistake workgroup scope alone for the library algorithm or restart
+  geometry/CUDA-translation sweeps.
   Keep isolated28864210 and its [general ordering gain](docs/results/2026-10-14-convolution-scheduling.md):
   63.597→60.041ms,5.59%, exact272 reports/initial-first-final292 tensors,20
   automatic boundaries with unchanged allocation/submissions. Execution-only

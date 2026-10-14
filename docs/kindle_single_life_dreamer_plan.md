@@ -27,10 +27,14 @@ timing bands fail, so CUDA counters are not native measurements. They show~58%
 integer instructions and~9% tensor activity: feeding the tensor operations is
 still costly. A physical-device query confirms an unused higher-level option:
 cooperative-matrix2 workgroup matrices/tensor addressing, with BF16→F32 support.
-Our Naga writer currently hard-codes subgroup scope. Next prove native
-compiler-managed loading/staging before compiler/backend feature work; support
-alone establishes no speedup or efficient convolution mapping. No tile sweep,
-production change or automatic adoption; the full goal remains open.
+Our Naga writer currently hard-codes subgroup scope. The [native proof rejects](results/2026-10-14-workgroup-convolution.md):
+actual dX2.14876→8.71198ms despite exact outputs and independent checks. Do not
+start compiler/backend feature work or tune that prototype. The retained full
+JAX trace instead shows four-stage256x32/64x256 convolution tiles versus our
+single-stage32x32, with8–10× fewer blocks. Layout/vector/reuse/staging differ
+together; tile ratios are not speedup estimates. Next inspect the actual library
+instruction/data-feeding contract before one shared typed lowering, counting
+transforms and scratch. No production change or goal-closure claim.
 
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
@@ -85,8 +89,9 @@ the full local gain with empty memory-barrier arrays, and qualifies the general
 rule above. Explicit access scopes are unnecessary; hardware/cache causes remain
 unmeasured. JAX's retained trace is effectively non-overlapping, not strictly
 serial or native-overlap evidence. The derivative/backend study above follows
-that audit; compiler-managed workgroup matrices are the next bounded proof,
-not a tile/split/geometry sweep. No blanket serialization or masked ranking.
+that audit; its workgroup-matrix follow-up rejects above. The library's complete
+data-feeding algorithm, not a tile/split/geometry sweep, is the next question.
+No blanket serialization or masked ranking.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.

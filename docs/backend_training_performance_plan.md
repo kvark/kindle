@@ -15,15 +15,24 @@ bands fail, so CUDA counters are not native proxies; nonetheless changing backen
 alone does not remove these costs. Translated kernels issue~1B warp instructions,
 ~58% integer, with~9% tensor activity. No occupancy target or extra CUDA sweep.
 
-**Next proof: compiler-managed workgroup matrices, not another tile sweep.**
+**The [workgroup-matrix proof rejects](results/2026-10-14-workgroup-convolution.md).**
 This5080/580 advertises `VK_NV_cooperative_matrix2`, including workgroup scope,
 flexible BF16→F32 dimensions and tensor addressing. Current Naga hard-codes
-subgroup scope; Blade exposes the older path. A query is not performance or
-numerical qualification: it created no logical device or shader. First test one
-bounded native matrix-load/staging prototype with independent numerics and full
-operation cost before adding shared typed Naga/Blade/Meganeura support. Efficient
-convolution mapping and whole-update gains remain unproven; no production/Atari
-restart. Full B32 stays60.041ms/2.25× JAX; host decoding/targets are separate.
+subgroup scope; Blade exposes the older path. But actual native dX with tensor
+loads/workgroup matrices takes8.71198ms versus2.14876ms,4.05× slower despite
+all16.78M exact outputs. No compiler/backend feature work or tuning of that
+prototype follows. Three guards/no warnings,265 F64 checks, zero updates/actions.
+
+The actual full-JAX trace shows a different convolution work-reuse contract:
+256x32/64x256 tiles, four stages and2,048/624 blocks, versus native32x32,
+one stage and16,384/6,400 blocks. All use128 threads; the library invests more
+resources in each block. dW's names identify16-byte aligned loads. Related public
+CUTLASS source pipelines async copies and arithmetic; source names are not
+binary causality or speedup estimates. The failed prototype did not reproduce
+these layout/reuse/staging choices. Next inspect actual library derivative
+instructions/data feeding before one shared typed convolution lowering, with
+all transforms/scratch counted. No geometry/translation sweep or automatic
+production/Atari restart. Full B32 stays60.041ms/2.25× JAX; host targets distinct.
 
 **Retained: [a general ordering rule retains the execution gain](results/2026-10-14-convolution-scheduling.md).**
 Complete RGB12M/B32 unchanged/single-boundary/general63.597/60.302/60.041ms:
