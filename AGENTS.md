@@ -7,7 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Narrow-product alternative rejected; inspect command recording next:**
+- **Command reuse removes a structural host bottleneck:**
+  [result](docs/results/2026-10-14-command-cache.md). Same RGB complete updates
+  28.416->25.530ms (10.16%), exact272 reports/first outputs/plans/pipelines/
+  initial-first-final292 tensors. Nsight CPU-API capture shows descriptor
+  updates5351->65 and pipeline binds5297->11;15 submissions/update unchanged.
+  All5286 GPU graph dispatches still execute. Eight graph chunks recorded once,
+  2168 reuses; dynamic optimizer commands remain live and barriers stay intact.
+  Selected CPU API1.562->.116ms is not all host cost or GPU acceleration;
+  capture perturbs control+7.85%, so use ordinary timing.16 lifecycle cases/
+  278528 exact values pass twice, second with repaired validation logging;
+  eight guards/four warnings,1152 synthetic updates/zero actions. CPU failures
+  remain. Keep isolated candidate, not production/portable/CDP qualification.
+  No worker/recovery; RGB still1.99x retained complete JAX. Next investigate
+  actual remaining library algorithms/checked boundary convolutions and device
+  dependencies, not another cache/geometry sweep or Atari restart. CI389 passes.
+- **Narrow-product alternative rejected:**
   [result](docs/results/2026-10-14-narrow-products.md). A shared typed scalar
   alternative removes padded rows in two checked decoder kernels, but complete
   RGB28.488->30.492ms is7.03% slower. All90 numerical cases/4,705,658 values,
@@ -15,11 +30,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Five guards/three warnings,592 synthetic updates/90 numerical executions,
   zero actions; first/final trajectories differ, no learning parity. No grouped
   GPU or F32 cooperative qualification. Reject without a geometry/CDP sweep;
-  production unchanged, no worker. Next isolate safe command recording reuse
-  from measured4.548ms host construction/submission. Preserve optimizer-step
-  uniforms, resources, barriers, staged lifetimes and ordinary chunking. This
-  is not demonstrated CUDA-graph-equivalent device acceleration; GPU algorithms
-  and dependency cost remain open. CI388 passes on2429a48.
+  production unchanged, no worker. Command recording is addressed above;
+  GPU algorithms and dependency cost remain open. CI388 passes on2429a48.
 - **Irregular convolution paths remain expensive:**
   [result](docs/results/2026-10-14-heavy-issued-work.md). Five checked RGB-boundary
   kernels contain11.1% of convolution nominal MACs but56.6% of measured cost:

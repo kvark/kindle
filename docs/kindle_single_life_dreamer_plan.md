@@ -66,9 +66,13 @@ slots after padding; this is not a JAX issued-work ratio or sole proven cause.
 The [typed scalar alternative](results/2026-10-14-narrow-products.md) passes
 90 numerical cases but slows complete updates28.488->30.492ms (7.03%): reject
 without a geometry sweep. Padding alone is not the proven explanation.
-Next isolate command-recording cost with safe resource/staged/optimizer
-lifetimes and unchanged submission chunks. This targets measured host work,
-not an assumed CUDA-graph-equivalent Vulkan device path. Upstream7574ad1 is
+The [command-cache intervention](results/2026-10-14-command-cache.md) now
+reduces complete updates28.416->25.530ms (10.16%), with all272 reports/plans/
+saved tensors exact. Nsight confirms5286 fewer descriptor updates and pipeline
+binds per update, while15 submissions and GPU work remain unchanged. Keep
+this isolated improvement; it is still1.99x retained complete JAX. Next
+investigate remaining library-kernel algorithms and device dependency costs,
+not a cache/geometry sweep. No CUDA-graph-equivalent device claim. Upstream7574ad1 is
 rechecked, not substituted for the optimized experimental backend.
 No Atari restart, learning-quality claim or whole-goal closure.
 

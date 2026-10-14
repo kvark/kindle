@@ -26,11 +26,13 @@ has been established.
 | Current whole-update boundary | Time |
 | --- | ---: |
 | Retained isolated RGB12M/B8/BF16, row selection + latest compiler | 28.213ms |
+| Isolated command-cache candidate, fresh ordinary full pair | 25.530ms |
 | Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
 | Retained isolated CDP12M/B32/mixed, row selection + latest compiler | 93.084ms |
 
-RGB remains **2.20×** the retained complete JAX caller boundary. CDP is a different
+The retained RGB control is2.20× complete JAX; the new cache candidate is
+**1.99×**. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
@@ -145,7 +147,7 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: isolate command-recording cost, not another kernel tuning sweep.**
+**Command recording is now addressed; continue with the GPU algorithms.**
 
 The [completed integration](results/2026-10-14-connected-learner.md) automatically
 selects127 connected forward/backward regions and removes378 dispatches, but
@@ -164,12 +166,22 @@ qualifies90 numerical cases but slows full RGB28.488->30.492ms (7.03%). It
 removes padded tensor products but also loses tensor hardware; reject without
 a geometry/CDP sweep. The expensive path remains unresolved.
 
-The coarse trace separately measured4.548ms host command construction/submit.
-Test cached immutable graph commands while recording changing optimizer state
-normally, retaining resource ownership, all barriers, staged late-input lifetimes
-and ordinary chunks. Measure whole updates, not just recording calls. This
-does not promise the lower device issue cost observed with CUDA graphs; those
-and heavy-library algorithms remain separate unresolved causes.
+The [command-cache intervention](results/2026-10-14-command-cache.md) reduces
+whole updates28.416->25.530ms (10.16%). Exact272 reports/first outputs/plans/
+292 tensors qualify unchanged arithmetic. Nsight shows5351->65 descriptor
+updates and5297->11 pipeline binds per update;15 submissions and all5286 GPU
+graph dispatches remain. Cache immutable graph chunks, keep optimizer state
+live, retain resources/barriers/staged lifetimes. No cache sweep. Selected
+API durations1.562->.116ms are incomplete host accounting and the capture
+perturbs timing; use the ordinary pair. The16 lifecycle cases pass again
+with repaired validation logging;1152 total synthetic updates/zero actions.
+
+Keep the isolated improvement, not a portable production/CDP qualification.
+The remaining~2x gap still requires actual GPU algorithm/dependency work.
+Match JAX's executable and native boundary convolutions before another
+intervention; do not infer a padding fix from nominal MACs or revive the
+rejected scalar path. CUDA graphs' lower device issue cost is separate from
+ordinary Vulkan command reuse. No whole-gap or Atari-learning closure.
 
 The [general reduction prototype](results/2026-10-14-connected-row-region.md)
 passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives
