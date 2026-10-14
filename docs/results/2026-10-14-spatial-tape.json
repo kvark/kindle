@@ -1,0 +1,140 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifact_root": "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq",
+  "interpretation": "Connected image lowering is a causal bottleneck, but this intervention closes only a small part of the complete gap.",
+  "precision_policy_changed": false,
+  "production_changed": false,
+  "game_actions": 0,
+  "current_upstream": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc"
+  },
+  "control_ms": 68.49080194140623,
+  "candidate_ms": 65.7363222421875,
+  "improvement_percent": 4.021678270865026,
+  "passes_three_percent_gate": true,
+  "retained_jax_ms": 27.1873448801,
+  "remaining_ratio": 2.417901510136201,
+  "closed_fraction_of_gap_percent": 6.66888414480728,
+  "complete_block_ms": {
+    "retained": {
+      "ordinary": 6.218014140625,
+      "staged": 6.3786496875
+    },
+    "candidate": {
+      "ordinary": 4.33568059375,
+      "staged": 4.3062976875
+    }
+  },
+  "block_improvement_percent": 30.27226224168409,
+  "exact": {
+    "reports_per_arm": 272,
+    "actor_tensors_per_boundary": 292,
+    "boundaries": [
+      "initial",
+      "first",
+      "final"
+    ],
+    "first_outputs": true,
+    "unaffected_plans": 3,
+    "unchanged_descriptors_in_world": 4081
+  },
+  "world_plan": {
+    "old_dispatches": 4101,
+    "new_dispatches": 4089,
+    "replaced_dispatches": 20,
+    "replacements": 8,
+    "regions": 4,
+    "posterior_label_is_same_staged_plan": true,
+    "logical_scheduled_output_bytes_saved": 719323136
+  },
+  "qualification": {
+    "shader_variants": 15,
+    "generic_cases": 24,
+    "generic_values": 25632,
+    "independent_cnn_values": 5104,
+    "all_staged_exact": true,
+    "all_retained_block_outputs_exact": true
+  },
+  "accounting": {
+    "guards": [
+      {
+        "name": "generic",
+        "passed": true,
+        "allocation_warnings": 0
+      },
+      {
+        "name": "block",
+        "passed": true,
+        "allocation_warnings": 0
+      },
+      {
+        "name": "control",
+        "passed": true,
+        "allocation_warnings": 0
+      },
+      {
+        "name": "candidate",
+        "passed": true,
+        "allocation_warnings": 0
+      }
+    ],
+    "allocation_warnings": 0,
+    "synthetic_updates": 544,
+    "block_calls": 248,
+    "measured_block_calls": 128,
+    "measured_updates": 512,
+    "game_actions": 0
+  },
+  "failures": [
+    {
+      "log": "build.log",
+      "reason": "Incomplete inherited source copy omitted untracked modules; copied original files before rebuilding."
+    },
+    {
+      "log": "build-v2.log",
+      "reason": "CPU tests omitted runtime resource bindings and exposed BF16 graph outputs; corrected test harness, no numerical tolerance change."
+    },
+    {
+      "log": "build-v3.log",
+      "reason": "Nested diagnostic workspace needed explicit exclusions; backend CPU tests already passed."
+    },
+    {
+      "log": "build-v4.log",
+      "reason": "Unused case field rejected by Clippy; removed."
+    },
+    {
+      "log": "timing-review.log",
+      "reason": "Audit assumed posterior had a separate forward-only plan; it aliases the staged world plan. Exact tensors/reports already passed."
+    },
+    {
+      "log": "plan-delta.log",
+      "reason": "Small field reader rejected a repeated input_buffers key; used unique top-level fields."
+    },
+    {
+      "log": "patch-check-first.log",
+      "reason": "Isolated patch exporter omitted Git new-file mode headers; repaired exporter, no source or GPU change."
+    }
+  ],
+  "limitations": [
+    "One ordinary paired synthetic timing, not a learning or CDP result.",
+    "Retained JAX and block control timings are not newly paired in this study.",
+    "Logical output extents are not measured DRAM traffic, physical free memory or peak VRAM.",
+    "GPU utilization remains unmeasured. No causal budget formed by subtracting unlike profiler metrics.",
+    "No GPU retry, tolerance relaxation, driver recovery or production repin."
+  ],
+  "next": "No pool/row/tile sweep. Review the remaining image program and the measured convolution staging/reuse gap together; prioritize one structural implementation with a complete-update gate. Host decode/targets remain a separate measured GPU-residency opportunity.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/preflight.json": "dba6c058d4cd462fb69d2bef9adbf52f9a3801dc0740b6dd6c7b6abacec34ee7",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/qualification-review.json": "f45d0cde95149e257fa9f12af5a99b9275948ab1664148a66457e85bd46a32fb",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/timing-review.json": "e4a3b460b76dd4dde2b64cbf5187f6fb014163f6644d647cd5c5aca6aea4a76d",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/intervention.patch": "8fba4cd00a54050ca24dd95d19cf21484a822a354d7397388df07db1338bc937",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/backend.patch": "c2001f66ba5f2ed1647c76b8223e038cf3781b4e512f15db3245d12045689b5c",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/kindle.patch": "7ffa122fce87bbc4e72095c65959522f4acd21fbd1566bd101a07fe87021f7e9",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/native": "f2b98efcefcb2761f25afbc36dc5d6fc192d0b50ab9f7912378232a51974bb25",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/kindle-tests": "3551bc53ebf2e638a7c7fcf6b294cee3f9ba2a11657aecc1ce2b3fcc8bf4291e",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/review.py": "680521fe2af9ae50fcdc6619766cce8cd999db7fd81b8c2a6c1f48d8f93e6482",
+    "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/summarize.py": "13f46b94658d125c3a9cac0066e72411de8b139706507b821bdf07eb6266a84d"
+  }
+}

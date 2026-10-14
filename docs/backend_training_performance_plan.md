@@ -18,18 +18,28 @@ The actual JAX capture preserves all272 reports and final tensors, with
 23.099ms kernel/copy union. The two forms of coverage are not an exact
 subtractable budget or SM utilization.
 
-**Next: connected spatial training lowering, including backward.** Native
-expands image work into F32 intermediates, materialized layout changes and
-separate pool/bias/gradient conversions. JAX combines several of these stages
-and their gradient partials while preserving compact layouts. In the first
-native block78.4% lies outside convolution; leave-one-out pool backward,
-bias, conversion and pool forward cost1.106/.561/.500/.420ms respectively.
-Use physical-layout/storage information and shared typed access to compose
-compatible stages and retain required backward values. Do not start another
-isolated kernel/tile sweep. Qualify complete forward/backward, then one
-ordinary whole-B32 comparison; a fixture-only win is insufficient. Keep
-rounding contracts explicit and host decode/targets as a separate measured
-device-residency opportunity. No production or learning promotion yet.
+**[Connected spatial lowering qualifies](results/2026-10-14-spatial-tape.md),
+but closes only6.67% of the remaining gap.** Fresh complete RGB B32 improves
+68.491→65.736ms,4.02%, still2.42× retained JAX. Pooling saves its original
+forward decisions, folds typed bias loads and emits the rounded dense gradient
+with F32 spatial partials. Same reduction tree/precision/model; all272 reports,
+first outputs and three292-tensor boundaries are exact. Four regions change
+20 operations into8;4,081 remaining descriptors are unchanged. Posterior/world
+labels describe the same staged plan, not duplicate work. The first block is
+30.27% faster than retained timing, but the complete-update gain is the decision.
+Four guards/no warnings or GPU failures; all independent/staged checks pass.
+Seven CPU preparation/report failures remain. Production stays unchanged.
+
+**Next: the measured convolution staging/reuse gap, not a pooling sweep.**
+Single-consumer fusion cannot by itself eliminate training tapes; the result
+above proves that forward saved values and multiple backward outputs need joint
+planning. It does not explain the remaining38.55ms. Use the dominant decoder
+forward/weight-gradient contracts for one shared typed staging/reuse intervention
+and require complete-update benefit. Review remaining image layout/storage with
+it; no automatic NHWC rewrite, broad capture or row/grid/tile/dtype sweep.
+Keep the independently measured5.383ms host decode/target path as a separate
+GPU-residency opportunity, not an additive savings promise. No Atari restart
+or whole-goal closure.
 
 **Bigger batches expose another implementation limit, not parity.** The
 [matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures
@@ -72,8 +82,8 @@ late-dy/staged outputs are exact. These are interacting wall-time allocations,
 not removable savings. The native-contract miniature JAX fails its large
 gradient gate, so it provides no timing ratio and receives no automatic retry.
 The actual complete JAX trace and native whole-update accounting now finish
-above. No further broad capture or automatic NHWC rewrite; implement one
-reviewed general typed spatial lowering and require whole-B32 benefit.
+above. The first general typed spatial lowering now passes its whole-B32 gate
+above; it is not enough to close the gap. No broad capture or automatic NHWC rewrite.
 No row-only, packing, tile or dtype sweep.
 
 The actual connected-projection audit found separate tape/reduction/backward

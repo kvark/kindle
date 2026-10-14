@@ -7,35 +7,34 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Execution-model gap located; connected lowering next:** [whole-update/native block/JAX capture](docs/results/2026-10-14-jax-image-profile.md).
-  Ordinary matched RGB B32 remains68.344/27.187ms JAX,2.51×; B8 remains1.79×.
-  Fresh native one-chunk ordinary/coarse68.704/68.633ms preserves272 reports,
-  five plans/keys/first outputs/three292-tensor boundaries/cache reuse exactly.
-  Coarse GPU-pass union56.948ms, outside11.688ms; host decode/targets5.383ms.
-  Actual JAX capture preserves272 reports/initial-final288 tensors and normalized
-  instruction identity;23.099ms kernel/copy union,22.573ms kernel sum. All23
-  convolution operations correlate to launches. Native/JAX coverage differs:
-  no exact causal subtraction, SM-utilization or additive-savings claim.
-  [First CNN](docs/results/2026-10-14-image-block.md)6.218ms allocates78.4%
-  outside convolution;5,104 F64 values/23 descriptors/full restorations pass.
-  Leave-one-out pool backward1.106ms/bias.561ms/cast.500ms/pool.420ms locates
-  costly separate passes. Native materializes640MiB logical forward outputs;
-  JAX combines bias/pool/statistics and backward gradient/partial reductions.
-  Layouts/rounding/tapes differ; the earlier6.19% wider-JAX study left image
-  islands unchanged. Miniature JAX large-gradient failure remains unqualified;
-  no block ratio/retry. Eleven guards(seven pass/four retained failures), zero
-  warnings,816 synthetic updates/1,923 block invocations/zero actions/workers;
-  five CPU failures retained, including corrected report labels/import shadowing.
-  Next one general typed connected spatial lowering with required saved backward
-  values, then an ordinary whole-B32 comparison. No further broad capture or
-  automatic NHWC rewrite/row-only/grid/tile/dtype sweep. Keep convolution
-  algorithm/device execution costs in scope and host targets as a separate
-  measured opportunity; no production repin, Atari restart or full-goal closure.
-  [Prior B32 masks](docs/results/2026-10-14-batch-residual.md) retain89.0%
-  convolution/other scaling, exact states/plans and all failures separately.
-  Latest Meganeura99e3de2 adds Xe2 rectangular BF16 support, retaining5080's
-  preferred16×16×16 shape; not an identified CNN-dataflow fix/qualification.
-  Bladee7c3f7b unchanged; CI401 passes on e104603.
+- **Connected image lowering qualifies, most of the gap remains:**
+  [result and limits](docs/results/2026-10-14-spatial-tape.md). Fresh complete
+  RGB12M/B32 control/candidate68.491→65.736ms,4.02%; still2.42× retained JAX
+  27.187ms. Only6.67% of that gap closes. Keep the isolated candidate3551bc53,
+  not a solved architecture or production promotion. B8 is not newly measured.
+  One shared typed pool lowering folds bias, saves original forward decisions,
+  and emits rounded gradient/F32 spatial partials together. Same precision,
+  reduction tree, model and tensor products. Four regions replace20 dispatches
+  with8;4,081 others retain descriptors. Posterior/world plan labels alias the
+  same staged session, not duplicate work. All272 reports/first outputs/three
+  292-tensor boundaries/cache counts exact; other three plans/keys exact.
+  First complete block6.218→4.336ms versus retained timing; all large outputs,
+  5,104 F64 values and staged restores pass.24 generic cases/25,632 reference
+  values/15 shader variants qualify; F16 is shader-only coverage.686MiB fewer
+  logical scheduled output extents, not DRAM traffic or peak memory. Four guards,
+  zero warnings/GPU failures,544 synthetic updates/248 block calls/zero actions
+  or workers. Seven CPU preparation/report failures and corrected sources remain.
+  No pool/row/grid/tile/dtype sweep. Next use the measured dominant decoder
+  forward/dW contracts for one shared typed staging/reuse intervention with a
+  complete-update gate; review remaining image layout/storage alongside it.
+  [Prior whole-program attribution](docs/results/2026-10-14-jax-image-profile.md)
+  retains56.948ms GPU-pass union/11.688ms outside and5.383ms host decode/targets;
+  actual JAX23.099ms kernel/copy union uses different coverage. No exact causal
+  subtraction, SM-utilization or additive-savings claim. Host targets remain
+  a separate measured GPU-residency opportunity. No broad capture, automatic
+  NHWC rewrite, production repin, Atari restart or full-goal closure. Earlier
+  miniature JAX failure stays unqualified/no retry. Upstream99e3de2/e7c3f7b
+  rechecked; no identified fix for this path. CI402 passes on f01502e.
 - **Packing cliff is not the dominant gap:** [qualified intervention](docs/results/2026-10-14-packing-grid.md)
   changes exactly four B32 convolutions but saves only1.49%,68.344→67.326ms,
   below3%; no promotion/sweep. Candidate remains2.48× retained complete JAX

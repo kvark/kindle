@@ -18,10 +18,17 @@ finds a structural compilation gap: native B32 spends56.948ms in GPU passes
 and11.688ms outside them, including5.383ms host decoding/targets. Exact-state
 native/JAX captures pass. Native materializes more image intermediates and
 layout conversions, while JAX combines forward/backward work and retains
-compact storage. Even zero host overhead would not close the gap. Next is
-one general typed connected spatial lowering, with required backward values
-and a complete-update speed check—not another broad profile. Production,
-Atari and the full performance goal remain unchanged/open.
+compact storage. Even zero host overhead would not close the gap. The first
+[connected spatial lowering](results/2026-10-14-spatial-tape.md) now qualifies:
+fresh complete B32 updates68.491→65.736ms,4.02%, with exact272 reports and
+three292-tensor boundaries. It saves forward pooling decisions and combines
+typed bias/backward gradient/partial-reduction work. The block improves30.27%,
+but only6.67% of the whole gap closes; the candidate remains2.42× retained JAX.
+Next address the measured convolution staging/reuse gap with one shared typed
+intervention and complete-update gate, reviewing remaining image layout/storage
+alongside it. Host decoding/targets remain a separate GPU-residency opportunity.
+No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
+unchanged; the full performance goal remains open.
 
 The [same RGB comparison at B32](results/2026-10-14-batch-granularity.md) gives
 68.456ms native versus27.187ms JAX,2.52×. Larger batches improve throughput
@@ -46,9 +53,10 @@ tapes/work. The [complete first CNN block](results/2026-10-14-image-block.md)
 now measures6.218ms; exact-restoring masks allocate78.4% outside convolution.
 Small F64 checks pass, but the miniature JAX large-gradient gate fails, so
 there is no cross-stack block speed claim. The actual complete B32 JAX trace
-and native whole-update accounting now finish above; require whole-B32
-benefit for the next connected lowering. No batch/grid sweep or learning
-promotion. Ordinary B32 remains68.344/27.187ms,2.51×.
+and native whole-update accounting now finish above; the subsequent connected
+lowering passes its whole-B32 gate but leaves most of the gap. No batch/grid
+sweep or learning promotion. The historical B32 control is68.344/27.187ms,
+2.51×; the new isolated candidate is65.736ms,2.42×.
 
 The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
 more native nominal heavy arithmetic. The gap is execution engineering, not
