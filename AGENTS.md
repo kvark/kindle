@@ -24,9 +24,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   logical scheduled output extents, not DRAM traffic or peak memory. Four guards,
   zero warnings/GPU failures,544 synthetic updates/248 block calls/zero actions
   or workers. Seven CPU preparation/report failures and corrected sources remain.
-  No pool/row/grid/tile/dtype sweep. Next use the measured dominant decoder
-  forward/dW contracts for one shared typed staging/reuse intervention with a
-  complete-update gate; review remaining image layout/storage alongside it.
+  No pool/row/grid/tile/dtype sweep. The following staging intervention closes
+  below its gate; next preserve physical layout/reuse across connected image
+  training, including padding/rounding/consumers and staged backward lifetimes.
   [Prior whole-program attribution](docs/results/2026-10-14-jax-image-profile.md)
   retains56.948ms GPU-pass union/11.688ms outside and5.383ms host decode/targets;
   actual JAX23.099ms kernel/copy union uses different coverage. No exact causal
@@ -34,7 +34,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   a separate measured GPU-residency opportunity. No broad capture, automatic
   NHWC rewrite, production repin, Atari restart or full-goal closure. Earlier
   miniature JAX failure stays unqualified/no retry. Upstream99e3de2/e7c3f7b
-  rechecked; no identified fix for this path. CI402 passes on f01502e.
+  rechecked; no identified fix for this path. CI403 passes on46e1463.
+- **Convolution spatial-vector staging rejected:** [result](docs/results/2026-10-14-convolution-spatial-staging.md).
+  Fresh decoder forward/dW sum2.03269→2.04531ms,0.62% slower; encoder dW also
+  regresses. All70,264,192 retained outputs/five plans exact; no whole-update
+  trial, promotion or vector-width sweep. Candidate680ea39a stays rejected.
+  CPU303 shader variants/2,152,448 component-address checks pass.200 GPU cases/
+  600 calls finish their individual checks, then fail my final count assertion:
+  93,280, not100,960. Keep the failed guard/source; independent CPU F64/exact/
+  change reconstruction passes all saved values at3.36e-7 maximum relative L2.
+  No GPU retry, numerical/API fault or tolerance change. Two timing guards pass;
+  three preparation failures remain (Clippy/BF16 literal/stale build cache).
+  2,060 kernel calls/zero learner updates/actions/warnings/workers. Production
+  unchanged; retained whole B32 remains65.736/27.187ms,2.42×. CPU audit of the
+  qualified4,089-dispatch world plan finds ten transpose→BF16→pack chains and
+  eight duplicate packs/80MiB repeated logical output extents. Not traffic,
+  peak memory, measured savings or the whole38.55ms explanation. Next one shared
+  typed connected-layout/reuse intervention with a complete-update gate, not
+  a duplicate-count-only sweep or automatic global NHWC rewrite. Goal stays open.
 - **Packing cliff is not the dominant gap:** [qualified intervention](docs/results/2026-10-14-packing-grid.md)
   changes exactly four B32 convolutions but saves only1.49%,68.344→67.326ms,
   below3%; no promotion/sweep. Candidate remains2.48× retained complete JAX

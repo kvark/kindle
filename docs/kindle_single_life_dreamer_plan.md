@@ -24,9 +24,15 @@ fresh complete B32 updates68.491→65.736ms,4.02%, with exact272 reports and
 three292-tensor boundaries. It saves forward pooling decisions and combines
 typed bias/backward gradient/partial-reduction work. The block improves30.27%,
 but only6.67% of the whole gap closes; the candidate remains2.42× retained JAX.
-Next address the measured convolution staging/reuse gap with one shared typed
-intervention and complete-update gate, reviewing remaining image layout/storage
-alongside it. Host decoding/targets remain a separate GPU-residency opportunity.
+The [spatial-vector convolution intervention](results/2026-10-14-convolution-spatial-staging.md)
+is rejected: its targeted decoder pair is0.62% slower with exact outputs, so no
+whole-update trial follows. The numerical run's final count assertion stays
+failed; independent CPU reconstruction passes all93,280 saved values without a
+GPU retry. A retained-plan audit now identifies ten transpose→BF16→pack chains
+and eight duplicate packs. Next preserve physical layouts and reuse across a
+connected image-training region, including saved backward/staged consumers;
+these counts are not a speedup forecast. Require a complete-update gate.
+Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
 

@@ -30,13 +30,22 @@ labels describe the same staged plan, not duplicate work. The first block is
 Four guards/no warnings or GPU failures; all independent/staged checks pass.
 Seven CPU preparation/report failures remain. Production stays unchanged.
 
-**Next: the measured convolution staging/reuse gap, not a pooling sweep.**
-Single-consumer fusion cannot by itself eliminate training tapes; the result
-above proves that forward saved values and multiple backward outputs need joint
-planning. It does not explain the remaining38.55ms. Use the dominant decoder
-forward/weight-gradient contracts for one shared typed staging/reuse intervention
-and require complete-update benefit. Review remaining image layout/storage with
-it; no automatic NHWC rewrite, broad capture or row/grid/tile/dtype sweep.
+**The [convolution spatial-staging trial is rejected](results/2026-10-14-convolution-spatial-staging.md).**
+The targeted decoder pair is0.62% slower despite exact numerical outputs;
+encoder dW also regresses. No full-update trial or vector-width/tile sweep.
+Two timing guards pass; the numerical guard retains a final count-assertion
+failure, independently recovered by checking all93,280 saved values on CPU.
+No GPU retry, tolerance change, production promotion or new whole-update claim.
+
+**Next: physical layout and reuse across connected image training.** The retained
+qualified world plan contains ten transpose→BF16→pack chains and eight duplicate
+packs (80MiB repeated logical output extents). Normalization already produces
+channels-last values, but the frontend returns to channels-first and the
+convolution lowering packs back again. Preserve padded strides, rounding,
+all consumers and staged backward lifetimes across this boundary. Counts are
+not measured savings or proof that this explains the remaining38.55ms; use one
+shared typed lowering with a complete-update gate, not a duplicate-count-only
+sweep. No automatic global NHWC rewrite, broad capture or row/grid/tile/dtype sweep.
 Keep the independently measured5.383ms host decode/target path as a separate
 GPU-residency opportunity, not an additive savings promise. No Atari restart
 or whole-goal closure.
