@@ -1,0 +1,227 @@
+{
+  "status": "complete",
+  "artifact_root": "runs/matrix-staging-20261014.iRAlLKXg",
+  "decision": "retain isolated vector-staging candidate",
+  "production_changed": false,
+  "learning_qualified": false,
+  "workers_remaining": false,
+  "numerical": {
+    "status": "complete",
+    "cases": 416,
+    "exact_f64_values": 660480,
+    "total_value_comparisons": 1981440,
+    "calls": 1248,
+    "guards": 1,
+    "allocation_warnings": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "cpu": {
+    "shader_variants": 243,
+    "selection_cases": 16,
+    "test_functions": 5,
+    "address_checks": {
+      "status": "complete",
+      "cases": 18,
+      "address_checks": 17350704,
+      "game_actions": 0,
+      "synthetic_updates": 0
+    },
+    "initial_template_collision_retained": true
+  },
+  "operations": [
+    {
+      "name": "dense-rows",
+      "control_ms": 0.0102565,
+      "candidate_ms": 0.0104895,
+      "less_time_percent": -2.2717301223614372
+    },
+    {
+      "name": "dense-gradient",
+      "control_ms": 0.008310000000000001,
+      "candidate_ms": 0.00627975,
+      "less_time_percent": 24.43140794223828
+    },
+    {
+      "name": "grouped-gradient",
+      "control_ms": 0.02071725,
+      "candidate_ms": 0.018635,
+      "less_time_percent": 10.050803074732418
+    },
+    {
+      "name": "grouped-forward",
+      "control_ms": 0.01036625,
+      "candidate_ms": 0.008368750000000001,
+      "less_time_percent": 19.2692632340528
+    }
+  ],
+  "micro_full_learner_gate": true,
+  "micro_exact_f64_values": 5345280,
+  "micro_calls": 2340,
+  "timing": {
+    "control_ms": 24.021522066406266,
+    "candidate_ms": 22.881178542968748,
+    "less_time_percent": 4.747174305962365,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15119220736,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.33792183984375,
+        "imagination_and_targets": 6.4066429140625,
+        "posterior": 3.80098003515625,
+        "world_train_and_sync": 12.47597727734375
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.33560705078125,
+        "imagination_and_targets": 6.45261783984375,
+        "posterior": 3.57531975390625,
+        "world_train_and_sync": 11.5176338984375
+      }
+    }
+  },
+  "retained_control": {
+    "control_ms": 24.339903566406242,
+    "candidate_ms": 24.021522066406266,
+    "less_time_percent": 1.3080639334964506,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15121317888,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.3829415546874997,
+        "imagination_and_targets": 6.557640296875,
+        "posterior": 3.81610090625,
+        "world_train_and_sync": 12.583220808593751
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.33792183984375,
+        "imagination_and_targets": 6.4066429140625,
+        "posterior": 3.80098003515625,
+        "world_train_and_sync": 12.47597727734375
+      }
+    }
+  },
+  "smoke": {
+    "control_ms": 23.899661124999998,
+    "candidate_ms": 22.756256875000002,
+    "less_time_percent": 4.784186035190052,
+    "exact_reports": 24,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15119220736,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.3437207500000006,
+        "imagination_and_targets": 6.3628075,
+        "posterior": 3.799749375,
+        "world_train_and_sync": 12.393383499999999
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.3985938749999987,
+        "imagination_and_targets": 6.272593125,
+        "posterior": 3.562412125,
+        "world_train_and_sync": 11.52265775
+      }
+    }
+  },
+  "changed_pipeline_counts": {
+    "behavior_gradient-plan.json": 8,
+    "imagination-plan.json": 0,
+    "posterior-plan.json": 430,
+    "slow_value-plan.json": 0,
+    "world_gradient-plan.json": 430
+  },
+  "cache_counts": {
+    "behavior": [
+      1,
+      271
+    ],
+    "imagination": [
+      1,
+      271
+    ],
+    "slow_value": [
+      1,
+      271
+    ],
+    "world": [
+      5,
+      1355
+    ]
+  },
+  "whole_update_gate": true,
+  "candidate_over_retained_complete_jax": 1.7825126090276924,
+  "retained_complete_jax_ms": 12.836475,
+  "jax_remeasured": false,
+  "guards": [
+    "runs/matrix-staging-20261014.iRAlLKXg/numerical-queue/numerical",
+    "runs/matrix-staging-20261014.iRAlLKXg/micro-queue/control",
+    "runs/matrix-staging-20261014.iRAlLKXg/micro-queue/candidate",
+    "runs/matrix-staging-20261014.iRAlLKXg/smoke-queue/rgb-control-smoke",
+    "runs/matrix-staging-20261014.iRAlLKXg/smoke-queue/rgb-candidate-smoke",
+    "runs/matrix-staging-20261014.iRAlLKXg/timing-queue/rgb-control",
+    "runs/matrix-staging-20261014.iRAlLKXg/timing-queue/rgb-candidate"
+  ],
+  "allocation_warnings": 1,
+  "minimum_sampled_headroom_bytes": 15119220736,
+  "synthetic_updates": 592,
+  "matrix_fixture_calls": 3588,
+  "game_actions": 0,
+  "source_changes": [
+    "src/codegen/cooperative/matrix.rs",
+    "src/codegen/cooperative.rs",
+    "src/codegen.rs",
+    "src/runtime.rs",
+    "src/shaders/matmul_checked.wgsl",
+    "src/shaders/matmul_checked_multiply.wgsl"
+  ],
+  "kindle_source_unchanged": true,
+  "source_sha256": {
+    "backend.patch": "459f494f409420ba9675735b99bf29c2afc6e4b88944732ecd5c48e556eef2d9",
+    "backend-numerical.patch": "039054b07aa4dbace3f12a4697e4fc909ac12bc0692765d0f8b7e4233b005ba7",
+    "kindle.patch": "6ff27a870bf1377977ad67eef88c263288d5c4c0e506f5fcd8646ce7ec6e72db",
+    "native-tests": "24304286b3cc8f309cd8e80c29758889c20fbf2399569ab51e760faf1667b1dc",
+    "micro-tests": "4681becd05a852f3524d6f684d0f297052b1675c6a018d163f5eda37e26b4fed",
+    "kindle-tests": "42f0006697f3d352af3ba6c67dcf170b8d870c0b57fbf002fff98da94022d2a4",
+    "audit-whole.py": "dd4e1746ca91e239151f2a53aebac35d56ef880f1e3b5364390d185b1aa5d430",
+    "audit-micro.py": "d6b60cd7b66609cd90529299ebc9557c56894b845285bfa6ce51ed10540d2dfc",
+    "publish.py": "15a67181369cf87289e2d7059d021839840699da2c5e7a77e1ff4a765a6b6321"
+  },
+  "scope": "Shared typed four-value staging with physical-major shared tiles; same tile/K order/precision/plans/dependencies. Native F32 cooperative multiplication has CPU shader coverage only. No fresh hardware counters, utilization, whole-gap closure or production/CDP/learning promotion."
+}

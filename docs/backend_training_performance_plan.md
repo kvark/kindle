@@ -8,6 +8,24 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Vector staging now demonstrates the native causal benefit.** The
+[shared typed intervention](results/2026-10-14-matrix-staging.md) cuts fresh
+complete RGB24.022→22.881ms (4.75%), retaining all272 reports/first outputs/
+five plans/initial-first-final292 tensors exactly. Four-value physical-major
+shared staging preserves arithmetic, precision, tiles, K partitions and actual
+dependencies. Grouped forward improves19.27%; dense/grouped gradients improve
+24.43%/10.05%, small-row forward regresses2.27%. Independent numerical/address/
+typed-shader checks and seven guards pass; one allocation warning and the first
+CPU template collision remain. Keep the isolated candidate, not a production/
+CDP/learning promotion. Whole RGB is still1.78× retained complete JAX.
+
+Next trace precision/materialization through an actual matched forward/backward
+block before a separate policy timing. The native deliberately widened
+intermediates differ from JAX's more continuous BF16 path; inventory counts
+alone cannot establish the cost or justify changing parameter/master-gradient
+precision. No vector-width/geometry sweep. Device dependency cost, convolution
+reuse and broader compiler dataflow remain separate contributors.
+
 **Checked matrix staging wastes instructions even when tensor work matches.**
 The [matched matrix/counter study](results/2026-10-14-matrix-library.md) verifies
 four actual native contracts and2,672,640 exact F64/JAX values. Grouped forward
@@ -19,14 +37,10 @@ tensor support or a case for more occupancy. Counters describe the translation,
 not native Vulkan; whole JAX changes addends/transposes/output contracts, so
 the miniature is not exact full-executable algorithm parity. Five guards pass,
 two failed fixtures/control retained, zero allocation warnings/actions/updates.
-No new whole-update speed claim; current24.340/12.836ms stays1.90×.
-
-Next implement one alignment-proven vector-staging path within the shared typed
-checked generator, retaining safe tails/transposes/groups and explicit storage/
-multiply/output types. CPU contracts, independent GPU numerics, then one complete
-update pair; no BF16-only fork or geometry/occupancy sweep. The existing aligned
-engine already stages vectors; small/irregular shapes must not lose that benefit
-merely because they need bounds checks. No promise this closes the full gap.
+That study itself makes no new whole-update speed claim; the subsequent native
+intervention above supplies it. The existing aligned engine already stages
+vectors; the shared checked path now retains that benefit with proven tails/
+transposes/groups. Neither the counter study nor vectorization closes the gap.
 
 Precision continuity remains separate: native matrix outputs247 BF16/469 F32
 versus JAX456/96, not a one-to-one mapping. Native backward intentionally widens
@@ -103,12 +117,13 @@ has been established.
 | Retained isolated RGB12M/B8/BF16, row selection + latest compiler | 28.213ms |
 | Isolated command-cache candidate, fresh ordinary full pair | 25.530ms |
 | Isolated incremental-address candidate, fresh ordinary full pair | 24.340ms |
+| Isolated vector-staging candidate, fresh ordinary full pair | 22.881ms |
 | Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
 | Retained isolated CDP12M/B32/mixed, row selection + latest compiler | 93.084ms |
 
-The retained RGB control is2.20× complete JAX; the current iterator candidate is
-**1.90×**. CDP is a different
+The retained RGB control is2.20× complete JAX; the current vector-staging candidate is
+**1.78×**. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.

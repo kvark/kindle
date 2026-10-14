@@ -8,8 +8,8 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Best isolated complete RGB12M/B8/BF16 updates take **24.340 ms versus JAX
-12.836 ms: still 1.90×**. Production remains on its earlier qualified~53 ms
+Best isolated complete RGB12M/B8/BF16 updates take **22.881 ms versus JAX
+12.836 ms: still 1.78×**. Production remains on its earlier qualified~53 ms
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
@@ -33,6 +33,9 @@ a much larger Dreamer workload. Three structural differences have evidence:
   in a CUDA translation reproducing native grouped-forward cost: scalar16-bit
   staging versus cuBLAS128-bit vectors. Four actual contracts pass exact outputs;
   whole JAX layouts/addends/storage differ, counters are not native Vulkan.
+  The [shared typed vector-staging intervention](results/2026-10-14-matrix-staging.md)
+  now saves4.75% of complete updates with exact reports/states. Same arithmetic,
+  tiles and dependencies; grouped forward19.27% faster, no fresh counter claim.
 - Host construction: [command reuse](results/2026-10-14-command-cache.md)
   saves10.16% of complete update time with exact reports/states. It removes
   repeated bindings/recording, not GPU operations or dependencies.
@@ -44,11 +47,12 @@ a much larger Dreamer workload. Three structural differences have evidence:
   about2× slower. All3,204 counters pass; close this API-flag detour. This is
   not a universal Vulkan limit or a fresh complete-learner measurement.
 
-Next: one alignment-proven vector-staging intervention in the shared typed
-checked path, with safe tails/groups/transposes and independent numerical plus
-complete-update checks. The five checked convolutions occupy only~2.50 ms, so keep matrix
+Next: trace precision/materialization through an actual matched forward/backward
+block before separately timing that policy. Native deliberately widened
+intermediates differ from JAX's more continuous BF16 path; aggregate output counts
+are not one-to-one proof of cost. The five checked convolutions occupy only~2.50 ms, so keep matrix
 efficiency, materialization and device dependencies in scope. No iterator/tile/
-occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
+vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
 Detailed successful and rejected interventions remain in the backend plan and
 linked results; individual savings are not additive. The full goal stays open.
 

@@ -7,24 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Checked matrix staging is instruction-heavy:**
-  [matched library/counter study](docs/results/2026-10-14-matrix-library.md).
-  All four actual native contracts/2,672,640 F64 outputs and matching JAX values
-  pass exactly. Grouped forward native10.357µs/CUDA translation10.324µs versus
-  cuBLAS3.930µs kernel time; boundaries differ. Same24,576 BF16 tensor
-  instructions/near-identical occupancy, but translation3.40× warp instructions,
-  5.22× integer instructions; scalar16-bit staging versus cuBLAS128-bit vectors.
-  Counters are CUDA, not native Vulkan. Whole JAX folds addends/transposes or
-  changes output storage; miniature identity presence is not full-algorithm
-  parity. Native247 BF16/469 F32 matrix results versus JAX456/96; non-one-to-one
-  inventory, separate precision-policy cost unmeasured. The extra BF16-output
-  control fails exact single rounding; retained, not a relaxed gate. Four
-  actual contracts keep exact checks. Five passing/two failed retained guards,
-  zero allocation warnings/actions/updates; no worker. Native495855c2/bridge
-  87ffceea, unchanged iterator backend. Next one shared typed checked-staging
-  intervention with proven alignment/tails, then numerical/full-update checks;
-  no BF16-only engine/tile sweep/Atari restart. Complete RGB24.340/JAX12.836ms
-  remains1.90×, full goal open. CI394 passes on precedingfdfa418.
+- **Shared typed vector staging qualifies:** [result](docs/results/2026-10-14-matrix-staging.md).
+  Fresh complete RGB24.022→22.881ms (4.75%), now1.78× retained complete
+  JAX12.836ms. All272 reports/first outputs/five plans/initial-first-final292
+  tensors exact; only eligible checked pipeline keys change. Same arithmetic,
+  precision, tile/K partitions/dependencies; four-value physical-major shared
+  staging, not a BF16-only engine.416 GPU cases/1,981,440 F64 comparisons,
+  four actual contracts/5,345,280 baseline F64 values,243 shader variants/16
+  selection cases/17,350,704 CPU address checks pass. Grouped forward19.27%,
+  dense/grouped gradients24.43%/10.05% faster; small-row forward2.27% slower.
+  Seven guards/one retained warning,592 synthetic updates/3,588 matrix calls,
+  zero actions/workers. Initial CPU template collision/source remains.
+  Native42f00066; keep isolated, no production/CDP/learning promotion.
+  The [preceding counters](docs/results/2026-10-14-matrix-library.md) find equal
+  tensor work/occupancy but3.40× instructions in a timing-matched CUDA translation;
+  not native Vulkan counters or full-JAX algorithm parity. Both failed controls
+  remain; no precision relaxation. Next trace actual matched forward/backward
+  precision/materialization contracts, then separately measure that policy;
+  native247 BF16/469 F32 versus JAX456/96 outputs are not one-to-one evidence.
+  Keep device-execution/convolution/compiler costs in scope. No vector-width/
+  tile sweep/Atari restart or whole-goal closure. CI395 passes on a219e08.
 - **Checked small products dominate matrix cost:**
   [current attribution](docs/results/2026-10-14-matrix-cost.md) assigns521 checked
   products2.903ms/63.54% of matrix cost for12.01% of nominal matrix MACs;195
