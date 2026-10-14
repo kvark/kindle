@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Exact-sequence GPU RNG removes a measured host bottleneck:**
+  [result](docs/results/2026-10-14-device-rng.md). Isolated wider-control RGB
+  32.246→30.053ms (6.80%) and CDP104.048→95.269ms (8.44%); saved2.194/8.779ms
+  scales almost exactly with B8/B32 draw counts. Existing compiled plans,
+  all272 reports, first targets and292/346 initial/first/final tensors are exact.
+  Explicit pinned ChaCha12 fills session inputs on the shared GPU queue:
+  2,107,118 primitive values, canaries/counter wrap/split fills/three no-host-wait
+  consumer handoffs, four CPU tests and both24-update smokes pass. Seven guards,
+  three allocation warnings,1,136 full synthetic updates, zero actions/faults.
+  Retain the CPU lint failure and initially incomplete backend patch; corrected
+  complete snapshot exactly matches the qualified wider source, no GPU retry.
+  Native57a1a1a3 stays isolated; no production/default/learning change.
+  RGB remains2.34× retained complete JAX12.836ms, not a fresh JAX capture.
+  Keep GPU RNG; next device EMA/targets, then row/backward fusion and safe
+  views/layout. No worker at publication; broader performance goal stays active.
+
 - **Remaining gap is structural; scalar fan-out is not the main limit:**
   [graph-execution controls](docs/results/2026-10-13-execution-boundaries.md),
   [multi-output scalar result](docs/results/2026-10-14-pointwise-regions.md).
@@ -31,7 +47,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   unstarted control ran after repair, no GPU job repeated. Three allocation
   warnings,1,136 full synthetic+146 small optimizer updates, zero actions.
   Native0483cf64 remains isolated; upstream2214412/fe5f5b5 unchanged.
-  Next device RNG/targets/slow-critic EMA, then row-level normalization/backward
+  GPU RNG qualifies above; next targets/slow-critic EMA, then row-level normalization/backward
   fusion and safe view/layout propagation. Preserve stream/update ordering,
   explicit rounding, public preparation roots and backward lifetimes. No more
   scalar/binding-cap/tile sweep, unsafe barriers, CUDA learner or Atari restart.

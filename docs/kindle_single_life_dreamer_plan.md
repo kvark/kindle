@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 13, 2026. This is the authoritative roadmap.
+Updated October 14, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -8,6 +8,15 @@ Updated October 13, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+Latest isolated candidate: [exact-sequence GPU RNG](results/2026-10-14-device-rng.md)
+reduces RGB32.246→30.053ms and larger-batch CDP104.048→95.269ms, with every
+metric and saved tensor identical. RGB remains2.34× retained complete JAX12.836ms;
+production stays on the earlier qualified~53ms runtime. Next connect device
+targets/slow-critic EMA, then row/backward and layout fusion. No Atari restart,
+learning-quality claim or whole-goal closure.
+
+### Retained causal findings
+
 The [execution-design diagnosis](results/2026-10-13-execution-gap.md) finds a
 fundamental implementation gap: basic kernels/incomplete training precision
 and fragmented learner dataflow versus optimized libraries/compiled device
