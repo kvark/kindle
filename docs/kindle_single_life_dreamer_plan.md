@@ -55,8 +55,17 @@ broadcasts and recomposition together. The subsequent
 measures35.5% lower complete block GPU time (12.841->8.280us), with all
 281,052 numerical values passing. Its general reduction extension saves
 forward values and emits both derivatives, but selection is still manual.
-Next qualify whole-graph integration with explicit BF16 rounding and staged
-lifetimes; no block sweep or whole-learner speed claim. Meganeura7574ad1
+The [whole-learner integration](results/2026-10-14-connected-learner.md) now
+passes numerical/staged checks but saves only.99% (28.280->27.999ms), below
+its3% gate. No CDP follow-up or further row sweep; later trajectories differ.
+The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) is the next
+priority: five irregular RGB-boundary convolutions cost3.785ms versus2.906ms
+for18 packed ones, despite only11.1% of useful convolution MACs. All already
+use BF16. Native's84.756G useful products occupy152.574G source-level matrix
+slots after padding; this is not a JAX issued-work ratio or sole proven cause.
+Review a general type-aware irregular-product algorithm, including full
+forward/backward and packing costs, before another complete-update check.
+No geometry sweep or assumption that this alone delivers parity. Meganeura7574ad1
 is used for this narrow check, not adopted as a replacement learner runtime.
 No Atari restart, learning-quality claim or whole-goal closure.
 

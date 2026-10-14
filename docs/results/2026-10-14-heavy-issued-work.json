@@ -1,0 +1,378 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/issued-work-20261014.zIcCT8c0",
+  "issued_work": {
+    "status": "complete",
+    "source_sha256": {
+      "src/codegen/cooperative.rs": "beec9efdb95c888caf40e0ef7b5cf37d92288649e75f8093e35a231ed1a12d57",
+      "src/codegen/coop_tiled.rs": "bbba070c437f0cf87464544e44b596f6fe03ab65b31f986ea1b2ea9bbf45f40d",
+      "src/shaders/matmul_checked.wgsl": "55ed63dfb7b8f38fdaa288ca99408567f510954c90587d5389ac4d73df1f272d",
+      "src/shaders/matmul_grouped_params.wgsl": "73827111e1edc0be5839759954b2519d2b62a853ba7db8801b2cc71eaf224592"
+    },
+    "dispatches": 739,
+    "nominal_macs": 84755617792,
+    "cooperative_product_slots": 152574099456,
+    "padding_ratio": 1.800165032487101,
+    "families": {
+      "dense": {
+        "dispatches": 587,
+        "nominal_macs": 19576133632,
+        "cooperative_product_slots": 22282240000,
+        "padding_ratio": 1.1382349762660222
+      },
+      "convolution_forward": {
+        "dispatches": 8,
+        "nominal_macs": 19293798400,
+        "cooperative_product_slots": 43553652736,
+        "padding_ratio": 2.257391304347826
+      },
+      "grouped": {
+        "dispatches": 129,
+        "nominal_macs": 8556380160,
+        "cooperative_product_slots": 12784238592,
+        "padding_ratio": 1.4941176470588236
+      },
+      "convolution_input": {
+        "dispatches": 7,
+        "nominal_macs": 18035507200,
+        "cooperative_product_slots": 30131879936,
+        "padding_ratio": 1.6706976744186046
+      },
+      "convolution_weight": {
+        "dispatches": 8,
+        "nominal_macs": 19293798400,
+        "cooperative_product_slots": 43822088192,
+        "padding_ratio": 2.271304347826087
+      }
+    },
+    "paths": {
+      "matrix_checked": {
+        "dispatches": 521,
+        "nominal_macs": 3377731584,
+        "cooperative_product_slots": 10311696384,
+        "padding_ratio": 3.052846600613721
+      },
+      "convolution_checked": {
+        "dispatches": 5,
+        "nominal_macs": 6291456000,
+        "cooperative_product_slots": 31675383808,
+        "padding_ratio": 5.034666666666666
+      },
+      "convolution_packed": {
+        "dispatches": 18,
+        "nominal_macs": 50331648000,
+        "cooperative_product_slots": 85832237056,
+        "padding_ratio": 1.7053333333333334
+      },
+      "matrix_tiled": {
+        "dispatches": 195,
+        "nominal_macs": 24754782208,
+        "cooperative_product_slots": 24754782208,
+        "padding_ratio": 1
+      }
+    },
+    "stages": {
+      "world_gradient": {
+        "dispatches": 514,
+        "nominal_macs": 60058304512,
+        "cooperative_product_slots": 127807782912,
+        "padding_ratio": 2.1280617884652946
+      },
+      "imagination": {
+        "dispatches": 188,
+        "nominal_macs": 15779364864,
+        "cooperative_product_slots": 15810428928,
+        "padding_ratio": 1.001968651100202
+      },
+      "behavior_gradient": {
+        "dispatches": 33,
+        "nominal_macs": 7173642240,
+        "cooperative_product_slots": 7211057152,
+        "padding_ratio": 1.0052156088564572
+      },
+      "slow_value": {
+        "dispatches": 4,
+        "nominal_macs": 1744306176,
+        "cooperative_product_slots": 1744830464,
+        "padding_ratio": 1.0003005710850617
+      }
+    },
+    "largest_padding": [
+      {
+        "stage": "world_gradient",
+        "index": 2537,
+        "logical_shape": [
+          128,
+          32,
+          3,
+          5,
+          5,
+          64,
+          64
+        ],
+        "nominal_macs": 1258291200,
+        "cooperative_product_slots": 13421772800,
+        "padding_ratio": 10.666666666666666
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2551,
+        "logical_shape": [
+          128,
+          32,
+          3,
+          5,
+          5,
+          64,
+          64
+        ],
+        "nominal_macs": 1258291200,
+        "cooperative_product_slots": 13421772800,
+        "padding_ratio": 10.666666666666666
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2513,
+        "logical_shape": [
+          128,
+          48,
+          32,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 13421772800,
+        "padding_ratio": 2.6666666666666665
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2569,
+        "logical_shape": [
+          128,
+          48,
+          32,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 13421772800,
+        "padding_ratio": 2.6666666666666665
+      },
+      {
+        "stage": "world_gradient",
+        "index": 4088,
+        "logical_shape": [
+          128,
+          32,
+          48,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 13421772800,
+        "padding_ratio": 2.6666666666666665
+      },
+      {
+        "stage": "world_gradient",
+        "index": 4089,
+        "logical_shape": [
+          128,
+          32,
+          48,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 6979321856,
+        "padding_ratio": 1.3866666666666667
+      },
+      {
+        "stage": "world_gradient",
+        "index": 139,
+        "logical_shape": [
+          128,
+          32,
+          48,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 6710886400,
+        "padding_ratio": 1.3333333333333333
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2568,
+        "logical_shape": [
+          128,
+          48,
+          32,
+          5,
+          5,
+          32,
+          32
+        ],
+        "nominal_macs": 5033164800,
+        "cooperative_product_slots": 6710886400,
+        "padding_ratio": 1.3333333333333333
+      },
+      {
+        "stage": "world_gradient",
+        "index": 156,
+        "logical_shape": [
+          128,
+          48,
+          64,
+          5,
+          5,
+          16,
+          16
+        ],
+        "nominal_macs": 2516582400,
+        "cooperative_product_slots": 3355443200,
+        "padding_ratio": 1.3333333333333333
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2350,
+        "logical_shape": [
+          128,
+          64,
+          48,
+          5,
+          5,
+          16,
+          16
+        ],
+        "nominal_macs": 2516582400,
+        "cooperative_product_slots": 3355443200,
+        "padding_ratio": 1.3333333333333333
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2584,
+        "logical_shape": [
+          128,
+          64,
+          48,
+          5,
+          5,
+          16,
+          16
+        ],
+        "nominal_macs": 2516582400,
+        "cooperative_product_slots": 3355443200,
+        "padding_ratio": 1.3333333333333333
+      },
+      {
+        "stage": "world_gradient",
+        "index": 2585,
+        "logical_shape": [
+          128,
+          64,
+          48,
+          5,
+          5,
+          16,
+          16
+        ],
+        "nominal_macs": 2516582400,
+        "cooperative_product_slots": 3355443200,
+        "padding_ratio": 1.3333333333333333
+      }
+    ],
+    "optimizer_updates": 0,
+    "game_actions": 0,
+    "scope": "Source-level cooperative matrix element-product slots on the retained 32-lane NVIDIA path. Includes output/reduction/channel padding. Not measured hardware instruction counts, memory traffic, kernel time or a JAX issued-work comparison; vendor kernels also pad."
+  },
+  "costs": {
+    "status": "complete",
+    "guards": 1,
+    "allocation_warnings": 0,
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "plans_pipelines_outputs_exact": true,
+    "families": {
+      "0": 4081,
+      "1": 5,
+      "2": 18
+    },
+    "baseline_gpu_ms": 16.154826,
+    "mask_means_ms": {
+      "0": 9.464968666666667,
+      "1": 13.248437333333333,
+      "2": 12.368457333333334,
+      "3": 16.15598
+    },
+    "shapley_ms": {
+      "non_convolution_and_commands": 9.464968666666667,
+      "checked": 3.7854956666666664,
+      "packed": 2.9055156666666666
+    },
+    "marginal_removal_ms": {
+      "checked": 3.787522666666666,
+      "packed": 2.907542666666666
+    },
+    "mask_sweeps_ms": [
+      {
+        "0": 9.469044,
+        "1": 13.247436,
+        "2": 12.365088,
+        "3": 16.151632
+      },
+      {
+        "0": 9.462154,
+        "1": 13.247228,
+        "2": 12.373554,
+        "3": 16.151538
+      },
+      {
+        "0": 9.463708,
+        "1": 13.250648,
+        "2": 12.36673,
+        "3": 16.16477
+      }
+    ],
+    "shapley_sweeps_ms": [
+      {
+        "non_convolution_and_commands": 9.469044,
+        "checked": 3.7824679999999997,
+        "packed": 2.9001199999999994
+      },
+      {
+        "non_convolution_and_commands": 9.462154,
+        "checked": 3.781528999999999,
+        "packed": 2.9078549999999996
+      },
+      {
+        "non_convolution_and_commands": 9.463708,
+        "checked": 3.79249,
+        "packed": 2.9085720000000004
+      }
+    ],
+    "synthetic_updates": 1,
+    "optimizer_free_replays": 367,
+    "game_actions": 0,
+    "minimum_sampled_headroom_bytes": 15112929280,
+    "scope": "Zero-workgroup masks keep all bindings, barriers, packing and other work. Interacting cost allocation, not pure kernel durations or additive optimization savings. Masked outputs are invalid learner outputs; full restored outputs and states match retained fixtures."
+  },
+  "checked_conv_nominal_fraction": 0.1111111111111111,
+  "checked_conv_cost_fraction": 0.5657583701596879,
+  "production_changed": false,
+  "goal_complete": false
+}

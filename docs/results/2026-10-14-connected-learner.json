@@ -1,0 +1,188 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/connected-learner-20261014.wLj595Bi",
+  "decision": "Below3% complete-update gate; no CDP follow-up, production adoption or row-fusion sweep.",
+  "workload": "RGB12M/B8/T16/H15/BF16, retained optimized source and four world chunks; same binary option disabled/enabled.",
+  "numerical": {
+    "cases": 56,
+    "values": 10251192,
+    "staged_cases": 2,
+    "max_relative_l2": 0.0000011328897311252665
+  },
+  "cpu_cases": 14,
+  "rejected_cpu_cases": 3,
+  "control_reproduction": {
+    "exact_reports": 272,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      }
+    }
+  },
+  "timing": {
+    "control_ms": 28.28011386718749,
+    "candidate_ms": 27.99918989843747,
+    "less_time_percent": 0.9933622264370223,
+    "reports": 272,
+    "exact_reports": 2,
+    "first_outputs_exact": true,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 188,
+        "relative_l2": 0.07861836336503357,
+        "max_abs": 19.89430271089077
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 2,
+        "relative_l2": 0.08318666542580971,
+        "max_abs": 1.8154630661010742
+      }
+    },
+    "minimum_sampled_headroom_bytes": 15008071680,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.5666080781249998,
+        "imagination_and_targets": 7.40870825390625,
+        "posterior": 4.32399102734375,
+        "world_train_and_sync": 14.9808065078125
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.57466603125,
+        "imagination_and_targets": 7.42779016015625,
+        "posterior": 4.2259748828125,
+        "world_train_and_sync": 14.770758824218749
+      }
+    }
+  },
+  "smoke": {
+    "control_ms": 28.156864625000004,
+    "candidate_ms": 27.268654124999998,
+    "less_time_percent": 3.15450783256378,
+    "exact_reports": 2,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 188,
+        "relative_l2": 0.07861836336503357,
+        "max_abs": 19.89430271089077
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 2,
+        "relative_l2": 0.017507501852674655,
+        "max_abs": 1.7898944020271301
+      }
+    }
+  },
+  "selected_regions": 127,
+  "total_dispatches": {
+    "control": 5286,
+    "candidate": 4908
+  },
+  "previous_partial_smoke": {
+    "reports": 24,
+    "exact_reports": 2,
+    "tensors": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_abs": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 188,
+        "relative_l2": 0.07861836336503357,
+        "max_abs": 19.89430271089077
+      },
+      "final": {
+        "tensors": 292,
+        "exact": 2,
+        "relative_l2": 0.017507501852674655,
+        "max_abs": 1.7898944020271301
+      }
+    }
+  },
+  "followup_threshold_percent": 3,
+  "qualifies_cdp_followup": false,
+  "guards": 9,
+  "allocation_warnings": 5,
+  "synthetic_updates": 640,
+  "optimizer_free_block_replays": 120,
+  "game_actions": 0,
+  "retained_jax_complete_ms": 12.836475229960342,
+  "candidate_to_retained_jax": 2.181221043693314,
+  "hashes": {
+    "backend-control.patch": "b381aad3d7a4417b9e1b31f9dc3315e1489c77f2b1379439d1385a5552d5ebd0",
+    "backend-build-first.patch": "00449123faafa5f62ce1d9d1843332a45ed28b8d2fd9c1e2b2f0a274ee1bee11",
+    "backend-build-v2-failed.patch": "ab1234c7062e313100af232e4cf44ce2ca20c30aaa0518ae9b027a9c31c84098",
+    "backend.patch": "36506adbbb88deededefbe2aaf0c0c2cab2403ceefa7c68c78b5bc78d2ce0a07",
+    "backend-head.patch": "1f5ee236a018f0d73b2fc2c8d3e644ddbc4eae9c831d702216e5d32f6bf510df",
+    "backend-runtime.patch": "ba2fb3300e1258ce11d7ba7ac1ab8bfc86218b621b7a922e3f5328891879b990",
+    "kindle.patch": "d8c790f4d2ca4bf9f13805c5d5cc393cb26ede3840692b8f1e03ab27d25d393f",
+    "backend-tests": "8065335b4e05718cdd5a31e2fcb0720bfa553f703058ec4ed4022163ff535838",
+    "backend-head-tests": "61c0e3138e223b14725023e4dcf0fe678e1b1d365242c766232a7f57bbae43e1",
+    "kindle-tests": "66f7076ffc002d1dc1f8a22c48d6185247f9c99bbca7a451b76d8f98f0581a60",
+    "backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2",
+    "audit-schema-failed.py": "7f29c206970c9775c5e3ca83975e11344d1ae010fd6b8c16f9334f97c70b5292",
+    "audit-buffer-id-failed.py": "653e871e02b262d1c69b251c8b8f7dab3fc6a44372ed2bac67156f75beebc8a6",
+    "inventory-difference.json": "6f8c623c4f0a4689884c3aa208d1c42ff5fa1c764a1a499a22a5b62154a66804",
+    "audit-smoke.json": "5dc5eecdacac3fc53eff86e1bfc8bda4042504228d8fa4f76332747f66f44f14",
+    "cpu/result.json": "823db7bcd21c1f2ab39ff5d6fe2c1e76bac5eeb637aa865e4960eadee826e5d5",
+    "numerical/result.json": "a9a92071b5514e9533b20cfc1efc443173e88bd499c9f690dbb083fbbb7916ec",
+    "policy-head-numerical/result.json": "31f0c496f11b209edbd733311fe5dd810a9392f6d4fff46d37654c033e1a7a97",
+    "full/backend.patch": "15d2a20bde5fb9d3f32e29acef5677df44f69425e7ab4204d253bd3f03a5221b",
+    "full/kindle.patch": "d8c790f4d2ca4bf9f13805c5d5cc393cb26ede3840692b8f1e03ab27d25d393f",
+    "full/backend-tests": "fa328dfd971c9528a1afb0a88a259a6e452f6b59b2329920fdab4d63f3164cf8",
+    "full/kindle-tests": "23f4cf93a86032682cd1f9795f702cd4ff2162783a849b388270d2980f2cdd93",
+    "full/backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "full/kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2",
+    "full/cpu/result.json": "22d790f6925296ce844bd107b399c898bb50dfa75fc8cb92e8a114a93408faee",
+    "full/numerical/result.json": "e8cf459a1916acf6d3739098661b06f511ba192091efb40988984973a73f17ff",
+    "full/audit-smoke.json": "fde8841a931b68cefee75d1bae40e2a7959161876c69dbc0a050bcb1df8bd3cd",
+    "full/audit-timing.json": "82ada39233c253e372e221f7b5cdd9e4d2e29bd746418cf6b34a90b3c5232ee2"
+  },
+  "production_changed": false,
+  "goal_complete": false,
+  "limits": [
+    "Full fixture trajectories differ; this is not learning-equivalence qualification.",
+    "F64 primitives qualify the changed block, not arbitrary full-learner gradients.",
+    "First aggregate checkpoint error includes optimizer state; no demonstrated optimizer-only explanation.",
+    "The inherited independent row-fusion rounding-boundary failure is not erased.",
+    "JAX is retained, not a fresh matched-weight or learning control.",
+    "Failed builds and CPU schema/physical-buffer-ID audits remain; packing recipe/source provenance is exact.",
+    "The initial backward-only integration and its48 updates/60 block replays remain."
+  ]
+}

@@ -7,6 +7,31 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Irregular convolution paths are the next measured bottleneck:**
+  [result](docs/results/2026-10-14-heavy-issued-work.md). Five checked RGB-boundary
+  kernels contain11.1% of convolution nominal MACs but56.6% of measured cost:
+  3.785ms versus2.906ms for18 packed kernels. All already multiply in BF16.
+  Exact source/grid accounting finds84.756G useful versus152.574G cooperative
+  product slots (1.80x), including10.67x padding in two three-output kernels.
+  Not hardware counters or a JAX issued-work ratio; padding is not the sole
+  proven timing cause. One guard/zero warnings, exact plans/pipelines/outputs/
+  292 tensors, one original update/367 optimizer-free replays, zero actions.
+  CPU count-typo failure remains. Next review a general type-aware irregular-
+  product alternative with actual forward/dX/dW controls and all packing costs,
+  then whole-update checks. No tile sweep, production change, Atari restart
+  or whole-gap closure. Device dependency/host costs stay in scope.
+- **Connected-region learner trial closes below its gate:**
+  [result](docs/results/2026-10-14-connected-learner.md). Automatic BF16-safe
+  forward/backward integration selects127 regions,5,286->4,908 dispatches,
+  but full RGB28.280->27.999ms saves only.99%, below3%. No CDP follow-up or
+  further row sweep/promotion. All56 cases/10,251,192 numerical values pass,
+  staged late-dy/alias poison included; heavy descriptors/packing provenance
+  match. Disabled control reproduces all272 reports/292 tensors; candidate
+  later trajectories differ, final aggregate L2.08319, no learning parity.
+  Nine guards/five warnings,640 synthetic updates/120 block replays including
+  the retained partial implementation; failed builds/CPU audits remain.
+  No worker or production change; whole2.20x gap remains open. CI387 passes.
+
 - **Connected training-region prototype passes:** [result](docs/results/2026-10-14-connected-row-region.md).
   Existing general reduction gains column prologues and extra row/element
   outputs; RMSNorm/SiLU saves forward values and emits both derivatives.
@@ -15,8 +40,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   29 CPU tests/two guards, two allocation warnings,556 optimizer-free replays,
   zero actions/updates/workers. Failures/source snapshots remain. Explicit plan
   construction on main7574ad1, not automatic compiler or BF16 learner adoption.
-  The20% block gate passes; next reviewed whole-graph integration must preserve
-  rounding/live outputs/staged backward lifetimes and measure complete updates.
+  The20% block gate passes; subsequent whole-graph integration above preserves
+  rounding/live outputs/staged backward lifetimes but saves only.99% overall.
   No block sweep, additive savings claim or Atari restart. Whole2.20x gap stays
   open; production unchanged. CI386 passes on preceding1e71e74.
 

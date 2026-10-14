@@ -145,17 +145,34 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: integrate the measured connected region, not another local knob.**
+**Next: fix measured irregular-product inefficiency, not another row knob.**
+
+The [completed integration](results/2026-10-14-connected-learner.md) automatically
+selects127 connected forward/backward regions and removes378 dispatches, but
+complete RGB28.280->27.999ms saves only.99%, below its3% gate. Numerical and
+staged checks pass, later trajectories differ; no CDP follow-up, row sweep or
+production promotion. This bounds what that promising block can contribute.
+
+The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) finds a
+more concentrated problem: five checked RGB-boundary convolutions consume
+3.785ms versus2.906ms for18 packed convolutions, despite only11.1% of nominal
+convolution MACs. All already use BF16. Actual source/grid accounting finds
+152.574G cooperative product slots for84.756G useful MACs; two three-output
+kernels waste10.67x slots. This is not hardware-counter or JAX-padding evidence,
+and checked indexing/staging also costs time. Prioritize a general type-aware
+irregular-product alternative with numerical forward/dX/dW controls, all
+packing/conversion costs and a complete-update check. Do not blindly apply
+the64x64 packed path to three channels or sweep tile sizes. The separate
+device-dependency/host-construction problem remains; no whole-gap closure.
 
 The [general reduction prototype](results/2026-10-14-connected-row-region.md)
 passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives
 12.841->8.280us (35.5%). Additional row/element outputs retain forward values;
 column prologues combine backward work. All281,052 GPU values and70,263 CPU
 values pass, normal aliasing/no-alias with poison included. Two guards/two
-warnings; zero optimizer updates/actions. This is explicit plan construction,
-not yet automatic lowering or BF16 learner qualification. Review integration
-across actual rounding/live-output/staged-backward boundaries, then one complete
-update comparison. No block-size sweep or extrapolation to all135 regions.
+warnings; zero optimizer updates/actions. This was explicit plan construction;
+the completed automatic BF16 learner integration above is its limited outcome.
+No block-size sweep or extrapolation to all135 regions.
 Retained full28.213/12.836ms remains2.20x; this alone cannot close the gap.
 
 The [CPU design control](results/2026-10-14-training-residuals.md) is complete
