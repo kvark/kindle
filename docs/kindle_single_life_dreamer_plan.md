@@ -46,6 +46,12 @@ The [non-heavy cost split](results/2026-10-14-materialization-cost.md) allocates
 plans/pipelines/states. Copies alone are not the missing fix. Prioritize
 connected row/backward regions plus efficient heavy kernels, preserving
 rounding/live outputs; cost a representative region before generalizing.
+The [latest-main training-compiler check](results/2026-10-14-training-residuals.md)
+now proves forward-tape reuse in JAX and recomputation in native derivatives.
+Simply expanding primitives worsens the representative plan14->28/32 dispatches;
+all analytical derivatives pass. Connected lowering must handle shared outputs,
+broadcasts and recomposition together. No new GPU speed claim; Meganeura7574ad1
+is used for this CPU check, not adopted as a replacement learner runtime.
 No Atari restart, learning-quality claim or whole-goal closure.
 
 ### Retained causal findings

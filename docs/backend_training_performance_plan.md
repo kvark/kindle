@@ -147,6 +147,19 @@ change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
 **Next: design a connected row/backward region, not another local knob.**
 
+The [CPU design control](results/2026-10-14-training-residuals.md) is complete
+on latest Meganeura7574ad1, including the upstream shared-widening fix.
+Actual HLO provenance proves saved forward norm/SiLU tapes. Native primitive
+expansion is numerically correct but worsens14 dispatches/seven groups to
+28/16 or32/17; recomposition and materialized broadcasts prevent the simple
+approach. Do not enable it in production. A general region must express row,
+column and elementwise inputs, preserve required shared outputs alongside a
+reduction, and keep deliberate F32/BF16 rounding and forward/backward lifetimes.
+The retained learner has141 conservative pure duplicate dispatches, not evidence
+for a large CSE-only gain. Prototype and measure one connected region before
+generalizing. This is not a substitute for heavy-kernel/device-execution work:
+the entire row/reduction allocation is only2.329ms of the remaining gap.
+
 1. The [accumulation-cost check](results/2026-10-14-accumulation-cost.md)
    closes a specific hypothesis: removing compensated dW reduces fixed-world
    GPU time only16.169->16.025ms (.89%), while reproducing14 pointwise F64

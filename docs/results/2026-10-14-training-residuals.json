@@ -1,0 +1,190 @@
+{
+  "status": "complete",
+  "artifact": "runs/row-region-audit-20261014.oDslX6Vm",
+  "backend": "7574ad187a2663a8e7c08a19d4b7c343d6065fa7",
+  "blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+  "naga": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+  "first_f64_comparisons": 132100,
+  "current_f64_comparisons": 198150,
+  "native_regions": {
+    "world_gradient": {
+      "paired": 123,
+      "input_only": 3,
+      "weight_only": 0,
+      "silu_direct": 126
+    },
+    "imagination": {
+      "paired": 0,
+      "input_only": 0,
+      "weight_only": 0,
+      "silu_direct": 0
+    },
+    "behavior_gradient": {
+      "paired": 9,
+      "input_only": 0,
+      "weight_only": 0,
+      "silu_direct": 9
+    },
+    "slow_value": {
+      "paired": 0,
+      "input_only": 0,
+      "weight_only": 0,
+      "silu_direct": 0
+    }
+  },
+  "sha256": {
+    "backend.patch": "11b8d8dd36ac13d167c60c54ca20ff27f04ef714faac01a5b4ea6fd20570f71b",
+    "backend-Cargo.lock": "17a4b854c461fd92543791984128f2810c437c0fe2e1e89d5d456eb0ed713a9b",
+    "backend-tests": "36cde8eb640c1f02663b7ae15c8d0b7438c011f294a8d24120538e75935d18f2",
+    "backend-first-cpu.patch": "3a4fad6e4817875a7bd4bfad6f0dfd7f61e754d2b738d443e3b4935a1c03e664",
+    "backend-first-cpu-tests": "ad8dba82c1a5cf2966a06d7d3c6c4faf335c5c14f40977bdf131dfd3fe28d9d8",
+    "regions.json": "e666f4fd7584f24f9694c69913316718970a0b350d263290217fc8e12713dd5f",
+    "provenance.json": "1de693430d283cd2085d6763c4418c0db78bb2b80afc855ee889b7e61b452822",
+    "duplicate-dispatches.json": "8cbd807726dc2287a9ac11338a0c3f0b79f90119f512ae92da4224fc7f091cd7",
+    "cpu/result.json": "92f1222b515a580d9823ee47bc4f641ec02206c9cc9c3cb9a018601c5231553c",
+    "cpu-full/result.json": "d13a809d810f3afa46a9d15d8de764076f75487280611e7fd557303b7a058246",
+    "cpu-full/fixture.json": "cdb1b98429c3f8ee2024fcf9ddb82417cdea768c4c8e2f01c98b872e92c61955",
+    "regions.py": "42e6c63ef6a982c555af871937ab25c231a27d53bc1f08e33af90f197aa208a1",
+    "provenance.py": "4d6469a087c6cf357f4c80086e28f275466824efa92a709c64f9d466176e1a69",
+    "duplicate-dispatches.py": "72a4e5f831b75c9a62a5b575046d243d95e24a39ca028772c1a35007952e9156",
+    "build-cpu.sh": "b10f6f90ef13be9d05c7e9aaf5268f4bf67fb23aacbdc89e5bcd55be82f51dc7",
+    "backend-compile-failed.patch": "4a811ba354c9a0a9f6368243f220d9bb842518519a44d8b43f1c782d44d96dab",
+    "build-failed.jsonl": "6144dfb99511dedd8bc50e8453164ec6e53bbe7042a21ef0d387ebc618b17259",
+    "provenance-failed.py": "3343f71dcd059b1a820bc47825b212229cc2d84d42e38ea02b66f4d63e41f832",
+    "build-cpu.log": "a8cc1bee9536801a7c8a46d7fe0e5182caecf48acff9307451a87272886ef047",
+    "build-cpu-v2.log": "4d56fbe7e3d745134958d07a4fbb4fb64da63c60c7f61b50fa23d19757b47753",
+    "build-cpu-v3.log": "7139a0364e53d33063c40a0b7a3bca8ab1b1041cc90f31903efc40a2dfb52530",
+    "build-cpu-full.log": "d36b03561d9af34b373aae89bc75edd887d83f10e9837af96e4a705b5aea136d",
+    "provenance.log": "fa158a1838e1dfc8a20bd1b64995b1e891389101bb047e97d9871e39f502b806",
+    "provenance-v2.log": "159fdb5f56949e9bc2e03fc6d38e6d6f3066bda01f1d49a61cedcfb7252dfdcc",
+    "upstream-test.log": "221050d89be5109b1ec544ca24ebab4b8d9c925b8f757e54a167ddfebda75827",
+    "cpu-full/composed-optimized-plan.json": "511160aa2842fd5a7985856ef072dc9f5317624a3d81d4d6c450ff4b371f3921",
+    "cpu-full/composed-raw-plan.json": "65b1f6308d05fac574e41d1c7889e8a4b8161d95c331331fd05e19ab5d8d0102",
+    "cpu-full/fully-primitive-optimized-plan.json": "0e8d8a25682d81f27eadc4b64a27f0f501a595e272081906d23e86f9de45e454",
+    "cpu-full/fully-primitive-raw-plan.json": "c3d6aee770c9511deabc7c698b91011c6694e4a5c65cd65b02671418fee1e815",
+    "cpu-full/primitive-optimized-plan.json": "f301d788094327ca6984584ca439807cd778d86935fe9c6a54abc24a58e27ce3",
+    "cpu-full/primitive-raw-plan.json": "28c67142a6eea8df127b0d82ae2312ced743bb41bc095fef1149f72b259f2b18",
+    "result-verbose.json": "e4eb250eb733998eaabab47829768f6cf0b17315106c8caae9bad075b61fab7a"
+  },
+  "inactive_services": {
+    "kindle-row-region-cpu-full-20261014": "inactive",
+    "kindle-row-upstream-test-20261014": "inactive",
+    "kindle-row-provenance-v2-20261014": "inactive",
+    "kindle-row-duplicates-20261014": "inactive"
+  },
+  "gpu_jobs": 0,
+  "game_actions": 0,
+  "optimizer_updates": 0,
+  "retained_complete_native_ms": 28.212816078125,
+  "retained_complete_jax_ms": 12.836475229960342,
+  "production_changed": false,
+  "goal_complete": false,
+  "cpu": {
+    "composed-optimized": {
+      "nodes": 21,
+      "dispatches": 14,
+      "groups": 7,
+      "logical_buffer_bytes": 2099216,
+      "f64_values": 33025,
+      "f64_max_abs_error": 4.336808689942018e-19
+    },
+    "composed-raw": {
+      "nodes": 22,
+      "dispatches": 17,
+      "groups": 8,
+      "logical_buffer_bytes": 2230288,
+      "f64_values": 33025,
+      "f64_max_abs_error": 4.336808689942018e-19
+    },
+    "fully-primitive-optimized": {
+      "nodes": 59,
+      "dispatches": 32,
+      "groups": 17,
+      "logical_buffer_bytes": 5643280,
+      "f64_values": 33025,
+      "f64_max_abs_error": 8.673617379884035e-19
+    },
+    "fully-primitive-raw": {
+      "nodes": 61,
+      "dispatches": 36,
+      "groups": 18,
+      "logical_buffer_bytes": 5905424,
+      "f64_values": 33025,
+      "f64_max_abs_error": 8.673617379884035e-19
+    },
+    "primitive-optimized": {
+      "nodes": 49,
+      "dispatches": 28,
+      "groups": 16,
+      "logical_buffer_bytes": 4332560,
+      "f64_values": 33025,
+      "f64_max_abs_error": 4.336808689942018e-19
+    },
+    "primitive-raw": {
+      "nodes": 51,
+      "dispatches": 31,
+      "groups": 17,
+      "logical_buffer_bytes": 4594704,
+      "f64_values": 33025,
+      "f64_max_abs_error": 4.336808689942018e-19
+    }
+  },
+  "hlo": {
+    "hlo_sha256": "1f51f0c5c233068bc0215cbc32a10fc070660cb0afb059d17654b0d02236b52c",
+    "scope": "Exact retained obs0norm/SiLU tapes produced in the forward loop and carried unchanged through backward. Not a whole-program recomputation count.",
+    "forward_loop_iterations": 16,
+    "backward_loop_iterations": 16,
+    "tapes": [
+      {
+        "backward_parameter": "p.2853",
+        "shape": "f32[16,8,1]{2,1,0}",
+        "backward_tuple_index": 78,
+        "backward_passthrough": true,
+        "forward_tuple_index": 58
+      },
+      {
+        "backward_parameter": "p.2856",
+        "shape": "f32[16,8,1]{2,1,0}",
+        "backward_tuple_index": 77,
+        "backward_passthrough": true,
+        "forward_tuple_index": 57
+      },
+      {
+        "backward_parameter": "p.2848",
+        "shape": "bf16[16,8,256]{2,1,0}",
+        "backward_tuple_index": 80,
+        "backward_passthrough": true,
+        "forward_tuple_index": 60
+      },
+      {
+        "backward_parameter": "p.2849",
+        "shape": "bf16[16,8,256]{2,1,0}",
+        "backward_tuple_index": 79,
+        "backward_passthrough": true,
+        "forward_tuple_index": 59
+      }
+    ]
+  },
+  "duplicate_dispatches": {
+    "world_gradient": {
+      "dispatches": 4104,
+      "exact_duplicate_pure_dispatches": 132,
+      "duplicate_logical_output_bytes": 1376256
+    },
+    "imagination": {
+      "dispatches": 922,
+      "exact_duplicate_pure_dispatches": 0,
+      "duplicate_logical_output_bytes": 0
+    },
+    "behavior_gradient": {
+      "dispatches": 247,
+      "exact_duplicate_pure_dispatches": 9,
+      "duplicate_logical_output_bytes": 4177924
+    },
+    "slow_value": {
+      "dispatches": 13,
+      "exact_duplicate_pure_dispatches": 0,
+      "duplicate_logical_output_bytes": 0
+    }
+  }
+}

@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Training compiler boundary diagnosed:** the [latest-main CPU control](docs/results/2026-10-14-training-residuals.md)
+  proves JAX carries forward normalization/activation tapes into backward;
+  native135 SiLU/norm derivative regions recompute them. Primitive expansion
+  alone worsens the representative plan14->28/32 dispatches and7->16/17 groups.
+  All198,150 F64 comparisons in six plans pass; initial132,100 retained.
+  Recomposition/shared-output/broadcast boundaries need connected lowering,
+  not a decomposition flag or more scalar tuning.141 descriptor-identical
+  pure dispatches in retained learner plans are not a timing claim. No GPU
+  allocation, production change or worker; full2.20× gap remains open.
+  Meganeura main7574ad1's BF16/shared-widening fixes are present in this CPU
+  fixture; exact upstream regression passes. Not full-main GPU qualification.
+  CI385 passes. Keep heavy-kernel and device dependency costs in scope;
+  row/reduction's whole2.329ms allocation cannot alone explain the gap.
+
 - **Comparable math, different execution machinery:** the
   [reachable executable audit](docs/results/2026-10-14-executable-work.md)
   finds84.756G native versus83.589G JAX nominal heavy MACs, only1.40% extra,
