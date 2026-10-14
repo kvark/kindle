@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Connected layout reuse rejected:** [result](docs/results/2026-10-14-connected-layout.md).
+  Complete RGB12M/B32 control/candidate65.651→65.593ms,0.089%, below3%; still
+  2.41× retained JAX27.187ms. Keep3551bc53, not rejected212713c4. World4,089→
+  4,069 dispatches removes eight packs/ten casts/two transposes; all heavy
+  descriptors/protected metadata,272 reports/first outputs/three292-tensor
+  boundaries/cache counts exact. Other three plans/keys exact.162 typed-pack
+  cases/279,936 exact values and12 connected pairs/14,877,300 exact outputs/
+  6,912 F64 probes pass, including staged lifetimes/aliasing/changed inputs.
+  Three guards pass/one CPU fixture shape failure retained; only unstarted
+  connected cases run after reviewed test-only repair. Two CPU build failures
+  retained; zero warnings/actions/workers,544 synthetic updates. No promotion,
+  layout sweep or gap closure. Next isolate packed-convolution shape/index
+  specialization: its fixed dimensions remain uniforms/software division while
+  scalar convolution already specializes them. Hypothesis, not established
+  causality; retain shared typed arithmetic and a complete-update gate.
 - **Connected image lowering qualifies, most of the gap remains:**
   [result and limits](docs/results/2026-10-14-spatial-tape.md). Fresh complete
   RGB12M/B32 control/candidate68.491→65.736ms,4.02%; still2.42× retained JAX

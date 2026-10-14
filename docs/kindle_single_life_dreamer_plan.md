@@ -28,10 +28,14 @@ The [spatial-vector convolution intervention](results/2026-10-14-convolution-spa
 is rejected: its targeted decoder pair is0.62% slower with exact outputs, so no
 whole-update trial follows. The numerical run's final count assertion stays
 failed; independent CPU reconstruction passes all93,280 saved values without a
-GPU retry. A retained-plan audit now identifies ten transpose→BF16→pack chains
-and eight duplicate packs. Next preserve physical layouts and reuse across a
-connected image-training region, including saved backward/staged consumers;
-these counts are not a speedup forecast. Require a complete-update gate.
+GPU retry. The subsequent [connected layout/reuse trial](results/2026-10-14-connected-layout.md)
+also rejects:65.651→65.593ms, only0.089%. It removes eight packs/ten casts/two
+transposes with exact reports/states and qualified staged backward lifetimes,
+but those static redundancies were not a major cost. Keep3551bc53, not rejected
+212713c4. Next isolate shape-specialized indexing in the shared packed convolution
+path: it still uses uniform dimensions/software division, unlike the scalar
+path. This is a hypothesis connected to the measured excess integer work,
+not a proven explanation or promise of parity. Require a complete-update gate.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.

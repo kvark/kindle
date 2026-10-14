@@ -37,15 +37,21 @@ Two timing guards pass; the numerical guard retains a final count-assertion
 failure, independently recovered by checking all93,280 saved values on CPU.
 No GPU retry, tolerance change, production promotion or new whole-update claim.
 
-**Next: physical layout and reuse across connected image training.** The retained
-qualified world plan contains ten transpose→BF16→pack chains and eight duplicate
-packs (80MiB repeated logical output extents). Normalization already produces
-channels-last values, but the frontend returns to channels-first and the
-convolution lowering packs back again. Preserve padded strides, rounding,
-all consumers and staged backward lifetimes across this boundary. Counts are
-not measured savings or proof that this explains the remaining38.55ms; use one
-shared typed lowering with a complete-update gate, not a duplicate-count-only
-sweep. No automatic global NHWC rewrite, broad capture or row/grid/tile/dtype sweep.
+**[Connected layout reuse is also rejected](results/2026-10-14-connected-layout.md).**
+Complete B32 control/candidate65.651→65.593ms, only0.089%, below3%. Removing
+eight packs/ten casts/two transposes preserves exact reports, tensors, heavy
+descriptors and staged lifetimes but gives no meaningful whole-update gain.
+All independent typed-pack/connected F64 checks pass; one CPU fixture shape
+failure and its test-only repair remain. Keep3551bc53, not rejected212713c4.
+Static duplicate/byte counts did not predict a substantial saving.
+
+**Next: shape-specialize packed convolution indexing.** The shared cooperative
+kernel still receives fixed dimensions through uniforms/software division,
+unlike the existing specialized scalar path. The earlier counter study found
+excessive integer address work. Test this specific compiler boundary without
+changing arithmetic, precision, tiles, split counts or layouts; source inspection
+alone does not establish causality. Require independent numerical checks and
+one complete-update gate. No broad capture or row/grid/tile/dtype/layout sweep.
 Keep the independently measured5.383ms host decode/target path as a separate
 GPU-residency opportunity, not an additive savings promise. No Atari restart
 or whole-goal closure.
