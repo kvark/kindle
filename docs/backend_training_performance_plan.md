@@ -8,6 +8,29 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Bigger batches expose another implementation limit, not parity.** The
+[matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures
+native22.780→68.456ms and complete JAX12.737→27.187ms: throughput improves
+1.33× versus1.87×, widening the ratio1.79→2.52×. All heavy arithmetic scales
+4×, with exact initials and exact retained B8 controls. Batch changes are not
+unchanged-learning speed gains. No batch/sequence or concurrent-seed sweep.
+
+Four B32 convolutions lose their packed implementation because a64MiB channel
+pack needs65,536 one-dimensional workgroups, one beyond the portable limit.
+The existing element/memory cap permits it. Reuse the general `linear_grid`
+helper and flatten the packing shader's actual grid, retaining all other bounds,
+types and accumulation partitions; qualify coverage/padding/transposes and
+complete B32 updates. This is the next concrete correction. Its whole-update
+benefit remains unmeasured, and it does not explain B8's remaining gap.
+The separate initialization scratch-cap repair raises64→128MiB and preserves
+B8's exact results; it is not the cause of these four runtime fallbacks.
+
+The actual connected-projection audit found separate tape/reduction/backward
+kernels on JAX too.128 native product/reduction/conversion tails are not a
+speedup estimate; no further row-only fusion trial follows from those counts.
+Production stays unchanged. Seven guards retain two pre-update failures and
+five warnings;1,112 synthetic updates, zero actions/workers. CI398 passes.
+
 **Current cached execution is predominantly device-side.** The
 [qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the
 command cache, which ordinary GPU profiling had disabled. One-chunk ordinary/
@@ -18,14 +41,13 @@ matrix and5.463 other operations. Cache reuse and exact restorations pass;
 these interacting allocations are not independent savings. Four guards pass,
 one warning retained, no game actions/production change/workers.
 
-This gives priority to a connected heavy-projection/training region, including
-layout, explicit rounding, multiple consumers and backward lifetimes. Compare
-its real native/JAX dataflow before a general lowering intervention, then check
-complete-update cost. Row-only integration already saved only~1%; do not repeat
-that local sweep or assume fewer dispatches guarantee a large gain. Host decode/
+The completed connected-region comparison above does not justify another
+fusion implementation on counts alone. Row-only integration already saved
+only~1%; do not repeat that local sweep or assume fewer dispatches guarantee
+a large gain. Correct the demonstrated packing-grid limitation next. Host decode/
 targets cost1.522ms; useful work, but not the primary device-side gap. Keep
 library algorithms and dependency execution in scope. The ordinary four-chunk
-candidate remains22.881ms/1.80× fresh JAX; no new throughput or parity claim.
+candidate's fresh B8 latency is22.780ms/1.79× JAX; no parity claim.
 
 **Wider intermediate precision does not supply the missing large multiplier.**
 The [qualified JAX control](results/2026-10-14-precision-flow.md) measures

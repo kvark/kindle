@@ -8,10 +8,18 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Best isolated complete RGB12M/B8/BF16 updates take **22.881 ms versus fresh JAX
-12.684 ms: still 1.80×**; native was not retimed. Production remains on its earlier qualified~53 ms
+Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
+12.737 ms: still 1.79×**. Production remains on its earlier qualified~53 ms
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
+
+The [same RGB comparison at B32](results/2026-10-14-batch-granularity.md) gives
+68.456ms native versus27.187ms JAX,2.52×. Larger batches improve throughput
+1.33× versus1.87×, so they do not resolve the implementation gap. Four native
+convolutions lose packing at a one-dimensional launch limit:65,536 workgroups
+versus65,535 allowed. Next qualify the existing general two-dimensional grid
+helper in the packing path, retaining memory and numerical bounds. Its speed
+effect is unmeasured; no batch sweep or learning promotion follows.
 
 The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
 more native nominal heavy arithmetic. The gap is execution engineering, not
@@ -61,8 +69,9 @@ The [current cached capture](results/2026-10-14-cached-residual.md) now attribut
 overhead and exact reports/states. Fixed-graph costs include4.295ms empty command
 stream and5.463ms other-than-heavy work, alongside5.587ms convolution/3.388ms
 matrices. These are interacting allocations, not additive removable costs or
-SM utilization. Next compare an actual connected heavy-projection/training region
-with its JAX consumers, then measure a general lowering intervention. The five checked
+SM utilization. The connected heavy-projection comparison finds separate JAX
+tape/reduction/backward kernels too; counts alone do not justify a new fusion
+trial. The packing-grid defect above is the next concrete correction. The five checked
 convolutions occupy only~2.50ms; prior row-only fusion saved~1%. Keep matrix
 efficiency, materialization and device execution in scope. No iterator/tile/
 vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
