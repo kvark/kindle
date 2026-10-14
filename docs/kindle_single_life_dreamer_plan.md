@@ -18,14 +18,15 @@ Removing about9% of dependency groups saves only1% of whole-update time:
 no row-operation tuning campaign or group-count-based speedup forecast.
 It builds on qualified [GPU RNG](results/2026-10-14-device-rng.md) and
 [device EMA](results/2026-10-14-device-ema.md), whose later trajectories differ.
-RGB remains2.21× retained complete JAX12.836ms; production stays on the earlier
+RGB remains2.20× retained complete JAX12.836ms; production stays on the earlier
 qualified~53ms runtime. [Target attribution](results/2026-10-14-target-boundary.md)
 also limits the host explanation: only2.027ms RGB in selected preparation/
 target/upload regions; required CPU replay readback remains.
-Next one [actual-grid dense selector check](experiments/2026-10-14-dense-launch-grid.md):
-64×64 dense tiles still choose splits using a32×32 grid estimate, unlike the
-grouped path. This is source evidence, not yet a measured speedup. Then reassess
-weighted kernel/execution costs; no sweep, Atari restart, learning-quality
+The [actual-grid selector check](results/2026-10-14-dense-launch-grid.md) now
+passes numerical gates but saves only1.00%/.92%, with changed trajectories.
+Keep its evidence, not a performance promotion or grid sweep. Retained control
+b3a086f measures28.213/93.084ms. Next [re-profile weighted residual cost](experiments/2026-10-14-residual-reassessment.md),
+including newer GPU RNG/EMA submissions. No Atari restart, learning-quality
 claim or whole-goal closure.
 
 ### Retained causal findings

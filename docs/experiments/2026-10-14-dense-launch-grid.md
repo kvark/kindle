@@ -52,3 +52,34 @@ hard faults stop for review, no blind retry, NVML polling or recovery.
 CPU build/analysis uses one CPU,2GiB and zero swap, never during matched timing.
 Publish the result and reassess expensive-work accounting; this check is not
 an indefinite gate or a promise of JAX parity.
+
+Started in `runs/dense-launch-grid-20261014.Upb23FRK`. CPU tests/Clippy pass;
+nativef9cbeb98 keeps the same compiler as controlb3a086f. The first new GPU
+test stops after its first case's outputs/partials/guard values pass: its
+unchanged-parameter check incorrectly calls F32-only read_param on F16
+storage. This is a test API assertion, not a numerical mismatch or wedge.
+Retain the source/binary/failed guard. A test-only correction reads the packed
+F16 bits using the existing raw buffer API; all values/gates/runtime sources
+stay unchanged. Rebuild only the regression test, then run the reviewed
+qualification from its first case. No learner timing before that review.
+
+Reviewed qualification passes all six groups:14 affected-shape cases verify
+1,769,472 outputs/6,684,672 partials exactly against F64 over three executions;
+existing dense/gradient/convolution/grouped/staged checks pass unchanged gates.
+Both24-update smokes have exact292/346 initial tensors and finite reports/states.
+First RGB model tensors are exact; CDP first model relativeL2 is1.23e-5.
+Optimizer states and later trajectories differ; categorical/forecast differences
+are retained, not a learning-equivalence claim. The product audit permits only
+the selected splits and necessary F32-partial/final-BF16 stores; all other
+product descriptors match. The first CPU plan summary used the empty compiled
+groups field; its reviewed replacement uses actual session metadata, retaining
+the old file. CDP imagination adds90 dispatches/60 groups. No GPU rerun for that
+metadata correction. Proceed to one ordinary pair/workload: RGB control/grid,
+CDP grid/control. All preparation/analysis ends before timing.
+
+Complete: [result](../results/2026-10-14-dense-launch-grid.md). Only1.00% RGB/
+.92% CDP full-update improvement, with different trajectories. Preserve the
+candidate, do not stack it as the performance baseline or run another grid
+candidate. All12 guards pass after the retained test-only failure; four warnings,
+1,136 full synthetic+144 small optimizer updates, zero game actions/workers.
+Next re-profile the retained improvedb3a086f control's weighted residual costs.

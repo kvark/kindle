@@ -25,15 +25,22 @@ has been established.
 
 | Current whole-update boundary | Time |
 | --- | ---: |
-| Isolated native RGB12M/B8/BF16, row selection + latest compiler | 28.314ms |
+| Retained isolated RGB12M/B8/BF16, row selection + latest compiler | 28.213ms |
 | Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
-| Isolated native CDP12M/B32/mixed, row selection + latest compiler | 93.049ms |
+| Retained isolated CDP12M/B32/mixed, row selection + latest compiler | 93.084ms |
 
-RGB remains **2.21×** the retained complete JAX caller boundary. CDP is a different
+RGB remains **2.20×** the retained complete JAX caller boundary. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
+
+The [actual-grid correction](results/2026-10-14-dense-launch-grid.md) saves
+only1.00% RGB/.92% CDP against these fresh controls. Numerical/plan checks pass,
+but trajectories differ; additional partitions also add reductions, stores
+and dependencies. Preserve the isolated candidate, not a promotion or another
+grid test. The table deliberately retainsb3a086f, not the grid candidate.
+Re-profile its weighted residual costs before another optimization.
 
 The [latest upstream compiler check](results/2026-10-14-storage-propagation.md)
 finds no material5080 gain: fresh RGB28.197→28.314ms/CDP92.965→93.049ms,
@@ -52,8 +59,8 @@ reviewed uniform-binding failure and one matrix-addend fusion difference.
 Do not continue a row-operation tuning campaign or equate fewer groups with
 proportional throughput. The source audit instead exposes a concrete selector
 inconsistency: dense64×64 tiles still choose K splits from a32×32 grid estimate;
-grouped products already use their actual grid. The next bounded check below
-tests that mismatch, not a new sweep or a promised major speedup.
+grouped products already use their actual grid. The completed check above
+finds no missing large speedup. End this line of tuning.
 
 The [device RNG intervention](results/2026-10-14-device-rng.md) now saves
 6.80% RGB /8.44% CDP against fresh32.246→30.053ms /104.048→95.269ms controls.
@@ -131,16 +138,16 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: qualify one actual-grid selector correction, then reassess weighted cost.**
+**Next: remeasure weighted residual cost on the improved stack.**
 
-1. Complete the [actual-grid dense split check](experiments/2026-10-14-dense-launch-grid.md).
-   Start from the separately checked latest compilerb3a086f.
-   Apply existing thresholds to the selected tile; keep algorithms, precision
-   and fused-addend exclusions fixed. CPU plans identify55 RGB/53 CDP affected
-   products, not a measured speedup. Qualify changed reduction orders before
-   one complete pair/workload. Then reassess weighted expensive-work and
-   execution overhead. The row-selection result does not justify another
-   scalar/row/binding-cap/tile sweep or a bespoke Dreamer kernel.
+1. Follow the [bounded residual reassessment](experiments/2026-10-14-residual-reassessment.md)
+   on retainedb3a086f. Earlier weighted profiles predate several interventions;
+   port qualified coarse GPU/CPU instrumentation, now including GPU RNG/EMA
+   submissions, and require exact ordinary/instrumented states/reports/plans.
+   Attribute actual time before another compiler change. A time-batchable prior
+   head is visible in source but only~.33% of nominal matrix/conv work; neither
+   MACs nor dependency counts establish its runtime importance. No scalar/row/
+   binding-cap/tile sweep, invalid Vulkan Nsight retry or bespoke Dreamer kernel.
 2. GPU RNG and EMA qualify in the isolated candidate, with EMA's later
    trajectory differences retained. Target attribution is complete; move
    construction onto device. Posterior readback also refreshes CPU replay and

@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Actual-grid split check closes without a material gain:**
+  [result](docs/results/2026-10-14-dense-launch-grid.md). RGB28.213→27.931ms /
+  CDP93.084→92.232ms, only1.00%/.92%.14 affected-shape cases verify1,769,472
+  outputs/6,684,672 F64 partial values over three executions; existing numerical
+  groups,35 CPU tests/52 shader cases and both Clippy checks pass. Exact initials,
+  finite states, all product descriptors match except declared partitions/stores;
+  later trajectories differ.12 guards/four warnings, one retained test API
+  failure;1,136 full synthetic+144 small optimizer updates, zero actions/workers.
+  Keep source/evidence, not a performance-baseline promotion or grid sweep.
+  Retainb3a086f/Blade96c1dc7/Naga a97559b for the
+  [next weighted residual profile](docs/experiments/2026-10-14-residual-reassessment.md).
+  New GPU RNG/EMA need complete trace coverage; no invalid Vulkan Nsight GPU
+  timestamps/Graphics retry. Production/Atari unchanged; broader goal active.
+
 - **Latest compiler does not materially close the5080 gap:**
   [result](docs/results/2026-10-14-storage-propagation.md). Blade96c1dc7/
   Naga a97559b changes storage propagation, not graphs: RGB28.197→28.314ms,
@@ -18,8 +32,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   1,136 full synthetic+144 small staged updates, zero actions/recovery/workers.
   Keep nativeb3a086f in isolated experiments; production remains unchanged.
   RGB2.21× retained complete JAX; no new JAX/utilization/learning claim. CI380
-  passes. Next actual-grid check below starts from this refreshed compiler,
-  not a combined compiler/geometry intervention. Broader goal remains active.
+  passes. The separately completed actual-grid check above uses this refreshed
+  compiler, not a combined compiler/geometry intervention. Broader goal stays active.
 
 - **Row selection qualifies, but dependency counts overstate its benefit:**
   [result](docs/results/2026-10-14-row-selection.md). Fresh RGB28.777→28.479ms /
@@ -36,10 +50,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   no fresh JAX or production/learning change. CI379 passes.
   **No row-operation tuning campaign.** A CPU audit identifies55 RGB/53 CDP
   dense products whose split selector assumes32×32 despite actual64×64 tiles;
-  grouped products already use their actual grid. The [next bounded check](docs/experiments/2026-10-14-dense-launch-grid.md)
-  applies the same rule to the actual tile, no threshold/algorithm sweep.
-  No speedup/underutilization claim before numerical qualification and one
-  matched whole-update pair. Broader root-cause/performance goal remains active.
+  grouped products already use their actual grid. The completed bounded check
+  above applies the same rule to the actual tile and yields only~1%; no
+  threshold/algorithm sweep or underutilization claim. Broader goal stays active.
 
 - **Residual target boundary attributed; prioritize compiler execution depth:**
   [result](docs/results/2026-10-14-target-boundary.md). Unchanged RGB29.084ms/
