@@ -8,6 +8,18 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**The newest counter evidence identifies wasted address-generation work.**
+The [RGB-boundary study](results/2026-10-14-boundary-algorithms.md) matches all
+five native kernels and isolates decoder forward/dW at1.310/1.742ms versus
+cuDNN.261/.338ms. Encoder forward/dX are competitive. The dW CUDA bridge
+executes1.785B warp instructions versus100.06M;73.1% are integer work.
+cuDNN issues12.5% *more* identical BF16 tensor instructions, yet is much faster.
+Its occupancy is lower, tensor-pipeline activity much higher. This is an
+iterator/staging/reuse problem, not a reason to chase occupancy or remove
+compensation. Bridge counters are not native Vulkan counters; its2.374ms is
+36.2% slower than native. Two primitive JAX algorithms differ from the full
+executable; dominant dW matches exactly. All outputs/F64 controls pass.
+
 **The remaining gap includes a device-side execution-path difference, not
 merely CPU launch overhead.** The [new causal controls](results/2026-10-13-execution-boundaries.md)
 measure about 2.05µs per tiny dependent kernel on Vulkan **and ordinary
@@ -178,10 +190,14 @@ with repaired validation logging;1152 total synthetic updates/zero actions.
 
 Keep the isolated improvement, not a portable production/CDP qualification.
 The remaining~2x gap still requires actual GPU algorithm/dependency work.
-Match JAX's executable and native boundary convolutions before another
-intervention; do not infer a padding fix from nominal MACs or revive the
-rejected scalar path. CUDA graphs' lower device issue cost is separate from
-ordinary Vulkan command reuse. No whole-gap or Atari-learning closure.
+That matching is now complete in the boundary study above. Next implement a
+general incremental convolution iterator, hoisting repeated coordinates/pointer
+deltas/masks while initially preserving its tile and arithmetic schedule.
+Cost complete updates before generalizing; no scalar revival, BF16-only fork
+or geometry sweep. JAX's F32-output controls widen operands and do not isolate
+gradient storage precision. The five kernels'~3.75ms footprint cannot explain
+the whole12.69ms residual; CUDA graphs' lower device issue cost and other
+GPU work stay in scope. No whole-gap or Atari-learning closure.
 
 The [general reduction prototype](results/2026-10-14-connected-row-region.md)
 passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives

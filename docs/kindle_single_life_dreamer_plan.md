@@ -8,73 +8,35 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Latest isolated compiler [refresh](results/2026-10-14-storage-propagation.md)
-measures RGB28.197→28.314ms/CDP92.965→93.049ms: no material gain, exact
-reports/plans/tensors. Keep Blade96c1dc7/Naga a97559b isolated; the inherited
-F64 rounding-boundary failure remains, with its scoped diagnostic. Earlier
-[row selection](results/2026-10-14-row-selection.md)
-reduces RGB28.777→28.479ms /CDP93.938→93.001ms with exact reports/tensors.
-Removing about9% of dependency groups saves only1% of whole-update time:
-no row-operation tuning campaign or group-count-based speedup forecast.
-It builds on qualified [GPU RNG](results/2026-10-14-device-rng.md) and
-[device EMA](results/2026-10-14-device-ema.md), whose later trajectories differ.
-RGB remains2.20× retained complete JAX12.836ms; production stays on the earlier
-qualified~53ms runtime. [Target attribution](results/2026-10-14-target-boundary.md)
-also limits the host explanation: only2.027ms RGB in selected preparation/
-target/upload regions; required CPU replay readback remains.
-The [actual-grid selector check](results/2026-10-14-dense-launch-grid.md) now
-passes numerical gates but saves only1.00%/.92%, with changed trajectories.
-Keep its evidence, not a performance promotion or grid sweep. Retained control
-b3a086f measures28.213/93.084ms. The [fresh complete profile](results/2026-10-14-residual-reassessment.md)
-now covers every update/tail: native GPU-pass union22.144ms versus retained
-JAX10.295ms, while RNG+copies+EMA total only.430ms. Heavy-kernel algorithms and
-dependent execution remain the main issues, not transfer bandwidth.
-[Compensated accumulation](results/2026-10-14-accumulation-cost.md) is not the
-large missing cost: removing it saves only.89% of fixed-world GPU time and
-reproduces14 pointwise failures/layout. Keep it; no accumulation sweep.
-The [separate next-tile prefetch check](results/2026-10-14-conv-prefetch.md)
-also closes: full RGB28.436->28.714ms (.98% slower), exact reports/states.
-No follow-up sweep. The [reachable-work audit](results/2026-10-14-executable-work.md)
-finds only1.40% more nominal heavy arithmetic in native despite2.20× latency:
-this is execution engineering, not a substantially larger mathematical workload.
-Actual JAX dataflow combines four head projections into a wider GEMM; native
-typed products/sessions stay separate. Cost the complete connected region and
-its materialized intermediates before further compiler changes; the wide-GEMM
-opportunity is not yet a measured large benefit. Numerical gates stay unchanged.
-The [non-heavy cost split](results/2026-10-14-materialization-cost.md) allocates
-1.432ms layout/casts,2.329ms row/reductions and1.631ms other, with exact
-plans/pipelines/states. Copies alone are not the missing fix. Prioritize
-connected row/backward regions plus efficient heavy kernels, preserving
-rounding/live outputs; cost a representative region before generalizing.
-The [latest-main training-compiler check](results/2026-10-14-training-residuals.md)
-now proves forward-tape reuse in JAX and recomputation in native derivatives.
-Simply expanding primitives worsens the representative plan14->28/32 dispatches;
-all analytical derivatives pass. Connected lowering must handle shared outputs,
-broadcasts and recomposition together. The subsequent
-[connected-region prototype](results/2026-10-14-connected-row-region.md)
-measures35.5% lower complete block GPU time (12.841->8.280us), with all
-281,052 numerical values passing. Its general reduction extension saves
-forward values and emits both derivatives, but selection is still manual.
-The [whole-learner integration](results/2026-10-14-connected-learner.md) now
-passes numerical/staged checks but saves only.99% (28.280->27.999ms), below
-its3% gate. No CDP follow-up or further row sweep; later trajectories differ.
-The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) finds
-five irregular RGB-boundary convolutions cost3.785ms versus2.906ms
-for18 packed ones, despite only11.1% of useful convolution MACs. All already
-use BF16. Native's84.756G useful products occupy152.574G source-level matrix
-slots after padding; this is not a JAX issued-work ratio or sole proven cause.
-The [typed scalar alternative](results/2026-10-14-narrow-products.md) passes
-90 numerical cases but slows complete updates28.488->30.492ms (7.03%): reject
-without a geometry sweep. Padding alone is not the proven explanation.
-The [command-cache intervention](results/2026-10-14-command-cache.md) now
-reduces complete updates28.416->25.530ms (10.16%), with all272 reports/plans/
-saved tensors exact. Nsight confirms5286 fewer descriptor updates and pipeline
-binds per update, while15 submissions and GPU work remain unchanged. Keep
-this isolated improvement; it is still1.99x retained complete JAX. Next
-investigate remaining library-kernel algorithms and device dependency costs,
-not a cache/geometry sweep. No CUDA-graph-equivalent device claim. Upstream7574ad1 is
-rechecked, not substituted for the optimized experimental backend.
-No Atari restart, learning-quality claim or whole-goal closure.
+Best isolated complete RGB12M/B8/BF16 updates take **25.530 ms versus JAX
+12.836 ms: still 1.99×**. Production remains on its earlier qualified~53 ms
+runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
+workload and must not be compared directly with this JAX number.
+
+The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
+more native nominal heavy arithmetic. The gap is execution engineering, not
+a much larger Dreamer workload. Three structural differences have evidence:
+
+- Kernel algorithms: the [latest matched convolution study](results/2026-10-14-boundary-algorithms.md)
+  isolates decoder forward/dW at1.310/1.742 ms versus cuDNN.261/.338 ms.
+  Its checked CUDA bridge executes17.84× as many warp instructions, mostly
+  integer indexing, although cuDNN issues12.5% more identical BF16 tensor
+  instructions. Bridge counters are not native Vulkan counters; two primitive
+  library algorithms differ from the full executable, dominant dW matches.
+- Host construction: [command reuse](results/2026-10-14-command-cache.md)
+  saves10.16% of complete update time with exact reports/states. It removes
+  repeated bindings/recording, not GPU operations or dependencies.
+- Device execution: [dependent-kernel controls](results/2026-10-13-execution-boundaries.md)
+  find about2.05µs per dependency for Vulkan/ordinary prequeued CUDA versus
+  .65µs for CUDA graphs. Host command reuse does not establish that advantage.
+
+Next: efficient incremental convolution iterators and staging in the shared
+typed path, preserving arithmetic/boundary checks first; require complete-update
+evidence before generalizing. The checked kernels occupy only~3.75 ms, so keep
+matrix efficiency, materialization and device dependencies in scope. No tile/
+occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
+Detailed successful and rejected interventions remain in the backend plan and
+linked results; individual savings are not additive. The full goal stays open.
 
 ### Retained causal findings
 

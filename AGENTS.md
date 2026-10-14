@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Checked convolution's dominant cost is address-generation work:**
+  [matched operations and Nsight counters](docs/results/2026-10-14-boundary-algorithms.md).
+  Five native kernels total3.748ms; encoder forward/dX are competitive, while
+  decoder forward/dW1.310/1.742ms versus cuDNN.261/.338ms dominate. Dominant
+  dW matches the full JAX algorithm; two other miniature algorithms differ.
+  Its CUDA translation executes1.785B warp instructions/1.306B integer versus
+  cuDNN100.06M/61.09M. cuDNN executes12.5% more identical BF16 HMMA operations,
+  with4.65->39.71% tensor activity and61.93->15.99% occupancy. Padding/occupancy
+  alone are not the cause. Bridge2.374ms is36.2% slower than native; counters
+  are not Vulkan instructions. All51,914,112 JAX values match at declared
+  rounding;1,664 F64 probes/640 coordinates and changed-input checks pass.
+  F32 JAX gradient-output controls widen operands: no storage-policy isolation.
+  Five guards pass; first fixture's BF16-input assertion fails before dispatch,
+  repaired via internal buffers with source/binary/failure retained. No actor
+  updates/actions/production change/worker. Next general incremental typed
+  convolution iterators, hoisted coordinates/deltas/masks, same arithmetic first;
+  complete-update proof before generalizing. No scalar revival, geometry sweep,
+  dtype-specific kernel or precision relaxation. Whole25.530/12.836ms gap stays
+  open;~3.75ms checked footprint does not explain it all. CI390 passes.
 - **Command reuse removes a structural host bottleneck:**
   [result](docs/results/2026-10-14-command-cache.md). Same RGB complete updates
   28.416->25.530ms (10.16%), exact272 reports/first outputs/plans/pipelines/
