@@ -8,6 +8,15 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Latest: [one mixed-group boundary closes a real execution penalty](results/2026-10-14-convolution-boundary.md).**
+Complete RGB12M/B32 improves63.633→60.268ms,5.29%, with exact272 reports,
+first targets, five plans/pipelines and initial/first/final292 tensors. One
+additional in-pass barrier preserves allocation and all submission ranges.
+The isolated candidate remains2.26× retained JAX26.632ms; it is not a general
+production scheduling policy or a new B8/CDP result. Next separate execution
+ordering from visibility/cache effects at that independent boundary before
+deriving a compact general rule. Atari and the full root-cause goal stay open.
+
 **The [whole-update comparison](results/2026-10-14-jax-image-profile.md)
 locates a structural compilation gap.** Native B32 spends56.948ms in GPU
 passes and11.688ms outside; host decoding/targets alone cost5.383ms. Removing
@@ -86,16 +95,21 @@ all16.8M rounded outputs and native256 F64 coordinates pass. Both cuDNN tunings
 differ from full JAX; its auxiliary widened-F32/Winograd dW fails127/128 probes
 and remains unqualified. Native already uses BF16 tensor operations.
 
-**Grouping does not explain the larger intact interval:** shared-dy heavy
-kernels grouped/serialized both take4.165ms, with100.9M exact checks. No grouping
-change or sweep. Next reproduce the full five-operation group with captured
-learner operands/buffer context, including omitted reductions; distinguish
-data/cache/allocation effects and timing scope before another kernel change.
-Do not repeat the same sparse timing for a nicer gate or revive masked rankings.
-Current complete B32 remains2.39× retained JAX. Kernel algorithms, connected
-execution and host decode/targets remain distinct problem areas, not additive
-savings. No image/row/layout/dtype/tile sweep, broad capture, production change
-or Atari restart; the full goal stays open.
+**The two-heavy-kernel grouping control omitted the relevant context.** It
+remains negative at4.165ms grouped/serialized, but the [captured five-operation
+follow-up](results/2026-10-14-convolution-boundary.md) reproduces the slowdown
+with.315% fixed-graph overhead. Changing real inputs to synthetic values does
+not recover the primitive result. In the original learner allocation, the
+auxiliary operations alone cost.0186ms and isolated dX/dW2.172/2.016ms, yet
+their intact group takes7.384ms versus4.230ms separated. The absolute3%
+attribution gate fails; this is an execution intervention, not passive profiling.
+One in-pass barrier alone gives7.387→4.168ms and the qualified5.29% complete
+gain above, with exact results and no new allocations/submissions. Ordering
+and memory visibility/cache effects are not yet separated; no universal
+serialization or hardware-mechanism claim. Five guards/zero warnings; build
+and CPU reviewer failures remain. No timing retry, masked ranking, production
+change or Atari restart. Kernel algorithms and host targets remain distinct
+gaps, not additive savings; the full goal stays open.
 
 **Bigger batches expose another implementation limit, not parity.** The
 [matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures

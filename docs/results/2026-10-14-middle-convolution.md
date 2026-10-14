@@ -96,3 +96,9 @@ allocation differences and timing boundary before another kernel intervention.
 No more grouping sweep or masked attribution. The full root-cause/performance
 goal remains active; kernel algorithms, connected execution and host targets
 remain distinct established problem areas, not an additive budget.
+
+Follow-up: the [captured complete group](2026-10-14-convolution-boundary.md)
+identifies context omitted by this two-heavy-kernel control. One barrier between
+the auxiliary operations and both convolutions gives7.387→4.168ms for the group
+and5.29% lower complete-update time, with exact outputs/states. This does not
+change the negative result for the smaller pair or resolve the hardware mechanism.

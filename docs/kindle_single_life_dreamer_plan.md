@@ -13,6 +13,13 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
+**Latest B32 result:** [one execution boundary](results/2026-10-14-convolution-boundary.md)
+reduces complete RGB updates63.633→60.268ms,5.29%, with exact272 reports,
+first targets, five plans/pipelines and initial/first/final292 tensors. No
+kernel, dtype, allocation or submission change. Still2.26× retained JAX26.632ms;
+the remaining gap is substantial. This diagnostic boundary is not yet a general
+production rule, and B8/CDP/learning are not remeasured.
+
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
 and11.688ms outside them, including5.383ms host decoding/targets. Exact-state
@@ -55,9 +62,14 @@ separately take2.148/2.015ms versus BF16 cuDNN.479/.550ms, with all16.8M rounded
 outputs agreeing. Both miniature library tunings differ from full JAX; an
 auxiliary F32/Winograd control fails and remains unqualified. A shared-group
 control finds no interference: grouped/serialized both4.165ms with100.9M exact
-checks. Next reproduce the full five-operation group with real learner operands
-and buffer context before another kernel change; no masked ranking or grouping
-sweep. The unchanged complete B32 candidate remains2.39× retained JAX.
+checks. The [captured full-group follow-up](results/2026-10-14-convolution-boundary.md)
+now isolates a context that control omitted: three auxiliary operations. Their
+standalone cost is only.0186ms, but one barrier before the two convolutions
+changes the exact group7.387→4.168ms. It also delivers the complete-update
+gain above. Real/synthetic input controls and original allocation mappings
+pass; separated timing is an intervention, not passive attribution. Next
+distinguish ordering from visibility/cache effects, then derive a compact
+general scheduling rule. No blanket serialization or masked ranking.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
