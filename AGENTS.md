@@ -7,32 +7,34 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **General ordering rule qualifies; complete B32 improves5.59%:**
-  [execution-only control, JAX audit and full updates](docs/results/2026-10-14-convolution-scheduling.md).
-  Unchanged/single-boundary/general63.597/60.302/60.041ms, still2.25× retained
-  JAX26.632. Keep isolated28864210; no production/CDP/B8/learning promotion.
-  All272 reports/first targets/five plans and initial-first-final292 tensors
-  match exactly, including historical control. One shared recording helper
-  separates adjacent convolution/non-convolution runs within existing independent
-  groups:18 product variants,20 boundaries, no diagnostic index/threshold/new
-  backend API/reorder/kernel/precision/allocation/submission change. All original
-  1,258 groups and five cached ranges remain; posterior/world alias one session.
-  The [captured-group cause](docs/results/2026-10-14-convolution-boundary.md)
-  persists with execution-only ordering:7.429→4.168ms, same as storage barriers.
-  Explicit access scopes are unnecessary; hardware/cache mechanism remains open.
-  Two guards/249 replays/130.49M exact output checks/unchanged292 tensors pass.
-  Retained JAX capture has only416–1,024ns/update sum-minus-union across22.6ms
-  kernel time: effectively non-overlapping, not strictly serial or native overlap
-  evidence. Three full-update guards/816 synthetic updates also pass; combined
-  zero warnings/actions/workers. Build/filter/lock-copy failures remain; eight
-  CPU tests/strict Clippy pass, no GPU retry/tolerance change. CI410 passes667b75c.
-  Next audit convolution work reuse/staging against actual cuDNN before one
-  algorithm-level intervention: small single-buffered versus larger multistage
-  tiles is a source difference, not an attributed saving or a tile/split sweep.
-  Primitive BF16 derivatives remain4.48×/3.67× slower; host targets are distinct.
-  No blanket serialization/additive-savings forecast. Earlier failed sparse/F32
-  and rejected optimization controls remain. Upstream99e3de27/e7c3f7b unchanged;
-  production/Atari, root-cause and five-game goals remain unchanged/open.
+- **Current derivative algorithms stay slow through CUDA:**
+  [comparison, counters and matrix2 readiness](docs/results/2026-10-14-convolution-backend.md).
+  Same B512/CI32/CO48/K5 checked dX/dW: native2.148/2.019ms,CUDA1.872/2.441,
+  retained cuDNN.479/.550. All16.82M outputs/backend and512 F64 checks pass;
+  both10% timing bands fail (−12.86/+20.92%), so CUDA counters are not native
+  counters or a calibrated time model. Current incremental dW/split/compensated
+  reduction and twelve algorithm sources match; no native rebuild. CUDA captures
+  show1.007/1.105B warp instructions,58.15/57.65% integer,~9% tensor activity,
+  no reported spilling. Retain clock/cache/optional-sampling warnings; no native
+  occupancy/utilization claim or renewed CUDA/geometry sweep. Five guards pass,
+  one allocation warning;292 native/330 CUDA calls plus two17-pass captures,
+  zero learner updates/actions/workers. CI411 passesb2390c3; upstream unchanged.
+  **5080/580 exposes cooperative-matrix2:** workgroup scope, flexible dimensions,
+  tensor addressing and BF16→F32;128 threads advertise32/16/16 M/N/K multiples.
+  Current Naga hard-codes subgroup scope; Blade does not expose matrix2. Exact
+  capability/source records remain. Query creates only an instance, no logical
+  device/allocation/pipeline/dispatch; support is not numerical/performance
+  qualification. Next one bounded native compiler-managed matrix-load/staging
+  proof before Naga/Blade/Meganeura feature work; shared typed path, no tile/split
+  sweep or automatic adoption. This offers a concrete higher-level alternative
+  to manual staging, not proof of efficient convolution mapping or parity.
+  Keep isolated28864210 and its [general ordering gain](docs/results/2026-10-14-convolution-scheduling.md):
+  63.597→60.041ms,5.59%, exact272 reports/initial-first-final292 tensors,20
+  automatic boundaries with unchanged allocation/submissions. Execution-only
+  ordering retains the local gain; hardware/cache causality remains open. No
+  blanket serialization/additive-savings forecast or revival of failed sparse/F32
+  controls. Full B32 remains2.25× JAX26.632ms, not remeasured this round.
+  Production/Atari, root-cause and five-game goals stay open; host targets distinct.
 - **Wide-image JAX control complete:** [result](docs/results/2026-10-14-image-precision-control.md).
   Complete RGB12M/B32 original/wide26.632→26.876ms,0.92%; retained native
   65.736ms is still2.45× wide JAX. F32 image bias/pool/norm/activation does not

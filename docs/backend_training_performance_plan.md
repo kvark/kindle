@@ -8,7 +8,24 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-**Latest: [a general ordering rule retains the execution gain](results/2026-10-14-convolution-scheduling.md).**
+**Latest: [the current derivative algorithms remain slow under CUDA](results/2026-10-14-convolution-backend.md).**
+Same-source dX/dW take2.148/2.019ms native and1.872/2.441ms CUDA, versus
+retained cuDNN.479/.550. Exact outputs/independent checks pass. Both10% timing
+bands fail, so CUDA counters are not native proxies; nonetheless changing backend
+alone does not remove these costs. Translated kernels issue~1B warp instructions,
+~58% integer, with~9% tensor activity. No occupancy target or extra CUDA sweep.
+
+**Next proof: compiler-managed workgroup matrices, not another tile sweep.**
+This5080/580 advertises `VK_NV_cooperative_matrix2`, including workgroup scope,
+flexible BF16→F32 dimensions and tensor addressing. Current Naga hard-codes
+subgroup scope; Blade exposes the older path. A query is not performance or
+numerical qualification: it created no logical device or shader. First test one
+bounded native matrix-load/staging prototype with independent numerics and full
+operation cost before adding shared typed Naga/Blade/Meganeura support. Efficient
+convolution mapping and whole-update gains remain unproven; no production/Atari
+restart. Full B32 stays60.041ms/2.25× JAX; host decoding/targets are separate.
+
+**Retained: [a general ordering rule retains the execution gain](results/2026-10-14-convolution-scheduling.md).**
 Complete RGB12M/B32 unchanged/single-boundary/general63.597/60.302/60.041ms:
 5.59% faster, still2.25× retained JAX26.632. All272 reports, first targets,
 five plans/pipelines and initial/first/final292 tensors match historical control.
@@ -19,10 +36,9 @@ ordering gives the same captured-group7.429→4.168ms benefit as storage barrier
 explicit access scopes are unnecessary, hardware/cache cause still unmeasured.
 Retained JAX kernels are effectively non-overlapping, not strictly serial or
 evidence of native overlap. Five guards/no warnings; all exact checks pass.
-Next audit convolution work reuse/staging against the actual cuDNN implementation
-before one algorithm-level intervention, not a tile/split/geometry sweep. Small
-single-buffered versus larger multistage tiles is a source difference, not a
-measured saving. Host targets remain distinct. Atari and the full goal stay open.
+The derivative/backend comparison above refines the remaining work. Small
+single-buffered versus larger multistage tiles is not itself a measured saving.
+Host targets remain distinct. Atari and the full goal stay open.
 
 **The [whole-update comparison](results/2026-10-14-jax-image-profile.md)
 locates a structural compilation gap.** Native B32 spends56.948ms in GPU

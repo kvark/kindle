@@ -21,6 +21,17 @@ Twenty automatic convolution/non-convolution boundaries need no diagnostic index
 or new API. Still2.25× retained JAX26.632ms: the remaining gap is substantial.
 Keep isolated28864210; production and B8/CDP/learning are not promoted/remeasured.
 
+**New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
+Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%
+timing bands fail, so CUDA counters are not native measurements. They show~58%
+integer instructions and~9% tensor activity: feeding the tensor operations is
+still costly. A physical-device query confirms an unused higher-level option:
+cooperative-matrix2 workgroup matrices/tensor addressing, with BF16→F32 support.
+Our Naga writer currently hard-codes subgroup scope. Next prove native
+compiler-managed loading/staging before compiler/backend feature work; support
+alone establishes no speedup or efficient convolution mapping. No tile sweep,
+production change or automatic adoption; the full goal remains open.
+
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
 and11.688ms outside them, including5.383ms host decoding/targets. Exact-state
@@ -73,9 +84,9 @@ pass; separated timing is an intervention, not passive attribution. The
 the full local gain with empty memory-barrier arrays, and qualifies the general
 rule above. Explicit access scopes are unnecessary; hardware/cache causes remain
 unmeasured. JAX's retained trace is effectively non-overlapping, not strictly
-serial or native-overlap evidence. Next audit convolution reuse/staging against
-actual cuDNN before an algorithm-level intervention, not a tile/split/geometry
-sweep. No blanket serialization or masked ranking.
+serial or native-overlap evidence. The derivative/backend study above follows
+that audit; compiler-managed workgroup matrices are the next bounded proof,
+not a tile/split/geometry sweep. No blanket serialization or masked ranking.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
