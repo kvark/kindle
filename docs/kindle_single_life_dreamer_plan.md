@@ -58,15 +58,18 @@ forward values and emits both derivatives, but selection is still manual.
 The [whole-learner integration](results/2026-10-14-connected-learner.md) now
 passes numerical/staged checks but saves only.99% (28.280->27.999ms), below
 its3% gate. No CDP follow-up or further row sweep; later trajectories differ.
-The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) is the next
-priority: five irregular RGB-boundary convolutions cost3.785ms versus2.906ms
+The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) finds
+five irregular RGB-boundary convolutions cost3.785ms versus2.906ms
 for18 packed ones, despite only11.1% of useful convolution MACs. All already
 use BF16. Native's84.756G useful products occupy152.574G source-level matrix
 slots after padding; this is not a JAX issued-work ratio or sole proven cause.
-Review a general type-aware irregular-product algorithm, including full
-forward/backward and packing costs, before another complete-update check.
-No geometry sweep or assumption that this alone delivers parity. Meganeura7574ad1
-is used for this narrow check, not adopted as a replacement learner runtime.
+The [typed scalar alternative](results/2026-10-14-narrow-products.md) passes
+90 numerical cases but slows complete updates28.488->30.492ms (7.03%): reject
+without a geometry sweep. Padding alone is not the proven explanation.
+Next isolate command-recording cost with safe resource/staged/optimizer
+lifetimes and unchanged submission chunks. This targets measured host work,
+not an assumed CUDA-graph-equivalent Vulkan device path. Upstream7574ad1 is
+rechecked, not substituted for the optimized experimental backend.
 No Atari restart, learning-quality claim or whole-goal closure.
 
 ### Retained causal findings

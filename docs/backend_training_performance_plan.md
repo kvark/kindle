@@ -145,7 +145,7 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: fix measured irregular-product inefficiency, not another row knob.**
+**Next: isolate command-recording cost, not another kernel tuning sweep.**
 
 The [completed integration](results/2026-10-14-connected-learner.md) automatically
 selects127 connected forward/backward regions and removes378 dispatches, but
@@ -159,11 +159,17 @@ more concentrated problem: five checked RGB-boundary convolutions consume
 convolution MACs. All already use BF16. Actual source/grid accounting finds
 152.574G cooperative product slots for84.756G useful MACs; two three-output
 kernels waste10.67x slots. This is not hardware-counter or JAX-padding evidence,
-and checked indexing/staging also costs time. Prioritize a general type-aware
-irregular-product alternative with numerical forward/dX/dW controls, all
-packing/conversion costs and a complete-update check. Do not blindly apply
-the64x64 packed path to three channels or sweep tile sizes. The separate
-device-dependency/host-construction problem remains; no whole-gap closure.
+and checked indexing/staging also costs time. The [typed scalar alternative](results/2026-10-14-narrow-products.md)
+qualifies90 numerical cases but slows full RGB28.488->30.492ms (7.03%). It
+removes padded tensor products but also loses tensor hardware; reject without
+a geometry/CDP sweep. The expensive path remains unresolved.
+
+The coarse trace separately measured4.548ms host command construction/submit.
+Test cached immutable graph commands while recording changing optimizer state
+normally, retaining resource ownership, all barriers, staged late-input lifetimes
+and ordinary chunks. Measure whole updates, not just recording calls. This
+does not promise the lower device issue cost observed with CUDA graphs; those
+and heavy-library algorithms remain separate unresolved causes.
 
 The [general reduction prototype](results/2026-10-14-connected-row-region.md)
 passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives

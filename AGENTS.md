@@ -7,7 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Irregular convolution paths are the next measured bottleneck:**
+- **Narrow-product alternative rejected; inspect command recording next:**
+  [result](docs/results/2026-10-14-narrow-products.md). A shared typed scalar
+  alternative removes padded rows in two checked decoder kernels, but complete
+  RGB28.488->30.492ms is7.03% slower. All90 numerical cases/4,705,658 values,
+  90 shader variants/eight selection checks/45 existing shader tests pass.
+  Five guards/three warnings,592 synthetic updates/90 numerical executions,
+  zero actions; first/final trajectories differ, no learning parity. No grouped
+  GPU or F32 cooperative qualification. Reject without a geometry/CDP sweep;
+  production unchanged, no worker. Next isolate safe command recording reuse
+  from measured4.548ms host construction/submission. Preserve optimizer-step
+  uniforms, resources, barriers, staged lifetimes and ordinary chunking. This
+  is not demonstrated CUDA-graph-equivalent device acceleration; GPU algorithms
+  and dependency cost remain open. CI388 passes on2429a48.
+- **Irregular convolution paths remain expensive:**
   [result](docs/results/2026-10-14-heavy-issued-work.md). Five checked RGB-boundary
   kernels contain11.1% of convolution nominal MACs but56.6% of measured cost:
   3.785ms versus2.906ms for18 packed kernels. All already multiply in BF16.
@@ -16,9 +29,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Not hardware counters or a JAX issued-work ratio; padding is not the sole
   proven timing cause. One guard/zero warnings, exact plans/pipelines/outputs/
   292 tensors, one original update/367 optimizer-free replays, zero actions.
-  CPU count-typo failure remains. Next review a general type-aware irregular-
-  product alternative with actual forward/dX/dW controls and all packing costs,
-  then whole-update checks. No tile sweep, production change, Atari restart
+  CPU count-typo failure remains. The general typed alternative above fails
+  the full-update speed gate; no further narrow-product/tile sweep, production change, Atari restart
   or whole-gap closure. Device dependency/host costs stay in scope.
 - **Connected-region learner trial closes below its gate:**
   [result](docs/results/2026-10-14-connected-learner.md). Automatic BF16-safe
