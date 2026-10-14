@@ -7,6 +7,38 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Comparable math, different execution machinery:** the
+  [reachable executable audit](docs/results/2026-10-14-executable-work.md)
+  finds84.756G native versus83.589G JAX nominal heavy MACs, only1.40% extra,
+  despite retained28.213/12.836ms (2.20×). All23 convolution shapes/counts and
+  129 grouped products match; dense587 versus423 calls account for the delta.
+  Actual JAX dataflow packs reward/continuation/value/slow-value projections
+  into one wide GEMM; native typed products/sessions stay separate. This is
+  not a measured large speedup or permission to revive rejected factorization.
+  Count scalar/layout work separately; nominal MACs are not hardware instructions.
+  CPU-only audit passes after a retained tuple-boundary proof failure; no GPU
+  jobs/actions/updates. Next identify a cost-bearing connected region and its
+  materialization/consumer constraints before more compiler implementation.
+  Keep kernel efficiency, device dependency cost and host construction distinct;
+  no small tuning sweep, additive savings forecast or production/Atari restart.
+
+- **Compensation and existing prefetch are not the missing large cost:** the
+  [bounded diagnostic](docs/results/2026-10-14-accumulation-cost.md) measures
+  fixed-world16.169->16.025ms, only.89%, below its10% follow-up threshold.
+  Plain dW retains14 F64 pointwise failures/layout; keep compensated arithmetic.
+  No Nsight/accumulation sweep or alternative-gradient optimizer updates.
+  Two guards/two warnings, one original preparatory update/443 optimizer-free
+  replays, exact292 tensors and restored outputs/68 gradients, zero actions.
+  Complete source snapshot repairs18 inherited omitted additions; failed CPU
+  build/incomplete patch remain, historical measurements unchanged.
+  The [separate prefetch check](docs/results/2026-10-14-conv-prefetch.md)
+  completes: RGB28.436->28.714ms (.98% slower), all272 reports/first outputs/
+  plans/292 tensors exact. Existing next-tile loads, not a multistage async-copy
+  implementation. Independent derivatives/CPU shaders/Clippy pass; five guards,
+  one warning,568 synthetic updates, zero actions. Close its conditional follow-up;
+  no CDP/counter/tile sweep or promotion. Upstream2214412/96c1dc7 unchanged.
+  No learning/production promotion; full gap remains open. CI383 passes.
+
 - **Fresh residual attribution confirms a GPU execution gap:**
   [result](docs/results/2026-10-14-residual-reassessment.md).
   Isolated ordinary28.213ms versus complete retained JAX12.836ms remains2.20×.
@@ -20,11 +52,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   2,380 optimizer-free replays, zero actions/workers. CPU coverage assertion and
   unused first instrumentation build remain; no GPU retry. Production unchanged.
   No row/grid/binding sweep or invalid Vulkan Nsight/Graphics retry.
-  The [next bounded check](docs/experiments/2026-10-14-accumulation-cost.md)
-  tests whether extra compensated weight-gradient accumulation imposes a
-  substantial cost: all eight actual dW dispatches use16 compensated blocks.
-  Register/spill pressure is only a source hypothesis. Keep gates/failures;
-  diagnostic alternative gradients must never update an actor/optimizer.
+  The completed compensation check above rules out that large-cost hypothesis;
+  no alternative gradients ever update an actor/optimizer. Keep gates/failures.
   The [actual-grid trial](docs/results/2026-10-14-dense-launch-grid.md)
   stays unpromoted (~1% gain, changed trajectories). Retainb3a086f/compiler
   96c1dc7/a97559b. No Atari allocation or whole-goal closure; CI382 passes.

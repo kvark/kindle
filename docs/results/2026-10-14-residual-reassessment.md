@@ -95,7 +95,7 @@ coarser dependent execution with fewer materialized intermediates, and reusable
 command construction/device-resident targets. Neither a blanket Vulkan penalty
 nor a single missing BF16 setting explains the evidence.
 
-## Next causal check: does our numerical contract add significant cost?
+## Follow-up: does our numerical contract add significant cost?
 
 Source inspection finds extra F32 total/error accumulator matrices and
 256-position compensated partials in both shared convolution weight-gradient
@@ -105,11 +105,12 @@ register cost**, not a measured spill, a proven cause or permission to relax
 qualification. Pipeline labels ending “scalar” do not prove scalar arithmetic;
 these generated shaders use cooperative matrix operations.
 
-The [next bounded diagnostic](../experiments/2026-10-14-accumulation-cost.md)
-will measure this mechanism on fixed optimizer-free work, retaining numerical
-errors and every existing failure. It must distinguish the cost of accuracy
-from layout/geometry and from the separate command-execution floor. No
-shape sweep, tolerance relaxation, new learner or production promotion.
+The [bounded diagnostic](2026-10-14-accumulation-cost.md) subsequently measures
+only.89% fixed-world benefit, with14 F64 pointwise failures/layout. Keep
+compensation; no follow-up sweep. The separate
+[executable-work audit](2026-10-14-executable-work.md) finds only1.40% extra
+native nominal heavy arithmetic. The remaining issue is execution, not a
+substantially larger heavy workload. No tolerance relaxation or promotion.
 
 ## Reproducibility
 
@@ -126,3 +127,11 @@ state/coverage audits pass. The inherited compiler row-gradient F64 failure
 remains a separate qualification limit; these exact instrumentation controls
 do not erase it. All services finish; CI382 on the precedingc406bec passes.
 No comparable-learning claim, installed runtime change or whole-goal closure.
+
+Reproduction correction at the next study's CPU preparation: the original
+`backend-masks.patch` is a tracked-only diff and omits18 inherited added files.
+Original source and the preparation's complete base patch remain. New
+`backend-complete-masks.patch` (SHA256
+`b381aad3d7a4417b9e1b31f9dc3315e1489c77f2b1379439d1385a5552d5ebd0`)
+includes those files and reverse-applies exactly. The incomplete diff and failed
+CPU build remain; no runtime, measurement, numerical gate or GPU run changed.

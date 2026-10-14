@@ -1,6 +1,10 @@
 # Bound the cost of compensated weight-gradient accumulation
 
-October14,2026. Unstarted follow-up to the
+October14,2026. **Complete:** [result](../results/2026-10-14-accumulation-cost.md).
+Only.89% lower fixed-world GPU time, below10%; retain compensation and close
+the conditional counter/sweep path. Original pointwise failures remain.
+Started after04:52 UTC in
+`runs/accumulation-cost-20261014.JNqzeTou`. Follow-up to the
 [weighted residual diagnosis](../results/2026-10-14-residual-reassessment.md).
 The remaining gap is not just host transfer: current GPU-pass union22.144ms
 versus retained JAX10.295ms. Convolution allocation6.888ms remains significant.
@@ -43,3 +47,31 @@ Bound each initial job to600 seconds; stop/review unexpected numerical/API/
 hard faults. No blind retries, NVML polling, GPU recovery or Atari allocation.
 Preparation/analysis uses one CPU,2GiB/no swap. No new permission gate for
 ordinary GPU work.
+
+Implementation: preserve the complete qualified control for one preparatory
+update, then disable optimizer/clipping/accumulation. Lazily compile only the
+eight dW dispatches' alternative pipelines using the same shared generators;
+all buffers, plans and other pipelines remain. Restore original pipelines
+before exact control-output/state checks. No alternative pipeline can execute
+with an optimizer enabled. Generated-source hashes distinguish the arithmetic
+variants even on the same device. No global environment toggle during threaded
+compilation; a scoped generator override must reset even on panic.
+
+CPU build review: the inherited mask patch omitted18 previously added files.
+Original sources/base patch remain; a complete mask snapshot restores those
+files before the new diagnostic. The original failed CPU build/log remains,
+with no GPU attempt. Both scoped-override/unwind and checked/packed shader
+validation tests now pass, as does backend release Clippy.
+
+First GPU preflight is the existing cancellation-sensitive3,808-position F64
+fixture in checked and packed layouts, each with original versus plain F32
+accumulation. Zero optimizers, unchanged pointwise/L2 gates; the original
+control must pass, alternative violations are explicit diagnostic results,
+never qualification. Review this before the fixed world timing. That timing
+uses one unchanged preparatory control update followed by443 optimizer-free
+world-graph replays: three alternating arm orders,8 warmups+64 measurements.
+Record all gradients/outputs and exact restored controls/model state.
+Before any GPU timing, define “substantial” as at least10% lower fixed-world
+GPU interval in the matched three-order comparison. Below that, close this
+hypothesis without Nsight or an accumulation/precision sweep. This is an
+investigation threshold, not a numerical acceptance or production gate.

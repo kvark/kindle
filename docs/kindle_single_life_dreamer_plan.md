@@ -28,11 +28,20 @@ Keep its evidence, not a performance promotion or grid sweep. Retained control
 b3a086f measures28.213/93.084ms. The [fresh complete profile](results/2026-10-14-residual-reassessment.md)
 now covers every update/tail: native GPU-pass union22.144ms versus retained
 JAX10.295ms, while RNG+copies+EMA total only.430ms. Heavy-kernel algorithms and
-dependent execution remain the main issues, not transfer bandwidth. Next
-[measure compensated-accumulation cost](experiments/2026-10-14-accumulation-cost.md)
-on fixed optimizer-free work; register pressure is only a hypothesis, and
-numerical gates stay unchanged. No Atari restart, learning-quality claim or
-whole-goal closure.
+dependent execution remain the main issues, not transfer bandwidth.
+[Compensated accumulation](results/2026-10-14-accumulation-cost.md) is not the
+large missing cost: removing it saves only.89% of fixed-world GPU time and
+reproduces14 pointwise failures/layout. Keep it; no accumulation sweep.
+The [separate next-tile prefetch check](results/2026-10-14-conv-prefetch.md)
+also closes: full RGB28.436->28.714ms (.98% slower), exact reports/states.
+No follow-up sweep. The [reachable-work audit](results/2026-10-14-executable-work.md)
+finds only1.40% more nominal heavy arithmetic in native despite2.20× latency:
+this is execution engineering, not a substantially larger mathematical workload.
+Actual JAX dataflow combines four head projections into a wider GEMM; native
+typed products/sessions stay separate. Cost the complete connected region and
+its materialized intermediates before further compiler changes; the wide-GEMM
+opportunity is not yet a measured large benefit. Numerical gates stay unchanged.
+No Atari restart, learning-quality claim or whole-goal closure.
 
 ### Retained causal findings
 

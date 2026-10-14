@@ -145,16 +145,25 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: test a concrete heavy-kernel arithmetic cost, not another count-based tweak.**
+**Next: cost a connected compiled region, not another local knob.**
 
-1. Follow the [bounded accumulation-cost diagnostic](experiments/2026-10-14-accumulation-cost.md).
-   Current dW kernels maintain extra total/error accumulator matrices and
-  16 compensated256-position blocks per partition. Measure whether the numerical
-   contract materially affects performance before blaming it or changing it.
-   Use fixed optimizer-free work and independent error accounting; no gate
-   relaxation, fast-path qualification or learning from diagnostic gradients.
-   Nsight CUDA twins are conditional on a substantial measured effect, not a
-   new capture sweep. Actual register pressure remains unmeasured.
+1. The [accumulation-cost check](results/2026-10-14-accumulation-cost.md)
+   closes a specific hypothesis: removing compensated dW reduces fixed-world
+   GPU time only16.169->16.025ms (.89%), while reproducing14 pointwise F64
+   failures/layout. Keep compensation; no conditional Nsight or precision sweep.
+   All292 tensors and restored outputs/gradients are exact; no alternative
+   optimizer writes. This is not new complete-update throughput.
+   The [separate prefetch check](results/2026-10-14-conv-prefetch.md)
+   also closes: full RGB28.436->28.714ms (.98% slower), exact reports/states,
+   independently qualified derivatives. No conditional CDP/counter follow-up.
+   The [reachable-work audit](results/2026-10-14-executable-work.md) finds
+   only1.40% extra native nominal heavy arithmetic despite2.20× latency.
+   Convolution and grouped shapes/counts match. JAX's actual graph combines
+   four head projections into one wide GEMM; native typed products and sessions
+   do not. This is a concrete compiler difference, not a measured large gain.
+   Identify the cost-bearing region and materialized intermediates first;
+   account for packing, output views, backward work and all consumers before
+   selecting a compiler change. More nominally fused operations are not enough.
    Continue general shared typed algorithms/coarser compiled execution, not
    another scalar/row/binding-cap/tile sweep or bespoke Dreamer kernel.
    The time-batchable prior head remains an unweighted source observation,
