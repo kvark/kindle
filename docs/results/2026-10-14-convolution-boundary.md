@@ -114,3 +114,8 @@ into production or treat this local result as a universal serialization rule.
 Convolution algorithm/staging inefficiency and host decoding/targets remain
 separate measured gaps. No additive-savings forecast, renewed geometry sweep,
 Atari restart or full-goal closure.
+
+Follow-up: the [execution-only control and general rule](2026-10-14-convolution-scheduling.md)
+retain this gain without explicit storage-access scopes or a hard-coded dispatch
+index. Complete B32 updates63.597→60.041ms,5.59%, with exact reports/states;
+hardware/cache causality and the remaining2.25× JAX gap stay open.

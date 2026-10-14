@@ -8,14 +8,21 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-**Latest: [one mixed-group boundary closes a real execution penalty](results/2026-10-14-convolution-boundary.md).**
-Complete RGB12M/B32 improves63.633→60.268ms,5.29%, with exact272 reports,
-first targets, five plans/pipelines and initial/first/final292 tensors. One
-additional in-pass barrier preserves allocation and all submission ranges.
-The isolated candidate remains2.26× retained JAX26.632ms; it is not a general
-production scheduling policy or a new B8/CDP result. Next separate execution
-ordering from visibility/cache effects at that independent boundary before
-deriving a compact general rule. Atari and the full root-cause goal stay open.
+**Latest: [a general ordering rule retains the execution gain](results/2026-10-14-convolution-scheduling.md).**
+Complete RGB12M/B32 unchanged/single-boundary/general63.597/60.302/60.041ms:
+5.59% faster, still2.25× retained JAX26.632. All272 reports, first targets,
+five plans/pipelines and initial/first/final292 tensors match historical control.
+Twenty automatic convolution/non-convolution boundaries preserve original groups,
+allocation, staging and submissions; no diagnostic index, threshold or new API.
+Keep isolated28864210, not production/B8/CDP/learning promotion. Execution-only
+ordering gives the same captured-group7.429→4.168ms benefit as storage barriers;
+explicit access scopes are unnecessary, hardware/cache cause still unmeasured.
+Retained JAX kernels are effectively non-overlapping, not strictly serial or
+evidence of native overlap. Five guards/no warnings; all exact checks pass.
+Next audit convolution work reuse/staging against the actual cuDNN implementation
+before one algorithm-level intervention, not a tile/split/geometry sweep. Small
+single-buffered versus larger multistage tiles is a source difference, not a
+measured saving. Host targets remain distinct. Atari and the full goal stay open.
 
 **The [whole-update comparison](results/2026-10-14-jax-image-profile.md)
 locates a structural compilation gap.** Native B32 spends56.948ms in GPU
@@ -104,9 +111,10 @@ auxiliary operations alone cost.0186ms and isolated dX/dW2.172/2.016ms, yet
 their intact group takes7.384ms versus4.230ms separated. The absolute3%
 attribution gate fails; this is an execution intervention, not passive profiling.
 One in-pass barrier alone gives7.387→4.168ms and the qualified5.29% complete
-gain above, with exact results and no new allocations/submissions. Ordering
-and memory visibility/cache effects are not yet separated; no universal
-serialization or hardware-mechanism claim. Five guards/zero warnings; build
+gain, with exact results and no new allocations/submissions. The subsequent
+[execution-only control](results/2026-10-14-convolution-scheduling.md) retains
+the full benefit without explicit memory-access scopes; this still does not
+identify hardware/cache behavior or justify universal serialization. Five guards/zero warnings; build
 and CPU reviewer failures remain. No timing retry, masked ranking, production
 change or Atari restart. Kernel algorithms and host targets remain distinct
 gaps, not additive savings; the full goal stays open.

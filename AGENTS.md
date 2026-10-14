@@ -7,30 +7,32 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Mixed-group execution penalty isolated; complete B32 improves5.29%:**
-  [captured inputs, causal boundary and full update](docs/results/2026-10-14-convolution-boundary.md).
-  One in-pass barrier before3977 changes no kernels/arithmetic/precision/
-  allocation/submission ranges:63.633→60.268ms, still2.26× retained JAX26.632.
+- **General ordering rule qualifies; complete B32 improves5.59%:**
+  [execution-only control, JAX audit and full updates](docs/results/2026-10-14-convolution-scheduling.md).
+  Unchanged/single-boundary/general63.597/60.302/60.041ms, still2.25× retained
+  JAX26.632. Keep isolated28864210; no production/CDP/B8/learning promotion.
   All272 reports/first targets/five plans and initial-first-final292 tensors
-  match exactly, including the historical control. Keep isolatedf3bdb0ac;
-  a diagnostic index is not a general production policy or CDP/B8 qualification.
-  Captured fixed-world3-section timing reproduces8.088ms at.315% overhead;
-  real/synthetic inputs in the same bindings take7.435/7.530ms. Separating
-  five operations gives7.384→4.230ms, with86.99M exact output checks; auxiliary
-  work alone.0186ms, dX/dW2.172/2.016ms. The corrected absolute3% attribution
-  gate fails: separation is an intervention, not passive component timing.
-  One barrier alone reproduces7.387→4.168ms,43.58%, with43.50M exact checks.
-  The [earlier two-heavy-only negative control](docs/results/2026-10-14-middle-convolution.md)
-  omitted those auxiliary operations; its result and failed sparse/F32 controls
-  remain. No GPU retry/tolerance relaxation. Five guards/zero warnings,
-  545 synthetic updates/162 optimizer-free full-world/721 target replays,
-  zero actions/workers. CPU build/reviewer failures and corrected sources remain.
-  Next distinguish ordering from visibility/cache effects at this independent
-  boundary, then derive a small general scheduling policy with a complete-update
-  gate. No blanket serialization/flag or geometry sweep. BF16 convolution
-  algorithms and host targets remain separate gaps; no additive-savings forecast.
-  Upstream99e3de27/e7c3f7b unchanged; CI409 passes on2bb10b8. Production/Atari,
-  root-cause and five-game goals remain unchanged/open.
+  match exactly, including historical control. One shared recording helper
+  separates adjacent convolution/non-convolution runs within existing independent
+  groups:18 product variants,20 boundaries, no diagnostic index/threshold/new
+  backend API/reorder/kernel/precision/allocation/submission change. All original
+  1,258 groups and five cached ranges remain; posterior/world alias one session.
+  The [captured-group cause](docs/results/2026-10-14-convolution-boundary.md)
+  persists with execution-only ordering:7.429→4.168ms, same as storage barriers.
+  Explicit access scopes are unnecessary; hardware/cache mechanism remains open.
+  Two guards/249 replays/130.49M exact output checks/unchanged292 tensors pass.
+  Retained JAX capture has only416–1,024ns/update sum-minus-union across22.6ms
+  kernel time: effectively non-overlapping, not strictly serial or native overlap
+  evidence. Three full-update guards/816 synthetic updates also pass; combined
+  zero warnings/actions/workers. Build/filter/lock-copy failures remain; eight
+  CPU tests/strict Clippy pass, no GPU retry/tolerance change. CI410 passes667b75c.
+  Next audit convolution work reuse/staging against actual cuDNN before one
+  algorithm-level intervention: small single-buffered versus larger multistage
+  tiles is a source difference, not an attributed saving or a tile/split sweep.
+  Primitive BF16 derivatives remain4.48×/3.67× slower; host targets are distinct.
+  No blanket serialization/additive-savings forecast. Earlier failed sparse/F32
+  and rejected optimization controls remain. Upstream99e3de27/e7c3f7b unchanged;
+  production/Atari, root-cause and five-game goals remain unchanged/open.
 - **Wide-image JAX control complete:** [result](docs/results/2026-10-14-image-precision-control.md).
   Complete RGB12M/B32 original/wide26.632→26.876ms,0.92%; retained native
   65.736ms is still2.45× wide JAX. F32 image bias/pool/norm/activation does not

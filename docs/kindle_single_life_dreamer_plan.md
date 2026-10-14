@@ -13,12 +13,13 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest B32 result:** [one execution boundary](results/2026-10-14-convolution-boundary.md)
-reduces complete RGB updates63.633→60.268ms,5.29%, with exact272 reports,
-first targets, five plans/pipelines and initial/first/final292 tensors. No
-kernel, dtype, allocation or submission change. Still2.26× retained JAX26.632ms;
-the remaining gap is substantial. This diagnostic boundary is not yet a general
-production rule, and B8/CDP/learning are not remeasured.
+**Latest B32 result:** [a general ordering rule](results/2026-10-14-convolution-scheduling.md)
+reduces complete RGB updates63.597→60.041ms,5.59%, retaining the single-boundary
+control's60.302ms benefit. Exact272 reports, first targets, five plans/pipelines
+and initial/first/final292 tensors; no kernel/dtype/allocation/submission change.
+Twenty automatic convolution/non-convolution boundaries need no diagnostic index
+or new API. Still2.25× retained JAX26.632ms: the remaining gap is substantial.
+Keep isolated28864210; production and B8/CDP/learning are not promoted/remeasured.
 
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
@@ -67,9 +68,14 @@ now isolates a context that control omitted: three auxiliary operations. Their
 standalone cost is only.0186ms, but one barrier before the two convolutions
 changes the exact group7.387→4.168ms. It also delivers the complete-update
 gain above. Real/synthetic input controls and original allocation mappings
-pass; separated timing is an intervention, not passive attribution. Next
-distinguish ordering from visibility/cache effects, then derive a compact
-general scheduling rule. No blanket serialization or masked ranking.
+pass; separated timing is an intervention, not passive attribution. The
+[ordering follow-up](results/2026-10-14-convolution-scheduling.md) now retains
+the full local gain with empty memory-barrier arrays, and qualifies the general
+rule above. Explicit access scopes are unnecessary; hardware/cache causes remain
+unmeasured. JAX's retained trace is effectively non-overlapping, not strictly
+serial or native-overlap evidence. Next audit convolution reuse/staging against
+actual cuDNN before an algorithm-level intervention, not a tile/split/geometry
+sweep. No blanket serialization or masked ranking.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
