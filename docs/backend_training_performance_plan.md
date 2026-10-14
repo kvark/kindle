@@ -25,15 +25,24 @@ has been established.
 
 | Current whole-update boundary | Time |
 | --- | ---: |
-| Isolated native RGB12M/B8/BF16, wider fusion + GPU RNG/EMA + row selection | 28.479ms |
+| Isolated native RGB12M/B8/BF16, row selection + latest compiler | 28.314ms |
 | Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
-| Isolated native CDP12M/B32/mixed + GPU RNG/EMA + row selection | 93.001ms |
+| Isolated native CDP12M/B32/mixed, row selection + latest compiler | 93.049ms |
 
-RGB remains **2.22×** the retained complete JAX caller boundary. CDP is a different
+RGB remains **2.21×** the retained complete JAX caller boundary. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
+
+The [latest upstream compiler check](results/2026-10-14-storage-propagation.md)
+finds no material5080 gain: fresh RGB28.197→28.314ms/CDP92.965→93.049ms,
+all reports/outputs/plans/tensors exact. Blade96c1dc7/Naga a97559b removes
+ordinary storage-access propagation; real barriers remain. Keep the refresh
+in isolated experiments. The inherited row-gradient F64 failure is reproduced
+on both compilers and diagnosed as three BF16 bin crossings; scoped old/new
+whole-learner parity is not an unconditional primitive pass. No production
+promotion, tolerance relaxation or5080 hardware-fence claim.
 
 The [row-selection intervention](results/2026-10-14-row-selection.md) limits
 the dependency-count hypothesis: groups fall2,271→2,058 RGB /2,483→2,253 CDP,
@@ -125,6 +134,7 @@ change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 **Next: qualify one actual-grid selector correction, then reassess weighted cost.**
 
 1. Complete the [actual-grid dense split check](experiments/2026-10-14-dense-launch-grid.md).
+   Start from the separately checked latest compilerb3a086f.
    Apply existing thresholds to the selected tile; keep algorithms, precision
    and fused-addend exclusions fixed. CPU plans identify55 RGB/53 CDP affected
    products, not a measured speedup. Qualify changed reduction orders before

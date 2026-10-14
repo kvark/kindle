@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Latest compiler does not materially close the5080 gap:**
+  [result](docs/results/2026-10-14-storage-propagation.md). Blade96c1dc7/
+  Naga a97559b changes storage propagation, not graphs: RGB28.197→28.314ms,
+  CDP92.965→93.049ms, all272 reports/first outputs/plans/292/346 tensors exact.
+  Six numerical groups pass; row-fusion's original F64 gate fails identically
+  on both compilers. A separate unchanged-tolerance diagnostic explains three
+  BF16 bin crossings; it is not an unconditional qualification pass. Keep both
+  failed guards, CPU parser OOMs and build failure.13 guards pass/three warnings,
+  1,136 full synthetic+144 small staged updates, zero actions/recovery/workers.
+  Keep nativeb3a086f in isolated experiments; production remains unchanged.
+  RGB2.21× retained complete JAX; no new JAX/utilization/learning claim. CI380
+  passes. Next actual-grid check below starts from this refreshed compiler,
+  not a combined compiler/geometry intervention. Broader goal remains active.
+
 - **Row selection qualifies, but dependency counts overstate its benefit:**
   [result](docs/results/2026-10-14-row-selection.md). Fresh RGB28.777→28.479ms /
   CDP93.938→93.001ms: only1.04%/1.00%, despite groups2,271→2,058/2,483→2,253.

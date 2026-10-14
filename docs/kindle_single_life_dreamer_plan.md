@@ -8,13 +8,17 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Latest isolated candidate: [row selection](results/2026-10-14-row-selection.md)
+Latest isolated compiler [refresh](results/2026-10-14-storage-propagation.md)
+measures RGB28.197→28.314ms/CDP92.965→93.049ms: no material gain, exact
+reports/plans/tensors. Keep Blade96c1dc7/Naga a97559b isolated; the inherited
+F64 rounding-boundary failure remains, with its scoped diagnostic. Earlier
+[row selection](results/2026-10-14-row-selection.md)
 reduces RGB28.777→28.479ms /CDP93.938→93.001ms with exact reports/tensors.
 Removing about9% of dependency groups saves only1% of whole-update time:
 no row-operation tuning campaign or group-count-based speedup forecast.
 It builds on qualified [GPU RNG](results/2026-10-14-device-rng.md) and
 [device EMA](results/2026-10-14-device-ema.md), whose later trajectories differ.
-RGB remains2.22× retained complete JAX12.836ms; production stays on the earlier
+RGB remains2.21× retained complete JAX12.836ms; production stays on the earlier
 qualified~53ms runtime. [Target attribution](results/2026-10-14-target-boundary.md)
 also limits the host explanation: only2.027ms RGB in selected preparation/
 target/upload regions; required CPU replay readback remains.

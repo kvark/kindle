@@ -4,13 +4,24 @@ October 14, 2026. One bounded follow-up to the
 [row-selection result](../results/2026-10-14-row-selection.md), not a tile,
 threshold or geometry sweep. No Atari allocation or production promotion.
 
+Unstarted: the03:03 UTC upstream check finds a relevant new Naga storage-
+propagation fix. [Qualify that separately first](2026-10-14-storage-propagation.md);
+do not combine compiler and launch-grid changes.
+
+The [separate compiler comparison](../results/2026-10-14-storage-propagation.md)
+now completes with unchanged reports/plans/tensors and no material speedup.
+Start this still-unstarted geometry check from its immutableb3a086f native
+and matching runtime sources (Blade96c1dc7/Naga a97559b), not the old compiler.
+Its reproduced row-oracle rounding-boundary failure remains explicitly scoped;
+all new dense-product numerical gates below remain mandatory and unchanged.
+
 The isolated shared tiled candidate chooses dense K partitions with an assumed
 32×32 output grid, then sometimes executes64×64 tiles. Grouped products already
 use the actual grid. The CPU audit identifies55 RGB and53 CDP products affected
 by applying the existing rule to the selected tile. This is source/plan evidence,
 not measured utilization or a claim that more partitions will be faster.
 
-Start from the immutable6d892a3d row-selection candidate in a new isolated
+Start from the refreshed row-selection candidate in a new isolated
 artifact/worktree; preserve all older failures and source snapshots. Recheck
 upstream before editing. Choose the existing kernel/tile before invoking
 matrix_splits_for_workgroups. Keep128 target groups, K>=1024, at least256 K
