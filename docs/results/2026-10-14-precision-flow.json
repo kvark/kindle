@@ -1,0 +1,147 @@
+{
+  "status": "complete",
+  "arms": {
+    "baseline": {
+      "core_ms": 12.379673909890698,
+      "complete_ms": 12.683879483120108,
+      "seed_ms": 0.22448184608947486,
+      "metric_ms": 0.07823187934263842,
+      "final_pending_drain_ms": 0.38191303610801697,
+      "finite_reports": 272,
+      "initial_final_tensors": 288,
+      "heavy_rectangle_macs": 83589070848,
+      "matrix_outputs": {
+        "bf16": 456,
+        "f32": 96
+      },
+      "explicit_rounding_nodes": 0,
+      "minimum_sampled_headroom_bytes": 7930773504,
+      "hlo_sha256": "6a6a708f0dba93768fe3d1d8c5d4f5601a017559a75c85957356e43693fcfc3e",
+      "construction_seconds": 28.15199376293458
+    },
+    "wide-v2": {
+      "core_ms": 13.130032862136432,
+      "complete_ms": 13.46920923970174,
+      "seed_ms": 0.2205267692261259,
+      "metric_ms": 0.11821823773061624,
+      "final_pending_drain_ms": 0.1104308757930994,
+      "finite_reports": 272,
+      "initial_final_tensors": 288,
+      "heavy_rectangle_macs": 83570327552,
+      "matrix_outputs": {
+        "bf16": 0,
+        "f32": 554
+      },
+      "explicit_rounding_nodes": 54,
+      "minimum_sampled_headroom_bytes": 7930773504,
+      "hlo_sha256": "2f92ca9c51ac9f8a9972a1ee0b607a319b03802f6af9183b934b0f24e055f689",
+      "construction_seconds": 36.237952820025384
+    }
+  },
+  "complete_slowdown_fraction": 0.06191558013672083,
+  "attribution_capture_gate": false,
+  "exact_initial_tensors": 288,
+  "exact_metric_reports": 1,
+  "exact_final_tensors": 5,
+  "source_snapshots_verified": true,
+  "work_difference": {
+    "status": "complete",
+    "raw_before": 83589070848,
+    "raw_after": 83570327552,
+    "removed_library_padding_macs": 18776064,
+    "scalar_product_macs": 32768,
+    "projection_packing_delta": 0,
+    "baseline_outer_product": [
+      [
+        "fused_add_multiply_reduce",
+        "multiply.925.11.clone.1"
+      ]
+    ],
+    "exact_explained_difference": true
+  },
+  "guards": [
+    {
+      "path": "grouped-queue/grouped/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "numerical-queue/numerical/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "numerical-v2-queue/numerical-v2/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "numerical-v3-queue/numerical-v3/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "numerical-v4-queue/numerical-v4/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "rounding-queue/rounding/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "rounding-v2-queue/rounding-v2/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "timing-queue/baseline/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "timing-queue/wide/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "wide-v2-queue/wide-v2/result.json",
+      "passed": true,
+      "exit": 0
+    }
+  ],
+  "allocation_warnings": 0,
+  "synthetic_updates": 544,
+  "numerical_function_calls": 66,
+  "game_actions": 0,
+  "qualification": {
+    "status": "complete",
+    "cases": 8,
+    "exact_f64_comparisons": 4809,
+    "frontend_values": 71,
+    "unchanged_convolution_values": 1272,
+    "guards": 1,
+    "allocation_warnings": 0,
+    "minimum_sampled_headroom_bytes": 7964327936,
+    "numerical_function_calls": 31,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "retained_native_ms": 22.88117854296875,
+  "retained_jax_complete_ms": 12.836475,
+  "limits": [
+    "Partial precision-policy control, not exact native clone or storage-only causal ablation",
+    "Explicit algorithm changes library/compiler choices; convolution BF16 islands retained",
+    "Same initials, changed trajectories; not a learning-quality claim",
+    "No native/production change or fresh native timing; no SM-utilization measurement"
+  ],
+  "artifact_root": "runs/precision-flow-20261014.YXhwiW88",
+  "date": "2026-10-14",
+  "native_retimed": false,
+  "native_to_fresh_jax_ratio": 1.8039574227600756,
+  "upstream_rechecked": {
+    "meganeura": "7574ad187a2663a8e7c08a19d4b7c343d6065fa7",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc"
+  }
+}

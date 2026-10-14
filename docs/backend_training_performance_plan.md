@@ -8,6 +8,23 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Wider intermediate precision does not supply the missing large multiplier.**
+The [qualified JAX control](results/2026-10-14-precision-flow.md) measures
+complete12.684→13.469ms (+6.19%), below the10% follow-up gate. Same288 initial
+tensors, BF16 heavy operands/rounded forwards, F32 matrix derivatives and
+intermediate interfaces; convolution islands remain BF16. Explicit accumulator
+selection changes XLA/library algorithms too: this is not a storage-only causal
+ablation or exact native clone. All independent numerical checks pass; physical
+padding/scalar-lowering/packing differences reconcile exactly. Failures remain.
+No further precision capture/sweep, production change or learning claim.
+
+Retained native22.881ms is1.80× the fresh baseline; it was not retimed.
+Next refresh low-perturbation attribution on this current candidate, then trace
+the largest connected heavy-kernel/compiler regions against actual JAX work.
+Prior row-only fusion saved~1%, so do not repeat that local sweep or assume
+dispatch counts predict savings. Kernel efficiency and device execution remain
+structural costs; preserving F32 derivatives alone need not impose the gap.
+
 **Vector staging now demonstrates the native causal benefit.** The
 [shared typed intervention](results/2026-10-14-matrix-staging.md) cuts fresh
 complete RGB24.022→22.881ms (4.75%), retaining all272 reports/first outputs/
@@ -19,10 +36,9 @@ typed-shader checks and seven guards pass; one allocation warning and the first
 CPU template collision remain. Keep the isolated candidate, not a production/
 CDP/learning promotion. Whole RGB is still1.78× retained complete JAX.
 
-Next trace precision/materialization through an actual matched forward/backward
-block before a separate policy timing. The native deliberately widened
-intermediates differ from JAX's more continuous BF16 path; inventory counts
-alone cannot establish the cost or justify changing parameter/master-gradient
+The subsequent precision/materialization check above traces the actual
+forward/backward block and measures a bounded policy control. Inventory counts
+alone cannot establish storage cost or justify changing parameter/master-gradient
 precision. No vector-width/geometry sweep. Device dependency cost, convolution
 reuse and broader compiler dataflow remain separate contributors.
 
@@ -44,8 +60,9 @@ transposes/groups. Neither the counter study nor vectorization closes the gap.
 
 Precision continuity remains separate: native matrix outputs247 BF16/469 F32
 versus JAX456/96, not a one-to-one mapping. Native backward intentionally widens
-intermediates; latest upstream retains that policy. Its independent time cost
-is unmeasured. The extra BF16-output small-row control fails exact single
+intermediates; latest upstream retains that policy. Its storage-only time cost
+remains unisolated; the qualified partial policy above adds only6.19% on JAX.
+The extra BF16-output small-row control fails exact single
 rounding and stays failed; all four actual native contracts keep exact checks.
 
 **Matrix inefficiency is concentrated in the checked small-product path.**

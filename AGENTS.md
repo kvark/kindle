@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Wider-intermediate JAX control completes below its follow-up gate:**
+  [result](docs/results/2026-10-14-precision-flow.md). Complete12.684→13.469ms,
+  +6.19%, below10%; no further precision capture/sweep. Actual obs0 contracts
+  show native F32 versus JAX BF16 input gradients, but both accumulate F32
+  master gradients; native forward partials narrow before bias/norm. Diagnostic
+  F32 interfaces/matrix derivatives retain BF16 products/rounded forwards and
+  unchanged BF16 convolution islands. Explicit algorithm changes compiler/
+  library choices: not a storage-only ablation or exact native clone.4,809 F64/
+  71 frontend/1,272 convolution values pass; all18 work-count differences
+  reconcile padding/scalar lowering/packing exactly, no tolerance relaxation.
+  Same288 initials;272 finite reports/arm, changed trajectories. Ten guards
+  (four pass/six retained failures), zero allocation warnings,544 synthetic
+  updates/66 fixture calls/zero actions/workers. Source/accounting audit passes.
+  Retain cast-elision, grouped arithmetic, classifier and preparation failures.
+  Native22.881ms unchanged,1.80× fresh JAX; no production/learning promotion.
+  Upstream7574ad1/e7c3f7b unchanged; CI396 passes on4237eed. Next refresh the
+  current candidate's low-perturbation attribution, then follow its largest
+  connected heavy-kernel/compiler costs. No dtype/row-only/tile sweep or
+  whole-goal closure. Device execution and kernel efficiency remain in scope.
 - **Shared typed vector staging qualifies:** [result](docs/results/2026-10-14-matrix-staging.md).
   Fresh complete RGB24.022→22.881ms (4.75%), now1.78× retained complete
   JAX12.836ms. All272 reports/first outputs/five plans/initial-first-final292

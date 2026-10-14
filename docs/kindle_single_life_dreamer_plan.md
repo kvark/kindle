@@ -8,8 +8,8 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Best isolated complete RGB12M/B8/BF16 updates take **22.881 ms versus JAX
-12.836 ms: still 1.78×**. Production remains on its earlier qualified~53 ms
+Best isolated complete RGB12M/B8/BF16 updates take **22.881 ms versus fresh JAX
+12.684 ms: still 1.80×**; native was not retimed. Production remains on its earlier qualified~53 ms
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
@@ -47,11 +47,19 @@ a much larger Dreamer workload. Three structural differences have evidence:
   about2× slower. All3,204 counters pass; close this API-flag detour. This is
   not a universal Vulkan limit or a fresh complete-learner measurement.
 
-Next: trace precision/materialization through an actual matched forward/backward
-block before separately timing that policy. Native deliberately widened
-intermediates differ from JAX's more continuous BF16 path; aggregate output counts
-are not one-to-one proof of cost. The five checked convolutions occupy only~2.50 ms, so keep matrix
-efficiency, materialization and device dependencies in scope. No iterator/tile/
+The [wider-intermediate control](results/2026-10-14-precision-flow.md) now traces
+an actual forward/backward block and measures complete JAX12.684→13.469ms,
+only6.19% more. F32 matrix derivatives/interfaces can remain close to JAX speed;
+both original stacks already accumulate F32 master gradients. Independent
+numerical/work checks pass. Explicit algorithm selection also changes compiler/
+library choices: not a storage-only ablation or exact native clone. No further
+precision sweep or conditional capture; changed trajectories are not learning
+equivalence. All failures remain.
+
+Next refresh low-perturbation attribution on the current native candidate,
+then pursue its largest connected heavy-kernel/compiler costs. The five checked
+convolutions occupy only~2.50ms; prior row-only fusion saved~1%. Keep matrix
+efficiency, materialization and device execution in scope. No iterator/tile/
 vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
 Detailed successful and rejected interventions remain in the backend plan and
 linked results; individual savings are not additive. The full goal stays open.
