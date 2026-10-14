@@ -8,6 +8,29 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**The [whole-update comparison](results/2026-10-14-jax-image-profile.md)
+locates a structural compilation gap.** Native B32 spends56.948ms in GPU
+passes and11.688ms outside; host decoding/targets alone cost5.383ms. Removing
+all host overhead would still leave its GPU program slower than the entire
+27.187ms JAX update. Native's68.704/68.633ms ordinary/coarse pair preserves
+all reports/plans/states/cache reuse, with−0.10% instrumentation difference.
+The actual JAX capture preserves all272 reports and final tensors, with
+23.099ms kernel/copy union. The two forms of coverage are not an exact
+subtractable budget or SM utilization.
+
+**Next: connected spatial training lowering, including backward.** Native
+expands image work into F32 intermediates, materialized layout changes and
+separate pool/bias/gradient conversions. JAX combines several of these stages
+and their gradient partials while preserving compact layouts. In the first
+native block78.4% lies outside convolution; leave-one-out pool backward,
+bias, conversion and pool forward cost1.106/.561/.500/.420ms respectively.
+Use physical-layout/storage information and shared typed access to compose
+compatible stages and retain required backward values. Do not start another
+isolated kernel/tile sweep. Qualify complete forward/backward, then one
+ordinary whole-B32 comparison; a fixture-only win is insufficient. Keep
+rounding contracts explicit and host decode/targets as a separate measured
+device-residency opportunity. No production or learning promotion yet.
+
 **Bigger batches expose another implementation limit, not parity.** The
 [matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures
 native22.780→68.456ms and complete JAX12.737→27.187ms: throughput improves
@@ -42,16 +65,22 @@ first and second convolution: separate F32 bias/pooling/normalization/SiLU,
 transposes, conversion and repacking. JAX combines conv+bias and pooling+
 statistics while retaining channels-last storage. This is not measured DRAM
 traffic, a matched rounding contract or a complete fused backward pass.
-**Next:** cost a complete staged image-training block, including late-dy and
-saved tensors; distinguish layout/compiler from heavy-kernel algorithm costs.
-Only then select a general typed lowering and require whole-B32 benefit.
-No automatic NHWC rewrite or another row-only, packing, tile or dtype sweep.
+The [complete first CNN block](results/2026-10-14-image-block.md) now costs
+6.218ms. Exact-restoring masks allocate1.269ms convolution versus4.859ms other
+work (78.4%) and0.069ms empty commands. All23 descriptors/5,104 F64 values pass;
+late-dy/staged outputs are exact. These are interacting wall-time allocations,
+not removable savings. The native-contract miniature JAX fails its large
+gradient gate, so it provides no timing ratio and receives no automatic retry.
+The actual complete JAX trace and native whole-update accounting now finish
+above. No further broad capture or automatic NHWC rewrite; implement one
+reviewed general typed spatial lowering and require whole-B32 benefit.
+No row-only, packing, tile or dtype sweep.
 
 The actual connected-projection audit found separate tape/reduction/backward
 kernels on JAX too.128 native product/reduction/conversion tails are not a
 speedup estimate; no further row-only fusion trial follows from those counts.
 Production stays unchanged. The preceding batch study retains its two
-pre-update failures/five warnings/1,112 synthetic updates. CI400 passes.
+pre-update failures/five warnings/1,112 synthetic updates. CI401 passes.
 
 **Current cached execution is predominantly device-side.** The
 [qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the

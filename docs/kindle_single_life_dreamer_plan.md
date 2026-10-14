@@ -13,6 +13,16 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
+The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
+finds a structural compilation gap: native B32 spends56.948ms in GPU passes
+and11.688ms outside them, including5.383ms host decoding/targets. Exact-state
+native/JAX captures pass. Native materializes more image intermediates and
+layout conversions, while JAX combines forward/backward work and retains
+compact storage. Even zero host overhead would not close the gap. Next is
+one general typed connected spatial lowering, with required backward values
+and a complete-update speed check—not another broad profile. Production,
+Atari and the full performance goal remain unchanged/open.
+
 The [same RGB comparison at B32](results/2026-10-14-batch-granularity.md) gives
 68.456ms native versus27.187ms JAX,2.52×. Larger batches improve throughput
 1.33× versus1.87×, so they do not resolve the implementation gap. Four native
@@ -32,9 +42,13 @@ restorations pass; these are not pure kernel times or removable savings.
 Actual first-CNN dataflow writes640MiB of summed logical intermediate outputs,
 while JAX combines conv+bias and pooling+statistics in channels-last storage.
 Not peak memory/DRAM traffic or identical rounding; JAX still has backward
-tapes/work. Next compare a complete staged image-training block before a
-general typed lowering; require whole-B32 benefit. No batch/grid sweep or
-learning promotion. Ordinary B32 remains68.344/27.187ms,2.51×.
+tapes/work. The [complete first CNN block](results/2026-10-14-image-block.md)
+now measures6.218ms; exact-restoring masks allocate78.4% outside convolution.
+Small F64 checks pass, but the miniature JAX large-gradient gate fails, so
+there is no cross-stack block speed claim. The actual complete B32 JAX trace
+and native whole-update accounting now finish above; require whole-B32
+benefit for the next connected lowering. No batch/grid sweep or learning
+promotion. Ordinary B32 remains68.344/27.187ms,2.51×.
 
 The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
 more native nominal heavy arithmetic. The gap is execution engineering, not
