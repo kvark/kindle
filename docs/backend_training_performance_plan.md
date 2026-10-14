@@ -1,6 +1,6 @@
 # Backend training performance plan
 
-Updated October 13, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 14, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
@@ -35,6 +35,16 @@ workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
 
+The [multi-output scalar follow-up](results/2026-10-14-pointwise-regions.md)
+does not materially close this gap: fresh RGB32.384→32.312ms (0.22%),
+CDP104.135→103.054ms (1.04%). It removes178 RGB dispatches but only32/2,271
+dependency groups. Nine guards/912 independent F64 comparisons/148,274 exact
+RNE values pass; all RGB reports/states are exact, CDP trajectories differ.
+Keep the source/evidence, not a production promotion or another scalar sweep.
+The stricter physical-descriptor audit catches horizontal packing3+1→2+2 in
+CDP; its reviewed per-product audit passes. All failures and three warnings
+remain. No worker or game actions; broader goal stays active.
+
 What is now causally established:
 
 - **Kernel algorithms matter.** Missing training precision coverage, excessive
@@ -49,12 +59,15 @@ What is now causally established:
   graph has 2,267 inter-group barriers. Its empty stream takes 4.709ms with
   full, partial or no memory-access masks, keeping compute execution ordering.
   Access-mask weakening is not the fix; real dependencies must remain correct.
-- **Single-output fusion is insufficient.** General typed row fusion helped;
+- **Scalar fusion alone is insufficient.** General typed row fusion helped;
   widening the pointwise input cap then reduces RGB dispatches 5,846→5,500 but
   groups only 2,333→2,271, saving just 2.32%. Shared/saved values and opaque
   backward operators block larger fusion. Independent primitives qualify,
   but the wider candidate changes trajectories and exposes near-zero LaProp
   sensitivity; no learning-equivalence claim or production promotion.
+  The subsequent multi-output region trial preserves shared values safely yet
+  removes only1.4% of RGB's groups. Further fusion should target row operations
+  and layout boundaries, not merely additional scalar edges.
 - **Host boundaries also matter.** Nsight finds native main-thread
   9.094ms on CPU/23.160ms off CPU per captured update; most poll time is
   sleeping, not CPU computation. RNG, target construction and EMA still cross
@@ -63,13 +76,16 @@ What is now causally established:
 
 **Next: change the compiled execution unit and connect device dataflow.**
 
-1. Prioritize general multi-output row/pointwise/backward fusion and safe
-   view/layout propagation. Preserve shared outputs, explicitly rounded values
-   and backward activation lifetimes. Measure actual dependency-group reduction
-   and complete updates, not just kernel counts. No tile/binding-cap sweep.
-2. Move RNG, targets and slow-critic EMA onto device and keep diagnostic
+1. Move RNG, targets and slow-critic EMA onto device and keep diagnostic
    posterior readback off the critical path. Preserve stream/RNG/update-order
    contracts. Existing posterior/imagination handoffs already stay on device.
+   Qualify one connected device-side stage at a time; no CPU learner workaround.
+2. Address row-level normalization/backward fusion and safe view/layout
+   propagation. Reuse the qualified scalar-region lessons where needed, but
+   do not stack its negligible gain by default. Preserve shared outputs,
+   explicit rounding, prepared-output boundaries and activation lifetimes.
+   Measure dependency groups and complete updates, not just kernel counts.
+   No further scalar binding-cap, geometry or pointwise sweep.
 3. Investigate a lower-overhead backend execution path only with a causal
    control. Cached CPU recording and CUDA-style device graph execution are
    distinct; do not promise that ordinary Vulkan command replay closes this gap.

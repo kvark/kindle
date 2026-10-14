@@ -7,32 +7,37 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Device graph execution is a fundamental remaining advantage:**
-  [new causal controls](docs/results/2026-10-13-execution-boundaries.md).
-  Tiny dependent kernels cost~2.05µs on Vulkan and fully prequeued ordinary
-  CUDA,~.65µs on CUDA graphs. All3,168 completed counter checks pass; the first
-  large CUDA prequeue check hits its100ms CPU gate and stays failed, with a
-  separately reviewed shorter control passing the unchanged limit.
-  Graph execution accelerates device dependency processing, not merely CPU
-  recording; ordinary Vulkan command reuse has no demonstrated equivalent.
-  Current zero-work stream4.709ms is unchanged by access-mask weakening.
-  Real kernels always retain full barriers. Large kernels' near-API parity
-  does not contradict this small-dependent-work cost.
-  Latest wider-binding RGB32.864→32.103ms/CDP105.185→103.925ms saves only
-  2.32%/1.20%; RGB groups2,333→2,271.224 independent GPU cases pass, but full
-  trajectories change; near-zero LaProp moment sensitivity is retained, not
-  a proved driver fault or learning equivalence. Isolated, not promoted.
-  Fresh JAX core12.420ms/complete caller12.836ms leaves RGB2.50× slower.
-  Its metrics are returned one update late; the final pending metric record
-  was not drained, while all saved parameter/policy/carry receipts are finite.
-  Native CPU capture finds9.094ms on CPU/23.160ms off CPU, mostly sleeping
-  waits, with exact reports/states. Timings are not SM utilization.
-  Fourteen guards pass/two diagnostic failures/five allocation warnings remain;
-  1,953 full synthetic updates, zero actions/production changes/workers.
-  Upstream2214412/fe5f5b5 unchanged. Next general multi-output/backward row
-  fusion and safe views, then device RNG/targets/EMA; no tile/binding-cap sweep,
-  unsafe barrier elision, additive parity claim or Atari restart.
-  Broader root-cause/performance goal stays active.
+- **Remaining gap is structural; scalar fan-out is not the main limit:**
+  [graph-execution controls](docs/results/2026-10-13-execution-boundaries.md),
+  [multi-output scalar result](docs/results/2026-10-14-pointwise-regions.md).
+  Tiny dependent kernels cost~2.05µs on Vulkan/fully prequeued ordinary CUDA
+  versus~.65µs on CUDA graphs. All3,168 completed counters pass; the failed
+  large prequeue and separately reviewed short control remain. Application
+  feeding is excluded, not every driver-internal host contribution. Current
+  zero-work stream4.709ms is unchanged by access-mask weakening. Real kernels
+  retain full barriers; ordinary Vulkan command reuse has no demonstrated
+  equivalent graph-execution advantage.
+  Isolated wider RGB32.103ms versus complete JAX12.836ms remains2.50×;
+  production stays on its earlier qualified~53ms runtime. The next multi-output
+  scalar trial barely helps: fresh RGB32.384→32.312ms/CDP104.135→103.054ms,
+  0.22%/1.04%. RGB dispatches5,500→5,322 but groups2,271→2,239; CDP6,200→5,955/
+  2,483→2,422. Shared scalar values are not the primary remaining bottleneck.
+  Do not promote or extend this trial. All912 F64 comparisons/148,274 exact
+  RNE values, staged lifetimes,52 CPU tests and nine guards pass. RGB272
+  reports/all292 tensors exact; CDP initials exact, later trajectories differ,
+  no learning parity. Physical horizontal packing3+1→2+2 is disclosed; reviewed
+  per-product descriptors match. Two Clippy failures, typed-fan-out assertion,
+  physical-descriptor audit and8-vs256 controller error remain; only the
+  unstarted control ran after repair, no GPU job repeated. Three allocation
+  warnings,1,136 full synthetic+146 small optimizer updates, zero actions.
+  Native0483cf64 remains isolated; upstream2214412/fe5f5b5 unchanged.
+  Next device RNG/targets/slow-critic EMA, then row-level normalization/backward
+  fusion and safe view/layout propagation. Preserve stream/update ordering,
+  explicit rounding, public preparation roots and backward lifetimes. No more
+  scalar/binding-cap/tile sweep, unsafe barriers, CUDA learner or Atari restart.
+  CPU capture's on/off-CPU timings are not SM utilization; JAX metrics return
+  one update late. Prior near-zero LaProp sensitivity stays unresolved. No
+  worker at publication; broader root-cause/performance goal remains active.
 
 - **Residual gap attributed; synchronization is a substantial cause:**
   [result](docs/results/2026-10-13-residual-gap.md). Current staged RGB33.776ms
