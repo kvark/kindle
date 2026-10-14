@@ -8,6 +8,23 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Matrix inefficiency is concentrated in the checked small-product path.**
+The [current-candidate attribution](results/2026-10-14-matrix-cost.md) assigns
+2.903ms/63.54% of matrix cost to521 checked products doing only12.01% of nominal
+matrix arithmetic;195 aligned products cost1.666ms. All already multiply BF16.
+World recurrence supplies2.568ms of the checked cost.302 products have eight
+rows,160 additional products reduce only eight elements. Plans/outputs/reports/
+292 tensors remain exact; one original update,1,468 optimizer-free replays,
+one guard/zero warnings. These are interacting fixed-graph allocations, not a
+new whole-update speed claim. Next match actual small-row/short-reduction dense
+and grouped library algorithms, including precision/addends, before choosing a
+general small-product kernel or cross-use gradient aggregation. Retained full
+HLO has96 reduction-eight cuBLAS calls with BF16 inputs/F32 results and `beta=1`;
+those counterparts do not avoid F32 accumulation. No tile sweep.
+The separate standard Vulkan executable query returns statistics but zero
+internal representations; close that inspection route without a driver change.
+Its logged compile-only guard passes; no native instructions were obtained.
+
 **Precise Vulkan synchronization does not recover CUDA graph execution cost.**
 The [four-path real-dependency check](results/2026-10-14-dependency-paths.md)
 finds existing/synchronization2-global/exact-buffer barriers all~2.05µs per

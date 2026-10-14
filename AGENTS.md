@@ -7,6 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Checked small products dominate matrix cost:**
+  [current attribution](docs/results/2026-10-14-matrix-cost.md) assigns521 checked
+  products2.903ms/63.54% of matrix cost for12.01% of nominal matrix MACs;195
+  aligned products1.666ms. All BF16;302 eight-row products,160 additional
+  reduction-eight products. World recurrence supplies2.568ms checked cost.
+  All plans/pipelines/reports/restored outputs/initial-before-after292 tensors
+  exact. One guard/zero warnings, one synthetic update/1,468 optimizer-free
+  replays/zero actions; two CPU classifier tests pass. Native1339b0b7, unchanged
+  iterator backend/compiler. No new whole-update or logged-validation claim.
+  Standard Vulkan executable query separately passes logged compile-only guard
+  but exposes no representations; retain uninterpreted statistics, no native
+  assembly/driver change. Two total guards/zero warnings, no worker. Next
+  matched small-row/short-reduction dense/grouped JAX algorithms and contracts,
+  then justified general algorithm or gradient aggregation—not a tile sweep.
+  Full reachable JAX HLO confirms96 reduction-eight BF16-input/F32-output
+  cuBLAS calls with `beta=1`; no claim they avoid our F32 accumulation.
+  Complete RGB/JAX24.340/12.836ms remains1.90×; full goal open.
+  CI393 passes on precedingaa498bc.
 - **Precise dependency APIs do not close the device-execution gap:**
   [four-path check](docs/results/2026-10-14-dependency-paths.md) finds legacy/
   synchronization2-global/exact-buffer barriers all~2.05µs per dependent kernel;

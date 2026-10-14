@@ -1,0 +1,208 @@
+{
+  "status": "complete",
+  "jax_short_reduction_contract": {
+    "f32_output_beta1_calls": 96,
+    "bf16_output_beta0_calls": 16,
+    "product_operands": "BF16",
+    "hlo_sha256": "1f51f0c5c233068bc0215cbc32a10fc070660cb0afb059d17654b0d02236b52c",
+    "artifact": "runs/matrix-cost-20261014.5lrQ8LIi/contracts.json",
+    "scope": "Retained reachable full executable, not per-shape timing or value/layout/invocation parity."
+  },
+  "guards": 1,
+  "allocation_warnings": 0,
+  "exact_tensors": {
+    "initial": 292,
+    "before": 292,
+    "after": 292
+  },
+  "exact_reports": 1,
+  "plans_pipelines_outputs_exact": true,
+  "sessions": {
+    "world_gradient": {
+      "families": {
+        "checked": 470,
+        "tiled": 21
+      },
+      "baseline_gpu_ms": 14.871983,
+      "mask_means_ms": {
+        "0": 12.192711333333333,
+        "1": 14.767754,
+        "2": 12.313164666666667,
+        "3": 14.873496666666666
+      },
+      "allocation_ms": {
+        "non_matrix_and_commands": 12.192711333333333,
+        "checked": 2.567687333333333,
+        "tiled": 0.11309799999999963
+      },
+      "allocations_by_round": [
+        {
+          "non_matrix_and_commands": 12.196094,
+          "checked": 2.563281999999999,
+          "tiled": 0.11237999999999992
+        },
+        {
+          "non_matrix_and_commands": 12.190876,
+          "checked": 2.5695650000000008,
+          "tiled": 0.11323699999999981
+        },
+        {
+          "non_matrix_and_commands": 12.191164,
+          "checked": 2.5702149999999993,
+          "tiled": 0.11367699999999914
+        }
+      ]
+    },
+    "imagination": {
+      "families": {
+        "checked": 33,
+        "tiled": 155
+      },
+      "baseline_gpu_ms": 4.04487075,
+      "mask_means_ms": {
+        "0": 2.6665253333333334,
+        "1": 2.8169866666666667,
+        "2": 3.8832413333333333,
+        "3": 4.04345
+      },
+      "allocation_ms": {
+        "non_matrix_and_commands": 2.6665253333333334,
+        "checked": 0.15533500000000008,
+        "tiled": 1.2215896666666666
+      },
+      "allocations_by_round": [
+        {
+          "non_matrix_and_commands": 2.666418,
+          "checked": 0.1563239999999999,
+          "tiled": 1.222132
+        },
+        {
+          "non_matrix_and_commands": 2.667,
+          "checked": 0.15388000000000002,
+          "tiled": 1.221438
+        },
+        {
+          "non_matrix_and_commands": 2.666158,
+          "checked": 0.1558010000000003,
+          "tiled": 1.221199
+        }
+      ]
+    },
+    "behavior_gradient": {
+      "families": {
+        "checked": 17,
+        "tiled": 16
+      },
+      "baseline_gpu_ms": 0.859302,
+      "mask_means_ms": {
+        "0": 0.4251493333333333,
+        "1": 0.6048913333333333,
+        "2": 0.7039673333333333,
+        "3": 0.859644
+      },
+      "allocation_ms": {
+        "non_matrix_and_commands": 0.4251493333333333,
+        "checked": 0.16770933333333335,
+        "tiled": 0.2667853333333333
+      },
+      "allocations_by_round": [
+        {
+          "non_matrix_and_commands": 0.425416,
+          "checked": 0.16772000000000004,
+          "tiled": 0.26561399999999996
+        },
+        {
+          "non_matrix_and_commands": 0.425074,
+          "checked": 0.16732099999999997,
+          "tiled": 0.26786299999999996
+        },
+        {
+          "non_matrix_and_commands": 0.424958,
+          "checked": 0.16808700000000001,
+          "tiled": 0.266879
+        }
+      ]
+    },
+    "slow_value": {
+      "families": {
+        "checked": 1,
+        "tiled": 3
+      },
+      "baseline_gpu_ms": 0.1341005,
+      "mask_means_ms": {
+        "0": 0.058038,
+        "1": 0.070144,
+        "2": 0.122392,
+        "3": 0.134294
+      },
+      "allocation_ms": {
+        "non_matrix_and_commands": 0.058038,
+        "checked": 0.012004,
+        "tiled": 0.064252
+      },
+      "allocations_by_round": [
+        {
+          "non_matrix_and_commands": 0.057890000000000004,
+          "checked": 0.012176999999999997,
+          "tiled": 0.064347
+        },
+        {
+          "non_matrix_and_commands": 0.057988,
+          "checked": 0.012102000000000009,
+          "tiled": 0.064328
+        },
+        {
+          "non_matrix_and_commands": 0.058236,
+          "checked": 0.011732999999999997,
+          "tiled": 0.064081
+        }
+      ]
+    }
+  },
+  "aggregate_ms": {
+    "non_matrix_and_commands": 15.342424000000001,
+    "checked": 2.9027356666666666,
+    "tiled": 1.6657249999999995
+  },
+  "matrix_nominal_macs": {
+    "checked": 3377731584,
+    "tiled": 24754782208
+  },
+  "baseline_gpu_ms": 19.91025625,
+  "synthetic_updates": 1,
+  "optimizer_free_replays": 1468,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 15096152064,
+  "scope": "Fixed-session counterfactual allocations; all other work and all commands/dependencies retained. No ordinary whole-update timing or SM-utilization claim. Command caching explicitly off for diagnostic recording. No new shaders or logged-validation qualification.",
+  "checked_fraction_of_matrix_cost": 0.6353859381664809,
+  "checked_fraction_of_matrix_nominal_macs": 0.12006504676309873,
+  "checked_shapes": {
+    "rows8": 302,
+    "other": 59,
+    "reduction8": 160
+  },
+  "native_executable_probe": {
+    "status": "complete",
+    "guarded": true,
+    "allocation_warnings": 0,
+    "internal_representations": 0,
+    "metadata": "pipeline=\"counter\"\nsupported=true\nexecutables=1\nexecutable=0 name=\"CS\" description=\"Compute Shader\" subgroup_size=32\nstat name=\"Register Count\" description=\"Number of temporary registers used by this shader stage\" value=16\nstat name=\"Binary Size\" description=\"Size in bytes of the executable for this stage\" value=384\nstat name=\"Stack Size\" description=\"Size in bytes required for the shader stack\" value=0\nstat name=\"Local Memory Size\" description=\"Size in bytes required per-thread for local memory\" value=68719476736\nstat name=\"Shared Memory Size\" description=\"Size in bytes used for shared memory\" value=0\nrepresentations=0\ntotal_representations=0\n",
+    "binary_sha256": "7047b47f4170c1761d6e1a4cc8d1233f9842418ee92217e58e99a03ab434954d",
+    "patch_sha256": "c60d688158eeb5b6e372b92c5d8dc38932dae8cc45c6b819f3954e30836e13b4",
+    "minimum_sampled_headroom_bytes": 16568483840,
+    "artifact_root": "runs/native-code-20261014.I4Ik2df6",
+    "scope": "Compile-only standard API query with logged validation; no executable code exposed, no follow-up compilation or execution."
+  },
+  "native_sha256": "1339b0b7d6c73ee4d3f4929c6ce4a780f645675f1639ea5bc5f31a06bda69807",
+  "kindle_patch_sha256": "3b1dbd89dd1f74fbe86d8807b248b00e20c708eeffac72c4246e44f0bc2ce32b",
+  "backend_patch_sha256": "9dcee74ea4af58540630c877174465c59c017bcf3b951bcb4c1663fa74c2208d",
+  "blade_patch_sha256": "c60d0a1cf7022e5dfcf84278d9d9e5c4af1434e3d3dd67e86fa352362ae253b5",
+  "artifact_root": "runs/matrix-cost-20261014.5lrQ8LIi",
+  "all_matrix_operands_and_multiply_bf16": true,
+  "total_guards": 2,
+  "retained_complete_rgb_ms": 24.339903566406242,
+  "retained_complete_jax_ms": 12.836475,
+  "fresh_whole_update_timing": false,
+  "production_changed": false,
+  "workers_remaining": false
+}

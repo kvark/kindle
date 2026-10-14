@@ -26,6 +26,10 @@ a much larger Dreamer workload. Three structural differences have evidence:
   The [native iterator intervention](results/2026-10-14-convolution-iterators.md)
   now cuts decoder dW37.15% and complete updates4.45% with exact reports/states:
   repeated indexing is a demonstrated cause, not the whole explanation.
+  The [matrix attribution](results/2026-10-14-matrix-cost.md) finds the checked
+  small-product path costs2.903ms/63.54% of matrix time for12.01% of matrix MACs;
+  all already use BF16. Match recurrent eight-row/short-reduction library
+  algorithms next; this is not a new speedup or a proven replacement kernel.
 - Host construction: [command reuse](results/2026-10-14-command-cache.md)
   saves10.16% of complete update time with exact reports/states. It removes
   repeated bindings/recording, not GPU operations or dependencies.
