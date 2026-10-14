@@ -15,21 +15,32 @@ native22.780→68.456ms and complete JAX12.737→27.187ms: throughput improves
 4×, with exact initials and exact retained B8 controls. Batch changes are not
 unchanged-learning speed gains. No batch/sequence or concurrent-seed sweep.
 
-Four B32 convolutions lose their packed implementation because a64MiB channel
-pack needs65,536 one-dimensional workgroups, one beyond the portable limit.
-The existing element/memory cap permits it. Reuse the general `linear_grid`
-helper and flatten the packing shader's actual grid, retaining all other bounds,
-types and accumulation partitions; qualify coverage/padding/transposes and
-complete B32 updates. This is the next concrete correction. Its whole-update
-benefit remains unmeasured, and it does not explain B8's remaining gap.
+The [qualified packing-grid correction](results/2026-10-14-packing-grid.md)
+now measures the effect of four B32 convolution fallbacks:68.344→67.326ms,
+only1.49%, below3%. Do not promote it or expand a packing/geometry sweep.
+Candidate remains2.48× retained complete JAX; B8 is unaffected. The selector
+rejects65,536 X groups despite an admissible64MiB pack; shared typed2D packing
+removes that rejection without raising memory/precision/accumulation bounds.
+Actual5080 X limit is2,147,483,647: this was conservative selection, not an
+invalid launch. All536,894,080 packing values/F64 derivative checks pass,
+B8 smoke/B32 control are exact, candidate B32 initials are exact and states
+finite but its trajectory changes. Seven guards/two warnings,592 synthetic
+updates/zero actions/workers; four CPU failures and successful repairs remain.
 The separate initialization scratch-cap repair raises64→128MiB and preserves
 B8's exact results; it is not the cause of these four runtime fallbacks.
+
+**Next:** [one cached B32 family attribution](experiments/2026-10-14-batch-residual.md)
+on the retained control, locating the growing convolution/matrix/other cost.
+One preparatory update and fixed optimizer-free replays, preserving all
+dependencies and exact restorations. The negative packing result does not
+identify the residual from operation counts. Match measured dominant operations
+to actual reachable JAX before another algorithm/compiler intervention.
 
 The actual connected-projection audit found separate tape/reduction/backward
 kernels on JAX too.128 native product/reduction/conversion tails are not a
 speedup estimate; no further row-only fusion trial follows from those counts.
-Production stays unchanged. Seven guards retain two pre-update failures and
-five warnings;1,112 synthetic updates, zero actions/workers. CI398 passes.
+Production stays unchanged. The preceding batch study retains its two
+pre-update failures/five warnings/1,112 synthetic updates. CI399 passes.
 
 **Current cached execution is predominantly device-side.** The
 [qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the
@@ -44,7 +55,8 @@ one warning retained, no game actions/production change/workers.
 The completed connected-region comparison above does not justify another
 fusion implementation on counts alone. Row-only integration already saved
 only~1%; do not repeat that local sweep or assume fewer dispatches guarantee
-a large gain. Correct the demonstrated packing-grid limitation next. Host decode/
+a large gain. The packing correction above saves only1.49%; locate the B32
+residual using the cached profiler next. Host decode/
 targets cost1.522ms; useful work, but not the primary device-side gap. Keep
 library algorithms and dependency execution in scope. The ordinary four-chunk
 candidate's fresh B8 latency is22.780ms/1.79× JAX; no parity claim.

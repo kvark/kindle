@@ -3,6 +3,10 @@
 October14,2026. [Declaration](../experiments/2026-10-14-batch-granularity.md) ·
 [Data](2026-10-14-batch-granularity.json) · [Backend plan](../backend_training_performance_plan.md).
 
+Follow-up: the [qualified packing-grid correction](2026-10-14-packing-grid.md)
+saves only1.49% of full B32 time. It does not explain the dominant gap; the
+original measurements and untested-at-the-time hypothesis below remain.
+
 **The remaining gap is not primarily a small-batch problem.** Increasing the
 RGB12M replay batch8→32 improves native throughput1.33×, but JAX improves1.87×.
 The native/JAX latency ratio grows1.79→2.52×. Both execute four times the

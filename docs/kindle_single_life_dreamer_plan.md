@@ -17,9 +17,16 @@ The [same RGB comparison at B32](results/2026-10-14-batch-granularity.md) gives
 68.456ms native versus27.187ms JAX,2.52×. Larger batches improve throughput
 1.33× versus1.87×, so they do not resolve the implementation gap. Four native
 convolutions lose packing at a one-dimensional launch limit:65,536 workgroups
-versus65,535 allowed. Next qualify the existing general two-dimensional grid
-helper in the packing path, retaining memory and numerical bounds. Its speed
-effect is unmeasured; no batch sweep or learning promotion follows.
+versus the selector's65,535 portable bound. The [qualified two-dimensional
+correction](results/2026-10-14-packing-grid.md) now saves only1.49% of fresh
+complete B32 time,68.344→67.326ms, below3%; do not promote it. Candidate remains
+2.48× retained complete JAX. Actual5080 X limit is2,147,483,647, so these were
+conservative selections, not invalid launches. Independent exact packing/F64
+checks and seven guards pass; B8 smoke/control states are exact, B32 candidate
+trajectories change. This does not explain the dominant gap. Next
+[attribute the retained B32 graph](experiments/2026-10-14-batch-residual.md),
+then match its measured dominant operations to actual JAX; no batch/grid sweep
+or learning promotion.
 
 The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
 more native nominal heavy arithmetic. The gap is execution engineering, not
@@ -71,7 +78,8 @@ stream and5.463ms other-than-heavy work, alongside5.587ms convolution/3.388ms
 matrices. These are interacting allocations, not additive removable costs or
 SM utilization. The connected heavy-projection comparison finds separate JAX
 tape/reduction/backward kernels too; counts alone do not justify a new fusion
-trial. The packing-grid defect above is the next concrete correction. The five checked
+trial. The packing-grid intervention above supplies only1.49%; the cached B32
+family attribution is next. The five checked
 convolutions occupy only~2.50ms; prior row-only fusion saved~1%. Keep matrix
 efficiency, materialization and device execution in scope. No iterator/tile/
 vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.

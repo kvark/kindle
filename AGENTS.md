@@ -7,22 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Larger batches widen the remaining gap:** [result](docs/results/2026-10-14-batch-granularity.md).
-  Fresh complete RGB B8 native/JAX22.780/12.737ms; B32 68.456/27.187ms,
-  ratios1.79→2.52×. Throughput improves1.33× native/1.87× JAX, not learning
-  speed. Exact per-framework initials; both B8 controls reproduce retained
-  reports/states/plans. All nominal heavy work scales4×; JAX's changed head
-  packing reconciles exactly. Seven guards/five pass/two retained pre-update
-  failures, five warnings,1,112 synthetic updates/zero actions/workers.
-  Nativee5d890dd only raises logical convolution scratch64→128MiB; production
-  unchanged. Separately, four B32 convolutions lose packing because a64MiB
-  pack needs65,536 X groups versus65,535 allowed. Existing `linear_grid`
-  supports32,768×2×1; shader flattening is missing. Next qualify that general
-  grid correction and whole B32 cost, without raising packing memory bounds.
-  Its speed effect remains unmeasured; B8's gap is unaffected. No batch/tile/
-  precision sweep, concurrent seeds, Atari restart or whole-goal closure.
-  Connected projection audit does not justify another row-only fusion trial.
-  Upstream7574ad1/e7c3f7b unchanged; CI398 passes on712b5cd.
+- **Packing cliff is not the dominant gap:** [qualified intervention](docs/results/2026-10-14-packing-grid.md)
+  changes exactly four B32 convolutions but saves only1.49%,68.344→67.326ms,
+  below3%; no promotion/sweep. Candidate remains2.48× retained complete JAX
+  27.187ms. The [batch comparison](docs/results/2026-10-14-batch-granularity.md)
+  retains B8 native/JAX22.780/12.737ms and1.33×/1.87× throughput scaling with
+  exact4× nominal work. The selector's65,535 X bound is conservative; actual
+  5080 limits[2147483647,65535,65535] admit all retained grids. No invalid-launch
+  claim. Shared typed2D packing preserves memory/precision/accumulation bounds.
+  All536,894,080 exact packing values/40 F64 derivative cases/seven partials
+  pass; B8 smoke and B32 control reproduce exact reports/plans/states. B32
+  candidate has exact initials/finite states but changed arithmetic/trajectory.
+  Seven guards/two warnings,592 synthetic updates/zero actions/workers. Four
+  CPU failures remain; repaired graph and complete-plan audits pass, no GPU
+  retry. Native9ad4b2b6 stays unpromoted; e5d890dd remains B32 control. Next
+  [one cached B32 family attribution](docs/experiments/2026-10-14-batch-residual.md),
+  then actual dominant operations against reachable JAX—not another row-only/
+  packing/tile/dtype sweep. No production change, Atari restart or full-goal
+  closure. Upstream7574ad1/e7c3f7b unchanged; CI399 passes on238a0d4.
 - **Current cached execution attributed:** [result](docs/results/2026-10-14-cached-residual.md).
   Profiling previously disabled the command cache; isolated primary-boundary
   timestamps retain it. Ordinary/coarse23.039/23.154ms,0.50% overhead, all272
