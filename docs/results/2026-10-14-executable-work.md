@@ -100,8 +100,12 @@ The latest [compensation](2026-10-14-accumulation-cost.md) and
 .89% fixed-world benefit with numerical failures, and.98% slower full updates.
 Neither warrants a sweep.
 
-Next identify a cost-bearing compiled region, including its layout/materialized
-intermediates and every consumer, before implementing more fusion. Typed shared-
+The subsequent [non-heavy attribution](2026-10-14-materialization-cost.md)
+allocates1.432ms to materialization,2.329ms to row/reduction and1.631ms to other
+work, with all plans/pipelines/outputs/states exact. Connected row/backward
+regions are the larger non-heavy priority; copies alone do not explain it.
+Keep layout/materialized intermediates and every consumer in scope before
+implementing more fusion. Typed shared-
 input projection combination is a concrete candidate, not yet a priority justified
 by time. Compare the complete connected region, including packing and backward
 work; require a numerical control and whole-update measurement before adoption.

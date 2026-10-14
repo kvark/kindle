@@ -145,7 +145,7 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: cost a connected compiled region, not another local knob.**
+**Next: design a connected row/backward region, not another local knob.**
 
 1. The [accumulation-cost check](results/2026-10-14-accumulation-cost.md)
    closes a specific hypothesis: removing compensated dW reduces fixed-world
@@ -161,9 +161,14 @@ change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
    Convolution and grouped shapes/counts match. JAX's actual graph combines
    four head projections into one wide GEMM; native typed products and sessions
    do not. This is a concrete compiler difference, not a measured large gain.
-   Identify the cost-bearing region and materialized intermediates first;
-   account for packing, output views, backward work and all consumers before
-   selecting a compiler change. More nominally fused operations are not enough.
+   The [non-heavy attribution](results/2026-10-14-materialization-cost.md)
+   now allocates1.432ms layout/casts,2.329ms row/reductions and1.631ms other.
+   Full world row/backward/scalar work is the larger non-heavy region; copies
+   alone are not the explanation. All plans/pipelines/outputs/292 tensors match.
+   Design connected row/backward lowering with explicit layouts, rounding and
+   multiple live outputs. Account for packing, views and all consumers in one
+   representative measured/numerical control before generalizing. More nominally
+   fused operations are not enough; no automatic optimization allocation.
    Continue general shared typed algorithms/coarser compiled execution, not
    another scalar/row/binding-cap/tile sweep or bespoke Dreamer kernel.
    The time-batchable prior head remains an unweighted source observation,

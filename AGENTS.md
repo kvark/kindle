@@ -17,10 +17,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   not a measured large speedup or permission to revive rejected factorization.
   Count scalar/layout work separately; nominal MACs are not hardware instructions.
   CPU-only audit passes after a retained tuple-boundary proof failure; no GPU
-  jobs/actions/updates. Next identify a cost-bearing connected region and its
-  materialization/consumer constraints before more compiler implementation.
+  jobs/actions/updates. The [separate non-heavy attribution](docs/results/2026-10-14-materialization-cost.md)
+  now allocates1.432ms to1,744 layout/cast dispatches,2.329ms to1,557 row/
+  reductions and1.631ms to1,246 other operations. Full fixed GPU21.171ms;
+  heavy work/unchanged commands15.778ms is not an optimized-program lower bound.
+  All plans/pipeline keys/outputs/292 tensors match; one guard, zero warnings,
+  one original update/2,380 optimizer-free replays, zero actions/workers.
+  Row/backward regions with explicit layouts/rounding/multiple live outputs
+  are a measured compiler priority, not another scalar cap or uncosted wide GEMM.
+  Time stacking is already balanced. No automatic implementation allocation.
   Keep kernel efficiency, device dependency cost and host construction distinct;
   no small tuning sweep, additive savings forecast or production/Atari restart.
+  Latest Bladee7c3f7b/Nagacbbac959 adds Metal BF16 only; no Vulkan/SPIR-V
+  changes. Current attribution retains96c1dc7/a97559b. CI384 passes.
 
 - **Compensation and existing prefetch are not the missing large cost:** the
   [bounded diagnostic](docs/results/2026-10-14-accumulation-cost.md) measures

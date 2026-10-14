@@ -1,0 +1,155 @@
+{
+  "status": "complete",
+  "guards": 1,
+  "allocation_warnings": 0,
+  "exact_tensors": {
+    "initial": 292,
+    "before": 292,
+    "after": 292
+  },
+  "exact_reports": 1,
+  "total_dispatches": 5286,
+  "baseline_gpu_ms": 21.1824295,
+  "mask_means_ms": {
+    "0": 15.778212,
+    "1": 17.384366,
+    "2": 18.292639333333334,
+    "3": 19.737562,
+    "4": 17.66267266666667,
+    "5": 18.971895333333332,
+    "6": 19.856654666666667,
+    "7": 21.1706
+  },
+  "shapley_ms": {
+    "heavy_plus_command_stream": 15.778212,
+    "materialization": 1.4323906666666661,
+    "row_reduction": 2.328907,
+    "other": 1.631090333333333
+  },
+  "optimizer_free_replays": 2380,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "source_plans_and_pipeline_keys_exact": true,
+  "full_outputs_match_previous": true,
+  "scope": "Heavy work always active. Counterfactual zero-workgroup dispatches retain bindings/barriers. Masked outputs are not valid learner outputs. Shapley allocates cache/overlap interactions; not pure kernel durations or independently additive optimization savings.",
+  "date": "2026-10-14",
+  "artifact_root": "/x/Code/kindle/runs/materialization-cost-20261014.yLfoQTsc",
+  "sessions": {
+    "behavior_gradient": {
+      "counts": {
+        "materialization": 40,
+        "other": 67,
+        "heavy": 33,
+        "row_reduction": 107
+      },
+      "baseline_gpu_ms": 0.8611565,
+      "cost_allocation_ms": {
+        "heavy_plus_command_stream": 0.46481733333333336,
+        "materialization": 0.07538000000000002,
+        "row_reduction": 0.24327699999999997,
+        "other": 0.07814033333333333
+      },
+      "marginal_removal_ms": {
+        "materialization": 0.0691713333333334,
+        "row_reduction": 0.19970733333333335,
+        "other": 0.03626733333333335
+      }
+    },
+    "imagination": {
+      "counts": {
+        "materialization": 366,
+        "heavy": 188,
+        "row_reduction": 290,
+        "other": 78
+      },
+      "baseline_gpu_ms": 4.0253765,
+      "cost_allocation_ms": {
+        "heavy_plus_command_stream": 2.7888633333333335,
+        "materialization": 0.6839747777777777,
+        "row_reduction": 0.4554404444444444,
+        "other": 0.09541611111111109
+      },
+      "marginal_removal_ms": {
+        "materialization": 0.6823893333333332,
+        "row_reduction": 0.48839133333333323,
+        "other": 0.07613000000000003
+      }
+    },
+    "slow_value": {
+      "counts": {
+        "materialization": 5,
+        "heavy": 4,
+        "row_reduction": 3,
+        "other": 1
+      },
+      "baseline_gpu_ms": 0.13530275,
+      "cost_allocation_ms": {
+        "heavy_plus_command_stream": 0.096482,
+        "materialization": 0.018225666666666664,
+        "row_reduction": 0.018294666666666664,
+        "other": 0.0020223333333333317
+      },
+      "marginal_removal_ms": {
+        "materialization": 0.018299999999999997,
+        "row_reduction": 0.018185999999999997,
+        "other": 0.0018993333333333269
+      }
+    },
+    "world_gradient": {
+      "counts": {
+        "materialization": 1333,
+        "other": 1100,
+        "heavy": 514,
+        "row_reduction": 1157
+      },
+      "baseline_gpu_ms": 16.16059375,
+      "cost_allocation_ms": {
+        "heavy_plus_command_stream": 12.428049333333334,
+        "materialization": 0.6548102222222218,
+        "row_reduction": 1.6118948888888889,
+        "other": 1.4555115555555553
+      },
+      "marginal_removal_ms": {
+        "materialization": 0.544084666666666,
+        "row_reduction": 1.4924200000000003,
+        "other": 1.3187413333333324
+      }
+    }
+  },
+  "allocation_sweeps_ms": [
+    {
+      "heavy_plus_command_stream": 15.774422,
+      "materialization": 1.4312053333333337,
+      "row_reduction": 2.3308783333333327,
+      "other": 1.6347903333333327
+    },
+    {
+      "heavy_plus_command_stream": 15.780598,
+      "materialization": 1.4326279999999998,
+      "row_reduction": 2.3311230000000007,
+      "other": 1.6264750000000003
+    },
+    {
+      "heavy_plus_command_stream": 15.779616,
+      "materialization": 1.4333386666666654,
+      "row_reduction": 2.3247196666666667,
+      "other": 1.6320056666666662
+    }
+  ],
+  "sha256": {
+    "kindle-tests": "a7c6e45e359849781c84f10e87653ddd5e1462fcf823e0fce43b7f6d1c82ccda",
+    "backend.patch": "7c883d5f5a8d72e5741b0d352009e6d30ed209364656b6123571efa207cd0fd1",
+    "kindle.patch": "17e219b65ec75babb6240dc6040e3e661f65285607193d830b6dbd066f4c0f40",
+    "backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2"
+  },
+  "upstream_review": {
+    "meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade_latest": "e7c3f7b64abe1caf25147987020931065665a9cc",
+    "naga_latest": "cbbac9599b65b5040d4ca18816aa309f25922936",
+    "retained_blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+    "retained_naga": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+    "reason": "Latest changes concern Metal BF16 only; no Vulkan/SPIR-V change. Retain qualified compiler for this fixed-graph diagnostic."
+  },
+  "decision": "The fundamental gap spans efficient heavy kernels, compiled region/materialization boundaries, and dependent execution. Layout-only work does not explain it; row/reduction plus world scalar/backward is the larger measured non-heavy region. Do not infer speedup from counts or promote another small fusion."
+}

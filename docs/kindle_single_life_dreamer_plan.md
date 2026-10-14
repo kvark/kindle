@@ -41,6 +41,11 @@ Actual JAX dataflow combines four head projections into a wider GEMM; native
 typed products/sessions stay separate. Cost the complete connected region and
 its materialized intermediates before further compiler changes; the wide-GEMM
 opportunity is not yet a measured large benefit. Numerical gates stay unchanged.
+The [non-heavy cost split](results/2026-10-14-materialization-cost.md) allocates
+1.432ms layout/casts,2.329ms row/reductions and1.631ms other, with exact
+plans/pipelines/states. Copies alone are not the missing fix. Prioritize
+connected row/backward regions plus efficient heavy kernels, preserving
+rounding/live outputs; cost a representative region before generalizing.
 No Atari restart, learning-quality claim or whole-goal closure.
 
 ### Retained causal findings
