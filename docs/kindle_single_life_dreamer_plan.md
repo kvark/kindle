@@ -34,13 +34,16 @@ transposes with exact reports/states and qualified staged backward lifetimes,
 but those static redundancies were not a major cost. Keep3551bc53, not rejected
 212713c4. [Packed shape specialization](results/2026-10-14-packed-specialization.md)
 also rejects:65.684→65.207ms,0.726%, with exact reports/states/plans and13.3M
-F64 comparisons. No shape sweep. Next address one complete image-training
-storage/fusion contract: JAX's first pooled values are32MiB BF16 versus native
-64MiB F32, with different bias/rounding/statistics boundaries. The previous
-wider-JAX experiment left these islands unchanged. This is static contract
-evidence, not promised savings; specify rounding/pooling derivatives, preserve
-F32 statistics/master state and judge independent numerics plus whole-update
-time. Deliberate precision changes need not preserve legacy trajectories.
+F64 comparisons. No shape sweep. The omitted [wide-image JAX control](results/2026-10-14-image-precision-control.md)
+now measures26.632→26.876ms, only0.92%, with unchanged heavy multiplication
+work and exact288 initial tensors. All544 updates and22,120 independent
+image-tail values/derivatives pass; no new native kernel or learning claim.
+JAX stays fast with F32 image intermediates because it still combines their
+work. Next implement connected image forward/backward lowering on the existing
+precision contract, including decoder blocks, rather than another dtype tweak.
+Preserve pooling derivatives, statistics/master state and staged lifetimes;
+judge independent numerics and whole-update time. The separate convolution
+algorithm/staging gap remains open too.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.

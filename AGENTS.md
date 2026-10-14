@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Wide-image JAX control complete:** [result](docs/results/2026-10-14-image-precision-control.md).
+  Complete RGB12M/B32 original/wide26.632→26.876ms,0.92%; retained native
+  65.736ms is still2.45× wide JAX. F32 image bias/pool/norm/activation does not
+  explain the multiplier. Heavy multiplication shapes/dtypes/MACs unchanged;
+  eight convolution bias operands move out, so not a storage-only/exact-native
+  control.288 initial tensors exact,272 finite reports/arm;283 final tensors
+  differ. Eight independent image-tail cases/22,120 F64 values/derivatives pass.
+  Three guards pass/one allocation warning; two CPU process failures and two
+  CPU report failures retained.544 synthetic updates, zero actions/workers/
+  native change. Next implement connected image forward/backward lowering on
+  existing precision, including decoder blocks: remove remaining norm/activation/
+  layout intermediates, share backward state/reductions, preserve pooling
+  derivatives/staged lifetimes. One shared typed path, independent numerical
+  checks and complete-update gate. No dtype/layout/row/tile sweep, miniature-JAX
+  retry, broad capture, Atari restart or goal closure. Keep3551bc53; convolution
+  staging/algorithms and host decode/targets remain separate measured gaps.
 - **Packed shape specialization rejected:** [result](docs/results/2026-10-14-packed-specialization.md).
   Complete RGB12M/B32 control/candidate65.684→65.207ms,0.726%, below3%;2.40×
   retained JAX27.187ms. Keep3551bc53, not rejectedf8e6e663/212713c4. All14

@@ -52,16 +52,24 @@ F64 comparisons pass. The original CPU12/16-word binding failure stays retained;
 the corrected boundary reuses existing parameter binding. Keep3551bc53, not
 either sub1% candidate. Visible local inefficiency is not weighted attribution.
 
-**Next: one complete image-training reduced-storage/fusion contract.** Actual
-JAX fuses convolution+bias into BF16, then pooling+F32 statistics; first pooled
-values are32MiB BF16 versus native64MiB F32. Native rounds before F32 bias and
-retains wide intervening operations. JAX still has a comparison-mask tape.
-The previous wider-JAX policy left these image islands unchanged. Specify
-rounding and pooling subgradients before implementing one shared typed region;
-keep F32 statistics/accumulators/master state. Independent quantized forward/
-backward checks and full-update timing matter, not legacy bitwise identity
-after deliberate precision changes. Static extents do not prove a speedup.
-No dtype/layout/row/tile sweep, failed miniature-JAX retry or broad capture.
+**[Wide image precision is not the missing multiplier](results/2026-10-14-image-precision-control.md).**
+JAX with F32 image bias/pooling/norm/activation takes26.632→26.876ms, only0.92%
+more. Heavy multiplication shapes/dtypes/MACs stay fixed;288 initial tensors
+match, both272-report/final-state checks pass. The precision change alters283
+final tensors and eight convolution-bias fusion boundaries; this is not a
+storage-only or exact-native control. Eight independent cases/22,120 values/
+derivatives pass. Three guards pass/one allocation warning; two CPU process
+failures and two CPU report failures remain. Zero actions/workers/native change.
+
+**Next: connected image forward/backward lowering, retaining current precision.**
+Wide JAX still combines bias/pooling/statistics without materializing each
+logical F32 image. Native's qualified pool path already folds encoder bias,
+but normalization/activation/layout and corresponding backward work remain
+separate. Fuse the connected region, including decoder blocks; preserve
+rounding/pooling derivatives, F32 statistics/accumulators/master state and
+staged/output lifetimes. Independent numerical checks and a whole-update gate
+must decide it. No preceding dtype/layout/row/tile sweep, failed miniature-JAX
+retry or broad capture. Convolution algorithm/staging remains a measured gap.
 Keep the independently measured5.383ms host decode/target path as a separate
 GPU-residency opportunity, not an additive savings promise. No Atari restart
 or whole-goal closure.

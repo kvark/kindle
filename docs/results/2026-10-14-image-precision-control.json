@@ -1,0 +1,132 @@
+{
+  "status": "complete",
+  "arms": {
+    "baseline": {
+      "mean_update_ms": 26.63169575862412,
+      "median_update_ms": 26.722725946456194,
+      "inclusive_ms": 27.33316128160368,
+      "construction_seconds": 32.41000401414931,
+      "compiled_memory": {
+        "generated_code_size_in_bytes": 4418232,
+        "argument_size_in_bytes": 141837552,
+        "output_size_in_bytes": 132197688,
+        "alias_size_in_bytes": 96328372,
+        "temp_size_in_bytes": 675878448,
+        "host_generated_code_size_in_bytes": 0,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_alias_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0
+      },
+      "heavy_nominal_macs": 334356283392,
+      "heavy_records": 112,
+      "minimum_sampled_headroom_bytes": 7930773504,
+      "image_contract": {
+        "status": "complete",
+        "wide_images": false,
+        "pool_reductions": 8,
+        "silu_exponentials": 20,
+        "expected_dtype": "bf16"
+      },
+      "hlo_sha256": "f04cc3b15e5525f21acff9171aa6574736ffc6e92391eabe54c39586071260c6",
+      "metric_reports": 272,
+      "state_tensors": 288
+    },
+    "wide-v3": {
+      "mean_update_ms": 26.875910188209673,
+      "median_update_ms": 27.057519531808794,
+      "inclusive_ms": 27.52723050161876,
+      "construction_seconds": 31.795305487932637,
+      "compiled_memory": {
+        "generated_code_size_in_bytes": 4387000,
+        "argument_size_in_bytes": 141837552,
+        "output_size_in_bytes": 132197688,
+        "alias_size_in_bytes": 96328372,
+        "temp_size_in_bytes": 750131760,
+        "host_generated_code_size_in_bytes": 0,
+        "host_argument_size_in_bytes": 0,
+        "host_output_size_in_bytes": 0,
+        "host_alias_size_in_bytes": 0,
+        "host_temp_size_in_bytes": 0
+      },
+      "heavy_nominal_macs": 334356283392,
+      "heavy_records": 112,
+      "minimum_sampled_headroom_bytes": 7930773504,
+      "image_contract": {
+        "status": "complete",
+        "wide_images": true,
+        "expected_dtype": "f32",
+        "pool_reductions": 8,
+        "image_silu_exponentials": 21,
+        "unchanged_dense_silu_exponentials": 3
+      },
+      "hlo_sha256": "f908dee723555e9903d7081fdcbde873271e4267ea4e53379ab87cbad80f065d",
+      "metric_reports": 272,
+      "state_tensors": 288
+    }
+  },
+  "wide_extra_ms": 0.24421442958555417,
+  "wide_extra_percent": 0.9170066818087186,
+  "retained_native_ms": 65.7363222421875,
+  "retained_native_over_wide": 2.445919850968459,
+  "exact_initial_tensors": 288,
+  "changed_final_tensors": 283,
+  "heavy_multiplication_contracts_exact": true,
+  "convolution_bias_operands_removed": 8,
+  "retained_cpu_report_failures": 2,
+  "independent_numerical": {
+    "status": "complete",
+    "cases": 8,
+    "numerical_values": 22120,
+    "max_relative_l2": 3.683838284306438e-7,
+    "minimum_sampled_headroom_bytes": 7979008000,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "unchanged_policy_after_harness_repair": true,
+    "failed_attempt": "CPU tracing: Ninjax state/output reversed; no completed numerical case",
+    "guard_sha256": "1a4905609452332e337dee19dc335a4e36ccfa109cc49d053a9193005615d5a4"
+  },
+  "guards_passed": 3,
+  "retained_cpu_failures": 2,
+  "new_events": [
+    {
+      "guard": "qualification-v2-queue/qualification-v2",
+      "event": "allocation_warning",
+      "message": "NVRM: nvCheckOkFailedNoLog: Check failed: Out of memory [NV_ERR_NO_MEMORY] (0x00000051) returned from _memdescAllocInternal(pMemDesc) @ mem_desc.c:1359"
+    }
+  ],
+  "synthetic_updates": 544,
+  "game_actions": 0,
+  "new_native_updates": 0,
+  "limits": [
+    "Partial image precision policy; not exact native layout/rounding/pooling subgradients.",
+    "Precision changes fusion and cuDNN selection; not a storage-only or additive savings estimate.",
+    "One complete timing pair, not learning evidence or SM utilization.",
+    "Native timing is retained, not a new simultaneous native/JAX comparison.",
+    "No production/default/backend change or Atari restart."
+  ],
+  "artifacts": {
+    "analyze.py": "5dc72c23c0e1c2b7bf3477dabda039407fb575f46303efee8951842aec18756e",
+    "analyze-v2.py": "a16347793b66768493675fb97e5447f010af63d390f9b4a6d118db6fe82fe92c",
+    "analyze-v3.py": "a7eeb82c79a521d52f3daa34ce9cfb74a224159cdcd09b64d170cbd8f0e7e4f8",
+    "work-difference.json": "9e752a641f346f354895478f5a99ca7a22f7bfd92a74d00fa154a78cf992fa53",
+    "convolution-calls.json": "22f2714751b4ff371c798694ee34e5a7d224fc03b4567363763f694ffe3f5756",
+    "qualification-v2-queue/qualification-v2/result.json": "1a4905609452332e337dee19dc335a4e36ccfa109cc49d053a9193005615d5a4",
+    "timing-queue/baseline/result.json": "38556c75586c26b6bc107cb58ce043b6a46dffc7cdb9dfdd1e16a0a38119fd9f",
+    "wide-v3-queue/wide-v3/result.json": "f6af58fdf66fbbbce00546ff67545eb98638fec1fff93fdbedc40bdeb55f589f",
+    "qualification-queue/qualification/result.json": "ba31cd282519feff4e3e8eee6ff766f117d4449d217646ef089da8becd647769",
+    "timing-queue/wide/result.json": "7b9f5646b0aa99e4d6005789a4fc408442d61c0225a31459b0579491271566d3",
+    "baseline/result.json": "8a35f9d1dea2cdab0f63b4d1c0657d99477ac22d49b0a27f7f464dbd642a8ffa",
+    "baseline/state-fingerprints.json": "04febdeb607a51e30d4b4731b19f1bac4f4fe7ca25363f3c6020ab8c249b4b65",
+    "baseline/metrics.json": "ae7ab0e128078d0acb9d023e084d94814ed3c6c8b77ccc14b5c4495fe5ed0ad6",
+    "baseline/batch-preflight.json": "d90cae51c4cd8456aa09693feb6a9a3975b99d2017c2e0c763770982450e20a1",
+    "baseline/image-dtype-preflight.json": "d0fc5c28597edd5de28383a71b6bbc797d4ef8739fa2bb19130f372e19290291",
+    "baseline/compiled-memory.txt": "7a590e05ddb2bc2588f901e96966a6ec5d480fd06e7b811880199e20b342e44d",
+    "wide-v3/result.json": "34c27626dbf9f2386cf58344b620f07d9cd89daafb39a82c99e3508aec18044d",
+    "wide-v3/state-fingerprints.json": "5558b718d81046afc5a7680afefa3153b9de000e25216865ef02ea57508025d0",
+    "wide-v3/metrics.json": "ab52c81ad5ae19ef154d9f915467b4aa8697f90737358c924a4a818fea32c519",
+    "wide-v3/batch-preflight.json": "f5256125fda30d3ec3a2f91f61f0dae31bec57b60a453213d36deec3b333246b",
+    "wide-v3/image-dtype-preflight.json": "ba231220ba9ca673ebdfada3fdf2ab7e026d27f6d450339c9b45cb96e86d4a5d",
+    "wide-v3/compiled-memory.txt": "c02f8c9866918a888d6e6cef222a47995f315632cfe3e27fcf883dabe7ad2083"
+  }
+}
