@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Incremental checked-convolution addresses qualify:**
+  [result](docs/results/2026-10-14-convolution-iterators.md). Same cached complete
+  RGB25.475→24.340ms (4.45%), now1.90× retained complete JAX12.836ms.
+  All272 reports/first outputs/plans/pipelines/initial-first-final292 tensors
+  exact. Five boundary kernels3.747→2.501ms; decoder dW37.15%/forward28.43%
+  faster, unchanged dX. Same arithmetic/precision/tiles/K partitions/barriers;
+  shared typed cursors, not a BF16-specific engine.70,264,192 exact compared
+  values/1,280 F64 probes,40 derivative cases/17 partials,32 typed/alias cases
+  and288,675 CPU address checks pass. F32 storage qualifies, not native F32
+  cooperative multiplication. Seven guards/zero warnings;592 synthetic updates,
+  1,460 boundary calls/zero actions. No worker/production/CDP/learning promotion.
+  Nativeb9152764, numerical5e178d83. Keep isolated candidate; next distinguish
+  remaining staging/reuse and device-execution costs, not an iterator/tile
+  sweep. Full gap stays open. CI391 passes on preceding7f28899.
 - **Checked convolution's dominant cost is address-generation work:**
   [matched operations and Nsight counters](docs/results/2026-10-14-boundary-algorithms.md).
   Five native kernels total3.748ms; encoder forward/dX are competitive, while
@@ -21,11 +35,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   F32 JAX gradient-output controls widen operands: no storage-policy isolation.
   Five guards pass; first fixture's BF16-input assertion fails before dispatch,
   repaired via internal buffers with source/binary/failure retained. No actor
-  updates/actions/production change/worker. Next general incremental typed
-  convolution iterators, hoisted coordinates/deltas/masks, same arithmetic first;
-  complete-update proof before generalizing. No scalar revival, geometry sweep,
-  dtype-specific kernel or precision relaxation. Whole25.530/12.836ms gap stays
-  open;~3.75ms checked footprint does not explain it all. CI390 passes.
+  updates/actions/production change/worker. The general incremental typed
+  iterator intervention above now demonstrates the native causal benefit.
+  No scalar revival, geometry sweep, dtype-specific kernel or precision
+  relaxation. The checked footprint does not explain the whole gap. CI390 passes.
 - **Command reuse removes a structural host bottleneck:**
   [result](docs/results/2026-10-14-command-cache.md). Same RGB complete updates
   28.416->25.530ms (10.16%), exact272 reports/first outputs/plans/pipelines/

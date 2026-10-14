@@ -8,7 +8,16 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-**The newest counter evidence identifies wasted address-generation work.**
+**Repeated convolution indexing is now a demonstrated native bottleneck.**
+The [incremental iterator intervention](results/2026-10-14-convolution-iterators.md)
+cuts complete cached RGB25.475→24.340ms (4.45%), exact272 reports/first outputs/
+plans/initial-first-final292 tensors. Decoder dW improves37.15%, forward28.43%;
+the five boundary kernels total3.747→2.501ms. Shared typed cursors retain all
+arithmetic, precision, tiles, partitions and barriers. Numerical/address/alias
+checks and seven guards pass, zero warnings. Keep it isolated; no production/
+CDP/learning qualification. No further iterator/geometry sweep.
+
+The preceding counter evidence explains why this was worth changing.
 The [RGB-boundary study](results/2026-10-14-boundary-algorithms.md) matches all
 five native kernels and isolates decoder forward/dW at1.310/1.742ms versus
 cuDNN.261/.338ms. Encoder forward/dX are competitive. The dW CUDA bridge
@@ -39,12 +48,13 @@ has been established.
 | --- | ---: |
 | Retained isolated RGB12M/B8/BF16, row selection + latest compiler | 28.213ms |
 | Isolated command-cache candidate, fresh ordinary full pair | 25.530ms |
+| Isolated incremental-address candidate, fresh ordinary full pair | 24.340ms |
 | Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
 | Retained isolated CDP12M/B32/mixed, row selection + latest compiler | 93.084ms |
 
-The retained RGB control is2.20× complete JAX; the new cache candidate is
-**1.99×**. CDP is a different
+The retained RGB control is2.20× complete JAX; the current iterator candidate is
+**1.90×**. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
@@ -190,14 +200,23 @@ with repaired validation logging;1152 total synthetic updates/zero actions.
 
 Keep the isolated improvement, not a portable production/CDP qualification.
 The remaining~2x gap still requires actual GPU algorithm/dependency work.
-That matching is now complete in the boundary study above. Next implement a
-general incremental convolution iterator, hoisting repeated coordinates/pointer
-deltas/masks while initially preserving its tile and arithmetic schedule.
-Cost complete updates before generalizing; no scalar revival, BF16-only fork
-or geometry sweep. JAX's F32-output controls widen operands and do not isolate
-gradient storage precision. The five kernels'~3.75ms footprint cannot explain
-the whole12.69ms residual; CUDA graphs' lower device issue cost and other
-GPU work stay in scope. No whole-gap or Atari-learning closure.
+That matching and the incremental-address intervention are now complete above.
+Next distinguish the remaining staging/reuse cost from device dependency cost
+on the current candidate, rather than repeat an iterator/tile sweep. JAX's
+F32-output controls widen operands and do not isolate gradient storage precision.
+The five kernels' remaining~2.50ms footprint cannot explain the whole11.50ms
+residual; matrix/other materialized work and CUDA graphs' lower device issue
+cost stay in scope. No whole-gap or Atari-learning closure.
+
+An API/literature check does not supply a shortcut: Vulkan's NV generated-command
+spec allows individual dispatches to execute in any order; a generated list is
+not a replacement for our dependent compute chain. Preserve real dependencies.
+[Khronos specification](https://docs.vulkan.org/spec/latest/chapters/device_generated_commands/generatedcommands.html#vkCmdExecuteGeneratedCommandsNV).
+A recent A40/CUDA11.8→13.0 command-stream study attributes lower **host launch**
+cost to a smaller submission footprint. It explicitly avoids interpreting
+undocumented commands; it does not explain our already-prequeued5080 device
+timing or establish Vulkan equivalence. No driver modification/reload is proposed.
+[Primary study, §6.3](https://arxiv.org/html/2604.26889v1#S6.SS3).
 
 The [general reduction prototype](results/2026-10-14-connected-row-region.md)
 passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives

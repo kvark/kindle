@@ -8,8 +8,8 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Best isolated complete RGB12M/B8/BF16 updates take **25.530 ms versus JAX
-12.836 ms: still 1.99×**. Production remains on its earlier qualified~53 ms
+Best isolated complete RGB12M/B8/BF16 updates take **24.340 ms versus JAX
+12.836 ms: still 1.90×**. Production remains on its earlier qualified~53 ms
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
@@ -23,6 +23,9 @@ a much larger Dreamer workload. Three structural differences have evidence:
   integer indexing, although cuDNN issues12.5% more identical BF16 tensor
   instructions. Bridge counters are not native Vulkan counters; two primitive
   library algorithms differ from the full executable, dominant dW matches.
+  The [native iterator intervention](results/2026-10-14-convolution-iterators.md)
+  now cuts decoder dW37.15% and complete updates4.45% with exact reports/states:
+  repeated indexing is a demonstrated cause, not the whole explanation.
 - Host construction: [command reuse](results/2026-10-14-command-cache.md)
   saves10.16% of complete update time with exact reports/states. It removes
   repeated bindings/recording, not GPU operations or dependencies.
@@ -30,10 +33,10 @@ a much larger Dreamer workload. Three structural differences have evidence:
   find about2.05µs per dependency for Vulkan/ordinary prequeued CUDA versus
   .65µs for CUDA graphs. Host command reuse does not establish that advantage.
 
-Next: efficient incremental convolution iterators and staging in the shared
-typed path, preserving arithmetic/boundary checks first; require complete-update
-evidence before generalizing. The checked kernels occupy only~3.75 ms, so keep
-matrix efficiency, materialization and device dependencies in scope. No tile/
+Next: distinguish remaining staging/reuse costs from the device-execution floor,
+on the current shared typed path; require complete-update evidence before
+generalizing. The five checked kernels now occupy only~2.50 ms, so keep matrix
+efficiency, materialization and device dependencies in scope. No iterator/tile/
 occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
 Detailed successful and rejected interventions remain in the backend plan and
 linked results; individual savings are not additive. The full goal stays open.
