@@ -78,14 +78,24 @@ restoration and all192 cache checks pass, but skipping producers changes the
 intermediate contents and execution context. The interaction's cause is not
 established. Four guards/zero warnings; all six CPU failures remain.
 
-**Next: sparse timing in the intact cached graph**, preserving real operands,
-producer execution, alias lifetimes and dependencies. Require exact reports/
-states and a bounded complete-update perturbation before attributing image and
-surrounding work. No new image/row/layout/dtype/tile optimization based on these
-masked rankings, failed miniature-JAX retry or broad capture. Convolution
-algorithm/staging remains a measured gap; host decode/targets remain a separate
-5.383ms opportunity, not additive savings. Production/Atari and the full goal
-remain unchanged/open.
+**[The intact trace fails its overhead gate](results/2026-10-14-middle-convolution.md):**
+63.577→65.704ms adds3.346%, above3%, despite exact reports/plans/states. Its
+mixed intervals are not ordinary component latency. The actual intermediate
+encoder derivatives separately take2.148/2.015ms versus BF16 cuDNN.479/.550ms;
+all16.8M rounded outputs and native256 F64 coordinates pass. Both cuDNN tunings
+differ from full JAX; its auxiliary widened-F32/Winograd dW fails127/128 probes
+and remains unqualified. Native already uses BF16 tensor operations.
+
+**Grouping does not explain the larger intact interval:** shared-dy heavy
+kernels grouped/serialized both take4.165ms, with100.9M exact checks. No grouping
+change or sweep. Next reproduce the full five-operation group with captured
+learner operands/buffer context, including omitted reductions; distinguish
+data/cache/allocation effects and timing scope before another kernel change.
+Do not repeat the same sparse timing for a nicer gate or revive masked rankings.
+Current complete B32 remains2.39× retained JAX. Kernel algorithms, connected
+execution and host decode/targets remain distinct problem areas, not additive
+savings. No image/row/layout/dtype/tile sweep, broad capture, production change
+or Atari restart; the full goal stays open.
 
 **Bigger batches expose another implementation limit, not parity.** The
 [matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures

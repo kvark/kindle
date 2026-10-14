@@ -7,26 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Connected image training is numerically qualified, barely above its speed gate:**
-  [result and failed attribution interpretation](docs/results/2026-10-14-image-training-region.md).
-  Complete RGB12M/B32 control/candidate65.609→63.640ms,3.0015%; retain isolated
-  e1a2407c, not robust speed/production promotion. Still2.39× retained original
-  JAX26.632ms,2.37× widened JAX26.876ms. Eight regions,4,089→4,023 world
-  dispatches;514 convolution/matrix-family descriptors unchanged. All292 initials,
-  first posterior/targets/world total exact;96 first/289 final tensors and270
-  reports differ after reduction reassociation. No learning-equivalence claim.
-  144 shader variants/168 protected CPU plans/42 GPU cases/1,266,240 values pass;
-  staged/alias/poison and BF16 cast boundaries qualify. Follow-up intact graph/
-  state restorations pass, but masked image/rest times strongly interact:
-  heavy-only26.822,heavy+image48.419,heavy+other31.689,full38.238ms. Formal
-  image14.073/other−2.657ms allocations are not usable kernel costs. No causal
-  explanation for that interaction is established. Next sparse timing in the
-  intact cached graph with real values/dependencies, exact reports/states and
-  a bounded whole-update perturbation gate—not another masked ranking or
-  image/row/layout/dtype/tile optimization. Four guards/zero warnings,545
-  synthetic updates/367 optimizer-free world replays/zero actions/workers;
-  six CPU failures/source snapshots retained, no GPU retry/tolerance change.
-  Production/Atari unchanged; full root-cause and five-game goals remain open.
+- **Intermediate convolution cost is real; full-context attribution remains open:**
+  [result and failed controls](docs/results/2026-10-14-middle-convolution.md).
+  Actual B512/32→48 encoder dX/dW descriptors take2.148/2.015ms versus isolated
+  cuDNN.479/.550ms, already BF16 tensor products. All16,815,616 rounded values/
+  native256 F64 coordinates pass; both miniature cuDNN tunings differ from full
+  JAX. Its auxiliary widened-F32/Winograd dW fails127/128 probes; retain it,
+  not a qualified precision control. Intact sparse timing preserves all272
+  reports/plans/first outputs/three292-tensor boundaries, but63.577→65.704ms
+  adds3.346%, failing3%. Mixed8.085ms group is not ordinary component latency.
+  Its two heavy kernels grouped/serialized both take4.165ms (.0084% difference),
+  with100,893,696 exact checks; no grouping change/sweep. Next reproduce the
+  complete five-operation group using captured learner operands/buffer context:
+  omitted reductions, data/cache/allocation and timing scope remain unseparated.
+  No new kernel optimization or masked ranking from that unexplained interval.
+  Seven guards/zero warnings,592 synthetic updates/584 native and648 JAX
+  primitive calls/zero actions/workers. CPU and numerical failures retained;
+  no GPU retry/tolerance relaxation. Keep isolated image candidatee1a2407c and its
+  [borderline3.0015% result](docs/results/2026-10-14-image-training-region.md),
+  not production/learning promotion. Current complete B32 remains2.39× retained
+  JAX; production/Atari, root-cause and five-game goals remain unchanged/open.
 - **Wide-image JAX control complete:** [result](docs/results/2026-10-14-image-precision-control.md).
   Complete RGB12M/B32 original/wide26.632→26.876ms,0.92%; retained native
   65.736ms is still2.45× wide JAX. F32 image bias/pool/norm/activation does not

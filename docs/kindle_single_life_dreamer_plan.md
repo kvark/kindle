@@ -48,10 +48,16 @@ without robust-speed, learning-equivalence or production promotion claims.
 The subsequent exact-restoring masked diagnostic cannot rank the remainder:
 removing unrelated operations makes image-enabled execution slower, producing
 a negative formal allocation for other work. Do not interpret it as kernel
-latency. Next measure sparse regions in the intact cached graph, preserving
-real data flow and qualifying whole-update perturbation. No further optimization
-based on masked rankings. The separate convolution algorithm/staging gap remains
-open too.
+latency. The [intact sparse trace](results/2026-10-14-middle-convolution.md)
+preserves exact results but fails its3% overhead gate at3.346%; its mixed scopes
+are not ordinary component costs. Exact actual intermediate encoder derivatives
+separately take2.148/2.015ms versus BF16 cuDNN.479/.550ms, with all16.8M rounded
+outputs agreeing. Both miniature library tunings differ from full JAX; an
+auxiliary F32/Winograd control fails and remains unqualified. A shared-group
+control finds no interference: grouped/serialized both4.165ms with100.9M exact
+checks. Next reproduce the full five-operation group with real learner operands
+and buffer context before another kernel change; no masked ranking or grouping
+sweep. The unchanged complete B32 candidate remains2.39× retained JAX.
 Host decoding/targets remain a separate GPU-residency opportunity.
 No pool/row/grid/tile/dtype sweep or broad capture. Production and Atari stay
 unchanged; the full performance goal remains open.
