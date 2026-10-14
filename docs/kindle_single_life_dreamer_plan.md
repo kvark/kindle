@@ -28,8 +28,11 @@ a much larger Dreamer workload. Three structural differences have evidence:
   repeated indexing is a demonstrated cause, not the whole explanation.
   The [matrix attribution](results/2026-10-14-matrix-cost.md) finds the checked
   small-product path costs2.903ms/63.54% of matrix time for12.01% of matrix MACs;
-  all already use BF16. Match recurrent eight-row/short-reduction library
-  algorithms next; this is not a new speedup or a proven replacement kernel.
+  all already use BF16. The [matched matrix counters](results/2026-10-14-matrix-library.md)
+  now find identical tensor work/near-identical occupancy, but3.40× instructions
+  in a CUDA translation reproducing native grouped-forward cost: scalar16-bit
+  staging versus cuBLAS128-bit vectors. Four actual contracts pass exact outputs;
+  whole JAX layouts/addends/storage differ, counters are not native Vulkan.
 - Host construction: [command reuse](results/2026-10-14-command-cache.md)
   saves10.16% of complete update time with exact reports/states. It removes
   repeated bindings/recording, not GPU operations or dependencies.
@@ -41,9 +44,9 @@ a much larger Dreamer workload. Three structural differences have evidence:
   about2× slower. All3,204 counters pass; close this API-flag detour. This is
   not a universal Vulkan limit or a fresh complete-learner measurement.
 
-Next: distinguish remaining staging/reuse costs from the device-execution floor,
-on the current shared typed path; require complete-update evidence before
-generalizing. The five checked kernels now occupy only~2.50 ms, so keep matrix
+Next: one alignment-proven vector-staging intervention in the shared typed
+checked path, with safe tails/groups/transposes and independent numerical plus
+complete-update checks. The five checked convolutions occupy only~2.50 ms, so keep matrix
 efficiency, materialization and device dependencies in scope. No iterator/tile/
 occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
 Detailed successful and rejected interventions remain in the backend plan and

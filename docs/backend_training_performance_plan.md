@@ -8,6 +8,32 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Checked matrix staging wastes instructions even when tensor work matches.**
+The [matched matrix/counter study](results/2026-10-14-matrix-library.md) verifies
+four actual native contracts and2,672,640 exact F64/JAX values. Grouped forward
+costs10.357µs native/10.324µs in a checked CUDA translation versus3.930µs for
+cuBLAS kernels. Counters show the same24,576 BF16 tensor instructions and
+near-identical occupancy, but3.40× warp instructions/5.22× integer work:
+scalar16-bit staging versus128-bit vector transfers. This is not missing
+tensor support or a case for more occupancy. Counters describe the translation,
+not native Vulkan; whole JAX changes addends/transposes/output contracts, so
+the miniature is not exact full-executable algorithm parity. Five guards pass,
+two failed fixtures/control retained, zero allocation warnings/actions/updates.
+No new whole-update speed claim; current24.340/12.836ms stays1.90×.
+
+Next implement one alignment-proven vector-staging path within the shared typed
+checked generator, retaining safe tails/transposes/groups and explicit storage/
+multiply/output types. CPU contracts, independent GPU numerics, then one complete
+update pair; no BF16-only fork or geometry/occupancy sweep. The existing aligned
+engine already stages vectors; small/irregular shapes must not lose that benefit
+merely because they need bounds checks. No promise this closes the full gap.
+
+Precision continuity remains separate: native matrix outputs247 BF16/469 F32
+versus JAX456/96, not a one-to-one mapping. Native backward intentionally widens
+intermediates; latest upstream retains that policy. Its independent time cost
+is unmeasured. The extra BF16-output small-row control fails exact single
+rounding and stays failed; all four actual native contracts keep exact checks.
+
 **Matrix inefficiency is concentrated in the checked small-product path.**
 The [current-candidate attribution](results/2026-10-14-matrix-cost.md) assigns
 2.903ms/63.54% of matrix cost to521 checked products doing only12.01% of nominal
@@ -16,9 +42,9 @@ World recurrence supplies2.568ms of the checked cost.302 products have eight
 rows,160 additional products reduce only eight elements. Plans/outputs/reports/
 292 tensors remain exact; one original update,1,468 optimizer-free replays,
 one guard/zero warnings. These are interacting fixed-graph allocations, not a
-new whole-update speed claim. Next match actual small-row/short-reduction dense
-and grouped library algorithms, including precision/addends, before choosing a
-general small-product kernel or cross-use gradient aggregation. Retained full
+new whole-update speed claim. The matched small-row/short-reduction library
+study above now motivates general checked staging rather than a new algorithm
+or cross-use gradient aggregation. Retained full
 HLO has96 reduction-eight cuBLAS calls with BF16 inputs/F32 results and `beta=1`;
 those counterparts do not avoid F32 accumulation. No tile sweep.
 The separate standard Vulkan executable query returns statistics but zero
