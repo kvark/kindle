@@ -25,15 +25,26 @@ has been established.
 
 | Current whole-update boundary | Time |
 | --- | ---: |
-| Isolated native RGB12M/B8/BF16, wider fusion + GPU RNG/EMA | 29.169ms |
-| Fresh JAX core, same model/batch size | 12.420ms |
+| Isolated native RGB12M/B8/BF16, wider fusion + GPU RNG/EMA + row selection | 28.479ms |
+| Retained JAX core, same model/batch size | 12.420ms |
 | JAX including caller seed/metric handling | 12.836ms |
-| Isolated native CDP12M/B32/mixed + GPU RNG/EMA | 94.059ms |
+| Isolated native CDP12M/B32/mixed + GPU RNG/EMA + row selection | 93.001ms |
 
-RGB remains **2.27×** the retained complete JAX caller boundary. CDP is a different
+RGB remains **2.22×** the retained complete JAX caller boundary. CDP is a different
 workload and is not compared directly to that JAX number. Production stays
 on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
 have not changed installed pins/defaults or restarted Atari.
+
+The [row-selection intervention](results/2026-10-14-row-selection.md) limits
+the dependency-count hypothesis: groups fall2,271→2,058 RGB /2,483→2,253 CDP,
+but fresh complete updates improve only28.777→28.479ms /93.938→93.001ms, about1%.
+Every272-report/first-output/saved-tensor comparison is exact. Preserve its
+reviewed uniform-binding failure and one matrix-addend fusion difference.
+Do not continue a row-operation tuning campaign or equate fewer groups with
+proportional throughput. The source audit instead exposes a concrete selector
+inconsistency: dense64×64 tiles still choose K splits from a32×32 grid estimate;
+grouped products already use their actual grid. The next bounded check below
+tests that mismatch, not a new sweep or a promised major speedup.
 
 The [device RNG intervention](results/2026-10-14-device-rng.md) now saves
 6.80% RGB /8.44% CDP against fresh32.246→30.053ms /104.048→95.269ms controls.
@@ -74,7 +85,7 @@ What is now causally established:
   removes 10.319G nominal MACs/895 dispatches and improves complete RGB
   39.392→33.681ms. Mixed CDP's different forward/world precision intentionally
   stays on its existing path.
-- **Fine-grained dependencies remain expensive.** The current 5,500-dispatch
+- **Fine-grained dependencies remain expensive.** The pre-selection5,500-dispatch
   graph has 2,267 inter-group barriers. Its empty stream takes 4.709ms with
   full, partial or no memory-access masks, keeping compute execution ordering.
   Access-mask weakening is not the fix; real dependencies must remain correct.
@@ -111,14 +122,15 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: change the compiled execution unit, then finish device target dataflow.**
+**Next: qualify one actual-grid selector correction, then reassess weighted cost.**
 
-1. Address row selection/normalization-backward fusion and safe broadcast/view/
-   layout propagation on the measured dependency chains. Reuse existing general
-   row templates and upstream indexing operations; no Dreamer-only kernel or
-   scalar/binding-cap/tile sweep. Preserve shared outputs, backward lifetimes,
-   explicit BF16 rounding and preparation roots. Measure logical depth and
-   complete-update cost; neither is sufficient without numerical checks.
+1. Complete the [actual-grid dense split check](experiments/2026-10-14-dense-launch-grid.md).
+   Apply existing thresholds to the selected tile; keep algorithms, precision
+   and fused-addend exclusions fixed. CPU plans identify55 RGB/53 CDP affected
+   products, not a measured speedup. Qualify changed reduction orders before
+   one complete pair/workload. Then reassess weighted expensive-work and
+   execution overhead. The row-selection result does not justify another
+   scalar/row/binding-cap/tile sweep or a bespoke Dreamer kernel.
 2. GPU RNG and EMA qualify in the isolated candidate, with EMA's later
    trajectory differences retained. Target attribution is complete; move
    construction onto device. Posterior readback also refreshes CPU replay and

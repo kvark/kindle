@@ -8,18 +8,21 @@ Updated October 14, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-Latest isolated candidate: [device EMA](results/2026-10-14-device-ema.md) reduces
-RGB30.260→29.169ms and larger-batch CDP95.473→94.059ms. Independent numerics
-pass; later trajectories differ. It builds on [exact-sequence GPU RNG](results/2026-10-14-device-rng.md),
-which separately reduced RGB32.246→30.053ms with exact reports/tensors.
-RGB remains2.27× retained complete JAX12.836ms; production stays on the earlier
-qualified~53ms runtime. The new [target attribution](results/2026-10-14-target-boundary.md)
-finds only2.027ms RGB host target/preparation/upload work against the~16.3ms gap.
-Imagination839 groups/839-node logical dependency depth and world1,387/1,383
-show why reordering alone cannot help much. Next row/indexing/backward and
-safe layout fusion, then device targets; keep required CPU replay readback.
-All numerical states/reports are exact in the unchanged capture. No Atari restart,
-learning-quality claim or whole-goal closure.
+Latest isolated candidate: [row selection](results/2026-10-14-row-selection.md)
+reduces RGB28.777→28.479ms /CDP93.938→93.001ms with exact reports/tensors.
+Removing about9% of dependency groups saves only1% of whole-update time:
+no row-operation tuning campaign or group-count-based speedup forecast.
+It builds on qualified [GPU RNG](results/2026-10-14-device-rng.md) and
+[device EMA](results/2026-10-14-device-ema.md), whose later trajectories differ.
+RGB remains2.22× retained complete JAX12.836ms; production stays on the earlier
+qualified~53ms runtime. [Target attribution](results/2026-10-14-target-boundary.md)
+also limits the host explanation: only2.027ms RGB in selected preparation/
+target/upload regions; required CPU replay readback remains.
+Next one [actual-grid dense selector check](experiments/2026-10-14-dense-launch-grid.md):
+64×64 dense tiles still choose splits using a32×32 grid estimate, unlike the
+grouped path. This is source evidence, not yet a measured speedup. Then reassess
+weighted kernel/execution costs; no sweep, Atari restart, learning-quality
+claim or whole-goal closure.
 
 ### Retained causal findings
 

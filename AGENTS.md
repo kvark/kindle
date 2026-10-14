@@ -7,6 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Row selection qualifies, but dependency counts overstate its benefit:**
+  [result](docs/results/2026-10-14-row-selection.md). Fresh RGB28.777→28.479ms /
+  CDP93.938→93.001ms: only1.04%/1.00%, despite groups2,271→2,058/2,483→2,253.
+  Both24-update smokes and all272 full-run reports/first outputs/initial-first-
+  final292/346 tensors are exact.32 CPU tests/52 shader cases,144 primitive
+  cases/2,922,192 exact one-hot values/21 F64 derivatives and eight guards pass.
+  Retain the original failed infinity-row guard: static(1,0,1) binding zeroed
+  runtime-one/table fields; bounded diagnosis and preserving those fields fix
+  it without gate relaxation. Five warnings,1,136 synthetic updates, zero
+  actions/recovery/workers. One RGB backward addend moves into its pointwise
+  consumer; failed strict inventory and reviewed exact exception remain.
+  Candidate6d892a3d stays isolated; RGB2.22× retained complete JAX12.836ms,
+  no fresh JAX or production/learning change. CI379 passes.
+  **No row-operation tuning campaign.** A CPU audit identifies55 RGB/53 CDP
+  dense products whose split selector assumes32×32 despite actual64×64 tiles;
+  grouped products already use their actual grid. The [next bounded check](docs/experiments/2026-10-14-dense-launch-grid.md)
+  applies the same rule to the actual tile, no threshold/algorithm sweep.
+  No speedup/underutilization claim before numerical qualification and one
+  matched whole-update pair. Broader root-cause/performance goal remains active.
+
 - **Residual target boundary attributed; prioritize compiler execution depth:**
   [result](docs/results/2026-10-14-target-boundary.md). Unchanged RGB29.084ms/
   CDP94.001ms captures match all272 reports, first outputs, plans and292/346
@@ -16,9 +36,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   cost. Posterior readback also feeds CPU replay/truncated training: retain it.
   RGB imagination839 groups/839-node longest logical chain; full world including
   prefix1,387/1,383. Reordering cannot remove real dependencies; these are
-  unweighted counts, not GPU critical-path times. Next general row selection/
-  normalization-backward and safe broadcast/view/layout lowering on these chains,
-  then device targets; no large bespoke target pipeline or scalar/tile sweep.
+  unweighted counts, not GPU critical-path times. The subsequent row-selection
+  intervention above limits their predictive value; do not continue a chain-
+  count-driven sweep. Device targets remain useful, not the whole-gap explanation.
   Two guards, zero warnings/faults,544 synthetic updates, zero game actions;
   bounded CPU audits/build/Clippy pass. Native17f1e5e is instrumentation only,
   production unchanged, no worker. CI378 passes; broader goal stays active.
