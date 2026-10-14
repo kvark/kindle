@@ -40,7 +40,14 @@ only1.00% RGB/.92% CDP against these fresh controls. Numerical/plan checks pass,
 but trajectories differ; additional partitions also add reductions, stores
 and dependencies. Preserve the isolated candidate, not a promotion or another
 grid test. The table deliberately retainsb3a086f, not the grid candidate.
-Re-profile its weighted residual costs before another optimization.
+The [fresh weighted profile](results/2026-10-14-residual-reassessment.md)
+now covers every update, including GPU RNG/EMA and asynchronous tails.
+Native GPU-pass union22.144ms versus retained JAX10.295ms dominates the
+captured gap; RNG+copies+EMA total only.430ms. Fixed-session masks allocate
+6.888ms convolution/4.475ms matrices/5.545ms other plus4.272ms empty command
+stream. These are interacting cost allocations, not additive promised gains.
+Single-chunk ordinary/coarse30.066/30.115ms preserves all reports/states with
+.16% instrumentation overhead; normal four-chunk28.213ms remains separate.
 
 The [latest upstream compiler check](results/2026-10-14-storage-propagation.md)
 finds no material5080 gain: fresh RGB28.197→28.314ms/CDP92.965→93.049ms,
@@ -138,16 +145,20 @@ First-max sampling, recursive feature concatenation and opaque backward/cast
 boundaries expose concrete row/indexing operations for a coherent compiler
 change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
 
-**Next: remeasure weighted residual cost on the improved stack.**
+**Next: test a concrete heavy-kernel arithmetic cost, not another count-based tweak.**
 
-1. Follow the [bounded residual reassessment](experiments/2026-10-14-residual-reassessment.md)
-   on retainedb3a086f. Earlier weighted profiles predate several interventions;
-   port qualified coarse GPU/CPU instrumentation, now including GPU RNG/EMA
-   submissions, and require exact ordinary/instrumented states/reports/plans.
-   Attribute actual time before another compiler change. A time-batchable prior
-   head is visible in source but only~.33% of nominal matrix/conv work; neither
-   MACs nor dependency counts establish its runtime importance. No scalar/row/
-   binding-cap/tile sweep, invalid Vulkan Nsight retry or bespoke Dreamer kernel.
+1. Follow the [bounded accumulation-cost diagnostic](experiments/2026-10-14-accumulation-cost.md).
+   Current dW kernels maintain extra total/error accumulator matrices and
+  16 compensated256-position blocks per partition. Measure whether the numerical
+   contract materially affects performance before blaming it or changing it.
+   Use fixed optimizer-free work and independent error accounting; no gate
+   relaxation, fast-path qualification or learning from diagnostic gradients.
+   Nsight CUDA twins are conditional on a substantial measured effect, not a
+   new capture sweep. Actual register pressure remains unmeasured.
+   Continue general shared typed algorithms/coarser compiled execution, not
+   another scalar/row/binding-cap/tile sweep or bespoke Dreamer kernel.
+   The time-batchable prior head remains an unweighted source observation,
+   not an established large opportunity.
 2. GPU RNG and EMA qualify in the isolated candidate, with EMA's later
    trajectory differences retained. Target attribution is complete; move
    construction onto device. Posterior readback also refreshes CPU replay and
@@ -173,12 +184,14 @@ moving `train_world` earlier is not equivalent. Preserve microbatch/BPTT and
 mixed-precision fallbacks; keep useful submission overlap until a measured
 replacement exists.
 
-The [residual GPU accounting](results/2026-10-13-residual-gap.md) and current
-CPU captures use different schedules/instrumentation. Do not add their intervals
-as independently removable budgets or label them ordinary SM utilization.
-Fourteen new guards pass, two diagnostic failures/five allocation warnings
-remain, 1,953 full synthetic updates and zero actions. No worker remains at
-publication. The full root-cause/performance goal stays active.
+The [current residual accounting](results/2026-10-14-residual-reassessment.md)
+and retained JAX capture use different schedules/instrumentation. Keep the
+1.048ms ordinary-versus-captured gap difference explicit. Native command-
+building/submission spans4.548ms and decode/targets1.513ms in the single-chunk
+capture; do not count GPU waits again as CPU arithmetic or claim SM utilization.
+Four current guards pass/one warning,569 synthetic updates and2,380
+optimizer-free session replays, zero actions/workers. All source/CPU coverage
+failures remain. The full root-cause/performance goal stays active.
 
 ## Retained qualified implementation boundaries
 

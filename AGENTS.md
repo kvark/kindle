@@ -7,19 +7,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Actual-grid split check closes without a material gain:**
-  [result](docs/results/2026-10-14-dense-launch-grid.md). RGB28.213→27.931ms /
-  CDP93.084→92.232ms, only1.00%/.92%.14 affected-shape cases verify1,769,472
-  outputs/6,684,672 F64 partial values over three executions; existing numerical
-  groups,35 CPU tests/52 shader cases and both Clippy checks pass. Exact initials,
-  finite states, all product descriptors match except declared partitions/stores;
-  later trajectories differ.12 guards/four warnings, one retained test API
-  failure;1,136 full synthetic+144 small optimizer updates, zero actions/workers.
-  Keep source/evidence, not a performance-baseline promotion or grid sweep.
-  Retainb3a086f/Blade96c1dc7/Naga a97559b for the
-  [next weighted residual profile](docs/experiments/2026-10-14-residual-reassessment.md).
-  New GPU RNG/EMA need complete trace coverage; no invalid Vulkan Nsight GPU
-  timestamps/Graphics retry. Production/Atari unchanged; broader goal active.
+- **Fresh residual attribution confirms a GPU execution gap:**
+  [result](docs/results/2026-10-14-residual-reassessment.md).
+  Isolated ordinary28.213ms versus complete retained JAX12.836ms remains2.20×.
+  Single-chunk ordinary/coarse30.066/30.115ms (.16% trace cost) preserves all272
+  reports/first outputs/plans/initial-first-final292 tensors. All272 updates
+  include20 steady-state passes and async tails;45 scalar probes/three checkpoint
+  copies are accounted separately. GPU-pass union22.144ms versus JAX10.295ms;
+  RNG+copies+EMA only.430ms. Current masks allocate convolution6.888ms,
+  matrices4.475ms, other5.545ms plus4.272ms empty command stream; not pure
+  kernel times or additive savings. Four guards/one warning,569 synthetic updates/
+  2,380 optimizer-free replays, zero actions/workers. CPU coverage assertion and
+  unused first instrumentation build remain; no GPU retry. Production unchanged.
+  No row/grid/binding sweep or invalid Vulkan Nsight/Graphics retry.
+  The [next bounded check](docs/experiments/2026-10-14-accumulation-cost.md)
+  tests whether extra compensated weight-gradient accumulation imposes a
+  substantial cost: all eight actual dW dispatches use16 compensated blocks.
+  Register/spill pressure is only a source hypothesis. Keep gates/failures;
+  diagnostic alternative gradients must never update an actor/optimizer.
+  The [actual-grid trial](docs/results/2026-10-14-dense-launch-grid.md)
+  stays unpromoted (~1% gain, changed trajectories). Retainb3a086f/compiler
+  96c1dc7/a97559b. No Atari allocation or whole-goal closure; CI382 passes.
 
 - **Latest compiler does not materially close the5080 gap:**
   [result](docs/results/2026-10-14-storage-propagation.md). Blade96c1dc7/

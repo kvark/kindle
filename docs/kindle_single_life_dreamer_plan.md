@@ -25,9 +25,14 @@ target/upload regions; required CPU replay readback remains.
 The [actual-grid selector check](results/2026-10-14-dense-launch-grid.md) now
 passes numerical gates but saves only1.00%/.92%, with changed trajectories.
 Keep its evidence, not a performance promotion or grid sweep. Retained control
-b3a086f measures28.213/93.084ms. Next [re-profile weighted residual cost](experiments/2026-10-14-residual-reassessment.md),
-including newer GPU RNG/EMA submissions. No Atari restart, learning-quality
-claim or whole-goal closure.
+b3a086f measures28.213/93.084ms. The [fresh complete profile](results/2026-10-14-residual-reassessment.md)
+now covers every update/tail: native GPU-pass union22.144ms versus retained
+JAX10.295ms, while RNG+copies+EMA total only.430ms. Heavy-kernel algorithms and
+dependent execution remain the main issues, not transfer bandwidth. Next
+[measure compensated-accumulation cost](experiments/2026-10-14-accumulation-cost.md)
+on fixed optimizer-free work; register pressure is only a hypothesis, and
+numerical gates stay unchanged. No Atari restart, learning-quality claim or
+whole-goal closure.
 
 ### Retained causal findings
 
