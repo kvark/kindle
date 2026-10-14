@@ -13,7 +13,12 @@ RGB30.260→29.169ms and larger-batch CDP95.473→94.059ms. Independent numerics
 pass; later trajectories differ. It builds on [exact-sequence GPU RNG](results/2026-10-14-device-rng.md),
 which separately reduced RGB32.246→30.053ms with exact reports/tensors.
 RGB remains2.27× retained complete JAX12.836ms; production stays on the earlier
-qualified~53ms runtime. Next connect device targets, then row/backward and layout fusion. No Atari restart,
+qualified~53ms runtime. The new [target attribution](results/2026-10-14-target-boundary.md)
+finds only2.027ms RGB host target/preparation/upload work against the~16.3ms gap.
+Imagination839 groups/839-node logical dependency depth and world1,387/1,383
+show why reordering alone cannot help much. Next row/indexing/backward and
+safe layout fusion, then device targets; keep required CPU replay readback.
+All numerical states/reports are exact in the unchanged capture. No Atari restart,
 learning-quality claim or whole-goal closure.
 
 ### Retained causal findings

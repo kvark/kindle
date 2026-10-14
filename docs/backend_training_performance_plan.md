@@ -96,19 +96,39 @@ What is now causally established:
   separately additive CPU/transfer budgets. JAX pipelines metric readback inside its wrapper; the excluded
   caller checking is only 0.177ms. Timing scope cannot explain the gap.
 
-**Next: change the compiled execution unit and connect device dataflow.**
+The [target-boundary attribution](results/2026-10-14-target-boundary.md)
+changes the immediate order: selected host target/preparation/upload regions
+total2.027ms RGB /7.520ms CDP; decode/bonus alone1.217/3.774ms. The unchanged
+instrumented updates29.084/94.001ms preserve every numerical report/tensor.
+Readback5.019/23.909ms includes unfinished GPU work, not pure transfer overhead.
+Host targets cannot explain the remaining~16.3ms RGB gap.
 
-1. GPU RNG and EMA now qualify in the isolated candidate, with EMA's later
-   trajectory differences retained. Move target construction onto device and keep diagnostic
-   posterior readback off the critical path. Preserve stream/RNG/update-order
+The same plans have839 imagination groups and a longest logical chain of839
+kernels; the full compiled world graph, including the staged posterior prefix,
+has1,387 groups versus1,383. Existing ordering is already near the dependency
+depth lower bound. These unweighted counts are not GPU critical-path timings.
+First-max sampling, recursive feature concatenation and opaque backward/cast
+boundaries expose concrete row/indexing operations for a coherent compiler
+change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
+
+**Next: change the compiled execution unit, then finish device target dataflow.**
+
+1. Address row selection/normalization-backward fusion and safe broadcast/view/
+   layout propagation on the measured dependency chains. Reuse existing general
+   row templates and upstream indexing operations; no Dreamer-only kernel or
+   scalar/binding-cap/tile sweep. Preserve shared outputs, backward lifetimes,
+   explicit BF16 rounding and preparation roots. Measure logical depth and
+   complete-update cost; neither is sufficient without numerical checks.
+2. GPU RNG and EMA qualify in the isolated candidate, with EMA's later
+   trajectory differences retained. Target attribution is complete; move
+   construction onto device. Posterior readback also refreshes CPU replay and
+   initializes truncated/microbatched training; it is not merely diagnostic.
+   Preserve that required work in timing and any future device transition.
+   Preserve stream/RNG/update-order
    contracts. Existing posterior/imagination handoffs already stay on device.
    Qualify one connected device-side stage at a time; no CPU learner workaround.
-2. Address row-level normalization/backward fusion and safe view/layout
-   propagation. Reuse the qualified scalar-region lessons where needed, but
-   do not stack its negligible gain by default. Preserve shared outputs,
-   explicit rounding, prepared-output boundaries and activation lifetimes.
-   Measure dependency groups and complete updates, not just kernel counts.
-   No further scalar binding-cap, geometry or pointwise sweep.
+   A large bespoke target/sort pipeline is not the main remaining gap-closing
+   bet. Keep the CPU arithmetic design check separate from GPU qualification.
 3. Investigate a lower-overhead backend execution path only with a causal
    control. Cached CPU recording and CUDA-style device graph execution are
    distinct; do not promise that ordinary Vulkan command replay closes this gap.

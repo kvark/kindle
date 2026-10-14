@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Residual target boundary attributed; prioritize compiler execution depth:**
+  [result](docs/results/2026-10-14-target-boundary.md). Unchanged RGB29.084ms/
+  CDP94.001ms captures match all272 reports, first outputs, plans and292/346
+  initial/first/final tensors exactly. CPU decode/bonus1.217/3.774ms; selected
+  host target/preparation/upload regions2.027/7.520ms cannot explain the~16.3ms
+  RGB gap. Readback5.019/23.909ms includes outstanding GPU work, not pure copy
+  cost. Posterior readback also feeds CPU replay/truncated training: retain it.
+  RGB imagination839 groups/839-node longest logical chain; full world including
+  prefix1,387/1,383. Reordering cannot remove real dependencies; these are
+  unweighted counts, not GPU critical-path times. Next general row selection/
+  normalization-backward and safe broadcast/view/layout lowering on these chains,
+  then device targets; no large bespoke target pipeline or scalar/tile sweep.
+  Two guards, zero warnings/faults,544 synthetic updates, zero game actions;
+  bounded CPU audits/build/Clippy pass. Native17f1e5e is instrumentation only,
+  production unchanged, no worker. CI378 passes; broader goal stays active.
+
 - **Exact-sequence GPU RNG removes a measured host bottleneck:**
   [result](docs/results/2026-10-14-device-rng.md). Isolated wider-control RGB
   32.246→30.053ms (6.80%) and CDP104.048→95.269ms (8.44%); saved2.194/8.779ms
@@ -31,8 +47,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   warnings,1,136 full synthetic plus one small SGD update, zero actions/GPU
   faults. The repaired offline audit's shadowed-handle failure remains.
   Nativea1c366a5 stays isolated; RGB now2.27× retained JAX, no fresh JAX capture.
-  Keep GPU RNG/EMA; next device targets, then row/backward fusion and safe
-  views/layout. No worker at publication; broader performance goal stays active.
+  Keep GPU RNG/EMA. The subsequent target attribution above puts row/indexing/
+  backward work first; device targets remain useful. No worker at publication;
+  broader performance goal stays active.
 
 - **Remaining gap is structural; scalar fan-out is not the main limit:**
   [graph-execution controls](docs/results/2026-10-13-execution-boundaries.md),
