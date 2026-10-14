@@ -8,6 +8,17 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**Precise Vulkan synchronization does not recover CUDA graph execution cost.**
+The [four-path real-dependency check](results/2026-10-14-dependency-paths.md)
+finds existing/synchronization2-global/exact-buffer barriers all~2.05µs per
+dependent kernel; immediate event set/wait costs~4.10µs. All3,204 counters/two
+guards pass, zero warnings/actions/updates. No arm reaches the20% gate; close
+the API-flag detour without full-learner integration. This is not proof of a
+universal Vulkan limit, nor a new whole-update measurement. CUDA graphs' lower
+device cost remains distinct from our successful host command reuse. Next
+isolate remaining kernel staging/reuse and work per execution unit on the
+current candidate, not another barrier/row/iterator tuning sweep.
+
 **Repeated convolution indexing is now a demonstrated native bottleneck.**
 The [incremental iterator intervention](results/2026-10-14-convolution-iterators.md)
 cuts complete cached RGB25.475→24.340ms (4.45%), exact272 reports/first outputs/

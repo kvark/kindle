@@ -32,6 +32,10 @@ a much larger Dreamer workload. Three structural differences have evidence:
 - Device execution: [dependent-kernel controls](results/2026-10-13-execution-boundaries.md)
   find about2.05µs per dependency for Vulkan/ordinary prequeued CUDA versus
   .65µs for CUDA graphs. Host command reuse does not establish that advantage.
+  The [legal dependency-path comparison](results/2026-10-14-dependency-paths.md)
+  finds synchronization2/exact-buffer barriers unchanged and immediate events
+  about2× slower. All3,204 counters pass; close this API-flag detour. This is
+  not a universal Vulkan limit or a fresh complete-learner measurement.
 
 Next: distinguish remaining staging/reuse costs from the device-execution floor,
 on the current shared typed path; require complete-update evidence before

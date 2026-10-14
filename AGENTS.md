@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Precise dependency APIs do not close the device-execution gap:**
+  [four-path check](docs/results/2026-10-14-dependency-paths.md) finds legacy/
+  synchronization2-global/exact-buffer barriers all~2.05µs per dependent kernel;
+  immediate event set/wait~4.10µs. All3,204 exact counters/two guards pass,
+  zero warnings/actions/updates; four CPU command tests pass. Failed initial
+  Rust build/source remains. No20% long-chain gate passes: close this API
+  detour, no full-learner integration/flag sweep. Native765e6294, isolated
+  Blade96c1dc7/Naga a97559b; production unchanged, no worker. No universal
+  Vulkan limit or SM-utilization claim. Current whole RGB24.340ms/retained
+  complete JAX12.836ms stays1.90×; root-cause goal open. Next remaining kernel
+  staging/reuse and useful work per execution unit, preserving real dependencies.
+  CI392 passes on precedingf2a8a3c.
 - **Incremental checked-convolution addresses qualify:**
   [result](docs/results/2026-10-14-convolution-iterators.md). Same cached complete
   RGB25.475→24.340ms (4.45%), now1.90× retained complete JAX12.836ms.
