@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **B32 residual now located:** [cached attribution and connected-image proof](docs/results/2026-10-14-batch-residual.md).
+  Convolution/other work accounts for89.0% of the retainedB8→B32 fixed-graph
+  increase; empty commands4.295→4.102ms, convolution5.587→21.858ms, matrix
+  3.388→7.543ms, other5.463→21.325ms. Not pure kernel costs or removable
+  savings. World-only subclasses allocate4.442ms layout/casts,5.379ms reductions,
+  5.893ms pointwise/image work. Actual first-CNN dataflow materializes640MiB
+  summed logical output extents; reachable JAX combines conv+bias and pool+
+  statistics with channels-last storage. This is not measured traffic, identical
+  rounding or an isolated speedup; JAX still has tapes/backward work.
+  Two guards/one warning, exact five plans/first outputs/report/three292-tensor
+  boundaries and all1,920 measured cache reuses pass; two synthetic updates,
+  2,975 optimizer-free replays, zero actions/workers. Three CPU failures remain.
+  Ordinary B32 remains68.344/27.187ms JAX,2.51×; B8 remains1.79×. Next complete
+  staged image-training block contracts/timing, then a general typed lowering
+  justified by whole-update benefit. No automatic NHWC rewrite, row-only/grid/
+  tile/dtype sweep, production repin, Atari restart or full-goal closure.
+  Latest Meganeura99e3de2 adds Xe2 rectangular BF16 support, retaining5080's
+  preferred16×16×16 shape; not an identified CNN-dataflow fix/qualification.
+  Bladee7c3f7b unchanged; CI400 passes on3ce1dcb.
 - **Packing cliff is not the dominant gap:** [qualified intervention](docs/results/2026-10-14-packing-grid.md)
   changes exactly four B32 convolutions but saves only1.49%,68.344→67.326ms,
   below3%; no promotion/sweep. Candidate remains2.48× retained complete JAX
@@ -21,8 +40,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Seven guards/two warnings,592 synthetic updates/zero actions/workers. Four
   CPU failures remain; repaired graph and complete-plan audits pass, no GPU
   retry. Native9ad4b2b6 stays unpromoted; e5d890dd remains B32 control. Next
-  [one cached B32 family attribution](docs/experiments/2026-10-14-batch-residual.md),
-  then actual dominant operations against reachable JAX—not another row-only/
+  cached B32 family attribution is complete above; follow actual connected
+  image operations against reachable JAX—not another row-only/
   packing/tile/dtype sweep. No production change, Atari restart or full-goal
   closure. Upstream7574ad1/e7c3f7b unchanged; CI399 passes on238a0d4.
 - **Current cached execution attributed:** [result](docs/results/2026-10-14-cached-residual.md).

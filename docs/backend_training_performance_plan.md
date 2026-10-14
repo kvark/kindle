@@ -29,18 +29,29 @@ updates/zero actions/workers; four CPU failures and successful repairs remain.
 The separate initialization scratch-cap repair raises64→128MiB and preserves
 B8's exact results; it is not the cause of these four runtime fallbacks.
 
-**Next:** [one cached B32 family attribution](experiments/2026-10-14-batch-residual.md)
-on the retained control, locating the growing convolution/matrix/other cost.
-One preparatory update and fixed optimizer-free replays, preserving all
-dependencies and exact restorations. The negative packing result does not
-identify the residual from operation counts. Match measured dominant operations
-to actual reachable JAX before another algorithm/compiler intervention.
+**The [cached B32 attribution](results/2026-10-14-batch-residual.md) is complete.**
+Convolution5.587→21.858ms and other work5.463→21.325ms explain89.0% of the
+retainedB8→B32 fixed-graph increase; matrix grows3.388→7.543ms while empty
+commands stay4.295→4.102ms. These interacting allocations are not pure kernel
+times or removable savings. A separate world-only check assigns4.442ms to
+layout/casts,5.379ms reductions and5.893ms pointwise/image work. Both exact
+full-plan/state restorations pass; two guards/one warning, zero game actions.
+
+CPU dataflow proof finds640MiB of summed logical outputs between native's
+first and second convolution: separate F32 bias/pooling/normalization/SiLU,
+transposes, conversion and repacking. JAX combines conv+bias and pooling+
+statistics while retaining channels-last storage. This is not measured DRAM
+traffic, a matched rounding contract or a complete fused backward pass.
+**Next:** cost a complete staged image-training block, including late-dy and
+saved tensors; distinguish layout/compiler from heavy-kernel algorithm costs.
+Only then select a general typed lowering and require whole-B32 benefit.
+No automatic NHWC rewrite or another row-only, packing, tile or dtype sweep.
 
 The actual connected-projection audit found separate tape/reduction/backward
 kernels on JAX too.128 native product/reduction/conversion tails are not a
 speedup estimate; no further row-only fusion trial follows from those counts.
 Production stays unchanged. The preceding batch study retains its two
-pre-update failures/five warnings/1,112 synthetic updates. CI399 passes.
+pre-update failures/five warnings/1,112 synthetic updates. CI400 passes.
 
 **Current cached execution is predominantly device-side.** The
 [qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the
@@ -55,8 +66,8 @@ one warning retained, no game actions/production change/workers.
 The completed connected-region comparison above does not justify another
 fusion implementation on counts alone. Row-only integration already saved
 only~1%; do not repeat that local sweep or assume fewer dispatches guarantee
-a large gain. The packing correction above saves only1.49%; locate the B32
-residual using the cached profiler next. Host decode/
+a large gain. The packing correction above saves only1.49%; the completed B32
+attribution now directs attention to connected image training. Host decode/
 targets cost1.522ms; useful work, but not the primary device-side gap. Keep
 library algorithms and dependency execution in scope. The ordinary four-chunk
 candidate's fresh B8 latency is22.780ms/1.79× JAX; no parity claim.

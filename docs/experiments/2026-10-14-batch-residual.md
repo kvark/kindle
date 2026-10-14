@@ -47,3 +47,61 @@ failures stop for review, no blind retry/recovery or NVML polling. Preparation/
 analysis one CPU,2GiB,zero swap; GPU work has no CPU quota. Production pins,
 learning defaults and Atari remain unchanged. Declare exact artifact directory,
 commands and binary hashes after the CPU build review and before GPU launch.
+
+Artifacts: `runs/batch-residual-20261014.b7KtbHQM`. Reuse the immutable cached
+Meganeura/Blade trees; only a new Kindle snapshot is needed. Add test-only
+full-plan/pipeline and first-output exports, plus recorded start/end headroom,
+outside the measured calls. The fixture and seed701 remain identical to the
+retained control; audit that construction as well as actual first outputs.
+No shader or measured replay loop changes. The first CPU build fails before
+compilation because the rejected multi-file edit left the old relative dependency
+path in place. Preserve that manifest/log; correct the path to the retained
+backend and apply the already-declared scratch setting before building again.
+No GPU job or numerical gate was affected. Upstream7574ad1/e7c3f7b is unchanged.
+The first CPU preflight also retains a Python delimiter error; corrected before
+any queue is declared. No GPU retry or acceptance change.
+
+The first allocation completes and its CPU review passes: full fixed graph
+54.828ms, allocated4.102 command stream/21.858 convolution/7.543 matrix/21.325
+other. Relative to retained B8, convolution and other work account for89.0%
+of the36.095ms increase; the command stream does not grow. All five complete
+plans/pipelines, first outputs/report and initial/before/after292 tensors match
+the ordinary B32 control. All1,536 measured calls verify cache reuse and full
+outputs restore. One passing guard/one retained warning,1 update/2,380 replays,
+zero actions/workers. These are interacting allocations, not removable savings.
+
+## Bounded follow-up: the world's non-heavy work
+
+World training supplies15.922 of21.325ms of the other-operation allocation.
+Before proposing a change, separate its layout/cast materialization, row/
+reduction and pointwise/image work. Reuse the explicit classifier and two CPU
+tests from `runs/materialization-cost-20261014.yLfoQTsc`, but keep the current
+cached backend and all actual B32 plans/weights. Heavy operations stay active
+in every subset. Unknown shader families fail CPU preflight; no permissive
+fallback category. This is attribution, not a revived row-fusion trial.
+
+One new isolated test-only Kindle snapshot/binary; no production/backend edit.
+One separately declared600-second GPU job, one fixed preparatory update and
+only the world session: three rotated eight-subset orders, two warmups+16
+measured samples/subset,64 full calls before/after and restoration calls,
+595 optimizer-free replays. Require exact complete plans/pipelines, first
+outputs/report and292 saved tensors against the same ordinary control;
+full world fingerprints must also match the first allocation after every
+restoration. Check every measured cache reuse and original dependency group.
+Keep the first allocation and sources unchanged. Independent CPU classification
+and source-delta audit precede launch. Same GPU/CPU/headroom/failure bounds;
+no optimizer changes, game actions, new JAX capture or automatic optimization.
+The follow-up's first CPU source normalizer catches rustfmt's wrapping of the
+longer diagnostic log label. Preserve the failed check; normalize only that
+exact reviewed log statement. The source/binary, replay loop and gates do not
+change, and no follow-up GPU job had started.
+
+Both allocations and their independent CPU reviews are now complete; see the
+[result](../results/2026-10-14-batch-residual.md). The world-only allocation
+assigns4.442ms layout/casts,5.379ms row/reduction and5.893ms pointwise/image
+work, with26.902ms heavy+command stream. Both exact full-plan/state restorations
+pass. Total two guards/one retained warning, two synthetic updates/2,975
+optimizer-free replays/1,920 measured cached calls, zero actions/workers.
+CPU reachable-dataflow proof identifies a concrete CNN storage/fusion
+difference; it is not a measured block speedup or automatic implementation
+allocation. Keep the broader goal active and all three CPU failures retained.

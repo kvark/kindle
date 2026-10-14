@@ -23,10 +23,18 @@ complete B32 time,68.344→67.326ms, below3%; do not promote it. Candidate remai
 2.48× retained complete JAX. Actual5080 X limit is2,147,483,647, so these were
 conservative selections, not invalid launches. Independent exact packing/F64
 checks and seven guards pass; B8 smoke/control states are exact, B32 candidate
-trajectories change. This does not explain the dominant gap. Next
-[attribute the retained B32 graph](experiments/2026-10-14-batch-residual.md),
-then match its measured dominant operations to actual JAX; no batch/grid sweep
-or learning promotion.
+trajectories change. This does not explain the dominant gap. The
+[completed cached attribution](results/2026-10-14-batch-residual.md) finds
+convolution and other-than-matrix work supply89.0% of the fixed-graph B8→B32
+increase; empty command cost does not grow. World layout/casts, reductions
+and pointwise/image work allocate4.442/5.379/5.893ms. Exact full-plan/state
+restorations pass; these are not pure kernel times or removable savings.
+Actual first-CNN dataflow writes640MiB of summed logical intermediate outputs,
+while JAX combines conv+bias and pooling+statistics in channels-last storage.
+Not peak memory/DRAM traffic or identical rounding; JAX still has backward
+tapes/work. Next compare a complete staged image-training block before a
+general typed lowering; require whole-B32 benefit. No batch/grid sweep or
+learning promotion. Ordinary B32 remains68.344/27.187ms,2.51×.
 
 The [executable audit](results/2026-10-14-executable-work.md) finds only1.40%
 more native nominal heavy arithmetic. The gap is execution engineering, not
@@ -78,8 +86,8 @@ stream and5.463ms other-than-heavy work, alongside5.587ms convolution/3.388ms
 matrices. These are interacting allocations, not additive removable costs or
 SM utilization. The connected heavy-projection comparison finds separate JAX
 tape/reduction/backward kernels too; counts alone do not justify a new fusion
-trial. The packing-grid intervention above supplies only1.49%; the cached B32
-family attribution is next. The five checked
+trial. The packing-grid intervention above supplies only1.49%; the completed
+B32 attribution points to connected image-training dataflow. The five checked
 convolutions occupy only~2.50ms; prior row-only fusion saved~1%. Keep matrix
 efficiency, materialization and device execution in scope. No iterator/tile/
 vector-width/occupancy sweep, scalar fallback revival, BF16-only fork or tolerance relaxation.
