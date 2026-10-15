@@ -102,15 +102,33 @@ constants and pipeline checks pass without a GPU repeat. Target building,
 percentile state and other host dataflow remain unchanged, not a fully
 GPU-resident learner. Keep the candidate isolated; do not restart Atari.
 
-### Next bounded diagnosis: distinguish algorithm design from API exposure
+### Whole-family audit: a concrete missing transfer contract
 
 World training still takes30.20ms, longer than JAX's complete26.63ms update.
-The next task is one CPU contract audit using the retained full native/JAX
-plans/captures: reconcile every actual convolution's layouts, tile/reuse,
-stages, derivative accumulation and output rounding, including the3-channel
-special cases and all failed-family regressions. Produce one capability-aware
-shared implementation proposal or an explicit missing-lowering contract before
-another GPU prototype. No new profiling campaign or invented native counters.
+The [completed CPU audit](results/2026-10-15-convolution-contract.md) reconciles
+all23 products, actual parameter/gradient paths and library kernels over eight
+captured updates. Library forward/dX and dW use different reuse/staging schedules.
+Native14 packed occurrences use8-byte BF16 vector expressions. The failed
+spatial family adds47.06% padded tile work across its15 occurrences; aligned
+cases also regress with identical tile work, so padding is not the whole cause.
+Current native23-product tile work is369.099G versus226.492G nominal; neither
+is a native/JAX instruction ratio. Preserve the corrected first audit.
+
+Six CPU cases identify an actual compiler-interface limitation: Naga discards
+the requested cooperative matrix scalar and derives it from the pointer.
+Thus F32/F16/BF16 matrix loads from packed `vec4<u32>` become integer matrices,
+although all three equivalent Vulkan SPIR-V cases validate. No GPU execution
+or Naga edit occurs. Source vector width does not prove hardware instruction
+width or a speedup; this contract is necessary for that representation, not
+proven to explain the entire gap.
+
+**Next:** the [fixed-contract transfer proof](experiments/2026-10-15-convolution-transfer.md)
+compares8-byte typed versus16-byte bit-pattern feeding across all14 packed
+occurrences/11 distinct contracts. One shared typed source, unchanged64×64/K32,
+grids/splits, layouts, compensation, transforms and output rounding. Require
+native control calibration, independent numerical gates and10% lower weighted
+complete-operation cost before any Naga change or whole-update trial. No
+geometry/dtype sweep, cherry-picked selector or revived matrix2 family.
 
 The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
 rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs
@@ -126,7 +144,8 @@ remaining27.592ms complete difference, and component allocations are not an
 additive savings budget. The original root-cause/performance goal stays open.
 No more broad profile, tile/row/dtype/hint sweep, CUDA learner, unsafe barrier
 weakening or automatic feature project. Latest upstream99e3de27/e7c3f7b is
-unchanged; check again before diagnosing a new backend issue. Keep failed
+unchanged; check again before diagnosing a new backend issue. The reserved-WGSL-
+keyword probe failure and original48-channel padding audit remain. Keep failed
 sources/gates/tails and historical pins; no recursive repinning.
 
 Historical experiment-by-experiment decisions remain in their linked reports

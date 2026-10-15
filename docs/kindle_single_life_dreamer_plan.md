@@ -62,9 +62,14 @@ rejects that shared replacement:12.833→18.131ms across13 distinct contracts/
 output pairs passing. Keep per-shape regressions and the nonstationary native
 dX samples; no cherry-picked selector, geometry sweep or Naga/Blade integration.
 Device-side categorical decoding now qualifies above; world training remains
-30.20ms, longer than the entire JAX update. Next reconcile the complete family's
-actual library feeding/scheduling with the legal shader interface using retained
-captures, before another implementation. The offline capability audit confirms
+30.20ms, longer than the entire JAX update. The [whole-family audit](results/2026-10-15-convolution-contract.md)
+now matches all23 products and exposes a concrete Naga limitation: matrix loads
+cannot retain F32/F16/BF16 arithmetic types independently of packed integer
+storage. Six CPU reproductions and three validated Vulkan SPIR-V controls pass;
+no compiler change or GPU speedup is claimed. Next is a [fixed-geometry transfer proof](experiments/2026-10-15-convolution-transfer.md)
+across all14 packed occurrences, including full transforms/reductions, before
+any Naga work. This tests8-byte versus16-byte feeding, not another tile sweep.
+The earlier offline capability audit confirms
 explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
 compiler-managed staging is different. No claim that the driver cannot generate
 async instructions or that exposing one API would close the gap. Production

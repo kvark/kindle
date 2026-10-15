@@ -55,16 +55,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   assertion and missing standalone SPIR-V tool failures remain; exact semantic
   plan/constant/pipeline audit and offline capability check pass without GPU
   retries. Targets/normalizer remain on CPU; no fully resident learner claim.
-- **Next: reconcile the whole convolution family's library feeding contracts
-  with the legal native shader interface, using retained captures.** World
-  training still30.20ms, longer than the complete JAX update. Explicit SPIR-V
-  async-copy/wait/event requires Kernel, unavailable in Vulkan Shader; adding
-  that spelling to Naga is not a valid solution. Matrix2 compiler-managed
-  staging is different; this is not proof the driver cannot generate async
-  instructions. Audit actual layouts/tiles/stages/reuse/rounding across all
-  contracts before proposing another implementation. No revived fixed family,
-  geometry sweep or automatic compiler project. Keep dependency execution and
-  remaining host targets distinct; no additive savings or whole-goal closure.
+- **Whole-family contract audit complete:** [result](docs/results/2026-10-15-convolution-contract.md).
+  All23 actual products/layer parameter paths and eight captured JAX updates
+  reconcile. Library uses pass-specific reuse/three-to-five-stage schedules;
+  current14 packed occurrences express8-byte BF16 transfers. Six CPU Naga
+  cases reproduce a missing contract: cooperative loads infer scalar type from
+  the pointer, discarding requested F32/F16/BF16 when storage is `vec4<u32>`.
+  All three equivalent Vulkan SPIR-V modules validate offline. No GPU run,
+  compiler edit or speedup claim. Retain original packed48-channel audit error
+  and reserved-keyword probe failure; reviewed versions pass. Native tiled
+  convolution work369.099G versus226.492G nominal is not a JAX instruction ratio.
+- **Next: one fixed-geometry transfer proof**, [declaration](docs/experiments/2026-10-15-convolution-transfer.md).
+  Reproduce all14 packed occurrences/11 distinct contracts, then compare8-byte
+  typed and16-byte bit-pattern feeding with the same64x64/K32 geometry, layouts,
+  compensation and complete transforms/reductions. Require native calibration,
+  independent derivatives and a10% weighted benefit before minimal Naga work.
+  No geometry/dtype sweep, failed-family revival or automatic compiler project.
+  Explicit SPIR-V async-copy/wait/event still requires Kernel, not Vulkan Shader;
+  wide transfers are a separate legal contract, not proof of async lowering.
+  World training remains30.20ms; dependencies/host targets remain distinct.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
   `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
