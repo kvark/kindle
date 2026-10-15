@@ -134,6 +134,20 @@ another isolated tile. Convolution feeding and non-image execution remain separa
 targets. No rejected family, full im2col, halo, invalid-mask, geometry/precision/
 flag sweep, new GPU allocation or Naga project follows automatically.
 
+The [CPU feeding-pipeline check](results/2026-10-15-feeding-pipeline.md) now
+separates an actual compiler restriction from Vulkan capability. Nine typed
+subgroup-matrix schedules validate offline; two operand slots plus scratch fit
+all reduced-precision layouts under48KiB. Packed F32 variants exceed it and
+remain unsupported by this schedule. Two loading/four computing subgroups with
+ordinary full-group barriers pass1.646M schedule-event checks/five negatives.
+Naga rejects subgroup-uniform consumer branches for all three types, while
+whole-group controls pass; the newer memory-model branch has the same analyzer.
+This is no GPU/numerical/performance result and no compiler change. Preserve
+three CPU preparation failures and repairs. Next prove an actual complete-family
+Vulkan implementation before considering a Naga project; do not disable uniformity
+checks, silently assume subgroup size or select favorable tiles. No new GPU
+allocation yet. The root-cause and parity goals remain open.
+
 ### What is established
 
 - **We are not doing four times as much model arithmetic.** The

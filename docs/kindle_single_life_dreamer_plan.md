@@ -19,6 +19,11 @@ targets, saved tensors and full-program audits pass. RGB remains1.91× inclusive
 JAX27.223ms. Keep isolated67559ce5 with image views/device means enabled; no
 production or Atari promotion. Kernel data feeding and device execution remain
 structural open work, not another BF16 switch.
+The [CPU pipeline review](results/2026-10-15-feeding-pipeline.md) identifies a
+specific Naga limitation: a subgroup-uniform producer/consumer split validates
+as Vulkan SPIR-V but is rejected by Naga's cooperative-operation analysis.
+Reduced-precision double buffering fits the retained resource limit; actual
+convolution correctness and benefit are untested. No compiler edit or GPU run.
 
 **Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier

@@ -281,8 +281,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   12:30:39UTC, CPU review12:31:48; no worker. Keep the isolated candidate, not
   a parity/learning claim. Preserve Clippy failure/source and explicit-reference
   repair. No convolution selection, precision, model or production change.
-  Next distinguish native interface expressibility from generated algorithm
-  efficiency; no layout/geometry sweep, new GPU allocation or Naga project implied.
+  The interface review below now identifies a separate compiler restriction;
+  no layout/geometry sweep, new GPU allocation or Naga project implied.
+- **Feeding-pipeline CPU feasibility passes:** [result](docs/results/2026-10-15-feeding-pipeline.md).
+  Nine typed Vulkan scheduling modules validate; all current23 convolution
+  selections reconcile. Two operand slots plus output scratch fit BF16/F16
+  at12/36/34KiB; packed F32 needs52/50KiB and exceeds the48KiB explicit limit.
+  Two loading/four computing subgroups, full192-invocation barriers and no spin
+  loops pass1,645,920 schedule events/five negative tests. This is not actual
+  convolution indexing/numerics or measured overlap. Naga a97559b rejects the
+  legal subgroup-uniform consumer branch for all three types; whole-workgroup
+  controls pass and divergent-lane negatives reject. New upstream memory-model
+  branchc0b23d16 has the identical analyzer; no compiler edit/commit. Preserve
+  the three CPU reader/probe failures and repairs. Zero GPU calls/actions/updates;
+  finishes12:55:34UTC, no worker. Next qualify an actual complete-family native
+  diagnostic before considering compiler changes; no GPU allocation yet, no
+  unsafe uniformity bypass, fixed-subgroup assumption without enforcement or
+  favorable tile subset. Current complete gap stays1.91x and goal stays open.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
