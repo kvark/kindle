@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 14, 2026. This is the authoritative roadmap.
+Updated October 15, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -32,9 +32,14 @@ actual dX2.14876→8.71198ms despite exact outputs and independent checks. Do no
 start compiler/backend feature work or tune that prototype. The retained full
 JAX trace instead shows four-stage256x32/64x256 convolution tiles versus our
 single-stage32x32, with8–10× fewer blocks. Layout/vector/reuse/staging differ
-together; tile ratios are not speedup estimates. Next inspect the actual library
-instruction/data-feeding contract before one shared typed lowering, counting
-transforms and scratch. No production change or goal-closure claim.
+together; tile ratios are not speedup estimates. The [actual library captures](results/2026-10-15-library-convolution-feeding.md)
+now verify asynchronous128-bit global-to-shared copies and10.33x/8.27x fewer
+warp instructions than the current CUDA translations, despite more tensor
+instructions. Both exact272-report/288-tensor/HLO checks pass. This is substantial
+supporting-work overhead, not simply low occupancy. Native instruction counts
+remain unknown: check native code generation before one shared typed aligned/
+reused/staged lowering, counting transforms and scratch. No production change,
+8x speedup forecast, new sweep or goal-closure claim.
 
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes

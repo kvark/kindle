@@ -1,0 +1,204 @@
+{
+  "status": "complete",
+  "root": "runs/library-profiler-api-fixed-20261014.gAETDd4o",
+  "whole_update_ms": {
+    "retained_native": 60.0411874375,
+    "retained_jax": 26.6316957586,
+    "remeasured": false
+  },
+  "native_counter_equivalence": false,
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "source_hashes_verified": 25,
+  "successful_guards": 2,
+  "successful_synthetic_updates": 544,
+  "game_actions": 0,
+  "profiled_launches": 2,
+  "profiler_passes": 34,
+  "exact_metric_reports_per_process": 272,
+  "exact_initial_final_tensors_per_process": 288,
+  "normalized_hlo_instructions_exact": true,
+  "minimum_sampled_headroom_bytes": 7744126976,
+  "allocation_warnings": 0,
+  "rows": [
+    {
+      "mode": "dx",
+      "library": {
+        "warp_instructions": 97492992,
+        "integer_instructions": 34398208,
+        "uniform_instructions": 23912448,
+        "tensor_instructions": 13107200,
+        "instructions_per_tensor_instruction": 7.438125,
+        "integer_fraction": 0.3528274934879422,
+        "profiled_heavy_kernel_ms": 0.5517759999999999,
+        "tensor_active_percent": 39.885633,
+        "occupancy_percent": 8.332228,
+        "l1tex_percent": 34.058019,
+        "dram_percent": 13.609096,
+        "registers_per_thread": 166,
+        "local_spilling_requests": 0,
+        "feeding_opcodes": {
+          "LDGSTS": 3907584,
+          "LDG": 16384,
+          "LD": 0,
+          "STS": 278528,
+          "LDSM": 4964352,
+          "MOVM": 0,
+          "PRMT": 262144,
+          "BAR": 507904
+        },
+        "observed_async_128_bit_global_to_shared": true
+      },
+      "current_algorithm_cuda": {
+        "warp_instructions": 1006803968,
+        "integer_instructions": 585456640,
+        "uniform_instructions": 8912896,
+        "tensor_instructions": 9961472,
+        "instructions_per_tensor_instruction": 101.06979851973684,
+        "integer_fraction": 0.5815001317118369,
+        "profiled_heavy_kernel_ms": 1.867296,
+        "tensor_active_percent": 8.98222,
+        "occupancy_percent": 81.678003,
+        "l1tex_percent": 64.581932,
+        "dram_percent": 6.540852,
+        "registers_per_thread": 48,
+        "local_spilling_requests": 0,
+        "feeding_opcodes": {
+          "LDGSTS": 0,
+          "LDG": 38846464,
+          "LD": 39845888,
+          "STS": 40108032,
+          "LDSM": 0,
+          "MOVM": 19922944,
+          "PRMT": 39845888,
+          "BAR": 5046272
+        }
+      },
+      "current_over_library": {
+        "warp_instructions": 10.326936812032603,
+        "integer_instructions": 17.0199749940462,
+        "tensor_instructions": 0.76,
+        "instructions_per_tensor_instruction": 13.588074752674475
+      }
+    },
+    {
+      "mode": "dw",
+      "library": {
+        "warp_instructions": 133572828,
+        "integer_instructions": 69417568,
+        "uniform_instructions": 20466904,
+        "tensor_instructions": 16932864,
+        "instructions_per_tensor_instruction": 7.888377772360305,
+        "integer_fraction": 0.519698272765476,
+        "profiled_heavy_kernel_ms": 0.931712,
+        "tensor_active_percent": 30.372727,
+        "occupancy_percent": 8.332766,
+        "l1tex_percent": 16.826687,
+        "dram_percent": 13.054533,
+        "registers_per_thread": 246,
+        "local_spilling_requests": 0,
+        "feeding_opcodes": {
+          "LDGSTS": 2733120,
+          "LDG": 84864,
+          "LD": 0,
+          "STS": 159744,
+          "LDSM": 4253184,
+          "MOVM": 0,
+          "PRMT": 19968,
+          "BAR": 292032
+        },
+        "observed_async_128_bit_global_to_shared": true
+      },
+      "current_algorithm_cuda": {
+        "warp_instructions": 1104588800,
+        "integer_instructions": 636774400,
+        "uniform_instructions": 1152000,
+        "tensor_instructions": 13107200,
+        "instructions_per_tensor_instruction": 84.2734375,
+        "integer_fraction": 0.5764809492908131,
+        "profiled_heavy_kernel_ms": 2.402176,
+        "tensor_active_percent": 9.131296,
+        "occupancy_percent": 32.777111,
+        "l1tex_percent": 78.559375,
+        "dram_percent": 4.743692,
+        "registers_per_thread": 128,
+        "local_spilling_requests": 0,
+        "feeding_opcodes": {
+          "LDGSTS": 0,
+          "LDG": 52428800,
+          "LD": 52428800,
+          "STS": 52531200,
+          "LDSM": 0,
+          "MOVM": 26214400,
+          "PRMT": 52428800,
+          "BAR": 6579200
+        }
+      },
+      "current_over_library": {
+        "warp_instructions": 8.26956212980682,
+        "integer_instructions": 9.173101541096917,
+        "tensor_instructions": 0.7740686985970004,
+        "instructions_per_tensor_instruction": 10.683240576444184
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "root": "runs/library-convolution-counters-20261014.N66Uf9ci",
+      "reason": "840-second profiler timeout; no capture; completed update prefix unknown",
+      "completed_update_prefix": null,
+      "guard": {
+        "monitoring": "host-only",
+        "host_guard_passed": false,
+        "child_spawned": true,
+        "child_exit_code": 1,
+        "reason": "native job exited 1",
+        "host_recovery_performed": false,
+        "guard_nvml_queries": 0,
+        "gpu_telemetry": "unmeasured",
+        "hardware_qualified": false,
+        "child_pid": 1807354,
+        "unfinished_children": []
+      },
+      "allocation_warnings": 0
+    },
+    {
+      "root": "runs/library-profiler-api-20261014.LOfH6xn9",
+      "reason": "CPU checker missing relocated asset; before update0",
+      "completed_update_prefix": 0,
+      "guard": {
+        "monitoring": "host-only",
+        "host_guard_passed": false,
+        "child_spawned": true,
+        "child_exit_code": 1,
+        "reason": "native job exited 1",
+        "host_recovery_performed": false,
+        "guard_nvml_queries": 0,
+        "gpu_telemetry": "unmeasured",
+        "hardware_qualified": false,
+        "child_pid": 1808399,
+        "unfinished_children": []
+      },
+      "allocation_warnings": 0
+    }
+  ],
+  "analysis_repairs": [
+    "Original analysis labels a raw duration as ms without reading its unit; corrected here.",
+    "Opcode labels have no suffix: count LDG/STS directly, not only dotted prefixes."
+  ],
+  "artifact_sha256": {
+    "review.py": "8dec83fbd30011f5cd5030ab6bfa54e92f8f25328a35343496229290f1645514",
+    "analysis.json": "2d2b24c147b6a2c7260b4a091c6dd94c681ce2b7e3d341dab022e386768c4f8f",
+    "analyze.py": "208a74524c3222e90586326f6bcd09c270a1bb2f9ac345f406dcc0bcb05f2414",
+    "dx/capture.ncu-rep": "9c3e38481186c0e8f4005ac60da06f60e5750aa7a7785b222a91fdd35c0a4452",
+    "dx/counters.json": "d7a409efa11d88dc71cbfff3a1152d8b305e3965224186956f538e2443015473",
+    "dx/opcodes.json": "d0fce1c4d2c810a9f789ae4005cafd8cfe4772c40ba839609ce2e6b70669d213",
+    "dx/counters.sass": "45e7fdbaae2b1ee4339dc856827c0be24e20f9537243d1f4a1d7beac5d87f4f5",
+    "dx/verified.json": "d270fa98cd200bc5cba28001cab10f1dfa3f79b651fe9a4f613f3dd98742fd3a",
+    "dw/capture.ncu-rep": "3857996846404274edefca4d741fd9a570e328f671ee147238540877d88f724c",
+    "dw/counters.json": "48509d826e16ca9c9f1e86b557f20ada2f5a744e8a2739ec4f925a2d7c183d2d",
+    "dw/opcodes.json": "c0920c0b6c5379acf139e0882864c9e3aedc9631980f142060bb7473a433a335",
+    "dw/counters.sass": "360a2eb00401443d24528ed36c44a53853656819e992e864f0d66152c447336c",
+    "dw/verified.json": "ac26d881b5723a75efe267017748c221d2dbe6bfca1eb42f3c404509437b98e1"
+  }
+}

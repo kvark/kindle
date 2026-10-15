@@ -7,6 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Actual library feeding gap measured:** [full-JAX counters](docs/results/2026-10-15-library-convolution-feeding.md).
+  CNN1 dX/dW execute97.49M/133.57M warp instructions versus current-algorithm
+  CUDA1.007B/1.105B,10.33x/8.27x fewer, despite31.6%/29.2% more tensor
+  instructions. Library tensor activity39.89%/30.37%,occupancy8.33%; current
+  CUDA~9% tensor activity and81.68%/32.78% occupancy. Actual SASS confirms
+  asynchronous128-bit global-to-shared copies, unlike translated scalar
+  loading/storing/fragment movement. Combine with larger four-stage reuse;
+  not a BF16 toggle or an occupancy target. CUDA/native timing bands still
+  fail: no native counter equivalence,8x native speed promise or causal split
+  among layout/reuse/staging/compiler lowering. Two guards,544 updates,34 replay
+  passes, zero actions/warnings; all272 reports/288 initial-final tensors and
+  normalized HLO exact/process. No worker remains. Retain original840s timeout
+  (completed update prefix unknown), pre-update missing CPU asset failure and
+  corrected CPU unit/opcode reporting. No wedge claim or blind retry.
+  Next native code-generation visibility, then one shared typed aligned/reused/
+  staged convolution proof including transforms/scratch—not another geometry
+  sweep or automatic backend feature work. Full B32 stays60.041/26.632ms,2.25x;
+  production/Atari/root-cause goal remain open. Upstreams unchanged; CI413 passes.
 - **Current derivative algorithms stay slow through CUDA:**
   [comparison, counters and matrix2 readiness](docs/results/2026-10-14-convolution-backend.md).
   Same B512/CI32/CO48/K5 checked dX/dW: native2.148/2.019ms,CUDA1.872/2.441,

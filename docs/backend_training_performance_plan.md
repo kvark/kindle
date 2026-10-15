@@ -1,12 +1,27 @@
 # Backend training performance plan
 
-Updated October 14, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 15, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
+
+**[Actual library counters confirm much cheaper data feeding](results/2026-10-15-library-convolution-feeding.md).**
+Full-JAX dX/dW execute10.33x/8.27x fewer warp instructions than the current
+source algorithms through CUDA, despite31.6%/29.2% more tensor instructions.
+Captured SASS verifies asynchronous128-bit global-to-shared copies; larger
+four-stage tiles amortize supporting work. Tensor activity reaches40%/30%
+with only8.33% occupancy, versus~9% tensor activity in the translations.
+Both exact272-report/288-tensor/HLO controls pass;544 updates, two guards,
+zero warnings/actions. This is a substantial algorithm/lowering difference,
+not a missing BF16 setting, fewer model MACs or an occupancy target.
+The CUDA/native10% timing bands still fail: no native counter proxy or8x
+speedup forecast. Next inspect native code generation, then one shared typed
+aligned/reused/staged convolution contract including transform/scratch cost.
+No geometry sweep or revival of the failed workgroup-only proof. The full
+2.25x gap remains open; production/training stay unchanged.
 
 **Latest: [the current derivative algorithms remain slow under CUDA](results/2026-10-14-convolution-backend.md).**
 Same-source dX/dW take2.148/2.019ms native and1.872/2.441ms CUDA, versus
