@@ -66,9 +66,15 @@ now passes: JAX inclusive27.223ms with graphs/29.505ms without. Native remains
 1.83x slower even without graphs; exact reports/tensors/fusion computation/
 library settings pass. Two guards/two warnings,544 synthetic updates, no actions.
 Historical26.632ms was JAX's core boundary; the current inclusive comparison
-is54.113/27.223ms,1.99x, not a new native speedup. Next isolate remaining
-non-convolution image-training work using valid saved outputs, not invalid
-masks or another kernel/flag sweep. All quality/budget gates remain open.
+is54.113/27.223ms,1.99x, not a new native speedup. The subsequent
+[closed-image attribution](results/2026-10-15-spatial-boundary-cost.md) now passes:
+non-convolution image substitution saves4.173ms; replacing the connected image/
+convolution region with exact escaping values reduces fixed-world34.195→6.564ms.
+Only7.014MB of its3.154GB logical outputs escape; poison/version/exact-output
+checks pass. These interacting oracle effects are not implementable full-update
+savings or CDP timings. Next compare the existing JAX image layout/materialization
+contract on CPU before a complete connected lowering, not another standalone
+kernel/flag sweep. Production and all quality/budget gates remain unchanged/open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

@@ -84,14 +84,29 @@ not caller-inclusive; this correction is not a native speedup. Two guards/two
 warnings,544 synthetic updates, zero actions. CPU serialization failure and
 qualified dependency-graph/JSON canonicalization repair remain; no GPU retry.
 
-**Next: isolate the remaining non-convolution spatial work with valid values.**
-Use the existing saved-output intervention on the current image-training region,
-retaining every live output, consumer and original dependency, before a physical
-layout/connected-region rewrite. Prior invalid-intermediate masks and failed
-sparse timing cannot rank this remainder. This is targeted causal attribution,
-not a matrix/tile/precision/flag sweep, new Naga feature or CUDA learner. Library
-algorithm/data feeding remains a separate demonstrated cost. No additive savings
-budget or learning restart; the broader parity goal remains open.
+**The connected image cost is now isolated with valid boundary values:**
+[all-output](results/2026-10-15-spatial-value-cost.md) and
+[closed-region](results/2026-10-15-spatial-boundary-cost.md) interventions pass.
+The former keeps3.154GB of logical intermediate outputs and shows only.530ms
+from replacing non-heavy image arithmetic. The closed cut preserves every
+escaping value but omits internal writes: non-heavy substitution saves4.173ms;
+combined image/convolution substitution reduces fixed-world34.195→6.564ms.
+Only46 outputs/7.014MB escape the combined region. This is not measured DRAM
+traffic or an attainable optimization; changed copies/dispatch work also matter.
+Independent runtime version proofs, poison checks and exact full outputs/tensors
+pass. Interaction−3.552ms rules out additive attribution. Three guards/no warnings
+across both studies, two initializer updates/1460 fixed replays, zero actions.
+Controller-only provenance and CPU/lint failures remain; no GPU rerun. Production
+and complete RGB/JAX54.113/27.223ms remain unchanged.
+
+**Next: inspect the corresponding JAX layout/materialization contract on CPU.**
+Use the existing executable/capture and exact native cut to select one complete
+connected-image lowering, including forward, both derivatives, conversions and
+scratch. Non-heavy fusion alone cannot account for the whole residual; efficient
+convolution/data feeding remains necessary. Do not revive rejected standalone
+families, full im2col, halo or invalid-value masks, or start another tile/precision/
+flag sweep. No new GPU allocation or Naga project is implied. Non-image execution
+remains a separate cost; the broader parity goal stays open.
 
 ### What is established
 

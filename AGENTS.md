@@ -230,10 +230,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   finishes09:42:04UTC; CPU review09:47:43UTC, no worker. Original serialized
   HLO failure remains: independent parameter order and JSON key order only;
   ten CPU regressions qualify semantic comparison without numerical relaxation.
-  No GPU repeat. Next isolate remaining non-convolution image-training work
-  using valid saved outputs/all live consumers before a layout/region rewrite.
+  No GPU repeat. The following closed-region diagnosis narrows the image work.
   Do not revive invalid-value masks, failed sparse-timing attribution, or start
   another matrix/tile/precision/flag sweep. No automatic learning promotion.
+- **Connected image attribution passes:** [all outputs](docs/results/2026-10-15-spatial-value-cost.md)
+  and [closed boundaries](docs/results/2026-10-15-spatial-boundary-cost.md).
+  Copying every intermediate hides materialization: non-heavy image substitution
+  saves.530ms there,4.173ms with internal writes omitted. Replacing image+conv
+  with exact escaping values reduces fixed-world34.195→6.564ms;46 outputs/7.014MB
+  escape versus344/3.154GB total region outputs. Not DRAM traffic, a pure cost
+  decomposition or attainable full-update saving. Interaction−3.552ms remains.
+  Independent version proofs, poisoned discarded values, full/live outputs,
+  exact292 tensors and full plans/pipelines/groups pass. Three guards/no warnings,
+  two initializer updates/1460 fixed replays/zero actions; CPU/lint failures and
+  controller-only snapshot repair remain, no GPU retry. Last GPU finishes10:35:20,
+  CPU review10:38:05, no worker. Production/complete gap unchanged. Next audit
+  corresponding existing JAX image layouts/materialized boundaries on CPU,
+  then select one connected lowering including forward/both derivatives and
+  conversion/scratch costs. No new GPU allocation, Naga project, standalone
+  family/geometry sweep or learning restart implied. Non-image costs stay open.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the

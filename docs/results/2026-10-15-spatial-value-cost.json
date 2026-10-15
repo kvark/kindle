@@ -1,0 +1,166 @@
+{
+  "status": "complete",
+  "fixed_world_gpu_ms": [
+    34.2065315,
+    14.27509575,
+    33.67674,
+    13.9791395
+  ],
+  "queued_wall_ms": [
+    34.21500446875,
+    14.286348929687499,
+    33.688078687499996,
+    13.987785039062501
+  ],
+  "before_snapshot_gpu_ms": 34.169654,
+  "relative_baseline_drift": {
+    "pre_snapshot": 0.0010792471003655546,
+    "retained": 0.0004455885465295406
+  },
+  "baseline_five_percent_gate": true,
+  "conditional_differences_ms": {
+    "convolution_with_spatial": 19.93143575,
+    "convolution_without_spatial": 19.6976005,
+    "spatial_with_convolution": 0.5297914999999946,
+    "spatial_without_convolution": 0.2959562499999997,
+    "convolution_symmetric": 19.814518125,
+    "spatial_symmetric": 0.41287387499999717,
+    "interaction": 0.23383524999999672,
+    "total": 20.227391999999995
+  },
+  "blocks": [
+    {
+      "block": 0,
+      "condition": 0,
+      "gpu_ms": 34.1687025,
+      "queued_wall_ms": 34.180034625000005
+    },
+    {
+      "block": 1,
+      "condition": 1,
+      "gpu_ms": 14.2633365,
+      "queued_wall_ms": 14.274658109375
+    },
+    {
+      "block": 2,
+      "condition": 2,
+      "gpu_ms": 33.6825945,
+      "queued_wall_ms": 33.693938984374995
+    },
+    {
+      "block": 3,
+      "condition": 3,
+      "gpu_ms": 13.979894,
+      "queued_wall_ms": 13.991299906250001
+    },
+    {
+      "block": 4,
+      "condition": 3,
+      "gpu_ms": 13.978385,
+      "queued_wall_ms": 13.984270171875
+    },
+    {
+      "block": 5,
+      "condition": 2,
+      "gpu_ms": 33.6708855,
+      "queued_wall_ms": 33.682218390624996
+    },
+    {
+      "block": 6,
+      "condition": 1,
+      "gpu_ms": 14.286855,
+      "queued_wall_ms": 14.29803975
+    },
+    {
+      "block": 7,
+      "condition": 0,
+      "gpu_ms": 34.2443605,
+      "queued_wall_ms": 34.2499743125
+    }
+  ],
+  "all_samples_retained": true,
+  "snapshot_bytes": 3154096284,
+  "snapshot_outputs": 344,
+  "live_boundaries": 178,
+  "convolution_dispatches": 23,
+  "spatial_dispatches": 286,
+  "exact_conditions": 4,
+  "exact_tensors": 292,
+  "exact_tensor_boundary_pairs": 3,
+  "program_identity": {
+    "world-plan.json": "ea3c54f7aeb0c5e1421d5bed6b66d40a30ef4f2af783293de2b2c957e793519b",
+    "world-pipelines.json": "753d0e44ff601234f19bb442fc9b64473b39404efd71a92b06c2688d48cbd679",
+    "world-groups.json": "2300ef59ee2b25e0dedba62f65f6a2df426d80c7fd8adc7c8b686346fcb87f97",
+    "first-outputs.json": "b1278278cbe9391dfe22740d206beb2f35efb7dd7171ebd5bfca73d461329fe5",
+    "config.json": "6acb14e4c85d8f601fe677cd2a0af2d8cada995a32c8e76218210e2cd2423bde"
+  },
+  "minimum_sampled_headroom_bytes": 9575661568,
+  "guards": 2,
+  "allocation_warnings": 0,
+  "source_seals": 3668,
+  "full_world_replays": 727,
+  "measured_world_replays": 576,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "copy_smoke_values": 3906,
+  "production_changed": false,
+  "artifacts": "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v",
+  "native_sha256": "6ad5dbfef29d4a7fd666be4382377e8fb9ee7b454f594c3381fd6ef1ebb6a381",
+  "cpu_boundary_proof": [
+    {
+      "original_output_count": 0,
+      "kept_output_count": 0,
+      "dropped_output_count": 0,
+      "original_output_bytes": 0,
+      "kept_output_bytes": 0,
+      "dropped_output_bytes": 0,
+      "completely_internal_dispatches": 0,
+      "active_reads_proved": 7198,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 23,
+      "kept_output_count": 23,
+      "dropped_output_count": 0,
+      "original_output_bytes": 855506944,
+      "kept_output_bytes": 855506944,
+      "dropped_output_bytes": 0,
+      "completely_internal_dispatches": 0,
+      "active_reads_proved": 7152,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 321,
+      "kept_output_count": 86,
+      "dropped_output_count": 235,
+      "original_output_bytes": 2298589340,
+      "kept_output_bytes": 705121428,
+      "dropped_output_bytes": 1593467912,
+      "completely_internal_dispatches": 200,
+      "active_reads_proved": 6765,
+      "protected_values_proved": 892
+    },
+    {
+      "original_output_count": 344,
+      "kept_output_count": 46,
+      "dropped_output_count": 298,
+      "original_output_bytes": 3154096284,
+      "kept_output_bytes": 7014164,
+      "dropped_output_bytes": 3147082120,
+      "completely_internal_dispatches": 263,
+      "active_reads_proved": 6719,
+      "protected_values_proved": 892
+    }
+  ],
+  "limits": [
+    "Fixed-world saved-value intervention, not full-update timing.",
+    "Copies retain intermediate materialization and add snapshot reads.",
+    "Logical bytes are not DRAM traffic; no pure or additive kernel-cost claim.",
+    "Production and learning remain unchanged."
+  ],
+  "source_sha256": {
+    "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v/review.json": "96fe9d574d0d946b2512eaa18cba1fd3a90c8ec720668f204d192eeb9b719daf",
+    "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v/closed-preflight.json": "3639aa5ecf042f3856cdf4ec80ab78b3871366b32cbd3a25144beeff48e5e3f1",
+    "/x/Code/kindle/runs/spatial-value-cost-20261015.AzzHQJ2v/publish.py": "3bb556289e705cfd2d27557b1aaf041dc1a52e42d12b1dce2a13ff31a9800e9f"
+  }
+}
