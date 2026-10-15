@@ -123,6 +123,13 @@ rejected standalone families, full im2col, halo or invalid-value masks, or start
 another tile/precision/flag sweep. No new GPU allocation or Naga project is
 implied; the broader parity goal stays open.
 
+The [CPU proof and implementation declaration](experiments/2026-10-15-image-views.md)
+now cover253,755,392 addresses,7,352 surviving reads and892 protected buffers.
+The proposed13 image-kernel changes remove31 dispatches/876.610MB of logical
+writes. Isolated implementation/build is underway, not a GPU result; complete
+CPU/codegen checks before a separately declared numerical/timing allocation.
+Convolution algorithms/selection and typed rounding remain unchanged.
+
 ### What is established
 
 - **We are not doing four times as much model arithmetic.** The

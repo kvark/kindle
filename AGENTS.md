@@ -266,6 +266,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   conversions/scratch; no new GPU allocation, Naga project, standalone family/
   geometry sweep or learning restart implied. Layout alone is not cuDNN feeding;
   the complete parity goal and non-image costs stay open.
+- **Connected image-view CPU proof passes:** [implementation declaration](docs/experiments/2026-10-15-image-views.md).
+  All253,755,392 proposed addresses/7,352 surviving reads/892 protected buffers
+  pass;13 modified image kernels remove31 dispatches/876.610MB logical writes.
+  No measured speed/traffic claim. Isolated shared typed implementation is in
+  `runs/image-views-20261015.EblKUBZN`; CPU build/codegen/selection checks precede
+  any separately declared GPU numerical/timing allocation. Preserve the original
+  Clippy failure/source and explicit-reference repair. No GPU allocation yet;
+  no convolution selection, precision, model or production change.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
