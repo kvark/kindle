@@ -270,10 +270,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   All253,755,392 proposed addresses/7,352 surviving reads/892 protected buffers
   pass;13 modified image kernels remove31 dispatches/876.610MB logical writes.
   No measured speed/traffic claim. Isolated shared typed implementation is in
-  `runs/image-views-20261015.EblKUBZN`; CPU build/codegen/selection checks precede
-  any separately declared GPU numerical/timing allocation. Preserve the original
-  Clippy failure/source and explicit-reference repair. No GPU allocation yet;
-  no convolution selection, precision, model or production change.
+  `runs/image-views-20261015.EblKUBZN`; native67559ce5 finishes CPU build/Clippy,
+  exact independent-plan selection, protected/multiple-writer checks and144
+  existing/432 new typed shader variants. The [next GPU qualification](docs/experiments/2026-10-15-image-views-qualification.md)
+  is declared but unstarted: exact24-update RGB/CDP pairs before one full timing
+  pair each. Full ordinary plan exports are independently enabled. Preserve the
+  original Clippy failure/source and explicit-reference repair. No worker or
+  convolution selection, precision, model or production change.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the

@@ -84,8 +84,10 @@ including forward/both derivatives and required saved/external values, before
 a complete-update allocation. Layout alone does not reproduce library data
 feeding. Production and all quality/budget gates remain unchanged/open.
 The [connected-view CPU proof](experiments/2026-10-15-image-views.md) now passes;
-isolated implementation is underway. Its31 removed dispatches/876.610MB logical
-writes are not speed or DRAM measurements. No GPU allocation or promotion yet.
+isolated native67559ce5 passes CPU build/Clippy and576 shader variants. Its31
+removed dispatches/876.610MB logical writes are not speed or DRAM measurements.
+The [GPU qualification](experiments/2026-10-15-image-views-qualification.md) is
+declared but unstarted; no production promotion or learning restart.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

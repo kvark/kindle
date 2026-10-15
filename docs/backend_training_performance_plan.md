@@ -126,9 +126,11 @@ implied; the broader parity goal stays open.
 The [CPU proof and implementation declaration](experiments/2026-10-15-image-views.md)
 now cover253,755,392 addresses,7,352 surviving reads and892 protected buffers.
 The proposed13 image-kernel changes remove31 dispatches/876.610MB of logical
-writes. Isolated implementation/build is underway, not a GPU result; complete
-CPU/codegen checks before a separately declared numerical/timing allocation.
-Convolution algorithms/selection and typed rounding remain unchanged.
+writes. Isolated native67559ce5 now passes CPU build/Clippy, exact independent
+plan selection and144 existing/432 new typed shader variants. The [GPU qualification](experiments/2026-10-15-image-views-qualification.md)
+is declared but unstarted: exact24-update RGB/CDP pairs precede one full timing
+pair each, with full ordinary program exports. Convolution algorithms/selection
+and typed rounding remain unchanged; this is not a GPU result or promotion.
 
 ### What is established
 
