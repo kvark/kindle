@@ -21,9 +21,10 @@ Its unchanged backend/control remains`28864210` from the
 reduces full B32 CDP78.206→50.122ms,35.91%, on that same binary. Historical Mixed
 selection misses later BF16 derivatives and staged posterior reuse; imagination
 is unchanged. Four guards and exact initials/finite trajectories pass, but this
-is cost evidence, not independent numerical qualification or a CDP/JAX ratio.
-Next qualify the BF16 CDP loss/gradients and staged prefix/tail, with no timing
-repeat or learning restart. Production remains unchanged.
+is cost evidence, not a CDP/JAX ratio. Its [scoped qualification](results/2026-10-15-cdp-bf16-qualification.md)
+now passes5.59M independent projection/loss values and exact whole/staged actual
+world gradients. This is not a full-model independent oracle or learning parity.
+No timing repeat or learning restart; production remains unchanged.
 
 ### What is established
 
@@ -208,8 +209,21 @@ reproduces its own smoke prefix; cross-policy trajectories differ. Actual model
 parameter relativeL2 is.0001757 after one step/.05677 after272, distinct from
 optimizer moments. The corrected CPU label/audit and all data remain. No source
 rebuild or game actions. This is cost evidence, not independent numerical
-qualification or a comparison to the RGB/JAX ratio. Qualify CDP BF16 loss/
-gradients and staged prefix/tail next, before promotion; no timing repeat.
+qualification or a comparison to the RGB/JAX ratio. The subsequent
+[BF16 boundary/staging checks](results/2026-10-15-cdp-bf16-qualification.md)
+pass: eight independent cases/5,585,254 values and two actual whole/staged pairs,
+86 raw gradient tensors/14,688,256 elements per pass. Late-input NaN poisoning,
+changed targets, exact restoration, three346-tensor pairs and1,200 source seals
+pass. The original JSON observer assertion remains failed: its5,618,720 F32
+values were exact, but in-memory and parsed F64 representations differed.
+Separate persistence/parsing repair and CPU regression pass without relaxing
+equality or repeating the independent boundary. Two passing/one failed guard,
+one warning,13 raw backwards/two initializers including failure; zero actions.
+No new timing, full-model independent oracle, learning parity or promotion.
+The next main-path attribution must reconcile the remaining23.94ms imagination/
+targets and existing ensemble workload, absent from RGB/JAX, separately from
+21.72ms posterior/world. Continue the structural feeding/execution investigation;
+do not resurrect the old18-way state-projection diagnosis.
 Do not make RGB decoder work the main-path bottleneck by assumption. Further
 algorithm work must address substantial data-feeding or execution structure,
 not another small tile/iterator variation. No new subset/geometry sweep,

@@ -131,9 +131,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   05:14:52 UTC in92.70s, no worker. CPU moment-name mislabel is corrected without
   GPU repeat:130 actual parameters differ by.0001757 relativeL2 after one update,
   .05677 after272; moments separately reported. Not numerical or learning parity.
-  Next independently qualify BF16 CDP loss/gradients and staged prefix/tail
-  numerics on this path before promotion. No timing repeat, precision sweep or
-  learner restart. RGB/JAX2.04x and the broader root-cause goal remain open.
+  The scoped qualification below now passes. No timing repeat, precision sweep
+  or learner restart. RGB/JAX2.04x and the broader root-cause goal remain open.
+- **BF16 CDP boundary/staging qualifies:** [result](docs/results/2026-10-15-cdp-bf16-qualification.md).
+  Eight independent projection/cosine cases pass5,585,254 values, explicitBF16
+  rounding and unchanged gates. Actual12M world whole/staged pairs match all86
+  raw gradient tensors/14,688,256 elements, including changed late targets,
+  NaN-poisoned prefix isolation and original restoration. Three346-tensor pairs,
+  first targets/reports, unchanged state/plans and1,200 seals pass. Original
+  in-memory-versus-parsed JSON assertion remains failed: all5,618,720 underlying
+  F32 values were exact; separate observer repair/CPU regression passes with
+  both files parsed identically. CPU extractor whitespace/Clippy failures stay.
+  Two passing/one failed guard, one warning,13 raw backwards/two initializer
+  updates including failure, zero game actions. Service finishes05:48:33 UTC;
+  no worker. No full-model independent oracle, learning parity or promotion.
+  Current CDP imagination/targets23.94ms exceeds posterior+world21.72ms.
+  Reconcile its existing ensemble workload separately from RGB/JAX; do not
+  resurrect the old18-way projection or assume decoder cost applies to CDP.
+  Remaining structural feeding/execution investigation stays active.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
   `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).

@@ -29,8 +29,14 @@ reduces full updates78.206→50.122ms,35.91%. The old Mixed policy excludes late
 BF16 derivative/staged-posterior improvements; posterior+world falls49.788→
 21.715ms, imagination stays23.94ms. Four guards/exact346 initials/finite states
 and each arm's own smoke prefix pass;592 synthetic updates, no game actions.
-Trajectories differ. Independently qualify CDP loss/gradients and staged prefix/
-tail before promotion; no timing repeat, precision sweep or learning restart.
+Trajectories differ. The [scoped BF16 qualification](results/2026-10-15-cdp-bf16-qualification.md)
+now passes5.59M independent projection/loss values and exact actual whole/staged
+gradients, late-target isolation and unchanged346 tensors. The original JSON
+observer failure remains, with5.62M exact underlying F32 values and a separately
+reviewed parser repair. Two passing/one failed guard, one warning; no full-model
+independent oracle, learning parity or promotion. Next reconcile CDP's remaining
+23.94ms imagination/targets separately from its21.72ms posterior/world and from
+RGB/JAX. No timing repeat, precision sweep or learning restart.
 This is separate from the unchanged RGB/JAX2.04x gap, not learned CDP quality.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
