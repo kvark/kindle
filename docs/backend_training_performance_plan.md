@@ -18,8 +18,15 @@ Both exact272-report/288-tensor/HLO controls pass;544 updates, two guards,
 zero warnings/actions. This is a substantial algorithm/lowering difference,
 not a missing BF16 setting, fewer model MACs or an occupancy target.
 The CUDA/native10% timing bands still fail: no native counter proxy or8x
-speedup forecast. Next inspect native code generation, then one shared typed
-aligned/reused/staged convolution contract including transform/scratch cost.
+speedup forecast. Native executable visibility already failed in the retained
+compile-only probe; no repeat. The [aligned block-reuse proof rejects](results/2026-10-15-aligned-convolution.md):
+native2.147ms versus7.433ms including transforms. A qualified phase trace finds
+packing.152ms versus7.283ms in the tensor kernel/dependencies. The latter
+contains addressing, multiplication and strided output; not isolated math.
+Explicit16-byte shader-alignment metadata changes only.054%. Six guards/all
+exact/F64 controls pass, no warnings/actions/updates. Stop this mapping/hint
+path. Next distinguish input/matrix work from strided NCHW output, counting any
+explicit GPU transpose before considering a shared typed backend change.
 No geometry sweep or revival of the failed workgroup-only proof. The full
 2.25x gap remains open; production/training stay unchanged.
 

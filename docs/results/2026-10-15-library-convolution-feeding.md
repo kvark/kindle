@@ -63,8 +63,10 @@ does not causally partition layout, larger reuse, async overlap and compiler
 instruction selection, or promise an8–10× native/full-learner speedup. The dW
 counter capture excludes its separate final reduction.
 
-Next check what native code generation actually exposes before another kernel
-intervention. Then target one shared typed convolution lowering that carries
+The retained [native executable probe](2026-10-14-matrix-cost.md#native-executable-inspection-is-unavailable-through-the-standard-api)
+already returned no internal representation; reuse that evidence, no new query.
+The next [bounded native proof](../experiments/2026-10-15-aligned-convolution.md)
+tests aligned input layout and larger block reuse, then targets shared typed lowering carrying
 aligned vector access, block-level reuse and load/compute staging together;
 count transforms/scratch and preserve independent derivatives. A bounded
 native complete-operation proof must precede Naga/Blade feature work and a

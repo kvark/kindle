@@ -37,8 +37,12 @@ now verify asynchronous128-bit global-to-shared copies and10.33x/8.27x fewer
 warp instructions than the current CUDA translations, despite more tensor
 instructions. Both exact272-report/288-tensor/HLO checks pass. This is substantial
 supporting-work overhead, not simply low occupancy. Native instruction counts
-remain unknown: check native code generation before one shared typed aligned/
-reused/staged lowering, counting transforms and scratch. No production change,
+remain unknown; the retained driver query returned no internal representation.
+The [aligned/reused native proof rejects](results/2026-10-15-aligned-convolution.md):
+2.147→7.433ms, with only.152ms in conversion; the tensor interval also includes
+strided stores. Exact outputs pass; explicit alignment metadata has no material
+effect. Next separate input/matrix work from that output path before shared
+typed backend lowering. No production change,
 8x speedup forecast, new sweep or goal-closure claim.
 
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)

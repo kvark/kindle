@@ -21,10 +21,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   normalized HLO exact/process. No worker remains. Retain original840s timeout
   (completed update prefix unknown), pre-update missing CPU asset failure and
   corrected CPU unit/opcode reporting. No wedge claim or blind retry.
-  Next native code-generation visibility, then one shared typed aligned/reused/
-  staged convolution proof including transforms/scratch—not another geometry
-  sweep or automatic backend feature work. Full B32 stays60.041/26.632ms,2.25x;
-  production/Atari/root-cause goal remain open. Upstreams unchanged; CI413 passes.
+  Native code visibility already failed in the retained compile-only probe;
+  do not repeat it. Next one shared typed aligned/reused/staged convolution
+  proof including transforms/scratch completes and [rejects](docs/results/2026-10-15-aligned-convolution.md):
+  native2.14694ms versus7.43313ms; larger256x32 blocks/aligned NHWC inputs do
+  not reproduce the library implementation. A qualified.0163%-overhead trace
+  assigns.15159ms to packing and7.28275ms to the tensor interval, which includes
+  addressing/math/strided output—not isolated multiplication. Explicit Aligned16
+  on only two SPIR-V loads saves.054%, not the missing switch. Six guards/zero
+  warnings,67.21M exact values/530 F64 checks(265 unique), zero updates/actions;
+  all workers finish. No hint/geometry sweep, production binary-patching or
+  automatic backend feature work. Next distinguish input/matrix work from the
+  strided output path; include any explicit GPU transpose in complete cost.
+  Full B32 stays60.041/26.632ms,2.25x; production/Atari/root-cause goal stay open.
+  Upstreams unchanged; CI414 passes b9d9d0b.
 - **Current derivative algorithms stay slow through CUDA:**
   [comparison, counters and matrix2 readiness](docs/results/2026-10-14-convolution-backend.md).
   Same B512/CI32/CO48/K5 checked dX/dW: native2.148/2.019ms,CUDA1.872/2.441,
