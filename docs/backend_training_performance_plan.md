@@ -137,7 +137,7 @@ cohort.132 guards/six warnings,18.819M F64 comparisons,5,115 optimizer-free call
 zero actions/learner updates/workers. No gate relaxation or promotion. The CPU
 aggregate membership error and corrected audit stay alongside all original data.
 
-### Next causal question: the resource contract, not another tile guess
+### Resource contract confirmed; fixed library control rejected
 
 A separate guarded physical query confirms **48KiB explicit Vulkan workgroup
 shared memory**, versus76/80KiB in the captured library dX/dW. In fact19/23 main
@@ -146,17 +146,27 @@ dispatch. The exact library allocation cannot be copied into explicit Workgroup
 variables. This does not establish the slowdown caused by capacity alone or
 rule out a different legal schedule/driver-managed cooperative-matrix path.
 
-The CPU control audit finds stage choices in22/23 actual products, with choices
-2/3/4 corresponding to captured3/4/5 stages. Original profiled cnn1 dX/dW retain
-engines40/33 and choice3. Next check those exact plans and a supported two-stage
-counterfactual, keeping other knobs fixed, before timing. Installed9.24 exposes
-a memory-used query and stages knob, but not the memory-limit attribute in the
-latest online docs. Do not infer legacy execution from frontend=false. Verify
-actual engine support before a new GPU declaration; do not invent an enum,
-silently upgrade the reference, revive the rejected family or run a geometry
-sweep. Preserve the resource review's compact/raw-schema failure and corrected
-raw hash/launch-field audit. This is a causal question to resolve, not permission
-to assume a48KiB speed ceiling or to start a CUDA learner.
+The [fixed library control](results/2026-10-15-library-pipeline.md) reconstructs
+original cnn1 engines40/33, shapes/strides/knobs/workspaces. Both stage-choice1
+configurations fail3000 at engine-configuration finalization, despite advertised
+individual ranges0–7. No candidate execution plan, kernel or timing exists.
+Two memory-metadata queries also fail; all four failed guards, their truncated
+failure-log snapshots and separately reviewed follow-ups remain. Zero new
+warnings, convolutions or learner updates. Local serialized GPU profiles confirm
+CUDA99KiB opt-in shared memory versus Vulkan48KiB, not the latency it causes.
+No stage/engine/tile sweep, silent library upgrade, invented enum or CUDA learner.
+Installed9.24 lacks the newer documented memory-limit attribute. The serialized
+frontend=false flag does not imply legacy execution. Preserve the earlier
+resource audit's compact/raw-schema failure and corrected review too.
+
+Next establish whether exact saved-output substitution can remove all23
+convolution products from a fixed replay while keeping real consumer values,
+allocation lifetimes and original dependency boundaries. Earlier zero-work
+masks left invalid intermediates and cannot rank the remainder reliably.
+Account for replacement copies and check complete/consumer outputs exactly;
+any GPU allocation needs a separate declaration. This is family-level causal
+diagnosis, not pure kernel latency, ordinary training or a micro-optimization.
+Do not reopen an iterator/geometry sweep on the strength of unknown counters.
 
 The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
 rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs

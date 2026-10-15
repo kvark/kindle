@@ -78,13 +78,18 @@ cost-only observation repeats no cohort and authorizes no compiler promotion.
 A separate properties-only query confirms a more structural constraint:
 Vulkan exposes48KiB explicit workgroup shared memory, while19/23 captured
 cuDNN products exceed it, including76/80KiB dX/dW. A literal port does not fit;
-this is not proof of a causal slowdown or inability to reach parity. CPU audit
-finds stage choices in22/23 products. Next check the saved library engines40/33
-and a supported two-stage counterfactual with all other knobs fixed, before
-timing or another kernel rewrite. Installed9.24 has stages/memory-used controls
-but lacks the latest documented memory-limit attribute. No invented enum,
-silent upgrade or new GPU allocation; serialized frontend=false is not proof
-of legacy execution.
+this is not proof of a causal slowdown or inability to reach parity. The
+[fixed library control](results/2026-10-15-library-pipeline.md) reconstructs
+original engines40/33, but both reduced-stage configurations fail before
+execution-plan construction. Two metadata-query failures also remain; four
+failed guards, zero executions/new warnings and four truncated failure-log
+snapshots. Local plans confirm CUDA99KiB opt-in capacity. No stage/engine/tile
+sweep or timing follows. Installed9.24 lacks the newer memory-limit attribute;
+no invented enum or silent upgrade. Serialized frontend=false is not proof
+of legacy execution. Next check exact saved-output substitution across the
+convolution family: earlier invalid-intermediate masks cannot rank the remainder.
+This requires a separate declaration, value/dependency checks and copy-cost
+accounting, not a learner shortcut or another small kernel tweak.
 The earlier offline capability audit confirms
 explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
 compiler-managed staging is different. No claim that the driver cannot generate

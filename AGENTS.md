@@ -82,13 +82,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   port does not fit, but this is not a causal slowdown or parity-impossibility
   proof. Keep compiler-managed storage distinct. CPU reviewer membership and
   compact/raw-schema failures remain; corrected audits pass without GPU repeats.
-  **Next: one plan-only check of saved cuDNN engines40/33 and a supported
-  two-stage counterfactual, all other knobs fixed, before timing.** CPU audit
-  finds stage choices in22/23 products; choice3 corresponds to four captured
-  stages, not three. Installed9.24 exposes a memory-used query/stages knob but
-  not the latest documented memory-limit attribute. No invented enums, silent
-  reference upgrade or new GPU allocation yet. Do not infer legacy execution
-  from the serialized frontend=false flag. Explicit async-copy/wait/event still
+  The [fixed library-side check rejects](docs/results/2026-10-15-library-pipeline.md):
+  original engines40/33 reconstruct, but both choice1 configurations fail3000
+  before execution-plan construction. Individual stage ranges do not establish
+  supported combinations. Two metadata-query failures also remain; four failed
+  guards, zero executions/new warnings, four truncated failure-log snapshots.
+  Exact plans confirm CUDA99KiB opt-in versus Vulkan48KiB, not its latency cost.
+  No stage/engine/tile sweep or timing follows. Installed9.24 lacks the latest
+  memory-limit attribute; no invented enums or silent reference upgrade.
+  Do not infer legacy execution from serialized frontend=false. Next check
+  feasibility of exact saved-output substitution across all23 convolutions:
+  earlier zero-work masks corrupted intermediate values and cannot rank the
+  remainder. Preserve values/dependencies/copy costs; no learner shortcut or
+  automatic GPU allocation. Explicit async-copy/wait/event still
   requires Kernel, not Vulkan Shader. Source width does not prove async lowering.
   World training remains30.20ms; dependencies/host targets remain distinct.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
