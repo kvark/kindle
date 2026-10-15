@@ -9,12 +9,14 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**54.113ms versus inclusive JAX27.223ms,1.99×**; B8 retains22.780/12.737ms,1.79×.
+**51.945ms versus inclusive JAX27.223ms,1.91×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`076f3135` with
-`KINDLE_DEVICE_MEANS=1`, from [repeated-row composition](results/2026-10-15-repeated-row-composition.md).
-Its control is`99f8aab0` from [GPU categorical means](results/2026-10-15-categorical-gpu.md);
+The current isolated B32 candidate is native`67559ce5` with
+`MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
+[connected image views](results/2026-10-15-image-views.md). Its control is
+`076f3135` from [repeated-row composition](results/2026-10-15-repeated-row-composition.md).
+`99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
 **Practical CDP finding:** the [existing-policy recheck](results/2026-10-15-cdp-precision-recheck.md)
@@ -112,25 +114,25 @@ no retime/promotion or claim that the gap has meaningfully closed. Six guards/
 four warnings,1088 synthetic updates/zero actions; original CPU observer failure
 and separate repair remain. Control076f3135 and inclusive1.99x remain current.
 
-**Next: prove a connected producer/consumer lowering on CPU.** Let image
-producers write the already-required converted/spatially expanded packed views,
-and share identical versions across forward/dX/dW. Preserve exact typed rounding,
-saved backward values and required external NCHW interfaces; prove every consumer
-and escape before allocating a bounded complete RGB/CDP test. Include conversions,
-scratch and both derivatives. No prediction of2x from logical bytes: efficient
-convolution feeding and non-image execution remain necessary. Do not revive
-rejected standalone families, full im2col, halo or invalid-value masks, or start
-another tile/precision/flag sweep. No new GPU allocation or Naga project is
-implied; the broader parity goal stays open.
+**Connected producer/consumer views now qualify:** [complete result](results/2026-10-15-image-views.md).
+RGB54.205→51.945ms,4.17%; CDP47.699→47.112ms,1.23%. All272 reports/targets and
+292/346 tensors at initial/first/final boundaries match exactly, including
+qualification prefixes and retained controls. Full-program review independently
+reconstructs13 changed images/31 removed dispatches in RGB and5/11 in CDP;
+convolution selection/arithmetic and non-world programs remain unchanged.
+CPU proof covers253.755M addresses;144 existing/432 new shader variants pass.
+876.610MB fewer logical writes is not measured DRAM traffic or a VRAM saving.
+Eight guards/seven warnings,1184 synthetic updates, zero actions; timing ends
+12:30:39UTC and CPU review12:31:48, no worker. Keep isolated67559ce5; no production
+or learning promotion. The original Clippy failure/source remain.
 
-The [CPU proof and implementation declaration](experiments/2026-10-15-image-views.md)
-now cover253,755,392 addresses,7,352 surviving reads and892 protected buffers.
-The proposed13 image-kernel changes remove31 dispatches/876.610MB of logical
-writes. Isolated native67559ce5 now passes CPU build/Clippy, exact independent
-plan selection and144 existing/432 new typed shader variants. The [GPU qualification](experiments/2026-10-15-image-views-qualification.md)
-is declared but unstarted: exact24-update RGB/CDP pairs precede one full timing
-pair each, with full ordinary program exports. Convolution algorithms/selection
-and typed rounding remain unchanged; this is not a GPU result or promotion.
+This removes2.26ms, not the remaining24.72ms over inclusive JAX. Next distinguish
+the native interface's expressible data-feeding pipeline from the generated
+algorithms' efficiency, using the complete forward/dX/dW contracts and measured
+resource limits. A credible parity route requires that combined pipeline, not
+another isolated tile. Convolution feeding and non-image execution remain separate
+targets. No rejected family, full im2col, halo, invalid-mask, geometry/precision/
+flag sweep, new GPU allocation or Naga project follows automatically.
 
 ### What is established
 

@@ -13,7 +13,14 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest B32 result:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
+**Latest complete B32 result:** [connected image views](results/2026-10-15-image-views.md)
+reduces RGB54.205→51.945ms,4.17%, and CDP47.699→47.112ms,1.23%. Exact reports,
+targets, saved tensors and full-program audits pass. RGB remains1.91× inclusive
+JAX27.223ms. Keep isolated67559ce5 with image views/device means enabled; no
+production or Atari promotion. Kernel data feeding and device execution remain
+structural open work, not another BF16 switch.
+
+**Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier
 [general ordering](results/2026-10-14-convolution-scheduling.md) improvement.
 Three distribution readbacks25.1MB→98KB; all28,860 independent F64 checks and
@@ -83,11 +90,13 @@ Next prove direct producer-to-consumer converted/expanded packed views on CPU,
 including forward/both derivatives and required saved/external values, before
 a complete-update allocation. Layout alone does not reproduce library data
 feeding. Production and all quality/budget gates remain unchanged/open.
-The [connected-view CPU proof](experiments/2026-10-15-image-views.md) now passes;
-isolated native67559ce5 passes CPU build/Clippy and576 shader variants. Its31
-removed dispatches/876.610MB logical writes are not speed or DRAM measurements.
-The [GPU qualification](experiments/2026-10-15-image-views-qualification.md) is
-declared but unstarted; no production promotion or learning restart.
+The [connected-view qualification and timing](results/2026-10-15-image-views.md)
+now pass: RGB4.17% faster, CDP1.23%, with all272 reports and initial/first/final
+292/346 tensors exact. Full program audits reconstruct only declared image-view
+changes; convolution algorithms remain unchanged. Eight guards/seven warnings,
+1184 synthetic updates, zero actions; no worker. Keep isolated67559ce5. Its31
+removed dispatches/876.610MB logical writes are not DRAM measurements; the
+measured2.26ms gain leaves a1.91x gap. No production promotion or learning restart.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

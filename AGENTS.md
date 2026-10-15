@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is54.113ms versus inclusive JAX27.223ms,1.99x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is51.945ms versus inclusive JAX27.223ms,1.91x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -266,22 +266,30 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   conversions/scratch; no new GPU allocation, Naga project, standalone family/
   geometry sweep or learning restart implied. Layout alone is not cuDNN feeding;
   the complete parity goal and non-image costs stay open.
-- **Connected image-view CPU proof passes:** [implementation declaration](docs/experiments/2026-10-15-image-views.md).
+- **Connected image views qualify:** [complete result](docs/results/2026-10-15-image-views.md).
   All253,755,392 proposed addresses/7,352 surviving reads/892 protected buffers
   pass;13 modified image kernels remove31 dispatches/876.610MB logical writes.
-  No measured speed/traffic claim. Isolated shared typed implementation is in
+  Logical bytes are not measured traffic. Isolated shared typed implementation is in
   `runs/image-views-20261015.EblKUBZN`; native67559ce5 finishes CPU build/Clippy,
   exact independent-plan selection, protected/multiple-writer checks and144
-  existing/432 new typed shader variants. The [next GPU qualification](docs/experiments/2026-10-15-image-views-qualification.md)
-  is declared but unstarted: exact24-update RGB/CDP pairs before one full timing
-  pair each. Full ordinary plan exports are independently enabled. Preserve the
-  original Clippy failure/source and explicit-reference repair. No worker or
-  convolution selection, precision, model or production change.
-- Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
-  `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
+  existing/432 new typed shader variants. Numerical24-update pairs and full
+  timings pass: RGB54.205->51.945ms,4.17%; CDP47.699->47.112ms,1.23%. All272
+  reports/targets/initial-first-final292/346 tensors match exactly, including
+  retained controls and qualification prefixes. Full programs independently
+  reconcile13/31 RGB and5/11 CDP changes/removals; non-world programs unchanged.
+  Eight guards/seven warnings,1184 synthetic updates/zero actions. Timing ends
+  12:30:39UTC, CPU review12:31:48; no worker. Keep the isolated candidate, not
+  a parity/learning claim. Preserve Clippy failure/source and explicit-reference
+  repair. No convolution selection, precision, model or production change.
+  Next distinguish native interface expressibility from generated algorithm
+  efficiency; no layout/geometry sweep, new GPU allocation or Naga project implied.
+- Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
+  `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
+  `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
+  control. `99f8aab0` remains the preceding
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
-  Current backend sources are in the repeated-row study; the control remains
+  Current backend sources are in the image-view study; the ordering control remains
   `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
   this candidate. Upstream rechecked October15: `99e3de27`/`e7c3f7b`, unchanged.
