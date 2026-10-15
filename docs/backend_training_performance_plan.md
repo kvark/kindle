@@ -99,14 +99,29 @@ across both studies, two initializer updates/1460 fixed replays, zero actions.
 Controller-only provenance and CPU/lint failures remain; no GPU rerun. Production
 and complete RGB/JAX54.113/27.223ms remain unchanged.
 
-**Next: inspect the corresponding JAX layout/materialization contract on CPU.**
-Use the existing executable/capture and exact native cut to select one complete
-connected-image lowering, including forward, both derivatives, conversions and
-scratch. Non-heavy fusion alone cannot account for the whole residual; efficient
-convolution/data feeding remains necessary. Do not revive rejected standalone
-families, full im2col, halo or invalid-value masks, or start another tile/precision/
-flag sweep. No new GPU allocation or Naga project is implied. Non-image execution
-remains a separate cost; the broader parity goal stays open.
+**The [image-interface audit](results/2026-10-15-image-layout-contract.md) is complete.**
+All23 JAX convolution outputs use BF16 NHWC/KRSC; native returns NCHW and F32
+derivatives, then converts/repacks. Eight identical-version packs duplicate
+83.886MB of logical writes. This is a compiler dataflow/layout issue, not proof
+that layout alone explains the library's feeding advantage. A concrete packing
+launch cliff affects four products; repairing it saves only2.13% of complete
+RGB updates,54.117→52.963ms, below the declared3% gate. CDP saves3.08%. Structured
+F64 checks and exact retained-control trajectories pass, but full timing-program
+exports were disabled, leaving that gate incomplete. Keep the repair isolated;
+no retime/promotion or claim that the gap has meaningfully closed. Six guards/
+four warnings,1088 synthetic updates/zero actions; original CPU observer failure
+and separate repair remain. Control076f3135 and inclusive1.99x remain current.
+
+**Next: prove a connected producer/consumer lowering on CPU.** Let image
+producers write the already-required converted/spatially expanded packed views,
+and share identical versions across forward/dX/dW. Preserve exact typed rounding,
+saved backward values and required external NCHW interfaces; prove every consumer
+and escape before allocating a bounded complete RGB/CDP test. Include conversions,
+scratch and both derivatives. No prediction of2x from logical bytes: efficient
+convolution feeding and non-image execution remain necessary. Do not revive
+rejected standalone families, full im2col, halo or invalid-value masks, or start
+another tile/precision/flag sweep. No new GPU allocation or Naga project is
+implied; the broader parity goal stays open.
 
 ### What is established
 

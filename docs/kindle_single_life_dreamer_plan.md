@@ -72,9 +72,17 @@ non-convolution image substitution saves4.173ms; replacing the connected image/
 convolution region with exact escaping values reduces fixed-world34.195→6.564ms.
 Only7.014MB of its3.154GB logical outputs escape; poison/version/exact-output
 checks pass. These interacting oracle effects are not implementable full-update
-savings or CDP timings. Next compare the existing JAX image layout/materialization
-contract on CPU before a complete connected lowering, not another standalone
-kernel/flag sweep. Production and all quality/budget gates remain unchanged/open.
+savings or CDP timings. The [image-interface audit](results/2026-10-15-image-layout-contract.md)
+now finds repeated NCHW materialization/casting/packing where JAX keeps BF16 NHWC
+interfaces. Eight duplicate packs are version-proven, not measured savings.
+Fixing a four-product packing launch cliff saves only2.13% of complete RGB
+updates, below its3% gate; CDP saves3.08%. Structured numerics/control trajectories
+pass, but full timing-program exports were disabled and that gate remains
+incomplete. No retime/promotion; keep076f3135 and the inclusive1.99x comparison.
+Next prove direct producer-to-consumer converted/expanded packed views on CPU,
+including forward/both derivatives and required saved/external values, before
+a complete-update allocation. Layout alone does not reproduce library data
+feeding. Production and all quality/budget gates remain unchanged/open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

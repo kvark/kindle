@@ -244,11 +244,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   exact292 tensors and full plans/pipelines/groups pass. Three guards/no warnings,
   two initializer updates/1460 fixed replays/zero actions; CPU/lint failures and
   controller-only snapshot repair remain, no GPU retry. Last GPU finishes10:35:20,
-  CPU review10:38:05, no worker. Production/complete gap unchanged. Next audit
-  corresponding existing JAX image layouts/materialized boundaries on CPU,
-  then select one connected lowering including forward/both derivatives and
-  conversion/scratch costs. No new GPU allocation, Naga project, standalone
-  family/geometry sweep or learning restart implied. Non-image costs stay open.
+  CPU review10:38:05, no worker. Production/complete gap unchanged. The following
+  audit identifies the corresponding existing JAX/native image interfaces.
+- **Image-layout audit complete; packing-limit repair not promoted:**
+  [result](docs/results/2026-10-15-image-layout-contract.md). All23 JAX convolution
+  interfaces are BF16 NHWC/KRSC. Native returns NCHW/F32 derivatives, then casts/
+  repacks;14 products already consume packed inputs. Eight version-proven
+  duplicate packs write83.886MB logically, not measured traffic or savings.
+  Four products fall back solely at65536 packing groups. Bounded2D dispatch
+  qualifies403.575M structured F64 values/134.525M CPU rechecks, but complete
+  RGB54.117->52.963ms saves2.13%, below the declared3% gate; CDP47.677->46.207ms
+  saves3.08%. No retime, subset or promotion. Exact retained-control272 metric
+  reports/initial-first-final292/346 tensors pass; candidate trajectories differ.
+  Full timing plan/pipeline exports were disabled: that gate stays incomplete,
+  not replaced by source/precision-summary checks. Original CPU time-field
+  comparison failure and observer-only repair remain. Six guards/four warnings,
+  1088 synthetic updates/48 standalone calls/zero actions; no worker. Keep076f3135.
+  Next prove a connected producer/consumer lowering on CPU: retain required
+  tapes/rounding/external layouts, write required converted/expanded packed
+  views directly and share identical versions across forward/dX/dW. Count all
+  conversions/scratch; no new GPU allocation, Naga project, standalone family/
+  geometry sweep or learning restart implied. Layout alone is not cuDNN feeding;
+  the complete parity goal and non-image costs stay open.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
