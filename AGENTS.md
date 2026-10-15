@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is54.224ms versus JAX26.632ms,2.04x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is54.245ms versus JAX26.632ms,2.04x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -156,17 +156,36 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   64.42G nominal MACs; not pure kernel cost, DRAM traffic or full-update gain.
   One guard/two warnings,325 fixed replays/one initializer/zero game actions;
   service finishes06:11:11 UTC, no worker. Three CPU tests/Clippy pass.
-  **Next:** four repeat→transpose→typed-normalization chains still write1.132GB
-  of logical intermediates. Existing row-addressing support misses them because
-  its matcher precedes typed scalar fusion and rejects its precision marker.
-  Test general view composition preserving arithmetic/rounding/protected buffers,
-  with one complete-update control; no row/geometry sweep or exploration change.
-  No measured speedup from that view fix yet. Upstream rechecked99e3de27/e7c3f7b;
-  production and RGB/JAX2.04x remain unchanged. Broader goal stays active.
-- Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
-  `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
+  The missed four repeat/transpose/typed-normalization chains are now fixed
+  by the complete-update comparison below; original attribution stays retained.
+- **Repeated-row composition qualifies:** [result](docs/results/2026-10-15-repeated-row-composition.md).
+  Complete CDP50.151→47.728ms,4.83% less; imagination/targets23.873→21.490ms.
+  RGB54.129→54.245ms is effectively unchanged, still2.04x JAX. Exact272 metric
+  reports and initial/first/final346 CDP/292 RGB tensors pass. Eight copies and
+  1.132GB logical writes removed;599 groups/170 BF16 matrices/205 typed scalar
+  kernels and logical buffer inventory unchanged. No VRAM/utilization claim.
+  Signed-probe qualification stays failed in both compilers:1.568M exact paired
+  values, all forward/raw-gradient arrays pass, only near-zero scalar relative
+  gates fail at1.013e−10 absolute error. Separately declared conditioned probe
+  passes5.249M F64 values/arm and exact pairs with unchanged tolerances.
+  Eight passing/two failed guards, five warnings,1,136 synthetic updates,
+  58 raw backwards/58 forward-only passes, zero actions. Service finishes06:59:59
+  UTC; no worker. Build-cache collision and unrelated test Clippy failures stay.
+  Differing same-name source copies need distinct Cargo target caches and
+  old/new compiled-plan assertions, not binary hashes alone.
+  Preserve barriers/rounding/visible values/fused metadata reads/source versions.
+  No exploration change, row/geometry sweep or production/learning promotion.
+  **Next:** CPU inventory for bounded GPU image-to-matrix packing plus existing
+  typed GEMM, including all layouts/scratch/reductions and actual contracts.
+  This is a different algorithmic trade, not the rejected workgroup prototype;
+  the old no-global-im2col preference is not a measured rejection. No new GPU
+  allocation before feasibility/declaration. Broader RGB/JAX goal remains open.
+- Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
+  `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
+  control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
-  Backend sources remain `runs/convolution-scheduling-20261014.BJ5AVZFt`.
+  Current backend sources are in the repeated-row study; the control remains
+  `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
   this candidate. Upstream rechecked October15: `99e3de27`/`e7c3f7b`, unchanged.
   CI status belongs on PR31.

@@ -39,9 +39,17 @@ now preserves all outputs while replacing the closed ensemble branch: fixed
 GPU20.771→8.705ms, conditional12.066ms, not a learner speedup. Existing ensemble
 projections add64.42G MACs; four repeat/transpose chains also materialize1.132GB
 of logical intermediates because address lowering and typed normalization fusion
-do not compose. Test that general compiler fix next, preserving precision and
-exploration. No geometry sweep or learning restart.
-This is separate from the unchanged RGB/JAX2.04x gap, not learned CDP quality.
+do not compose. The [qualified compiler fix](results/2026-10-15-repeated-row-composition.md)
+now saves4.83% of complete CDP updates,50.151→47.728ms, with exact272 reports and
+346 initial/first/final tensors. RGB54.129→54.245ms remains2.04x JAX. Conditioned
+F64 and exact pairs pass; both compilers' original near-zero scalar gate failure
+stays retained, not relaxed. Eight passing/two failed guards/five warnings,
+1,136 synthetic updates, no game actions/workers. Keep isolated076f3135, with
+99f8aab0 as control; no production or learning promotion.
+Next assess bounded GPU image-to-matrix packing into existing typed GEMM,
+including every layout/scratch/reduction cost before any new GPU declaration.
+This is a different algorithmic trade from the rejected workgroup prototype;
+no geometry sweep, CUDA learner or learning restart. The RGB/JAX goal stays open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

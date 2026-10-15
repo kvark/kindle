@@ -9,13 +9,13 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**54.224ms versus JAX26.632ms,2.04×**; B8 retains22.780/12.737ms,1.79×.
+**54.245ms versus JAX26.632ms,2.04×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`99f8aab0` with
-`KINDLE_DEVICE_MEANS=1`, from [GPU categorical means](results/2026-10-15-categorical-gpu.md).
-Its unchanged backend/control remains`28864210` from the
-[general-ordering trial](results/2026-10-14-convolution-scheduling.md).
+The current isolated B32 candidate is native`076f3135` with
+`KINDLE_DEVICE_MEANS=1`, from [repeated-row composition](results/2026-10-15-repeated-row-composition.md).
+Its control is`99f8aab0` from [GPU categorical means](results/2026-10-15-categorical-gpu.md);
+`28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
 **Practical CDP finding:** the [existing-policy recheck](results/2026-10-15-cdp-precision-recheck.md)
 reduces full B32 CDP78.206→50.122ms,35.91%, on that same binary. Historical Mixed
@@ -33,9 +33,23 @@ ordinary update gain or pure kernel latency. The actual12 projections add64.42G
 nominal MACs. A concrete compiler-composition miss also leaves four repeat/
 transpose/normalization chains writing1.132GB of logical intermediates. Existing
 row-addressing support runs before typed normalization fusion exposes the
-pattern, then rejects its precision marker. Next test general view composition
-with preserved rounding/protected values and complete-update evidence. No
-exploration change, geometry sweep or claimed speedup before measurement.
+pattern, then rejects its precision marker. The [general composition fix](results/2026-10-15-repeated-row-composition.md)
+now reduces complete CDP50.151→47.728ms,4.83%, with exact272 reports and346
+initial/first/final tensors. RGB54.129→54.245ms is effectively unchanged.
+Eight copies disappear; groups, typed arithmetic and rounding stay. Conditioned
+F64/exact-pair checks pass; the original signed near-zero scalar failure remains
+in both compilers with identical values and unchanged tolerances. No exploration
+change, production promotion, row/geometry sweep or learning evidence.
+
+**Next structural check:** inventory all actual convolution contracts for a
+bounded GPU image-to-matrix lowering into existing typed GEMM. Include packing,
+transposes, final reductions and peak reusable scratch; no new GPU allocation
+before that feasibility review and a fixed declaration. This trades repeated
+implicit address work for explicit bandwidth and reuse, unlike the rejected
+workgroup/tile prototype. The original no-global-im2col preference below was an
+implementation choice, not a measured rejection of this algorithm. Keep the
+native stack, every family regression and full-update gate; no shape sweep,
+CUDA learner or Naga feature project. RGB world training remains30.21ms.
 
 ### What is established
 
