@@ -49,10 +49,15 @@ stays retained, not relaxed. Eight passing/two failed guards/five warnings,
 The [explicit matrix feasibility screen](results/2026-10-15-convolution-matrix-feasibility.md)
 rejects that route: all23 products' patch construction alone costs34.348ms,
 before GEMM or output work. All6.647M exact values/47,288 actual samples and
-two guards pass, no new warnings/actions/updates. Next test caching each tile's
-overlapping pixels inside the existing kernel, keeping geometry, K order and
-output scatter unchanged. CPU address/resource proof passes; no halo shader
-or GPU trial yet. No matrix2/geometry sweep, CUDA learner or learning restart.
+two guards pass, no new warnings/actions/updates. The subsequent
+[fixed-geometry halo-cache trial](results/2026-10-15-convolution-halo.md) also
+loses: all15 forward/dX occurrences13.706→18.598ms,35.69% slower, despite exact
+F64/output pairs. Six guards/two warnings, no actions/updates. Failed B1
+kernel-selection coverage and its separately reviewed repair remain. No
+full-update trial, geometry sweep, CUDA learner or learning restart follows.
+Next refresh the latest native full-update trace against retained JAX before
+another kernel change. Whole RGB first/last32 measured means54.260/54.198ms
+are stable; isolated-kernel timing shifts do not explain away the2.04x gap.
 The larger RGB/JAX goal remains open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).

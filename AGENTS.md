@@ -183,15 +183,34 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Service finishes07:40:37UTC in15.403s; no worker. Warning-schema audit repair
   retains the original source/report, no GPU repeat. Logical18.119GB writes
   are not DRAM traffic or a universal lower bound for other implementations.
-  **Next:** fixed-geometry intra-kernel halo reuse, not global expansion or the
-  rejected matrix2 prototype. CPU proof covers all15 forward/dX occurrences,
+  CPU proof of intra-kernel halo reuse covers all15 forward/dX occurrences,
   20.070M exact addresses; unchanged staging/output scratch fits47,104/49,152B.
   Keep original32/64 tiles, K order, rounding and scatter; segmented output
   scratch is unnecessary and not selected. Eight dW products/compensation stay.
   Logical image requests9.461->1.642GB are not measured traffic or latency.
-  No halo shader/build/GPU work yet. Declare one complete-family qualification
-  before a full-update trial; no selector/geometry sweep, Naga feature project
-  or automatic learning promotion. Broader RGB/JAX goal remains open.
+  The complete-family trial below now rejects this particular reuse scheme.
+- **Fixed-geometry halo cache rejected:** [result](docs/results/2026-10-15-convolution-halo.md).
+  All15 forward/dX occurrences cost13.706->18.598ms,35.69% slower, including
+  original transforms/output handling. Unchanged math/tiles/K order and exact
+  503,808 F64 outputs/257,949,696 B512 paired outputs pass; no full-update
+  trial, selector/geometry sweep or integration. Only one case improves3.2%.
+  Six guards/two warnings,3,952 operation calls/8,720 operation dispatches,
+  zero actions/updates. Timing finishes08:42:42UTC; no worker remains.
+  Original B1 compile selects different kernels: its two passing GPU guards
+  do not qualify the family. Failed CPU coverage review and two build-receipt
+  path failures stay; separate declared exact-schedule repair passes.
+  Distinct cache/source receipt and old/new pipeline assertions are required.
+  Fewer logical image loads do not establish lower DRAM traffic or better
+  feeding; added shared/address/preload/resource costs are not separately
+  measured. Two kernel sample series shift sharply, without trimming any;
+  latest complete RGB first/last32 means54.260/54.198ms are stable. No cause
+  for the kernel shifts or explanation-away of the2.04x gap is established.
+  **Next:** refresh the latest unchanged native full-update trace against
+  retained JAX before another kernel change. Earlier native captures predate
+  several whole-program improvements; no additive microbenchmark savings
+  budget. CategoricalGpu submits Blade work outside Meganeura's coarse GPU
+  trace; uncovered time must not be labeled wholly CPU/idle. No Naga feature
+  project or automatic learning promotion.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the

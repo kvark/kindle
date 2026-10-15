@@ -48,18 +48,30 @@ All6.647M exact small-case values and47,288 actual samples pass; two passing
 guards, no new warnings or learner updates. No complete lowering or chunk sweep.
 Logical18.119GB writes are not DRAM traffic or a universal latency lower bound.
 
-**Next structural intervention: on-chip spatial reuse at unchanged geometry.**
-Cache each tile's surrounding pixels once, then retain current32/64 tiles,
-K order, typed arithmetic, staging, output scratch and scatter. CPU proof covers
-all15 forward/dX occurrences and20.070M exact addresses; the largest shared
-allocation is47,104 bytes, within the recorded49,152-byte limit. A segmented
-output epilogue considered during inventory is unnecessary and not selected.
-Eight dW products and their compensation stay unchanged. Logical image requests
-9.461→1.642GB are not measured traffic or a speed forecast: cache hits, occupancy
-and extra initialization barriers matter. No halo shader/build/GPU work yet.
-Declare one complete-family check and require a useful ordinary complete-update
-benefit before integration. No new tile selection, matrix2/Naga project, CUDA
-learner or learning restart. RGB world training remains30.21ms.
+**Fixed-geometry spatial caching also loses:** [complete-family result](results/2026-10-15-convolution-halo.md).
+All15 forward/dX occurrences cost13.706→18.598ms,35.69% slower with original
+packing/output work.503,808 F64 outputs and257,949,696 B512 paired outputs pass;
+math, K order,32/64 tiles, staging/scatter and all eight dW products stay.
+The largest shared allocation47,104B fits, but logical image requests falling
+9.461→1.642GB does not establish reduced DRAM traffic or a useful pipeline.
+Additional shared/address/preload/resource costs are not individually measured.
+Six passing guards/two warnings, no actions/updates; no full-update trial or
+favorable-subset promotion. Original B1 kernel-selection coverage failure and
+CPU receipt errors remain; a separately declared exact-schedule repair passes.
+Two isolated kernel series shift within the128 samples, all retained. A CPU
+audit finds complete RGB first/last32 means54.260/54.198ms; no comparable drift
+explains the whole2.04x gap. Do not infer a driver/clock cause from timing alone.
+
+**Next: refresh complete-execution attribution before another kernel change.**
+Capture the latest unchanged native candidate and reconcile its whole-update
+trace against retained actual JAX. Earlier native captures predate several
+whole-program fixes. Separate host work, device execution, dependencies and
+convolution/matrix/other work at consistent scope; family/bypass timings are
+not additive savings. Source review finds CategoricalGpu's Blade submission is
+outside Meganeura's coarse GPU trace; retain that coverage gap and do not label
+all uncovered intervals CPU work/idle. This is diagnosis, not another tile/precision search,
+matrix2/Naga feature project, CUDA learner or learning restart. RGB world
+training remains30.21ms and the broader parity goal remains open.
 
 ### What is established
 
