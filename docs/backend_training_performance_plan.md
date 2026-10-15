@@ -178,6 +178,20 @@ Current67559ce5 and the1.91x whole gap remain unchanged. No rejected-family
 revival, tile/precision sweep, favorable subset or relaxed numerical gates.
 The broader root-cause/parity goal and non-convolution costs stay open.
 
+**The resulting fixed policy is now in numerical qualification:**
+[design](experiments/2026-10-15-reuse-policy.md) and
+[allocation](experiments/2026-10-15-reuse-policy-gpu.md). It includes all23 products,
+not just already-packed ones: four-channel packing, resource-bounded wider reuse,
+one input slot and4KiB output fragments. K32, split ranges and compensation stay;
+forward/dX terms may reorder and retain the original independent numerical gates.
+120 offline modules and104.808M CPU addresses pass; source-state bounds are64
+spatial/96 compensated values per computing lane, not measured registers.
+Padded work increases1.45%,374.467G versus369.099G, so a win must come from feeding/
+reuse, not less nominal arithmetic. The60-guard numerical service starts15:49UTC;
+timing is separately reviewed/prepared only after completion. Keep unchanged
+native/GLSL controls, all packing/reductions and all cases. No speedup, compiler
+project, favorable selector, sweep or production/learning promotion yet.
+
 ### What is established
 
 - **We are not doing four times as much model arithmetic.** The

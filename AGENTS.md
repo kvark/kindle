@@ -333,6 +333,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass. Zero actions/updates; no worker. Next CPU-derive a complete compact
   operand/reuse policy bounded by shared and accumulator state before any GPU
   allocation. No geometry/precision sweep, relaxed gates or automatic promotion.
+- **Compact-channel/reuse numerical qualification is running:** [policy](docs/experiments/2026-10-15-reuse-policy.md)
+  and [bounded allocation](docs/experiments/2026-10-15-reuse-policy-gpu.md).
+  One shared typed algorithm covers all23 occurrences: four-channel alignment,
+  output-area bounds8192 spatial/4096 dW, K32, unchanged splits/compensation,
+  one input slot and4KiB output fragments.120 offline modules/104.808M CPU
+  addresses pass; BF16/F32 explicit shared maxima26.5/44.5KiB, logical state
+  maxima64 spatial/96 compensated values per computing lane, not registers.
+  Padded arithmetic374.467G is1.45% above retained369.099G. No speed claim.
+  Source-review repairs preserve the first preflight; no GPU retry. Unchanged
+  native67559ce5 and original GLSL controls pass1,720 provenance checks.
+  Numerical service starts October15 at15:49 UTC;60 guards,120s/process,1h
+  service bound, no GPU-worker CPU quota. Complete numerical review precedes
+  a separately prepared timing phase. All cases/regressions/costs remain; no
+  favorable subset, geometry sweep, relaxed gates or automatic integration.
+  Artifacts `runs/reuse-policy-20261015.Yy1qEpm6`. Production/Atari stay stopped.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
