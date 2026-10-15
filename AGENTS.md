@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is54.245ms versus JAX26.632ms,2.04x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is54.113ms versus inclusive JAX27.223ms,1.99x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -205,12 +205,35 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   measured. Two kernel sample series shift sharply, without trimming any;
   latest complete RGB first/last32 means54.260/54.198ms are stable. No cause
   for the kernel shifts or explanation-away of the2.04x gap is established.
-  **Next:** refresh the latest unchanged native full-update trace against
-  retained JAX before another kernel change. Earlier native captures predate
-  several whole-program improvements; no additive microbenchmark savings
-  budget. CategoricalGpu submits Blade work outside Meganeura's coarse GPU
-  trace; uncovered time must not be labeled wholly CPU/idle. No Naga feature
-  project or automatic learning promotion.
+- **Latest complete-update attribution passes:** [result](docs/results/2026-10-15-whole-update-attribution.md).
+  Fresh ordinary54.113ms; coarse55.150ms,+1.916% instrumentation. GPU-pass
+  union47.699ms, uncovered7.453ms; cached programs46.484ms, means.059ms and
+  optimizer.464ms. Helpers/host work alone cannot explain the residual2.03x.
+  Pass coverage is not SM utilization; readback/submit spans contain GPU waits.
+  All272 reports/first targets/initial-first-final292 tensors and paired plans/
+  pipelines/groups pass exactly. Two guards/no new warnings/2,068 seals,
+  544 synthetic updates/zero actions. GPU finishes09:10:01UTC; no worker.
+  Correct the sealed declaration's chunk description in the result: two prefix
+  plus three backward chunks, not one plus four. Timed chunking adds three
+  intermediate waits; same setting does not preserve ordinary overlap. Original
+  CPU receipt/module failures stay; no GPU retry. Instrumentationcc11418e is
+  not promoted. Current world graph matches prior valid-value attribution;
+  its19.909ms conditional convolution difference is not an additive saving.
+- **Current B32 JAX execution control passes:** [result](docs/results/2026-10-15-jax-command-buffer-b32.md).
+  Command buffers on/off: core26.550/29.042ms, inclusive27.223/29.505ms.
+  Exact272 reports/288 initial-final tensors,940 static fusion computation
+  bodies/112 custom-call configurations/physical shapes/reachable heavy work
+  match, including retained control. Native54.113ms remains1.83x slower even
+  without JAX graphs; graphs are not the dominant B32 residual. Historical
+  JAX26.632ms was a core boundary, not caller-inclusive; no new native speedup.
+  Two guards/two warnings/82 seals,544 synthetic updates/zero actions. GPU
+  finishes09:42:04UTC; CPU review09:47:43UTC, no worker. Original serialized
+  HLO failure remains: independent parameter order and JSON key order only;
+  ten CPU regressions qualify semantic comparison without numerical relaxation.
+  No GPU repeat. Next isolate remaining non-convolution image-training work
+  using valid saved outputs/all live consumers before a layout/region rewrite.
+  Do not revive invalid-value masks, failed sparse-timing attribution, or start
+  another matrix/tile/precision/flag sweep. No automatic learning promotion.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the

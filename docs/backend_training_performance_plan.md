@@ -9,7 +9,7 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**54.245ms versus JAX26.632ms,2.04×**; B8 retains22.780/12.737ms,1.79×.
+**54.113ms versus inclusive JAX27.223ms,1.99×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
 The current isolated B32 candidate is native`076f3135` with
@@ -62,16 +62,36 @@ Two isolated kernel series shift within the128 samples, all retained. A CPU
 audit finds complete RGB first/last32 means54.260/54.198ms; no comparable drift
 explains the whole2.04x gap. Do not infer a driver/clock cause from timing alone.
 
-**Next: refresh complete-execution attribution before another kernel change.**
-Capture the latest unchanged native candidate and reconcile its whole-update
-trace against retained actual JAX. Earlier native captures predate several
-whole-program fixes. Separate host work, device execution, dependencies and
-convolution/matrix/other work at consistent scope; family/bypass timings are
-not additive savings. Source review finds CategoricalGpu's Blade submission is
-outside Meganeura's coarse GPU trace; retain that coverage gap and do not label
-all uncovered intervals CPU work/idle. This is diagnosis, not another tile/precision search,
-matrix2/Naga feature project, CUDA learner or learning restart. RGB world
-training remains30.21ms and the broader parity goal remains open.
+**Current complete-execution attribution now passes:** [result](results/2026-10-15-whole-update-attribution.md).
+Fresh ordinary54.113ms; coarse55.150ms,+1.916% instrumentation. GPU-pass union
+47.699ms versus7.453ms uncovered. Cached programs46.484ms dominate; categorical
+means.059ms and optimizer.464ms cannot explain the gap. All272 reports/292
+initial-first-final tensors and paired plans/pipelines/groups match exactly.
+Two guards/no warnings,544 synthetic updates, zero actions. Timed chunking
+adds three intermediate waits; pass coverage is not SM utilization or an exact
+ordinary decomposition. The corrected two-prefix/three-backward description
+and original CPU failures remain. Current world graph matches the retained
+valid-value convolution attribution, not an additive savings estimate.
+
+**Current B32 graph-execution control passes:** [result](results/2026-10-15-jax-command-buffer-b32.md).
+JAX command buffers on/off: core26.550/29.042ms, inclusive27.223/29.505ms.
+Exact272 reports/288 initial-final tensors,940 static fusion computations,
+112 library configurations/physical shapes and reachable heavy work match.
+Native remains1.83x slower even without JAX graphs. Their2.282ms inclusive
+effect cannot explain most of the residual; old tiny-chain/B8 ratios do not
+scale into a dominant B32 advantage. Historical26.632ms was JAX's core boundary,
+not caller-inclusive; this correction is not a native speedup. Two guards/two
+warnings,544 synthetic updates, zero actions. CPU serialization failure and
+qualified dependency-graph/JSON canonicalization repair remain; no GPU retry.
+
+**Next: isolate the remaining non-convolution spatial work with valid values.**
+Use the existing saved-output intervention on the current image-training region,
+retaining every live output, consumer and original dependency, before a physical
+layout/connected-region rewrite. Prior invalid-intermediate masks and failed
+sparse timing cannot rank this remainder. This is targeted causal attribution,
+not a matrix/tile/precision/flag sweep, new Naga feature or CUDA learner. Library
+algorithm/data feeding remains a separate demonstrated cost. No additive savings
+budget or learning restart; the broader parity goal remains open.
 
 ### What is established
 

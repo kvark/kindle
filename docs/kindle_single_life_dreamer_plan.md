@@ -55,10 +55,20 @@ loses: all15 forward/dX occurrences13.706→18.598ms,35.69% slower, despite exac
 F64/output pairs. Six guards/two warnings, no actions/updates. Failed B1
 kernel-selection coverage and its separately reviewed repair remain. No
 full-update trial, geometry sweep, CUDA learner or learning restart follows.
-Next refresh the latest native full-update trace against retained JAX before
-another kernel change. Whole RGB first/last32 measured means54.260/54.198ms
-are stable; isolated-kernel timing shifts do not explain away the2.04x gap.
-The larger RGB/JAX goal remains open.
+The [refreshed complete trace](results/2026-10-15-whole-update-attribution.md)
+now passes: ordinary54.113ms, still2.03x JAX. Coarse instrumentation adds1.916%;
+47.699ms of55.152ms lies inside GPU passes, cached programs46.484ms. Helpers
+and host work alone cannot explain the residual. All272 reports/292 tensors
+at three boundaries and plans match exactly; two guards/no warnings,544
+synthetic updates, zero actions. Timed chunking adds three waits; coverage
+is not utilization. The [current B32 command-buffer control](results/2026-10-15-jax-command-buffer-b32.md)
+now passes: JAX inclusive27.223ms with graphs/29.505ms without. Native remains
+1.83x slower even without graphs; exact reports/tensors/fusion computation/
+library settings pass. Two guards/two warnings,544 synthetic updates, no actions.
+Historical26.632ms was JAX's core boundary; the current inclusive comparison
+is54.113/27.223ms,1.99x, not a new native speedup. Next isolate remaining
+non-convolution image-training work using valid saved outputs, not invalid
+masks or another kernel/flag sweep. All quality/budget gates remain open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%
