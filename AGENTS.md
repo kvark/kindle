@@ -175,11 +175,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   old/new compiled-plan assertions, not binary hashes alone.
   Preserve barriers/rounding/visible values/fused metadata reads/source versions.
   No exploration change, row/geometry sweep or production/learning promotion.
-  **Next:** CPU inventory for bounded GPU image-to-matrix packing plus existing
-  typed GEMM, including all layouts/scratch/reductions and actual contracts.
-  This is a different algorithmic trade, not the rejected workgroup prototype;
-  the old no-global-im2col preference is not a measured rejection. No new GPU
-  allocation before feasibility/declaration. Broader RGB/JAX goal remains open.
+- **Explicit image-to-matrix feasibility rejects:** [result](docs/results/2026-10-15-convolution-matrix-feasibility.md).
+  All23 products' patch generation alone costs34.348ms, above the declared15ms
+  gate, even excluding NHWC preparation/GEMM/output scatter/reduction. No full
+  lowering, shape/chunk sweep or integration. All6.647M exact small-case values,
+  47,288 actual samples and two guards pass; zero new warnings/actions/updates.
+  Service finishes07:40:37UTC in15.403s; no worker. Warning-schema audit repair
+  retains the original source/report, no GPU repeat. Logical18.119GB writes
+  are not DRAM traffic or a universal lower bound for other implementations.
+  **Next:** fixed-geometry intra-kernel halo reuse, not global expansion or the
+  rejected matrix2 prototype. CPU proof covers all15 forward/dX occurrences,
+  20.070M exact addresses; unchanged staging/output scratch fits47,104/49,152B.
+  Keep original32/64 tiles, K order, rounding and scatter; segmented output
+  scratch is unnecessary and not selected. Eight dW products/compensation stay.
+  Logical image requests9.461->1.642GB are not measured traffic or latency.
+  No halo shader/build/GPU work yet. Declare one complete-family qualification
+  before a full-update trial; no selector/geometry sweep, Naga feature project
+  or automatic learning promotion. Broader RGB/JAX goal remains open.
 - Keep isolated candidate`076f3135` with `KINDLE_DEVICE_MEANS=1` under
   `runs/repeated-row-composition-20261015.dDTCIIip`; `99f8aab0` remains its
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the

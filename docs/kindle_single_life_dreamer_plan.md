@@ -46,10 +46,14 @@ F64 and exact pairs pass; both compilers' original near-zero scalar gate failure
 stays retained, not relaxed. Eight passing/two failed guards/five warnings,
 1,136 synthetic updates, no game actions/workers. Keep isolated076f3135, with
 99f8aab0 as control; no production or learning promotion.
-Next assess bounded GPU image-to-matrix packing into existing typed GEMM,
-including every layout/scratch/reduction cost before any new GPU declaration.
-This is a different algorithmic trade from the rejected workgroup prototype;
-no geometry sweep, CUDA learner or learning restart. The RGB/JAX goal stays open.
+The [explicit matrix feasibility screen](results/2026-10-15-convolution-matrix-feasibility.md)
+rejects that route: all23 products' patch construction alone costs34.348ms,
+before GEMM or output work. All6.647M exact values/47,288 actual samples and
+two guards pass, no new warnings/actions/updates. Next test caching each tile's
+overlapping pixels inside the existing kernel, keeping geometry, K order and
+output scatter unchanged. CPU address/resource proof passes; no halo shader
+or GPU trial yet. No matrix2/geometry sweep, CUDA learner or learning restart.
+The larger RGB/JAX goal remains open.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%

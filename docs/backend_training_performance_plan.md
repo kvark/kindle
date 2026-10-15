@@ -41,15 +41,25 @@ F64/exact-pair checks pass; the original signed near-zero scalar failure remains
 in both compilers with identical values and unchanged tolerances. No exploration
 change, production promotion, row/geometry sweep or learning evidence.
 
-**Next structural check:** inventory all actual convolution contracts for a
-bounded GPU image-to-matrix lowering into existing typed GEMM. Include packing,
-transposes, final reductions and peak reusable scratch; no new GPU allocation
-before that feasibility review and a fixed declaration. This trades repeated
-implicit address work for explicit bandwidth and reuse, unlike the rejected
-workgroup/tile prototype. The original no-global-im2col preference below was an
-implementation choice, not a measured rejection of this algorithm. Keep the
-native stack, every family regression and full-update gate; no shape sweep,
-CUDA learner or Naga feature project. RGB world training remains30.21ms.
+**Explicit matrix lowering is now rejected by measurement:** [feasibility screen](results/2026-10-15-convolution-matrix-feasibility.md).
+All23 products' input-patch construction alone costs34.348ms, above the declared
+15ms gate, even with free NHWC preparation and no GEMM/output/reduction cost.
+All6.647M exact small-case values and47,288 actual samples pass; two passing
+guards, no new warnings or learner updates. No complete lowering or chunk sweep.
+Logical18.119GB writes are not DRAM traffic or a universal latency lower bound.
+
+**Next structural intervention: on-chip spatial reuse at unchanged geometry.**
+Cache each tile's surrounding pixels once, then retain current32/64 tiles,
+K order, typed arithmetic, staging, output scratch and scatter. CPU proof covers
+all15 forward/dX occurrences and20.070M exact addresses; the largest shared
+allocation is47,104 bytes, within the recorded49,152-byte limit. A segmented
+output epilogue considered during inventory is unnecessary and not selected.
+Eight dW products and their compensation stay unchanged. Logical image requests
+9.461→1.642GB are not measured traffic or a speed forecast: cache hits, occupancy
+and extra initialization barriers matter. No halo shader/build/GPU work yet.
+Declare one complete-family check and require a useful ordinary complete-update
+benefit before integration. No new tile selection, matrix2/Naga project, CUDA
+learner or learning restart. RGB world training remains30.21ms.
 
 ### What is established
 
