@@ -71,7 +71,7 @@ or retry unsafe profiling routes.
 Six guards pass, zero allocation/validation warnings, zero learner updates/game
 actions/recovery/NVML polling.444 candidate operation invocations/1,332 shader
 dispatches plus292 unchanged native operations;67,212,800 exact output checks
-and530 retained F64 checks across265 unique coordinates. Minimum sampled Vulkan
+and530 retained F64 checks across265 shape/index cases (264 distinct flat indices). Minimum sampled Vulkan
 headroom15,999,565,824 bytes, not physical free/peak. CPU address/build/review
 checks pass; all workers finish. Candidate binary9e9b7d11; sources, original and
 hinted shaders, all samples and manifests remain under

@@ -29,12 +29,34 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   assigns.15159ms to packing and7.28275ms to the tensor interval, which includes
   addressing/math/strided output—not isolated multiplication. Explicit Aligned16
   on only two SPIR-V loads saves.054%, not the missing switch. Six guards/zero
-  warnings,67.21M exact values/530 F64 checks(265 unique), zero updates/actions;
-  all workers finish. No hint/geometry sweep, production binary-patching or
-  automatic backend feature work. Next distinguish input/matrix work from the
-  strided output path; include any explicit GPU transpose in complete cost.
+  warnings,67.21M exact values/530 F64 checks(265 shape/index cases), zero updates/actions;
+  all workers finish. [Contiguous output](docs/results/2026-10-15-convolution-store.md)
+  does not help7.430→7.534ms; [F16](docs/results/2026-10-15-convolution-type.md)
+  with identical dyadic values also does not help7.43375→7.43317ms.
+  **[Fixed valid input loads](docs/results/2026-10-15-convolution-address.md)
+  cut7.438→1.877ms**, including a GPU halo pack:74.77% less than the rejected
+  proof, only12.59% less than retained native2.147ms. Exact outputs/F64 checks
+  pass. Trace overhead.112%/.120% qualifies,.179ms packing/1.700ms tensor and
+  dependencies; not isolated math. Compile-only stats report255 registers in
+  both shaders, code274,304→125,056 bytes/shared48,640 unchanged. Local-memory
+  values remain bogus even in a scalar control; do not infer spill bytes.
+  This compound addressing/lowering intervention does not prove which machine
+  instructions change or that the existing native kernel has the same issue.
+  Thirteen new guards/zero warnings,117.54M exact checks across these three
+  diagnostics; zero updates/actions. No native assembly retry or automatic
+  backend/compiler work. The [library-derived K32 contraction](docs/results/2026-10-15-convolution-contraction.md)
+  then saves1.876→1.293ms,31.11%, with identical runner/packs/output and total
+  nominal work. This is39.79% below retained native2.147ms, not a newly paired
+  native/full-update or parity claim. Registers stay255; shared48,640→24,576,
+  code125,056→176,256, so no smaller-code/fewer-register/spill attribution.
+  Four more guards/zero warnings; total17 new guards/151.13M exact checks,
+  zero updates/actions/workers. The CPU publication audit's duplicated flat
+  index0 is corrected:264 distinct flat indices/265 shape-index cases, no
+  numerical change or GPU retry; original failed audit remains. Next broader BF16 derivatives and a fresh
+  native/complete-operation pair before shared typed backend support. No open
+  geometry/hint sweep, automatic compiler project or production promotion.
   Full B32 stays60.041/26.632ms,2.25x; production/Atari/root-cause goal stay open.
-  Upstreams unchanged; CI414 passes b9d9d0b.
+  Upstreams unchanged; CI415 passes d46cb4e.
 - **Current derivative algorithms stay slow through CUDA:**
   [comparison, counters and matrix2 readiness](docs/results/2026-10-14-convolution-backend.md).
   Same B512/CI32/CO48/K5 checked dX/dW: native2.148/2.019ms,CUDA1.872/2.441,

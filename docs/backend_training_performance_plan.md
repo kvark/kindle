@@ -25,10 +25,22 @@ packing.152ms versus7.283ms in the tensor kernel/dependencies. The latter
 contains addressing, multiplication and strided output; not isolated math.
 Explicit16-byte shader-alignment metadata changes only.054%. Six guards/all
 exact/F64 controls pass, no warnings/actions/updates. Stop this mapping/hint
-path. Next distinguish input/matrix work from strided NCHW output, counting any
-explicit GPU transpose before considering a shared typed backend change.
-No geometry sweep or revival of the failed workgroup-only proof. The full
-2.25x gap remains open; production/training stay unchanged.
+path. The [output-store](results/2026-10-15-convolution-store.md) and
+[BF16/F16](results/2026-10-15-convolution-type.md) controls do not improve it.
+**[Fixed valid input addressing](results/2026-10-15-convolution-address.md)
+cuts7.438→1.877ms**, counting a new GPU halo pack:74.77% less than the rejected
+proof,12.59% less than retained native2.147ms. Qualified trace assigns.179ms
+packing/1.700ms to loads/math/output/dependencies. Compound input/lowering change,
+not an instruction-level causal split or whole-agent gain. Compiler metadata
+reports255 registers in both forms and code274,304→125,056 bytes; local-memory
+statistics fail the scalar control and remain uninterpreted. Next one declared
+[library K32 contraction](results/2026-10-15-convolution-contraction.md)
+now cuts1.876→1.293ms,31.11%, with unchanged total nominal work/runner/packs/
+output. It is39.79% below retained native2.147ms, not a fresh native pair or
+whole-update gain. Registers stay255, shared memory halves, executable grows;
+no measured spill/fewer-register claim. Next broader BF16 derivatives and one
+fresh native/candidate pair before shared typed backend support. No geometry/
+hint sweep or automatic compiler project;2.25x full gap/production/Atari stay open.
 
 **Latest: [the current derivative algorithms remain slow under CUDA](results/2026-10-14-convolution-backend.md).**
 Same-source dX/dW take2.148/2.019ms native and1.872/2.441ms CUDA, versus

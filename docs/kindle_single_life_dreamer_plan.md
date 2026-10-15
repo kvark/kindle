@@ -41,9 +41,19 @@ remain unknown; the retained driver query returned no internal representation.
 The [aligned/reused native proof rejects](results/2026-10-15-aligned-convolution.md):
 2.147→7.433ms, with only.152ms in conversion; the tensor interval also includes
 strided stores. Exact outputs pass; explicit alignment metadata has no material
-effect. Next separate input/matrix work from that output path before shared
-typed backend lowering. No production change,
-8x speedup forecast, new sweep or goal-closure claim.
+effect. Output-store and BF16/F16 controls do not help. A
+[fixed-valid-input contract](results/2026-10-15-convolution-address.md) then cuts
+the proof7.438→1.877ms including GPU halo padding—fourfold relative to that
+failed proof, only12.59% faster than retained native2.147ms. Qualified trace
+assigns.179ms packing/1.700ms to the remaining tensor interval. Both forms
+report255 registers; smaller code supports different compiler lowering, not
+measured spill bytes or exact instruction attribution. Testing the observed
+library K32 reduction step for operand liveness yields another improvement: that
+[fixed test now saves31%](results/2026-10-15-convolution-contraction.md), to1.293ms
+including transforms,39.79% below retained native2.147ms. Broader derivatives
+and a fresh native pair remain before shared typed backend support. No open
+geometry/hint sweep, automatic compiler project or production promotion. Whole
+B32 remains60.041/26.632ms; no8x forecast or full-gap closure.
 
 The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
