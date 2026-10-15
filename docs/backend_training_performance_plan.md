@@ -17,6 +17,14 @@ The current isolated B32 candidate is native`99f8aab0` with
 Its unchanged backend/control remains`28864210` from the
 [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
+**Practical CDP finding:** the [existing-policy recheck](results/2026-10-15-cdp-precision-recheck.md)
+reduces full B32 CDP78.206→50.122ms,35.91%, on that same binary. Historical Mixed
+selection misses later BF16 derivatives and staged posterior reuse; imagination
+is unchanged. Four guards and exact initials/finite trajectories pass, but this
+is cost evidence, not independent numerical qualification or a CDP/JAX ratio.
+Next qualify the BF16 CDP loss/gradients and staged prefix/tail, with no timing
+repeat or learning restart. Production remains unchanged.
+
 ### What is established
 
 - **We are not doing four times as much model arithmetic.** The
@@ -177,12 +185,35 @@ barriers but omits nonselected commands; it is not a subtractable kernel cost.
 The14.282ms remainder and other learner stages remain real. Latest complete
 54.224/26.632ms stays unchanged; no native SM-utilization claim.
 
-Next distinguish encoder from RGB decoder using valid values before another
-kernel intervention. Eleven products belong to the encoder and12 to the decoder;
-CDP removes RGB reconstruction. Nine checked/14 packed products and their padded
-arithmetic are useful source distinctions, not latency shares. A decoder-only
-gain cannot establish a CDP gain. No new subset allocation is declared/running,
-and no iterator/geometry sweep follows from unknown counters.
+The [encoder/decoder comparison](results/2026-10-15-convolution-role-cost.md)
+now passes: normal/encoder-substituted/decoder-substituted/both fixed-world
+intervals34.216/27.285/21.142/14.280ms. The symmetric conditional allocation is
+6.896ms encoder/13.039ms decoder, with only.069ms interaction. About65% of the
+convolution intervention belongs to RGB reconstruction, which CDP removes.
+All four conditions preserve exact live/full outputs and three292-tensor pairs;
+first targets/reports, complete graph semantics and1,157 source seals pass.
+One guard/zero warnings,512 retained samples/647 full-world replays and one
+initializer update. No new failed process or timing retry. This is not pure
+kernel cost or a whole-learner/CDP speedup; the14.280ms remainder stays real.
+
+Source review confirms CDP already has the October11 exploration projection
+reuse/hidden centering; its old18-way first-projection diagnosis is obsolete.
+Mixed's separate BF16 inference/F16-world path does not inherit staged RGB
+posterior reuse. The policy was selected before BF16 backward and staging
+support existed. The [bounded recheck](results/2026-10-15-cdp-precision-recheck.md)
+now finds Mixed/BF16 full updates78.206/50.122ms,35.91% less time. Posterior+world
+49.788→21.715ms accounts for the change; imagination stays23.94ms. Four guards,
+one warning,592 synthetic updates and exact346 initial tensors pass. Each arm
+reproduces its own smoke prefix; cross-policy trajectories differ. Actual model
+parameter relativeL2 is.0001757 after one step/.05677 after272, distinct from
+optimizer moments. The corrected CPU label/audit and all data remain. No source
+rebuild or game actions. This is cost evidence, not independent numerical
+qualification or a comparison to the RGB/JAX ratio. Qualify CDP BF16 loss/
+gradients and staged prefix/tail next, before promotion; no timing repeat.
+Do not make RGB decoder work the main-path bottleneck by assumption. Further
+algorithm work must address substantial data-feeding or execution structure,
+not another small tile/iterator variation. No new subset/geometry sweep,
+production promotion or learning restart follows.
 
 The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
 rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs

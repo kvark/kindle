@@ -1,0 +1,191 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "artifact_root": "runs/convolution-role-cost-20261015.8xUKRn0w",
+  "native_sha256": "f282ad74cbc4e8951dec8472b91dd984e7b7498a3d53cc0a541c0e124a5bf2ca",
+  "ordinary_full_update_retimed": false,
+  "conditions": [
+    "none",
+    "encoder",
+    "decoder",
+    "both"
+  ],
+  "fixed_world_gpu_ms": [
+    34.215532,
+    27.2848185,
+    21.142393,
+    14.280216
+  ],
+  "queued_wall_ms": [
+    34.22473009375,
+    27.29367421875,
+    21.155029765625002,
+    14.285062343749999
+  ],
+  "conditional_and_symmetric_difference_ms": {
+    "encoder_without_decoder_substitution": 6.930713500000003,
+    "encoder_with_decoder_substitution": 6.862176999999999,
+    "decoder_without_encoder_substitution": 13.073139000000005,
+    "decoder_with_encoder_substitution": 13.0046025,
+    "encoder_symmetric": 6.896445250000001,
+    "decoder_symmetric": 13.038870750000003,
+    "total": 19.935316000000004,
+    "interaction": 0.068536500000004
+  },
+  "prior_relative_drift": {
+    "control": 0.0007088280544498282,
+    "both": -0.00013175585498292897
+  },
+  "both_prior_means_within_three_percent": true,
+  "blocks": [
+    {
+      "block": 0,
+      "condition": 0,
+      "gpu_ms": 34.136128,
+      "queued_wall_ms": 34.1465265,
+      "recording_ms": 0.0023945625
+    },
+    {
+      "block": 1,
+      "condition": 1,
+      "gpu_ms": 27.2812025,
+      "queued_wall_ms": 27.29383140625,
+      "recording_ms": 0.004611140625
+    },
+    {
+      "block": 2,
+      "condition": 2,
+      "gpu_ms": 21.142139,
+      "queued_wall_ms": 21.1551714375,
+      "recording_ms": 0.004823328125
+    },
+    {
+      "block": 3,
+      "condition": 3,
+      "gpu_ms": 14.279498,
+      "queued_wall_ms": 14.284405843750001,
+      "recording_ms": 0.0027889375
+    },
+    {
+      "block": 4,
+      "condition": 3,
+      "gpu_ms": 14.280934,
+      "queued_wall_ms": 14.285718843749999,
+      "recording_ms": 0.002388140625
+    },
+    {
+      "block": 5,
+      "condition": 2,
+      "gpu_ms": 21.142647,
+      "queued_wall_ms": 21.15488809375,
+      "recording_ms": 0.0039114375
+    },
+    {
+      "block": 6,
+      "condition": 1,
+      "gpu_ms": 27.2884345,
+      "queued_wall_ms": 27.293517031249998,
+      "recording_ms": 0.002446578125
+    },
+    {
+      "block": 7,
+      "condition": 0,
+      "gpu_ms": 34.294936,
+      "queued_wall_ms": 34.3029336875,
+      "recording_ms": 0.0038420625
+    }
+  ],
+  "all_samples_retained": true,
+  "measured_replays_per_condition": 128,
+  "full_world_replays_including_validation_and_warmup": 647,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "guards_passed": 1,
+  "new_allocation_warnings": 0,
+  "snapshot_bytes": 855506944,
+  "snapshot_outputs": 23,
+  "live_boundary_groups": 17,
+  "conditions_exact": 4,
+  "exact_tensors_per_boundary": 292,
+  "exact_tensor_boundary_pairs": 3,
+  "minimum_sampled_headroom_bytes": 12165971968,
+  "semantic_leaf_fingerprints": {
+    "world-plan.json": {
+      "leaf_count": 24531915,
+      "sha256_sum": "fc2b3db760af86109f615c5bd12db7143dd3e85db971a10299c36176a141c087",
+      "sha256_xor": "f08faac42f962b1b67d52d5e4a27ac6ff15c620e83dc71961d10d98c5e8af39d"
+    },
+    "world-pipelines.json": {
+      "leaf_count": 4023,
+      "sha256_sum": "e405ddc433da7eb71face4514f6a1d30a41d66fc6f3563c5068226eee8afbbbf",
+      "sha256_xor": "93de7ffc1e6ef817200a0ac1ce1184c467bf5f0574ce81e11a66c48ead59914b"
+    },
+    "world-groups.json": {
+      "leaf_count": 2516,
+      "sha256_sum": "a62793134aadbc40bdd389cf90e95c003a12cbc57137996bd0882ef6bdeae524",
+      "sha256_xor": "342b2e9de83867c8c2d5e983994bae1511f63d528e29c90eec288615180a3a04"
+    },
+    "first-outputs.json": {
+      "leaf_count": 5618720,
+      "sha256_sum": "99a46379031a7710d28009afd5d98e0c3cab2a89f88aa6626babddca7e98e723",
+      "sha256_xor": "53613911a042d992ea76e3e7de4599777fd2c47c6aae4cb7ccb298a565f3272d"
+    },
+    "config.json": {
+      "leaf_count": 55,
+      "sha256_sum": "1b9296925897b6ef759a020ac6b2b749b4ed1069136b1e8a23e33e430f1db78e",
+      "sha256_xor": "60586925377792e606eb77c17dce78d0953cfcb6e624b90bf977ee2d74cf30f8"
+    }
+  },
+  "source_seals": 1157,
+  "roles": {
+    "encoder": {
+      "products": 11,
+      "indices": [
+        121,
+        129,
+        137,
+        145,
+        3953,
+        3954,
+        3968,
+        3969,
+        3977,
+        3978,
+        3988
+      ],
+      "snapshot_bytes": 343867392,
+      "checked": 4,
+      "packed": 7
+    },
+    "decoder": {
+      "products": 12,
+      "indices": [
+        1902,
+        2133,
+        2226,
+        2357,
+        2492,
+        2493,
+        2511,
+        2517,
+        2535,
+        2536,
+        2550,
+        2551
+      ],
+      "snapshot_bytes": 511639552,
+      "checked": 5,
+      "packed": 7
+    }
+  },
+  "interpretation": [
+    "Each intervention retains exact live-boundary and complete finite output values.",
+    "Differences include replacement copies, cache effects and preserved dependency boundaries, not pure kernel costs.",
+    "The symmetric allocation averages each conditional difference; it is not an independently measured exclusive kernel sum.",
+    "CDP removes the decoder, but changes the graph and gradients; this RGB encoder finding is not measured CDP throughput.",
+    "No ordinary learner speedup, native utilization measurement or automatic production promotion follows."
+  ],
+  "reviewer_sha256": "31c633d6d4cc6792130a88ac0ed0c7991a9c2d0650702eabbb9eed0926ca3660",
+  "raw_result_sha256": "3b298bc7eb89badee7978fdeff53be2de0c005afd92d571b96886380b7443a5c",
+  "raw_review_sha256": "724d819fa0ae69ffcec0b92671709a6966abdb99a00e66b83bcc00379107186a"
+}

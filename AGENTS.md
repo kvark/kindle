@@ -104,10 +104,36 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   original binding-contract smoke remains failed, with separately declared
   source repair. One initializer update,324 full-world/80 copy-only replays;
   CPU whole-object audit OOM and corrected streaming audit stay. No worker.
-  Next separate11 encoder from12 decoder products before choosing an algorithm:
-  CDP removes the RGB decoder, so a decoder-only win is not a CDP win. Nine
-  checked/14 packed products are source inventory, not their measured shares.
-  No new subset allocation, geometry/iterator sweep or production promotion.
+- **Encoder/decoder attribution passes:** [result](docs/results/2026-10-15-convolution-role-cost.md).
+  One valid-value four-condition comparison measures fixed-world34.216ms normal,
+  27.285ms encoder substituted,21.142ms decoder substituted,14.280ms both.
+  Symmetric conditional differences6.896/13.039ms, interaction.069ms; about65%
+  of this intervention belongs to RGB reconstruction, absent from CDP. Not pure
+  kernel costs, ordinary learning gains or measured CDP throughput. Fresh outer
+  conditions remain within.071% of the predecessor; all512 samples retained.
+  Four exact live/full-output conditions, three292-tensor pairs, first targets/
+  reports, complete plan/pipeline/group semantics and1,157 source seals pass.
+  One guard/zero warnings,647 fixed-world replays/one initializer/zero actions;
+  CPU audit67.01s/77.2MiB, four selector/shader tests and Clippy pass. No worker.
+  Source review confirms CDP already has exploration projection reuse/hidden
+  centering; its old18-way first-projection cost is obsolete. Mixed's separate
+  posterior predates BF16 backward/staging support.
+  No decoder-only CDP claim, small tile/iterator sweep, new subset allocation
+  or automatic promotion. RGB/JAX remains a separate unchanged comparison.
+- **CDP policy cost recheck complete:** [result](docs/results/2026-10-15-cdp-precision-recheck.md).
+  Same native99f8aab0/checkpoint/B32/T16 recipe: Mixed→BF16 full updates
+  78.206→50.122ms,35.91%; posterior+world49.788→21.715ms, imagination23.94ms
+  unchanged. Historical Mixed selection predates BF16 derivatives/staged reuse;
+  both mechanisms change together, not an isolated shader attribution. No new
+  kernel/rebuild. Four guards/one warning/592 synthetic updates/zero actions;
+  exact346 initials, finite states/reports and each arm's own24-report/first-
+  outputs/tensors smoke prefix pass. All454 source seals pass; service finishes
+  05:14:52 UTC in92.70s, no worker. CPU moment-name mislabel is corrected without
+  GPU repeat:130 actual parameters differ by.0001757 relativeL2 after one update,
+  .05677 after272; moments separately reported. Not numerical or learning parity.
+  Next independently qualify BF16 CDP loss/gradients and staged prefix/tail
+  numerics on this path before promotion. No timing repeat, precision sweep or
+  learner restart. RGB/JAX2.04x and the broader root-cause goal remain open.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
   `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).

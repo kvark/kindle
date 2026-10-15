@@ -21,7 +21,17 @@ Three distribution readbacks25.1MB→98KB; all28,860 independent F64 checks and
 but later F32-vs-F64 trajectories differ; no learning-equivalence claim.
 Four guards/three warnings,545 synthetic updates, zero actions/workers.
 Still2.04× retained JAX26.632ms. Keep isolated99f8aab0 with device means enabled;
-production and B8/CDP/learning are not promoted/remeasured. Targets remain on CPU.
+production, B8 and learning are not promoted/remeasured by that result. The
+separate CDP recheck follows below. Targets remain on CPU.
+
+**New CDP cost finding:** [Mixed→BF16 on the current binary](results/2026-10-15-cdp-precision-recheck.md)
+reduces full updates78.206→50.122ms,35.91%. The old Mixed policy excludes later
+BF16 derivative/staged-posterior improvements; posterior+world falls49.788→
+21.715ms, imagination stays23.94ms. Four guards/exact346 initials/finite states
+and each arm's own smoke prefix pass;592 synthetic updates, no game actions.
+Trajectories differ. Independently qualify CDP loss/gradients and staged prefix/
+tail before promotion; no timing repeat, precision sweep or learning restart.
+This is separate from the unchanged RGB/JAX2.04x gap, not learned CDP quality.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%
@@ -93,9 +103,17 @@ checked outputs/tensors. This resolves the old invalid-intermediate masking
 problem, not ordinary training speed or pure kernel latency. Copy-only2.005ms
 includes original barriers and is not a subtractable saving. Two guards/zero
 new warnings; original binding-contract failure and CPU audit OOM remain beside
-their reviewed repairs. No worker or production change. Next separate11 encoder
-from12 decoder products: CDP removes reconstruction, so decoder-only savings
-are not CDP savings. No new subset allocation or geometry/iterator sweep.
+their reviewed repairs. The [role comparison](results/2026-10-15-convolution-role-cost.md)
+now assigns6.896ms to encoder and13.039ms to decoder substitution, with.069ms
+interaction; normal/both34.216/14.280ms. About65% belongs to RGB reconstruction,
+absent from CDP. These are valid-value intervention differences, not pure kernel
+latencies or measured CDP gains. All four conditions, live/full outputs, three
+292-tensor pairs and complete graph/source audits pass; one guard/zero warnings,
+647 fixed replays/one initializer/zero actions. No worker or production change.
+The source review and existing-policy comparison above reconcile the next CDP
+contract: exploration projection reuse is already present, while Mixed excludes
+the staged BF16 path. No decoder-only CDP claim or new subset/geometry/iterator
+sweep follows.
 The earlier offline capability audit confirms
 explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
 compiler-managed staging is different. No claim that the driver cannot generate
