@@ -298,23 +298,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   diagnostic below precedes compiler changes; no
   unsafe uniformity bypass, fixed-subgroup assumption without enforcement or
   favorable tile subset. Current complete gap stays1.91x and goal stays open.
-- **Actual feeding-family qualification running:** [declaration](docs/experiments/2026-10-15-feeding-family.md),
-  [indexing repair](docs/experiments/2026-10-15-feeding-family-index.md).
-  All23 current products/20 contracts retain32/64 tiles,K32,B512 and original
-  dW splits/compensation. Native/GLSL serial/two-producer-four-consumer arms;
-  no Naga edit or geometry sweep.180 typed SPIR-V variants validate;4,165,339
-  checked-iterator addresses and113,664 ownership checks pass. Required32-lane
-  full subgroups are enforced. Original first five numerical cohorts/15 guards
-  pass, then a source review stops the service: local invocation IDs are not
-  guaranteed to map to subgroup IDs. Sixth native guard is interrupted and lacks
-  a completion receipt; do not count systemd's successful stop as study success.
-  Corrected producer IDs pass720 assignment permutations; old formula fails288.
-  Fresh guarded qualification runs under `runs/feeding-family-index-20261015.y5CaEr4O`,
-  with independent review between cohorts. No timing until complete numerical
-  review; require10% native/GLSL calibration and20% complete-family benefit before
-  considering compiler integration. Original CPU manifest's missing env_logger
-  and its wrapper-only repair remain. Production/Atari unchanged; no GPU fault
-  or wedge observed. Upstream99e3de27/e7c3f7b remains unchanged.
+- **Actual feeding family rejected:** [complete result](docs/results/2026-10-15-feeding-family.md).
+  All23 products/20 contracts retain32/64 tiles,K32,B512 and original splits/
+  compensation. Native/GLSL serial/pipeline complete GPU costs22.412/24.418/
+  46.671ms; queued wall22.472/24.483/46.749ms. Aggregate calibration+8.95%
+  passes10%, not per-kernel calibration. Every contract regresses versus both
+  controls; pipeline+108.24% versus native,+91.13% versus GLSL. No Naga project,
+  favorable selector, loader/tile sweep or full-update trial.60 numerical/60
+  timing guards,4,035,648 F64 comparisons and1,033,149,184 exact value pairs pass;
+  31 warnings,8,940 standalone calls, zero actions/learner updates. Numerical
+  fixtures use two active images with full512 grids/splits; old cancellation
+  failures remain.180 SPIR-V variants/4.165M addresses/113,664 ownership checks
+  pass. Original15 guards/45 calls/25 warnings plus an interrupted sixth native
+  cohort remain: local IDs did not guarantee subgroup mapping. Corrected subgroup
+  IDs pass720 assignments; old formula fails288. Missing logging dependency and
+  early CPU-audit receipt race remain; no GPU repeat for those CPU repairs.
+  Timing ends13:50:25UTC; full independent audits pass, no worker remains.
+  Current whole gap stays1.91x; this changes neither production nor Atari.
+  Next CPU-audit exact output-store layouts/rounding/tails/reductions without
+  a full shared output tile: current64x64 scratch16KiB would become64KiB at
+  64x256, already above48KiB. This is an unproven prerequisite for larger reuse,
+  not a new allocation or revival of rejected algorithms. Keep67559ce5.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

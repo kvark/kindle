@@ -142,11 +142,26 @@ remain unsupported by this schedule. Two loading/four computing subgroups with
 ordinary full-group barriers pass1.646M schedule-event checks/five negatives.
 Naga rejects subgroup-uniform consumer branches for all three types, while
 whole-group controls pass; the newer memory-model branch has the same analyzer.
-This is no GPU/numerical/performance result and no compiler change. Preserve
-three CPU preparation failures and repairs. Next prove an actual complete-family
-Vulkan implementation before considering a Naga project; do not disable uniformity
-checks, silently assume subgroup size or select favorable tiles. No new GPU
-allocation yet. The root-cause and parity goals remain open.
+That CPU result is not performance evidence and changes no compiler. Preserve
+three CPU preparation failures and repairs. Its [actual complete-family follow-up](results/2026-10-15-feeding-family.md)
+now **rejects the schedule**: native/GLSL serial/pipeline GPU totals22.412/24.418/
+46.671ms, all23 products included. Aggregate serial calibration+8.95% passes;
+every distinct contract regresses against both controls. All4.036M F64 comparisons,
+1.033B paired values and120 guards pass, but there is no useful speedup or reason
+to start the Naga feature project. Preserve the stopped original allocation's
+subgroup-ID/local-ID assumption and the separately qualified repair; enforcing
+subgroup size alone does not establish that mapping. No full-update trial,
+favorable selector or loader/geometry sweep follows.
+
+Next audit exact output-store contracts on CPU before another GPU algorithm:
+current64x64 kernels allocate16KiB of F32 shared output scratch;64x256 would need
+64KiB for output alone, beyond the48KiB explicit limit. Determine whether final/
+partial layouts, rounding, tails and reductions can avoid a full shared output
+tile. This could enable larger reuse within the interface, but is not yet a
+proved lowering or speedup. The loader split preserves repeated operand/address
+work; merely overlapping it has failed. Current67559ce5 and the1.91x whole gap
+remain unchanged. No new GPU allocation or compiler project; the broader
+root-cause/parity goals stay open.
 
 ### What is established
 

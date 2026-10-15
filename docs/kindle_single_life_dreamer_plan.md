@@ -22,8 +22,14 @@ structural open work, not another BF16 switch.
 The [CPU pipeline review](results/2026-10-15-feeding-pipeline.md) identifies a
 specific Naga limitation: a subgroup-uniform producer/consumer split validates
 as Vulkan SPIR-V but is rejected by Naga's cooperative-operation analysis.
-Reduced-precision double buffering fits the retained resource limit; actual
-convolution correctness and benefit are untested. No compiler edit or GPU run.
+Reduced-precision double buffering fits the retained resource limit, but the
+[actual full-family trial](results/2026-10-15-feeding-family.md) now rejects this
+schedule:22.412/24.418/46.671ms native/GLSL serial/separate loaders. Every contract
+regresses, despite passing numerical checks and aggregate calibration. No Naga
+project, full-update trial or favorable selector follows. Next CPU-audit the
+output-store contract needed for larger reuse without a full shared output tile;
+do not mistake overlapping unchanged loading/address work for cuDNN's pipeline.
+Keep the1.91x whole gap and all original failed/stopped evidence; no new allocation.
 
 **Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier
