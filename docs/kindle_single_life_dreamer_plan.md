@@ -29,11 +29,17 @@ regresses, despite passing numerical checks and aggregate calibration. No Naga
 project, full-update trial or favorable selector follows. The subsequent
 [CPU output audit](results/2026-10-15-output-contract.md) proves exact layouts can
 avoid a full shared output tile, including a4KiB fragment alternative supported
-by current Naga. This is not a GPU speedup. Operand padding and accumulator live
-state still constrain wider reuse; next derive a complete resource-bounded layout
-policy before allocating another GPU trial. Keep compensation, numerical gates,
-the1.91x whole gap and all failed/stopped evidence. No new compiler project or
-allocation; overlapping unchanged loading work is not cuDNN's pipeline.
+by current Naga. The resulting [complete resource-bounded policy](results/2026-10-15-reuse-policy.md)
+now passes numerical checks but loses21.72%:22.327→27.177ms across all23 products,
+18/20 contracts regressing.120 guards/no warnings; no integration or favorable
+selector. Source staging drops33.93%, but output barriers and in-loop coordinate
+work increase; these are not hardware-counter costs. Keep compensation, numerical
+gates, isolated67559ce5 and the1.91x whole gap. No new kernel sweep or Atari run.
+Next obtain native counters without failed Graphics injection: the standard
+Vulkan counter extension is absent; the login-gated Linux Nsight Perf SDK has
+been requested for direct in-application collection. Compatibility/lifecycle
+must be reviewed before capture. All workers are finished; this is a diagnostic
+tool limitation, not a GPU-health/permission blocker.
 
 **Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier

@@ -19,6 +19,16 @@ The current isolated B32 candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
+**Latest boundary:** the [complete compact-channel/reuse policy](results/2026-10-15-reuse-policy.md)
+passes numerics but loses21.72% versus native,22.327→27.177ms over all23
+convolutions. No integration or favorable-shape selector. Source-level staging
+falls33.93%, but output synchronization and in-loop coordinate work increase;
+these are not hardware-counter attribution. Direct native counters are the next
+discriminator. The standard Vulkan counter extension is absent on this driver;
+the login-gated Linux Nsight Perf SDK has been requested. No Graphics injection
+retry, driver change or new kernel sweep. All workers have finished; the goal
+remains open, not a GPU-health/approval blockage.
+
 **Practical CDP finding:** the [existing-policy recheck](results/2026-10-15-cdp-precision-recheck.md)
 reduces full B32 CDP78.206→50.122ms,35.91%, on that same binary. Historical Mixed
 selection misses later BF16 derivatives and staged posterior reuse; imagination
@@ -170,27 +180,22 @@ also represent384 logical F32 values/compute lane with retained compensation;
 not measured registers/spills. Its earlier removal saves only.89% and fails
 numerical checks: keep it. No accumulation sweep or unsupported cuDNN claim.
 
-Next derive a complete compact operand/reuse policy bounded by shared storage
-and accumulator live state before another GPU allocation. Use the existing-API
-fragment output option first; a missing direct-store builtin does not justify
-a compiler project. The loader split preserved repeated work and failed.
-Current67559ce5 and the1.91x whole gap remain unchanged. No rejected-family
-revival, tile/precision sweep, favorable subset or relaxed numerical gates.
-The broader root-cause/parity goal and non-convolution costs stay open.
-
-**The resulting fixed policy is now in numerical qualification:**
+**The resulting fixed policy now fails its complete-family timing gate:**
 [design](experiments/2026-10-15-reuse-policy.md) and
-[allocation](experiments/2026-10-15-reuse-policy-gpu.md). It includes all23 products,
+[result](results/2026-10-15-reuse-policy.md). It includes all23 products,
 not just already-packed ones: four-channel packing, resource-bounded wider reuse,
 one input slot and4KiB output fragments. K32, split ranges and compensation stay;
 forward/dX terms may reorder and retain the original independent numerical gates.
 120 offline modules and104.808M CPU addresses pass; source-state bounds are64
 spatial/96 compensated values per computing lane, not measured registers.
-Padded work increases1.45%,374.467G versus369.099G, so a win must come from feeding/
-reuse, not less nominal arithmetic. The60-guard numerical service starts15:49UTC;
-timing is separately reviewed/prepared only after completion. Keep unchanged
-native/GLSL controls, all packing/reductions and all cases. No speedup, compiler
-project, favorable selector, sweep or production/learning promotion yet.
+Padded work increases1.45%,374.467G versus369.099G. Native/GLSL/candidate totals
+22.327/24.313/27.177ms include packing/reduction; aggregate calibration passes,
+but18/20 contracts regress.120 guards/no warnings and independent final audits
+pass; numerical15/20 contracts are exact, five pass unchanged nonexact limits.
+All samples/transients and CPU observer repairs remain. Timing finishes16:10:46UTC.
+No compiler project, integration, selector, sweep or learning promotion. Keep
+67559ce5 and the1.91x whole gap. Native counter access above is now the next
+discriminator; fitting resources is not sufficient evidence of an efficient kernel.
 
 ### What is established
 

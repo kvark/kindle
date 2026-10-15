@@ -330,24 +330,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   compensation-removal.89% null/numerical failure stays closed. No Naga feature
   project: the fragment alternative uses existing operations. Original missing
   rustc PATH failure/source retained; absolute-path repair and independent audit
-  pass. Zero actions/updates; no worker. Next CPU-derive a complete compact
-  operand/reuse policy bounded by shared and accumulator state before any GPU
-  allocation. No geometry/precision sweep, relaxed gates or automatic promotion.
-- **Compact-channel/reuse numerical qualification is running:** [policy](docs/experiments/2026-10-15-reuse-policy.md)
-  and [bounded allocation](docs/experiments/2026-10-15-reuse-policy-gpu.md).
-  One shared typed algorithm covers all23 occurrences: four-channel alignment,
-  output-area bounds8192 spatial/4096 dW, K32, unchanged splits/compensation,
-  one input slot and4KiB output fragments.120 offline modules/104.808M CPU
-  addresses pass; BF16/F32 explicit shared maxima26.5/44.5KiB, logical state
-  maxima64 spatial/96 compensated values per computing lane, not registers.
-  Padded arithmetic374.467G is1.45% above retained369.099G. No speed claim.
-  Source-review repairs preserve the first preflight; no GPU retry. Unchanged
-  native67559ce5 and original GLSL controls pass1,720 provenance checks.
-  Numerical service starts October15 at15:49 UTC;60 guards,120s/process,1h
-  service bound, no GPU-worker CPU quota. Complete numerical review precedes
-  a separately prepared timing phase. All cases/regressions/costs remain; no
-  favorable subset, geometry sweep, relaxed gates or automatic integration.
-  Artifacts `runs/reuse-policy-20261015.Yy1qEpm6`. Production/Atari stay stopped.
+  pass. Zero actions/updates; no worker. The resulting complete policy below
+  fails; no geometry/precision sweep, relaxed gates or automatic promotion.
+- **Compact-channel/reuse policy rejected:** [full result](docs/results/2026-10-15-reuse-policy.md).
+  All23 products cost22.327/24.313/27.177ms native/GLSL serial/candidate:
+  21.72% slower than native;18/20 contracts regress. Aggregate calibration+8.89%
+  passes10%, not per-kernel calibration. Keep all samples including CNN0 GLSL's
+  large transient.120 guards/no warnings,4.036M F64 values/1.033B paired values;
+  candidate numerical15/20 exact, five reordered cases pass unchanged gates.
+  Timing ends16:10:46UTC; independent audits pass, no worker.8,940 standalone
+  calls, zero actions/updates.120 offline modules/104.808M CPU addresses pass.
+  CPU source accounting finds33.93% fewer staged positions but more output
+  barriers and reintroduced in-loop coordinate work; not hardware counters or
+  proven slowdown attribution. Preserve initial preflight and constant-branch
+  observer defects/repairs. No favorable selector, sweep or integration.
+  Whole gap stays1.91x; keep67559ce5. Production/Atari stay stopped.
+- **Native counter readiness checked:** same [report](docs/results/2026-10-15-reuse-policy.md#native-counter-access).
+  One properties-only guard/no warnings finishes16:19:37UTC; no logical device
+  or dispatch.5080/580.178.04 has252 extensions but no KHR performance-query
+  extension. No counter collection/feature query; unqueried zeros are not activity.
+  Requested the login-gated Linux Nsight Perf SDK for direct in-application
+  Vulkan counters. Review compatibility/lifecycle before a bounded collection;
+  no Graphics injection/assembly retry, driver change or kernel sweep. Not a
+  GPU-health or permission blocker. Source/receipt audit passes; no worker.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -357,7 +362,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current backend sources are in the image-view study; the ordering control remains
   `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Upstream rechecked October15: `99e3de27`/`e7c3f7b`, unchanged.
+  this candidate. Latest October15 upstream: `f648a453`/`e7c3f7b`; Meganeura's
+  two new search/attention exploration fixes do not change ordinary convolution.
+  No runtime refresh or historical repin from this review.
   CI status belongs on PR31.
 - **Closed diagnostics stay closed.** No native assembly-query retry (the
   retained query returned no representations), failed Nsight Graphics injection
