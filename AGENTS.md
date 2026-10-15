@@ -315,10 +315,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   early CPU-audit receipt race remain; no GPU repeat for those CPU repairs.
   Timing ends13:50:25UTC; full independent audits pass, no worker remains.
   Current whole gap stays1.91x; this changes neither production nor Atari.
-  Next CPU-audit exact output-store layouts/rounding/tails/reductions without
-  a full shared output tile: current64x64 scratch16KiB would become64KiB at
-  64x256, already above48KiB. This is an unproven prerequisite for larger reuse,
-  not a new allocation or revival of rejected algorithms. Keep67559ce5.
+  The following CPU output audit addresses one prerequisite for larger reuse;
+  it does not revive this rejected schedule. Keep67559ce5.
+- **Output-storage CPU feasibility passes:** [result](docs/results/2026-10-15-output-contract.md).
+  All23 occurrences/280.986M outputs/378.339M fragment positions reconcile.
+  Nine direct-store typed SPIR-V modules validate with zero explicit output
+  scratch; nine existing-Naga fragment-store IR variants use4KiB, two barriers
+  per phase.1.442M bit-rounding checks/seven negatives pass; no GPU execution.
+  Padded two-slot operands fit3/9/13 of22 known library tiles with full/fragment/
+  direct output; unpadded payload with fragment/direct fits18/22 and22/22.
+  These are storage envelopes, not conflict-free layouts or actual library-stage
+  replication. Four larger dW tiles also imply384 logical F32 values/compute
+  lane with retained compensation; not measured registers/spilling. The old
+  compensation-removal.89% null/numerical failure stays closed. No Naga feature
+  project: the fragment alternative uses existing operations. Original missing
+  rustc PATH failure/source retained; absolute-path repair and independent audit
+  pass. Zero actions/updates; no worker. Next CPU-derive a complete compact
+  operand/reuse policy bounded by shared and accumulator state before any GPU
+  allocation. No geometry/precision sweep, relaxed gates or automatic promotion.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -153,15 +153,30 @@ subgroup-ID/local-ID assumption and the separately qualified repair; enforcing
 subgroup size alone does not establish that mapping. No full-update trial,
 favorable selector or loader/geometry sweep follows.
 
-Next audit exact output-store contracts on CPU before another GPU algorithm:
-current64x64 kernels allocate16KiB of F32 shared output scratch;64x256 would need
-64KiB for output alone, beyond the48KiB explicit limit. Determine whether final/
-partial layouts, rounding, tails and reductions can avoid a full shared output
-tile. This could enable larger reuse within the interface, but is not yet a
-proved lowering or speedup. The loader split preserves repeated operand/address
-work; merely overlapping it has failed. Current67559ce5 and the1.91x whole gap
-remain unchanged. No new GPU allocation or compiler project; the broader
-root-cause/parity goals stay open.
+The [output-contract CPU audit](results/2026-10-15-output-contract.md) now passes
+all23 actual contracts/280.986M outputs. Nine typed direct-store SPIR-V variants
+need zero explicit output scratch; nine existing-Naga fragment-store IR variants
+use4KiB independent of full tile size. The latter needs no new compiler builtin,
+but adds two barriers per phase.1.442M independent bit-rounding checks pass;
+neither route has GPU numerical/timing qualification. Preserve the original
+missing-rustc preparation failure and reviewed absolute-path repair.
+
+Removing the full output tile is necessary for some wider reuse schemes, not
+sufficient for a good pipeline. Applying current packed-kernel padding, two slots fit
+3/9/13 of22 known library geometries under48KiB with full/fragment/direct output.
+Unpadded payload with fragment/direct fits18/22 or22/22, but that is only a storage
+lower bound, not a qualified bank-conflict-free mapping. Four larger dW tiles
+also represent384 logical F32 values/compute lane with retained compensation;
+not measured registers/spills. Its earlier removal saves only.89% and fails
+numerical checks: keep it. No accumulation sweep or unsupported cuDNN claim.
+
+Next derive a complete compact operand/reuse policy bounded by shared storage
+and accumulator live state before another GPU allocation. Use the existing-API
+fragment output option first; a missing direct-store builtin does not justify
+a compiler project. The loader split preserved repeated work and failed.
+Current67559ce5 and the1.91x whole gap remain unchanged. No rejected-family
+revival, tile/precision sweep, favorable subset or relaxed numerical gates.
+The broader root-cause/parity goal and non-convolution costs stay open.
 
 ### What is established
 
