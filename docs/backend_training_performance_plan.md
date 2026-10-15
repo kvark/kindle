@@ -26,6 +26,17 @@ now passes5.59M independent projection/loss values and exact whole/staged actual
 world gradients. This is not a full-model independent oracle or learning parity.
 No timing repeat or learning restart; production remains unchanged.
 
+**Current main-path attribution:** [exact bonus substitution](results/2026-10-15-cdp-imagination-work.md)
+changes fixed imagination20.771→8.705ms. Its12.066ms conditional cost belongs to
+the additional action-effects ensemble, absent from RGB/JAX; this is not an
+ordinary update gain or pure kernel latency. The actual12 projections add64.42G
+nominal MACs. A concrete compiler-composition miss also leaves four repeat/
+transpose/normalization chains writing1.132GB of logical intermediates. Existing
+row-addressing support runs before typed normalization fusion exposes the
+pattern, then rejects its precision marker. Next test general view composition
+with preserved rounding/protected values and complete-update evidence. No
+exploration change, geometry sweep or claimed speedup before measurement.
+
 ### What is established
 
 - **We are not doing four times as much model arithmetic.** The
@@ -220,10 +231,11 @@ Separate persistence/parsing repair and CPU regression pass without relaxing
 equality or repeating the independent boundary. Two passing/one failed guard,
 one warning,13 raw backwards/two initializers including failure; zero actions.
 No new timing, full-model independent oracle, learning parity or promotion.
-The next main-path attribution must reconcile the remaining23.94ms imagination/
-targets and existing ensemble workload, absent from RGB/JAX, separately from
-21.72ms posterior/world. Continue the structural feeding/execution investigation;
-do not resurrect the old18-way state-projection diagnosis.
+The [completed main-path attribution](results/2026-10-15-cdp-imagination-work.md)
+now identifies12.066ms of conditional imagination cost in the additional
+ensemble, with all outputs preserved. Its pass-order/view-composition miss above
+is the next concrete compiler test. Continue the separate structural feeding/
+execution investigation; do not resurrect the old18-way state-projection diagnosis.
 Do not make RGB decoder work the main-path bottleneck by assumption. Further
 algorithm work must address substantial data-feeding or execution structure,
 not another small tile/iterator variation. No new subset/geometry sweep,

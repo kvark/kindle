@@ -1,0 +1,187 @@
+{
+  "status": "complete",
+  "native_sha256": "86d87c8294e56ccd158dffd6f201d3281e7aeece032b1072c6824baa46ba4dfe",
+  "guards_passed": 1,
+  "allocation_warnings": 2,
+  "gpu_ms": {
+    "normal": 20.7708015,
+    "substituted": 8.70515525
+  },
+  "conditional_difference_ms": 12.06564625,
+  "conditional_fraction_percent": 58.08945913810788,
+  "blocks": [
+    {
+      "block": 0,
+      "removed": false,
+      "mean_gpu_ms": 20.769957,
+      "queued_wall_ms_per_replay": 20.77913115625,
+      "record_ms": 0.05084
+    },
+    {
+      "block": 1,
+      "removed": true,
+      "mean_gpu_ms": 8.704147,
+      "queued_wall_ms_per_replay": 8.712856734375,
+      "record_ms": 0.04927
+    },
+    {
+      "block": 2,
+      "removed": true,
+      "mean_gpu_ms": 8.7061635,
+      "queued_wall_ms_per_replay": 8.70900153125,
+      "record_ms": 0.049271
+    },
+    {
+      "block": 3,
+      "removed": false,
+      "mean_gpu_ms": 20.771646,
+      "queued_wall_ms_per_replay": 20.77998128125,
+      "record_ms": 0.05074
+    }
+  ],
+  "base_ancestor_dispatches": 802,
+  "bonus_exclusive_dispatches": 90,
+  "all_dispatches": 892,
+  "groups": 599,
+  "ensemble_matrix_macs": 64424509440,
+  "exclusive_logical_write_bytes": 3360944128,
+  "snapshot_bytes": 30720,
+  "measured_replays": 256,
+  "complete_imagination_replays": 325,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "exact_tensor_pairs": 3,
+  "tensors_per_pair": 346,
+  "exact_output_count": 7,
+  "independent_closed_branch_proof": true,
+  "minimum_sampled_headroom_bytes": 12368216064,
+  "source_seals": 1797,
+  "current_ordinary_update_ms": 50.12159263671872,
+  "current_ordinary_imagination_and_targets_ms": 23.94118869921875,
+  "ordinary_full_update_speedup": false,
+  "pure_kernel_latency": false,
+  "sm_utilization_measured": false,
+  "date": "2026-10-15",
+  "artifact_root": "runs/cdp-imagination-work-20261015.UeGXjU8B",
+  "matrix_families": [
+    {
+      "parameter_suffix": "layer0.weight",
+      "occurrences": 4,
+      "mnk": [
+        7680,
+        256,
+        2560
+      ],
+      "nominal_macs": 20132659200
+    },
+    {
+      "parameter_suffix": "layer1.weight",
+      "occurrences": 4,
+      "mnk": [
+        138240,
+        256,
+        256
+      ],
+      "nominal_macs": 36238786560
+    },
+    {
+      "parameter_suffix": "out.weight",
+      "occurrences": 4,
+      "mnk": [
+        7680,
+        1024,
+        256
+      ],
+      "nominal_macs": 8053063680
+    }
+  ],
+  "view_composition": {
+    "opportunities": [
+      {
+        "broadcast": 771,
+        "transpose": 776,
+        "reduction": 782,
+        "slot": 0,
+        "rows": 138240,
+        "width": 256,
+        "repeats": 18,
+        "source_buffer": 1975,
+        "expanded_buffer": 1981,
+        "transposed_buffer": 1987,
+        "logical_write_bytes": 283115520
+      },
+      {
+        "broadcast": 772,
+        "transpose": 777,
+        "reduction": 783,
+        "slot": 0,
+        "rows": 138240,
+        "width": 256,
+        "repeats": 18,
+        "source_buffer": 1976,
+        "expanded_buffer": 1982,
+        "transposed_buffer": 1988,
+        "logical_write_bytes": 283115520
+      },
+      {
+        "broadcast": 773,
+        "transpose": 778,
+        "reduction": 784,
+        "slot": 0,
+        "rows": 138240,
+        "width": 256,
+        "repeats": 18,
+        "source_buffer": 1977,
+        "expanded_buffer": 1983,
+        "transposed_buffer": 1989,
+        "logical_write_bytes": 283115520
+      },
+      {
+        "broadcast": 774,
+        "transpose": 779,
+        "reduction": 785,
+        "slot": 0,
+        "rows": 138240,
+        "width": 256,
+        "repeats": 18,
+        "source_buffer": 1978,
+        "expanded_buffer": 1984,
+        "transposed_buffer": 1990,
+        "logical_write_bytes": 283115520
+      }
+    ],
+    "logical_write_bytes": 1132462080,
+    "folded_in_current_plan": false,
+    "repeated_row_addressing_already_supported": true,
+    "view_matching_precedes_typed_row_fusion": true,
+    "consumer_mixed_storage_marks_fusion_barrier": true,
+    "speedup_established": false
+  },
+  "production_changed": false,
+  "learning_equivalence": false,
+  "rgb_jax_retimed": false,
+  "root_cause_goal_complete": false,
+  "next": "Test general repeated-row view composition through typed normalization, preserving rounding and protected buffers; measure complete CDP and retain the separate RGB/JAX question. No exploration change or sweep.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/prepare.json": "93ac0521e99c38ff02270b16ee99c4d23a0d8e7bd83b6e7d845b9adda374e750",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/review.json": "a45958583746e8c23f34fdabe199748be595b3e1259c9c3ba985c460391554e9",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/view-audit.json": "66a6e3880db494665abd9c34a8f419ab26c8bfdd55cc91849839ff6df6826d04",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/view_audit.py": "9927503afee3c943bc9ada980a5e7c9795341f20e5238cb734f8cea5ba42b661",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/publication.py": "020ec2bf96494c4837d00cd1bc239d7f690189b8213d8f518458d775f973c79e",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/result.json": "c1db46b3a0fd87b9a4771e8f657952fb4515bf1b59f9e8bd460350bef6e52cd5",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/branch.json": "4b1ff9da3a47af080c926e6454567ac3445effe9902989ee73b584fb297973a9",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/contract-plan.json": "fd979c3ec3d742a5363f964b1ae20332c010c7e40b740ca8a6b667e309df6f45",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/frozen-input-state.json": "37ba116bf1c96ffb177761b4de8e5dbcda473991a85dfb2c86852c8b642e9110",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/baseline-outputs.json": "cf2f9d0bf5db6c186c01dcf6e49dbdd9b3b49b44870d60fe3bc190866cb96a5a",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/capture.json": "790e7cb417f6be0a688801d0f0a445247d4c7c97b835473aea4466302790825b",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/build.log": "5f5a32ca7978cc74392216d49b48263ac18a1c75a6adc2e228e2a2ef8c04805d"
+  },
+  "view_source_sha256": {
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/view_audit.py": "9927503afee3c943bc9ada980a5e7c9795341f20e5238cb734f8cea5ba42b661",
+    "/x/Code/kindle/runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/compile.rs": "7f977caad934f3975f006404e2bc4e7d05405763dd108d5b2bb56ab8935f0722",
+    "/x/Code/kindle/runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/compile/row_fusion.rs": "3bfbfbe7479e2839902c377bf1385f817773146494d029372a3cc00dfce4d9b4",
+    "/x/Code/kindle/runs/convolution-scheduling-20261014.BJ5AVZFt/meganeura/src/schedule.rs": "4b3b00781e0a31a5f297282dbfad1b0b4481b4e586644ec063c940cc8840a37b",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/imagination/contract-plan.json": "fd979c3ec3d742a5363f964b1ae20332c010c7e40b740ca8a6b667e309df6f45",
+    "/x/Code/kindle/runs/cdp-imagination-work-20261015.UeGXjU8B/review.json": "a45958583746e8c23f34fdabe199748be595b3e1259c9c3ba985c460391554e9"
+  }
+}

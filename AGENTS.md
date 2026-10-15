@@ -146,9 +146,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   updates including failure, zero game actions. Service finishes05:48:33 UTC;
   no worker. No full-model independent oracle, learning parity or promotion.
   Current CDP imagination/targets23.94ms exceeds posterior+world21.72ms.
-  Reconcile its existing ensemble workload separately from RGB/JAX; do not
-  resurrect the old18-way projection or assume decoder cost applies to CDP.
-  Remaining structural feeding/execution investigation stays active.
+  Its existing ensemble workload is attributed below, separately from RGB/JAX.
+  Do not resurrect the old18-way projection or assume decoder cost applies to CDP.
+- **Current CDP imagination attributed:** [result](docs/results/2026-10-15-cdp-imagination-work.md).
+  Exact saved-bonus substitution changes fixed complete imagination20.771→
+  8.705ms, conditional12.066ms/58.09%. All seven outputs, input/parameter state,
+  three346-tensor pairs and plan/pipelines/groups match; independent versioned
+  closure/source audit passes.90 extra ensemble dispatches/12 products add
+  64.42G nominal MACs; not pure kernel cost, DRAM traffic or full-update gain.
+  One guard/two warnings,325 fixed replays/one initializer/zero game actions;
+  service finishes06:11:11 UTC, no worker. Three CPU tests/Clippy pass.
+  **Next:** four repeat→transpose→typed-normalization chains still write1.132GB
+  of logical intermediates. Existing row-addressing support misses them because
+  its matcher precedes typed scalar fusion and rejects its precision marker.
+  Test general view composition preserving arithmetic/rounding/protected buffers,
+  with one complete-update control; no row/geometry sweep or exploration change.
+  No measured speedup from that view fix yet. Upstream rechecked99e3de27/e7c3f7b;
+  production and RGB/JAX2.04x remain unchanged. Broader goal stays active.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
   `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).

@@ -34,9 +34,13 @@ now passes5.59M independent projection/loss values and exact actual whole/staged
 gradients, late-target isolation and unchanged346 tensors. The original JSON
 observer failure remains, with5.62M exact underlying F32 values and a separately
 reviewed parser repair. Two passing/one failed guard, one warning; no full-model
-independent oracle, learning parity or promotion. Next reconcile CDP's remaining
-23.94ms imagination/targets separately from its21.72ms posterior/world and from
-RGB/JAX. No timing repeat, precision sweep or learning restart.
+independent oracle, learning parity or promotion. The [imagination attribution](results/2026-10-15-cdp-imagination-work.md)
+now preserves all outputs while replacing the closed ensemble branch: fixed
+GPU20.771→8.705ms, conditional12.066ms, not a learner speedup. Existing ensemble
+projections add64.42G MACs; four repeat/transpose chains also materialize1.132GB
+of logical intermediates because address lowering and typed normalization fusion
+do not compose. Test that general compiler fix next, preserving precision and
+exploration. No geometry sweep or learning restart.
 This is separate from the unchanged RGB/JAX2.04x gap, not learned CDP quality.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
