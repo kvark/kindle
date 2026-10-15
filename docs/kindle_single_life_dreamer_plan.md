@@ -50,12 +50,20 @@ report255 registers; smaller code supports different compiler lowering, not
 measured spill bytes or exact instruction attribution. Testing the observed
 library K32 reduction step for operand liveness yields another improvement: that
 [fixed test now saves31%](results/2026-10-15-convolution-contraction.md), to1.293ms
-including transforms,39.79% below retained native2.147ms. Broader derivatives
-and a fresh native pair remain before shared typed backend support. No open
-geometry/hint sweep, automatic compiler project or production promotion. Whole
-B32 remains60.041/26.632ms; no8x forecast or full-gap closure.
+including transforms,39.79% below retained native2.147ms. The [broader F64
+qualification and fresh native pair](results/2026-10-15-convolution-qualification.md)
+now pass:196,608 outputs and2.14890→1.29280ms,39.84%. But this operation occurs
+once; its.856ms saving is only1.43% of the full update before integration effects.
+The [actual spatial-family check](results/2026-10-15-convolution-family.md) now
+rejects that shared replacement:12.833→18.131ms across13 distinct contracts/
+15 occurrences,41.29% slower, despite all numerical gates and257.95M exact
+output pairs passing. Keep per-shape regressions and the nonstationary native
+dX samples; no cherry-picked selector, geometry sweep or Naga/Blade integration.
+Next address device-side categorical decode/target dataflow, including mirrored
+bin cancellation and old-weight consumers. Whole B32 remains60.041/26.632ms;
+production unchanged, no8x forecast or full-gap closure.
 
-The [current whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
+The [retained whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes
 and11.688ms outside them, including5.383ms host decoding/targets. Exact-state
 native/JAX captures pass. Native materializes more image intermediates and

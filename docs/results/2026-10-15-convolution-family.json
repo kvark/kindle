@@ -1,0 +1,420 @@
+{
+  "status": "complete",
+  "decision": "reject_spatial_family",
+  "date": "2026-10-15",
+  "artifact_root": "runs/convolution-family-20261015.ZI0VhKI6",
+  "numerical": {
+    "status": "complete",
+    "checks": [
+      {
+        "name": "forward-0",
+        "outputs": 131072,
+        "relative_l2": 0.000024281025675517078,
+        "maximum_abs_error": 0.0078125,
+        "maximum_bound_fraction": 0.7503001200480193,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-1",
+        "outputs": 49152,
+        "relative_l2": 0.00007409915071594918,
+        "maximum_abs_error": 0.0625,
+        "maximum_bound_fraction": 0.8074935400516796,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-2",
+        "outputs": 16384,
+        "relative_l2": 0.00011973027978744284,
+        "maximum_abs_error": 0.0625,
+        "maximum_bound_fraction": 0.7584951456310679,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-3",
+        "outputs": 4096,
+        "relative_l2": 0.00009737361910051084,
+        "maximum_abs_error": 0.0625,
+        "maximum_bound_fraction": 0.6338742393509127,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-4",
+        "outputs": 12288,
+        "relative_l2": 0.00010453374661420138,
+        "maximum_abs_error": 0.03125,
+        "maximum_bound_fraction": 0.9137426900584795,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-5",
+        "outputs": 32768,
+        "relative_l2": 0.0001125696525487355,
+        "maximum_abs_error": 0.0625,
+        "maximum_bound_fraction": 0.9659969088098916,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "forward-6",
+        "outputs": 12288,
+        "relative_l2": 0.00004833441351606958,
+        "maximum_abs_error": 0.0078125,
+        "maximum_bound_fraction": 0.8668515950069346,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-1",
+        "outputs": 32768,
+        "relative_l2": 0.0000013215372426070494,
+        "maximum_abs_error": 0.00001940503716468811,
+        "maximum_bound_fraction": 0.09422457425750683,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-2",
+        "outputs": 12288,
+        "relative_l2": 0.0000017311864664151654,
+        "maximum_abs_error": 0.000030957162380218506,
+        "maximum_bound_fraction": 0.15559981956034866,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-3",
+        "outputs": 4096,
+        "relative_l2": 0.0000014018597936180272,
+        "maximum_abs_error": 0.000029325485229492188,
+        "maximum_bound_fraction": 0.13711755565596248,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-4",
+        "outputs": 16384,
+        "relative_l2": 0.000001334128545495687,
+        "maximum_abs_error": 0.00002956390380859375,
+        "maximum_bound_fraction": 0.1309485278397859,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-5",
+        "outputs": 49152,
+        "relative_l2": 0.0000010221052551451046,
+        "maximum_abs_error": 0.000038001686334609985,
+        "maximum_bound_fraction": 0.12746241299157007,
+        "pointwise_failures": 0,
+        "passed": true
+      },
+      {
+        "name": "dx-6",
+        "outputs": 131072,
+        "relative_l2": 3.1439132560920525E-7,
+        "maximum_abs_error": 0.000003725290298461914,
+        "maximum_bound_fraction": 0.026032563242004456,
+        "pointwise_failures": 0,
+        "passed": true
+      }
+    ],
+    "independent_f64_values": 503808,
+    "operation_calls": 39,
+    "shader_dispatches": 138,
+    "guards": 13,
+    "allocation_warnings": 0,
+    "source_hashes": 108,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "ordinary": {
+    "status": "complete",
+    "checks": [
+      {
+        "name": "forward-0",
+        "occurrences": 1,
+        "native_gpu_ms": 0.58983225,
+        "candidate_gpu_ms": 3.30951675,
+        "native_queued_wall_ms": 0.5908370703125,
+        "candidate_queued_wall_ms": 3.3105828125,
+        "gpu_reduction_percent": -461.0945739233485,
+        "scratch_bytes": 420005888,
+        "independent_f64_probes": 32,
+        "exact_values": 67108864,
+        "native_inclusive_wall_ms": 0.5922898203125,
+        "native_recording_ms": 0.00145275
+      },
+      {
+        "name": "forward-1",
+        "occurrences": 1,
+        "native_gpu_ms": 0.8420195,
+        "candidate_gpu_ms": 1.602011,
+        "native_queued_wall_ms": 0.8430065234374999,
+        "candidate_queued_wall_ms": 1.6030695703125,
+        "gpu_reduction_percent": -90.25818285681034,
+        "scratch_bytes": 143233024,
+        "independent_f64_probes": 32,
+        "exact_values": 25165824,
+        "native_inclusive_wall_ms": 0.8460679609374999,
+        "native_recording_ms": 0.0030614375
+      },
+      {
+        "name": "forward-2",
+        "occurrences": 1,
+        "native_gpu_ms": 0.37258975,
+        "candidate_gpu_ms": 0.684434,
+        "native_queued_wall_ms": 0.3760873125,
+        "candidate_queued_wall_ms": 0.685788078125,
+        "gpu_reduction_percent": -83.69641140154822,
+        "scratch_bytes": 59973632,
+        "independent_f64_probes": 32,
+        "exact_values": 8388608,
+        "native_inclusive_wall_ms": 0.3790791328125,
+        "native_recording_ms": 0.0029918203125
+      },
+      {
+        "name": "forward-3",
+        "occurrences": 2,
+        "native_gpu_ms": 0.11731975,
+        "candidate_gpu_ms": 0.1416605,
+        "native_queued_wall_ms": 0.117763640625,
+        "candidate_queued_wall_ms": 0.1470294609375,
+        "gpu_reduction_percent": -20.74735924684463,
+        "scratch_bytes": 18030592,
+        "independent_f64_probes": 32,
+        "exact_values": 2097152,
+        "native_inclusive_wall_ms": 0.1203203828125,
+        "native_recording_ms": 0.0025567421875
+      },
+      {
+        "name": "forward-4",
+        "occurrences": 1,
+        "native_gpu_ms": 0.3709315,
+        "candidate_gpu_ms": 0.67219575,
+        "native_queued_wall_ms": 0.3719360234375,
+        "candidate_queued_wall_ms": 0.675676890625,
+        "gpu_reduction_percent": -81.21829771804225,
+        "scratch_bytes": 51585024,
+        "independent_f64_probes": 32,
+        "exact_values": 6291456,
+        "native_inclusive_wall_ms": 0.3749723046875,
+        "native_recording_ms": 0.00303628125
+      },
+      {
+        "name": "forward-5",
+        "occurrences": 1,
+        "native_gpu_ms": 1.5238575,
+        "candidate_gpu_ms": 1.37653825,
+        "native_queued_wall_ms": 1.5277051328125,
+        "candidate_queued_wall_ms": 1.38027996875,
+        "gpu_reduction_percent": 9.667521405380752,
+        "scratch_bytes": 152145920,
+        "independent_f64_probes": 32,
+        "exact_values": 16777216,
+        "native_inclusive_wall_ms": 1.529836640625,
+        "native_recording_ms": 0.0021315078125
+      },
+      {
+        "name": "forward-6",
+        "occurrences": 1,
+        "native_gpu_ms": 3.890313,
+        "candidate_gpu_ms": 2.96795025,
+        "native_queued_wall_ms": 3.89406121875,
+        "candidate_queued_wall_ms": 2.971590765625,
+        "gpu_reduction_percent": 23.7092169704597,
+        "scratch_bytes": 176736256,
+        "independent_f64_probes": 32,
+        "exact_values": 6291456,
+        "native_inclusive_wall_ms": 3.895791703125,
+        "native_recording_ms": 0.001730484375
+      },
+      {
+        "name": "dx-1",
+        "occurrences": 1,
+        "native_gpu_ms": 2.5119142500000002,
+        "candidate_gpu_ms": 1.290478,
+        "native_queued_wall_ms": 2.514458359375,
+        "candidate_queued_wall_ms": 1.2940290390625,
+        "gpu_reduction_percent": 48.62571443272795,
+        "scratch_bytes": 85037056,
+        "independent_f64_probes": 32,
+        "exact_values": 16777216,
+        "native_inclusive_wall_ms": 2.51635165625,
+        "native_recording_ms": 0.001893296875
+      },
+      {
+        "name": "dx-2",
+        "occurrences": 1,
+        "native_gpu_ms": 0.368421,
+        "candidate_gpu_ms": 0.6435945,
+        "native_queued_wall_ms": 0.369324828125,
+        "candidate_queued_wall_ms": 0.6468952265625,
+        "gpu_reduction_percent": -74.68996066999438,
+        "scratch_bytes": 26419200,
+        "independent_f64_probes": 32,
+        "exact_values": 6291456,
+        "native_inclusive_wall_ms": 0.3723815,
+        "native_recording_ms": 0.003056671875
+      },
+      {
+        "name": "dx-3",
+        "occurrences": 2,
+        "native_gpu_ms": 0.11820575,
+        "candidate_gpu_ms": 0.13532425,
+        "native_queued_wall_ms": 0.11862951562500001,
+        "candidate_queued_wall_ms": 0.1359599765625,
+        "gpu_reduction_percent": -14.481952020100564,
+        "scratch_bytes": 9641984,
+        "independent_f64_probes": 32,
+        "exact_values": 2097152,
+        "native_inclusive_wall_ms": 0.12169618750000001,
+        "native_recording_ms": 0.003066671875
+      },
+      {
+        "name": "dx-4",
+        "occurrences": 1,
+        "native_gpu_ms": 0.38019225,
+        "candidate_gpu_ms": 0.65198375,
+        "native_queued_wall_ms": 0.38375402343750004,
+        "candidate_queued_wall_ms": 0.65284434375,
+        "gpu_reduction_percent": -71.48791170782675,
+        "scratch_bytes": 26419200,
+        "independent_f64_probes": 32,
+        "exact_values": 8388608,
+        "native_inclusive_wall_ms": 0.38680483593750004,
+        "native_recording_ms": 0.0030508125
+      },
+      {
+        "name": "dx-5",
+        "occurrences": 1,
+        "native_gpu_ms": 0.85107925,
+        "candidate_gpu_ms": 1.456996,
+        "native_queued_wall_ms": 0.8548403124999999,
+        "candidate_queued_wall_ms": 1.4607610078125,
+        "gpu_reduction_percent": -71.1939281800138,
+        "scratch_bytes": 42569728,
+        "independent_f64_probes": 32,
+        "exact_values": 25165824,
+        "native_inclusive_wall_ms": 0.8581876015625,
+        "native_recording_ms": 0.0033472890625000002
+      },
+      {
+        "name": "dx-6",
+        "occurrences": 1,
+        "native_gpu_ms": 0.66057075,
+        "candidate_gpu_ms": 2.9214225,
+        "native_queued_wall_ms": 0.6640931171875001,
+        "candidate_queued_wall_ms": 2.925981375,
+        "gpu_reduction_percent": -342.257320657931,
+        "scratch_bytes": 151570432,
+        "independent_f64_probes": 32,
+        "exact_values": 67108864,
+        "native_inclusive_wall_ms": 0.6655787578125001,
+        "native_recording_ms": 0.0014856406250000002
+      }
+    ],
+    "weighted_native_gpu_ms": 12.832771999999999,
+    "weighted_candidate_gpu_ms": 18.13109025,
+    "weighted_native_queued_wall_ms": 12.862890234375,
+    "weighted_candidate_queued_wall_ms": 18.173477953125,
+    "gpu_reduction_percent": -41.28740267496378,
+    "wall_reduction_percent": -41.286115499593556,
+    "clears_20_percent_gate": false,
+    "exact_output_pairs": 257949696,
+    "independent_f64_probes": 416,
+    "operation_calls": 3796,
+    "shader_dispatches": 10950,
+    "native_shader_dispatches": 4234,
+    "candidate_shader_dispatches": 6716,
+    "guards": 14,
+    "allocation_warnings": 5,
+    "source_hashes": 113,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "weighted_native_inclusive_wall_ms": 12.9013750546875,
+    "earlier_native_wall_included_recording": true,
+    "source_sha256": {
+      "runs/convolution-family-20261015.ZI0VhKI6/ordinary-review.json": "597675ff4a2d046889606c2e617b5f5ffcf8bdd24a1f55859825b0ec4a4a0005",
+      "runs/convolution-family-20261015.ZI0VhKI6/native/result.json": "45e788bd4c644b9fd81d8555a78bfc04b950018e8ec1f265971e7a559c2c092c",
+      "runs/convolution-family-20261015.ZI0VhKI6/wall-audit.py": "9b9b1b16529433bf5e91ee76efc35bda6352c00871678b8d50eff72bfffb9461"
+    }
+  },
+  "cpu_preflight": {
+    "status": "complete",
+    "cases": 13,
+    "occurrences": 15,
+    "coordinate_checks": 33177600,
+    "output_coverage_values": 503808,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "family_classes": {
+    "forward": {
+      "occurrences": 8,
+      "native_gpu_ms": 7.824183,
+      "candidate_gpu_ms": 10.895967
+    },
+    "dx": {
+      "occurrences": 7,
+      "native_gpu_ms": 5.008589000000001,
+      "candidate_gpu_ms": 7.23512325
+    }
+  },
+  "native_dx_timing_variation": {
+    "first_four_ms": [
+      6.075488,
+      6.120608,
+      6.128480000000001,
+      6.128672
+    ],
+    "last_four_ms": [
+      2.150592,
+      2.1502079999999997,
+      2.152448,
+      2.152608
+    ],
+    "minimum_ms": 2.123776,
+    "maximum_ms": 6.130656,
+    "samples": 128,
+    "samples_discarded": 0,
+    "unchanged_codegen_files": 8,
+    "cause_established": false
+  },
+  "validation": {
+    "guards": 27,
+    "allocation_warnings": 5,
+    "operation_calls": 3835,
+    "shader_dispatches": 11088,
+    "source_hashes": 113,
+    "cpu_shader_variants": 78
+  },
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "whole_update_remeasured": false,
+  "retained_complete_native_ms": 60.0411874375,
+  "retained_complete_jax_ms": 26.6316957586,
+  "source_sha256": {
+    "runs/convolution-family-20261015.ZI0VhKI6/publication.py": "e6db89ae3f5c362312c4f30d0bb6d0e4d591d0d07167c3d92a8edd46863a3f95",
+    "runs/convolution-family-20261015.ZI0VhKI6/build.py": "9188e53bfbb92abc2b9f9213207e2689598209d504804d740817e47a1085cca8",
+    "runs/convolution-family-20261015.ZI0VhKI6/build.log": "e296e97adf5ed309fb5bec200d39cc5f34bdbc398386743a605ee6ce7c687073",
+    "runs/convolution-family-20261015.ZI0VhKI6/spatial-template-failed.comp": "d64e68a30f99b491f080d3c631cf0adc4f120928f907bc8c44f510bc5fb5b43b",
+    "runs/convolution-family-20261015.ZI0VhKI6/build-v2.py": "684b155f5aa9e399d5c40928f57e230420d28926fe6ea2c96eb68dde90b1a49f",
+    "runs/convolution-family-20261015.ZI0VhKI6/build-v2.log": "19ad7e7089ee7bc0d9d624cc316f1a13d73da69ac6f22944060f933a6790f682",
+    "runs/convolution-family-20261015.ZI0VhKI6/build.json": "03500381207e88abae42e17703b882ea2d48d430aec2deccea72a9ad05084c84",
+    "runs/convolution-family-20261015.ZI0VhKI6/numerical-review.json": "ae05ebc2b94921b3b05e5a25429e2ce096db445212d33dbbc87430bb1ae2c6ec",
+    "runs/convolution-family-20261015.ZI0VhKI6/ordinary-review.json": "597675ff4a2d046889606c2e617b5f5ffcf8bdd24a1f55859825b0ec4a4a0005",
+    "runs/convolution-family-20261015.ZI0VhKI6/ordinary-wall-review.json": "581fb2fa29297e5499be09775e02338d2f3c4b1e8f4c239d5afc2e6c92843d2e",
+    "runs/convolution-family-20261015.ZI0VhKI6/wall-audit.py": "9b9b1b16529433bf5e91ee76efc35bda6352c00871678b8d50eff72bfffb9461",
+    "runs/convolution-family-20261015.ZI0VhKI6/wall-audit.log": "418d87021eea063a96037f024e409a9a990a665cd1a72528de896e45b629a1a7",
+    "runs/convolution-family-20261015.ZI0VhKI6/native/result.json": "45e788bd4c644b9fd81d8555a78bfc04b950018e8ec1f265971e7a559c2c092c",
+    "runs/convolution-family-20261015.ZI0VhKI6/preflight.json": "2456060817eaf41bdebc3f530fab6af5c8af1d0297c88e4518071f5eedb37ec1"
+  }
+}

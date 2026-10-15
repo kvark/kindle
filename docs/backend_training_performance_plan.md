@@ -8,624 +8,111 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-**[Actual library counters confirm much cheaper data feeding](results/2026-10-15-library-convolution-feeding.md).**
-Full-JAX dX/dW execute10.33x/8.27x fewer warp instructions than the current
-source algorithms through CUDA, despite31.6%/29.2% more tensor instructions.
-Captured SASS verifies asynchronous128-bit global-to-shared copies; larger
-four-stage tiles amortize supporting work. Tensor activity reaches40%/30%
-with only8.33% occupancy, versus~9% tensor activity in the translations.
-Both exact272-report/288-tensor/HLO controls pass;544 updates, two guards,
-zero warnings/actions. This is a substantial algorithm/lowering difference,
-not a missing BF16 setting, fewer model MACs or an occupancy target.
-The CUDA/native10% timing bands still fail: no native counter proxy or8x
-speedup forecast. Native executable visibility already failed in the retained
-compile-only probe; no repeat. The [aligned block-reuse proof rejects](results/2026-10-15-aligned-convolution.md):
-native2.147ms versus7.433ms including transforms. A qualified phase trace finds
-packing.152ms versus7.283ms in the tensor kernel/dependencies. The latter
-contains addressing, multiplication and strided output; not isolated math.
-Explicit16-byte shader-alignment metadata changes only.054%. Six guards/all
-exact/F64 controls pass, no warnings/actions/updates. Stop this mapping/hint
-path. The [output-store](results/2026-10-15-convolution-store.md) and
-[BF16/F16](results/2026-10-15-convolution-type.md) controls do not improve it.
-**[Fixed valid input addressing](results/2026-10-15-convolution-address.md)
-cuts7.438→1.877ms**, counting a new GPU halo pack:74.77% less than the rejected
-proof,12.59% less than retained native2.147ms. Qualified trace assigns.179ms
-packing/1.700ms to loads/math/output/dependencies. Compound input/lowering change,
-not an instruction-level causal split or whole-agent gain. Compiler metadata
-reports255 registers in both forms and code274,304→125,056 bytes; local-memory
-statistics fail the scalar control and remain uninterpreted. Next one declared
-[library K32 contraction](results/2026-10-15-convolution-contraction.md)
-now cuts1.876→1.293ms,31.11%, with unchanged total nominal work/runner/packs/
-output. It is39.79% below retained native2.147ms, not a fresh native pair or
-whole-update gain. Registers stay255, shared memory halves, executable grows;
-no measured spill/fewer-register claim. Next broader BF16 derivatives and one
-fresh native/candidate pair before shared typed backend support. No geometry/
-hint sweep or automatic compiler project;2.25x full gap/production/Atari stay open.
+The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
+**60.041ms versus JAX26.632ms,2.25×**; B8 retains22.780/12.737ms,1.79×.
+Production is not promoted and Atari stays stopped. CDP's larger exploration
+workload is different and must not be compared directly with these RGB numbers.
+The current B32 control is native`28864210` from the
+[general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest: [the current derivative algorithms remain slow under CUDA](results/2026-10-14-convolution-backend.md).**
-Same-source dX/dW take2.148/2.019ms native and1.872/2.441ms CUDA, versus
-retained cuDNN.479/.550. Exact outputs/independent checks pass. Both10% timing
-bands fail, so CUDA counters are not native proxies; nonetheless changing backend
-alone does not remove these costs. Translated kernels issue~1B warp instructions,
-~58% integer, with~9% tensor activity. No occupancy target or extra CUDA sweep.
+### What is established
 
-**The [workgroup-matrix proof rejects](results/2026-10-14-workgroup-convolution.md).**
-This5080/580 advertises `VK_NV_cooperative_matrix2`, including workgroup scope,
-flexible BF16→F32 dimensions and tensor addressing. Current Naga hard-codes
-subgroup scope; Blade exposes the older path. But actual native dX with tensor
-loads/workgroup matrices takes8.71198ms versus2.14876ms,4.05× slower despite
-all16.78M exact outputs. No compiler/backend feature work or tuning of that
-prototype follows. Three guards/no warnings,265 F64 checks, zero updates/actions.
+- **We are not doing four times as much model arithmetic.** The
+  [reachable executable audit](results/2026-10-14-executable-work.md) finds only
+  1.40% more nominal heavy MACs. Shapes/precision/rounding and scalar work still
+  matter; MAC counts are not instruction counts or utilization.
+- **The convolution implementation differs fundamentally from the library.**
+  [Actual full-JAX counters](results/2026-10-15-library-convolution-feeding.md)
+  show10.33×/8.27× fewer warp instructions than same-algorithm CUDA translations
+  of our dX/dW, despite31.6%/29.2% more tensor instructions. Library SASS uses
+  asynchronous128-bit global-to-shared copies and multistage block reuse.
+  CUDA/native timing bands fail, so these are not native counters or an8×
+  speed promise. The [native iterator improvement](results/2026-10-14-convolution-iterators.md)
+  demonstrates part of the supporting-work cost, not complete library parity.
+- **Whole-program execution also mattered.** [Staged posterior reuse](results/2026-10-13-staged-world.md)
+  removes duplicate computation; [command reuse](results/2026-10-14-command-cache.md)
+  reduces complete-update time10.16%; GPU [RNG](results/2026-10-14-device-rng.md)
+  and [EMA](results/2026-10-14-device-ema.md) remove measured host boundaries.
+  These are separate experiments, not additive savings. Mixed CDP cannot
+  automatically reuse a different-precision posterior.
+- **Real dependencies remain expensive.** [Execution controls](results/2026-10-13-execution-boundaries.md)
+  measure~2.05µs for tiny dependent Vulkan/ordinary-CUDA kernels versus~.65µs
+  in CUDA graphs. [Precise barriers/events](results/2026-10-14-dependency-paths.md)
+  do not supply the missing multiplier. Never remove actual dependencies.
+  Many fewer dispatches or groups have repeatedly yielded only~1% whole gains;
+  counts alone do not justify another fusion sweep.
+- **Precision alone does not explain the residual.** [Wider JAX image intermediates](results/2026-10-14-image-precision-control.md)
+  add only.92% to complete updates; the earlier wider matrix/intermediate
+  control adds6.19%. These change some compiler/library choices, not storage
+  alone. Native connected [pooling tape](results/2026-10-14-spatial-tape.md) and
+  [image training](results/2026-10-14-image-training-region.md) help, but their
+  individual4.02%/3.0015% complete gains do not close the gap.
 
-The actual full-JAX trace shows a different convolution work-reuse contract:
-256x32/64x256 tiles, four stages and2,048/624 blocks, versus native32x32,
-one stage and16,384/6,400 blocks. All use128 threads; the library invests more
-resources in each block. dW's names identify16-byte aligned loads. Related public
-CUTLASS source pipelines async copies and arithmetic; source names are not
-binary causality or speedup estimates. The failed prototype did not reproduce
-these layout/reuse/staging choices. Next inspect actual library derivative
-instructions/data feeding before one shared typed convolution lowering, with
-all transforms/scratch counted. No geometry/translation sweep or automatic
-production/Atari restart. Full B32 stays60.041ms/2.25× JAX; host targets distinct.
+The [retained full B32 profile](results/2026-10-14-jax-image-profile.md), before
+the latest image/order improvements, measures68.637ms complete,56.948ms GPU-pass
+union and11.688ms outside, including3.752ms CPU distribution decoding and1.632ms
+target construction. JAX has23.099ms kernel/copy union inside27.617ms captured
+intervals. Native interacting family allocations and JAX kernel sums have
+different coverage; do not subtract them into a promised savings budget or
+call them SM utilization. Host work cannot be the sole explanation.
 
-**Retained: [a general ordering rule retains the execution gain](results/2026-10-14-convolution-scheduling.md).**
-Complete RGB12M/B32 unchanged/single-boundary/general63.597/60.302/60.041ms:
-5.59% faster, still2.25× retained JAX26.632. All272 reports, first targets,
-five plans/pipelines and initial/first/final292 tensors match historical control.
-Twenty automatic convolution/non-convolution boundaries preserve original groups,
-allocation, staging and submissions; no diagnostic index, threshold or new API.
-Keep isolated28864210, not production/B8/CDP/learning promotion. Execution-only
-ordering gives the same captured-group7.429→4.168ms benefit as storage barriers;
-explicit access scopes are unnecessary, hardware/cache cause still unmeasured.
-Retained JAX kernels are effectively non-overlapping, not strictly serial or
-evidence of native overlap. Five guards/no warnings; all exact checks pass.
-The derivative/backend comparison above refines the remaining work. Small
-single-buffered versus larger multistage tiles is not itself a measured saving.
-Host targets remain distinct. Atari and the full goal stay open.
+### Latest result: do not integrate the workgroup prototype
 
-**The [whole-update comparison](results/2026-10-14-jax-image-profile.md)
-locates a structural compilation gap.** Native B32 spends56.948ms in GPU
-passes and11.688ms outside; host decoding/targets alone cost5.383ms. Removing
-all host overhead would still leave its GPU program slower than the entire
-27.187ms JAX update. Native's68.704/68.633ms ordinary/coarse pair preserves
-all reports/plans/states/cache reuse, with−0.10% instrumentation difference.
-The actual JAX capture preserves all272 reports and final tensors, with
-23.099ms kernel/copy union. The two forms of coverage are not an exact
-subtractable budget or SM utilization.
+The [fixed-address/K32 derivative](results/2026-10-15-convolution-qualification.md)
+qualifies against broader BF16 inputs:196,608 F64 outputs, worst relativeL2
+1.412e−6, all pointwise gates. Fresh native/proof2.14890→1.29280ms is39.84%
+less GPU time with all transforms/scratch. But it occurs once in the full
+graph: its.856ms saving is only1.43% of the retained update before integration
+effects. This does not justify a compiler project.
 
-**[Connected spatial lowering qualifies](results/2026-10-14-spatial-tape.md),
-but closes only6.67% of the remaining gap.** Fresh complete RGB B32 improves
-68.491→65.736ms,4.02%, still2.42× retained JAX. Pooling saves its original
-forward decisions, folds typed bias loads and emits the rounded dense gradient
-with F32 spatial partials. Same reduction tree/precision/model; all272 reports,
-first outputs and three292-tensor boundaries are exact. Four regions change
-20 operations into8;4,081 remaining descriptors are unchanged. Posterior/world
-labels describe the same staged plan, not duplicate work. The first block is
-30.27% faster than retained timing, but the complete-update gain is the decision.
-Four guards/no warnings or GPU failures; all independent/staged checks pass.
-Seven CPU preparation/report failures remain. Production stays unchanged.
+The subsequent [shared spatial-family check](results/2026-10-15-convolution-family.md)
+covers all13 distinct forward/dX contracts and15 actual occurrences with one
+fixed typed implementation. It **regresses12.833→18.131ms,41.29%**, including
+all packing and output conversion. All503,808 F64 values/416 probes and
+257,949,696 exact output pairs pass;27 guards/five warnings, zero learner
+updates/actions. Keep all per-shape regressions; no cherry-picked selector,
+geometry sweep, Naga/Blade integration or complete-update trial follows.
+The native dX samples themselves transition~6.13→2.15ms; retain every sample,
+do not relabel the mean steady state or assign a hardware cause without evidence.
 
-**The [convolution spatial-staging trial is rejected](results/2026-10-14-convolution-spatial-staging.md).**
-The targeted decoder pair is0.62% slower despite exact numerical outputs;
-encoder dW also regresses. No full-update trial or vector-width/tile sweep.
-Two timing guards pass; the numerical guard retains a final count-assertion
-failure, independently recovered by checking all93,280 saved values on CPU.
-No GPU retry, tolerance change, production promotion or new whole-update claim.
+This narrows the conclusion: larger workgroups, high-level tensor addressing
+and a tile copied from one library operation do not reproduce the library's
+feeding pipeline across the model. The three-input-channel cases waste padded
+contractions, but aligned cases also regress. Shared typed arithmetic is still
+the right design; one fixed schedule is not automatically a good implementation.
+Earlier store, alignment, BF16/F16 and compiler-statistics diagnostics remain
+closed. The local-memory statistic fails a scalar control and is not spill data.
+Native executable queries returned no representation; no unsafe profiler retry.
 
-**[Connected layout reuse is also rejected](results/2026-10-14-connected-layout.md).**
-Complete B32 control/candidate65.651→65.593ms, only0.089%, below3%. Removing
-eight packs/ten casts/two transposes preserves exact reports, tensors, heavy
-descriptors and staged lifetimes but gives no meaningful whole-update gain.
-All independent typed-pack/connected F64 checks pass; one CPU fixture shape
-failure and its test-only repair remain. Keep3551bc53, not rejected212713c4.
-Static duplicate/byte counts did not predict a substantial saving.
+### Next bounded intervention
 
-**[Packed shape specialization also rejects](results/2026-10-14-packed-specialization.md):**
-65.684→65.207ms,0.726%, below3%. All14 packed kernels use constant dimensions/
-native division; all plans/reports/states remain exact.40 GPU cases/13,304,541
-F64 comparisons pass. The original CPU12/16-word binding failure stays retained;
-the corrected boundary reuses existing parameter binding. Keep3551bc53, not
-either sub1% candidate. Visible local inefficiency is not weighted attribution.
+1. Trace the existing imagination/slow-value outputs through categorical means
+   into scalar targets. Replace bulk host distribution decoding with GPU means
+   on the existing Meganeura/Blade dataflow. Preserve heavy model operations,
+   action/RNG ordering and old-weight consumers.
+2. Qualify independently before complete-update timing. Current CPU decode uses
+   F64 exponentials and mirrored raw-value bins up to~4.85e8: preserve symmetric
+   cancellation, exact zero controls and stable near-zero values. A naive F32
+   weighted sum is not a qualified substitute. Test deliberately chosen
+   distributions and actual saved learner outputs, including changed inputs
+   and staged lifetimes. Explicit reduced precision may change trajectories;
+   finite numerical checks do not establish learning equivalence.
+3. Run one ordinary complete B32 control/candidate comparison, all transfers and
+   targets included. Keep production/Atari stopped. Extend target residency
+   only from measured benefit, preserving terminal alignment, percentile state,
+   continuation discount, intrinsic reward placement and `ac_grads=false`.
 
-**[Wide image precision is not the missing multiplier](results/2026-10-14-image-precision-control.md).**
-JAX with F32 image bias/pooling/norm/activation takes26.632→26.876ms, only0.92%
-more. Heavy multiplication shapes/dtypes/MACs stay fixed;288 initial tensors
-match, both272-report/final-state checks pass. The precision change alters283
-final tensors and eight convolution-bias fusion boundaries; this is not a
-storage-only or exact-native control. Eight independent cases/22,120 values/
-derivatives pass. Three guards pass/one allocation warning; two CPU process
-failures and two CPU report failures remain. Zero actions/workers/native change.
+This targets a measured structural boundary, not a claim that~5.38ms host work
+explains the entire remaining~33ms difference. Convolution feeding, non-heavy
+device execution and dependency costs remain part of the original objective.
+No more broad profile, tile/row/dtype/hint sweep, CUDA learner, unsafe barrier
+weakening or automatic feature project. Latest upstream99e3de27/e7c3f7b is
+unchanged; check again before diagnosing a new backend issue. Keep failed
+sources/gates/tails and historical pins; no recursive repinning.
 
-**[Connected image training now qualifies numerically](results/2026-10-14-image-training-region.md),
-but only barely clears its speed gate:**65.609→63.640ms,3.0015%, still2.39×
-retained original JAX. Eight encoder/decoder regions share forward tapes and
-backward reductions with unchanged precision/heavy descriptors.144 shader
-variants/168 CPU plans/42 GPU cases/1.27M values pass. Initial tensors/first
-targets/world loss match;96 first/289 final tensors change after reduction
-reassociation. Retain isolated e1a2407c, not robust speed/learning/production
-promotion. No timing repeat to manufacture a larger margin.
-
-**Its follow-up masked attribution is not a usable latency budget.** Image and
-remaining non-heavy classes strongly interact: heavy-only26.822ms,heavy+image
-48.419ms,heavy+other31.689ms,full38.238ms. The negative formal allocation to
-other work is retained, not treated as a cost. Exact plans/states/full-output
-restoration and all192 cache checks pass, but skipping producers changes the
-intermediate contents and execution context. The interaction's cause is not
-established. Four guards/zero warnings; all six CPU failures remain.
-
-**[The intact trace fails its overhead gate](results/2026-10-14-middle-convolution.md):**
-63.577→65.704ms adds3.346%, above3%, despite exact reports/plans/states. Its
-mixed intervals are not ordinary component latency. The actual intermediate
-encoder derivatives separately take2.148/2.015ms versus BF16 cuDNN.479/.550ms;
-all16.8M rounded outputs and native256 F64 coordinates pass. Both cuDNN tunings
-differ from full JAX; its auxiliary widened-F32/Winograd dW fails127/128 probes
-and remains unqualified. Native already uses BF16 tensor operations.
-
-**The two-heavy-kernel grouping control omitted the relevant context.** It
-remains negative at4.165ms grouped/serialized, but the [captured five-operation
-follow-up](results/2026-10-14-convolution-boundary.md) reproduces the slowdown
-with.315% fixed-graph overhead. Changing real inputs to synthetic values does
-not recover the primitive result. In the original learner allocation, the
-auxiliary operations alone cost.0186ms and isolated dX/dW2.172/2.016ms, yet
-their intact group takes7.384ms versus4.230ms separated. The absolute3%
-attribution gate fails; this is an execution intervention, not passive profiling.
-One in-pass barrier alone gives7.387→4.168ms and the qualified5.29% complete
-gain, with exact results and no new allocations/submissions. The subsequent
-[execution-only control](results/2026-10-14-convolution-scheduling.md) retains
-the full benefit without explicit memory-access scopes; this still does not
-identify hardware/cache behavior or justify universal serialization. Five guards/zero warnings; build
-and CPU reviewer failures remain. No timing retry, masked ranking, production
-change or Atari restart. Kernel algorithms and host targets remain distinct
-gaps, not additive savings; the full goal stays open.
-
-**Bigger batches expose another implementation limit, not parity.** The
-[matched B8/B32 comparison](results/2026-10-14-batch-granularity.md) measures
-native22.780→68.456ms and complete JAX12.737→27.187ms: throughput improves
-1.33× versus1.87×, widening the ratio1.79→2.52×. All heavy arithmetic scales
-4×, with exact initials and exact retained B8 controls. Batch changes are not
-unchanged-learning speed gains. No batch/sequence or concurrent-seed sweep.
-
-The [qualified packing-grid correction](results/2026-10-14-packing-grid.md)
-now measures the effect of four B32 convolution fallbacks:68.344→67.326ms,
-only1.49%, below3%. Do not promote it or expand a packing/geometry sweep.
-Candidate remains2.48× retained complete JAX; B8 is unaffected. The selector
-rejects65,536 X groups despite an admissible64MiB pack; shared typed2D packing
-removes that rejection without raising memory/precision/accumulation bounds.
-Actual5080 X limit is2,147,483,647: this was conservative selection, not an
-invalid launch. All536,894,080 packing values/F64 derivative checks pass,
-B8 smoke/B32 control are exact, candidate B32 initials are exact and states
-finite but its trajectory changes. Seven guards/two warnings,592 synthetic
-updates/zero actions/workers; four CPU failures and successful repairs remain.
-The separate initialization scratch-cap repair raises64→128MiB and preserves
-B8's exact results; it is not the cause of these four runtime fallbacks.
-
-**The [cached B32 attribution](results/2026-10-14-batch-residual.md) is complete.**
-Convolution5.587→21.858ms and other work5.463→21.325ms explain89.0% of the
-retainedB8→B32 fixed-graph increase; matrix grows3.388→7.543ms while empty
-commands stay4.295→4.102ms. These interacting allocations are not pure kernel
-times or removable savings. A separate world-only check assigns4.442ms to
-layout/casts,5.379ms reductions and5.893ms pointwise/image work. Both exact
-full-plan/state restorations pass; two guards/one warning, zero game actions.
-
-CPU dataflow proof finds640MiB of summed logical outputs between native's
-first and second convolution: separate F32 bias/pooling/normalization/SiLU,
-transposes, conversion and repacking. JAX combines conv+bias and pooling+
-statistics while retaining channels-last storage. This is not measured DRAM
-traffic, a matched rounding contract or a complete fused backward pass.
-The [complete first CNN block](results/2026-10-14-image-block.md) now costs
-6.218ms. Exact-restoring masks allocate1.269ms convolution versus4.859ms other
-work (78.4%) and0.069ms empty commands. All23 descriptors/5,104 F64 values pass;
-late-dy/staged outputs are exact. These are interacting wall-time allocations,
-not removable savings. The native-contract miniature JAX fails its large
-gradient gate, so it provides no timing ratio and receives no automatic retry.
-The actual complete JAX trace and native whole-update accounting now finish
-above. The first general typed spatial lowering now passes its whole-B32 gate
-above; it is not enough to close the gap. No broad capture or automatic NHWC rewrite.
-No row-only, packing, tile or dtype sweep.
-
-The actual connected-projection audit found separate tape/reduction/backward
-kernels on JAX too.128 native product/reduction/conversion tails are not a
-speedup estimate; no further row-only fusion trial follows from those counts.
-Production stays unchanged. The preceding batch study retains its two
-pre-update failures/five warnings/1,112 synthetic updates. CI401 passes.
-
-**Current cached execution is predominantly device-side.** The
-[qualified refreshed capture](results/2026-10-14-cached-residual.md) retains the
-command cache, which ordinary GPU profiling had disabled. One-chunk ordinary/
-coarse23.039/23.154ms has0.50% overhead and exact reports/plans/pipelines/states.
-GPU-pass union19.697ms versus3.458ms uncovered is not SM utilization. Fixed
-graph18.733ms allocates4.295ms empty command stream,5.587 convolution,3.388
-matrix and5.463 other operations. Cache reuse and exact restorations pass;
-these interacting allocations are not independent savings. Four guards pass,
-one warning retained, no game actions/production change/workers.
-
-The completed connected-region comparison above does not justify another
-fusion implementation on counts alone. Row-only integration already saved
-only~1%; do not repeat that local sweep or assume fewer dispatches guarantee
-a large gain. The packing correction above saves only1.49%; the completed B32
-attribution now directs attention to connected image training. Host decode/
-targets cost1.522ms; useful work, but not the primary device-side gap. Keep
-library algorithms and dependency execution in scope. The ordinary four-chunk
-candidate's fresh B8 latency is22.780ms/1.79× JAX; no parity claim.
-
-**Wider intermediate precision does not supply the missing large multiplier.**
-The [qualified JAX control](results/2026-10-14-precision-flow.md) measures
-complete12.684→13.469ms (+6.19%), below the10% follow-up gate. Same288 initial
-tensors, BF16 heavy operands/rounded forwards, F32 matrix derivatives and
-intermediate interfaces; convolution islands remain BF16. Explicit accumulator
-selection changes XLA/library algorithms too: this is not a storage-only causal
-ablation or exact native clone. All independent numerical checks pass; physical
-padding/scalar-lowering/packing differences reconcile exactly. Failures remain.
-No further precision capture/sweep, production change or learning claim.
-
-Retained native22.881ms is1.80× the fresh baseline; it was not retimed.
-The refreshed attribution above now directs the next connected heavy-kernel/
-compiler comparison against actual JAX work.
-Prior row-only fusion saved~1%, so do not repeat that local sweep or assume
-dispatch counts predict savings. Kernel efficiency and device execution remain
-structural costs; preserving F32 derivatives alone need not impose the gap.
-
-**Vector staging now demonstrates the native causal benefit.** The
-[shared typed intervention](results/2026-10-14-matrix-staging.md) cuts fresh
-complete RGB24.022→22.881ms (4.75%), retaining all272 reports/first outputs/
-five plans/initial-first-final292 tensors exactly. Four-value physical-major
-shared staging preserves arithmetic, precision, tiles, K partitions and actual
-dependencies. Grouped forward improves19.27%; dense/grouped gradients improve
-24.43%/10.05%, small-row forward regresses2.27%. Independent numerical/address/
-typed-shader checks and seven guards pass; one allocation warning and the first
-CPU template collision remain. Keep the isolated candidate, not a production/
-CDP/learning promotion. Whole RGB is still1.78× retained complete JAX.
-
-The subsequent precision/materialization check above traces the actual
-forward/backward block and measures a bounded policy control. Inventory counts
-alone cannot establish storage cost or justify changing parameter/master-gradient
-precision. No vector-width/geometry sweep. Device dependency cost, convolution
-reuse and broader compiler dataflow remain separate contributors.
-
-**Checked matrix staging wastes instructions even when tensor work matches.**
-The [matched matrix/counter study](results/2026-10-14-matrix-library.md) verifies
-four actual native contracts and2,672,640 exact F64/JAX values. Grouped forward
-costs10.357µs native/10.324µs in a checked CUDA translation versus3.930µs for
-cuBLAS kernels. Counters show the same24,576 BF16 tensor instructions and
-near-identical occupancy, but3.40× warp instructions/5.22× integer work:
-scalar16-bit staging versus128-bit vector transfers. This is not missing
-tensor support or a case for more occupancy. Counters describe the translation,
-not native Vulkan; whole JAX changes addends/transposes/output contracts, so
-the miniature is not exact full-executable algorithm parity. Five guards pass,
-two failed fixtures/control retained, zero allocation warnings/actions/updates.
-That study itself makes no new whole-update speed claim; the subsequent native
-intervention above supplies it. The existing aligned engine already stages
-vectors; the shared checked path now retains that benefit with proven tails/
-transposes/groups. Neither the counter study nor vectorization closes the gap.
-
-Precision continuity remains separate: native matrix outputs247 BF16/469 F32
-versus JAX456/96, not a one-to-one mapping. Native backward intentionally widens
-intermediates; latest upstream retains that policy. Its storage-only time cost
-remains unisolated; the qualified partial policy above adds only6.19% on JAX.
-The extra BF16-output small-row control fails exact single
-rounding and stays failed; all four actual native contracts keep exact checks.
-
-**Matrix inefficiency is concentrated in the checked small-product path.**
-The [current-candidate attribution](results/2026-10-14-matrix-cost.md) assigns
-2.903ms/63.54% of matrix cost to521 checked products doing only12.01% of nominal
-matrix arithmetic;195 aligned products cost1.666ms. All already multiply BF16.
-World recurrence supplies2.568ms of the checked cost.302 products have eight
-rows,160 additional products reduce only eight elements. Plans/outputs/reports/
-292 tensors remain exact; one original update,1,468 optimizer-free replays,
-one guard/zero warnings. These are interacting fixed-graph allocations, not a
-new whole-update speed claim. The matched small-row/short-reduction library
-study above now motivates general checked staging rather than a new algorithm
-or cross-use gradient aggregation. Retained full
-HLO has96 reduction-eight cuBLAS calls with BF16 inputs/F32 results and `beta=1`;
-those counterparts do not avoid F32 accumulation. No tile sweep.
-The separate standard Vulkan executable query returns statistics but zero
-internal representations; close that inspection route without a driver change.
-Its logged compile-only guard passes; no native instructions were obtained.
-
-**Precise Vulkan synchronization does not recover CUDA graph execution cost.**
-The [four-path real-dependency check](results/2026-10-14-dependency-paths.md)
-finds existing/synchronization2-global/exact-buffer barriers all~2.05µs per
-dependent kernel; immediate event set/wait costs~4.10µs. All3,204 counters/two
-guards pass, zero warnings/actions/updates. No arm reaches the20% gate; close
-the API-flag detour without full-learner integration. This is not proof of a
-universal Vulkan limit, nor a new whole-update measurement. CUDA graphs' lower
-device cost remains distinct from our successful host command reuse. Next
-isolate remaining kernel staging/reuse and work per execution unit on the
-current candidate, not another barrier/row/iterator tuning sweep.
-
-**Repeated convolution indexing is now a demonstrated native bottleneck.**
-The [incremental iterator intervention](results/2026-10-14-convolution-iterators.md)
-cuts complete cached RGB25.475→24.340ms (4.45%), exact272 reports/first outputs/
-plans/initial-first-final292 tensors. Decoder dW improves37.15%, forward28.43%;
-the five boundary kernels total3.747→2.501ms. Shared typed cursors retain all
-arithmetic, precision, tiles, partitions and barriers. Numerical/address/alias
-checks and seven guards pass, zero warnings. Keep it isolated; no production/
-CDP/learning qualification. No further iterator/geometry sweep.
-
-The preceding counter evidence explains why this was worth changing.
-The [RGB-boundary study](results/2026-10-14-boundary-algorithms.md) matches all
-five native kernels and isolates decoder forward/dW at1.310/1.742ms versus
-cuDNN.261/.338ms. Encoder forward/dX are competitive. The dW CUDA bridge
-executes1.785B warp instructions versus100.06M;73.1% are integer work.
-cuDNN issues12.5% *more* identical BF16 tensor instructions, yet is much faster.
-Its occupancy is lower, tensor-pipeline activity much higher. This is an
-iterator/staging/reuse problem, not a reason to chase occupancy or remove
-compensation. Bridge counters are not native Vulkan counters; its2.374ms is
-36.2% slower than native. Two primitive JAX algorithms differ from the full
-executable; dominant dW matches exactly. All outputs/F64 controls pass.
-
-**The remaining gap includes a device-side execution-path difference, not
-merely CPU launch overhead.** The [new causal controls](results/2026-10-13-execution-boundaries.md)
-measure about 2.05µs per tiny dependent kernel on Vulkan **and ordinary
-prequeued CUDA**, versus 0.64–0.66µs on CUDA graphs. Same CUDA kernel/data,
-all work queued before GPU timing; 3,168 counters pass across the completed
-studies. The first large prequeue check fails its unchanged 100ms host-gate
-limit and remains failed; the reviewed shorter control passes.
-
-CUDA graph execution therefore does more than avoid recording commands again.
-Ordinary Vulkan command-buffer reuse has not been shown to deliver its lower
-device dependency cost. Large-kernel CUDA translations previously stayed
-within roughly 7% of Vulkan: this is a small-dependent-work finding, not a
-blanket API penalty. No hardware mechanism or equivalent Vulkan extension
-has been established.
-
-| Current whole-update boundary | Time |
-| --- | ---: |
-| Retained isolated RGB12M/B8/BF16, row selection + latest compiler | 28.213ms |
-| Isolated command-cache candidate, fresh ordinary full pair | 25.530ms |
-| Isolated incremental-address candidate, fresh ordinary full pair | 24.340ms |
-| Isolated vector-staging candidate, fresh ordinary full pair | 22.881ms |
-| Retained JAX core, same model/batch size | 12.420ms |
-| JAX including caller seed/metric handling | 12.836ms |
-| Retained isolated CDP12M/B32/mixed, row selection + latest compiler | 93.084ms |
-
-The retained RGB control is2.20× complete JAX; the current vector-staging candidate is
-**1.78×**. CDP is a different
-workload and is not compared directly to that JAX number. Production stays
-on its earlier qualified ~53ms RGB runtime; isolated diagnostic improvements
-have not changed installed pins/defaults or restarted Atari.
-
-The [actual-grid correction](results/2026-10-14-dense-launch-grid.md) saves
-only1.00% RGB/.92% CDP against these fresh controls. Numerical/plan checks pass,
-but trajectories differ; additional partitions also add reductions, stores
-and dependencies. Preserve the isolated candidate, not a promotion or another
-grid test. The table deliberately retainsb3a086f, not the grid candidate.
-The [fresh weighted profile](results/2026-10-14-residual-reassessment.md)
-now covers every update, including GPU RNG/EMA and asynchronous tails.
-Native GPU-pass union22.144ms versus retained JAX10.295ms dominates the
-captured gap; RNG+copies+EMA total only.430ms. Fixed-session masks allocate
-6.888ms convolution/4.475ms matrices/5.545ms other plus4.272ms empty command
-stream. These are interacting cost allocations, not additive promised gains.
-Single-chunk ordinary/coarse30.066/30.115ms preserves all reports/states with
-.16% instrumentation overhead; normal four-chunk28.213ms remains separate.
-
-The [latest upstream compiler check](results/2026-10-14-storage-propagation.md)
-finds no material5080 gain: fresh RGB28.197→28.314ms/CDP92.965→93.049ms,
-all reports/outputs/plans/tensors exact. Blade96c1dc7/Naga a97559b removes
-ordinary storage-access propagation; real barriers remain. Keep the refresh
-in isolated experiments. The inherited row-gradient F64 failure is reproduced
-on both compilers and diagnosed as three BF16 bin crossings; scoped old/new
-whole-learner parity is not an unconditional primitive pass. No production
-promotion, tolerance relaxation or5080 hardware-fence claim.
-
-The [row-selection intervention](results/2026-10-14-row-selection.md) limits
-the dependency-count hypothesis: groups fall2,271→2,058 RGB /2,483→2,253 CDP,
-but fresh complete updates improve only28.777→28.479ms /93.938→93.001ms, about1%.
-Every272-report/first-output/saved-tensor comparison is exact. Preserve its
-reviewed uniform-binding failure and one matrix-addend fusion difference.
-Do not continue a row-operation tuning campaign or equate fewer groups with
-proportional throughput. The source audit instead exposes a concrete selector
-inconsistency: dense64×64 tiles still choose K splits from a32×32 grid estimate;
-grouped products already use their actual grid. The completed check above
-finds no missing large speedup. End this line of tuning.
-
-The [device RNG intervention](results/2026-10-14-device-rng.md) now saves
-6.80% RGB /8.44% CDP against fresh32.246→30.053ms /104.048→95.269ms controls.
-It generates the exact original ChaCha12 streams directly into GPU inputs:
-2,107,118 exact primitive values, both24-update smokes, all272 reports and
-292/346 initial/first/final tensors pass. Existing compiled plans are unchanged;
-46 small RNG dispatches/two submissions replace host generation/uploads.
-Seven guards/three retained warnings,1,136 synthetic updates, no game actions.
-Keep this isolated candidate; JAX is the retained comparison, not a fresh run.
-
-The subsequent [device EMA intervention](results/2026-10-14-device-ema.md)
-removes parameter readback/blending/upload: fresh RGB30.260→29.169ms (3.61%),
-CDP95.473→94.059ms (1.48%). Behavior/sync accounts for most of the difference.
-5,267,639 primitive values and853,503 first production blend values/workload
-pass the independent F64 bound; initial and first non-EMA state are exact.
-Later trajectories differ (82/272 RGB and1/272 CDP reports exact), with
-finite final states; no learning equivalence or proven LaProp causality.
-Seven guards/six warnings,1,136 synthetic plus one small SGD update, zero
-actions. Keep it isolated; installed runtime and training remain unchanged.
-
-The [multi-output scalar follow-up](results/2026-10-14-pointwise-regions.md)
-does not materially close this gap: fresh RGB32.384→32.312ms (0.22%),
-CDP104.135→103.054ms (1.04%). It removes178 RGB dispatches but only32/2,271
-dependency groups. Nine guards/912 independent F64 comparisons/148,274 exact
-RNE values pass; all RGB reports/states are exact, CDP trajectories differ.
-Keep the source/evidence, not a production promotion or another scalar sweep.
-The stricter physical-descriptor audit catches horizontal packing3+1→2+2 in
-CDP; its reviewed per-product audit passes. All failures and three warnings
-remain. No worker or game actions; broader goal stays active.
-
-What is now causally established:
-
-- **Kernel algorithms matter.** Missing training precision coverage, excessive
-  convolution indexing/staging and weak data reuse were identified and improved
-  in [shared typed training kernels](results/2026-10-13-conv-training-layout.md).
-  Full BF16 coverage does not imply library-level execution efficiency.
-- **Duplicate work mattered.** [Staged posterior reuse](results/2026-10-13-staged-world.md)
-  removes 10.319G nominal MACs/895 dispatches and improves complete RGB
-  39.392→33.681ms. Mixed CDP's different forward/world precision intentionally
-  stays on its existing path.
-- **Fine-grained dependencies remain expensive.** The pre-selection5,500-dispatch
-  graph has 2,267 inter-group barriers. Its empty stream takes 4.709ms with
-  full, partial or no memory-access masks, keeping compute execution ordering.
-  Access-mask weakening is not the fix; real dependencies must remain correct.
-- **Scalar fusion alone is insufficient.** General typed row fusion helped;
-  widening the pointwise input cap then reduces RGB dispatches 5,846→5,500 but
-  groups only 2,333→2,271, saving just 2.32%. Shared/saved values and opaque
-  backward operators block larger fusion. Independent primitives qualify,
-  but the wider candidate changes trajectories and exposes near-zero LaProp
-  sensitivity; no learning-equivalence claim or production promotion.
-  The subsequent multi-output region trial preserves shared values safely yet
-  removes only1.4% of RGB's groups. Further fusion should target row operations
-  and layout boundaries, not merely additional scalar edges.
-- **Host boundaries also matter.** Nsight finds native main-thread
-  9.094ms on CPU/23.160ms off CPU per captured update; most poll time is
-  sleeping, not CPU computation. Moving identical RNG streams onto the GPU
-  saves2.194ms at B8 and8.779ms at B32, almost proportional to draw count.
-  Device EMA then saves1.091ms RGB /1.413ms CDP. Target construction still
-  crosses the host. These interventions measure complete replacements, not
-  separately additive CPU/transfer budgets. JAX pipelines metric readback inside its wrapper; the excluded
-  caller checking is only 0.177ms. Timing scope cannot explain the gap.
-
-The [target-boundary attribution](results/2026-10-14-target-boundary.md)
-changes the immediate order: selected host target/preparation/upload regions
-total2.027ms RGB /7.520ms CDP; decode/bonus alone1.217/3.774ms. The unchanged
-instrumented updates29.084/94.001ms preserve every numerical report/tensor.
-Readback5.019/23.909ms includes unfinished GPU work, not pure transfer overhead.
-Host targets cannot explain the remaining~16.3ms RGB gap.
-
-The same plans have839 imagination groups and a longest logical chain of839
-kernels; the full compiled world graph, including the staged posterior prefix,
-has1,387 groups versus1,383. Existing ordering is already near the dependency
-depth lower bound. These unweighted counts are not GPU critical-path timings.
-First-max sampling, recursive feature concatenation and opaque backward/cast
-boundaries expose concrete row/indexing operations for a coherent compiler
-change. Preserve deliberate rounding/shared outputs; do not drop dependencies.
-
-**Command recording is now addressed; continue with the GPU algorithms.**
-
-The [completed integration](results/2026-10-14-connected-learner.md) automatically
-selects127 connected forward/backward regions and removes378 dispatches, but
-complete RGB28.280->27.999ms saves only.99%, below its3% gate. Numerical and
-staged checks pass, later trajectories differ; no CDP follow-up, row sweep or
-production promotion. This bounds what that promising block can contribute.
-
-The [heavy-path diagnosis](results/2026-10-14-heavy-issued-work.md) finds a
-more concentrated problem: five checked RGB-boundary convolutions consume
-3.785ms versus2.906ms for18 packed convolutions, despite only11.1% of nominal
-convolution MACs. All already use BF16. Actual source/grid accounting finds
-152.574G cooperative product slots for84.756G useful MACs; two three-output
-kernels waste10.67x slots. This is not hardware-counter or JAX-padding evidence,
-and checked indexing/staging also costs time. The [typed scalar alternative](results/2026-10-14-narrow-products.md)
-qualifies90 numerical cases but slows full RGB28.488->30.492ms (7.03%). It
-removes padded tensor products but also loses tensor hardware; reject without
-a geometry/CDP sweep. The expensive path remains unresolved.
-
-The [command-cache intervention](results/2026-10-14-command-cache.md) reduces
-whole updates28.416->25.530ms (10.16%). Exact272 reports/first outputs/plans/
-292 tensors qualify unchanged arithmetic. Nsight shows5351->65 descriptor
-updates and5297->11 pipeline binds per update;15 submissions and all5286 GPU
-graph dispatches remain. Cache immutable graph chunks, keep optimizer state
-live, retain resources/barriers/staged lifetimes. No cache sweep. Selected
-API durations1.562->.116ms are incomplete host accounting and the capture
-perturbs timing; use the ordinary pair. The16 lifecycle cases pass again
-with repaired validation logging;1152 total synthetic updates/zero actions.
-
-Keep the isolated improvement, not a portable production/CDP qualification.
-The remaining~2x gap still requires actual GPU algorithm/dependency work.
-That matching and the incremental-address intervention are now complete above.
-Next distinguish the remaining staging/reuse cost from device dependency cost
-on the current candidate, rather than repeat an iterator/tile sweep. JAX's
-F32-output controls widen operands and do not isolate gradient storage precision.
-The five kernels' remaining~2.50ms footprint cannot explain the whole11.50ms
-residual; matrix/other materialized work and CUDA graphs' lower device issue
-cost stay in scope. No whole-gap or Atari-learning closure.
-
-An API/literature check does not supply a shortcut: Vulkan's NV generated-command
-spec allows individual dispatches to execute in any order; a generated list is
-not a replacement for our dependent compute chain. Preserve real dependencies.
-[Khronos specification](https://docs.vulkan.org/spec/latest/chapters/device_generated_commands/generatedcommands.html#vkCmdExecuteGeneratedCommandsNV).
-A recent A40/CUDA11.8→13.0 command-stream study attributes lower **host launch**
-cost to a smaller submission footprint. It explicitly avoids interpreting
-undocumented commands; it does not explain our already-prequeued5080 device
-timing or establish Vulkan equivalence. No driver modification/reload is proposed.
-[Primary study, §6.3](https://arxiv.org/html/2604.26889v1#S6.SS3).
-
-The [general reduction prototype](results/2026-10-14-connected-row-region.md)
-passes its20% block gate: complete8x256 norm/SiLU forward+both derivatives
-12.841->8.280us (35.5%). Additional row/element outputs retain forward values;
-column prologues combine backward work. All281,052 GPU values and70,263 CPU
-values pass, normal aliasing/no-alias with poison included. Two guards/two
-warnings; zero optimizer updates/actions. This was explicit plan construction;
-the completed automatic BF16 learner integration above is its limited outcome.
-No block-size sweep or extrapolation to all135 regions.
-Retained full28.213/12.836ms remains2.20x; this alone cannot close the gap.
-
-The [CPU design control](results/2026-10-14-training-residuals.md) is complete
-on latest Meganeura7574ad1, including the upstream shared-widening fix.
-Actual HLO provenance proves saved forward norm/SiLU tapes. Native primitive
-expansion is numerically correct but worsens14 dispatches/seven groups to
-28/16 or32/17; recomposition and materialized broadcasts prevent the simple
-approach. Do not enable it in production. A general region must express row,
-column and elementwise inputs, preserve required shared outputs alongside a
-reduction, and keep deliberate F32/BF16 rounding and forward/backward lifetimes.
-The retained learner has141 conservative pure duplicate dispatches, not evidence
-for a large CSE-only gain. Prototype and measure one connected region before
-generalizing. This is not a substitute for heavy-kernel/device-execution work:
-the entire row/reduction allocation is only2.329ms of the remaining gap.
-
-1. The [accumulation-cost check](results/2026-10-14-accumulation-cost.md)
-   closes a specific hypothesis: removing compensated dW reduces fixed-world
-   GPU time only16.169->16.025ms (.89%), while reproducing14 pointwise F64
-   failures/layout. Keep compensation; no conditional Nsight or precision sweep.
-   All292 tensors and restored outputs/gradients are exact; no alternative
-   optimizer writes. This is not new complete-update throughput.
-   The [separate prefetch check](results/2026-10-14-conv-prefetch.md)
-   also closes: full RGB28.436->28.714ms (.98% slower), exact reports/states,
-   independently qualified derivatives. No conditional CDP/counter follow-up.
-   The [reachable-work audit](results/2026-10-14-executable-work.md) finds
-   only1.40% extra native nominal heavy arithmetic despite2.20× latency.
-   Convolution and grouped shapes/counts match. JAX's actual graph combines
-   four head projections into one wide GEMM; native typed products and sessions
-   do not. This is a concrete compiler difference, not a measured large gain.
-   The [non-heavy attribution](results/2026-10-14-materialization-cost.md)
-   now allocates1.432ms layout/casts,2.329ms row/reductions and1.631ms other.
-   Full world row/backward/scalar work is the larger non-heavy region; copies
-   alone are not the explanation. All plans/pipelines/outputs/292 tensors match.
-   Design connected row/backward lowering with explicit layouts, rounding and
-   multiple live outputs. Account for packing, views and all consumers in one
-   representative measured/numerical control before generalizing. More nominally
-   fused operations are not enough; no automatic optimization allocation.
-   Continue general shared typed algorithms/coarser compiled execution, not
-   another scalar/row/binding-cap/tile sweep or bespoke Dreamer kernel.
-   The time-batchable prior head remains an unweighted source observation,
-   not an established large opportunity.
-2. GPU RNG and EMA qualify in the isolated candidate, with EMA's later
-   trajectory differences retained. Target attribution is complete; move
-   construction onto device. Posterior readback also refreshes CPU replay and
-   initializes truncated/microbatched training; it is not merely diagnostic.
-   Preserve that required work in timing and any future device transition.
-   Preserve stream/RNG/update-order
-   contracts. Existing posterior/imagination handoffs already stay on device.
-   Qualify one connected device-side stage at a time; no CPU learner workaround.
-   A large bespoke target/sort pipeline is not the main remaining gap-closing
-   bet. Keep the CPU arithmetic design check separate from GPU qualification.
-3. Investigate a lower-overhead backend execution path only with a causal
-   control. Cached CPU recording and CUDA-style device graph execution are
-   distinct; do not promise that ordinary Vulkan command replay closes this gap.
-4. Qualify one bounded complete RGB/CDP comparison with independent numerics
-   and saved-state checks, then a separately declared learning/time-to-score
-   comparison before changing training defaults. No additive savings forecast,
-   unsafe barrier removal, CUDA learner or new Atari allocation.
-
-Staged reuse must retain forward activations across posterior → imagination/
-targets → world backward; optimizer writes follow consumers of old weights.
-The world loss needs replay-value targets produced after imagination. Merely
-moving `train_world` earlier is not equivalent. Preserve microbatch/BPTT and
-mixed-precision fallbacks; keep useful submission overlap until a measured
-replacement exists.
-
-The [current residual accounting](results/2026-10-14-residual-reassessment.md)
-and retained JAX capture use different schedules/instrumentation. Keep the
-1.048ms ordinary-versus-captured gap difference explicit. Native command-
-building/submission spans4.548ms and decode/targets1.513ms in the single-chunk
-capture; do not count GPU waits again as CPU arithmetic or claim SM utilization.
-Four current guards pass/one warning,569 synthetic updates and2,380
-optimizer-free session replays, zero actions/workers. All source/CPU coverage
-failures remain. The full root-cause/performance goal stays active.
+Historical experiment-by-experiment decisions remain in their linked reports
+and git history. The following sections retain earlier production integration,
+starting controls and architectural work packages; they are not an active queue.
 
 ## Retained qualified implementation boundaries
 
@@ -733,7 +220,7 @@ ended cleanly at 39,568 actions / 9,831 updates, with a partial checkpoint.
 No learner finished and no other arm or frozen cohort started. Preserve the
 declaration and artifacts; do not resume a checkpoint as the same lifetime.
 
-## Current implementation state
+## Earlier production integration state
 
 [First-round evidence](results/2026-10-11-backend-training-performance.md):
 

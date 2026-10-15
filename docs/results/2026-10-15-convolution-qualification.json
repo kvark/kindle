@@ -1,0 +1,142 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "artifact_root": "runs/convolution-qualification-20261015.GqNMZ6qJ",
+  "numerical": {
+    "checks": [
+      {
+        "name": "fixture0-k64",
+        "outputs": 32768,
+        "relative_l2": 0.0000013215372426070494,
+        "maximum_abs_error": 0.00001940503716468811,
+        "maximum_bound_fraction": 0.09422457425750683,
+        "pointwise_failures": 0,
+        "expected_min": -9.910259179770947,
+        "expected_max": 11.39510627835989,
+        "passed": true
+      },
+      {
+        "name": "fixture0-k32",
+        "outputs": 32768,
+        "relative_l2": 0.0000013215372426070494,
+        "maximum_abs_error": 0.00001940503716468811,
+        "maximum_bound_fraction": 0.09422457425750683,
+        "pointwise_failures": 0,
+        "expected_min": -9.910259179770947,
+        "expected_max": 11.39510627835989,
+        "passed": true
+      },
+      {
+        "name": "fixture1-k64",
+        "outputs": 32768,
+        "relative_l2": 0.0000013262680088391383,
+        "maximum_abs_error": 3.522717378912077E-8,
+        "maximum_bound_fraction": 0.00035163410021562885,
+        "pointwise_failures": 0,
+        "expected_min": -0.014855369398000862,
+        "expected_max": 0.01813355630719088,
+        "passed": true
+      },
+      {
+        "name": "fixture1-k32",
+        "outputs": 32768,
+        "relative_l2": 0.0000013262680088391383,
+        "maximum_abs_error": 3.522717378912077E-8,
+        "maximum_bound_fraction": 0.00035163410021562885,
+        "pointwise_failures": 0,
+        "expected_min": -0.014855369398000862,
+        "expected_max": 0.01813355630719088,
+        "passed": true
+      },
+      {
+        "name": "fixture2-k64",
+        "outputs": 32768,
+        "relative_l2": 0.0000014117205458164375,
+        "maximum_abs_error": 0.00004794495180249214,
+        "maximum_bound_fraction": 0.1815119813973298,
+        "pointwise_failures": 0,
+        "expected_min": -22.642739461909514,
+        "expected_max": 20.552078632696066,
+        "passed": true
+      },
+      {
+        "name": "fixture2-k32",
+        "outputs": 32768,
+        "relative_l2": 0.0000014117205458164375,
+        "maximum_abs_error": 0.00004794495180249214,
+        "maximum_bound_fraction": 0.1815119813973298,
+        "pointwise_failures": 0,
+        "expected_min": -22.642739461909514,
+        "expected_max": 20.552078632696066,
+        "passed": true
+      }
+    ],
+    "independent_f64_values": 196608,
+    "worst_relative_l2": 0.0000014117205458164375,
+    "all_pointwise_pass": true,
+    "paired_output_bits_equal": true,
+    "paired_output_values": 98304
+  },
+  "ordinary": {
+    "native_dx_gpu_ms": 2.1488995,
+    "native_dx_queued_wall_ms": 2.1501411640625,
+    "gpu_reduction_percent": 39.83883378445573,
+    "wall_reduction_percent": 39.7107604152255,
+    "clears_20_percent_gate": true,
+    "exact_output_values": 33592832,
+    "independent_f64_probes": 128,
+    "native_dx_inclusive_wall_ms": 2.152458609375,
+    "native_dx_recording_ms": 0.0023174453125
+  },
+  "candidate": {
+    "gpu_ms": 1.292803,
+    "queued_wall_ms": 1.2963037578125,
+    "scratch_bytes": 85037056,
+    "packing_included": true,
+    "minimum_sampled_headroom_bytes": 16355164160
+  },
+  "validation": {
+    "guards": 8,
+    "allocation_warnings": 0,
+    "operation_calls": 456,
+    "native_shader_dispatches": 438,
+    "prototype_shader_dispatches": 492,
+    "total_shader_dispatches": 930,
+    "source_hashes": 72
+  },
+  "full_graph": {
+    "convolution_counts": {
+      "Forward": 8,
+      "InputGradient": 7,
+      "WeightGradient": 8
+    },
+    "tested_operation_occurrences": 1,
+    "posterior_world_are_same_plan": true,
+    "standalone_delta_ms": 0.8560965000000003,
+    "delta_as_fraction_of_retained_update": 0.014258487157522587,
+    "retained_native_update_ms": 60.0411874375,
+    "retained_jax_update_ms": 26.6316957586,
+    "whole_update_remeasured": false
+  },
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "source_sha256": {
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication.py": "2746b25e33cf6916c1443333e070cb862d85eab66265294c3e18ee2ab36a5d60",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication-bounded.py": "d8e06c2f04d9b02343ff27bddb044b0dea02e836b843f0ec88c6861bf93c4db7",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication-bounded.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication-stream.py": "c82f6b511d3c31f4a3d6a5843483b8ef8e435b98f1cb642a5aacd023191dca10",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/numerical-review.json": "fe91553aab0b3da8be0490c6cc6360346a72c91a3013f8c13deeb03203072107",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/ordinary-review.json": "60420824ac9faf881fdb4bed9d37ae864d722fde8629b6b8897bf82ea1fbca86",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/posterior-plan.json": "6476e09e8212e8f024c9cd1e8100cde612d140adbc55908695ec4b8f41fb0266",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/world_gradient-plan.json": "6476e09e8212e8f024c9cd1e8100cde612d140adbc55908695ec4b8f41fb0266",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/imagination-plan.json": "6ce64002eeab7d7a679b645052f048479fbe9bd2884f33d9a4073eb75b2c253c",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/behavior_gradient-plan.json": "6005eff080c661f455f8932fdf793f3ae79fe8af1e8aee2f06681894c59e9ce2",
+    "runs/convolution-scheduling-20261014.BJ5AVZFt/automatic/slow_value-plan.json": "a5e69f459f079d6d5d067e52e1c91b2acdc9139f3840087da9853a1c4f5e41c8",
+    "runs/convolution-qualification-20261015.GqNMZ6qJ/publication.json": "d8457e702029e84795be3da31d18a328dc92d39bd632055ca0d4d24112dcc586",
+    "runs/convolution-family-20261015.ZI0VhKI6/wall-audit.py": "9b9b1b16529433bf5e91ee76efc35bda6352c00871678b8d50eff72bfffb9461"
+  },
+  "earlier_native_wall_included_recording": true
+}
