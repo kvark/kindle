@@ -13,13 +13,15 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest B32 result:** [a general ordering rule](results/2026-10-14-convolution-scheduling.md)
-reduces complete RGB updates63.597→60.041ms,5.59%, retaining the single-boundary
-control's60.302ms benefit. Exact272 reports, first targets, five plans/pipelines
-and initial/first/final292 tensors; no kernel/dtype/allocation/submission change.
-Twenty automatic convolution/non-convolution boundaries need no diagnostic index
-or new API. Still2.25× retained JAX26.632ms: the remaining gap is substantial.
-Keep isolated28864210; production and B8/CDP/learning are not promoted/remeasured.
+**Latest B32 result:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
+reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier
+[general ordering](results/2026-10-14-convolution-scheduling.md) improvement.
+Three distribution readbacks25.1MB→98KB; all28,860 independent F64 checks and
+873 exact symmetric zeros pass. Initial/first292 tensors and targets match,
+but later F32-vs-F64 trajectories differ; no learning-equivalence claim.
+Four guards/three warnings,545 synthetic updates, zero actions/workers.
+Still2.04× retained JAX26.632ms. Keep isolated99f8aab0 with device means enabled;
+production and B8/CDP/learning are not promoted/remeasured. Targets remain on CPU.
 
 **New root-cause evidence:** [the same derivative algorithms remain slow in CUDA](results/2026-10-14-convolution-backend.md).
 Native dX/dW2.148/2.019ms versus CUDA1.872/2.441; exact outputs pass, but both10%
@@ -59,9 +61,14 @@ rejects that shared replacement:12.833→18.131ms across13 distinct contracts/
 15 occurrences,41.29% slower, despite all numerical gates and257.95M exact
 output pairs passing. Keep per-shape regressions and the nonstationary native
 dX samples; no cherry-picked selector, geometry sweep or Naga/Blade integration.
-Next address device-side categorical decode/target dataflow, including mirrored
-bin cancellation and old-weight consumers. Whole B32 remains60.041/26.632ms;
-production unchanged, no8x forecast or full-gap closure.
+Device-side categorical decoding now qualifies above; world training remains
+30.20ms, longer than the entire JAX update. Next reconcile the complete family's
+actual library feeding/scheduling with the legal shader interface using retained
+captures, before another implementation. The offline capability audit confirms
+explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
+compiler-managed staging is different. No claim that the driver cannot generate
+async instructions or that exposing one API would close the gap. Production
+unchanged, no8x forecast or full-gap closure.
 
 The [retained whole-update diagnosis](results/2026-10-14-jax-image-profile.md)
 finds a structural compilation gap: native B32 spends56.948ms in GPU passes

@@ -9,10 +9,12 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**60.041ms versus JAX26.632ms,2.25×**; B8 retains22.780/12.737ms,1.79×.
+**54.224ms versus JAX26.632ms,2.04×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current B32 control is native`28864210` from the
+The current isolated B32 candidate is native`99f8aab0` with
+`KINDLE_DEVICE_MEANS=1`, from [GPU categorical means](results/2026-10-15-categorical-gpu.md).
+Its unchanged backend/control remains`28864210` from the
 [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
 ### What is established
@@ -56,7 +58,7 @@ intervals. Native interacting family allocations and JAX kernel sums have
 different coverage; do not subtract them into a promised savings budget or
 call them SM utilization. Host work cannot be the sole explanation.
 
-### Latest result: do not integrate the workgroup prototype
+### Rejected route: do not integrate the workgroup prototype
 
 The [fixed-address/K32 derivative](results/2026-10-15-convolution-qualification.md)
 qualifies against broader BF16 inputs:196,608 F64 outputs, worst relativeL2
@@ -84,27 +86,44 @@ Earlier store, alignment, BF16/F16 and compiler-statistics diagnostics remain
 closed. The local-memory statistic fails a scalar control and is not spill data.
 Native executable queries returned no representation; no unsafe profiler retry.
 
-### Next bounded intervention
+### Latest result: remove bulk CPU distribution decoding
 
-1. Trace the existing imagination/slow-value outputs through categorical means
-   into scalar targets. Replace bulk host distribution decoding with GPU means
-   on the existing Meganeura/Blade dataflow. Preserve heavy model operations,
-   action/RNG ordering and old-weight consumers.
-2. Qualify independently before complete-update timing. Current CPU decode uses
-   F64 exponentials and mirrored raw-value bins up to~4.85e8: preserve symmetric
-   cancellation, exact zero controls and stable near-zero values. A naive F32
-   weighted sum is not a qualified substitute. Test deliberately chosen
-   distributions and actual saved learner outputs, including changed inputs
-   and staged lifetimes. Explicit reduced precision may change trajectories;
-   finite numerical checks do not establish learning equivalence.
-3. Run one ordinary complete B32 control/candidate comparison, all transfers and
-   targets included. Keep production/Atari stopped. Extend target residency
-   only from measured benefit, preserving terminal alignment, percentile state,
-   continuation discount, intrinsic reward placement and `ac_grads=false`.
+[GPU categorical means](results/2026-10-15-categorical-gpu.md) reduces complete
+B32 updates59.963→54.224ms,9.57%, with heavy graphs unchanged. Three readbacks
+shrink25.1MB→98KB; imagination/targets17.814→11.945ms. Native Blade computes
+detached means with mirrored bins/stable exponential differences. All28,860
+F64 checks and873 exact symmetric zeros pass, including actual trained logits.
+This deliberately replaces F64 CPU arithmetic with F32: first targets/tensors
+are exact, later trajectories differ. No learning-equivalence claim.
 
-This targets a measured structural boundary, not a claim that~5.38ms host work
-explains the entire remaining~33ms difference. Convolution feeding, non-heavy
-device execution and dependency costs remain part of the original objective.
+Four guards/three warnings,545 synthetic updates, no game actions/workers.
+The failed raw-JSON plan assertion is retained; exact semantic maps, ordered
+constants and pipeline checks pass without a GPU repeat. Target building,
+percentile state and other host dataflow remain unchanged, not a fully
+GPU-resident learner. Keep the candidate isolated; do not restart Atari.
+
+### Next bounded diagnosis: distinguish algorithm design from API exposure
+
+World training still takes30.20ms, longer than JAX's complete26.63ms update.
+The next task is one CPU contract audit using the retained full native/JAX
+plans/captures: reconcile every actual convolution's layouts, tile/reuse,
+stages, derivative accumulation and output rounding, including the3-channel
+special cases and all failed-family regressions. Produce one capability-aware
+shared implementation proposal or an explicit missing-lowering contract before
+another GPU prototype. No new profiling campaign or invented native counters.
+
+The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
+rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs
+Kernel, not Vulkan Shader. The untyped variant still needs the event contract.
+Matrix2's compiler-managed staging is not explicit control of the library's
+four-stage async schedule. This is not proof the driver cannot emit asynchronous
+copies, nor evidence that async copies alone close the gap. Do not start Naga
+feature work merely because an instruction exists in the combined SPIR-V spec.
+
+Remaining scalar targets, non-heavy device work and dependent execution remain
+separate costs. The measured5.739ms host-boundary saving does not explain the
+remaining27.592ms complete difference, and component allocations are not an
+additive savings budget. The original root-cause/performance goal stays open.
 No more broad profile, tile/row/dtype/hint sweep, CUDA learner, unsafe barrier
 weakening or automatic feature project. Latest upstream99e3de27/e7c3f7b is
 unchanged; check again before diagnosing a new backend issue. Keep failed

@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is60.041ms versus JAX26.632ms,2.25x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is54.224ms versus JAX26.632ms,2.04x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -46,23 +46,32 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   proposed compiler-integration next step, not its numerical evidence.
   Workgroup scope, larger blocks, alignment metadata and precision alone do
   not reproduce the library's asynchronous multistage implementation.
-- **Next: one bounded device-side categorical decode/target-dataflow study.**
-  The retained B32 profile measures3.752ms CPU distribution decode plus1.632ms
-  target construction; neither explains the whole gap. Inspect current
-  imagination/slow-value readbacks, put bulk categorical means on GPU, and
-  require independent numerical checks plus a complete-update comparison.
-  Preserve mirrored exponential bins, cancellation/zero symmetry, terminal/
-  reward indexing, normalizer state and `ac_grads=false`. CPU decode currently
-  uses F64: a naive F32 weighted sum is not a qualified replacement. Deliberate
-  precision changes need not match old stochastic trajectories, but must be
-  explicit. No CPU learner workaround, automatic precision sweep or whole-goal
-  closure. Kernel efficiency and command dependencies remain in scope.
-- Keep isolated native`28864210` from the [general-ordering trial](docs/results/2026-10-14-convolution-scheduling.md)
-  as current B32 control. Do not rebuild it for documentation. Actual backend
-  sources live in `runs/convolution-scheduling-20261014.BJ5AVZFt`; do not
-  confuse neighboring user work with this candidate. Meganeura/Blade upstream
-  rechecked October15: `99e3de27`/`e7c3f7b`, unchanged. CI416 passes`2d60ed5`;
-  subsequent documentation CI belongs on PR31.
+- **GPU categorical means qualify:** [result](docs/results/2026-10-15-categorical-gpu.md).
+  Full B32 updates59.963→54.224ms,9.57%; three distribution readbacks25.1MB→98KB.
+  All28,860 independent F64 comparisons/873 symmetric zeros pass; exact initial/
+  first292 tensors and first targets, later F32-vs-F64 trajectories differ
+  (2/272 reports exact, final relativeL2.05875). Four guards/three warnings,
+  545 synthetic updates, zero actions/workers. CPU plan-map serialization
+  assertion and missing standalone SPIR-V tool failures remain; exact semantic
+  plan/constant/pipeline audit and offline capability check pass without GPU
+  retries. Targets/normalizer remain on CPU; no fully resident learner claim.
+- **Next: reconcile the whole convolution family's library feeding contracts
+  with the legal native shader interface, using retained captures.** World
+  training still30.20ms, longer than the complete JAX update. Explicit SPIR-V
+  async-copy/wait/event requires Kernel, unavailable in Vulkan Shader; adding
+  that spelling to Naga is not a valid solution. Matrix2 compiler-managed
+  staging is different; this is not proof the driver cannot generate async
+  instructions. Audit actual layouts/tiles/stages/reuse/rounding across all
+  contracts before proposing another implementation. No revived fixed family,
+  geometry sweep or automatic compiler project. Keep dependency execution and
+  remaining host targets distinct; no additive savings or whole-goal closure.
+- Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
+  `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its
+  [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
+  Backend sources remain `runs/convolution-scheduling-20261014.BJ5AVZFt`.
+  Do not rebuild unchanged code for docs or confuse neighboring user work with
+  this candidate. Upstream rechecked October15: `99e3de27`/`e7c3f7b`, unchanged.
+  CI status belongs on PR31.
 - **Closed diagnostics stay closed.** No native assembly-query retry (the
   retained query returned no representations), failed Nsight Graphics injection
   retry, unsafe barrier weakening, or revived CUDA/geometry/hint/row-only sweep.
