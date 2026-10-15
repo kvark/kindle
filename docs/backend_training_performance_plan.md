@@ -122,13 +122,41 @@ or Naga edit occurs. Source vector width does not prove hardware instruction
 width or a speedup; this contract is necessary for that representation, not
 proven to explain the entire gap.
 
-**Next:** the [fixed-contract transfer proof](experiments/2026-10-15-convolution-transfer.md)
-compares8-byte typed versus16-byte bit-pattern feeding across all14 packed
-occurrences/11 distinct contracts. One shared typed source, unchanged64×64/K32,
-grids/splits, layouts, compensation, transforms and output rounding. Require
-native control calibration, independent numerical gates and10% lower weighted
-complete-operation cost before any Naga change or whole-update trial. No
-geometry/dtype sweep, cherry-picked selector or revived matrix2 family.
+The [transfer observation](results/2026-10-15-convolution-transfer.md) now
+measures all14 packed occurrences/11 contracts:4.933→4.170ms,15.48% less complete-
+operation GPU time. The generic control calibrates+3.66% GPU/+4.00% queued wall.
+But the.763ms saving is only1.41% of the retained full update as a scale comparison,
+not measured whole improvement. Keep this local benefit isolated; it is not
+the missing multiplier or a reason for another compiler project.
+
+Qualification remains failed:40 forward and1,277 dX cancellation values exceed
+original absolute envelopes in native and both variants, with bit-identical
+outputs. Exact integer contractions confirm every failed reference. Both stopped
+allocations remain; the separate cost-only observation repeats no numerical
+cohort.132 guards/six warnings,18.819M F64 comparisons,5,115 optimizer-free calls,
+zero actions/learner updates/workers. No gate relaxation or promotion. The CPU
+aggregate membership error and corrected audit stay alongside all original data.
+
+### Next causal question: the resource contract, not another tile guess
+
+A separate guarded physical query confirms **48KiB explicit Vulkan workgroup
+shared memory**, versus76/80KiB in the captured library dX/dW. In fact19/23 main
+library convolutions exceed48KiB. One guard, no warnings, no logical device or
+dispatch. The exact library allocation cannot be copied into explicit Workgroup
+variables. This does not establish the slowdown caused by capacity alone or
+rule out a different legal schedule/driver-managed cooperative-matrix path.
+
+The CPU control audit finds stage choices in22/23 actual products, with choices
+2/3/4 corresponding to captured3/4/5 stages. Original profiled cnn1 dX/dW retain
+engines40/33 and choice3. Next check those exact plans and a supported two-stage
+counterfactual, keeping other knobs fixed, before timing. Installed9.24 exposes
+a memory-used query and stages knob, but not the memory-limit attribute in the
+latest online docs. Do not infer legacy execution from frontend=false. Verify
+actual engine support before a new GPU declaration; do not invent an enum,
+silently upgrade the reference, revive the rejected family or run a geometry
+sweep. Preserve the resource review's compact/raw-schema failure and corrected
+raw hash/launch-field audit. This is a causal question to resolve, not permission
+to assume a48KiB speed ceiling or to start a CUDA learner.
 
 The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
 rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs

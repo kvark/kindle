@@ -65,14 +65,31 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   compiler edit or speedup claim. Retain original packed48-channel audit error
   and reserved-keyword probe failure; reviewed versions pass. Native tiled
   convolution work369.099G versus226.492G nominal is not a JAX instruction ratio.
-- **Next: one fixed-geometry transfer proof**, [declaration](docs/experiments/2026-10-15-convolution-transfer.md).
-  Reproduce all14 packed occurrences/11 distinct contracts, then compare8-byte
-  typed and16-byte bit-pattern feeding with the same64x64/K32 geometry, layouts,
-  compensation and complete transforms/reductions. Require native calibration,
-  independent derivatives and a10% weighted benefit before minimal Naga work.
-  No geometry/dtype sweep, failed-family revival or automatic compiler project.
-  Explicit SPIR-V async-copy/wait/event still requires Kernel, not Vulkan Shader;
-  wide transfers are a separate legal contract, not proof of async lowering.
+- **Transfer observation complete, qualification failed:** [result](docs/results/2026-10-15-convolution-transfer.md).
+  All14 packed occurrences/11 contracts cost4.933→4.170ms,15.48% less; generic
+  control calibrates+3.66% GPU/+4.00% queued wall. The.763ms saving is only1.41%
+  of the retained full update as a scale comparison, not measured whole benefit.
+  Native/typed/wide outputs match exactly;40 forward and1,277 dX cancellation
+  values fail original absolute envelopes in all three. Exact integer checks
+  confirm every failed reference. Both stopped allocations stay failed; a
+  separately reviewed cost-only observation repeats no cohort and cannot promote
+  the candidate.132 guards/six warnings,18.819M F64 comparisons,5,115 operation
+  calls, zero learner updates/actions/workers. No Naga work or timing sweep.
+- **A concrete resource-interface constraint:** the separate properties-only
+  query finds48KiB Vulkan explicit workgroup shared memory, while19/23 captured
+  cuDNN convolution products use more; profiled dX/dW use76/80KiB. One passing
+  guard/no warnings, no logical device or dispatch. A literal explicit-shared
+  port does not fit, but this is not a causal slowdown or parity-impossibility
+  proof. Keep compiler-managed storage distinct. CPU reviewer membership and
+  compact/raw-schema failures remain; corrected audits pass without GPU repeats.
+  **Next: one plan-only check of saved cuDNN engines40/33 and a supported
+  two-stage counterfactual, all other knobs fixed, before timing.** CPU audit
+  finds stage choices in22/23 products; choice3 corresponds to four captured
+  stages, not three. Installed9.24 exposes a memory-used query/stages knob but
+  not the latest documented memory-limit attribute. No invented enums, silent
+  reference upgrade or new GPU allocation yet. Do not infer legacy execution
+  from the serialized frontend=false flag. Explicit async-copy/wait/event still
+  requires Kernel, not Vulkan Shader. Source width does not prove async lowering.
   World training remains30.20ms; dependencies/host targets remain distinct.
 - Keep isolated candidate`99f8aab0` with `KINDLE_DEVICE_MEANS=1` under
   `runs/categorical-gpu-20261015.lkZAlUAS`; native`28864210` remains its

@@ -66,9 +66,25 @@ Device-side categorical decoding now qualifies above; world training remains
 now matches all23 products and exposes a concrete Naga limitation: matrix loads
 cannot retain F32/F16/BF16 arithmetic types independently of packed integer
 storage. Six CPU reproductions and three validated Vulkan SPIR-V controls pass;
-no compiler change or GPU speedup is claimed. Next is a [fixed-geometry transfer proof](experiments/2026-10-15-convolution-transfer.md)
-across all14 packed occurrences, including full transforms/reductions, before
-any Naga work. This tests8-byte versus16-byte feeding, not another tile sweep.
+no compiler change or GPU speedup is claimed by that audit. The subsequent
+[transfer observation](results/2026-10-15-convolution-transfer.md) finds a real
+but small local benefit:4.933→4.170ms across all14 packed occurrences,15.48% less
+complete-operation time. That.763ms is only1.41% of the retained full update as
+a scale comparison; no complete update is remeasured. Qualification remains
+failed at40 forward/1,277 dX cancellation values shared identically by native
+and both variants. Exact integer references confirm the failures; the separate
+cost-only observation repeats no cohort and authorizes no compiler promotion.
+132 guards/six warnings, zero learner updates/actions/workers; all failures stay.
+A separate properties-only query confirms a more structural constraint:
+Vulkan exposes48KiB explicit workgroup shared memory, while19/23 captured
+cuDNN products exceed it, including76/80KiB dX/dW. A literal port does not fit;
+this is not proof of a causal slowdown or inability to reach parity. CPU audit
+finds stage choices in22/23 products. Next check the saved library engines40/33
+and a supported two-stage counterfactual with all other knobs fixed, before
+timing or another kernel rewrite. Installed9.24 has stages/memory-used controls
+but lacks the latest documented memory-limit attribute. No invented enum,
+silent upgrade or new GPU allocation; serialized frontend=false is not proof
+of legacy execution.
 The earlier offline capability audit confirms
 explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
 compiler-managed staging is different. No claim that the driver cannot generate
