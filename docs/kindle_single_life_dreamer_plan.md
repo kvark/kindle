@@ -86,10 +86,16 @@ failed guards, zero executions/new warnings and four truncated failure-log
 snapshots. Local plans confirm CUDA99KiB opt-in capacity. No stage/engine/tile
 sweep or timing follows. Installed9.24 lacks the newer memory-limit attribute;
 no invented enum or silent upgrade. Serialized frontend=false is not proof
-of legacy execution. Next check exact saved-output substitution across the
-convolution family: earlier invalid-intermediate masks cannot rank the remainder.
-This requires a separate declaration, value/dependency checks and copy-cost
-accounting, not a learner shortcut or another small kernel tweak.
+of legacy execution. The [exact saved-output comparison](results/2026-10-15-convolution-value-bypass.md)
+now passes: replacing all23 products with recorded-value copies cuts fixed-world
+GPU34.191→14.282ms,58.23%, preserving allocations/consumers/dependencies and all
+checked outputs/tensors. This resolves the old invalid-intermediate masking
+problem, not ordinary training speed or pure kernel latency. Copy-only2.005ms
+includes original barriers and is not a subtractable saving. Two guards/zero
+new warnings; original binding-contract failure and CPU audit OOM remain beside
+their reviewed repairs. No worker or production change. Next separate11 encoder
+from12 decoder products: CDP removes reconstruction, so decoder-only savings
+are not CDP savings. No new subset allocation or geometry/iterator sweep.
 The earlier offline capability audit confirms
 explicit SPIR-V async-copy/wait/event is not a Vulkan Shader primitive; Matrix2
 compiler-managed staging is different. No claim that the driver cannot generate

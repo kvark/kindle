@@ -159,14 +159,30 @@ Installed9.24 lacks the newer documented memory-limit attribute. The serialized
 frontend=false flag does not imply legacy execution. Preserve the earlier
 resource audit's compact/raw-schema failure and corrected review too.
 
-Next establish whether exact saved-output substitution can remove all23
-convolution products from a fixed replay while keeping real consumer values,
-allocation lifetimes and original dependency boundaries. Earlier zero-work
-masks left invalid intermediates and cannot rank the remainder reliably.
-Account for replacement copies and check complete/consumer outputs exactly;
-any GPU allocation needs a separate declaration. This is family-level causal
-diagnosis, not pure kernel latency, ordinary training or a micro-optimization.
-Do not reopen an iterator/geometry sweep on the strength of unknown counters.
+### Exact-value attribution: convolution is still a large cost
+
+The [saved-output comparison](results/2026-10-15-convolution-value-bypass.md)
+passes: fixed-world GPU34.191→14.282ms,58.23%, after replacing all23 products
+with copies of their exact recorded outputs. Original allocations, consumers,
+4,023 descriptors/1,258 groups and dependency boundaries remain. All live/output
+fingerprints, three292-tensor boundary pairs, first targets/reports and full
+plan/pipeline semantics pass. This avoids the invalid data in earlier zero-work
+masks. Two guards/zero new warnings; the original binding smoke failure and CPU
+whole-object audit OOM remain, with separate binding/streaming corrections.
+No GPU timing repeat, relaxed gate or raised CPU memory limit.
+
+This is not a58% full-learner improvement: it is optimizer-free fixed replay,
+with no actual convolution computation. Copy-only2.005ms includes all original
+barriers but omits nonselected commands; it is not a subtractable kernel cost.
+The14.282ms remainder and other learner stages remain real. Latest complete
+54.224/26.632ms stays unchanged; no native SM-utilization claim.
+
+Next distinguish encoder from RGB decoder using valid values before another
+kernel intervention. Eleven products belong to the encoder and12 to the decoder;
+CDP removes RGB reconstruction. Nine checked/14 packed products and their padded
+arithmetic are useful source distinctions, not latency shares. A decoder-only
+gain cannot establish a CDP gain. No new subset allocation is declared/running,
+and no iterator/geometry sweep follows from unknown counters.
 
 The [offline capability check](results/2026-10-15-categorical-gpu.md#what-remains-fundamental)
 rules out a misleading shortcut: SPIR-V explicit async-copy/wait/event needs
