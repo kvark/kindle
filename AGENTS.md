@@ -294,10 +294,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   controls pass and divergent-lane negatives reject. New upstream memory-model
   branchc0b23d16 has the identical analyzer; no compiler edit/commit. Preserve
   the three CPU reader/probe failures and repairs. Zero GPU calls/actions/updates;
-  finishes12:55:34UTC, no worker. Next qualify an actual complete-family native
-  diagnostic before considering compiler changes; no GPU allocation yet, no
+  finishes12:55:34UTC, no worker in that CPU allocation. The actual complete-family
+  diagnostic below precedes compiler changes; no
   unsafe uniformity bypass, fixed-subgroup assumption without enforcement or
   favorable tile subset. Current complete gap stays1.91x and goal stays open.
+- **Actual feeding-family qualification running:** [declaration](docs/experiments/2026-10-15-feeding-family.md),
+  [indexing repair](docs/experiments/2026-10-15-feeding-family-index.md).
+  All23 current products/20 contracts retain32/64 tiles,K32,B512 and original
+  dW splits/compensation. Native/GLSL serial/two-producer-four-consumer arms;
+  no Naga edit or geometry sweep.180 typed SPIR-V variants validate;4,165,339
+  checked-iterator addresses and113,664 ownership checks pass. Required32-lane
+  full subgroups are enforced. Original first five numerical cohorts/15 guards
+  pass, then a source review stops the service: local invocation IDs are not
+  guaranteed to map to subgroup IDs. Sixth native guard is interrupted and lacks
+  a completion receipt; do not count systemd's successful stop as study success.
+  Corrected producer IDs pass720 assignment permutations; old formula fails288.
+  Fresh guarded qualification runs under `runs/feeding-family-index-20261015.y5CaEr4O`,
+  with independent review between cohorts. No timing until complete numerical
+  review; require10% native/GLSL calibration and20% complete-family benefit before
+  considering compiler integration. Original CPU manifest's missing env_logger
+  and its wrapper-only repair remain. Production/Atari unchanged; no GPU fault
+  or wedge observed. Upstream99e3de27/e7c3f7b remains unchanged.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
