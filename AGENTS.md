@@ -508,6 +508,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   stays failed, no timings or promotion. Keep this numerical follow-up open;
   next prioritize matched native/JAX imagination boundaries before another GPU
   allocation. Native8.740ms includes heads, JAX2.852ms does not. Keep834241b6/1.77x.
+- **Imagination boundaries audited:** [result](docs/results/2026-10-16-imagination-boundaries.md).
+  Native802 dispatches split20 parameter conversions/722 recurrence+features/
+  43 rollout assembly/17 heads;180 recurrent matrices match JAX arithmetic
+  apart from action padding. Fifteen private RSSM input chains use105 dispatches
+  and747.110MB logical writes versus125.829MB final packed inputs;62.915M exact
+  address checks/182 protected buffers pass. JAX uses15 actual fusions. Not
+  measured traffic, speedup or GPU qualification. Stacking already uses balanced
+  trees, but separate15/16-state outputs duplicate assembly;43 copies write
+  647.049MB logically. JAX recurrence630 kernels+45 copies gives2.907ms activity/
+  3.147ms span, not comparable directly with native8.740ms including heads.
+  All360 retained copies/63 seals/six mutations/three label regressions pass;
+  preserve original SQL inline-versus-registered-label failure and repair.
+  CPU only, no build/GPU/actions/updates; review before10:38:10UTC, no worker.
+  Next separately declare valid-value native recurrence attribution, matrices
+  versus surrounding execution, before choosing composition or matrix work.
+  No numerical relaxation, prior-candidate timing, sweep or promotion. Keep834241b6.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

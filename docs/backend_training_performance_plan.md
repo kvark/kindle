@@ -105,10 +105,23 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** establish matched native/JAX imagination boundaries and work, including
-the heads currently absent from the JAX recurrence-only interval. Use existing
-plans/HLO/capture evidence first, then separately declare any necessary bounded
-measurement. Do not turn unlike intervals into a performance ratio. Keep prior
+The [imagination boundary audit](results/2026-10-16-imagination-boundaries.md)
+now separates all802 native dispatches and accounts for45 CUDA rollout copies
+per update. JAX recurrence is2.907ms of GPU activity within3.147ms elapsed,
+still not directly comparable with native8.740ms including heads. A concrete
+composition miss remains:15 private RSSM input chains use105 dispatches and
+747.110MB logical writes where15 JAX fusions write125.829MB. All62.915M addresses
+and source/consumer checks pass; these are not traffic or speed measurements.
+Rollout stacking is already balanced, but independently constructs overlapping
+15/16-state outputs. Six mutation tests/three label regressions/63 seals pass;
+the failed registered-NVTX-label observer remains. CPU only, no worker.
+
+**Next:** separately declare one valid-value fixed-input attribution of native
+recurrence matrices versus surrounding execution/materialization, with original
+heads, allocations, barriers and exact escaping values. Use the result to choose
+the proven copy composition or recurrent matrix execution; do not assume byte
+counts explain the residual gap. Do not turn unlike intervals into a ratio or
+conditional differences into additive savings. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
 an automatic allocation or reason to relax the original gates. No candidate timing.

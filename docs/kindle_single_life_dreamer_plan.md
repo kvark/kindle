@@ -55,6 +55,16 @@ now restores all56 outputs and passes32 prior-parameter comparisons, but leaves
 and independent156.977M comparisons pass, two guards/no warnings/14 raw backwards,
 zero updates/actions. Keep the numerical issue open; next match the complete
 native/JAX imagination work before another performance allocation.
+The [imagination audit](results/2026-10-16-imagination-boundaries.md) now proves
+15 private RSSM input-assembly chains could compose105 dispatches into15,
+preserving62.915M indexed reads. Their747.110MB logical writes versus125.829MB
+final packed outputs are not measured DRAM traffic or speedup. Stacking is
+already balanced; overlapping15/16-state outputs remain separately assembled.
+Saved JAX recurrence includes45 copies:2.907ms activity/3.147ms elapsed, still
+not a direct comparison with native8.740ms including heads. CPU audits pass,
+original NVTX-label observer failure retained, no GPU call or worker. Next
+separately attribute native recurrent matrices versus surrounding execution
+before choosing an optimization. No prior-candidate timing or promotion.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
