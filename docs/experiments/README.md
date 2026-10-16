@@ -1,6 +1,11 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [upstream workgroup review](../results/2026-10-16-workgroup-contract.md)
+passes one properties-only guard and all23 CPU resource contracts. No shader
+executes. The rejected October15 family already used tensor addressing/workgroup
+scope, so new Blade exposure does not justify another trial or compiler project.
+
 October16's [prior-batching qualification](../results/2026-10-16-prior-batching.md)
 is incomplete:144→9 boundary products and passing paired checks, but14
 independent-reference array failures in both arms. CPU rounding diagnosis is

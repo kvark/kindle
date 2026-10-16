@@ -434,9 +434,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Preserve the read-method/build and length-one-config failures/repairs.
   Isolatedaca80566 remains unqualified; keep834241b6 and1.77x complete gap.
   Resolve the finite-precision reference before progressing this candidate.
-  New upstream Blade4845d652 already supplies workgroup cooperative matrices
-  and BF16 capability alignment; review it separately before new compiler work.
+  New upstream Blade4845d652 supplies workgroup matrices/BF16 capability alignment.
   No production/Atari promotion or convolution sweep.
+- **Upstream workgroup contract reviewed:** [result](docs/results/2026-10-16-workgroup-contract.md).
+  One properties-only guard/no warnings; all seven optional features advertised,
+  but Blade enables two and Naga lacks tensor-addressing IR. All23 current shapes/
+  resource bounds and six negatives pass;72 seals. Historical-index reader failure
+  stays; full membership repair passes without GPU repeat. No device/dispatch/update.
+  The rejected October15 family already used tensor addressing/workgroup matrices;
+  new upstream exposure does not revive it or justify a compiler project. Keep
+  834241b6/1.77x, resolve prior-reference discrepancy; no worker/production change.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

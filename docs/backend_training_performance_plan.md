@@ -77,8 +77,12 @@ without relaxing its gates or repeating GPU cohorts. The implementation is
 isolated, not qualified or timed. Keep causal observation/imagination sequential,
 masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
 gradient/boundary qualification still precedes a matched complete comparison.
-Separately review new upstream Blade4845d652 workgroup-cooperative-matrix support
-against the feeding contract before proposing compiler work; no silent repin.
+The [upstream workgroup review](results/2026-10-16-workgroup-contract.md) is complete:
+all seven optional features are advertised, Blade enables two, and Naga lacks
+tensor-addressing IR. One properties-only guard/no warnings, no logical device
+or dispatch. The rejected October15 family already used tensor addressing and
+workgroup matrices; new upstream exposure does not justify reviving that route
+or a compiler project. No silent repin.
 Matched imagination arithmetic is the
 next narrow execution region to attribute, not a new broad profile or sweep.
 Incomparable instrumented/ordinary regions cannot form a savings budget.

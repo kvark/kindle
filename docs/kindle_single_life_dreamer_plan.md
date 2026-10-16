@@ -33,8 +33,10 @@ The [isolated prior-batching implementation](results/2026-10-16-prior-batching.m
 reduces standalone products144→9 and passes all paired checks, but independent
 F64 gates fail in both arms. CPU rounding diagnosis is partial; preserve failures
 and resolve the reference before actual-world qualification or full timing.
-One guard/no warnings,16 raw backwards, no optimizer updates/actions. New Blade
-workgroup-matrix support is a separate feeding-contract review, not a repin.
+One guard/no warnings,16 raw backwards, no optimizer updates/actions. The separate
+[upstream workgroup review](results/2026-10-16-workgroup-contract.md) now passes:
+all23 resource contracts fit, no shader executes. The rejected October15 family
+already used tensor addressing/workgroup scope; no retry or compiler project.
 Basic head batching is already present. All eight JAX
 updates reconcile, but native pass intervals and JAX kernel sums are not
 subtractable savings. No new layout/tile sweep or automatic GPU allocation;
