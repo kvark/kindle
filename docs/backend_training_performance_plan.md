@@ -280,13 +280,24 @@ types/K order/compensation/layouts/barriers. No new alignment branch or helper.
 Static dX divisions/calls and dW branches decrease, but select/min/max work grows;
 this is not a native-instruction or speed result. CPU-only, no retry/worker.
 
-**Next:** separately declare one complete-family numerical/counter/ordinary-time
-comparison with unchanged gates, products, transforms and reductions. The
-qualified baseline already has nearly32 active threads per warp instruction;
-the new arithmetic must demonstrate an actual benefit without losing that
-execution behavior. No full-update integration unless that comparison passes.
-No automatic allocation, vector-width/geometry sweep or parity promise;
-library feeding/reuse remains open.
+The [complete shared-address trial](results/2026-10-16-convolution-carry-family.md)
+now rejects integration:18.954→18.349ms GPU,3.19%; queued wall3.26%, both below5%.
+Calibration+.81%/+.85% passes in aggregate. Four dW gains cannot justify a subset:
+two dX regress. Warp work rises1.60%, ALU3.03%; active lanes stay31.997 and local
+traffic zero. Small elapsed improvement does not make static sites or instruction
+counts a latency model. All numerical/full-output/plan/pipeline/binding gates
+pass;140 guards/46 warnings,2,000 counter passes, zero updates/actions. Keep all
+7,680 samples, especially the dX control's.445→.739ms unexplained tail shift.
+GPU ends19:49:53UTC; no worker, retime or full-update trial. Keep58aff452/1.70x.
+
+**Next:** stop local cursor/division substitutions. CPU-audit a reusable geometry-
+only operand-address/predicate representation across the complete family. Prove
+indices, masks, K order, values and lifetime; account for every table, lookup,
+preparation and capacity constraint before considering GPU implementation.
+This tests whether feeding metadata can be amortized, not whether another
+per-load expression looks smaller. It is not a cuDNN implementation claim or
+speed promise. No automatic GPU allocation, width/tile/layout sweep, revived
+schedule or compiler feature; library reuse and non-convolution costs stay open.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,

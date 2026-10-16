@@ -54,11 +54,10 @@ independent address census at19:22:16UTC; no study worker remains.
 
 ## Decision
 
-This is ready for a separately declared **complete-family numerical, counter
-and ordinary-time comparison**, retaining unchanged products, transforms,
-reductions and existing gates. Do not infer a speedup from the CPU proof or
-choose only favorable shapes. Full-update integration still requires that
-comparison to pass; no automatic allocation/promotion follows. The wider-read
-rejection, unqualified prior batching and broader JAX-gap goal remain open.
+The separately declared [complete-family comparison](2026-10-16-convolution-carry-family.md)
+now rejects integration:3.19% GPU/3.26% queued-wall benefit misses both5% gates.
+The CPU proof remains valid, not a speed claim. No favorable shape selection,
+retiming or full-update trial follows. The wider-read rejection, unqualified
+prior batching and broader JAX-gap goal remain open.
 
 Artifacts: `runs/convolution-carry-20261016.DpXsI5oj`.

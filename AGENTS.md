@@ -761,10 +761,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   divisions32→25/calls26→18; dW branches75→72. Added select/min/max work is not
   measured native work or a speedup. No new alignment branch, helper or selector.
   CPU audits finish19:20:31UTC without retries; zero GPU/backend rebuilds/updates/actions,
-  no worker. Next separately declare one complete-family numerical/counter/
-  ordinary comparison with existing gates and all transforms/reductions;
-  full-update integration requires it to pass. No automatic allocation, prior
-  timing, geometry/precision sweep or promotion. Keep58aff452/1.70x and goal open.
+  no worker. The complete comparison below rejects integration. No automatic
+  allocation, prior timing, geometry/precision sweep or promotion.
+- **Shared-address complete family rejected:** [result](docs/results/2026-10-16-convolution-carry-family.md).
+  All23 products18.954→18.349ms,3.19%; queued wall3.26% improves but both miss5%.
+  Aggregate native/control calibration+.81%/+.85% passes, not per-kernel proof.
+  Four dW contracts improve9.31–10.89%; two dX regress, no favorable selector.
+  Warp work+1.60%/ALU+3.03%, active threads/warp remain31.997 and local traffic
+  remains zero. Source simplification is not an instruction/latency model.
+  All2.690M F64 comparisons/1.033B bit-exact pairs, full plan/pipeline/binding/
+  segment checks and2,031 seals pass.140 guards/46 warnings,2,000 passes/6,728
+  offline metrics/11,600 standalone calls, zero updates/actions/backend rebuilds.
+  All7,680 timings stay, including the dX32→3 control's.445→.739ms first/last32
+  shift; cause unknown, no steady-state claim or retime. GPU19:49:53UTC,
+  aggregate19:50:20UTC; no worker. Initial tool syntax failure preceded writes/
+  execution; corrected without a cohort retry. No integration/full-update trial.
+  Next CPU-audit reusable geometry-only operand addresses/predicates across the
+  complete family, preserving K order/values and counting all table/preparation/
+  lookup/lifetime costs. This is a feeding hypothesis, not a promise or claim
+  about cuDNN internals. No local cursor/division tweak, width/tile/layout sweep,
+  compiler feature or automatic GPU allocation. Keep58aff452/1.70x and goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

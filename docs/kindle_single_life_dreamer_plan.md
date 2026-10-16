@@ -166,9 +166,15 @@ and small/odd/strided/boundary checks. Six derivatives change while17 forward/
 packed occurrences remain exact; scalar loads/masks/types/K order/layouts/
 compensation/barriers stay. No new alignment fast/slow path. Static operation
 reductions are not measured speed; no GPU execution or retry, no worker.
-Next separately declare one complete-family numerical/counter/time comparison;
-integration requires its existing gates to pass. No renewed width/geometry
-sweep, automatic GPU allocation or compiler feature follows.
+The [complete comparison](results/2026-10-16-convolution-carry-family.md) now
+rejects integration:3.19% GPU/3.26% queued-wall improvement misses both5% gates.
+Warp instructions rise1.60% despite unchanged active lanes/local traffic; all
+numerical and exact-output gates pass.140 guards/46 warnings, zero updates/actions;
+all samples remain, including an unexplained dX control tail shift. GPU ends
+19:49:53UTC, no worker, subset selection, retime or full-update trial. Next
+CPU-audit reusable geometry-only address/predicate metadata, including complete
+storage/preparation/lookup costs and exact values/K order. No local cursor tweak,
+renewed width/geometry/layout sweep, automatic allocation or compiler feature.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.
