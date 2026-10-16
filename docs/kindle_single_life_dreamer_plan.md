@@ -194,10 +194,16 @@ JAX constructs them on device. All18 behavior/160 world-target interfaces and
 CPU alignment checks pass. Its source also uses dense one-hot arrays; no compact-
 loss claim. The retained trace shows1.437ms target/report work and1.012ms behavior
 input preparation, not a whole-gap explanation. Preserve the initial physical-
-layout reader failure/repair and production replay-context refresh. Next implement
-resident returns/normalizer/targets with existing device facilities and unchanged
-losses, then separately qualify the complete RGB/CDP path. No CPU normalizer
-workaround, numerical relaxation, prior timing or learning restart is implied.
+layout reader failure/repair and production replay-context refresh. The
+[resident implementation](results/2026-10-16-resident-targets.md) now covers that
+complete path, with unchanged losses and passing offline/binding checks. Its12
+GPU component generations pass the guard/structural checks, but two coefficient
+occurrences fail the F64 gate among19.652M comparisons. The exact reference is
+verified; original Rust CPU arithmetic also fails this envelope at four other
+occurrences. Keep those failures. A CPU-only affine rewrite is rejected with no
+GPU attempt. Next resolve the return/encoding precision contract on the retained
+cohort before repair and complete RGB/CDP comparison. No timing, CPU normalizer
+workaround, compiler feature, numerical relaxation or learning restart follows.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.

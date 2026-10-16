@@ -329,15 +329,25 @@ Independent272-update trace reconstruction retains1.437ms target/report work and
 1.012ms behavior-input preparation. The8.086ms readback span includes7.913ms GPU
 execution; uncovered time is not pure CPU cost or additive savings.
 
-**Next:** implement complete resident target generation—F32 returns/weights,
-percentile/EMA, weighted actions/two-hot encoding, replay-feature handoff and
-staged world target writes—using existing device-copy/mean facilities and graph
-losses. Preserve pre-update parameters, normalizer state/checkpoints, diagnostics,
-CDP bonuses and production replay-context refresh. The fixed benchmark excludes
-that refresh; do not silently remove it. Offline binding/lifetime/source proof
-precedes a separately declared GPU qualification and complete RGB/CDP comparison.
-No CPU normalizer workaround or new convolution/geometry sweep. Keep58aff452/
-1.70x; target work is a bounded portion, not an explanation of the entire gap.
+The [resident implementation](results/2026-10-16-resident-targets.md) now exists
+in isolation, preserving that complete scope and the existing losses. Offline
+binding/prefix/lifetime checks, ten Vulkan modules and Clippy pass.12 component
+generations/zero learner updates/actions pass the guard and structural checks,
+but two occurrences of one coefficient fail the declared F64 envelope among
+19.652M comparisons. Exact rational arithmetic verifies the failed reference.
+The original Rust functions reproduce7.840M source-F32 values exactly and also
+fail this envelope at four other occurrences. CPU equality alone would not fix
+the gate; an explicit-FMA affine rewrite fails78 occurrences on CPU and is rejected
+without a GPU attempt. No full-model timing or promotion follows. Preserve all
+failures and the original cohort/gates; no worker remains.
+
+**Next:** resolve the scalar-return versus encoding precision contract on those
+retained inputs before selecting a repair and separately declaring GPU
+qualification/full RGB-CDP comparison. Keep pre-update ordering, masks/discount,
+normalizer checkpoints, diagnostics, CDP bonuses and production replay refresh.
+No CPU normalizer workaround, compiler feature, favorable subset or numerical
+gate widening follows. Keep58aff452/1.70x; target work is a bounded portion,
+not an explanation of the entire gap.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,

@@ -838,6 +838,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   and complete RGB/CDP comparison; no CPU-normalizer workaround, prior timing,
   convolution revival, automatic promotion or Atari restart. Keep58aff452/1.70x;
   target work is a bounded portion and the full root-cause goal remains open.
+- **Resident target implementation exists; qualification fails:** [result](docs/results/2026-10-16-resident-targets.md).
+  Isolated27b8befc implements F32 returns/weights, percentile/EMA, weighted action/
+  two-hot targets, GPU replay features and staged-world writes. Keeps losses,
+  masks/CDP arrival bonuses/checkpoints and CPU replay-context refresh. Actual
+  RGB/CDP16 behavior/160 world targets, prefix/scratch exclusion, eight negatives,
+  ten offline Vulkan modules and Clippy pass. New buffers598,892B;81 device-copy
+  regions/6.486MB logical, not traffic/savings. Supports<=8192 returns and staged
+  full-BPTT/full-microbatch only.12 component generations/zero updates/actions,
+  one guard/no new warnings; identity consumers use48-wide features, not actual
+  12M training.759 output-array/301 restored-file checks pass.19,652,262 numerical
+  comparisons fail one replay coefficient plus its world copy: error1.6867e-5
+  versus unchanged1.6019e-5 gate. Exact rational reference confirms the failure.
+  Original Rust helpers reproduce7,839,540 source-F32 values exactly but fail
+  four occurrences elsewhere under this same envelope: CPU equality alone is
+  not a solution. Same-scalar encoding agrees within one F32 ULP; no native
+  instruction-level contraction claim. A CPU-only affine/FMA rewrite fails78
+  occurrences and is rejected without GPU execution. Preserve mutable-caller,
+  reserved-WGSL-name and missing-CPU-helper failures/repairs; no widened gates,
+  GPU repeats, compiler feature, timing or promotion. Last guard21:48:36UTC;
+  CPU control22:05:39UTC, no worker. Next resolve the scalar-return/encoding
+  precision contract on the retained cohort before a separately declared repair
+  and complete RGB/CDP comparison. Keep58aff452/1.70x; full goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
