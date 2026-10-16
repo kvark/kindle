@@ -179,12 +179,19 @@ products and original K/layout contracts. No shader or speed qualification;
 GPU initialization/lifetime remains to implement; existing host-visible constants
 are not sufficient. CPU review20:04:56UTC, no worker, zero GPU/builds/actions.
 The [actual consumers/initializer](results/2026-10-16-convolution-metadata-kernels.md)
-now pass offline, and the first GPU numerical pair passes. Its path-schema reader
-failure is repaired without repeating GPU work; all original failures remain.
-One bounded complete-family continuation starts20:32:29UTC for only138 unstarted
-guards, retaining the first two. Counter/timing aggregate remains pending; review
-completion or failure before any follow-up. No local cursor tweak, selector,
-width/geometry/layout sweep, automatic integration or compiler feature.
+now pass offline and GPU numerics, but the complete family is rejected:
+19.112→36.871ms,92.92% slower,19/20 contracts regress. ALU work falls9.25% while
+warp work grows16.26% and measured L2 traffic3.422x; neither DRAM traffic nor
+local spilling explains the aggregate by itself.2.690M F64 comparisons/1.033B
+exact pairs and all plans/bindings/counters pass;140 guards/ten warnings, zero
+updates/actions.60 initializations/readbacks and all7,680 samples remain. All
+CPU reader failures are retained and repaired without repeating GPU work. GPU
+ends20:52:28UTC, independent review20:53:01; no worker. No lookup/geometry/layout
+sweep, favorable selector, integration or full-update trial.
+Next CPU-reconcile native host-target/readback dependencies against JAX's resident
+update, including precision/state and existing device paths. The uncovered
+instrumented interval is not pure CPU cost or promised savings; no new GPU run,
+numerical relaxation, prior-batching timing or learning restart is implied.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.

@@ -798,23 +798,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   semantics offline, then separately declare complete-family qualification.
   No automatic allocation, selector/layout/tile sweep, compiler feature or
   promotion. Keep58aff452/1.70x and goal open; the local carry rejection stands.
-- **Actual metadata kernels qualified offline; GPU family running:** [result](docs/results/2026-10-16-convolution-metadata-kernels.md).
- 320 paired typed/packed modules plus initializer validate;266 retained controls
- match exactly.302 B consumers change,18 matrices stay exact. Actual emitted
- 26.163M table indices/30.428M source addresses,272,000 initializer entries,
- 36 small cases/177,993 addresses and four mutations pass. Source/SPIR-V review
- preserves non-B work, types, matrices and barriers; observerfb6d0cc1 compiles
- and its CPU geometry test passes without a backend rebuild. Two CPU reader
- failures (module-local IDs, rustfmt whitespace) and repairs stay retained.
- First numerical pair:two guards/no warnings,524,288 F64 values/67.109M exact
- pairs/102,400 GPU map entries pass. Original controller then stops on serde's
- Unix-tagged path; separate CPU repair passes, no GPU repeat/fault/recovery.
- `kindle-metadata-gpu-remaining-20261016` and its persistent finisher start
- 20:32:29UTC for only138 unstarted guards;2,414 seals pass. All20 contracts/23
- occurrences, original5% gates and initialization costs remain in scope.
- Counter/ordinary aggregate pending; review completion or first failure before
- further GPU work. No full-world shared cache, selector/retime, promotion or
- Atari restart. Keep58aff452/1.70x; goal remains open.
+- **Spatial-metadata complete family rejected:** [result](docs/results/2026-10-16-convolution-metadata-kernels.md).
+  All23 products19.112→36.871ms,92.92% slower; queued wall92.65% slower and19/20
+  contracts regress. Aggregate control/native calibration+.0559%/+.0388% passes5%.
+  ALU work−9.25% but warp work+16.26%, LSU+28.08%, L2 bytes3.422x and CBU22.57x;
+  tensor counts exact, DRAM+.012%, local traffic zero. Packed regressions also
+  occur with fewer L2 bytes: no single traffic/source-site/latency explanation.
+  All320 paired modules plus initializer, actual-source addresses,2.690M F64/
+  1.033B exact GPU values, plans/pipelines/bindings and2,415 seals pass.140 guards/
+  ten warnings,2,000 counter passes/6,728 offline metrics/11,600 calls; zero
+  updates/actions/backend rebuilds.60 map initializations/readbacks verify2.126M
+  entries; setup wall376.987ms total, not shared full-world startup or per-call
+  cost. All7,680 samples stay; max first/last32 shift4.21%. GPU20:52:28UTC,
+  independent review20:53:01UTC; no worker. Preserve type-ID/whitespace/tagged-path
+  CPU failures and repairs; retain first pair, no GPU repeat/recovery. No table/
+  layout/geometry sweep, selector, integration or full-update trial. Keep58aff452/
+  1.70x. Next CPU-reconcile existing native host-target/readback dependencies and
+  resident JAX boundaries before choosing a device implementation or measurement.
+  Uncovered7.528ms is not pure CPU cost or additive saving; preserve precision/
+  normalizer/target state and existing device means. No new GPU allocation,
+  prior timing, numerical relaxation or Atari restart; full goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

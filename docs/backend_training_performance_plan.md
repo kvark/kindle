@@ -300,20 +300,31 @@ Required one-time GPU initialization is eight dispatches/1,064 groups; existing
 host-visible constants do not provide the device-local immutable lifetime.
 CPU review20:04:56UTC, no worker/retry, zero GPU calls/builds/actions/updates.
 
-The [actual shader path](results/2026-10-16-convolution-metadata-kernels.md)
-now passes offline:320 paired modules plus initializer,26.163M interpreted map
-indices/30.428M addresses, exact non-B semantics, binding/lifetime review and a
-compiled observer CPU test. The first GPU numerical pair passes; its Unix-path
-receipt-reader failure is repaired on CPU without repeating the pair. Two older
-offline reader failures remain. No full-family speed or runtime claim yet.
+The [complete spatial-metadata trial](results/2026-10-16-convolution-metadata-kernels.md)
+now rejects integration:19.112→36.871ms GPU,92.92% slower; queued wall92.65%
+slower,19/20 contracts regress. Aggregate calibration+.0559%/+.0388% passes5%.
+ALU instructions fall9.25% but total warp work rises16.26%, LSU28.08% and L2
+traffic3.422x; tensor work stays exact and local traffic zero. DRAM is unchanged
+within.012%; several packed cases regress despite less L2 traffic. No single
+memory/stall/source-site explanation follows. Precomputing addresses alone does
+not reproduce library feeding. Close this lookup implementation, without a
+table/layout/geometry sweep, selector, retime or full-update integration.
 
-**Running:** `kindle-metadata-gpu-remaining-20261016` starts20:32:29UTC for only
-138 unstarted guards, with the first two retained. All20 contracts/23 occurrences,
-original numerics/counters/ordinary gates and disclosed initialization costs.
-Persistent finisher aggregates all cohorts; review completion or first failure
-before further GPU work. Keep58aff452/1.70x. No automatic integration, width/tile/
-layout sweep, revived schedule or compiler feature; library reuse and
-non-convolution costs stay open.
+All offline source proofs,2.690M independent F64 comparisons/1.033B exact GPU
+pairs,2,000 counter passes/6,728 metrics and2,415 source seals pass.140 guards/
+ten warnings, zero updates/actions.60 initialization/readback pairs verify2.126M
+entries; complete setup wall totals376.987ms across isolated processes, not
+shared full-world startup. All7,680 timings stay. GPU ends20:52:28UTC, independent
+review20:53:01; no worker. Preserve all three CPU reader failures/repairs and the
+unrepeated first pair. No backend rebuild or production/learning change.
+
+**Next:** CPU-reconcile native host-target/readback dependencies with the resident
+JAX update using existing source and captures. Identify exact target arithmetic,
+precision, state transitions, transfer boundaries and already-existing device
+paths before choosing a resident-target implementation or new measurement.
+The uncovered7.528ms instrumented interval contains waits and is not pure CPU
+cost or additive savings. Keep58aff452/1.70x; convolution/library reuse remains
+open. No new GPU allocation, revived schedule or compiler feature follows.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
