@@ -23,11 +23,12 @@ pass. Later trajectories differ; no learning parity or production/Atari promotio
 Nine guards/six warnings,1,184 synthetic updates/12 component generations/zero
 actions; no GPU worker in that study. The remaining15.97ms gap still needs root-cause work.
 
-The [next output-path contract](results/2026-10-16-direct-output-contract.md)
-passes CPU address/compiler/current-plan checks. One bounded whole-family
-numerical/timing queue is running with automatic review; there is no new speed
-or learning result yet. It changes only eligible F32 output handling, not inner
-arithmetic/feeding loops, model capacity or precision. Keep the1.59× baseline.
+The [output-path trial](results/2026-10-16-direct-output-family.md) passes all
+numerical checks but improves complete convolution operations only3.60%, below
+its5% gate. Reject integration; no retime or full-update trial.100 guards pass
+with15 recorded warnings; all samples, including a large native dX transient,
+remain. No worker, learning result or baseline change: keep1.59×. Operand
+feeding, matrix work distribution and graph execution remain separate questions.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact

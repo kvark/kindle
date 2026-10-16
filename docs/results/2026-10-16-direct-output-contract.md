@@ -1,4 +1,4 @@
-# Direct F32 output is feasible; complete-family qualification is running
+# Direct F32 output CPU contract
 
 October 16, 2026. [CPU declaration](../experiments/2026-10-16-direct-output-contract.md)
 · [GPU declaration](../experiments/2026-10-16-direct-output-family.md)
@@ -7,7 +7,9 @@ October 16, 2026. [CPU declaration](../experiments/2026-10-16-direct-output-cont
 **The existing compiler can write eligible convolution accumulators directly
 to their original F32 destinations.** No new compiler API, tile geometry,
 precision, output layout or backend build is needed. This is a CPU feasibility
-result, not yet a numerical GPU qualification or speedup. Keep isolated
+result, not by itself a numerical GPU qualification or speedup. The subsequent
+[complete-family comparison](2026-10-16-direct-output-family.md) passes numerics
+but misses its performance gate and rejects integration. Keep isolated
 native `e45b9c43`: complete RGB43.197ms versus inclusive JAX27.223ms, **1.59×**.
 Production and Atari remain unchanged.
 
@@ -69,6 +71,6 @@ automatic promotion.100 bounded serialized guards; zero learner updates/actions.
 The separate terminal observer waits for service success before auditing once.
 
 Artifacts: `runs/convolution-direct-output-20261016.93l7AixM`. CPU build,
-address/source audit and observer preflight pass. GPU results are pending in
-this report; [PR31](https://github.com/kvark/kindle/pull/31) tracks execution.
+address/source audit and observer preflight pass. The separate GPU result retains
+all samples and failures; [PR31](https://github.com/kvark/kindle/pull/31) tracks status.
 The root-cause/parity and learning-quality goals remain open.

@@ -27,11 +27,22 @@ now passes:320 paired modules/275.972M explicit addresses/current RGB/CDP plans.
 The existing API can skip explicit scratch/scatter on aligned full tiles covering
 104.595M/280.986M output values in seven RGB occurrences. K loops and shared
 allocation stay unchanged; this is not the main feeding-loop fix or a speed claim.
-One separately declared whole-family numerical/timing queue is running, with
-automated failure stops and terminal audit. Require5% aggregate GPU/queued-wall
-benefit and5% calibration. No subset, retime, compiler project or automatic
-integration. Upstream41a15d31's seven new commits leave ordinary codegen/shader/
+The [complete family](results/2026-10-16-direct-output-family.md) passes numerics
+but improves only3.60% GPU/3.65% queued wall, below5%: reject integration.
+All100 guards/2.690M F64/774.862M exact comparisons pass;15 warnings retained.
+Native dX's large transient remains untrimmed and unexplained. No worker,
+subset, retime, compiler project or full-update trial. Upstream41a15d31's seven
+new commits leave ordinary codegen/shader/
 compiler trees unchanged; no repin. Preserve the CPU syntax-reader failure.
+
+Next reconcile counters with the current complete native execution, before
+another kernel proposal. Existing native counters use standalone synthetic
+operands; JAX's use an actual update. Prove complete range membership and retain
+original commands/dependencies before a bounded collection; counter replay time
+is not ordinary latency. The rejected October15 workgroup source already loads
+global storage directly with `coopMatLoadTensorNV`: this is not an untried API
+or grounds to restart that family. No new GPU allocation or compiler work is
+implied by this source review.
 
 The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
@@ -370,9 +381,13 @@ learning parity is not established. Preserve the CPU descriptor-lifetime failure
 repair and timing-count correction. Nine guards/six warnings,1,184 updates, no
 actions; no GPU worker. Keep isolatede45b9c43, not production or Atari promotion.
 
-**Next:** the measured2.66ms reduction leaves15.97ms over inclusive JAX. Continue
-from the existing convolution/nonconvolution counter and dependency evidence,
-requiring a distinct mechanism and CPU proof before another GPU allocation.
+**Next:** the measured2.66ms target reduction leaves15.97ms over inclusive JAX.
+Direct output's small standalone benefit does not close that gap. Continue from
+existing convolution feeding and nonconvolution execution evidence, requiring a
+distinct mechanism and CPU proof before another GPU allocation. In particular,
+matrix instruction parity is not timing parity: recurrence workgroup counts
+differ21,840/66,480 native/JAX, but standalone and full-program time boundaries
+are not interchangeable. Do not turn that observation into a tile/split-K sweep.
 Keep pre-update ordering, masks/discount, normalizer checkpoints, CDP bonuses
 and production replay refresh. No CPU normalizer workaround, favorable subset,
 closed-family revival or compiler project follows automatically. Keep1.59x;

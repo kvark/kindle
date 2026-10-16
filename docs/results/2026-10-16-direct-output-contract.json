@@ -1,5 +1,6 @@
 {
-  "status": "cpu_contract_passed_gpu_qualification_running",
+  "status": "cpu_contract_passed_subsequent_family_performance_gate_failed",
+  "subsequent_result": "2026-10-16-direct-output-family.json",
   "artifact_root": "runs/convolution-direct-output-20261016.93l7AixM",
   "unchanged_native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
   "unchanged_complete_rgb_ms": 43.196506554687524,

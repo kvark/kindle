@@ -887,19 +887,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   mechanism and CPU proof before another GPU allocation. No closed-family revival,
   geometry/precision sweep, prior-batching timing or new compiler project implied.
   Full root-cause and learning-quality goals remain open.
-- **Direct F32 output CPU contract passes; GPU qualification running:**
-  [result](docs/results/2026-10-16-direct-output-contract.md).320 paired modules,
-  275.972M explicit output addresses and current23 RGB/11 CDP memberships pass.
-  Uniform full-tile/alignment eligibility covers104.595M/280.986M output values,
-  seven occurrences; tails/reduced outputs/packed dW retain scatter. K loops,
-  geometry/compensation/rounding and shared allocation stay unchanged. Ten negative
-  checks pass; preserve initial reader syntax failure/repair. No compiler project.
-  Fixed100-guard numerical/timing queue starts23:14:15UTC under
-  `kindle-direct-output-gpu-20261016.service`; terminal CPU audit is automated.
-  Artifacts`runs/convolution-direct-output-20261016.93l7AixM`. Require5% aggregate
-  GPU/queued-wall benefit and5% control calibration. Review terminal artifacts
-  before follow-up; no retime, favorable subset, counter/full-update allocation
-  or promotion. Keepe45b9c43/1.59x; production/Atari and goal remain unchanged.
+- **Direct F32 output family rejected:** [result](docs/results/2026-10-16-direct-output-family.md).
+  All23 complete products19.120->18.432ms GPU,3.60%; queued wall3.65% better,
+  both miss5% gates. Native/control calibration−1.77%/−1.74% passes in aggregate;
+  ten of20 contracts regress. All2.690M F64/774.862M bit-exact comparisons and
+  2,020 source receipts pass.100 guards/15 warnings,8,880 standalone calls,
+  zero updates/actions. GPU ends23:28:37UTC, independent audit23:29:00; no worker.
+  Native dX32→3 first/last32 shifts2.035→.457ms; retain all samples/cause unknown.
+  K loops and shared allocation stay; seven occurrences bypass output scatter.
+  Preserve CPU syntax-reader failure/repair. No retime, selector, integration,
+  full-update trial or compiler project. Artifacts
+  `runs/convolution-direct-output-20261016.93l7AixM`. Keepe45b9c43/1.59x.
+  Convolution feeding and recurrent work distribution remain distinct questions;
+  fewer matrix instructions do not prove time parity. No closed tile/split-K/
+  feeding sweep, automatic GPU allocation, production or Atari promotion.
+  Source review confirms October15's rejected tensor family already loads global
+  image/weight storage directly, not shader-managed shared operands. Do not
+  relabel that API as untried. Next prove complete current native model counter
+  membership and a command/dependency-preserving observer: existing native
+  counters use standalone synthetic inputs, while JAX's use its full update.
+  Historical captured-group value controls remain valid but are not universal.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
