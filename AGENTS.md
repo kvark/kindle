@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is48.068ms versus inclusive JAX27.223ms,1.77x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is46.199ms versus inclusive JAX27.223ms,1.70x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -535,17 +535,37 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   one initializer/zero actions; GPU ends10:57:19UTC, no worker.574 seals/eight
   CPU tests/Clippy and independent audit pass. Keep the observer BufferRef-Ord
   compile failure/repair. No GPU retry, new ordinary-update ratio or promotion.
-  Next CPU-proof general private copy/cast composition across full RGB/CDP
-  programs, preserving tapes, versions, external values and rounding; separately
-  qualify and measure the complete update. Matrices/convolution feeding remain
-  open. No automatic allocation, prior timing, geometry/precision sweep. Keep834241b6.
+  The following general copy/cast composition now qualifies across full RGB/CDP
+  programs. Matrices/convolution feeding remain open. No prior timing or
+  geometry/precision sweep follows from the attribution alone.
+- **General private copy composition qualifies:** [result](docs/results/2026-10-16-copy-composition.md).
+  Complete RGB48.133→46.199ms,4.02%; CDP45.669→43.939ms,3.79%. RGB/JAX1.70x.
+  All272 reports/targets/initial-first-final292/346 tensors and24-update prefixes
+  match exactly; controls drift+.1363%/+.3604%.47.082M raw-gradient values per
+  comparison match original/changed late targets and NaN-poisoned preparation;
+  18 checkpoint pairs stay exact.319.752M CPU addresses/11 Rust fixtures/615
+  typed variants/Clippy pass.93/112 rewrites remove362/458 dispatches and
+  1.190/1.207GB logical writes, not measured traffic.24/32 executed copy modules
+  match actual CPU generation; all source versions, plans/constants and unchanged
+  pipelines reconcile. World groups audited; non-world runtime groups unexported.
+  Six helper-order permutations and three unexecuted extra modules explain the
+  shader-catalog failures. Preserve first arity, lint, fixture, dependency, group-
+  schema, shader-scope and occurrence-count failures; CPU repairs use no GPU repeats.
+  Twelve guards/ten warnings,1,188 synthetic updates/16 raw backwards/zero actions;
+  GPU11:51:32UTC, final CPU11:59:49UTC, no worker.3,044 timing seals pass.
+  Keep isolated native`58aff452` under `runs/copy-composition-20261016.ABr4pCUH`,
+  with `MEGANEURA_COPY_COMPOSITION=1` plus word staging/image views/device means/
+  cached recording.834241b6 remains its preceding control. No F16 GPU, acting,
+  learning or production promotion. Next CPU-audit remaining matrix/convolution
+  instruction and specialization contracts against matched JAX work; no new
+  allocation, copy/geometry/precision sweep or prior-batching timing implied.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
   control. `99f8aab0` remains the preceding
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
-  Current isolated backend sources are in the word-staging study; the ordering
+  Current isolated backend sources are in the copy-composition study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
   this candidate. Latest October16 upstream: `f648a453`/`4845d652`; Meganeura's

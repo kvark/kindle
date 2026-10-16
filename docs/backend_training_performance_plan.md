@@ -9,12 +9,15 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**48.068ms versus inclusive JAX27.223ms,1.77×**; B8 retains22.780/12.737ms,1.79×.
+**46.199ms versus inclusive JAX27.223ms,1.70×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`834241b6` from
-[typed word staging](results/2026-10-16-word-staging.md), with
+The current isolated B32 candidate is native`58aff452` from
+[private copy composition](results/2026-10-16-copy-composition.md), with
+`MEGANEURA_COPY_COMPOSITION=1` and
 `MEGANEURA_CONVOLUTION_WORDS=1` plus image views/device means/cached recording.
+Its preceding control is native`834241b6` from
+[typed word staging](results/2026-10-16-word-staging.md).
 The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
 [connected image views](results/2026-10-15-image-views.md). Its control is
@@ -22,7 +25,7 @@ The preceding candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest qualification: [prior batching is incomplete](results/2026-10-16-prior-batching.md).**
+**Separate unresolved candidate: [prior batching is incomplete](results/2026-10-16-prior-batching.md).**
 The isolated boundary has144→9 matrix products and1181→168 dispatches;
 all serial/batched comparisons pass. Independent F64 checks fail14 arrays
 in both arms. The subsequent [forward-tape capture](results/2026-10-16-prior-tape.md)
@@ -125,19 +128,27 @@ outputs, checkpoints, first targets/reports and programs pass; two guards/four
 warnings,733 fixed replays/one initializer/zero actions, no worker. All576 timing
 samples remain; calibration gates pass. Original observer compile failure stays.
 
-**Next:** CPU-proof a general private copy/cast composition across complete
-RGB/CDP programs, using the known RSSM concat/repeat input mapping. Preserve
-gradient tapes, source versions, external values and rounding; no model-specific
-arithmetic kernel or precision change. Then separately qualify the implementation
-and make one matched complete-update comparison. This tests a proven compilation
-miss; it does not assume copies explain the entire surrounding-work cost or
-the1.77× gap. Recurrent matrices and convolution feeding remain open. Keep prior
+The [general copy/cast implementation](results/2026-10-16-copy-composition.md)
+now qualifies: complete RGB48.133→46.199ms,4.02%, CDP45.669→43.939ms,3.79%.
+It removes362/458 dispatches while preserving all272 reports, targets and
+292/346 state tensors exactly. Actual raw gradients, changed late targets and
+poisoned preparation pass47.082M values per comparison. All319.752M CPU addresses,
+615 typed variants, source-version/plan/pipeline audits and world-group coverage
+pass. Non-world runtime groups were not exported. Shader ordering/scope and
+reader failures remain, with CPU-only repairs; no GPU repeats. Twelve guards,
+ten warnings,1,188 updates/16 raw backwards/zero actions; no worker. The gain
+is mostly imagination/targets, not the remaining18.977ms RGB/JAX difference.
+
+**Next:** CPU-audit the remaining matrix/convolution instruction and
+specialization contracts against matched JAX work before another implementation.
+Keep the general composition; no copy/tile/precision sweep or automatic GPU
+allocation. Recurrent matrices and convolution feeding remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
 an automatic allocation or reason to relax the original gates. No candidate timing.
 Keep causal observation/imagination sequential,
 masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
-gradient/boundary qualification still precedes a matched complete comparison.
+gradient/boundary qualification for prior batching still precedes its matched comparison.
 The [upstream workgroup review](results/2026-10-16-workgroup-contract.md) is complete:
 all seven optional features are advertised, Blade enables two, and Naga lacks
 tensor-addressing IR. One properties-only guard/no warnings, no logical device

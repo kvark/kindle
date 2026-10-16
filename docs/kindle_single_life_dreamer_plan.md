@@ -13,7 +13,15 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest complete B32 result:** [typed word staging](results/2026-10-16-word-staging.md)
+**Latest complete B32 result:** [private copy composition](results/2026-10-16-copy-composition.md)
+reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
+272 reports/targets/state tensors, raw gradients and complete program audits.
+RGB remains1.70× inclusive JAX. Keep isolated native58aff452 with copy composition,
+word staging/image views/device means/cached recording. Twelve guards/ten warnings,
+1,188 synthetic updates/16 raw backwards/zero actions; no worker. No production,
+acting, F16 GPU or learning promotion. Non-world runtime groups were not exported.
+
+The preceding [typed word staging](results/2026-10-16-word-staging.md)
 reduces RGB51.763→48.068ms,7.14%, and CDP46.929→45.505ms,3.03%, with exact
 reports/targets/tensors and full plans/shaders. RGB remains1.77× inclusive JAX.
 Keep isolated native834241b6 with word staging/image views/device means/cached
@@ -70,10 +78,13 @@ fixed imagination8.702ms becomes5.932ms with matrices substituted,6.639ms with
 surrounding work substituted,2.275ms with both. The−1.594ms interaction prevents
 an additive kernel-cost claim; both classes matter. Exact outputs/state/programs
 and calibration pass, two guards/four warnings,733 fixed replays/one initializer,
-zero actions. No ordinary update speedup or worker. Next CPU-proof general
-private copy/cast composition across full RGB/CDP programs, preserving tapes,
-source versions and rounding, before separately qualifying/measuring it.
-Matrix execution, convolution feeding and the1.77× complete gap remain open.
+zero actions. That intervention was not an ordinary update speedup. The general
+private copy/cast composition above now qualifies, preserving tapes, versions
+and rounding;319.752M CPU addresses and47.082M raw-gradient values per comparison
+pass. Original reader/shader-catalog failures remain with CPU-only repairs and
+no GPU repeat. Matrix execution, convolution feeding and the1.70× complete gap
+remain open. Next CPU-audit their instruction/specialization contracts against
+matched JAX work, not another copy/geometry/precision sweep or prior timing.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
