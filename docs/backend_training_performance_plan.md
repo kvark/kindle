@@ -9,10 +9,14 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**46.199ms versus inclusive JAX27.223ms,1.70×**; B8 retains22.780/12.737ms,1.79×.
+**43.197ms versus inclusive JAX27.223ms,1.59×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`58aff452` from
+The current isolated B32 candidate is native`e45b9c43` from
+[resident targets](results/2026-10-16-resident-targets-qualified.md), with
+`KINDLE_DEVICE_TARGETS=1` and the preceding backend flags. Its numerical/integration
+contract allows F32 encoding rounding; learning parity is untested. The preceding
+control is native`58aff452` from
 [private copy composition](results/2026-10-16-copy-composition.md), with
 `MEGANEURA_COPY_COMPOSITION=1` and
 `MEGANEURA_CONVOLUTION_WORDS=1` plus image views/device means/cached recording.
@@ -341,17 +345,31 @@ the gate; an explicit-FMA affine rewrite fails78 occurrences on CPU and is rejec
 without a GPU attempt. No full-model timing or promotion follows. Preserve all
 failures and the original cohort/gates; no worker remains.
 
-**Next:** resolve the scalar-return versus encoding precision contract on those
-retained inputs before selecting a repair and separately declaring GPU
-qualification/full RGB-CDP comparison. Keep pre-update ordering, masks/discount,
-normalizer checkpoints, diagnostics, CDP bonuses and production replay refresh.
-No CPU normalizer workaround, compiler feature, favorable subset or numerical
-gate widening follows. Keep58aff452/1.70x; target work is a bounded portion,
-not an explanation of the entire gap.
+The [separate repair/full-update comparison](results/2026-10-16-resident-targets-qualified.md)
+now qualifies under an explicitly revised encoding contract. Local compensated
+F32 returns pass the original19.652M component comparisons. Complete RGB
+45.852->43.197ms saves5.79%; CDP43.657->40.997ms saves6.09%. All actual first
+targets/metrics and unchanged programs pass; retained controls and own smoke
+prefixes/checkpoint restorations are exact. The original full-model exact-slow-
+encoding screen stays failed: its requirement exceeded the component contract.
+Applying the original dense-target tolerance to all encodings passes the entire
+retained cohort, without a runtime change or GPU repeat. Fifteen observer tests
+pass. Later learner parameters differ by.000256/.05434 relativeL2 RGB/CDP;
+learning parity is not established. Preserve the CPU descriptor-lifetime failure/
+repair and timing-count correction. Nine guards/six warnings,1,184 updates, no
+actions; no GPU worker. Keep isolatede45b9c43, not production or Atari promotion.
+
+**Next:** the measured2.66ms reduction leaves15.97ms over inclusive JAX. Continue
+from the existing convolution/nonconvolution counter and dependency evidence,
+requiring a distinct mechanism and CPU proof before another GPU allocation.
+Keep pre-update ordering, masks/discount, normalizer checkpoints, CDP bonuses
+and production replay refresh. No CPU normalizer workaround, favorable subset,
+closed-family revival or compiler project follows automatically. Keep1.59x;
+the host-target improvement is not an explanation of the entire remaining gap.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
-prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
+prior timing, compiler feature or automatic promotion. Keepe45b9c43/1.59x.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not

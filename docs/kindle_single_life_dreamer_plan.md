@@ -13,7 +13,17 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest complete B32 result:** [private copy composition](results/2026-10-16-copy-composition.md)
+**Latest complete B32 result:** [resident targets](results/2026-10-16-resident-targets-qualified.md)
+reduce RGB45.852->43.197ms,5.79%, and CDP43.657->40.997ms,6.09%. RGB is1.59×
+inclusive JAX. Keep isolatede45b9c43 with device targets plus the preceding flags;
+backend unchanged. Original component failures and the overly strict slow-encoding
+smoke stay retained; the repaired recurrence and explicitly revised encoding
+contract pass. Complete programs, retained controls and own checkpoints/prefixes
+pass. Later trajectories differ; no learning parity or production/Atari promotion.
+Nine guards/six warnings,1,184 synthetic updates/12 component generations/zero
+actions; no GPU worker. The remaining15.97ms gap still needs root-cause work.
+
+The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
 272 reports/targets/state tensors, raw gradients and complete program audits.
 RGB remains1.70× inclusive JAX. Keep isolated native58aff452 with copy composition,
@@ -201,11 +211,14 @@ GPU component generations pass the guard/structural checks, but two coefficient
 occurrences fail the F64 gate among19.652M comparisons. The exact reference is
 verified; original Rust CPU arithmetic also fails this envelope at four other
 occurrences. Keep those failures. A CPU-only affine rewrite is rejected with no
-GPU attempt. Next resolve the return/encoding precision contract on the retained
-cohort before repair and complete RGB/CDP comparison. No timing, CPU normalizer
-workaround, compiler feature, numerical relaxation or learning restart follows.
+GPU attempt. The [separate repaired path](results/2026-10-16-resident-targets-qualified.md)
+now passes original component tolerances and complete-update timing. Its original
+exact-slow-encoding smoke remains failed, with the consistent component encoding
+contract explicitly applied in a separate CPU-only review. No GPU repeat, CPU
+normalizer workaround, compiler feature or learning restart follows. Full targets,
+unchanged programs and checkpoint restores pass; learning trajectories differ.
 The prior sealed-declaration publication error is restored
-with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
+with its failure retained. Keepe45b9c43/1.59×, production/Atari unchanged and
 the full root-cause/parity goal open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.

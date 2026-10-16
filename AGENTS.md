@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is46.199ms versus inclusive JAX27.223ms,1.70x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is43.197ms versus inclusive JAX27.223ms,1.59x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -857,9 +857,36 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   occurrences and is rejected without GPU execution. Preserve mutable-caller,
   reserved-WGSL-name and missing-CPU-helper failures/repairs; no widened gates,
   GPU repeats, compiler feature, timing or promotion. Last guard21:48:36UTC;
-  CPU control22:05:39UTC, no worker. Next resolve the scalar-return/encoding
-  precision contract on the retained cohort before a separately declared repair
-  and complete RGB/CDP comparison. Keep58aff452/1.70x; full goal remains open.
+  CPU control22:05:39UTC, no worker. The following separately declared repair
+  supersedes its next step, not the failed evidence or original gates.
+- **Resident targets qualify under the revised encoding contract:** [result](docs/results/2026-10-16-resident-targets-qualified.md).
+  Complete RGB45.852->43.197ms,5.79%; CDP43.657->40.997ms,6.09%. RGB/JAX1.59x;
+  fresh controls calibrate within.76%. Keep isolatede45b9c43 with
+  `KINDLE_DEVICE_TARGETS=1` under `runs/resident-target-model-20261016.tEVYDi5C`,
+  alongside device means/copy composition/word staging/image views/cached recording.
+  Leave the presence-based target flag unset for control58aff452. Backend unchanged.
+  One local compensated-F32 recurrence passes the original19.652M component
+  comparisons; ordinary F32 buffers/masks/losses stay. Actual12M first targets/
+  metrics, all programs/pipelines/groups, retained272-report/initial-first-final
+  controls and each arm's24-report prefix pass. Eight checkpoint roundtrips
+  preserve all292/346 tensors/normalizer/counters exactly, not replay/live lifetime.
+  The original exact-slow-target smoke stays failed: CDP5,219/310 coefficients
+  differ by<=2/1 ULPs. Explicitly revised smoke applies the original dense-target
+  tolerance to all encodings; no component tolerance or GPU cohort changes.
+  Fifteen CPU regression checks pass; provisional RGB/one-ULP labels are corrected.
+  Learner parameters are not trajectory-exact: final relativeL2.000256 RGB/.05434
+  CDP after272 updates; moments/slow critic separately reported. No learning parity.
+  Nine new guards/six warnings,12 component generations/1,184 synthetic updates/
+  zero actions. GPU ends22:45:15UTC, independent audit22:49:19UTC; no GPU worker.
+  Retain CPU descriptor exhaustion and pair-lifetime repair, plus stale common
+  observer96 metadata and independently verified1,088 timing updates. No raised
+  limits or GPU repeats. Supports<=8192 returns/full staged BPTT/microbatch;
+  production replay-context readback/refresh remains. No production/Atari promotion.
+  About2.66ms saved does not explain the remaining15.97ms over JAX. Continue from
+  existing convolution/nonconvolution counters and dependencies; require a distinct
+  mechanism and CPU proof before another GPU allocation. No closed-family revival,
+  geometry/precision sweep, prior-batching timing or new compiler project implied.
+  Full root-cause and learning-quality goals remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
