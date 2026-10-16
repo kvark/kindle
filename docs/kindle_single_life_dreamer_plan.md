@@ -188,10 +188,16 @@ updates/actions.60 initializations/readbacks and all7,680 samples remain. All
 CPU reader failures are retained and repaired without repeating GPU work. GPU
 ends20:52:28UTC, independent review20:53:01; no worker. No lookup/geometry/layout
 sweep, favorable selector, integration or full-update trial.
-Next CPU-reconcile native host-target/readback dependencies against JAX's resident
-update, including precision/state and existing device paths. The uncovered
-instrumented interval is not pure CPU cost or promised savings; no new GPU run,
-numerical relaxation, prior-batching timing or learning restart is implied.
+The [host-target contract](results/2026-10-16-host-target-contract.md) now passes:
+22.1472MB CPU-produced behavior inputs/update, including16.6464MB dense targets;
+JAX constructs them on device. All18 behavior/160 world-target interfaces and
+CPU alignment checks pass. Its source also uses dense one-hot arrays; no compact-
+loss claim. The retained trace shows1.437ms target/report work and1.012ms behavior
+input preparation, not a whole-gap explanation. Preserve the initial physical-
+layout reader failure/repair and production replay-context refresh. Next implement
+resident returns/normalizer/targets with existing device facilities and unchanged
+losses, then separately qualify the complete RGB/CDP path. No CPU normalizer
+workaround, numerical relaxation, prior timing or learning restart is implied.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.

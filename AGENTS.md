@@ -818,6 +818,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Uncovered7.528ms is not pure CPU cost or additive saving; preserve precision/
   normalizer/target state and existing device means. No new GPU allocation,
   prior timing, numerical relaxation or Atari restart; full goal remains open.
+- **Host-target dependency contract passes:** [result](docs/results/2026-10-16-host-target-contract.md).
+  RGB/CDP each write22.1472MB of eight behavior inputs on CPU, including16.6464MB dense
+  two-hot targets expanded from65,280 scalar bytes;80 world target inputs add
+  1.5708MB of logical writes, not unique data or measured traffic. Means/features/
+  slow EMA already have device paths. JAX also constructs dense one-hot targets,
+  inside its compiled update; no compact-loss/fusion claim. All18 behavior/160
+  world interfaces,36 source-F32 lambda cases/6,696 values, six negatives/seven
+  retained CPU tests and33 seals pass. Raw272-update trace/2,448 intersections
+  reconcile: targets1.437ms, behavior inputs1.012ms;8.086ms readback overlaps
+  7.913ms GPU work, not removable transfer overhead. Preserve initial[32,512]
+  stochastic-layout audit failure; exact[1024,16] repair passes on CPU. Production
+  replay-context refresh remains required and excluded from the fixed benchmark.
+  No GPU/builds/actions/updates. Next implement resident F32 returns, percentile/
+  EMA, weighted action/two-hot targets and staged-world writes; reuse existing
+  DeviceCopies::copy_regions, means and graph losses. Preserve masks/discount/
+  pre-update ordering, normalizer checkpoints/diagnostics and CDP bonuses.
+  Offline/binding/lifetime proof precedes separately declared GPU qualification
+  and complete RGB/CDP comparison; no CPU-normalizer workaround, prior timing,
+  convolution revival, automatic promotion or Atari restart. Keep58aff452/1.70x;
+  target work is a bounded portion and the full root-cause goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

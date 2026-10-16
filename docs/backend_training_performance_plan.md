@@ -318,13 +318,26 @@ shared full-world startup. All7,680 timings stay. GPU ends20:52:28UTC, independe
 review20:53:01; no worker. Preserve all three CPU reader failures/repairs and the
 unrepeated first pair. No backend rebuild or production/learning change.
 
-**Next:** CPU-reconcile native host-target/readback dependencies with the resident
-JAX update using existing source and captures. Identify exact target arithmetic,
-precision, state transitions, transfer boundaries and already-existing device
-paths before choosing a resident-target implementation or new measurement.
-The uncovered7.528ms instrumented interval contains waits and is not pure CPU
-cost or additive savings. Keep58aff452/1.70x; convolution/library reuse remains
-open. No new GPU allocation, revived schedule or compiler feature follows.
+The [host-target contract](results/2026-10-16-host-target-contract.md) now passes.
+Both workloads construct22.1472MB of behavior inputs on CPU,16.6464MB of it dense
+two-hot targets from65,280 scalar bytes. All18 behavior/160 world-target interfaces
+reconcile. JAX constructs targets inside its compiled update, but also uses dense
+one-hot source arrays: no unsupported compact-loss claim. GPU means/features/EMA
+already exist. Seven CPU tests/36 source-F32 lambda cases/six negatives/33 seals
+pass; preserve the initial stochastic-layout reader failure and exact repair.
+Independent272-update trace reconstruction retains1.437ms target/report work and
+1.012ms behavior-input preparation. The8.086ms readback span includes7.913ms GPU
+execution; uncovered time is not pure CPU cost or additive savings.
+
+**Next:** implement complete resident target generation—F32 returns/weights,
+percentile/EMA, weighted actions/two-hot encoding, replay-feature handoff and
+staged world target writes—using existing device-copy/mean facilities and graph
+losses. Preserve pre-update parameters, normalizer state/checkpoints, diagnostics,
+CDP bonuses and production replay-context refresh. The fixed benchmark excludes
+that refresh; do not silently remove it. Offline binding/lifetime/source proof
+precedes a separately declared GPU qualification and complete RGB/CDP comparison.
+No CPU normalizer workaround or new convolution/geometry sweep. Keep58aff452/
+1.70x; target work is a bounded portion, not an explanation of the entire gap.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
