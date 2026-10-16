@@ -781,6 +781,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   lookup/lifetime costs. This is a feeding hypothesis, not a promise or claim
   about cuDNN internals. No local cursor/division tweak, width/tile/layout sweep,
   compiler feature or automatic GPU allocation. Keep58aff452/1.70x and goal open.
+- **Reusable operand metadata CPU feasibility passes:** [result](docs/results/2026-10-16-convolution-metadata.md).
+  All20 contracts/23 current world occurrences share eight maps/272,000 u32
+  entries/1,088,000 bytes. Forward/dW share spatial addresses; dX uses inverse
+  maps. Exact original K order/layouts/padded reads,30.428M explicit endpoint
+  address checks with bounded affine interior proof,36 small cases/177,993
+  checks and eight negatives pass. Independent source/map review reconciles
+  128 B-read sites/37,888 staging assignments/1,375 split ranges and38 seals.
+  Logical7.314B requests/29.255GB before masks are not GPU loads/DRAM traffic.
+  One-time GPU initialization would require eight dispatches/1,064 groups;
+  existing Session constants are host-visible, not the required device-local
+  immutable lifetime. No actual consumer/initializer or cross-Session cache
+  qualified. CPU review20:04:56UTC, no failures/retries/workers, zero GPU/builds/
+  actions/updates. Next implement one shared typed observer consumer and GPU
+  initialization, prove emitted indices/bindings/readiness and unchanged other
+  semantics offline, then separately declare complete-family qualification.
+  No automatic allocation, selector/layout/tile sweep, compiler feature or
+  promotion. Keep58aff452/1.70x and goal open; the local carry rejection stands.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

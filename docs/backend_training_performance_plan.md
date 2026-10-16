@@ -290,14 +290,24 @@ pass;140 guards/46 warnings,2,000 counter passes, zero updates/actions. Keep all
 7,680 samples, especially the dX control's.445→.739ms unexplained tail shift.
 GPU ends19:49:53UTC; no worker, retime or full-update trial. Keep58aff452/1.70x.
 
-**Next:** stop local cursor/division substitutions. CPU-audit a reusable geometry-
-only operand-address/predicate representation across the complete family. Prove
-indices, masks, K order, values and lifetime; account for every table, lookup,
-preparation and capacity constraint before considering GPU implementation.
-This tests whether feeding metadata can be amortized, not whether another
-per-load expression looks smaller. It is not a cuDNN implementation claim or
-speed promise. No automatic GPU allocation, width/tile/layout sweep, revived
-schedule or compiler feature; library reuse and non-convolution costs stay open.
+The [geometry-metadata CPU audit](results/2026-10-16-convolution-metadata.md)
+passes: eight maps/1.04MiB cover all23 current products,30.428M explicit address
+checks plus bounded affine batch extension. Forward/dW share spatial maps;
+dX uses the inverse. All272,000 entries, original K/layout/staging/splits and
+38 source seals reconcile. No actual shader or speed result. Its7.314B logical
+lookups/29.255GB before masks are not measured traffic and cannot be ignored.
+Required one-time GPU initialization is eight dispatches/1,064 groups; existing
+host-visible constants do not provide the device-local immutable lifetime.
+CPU review20:04:56UTC, no worker/retry, zero GPU calls/builds/actions/updates.
+
+**Next:** implement one shared typed consumer and GPU table initialization in
+the isolated observer. Prove actual emitted addresses, bindings, readiness/
+lifetime and unchanged non-address semantics offline before separately declaring
+a complete-family numerical/counter/ordinary trial with existing gates. Count
+initialization and every per-operation cost. This tests amortized feeding, not
+another local cursor tweak; no cuDNN implementation or speed promise. No automatic
+allocation, width/tile/layout sweep, revived schedule or compiler feature;
+library reuse and non-convolution costs stay open.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,

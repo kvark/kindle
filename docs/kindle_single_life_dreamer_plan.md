@@ -171,10 +171,16 @@ rejects integration:3.19% GPU/3.26% queued-wall improvement misses both5% gates.
 Warp instructions rise1.60% despite unchanged active lanes/local traffic; all
 numerical and exact-output gates pass.140 guards/46 warnings, zero updates/actions;
 all samples remain, including an unexplained dX control tail shift. GPU ends
-19:49:53UTC, no worker, subset selection, retime or full-update trial. Next
-CPU-audit reusable geometry-only address/predicate metadata, including complete
-storage/preparation/lookup costs and exact values/K order. No local cursor tweak,
-renewed width/geometry/layout sweep, automatic allocation or compiler feature.
+19:49:53UTC, no worker, subset selection, retime or full-update trial.
+The [metadata CPU proof](results/2026-10-16-convolution-metadata.md) now passes:
+eight shared spatial maps/1.04MiB,30.428M explicit address comparisons, all23
+products and original K/layout contracts. No shader or speed qualification;
+7.314B logical table requests are not traffic or free. Device-local immutable
+GPU initialization/lifetime remains to implement; existing host-visible constants
+are not sufficient. CPU review20:04:56UTC, no worker, zero GPU/builds/actions.
+Next prove actual shared typed consumers/initializer offline before separately
+declaring full-family numerical/counter/time qualification. No local cursor
+tweak, width/geometry/layout sweep, automatic allocation or compiler feature.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.
