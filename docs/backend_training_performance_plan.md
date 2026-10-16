@@ -249,12 +249,23 @@ remain. Public external bindings use offset zero; general logical extents still
 need explicit eligibility. Original sealed-declaration publication error and
 CPU restoration remain; runtime bytes are unchanged. No GPU/build/update/action.
 
-**Next:** CPU-prototype one type-aware address/mask/read-span composition with
-exact scalar fallback. Preserve tiles/splits/K order/rounding/compensation and
-prove actual generated code/binding eligibility before a separately declared
-complete-family numerical/counter/timing check. Wider declarations alone are
-not an explanation of the7.287x ALU count. Existing cursors/division helpers/
-word staging stay. Keep caller/pass/kernel scopes distinct; no
+The [complete read-span trial](results/2026-10-16-convolution-read-spans.md)
+rejects the shared implementation: all23 products cost19.025/18.809/28.187ms
+native/control/candidate. GPU/queued wall regress49.86%/49.61%, despite passing
+calibration. All nine changed contracts regress; unchanged packed operations
+stay stable. Warp work rises18.01%, CBU13.68x, ALU12.14% and LSU15.27%, despite
+10.86% less L2 traffic and unchanged tensor work. Full numerics/1.033B bit-exact
+pairs,304 modules, all140 guards and1,331 seals pass;133 warnings remain.
+All7,680 samples, including a native33.14% tail shift, are retained. Last guard
+18:23:15UTC; no worker, backend rebuild or production change. The CPU failures
+and separately reviewed repairs stay. No integration, selector or retiming.
+
+**Next:** CPU-inspect the emitted common-predicate/alignment/fallback control
+against complete counters and the retained library interface. More source
+vectorization is not inherently less native work; exact driver instructions,
+subgroup divergence and candidate spills remain unassigned. No new GPU
+allocation follows. Existing cursors/division helpers/word staging stay.
+Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
 prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.

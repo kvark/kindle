@@ -714,10 +714,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   the accidentally appended prior declaration repairs the initial audit;
   edited version/failure remain, runtime unchanged. Public import offset is zero,
   ordinary/donor alignment is preserved; raw alias helper is not a size guard.
-  CPU17:13:51UTC, zero GPU/builds/updates/actions, no worker. Next CPU-prototype
-  one type-aware address/mask/read-span composition with scalar fallback before
-  any separate complete-family qualification. No width/geometry sweep, new Naga
+  CPU17:13:51UTC, zero GPU/builds/updates/actions, no worker. The following fixed
+  read-span trial rejects that implementation. No width/geometry sweep, new Naga
   feature, prior timing or promotion. Keep58aff452/1.70x and the goal open.
+- **Shared read-span composition rejected:** [result](docs/results/2026-10-16-convolution-read-spans.md).
+  All23 complete products cost19.025/18.809/28.187ms native/control/candidate;
+  candidate49.86% slower, queued wall49.61% slower. Calibration−1.13%/−1.04%
+  passes5%; all nine changed contracts regress42.02–102.72%. No integration,
+  selector, retime or full-update trial. Warp instructions rise18.01%, ALU12.14%,
+  CBU13.68x, LSU15.27%, despite10.86% less L2 traffic; tensor counts stay exact.
+  Control/packed instructions reproduce. Not source-line, divergence or spill
+  attribution; the41-metric capture does not measure candidate local traffic.
+  All304 modules/196.947M actual CPU addresses/27 small cases,2.690M F64 values
+  and1.033B bit-exact output pairs pass.140 guards/133 warnings,1,360 counter
+  passes/4,756 offline metrics/10,960 calls, zero learner updates/actions.
+  All7,680 timings stay, including one native33.14% first/last32 shift; no cause
+  asserted. Last guard18:23:15UTC, CPU18:23:50UTC, no worker.1,331 seals pass.
+  Preserve unused-field build, per-image-alignment audit, binding-index compile
+  and historical-library-membership failures/repairs. Five libraries have old
+  seals; all137 are sealed now, not retroactively. No backend rebuild.
+  Next CPU-inspect emitted common-predicate/alignment/fallback control against
+  these counters and library interfaces; no new width/tile/layout sweep, GPU
+  allocation, compiler feature or promotion. Keep58aff452/1.70x and the full goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

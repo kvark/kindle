@@ -147,10 +147,17 @@ one failed guard, zero warnings/816 synthetic updates; no worker. The
 scalar global reads despite vector shared stores, not hot BF16 conversion or
 injected bounds checks. Safe aligned-four composition reduces modeled source
 reads28.03%; this is not a measured gain or explanation of all ALU overhead.
-Next CPU-prototype shared address/mask/read-span composition, preserving scalar
-fallback and the complete-family gate. The prior sealed-declaration publication
-error is restored with its failure retained; no runtime/GPU change. Keep58aff452/
-1.70×, production/Atari unchanged and the full goal open.
+The [complete read-span trial](results/2026-10-16-convolution-read-spans.md)
+rejects that implementation: convolution18.809→28.187ms,49.86% slower; all nine
+changed contracts regress. Warp instructions rise18.01% and control-flow-pipe
+work13.68x despite10.86% less L2 traffic; tensor work stays exact. Calibration,
+2.690M F64 comparisons and1.033B bit-exact pairs pass.140 guards/133 warnings,
+zero learner updates/actions; all samples and CPU failures remain. Last guard
+18:23:15UTC, no worker or integration. Next CPU-inspect emitted control against
+these counters; no renewed width/geometry sweep, GPU allocation or compiler
+feature follows. The prior sealed-declaration publication error is restored
+with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
+the full root-cause/parity goal open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
