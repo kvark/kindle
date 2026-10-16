@@ -9,7 +9,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is51.945ms versus inclusive JAX27.223ms,1.91x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is48.068ms versus inclusive JAX27.223ms,1.77x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)
@@ -27,7 +27,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   despite more tensor instructions. CUDA/native timing bands fail: these are
   not native instruction counts or an8x speed promise. High occupancy is not
   the target; useful tensor throughput is.
-- **Latest convolution family rejected:** [result](docs/results/2026-10-15-convolution-family.md).
+- **Earlier shared-workgroup convolution family rejected:** [result](docs/results/2026-10-15-convolution-family.md).
   One shared typed fixed-address workgroup implementation covers all13 distinct
   forward/dX shapes,15 actual occurrences. Complete operations total
   12.833→18.131ms,41.29% slower; all transforms/scratch included. No cherry-picked
@@ -360,19 +360,41 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   succeed; no official-version-support claim. First preflight bridge/decode-wait
   correction stays; no GPU failure/retry. Artifacts in
   `runs/native-perf-sdk-20261016.ZVAi5Ubl`, production/67559ce5 unchanged.
-  Next CPU-proof type-aware word/vector staging and shared-bank layout with
-  existing tiles/K order/compensation/rounding/interfaces, then complete-family
-  counters and latency. Padding alone is not a promised fix. No geometry sweep,
-  rejected-policy revival, favorable selector, Naga project or learning restart.
+  The following word-staging result tests this contract with existing tiles/
+  K order/compensation/rounding/interfaces. Padding alone is not a promised fix.
+  No geometry sweep, rejected-policy revival, favorable selector, Naga project
+  or learning restart.
   Root-cause/parity goal stays open; no missing-SDK or usage-approval blocker.
-- Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
+- **Typed word staging qualifies:** [result](docs/results/2026-10-16-word-staging.md).
+  Complete RGB51.763→48.068ms,7.14%; CDP46.929→45.505ms,3.03%, with exact272
+  reports/targets/initial-first-final292/346 tensors and retained24-report prefixes.
+  All plans/constants/pipelines/groups and actual shader changes pass; four
+  shared modules cover nine/four RGB/CDP occurrences. Complete23-product family
+  22.493→19.112ms,15.03%, including one12.1% regression and unchanged14 packed
+  occurrences. CNN1 dX instructions1.554→.841G, conflicts122→22M and latency
+  2.155→1.119ms; dW1.208→1.092G,158→27M and2.025→1.841ms. Tensor counts stay.
+  dW uniform-pipe315.42→.46M but ALU507.57→765.88M suggests lost warp-uniform
+  address work; conditional source evidence, not SASS attribution. Both still
+  exceed JAX warp instructions8.63x/8.17x. Preserve all samples, typed-zero,
+  offline-emission observer and direct-Blade-path CPU failures/repairs.
+  124 passing guards/five warnings,2.690M F64/774.862M exact pairs,116 ranges/
+  4,756 offline metrics;1,266/1,775 seals.9,320 standalone calls/1,360 counter
+  replays/1,088 synthetic updates, zero actions. GPU ends05:53:42UTC, CPU review
+  05:54:22; no worker. Keep isolated native`834241b6` under
+  `runs/convolution-word-staging-20261016.ssN5oC6N`, with
+  `MEGANEURA_CONVOLUTION_WORDS=1`, image views/device means/cached recording.
+  Next CPU-proof packet addressing that preserves shared calculations, including
+  subgroup/operand-layout contracts; no implicit contiguous-lane assumption,
+  geometry/selector sweep, Naga project or automatic allocation. Whole parity,
+  non-convolution work and learning quality remain open. No production/Atari promotion.
+- Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
   control. `99f8aab0` remains the preceding
   control under `runs/categorical-gpu-20261015.lkZAlUAS`. Native`28864210` is the
   [general-ordering control](docs/results/2026-10-14-convolution-scheduling.md).
-  Current backend sources are in the image-view study; the ordering control remains
-  `runs/convolution-scheduling-20261014.BJ5AVZFt`.
+  Current isolated backend sources are in the word-staging study; the ordering
+  control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
   this candidate. Latest October15 upstream: `f648a453`/`e7c3f7b`; Meganeura's
   two new search/attention exploration fixes do not change ordinary convolution.

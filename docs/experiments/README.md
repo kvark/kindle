@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [word-staging result](../results/2026-10-16-word-staging.md) improves
+complete RGB51.763→48.068ms (7.14%) and CDP46.929→45.505ms (3.03%), with exact
+reports/tensors/full programs. All23 convolution operations improve15.03%;
+native counters confirm less instruction/shared-conflict work.124 guards pass,
+five warnings, no game actions. Keep isolated834241b6; RGB/JAX remains1.77x.
+Next preserve shared address calculations; no production or Atari promotion.
 October16's [direct native counters](../results/2026-10-16-native-counters.md)
 use the supplied Perf SDK on the existing driver: all20 contracts pass. CNN1
 dX/dW execute15.94x/9.04x full-JAX warp instructions, with fewer tensor operations.

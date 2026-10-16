@@ -13,7 +13,16 @@ Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest complete B32 result:** [connected image views](results/2026-10-15-image-views.md)
+**Latest complete B32 result:** [typed word staging](results/2026-10-16-word-staging.md)
+reduces RGB51.763→48.068ms,7.14%, and CDP46.929→45.505ms,3.03%, with exact
+reports/targets/tensors and full plans/shaders. RGB remains1.77× inclusive JAX.
+Keep isolated native834241b6 with word staging/image views/device means/cached
+recording; no production or Atari promotion. The124 guards pass with five
+warnings. Native counters establish instruction/shared-feeding improvements,
+but substantial instruction overhead remains; next CPU-proof preservation of
+shared address calculations, not another tile sweep. No GPU worker remains.
+
+**Preceding B32 result:** [connected image views](results/2026-10-15-image-views.md)
 reduces RGB54.205→51.945ms,4.17%, and CDP47.699→47.112ms,1.23%. Exact reports,
 targets, saved tensors and full-program audits pass. RGB remains1.91× inclusive
 JAX27.223ms. Keep isolated67559ce5 with image views/device means enabled; no
@@ -40,9 +49,9 @@ on the existing driver: all20 contracts/23 occurrences pass, with exact retained
 outputs and no faults. Native CNN1 dX/dW execute15.94x/9.04x the warp instructions
 of the retained full-JAX kernels. Low DRAM throughput and substantial shared-bank
 conflicts point toward scalar/on-chip data feeding, not another BF16 switch.
-Next prove a word/vector staging and shared-bank layout contract before a
-counter-guided complete-family test; preserve tiles, rounding and numerical gates.
-The1.91x whole gap remains open. No tool/approval blocker or active worker remains.
+The word-staging result above now qualifies that contract and narrows the gap
+to1.77x. Preserve tiles, rounding and numerical gates; parity remains open.
+No tool/approval blocker or active worker remains.
 
 **Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier

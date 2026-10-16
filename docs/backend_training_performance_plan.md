@@ -9,17 +9,31 @@ not a new learning allocation; PR31 remains the status dashboard.
 ## Current diagnosis and implementation order
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**51.945ms versus inclusive JAX27.223ms,1.91×**; B8 retains22.780/12.737ms,1.79×.
+**48.068ms versus inclusive JAX27.223ms,1.77×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`67559ce5` with
+The current isolated B32 candidate is native`834241b6` from
+[typed word staging](results/2026-10-16-word-staging.md), with
+`MEGANEURA_CONVOLUTION_WORDS=1` plus image views/device means/cached recording.
+The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
 [connected image views](results/2026-10-15-image-views.md). Its control is
 `076f3135` from [repeated-row composition](results/2026-10-15-repeated-row-composition.md).
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest boundary: [actual native counters now pass](results/2026-10-16-native-counters.md).**
+**Latest boundary: [word staging qualifies complete updates](results/2026-10-16-word-staging.md).**
+RGB51.763→48.068ms,7.14%; CDP46.929→45.505ms,3.03%, with exact reports,
+targets/tensors and full-program/source checks. Complete convolution operations
+improve15.03%, including all23 occurrences and one regression. CNN1 dX nearly
+halves latency, with46% fewer warp instructions and82% fewer shared conflicts.
+dW conflicts fall83%, but latency only9.1%; ordinary ALU work rises while its
+uniform-pipe work disappears. This is consistent with a lane-mapping/addressing
+tradeoff, not an isolated source-instruction attribution.124 guards pass, five
+warnings; GPU ends05:53:42UTC, no worker. Production/learning stay unchanged.
+
+The preceding [actual native counters](results/2026-10-16-native-counters.md)
+established the baseline.
 The supplied Perf SDK2026.3 works directly on580.178.04. All20 contracts/23
 occurrences retain exact outputs/plans/pipeline keys;21 guards/no warnings.
 Native CNN1 dX/dW execute15.94x/9.04x the warp instructions of the retained
@@ -30,11 +44,13 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** prove a type-aware word/vector staging and shared-bank layout contract
-on CPU, preserving current tiles/K order/compensation/rounding/interfaces.
-Then use native instruction/transaction counters and complete-family latency
-to test it. A bank-padding change alone is not a promised fix; no geometry
-sweep, favorable selector, numerical relaxation or speculative Naga project.
+**Next:** prove a packet mapping that preserves shared address calculations,
+including subgroup mapping and operand layout. Keep tiles/K order/compensation/
+rounding/interfaces and the complete-family gates. Current dX/dW still execute
+8.63x/8.17x full-JAX warp instructions; a proposed fix needs counters and whole
+updates, not source arithmetic alone. No implicit contiguous-lane assumption,
+automatic allocation, geometry sweep, favorable selector, numerical relaxation
+or speculative Naga project.
 The [complete compact-channel/reuse policy](results/2026-10-15-reuse-policy.md)
 still loses21.72% and stays rejected. Its source-work reduction was not measured
 hardware improvement. Host targets and non-convolution execution remain open;
