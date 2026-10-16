@@ -1,0 +1,62 @@
+{
+  "status": "offline_complete_gpu_family_running",
+  "as_of": "2026-10-16T20:35:36.195863+00:00",
+  "baseline": {
+    "native": "58aff452",
+    "rgb_ms": 46.199419203125,
+    "inclusive_jax_ms": 27.222569
+  },
+  "observer_sha256": "fb6d0cc19c52c9056f80834e7944e502b20423701c545ddc481be3734872aead",
+  "paired_modules": 320,
+  "initializer_modules": 1,
+  "changed_consumers": 302,
+  "unchanged_matrix_controls": 18,
+  "matched_retained_controls": 266,
+  "actual_map_indices": 26163200,
+  "actual_source_addresses": 30428168,
+  "initializer_entries": 272000,
+  "masked_tail_invocations": 7624,
+  "small_cases": 36,
+  "small_addresses": 177993,
+  "address_mutations": 4,
+  "semantic_type_regressions": 7,
+  "runtime_geometry_test_passes": 1,
+  "offline_review_finished_at": "2026-10-16T20:24:48.032178+00:00",
+  "source_seals": 2414,
+  "first_numerical_pair": {
+    "guards": 2,
+    "warnings": 0,
+    "f64_comparisons": 524288,
+    "exact_output_pairs": 67108864,
+    "gpu_map_entries": 102400,
+    "gpu_repeats": 0
+  },
+  "remaining_guards": 138,
+  "running_unit": "kindle-metadata-gpu-remaining-20261016.service",
+  "retained_failures": [
+    "CPU module-local type IDs",
+    "CPU Rust whitespace lookup",
+    "CPU OsString receipt schema"
+  ],
+  "artifacts": "runs/convolution-metadata-kernels-20261016.c0XlqDMn",
+  "receipt_sha256": {
+    "declaration.md": "7d84bb06be25ec9fe3a6335add94c218511262c644f31bc97b600f4975920d3a",
+    "gpu_declaration.md": "3d2a91a24a64d83d25ddd4abc740e52349afe43e7c9cb94498f06f9e02c3b7f6",
+    "remaining_declaration.md": "fc65594cee05a3866fc37981fce3a3f851c08adf042d2e6184bc84f2937b910d",
+    "addresses.json": "00019ed1a6a37b9a132dd5f3bec6dfc4a56cc5f8373b0cf375bf641a3091c1a7",
+    "review-v3.json": "ef1c5d7343f12ce70eba393866e49ac4d51018bd33b189f1ae84873cd88afa70",
+    "gpu-observer-build.json": "6b98656bc5be6661d3a9f8bf478b9bbc201d1cf8286c7f1a82771482b741f7f0",
+    "remaining-preparation.json": "530b45274e4bc730b3e31fe40dbac3b5188907f428b1835f6a4ab6d37249f958",
+    "numerical-review-0-3-32-64.json": "9ff11009e651a36b54ebd1042d841e4d03a5f09119f6157bf38b00fc85340282"
+  },
+  "limits": [
+    "Full-family numerical/counter/timing gates pending",
+    "No full-update/shared-world-cache or learning claim",
+    "First/last image addresses explicit; bounded affine extension for interior images",
+    "Only BF16 has the first GPU numerical evidence"
+  ],
+  "learner_updates": 0,
+  "game_actions": 0,
+  "backend_builds": 0,
+  "production_changed": false
+}

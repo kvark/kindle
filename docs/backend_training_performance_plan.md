@@ -300,14 +300,20 @@ Required one-time GPU initialization is eight dispatches/1,064 groups; existing
 host-visible constants do not provide the device-local immutable lifetime.
 CPU review20:04:56UTC, no worker/retry, zero GPU calls/builds/actions/updates.
 
-**Next:** implement one shared typed consumer and GPU table initialization in
-the isolated observer. Prove actual emitted addresses, bindings, readiness/
-lifetime and unchanged non-address semantics offline before separately declaring
-a complete-family numerical/counter/ordinary trial with existing gates. Count
-initialization and every per-operation cost. This tests amortized feeding, not
-another local cursor tweak; no cuDNN implementation or speed promise. No automatic
-allocation, width/tile/layout sweep, revived schedule or compiler feature;
-library reuse and non-convolution costs stay open.
+The [actual shader path](results/2026-10-16-convolution-metadata-kernels.md)
+now passes offline:320 paired modules plus initializer,26.163M interpreted map
+indices/30.428M addresses, exact non-B semantics, binding/lifetime review and a
+compiled observer CPU test. The first GPU numerical pair passes; its Unix-path
+receipt-reader failure is repaired on CPU without repeating the pair. Two older
+offline reader failures remain. No full-family speed or runtime claim yet.
+
+**Running:** `kindle-metadata-gpu-remaining-20261016` starts20:32:29UTC for only
+138 unstarted guards, with the first two retained. All20 contracts/23 occurrences,
+original numerics/counters/ordinary gates and disclosed initialization costs.
+Persistent finisher aggregates all cohorts; review completion or first failure
+before further GPU work. Keep58aff452/1.70x. No automatic integration, width/tile/
+layout sweep, revived schedule or compiler feature; library reuse and
+non-convolution costs stay open.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,

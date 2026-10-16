@@ -178,9 +178,13 @@ products and original K/layout contracts. No shader or speed qualification;
 7.314B logical table requests are not traffic or free. Device-local immutable
 GPU initialization/lifetime remains to implement; existing host-visible constants
 are not sufficient. CPU review20:04:56UTC, no worker, zero GPU/builds/actions.
-Next prove actual shared typed consumers/initializer offline before separately
-declaring full-family numerical/counter/time qualification. No local cursor
-tweak, width/geometry/layout sweep, automatic allocation or compiler feature.
+The [actual consumers/initializer](results/2026-10-16-convolution-metadata-kernels.md)
+now pass offline, and the first GPU numerical pair passes. Its path-schema reader
+failure is repaired without repeating GPU work; all original failures remain.
+One bounded complete-family continuation starts20:32:29UTC for only138 unstarted
+guards, retaining the first two. Counter/timing aggregate remains pending; review
+completion or failure before any follow-up. No local cursor tweak, selector,
+width/geometry/layout sweep, automatic integration or compiler feature.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.
