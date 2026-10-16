@@ -44,6 +44,15 @@ global storage directly with `coopMatLoadTensorNV`: this is not an untried API
 or grounds to restart that family. No new GPU allocation or compiler work is
 implied by this source review.
 
+The [current-model counter contract](results/2026-10-16-model-counter-contract.md)
+now reconciles all3,751 world dispatches/23 products and versioned owners. All17
+convolution groups are mixed. The proposed1,138 in-pass ranges preserve1,131
+existing barriers; naive per-group recording would add1,111 compute boundaries.
+Six negative CPU checks pass. The original label-owner assertion stays failed;
+the versioned-path repair passes. No GPU call/build/worker or implemented observer.
+Next implement the scoped marker observer with correct launch capacity and cache
+lifecycle, then independently qualify it before collection. No new timing claim.
+
 The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
 [connected image views](results/2026-10-15-image-views.md). Its control is

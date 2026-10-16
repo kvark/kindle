@@ -29,6 +29,9 @@ its5% gate. Reject integration; no retime or full-update trial.100 guards pass
 with15 recorded warnings; all samples, including a large native dX transient,
 remain. No worker, learning result or baseline change: keep1.59×. Operand
 feeding, matrix work distribution and graph execution remain separate questions.
+The [next counter boundary](results/2026-10-16-model-counter-contract.md) now
+passes CPU coverage/scheduling checks. It will observe actual model execution
+without adding compute-pass boundaries; implementation/GPU qualification remains.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact

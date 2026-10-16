@@ -907,6 +907,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   membership and a command/dependency-preserving observer: existing native
   counters use standalone synthetic inputs, while JAX's use its full update.
   Historical captured-group value controls remain valid but are not universal.
+- **Current-model counter CPU contract passes:** [result](docs/results/2026-10-16-model-counter-contract.md).
+  All3,751 world dispatches/23 products and versioned owners reconcile. All17
+  convolution-containing groups are mixed.1,138 non-nested in-pass marker ranges
+  preserve1,131 original barriers in the CPU command model; six negatives pass.
+  Naive per-group diagnostic recording adds1,111 compute boundaries. Allocate
+  for3,751 launches, not1,139 ranges including empty; invalidate marked caches
+  at profiler lifecycle changes. No implemented observer/GPU qualification yet.
+  Initial label-owner assertion fails; separate versioned-path repair passes.
+  CPU ends23:45:00UTC, zero builds/GPU calls/updates/actions, no worker. Next
+  implement/audit the scoped observer, then separately declare collection.
+  Fixed-world counters omit optimizer/other programs; replay time is not ordinary
+  latency. No kernel/geometry sweep, closed-family revival or automatic promotion.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
