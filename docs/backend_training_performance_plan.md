@@ -116,12 +116,22 @@ Rollout stacking is already balanced, but independently constructs overlapping
 15/16-state outputs. Six mutation tests/three label regressions/63 seals pass;
 the failed registered-NVTX-label observer remains. CPU only, no worker.
 
-**Next:** separately declare one valid-value fixed-input attribution of native
-recurrence matrices versus surrounding execution/materialization, with original
-heads, allocations, barriers and exact escaping values. Use the result to choose
-the proven copy composition or recurrent matrix execution; do not assume byte
-counts explain the residual gap. Do not turn unlike intervals into a ratio or
-conditional differences into additive savings. Keep prior
+The [native valid-value attribution](results/2026-10-16-imagination-cost.md)
+now passes: complete fixed imagination8.702ms, matrices substituted5.932ms,
+surrounding operations6.639ms,both2.275ms. The2.770/2.063ms conditional differences
+have a−1.594ms interaction; neither they nor the remaining2.275ms are pure kernel
+costs or additive achievable savings. Both classes matter. Exact full/live
+outputs, checkpoints, first targets/reports and programs pass; two guards/four
+warnings,733 fixed replays/one initializer/zero actions, no worker. All576 timing
+samples remain; calibration gates pass. Original observer compile failure stays.
+
+**Next:** CPU-proof a general private copy/cast composition across complete
+RGB/CDP programs, using the known RSSM concat/repeat input mapping. Preserve
+gradient tapes, source versions, external values and rounding; no model-specific
+arithmetic kernel or precision change. Then separately qualify the implementation
+and make one matched complete-update comparison. This tests a proven compilation
+miss; it does not assume copies explain the entire surrounding-work cost or
+the1.77× gap. Recurrent matrices and convolution feeding remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
 an automatic allocation or reason to relax the original gates. No candidate timing.

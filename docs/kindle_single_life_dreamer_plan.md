@@ -65,6 +65,15 @@ not a direct comparison with native8.740ms including heads. CPU audits pass,
 original NVTX-label observer failure retained, no GPU call or worker. Next
 separately attribute native recurrent matrices versus surrounding execution
 before choosing an optimization. No prior-candidate timing or promotion.
+The [native attribution](results/2026-10-16-imagination-cost.md) now passes:
+fixed imagination8.702ms becomes5.932ms with matrices substituted,6.639ms with
+surrounding work substituted,2.275ms with both. The−1.594ms interaction prevents
+an additive kernel-cost claim; both classes matter. Exact outputs/state/programs
+and calibration pass, two guards/four warnings,733 fixed replays/one initializer,
+zero actions. No ordinary update speedup or worker. Next CPU-proof general
+private copy/cast composition across full RGB/CDP programs, preserving tapes,
+source versions and rounding, before separately qualifying/measuring it.
+Matrix execution, convolution feeding and the1.77× complete gap remain open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

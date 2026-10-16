@@ -524,6 +524,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Next separately declare valid-value native recurrence attribution, matrices
   versus surrounding execution, before choosing composition or matrix work.
   No numerical relaxation, prior-candidate timing, sweep or promotion. Keep834241b6.
+- **Native imagination attribution passes:** [result](docs/results/2026-10-16-imagination-cost.md).
+  Complete fixed imagination8.702ms; recurrent matrices substituted5.932ms,
+  surrounding work6.639ms,both2.275ms. Conditional differences2.770/2.063ms
+  interact by−1.594ms; not pure/additive kernel costs or an ordinary speedup.
+  All six outputs/four conditions, three292-tensor pairs,176 protected hashes,
+  first targets/reports and ten plan/pipeline identities pass.31 outputs/84.439MB
+  escape the722-dispatch recurrence; original allocations/groups stay. Two
+  guards/four warnings,3,906 copy-smoke words/35 executions,733 fixed replays/
+  one initializer/zero actions; GPU ends10:57:19UTC, no worker.574 seals/eight
+  CPU tests/Clippy and independent audit pass. Keep the observer BufferRef-Ord
+  compile failure/repair. No GPU retry, new ordinary-update ratio or promotion.
+  Next CPU-proof general private copy/cast composition across full RGB/CDP
+  programs, preserving tapes, versions, external values and rounding; separately
+  qualify and measure the complete update. Matrices/convolution feeding remain
+  open. No automatic allocation, prior timing, geometry/precision sweep. Keep834241b6.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
