@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [direct native counters](../results/2026-10-16-native-counters.md)
+use the supplied Perf SDK on the existing driver: all20 contracts pass. CNN1
+dX/dW execute15.94x/9.04x full-JAX warp instructions, with fewer tensor operations.
+Exact retained outputs/plans,21 guards and offline metric reevaluation pass;
+zero actions/updates. Complete RGB stays1.91x JAX. The next contract targets
+scalar staging/shared layout, not another tile sweep or learning restart.
 October11's new [performance pivot](../kindle_single_life_dreamer_plan.md#performance-pivot)
 authorizes reduced precision, cheaper exploration, wider batches and native/JAX
 profiling. The old Pong queue stays cancelled; no long-run extension is implied.

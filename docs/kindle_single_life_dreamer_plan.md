@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 15, 2026. This is the authoritative roadmap.
+Updated October 16, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -35,11 +35,14 @@ now passes numerical checks but loses21.72%:22.327→27.177ms across all23 produ
 selector. Source staging drops33.93%, but output barriers and in-loop coordinate
 work increase; these are not hardware-counter costs. Keep compensation, numerical
 gates, isolated67559ce5 and the1.91x whole gap. No new kernel sweep or Atari run.
-Next obtain native counters without failed Graphics injection: the standard
-Vulkan counter extension is absent; the login-gated Linux Nsight Perf SDK has
-been requested for direct in-application collection. Compatibility/lifecycle
-must be reviewed before capture. All workers are finished; this is a diagnostic
-tool limitation, not a GPU-health/permission blocker.
+The supplied Perf SDK now enables [direct native counters](results/2026-10-16-native-counters.md)
+on the existing driver: all20 contracts/23 occurrences pass, with exact retained
+outputs and no faults. Native CNN1 dX/dW execute15.94x/9.04x the warp instructions
+of the retained full-JAX kernels. Low DRAM throughput and substantial shared-bank
+conflicts point toward scalar/on-chip data feeding, not another BF16 switch.
+Next prove a word/vector staging and shared-bank layout contract before a
+counter-guided complete-family test; preserve tiles, rounding and numerical gates.
+The1.91x whole gap remains open. No tool/approval blocker or active worker remains.
 
 **Earlier B32 step:** [GPU categorical means](results/2026-10-15-categorical-gpu.md)
 reduces complete RGB updates59.963→54.224ms,9.57%, retaining the earlier

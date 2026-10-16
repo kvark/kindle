@@ -1,6 +1,6 @@
 # Backend training performance plan
 
-Updated October 15, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 16, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
@@ -19,15 +19,26 @@ The current isolated B32 candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest boundary:** the [complete compact-channel/reuse policy](results/2026-10-15-reuse-policy.md)
-passes numerics but loses21.72% versus native,22.327→27.177ms over all23
-convolutions. No integration or favorable-shape selector. Source-level staging
-falls33.93%, but output synchronization and in-loop coordinate work increase;
-these are not hardware-counter attribution. Direct native counters are the next
-discriminator. The standard Vulkan counter extension is absent on this driver;
-the login-gated Linux Nsight Perf SDK has been requested. No Graphics injection
-retry, driver change or new kernel sweep. All workers have finished; the goal
-remains open, not a GPU-health/approval blockage.
+**Latest boundary: [actual native counters now pass](results/2026-10-16-native-counters.md).**
+The supplied Perf SDK2026.3 works directly on580.178.04. All20 contracts/23
+occurrences retain exact outputs/plans/pipeline keys;21 guards/no warnings.
+Native CNN1 dX/dW execute15.94x/9.04x the warp instructions of the retained
+full-JAX kernels, with fewer tensor instructions. This is native evidence,
+not the old CUDA proxy or a latency ratio. Nine scalar-staged occurrences
+execute10.214G warp instructions versus1.596G for14 packed occurrences.
+The two derivative captures show<6% peak DRAM throughput and122M/158M
+shared-bank conflicts; conflicts are not yet isolated removable latency.
+No missing-tool or GPU-health/approval blocker remains; all workers exit.
+
+**Next:** prove a type-aware word/vector staging and shared-bank layout contract
+on CPU, preserving current tiles/K order/compensation/rounding/interfaces.
+Then use native instruction/transaction counters and complete-family latency
+to test it. A bank-padding change alone is not a promised fix; no geometry
+sweep, favorable selector, numerical relaxation or speculative Naga project.
+The [complete compact-channel/reuse policy](results/2026-10-15-reuse-policy.md)
+still loses21.72% and stays rejected. Its source-work reduction was not measured
+hardware improvement. Host targets and non-convolution execution remain open;
+no whole-gap/parity claim or production/Atari promotion follows these captures.
 
 **Practical CDP finding:** the [existing-policy recheck](results/2026-10-15-cdp-precision-recheck.md)
 reduces full B32 CDP78.206→50.122ms,35.91%, on that same binary. Historical Mixed
@@ -194,8 +205,8 @@ but18/20 contracts regress.120 guards/no warnings and independent final audits
 pass; numerical15/20 contracts are exact, five pass unchanged nonexact limits.
 All samples/transients and CPU observer repairs remain. Timing finishes16:10:46UTC.
 No compiler project, integration, selector, sweep or learning promotion. Keep
-67559ce5 and the1.91x whole gap. Native counter access above is now the next
-discriminator; fitting resources is not sufficient evidence of an efficient kernel.
+67559ce5 and the1.91x whole gap. Native counter evidence above now guides the next
+implementation contract; fitting resources does not establish an efficient kernel.
 
 ### What is established
 

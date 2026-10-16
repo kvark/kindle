@@ -345,14 +345,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   proven slowdown attribution. Preserve initial preflight and constant-branch
   observer defects/repairs. No favorable selector, sweep or integration.
   Whole gap stays1.91x; keep67559ce5. Production/Atari stay stopped.
-- **Native counter readiness checked:** same [report](docs/results/2026-10-15-reuse-policy.md#native-counter-access).
-  One properties-only guard/no warnings finishes16:19:37UTC; no logical device
-  or dispatch.5080/580.178.04 has252 extensions but no KHR performance-query
-  extension. No counter collection/feature query; unqueried zeros are not activity.
-  Requested the login-gated Linux Nsight Perf SDK for direct in-application
-  Vulkan counters. Review compatibility/lifecycle before a bounded collection;
-  no Graphics injection/assembly retry, driver change or kernel sweep. Not a
-  GPU-health or permission blocker. Source/receipt audit passes; no worker.
+- **Actual native counters now qualify:** [report](docs/results/2026-10-16-native-counters.md).
+  User-supplied Perf SDK2026.3 works directly on5080/580.178.04 despite absent
+  standard KHR counters. All20 contracts/23 occurrences pass; native CNN1 dX/dW
+  execute15.94x/9.04x retained full-JAX warp instructions, with fewer tensor
+  instructions. These are native counters, not the old CUDA proxy or a latency
+  ratio. Nine scalar-staged occurrences execute10.214G instructions versus1.596G
+  for14 packed occurrences. The two derivatives show<6% peak DRAM throughput
+  and122M/158M shared-bank conflicts; no isolated removable-latency claim.
+  21 guards/no warnings,680 replay passes/1680 standalone calls/zero actions or
+  updates. All58 ranges/2378 metrics reevaluate offline;258.287M outputs, full
+  plans/pipeline keys and1794+29 source seals pass. Captures finish04:39:04UTC,
+  audit04:39:52; no worker. SDK's device API-version flag is false but all calls
+  succeed; no official-version-support claim. First preflight bridge/decode-wait
+  correction stays; no GPU failure/retry. Artifacts in
+  `runs/native-perf-sdk-20261016.ZVAi5Ubl`, production/67559ce5 unchanged.
+  Next CPU-proof type-aware word/vector staging and shared-bank layout with
+  existing tiles/K order/compensation/rounding/interfaces, then complete-family
+  counters and latency. Padding alone is not a promised fix. No geometry sweep,
+  rejected-policy revival, favorable selector, Naga project or learning restart.
+  Root-cause/parity goal stays open; no missing-SDK or usage-approval blocker.
 - Keep isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
