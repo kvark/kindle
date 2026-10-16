@@ -228,12 +228,23 @@ promoted, and timed chunking still adds three waits. JAX inputs are resident;
 native input preparation is measured. Neither that boundary nor host-only work
 explains the larger GPU-covered interval.
 
-**Next:** CPU-reconcile counter coverage for all23 convolution products and
-helpers against actual JAX launches before declaring more collection. Existing
-library instruction captures cover two encoder derivatives, not the complete
-decoder-dominated family. The recurrence result warns against generalizing
-them. Keep caller/pass/kernel scopes distinct; no additive gap budget from
-incompatible boundaries. No padding/tile/precision/shape-
+The [complete convolution capture](results/2026-10-16-jax-convolution-counters.md)
+now covers all23 mains/18 helpers. Native/JAX warp instructions10.296/2.420B,
+4.255x; ALU7.287x, tensor.792x. Every pass has excess work. Nine typed occurrences
+contribute84.50% of native instructions; fourteen packed still have3.20x overhead.
+These are not time shares. JAX has local traffic despite native zero. Original
+36/41 capture remains failed; separate metadata and missing-profile allocations
+complete coverage with exact reports/tensors/HLO and240 seals. Two passing/one
+failed guard, zero warnings/816 synthetic updates, last GPU16:25:10UTC, no worker.
+Retain all CPU reader failures, including unit scaling and metric membership;
+offline repairs do not repeat GPU collection.
+
+**Next:** CPU-account the current typed/packed operand loads, predicates, address
+updates, cooperative stores and compensation against captured library schedules
+before choosing one complete-family mechanism. Incremental cursors, exact
+division helpers and typed word staging already exist. Counter ratios alone do
+not locate source instructions. Keep caller/pass/kernel scopes distinct; no
+additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
 prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
 Recurrent matrices and host/graph execution remain open. Keep prior

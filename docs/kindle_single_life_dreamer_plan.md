@@ -136,9 +136,15 @@ close the gap. Cached world27.935ms/imagination6.976ms dominate; chunk intervals
 are not pure convolution costs. Exact272 reports/292-tensor states/programs
 pass, two guards/no warnings, no worker. Preserve zero-test preflight sequencing
 failure, formatting failure and crossing-interval reader failure; independent
-CPU repairs pass without GPU repeat or changed gates. Next reconcile all23
-actual convolution products/helpers before extrapolating two encoder derivative
-counters to the whole family. Keep58aff452/1.70×, production/Atari unchanged.
+CPU repairs pass without GPU repeat or changed gates. The [complete convolution
+capture](results/2026-10-16-jax-convolution-counters.md) now reconciles all23 mains
+and18 helpers: native executes4.255× warp/7.287× ALU instructions despite fewer
+tensor instructions. All passes show excess; nine typed occurrences hold84.50%
+of native instructions, not time. Original36/41 capture stays failed; reviewed
+metadata/supplement complete coverage with exact model/HLO controls. Two passing/
+one failed guard, zero warnings/816 synthetic updates; no worker. Next CPU-account
+current typed/packed feeding work; existing cursors/word staging are not missing
+features. Keep58aff452/1.70×, production/Atari unchanged and the full goal open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

@@ -688,6 +688,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   before any additional collection. Two encoder derivative captures are not
   a whole-family instruction/speedup claim. No geometry/staging sweep, prior
   timing or promotion; keep58aff452/1.70x and the full goal open.
+- **Complete convolution counters reconcile:** [result](docs/results/2026-10-16-jax-convolution-counters.md).
+  All23 native/JAX mains execute10.296/2.420B warp instructions,4.255x; ALU7.287x,
+  tensor.792x. Forward/dX/dW ratios3.942/3.531/4.922x; not latency ratios. Nine
+  typed occurrences contribute84.50% of native instructions,14 packed still3.20x.
+  All18 JAX helpers add61.033M; native composed helpers remain outside this scope.
+  JAX has78.643/1.589MB local reads/writes versus native zero; async/shared paths
+  differ, so LSU wavefronts are not all transfers. Original36/41 guard stays
+  failed; a41-launch metadata census and seven-profile supplement complete
+  membership, with two retained controls. Exact reports/tensors/HLO and240 seals
+  pass. Two passing/one failed guard, no warnings,816 synthetic updates/zero
+  native calls/actions. GPU16:25:10UTC, CPU16:28:01UTC; no worker. Retain section,
+  receipt-race, singular-pass, CSV-unit and metric-membership reader failures;
+  offline repairs do not repeat GPU work. Next CPU-account current typed/packed
+  feeding structures; incremental cursors/exact division/word staging already
+  exist. No new allocation, sweep, compiler feature or promotion;58aff452/1.70x
+  and the root-cause goal remain unchanged.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
