@@ -648,10 +648,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   new upstream. No silent repin or retrospective graph-gate relaxation.
   Original CPU absent-file assertion stays failed; source-membership repair/
   19 seals pass, CPU14:51:56UTC, zero GPU/builds/updates/actions, no worker.
-  Next prepare bounded actual full-JAX12-node counters and the two missing native
-  contracts, aggregate-first with padding/addend limits. No HLO selector invented
+  The bounded full-JAX capture below covers the two missing native contracts.
+  Retain aggregate-first padding/addend limits. No HLO selector invented
   from names/order, new kernel/geometry/layout sweep or learning. Keep58aff452/
   1.70x; the root-cause/parity goal remains open.
+- **Actual recurrence counters reconcile:** [result](docs/results/2026-10-16-jax-matrix-counters.md).
+  All180 products: native277.979M/JAX300.272M warp instructions,7.42% fewer native;
+  tensor21.934/21.965M, zero local traffic in both. Convolution's large instruction
+  overhead does not generalize to these matrices. Native read conflicts24.36x,
+  total read wavefronts only1.0174x; neither is a latency attribution. Actual JAX
+  captures all15 steps, native uses synthetic checked fixtures; action padding/
+  grouped beta=1 boundaries remain. Exact272 reports/288 tensors/full HLO,
+  all memberships and561,152 new F64/integer outputs pass. Three guards/no
+  warnings,3,240 JAX passes/74 native passes/176 native calls/272 synthetic
+  updates, zero builds/actions. GPU ends15:15:27UTC, CPU review15:18:11UTC;
+  no worker. Successful transient-unit collection trips the completion observer;
+  retain failure/source and separate unchanged CPU review, no GPU repeat.
+  Current ordinary RGB caller intervals7.037/10.208/24.403/4.552ms sum46.199ms;
+  they contain waits, not pure GPU work or equivalent JAX boundaries. Next CPU-
+  reconcile complete execution boundaries before a new change. No generic
+  matrix staging/geometry sweep, prior timing or promotion. Keep58aff452/1.70x;
+  the root-cause/parity goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

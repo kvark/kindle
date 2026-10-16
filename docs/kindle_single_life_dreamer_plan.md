@@ -116,11 +116,21 @@ The [actual matrix interface audit](results/2026-10-16-jax-matrix-contract.md)
 now reconciles12 roles/180 products,20.934M addresses and1,440 JAX launches.
 Action padding and grouped beta=1 additions remain explicit boundary differences.
 Graph-node membership is proven, individual HLO ownership is not. Native counters
-cover150/180 occurrences; next prepare a bounded all12-node JAX capture plus the
-two missing native action contracts, not a favorable subset or inferred per-layer
+cover150/180 occurrences; the subsequent all12-node JAX capture adds the two
+missing native action contracts, not a favorable subset or inferred per-layer
 timing. New upstream12df95c is reviewed, not repinned; primitive accuracy policy
 does not waive graph failures. CPU-only/seven negatives, no worker. No padding/
 geometry/precision/shape-constant sweep, prior timing or promotion;1.70× gap stays.
+The [complete recurrence counters](results/2026-10-16-jax-matrix-counters.md)
+now show **7.42% fewer total native warp instructions than JAX**, almost equal
+tensor counts and zero local traffic across all180 matrix products. Convolution's
+large instruction deficit is not universal. Native read conflicts24.36× versus
+only1.0174× total read wavefronts do not identify the timing cause. All272 JAX
+reports/288 tensors/full HLO and561,152 new native independent outputs pass.
+Three guards/no warnings; GPU ends15:15:27UTC, no worker. Retain completion-
+observer failure after successful transient-service collection; unchanged CPU
+review passes without GPU retry. Next reconcile complete execution boundaries
+before another kernel proposal. Keep58aff452/1.70×, production/Atari unchanged.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

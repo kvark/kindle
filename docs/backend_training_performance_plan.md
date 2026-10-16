@@ -204,11 +204,22 @@ two actual512-row action contracts. Seven negatives/19 seals pass; repaired CPU
 upstream-file assertion remains, no GPU work. Meganeura's six commits through
 12df95c are reviewed; no repin or retrospective numerical-gate relaxation.
 
-**Next:** prepare bounded counters for all12 actual JAX recurrence launch nodes
-and the two missing native contracts. Preserve full-update reference checks;
-compare aggregates first, disclosing padding/addend boundaries rather than
-inventing per-HLO launch attribution. The existing actual JAX/native convolution
-instruction comparison does not cover matrices. No padding/tile/precision/shape-
+The [actual recurrence counters](results/2026-10-16-jax-matrix-counters.md)
+now cover all180 products: native277.979M versus JAX300.272M warp instructions,
+**7.42% fewer native**, nearly identical tensor counts and zero local traffic.
+Convolution's instruction overhead does not generalize to these matrices.
+Native shared-read conflicts are24.36x but total read wavefronts only1.0174x;
+neither proves a latency cause. All272 JAX reports/288 tensors/full HLO and
+561,152 new native independent outputs pass. Three guards/no warnings, zero
+builds/actions. Capture ends15:15:27UTC, no worker. Retain the collected-transient-
+service observer failure; unchanged CPU review passes without a GPU repeat.
+
+**Next:** CPU-reconcile current complete execution boundaries against retained
+JAX, distinguishing measured caller/pass/activity boundaries from interventions.
+Current ordinary RGB posterior/imagination-targets/world-remainder/behavior
+intervals7.037/10.208/24.403/4.552ms sum46.199ms; these include GPU waits and
+cannot be subtracted from narrower JAX loop sums. Matrix instruction counts
+alone do not justify another implementation. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
 prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
 Recurrent matrices and host/graph execution remain open. Keep prior
