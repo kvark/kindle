@@ -22,7 +22,15 @@ The preceding candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
+**Latest qualification: [prior batching is incomplete](results/2026-10-16-prior-batching.md).**
+The isolated boundary has144→9 matrix products and1181→168 dispatches;
+all serial/batched comparisons pass. Independent F64 checks fail14 arrays
+in both arms. F32 normalization/activation sensitivity explains part, not all,
+of the logit discrepancy. One guard/no warnings,16 raw backwards and zero
+optimizer updates/actions. No actual whole/staged check or full timing follows.
+Keep the failed gates, unqualifiedaca80566 and qualified834241b6 distinct.
+
+**Graph diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
 Native144 matrix products versus JAX9 do identical1.107G nominal MACs outside
 the posterior recurrence. This explains135 of159 extra matrix products, not
 their cost or the whole gap. All28,064 JAX kernels/eight updates reconcile;
@@ -64,11 +72,14 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** time-batch the independent training prior and KL using the existing
-world-head pattern. Keep causal observation and imagination sequential; preserve
-masks, free nats, stop-gradients, rounding and staged late targets. Qualify raw
-gradients/boundaries before one matched complete-update comparison. No timing
-claim follows the CPU dependency proof. Matched imagination arithmetic is the
+**Next:** resolve the training-prior finite-precision reference discrepancy
+without relaxing its gates or repeating GPU cohorts. The implementation is
+isolated, not qualified or timed. Keep causal observation/imagination sequential,
+masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
+gradient/boundary qualification still precedes a matched complete comparison.
+Separately review new upstream Blade4845d652 workgroup-cooperative-matrix support
+against the feeding contract before proposing compiler work; no silent repin.
+Matched imagination arithmetic is the
 next narrow execution region to attribute, not a new broad profile or sweep.
 Incomparable instrumented/ordinary regions cannot form a savings budget.
 Convolution feeding remains open: current dX/dW still execute8.63x/8.17x

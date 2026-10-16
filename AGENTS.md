@@ -422,6 +422,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   preserving masks/free nats/rounding/gradients/staged late targets; qualify before
   one complete comparison. No automatic GPU allocation, convolution sweep,
   production or Atari promotion. Keep834241b6; the1.77x parity goal remains open.
+- **Training-prior batching is implemented, not qualified:** [result](docs/results/2026-10-16-prior-batching.md).
+  Standalone12M products144→9, dispatches1181→168; all eight paired output/raw-
+  gradient comparisons pass. Independent27.565M-value review fails14 array
+  checks in both arms; some pointwise gates fail despite relativeL2<.000350.
+  CPU F32 normalization/activation diagnosis reduces748 failed logit envelopes
+  to408, not zero. Rounding sensitivity is established, full cause is not.
+  Keep every failure/gate/source; no relaxed rerun or replacement cohort.
+  Actual whole/staged checks and full timings are unrun. One guard/no warnings,
+  16 raw backwards/zero optimizer updates/actions;2,271 seals, no worker.
+  Preserve the read-method/build and length-one-config failures/repairs.
+  Isolatedaca80566 remains unqualified; keep834241b6 and1.77x complete gap.
+  Resolve the finite-precision reference before progressing this candidate.
+  New upstream Blade4845d652 already supplies workgroup cooperative matrices
+  and BF16 capability alignment; review it separately before new compiler work.
+  No production/Atari promotion or convolution sweep.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -431,11 +446,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the word-staging study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October16 upstream: `f648a453`/`01be8446`; Meganeura's
+  this candidate. Latest October16 upstream: `f648a453`/`4845d652`; Meganeura's
   two new search/attention exploration fixes do not change ordinary convolution.
-  Blade's new entry-point/override resolution takes its unchanged fast path for
-  all152 tested single-entry/override-free variants. No runtime refresh or
-  historical repin from this review.
+  Blade's preceding entry-point/override resolution takes its unchanged fast
+  path for all152 tested single-entry/override-free variants. New workgroup/
+  BF16 capabilities are not yet qualified here. No runtime refresh or historical
+  repin from this review.
   CI status belongs on PR31.
 - **Closed diagnostics stay closed.** No native assembly-query retry (the
   retained query returned no representations), failed Nsight Graphics injection

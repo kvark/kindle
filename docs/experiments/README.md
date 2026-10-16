@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [prior-batching qualification](../results/2026-10-16-prior-batching.md)
+is incomplete:144→9 boundary products and passing paired checks, but14
+independent-reference array failures in both arms. CPU rounding diagnosis is
+partial; no changed gates, GPU retry or full-update timing. One guard/no warnings,
+16 raw backwards/zero optimizer updates/actions. Keep834241b6 and1.77×.
+
 October16's [non-convolution audit](../results/2026-10-16-nonconvolution-contract.md)
 finds training-prior fragmentation:144 native products versus9 JAX products
 with identical1.107G MACs outside the recurrent dependency. All28,064 saved

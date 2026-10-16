@@ -29,8 +29,13 @@ full-update trial or promotion. Keep834241b6 and1.77×.
 The [subsequent CPU graph audit](results/2026-10-16-nonconvolution-contract.md)
 finds training-prior work unnecessarily unrolled:144 matrix products versus9
 batched JAX products, identical arithmetic outside the posterior dependency.
-Next isolate prior/KL time batching and qualify gradients/staging before a
-complete comparison. Basic head batching is already present. All eight JAX
+The [isolated prior-batching implementation](results/2026-10-16-prior-batching.md)
+reduces standalone products144→9 and passes all paired checks, but independent
+F64 gates fail in both arms. CPU rounding diagnosis is partial; preserve failures
+and resolve the reference before actual-world qualification or full timing.
+One guard/no warnings,16 raw backwards, no optimizer updates/actions. New Blade
+workgroup-matrix support is a separate feeding-contract review, not a repin.
+Basic head batching is already present. All eight JAX
 updates reconcile, but native pass intervals and JAX kernel sums are not
 subtractable savings. No new layout/tile sweep or automatic GPU allocation;
 convolution feeding and parity remain open.
