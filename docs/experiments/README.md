@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [non-convolution audit](../results/2026-10-16-nonconvolution-contract.md)
+finds training-prior fragmentation:144 native products versus9 JAX products
+with identical1.107G MACs outside the recurrent dependency. All28,064 saved
+JAX kernels and current non-world program identities reconcile. Next qualify
+prior/KL time batching; no measured gain or GPU allocation in this CPU audit.
+Keep834241b6 and1.77×; convolution feeding and parity remain open.
+
 October16's [packet-axis result](../results/2026-10-16-packet-axis.md) rejects a
 numerically exact alternative: complete convolution19.089→21.217ms,11.15%
 slower. dW uniform work returns but total instructions rise; dX slows despite

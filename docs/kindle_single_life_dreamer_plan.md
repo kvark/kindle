@@ -25,9 +25,15 @@ The subsequent [packet-axis test](results/2026-10-16-packet-axis.md) passes
 numerics but regresses the complete convolution family11.15%. Restoring uniform
 instructions in dW increases total instruction work; reduced dX L2 traffic does
 not improve time.120 guards/22 warnings and all offline audits pass, with no
-full-update trial or promotion. Keep834241b6 and1.77×. Next CPU-reconcile the
-remaining non-convolution native/JAX programs and host boundaries, without a
-new layout/tile sweep or an automatic GPU allocation. Parity remains open.
+full-update trial or promotion. Keep834241b6 and1.77×.
+The [subsequent CPU graph audit](results/2026-10-16-nonconvolution-contract.md)
+finds training-prior work unnecessarily unrolled:144 matrix products versus9
+batched JAX products, identical arithmetic outside the posterior dependency.
+Next isolate prior/KL time batching and qualify gradients/staging before a
+complete comparison. Basic head batching is already present. All eight JAX
+updates reconcile, but native pass intervals and JAX kernel sums are not
+subtractable savings. No new layout/tile sweep or automatic GPU allocation;
+convolution feeding and parity remain open.
 
 **Preceding B32 result:** [connected image views](results/2026-10-15-image-views.md)
 reduces RGB54.205→51.945ms,4.17%, and CDP47.699→47.112ms,1.23%. Exact reports,

@@ -401,10 +401,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pairs,116 ranges/4,756 offline metrics/1,274 seals;9,320 standalone calls,
   1,360 counter replays, zero updates/actions. GPU ends06:38:36UTC; CPU06:40:19,
   no worker. Retain the exploratory reader syntax failure/repair. Keep834241b6
-  and1.77x complete gap. Next CPU-reconcile remaining non-convolution native/JAX
-  programs and host boundaries before selecting another intervention; no sums
+  and1.77x complete gap. The following CPU audit reconciles remaining programs
+  and host boundaries before selecting another intervention; no sums
   of incomparable timing regions, renewed layout/tile sweep or automatic GPU run.
   Convolution feeding and whole parity remain open, Atari stopped.
+- **Non-convolution contract audit passes:** [result](docs/results/2026-10-16-nonconvolution-contract.md).
+  Current non-world plans/pipelines match the coarse capture; all28,064 JAX
+  kernels/eight updates and940 fusion bodies/112 library configurations reconcile.
+  Training prior is unnecessarily unrolled:144 products versus9 batched JAX,
+  identical1.107G nominal MACs. Versioned gradients and both posterior closures
+  prove these products are outside the recurrent dependency. This explains135
+  of159 extra matrix products, not their latency or the whole gap. Imagination
+  recurrence has180 products in both stacks;44.866/44.890G MACs differ only by
+  action padding. Native8.740ms pass includes heads; JAX2.852ms recurrence kernel
+  sum does not, so no3x recurrence claim. Heads already batch; grouped matrices
+  already use cooperative hardware. Target/replay work and tape reuse stay distinct.
+  First observer's loop-scope leak stays invalid;18 regression checks/six original
+  negatives and independent SQL/body audits pass.51 seals; CPU ends07:13:16UTC,
+  zero GPU calls/builds/updates/actions. Next isolate training-prior/KL batching,
+  preserving masks/free nats/rounding/gradients/staged late targets; qualify before
+  one complete comparison. No automatic GPU allocation, convolution sweep,
+  production or Atari promotion. Keep834241b6; the1.77x parity goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

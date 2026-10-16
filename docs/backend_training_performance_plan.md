@@ -22,7 +22,18 @@ The preceding candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest diagnosis: [column-major packet axis is rejected](results/2026-10-16-packet-axis.md).**
+**Latest diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
+Native144 matrix products versus JAX9 do identical1.107G nominal MACs outside
+the posterior recurrence. This explains135 of159 extra matrix products, not
+their cost or the whole gap. All28,064 JAX kernels/eight updates reconcile;
+current non-world plans match the coarse capture. Imagination's180 products
+also match, with only action-padding arithmetic different. Its native pass
+includes heads while the JAX2.852ms kernel sum is recurrence-only: no direct
+ratio or additive saving. Basic head batching/cooperative products already exist.
+The original loop-scope observer defect is retained; separate repair and
+independent checks pass. CPU only, no new measured speedup or GPU allocation.
+
+**Preceding diagnosis: [column-major packet axis is rejected](results/2026-10-16-packet-axis.md).**
 Complete convolution19.089→21.217ms,11.15% slower, with all numerical checks
 passing. Restoring dW uniform-pipe work does not reduce total instructions:
 they rise17.06%, time1.01%, while shared conflicts stay flat. dX instructions/
@@ -53,10 +64,13 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** CPU-reconcile the remaining non-convolution native programs and host
-boundaries with the retained complete JAX capture before selecting another
-intervention. Require common work and explicit dependencies; incomparable
-instrumented/ordinary timing regions cannot be subtracted into a savings budget.
+**Next:** time-batch the independent training prior and KL using the existing
+world-head pattern. Keep causal observation and imagination sequential; preserve
+masks, free nats, stop-gradients, rounding and staged late targets. Qualify raw
+gradients/boundaries before one matched complete-update comparison. No timing
+claim follows the CPU dependency proof. Matched imagination arithmetic is the
+next narrow execution region to attribute, not a new broad profile or sweep.
+Incomparable instrumented/ordinary regions cannot form a savings budget.
 Convolution feeding remains open: current dX/dW still execute8.63x/8.17x
 full-JAX warp instructions. Do not revive the rejected packet orientation,
 start a layout/geometry sweep or infer parity from source arithmetic. Keep
