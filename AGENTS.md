@@ -733,9 +733,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Preserve unused-field build, per-image-alignment audit, binding-index compile
   and historical-library-membership failures/repairs. Five libraries have old
   seals; all137 are sealed now, not retroactively. No backend rebuild.
-  Next CPU-inspect emitted common-predicate/alignment/fallback control against
-  these counters and library interfaces; no new width/tile/layout sweep, GPU
-  allocation, compiler feature or promotion. Keep58aff452/1.70x and the full goal open.
+  The unchanged-kernel observation below diagnoses the control lowering;
+  no new width/tile/layout sweep, compiler feature or promotion follows.
+- **Read-span control lowering diagnosed:** [result](docs/results/2026-10-16-control-lowering.md).
+  All20 contracts/23 occurrences: active thread work falls23.08% but warp work
+  rises18.01%; active threads per warp instruction31.997→20.857. Both arms have
+  zero local traffic with a passing positive control. The qualified baseline
+  already keeps its lanes active: do not generalize the rejected candidate's
+  problem to the remaining JAX gap. No direct divergence/call/inlining attribution.
+  All old instruction anchors,516.575M retained values/258.287M paired values,
+  full plans/pipelines and361 collection seals pass.41 guards/40 warnings,
+  2,050 passes/6,902 offline metrics/2,822 calls, zero updates/actions/timings.
+  GPU18:55:17UTC; no worker. CPU proof covers1.311M unreachable dW fallback
+  positions and65,564 interpreted constant-one remainder values; subgroup mapping
+  is not inferred. Signed-helper and terminal-newline audit failures/repairs stay.
+  Next CPU-prove derivative common-base/carry arithmetic from qualified scalar
+  loads, preserving masks/load bodies/K order/precision/compensation/barriers
+  and general small/strided cases. No alignment fast/slow path, vector-width/
+  geometry sweep, automatic GPU allocation or promotion. Keep58aff452/1.70x;
+  library feeding/reuse, non-convolution costs and the full goal remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -153,9 +153,17 @@ changed contracts regress. Warp instructions rise18.01% and control-flow-pipe
 work13.68x despite10.86% less L2 traffic; tensor work stays exact. Calibration,
 2.690M F64 comparisons and1.033B bit-exact pairs pass.140 guards/133 warnings,
 zero learner updates/actions; all samples and CPU failures remain. Last guard
-18:23:15UTC, no worker or integration. Next CPU-inspect emitted control against
-these counters; no renewed width/geometry sweep, GPU allocation or compiler
-feature follows. The prior sealed-declaration publication error is restored
+18:23:15UTC, no worker or integration. The [unchanged-kernel diagnosis](results/2026-10-16-control-lowering.md)
+finds active threads per warp instruction31.997→20.857, with zero local traffic
+in both arms and a passing positive control. Fewer thread instructions but more
+warp instructions explain the failed candidate's lost active lanes, not the
+baseline's remaining gap. No direct divergence/inlining attribution.41 guards/
+40 warnings,2,050 counter passes; zero updates/actions/new timings. GPU ends
+18:55:17UTC, no worker; CPU failures and repaired audits remain. Next CPU-prove
+shared derivative address/carry arithmetic while retaining the baseline's scalar
+loads/masks/K order/precision/barriers and general small/strided cases. No renewed
+width/geometry sweep, automatic GPU allocation or compiler feature follows.
+The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two

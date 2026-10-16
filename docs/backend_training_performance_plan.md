@@ -260,11 +260,24 @@ All7,680 samples, including a native33.14% tail shift, are retained. Last guard
 18:23:15UTC; no worker, backend rebuild or production change. The CPU failures
 and separately reviewed repairs stay. No integration, selector or retiming.
 
-**Next:** CPU-inspect the emitted common-predicate/alignment/fallback control
-against complete counters and the retained library interface. More source
-vectorization is not inherently less native work; exact driver instructions,
-subgroup divergence and candidate spills remain unassigned. No new GPU
-allocation follows. Existing cursors/division helpers/word staging stay.
+The [unchanged-kernel control observation](results/2026-10-16-control-lowering.md)
+now identifies lost active lanes: thread instructions fall23.08% but warp
+instructions rise18.01%; active threads per warp instruction31.997→20.857.
+Local traffic is zero in both arms with a positive control. All old instruction
+anchors/outputs/plans remain exact.41 guards/40 warnings,2,050 counter passes,
+zero updates/actions/timing samples; last GPU18:55:17UTC, no worker. CPU proofs
+exclude executed dW fallback divisions for the current workload and show existing
+dX remainder helpers have divisor1. Neither proves driver elimination/inlining.
+Retain CPU classification/newline failures and repairs. Direct divergent branches
+are not measured; local-ID ordering does not establish subgroup membership.
+
+**Next:** the qualified baseline already has nearly32 active threads per warp
+instruction. Preserve its guarded scalar loads and CPU-prove shared derivative
+common-base/carry arithmetic, reducing redundant coordinates/cursors without
+adding per-lane alignment fast/slow paths. Preserve masks, load bodies, K order,
+precision, compensation, barriers and general small/strided cases. This is not a
+vector-width/geometry sweep or parity promise; library feeding/reuse remains open.
+No new GPU allocation follows from this diagnosis alone.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
