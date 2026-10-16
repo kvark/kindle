@@ -633,6 +633,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   matrix interfaces/launch membership, especially the common imagined recurrence,
   before selecting counters. No shape-constant/layout/geometry sweep or prior
   timing. Production/Atari stay unchanged and the root-cause goal remains open.
+- **Actual imagined matrix interfaces reconcile:** [CPU result](docs/results/2026-10-16-jax-matrix-contract.md).
+  All12 roles/180 products match, apart from18→24 action padding; native/JAX
+  44.866/44.890G MACs.20.934M physical addresses/seven negatives pass. Grouped
+  layouts match physically, but JAX includes BF16 beta=1 additions while native
+  adds bias outside the matrix; all JAX epilogues DEFAULT, not inferred ReLU.
+  All12 graph nodes/1,440 actual launches reconcile2.105519ms kernel sum, not
+  a native pass time. Individual HLO ownership is unresolved; no invented order-
+  based layer timing. Native counters cover150/180 occurrences/seven contracts;
+  the30 action products need their actual512-row shapes, not older checked cases.
+  Six new Meganeura commits through12df95c add typed dense staging/tuning and a
+  primitive accuracy policy. Upstream tiled blobcdb65862 is unchanged and lacks
+  isolated typed/grouped branches; current checked staging is not identical to
+  new upstream. No silent repin or retrospective graph-gate relaxation.
+  Original CPU absent-file assertion stays failed; source-membership repair/
+  19 seals pass, CPU14:51:56UTC, zero GPU/builds/updates/actions, no worker.
+  Next prepare bounded actual full-JAX12-node counters and the two missing native
+  contracts, aggregate-first with padding/addend limits. No HLO selector invented
+  from names/order, new kernel/geometry/layout sweep or learning. Keep58aff452/
+  1.70x; the root-cause/parity goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -642,8 +661,9 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the copy-composition study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October16 upstream: `f648a453`/`4845d652`; Meganeura's
-  two new search/attention exploration fixes do not change ordinary convolution.
+  this candidate. Latest October16 upstream: `12df95c`/`4845d652`; six new typed-
+  matrix/staging/tuning/accuracy commits are reviewed above, not runtime-qualified.
+  Preceding `f648a453` search/attention fixes do not change ordinary convolution.
   Blade's preceding entry-point/override resolution takes its unchanged fast
   path for all152 tested single-entry/override-free variants. New workgroup/
   BF16 capabilities are not yet qualified here. No runtime refresh or historical

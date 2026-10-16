@@ -193,13 +193,24 @@ integer/reference output checks and10,800 offline metrics pass, with two warning
 No integration, full-update trial, favorable selector or retime. Zero builds/
 updates/actions; GPU ends14:20:56UTC, CPU interpretation14:39:01UTC, no worker.
 
-**Next:** CPU-map actual retained JAX matrix interfaces and launch membership
-against the native family, starting with the common imagined recurrence. The
-existing actual JAX/native convolution instruction comparison does not cover
-matrices. Prove layouts, epilogues and execution grouping before selecting a
-bounded counter capture. No padding/tile/precision/shape-constant sweep, favorable
-orientation selector, rejected convolution scheme, prior timing, compiler feature
-or automatic promotion. Keep58aff452 and the1.70x complete gap.
+The [actual recurrence interface audit](results/2026-10-16-jax-matrix-contract.md)
+now reconciles12 roles/180 products,20.934M physical addresses and1,440 captured
+JAX launches. Padding18→24 accounts for the tiny MAC difference. Grouped layouts
+match physically, but JAX's beta=1 addend is outside the native matrix boundary.
+All epilogues are DEFAULT; do not infer ReLU from a kernel name.12 graph nodes
+and their enclosing command buffers are exact; individual HLO ownership remains
+unresolved. Existing native counters cover150/180 recurrence products, not the
+two actual512-row action contracts. Seven negatives/19 seals pass; repaired CPU
+upstream-file assertion remains, no GPU work. Meganeura's six commits through
+12df95c are reviewed; no repin or retrospective numerical-gate relaxation.
+
+**Next:** prepare bounded counters for all12 actual JAX recurrence launch nodes
+and the two missing native contracts. Preserve full-update reference checks;
+compare aggregates first, disclosing padding/addend boundaries rather than
+inventing per-HLO launch attribution. The existing actual JAX/native convolution
+instruction comparison does not cover matrices. No padding/tile/precision/shape-
+constant sweep, favorable orientation selector, rejected convolution scheme,
+prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
