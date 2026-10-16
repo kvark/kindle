@@ -214,12 +214,26 @@ neither proves a latency cause. All272 JAX reports/288 tensors/full HLO and
 builds/actions. Capture ends15:15:27UTC, no worker. Retain the collected-transient-
 service observer failure; unchanged CPU review passes without a GPU repeat.
 
-**Next:** CPU-reconcile current complete execution boundaries against retained
-JAX, distinguishing measured caller/pass/activity boundaries from interventions.
-Current ordinary RGB posterior/imagination-targets/world-remainder/behavior
-intervals7.037/10.208/24.403/4.552ms sum46.199ms; these include GPU waits and
-cannot be subtracted from narrower JAX loop sums. Matrix instruction counts
-alone do not justify another implementation. No padding/tile/precision/shape-
+The [fresh complete trace](results/2026-10-16-current-update-attribution.md)
+now reconciles current execution: ordinary46.108ms/coarse47.176ms,+2.315%
+instrumentation. GPU-pass union39.650ms exceeds the entire inclusive JAX update;
+uncovered7.528ms cannot by itself explain parity. Cached world27.935ms and
+imagination6.976ms dominate; decoder-containing15.505ms/encoder-derivative6.720ms
+chunks are not pure convolution costs. Exact reports/tensors/programs pass,
+two guards/no warnings/544 synthetic updates. GPU15:38:52UTC, no worker.
+Retain zero-test preflight failure (correct test runs only after capture),
+formatting failure and crossing-interval reader failure; independent CPU
+repairs preserve all timestamps/gates, no GPU repeat. Instrumentation is not
+promoted, and timed chunking still adds three waits. JAX inputs are resident;
+native input preparation is measured. Neither that boundary nor host-only work
+explains the larger GPU-covered interval.
+
+**Next:** CPU-reconcile counter coverage for all23 convolution products and
+helpers against actual JAX launches before declaring more collection. Existing
+library instruction captures cover two encoder derivatives, not the complete
+decoder-dominated family. The recurrence result warns against generalizing
+them. Keep caller/pass/kernel scopes distinct; no additive gap budget from
+incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
 prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
 Recurrent matrices and host/graph execution remain open. Keep prior

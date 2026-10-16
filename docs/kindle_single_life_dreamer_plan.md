@@ -129,8 +129,16 @@ only1.0174× total read wavefronts do not identify the timing cause. All272 JAX
 reports/288 tensors/full HLO and561,152 new native independent outputs pass.
 Three guards/no warnings; GPU ends15:15:27UTC, no worker. Retain completion-
 observer failure after successful transient-service collection; unchanged CPU
-review passes without GPU retry. Next reconcile complete execution boundaries
-before another kernel proposal. Keep58aff452/1.70×, production/Atari unchanged.
+review passes without GPU retry. The [fresh complete attribution](results/2026-10-16-current-update-attribution.md)
+now measures39.650ms GPU-pass union/7.528ms uncovered in47.176ms profiled updates;
+ordinary46.108ms calibrates, instrumentation+2.315%. Host work alone cannot
+close the gap. Cached world27.935ms/imagination6.976ms dominate; chunk intervals
+are not pure convolution costs. Exact272 reports/292-tensor states/programs
+pass, two guards/no warnings, no worker. Preserve zero-test preflight sequencing
+failure, formatting failure and crossing-interval reader failure; independent
+CPU repairs pass without GPU repeat or changed gates. Next reconcile all23
+actual convolution products/helpers before extrapolating two encoder derivative
+counters to the whole family. Keep58aff452/1.70×, production/Atari unchanged.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

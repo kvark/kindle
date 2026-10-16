@@ -665,10 +665,29 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   no worker. Successful transient-unit collection trips the completion observer;
   retain failure/source and separate unchanged CPU review, no GPU repeat.
   Current ordinary RGB caller intervals7.037/10.208/24.403/4.552ms sum46.199ms;
-  they contain waits, not pure GPU work or equivalent JAX boundaries. Next CPU-
-  reconcile complete execution boundaries before a new change. No generic
+  they contain waits, not pure GPU work or equivalent JAX boundaries. The current
+  complete trace below reconciles those boundaries. No generic
   matrix staging/geometry sweep, prior timing or promotion. Keep58aff452/1.70x;
   the root-cause/parity goal remains open.
+- **Current complete attribution reconciles:** [result](docs/results/2026-10-16-current-update-attribution.md).
+  Fresh ordinary46.108ms/coarse47.176ms,+2.315% overhead; GPU-pass union39.650ms,
+  uncovered7.528ms. Host elimination alone cannot reach inclusive JAX27.223ms;
+  coverage is not SM utilization. Cached world27.935/imagination6.976/slow.505/
+  behavior3.014ms; helpers1.232ms. Decoder-containing chunk15.505ms and encoder-
+  derivative chunk6.720ms are not pure convolution times. All23 products/272
+  reports/three292-tensor states/full plans/pipelines/world groups/cache pass.
+  Two guards/no warnings/544 synthetic updates/zero actions; GPU15:38:52UTC,
+  publication15:49:07UTC, no worker. Backend rlib unchanged; instrumentation
+  7324a048 is not promoted. Retain inherited fmt failure, zero-test preflight
+  (correct test passes only after capture), and global-stack trace failure.
+  One2107ns crossing retains every timestamp; ten CPU tests and independent
+  6775-interval/1088-stage/3249-seal audit pass without GPU repeat. Original
+  preflight sequencing remains failed. Timed chunking adds three waits.
+  Current JAX inputs are resident; native input preparation is measured. Next
+  CPU-reconcile all23 convolution products/helpers against actual JAX launches
+  before any additional collection. Two encoder derivative captures are not
+  a whole-family instruction/speedup claim. No geometry/staging sweep, prior
+  timing or promotion; keep58aff452/1.70x and the full goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
