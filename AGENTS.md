@@ -493,6 +493,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The113 whole-world gradient failures remain. Next separately attribute them
   with the same first-product intervention, retaining ordinary controls and both
   late-target conditions; no timing, relaxed gates, sweep or promotion. Keep834241b6.
+- **Whole-world first-product attribution complete:** [result](docs/results/2026-10-16-prior-world-intervention.md).
+  Substitution reduces pointwise failures903,879→60,682, but78 arrays still fail.
+  All56 outputs are bit-exact;32 prior-parameter comparisons pass, maxrelativeL2
+  8.914e-7. Residual failures are posterior/recurrent/encoder, not those prior
+  parameters. Ordinary/split controls match104.652M values; independent156.977M
+  comparisons and four292/346-tensor checkpoint pairs pass. Two guards/no warnings,
+  14 raw backwards/four copies/zero updates/actions;5,674 seals, GPU10:06:37UTC,
+  no worker. Only the test observer changes; backend library bytes stay exact.
+  CPU32-join audit finds serial's six-input adjoint expression becomes a stored
+  F32 branch plus four-input join;4,096 strict-F32 fixtures/two negatives pass.
+  This is a materialization difference, not observed contraction/rounding or equal
+  dynamic operands. Preserve the Clippy failure/repair. Original qualification
+  stays failed, no timings or promotion. Keep this numerical follow-up open;
+  next prioritize matched native/JAX imagination boundaries before another GPU
+  allocation. Native8.740ms includes heads, JAX2.852ms does not. Keep834241b6/1.77x.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -54,6 +54,15 @@ forward paths/zero raw backwards or updates. The CPU approximation underpredicts
 the changed values; it is not bit-exact GPU arithmetic. Full-gradient attribution
 and candidate qualification remain open; no timing or production change.
 
+The [full-world intervention](results/2026-10-16-prior-world-intervention.md)
+now reduces pointwise failures903,879→60,682, but78 arrays still fail. All56
+world outputs are bit-exact and32 prior-parameter comparisons pass; residual
+failures lie in posterior/recurrent/encoder gradients. Ordinary/split controls,
+four checkpoint pairs and independent156.977M comparisons pass. Two guards/no
+warnings,14 raw backwards/zero updates. CPU inspection proves an additional
+posterior-adjoint materialization boundary, not its GPU numerical effect.
+Original qualification remains failed; do not time or promote the candidate.
+
 **Graph diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
 Native144 matrix products versus JAX9 do identical1.107G nominal MACs outside
 the posterior recurrence. This explains135 of159 extra matrix products, not
@@ -96,12 +105,13 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** separately diagnose the failed whole-world gradients using the exact
-serial first-product substitution, now proven to restore this forward path.
-Retain the unchanged ordinary control, both original/changed late targets and
-all original gates. This is causal instrumentation, not a qualification retry or
-timing allocation. Keep the standalone F64 diagnosis distinct. Additional
-backward reduction differences remain possible; the candidate stays unqualified.
+**Next:** establish matched native/JAX imagination boundaries and work, including
+the heads currently absent from the JAX recurrence-only interval. Use existing
+plans/HLO/capture evidence first, then separately declare any necessary bounded
+measurement. Do not turn unlike intervals into a performance ratio. Keep prior
+batching isolated: its remaining posterior-adjoint/materialization and prior-to-
+deterministic-state gradient boundaries are specific numerical follow-ups, not
+an automatic allocation or reason to relax the original gates. No candidate timing.
 Keep causal observation/imagination sequential,
 masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
 gradient/boundary qualification still precedes a matched complete comparison.
@@ -112,7 +122,7 @@ or dispatch. The rejected October15 family already used tensor addressing and
 workgroup matrices; new upstream exposure does not justify reviving that route
 or a compiler project. No silent repin.
 Matched imagination arithmetic is the
-next narrow execution region to attribute, not a new broad profile or sweep.
+current narrow execution region to attribute, not a new broad profile or sweep.
 Incomparable instrumented/ordinary regions cannot form a savings budget.
 Convolution feeding remains open: current dX/dW still execute8.63x/8.17x
 full-JAX warp instructions. Do not revive the rejected packet orientation,

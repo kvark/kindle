@@ -48,6 +48,13 @@ the forward divergence: replacing only this product makes all later values and
 backwards or updates. The113 gradient failures remain; next separately apply
 that intervention to raw world gradients with unchanged ordinary controls and
 both late-target conditions. No relaxed gate, timing or promotion follows.
+That [whole-world intervention](results/2026-10-16-prior-world-intervention.md)
+now restores all56 outputs and passes32 prior-parameter comparisons, but leaves
+78 failing posterior/recurrent/encoder gradient arrays. Pointwise failures fall
+903,879→60,682; original qualification stays failed. Exact controls/checkpoints
+and independent156.977M comparisons pass, two guards/no warnings/14 raw backwards,
+zero updates/actions. Keep the numerical issue open; next match the complete
+native/JAX imagination work before another performance allocation.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
