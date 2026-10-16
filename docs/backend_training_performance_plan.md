@@ -171,14 +171,23 @@ partials. The original exact shared counter identity fails44/65 up to.12737%;
 report independent counters, no relaxed numerical gates or GPU review retry.
 No new backend, full-update time or learner result; all workers finish.
 
-**Next:** CPU-prove one type-generic physical-major vector staging and cooperative
-consumer contract across all54 actual tiled matrices and existing typed cases.
-Keep K order/prefetch/splits/rounding/output/tapes/barriers, and account for both
-read/write layouts and shared storage. Require reduced instruction/transfer work
-without simply moving write conflicts to reads. Only a passing CPU proof justifies
-a separately declared complete-family comparison; no padding/tile sweep,
-rejected convolution-orientation revival, automatic allocation or compiler project.
-Keep the general copy composition and unchanged58aff452.
+The [typed storage CPU proof](results/2026-10-16-matrix-vector-contract.md) now
+passes all54 selected contracts/729 occurrences and468 typed requests. It keeps
+physical-major vector storage and expresses logical orientation in cooperative
+loads;32 scalar stores become eight vector stores in emitted SPIR-V, not yet
+measured native instructions. Producer/consumer/affine-address checks,463 control/
+463 candidate modules,48 storage envelopes and seven negatives pass. All selected
+cases fit; two larger transposed-B/scratch geometries newly exceed48KiB. Any
+integration must share orientation-aware layout accounting with the existing
+capacity guard. Original CPU envelope-count failure/repair remains; no GPU calls,
+backend rebuilds or new update result. Keep58aff452 and general copy composition.
+
+**Next:** declare one complete54-contract paired numerical/counter/time comparison.
+Preserve K order/prefetch/splits/rounding/output/tapes/barriers and count both read
+and write costs. Require complete-workload benefit before backend integration and
+full-update qualification, without simply moving write conflicts to reads. No
+padding/tile/precision sweep, favorable orientation selector, rejected convolution
+scheme, prior timing, compiler feature or automatic promotion.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not

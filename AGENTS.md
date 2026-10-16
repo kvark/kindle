@@ -603,10 +603,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   observer timeout/partials, reviewed bulk-copy repair and CPU schema/dependency
   failures. Original exact shared total=read+write gate fails44/65, max.12737%;
   separate CPU review reports independent counters without a tolerance/GPU retry.
-  Next CPU-prove one generic physical-major vector staging/consumer contract for
-  all tiled matrix orientations/types, including read layout and storage budget.
-  No GPU allocation, padding/geometry sweep, prior timing, compiler project or
-  automatic promotion. Keep58aff452/1.70x and the broader goal open.
+  The following CPU proof covers the proposed storage interface.
+- **Typed tiled vector-storage CPU proof passes:** [result](docs/results/2026-10-16-matrix-vector-contract.md).
+  All54 actual contracts/729 occurrences,468 typed requests and463 old/463 new
+  module emissions pass;32 scalar stores become eight vector stores, not measured
+  native instructions.3.834M producer/7.668M consumer/442,368 affine input checks,
+  48 envelopes/seven negatives/1,885 seals pass. All selected cases fit9,728–27,648B;
+  two larger transposed-B/scratch envelopes newly exceed48KiB. Integration must
+  make the existing capacity accounting orientation-aware; no favorable selector.
+  Non-staging source, barriers/K order/rounding and58aff452 stay unchanged.
+  Original CPU reviewer96-versus48 count failure and count-only repair remain;
+  zero GPU calls/builds/updates/actions, review13:57:45UTC, no worker. Next declare
+  one complete54-contract paired numerical/counter/time comparison, including
+  read-side costs, before backend integration/full-update qualification. No padding/
+  geometry/precision sweep, prior timing, compiler feature or automatic promotion.
+  Keep58aff452/1.70x and the broader goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

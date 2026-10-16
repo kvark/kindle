@@ -101,10 +101,14 @@ feeding work, not latency attribution. Checked-vector read conflicts warn agains
 blind layout copying. Preserve the observer timeout/bulk-copy repair and44/65
 failed exact counter identities; separate CPU review changes no raw evidence or
 numerical gates.65 passing/one failed guard, no warnings/updates/actions/workers.
-Next CPU-prove generic physical-major vector staging and cooperative consumers
-across all orientations/types, accounting for read layout/storage as well as
-writes. No automatic GPU allocation, padding/geometry/precision sweep, prior
-timing or compiler feature project; complete1.70× gap remains.
+The [generic vector-storage CPU proof](results/2026-10-16-matrix-vector-contract.md)
+now passes all54 actual contracts and468 typed requests, including complete
+producer/consumer/address checks. All selected cases fit; two larger transposed-B
+storage envelopes newly exceed48KiB and require orientation-aware capacity
+accounting before integration. Original CPU count-review failure/repair remains;
+no GPU/build/update. Next declare the complete54-contract paired numerical/
+counter/time comparison, not a favorable subset or padding/geometry/precision
+sweep. No prior timing, compiler feature or automatic promotion;1.70× gap remains.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
