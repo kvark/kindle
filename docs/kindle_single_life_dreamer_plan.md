@@ -106,9 +106,15 @@ now passes all54 actual contracts and468 typed requests, including complete
 producer/consumer/address checks. All selected cases fit; two larger transposed-B
 storage envelopes newly exceed48KiB and require orientation-aware capacity
 accounting before integration. Original CPU count-review failure/repair remains;
-no GPU/build/update. Next declare the complete54-contract paired numerical/
-counter/time comparison, not a favorable subset or padding/geometry/precision
-sweep. No prior timing, compiler feature or automatic promotion;1.70× gap remains.
+no GPU/build/update. The [complete paired family](results/2026-10-16-matrix-vector-family.md)
+now rejects this implementation: only1.68%/1.50% less RGB/CDP GPU time, CDP queued
+wall slightly worse,7.18%/8.34% more warp instructions. Fewer shared-write conflicts
+do not satisfy the declared gates. All108 guards/665.846M integer/reference output
+checks/10,800 offline metrics pass; two warnings, zero builds/updates/actions,
+no worker. No integration, favorable subset, full-update trial or retiming.
+Next CPU-map actual JAX matrix interfaces and launch membership to the common
+native recurrence before another counter capture, not a padding/geometry/precision
+or shape-constant sweep. No prior timing/compiler feature/promotion;1.70× gap stays.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

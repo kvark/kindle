@@ -182,12 +182,24 @@ integration must share orientation-aware layout accounting with the existing
 capacity guard. Original CPU envelope-count failure/repair remains; no GPU calls,
 backend rebuilds or new update result. Keep58aff452 and general copy composition.
 
-**Next:** declare one complete54-contract paired numerical/counter/time comparison.
-Preserve K order/prefetch/splits/rounding/output/tapes/barriers and count both read
-and write costs. Require complete-workload benefit before backend integration and
-full-update qualification, without simply moving write conflicts to reads. No
-padding/tile/precision sweep, favorable orientation selector, rejected convolution
-scheme, prior timing, compiler feature or automatic promotion.
+The [complete vector-staging family](results/2026-10-16-matrix-vector-family.md)
+now rejects that implementation: all54 contracts improve weighted GPU time only
+1.68%/1.50% for RGB/CDP; CDP queued wall worsens.16%. Both5% time gates and the
+instruction-reduction gate fail. Warp work grows7.18%/8.34% despite substantially
+fewer write conflicts; every20 NN contract retains its total LSU count. Nine
+emitted pairs keep explicit float operations unchanged while adding vector-unit
+indexing; static IR does not explain native source sites. All108 guards,665.846M
+integer/reference output checks and10,800 offline metrics pass, with two warnings.
+No integration, full-update trial, favorable selector or retime. Zero builds/
+updates/actions; GPU ends14:20:56UTC, CPU interpretation14:39:01UTC, no worker.
+
+**Next:** CPU-map actual retained JAX matrix interfaces and launch membership
+against the native family, starting with the common imagined recurrence. The
+existing actual JAX/native convolution instruction comparison does not cover
+matrices. Prove layouts, epilogues and execution grouping before selecting a
+bounded counter capture. No padding/tile/precision/shape-constant sweep, favorable
+orientation selector, rejected convolution scheme, prior timing, compiler feature
+or automatic promotion. Keep58aff452 and the1.70x complete gap.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not

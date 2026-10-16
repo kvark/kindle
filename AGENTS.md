@@ -613,11 +613,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   make the existing capacity accounting orientation-aware; no favorable selector.
   Non-staging source, barriers/K order/rounding and58aff452 stay unchanged.
   Original CPU reviewer96-versus48 count failure and count-only repair remain;
-  zero GPU calls/builds/updates/actions, review13:57:45UTC, no worker. Next declare
-  one complete54-contract paired numerical/counter/time comparison, including
-  read-side costs, before backend integration/full-update qualification. No padding/
-  geometry/precision sweep, prior timing, compiler feature or automatic promotion.
+  zero GPU calls/builds/updates/actions, review13:57:45UTC, no worker. The complete
+  comparison below rejects this implementation. No padding/geometry/precision
+  sweep, prior timing, compiler feature or automatic promotion.
   Keep58aff452/1.70x and the broader goal open.
+- **Complete matrix vector-staging family rejected:** [result](docs/results/2026-10-16-matrix-vector-family.md).
+  All54 contracts/729 memberships: GPU RGB7.763→7.633ms,1.68%; CDP11.006→10.840ms,
+  1.50%. Queued wall improves1.54%/worsens.16%; both5% time gates fail. Warp work
+  rises7.18%/8.34% despite63.99%/50.92% fewer write conflicts. Tensor counts stay;
+  all54 control warp counts reproduce. All20 NN contracts retain exact total LSU
+  counts and unchanged scalar row geometry; ALU/FMA-pipe work increases. Static
+  float opcodes stay;16 new constant4 divisions/module are not native source-site
+  attribution or a new candidate. Nine-module/six-group CPU interpretation passes.
+  108 guards/two warnings,665.846M integer/retained-F64-reference output checks,
+  10,800 offline metrics/1,987 seals pass;87 nonadditive shared observations stay.
+  9,504 standalone calls/3,996 passes, zero builds/updates/actions. GPU14:20:56UTC,
+  interpretation14:39:01UTC; no worker. No integration, favorable selector, full-
+  update trial or retime. Keep58aff452/1.70x. Next CPU-map actual retained JAX
+  matrix interfaces/launch membership, especially the common imagined recurrence,
+  before selecting counters. No shape-constant/layout/geometry sweep or prior
+  timing. Production/Atari stay unchanged and the root-cause goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
