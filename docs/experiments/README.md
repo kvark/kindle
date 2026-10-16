@@ -1,12 +1,19 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [packet-axis result](../results/2026-10-16-packet-axis.md) rejects a
+numerically exact alternative: complete convolution19.089→21.217ms,11.15%
+slower. dW uniform work returns but total instructions rise; dX slows despite
+less L2 traffic.120 guards/22 warnings and offline counter audits pass. No
+full-update trial or promotion; keep834241b6 and the1.77× complete gap.
+
 October16's [word-staging result](../results/2026-10-16-word-staging.md) improves
 complete RGB51.763→48.068ms (7.14%) and CDP46.929→45.505ms (3.03%), with exact
 reports/tensors/full programs. All23 convolution operations improve15.03%;
 native counters confirm less instruction/shared-conflict work.124 guards pass,
 five warnings, no game actions. Keep isolated834241b6; RGB/JAX remains1.77x.
-Next preserve shared address calculations; no production or Atari promotion.
+The packet-axis follow-up above rejects that particular implementation;
+no production or Atari promotion.
 October16's [direct native counters](../results/2026-10-16-native-counters.md)
 use the supplied Perf SDK on the existing driver: all20 contracts pass. CNN1
 dX/dW execute15.94x/9.04x full-JAX warp instructions, with fewer tensor operations.

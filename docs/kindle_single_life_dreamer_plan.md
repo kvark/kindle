@@ -19,8 +19,15 @@ reports/targets/tensors and full plans/shaders. RGB remains1.77× inclusive JAX.
 Keep isolated native834241b6 with word staging/image views/device means/cached
 recording; no production or Atari promotion. The124 guards pass with five
 warnings. Native counters establish instruction/shared-feeding improvements,
-but substantial instruction overhead remains; next CPU-proof preservation of
-shared address calculations, not another tile sweep. No GPU worker remains.
+but substantial instruction overhead remains. No GPU worker remains.
+
+The subsequent [packet-axis test](results/2026-10-16-packet-axis.md) passes
+numerics but regresses the complete convolution family11.15%. Restoring uniform
+instructions in dW increases total instruction work; reduced dX L2 traffic does
+not improve time.120 guards/22 warnings and all offline audits pass, with no
+full-update trial or promotion. Keep834241b6 and1.77×. Next CPU-reconcile the
+remaining non-convolution native/JAX programs and host boundaries, without a
+new layout/tile sweep or an automatic GPU allocation. Parity remains open.
 
 **Preceding B32 result:** [connected image views](results/2026-10-15-image-views.md)
 reduces RGB54.205→51.945ms,4.17%, and CDP47.699→47.112ms,1.23%. Exact reports,

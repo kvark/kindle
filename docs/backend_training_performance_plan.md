@@ -22,7 +22,16 @@ The preceding candidate is native`67559ce5` with
 `99f8aab0` retains [GPU categorical means](results/2026-10-15-categorical-gpu.md);
 `28864210` retains the preceding [general-ordering trial](results/2026-10-14-convolution-scheduling.md).
 
-**Latest boundary: [word staging qualifies complete updates](results/2026-10-16-word-staging.md).**
+**Latest diagnosis: [column-major packet axis is rejected](results/2026-10-16-packet-axis.md).**
+Complete convolution19.089→21.217ms,11.15% slower, with all numerical checks
+passing. Restoring dW uniform-pipe work does not reduce total instructions:
+they rise17.06%, time1.01%, while shared conflicts stay flat. dX instructions/
+time rise despite less L2 traffic. Uniformity, occupancy or traffic alone is
+not the missing mechanism.120 guards/22 warnings, exact outputs and
+offline counter audits pass; GPU ends06:38:36UTC, no worker. No full-update
+trial, selector or promotion. Keep834241b6 and the1.77× complete gap.
+
+**Latest qualified update: [word staging](results/2026-10-16-word-staging.md).**
 RGB51.763→48.068ms,7.14%; CDP46.929→45.505ms,3.03%, with exact reports,
 targets/tensors and full-program/source checks. Complete convolution operations
 improve15.03%, including all23 occurrences and one regression. CNN1 dX nearly
@@ -44,13 +53,14 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** prove a packet mapping that preserves shared address calculations,
-including subgroup mapping and operand layout. Keep tiles/K order/compensation/
-rounding/interfaces and the complete-family gates. Current dX/dW still execute
-8.63x/8.17x full-JAX warp instructions; a proposed fix needs counters and whole
-updates, not source arithmetic alone. No implicit contiguous-lane assumption,
-automatic allocation, geometry sweep, favorable selector, numerical relaxation
-or speculative Naga project.
+**Next:** CPU-reconcile the remaining non-convolution native programs and host
+boundaries with the retained complete JAX capture before selecting another
+intervention. Require common work and explicit dependencies; incomparable
+instrumented/ordinary timing regions cannot be subtracted into a savings budget.
+Convolution feeding remains open: current dX/dW still execute8.63x/8.17x
+full-JAX warp instructions. Do not revive the rejected packet orientation,
+start a layout/geometry sweep or infer parity from source arithmetic. Keep
+numerical gates and834241b6; no automatic GPU allocation or compiler project.
 The [complete compact-channel/reuse policy](results/2026-10-15-reuse-policy.md)
 still loses21.72% and stays rejected. Its source-work reduction was not measured
 hardware improvement. Host targets and non-convolution execution remain open;

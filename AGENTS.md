@@ -383,10 +383,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   05:54:22; no worker. Keep isolated native`834241b6` under
   `runs/convolution-word-staging-20261016.ssN5oC6N`, with
   `MEGANEURA_CONVOLUTION_WORDS=1`, image views/device means/cached recording.
-  Next CPU-proof packet addressing that preserves shared calculations, including
-  subgroup/operand-layout contracts; no implicit contiguous-lane assumption,
-  geometry/selector sweep, Naga project or automatic allocation. Whole parity,
+  The following packet-axis trial tests shared calculations without assuming
+  contiguous subgroup membership and rejects that implementation. No geometry/
+  selector sweep, Naga project or automatic allocation. Whole parity,
   non-convolution work and learning quality remain open. No production/Atari promotion.
+- **Column-major packet axis rejected:** [result](docs/results/2026-10-16-packet-axis.md).
+  All23 products19.089→21.217ms,11.15% slower; seven of nine changed contracts
+  regress. No full-update trial, selector or production change. dW uniform-pipe
+  work returns.46→372.22M and ALU falls765.88→569.86M, but total instructions
+  rise17.06% and time1.01%; shared conflicts stay26.9M. dX instructions rise
+  12.48%/time27.08% despite42.65% less L2 traffic; conflicts remain21.5M.
+  Tensor counts stay exact; uniformity/occupancy/traffic alone are not the fix.
+  The eight-versus-two reduction cursors and orientation change together, not
+  an isolated SASS attribution. CPU local-ID ownership is permutation-safe;
+  no implicit subgroup mapping or compiler feature.304 modules/5.690M addresses/
+  10.492M cursor transitions pass.120 guards/22 warnings,2.690M F64/774.862M exact
+  pairs,116 ranges/4,756 offline metrics/1,274 seals;9,320 standalone calls,
+  1,360 counter replays, zero updates/actions. GPU ends06:38:36UTC; CPU06:40:19,
+  no worker. Retain the exploratory reader syntax failure/repair. Keep834241b6
+  and1.77x complete gap. Next CPU-reconcile remaining non-convolution native/JAX
+  programs and host boundaries before selecting another intervention; no sums
+  of incomparable timing regions, renewed layout/tile sweep or automatic GPU run.
+  Convolution feeding and whole parity remain open, Atari stopped.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -396,9 +414,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the word-staging study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October15 upstream: `f648a453`/`e7c3f7b`; Meganeura's
+  this candidate. Latest October16 upstream: `f648a453`/`01be8446`; Meganeura's
   two new search/attention exploration fixes do not change ordinary convolution.
-  No runtime refresh or historical repin from this review.
+  Blade's new entry-point/override resolution takes its unchanged fast path for
+  all152 tested single-entry/override-free variants. No runtime refresh or
+  historical repin from this review.
   CI status belongs on PR31.
 - **Closed diagnostics stay closed.** No native assembly-query retry (the
   retained query returned no representations), failed Nsight Graphics injection
