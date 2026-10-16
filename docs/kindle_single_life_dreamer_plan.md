@@ -93,10 +93,18 @@ large tiled matrix path still emits scalar shared stores despite vector global
 loads. It carries91.04%/93.24% of RGB/CDP nominal matrix MACs; this is not time
 coverage. All1,519 heavy occurrences and28 selected modules reconcile. The
 conditional convolution bank model fails on packed kernels and does not identify
-output-store cost. No GPU work; CPU reviewer failure/repair retained. Next
-prepare a bounded unchanged-kernel counter diagnostic for all54 actual tiled
-matrix contracts plus checked controls, not another padding/geometry/precision
-sweep, prior timing or compiler feature project.
+output-store cost. The [matrix capture](results/2026-10-16-matrix-feeding-counters.md)
+now covers all54 tiled contracts plus11 checked controls: zero local traffic,
+exact tensor counts,335.647M output values and6,500 offline metrics pass. Native
+warp/tensor instruction ratios11.94/12.72 and shared read/write conflicts identify
+feeding work, not latency attribution. Checked-vector read conflicts warn against
+blind layout copying. Preserve the observer timeout/bulk-copy repair and44/65
+failed exact counter identities; separate CPU review changes no raw evidence or
+numerical gates.65 passing/one failed guard, no warnings/updates/actions/workers.
+Next CPU-prove generic physical-major vector staging and cooperative consumers
+across all orientations/types, accounting for read layout/storage as well as
+writes. No automatic GPU allocation, padding/geometry/precision sweep, prior
+timing or compiler feature project; complete1.70× gap remains.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

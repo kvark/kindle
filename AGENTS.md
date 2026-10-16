@@ -589,10 +589,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   measured payload/wavefront relations reconcile. The96 intercept stays
   unattributed; Naga preserves cooperative-store opcodes, not known driver lowering.
   Original CPU review substring failure and construction-specific repair remain.
-  Zero GPU calls/updates/actions, no worker. Keep58aff452/1.70x. Next prepare a
-  separately bounded unchanged-kernel counter diagnostic for all54 tiled matrix
-  contracts plus checked controls before selecting a staging change. No padding/
-  geometry sweep, prior timing, compiler project or automatic promotion.
+  Zero GPU calls/updates/actions, no worker. Keep58aff452/1.70x. The following
+  unchanged-kernel capture now covers this matrix path.
+- **Tiled matrix counters observed:** [result](docs/results/2026-10-16-matrix-feeding-counters.md).
+  All54 actual tiled contracts/729 occurrences plus11 checked controls have zero
+  local traffic and exact expected tensor counts. Weighted RGB/CDP warp-to-tensor
+  counts11.94/12.72; shared read/write conflict fractions32.52/64.17% and32.28/60.39%
+  are transactions, not time shares or speed promises. Checked-vector reads are
+  about12 conflicts/tensor versus tiled1; shapes differ, no alternative timing.
+  65 passing/one failed guard, zero warnings,335.647M output/161.773M input values,
+  6,500 offline metrics/1,249 seals pass;5,720 completed calls plus2–3 interrupted,
+  zero updates/actions. GPU ends13:26:37UTC; no worker. Preserve the180s mapped-read
+  observer timeout/partials, reviewed bulk-copy repair and CPU schema/dependency
+  failures. Original exact shared total=read+write gate fails44/65, max.12737%;
+  separate CPU review reports independent counters without a tolerance/GPU retry.
+  Next CPU-prove one generic physical-major vector staging/consumer contract for
+  all tiled matrix orientations/types, including read layout and storage budget.
+  No GPU allocation, padding/geometry sweep, prior timing, compiler project or
+  automatic promotion. Keep58aff452/1.70x and the broader goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -159,12 +159,26 @@ fails every packed contract; legal subgroup permutations also change predictions
 The output intercept and driver lowering remain unattributed. Original CPU
 reviewer failure/repair are retained; no GPU work or backend rebuild.
 
-**Next:** prepare a separately bounded unchanged-kernel counter diagnostic for
-the54 actual tiled matrix contracts, plus checked-path controls. Measure shared
-write/read behavior, instructions and local traffic before choosing a staging
-change. Require reduced instruction/transfer work without simply moving write
-conflicts to reads; no padding/tile sweep or rejected-orientation revival.
-Keep the general composition; no automatic GPU allocation or compiler project.
+The [complete matrix counter diagnostic](results/2026-10-16-matrix-feeding-counters.md)
+now covers all54 tiled contracts/729 occurrences plus11 checked controls.
+Zero local traffic and exact tensor counts pass in all65; weighted RGB/CDP
+warp instructions per tensor instruction are11.94/12.72. Shared read/write
+conflicts are substantial, not measured time shares. Checked-vector reads have
+about12 conflicts/tensor versus tiled1, on different shapes; copying that layout
+is not an established win.335.647M output values/6,500 offline metrics pass.
+65 guards pass, one observer times out; reviewed bulk-copy repair preserves its
+partials. The original exact shared counter identity fails44/65 up to.12737%;
+report independent counters, no relaxed numerical gates or GPU review retry.
+No new backend, full-update time or learner result; all workers finish.
+
+**Next:** CPU-prove one type-generic physical-major vector staging and cooperative
+consumer contract across all54 actual tiled matrices and existing typed cases.
+Keep K order/prefetch/splits/rounding/output/tapes/barriers, and account for both
+read/write layouts and shared storage. Require reduced instruction/transfer work
+without simply moving write conflicts to reads. Only a passing CPU proof justifies
+a separately declared complete-family comparison; no padding/tile sweep,
+rejected convolution-orientation revival, automatic allocation or compiler project.
+Keep the general copy composition and unchanged58aff452.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
