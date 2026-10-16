@@ -125,3 +125,9 @@ Naga feature, new GPU allocation or promotion follows this result. The full
 root-cause/parity goal remains open.
 
 Artifacts: `runs/jax-convolution-counters-20261016.1F8DAYTk`.
+
+Publication correction: the following [load-contract audit](2026-10-16-convolution-load-contract.md)
+finds that commit9c21174 appended follow-up notes to this experiment's sealed
+declaration after the source audit. The original bytes are restored; the edited
+version and initial failed audit remain retained. Runtime/results are unchanged,
+and the separate census/supplement declarations still document both allocations.

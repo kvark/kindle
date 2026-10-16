@@ -142,9 +142,15 @@ and18 helpers: native executes4.255× warp/7.287× ALU instructions despite fewe
 tensor instructions. All passes show excess; nine typed occurrences hold84.50%
 of native instructions, not time. Original36/41 capture stays failed; reviewed
 metadata/supplement complete coverage with exact model/HLO controls. Two passing/
-one failed guard, zero warnings/816 synthetic updates; no worker. Next CPU-account
-current typed/packed feeding work; existing cursors/word staging are not missing
-features. Keep58aff452/1.70×, production/Atari unchanged and the full goal open.
+one failed guard, zero warnings/816 synthetic updates; no worker. The
+[CPU load audit](results/2026-10-16-convolution-load-contract.md) now confirms
+scalar global reads despite vector shared stores, not hot BF16 conversion or
+injected bounds checks. Safe aligned-four composition reduces modeled source
+reads28.03%; this is not a measured gain or explanation of all ALU overhead.
+Next CPU-prototype shared address/mask/read-span composition, preserving scalar
+fallback and the complete-family gate. The prior sealed-declaration publication
+error is restored with its failure retained; no runtime/GPU change. Keep58aff452/
+1.70×, production/Atari unchanged and the full goal open.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

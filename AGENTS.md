@@ -700,10 +700,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass. Two passing/one failed guard, no warnings,816 synthetic updates/zero
   native calls/actions. GPU16:25:10UTC, CPU16:28:01UTC; no worker. Retain section,
   receipt-race, singular-pass, CSV-unit and metric-membership reader failures;
-  offline repairs do not repeat GPU work. Next CPU-account current typed/packed
-  feeding structures; incremental cursors/exact division/word staging already
-  exist. No new allocation, sweep, compiler feature or promotion;58aff452/1.70x
-  and the root-cause goal remain unchanged.
+  offline repairs do not repeat GPU work. The following source audit narrows
+  feeding work;58aff452/1.70x and the root-cause goal remain unchanged.
+- **Convolution load contract passes on CPU:** [result](docs/results/2026-10-16-convolution-load-contract.md).
+  All20 contracts/23 occurrences: nine typed paths retain16 scalar global loads
+  per static K-loop and four vector shared stores; no hot BF16 conversion or
+  injected array checks. Existing cursors/divisors/compensation stay.196.947M
+  positions and independent per-case counts prove aligned-four composition:
+  modeled source reads9.566→6.885B,28.03%, not hardware traffic/instructions or
+  speed. A58.59%/B11.52% reduction is uneven; repeated masks/addresses remain.
+  All152 CPU re-emissions match/20 actual modules validate. Original WGSL seals
+  pass; retained runtime-option SPIR-V was not historically sealed. Restoring
+  the accidentally appended prior declaration repairs the initial audit;
+  edited version/failure remain, runtime unchanged. Public import offset is zero,
+  ordinary/donor alignment is preserved; raw alias helper is not a size guard.
+  CPU17:13:51UTC, zero GPU/builds/updates/actions, no worker. Next CPU-prototype
+  one type-aware address/mask/read-span composition with scalar fallback before
+  any separate complete-family qualification. No width/geometry sweep, new Naga
+  feature, prior timing or promotion. Keep58aff452/1.70x and the goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

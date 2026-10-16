@@ -45,16 +45,3 @@ precision sweep, prior-candidate timing, promotion or Atari allocation.
 
 Upstream12df95c/4845d652 rechecked unchanged. Artifacts:
 `runs/jax-convolution-counters-20261016.1F8DAYTk`.
-
-## Reviewed follow-ups and outcome
-
-The first capture fails36/41 completeness. The retained
-`census_declaration.md` declares a separate broad-selector metadata observation;
-CPU preparation narrows it to nine explicit launch metrics before execution.
-It verifies all41 exact identities. `supplement_declaration.md` then declares
-seven profiles: the five missing mains and two same-name controls. Original
-profiles take precedence and control CTA/warp/tensor counters must match exactly.
-Both follow-ups preserve the272-update benchmark and all numerical/HLO gates;
-each has a300-second guard/420-second GPU service,12GiB/no swap/no CPU quota.
-No automatic retry or native dispatch is added. All three allocations and CPU
-reader failures remain in the [complete result](../results/2026-10-16-jax-convolution-counters.md).

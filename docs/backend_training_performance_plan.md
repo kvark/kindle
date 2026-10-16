@@ -239,11 +239,22 @@ failed guard, zero warnings/816 synthetic updates, last GPU16:25:10UTC, no worke
 Retain all CPU reader failures, including unit scaling and metric membership;
 offline repairs do not repeat GPU collection.
 
-**Next:** CPU-account the current typed/packed operand loads, predicates, address
-updates, cooperative stores and compensation against captured library schedules
-before choosing one complete-family mechanism. Incremental cursors, exact
-division helpers and typed word staging already exist. Counter ratios alone do
-not locate source instructions. Keep caller/pass/kernel scopes distinct; no
+The [load-contract audit](results/2026-10-16-convolution-load-contract.md) now
+confirms scalar global reads in all nine typed paths, without hot-loop BF16
+conversion or injected bounds checks. All20 contracts/23 occurrences and152
+CPU emissions reconcile.196.947M address positions/independent counts prove
+aligned-four composition could reduce modeled source reads28.03%, not hardware
+work or time. A58.59%/B11.52% reduction is uneven; repeated predicates/coordinates
+remain. Public external bindings use offset zero; general logical extents still
+need explicit eligibility. Original sealed-declaration publication error and
+CPU restoration remain; runtime bytes are unchanged. No GPU/build/update/action.
+
+**Next:** CPU-prototype one type-aware address/mask/read-span composition with
+exact scalar fallback. Preserve tiles/splits/K order/rounding/compensation and
+prove actual generated code/binding eligibility before a separately declared
+complete-family numerical/counter/timing check. Wider declarations alone are
+not an explanation of the7.287x ALU count. Existing cursors/division helpers/
+word staging stay. Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,
 prior timing, compiler feature or automatic promotion. Keep58aff452/1.70x.
