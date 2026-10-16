@@ -44,6 +44,16 @@ reduction/BF16 conversion to one tiled/BF16 product; both retain conversion.
 This is a candidate cause, not an established full-gradient explanation.
 Keep the failed gates, unqualifiedaca80566 and qualified834241b6 distinct.
 
+The [real-input intervention](results/2026-10-16-prior-real-inputs.md) now
+attributes the forward divergence to that first product. Its135/163 changed
+BF16 values produce8,028/3,549 changed RGB/CDP logits. Substituting only the
+serial product makes all3.146M path values, including524,288 logits, exact.
+All102 actual-world contracts, live copies, local partials/precision checks and
+independent7.340M paired comparisons pass. One guard/no warnings, six closed
+forward paths/zero raw backwards or updates. The CPU approximation underpredicts
+the changed values; it is not bit-exact GPU arithmetic. Full-gradient attribution
+and candidate qualification remain open; no timing or production change.
+
 **Graph diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
 Native144 matrix products versus JAX9 do identical1.107G nominal MACs outside
 the posterior recurrence. This explains135 of159 extra matrix products, not
@@ -86,10 +96,12 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** inspect saved actual prior inputs/weights and the first product's changed
-partition/rounding contract. The whole-world native-pair gradient gate now fails;
-do not repeat its cohort, relax the gate or proceed to timing. Keep the standalone
-F64 diagnosis distinct. The implementation remains isolated and unqualified.
+**Next:** separately diagnose the failed whole-world gradients using the exact
+serial first-product substitution, now proven to restore this forward path.
+Retain the unchanged ordinary control, both original/changed late targets and
+all original gates. This is causal instrumentation, not a qualification retry or
+timing allocation. Keep the standalone F64 diagnosis distinct. Additional
+backward reduction differences remain possible; the candidate stays unqualified.
 Keep causal observation/imagination sequential,
 masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
 gradient/boundary qualification still precedes a matched complete comparison.

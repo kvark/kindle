@@ -478,6 +478,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Next inspect saved real prior inputs/weights and both reduction contracts.
   No relaxed gates, qualification replacement, K/tile sweep or timed promotion.
   Keep834241b6 and1.77x; this native-pair failure differs from the F64 diagnosis.
+- **Real-input forward divergence attributed:** [result](docs/results/2026-10-16-prior-real-inputs.md).
+  First prior products differ135/163 BF16 values, yielding8,028/3,549 changed
+  RGB/CDP logits. Exact serial-product substitution makes all3.146M subsequent
+  path values, including524,288 logits, exact.102 actual-world contracts and
+  six closed dependency paths pass; no KL/backward seed or posterior placeholder
+  executes. All2.097M partial/F64 checks and1.573M normalization/activation values
+  each pass their existing gates/contracts. CPU dot16 predicts only15/17 changes;
+  it is not bit-exact GPU arithmetic or independent partition/tiling attribution.
+  One guard/no warnings,568 forward dispatches/two copies/zero raw backwards,
+  updates/actions;2,855 seals, GPU ends09:46:51UTC, no worker. Independent7.340M
+  paired-value audit/four negatives pass. CPU import/schema/status failures stay;
+  repaired readers match full JSON without GPU repeats or raised limits.
+  The113 whole-world gradient failures remain. Next separately attribute them
+  with the same first-product intervention, retaining ordinary controls and both
+  late-target conditions; no timing, relaxed gates, sweep or promotion. Keep834241b6.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

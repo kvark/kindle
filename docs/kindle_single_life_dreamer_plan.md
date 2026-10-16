@@ -41,8 +41,13 @@ F64 result. The [actual-world test](results/2026-10-16-prior-world.md) passes
 staging/state checks, but113 gradient arrays fail the original pointwise gate.
 All relativeL2 errors stay below.007095; this does not make the test pass.
 Four guards/no warnings/24 raw backwards, no timing or optimizer updates.
-First-prior partitioning changes8→1 while retaining BF16 conversion; inspect
-its real saved inputs before attributing the gradient difference or changing code.
+First-prior partitioning changes8→1 while retaining BF16 conversion. The
+[real-input intervention](results/2026-10-16-prior-real-inputs.md) now attributes
+the forward divergence: replacing only this product makes all later values and
+524,288 RGB/CDP logits exact. One guard/no warnings, six forward closures/zero
+backwards or updates. The113 gradient failures remain; next separately apply
+that intervention to raw world gradients with unchanged ordinary controls and
+both late-target conditions. No relaxed gate, timing or promotion follows.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate
