@@ -887,6 +887,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   mechanism and CPU proof before another GPU allocation. No closed-family revival,
   geometry/precision sweep, prior-batching timing or new compiler project implied.
   Full root-cause and learning-quality goals remain open.
+- **Direct F32 output CPU contract passes; GPU qualification running:**
+  [result](docs/results/2026-10-16-direct-output-contract.md).320 paired modules,
+  275.972M explicit output addresses and current23 RGB/11 CDP memberships pass.
+  Uniform full-tile/alignment eligibility covers104.595M/280.986M output values,
+  seven occurrences; tails/reduced outputs/packed dW retain scatter. K loops,
+  geometry/compensation/rounding and shared allocation stay unchanged. Ten negative
+  checks pass; preserve initial reader syntax failure/repair. No compiler project.
+  Fixed100-guard numerical/timing queue starts23:14:15UTC under
+  `kindle-direct-output-gpu-20261016.service`; terminal CPU audit is automated.
+  Artifacts`runs/convolution-direct-output-20261016.93l7AixM`. Require5% aggregate
+  GPU/queued-wall benefit and5% control calibration. Review terminal artifacts
+  before follow-up; no retime, favorable subset, counter/full-update allocation
+  or promotion. Keepe45b9c43/1.59x; production/Atari and goal remain unchanged.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -896,8 +909,11 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the copy-composition study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October16 upstream: `12df95c`/`4845d652`; six new typed-
-  matrix/staging/tuning/accuracy commits are reviewed above, not runtime-qualified.
+  this candidate. Latest October16 upstream: `41a15d31`/`4845d652`; seven new
+  tuning/calibration commits preserve codegen/shader/compiler trees and ordinary
+  unbounded pipeline construction. Isolated fetch/audit, no refresh or search.
+  The preceding six typed-matrix/staging/tuning/accuracy commits through12df95c
+  are reviewed above, not runtime-qualified.
   Preceding `f648a453` search/attention fixes do not change ordinary convolution.
   Blade's preceding entry-point/override resolution takes its unchanged fast
   path for all152 tested single-entry/override-free variants. New workgroup/

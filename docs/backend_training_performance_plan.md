@@ -22,6 +22,17 @@ control is native`58aff452` from
 `MEGANEURA_CONVOLUTION_WORDS=1` plus image views/device means/cached recording.
 Its preceding control is native`834241b6` from
 [typed word staging](results/2026-10-16-word-staging.md).
+The [direct F32 output CPU contract](results/2026-10-16-direct-output-contract.md)
+now passes:320 paired modules/275.972M explicit addresses/current RGB/CDP plans.
+The existing API can skip explicit scratch/scatter on aligned full tiles covering
+104.595M/280.986M output values in seven RGB occurrences. K loops and shared
+allocation stay unchanged; this is not the main feeding-loop fix or a speed claim.
+One separately declared whole-family numerical/timing queue is running, with
+automated failure stops and terminal audit. Require5% aggregate GPU/queued-wall
+benefit and5% calibration. No subset, retime, compiler project or automatic
+integration. Upstream41a15d31's seven new commits leave ordinary codegen/shader/
+compiler trees unchanged; no repin. Preserve the CPU syntax-reader failure.
+
 The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from
 [connected image views](results/2026-10-15-image-views.md). Its control is
