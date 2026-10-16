@@ -454,6 +454,30 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   zero raw backwards/updates/actions;2,477 seals, no worker. Preserve CPU reader/
   JSON failures; exact constant-bit repair and seven negatives pass without GPU
   repeat. Next diagnose raw-gradient rounding, not tune final-output thresholds.
+- **Prior-gradient discrepancy diagnosed:** [result](docs/results/2026-10-16-prior-gradient.md).
+  One original168-dispatch backward preserves every output/40 raw gradients.
+  KL F32 differences<=1.932e-10 change50 BF16 derivatives, then115/403 in earlier
+  layers. All36 local checks/7.686M comparisons pass unchanged gates; observed
+  operands explain all69 first-variant failed weights. Second-variant source-F32
+  hypothesis clears both arms; not bit-exact Vulkan or end-to-end F64 qualification.
+  Original14 failed arrays stay.49 finite differences/seven negatives,2,669 seals,
+  one guard/no warnings/one raw backward/zero updates/actions; no worker.
+  Preserve serde-array compile and35-versus36 audit failures/repairs. No backend
+  rebuild. Next separately qualify actual whole/staged world gradients before
+  timing; keep834241b6/1.77x, not unqualifiedaca80566. No Atari promotion.
+- **Actual-world prior batching fails:** [result](docs/results/2026-10-16-prior-world.md).
+  Eight whole/staged pairs, poisoned late-input isolation, restoration and all
+  initial/final292/346 tensors pass exactly. All56 outputs pass, but113/308
+  gradient arrays/903,879 values fail pointwise gates; all relativeL2<=.007095.
+  Independent52.326M-value audit reproduces failures. Four guards/no warnings,
+  24 raw backwards/zero updates/actions;3,455 seals, no worker or timing.
+  Disabled compiled control matches; each workload removes135 products/982
+  dispatches, not barrier groups. First prior product changes8-way F32 partials/
+  SumRows/BF16 to one tiled/BF16 product. All34 paths preserve final conversion;
+  changed accumulation is a candidate cause, not full causal attribution.
+  Next inspect saved real prior inputs/weights and both reduction contracts.
+  No relaxed gates, qualification replacement, K/tile sweep or timed promotion.
+  Keep834241b6 and1.77x; this native-pair failure differs from the F64 diagnosis.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

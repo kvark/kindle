@@ -33,10 +33,19 @@ The [isolated prior-batching implementation](results/2026-10-16-prior-batching.m
 reduces standalone products144→9 and passes all paired checks, but independent
 F64 gates fail in both arms. The [forward tape](results/2026-10-16-prior-tape.md)
 now explains the logit difference through small F32 errors crossing BF16 midpoints;
-all local matrices/biases are exact. Raw-gradient failures remain open. Preserve
-original failures; no actual-world qualification or full timing yet.
+all local matrices/biases are exact. The [backward capture](results/2026-10-16-prior-gradient.md)
+now traces first-variant weight failures to F32 KL differences changing BF16
+derivative inputs. All local derivatives/conversions pass unchanged gates;
+second-variant source-F32 gradients also pass. Preserve the original failed
+F64 result. The [actual-world test](results/2026-10-16-prior-world.md) passes
+staging/state checks, but113 gradient arrays fail the original pointwise gate.
+All relativeL2 errors stay below.007095; this does not make the test pass.
+Four guards/no warnings/24 raw backwards, no timing or optimizer updates.
+First-prior partitioning changes8→1 while retaining BF16 conversion; inspect
+its real saved inputs before attributing the gradient difference or changing code.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
-forward prefixes. No warnings, optimizer updates or actions. The separate
+forward prefixes; the backward capture adds one guard/one raw backward.
+No warnings, optimizer updates or actions. The separate
 [upstream workgroup review](results/2026-10-16-workgroup-contract.md) now passes:
 all23 resource contracts fit, no shader executes. The rejected October15 family
 already used tensor addressing/workgroup scope; no retry or compiler project.

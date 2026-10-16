@@ -1,10 +1,24 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [actual-world prior-batching test](../results/2026-10-16-prior-world.md)
+passes exact staging/state checks but fails113 gradient-array pointwise gates.
+All relativeL2 errors remain below.007095; no timing or promotion follows.
+Four guards/no warnings/24 raw backwards, zero optimizer updates/actions.
+The first prior product changes8-way split reduction to one tiled product;
+both retain BF16 conversion. This is a candidate cause, not causal proof.
+
+October16's [prior-gradient diagnosis](../results/2026-10-16-prior-gradient.md)
+explains first-variant failures through F32 KL/BF16 derivative propagation.
+All36 local checks and both-arm matrix checks pass unchanged gates; second-
+variant source-F32 gradients pass too. Original F64 failures remain failed.
+One guard/no warnings/one raw backward/zero updates/actions; no speed claim.
+The subsequent actual-world comparison above fails, so timing stays stopped.
+
 October16's [prior forward tape](../results/2026-10-16-prior-tape.md) explains the
 logit discrepancy:2.097M local matrix/bias values are exact; small legal F32
 normalization/SiLU errors cross BF16 midpoints. Original F64 failures remain;
-raw-gradient failures are still open. One guard/no warnings/two forward prefixes,
+raw-gradient diagnosis follows above. One guard/no warnings/two forward prefixes,
 zero complete backwards/updates/actions. No qualification or speed promotion.
 
 October16's [upstream workgroup review](../results/2026-10-16-workgroup-contract.md)

@@ -28,10 +28,20 @@ all serial/batched comparisons pass. Independent F64 checks fail14 arrays
 in both arms. The subsequent [forward-tape capture](results/2026-10-16-prior-tape.md)
 now explains the logit discrepancy: local matrices/biases match exactly;
 small permitted F32 normalization/SiLU differences cross BF16 midpoints.
-It does not explain the remaining raw-gradient failures. The original boundary
-test used one guard/no warnings,16 raw backwards and zero optimizer updates/actions;
-the tape adds one guard/no warnings and two forward-only prefixes. No actual
-whole/staged check or full timing follows.
+The [backward diagnosis](results/2026-10-16-prior-gradient.md) now explains the
+first variant's remaining failures: small F32 KL errors change50 BF16 derivative
+values, propagating to115/403 earlier-layer operands. All36 local checks and
+both-arm matrix rechecks pass unchanged gates; the operand changes account for
+all69 failed weights. A source-F32 calculation clears second-variant gradients
+in both arms. This is not an end-to-end F64 pass: all original failures remain.
+The new capture uses one guard/no warnings/one raw backward/zero updates/actions;
+no worker or timing result. The subsequent [actual-world comparison](results/2026-10-16-prior-world.md)
+passes eight whole/staged pairs, unchanged states and all56 outputs, but fails
+113 raw-gradient arrays at903,879 values. RelativeL2 remains below.007095;
+that does not override pointwise failures. Four guards/no warnings/24 raw
+backwards, no timing. First-prior execution changes eight F32 partials plus
+reduction/BF16 conversion to one tiled/BF16 product; both retain conversion.
+This is a candidate cause, not an established full-gradient explanation.
 Keep the failed gates, unqualifiedaca80566 and qualified834241b6 distinct.
 
 **Graph diagnosis: [the training prior is unnecessarily unrolled](results/2026-10-16-nonconvolution-contract.md).**
@@ -76,10 +86,11 @@ The two derivative captures show<6% peak DRAM throughput and122M/158M
 shared-bank conflicts; conflicts are not yet isolated removable latency.
 No missing-tool or GPU-health/approval blocker remains; all workers exit.
 
-**Next:** diagnose the training-prior raw-gradient finite-precision discrepancy
-without relaxing its gates or repeating qualification cohorts. The forward-only
-tape capture explains logits but runs no complete backward. The implementation is
-isolated, not qualified or timed. Keep causal observation/imagination sequential,
+**Next:** inspect saved actual prior inputs/weights and the first product's changed
+partition/rounding contract. The whole-world native-pair gradient gate now fails;
+do not repeat its cohort, relax the gate or proceed to timing. Keep the standalone
+F64 diagnosis distinct. The implementation remains isolated and unqualified.
+Keep causal observation/imagination sequential,
 masks/free nats/stop-gradients and staged late targets intact. Actual raw-world
 gradient/boundary qualification still precedes a matched complete comparison.
 The [upstream workgroup review](results/2026-10-16-workgroup-contract.md) is complete:
