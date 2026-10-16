@@ -271,13 +271,22 @@ dX remainder helpers have divisor1. Neither proves driver elimination/inlining.
 Retain CPU classification/newline failures and repairs. Direct divergent branches
 are not measured; local-ID ordering does not establish subgroup membership.
 
-**Next:** the qualified baseline already has nearly32 active threads per warp
-instruction. Preserve its guarded scalar loads and CPU-prove shared derivative
-common-base/carry arithmetic, reducing redundant coordinates/cursors without
-adding per-lane alignment fast/slow paths. Preserve masks, load bodies, K order,
-precision, compensation, barriers and general small/strided cases. This is not a
-vector-width/geometry sweep or parity promise; library feeding/reuse remains open.
-No new GPU allocation follows from this diagnosis alone.
+The [shared-address CPU proof](results/2026-10-16-convolution-carry.md) now passes:
+six derivative contracts share common-base/carry arithmetic;17 forward/packed
+occurrences stay exact.532 modules validate; actual emitted expressions match
+184.591M address slots,5.244M cursor transitions,20 small cases and99,585 boundary
+carries. Exact structural scope preserves masks, scalar loads, B-side code,
+types/K order/compensation/layouts/barriers. No new alignment branch or helper.
+Static dX divisions/calls and dW branches decrease, but select/min/max work grows;
+this is not a native-instruction or speed result. CPU-only, no retry/worker.
+
+**Next:** separately declare one complete-family numerical/counter/ordinary-time
+comparison with unchanged gates, products, transforms and reductions. The
+qualified baseline already has nearly32 active threads per warp instruction;
+the new arithmetic must demonstrate an actual benefit without losing that
+execution behavior. No full-update integration unless that comparison passes.
+No automatic allocation, vector-width/geometry sweep or parity promise;
+library feeding/reuse remains open.
 Keep caller/pass/kernel scopes distinct; no
 additive gap budget from incompatible boundaries. No padding/tile/precision/shape-
 constant sweep, favorable orientation selector, rejected convolution scheme,

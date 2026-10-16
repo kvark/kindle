@@ -159,10 +159,16 @@ in both arms and a passing positive control. Fewer thread instructions but more
 warp instructions explain the failed candidate's lost active lanes, not the
 baseline's remaining gap. No direct divergence/inlining attribution.41 guards/
 40 warnings,2,050 counter passes; zero updates/actions/new timings. GPU ends
-18:55:17UTC, no worker; CPU failures and repaired audits remain. Next CPU-prove
-shared derivative address/carry arithmetic while retaining the baseline's scalar
-loads/masks/K order/precision/barriers and general small/strided cases. No renewed
-width/geometry sweep, automatic GPU allocation or compiler feature follows.
+18:55:17UTC, no worker; CPU failures and repaired audits remain. The
+[shared derivative-address proof](results/2026-10-16-convolution-carry.md) now
+passes532 offline modules,184.591M actual address slots,5.244M cursor transitions
+and small/odd/strided/boundary checks. Six derivatives change while17 forward/
+packed occurrences remain exact; scalar loads/masks/types/K order/layouts/
+compensation/barriers stay. No new alignment fast/slow path. Static operation
+reductions are not measured speed; no GPU execution or retry, no worker.
+Next separately declare one complete-family numerical/counter/time comparison;
+integration requires its existing gates to pass. No renewed width/geometry
+sweep, automatic GPU allocation or compiler feature follows.
 The prior sealed-declaration publication error is restored
 with its failure retained. Keep58aff452/1.70×, production/Atari unchanged and
 the full root-cause/parity goal open.

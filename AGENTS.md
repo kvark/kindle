@@ -747,11 +747,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   GPU18:55:17UTC; no worker. CPU proof covers1.311M unreachable dW fallback
   positions and65,564 interpreted constant-one remainder values; subgroup mapping
   is not inferred. Signed-helper and terminal-newline audit failures/repairs stay.
-  Next CPU-prove derivative common-base/carry arithmetic from qualified scalar
-  loads, preserving masks/load bodies/K order/precision/compensation/barriers
-  and general small/strided cases. No alignment fast/slow path, vector-width/
-  geometry sweep, automatic GPU allocation or promotion. Keep58aff452/1.70x;
+  The CPU common-base/carry proof below preserves qualified scalar loads.
+  No alignment fast/slow path, vector-width/geometry sweep or promotion.
+  Keep58aff452/1.70x;
   library feeding/reuse, non-convolution costs and the full goal remain open.
+- **Shared derivative address CPU proof passes:** [result](docs/results/2026-10-16-convolution-carry.md).
+  All20 contracts/23 occurrences: six derivatives change,17 forward/packed
+  occurrences stay exact.532 modules validate;152 old controls reproduce and
+  222 typed variants change. Actual emitted-expression interpretation matches
+  184.591M A slots/115.384M valid reads,5.244M cursor transitions,20 small cases,
+  99,585 boundary carries; ten mutations reject. Exact structural scope preserves
+  B-side code/load masks/types/K order/compensation/layouts/barriers. Static dX
+  divisions32→25/calls26→18; dW branches75→72. Added select/min/max work is not
+  measured native work or a speedup. No new alignment branch, helper or selector.
+  CPU audits finish19:20:31UTC without retries; zero GPU/backend rebuilds/updates/actions,
+  no worker. Next separately declare one complete-family numerical/counter/
+  ordinary comparison with existing gates and all transforms/reductions;
+  full-update integration requires it to pass. No automatic allocation, prior
+  timing, geometry/precision sweep or promotion. Keep58aff452/1.70x and goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
