@@ -577,6 +577,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   counters do not assign source sites or rule out compiler-managed shared storage.
   No padding/geometry sweep, rejected orientation revival, Naga project or
   automatic GPU allocation. Matrix/host/graph costs and parity remain open.
+- **Shared-store contract audit passes:** [result](docs/results/2026-10-16-shared-store-contract.md).
+  All1,519 actual heavy occurrences map to28 selected modules. Nine tiled matrix
+  keys retain32 scalar16-bit shared stores despite vector global loads;342/716
+  RGB and387/769 CDP matrix products carry91.04%/93.24% of nominal matrix MACs.
+  This is not measured matrix instruction/time coverage.54 distinct contracts
+  span both workloads.29 catalog modules emit SPIR-V, one explicitly unused;
+  152 retained typed modules,6,144 ownership values and14 signature negatives pass.
+  The conditional bank model matches the word kernels' slope, but legal subgroup
+  permutations change it; simple scaling fails all11 packed contracts. All20
+  measured payload/wavefront relations reconcile. The96 intercept stays
+  unattributed; Naga preserves cooperative-store opcodes, not known driver lowering.
+  Original CPU review substring failure and construction-specific repair remain.
+  Zero GPU calls/updates/actions, no worker. Keep58aff452/1.70x. Next prepare a
+  separately bounded unchanged-kernel counter diagnostic for all54 tiled matrix
+  contracts plus checked controls before selecting a staging change. No padding/
+  geometry sweep, prior timing, compiler project or automatic promotion.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

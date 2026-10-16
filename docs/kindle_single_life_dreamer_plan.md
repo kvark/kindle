@@ -87,9 +87,16 @@ remain open. The [kernel-memory diagnosis](results/2026-10-16-kernel-memory.md)
 now finds zero local traffic in all20 convolution contracts, with a positive
 control, and99.711% of remaining shared-bank conflicts on writes. All instruction
 counts/shaders/outputs reconcile;21 guards/13 warnings, no updates/actions.
-This is not a new speedup or proof that conflicts explain the entire gap. Next
-CPU-audit shared-store transaction/ownership contracts, not another padding/
-geometry/precision sweep, prior timing or compiler feature project.
+This is not a new speedup or proof that conflicts explain the entire gap. The
+[shared-store audit](results/2026-10-16-shared-store-contract.md) now finds the
+large tiled matrix path still emits scalar shared stores despite vector global
+loads. It carries91.04%/93.24% of RGB/CDP nominal matrix MACs; this is not time
+coverage. All1,519 heavy occurrences and28 selected modules reconcile. The
+conditional convolution bank model fails on packed kernels and does not identify
+output-store cost. No GPU work; CPU reviewer failure/repair retained. Next
+prepare a bounded unchanged-kernel counter diagnostic for all54 actual tiled
+matrix contracts plus checked controls, not another padding/geometry/precision
+sweep, prior timing or compiler feature project.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

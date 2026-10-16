@@ -149,10 +149,21 @@ robust access are already off. All current heavy descriptors/keys/shader bytes
 and retained instruction counts reconcile; no new complete-update measurement.
 21 guards/13 warnings,3,050 offline metrics/258.287M exact values pass; no worker.
 
-**Next:** CPU-audit shared-store transaction/ownership contracts across the
-existing typed generators, including staging and cooperative result handling.
-Require a mechanism that reduces instruction/transfer work without simply moving
-write conflicts to reads; no padding/tile sweep or rejected-orientation revival.
+The [shared-store contract audit](results/2026-10-16-shared-store-contract.md)
+now identifies a separate remaining path: nine tiled matrix keys load vectors
+but emit32 scalar16-bit shared stores per K-stage. They carry91.04%/93.24% of
+RGB/CDP nominal matrix arithmetic, not measured time. All1,519 heavy occurrences,
+28 selected modules,29 emitted catalog modules and152 retained typed modules
+reconcile. The conditional convolution bank model fits word-kernel slopes but
+fails every packed contract; legal subgroup permutations also change predictions.
+The output intercept and driver lowering remain unattributed. Original CPU
+reviewer failure/repair are retained; no GPU work or backend rebuild.
+
+**Next:** prepare a separately bounded unchanged-kernel counter diagnostic for
+the54 actual tiled matrix contracts, plus checked-path controls. Measure shared
+write/read behavior, instructions and local traffic before choosing a staging
+change. Require reduced instruction/transfer work without simply moving write
+conflicts to reads; no padding/tile sweep or rejected-orientation revival.
 Keep the general composition; no automatic GPU allocation or compiler project.
 Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
