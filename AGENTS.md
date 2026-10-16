@@ -444,6 +444,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   The rejected October15 family already used tensor addressing/workgroup matrices;
   new upstream exposure does not revive it or justify a compiler project. Keep
   834241b6/1.77x, resolve prior-reference discrepancy; no worker/production change.
+- **Prior forward discrepancy explained:** [tape result](docs/results/2026-10-16-prior-tape.md).
+  Two unchanged forward prefixes match retained logits/plan/pipelines;2.097M local
+  matrix/bias values are exact. All1.049M normalization/activation values fit
+  checked Vulkan precision contracts; six SiLU values lie within.604F32ULP of
+  BF16 midpoints and round differently from exact SiLU. Not an end-to-end F64
+  pass; original748 logit failures remain. Gradient failures remain unexplained,
+  batching/world checks/timing unqualified. One guard/no warnings,106 dispatches,
+  zero raw backwards/updates/actions;2,477 seals, no worker. Preserve CPU reader/
+  JSON failures; exact constant-bit repair and seven negatives pass without GPU
+  repeat. Next diagnose raw-gradient rounding, not tune final-output thresholds.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

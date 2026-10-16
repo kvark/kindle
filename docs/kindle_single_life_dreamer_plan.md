@@ -31,9 +31,12 @@ finds training-prior work unnecessarily unrolled:144 matrix products versus9
 batched JAX products, identical arithmetic outside the posterior dependency.
 The [isolated prior-batching implementation](results/2026-10-16-prior-batching.md)
 reduces standalone products144→9 and passes all paired checks, but independent
-F64 gates fail in both arms. CPU rounding diagnosis is partial; preserve failures
-and resolve the reference before actual-world qualification or full timing.
-One guard/no warnings,16 raw backwards, no optimizer updates/actions. The separate
+F64 gates fail in both arms. The [forward tape](results/2026-10-16-prior-tape.md)
+now explains the logit difference through small F32 errors crossing BF16 midpoints;
+all local matrices/biases are exact. Raw-gradient failures remain open. Preserve
+original failures; no actual-world qualification or full timing yet.
+The original test used one guard/16 raw backwards; the tape adds one guard/two
+forward prefixes. No warnings, optimizer updates or actions. The separate
 [upstream workgroup review](results/2026-10-16-workgroup-contract.md) now passes:
 all23 resource contracts fit, no shader executes. The rejected October15 family
 already used tensor addressing/workgroup scope; no retry or compiler project.

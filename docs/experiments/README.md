@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [prior forward tape](../results/2026-10-16-prior-tape.md) explains the
+logit discrepancy:2.097M local matrix/bias values are exact; small legal F32
+normalization/SiLU errors cross BF16 midpoints. Original F64 failures remain;
+raw-gradient failures are still open. One guard/no warnings/two forward prefixes,
+zero complete backwards/updates/actions. No qualification or speed promotion.
+
 October16's [upstream workgroup review](../results/2026-10-16-workgroup-contract.md)
 passes one properties-only guard and all23 CPU resource contracts. No shader
 executes. The rejected October15 family already used tensor addressing/workgroup
