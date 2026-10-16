@@ -556,9 +556,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Keep isolated native`58aff452` under `runs/copy-composition-20261016.ABr4pCUH`,
   with `MEGANEURA_COPY_COMPOSITION=1` plus word staging/image views/device means/
   cached recording.834241b6 remains its preceding control. No F16 GPU, acting,
-  learning or production promotion. Next CPU-audit remaining matrix/convolution
-  instruction and specialization contracts against matched JAX work; no new
-  allocation, copy/geometry/precision sweep or prior-batching timing implied.
+  learning or production promotion. The following audit/capture narrows the
+  remaining convolution work; no copy/geometry/precision sweep or prior timing.
+- **Local-memory/shared-write diagnosis passes:** [result](docs/results/2026-10-16-kernel-memory.md).
+  All20 contracts/23 RGB occurrences have zero local traffic; a private-array
+  positive control reads8.468MB/writes12.594MB while scalar/empty controls stay
+  zero.99.711% of remaining shared-bank conflicts are writes:308.566M versus
+  .894M reads. All nine word paths fit workgroups×(32×K-stages+96), including
+  seven held-out cases; this is not source-site/latency attribution. No software
+  reciprocal division occurs in those K-loop call closures; automatic bounds
+  checks/core robust access are off already. All716/769 matrices and23/11
+  RGB/CDP convolutions retain descriptors/keys; current shader bytes match captures.
+  21 guards/13 warnings,777 counter passes,1,740 convolution calls/76 probe
+  dispatches,258.287M exact retained values,61 ranges/3,050 offline metrics and
+  159 seals pass. All instruction counts reproduce; zero updates/actions.
+  GPU12:25:52UTC, no worker. Preserve first CPU SDK-enumerator compile failure/
+  host-only repair. No backend rebuild, memory-stat masking or native assembly.
+  Keep58aff452/1.70x. Next CPU-audit shared-store transaction/ownership contracts
+  across existing typed generators, including staging/cooperative result handling;
+  counters do not assign source sites or rule out compiler-managed shared storage.
+  No padding/geometry sweep, rejected orientation revival, Naga project or
+  automatic GPU allocation. Matrix/host/graph costs and parity remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

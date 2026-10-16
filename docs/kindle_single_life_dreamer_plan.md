@@ -83,8 +83,13 @@ private copy/cast composition above now qualifies, preserving tapes, versions
 and rounding;319.752M CPU addresses and47.082M raw-gradient values per comparison
 pass. Original reader/shader-catalog failures remain with CPU-only repairs and
 no GPU repeat. Matrix execution, convolution feeding and the1.70× complete gap
-remain open. Next CPU-audit their instruction/specialization contracts against
-matched JAX work, not another copy/geometry/precision sweep or prior timing.
+remain open. The [kernel-memory diagnosis](results/2026-10-16-kernel-memory.md)
+now finds zero local traffic in all20 convolution contracts, with a positive
+control, and99.711% of remaining shared-bank conflicts on writes. All instruction
+counts/shaders/outputs reconcile;21 guards/13 warnings, no updates/actions.
+This is not a new speedup or proof that conflicts explain the entire gap. Next
+CPU-audit shared-store transaction/ownership contracts, not another padding/
+geometry/precision sweep, prior timing or compiler feature project.
 The original test used one guard/16 raw backwards; the tape adds one guard/two
 forward prefixes; the backward capture adds one guard/one raw backward.
 No warnings, optimizer updates or actions. The separate

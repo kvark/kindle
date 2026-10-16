@@ -139,10 +139,22 @@ reader failures remain, with CPU-only repairs; no GPU repeats. Twelve guards,
 ten warnings,1,188 updates/16 raw backwards/zero actions; no worker. The gain
 is mostly imagination/targets, not the remaining18.977ms RGB/JAX difference.
 
-**Next:** CPU-audit the remaining matrix/convolution instruction and
-specialization contracts against matched JAX work before another implementation.
-Keep the general composition; no copy/tile/precision sweep or automatic GPU
-allocation. Recurrent matrices and convolution feeding remain open. Keep prior
+The [kernel-memory audit/capture](results/2026-10-16-kernel-memory.md) now rules
+out local-memory traffic for all20 convolution contracts, with a validated
+positive control.99.711% of remaining shared-bank conflicts occur on writes.
+All nine word paths fit workgroups×(32×K-stages+96); seven held-out contracts
+pass, but this is not source-site or latency attribution. Software reciprocal
+division is outside their reduction-loop closures. Generic bounds checking/core
+robust access are already off. All current heavy descriptors/keys/shader bytes
+and retained instruction counts reconcile; no new complete-update measurement.
+21 guards/13 warnings,3,050 offline metrics/258.287M exact values pass; no worker.
+
+**Next:** CPU-audit shared-store transaction/ownership contracts across the
+existing typed generators, including staging and cooperative result handling.
+Require a mechanism that reduces instruction/transfer work without simply moving
+write conflicts to reads; no padding/tile sweep or rejected-orientation revival.
+Keep the general composition; no automatic GPU allocation or compiler project.
+Recurrent matrices and host/graph execution remain open. Keep prior
 batching isolated: its remaining posterior-adjoint/materialization and prior-to-
 deterministic-state gradient boundaries are specific numerical follow-ups, not
 an automatic allocation or reason to relax the original gates. No candidate timing.
