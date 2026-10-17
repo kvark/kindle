@@ -957,6 +957,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   replacement observer, then separately declare one complete-family numerical/
   counter test of this fixed mechanism. No pass/geometry search, Naga feature,
   closed-family revival or automatic integration. Keepe45b9c43/1.59x; goal open.
+- **Uniform-interface control reconciled:** [result](docs/results/2026-10-17-uniform-interface.md).
+  Fixed normalization passes all20 contracts/3.366M F64/275.972M paired values,
+  then its first counter control fails native anchors;19 captures stay unstarted.
+  Keep that controller failed. A separate fixed four-condition CNN0-forward
+  diagnosis identifies inline-uniform versus UBO parameter storage: UBO removes
+  14.05% warp/22.77% ALU instructions, identical outputs/CTA/tensor work. Explicit
+  full32/default subgroup settings have no effect here. Both native/direct
+  anchors reproduce exactly. All20 functions match across library generations
+  and actual Blade SPIR-V1.3 emission; packed descriptor permutations are known.
+  This is not ordinary latency, a whole-family result or source-line attribution.
+  Across both allocations23 guards/15 warnings/450 standalone dispatches/100
+  counter passes, zero learner updates/actions. Four-condition checks pass2.097M
+  F64/402.653M pairs;450 source seals pass, CPU review01:39:15UTC, no worker.
+  Missing names/descriptor-order/negative-extent/output-name/SPIR-V-version CPU
+  failures and repairs remain, as does the original normalization-anchor failure.
+  Next CPU-audit existing Blade UBO scratch/descriptors/refresh against actual
+  RGB/CDP cached programs before a separately declared same-native complete
+  numerical/ordinary comparison. Count all uploads/lifetimes. No normalization
+  restart, new descriptor backend, favorable selector, pass/subgroup/geometry
+  search or automatic promotion. Keepe45b9c43/1.59x; root-cause goal remains open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -42,10 +42,16 @@ now proves a1,109-dispatch chain across1,112 groups: scheduling alone cannot
 remove hundreds of dependencies. Non-convolution spans are mixed and show more
 memory-dependency waiting; warp-cycle fractions are not time shares. Fixed
 SPIR-V normalization passes offline contracts and reduces static K-loop IR,
-but changes no branch or global/shared access sites. Next review one isolated
-module-replacement observer before a bounded complete-family numerical/counter
-test; no pass/tile sweep or automatic integration. Zero GPU calls in this step;
-the root-cause/parity goal and1.59× complete gap stay open.
+but changes no branch or global/shared access sites. Its [GPU test](results/2026-10-17-uniform-interface.md)
+passes all20 numerical contracts, then stops on a mismatched native counter
+anchor. A separate four-condition diagnosis traces the mismatch to inline
+uniform versus UBO parameter storage: UBO removes14.05% warp/22.77% ALU
+instructions for CNN0 forward; subgroup request settings have no effect there.
+Identical shader functions/outputs and both retained anchors pass. This is not
+an ordinary speedup or whole-family result. Next audit the existing UBO fallback's
+actual-program lifetimes before a separately declared complete-workload comparison.
+No failed-queue restart, new descriptor backend or automatic integration; no
+worker. The root-cause/parity goal and1.59× complete gap stay open.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact

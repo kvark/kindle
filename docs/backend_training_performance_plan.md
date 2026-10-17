@@ -65,10 +65,22 @@ The first output-validation claim was incomplete; separate unchanged-output
 validation repairs it without normalization repeats. Zero GPU calls/builds/
 updates/actions; CPU ends00:53:58UTC, no worker.
 
-Next CPU-review one exact-module replacement observer, then separately declare
-one complete-family numerical/counter comparison of that fixed normalization.
-No optimizer-pass search or speed claim from smaller IR. Ordinary timing and
-complete-update qualification would remain necessary before integration.
+The [normalization GPU test and control reconciliation](results/2026-10-17-uniform-interface.md)
+now pass all20 numerical contracts, but the first counter control fails its
+native anchor;19 captures stay unstarted. The separate four-condition diagnosis
+identifies parameter storage: UBO removes14.05% warp/22.77% ALU instructions
+versus inline uniforms in CNN0 forward, with exact outputs and native/direct
+anchors. Explicit-full32/default subgroup settings have no effect here. Actual
+shader functions match across both retained library generations and Blade
+emission. No ordinary latency or whole-family benefit is established.
+
+Next audit existing Blade UBO scratch/descriptor/parameter-refresh lifetimes
+against actual RGB/CDP programs, including cached commands and all host uploads.
+If sound, declare a same-native complete-workload numerical/ordinary comparison.
+No new descriptor backend, favorable convolution selector, automatic promotion
+or restart of the failed normalization queue.23 guards/15 warnings/450 standalone
+dispatches/zero learner updates/actions; independent review01:39:15UTC, no worker.
+All original CPU/counter failures remain; smaller IR is still not a speed claim.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.
