@@ -130,10 +130,18 @@ updates/actions or worker; keepe45b9c43/1.59×.
 
 Fresh Meganeura5d6d9a36 adds typed rectangular workgroup matrices and search
 integration, using Blade4845d652/Naga13f582dd. That family is absent from the
-retained runtime and requires explicit selection or measured search. Next
-CPU-audit its fit to all actual dense interfaces, reductions/bindings/types and
-device/compiler contracts before any separate complete comparison. No silent
-refresh, geometry sweep, favorable subset or compiler feature project. Existing
+retained runtime and requires explicit selection or measured search. The
+[CPU compatibility audit](results/2026-10-17-workgroup-matrix-contract.md) passes:
+one32x64/K32/64-thread policy fits504/716 RGB and552/769 CDP products, preserving
+grouped/unaligned fallbacks and all106 split partitions/reductions. Six unchanged
+upstream shaders compile/validate;61 contracts,4.937M addresses,27 negatives and
+71 receipts pass. Four failed CPU readers/repairs remain. Zero GPU calls or
+native runtime refresh; physical support is not logical-device qualification.
+Next prepare one bounded existing-observer GPU comparison covering feature
+enablement, native binding/control calibration, independent numerics and the
+complete policy costs, including unchanged fallbacks and split reductions.
+Review before a full-model trial. No silent refresh, geometry sweep, favorable
+subset or compiler feature project. Existing
 counters do not establish matrix latency parity, and this family alone is not
 a parity plan. Library feeding/non-image costs stay distinct; no image-fusion/
 precision search, uniform selector, failed-normalization restart or promotion.

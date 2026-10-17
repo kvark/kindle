@@ -1050,11 +1050,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   CPU review03:27:19UTC,1,712-seal closure03:30:48UTC; zero GPU/builds/updates/
   actions, no worker. Keepe45b9c43/1.59x.
   Fresh upstream5d6d9a36 adds a workgroup matrix family, absent from our runtime;
-  opt-in/search selected, not an automatic speedup. Next CPU-audit all current
-  dense interfaces/device/compiler compatibility before any separate comparison.
+  opt-in/search selected, not an automatic speedup. The CPU interface/compiler
+  audit below now passes before any separate GPU comparison.
   No geometry sweep, favorable subset, closed-family revival, compiler feature
   project, automatic refresh/promotion or Atari restart. Nonmatrix/conv costs and
   the full goal remain open.
+- **Upstream dense workgroup CPU compatibility passes:** [result](docs/results/2026-10-17-workgroup-matrix-contract.md).
+  One32x64/K32/64-thread policy fits504/716 RGB and552/769 CDP products;
+  grouped/unaligned fallbacks stay. All61 contracts/six unchanged upstream
+  shaders validate with Naga13f582dd/SPIR-V1.6. All106 split products retain
+  partitions/F32 partials/SumRows.4.937M addresses/2,048 ownership values,
+  27 negative checks and71 receipts pass. No GPU numerics/performance claim.
+  Four failed CPU readers (semantic hashes, Default tag, stripped names,
+  uniform wrapper) and repairs remain; no GPU repeat/compiler edit. CPU review
+  03:47:15UTC, zero GPU calls/updates/actions, no worker. Retained properties
+  support the policy, but current logical-device enablement is still absent.
+  Next prepare one bounded existing-observer comparison: feature/binding/control
+  qualification, all compatible contracts and complete operation costs including
+  unchanged fallbacks/reductions. Review before a full-model trial. No geometry
+  search, favorable subset, new compiler feature, silent refresh or promotion.
+  Keepe45b9c43/1.59x; convolution/nonmatrix costs and the full goal remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

@@ -80,9 +80,14 @@ cross-boundary work stays separate. JAX's3.147ms span has different interfaces,
 not an additive saving. Library-owner ambiguity and one.0112ms posterior symbol
 remain explicit. CPU-only review03:27:19UTC; no worker or baseline change.
 New upstream5d6d9a36 provides a workgroup-matrix family absent from this runtime.
-Next CPU-audit all current dense/device/compiler contracts before a separate
-comparison; no silent refresh, geometry sweep, closed-family revival, compiler
-project or automatic promotion. Keep e45b9c43 and the goal open at1.59×.
+Its [CPU compatibility check](results/2026-10-17-workgroup-matrix-contract.md)
+now passes: one fixed policy fits504/716 RGB and552/769 CDP products, preserving
+grouped/unaligned fallbacks and106 split reductions. Six unchanged upstream
+shaders validate;4.937M addresses/27 negatives pass. Four failed CPU readers
+and repairs remain, no GPU work or runtime refresh. Next prepare a bounded
+complete-policy GPU comparison before any full-model trial; no geometry search,
+favorable subset, closed-family revival or compiler feature project. Keep
+e45b9c43 and the goal open at1.59×; no production/learning promotion.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
