@@ -48,10 +48,14 @@ anchor. A separate four-condition diagnosis traces the mismatch to inline
 uniform versus UBO parameter storage: UBO removes14.05% warp/22.77% ALU
 instructions for CNN0 forward; subgroup request settings have no effect there.
 Identical shader functions/outputs and both retained anchors pass. This is not
-an ordinary speedup or whole-family result. Next audit the existing UBO fallback's
-actual-program lifetimes before a separately declared complete-workload comparison.
-No failed-queue restart, new descriptor backend or automatic integration; no
-worker. The root-cause/parity goal and1.59× complete gap stay open.
+an ordinary speedup or whole-family result. The [complete UBO comparison](results/2026-10-17-uniform-model.md)
+now passes exact numerical/lifetime checks but rejects adoption: RGB improves
+only1.45%, below3%, while CDP regresses1.89%. Eight guards/four warnings,
+1,184 synthetic updates/zero actions; all plans/shaders/checkpoints pass. No
+worker, retime, selector or failed-queue restart. Keep e45b9c43/1.59× and the
+root-cause goal open. Next use existing captures to CPU-match native image
+normalization/activation/adjoint boundaries with actual JAX fusions, preserving
+versions, tapes and rounding; no new allocation or compiler project implied.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact

@@ -74,13 +74,21 @@ anchors. Explicit-full32/default subgroup settings have no effect here. Actual
 shader functions match across both retained library generations and Blade
 emission. No ordinary latency or whole-family benefit is established.
 
-Next audit existing Blade UBO scratch/descriptor/parameter-refresh lifetimes
-against actual RGB/CDP programs, including cached commands and all host uploads.
-If sound, declare a same-native complete-workload numerical/ordinary comparison.
-No new descriptor backend, favorable convolution selector, automatic promotion
-or restart of the failed normalization queue.23 guards/15 warnings/450 standalone
-dispatches/zero learner updates/actions; independent review01:39:15UTC, no worker.
-All original CPU/counter failures remain; smaller IR is still not a speed claim.
+The [complete UBO comparison](results/2026-10-17-uniform-model.md) now rejects
+global adoption: RGB43.164→42.540ms improves1.45%, below3%, while CDP41.044→
+41.820ms regresses1.89%. All reports/targets/292/346 state tensors, full plans/
+shaders and checkpoint roundtrips are exact. Existing scratch/lifetimes pass;
+no new allocation scheme, shader or Naga change. Eight guards/four warnings,
+1,184 synthetic updates/zero actions; independent review02:07:51UTC, no worker.
+Keep e45b9c43/1.59×, not rejectedb01fe8f3. All CPU/build failures remain.
+
+Next CPU-match current convolution/normalization/activation/adjoint interfaces
+to actual JAX fusion bodies: versioned dependencies, required tapes, escaping
+values and rounding points. Establish a concrete composition contract before
+any implementation/allocation. This uses existing captures, not a dispatch-count
+speed promise. Library feeding and non-image costs remain distinct. No uniform
+selector, retime, failed-normalization restart or automatic promotion. The prior
+single-kernel instruction result remains valid, not a learner-speed claim.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.

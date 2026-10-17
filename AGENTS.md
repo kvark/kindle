@@ -977,6 +977,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   numerical/ordinary comparison. Count all uploads/lifetimes. No normalization
   restart, new descriptor backend, favorable selector, pass/subgroup/geometry
   search or automatic promotion. Keepe45b9c43/1.59x; root-cause goal remains open.
+- **Complete UBO policy rejected:** [result](docs/results/2026-10-17-uniform-model.md).
+  Same-native complete RGB43.164→42.540ms,1.45% less, misses3%; CDP41.044→
+  41.820ms,1.89% slower. All24/272 reports/first targets/initial-first-final292/
+  346 tensors, full plans/shaders and eight checkpoint roundtrips match exactly.
+  Controls calibrate within.116%; all samples/tails stay. CPU audit covers ten
+  program views/430 modules/19 lifetime checks; existing1MiB per-command scratch
+  fits, cached graphs remain immutable and optimizer bindings dynamic. Actual
+  alignment64; command cache required. No shader/Naga/precision change.
+  Eight guards/four warnings/1,184 synthetic updates/zero actions; GPU ends
+  02:06:04UTC, independent3,196-seal review02:07:51UTC, no worker. Preserve the
+  constant-shader reader, Rust edition and dual-Blade-path build failures/repairs.
+  Isolatedb01fe8f3 is not adopted; keepe45b9c43/1.59x. Single-kernel instruction
+  savings are not full-model latency. No selector, retime, normalization restart
+  or production change. Next CPU-match current convolution/normalization/
+  activation/adjoint interfaces to actual JAX fusion bodies, including versions,
+  tapes and rounding. Existing captures only; no new GPU allocation/compiler
+  feature or geometry sweep. Feeding/non-image costs and the full goal stay open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
