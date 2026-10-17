@@ -82,13 +82,23 @@ no new allocation scheme, shader or Naga change. Eight guards/four warnings,
 1,184 synthetic updates/zero actions; independent review02:07:51UTC, no worker.
 Keep e45b9c43/1.59×, not rejectedb01fe8f3. All CPU/build failures remain.
 
-Next CPU-match current convolution/normalization/activation/adjoint interfaces
-to actual JAX fusion bodies: versioned dependencies, required tapes, escaping
-values and rounding points. Establish a concrete composition contract before
-any implementation/allocation. This uses existing captures, not a dispatch-count
-speed promise. Library feeding and non-image costs remain distinct. No uniform
-selector, retime, failed-normalization restart or automatic promotion. The prior
-single-kernel instruction result remains valid, not a learner-speed claim.
+The [image-fusion audit](results/2026-10-17-image-fusion-contract.md) rules out
+missing basic composition: all16 RGB/eight CDP regions already fuse bias,
+pooling, normalization, SiLU and adjoints. JAX's eight forward convolutions have
+activation=None; its26 connected forward fusion nodes include extra layout/
+mask work, not an apples-to-apples launch ratio. All1,215 top-level HLO nodes/
+3,198 reads/23 products and native tapes/parameter gradients reconcile. JAX's
+BF16 activation boundaries differ; no precision change or speed claim. CPU-only,
+29 seals pass at02:28:37UTC, no worker; original reader failures remain.
+
+Next establish a CPU contract for boundary-matched timing of current world and
+imagination work. Reconcile retained timestamp coverage first; any in-pass
+observer must preserve cached commands, barriers, submissions and query
+lifetimes, with a declared overhead/numerical gate. Existing per-dispatch pass
+splitting and coarse extra waits are not ordinary overlap. No new backend edit
+or GPU allocation until that contract is reviewed. Library feeding and non-image
+costs remain distinct. No image-fusion/precision/geometry search, uniform
+selector, retime, failed-normalization restart or automatic promotion.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.

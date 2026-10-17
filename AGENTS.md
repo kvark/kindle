@@ -994,6 +994,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   activation/adjoint interfaces to actual JAX fusion bodies, including versions,
   tapes and rounding. Existing captures only; no new GPU allocation/compiler
   feature or geometry sweep. Feeding/non-image costs and the full goal stay open.
+- **Image-fusion contract complete:** [result](docs/results/2026-10-17-image-fusion-contract.md).
+  All16 RGB/eight CDP image regions already fuse bias/pooling/normalization/
+  SiLU and adjoints. Eight JAX forward libraries use activation=None;26 connected
+  forward fusion nodes include extra layout/mask work, not a timing/dispatch-
+  advantage ratio. All1,215 top-level HLO nodes/3,198 reads/17 call contexts and
+  23 products reconcile through actual tuple paths. Eight JAX BF16 activation
+  boundaries differ from native F32 image arithmetic; no precision change.
+  All15/eight native parameter-gradient chains and required tapes reconcile;
+  logical313.852/208.306MB tapes are not traffic, peak VRAM or removable savings.
+  Four shape fixtures/four malformed-shape/eight trace-mutation rejections and
+  29 seals pass. Preserve nested-tuple/comment reader failures, local inspect
+  shadowing and original negative-check label clarification. CPU02:28:37UTC,
+  zero GPU/builds/updates/actions, no worker. Keepe45b9c43/1.59x.
+  Next CPU-audit retained timestamp coverage and an in-pass world/imagination
+  timing contract preserving cached commands, barriers, submissions and query
+  lifetimes. Do not revive per-dispatch pass splitting or coarse extra waits as
+  ordinary timing. Overhead/numerical qualification precedes separate collection;
+  no backend edit/new GPU allocation or fusion/precision/geometry sweep implied.
+  Convolution feeding/recurrence and the full root-cause goal remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

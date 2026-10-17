@@ -53,9 +53,13 @@ now passes exact numerical/lifetime checks but rejects adoption: RGB improves
 only1.45%, below3%, while CDP regresses1.89%. Eight guards/four warnings,
 1,184 synthetic updates/zero actions; all plans/shaders/checkpoints pass. No
 worker, retime, selector or failed-queue restart. Keep e45b9c43/1.59× and the
-root-cause goal open. Next use existing captures to CPU-match native image
-normalization/activation/adjoint boundaries with actual JAX fusions, preserving
-versions, tapes and rounding; no new allocation or compiler project implied.
+root-cause goal open. The [image-fusion audit](results/2026-10-17-image-fusion-contract.md)
+now proves all16 RGB/eight CDP regions already use the composed normalization/
+activation/adjoint path. JAX also keeps normalization outside its convolutions;
+different rounding/tapes preclude a free precision substitution. Actual HLO
+references/native gradients pass, CPU only, no worker or speed claim. Next
+audit a boundary-matched timing observer that preserves ordinary cached commands,
+barriers/submissions/query lifetimes; no new allocation or compiler project implied.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
