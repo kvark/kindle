@@ -1016,15 +1016,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Retained272-update/6,775-interval coarse trace still adds three waits; not
   current ordinary timing. Original18-versus20 enum-census failure remains.
   CPU02:43:42UTC, zero GPU/builds/updates/actions, no worker. Keepe45b9c43/1.59x.
-  Next implement an isolated observer with per-secondary query ownership,
-  checked existing-wait success and replay generations; current wait code drops
-  results, so availability alone is insufficient. Export actual non-world groups.
-  Keep normal timing off; report intra-secondary completion intervals, not
-  calibrated overlap/pure kernel time. ALL_COMMANDS query writes can perturb
-  execution. CPU/source validation precedes separate24-update and ordinary/
-  marked272-update RGB qualification, <=5% drift/overhead with exact numerical/
-  command gates. No extra waits, pass splits, marker-density search, retime,
-  compiler feature, automatic GPU allocation, promotion or Atari restart.
+  The isolated implementation below now qualifies with checked existing waits,
+  per-secondary ownership/generations and actual non-world groups. The original
+  CPU evidence stays; query availability alone remains insufficient.
+- **Cached model boundary timing qualifies:** [result](docs/results/2026-10-17-boundary-timing.md).
+  Complete RGB43.192→44.775ms marked,+3.6647% overhead, passes5%; control drift
+  −.0100%. All24/272 reports/first targets/initial-first-final292 tensors, four
+  checkpoint roundtrips/full plans/shaders/groups and submit/wait counts match.
+  Source command projection retains original passes/barriers/waits; no complete
+  driver event trace. All2,176 cached replays/462,128 intervals/1,677 seals pass.
+  World29.069ms includes18.060ms convolution-only intervals; total cached39.909ms,
+  nonconvolution21.850ms. These are completion-frontier intervals, not pure
+  kernels, global GPU coverage or an additive gap budget. All23 products match
+  retained JAX11.255ms kernel activity including helpers; different boundaries.
+  Native encoder/decoder6.162/11.897ms versus JAX4.958/6.297ms is not a CDP gain.
+  Four guards/two warnings/592 synthetic updates/zero actions; controller
+  03:05:30UTC, independent attribution03:08:47UTC, no GPU worker. Initial patch
+  parser refusal/repair stays; no GPU failure/repeat. Three CPU tests/build/Clippy
+  pass. Observer786a3010 is not promoted; keepe45b9c43/1.59x, production unchanged.
+  Next CPU-map all nonconvolution interval versions/membership to retained JAX
+  launches, distinguishing mixed from matrix-only groups before a new mechanism.
+  No GPU allocation, closed-family revival, timing-density/precision/geometry
+  search, compiler project, automatic promotion or Atari restart. Goal stays open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

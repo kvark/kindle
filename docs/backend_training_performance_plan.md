@@ -97,17 +97,30 @@ now passes: ten world command projections,2,176 modeled executions/22 negatives,
 fit17 existing intervals. Old complete trace still adds three waits, not ordinary
 overlap. Preserve the enum-count reader failure and separate named-set repair.
 
-Next implement an isolated observer: one pool per immutable secondary, reset on
-its recorded path, harvest after checked existing-wait success, owner/generation
-checks and actual non-world group/command exports. Current wait paths discard
-results; availability alone is not fresh completion proof. Keep normal timing
-off. ALL_COMMANDS timestamps may perturb execution; report intra-secondary
-completion intervals, not calibrated host overlap or pure kernel latency.
-CPU/source review precedes a separately declared24-update numerical check and
-ordinary/marked272-update RGB pair, <=5% control drift/overhead and exact command/
-numerical gates. No extra waits, pass splitting, marker-density search or retime.
-Library feeding/non-image costs stay distinct; no image-fusion/precision/geometry
-search, uniform selector, failed-normalization restart or automatic promotion.
+The [implemented observer](results/2026-10-17-boundary-timing.md) now qualifies:
+ordinary43.192ms, marked44.775ms,3.6647% overhead within5%; control drift−.0100%.
+All24/272 reports/targets/292-tensor states, four checkpoint roundtrips, full
+plans/shaders/groups and submit/wait counts match. Source command projection
+retains original passes/barriers/waits; not a complete driver event trace.
+Per-secondary ownership and checked existing waits qualify all2,176 replays/
+462,128 intervals. Four guards/two warnings/592 synthetic updates/zero actions;
+independent attribution03:08:47UTC, no GPU worker. Keep the initial patch-parser
+refusal and repair. No GPU repeat or observer promotion; keepe45b9c43/1.59×.
+
+World completion intervals total29.069ms, including18.060ms convolution-only;
+all cached programs39.909ms,21.850ms outside convolution. All23 products map to
+retained JAX11.255ms kernel activity with helpers. Encoder/decoder native
+6.162/11.897ms versus JAX4.958/6.297ms uses different timing boundaries, not a
+causal gap budget or attainable saving. The latter reconstruction is absent
+from CDP. The4.866ms marked-wall/cached difference is not pure CPU overhead.
+Mixed matrix/image groups cannot be assigned wholly to their named heavy work.
+
+Next CPU-match all remaining interval memberships/versions to actual retained
+JAX launches, including recurrence and surrounding materialization. Existing
+counters do not establish matrix latency parity. No new GPU allocation or
+marker-density search follows. Library feeding/non-image costs stay distinct;
+no image-fusion/precision/geometry search, uniform selector, failed-normalization
+restart or automatic promotion.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.

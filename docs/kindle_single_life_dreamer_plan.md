@@ -61,11 +61,19 @@ references/native gradients pass, CPU only, no worker or speed claim. The
 [boundary-timing CPU contract](results/2026-10-17-boundary-timing-contract.md)
 also passes: cached-chunk query ownership can preserve original commands and
 avoid the coarse profiler's extra waits. All23 RGB convolutions occupy17 existing
-intervals; independent products stay together. Next implement the isolated
-observer with checked existing waits/replay generations and actual group exports,
-then separately qualify exact numerics/commands and <=5% timing overhead. Query
-writes themselves may perturb execution; no pure-kernel/overlap claim, new GPU
-allocation, compiler project or automatic promotion. Goal stays open at1.59×.
+intervals; independent products stay together. The [observer now qualifies](results/2026-10-17-boundary-timing.md):
+ordinary43.192ms versus marked44.775ms,3.6647% overhead within5%. Exact reports/
+targets/states/plans/shaders/groups/checkpoints and submit/wait counts pass;
+no extra host waits or pass splits. All2,176 replays/462,128 intervals reconcile.
+World29.069ms includes18.060ms convolution-only intervals; all cached work
+39.909ms leaves21.850ms outside convolution. The matching JAX convolutions and
+helpers total11.255ms kernel activity, a different timing boundary. Most of this
+table's difference is RGB reconstruction, absent from CDP; not a measured CDP
+gain, additive gap budget or pure-kernel comparison. Four guards/two warnings/
+592 synthetic updates/zero actions; attribution03:08:47UTC, no GPU worker.
+Next CPU-map the remaining intervals/versions to actual JAX launches before a
+new mechanism. No GPU allocation, closed-family revival, compiler project or
+automatic promotion. Keep e45b9c43 and the goal open at1.59×.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
