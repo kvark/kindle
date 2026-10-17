@@ -1,0 +1,42 @@
+{
+  "status": "bf16_convolution_full_updates_qualified",
+  "raw_root": "runs/bf16-convolution-20261012.Y61SZP2u",
+  "qualified_meganeura": "17c9287",
+  "published_meganeura": "66eee3a",
+  "native_sha256": "e7879b6e0d5c3d60daf42cf631ca219c12eb292a91e7fa91f1f6792971829c82",
+  "numerical_sha256": "63eabcce134d2388de797077e92a008599a04d690c6fb1a18720675d5107ff5e",
+  "cdp_full_ms": [
+    149.2744317226563,
+    146.31464454687503
+  ],
+  "rgb_full_ms": [
+    66.5080423515625,
+    61.01940723828127
+  ],
+  "cdp_world_ms": [
+    61.493010558593745,
+    61.8710595234375
+  ],
+  "rgb_world_ms": [
+    41.15770563671875,
+    36.73459727734375
+  ],
+  "cdp_posterior_ms": [
+    20.142074054687498,
+    16.849428019531253
+  ],
+  "forward_and_master_gradient_cases": 16,
+  "existing_bf16_tests": 9,
+  "passing_guards": 6,
+  "allocation_warnings": 3,
+  "finite_reports_per_arm": 272,
+  "game_actions": 0,
+  "limits": [
+    "CDP world stage regresses slightly; its whole-update gain comes from posterior inference",
+    "Convolution derivatives, grouped products, optimizer, masters and reductions remain F32",
+    "Sampled headroom decreases; no whole-agent memory-saving claim",
+    "No learning quality or SM utilization evidence"
+  ],
+  "cdp_reduction_pct": 1.9827824106410818,
+  "rgb_reduction_pct": 8.25258858811122
+}

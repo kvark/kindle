@@ -1,0 +1,221 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-16T16:27:17.445339+00:00",
+  "jax_main_counters": {
+    "sm__ctas_launched.sum": 108540,
+    "smsp__inst_executed.sum": 2419559564,
+    "smsp__inst_executed_pipe_adu.sum": 58766932,
+    "smsp__inst_executed_pipe_alu.sum": 935678944,
+    "smsp__inst_executed_pipe_cbu.sum": 16220310,
+    "smsp__inst_executed_pipe_fma.sum": 556328416,
+    "smsp__inst_executed_pipe_lsu.sum": 236698937,
+    "smsp__inst_executed_pipe_tensor.sum": 227523584,
+    "smsp__inst_executed_pipe_uniform.sum": 287832052,
+    "smsp__inst_executed_pipe_xu.sum": 49380,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 78643200,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 1588864,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 11597392,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 153486,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 485794192,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 20976398
+  },
+  "jax_helper_counters": {
+    "sm__ctas_launched.sum": 1991,
+    "smsp__inst_executed.sum": 61032804,
+    "smsp__inst_executed_pipe_adu.sum": 467090,
+    "smsp__inst_executed_pipe_alu.sum": 32940765,
+    "smsp__inst_executed_pipe_cbu.sum": 4179594,
+    "smsp__inst_executed_pipe_fma.sum": 18226899,
+    "smsp__inst_executed_pipe_lsu.sum": 2834114,
+    "smsp__inst_executed_pipe_tensor.sum": 0,
+    "smsp__inst_executed_pipe_uniform.sum": 359538,
+    "smsp__inst_executed_pipe_xu.sum": 0,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 0,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 0,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 2177,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 2179
+  },
+  "native_main_counters": {
+    "sm__ctas_launched.sum": 283600,
+    "smsp__inst_executed.sum": 10295818368,
+    "smsp__inst_executed_pipe_adu.sum": 88836416,
+    "smsp__inst_executed_pipe_alu.sum": 6818554368,
+    "smsp__inst_executed_pipe_cbu.sum": 25593280,
+    "smsp__inst_executed_pipe_fma.sum": 1141384640,
+    "smsp__inst_executed_pipe_lsu.sum": 774339200,
+    "smsp__inst_executed_pipe_tensor.sum": 180224000,
+    "smsp__inst_executed_pipe_uniform.sum": 43965504,
+    "smsp__inst_executed_pipe_xu.sum": 9727424,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 893561,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 308565501,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 579875961,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 605470205
+  },
+  "main_ratios_native_over_jax": {
+    "sm__ctas_launched.sum": 2.6128616178367423,
+    "smsp__inst_executed.sum": 4.255244847528788,
+    "smsp__inst_executed_pipe_adu.sum": 1.5116735377644013,
+    "smsp__inst_executed_pipe_alu.sum": 7.287279906984847,
+    "smsp__inst_executed_pipe_cbu.sum": 1.57785393744016,
+    "smsp__inst_executed_pipe_fma.sum": 2.0516382179550576,
+    "smsp__inst_executed_pipe_lsu.sum": 3.2714097064153695,
+    "smsp__inst_executed_pipe_tensor.sum": 0.792111291636475,
+    "smsp__inst_executed_pipe_uniform.sum": 0.1527470748810143,
+    "smsp__inst_executed_pipe_xu.sum": 196.9911705143783,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 0.07704844330518447,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 2010.3820609045777,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 1.1936658991592062,
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 28.86435531019196
+  },
+  "jax_launches": 41,
+  "jax_main_launches": 23,
+  "jax_helper_launches": 18,
+  "native_main_occurrences": 23,
+  "native_contracts": 20,
+  "counter_profiles": 43,
+  "counter_passes": 774,
+  "metadata_profiles": 41,
+  "metadata_passes": 41,
+  "passing_guards": 2,
+  "failed_guards": 1,
+  "allocation_warnings": 0,
+  "synthetic_updates": 816,
+  "game_actions": 0,
+  "native_gpu_calls": 0,
+  "exact_jax_reports_per_run": 272,
+  "exact_jax_initial_final_tensors_per_run": 288,
+  "full_semantic_hlo_exact": true,
+  "original_capture_status": "failed_completeness_36_of_41",
+  "limits": [
+    "Complete main-kernel family, not complete native helper or whole-update cost",
+    "Native uses retained synthetic fixtures; JAX uses actual model inputs",
+    "Output layout/precision, padding, compensation and workspace differ",
+    "Identical launch identities retain candidate owners; no arbitrary per-layer attribution",
+    "Instruction ratios are not speedups or additive savings; no promotion",
+    "Original capture remains failed; combined coverage uses a separately declared supplement"
+  ],
+  "roles": {
+    "Forward": {
+      "products": 8,
+      "native_warp": 3710599168,
+      "jax_warp": 941203456,
+      "warp_ratio": 3.9423985795479273,
+      "native_tensor": 68812800,
+      "jax_tensor": 68812800
+    },
+    "InputGradient": {
+      "products": 7,
+      "native_warp": 1755115520,
+      "jax_warp": 497121280,
+      "warp_ratio": 3.5305580159433125,
+      "native_tensor": 42598400,
+      "jax_tensor": 68812800
+    },
+    "WeightGradient": {
+      "products": 8,
+      "native_warp": 4830103680,
+      "jax_warp": 981234828,
+      "warp_ratio": 4.922474765642949,
+      "native_tensor": 68812800,
+      "jax_tensor": 89897984
+    }
+  },
+  "source_seals": 240,
+  "independently_verified_profile_rows": 41,
+  "ambiguous_identity_classes": 5,
+  "current_native": "58aff452",
+  "qualified_rgb_ms": 46.199419203125,
+  "qualified_jax_inclusive_ms": 27.222569,
+  "full_update_ratio": 1.6970999027727691,
+  "ordinary_timing_repeated": false,
+  "artifact_root": "runs/jax-convolution-counters-20261016.1F8DAYTk",
+  "publication_finished_utc": "2026-10-16T16:28:01.105239+00:00",
+  "overlap_controls": [
+    {
+      "required_exact": true,
+      "differences": {
+        "sm__ctas_launched.sum": 0,
+        "smsp__inst_executed.sum": 0,
+        "smsp__inst_executed_pipe_adu.sum": 0,
+        "smsp__inst_executed_pipe_alu.sum": 0,
+        "smsp__inst_executed_pipe_cbu.sum": 0,
+        "smsp__inst_executed_pipe_fma.sum": 0,
+        "smsp__inst_executed_pipe_lsu.sum": 0,
+        "smsp__inst_executed_pipe_tensor.sum": 0,
+        "smsp__inst_executed_pipe_uniform.sum": 0,
+        "smsp__inst_executed_pipe_xu.sum": 0,
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0,
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 0,
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 0,
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 0,
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 0
+      }
+    },
+    {
+      "required_exact": true,
+      "differences": {
+        "sm__ctas_launched.sum": 0,
+        "smsp__inst_executed.sum": 0,
+        "smsp__inst_executed_pipe_adu.sum": 0,
+        "smsp__inst_executed_pipe_alu.sum": 0,
+        "smsp__inst_executed_pipe_cbu.sum": 0,
+        "smsp__inst_executed_pipe_fma.sum": 0,
+        "smsp__inst_executed_pipe_lsu.sum": 0,
+        "smsp__inst_executed_pipe_tensor.sum": 0,
+        "smsp__inst_executed_pipe_uniform.sum": 0,
+        "smsp__inst_executed_pipe_xu.sum": 0,
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0,
+        "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0,
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": 725,
+        "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st.sum": 0,
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": 725,
+        "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_st.sum": 0
+      }
+    }
+  ],
+  "native_implementation_groups": {
+    "Conv2dBF16": {
+      "products": 3,
+      "native_warp": 3141009408,
+      "jax_warp": 751029248,
+      "warp_ratio": 4.182273082392658
+    },
+    "Conv2dPacked": {
+      "products": 14,
+      "native_warp": 1595849856,
+      "jax_warp": 498464356,
+      "warp_ratio": 3.2015325404731647
+    },
+    "Conv2dGradientTyped": {
+      "products": 6,
+      "native_warp": 5558959104,
+      "jax_warp": 1170065960,
+      "warp_ratio": 4.750979255904514
+    }
+  },
+  "jax_async_opcodes": {
+    "LDSM": 90026992,
+    "LDGSTS": 60533384,
+    "LDGDEPBAR": 8577304,
+    "DEPBAR": 8361496
+  },
+  "family_breakdown_finished_utc": "2026-10-16T16:31:48.653959+00:00",
+  "failures_retained": [
+    "Original 36/41 counter capture and failed guard",
+    "Metadata section-name regex matched DisplayName",
+    "Anchored section check found non-launch metrics; explicit nine launch metrics used before any GPU execution",
+    "Metadata review started before guard receipt existed",
+    "Metadata pass-count reader expected plural passes instead of singular pass",
+    "Combined API/CSV audit omitted automatic MB scaling; same reports re-exported in base units",
+    "Independent publication included 50 native counters instead of declared 16; restricted membership repair"
+  ],
+  "last_gpu_end_utc": "2026-10-16T16:25:10Z",
+  "worker_running": false
+}

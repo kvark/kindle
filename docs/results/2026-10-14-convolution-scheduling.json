@@ -1,0 +1,162 @@
+{
+  "status": "complete",
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "ordering": {
+    "root": "runs/convolution-ordering-20261014.T8A1WKAK",
+    "reviews": [
+      "smoke-review.json",
+      "timing-review.json"
+    ],
+    "native_sha256": "81c25593b883670be684be88b366d32bde97e2a3183fdb4748eb2e1760f51590",
+    "patch_sha256": {
+      "blade": "f105a3ea0feff5c6d9498cea1bd6cef91ddf1d48c6473d79a6dd26932cef2de2",
+      "meganeura": "ce50d5cc77c09790555a69c4786937b4f54d161aeab1d1ac5a8cf498265664e9",
+      "kindle": "4437845c8659d758ddf6c5b54e82d5cb0389aa27df7e33bf3354a92afd6a3b3b"
+    },
+    "target_ms": {
+      "intact": 7.4289395,
+      "storage": 4.1680085,
+      "execution_only": 4.1679605
+    },
+    "execution_gain_percent": 43.8956192872482,
+    "exact_output_values": 130486272,
+    "exact_tensors_per_checkpoint": 292,
+    "group_replays": 249,
+    "explicit_storage_access_scopes_unnecessary": true,
+    "hardware_cache_cause_proven": false
+  },
+  "general_rule": {
+    "root": "runs/convolution-scheduling-20261014.BJ5AVZFt",
+    "review": "review.json",
+    "native_sha256": "288642103cc2d74e6c6b540a2f8d7cfc408a5525341d0b8aaaff22112dc52eaf",
+    "patch_sha256": {
+      "meganeura": "7c2b2b5975fd421be40b6b6dcb7ca8df9f259e6d48896571232becd2679b0f3e",
+      "kindle": "cb649087d5ab83a09a73186e59561f1f19ec27e939b4f5c874f628e1e20ed06c"
+    },
+    "policy": "Within original independent groups, ordinary barriers separate adjacent convolution-product and non-convolution-product dispatches.",
+    "convolution_product_variants": 18,
+    "staged_world_boundaries": [
+      121,
+      129,
+      137,
+      145,
+      1902,
+      1903,
+      2133,
+      2226,
+      2357,
+      2492,
+      2494,
+      2511,
+      2517,
+      2518,
+      2535,
+      2550,
+      3953,
+      3968,
+      3977,
+      3988
+    ],
+    "other_session_boundaries": 0,
+    "original_groups_retained": 1258,
+    "mean_update_ms": {
+      "unchanged": 63.59692852343747,
+      "single": 60.30233692187499,
+      "automatic": 60.041187437500014
+    },
+    "improvement_vs_unchanged_percent": 5.591057883600548,
+    "extra_vs_single_percent": -0.4330669385388952,
+    "passes_retention_gate": true,
+    "warmup_updates_per_arm": 16,
+    "measured_updates_per_arm": 256,
+    "exact_reports_per_arm": 272,
+    "exact_first_outputs": true,
+    "exact_plans_and_pipeline_inventories": 5,
+    "exact_initial_first_final_tensors_per_arm": [
+      292,
+      292,
+      292
+    ],
+    "historical_control_reproduced": true,
+    "exact_cache_counts": {
+      "behavior": [
+        1,
+        271
+      ],
+      "imagination": [
+        1,
+        271
+      ],
+      "slow_value": [
+        1,
+        271
+      ],
+      "world": [
+        5,
+        1355
+      ]
+    },
+    "exact_submission_ranges": [
+      [
+        0,
+        607
+      ],
+      [
+        607,
+        1048
+      ],
+      [
+        1048,
+        2970
+      ],
+      [
+        2970,
+        3473
+      ],
+      [
+        3473,
+        4023
+      ]
+    ]
+  },
+  "retained_jax": {
+    "source": "docs/results/2026-10-14-image-precision-control.json",
+    "mean_update_ms": 26.63169575862412,
+    "ratio": 2.254501102058322,
+    "fresh_capture": false,
+    "trace_audit": "runs/convolution-ordering-20261014.T8A1WKAK/jax-scheduling.json",
+    "trace_source": "runs/jax-image-profile-20261014.qpFghMhM/trace.sqlite",
+    "captured_updates": 8,
+    "captured_kernels": 28064,
+    "sum_minus_union_ns": {
+      "min": 416,
+      "max": 1024,
+      "mean": 764
+    },
+    "strictly_serial": false
+  },
+  "accounting": {
+    "gpu_guards_passed": 5,
+    "allocation_warnings": 0,
+    "validation_messages": 0,
+    "synthetic_learner_updates": 816,
+    "group_replays": 249,
+    "game_actions": 0,
+    "minimum_sampled_headroom_bytes": 13195935744,
+    "active_workers": 0
+  },
+  "retained_cpu_failures": [
+    "Ordering bootstrap requested nonexistent standalone Blade Cargo.lock; corrected copy only; existing worktrees preserved.",
+    "First Blade test filter selected zero tests; corrected CPU-only filter passes four tests.",
+    "General-policy CPU tests used obsolete ShaderEntry::Add instead of Generated; first source/log retained; corrected four tests pass."
+  ],
+  "limits": [
+    "Execution-only API dependency does not establish absence of hardware cache operations.",
+    "JAX trace is effectively non-overlapping, not exactly serial or native Vulkan occupancy evidence.",
+    "General rule qualified only in isolated RGB12M/B32 fixture; no production/B8/CDP/learning promotion.",
+    "No numerical tolerance change, GPU retry, blanket serialization or geometry sweep.",
+    "Retain prior failed sparse instrumentation, auxiliary F32 controls and rejected optimizations."
+  ],
+  "next": "Audit shared convolution work/reuse/staging against the captured cuDNN implementation before one algorithm-level intervention; not another tile/split/geometry sweep. Host decoding/targets remain a distinct measured gap."
+}

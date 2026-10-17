@@ -29,6 +29,7 @@ FAULT = re.compile(
     r"NVRM: Xid|PMU has halted|GPU is probably locked|RmInitAdapter failed"
     r"|Cannot initialize GSP|NVRM: API mismatch|GSP.*(?:timeout|Timeout)"
 )
+ALLOCATION_WARNING = re.compile(r"NVRM:.*(?:nvCheckOkFailedNoLog|NV_ERR_NO_MEMORY)")
 BOOT = Path("/proc/sys/kernel/random/boot_id")
 DRIVER = Path("/sys/module/nvidia/version")
 
@@ -209,7 +210,8 @@ def parse_journal(text, boot, limit):
     return records
 
 
-def check_kernel(evidence, boot, cursor=None):
+def check_kernel(evidence, boot, cursor=None, reviewed_warnings=(), allocation_diagnostic=None,
+                 *, record_allocation_warnings=False):
     limit = 4096 if cursor else 50001
     command = ["journalctl", "--no-pager", "--quiet", "-o", "json", f"--boot={boot.replace('-', '')}",
                "-n", str(limit), "_TRANSPORT=kernel"]
@@ -223,6 +225,23 @@ def check_kernel(evidence, boot, cursor=None):
         if FAULT.search(row["MESSAGE"]):
             evidence.event("kernel_fault", record=row)
             raise GuardError("NVIDIA kernel fault; this boot requires explicit recovery review")
+        if ALLOCATION_WARNING.search(row["MESSAGE"]):
+            if record_allocation_warnings:
+                evidence.event("allocation_warning", record=row, baseline=cursor is None)
+                continue
+            identity = {"cursor": row["__CURSOR"], "message": row["MESSAGE"]}
+            if cursor is None and identity in reviewed_warnings:
+                evidence.event("reviewed_kernel_warning", record=row)
+            elif (cursor is not None and allocation_diagnostic
+                  and row["MESSAGE"] == allocation_diagnostic["message"]):
+                count = getattr(evidence, "allocation_warning_count", 0) + 1
+                evidence.allocation_warning_count = count
+                evidence.event("diagnostic_allocation_warning", record=row, count=count)
+                if count > allocation_diagnostic["max_occurrences"]:
+                    raise GuardError("allocation diagnostic warning limit exceeded")
+            else:
+                evidence.event("kernel_fault", record=row)
+                raise GuardError("unreviewed NVIDIA allocation warning")
     return records[-1]["__CURSOR"] if records else cursor
 
 

@@ -1,0 +1,300 @@
+{
+  "status": "qualified",
+  "decision": "adopt_for_performance_not_learning_equivalence",
+  "raw_root": "runs/bf16-split-k-20261012.pqxf7avt",
+  "control": "5a493322af7569a057f3c8db3ff73c1ca10680b2",
+  "timed_candidate": "87a3236ed068ca52d0c5821d9b92ce28791f9798",
+  "pinned_candidate": "9e05731ae12c1e7b73331c2591a13fa22ac9a74d",
+  "published_runtime_identical": true,
+  "blade": "663afd2194069af25c5be884e90c3d53e83a3973",
+  "naga": "c9fd6a85a87034ecb5a784611c6f90a14d8d50ce",
+  "upstream_pr": "https://github.com/kvark/meganeura/pull/256",
+  "pairs": {
+    "rgb": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 56.268805347656226,
+          "median_update_ms": 56.251073000000005,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.6540650468750004,
+            "imagination_and_targets": 13.772301109375,
+            "posterior": 7.20308562109375,
+            "world_train_and_sync": 31.6393535703125
+          },
+          "minimum_sampled_headroom_bytes": 14715518976,
+          "reported_meganeura_revision": "5a493322af7569a057f3c8db3ff73c1ca10680b2",
+          "dispatches": {
+            "behavior_gradient": 246,
+            "imagination": 1230,
+            "posterior": 933,
+            "slow_value": 19,
+            "world_gradient": 4134
+          },
+          "logical_buffer_bytes": {
+            "behavior_gradient": 234414924,
+            "imagination": 1100396100,
+            "posterior": 622238912,
+            "slow_value": 81634812,
+            "world_gradient": 2509519152
+          }
+        },
+        "candidate": {
+          "mean_update_ms": 53.064659597656245,
+          "median_update_ms": 52.9888595,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.51269426953125,
+            "imagination_and_targets": 12.9260098515625,
+            "posterior": 6.31548413671875,
+            "world_train_and_sync": 30.31047133984375
+          },
+          "minimum_sampled_headroom_bytes": 14709227520,
+          "reported_meganeura_revision": "87a3236ed068ca52d0c5821d9b92ce28791f9798",
+          "dispatches": {
+            "behavior_gradient": 254,
+            "imagination": 1320,
+            "posterior": 997,
+            "slow_value": 19,
+            "world_gradient": 4237
+          },
+          "logical_buffer_bytes": {
+            "behavior_gradient": 237654860,
+            "imagination": 1123989060,
+            "posterior": 624860352,
+            "slow_value": 81634812,
+            "world_gradient": 2515286320
+          }
+        }
+      },
+      "less_time_pct": 5.694355389639427,
+      "tensors": {
+        "initial": {
+          "tensors": 292,
+          "exact_tensors": 292,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "first": {
+          "tensors": 292,
+          "exact_tensors": 140,
+          "max_abs": 25.024279788136482,
+          "relative_l2": 0.1221459000237234
+        },
+        "final": {
+          "tensors": 292,
+          "exact_tensors": 1,
+          "max_abs": 2.541609048843384,
+          "relative_l2": 0.08866696586461027
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "deter": {
+          "exact": false,
+          "max_abs": 0.0004546418786048889,
+          "relative_l2": 0.0005218049597482878
+        },
+        "imagined_slow_target": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "imagined_value_target": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "imagined_weight": {
+          "exact": false,
+          "max_abs": 0.035770297050476074,
+          "relative_l2": 0.010222821592950845
+        },
+        "replay_slow_target": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "replay_value_target": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "replay_weight": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "stoch": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        }
+      },
+      "exact_metric_reports": 0,
+      "finite_reports": 272
+    },
+    "cdp": {
+      "arms": {
+        "control": {
+          "mean_update_ms": 126.87969734375,
+          "median_update_ms": 126.80062649999999,
+          "stages_ms": {
+            "behavior_train_and_sync": 10.082503582031249,
+            "imagination_and_targets": 54.1932524140625,
+            "posterior": 16.6374974921875,
+            "world_train_and_sync": 45.966443855468754
+          },
+          "minimum_sampled_headroom_bytes": 11290017792,
+          "reported_meganeura_revision": "5a493322af7569a057f3c8db3ff73c1ca10680b2",
+          "dispatches": {
+            "behavior_gradient": 246,
+            "imagination": 1338,
+            "posterior": 1166,
+            "slow_value": 19,
+            "world_gradient": 4139
+          },
+          "logical_buffer_bytes": {
+            "behavior_gradient": 842381340,
+            "imagination": 14732806724,
+            "posterior": 3167739584,
+            "slow_value": 311186940,
+            "world_gradient": 4172302036
+          }
+        },
+        "candidate": {
+          "mean_update_ms": 125.4324421875001,
+          "median_update_ms": 125.35985350000001,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.474090484375001,
+            "imagination_and_targets": 54.20885084765625,
+            "posterior": 15.703049765625,
+            "world_train_and_sync": 46.04645108984375
+          },
+          "minimum_sampled_headroom_bytes": 11287920640,
+          "reported_meganeura_revision": "87a3236ed068ca52d0c5821d9b92ce28791f9798",
+          "dispatches": {
+            "behavior_gradient": 254,
+            "imagination": 1338,
+            "posterior": 1230,
+            "slow_value": 19,
+            "world_gradient": 4139
+          },
+          "logical_buffer_bytes": {
+            "behavior_gradient": 846278684,
+            "imagination": 14732806724,
+            "posterior": 3178225344,
+            "slow_value": 311186940,
+            "world_gradient": 4172302036
+          }
+        }
+      },
+      "less_time_pct": 1.1406514884165442,
+      "tensors": {
+        "initial": {
+          "tensors": 346,
+          "exact_tensors": 346,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "first": {
+          "tensors": 346,
+          "exact_tensors": 2,
+          "max_abs": 6.324598073959351,
+          "relative_l2": 0.16282124621810545
+        },
+        "final": {
+          "tensors": 346,
+          "exact_tensors": 0,
+          "max_abs": 5.338134288787842,
+          "relative_l2": 0.848494571188359
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": false,
+          "max_abs": 0.748875617980957,
+          "relative_l2": 0.2882888637789683
+        },
+        "deter": {
+          "exact": false,
+          "max_abs": 0.9992698505520821,
+          "relative_l2": 0.025888117064444032
+        },
+        "imagined_slow_target": {
+          "exact": false,
+          "max_abs": 0.9988310933113098,
+          "relative_l2": 0.1952515734791061
+        },
+        "imagined_value_target": {
+          "exact": false,
+          "max_abs": 0.9992919564247131,
+          "relative_l2": 0.28156610048503694
+        },
+        "imagined_weight": {
+          "exact": false,
+          "max_abs": 0.26074129343032837,
+          "relative_l2": 0.011470397645768597
+        },
+        "replay_slow_target": {
+          "exact": false,
+          "max_abs": 0.5487632751464844,
+          "relative_l2": 0.09082337619663315
+        },
+        "replay_value_target": {
+          "exact": false,
+          "max_abs": 0.9951530694961548,
+          "relative_l2": 0.2973703378165704
+        },
+        "replay_weight": {
+          "exact": true,
+          "max_abs": 0.0,
+          "relative_l2": 0.0
+        },
+        "stoch": {
+          "exact": false,
+          "max_abs": 1.0,
+          "relative_l2": 0.1620034480728728
+        }
+      },
+      "exact_metric_reports": 0,
+      "finite_reports": 272
+    }
+  },
+  "control_reproduces_all_retained_reports_and_tensors": true,
+  "full_f64_cases": 32,
+  "exact_f64_values": 859216,
+  "long_gradient_cases": 12,
+  "guards": [
+    "queue-fixed/partitions_and_outputs_match_full_f64",
+    "queue-reviewed/bf16_connected_forward_backward_and_updates",
+    "queue-reviewed/bf16_convolution_storage_and_master_gradients",
+    "queue-reviewed/bf16_matrix_reduced_gradients",
+    "queue-reviewed/bf16_matrix_values_and_f32_gradients",
+    "queue-reviewed/cdp-candidate",
+    "queue-reviewed/cdp-control",
+    "queue-reviewed/long_products_preserve_master_and_reduced_gradients",
+    "queue-reviewed/rgb-candidate",
+    "queue-reviewed/rgb-control"
+  ],
+  "failed_guards": [
+    "queue/partitions_and_outputs_match_full_f64",
+    "queue-fixed/long_products_preserve_master_and_reduced_gradients"
+  ],
+  "allocation_warnings": 0,
+  "synthetic_learner_updates": 1088,
+  "backend_adam_updates": 32,
+  "game_actions": 0,
+  "timing_repeated": false,
+  "ordinary_sm_utilization": null,
+  "learning_equivalence": false,
+  "binaries": {
+    "backend-tests": "e940e3e41c8ea9efabcb3dff56b20884d9629e1c3438d39519d2a288de6d1625",
+    "kindle-tests": "a9ae03d9a9157f4c63e12286b1ab27650009d3f0830318d6c09bfc658a421faa",
+    "backend-fixed-tests": "591dddac71a962b25cc9d3d8dfeecbae226b65f2008e7d82813a6df5a8d9b93d",
+    "kindle-fixed-tests": "223511cb4d015e20ea953597f1a488b96c8605cb51694c2deb8ea2d4d2ea495a",
+    "backend-reviewed-tests": "e561b2414515559f7ba501d9def0dc0b3012945283337176b94cf68da3a5dd63"
+  }
+}

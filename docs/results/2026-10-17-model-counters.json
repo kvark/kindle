@@ -1,0 +1,211 @@
+{
+  "status": "qualified_current_world_counter_observation",
+  "baseline": {
+    "native_sha256": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+    "native_ms": 43.196506554687524,
+    "inclusive_jax_ms": 27.22256929610012,
+    "ratio": 1.5867902138420056,
+    "production_promoted": false
+  },
+  "observer_native_sha256": "47dfc6f7baad07ab2a5e9e766a8032292efd8d89932d99ec66ca0dfe543b0612",
+  "artifacts": {
+    "original": "/x/Code/kindle/runs/model-counters-20261016.wXXkmWyB",
+    "coalesced": "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE"
+  },
+  "ranges": {
+    "whole": 2,
+    "detailed": 42,
+    "convolution": 23,
+    "other": 18,
+    "dispatches": 3751,
+    "original_groups": 1112,
+    "original_barriers": 1131,
+    "counter_image_bytes": 22129916,
+    "original_failed_counter_image_bytes": 599932980
+  },
+  "whole_counters": {
+    "sm__ctas_launched.sum": 1694477,
+    "smsp__inst_executed.sum": 11995425907,
+    "smsp__inst_executed_pipe_alu.sum": 7500232950,
+    "smsp__inst_executed_pipe_tensor.sum": 186941440,
+    "smsp__inst_executed_pipe_lsu.sum": 975225682,
+    "smsp__thread_inst_executed.sum": 382901794387
+  },
+  "convolution_vs_jax": {
+    "sm__ctas_launched.sum": {
+      "native": 283600,
+      "jax": 108540,
+      "ratio": 2.6128616178367423
+    },
+    "smsp__inst_executed.sum": {
+      "native": 10295818368,
+      "jax": 2419559564,
+      "ratio": 4.255244847528788
+    },
+    "smsp__inst_executed_pipe_alu.sum": {
+      "native": 6818554368,
+      "jax": 935678944,
+      "ratio": 7.287279906984847
+    },
+    "smsp__inst_executed_pipe_tensor.sum": {
+      "native": 180224000,
+      "jax": 227523584,
+      "ratio": 0.792111291636475
+    },
+    "smsp__inst_executed_pipe_lsu.sum": {
+      "native": 774339200,
+      "jax": 236698937,
+      "ratio": 3.2714097064153695
+    }
+  },
+  "other_world_counters": {
+    "sm__ctas_launched.sum": 1410877,
+    "smsp__inst_executed.sum": 1699607539,
+    "smsp__inst_executed_pipe_alu.sum": 681678582,
+    "smsp__inst_executed_pipe_tensor.sum": 6717440,
+    "smsp__inst_executed_pipe_lsu.sum": 200886482
+  },
+  "convolution_warp_fraction": 0.8583120305875772,
+  "convolution_roles": {
+    "Forward": {
+      "occurrences": 8,
+      "warp_instructions": 3710599168
+    },
+    "InputGradient": {
+      "occurrences": 7,
+      "warp_instructions": 1755115520
+    },
+    "WeightGradient": {
+      "occurrences": 8,
+      "warp_instructions": 4830103680
+    }
+  },
+  "standalone_anchors": {
+    "exact": 92,
+    "compared": 92
+  },
+  "integer_gates": {
+    "sm__ctas_launched.sum": {
+      "whole": 1694477,
+      "detailed": 1694477,
+      "exact": true
+    },
+    "smsp__inst_executed.sum": {
+      "whole": 11995425907,
+      "detailed": 11995425907,
+      "exact": true
+    },
+    "smsp__inst_executed_pipe_tensor.sum": {
+      "whole": 186941440,
+      "detailed": 186941440,
+      "exact": true
+    }
+  },
+  "local_traffic": {
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": {
+      "whole": 0,
+      "detailed": 0
+    },
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": {
+      "whole": 0,
+      "detailed": 0
+    },
+    "l1tex__t_sectors_pipe_lsu_mem_local_op_ld.sum": {
+      "whole": 0,
+      "detailed": 0
+    },
+    "l1tex__t_sectors_pipe_lsu_mem_local_op_st.sum": {
+      "whole": 0,
+      "detailed": 0
+    }
+  },
+  "correctness": {
+    "prefix_reports": 24,
+    "prefix_state_pairs": 3,
+    "first_targets": {
+      "deter": 1048576,
+      "stoch": 262144,
+      "action_target": 138240,
+      "imagined_weight": 7680,
+      "imagined_value_target": 1958400,
+      "imagined_slow_target": 1958400,
+      "replay_value_target": 122400,
+      "replay_slow_target": 122400,
+      "replay_weight": 480
+    },
+    "capture_state_pairs": {
+      "initial": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_absolute": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_absolute": 0
+      },
+      "frozen": {
+        "tensors": 292,
+        "exact": 292,
+        "relative_l2": 0,
+        "max_absolute": 0
+      }
+    },
+    "exact_full_output_values": 1310729,
+    "protected_buffers": 813,
+    "full_programs_exact": true,
+    "marker_recordings": {
+      "cpu_pushes": 91,
+      "commands": 2
+    },
+    "partial_source_seals": 787,
+    "complete_source_seals": 2095
+  },
+  "allocation": {
+    "guards": 3,
+    "passing_guards": 2,
+    "failed_guards": 1,
+    "allocation_warnings": 0,
+    "synthetic_updates": 26,
+    "counter_replays": 100,
+    "ordinary_fixed_replays": 35,
+    "offline_metrics": 2552,
+    "game_actions": 0,
+    "last_guard_event_utc": "2026-10-17T00:19:53.264442+00:00",
+    "independent_review_utc": "2026-10-17T00:21:05.149860+00:00"
+  },
+  "retained_failures": [
+    "Original detailed allocation exceeds 128 MiB observer cap before detailed dispatch",
+    "Original capture omits seven resident first-target exports; that gate stays incomplete",
+    "First observer build missing direct bytemuck dependency; explicit byte hashing repair",
+    "Original partial reviewer requires omitted target diagnostics; separate incomplete-status review",
+    "Coalesced Clippy single-element-loop failure; equivalent lexical block repair",
+    "Coalesced preflight launched after failed build; missing receipt stops before GPU",
+    "Coalesced reviewer expects nonexistent metadata.json; exact three-file tensor checkpoint reader repair"
+  ],
+  "limits": [
+    "No new ordinary full-update timing, utilization or learning result",
+    "Warp instruction fractions are not latency fractions or attainable speedup",
+    "Fixed world excludes optimizer and imagination/behavior/target programs",
+    "JAX physical layouts, compensated gradients, helpers and padding differ",
+    "Original failed allocation is not retroactively qualified",
+    "No kernel, compiler, production or Atari promotion"
+  ],
+  "source_sha256": {
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/publication.py": "3fb9ba9d4579bc69ea18b02c92be225ff60ddc31bff4c8b83696cb6b2c47d89b",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/review.json": "f4e6df52abf986db50acdda5f443c7012886004c3b5721611e84339d35872ad6",
+    "/x/Code/kindle/runs/model-counters-20261016.wXXkmWyB/partial-review.json": "f75cba244df1d6aa4abd7790067bb7191b7168668167e9619ad9b2ab59de0634",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/preflight.json": "ecfcd6ff334f221d98021d3b2f427a62087a51f152b59296fe84616f56856ce4",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/build.json": "3a56d7a632dc89e80449add52e5c56ceea1017aefde5f105b5606509301fae0a",
+    "/x/Code/kindle/runs/model-counters-20261016.wXXkmWyB/coalescing.json": "7a7f851fa4441d7b311580633b5decb4769a3f4f94a96547b15712cba95f0df8",
+    "/x/Code/kindle/runs/jax-convolution-counters-20261016.1F8DAYTk/review.json": "e5a80b345374bae927b6c8162c53ead2bb50f1e962b0beb6e6b4541d1a5243dd",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/controller.log": "2ae8563ab6428bc685f055b26a19dc26042bb29dd896f320046ef9dbfabc762e",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/review.log": "0199b3d300af8dd909767945c33b3007413929df1f28426bfba899fd5cc10c94",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/review-v2.log": "ebac7982583de81b6ab5ae5cb68b04789157dd34b5748dabccbab0c76a11db1a",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/gpu-declaration.md": "c5de97b7d9409b6756bb140cd8058dd3084ceddd90dbb144d7bb9502b11fbe9b",
+    "/x/Code/kindle/runs/model-counter-coalesced-20261017.vFEgVtiE/cpu-declaration.md": "bc79f358d5d92007486db62823466984b3df38d4ecd67262ada804c25f6fdd65"
+  },
+  "finished_utc": "2026-10-17T00:22:19.632931+00:00"
+}

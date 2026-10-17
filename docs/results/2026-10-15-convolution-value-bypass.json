@@ -1,0 +1,140 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "artifact_root": "runs/convolution-value-bypass-20261015.Xtf57sNy",
+  "native_sha256": "bcf5315a57a98a64f108cd498dad92cdeb177666ced05752069d1398ffa9928b",
+  "ordinary_full_update_retimed": false,
+  "fixed_world_control_gpu_ms": 34.19129625,
+  "fixed_world_substitution_gpu_ms": 14.28209775,
+  "difference_ms": 19.909198500000002,
+  "fraction_less": 0.5822884968861045,
+  "control_queued_wall_ms": 34.202555437499996,
+  "substitution_queued_wall_ms": 14.28998559375,
+  "copy_only_original_barriers_gpu_ms": 2.0049395,
+  "blocks": [
+    {
+      "block": 0,
+      "mode": 0,
+      "gpu_ms": 34.1771665,
+      "queued_wall_ms": 34.188585765625,
+      "recording_ms": 0.002878
+    },
+    {
+      "block": 1,
+      "mode": 1,
+      "gpu_ms": 14.2859165,
+      "queued_wall_ms": 14.291625125000001,
+      "recording_ms": 0.00278534375
+    },
+    {
+      "block": 2,
+      "mode": 1,
+      "gpu_ms": 14.278279,
+      "queued_wall_ms": 14.2883460625,
+      "recording_ms": 0.002771578125
+    },
+    {
+      "block": 3,
+      "mode": 0,
+      "gpu_ms": 34.205426,
+      "queued_wall_ms": 34.216525109375,
+      "recording_ms": 0.002806109375
+    }
+  ],
+  "all_samples_retained": true,
+  "measured_replays_per_arm": 128,
+  "copy_only_measured_replays": 64,
+  "full_world_replays_including_validation_and_warmup": 324,
+  "copy_only_replays_including_warmup": 80,
+  "synthetic_updates": 1,
+  "game_actions": 0,
+  "guards_passed": 2,
+  "original_guard_failed": 1,
+  "new_allocation_warnings": 0,
+  "snapshot_bytes": 855506944,
+  "snapshot_outputs": 23,
+  "live_boundary_groups": 17,
+  "exact_tensors_per_boundary": 292,
+  "exact_tensor_boundary_pairs": 3,
+  "minimum_sampled_headroom_bytes": 12165971968,
+  "original_smoke_failure": "explicit_bindings_rejected_by_Blade_before_copy_pipeline",
+  "semantic_leaf_fingerprints": {
+    "world-plan.json": {
+      "leaf_count": 24531915,
+      "sha256_sum": "fc2b3db760af86109f615c5bd12db7143dd3e85db971a10299c36176a141c087",
+      "sha256_xor": "f08faac42f962b1b67d52d5e4a27ac6ff15c620e83dc71961d10d98c5e8af39d"
+    },
+    "world-pipelines.json": {
+      "leaf_count": 4023,
+      "sha256_sum": "e405ddc433da7eb71face4514f6a1d30a41d66fc6f3563c5068226eee8afbbbf",
+      "sha256_xor": "93de7ffc1e6ef817200a0ac1ce1184c467bf5f0574ce81e11a66c48ead59914b"
+    },
+    "world-groups.json": {
+      "leaf_count": 2516,
+      "sha256_sum": "a62793134aadbc40bdd389cf90e95c003a12cbc57137996bd0882ef6bdeae524",
+      "sha256_xor": "342b2e9de83867c8c2d5e983994bae1511f63d528e29c90eec288615180a3a04"
+    },
+    "first-outputs.json": {
+      "leaf_count": 5618720,
+      "sha256_sum": "99a46379031a7710d28009afd5d98e0c3cab2a89f88aa6626babddca7e98e723",
+      "sha256_xor": "53613911a042d992ea76e3e7de4599777fd2c47c6aae4cb7ccb298a565f3272d"
+    },
+    "config.json": {
+      "leaf_count": 55,
+      "sha256_sum": "1b9296925897b6ef759a020ac6b2b749b4ed1069136b1e8a23e33e430f1db78e",
+      "sha256_xor": "60586925377792e606eb77c17dce78d0953cfcb6e624b90bf977ee2d74cf30f8"
+    }
+  },
+  "source_seals": 718,
+  "families": {
+    "packed": {
+      "products": 14,
+      "indices": [
+        129,
+        137,
+        145,
+        1902,
+        2133,
+        2517,
+        2535,
+        2536,
+        2550,
+        2551,
+        3953,
+        3954,
+        3968,
+        3969
+      ],
+      "nominal_gmac": 120.7959552,
+      "tiled_gmac": 154.3503872
+    },
+    "checked": {
+      "products": 9,
+      "indices": [
+        121,
+        2226,
+        2357,
+        2492,
+        2493,
+        2511,
+        3977,
+        3978,
+        3988
+      ],
+      "nominal_gmac": 105.6964608,
+      "tiled_gmac": 214.7483648
+    }
+  },
+  "retained_cpu_review_failure": "whole-object jq exceeded original 2GiB limit; reviewed streaming leaf audit keeps that limit",
+  "interpretation": [
+    "Replacing convolution computation with exact captured output copies removes 58% of this valid fixed-world interval.",
+    "Original allocation, consumer values and dependency boundaries remain; original and replacement pipelines coexist.",
+    "This is not pure convolution latency, zero-cost substitution or an ordinary full-learner speedup.",
+    "Copy-only includes every original barrier but omits nonselected commands; it is not a subtractable kernel cost.",
+    "Packed/checked counts and arithmetic are source inventory, not their measured latency shares.",
+    "Production and Atari remain unchanged; latest full native/JAX ratio is still retained 54.224/26.632ms."
+  ],
+  "reviewer_sha256": "dd178a7fef2583f5eaaa02adb1aeb29e99f7e4964c8a39d1fe53c2dae103c7b0",
+  "raw_result_sha256": "ae9283768001e4fd68c1a387ab3e21c2c17185fa13dfd72e56a2a74d6f79e429",
+  "raw_review_sha256": "274e67b5fdabe314d08060a6f6c8914fa056623a3959ac2bccc1e069f75e199a"
+}

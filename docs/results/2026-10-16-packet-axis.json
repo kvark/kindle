@@ -1,0 +1,1105 @@
+{
+  "status": "rejected_performance",
+  "artifact_root": "runs/convolution-packet-axis-20261016.JfluRtMn",
+  "family_timing": {
+    "status": "complete",
+    "mode": "ordinary",
+    "contracts": 20,
+    "occurrences": 23,
+    "guards": 40,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "weighted_costs": {
+      "control": {
+        "gpu_ms": 19.08874375,
+        "queued_wall_ms": 19.13642325,
+        "record_ms": 0.0140236640625
+      },
+      "candidate": {
+        "gpu_ms": 21.2165215,
+        "queued_wall_ms": 21.259629890625,
+        "record_ms": 0.013281921875
+      }
+    },
+    "benefit_percent": {
+      "gpu_ms": -11.146766795483853,
+      "queued_wall_ms": -11.095107026465879
+    },
+    "clears_gate": false,
+    "allocation_warnings": 1
+  },
+  "counter_groups": {
+    "Conv2dBF16": {
+      "control": {
+        "warp_instructions": 3141009408.0,
+        "tensor_instructions": 39321600.0,
+        "shared_bank_conflicts": 93045390.0,
+        "dram_bytes": 384497664.0,
+        "l2_bytes": 2515872128.0
+      },
+      "candidate": {
+        "warp_instructions": 3607363584.0,
+        "tensor_instructions": 39321600.0,
+        "shared_bank_conflicts": 93035543.0,
+        "dram_bytes": 385231360.0,
+        "l2_bytes": 2072658144.0
+      }
+    },
+    "Conv2dPacked": {
+      "control": {
+        "warp_instructions": 1595849856.0,
+        "tensor_instructions": 75366400.0,
+        "shared_bank_conflicts": 74777452.0,
+        "dram_bytes": 319488768.0,
+        "l2_bytes": 7950620256.0
+      },
+      "candidate": {
+        "warp_instructions": 1595849856.0,
+        "tensor_instructions": 75366400.0,
+        "shared_bank_conflicts": 74774158.0,
+        "dram_bytes": 319656192.0,
+        "l2_bytes": 7944332160.0
+      }
+    },
+    "Conv2dGradientTyped": {
+      "control": {
+        "warp_instructions": 5558959104.0,
+        "tensor_instructions": 65536000.0,
+        "shared_bank_conflicts": 141629750.0,
+        "dram_bytes": 929935104.0,
+        "l2_bytes": 5497775616.0
+      },
+      "candidate": {
+        "warp_instructions": 6432500736.0,
+        "tensor_instructions": 65536000.0,
+        "shared_bank_conflicts": 141597350.0,
+        "dram_bytes": 929747456.0,
+        "l2_bytes": 4985057024.0
+      }
+    }
+  },
+  "jax_comparison": [
+    {
+      "mode": "dx",
+      "jax_warp_instructions": 97492992.0,
+      "control": {
+        "warp_instructions": 841089024.0,
+        "over_jax_instructions": 8.627174187043106,
+        "shared_bank_conflicts": 21534900.0,
+        "dram_peak_percent": 10.566880819014457,
+        "tensor_active_peak_percent": 35.36456296999793,
+        "ordinary_ms": 1.12017125
+      },
+      "candidate": {
+        "warp_instructions": 946077696.0,
+        "over_jax_instructions": 9.704058482480464,
+        "shared_bank_conflicts": 21535640.0,
+        "dram_peak_percent": 8.419330476006891,
+        "tensor_active_peak_percent": 25.94778362255097,
+        "ordinary_ms": 1.42354175
+      }
+    },
+    {
+      "mode": "dw",
+      "jax_warp_instructions": 133572828.0,
+      "control": {
+        "warp_instructions": 1091532800.0,
+        "over_jax_instructions": 8.171817699330285,
+        "shared_bank_conflicts": 26867052.0,
+        "dram_peak_percent": 6.286941063105476,
+        "tensor_active_peak_percent": 26.74676146239417,
+        "ordinary_ms": 1.8384775
+      },
+      "candidate": {
+        "warp_instructions": 1277772800.0,
+        "over_jax_instructions": 9.566113251716136,
+        "shared_bank_conflicts": 26852883.0,
+        "dram_peak_percent": 6.214206636895308,
+        "tensor_active_peak_percent": 27.36606995123535,
+        "ordinary_ms": 1.8571285
+      }
+    }
+  ],
+  "rows": [
+    {
+      "case": "0-3-32-64",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.5283645,
+        "candidate": 0.54853175
+      },
+      "time_reduction_percent": -3.816919948255415,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 146864384.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 28.622168162079316,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 12642566.0,
+          "lts__t_bytes.sum": 236505664.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 22.068565313104898,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 40.08747134895682,
+          "smsp__inst_executed.sum": 348913664.0,
+          "smsp__inst_executed_pipe_adu.sum": 3670016.0,
+          "smsp__inst_executed_pipe_alu.sum": 223346688.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 44826624.0,
+          "smsp__inst_executed_pipe_lsu.sum": 24903680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 3145728.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 147008256.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 27.603125192272195,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 12642588.0,
+          "lts__t_bytes.sum": 237577120.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 21.574911009100116,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 40.10848781382215,
+          "smsp__inst_executed.sum": 374079488.0,
+          "smsp__inst_executed_pipe_adu.sum": 3670016.0,
+          "smsp__inst_executed_pipe_alu.sum": 247463936.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 50855936.0,
+          "smsp__inst_executed_pipe_lsu.sum": 24903680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1572864.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    {
+      "case": "0-32-48-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.75911775,
+        "candidate": 0.7590205
+      },
+      "time_reduction_percent": 0.012810924260442391,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 79462400.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 12.14990730998547,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 16773316.0,
+          "lts__t_bytes.sum": 1151382976.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 69.00333887537002,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.65007897031917,
+          "smsp__inst_executed.sum": 262602752.0,
+          "smsp__inst_executed_pipe_adu.sum": 1933312.0,
+          "smsp__inst_executed_pipe_alu.sum": 156139520.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2195456.0,
+          "smsp__inst_executed_pipe_fma.sum": 41549824.0,
+          "smsp__inst_executed_pipe_lsu.sum": 21954560.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1081344.0,
+          "smsp__inst_executed_pipe_xu.sum": 1769472.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 79437824.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 12.151629072681704,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 16773187.0,
+          "lts__t_bytes.sum": 1150962048.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 68.99534840972078,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.64999010199657,
+          "smsp__inst_executed.sum": 262602752.0,
+          "smsp__inst_executed_pipe_adu.sum": 1933312.0,
+          "smsp__inst_executed_pipe_alu.sum": 156139520.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2195456.0,
+          "smsp__inst_executed_pipe_fma.sum": 41549824.0,
+          "smsp__inst_executed_pipe_lsu.sum": 21954560.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1081344.0,
+          "smsp__inst_executed_pipe_xu.sum": 1769472.0
+        }
+      }
+    },
+    {
+      "case": "0-48-64-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.374952,
+        "candidate": 0.37520575
+      },
+      "time_reduction_percent": -0.06767532910878504,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 16899072.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 4.991229131381563,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7887493.0,
+          "lts__t_bytes.sum": 771739840.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 69.92353824504309,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.06622191908054,
+          "smsp__inst_executed.sum": 123240448.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 73089024.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19742720.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10567680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 16995072.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 5.006742325514046,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7883408.0,
+          "lts__t_bytes.sum": 771501952.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 69.90248484184626,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.069466495570722,
+          "smsp__inst_executed.sum": 123240448.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 73089024.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19742720.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10567680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        }
+      }
+    },
+    {
+      "case": "0-64-64-8",
+      "occurrences": 2,
+      "gpu_ms": {
+        "control": 0.12643175,
+        "candidate": 0.12626375
+      },
+      "time_reduction_percent": 0.13287801521374432,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 768.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.0006706008583690987,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1937814.0,
+          "lts__t_bytes.sum": 170558720.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 66.1266727972024,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 22.423505834617625,
+          "smsp__inst_executed.sum": 30810112.0,
+          "smsp__inst_executed_pipe_adu.sum": 223232.0,
+          "smsp__inst_executed_pipe_alu.sum": 18272256.0,
+          "smsp__inst_executed_pipe_cbu.sum": 137216.0,
+          "smsp__inst_executed_pipe_fma.sum": 4935680.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2641920.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 92160.0,
+          "smsp__inst_executed_pipe_xu.sum": 221184.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 1280.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.001099732545045045,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1938939.0,
+          "lts__t_bytes.sum": 169386560.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 66.11838074010036,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 22.43895863097049,
+          "smsp__inst_executed.sum": 30810112.0,
+          "smsp__inst_executed_pipe_adu.sum": 223232.0,
+          "smsp__inst_executed_pipe_alu.sum": 18272256.0,
+          "smsp__inst_executed_pipe_cbu.sum": 137216.0,
+          "smsp__inst_executed_pipe_fma.sum": 4935680.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2641920.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 92160.0,
+          "smsp__inst_executed_pipe_xu.sum": 221184.0
+        }
+      }
+    },
+    {
+      "case": "0-64-48-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.3745035,
+        "candidate": 0.3745675
+      },
+      "time_reduction_percent": -0.017089292890459795,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 11505920.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 3.4902123403409377,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7751828.0,
+          "lts__t_bytes.sum": 652347232.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 71.59645202642467,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.05364658278635,
+          "smsp__inst_executed.sum": 122126336.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 72433664.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19480576.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10436608.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 11446016.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 3.4619756435987017,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7749457.0,
+          "lts__t_bytes.sum": 652123488.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 71.61173933959088,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.057337130333572,
+          "smsp__inst_executed.sum": 122126336.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 72433664.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19480576.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10436608.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        }
+      }
+    },
+    {
+      "case": "0-48-32-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 1.10663025,
+        "candidate": 1.35007275
+      },
+      "time_reduction_percent": -21.998540162805046,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 83906816.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 7.883296966758256,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 21538752.0,
+          "lts__t_bytes.sum": 1257165760.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 33.612917434825974,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 41.11811501003837,
+          "smsp__inst_executed.sum": 765984768.0,
+          "smsp__inst_executed_pipe_adu.sum": 5505024.0,
+          "smsp__inst_executed_pipe_alu.sum": 517668864.0,
+          "smsp__inst_executed_pipe_cbu.sum": 1114112.0,
+          "smsp__inst_executed_pipe_fma.sum": 67567616.0,
+          "smsp__inst_executed_pipe_lsu.sum": 61538304.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 3080192.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 83693824.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 6.478336651807512,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 21527309.0,
+          "lts__t_bytes.sum": 790253184.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 27.487966462618907,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 41.254168041393974,
+          "smsp__inst_executed.sum": 889192448.0,
+          "smsp__inst_executed_pipe_adu.sum": 5505024.0,
+          "smsp__inst_executed_pipe_alu.sum": 644153344.0,
+          "smsp__inst_executed_pipe_cbu.sum": 1114112.0,
+          "smsp__inst_executed_pipe_fma.sum": 69861376.0,
+          "smsp__inst_executed_pipe_lsu.sum": 61538304.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 2686976.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    {
+      "case": "0-32-3-64",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 2.905133,
+        "candidate": 3.39410125
+      },
+      "time_reduction_percent": -16.831182944119938,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 153726464.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 5.553925688934139,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 58864072.0,
+          "lts__t_bytes.sum": 1022200704.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 32.934119859515334,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 41.28816609584995,
+          "smsp__inst_executed.sum": 2026110976.0,
+          "smsp__inst_executed_pipe_adu.sum": 15204352.0,
+          "smsp__inst_executed_pipe_alu.sum": 1367801856.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 179568640.0,
+          "smsp__inst_executed_pipe_lsu.sum": 160301056.0,
+          "smsp__inst_executed_pipe_tensor.sum": 26214400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 8912896.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 154529280.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 4.782830965595754,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 58865646.0,
+          "lts__t_bytes.sum": 1044827840.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 28.443118959820897,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 41.3545077009394,
+          "smsp__inst_executed.sum": 2344091648.0,
+          "smsp__inst_executed_pipe_adu.sum": 15204352.0,
+          "smsp__inst_executed_pipe_alu.sum": 1693122560.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 187957248.0,
+          "smsp__inst_executed_pipe_lsu.sum": 160301056.0,
+          "smsp__inst_executed_pipe_tensor.sum": 26214400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 7340032.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    {
+      "case": "1-32-3-64",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.743845,
+        "candidate": 1.7858025
+      },
+      "time_reduction_percent": -140.0772338323172,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 277383680.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 61.38562817258884,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 12646499.0,
+          "lts__t_bytes.sum": 372002432.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 27.078293881766935,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 56.332190828729104,
+          "smsp__inst_executed.sum": 353894400.0,
+          "smsp__inst_executed_pipe_adu.sum": 3407872.0,
+          "smsp__inst_executed_pipe_alu.sum": 201588736.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 67895296.0,
+          "smsp__inst_executed_pipe_lsu.sum": 24903680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 3407872.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 277293568.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 83.47755185084712,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 12661322.0,
+          "lts__t_bytes.sum": 369017440.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 20.79617145687233,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 40.12570821278116,
+          "smsp__inst_executed.sum": 377487360.0,
+          "smsp__inst_executed_pipe_adu.sum": 3407872.0,
+          "smsp__inst_executed_pipe_alu.sum": 225968128.0,
+          "smsp__inst_executed_pipe_cbu.sum": 4456448.0,
+          "smsp__inst_executed_pipe_fma.sum": 73138176.0,
+          "smsp__inst_executed_pipe_lsu.sum": 24903680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1835008.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    {
+      "case": "2-32-3-64",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 3.81467575,
+        "candidate": 3.756928
+      },
+      "time_reduction_percent": 1.513831155898382,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 160201472.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 4.4142622145977,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 53718780.0,
+          "lts__t_bytes.sum": 543568992.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 24.926010402807492,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 33.00320467543013,
+          "smsp__inst_executed.sum": 2180377600.0,
+          "smsp__inst_executed_pipe_adu.sum": 22579200.0,
+          "smsp__inst_executed_pipe_alu.sum": 1531212800.0,
+          "smsp__inst_executed_pipe_cbu.sum": 870400.0,
+          "smsp__inst_executed_pipe_fma.sum": 182067200.0,
+          "smsp__inst_executed_pipe_lsu.sum": 159360000.0,
+          "smsp__inst_executed_pipe_tensor.sum": 26214400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 921600.0,
+          "smsp__inst_executed_pipe_xu.sum": 409600.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 160788224.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 4.499267313409913,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 53697575.0,
+          "lts__t_bytes.sum": 562677856.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 26.385210968266726,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 49.329609189717225,
+          "smsp__inst_executed.sum": 2552857600.0,
+          "smsp__inst_executed_pipe_adu.sum": 14182400.0,
+          "smsp__inst_executed_pipe_alu.sum": 1139174400.0,
+          "smsp__inst_executed_pipe_cbu.sum": 870400.0,
+          "smsp__inst_executed_pipe_fma.sum": 188928000.0,
+          "smsp__inst_executed_pipe_lsu.sum": 158540800.0,
+          "smsp__inst_executed_pipe_tensor.sum": 26214400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 744448000.0,
+          "smsp__inst_executed_pipe_xu.sum": 204800.0
+        }
+      }
+    },
+    {
+      "case": "2-48-32-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 1.4552815,
+        "candidate": 1.44525375
+      },
+      "time_reduction_percent": 0.6890591270486079,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 108512512.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 7.824443121943152,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 20416586.0,
+          "lts__t_bytes.sum": 1303826848.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 25.816255751235495,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 32.54831451060683,
+          "smsp__inst_executed.sum": 829958144.0,
+          "smsp__inst_executed_pipe_adu.sum": 8580096.0,
+          "smsp__inst_executed_pipe_alu.sum": 582142976.0,
+          "smsp__inst_executed_pipe_cbu.sum": 334848.0,
+          "smsp__inst_executed_pipe_fma.sum": 69749760.0,
+          "smsp__inst_executed_pipe_lsu.sum": 60838912.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 350208.0,
+          "smsp__inst_executed_pipe_xu.sum": 155648.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 108646400.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 7.851163836991783,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 20406680.0,
+          "lts__t_bytes.sum": 1364862400.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 26.569145994400102,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 48.20862894718411,
+          "smsp__inst_executed.sum": 971500544.0,
+          "smsp__inst_executed_pipe_adu.sum": 5389312.0,
+          "smsp__inst_executed_pipe_alu.sum": 433168384.0,
+          "smsp__inst_executed_pipe_cbu.sum": 334848.0,
+          "smsp__inst_executed_pipe_fma.sum": 72356864.0,
+          "smsp__inst_executed_pipe_lsu.sum": 60527616.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 282890240.0,
+          "smsp__inst_executed_pipe_xu.sum": 77824.0
+        }
+      }
+    },
+    {
+      "case": "1-48-32-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.7563795,
+        "candidate": 0.7568765000000001
+      },
+      "time_reduction_percent": -0.0657077564899744,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 130232832.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 20.011533571662348,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 16768515.0,
+          "lts__t_bytes.sum": 1220263328.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 69.90151316697423,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.63721753315287,
+          "smsp__inst_executed.sum": 257359872.0,
+          "smsp__inst_executed_pipe_adu.sum": 1933312.0,
+          "smsp__inst_executed_pipe_alu.sum": 151093248.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2195456.0,
+          "smsp__inst_executed_pipe_fma.sum": 41549824.0,
+          "smsp__inst_executed_pipe_lsu.sum": 21954560.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1081344.0,
+          "smsp__inst_executed_pipe_xu.sum": 1769472.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 130464000.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 20.015309232354717,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 16765925.0,
+          "lts__t_bytes.sum": 1219745184.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 69.93091002173051,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.645913928794368,
+          "smsp__inst_executed.sum": 257359872.0,
+          "smsp__inst_executed_pipe_adu.sum": 1933312.0,
+          "smsp__inst_executed_pipe_alu.sum": 151093248.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2195456.0,
+          "smsp__inst_executed_pipe_fma.sum": 41549824.0,
+          "smsp__inst_executed_pipe_lsu.sum": 21954560.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1081344.0,
+          "smsp__inst_executed_pipe_xu.sum": 1769472.0
+        }
+      }
+    },
+    {
+      "case": "1-64-48-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.37431775,
+        "candidate": 0.374207
+      },
+      "time_reduction_percent": 0.029587162243838172,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 31743232.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 9.512473916779182,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7844388.0,
+          "lts__t_bytes.sum": 789876736.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 70.82782264811453,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.06068118594673,
+          "smsp__inst_executed.sum": 121397248.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 71483392.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19742720.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10567680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 31782144.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 9.442769434843985,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7846250.0,
+          "lts__t_bytes.sum": 790051552.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 70.85655093781993,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.072290826338797,
+          "smsp__inst_executed.sum": 121397248.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 71483392.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19742720.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10567680.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        }
+      }
+    },
+    {
+      "case": "2-64-48-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.5729075,
+        "candidate": 0.5726835
+      },
+      "time_reduction_percent": 0.0390988073990961,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 12179712.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 2.5758064655844493,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 985795.0,
+          "lts__t_bytes.sum": 743614656.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 54.07823264863401,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 28.52724574123488,
+          "smsp__inst_executed.sum": 185708800.0,
+          "smsp__inst_executed_pipe_adu.sum": 848000.0,
+          "smsp__inst_executed_pipe_alu.sum": 106880000.0,
+          "smsp__inst_executed_pipe_cbu.sum": 419200.0,
+          "smsp__inst_executed_pipe_fma.sum": 35004800.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10092800.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 6569600.0,
+          "smsp__inst_executed_pipe_xu.sum": 316800.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 12207360.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 2.6195022588640637,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 975105.0,
+          "lts__t_bytes.sum": 742051552.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 53.92876739656744,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 28.463950996273528,
+          "smsp__inst_executed.sum": 185708800.0,
+          "smsp__inst_executed_pipe_adu.sum": 848000.0,
+          "smsp__inst_executed_pipe_alu.sum": 106880000.0,
+          "smsp__inst_executed_pipe_cbu.sum": 419200.0,
+          "smsp__inst_executed_pipe_fma.sum": 35004800.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10092800.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 6569600.0,
+          "smsp__inst_executed_pipe_xu.sum": 316800.0
+        }
+      }
+    },
+    {
+      "case": "1-64-64-8",
+      "occurrences": 2,
+      "gpu_ms": {
+        "control": 0.125687,
+        "candidate": 0.12537475
+      },
+      "time_reduction_percent": 0.24843460341958945,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 17408.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.015320836337418889,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1924845.0,
+          "lts__t_bytes.sum": 175892192.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 67.01461488667151,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 22.383998460437702,
+          "smsp__inst_executed.sum": 30349312.0,
+          "smsp__inst_executed_pipe_adu.sum": 223232.0,
+          "smsp__inst_executed_pipe_alu.sum": 17870848.0,
+          "smsp__inst_executed_pipe_cbu.sum": 137216.0,
+          "smsp__inst_executed_pipe_fma.sum": 4935680.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2641920.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 92160.0,
+          "smsp__inst_executed_pipe_xu.sum": 221184.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 3840.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.0033218765502090568,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1924778.0,
+          "lts__t_bytes.sum": 175409344.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 67.18355596003607,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 22.459855953351322,
+          "smsp__inst_executed.sum": 30349312.0,
+          "smsp__inst_executed_pipe_adu.sum": 223232.0,
+          "smsp__inst_executed_pipe_alu.sum": 17870848.0,
+          "smsp__inst_executed_pipe_cbu.sum": 137216.0,
+          "smsp__inst_executed_pipe_fma.sum": 4935680.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2641920.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 92160.0,
+          "smsp__inst_executed_pipe_xu.sum": 221184.0
+        }
+      }
+    },
+    {
+      "case": "2-64-64-8",
+      "occurrences": 2,
+      "gpu_ms": {
+        "control": 0.19001200000000001,
+        "candidate": 0.1898765
+      },
+      "time_reduction_percent": 0.07131128560301514,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 1024.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.0006418155678784144,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 121289.0,
+          "lts__t_bytes.sum": 207454336.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 40.96438293166077,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 19.750630341930556,
+          "smsp__inst_executed.sum": 46728000.0,
+          "smsp__inst_executed_pipe_adu.sum": 212000.0,
+          "smsp__inst_executed_pipe_alu.sum": 26873600.0,
+          "smsp__inst_executed_pipe_cbu.sum": 104800.0,
+          "smsp__inst_executed_pipe_fma.sum": 8847200.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2536000.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1642400.0,
+          "smsp__inst_executed_pipe_xu.sum": 104800.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 768.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 0.000475453899989857,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 120437.0,
+          "lts__t_bytes.sum": 207440608.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 40.9265620325856,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 19.75219681787978,
+          "smsp__inst_executed.sum": 46728000.0,
+          "smsp__inst_executed_pipe_adu.sum": 212000.0,
+          "smsp__inst_executed_pipe_alu.sum": 26873600.0,
+          "smsp__inst_executed_pipe_cbu.sum": 104800.0,
+          "smsp__inst_executed_pipe_fma.sum": 8847200.0,
+          "smsp__inst_executed_pipe_lsu.sum": 2536000.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1638400.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1642400.0,
+          "smsp__inst_executed_pipe_xu.sum": 104800.0
+        }
+      }
+    },
+    {
+      "case": "1-48-64-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.3723945,
+        "candidate": 0.372184
+      },
+      "time_reduction_percent": 0.056526076512941614,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 23580416.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 7.238335177408405,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7730578.0,
+          "lts__t_bytes.sum": 666989344.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 72.50166497957686,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.062398724490436,
+          "smsp__inst_executed.sum": 120676352.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 71286784.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19480576.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10436608.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 23605760.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 7.207149467260267,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 7736706.0,
+          "lts__t_bytes.sum": 666599776.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 72.48345136174953,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 24.06049587743158,
+          "smsp__inst_executed.sum": 120676352.0,
+          "smsp__inst_executed_pipe_adu.sum": 892928.0,
+          "smsp__inst_executed_pipe_alu.sum": 71286784.0,
+          "smsp__inst_executed_pipe_cbu.sum": 548864.0,
+          "smsp__inst_executed_pipe_fma.sum": 19480576.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10436608.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 368640.0,
+          "smsp__inst_executed_pipe_xu.sum": 884736.0
+        }
+      }
+    },
+    {
+      "case": "2-48-64-16",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.5616805,
+        "candidate": 0.56202925
+      },
+      "time_reduction_percent": -0.06209045889968845,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 13846784.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 2.9857823567857835,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1067643.0,
+          "lts__t_bytes.sum": 846595648.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 53.559798081609436,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 28.277260388505233,
+          "smsp__inst_executed.sum": 186963200.0,
+          "smsp__inst_executed_pipe_adu.sum": 848000.0,
+          "smsp__inst_executed_pipe_alu.sum": 107494400.0,
+          "smsp__inst_executed_pipe_cbu.sum": 470400.0,
+          "smsp__inst_executed_pipe_fma.sum": 35388800.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10144000.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 6569600.0,
+          "smsp__inst_executed_pipe_xu.sum": 419200.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 13706240.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 2.96690192045112,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 1075812.0,
+          "lts__t_bytes.sum": 846823584.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 53.2729683226148,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 28.154538633971605,
+          "smsp__inst_executed.sum": 186963200.0,
+          "smsp__inst_executed_pipe_adu.sum": 848000.0,
+          "smsp__inst_executed_pipe_alu.sum": 107494400.0,
+          "smsp__inst_executed_pipe_cbu.sum": 470400.0,
+          "smsp__inst_executed_pipe_fma.sum": 35388800.0,
+          "smsp__inst_executed_pipe_lsu.sum": 10144000.0,
+          "smsp__inst_executed_pipe_tensor.sum": 6553600.0,
+          "smsp__inst_executed_pipe_uniform.sum": 6569600.0,
+          "smsp__inst_executed_pipe_xu.sum": 419200.0
+        }
+      }
+    },
+    {
+      "case": "1-32-48-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 1.12017125,
+        "candidate": 1.42354175
+      },
+      "time_reduction_percent": -27.082510821448057,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 114359552.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 10.566880819014457,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 21534900.0,
+          "lts__t_bytes.sum": 1511564608.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 35.36456296999793,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 57.488791983809804,
+          "smsp__inst_executed.sum": 841089024.0,
+          "smsp__inst_executed_pipe_adu.sum": 5439488.0,
+          "smsp__inst_executed_pipe_alu.sum": 509149184.0,
+          "smsp__inst_executed_pipe_cbu.sum": 1114112.0,
+          "smsp__inst_executed_pipe_fma.sum": 146735104.0,
+          "smsp__inst_executed_pipe_lsu.sum": 61538304.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 3145728.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 114496256.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 8.419330476006891,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 21535640.0,
+          "lts__t_bytes.sum": 866863360.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 25.94778362255097,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 41.26818513758882,
+          "smsp__inst_executed.sum": 946077696.0,
+          "smsp__inst_executed_pipe_adu.sum": 5439488.0,
+          "smsp__inst_executed_pipe_alu.sum": 619380736.0,
+          "smsp__inst_executed_pipe_cbu.sum": 1114112.0,
+          "smsp__inst_executed_pipe_fma.sum": 148832256.0,
+          "smsp__inst_executed_pipe_lsu.sum": 61538304.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9961472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 2752512.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    {
+      "case": "2-32-48-32",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 1.8384775,
+        "candidate": 1.8571285
+      },
+      "time_reduction_percent": -1.014480732018752,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 109835520.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 6.286941063105476,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 26867052.0,
+          "lts__t_bytes.sum": 1332782080.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 26.74676146239417,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 32.764039805466915,
+          "smsp__inst_executed.sum": 1091532800.0,
+          "smsp__inst_executed_pipe_adu.sum": 11289600.0,
+          "smsp__inst_executed_pipe_alu.sum": 765875200.0,
+          "smsp__inst_executed_pipe_cbu.sum": 435200.0,
+          "smsp__inst_executed_pipe_fma.sum": 91571200.0,
+          "smsp__inst_executed_pipe_lsu.sum": 79948800.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 460800.0,
+          "smsp__inst_executed_pipe_xu.sum": 204800.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 108979200.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 6.214206636895308,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 26852883.0,
+          "lts__t_bytes.sum": 1382963584.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 27.36606995123535,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 48.695020982365996,
+          "smsp__inst_executed.sum": 1277772800.0,
+          "smsp__inst_executed_pipe_adu.sum": 7091200.0,
+          "smsp__inst_executed_pipe_alu.sum": 569856000.0,
+          "smsp__inst_executed_pipe_cbu.sum": 435200.0,
+          "smsp__inst_executed_pipe_fma.sum": 95001600.0,
+          "smsp__inst_executed_pipe_lsu.sum": 79539200.0,
+          "smsp__inst_executed_pipe_tensor.sum": 13107200.0,
+          "smsp__inst_executed_pipe_uniform.sum": 372224000.0,
+          "smsp__inst_executed_pipe_xu.sum": 102400.0
+        }
+      }
+    },
+    {
+      "case": "2-3-32-64",
+      "occurrences": 1,
+      "gpu_ms": {
+        "control": 0.5456505,
+        "candidate": 0.62535725
+      },
+      "time_reduction_percent": -14.607656366117116,
+      "counters": {
+        "control": {
+          "dram__bytes.sum": 159642368.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 30.61006809185725,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 6445933.0,
+          "lts__t_bytes.sum": 434030656.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 22.30439914202733,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 30.99264202867881,
+          "smsp__inst_executed.sum": 262107136.0,
+          "smsp__inst_executed_pipe_adu.sum": 2709504.0,
+          "smsp__inst_executed_pipe_alu.sum": 183834624.0,
+          "smsp__inst_executed_pipe_cbu.sum": 120832.0,
+          "smsp__inst_executed_pipe_fma.sum": 22026240.0,
+          "smsp__inst_executed_pipe_lsu.sum": 19212288.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 110592.0,
+          "smsp__inst_executed_pipe_xu.sum": 49152.0
+        },
+        "candidate": {
+          "dram__bytes.sum": 159543808.0,
+          "dram__throughput.avg.pct_of_peak_sustained_elapsed": 26.612140114507465,
+          "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 6443250.0,
+          "lts__t_bytes.sum": 438672384.0,
+          "sm__pipe_tensor_cycles_active.avg.pct_of_peak_sustained_active": 21.85480232757823,
+          "sm__warps_active.avg.pct_of_peak_sustained_active": 46.34219837904214,
+          "smsp__inst_executed.sum": 306804736.0,
+          "smsp__inst_executed_pipe_adu.sum": 1701888.0,
+          "smsp__inst_executed_pipe_alu.sum": 136790016.0,
+          "smsp__inst_executed_pipe_cbu.sum": 120832.0,
+          "smsp__inst_executed_pipe_fma.sum": 22849536.0,
+          "smsp__inst_executed_pipe_lsu.sum": 19113984.0,
+          "smsp__inst_executed_pipe_tensor.sum": 3145728.0,
+          "smsp__inst_executed_pipe_uniform.sum": 89333760.0,
+          "smsp__inst_executed_pipe_xu.sum": 24576.0
+        }
+      }
+    }
+  ],
+  "matched_control_instruction_pairs": 40,
+  "qualification": {
+    "guards": 120,
+    "allocation_warnings": 22,
+    "source_seals": 1274,
+    "exact_output_pairs": 774861888,
+    "f64_values": 2690432,
+    "counter_ranges": 116,
+    "metrics_rechecked": 4756,
+    "operation_calls": 9320,
+    "counter_replays": 1360,
+    "minimum_sampled_headroom_bytes": 15828123648,
+    "game_actions": 0,
+    "learner_updates": 0
+  },
+  "cpu_addresses": {
+    "a_source_addresses": 131072,
+    "actual_address_sampling": "all columns, first/last64 and256 deterministic reduction coordinates; all K cursor transitions",
+    "actual_contracts": 9,
+    "b_source_addresses": 5559244,
+    "cursor_transitions": 5248059,
+    "gpu_calls": 0,
+    "gradient_transitions": 5243557,
+    "local_id_permutations": 4,
+    "masked_packet_values": 164767,
+    "negative_controls": 3,
+    "packet_and_fragment_checks": 40960,
+    "shared_bytes": {
+      "BF16": 9216,
+      "F16": 9216,
+      "F32": 13312
+    },
+    "small_exhaustive_cases": 12,
+    "status": "complete"
+  },
+  "cpu_modules": {
+    "per_arm": 152,
+    "changed": 123,
+    "unchanged": 29
+  },
+  "source_sha256": {
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/publish.py": "92ec5ded65b9021adb1e89e4ae6cee7b9deb3b31e277469f30a3dad1af67abbe",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/audit.py": "08c2a862faec31d9a8326844fd3c1eb36ae338f5d222094f0e88e06fe0db152c",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/interpret.py": "cc52c37b6bd83698f1b1c49675a0e4ce5713faad4afa8a4e75cde0406970f8c3",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/audit.json": "dcb25540769a2d1aa44c2284b5253c39ebc6404512df9494438625be9b22a0a2",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/interpretation.json": "8f620c6ef2f4eb307005654e5b69335c04bcb0737feea572045050e304b9d34e",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/cpu-build.json": "ff68df1be201d3a988a6ccaf9ff65b4c73814a04c7fc999908d99e1cf72d1fda",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/addresses.json": "511f2634e627e2d82a97840744a752b93cdf6435fb82043b6bd8382b3803eae2",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/mechanism-runtime-audit.json": "746b8dae699369f2f4a09318d7e60a4280db2b2ba633e136641d4df0ce13e962",
+    "/x/Code/kindle/runs/convolution-packet-axis-20261016.JfluRtMn/gpu-build.json": "b6a55656dc395186570721a16fbefe36f724d9e80a3fba26ba99d91146680371"
+  },
+  "journal_sha256": {
+    "prepare": "7c58137749d6622da0ab25a890e033315c688d4f149c324876ca9cc2344b7f09",
+    "build": "d51956f374eb413dd23db7ce30512d27d98f5fd41ad1c18fb3a25710f8b3d2c8",
+    "audit": "ce1e437f23e5b72c592f6bdca3b926a4c03f7b7adcbd191425ff8a2da4d36973",
+    "gpu-build": "1bb18719f5e2269a844f2f10b3021a9c71a3c2f832a36288cee13f29cb382203",
+    "numerical": "ac12b3ae1c06df7fe07a1477014e44f6120c94b3664de24c21e7d1c4aba73da0",
+    "ordinary": "b54170e5a52c7d70d0596570ec9a57b8fa0e65e1c3e4616e620d026cb4cf6921",
+    "capture": "059f5d18e79265feec0be355586dad9626a9ad5ab9c0b1570a320abd158bf023",
+    "final-audit": "13e799b2641e9d742da3280eae598cd2a90cec061194fd556fcde5abcd8cb158"
+  },
+  "unchanged_complete_update": {
+    "native_sha256": "834241b6b9f702a8150731a0e879e704ba817aa8dfde5aa48742251aa249c596",
+    "rgb_ms": 48.067952656,
+    "jax_inclusive_ms": 27.222569,
+    "ratio": 1.7657390327856273,
+    "cdp_ms": 45.504590176
+  },
+  "upstream": {
+    "meganeura": "f648a4534a87e29ac29810a88dfa19117f70df9b",
+    "blade": "01be8446058858821fffdcd22c14ebd4e953e1db",
+    "blade_review": "All152 shader variants are single-entry and override-free; new entry-point resolution takes its unchanged fast path. No runtime refresh."
+  },
+  "limitations": [
+    "Counters and ordinary timing are separate captures.",
+    "Pipe counts do not identify source or SASS instructions.",
+    "Local-ID ownership does not require contiguous subgroup membership; expected uniformity is conditional.",
+    "Standalone operation costs are not full-update improvements.",
+    "No full-update trial, production promotion, selector or sweep."
+  ]
+}

@@ -1,0 +1,286 @@
+{
+  "protocol": "phase2-shared-ale-trace-v1",
+  "status": "cpu_alignment_complete_gpu_smoke_pending",
+  "upstream_revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+  "snapshots": [
+    {
+      "protocol": "phase2-shared-ale-trace-v1",
+      "seed": 1009,
+      "streams": 6,
+      "forced_cutoff_frames": 256,
+      "records": [
+        {
+          "game": "pong",
+          "trace_sha256": "11368a7e82f93ceddee587d6e63fff06ee713d7b64b566e0abe0f616bd0405be",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        },
+        {
+          "game": "breakout",
+          "trace_sha256": "fd49e4747abe8efbd61f90aa323bd75fb1c3aed5459f702a48b64f2fbb011e7d",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        },
+        {
+          "game": "seaquest",
+          "trace_sha256": "293cb207b35b1147827964341360c8efdf0a95e35bb552fa8e36249347f68bc0",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        }
+      ],
+      "versions": {
+        "gymnasium": "1.3.0",
+        "ale-py": "0.12.1",
+        "numpy": "2.5.2",
+        "pillow": "12.3.0"
+      }
+    },
+    {
+      "protocol": "phase2-shared-ale-trace-v1",
+      "seed": 1009,
+      "streams": 6,
+      "forced_cutoff_frames": 256,
+      "records": [
+        {
+          "game": "pong",
+          "trace_sha256": "11368a7e82f93ceddee587d6e63fff06ee713d7b64b566e0abe0f616bd0405be",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        },
+        {
+          "game": "breakout",
+          "trace_sha256": "fd49e4747abe8efbd61f90aa323bd75fb1c3aed5459f702a48b64f2fbb011e7d",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        },
+        {
+          "game": "seaquest",
+          "trace_sha256": "293cb207b35b1147827964341360c8efdf0a95e35bb552fa8e36249347f68bc0",
+          "actions": 960,
+          "resets": 18,
+          "terminals": 0,
+          "cutoffs": 12,
+          "executed_action_frames": [
+            640,
+            640,
+            640,
+            640,
+            640,
+            640
+          ]
+        }
+      ],
+      "versions": {
+        "gymnasium": "1.3.0",
+        "ale-py": "0.12.1",
+        "numpy": "1.26.4",
+        "pillow": "12.3.0"
+      }
+    },
+    {
+      "protocol": "phase2-shared-ale-trace-v1",
+      "seed": 1009,
+      "streams": 6,
+      "forced_cutoff_frames": null,
+      "records": [
+        {
+          "game": "pong",
+          "trace_sha256": "e5269fd0e7bfc37489e4b1bbbd6dc8a958471dd528912cce8e1c5ac544046513",
+          "actions": 9216,
+          "resets": 12,
+          "terminals": 6,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6143,
+            6144,
+            6141,
+            6144,
+            6144,
+            6144
+          ]
+        },
+        {
+          "game": "breakout",
+          "trace_sha256": "78aeaa730d114094a9520738a2b579708201cef82f522237b3ba9525edb92298",
+          "actions": 9216,
+          "resets": 61,
+          "terminals": 55,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6124,
+            6125,
+            6117,
+            6121,
+            6122,
+            6128
+          ]
+        },
+        {
+          "game": "seaquest",
+          "trace_sha256": "836847d0004994ae4877f1f0155bec436eda6b842a198a4220f8ed10e74c42f3",
+          "actions": 9216,
+          "resets": 22,
+          "terminals": 16,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6138,
+            6138,
+            6135,
+            6135,
+            6135,
+            6135
+          ]
+        }
+      ],
+      "versions": {
+        "gymnasium": "1.3.0",
+        "ale-py": "0.12.1",
+        "numpy": "2.5.2",
+        "pillow": "12.3.0"
+      }
+    },
+    {
+      "protocol": "phase2-shared-ale-trace-v1",
+      "seed": 1009,
+      "streams": 6,
+      "forced_cutoff_frames": null,
+      "records": [
+        {
+          "game": "pong",
+          "trace_sha256": "e5269fd0e7bfc37489e4b1bbbd6dc8a958471dd528912cce8e1c5ac544046513",
+          "actions": 9216,
+          "resets": 12,
+          "terminals": 6,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6143,
+            6144,
+            6141,
+            6144,
+            6144,
+            6144
+          ]
+        },
+        {
+          "game": "breakout",
+          "trace_sha256": "78aeaa730d114094a9520738a2b579708201cef82f522237b3ba9525edb92298",
+          "actions": 9216,
+          "resets": 61,
+          "terminals": 55,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6124,
+            6125,
+            6117,
+            6121,
+            6122,
+            6128
+          ]
+        },
+        {
+          "game": "seaquest",
+          "trace_sha256": "836847d0004994ae4877f1f0155bec436eda6b842a198a4220f8ed10e74c42f3",
+          "actions": 9216,
+          "resets": 22,
+          "terminals": 16,
+          "cutoffs": 0,
+          "executed_action_frames": [
+            6138,
+            6138,
+            6135,
+            6135,
+            6135,
+            6135
+          ]
+        }
+      ],
+      "versions": {
+        "gymnasium": "1.3.0",
+        "ale-py": "0.12.1",
+        "numpy": "1.26.4",
+        "pillow": "12.3.0"
+      }
+    }
+  ],
+  "comparison": {
+    "learner_seeds": [
+      1009,
+      2017,
+      3019
+    ],
+    "actual_actions_per_seed": 200004,
+    "streams": 6,
+    "batch": 16,
+    "sequence_length": 64,
+    "replay_context": 1,
+    "train_ratio": 256,
+    "learning_rate": 0.00004,
+    "learning_rate_warmup": 1000,
+    "agc": 0.3,
+    "precision": "F32",
+    "replay_arrivals": 100000,
+    "upstream_sequence_capacity": 99616,
+    "cutoff_frames": 100000,
+    "cutoff_bootstraps": true,
+    "sticky_probability": 0.25,
+    "full_actions": true,
+    "reset_noops": 0,
+    "reward_action_aids": "none",
+    "video_pretraining": "Tiny: 250k frames on Boxing/Pong/Freeway/Breakout/Qbert; Large: released VideoMix; upstream: none",
+    "limits": [
+      "offline corpus/probe seeds are separate from RL seeds",
+      "whole packages differ: native frozen latents/prediction versus learned RGB64/reconstruction",
+      "sampling RNG, chunk storage, eviction and native upstream policy-sync lag differ"
+    ]
+  }
+}

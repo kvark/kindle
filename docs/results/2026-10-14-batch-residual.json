@@ -1,0 +1,126 @@
+{
+  "status": "complete",
+  "artifact_root": "runs/batch-residual-20261014.b7KtbHQM",
+  "guards": 2,
+  "allocation_warnings": 1,
+  "synthetic_updates": 2,
+  "optimizer_free_replays": 2975,
+  "measured_cached_calls": 1920,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 12684099584,
+  "family": {
+    "native_sha256": "571edbdf3591e7f8b85c18b70b6812455ff66c9c4f0d9b0fa4684a72a358acf9",
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "exact_first_outputs": true,
+    "total_dispatches": 5163,
+    "baseline_gpu_ms": 54.82364525,
+    "mask_means_ms": {
+      "0": 4.102392666666667,
+      "1": 26.109978666666667,
+      "2": 11.334857999999999,
+      "3": 33.410472,
+      "4": 25.307342000000002,
+      "5": 47.000525333333336,
+      "6": 33.147111333333335,
+      "7": 54.82815133333334
+    },
+    "shapley_ms": {
+      "command_stream_floor": 4.102392666666667,
+      "convolution": 21.857674888888887,
+      "matrix": 7.543407555555555,
+      "remaining": 21.324676222222223
+    },
+    "batch_scaling": {
+      "command_stream_floor": {
+        "b8_ms": 4.295188666666666,
+        "b32_ms": 4.102392666666667,
+        "scale": 0.9551134967606391,
+        "increment_ms": -0.19279599999999952
+      },
+      "convolution": {
+        "b8_ms": 5.586719111111111,
+        "b32_ms": 21.857674888888887,
+        "scale": 3.9124349111122103,
+        "increment_ms": 16.270955777777775
+      },
+      "matrix": {
+        "b8_ms": 3.388130777777777,
+        "b32_ms": 7.543407555555555,
+        "scale": 2.226421602445688,
+        "increment_ms": 4.155276777777777
+      },
+      "remaining": {
+        "b8_ms": 5.462644777777777,
+        "b32_ms": 21.324676222222223,
+        "scale": 3.903727423201985,
+        "increment_ms": 15.862031444444446
+      }
+    },
+    "scope": "Counterfactual zero-workgroup dispatches retain bindings/barriers. Masked outputs are not valid learner outputs. Shapley allocates cache/overlap interactions; not pure kernel durations or independently additive optimization savings."
+  },
+  "world_subclasses": {
+    "native_sha256": "52597d90668b358a5f8f9a2f2c721fc6cacd64dac4ad18e0f94b04fea3a1fa10",
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "exact_first_outputs": true,
+    "baseline_gpu_ms": 42.59466925,
+    "shapley_ms": {
+      "heavy_plus_command_stream": 26.902071333333332,
+      "materialization": 4.4415536666666675,
+      "row_reduction": 5.378822666666665,
+      "other": 5.893369
+    },
+    "heavy_always_active": true,
+    "world_only": true,
+    "exact_previous_world_outputs": true,
+    "scope": "World session only; heavy work always active. Interacting zero-workgroup allocations retain every binding/dependency/cache boundary, not pure kernel costs, additive savings or complete-update time."
+  },
+  "cnn": {
+    "native_actual_conv_output_bf16": true,
+    "native_label_is_stale_not_type_evidence": true,
+    "native_conv_output_bytes": 134217728,
+    "logical_output_extent_sum_bytes": 671088640,
+    "jax_entry": "main.16158",
+    "jax_scale_activation_computation": "fused_multiply.10",
+    "root_reachable_dataflow_verified": true,
+    "native_backwards_in_region": {
+      "ToBF16": 2,
+      "Generated": 4,
+      "SumRows": 3,
+      "Transpose": 3,
+      "PackChannels": 1,
+      "Conv2dBF16": 1,
+      "MaxPool2dGrad": 1,
+      "MaxPool2d": 1,
+      "SiluGrad": 1,
+      "RmsNormGradWRowPar": 1,
+      "RmsNormGradX": 1
+    },
+    "source_sha256": {
+      "/x/Code/kindle/runs/batch-residual-20261014.b7KtbHQM/family-masks/world_gradient-plan.json": "f00978ec579fb391fea7bbe69ad164da360143cc043ff3bfa10c72b866ca3e6f",
+      "/x/Code/kindle/runs/connected-projections-20261014.lmjwrepW/jax-b32-v3/compiled.hlo": "a60b698f49cacac0ce2c271f2a28a314dc3fe12db346631e986289d789652726"
+    },
+    "scope": "Actual connected image-block storage and lowering, not isolated block timing or value/derivative equality. Logical output extents are not peak VRAM or measured DRAM traffic; JAX retains separate mask, reciprocal-root and activation work. No claim that layout alone closes the gap."
+  },
+  "retained_complete_ms": {
+    "native_b8": 22.779939113281262,
+    "jax_b8": 12.73682200917392,
+    "native_b32": 68.3444008984375,
+    "jax_b32": 27.187344880076125
+  },
+  "retained_cpu_failures": [
+    "build.log: unapplied dependency-path/scratch edit; repaired before compilation",
+    "preflight.log: Python delimiter syntax; repaired before first GPU declaration",
+    "preflight-subclasses.log: exact source-normalizer log wrapping; repaired before follow-up GPU declaration"
+  ],
+  "decision": "Measure a complete connected image-training block with staged backward, live tapes and explicit layout/rounding; no production or Atari restart, no packing/row-only/tile/dtype sweep, no whole-goal closure."
+}

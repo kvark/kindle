@@ -1,0 +1,331 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T02:07:51.623923+00:00",
+  "performance_gate": false,
+  "native_sha256": "b01fe8f3f7c62c9de0d8fa742c3b6d80be3b4541720f22b7d8a018f738cd37aa",
+  "workloads": {
+    "rgb": {
+      "control": {
+        "mean_ms": 43.163615703125,
+        "min_ms": 42.487188,
+        "max_ms": 45.305068,
+        "first32_ms": 43.17289184375,
+        "last32_ms": 43.01403665625,
+        "samples": 256,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.5090558242187497,
+          "imagination_and_targets": 7.6843959140625,
+          "posterior": 7.06312580078125,
+          "world_train_and_sync": 24.9070381640625
+        }
+      },
+      "candidate": {
+        "mean_ms": 42.53951837890625,
+        "min_ms": 41.944523999999994,
+        "max_ms": 44.223681,
+        "first32_ms": 42.5404380625,
+        "last32_ms": 42.47194375,
+        "samples": 256,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.59791698046875,
+          "imagination_and_targets": 7.85686757421875,
+          "posterior": 7.1598699140625,
+          "world_train_and_sync": 23.92486391015625
+        }
+      },
+      "fraction_reduced": 0.01445887500507892
+    },
+    "cdp": {
+      "control": {
+        "mean_ms": 41.04442537890625,
+        "min_ms": 40.361874,
+        "max_ms": 41.896615,
+        "first32_ms": 41.071070875000004,
+        "last32_ms": 41.003335156249996,
+        "samples": 256,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.5499850234375,
+          "imagination_and_targets": 17.254850265625,
+          "posterior": 7.66537714453125,
+          "world_train_and_sync": 12.5742129453125
+        }
+      },
+      "candidate": {
+        "mean_ms": 41.820080921875,
+        "min_ms": 41.004258,
+        "max_ms": 42.587629,
+        "first32_ms": 41.955908281250004,
+        "last32_ms": 41.7157641875,
+        "samples": 256,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.53804320703125,
+          "imagination_and_targets": 17.4349299140625,
+          "posterior": 7.86440937109375,
+          "world_train_and_sync": 12.9826984296875
+        }
+      },
+      "fraction_reduced": -0.018897951081253916
+    }
+  },
+  "guards": 8,
+  "allocation_warnings": 4,
+  "synthetic_updates": 1184,
+  "game_actions": 0,
+  "state_pairs": 32,
+  "exact_reports": 1184,
+  "guarantees": {
+    "smoke-rgb-control": {
+      "reports": 24,
+      "tensors": 292,
+      "target_values": 5618720,
+      "shaders": 205,
+      "policy": [
+        [
+          "false",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 13283950592
+    },
+    "smoke-rgb-candidate": {
+      "reports": 24,
+      "tensors": 292,
+      "target_values": 5618720,
+      "shaders": 205,
+      "policy": [
+        [
+          "true",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 13283950592
+    },
+    "smoke-cdp-control": {
+      "reports": 24,
+      "tensors": 346,
+      "target_values": 5618720,
+      "shaders": 225,
+      "policy": [
+        [
+          "false",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 12374507520
+    },
+    "smoke-cdp-candidate": {
+      "reports": 24,
+      "tensors": 346,
+      "target_values": 5618720,
+      "shaders": 225,
+      "policy": [
+        [
+          "true",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 12374507520
+    },
+    "timing-rgb-control": {
+      "reports": 272,
+      "tensors": 292,
+      "target_values": 5618720,
+      "shaders": 205,
+      "policy": [
+        [
+          "false",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 13283950592
+    },
+    "timing-rgb-candidate": {
+      "reports": 272,
+      "tensors": 292,
+      "target_values": 5618720,
+      "shaders": 205,
+      "policy": [
+        [
+          "true",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 13283950592
+    },
+    "timing-cdp-control": {
+      "reports": 272,
+      "tensors": 346,
+      "target_values": 5618720,
+      "shaders": 225,
+      "policy": [
+        [
+          "false",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 12374507520
+    },
+    "timing-cdp-candidate": {
+      "reports": 272,
+      "tensors": 346,
+      "target_values": 5618720,
+      "shaders": 225,
+      "policy": [
+        [
+          "true",
+          "64",
+          "256"
+        ]
+      ],
+      "minimum_headroom": 12374507520
+    }
+  },
+  "last_guard_utc": "2026-10-17T02:06:04.793348+00:00",
+  "inclusive_jax_ms": 27.22256929610012,
+  "rgb_to_jax": 1.5626562620230129,
+  "cpu_contract": {
+    "status": "complete",
+    "finished_utc": "2026-10-17T01:51:34.518506+00:00",
+    "programs": [
+      {
+        "model": "rgb",
+        "program": "world_gradient",
+        "dispatches": 3751,
+        "plain_payload_bytes": 62960,
+        "largest_plain": 64,
+        "conservative_whole_program_scratch": 960016,
+        "optimizer_upper_bound_bytes": 70656,
+        "parameter_pairs": 68
+      },
+      {
+        "model": "rgb",
+        "program": "posterior",
+        "dispatches": 3751,
+        "plain_payload_bytes": 62960,
+        "largest_plain": 64,
+        "conservative_whole_program_scratch": 960016,
+        "optimizer_upper_bound_bytes": 70656,
+        "parameter_pairs": 68
+      },
+      {
+        "model": "rgb",
+        "program": "imagination",
+        "dispatches": 681,
+        "plain_payload_bytes": 11376,
+        "largest_plain": 32,
+        "conservative_whole_program_scratch": 174096,
+        "optimizer_upper_bound_bytes": 1024,
+        "parameter_pairs": 0
+      },
+      {
+        "model": "rgb",
+        "program": "behavior_gradient",
+        "dispatches": 247,
+        "plain_payload_bytes": 3952,
+        "largest_plain": 16,
+        "conservative_whole_program_scratch": 62992,
+        "optimizer_upper_bound_bytes": 23552,
+        "parameter_pairs": 22
+      },
+      {
+        "model": "rgb",
+        "program": "slow_value",
+        "dispatches": 13,
+        "plain_payload_bytes": 208,
+        "largest_plain": 16,
+        "conservative_whole_program_scratch": 3088,
+        "optimizer_upper_bound_bytes": 1024,
+        "parameter_pairs": 0
+      },
+      {
+        "model": "cdp",
+        "program": "world_gradient",
+        "dispatches": 4088,
+        "plain_payload_bytes": 67600,
+        "largest_plain": 64,
+        "conservative_whole_program_scratch": 1046288,
+        "optimizer_upper_bound_bytes": 89088,
+        "parameter_pairs": 86
+      },
+      {
+        "model": "cdp",
+        "program": "posterior",
+        "dispatches": 4088,
+        "plain_payload_bytes": 67600,
+        "largest_plain": 64,
+        "conservative_whole_program_scratch": 1046288,
+        "optimizer_upper_bound_bytes": 89088,
+        "parameter_pairs": 86
+      },
+      {
+        "model": "cdp",
+        "program": "imagination",
+        "dispatches": 763,
+        "plain_payload_bytes": 12688,
+        "largest_plain": 32,
+        "conservative_whole_program_scratch": 195088,
+        "optimizer_upper_bound_bytes": 1024,
+        "parameter_pairs": 0
+      },
+      {
+        "model": "cdp",
+        "program": "behavior_gradient",
+        "dispatches": 247,
+        "plain_payload_bytes": 3952,
+        "largest_plain": 16,
+        "conservative_whole_program_scratch": 62992,
+        "optimizer_upper_bound_bytes": 23552,
+        "parameter_pairs": 22
+      },
+      {
+        "model": "cdp",
+        "program": "slow_value",
+        "dispatches": 13,
+        "plain_payload_bytes": 208,
+        "largest_plain": 16,
+        "conservative_whole_program_scratch": 3088,
+        "optimizer_upper_bound_bytes": 1024,
+        "parameter_pairs": 0
+      }
+    ],
+    "generated_uniform_span_counts": {
+      "16": 367,
+      "32": 35,
+      "48": 2,
+      "52": 2,
+      "64": 18
+    },
+    "emitted_modules": 430,
+    "specialized_construction_modules": 6,
+    "capacity_negative_tests": 6,
+    "source_lifetime_checks": 19,
+    "scope": [
+      "Current cached successful execution paths, not arbitrary larger programs or failed-device recovery.",
+      "World/posterior are aliases; aligned scratch/payload extents are not measured traffic.",
+      "GPU comparison must verify actual alignment<=256 and existing bounds, preserve COMMAND_CACHE=1.",
+      "Dynamic optimizer/helper bindings must stay outside immutable cached graph chunks.",
+      "No GPU runtime qualification or speedup from this CPU review."
+    ],
+    "gpu_calls": 0,
+    "backend_builds": 0
+  },
+  "sources_checked": 3196,
+  "production_changed": false,
+  "artifacts": {
+    "cpu": "runs/ubo-contract-20261017.BG5JhGQn",
+    "comparison": "runs/ubo-model-20261017.9I4iuDbs"
+  },
+  "decision": "Reject global UBO policy: RGB improvement below 3%; retain e45b9c43 and 1.59x qualified RGB/JAX.",
+  "failures_preserved": [
+    "CPU uniform-variable assumption for six specialized constant shaders",
+    "Rust2021 formatter on Rust2024 source",
+    "Duplicate Blade path before compilation"
+  ]
+}

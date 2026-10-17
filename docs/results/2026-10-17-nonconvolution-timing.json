@@ -1,0 +1,346 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T03:27:19.152520+00:00",
+  "gpu_calls": 0,
+  "builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "native_dispatches": 4692,
+  "native_versioned_reads": 8948,
+  "native_matrix_products": 716,
+  "native_intervals": 1699,
+  "cached_interval_ms": 39.909214375,
+  "jax_updates": 8,
+  "jax_kernels": 28064,
+  "jax_kernel_mean_ms": 22.57259125,
+  "retained_independent_fusion_pairs": 1120,
+  "jax_match_status": {
+    "direct_thunk": 82,
+    "library_product_candidates": 48,
+    "exact_fusion_computation": 669,
+    "library_helper_candidates": 6,
+    "named_sort": 6,
+    "unresolved": 1
+  },
+  "explicit_unresolved": [
+    {
+      "index": 221,
+      "kernel": "loop_add_fusion_1",
+      "known": [
+        [
+          "region_12.2752.sunk.clone.sunk.clone.clone.clone",
+          "loop_add_fusion.1",
+          "5401eea4586c03e5513efe721e9beace727856b69bbb4fb36c3183f2d8433c3d"
+        ]
+      ],
+      "scope": [
+        "rssm_backward"
+      ],
+      "ms": 0.011200249999999998
+    }
+  ],
+  "mutation_refusals": 20,
+  "sort_positive_cases": 6,
+  "native_partition": {
+    "world": {
+      "dispatches": 3751,
+      "partitions": {
+        "other_world_forward": {
+          "dispatches": 689,
+          "matrix_products": 59,
+          "complete_interval_ms": 4.509105625,
+          "mixed_touching_ms": 1.945954375,
+          "complete_interval_classes": {
+            "convolution_only": 4.44760275,
+            "matrix_mixed": 0.047133125,
+            "other": 0.01436975
+          }
+        },
+        "parameter_preparation": {
+          "dispatches": 88,
+          "matrix_products": 0,
+          "complete_interval_ms": 0,
+          "mixed_touching_ms": 0.321396625,
+          "complete_interval_classes": {}
+        },
+        "posterior_dependency": {
+          "dispatches": 886,
+          "matrix_products": 112,
+          "complete_interval_ms": 4.994704,
+          "mixed_touching_ms": 0.08939925,
+          "complete_interval_classes": {
+            "convolution_only": 1.652776125,
+            "image_mixed": 0.524424125,
+            "matrix_mixed": 0.58763025,
+            "matrix_only": 0.4736245,
+            "other": 1.756249
+          }
+        },
+        "world_adjoint": {
+          "dispatches": 2088,
+          "matrix_products": 320,
+          "complete_interval_ms": 17.53017675,
+          "mixed_touching_ms": 1.72623375,
+          "complete_interval_classes": {
+            "convolution_only": 11.959288875,
+            "image_mixed": 0.92411925,
+            "matrix_mixed": 1.20369425,
+            "matrix_only": 1.017846125,
+            "other": 2.42522825
+          }
+        }
+      },
+      "interval_totals_ms": {
+        "parameter_preparation+posterior_dependency": 0.08939925,
+        "posterior_dependency": 4.994704000000007,
+        "other_world_forward+parameter_preparation": 0.219720625,
+        "other_world_forward+parameter_preparation+world_adjoint": 0.01227675,
+        "other_world_forward+world_adjoint": 1.7139570000000002,
+        "other_world_forward": 4.509105625,
+        "world_adjoint": 17.530176750000017
+      },
+      "interval_counts": {
+        "parameter_preparation+posterior_dependency": 2,
+        "posterior_dependency": 504,
+        "other_world_forward+parameter_preparation": 3,
+        "other_world_forward+parameter_preparation+world_adjoint": 1,
+        "other_world_forward+world_adjoint": 22,
+        "other_world_forward": 7,
+        "world_adjoint": 593
+      }
+    },
+    "imagination": {
+      "dispatches": 681,
+      "partitions": {
+        "batched_heads": {
+          "dispatches": 17,
+          "matrix_products": 8,
+          "complete_interval_ms": 0.82081375,
+          "mixed_touching_ms": 0,
+          "complete_interval_classes": {
+            "matrix_only": 0.548507875,
+            "other": 0.272305875
+          }
+        },
+        "parameter_preparation": {
+          "dispatches": 20,
+          "matrix_products": 0,
+          "complete_interval_ms": 0,
+          "mixed_touching_ms": 0.072599,
+          "complete_interval_classes": {}
+        },
+        "recurrence_and_features": {
+          "dispatches": 631,
+          "matrix_products": 180,
+          "complete_interval_ms": 5.757902875,
+          "mixed_touching_ms": 0.437858,
+          "complete_interval_classes": {
+            "matrix_mixed": 0.827257375,
+            "matrix_only": 2.472340875,
+            "other": 2.458304625
+          }
+        },
+        "rollout_assembly": {
+          "dispatches": 13,
+          "matrix_products": 0,
+          "complete_interval_ms": 0.295647375,
+          "mixed_touching_ms": 0.365259,
+          "complete_interval_classes": {
+            "other": 0.295647375
+          }
+        }
+      },
+      "interval_totals_ms": {
+        "parameter_preparation+recurrence_and_features": 0.072599,
+        "recurrence_and_features": 5.757902874999998,
+        "recurrence_and_features+rollout_assembly": 0.36525899999999994,
+        "rollout_assembly": 0.295647375,
+        "batched_heads": 0.8208137499999999
+      },
+      "interval_counts": {
+        "parameter_preparation+recurrence_and_features": 1,
+        "recurrence_and_features": 499,
+        "recurrence_and_features+rollout_assembly": 10,
+        "rollout_assembly": 3,
+        "batched_heads": 9
+      }
+    },
+    "behavior": {
+      "dispatches": 247,
+      "partitions": {
+        "behavior": {
+          "dispatches": 226,
+          "matrix_products": 33,
+          "complete_interval_ms": 2.464252625,
+          "mixed_touching_ms": 0.560580125,
+          "complete_interval_classes": {
+            "matrix_mixed": 2.0091455,
+            "other": 0.455107125
+          }
+        },
+        "parameter_preparation": {
+          "dispatches": 21,
+          "matrix_products": 0,
+          "complete_interval_ms": 0,
+          "mixed_touching_ms": 0.560580125,
+          "complete_interval_classes": {}
+        }
+      },
+      "interval_totals_ms": {
+        "behavior+parameter_preparation": 0.560580125,
+        "behavior": 2.464252625
+      },
+      "interval_counts": {
+        "behavior+parameter_preparation": 5,
+        "behavior": 31
+      }
+    },
+    "slow_value": {
+      "dispatches": 13,
+      "partitions": {
+        "parameter_preparation": {
+          "dispatches": 4,
+          "matrix_products": 0,
+          "complete_interval_ms": 0,
+          "mixed_touching_ms": 0.15698675,
+          "complete_interval_classes": {}
+        },
+        "slow_value": {
+          "dispatches": 9,
+          "matrix_products": 4,
+          "complete_interval_ms": 0.345832875,
+          "mixed_touching_ms": 0.15698675,
+          "complete_interval_classes": {
+            "matrix_only": 0.268163625,
+            "other": 0.07766925
+          }
+        }
+      },
+      "interval_totals_ms": {
+        "parameter_preparation+slow_value": 0.15698675,
+        "slow_value": 0.34583287500000004
+      },
+      "interval_counts": {
+        "parameter_preparation+slow_value": 1,
+        "slow_value": 8
+      }
+    }
+  },
+  "native_recurrence_interval_labels": {
+    "copy_or_conversion+matrix": {
+      "intervals": 11,
+      "dispatches": 23,
+      "ms": 0.1688025
+    },
+    "matrix+normalization_composed": {
+      "intervals": 14,
+      "dispatches": 29,
+      "ms": 0.658454875
+    },
+    "normalization_composed": {
+      "intervals": 103,
+      "dispatches": 117,
+      "ms": 0.5588256249999999
+    },
+    "matrix": {
+      "intervals": 134,
+      "dispatches": 148,
+      "ms": 2.4723408749999995
+    },
+    "other_composed": {
+      "intervals": 60,
+      "dispatches": 60,
+      "ms": 0.4461949999999999
+    },
+    "categorical_composed": {
+      "intervals": 90,
+      "dispatches": 90,
+      "ms": 0.41956675000000004
+    },
+    "copy_or_conversion": {
+      "intervals": 72,
+      "dispatches": 116,
+      "ms": 0.8803236250000003
+    },
+    "copy_or_conversion+other_composed": {
+      "intervals": 15,
+      "dispatches": 30,
+      "ms": 0.153393625
+    }
+  },
+  "jax_recurrence": {
+    "direct_thunk": {
+      "calls": 15,
+      "ms": 0.013108249999999998
+    },
+    "exact_fusion_computation": {
+      "calls": 435,
+      "ms": 0.73351775
+    },
+    "library_product_candidates": {
+      "calls": 180,
+      "ms": 2.1055189999999997
+    }
+  },
+  "jax_recurrence_copies": {
+    "kernel_ms": 2.852145,
+    "copy_ms": 0.055252125,
+    "copy_bytes": 39352320,
+    "activity_union_ms": 2.907397125,
+    "elapsed_span_ms": 3.146679125
+  },
+  "upstream": {
+    "head": "5d6d9a3666cca4090a9c960b7ebfe8551f5ba18a",
+    "preceding": "41a15d31b652f95aa9fb427dea47acf052c1e9bd",
+    "commits": 5,
+    "workgroup_override_default": null,
+    "requires_explicit_override_or_measured_search": true,
+    "new_naga": "13f582ddd2792befb46952498010248bd65818e6",
+    "blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+    "current_runtime_has_family": false,
+    "runtime_refreshed": false,
+    "files": {
+      "src/runtime/workgroup.rs": "e63b557bc5144337a5971284104d6cee0921cf6bea2976c7e87a3cfa699e03eb",
+      "src/codegen/workgroup.rs": "ab869e9cc4c5d22965320663e9ccd196e117d5604fef0d66d7c470bfc3974653",
+      "src/tune.rs": "069cee8e810764dad2fadf5d74e6215cf689c767e8698e69acb74cbc73172259",
+      "src/config.rs": "c397b5c63df544396cfc921aa2e1376ec9459ccaa0d50509bd2b6e6ac36fc693",
+      "Cargo.toml": "f7b0233cdc73a0316ccdc7aa270795ede25c663e60ff9de4a5ad4d10ed2b4553"
+    }
+  },
+  "source_count": 69,
+  "combined_source_seals": 1712,
+  "source_closure_finished_utc": "2026-10-17T03:30:48.411031+00:00",
+  "closure_receipts": {
+  "runs/nonconvolution-timing-20261017.bGwyvF7S/closure-review.json": "9246c6f72fc53faf71e03c1148fb5d0ede73a63c099ccc93c40bfb66795c78d0",
+  "runs/nonconvolution-timing-20261017.bGwyvF7S/closure_review.py": "bd9f9e63dfcaeeaa7370a1b3bc62c08d83ba77b5432c4ef66788a0995ae3587d"
+},
+  "limits": [
+    "No duration is divided among members of a mixed native interval or ambiguous JAX library group.",
+    "One 0.01120025ms JAX symbol remains exactly-unresolved within its known posterior context.",
+    "Completion-frontier intervals and JAX kernel/copy activity use different boundaries; no additive gap budget or ordinary speedup.",
+    "Upstream workgroup path requires separate compatibility/numerical qualification; no geometry sweep, automatic integration or Atari restart."
+  ],
+  "artifact_root": "runs/nonconvolution-timing-20261017.bGwyvF7S",
+  "native_qualified_unchanged": "e45b9c43",
+  "ordinary_update_ms_unchanged": 43.196506554687524,
+  "inclusive_jax_ms_unchanged": 27.22256929610012,
+  "ordinary_ratio_unchanged": 1.5867902138420056,
+  "production_changed": false,
+  "atari_restarted": false,
+  "failures_retained": [
+    "First sort reader assumes an extra suffix after sort.5.0 and rejects sort_5_0.",
+    "Second exact-only reader rejects sort_5_0__5; complete six-name enumeration and separate v3 reader preserve both failures.",
+    "Exploratory missing-file lookups remain in the session; no GPU capture or numerical gate changed."
+  ],
+  "source_sha256": {
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/review.json": "96f7a77814023ab6a1d13413287a3c9d40d89998f07ad3c64f26243d9c9ab03a",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/review.py": "1a150286c86b97287c96b179c4d0ac2908b0e7b2a48833d29f03a8d63a92e6bf",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/mapping.json": "18c3c81c9217193039947aad0ba89ffc7c0e5b6253752e2f6b5ca001533eb42e",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/refined-v3.json": "b71d1a73447512ccf884733d0aebbd1bc35f987384520706f2abf920947f7a1b",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/inspection.json": "f521650e971b8937ba39639eca9d684875dfceddad20fbcf38fcc448dbcdf2b5",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/interval-membership.json": "135e9114e66bad9d72e6ec68199d07afc99cb21f12728c6a7a95d29450d62b10",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/jax-membership-refined-v3.json": "cd3d60f15b1bc5f80a65802d7310ec7c1a5413111bcfc746d7ddd60d4f059381",
+    "runs/nonconvolution-timing-20261017.bGwyvF7S/upstream-diff.log": "5ebc2ec119d899901852109b87e8246b0023daf4d9295dea759f77e3378705f9"
+  },
+  "next_step": "CPU-audit the newly merged upstream workgroup-matrix implementation against all current dense interfaces and recorded device/compiler contracts before a separately declared comparison. No geometry sweep or automatic refresh. Retain nonmatrix and convolution feeding as separate unresolved costs."
+}

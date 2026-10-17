@@ -1,0 +1,414 @@
+{
+  "status": "complete",
+  "artifact_root": "runs/boundary-algorithms-20261014.boE7ZosI",
+  "rows": [
+    {
+      "name": "encoder-forward",
+      "native_ms": 0.16041699999999998,
+      "native_output": "BF16",
+      "jax": [
+        {
+          "output": "bf16",
+          "ms": 0.164055125,
+          "kernels": 1.0,
+          "copies": 0.0,
+          "same_full_algorithm": true,
+          "same_full_contract": true,
+          "selected_operands": [
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ],
+            [
+              "bf16",
+              [
+                32,
+                5,
+                5,
+                3
+              ]
+            ],
+            [
+              "bf16",
+              [
+                32
+              ]
+            ]
+          ],
+          "exact_elements": 16777216,
+          "native_reference_rounded": false
+        }
+      ]
+    },
+    {
+      "name": "decoder-forward",
+      "native_ms": 1.31001425,
+      "native_output": "BF16",
+      "jax": [
+        {
+          "output": "bf16",
+          "ms": 0.26060775,
+          "kernels": 5.0,
+          "copies": 0.0,
+          "same_full_algorithm": false,
+          "same_full_contract": true,
+          "selected_operands": [
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                32
+              ]
+            ],
+            [
+              "bf16",
+              [
+                3,
+                5,
+                5,
+                32
+              ]
+            ],
+            [
+              "bf16",
+              [
+                3
+              ]
+            ]
+          ],
+          "exact_elements": 1572864,
+          "native_reference_rounded": false
+        }
+      ]
+    },
+    {
+      "name": "decoder-dx",
+      "native_ms": 0.16837775,
+      "native_output": "F32",
+      "jax": [
+        {
+          "output": "bf16",
+          "ms": 0.248073875,
+          "kernels": 3.0,
+          "copies": 0.0,
+          "same_full_algorithm": true,
+          "same_full_contract": true,
+          "selected_operands": [
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ],
+            [
+              "bf16",
+              [
+                3,
+                5,
+                5,
+                32
+              ]
+            ]
+          ],
+          "exact_elements": 16777216,
+          "native_reference_rounded": true
+        },
+        {
+          "output": "f32",
+          "ms": 0.16661525,
+          "kernels": 3.0,
+          "copies": 0.0,
+          "same_full_algorithm": false,
+          "same_full_contract": false,
+          "selected_operands": [
+            [
+              "f32",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ],
+            [
+              "f32",
+              [
+                32,
+                5,
+                5,
+                3
+              ]
+            ]
+          ],
+          "exact_elements": 16777216,
+          "native_reference_rounded": false
+        }
+      ]
+    },
+    {
+      "name": "decoder-dw",
+      "native_ms": 1.7424325,
+      "native_output": "F32",
+      "jax": [
+        {
+          "output": "bf16",
+          "ms": 0.3377685,
+          "kernels": 4.0,
+          "copies": 0.0,
+          "same_full_algorithm": true,
+          "same_full_contract": true,
+          "selected_operands": [
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                32
+              ]
+            ],
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ]
+          ],
+          "exact_elements": 2400,
+          "native_reference_rounded": true
+        },
+        {
+          "output": "f32",
+          "ms": 1.2005708125,
+          "kernels": 3.0,
+          "copies": 0.0,
+          "same_full_algorithm": false,
+          "same_full_contract": false,
+          "selected_operands": [
+            [
+              "f32",
+              [
+                128,
+                64,
+                64,
+                32
+              ]
+            ],
+            [
+              "f32",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ]
+          ],
+          "exact_elements": 2400,
+          "native_reference_rounded": false
+        }
+      ]
+    },
+    {
+      "name": "encoder-dw",
+      "native_ms": 0.36644475,
+      "native_output": "F32",
+      "jax": [
+        {
+          "output": "bf16",
+          "ms": 0.1494230625,
+          "kernels": 4.0,
+          "copies": 0.0,
+          "same_full_algorithm": false,
+          "same_full_contract": true,
+          "selected_operands": [
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ],
+            [
+              "bf16",
+              [
+                128,
+                64,
+                64,
+                32
+              ]
+            ]
+          ],
+          "exact_elements": 2400,
+          "native_reference_rounded": true
+        },
+        {
+          "output": "f32",
+          "ms": 0.2907501875,
+          "kernels": 3.0,
+          "copies": 0.0,
+          "same_full_algorithm": false,
+          "same_full_contract": false,
+          "selected_operands": [
+            [
+              "f32",
+              [
+                128,
+                64,
+                64,
+                3
+              ]
+            ],
+            [
+              "f32",
+              [
+                128,
+                64,
+                64,
+                32
+              ]
+            ]
+          ],
+          "exact_elements": 2400,
+          "native_reference_rounded": false
+        }
+      ]
+    }
+  ],
+  "native_sum_ms": 3.74768625,
+  "jax_primitive_kernel_sum_ms": 1.1599283125,
+  "sum_not_full_update_speedup": true,
+  "all_exact_jax_elements": 51914112,
+  "f64_probes": 1664,
+  "independent_coordinates": 640,
+  "cuda_bridge_ordinary_ms": 2.3738234043125,
+  "cuda_bridge_slower_than_native_percent": 36.23617582388414,
+  "counters": {
+    "cuda-profile": {
+      "total_warp_instructions": 1785024000,
+      "categories": {
+        "Integer": 1305702400,
+        "Load/Store": 157683200,
+        "Movement": 131225600,
+        "Control": 95155200,
+        "Uniform Datapath": 71180800,
+        "Floating Point": 13120000,
+        "Miscellaneous": 9292800,
+        "Predicate": 1664000
+      },
+      "hmma": {
+        "label": "HMMA.16816.F32.BF16",
+        "count": 6553600
+      },
+      "integer_percent": 73.14761034025312,
+      "profile_replay_passes": 17,
+      "tensor_active_percent": 4.648668,
+      "occupancy_percent": 61.932912,
+      "sm_clock_ghz": 2.863697,
+      "aluheavy_percent": 69.214716,
+      "registers_per_thread": 58,
+      "grid": "(1, 25, 128)",
+      "ldgsts": 0
+    },
+    "library-profile": {
+      "total_warp_instructions": 100059316,
+      "categories": {
+        "Integer": 61090631,
+        "Movement": 12835025,
+        "Uniform Datapath": 9053744,
+        "Floating Point": 7383040,
+        "Load/Store": 6649391,
+        "Predicate": 1423744,
+        "Miscellaneous": 1069376,
+        "Control": 548093,
+        "Conversion": 6272
+      },
+      "hmma": {
+        "label": "HMMA.16816.F32.BF16",
+        "count": 7375872
+      },
+      "integer_percent": 61.05441596262761,
+      "profile_replay_passes": 17,
+      "tensor_active_percent": 39.706479,
+      "occupancy_percent": 15.991539,
+      "sm_clock_ghz": 2.831968,
+      "aluheavy_percent": 27.880375,
+      "registers_per_thread": 122,
+      "grid": "(7, 1, 112)",
+      "ldgsts": 2352000
+    }
+  },
+  "warp_instruction_ratio": 17.839658228325288,
+  "integer_instruction_ratio": 21.373202054501615,
+  "library_more_hmma_percent": 12.546875000000002,
+  "guards": [
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/queue/native",
+      "passed": false
+    },
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/queue-v2/native",
+      "passed": true
+    },
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/queue-v2/library",
+      "passed": true
+    },
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/bridge-ordinary-queue/ordinary",
+      "passed": true
+    },
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/bridge-counters-queue/cuda-profile",
+      "passed": true
+    },
+    {
+      "path": "runs/boundary-algorithms-20261014.boE7ZosI/bridge-counters-queue/library-profile",
+      "passed": true
+    }
+  ],
+  "passed_guards": 5,
+  "failed_pre_dispatch_guards": 1,
+  "allocation_warnings": 1,
+  "named_native_operation_calls": 730,
+  "named_jax_operation_calls": 1296,
+  "cuda_bridge_calls": 161,
+  "jax_counter_calls": 17,
+  "counts_exclude_autotuning_and_profiler_replays": true,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "whole_update_remeasured": false,
+  "workers_remaining": false,
+  "exact_retained_backend_source_files": 194,
+  "dependency_lock_exact": true,
+  "source_sha256": {
+    "backend.patch": "b520239b95c38fb9fcb318256bbece78114fc4b40a0293820f711a2cf0246fda",
+    "native-tests": "33e1c19879c961c42fd18249a98d28e4f069c0d25ff0251ce999c4c8d4f7a4a1",
+    "weight.cu": "8b84f8b8e9a57d378e1af95b8b4d80849cee7d287946d54ac3bd6964e40dab11",
+    "weight": "f696695d64f8f735d7d96607fdb8e0e42ca9873fb65b369fff1631c178453b36",
+    "library.py": "a63db407ad2ae1934bf8cec1c5c9ee5833b57ce409bd0f7b8fa460cd25da86cf",
+    "library_weight.py": "562b2160abf3b7f342df46f08f4656cd0b28e378042ec465e8bcbaa813ff5ba9",
+    "audit.py": "c8bb180433dc8428246231f3ad26e828c282b3baf1abc970afc5eae5b1247a78",
+    "bridge.py": "f820aa0824d4bb9d3d24a05492e4a9058ffc7e99691ab225a82bd726e652cf56",
+    "counters.py": "3bd23161e2aa702edf324f5797d5a5561078c036a5031c70f5267996ef6005de",
+    "opcodes.py": "47571f75bf813f61db9acb782f71c2e529b25da57faafc7bd2d20f9309b69b8c",
+    "opcode_forms.py": "87d2b6c44b31363f527f2ad625726fa156f87558c401044f878ac14419083933"
+  },
+  "scope": "CUDA counter bridge is 36% slower than native; its counters are not Vulkan instruction counts. Primitive BF16 outputs match after rounding; F32-output JAX controls widen operands. Two of five BF16 primitive algorithms differ from retained full executable. No precision-policy, whole-gap or learning claim."
+}

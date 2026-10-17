@@ -1,0 +1,167 @@
+{
+  "date": "2026-10-16",
+  "status": "cpu_load_contract_complete",
+  "artifact_root": "runs/convolution-load-contract-20261016.fWW2fJ4W",
+  "unchanged_baseline": {
+    "native": "58aff452",
+    "rgb_ms": 46.199419203125,
+    "jax_inclusive_ms": 27.222569,
+    "rgb_jax_ratio": 1.6970999027727691,
+    "cdp_ms_separate_workload": 43.9387759296875,
+    "production_promoted": false,
+    "atari_resumed": false,
+    "goal_complete": false
+  },
+  "contracts": 20,
+  "occurrences": 23,
+  "static_ir_loop_interfaces": {
+    "typed-0": {
+      "sites": {
+        "global_load_width_bytes": {
+          "2": 16
+        },
+        "global_loads_per_source_loop": 16,
+        "shared_vector_stores_per_source_loop": 4,
+        "CooperativeMatrixMulAddKHR": 2,
+        "BranchConditional": 69,
+        "ControlBarrier": 2
+      },
+      "occurrences": 3
+    },
+    "packed-0": {
+      "sites": {
+        "global_load_width_bytes": {
+          "8": 8
+        },
+        "global_loads_per_source_loop": 8,
+        "shared_vector_stores_per_source_loop": 8,
+        "CooperativeMatrixMulAddKHR": 8,
+        "BranchConditional": 25,
+        "ControlBarrier": 2
+      },
+      "occurrences": 5
+    },
+    "typed-1": {
+      "sites": {
+        "global_load_width_bytes": {
+          "2": 16
+        },
+        "global_loads_per_source_loop": 16,
+        "shared_vector_stores_per_source_loop": 4,
+        "CooperativeMatrixMulAddKHR": 2,
+        "BranchConditional": 85,
+        "ControlBarrier": 2
+      },
+      "occurrences": 2
+    },
+    "packed-1": {
+      "sites": {
+        "global_load_width_bytes": {
+          "8": 8
+        },
+        "global_loads_per_source_loop": 8,
+        "shared_vector_stores_per_source_loop": 8,
+        "CooperativeMatrixMulAddKHR": 8,
+        "BranchConditional": 33,
+        "ControlBarrier": 2
+      },
+      "occurrences": 5
+    },
+    "typed-2": {
+      "sites": {
+        "global_load_width_bytes": {
+          "2": 16
+        },
+        "global_loads_per_source_loop": 16,
+        "shared_vector_stores_per_source_loop": 4,
+        "CooperativeMatrixMulAddKHR": 2,
+        "BranchConditional": 75,
+        "ControlBarrier": 2
+      },
+      "occurrences": 4
+    },
+    "packed-2": {
+      "sites": {
+        "global_load_width_bytes": {
+          "8": 8
+        },
+        "global_loads_per_source_loop": 8,
+        "shared_vector_stores_per_source_loop": 8,
+        "CooperativeMatrixMulAddKHR": 8,
+        "BranchConditional": 43,
+        "ControlBarrier": 2
+      },
+      "occurrences": 4
+    }
+  },
+  "hot_loop_bf16_conversion_sites": 0,
+  "reachable_array_length_sites": 0,
+  "logical_read_model": {
+    "a": {
+      "scalar": 3355443200,
+      "composed": 1389363200,
+      "reduction_percent": 58.59375
+    },
+    "b": {
+      "scalar": 6210783232,
+      "composed": 5495597056,
+      "reduction_percent": 11.515233252951507
+    },
+    "total": {
+      "scalar": 9566226432,
+      "composed": 6884960256,
+      "reduction_percent": 28.028462372904873
+    }
+  },
+  "address_proof": {
+    "checked_address_slots": 196946944,
+    "negative_cases": 7,
+    "positive_cases": 1
+  },
+  "independent_address_count_cases": 9,
+  "regenerated_cpu_modules": 152,
+  "validated_actual_modules": 20,
+  "binding_alignment": {
+    "ordinary_session_offset_multiple": 256,
+    "external_offset": 0,
+    "donor_preserves_offset": true,
+    "raw_alias_helper_checks_alignment": false,
+    "logical_size_guard_still_required": true
+  },
+  "receipts": {
+    "source_seals_rechecked": 887,
+    "original_wgsl_seals_match": true,
+    "retained_runtime_spirv_originally_sealed": false,
+    "exact_current_cpu_reemission": true
+  },
+  "failures_retained": [
+    "Initial source audit fails after preceding publication appends notes to its sealed declaration",
+    "Edited declaration retained in commit9c21174 and publication-edited-declaration.md; original bytes restored",
+    "First restoration trailing blank line fails diff check; removed before publication"
+  ],
+  "runtime_sources_changed": false,
+  "work": {
+    "gpu_calls": 0,
+    "native_builds": 0,
+    "learner_updates": 0,
+    "actions": 0,
+    "cpu_review_finished_utc": "2026-10-16T17:13:51.371574+00:00",
+    "cpu_review_wall_seconds": 1.449,
+    "cpu_review_peak_mib": 63.4,
+    "address_proof_wall_seconds": 6.001,
+    "address_proof_peak_mib": 108.5,
+    "study_worker_remaining": false
+  },
+  "upstream_review": {
+    "meganeura": "12df95cda18e8e5039e2e360e3e2619be25900a1",
+    "blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+    "runtime_repinned": false
+  },
+  "next": "CPU-prototype one shared type-aware address/mask/read-span composition with exact scalar fallback, then separately declare complete-family qualification",
+  "limits": [
+    "Static IR counts are not native instruction counts or latency shares",
+    "Source read model counts one staging round per logical tile/K-stage; extra subgroup-width rounds repeat values",
+    "Read model excludes added branch/extraction work and is not measured traffic or speed",
+    "No captured native assembly, new compiler feature, width/geometry sweep, prior timing or learning promotion"
+  ]
+}

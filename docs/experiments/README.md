@@ -1,11 +1,234 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October16's [actual-world prior-batching test](../results/2026-10-16-prior-world.md)
+passes exact staging/state checks but fails113 gradient-array pointwise gates.
+All relativeL2 errors remain below.007095; no timing or promotion follows.
+Four guards/no warnings/24 raw backwards, zero optimizer updates/actions.
+The first prior product changes8-way split reduction to one tiled product;
+both retain BF16 conversion. This is a candidate cause, not causal proof.
+
+October16's [prior-gradient diagnosis](../results/2026-10-16-prior-gradient.md)
+explains first-variant failures through F32 KL/BF16 derivative propagation.
+All36 local checks and both-arm matrix checks pass unchanged gates; second-
+variant source-F32 gradients pass too. Original F64 failures remain failed.
+One guard/no warnings/one raw backward/zero updates/actions; no speed claim.
+The subsequent actual-world comparison above fails, so timing stays stopped.
+
+October16's [prior forward tape](../results/2026-10-16-prior-tape.md) explains the
+logit discrepancy:2.097M local matrix/bias values are exact; small legal F32
+normalization/SiLU errors cross BF16 midpoints. Original F64 failures remain;
+raw-gradient diagnosis follows above. One guard/no warnings/two forward prefixes,
+zero complete backwards/updates/actions. No qualification or speed promotion.
+
+October16's [upstream workgroup review](../results/2026-10-16-workgroup-contract.md)
+passes one properties-only guard and all23 CPU resource contracts. No shader
+executes. The rejected October15 family already used tensor addressing/workgroup
+scope, so new Blade exposure does not justify another trial or compiler project.
+
+October16's [prior-batching qualification](../results/2026-10-16-prior-batching.md)
+is incomplete:144→9 boundary products and passing paired checks, but14
+independent-reference array failures in both arms. CPU rounding diagnosis is
+partial; no changed gates, GPU retry or full-update timing. One guard/no warnings,
+16 raw backwards/zero optimizer updates/actions. Keep834241b6 and1.77×.
+
+October16's [non-convolution audit](../results/2026-10-16-nonconvolution-contract.md)
+finds training-prior fragmentation:144 native products versus9 JAX products
+with identical1.107G MACs outside the recurrent dependency. All28,064 saved
+JAX kernels and current non-world program identities reconcile. Next qualify
+prior/KL time batching; no measured gain or GPU allocation in this CPU audit.
+Keep834241b6 and1.77×; convolution feeding and parity remain open.
+
+October16's [packet-axis result](../results/2026-10-16-packet-axis.md) rejects a
+numerically exact alternative: complete convolution19.089→21.217ms,11.15%
+slower. dW uniform work returns but total instructions rise; dX slows despite
+less L2 traffic.120 guards/22 warnings and offline counter audits pass. No
+full-update trial or promotion; keep834241b6 and the1.77× complete gap.
+
+October16's [word-staging result](../results/2026-10-16-word-staging.md) improves
+complete RGB51.763→48.068ms (7.14%) and CDP46.929→45.505ms (3.03%), with exact
+reports/tensors/full programs. All23 convolution operations improve15.03%;
+native counters confirm less instruction/shared-conflict work.124 guards pass,
+five warnings, no game actions. Keep isolated834241b6; RGB/JAX remains1.77x.
+The packet-axis follow-up above rejects that particular implementation;
+no production or Atari promotion.
+October16's [direct native counters](../results/2026-10-16-native-counters.md)
+use the supplied Perf SDK on the existing driver: all20 contracts pass. CNN1
+dX/dW execute15.94x/9.04x full-JAX warp instructions, with fewer tensor operations.
+Exact retained outputs/plans,21 guards and offline metric reevaluation pass;
+zero actions/updates. Complete RGB stays1.91x JAX. The next contract targets
+scalar staging/shared layout, not another tile sweep or learning restart.
+October11's new [performance pivot](../kindle_single_life_dreamer_plan.md#performance-pivot)
+authorizes reduced precision, cheaper exploration, wider batches and native/JAX
+profiling. The old Pong queue stays cancelled; no long-run extension is implied.
+The [performance result](../results/2026-10-11-cdp-performance.md) measures2.66x
+synthetic replay throughput; its [paired Freeway learning screen](2026-10-11-cdp-performance-learning.md)
+is stopped at39,568 actions with no completed learner. October12's
+[combined backend result](../results/2026-10-12-backend-integration.md) integrates
+BF16 storage, row addressing and convolution selection: CDP161.32→135.17ms,
+RGB72.69→61.15ms. The large JAX gap and learning-quality check remain open;
+no game training or old lifetime resumes from these synthetic results.
+October13's [execution-design diagnosis](../results/2026-10-13-execution-gap.md)
+goes beyond cost buckets: same-algorithm CUDA/Vulkan controls, JAX precision/
+command-buffer interventions and matched library matrices locate algorithm and
+learner-dataflow differences. Native~53ms/JAX12.42ms remains open. New diagnostic
+code/pins are not adopted; negative staging/coalescing tests and all failures
+remain. Prioritize training-grade type-aware kernels and connected device work,
+not a CUDA rewrite or another local-tile sweep.
+The [fixed shared-tiled prototype](../results/2026-10-13-tiled-gap.md) reaches
+2.92x on a real transposed matrix but only2.59% RGB/6.43% CDP whole-update savings,
+with exact reports/tensors and12 passing guards. World training remains unchanged;
+convolution-backward/grouped coverage is next. No production adoption or parity.
+The isolated [convolution-backward test](../results/2026-10-13-conv-backward-gap.md)
+reaches48.90ms (8.01% less), still3.94x JAX despite90.51% nominal BF16 arithmetic
+coverage. Five guards pass after a retained long-reduction failure/correction;
+changed trajectories are not learning-equivalent. Next convolution kernel
+counters, grouped algorithms and device dataflow; no candidate adoption.
+The [counter-guided convolution study](../results/2026-10-13-conv-kernel-cause.md)
+demonstrates layout/iterator and reuse savings with exact outputs and packing
+included:629→343µs, then348→211µs. Lower occupancy accompanies faster tensor
+execution; this is not a native/whole-learner claim. Micro-study closed; next
+shared native implementation and complete-update verification, not a tile sweep.
+The [Nsight attribution](../results/2026-10-12-nsight-root-cause.md) identifies
+costly scalar convolution gradients and matrix kernels. One isolated split-tile
+check saves8.2% RGB/6.3% CDP update time with exact tensors; no production adoption.
+Counter access is enabled; profiler teardown failures and invalid Systems
+timestamps remain explicit. Full JAX parity and learning quality remain open.
+The [qualified follow-up](../results/2026-10-12-split-convolution-tiles.md) adopts
+the upstream tile fix on refreshed main:8.14% RGB/6.17% CDP savings, exact
+numerical controls, all17 guards and193 installed-binding tests. PR255 is open;
+training stays stopped and the remaining JAX gap is not closed.
+The [full gap accounting](../results/2026-10-12-jax-gap-accounting.md) confirms equal
+model size and only.262ms input-refresh cost. Matched matrices/convolution expose
+both missing backward/grouped BF16 coverage and inefficient BF16 kernels; native
+host preparation/targets and repeated posterior work add cost. Current native
+counterfactuals now close the operation-group accounting:17.32ms convolution,
+14.04ms matrix,6.84ms remaining and5.89ms zero-work command stream. Complete
+traces and explicit boundary adjustments reconcile the44.04ms ordinary gap;
+rejected per-dispatch sums and the0.434ms block residual remain. This is cost
+accounting, not causal closure, JAX speed parity or a new production change.
 The September 27 strategy reset stops unchanged mastery campaigns. New compact
 results live in `docs/results/`: [historical human-normalized scores](../results/2026-09-27-historical-scores.md)
 and [shared-parameter timing/integration](../results/2026-09-27-shared-parameters.md).
 Logs, declarations, checkpoints and videos live in git-ignored `runs/`. Do not
 overwrite completed/failed experiments or change their acceptance gates.
+
+October11: the [three-seed Qbert2M budget study](../results/2026-10-11-cdp-qbert-budget.md)
+is complete. Frozen mean7,367.01 versus retained500k2,657.99; first pyramids
+0/0/24 ->20/22/20. All scores improve, not every completion count. Nine guards,
+144 natural frozen episodes and six whole replay/videos pass, costing46h40m1s
+training. No full mastery gate passes or automatic budget extension follows.
+The [paired frozen forecast diagnostic](../results/2026-10-11-cdp-qbert-forecasts.md)
+is complete: every2M seed has useful h15 reward forecasts; survival remains
+unresolved. Six guards/exact tensors pass; failed capture/source and the
+continuation-discount correction remain. The [greedy action-mode check](../results/2026-10-11-cdp-qbert-action-mode.md)
+also completes: first pyramids62/72→69/72, but mean score7,367.01→6,953.47;
+no consistent score gain. Keep sampled evaluation. The
+[live-value check](../results/2026-10-11-cdp-qbert-values.md) also completes:
+all critics beat constant/zero controls, with seed-specific bias and<.03%
+intrinsic contribution. Exact historical traces/tensors and all five guards pass;
+the CPU timestamp-review failure remains, with no GPU retry. All five quality
+targets remain open. The [bounded upstream measured-build check](../results/2026-10-11-cdp-measured-build.md)
+is complete: ordinary2c42b448 qualifies with exact fixture agreement and no
+speedup (107.93→108.30ms). The original logical-memory preflight fails; one
+declared correction reaches a numerical mismatch and stops. Both failures
+remain, with no tolerance relaxation or retained test hook. The
+[three-seed Pong2M budget study](2026-10-11-cdp-pong-budget.md) is **stopped by
+the user for a pivot** at20:25:19 UTC. Only1009 starts, retaining189,576 actions /
+47,333 updates and a graceful partial checkpoint; no new frozen evaluation.
+Seeds2017/3019 and all evaluation jobs are cancelled, not queued for resumption.
+The [stop receipt](../results/2026-10-11-cdp-pong-stop.json) preserves the boundary;
+the [roadmap handoff](../kindle_single_life_dreamer_plan.md#preserved-pivot-boundary)
+summarizes the usable baseline and open decisions. Historical goals remain open.
+
+October6 follow-up: [centered CDP improves early Pong learning in all three seeds](../results/2026-10-06-cdp-centered-learning.md),
+with [paired state/forecast evidence](../results/2026-10-06-cdp-centered-world.md),
+but only4/72 wins. The [single grouped-imagination trial](../results/2026-10-06-cdp-imagination-throughput.md)
+passes numerical checks and reduces synthetic full-update time by8.12%.
+Next is the separately declared [five-game500k centered allocation](2026-10-06-cdp-centered-five-game-budget.md),
+not a closed quality goal or restarted historical queue.
+
+October6: the [500k-action Pong follow-up](../results/2026-10-06-cdp-pong-budget.md)
+is complete, but two seeds remain near a complete loss; only2017 improves.
+The [latest Meganeura refresh](../results/2026-10-06-meganeura-refresh.md)
+passes18 guards and2,824 upstream comparisons. The
+[frozen Pong result](../results/2026-10-06-cdp-pong-world.md) finds readable CNN
+features but weak recurrent ball/reward state in the two failed seeds. All four
+guards/exact tensors pass;131,072 diagnostic actions, no actor updates.
+[Centered CDP qualifies](../results/2026-10-06-cdp-centered-qualification.md) and
+its [three-seed200k learning screen passes](../results/2026-10-06-cdp-centered-learning.md):
+frozen−8.4583 versus−18.6528 raw CDP, paired+10.1944 [7.5,12.375]. All six
+learners and18 guards/288 natural frozen episodes finish08:41 UTC. Only4/72
+centered matches are wins, not mastery. The separately guarded profile and
+[six paired frozen state/forecast probes](../results/2026-10-06-cdp-centered-world.md)
+now complete. Every centered seed retains useful recurrent ball state and h15
+negative-event forecasts, with sparse-positive and coordinate-control limits.
+[One bounded throughput trial](2026-10-06-cdp-imagination-throughput.md) is next,
+not an optimization sweep. No further learning-budget extension is declared.
+
+October5's [five-game CDP screen](../results/2026-10-05-cdp-five-game-screen.md)
+is complete: twelve new200k-action learners plus all three retained Freeway
+cohorts. Boxing and Freeway learn strongly, Breakout/Qbert improve modestly,
+and Pong improves in only one of three seeds. All45 guards and720 selected
+natural frozen episodes pass; none reaches the predeclared long-run DreamerV3
+reference. Early published curves are similarly weak on Pong/Breakout, so the
+next reviewed [three-seed Pong budget test](2026-10-05-cdp-pong-budget.md)
+changes only fresh training length to500k actions. Full five-game mastery and
+the lower-budget claim remain open; no old matrix resumes.
+
+October5's [unassisted Freeway result](../results/2026-10-05-freeway-effects-200k.md)
+resolves the CDP exploration blocker: three200k-action learners retain frozen
+means22.21/23.21/27.00; all72 candidate rounds score19–30 versus0 in all72 initial
+controls. Full guards, tensors, replays and whole videos pass. Only one seed
+passes the unchanged historical mastery gate; Phase3 and the deferred five-game
+comparison are not complete. All new runs are finished; no automatic extension.
+The report links earlier negative screens, the32k matched controls and limitations.
+
+October4's [CDP protocol](2026-10-04-cdp.md) supersedes the unstarted
+posterior-Tiny ablation. Its [qualification report](../results/2026-10-04-cdp-qualification.md)
+passes independent cosine gradients,1,300 CDP/1,524 RGB upstream comparisons,
+native replay/restore and both production smokes. CI278 passes. Earlier failures
+and the06:31 warning stop remain retained. The [six-run learning result](../results/2026-10-04-cdp-learning.md)
+favors CDP on all three pairs:543.6 versus318.1 online mean,13.6% less wall time.
+All learning and frozen state/forecast audits pass. CDP's RSSM retains much more
+readable player state; h15 latent forecasts beat persistence, a constant mean
+and unrelated actions. One-step persistence, zero-reward MAE and matched
+privileged position persistence still win. The user now adopts CDP on the main
+path: next is unassisted Atari exploration/reward, then video priors and native
+games. RGB remains the reference; the CLI still requires explicit `--cdp`.
+All services have exited; the [revised roadmap](../kindle_single_life_dreamer_plan.md)
+does not launch a campaign or revive the deferred Tiny ablation.
+
+October 2's [joint Tiny protocol](2026-10-02-joint-tiny.md) follows the user's
+task-adaptive representation hypothesis. Its
+[qualification report](../results/2026-10-02-joint-tiny-qualification.md) records
+the implementation/CPU checks and original native blockers.
+October 3's [initialization diagnostic](../results/2026-10-03-allocation-initialization.md)
+shows native allocation and compute succeeding despite the startup warning;
+the [Tiny backward follow-up](../results/2026-10-03-joint-tiny-backward.md) fixes
+stale attention-gradient aliases and passes all148 independent gradient checks.
+Full-update/restore/cost qualification and all nine online runs now complete.
+The [task-only](../results/2026-10-03-joint-tiny-learning.md) and
+[direct-policy](../results/2026-10-03-policy-tiny-learning.md) comparisons find no
+clear early benefit. The [fixed-target diagnostic](../results/2026-10-03-fixed-latent-sufficiency.md)
+finds readable positions and better-than-persistence latent forecasts, but no
+established action/reward-sensitive world modeling. The October4
+[RSSM target-scaling test](../results/2026-10-04-rssm-target-standardization.md)
+cuts raw-target forecast errors substantially, but state/reward/action controls
+still do not establish useful dynamics. All six offline arms and audits pass
+in21m35s without new gameplay. The subsequent
+[frozen-belief diagnostic](../results/2026-10-04-rssm-belief-probes.md) locates
+poor held-out horizontal-position readability between adapter and posterior.
+Stage-fitted heads recover vertical information missed by transferred heads;
+some action signal survives, but forecasts still lose to persistence. All three
+frozen replays and24 GPU readouts complete in6m39s, with no actor updates or
+new gameplay. No GPU queue remains active.
+The authorized [posterior-target ablation](2026-10-04-posterior-latent-targets.md)
+is implemented, but its [native qualification](../results/2026-10-04-posterior-latent-qualification.md)
+stopped on a new allocation warning before learning. CPU checks pass; no new
+learning result is available, and GPU work remains stopped pending review.
+The known shader VUID is non-blocking by user direction, not silently removed
+from the evidence.
 
 The [GPU-resident acting report](2026-09-26-gpu-resident-acting.md) covers the
 shared single/vector actor, GPU replay collection, removal of DINO, Tiny-default

@@ -1,0 +1,293 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T03:12:22.251632+00:00",
+  "artifact_root": "runs/boundary-timing-20261017.l27008nG",
+  "native_observer_sha256": "786a3010df4ccf4c99ecf2e450ee559ad9e16faa89370e9e5cf4a56ad055e967",
+  "native_qualified_unchanged": "e45b9c43",
+  "ordinary_ratio_unchanged": 1.5867902138420056,
+  "instrumentation_gate": true,
+  "control_drift_limit": 0.05,
+  "overhead_limit": 0.05,
+  "timing": {
+    "control": {
+      "mean_ms": 43.1921713203125,
+      "first32_ms": 43.2075465625,
+      "last32_ms": 43.21497140625,
+      "stage_ms": {
+        "behavior_train_and_sync": 3.51911991015625,
+        "imagination_and_targets": 7.6980003828125,
+        "posterior": 7.05809973828125,
+        "world_train_and_sync": 24.9169512890625
+      },
+      "relative_retained_drift": -0.00010036076342279099
+    },
+    "marked": {
+      "mean_ms": 44.7750338671875,
+      "first32_ms": 44.7449634375,
+      "last32_ms": 44.6744075625,
+      "stage_ms": {
+        "behavior_train_and_sync": 3.55853621484375,
+        "imagination_and_targets": 8.066755328125,
+        "posterior": 7.6105089296875,
+        "world_train_and_sync": 25.53923339453125
+      }
+    },
+    "fractional_overhead": 0.03664697787792415
+  },
+  "program_boundaries": {
+    "world": {
+      "dispatches": 3751,
+      "groups": 1112,
+      "chunks": 5,
+      "queries": 1137,
+      "interval_classes": {
+        "other": 873,
+        "matrix_containing": 233,
+        "convolution_only": 17,
+        "image_without_matrix": 9
+      },
+      "convolution_products": 23,
+      "samples": 1360,
+      "measured": {
+        "mean_ms": 29.069339999999997,
+        "category_ms": {
+          "other": 4.716818374999997,
+          "matrix_containing": 4.640914749999998,
+          "convolution_only": 18.05966775,
+          "image_without_matrix": 1.6519391250000002
+        },
+        "first32_ms": 29.067164999999996,
+        "last32_ms": 29.078439999999993
+      }
+    },
+    "imagination": {
+      "dispatches": 681,
+      "groups": 522,
+      "chunks": 1,
+      "queries": 523,
+      "interval_classes": {
+        "other": 353,
+        "matrix_containing": 169
+      },
+      "convolution_products": 0,
+      "samples": 272,
+      "measured": {
+        "mean_ms": 7.312222000000008,
+        "category_ms": {
+          "other": 3.3022362500000058,
+          "matrix_containing": 4.009985750000003
+        },
+        "first32_ms": 7.313657000000008,
+        "last32_ms": 7.314229000000009
+      }
+    },
+    "behavior": {
+      "dispatches": 247,
+      "groups": 36,
+      "chunks": 1,
+      "queries": 37,
+      "interval_classes": {
+        "other": 20,
+        "matrix_containing": 16
+      },
+      "convolution_products": 0,
+      "samples": 272,
+      "measured": {
+        "mean_ms": 3.0248327500000003,
+        "category_ms": {
+          "other": 0.748206125,
+          "matrix_containing": 2.276626625
+        },
+        "first32_ms": 3.02557,
+        "last32_ms": 3.023645
+      }
+    },
+    "slow_value": {
+      "dispatches": 13,
+      "groups": 9,
+      "chunks": 1,
+      "queries": 10,
+      "interval_classes": {
+        "other": 5,
+        "matrix_containing": 4
+      },
+      "convolution_products": 0,
+      "samples": 272,
+      "measured": {
+        "mean_ms": 0.502819625,
+        "category_ms": {
+          "other": 0.23465599999999998,
+          "matrix_containing": 0.268163625
+        },
+        "first32_ms": 0.502974,
+        "last32_ms": 0.5031479999999999
+      }
+    }
+  },
+  "classified_ms": {
+    "world": {
+      "convolution_only": 18.05966775,
+      "image_mixed": 1.651939125,
+      "matrix_mixed": 3.149444125,
+      "matrix_only": 1.491470625,
+      "other": 4.716818375
+    },
+    "imagination": {
+      "matrix_mixed": 0.989137,
+      "matrix_only": 3.02084875,
+      "other": 3.30223625
+    },
+    "behavior": {
+      "matrix_mixed": 2.276626625,
+      "other": 0.748206125
+    },
+    "slow_value": {
+      "matrix_only": 0.268163625,
+      "other": 0.234656
+    }
+  },
+  "convolution_scope_totals": {
+    "encoder": {
+      "native_interval_ms": 6.162221250000001,
+      "jax_main_ms": 4.8862123749999995,
+      "jax_with_helpers_ms": 4.9582165
+    },
+    "decoder": {
+      "native_interval_ms": 11.8974465,
+      "jax_main_ms": 6.053660125,
+      "jax_with_helpers_ms": 6.296897749999999
+    }
+  },
+  "retained_jax": {
+    "convolution_main_ms": 10.9398725,
+    "convolution_with_helpers_ms": 11.25511425,
+    "captured_wall_ms": 27.6169055,
+    "whole_kernel_union_ms": 23.0994105,
+    "whole_matrix_with_helpers_ms": 4.654804999999992
+  },
+  "cached_total_ms": 39.909214375,
+  "nonconvolution_cached_ms": 21.849546625,
+  "outside_cached_interval_difference_ms": 4.865819492187505,
+  "verification": {
+    "exact_reports_targets_states": true,
+    "exact_initial_first_final_tensors": 292,
+    "exact_first_target_values": 5618720,
+    "checkpoint_roundtrips": 4,
+    "exact_plans_pipelines_shaders": true,
+    "shader_variants": 205,
+    "actual_groups_exact": true,
+    "original_command_source_projection_exact": true,
+    "driver_command_event_trace_collected": false,
+    "submission_wait_counts_exact": true,
+    "submission_wait_count_distribution": [
+      {
+        "submissions": 62,
+        "waits": 54,
+        "updates": 1
+      },
+      {
+        "submissions": 17,
+        "waits": 13,
+        "updates": 1
+      },
+      {
+        "submissions": 17,
+        "waits": 15,
+        "updates": 270
+      }
+    ],
+    "all_interval_samples_checked": 462128,
+    "cached_replays": 2176,
+    "queries_per_update": 1707,
+    "timestamp_period_ns": 1.0,
+    "timestamp_valid_bits": 64,
+    "compiled_cpu_tests": 3,
+    "build_source_seals": 592,
+    "decision_source_seals": 1677
+  },
+  "jobs": [
+    {
+      "name": "smoke-rgb-control",
+      "synthetic_updates": 24,
+      "allocation_warnings": 1,
+      "exact_reports": 24
+    },
+    {
+      "name": "smoke-rgb-candidate",
+      "synthetic_updates": 24,
+      "allocation_warnings": 1,
+      "exact_reports": 24
+    },
+    {
+      "name": "timing-rgb-control",
+      "synthetic_updates": 272,
+      "allocation_warnings": 0,
+      "exact_reports": 272
+    },
+    {
+      "name": "timing-rgb-candidate",
+      "synthetic_updates": 272,
+      "allocation_warnings": 0,
+      "exact_reports": 272
+    }
+  ],
+  "guards": 4,
+  "allocation_warnings": 2,
+  "synthetic_updates": 592,
+  "game_actions": 0,
+  "guard_nvml_queries": 0,
+  "recovery_performed": false,
+  "last_guard_event_utc": "2026-10-17T03:05:21.940195+00:00",
+  "controller_finished_utc": "2026-10-17T03:05:30.384276+00:00",
+  "independent_attribution_finished_utc": "2026-10-17T03:08:47.909257+00:00",
+  "production_changed": false,
+  "atari_restarted": false,
+  "observer_promoted": false,
+  "failures_retained": [
+    "Initial apply_patch Delete/Add of the same path was rejected before file edits; Update repair retained.",
+    "Preceding CPU contract enum census and older profiler failures remain in their original artifacts."
+  ],
+  "limits": [
+    "Complete observer overhead 3.6647% qualifies, but its distribution among intervals is unmeasured.",
+    "Convolution-only intervals include completion/issue effects; JAX numbers are kernel activity sums, not equal timing boundaries.",
+    "Mixed intervals cannot be assigned wholly to their matrix/image members.",
+    "Elapsed cached sums exclude helper/optimizer/submission intervals and are not calibrated global GPU coverage.",
+    "No causal additive gap budget, speedup, new ordinary baseline, CDP timing or learning claim.",
+    "RGB only; no CDP observer qualification or learning result.",
+    "Original command preservation is proved by source projection plus actual group and submit/wait counts, not a full driver event trace."
+  ],
+  "next_step": "CPU-map all retained nonconvolution interval memberships to actual JAX launches and versions before selecting a new mechanism; no GPU allocation or closed-family restart implied.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/attribution.json": "a839bd4dc6aef4ad27a9f5363c360f32de2739dbb81e270071b87f56cfcdd172",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/attribution.py": "8fcd42e55ad8cbfe10070b35ad5883741a514688c7400817cf70fbeb14c07a81",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/boundary_audit.py": "ccb78e62e2288833525849e1444a56a46c416adbd7a80763d47888065282117f",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/build.json": "d6aa559bf10f2604d149ba0ff5c4cb3354b0101ab75bfcf978eedefa3d5a3305",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/controller-result.json": "e915159f564ffa3e8c180c7fcd187b576781f4307e7f157abd97f2bbd8bca580",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/cpu-declaration.md": "40e6f2b036684292341c6eac84fa306cb75048db56e8b8a20a18a074e53e46a3",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/cpu-tests.log": "5d54d13e8c345320653f693a6c16b7a2e89b790771f4fdd7a7c4a5fc2c1bfb0f",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/decision.json": "504a5c59fbb731ad3c4d8787ef9c0807a63a07d2760f2f3d99cd5935494b5f9b",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/gpu-declaration.md": "4240a9eec4c6d621b544b10afc171834702b0eae5e14708ccb0d6950b3b4bc51",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/intervals.json": "169ab03a6784d7cd7d3f954cb1fec42b0ff124b8980c28316828e7126fc48275",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/patch-parser-failure.md": "250e7ff87b75aa470244a0775de81ee2b0a59af83b6f38faabcae466079013d0",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/preflight.json": "054fefd4b4c406dbf2475c575b0b22abd2eb048e1d3e9c65fdbc4d5e7cf9fac9",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/publication.py": "f84132c971e1c2acdbfbd25f58b5accaab70732c7e1335d7657558db96486fe6",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/reader_tests.py": "623d607bd6667ba765e5790cc81193292788abf9164e993bdf947a1d8bece9f8",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-candidate.guardqueue/result.json": "4574eac36604f09177261ccc3783b3d6bde1890486cee1cbc8de95d9d5221dce",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-candidate.guardqueue/smoke-rgb-candidate/events.jsonl": "8327d58652e126a523469a0c18382c9a6187aa44d9415b412822b9abd5ef1e6e",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-candidate.guardqueue/smoke-rgb-candidate/result.json": "3078bb5d3f7365bc4b4d3e4da080d455a18013c4f6426a6a9b645564294e85ca",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-candidate.review.json": "5558eb6ca1ebc8e056e47e5b5582f3c23735f4c6391f380dc80259b660e87db1",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-control.guardqueue/result.json": "7712277261bbbe194bbde007fbfbb6d1982e96663215b7fda9250dd27cf3210b",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-control.guardqueue/smoke-rgb-control/events.jsonl": "b305a5ce47cf144ebc4d30dda74c88da858e3a2e48c3e52ab5a0bd34df8f237f",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-control.guardqueue/smoke-rgb-control/result.json": "92218ff33e6f0737a77642188c99e259a1b9672fc3143fc25e2a4e528f52457a",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/smoke-rgb-control.review.json": "9d745054bbcc4f500429b1ec00ec4cb7c03353c32541a163bf23012385163e53",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/source-review.json": "7219fd999597617faef49791725f5a17389663bf73cc0f876dd311cc0c527231",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-candidate.guardqueue/result.json": "216fd61f39d0859e413d15532a26071c2cb7a74b578850496e2935cdfaff34a8",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-candidate.guardqueue/timing-rgb-candidate/events.jsonl": "156f3e46aba49c8ff03940308033a8b2e38887d08989666c96b30f392ee7a66b",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-candidate.guardqueue/timing-rgb-candidate/result.json": "b1e97548f9c008a63ee5325d25b284af8fd43747fb484bc6c317e072d40a43dc",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-candidate.review.json": "565361f7d0f89e5ebce76739160e756686bc21281859ab7fc8cece71ac8d5334",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-control.guardqueue/result.json": "c50f28a2c620547482fe6f09a029fdc69b67cee794f36deabe4227ccd6bff435",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-control.guardqueue/timing-rgb-control/events.jsonl": "88cc5638301257ab389e846f4b061605ccf0443565f8ccda73238e83cec143ab",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-control.guardqueue/timing-rgb-control/result.json": "1e62918b8f3b6133a6ac0d3c4feda783097fc50b54047102424fda53f81d1fc4",
+    "/x/Code/kindle/runs/boundary-timing-20261017.l27008nG/timing-rgb-control.review.json": "f5725c2cc845de0084d0e093b983bd3099c19ed31197dd702ab5316cddb0308b"
+  }
+}

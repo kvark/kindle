@@ -1,0 +1,542 @@
+{
+  "status": "complete",
+  "scope": "three frozen final Qbert models; no new learning or competence claim",
+  "native_sha256": "e9ebbf5df94c35b353407dc23fc7374ea79c5f842e8e51605f02eef5d49281a0",
+  "retained_native_sha256": "7311547db9c002cbdf3b0ecea80de069bfb8ec872b8734ed0908cc13b288fe0f",
+  "actions": 193248,
+  "smoke_actions": 1024,
+  "actor_updates": 0,
+  "guards": 5,
+  "warnings": 5,
+  "selected_natural_episodes": 72,
+  "calibration_episodes": 24,
+  "test_episodes": 48,
+  "exact_tensors_per_model": 346,
+  "excess_episodes": 9,
+  "capture_seconds": 88.87478497927077,
+  "groups": [
+    {
+      "status": "review_passed",
+      "name": "qbert-centered-1009-candidate-frozen",
+      "seed": 1009,
+      "actions": 46616,
+      "actor_updates": 0,
+      "exact_tensors": 346,
+      "trace_records": 5880,
+      "warnings": 1,
+      "log_sha256": "b3b1b4291cad00cb9c958aed675ed8dc20177c8ca3700b2ea5d786a535636a66",
+      "elapsed_seconds": 21.434738929150626,
+      "task": {
+        "environment": "ALE/Qbert-v5",
+        "criteria": {
+          "minimum_completed_episodes": 20,
+          "minimum_success_fraction": 0.9,
+          "minimum_mean_return": 15000,
+          "maximum_truncated_episodes": null
+        },
+        "completed_episodes": 24,
+        "natural_episodes": 24,
+        "truncated_episodes": 0,
+        "task_successes": 20,
+        "mean_completed_return": 5172.916666666667,
+        "task_success_fraction": 0.8333333333333334,
+        "task_gate_passed": false,
+        "score_scope": "completed episodes of one frozen policy; partial tails excluded",
+        "reliability_assessed": false
+      },
+      "video": {
+        "path": "/x/Code/kindle/runs/cdp-qbert-values-20261011.uB5QeBTv/qbert-centered-1009-candidate-frozen.mp4",
+        "sha256": "0eee91d051fad6e630c2c7374783f16ba1d9890ac90176b1663df2701fa5f437",
+        "stream": 0,
+        "frames": 23303,
+        "fps": 60,
+        "raw_frames_sha256": "c8f029ad0c170116b31dd7915972649cf53fcf3a10034b986f75c01a9bbd8b86",
+        "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+      },
+      "excess_episodes": 3,
+      "partial_lengths": [
+        1238,
+        478,
+        738,
+        199,
+        866,
+        561,
+        0,
+        372
+      ],
+      "replay_sha256": "5e2abcee71da73e11c4787bab06c2cda5e181196c89339b25789f4aab43b96fe",
+      "values": {
+        "discount": 0.9969969987869263,
+        "actions": 46616,
+        "actor_updates": 0,
+        "score": 5172.916666666667,
+        "calibration_episodes": 8,
+        "test_episodes": 16,
+        "calibration_mean": 745.2043030699925,
+        "slices": {
+          "all": {
+            "critic": {
+              "count": 24695,
+              "target_mean": 726.8840114550991,
+              "prediction_mean": 963.0856602963225,
+              "bias": 236.20164884122337,
+              "mae": 337.2746337890784,
+              "rmse": 743.0081639752466,
+              "r2": 0.43459248533748107,
+              "correlation": 0.7722456662085654
+            },
+            "calibration_mean": {
+              "count": 24695,
+              "target_mean": 726.8840114550991,
+              "prediction_mean": 745.2043030699925,
+              "bias": 18.32029161489333,
+              "mae": 786.4472396760503,
+              "rmse": 988.2968894903465,
+              "r2": -0.0003437472001517339,
+              "correlation": null
+            },
+            "zero": {
+              "count": 24695,
+              "target_mean": 726.8840114550991,
+              "prediction_mean": 0.0,
+              "bias": -726.8840114550991,
+              "mae": 726.8840114550991,
+              "rmse": 1226.6847495589468,
+              "r2": -0.5411337699316854,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 726.6854334252055,
+            "intrinsic_return_mean": 0.19857802989372395
+          },
+          "before_first_pyramid": {
+            "critic": {
+              "count": 7508,
+              "target_mean": 1710.1667156148826,
+              "prediction_mean": 2473.550507833555,
+              "bias": 763.3837922186723,
+              "mae": 810.6745001003188,
+              "rmse": 1329.2571034302816,
+              "r2": -0.28955945873093203,
+              "correlation": 0.37075179933845065
+            },
+            "calibration_mean": {
+              "count": 7508,
+              "target_mean": 1710.1667156148826,
+              "prediction_mean": 745.2043030699925,
+              "bias": -964.9624125448903,
+              "mae": 1358.4472798189709,
+              "rmse": 1517.0132673505855,
+              "r2": -0.6795856276002226,
+              "correlation": null
+            },
+            "zero": {
+              "count": 7508,
+              "target_mean": 1710.1667156148826,
+              "prediction_mean": 0.0,
+              "bias": -1710.1667156148826,
+              "mae": 1710.1667156148826,
+              "rmse": 2072.4012620364424,
+              "r2": -2.134520307444888,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 1709.894490458042,
+            "intrinsic_return_mean": 0.2722251568407114
+          },
+          "after_first_pyramid": {
+            "critic": {
+              "count": 17187,
+              "target_mean": 297.34502601077173,
+              "prediction_mean": 303.2514789203092,
+              "bias": 5.906452909537441,
+              "mae": 130.47378452714827,
+              "rmse": 146.1439547286723,
+              "r2": 0.8918649621516106,
+              "correlation": 0.947367284217912
+            },
+            "calibration_mean": {
+              "count": 17187,
+              "target_mean": 297.34502601077173,
+              "prediction_mean": 745.2043030699924,
+              "bias": 447.85927705922074,
+              "mae": 536.5737130924085,
+              "rmse": 630.9443279692629,
+              "r2": -1.0155185835980625,
+              "correlation": 1.4669427571761502e-16
+            },
+            "zero": {
+              "count": 17187,
+              "target_mean": 297.34502601077173,
+              "prediction_mean": 0.0,
+              "bias": -297.34502601077173,
+              "mae": 297.34502601077173,
+              "rmse": 534.7213081988817,
+              "r2": -0.44763710856756145,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 297.1786201243072,
+            "intrinsic_return_mean": 0.16640588646450524
+          }
+        },
+        "bonus_mean": 0.0008188197225299544,
+        "bonus_max": 0.007699897512793541
+      }
+    },
+    {
+      "status": "review_passed",
+      "name": "qbert-centered-2017-candidate-frozen",
+      "seed": 2017,
+      "actions": 32080,
+      "actor_updates": 0,
+      "exact_tensors": 346,
+      "trace_records": 4058,
+      "warnings": 0,
+      "log_sha256": "ec49759438231c7eed590cf7542119874236fc655c30e896dd12d6a1f8ffbdeb",
+      "elapsed_seconds": 14.89228980615735,
+      "task": {
+        "environment": "ALE/Qbert-v5",
+        "criteria": {
+          "minimum_completed_episodes": 20,
+          "minimum_success_fraction": 0.9,
+          "minimum_mean_return": 15000,
+          "maximum_truncated_episodes": null
+        },
+        "completed_episodes": 24,
+        "natural_episodes": 24,
+        "truncated_episodes": 0,
+        "task_successes": 22,
+        "mean_completed_return": 5812.5,
+        "task_success_fraction": 0.9166666666666666,
+        "task_gate_passed": false,
+        "score_scope": "completed episodes of one frozen policy; partial tails excluded",
+        "reliability_assessed": false
+      },
+      "video": {
+        "path": "/x/Code/kindle/runs/cdp-qbert-values-20261011.uB5QeBTv/qbert-centered-2017-candidate-frozen.mp4",
+        "sha256": "c14bc410aa5086339863be5f323b898cd8a247042dcb1b2cd5cc0e9e22e1d763",
+        "stream": 0,
+        "frames": 16033,
+        "fps": 60,
+        "raw_frames_sha256": "a20d8432e20494b7fb817e93213f481642f1113a758751aec3d4549e2990dcbc",
+        "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+      },
+      "excess_episodes": 0,
+      "partial_lengths": [
+        0,
+        754,
+        386,
+        101,
+        999,
+        306,
+        186,
+        305
+      ],
+      "replay_sha256": "67b83a5c485756258b8ceb38c3dd7a61673b4c6731e204c024c6b9cf93d69a61",
+      "values": {
+        "discount": 0.9969969987869263,
+        "actions": 32080,
+        "actor_updates": 0,
+        "score": 5812.5,
+        "calibration_episodes": 8,
+        "test_episodes": 16,
+        "calibration_mean": 1226.8592060181186,
+        "slices": {
+          "all": {
+            "critic": {
+              "count": 19164,
+              "target_mean": 1133.2925025995976,
+              "prediction_mean": 1071.002494887155,
+              "bias": -62.29000771244231,
+              "mae": 218.35657536761997,
+              "rmse": 318.7799332171225,
+              "r2": 0.9270805333481477,
+              "correlation": 0.9643012575485481
+            },
+            "calibration_mean": {
+              "count": 19164,
+              "target_mean": 1133.2925025995976,
+              "prediction_mean": 1226.8592060181184,
+              "bias": 93.56670341852113,
+              "mae": 1070.719738368687,
+              "rmse": 1184.2110391577578,
+              "r2": -0.006282090518595851,
+              "correlation": -2.0325996335972673e-16
+            },
+            "zero": {
+              "count": 19164,
+              "target_mean": 1133.2925025995976,
+              "prediction_mean": 0.0,
+              "bias": -1133.2925025995976,
+              "mae": 1133.2925025995976,
+              "rmse": 1636.4452186745957,
+              "r2": -0.9216065743809843,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 1133.164447393684,
+            "intrinsic_return_mean": 0.12805520591349986
+          },
+          "before_first_pyramid": {
+            "critic": {
+              "count": 8102,
+              "target_mean": 2114.0581092846473,
+              "prediction_mean": 2112.1782662333517,
+              "bias": -1.8798430512959456,
+              "mae": 293.51879307697436,
+              "rmse": 426.93682980916753,
+              "r2": 0.832790668697929,
+              "correlation": 0.9151617550060808
+            },
+            "calibration_mean": {
+              "count": 8102,
+              "target_mean": 2114.0581092846473,
+              "prediction_mean": 1226.8592060181184,
+              "bias": -887.1989032665289,
+              "mae": 1211.8567198256508,
+              "rmse": 1370.1178337365498,
+              "r2": -0.7220632815182768,
+              "correlation": -3.3545105548386517e-17
+            },
+            "zero": {
+              "count": 8102,
+              "target_mean": 2114.0581092846473,
+              "prediction_mean": 0.0,
+              "bias": -2114.0581092846473,
+              "mae": 2114.0581092846473,
+              "rmse": 2357.8258361884536,
+              "r2": -4.099841898622906,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 2113.8707943442146,
+            "intrinsic_return_mean": 0.18731494043246924
+          },
+          "after_first_pyramid": {
+            "critic": {
+              "count": 11062,
+              "target_mean": 414.9628203213227,
+              "prediction_mean": 308.42736385778585,
+              "bias": -106.53545646353686,
+              "mae": 163.30646798367593,
+              "rmse": 206.2715716486215,
+              "r2": 0.8923869447313484,
+              "correlation": 0.9623956534264126
+            },
+            "calibration_mean": {
+              "count": 11062,
+              "target_mean": 414.9628203213227,
+              "prediction_mean": 1226.8592060181184,
+              "bias": 811.896385696796,
+              "mae": 967.3485736819831,
+              "rmse": 1026.9152440755254,
+              "r2": -1.6671989289630131,
+              "correlation": 1.2970935349516407e-16
+            },
+            "zero": {
+              "count": 11062,
+              "target_mean": 414.9628203213227,
+              "prediction_mean": 0.0,
+              "bias": -414.9628203213227,
+              "mae": 414.9628203213227,
+              "rmse": 753.3746210592722,
+              "r2": -0.43551646644176856,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 414.87816796923966,
+            "intrinsic_return_mean": 0.0846523520830271
+          }
+        },
+        "bonus_mean": 0.0005731257731815961,
+        "bonus_max": 0.006262955255806446
+      }
+    },
+    {
+      "status": "review_passed",
+      "name": "qbert-centered-3019-candidate-frozen",
+      "seed": 3019,
+      "actions": 114552,
+      "actor_updates": 0,
+      "exact_tensors": 346,
+      "trace_records": 14379,
+      "warnings": 1,
+      "log_sha256": "429753c3d82af918ccf613b677385e3292053f5859c51ee79d394087fa2efeda",
+      "elapsed_seconds": 52.547756243962795,
+      "task": {
+        "environment": "ALE/Qbert-v5",
+        "criteria": {
+          "minimum_completed_episodes": 20,
+          "minimum_success_fraction": 0.9,
+          "minimum_mean_return": 15000,
+          "maximum_truncated_episodes": null
+        },
+        "completed_episodes": 24,
+        "natural_episodes": 24,
+        "truncated_episodes": 0,
+        "task_successes": 20,
+        "mean_completed_return": 11115.625,
+        "task_success_fraction": 0.8333333333333334,
+        "task_gate_passed": false,
+        "score_scope": "completed episodes of one frozen policy; partial tails excluded",
+        "reliability_assessed": false
+      },
+      "video": {
+        "path": "/x/Code/kindle/runs/cdp-qbert-values-20261011.uB5QeBTv/qbert-centered-3019-candidate-frozen.mp4",
+        "sha256": "fa8329652b4dd48727dada0e5c2c930303d8e41f768b027527266c8315389ccf",
+        "stream": 0,
+        "frames": 57269,
+        "fps": 60,
+        "raw_frames_sha256": "e397e8dd128384242882dde52006e671459b26ddad8f82b97c0de7d638192402",
+        "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+      },
+      "excess_episodes": 6,
+      "partial_lengths": [
+        0,
+        671,
+        4575,
+        1465,
+        277,
+        961,
+        238,
+        1294
+      ],
+      "replay_sha256": "4f23e5f51b6bbd97064b6f0056576b4df1a5ead3a43f9a166a0e067e6003dde5",
+      "values": {
+        "discount": 0.9969969987869263,
+        "actions": 114552,
+        "actor_updates": 0,
+        "score": 11115.625,
+        "calibration_episodes": 8,
+        "test_episodes": 16,
+        "calibration_mean": 842.7647466256395,
+        "slices": {
+          "all": {
+            "critic": {
+              "count": 47820,
+              "target_mean": 828.5849142302378,
+              "prediction_mean": 676.2999303654615,
+              "bias": -152.28498386477634,
+              "mae": 302.4760678466617,
+              "rmse": 443.1203405950063,
+              "r2": 0.5314507750242037,
+              "correlation": 0.8168101679590171
+            },
+            "calibration_mean": {
+              "count": 47820,
+              "target_mean": 828.5849142302378,
+              "prediction_mean": 842.7647466256396,
+              "bias": 14.17983239540167,
+              "mae": 421.10833776671393,
+              "rmse": 647.5126163868167,
+              "r2": -0.0004797931541848932,
+              "correlation": -1.3350110190518399e-16
+            },
+            "zero": {
+              "count": 47820,
+              "target_mean": 828.5849142302378,
+              "prediction_mean": 0.0,
+              "bias": -828.5849142302378,
+              "mae": 828.5849142302378,
+              "rmse": 1051.4867953632465,
+              "r2": -1.6382715744761707,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 828.3450471150403,
+            "intrinsic_return_mean": 0.2398671151974051
+          },
+          "before_first_pyramid": {
+            "critic": {
+              "count": 7040,
+              "target_mean": 1671.9231279328599,
+              "prediction_mean": 1957.838719853759,
+              "bias": 285.915591920899,
+              "mae": 431.86218315365693,
+              "rmse": 856.1159479254644,
+              "r2": 0.4753712841560004,
+              "correlation": 0.745407940248598
+            },
+            "calibration_mean": {
+              "count": 7040,
+              "target_mean": 1671.9231279328599,
+              "prediction_mean": 842.7647466256399,
+              "bias": -829.1583813072203,
+              "mae": 1304.194919991171,
+              "rmse": 1443.7996308643478,
+              "r2": -0.4921096413921304,
+              "correlation": 1.3990425584851705e-16
+            },
+            "zero": {
+              "count": 7040,
+              "target_mean": 1671.9231279328599,
+              "prediction_mean": 0.0,
+              "bias": -1671.9231279328599,
+              "mae": 1671.9231279328599,
+              "rmse": 2047.5303901307095,
+              "r2": -2.000872865578956,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 1671.6454768459853,
+            "intrinsic_return_mean": 0.277651086874633
+          },
+          "after_first_pyramid": {
+            "critic": {
+              "count": 40780,
+              "target_mean": 682.9963653222816,
+              "prediction_mean": 455.06321928165545,
+              "bias": -227.9331460406261,
+              "mae": 280.13967128557175,
+              "rmse": 322.06221281648374,
+              "r2": 0.023888048016619923,
+              "correlation": 0.7218805219429368
+            },
+            "calibration_mean": {
+              "count": 40780,
+              "target_mean": 682.9963653222816,
+              "prediction_mean": 842.7647466256394,
+              "bias": 159.76838130335798,
+              "mae": 268.6578831600396,
+              "rmse": 363.0267312761032,
+              "r2": -0.24021590307717022,
+              "correlation": -9.195222943655813e-17
+            },
+            "zero": {
+              "count": 40780,
+              "target_mean": 682.9963653222816,
+              "prediction_mean": 0.0,
+              "bias": -682.9963653222816,
+              "mae": 682.9963653222816,
+              "rmse": 756.8001764007222,
+              "r2": -4.389922674050507,
+              "correlation": null
+            },
+            "extrinsic_return_mean": 682.7630209917975,
+            "intrinsic_return_mean": 0.233344330484122
+          }
+        },
+        "bonus_mean": 0.0008316861997007308,
+        "bonus_max": 0.008026761934161186
+      }
+    }
+  ],
+  "raw_result": "/x/Code/kindle/runs/cdp-qbert-values-20261011.uB5QeBTv/result.json",
+  "raw_result_sha256": "90c507c16c58cfcb959e6b0084c1cc683079e0adfaa443030d7de7185ecf3534",
+  "cpu_review_seconds": 2.109526190208271,
+  "source_pins": 48,
+  "repaired_review": {
+    "reason": "CPU reviewer compared run-local unix_time on episode/reset rows. All gameplay fields agree.",
+    "failed_trace_records": 5880,
+    "differing_rows": 53,
+    "differing_fields": [
+      "unix_time"
+    ],
+    "retained_reviewer": "study.review-failed.py",
+    "retained_reviewer_sha256": "3bbda2a05706a8f3f37b014087a0bf7d19d5e4b027a869625d7a5e66bd2d8af8",
+    "corrected_reviewer_sha256": "a60106b897c9d304a21fa84f2456715028a8eafb21414a4dfc6a45fe979737df",
+    "correction": "Exclude only elapsed_seconds and unix_time from episode/reset equality; transition comparisons unchanged.",
+    "runtime_changes": false,
+    "gpu_retries": 0,
+    "followup": "Review the completed 1009 capture on CPU, then only the two unstarted entries 2017 and 3019. Original service remains closed."
+  },
+  "cpu_build_failures": [
+    "service PATH omitted cargo",
+    "uv virtualenv has no pip; use maturin --uv"
+  ],
+  "quality_goal_complete": false,
+  "gpu_utilization": "unmeasured"
+}

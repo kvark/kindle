@@ -1,0 +1,60 @@
+{
+  "status": "complete",
+  "coverage": {
+    "rgb": {
+      "matrix_products": 716,
+      "tiled_products": 342,
+      "unique_tiled_contracts": 41,
+      "nominal_matrix_macs": 112530055168,
+      "tiled_nominal_macs": 102450069504,
+      "tiled_mac_fraction": 0.9104240582753537,
+      "imagination_matrix_products": 188,
+      "tiled_imagination_products": 155,
+      "tiled_imagination_mac_fraction": 0.9819000390407602
+    },
+    "cdp": {
+      "matrix_products": 769,
+      "tiled_products": 387,
+      "unique_tiled_contracts": 45,
+      "nominal_matrix_macs": 189187252224,
+      "tiled_nominal_macs": 176404037632,
+      "tiled_mac_fraction": 0.9324308882246225,
+      "imagination_matrix_products": 200,
+      "tiled_imagination_products": 167,
+      "tiled_imagination_mac_fraction": 0.9910427637122996
+    }
+  },
+  "unique_tiled_shader_keys": 9,
+  "unique_tiled_contracts": 54,
+  "selected_shader_keys": 28,
+  "catalog_modules_emitted": 29,
+  "unused_catalog_sources": [
+    "3d61ea29f2d47d916d0b5e7c1929edbd64d3d0f7856bd31107eb559815dee65f"
+  ],
+  "selected_products": 1519,
+  "retained_typed_modules": 152,
+  "bank_model_negative_tests": [
+    "duplicate-local-owner",
+    "legal-permuted-subgroup-breaks-model",
+    "unmodified-packed-family-breaks-scaled-word-model"
+  ],
+  "explicit_ownership_values": 6144,
+  "word_counter_cases": 9,
+  "packed_counterexamples": 11,
+  "naga_preserves_cooperative_store_opcode": true,
+  "retained_failure": {
+    "scope": "CPU reviewer only",
+    "source": "/x/Code/kindle/runs/shared-store-contract-20261016.Mi1tGL3k/review-first.py",
+    "log": "/x/Code/kindle/runs/shared-store-contract-20261016.Mi1tGL3k/review.log",
+    "cause": "Overbroad forbidden substring also matched the required CooperativeMatrixLayout enum.",
+    "repair": "Check explicit store/allocation construction, preserve the two legal layout enum choices.",
+    "gpu_repeats": 0
+  },
+  "gpu_calls": 0,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "artifact_root": "/x/Code/kindle/runs/shared-store-contract-20261016.Mi1tGL3k",
+  "source_seals": 412,
+  "detailed_review_sha256": "ee1b585dcac894aeb4971693547d0fb901f44b592dac4f8b39f8b1f71d7175be",
+  "detailed_audit_sha256": "325bdc2536d9511bd3f889271d8b58486464226a00f10db8b7def7978740bb6f"
+}

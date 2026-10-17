@@ -1,0 +1,160 @@
+{
+  "status": "qualified_with_retained_control_failure",
+  "date": "2026-10-15",
+  "artifact_root": "runs/repeated-row-composition-20261015.dDTCIIip",
+  "candidate_native_sha256": "076f3135b5e3c89c6cb0f66e761bd57b9d8e73d63b390c534023b8545ef3ef83",
+  "control_native_sha256": "99f8aab038d460bfd8ad4f5cc967d99d4716a3f1fc157d44279ebf8793004214",
+  "accepted": true,
+  "production_changed": false,
+  "learning_equivalence": false,
+  "root_cause_goal_complete": false,
+  "workloads": {
+    "cdp": {
+      "exact_tensors_per_boundary": 346,
+      "exact_reports": 272,
+      "mean_update_ms": {
+        "control": 50.15117535937502,
+        "candidate": 47.72827578125003
+      },
+      "improvement_percent": 4.831192012476071,
+      "stage_ms": {
+        "control": {
+          "behavior_train_and_sync": 4.530511929687499,
+          "imagination_and_targets": 23.87334224609375,
+          "posterior": 8.29395119140625,
+          "world_train_and_sync": 13.4533699921875
+        },
+        "candidate": {
+          "behavior_train_and_sync": 4.61483575390625,
+          "imagination_and_targets": 21.489679667968748,
+          "posterior": 8.24252181640625,
+          "world_train_and_sync": 13.38123854296875
+        }
+      }
+    },
+    "rgb": {
+      "exact_tensors_per_boundary": 292,
+      "exact_reports": 272,
+      "mean_update_ms": {
+        "control": 54.12867170703126,
+        "candidate": 54.24502512500002
+      },
+      "improvement_percent": -0.21495709076053693,
+      "stage_ms": {
+        "control": {
+          "behavior_train_and_sync": 4.5411668515625,
+          "imagination_and_targets": 11.899551113281248,
+          "posterior": 7.48014980859375,
+          "world_train_and_sync": 30.20780393359375
+        },
+        "candidate": {
+          "behavior_train_and_sync": 4.553244765624999,
+          "imagination_and_targets": 11.951796660156251,
+          "posterior": 7.52546033203125,
+          "world_train_and_sync": 30.214523367187503
+        }
+      }
+    }
+  },
+  "rgb_jax_ratio": 2.0368595983033875,
+  "retained_jax_ms": 26.6316957586,
+  "numerical": {
+    "conditioned_cases_per_arm": 16,
+    "conditioned_f64_comparisons_per_arm": 5248728,
+    "conditioned_exact_pairs": 5248728,
+    "signed_exact_pairs": 1567698,
+    "signed_scalar_gate_passes": false,
+    "original_failure": [
+      {
+        "case": "r129-c256-a18-f0-bf0",
+        "name": "inference_loss",
+        "failures": 0,
+        "l2_pass": false,
+        "max_abs": 1.0131810374070184E-10,
+        "relative_l2": 0.0000771089484123018,
+        "values": 1
+      },
+      {
+        "case": "r129-c256-a18-f0-bf0",
+        "name": "loss",
+        "failures": 0,
+        "l2_pass": false,
+        "max_abs": 1.0131810374070184E-10,
+        "relative_l2": 0.0000771089484123018,
+        "values": 1
+      }
+    ],
+    "diagnosis": {
+      "training": {
+        "saved_loss": -0.0000013140617056706105,
+        "reference_loss": -0.0000013139603875674935,
+        "reconstructed_loss_from_gpu_values": -0.00000131399208267858,
+        "relative_error": 0.00007710894793764814,
+        "cancellation_condition": 123122.62140954974,
+        "mean_absolute_contribution": 0.16177824734561774,
+        "forward_error_contribution": -3.169511108655978E-11,
+        "reduction_error_contribution": -6.962299203051406E-11
+      },
+      "inference_": {
+        "saved_loss": -0.0000013140617056706105,
+        "reference_loss": -0.0000013139603875674935,
+        "reconstructed_loss_from_gpu_values": -0.00000131399208267858,
+        "relative_error": 0.00007710894793764814,
+        "cancellation_condition": 123122.62140954974,
+        "mean_absolute_contribution": 0.16177824734561774,
+        "forward_error_contribution": -3.169511108655978E-11,
+        "reduction_error_contribution": -6.962299203051406E-11
+      }
+    },
+    "tolerances_changed": false,
+    "paired_signed_cases": 13
+  },
+  "views": {
+    "dispatches": {
+      "control": 892,
+      "candidate": 884
+    },
+    "groups": {
+      "control": 599,
+      "candidate": 599
+    },
+    "bf16_matrices": 170,
+    "bf16_scalar_kernels": 205,
+    "copies_removed": 8,
+    "logical_intermediate_writes_removed_bytes": 1132462080,
+    "logical_buffer_inventory_bytes": 15176219196,
+    "physical_vram_saving_claim": false
+  },
+  "guards_passed": 8,
+  "guards_failed": 2,
+  "allocation_warnings": 5,
+  "synthetic_updates": 1136,
+  "raw_backward_passes": 58,
+  "forward_only_passes": 58,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 12378701824,
+  "source_seals": 1999,
+  "completion_utc": "2026-10-15 06:59:59 UTC",
+  "service_wall_seconds": 204.462,
+  "retained_failures": [
+    "pre-GPU shared-target original/candidate binary collision",
+    "five unrelated existing regression-test Clippy chunks_exact lints",
+    "original signed near-zero scalar relative gate in both compilers"
+  ],
+  "next": "Return to the RGB convolution-feeding algorithm; no more row/geometry sweeps. Check a bounded explicit GPU lowering to existing typed GEMM, including packing and scratch, before any new GPU allocation. Do not resurrect the rejected workgroup prototype.",
+  "source_sha256": {
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/prepare.json": "9492f6e739194ec1aa719e709a0422a87760eaa9884fa908a81e31823856d16f",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/failure-review.json": "8f44038228cc727a74cf56f185155100a512f9456d89f19142d5cf80216b2d92",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/review_failure.py": "32b69dc6b2add2a8907d876bbb5375c6ae512fc91f3a6cbfc9f587cfca7f7b24",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/publication.py": "1049aeb68d66ac110b69018492921dd050a6fc6eca1ea09f9b84826c68fdffc3",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/build-v1.log": "bd9fa43c07a534fbfe2818479f3e5f3fc1f84b8e895806d348005ae4403ca69e",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/build-v2.log": "ac8724a2bf11e91f16568593aceb0a2f547e4a14d4ac7326d3f29632732e1b6e",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/build-v3.log": "2805277e81a17431eb45800d8338d747acf0f81ac4d53537f743e4221dc47c3e",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/signed-review.json": "461d5e0eaf003a85b556a6fbab696f2aba1cfac6e96661e5c0c2a48831d4cf20",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/numerical-review.json": "4dac13b6fb56145388786f24bbad8e1e17ceb2f4ccb8c07b77dc10cacd34a6c1",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/smoke-review.json": "7b4373b68550a56d28925b954d864579101bf9055732b5518d732ec80d29c328",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/timing-review.json": "a4ae0e5e3ee22d7308633953444d48603be692ed1dcf39d296d38216d512364c",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/build.log": "c6d9b2f451e712a7de37efb48841c240ec99d050fd51c111828ea724bb4ddc0e",
+    "/x/Code/kindle/runs/repeated-row-composition-20261015.dDTCIIip/conditioned/controller.log": "7a55b04994cdf384818b2cfd5777b0d54a24acd93f110df4143e009a2919b145"
+  }
+}

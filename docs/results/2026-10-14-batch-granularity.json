@@ -1,0 +1,246 @@
+{
+  "status": "complete",
+  "arms": {
+    "native-b8-v2": {
+      "complete_ms": 22.779939113281262,
+      "ms_per_replay_position": 0.17796827432250986,
+      "batch_size": 8,
+      "replay_positions": 128,
+      "finite_reports": 272,
+      "finite_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "stages_ms": {
+        "behavior_train_and_sync": 1.31381455078125,
+        "imagination_and_targets": 6.4276591875,
+        "posterior": 3.5722536796875,
+        "world_train_and_sync": 11.4662116953125
+      },
+      "minimum_sampled_headroom_bytes": 15119220736,
+      "cache": {
+        "behavior": [
+          1,
+          271
+        ],
+        "imagination": [
+          1,
+          271
+        ],
+        "slow_value": [
+          1,
+          271
+        ],
+        "world": [
+          5,
+          1355
+        ]
+      }
+    },
+    "native-b32-v2": {
+      "complete_ms": 68.45599165624998,
+      "ms_per_replay_position": 0.13370310870361324,
+      "batch_size": 32,
+      "replay_positions": 512,
+      "finite_reports": 272,
+      "finite_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "stages_ms": {
+        "behavior_train_and_sync": 4.531242945312499,
+        "imagination_and_targets": 17.85389451953125,
+        "posterior": 9.224223234375,
+        "world_train_and_sync": 36.84663095703125
+      },
+      "minimum_sampled_headroom_bytes": 12665225216,
+      "cache": {
+        "behavior": [
+          1,
+          271
+        ],
+        "imagination": [
+          1,
+          271
+        ],
+        "slow_value": [
+          1,
+          271
+        ],
+        "world": [
+          5,
+          1355
+        ]
+      }
+    },
+    "jax-b8-v3": {
+      "complete_ms": 12.73682200917392,
+      "core_ms": 12.374903330965026,
+      "ms_per_replay_position": 0.09950642194667125,
+      "batch_size": 8,
+      "replay_positions": 128,
+      "finite_reports": 272,
+      "initial_final_tensors": 288,
+      "seed_ms": 0.21989816741552204,
+      "metric_ms": 0.14165820175549015,
+      "final_pending_drain_ms": 0.09275111369788647,
+      "heavy_nominal_macs": 83589070848,
+      "hlo_sha256": "915e7f197fa214f4b8cce7351c535757cb1addeb68b13f256c832e0a387ec65e",
+      "minimum_sampled_headroom_bytes": 7930773504
+    },
+    "jax-b32-v3": {
+      "complete_ms": 27.187344880076125,
+      "core_ms": 26.513069207794615,
+      "ms_per_replay_position": 0.05310028296889868,
+      "batch_size": 32,
+      "replay_positions": 512,
+      "finite_reports": 272,
+      "initial_final_tensors": 288,
+      "seed_ms": 0.4440492957655806,
+      "metric_ms": 0.22941707175050396,
+      "final_pending_drain_ms": 0.20718201994895935,
+      "heavy_nominal_macs": 334356283392,
+      "hlo_sha256": "a60b698f49cacac0ce2c271f2a28a314dc3fe12db346631e986289d789652726",
+      "minimum_sampled_headroom_bytes": 7930773504
+    }
+  },
+  "scaling": {
+    "native": {
+      "update_scale": 3.0050998519279823,
+      "throughput_gain": 1.3310705790470554
+    },
+    "jax": {
+      "update_scale": 2.134546974158386,
+      "throughput_gain": 1.873933929974593
+    }
+  },
+  "native_over_jax": {
+    "8": 1.7885104382296941,
+    "32": 2.517935898419305
+  },
+  "retained_native_reproduction": {
+    "control_ms": 22.881178542968748,
+    "candidate_ms": 22.779939113281262,
+    "less_time_percent": 0.44245723399852777,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "plan_sha256": {
+      "behavior_gradient-plan.json": "9dfbb32686172160042544911f494568dac1a0deb6181f667d5f42bf205e6da6",
+      "imagination-plan.json": "8965dd9423c245054337271a8a4350a7e0fa07a692af931f962c51477d5d8e64",
+      "posterior-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58",
+      "slow_value-plan.json": "96b8f478a446ac5f1271705cb12f7429af26b23360de444f7d46ca7c6e36cbcb",
+      "world_gradient-plan.json": "385285ff0dcd2fc7257a180b145342f2950d5287b9b96e4a00406489a1627b58"
+    },
+    "minimum_sampled_headroom_bytes": 15119220736,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.33560705078125,
+        "imagination_and_targets": 6.45261783984375,
+        "posterior": 3.57531975390625,
+        "world_train_and_sync": 11.5176338984375
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.31381455078125,
+        "imagination_and_targets": 6.4276591875,
+        "posterior": 3.5722536796875,
+        "world_train_and_sync": 11.4662116953125
+      }
+    }
+  },
+  "exact_jax_b8_reports": 272,
+  "exact_jax_b8_initial_final_tensors": 288,
+  "exact_per_framework_initials": true,
+  "first_target_scalar_counts": {
+    "8": {
+      "action_target": 34560,
+      "deter": 262144,
+      "imagined_slow_target": 489600,
+      "imagined_value_target": 489600,
+      "imagined_weight": 1920,
+      "replay_slow_target": 30600,
+      "replay_value_target": 30600,
+      "replay_weight": 120,
+      "stoch": 65536
+    },
+    "32": {
+      "action_target": 138240,
+      "deter": 1048576,
+      "imagined_slow_target": 1958400,
+      "imagined_value_target": 1958400,
+      "imagined_weight": 7680,
+      "replay_slow_target": 122400,
+      "replay_value_target": 122400,
+      "replay_weight": 480,
+      "stoch": 262144
+    }
+  },
+  "guards": [
+    {
+      "path": "smoke/native-b32-smoke/result.json",
+      "passed": false,
+      "exit": 101
+    },
+    {
+      "path": "smoke-v2/native-b32-smoke-v2/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "timing-v2/jax-b32-v2/result.json",
+      "passed": false,
+      "exit": 1
+    },
+    {
+      "path": "timing-v2/native-b32-v2/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "timing-v2/native-b8-v2/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "jax-v3/jax-b32-v3/result.json",
+      "passed": true,
+      "exit": 0
+    },
+    {
+      "path": "jax-v3/jax-b8-v3/result.json",
+      "passed": true,
+      "exit": 0
+    }
+  ],
+  "allocation_warnings": 5,
+  "synthetic_updates": 1112,
+  "game_actions": 0,
+  "failed_initialization_updates": 0,
+  "limits": [
+    "Different cross-framework weights/RNG, same within-framework initials",
+    "Batch size changes learning statistics/scheduling; throughput is not time to score",
+    "No SM utilization, hardware instruction count, or production promotion",
+    "One fixed B8/B32 comparison, not a batch/sequence/precision sweep"
+  ],
+  "artifacts": "runs/connected-projections-20261014.lmjwrepW",
+  "native_sha256": "e5d890dd4c121e1f51e98cb41075c34639692dbd9aabfe0d39a95956445e663d",
+  "packing_limit": {
+    "affected_convolutions": 4,
+    "affected_nominal_macs": 80530636800,
+    "required_x_groups": 65536,
+    "portable_limit": 65535,
+    "existing_balanced_grid": [
+      32768,
+      2,
+      1
+    ],
+    "unchanged_packing_cap_bytes": 67108864,
+    "speed_effect": "unmeasured"
+  }
+}

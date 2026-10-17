@@ -1,0 +1,180 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifacts": "runs/command-cache-20261014.rATLoIBZ",
+  "decision": "Keep isolated command reuse candidate; no production/Atari promotion or whole-gap closure.",
+  "ordinary": {
+    "control_ms": 28.416441210937503,
+    "candidate_ms": 25.53032745312499,
+    "less_time_percent": 10.156492631813608,
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "first_outputs_exact": true,
+    "minimum_sampled_headroom_bytes": 15121317888,
+    "stages_ms": {
+      "control": {
+        "behavior_train_and_sync": 1.62239551953125,
+        "imagination_and_targets": 7.39987633984375,
+        "posterior": 4.33041491015625,
+        "world_train_and_sync": 15.06375444140625
+      },
+      "candidate": {
+        "behavior_train_and_sync": 1.40277753515625,
+        "imagination_and_targets": 6.51139529296875,
+        "posterior": 3.80847955859375,
+        "world_train_and_sync": 13.807675066406249
+      }
+    }
+  },
+  "cache_counts": {
+    "behavior": [
+      1,
+      271
+    ],
+    "imagination": [
+      1,
+      271
+    ],
+    "slow_value": [
+      1,
+      271
+    ],
+    "world": [
+      5,
+      1355
+    ]
+  },
+  "jax_retained_complete_ms": 12.836475,
+  "native_to_jax_ratio": 1.9888892747522189,
+  "cpu_api_capture": {
+    "control": {
+      "updates": 8,
+      "wall_ms": 30.454592375,
+      "api": {
+        "vkBeginCommandBuffer": {
+          "calls": 15,
+          "ms": 0.068191
+        },
+        "vkCmdBindDescriptorSets": {
+          "calls": 1.5,
+          "ms": 0.00338
+        },
+        "vkCmdBindPipeline": {
+          "calls": 5297,
+          "ms": 0.41381387500001043
+        },
+        "vkEndCommandBuffer": {
+          "calls": 15,
+          "ms": 0.0101375
+        },
+        "vkQueueSubmit": {
+          "calls": 15,
+          "ms": 0.04371025
+        },
+        "vkUpdateDescriptorSetWithTemplate": {
+          "calls": 5351,
+          "ms": 1.022515250000016
+        }
+      },
+      "sqlite_sha256": "e06524cd19a61022b970b1fc538cdf6cef0070482f4794a9f142e7b70189851b",
+      "selected_api_ms": 1.5617478750000267
+    },
+    "cached": {
+      "updates": 8,
+      "wall_ms": 25.238460749999998,
+      "api": {
+        "vkBeginCommandBuffer": {
+          "calls": 15,
+          "ms": 0.033039124999999996
+        },
+        "vkCmdBindDescriptorSets": {
+          "calls": 0.25,
+          "ms": 0.00048875
+        },
+        "vkCmdBindPipeline": {
+          "calls": 11,
+          "ms": 0.0047375
+        },
+        "vkCmdPipelineBarrier": {
+          "calls": 8,
+          "ms": 0.0036376250000000002
+        },
+        "vkEndCommandBuffer": {
+          "calls": 15,
+          "ms": 0.010119
+        },
+        "vkQueueSubmit": {
+          "calls": 15,
+          "ms": 0.050334000000000004
+        },
+        "vkUpdateDescriptorSetWithTemplate": {
+          "calls": 65,
+          "ms": 0.01335125
+        }
+      },
+      "sqlite_sha256": "fca102d46e3d6af670aa5eae0b43f8a1212212296522ba520a979acb854f5024",
+      "selected_api_ms": 0.11570725
+    }
+  },
+  "capture_perturbation_percent": {
+    "control": 7.85166625643432,
+    "cached": -0.16618394462996067
+  },
+  "qualification": {
+    "distinct_lifecycle_cases": 16,
+    "executions": 32,
+    "exact_values_per_execution_set": 278528,
+    "logged_set_passed": true,
+    "cpu_command_tests": 4,
+    "clippy_libraries": [
+      "blade-graphics",
+      "meganeura",
+      "kindle"
+    ],
+    "guards": {
+      "numerical": {
+        "guards": 1,
+        "allocation_warnings": 0
+      },
+      "logged": {
+        "guards": 1,
+        "allocation_warnings": 1
+      },
+      "smoke": {
+        "guards": 2,
+        "allocation_warnings": 1
+      },
+      "timing": {
+        "guards": 2,
+        "allocation_warnings": 2
+      },
+      "capture": {
+        "guards": 2,
+        "allocation_warnings": 0
+      }
+    },
+    "synthetic_updates": 1152,
+    "game_actions": 0,
+    "exact_full_reports": 272,
+    "exact_smoke_reports": 24,
+    "exact_capture_reports_per_arm": 24,
+    "exact_tensors_per_checkpoint": 292
+  },
+  "binaries": {
+    "kindle_sha256": "416451697c87077fd1ad5672d152274e94702fb5eaeec76ac42183cd8d20c4ce",
+    "backend_initial_sha256": "c55c02c895d71f691f0e745795e1f0566ba0133c5a801a74be74b296ffa45d74",
+    "backend_logged_sha256": "cfd8d9a575856768a26f2f5f5758c99b10e4d098c279e8c1db4662456e1f9585"
+  },
+  "limits": [
+    "CPU Vulkan API durations are selected instrumentation, not all host time, GPU execution or utilization.",
+    "No API submission reduction: exactly 15 per update in each capture.",
+    "No change to 5286 GPU graph dispatches; the cache removes their host re-recording.",
+    "No JAX rerun, CDP or learning qualification, Metal/other-backend support, or production change.",
+    "Original numerical set did not install validation logging; retain its 256 updates separately from logged qualification.",
+    "CPU visibility/Clippy, pre-lock snapshot and map-order audit failures retained."
+  ]
+}

@@ -1,0 +1,587 @@
+{
+  "status": "complete",
+  "published_utc": "2026-10-14T00:12:30.068573+00:00",
+  "scope": "Isolated scalar-region compiler diagnostic; no production promotion or game actions",
+  "artifacts": "/x/Code/kindle/runs/pointwise-regions-20261013.vz7sFGG9",
+  "candidate_native_sha256": "0483cf64ef26872a5358ba630afcea45f2d71d0cfbb0f110ff35b93a679595f2",
+  "control_native_sha256": "aca8359bf63b5781481ade19b1d5ce9456a98ab368965011ae52c701884cc7f2",
+  "backend_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+  "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+  "naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8",
+  "upstream_recheck": {
+    "meganeura_main": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade_main": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+    "unchanged": true
+  },
+  "numerics": {
+    "region": {
+      "cases": 48,
+      "comparisons": 240,
+      "exact_rne_values": 26166
+    },
+    "retained_wide_suite": {
+      "cases": 224,
+      "comparisons": 672,
+      "exact_rne_values": 122108
+    },
+    "total_f64_comparisons": 912,
+    "total_exact_rne_values": 148274,
+    "small_optimizer_updates": 146,
+    "staged_exact_cases": 8
+  },
+  "cpu": {
+    "passing_tests": 52,
+    "generated_shader_variants": 28,
+    "library_clippy": [
+      "meganeura",
+      "kindle"
+    ],
+    "formatting": true,
+    "prior_root_ci": {
+      "run_number": 375,
+      "conclusion": "success"
+    }
+  },
+  "timing": {
+    "status": "complete",
+    "mode": "timing",
+    "guards": 9,
+    "allocation_warnings": 3,
+    "games": 0,
+    "comparisons": {
+      "rgb": {
+        "exact_reports": 272,
+        "reports": 272,
+        "tensors": {
+          "initial": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "first": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "final": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "imagined_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 1053,
+        "posterior_is_world_prefix": true,
+        "minimum_headroom_bytes": 15104540672,
+        "control_ms": 32.38379110546875,
+        "fused_ms": 32.31196098046875,
+        "less_time_percent": 0.22180888199923032,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 2.6039923203125,
+            "imagination_and_targets": 10.0526359609375,
+            "posterior": 4.48344489453125,
+            "world_train_and_sync": 15.2437179296875
+          },
+          "fused": {
+            "behavior_train_and_sync": 2.56797054296875,
+            "imagination_and_targets": 10.054480859375,
+            "posterior": 4.470748921875,
+            "world_train_and_sync": 15.21876065625
+          }
+        }
+      },
+      "cdp": {
+        "exact_reports": 4,
+        "reports": 272,
+        "tensors": {
+          "initial": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "first": {
+            "tensors": 346,
+            "exact": 345,
+            "relative_l2": 9.795356827145023e-12,
+            "max_abs": 2.9802322387695312e-8
+          },
+          "final": {
+            "tensors": 346,
+            "exact": 0,
+            "relative_l2": 0.5586259544291773,
+            "max_abs": 5.553146839141846
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "imagined_value_target": {
+            "exact": false,
+            "changed": 2,
+            "relative_l2": 1.1678426186698206e-9,
+            "max_abs": 5.960464477539063e-8
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0,
+            "max_abs": 0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 0,
+        "posterior_is_world_prefix": false,
+        "minimum_headroom_bytes": 11310989312,
+        "control_ms": 104.13527191406251,
+        "fused_ms": 103.05372059765635,
+        "less_time_percent": 1.038602287703927,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 5.975987402343751,
+            "imagination_and_targets": 39.96729128125,
+            "posterior": 11.9835937421875,
+            "world_train_and_sync": 46.20839948828125
+          },
+          "fused": {
+            "behavior_train_and_sync": 5.981051550781251,
+            "imagination_and_targets": 39.20958666796875,
+            "posterior": 12.27624985546875,
+            "world_train_and_sync": 45.5868325234375
+          }
+        }
+      }
+    }
+  },
+  "smoke": {
+    "guards": 5,
+    "allocation_warnings": 0,
+    "comparisons": {
+      "rgb": {
+        "reports": 24,
+        "exact_reports": 24,
+        "tensors": {
+          "initial": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "first": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "final": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_abs": 0
+          }
+        },
+        "minimum_headroom_bytes": 15104540672
+      },
+      "cdp": {
+        "reports": 24,
+        "exact_reports": 4,
+        "tensors": {
+          "initial": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0,
+            "max_abs": 0
+          },
+          "first": {
+            "tensors": 346,
+            "exact": 345,
+            "relative_l2": 9.795356827145023e-12,
+            "max_abs": 2.9802322387695312e-8
+          },
+          "final": {
+            "tensors": 346,
+            "exact": 0,
+            "relative_l2": 0.25283792998332977,
+            "max_abs": 13.95836067199707
+          }
+        },
+        "minimum_headroom_bytes": 11310989312
+      }
+    }
+  },
+  "inventory": {
+    "scope": "Same per-product matrix/convolution descriptors and nominal arithmetic after expanding verified horizontal batches; physical horizontal grouping may change. Staged RGB posterior counted once. Groups are actual runtime counts.",
+    "workloads": {
+      "rgb": {
+        "imagination": {
+          "control": {
+            "dispatches": 1072,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 839
+          },
+          "fused": {
+            "dispatches": 1057,
+            "regions": {
+              "dispatches": 15,
+              "scalar_ops": 240,
+              "extra_outputs": 0,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 839
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "world_gradient": {
+          "control": {
+            "dispatches": 4168,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 1387
+          },
+          "fused": {
+            "dispatches": 4007,
+            "regions": {
+              "dispatches": 112,
+              "scalar_ops": 1234,
+              "extra_outputs": 129,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 1355
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "behavior_gradient": {
+          "control": {
+            "dispatches": 247,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 36
+          },
+          "fused": {
+            "dispatches": 245,
+            "regions": {
+              "dispatches": 1,
+              "scalar_ops": 6,
+              "extra_outputs": 1,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 36
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "slow_value": {
+          "control": {
+            "dispatches": 13,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 9
+          },
+          "fused": {
+            "dispatches": 13,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 9
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "total_dispatches": {
+          "control": 5500,
+          "fused": 5322
+        },
+        "total_groups": {
+          "control": 2271,
+          "fused": 2239
+        }
+      },
+      "cdp": {
+        "posterior": {
+          "control": {
+            "dispatches": 1088,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 600
+          },
+          "fused": {
+            "dispatches": 1036,
+            "regions": {
+              "dispatches": 32,
+              "scalar_ops": 396,
+              "extra_outputs": 30,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 585
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "imagination": {
+          "control": {
+            "dispatches": 1042,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 749
+          },
+          "fused": {
+            "dispatches": 1021,
+            "regions": {
+              "dispatches": 16,
+              "scalar_ops": 275,
+              "extra_outputs": 0,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 749
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "world_gradient": {
+          "control": {
+            "dispatches": 3810,
+            "regions": {},
+            "horizontal_batches": {
+              "3": 3
+            },
+            "groups": 1089
+          },
+          "fused": {
+            "dispatches": 3640,
+            "regions": {
+              "dispatches": 119,
+              "scalar_ops": 1255,
+              "extra_outputs": 134,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {
+              "2": 2,
+              "3": 2
+            },
+            "groups": 1043
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "behavior_gradient": {
+          "control": {
+            "dispatches": 247,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 36
+          },
+          "fused": {
+            "dispatches": 245,
+            "regions": {
+              "dispatches": 1,
+              "scalar_ops": 6,
+              "extra_outputs": 1,
+              "bf16_rounds": 0
+            },
+            "horizontal_batches": {},
+            "groups": 36
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "slow_value": {
+          "control": {
+            "dispatches": 13,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 9
+          },
+          "fused": {
+            "dispatches": 13,
+            "regions": {},
+            "horizontal_batches": {},
+            "groups": 9
+          },
+          "logical_matrix_convolution_descriptors_exact": true
+        },
+        "total_dispatches": {
+          "control": 6200,
+          "fused": 5955
+        },
+        "total_groups": {
+          "control": 2483,
+          "fused": 2422
+        }
+      }
+    }
+  },
+  "remaining_row_layout_candidates": {
+    "rgb": {
+      "imagination": {
+        "Concat": 149,
+        "GlobalAvgPoolGrad": 60,
+        "SplitA": 30,
+        "SplitB": 30,
+        "ToBF16": 157
+      },
+      "world_gradient": {
+        "Concat": 374,
+        "GlobalAvgPoolGrad": 187,
+        "RmsNormGradWRowPar": 123,
+        "RmsNormGradX": 126,
+        "SplitA": 190,
+        "SplitB": 191,
+        "ToBF16": 349,
+        "Transpose": 38
+      }
+    },
+    "cdp": {
+      "imagination": {
+        "Concat": 149,
+        "FromBF16": 4,
+        "GlobalAvgPoolGrad": 68,
+        "SplitA": 34,
+        "SplitB": 34,
+        "ToBF16": 110,
+        "Transpose": 12
+      },
+      "world_gradient": {
+        "Concat": 451,
+        "GlobalAvgPoolGrad": 168,
+        "RmsNormGradWRowPar": 127,
+        "RmsNormGradX": 130,
+        "SplitA": 206,
+        "SplitB": 207,
+        "Transpose": 19
+      }
+    }
+  },
+  "full_synthetic_updates": 1136,
+  "game_actions": 0,
+  "retained_failures": [
+    "Two Clippy preflights (explicit-reference pattern/style conflicts); no GPU",
+    "CPU fan-out assertion: typed kernels were skipped; corrected with explicit typed region boundaries",
+    "Physical matrix-descriptor audit: CDP changes horizontal batching3+1 to2+2; per-product audit passes",
+    "Controller expected8 instead of declared256 measured CDP updates; all GPU jobs passed, only unstarted control ran in a new queue"
+  ],
+  "decision": "No meaningful RGB gain; do not promote or extend this pointwise experiment. Keep root-cause goal active; next device RNG/targets/EMA and row/layout-level compilation.",
+  "source_sha256": {
+    "backend-tests": "3ab8be337abe5ab750a062325a91b5c374ce8e992cbafcba699bfc51bde56366",
+    "backend-lib-tests": "0a2e924b439018a8a9a496d2a5997138a978aa917f8149cfcdbc061e4e5ebb74",
+    "kindle-tests": "0483cf64ef26872a5358ba630afcea45f2d71d0cfbb0f110ff35b93a679595f2",
+    "backend-untyped-tests": "a61c60d9975d8ea7b252aadd4d857179070253107e375a684492000b2172298c",
+    "backend-untyped-lib-tests": "fa6c083028091acde7313f3bfd75d7a7980f61dcc918853a9485625afefedb48",
+    "backend-first.patch": "e41920b6fb0604141a4019093146135d515cd1a1a32be818caafcaa88c3299ea",
+    "backend-reviewed.patch": "79ee1f62091f20aa0f7af8bfedd70db0047c45bf99c101c885544883e418ce29",
+    "backend-qualified.patch": "acc20f88ad5f577962515749832815438147a79e318b94b637d263760e17c395",
+    "backend-typed.patch": "73de5b945e0be0d24587bcca58049714acec89e77bbab83be20d99bc31562c31",
+    "kindle.patch": "cebac52717106f195e3cb7edb489bb85bd27a3628ebca61075787077f150774c",
+    "backend-Cargo.lock": "7b9cfd6d8e16eac3352c7742979fe57532c4bbaca3f3f930d072d5220f853e5a",
+    "kindle-Cargo.lock": "3ecaf353f0ac830194715e684f756389eb414c25ae54af239f45f7c020af8ffe",
+    "numerical-queue.json": "701382238160b1e529b9e52914b9c0e30c5bc17e51bc872fd24b50b13d518fca",
+    "smoke-queue.json": "2b307d2835835d88c128307f17d2d978a59ca9e69be34c2ea1069694315b40bb",
+    "timing-queue.json": "5afc0e0c069e9327bbbb6ccb0f5edd4b409a78cd120f2096d6464a585025b08c",
+    "timing-remainder-queue.json": "4067d8bfcca0453d06438fd8ad1e520a561b1661b63dad44365f8de4c201107d",
+    "audit.py": "9ce0431246d263cb06047ed95b972365212db7bd9bb51af4a7238bef33127629",
+    "audit-reviewed.py": "d535b9fd24e48f87f06e1fb5fa4a0775059bd8f545b21dcdd944202157ffb34a",
+    "inventory.py": "ae2e0cdc8e9fa10cb3c732ef437670f0b6ea52a75de26982af5e093a8a5eec22",
+    "inventory-reviewed.py": "1f9f173c5062e78063e426b9917796132c07fb0d1abd64eaa2c1a52bacc21268",
+    "inspect-descriptors.py": "0ed2c6b3e6b00405d1376bfa683120a1c0cb91d33297535979d59cbb0a2bdbfe",
+    "descriptor-differences.json": "e13305372c8f479bf341e9e4ac13c2de4e8d0422f38f8e0edb9d0e3f966aaee9",
+    "summarize.py": "76477e712cb373e01eb3ad98e7751e85210652e94c3b228a851ff66cb537e457"
+  }
+}

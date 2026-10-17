@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-01",
+  "phase2_complete": true,
+  "decision": "Learned RGB is the 2D Atari screening default; frozen causal Tiny remains an explicit video/3D hypothesis.",
+  "scope": "Seaquest, held out from Tiny pretraining; Size1M/N8/B8/T16/H15/R32, 200000 actions, learner seeds 1009/2017/3019",
+  "evidence": {
+    "learning": "2026-10-01-small-jepa-learning.json",
+    "replication": "2026-09-30-small-replication-learning.json",
+    "probes": "2026-09-27-representation-probes.json",
+    "timing": "2026-10-01-jepa-timing-attribution.json"
+  },
+  "allocation": {
+    "replication_attempts": 7,
+    "replication_cap": 10,
+    "jepa_attempts": 6,
+    "jepa_declared_runs": 6,
+    "reused_rgb_runs": 3
+  },
+  "results": {
+    "initial_tiny": {
+      "final_online_score": {
+        "mean": 230.66666666666666,
+        "ci95": [
+          218.80000000000004,
+          239.19999999999996
+        ],
+        "seeds": [
+          239.2,
+          234,
+          218.8
+        ]
+      },
+      "mean_run_seconds": 1879.0489522823289,
+      "mean_construction_seconds": 5.384077080661275,
+      "world_train_ms_per_update": 6.207942545545572,
+      "total_learner_ms_per_update": 35.619740598216595,
+      "parameters": {
+        "trainable": 830513,
+        "frozen_encoder": 5486592,
+        "basis": "unique logical parameters with optimizer moments; shared names counted once"
+      }
+    },
+    "learned_cnn": {
+      "final_online_score": {
+        "mean": 368,
+        "ci95": [
+          328.8,
+          440.3999999999999
+        ],
+        "seeds": [
+          328.8,
+          334.8,
+          440.4
+        ]
+      },
+      "mean_run_seconds": 1591.3415096499957,
+      "mean_construction_seconds": 5.311570756341098,
+      "world_train_ms_per_update": 12.768725975736972,
+      "total_learner_ms_per_update": 30.431482876215636,
+      "parameters": {
+        "trainable": 688004,
+        "frozen_encoder": 0,
+        "basis": "unique logical parameters with optimizer moments; shared names counted once"
+      }
+    },
+    "pretrained_tiny": {
+      "final_online_score": {
+        "mean": 225.33333333333334,
+        "ci95": [
+          206.80000000000004,
+          258
+        ],
+        "seeds": [
+          206.8,
+          258,
+          211.2
+        ]
+      },
+      "mean_run_seconds": 1877.153768435014,
+      "mean_construction_seconds": 5.494124941673363,
+      "world_train_ms_per_update": 6.208231419725371,
+      "total_learner_ms_per_update": 35.57466905781708,
+      "parameters": {
+        "trainable": 830513,
+        "frozen_encoder": 5486592,
+        "basis": "unique logical parameters with optimizer moments; shared names counted once"
+      }
+    }
+  },
+  "paired_final_scores": [
+    {
+      "candidate": "pretrained_tiny",
+      "control": "learned_cnn",
+      "game": "Seaquest",
+      "seeds": [
+        1009,
+        2017,
+        3019
+      ],
+      "difference": {
+        "mean": -142.66666666666666,
+        "ci95": [
+          -229.19999999999996,
+          -76.80000000000001
+        ],
+        "seeds": [
+          -122,
+          -76.80000000000001,
+          -229.2
+        ]
+      }
+    },
+    {
+      "candidate": "pretrained_tiny",
+      "control": "initial_tiny",
+      "game": "Seaquest",
+      "seeds": [
+        1009,
+        2017,
+        3019
+      ],
+      "difference": {
+        "mean": -5.333333333333333,
+        "ci95": [
+          -32.39999999999998,
+          24
+        ],
+        "seeds": [
+          -32.39999999999998,
+          24,
+          -7.600000000000023
+        ]
+      }
+    }
+  ],
+  "pretrained_vs_rgb": {
+    "run_time_ratio": 1.1796046021874216,
+    "world_train_time_ratio": 0.4862060186366441
+  },
+  "verification": {
+    "python_tests_passed": 976,
+    "native_runtime_changed": false,
+    "new_learning_runs_for_cli_change": 0,
+    "selected_native_path_evidence": "The same learned_rgb constructor/objectives completed all three retained native RGB runs; fresh/default and frozen restore CLI routes are covered by CPU mock tests.",
+    "ci": {
+      "run": 250,
+      "url": "https://github.com/kvark/kindle/actions/runs/36835906681",
+      "source_commit": "f84d9b6cb1e11ec03b02fd916950a1c8507ef79a",
+      "conclusion": "success",
+      "platforms": ["Linux/lavapipe", "macOS/Metal", "Python bindings"]
+    }
+  },
+  "limits": [
+    "Three learner seeds and one short held-out title, not Atari-wide superiority or frozen competence.",
+    "Curves cross mid-training; this is not uniform RGB dominance or proof against JEPA.",
+    "RGB versus Tiny changes observation/objective packages; pretraining is isolated only by pretrained versus its own initial Tiny.",
+    "Tiny has 250k extra random-play RGB64 frames from Boxing/Pong/Freeway/Breakout/Qbert.",
+    "World-training savings do not establish whole-agent savings; replay timing includes prior shared-queue observation/perception work.",
+    "Sampled Vulkan budget headroom is not physical free memory or peak VRAM; GPU utilization is unmeasured."
+  ]
+}

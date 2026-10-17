@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-16",
+  "status": "complete",
+  "decision": "native hardware counters captured; parity goal remains open",
+  "artifacts": "runs/native-perf-sdk-20261016.ZVAi5Ubl",
+  "sdk_version": "2026.3.0",
+  "package_sha256": "cb30c2ba0079d3be4c4b4df22f70dc9625320605d1e7ca38ff7dcfaf8f3011ea",
+  "driver": "580.178.04",
+  "device": "NVIDIA GeForce RTX 5080",
+  "guards": 21,
+  "allocation_warnings": 0,
+  "contracts": 20,
+  "occurrences": 23,
+  "metrics_per_range": 41,
+  "ranges": 58,
+  "counter_values_offline_rechecked": 2378,
+  "counter_replay_calls": 680,
+  "operation_calls": 1680,
+  "exact_retained_output_elements": 258287296,
+  "source_seals": 1794,
+  "readiness_source_seals": 29,
+  "minimum_sampled_headroom_bytes": 15828123648,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "clock_setting_calls": 0,
+  "gpu_faults": 0,
+  "capture_completed_utc": "2026-10-16 04:39:04",
+  "capture_service_seconds": 189.109,
+  "audit_completed_utc": "2026-10-16 04:39:52",
+  "audit_service_seconds": 5.320,
+  "families": {
+    "Conv2dPacked": {"contracts": 11, "occurrences": 14, "warp_instructions": 1595849856, "tensor_instructions": 75366400},
+    "Conv2dBF16": {"contracts": 3, "occurrences": 3, "warp_instructions": 3346857984, "tensor_instructions": 39321600},
+    "Conv2dGradientTyped": {"contracts": 6, "occurrences": 6, "warp_instructions": 6867411968, "tensor_instructions": 65536000}
+  },
+  "cnn1": {
+    "dx": {
+      "native_warp_instructions": 1554071552,
+      "jax_warp_instructions": 97492992,
+      "instruction_ratio": 15.940341147802705,
+      "native_tensor_pipe_instructions": 9961472,
+      "jax_tensor_sass_instructions": 13107200,
+      "native_dram_peak_percent": 5.627240439126069,
+      "native_l2_peak_percent": 29.507458258380804,
+      "native_shared_bank_conflicts": 122081098
+    },
+    "dw": {
+      "native_warp_instructions": 1207884800,
+      "jax_warp_instructions": 133572828,
+      "instruction_ratio": 9.04289306504763,
+      "native_tensor_pipe_instructions": 13107200,
+      "jax_tensor_sass_instructions": 16932864,
+      "native_dram_peak_percent": 5.674136090968737,
+      "native_l2_peak_percent": 15.292849970827643,
+      "native_shared_bank_conflicts": 157984367
+    }
+  },
+  "whole_update_remeasured": false,
+  "retained_rgb_b32_ms": 51.944966918,
+  "retained_jax_b32_inclusive_ms": 27.222569,
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "limits": [
+    "Native fixed fixtures and retained full-JAX captures share shapes, not inputs/layouts/output precision/capture context.",
+    "Counters and stall fractions are not additive latency savings or a full-update speedup prediction.",
+    "Offline reevaluation uses NVIDIA's same metric evaluator in separate CPU-only processes.",
+    "Shared bank conflicts are measured, not causally isolated removable time.",
+    "Empty ranges report zero launches/instructions but 0-1024 DRAM bytes; no overhead subtraction.",
+    "No officially-supported-device-Vulkan-version claim: SDK reports false for that version flag."
+  ]
+}

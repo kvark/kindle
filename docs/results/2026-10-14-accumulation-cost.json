@@ -1,0 +1,297 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "qualification": false,
+  "decision": "Retain compensation; .887% fixed-world effect is below predeclared10% follow-up threshold. No Nsight or accumulation sweep.",
+  "artifact_root": "/x/Code/kindle/runs/accumulation-cost-20261014.JNqzeTou",
+  "upstream": {
+    "meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+    "naga": "a97559b6318dc0a857ace502ffc7f3e442951f39"
+  },
+  "source": {
+    "backend_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "kindle_base": "212bc4bb428da577400a01489e4c3fb018db083b",
+    "backend_patch": "26c47d916bf9633581235991d3fce777ccbf2e66f4b937b54246d6162251d82d",
+    "kindle_patch": "e1d7818d2937e6a8826ebbf33bda0c4d6f76a2ecc590436243ac4671e889b15f",
+    "backend_binary": "8cc7f2822a1c130c31b3477cdca607e8687e20cf8e1efd3c7dd93be6ba935e3e",
+    "kindle_binary": "f273e8ce364dda134b87a1b8dd1777f8e32e8c358e283c9fd2fa3e1addead304"
+  },
+  "accounting": {
+    "guards": 2,
+    "allocation_warnings": 2,
+    "preparatory_control_updates": 1,
+    "alternative_optimizer_updates": 0,
+    "world_graph_replays": 443,
+    "game_actions": 0,
+    "performance_promotion": false
+  },
+  "numerics": {
+    "status": "diagnostic-complete",
+    "qualification": false,
+    "guards": 1,
+    "allocation_warnings": 1,
+    "optimizer_updates": 0,
+    "game_actions": 0,
+    "comparisons": [
+      {
+        "packed": false,
+        "compensated": true,
+        "tensor": "x",
+        "pointwise_failures": 0,
+        "max_abs": 0.000002259388566017151,
+        "relative_l2": 1.8507973145225513e-7,
+        "value968": 2.5558498,
+        "reference968": 2.5558507731184363,
+        "gate": "None"
+      },
+      {
+        "packed": false,
+        "compensated": true,
+        "tensor": "w",
+        "pointwise_failures": 0,
+        "max_abs": 0.000005541136488318443,
+        "relative_l2": 1.942821636819844e-7,
+        "value968": -0.010348469,
+        "reference968": -0.010347925126552582,
+        "gate": "None"
+      },
+      {
+        "packed": false,
+        "compensated": false,
+        "tensor": "x",
+        "pointwise_failures": 0,
+        "max_abs": 0.000002259388566017151,
+        "relative_l2": 1.8507973145225513e-7,
+        "value968": 2.5558498,
+        "reference968": 2.5558507731184363,
+        "gate": "None"
+      },
+      {
+        "packed": false,
+        "compensated": false,
+        "tensor": "w",
+        "pointwise_failures": 14,
+        "max_abs": 0.00009879004210233688,
+        "relative_l2": 0.0000036189308554626253,
+        "value968": -0.010330051,
+        "reference968": -0.010347925126552582,
+        "gate": "Some(\"retained failure[968] = -1.0330051e-2, reference -1.0347925126552582e-2\")"
+      },
+      {
+        "packed": true,
+        "compensated": true,
+        "tensor": "x",
+        "pointwise_failures": 0,
+        "max_abs": 0.000002592802047729492,
+        "relative_l2": 1.8197912840443955e-7,
+        "value968": 2.5558503,
+        "reference968": 2.5558507731184363,
+        "gate": "None"
+      },
+      {
+        "packed": true,
+        "compensated": true,
+        "tensor": "w",
+        "pointwise_failures": 0,
+        "max_abs": 0.000005541136488318443,
+        "relative_l2": 1.942821636819844e-7,
+        "value968": -0.010348469,
+        "reference968": -0.010347925126552582,
+        "gate": "None"
+      },
+      {
+        "packed": true,
+        "compensated": false,
+        "tensor": "x",
+        "pointwise_failures": 0,
+        "max_abs": 0.000002592802047729492,
+        "relative_l2": 1.8197912840443955e-7,
+        "value968": 2.5558503,
+        "reference968": 2.5558507731184363,
+        "gate": "None"
+      },
+      {
+        "packed": true,
+        "compensated": false,
+        "tensor": "w",
+        "pointwise_failures": 14,
+        "max_abs": 0.00009879004210233688,
+        "relative_l2": 0.0000036189308554626253,
+        "value968": -0.010330051,
+        "reference968": -0.010347925126552582,
+        "gate": "Some(\"retained failure[968] = -1.0330051e-2, reference -1.0347925126552582e-2\")"
+      }
+    ]
+  },
+  "world": {
+    "status": "diagnostic-complete",
+    "qualification": false,
+    "guards": 1,
+    "allocation_warnings": 1,
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "world_plan_sha256": "78fcdf9aeebbeef2959cada53d046795f3428a5a14100f93f2b33de141d58eb7",
+    "preparatory_control_updates": 1,
+    "alternative_optimizer_updates": 0,
+    "game_actions": 0,
+    "world_graph_replays": 443,
+    "measured_per_arm": 192,
+    "affected_dispatches": 8,
+    "means": {
+      "control": {
+        "gpu_ms": 16.168785333333332,
+        "wall_ms": 19.81109997395833
+      },
+      "plain": {
+        "gpu_ms": 16.025312666666668,
+        "wall_ms": 19.58035990625
+      }
+    },
+    "rounds": [
+      {
+        "round": 0,
+        "control": {
+          "gpu_ms": 16.166926,
+          "wall_ms": 19.763976
+        },
+        "plain": {
+          "gpu_ms": 16.0181905,
+          "wall_ms": 19.62356709375
+        },
+        "gpu_reduction_percent": 0.91999864414547
+      },
+      {
+        "round": 1,
+        "control": {
+          "gpu_ms": 16.169123,
+          "wall_ms": 19.865171921875
+        },
+        "plain": {
+          "gpu_ms": 16.0198095,
+          "wall_ms": 19.624936734375
+        },
+        "gpu_reduction_percent": 0.9234483527646997
+      },
+      {
+        "round": 2,
+        "control": {
+          "gpu_ms": 16.170307,
+          "wall_ms": 19.804152
+        },
+        "plain": {
+          "gpu_ms": 16.037938,
+          "wall_ms": 19.492575890624998
+        },
+        "gpu_reduction_percent": 0.8185929926995295
+      }
+    ],
+    "gpu_reduction_percent": 0.8873435060757662,
+    "predeclared_followup_threshold_percent": 10,
+    "substantial": false,
+    "restored_controls": 6,
+    "gradient_tensors": 68,
+    "scope": "Fixed optimizer-free world graph, including forward/backward/dependencies. Not whole-update speed or qualified alternative gradients.",
+    "alternative_difference": {
+      "outputs": {
+        "elements": 327689,
+        "changed": 0,
+        "max_abs": 0,
+        "relative_l2": 0,
+        "reference_l2": 1818.9661240551436
+      },
+      "gradients": {
+        "elements": 8852675,
+        "changed": 438522,
+        "max_abs": 0.000701904296875,
+        "relative_l2": 0.0000036045368019927526,
+        "reference_l2": 4891.35419822054
+      },
+      "changed_parameters": [
+        {
+          "name": "world.representation.encoder.cnn0.weight",
+          "elements": 2400,
+          "changed": 2375,
+          "max_abs": 7.450580596923828e-7,
+          "relative_l2": 0.0000019632238332659693,
+          "reference_l2": 4.295230430889462
+        },
+        {
+          "name": "world.representation.encoder.cnn1.weight",
+          "elements": 38400,
+          "changed": 38214,
+          "max_abs": 0.0000026226043701171875,
+          "relative_l2": 0.0000017267094048221672,
+          "reference_l2": 61.19413243644322
+        },
+        {
+          "name": "world.representation.encoder.cnn2.weight",
+          "elements": 76800,
+          "changed": 76448,
+          "max_abs": 0.000008106231689453125,
+          "relative_l2": 0.0000013466956105088319,
+          "reference_l2": 99.30699349193036
+        },
+        {
+          "name": "world.representation.encoder.cnn3.weight",
+          "elements": 102400,
+          "changed": 101610,
+          "max_abs": 0.00001239776611328125,
+          "relative_l2": 0.0000015126130972908477,
+          "reference_l2": 145.9347655335674
+        },
+        {
+          "name": "world.decoder.conv2.weight",
+          "elements": 102400,
+          "changed": 102345,
+          "max_abs": 0.0000820159912109375,
+          "relative_l2": 0.000003356548273490636,
+          "reference_l2": 1392.8436381658382
+        },
+        {
+          "name": "world.decoder.conv1.weight",
+          "elements": 76800,
+          "changed": 76763,
+          "max_abs": 0.000255584716796875,
+          "relative_l2": 0.000003565935359890484,
+          "reference_l2": 2123.065793257318
+        },
+        {
+          "name": "world.decoder.conv0.weight",
+          "elements": 38400,
+          "changed": 38367,
+          "max_abs": 0.0005950927734375,
+          "relative_l2": 0.0000042501963339722936,
+          "reference_l2": 2638.314824108855
+        },
+        {
+          "name": "world.decoder.imgout.weight",
+          "elements": 2400,
+          "changed": 2400,
+          "max_abs": 0.000701904296875,
+          "relative_l2": 0.000003973283144619369,
+          "reference_l2": 2589.5588945215527
+        }
+      ]
+    },
+    "detailed_audit": "runs/accumulation-cost-20261014.JNqzeTou/world-audit.json"
+  },
+  "reproduction_correction": {
+    "original_incomplete_patch": "runs/residual-reassessment-20261014.FpwNnsTD/backend-masks.patch",
+    "complete_patch": "runs/residual-reassessment-20261014.FpwNnsTD/backend-complete-masks.patch",
+    "complete_sha256": "b381aad3d7a4417b9e1b31f9dc3315e1489c77f2b1379439d1385a5552d5ebd0",
+    "restored_added_files": 18,
+    "prior_measurements_unchanged": true,
+    "failed_cpu_build_retained": true
+  },
+  "limits": [
+    "No alternative-gradient qualification or optimizer/actor update.",
+    "Not a whole-update timing or SM-utilization measurement.",
+    "Small global relative L2 does not override pointwise failures.",
+    "All previous strict F64 failures remain; production unchanged."
+  ]
+}

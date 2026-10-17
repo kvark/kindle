@@ -1,29 +1,33 @@
-# Kindle strategy reset: execution plan
+# Kindle strategy reset: rationale and phase history
 
-**Audience:** an engineering agent picking up Kindle.
-**Date written:** 2026-09-26.
-**Code base:** branch `dreamer-jepa-kickoff` (PR #29), head `16afaa7`. All file
-paths below refer to that branch, not `main`.
-
-**Adopted September 27.** Current execution/evidence is maintained in
+Written September 26, adopted September 27; direction updated October 4, 2026.
+The authoritative execution order and current evidence are in
 [the project roadmap](kindle_single_life_dreamer_plan.md#current-execution-order--strategy-reset)
-and PR #29. Some initial premises below are historical: Tiny is now default,
-native-detail GPU acting/capture is integrated, and sticky Pong fails its
-robustness check. The historical upstream speed numbers are not a reconciled
-comparison. Phase 0 encoder CI/disclosures pass; compact human-normalized data
-is in [docs/results](results/2026-09-27-historical-scores.md).
-Phase 1's implementation and fast-screening work is now measured:
-[GPU sampling/fused recurrence/grouped RSSM](results/2026-09-27-fused-learner.md)
-gives 1.15× updates / 1.16× short Pong throughput; the **3× target remains unmet**.
-[Three Size1M MinAtar seeds](results/2026-09-27-minatar-screen.md) complete in
-8m18s with committed curves; the low scores do not establish strong learning.
-Do not confuse completed engineering deliverables with achieving that speed
-target or demonstrating the value of JEPA. The user explicitly accepts **3× as
-a stretch target, not a Phase 1 exit gate**; these completed implementation and
-screening deliverables close Phase 1. Phase 2 is next.
-The 864-point gate is unsupported at the tested budget, not mathematically
-impossible. Current GPU pixel collection does not support the old host-based
-visitation bonus; any intrinsic mechanism must honor the GPU path.
+and [PR31](https://github.com/kvark/kindle/pull/31). This file preserves the
+strategy's rationale and historical Phase 0–2 proposals, not a second work queue.
+PR29 is merged history. Original budgets, baselines and speed estimates below
+must not be read as current measurements.
+
+**October 4 user decision: CDP is the main path.** Fast iteration, small native/
+upstream replication, the frozen/joint Tiny studies and the
+[CDP evaluation](results/2026-10-04-cdp-learning.md) are complete. CDP improves
+all three short Seaquest learning pairs at lower whole-agent cost; this is not
+Atari-wide mastery. New main-path experiments explicitly use `--cdp`; the CLI
+default is still learned RGB, retained as reference/fallback.
+
+**Next:** Atari exploration/reward with CDP, starting with unassisted Freeway
+(extrinsic-only versus one GPU-compatible mechanism, three seeds), then one
+held-out exploration task, planned as Venture. Declare the bounded experiment
+before launch. No training is started by this roadmap edit. Video priors follow,
+then native games/GOG, transfer/retention and finally swarms. Asynchronous
+learning is a later response to measured real-time constraints, not a prerequisite.
+
+Phase 1's original 3x speed target remains an unmet, user-accepted stretch target.
+Phase 2 used seven of ten replication attempts plus six separately declared Tiny
+runs; no allocation remains open. The old 45-run matrix is cancelled (24 completed,
+21 unstarted). No unchanged mastery queue, posterior-Tiny ablation or encoder
+matrix resumes. Keep its failures and original measurements in the
+[archive](experiments/README.md).
 
 ## 1. Goal and why the plan changes
 
@@ -161,56 +165,125 @@ finishes in ≤1 hour with a committed curve summary.
    - chunk phase 0 vs. 15 for the same frame (quantify the phase effect).
 3. Report R² per target, especially small fast objects (ball) and velocities.
 
-### 2b. One matched learning comparison
+### 2b. Replication first, then qualify the cheap learning screen
 
-3 seeds each, same protocol, same budget (e.g. 200k actions), 2–3 games
-(Pong, Breakout, and one non-corpus game):
+The initial execution selected the largest proposed matrix: five methods ×
+three games × three seeds, 200,004 actions each, Size12M/B16/T64/H15/R256/F32.
+That is roughly 140 GPU-hours, not a fast engineering check. Six environments
+and GPU inference/learning are already batched; the native learner calls/waits
+account for about 98–99% of measured run time and emulation about 0.6%.
+These stage timings are not GPU utilization measurements. More emulator
+parallelism alone cannot remove the dominant cost.
 
-- upstream DreamerV3 12M (`python/examples/run_upstream_control.py`);
-- Kindle + Large; Kindle + pretrained Tiny; Kindle + random-init Tiny;
-- Kindle + a learned CNN encoder, if Phase 2a shows it helps.
+The user approves replacing its unstarted work with this order:
 
-**Decision rule:** if no LeVJEPA variant beats the random-init or learned-encoder
-baseline on probes *and* learning curves, stop using a frozen encoder for 2D
-games. Keep LeVJEPA only as a candidate for 3D titles and re-test there.
-If the best probe variants (native input, space-to-depth, PCA) help, adopt them
-one at a time with a learning comparison each.
+**Budget cap (September 30): at most 10 new replication training runs total,**
+counting upstream and native together and including failed/interrupted attempts.
+Target three paired learner seeds (six runs), with at most four pilot/debug
+attempts. A qualifying pilot can count toward the paired comparison if its
+recipe is unchanged. Numerical unit/gradient checks remain small and bounded;
+they are not additional learning campaigns. Report a remaining limitation when
+the cap is reached instead of extending the queue. The subsequent JEPA comparison
+needs an explicit compact allocation, not an automatic return to a large matrix.
 
-## 6. Phase 3 — Exploration and reward
+1. **Faithful RGB baseline.** Replace the research patch CNN/dense decoder with
+   the pinned upstream multiscale CNN/convolutional decoder for the baseline.
+   Keep the GPU pixel path. Match normalization, output transform, losses,
+   replay/reset semantics, optimizer and slow targets—not just the RSSM size.
+   Do not preserve the research CNN as a checkpoint-compatibility branch.
+2. **Fixed-batch numerical comparisons.** Use common weights, observations,
+   flags/actions and explicit stochastic draws. Compare forward values, loss
+   components, gradients and optimizer/EMA updates on small shapes, including
+   reset/terminal/truncation boundaries and more than one update. Retain
+   independent scalar/finite-difference references where useful. Passing native
+   versus native execution variants is not a full upstream reproduction.
+3. **Qualify a fast recipe before queuing seeds.** Start with the Size1M preset,
+   batched environments and a declared short action budget. Time one bounded
+   upstream/native pilot and check that upstream actually learns. Small capacity
+   is a hypothesis, not guaranteed sufficient because the game looks simple.
+   Target a sub-hour development comparison; increase capacity/budget only for
+   a demonstrated limitation. The existing three-seed MinAtar screen finishes
+   in 8m18s but has weak learning, so speed alone is not qualification.
+4. **Matched learning regression.** Fix the selected recipe, then compare at
+   least three learner seeds with score-vs-actions/time and uncertainty. A lower
+   replay ratio or shorter sequence is a different screening recipe, not an
+   optimization speedup at unchanged learning. No five-game mastery campaign.
 
-All experiments here: extrinsic-only control vs. one added mechanism, 3 seeds,
-on sparse-reward tasks **without** the random-action aid. Development on the
-fast environment; confirmation on Atari hard-exploration games (Freeway
-unassisted, Private Eye, Venture; Montezuma's Revenge as a stretch).
+Use the authors' [published Atari scores](https://github.com/danijar/dreamerv3/tree/main/scores)
+and [configuration presets](https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/dreamerv3/configs.yaml)
+as reference evidence. A local upstream control establishes the smaller/custom
+recipe and native replication; it need not recreate the full published suite.
+Published scores from other model sizes, interaction budgets or Atari protocols
+are not directly matched targets for our short pilot.
 
-1. **Visitation bonus (already implemented, never used).** Enable
-   `visitation_bonus` with a nonzero `intrinsic_reward_scale`
-   (`kindle/src/dreamer/intrinsic.rs`). Cheapest first test: unassisted Freeway.
-2. **Latent disagreement (Plan2Explore-style).** Add an ensemble of K small
-   one-step predictors of the next latent (or next frozen feature) from
-   (deter, stoch, action); intrinsic reward = ensemble variance, computed in
-   imagination. Train the actor on a mix of intrinsic and extrinsic rewards,
-   optionally with separate critics.
-3. **Game-native signals.** Add life-loss as a configurable signal (small
-   negative reward and/or continuation drop) to the Atari wrapper
-   (`python/examples/atari.py`, read `ale.lives()`); keep it declared and
-   ablated. Target Qbert and Breakout first.
-4. **Model-based reward (experimental).** A vision-language model scores
-   progress or proposes subgoals from frames every few seconds; its output is a
-   separate, scaled reward channel. Compare against extrinsic-only; watch for
-   reward hacking by inspecting videos.
+**Completed October 1:** all three small upstream/native seed pairs pass,
+using seven replication attempts including the interruption. Native/upstream
+final online means are 368.0/307.733; native takes about 3.08× longer. This
+[local qualification](results/2026-09-30-small-replication-learning.md) is not
+the full published benchmark or frozen competence. The ten-attempt cap applies
+to replication; it does not silently replace Phase 2c's separate declaration.
 
-**Done when:** at least one mechanism learns unassisted Freeway (3/3 seeds
-nonzero and rising) and shows a gain on one other sparse-reward task.
+### 2c. Test the JEPA hypothesis on the qualified recipe
+
+Keep the completed offline probes and all historical learning curves. The
+[October 1 compact declaration](experiments/2026-10-01-small-jepa-comparison.md)
+adds six Seaquest runs, reusing the three completed native RGB controls.
+After 2b, declare a focused comparison of the faithful learned encoder, pretrained
+Tiny and its own initial weights, with >=3 learner seeds and a held-out title.
+Include Large only within the measured iteration budget or as a separately
+justified confirmation. Fix methods, budgets and score summaries before running;
+do not select a favorable completed seed from the stopped matrix.
+
+**Decision rule:** a frozen encoder must earn its whole-agent cost through
+useful probes *and* learning curves versus random/learned controls. Prefer the
+simpler learned 2D frontend if a useful benefit is not established; do not call
+an inconclusive small study proof that JEPA cannot work. Retain LeVJEPA as a
+3D hypothesis. Native/JL64/mean remains the frozen-feature reference; existing
+probes do not justify more pooling/PCA variants. Promote only promising changes
+to larger confirmation, one factor at a time.
+
+**Done when:** the native control has numerical and learning evidence against
+upstream, the cheap representation comparison is published with its costs,
+uncertainty and limitations, and the resulting frontend decision is implemented
+and verified. Cancelling the expensive matrix does not by itself close Phase 2.
+
+**Completed October 1:** all criteria above are met; [decision and verification](results/2026-10-01-frontend-decision.md).
+The ten-attempt replication cap used seven attempts; the separate compact
+JEPA study used its six declared runs and reused all three native RGB controls.
+Do not extend either allocation or restart the cancelled matrix.
+
+## 6. Phase 3 — Atari exploration and reward with CDP
+
+CDP is the main-path agent; **extrinsic-only CDP**, not RGB or frozen Tiny, is
+the control for exploration changes. Start on unassisted Freeway, three learner
+seeds, with one bounded GPU-compatible intrinsic mechanism. Keep the qualified
+small recipe and game protocol fixed; declare budgets/settings before launch.
+No persistent random-action aid, new external reward shaping or pretraining.
+
+Report first reward, extrinsic return versus actions/time, seed stability and
+whole-agent cost; include predeclared frozen evaluations and complete rollout
+videos. Do not use intrinsic return as game performance. The old CPU
+feature-readback visitation workaround remains excluded.
+
+Then confirm a selected mechanism on one predeclared second exploration task,
+planned as Venture, with same-game controls. Seaquest's completed CDP screen is
+the existing learning reference, not a reason to repeat it unchanged.
+Model-disagreement, game-native shaping and model-generated rewards are separate
+future alternatives, not four mechanisms to implement or queue together.
+
+**Phase outcome:** useful unassisted learning across three seeds and improvement
+on a second task at acceptable cost. A negative result is a reason to identify
+the next limitation, not to expand the budget or revive the old mastery gates.
+The [roadmap](kindle_single_life_dreamer_plan.md) owns the current sequence.
 
 ## 7. Phase 4 — Use video for dynamics and behavior
 
-Replace "video only trains a frozen encoder" with:
+Build on the small online CDP agent. Replace "video only trains a frozen encoder" with:
 
 1. **Action-free world-model pretraining.** Pretrain the RSSM (or a latent
    predictor) on gameplay video to predict next latents with actions masked;
    then fine-tune with real actions online. Compare fresh vs. pretrained
-   dynamics at equal online budgets (the plan already specifies this matrix).
+   dynamics at equal online budgets; start with one predeclared comparison.
 2. **Latent or inferred actions.** Train an inverse-dynamics or latent-action
    model on a small labelled/online set, label the video, and pretrain a
    behavior prior (policy initialization or KL regularizer toward it).
@@ -220,18 +293,20 @@ Replace "video only trains a frozen encoder" with:
 **Done when:** a pretrained variant reaches a fixed score threshold in fewer
 online steps than the fresh baseline on ≥2 games, 3 seeds.
 
-## 8. Phase 5 — Real-time GPU-resident deployment
+## 8. Phase 5 — Useful native-game learning, then real-time deployment
 
-1. Split into a low-latency GPU **actor** and an asynchronous GPU **learner**,
-   with GPU-side replay writes and periodic GPU-side weight updates. This
-   deliberately lifts the current "no concurrent learner service" rule; update
-   `AGENTS.md` when starting this phase.
-2. Measure p50/p95/p99 action latency, learner debt, and effective replay
-   ratio under real-time play.
-3. Multi-Kindle experience sharing = multiple actors writing to one replay
-   (Ape-X/IMPALA pattern), only after a single real-time Kindle works.
-4. First real-time target: a native game from `/x/Code/mind-games`
-   (vkQuake2 preferred), with frame capture kept on the GPU.
+1. Integrate one native game through `/x/Code/mind-games`: vkQuake2 first, then
+   TMNF. Qualify the current GPU capture ownership/reuse contract and complete
+   sparse reward/terminal and action adapters. Old vkQuake plumbing is not game
+   competence or qualification of the changed v4 producer.
+2. Establish single-actor learning before adding services. In free-running games,
+   measure capture-to-action p50/p95/p99 latency, observation gaps, learner debt
+   and effective replay ratio. Add an asynchronous actor/learner only if those
+   measurements require it; update `AGENTS.md` when deliberately starting it.
+3. Extend to a small GOG/Wine panel and measure held-out cross-game adaptation
+   and retention. These milestones precede swarm work.
+4. Only then test experience sharing among Kindles, with explicit ownership and
+   independent causal histories. Several environment streams are not a swarm.
 
 ## 9. What not to do
 

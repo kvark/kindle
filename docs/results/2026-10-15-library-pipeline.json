@@ -1,0 +1,76 @@
+{
+  "status": "review_complete_capability_control_rejected",
+  "date": "2026-10-15",
+  "root": "runs/library-pipeline-20261015.I0dyGaYL",
+  "failed_guarded_processes": 4,
+  "original_plan_constructions": 3,
+  "original_distinct_plans": 2,
+  "unsupported_metadata_queries": 2,
+  "unsupported_stage_configurations": 2,
+  "convolution_executions": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "new_allocation_warnings": 0,
+  "separate_nvml_queries": 0,
+  "max_vulkan_explicit_shared_bytes": 49152,
+  "cuda_optin_shared_bytes": 101376,
+  "minimum_sampled_headroom_bytes": 16594173952,
+  "plans": [
+    {
+      "role": "dx",
+      "engine": 40,
+      "knobs": {
+        "2": 16,
+        "13": 0,
+        "14": 3
+      },
+      "workspace_bytes": 0,
+      "captured_shared_bytes": 77824,
+      "original_plan_constructions": 2,
+      "candidate_stage_choice": 1,
+      "candidate_failure": "engine_configuration_finalize_not_supported"
+    },
+    {
+      "role": "dw",
+      "engine": 33,
+      "knobs": {
+        "0": 156,
+        "2": 9,
+        "5": 3,
+        "14": 3
+      },
+      "workspace_bytes": 23961728,
+      "captured_shared_bytes": 81920,
+      "original_plan_constructions": 1,
+      "candidate_stage_choice": 1,
+      "candidate_failure": "engine_configuration_finalize_not_supported"
+    }
+  ],
+  "conclusions": [
+    "Original engine/knob/shape/workspace contracts reconstruct; they were not executed.",
+    "Advertised individual knob ranges do not guarantee this combined engine configuration.",
+    "Both fixed choice-1 configurations fail before execution-plan construction; no stage-2 kernel or timing exists.",
+    "The 48/99KiB API capacity difference is observed, not a measured causal latency penalty.",
+    "Four failed jobs remain failed; no tolerance, engine, tile, stage sweep or library upgrade."
+  ],
+  "review_sha256": "36798bdc8ff356ac8a468fcecbe73e576349abf7dbe7a6fb988196aa0b4a7b5a",
+  "raw_review_sha256": "57dafd5e01582ad240fb559599749d8a09b59dc760bf2e2b9b4da48932957486",
+  "failure_capture_limits": [
+    {
+      "directory": ".",
+      "count": 1
+    },
+    {
+      "directory": "metadata32",
+      "count": 1
+    },
+    {
+      "directory": "remaining",
+      "count": 1
+    },
+    {
+      "directory": "dw",
+      "count": 1
+    }
+  ]
+}

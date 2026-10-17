@@ -1,0 +1,389 @@
+{
+  "status": "rejected_for_promotion",
+  "decision": "RGB improvement below declared 3% gate; full program-export gate incomplete. Keep control 076f3135, no repeat or subset.",
+  "numerical_qualification": {
+    "status": "complete",
+    "guards": 2,
+    "allocation_warnings": 3,
+    "operation_calls": 48,
+    "independent_cpu_rechecked_values": 134524928,
+    "reported_gpu_oracle_checks": 403574784
+  },
+  "timing": {
+    "status": "complete_cost_observation",
+    "performance_gate": false,
+    "full_program_gate": "incomplete_missing_exports",
+    "guards": 4,
+    "allocation_warnings": 1,
+    "source_seals": 2440,
+    "synthetic_updates": 1088,
+    "game_actions": 0,
+    "observer_repair": "Ignore only elapsed_ms and stage_ms; every other report field and all retained tensors remain exact. Full program exports were not enabled; do not claim their equality."
+  },
+  "workloads": {
+    "rgb": {
+      "control_ms": 54.11715749609376,
+      "candidate_ms": 52.96298722265626,
+      "speedup": 1.0217920161599905,
+      "fraction_reduced": 0.021327252332512314,
+      "retained_metric_reports_exact": 272,
+      "paired_metric_reports_exact": 0,
+      "packed_counts": {
+        "control": 14,
+        "candidate": 18
+      },
+      "first_32_ms": {
+        "control": 54.06471828125,
+        "candidate": 52.887746
+      },
+      "last_32_ms": {
+        "control": 54.14967665625,
+        "candidate": 52.7420426875
+      }
+    },
+    "cdp": {
+      "control_ms": 47.676793101562524,
+      "candidate_ms": 46.20730409765626,
+      "speedup": 1.0318020934699108,
+      "fraction_reduced": 0.03082189275557845,
+      "retained_metric_reports_exact": 272,
+      "paired_metric_reports_exact": 5,
+      "packed_counts": {
+        "control": 7,
+        "candidate": 9
+      },
+      "first_32_ms": {
+        "control": 47.677669875,
+        "candidate": 46.18035221875
+      },
+      "last_32_ms": {
+        "control": 47.64093021875,
+        "candidate": 46.1542836875
+      }
+    }
+  },
+  "parameter_and_optimizer_differences": {
+    "rgb": {
+      "first": {
+        "parameters": {
+          "tensors": 112,
+          "exact": 112,
+          "maximum_absolute": 0.0,
+          "relative_l2": 0.0
+        },
+        "adam_m": {
+          "tensors": 90,
+          "exact": 40,
+          "maximum_absolute": 0.2000000774860382,
+          "relative_l2": 0.032115070939020975
+        },
+        "adam_v": {
+          "tensors": 90,
+          "exact": 40,
+          "maximum_absolute": 7.934286259114742e-07,
+          "relative_l2": 0.0002719134932620659
+        }
+      },
+      "final": {
+        "parameters": {
+          "tensors": 112,
+          "exact": 1,
+          "maximum_absolute": 0.000636080396361649,
+          "relative_l2": 0.0002530856380342419
+        },
+        "adam_m": {
+          "tensors": 90,
+          "exact": 1,
+          "maximum_absolute": 1.3716015815734863,
+          "relative_l2": 0.07643503716343694
+        },
+        "adam_v": {
+          "tensors": 90,
+          "exact": 1,
+          "maximum_absolute": 0.00024406611919403076,
+          "relative_l2": 0.0018892004662755047
+        }
+      }
+    },
+    "cdp": {
+      "first": {
+        "parameters": {
+          "tensors": 130,
+          "exact": 129,
+          "maximum_absolute": 7.450580596923828e-09,
+          "relative_l2": 1.6786703150469376e-11
+        },
+        "adam_m": {
+          "tensors": 108,
+          "exact": 105,
+          "maximum_absolute": 8.682906627655029e-05,
+          "relative_l2": 6.607582952986784e-08
+        },
+        "adam_v": {
+          "tensors": 108,
+          "exact": 107,
+          "maximum_absolute": 1.862645149230957e-09,
+          "relative_l2": 1.4961784479023635e-09
+        }
+      },
+      "final": {
+        "parameters": {
+          "tensors": 130,
+          "exact": 0,
+          "maximum_absolute": 0.14992719888687134,
+          "relative_l2": 0.029562216789576927
+        },
+        "adam_m": {
+          "tensors": 108,
+          "exact": 0,
+          "maximum_absolute": 7.136108249425888,
+          "relative_l2": 1.1356813605639038
+        },
+        "adam_v": {
+          "tensors": 108,
+          "exact": 0,
+          "maximum_absolute": 0.013601706945337355,
+          "relative_l2": 0.02947164573462307
+        }
+      }
+    }
+  },
+  "layout": {
+    "jax_convolutions": 23,
+    "jax_all_convolution_outputs": "BF16 NHWC activations / KRSC weight gradients",
+    "native_roles": {
+      "Forward": 8,
+      "InputGradient": 7,
+      "WeightGradient": 8
+    },
+    "native_forward_output": "BF16 NCHW",
+    "native_derivative_output": "F32 NCHW / CoCiKhKw partials",
+    "native_image_kernels": 16,
+    "native_image_forward_output": "F32 NCHW",
+    "duplicate_pack_bytes": 83886080,
+    "convolution_output_bytes": 855506944,
+    "spatial_output_bytes": {
+      "\"ToBF16\"": 287141248,
+      "\"Concat\"": 224395264,
+      "{\"PackChannels\": {\"dtype\": \"BF16\", \"transpose\": false}}": 235725824,
+      "Image": 846004224,
+      "\"Transpose\"": 12582912,
+      "\"SplitA\"": 4194304,
+      "\"SplitB\"": 6291456,
+      "\"Generated\"": 140515340,
+      "{\"PackChannels\": {\"dtype\": \"BF16\", \"transpose\": true}}": 844800,
+      "\"GlobalAvgPoolGrad\"": 25165824,
+      "\"Upsample2x\"": 411041792,
+      "\"SumAll\"": 1028,
+      "\"SumRows\"": 1924876,
+      "\"Upsample2xGrad\"": 102760448
+    },
+    "original_packed": 14,
+    "launch_cliff": [
+      {
+        "index": 2226,
+        "layer": "conv0",
+        "role": "Forward",
+        "failed": [
+          "packing_grid_1d"
+        ]
+      },
+      {
+        "index": 2511,
+        "layer": "conv0",
+        "role": "WeightGradient",
+        "failed": [
+          "packing_grid_1d"
+        ]
+      },
+      {
+        "index": 3977,
+        "layer": "cnn1",
+        "role": "InputGradient",
+        "failed": [
+          "packing_grid_1d"
+        ]
+      },
+      {
+        "index": 3978,
+        "layer": "cnn1",
+        "role": "WeightGradient",
+        "failed": [
+          "packing_grid_1d"
+        ]
+      }
+    ],
+    "limits": [
+      "Logical writes are not DRAM traffic, latency or independent savings.",
+      "Versioned duplicate-pack proof is CPU metadata only; no optimization or speed claim.",
+      "NHWC interfaces already exist inside 14 packed convolutions; layout alone does not reproduce cuDNN feeding."
+    ]
+  },
+  "duplicate_packs": [
+    {
+      "first": 143,
+      "redundant": 1186,
+      "input_version": [
+        1361,
+        1
+      ],
+      "bytes": 4194304,
+      "consumers": [
+        3954
+      ],
+      "params": [
+        512,
+        64,
+        64,
+        64
+      ]
+    },
+    {
+      "first": 135,
+      "redundant": 1188,
+      "input_version": [
+        1322,
+        1
+      ],
+      "bytes": 16777216,
+      "consumers": [
+        3969
+      ],
+      "params": [
+        512,
+        48,
+        256,
+        64
+      ]
+    },
+    {
+      "first": 1830,
+      "redundant": 1832,
+      "input_version": [
+        4615,
+        1
+      ],
+      "bytes": 4194304,
+      "consumers": [
+        2551
+      ],
+      "params": [
+        512,
+        64,
+        64,
+        64
+      ]
+    },
+    {
+      "first": 2096,
+      "redundant": 2097,
+      "input_version": [
+        4673,
+        1
+      ],
+      "bytes": 16777216,
+      "consumers": [
+        2536
+      ],
+      "params": [
+        512,
+        64,
+        256,
+        64
+      ]
+    },
+    {
+      "first": 2529,
+      "redundant": 2530,
+      "input_version": [
+        4744,
+        1
+      ],
+      "bytes": 16777216,
+      "consumers": [
+        2536
+      ],
+      "params": [
+        512,
+        48,
+        256,
+        64
+      ]
+    },
+    {
+      "first": 2545,
+      "redundant": 2546,
+      "input_version": [
+        4755,
+        1
+      ],
+      "bytes": 4194304,
+      "consumers": [
+        2551
+      ],
+      "params": [
+        512,
+        64,
+        64,
+        64
+      ]
+    },
+    {
+      "first": 3945,
+      "redundant": 3946,
+      "input_version": [
+        6523,
+        1
+      ],
+      "bytes": 4194304,
+      "consumers": [
+        3954
+      ],
+      "params": [
+        512,
+        64,
+        64,
+        64
+      ]
+    },
+    {
+      "first": 3963,
+      "redundant": 3964,
+      "input_version": [
+        6541,
+        1
+      ],
+      "bytes": 16777216,
+      "consumers": [
+        3969
+      ],
+      "params": [
+        512,
+        64,
+        256,
+        64
+      ]
+    }
+  ],
+  "native_sha256": "66f24c3cc361ca73439c614f8417ba69d397077e03cd0fd158504bf946f3204d",
+  "guards": 6,
+  "allocation_warnings": 4,
+  "game_actions": 0,
+  "synthetic_updates": 1088,
+  "production_changed": false,
+  "raw_artifacts": [
+    "runs/packing-launch-coverage-20261015.veO7PGEx",
+    "runs/image-layout-contract-20261015.3rtIyFpF"
+  ],
+  "failures": [
+    "Original CPU reviewer incorrectly compared elapsed/stage time fields; all remaining control metrics and initial/first/final tensors are exact.",
+    "Full plan/pipeline exports were disabled in both timing arms. Source seals, CPU actual-graph selection tests, precision summaries and group controls pass; do not substitute those for full-program equality.",
+    "First CPU publication exceeded file descriptors by retaining old tensor maps while opening the next pair; explicit per-pair closure repairs it without raising limits or GPU repeat."
+  ],
+  "source_sha256": {
+    "/x/Code/kindle/runs/packing-launch-coverage-20261015.veO7PGEx/publication_v2.py": "c06dfdd8e70acc267b4410b10648697eae02265fc77a49a44573d35f654d7e05",
+    "/x/Code/kindle/runs/packing-launch-coverage-20261015.veO7PGEx/timing-review-v2.json": "70a2d2903565c2033e9af3d7c5c0240bd9e8efabe5844a939e82bc0f596a6dd4",
+    "/x/Code/kindle/runs/packing-launch-coverage-20261015.veO7PGEx/numerical-review.json": "f5aab2dbc7cad809e4c77bc99fbf16aaba24da28621604491d78cdd708eea213",
+    "/x/Code/kindle/runs/image-layout-contract-20261015.3rtIyFpF/summary.json": "cbba21f31cf239d3069a9c4f6f95157870696c971d26c97dc7e0c2df1a2bad47"
+  }
+}

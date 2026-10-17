@@ -1,0 +1,179 @@
+{
+  "summary": {
+    "status": "complete",
+    "jax_hlo_sha256": "1f51f0c5c233068bc0215cbc32a10fc070660cb0afb059d17654b0d02236b52c",
+    "hlo_entry": "main.16158",
+    "hlo_computations": 1543,
+    "reachable_computations": 919,
+    "loops": [
+      {
+        "module": "main.16158",
+        "node": "while.8",
+        "trips": 16,
+        "invocations": 1,
+        "body": "region_12.2752.sunk.clone.sunk.clone.clone.clone"
+      },
+      {
+        "module": "main.16158",
+        "node": "while.5",
+        "trips": 15,
+        "invocations": 1,
+        "body": "region_76.5176.sunk.clone"
+      },
+      {
+        "module": "main.16158",
+        "node": "while.10211",
+        "trips": 16,
+        "invocations": 1,
+        "body": "region_348.10104"
+      }
+    ],
+    "jax": {
+      "convolution_forward": {
+        "calls": 8,
+        "nominal_macs": 19293798400
+      },
+      "dense": {
+        "calls": 423,
+        "nominal_macs": 18409586688
+      },
+      "grouped": {
+        "calls": 129,
+        "nominal_macs": 8556380160
+      },
+      "convolution_weight": {
+        "calls": 8,
+        "nominal_macs": 19293798400
+      },
+      "convolution_input": {
+        "calls": 7,
+        "nominal_macs": 18035507200
+      }
+    },
+    "native": {
+      "dense": {
+        "calls": 587,
+        "nominal_macs": 19576133632
+      },
+      "convolution_forward": {
+        "calls": 8,
+        "nominal_macs": 19293798400
+      },
+      "grouped": {
+        "calls": 129,
+        "nominal_macs": 8556380160
+      },
+      "convolution_input": {
+        "calls": 7,
+        "nominal_macs": 18035507200
+      },
+      "convolution_weight": {
+        "calls": 8,
+        "nominal_macs": 19293798400
+      }
+    },
+    "other_custom": {},
+    "jax_nominal_macs": 83589070848,
+    "native_nominal_macs": 84755617792,
+    "captured_kernel_count": 3429,
+    "captured_kernel_sum_ms": 9.869361875,
+    "game_actions": 0,
+    "optimizer_updates": 0,
+    "scope": "Nominal heavy arithmetic from reachable HLO and current staged plans, including horizontal batching. Excludes scalar arithmetic, padding beyond descriptors, auxiliary transforms and hardware-issued instructions; not timing attribution."
+  },
+  "comparison": {
+    "status": "complete",
+    "grouped_products_exact": true,
+    "nominal_mac_difference": 1166546944,
+    "native_extra_percent": 1.3955735267368528,
+    "explicit_implicit_gemm_kernel_ms": 3.150526625,
+    "transform_name_matches": [],
+    "game_actions": 0,
+    "optimizer_updates": 0,
+    "limitations": [
+      "Matrix shape comparison allows output-axis transposition; not value/gradient parity.",
+      "Kernel-name matches do not prove actual instruction counts or identify every algorithm.",
+      "Nominal products exclude scalar work/auxiliary transforms/physical tile padding."
+    ]
+  },
+  "wide": {
+    "status": "complete",
+    "gemm": {
+      "module": "command_buffer.4",
+      "node": "custom-call.151",
+      "line": 21286,
+      "shapes": [
+        [
+          2176,
+          2560
+        ],
+        [
+          2560,
+          1024
+        ],
+        [
+          2176,
+          1024
+        ]
+      ]
+    },
+    "packed_weight": {
+      "module": "fused_concatenate.7",
+      "node": "concatenate.49.1",
+      "line": 9601,
+      "parts": 4,
+      "part_shape": [
+        2560,
+        256
+      ],
+      "axis": 1,
+      "caller": "main.16158",
+      "caller_node": "get-tuple-element.5635",
+      "producer_scope": "command_buffer",
+      "producer_node": "input_concatenate_fusion.7",
+      "producer_path": [
+        {
+          "module": "main.16158",
+          "node": "get-tuple-element.5635",
+          "op": "get-tuple-element",
+          "line": 31825
+        },
+        {
+          "module": "command_buffer",
+          "node": "input_concatenate_fusion.7",
+          "op": "fusion",
+          "line": 10322
+        }
+      ]
+    },
+    "consumers": [
+      "con",
+      "rew",
+      "slowval",
+      "val"
+    ],
+    "game_actions": 0,
+    "optimizer_updates": 0,
+    "limit": "Actual compiler concatenation/dataflow proof, not an isolated timing or proof of native optimization benefit."
+  },
+  "status": "complete",
+  "date": "2026-10-14",
+  "artifact_root": "/x/Code/kindle/runs/executable-work-20261014.nGd9eA2Y",
+  "decision": "The heavy mathematical workload is comparable; focus on kernel algorithms and compiled execution/dataflow, not another dtype/tile/prefetch sweep. Wide projections are a demonstrated compiler difference, not a measured large optimization.",
+  "retained_boundaries": {
+    "native_ordinary_ms": 28.212816078125,
+    "jax_complete_ms": 12.836475229960342,
+    "native_gpu_pass_union_ms": 22.1436301171875,
+    "jax_gpu_kernel_copy_union_ms": 10.295496625,
+    "production_unchanged": true
+  },
+  "failures_retained": [
+    {
+      "path": "wide-proof.log",
+      "reason": "Initial CPU dataflow auditor assumed a direct fusion; actual packed weights cross a command-buffer tuple. Reviewed v2 follows that boundary and proves the original concatenation."
+    }
+  ],
+  "new_gpu_jobs": 0,
+  "new_game_actions": 0,
+  "new_optimizer_updates": 0
+}
