@@ -137,11 +137,20 @@ grouped/unaligned fallbacks and all106 split partitions/reductions. Six unchange
 upstream shaders compile/validate;61 contracts,4.937M addresses,27 negatives and
 71 receipts pass. Four failed CPU readers/repairs remain. Zero GPU calls or
 native runtime refresh; physical support is not logical-device qualification.
-Next prepare one bounded existing-observer GPU comparison covering feature
-enablement, native binding/control calibration, independent numerics and the
-complete policy costs, including unchanged fallbacks and split reductions.
-Review before a full-model trial. No silent refresh, geometry sweep, favorable
-subset or compiler feature project. Existing
+The [complete fixed-policy comparison](results/2026-10-17-workgroup-matrix-family.md)
+now passes feature/binding/numerical checks but rejects performance. All96
+operations/716 RGB/769 CDP occurrences retain fallbacks and142 reductions/130
+casts. Current/upstream-original/candidate weighted GPU costs are11.932/11.939/
+12.797ms RGB and15.605/15.614/18.345ms CDP:7.25%/17.56% regressions versus current.
+Both controls calibrate within.312%; queued wall also regresses. All190.859M
+F64/763.437M exact values and288 guards pass,20 warnings.23,904 operations/
+26,643 dispatches, zero updates/actions; GPU04:30:34UTC/review04:30:53UTC, no worker.
+Standalone totals are not full-update latency or a rejection of all upstream
+geometries. No full-model trial, retime, selector or geometry sweep follows.
+Next CPU-match retained native/JAX nonmatrix recurrence reduction/dtype/
+materialization contracts and identify a concrete mechanism before another
+allocation. No failed-prior restart, precision search, compiler project or
+promotion. Existing
 counters do not establish matrix latency parity, and this family alone is not
 a parity plan. Library feeding/non-image costs stay distinct; no image-fusion/
 precision search, uniform selector, failed-normalization restart or promotion.

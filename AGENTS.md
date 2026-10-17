@@ -1065,11 +1065,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   uniform wrapper) and repairs remain; no GPU repeat/compiler edit. CPU review
   03:47:15UTC, zero GPU calls/updates/actions, no worker. Retained properties
   support the policy, but current logical-device enablement is still absent.
-  Next prepare one bounded existing-observer comparison: feature/binding/control
-  qualification, all compatible contracts and complete operation costs including
-  unchanged fallbacks/reductions. Review before a full-model trial. No geometry
-  search, favorable subset, new compiler feature, silent refresh or promotion.
+  The complete bounded comparison below now qualifies features/bindings/numerics
+  but rejects this policy's performance. No geometry search, favorable subset,
+  new compiler feature, silent refresh or promotion.
   Keepe45b9c43/1.59x; convolution/nonmatrix costs and the full goal remain open.
+- **Fixed upstream workgroup-matrix policy rejected:** [result](docs/results/2026-10-17-workgroup-matrix-family.md).
+  All96 operations/716 RGB/769 CDP memberships include grouped/unaligned
+  fallbacks and142 reductions/130 casts. Current/upstream-original/candidate
+  weighted GPU costs11.932/11.939/12.797ms RGB and15.605/15.614/18.345ms CDP:
+  candidate regresses7.25%/17.56% versus current; queued wall also regresses.
+  Both compiler controls calibrate within.312%; both5% performance gates fail.
+  These are complete standalone policy costs, not full-update timings or a
+  rejection of every upstream geometry/search. All190.859M F64/763.437M exact
+  paired values and288 guards pass;20 warnings,23,904 operations/26,643 dispatches,
+  zero updates/actions/counter passes. GPU ends04:30:34UTC, independent3,308-seal
+  review04:30:53UTC, no worker/retry. Structured fixtures do not qualify actual
+  gradients/learning. No full-model trial, favorable subset, retime or sweep.
+  Keep e45b9c43/1.59x. Next CPU-match retained native/JAX nonmatrix recurrence
+  reduction/dtype/materialization contracts before any new allocation. No closed
+  precision/geometry search, failed prior restart, compiler project or promotion.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

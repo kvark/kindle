@@ -84,9 +84,14 @@ Its [CPU compatibility check](results/2026-10-17-workgroup-matrix-contract.md)
 now passes: one fixed policy fits504/716 RGB and552/769 CDP products, preserving
 grouped/unaligned fallbacks and106 split reductions. Six unchanged upstream
 shaders validate;4.937M addresses/27 negatives pass. Four failed CPU readers
-and repairs remain, no GPU work or runtime refresh. Next prepare a bounded
-complete-policy GPU comparison before any full-model trial; no geometry search,
-favorable subset, closed-family revival or compiler feature project. Keep
+and repairs remain. The [complete GPU comparison](results/2026-10-17-workgroup-matrix-family.md)
+now passes numerical/feature checks but rejects this fixed policy: weighted
+matrix operations regress7.25% RGB/17.56% CDP, with all fallbacks/reductions/casts.
+Compiler controls calibrate within.312%;190.859M F64/763.437M exact paired values
+and288 guards pass,20 warnings. No full-model trial, retime or subset follows.
+23,904 operations/zero updates/actions; GPU04:30:34UTC/review04:30:53UTC, no worker.
+Next CPU-match remaining nonmatrix recurrence contracts against retained JAX,
+not another geometry/precision search or compiler project. Keep
 e45b9c43 and the goal open at1.59×; no production/learning promotion.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
