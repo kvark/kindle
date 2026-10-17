@@ -939,6 +939,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Next CPU-map retained convolution dependency counters and18 non-convolution
   spans to actual producers/consumers. No new GPU cohort needed for that review,
   closed-family/assembly retry, compiler project, precision sweep or Atari restart.
+- **Current-model dependency map complete:** [result](docs/results/2026-10-17-model-dependencies.md).
+  All3,751 dispatches/7,063 versioned reads/813 roots/41 ranges reconcile. A1,109-
+  dispatch chain crosses1,109 of1,112 groups: regrouping alone cannot remove
+  hundreds of dependencies. This is not critical-path latency. Other spans are
+  mixed, not encoder/decoder labels; long-scoreboard warp-cycle fractions are
+  44.21% other/18.79% convolution, not wall-time shares or SM utilization.
+  Blade already disables synthetic loop/division guards. One fixed non-algebraic
+  SPIR-V normalization validates40 modules for20 contracts/23 products,
+  complete interfaces/layouts/cooperative operations/barriers and three negatives.
+  Call-expanded K-loop IR falls11.10–19.01%; all branch/global/shared-access sites
+  stay. No native instruction/speed claim: the driver may already remove this IR.
+  Original output-validation claim was incomplete: optimizer validates inputs.
+  Separate unchanged-output validation passes,60 tool calls total/no normalization
+  repeat. Six graph negatives/171 combined receipts pass; CPU ends00:53:58UTC, zero GPU
+  calls/builds/updates/actions, no worker. Next CPU-review one exact-module
+  replacement observer, then separately declare one complete-family numerical/
+  counter test of this fixed mechanism. No pass/geometry search, Naga feature,
+  closed-family revival or automatic integration. Keepe45b9c43/1.59x; goal open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

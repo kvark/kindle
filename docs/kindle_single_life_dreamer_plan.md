@@ -37,8 +37,15 @@ Whole/detailed counts, first targets, states and outputs pass; no local traffic
 is measured. The first profiler-storage failure and missing target exports stay
 retained; a separate complete42-range capture fits the unchanged limit. Three
 guards/two pass/one fail, zero warnings/26 synthetic updates/zero actions.
-No worker or baseline change. Next analyze the retained ranges/dependencies on
-CPU before another lowering or allocation; the root-cause/parity goal stays open.
+No worker or baseline change. The [CPU dependency map](results/2026-10-17-model-dependencies.md)
+now proves a1,109-dispatch chain across1,112 groups: scheduling alone cannot
+remove hundreds of dependencies. Non-convolution spans are mixed and show more
+memory-dependency waiting; warp-cycle fractions are not time shares. Fixed
+SPIR-V normalization passes offline contracts and reduces static K-loop IR,
+but changes no branch or global/shared access sites. Next review one isolated
+module-replacement observer before a bounded complete-family numerical/counter
+test; no pass/tile sweep or automatic integration. Zero GPU calls in this step;
+the root-cause/parity goal and1.59× complete gap stay open.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact

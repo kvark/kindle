@@ -51,9 +51,24 @@ targets,292-tensor state pairs, full outputs and813 protected hashes pass in the
 separate capture. Three guards/two pass/one fail, zero warnings,26 synthetic
 updates/100 counter replays/zero actions; no worker. Reader/build failures stay.
 
-Next map the retained41 nonempty ranges and dependency counters to actual
-producers/consumers on CPU, distinguishing convolution feeding/control work
-from the18 non-convolution spans. No fresh GPU cohort is needed for this step.
+The [retained-range dependency map](results/2026-10-17-model-dependencies.md)
+now passes all3,751 dispatches/7,063 versioned reads/813 roots. A1,109-dispatch
+chain crosses1,109 of1,112 groups: regrouping alone cannot remove hundreds of
+dependencies. This is not a latency bound. Other ranges are mixed; their44.21%
+long-scoreboard warp-cycle fraction versus18.79% convolution is not a time share.
+Six graph negatives pass. One fixed non-algebraic SPIR-V normalization also
+validates40 modules/all20 contracts/23 occurrences and complete layout/
+barrier checks. Call-expanded K-loop IR falls11.10–19.01%, but branches and
+global/shared access sites stay. The driver may already remove that redundant
+IR; neither native instruction improvement nor runtime numerics is established.
+The first output-validation claim was incomplete; separate unchanged-output
+validation repairs it without normalization repeats. Zero GPU calls/builds/
+updates/actions; CPU ends00:53:58UTC, no worker.
+
+Next CPU-review one exact-module replacement observer, then separately declare
+one complete-family numerical/counter comparison of that fixed normalization.
+No optimizer-pass search or speed claim from smaller IR. Ordinary timing and
+complete-update qualification would remain necessary before integration.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.
