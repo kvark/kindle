@@ -1,0 +1,39 @@
+{
+  "status": "cpu_contracts_passed_not_implemented",
+  "finished_utc": "2026-10-17T04:46:46.176434+00:00",
+  "artifacts": "runs/recurrence-contract-20261017.ibRYGSCL",
+  "address_comparisons": 121507840,
+  "small_materialized_cases": 36,
+  "small_bit_pattern_values": 560,
+  "proposed_removed_dispatches": { "rgb": 329, "cdp": 359 },
+  "proposed_logical_writes_removed": { "rgb": 404488192, "cdp": 421265408 },
+  "native_recurrence_dispatches": 631,
+  "jax_recurrence_kernels": 630,
+  "jax_recurrence_copies": 45,
+  "native_rms_calls": 135,
+  "native_rms_workgroup_barrier_sites_per_shader": 9,
+  "native_rms_variants": { "256_f32": 45, "256_bf16": 75, "2048_bf16": 15 },
+  "jax_logical_norms": 135,
+  "jax_norm_kernels": 225,
+  "jax_norm_kernel_ms": 0.26570237500000005,
+  "complete_interval_context": {
+    "world": { "removed_only_ms": 0.2389495, "removed_mixed_ms": 0.57206425 },
+    "imagination": { "removed_only_ms": 0.307784875, "removed_mixed_ms": 0.153393625 }
+  },
+  "source_receipts": 104,
+  "retained_reader_failures": 1,
+  "gpu_calls": 0,
+  "builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "performance_claimed": false,
+  "production_changed": false,
+  "upstream_meganeura": "f4153c6d6015823ef8653bf4103e45bcbbb53b85",
+  "upstream_blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+  "qualified_native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+  "source_sha256": {
+    "runs/recurrence-contract-20261017.ibRYGSCL/audit.json": "4ef3e4edf1cd639597880a2e713f5732b04c129cd8bb5abbe0ca4d230990b1b7",
+    "runs/recurrence-contract-20261017.ibRYGSCL/review.json": "ad1457d8b7d404791f1ceae0f746e119e993f59f7546917fd39ed4fd91d30b6e",
+    "runs/recurrence-contract-20261017.ibRYGSCL/views.json": "9bf6b1606962bd62c94302d57f1766dc98a86d75c9c0acaac1bb4db75748b85e"
+  }
+}

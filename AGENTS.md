@@ -1081,9 +1081,28 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   zero updates/actions/counter passes. GPU ends04:30:34UTC, independent3,308-seal
   review04:30:53UTC, no worker/retry. Structured fixtures do not qualify actual
   gradients/learning. No full-model trial, favorable subset, retime or sweep.
-  Keep e45b9c43/1.59x. Next CPU-match retained native/JAX nonmatrix recurrence
-  reduction/dtype/materialization contracts before any new allocation. No closed
+  Keep e45b9c43/1.59x. The CPU recurrence comparison below now passes. No closed
   precision/geometry search, failed prior restart, compiler project or promotion.
+- **Nonmatrix recurrence contracts pass:** [result](docs/results/2026-10-17-recurrence-contract.md).
+  Native135 RMS calls versus225 JAX kernels implement the same135 logical
+  normalizations: basic normalization fusion is not missing. Three retained
+  native WGSL forms all use256 invocations/one row/nine workgroup barriers;
+  this is not hardware stall attribution or evidence of JAX subgroup scheduling.
+  GRU slices/update take90 native dispatches versus15 JAX fusions, excluding
+  bias. F32/BF16 state/rounding and external/in-loop RNG differences remain.
+  All631 native/630 JAX launches and45 JAX copies stay accounted for.
+  Complete RGB/CDP private F32 split-view proof passes121.508M addresses,
+  source versions/protection/readers and36 small cases/560 bit patterns. Could
+  remove329/359 copy dispatches and404.488/421.265MB logical writes; no codegen,
+  DRAM or speedup claim. Copy-only current RGB intervals total.239ms world/
+  .308ms imagination, with.572/.153ms mixed; not attainable/additive savings.
+  Separate sigmoid duplicate bindings remain, not included in removals.
+  One failed metadata reader/repair retained. Independent104-seal review
+  04:46:46UTC, zero GPU/builds/updates/actions, no worker. Next CPU-prove a
+  subgroup reduction tail preserving the exact tree, complete typed family,
+  enforced size/lane ownership, required cross-subgroup barriers and rounding.
+  No local-ID assumption, unsafe barrier weakening, row/geometry sweep or new
+  Naga project. Slice views remain unimplemented. Keepe45b9c43/1.59x.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -1093,8 +1112,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the copy-composition study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October17 upstream is `5d6d9a36`/`4845d652`, reviewed
-  above with no runtime refresh. Preceding October16 `41a15d31` added seven
+  this candidate. Latest October17 upstream is `f4153c6d`/`4845d652`. The two
+  commits since5d6d9a36 add repeated-row folding and intermediate timestamp
+  harvesting; both mechanisms are already represented in our isolated stack.
+  No runtime refresh. Preceding October16 `41a15d31` added seven
   tuning/calibration commits preserve codegen/shader/compiler trees and ordinary
   unbounded pipeline construction. Isolated fetch/audit, no refresh or search.
   The preceding six typed-matrix/staging/tuning/accuracy commits through12df95c
@@ -1102,7 +1123,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Preceding `f648a453` search/attention fixes do not change ordinary convolution.
   Blade's preceding entry-point/override resolution takes its unchanged fast
   path for all152 tested single-entry/override-free variants. New workgroup/
-  BF16 capabilities are not yet qualified here. No runtime refresh or historical
+  BF16 capabilities qualify only in the isolated observer. No runtime refresh or historical
   repin from this review.
   CI status belongs on PR31.
 - **Closed diagnostics stay closed.** No native assembly-query retry (the

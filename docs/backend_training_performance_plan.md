@@ -147,10 +147,22 @@ F64/763.437M exact values and288 guards pass,20 warnings.23,904 operations/
 26,643 dispatches, zero updates/actions; GPU04:30:34UTC/review04:30:53UTC, no worker.
 Standalone totals are not full-update latency or a rejection of all upstream
 geometries. No full-model trial, retime, selector or geometry sweep follows.
-Next CPU-match retained native/JAX nonmatrix recurrence reduction/dtype/
-materialization contracts and identify a concrete mechanism before another
-allocation. No failed-prior restart, precision search, compiler project or
-promotion. Existing
+The [CPU recurrence comparison](results/2026-10-17-recurrence-contract.md) now
+finds135 native RMS calls versus225 JAX kernels for the same135 logical norms;
+basic normalization fusion is not missing. Native uses nine explicit workgroup
+barriers per call; JAX hardware synchronization is not established by HLO.
+GRU slices/update are90 native dispatches versus15 JAX fusions, excluding bias,
+with different F32/BF16 rounding. Complete private split-view proof passes
+121.508M addresses and all liveness/protection checks:329/359 proposed RGB/CDP
+copy removals,404.488/421.265MB logical writes, no measured saving. Current
+copy-only intervals total.239ms world/.308ms imagination; mixed intervals stay
+separate. One reader failure/repair,104 receipts, CPU04:46:46UTC, no GPU/builds.
+Latest f4153c6d's repeated-row/timestamp fixes are already represented here.
+Next CPU-prove a subgroup reduction tail preserving the exact tree, complete
+typed family, enforced subgroup/lane ownership and necessary cross-subgroup
+barriers. No row/precision/geometry sweep, Naga project, implementation or GPU
+allocation follows without feasibility review. Slice views stay a separate
+unimplemented opportunity; no failed-prior restart or promotion. Existing
 counters do not establish matrix latency parity, and this family alone is not
 a parity plan. Library feeding/non-image costs stay distinct; no image-fusion/
 precision search, uniform selector, failed-normalization restart or promotion.

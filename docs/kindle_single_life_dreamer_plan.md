@@ -90,8 +90,14 @@ matrix operations regress7.25% RGB/17.56% CDP, with all fallbacks/reductions/cas
 Compiler controls calibrate within.312%;190.859M F64/763.437M exact paired values
 and288 guards pass,20 warnings. No full-model trial, retime or subset follows.
 23,904 operations/zero updates/actions; GPU04:30:34UTC/review04:30:53UTC, no worker.
-Next CPU-match remaining nonmatrix recurrence contracts against retained JAX,
-not another geometry/precision search or compiler project. Keep
+The [CPU recurrence audit](results/2026-10-17-recurrence-contract.md) now identifies
+materialized GRU slices and shared-memory reduction structure, not missing basic
+normalization fusion.135 native RMS calls/225 JAX kernels represent the same135
+logical norms. Private split-view addressing passes121.508M comparisons across
+complete RGB/CDP programs;329/359 proposed removals are not an implemented
+speedup. Next CPU-prove an exact-tree subgroup reduction tail with enforced lane
+ownership and necessary barriers; no precision/geometry search or Naga project.
+One reader failure/repair retained,104-seal review04:46:46UTC, no GPU/build/worker. Keep
 e45b9c43 and the goal open at1.59×; no production/learning promotion.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
