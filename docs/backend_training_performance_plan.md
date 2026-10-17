@@ -1,6 +1,6 @@
 # Backend training performance plan
 
-Updated October 16, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 17, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
@@ -35,23 +35,28 @@ subset, retime, compiler project or full-update trial. Upstream41a15d31's seven
 new commits leave ordinary codegen/shader/
 compiler trees unchanged; no repin. Preserve the CPU syntax-reader failure.
 
-Next reconcile counters with the current complete native execution, before
-another kernel proposal. Existing native counters use standalone synthetic
-operands; JAX's use an actual update. Prove complete range membership and retain
-original commands/dependencies before a bounded collection; counter replay time
-is not ordinary latency. The rejected October15 workgroup source already loads
-global storage directly with `coopMatLoadTensorNV`: this is not an untried API
-or grounds to restart that family. No new GPU allocation or compiler work is
-implied by this source review.
+The [current-model counter capture](results/2026-10-17-model-counters.md) now
+qualifies all3,751 world dispatches with original commands/dependencies. All23
+convolutions match92 standalone CTA/warp/tensor/ALU anchors exactly: synthetic
+inputs were not the instruction-gap explanation. Convolutions execute85.83%
+of world warp instructions and4.255× JAX's convolution instructions, including
+7.287× ALU work. These are not time fractions or attainable speedups. Whole and
+detailed integer counts reconcile; local traffic is zero across the world.
+Fixed-world excludes optimizer/other learner programs; the1.59× gap stays.
 
-The [current-model counter contract](results/2026-10-16-model-counter-contract.md)
-now reconciles all3,751 world dispatches/23 products and versioned owners. All17
-convolution groups are mixed. The proposed1,138 in-pass ranges preserve1,131
-existing barriers; naive per-group recording would add1,111 compute boundaries.
-Six negative CPU checks pass. The original label-owner assertion stays failed;
-the versioned-path repair passes. No GPU call/build/worker or implemented observer.
-Next implement the scoped marker observer with correct launch capacity and cache
-lifecycle, then independently qualify it before collection. No new timing claim.
+The original detailed capture exceeds128MiB profiler storage before dispatch;
+it also omits seven target exports. Both failures remain. CPU-proved coalescing
+fits42 ranges into22.13MB, retaining all23 convolutions/1,131 barriers. Exact
+targets,292-tensor state pairs, full outputs and813 protected hashes pass in the
+separate capture. Three guards/two pass/one fail, zero warnings,26 synthetic
+updates/100 counter replays/zero actions; no worker. Reader/build failures stay.
+
+Next map the retained41 nonempty ranges and dependency counters to actual
+producers/consumers on CPU, distinguishing convolution feeding/control work
+from the18 non-convolution spans. No fresh GPU cohort is needed for this step.
+The rejected October15 workgroup source already loads global storage with
+`coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
+No closed tile/precision/split-K sweep, compiler project or automatic promotion.
 
 The preceding candidate is native`67559ce5` with
 `MEGANEURA_IMAGE_VIEWS=1` and `KINDLE_DEVICE_MEANS=1`, from

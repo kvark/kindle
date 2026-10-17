@@ -913,12 +913,32 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   preserve1,131 original barriers in the CPU command model; six negatives pass.
   Naive per-group diagnostic recording adds1,111 compute boundaries. Allocate
   for3,751 launches, not1,139 ranges including empty; invalidate marked caches
-  at profiler lifecycle changes. No implemented observer/GPU qualification yet.
+  at profiler lifecycle changes. The subsequent capture below now qualifies a
+  coalesced partition; retain this original CPU evidence.
   Initial label-owner assertion fails; separate versioned-path repair passes.
-  CPU ends23:45:00UTC, zero builds/GPU calls/updates/actions, no worker. Next
-  implement/audit the scoped observer, then separately declare collection.
+  CPU ends23:45:00UTC, zero builds/GPU calls/updates/actions, no worker. The
+  later implementation/capture is not part of this CPU allocation.
   Fixed-world counters omit optimizer/other programs; replay time is not ordinary
   latency. No kernel/geometry sweep, closed-family revival or automatic promotion.
+- **Current-model counters qualify:** [result](docs/results/2026-10-17-model-counters.md).
+  All3,751 world dispatches retain original1,112 groups/1,131 barriers. All23
+  convolutions match92 standalone CTA/warp/tensor/ALU anchors; actual inputs
+  do not explain the instruction gap. They execute85.83% of world warp work,
+  4.255x JAX convolution instructions/7.287x ALU, not time fractions or speedups.
+  Whole/detailed integer sums, full outputs/targets/three292-tensor pairs and813
+  protected hashes pass; local traffic is zero. First detailed allocation fails
+  the128MiB host-profiler cap before dispatch; seven target exports are missing.
+  Both failures remain. Separate41-range+empty coalescing fits22.13MB without
+  raising limits or repeating the completed whole capture; new target exports pass.
+  Three guards/two pass/one fail, zero warnings,26 synthetic updates/100 counter
+  replays/35 ordinary fixed replays/zero actions;2,552 offline metrics and2,095
+  repaired-capture seals pass. GPU ends00:19:53UTC, CPU publication00:22:19;
+  no worker. Original dependency/lint/premature-preflight/target/metadata reader
+  failures and failed controller status remain; separate terminal review passes.
+  Isolated observer47dfc6f7 is not promoted; keepe45b9c43/1.59x complete gap.
+  Next CPU-map retained convolution dependency counters and18 non-convolution
+  spans to actual producers/consumers. No new GPU cohort needed for that review,
+  closed-family/assembly retry, compiler project, precision sweep or Atari restart.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

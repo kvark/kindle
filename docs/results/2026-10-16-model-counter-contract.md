@@ -3,8 +3,10 @@
 October 16, 2026. [Evidence](2026-10-16-model-counter-contract.json) ·
 [Backend plan](../backend_training_performance_plan.md).
 
-**CPU coverage and marker scheduling pass; the observer is not implemented or
-GPU-qualified yet.** Keep complete RGB43.197ms versus inclusive JAX27.223ms,
+**CPU coverage and marker scheduling pass.** The observer was not implemented
+at this boundary; the [October17 capture](2026-10-17-model-counters.md) now
+qualifies a coalesced partition, retaining the first allocation's storage and
+missing-target failures. Keep complete RGB43.197ms versus inclusive JAX27.223ms,
 1.59×. No new speed, utilization or learning result.
 
 The current native world program has3,751 dispatches,1,112 original groups and
@@ -61,6 +63,7 @@ and the latest direct-output family rejection remain closed.
 
 Audits finish23:43:37/23:45:00 UTC. Zero GPU calls, builds, learner updates or game
 actions; no worker remains. Artifacts: `runs/model-counter-contract-20261016.0NNv3etx`.
-Next implement and independently audit the scoped observer, then separately
-declare bounded collection. No kernel/compiler project, geometry sweep,
+The subsequent observer implementation and collection are recorded in the
+[follow-up](2026-10-17-model-counters.md), not in this CPU allocation.
+No kernel/compiler project, geometry sweep,
 production promotion or Atari restart; the full parity goal remains open.

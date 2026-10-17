@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 16, 2026. This is the authoritative roadmap.
+Updated October 17, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -29,9 +29,16 @@ its5% gate. Reject integration; no retime or full-update trial.100 guards pass
 with15 recorded warnings; all samples, including a large native dX transient,
 remain. No worker, learning result or baseline change: keep1.59×. Operand
 feeding, matrix work distribution and graph execution remain separate questions.
-The [next counter boundary](results/2026-10-16-model-counter-contract.md) now
-passes CPU coverage/scheduling checks. It will observe actual model execution
-without adding compute-pass boundaries; implementation/GPU qualification remains.
+The [actual-model counter capture](results/2026-10-17-model-counters.md) now
+qualifies unchanged execution boundaries. All23 convolution instruction anchors
+match standalone counts; they execute85.83% of world warp instructions and4.255×
+JAX's convolution instructions. This is not a latency fraction or speed promise.
+Whole/detailed counts, first targets, states and outputs pass; no local traffic
+is measured. The first profiler-storage failure and missing target exports stay
+retained; a separate complete42-range capture fits the unchanged limit. Three
+guards/two pass/one fail, zero warnings/26 synthetic updates/zero actions.
+No worker or baseline change. Next analyze the retained ranges/dependencies on
+CPU before another lowering or allocation; the root-cause/parity goal stays open.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
