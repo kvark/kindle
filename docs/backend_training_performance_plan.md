@@ -91,14 +91,23 @@ mask work, not an apples-to-apples launch ratio. All1,215 top-level HLO nodes/
 BF16 activation boundaries differ; no precision change or speed claim. CPU-only,
 29 seals pass at02:28:37UTC, no worker; original reader failures remain.
 
-Next establish a CPU contract for boundary-matched timing of current world and
-imagination work. Reconcile retained timestamp coverage first; any in-pass
-observer must preserve cached commands, barriers, submissions and query
-lifetimes, with a declared overhead/numerical gate. Existing per-dispatch pass
-splitting and coarse extra waits are not ordinary overlap. No new backend edit
-or GPU allocation until that contract is reviewed. Library feeding and non-image
-costs remain distinct. No image-fusion/precision/geometry search, uniform
-selector, retime, failed-normalization restart or automatic promotion.
+The [cached boundary-timing CPU contract](results/2026-10-17-boundary-timing-contract.md)
+now passes: ten world command projections,2,176 modeled executions/22 negatives,
+29 seals; CPU02:43:42UTC, no GPU/builds/actions or worker. All23 RGB convolutions
+fit17 existing intervals. Old complete trace still adds three waits, not ordinary
+overlap. Preserve the enum-count reader failure and separate named-set repair.
+
+Next implement an isolated observer: one pool per immutable secondary, reset on
+its recorded path, harvest after checked existing-wait success, owner/generation
+checks and actual non-world group/command exports. Current wait paths discard
+results; availability alone is not fresh completion proof. Keep normal timing
+off. ALL_COMMANDS timestamps may perturb execution; report intra-secondary
+completion intervals, not calibrated host overlap or pure kernel latency.
+CPU/source review precedes a separately declared24-update numerical check and
+ordinary/marked272-update RGB pair, <=5% control drift/overhead and exact command/
+numerical gates. No extra waits, pass splitting, marker-density search or retime.
+Library feeding/non-image costs stay distinct; no image-fusion/precision/geometry
+search, uniform selector, failed-normalization restart or automatic promotion.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.

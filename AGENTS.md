@@ -1007,12 +1007,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   29 seals pass. Preserve nested-tuple/comment reader failures, local inspect
   shadowing and original negative-check label clarification. CPU02:28:37UTC,
   zero GPU/builds/updates/actions, no worker. Keepe45b9c43/1.59x.
-  Next CPU-audit retained timestamp coverage and an in-pass world/imagination
-  timing contract preserving cached commands, barriers, submissions and query
-  lifetimes. Do not revive per-dispatch pass splitting or coarse extra waits as
-  ordinary timing. Overhead/numerical qualification precedes separate collection;
-  no backend edit/new GPU allocation or fusion/precision/geometry sweep implied.
-  Convolution feeding/recurrence and the full root-cause goal remain open.
+  The following CPU timing contract now passes; no fusion/precision/geometry
+  search follows. Convolution feeding/recurrence and the full goal remain open.
+- **Cached boundary-timing CPU contract passes:** [result](docs/results/2026-10-17-boundary-timing-contract.md).
+  All23/11 RGB/CDP convolutions occupy17/eight original intervals; ten cached
+  world command projections preserve groups/barriers/submissions.1,137/1,130
+  proposed query slots,2,176 modeled executions/22 negatives/29 seals pass.
+  Retained272-update/6,775-interval coarse trace still adds three waits; not
+  current ordinary timing. Original18-versus20 enum-census failure remains.
+  CPU02:43:42UTC, zero GPU/builds/updates/actions, no worker. Keepe45b9c43/1.59x.
+  Next implement an isolated observer with per-secondary query ownership,
+  checked existing-wait success and replay generations; current wait code drops
+  results, so availability alone is insufficient. Export actual non-world groups.
+  Keep normal timing off; report intra-secondary completion intervals, not
+  calibrated overlap/pure kernel time. ALL_COMMANDS query writes can perturb
+  execution. CPU/source validation precedes separate24-update and ordinary/
+  marked272-update RGB qualification, <=5% drift/overhead with exact numerical/
+  command gates. No extra waits, pass splits, marker-density search, retime,
+  compiler feature, automatic GPU allocation, promotion or Atari restart.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its

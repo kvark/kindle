@@ -57,9 +57,15 @@ root-cause goal open. The [image-fusion audit](results/2026-10-17-image-fusion-c
 now proves all16 RGB/eight CDP regions already use the composed normalization/
 activation/adjoint path. JAX also keeps normalization outside its convolutions;
 different rounding/tapes preclude a free precision substitution. Actual HLO
-references/native gradients pass, CPU only, no worker or speed claim. Next
-audit a boundary-matched timing observer that preserves ordinary cached commands,
-barriers/submissions/query lifetimes; no new allocation or compiler project implied.
+references/native gradients pass, CPU only, no worker or speed claim. The
+[boundary-timing CPU contract](results/2026-10-17-boundary-timing-contract.md)
+also passes: cached-chunk query ownership can preserve original commands and
+avoid the coarse profiler's extra waits. All23 RGB convolutions occupy17 existing
+intervals; independent products stay together. Next implement the isolated
+observer with checked existing waits/replay generations and actual group exports,
+then separately qualify exact numerics/commands and <=5% timing overhead. Query
+writes themselves may perturb execution; no pure-kernel/overlap claim, new GPU
+allocation, compiler project or automatic promotion. Goal stays open at1.59×.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
