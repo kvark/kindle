@@ -115,12 +115,28 @@ causal gap budget or attainable saving. The latter reconstruction is absent
 from CDP. The4.866ms marked-wall/cached difference is not pure CPU overhead.
 Mixed matrix/image groups cannot be assigned wholly to their named heavy work.
 
-Next CPU-match all remaining interval memberships/versions to actual retained
-JAX launches, including recurrence and surrounding materialization. Existing
-counters do not establish matrix latency parity. No new GPU allocation or
-marker-density search follows. Library feeding/non-image costs stay distinct;
-no image-fusion/precision/geometry search, uniform selector, failed-normalization
-restart or automatic promotion.
+The [nonconvolution membership review](results/2026-10-17-nonconvolution-timing.md)
+now covers all4,692 dispatches/8,948 versioned reads/716 matrix products/1,699
+intervals and28,064 retained JAX kernels. Native recurrence/features has180
+products within631 dispatches versus JAX180 within630 kernels plus45 copies:
+not a large launch-count mismatch. Wholly-recurrent native intervals5.758ms
+contain2.472ms matrix-only,2.458ms no-matrix and.827ms mixed. Another.438ms crosses
+scope boundaries. JAX matrices2.106ms/other kernels.747ms/copies.055ms and its
+3.147ms span use different interfaces/boundaries, not an additive gap budget.
+All669 grouped fusion-symbol rows/1,120 exact body pairs pass;54 library groups
+retain candidates and one.0112ms posterior symbol stays explicitly unresolved.
+Both sort-reader failures and repairs remain. CPU03:27:19UTC, no GPU/builds/
+updates/actions or worker; keepe45b9c43/1.59×.
+
+Fresh Meganeura5d6d9a36 adds typed rectangular workgroup matrices and search
+integration, using Blade4845d652/Naga13f582dd. That family is absent from the
+retained runtime and requires explicit selection or measured search. Next
+CPU-audit its fit to all actual dense interfaces, reductions/bindings/types and
+device/compiler contracts before any separate complete comparison. No silent
+refresh, geometry sweep, favorable subset or compiler feature project. Existing
+counters do not establish matrix latency parity, and this family alone is not
+a parity plan. Library feeding/non-image costs stay distinct; no image-fusion/
+precision search, uniform selector, failed-normalization restart or promotion.
 The rejected October15 workgroup source already loads global storage with
 `coopMatLoadTensorNV`; this is not an untried API or grounds to revive its family.
 No closed tile/precision/split-K sweep, compiler project or automatic promotion.

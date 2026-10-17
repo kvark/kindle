@@ -1034,10 +1034,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   03:05:30UTC, independent attribution03:08:47UTC, no GPU worker. Initial patch
   parser refusal/repair stays; no GPU failure/repeat. Three CPU tests/build/Clippy
   pass. Observer786a3010 is not promoted; keepe45b9c43/1.59x, production unchanged.
-  Next CPU-map all nonconvolution interval versions/membership to retained JAX
-  launches, distinguishing mixed from matrix-only groups before a new mechanism.
-  No GPU allocation, closed-family revival, timing-density/precision/geometry
-  search, compiler project, automatic promotion or Atari restart. Goal stays open.
+  The complete CPU membership review below now passes; no timing-density search
+  or automatic promotion follows. Goal stays open.
+- **Nonconvolution timing membership reconciles:** [result](docs/results/2026-10-17-nonconvolution-timing.md).
+  All4,692 dispatches/8,948 versioned reads/716 matrix products/1,699 intervals
+  and28,064 JAX kernels reconcile. Native imagined recurrence/features has180
+  products in631 dispatches; JAX180 in630 kernels plus45 copies. This is not a
+  large launch-count mismatch. Native wholly-recurrent intervals5.758ms contain
+  2.472ms matrix-only/2.458ms no-matrix/.827ms mixed;148 products are matrix-only.
+  Boundary-mixed.438ms stays separate. JAX matrix2.106/other.747/copy.055ms,
+  3.147ms span uses different interfaces/boundaries; no additive saving or ratio.
+  All669 grouped fusion-symbol rows/1,120 exact body pairs pass;54 library groups
+  retain candidate sets and one.0112ms posterior symbol remains unresolved, not
+  omitted.20 negative/six positive sort checks pass; both failed sort readers stay.
+  CPU review03:27:19UTC,1,712-seal closure03:30:48UTC; zero GPU/builds/updates/
+  actions, no worker. Keepe45b9c43/1.59x.
+  Fresh upstream5d6d9a36 adds a workgroup matrix family, absent from our runtime;
+  opt-in/search selected, not an automatic speedup. Next CPU-audit all current
+  dense interfaces/device/compiler compatibility before any separate comparison.
+  No geometry sweep, favorable subset, closed-family revival, compiler feature
+  project, automatic refresh/promotion or Atari restart. Nonmatrix/conv costs and
+  the full goal remain open.
 - Preceding isolated candidate`67559ce5` with `MEGANEURA_IMAGE_VIEWS=1` and
   `KINDLE_DEVICE_MEANS=1` under `runs/image-views-20261015.EblKUBZN`;
   `076f3135` under `runs/repeated-row-composition-20261015.dDTCIIip` is its
@@ -1047,7 +1064,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Current isolated backend sources are in the copy-composition study; the ordering
   control remains `runs/convolution-scheduling-20261014.BJ5AVZFt`.
   Do not rebuild unchanged code for docs or confuse neighboring user work with
-  this candidate. Latest October16 upstream: `41a15d31`/`4845d652`; seven new
+  this candidate. Latest October17 upstream is `5d6d9a36`/`4845d652`, reviewed
+  above with no runtime refresh. Preceding October16 `41a15d31` added seven
   tuning/calibration commits preserve codegen/shader/compiler trees and ordinary
   unbounded pipeline construction. Isolated fetch/audit, no refresh or search.
   The preceding six typed-matrix/staging/tuning/accuracy commits through12df95c

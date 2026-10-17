@@ -71,9 +71,18 @@ helpers total11.255ms kernel activity, a different timing boundary. Most of this
 table's difference is RGB reconstruction, absent from CDP; not a measured CDP
 gain, additive gap budget or pure-kernel comparison. Four guards/two warnings/
 592 synthetic updates/zero actions; attribution03:08:47UTC, no GPU worker.
-Next CPU-map the remaining intervals/versions to actual JAX launches before a
-new mechanism. No GPU allocation, closed-family revival, compiler project or
-automatic promotion. Keep e45b9c43 and the goal open at1.59×.
+The [remaining membership audit](results/2026-10-17-nonconvolution-timing.md)
+now reconciles all4,692 native dispatches/1,699 intervals and28,064 JAX kernels.
+Imagined recurrence has180 matrices in631 native dispatches versus180 in630 JAX
+kernels plus45 copies: not a large launch-count mismatch. Wholly-recurrent
+native intervals5.758ms include2.472ms matrix-only/2.458ms no-matrix/.827ms mixed;
+cross-boundary work stays separate. JAX's3.147ms span has different interfaces,
+not an additive saving. Library-owner ambiguity and one.0112ms posterior symbol
+remain explicit. CPU-only review03:27:19UTC; no worker or baseline change.
+New upstream5d6d9a36 provides a workgroup-matrix family absent from this runtime.
+Next CPU-audit all current dense/device/compiler contracts before a separate
+comparison; no silent refresh, geometry sweep, closed-family revival, compiler
+project or automatic promotion. Keep e45b9c43 and the goal open at1.59×.
 
 The preceding [private copy composition](results/2026-10-16-copy-composition.md)
 reduces RGB48.133→46.199ms,4.02%, and CDP45.669→43.939ms,3.79%, with exact
