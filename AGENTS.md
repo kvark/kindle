@@ -7,6 +7,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **October 19 upstream refresh is the immediate task.** The user requests
+  picking up merged Meganeura changes before more gap diagnostics. Follow the
+  [bounded refresh declaration](docs/experiments/2026-10-19-upstream-refresh.md):
+  reconcile latest `c19cb1ca`/Blade `4845d652` with the qualified isolated
+  extensions, then compare complete RGB/CDP updates. The new stack is not yet
+  GPU-qualified. Keep `e45b9c43` and the retained JAX inclusive boundary as
+  controls. Measured-search improvements are not ordinary-default speedups.
+  This supersedes the recurrence/subgroup proposal as the next action; no
+  closed manual sweep, production promotion or Atari restart follows.
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
   RGB12M/B32/T16 is43.197ms versus inclusive JAX27.223ms,1.59x; B8 retains22.780/12.737ms,

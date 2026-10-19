@@ -1,12 +1,21 @@
 # Backend training performance plan
 
-Updated October 17, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 19, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
+
+Immediate priority, requested October 19: [refresh current upstream onto the
+qualified learner](experiments/2026-10-19-upstream-refresh.md), preserving the
+isolated optimizations and measuring complete RGB/CDP updates. Meganeura
+`c19cb1ca` includes newer typed dense execution and measured-search work;
+Blade is `4845d652`. Integration is in progress, not a new qualified timing.
+This takes precedence over the unimplemented subgroup-reduction proposal.
+Do not interpret the old uniform workgroup-policy rejection as a test of the
+new complete upstream stack, or credit conditional search changes to defaults.
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
 **43.197ms versus inclusive JAX27.223ms,1.59×**; B8 retains22.780/12.737ms,1.79×.
