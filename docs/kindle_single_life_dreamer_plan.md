@@ -16,12 +16,14 @@ reports/targets/state tensors/full programs/generated shader contents pass.
 RGB remains1.58× inclusive JAX27.223ms. Keep latest isolated`d3ff4948`, historical
 anchor`e45b9c43`; production and Atari remain unchanged. The
 [typed-selector integration](results/2026-10-19-typed-selector.md) now passes
-CPU/small GPU checks, including command-cache invalidation, but actual-model
-search and complete timings remain unrun. Its default scratch budget misses
-several large heads; account for the full search allocation before proceeding.
-Preserve the untuned incumbent. Ordinary construction does not run the latest
-search improvements. Convolution feeding and recurrence/materialization remain distinct
-structural targets; no further blind tile sweep or learning restart.
+CPU/small GPU checks, including command-cache invalidation. The subsequent
+[actual-model search](results/2026-10-19-model-selector.md) is numerically exact
+but fails complete-update acceptance: RGB.28%/CDP1.08% less time. Full scratch
+accounting and180/206 changed pipeline selections rule out simple search-domain
+omission as the big missing lever. Preserve the untuned incumbent; no retime or
+promotion. Convolution feeding and non-matrix recurrence/materialization remain
+distinct structural targets. Resume CPU recurrence contracts, not a blind tile
+sweep or learning restart; the root-cause/parity goal stays open.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 12.737 ms: still 1.79×**. Production remains on its earlier qualified~53 ms

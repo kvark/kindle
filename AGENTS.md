@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Actual-model dense selection qualifies but fails performance acceptance:**
+  [result](docs/results/2026-10-19-model-selector.md). RGB43.010→42.890ms,.28%,
+  below3%; CDP40.817→40.375ms,1.08%. Keepd3ff4948/1.58x, no promotion/retime.
+  Full-race bounds111.25/228.625MiB fit512MiB; actual timed180/206 dispatches and
+  pipeline keys change. All527.640M paired outputs/raw gradients, staged/whole
+  late-target checks,272 reports and five292/346-tensor checkpoint pairs pass
+  exactly. Search3.536/5.352s; private timing differences are not additive graph
+  savings. RGB posterior+world essentially unchanged. Six guards/eight warnings,
+  1,094 synthetic updates/84 raw backwards/24 forwards/zero actions; GPU ends
+  14:14:54UTC, final tensor audit14:19:05, no worker.678 seals/CPU tests/Clippy
+  pass. First CPU audit397s; upcoming-audit BLAS threading fixed, no numerical
+  relaxation/repeat. Isolated study`runs/model-selector-20261019.0xWDbwn1`.
+  Missing dense choices are not the big remaining lever. Resume CPU subgroup-tail/
+  slice-view contracts from the recurrence audit; convolution feeding remains
+  the larger distinct deficit. No new geometry sweep, automatic allocation or
+  Atari restart; root-cause/parity goal remains open.
 - **Typed selector integration qualifies, not a new learner speedup:**
   [result](docs/results/2026-10-19-typed-selector.md). All587/643 RGB/CDP typed
   dense incumbents preserve their captured shaders;1,182 typed variants validate

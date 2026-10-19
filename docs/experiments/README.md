@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October19's [actual-model selector](../results/2026-10-19-model-selector.md)
+passes527.640M exact output/raw-gradient comparisons and complete learner/state
+checks, but fails its3% RGB performance gate: .28% RGB/1.08% CDP reduction.
+Keep the untuned control and all samples; no retime, promotion or Atari restart.
+Six guards/eight warnings,1,094 synthetic updates, zero actions; no worker.
+
 October16's [actual-world prior-batching test](../results/2026-10-16-prior-world.md)
 passes exact staging/state checks but fails113 gradient-array pointwise gates.
 All relativeL2 errors remain below.007095; no timing or promotion follows.

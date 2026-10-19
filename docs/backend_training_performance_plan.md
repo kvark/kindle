@@ -27,12 +27,20 @@ valid. Default64MiB scratch is also too small for eight/sixteen current dense
 occurrences; largest incumbent lower bounds86.25/203.625MiB exclude extra search
 overhead. These are integration findings, not a measured learner speedup.
 
-Next qualify actual-model outputs/gradients and measured whole-program search,
-including state restoration, late targets, cached/staged execution and fully
-accounted scratch. Preserve the untuned incumbent, generated-source coverage and
-held-out complete timing. Ordinary`build` still does not run search. No manual
-geometry/family sweep, fixture-winner promotion or assumption that search fixes
-convolution feeding. This precedes the unimplemented subgroup-reduction proposal.
+The [actual-model selection comparison](results/2026-10-19-model-selector.md)
+now qualifies these contracts but fails performance acceptance: RGB43.010→42.890ms
+(.28%, below3%), CDP40.817→40.375ms(1.08%). All527.640M paired output/raw-gradient
+values, staged late targets,272 reports and292/346 state tensors match exactly.
+The timed plans really change180/206 dispatches/pipeline keys; full-race bounds
+111.25/228.625MiB fit the declared budget. Private kernel timings do not add up
+to full-update savings. Keep the untuned incumbent; no retime or promotion.
+
+Next resume the existing CPU subgroup-tail/slice-view contracts for non-matrix
+recurrence, preserving reduction order and source versions. Keep their limited
+opportunity distinct from the larger measured convolution-feeding deficit.
+Ordinary`build` still does not search, but missing dense selection is no longer
+a plausible large missing lever under this recipe. No geometry/family sweep,
+fixture-winner promotion, new GPU allocation or parity claim follows.
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
 **42.983ms versus inclusive JAX27.223ms,1.58×**; B8 retains22.780/12.737ms,1.79×.
