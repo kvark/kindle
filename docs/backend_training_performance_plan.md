@@ -18,13 +18,21 @@ route recovers3.367ms. Latest RGB42.983ms/CDP40.741ms are within.17%/.10% of the
 original fresh controls. Exact trajectories, programs and generated sources pass;
 all earlier failures remain. This was integration recovery, not JAX-gap progress.
 
-Next expose the already-qualified typed larger-reuse implementation to the
-common selector before testing measured whole-program search. The current typed
-candidate domain cannot select it; ordinary`build` does not exercise the recent
-search improvements. Preserve the fast incumbent and full generated-source
-coverage, not just plan labels. No new manual geometry/family sweep or assumption
-that search will fix convolution feeding. This takes precedence over the
-unimplemented subgroup-reduction proposal; both structural costs stay open.
+The [typed-selector integration](results/2026-10-19-typed-selector.md) now passes
+CPU and small GPU qualification: all587/643 dense incumbents retain their shader
+sources,1,182 typed variants validate offline, and12 fixtures pass327,800 exact
+F64 comparisons with cache re-recording. Grouped products remain excluded.
+The local cache needed invalidation after selection; old untuned controls stay
+valid. Default64MiB scratch is also too small for eight/sixteen current dense
+occurrences; largest incumbent lower bounds86.25/203.625MiB exclude extra search
+overhead. These are integration findings, not a measured learner speedup.
+
+Next qualify actual-model outputs/gradients and measured whole-program search,
+including state restoration, late targets, cached/staged execution and fully
+accounted scratch. Preserve the untuned incumbent, generated-source coverage and
+held-out complete timing. Ordinary`build` still does not run search. No manual
+geometry/family sweep, fixture-winner promotion or assumption that search fixes
+convolution feeding. This precedes the unimplemented subgroup-reduction proposal.
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
 **42.983ms versus inclusive JAX27.223ms,1.58×**; B8 retains22.780/12.737ms,1.79×.

@@ -14,10 +14,13 @@ RGB42.983ms/CDP40.741ms. Two routing changes had bypassed substantial existing
 optimizations; restoring them recovers old speed, not a new speedup. Exact
 reports/targets/state tensors/full programs/generated shader contents pass.
 RGB remains1.58× inclusive JAX27.223ms. Keep latest isolated`d3ff4948`, historical
-anchor`e45b9c43`; production and Atari remain unchanged. Next make the qualified
-typed reuse family available to measured selection, preserving it as an incumbent
-before testing search. Ordinary construction does not run the latest search
-improvements. Convolution feeding and recurrence/materialization remain distinct
+anchor`e45b9c43`; production and Atari remain unchanged. The
+[typed-selector integration](results/2026-10-19-typed-selector.md) now passes
+CPU/small GPU checks, including command-cache invalidation, but actual-model
+search and complete timings remain unrun. Its default scratch budget misses
+several large heads; account for the full search allocation before proceeding.
+Preserve the untuned incumbent. Ordinary construction does not run the latest
+search improvements. Convolution feeding and recurrence/materialization remain distinct
 structural targets; no further blind tile sweep or learning restart.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX

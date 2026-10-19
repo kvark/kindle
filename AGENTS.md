@@ -7,6 +7,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Typed selector integration qualifies, not a new learner speedup:**
+  [result](docs/results/2026-10-19-typed-selector.md). All587/643 RGB/CDP typed
+  dense incumbents preserve their captured shaders;1,182 typed variants validate
+  offline. Twelve GPU fixtures pass327,800 exact F64 comparisons, unchanged
+  parameters and command-cache re-recording; eight plans change. Grouped129/126
+  products remain excluded. Local tuning/swap cache invalidation is repaired;
+  swap GPU coverage remains unrun. Default64MiB scratch excludes eight/sixteen
+  actual dense occurrences; largest incumbent lower bounds86.25/203.625MiB.
+  Two guards/one pass/one wrong-adapter initialization failure, zero new warnings/
+  actions/updates; original CPU API/SPIR-V observer failures stay. Repaired source
+  is `runs/typed-selector-20261019.MhXVhJTs/device-fix`; not production or a new
+  Kindle binary. Next actual-model qualification and complete cached/staged
+  search with a properly accounted scratch bound. Keepd3ff4948/1.58x; no fixture
+  winner promotion, manual sweep or Atari restart. GPU ends07:06:03UTC; final
+  CPU publication07:12:44UTC checks743 seals, library Clippy passes. Empty-race
+  serialization/baseline-warning reader repairs retain both originals, no GPU
+  repeat. No worker remains.
 - **October19 current upstream qualifies without a net speedup:**
   [result](docs/results/2026-10-19-upstream-refresh.md). Meganeura`c19cb1ca`,
   Blade`4845d652`, Naga`13f582dd`, plus retained isolated extensions. New ordinary
