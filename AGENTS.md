@@ -7,18 +7,34 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **October 19 upstream refresh is the immediate task.** The user requests
-  picking up merged Meganeura changes before more gap diagnostics. Follow the
-  [bounded refresh declaration](docs/experiments/2026-10-19-upstream-refresh.md):
-  reconcile latest `c19cb1ca`/Blade `4845d652` with the qualified isolated
-  extensions, then compare complete RGB/CDP updates. The new stack is not yet
-  GPU-qualified. Keep `e45b9c43` and the retained JAX inclusive boundary as
-  controls. Measured-search improvements are not ordinary-default speedups.
-  This supersedes the recurrence/subgroup proposal as the next action; no
-  closed manual sweep, production promotion or Atari restart follows.
+- **October19 current upstream qualifies without a net speedup:**
+  [result](docs/results/2026-10-19-upstream-refresh.md). Meganeura`c19cb1ca`,
+  Blade`4845d652`, Naga`13f582dd`, plus retained isolated extensions. New ordinary
+  dense policy regresses RGB42.912→57.108ms/CDP40.701→65.495ms. Restoring the whole
+  qualified dense policy removes18.76%/37.50% versus fresh new-default controls,
+  but RGB46.380ms fails its original5% recovery gate. Full source audit then
+  finds one convolution route bypassing vector/incremental staging despite
+  unchanged plan labels. Restoring that existing generator removes3.367ms RGB:
+  latest42.983ms/CDP40.741ms, within.17%/.10% of the original controls. Not a new
+  JAX-gap improvement. Exact272 reports/targets/initial-first-final292/346 tensors,
+  eight programs/constants/pipelines and205/225 shader-source multisets pass.
+  Keep current-upstream isolated`d3ff4948` in
+  `runs/upstream-refresh-20261019.KWEh8dEH/conv-route`, all six retained flags,
+  with`e45b9c43` as historical anchor.26 guards/21 pass/5 fail/21 warnings,
+  3,456 complete synthetic updates/one partial world update/19 dense probes,
+  zero actions. Final2,464-seal review06:09:49UTC; no worker. Preserve integration
+  storage bug, observers, failed recovery gate, CPU filename/source assertion,
+  copied-manifest/flag failures and repairs; no tolerance relaxation or GPU retry
+  for CPU defects. Fixed-binding offline251-module compiler comparison has250
+  byte-exact pairs; RMS-gradient difference stays, not a driver-code identity claim.
+  Next expose the retained typed larger-reuse family to the common selector
+  before measured whole-program search; the current typed domain cannot choose
+  it, and ordinary`build` does not run search. This supersedes the unimplemented
+  recurrence/subgroup proposal, not the measured convolution-feeding deficit.
+  No closed manual sweep, production promotion or Atari restart follows.
 - **Active goal: understand the remaining JAX gap and establish how to reach
   similar Meganeura performance.** It remains open. Latest isolated complete
-  RGB12M/B32/T16 is43.197ms versus inclusive JAX27.223ms,1.59x; B8 retains22.780/12.737ms,
+  RGB12M/B32/T16 is42.983ms versus inclusive JAX27.223ms,1.58x; B8 retains22.780/12.737ms,
   1.79x. Production is unchanged; these are not current CDP learning results.
   Atari remains stopped. No automatic promotion or old queue restart.
 - Follow the [backend performance plan](docs/backend_training_performance_plan.md)

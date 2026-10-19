@@ -8,17 +8,24 @@ Updated October 19, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-The immediate task is the [October 19 upstream refresh](experiments/2026-10-19-upstream-refresh.md):
-bring merged backend improvements into the qualified isolated learner, then
-measure complete RGB/CDP updates before more individual-kernel experiments.
-No new performance or learning result is established by the source refresh alone.
+The [October19 upstream refresh](results/2026-10-19-upstream-refresh.md) is
+qualified in isolation: latest Meganeura/Blade/Naga plus retained fast paths,
+RGB42.983ms/CDP40.741ms. Two routing changes had bypassed substantial existing
+optimizations; restoring them recovers old speed, not a new speedup. Exact
+reports/targets/state tensors/full programs/generated shader contents pass.
+RGB remains1.58× inclusive JAX27.223ms. Keep latest isolated`d3ff4948`, historical
+anchor`e45b9c43`; production and Atari remain unchanged. Next make the qualified
+typed reuse family available to measured selection, preserving it as an incumbent
+before testing search. Ordinary construction does not run the latest search
+improvements. Convolution feeding and recurrence/materialization remain distinct
+structural targets; no further blind tile sweep or learning restart.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 12.737 ms: still 1.79×**. Production remains on its earlier qualified~53 ms
 runtime; no Atari restart or learning-quality claim. CDP/B32 is a different
 workload and must not be compared directly with this JAX number.
 
-**Latest complete B32 result:** [resident targets](results/2026-10-16-resident-targets-qualified.md)
+**Pre-refresh complete B32 anchor:** [resident targets](results/2026-10-16-resident-targets-qualified.md)
 reduce RGB45.852->43.197ms,5.79%, and CDP43.657->40.997ms,6.09%. RGB is1.59×
 inclusive JAX. Keep isolatede45b9c43 with device targets plus the preceding flags;
 backend unchanged. Original component failures and the overly strict slow-encoding

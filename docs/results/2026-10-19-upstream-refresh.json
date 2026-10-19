@@ -1,0 +1,164 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-19T06:09:49.671898+00:00",
+  "artifact_root": "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH",
+  "upstream": {
+    "meganeura": "c19cb1caedd90be7abc61de61f6197018711398e",
+    "blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+    "naga": "13f582ddd2792befb46952498010248bd65818e6"
+  },
+  "initial_comparisons": {
+    "rgb": {
+      "old_qualified_ms": 42.911543792968736,
+      "new_default_ms": 57.10846569921876,
+      "policy_control_ms": 57.09213837500004,
+      "restored_policy_ms": 46.37950674609376,
+      "new_default_relative_change": 0.330841555706888,
+      "policy_fraction_reduced": 0.18763759659065793,
+      "restored_relative_to_old": 0.08081655066656612,
+      "recovery_gate_passed": false,
+      "exact_reports": 272,
+      "original_stages": {
+        "behavior_train_and_sync": 3.4156859296875,
+        "imagination_and_targets": 7.6622014921875,
+        "posterior": 7.043453921874999,
+        "world_train_and_sync": 24.790202449218746
+      },
+      "restored_stages": {
+        "behavior_train_and_sync": 3.41596098046875,
+        "imagination_and_targets": 7.6675387734375,
+        "posterior": 7.171473332031249,
+        "world_train_and_sync": 28.12453366015625
+      },
+      "old_calibration": -0.006596893694586603,
+      "new_default_calibration": -0.0002859002429642654
+    },
+    "cdp": {
+      "old_qualified_ms": 40.700910519531284,
+      "new_default_ms": 65.49521027734376,
+      "policy_control_ms": 65.35270357421875,
+      "restored_policy_ms": 40.844357777343745,
+      "new_default_relative_change": 0.6091829259179435,
+      "policy_fraction_reduced": 0.37501655565085756,
+      "restored_relative_to_old": 0.0035244238023526275,
+      "recovery_gate_passed": true,
+      "exact_reports": 272,
+      "original_stages": {
+        "behavior_train_and_sync": 3.3687864101562504,
+        "imagination_and_targets": 17.200113761718754,
+        "posterior": 7.663364875,
+        "world_train_and_sync": 12.46864547265625
+      },
+      "restored_stages": {
+        "behavior_train_and_sync": 3.3740900156249998,
+        "imagination_and_targets": 17.208774515625002,
+        "posterior": 7.788098984375001,
+        "world_train_and_sync": 12.473394261718749
+      },
+      "old_calibration": -0.007220770146959654,
+      "new_default_calibration": -0.002175833965896934
+    }
+  },
+  "convolution_route_comparison": {
+    "rgb": {
+      "control_ms": 46.34951345703123,
+      "candidate_ms": 42.982910671874976,
+      "fraction_reduced": 0.07263512675871553,
+      "restored_relative_to_old": 0.0016631160894735597,
+      "control_calibration": -0.0006466927133729206,
+      "recovery_gate_passed": true,
+      "exact_reports": 272,
+      "captured_sources": 205,
+      "stages": {
+        "behavior_train_and_sync": 3.432136578125,
+        "imagination_and_targets": 7.658210992187501,
+        "posterior": 7.04029341015625,
+        "world_train_and_sync": 24.85226969140625
+      },
+      "first32_ms": 42.9263685625,
+      "last32_ms": 42.98523371875
+    },
+    "cdp": {
+      "control_ms": 40.80264751171876,
+      "candidate_ms": 40.741071085937534,
+      "fraction_reduced": 0.0015091281947706703,
+      "restored_relative_to_old": 0.0009867240288636836,
+      "control_calibration": -0.0010212001827122341,
+      "recovery_gate_passed": true,
+      "exact_reports": 272,
+      "captured_sources": 225,
+      "stages": {
+        "behavior_train_and_sync": 3.3719568125000006,
+        "imagination_and_targets": 17.205677218749997,
+        "posterior": 7.68596851171875,
+        "world_train_and_sync": 12.47746854296875
+      },
+      "first32_ms": 40.7473453125,
+      "last32_ms": 40.753432843750005
+    }
+  },
+  "upstream_integrated_native": "d3ff49484ddc6e690272c4d1dad75f641500d88d5935710d1c51f6b3563c247d",
+  "retained_qualified_control": "e45b9c43",
+  "jax_inclusive_ms": 27.222569,
+  "final_rgb_jax_ratio": 1.5789439516849044,
+  "retains_isolated_extensions": true,
+  "measured_search": false,
+  "production_changed": false,
+  "learning_parity": false,
+  "independent_full_model_oracle": false,
+  "game_actions": 0,
+  "completed_synthetic_updates": 3456,
+  "partial_world_updates": 1,
+  "standalone_dense_calls": 19,
+  "passed_guards": 21,
+  "failed_guards": 5,
+  "warnings": 21,
+  "verified_source_seals": 2464,
+  "source_sha256": {
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/final-publication.json": "007c3a172dbf1dae5a9091647c1cd450a8a7fd4a30171cc04ac9d9f590f7f181",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/compiler-union-audit.json": "ba50945fbb48f3fd1a7dbc4fafb855319d161671b826ba898961aa8374a40b81",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/compiler-convolution-membership.json": "82e39222e73e9af66d8965444eb4e33d0e8791673f1d851287185e01b722d9f4",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/timing-conv-route-review.json": "13f8c3a3f1158277a9b094bd6c0cb0d6c68977d6a5fee2f2bafdf2c415ca7950",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/timing-conv-route-plans.json": "aab107a06f3eb81a6bc8b9b84f39e15c29e9565b12a5f154763e7dcd4e22c248",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route-build-review.md": "468b1db60db83a320a55fbdfe02446696b5f82578d26fc8b1640cfddf82840b7",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route-build.log": "5bb305f5a7c67448947a1e05cba0f8cd80079149e05a260835559e68c75d778e",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route-rebuild.log": "e588095045c467d8d350f54e75e1a80147b6d5f20abfb60e421213f819d6a47f",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route/failed-initial-build.json": "7703632119f13acd903e462eaac2d01f1c21a04bc8c6e64ff8ac1b923ae0dd69",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route/failed-initial-build.jsonl": "e4bdb034aff980da4e72807cbca744453fa9d3f1867cd28b48c9114c6124aa3a",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route/failed-initial-Cargo.toml": "120fc0094340d78fcb7b2fb082acea56bb5a6a7d63a688f5c2af3e28e23f01ba",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv-route/build.json": "b21ff8425741a52419fe8e5dadffbeac9e63e7898d69d6e61524e9122806aaba",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv_route_controller.py": "a6286fe48903c8b67abcb6e464b19c53d71d4e78459fc7abafbbf254c93b362f",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/conv_route_controller_timing.py": "b79316749b32b8dab3f64bfe688e20b441e9f27d875ed2e54fecc962b2893415",
+    "/x/Code/kindle/runs/upstream-refresh-20261019.KWEh8dEH/integrated_publication.py": "bab664e5e210dcf41d761c1b10f97f483ffa6880a0b75bbe2803497e40131fc9"
+  },
+  "scope": "Current upstream plus retained isolated extensions; unchanged model/precision/learning recipe, not stock main or a learning result",
+  "flags": {
+    "KINDLE_DEVICE_TARGETS": "1",
+    "KINDLE_DEVICE_MEANS": "1",
+    "MEGANEURA_COMMAND_CACHE": "1",
+    "MEGANEURA_IMAGE_VIEWS": "1",
+    "MEGANEURA_COPY_COMPOSITION": "1",
+    "MEGANEURA_CONVOLUTION_WORDS": "1"
+  },
+  "compiler_comparison": {
+    "gpu_calls": 0,
+    "sources": 246,
+    "modules_per_compiler": 251,
+    "byte_identical": 250,
+    "remaining_difference": "rms_norm_grad_w; unchanged opcode counts but still different after ID compaction",
+    "binding_contract": "Fixed sequential bindings, not captured driver modules"
+  },
+  "failures_preserved": [
+    "Initial host guard stopped on nine old application-named Xids; separately reviewed exact baseline",
+    "Integration-only typed-generator early return treated BF16 buffers as F32",
+    "BF16 diagnostic counter and duplicate create-new export",
+    "One partial world update, invalid targets before completed behavior/learner step",
+    "Diagnostic controller missing inherited sampled-budget field",
+    "Initial refreshed default performance gate",
+    "Dense-only restored RGB recovery gate",
+    "CPU source-inventory assertion: filename changes plus one actual convolution source change",
+    "Convolution repair first build selected old backend; probe omitted word-staging flag",
+    "Original preparation/build/observer failures and all allocation warnings"
+  ],
+  "no_gpu_worker_remains": true
+}

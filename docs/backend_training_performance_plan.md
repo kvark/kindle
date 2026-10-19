@@ -8,20 +8,31 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-Immediate priority, requested October 19: [refresh current upstream onto the
-qualified learner](experiments/2026-10-19-upstream-refresh.md), preserving the
-isolated optimizations and measuring complete RGB/CDP updates. Meganeura
-`c19cb1ca` includes newer typed dense execution and measured-search work;
-Blade is `4845d652`. Integration is in progress, not a new qualified timing.
-This takes precedence over the unimplemented subgroup-reduction proposal.
-Do not interpret the old uniform workgroup-policy rejection as a test of the
-new complete upstream stack, or credit conditional search changes to defaults.
+The [October19 upstream refresh](results/2026-10-19-upstream-refresh.md) now
+qualifies Meganeura`c19cb1ca`/Blade`4845d652`/Naga`13f582dd` with retained isolated
+extensions, without a net speedup. New default dense lowering regressed full
+RGB/CDP33.08%/60.92%; restoring the qualified whole policy recovers most of it.
+RGB still failed recovery until the generated-source audit found a convolution
+route bypassing the retained vectorized/incremental generator. Restoring that
+route recovers3.367ms. Latest RGB42.983ms/CDP40.741ms are within.17%/.10% of the
+original fresh controls. Exact trajectories, programs and generated sources pass;
+all earlier failures remain. This was integration recovery, not JAX-gap progress.
+
+Next expose the already-qualified typed larger-reuse implementation to the
+common selector before testing measured whole-program search. The current typed
+candidate domain cannot select it; ordinary`build` does not exercise the recent
+search improvements. Preserve the fast incumbent and full generated-source
+coverage, not just plan labels. No new manual geometry/family sweep or assumption
+that search will fix convolution feeding. This takes precedence over the
+unimplemented subgroup-reduction proposal; both structural costs stay open.
 
 The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**43.197ms versus inclusive JAX27.223ms,1.59×**; B8 retains22.780/12.737ms,1.79×.
+**42.983ms versus inclusive JAX27.223ms,1.58×**; B8 retains22.780/12.737ms,1.79×.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
-The current isolated B32 candidate is native`e45b9c43` from
+The current-upstream isolated control is native`d3ff4948` under
+`runs/upstream-refresh-20261019.KWEh8dEH/conv-route`, with the same six flags.
+Its historical B32 anchor is native`e45b9c43` from
 [resident targets](results/2026-10-16-resident-targets-qualified.md), with
 `KINDLE_DEVICE_TARGETS=1` and the preceding backend flags. Its numerical/integration
 contract allows F32 encoding rounding; learning parity is untested. The preceding
