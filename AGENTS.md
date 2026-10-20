@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **CPU reduction-tail contract passes:** [result](docs/results/2026-10-20-reduction-tail-contract.md).
+  All1,534 generated reductions/eight actual RGB/CDP programs inventoried;
+  231 symbolic configurations/20,763 ordered nodes/6,625 independently constructed
+  row trees pass. Common RMS barriers could fall9→5 at full subgroup32; no
+  compiled candidate, numerical or speed claim. Ordinary Blade emission does
+  not enforce full subgroups: establish that contract, use actual subgroup/lane
+  IDs and preserve fallback, row geometry, ordered arithmetic and cross-subgroup/
+  final-publication barriers before GPU qualification. No local-ID assumption.
+  Latest upstreamf1f4395c/eae0c6f7 reviewed in isolation; matrix extraction/
+  rectangular staging/FP16 denorm changes do not implement this mechanism.
+  No runtime refresh. CPU review05:49:50UTC October20,13 receipts, zero GPU/
+  builds/updates/actions; no worker. Next isolated typed implementation and
+  complete offline compiler checks, not a sweep or Atari restart.
+  Keepd3ff4948/1.58x; convolution's larger deficit and the full goal stay open.
 - **Actual-model dense selection qualifies but fails performance acceptance:**
   [result](docs/results/2026-10-19-model-selector.md). RGB43.010→42.890ms,.28%,
   below3%; CDP40.817→40.375ms,1.08%. Keepd3ff4948/1.58x, no promotion/retime.

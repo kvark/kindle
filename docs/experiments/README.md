@@ -1,6 +1,11 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October20's [reduction-tail contract](../results/2026-10-20-reduction-tail-contract.md)
+passes CPU ordered-tree checks across all1,534 captured reductions/eight programs.
+Runtime full-subgroup enforcement and candidate compiler/GPU qualification remain;
+the proposed RMS9→5 barriers are not measured speed. No GPU calls or restart.
+
 October19's [actual-model selector](../results/2026-10-19-model-selector.md)
 passes527.640M exact output/raw-gradient comparisons and complete learner/state
 checks, but fails its3% RGB performance gate: .28% RGB/1.08% CDP reduction.

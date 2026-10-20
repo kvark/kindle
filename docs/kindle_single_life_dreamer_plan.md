@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 19, 2026. This is the authoritative roadmap.
+Updated October 20, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -22,8 +22,13 @@ but fails complete-update acceptance: RGB.28%/CDP1.08% less time. Full scratch
 accounting and180/206 changed pipeline selections rule out simple search-domain
 omission as the big missing lever. Preserve the untuned incumbent; no retime or
 promotion. Convolution feeding and non-matrix recurrence/materialization remain
-distinct structural targets. Resume CPU recurrence contracts, not a blind tile
-sweep or learning restart; the root-cause/parity goal stays open.
+distinct structural targets. The
+[reduction-tail CPU proof](results/2026-10-20-reduction-tail-contract.md) now
+preserves ordered arithmetic across the full captured reduction family. A
+runtime full-subgroup guarantee must precede implementation qualification;
+fewer proposed barriers are not a speedup. Next isolated implementation/offline
+validation, not a blind tile sweep or learning restart; the root-cause/parity
+goal stays open.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
 12.737 ms: still 1.79×**. Production remains on its earlier qualified~53 ms

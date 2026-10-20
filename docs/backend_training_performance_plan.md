@@ -1,6 +1,6 @@
 # Backend training performance plan
 
-Updated October 19, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 20, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
@@ -35,8 +35,15 @@ The timed plans really change180/206 dispatches/pipeline keys; full-race bounds
 111.25/228.625MiB fit the declared budget. Private kernel timings do not add up
 to full-update savings. Keep the untuned incumbent; no retime or promotion.
 
-Next resume the existing CPU subgroup-tail/slice-view contracts for non-matrix
-recurrence, preserving reduction order and source versions. Keep their limited
+The [CPU subgroup-tail contract](results/2026-10-20-reduction-tail-contract.md)
+now passes for all1,534 captured reductions:231 symbolic configurations and
+6,625 independently constructed row trees preserve exact operand ordering.
+Common RMS barriers could fall9→5, but this is not GPU code or a speed claim.
+Ordinary Blade emission does not enforce full subgroups; the isolated typed
+implementation must establish that guarantee, use actual subgroup/lane IDs and
+preserve fallback before complete offline and GPU qualification. Latest upstream
+f1f4395c/eae0c6f7 is reviewed, not runtime-refreshed; it does not implement this
+mechanism. Slice views remain a separate opportunity. Keep their limited
 opportunity distinct from the larger measured convolution-feeding deficit.
 Ordinary`build` still does not search, but missing dense selection is no longer
 a plausible large missing lever under this recipe. No geometry/family sweep,
