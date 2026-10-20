@@ -1,6 +1,11 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October20's [guarded reduction-tail implementation](../results/2026-10-20-reduction-tail.md)
+preserves complete numerical trajectories but regresses RGB/CDP updates.79%/3.32%.
+Reject without retiming/promotion; eight guards/six warnings/1,184 synthetic
+updates/zero actions. Both observer failures remain; no GPU cohort repeats.
+
 October20's [reduction-tail contract](../results/2026-10-20-reduction-tail-contract.md)
 passes CPU ordered-tree checks across all1,534 captured reductions/eight programs.
 Runtime full-subgroup enforcement and candidate compiler/GPU qualification remain;

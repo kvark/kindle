@@ -35,16 +35,18 @@ The timed plans really change180/206 dispatches/pipeline keys; full-race bounds
 111.25/228.625MiB fit the declared budget. Private kernel timings do not add up
 to full-update savings. Keep the untuned incumbent; no retime or promotion.
 
-The [CPU subgroup-tail contract](results/2026-10-20-reduction-tail-contract.md)
-now passes for all1,534 captured reductions:231 symbolic configurations and
-6,625 independently constructed row trees preserve exact operand ordering.
-Common RMS barriers could fall9→5, but this is not GPU code or a speed claim.
-Ordinary Blade emission does not enforce full subgroups; the isolated typed
-implementation must establish that guarantee, use actual subgroup/lane IDs and
-preserve fallback before complete offline and GPU qualification. Latest upstream
+The [guarded subgroup-tail implementation](results/2026-10-20-reduction-tail.md)
+now fails its complete-update cost gates: RGB42.936→43.275ms(.79% slower),
+CDP40.673→42.023ms(3.32% slower). All24/272 reports and four checkpoint states
+match exactly;1,972 offline modules pass. Runtime membership is guarded in the
+shader with an unchanged-tree fallback, requiring no Blade/Naga change.
+The common RMS9→5 barrier proposal does not establish reduced latency. Keep
+the incumbent; no retiming/specialization sweep or further qualification for
+this rejected implementation. Next implement the existing version-safe
+slice-view contract. Latest upstream
 f1f4395c/eae0c6f7 is reviewed, not runtime-refreshed; it does not implement this
-mechanism. Slice views remain a separate opportunity. Keep their limited
-opportunity distinct from the larger measured convolution-feeding deficit.
+mechanism. Keep the slice-view opportunity's limited potential distinct from
+the larger measured convolution-feeding deficit.
 Ordinary`build` still does not search, but missing dense selection is no longer
 a plausible large missing lever under this recipe. No geometry/family sweep,
 fixture-winner promotion, new GPU allocation or parity claim follows.

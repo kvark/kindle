@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Guarded reduction-tail implementation rejected:** [result](docs/results/2026-10-20-reduction-tail.md).
+  Complete RGB42.936→43.275ms/CDP40.673→42.023ms regress.79%/3.32%;
+  both declared cost gates fail. All24/272 reports/targets and four292/346-tensor
+  checkpoint pairs match exactly; full plans/groups/pipelines and27/30 changed
+  runtime shader bodies reconcile.1,972 offline modules/2,323 ownership cases
+  pass. Shader-level subgroup count/width guard preserves the old tree on partial
+  membership; no Blade/Naga change or fixed local-ID assumption. Primitive GPU
+  oracle, runtime branch observation and staged raw gradients remain unrun:
+  cost rejection ends this candidate without those allocations.
+  Eight guards/six warnings/1,184 synthetic updates/zero actions; final audit
+  06:08:32UTC, no worker. Preserve the CDP initial-step observer failure and
+  missing five runtime-source bodies per workload; repairs repeat no GPU cohort.
+  No retime, specialization/geometry sweep or promotion. Keepd3ff4948/1.58x.
+  Next version-safe slice-view implementation from the existing CPU proof;
+  its limited opportunity is not convolution's larger deficit or parity.
 - **CPU reduction-tail contract passes:** [result](docs/results/2026-10-20-reduction-tail-contract.md).
   All1,534 generated reductions/eight actual RGB/CDP programs inventoried;
   231 symbolic configurations/20,763 ordered nodes/6,625 independently constructed

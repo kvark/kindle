@@ -23,11 +23,11 @@ accounting and180/206 changed pipeline selections rule out simple search-domain
 omission as the big missing lever. Preserve the untuned incumbent; no retime or
 promotion. Convolution feeding and non-matrix recurrence/materialization remain
 distinct structural targets. The
-[reduction-tail CPU proof](results/2026-10-20-reduction-tail-contract.md) now
-preserves ordered arithmetic across the full captured reduction family. A
-runtime full-subgroup guarantee must precede implementation qualification;
-fewer proposed barriers are not a speedup. Next isolated implementation/offline
-validation, not a blind tile sweep or learning restart; the root-cause/parity
+[guarded reduction-tail implementation](results/2026-10-20-reduction-tail.md)
+preserves all24/272 reports, targets and checkpoint states, but regresses full
+RGB/CDP updates.79%/3.32%. Reject it without retiming or promotion: fewer proposed
+barriers are not a speedup. Next the already-proven version-safe slice-view
+opportunity, not a blind tile sweep or learning restart; the root-cause/parity
 goal stays open.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
