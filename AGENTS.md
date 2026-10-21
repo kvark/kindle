@@ -11,15 +11,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   completing the upstream port are not prerequisites for Atari. Stop further
   optimization/porting; use the already-qualified c8aeba28 implementation in
   `runs/convolution-reuse-native-20261021.foJSYVFJ` (CDP39.398ms synthetic update).
-  Build the live runner from that exact source, perform a bounded live-game
-  train/frozen-eval smoke, then resume the roadmap's CDP Freeway exploration
-  work toward the original five games. Declare fresh runs; do not restart the
+  The live runner now builds from that source. Perform a bounded live-game
+  train/frozen-eval smoke, then run fresh Freeway seed2017 for500k actions:
+  12M/B32/T16/BF16, eight environments, train ratio32, centered CDP and
+  action-effects scale1. Freeway exploration was solved in October5 results;
+  reliability remains open (October9 frozen2017=17.25 versus33.58/31.79).
+  Follow with frozen final and actual-initial controls,24 episodes each.
+  Batch/precision differ from the historical recipe: no isolated backend or
+  guaranteed learning-speedup claim. Declare fresh runs; do not restart the
   old interrupted queue or call checkpoint loading an equivalent lifetime resume.
   This supersedes older blanket Atari-stop/upstream-integration gates below.
   No JAX-parity gate. Upstream work is parked: localdefdef6, qualified60 GPU
   cases/2,987,208 F64 comparisons/zero warnings, in
   `runs/convolution-reuse-port-20261021.OiHEkqEk`; its cache is immutable.
-  Training is not yet running. Keep PR31 focused on learning progress.
+  Build and live smoke pass:4,096 actions/217 updates,1,024 frozen actions/
+  zero updates/all346 tensors exact. Preserve the first audit's file-serialization
+  mismatch; tensor comparison passes without repeating GPU work. Fresh500k
+  seed2017 is now running, followed automatically by final/initial evaluation,
+  in `runs/cdp-training-return-20261021.LaTWMxXh`, service
+  `kindle-cdp-freeway-2017-20261021`. Keep PR31 focused on learning.
 - **Packed convolution upstream port passes GPU qualification:**
   [result](docs/results/2026-10-21-convolution-packed-port.md). Local3e61376
   extends typed-backward132b574 on currenta75c38e: type-generic forward/dX/dW,

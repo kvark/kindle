@@ -5,18 +5,39 @@ Updated October 21, 2026. This is the authoritative roadmap.
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
 
-## Performance pivot
+## Return to training
 
 **October21 priority correction: return to CDP training.** Upstream integration
 and closing the remaining JAX gap are follow-up work, not training gates. Use
 the already-qualified c8aeba28 source (39.398ms CDP synthetic updates), build
-its live runner and run a bounded train/frozen-evaluation smoke. Then resume
-the declared Freeway exploration work toward the original five-game objective.
-Use fresh runs rather than resurrecting the interrupted queue. The historical
-Atari-stop and port-first directions below are superseded. Training has not
-restarted yet; PR31 tracks the handoff.
+its live runner and run a bounded train/frozen-evaluation smoke. Both pass:
+4,096 training actions/217 updates followed by1,024 frozen actions/zero updates,
+all346 saved tensors unchanged. The first audit compared file serialization;
+the corrected tensor comparison passes without repeating either GPU run.
+Fresh500k-action Freeway2017 training is now running, with final/initial frozen
+evaluations queued automatically in `runs/cdp-training-return-20261021.LaTWMxXh`
+(service `kindle-cdp-freeway-2017-20261021`).
 
-**Current work: [backend training performance](backend_training_performance_plan.md).**
+Freeway exploration is already solved ([October5](results/2026-10-05-freeway-effects-200k.md));
+the next task is reliability, not another exploration redesign. The
+[October9 capacity run](results/2026-10-09-cdp-freeway-capacity.md) scored
+33.58/17.25/31.79 across three seeds. Start fresh seed2017 for500k actions with
+eight vector environments,12M/B32/T16/BF16, train ratio32, centered CDP and
+action-effects scale1. Follow with24 natural frozen episodes of the final
+policy and24 of its actual initial policy, on matched evaluation seeds.
+Review learning progress and wall time before allocating the remaining games.
+This changes batch/precision as well as implementation relative to that old
+reference, so it is not an isolated backend-effect comparison.
+
+Use fresh runs rather than resurrecting the interrupted queue. The historical
+Atari-stop and port-first directions below are superseded. PR31 tracks the handoff.
+
+## Historical backend work (parked, not training prerequisites)
+
+The following entries retain historical results and proposed next steps; they
+do not override the return-to-training direction above.
+
+**Parked: [backend training performance](backend_training_performance_plan.md).**
 The [packed convolution port](results/2026-10-21-convolution-packed-port.md)
 passes48 GPU/F64 cases, including all three packed passes and split gradients.
 All14 packed/7 reuse source-SPIR-V pairs remain exact. Next wire full32/larger-reuse
