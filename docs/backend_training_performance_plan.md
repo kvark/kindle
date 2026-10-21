@@ -8,6 +8,20 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [packed register transpose](results/2026-10-21-b-register-transpose.md)
+now qualifies numerically but fails its instruction gate: warp+4.638%. Each
+affected case trades removed derived reads for the same added store conflicts;
+this is not equal-time attribution. The isolated typed BF16 bitcast fix and all
+nine actual modules qualify, without a Naga commit or production change. Both
+B-layout implementations stay closed, with no timing/padding/geometry follow-up.
+
+Next CPU-reconcile the unchanged pinned current-driver JAX executable and full
+convolution-capture recipe, then separately declare current-driver library
+counters. Historical580 JAX counters do not establish a fresh615 comparison.
+Keep all23 products/helpers and their distinct layouts/tiling; do not claim
+kernel/SASS identity or retry native assembly queries. Larger library reuse and
+pipelined feeding remain unresolved; keep79bc7cec/1.642× and Atari stopped.
+
 The [B-column scatter test](results/2026-10-21-b-column.md) closes that candidate:
 all nine numerical cases and35 model anchors pass, but warp instructions fall
 2.482%, below3%, while shared-store wavefronts rise2.392×. Its read-pattern fix
@@ -16,10 +30,10 @@ does not justify timing. No subset, retime or automatic promotion follows.
 A different register transpose preserves vector shared stores in its CPU
 bit/address proof. Both WGSL implementations fail: reshaped bitcast lowering,
 then BF16/u16 validation. Latest pinned Naga still has the latter restriction;
-nine actual SPIR-V raw roundtrip modules validate independently. Next minimal
-isolated typed bitcast support with negative tests, then complete offline
-transpose compilation. Full32 subgroup enforcement/actual IDs and appropriate
-Int16 enablement must precede any GPU comparison. No compiler commit without
+nine actual SPIR-V raw roundtrip modules validate independently. Isolated typed
+bitcast support, negative tests and complete offline transpose compilation
+subsequently pass above, followed by a rejected GPU counter result. That test
+explicitly enforces full32 subgroups/actual IDs and Int16 enablement. No compiler commit without
 permission, validator bypass or payload-changing F32 conversion. Larger library
 reuse/pipelined feeding remains distinct. Keep79bc7cec/1.642×; no worker remains.
 

@@ -8,6 +8,13 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [packed B transpose](results/2026-10-21-b-register-transpose.md) passes GPU
+correctness but fails the instruction gate:4.638% more warp work. It exchanges
+the extra reads for store conflicts; no timing/promotion follows. The compiler
+prerequisite is fixed only in an isolated uncommitted checkout. Next reconcile
+the current-driver JAX comparison before another optimization proposal. No new
+learning result; retain79bc7cec/1.642×. All workers are terminal, Atari stopped.
+
 The [B-column experiment](results/2026-10-21-b-column.md) passes correctness but
 fails its instruction gate:2.482% less warp work,2.392× shared-store wavefronts.
 No timing or learning restart. A register-transpose CPU proof passes, but shader

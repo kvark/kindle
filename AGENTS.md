@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Packed B transpose rejected after compiler/GPU qualification:**
+  [result](docs/results/2026-10-21-b-register-transpose.md). Warp+4.638%, fails3%
+  reduction gate; no timing/promotion. Each of9 cases trades removed derived
+  reads for exactly as many extra store conflicts/wavefronts,209.715M total;
+  not equal latency. All35 model anchors/exact numerics pass.18 guards/zero
+  warnings/1,008 dispatches/450 passes/zero updates/actions; GPU12:38:54UTC.
+  Isolated uncommitted Naga bitcast fix passes9 BF16/144 library/184 WGSL-error
+  tests,strict Clippy,15 test/18 actual modules/nine exact controls. Full32 and
+  Int16 explicitly enabled;8,192 ownership checks. Preserve writer-enable,
+  enum-qualification and stack-size failures; no lint relaxation/GPU repeats.
+  633 receipts12:41:15,no worker;2.105GiB duplicate blocks reclaimed,all36 paths
+  retained. Compiler stays in runs/bf16-bitcast-20261021.y6n5Yux5, no commit.
+  Both B-layout candidates closed; no padding/geometry sweep or assembly retry.
+  Next CPU reconcile pinned current-driver JAX executable/capture recipe before
+  separately declared full-family counters; historical580 JAX is not current615.
+  Keep79bc7cec/1.642x; larger feeding gap/five-game goal open, Atari off.
 - **B-column scatter rejected; register transpose has a compiler prerequisite:**
   [result](docs/results/2026-10-21-b-column.md). All9 GPU cases/35 model anchors
   pass; extra derived reads209.715M removed, but warp falls2.482% below3% gate

@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [packed B transpose](../results/2026-10-21-b-register-transpose.md)
+passes GPU numerics/35 model anchors but adds4.638% warp instructions. Every
+affected case replaces removed derived reads with identical added store-conflict
+counts. No timing/promotion.18 guards/zero warnings/450 passes/zero updates/actions.
+Isolated compiler fix passes9 BF16/144 library/184 WGSL-error tests and all18
+actual modules; no Naga commit.633-receipt audit12:41:15UTC, no worker.
+
 October21's [B-column scatter](../results/2026-10-21-b-column.md) passes all9
 GPU cases/35 anchors but fails its3% warp gate at2.482%; writes rise2.392×.
 18 guards/zero warnings/450 passes/zero learner updates/actions; no timing.
