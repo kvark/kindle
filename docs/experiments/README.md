@@ -1,6 +1,11 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [optimizer poison/cache qualification](../results/2026-10-21-optimizer-cached.md)
+passes on current upstream and the retained cached runtime; draft MeganeuraPR275
+contains the repair. Two guards/zero warnings/106 synthetic Session updates,
+zero full Dreamer updates/actions. Complete-model numerical/cost checks remain.
+
 October21's [optimizer state/Session qualification](../results/2026-10-21-optimizer-state-boundaries.md)
 passes786,432 stateful checks and current-upstream backward/checkpoint tests.
 Nonfinite-state poisoning and cached/full-model qualification remain. Two guards,

@@ -24,10 +24,12 @@ fixes all original failures without changing epsilon or stored state format;
 ten unaffected first-step cases remain bit-exact. The subsequent
 [stateful and current-upstream Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
 passes786,432 boundary/sequence checks plus actual raw gradients/checkpoint
-continuation. **Next: preserve nonfinite-history poisoning in the beta2=0 guard,
-then qualify the retained command cache and complete-model numerics/cost.**
-Upstream has no retained cache API; that path is not covered. The finite-input
-tests are not full-model or performance qualification. Latest Blade's
+continuation. [Poison and retained-cache qualification](results/2026-10-21-optimizer-cached.md)
+now also passes; draft MeganeuraPR275 contains the repair. The retained runtime
+checks are separate from upstream, which has no cache API. **Next: complete RGB/CDP
+numerical qualification, then repair overhead measurement.** Built candidate6b621e5c
+changes only the optimizer shader; no full-model update has run on it yet.
+Component tests are not full-model or performance qualification. Latest Blade's
 F16 preservation is not an F32 repair. No more performance allocation or Atari
 restart follows until this numerical issue is addressed.
 

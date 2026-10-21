@@ -22,9 +22,10 @@ FP32 denormal preservation. Scaled GPU arithmetic fixes the original fixture
 without changing epsilon or variance storage. The subsequent
 [stateful/Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
 passes boundary sequences, raw gradients and checkpoint continuation on current
-upstream. Nonfinite-state poisoning, the retained command cache and full-model
-numerical/cost qualification remain; this is not yet a learner fix or learning
-result. No production/Atari restart.
+upstream. [Nonfinite-state and retained-cache qualification](results/2026-10-21-optimizer-cached.md)
+also passes; the repair is in draft MeganeuraPR275. Complete-model numerical/cost
+qualification remains before adoption. No full-model execution on the new
+candidate, production/Atari restart or learning result yet.
 
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.

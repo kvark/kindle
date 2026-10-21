@@ -7,22 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Finite-state optimizer and upstream Session qualification pass:**
-  [result](docs/results/2026-10-21-optimizer-state-boundaries.md). Repair the
-  beta2=0 history guard;786,432 checks/4,096 standalone updates pass across
-  Adam/LaProp/four decays/512-step sequences. CPU8.389M decode/16.777M encode
-  checks pass. Current upstreama75c38e/Bladeeae0c6f7/Nagaa489554c plus helper
-  passes two actual Session tests:512 raw gradients/1,536 F64 checks/four
-  checkpoints/960 exact restore-continuation values;192 independently parsed
-  checkpoint values pass. Local prototypec4f2cc2 at/x/Code/meganeura-optimizer-subnormal,
-  not production/pushed/upstream-ready. Two guards/zero warnings/4,096 standalone+
-  49 synthetic Session updates/zero full Dreamer updates/actions; no worker.
-  CPU wrong-counterexample/serialization and workspace/lock failures remain.
-  Next preserve nonfinite-history poisoning at beta2=0; source review finds
-  current zero-history selection discards it, untested on GPU. Move workstation
-  headroom gate out of portable regression. Then qualify retained command-cache
-  runtime and full-model numerics/cost. Upstream has no such cache API; do not
-  claim it was tested. No epsilon/state-format change or Atari restart.
+- **Optimizer poison and cached-runtime qualification pass:**
+  [result](docs/results/2026-10-21-optimizer-cached.md). Finite-history guard
+  preserves NaN/Inf;192 new classifications/value checks and prior finite/raw-
+  gradient/checkpoint tests pass on latesta75c38e/Bladeeae0c6f7/Nagaa489554c.
+  Portable regression has no workstation headroom gate; local launcher retains it.
+  Draft MeganeuraPR275/4bdcb8d is pushed, not merged. Same shader-only change on
+  retainedd3ff4948 backend passes three tests/eight cache recording+replay checks;
+  192 checkpoint values/metadata exact. Built Kindle6b621e5c in
+  runs/optimizer-cached-20261021.2sOmnmzz, no full-model execution yet.
+  Two guards/zero warnings/106 synthetic Session updates/zero Dreamer updates/
+  actions;342/451 receipts pass, no worker. Missing-wrapper-seal failure is
+  pre-child. Original checkpoint byte gate remains failed3/4 due metadata key
+  order; separate strict semantic audit/eight negatives pass, no GPU repeat.
+  Next complete RGB/CDP numerical qualification then repair overhead, preserving
+  six flags/config/precision. Keepd3ff4948 control; no reproduction of known-bad
+  underflow, automatic promotion or Atari restart. Full parity/learning goal open.
 - **JAX tiny-gradient control and first GPU repair pass:**
   [result](docs/results/2026-10-21-optimizer-denormals.md). Pinned JAX passes96
   F64 checks and preserves tiny variances; queried Vulkan FP32 DenormPreserve
