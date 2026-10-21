@@ -17,6 +17,11 @@ counter observer on current sources for RGB world and CDP imagination; historica
 580 counters cannot stand in for615 captures. Five-game success is still open;
 production/Atari remain stopped, no automatic observer promotion.
 
+The observer CPU contract now covers all current RGB world/CDP imagination
+dispatches and fits the existing profiler storage budget. It proves a marker-only
+source port is feasible, not current-driver counters. Implementation/build and
+ordinary numerical qualification come next; no additional coarse profile needed.
+
 The [new-driver JAX control](results/2026-10-21-driver615-baseline.md) measures
 26.066ms inclusive versus native48.281ms,1.85×. Its trajectory and compiled work
 are unchanged. A separate native optimizer probe now exposes tiny-gradient

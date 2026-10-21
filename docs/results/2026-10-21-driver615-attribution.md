@@ -112,3 +112,38 @@ original model execution and compare counters only at reconciled boundaries.
 This targets both the RGB/JAX structural question and the CDP learning path;
 it is not permission to substitute RGB throughput for five-game success.
 The performance gap and Atari five-game goal remain unfinished.
+
+### Follow-up: current counter-observer CPU contract passes
+
+The saved current plans admit complete, nonnested partitions:41 RGB ranges
+cover all3,751 world dispatches, including23 separate convolutions;52 CDP
+ranges cover all763 imagination dispatches. An independent reverse dependency
+walk isolates82 bonus-exclusive dispatches without dropping any base consumer.
+All12 ensemble matrix products remain64.425G nominal MACs, with their actual
+parameter names, types, dimensions and selected kernels retained. This is
+logical work, not current-driver instructions or a removable latency budget.
+
+Removing the old observer's marker additions reproduces today's two command
+recording functions exactly after whitespace normalization; convolution boundary
+predicates match too. The current isolated Blade already has primary-command
+and device-handle accessors, but lacks the old secondary-command accessor.
+Reintroduce only that diagnostic accessor in an isolated copy; no compiler or
+shader change is implied. No observer is compiled or current-driver counter
+support established yet.
+
+Ten negative partition tests reject gaps, overlaps, wrong labels, CTA counts
+and duplicate names. The existing SDK host-only sizing executable needs
+27,923,748 bytes for the larger53-range capture including its empty control,
+below the unchanged128MiB cap. Zero device handles, target initialization or GPU
+calls occur. This is profiler storage sizing, not a GPU-memory or driver-health
+test. Runtime counter availability and output qualification remain prerequisites.
+
+The first CPU reader was killed at its2GiB limit while decoding whole plan JSON
+and large constant payloads. Its source/log/service remain. A separate bounded
+metadata/constant-ID reader passes under the same limit; no increased resource
+budget, build or GPU repeat. Independent review finishes **08:56:30UTC** with
+all sources sealed; no worker remains. Artifacts:
+`runs/current-counter-contract-20261021.0GrKXG3X`.
+Next implement and compile this marker-only port, verify ordinary transfer and
+then declare bounded current-driver captures. Do not rerun completed coarse
+profiling or resurrect rejected numerical/kernel candidates.

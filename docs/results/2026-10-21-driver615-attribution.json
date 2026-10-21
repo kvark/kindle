@@ -442,5 +442,55 @@
     "CDP is not a matched JAX workload"
   ],
   "finished_utc": "2026-10-21T08:48:28.281196+00:00",
-  "publication_receipts": 63
+  "publication_receipts": 63,
+  "counter_observer_cpu_followup": {
+    "status": "passed",
+    "rgb_ranges": 41,
+    "cdp_ranges": 52,
+    "empty_control_ranges_per_capture": 1,
+    "dispatches": {
+      "rgb": 3751,
+      "cdp": 763
+    },
+    "bonus_exclusive_dispatches": 82,
+    "ensemble_macs": 64424509440,
+    "reverse_closure_matches": true,
+    "negative_partition_tests": 10,
+    "storage": {
+      "device_handles": 0,
+      "gpu_calls": 0,
+      "rows": [
+        {
+          "counter_data_bytes": 1061436,
+          "passes_128MiB_limit": true,
+          "ranges": 2
+        },
+        {
+          "counter_data_bytes": 599932980,
+          "passes_128MiB_limit": false,
+          "ranges": 1139
+        },
+        {
+          "counter_data_bytes": 27923748,
+          "passes_128MiB_limit": true,
+          "ranges": 53
+        }
+      ],
+      "status": "complete",
+      "target_initializations": 0
+    },
+    "marker_projection_matches_current": true,
+    "secondary_accessor_required": true,
+    "compiled_observer": false,
+    "current_driver_counter_support_unverified": true,
+    "gpu_calls": 0,
+    "builds": 0,
+    "learner_updates": 0,
+    "game_actions": 0,
+    "original_cpu_oom_retained": true,
+    "memory_limit_bytes": 2147483648,
+    "finished_utc": "2026-10-21T08:56:30.273975+00:00",
+    "source_receipts": 18,
+    "artifact_root": "/x/Code/kindle/runs/current-counter-contract-20261021.0GrKXG3X"
+  }
 }

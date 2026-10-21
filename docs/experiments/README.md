@@ -7,6 +7,10 @@ overhead. RGB48.442ms/CDP41.893ms ordinary; means/targets only.281/.278ms,
 cached model execution dominates. Four guards/zero warnings/1,088 synthetic
 updates/zero actions; CPU preflight/tail-reader repairs repeat no GPU work.
 No production/Atari change. Next current-runtime SDK observer CPU qualification.
+The same report's follow-up now passes that CPU contract:41/52 complete ranges,
+independent CDP bonus closure,ten negative tests,marker-erasure identity and
+host-only storage sizing. Original whole-plan2GiB OOM remains; bounded reader
+passes unchanged limits. No build/GPU call; marker-only implementation is next.
 
 October21's [final optimizer interface](../results/2026-10-21-optimizer-final.md)
 passes all six CI jobs including Metal,161M state comparisons and exact complete

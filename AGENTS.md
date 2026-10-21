@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Current counter-observer CPU contract passes:**
+  [follow-up](docs/results/2026-10-21-driver615-attribution.md#follow-up-current-counter-observer-cpu-contract-passes).
+  Complete41 RGB/52 CDP ranges cover3,751/763 dispatches; independent reverse
+  closure proves82 bonus-exclusive dispatches/12 matrices/64.425G nominal MACs.
+  Ten malformed partitions reject. Marker erasure matches current recording
+  functions; only isolated Blade secondary-handle accessor needs restoring.
+  Host-only SDK sizing53 ranges27,923,748B fits128MiB; zero device/GPU calls.
+  Original whole-JSON CPU2GiB OOM remains; bounded metadata reader passes same
+  limit. Review08:56:30UTC, no builds/updates/actions/worker. Not compiled or
+  current-driver counter qualification. Next marker-only implementation/build,
+  exact ordinary transfer, then separately declared bounded current615 captures.
+  Keep72005c8b/1.858x; no coarse retime, tile sweep, production or Atari restart.
 - **Current-driver complete attribution qualifies:**
   [result](docs/results/2026-10-21-driver615-attribution.md). Ordinary RGB48.442ms/
   CDP41.893ms; coarse overhead1.926%/1.947%, exact272 reports/targets and292/346

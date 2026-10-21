@@ -20,6 +20,16 @@ RGB world and CDP imagination before declaring current-driver GPU captures.
 Do not assume historical580 instructions survived the driver/runtime changes.
 Keep ordinary72005c8b; no observer promotion, tile sweep or Atari restart.
 
+That observer's [CPU contract now passes](results/2026-10-21-driver615-attribution.md#follow-up-current-counter-observer-cpu-contract-passes):
+41 RGB/52 CDP ranges cover the complete current programs;82 CDP bonus-exclusive
+dispatches include all12 ensemble products. Independent closure/ten negative
+partition tests pass. Marker erasure reproduces current recording functions;
+the missing isolated secondary-handle accessor is identified. SDK host-only
+sizing fits27.924MB within128MiB; no GPU/device calls. Preserve the whole-plan
+CPU OOM and bounded-reader repair at the unchanged2GiB limit. Next implement/
+compile the diagnostic port, qualify ordinary transfer, then bounded counters.
+No current-driver instruction or performance improvement claim follows yet.
+
 The [final optimizer interface](results/2026-10-21-optimizer-final.md) now passes:
 all six Meganeura CI1048 jobs, unchanged Metal regressions,161M actual-model
 state comparisons, exact272 reports/checkpoints and essentially unchanged
