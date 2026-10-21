@@ -7,73 +7,31 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Freeway B8 cohort fails reliability; test cheap generic exploration:**
-  [result](docs/results/2026-10-21-cdp-freeway-reliability.md).1009/2017/3019
-  score31.83/30.58/0, initial0 each,48/72 crossing successes.1h54m11s total;
-  nine guards/zero warnings/six videos and audits pass, finish18:42:16UTC.
-  Failed3019 finds one crossing; it enters25 updates, so not a wholly
-  disconnected reward channel. No stability or five-game victory claim.
-  Fresh3019 with5% persistent-uniform16-action blocks is running,500k actions,
-  otherwise unchanged B8/BF16/CDP/intrinsic recipe; frozen overrides off,
-  final/initial24-round controls and exact frozen tensor exports queued.
-  Service`kindle-cdp-freeway-persistent-v3-3019-20261021`, linked artifacts
-  `runs/cdp-freeway-persistent-v3-20261021.QSzX1nuK`. Preserve earlier CLI
-  rejection before GPU/env/actions in`cdp-freeway-persistent-20261021.Y7bKJQkQ`.
-  Also preserve v2's wrapper-fingerprint path failure after initialization,
-  zero actions/updates. Adapter permission and loaded-wrapper provenance
-  repairs/285 CPU tests pass; native code unchanged.
-  This is disclosed generic guidance, not pure intrinsic success or a game
-  action hint. No automatic extension/sweep; Pong2M remains pending, backend
-  optimization stays parked.
-- **B8 restores learning; verify remaining seeds:** [result](docs/results/2026-10-21-cdp-freeway-b8.md).
-  Same-current-backend/BF16 seed2017 scores30.58 versus B32's0,24/24 rounds
-  reach25 crossings, actual-initial0.500k actions/124,939 updates take37m36s;
-  all346 initial tensors match B32 exactly. Three guards/zero warnings/full
-  replays/videos and automatic audit pass, finished17:19:57UTC. No optimizer/
-  kernel rewrite; batch changes cadence and sampled trajectories, not an
-  isolated proof about optimizer-step count. Historical B8 scored17.25 in
-  3h54m12s on different precision/backend; one seed is not reliability.
-  Original seeds1009/3019 now run serially with unchanged B8 recipe,500k actions
-  each, final/initial24-round controls and audits. Service
-  `kindle-cdp-freeway-reliability-20261021`, linked artifacts
-  `runs/cdp-freeway-reliability-20261021.osxXuUW7` on fresh `/mnt/data` storage.
-  Storage differs from2017; don't attribute its wall-time effects to learning.
-  Review the completed cohort before more allocations; backend work stays parked.
-- **Live learning, not optimization:** [Freeway return result](docs/results/2026-10-21-cdp-training-return.md).
-  B32/BF16 seed2017 completes500k actions/31,211 updates in28m14s, but final
-  and actual-initial frozen scores are0/0 across24 rounds each. One training
-  crossing enters45 learner updates; no broad reward-disconnection finding.
-  Three guards/zero warnings/full videos and CDP-compatible audit pass;
-  preserve the controller's inapplicable extrinsic-only final-audit failure.
-  Fresh B8 seed2017 has completed on the same binary/BF16/recipe, only batch and
-  microbatch changed; all346 actual initial tensors match.500k actions,
-  expected124,939 updates, then final/initial24-episode evaluations and videos.
-  Service`kindle-cdp-freeway-b8-2017-20261021`, artifacts
-  `runs/cdp-freeway-b8-20261021.JEzySupH`. No new optimizer/kernel project or
-  automatic broad campaign. Review this batch-control learning result first.
-- **Return to training now (user correction, October21).** Backend parity and
-  completing the upstream port are not prerequisites for Atari. Stop further
-  optimization/porting; use the already-qualified c8aeba28 implementation in
-  `runs/convolution-reuse-native-20261021.foJSYVFJ` (CDP39.398ms synthetic update).
-  The live runner now builds from that source. Perform a bounded live-game
-  train/frozen-eval smoke, then run fresh Freeway seed2017 for500k actions:
-  12M/B32/T16/BF16, eight environments, train ratio32, centered CDP and
-  action-effects scale1. Freeway exploration was solved in October5 results;
-  reliability remains open (October9 frozen2017=17.25 versus33.58/31.79).
-  Follow with frozen final and actual-initial controls,24 episodes each.
-  Batch/precision differ from the historical recipe: no isolated backend or
-  guaranteed learning-speedup claim. Declare fresh runs; do not restart the
-  old interrupted queue or call checkpoint loading an equivalent lifetime resume.
-  This supersedes older blanket Atari-stop/upstream-integration gates below.
-  No JAX-parity gate. Upstream work is parked: localdefdef6, qualified60 GPU
-  cases/2,987,208 F64 comparisons/zero warnings, in
-  `runs/convolution-reuse-port-20261021.OiHEkqEk`; its cache is immutable.
-  Build and live smoke pass:4,096 actions/217 updates,1,024 frozen actions/
-  zero updates/all346 tensors exact. Preserve the first audit's file-serialization
-  mismatch; tensor comparison passes without repeating GPU work. Fresh500k
-  seed2017 has completed with failed learning as recorded above,
-  in `runs/cdp-training-return-20261021.LaTWMxXh`, service
-  `kindle-cdp-freeway-2017-20261021`. Keep PR31 focused on learning.
+- **Training is the priority; backend optimization and upstream porting are parked.**
+  Use the qualified c8aeba28 native implementation. JAX parity is not a learning
+  prerequisite. Older backend next steps below are historical, not active gates.
+- **Pong1009 is running:** fresh2M actions, eight environments, batched inference,
+  B8/T16/BF16/12M centered CDP/action-effects1, no action overrides.
+  Service `kindle-cdp-pong-budget-1009-20261021`, artifacts
+  `runs/cdp-pong-budget-20261021.SNxyTFk7`.
+  Fixed500k/2M/actual-initial frozen controls,24 natural rounds each, exact frozen
+  tensors and whole videos are automated. Review this seed before allocating more;
+  no checkpoint lifetime resume or automatic broad campaign.
+- **Freeway selected-seed exploration rescue passes:** [result](docs/results/2026-10-21-cdp-freeway-reliability.md).
+  Failed3019 improves0→32.96,24/24 rounds reach25 crossings, actual-initial0.
+  Fresh500k actions/124,939 updates take38m19s with5% persistent-uniform
+  16-action blocks; overrides are disabled in evaluation. All346 initial tensors
+  match the failed control; both frozen346-tensor exports and full replay/video
+  audits pass. Service finishes19:31:28UTC; no Freeway worker remains.
+  This intentionally selected seed does not establish reliability; do not combine
+  it with unassisted seeds into a claimed single-recipe successful cohort.
+  Preserve CLI refusal before GPU/actions and copied-wrapper provenance failure
+  after initialization/zero actions. Adapter repairs/285 CPU tests pass.
+- **Unassisted B8 Freeway reliability remains unresolved:**1009/2017/3019 score
+  31.83/30.58/0, initial0 each;48/72 crossing successes,1h54m11s total.
+  B8 seed2017 recovers from same-backend B32's0 but is not stable across seeds.
+  Both batch recipes retain their evidence; faster synthetic updates are not
+  the learning objective. Full five-game mastery remains unfinished.
 - **Packed convolution upstream port passes GPU qualification:**
   [result](docs/results/2026-10-21-convolution-packed-port.md). Local3e61376
   extends typed-backward132b574 on currenta75c38e: type-generic forward/dX/dW,

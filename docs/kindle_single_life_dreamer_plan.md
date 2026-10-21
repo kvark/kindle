@@ -7,47 +7,31 @@ Updated October 21, 2026. This is the authoritative roadmap.
 
 ## Return to training
 
-**Cohort update:** [B8 Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md)
-finishes31.83/30.58/0: two successful seeds, one failure. Do not promote the
-single-seed batch recovery into a stability claim. A bounded fresh3019 test
-adds generic persistent-uniform controls on5% of16-action blocks, with no
-frozen overrides, reward shaping or directional hint. Model/B8/BF16 settings
-stay unchanged. Review this intervention before any further allocation;
-longer-budget Pong is pending, not cancelled or replaced by backend work.
+**Training is the active work.** Backend parity and upstream integration are
+parked, not prerequisites. Use the qualified c8aeba28 live runner with BF16,
+eight vector environments and batched inference. The initial live/frozen smoke
+passes; no new optimization project is needed to play.
 
-**Latest learning result:** [B8 Freeway2017](results/2026-10-21-cdp-freeway-b8.md)
-scores30.58 and passes25 crossings in24/24 frozen rounds; actual-initial0.
-500k actions take37m36s. The same-backend B32 run took28m14s but scored0;
-all346 actual initial tensors are identical. Keep B8 for the next learning
-replicates rather than treating synthetic throughput as the objective.
-Original seeds1009/3019 are now allocated serially with unchanged B8/BF16
-recipe,500k actions each and final/actual-initial frozen controls. Review the
-whole cohort before further allocation. Backend optimization remains parked.
+[Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md) remains
+unresolved: unassisted B8 seeds1009/2017/3019 score31.83/30.58/0. A fresh test
+of the failed3019 seed with generic persistent-uniform exploration reaches32.96,
+24/24 rounds above25 crossings, versus actual-initial0. Evaluation removes the
+aid; exact frozen tensors and whole replay/videos pass. This is a selected-seed
+rescue, not a replicated recipe. Keep it separate from the unassisted cohort.
 
-**October21 priority correction: return to CDP training.** Upstream integration
-and closing the remaining JAX gap are follow-up work, not training gates. Use
-the already-qualified c8aeba28 source (39.398ms CDP synthetic updates), build
-its live runner and run a bounded train/frozen-evaluation smoke. Both pass:
-4,096 training actions/217 updates followed by1,024 frozen actions/zero updates,
-all346 saved tensors unchanged. The first audit compared file serialization;
-the corrected tensor comparison passes without repeating either GPU run.
-That first500k-action Freeway2017 train/evaluation pair has now completed in
-`runs/cdp-training-return-20261021.LaTWMxXh`
-(service `kindle-cdp-freeway-2017-20261021`).
+**Now running: fresh Pong1009,2M actions.** Retain the unassisted B8/BF16/12M
+centered-CDP/action-effects1 recipe. Save500k checkpoints and evaluate the fixed
+500k prefix,2M final and actual-initial policy for24 natural rounds each.
+Automated checks cover zero evaluation updates, exact frozen tensors, action
+replay and whole videos. Review this seed before allocating more.
+[Allocation](experiments/2026-10-21-cdp-pong-budget.md);
+service `kindle-cdp-pong-budget-1009-20261021`;
+artifacts `runs/cdp-pong-budget-20261021.SNxyTFk7`.
 
-Freeway exploration is already solved ([October5](results/2026-10-05-freeway-effects-200k.md));
-the next task is reliability, not another exploration redesign. The
-[October9 capacity run](results/2026-10-09-cdp-freeway-capacity.md) scored
-33.58/17.25/31.79 across three seeds. Start fresh seed2017 for500k actions with
-eight vector environments,12M/B32/T16/BF16, train ratio32, centered CDP and
-action-effects scale1. Follow with24 natural frozen episodes of the final
-policy and24 of its actual initial policy, on matched evaluation seeds.
-Review learning progress and wall time before allocating the remaining games.
-This changes batch/precision as well as implementation relative to that old
-reference, so it is not an isolated backend-effect comparison.
-
-Use fresh runs rather than resurrecting the interrupted queue. The historical
-Atari-stop and port-first directions below are superseded. PR31 tracks the handoff.
+Do not restart interrupted queues or call checkpoint loading an equivalent
+lifetime resume. Keep all five games and their published reference targets;
+one rescued Freeway seed or a good Pong run does not finish that goal.
+PR31 is the high-level dashboard. Historical backend gates below are superseded.
 
 ## Historical backend work (parked, not training prerequisites)
 

@@ -56,10 +56,21 @@ reporter now hashes the actually imported wrapper module. The285 CPU tests
 also cover a wrapper loaded from another path. Both failed guards/sources stay;
 there was no native numerical/API fault or recovery.
 
-A fresh separately declared run uses
-`kindle-cdp-freeway-persistent-v3-3019-20261021`. It additionally exports both
-frozen checkpoints for exact346-tensor comparisons. No automatic extension
-or parameter sweep. Longer-budget Pong remains pending; backend work is parked.
+The fresh separately declared run completes successfully at19:31:28UTC:
+**32.9583 mean,24/24 rounds reaching25 crossings**, actual-initial0.
+500k actions/124,939 updates take2299.31s (38m19s). All346 actual initial
+tensors match the failed unassisted3019 control. Both frozen exports preserve
+all346 tensors exactly; complete action/override accounting and whole CPU
+replays/videos pass. The exploration aid is absent in frozen evaluation.
+
+This rescues one intentionally selected failed seed, not reliability across
+seeds. Do not replace the failed unassisted result or splice this score into
+that cohort. No exploration sweep follows. A fresh unassisted Pong1009 run
+now tests2M actions with fixed500k/final/initial evaluations; backend work stays
+parked.
+
+- [Rescue audit](../../runs/cdp-freeway-persistent-v3-20261021.QSzX1nuK/seed-3019/learning-review.json)
+- [Successful whole rollout](../../runs/cdp-freeway-persistent-v3-20261021.QSzX1nuK/seed-3019/freeway-3019-final.mp4)
 
 - [Cohort](../../runs/cdp-freeway-reliability-20261021.osxXuUW7/cohort.json)
 - [1009 whole video](../../runs/cdp-freeway-reliability-20261021.osxXuUW7/seed-1009/freeway-1009-final.mp4)
