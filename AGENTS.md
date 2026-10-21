@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Live learning, not optimization:** [Freeway return result](docs/results/2026-10-21-cdp-training-return.md).
+  B32/BF16 seed2017 completes500k actions/31,211 updates in28m14s, but final
+  and actual-initial frozen scores are0/0 across24 rounds each. One training
+  crossing enters45 learner updates; no broad reward-disconnection finding.
+  Three guards/zero warnings/full videos and CDP-compatible audit pass;
+  preserve the controller's inapplicable extrinsic-only final-audit failure.
+  Fresh B8 seed2017 is running on the same binary/BF16/recipe, only batch and
+  microbatch changed; all346 actual initial tensors match.500k actions,
+  expected124,939 updates, then final/initial24-episode evaluations and videos.
+  Service`kindle-cdp-freeway-b8-2017-20261021`, artifacts
+  `runs/cdp-freeway-b8-20261021.JEzySupH`. No new optimizer/kernel project or
+  automatic broad campaign. Review this batch-control learning result first.
 - **Return to training now (user correction, October21).** Backend parity and
   completing the upstream port are not prerequisites for Atari. Stop further
   optimization/porting; use the already-qualified c8aeba28 implementation in
@@ -27,7 +39,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Build and live smoke pass:4,096 actions/217 updates,1,024 frozen actions/
   zero updates/all346 tensors exact. Preserve the first audit's file-serialization
   mismatch; tensor comparison passes without repeating GPU work. Fresh500k
-  seed2017 is now running, followed automatically by final/initial evaluation,
+  seed2017 has completed with failed learning as recorded above,
   in `runs/cdp-training-return-20261021.LaTWMxXh`, service
   `kindle-cdp-freeway-2017-20261021`. Keep PR31 focused on learning.
 - **Packed convolution upstream port passes GPU qualification:**

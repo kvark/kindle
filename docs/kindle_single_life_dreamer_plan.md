@@ -7,6 +7,14 @@ Updated October 21, 2026. This is the authoritative roadmap.
 
 ## Return to training
 
+**Latest learning result:** [B32 Freeway2017](results/2026-10-21-cdp-training-return.md)
+finishes500k actions in28m14s, but scores0 in24 final frozen rounds, matching
+its actual-initial control. Only one training crossing occurred. This is not
+a successful speed-for-learning tradeoff. A fresh B8 control is now running
+on the same BF16 backend with identical initial tensors and all other settings
+unchanged. Finish its500k actions and final/initial evaluations before further
+allocation. Backend optimization remains parked.
+
 **October21 priority correction: return to CDP training.** Upstream integration
 and closing the remaining JAX gap are follow-up work, not training gates. Use
 the already-qualified c8aeba28 source (39.398ms CDP synthetic updates), build
@@ -14,8 +22,8 @@ its live runner and run a bounded train/frozen-evaluation smoke. Both pass:
 4,096 training actions/217 updates followed by1,024 frozen actions/zero updates,
 all346 saved tensors unchanged. The first audit compared file serialization;
 the corrected tensor comparison passes without repeating either GPU run.
-Fresh500k-action Freeway2017 training is now running, with final/initial frozen
-evaluations queued automatically in `runs/cdp-training-return-20261021.LaTWMxXh`
+That first500k-action Freeway2017 train/evaluation pair has now completed in
+`runs/cdp-training-return-20261021.LaTWMxXh`
 (service `kindle-cdp-freeway-2017-20261021`).
 
 Freeway exploration is already solved ([October5](results/2026-10-05-freeway-effects-200k.md));
