@@ -17,11 +17,15 @@ failure: subnormal F32 second moments become zero and LaProp momentum reaches30
 instead ofabout.1. Six signed cases fail independent variance/momentum/update
 checks. This is not a GPU wedge or a measured explanation of the performance gap.
 
-**Next: qualify F32 optimizer underflow handling on GPU.** Compare the pinned JAX
-optimizer on the same explicit inputs, inspect emitted float controls and select
-a minimal repair with independent references. Preserve epsilon/model semantics;
-latest Blade's F16 preservation is not an F32 qualification. No more performance
-allocation or Atari restart follows until this numerical issue is addressed.
+The [pinned JAX comparison and first GPU repair](results/2026-10-21-optimizer-denormals.md)
+now pass96 independent checks each. JAX preserves tiny variances; Vulkan reports
+no explicit FP32 denormal-preservation support. A shared scaled-variance shader
+fixes all original failures without changing epsilon or stored state format;
+ten unaffected first-step cases remain bit-exact. **Next: qualify state boundaries,
+rounding and long sequences, then actual Session/checkpoint/cache integration.**
+The tiny fixture is not full-model or performance qualification. Latest Blade's
+F16 preservation is not an F32 repair. No more performance allocation or Atari
+restart follows until this numerical issue is addressed.
 
 The [slice-view implementation](results/2026-10-21-slice-views.md) preserves
 complete synthetic trajectories but misses the3% RGB gate: fresh RGB48.281→
@@ -80,8 +84,9 @@ Ordinary`build` still does not search, but missing dense selection is no longer
 a plausible large missing lever under this recipe. No geometry/family sweep,
 fixture-winner promotion, new GPU allocation or parity claim follows.
 
-The goal remains open. The latest isolated complete RGB12M/B32/T16 update is
-**42.983ms versus inclusive JAX27.223ms,1.58×**; B8 retains22.780/12.737ms,1.79×.
+The goal remains open. The historical580 isolated RGB12M/B32/T16 update is
+**42.983ms versus inclusive JAX27.223ms,1.58×**; historical B8 retains22.780/12.737ms,1.79×.
+Current615 B32 is48.281/26.066ms,1.85× as reported above.
 Production is not promoted and Atari stays stopped. CDP's larger exploration
 workload is different and must not be compared directly with these RGB numbers.
 The current-upstream isolated control is native`d3ff4948` under

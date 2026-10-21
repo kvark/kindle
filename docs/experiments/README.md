@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [optimizer denormal comparison](../results/2026-10-21-optimizer-denormals.md)
+passes96 pinned-JAX and96 candidate-GPU checks. A scaled-variance shader fixes
+the original tiny-gradient failures with unchanged epsilon/storage. Explicit
+FP32 preservation is unsupported. State-boundary and Session integration remain;
+two passing guards/six standalone optimizer steps/zero learner updates/actions.
+
 October21's [current-driver baseline and optimizer probe](../results/2026-10-21-driver615-baseline.md)
 establish1.85× native/JAX throughput gap and reproduce six tiny-gradient LaProp
 failures. Numerical repair takes priority over further profiling; no Atari restart.
@@ -8,7 +14,7 @@ failures. Numerical repair takes priority over further profiling; no Atari resta
 October21's [slice-view comparison](../results/2026-10-21-slice-views.md) preserves
 complete numerical trajectories but misses its3% RGB gate:1.05% RGB/1.81% CDP.
 Nine guards/zero warnings/1,184 synthetic updates/zero actions; no promotion.
-The new615.71.09 driver needs a fresh JAX control; historical ratios stay historical.
+The fresh615.71.09 JAX control is published above; historical ratios stay historical.
 
 October20's [guarded reduction-tail implementation](../results/2026-10-20-reduction-tail.md)
 preserves complete numerical trajectories but regresses RGB/CDP updates.79%/3.32%.

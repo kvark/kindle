@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **JAX tiny-gradient control and first GPU repair pass:**
+  [result](docs/results/2026-10-21-optimizer-denormals.md). Pinned JAX passes96
+  F64 checks and preserves tiny variances; queried Vulkan FP32 DenormPreserve
+  is unsupported, so latest Blade's F16 fix is insufficient. Upstreama75c38e
+  still has the failing update. Isolated scaled-variance shader preserves state
+  format/epsilon and passes96 checks over16 gradients/two reversed-sign steps;
+  all48 original control values and30 unaffected candidate values match exactly.
+  For3e-18, momentum30→.0996678. Not a full learner or performance qualification.
+  Two passing guards/zero warnings/six standalone optimizer steps/zero learner
+  updates/actions;625 candidate receipts and119 JAX receipts pass. CPU memory-
+  field/offline-binding failures remain. Review07:15:35UTC; no worker.
+  Next state-boundary/rounding/long-sequence tests, then isolated actual Session/
+  checkpoint/cache integration. Keep ordinary state semantics and epsilon; no
+  CPU workaround, Naga feature project, automatic promotion or Atari restart.
 - **Current-driver JAX control passes; optimizer underflow reproduces:**
   [result](docs/results/2026-10-21-driver615-baseline.md). JAX25.606ms core/
   26.066ms inclusive versus native48.281ms,1.85x on615.71.09. Exact272 reports/

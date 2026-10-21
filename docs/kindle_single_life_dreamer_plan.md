@@ -16,6 +16,13 @@ Qualify a GPU-side repair before more profiling or training. No claim yet that
 this explains historical scores or the speed gap; epsilon/model semantics stay
 fixed and both failed probe allocations remain recorded.
 
+The [pinned JAX tiny-gradient control and first shader repair](results/2026-10-21-optimizer-denormals.md)
+now pass. JAX preserves the tiny variances; Vulkan does not advertise explicit
+FP32 denormal preservation. Scaled GPU arithmetic fixes the original fixture
+without changing epsilon or variance storage. Next qualify state boundaries and
+actual Session/checkpoint/cache integration; this is not yet a learner fix or a
+learning result. No production/Atari restart.
+
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.
 The host has rebooted onto615.71.09; fresh native control is48.281ms RGB/41.771ms

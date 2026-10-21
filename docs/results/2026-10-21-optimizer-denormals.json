@@ -1,0 +1,45 @@
+{
+  "status": "original_fixture_qualified_not_integrated",
+  "date": "2026-10-21",
+  "driver": "615.71.09",
+  "jax": {
+    "artifacts": "runs/optimizer-f32-20261021.YBh7h6AF",
+    "independent_comparisons": 96,
+    "negative_control_checks": 18,
+    "source_receipts": 119,
+    "optimizer_steps": 2,
+    "fp32_explicit_denorm_preservation_supported": false,
+    "gradient_3e_minus18_first_step": {
+      "variance": 9.000000536449535e-39,
+      "momentum": 0.09966713935136795,
+      "parameter": 0.9003328680992126
+    }
+  },
+  "candidate": {
+    "artifacts": "runs/optimizer-scaled-20261021.PYgm00jM",
+    "review_finished_utc": "2026-10-21T07:15:35.785357+00:00",
+    "independent_comparisons": 96,
+    "original_control_first_step_exact": 48,
+    "unaffected_candidate_first_step_exact": 30,
+    "source_receipts": 625,
+    "control_and_candidate_optimizer_steps": 4,
+    "minimum_sampled_vulkan_headroom_bytes": 16666263552,
+    "gradient_3e_minus18_first_step": {
+      "variance": 8.999884228676996e-39,
+      "momentum": 0.09966780245304108,
+      "parameter": 0.9003322124481201
+    },
+    "review_sha256": "7a2ba8ffe5bc7868f6fc6c78cf78fabd6ceaf36061130111101c4861b17af163"
+  },
+  "passing_gpu_guards": 2,
+  "new_warnings": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "remaining": [
+    "State-boundary, rounding and long-sequence tests",
+    "Actual Session/checkpoint/cache integration",
+    "Complete-model numerical and performance qualification",
+    "Atari five-game learning objective remains unachieved"
+  ]
+}
