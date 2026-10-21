@@ -8,19 +8,19 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-The [typed convolution backward port](results/2026-10-21-convolution-backward-port.md)
-passes36 GPU/F64 cases, including split gradients; graphs, bounded scratch and
-runtime bindings are wired. Next port the fourteen measured packed products and
-full32/larger-reuse selection/cache contracts, then qualify the complete learner.
-This is not a new speed or learning result; production remains unchanged.
+The [packed convolution port](results/2026-10-21-convolution-packed-port.md)
+passes48 GPU/F64 cases, including all three packed passes and split gradients.
+All14 packed/7 reuse source-SPIR-V pairs remain exact. Next wire full32/larger-reuse
+selection/cache contracts, audit other upstream-vs-measured differences, then
+qualify the complete learner. No new speed or learning result; production unchanged.
 The [complete reuse qualification](results/2026-10-21-convolution-reuse-cost.md)
 passes: RGB42.753→39.740ms (7.05% less), CDP40.605→39.398ms (2.97% less).
 All raw/staged gradients,272 reports/targets/five checkpoint pairs and complete
 plans/runtime sources reconcile exactly. Retain isolatedc8aeba28/1.525× JAX;
 production unchanged. The[Blade prerequisite](results/2026-10-21-full-subgroups-upstream.md)
-is now PR417 with passing local CPU/GPU checks and cross-platform CI running.
-Next port the missing Meganeura typed-gradient prerequisites and full reuse
-family, then remaining-cost review—not a forward-only substitute or geometry
+is now PR417 with passing local CPU/GPU checks and all12 cross-platform CI jobs.
+Next finish Meganeura's full reuse runtime integration and remaining-cost
+review—not a forward-only substitute or geometry
 sweep. CDP imagination and library feeding remain distinct
 costs. No new learning result or automatic Atari restart; five-game supremacy
 remains unfinished. Older entries below retain their historical scope.

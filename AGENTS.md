@@ -7,24 +7,26 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Typed convolution backward port passes GPU qualification:**
-  [result](docs/results/2026-10-21-convolution-backward-port.md). Local132b574
-  on currenta75c38e wires BF16 backward graphs, compensated/split F32 gradients,
-  total scratch bounds, bindings, precision requirements and descriptor cache keys.
-  16 control/20 typed cases pass155,148/358,272 F64 comparisons; includes K8450
-  three-way splitting, tails, rectangular kernels and tiny gradients.143 CPU
-  tests/strict library+regression Clippy/444 offline modules pass;714 existing
-  sources and7 qualified reuse source/SPIR-V pairs remain exact. Larger reuse
-  and full32/geometry runtime selection remain unwired; fourteen measured packed
-  products also lack upstream integration. Next port these complete prerequisites,
-  then actual-model raw/staged/full-update qualification. No new timing/pin/PR/
-  Atari restart. Keepc8aeba28/1.525x. Two guards,zero warnings,36 forward/backward
-  evaluations,zero optimizer updates/actions; GPU15:20:25UTC,296-receipt audit
-  15:22:23,no worker. Preserve initial three missing-match compiler errors and
-  unexecuted wrong-device-key queue; repairs repeat no GPU work.565 immutable
-  library duplicates reclaimed1.087GB, all paths/bytes retained,~3.0GiB free.
-  Both port target caches/worktrees are archived: use a new worktree and target,
-  never mutate shared caches. Only user merges; no geometry sweep.
+- **Packed convolution upstream port passes GPU qualification:**
+  [result](docs/results/2026-10-21-convolution-packed-port.md). Local3e61376
+  extends typed-backward132b574 on currenta75c38e: type-generic forward/dX/dW,
+  GPU channel packing/transposed weights, bounded capability-aware selection,
+  external layouts, compensated/split F32 gradients and descriptor cache identity.
+  All14 packed/7 reuse WGSL-SPIR-V pairs and714 existing sources remain exact;
+  145 CPU tests/strict library+regression Clippy/549 offline modules pass.
+  48 GPU cases pass2,805,360 F64 comparisons, including twelve forced-packed
+  cases with2,291,940 values; tails/rectangular/stride2/tiny gradients/two- and
+  three-way splits covered. Three guards,zero warnings,zero optimizer updates/
+  actions; monitoring15:41:24UTC,1,014-receipt review15:42:27,no worker.
+  Preserve initial helper-signature compile failure and publication parser's
+  missed should-panic tests; CPU repairs repeat no GPU work or tolerance changes.
+  Next wire full32/larger-reuse selection and both geometry caches, inventory
+  remaining measured-vs-upstream differences, then actual-model raw/staged/full
+  update qualification. No new timing/pin/PR/Atari restart; keepc8aeba28/1.525x.
+  640 exact library duplicates reclaimed1.150GB, all paths/bytes retained,~2.6GiB
+  free. All three port caches/worktrees archived: use a fresh worktree/target;
+  never mutate shared caches. Blade PR417 CI1192 now all12 jobs pass. Only user
+  merges; no geometry sweep. Five-game mastery remains unfinished.
 - **Blade full-subgroup upstream port qualified; PR417 open:**
   [result](docs/results/2026-10-21-full-subgroups-upstream.md). Commit0af76fd on
   currenteae0c6f adds optional width/full membership, capability/geometry checks,
@@ -35,7 +37,7 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   Preserve reserved-WGSL-variable failure and original binary/source; fixed
   fixture validates offline before separate execution. Strict GLES lint failure
   reproduces on pristine upstream; actual CI policy passes with identical warning.
-  CI1192 still running; only user merges. No Naga/pin/production change.
+  CI1192 now all12 jobs pass; only user merges. No Naga/pin/production change.
   Next audit/port Meganeura typed-gradient prerequisites: a75c38e lacks isolated
   Conv2dGradientTyped and full-size cache wiring. Do not substitute a forward-only
   port or import all experimental extensions. Keepc8aeba28/1.525x and Atari stopped.

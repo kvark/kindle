@@ -36,6 +36,10 @@ No local worker remains. Cross-platform[CI1192](https://github.com/kvark/blade/a
 is still running at publication; MSRV/Format/Android/Web have passed, not the
 entire workflow. Only the user merges.
 
+Follow-up on October21: all12 jobs now report completed/success, including Linux,
+Windows and macOS GPU jobs. The response is archived in
+`runs/convolution-packed-port-20261021.DouXgWRZ/blade-ci.json`. No merge or pin.
+
 The preceding[complete-update speedup](2026-10-21-convolution-reuse-cost.md)
 remains39.740ms RGB/39.398ms CDP,1.525× inclusive JAX. Those measurements belong
 to isolatedc8aeba28, not this new upstream dependency combination or Blade alone.
