@@ -8,6 +8,12 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [bounded reuse design](results/2026-10-21-convolution-reuse-contract.md)
+passes CPU/compiler checks across the full convolution family: seven changes,
+sixteen retained,24.25% fewer typed logical staging slots, no added padded
+arithmetic. This is not measured speed. Next implement actual optimized gathers
+and qualify the fixed policy; keep79bc7cec/1.642× and Atari stopped.
+
 The [current-driver JAX capture](results/2026-10-21-jax-current-convolution.md)
 confirms4.280× native convolution warp instructions despite fewer tensor
 instructions. All23 kernels/18helpers and exact model controls reconcile; same

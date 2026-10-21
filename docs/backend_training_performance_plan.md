@@ -8,6 +8,19 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [fixed reuse policy](results/2026-10-21-convolution-reuse-contract.md) passes
+CPU schedule/storage checks: seven typed products change, sixteen remain,
+padded arithmetic is unchanged. Typed logical staging falls24.25%; full-family
+workgroups283,600→105,936. All27 typed schedule modules validate offline, with
+at most15KiB BF16 shared payload. These are not performance measurements.
+
+Next implement actual convolution gathers using the existing optimized iterators,
+not the proof's dense virtual operands. Preserve split/compensated arithmetic,
+rounding, bindings and fallback sources; make geometry part of cache identity.
+Complete offline address/source qualification precedes any declared GPU trial.
+No Naga project, geometry sweep, automatic production/Atari restart or speed claim.
+Keep79bc7cec/1.642×; all workers terminal. Earlier milestones retain their scope.
+
 The [same-driver JAX capture](results/2026-10-21-jax-current-convolution.md)
 qualifies all23 convolution kernels and18 helpers. Current native/JAX warp ratio
 is4.280×, ALU6.926×, LSU3.860×, despite fewer tensor instructions. Exact reports,

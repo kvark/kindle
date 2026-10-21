@@ -7,6 +7,22 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Bounded convolution-reuse CPU contract passes:**
+  [result](docs/results/2026-10-21-convolution-reuse-contract.md). One resource/
+  divisibility policy changes7 typed products, retains16; padded matrix work
+  unchanged. Typed staging13.422B→10.167B scalar slots(−24.25%); complete-family
+  groups283,600→105,936 are logical counts, not instructions/traffic/time.
+  All27 typed schedule SPIR-V modules/421,568 independent output-plane values/
+  36,864 symbolic coefficients/96 subgroup assignments/five negatives pass.
+  At most15KiB BF16 shared payload,48 persistent/80 named-compensation F32
+  values/lane for actual candidates; not physical registers/occupancy. Modules
+  use virtual dense operands, not convolution gathers. Full32 must be enforced.
+  Next implement with existing optimized convolution iterators/vector loads,
+  full binding/geometry cache identity and offline actual-address qualification;
+  not per-iteration division or a new Naga feature. No geometry sweep, failed
+  loader-pipeline revival or automatic GPU allocation. Initial static-site count
+  assertion retained;82 receipts pass, CPU review13:11:45UTC,no worker/GPU/update/
+  action. Keep79bc7cec/1.642x; performance and five-game goals remain open.
 - **Same-driver full JAX convolution comparison qualifies:**
   [result](docs/results/2026-10-21-jax-current-convolution.md). Native/JAX warp
   10.302B/2.407B=4.280x, ALU6.926x, LSU3.860x, tensor.792x. All23 main/18helper
