@@ -8,6 +8,22 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [actual reuse implementation](results/2026-10-21-convolution-reuse.md)
+now passes numerical/counter qualification: composed complete-family warp
+instructions fall21.37%, with unchanged tensor counts. All seven changed products
+improve; nine typed products were freshly measured and fourteen unchanged packed
+products retain their counters. Actual optimized gathers and offline address/
+binding checks pass. No ordinary timing, model-gradient or learning claim.
+
+An isolated Blade optional-full-subgroup API now passes CPU boundary/stage-builder
+tests and strict native library lint. It has not run on the GPU; default callers
+remain unchanged. Next integrate the fixed policy into the isolated runtime,
+carrying geometry and explicit full32 requirements through pipeline/cache
+selection, with unchanged fallbacks. Default subgroup width alone is insufficient.
+Then qualify actual-model gradients/plans and complete-update cost, including
+all transforms/partials/epilogues. No tile sweep or automatic promotion/Atari
+restart. Retain79bc7cec/1.642×; the earlier milestones below are historical.
+
 The [fixed reuse policy](results/2026-10-21-convolution-reuse-contract.md) passes
 CPU schedule/storage checks: seven typed products change, sixteen remain,
 padded arithmetic is unchanged. Typed logical staging falls24.25%; full-family

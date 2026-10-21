@@ -8,6 +8,14 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [actual convolution reuse implementation](results/2026-10-21-convolution-reuse.md)
+passes numerical checks and lowers composed full-family warp instructions21.37%,
+with unchanged tensor work. This is not measured speed: integrate explicit
+full32/geometry/cache contracts, then qualify actual-model correctness and
+complete-update cost. Keep79bc7cec/1.642×, no production or Atari restart.
+Five-game CDP mastery remains the objective; older entries below retain their
+historical scope.
+
 The [bounded reuse design](results/2026-10-21-convolution-reuse-contract.md)
 passes CPU/compiler checks across the full convolution family: seven changes,
 sixteen retained,24.25% fewer typed logical staging slots, no added padded

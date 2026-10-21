@@ -7,6 +7,31 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Actual convolution reuse passes numerical/counter qualification:**
+  [result](docs/results/2026-10-21-convolution-reuse.md). Complete23-product
+  composed warp10.302B→8.101B,−21.37%, tensor counts exact. Nine fresh typed
+  products (all7 changes improve),14 unchanged packed products retain counters.
+  All35 model anchors/46 offline modules/30.628M address slots pass;3.373M F64/
+  372.703M paired values qualify sparse primitive fixtures, not full-model gradients.
+  18 guards/zero warnings/1,008 dispatches/450 counter passes/zero updates/actions/
+  ordinary timing. GPU13:32:24UTC, publication13:33:15,467 receipts; no worker.
+  Actual optimized gathers now implemented; native geometry/cache integration
+  remains. Enforce full32 explicitly: Blade's default width is insufficient.
+  Next isolated runtime integration and complete cost qualification, no geometry
+  sweep/promotion/Atari restart. Preserve CPU scoping/newline failures; no GPU
+  retry.2.105GiB duplicates reclaimed with all paths/bytes retained, no Naga edit.
+  Keep79bc7cec/1.642x; instruction savings are not speed or five-game mastery.
+- **Explicit full-subgroup runtime prerequisite implemented, CPU-only:**
+  Isolated `runs/convolution-reuse-runtime-20261021.fTithS5D` adds optional Blade
+  compute requirements/capabilities, Vulkan feature enablement/size chain/full
+  flags and unsupported-backend rejection. Two CPU tests and strict Blade/
+  Meganeura/Kindle library Clippy pass; default call sites remain None. No GPU
+  initialization/dispatch or candidate selection/cache integration yet. Preserve
+  both test lifetime compile failures and initial successful check's archived
+  pipeline source. Next wire fixed convolution reuse through selection, shared
+  cache identity and enforced capability fallback, then model GPU qualification.
+  Distinct independent target; only about1.3GiB disk remains. No Naga edit,
+  production promotion or Atari restart; full performance/learning goals open.
 - **Bounded convolution-reuse CPU contract passes:**
   [result](docs/results/2026-10-21-convolution-reuse-contract.md). One resource/
   divisibility policy changes7 typed products, retains16; padded matrix work
