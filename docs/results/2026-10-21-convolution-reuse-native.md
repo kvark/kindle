@@ -1,5 +1,8 @@
 # Fixed convolution reuse integrates and passes actual-model prefix checks
 
+Follow-up: [raw/staged gradients and complete-update cost now pass](2026-10-21-convolution-reuse-cost.md).
+The evidence below retains its original prefix-only scope.
+
 October 21, 2026. The [instruction-screen candidate](2026-10-21-convolution-reuse.md)
 now runs through isolated native Meganeura + Blade, not just the primitive
 observer. **RGB and CDP each reproduce all24 reports, first targets and five

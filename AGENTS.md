@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Fixed convolution reuse qualifies complete-update performance:**
+  [result](docs/results/2026-10-21-convolution-reuse-cost.md). RGB42.753→39.740ms,
+  −7.05%; CDP40.605→39.398ms,−2.97%; both declared cost gates pass, controls
+  within.13%. Retain isolatedc8aeba28/1.525x inclusive JAX, not production.
+  All68/86 raw world gradients match original/changed rewards and whole/staged
+  execution with NaN reward inputs during prepare; scope is that late boundary.
+  Exact272 reports/targets/five292/346-tensor checkpoint pairs and complete
+  plans/pipelines/groups/runtime shaders match qualified prefixes. Six guards/
+  zero warnings/1,090 synthetic updates/eight raw backwards/zero actions;
+  GPU14:25:08UTC, timing audit14:26:28, final1,554-receipt review14:27:24,no worker.
+  Preserve original Python
+  compensated-sum versus Rust sequential-sum audit failure; exact ordered-sum
+  repair passes with no GPU retry/tolerance change.13.183GB duplicate libraries
+  reclaimed across7,033 paths, all bytes/paths retained; shared archives immutable,
+  active cache untouched,~6.5GiB free. No new native build or Naga edit.
+  Next minimal upstream Blade full32 contract/Meganeura fixed-policy integration
+  and existing-capture residual review; no new geometry sweep or Atari restart.
+  CDP imagination16.45ms and library feeding/parity/five-game goals stay open.
+  Artifacts `runs/convolution-reuse-gradients-20261021.t53uOXUr`.
 - **Native fixed convolution reuse passes actual-model prefix qualification:**
   [result](docs/results/2026-10-21-convolution-reuse-native.md). Isolatedc8aeba28
   wires shape/full32 requirements through selection, Blade and both caches;
