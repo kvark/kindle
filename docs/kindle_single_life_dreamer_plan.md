@@ -8,19 +8,29 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [actual-model hardware counters](results/2026-10-21-current-model-counters.md)
+now qualify on the current driver. Nine typed convolution occurrences account
+for a historical-to-current instruction increase even though all23 reconstructed
+SPIR-V pairs match. This narrows the investigation, not a speedup or proof of
+driver-only causality. CDP imagination is captured, but mixed base/bonus regions
+do not isolate exploration cost. The CPU audit confirms marker placement alone
+cannot isolate its bonus without changing execution. Next audit typed control/
+load lowering. Keep ordinary72005c8b/RGB1.858x; no production
+promotion or Atari restart. Five-game supremacy remains unfinished.
+
 The [current-driver profile](results/2026-10-21-driver615-attribution.md) qualifies
 with exact numerical transfer: ordinary RGB48.442ms/CDP41.893ms, about1.9%
 instrumentation overhead. The newly observed mean/target helpers cost only.28ms;
 model execution remains dominant, including15.705ms CDP imagination. This is
-not a speedup or learning result. Next qualify the existing actual-model hardware
-counter observer on current sources for RGB world and CDP imagination; historical
-580 counters cannot stand in for615 captures. Five-game success is still open;
+not a speedup or learning result. The actual-model hardware-counter observer
+subsequently qualifies above; historical580 counters cannot stand in for615
+captures. Five-game success is still open;
 production/Atari remain stopped, no automatic observer promotion.
 
 The observer CPU contract now covers all current RGB world/CDP imagination
 dispatches and fits the existing profiler storage budget. It proves a marker-only
-source port is feasible, not current-driver counters. Implementation/build and
-ordinary numerical qualification come next; no additional coarse profile needed.
+source port is feasible, not current-driver counters. Subsequent implementation,
+ordinary transfer and grouped-counter qualification are reported above.
 
 The [new-driver JAX control](results/2026-10-21-driver615-baseline.md) measures
 26.066ms inclusive versus native48.281ms,1.85×. Its trajectory and compiled work

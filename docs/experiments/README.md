@@ -1,6 +1,19 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [current model counters](../results/2026-10-21-current-model-counters.md)
+qualify35 RGB/20 CDP grouped regions with exact outputs/state/commands and3,306
+offline metrics. Original per-kernel RGB attribution stays failed; a marker-only
+repair uses existing barriers. Historical-to-current convolution instructions
+increase11.56%, concentrated in nine typed occurrences. All23 reconstructed
+actual-binding SPIR-V pairs match across linked stacks; not SASS or driver-only
+causality. CDP mixed regions cannot isolate bonus cost. Four passing/one failed
+guards,zero warnings,51 synthetic updates,zero actions. Compiler audit09:37:26UTC;
+no worker or production/Atari change. Keep72005c8b/RGB1.858x. Next typed control/
+load audit, not a sweep. CPU enumeration finds no bonus-only CDP sync interval;
+do not add barriers for attribution.1.33GiB copied cache reclaimed;
+selected binaries and sealed evidence remain.
+
 October21's [current-driver attribution](../results/2026-10-21-driver615-attribution.md)
 qualifies exact ordinary/coarse trajectories and1.93%/1.95% instrumentation
 overhead. RGB48.442ms/CDP41.893ms ordinary; means/targets only.281/.278ms,

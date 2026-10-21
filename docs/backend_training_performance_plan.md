@@ -8,15 +8,36 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [current actual-model counters](results/2026-10-21-current-model-counters.md)
+now qualify on615:35 RGB world/20 CDP imagination regions, exact state/output/
+command transfer and3,306 offline metrics. The original per-kernel RGB capture
+fails attribution; a separately declared marker-only repair aligns regions to
+existing barriers, without new synchronization. Its failures stay retained.
+
+Current convolution executes11.487B warp instructions,11.56% above historical
+native, with exactly180.224M tensor instructions. The increase is concentrated
+in nine typed occurrences; packed LSU counts are unchanged. CPU regeneration
+using both actual linked stacks and actual binding layouts produces23/23
+byte-identical SPIR-V pairs, all46 modules valid. This excludes those reconstructed
+compiler-input differences, not unrecorded runtime state or driver causality.
+No current-native/historical-JAX instruction ratio or new speedup is claimed.
+CDP's19 mixed regions cannot isolate exploration counters. CPU enumeration of
+every existing synchronization interval confirms all82 bonus dispatches share
+intervals with base work; a six-region partition narrows mixed work to130
+dispatches but provides no exclusive bonus range. Do not add barriers for
+attribution. Next inspect typed control/load lowering; no blind tile sweep,
+assembly-query retry or Atari restart.
+Keep ordinary72005c8b/RGB1.858x. Detailed prior milestones below retain their
+original chronological scope; the observer implementation step is now complete.
+
 The [current-driver complete profile](results/2026-10-21-driver615-attribution.md)
 now qualifies: ordinary RGB48.442ms/CDP41.893ms,1.93%/1.95% trace overhead with
 exact reports/targets/checkpoints/full programs. Newly captured mean/target
 helpers total only.281/.278ms. Cached programs43.699/36.787ms dominate; CDP
 imagination alone15.705ms. GPU-pass coverage is not utilization, and uncovered
 4.230/4.116ms is not pure CPU time. Three extra coarse waits remain disclosed.
-No helper-only fix explains the RGB1.858x JAX gap. Next CPU-port and qualify the
-existing actual-model Perf SDK observer against current sources/commands for
-RGB world and CDP imagination before declaring current-driver GPU captures.
+No helper-only fix explains the RGB1.858x JAX gap. The subsequent actual-model
+Perf SDK observer qualification above covers current RGB world/CDP imagination.
 Do not assume historical580 instructions survived the driver/runtime changes.
 Keep ordinary72005c8b; no observer promotion, tile sweep or Atari restart.
 
@@ -26,9 +47,9 @@ dispatches include all12 ensemble products. Independent closure/ten negative
 partition tests pass. Marker erasure reproduces current recording functions;
 the missing isolated secondary-handle accessor is identified. SDK host-only
 sizing fits27.924MB within128MiB; no GPU/device calls. Preserve the whole-plan
-CPU OOM and bounded-reader repair at the unchanged2GiB limit. Next implement/
-compile the diagnostic port, qualify ordinary transfer, then bounded counters.
-No current-driver instruction or performance improvement claim follows yet.
+CPU OOM and bounded-reader repair at the unchanged2GiB limit. This precedes
+the implemented port, ordinary transfer and grouped-counter qualification above;
+the CPU contract alone establishes no instructions or performance improvement.
 
 The [final optimizer interface](results/2026-10-21-optimizer-final.md) now passes:
 all six Meganeura CI1048 jobs, unchanged Metal regressions,161M actual-model

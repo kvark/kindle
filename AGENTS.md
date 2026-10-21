@@ -7,6 +7,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Current-driver grouped model counters qualify:**
+  [result](docs/results/2026-10-21-current-model-counters.md). RGB35/CDP20 regions
+  cover3,751/763 dispatches with exact outputs/state/commands and3,306 offline
+  metrics. Original RGB per-kernel capture stays failed: four adjacent CTA
+  migrations, missing post-capture gates; no CDP start. Marker-only repair uses
+  existing barriers, no new GPU synchronization. Nine typed convolutions account
+  for the historical-to-current instruction increase; all23 reconstructed
+  actual-binding SPIR-V pairs match exactly across linked compiler stacks.
+  Not captured driver payloads, SASS identity or driver-only causality. Current
+  conv11.487B instructions/180.224M tensor; no fresh JAX counter ratio. CDP19
+  mixed regions cannot isolate exploration. Four passing/one failed guards,
+  zero warnings/51 synthetic updates/150 counter replays/zero actions; final
+  2,135-receipt CPU audit09:41:35UTC, no worker. Every existing CDP sync interval
+  containing bonus work is mixed: six coalesced regions narrow mixed work to130
+  dispatches but cannot isolate82 bonus dispatches. No new capture/barrier.
+  Preserve missing-import/stale CTA annotation repairs,
+  original reports and truncated failure-log snapshot; no CPU-repair GPU repeats.
+  Removed1.33GiB rebuildable copied cache only; all selected/sealed evidence stays.
+  Next typed-convolution control/load audit, not
+  another tile sweep or native assembly query. Keep72005c8b/RGB1.858x; no
+  production/Atari restart. Full performance/learning goals remain open.
 - **Current counter-observer CPU contract passes:**
   [follow-up](docs/results/2026-10-21-driver615-attribution.md#follow-up-current-counter-observer-cpu-contract-passes).
   Complete41 RGB/52 CDP ranges cover3,751/763 dispatches; independent reverse
