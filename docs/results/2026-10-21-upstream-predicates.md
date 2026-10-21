@@ -10,6 +10,9 @@ regression. It is based on current upstream `a75c38e`, rechecked unchanged befor
 publication. The PR is unmerged; CI is separate from the local qualification.
 The neighboring dirty Meganeura checkout is untouched.
 
+Follow-up: all six CI1050 jobs pass for `e545a9f`, including Metal and lavapipe;
+the [shared-read follow-up](2026-10-21-shared-read-residual.md) retains the receipt.
+
 Pure A/B bounds comparisons become `all(vec2<bool>(...))`; invalid image
 coordinates use `any(vec4<bool>(...))`. Loads remain conditional, including the
 pixel gather's early zero return. Output guards, precision, arithmetic order,

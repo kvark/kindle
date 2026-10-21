@@ -8,13 +8,24 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [residual shared-read audit](results/2026-10-21-shared-read-residual.md)
+finds an exact historical/current relation in all nine typed occurrences:
+shared-read wavefronts minus conflicts increase by twice the unchanged tensor
+instruction count. Packed paths retain their derived counts; the predicate fix
+does not remove this difference. This is post-hoc evidence, not source-site or
+driver-only attribution. A reversible raw-word shared-storage view now validates
+offline, preserving logical packet/index/stride and matrix operations. Physical
+layout and GPU behavior are unproven. Next qualify one actual-binding numerical/
+counter probe before compiler changes or timing; no rejected feeding-family retry.
+PR276 passes all six CI1050 jobs and remains unmerged.
+
 The [upstream predicate port](results/2026-10-21-upstream-predicates.md) now
 qualifies: MeganeuraPR276/e545a9f changes three guards in shared templates,
 with1,860 offline modules and148 GPU cases/arm passing. All395,304 paired output/
 gradient values, plans and runtime source transformations reconcile. No new timing
 or automatic promotion: upstream's derivative implementation differs from our
-retained candidate. Finish CI/review, then resume the remaining operand-load/
-feeding investigation; this control-flow fix did not remove the LSU deficit.
+retained candidate. CI is green; review remains. The operand-load investigation
+above follows the separate LSU deficit left by the control-flow fix.
 
 The [candidate hardware capture](results/2026-10-21-predicate-counters.md)
 now confirms the mechanism: nine typed convolutions execute11.91% fewer warp

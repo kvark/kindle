@@ -8,10 +8,15 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [saved-counter follow-up](results/2026-10-21-shared-read-residual.md)
+narrows a remaining question to shared operand-load lowering. One raw-word view
+validates offline; GPU numerical/counter qualification is next, not a speed or
+learning claim. No additional training or GPU capture ran for this audit.
+
 The [narrow upstream predicate port](results/2026-10-21-upstream-predicates.md)
-passes compiler and paired GPU correctness checks; MeganeuraPR276 is unmerged.
+passes compiler, paired GPU correctness and all six CI jobs; MeganeuraPR276 is unmerged.
 This packages the proved mechanism without importing experimental extensions.
-It is not another speed or learning result. CI/review and the remaining
+It is not another speed or learning result. Review and the remaining
 operand-load/feeding investigation are next; production and Atari stay unchanged.
 
 The [hardware attribution](results/2026-10-21-predicate-counters.md) now confirms

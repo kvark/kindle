@@ -1,6 +1,15 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [shared-read residual](../results/2026-10-21-shared-read-residual.md)
+finds an exact post-hoc +2x tensor-instruction relation in typed shared-read
+wavefronts minus conflicts, absent in packed paths and untouched by predicates.
+Actual memberships/CTA/tensor inputs reconcile; not SASS or latency attribution.
+A reversible raw-word shared view passes18 offline modules/262,144 payloads;
+implicit physical layout/GPU numerics remain unproven. Zero GPU/builds/updates/
+actions; view finishes11:11:57UTC. PR276 passes all six CI1050 jobs, unmerged.
+Next actual-binding numerical/counter diagnostic, not a rejected feeding sweep.
+
 October21's [upstream predicate port](../results/2026-10-21-upstream-predicates.md)
 qualifies MeganeuraPR276/e545a9f: three guards/two templates,1,860 offline modules,
 148 GPU cases/arm,180 exact arrays/395,304 values and72 reconciled runtime sources.

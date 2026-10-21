@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Residual shared-read relation and offline word view pass:**
+  [result](docs/results/2026-10-21-shared-read-residual.md). All7 typed regions/
+  9 occurrences have historical→current shared-read wavefronts minus conflicts
+  increase209,715,200=2x tensor instructions;10 packed regions/14 occurrences
+  unchanged. Predicate fix restores31.99952 active threads/warp but not this
+  relation. Post-hoc counter evidence, not driver-only/SASS/source-site/latency
+  attribution. CPU reversible vec4<bf16>→vec2<u32> shared view validates18 modules/
+  262,144 payloads across9 occurrences, same logical packet/index/stride/matrix
+  ops. Implicit workgroup layout: no physical allocation identity or GPU claim.
+  No Naga edit; next separately declared actual-binding numerical/counter probe,
+  not new geometry/read-span/pipeline work or old retiming. Preserve receipt-name,
+  absent-ArrayStride and duplicate-type failures. Zero GPU/builds/updates/actions;
+  last CPU view11:11:57UTC,no worker. PR276/e545a9f passes all6 CI1050 jobs,
+  unmerged. Keep79bc7cec/1.642x; production/Atari unchanged; full goal open.
 - **Narrow upstream predicate port qualifies:**
   [result](docs/results/2026-10-21-upstream-predicates.md), MeganeuraPR276/e545a9f,
   unmerged. Three guards/two shared templates, one CPU regression; no retained
