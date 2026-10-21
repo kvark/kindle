@@ -1,5 +1,9 @@
 # Smaller batches recover Freeway learning on the fast backend
 
+**Cohort update:** [the third seed fails](2026-10-21-cdp-freeway-reliability.md).
+The completed three-seed mean is20.81 with48/72 crossing successes. The
+successful single-seed batch comparison below is not a reliability result.
+
 **Seed2017 scores30.58 frozen with B8, versus0 with B32. All24 natural rounds
 reach25 crossings; the actual-initial control scores0.** B8 takes37m36s,
 versus28m14s for B32. Use B8 for the next learning replicates, not the faster

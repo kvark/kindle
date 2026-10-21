@@ -20,6 +20,7 @@ import ale_py
 import gymnasium as gym
 
 import kindle
+import atari
 from kindle._vector_audit import EPISODE_EVALUATION_PROTOCOL, VECTOR_PROTOCOL, episode_summary
 import kindle._exploration as exploration_module
 from kindle._exploration import EXPLORATION_KIND, EXPLORATION_PROTOCOL, PersistentExploration
@@ -156,8 +157,8 @@ def main():
         parser.error("centered CDP requires --cdp and full-batch world training")
     if not math.isfinite(args.disagreement_scale) or args.disagreement_scale < 0:
         parser.error("disagreement-scale must be finite and non-negative")
-    if args.disagreement_scale and (not args.cdp or args.exploration_probability):
-        parser.error("disagreement requires fresh CDP without action overrides")
+    if args.disagreement_scale and not args.cdp:
+        parser.error("disagreement requires fresh CDP")
     if args.replay_capacity <= 0:
         parser.error("replay-capacity must be positive")
     if args.encoder_training and (learned_rgb or args.encoder == "levjepa"
@@ -281,7 +282,7 @@ def main():
                   restored_checkpoint=restored, starting_environment_step=starting_actions,
                   starting_learner_step=starting_updates, agent_construction_seconds=construction,
                   native_extension_sha256=sha256_file(kindle._native.__file__),
-                  runner_sha256=sha256_file(__file__), wrapper_sha256=sha256_file(Path(__file__).with_name("atari.py")),
+                  runner_sha256=sha256_file(__file__), wrapper_sha256=sha256_file(atari.__file__),
                   **exploration_header))
         stop = False
 

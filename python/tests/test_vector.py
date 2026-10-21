@@ -45,7 +45,6 @@ import profile_atari_vector
     (["--disagreement-scale", "nan"], "finite and non-negative"),
     (["--disagreement-scale", "inf"], "finite and non-negative"),
     (["--disagreement-scale", "1"], "requires fresh CDP"),
-    (["--cdp", "--disagreement-scale", "1", "--exploration-probability", ".5"], "without action overrides"),
 ])
 def test_joint_encoder_recipe_refusals_precede_outputs(monkeypatch, tmp_path, capsys, args, message):
     output = tmp_path / "never.jsonl"
@@ -407,10 +406,13 @@ def test_episode_summary_requires_actual_boolean_boundaries(terminal, truncated)
 @pytest.mark.parametrize("behavior", ["default", "exploration", "ignored_override"])
 @pytest.mark.parametrize("memory_enabled", [False, True])
 @pytest.mark.parametrize("encoder_kind,observation_size", [
-    (None, None), (None, "64"), ("levjepa-tiny", None), ("levjepa-tiny", "64"), ("learned-cnn", None)])
+    (None, None), (None, "64"), ("levjepa-tiny", None), ("levjepa-tiny", "64"),
+    ("learned-cnn", None), ("cdp-disagreement", None)])
 @pytest.mark.parametrize("sticky_actions", [0.0, 0.25])
 def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatch, tmp_path, behavior, memory_enabled, encoder_kind, observation_size, sticky_actions):
     created = []
+    learned = encoder_kind in ("learned-cnn", "cdp-disagreement")
+    disagreement = encoder_kind == "cdp-disagreement"
 
     class Environment:
         action_space = SimpleNamespace(n=2)
@@ -452,11 +454,13 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
 
         @classmethod
         def learned_rgb(cls, streams, config):
-            assert encoder_kind == "learned-cnn"
+            assert learned
             assert config["observation_kind"] == "rgb64"
-            assert config["loss_scales"]["reconstruction"] == 1
-            assert config["loss_scales"]["future_prediction"] == 0
-            return cls(None, streams, config, encoder="learned-cnn")
+            assert config["loss_scales"]["reconstruction"] == (0 if disagreement else 1)
+            assert config["loss_scales"]["future_prediction"] == (500 if disagreement else 0)
+            assert config["disagreement_bonus"] is disagreement
+            assert config["intrinsic_reward_scale"] == int(disagreement)
+            return cls(None, streams, config, encoder=encoder_kind)
 
         def begin_episodes(self, ids, frames):
             self.replay_len += len(ids)
@@ -491,15 +495,19 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
         return env
 
     output = tmp_path / "vector.jsonl"
+    loaded_wrapper = tmp_path / "loaded_atari.py"
+    loaded_wrapper.write_text("independently loaded wrapper fixture")
+    monkeypatch.setattr(atari_vector.atari, "__file__", str(loaded_wrapper))
     monkeypatch.setattr(atari_vector.gym, "make", make)
     monkeypatch.setattr(atari_vector, "DreamerAtariPreprocessing", wrap)
     monkeypatch.setattr(kindle, "VectorAgent", Agent)
     monkeypatch.setattr(sys, "argv", ["atari_vector.py", "ALE/Seaquest-v5",
-        *([] if encoder_kind == "learned-cnn" else ["--encoder-checkpoint", "unused"]),
+        *([] if learned else ["--encoder-checkpoint", "unused"]),
+        *(["--cdp", "--cdp-centered", "--disagreement-scale", "1"] if disagreement else []),
         "--output", str(output), "--steps", "6", "--num-envs", "2", "--train-ratio", "0",
         "--sticky-actions", str(sticky_actions),
         *(["--observation-size", observation_size] if observation_size else []),
-        *(["--encoder", encoder_kind] if encoder_kind and encoder_kind != "learned-cnn" else []),
+        *(["--encoder", encoder_kind] if encoder_kind and not learned else []),
         *(["--min-gpu-budget-headroom-mib", "2048"] if memory_enabled else []),
         *([] if behavior == "default" else ["--exploration-probability", "1", "--exploration-hold", "4"])])
     if behavior == "ignored_override":
@@ -522,7 +530,8 @@ def test_vector_runner_emits_generic_episode_accounting_without_a_gpu(monkeypatc
     rows = [json.loads(line) for line in output.read_text().splitlines()]
     assert rows[0]["observation_size"] == (observation_size or "native")
     assert rows[0]["sticky_actions"] == sticky_actions
-    assert ("learned_rgb_preprocessing" in rows[0]) == (encoder_kind == "learned-cnn")
+    assert rows[0]["wrapper_sha256"] == atari_vector.sha256_file(loaded_wrapper)
+    assert ("learned_rgb_preprocessing" in rows[0]) == learned
     assert rows[0]["protocol"] == (VECTOR_PROTOCOL if behavior == "default" else EXPLORATION_PROTOCOL)
     assert "natural_wins" not in rows[-1] and "completed_games" not in rows[-1]
     result = audit(output)

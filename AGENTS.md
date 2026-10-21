@@ -7,6 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Freeway B8 cohort fails reliability; test cheap generic exploration:**
+  [result](docs/results/2026-10-21-cdp-freeway-reliability.md).1009/2017/3019
+  score31.83/30.58/0, initial0 each,48/72 crossing successes.1h54m11s total;
+  nine guards/zero warnings/six videos and audits pass, finish18:42:16UTC.
+  Failed3019 finds one crossing; it enters25 updates, so not a wholly
+  disconnected reward channel. No stability or five-game victory claim.
+  Fresh3019 with5% persistent-uniform16-action blocks is running,500k actions,
+  otherwise unchanged B8/BF16/CDP/intrinsic recipe; frozen overrides off,
+  final/initial24-round controls and exact frozen tensor exports queued.
+  Service`kindle-cdp-freeway-persistent-v3-3019-20261021`, linked artifacts
+  `runs/cdp-freeway-persistent-v3-20261021.QSzX1nuK`. Preserve earlier CLI
+  rejection before GPU/env/actions in`cdp-freeway-persistent-20261021.Y7bKJQkQ`.
+  Also preserve v2's wrapper-fingerprint path failure after initialization,
+  zero actions/updates. Adapter permission and loaded-wrapper provenance
+  repairs/285 CPU tests pass; native code unchanged.
+  This is disclosed generic guidance, not pure intrinsic success or a game
+  action hint. No automatic extension/sweep; Pong2M remains pending, backend
+  optimization stays parked.
 - **B8 restores learning; verify remaining seeds:** [result](docs/results/2026-10-21-cdp-freeway-b8.md).
   Same-current-backend/BF16 seed2017 scores30.58 versus B32's0,24/24 rounds
   reach25 crossings, actual-initial0.500k actions/124,939 updates take37m36s;

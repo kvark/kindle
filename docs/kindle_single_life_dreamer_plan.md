@@ -7,6 +7,14 @@ Updated October 21, 2026. This is the authoritative roadmap.
 
 ## Return to training
 
+**Cohort update:** [B8 Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md)
+finishes31.83/30.58/0: two successful seeds, one failure. Do not promote the
+single-seed batch recovery into a stability claim. A bounded fresh3019 test
+adds generic persistent-uniform controls on5% of16-action blocks, with no
+frozen overrides, reward shaping or directional hint. Model/B8/BF16 settings
+stay unchanged. Review this intervention before any further allocation;
+longer-budget Pong is pending, not cancelled or replaced by backend work.
+
 **Latest learning result:** [B8 Freeway2017](results/2026-10-21-cdp-freeway-b8.md)
 scores30.58 and passes25 crossings in24/24 frozen rounds; actual-initial0.
 500k actions take37m36s. The same-backend B32 run took28m14s but scored0;
