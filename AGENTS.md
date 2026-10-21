@@ -10,13 +10,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
-- **Pong1009 is running:** fresh2M actions, eight environments, batched inference,
-  B8/T16/BF16/12M centered CDP/action-effects1, no action overrides.
-  Service `kindle-cdp-pong-budget-1009-20261021`, artifacts
-  `runs/cdp-pong-budget-20261021.SNxyTFk7`.
-  Fixed500k/2M/actual-initial frozen controls,24 natural rounds each, exact frozen
-  tensors and whole videos are automated. Review this seed before allocating more;
-  no checkpoint lifetime resume or automatic broad campaign.
+- **Pong1009 passes intermediate gate at500k and2M:** [result](docs/results/2026-10-21-cdp-pong-budget.md).
+  Frozen16.75/16.92,24/24 wins each; actual-initial−20.13/zero wins. Extra1.5M
+  actions add only.167 score on this seed.2M/499,939 updates take2h28m15s;
+  all four guards/three346-tensor frozen comparisons/replays/videos pass,
+  final review22:09:44UTC. Published20.45 and multi-seed reliability stay open.
+  Fresh2017/3019 now run serial500k-action replicates with unchanged unassisted
+  B8/T16/BF16/12M centered CDP/action-effects1; eight environments/batched inference.
+  Service `kindle-cdp-pong-reliability-20261021`, artifacts
+  `runs/cdp-pong-reliability-20261021.R6HKgGOt`. Final/initial controls and audits
+  precede the next seed. Review the500k cohort before weaker games; no automatic
+  2M extension, checkpoint lifetime resume or backend project.
 - **Freeway selected-seed exploration rescue passes:** [result](docs/results/2026-10-21-cdp-freeway-reliability.md).
   Failed3019 improves0→32.96,24/24 rounds reach25 crossings, actual-initial0.
   Fresh500k actions/124,939 updates take38m19s with5% persistent-uniform

@@ -19,14 +19,14 @@ of the failed3019 seed with generic persistent-uniform exploration reaches32.96,
 aid; exact frozen tensors and whole replay/videos pass. This is a selected-seed
 rescue, not a replicated recipe. Keep it separate from the unassisted cohort.
 
-**Now running: fresh Pong1009,2M actions.** Retain the unassisted B8/BF16/12M
-centered-CDP/action-effects1 recipe. Save500k checkpoints and evaluate the fixed
-500k prefix,2M final and actual-initial policy for24 natural rounds each.
-Automated checks cover zero evaluation updates, exact frozen tensors, action
-replay and whole videos. Review this seed before allocating more.
-[Allocation](experiments/2026-10-21-cdp-pong-budget.md);
-service `kindle-cdp-pong-budget-1009-20261021`;
-artifacts `runs/cdp-pong-budget-20261021.SNxyTFk7`.
+**Pong1009 completes:** [result and videos](results/2026-10-21-cdp-pong-budget.md).
+500k/2M frozen scores16.75/16.92,24/24 wins each; actual-initial−20.13.
+All frozen tensor/replay audits pass. The extra1.5M actions bring only.167
+score on this seed, so fresh2017/3019 now replicate500k, not2M, serially.
+Retain unassisted B8/BF16/12M centered-CDP/action-effects1; audit final/initial
+controls before the next seed. Review this cohort before weaker games.
+Service `kindle-cdp-pong-reliability-20261021`;
+artifacts `runs/cdp-pong-reliability-20261021.R6HKgGOt`.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
