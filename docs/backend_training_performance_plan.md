@@ -8,6 +8,20 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [native reuse integration](results/2026-10-21-convolution-reuse-native.md)
+now passes actual-model prefix qualification. Explicit full32 support, geometry
+and cache identity are wired; unsupported/disabled cases keep existing GPU
+kernels. All23 generated modules match the primitive-qualified SPIR-V exactly.
+RGB7/CDP3 world changes preserve24 reports, first targets and all five292/346-
+tensor checkpoint pairs; all plans/pipelines/groups/source changes reconcile.
+Two guards, zero warnings,48 synthetic updates, no actions; no worker remains.
+
+Next qualify actual-model raw gradients and staged/whole late-target behavior,
+then one declared complete-update cost comparison. Budget full checkpoint/plan/
+gradient artifacts first: the prefix estimate was too small, and~1.1GiB remains
+after verified duplicate reclamation. No ordinary speed claim or production/
+Atari restart; keep79bc7cec/1.642×. Earlier entries below retain historical scope.
+
 The [actual reuse implementation](results/2026-10-21-convolution-reuse.md)
 now passes numerical/counter qualification: composed complete-family warp
 instructions fall21.37%, with unchanged tensor counts. All seven changed products

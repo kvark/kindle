@@ -8,6 +8,13 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [native reuse integration](results/2026-10-21-convolution-reuse-native.md)
+passes actual-model prefix checks: RGB/CDP reports, targets and five checkpoint
+pairs are exact, with only7/3 world-product changes. Full-subgroup selection and
+cache contracts are wired. Next actual-model raw/staged gradients, then complete
+update cost; budget checkpoint/plan storage first. Keep79bc7cec/1.642× until an
+ordinary comparison passes. No new learning result or automatic Atari restart.
+
 The [actual convolution reuse implementation](results/2026-10-21-convolution-reuse.md)
 passes numerical checks and lowers composed full-family warp instructions21.37%,
 with unchanged tensor work. This is not measured speed: integrate explicit

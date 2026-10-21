@@ -7,6 +7,23 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Native fixed convolution reuse passes actual-model prefix qualification:**
+  [result](docs/results/2026-10-21-convolution-reuse-native.md). Isolatedc8aeba28
+  wires shape/full32 requirements through selection, Blade and both caches;
+  unsupported/disabled selections retain GPU fallbacks. All23 native SPIR-V
+  modules match the primitive-qualified modules exactly. RGB7/CDP3 world changes;
+  all24 reports/first targets/five292/346-tensor checkpoint pairs match exactly.
+  All exported plans/pipelines/groups and runtime source deltas reconcile;
+  non-world programs unchanged. Two guards/zero warnings/48 synthetic updates/
+  zero actions; GPU14:08:31UTC,705-receipt audit14:11:21,no worker. Seven CPU tests/
+  strict library Clippy pass. Preserve workspace-test refusal, two stale test
+  APIs and passed-two/expected-one observer failure; no GPU retry. Reclaimed
+  2,873,462,784 duplicate bytes, all1,676 paths retained; shared archives immutable.
+  Prefix outputs exceeded disk estimate, leaving194MiB before dedup; now~1.1GiB.
+  Next budget all artifacts, qualify actual-model raw/staged gradients, then
+  complete-update cost. No timing/speed/promotion/Atari claim; keep79bc7cec/1.642x.
+  Artifacts `runs/convolution-reuse-native-20261021.foJSYVFJ`; old runtime-source
+  tree preserved, its unsealed target relocated here and CPU test binary archived.
 - **Actual convolution reuse passes numerical/counter qualification:**
   [result](docs/results/2026-10-21-convolution-reuse.md). Complete23-product
   composed warp10.302B→8.101B,−21.37%, tensor counts exact. Nine fresh typed
