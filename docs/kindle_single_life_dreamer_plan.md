@@ -8,6 +8,13 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [hardware attribution](results/2026-10-21-predicate-counters.md) now confirms
+11.91% fewer typed-convolution warp instructions and96.20% fewer control-pipe
+instructions, with unchanged tensor work. This is a control-flow improvement,
+not the unresolved data-feeding fix. No timing repeat or learning result.
+Next map the proved mechanism onto current upstream's different shared templates
+and qualify a narrow port. Candidate79bc7cec remains isolated; Atari stays off.
+
 The faster candidate's [BF16 primitive and actual-model raw-gradient checks](results/2026-10-21-predicate-qualification.md)
 now pass, including changed-input/restoration and whole/staged reward-label
 isolation. No timing repeat, production promotion or new learning result.

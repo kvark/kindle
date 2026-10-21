@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Predicate hardware attribution passes:**
+  [result](docs/results/2026-10-21-predicate-counters.md). Nine typed convolutions
+  warp9.945→8.761B(−11.91%), control456.762→17.359M(−96.20%), tensor exact.
+  Packed/non-convolution total/control/LSU/tensor counts exact. LSU rises.26%:
+  measured control-flow improvement, not a feeding/load fix or additive time
+  attribution. Complete35 grouped RGB regions/3,751 dispatches,2,088 offline
+  metrics,813 protected buffers/1.311M outputs and292-tensor states pass.
+  Ordinary observer24-prefix exact; Naga/Blade and marker-only recording unchanged.
+  Two guards/zero warnings/25 synthetic updates/50 counter replays/zero actions;
+  2,717 receipts10:35:57UTC, no worker. No new full timing or CDP capture.
+  Keep isolated79bc7cec/1.642x and reference72005c8b; production/Atari unchanged.
+  Next clean upstream pure-predicate port CPU scope: a75c38e has shared checked
+  templates, not the retained two files; no direct cherry-pick or port speed claim.
+  Preserve conditional reads/types, qualify separately, leave dirty neighboring
+  tree alone. No retained-extension import, tile sweep or automatic promotion.
 - **Predicate primitive/staged-gradient qualification passes:**
   [result](docs/results/2026-10-21-predicate-qualification.md).48 fixed BF16 cases/
   arm,178.617M F64 comparisons each (170.077M empty-partition zeros;8.540M

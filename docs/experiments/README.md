@@ -1,6 +1,14 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [predicate counters](../results/2026-10-21-predicate-counters.md)
+confirm typed warp/control instructions fall11.91%/96.20%, tensor work unchanged.
+Packed/non-convolution totals are exact; LSU rises.26%, not a load/feeding fix.
+35 RGB regions/3,751 dispatches and2,088 offline metrics qualify with exact
+state/outputs/programs. Two guards/zero warnings/25 synthetic updates/zero actions;
+2,717 receipts10:35:57UTC, no worker. No retime/CDP capture/promotion. Next clean
+upstream template-scope audit: current shared templates differ from retained files.
+
 October21's [predicate qualification](../results/2026-10-21-predicate-qualification.md)
 passes48 BF16 cases/arm and exact actual RGB/CDP raw whole/staged gradients with
 changed reward labels.178.617M F64 values/arm include170.077M empty-split zeros;

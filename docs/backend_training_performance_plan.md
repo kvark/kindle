@@ -8,6 +8,16 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [candidate hardware capture](results/2026-10-21-predicate-counters.md)
+now confirms the mechanism: nine typed convolutions execute11.91% fewer warp
+and96.20% fewer control-pipe instructions, with unchanged tensor work. Packed
+and non-convolution instruction totals stay exact. LSU rises.26%; this addresses
+control flow, not the separate feeding deficit. Complete grouped capture,
+ordinary transfer and offline metric checks pass. No timing repeat or promotion.
+Next prepare a narrow upstream port: a75c38e uses shared checked templates,
+not our retained two files. Establish operation/type coverage on CPU before
+separate port qualification; do not claim these speedups for untested upstream.
+
 The candidate's [primitive and staged-gradient qualification](results/2026-10-21-predicate-qualification.md)
 now passes:48 BF16 cases/arm with independent F64 forward/dX/dW/partial checks,
 all9 changed model source occurrences covered, and exact actual RGB/CDP whole/
