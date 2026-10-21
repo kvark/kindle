@@ -1,6 +1,15 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [pure convolution predicates](../results/2026-10-21-convolution-predicates.md)
+pass complete-update acceptance: RGB48.452→42.808ms/CDP41.927→40.563ms,
+11.65%/3.25% less time. Exact24/272 reports/targets/tensors/full programs and
+130 offline shader modules pass. Six guards/zero warnings/1,136 synthetic updates,
+zero actions. Candidate79bc7cec remains isolated pending independent primitive
+GPU checks and actual counters. Static branches are not measured instructions.
+All failures remain; only the unstarted final job ran after controller repair.
+18.26GiB reclaimed through byte-verified immutable readout hardlinks, no lost paths.
+
 October21's [current model counters](../results/2026-10-21-current-model-counters.md)
 qualify35 RGB/20 CDP grouped regions with exact outputs/state/commands and3,306
 offline metrics. Original per-kernel RGB attribution stays failed; a marker-only

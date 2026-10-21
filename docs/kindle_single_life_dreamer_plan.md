@@ -8,6 +8,13 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [pure-predicate candidate](results/2026-10-21-convolution-predicates.md)
+now saves11.65% RGB /3.25% CDP complete-update time with exact synthetic model
+trajectories. It changes bounds-check control flow, not tiling or arithmetic.
+Independent primitive GPU correctness and hardware attribution remain next;
+candidate79bc7cec is not production or a new learning result. No timing repeat
+or automatic Atari restart. Five-game supremacy remains unfinished.
+
 The [actual-model hardware counters](results/2026-10-21-current-model-counters.md)
 now qualify on the current driver. Nine typed convolution occurrences account
 for a historical-to-current instruction increase even though all23 reconstructed

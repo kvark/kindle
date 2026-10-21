@@ -7,6 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Pure convolution predicates pass the complete-update cost gate:**
+  [result](docs/results/2026-10-21-convolution-predicates.md). RGB48.452→42.808ms
+  saves11.65%; CDP41.927→40.563ms saves3.25%, calibrated fresh controls. Exact
+  24/272 reports/targets/initial-first-final292/346 tensors and complete programs/
+  runtime sources pass. Nine typed occurrences change;14 packed remain exact.
+  Pure eager bounds checks preserve conditional loads/nonnegative remainder
+  guards, geometry/order/precision/barriers.130 offline modules pass; fewer
+  static branches are not measured hardware instructions. Six passing guards,
+  zero warnings/1,136 synthetic updates/zero actions. Candidate79bc7cec remains
+  isolated; keep production/control72005c8b. Candidate RGB1.642x retained current
+  JAX, not parity or learning evidence. Next independent GPU primitive/reference
+  qualification and current-model grouped counters, not retiming/tile sweeps.
+  Preserve rustfmt/WGSL parse/pre-child schema failures and final-step controller
+  failure. Only the unstarted CDP candidate ran in continuation; no cohort repeat.
+  Publication's compensated-sum mismatch is repaired with Rust-order explicit
+  folding, no tolerance change.883 receipts pass10:14:56UTC; no worker remains.
+  Reclaimed18.26GiB via247 byte-verified immutable-readout hardlinks; all273 paths/
+  bytes retained. Copy before mutating those archives. No Atari restart.
 - **Current-driver grouped model counters qualify:**
   [result](docs/results/2026-10-21-current-model-counters.md). RGB35/CDP20 regions
   cover3,751/763 dispatches with exact outputs/state/commands and3,306 offline

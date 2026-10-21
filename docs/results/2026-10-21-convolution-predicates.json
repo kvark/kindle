@@ -1,0 +1,193 @@
+{
+  "status": "cost_gate_passed_further_qualification_required",
+  "date": "2026-10-21",
+  "driver": "615.71.09",
+  "retained_native": "72005c8b536bedf02543676e2be04e7d55f18a10e7c5b6975a63506cdc642faf",
+  "candidate_native": "79bc7cec0bc760d2f030b7c7721307868f4b557518f9a6adae0d60a2fb93c637",
+  "retained_jax_inclusive_ms": 26.066381933361527,
+  "production_changed": false,
+  "atari_started": false,
+  "build": {
+    "native_sha256": "79bc7cec0bc760d2f030b7c7721307868f4b557518f9a6adae0d60a2fb93c637",
+    "source_changes": [
+      "src/shaders/conv_tile_address.wgsl",
+      "src/codegen/cooperative/convolution_words.rs"
+    ],
+    "naga_blade_unchanged": true
+  },
+  "cpu": {
+    "status": "passed",
+    "test_cases": {
+      "boolean_cases": 92,
+      "coordinate_cases": 81920
+    },
+    "actual_occurrences": 23,
+    "changed_occurrences": 9,
+    "general_variants": 42,
+    "validated_modules": 130,
+    "finished_utc": "2026-10-21T09:56:01.654825+00:00"
+  },
+  "prefix": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "exact_reports": 24,
+        "tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 205,
+        "changed_shader_bodies": 4
+      },
+      "cdp": {
+        "exact_reports": 24,
+        "tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 225,
+        "changed_shader_bodies": 4
+      }
+    },
+    "guards": 2,
+    "warnings": 0,
+    "synthetic_updates": 48,
+    "game_actions": 0,
+    "source_receipts": 874,
+    "finished_utc": "2026-10-21T10:00:02.627787+00:00"
+  },
+  "timing": {
+    "status": "passed",
+    "numerical_qualification": true,
+    "calibration_passed": true,
+    "cost_gate_passed": true,
+    "accepted_for_further_qualification": true,
+    "workloads": {
+      "rgb": {
+        "control_ms": 48.45217296875002,
+        "candidate_ms": 42.80847628125001,
+        "reduction_percent": 11.647974366681135,
+        "control_drift_percent": 0.020200534345105048,
+        "exact_reports": 272,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "changed_shader_bodies": 4,
+        "summaries": {
+          "control": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.985163089843751,
+              "imagination_and_targets": 7.0361710078124995,
+              "posterior": 6.692415503906249,
+              "world_train_and_sync": 30.738423367187487
+            },
+            "first32_mean_ms": 48.490780406249996,
+            "last32_mean_ms": 48.4802039375
+          },
+          "candidate": {
+            "stages_ms": {
+              "behavior_train_and_sync": 4.030419101562499,
+              "imagination_and_targets": 7.031122906249997,
+              "posterior": 6.563581441406252,
+              "world_train_and_sync": 25.183352832031286
+            },
+            "first32_mean_ms": 42.76355175,
+            "last32_mean_ms": 42.7855008125
+          }
+        }
+      },
+      "cdp": {
+        "control_ms": 41.927248792968754,
+        "candidate_ms": 40.5625804921875,
+        "reduction_percent": 3.2548481955489317,
+        "control_drift_percent": 0.08080093522164766,
+        "exact_reports": 272,
+        "exact_tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "changed_shader_bodies": 4,
+        "summaries": {
+          "control": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.967395066406248,
+              "imagination_and_targets": 16.476042179687493,
+              "posterior": 7.269138292968751,
+              "world_train_and_sync": 14.214673253906248
+            },
+            "first32_mean_ms": 42.120248437499995,
+            "last32_mean_ms": 42.03648346874999
+          },
+          "candidate": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.9926106953125005,
+              "imagination_and_targets": 16.462252371093754,
+              "posterior": 7.116473140624996,
+              "world_train_and_sync": 12.991244285156258
+            },
+            "first32_mean_ms": 40.46678434375001,
+            "last32_mean_ms": 40.675940250000004
+          }
+        }
+      }
+    },
+    "guards": 4,
+    "warnings": 0,
+    "synthetic_updates": 1088,
+    "game_actions": 0,
+    "production_changed": false,
+    "source_receipts": 883,
+    "finished_utc": "2026-10-21T10:12:15.933321+00:00"
+  },
+  "publication": {
+    "status": "passed",
+    "source_receipts": 883,
+    "total_passing_guards": 6,
+    "total_warnings": 0,
+    "total_synthetic_updates": 1136,
+    "game_actions": 0,
+    "production_changed": false,
+    "candidate_rgb_vs_retained_current_jax": 1.642286850192309,
+    "gpu_primitive_qualification": "unrun",
+    "hardware_instruction_attribution": "unrun",
+    "cleanup": {
+      "status": "passed",
+      "files_preserved": 273,
+      "duplicates_replaced": 247,
+      "duplicate_logical_bytes": 19604176896,
+      "observed_available_bytes_change": 19603869696,
+      "unique_data_removed": false,
+      "all_original_paths_and_bytes_preserved": true,
+      "metadata_preserved_in_manifest": true,
+      "recovery": "Copy canonical bytes to separate files before mutation; original metadata is in plan.json",
+      "gpu_calls": 0,
+      "finished_utc": "2026-10-21T10:04:46.357005+00:00"
+    },
+    "finished_utc": "2026-10-21T10:14:56.370825+00:00"
+  },
+  "retained_failures": [
+    "WGSL passed to rustfmt before build",
+    "Unparenthesized comparison in vector constructor rejected by Naga",
+    "Unsupported empty host declaration field rejected before GPU child",
+    "Timing controller expected final step 272 for CDP checkpoint starting at 124939; only unstarted final job continued",
+    "Publication reader used compensated Python sum instead of sequential Rust fold; exact explicit-fold repair passes without tolerance change"
+  ],
+  "unrun": [
+    "independent GPU primitive oracle",
+    "staged raw-gradient checks",
+    "candidate hardware-counter attribution",
+    "learning qualification"
+  ],
+  "artifacts": {
+    "original": "runs/convolution-predicates-20261021.wsBteZ9d",
+    "candidate": "runs/convolution-predicates-fixed-20261021.oF3Xs5YJ",
+    "cleanup": "runs/readout-dedup-20261021.dhR8EhJK"
+  }
+}

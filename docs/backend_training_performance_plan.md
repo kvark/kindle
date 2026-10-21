@@ -8,6 +8,18 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [pure-predicate candidate](results/2026-10-21-convolution-predicates.md)
+passes its complete-update cost gate: RGB48.452→42.808ms (11.65% less time),
+CDP41.927→40.563ms (3.25%). Exact synthetic trajectories and complete runtime
+source/program checks pass. Nine typed convolution occurrences simplify pure
+bounds predicates without changing geometry, arithmetic or conditional loads;
+14 packed occurrences stay identical. Static SPIR-V branches fall, but candidate
+hardware instructions are not measured. Next qualify independent GPU primitives
+and capture actual-model counters with the existing barrier-aligned observer.
+Do not repeat timing or promote automatically. Candidate79bc7cec is isolated;
+production/control72005c8b stays. Candidate RGB is1.642x retained current JAX;
+the full performance and five-game learning goals remain open.
+
 The [current actual-model counters](results/2026-10-21-current-model-counters.md)
 now qualify on615:35 RGB world/20 CDP imagination regions, exact state/output/
 command transfer and3,306 offline metrics. The original per-kernel RGB capture
