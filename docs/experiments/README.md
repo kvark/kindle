@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [current-driver attribution](../results/2026-10-21-driver615-attribution.md)
+qualifies exact ordinary/coarse trajectories and1.93%/1.95% instrumentation
+overhead. RGB48.442ms/CDP41.893ms ordinary; means/targets only.281/.278ms,
+cached model execution dominates. Four guards/zero warnings/1,088 synthetic
+updates/zero actions; CPU preflight/tail-reader repairs repeat no GPU work.
+No production/Atari change. Next current-runtime SDK observer CPU qualification.
+
 October21's [final optimizer interface](../results/2026-10-21-optimizer-final.md)
 passes all six CI jobs including Metal,161M state comparisons and exact complete
 RGB/CDP trajectories.48.448/41.826ms is essentially unchanged. PR275 ready,

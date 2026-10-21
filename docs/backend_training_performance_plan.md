@@ -8,12 +8,24 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [current-driver complete profile](results/2026-10-21-driver615-attribution.md)
+now qualifies: ordinary RGB48.442ms/CDP41.893ms,1.93%/1.95% trace overhead with
+exact reports/targets/checkpoints/full programs. Newly captured mean/target
+helpers total only.281/.278ms. Cached programs43.699/36.787ms dominate; CDP
+imagination alone15.705ms. GPU-pass coverage is not utilization, and uncovered
+4.230/4.116ms is not pure CPU time. Three extra coarse waits remain disclosed.
+No helper-only fix explains the RGB1.858x JAX gap. Next CPU-port and qualify the
+existing actual-model Perf SDK observer against current sources/commands for
+RGB world and CDP imagination before declaring current-driver GPU captures.
+Do not assume historical580 instructions survived the driver/runtime changes.
+Keep ordinary72005c8b; no observer promotion, tile sweep or Atari restart.
+
 The [final optimizer interface](results/2026-10-21-optimizer-final.md) now passes:
 all six Meganeura CI1048 jobs, unchanged Metal regressions,161M actual-model
 state comparisons, exact272 reports/checkpoints and essentially unchanged
 RGB48.448ms/CDP41.826ms cost. PR275 is ready for review, not merged. Use isolated
-72005c8b for the next declared current-driver complete-update attribution; include
-categorical-mean and resident-target timestamp coverage absent from current
+72005c8b for the qualified current-driver attribution above, which includes
+categorical-mean and resident-target timestamp coverage absent from prior
 helper waits. Production/Atari stay unchanged; historical580 counters do not
 establish current615 machine instructions. The~1.86x JAX gap remains open.
 

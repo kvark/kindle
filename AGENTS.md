@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Current-driver complete attribution qualifies:**
+  [result](docs/results/2026-10-21-driver615-attribution.md). Ordinary RGB48.442ms/
+  CDP41.893ms; coarse overhead1.926%/1.947%, exact272 reports/targets and292/346
+  initial-first-final tensors/full programs/shaders. GPU-pass union45.148/38.596ms,
+  uncovered4.230/4.116ms is not SM utilization or pure CPU time. Means+six target
+  passes only.281/.278ms; cached imagination6.253/15.705ms, world29.309/12.384ms
+  excludes posterior. Keep72005c8b, RGB/JAX1.858x; no production/Atari change.
+  Four guards/zero warnings/1,088 synthetic updates/zero actions;1,458 source/
+  63 publication receipts, final08:48:28UTC, no worker. Missing shader-test output
+  env and first-tail reader failures remain; same-binary/CPU repairs repeat no GPU.
+  Five positive/nine negative reader tests pass; preserve tails and three extra
+  coarse waits. Upstreama75c38e unchanged. Next CPU port/prove existing actual-model
+  SDK observer on current runtime: RGB world and CDP imagination, with complete
+  command/source/range coverage before GPU declaration. Historical580 counters
+  are not615; no helper/tile sweep, automatic promotion or learning restart.
 - **Final optimizer interface qualifies; PR275 ready for review:**
   [result](docs/results/2026-10-21-optimizer-final.md). 5d916851 passes all six
   CI1048 jobs, including unchanged Metal regressions. Isolated72005c8b passes

@@ -8,6 +8,15 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [current-driver profile](results/2026-10-21-driver615-attribution.md) qualifies
+with exact numerical transfer: ordinary RGB48.442ms/CDP41.893ms, about1.9%
+instrumentation overhead. The newly observed mean/target helpers cost only.28ms;
+model execution remains dominant, including15.705ms CDP imagination. This is
+not a speedup or learning result. Next qualify the existing actual-model hardware
+counter observer on current sources for RGB world and CDP imagination; historical
+580 counters cannot stand in for615 captures. Five-game success is still open;
+production/Atari remain stopped, no automatic observer promotion.
+
 The [new-driver JAX control](results/2026-10-21-driver615-baseline.md) measures
 26.066ms inclusive versus native48.281ms,1.85×. Its trajectory and compiled work
 are unchanged. A separate native optimizer probe now exposes tiny-gradient
@@ -30,8 +39,8 @@ a follow-up prevents a cancellation-prone reassociation using independent
 1-beta uniforms. [Final qualification](results/2026-10-21-optimizer-final.md)
 now passes all six CI jobs including Metal,161M state comparisons and complete
 RGB/CDP checks with essentially unchanged cost. PR275 is ready for review;
-production/Atari remain unchanged. Next current-driver performance attribution,
-including resident-target/mean helpers; no new learning result yet.
+production/Atari remain unchanged. Current-driver performance attribution,
+including resident-target/mean helpers, now qualifies above; no new learning result.
 
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.
