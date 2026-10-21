@@ -21,9 +21,13 @@ The [pinned JAX comparison and first GPU repair](results/2026-10-21-optimizer-de
 now pass96 independent checks each. JAX preserves tiny variances; Vulkan reports
 no explicit FP32 denormal-preservation support. A shared scaled-variance shader
 fixes all original failures without changing epsilon or stored state format;
-ten unaffected first-step cases remain bit-exact. **Next: qualify state boundaries,
-rounding and long sequences, then actual Session/checkpoint/cache integration.**
-The tiny fixture is not full-model or performance qualification. Latest Blade's
+ten unaffected first-step cases remain bit-exact. The subsequent
+[stateful and current-upstream Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
+passes786,432 boundary/sequence checks plus actual raw gradients/checkpoint
+continuation. **Next: preserve nonfinite-history poisoning in the beta2=0 guard,
+then qualify the retained command cache and complete-model numerics/cost.**
+Upstream has no retained cache API; that path is not covered. The finite-input
+tests are not full-model or performance qualification. Latest Blade's
 F16 preservation is not an F32 repair. No more performance allocation or Atari
 restart follows until this numerical issue is addressed.
 

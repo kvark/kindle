@@ -19,9 +19,12 @@ fixed and both failed probe allocations remain recorded.
 The [pinned JAX tiny-gradient control and first shader repair](results/2026-10-21-optimizer-denormals.md)
 now pass. JAX preserves the tiny variances; Vulkan does not advertise explicit
 FP32 denormal preservation. Scaled GPU arithmetic fixes the original fixture
-without changing epsilon or variance storage. Next qualify state boundaries and
-actual Session/checkpoint/cache integration; this is not yet a learner fix or a
-learning result. No production/Atari restart.
+without changing epsilon or variance storage. The subsequent
+[stateful/Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
+passes boundary sequences, raw gradients and checkpoint continuation on current
+upstream. Nonfinite-state poisoning, the retained command cache and full-model
+numerical/cost qualification remain; this is not yet a learner fix or learning
+result. No production/Atari restart.
 
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.

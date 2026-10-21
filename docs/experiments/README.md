@@ -1,6 +1,11 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [optimizer state/Session qualification](../results/2026-10-21-optimizer-state-boundaries.md)
+passes786,432 stateful checks and current-upstream backward/checkpoint tests.
+Nonfinite-state poisoning and cached/full-model qualification remain. Two guards,
+zero warnings,4,096 standalone plus49 synthetic Session updates, zero game actions.
+
 October21's [optimizer denormal comparison](../results/2026-10-21-optimizer-denormals.md)
 passes96 pinned-JAX and96 candidate-GPU checks. A scaled-variance shader fixes
 the original tiny-gradient failures with unchanged epsilon/storage. Explicit
