@@ -8,13 +8,28 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [B-column scatter test](results/2026-10-21-b-column.md) closes that candidate:
+all nine numerical cases and35 model anchors pass, but warp instructions fall
+2.482%, below3%, while shared-store wavefronts rise2.392×. Its read-pattern fix
+does not justify timing. No subset, retime or automatic promotion follows.
+
+A different register transpose preserves vector shared stores in its CPU
+bit/address proof. Both WGSL implementations fail: reshaped bitcast lowering,
+then BF16/u16 validation. Latest pinned Naga still has the latter restriction;
+nine actual SPIR-V raw roundtrip modules validate independently. Next minimal
+isolated typed bitcast support with negative tests, then complete offline
+transpose compilation. Full32 subgroup enforcement/actual IDs and appropriate
+Int16 enablement must precede any GPU comparison. No compiler commit without
+permission, validator bypass or payload-changing F32 conversion. Larger library
+reuse/pipelined feeding remains distinct. Keep79bc7cec/1.642×; no worker remains.
+
 The [A/B role diagnostic](results/2026-10-21-operand-role.md) now fits4A+8B+O
 and passes a both-reused holdout. B preparation is the more expensive shared-read
 path in this fixed probe; it is not a latency or historical-driver attribution.
 A B-only shared-scatter candidate passes CPU checks across all nine affected
 modules, preserving A/global gathers/iterators. It adds scalar stores, so benefit
-is unproven. Next all-nine GPU primitive/counter qualification, then one complete
-family cost gate if justified. No revival of the rejected both-column rewrite.
+was unproven at that point; the complete numerical/counter test above now rejects
+it. No revival of the rejected both-column rewrite or scatter cost trial.
 
 The [load/MMA isolation](results/2026-10-21-load-mma-isolation.md) now passes
 its model-pattern calibration. In one fixed shader, doubling matrix arithmetic

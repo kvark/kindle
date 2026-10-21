@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **B-column scatter rejected; register transpose has a compiler prerequisite:**
+  [result](docs/results/2026-10-21-b-column.md). All9 GPU cases/35 model anchors
+  pass; extra derived reads209.715M removed, but warp falls2.482% below3% gate
+  and store wavefronts rise2.392x. No timing/subset/sweep/promotion.18 guards/zero
+  warnings/1,008 dispatches/450 passes/zero updates/actions;282 receipts12:09:15UTC.
+  GPU ends12:08:50. Reclaimed2.105GiB duplicate blocks, all36 paths/bytes retained.
+  Register transpose CPU1,048,576 payloads/4,096 stores pass; both WGSL attempts
+  fail (reshaped bitcast, BF16/u16 validation). Latest pinned Nagaa489554c still
+  rejects BF16 bitcasts. Nine actual raw SPIR-V roundtrip modules/36 sites validate;
+  not a compiled transpose or GPU result.317 receipts12:20:57, no worker.
+  Next minimal isolated typed bitcast support/negative tests before full modules;
+  no Naga commit without permission. Require enforced full32/actual subgroup IDs
+  and explicit Int16 support where used; no native-default/local-ID assumption,
+  numeric-conversion substitute or validation bypass. Preserve both CPU failures.
+  Keep79bc7cec/1.642x; cuDNN feeding/full five-game goal remain open, Atari off.
 - **A/B role isolation passes; B-only staging CPU proof ready:**
   [result](docs/results/2026-10-21-operand-role.md). Fixed shader/four settings
   fit4A+8B+O; both-reused holdout passes. B reuse lowers LSU64,512→56,320;

@@ -8,9 +8,18 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [B-column experiment](results/2026-10-21-b-column.md) passes correctness but
+fails its instruction gate:2.482% less warp work,2.392× shared-store wavefronts.
+No timing or learning restart. A register-transpose CPU proof passes, but shader
+compilation exposes a BF16 bitcast restriction still present in latest pinned
+Naga. Legal SPIR-V roundtrips validate; the full transpose remains uncompiled.
+Resolve that typed compiler contract before any separate GPU qualification,
+with enforced subgroup ownership. Keep79bc7cec/1.642×; five-game mastery remains
+unfinished. All workers are terminal; no production change.
+
 The [operand-role follow-up](results/2026-10-21-operand-role.md) localizes the
 current diagnostic asymmetry to B preparation. One B-only staging candidate
-passes CPU proofs; GPU correctness/cost remain next. No speedup, production or
+passes CPU proofs; its GPU counter rejection is now recorded above. No speedup, production or
 learning claim; keep79bc7cec/1.642×. All workers finished.
 
 The [calibrated load/MMA diagnostic](results/2026-10-21-load-mma-isolation.md)

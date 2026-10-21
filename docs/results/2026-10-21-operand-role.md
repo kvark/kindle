@@ -1,5 +1,8 @@
 # Operand-role isolation identifies a B-preparation asymmetry
 
+Follow-up: [the B-only scatter passes GPU correctness but fails its instruction
+gate](2026-10-21-b-column.md). The CPU-only status below records this earlier step.
+
 October21,2026. [Evidence](2026-10-21-operand-role.json) ·
 [Preceding load/MMA diagnostic](2026-10-21-load-mma-isolation.md).
 

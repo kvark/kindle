@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [B-column scatter](../results/2026-10-21-b-column.md) passes all9
+GPU cases/35 anchors but fails its3% warp gate at2.482%; writes rise2.392×.
+18 guards/zero warnings/450 passes/zero learner updates/actions; no timing.
+Register-transpose CPU payload/ownership proof passes, but two WGSL encodings
+fail. Latest Naga still rejects BF16 bitcasts;9 actual SPIR-V roundtrips validate.
+317-receipt CPU review12:20:57UTC; no worker. Both failures stay, no promotion.
+
 October21's [operand-role test](../results/2026-10-21-operand-role.md) fits
 4A+8B+O and passes the held-out both-reused case. Eight guards/zero warnings,
 200 counter passes, no updates/actions. All23 layouts reconcile; a B-only
