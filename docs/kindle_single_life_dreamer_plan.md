@@ -12,8 +12,11 @@ The [complete reuse qualification](results/2026-10-21-convolution-reuse-cost.md)
 passes: RGB42.753→39.740ms (7.05% less), CDP40.605→39.398ms (2.97% less).
 All raw/staged gradients,272 reports/targets/five checkpoint pairs and complete
 plans/runtime sources reconcile exactly. Retain isolatedc8aeba28/1.525× JAX;
-production unchanged. Next minimal upstream integration and remaining-cost
-review, not a geometry sweep. CDP imagination and library feeding remain distinct
+production unchanged. The[Blade prerequisite](results/2026-10-21-full-subgroups-upstream.md)
+is now PR417 with passing local CPU/GPU checks and cross-platform CI running.
+Next port the missing Meganeura typed-gradient prerequisites and full reuse
+family, then remaining-cost review—not a forward-only substitute or geometry
+sweep. CDP imagination and library feeding remain distinct
 costs. No new learning result or automatic Atari restart; five-game supremacy
 remains unfinished. Older entries below retain their historical scope.
 

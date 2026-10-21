@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Blade full-subgroup upstream port qualified; PR417 open:**
+  [result](docs/results/2026-10-21-full-subgroups-upstream.md). Commit0af76fd on
+  currenteae0c6f adds optional width/full membership, capability/geometry checks,
+  Vulkan feature/stage wiring and unsupported-backend rejection; defaultsNone.
+  22 CPU tests/strict Vulkan Clippy/offline WGSL and three5080 GPU tests pass.
+  Four guards(one failed shader parse,three pass),four dispatches,zero warnings/
+  updates/actions; GPU14:40:16UTC,180-receipt audit14:43:07,no local worker.
+  Preserve reserved-WGSL-variable failure and original binary/source; fixed
+  fixture validates offline before separate execution. Strict GLES lint failure
+  reproduces on pristine upstream; actual CI policy passes with identical warning.
+  CI1192 still running; only user merges. No Naga/pin/production change.
+  Next audit/port Meganeura typed-gradient prerequisites: a75c38e lacks isolated
+  Conv2dGradientTyped and full-size cache wiring. Do not substitute a forward-only
+  port or import all experimental extensions. Keepc8aeba28/1.525x and Atari stopped.
+  Artifacts `runs/full-subgroups-upstream-20261021.zgoBU9Zk`;~4.7GiB disk free.
 - **Fixed convolution reuse qualifies complete-update performance:**
   [result](docs/results/2026-10-21-convolution-reuse-cost.md). RGB42.753→39.740ms,
   −7.05%; CDP40.605→39.398ms,−2.97%; both declared cost gates pass, controls

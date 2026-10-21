@@ -16,13 +16,20 @@ and full plan/pipeline/runtime-source checks pass exactly. Six guards, zero
 warnings,1,090 synthetic updates/eight raw backwards, zero actions. GPU workers
 are terminal; production and Atari remain unchanged.
 
-Next prepare minimal upstream integration of the optional Blade full32 contract
-and fixed Meganeura reuse policy with portable fallbacks; only the user merges.
+The[Blade upstream port](results/2026-10-21-full-subgroups-upstream.md) is now
+PR417/0af76fd:22 CPU tests, strict Vulkan Clippy, offline shader validation and
+three5080 GPU tests pass. Cross-platformCI1192 is running; only the user merges.
+The original shader-parse failure and unchanged-upstream strict GLES warning
+are preserved. Next audit/port Meganeura's typed-gradient prerequisites and full
+pipeline/cache contract before the fixed reuse policy: current main lacks the
+isolated Conv2dGradientTyped family. A forward-only port omits measured backward
+work; importing every experimental extension is also out of scope.
 Review remaining feeding and CDP imagination costs from existing captures, not
 a new geometry sweep. CDP imagination/targets remains16.45ms; backend parity
 and five-game learning stay open. The original ordered-sum observer failure is
 retained with a CPU-only exact repair. Verified immutable-library deduplication
-reclaimed13.183GB without removing unique evidence;~6.5GiB remains. Earlier
+reclaimed13.183GB without removing unique evidence;~4.7GiB remains after the
+independent upstream build. Earlier
 entries below retain historical scope, not new work or current speed claims.
 
 The [actual reuse implementation](results/2026-10-21-convolution-reuse.md)
