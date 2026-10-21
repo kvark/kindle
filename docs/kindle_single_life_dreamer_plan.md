@@ -8,6 +8,11 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [calibrated load/MMA diagnostic](results/2026-10-21-load-mma-isolation.md)
+points to operand loading/preparation: doubled arithmetic leaves shared reads
+unchanged. Next separate A/B operand roles; no new speed or learning result.
+The retained1.642× gap and five-game goal remain open; no worker remains.
+
 The [raw-word shared-storage probe](results/2026-10-21-shared-word-view.md)
 passes correctness but leaves all measured instruction anchors and the extra
 shared-read relation unchanged across nine typed convolutions. That fix is

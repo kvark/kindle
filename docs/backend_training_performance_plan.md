@@ -8,6 +8,13 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [load/MMA isolation](results/2026-10-21-load-mma-isolation.md) now passes
+its model-pattern calibration. In one fixed shader, doubling matrix arithmetic
+adds tensor instructions but no shared reads or LSU instructions. Loading
+iterations scale the residual instead. This narrows the next CPU design to A/B
+operand loading/preparation, not repeated accumulator arithmetic. No timing,
+SASS attribution, new backend fix or production promotion is claimed.
+
 The [raw-word view diagnostic](results/2026-10-21-shared-word-view.md) now
 rejects that representation-only fix: all nine typed occurrences pass numerical
 checks and35 model counter anchors, but warp/ALU/LSU/tensor instructions and

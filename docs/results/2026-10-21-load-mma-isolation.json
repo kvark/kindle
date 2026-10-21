@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "rows": [
+    {
+      "iterations": 1,
+      "repeat_mma": 1,
+      "logical_counts": [
+        4096,
+        2048,
+        8192
+      ],
+      "wavefronts_minus_conflicts": 32768,
+      "tensor_instructions": 4096,
+      "warp_instructions": 271360,
+      "lsu_instructions": 64512
+    },
+    {
+      "iterations": 2,
+      "repeat_mma": 1,
+      "logical_counts": [
+        8192,
+        4096,
+        8192
+      ],
+      "wavefronts_minus_conflicts": 57344,
+      "tensor_instructions": 8192,
+      "warp_instructions": 428032,
+      "lsu_instructions": 104448
+    },
+    {
+      "iterations": 1,
+      "repeat_mma": 2,
+      "logical_counts": [
+        4096,
+        4096,
+        8192
+      ],
+      "wavefronts_minus_conflicts": 32768,
+      "tensor_instructions": 8192,
+      "warp_instructions": 283648,
+      "lsu_instructions": 64512
+    }
+  ],
+  "local_coefficients": {
+    "logical_loads": 6,
+    "logical_mma": 0,
+    "logical_output_groups": 1
+  },
+  "scope": "Single-pipeline fixed diagnostic; coefficient is not a source-site instruction count or measured latency.",
+  "accounting_cases": 9,
+  "source_negative_checks": 36,
+  "existing_rank": 2,
+  "diagnostic_rank": 3,
+  "guards": 6,
+  "warnings": 0,
+  "operation_calls": 336,
+  "f64_values": 3145728,
+  "paired_values": 1572864,
+  "membership_values": 196608,
+  "counter_passes": 150,
+  "offline_metric_values": 522,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "ordinary_timing_samples": 0,
+  "backend_builds": 0,
+  "diagnostic_helper_builds": 2,
+  "source_receipts": 141,
+  "gpu_finished_utc": "2026-10-21T11:42:55.908246+00:00",
+  "finished_utc": "2026-10-21T11:44:43.871977+00:00",
+  "raw_artifacts": "runs/shared-read-accounting-20261021.boSjzSV5"
+}

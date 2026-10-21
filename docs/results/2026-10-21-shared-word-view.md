@@ -3,6 +3,10 @@
 October 21, 2026. [Compact evidence](2026-10-21-shared-word-view.json) ·
 [Preceding contract](2026-10-21-shared-read-residual.md).
 
+Follow-up: [load/MMA isolation](2026-10-21-load-mma-isolation.md) now points to
+operand loading/preparation rather than additional repeated multiply-add work.
+This representation-only null result remains unchanged.
+
 **Reject the representation-only fix.** All nine actual typed convolution
 occurrences pass numerical qualification, but changing shared storage from
 `vec4<bf16>` to `vec2<u32>` changes none of their warp, ALU, LSU or tensor

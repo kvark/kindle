@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [load/MMA isolation](../results/2026-10-21-load-mma-isolation.md)
+breaks the existing counters' load/MMA ambiguity. Calibrated single-shader
+settings point to operand preparation, not additional repeated MMA: tensor
+counts double while shared reads/LSU do not. Six guards/zero warnings/150
+counter passes/zero updates/actions;141 receipts pass, no worker. No speed claim.
+
 October21's [raw-word view](../results/2026-10-21-shared-word-view.md) passes
 all9 numerical cases and35 current-model anchors but changes no warp/ALU/LSU/
 tensor instructions or derived shared-read counts. Reject the representation

@@ -7,6 +7,17 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Load/MMA diagnostic separates the shared-read residual:**
+  [result](docs/results/2026-10-21-load-mma-isolation.md). Nine actual modules
+  fit historical4L+O/current6L+O, but L=2M makes source attribution ambiguous.
+  One fixed shader/three settings break that dependency: doubling MMA doubles
+  tensor counts while shared reads/LSU stay exact; loading iterations scale
+  derived reads. Baseline model-pattern gate passes; local6L+0M+O, not SASS/
+  per-instruction latency or driver-only proof. Next CPU design separates A/B
+  operand reuse, including first-use preparation; no format/tile sweep/Naga edit.
+  Six guards/zero warnings/336 primitive dispatches/150 passes/zero updates/actions;
+  3.146M F64/1.573M pairs/522 offline metrics,141 receipts11:44:43UTC. GPU ends
+  11:42:55, no worker. Keep79bc7cec/1.642x; cuDNN feeding/full goal remain open.
 - **Raw-word shared-view hypothesis rejected by counters:**
   [result](docs/results/2026-10-21-shared-word-view.md). All9 actual typed
   occurrences pass paired/F64/changed/restored outputs and35 model anchors
