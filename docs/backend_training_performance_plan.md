@@ -1,12 +1,27 @@
 # Backend training performance plan
 
-Updated October 20, 2026. Improve one RTX 5080 learner on Meganeura + Blade
+Updated October 21, 2026. Improve one RTX 5080 learner on Meganeura + Blade
 before returning to Kindle learning campaigns. Keep CDP, model capacity,
 replay ratio, image detail and exploration semantics unchanged. This is an
 implementation plan under the [roadmap](kindle_single_life_dreamer_plan.md),
 not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
+
+The [slice-view implementation](results/2026-10-21-slice-views.md) preserves
+complete synthetic trajectories but misses the3% RGB gate: fresh RGB48.281→
+47.776ms(1.05%), CDP41.771→41.016ms(1.81%). No promotion or retime. All329/359
+predicted dispatch removals occur; fewer logical writes do not ensure a large
+speedup. Primitive GPU numerics and complete program membership pass; cost
+rejection ends further qualification of this candidate.
+
+**The host now runs615.71.09 after reboot.** The historical580 results below,
+including1.58× JAX and instruction counters, retain their original scope. Next
+run the unchanged JAX control on this driver with exact fixture/HLO/trajectory
+checks and the same caller-inclusive boundary. Do not mix old JAX latency with
+new native timing or attribute cross-session differences to the driver alone.
+The larger convolution-feeding deficit remains a distinct historical finding;
+refresh the comparison before choosing further structural work. Atari stays off.
 
 The [October19 upstream refresh](results/2026-10-19-upstream-refresh.md) now
 qualifies Meganeura`c19cb1ca`/Blade`4845d652`/Naga`13f582dd` with retained isolated
@@ -42,8 +57,8 @@ match exactly;1,972 offline modules pass. Runtime membership is guarded in the
 shader with an unchanged-tree fallback, requiring no Blade/Naga change.
 The common RMS9→5 barrier proposal does not establish reduced latency. Keep
 the incumbent; no retiming/specialization sweep or further qualification for
-this rejected implementation. Next implement the existing version-safe
-slice-view contract. Latest upstream
+this rejected implementation. The subsequent slice-view implementation above
+also misses its cost gate. Previously reviewed upstream
 f1f4395c/eae0c6f7 is reviewed, not runtime-refreshed; it does not implement this
 mechanism. Keep the slice-view opportunity's limited potential distinct from
 the larger measured convolution-feeding deficit.

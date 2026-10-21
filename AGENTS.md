@@ -7,6 +7,18 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Slice views miss the cost gate:** [result](docs/results/2026-10-21-slice-views.md).
+  Fresh driver615.71.09 RGB48.281→47.776ms/CDP41.771→41.016ms improve1.05%/1.81%;
+  RGB fails3%, no promotion/retime. All24/272 reports/targets and four292/346
+  tensor pairs match exactly;329/359 dispatches removed. CPU121.508M addresses/
+  59 modules and GPU48 cases/12,800 F64 values pass. Nine guards/zero warnings,
+  1,184 synthetic updates/384 primitive forwards/zero actions; no worker.
+  Preserve initial CPU type-inference failure; staged raw-gradient and non-world
+  runtime-group qualification remain unrun after cost rejection. Keepd3ff4948.
+  Host rebooted into615.71.09: historical580 timing42.983/27.223ms/1.58x and
+  counters are not current-driver measurements. Next fresh unchanged JAX control
+  against the new native baseline, not another small-kernel sweep or Atari restart.
+  Upstreama75c38e/eae0c6f7 checked; no silent source refresh.
 - **Guarded reduction-tail implementation rejected:** [result](docs/results/2026-10-20-reduction-tail.md).
   Complete RGB42.936→43.275ms/CDP40.673→42.023ms regress.79%/3.32%;
   both declared cost gates fail. All24/272 reports/targets and four292/346-tensor

@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 20, 2026. This is the authoritative roadmap.
+Updated October 21, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -8,6 +8,13 @@ Updated October 20, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
+checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.
+The host has rebooted onto615.71.09; fresh native control is48.281ms RGB/41.771ms
+CDP. Historical580 timings and JAX ratios below are not current-driver results.
+Next refresh the unchanged JAX control before stating the current gap. Production
+and Atari remain stopped; no new learning-quality evidence.
+
 The [October19 upstream refresh](results/2026-10-19-upstream-refresh.md) is
 qualified in isolation: latest Meganeura/Blade/Naga plus retained fast paths,
 RGB42.983ms/CDP40.741ms. Two routing changes had bypassed substantial existing
@@ -26,8 +33,8 @@ distinct structural targets. The
 [guarded reduction-tail implementation](results/2026-10-20-reduction-tail.md)
 preserves all24/272 reports, targets and checkpoint states, but regresses full
 RGB/CDP updates.79%/3.32%. Reject it without retiming or promotion: fewer proposed
-barriers are not a speedup. Next the already-proven version-safe slice-view
-opportunity, not a blind tile sweep or learning restart; the root-cause/parity
+barriers are not a speedup. The subsequent slice-view test above also misses
+its gate; no blind tile sweep or learning restart. The root-cause/parity
 goal stays open.
 
 Fresh isolated complete RGB12M/B8/BF16 updates take **22.780 ms versus JAX
