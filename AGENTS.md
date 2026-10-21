@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Return to training now (user correction, October21).** Backend parity and
+  completing the upstream port are not prerequisites for Atari. Stop further
+  optimization/porting; use the already-qualified c8aeba28 implementation in
+  `runs/convolution-reuse-native-20261021.foJSYVFJ` (CDP39.398ms synthetic update).
+  Build the live runner from that exact source, perform a bounded live-game
+  train/frozen-eval smoke, then resume the roadmap's CDP Freeway exploration
+  work toward the original five games. Declare fresh runs; do not restart the
+  old interrupted queue or call checkpoint loading an equivalent lifetime resume.
+  This supersedes older blanket Atari-stop/upstream-integration gates below.
+  No JAX-parity gate. Upstream work is parked: localdefdef6, qualified60 GPU
+  cases/2,987,208 F64 comparisons/zero warnings, in
+  `runs/convolution-reuse-port-20261021.OiHEkqEk`; its cache is immutable.
+  Training is not yet running. Keep PR31 focused on learning progress.
 - **Packed convolution upstream port passes GPU qualification:**
   [result](docs/results/2026-10-21-convolution-packed-port.md). Local3e61376
   extends typed-backward132b574 on currenta75c38e: type-generic forward/dX/dW,

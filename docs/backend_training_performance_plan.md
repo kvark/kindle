@@ -8,6 +8,15 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+**User correction, October21: stop extending this performance detour and return
+to training.** The qualified c8aeba28 implementation is sufficient for the next
+live CDP campaign after a bounded live-runner smoke. Upstream ports and the
+remaining1.525× RGB/JAX gap are nonblocking follow-ups. Do not require completion
+of the integration sequence below before training. Latest local portdefdef6
+qualifies60 GPU cases/2,987,208 F64 comparisons with zero warnings; its artifact
+root is `runs/convolution-reuse-port-20261021.OiHEkqEk`. All workers stopped,
+cache immutable. Earlier next-step/Atari-stop statements are historical.
+
 The [packed convolution port](results/2026-10-21-convolution-packed-port.md)
 now passes48 GPU cases and2,805,360 F64 comparisons. Local3e61376 extends typed
 backward132b574 with type-generic packed products, GPU packers and capability-aware

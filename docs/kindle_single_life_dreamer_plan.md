@@ -7,6 +7,15 @@ Updated October 21, 2026. This is the authoritative roadmap.
 
 ## Performance pivot
 
+**October21 priority correction: return to CDP training.** Upstream integration
+and closing the remaining JAX gap are follow-up work, not training gates. Use
+the already-qualified c8aeba28 source (39.398ms CDP synthetic updates), build
+its live runner and run a bounded train/frozen-evaluation smoke. Then resume
+the declared Freeway exploration work toward the original five-game objective.
+Use fresh runs rather than resurrecting the interrupted queue. The historical
+Atari-stop and port-first directions below are superseded. Training has not
+restarted yet; PR31 tracks the handoff.
+
 **Current work: [backend training performance](backend_training_performance_plan.md).**
 The [packed convolution port](results/2026-10-21-convolution-packed-port.md)
 passes48 GPU/F64 cases, including all three packed passes and split gradients.
