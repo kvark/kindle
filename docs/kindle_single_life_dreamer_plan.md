@@ -8,6 +8,11 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [operand-role follow-up](results/2026-10-21-operand-role.md) localizes the
+current diagnostic asymmetry to B preparation. One B-only staging candidate
+passes CPU proofs; GPU correctness/cost remain next. No speedup, production or
+learning claim; keep79bc7cec/1.642×. All workers finished.
+
 The [calibrated load/MMA diagnostic](results/2026-10-21-load-mma-isolation.md)
 points to operand loading/preparation: doubled arithmetic leaves shared reads
 unchanged. Next separate A/B operand roles; no new speed or learning result.

@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **A/B role isolation passes; B-only staging CPU proof ready:**
+  [result](docs/results/2026-10-21-operand-role.md). Fixed shader/four settings
+  fit4A+8B+O; both-reused holdout passes. B reuse lowers LSU64,512→56,320;
+  A reuse does not. Tensor4,096 exact. Not latency/SASS/historical driver cause.
+  All23 layouts audited:9 typed A/B-row,10 packed A-row/B-column,4 packed
+  A-column/B-row. No blanket orientation explanation. B-only scatter preserves
+  A/global gathers/iterators;18 offline modules/nine exact controls/9,216 writes/
+  18,432 value addresses pass. Two B-vector stores become eight scalar stores:
+  GPU correctness/cost unrun, no Naga feature or prior both-column-family retry.
+  Next all9 primitive/counter qualification; useful counters precede one complete
+  family cost gate, no subset/sweep/promotion. Eight guards/zero warnings/448
+  primitive calls/200 passes/zero updates/actions;216 receipts12:00:20UTC, no
+  worker. Preserve degenerate-B fixture and overbroad layout-reader failures;
+  CPU repairs repeat no GPU work. Keep79bc7cec/1.642x; full goal remains open.
 - **Load/MMA diagnostic separates the shared-read residual:**
   [result](docs/results/2026-10-21-load-mma-isolation.md). Nine actual modules
   fit historical4L+O/current6L+O, but L=2M makes source attribution ambiguous.

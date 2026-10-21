@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [operand-role test](../results/2026-10-21-operand-role.md) fits
+4A+8B+O and passes the held-out both-reused case. Eight guards/zero warnings,
+200 counter passes, no updates/actions. All23 layouts reconcile; a B-only
+scatter candidate passes18 offline modules/nine exact controls, not GPU/cost.
+Fixture/layout-reader CPU failures stay;216 receipts12:00:20UTC, no worker.
+
 October21's [load/MMA isolation](../results/2026-10-21-load-mma-isolation.md)
 breaks the existing counters' load/MMA ambiguity. Calibrated single-shader
 settings point to operand preparation, not additional repeated MMA: tensor

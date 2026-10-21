@@ -1,0 +1,115 @@
+{
+  "diagnostic": {
+    "status": "passed",
+    "scope": "Fixed single-pipeline synthetic operand-role diagnostic, not production reuse or latency.",
+    "rows": [
+      {
+        "case": "reuse-a0-b0",
+        "role_counts": [
+          2048,
+          2048,
+          8192
+        ],
+        "derived_shared_reads": 32768,
+        "tensor_instructions": 4096,
+        "lsu_instructions": 64512,
+        "warp_instructions": 276480
+      },
+      {
+        "case": "reuse-a1-b0",
+        "role_counts": [
+          1024,
+          2048,
+          8192
+        ],
+        "derived_shared_reads": 28672,
+        "tensor_instructions": 4096,
+        "lsu_instructions": 64512,
+        "warp_instructions": 276480
+      },
+      {
+        "case": "reuse-a0-b1",
+        "role_counts": [
+          2048,
+          1024,
+          8192
+        ],
+        "derived_shared_reads": 24576,
+        "tensor_instructions": 4096,
+        "lsu_instructions": 56320,
+        "warp_instructions": 264192
+      },
+      {
+        "case": "reuse-a1-b1",
+        "role_counts": [
+          1024,
+          1024,
+          8192
+        ],
+        "derived_shared_reads": 20480,
+        "tensor_instructions": 4096,
+        "lsu_instructions": 56320,
+        "warp_instructions": 264192
+      }
+    ],
+    "coefficients": {
+      "a_loads": "4",
+      "b_loads": "8",
+      "output_groups": "1"
+    },
+    "heldout_prediction": "20480",
+    "heldout_passed": true,
+    "scalar_oracle_checks": 4096,
+    "guards": 8,
+    "warnings": 0,
+    "operation_calls": 448,
+    "f64_values": 4194304,
+    "paired_values": 2097152,
+    "membership_values": 262144,
+    "counter_passes": 200,
+    "offline_metric_values": 696,
+    "learner_updates": 0,
+    "game_actions": 0,
+    "ordinary_timing_samples": 0,
+    "native_builds": 0,
+    "compiler_edits": 0,
+    "source_receipts": 130,
+    "gpu_finished_utc": "2026-10-21T11:52:27.708651+00:00",
+    "finished_utc": "2026-10-21T11:52:48.726139+00:00"
+  },
+  "final_review": {
+    "status": "passed",
+    "layout_groups": [
+      {
+        "family": "typed",
+        "a_layout": "row",
+        "b_layout": "row",
+        "a_stride": 10,
+        "b_stride": 10,
+        "occurrences": 9
+      },
+      {
+        "family": "packed",
+        "a_layout": "row",
+        "b_layout": "column",
+        "a_stride": 10,
+        "b_stride": 10,
+        "occurrences": 10
+      },
+      {
+        "family": "packed",
+        "a_layout": "column",
+        "b_layout": "row",
+        "a_stride": 18,
+        "b_stride": 18,
+        "occurrences": 4
+      }
+    ],
+    "candidate_cpu_cases": 9,
+    "candidate_gpu_executed": false,
+    "confirmed_fixture_degeneracy": true,
+    "source_receipts": 216,
+    "finished_utc": "2026-10-21T12:00:20.303026+00:00"
+  },
+  "raw_artifacts": "runs/operand-role-distinct-20261021.cfEouL1R"
+}

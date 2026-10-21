@@ -8,6 +8,14 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [A/B role diagnostic](results/2026-10-21-operand-role.md) now fits4A+8B+O
+and passes a both-reused holdout. B preparation is the more expensive shared-read
+path in this fixed probe; it is not a latency or historical-driver attribution.
+A B-only shared-scatter candidate passes CPU checks across all nine affected
+modules, preserving A/global gathers/iterators. It adds scalar stores, so benefit
+is unproven. Next all-nine GPU primitive/counter qualification, then one complete
+family cost gate if justified. No revival of the rejected both-column rewrite.
+
 The [load/MMA isolation](results/2026-10-21-load-mma-isolation.md) now passes
 its model-pattern calibration. In one fixed shader, doubling matrix arithmetic
 adds tensor instructions but no shared reads or LSU instructions. Loading

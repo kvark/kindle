@@ -3,6 +3,10 @@
 October21,2026. [Evidence](2026-10-21-load-mma-isolation.json) ·
 [Preceding null result](2026-10-21-shared-word-view.md).
 
+Follow-up: [operand-role isolation](2026-10-21-operand-role.md) separates A/B
+effects and passes a both-reused holdout. A B-only staging candidate is now
+CPU-qualified, not GPU- or performance-qualified.
+
 **A calibrated single-shader diagnostic separates operand loading/preparation
 from repeated matrix multiply-add work.** Doubling multiply-adds doubles tensor
 instructions but changes neither LSU instructions nor shared-read wavefronts
