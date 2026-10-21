@@ -8,6 +8,15 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [raw-word view diagnostic](results/2026-10-21-shared-word-view.md) now
+rejects that representation-only fix: all nine typed occurrences pass numerical
+checks and35 model counter anchors, but warp/ALU/LSU/tensor instructions and
+shared-read wavefronts minus conflicts remain exact. No Naga integration, timing
+or neighboring-format sweep follows. Next design a minimal known-value isolation
+of cooperative loads versus accumulator/shared-output handling on CPU; do not
+attribute aggregate counters to a source site without that evidence. The larger
+cuDNN reuse/feeding gap and complete1.642× RGB gap remain open. No worker remains.
+
 The [residual shared-read audit](results/2026-10-21-shared-read-residual.md)
 finds an exact historical/current relation in all nine typed occurrences:
 shared-read wavefronts minus conflicts increase by twice the unchanged tensor
@@ -15,8 +24,8 @@ instruction count. Packed paths retain their derived counts; the predicate fix
 does not remove this difference. This is post-hoc evidence, not source-site or
 driver-only attribution. A reversible raw-word shared-storage view now validates
 offline, preserving logical packet/index/stride and matrix operations. Physical
-layout and GPU behavior are unproven. Next qualify one actual-binding numerical/
-counter probe before compiler changes or timing; no rejected feeding-family retry.
+layout was unproven at that point. The actual-binding probe above now qualifies
+numerics and rejects the hoped-for counter change; no rejected feeding-family retry.
 PR276 passes all six CI1050 jobs and remains unmerged.
 
 The [upstream predicate port](results/2026-10-21-upstream-predicates.md) now

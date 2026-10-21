@@ -3,6 +3,11 @@
 October 21, 2026. [Compact evidence](2026-10-21-shared-read-residual.json)
 · [Predicate hardware capture](2026-10-21-predicate-counters.md).
 
+Follow-up: the [GPU raw-word-view diagnostic](2026-10-21-shared-word-view.md)
+passes numerical checks but changes none of the instruction anchors or derived
+shared-read counts. Its proposed representation fix is rejected; this saved
+counter relation remains valid and unexplained.
+
 **The current typed convolutions have an exact additional shared-read counter
 pattern that the predicate fix does not remove.** Across every comparable typed
 region, the historical-to-current increase in shared-read wavefronts minus

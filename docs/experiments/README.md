@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [raw-word view](../results/2026-10-21-shared-word-view.md) passes
+all9 numerical cases and35 current-model anchors but changes no warp/ALU/LSU/
+tensor instructions or derived shared-read counts. Reject the representation
+fix; no timing/Naga integration/sweep.18 passing guards/zero warnings,450 counter
+passes/1,008 primitive dispatches/zero updates/actions;281 receipts11:29:31UTC,
+no worker. Keep79bc7cec/1.642×; next CPU operation-isolation design.
+
 October21's [shared-read residual](../results/2026-10-21-shared-read-residual.md)
 finds an exact post-hoc +2x tensor-instruction relation in typed shared-read
 wavefronts minus conflicts, absent in packed paths and untouched by predicates.

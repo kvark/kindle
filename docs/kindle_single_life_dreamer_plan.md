@@ -8,10 +8,17 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [raw-word shared-storage probe](results/2026-10-21-shared-word-view.md)
+passes correctness but leaves all measured instruction anchors and the extra
+shared-read relation unchanged across nine typed convolutions. That fix is
+closed without compiler integration or timing. Next isolate the responsible
+operation in a CPU-designed diagnostic; neither the cuDNN feeding gap nor
+five-game learning is resolved. Keep79bc7cec/1.642×; no worker or Atari restart.
+
 The [saved-counter follow-up](results/2026-10-21-shared-read-residual.md)
-narrows a remaining question to shared operand-load lowering. One raw-word view
-validates offline; GPU numerical/counter qualification is next, not a speed or
-learning claim. No additional training or GPU capture ran for this audit.
+narrows a remaining question to shared operand-load lowering. Its offline
+raw-word view is now tested and rejected above as an instruction fix, not
+promoted. The preceding CPU audit itself ran no training or GPU capture.
 
 The [narrow upstream predicate port](results/2026-10-21-upstream-predicates.md)
 passes compiler, paired GPU correctness and all six CI jobs; MeganeuraPR276 is unmerged.

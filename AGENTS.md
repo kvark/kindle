@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Raw-word shared-view hypothesis rejected by counters:**
+  [result](docs/results/2026-10-21-shared-word-view.md). All9 actual typed
+  occurrences pass paired/F64/changed/restored outputs and35 model anchors
+  across7 regions. Warp8.761B/ALU5.520B/LSU1.018B/tensor104.858M unchanged;
+  wavefronts-minus-conflicts634,981,888 exact in each arm. No instruction fix,
+  SASS identity, timing or driver-only claim.18 passing guards/zero warnings,
+  450 counter passes/1,008 primitive dispatches/zero updates/actions;3.373M F64,
+  742.034M empty zeros/372.703M paired values include capture rechecks.281 receipts
+  pass11:29:31UTC, GPU ends11:27:20, no worker. Preserve pre-capture SDK-reader
+  name correction and original offline failures; no GPU repeat. No Naga edit,
+  timing, representation/geometry sweep or promotion. Keep79bc7cec/1.642x.
+  Next CPU design separates cooperative-load from accumulator/shared-output
+  handling with actual matrix contracts and known values before any GPU test;
+  cuDNN's larger reuse/multistage feeding remains distinct. Atari/full goal open.
 - **Residual shared-read relation and offline word view pass:**
   [result](docs/results/2026-10-21-shared-read-residual.md). All7 typed regions/
   9 occurrences have historical→current shared-read wavefronts minus conflicts
