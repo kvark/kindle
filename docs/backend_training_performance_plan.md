@@ -8,15 +8,17 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-The [typed generator port](results/2026-10-21-convolution-generator-port.md)
-now passes on current Meganeura: all seven changed model WGSL/SPIR-V pairs
-match exactly;48 codegen tests, strict library Clippy and432 offline modules
-pass. Local653ce00 is not runtime-integrated or a new performance result.
-Next wire typed backward graph construction, bounded split scratch, bindings,
-selection and full-subgroup/geometry cache identity, then qualify the complete
-integrated learner. No forward-only substitute, production pin or Atari restart.
-Blade PR417's three platform GPU jobs pass; Linux build still reports running.
-The original workspace-isolation failure is retained with its CPU-only repair.
+The [typed backward port](results/2026-10-21-convolution-backward-port.md)
+now passes36 GPU forward/backward cases against F64, including three-way split
+gradients. Local132b574 wires graphs, bounded scratch, bindings and typed cache
+identity;143 CPU tests, strict Clippy and444 offline modules pass. All714
+existing sources and seven qualified reuse WGSL/SPIR-V pairs remain exact.
+Next port the fourteen measured packed products still absent upstream and wire
+capability-aware larger reuse/full32/geometry caches, then qualify the complete
+integrated learner. This is not a new performance result, production pin or
+Atari restart. Two guards/zero warnings; all workers terminal. Both port caches
+are archived/immutable after1.087GB exact deduplication; use a fresh worktree/target.
+Blade PR417's three platform GPU jobs pass; Linux build last reports running.
 
 The [complete reuse qualification](results/2026-10-21-convolution-reuse-cost.md)
 passes: RGB42.753→39.740ms (7.05% less), CDP40.605→39.398ms (2.97% less).

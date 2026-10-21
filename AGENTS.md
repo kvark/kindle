@@ -7,19 +7,24 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
-- **Typed convolution generator port passes offline qualification:**
-  [result](docs/results/2026-10-21-convolution-generator-port.md). Local653ce00
-  on currenta75c38e reproduces all7 changed model WGSL/SPIR-V pairs exactly;
-  all23 identities reconcile,16 retained products are not reimplemented.
-  48 codegen tests/strict library Clippy/432 offline modules pass;425 generic
-  variants are compiler coverage, not GPU numerics. No graph/runtime activation,
-  pin, Meganeura PR or new speed claim. Preserve initial nested-workspace failure;
-  separate containing workspace fixes it without repository manifest changes.
-  Final251-input audit14:59:52UTC,zero GPU/updates/actions,no local worker,~3.5GiB free.
-  Next typed backward graph, bounded split scratch, bindings/selection/full32
-  and geometry cache contract, then integrated qualification. Keepc8aeba28/1.525x;
-  Atari stopped. Blade PR417 GPU CI passes Linux/Windows/macOS; Linux build still
-  reports running, other jobs pass. Only user merges; no geometry sweep.
+- **Typed convolution backward port passes GPU qualification:**
+  [result](docs/results/2026-10-21-convolution-backward-port.md). Local132b574
+  on currenta75c38e wires BF16 backward graphs, compensated/split F32 gradients,
+  total scratch bounds, bindings, precision requirements and descriptor cache keys.
+  16 control/20 typed cases pass155,148/358,272 F64 comparisons; includes K8450
+  three-way splitting, tails, rectangular kernels and tiny gradients.143 CPU
+  tests/strict library+regression Clippy/444 offline modules pass;714 existing
+  sources and7 qualified reuse source/SPIR-V pairs remain exact. Larger reuse
+  and full32/geometry runtime selection remain unwired; fourteen measured packed
+  products also lack upstream integration. Next port these complete prerequisites,
+  then actual-model raw/staged/full-update qualification. No new timing/pin/PR/
+  Atari restart. Keepc8aeba28/1.525x. Two guards,zero warnings,36 forward/backward
+  evaluations,zero optimizer updates/actions; GPU15:20:25UTC,296-receipt audit
+  15:22:23,no worker. Preserve initial three missing-match compiler errors and
+  unexecuted wrong-device-key queue; repairs repeat no GPU work.565 immutable
+  library duplicates reclaimed1.087GB, all paths/bytes retained,~3.0GiB free.
+  Both port target caches/worktrees are archived: use a new worktree and target,
+  never mutate shared caches. Only user merges; no geometry sweep.
 - **Blade full-subgroup upstream port qualified; PR417 open:**
   [result](docs/results/2026-10-21-full-subgroups-upstream.md). Commit0af76fd on
   currenteae0c6f adds optional width/full membership, capability/geometry checks,

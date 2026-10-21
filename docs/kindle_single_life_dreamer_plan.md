@@ -8,11 +8,11 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
-The [typed convolution generator port](results/2026-10-21-convolution-generator-port.md)
-reproduces all seven qualified WGSL/SPIR-V pairs exactly on current Meganeura;
-48 codegen tests and432 offline modules pass. Runtime integration is next:
-typed backward graphs, bounded scratch, bindings/selection and full32/cache
-contracts. This is not a new speed or learning result; production remains unchanged.
+The [typed convolution backward port](results/2026-10-21-convolution-backward-port.md)
+passes36 GPU/F64 cases, including split gradients; graphs, bounded scratch and
+runtime bindings are wired. Next port the fourteen measured packed products and
+full32/larger-reuse selection/cache contracts, then qualify the complete learner.
+This is not a new speed or learning result; production remains unchanged.
 The [complete reuse qualification](results/2026-10-21-convolution-reuse-cost.md)
 passes: RGB42.753→39.740ms (7.05% less), CDP40.605→39.398ms (2.97% less).
 All raw/staged gradients,272 reports/targets/five checkpoint pairs and complete
