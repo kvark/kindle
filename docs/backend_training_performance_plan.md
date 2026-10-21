@@ -8,41 +8,25 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
-The [complete-model optimizer check](results/2026-10-21-optimizer-model.md)
-passes160,998,750 independent state comparisons and exact observer transfer.
-RGB48.403→48.446ms/CDP41.817→41.886ms adds only.090%/.164%; all272 reports/states
-match on these fixtures. No observed model subnormal variance; component tests
-cover the original failure. Metal CI exposes a separate cancellation/nonfinite
-issue whose exact arithmetic signature is reproduced on CPU. Qualify independent
-1-beta uniforms in actual Metal CI, then verify the final interface. Follow-up
-5d916851 passes local GPU/layout/Clippy tests; CI1048 is in progress.
-Do not promote4bd as cross-backend qualified or extend its full-model evidence
-to the unqualified follow-up. No Atari restart or new speedup claim.
+The [final optimizer interface](results/2026-10-21-optimizer-final.md) now passes:
+all six Meganeura CI1048 jobs, unchanged Metal regressions,161M actual-model
+state comparisons, exact272 reports/checkpoints and essentially unchanged
+RGB48.448ms/CDP41.826ms cost. PR275 is ready for review, not merged. Use isolated
+72005c8b for the next declared current-driver complete-update attribution; include
+categorical-mean and resident-target timestamp coverage absent from current
+helper waits. Production/Atari stay unchanged; historical580 counters do not
+establish current615 machine instructions. The~1.86x JAX gap remains open.
 
-The [current-driver comparison](results/2026-10-21-driver615-baseline.md) passes:
-native48.281ms versus caller-inclusive JAX26.066ms, **1.85×**. JAX's complete
-trajectory and compiled computation match the old control; native's cross-session
-trajectory does not, although its plans and shader sources match. Before reusing
-the old native timestamp observer, a tiny-gradient probe exposes an optimizer
-failure: subnormal F32 second moments become zero and LaProp momentum reaches30
-instead ofabout.1. Six signed cases fail independent variance/momentum/update
-checks. This is not a GPU wedge or a measured explanation of the performance gap.
-
-The [pinned JAX comparison and first GPU repair](results/2026-10-21-optimizer-denormals.md)
-now pass96 independent checks each. JAX preserves tiny variances; Vulkan reports
-no explicit FP32 denormal-preservation support. A shared scaled-variance shader
-fixes all original failures without changing epsilon or stored state format;
-ten unaffected first-step cases remain bit-exact. The subsequent
-[stateful and current-upstream Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
-passes786,432 boundary/sequence checks plus actual raw gradients/checkpoint
-continuation. [Poison and retained-cache qualification](results/2026-10-21-optimizer-cached.md)
-now also passes; draft MeganeuraPR275 contains the repair. The retained runtime
-checks are separate from upstream, which has no cache API. **Next: complete RGB/CDP
-numerical qualification, then repair overhead measurement.** Built candidate6b621e5c
-changes only the optimizer shader; no full-model update has run on it yet.
-Component tests are not full-model or performance qualification. Latest Blade's
-F16 preservation is not an F32 repair. No more performance allocation or Atari
-restart follows until this numerical issue is addressed.
+The preceding [current-driver comparison](results/2026-10-21-driver615-baseline.md)
+found tiny-gradient underflow while checking observer transfer: momentum30
+instead ofabout.1. [Pinned JAX/component tests](results/2026-10-21-optimizer-denormals.md),
+[stateful/Session tests](results/2026-10-21-optimizer-state-boundaries.md),
+[poison/cache checks](results/2026-10-21-optimizer-cached.md) and the
+[first full-model qualification](results/2026-10-21-optimizer-model.md) lead to
+the final repair above. Full-model snapshots contain no subnormal variances;
+dedicated component tests cover that case. The issue's contribution to historical
+game scores or the performance gap is unmeasured. Initial Metal failures and
+all other failed checks remain in their reports, not retroactively successful.
 
 The [slice-view implementation](results/2026-10-21-slice-views.md) preserves
 complete synthetic trajectories but misses the3% RGB gate: fresh RGB48.281→

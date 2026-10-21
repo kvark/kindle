@@ -1,0 +1,190 @@
+{
+  "status": "qualified",
+  "commit": "5d916851b908a71bdb124e2db5e8cfcf1870e7d1",
+  "native_sha256": "72005c8b536bedf02543676e2be04e7d55f18a10e7c5b6975a63506cdc642faf",
+  "observer_sha256": "b0a57b04fd4957df72860ac105571b08fd0492679c45088625f5fe3133befa39",
+  "artifacts": "runs/optimizer-final-20261021.f8VAIszC",
+  "ci": {
+    "run": 39568247325,
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": {
+      "Dependency audit": "success",
+      "Rust MSRV": "success",
+      "macOS (Metal)": "success",
+      "Quality gates": "success",
+      "Linux (lavapipe)": "success",
+      "Windows compile (Vulkan)": "success"
+    }
+  },
+  "numerical": {
+    "comparisons": 160998750,
+    "max_error_over_bound": [
+      0.011920924691823235,
+      0.04709600479519445,
+      0.005935546611610119
+    ],
+    "model_subnormal_variances": 0,
+    "retained_transfer": {
+      "rgb": {
+        "exact_reports": 24,
+        "checkpoint_counts": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "optimizer_body_replacements": 1
+      },
+      "cdp": {
+        "exact_reports": 24,
+        "checkpoint_counts": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "optimizer_body_replacements": 1
+      }
+    },
+    "observer_transfer": {
+      "rgb": {
+        "exact_reports": 24,
+        "exact_checkpoint_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 205,
+        "cache": {
+          "behavior": [
+            1,
+            23
+          ],
+          "imagination": [
+            1,
+            23
+          ],
+          "slow_value": [
+            1,
+            23
+          ],
+          "world": [
+            5,
+            115
+          ]
+        }
+      },
+      "cdp": {
+        "exact_reports": 24,
+        "exact_checkpoint_tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 225,
+        "cache": {
+          "behavior": [
+            1,
+            23
+          ],
+          "imagination": [
+            1,
+            23
+          ],
+          "slow_value": [
+            1,
+            23
+          ],
+          "world": [
+            5,
+            115
+          ]
+        }
+      }
+    },
+    "source_receipts": 1341
+  },
+  "timing": {
+    "workloads": {
+      "rgb": {
+        "control_ms": 48.52356083593749,
+        "candidate_ms": 48.448095894531214,
+        "overhead_percent": -0.15552226610373587,
+        "exact_reports": 272,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 4.009613472656251,
+            "imagination_and_targets": 7.052438484374997,
+            "posterior": 6.738034683593755,
+            "world_train_and_sync": 30.723474195312498
+          },
+          "candidate": {
+            "behavior_train_and_sync": 3.9816548828125002,
+            "imagination_and_targets": 7.037739617187502,
+            "posterior": 6.690161476562505,
+            "world_train_and_sync": 30.738539917968758
+          }
+        }
+      },
+      "cdp": {
+        "control_ms": 41.79188965234375,
+        "candidate_ms": 41.82634227343747,
+        "overhead_percent": 0.08243853384071187,
+        "exact_reports": 272,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 3.906192546875001,
+            "imagination_and_targets": 16.434519925781256,
+            "posterior": 7.270113640625,
+            "world_train_and_sync": 14.181063539062501
+          },
+          "candidate": {
+            "behavior_train_and_sync": 3.9596428085937516,
+            "imagination_and_targets": 16.456885855468744,
+            "posterior": 7.24755988671875,
+            "world_train_and_sync": 14.162253722656242
+          }
+        }
+      }
+    },
+    "exact_tensor_counts": {
+      "rgb": {
+        "first": 292,
+        "final": 292
+      },
+      "cdp": {
+        "first": 346,
+        "final": 346
+      }
+    },
+    "source_receipts": 1346
+  },
+  "guards": 8,
+  "warnings": 0,
+  "synthetic_updates": 1184,
+  "game_actions": 0,
+  "production_changed": false,
+  "finished_utc": "2026-10-21T08:28:34.561504+00:00",
+  "sha256": {
+    "declaration.md": "61d379cfdcc102e8fecbd4b2d672c0cb611d632a3d476e366d3a549589d90fa7",
+    "build.py": "1d04047e028961a76d1f4a19f98be2042b8fa6f4abc89ecc8afa3e1e0da597c5",
+    "build-original.py": "0489ce21e09e9d91345d09eafa65e57a77fb84f5883a6224d0df77809a23de9b",
+    "build.log": "6b057bb1f4f4e372dc6d41b32378ccaadf2fd0a9ac0aa70f1360437bea9f5e93",
+    "build-v2.log": "e8df6945d0f397d14b2303a6f74c6519d815a91d13409455af23019162871acc",
+    "build.json": "1481d64afc67f918461f62e06ef66197df9bba1cb3a633add0e3fbd21e1cded4",
+    "queue.json": "6408a93909a12a818d0a035449f55ec3053e0de0715efdccd723ef80b76aa997",
+    "review.py": "451eb32b05ace8ec39f1d6fe1b55ebdf82ad5907fe02cd4266c8dd82a0773df0",
+    "numerical-review.json": "3c2737cff99b7dc14d4611eee0cfa8cac1880220dc55d1a7f3c10a0191f23ed3",
+    "review.json": "8e61f015ad2fa6d0c85599294e8f2804f08948224ef5f8a54be421668d35806d",
+    "timing-declaration.md": "4ba1a7d15e6b9a31c98a88b815242aaa7985c35d981491c42250263860b68772",
+    "timing.py": "80e6242a2657bea1eb6e12ded12dc133b606a81c149abd0011696fa250f38136",
+    "timing-queue.json": "3bcf2524194a2e6980f07f4837a5c25d80594d870cd09482bbf8ed13fd16f340",
+    "timing_review.py": "3b503e455f34562fe0bf92ba17eaacec802356d6b5ca68064d6aea92b25f8a5a",
+    "timing-review.json": "d0600c49ab101eb80438f0da39e55c025af5fa4f0c9ac675e8db0775aa01285a",
+    "ci-complete.json": "807f28212fcd1675be8ea75e7de331d9f1c37c11b9eb379c67b39af5d80380bc",
+    "metal-ci.log": "bda776ed9e3daf284a08c6ff21f64a5d5d67109764511d30ab9695aeae2eaa81"
+  }
+}

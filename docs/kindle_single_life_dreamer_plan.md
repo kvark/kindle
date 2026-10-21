@@ -23,12 +23,15 @@ without changing epsilon or variance storage. The subsequent
 [stateful/Session qualification](results/2026-10-21-optimizer-state-boundaries.md)
 passes boundary sequences, raw gradients and checkpoint continuation on current
 upstream. [Nonfinite-state and retained-cache qualification](results/2026-10-21-optimizer-cached.md)
-also passes; the repair is in draft MeganeuraPR275. The subsequent
+also passes; these preceded MeganeuraPR275. The subsequent
 [complete-model check](results/2026-10-21-optimizer-model.md) passes161M state
-comparisons and measures only.090%/.164% RGB/CDP overhead. Metal CI still fails:
+comparisons and measures only.090%/.164% RGB/CDP overhead. Metal CI initially failed:
 a follow-up prevents a cancellation-prone reassociation using independent
-1-beta uniforms. Actual Metal CI and final-interface qualification remain;
-no production/Atari restart or new learning result yet.
+1-beta uniforms. [Final qualification](results/2026-10-21-optimizer-final.md)
+now passes all six CI jobs including Metal,161M state comparisons and complete
+RGB/CDP checks with essentially unchanged cost. PR275 is ready for review;
+production/Atari remain unchanged. Next current-driver performance attribution,
+including resident-target/mean helpers; no new learning result yet.
 
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.

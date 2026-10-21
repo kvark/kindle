@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Final optimizer interface qualifies; PR275 ready for review:**
+  [result](docs/results/2026-10-21-optimizer-final.md). 5d916851 passes all six
+  CI1048 jobs, including unchanged Metal regressions. Isolated72005c8b passes
+  160,998,750 F64 state checks, exact cached/ordinary and prior24-update transfer.
+  Complete RGB48.524→48.448ms/CDP41.792→41.826ms,−.156%/+.082%; all272 reports
+  and292/346 initial-first-final tensors exact. Full programs and exactly one
+  optimizer-source replacement reconcile. Eight guards/zero warnings/1,184
+  synthetic updates/zero actions;1,341/1,346 receipts; final CPU08:28:34UTC,
+  no worker. Preserve failed whole-file equivalence assertion: upstream lacks
+  retained prepared-step guard; exact-context two-file delta preserves it.
+  No GPU repeat. PR275 is ready, unmerged; production unchanged. Use qualified
+  isolated72005c8b for next declared current-driver attribution, not automatic
+  Atari restart. Include categorical-mean and resident-target timestamps missing
+  from helper waits; preserve numerics/caching and disclose extra waits. Historical
+  580 counters are not615 captures. JAX gap~1.86x and five-game goal remain open.
 - **Optimizer complete-model qualification passes; Metal CI follow-up active:**
   [result](docs/results/2026-10-21-optimizer-model.md). Shader-only4bd/6b621e5c
   passes160,998,750 F64 state checks and exact24-update observer transfer.

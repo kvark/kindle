@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [final optimizer interface](../results/2026-10-21-optimizer-final.md)
+passes all six CI jobs including Metal,161M state comparisons and exact complete
+RGB/CDP trajectories.48.448/41.826ms is essentially unchanged. PR275 ready,
+unmerged; eight guards/zero warnings/1,184 synthetic updates/zero actions.
+Use isolated72005c8b for current-driver attribution; no production/Atari restart.
+
 October21's [complete-model optimizer qualification](../results/2026-10-21-optimizer-model.md)
 passes161M state checks and measures.090%/.164% RGB/CDP overhead, with exact
 272-report/state pairs. Eight guards/zero warnings/1,184 synthetic updates,
