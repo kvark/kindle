@@ -13,6 +13,12 @@ but unsuccessful B32 recipe.
 | Training wall time |3h54m12s |28m14s |37m36s |
 | Online last50-round mean |5.86 |0 |22.76 |
 
+![Online learning against actions and wall time; diamonds are frozen scores](2026-10-21-cdp-freeway-b8.svg)
+
+Every nonempty retained online report is plotted, with no smoothing or
+extrapolation. Diamonds are final frozen means, not online training scores.
+This is one learner seed, not a confidence band or seed-reliability result.
+
 Current B8/B32 use the same qualified native binary, BF16, model, seed, rates,
 reward/exploration, action protocol and interaction budget. **All346 actual
 initial tensors match exactly.** Only batch and world microbatch change32→8.
