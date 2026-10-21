@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Predicate primitive/staged-gradient qualification passes:**
+  [result](docs/results/2026-10-21-predicate-qualification.md).48 fixed BF16 cases/
+  arm,178.617M F64 comparisons each (170.077M empty-partition zeros;8.540M
+  remaining),576 exact output hashes and all9 changed actual sources covered.
+  No arbitrary-input/F16/F32 or SASS claim. Actual RGB68/CDP86 raw gradient
+  tensors match whole/staged and old/new with original/changed reward labels;
+  NaN prefix isolation and five292/346 checkpoint pairs pass. Raw state unchanged;
+  final restoration is weights only after deliberate optimizer clear. Six guards,
+  zero warnings/288 primitive forwards/16 raw backwards/four initializer updates/
+  zero actions.900 receipts pass10:25:24UTC; no worker. No timing repeat; retain
+  11.65%/3.25% RGB/CDP saving and isolated79bc7cec, control72005c8b. Next qualified
+  grouped actual-model counter observer on candidate, ordinary transfer first.
+  No profiling-only barriers, retime, sweep, automatic promotion or Atari restart.
 - **Pure convolution predicates pass the complete-update cost gate:**
   [result](docs/results/2026-10-21-convolution-predicates.md). RGB48.452→42.808ms
   saves11.65%; CDP41.927→40.563ms saves3.25%, calibrated fresh controls. Exact

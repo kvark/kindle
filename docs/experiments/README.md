@@ -1,6 +1,14 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [predicate qualification](../results/2026-10-21-predicate-qualification.md)
+passes48 BF16 cases/arm and exact actual RGB/CDP raw whole/staged gradients with
+changed reward labels.178.617M F64 values/arm include170.077M empty-split zeros;
+8.540M remaining values, all9 changed source occurrences covered. Five checkpoint
+pairs/raw state checks pass. Six guards/zero warnings/four initializer updates/
+16 raw backwards/288 primitive forwards/zero actions;900 receipts10:25:24UTC,
+no worker. No timing repeat or promotion; candidate hardware counters next.
+
 October21's [pure convolution predicates](../results/2026-10-21-convolution-predicates.md)
 pass complete-update acceptance: RGB48.452→42.808ms/CDP41.927→40.563ms,
 11.65%/3.25% less time. Exact24/272 reports/targets/tensors/full programs and

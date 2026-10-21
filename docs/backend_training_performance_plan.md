@@ -8,6 +8,16 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The candidate's [primitive and staged-gradient qualification](results/2026-10-21-predicate-qualification.md)
+now passes:48 BF16 cases/arm with independent F64 forward/dX/dW/partial checks,
+all9 changed model source occurrences covered, and exact actual RGB/CDP whole/
+staged raw gradients with changed reward labels. Five checkpoint pairs and
+before/after raw state match. Most primitive values are empty-partition zeros;
+the report separates those from8.54M remaining values. No timing repeat or
+promotion. Next port the qualified grouped counter observer to candidate79bc7cec,
+verify ordinary transfer and measure instruction changes. Do not infer them
+from static branches or add GPU synchronization for attribution.
+
 The [pure-predicate candidate](results/2026-10-21-convolution-predicates.md)
 passes its complete-update cost gate: RGB48.452→42.808ms (11.65% less time),
 CDP41.927→40.563ms (3.25%). Exact synthetic trajectories and complete runtime

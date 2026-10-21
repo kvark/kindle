@@ -1,0 +1,109 @@
+{
+  "date": "2026-10-21",
+  "status": "primitive_and_staged_gradient_qualification_passed",
+  "driver": "615.71.09",
+  "candidate": "79bc7cec0bc760d2f030b7c7721307868f4b557518f9a6adae0d60a2fb93c637",
+  "control": "72005c8b536bedf02543676e2be04e7d55f18a10e7c5b6975a63506cdc642faf",
+  "production_changed": false,
+  "atari_started": false,
+  "timing_repeated": false,
+  "hardware_counters": "unrun",
+  "primitive": {
+    "status": "passed",
+    "cases_per_arm": 48,
+    "forward_passes_per_arm": 144,
+    "f64_values_per_arm": 178617168,
+    "paired_output_hashes": 576,
+    "unique_shader_bodies": 35,
+    "actual_changed_occurrences_covered": 9,
+    "plan_pairs": 48,
+    "shader_pairs": 144,
+    "source_receipts": 603,
+    "guards": 2,
+    "warnings": 0,
+    "learner_updates": 0,
+    "game_actions": 0,
+    "scope": "structured BF16 primitive oracle; not F16/F32 or arbitrary-input proof",
+    "finished_utc": "2026-10-21T10:22:44.358549+00:00"
+  },
+  "raw_gradients": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "exact_tensor_pairs": {
+          "initial": 292,
+          "first": 292,
+          "before_raw": 292,
+          "after_raw": 292,
+          "restored": 292
+        },
+        "raw_gradient_variants": [
+          {
+            "tensors": 68,
+            "elements": 8852675
+          },
+          {
+            "tensors": 68,
+            "elements": 8852675
+          }
+        ],
+        "changed_gradient_tensors": 2,
+        "plan_pipeline_pairs": 2,
+        "raw_backward_passes": 8,
+        "initializer_updates": 2,
+        "before_after_raw_state_exact": true,
+        "restored_scope": "weights restored; optimizer deliberately cleared before raw checks"
+      },
+      "cdp": {
+        "exact_tensor_pairs": {
+          "initial": 346,
+          "first": 346,
+          "before_raw": 346,
+          "after_raw": 346,
+          "restored": 346
+        },
+        "raw_gradient_variants": [
+          {
+            "tensors": 86,
+            "elements": 14688256
+          },
+          {
+            "tensors": 86,
+            "elements": 14688256
+          }
+        ],
+        "changed_gradient_tensors": 36,
+        "plan_pipeline_pairs": 2,
+        "raw_backward_passes": 8,
+        "initializer_updates": 2,
+        "before_after_raw_state_exact": true,
+        "restored_scope": "weights restored; optimizer deliberately cleared before raw checks"
+      }
+    },
+    "guards": 4,
+    "warnings": 0,
+    "initializer_updates": 4,
+    "raw_backward_passes": 16,
+    "game_actions": 0,
+    "source_receipts": 888,
+    "production_changed": false,
+    "finished_utc": "2026-10-21T10:24:19.974191+00:00"
+  },
+  "publication": {
+    "status": "passed",
+    "source_receipts": 900,
+    "primitive_values_per_arm": 178617168,
+    "guaranteed_empty_partition_values_per_arm": 170077302,
+    "remaining_values_per_arm": 8539866,
+    "passing_guards": 6,
+    "warnings": 0,
+    "primitive_forward_passes": 288,
+    "raw_backward_passes": 16,
+    "initializer_updates": 4,
+    "game_actions": 0,
+    "production_changed": false,
+    "hardware_instruction_attribution": "unrun",
+    "finished_utc": "2026-10-21T10:25:24.079872+00:00"
+  },
+  "artifacts": "runs/predicate-qualification-20261021.GPHjMWoZ"
+}

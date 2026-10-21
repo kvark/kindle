@@ -8,6 +8,11 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The faster candidate's [BF16 primitive and actual-model raw-gradient checks](results/2026-10-21-predicate-qualification.md)
+now pass, including changed-input/restoration and whole/staged reward-label
+isolation. No timing repeat, production promotion or new learning result.
+Hardware-counter attribution is next; candidate79bc7cec remains isolated.
+
 The [pure-predicate candidate](results/2026-10-21-convolution-predicates.md)
 now saves11.65% RGB /3.25% CDP complete-update time with exact synthetic model
 trajectories. It changes bounds-check control flow, not tiling or arithmetic.
