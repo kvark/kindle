@@ -1,6 +1,13 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [upstream predicate port](../results/2026-10-21-upstream-predicates.md)
+qualifies MeganeuraPR276/e545a9f: three guards/two templates,1,860 offline modules,
+148 GPU cases/arm,180 exact arrays/395,304 values and72 reconciled runtime sources.
+Two guards/zero warnings/264 forwards/32 raw backwards/zero learner updates/actions;
+review10:56:21UTC,no local worker. CPU preparation failures remain. No new speed
+claim, retained-extension import, merge or Atari restart; CI and feeding audit next.
+
 October21's [predicate counters](../results/2026-10-21-predicate-counters.md)
 confirm typed warp/control instructions fall11.91%/96.20%, tensor work unchanged.
 Packed/non-convolution totals are exact; LSU rises.26%, not a load/feeding fix.

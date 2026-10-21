@@ -8,15 +8,22 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [upstream predicate port](results/2026-10-21-upstream-predicates.md) now
+qualifies: MeganeuraPR276/e545a9f changes three guards in shared templates,
+with1,860 offline modules and148 GPU cases/arm passing. All395,304 paired output/
+gradient values, plans and runtime source transformations reconcile. No new timing
+or automatic promotion: upstream's derivative implementation differs from our
+retained candidate. Finish CI/review, then resume the remaining operand-load/
+feeding investigation; this control-flow fix did not remove the LSU deficit.
+
 The [candidate hardware capture](results/2026-10-21-predicate-counters.md)
 now confirms the mechanism: nine typed convolutions execute11.91% fewer warp
 and96.20% fewer control-pipe instructions, with unchanged tensor work. Packed
 and non-convolution instruction totals stay exact. LSU rises.26%; this addresses
 control flow, not the separate feeding deficit. Complete grouped capture,
 ordinary transfer and offline metric checks pass. No timing repeat or promotion.
-Next prepare a narrow upstream port: a75c38e uses shared checked templates,
-not our retained two files. Establish operation/type coverage on CPU before
-separate port qualification; do not claim these speedups for untested upstream.
+The narrow upstream port above separately qualifies its different shared templates;
+these retained full-update speedups are not measurements of the upstream port.
 
 The candidate's [primitive and staged-gradient qualification](results/2026-10-21-predicate-qualification.md)
 now passes:48 BF16 cases/arm with independent F64 forward/dX/dW/partial checks,

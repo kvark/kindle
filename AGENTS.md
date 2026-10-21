@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Narrow upstream predicate port qualifies:**
+  [result](docs/results/2026-10-21-upstream-predicates.md), MeganeuraPR276/e545a9f,
+  unmerged. Three guards/two shared templates, one CPU regression; no retained
+  extension import. All1,860 offline modules/51 type combinations/two shapes
+  pass; original-template regression fails as intended. GPU148 cases/arm,
+  180 paired arrays/395,304 values,148 plans/pipeline lists exact. All72 runtime
+  sources reconcile:18 dense/eight conv changed,46 unchanged. Two guards/zero
+  warnings,264 forwards/32 raw backwards/zero updates/actions; review10:56:21UTC,
+  no local worker. Current upstream derivatives differ: no transfer of retained
+  speed claims, F32 hardware or full-model claim. Preserve workspace/log-receipt/
+  linker/test-only-API preparation failures, no GPU repeats. Keep79bc7cec/1.642x
+  and72005c8b reference; production/Atari unchanged. Next CI/review and remaining
+  typed operand-load/feeding audit, not retiming or rejected read-span/geometry/pipeline
+  sweeps. Same native geometry is not native/JAX equivalence; full goal open.
 - **Predicate hardware attribution passes:**
   [result](docs/results/2026-10-21-predicate-counters.md). Nine typed convolutions
   warp9.945→8.761B(−11.91%), control456.762→17.359M(−96.20%), tensor exact.
