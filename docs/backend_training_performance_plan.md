@@ -8,6 +8,16 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [typed generator port](results/2026-10-21-convolution-generator-port.md)
+now passes on current Meganeura: all seven changed model WGSL/SPIR-V pairs
+match exactly;48 codegen tests, strict library Clippy and432 offline modules
+pass. Local653ce00 is not runtime-integrated or a new performance result.
+Next wire typed backward graph construction, bounded split scratch, bindings,
+selection and full-subgroup/geometry cache identity, then qualify the complete
+integrated learner. No forward-only substitute, production pin or Atari restart.
+Blade PR417's three platform GPU jobs pass; Linux build still reports running.
+The original workspace-isolation failure is retained with its CPU-only repair.
+
 The [complete reuse qualification](results/2026-10-21-convolution-reuse-cost.md)
 passes: RGB42.753→39.740ms (7.05% less), CDP40.605→39.398ms (2.97% less).
 Retain isolatedc8aeba28/1.525× inclusive JAX. Actual raw gradients, changed reward
@@ -18,7 +28,8 @@ are terminal; production and Atari remain unchanged.
 
 The[Blade upstream port](results/2026-10-21-full-subgroups-upstream.md) is now
 PR417/0af76fd:22 CPU tests, strict Vulkan Clippy, offline shader validation and
-three5080 GPU tests pass. Cross-platformCI1192 is running; only the user merges.
+three5080 GPU tests pass. Cross-platformCI1192 awaits the Linux build's terminal
+status; other jobs pass. Only the user merges.
 The original shader-parse failure and unchanged-upstream strict GLES warning
 are preserved. Next audit/port Meganeura's typed-gradient prerequisites and full
 pipeline/cache contract before the fixed reuse policy: current main lacks the

@@ -7,6 +7,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Typed convolution generator port passes offline qualification:**
+  [result](docs/results/2026-10-21-convolution-generator-port.md). Local653ce00
+  on currenta75c38e reproduces all7 changed model WGSL/SPIR-V pairs exactly;
+  all23 identities reconcile,16 retained products are not reimplemented.
+  48 codegen tests/strict library Clippy/432 offline modules pass;425 generic
+  variants are compiler coverage, not GPU numerics. No graph/runtime activation,
+  pin, Meganeura PR or new speed claim. Preserve initial nested-workspace failure;
+  separate containing workspace fixes it without repository manifest changes.
+  Final251-input audit14:59:52UTC,zero GPU/updates/actions,no local worker,~3.5GiB free.
+  Next typed backward graph, bounded split scratch, bindings/selection/full32
+  and geometry cache contract, then integrated qualification. Keepc8aeba28/1.525x;
+  Atari stopped. Blade PR417 GPU CI passes Linux/Windows/macOS; Linux build still
+  reports running, other jobs pass. Only user merges; no geometry sweep.
 - **Blade full-subgroup upstream port qualified; PR417 open:**
   [result](docs/results/2026-10-21-full-subgroups-upstream.md). Commit0af76fd on
   currenteae0c6f adds optional width/full membership, capability/geometry checks,
