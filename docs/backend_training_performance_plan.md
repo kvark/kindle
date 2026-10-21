@@ -8,6 +8,21 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [same-driver JAX capture](results/2026-10-21-jax-current-convolution.md)
+qualifies all23 convolution kernels and18 helpers. Current native/JAX warp ratio
+is4.280×, ALU6.926×, LSU3.860×, despite fewer tensor instructions. Exact reports,
+tensors and compiled work pass; no native SASS or equal-kernel/tiling claim.
+No new timing: retain79bc7cec/RGB42.808ms/CDP40.563ms,1.642× JAX.
+
+Next derive one complete-family reuse/operand-storage contract from the existing
+fragment-output proof, bounding shared storage and live accumulator state.
+Account for all23 products, padding, compensation and conversions before
+implementation. This targets repeated feeding/address work; it is not another
+tile sweep or revival of the rejected separate-loader pipeline. No automatic
+GPU allocation, promotion or Atari restart. The controller's post-completion
+summary failure and CPU reader failures remain; offline repair repeated no GPU
+work. All workers are terminal. Earlier milestones below retain historical scope.
+
 The [packed register transpose](results/2026-10-21-b-register-transpose.md)
 now qualifies numerically but fails its instruction gate: warp+4.638%. Each
 affected case trades removed derived reads for the same added store conflicts;
@@ -15,7 +30,7 @@ this is not equal-time attribution. The isolated typed BF16 bitcast fix and all
 nine actual modules qualify, without a Naga commit or production change. Both
 B-layout implementations stay closed, with no timing/padding/geometry follow-up.
 
-Next CPU-reconcile the unchanged pinned current-driver JAX executable and full
+The next step was to reconcile the unchanged pinned current-driver JAX executable and full
 convolution-capture recipe, then separately declare current-driver library
 counters. Historical580 JAX counters do not establish a fresh615 comparison.
 Keep all23 products/helpers and their distinct layouts/tiling; do not claim

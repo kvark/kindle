@@ -8,6 +8,13 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [current-driver JAX capture](results/2026-10-21-jax-current-convolution.md)
+confirms4.280× native convolution warp instructions despite fewer tensor
+instructions. All23 kernels/18helpers and exact model controls reconcile; same
+kernels/tiling or native machine-code identity are not established. Next CPU
+design: bounded complete-family reuse/storage, not another B-layout tweak or
+tile sweep. No new speed or learning result; keep79bc7cec/1.642×, Atari stopped.
+
 The [packed B transpose](results/2026-10-21-b-register-transpose.md) passes GPU
 correctness but fails the instruction gate:4.638% more warp work. It exchanges
 the extra reads for store conflicts; no timing/promotion follows. The compiler

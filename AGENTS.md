@@ -7,6 +7,20 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Same-driver full JAX convolution comparison qualifies:**
+  [result](docs/results/2026-10-21-jax-current-convolution.md). Native/JAX warp
+  10.302B/2.407B=4.280x, ALU6.926x, LSU3.860x, tensor.792x. All23 main/18helper
+  identities and272 reports/288 initial-final tensors/full HLO match controls.
+  Typed9/packed14 ratios4.548x/3.204x; not identical kernels/tiling, SASS or time.
+  One passing guard/zero warnings/738 counter passes/272 synthetic updates/zero
+  actions; GPU controller ends12:56:27UTC, CPU publication12:58:27,no worker.
+  Preserve preparation import failure, post-capture summary-headroom controller
+  failure and compact-native-counter reader failure; offline repairs repeat no
+  GPU work.59 artifact/149 source receipts pass. Current upstreama75c38e unchanged.
+  Next CPU complete-family reuse/operand-storage contract from existing fragment
+  output proof, bounding shared storage and accumulator state; all23 contracts,
+  compensation/rounding retained. No tile sweep, failed pipeline revival, compiler
+  project or automatic allocation. Keep79bc7cec/1.642x; Atari/full goal open.
 - **Packed B transpose rejected after compiler/GPU qualification:**
   [result](docs/results/2026-10-21-b-register-transpose.md). Warp+4.638%, fails3%
   reduction gate; no timing/promotion. Each of9 cases trades removed derived
