@@ -8,11 +8,19 @@ Updated October 21, 2026. This is the authoritative roadmap.
 ## Performance pivot
 
 **Current work: [backend training performance](backend_training_performance_plan.md).**
+The [new-driver JAX control](results/2026-10-21-driver615-baseline.md) measures
+26.066ms inclusive versus native48.281ms,1.85×. Its trajectory and compiled work
+are unchanged. A separate native optimizer probe now exposes tiny-gradient
+underflow: variance becomes zero and normalized momentum can be300× too large.
+Qualify a GPU-side repair before more profiling or training. No claim yet that
+this explains historical scores or the speed gap; epsilon/model semantics stay
+fixed and both failed probe allocations remain recorded.
+
 The [slice-view comparison](results/2026-10-21-slice-views.md) passes numerical
 checks but misses its performance gate: RGB1.05%/CDP1.81% less time, no promotion.
 The host has rebooted onto615.71.09; fresh native control is48.281ms RGB/41.771ms
 CDP. Historical580 timings and JAX ratios below are not current-driver results.
-Next refresh the unchanged JAX control before stating the current gap. Production
+The unchanged JAX control is now refreshed above. Production
 and Atari remain stopped; no new learning-quality evidence.
 
 The [October19 upstream refresh](results/2026-10-19-upstream-refresh.md) is

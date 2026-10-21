@@ -8,6 +8,21 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [current-driver comparison](results/2026-10-21-driver615-baseline.md) passes:
+native48.281ms versus caller-inclusive JAX26.066ms, **1.85×**. JAX's complete
+trajectory and compiled computation match the old control; native's cross-session
+trajectory does not, although its plans and shader sources match. Before reusing
+the old native timestamp observer, a tiny-gradient probe exposes an optimizer
+failure: subnormal F32 second moments become zero and LaProp momentum reaches30
+instead ofabout.1. Six signed cases fail independent variance/momentum/update
+checks. This is not a GPU wedge or a measured explanation of the performance gap.
+
+**Next: qualify F32 optimizer underflow handling on GPU.** Compare the pinned JAX
+optimizer on the same explicit inputs, inspect emitted float controls and select
+a minimal repair with independent references. Preserve epsilon/model semantics;
+latest Blade's F16 preservation is not an F32 qualification. No more performance
+allocation or Atari restart follows until this numerical issue is addressed.
+
 The [slice-view implementation](results/2026-10-21-slice-views.md) preserves
 complete synthetic trajectories but misses the3% RGB gate: fresh RGB48.281→
 47.776ms(1.05%), CDP41.771→41.016ms(1.81%). No promotion or retime. All329/359
@@ -16,9 +31,8 @@ speedup. Primitive GPU numerics and complete program membership pass; cost
 rejection ends further qualification of this candidate.
 
 **The host now runs615.71.09 after reboot.** The historical580 results below,
-including1.58× JAX and instruction counters, retain their original scope. Next
-run the unchanged JAX control on this driver with exact fixture/HLO/trajectory
-checks and the same caller-inclusive boundary. Do not mix old JAX latency with
+including1.58× JAX and instruction counters, retain their original scope. The
+unchanged JAX control is now refreshed above. Do not mix old JAX latency with
 new native timing or attribute cross-session differences to the driver alone.
 The larger convolution-feeding deficit remains a distinct historical finding;
 refresh the comparison before choosing further structural work. Atari stays off.

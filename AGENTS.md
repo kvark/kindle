@@ -7,6 +7,21 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Current-driver JAX control passes; optimizer underflow reproduces:**
+  [result](docs/results/2026-10-21-driver615-baseline.md). JAX25.606ms core/
+  26.066ms inclusive versus native48.281ms,1.85x on615.71.09. Exact272 reports/
+  288 initial-final tensors,940 fusion bodies/112 library calls/heavy work pass.
+  Native observer transfer fails numerical equality despite exact programs and
+  shader sources. Historical580 has four oversized first LaProp moments, max29.24,
+  with zero variance; current model fixture has none, but a separate current-driver
+  probe reproduces six signed tiny-gradient failures:3e-18 stores variance0 and
+  momentum30 instead ofabout.1. Raw gradients exact; original failure plus one
+  declared diagnostic export remain failed. No tolerance relaxation or driver-bug
+  claim. One passing/two failed guards,zero warnings,272 JAX updates/two standalone
+  optimizer steps/zero actions; no worker. Next pinned-JAX tiny-gradient comparison
+  and F32 float-control qualification before more profiling; do not assume latest
+  Blade's F16-only denormal fix covers it. No CPU workaround, epsilon change,
+  automatic promotion/Atari restart or assertion that this explains game scores.
 - **Slice views miss the cost gate:** [result](docs/results/2026-10-21-slice-views.md).
   Fresh driver615.71.09 RGB48.281→47.776ms/CDP41.771→41.016ms improve1.05%/1.81%;
   RGB fails3%, no promotion/retime. All24/272 reports/targets and four292/346
