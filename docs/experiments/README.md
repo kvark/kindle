@@ -1,6 +1,12 @@
 # Current evidence and research archive
 
 The [project plan](../kindle_single_life_dreamer_plan.md) is the only roadmap.
+October21's [complete-model optimizer qualification](../results/2026-10-21-optimizer-model.md)
+passes161M state checks and measures.090%/.164% RGB/CDP overhead, with exact
+272-report/state pairs. Eight guards/zero warnings/1,184 synthetic updates,
+zero actions. Metal CI remains failed; independent-coefficient follow-up is
+under qualification. No production/Atari restart or learning claim.
+
 October21's [optimizer poison/cache qualification](../results/2026-10-21-optimizer-cached.md)
 passes on current upstream and the retained cached runtime; draft MeganeuraPR275
 contains the repair. Two guards/zero warnings/106 synthetic Session updates,

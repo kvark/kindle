@@ -1,0 +1,531 @@
+{
+  "status": "full_model_pass_metal_followup_ci_in_progress",
+  "coefficient_followup": {
+    "commit": "5d916851b908a71bdb124e2db5e8cfcf1870e7d1",
+    "artifacts": "runs/optimizer-coefficients-20261021.pcZGh5zI",
+    "local_gpu_tests": 3,
+    "local_layout_tests": 2,
+    "session_updates": 53,
+    "guards": 1,
+    "warnings": 0,
+    "exact_checkpoint_values": 192,
+    "source_receipts": 338,
+    "ci_run": 39568247325,
+    "ci_status_at_publication": "in_progress",
+    "full_model_qualified": false
+  },
+  "artifacts": "runs/optimizer-model-20261021.lNTSllDW",
+  "numerical": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "exact_reports": 24,
+        "exact_checkpoint_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 205,
+        "cache": {
+          "behavior": [
+            1,
+            23
+          ],
+          "imagination": [
+            1,
+            23
+          ],
+          "slow_value": [
+            1,
+            23
+          ],
+          "world": [
+            5,
+            115
+          ]
+        }
+      },
+      "cdp": {
+        "exact_reports": 24,
+        "exact_checkpoint_tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 225,
+        "cache": {
+          "behavior": [
+            1,
+            23
+          ],
+          "imagination": [
+            1,
+            23
+          ],
+          "slow_value": [
+            1,
+            23
+          ],
+          "world": [
+            5,
+            115
+          ]
+        }
+      }
+    },
+    "numerical_checks": {
+      "rgb-0-world": {
+        "optimized_tensors": 68,
+        "checked": 26558025,
+        "max_error_over_bound": [
+          0.011920909059914726,
+          0.0013546509882612448,
+          0.0
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 0,
+        "failures": []
+      },
+      "rgb-0-behavior": {
+        "optimized_tensors": 22,
+        "checked": 4938291,
+        "max_error_over_bound": [
+          0.01192083942736553,
+          0.0027093020132240757,
+          0.0
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 0,
+        "failures": []
+      },
+      "rgb-23-world": {
+        "optimized_tensors": 68,
+        "checked": 26558025,
+        "max_error_over_bound": [
+          0.011920924691823235,
+          0.007947284075271906,
+          0.00036094177186994376
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 8849490,
+        "failures": []
+      },
+      "rgb-23-behavior": {
+        "optimized_tensors": 22,
+        "checked": 4938291,
+        "max_error_over_bound": [
+          0.011920903375594524,
+          0.007947235442889894,
+          0.000694150683731482
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 1645708,
+        "failures": []
+      },
+      "cdp-0-world": {
+        "optimized_tensors": 86,
+        "checked": 44064768,
+        "max_error_over_bound": [
+          0.011920921849655002,
+          0.04440896401950675,
+          0.005789974913196696
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 14685831,
+        "failures": []
+      },
+      "cdp-0-behavior": {
+        "optimized_tensors": 22,
+        "checked": 4938291,
+        "max_error_over_bound": [
+          0.01192084226949472,
+          0.017961537881242624,
+          0.0006970309909179371
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 1645995,
+        "failures": []
+      },
+      "cdp-23-world": {
+        "optimized_tensors": 86,
+        "checked": 44064768,
+        "max_error_over_bound": [
+          0.011920920428571393,
+          0.04259267895938788,
+          0.005935546611610119
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 14687504,
+        "failures": []
+      },
+      "cdp-23-behavior": {
+        "optimized_tensors": 22,
+        "checked": 4938291,
+        "max_error_over_bound": [
+          0.011920909059914726,
+          0.04709600479519445,
+          0.0006991081463394984
+        ],
+        "stored_subnormal_variances": 0,
+        "changed_parameters": 1646008,
+        "failures": []
+      }
+    },
+    "game_actions": 0,
+    "production_changed": false,
+    "source_receipts": 544,
+    "guards": 4,
+    "warnings": 0,
+    "synthetic_updates": 96,
+    "finished_utc": "2026-10-21T08:07:14.781886+00:00"
+  },
+  "timing": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "control_ms": 48.40279640624999,
+        "candidate_ms": 48.44635399999999,
+        "overhead_percent": 0.08998982906776032,
+        "tensors": {
+          "first": {
+            "world": {
+              "tensors": 215,
+              "exact": 215,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 68,
+                  "tensors": 68,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 68,
+                  "tensors": 68,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 79,
+                  "tensors": 79,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "behavior": {
+              "tensors": 66,
+              "exact": 66,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "slow": {
+              "tensors": 11,
+              "exact": 11,
+              "groups": {
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 11,
+                  "tensors": 11,
+                  "relative_l2": 0.0
+                }
+              }
+            }
+          },
+          "final": {
+            "world": {
+              "tensors": 215,
+              "exact": 215,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 68,
+                  "tensors": 68,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 68,
+                  "tensors": 68,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 79,
+                  "tensors": 79,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "behavior": {
+              "tensors": 66,
+              "exact": 66,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "slow": {
+              "tensors": 11,
+              "exact": 11,
+              "groups": {
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 11,
+                  "tensors": 11,
+                  "relative_l2": 0.0
+                }
+              }
+            }
+          }
+        },
+        "exact_reports": 272,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 3.958389117187499,
+            "imagination_and_targets": 7.012885898437504,
+            "posterior": 6.692676175781252,
+            "world_train_and_sync": 30.73884521484376
+          },
+          "candidate": {
+            "behavior_train_and_sync": 4.012626871093747,
+            "imagination_and_targets": 7.006284515625007,
+            "posterior": 6.68154505078125,
+            "world_train_and_sync": 30.745897562499984
+          }
+        }
+      },
+      "cdp": {
+        "control_ms": 41.81743181249998,
+        "candidate_ms": 41.88617454296876,
+        "overhead_percent": 0.16438773853211242,
+        "tensors": {
+          "first": {
+            "world": {
+              "tensors": 269,
+              "exact": 269,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 86,
+                  "tensors": 86,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 86,
+                  "tensors": 86,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 97,
+                  "tensors": 97,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "behavior": {
+              "tensors": 66,
+              "exact": 66,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "slow": {
+              "tensors": 11,
+              "exact": 11,
+              "groups": {
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 11,
+                  "tensors": 11,
+                  "relative_l2": 0.0
+                }
+              }
+            }
+          },
+          "final": {
+            "world": {
+              "tensors": 269,
+              "exact": 269,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 86,
+                  "tensors": 86,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 86,
+                  "tensors": 86,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 97,
+                  "tensors": 97,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "behavior": {
+              "tensors": 66,
+              "exact": 66,
+              "groups": {
+                "moment": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "variance": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                },
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 22,
+                  "tensors": 22,
+                  "relative_l2": 0.0
+                }
+              }
+            },
+            "slow": {
+              "tensors": 11,
+              "exact": 11,
+              "groups": {
+                "parameter": {
+                  "maximum": 0.0,
+                  "exact": 11,
+                  "tensors": 11,
+                  "relative_l2": 0.0
+                }
+              }
+            }
+          }
+        },
+        "exact_reports": 272,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 3.9258074296874983,
+            "imagination_and_targets": 16.4588831640625,
+            "posterior": 7.248871539062501,
+            "world_train_and_sync": 14.18386967968749
+          },
+          "candidate": {
+            "behavior_train_and_sync": 3.950453480468749,
+            "imagination_and_targets": 16.474881414062494,
+            "posterior": 7.274216585937499,
+            "world_train_and_sync": 14.186623062499999
+          }
+        }
+      }
+    },
+    "game_actions": 0,
+    "production_changed": false,
+    "guards": 4,
+    "warnings": 0,
+    "synthetic_updates": 1088,
+    "source_receipts": 549,
+    "overhead_within_five_percent": true,
+    "finished_utc": "2026-10-21T08:12:48.351725+00:00"
+  },
+  "metal_arithmetic": {
+    "status": "passed",
+    "arithmetic_forms": {
+      "original": {
+        "value": 1.9989742503558625e-15,
+        "bits": 655362705
+      },
+      "reassociated": {
+        "value": 1.9989435454115245e-15,
+        "bits": 655362560
+      },
+      "fused_reassociated": {
+        "value": 1.9989469335433135e-15,
+        "bits": 655362576
+      },
+      "fused_original": {
+        "value": 1.9989742503558625e-15,
+        "bits": 655362705
+      }
+    },
+    "metal_bits": 655362576,
+    "nan_inf_signature_matches": true,
+    "limit": "Exact arithmetic counterexample, not captured Metal machine-code attribution.",
+    "next": "Supply the invariant F32 (1-beta) coefficients independently, preventing this cancellation rewrite without changing tolerances or globally disabling fast math."
+  },
+  "sha256": {
+    "declaration.md": "7ee20650c1f3c377c23c8d7987bed7bbccd1594c3bebc669b8696f21eec28282",
+    "queue.json": "3d081d0b3af36f48dbea8fa83c683ce3389cfdb8c9fb3a6c14ccd60c420f2e68",
+    "review.py": "3fd2299639715676d5a19a61825b2f2643106288c04e023fe1ab1410369a3e81",
+    "review.json": "96f826de36c1f8138aad72762a29d559defa3ba90f9b9dab60c2ecbdecc58148",
+    "timing-declaration.md": "d3617b98033855e4c0500a93b0c5135b8960ef09db3a165b40e0e14f8dc050e5",
+    "timing-queue.json": "bc5e51f74e2350357abec40f2a3f0b06683d120149180cd1aa1b9e3d737f79d7",
+    "timing_review.py": "1817e55ef5b264048c856dc6ecae133ad56f13cccfb3a9fe74c9861e99a73602",
+    "timing-review.json": "4b850f98c92c6b16823d8ece965de1bf380a20416b1cabf0f4de96e69e196c71",
+    "timing_review_v2.py": "e5e9d2ab4583bfd2a00109df1bfcdf930790dfcda21a716da7366f8e0d547787",
+    "timing-review-v2.json": "b6808b65d6f5742b5e381ba58b27de3afe4393ecc136cafb6468bb85b599323f",
+    "optimizer_observer.rs": "e0cd33f8cc4bf6299249ecac98298c24cbc0a3b360e875bf7d2d9e0d103dcde6",
+    "metal-ci.log": "51ccd2c9431d5f586fdc2cb91f0a63f185a08e46b772d7235c94437c66f10fb8",
+    "metal-ci-jobs.json": "86ad07125354aee0ad5abb3f0d90b46437253de9d1234e14c244ffaf55989a73",
+    "metal_reassociation.py": "d9c4acfa58d974ee0d0ea5ff17deedc75b9ff891234f5424cd4dc66b2f828e64",
+    "metal-reassociation.json": "b181bd49d2e025e6a3a3eb2fe1fc589b54d2cde30561fd272b696a971b829c4b"
+  }
+}

@@ -8,6 +8,17 @@ not a new learning allocation; PR31 remains the status dashboard.
 
 ## Current diagnosis and implementation order
 
+The [complete-model optimizer check](results/2026-10-21-optimizer-model.md)
+passes160,998,750 independent state comparisons and exact observer transfer.
+RGB48.403→48.446ms/CDP41.817→41.886ms adds only.090%/.164%; all272 reports/states
+match on these fixtures. No observed model subnormal variance; component tests
+cover the original failure. Metal CI exposes a separate cancellation/nonfinite
+issue whose exact arithmetic signature is reproduced on CPU. Qualify independent
+1-beta uniforms in actual Metal CI, then verify the final interface. Follow-up
+5d916851 passes local GPU/layout/Clippy tests; CI1048 is in progress.
+Do not promote4bd as cross-backend qualified or extend its full-model evidence
+to the unqualified follow-up. No Atari restart or new speedup claim.
+
 The [current-driver comparison](results/2026-10-21-driver615-baseline.md) passes:
 native48.281ms versus caller-inclusive JAX26.066ms, **1.85×**. JAX's complete
 trajectory and compiled computation match the old control; native's cross-session

@@ -7,6 +7,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **Optimizer complete-model qualification passes; Metal CI follow-up active:**
+  [result](docs/results/2026-10-21-optimizer-model.md). Shader-only4bd/6b621e5c
+  passes160,998,750 F64 state checks and exact24-update observer transfer.
+  No model subnormal variances; component tests cover those. Complete RGB
+  48.403→48.446ms/CDP41.817→41.886ms,.090%/.164% overhead; all272 reports and
+  292/346 initial-first-final tensors exact. Full programs/sources reconcile
+  exactly one optimizer-body replacement. Eight guards/zero warnings/1,184
+  synthetic updates/zero actions; final CPU audit08:12:48UTC, no GPU worker.
+  Preserve two pre-build assertions and original all-shader-equality audit;
+  separate exact-body CPU repair passes without GPU repeat. PR275 CI1047 passes
+  five jobs but Metal fails normal variance/Inf regressions. F32 fused
+  beta*(old-g*g)+g*g reproduces its exact bits and NaN signature; not SASS proof.
+  Separate worktree/runs/optimizer-coefficients-20261021.pcZGh5zI supplies independent
+  1-beta uniforms,56-byte interface; tests/tolerances unchanged. Follow-up5d916851
+  pushed to PR275: three GPU/two layout tests/Clippy pass,53 Session updates,
+  192 exact checkpoint values,one guard/zero warnings/338 receipts. CI1048 is
+  confirmed in progress; actual Metal CI and final-model interface checks remain.
+  No local worker remains. No production
+  promotion/Atari restart; original complete evidence does not qualify this follow-up.
 - **Optimizer poison and cached-runtime qualification pass:**
   [result](docs/results/2026-10-21-optimizer-cached.md). Finite-history guard
   preserves NaN/Inf;192 new classifications/value checks and prior finite/raw-
