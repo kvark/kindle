@@ -35,7 +35,10 @@ benefit. B32 performs about one quarter as many optimizer steps at the same
 replay-position ratio. Its intrinsic reward remains nonzero; finite losses
 and lower cosine loss do not establish a useful policy representation.
 
-## Next learning test, already running
+## Follow-up learning test (now complete)
+
+**Update:** [B8 scores30.58 with24/24 crossing successes](2026-10-21-cdp-freeway-b8.md)
+in37m36s. The failed B32 result below is retained unchanged.
 
 A fresh500k-action **B8 seed2017** run changes only batch/microbatch size
 relative to the completed current-backend B32 recipe. Same native binary,

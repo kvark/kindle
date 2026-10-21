@@ -7,13 +7,14 @@ Updated October 21, 2026. This is the authoritative roadmap.
 
 ## Return to training
 
-**Latest learning result:** [B32 Freeway2017](results/2026-10-21-cdp-training-return.md)
-finishes500k actions in28m14s, but scores0 in24 final frozen rounds, matching
-its actual-initial control. Only one training crossing occurred. This is not
-a successful speed-for-learning tradeoff. A fresh B8 control is now running
-on the same BF16 backend with identical initial tensors and all other settings
-unchanged. Finish its500k actions and final/initial evaluations before further
-allocation. Backend optimization remains parked.
+**Latest learning result:** [B8 Freeway2017](results/2026-10-21-cdp-freeway-b8.md)
+scores30.58 and passes25 crossings in24/24 frozen rounds; actual-initial0.
+500k actions take37m36s. The same-backend B32 run took28m14s but scored0;
+all346 actual initial tensors are identical. Keep B8 for the next learning
+replicates rather than treating synthetic throughput as the objective.
+Original seeds1009/3019 are now allocated serially with unchanged B8/BF16
+recipe,500k actions each and final/actual-initial frozen controls. Review the
+whole cohort before further allocation. Backend optimization remains parked.
 
 **October21 priority correction: return to CDP training.** Upstream integration
 and closing the remaining JAX gap are follow-up work, not training gates. Use

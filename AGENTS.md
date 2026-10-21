@@ -7,13 +7,27 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 
 ## Current priority
 
+- **B8 restores learning; verify remaining seeds:** [result](docs/results/2026-10-21-cdp-freeway-b8.md).
+  Same-current-backend/BF16 seed2017 scores30.58 versus B32's0,24/24 rounds
+  reach25 crossings, actual-initial0.500k actions/124,939 updates take37m36s;
+  all346 initial tensors match B32 exactly. Three guards/zero warnings/full
+  replays/videos and automatic audit pass, finished17:19:57UTC. No optimizer/
+  kernel rewrite; batch changes cadence and sampled trajectories, not an
+  isolated proof about optimizer-step count. Historical B8 scored17.25 in
+  3h54m12s on different precision/backend; one seed is not reliability.
+  Original seeds1009/3019 now run serially with unchanged B8 recipe,500k actions
+  each, final/initial24-round controls and audits. Service
+  `kindle-cdp-freeway-reliability-20261021`, linked artifacts
+  `runs/cdp-freeway-reliability-20261021.osxXuUW7` on fresh `/mnt/data` storage.
+  Storage differs from2017; don't attribute its wall-time effects to learning.
+  Review the completed cohort before more allocations; backend work stays parked.
 - **Live learning, not optimization:** [Freeway return result](docs/results/2026-10-21-cdp-training-return.md).
   B32/BF16 seed2017 completes500k actions/31,211 updates in28m14s, but final
   and actual-initial frozen scores are0/0 across24 rounds each. One training
   crossing enters45 learner updates; no broad reward-disconnection finding.
   Three guards/zero warnings/full videos and CDP-compatible audit pass;
   preserve the controller's inapplicable extrinsic-only final-audit failure.
-  Fresh B8 seed2017 is running on the same binary/BF16/recipe, only batch and
+  Fresh B8 seed2017 has completed on the same binary/BF16/recipe, only batch and
   microbatch changed; all346 actual initial tensors match.500k actions,
   expected124,939 updates, then final/initial24-episode evaluations and videos.
   Service`kindle-cdp-freeway-b8-2017-20261021`, artifacts
