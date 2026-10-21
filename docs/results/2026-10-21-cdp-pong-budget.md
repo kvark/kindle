@@ -32,18 +32,37 @@ jobs finish22:08:20 and review22:09:44. The service exits successfully; no
 worker from this allocation remains. Other saved snapshots are not evaluated
 or selected as winners.
 
-## Next: inexpensive reliability, then weaker games
+## Completed500k reliability check
 
-Fresh original seeds2017/3019 run serially for500k actions each, retaining the
-same recipe. Each has124,939 updates, final/actual-initial24-round evaluations,
-exact frozen exports and whole videos; audit each before starting the next.
-The1009 prefix is the predefined third500k observation, not an independently
-retrained seed or a best-checkpoint selection. Report all failures. No automatic
-2M extension; review this cohort before moving to weaker games. Backend
-optimization remains parked and the full five-game objective remains open.
+| Seed | Frozen mean | Wins | Actual initial | Training to500k |
+| --- | ---: | ---: | ---: | ---: |
+|1009 prefix |16.750 |24/24 |−20.125 |37m13s |
+|2017 |15.083 |24/24 |−20.250 |37m13s |
+|3019 |15.292 |24/24 |−20.250 |37m24s |
 
-Service: `kindle-cdp-pong-reliability-20261021`.
-[Replicate controller](../../runs/cdp-pong-reliability-20261021.R6HKgGOt/cohort.py).
+**Mean15.708,72/72 wins; all three intermediate gates pass.** All initial
+controls lose24/24. These are three training seeds, not72 independent learners;
+published20.4455 remains unmet. Seed1009's predefined prefix is not a second
+independent learner or a best-checkpoint selection. Time to500k sums1h51m50s;
+actual training also includes1009's extra1h51m02s, which is not discarded.
+
+Fresh2017/3019 each complete500k actions/124,939 updates with zero debt, then
+final/initial24-round controls. All six new guards, four346-tensor frozen
+comparisons, finite checkpoints, whole action/frame replays and videos pass.
+Each seed is audited before the next. Review finishes23:31:58UTC; service
+`kindle-cdp-pong-reliability-20261021` exits successfully and has no worker.
+
+The combined CPU review recomputes selected scores/wins and confirms the same
+native binary and config except intentional learner seeds. An initial interactive
+config-equality assertion omitted that seed field; the corrected reviewer passes
+without repeating GPU work or changing any score. [Combined evidence](../../runs/cdp-pong-reliability-20261021.R6HKgGOt/cohort-review.json).
+
+Move to [one fresh longer-budget Breakout learner](../experiments/2026-10-21-cdp-breakout-budget.md),
+not further Pong extension or backend optimization. Full five-game mastery
+and matched RGB comparison remain open.
+
+- [2017 whole rollout](../../runs/cdp-pong-reliability-20261021.R6HKgGOt/seed-2017/pong-2017-final.mp4)
+- [3019 whole rollout](../../runs/cdp-pong-reliability-20261021.R6HKgGOt/seed-3019/pong-3019-final.mp4)
 
 - [Complete audit](../../runs/cdp-pong-budget-20261021.SNxyTFk7/learning-review.json)
 - [500k whole rollout](../../runs/cdp-pong-budget-20261021.SNxyTFk7/pong-1009-prefix.mp4)

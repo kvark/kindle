@@ -21,12 +21,17 @@ rescue, not a replicated recipe. Keep it separate from the unassisted cohort.
 
 **Pong1009 completes:** [result and videos](results/2026-10-21-cdp-pong-budget.md).
 500k/2M frozen scores16.75/16.92,24/24 wins each; actual-initial−20.13.
-All frozen tensor/replay audits pass. The extra1.5M actions bring only.167
-score on this seed, so fresh2017/3019 now replicate500k, not2M, serially.
-Retain unassisted B8/BF16/12M centered-CDP/action-effects1; audit final/initial
-controls before the next seed. Review this cohort before weaker games.
-Service `kindle-cdp-pong-reliability-20261021`;
-artifacts `runs/cdp-pong-reliability-20261021.R6HKgGOt`.
+The two fresh500k replicates finish15.08/15.29, also24/24 wins each. All three
+intermediate gates and frozen tensor/replay/video audits pass: mean15.71,
+72/72 wins. Published20.45 remains unmet. Another1.5M actions brought only.167
+on1009, so do not extend Pong automatically.
+
+**Now running: fresh Breakout1009,2M actions.** Same unassisted B8/BF16/12M
+centered-CDP/action-effects1 recipe. Fixed500k/final/actualinitial evaluations
+and videos are automated. Review before any other seed or extension.
+[Allocation](experiments/2026-10-21-cdp-breakout-budget.md);
+service `kindle-cdp-breakout-budget-1009-20261021`;
+artifacts `runs/cdp-breakout-budget-20261021.wqYChxy8`.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
@@ -1397,8 +1402,9 @@ Do not build swarm infrastructure or a concurrent learner service now.
 
 ## Current game status
 
-These are current sticky/full-action centered CDP500k results, except Qbert's
-separately allocated2M follow-up. All five titles retain12M/1M500k controls;
+These are sticky/full-action centered CDP results, with current October21
+Pong/Freeway entries and retained older Boxing/Breakout/Qbert evidence.
+All five titles retain12M/1M500k controls;
 the qualified backend refresh prevents an exact same-binary capacity ablation.
 This is not a comparison against raw CDP or RGB. Frozen means cover three learner seeds and24 natural
 episodes/model; streams/episodes are not independent learner replicates.
@@ -1410,8 +1416,8 @@ Links into `runs/` require this workspace.
 | --- | --- | --- | --- |
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing |12M frozen85.26 vs1.96 initial; seeds73.17/92.33/90.29,72/72 wins. Paired gain over1M+7.57 [−1.29,20.71]; training costs3.57x. | Both sizes pass historical gates in every seed; larger-model advantage is inconsistent. Published99.61 remains unmet. | [Capacity results and videos](results/2026-10-09-cdp-boxing-capacity.md) |
-| Pong |12M frozen+12.40 vs−20.21 initial; seeds+7.21/+12.96/+17.04,69/72 wins. All beat retained1M controls at500k actions; training costs3.57x. | Only3019 passes historical>=90% wins/mean>=15. Published20.45 remains unmet;12M forecasts untested. | [Capacity results and videos](results/2026-10-08-cdp-pong-capacity.md); [earlier1M paired world report](results/2026-10-06-cdp-centered-world.md) |
-| Freeway |12M frozen27.54 vs0; seeds33.58/17.25/31.79. Retained1M30.26; paired−2.72 [−13.29,4.08], training costs3.57x. | Crossing gates fall72/72 ->48/72;2017 regresses. No universal capacity advantage. Published33.40 remains unmet by the cohort. | [Capacity results and videos](results/2026-10-09-cdp-freeway-capacity.md); [exploration evidence](results/2026-10-05-freeway-effects-200k.md) |
+| Pong | Current BF16/B8/12M500k seeds16.75/15.08/15.29, mean15.71,72/72 wins; actual-initial0/72 wins.1009 at2M scores16.92, little improvement. | All three intermediate gates pass; published20.45 remains unmet. No universal reliability or old-backend isolated speedup claim. | [Budget, replication and videos](results/2026-10-21-cdp-pong-budget.md); [historical capacity](results/2026-10-08-cdp-pong-capacity.md) |
+| Freeway | Current unassisted BF16/B8 seeds31.83/30.58/0, mean20.81,48/72 crossing successes. Generic persistent exploration rescues selected3019 to32.96/24 successes, initial0. | Selected-seed rescue is not a reliable single-recipe cohort. Published33.40 remains unmet; historical unassisted mean27.54 was higher. | [Current reliability and rescue/videos](results/2026-10-21-cdp-freeway-reliability.md); [historical capacity](results/2026-10-09-cdp-freeway-capacity.md) |
 | Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
 | Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 rewards and live values in all seeds, with calibration errors; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecasts](results/2026-10-11-cdp-qbert-forecasts.md); [values](results/2026-10-11-cdp-qbert-values.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 

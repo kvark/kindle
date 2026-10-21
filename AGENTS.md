@@ -10,17 +10,25 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
+- **Breakout1009 is running:** [allocation](docs/experiments/2026-10-21-cdp-breakout-budget.md).
+  One fresh2M-action/499,939-update life, same unassisted12M/B8/T16/BF16/ratio32
+  centered CDP/action-effects1, eight environments and batched inference.
+  Fixed500k/final/actualinitial24-round frozen controls, exact tensors and videos
+  are automated. Service `kindle-cdp-breakout-budget-1009-20261021`, artifacts
+  `runs/cdp-breakout-budget-20261021.wqYChxy8`. Review before any extension or
+  other seed. Published381.81/two-wall864 gate stay open; old1M readout failures
+  do not diagnose12M. No game hints, RAM inputs or backend project.
 - **Pong1009 passes intermediate gate at500k and2M:** [result](docs/results/2026-10-21-cdp-pong-budget.md).
   Frozen16.75/16.92,24/24 wins each; actual-initial−20.13/zero wins. Extra1.5M
   actions add only.167 score on this seed.2M/499,939 updates take2h28m15s;
   all four guards/three346-tensor frozen comparisons/replays/videos pass,
-  final review22:09:44UTC. Published20.45 and multi-seed reliability stay open.
-  Fresh2017/3019 now run serial500k-action replicates with unchanged unassisted
-  B8/T16/BF16/12M centered CDP/action-effects1; eight environments/batched inference.
-  Service `kindle-cdp-pong-reliability-20261021`, artifacts
-  `runs/cdp-pong-reliability-20261021.R6HKgGOt`. Final/initial controls and audits
-  precede the next seed. Review the500k cohort before weaker games; no automatic
-  2M extension, checkpoint lifetime resume or backend project.
+  final review22:09:44UTC. Fresh500k2017/3019 complete15.08/15.29,24/24 wins
+  each, with exact frozen tensors/replay/video audits. All three500k seeds pass
+  intermediate gates, mean15.71/72 wins; published20.45 remains unmet.
+  Reliability service finishes23:31:58UTC; no Pong worker remains. Combined
+  reviewer permits only intentional config seed differences; preserve its
+  initial interactive equality-assertion failure, no GPU repeat. No further
+  Pong extension or automatic broad campaign; proceed to weaker games.
 - **Freeway selected-seed exploration rescue passes:** [result](docs/results/2026-10-21-cdp-freeway-reliability.md).
   Failed3019 improves0→32.96,24/24 rounds reach25 crossings, actual-initial0.
   Fresh500k actions/124,939 updates take38m19s with5% persistent-uniform
