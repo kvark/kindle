@@ -8,6 +8,7 @@ head seeds measure fit variability, not independent RL agents or test datasets.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import time
 
@@ -20,7 +21,11 @@ from kindle._representation_probe import PROTOCOL, regression_metrics, ridge_pro
 
 def checked_memory(model):
     device, memory = model.gpu_device, model.gpu_memory_budget
-    if device["device_name"] != "NVIDIA GeForce RTX 5080" or device["driver_info"] != "580.178.04":
+    expected_name = os.environ.get("KINDLE_EXPECT_DEVICE_NAME", "NVIDIA GeForce RTX 5080")
+    expected_driver = os.environ.get("KINDLE_EXPECT_DRIVER_INFO")
+    if device["device_name"] != expected_name or (
+        expected_driver is not None and device["driver_info"] != expected_driver
+    ):
         raise RuntimeError(f"unexpected probe GPU: {device}")
     if memory is None or memory["budget_bytes"] - memory["usage_bytes"] < 2 << 30:
         raise RuntimeError(f"less than 2GiB estimated headroom: {memory}")

@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 21, 2026. This is the authoritative roadmap.
+Updated October 22, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -26,12 +26,15 @@ intermediate gates and frozen tensor/replay/video audits pass: mean15.71,
 72/72 wins. Published20.45 remains unmet. Another1.5M actions brought only.167
 on1009, so do not extend Pong automatically.
 
-**Now running: fresh Breakout1009,2M actions.** Same unassisted B8/BF16/12M
-centered-CDP/action-effects1 recipe. Fixed500k/final/actualinitial evaluations
-and videos are automated. Review before any other seed or extension.
-[Allocation](experiments/2026-10-21-cdp-breakout-budget.md);
-service `kindle-cdp-breakout-budget-1009-20261021`;
-artifacts `runs/cdp-breakout-budget-20261021.wqYChxy8`.
+**Breakout1009 completes:** [result/videos](results/2026-10-22-cdp-breakout-budget.md).
+Frozen58.83→98.21 from500k→2M, initial1.42; all frozen tensors/replays pass.
+More experience helps this seed, but381.81 and the two-wall gate remain unmet.
+Before another long allocation, run the existing bounded
+[same-trajectory forecast check](experiments/2026-10-22-cdp-breakout-forecasts.md)
+on both checkpoints. This is a learning diagnosis, not backend optimization:
+no learner updates/new policy rollout or representation rewrite. A stale
+driver-string preflight stopped the first smoke before actions; the explicit
+driver expectation repair passes78 CPU tests. Preserve that failed attempt.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
@@ -1418,7 +1421,7 @@ Links into `runs/` require this workspace.
 | Boxing |12M frozen85.26 vs1.96 initial; seeds73.17/92.33/90.29,72/72 wins. Paired gain over1M+7.57 [−1.29,20.71]; training costs3.57x. | Both sizes pass historical gates in every seed; larger-model advantage is inconsistent. Published99.61 remains unmet. | [Capacity results and videos](results/2026-10-09-cdp-boxing-capacity.md) |
 | Pong | Current BF16/B8/12M500k seeds16.75/15.08/15.29, mean15.71,72/72 wins; actual-initial0/72 wins.1009 at2M scores16.92, little improvement. | All three intermediate gates pass; published20.45 remains unmet. No universal reliability or old-backend isolated speedup claim. | [Budget, replication and videos](results/2026-10-21-cdp-pong-budget.md); [historical capacity](results/2026-10-08-cdp-pong-capacity.md) |
 | Freeway | Current unassisted BF16/B8 seeds31.83/30.58/0, mean20.81,48/72 crossing successes. Generic persistent exploration rescues selected3019 to32.96/24 successes, initial0. | Selected-seed rescue is not a reliable single-recipe cohort. Published33.40 remains unmet; historical unassisted mean27.54 was higher. | [Current reliability and rescue/videos](results/2026-10-21-cdp-freeway-reliability.md); [historical capacity](results/2026-10-09-cdp-freeway-capacity.md) |
-| Breakout |12M frozen38.21 vs1.56 initial; seeds48.17/15.88/50.58. All beat retained1M4.00/3.50/7.92 at500k actions; training costs3.58x. | Published381.81 and historical two-wall/864-point gate remain unmet. Capacity helps;12M forecasts remain untested. Earlier weak-state diagnosis applies to1M, not automatically to12M. | [Capacity results and videos](results/2026-10-07-cdp-capacity.md); [1M world diagnosis](results/2026-10-07-cdp-breakout-world.md) |
+| Breakout | Current1009 BF16/12M frozen58.83→98.21 from500k→2M, initial1.42; all audits pass. Historical500k cohort mean38.21 on older backend/precision. | Published381.81/two-wall864 and multi-seed reliability remain unmet. Same-trajectory12M forecasts next; old1M diagnosis does not apply automatically. | [Current budget result/videos](results/2026-10-22-cdp-breakout-budget.md); [historical capacity](results/2026-10-07-cdp-capacity.md) |
 | Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 rewards and live values in all seeds, with calibration errors; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecasts](results/2026-10-11-cdp-qbert-forecasts.md); [values](results/2026-10-11-cdp-qbert-values.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video
