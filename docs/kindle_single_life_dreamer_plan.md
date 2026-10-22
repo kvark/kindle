@@ -29,12 +29,21 @@ on1009, so do not extend Pong automatically.
 **Breakout1009 completes:** [result/videos](results/2026-10-22-cdp-breakout-budget.md).
 Frozen58.83→98.21 from500k→2M, initial1.42; all frozen tensors/replays pass.
 More experience helps this seed, but381.81 and the two-wall gate remain unmet.
-Before another long allocation, run the existing bounded
-[same-trajectory forecast check](experiments/2026-10-22-cdp-breakout-forecasts.md)
-on both checkpoints. This is a learning diagnosis, not backend optimization:
-no learner updates/new policy rollout or representation rewrite. A stale
-driver-string preflight stopped the first smoke before actions; the explicit
-driver expectation repair passes78 CPU tests. Preserve that failed attempt.
+[Same-trajectory forecasts](results/2026-10-22-cdp-breakout-forecasts.md) improve
+h15 cumulative reward MAE1.856→1.338, beating all fixed controls at2M. Exact
+reward timing and false positives remain imperfect; survival evidence is sparse.
+All trace/frozen-tensor checks pass, zero learner updates. Preserve the first
+smoke's stale driver-string preflight failure and its78-test expectation repair.
+
+**Now running: explicit Breakout warm-start life.** Restore the original2M
+weights/optimizer/normalizer, add6M actions with the same recipe. Replay/games/
+RNG restart: not an exact lifetime resume or an independent seed. The short
+live/frozen smoke passes963 updates and all346 frozen tensors. Main starts
+from the original checkpoint, not the smoke. Fixed2M/6M-additional/source
+evaluations and videos are queued; review before anything else.
+[Plan](experiments/2026-10-22-cdp-breakout-warmstart.md), approximately7½h training;
+service `kindle-cdp-breakout-warmstart-20261022`;
+artifacts `runs/cdp-breakout-warmstart-20261022.ec73sFZx`.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;

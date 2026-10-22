@@ -10,23 +10,35 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
+- **Breakout warm-start learning is running:** [plan](docs/experiments/2026-10-22-cdp-breakout-warmstart.md).
+  Restore original2M weights/optimizer/normalizer, add6M actions, same config;
+  new games seed101009, empty replay and reseeded RNG. Not an exact lifetime
+  resume or independent seed. Expected1,499,939 new updates/1,999,878 total,
+  8M lineage exposure. Fixed2M/6M-additional/source-policy frozen controls and
+  videos are automated; no further learner queued. Service
+  `kindle-cdp-breakout-warmstart-20261022`, artifacts
+  `runs/cdp-breakout-warmstart-20261022.ec73sFZx`. Budget~7½h, train cap10h.
+  Disposable4096-action smoke passes963 updates, retained counters/debt0,
+  1024 frozen actions/all346 tensors, review02:32:42UTC. Main starts from the
+  original checkpoint, not the smoke. Record both additional and total exposure.
 - **Breakout1009 improves, not mastery:** [result](docs/results/2026-10-22-cdp-breakout-budget.md).
   Fixed500k/2M frozen58.83→98.21, initial1.42; zero two-wall successes/cutoffs.
   2M actions/499,939 updates in2h29m51s; four guards/three346-tensor frozen
   comparisons/replays/videos pass, review October22 02:07:31UTC. No learner
   worker remains. Published381.81 and reliability stay open; uneven online
   curve is not permission to select the unevaluated1.5M snapshot.
-  Next [same-trajectory frozen h1/h15 forecasts](docs/experiments/2026-10-22-cdp-breakout-forecasts.md),
-  existing12M/BF16/native code, no learner updates/new policy rollout. First
+  [Frozen forecasts complete](docs/results/2026-10-22-cdp-breakout-forecasts.md):
+  h15 cumulative reward MAE1.856→1.338, beats all four controls at2M. Endpoint
+  timing/false-positive rewards remain imperfect; survival evidence too sparse.
+  54,304 diagnostic actions/zero updates, two exact346-tensor checks/full traces
+  pass, service ends02:19:42UTC. No forecast worker remains. First
   smoke's stale hard-coded580 driver assertion fails before actions/updates;
   preserve `runs/cdp-breakout-forecasts-20261022.Xc9A3Zla`. Explicit driver/device
   expectations repair the helper,78 CPU tests pass, no native rebuild/recovery.
   Fresh smoke passes128 actions/zero updates/all346 tensors and invariance,
-  11.90s capture; CPU review02:15:53UTC. Two full captures now run under
-  `kindle-cdp-breakout-forecasts-full-20261022`, artifacts
-  `runs/cdp-breakout-forecasts-v2-20261022.bcDtlMcb`,54,304 replayed diagnostic
-  actions total, no learner/readout updates or new policy choices.
-  No new training extension, game hints, RAM input or backend project.
+  11.90s capture; CPU review02:15:53UTC. Artifacts
+  `runs/cdp-breakout-forecasts-v2-20261022.bcDtlMcb`. Useful forecasts support
+  more experience, not a representation rewrite. No game hints/RAM/backend project.
 - **Pong1009 passes intermediate gate at500k and2M:** [result](docs/results/2026-10-21-cdp-pong-budget.md).
   Frozen16.75/16.92,24/24 wins each; actual-initial−20.13/zero wins. Extra1.5M
   actions add only.167 score on this seed.2M/499,939 updates take2h28m15s;

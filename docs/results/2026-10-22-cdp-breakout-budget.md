@@ -37,10 +37,12 @@ GPU collection ends02:06:49 and final audit02:07:31. Service exits successfully.
 Replay reward estimates have already seen the target observation. Their low
 error does not prove useful open-loop dynamics. Late imagined intrinsic reward
 is.00488 versus extrinsic.09208; this does not support assuming bonus domination.
-Use the existing [frozen forecast check](../experiments/2026-10-22-cdp-breakout-forecasts.md)
-on both predefined checkpoints and the same complete final-policy trajectory.
-No new learner allocation, backend work or representation rewrite follows
-automatically. All five quality targets and the matched RGB comparison stay open.
+The [completed frozen forecast check](2026-10-22-cdp-breakout-forecasts.md)
+uses both predefined checkpoints and the same complete final-policy trajectory.
+H15 cumulative reward MAE improves1.856→1.338 and beats all fixed controls at2M;
+exact timing/false positives remain imperfect. A separately declared warm-start
+life now tests more experience after its short live/frozen smoke passes. No
+backend project or representation rewrite; all five quality targets stay open.
 
 - [Complete audit](../../runs/cdp-breakout-budget-20261021.wqYChxy8/learning-review.json)
 - [500k whole rollout](../../runs/cdp-breakout-budget-20261021.wqYChxy8/breakout-1009-prefix.mp4)
