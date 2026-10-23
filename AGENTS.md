@@ -28,6 +28,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   first device/budget query. After recovery, add host stage markers before any
   further restore; no identical blind retry. Future snapshot is current-boot/
   4096 records with explicit truncation,133 CPU guard tests pass. Runtime unchanged.
+  CPU-only debugger preparation resolves10 native startup symbols and verifies9
+  nested fixture events, no rebuild/GPU calls. Artifacts
+  `runs/context64-startup-trace-20261023`; after recovery, contain debugger and
+  inferior together. This is not native restore qualification or a speed result.
   B2/T64 smoke training passes4096 actions/867 updates/finite346 tensors and
   exact346 initials in45.245s. Separate frozen restore fails before run_start:
   Xid62/PMU halted, Xid154 PF FLR at05:17:15UTC October23, then reset-required

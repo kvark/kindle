@@ -83,6 +83,27 @@ records across boots, exceeding64MiB in both incidents. All133 guard CPU tests
 pass, including current-boot scoping and truncation reporting. This is incident
 capture maintenance, not a runtime/backend change or GPU qualification.
 
+### Startup tracing prepared without rebuilding the qualified binary
+
+`runs/context64-startup-trace-20261023` contains a locally extracted Ubuntu GDB
+17.1 (no system installation), symbol inventory and entry/return tracer. All ten
+native stage symbols resolve in the qualified binary: vector restore, context,
+pixels, core, restored core, checkpoint wrapper/backend, world synchronization,
+device identity and budget query. The debugger reads the object file without
+loading or executing it. A dynamically loaded CPU-only fixture verifies nested
+entry/return events across repeated calls and process completion: nine events.
+No GPU calls, native rebuild or runtime/source changes. Binary SHA-256 remains
+`ecd69601c7930fd1e797f949be2f199727af2d0c90abc692f92fe312b1a77d4c`.
+
+This is prepared instrumentation, not a native restore result. After recovery,
+declare the diagnostic with containment for both debugger and inferior; the
+existing guard's direct-child assumption alone does not cover a debugger tree.
+Breakpoints perturb host timing, so diagnostic timing is not training throughput.
+The qualified ordinary frozen-restore acceptance still remains required.
+
+- [CPU tracing check](../../runs/context64-startup-trace-20261023/review.json)
+- [Tracer](../../runs/context64-startup-trace-20261023/trace.py)
+
 - [Second incident CPU review](../../runs/cdp-context64-restore-20261023.a2He3BM1/fault-review.json)
 - [Second incident kernel supplement](../../runs/cdp-context64-restore-20261023.a2He3BM1/fault-kernel-window.jsonl)
 - [Second failed restore guard](../../runs/cdp-context64-restore-20261023.a2He3BM1/queue/breakout-final-recovery/result.json)
