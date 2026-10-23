@@ -15,8 +15,11 @@ passes; no new optimization project is needed to play.
 **Current interruption:** [B2/T64 restore hits a GPU fault](results/2026-10-23-cdp-context64-gpu-fault.md).
 The4096-action/867-update smoke training completes, but separate frozen restore
 hits Xid62/PMU halted and reset-required/Xid109 errors. No learner remains and
-no full2M run starts. GPU recovery is needed, then finish only the unfinished
-restore; do not repeat completed training. This is not an allocation-warning
+no full2M run starts. The restore also faults after reboot onto595.91.07 at
+06:39:20UTC. GPU recovery and initialization stage tracing are needed before
+another restore; do not repeat the same blind launch or completed training.
+Empty memory logs do not separate construction from the initial budget query.
+This is not an allocation-warning
 approval gate or a return to backend optimization.
 
 [Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md) remains
@@ -68,8 +71,8 @@ and reused seeds remain limitations. No worker remains from this queue.
 Longer full-sequence gradients with the same128 positions/update and ratio32;
 fewer independent sequences is an explicit tradeoff. No new backend/model.
 The disposable4096-action/867-update training portion passes its CPU audit,
-but the restore fault leaves smoke qualification incomplete. After recovery,
-finish restore and review before a fresh2M life with fixed500k/final/initial
+but repeated restore faults leave smoke qualification incomplete. After recovery,
+localize initialization, finish restore and review before a fresh2M life with fixed500k/final/initial
 evaluations. No learner remains. Backend projects remain parked.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent

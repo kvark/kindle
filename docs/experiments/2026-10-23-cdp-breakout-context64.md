@@ -2,8 +2,9 @@
 
 **Smoke training completes; frozen restore fails on a real GPU fault.**
 [Incident and CPU review](../results/2026-10-23-cdp-context64-gpu-fault.md).
-Freeway replication completes first. After GPU recovery, finish only the
-unfinished restore and review it before separately launching the learning
+Freeway replication completes first. Restore fails again after reboot onto
+595.91.07. After recovery, localize construction/checkpoint/query stages before
+another restore; no identical blind retry. Finish and review the restore before launching the learning
 comparison. Backend optimization remains parked.
 
 ## Learning hypothesis

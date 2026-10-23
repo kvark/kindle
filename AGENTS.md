@@ -20,6 +20,14 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
  untouched. No GPU work or old queue restart. Release reproducible build caches
  after packaging; avoid indefinite checkpoint histories.
 - **GPU recovery needed after a real fault:** [incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md).
+  Restore also fails after reboot onto595.91.07/bootdddae8da: Xid62/PMU halted
+  at06:39:20UTC, reset-required/Xid109 afterward. Guard stops child; service
+  ends06:39:28, no unfinished children or full training. CPU audit verifies329
+  sources/native/sealed artifacts and546 bounded current-boot records. No NVML.
+  Empty constructed-memory log cannot distinguish native construction from the
+  first device/budget query. After recovery, add host stage markers before any
+  further restore; no identical blind retry. Future snapshot is current-boot/
+  4096 records with explicit truncation,133 CPU guard tests pass. Runtime unchanged.
   B2/T64 smoke training passes4096 actions/867 updates/finite346 tensors and
   exact346 initials in45.245s. Separate frozen restore fails before run_start:
   Xid62/PMU halted, Xid154 PF FLR at05:17:15UTC October23, then reset-required
@@ -27,8 +35,8 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   no unfinished process or learner remains, no full2M run started. Zero job/
   guard NVML calls; exact cause unknown. Original over-limit broad kernel
   snapshot retained; bounded current-boot supplement and CPU-only review pass.
-  No reset/reload/reboot or GPU retry. After recovery, finish only the declared
-  smoke's frozen restore from4096 checkpoint before reviewing full training.
+  No agent reset/reload/reboot. Finish the declared smoke's frozen restore from
+  4096 checkpoint after diagnosing initialization, before reviewing full training.
 - **Breakout warm start completes without a gain:** [result](docs/results/2026-10-23-cdp-breakout-warmstart.md).
   Source2M98.21→4M-total80.17→8M-total85.17; source control reproduces98.21.
   Zero two-wall successes/cutoffs.6M new actions/1,499,939 updates in7h27m28s,

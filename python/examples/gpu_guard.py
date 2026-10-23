@@ -140,7 +140,7 @@ class Evidence:
         """Avoid more GPU ioctls after a fault; save bounded host evidence only."""
         commands = {
             "kernel-snapshot": ["journalctl", "--no-pager", "--quiet", "-o", "json",
-                                "-n", "100000", "_TRANSPORT=kernel"],
+                                "--boot=0", "-n", "4096", "_TRANSPORT=kernel"],
             "boots": ["journalctl", "--list-boots", "--no-pager"],
             "pci": ["lspci", "-nnk"],
             "modules": ["lsmod"],
@@ -150,7 +150,7 @@ class Evidence:
         for name, command in commands.items():
             try:
                 text = self.probe(name, command, timeout=5, limit=64 * 1024 * 1024)
-                if name == "kernel-snapshot" and len(text.splitlines()) >= 100000:
+                if name == "kernel-snapshot" and len(text.splitlines()) >= 4096:
                     self.event("capture_incomplete", name=name, error="journal record limit reached")
             except GuardError as error:
                 self.event("capture_incomplete", name=name, error=str(error))

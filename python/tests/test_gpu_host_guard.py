@@ -327,6 +327,19 @@ def test_snapshot_uses_only_the_host_allowlist(tmp_path, monkeypatch):
     evidence = host.HostEvidence(tmp_path / "snapshot")
     evidence.snapshot()
     assert len(commands) == 6 and all(command[0] in {"journalctl", "lspci", "lsmod", "modinfo", "ps"} for command in commands)
+    kernel = commands[0]
+    assert "--boot=0" in kernel
+    assert kernel[kernel.index("-n") + 1] == "4096"
+
+
+def test_snapshot_reports_truncated_current_boot(tmp_path, monkeypatch):
+    monkeypatch.setattr(retained.Evidence, "probe", lambda self, name, command, **kw:
+                        "{}\n" * 4096 if name == "kernel-snapshot" else "")
+    evidence = host.HostEvidence(tmp_path / "snapshot")
+    evidence.snapshot()
+    records = [json.loads(line) for line in (evidence.root / "events.jsonl").read_text().splitlines()]
+    assert any(row["event"] == "capture_incomplete" and row["name"] == "kernel-snapshot"
+               and row["error"] == "journal record limit reached" for row in records)
 
 
 def test_audit_detects_tampering(environment):

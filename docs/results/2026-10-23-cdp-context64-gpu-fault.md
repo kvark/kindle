@@ -32,12 +32,68 @@ time-window capture retains36 matching records, and the CPU-only review makes
 zero GPU calls. No guard bypass, GPU retry, reset, driver reload or reboot was
 performed. No learner remains active.
 
-## Resume direction
+## Restore fails again after recovery onto 595.91.07
+
+Boot `dddae8da-ad5c-4cd0-a9d8-8105d2eafb1d` starts with no recorded kernel
+fault in the guard's preflight. Only the unfinished frozen restore is launched,
+using the unchanged qualified binary and the completed4096-action checkpoint.
+No completed training is repeated and no full2M run starts.
+
+- 06:39:00UTC: the restore child starts on driver595.91.07.
+- 06:39:20: Xid62 and `PMU has halted`; Xid154 requests GPU reset.
+- 06:39:25: the guard detects the fault and stops the child; exit−15.
+- The service terminates06:39:28. No unfinished children remain. Subsequent
+  reset-required errors and Xid109 context-switch timeouts persist.
+
+The CPU review verifies the binary,329 source hashes, controller and all sealed
+guard artifacts. Both run and memory logs remain empty, with no frozen export.
+A bounded06:39–06:45 current-boot supplement retains546 kernel records. The
+first supplement command rejected a hyphenated journal boot ID; removing the
+hyphens repairs only log collection, with no GPU retry. Original guard records
+remain unchanged. No job/guard NVML calls or agent-initiated recovery.
+
+This repeats the failure across two drivers and boots, but does not establish
+whether the cause is application code, the driver/firmware, or hardware.
+
+### CPU inspection and next diagnostic boundary
+
+Inspection uses the exact qualified source, not the current upstream backend:
+
+- Fresh `learned_rgb` constructs the core before the pixel preprocessor;
+  `restore_rgb` constructs the preprocessor before the core. The preprocessor
+  constructor creates a pipeline and command encoder but submits no frame work.
+- Restore constructs the ordinary core, loads world/behavior/slow-value tensors,
+  restores normalization, then synchronizes inference weights. The loader
+  validates tensor layouts before writing, waits for its session, and allocates
+  Adam moments before restoring them. Device writes use bounded staging copies
+  with waits. This inspection finds no proven bad transfer or missing wait.
+- Crucially, an empty `constructed` memory log does **not** prove that the native
+  constructor failed: device identity and the first Vulkan memory-budget query
+  also precede that record. No existing trace distinguishes these stages.
+
+After recovery, localize those stages with flushed host markers before another
+restore attempt: constructor entry/exit, core construction, each checkpoint
+load, weight synchronization, and initial device/budget queries. Keep GPU
+operations and model semantics unchanged; no bypass of the failed restore gate.
+Do not repeat the same uninstrumented launch or begin full training blindly.
+
+The future guard's snapshot now selects only the current boot's last4096 kernel
+records and marks a reached limit as incomplete. Previously it requested100,000
+records across boots, exceeding64MiB in both incidents. All133 guard CPU tests
+pass, including current-boot scoping and truncation reporting. This is incident
+capture maintenance, not a runtime/backend change or GPU qualification.
+
+- [Second incident CPU review](../../runs/cdp-context64-restore-20261023.a2He3BM1/fault-review.json)
+- [Second incident kernel supplement](../../runs/cdp-context64-restore-20261023.a2He3BM1/fault-kernel-window.jsonl)
+- [Second failed restore guard](../../runs/cdp-context64-restore-20261023.a2He3BM1/queue/breakout-final-recovery/result.json)
+
+## Resume direction (updated after the second fault)
 
 GPU recovery is needed before further dispatch. After recovery is confirmed,
-review the new boot/driver and declare **only the unfinished frozen restore**
-from `smoke/checkpoints/4096`; do not repeat completed training or restart old
-queues. Require exact frozen tensors before declaring smoke success. Then
+review the new boot/driver and localize initialization as described above.
+The unfinished frozen restore is from `smoke/checkpoints/4096`; do not repeat
+completed training or restart old queues. Require exact frozen tensors before
+declaring smoke success. Then
 review the evidence before the fresh2M learning experiment. Backend parity
 remains parked; the successful Freeway cohort is unaffected.
 
