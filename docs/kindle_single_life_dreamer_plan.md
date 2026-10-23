@@ -58,6 +58,12 @@ Service `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
 Do not splice these aided results into the unassisted cohort or call the
 selected3019 rescue alone reliable. Backend projects remain parked.
 
+**Prepared after Freeway:** [Breakout B2/T64 test](experiments/2026-10-23-cdp-breakout-context64.md).
+Longer full-sequence gradients with the same128 positions/update and ratio32;
+fewer independent sequences is an explicit tradeoff. No new backend/model.
+Run and review a disposable4096-action smoke before a fresh2M-action life,
+fixed500k/final/actual-initial evaluations. Not started; no concurrent learner.
+
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
 one rescued Freeway seed or a good Pong run does not finish that goal.

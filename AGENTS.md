@@ -34,6 +34,12 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
   `runs/cdp-freeway-persistent-replication-20261023.mr2oPmJq`. Automated frozen
   controls/videos/cohort audit; no concurrent learner.285 adapter CPU tests pass.
+  [Prepared next Breakout test](docs/experiments/2026-10-23-cdp-breakout-context64.md):
+  B2/T64 versus retained B8/T16, fixed128 positions/update and ratio32; longer
+  gradient paths but fewer independent sequences, not a pure BPTT ablation.
+  No worker/allocation yet; finish Freeway, then disposable4096-action smoke
+  and review before a fresh2M life. Source/schedule preflight and293 adapter
+  CPU tests pass. Keep existing native binary; no backend build or speed gate.
   Published381.81/all five targets remain open.
 - **Breakout1009 improves, not mastery:** [result](docs/results/2026-10-22-cdp-breakout-budget.md).
   Fixed500k/2M frozen58.83→98.21, initial1.42; zero two-wall successes/cutoffs.

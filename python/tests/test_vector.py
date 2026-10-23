@@ -93,7 +93,8 @@ def test_runner_forwards_actor_critic_gradient_before_gpu(monkeypatch, tmp_path,
 
 @pytest.mark.parametrize("scale", [0, 1])
 @pytest.mark.parametrize("centered", [False, True])
-def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered):
+@pytest.mark.parametrize("batch_shape", [None, (8, 16), (2, 64)])
+def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered, batch_shape):
     environment = SimpleNamespace(action_space=SimpleNamespace(n=18),
                                   reset=lambda **_: (None, {}), close=lambda: None)
     monkeypatch.setattr(atari_vector.gym, "make", lambda *_, **__: environment)
@@ -110,11 +111,18 @@ def test_runner_cdp_recipe_before_gpu(monkeypatch, tmp_path, scale, centered):
         assert config['disagreement_bonus'] is (scale > 0)
         assert config['intrinsic_reward_scale'] == scale
         assert config['cdp_centered'] is centered
+        if batch_shape is not None:
+            batch, length = batch_shape
+            assert config['batch_size'] == config['world_microbatch_size'] == batch
+            assert config['batch_length'] == config['world_backprop_length'] == length
+            assert batch * length == 128
         raise RuntimeError('CDP recipe checked before GPU')
 
     monkeypatch.setattr(kindle, 'VectorAgent', SimpleNamespace(learned_rgb=construct))
     monkeypatch.setattr(sys, 'argv', ['atari_vector.py', '--output', str(tmp_path / 'cdp.jsonl'),
                                     '--cdp', '--disagreement-scale', str(scale),
+                                    *(['--batch-size', str(batch_shape[0]), '--batch-length', str(batch_shape[1]),
+                                       '--world-microbatch-size', str(batch_shape[0])] if batch_shape else []),
                                     *(['--cdp-centered'] if centered else [])])
     with pytest.raises(RuntimeError, match='CDP recipe checked'):
         atari_vector.main()
