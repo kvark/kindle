@@ -10,6 +10,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
+- **User-requested artifact cleanup complete:** [record](docs/results/2026-10-23-artifact-cleanup.md).
+ 117 tagged inactive Rust caches and106 old top-level Pong history intermediates
+ removed;163.7GiB reclaimed locally,529GiB free. First/final old snapshots,
+ metadata/checksums, current CDP checkpoints/videos/logs/sources are retained.
+ Qualified native/source hashes and pending4096-action/867-update checkpoint
+ verify unchanged. Historical cache binaries may require rebuilding; deleted
+ intermediate weights are not in Git. Shared data remains98% full/178GiB free,
+ untouched. No GPU work or old queue restart. Release reproducible build caches
+ after packaging; avoid indefinite checkpoint histories.
 - **GPU recovery needed after a real fault:** [incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md).
   B2/T64 smoke training passes4096 actions/867 updates/finite346 tensors and
   exact346 initials in45.245s. Separate frozen restore fails before run_start:
