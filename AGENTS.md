@@ -20,6 +20,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
  untouched. No GPU work or old queue restart. Release reproducible build caches
  after packaging; avoid indefinite checkpoint histories.
 - **GPU recovery needed after a real fault:** [incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md).
+  Third bootc1fd11cc/595.91.07: GDB-traced restore passes1024 frozen actions/
+  zero updates/exact346 tensors/all10 startup stages. Ordinary same-boot control
+  then repeats Xid62 at16:12:42UTC with identical595 payload, before run_start;
+  service ends16:12:43, no children/learner. Comparison audit passes. GDB default
+  disables ASLR: timing AND host layout differ, no established fix/root cause.
+  After recovery trace with normal ASLR explicitly retained; no blind retry.
+  Artifacts `runs/gpu-fault-comparison-20261023`. No training/backend changes.
   Restore also fails after reboot onto595.91.07/bootdddae8da: Xid62/PMU halted
   at06:39:20UTC, reset-required/Xid109 afterward. Guard stops child; service
   ends06:39:28, no unfinished children or full training. CPU audit verifies329

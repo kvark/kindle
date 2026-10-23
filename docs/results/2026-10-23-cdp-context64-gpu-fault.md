@@ -6,6 +6,11 @@ checkpoint checks and exact346 initial tensors against the B8/T16 control pass.
 This does **not** qualify the complete smoke: frozen restore fails before
 run_start and before the first constructed-memory record. No2M training starts.
 
+**Latest diagnosis:** a traced restore succeeds on a third boot, but its
+ordinary same-boot control repeats the PMU halt. GDB changes both timing and
+ASLR, so neither a fix nor an exact cause is established. See the comparison
+below. No learner is running; the third boot now also requires recovery.
+
 ## Incident
 
 On driver615.71.09, boot`76297c0a-a477-4dbb-8426-2188b4d558f7`:
@@ -108,7 +113,83 @@ The qualified ordinary frozen-restore acceptance still remains required.
 - [Second incident kernel supplement](../../runs/cdp-context64-restore-20261023.a2He3BM1/fault-kernel-window.jsonl)
 - [Second failed restore guard](../../runs/cdp-context64-restore-20261023.a2He3BM1/queue/breakout-final-recovery/result.json)
 
-## Resume direction (updated after the second fault)
+## Same-boot traced success and ordinary failure
+
+On October23 the host has rebooted onto595.91.07,
+boot`c1fd11cc-57ba-4ca2-8d75-8f38dbbdec89`. Its preflight kernel journal has
+no GPU faults. One instrumented restore runs, followed only after its CPU
+review by one ordinary restore. Both use the same qualified native binary,
+checkpoint, model config, action budget and GPU environment. No backend change,
+driver setting change, reset or training. A CPU timeout fixture first verifies
+that the systemd containment stops both debugger and inferior.
+
+| Attempt | Outcome | Time from child launch to PMU halt |
+| --- | --- | ---: |
+|615.71.09, first boot | Ordinary restore fails |19.630s |
+|595.91.07, second boot | Ordinary restore fails |20.415s |
+|595.91.07, third boot | GDB-traced restore passes | No fault |
+|595.91.07, same third boot | Ordinary restore fails |19.632s |
+
+The successful trace covers all ten stages. Core construction takes19.785s;
+the first checkpoint wrapper runs for0.529s. All three checkpoint loads,
+weight synchronization, device queries and memory-budget queries return.
+The run completes1024 frozen actions/zero updates, learner counter867, and
+all346 exported tensors match the smoke checkpoint. Its complete run identity
+matches the original training except the expected driver/evaluation fields.
+This proves the saved model can restore and act on595; it does not qualify
+ordinary restore reliability. Tracing overhead is not a throughput measurement.
+
+The subsequent ordinary control faults at16:12:42UTC, before either run_start
+or constructed-memory output. **Its eight-word Xid62 payload exactly matches
+the second incident.** The guard stops the child and the service ends16:12:43;
+no unfinished children or learner remain. All three failed guards retain their
+failure status. The new bounded kernel snapshot completes without the earlier
+cross-boot output overflow. A separate224-record window preserves the third
+incident; comparison audits all saved guard manifests and traced frozen tensors.
+
+### What the logs establish
+
+PMU halt is the first reported failure in all three incidents. Reset-required
+errors, resource-cleanup assertions and Xid109 timeouts follow. On both595
+incidents, a subsequent GSP watchdog identifies partition4#0/task3. Neither
+original incident's bounded two-minute lead-in contains allocation/OOM,
+thermal or PCIe AER errors. Absence of those logs does not exclude hardware,
+temperature or power problems; failure-time telemetry was not recorded.
+
+NVIDIA's [Xid guidance](https://docs.nvidia.com/deploy/gpu-debug-guidelines/gpu-node-triage.html)
+identifies62 as a PMU halt. Its
+[open driver handler](https://github.com/NVIDIA/open-gpu-kernel-modules/blob/595.91.07/src/nvidia/src/kernel/gpu/gsp/kernel_gsp.c)
+marks the GSP fatal after receiving that notification and avoids further RPCs.
+This explains why stopping Python does not restore the GPU; it does not identify
+the original trigger.
+
+A [firsthand Blackwell report](https://github.com/NVIDIA/open-gpu-kernel-modules/issues/1307)
+describes PMU halt followed by the same GSP watchdog task during desktop idle,
+without Kindle. That supports considering a shared firmware failure class,
+but is not confirmation that our cause is identical or that the hardware is sound.
+
+### What the successful debugger run changes
+
+GDB's default `disable-randomization` setting is **on**, and this run did not
+override it. It also introduces startup delay, thread stops and breakpoint
+overhead. Therefore this is not a controlled timing-only experiment. Host
+virtual-memory layout, concurrency/timing, and intervening device state differ.
+One success does not justify disabling ASLR, adding sleeps, rearranging the
+constructor, or blaming a particular shader. Checkpoint corruption is a weaker
+hypothesis after an exact346-tensor successful restore, but the failing native
+operation remains unlocalized.
+
+After recovery, the next diagnostic should retain normal ASLR explicitly with
+`set disable-randomization off`, retain flushed stage markers and capture the
+last host stack if it stalls. Keep the same binary/checkpoint. No further blind
+ordinary retry, driver cycling or training while the device requires recovery.
+
+- [Comparison audit](../../runs/gpu-fault-comparison-20261023/comparison.json)
+- [Successful traced restore](../../runs/gpu-fault-comparison-20261023/restore/review.json)
+- [Third failed guard](../../runs/gpu-fault-comparison-20261023/ordinary/guard/result.json)
+- [Third kernel window](../../runs/gpu-fault-comparison-20261023/595-third-kernel.jsonl)
+
+## Resume direction (updated after the third fault)
 
 GPU recovery is needed before further dispatch. After recovery is confirmed,
 review the new boot/driver and localize initialization as described above.
