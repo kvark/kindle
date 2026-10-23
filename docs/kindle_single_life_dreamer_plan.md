@@ -1,6 +1,6 @@
 # Kindle: a single actor that learns while acting
 
-Updated October 22, 2026. This is the authoritative roadmap.
+Updated October 23, 2026. This is the authoritative roadmap.
 [PR31](https://github.com/kvark/kindle/pull/31) is the done/running/next dashboard;
 [experiment reports](experiments/README.md) retain detailed evidence and failures.
 [AGENTS.md](../AGENTS.md) gives working rules. No separate status document.
@@ -35,15 +35,28 @@ reward timing and false positives remain imperfect; survival evidence is sparse.
 All trace/frozen-tensor checks pass, zero learner updates. Preserve the first
 smoke's stale driver-string preflight failure and its78-test expectation repair.
 
-**Now running: explicit Breakout warm-start life.** Restore the original2M
-weights/optimizer/normalizer, add6M actions with the same recipe. Replay/games/
-RNG restart: not an exact lifetime resume or an independent seed. The short
-live/frozen smoke passes963 updates and all346 frozen tensors. Main starts
-from the original checkpoint, not the smoke. Fixed2M/6M-additional/source
-evaluations and videos are queued; review before anything else.
-[Plan](experiments/2026-10-22-cdp-breakout-warmstart.md), approximately7½h training;
-service `kindle-cdp-breakout-warmstart-20261022`;
-artifacts `runs/cdp-breakout-warmstart-20261022.ec73sFZx`.
+**Warm-start continuation does not improve Breakout:** [result/videos](results/2026-10-23-cdp-breakout-warmstart.md).
+Source2M98.21→4M-total80.17→8M-total85.17, source control reproduces98.21.
+All frozen/audit checks pass;6M additional actions cost7h27m28s. Replay/games/
+RNG restarted, so this is not an uninterrupted8M baseline or independent seed.
+The [greedy comparison](results/2026-10-23-cdp-breakout-action-mode.md) completes:
+source53.46/final97.79/initial2.21, with all frozen/replay checks passing.
+The inconsistent effect does not justify changing standard sampled evaluation.
+The bounded [actual12M spatial-state check](results/2026-10-23-cdp-breakout-state.md)
+passes: trained posterior/prior retain ball information absent from the initial
+recurrent readouts; paddle predictions depend on actions.15-step ball precision
+remains limited and does not improve with longer training. All trace/frozen
+checks pass, zero actor updates; no automatic long unchanged extension or
+encoder replacement. Future Breakout work needs a targeted learning hypothesis.
+
+**Running training:** [Freeway exploration replication](experiments/2026-10-23-cdp-freeway-replication.md).
+Fresh1009/2017,500k actions each, the exact intervention that rescued3019;
+eight environments/batched inference, fixed final/initial evaluation and videos.
+Expected about80 minutes of training, sequentially after the completed state capture.
+Service `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
+`runs/cdp-freeway-persistent-replication-20261023.mr2oPmJq`.
+Do not splice these aided results into the unassisted cohort or call the
+selected3019 rescue alone reliable. Backend projects remain parked.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
@@ -1430,7 +1443,7 @@ Links into `runs/` require this workspace.
 | Boxing |12M frozen85.26 vs1.96 initial; seeds73.17/92.33/90.29,72/72 wins. Paired gain over1M+7.57 [−1.29,20.71]; training costs3.57x. | Both sizes pass historical gates in every seed; larger-model advantage is inconsistent. Published99.61 remains unmet. | [Capacity results and videos](results/2026-10-09-cdp-boxing-capacity.md) |
 | Pong | Current BF16/B8/12M500k seeds16.75/15.08/15.29, mean15.71,72/72 wins; actual-initial0/72 wins.1009 at2M scores16.92, little improvement. | All three intermediate gates pass; published20.45 remains unmet. No universal reliability or old-backend isolated speedup claim. | [Budget, replication and videos](results/2026-10-21-cdp-pong-budget.md); [historical capacity](results/2026-10-08-cdp-pong-capacity.md) |
 | Freeway | Current unassisted BF16/B8 seeds31.83/30.58/0, mean20.81,48/72 crossing successes. Generic persistent exploration rescues selected3019 to32.96/24 successes, initial0. | Selected-seed rescue is not a reliable single-recipe cohort. Published33.40 remains unmet; historical unassisted mean27.54 was higher. | [Current reliability and rescue/videos](results/2026-10-21-cdp-freeway-reliability.md); [historical capacity](results/2026-10-09-cdp-freeway-capacity.md) |
-| Breakout | Current1009 BF16/12M frozen58.83→98.21 from500k→2M, initial1.42; all audits pass. Historical500k cohort mean38.21 on older backend/precision. | Published381.81/two-wall864 and multi-seed reliability remain unmet. Same-trajectory12M forecasts next; old1M diagnosis does not apply automatically. | [Current budget result/videos](results/2026-10-22-cdp-breakout-budget.md); [historical capacity](results/2026-10-07-cdp-capacity.md) |
+| Breakout | Current1009 BF16/12M58.83→98.21 at500k→2M; warm4M/8M-total80.17/85.17, source control98.21, initial1.42. All audits pass. | Published381.81/two-wall864 and reliability unmet. Useful cumulative forecasts, imperfect timing; frozen action-mode check next. Warm life is not uninterrupted8M. | [Warm-start result/videos](results/2026-10-23-cdp-breakout-warmstart.md); [forecasts](results/2026-10-22-cdp-breakout-forecasts.md); [original budget](results/2026-10-22-cdp-breakout-budget.md) |
 | Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 rewards and live values in all seeds, with calibration errors; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecasts](results/2026-10-11-cdp-qbert-forecasts.md); [values](results/2026-10-11-cdp-qbert-values.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 
 Historical Tiny results used nonsticky protocols and250k same-title video

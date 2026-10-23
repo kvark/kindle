@@ -10,6 +10,21 @@ sys.path.insert(0, str(Path(__file__).parents[1] / 'examples'))
 import probe_cdp as probe
 
 
+@pytest.mark.parametrize('deter,cnn,stoch', [(512, 256, 128), (2048, 1024, 512)])
+def test_representation_dimensions_come_from_checkpoint(tmp_path, deter, cnn, stoch):
+    from safetensors.numpy import save_file
+    tensors = {'world.dynamics.prior0.weight': np.zeros((deter, 1), np.float32),
+               'world.representation.posterior.obs0.weight': np.zeros((deter+cnn, 1), np.float32),
+               'world.dynamics.priorlogit.bias': np.zeros(stoch, np.float32),
+               'world.representation.posterior.obslogit.bias': np.zeros(stoch, np.float32)}
+    save_file(tensors, tmp_path / 'world.safetensors')
+    assert probe.representation_dimensions(tmp_path) == dict(deter=deter, cnn=cnn, posterior=deter+stoch)
+    tensors['world.representation.posterior.obslogit.bias'] = np.zeros(stoch+1, np.float32)
+    save_file(tensors, tmp_path / 'world.safetensors')
+    with pytest.raises(ValueError, match='inconsistent'):
+        probe.representation_dimensions(tmp_path)
+
+
 class Environment:
     action_space = SimpleNamespace(n=18)
 

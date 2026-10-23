@@ -10,17 +10,31 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
-- **Breakout warm-start learning is running:** [plan](docs/experiments/2026-10-22-cdp-breakout-warmstart.md).
-  Restore original2M weights/optimizer/normalizer, add6M actions, same config;
-  new games seed101009, empty replay and reseeded RNG. Not an exact lifetime
-  resume or independent seed. Expected1,499,939 new updates/1,999,878 total,
-  8M lineage exposure. Fixed2M/6M-additional/source-policy frozen controls and
-  videos are automated; no further learner queued. Service
-  `kindle-cdp-breakout-warmstart-20261022`, artifacts
-  `runs/cdp-breakout-warmstart-20261022.ec73sFZx`. Budget~7½h, train cap10h.
-  Disposable4096-action smoke passes963 updates, retained counters/debt0,
-  1024 frozen actions/all346 tensors, review02:32:42UTC. Main starts from the
-  original checkpoint, not the smoke. Record both additional and total exposure.
+- **Breakout warm start completes without a gain:** [result](docs/results/2026-10-23-cdp-breakout-warmstart.md).
+  Source2M98.21→4M-total80.17→8M-total85.17; source control reproduces98.21.
+  Zero two-wall successes/cutoffs.6M new actions/1,499,939 updates in7h27m28s,
+  absolute counters8M/1,999,878 and debt0. Four guards/three346-tensor frozen
+  comparisons/replays/videos pass; audit October22 10:04:41UTC. No learner
+  worker remains. Replay/games/RNG restart means this is not uninterrupted8M
+  learning or an independent seed. No post-hoc favorable-checkpoint selection.
+  [Greedy check completes](docs/results/2026-10-23-cdp-breakout-action-mode.md):
+  source53.46/final97.79/initial2.21; inconsistent effect, keep sampled standard.
+  All three guards/exact346-tensor comparisons/replays pass;51,944 actions,
+  zero updates/cutoffs/two-wall successes, terminal03:30:34UTC October23.
+  [Actual12M state diagnosis passes](docs/results/2026-10-23-cdp-breakout-state.md):
+  trained posterior/prior ball information beats actual-initial, but h15 ball-x
+  R².269→.227 does not improve; paddle action sensitivity is useful. Weak pixel
+  readout is not absent-image evidence.98,304 diagnostic actions/30,720 readout
+  updates/zero actor updates, three guards/exact346-tensor checks/trace audits
+  pass; GPU ends03:51:03, CPU03:51:15UTC. No probe worker remains. Original
+  smoke CPU import failure preserved; import-only repair repeats no GPU capture.
+  80 CPU probe tests pass. No entropy sweep/backend project/long unchanged extension.
+  **Running training:** [fixed Freeway exploration replication](docs/experiments/2026-10-23-cdp-freeway-replication.md),
+  seeds1009/2017,500k each, sequentially. Service
+  `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
+  `runs/cdp-freeway-persistent-replication-20261023.mr2oPmJq`. Automated frozen
+  controls/videos/cohort audit; no concurrent learner.285 adapter CPU tests pass.
+  Published381.81/all five targets remain open.
 - **Breakout1009 improves, not mastery:** [result](docs/results/2026-10-22-cdp-breakout-budget.md).
   Fixed500k/2M frozen58.83→98.21, initial1.42; zero two-wall successes/cutoffs.
   2M actions/499,939 updates in2h29m51s; four guards/three346-tensor frozen

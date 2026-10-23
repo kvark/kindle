@@ -15,7 +15,9 @@ import time
 import ale_py
 import gymnasium as gym
 import numpy as np
+from safetensors import safe_open
 
+import atari
 import kindle
 from atari import DreamerAtariPreprocessing, checkpoint_identity, sha256_file
 from fit_atari_probes import checked_memory, mlp_probe
@@ -32,6 +34,19 @@ POSITION_TARGETS = {'Seaquest': ('player_x', 'player_y'),
                     'Breakout': ('ball_x', 'ball_y', 'player_x')}
 TRACE_FIELDS = ('current', 'following', 'actions', 'rewards', 'terminated', 'truncated',
                 'collection_cut', 'episodes', 'positions')
+
+
+def representation_dimensions(checkpoint):
+    with safe_open(checkpoint / 'world.safetensors', framework='np') as tensors:
+        prior = tensors.get_slice('world.dynamics.prior0.weight').get_shape()
+        posterior = tensors.get_slice('world.representation.posterior.obs0.weight').get_shape()
+        prior_logits = tensors.get_slice('world.dynamics.priorlogit.bias').get_shape()
+        posterior_logits = tensors.get_slice('world.representation.posterior.obslogit.bias').get_shape()
+    if (len(prior) != 2 or len(posterior) != 2 or len(prior_logits) != 1
+            or prior_logits != posterior_logits or min(prior + posterior + prior_logits) <= 0
+            or posterior[0] <= prior[0]):
+        raise ValueError('inconsistent RGB/CDP checkpoint representation dimensions')
+    return dict(deter=prior[0], cnn=posterior[0]-prior[0], posterior=prior[0]+prior_logits[0])
 
 
 def trace_identity(data):
@@ -307,18 +322,20 @@ def fit_readouts(root, result, save, *, steps):
 
 
 def run(checkpoint, output, smoke, game='Seaquest'):
+    dimensions = representation_dimensions(checkpoint)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     agent = kindle.Agent.restore_rgb(str(checkpoint))
     config = agent.config
-    if (config['model_size'] != 'size1_m' or config['observation_kind'] != 'rgb64' or config['video_encoder'] is not None
+    if (config['observation_kind'] != 'rgb64' or config['video_encoder'] is not None
             or config['action_count'] != 18 or config['visitation_bonus'] or config['actor_critic_gradient']):
-        raise ValueError('requires Size1M RGB/CDP actor with ac_grads=false and no visitation bonus')
+        raise ValueError('requires RGB/CDP actor with ac_grads=false and no visitation bonus')
     cdp = config['loss_scales']['future_prediction'] > 0
     result = dict(protocol=PROTOCOL, status='running', smoke=smoke, method='cdp' if cdp else 'rgb',
                   seed=config['seed'], checkpoint=checkpoint_identity(checkpoint), config=config,
                   source_sha256=sha256_file(__file__), native_sha256=sha256_file(kindle._native.__file__),
-                  wrapper_sha256=sha256_file(Path(__file__).with_name('atari.py')), ale_py_version=ale_py.__version__,
+                  wrapper_sha256=sha256_file(atari.__file__), ale_py_version=ale_py.__version__,
+                  representation_dimensions=dimensions,
                   environment=dict(name=f'ALE/{game}-v5', observation_size='native', sticky_actions=.25,
                                    full_action_space=True, action_repeat=4, noop_max=0, max_episode_frames=100000),
                   gpu_device=agent.gpu_device, label_source=LABEL_SOURCE, labels=list(POSITION_TARGETS[game]),
@@ -346,9 +363,10 @@ def run(checkpoint, output, smoke, game='Seaquest'):
     try:
         for split, seeds in SPLITS.items():
             for seed in seeds[:1] if smoke else seeds:
-                data, row = collect_trace(agent, env, seed, result['steps_per_trajectory'], check_memory, cdp=cdp, game=game)
-                if data['cnn'].shape[1] != 256 or data['posterior'].shape[1] != 640:
-                    raise RuntimeError('unexpected Size1M representation dimensions')
+                data, row = collect_trace(agent, env, seed, result['steps_per_trajectory'], check_memory,
+                                          cdp=cdp, deter=dimensions['deter'], game=game)
+                if data['cnn'].shape[1] != dimensions['cnn'] or data['posterior'].shape[1] != dimensions['posterior']:
+                    raise RuntimeError('observed representation dimensions differ from checkpoint')
                 if game in ('Pong', 'Breakout') and data['pixels'].shape[1] != 3*64*64:
                     raise RuntimeError('unexpected learned-RGB input dimensions')
                 path = output / f'{split}-{seed}.npz'
