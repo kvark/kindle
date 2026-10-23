@@ -12,6 +12,13 @@ parked, not prerequisites. Use the qualified c8aeba28 live runner with BF16,
 eight vector environments and batched inference. The initial live/frozen smoke
 passes; no new optimization project is needed to play.
 
+**Current interruption:** [B2/T64 restore hits a GPU fault](results/2026-10-23-cdp-context64-gpu-fault.md).
+The4096-action/867-update smoke training completes, but separate frozen restore
+hits Xid62/PMU halted and reset-required/Xid109 errors. No learner remains and
+no full2M run starts. GPU recovery is needed, then finish only the unfinished
+restore; do not repeat completed training. This is not an allocation-warning
+approval gate or a return to backend optimization.
+
 [Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md) remains
 unresolved: unassisted B8 seeds1009/2017/3019 score31.83/30.58/0. A fresh test
 of the failed3019 seed with generic persistent-uniform exploration reaches32.96,
@@ -49,20 +56,21 @@ remains limited and does not improve with longer training. All trace/frozen
 checks pass, zero actor updates; no automatic long unchanged extension or
 encoder replacement. Future Breakout work needs a targeted learning hypothesis.
 
-**Running training:** [Freeway exploration replication](experiments/2026-10-23-cdp-freeway-replication.md).
-Fresh1009/2017,500k actions each, the exact intervention that rescued3019;
-eight environments/batched inference, fixed final/initial evaluation and videos.
-Expected about80 minutes of training, sequentially after the completed state capture.
-Service `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
-`runs/cdp-freeway-persistent-replication-20261023.mr2oPmJq`.
-Do not splice these aided results into the unassisted cohort or call the
-selected3019 rescue alone reliable. Backend projects remain parked.
+**Freeway replication completes:** [results and videos](results/2026-10-23-cdp-freeway-replication.md).
+Fixed aided1009/2017/retained3019 score32.67/30.67/32.96: mean32.10 and72/72
+rounds above25 crossings, initial0. All three intermediate gates pass, with
+all frozen/replay audits. Two new500k runs take1h16m36s training; service/audit
+finish05:13:56UTC. Published33.40 remains unmet. Keep this fixed development
+recipe separate from the unassisted20.81/48-success cohort; selection on3019
+and reused seeds remain limitations. No worker remains from this queue.
 
-**Prepared after Freeway:** [Breakout B2/T64 test](experiments/2026-10-23-cdp-breakout-context64.md).
+**Awaiting GPU recovery:** [Breakout B2/T64 test](experiments/2026-10-23-cdp-breakout-context64.md).
 Longer full-sequence gradients with the same128 positions/update and ratio32;
 fewer independent sequences is an explicit tradeoff. No new backend/model.
-Run and review a disposable4096-action smoke before a fresh2M-action life,
-fixed500k/final/actual-initial evaluations. Not started; no concurrent learner.
+The disposable4096-action/867-update training portion passes its CPU audit,
+but the restore fault leaves smoke qualification incomplete. After recovery,
+finish restore and review before a fresh2M life with fixed500k/final/initial
+evaluations. No learner remains. Backend projects remain parked.
 
 Do not restart interrupted queues or call checkpoint loading an equivalent
 lifetime resume. Keep all five games and their published reference targets;
@@ -1448,7 +1456,7 @@ Links into `runs/` require this workspace.
 | Seaquest | Three extrinsic CDP/RGB pairs: online543.6 vs318.1; CDP13.6% less wall time and35.9% less world-training time. Frozen world probes complete. | Controlled result on one title, not frozen policy mastery or five-game speed superiority. | [Learning and world report](results/2026-10-04-cdp-learning.md) |
 | Boxing |12M frozen85.26 vs1.96 initial; seeds73.17/92.33/90.29,72/72 wins. Paired gain over1M+7.57 [−1.29,20.71]; training costs3.57x. | Both sizes pass historical gates in every seed; larger-model advantage is inconsistent. Published99.61 remains unmet. | [Capacity results and videos](results/2026-10-09-cdp-boxing-capacity.md) |
 | Pong | Current BF16/B8/12M500k seeds16.75/15.08/15.29, mean15.71,72/72 wins; actual-initial0/72 wins.1009 at2M scores16.92, little improvement. | All three intermediate gates pass; published20.45 remains unmet. No universal reliability or old-backend isolated speedup claim. | [Budget, replication and videos](results/2026-10-21-cdp-pong-budget.md); [historical capacity](results/2026-10-08-cdp-pong-capacity.md) |
-| Freeway | Current unassisted BF16/B8 seeds31.83/30.58/0, mean20.81,48/72 crossing successes. Generic persistent exploration rescues selected3019 to32.96/24 successes, initial0. | Selected-seed rescue is not a reliable single-recipe cohort. Published33.40 remains unmet; historical unassisted mean27.54 was higher. | [Current reliability and rescue/videos](results/2026-10-21-cdp-freeway-reliability.md); [historical capacity](results/2026-10-09-cdp-freeway-capacity.md) |
+| Freeway | Fixed persistent-exploration1009/2017/3019 score32.67/30.67/32.96, mean32.10,72/72 crossing successes, initial0. Unassisted20.81/48 successes stays separate. | All three intermediate gates pass; published33.40 remains unmet. Intervention selected on3019 and development seeds reused. | [Replicated recipe/videos](results/2026-10-23-cdp-freeway-replication.md); [unassisted and rescue](results/2026-10-21-cdp-freeway-reliability.md) |
 | Breakout | Current1009 BF16/12M58.83→98.21 at500k→2M; warm4M/8M-total80.17/85.17, source control98.21, initial1.42. All audits pass. | Published381.81/two-wall864 and reliability unmet. Useful cumulative forecasts, imperfect timing; frozen action-mode check next. Warm life is not uninterrupted8M. | [Warm-start result/videos](results/2026-10-23-cdp-breakout-warmstart.md); [forecasts](results/2026-10-22-cdp-breakout-forecasts.md); [original budget](results/2026-10-22-cdp-breakout-budget.md) |
 | Qbert | At2M actions,12M frozen7,367.01 vs200.69 initial; seeds5,172.92/5,812.50/11,115.63. All beat retained500k scores; first pyramids20/22/20 versus0/0/24, training costs4.002x. | Published193,220.77 and historical>=90% first pyramids/mean>=15,000 remain unmet.3019 loses four first-pyramid successes despite its higher score. Useful h15 rewards and live values in all seeds, with calibration errors; survival remains unresolved. | [Budget results and videos](results/2026-10-11-cdp-qbert-budget.md); [forecasts](results/2026-10-11-cdp-qbert-forecasts.md); [values](results/2026-10-11-cdp-qbert-values.md); [retained500k capacity](results/2026-10-08-cdp-qbert-capacity.md) |
 

@@ -10,6 +10,16 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
 - **Training is the priority; backend optimization and upstream porting are parked.**
   Use the qualified c8aeba28 native implementation. JAX parity is not a learning
   prerequisite. Older backend next steps below are historical, not active gates.
+- **GPU recovery needed after a real fault:** [incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md).
+  B2/T64 smoke training passes4096 actions/867 updates/finite346 tensors and
+  exact346 initials in45.245s. Separate frozen restore fails before run_start:
+  Xid62/PMU halted, Xid154 PF FLR at05:17:15UTC October23, then reset-required
+  errors and repeated Xid109. Driver615.71.09, boot76297c0a. Guard stops child;
+  no unfinished process or learner remains, no full2M run started. Zero job/
+  guard NVML calls; exact cause unknown. Original over-limit broad kernel
+  snapshot retained; bounded current-boot supplement and CPU-only review pass.
+  No reset/reload/reboot or GPU retry. After recovery, finish only the declared
+  smoke's frozen restore from4096 checkpoint before reviewing full training.
 - **Breakout warm start completes without a gain:** [result](docs/results/2026-10-23-cdp-breakout-warmstart.md).
   Source2M98.21→4M-total80.17→8M-total85.17; source control reproduces98.21.
   Zero two-wall successes/cutoffs.6M new actions/1,499,939 updates in7h27m28s,
@@ -29,16 +39,19 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   pass; GPU ends03:51:03, CPU03:51:15UTC. No probe worker remains. Original
   smoke CPU import failure preserved; import-only repair repeats no GPU capture.
   80 CPU probe tests pass. No entropy sweep/backend project/long unchanged extension.
-  **Running training:** [fixed Freeway exploration replication](docs/experiments/2026-10-23-cdp-freeway-replication.md),
-  seeds1009/2017,500k each, sequentially. Service
-  `kindle-cdp-freeway-persistent-replication-20261023`, artifacts
-  `runs/cdp-freeway-persistent-replication-20261023.mr2oPmJq`. Automated frozen
-  controls/videos/cohort audit; no concurrent learner.285 adapter CPU tests pass.
-  [Prepared next Breakout test](docs/experiments/2026-10-23-cdp-breakout-context64.md):
+  **Freeway replication passes:** [results/videos](docs/results/2026-10-23-cdp-freeway-replication.md).
+  Fixed aided1009/2017/retained3019 score32.67/30.67/32.96, mean32.10 and72/72
+  crossing successes, initial0. All three intermediate gates pass; published33.40
+  remains unmet. Two new500k runs/249,878 updates take1h16m36s; all initial/frozen
+  tensor/guard/replay audits pass. GPU ends05:13:04, final audit05:13:56UTC;
+  no worker remains. Keep separate from unassisted20.81/48 successes. Intervention
+  was selected on3019; reused development seeds, not untouched final evidence.
+  [Next Breakout test](docs/experiments/2026-10-23-cdp-breakout-context64.md):
   B2/T64 versus retained B8/T16, fixed128 positions/update and ratio32; longer
   gradient paths but fewer independent sequences, not a pure BPTT ablation.
-  No worker/allocation yet; finish Freeway, then disposable4096-action smoke
-  and review before a fresh2M life. Source/schedule preflight and293 adapter
+  Disposable4096-action smoke training completes, but restore hits the GPU fault
+  above. Artifacts `runs/cdp-breakout-context64-20261023.5OA15Iew`; no full
+  fresh2M life or other learner queued. Source/schedule preflight and293 adapter
   CPU tests pass. Keep existing native binary; no backend build or speed gate.
   Published381.81/all five targets remain open.
 - **Breakout1009 improves, not mastery:** [result](docs/results/2026-10-22-cdp-breakout-budget.md).

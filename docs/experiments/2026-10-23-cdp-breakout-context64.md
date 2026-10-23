@@ -1,8 +1,10 @@
 # Breakout: longer training sequences at fixed sampled-position budget
 
-**Prepared, not running.** Finish the active Freeway replication first. Run a
-disposable construction/train/frozen-restore smoke, review it, then separately
-launch the learning comparison. Backend optimization remains parked.
+**Smoke training completes; frozen restore fails on a real GPU fault.**
+[Incident and CPU review](../results/2026-10-23-cdp-context64-gpu-fault.md).
+Freeway replication completes first. After GPU recovery, finish only the
+unfinished restore and review it before separately launching the learning
+comparison. Backend optimization remains parked.
 
 ## Learning hypothesis
 
@@ -58,5 +60,5 @@ Retain failed captures and observer failures; CPU repairs repeat no GPU cohort.
 Artifacts: `runs/cdp-breakout-context64-20261023.5OA15Iew`.
 Controller: `run.py smoke` followed, only after review, by `run.py train`.
 The controller validates exact config differences and initial tensors, frozen
-exports, complete replay/video and fixed evaluation cohorts. No worker from
-this declaration has started yet; Freeway owns the GPU.
+exports, complete replay/video and fixed evaluation cohorts. No worker remains
+after the failed smoke restore; full training has not started.
