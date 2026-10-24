@@ -27,6 +27,10 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   disables ASLR: timing AND host layout differ, no established fix/root cause.
   After recovery trace with normal ASLR explicitly retained; no blind retry.
   Artifacts `runs/gpu-fault-comparison-20261023`. No training/backend changes.
+  October24 CPU preparation: `runs/context64-aslr-trace-20261024` explicitly
+  retains ASLR, verifies child personality and distinct addresses, propagates
+  failed exits and captures/kills a stopped inferior. Four CPU cases pass;
+  native test unrun, bootc1fd11cc still reports Xid109. No GPU calls.
   Restore also fails after reboot onto595.91.07/bootdddae8da: Xid62/PMU halted
   at06:39:20UTC, reset-required/Xid109 afterward. Guard stops child; service
   ends06:39:28, no unfinished children or full training. CPU audit verifies329

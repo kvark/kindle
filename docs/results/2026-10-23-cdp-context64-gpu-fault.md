@@ -189,6 +189,20 @@ ordinary retry, driver cycling or training while the device requires recovery.
 - [Third failed guard](../../runs/gpu-fault-comparison-20261023/ordinary/guard/result.json)
 - [Third kernel window](../../runs/gpu-fault-comparison-20261023/595-third-kernel.jsonl)
 
+### October24: ASLR-preserving tracer passes CPU checks
+
+The host remains on bootc1fd11cc with Xid109 timeouts; no GPU test runs.
+`runs/context64-aslr-trace-20261024` retains the next tracer separately from
+the original evidence. It explicitly keeps ASLR enabled and checks the child's
+personality flag. Two CPU fixture runs retain ASLR and use different library
+addresses. Two negative cases verify nonzero exit propagation and capture a
+stopped inferior's thread stack before killing it; a stopped process can no
+longer be mislabeled finished. All four checks pass. Original traced success
+also had an explicit normal-exit message and independently verified outputs;
+its result is unchanged. Native stack capture/restore remains unrun.
+
+- [ASLR and stop-handling CPU checks](../../runs/context64-aslr-trace-20261024/review.json)
+
 ## Resume direction (updated after the third fault)
 
 GPU recovery is needed before further dispatch. After recovery is confirmed,
