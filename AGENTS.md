@@ -27,8 +27,13 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
   waiting operation, not proof of the firmware cause. Guard captures stack;
   service ends02:35:50, no child/learner. CPU containment and216-record/guard/
   source review pass. Artifacts `runs/cdp-context64-aslr-native-20261024`.
-  After recovery capture actual allocation/binding/fill sizes/order for a minimal
-  reproduction; no blind full restore or presumed ASLR fix. No backend change.
+  CPU-only pre-submit collector: `runs/context64-fill-capture-20261024`, six
+  fixture cases pass; captures pinned-ABI fill handles/capacities/offsets/sizes/
+  values and kills inferior before first Blade submit. Native capture unrun;
+  actual memory bindings remain uncaptured. After recovery use contained capture
+  before designing a minimal submission reproducer; no blind full restore or
+  presumed ASLR fix. Later IOMMU faults start30s after PMU halt, not established
+  initiating cause. No backend change.
   Third bootc1fd11cc/595.91.07: GDB-traced restore passes1024 frozen actions/
   zero updates/exact346 tensors/all10 startup stages. Ordinary same-boot control
   then repeats Xid62 at16:12:42UTC with identical595 payload, before run_start;

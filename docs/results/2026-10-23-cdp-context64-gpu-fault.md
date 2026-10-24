@@ -9,7 +9,7 @@ run_start and before the first constructed-memory record. No2M training starts.
 **Latest diagnosis (October24):** ASLR-preserving tracing reproduces the halt
 on a fourth boot and captures the main thread waiting for the first world
 session's device-local buffer fills. No checkpoint load is reached. This
-localizes the waiting operation, not the underlying firmware defect. No learner
+localizes the waiting operation, not the underlying cause. No learner
 is running; boot24f26399 now requires recovery. See the fourth-boot result below.
 
 ## Incident
@@ -264,10 +264,43 @@ and all prior evidence. Ordinary restore and full2M training remain unqualified.
 - [Session initialization disassembly](../../runs/cdp-context64-aslr-native-20261024/session-init.asm)
 - [Core initialization disassembly](../../runs/cdp-context64-aslr-native-20261024/core-init.asm)
 
+### Capture prepared to stop before submission
+
+`runs/context64-fill-capture-20261024` prepares a smaller next diagnostic on the
+unchanged binary. Its x86-64 register/structure decoding comes from the pinned
+Blade fill and buffer-creation disassembly, not an assumed stable Rust ABI.
+It records each fill's buffer handle, declared capacity, offset, byte count,
+fill value and command buffer. It checks bounds/alignment and stops at the first
+Blade submission, killing the inferior **before submitting the fills**. An
+unexpected submission or undecodable argument also stops execution. Normal ASLR
+is retained. The native binary hash is checked before starting the debugger.
+
+Six CPU fixture cases pass: valid boundary fills, oversized fill, unaligned
+offset, null handle, submission without fills, and premature process exit. No
+submission sentinel is created and no inferior remains. All three native
+symbols resolve offline. No native module is loaded or GPU API called in these
+checks. This validates the collector, not the real initialization arguments.
+Future native capture still constructs GPU resources and needs a recovered
+device plus the existing debugger-tree containment. Physical memory bindings
+are not captured by this tool; declared buffer capacity alone cannot validate
+the allocator or driver. There is no claim that capture itself is fault-proof.
+
+The retained fourth-boot kernel window also contains AMD-Vi I/O page faults.
+Using source monotonic timestamps, the first appears **30.000 seconds after**
+Xid62; the GSP watchdog follows at4.999s and the first Xid109 at60.154s.
+These later errors do not identify the initiating fault or justify changing
+IOMMU settings. The same boot still reports context-switch timeouts during this
+CPU preparation. No retry, recovery action or runtime change is performed.
+
+- [Collector and CPU checks](../../runs/context64-fill-capture-20261024/review.json)
+- [Capture script](../../runs/context64-fill-capture-20261024/capture.py)
+
 ## Resume direction (updated after the fourth fault)
 
 GPU recovery is needed before further dispatch. After recovery is confirmed,
-review the new boot/driver and localize initialization as described above.
+review the new boot/driver and capture initialization arguments **without
+submitting the fills**, as described above. Inspect those arguments before
+designing a minimal submission reproducer; do not repeat full restore blindly.
 The unfinished frozen restore is from `smoke/checkpoints/4096`; do not repeat
 completed training or restart old queues. Require exact frozen tensors before
 declaring smoke success. Then
