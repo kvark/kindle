@@ -25,6 +25,10 @@ On a third boot, traced restore passes1024 frozen actions/exact346 tensors,
 but its ordinary same-boot control faults again at16:12:42UTC. GDB changes
 timing and ASLR, so the trigger is still unlocalized and ordinary restore remains
 unqualified. After recovery, retain normal ASLR in the next stage trace.
+That trace on the fourth boot reproduces the halt and captures the first world
+session waiting for device-local buffer fills, before checkpoint loading.
+Boot24f26399 now requires recovery. Next isolate allocation/fill submission for
+a minimal reproduction; do not rerun a full ordinary restore blindly.
 
 [Freeway reliability](results/2026-10-21-cdp-freeway-reliability.md) remains
 unresolved: unassisted B8 seeds1009/2017/3019 score31.83/30.58/0. A fresh test

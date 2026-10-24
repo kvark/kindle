@@ -6,10 +6,11 @@ checkpoint checks and exact346 initial tensors against the B8/T16 control pass.
 This does **not** qualify the complete smoke: frozen restore fails before
 run_start and before the first constructed-memory record. No2M training starts.
 
-**Latest diagnosis:** a traced restore succeeds on a third boot, but its
-ordinary same-boot control repeats the PMU halt. GDB changes both timing and
-ASLR, so neither a fix nor an exact cause is established. See the comparison
-below. No learner is running; the third boot now also requires recovery.
+**Latest diagnosis (October24):** ASLR-preserving tracing reproduces the halt
+on a fourth boot and captures the main thread waiting for the first world
+session's device-local buffer fills. No checkpoint load is reached. This
+localizes the waiting operation, not the underlying firmware defect. No learner
+is running; boot24f26399 now requires recovery. See the fourth-boot result below.
 
 ## Incident
 
@@ -203,7 +204,67 @@ its result is unchanged. Native stack capture/restore remains unrun.
 
 - [ASLR and stop-handling CPU checks](../../runs/context64-aslr-trace-20261024/review.json)
 
-## Resume direction (updated after the third fault)
+## Fourth boot: fault localized before checkpoint loading
+
+Boot`24f26399-efd1-442a-9d22-45c0fc1aaf53`, driver595.91.07, starts with no
+recorded GPU faults. One bounded trace retains normal ASLR explicitly. A CPU
+timeout fixture first verifies that SIGINT lets GDB capture the inferior stack,
+then both processes exit under the existing systemd containment. On a real fault
+the controller allows at most two seconds for that stack before normal forced
+termination. No retry or training follows this diagnostic.
+
+At02:35:49UTC October24, Xid62/PMU halted recurs with the identical595 payload.
+The guard interrupts GDB, captures all thread stacks, and stops both processes;
+the service ends02:35:50. No checkpoint export, adapter memory record, run_start,
+gameplay or learner update is reached. A216-record bounded kernel window and
+all sealed guard artifacts pass CPU review. No unfinished process remains.
+
+The trace observes context and pixel-pipeline constructors returning, then
+enters `DreamerCore::with_gpu` without returning. It never enters the checkpoint
+loader. The main host stack is:
+
+```text
+poll / NVIDIA user driver
+Blade Context::wait_for
+Meganeura wait_for_timed_encoder
+Meganeura Session::build_session_impl
+Meganeura make_session / build
+Kindle build_session_with_policy
+Kindle DreamerCore::with_gpu / restore_with_gpu / restore_rgb
+```
+
+Offline disassembly of the unchanged binary maps the saved return addresses
+to offsets`0x4532f7` and`0x3929e3`, with the same load base. The former is the
+first of the two initialization waits in `build_session_impl`: the variable-fill
+loop named `zero_device_local`, not the later optimizer-buffer clearing loop.
+The latter is the first session construction in `with_gpu`, the world training
+session. Qualified source at Meganeura `runtime.rs:5086` and Blade's transfer
+implementation identifies `vkCmdFillBuffer` calls followed by a submission wait.
+No model forward/backward or checkpoint tensor upload is reached on this path.
+Internal allocation budget checks occur earlier; the absent memory record only
+excludes the adapter's post-construction memory query.
+
+This excludes checkpoint tensor loading as the immediate operation in this
+incident and provides a much smaller reproduction target: initialization fills
+of the world's device-local allocations. A stack captured after the halt cannot
+prove that a particular fill caused the firmware failure. Actual fill sizes,
+handles and memory bindings were not captured, and the source's aligned sizing
+alone does not validate all runtime values. Do not declare the driver or backend
+exonerated. The earlier ASLR-off success is on a different boot and remains only
+a correlation, not proof that ASLR is the cause or a workaround.
+
+After recovery, target the allocation/fill submission boundary: retain normal
+ASLR and capture actual buffer creation/binding/fill sizes and order for a
+minimal reproduction. Avoid another full uninstrumented restore, model/kernel
+optimization, or disabling ASLR as a supposed fix. Keep the qualified binary
+and all prior evidence. Ordinary restore and full2M training remain unqualified.
+
+- [Fourth incident CPU review and stack](../../runs/cdp-context64-aslr-native-20261024/review.json)
+- [Bounded kernel window](../../runs/cdp-context64-aslr-native-20261024/kernel-window.jsonl)
+- [Session initialization disassembly](../../runs/cdp-context64-aslr-native-20261024/session-init.asm)
+- [Core initialization disassembly](../../runs/cdp-context64-aslr-native-20261024/core-init.asm)
+
+## Resume direction (updated after the fourth fault)
 
 GPU recovery is needed before further dispatch. After recovery is confirmed,
 review the new boot/driver and localize initialization as described above.

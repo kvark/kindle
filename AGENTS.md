@@ -20,6 +20,15 @@ adapters, reference controls and analysis. Follow `/mnt/data/GUIDELINES.md`.
  untouched. No GPU work or old queue restart. Release reproducible build caches
  after packaging; avoid indefinite checkpoint histories.
 - **GPU recovery needed after a real fault:** [incident](docs/results/2026-10-23-cdp-context64-gpu-fault.md).
+  Fourth boot24f26399/595.91.07: ASLR-preserving trace repeats PMU halt at
+  October24 02:35:49UTC, identical595 payload. Main stack/disassembly localizes
+  wait to first world session's `zero_device_local` buffer-fill submission,
+  before checkpoint load/model execution/adapter memory query. This is the
+  waiting operation, not proof of the firmware cause. Guard captures stack;
+  service ends02:35:50, no child/learner. CPU containment and216-record/guard/
+  source review pass. Artifacts `runs/cdp-context64-aslr-native-20261024`.
+  After recovery capture actual allocation/binding/fill sizes/order for a minimal
+  reproduction; no blind full restore or presumed ASLR fix. No backend change.
   Third bootc1fd11cc/595.91.07: GDB-traced restore passes1024 frozen actions/
   zero updates/exact346 tensors/all10 startup stages. Ordinary same-boot control
   then repeats Xid62 at16:12:42UTC with identical595 payload, before run_start;
