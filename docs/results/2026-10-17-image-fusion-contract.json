@@ -1,0 +1,96 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T02:28:37.090503+00:00",
+  "native": {
+    "rgb": {
+      "regions": 16,
+      "forward_pairs": 8,
+      "parameter_gradient_reduction_chains": 15,
+      "sumrows_dispatches": 30,
+      "logical_backward_tape_bytes": 313851904
+    },
+    "cdp": {
+      "regions": 8,
+      "forward_pairs": 4,
+      "parameter_gradient_reduction_chains": 8,
+      "sumrows_dispatches": 16,
+      "logical_backward_tape_bytes": 208306176
+    }
+  },
+  "jax_regions": [
+    {
+      "role": "enc/cnn0",
+      "forward_fusions": 4,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "enc/cnn1",
+      "forward_fusions": 4,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "enc/cnn2",
+      "forward_fusions": 3,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "enc/cnn3",
+      "forward_fusions": 2,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "dec/conv2",
+      "forward_fusions": 3,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "dec/conv1",
+      "forward_fusions": 4,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "dec/conv0",
+      "forward_fusions": 4,
+      "bf16_normalization_rounding_boundaries": 1
+    },
+    {
+      "role": "dec/spatial",
+      "forward_fusions": 2,
+      "bf16_normalization_rounding_boundaries": 1
+    }
+  ],
+  "verified_hlo_nodes": 1215,
+  "verified_hlo_reads": 3198,
+  "call_contexts": 17,
+  "convolution_products": 23,
+  "forward_library_activation_none": 8,
+  "shape_positive_tests": 4,
+  "malformed_shape_rejections": 4,
+  "trace_membership_rejections": 8,
+  "original_review_check_label": "Six includes four malformed-shape rejections plus two equality sanity checks; eight additional actual refusal tests pass here.",
+  "source_seals": 29,
+  "gpu_calls": 0,
+  "backend_builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "baseline": {
+    "native": "e45b9c43",
+    "rgb_ms": 43.196506554687524,
+    "jax_inclusive_ms": 27.22256929610012,
+    "ratio": 1.5867902138420056
+  },
+  "limits": [
+    "Top-level call graph leaves loop/fusion bodies opaque; not total runtime launch counts.",
+    "Logical boundary/tape extents are not DRAM traffic, peak memory, latency or removable savings.",
+    "Native/JAX rounding, forward pooling state and bias placement differ; no numerical parity claim.",
+    "Existing fusion is not evidence that a convolution epilogue can consume a complete channel/pool row."
+  ],
+  "artifacts": "runs/image-fusion-contract-20261017.y8KNZDkG",
+  "publication_sha256": "8f617f6373f6534974925fc449d3c9d9de0c190ec66466e81de6cae8035ffe3a",
+  "decision": "No missing basic image-region fusion. Keep e45b9c43; audit ordinary-boundary timing before another intervention.",
+  "failures_preserved": [
+    "Nested HLO tuple mistaken for one array",
+    "HLO tuple-index display comments rejected by strict type parser",
+    "Local inspect.py shadowing standard-library module during traceback reporting"
+  ]
+}

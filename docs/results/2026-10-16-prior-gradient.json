@@ -1,0 +1,60 @@
+{
+  "status": "diagnosis_complete",
+  "date": "2026-10-16",
+  "artifacts": "runs/prior-gradient-20261016.4efbUy2T",
+  "qualification_changed": false,
+  "production_changed": false,
+  "native_reader_sha256": "aad3ab1e0b735ad4e9295ff4e558ec7d7c5ddcbfb93eb4d5a87df8269bf3f02d",
+  "evidence_sha256": {
+    "review.json": "6e0cfcb3832be01eda4f6db53c8fe873980f28fa0f2a6274c6a5f350451c7c66",
+    "diagnosis.json": "6556883db609ba27abbf05475aadefca474bf8f41af55a87bd8ce33732ad89e8",
+    "review-validation.json": "a1baae4598a4e9d4ac73a03c73e87e2cc70ce859e5cc45bcbe30fa7fa076f813"
+  },
+  "cpu_hypotheses": {
+    "values_checked": 16265216,
+    "second_variant_source_f32_all_gradient_gates_pass_both_arms": true,
+    "first_variant_source_f32_remaining_weight_failures": [3, 130],
+    "bit_exact_vulkan_simulation": false
+  },
+  "captured_variant": 0,
+  "captured_intermediates": 39,
+  "dispatches": 168,
+  "retained_outputs_and_raw_gradients_exact": true,
+  "parameters_unchanged": 40,
+  "local_checks": 36,
+  "local_comparisons_including_repeated_handoffs": 7686144,
+  "finite_difference_checks": 49,
+  "negative_checks": 7,
+  "original_pointwise_absolute": 0.00002,
+  "original_pointwise_relative": 0.02,
+  "original_relative_l2": 0.01,
+  "first_variant_attribution": [
+    {"layer": "priorlogit", "changed_bf16_forward_inputs": 0, "changed_bf16_derivative_inputs": 50, "original_weight_failures": 0, "operand_corrected_failures": 0, "max_matrix_residual": 1.192074705613777e-8},
+    {"layer": "prior1", "changed_bf16_forward_inputs": 0, "changed_bf16_derivative_inputs": 115, "original_weight_failures": 3, "operand_corrected_failures": 0, "max_matrix_residual": 1.3445242075249553e-7},
+    {"layer": "prior0", "changed_bf16_forward_inputs": 0, "changed_bf16_derivative_inputs": 403, "original_weight_failures": 66, "operand_corrected_failures": 0, "max_matrix_residual": 5.401670932769775e-7}
+  ],
+  "kl_derivative_max_difference_from_original": 1.9312697328941614e-10,
+  "free_nats_active_rows": 512,
+  "free_nats_minimum_margin": 0.34708907057887073,
+  "retained_original_failed_array_checks": 14,
+  "retained_paired_cases": 8,
+  "fully_clamped_forward_equivalences": 4,
+  "independent_both_arm_matrix_checks": 6,
+  "verified_unique_source_seals": 2669,
+  "guards": 1,
+  "allocation_warnings": 0,
+  "full_prior_passes": 1,
+  "raw_backward_passes": 1,
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 16480206848,
+  "guard_finished_utc": "2026-10-16T09:00:44Z",
+  "retained_failures": [
+    "Reader serde fixed-array serialization compile failure; slice repair passes before GPU execution",
+    "CPU audit expected 35 checks; explicit 36-check membership repair passes without GPU repeat",
+    "All original independent end-to-end F64 failures remain failed"
+  ],
+  "full_model_independent_oracle": false,
+  "whole_update_timing": false,
+  "learning_claim": false
+}

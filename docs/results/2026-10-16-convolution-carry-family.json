@@ -1,0 +1,353 @@
+{
+  "status": "complete",
+  "qualification": "rejected",
+  "completed_at": "2026-10-16T19:50:20.714180+00:00",
+  "last_guard_event_utc": "2026-10-16T19:49:53.415076+00:00",
+  "contracts": 20,
+  "occurrences": 23,
+  "totals": {
+    "guards": 140,
+    "allocation_warnings": 46,
+    "exact_output_pairs": 1033149184,
+    "raw_bitwise_output_pairs": 1033149184,
+    "f64_values": 2690432,
+    "operation_calls": 11600,
+    "offline_values": 6728,
+    "counter_passes": 2000,
+    "retained_timing_samples": 7680
+  },
+  "activity": {
+    "control": {
+      "active_threads_per_warp_instruction": 31.99699241314355,
+      "predicated_on_threads_per_warp_instruction": 25.95099216934826,
+      "local_read_bytes": 0.0,
+      "local_write_bytes": 0.0
+    },
+    "candidate": {
+      "active_threads_per_warp_instruction": 31.997040232489454,
+      "predicated_on_threads_per_warp_instruction": 26.180844892738918,
+      "local_read_bytes": 0.0,
+      "local_write_bytes": 0.0
+    }
+  },
+  "minimum_sampled_headroom_bytes": 15828123648,
+  "ordinary": {
+    "status": "complete",
+    "mode": "ordinary",
+    "contracts": 20,
+    "occurrences": 23,
+    "guards": 60,
+    "allocation_warnings": 16,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "weighted_costs": {
+      "native": {
+        "gpu_ms": 18.80187025,
+        "queued_wall_ms": 18.864021390625002,
+        "record_ms": 0.0147933671875
+      },
+      "control": {
+        "gpu_ms": 18.95426525,
+        "queued_wall_ms": 19.0243448515625,
+        "record_ms": 0.10048872656249999
+      },
+      "candidate": {
+        "gpu_ms": 18.34931225,
+        "queued_wall_ms": 18.403368296875,
+        "record_ms": 0.0987965703125
+      }
+    },
+    "benefit_percent": {
+      "gpu_ms": 3.191645743165894,
+      "queued_wall_ms": 3.2641153192536687
+    },
+    "calibration_percent": {
+      "gpu_ms": 0.8105310693759193,
+      "queued_wall_ms": 0.8498901565981765
+    },
+    "clears_gate": false
+  },
+  "counter_totals": {
+    "control": {
+      "dram__bytes.sum": 1633857280.0,
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 309462711.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0.0,
+      "lts__t_bytes.sum": 15953939264.0,
+      "sm__ctas_launched.sum": 283600.0,
+      "smsp__inst_executed.sum": 10295818368.0,
+      "smsp__inst_executed_pipe_adu.sum": 88836416.0,
+      "smsp__inst_executed_pipe_alu.sum": 6818554368.0,
+      "smsp__inst_executed_pipe_cbu.sum": 25593280.0,
+      "smsp__inst_executed_pipe_cbu_pred_off_all.sum": 0.0,
+      "smsp__inst_executed_pipe_cbu_pred_on_any.sum": 25593280.0,
+      "smsp__inst_executed_pipe_fma.sum": 1141384640.0,
+      "smsp__inst_executed_pipe_lsu.sum": 774339200.0,
+      "smsp__inst_executed_pipe_tensor.sum": 180224000.0,
+      "smsp__inst_executed_pipe_uniform.sum": 43965504.0,
+      "smsp__inst_executed_pipe_xu.sum": 9727424.0,
+      "smsp__thread_inst_executed.sum": 329435222208.0,
+      "smsp__thread_inst_executed_pipe_alu_pred_on.sum": 173563087616.0,
+      "smsp__thread_inst_executed_pipe_fma_pred_on.sum": 28328261952.0,
+      "smsp__thread_inst_executed_pipe_lsu_pred_on.sum": 20746424832.0,
+      "smsp__thread_inst_executed_pred_off.sum": 62248520363.0,
+      "smsp__thread_inst_executed_pred_on.sum": 267186701845.0
+    },
+    "candidate": {
+      "dram__bytes.sum": 1629392384.0,
+      "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 309548541.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": 0.0,
+      "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": 0.0,
+      "lts__t_bytes.sum": 16124523712.0,
+      "sm__ctas_launched.sum": 283600.0,
+      "smsp__inst_executed.sum": 10460821632.0,
+      "smsp__inst_executed_pipe_adu.sum": 70732096.0,
+      "smsp__inst_executed_pipe_alu.sum": 7024976384.0,
+      "smsp__inst_executed_pipe_cbu.sum": 25593280.0,
+      "smsp__inst_executed_pipe_cbu_pred_off_all.sum": 0.0,
+      "smsp__inst_executed_pipe_cbu_pred_on_any.sum": 25593280.0,
+      "smsp__inst_executed_pipe_fma.sum": 1103312320.0,
+      "smsp__inst_executed_pipe_lsu.sum": 774339200.0,
+      "smsp__inst_executed_pipe_tensor.sum": 180224000.0,
+      "smsp__inst_executed_pipe_uniform.sum": 60349504.0,
+      "smsp__inst_executed_pipe_xu.sum": 9625024.0,
+      "smsp__thread_inst_executed.sum": 334715330624.0,
+      "smsp__thread_inst_executed_pipe_alu_pred_on.sum": 181404761280.0,
+      "smsp__thread_inst_executed_pipe_fma_pred_on.sum": 27267241472.0,
+      "smsp__thread_inst_executed_pipe_lsu_pred_on.sum": 20746426464.0,
+      "smsp__thread_inst_executed_pred_off.sum": 60842182026.0,
+      "smsp__thread_inst_executed_pred_on.sum": 273873148598.0
+    }
+  },
+  "counter_change_percent": {
+    "dram__bytes.sum": -0.2732733179730329,
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared.sum": 0.027735167097397984,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_ld.sum": null,
+    "l1tex__t_bytes_pipe_lsu_mem_local_op_st.sum": null,
+    "lts__t_bytes.sum": 1.0692308976311793,
+    "sm__ctas_launched.sum": 0.0,
+    "smsp__inst_executed.sum": 1.602624076128234,
+    "smsp__inst_executed_pipe_adu.sum": -20.37939036171833,
+    "smsp__inst_executed_pipe_alu.sum": 3.027357484582871,
+    "smsp__inst_executed_pipe_cbu.sum": 0.0,
+    "smsp__inst_executed_pipe_cbu_pred_off_all.sum": null,
+    "smsp__inst_executed_pipe_cbu_pred_on_any.sum": 0.0,
+    "smsp__inst_executed_pipe_fma.sum": -3.335625753646032,
+    "smsp__inst_executed_pipe_lsu.sum": 0.0,
+    "smsp__inst_executed_pipe_tensor.sum": 0.0,
+    "smsp__inst_executed_pipe_uniform.sum": 37.26557985096679,
+    "smsp__inst_executed_pipe_xu.sum": -1.0526939095077958,
+    "smsp__thread_inst_executed.sum": 1.6027759207442038,
+    "smsp__thread_inst_executed_pipe_alu_pred_on.sum": 4.518053793413346,
+    "smsp__thread_inst_executed_pipe_fma_pred_on.sum": -3.745448562279663,
+    "smsp__thread_inst_executed_pipe_lsu_pred_on.sum": 7.866415607793442e-06,
+    "smsp__thread_inst_executed_pred_off.sum": -2.259231751693036,
+    "smsp__thread_inst_executed_pred_on.sum": 2.502537254596948
+  },
+  "all_output_pairs_bitwise": true,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "full_update_tested": false,
+  "source_seals": 2031,
+  "artifacts": "runs/convolution-carry-20261016.DpXsI5oj",
+  "rows": [
+    {
+      "case": "0-3-32-64",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "native_ms": 0.528416,
+      "control_ms": 0.52202725,
+      "candidate_ms": 0.5219685000000001,
+      "change_percent": -0.011254201768207128
+    },
+    {
+      "case": "0-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.7589585,
+      "control_ms": 0.76031875,
+      "candidate_ms": 0.760105,
+      "change_percent": -0.028113209098157288
+    },
+    {
+      "case": "0-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.3757115,
+      "control_ms": 0.3766655,
+      "candidate_ms": 0.377256,
+      "change_percent": 0.15677039707644447
+    },
+    {
+      "case": "0-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "native_ms": 0.126227,
+      "control_ms": 0.12806375,
+      "candidate_ms": 0.12807125,
+      "change_percent": 0.0058564582092746065
+    },
+    {
+      "case": "0-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.37449475,
+      "control_ms": 0.38367999999999997,
+      "candidate_ms": 0.376639,
+      "change_percent": -1.8351230191826384
+    },
+    {
+      "case": "0-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "native_ms": 1.107828,
+      "control_ms": 1.09869125,
+      "candidate_ms": 1.095022,
+      "change_percent": -0.3339655248915441
+    },
+    {
+      "case": "0-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dBF16",
+      "native_ms": 2.90395025,
+      "control_ms": 2.8974242500000003,
+      "candidate_ms": 2.89611425,
+      "change_percent": -0.045212571131070245
+    },
+    {
+      "case": "1-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 0.4561855,
+      "control_ms": 0.57220125,
+      "candidate_ms": 0.7386895,
+      "change_percent": 29.096100366785294
+    },
+    {
+      "case": "2-32-3-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 3.81696225,
+      "control_ms": 3.81812,
+      "candidate_ms": 3.4024425,
+      "change_percent": -10.886967931861758
+    },
+    {
+      "case": "2-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 1.45363625,
+      "control_ms": 1.46246275,
+      "candidate_ms": 1.3209165,
+      "change_percent": -9.678622583720509
+    },
+    {
+      "case": "1-48-32-32",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.7569940000000001,
+      "control_ms": 0.75776775,
+      "candidate_ms": 0.7583245,
+      "change_percent": 0.07347237989476785
+    },
+    {
+      "case": "1-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.37425375,
+      "control_ms": 0.37519375,
+      "candidate_ms": 0.37503875000000003,
+      "change_percent": -0.04131198880577003
+    },
+    {
+      "case": "2-64-48-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.57248075,
+      "control_ms": 0.5787295,
+      "candidate_ms": 0.57926025,
+      "change_percent": 0.09170951195680566
+    },
+    {
+      "case": "1-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "native_ms": 0.12556825,
+      "control_ms": 0.12748675,
+      "candidate_ms": 0.12756425,
+      "change_percent": 0.06079063118322736
+    },
+    {
+      "case": "2-64-64-8",
+      "occurrences": 2,
+      "family": "Conv2dPacked",
+      "native_ms": 0.19002925,
+      "control_ms": 0.19697,
+      "candidate_ms": 0.19706225,
+      "change_percent": 0.04683454333147541
+    },
+    {
+      "case": "1-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.37196075,
+      "control_ms": 0.373755,
+      "candidate_ms": 0.37372825,
+      "change_percent": -0.007157094888365911
+    },
+    {
+      "case": "2-48-64-16",
+      "occurrences": 1,
+      "family": "Conv2dPacked",
+      "native_ms": 0.56228825,
+      "control_ms": 0.56781325,
+      "candidate_ms": 0.56794475,
+      "change_percent": 0.023159022794905226
+    },
+    {
+      "case": "1-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 1.1183655,
+      "control_ms": 1.110251,
+      "candidate_ms": 1.129869,
+      "change_percent": 1.7669878252755344
+    },
+    {
+      "case": "2-32-48-32",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 1.8389915000000001,
+      "control_ms": 1.8431947499999999,
+      "candidate_ms": 1.67156525,
+      "change_percent": -9.311522832842268
+    },
+    {
+      "case": "2-3-32-64",
+      "occurrences": 1,
+      "family": "Conv2dGradientTyped",
+      "native_ms": 0.54674375,
+      "control_ms": 0.55092825,
+      "candidate_ms": 0.49903274999999997,
+      "change_percent": -9.419647658293073
+    }
+  ],
+  "summary_sha256": "0d7a65fce020707f62d10c8c4be93c7e64c9a8e5326e305f30a9bc7569bed5ff",
+  "observer_sha256": "2b8d83a86513fcfeb01b04a62fa99298cb29935b4e098d9debe555fc37a1a411",
+  "declaration_sha256": {
+    "declaration.md": "d57c9c061b92ec88ffd384db68bf4fb4876c07bc0b33c0f98bcf284ceb04ada2",
+    "gpu_declaration.md": "c6d755eb11a3b0080be05a3752f38fedfb7587153638365c718a1f5f1ddd6d97"
+  },
+  "retained_failures": [
+    "Initial tool-orchestration syntax error before files or GPU execution; corrected without a cohort retry."
+  ],
+  "current_complete_rgb_ms": 46.199419203125,
+  "inclusive_jax_ms": 27.222569,
+  "limitations": [
+    "Standalone complete operation timing, not a whole-update gain",
+    "Thread/local traffic measured; no direct divergent-branch or driver source-site attribution",
+    "F32/F16 CPU variants are not GPU numerical qualification",
+    "All original samples, failures, and gates remain"
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "numerical": {
+    "status": "complete",
+    "guards": [
+      "synthetic",
+      "actual"
+    ],
+    "allocation_warnings": 1,
+    "game_actions": 0,
+    "synthetic_updates": 1,
+    "comparisons": 15,
+    "means": 28860,
+    "worst_relative_l2": 0.0000015983002789146365,
+    "worst_absolute_error": 73.91619861125946,
+    "symmetric_rows": 873,
+    "exact_restored": {
+      "tensors": 292,
+      "exact_tensors": 292,
+      "relative_l2": 0
+    },
+    "exact_capture": {
+      "tensors": 292,
+      "exact_tensors": 292,
+      "relative_l2": 0
+    },
+    "after_update": {
+      "tensors": 292,
+      "exact_tensors": 101,
+      "relative_l2": 0.10690728839262939
+    }
+  },
+  "ordinary": {
+    "status": "complete",
+    "guards": [
+      "control",
+      "candidate"
+    ],
+    "allocation_warnings": 2,
+    "game_actions": 0,
+    "synthetic_updates": 544,
+    "mean_update_ms": {
+      "control": 59.96280205859372,
+      "candidate": 54.223671332031245
+    },
+    "improvement_percent": 9.571151663250122,
+    "passes_retention_gate": true,
+    "exact_control": {
+      "initial": {
+        "tensors": 292,
+        "exact_tensors": 292,
+        "relative_l2": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact_tensors": 292,
+        "relative_l2": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact_tensors": 292,
+        "relative_l2": 0
+      }
+    },
+    "candidate_states": {
+      "initial": {
+        "tensors": 292,
+        "exact_tensors": 292,
+        "relative_l2": 0
+      },
+      "first": {
+        "tensors": 292,
+        "exact_tensors": 292,
+        "relative_l2": 0
+      },
+      "final": {
+        "tensors": 292,
+        "exact_tensors": 2,
+        "relative_l2": 0.058746559298875636
+      }
+    },
+    "first_outputs": {
+      "action_target": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "deter": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "imagined_slow_target": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "imagined_value_target": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "imagined_weight": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "replay_slow_target": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "replay_value_target": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "replay_weight": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      },
+      "stoch": {
+        "max_absolute_error": 0,
+        "relative_l2": 0,
+        "exact": true
+      }
+    },
+    "stage_ms": {
+      "control": {
+        "behavior_train_and_sync": 4.5069314218750005,
+        "imagination_and_targets": 17.81435876171875,
+        "posterior": 7.504095707031249,
+        "world_train_and_sync": 30.137416167968752
+      },
+      "candidate": {
+        "behavior_train_and_sync": 4.56252034375,
+        "imagination_and_targets": 11.94474418359375,
+        "posterior": 7.51817397265625,
+        "world_train_and_sync": 30.198232832031252
+      }
+    },
+    "exact_reports": 2,
+    "retained_jax_ms": 26.6316957586,
+    "ratio_to_retained_jax": 2.036057779554693,
+    "distribution_readback_bytes_before": 25067520,
+    "distribution_readback_bytes_after": 98304,
+    "limits": [
+      "Isolated RGB12M/B32 synthetic updates; not CDP learning or production promotion.",
+      "F32 device means replace F64 host decode; later trajectories may differ.",
+      "Targets/normalizer and other readbacks remain on the CPU; not a fully resident learner.",
+      "Timings are not SM utilization, no new JAX timing."
+    ]
+  },
+  "feeding_contract": {
+    "status": "complete",
+    "gpu_calls": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "grammar_sha256": "508e6677e27b0b58eac8395aa49a90ac1766a8d392c247a0aba7b03f4fdd85b9",
+    "instruction_capabilities": {
+      "OpTypeEvent": [
+        "Kernel"
+      ],
+      "OpGroupAsyncCopy": [
+        "Kernel"
+      ],
+      "OpGroupWaitEvents": [
+        "Kernel"
+      ],
+      "OpUntypedGroupAsyncCopyKHR": [
+        "UntypedPointersKHR"
+      ]
+    },
+    "validator_returncode": 1,
+    "validator_stderr": "error: line 1: Capability Kernel is not allowed by Vulkan 1.3 specification (or requires extension)\n  OpCapability Kernel\n\n",
+    "spirv_sha256": "3c0b6de5e5e5fc4bd25a332c5c13e0e3fd2657454fd31a6630e6b72b1177e313",
+    "conclusions": [
+      "Core SPIR-V async copy/wait and its event type require Kernel, not Vulkan Shader.",
+      "The untyped copy still returns OpTypeEvent and requires the unavailable event/wait contract.",
+      "Cooperative matrix2 compiler-managed staging is different from explicit asynchronous copy/wait control.",
+      "This does not prove the NVIDIA compiler cannot generate LDGSTS or that async copies alone close the gap."
+    ]
+  },
+  "status": "complete",
+  "artifact_root": "runs/categorical-gpu-20261015.lkZAlUAS",
+  "native_sha256": "99f8aab038d460bfd8ad4f5cc967d99d4716a3f1fc157d44279ebf8793004214",
+  "control_sha256": "288642103cc2d74e6c6b540a2f8d7cfc408a5525341d0b8aaaff22112dc52eaf",
+  "synthetic_updates": 545,
+  "guards": 4,
+  "allocation_warnings": 3,
+  "retained_failures": [
+    "CPU reviewer compared raw JSON bytes despite unordered HashMap serialization; exact semantic plan/constant/pipeline audit passes without rerunning GPU work.",
+    "CPU feeding-contract probe first lacked standalone spirv-as; existing glslangValidator/spirv-opt validate a base module and reject the Kernel/event insertion offline. No invalid module is submitted to a driver."
+  ]
+}

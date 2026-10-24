@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "blade_base": "eae0c6f7aa3167c79d1135050cf8e17c17fabd0a",
+  "blade_commit": "0af76fdfc9b906782f5d235977f4f7473db72533",
+  "pull_request": "https://github.com/kvark/blade/pull/417",
+  "cpu_library_tests": 22,
+  "offline_shader_tests": 1,
+  "gpu": {
+    "status": "passed",
+    "gpu_tests": 3,
+    "dispatches": 4,
+    "guards": 3,
+    "warnings": 0,
+    "source_receipts": 157,
+    "learner_updates": 0,
+    "game_actions": 0,
+    "finished_utc": "2026-10-21T14:40:34.394943+00:00"
+  },
+  "total_guards": 4,
+  "failed_guards": 1,
+  "allocation_warnings": 0,
+  "failed_fixture_dispatches": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "strict_gles_clippy_passed": false,
+  "unchanged_upstream_gles_warning": true,
+  "meganeura_port_prerequisite": {
+    "revision": "a75c38e1880de8e25e44ca169cc5f737812385ae",
+    "missing_typed_gradient_family": "Conv2dGradientTyped",
+    "full_subgroup_pipeline_keys_unwired": true
+  },
+  "source_receipts": 180,
+  "free_bytes": 5038657536,
+  "finished_utc": "2026-10-21T14:43:07.509006+00:00"
+}

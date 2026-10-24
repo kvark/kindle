@@ -1,0 +1,139 @@
+{
+  "status": "complete",
+  "whole_goal": "active",
+  "production_unchanged": true,
+  "whole_update_speedup_claim": false,
+  "artifact_roots": [
+    "runs/intact-image-timing-20261014.rQVbtlH0",
+    "runs/middle-convolution-20261014.mSEtvvHC",
+    "runs/convolution-group-context-20261014.riFTxPRm"
+  ],
+  "whole_update": {
+    "native_b32_ms": 63.57671939453123,
+    "retained_jax_ms": 26.63169575862412,
+    "ratio": 2.3872576485837644
+  },
+  "intact_trace": {
+    "native_sha256": "19a8b76d91cd02589e70c73c23652e26b34d472b93f8f77e4c9fe6006f1ef0d4",
+    "ordinary_ms": 63.57671939453123,
+    "profile_ms": 65.70401501562503,
+    "overhead_percent": 3.3460292405033787,
+    "passes_3_percent_gate": false,
+    "smoke_overhead_percent": 2.8133767281251387,
+    "exact_metric_reports_per_arm": 272,
+    "exact_plans_and_pipeline_lists": 5,
+    "exact_tensors_at_each_of_three_boundaries": 292,
+    "cached_sections_per_update": 49,
+    "measured_marked_scopes": 7936,
+    "mixed_group_instrumented_ms": 8.085184375,
+    "interpretation": "Numerical/state checks pass, full overhead gate fails; mixed scopes are not ordinary component latency."
+  },
+  "middle_convolution": {
+    "native_sha256": "9bd001c7671d4b83871096bc78683f8b46f78b290665cea9bc424baf94a67518",
+    "shape": {
+      "batch": 512,
+      "in_channels": 32,
+      "out_channels": 48,
+      "height": 32,
+      "width": 32,
+      "kernel": 5,
+      "stride": 1,
+      "padding": 2
+    },
+    "native_f64_exact_coordinates": 256,
+    "canonical_bf16_checked_coordinates": 256,
+    "canonical_bf16_rounded_exact_values": 16815616,
+    "cases": [
+      {
+        "name": "encoder-dx",
+        "native_gpu_pass_ms": 2.1478330000000003,
+        "native_queued_wall_ms": 2.1539342265625,
+        "exact_actual_descriptor_and_pipeline": true,
+        "jax_bf16_gpu_kernel_ms": 0.479327625,
+        "jax_bf16_queued_wall_ms": 0.48105160931299906,
+        "primitive_ratio": 4.480928884497321,
+        "same_cudnn_tuning_as_full": false,
+        "rounded_exact_values": 16777216,
+        "auxiliary_f32": {
+          "qualified": true,
+          "failing_f64_probes": 0,
+          "operand_dtype": "f32",
+          "relative_l2_to_native": 2.350552472775821e-7,
+          "max_abs_to_native": 0.000003814697265625
+        }
+      },
+      {
+        "name": "encoder-dw",
+        "native_gpu_pass_ms": 2.0147685,
+        "native_queued_wall_ms": 2.0219053828125,
+        "exact_actual_descriptor_and_pipeline": true,
+        "jax_bf16_gpu_kernel_ms": 0.5495440625,
+        "jax_bf16_queued_wall_ms": 0.5567319076362764,
+        "primitive_ratio": 3.666254696364771,
+        "same_cudnn_tuning_as_full": false,
+        "rounded_exact_values": 38400,
+        "auxiliary_f32": {
+          "qualified": false,
+          "failing_f64_probes": 127,
+          "operand_dtype": "f32",
+          "relative_l2_to_native": 0.008589638482740884,
+          "max_abs_to_native": 6.655517578125
+        }
+      }
+    ],
+    "retained_full_jax": {
+      "input_gradient_ms": 0.545256,
+      "weight_gradient_with_reduction_ms": 0.952235,
+      "not_fresh_paired_timing": true
+    },
+    "interpretation": "Primitive BF16 comparisons qualify, but neither miniature cuDNN tuning equals full JAX. Auxiliary F32 dW is unqualified; widened operands and Winograd transforms are not a storage-only control."
+  },
+  "group_context": {
+    "native_sha256": "351d1010eec5b8dfec31796aafd0a4923b9d637afcc4ce1f232199653ddc9193",
+    "grouped_ms": 4.1653882499999995,
+    "serial_ms": 4.16503875,
+    "grouped_extra_percent": 0.008391278472497099,
+    "exceeds_10_percent_gate": false,
+    "exact_plans_and_keys": true,
+    "exact_checked_values": 100893696,
+    "interpretation": "Additional barrier has no material effect; independent grouping does not reproduce the mixed-trace interval."
+  },
+  "accounting": {
+    "passed": 7,
+    "allocation_warnings": 0,
+    "synthetic_updates": 592,
+    "native_primitive_session_calls": 584,
+    "jax_primitive_calls": 648,
+    "game_actions": 0
+  },
+  "minimum_sampled_headroom_bytes": 7951679488,
+  "retained_failures": [
+    "Intact build: mixed Blade paths",
+    "Intact CPU parser: Instant event kind confused with track",
+    "Intact CPU parser: calibrated GPU intervals incorrectly assumed LIFO",
+    "Intact trace: 3.346% overhead exceeds 3% gate",
+    "Middle CPU build: explicit test target absent",
+    "Middle CPU Clippy: inherited chunks_exact lint",
+    "Middle CPU review: wrong Python environment missing ml_dtypes",
+    "Middle auxiliary F32 JAX dW: 127/128 independent probes fail unchanged bounds",
+    "Middle CPU reporter: numpy bool serialization; incomplete file retained",
+    "Context CPU test: incorrect assumption about compiler dispatch order"
+  ],
+  "retained_manifest_warning": "Temporary test.0.exclude placement corrected; final cargo metadata clean, runtime source unchanged.",
+  "next": "Reproduce the full five-operation group using captured learner operands and buffer context; distinguish omitted reductions, data/cache/allocation effects and timing scope before another kernel intervention.",
+  "source_sha256": {
+    "runs/intact-image-timing-20261014.rQVbtlH0/timing-review.json": "615a60680f388fc39660772726437e776a5034a86fcdff90e2d316a9146dfbed",
+    "runs/intact-image-timing-20261014.rQVbtlH0/smoke-review.json": "eb21e5c60372875fffcaf87e63e31eab8c874d2748bd2c41bbfdee177f398933",
+    "runs/intact-image-timing-20261014.rQVbtlH0/preflight.json": "5e551bc987ca6cafb5820effab103d134586226e846fc9db2007f12747c5db98",
+    "runs/intact-image-timing-20261014.rQVbtlH0/review_v3.py": "10a73ceb5b08956be35ddb5a6be45622431e1c3c502610d59f06c556bcf9ef8c",
+    "runs/middle-convolution-20261014.mSEtvvHC/audit.json": "c8037b3feae476aaaa9f9df012ee73d1527f87931e52f8bca3df38246dbb5b7c",
+    "runs/middle-convolution-20261014.mSEtvvHC/probes.json": "6401a594f8f257f1fe71487f681f84b51ef5dc5577397af1cbf4496ae32ea134",
+    "runs/middle-convolution-20261014.mSEtvvHC/preflight.json": "f2a4411da0156f66782d8fe3cabbf40d15e456e615390b46ebfaedb0a8d75368",
+    "runs/middle-convolution-20261014.mSEtvvHC/audit.py": "f3dbad332c19f1e71b4acc5c27eae516bbe584d6c4f375f198fd8a8879b6754c",
+    "runs/middle-convolution-20261014.mSEtvvHC/audit_complete.py": "9b8fee2fb0de192473faf28cd8a261f9fabe7cce75b59bc0b39c73fe82db71cd",
+    "runs/convolution-group-context-20261014.riFTxPRm/review.json": "69d31d4ee0eb47f52a448b6dfbf3699bbd362e52cbcad18d858c1c1c2f83ddcb",
+    "runs/convolution-group-context-20261014.riFTxPRm/preflight.json": "32767f7890031863ffc7074ac26e7f802590f011b8ffd6d6099b822f79ee0ea9",
+    "runs/convolution-group-context-20261014.riFTxPRm/review.py": "bc8d02b1836fb430f5a50250d1faf6a1a298db4e29deda1e181f04b68e10350e",
+    "runs/jax-image-profile-20261014.qpFghMhM/library-mapping.json": "10e64c6f0415f2e2166c9db591bd017ffbde16ce3e38cd38d27a58cb3484f71c"
+  }
+}

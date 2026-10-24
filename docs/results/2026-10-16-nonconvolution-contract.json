@@ -1,0 +1,171 @@
+{
+  "status": "complete",
+  "source_seals": 51,
+  "exact_fusion_bodies": 940,
+  "exact_custom_call_configurations": 112,
+  "captured_updates": 8,
+  "captured_kernels": 28064,
+  "trace_scopes": {
+    "entry": {
+      "calls": 68,
+      "kernel_ms": 12.420898000000003,
+      "kernels": 63
+    },
+    "imagination_recurrence": {
+      "calls": 630,
+      "kernel_ms": 2.8521449999999997,
+      "kernels": 31
+    },
+    "entry/call.15": {
+      "calls": 317,
+      "kernel_ms": 2.3420173749999975,
+      "kernels": 214
+    },
+    "entry/call.27": {
+      "calls": 22,
+      "kernel_ms": 0.6242406250000002,
+      "kernels": 22
+    },
+    "rssm_backward": {
+      "calls": 544,
+      "kernel_ms": 1.391154,
+      "kernels": 29
+    },
+    "posterior_recurrence": {
+      "calls": 1440,
+      "kernel_ms": 1.5299382500000003,
+      "kernels": 69
+    },
+    "entry/call.26": {
+      "calls": 13,
+      "kernel_ms": 0.0979125,
+      "kernels": 13
+    },
+    "entry/call.18": {
+      "calls": 9,
+      "kernel_ms": 0.10237275000000003,
+      "kernels": 9
+    },
+    "entry/call.23": {
+      "calls": 20,
+      "kernel_ms": 0.12289287500000003,
+      "kernels": 19
+    },
+    "entry/call.25": {
+      "calls": 16,
+      "kernel_ms": 0.10345300000000002,
+      "kernels": 16
+    },
+    "entry/call.14": {
+      "calls": 86,
+      "kernel_ms": 0.254753875,
+      "kernels": 76
+    },
+    "entry/call.13": {
+      "calls": 171,
+      "kernel_ms": 0.33314999999999995,
+      "kernels": 103
+    },
+    "entry/call.22": {
+      "calls": 6,
+      "kernel_ms": 0.046988249999999995,
+      "kernels": 6
+    },
+    "entry/call.21": {
+      "calls": 74,
+      "kernel_ms": 0.143213,
+      "kernels": 53
+    },
+    "entry/call.20": {
+      "calls": 37,
+      "kernel_ms": 0.11336487499999999,
+      "kernels": 35
+    },
+    "entry/call.19": {
+      "calls": 9,
+      "kernel_ms": 0.024300125000000002,
+      "kernels": 9
+    },
+    "entry/call.28": {
+      "calls": 14,
+      "kernel_ms": 0.028316374999999998,
+      "kernels": 14
+    },
+    "entry/call.17": {
+      "calls": 16,
+      "kernel_ms": 0.020108124999999994,
+      "kernels": 15
+    },
+    "entry/call.16": {
+      "calls": 5,
+      "kernel_ms": 0.00772025,
+      "kernels": 5
+    },
+    "entry/call.24": {
+      "calls": 11,
+      "kernel_ms": 0.013652000000000001,
+      "kernels": 11
+    }
+  },
+  "native_matrix_products": 716,
+  "jax_matrix_products": 557,
+  "native_matrix_macs": 112530055168,
+  "jax_matrix_macs": 107863867392,
+  "training_prior_products": {
+    "native": 144,
+    "jax": 9,
+    "same_nominal_macs": 1107296256,
+    "potential_product_reduction": 135,
+    "qualification": false
+  },
+  "imagination_recurrence": {
+    "matrix_products": 180,
+    "native_macs": 44865945600,
+    "jax_macs": 44889538560,
+    "explained_padded_action_macs": 23592960,
+    "jax_kernel_ms": 2.8521449999999997,
+    "jax_matrix_kernel_ms": 2.1055189999999997,
+    "jax_other_kernel_ms": 0.746626
+  },
+  "native_nonworld_pass_ms": {
+    "imagination": 8.74033275,
+    "slow_value": 0.503597125,
+    "behavior": 3.0112365
+  },
+  "gpu_calls": 0,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "limits": [
+    "Native GPU pass intervals include issue/dependency gaps; JAX kernel sums do not.",
+    "Command-buffer kernel ownership is exact here, but a library launch label can contain several HLO products.",
+    "The prior audit proves dependency and arithmetic, not numerical equivalence or measured savings.",
+    "Scalar target/normalizer and replay refresh work must be retained. Convolution feeding and the full parity goal remain open."
+  ],
+  "artifacts": {
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/review.json": "8296800dae002b18b620e7e0394b057f9dea7e63e87746c4ac0d7660c31a3e81",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/contracts.json": "f0f53403e252142b2e7b04572d270b0df8b51d6028219a53a31094b6e477610c",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/trace-map.json": "ae0c9fd1966af905db4b9b538d3a40a1ffbe118798cc760d35a75cd492f5c76d",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/trace-map-v2.json": "490476774608d562558753dcf061c2fb1d31923521ba4969d120fb9b35e48ca5",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/prior-contract.json": "922b44769733e4c1f456f28570881f972a82b1954e4f97d28c6b23b90566aa4a",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/context-regression.json": "9b10fb8c35746b8c690700096e92a0f1dc27377380724eecb020f5ed36f3a2ff",
+    "runs/nonconvolution-contract-20261016.Z0XELHL5/observer-notes.md": "292c6ec70c3c83e38935bf7108dd68f57a53f2ba1424209a3ffde7a4e4632ace"
+  },
+  "date": "2026-10-16",
+  "artifact_root": "runs/nonconvolution-contract-20261016.Z0XELHL5",
+  "current": {
+    "native": "834241b6",
+    "rgb_b32_ms": 48.06795265625,
+    "inclusive_jax_b32_ms": 27.222569,
+    "qualified_changes_in_this_audit": false
+  },
+  "retained_failure": {
+    "original": "trace_map.py/trace-map.json",
+    "reason": "Enclosing scope leaked past while nodes; phase labels invalid despite exact totals.",
+    "repaired": "trace_map_v2.py/trace-map-v2.json",
+    "regression_checks": 18,
+    "reproduced_original_failures": 6,
+    "gpu_retries": 0
+  },
+  "next": "Time-batch the independent training prior/KL; preserve the causal core, numerical boundaries and staged late targets. No GPU allocation in this audit."
+}

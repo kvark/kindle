@@ -1,0 +1,134 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-17T01:39:15.559151+00:00",
+  "baseline": {
+    "native": "e45b9c43",
+    "rgb_ms": 43.196506554687524,
+    "jax_inclusive_ms": 27.22256929610012,
+    "ratio": 1.5867902138420056
+  },
+  "stopped_normalization": {
+    "status": "failed-native-anchor",
+    "completed_numerical_contracts": 20,
+    "occurrences": 23,
+    "numerical_totals": {
+      "guards": 20,
+      "allocation_warnings": 14,
+      "f64_values": 3365632,
+      "exact_zero_values": 548578560,
+      "exact_paired_output_values": 275972096,
+      "exact_runtime_comparison_values": 1103888384,
+      "operation_calls": 120,
+      "counter_passes": 0,
+      "anchor_checks": 0,
+      "offline_metric_values": 0
+    },
+    "completed_counter_captures": 1,
+    "unstarted_captures": 19,
+    "counter_guard_passed": true,
+    "counter_review_failed": true,
+    "counter_warnings": 0,
+    "first_case_counters": {
+      "retained_native": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 348913664,
+        "smsp__inst_executed_pipe_alu.sum": 223346688,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728
+      },
+      "direct_original": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 299892736,
+        "smsp__inst_executed_pipe_alu.sum": 172490752,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728
+      },
+      "normalized": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 299106304,
+        "smsp__inst_executed_pipe_alu.sum": 169607168,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728
+      }
+    },
+    "evidence_root": "/x/Code/kindle/runs/spirv-normalization-gpu-20261017.OEnwWyDu"
+  },
+  "context_diagnosis": {
+    "conditions": [
+      "ubo_full",
+      "ubo_default",
+      "inline_full",
+      "inline_default"
+    ],
+    "case": "0-3-32-64",
+    "shader_functions_exact": 20,
+    "counters": {
+      "ubo_full": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 299892736,
+        "smsp__inst_executed_pipe_alu.sum": 172490752,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728,
+        "smsp__inst_executed_pipe_uniform.sum": 6029312
+      },
+      "ubo_default": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 299892736,
+        "smsp__inst_executed_pipe_alu.sum": 172490752,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728,
+        "smsp__inst_executed_pipe_uniform.sum": 6029312
+      },
+      "inline_full": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 348913664,
+        "smsp__inst_executed_pipe_alu.sum": 223346688,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728,
+        "smsp__inst_executed_pipe_uniform.sum": 3145728
+      },
+      "inline_default": {
+        "sm__ctas_launched.sum": 65536,
+        "smsp__inst_executed.sum": 348913664,
+        "smsp__inst_executed_pipe_alu.sum": 223346688,
+        "smsp__inst_executed_pipe_tensor.sum": 3145728,
+        "smsp__inst_executed_pipe_uniform.sum": 3145728
+      }
+    },
+    "ubo_reduction_percent": {
+      "warp": 14.049586776859503,
+      "alu": 22.76995305164319
+    },
+    "anchor_checks": 8,
+    "totals": {
+      "guards": 2,
+      "allocation_warnings": 1,
+      "f64_values": 2097152,
+      "exact_zeros": 534773760,
+      "independently_paired_values": 402653184,
+      "operation_calls": 224,
+      "counter_passes": 50
+    }
+  },
+  "services": {
+    "kindle-spirv-normalization-gpu-20261017.service": {
+      "ActiveState": "failed",
+      "SubState": "failed",
+      "MainPID": "0",
+      "Result": "exit-code",
+      "ExecMainStatus": "1"
+    },
+    "kindle-normalization-context-gpu-20261017.service": {
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStatus": "0"
+    }
+  },
+  "game_actions": 0,
+  "learner_updates": 0,
+  "ordinary_timing_samples": 0,
+  "limitations": [
+    "Single-case interface-conditioned instruction result, not whole-family effect or latency.",
+    "Original normalization counter allocation remains failed; no >=5% aggregate gate was evaluated.",
+    "No driver assembly/source-line explanation of the extra instructions.",
+    "No production or learning promotion; complete parity goal remains open."
+  ],
+  "evidence_root": "/x/Code/kindle/runs/normalization-context-20261017.c1LhUqjX",
+  "source_seals": 450
+}

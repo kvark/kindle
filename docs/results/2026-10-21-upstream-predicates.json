@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "paired_cases": 148,
+  "paired_arrays": 180,
+  "paired_values": 395304,
+  "plan_and_pipeline_pairs": 148,
+  "runtime_shader_sources": 72,
+  "runtime_shader_changes": {
+    "unchanged": 46,
+    "dense": 18,
+    "convolution": 8
+  },
+  "new_allocation_warnings": 0,
+  "gpu_forward_only_passes": 264,
+  "gpu_raw_backwards": 32,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "minimum_sampled_headroom_bytes": 16651321344,
+  "finished_utc": "2026-10-21T10:56:21.733259+00:00",
+  "upstream_base": "a75c38e1880de8e25e44ca169cc5f737812385ae",
+  "upstream_candidate": "e545a9f13bada46f2d25d326acfea5e8cd441c7e",
+  "pull_request": "https://github.com/kvark/meganeura/pull/276",
+  "raw_artifacts": "/x/Code/kindle/runs/upstream-predicates-20261021.HJqUc6bR",
+  "cpu_modules_per_arm": 930,
+  "cpu_spirv_modules": 1860,
+  "valid_type_combinations": 51,
+  "branch_histogram": [
+    {
+      "control": 7,
+      "candidate": 5,
+      "modules": 504
+    },
+    {
+      "control": 8,
+      "candidate": 6,
+      "modules": 72
+    },
+    {
+      "control": 9,
+      "candidate": 7,
+      "modules": 36
+    },
+    {
+      "control": 12,
+      "candidate": 7,
+      "modules": 264
+    },
+    {
+      "control": 13,
+      "candidate": 8,
+      "modules": 36
+    },
+    {
+      "control": 14,
+      "candidate": 9,
+      "modules": 18
+    }
+  ],
+  "source_receipts": 5809,
+  "upstream_speed_claim": false,
+  "production_promoted": false,
+  "atari_restarted": false,
+  "five_game_goal_complete": false,
+  "passed_gpu_guards": 2,
+  "retained_candidate": "79bc7cec",
+  "retained_reference": "72005c8b",
+  "retained_rgb_jax_ratio": 1.642,
+  "failures_preserved": [
+    "Cargo parent-workspace rejection",
+    "live build-log receipt",
+    "standalone linker dependency directory",
+    "release API lacks test-only Naga field"
+  ],
+  "publication_utc": "2026-10-21T10:59:03.849952+00:00"
+}

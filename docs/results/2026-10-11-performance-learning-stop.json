@@ -1,0 +1,19 @@
+{
+  "status": "stopped_by_user_for_backend_performance",
+  "service": "kindle-performance-learning-20261011",
+  "stopped_at_utc": "2026-10-11T21:52:41Z",
+  "service_active_state": "inactive",
+  "service_main_pid": 0,
+  "learner": "freeway-b8-auto-1009",
+  "actions": 39568,
+  "updates": 9831,
+  "training_debt": 0,
+  "elapsed_seconds": 682.9800242048223,
+  "runner_reason": "interrupted",
+  "completed_learners": 0,
+  "frozen_cohorts": 0,
+  "other_arms_started": false,
+  "partial_checkpoint": "runs/cdp-performance-20261011.7SpyzGUa/learning-freeway-b8-1009-checkpoint",
+  "artifacts": "runs/cdp-performance-20261011.7SpyzGUa",
+  "automatic_resume": false
+}

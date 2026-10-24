@@ -1,0 +1,264 @@
+{
+  "status": "complete_attribution_no_new_speedup",
+  "date": "2026-10-14",
+  "artifacts": "runs/jax-image-profile-20261014.qpFghMhM",
+  "retained_ordinary_complete_ms": {
+    "native_b8": 22.779939113281262,
+    "jax_b8": 12.73682200917392,
+    "native_b32": 68.3444008984375,
+    "jax_b32": 27.187344880076125,
+    "fresh_native_b32_single_chunk": 68.70428055859375
+  },
+  "native_coarse": {
+    "summary": {
+      "wall_ms": 68.636553,
+      "gpu_pass_ms": 56.948463359375,
+      "uncovered_ms": 11.688089640625,
+      "outside_timer_union_ms": 0.011500515625,
+      "stages": {
+        "posterior": {
+          "wall_ms": 9.24626033203125,
+          "gpu_pass_ms": 6.9255185,
+          "uncovered_ms": 2.32074183203125
+        },
+        "imagination": {
+          "wall_ms": 17.76233919921875,
+          "gpu_pass_ms": 10.634105625,
+          "uncovered_ms": 7.12823357421875
+        },
+        "world": {
+          "wall_ms": 37.01779982421875,
+          "gpu_pass_ms": 36.309927625,
+          "uncovered_ms": 0.70787219921875
+        },
+        "behavior": {
+          "wall_ms": 4.61015364453125,
+          "gpu_pass_ms": 3.078911609375,
+          "uncovered_ms": 1.53124203515625
+        }
+      },
+      "pass_ms": {
+        "cached_graph": 54.838107,
+        "kindle_uniforms": 0.073615875,
+        "kindle_readback": 1.178442125,
+        "kindle_device_copy": 0.389363375,
+        "agc_norms": 0.11195375,
+        "agc_factor": 0.008535875,
+        "agc_apply": 0.039893125,
+        "adam_update": 0.307726125,
+        "parameter_blend": 0.012326625,
+        "readback_copy": 0
+      }
+    },
+    "instrumentation_overhead_percent": -0.10331131670094917,
+    "host_decode_and_targets_ms": 5.38344030078125,
+    "exact_reports_per_arm": 272,
+    "exact_tensors_at_each_boundary": 292,
+    "exact_boundaries": [
+      "initial",
+      "first",
+      "final"
+    ],
+    "exact_plans": 5,
+    "all_updates_covered": 272,
+    "cache": {
+      "behavior": [
+        1,
+        271
+      ],
+      "imagination": [
+        1,
+        271
+      ],
+      "slow_value": [
+        1,
+        271
+      ],
+      "world": [
+        2,
+        542
+      ]
+    }
+  },
+  "jax_capture": {
+    "means": {
+      "kernels": 3508,
+      "kernel_ms": 22.57259125,
+      "gpu_union_ms": 23.0994105,
+      "captured_wall_ms": 27.6169055
+    },
+    "family_ms": {
+      "convolution_with_helpers": 11.25511425,
+      "matrix_with_helpers": 4.654804999999992,
+      "fusion_and_other": 6.662672000000017
+    },
+    "mapped_image_fusion_ms": {
+      "encoder": 1.556094375,
+      "decoder": 0.9037981250000002,
+      "other": 4.180563375000004
+    },
+    "exact_reports": 272,
+    "exact_initial_and_final_tensors": 288,
+    "normalized_hlo_instruction_identity": true,
+    "header_fingerprint_difference": true,
+    "raw_different_hlo_lines": 22,
+    "convolution_operations": 23,
+    "missing_convolution_correlations": 0,
+    "captured_updates": 8,
+    "kernels_outside_windows": 0,
+    "captured_inclusive_ms": 27.540550247067586,
+    "uncaptured_inclusive_ms": 26.827963335709946
+  },
+  "native_block": {
+    "ordinary_ms": 6.218014140625,
+    "non_convolution_percent": 78.40914312139425,
+    "independent_f64_values": 5104,
+    "exact_dispatch_descriptors": 23,
+    "operations_full_ms": 6.223677270833333,
+    "leave_one_out": [
+      {
+        "index": 17,
+        "shader": "MaxPool2dGrad",
+        "mean_removed_ms": 1.1063053125
+      },
+      {
+        "index": 20,
+        "shader": "Conv2dGradientTyped",
+        "mean_removed_ms": 0.6635484374999999
+      },
+      {
+        "index": 2,
+        "shader": "Conv2dBF16",
+        "mean_removed_ms": 0.6084767291666665
+      },
+      {
+        "index": 3,
+        "shader": "Generated",
+        "mean_removed_ms": 0.5608623333333332
+      },
+      {
+        "index": 18,
+        "shader": "ToBF16",
+        "mean_removed_ms": 0.5004598958333331
+      },
+      {
+        "index": 4,
+        "shader": "MaxPool2d",
+        "mean_removed_ms": 0.41968956250000006
+      },
+      {
+        "index": 19,
+        "shader": "Generated",
+        "mean_removed_ms": 0.30901316666666645
+      },
+      {
+        "index": 12,
+        "shader": "RmsNormGradWRowPar",
+        "mean_removed_ms": 0.30250749999999993
+      },
+      {
+        "index": 13,
+        "shader": "RmsNormGradX",
+        "mean_removed_ms": 0.2711842916666664
+      },
+      {
+        "index": 11,
+        "shader": "SiluGrad",
+        "mean_removed_ms": 0.23473339583333322
+      },
+      {
+        "index": 7,
+        "shader": "Generated",
+        "mean_removed_ms": 0.22073843749999997
+      },
+      {
+        "index": 8,
+        "shader": "Transpose",
+        "mean_removed_ms": 0.21303802083333304
+      },
+      {
+        "index": 6,
+        "shader": "Generated",
+        "mean_removed_ms": 0.1987880208333331
+      },
+      {
+        "index": 5,
+        "shader": "Transpose",
+        "mean_removed_ms": 0.19367435416666692
+      },
+      {
+        "index": 10,
+        "shader": "Transpose",
+        "mean_removed_ms": 0.18303887499999996
+      },
+      {
+        "index": 15,
+        "shader": "Transpose",
+        "mean_removed_ms": 0.1518563541666668
+      },
+      {
+        "index": 0,
+        "shader": "ToBF16",
+        "mean_removed_ms": 0.07073535416666665
+      },
+      {
+        "index": 9,
+        "shader": "ToBF16",
+        "mean_removed_ms": 0.06082181249999952
+      },
+      {
+        "index": 22,
+        "shader": "SumRows",
+        "mean_removed_ms": 0.043646166666666396
+      },
+      {
+        "index": 21,
+        "shader": "SumRows",
+        "mean_removed_ms": 0.03183816666666672
+      },
+      {
+        "index": 16,
+        "shader": "SumRows",
+        "mean_removed_ms": 0.00012893749999983348
+      },
+      {
+        "index": 1,
+        "shader": "ToBF16",
+        "mean_removed_ms": -0.022322041666666514
+      },
+      {
+        "index": 14,
+        "shader": "SumRows",
+        "mean_removed_ms": -0.023540604166666885
+      }
+    ],
+    "jax_miniature_qualified": false
+  },
+  "validation": {
+    "guards": 11,
+    "passing_guards": 7,
+    "retained_guard_failures": 4,
+    "allocation_warnings": 0,
+    "retained_cpu_failures": 5,
+    "synthetic_updates": 816,
+    "block_invocations": 1923,
+    "measured_native_block_calls": 1472,
+    "game_actions": 0,
+    "production_changed": false
+  },
+  "source_sha256": {
+    "runs/jax-image-profile-20261014.qpFghMhM/capture-audit.json": "0a12e3b7df070d8ad8d7f9e8bffe9f132fa6020aba3c987dd054e2fb36cdc830",
+    "runs/jax-image-profile-20261014.qpFghMhM/dataflow.json": "6cb5efe24599233ea54394ded664765af1fb483ee4e776b7873ff36e1c42a94f",
+    "runs/jax-image-profile-20261014.qpFghMhM/library-mapping.json": "10e64c6f0415f2e2166c9db591bd017ffbde16ce3e38cd38d27a58cb3484f71c",
+    "runs/jax-image-profile-20261014.qpFghMhM/native-audit.json": "bba9aa0c835ac611fac56041833306f6522f87a120ad5f8682542e9a4f4e113b",
+    "runs/jax-image-profile-20261014.qpFghMhM/summarize.py": "478a8934c5c1235a37eb83133802f2bd23b259ea4c69f236cf2b10fe0a0fd62b",
+    "runs/image-operations-20261014.cRZo7KQC/review-v2.json": "6898bec0a46ea37ec5311314fd7565693ad934bdbbd8a47751f2f0a21181bc63"
+  },
+  "limits": [
+    "Native pass union includes device issue/dependencies; JAX kernel/copy union does not count inter-kernel gaps. Do not subtract these as an exact causal budget or call them SM utilization.",
+    "Native fixed-graph allocations and JAX live-update kernel sums are different measurements; no additive savings estimate.",
+    "Image-fusion tags are not the entire encoder/decoder or an identical native rounding/tape contract.",
+    "Native operation leave-one-out differences interact; tiny negative results are retained noise.",
+    "No new throughput/learning claim, production repin or CDP-wide inference. RGB reconstruction and CDP action-effects workloads differ."
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "status": "complete_cpu_feasibility",
+  "date": "2026-10-15",
+  "artifacts": "runs/feeding-pipeline-20261015.SFuQGA0f",
+  "decision": "CPU interface feasibility only; actual convolution implementation and GPU performance untested",
+  "gpu_calls": 0,
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "current_convolution_products": 23,
+  "current_tiles": {
+    "checked32": 9,
+    "packed64": 14
+  },
+  "load_subgroups": 2,
+  "compute_subgroups": 4,
+  "required_subgroup_size": 32,
+  "workgroup_invocations": 192,
+  "operand_slots": 2,
+  "k_stage": 32,
+  "shader_variants": [
+    {
+      "name": "f32-checked",
+      "shared_bytes": 20480,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "a2a2e5081158203edd75dbea957a843bc677a470e9533ece1adc446c55fac682"
+    },
+    {
+      "name": "f32-packed-spatial",
+      "shared_bytes": 53248,
+      "fits_48k": false,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "bb8866b17be13dfea0305eb9ff3f43e106e37d93356aaa0389314f94e46177ae"
+    },
+    {
+      "name": "f32-packed-weight",
+      "shared_bytes": 51200,
+      "fits_48k": false,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "f80ffdfea6cb75b9fabbbdcbf44ef96f404e1acd981d6b8fcd08d945f9e447a2"
+    },
+    {
+      "name": "f16-checked",
+      "shared_bytes": 12288,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "5343df389abc2f14fa7f3dc82d5ccfd3f8d6e394ac1569fe5caa098a8c227c16"
+    },
+    {
+      "name": "f16-packed-spatial",
+      "shared_bytes": 36864,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "aa69c26f3296efa9837b2b6d335534c52e4f6eac87bf807ab771fed5335cdc45"
+    },
+    {
+      "name": "f16-packed-weight",
+      "shared_bytes": 34816,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "9d4ed7c6dce586d53f387928a28ca5eb3b0e6b1322488b43ec922607e62a13d1"
+    },
+    {
+      "name": "bf16-checked",
+      "shared_bytes": 12288,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "2bfc8baaf44b9a86a1de08d1e914918abbcfd3d9f32f6ce0428e94da0da9f5e6"
+    },
+    {
+      "name": "bf16-packed-spatial",
+      "shared_bytes": 36864,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "3db41f691b4782a90cf3cf5bb8b05cf930e50370b986fa2c15a583da912c1668"
+    },
+    {
+      "name": "bf16-packed-weight",
+      "shared_bytes": 34816,
+      "fits_48k": true,
+      "validated": true,
+      "subgroup_matrices": 3,
+      "static_workgroup_barriers": 3,
+      "spirv_sha256": "814455989378691f5b5be4843cf55de09edf607f2949d96808e4855f58ef2bc1"
+    }
+  ],
+  "schedule_reduction_lengths": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    25,
+    38,
+    50,
+    128,
+    129
+  ],
+  "schedule_event_checks": 1645920,
+  "negative_checks": [
+    {
+      "name": "same_slot",
+      "rejected": "concurrent same-slot read/write"
+    },
+    {
+      "name": "no_initial_publication",
+      "rejected": "read missing/overwritten version"
+    },
+    {
+      "name": "early_reuse",
+      "rejected": "concurrent same-slot read/write"
+    },
+    {
+      "name": "missing_consumer_barrier",
+      "rejected": "unequal barrier participation"
+    },
+    {
+      "name": "early_producer_exit",
+      "rejected": "unequal barrier participation"
+    }
+  ],
+  "naga": {
+    "revision": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+    "cases": [
+      {
+        "name": "f32-whole_workgroup",
+        "parsed": true,
+        "validated": true,
+        "reason": null
+      },
+      {
+        "name": "f32-subgroup_consumer",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      },
+      {
+        "name": "f32-divergent_lane",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      },
+      {
+        "name": "f16-whole_workgroup",
+        "parsed": true,
+        "validated": true,
+        "reason": null
+      },
+      {
+        "name": "f16-subgroup_consumer",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      },
+      {
+        "name": "f16-divergent_lane",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      },
+      {
+        "name": "bf16-whole_workgroup",
+        "parsed": true,
+        "validated": true,
+        "reason": null
+      },
+      {
+        "name": "bf16-subgroup_consumer",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      },
+      {
+        "name": "bf16-divergent_lane",
+        "parsed": true,
+        "validated": false,
+        "reason": "NonUniformControlFlow(COOP_OPS)"
+      }
+    ],
+    "rechecked_branch": "vulkan-memory-model-compliance",
+    "rechecked_revision": "c0b23d165a8d8a6b856711d2b010c8d0a9a74622",
+    "analyzer_identical": true,
+    "analyzer_sha256": "87783df5a8049c6f2a671227ab3cb56e368605ce30464653090016fe92af45fe",
+    "edited": false
+  },
+  "execution_mode_cpu_checks": 5,
+  "retained_cpu_failures": [
+    "original reader required ID-form LocalSize; compiler emits legal literal LocalSize",
+    "Naga probe used reserved WGSL shared identifier; identifier-only repair",
+    "Repaired probe omitted storage binding; add group0/binding0 before inspecting control-flow behavior"
+  ],
+  "finished_utc": "2026-10-15 12:55:34 UTC",
+  "source_sha256": {
+    "runs/feeding-pipeline-20261015.SFuQGA0f/result.json": "e39a71acfb304c6eb5ddeeb46cdfa5435771668b3dba93fe265fc02d1e365e4f",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/analyze.py": "4132531e7eece4fde2331c1d75fb3f5f0a91ce2da8d1b295fedb764ddce4ee09",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/analyze_v2.py": "d5624549a0bd551827c84eb43801c11ade5dc79524a041a0adb24e1488523224",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/analyze_v3.py": "1fbd7e3a406039bc80871cb4ee347000120b2b9734bf3ecf07e1101561bf679d",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/analyze_v4.py": "5c64f186391ddf4486624c6235fa6eea90bd6dea7c87619a7ff931a86f0b853c",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/schedule.comp": "9e53b589a846150357e984cd8ec41bdeeac9b7f2affcd579ae2bc719f49bd4c7",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/uniformity.rs": "818a05ee9ff1e526d63a7e7dfd16313d247ef0527e3378ffe07df8ef4014f0ef",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/uniformity_v2.rs": "4e1aa4649ab1cd350ac1a29317d8c55c4f45f5dbd629727555b47c4710dbea9f",
+    "runs/feeding-pipeline-20261015.SFuQGA0f/uniformity_v3.rs": "8688e292cb42e71ad7fedde4b14c36aaaf7fff14a9d8eba954d0ded958c59ba4"
+  }
+}

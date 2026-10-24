@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "decision": "Reject raw-word representation as a fix for the measured instruction/shared-read residual; no timing or compiler integration.",
+  "actual_typed_occurrences": 9,
+  "model_anchor_regions": 7,
+  "exact_anchor_values": 35,
+  "counter_passes": 450,
+  "offline_metric_values": 1566,
+  "summary": {
+    "sm__ctas_launched.sum": {
+      "original": 254976,
+      "normalized": 254976
+    },
+    "smsp__inst_executed.sum": {
+      "original": 8760672768,
+      "normalized": 8760672768
+    },
+    "smsp__inst_executed_pipe_alu.sum": {
+      "original": 5520477696,
+      "normalized": 5520477696
+    },
+    "smsp__inst_executed_pipe_lsu.sum": {
+      "original": 1017805824,
+      "normalized": 1017805824
+    },
+    "smsp__inst_executed_pipe_tensor.sum": {
+      "original": 104857600,
+      "normalized": 104857600
+    },
+    "l1tex__data_pipe_lsu_wavefronts_mem_shared_op_ld.sum": {
+      "original": 635331212,
+      "normalized": 635329154
+    },
+    "l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum": {
+      "original": 349324,
+      "normalized": 347266
+    }
+  },
+  "unchanged_read_wavefronts_minus_conflicts": 634981888,
+  "counts": {
+    "guards": 18,
+    "warnings": 0,
+    "operation_calls": 1008,
+    "f64_values": 3372544,
+    "exact_zeros": 742033920,
+    "paired_values": 372703232
+  },
+  "game_actions": 0,
+  "learner_updates": 0,
+  "ordinary_timing_samples": 0,
+  "gpu_finished_utc": "2026-10-21T11:27:20.709623+00:00",
+  "source_receipts": 281,
+  "finished_utc": "2026-10-21T11:29:31.233054+00:00",
+  "raw_artifacts": "runs/shared-word-gpu-20261021.xjH2gChb"
+}

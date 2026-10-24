@@ -1,0 +1,48 @@
+{
+  "status": "passed",
+  "decision": "retain grouped BlockLinear through B128",
+  "root": "runs/cdp-imagination-20261006.e8agRpD0",
+  "native_sha256": "6d38eea2ebe8f1ae81cea20e138a10b525ec371af465989071b731d12f897223",
+  "backend": {
+    "meganeura": "c63765420d4cc7ef4de350d73b05c33be21cd859",
+    "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72"
+  },
+  "qualification_audit_sha256": "ad14efa8dc9a11355ffb65668d8bf7745f9f9dcedffb32835c71866ab3f918c1",
+  "timing_audit_sha256": "3d910daa030a03bb857194a5834b8772c462a42ff63b5709af8731495eb26026",
+  "guards": 14,
+  "new_warnings": 0,
+  "upstream_comparisons": {"cdp": 1300, "rgb": 1524},
+  "f64_block_outputs": 428032,
+  "f64_block_maximum_absolute_error": 9.553846496146434e-7,
+  "f64_block_maximum_relative_l2": 2.837671926650695e-7,
+  "cpu_rust_tests": 115,
+  "cpu_python_tests": 1172,
+  "timing": {
+    "warmup_per_arm": 16,
+    "measured_per_arm": 256,
+    "control_mean_ms": 30.48679309765626,
+    "candidate_mean_ms": 28.011226011718747,
+    "speedup": 1.0883776770392641,
+    "reduction_fraction": 0.08120129519715957,
+    "control_imagination_dispatches": 3100,
+    "candidate_imagination_dispatches": 1210,
+    "exact_initial_tensors": 346,
+    "first_targets_exact": true,
+    "all_272_metric_reports_exact_excluding_timing": true
+  },
+  "extra_compute": {
+    "synthetic_timing_updates": 544,
+    "exported_reference_updates": 8,
+    "smoke_training_actions": 2048,
+    "smoke_training_updates": 390,
+    "smoke_frozen_actions": 2048,
+    "smoke_frozen_updates": 0
+  },
+  "limits": [
+    "one matched synthetic network-update timing, not measured environment throughput",
+    "fixture generation, replay bookkeeping and exports excluded from timing",
+    "no GPU-utilization or peak-memory measurement",
+    "fixed-sequence equality does not prove arbitrary stochastic trajectory equality",
+    "no five-game quality or compute-saving result"
+  ]
+}

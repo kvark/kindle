@@ -1,0 +1,495 @@
+{
+  "status": "complete_candidate_rejected",
+  "current_whole_update": {
+    "native_ms": 51.944966918,
+    "jax_inclusive_ms": 27.222569,
+    "ratio": 1.9081581506139262,
+    "remeasured": false
+  },
+  "complete_family": {
+    "status": "complete",
+    "mode": "ordinary",
+    "cases": 20,
+    "occurrences": 23,
+    "guards": 60,
+    "allocation_warnings": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "weighted_costs": {
+      "native": {
+        "gpu_ms": 22.41194775,
+        "queued_wall_ms": 22.472254687499998,
+        "record_ms": 0.0831476875
+      },
+      "serial": {
+        "gpu_ms": 24.417714,
+        "queued_wall_ms": 24.483231382812498,
+        "record_ms": 0.0783511640625
+      },
+      "pipeline": {
+        "gpu_ms": 46.670662,
+        "queued_wall_ms": 46.7486917578125,
+        "record_ms": 0.08201096875
+      }
+    },
+    "calibration_percent": {
+      "gpu_ms": 8.949540095193198,
+      "queued_wall_ms": 8.948709078271033
+    },
+    "benefit_percent": {
+      "native": {
+        "gpu_ms": -108.24009818602222,
+        "queued_wall_ms": -108.0284884979346
+      },
+      "serial": {
+        "gpu_ms": -91.13444444471747,
+        "queued_wall_ms": -90.94167361678657
+      }
+    },
+    "calibrates": true,
+    "clears_20_percent_gate": false
+  },
+  "groups": {
+    "32x32": {
+      "occurrences": 9,
+      "gpu_ms": {
+        "native": 17.462683249999998,
+        "serial": 19.287725249999998,
+        "pipeline": 39.41824025
+      }
+    },
+    "64x64": {
+      "occurrences": 14,
+      "gpu_ms": {
+        "native": 4.9492645,
+        "serial": 5.12998875,
+        "pipeline": 7.25242175
+      }
+    }
+  },
+  "all_20_contracts_regress_vs_both_controls": true,
+  "numerical": {
+    "guards": 60,
+    "allocation_warnings": 31,
+    "independent_f64_comparisons": 4035648,
+    "exact_three_arm_output_pairs": 516574592,
+    "operation_calls": 180,
+    "source_hashes": 380
+  },
+  "timing": {
+    "guards": 60,
+    "allocation_warnings": 0,
+    "exact_three_arm_output_pairs": 516574592,
+    "operation_calls": 8760,
+    "source_hashes": 382
+  },
+  "total_corrected_operation_calls": 8940,
+  "minimum_sampled_headroom_bytes": 15828123648,
+  "stopped_allocation": {
+    "status": "stopped_for_review",
+    "completed_cohorts": 5,
+    "passing_guards": 15,
+    "interrupted_guards": 1,
+    "allocation_warnings": 25,
+    "completed_operation_calls": 45,
+    "additional_interrupted_calls": "unknown; no completion receipt",
+    "f64_comparisons_in_completed_cohorts": 1277952,
+    "exact_output_pairs_in_completed_cohorts": 218103808
+  },
+  "cpu": {
+    "shader_variants": 180,
+    "checked_iterator_valid_addresses": 4165339,
+    "ownership_checks": 113664,
+    "subgroup_permutations": 720,
+    "old_index_negative_cases": 288
+  },
+  "retained_cpu_failures": [
+    "original build manifest lacks env_logger; unchanged shaders/C++ harness reused and native wrapper logging removed",
+    "aggregate audit started before numerical completion receipt; unchanged audit rerun after controller completes, no GPU repeat"
+  ],
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "production_changed": false,
+  "naga_changed": false,
+  "workers_remaining": false,
+  "artifacts": "runs/feeding-family-index-20261015.y5CaEr4O",
+  "original_artifacts": "runs/feeding-family-20261015.FnlUqnyM",
+  "services": {
+    "numerical": {
+      "unit": "kindle-feeding-family-index-numerical-20261015.service",
+      "start": "2026-10-15T13:30:53.844272+00:00",
+      "end": "2026-10-15T13:39:35.371712+00:00",
+      "wall_seconds": 521.52744,
+      "final_message": "kindle-feeding-family-index-numerical-20261015.service: Consumed 6min 19.441s CPU time over 8min 41.527s wall clock time, 2.2G memory peak, 3.2M memory swap peak."
+    },
+    "ordinary": {
+      "unit": "kindle-feeding-family-index-ordinary-20261015.service",
+      "start": "2026-10-15T13:41:30.297617+00:00",
+      "end": "2026-10-15T13:50:25.820604+00:00",
+      "wall_seconds": 535.522987,
+      "final_message": "kindle-feeding-family-index-ordinary-20261015.service: Consumed 6min 13.173s CPU time over 8min 55.522s wall clock time, 2.5G memory peak, 2.5M memory swap peak."
+    }
+  },
+  "upstream": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc",
+    "refreshed": false
+  },
+  "receipt_sha256": {
+    "runs/feeding-family-index-20261015.y5CaEr4O/numerical-audit.json": "d8f1e79b6d662838536d1dc1825cfb18c3ffba75ee4c3855c051d6ca1d26c645",
+    "runs/feeding-family-index-20261015.y5CaEr4O/ordinary-audit.json": "ec06dfb7485fc65b886de6ab70d3d208098f5cac6ec6d049eb9b9317567ab479",
+    "runs/feeding-family-index-20261015.y5CaEr4O/stopped-allocation.json": "f5b5fc4c25de11c8bd15dc42c1ffc7f5611c67cdefd7390a430be011d8d16de1",
+    "runs/feeding-family-index-20261015.y5CaEr4O/preflight.json": "055516a56998c41d85ea86025cf5a5ea255fd91c5659c5ee36c23152bedd0ef9",
+    "runs/feeding-family-index-20261015.y5CaEr4O/build-native-v2.json": "335bb35d8d0146b83bae3ff4ad612db1750e7093fc31a33f41b5dafc6ee4006f",
+    "runs/feeding-family-index-20261015.y5CaEr4O/shader-build.json": "4a925fb907e581628425e647efe248e656e9ece3aec6dc7702b0bb64cf103138"
+  },
+  "cases": [
+    {
+      "case": "0-3-32-64",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 1,
+      "gpu_ms": [
+        0.590206,
+        1.4308125,
+        1.7791585
+      ],
+      "queued_wall_ms": [
+        0.59370428125,
+        1.4331948359375,
+        1.7968217109375
+      ]
+    },
+    {
+      "case": "0-32-48-32",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.750584,
+        0.72750575,
+        0.98999225
+      ],
+      "queued_wall_ms": [
+        0.7548916718750001,
+        0.7319187265625,
+        0.994256265625
+      ]
+    },
+    {
+      "case": "0-48-64-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.3727035,
+        0.36394175,
+        0.48056
+      ],
+      "queued_wall_ms": [
+        0.37479385937500004,
+        0.368118328125,
+        0.4817406171875
+      ]
+    },
+    {
+      "case": "0-64-64-8",
+      "occurrences": 2,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.12332675,
+        0.12053975,
+        0.1551845
+      ],
+      "queued_wall_ms": [
+        0.12377378124999999,
+        0.1246216796875,
+        0.158997296875
+      ]
+    },
+    {
+      "case": "0-64-48-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.37085275,
+        0.3632585,
+        0.4807775
+      ],
+      "queued_wall_ms": [
+        0.374448859375,
+        0.3674898125,
+        0.4860464375
+      ]
+    },
+    {
+      "case": "0-48-32-32",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 1,
+      "gpu_ms": [
+        1.487723,
+        1.4705615,
+        3.8802125
+      ],
+      "queued_wall_ms": [
+        1.4887866484375,
+        1.4745229375,
+        3.8839071484375
+      ]
+    },
+    {
+      "case": "0-32-3-64",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 1,
+      "gpu_ms": [
+        3.88216375,
+        3.84964725,
+        10.1007875
+      ],
+      "queued_wall_ms": [
+        3.8865941953125,
+        3.8537698359375,
+        10.102280390625
+      ]
+    },
+    {
+      "case": "1-32-3-64",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 1,
+      "gpu_ms": [
+        0.7372935,
+        0.7706722500000001,
+        1.14965125
+      ],
+      "queued_wall_ms": [
+        0.7394973046875,
+        0.7718285390625,
+        1.1509855625
+      ]
+    },
+    {
+      "case": "2-32-3-64",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 512,
+      "gpu_ms": [
+        4.306142,
+        4.67500325,
+        7.7144975
+      ],
+      "queued_wall_ms": [
+        4.310156695312499,
+        4.678949953125,
+        7.7189168125
+      ]
+    },
+    {
+      "case": "2-48-32-32",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 128,
+      "gpu_ms": [
+        1.61755025,
+        1.7801215,
+        4.58753225
+      ],
+      "queued_wall_ms": [
+        1.6205812890625,
+        1.7816735390625,
+        4.5892071171875
+      ]
+    },
+    {
+      "case": "1-48-32-32",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.74796425,
+        0.7491385,
+        1.047442
+      ],
+      "queued_wall_ms": [
+        0.75152609375,
+        0.750688890625,
+        1.0489369765625
+      ]
+    },
+    {
+      "case": "1-64-48-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.37026875,
+        0.3713645,
+        0.4910445
+      ],
+      "queued_wall_ms": [
+        0.3738090078125,
+        0.3726317265625,
+        0.4949850234375
+      ]
+    },
+    {
+      "case": "2-64-48-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 32,
+      "gpu_ms": [
+        0.55815625,
+        0.62693825,
+        0.95104925
+      ],
+      "queued_wall_ms": [
+        0.5592417734375,
+        0.63075734375,
+        0.952370328125
+      ]
+    },
+    {
+      "case": "1-64-64-8",
+      "occurrences": 2,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.12198125,
+        0.1227015,
+        0.1575975
+      ],
+      "queued_wall_ms": [
+        0.1254884921875,
+        0.1240844140625,
+        0.158401125
+      ]
+    },
+    {
+      "case": "2-64-64-8",
+      "occurrences": 2,
+      "tile": 64,
+      "splits": 8,
+      "gpu_ms": [
+        0.185081,
+        0.21748475,
+        0.367579
+      ],
+      "queued_wall_ms": [
+        0.1855019140625,
+        0.2187065859375,
+        0.371328515625
+      ]
+    },
+    {
+      "case": "1-48-64-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 1,
+      "gpu_ms": [
+        0.368535,
+        0.376074,
+        0.49514425
+      ],
+      "queued_wall_ms": [
+        0.37271478124999996,
+        0.3800350859375,
+        0.4965702734375
+      ]
+    },
+    {
+      "case": "2-48-64-16",
+      "occurrences": 1,
+      "tile": 64,
+      "splits": 32,
+      "gpu_ms": [
+        0.549422,
+        0.6303155,
+        0.95569
+      ],
+      "queued_wall_ms": [
+        0.553108203125,
+        0.6315790703125,
+        0.9596273515625
+      ]
+    },
+    {
+      "case": "1-32-48-32",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 1,
+      "gpu_ms": [
+        2.14857,
+        2.4124615,
+        3.596761
+      ],
+      "queued_wall_ms": [
+        2.152420390625,
+        2.4166144296875,
+        3.5980942421875
+      ]
+    },
+    {
+      "case": "2-32-48-32",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 128,
+      "gpu_ms": [
+        2.0235825,
+        2.28253125,
+        4.97151725
+      ],
+      "queued_wall_ms": [
+        2.0247543203125,
+        2.2873422421875,
+        4.973267859375
+      ]
+    },
+    {
+      "case": "2-3-32-64",
+      "occurrences": 1,
+      "tile": 32,
+      "splits": 512,
+      "gpu_ms": [
+        0.66945225,
+        0.61591425,
+        1.6381225
+      ],
+      "queued_wall_ms": [
+        0.6716969374999999,
+        0.6172907265625,
+        1.643223765625
+      ]
+    }
+  ],
+  "arms": [
+    "native",
+    "serial",
+    "pipeline"
+  ],
+  "sample_transients": [
+    {
+      "case": "0-3-32-64",
+      "arm": "serial",
+      "first32_ms": 4.100844,
+      "last32_ms": 0.541546,
+      "minimum_ms": 0.53824,
+      "maximum_ms": 5.399296
+    },
+    {
+      "case": "0-3-32-64",
+      "arm": "pipeline",
+      "first32_ms": 3.151387,
+      "last32_ms": 1.322758,
+      "minimum_ms": 1.316704,
+      "maximum_ms": 5.30384
+    }
+  ],
+  "full_sample_summaries": {
+    "path": "runs/feeding-family-index-20261015.y5CaEr4O/summary.json",
+    "sha256": "64f967f780c474f69cdbe8340903d09b24bfe6d6f504b952e45e03f029a6c2de"
+  }
+}

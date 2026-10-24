@@ -1,0 +1,319 @@
+{
+  "date": "2026-10-14",
+  "status": "complete",
+  "artifacts": "/x/Code/kindle/runs/dense-launch-grid-20261014.Upb23FRK",
+  "mechanism": "Existing K-split rule applied to actual dense output grid, no threshold/tile/precision changes",
+  "production_changed": false,
+  "adopted_as_performance_baseline": false,
+  "lineage": {
+    "kindle_base": "cafade894e3d8881c462cff058e00bf3aa6e757c",
+    "meganeura_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "upstream_meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "96c1dc731b1d5e133a6c0a8a020014619ff2e434",
+    "naga": "a97559b6318dc0a857ace502ffc7f3e442951f39",
+    "control_native": "b3a086f6070fa16389f7d43caee1e0888b667a91bcb94eb94527ea9faf66eac3",
+    "candidate_native": "f9cbeb9813245adabcdee8e227ae9fe4eedabf47524721b49cc7bb5fcf9dc6a9",
+    "backend_tests": "df421c2a8586c0b0590a79026fc9572b04cb079cc960a25caa770c5921615d46"
+  },
+  "protocol": {
+    "warmup": 16,
+    "measured": 256,
+    "pairs_per_workload": 1,
+    "order": [
+      "rgb-control",
+      "rgb-grid",
+      "cdp-grid",
+      "cdp-control"
+    ],
+    "gpu_trace": false,
+    "concurrent_build_analysis": false,
+    "rgb": "12M/B8/T16/H15/BF16",
+    "cdp": "12M/B32/T16/H15/mixed"
+  },
+  "validation": {
+    "cpu_tests": 35,
+    "shader_cases": 52,
+    "clippy": [
+      "meganeura",
+      "kindle"
+    ],
+    "new_product_cases": 14,
+    "exact_f64_outputs": 1769472,
+    "exact_f64_partial_values": 6684672,
+    "repetitions": 3,
+    "other_dense_cases": 18,
+    "other_dense_f64_values": 73728,
+    "reduced_gradient_cases": 18,
+    "packed_convolution_cases": 40,
+    "convolution_partials": 7,
+    "grouped_cases": 48,
+    "grouped_partials": 96,
+    "staged_cases": 8,
+    "small_optimizer_updates": 144,
+    "smoke_updates_per_workload": 24,
+    "full_synthetic_updates": 1136,
+    "guards": 12,
+    "retained_failed_guards": 1,
+    "allocation_warnings": 4,
+    "game_actions": 0,
+    "nvml_polling": false,
+    "recovery": false,
+    "worker_remaining": false
+  },
+  "timing": {
+    "rgb": {
+      "exact_reports": 0,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 292,
+          "exact": 292,
+          "elements": 33203322,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 292,
+          "exact": 190,
+          "elements": 33203322,
+          "relative_l2": 0.07247619427968088,
+          "max_abs": 19.894130520522594
+        },
+        "final": {
+          "tensors": 292,
+          "exact": 2,
+          "elements": 33203322,
+          "relative_l2": 0.06860649944039646,
+          "max_abs": 1.3891618251800537
+        }
+      },
+      "minimum_sampled_headroom_bytes": 15104540672,
+      "control_ms": 28.212816078124998,
+      "grid_ms": 27.931472296875015,
+      "less_time_percent": 0.9972197758313261,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 1.5590199921874999,
+          "imagination_and_targets": 7.3580316171875,
+          "posterior": 4.3348138359375,
+          "world_train_and_sync": 14.9609506328125
+        },
+        "grid": {
+          "behavior_train_and_sync": 1.5446911367187501,
+          "imagination_and_targets": 7.247037125,
+          "posterior": 4.3022481953125,
+          "world_train_and_sync": 14.83749583984375
+        }
+      }
+    },
+    "cdp": {
+      "exact_reports": 0,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 346,
+          "exact": 346,
+          "elements": 50710065,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 346,
+          "exact": 168,
+          "elements": 50710065,
+          "relative_l2": 0.031792524842537875,
+          "max_abs": 6.3245954513549805
+        },
+        "final": {
+          "tensors": 346,
+          "exact": 0,
+          "elements": 50710065,
+          "relative_l2": 0.619055467462522,
+          "max_abs": 6.187691777944565
+        }
+      },
+      "minimum_sampled_headroom_bytes": 11319377920,
+      "control_ms": 93.0842292812501,
+      "grid_ms": 92.231915546875,
+      "less_time_percent": 0.9156370965911598,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 4.7974910625,
+          "imagination_and_targets": 30.98450383984375,
+          "posterior": 11.11270419140625,
+          "world_train_and_sync": 46.1895301875
+        },
+        "grid": {
+          "behavior_train_and_sync": 4.71053834375,
+          "imagination_and_targets": 30.27252044921875,
+          "posterior": 11.094877640625,
+          "world_train_and_sync": 46.15397911328125
+        }
+      }
+    }
+  },
+  "first_state_parts": {
+    "rgb": {
+      "optimizer": {
+        "tensors": 180,
+        "exact": 78,
+        "max_abs": 19.894130520522594,
+        "relative_l2": 0.07906402510165833
+      },
+      "model": {
+        "tensors": 112,
+        "exact": 112,
+        "max_abs": 0,
+        "relative_l2": 0
+      }
+    },
+    "cdp": {
+      "optimizer": {
+        "tensors": 216,
+        "exact": 110,
+        "max_abs": 6.3245954513549805,
+        "relative_l2": 0.03199298120973318
+      },
+      "model": {
+        "tensors": 130,
+        "exact": 58,
+        "max_abs": 0.0023527443408966064,
+        "relative_l2": 0.000012254952381378605
+      }
+    }
+  },
+  "plans": {
+    "rgb": {
+      "imagination": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 922,
+          "groups": 689,
+          "logical_buffer_bytes": 1271806012
+        },
+        "grid": {
+          "dispatches": 922,
+          "groups": 689,
+          "logical_buffer_bytes": 1299331132
+        }
+      },
+      "world_gradient": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 4104,
+          "groups": 1324,
+          "logical_buffer_bytes": 2620895152
+        },
+        "grid": {
+          "dispatches": 4104,
+          "groups": 1324,
+          "logical_buffer_bytes": 2623778736
+        }
+      },
+      "behavior_gradient": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 247,
+          "groups": 36,
+          "logical_buffer_bytes": 237654860
+        },
+        "grid": {
+          "dispatches": 251,
+          "groups": 38,
+          "logical_buffer_bytes": 250762060
+        }
+      },
+      "slow_value": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 13,
+          "groups": 9,
+          "logical_buffer_bytes": 81634812
+        },
+        "grid": {
+          "dispatches": 13,
+          "groups": 9,
+          "logical_buffer_bytes": 81634812
+        }
+      }
+    },
+    "cdp": {
+      "posterior": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 1008,
+          "groups": 520,
+          "logical_buffer_bytes": 3278261952
+        },
+        "grid": {
+          "dispatches": 1016,
+          "groups": 520,
+          "logical_buffer_bytes": 3286650560
+        }
+      },
+      "imagination": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 892,
+          "groups": 599,
+          "logical_buffer_bytes": 15176219196
+        },
+        "grid": {
+          "dispatches": 982,
+          "groups": 659,
+          "logical_buffer_bytes": 15270591036
+        }
+      },
+      "world_gradient": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 3810,
+          "groups": 1089,
+          "logical_buffer_bytes": 4172302036
+        },
+        "grid": {
+          "dispatches": 3810,
+          "groups": 1089,
+          "logical_buffer_bytes": 4172302036
+        }
+      },
+      "behavior_gradient": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 247,
+          "groups": 36,
+          "logical_buffer_bytes": 846278684
+        },
+        "grid": {
+          "dispatches": 247,
+          "groups": 36,
+          "logical_buffer_bytes": 852570140
+        }
+      },
+      "slow_value": {
+        "descriptors_exact_except_declared_partitioning": true,
+        "control": {
+          "dispatches": 13,
+          "groups": 9,
+          "logical_buffer_bytes": 311186940
+        },
+        "grid": {
+          "dispatches": 13,
+          "groups": 9,
+          "logical_buffer_bytes": 311186940
+        }
+      }
+    }
+  },
+  "failures": [
+    "Original new test used F32-only parameter readback on F16 storage after first output/partial checks passed. Fixed test-only packed readback; original guard/source/binary retained.",
+    "First CPU plan summary used empty compile-time groups instead of actual session metadata; corrected without another GPU run, old summary retained."
+  ],
+  "sha256": {
+    "kindle.patch": "d8c790f4d2ca4bf9f13805c5d5cc393cb26ede3840692b8f1e03ab27d25d393f",
+    "backend-reviewed.patch": "4ef7715f542a41339c6bfad45a205077d23d568d8cadea7fbd19fcd63e1a13a4",
+    "backend-Cargo.lock": "82e55a5c4fd0d8c797e174d96410be067a61f4b544a31ee764bf6af787d1a449",
+    "kindle-Cargo.lock": "ff6d6f041a5af741264a6c7bef0ba69200d1f5894d144f438a74e80d259114f2"
+  },
+  "decision": "Numerically checked selector consistency, only ~1% complete gain with different trajectories. Preserve candidate, no speed promotion or grid sweep. Retain b3a086f baseline for fresh weighted residual profiling."
+}

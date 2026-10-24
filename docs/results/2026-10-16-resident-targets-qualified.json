@@ -1,0 +1,235 @@
+{
+  "status": "qualified_isolated_revised_encoding_contract",
+  "artifact_root": "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C",
+  "component_artifact_root": "/x/Code/kindle/runs/resident-return-precision-20261016.vDXqdfSg",
+  "native_sha256": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+  "backend_sha256": "4b772c349aed41d3c224a60d414518104770bfeabbc0a897db70787790f3bc05",
+  "runtime_backend_unchanged": true,
+  "selected_flags": [
+    "KINDLE_DEVICE_TARGETS=1",
+    "KINDLE_DEVICE_MEANS=1",
+    "MEGANEURA_COPY_COMPOSITION=1",
+    "MEGANEURA_CONVOLUTION_WORDS=1",
+    "MEGANEURA_IMAGE_VIEWS=1",
+    "MEGANEURA_COMMAND_CACHE=1"
+  ],
+  "preceding_control": "58aff452",
+  "timing": {
+    "rgb": {
+      "control": {
+        "mean_ms": 45.851712851562475,
+        "first32_ms": 45.6478230625,
+        "last32_ms": 45.91026571875,
+        "stage_ms": {
+          "behavior_train_and_sync": 4.55361959765625,
+          "imagination_and_targets": 9.91352044140625,
+          "posterior": 6.9954376015625,
+          "world_train_and_sync": 24.3891352109375
+        }
+      },
+      "candidate": {
+        "mean_ms": 43.196506554687524,
+        "first32_ms": 43.198756375,
+        "last32_ms": 43.0673430625,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.5436457343749996,
+          "imagination_and_targets": 7.680125890625,
+          "posterior": 7.03400300390625,
+          "world_train_and_sync": 24.93873192578125
+        }
+      },
+      "fraction_reduced": 0.05790855197647149
+    },
+    "cdp": {
+      "control": {
+        "mean_ms": 43.65709643359375,
+        "first32_ms": 43.74498125,
+        "last32_ms": 43.55566034375,
+        "stage_ms": {
+          "behavior_train_and_sync": 4.54862493359375,
+          "imagination_and_targets": 19.37657579296875,
+          "posterior": 7.655989578125,
+          "world_train_and_sync": 12.075906128906249
+        }
+      },
+      "candidate": {
+        "mean_ms": 40.99693999999998,
+        "first32_ms": 40.87382625,
+        "last32_ms": 41.00049221875,
+        "stage_ms": {
+          "behavior_train_and_sync": 3.53447717578125,
+          "imagination_and_targets": 17.256365625,
+          "posterior": 7.63056641015625,
+          "world_train_and_sync": 12.5755307890625
+        }
+      },
+      "fraction_reduced": 0.06093296739603604
+    }
+  },
+  "control_calibration": {
+    "rgb": {
+      "retained_ms": 46.199419203124975,
+      "current_ms": 45.851712851562475,
+      "relative_drift": -0.007526206120335388,
+      "passes": true
+    },
+    "cdp": {
+      "retained_ms": 43.93877592968751,
+      "current_ms": 43.65709643359375,
+      "relative_drift": -0.0064107269748368,
+      "passes": true
+    }
+  },
+  "inclusive_JAX_ms": 27.22256929610012,
+  "RGB_over_inclusive_JAX": 1.5867902138420056,
+  "original_component_qualification": "failed",
+  "original_full_model_smoke": "failed_exact_slow_encoding",
+  "revised_contract": "Original component tolerance applies to all dense encodings; copied arrays, retained controls and own checkpoints stay exact.",
+  "component_comparisons": 19652262,
+  "component_output_arrays": 759,
+  "identical_component_fixture_arrays": 144,
+  "restored_component_files": 301,
+  "component_generations": 12,
+  "smoke_updates": 96,
+  "timing_updates": 1088,
+  "total_new_updates": 1184,
+  "game_actions": 0,
+  "new_GPU_guards": 9,
+  "new_allocation_warnings": 6,
+  "observer_regression_checks": 15,
+  "state_groups": {
+    "rgb/first": {
+      "moments": {
+        "tensors": 180,
+        "exact": 176,
+        "elements": 20997544,
+        "max_absolute_error": 1.4901161193847656e-08,
+        "relative_L2": 5.503285531955182e-11
+      },
+      "learner_parameters": {
+        "tensors": 101,
+        "exact": 101,
+        "elements": 11352275,
+        "max_absolute_error": 0.0,
+        "relative_L2": 0.0
+      },
+      "slow_critic": {
+        "tensors": 11,
+        "exact": 11,
+        "elements": 853503,
+        "max_absolute_error": 0.0,
+        "relative_L2": 0.0
+      }
+    },
+    "rgb/final": {
+      "moments": {
+        "tensors": 180,
+        "exact": 2,
+        "elements": 20997544,
+        "max_absolute_error": 0.7198172211647034,
+        "relative_L2": 0.060140527946244575
+      },
+      "learner_parameters": {
+        "tensors": 101,
+        "exact": 1,
+        "elements": 11352275,
+        "max_absolute_error": 0.0002709031105041504,
+        "relative_L2": 0.00025595187104393997
+      },
+      "slow_critic": {
+        "tensors": 11,
+        "exact": 0,
+        "elements": 853503,
+        "max_absolute_error": 0.00014738738536834717,
+        "relative_L2": 0.0001534004590279813
+      }
+    },
+    "cdp/first": {
+      "moments": {
+        "tensors": 216,
+        "exact": 108,
+        "elements": 32668706,
+        "max_absolute_error": 0.2255677580833435,
+        "relative_L2": 7.273812701264116e-05
+      },
+      "learner_parameters": {
+        "tensors": 119,
+        "exact": 70,
+        "elements": 17187856,
+        "max_absolute_error": 9.022653102874756e-05,
+        "relative_L2": 2.5804404501408564e-07
+      },
+      "slow_critic": {
+        "tensors": 11,
+        "exact": 7,
+        "elements": 853503,
+        "max_absolute_error": 7.450580596923828e-09,
+        "relative_L2": 8.69792878095416e-10
+      }
+    },
+    "cdp/final": {
+      "moments": {
+        "tensors": 216,
+        "exact": 0,
+        "elements": 32668706,
+        "max_absolute_error": 6.604189693927765,
+        "relative_L2": 1.115325245595751
+      },
+      "learner_parameters": {
+        "tensors": 119,
+        "exact": 0,
+        "elements": 17187856,
+        "max_absolute_error": 0.18695810437202454,
+        "relative_L2": 0.05434343712010395
+      },
+      "slow_critic": {
+        "tensors": 11,
+        "exact": 0,
+        "elements": 853503,
+        "max_absolute_error": 0.02148629305884242,
+        "relative_L2": 0.014626417426534135
+      }
+    }
+  },
+  "last_GPU_observation_utc": "2026-10-16T22:45:15.493374+00:00",
+  "final_audit_utc": "2026-10-16T22:49:19.767883+00:00",
+  "limitations": [
+    "no bitwise cross-arm trajectory or learning parity",
+    "no production promotion or Atari restart",
+    "production replay-context readback/refresh remains",
+    "at most8192 returns and full staged BPTT/microbatch",
+    "logical extents are not physical traffic",
+    "B8 and JAX controls not remeasured",
+    "remaining convolution feeding gap unresolved"
+  ],
+  "retained_failures": [
+    "original end-to-end component GPU and CPU coefficient failures",
+    "rejected CPU affine recurrence",
+    "full-model exact slow-encoding assertion",
+    "provisional RGB/one-ULP label corrected to CDP/two ULPs",
+    "common timing observer retains smoke96 metadata; actual1088 independently audited",
+    "independent CPU audit exceeded descriptor limit; mapped pairs released without raising limits or GPU repeat"
+  ],
+  "production_changed": false,
+  "learning_restarted": false,
+  "goal_complete": false,
+  "finished_utc": "2026-10-16T22:51:52.166159+00:00",
+  "receipts_sha256": {
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/retained-review.json": "fe91e08d5f93b12ae7eeca0b20cdb00108c3b35b126db1bea95c9f89607451f5",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/timing-decision.json": "509043c59ae848249091608d72b0261ab9b2dc4d8341ce83690d73a311404ef6",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/timing-audit.json": "175bc7cf62039ae2cd81f18bcee4ded71cec7f0faaca3fa0cb53cb0050aa20b4",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/observer-tests.json": "d65a9c64c8d4b8c9551fee56551c0e61eef6dd974abb41e4e257eae29907c4c5",
+    "/x/Code/kindle/runs/resident-return-precision-20261016.vDXqdfSg/component-review.json": "2b2803cfd7c7c18ada2bac394f56217980ab3d9eb91d19f1ec2186893556057c",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/build.json": "58a2f40e45df5de77f92cf5d93861157ceda9d0e143319f1c3f784b3df417d85",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/publish.py": "b1d64c42c24c3149fee068ae98bcea47ec43e35794777e3305c36426077075c0",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/smoke-review.log": "1776baa6d968827cc4d0fa781fdb4e91087749f7e9884315412a3745414c423e",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/review_smoke.py": "55f1374611258150ae36102a40706666f64bc6b13051997549b7a2221401dca5",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/review_retained.py": "a63fbbc7eb70b9596091fe234832dfa187f9dae4f46503b952b4adea789c154a",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/audit_timing.py": "287c2d39a34c58b116e459d7b1283eee0511001050dee8bf0f93f715934a5246",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/audit_timing_fixed.py": "2235b5bdb83fcc3bc57e5c6334aad22928e29e753180d34e20bc649fdda018bc",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/timing-audit.log": "d0a3f15a6bfa0a66868b6f71a8474f3fc847a7fa99c9b5d839a036e01e59cdd6",
+    "/x/Code/kindle/runs/resident-target-model-20261016.tEVYDi5C/timing-review.json": "5b4e0f24f5ef31ba7ff341778cd18809b8d08a557549771014425cfc4ca9b990",
+    "/x/Code/kindle/runs/resident-targets-20261016.6aBO2GAy/precision-contract.json": "c7c5d281066410564e8b4a03226e149bd6d52edb6cc5dc0c20f89f388d1354bd",
+    "/x/Code/kindle/runs/resident-targets-20261016.6aBO2GAy/compensated-preflight.json": "8cb59a15d33e9c5f0db36ec9fb962dc5a2057495e056ef07cac22fa722b00bec"
+  }
+}

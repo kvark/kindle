@@ -1,0 +1,166 @@
+{
+  "status": "complete_cpu_contract",
+  "date": "2026-10-16",
+  "baseline_native": "58aff452",
+  "baseline_rgb_ms": 46.199419203125,
+  "inclusive_jax_ms": 27.22256929610012,
+  "workloads": {
+    "rgb": {
+      "host_behavior_input_bytes": 22147200,
+      "dense_two_hot_bytes": 16646400,
+      "equivalent_scalar_target_bytes": 65280,
+      "world_target_inputs": 80,
+      "world_target_input_bytes": 1570816,
+      "posterior_readback_bytes": 5242880,
+      "imagination_readback_bytes": 684032
+    },
+    "cdp": {
+      "host_behavior_input_bytes": 22147200,
+      "dense_two_hot_bytes": 16646400,
+      "equivalent_scalar_target_bytes": 65280,
+      "world_target_inputs": 80,
+      "world_target_input_bytes": 1570816,
+      "posterior_readback_bytes": 5242880,
+      "imagination_readback_bytes": 716800
+    }
+  },
+  "jax": {
+    "reachable_computations": 1595,
+    "entry_parameter_nodes": 302,
+    "normalizer_nodes": 50,
+    "normalizer_opcodes": {
+      "fusion": 3,
+      "bitcast": 4,
+      "sort": 1,
+      "get-tuple-element": 3,
+      "multiply": 8,
+      "constant": 4,
+      "add": 4,
+      "subtract": 1,
+      "maximum": 1,
+      "compare": 7,
+      "reduce": 1,
+      "broadcast": 2,
+      "select": 5,
+      "transpose": 1,
+      "parameter": 4,
+      "or": 1
+    },
+    "two_hot_loss_nodes": 542,
+    "dense_target_entry_parameters": 0,
+    "normalization": {
+      "debias": false,
+      "impl": "perc",
+      "limit": 1.0,
+      "perchi": 95.0,
+      "perclo": 5.0,
+      "rate": 0.01
+    },
+    "valnorm": "none",
+    "advnorm": "none"
+  },
+  "source_f32_lambda_cases": 36,
+  "source_f32_lambda_values": 6696,
+  "negative_interface_checks": 6,
+  "rust_cpu_tests": 7,
+  "trace_pieces_ms": {
+    "posterior_inputs": {
+      "wall_ms": 1.83866642578125,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 1.83866642578125
+    },
+    "posterior_readback": {
+      "wall_ms": 1.48837708203125,
+      "gpu_pass_ms": 1.25675735546875,
+      "uncovered_ms": 0.2316197265625
+    },
+    "posterior_unpack": {
+      "wall_ms": 0.15133346484375,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 0.15133346484375
+    },
+    "imagination_inputs": {
+      "wall_ms": 0.37358620703125,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 0.37358620703125
+    },
+    "imagination_readback": {
+      "wall_ms": 8.0857035546875,
+      "gpu_pass_ms": 7.91264920703125,
+      "uncovered_ms": 0.17305434765625
+    },
+    "decode": {
+      "wall_ms": 0.122098890625,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 0.122098890625
+    },
+    "targets": {
+      "wall_ms": 1.43710872265625,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 1.43710872265625
+    },
+    "world_inputs": {
+      "wall_ms": 0.13288210546875,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 0.13288210546875
+    },
+    "behavior_inputs": {
+      "wall_ms": 1.01226248046875,
+      "gpu_pass_ms": 0.0,
+      "uncovered_ms": 1.01226248046875
+    }
+  },
+  "raw_trace_updates": 272,
+  "raw_trace_selected_intersections": 2448,
+  "source_seals": 33,
+  "audit_finished_at": "2026-10-16T21:10:36.947505+00:00",
+  "review_finished_at": "2026-10-16T21:13:05.878600+00:00",
+  "retained_failure": "Initial CPU reader expected flattened stochastic input [32,512]; exact physical shape is [1024,16]",
+  "target_semantics": [
+    "arrival reward/terminal index t+1",
+    "last cuts trace but preserves bootstrap",
+    "imagined continuation already contains discount",
+    "current value bootstrap; slow critic is regularizer",
+    "5/95 linear F32 percentiles, EMA .01, no debias, min scale1",
+    "pre-update parameters; detached targets; normalizer updates once before actor advantages",
+    "world final-row replay weight0 and T/(T-1) correction",
+    "CDP bonus belongs to arrival reward"
+  ],
+  "selected_next_scope": [
+    "resident F32 returns, percentile/EMA, weighted action and two-hot targets",
+    "write existing behavior inputs and staged world late-target inputs; preserve all losses",
+    "copy replay feature on device, retain production replay-context refresh separately",
+    "checkpoint normalizer state and diagnostics explicitly; no CPU target workaround"
+  ],
+  "existing_device_copy_regions": true,
+  "production_replay_context_required": true,
+  "fixed_benchmark_refreshes_replay": false,
+  "gpu_implementation": false,
+  "new_speed_measurement": false,
+  "limits": [
+    "CPU source/contracts, not a GPU implementation or numerical qualification",
+    "logical input extents are not measured PCIe/DRAM traffic or removable latency",
+    "coarse trace includes changed synchronization and2.315% overhead",
+    "JAX source builds dense one-hot targets too; no unsupported compact-loss claim",
+    "NumPy source evaluation is not bit-exact XLA/Vulkan arithmetic",
+    "host targets are a bounded portion; convolution feeding and parity remain open"
+  ],
+  "artifacts": "runs/host-target-contract-20261016.8BBXEPyc",
+  "receipt_sha256": {
+    "declaration.md": "7a8aef68e5f009d088f1c7b6dba65a6d3a4ec0cce7c59cd6bced14932e3247d6",
+    "audit.py": "6dc979b77f2165575948e1d51abffe66ad17397d8d2dc91f05ee280dcd1e43a0",
+    "audit.log": "601367fe8b2e7e3ef6fb0f27e7f8b0323a00c5f50ebb6f8e9fd1751c24be2823",
+    "reader-repair.md": "e573c16b9bda4472d8db3c40d62b4754f73d62a380f1164d128041c24cf82545",
+    "audit_reviewed.py": "1607d7316f68982f9c7f8ef42d117e3972c2e0a1d63b9312e10b4ed626083198",
+    "audit.json": "6813a6c53317f3f0ee39a1853a7a9a7646a4405b6d5c69460bf4f327ed2a30ac",
+    "review.py": "4636d270f8bf2047d796cde816eb24d92db9ba5f6cb12b1af2a87dc81c7324e9",
+    "review.json": "eeaa7243a36cd2eed82f7c2c1f3c0817d37903f7eb1436eae052dbd150ab712e",
+    "cpu-tests.log": "0a294826ce2eabee1e2fd2a863493d2a83ec8065d4629874affccb61af4cac93"
+  },
+  "gpu_calls": 0,
+  "backend_builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "production_changed": false,
+  "goal_complete": false
+}

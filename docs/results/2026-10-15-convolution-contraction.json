@@ -1,0 +1,153 @@
+{
+  "status": "complete",
+  "root": "runs/convolution-contraction-20261015.Hr1XtpMO",
+  "ordinary": {
+    "status": "complete",
+    "guards": 2,
+    "allocation_warnings": 0,
+    "reports": {
+      "direct": {
+        "status": "complete",
+        "device": "NVIDIA GeForce RTX 5080",
+        "batch": 512,
+        "calls": 146,
+        "dispatches": 438,
+        "scratch_bytes": 85037056,
+        "input_halo": 2,
+        "matrix_loads_proven_valid": true,
+        "packing_included": true,
+        "gpu_ms": 1.8764425,
+        "queued_wall_ms": 1.8786083828125,
+        "recording_ms": 0.002017828125,
+        "elements": 16777216,
+        "changed_input_exact": true,
+        "restored_exact": true,
+        "minimum_sampled_headroom_bytes": 16206331904,
+        "validation_enabled": false,
+        "validation_errors": 0,
+        "validation_warnings": 0,
+        "game_actions": 0,
+        "synthetic_updates": 0
+      },
+      "candidate": {
+        "status": "complete",
+        "device": "NVIDIA GeForce RTX 5080",
+        "batch": 512,
+        "calls": 146,
+        "dispatches": 438,
+        "scratch_bytes": 85037056,
+        "input_halo": 2,
+        "matrix_loads_proven_valid": true,
+        "packing_included": true,
+        "gpu_ms": 1.292624,
+        "queued_wall_ms": 1.2935994296875,
+        "recording_ms": 0.002032828125,
+        "elements": 16777216,
+        "changed_input_exact": true,
+        "restored_exact": true,
+        "minimum_sampled_headroom_bytes": 16355164160,
+        "validation_enabled": false,
+        "validation_errors": 0,
+        "validation_warnings": 0,
+        "game_actions": 0,
+        "synthetic_updates": 0
+      }
+    },
+    "exact_output_values": 33554432,
+    "independent_f64_checks": 256,
+    "operation_calls": 292,
+    "shader_dispatches": 876,
+    "source_hashes": 64,
+    "minimum_sampled_headroom_bytes": 16206331904,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "gpu_reduction_percent": 31.1130503599231,
+    "wall_reduction_percent": 31.140548422826264,
+    "material_improvement": true
+  },
+  "compiler_statistics": {
+    "status": "complete",
+    "guards": 1,
+    "allocation_warnings": 0,
+    "reports": {
+      "candidate": {
+        "status": "complete",
+        "device": "NVIDIA GeForce RTX 5080",
+        "executables": 1,
+        "subgroup_size": 32,
+        "minimum_sampled_headroom_bytes": 16559898624,
+        "statistics": [
+          {
+            "name": "Register Count",
+            "description": "Number of temporary registers used by this shader stage",
+            "format": 2,
+            "raw_u64": 255,
+            "value": 255
+          },
+          {
+            "name": "Binary Size",
+            "description": "Size in bytes of the executable for this stage",
+            "format": 2,
+            "raw_u64": 176256,
+            "value": 176256
+          },
+          {
+            "name": "Stack Size",
+            "description": "Size in bytes required for the shader stack",
+            "format": 2,
+            "raw_u64": 0,
+            "value": 0
+          },
+          {
+            "name": "Local Memory Size",
+            "description": "Size in bytes required per-thread for local memory",
+            "format": 2,
+            "raw_u64": 68719476784,
+            "value": 68719476784
+          },
+          {
+            "name": "Shared Memory Size",
+            "description": "Size in bytes used for shared memory",
+            "format": 2,
+            "raw_u64": 24576,
+            "value": 24576
+          }
+        ],
+        "representations_requested": false,
+        "logical_buffer_allocations": 0,
+        "shader_dispatches": 0,
+        "validation_errors": 0,
+        "validation_warnings": 0,
+        "game_actions": 0,
+        "synthetic_updates": 0
+      }
+    },
+    "shader_dispatches": 0,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "assembly_requested": false,
+    "ordinary_binary_identity_claimed": false
+  },
+  "accounting": {
+    "guards": 4,
+    "allocation_warnings": 0,
+    "operation_calls": 295,
+    "shader_dispatches": 885,
+    "exact_output_value_checks": 33587200,
+    "f64_checks": 393,
+    "unique_f64_coordinates": 264,
+    "compile_only_pipelines": 1,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "retained_native_control_ms": 2.146943,
+  "reduction_vs_retained_native_percent": 39.792346606314176,
+  "whole_update_ms": {
+    "native": 60.0411874375,
+    "jax": 26.6316957586,
+    "remeasured": false
+  },
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "local_memory_statistics_trusted": false
+}

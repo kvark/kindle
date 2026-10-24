@@ -1,0 +1,126 @@
+{
+  "status": "complete",
+  "numerical_parity": true,
+  "pairs": {
+    "rgb": {
+      "exact_reports": 272,
+      "exact_first_outputs": true,
+      "exact_tensors": {
+        "initial": 292,
+        "first": 292,
+        "final": 292
+      },
+      "expected_tensor_count": 292,
+      "timings": {
+        "control": {
+          "mean_update_ms": 52.986773828124996,
+          "stages_ms": {
+            "behavior_train_and_sync": 3.541797515625,
+            "imagination_and_targets": 12.92929949609375,
+            "posterior": 6.29164859765625,
+            "world_train_and_sync": 30.22402821875
+          }
+        },
+        "tiled": {
+          "mean_update_ms": 51.6160274765625,
+          "stages_ms": {
+            "behavior_train_and_sync": 2.7037947031250003,
+            "imagination_and_targets": 12.4709491796875,
+            "posterior": 6.2917056015625,
+            "world_train_and_sync": 30.1495779921875
+          }
+        }
+      },
+      "less_time_percent": 2.5869594476705338
+    },
+    "cdp": {
+      "exact_reports": 272,
+      "exact_first_outputs": true,
+      "exact_tensors": {
+        "initial": 346,
+        "first": 346,
+        "final": 346
+      },
+      "expected_tensor_count": 346,
+      "timings": {
+        "control": {
+          "mean_update_ms": 126.20344779296879,
+          "stages_ms": {
+            "behavior_train_and_sync": 9.4519774375,
+            "imagination_and_targets": 54.18172141796875,
+            "posterior": 15.66896109765625,
+            "world_train_and_sync": 46.90078783984375
+          }
+        },
+        "tiled": {
+          "mean_update_ms": 118.08944431249996,
+          "stages_ms": {
+            "behavior_train_and_sync": 5.81121093359375,
+            "imagination_and_targets": 50.0095994765625,
+            "posterior": 15.32360262109375,
+            "world_train_and_sync": 46.94503128125
+          }
+        }
+      },
+      "less_time_percent": 6.429304129455716
+    }
+  },
+  "kernel": [
+    {
+      "name": "small",
+      "exact_values": 2048,
+      "exact_f64_probes": 128,
+      "control_pass_ms": 0.010701500000000001,
+      "tiled_pass_ms": 0.01072325,
+      "speedup": 0.9979716970134987,
+      "splits": 8
+    },
+    {
+      "name": "wide",
+      "exact_values": 32768,
+      "exact_f64_probes": 128,
+      "control_pass_ms": 0.018766,
+      "tiled_pass_ms": 0.01661825,
+      "speedup": 1.1292404434883336,
+      "splits": 4
+    },
+    {
+      "name": "at",
+      "exact_values": 655360,
+      "exact_f64_probes": 128,
+      "control_pass_ms": 0.168487,
+      "tiled_pass_ms": 0.0577465,
+      "speedup": 2.9177006398656196,
+      "splits": 1
+    },
+    {
+      "name": "conv",
+      "exact_values": 6291456,
+      "exact_f64_probes": 128,
+      "control_pass_ms": 0.67086325,
+      "tiled_pass_ms": 0.67030275,
+      "speedup": 1.000836189318931,
+      "splits": 1
+    }
+  ],
+  "guards_passed": 12,
+  "allocation_warnings": 1,
+  "game_actions": 0,
+  "native_synthetic_updates": 1088,
+  "kernel_calls": 1152,
+  "production_changed": false,
+  "date": "2026-10-13",
+  "artifacts": "runs/tiled-gap-20261013.zcK8nU4V",
+  "production_pins_unchanged": true,
+  "effective_backend": {
+    "meganeura": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+    "naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8",
+    "local_patch": "backend.patch"
+  },
+  "new_aligned_f64": {
+    "cases": 18,
+    "outputs": 73728
+  },
+  "scope": "Isolated shared aligned tiled algorithm; full update fixtures preserve precision. Single ordinary pair each; no learning evidence or parity claim."
+}

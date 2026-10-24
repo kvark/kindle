@@ -1,0 +1,142 @@
+{
+  "status": "cpu_proof_complete",
+  "published_at": "2026-10-16T19:22:16.986696+00:00",
+  "artifact_root": "runs/convolution-carry-20261016.DpXsI5oj",
+  "contracts": 20,
+  "occurrences": 23,
+  "changed_contracts": 6,
+  "unchanged_occurrences": 17,
+  "validated_modules": 532,
+  "matched_old_modules": 152,
+  "changed_typed_modules": 222,
+  "actual_slots": 184591360,
+  "actual_valid_reads": 115384160,
+  "cursor_transitions": 5243584,
+  "small_cases": 20,
+  "small_slots": 36864,
+  "boundary_carries": 99585,
+  "negative_mutations": 10,
+  "static_loop_sites": {
+    "dX": {
+      "control": {
+        "BranchConditional": 85,
+        "FunctionCall": 26,
+        "UDiv": 32,
+        "UMod": 14,
+        "IAdd": 75,
+        "ISub": 36,
+        "IMul": 56,
+        "Select": 16,
+        "ExtInst": 0
+      },
+      "candidate": {
+        "BranchConditional": 85,
+        "FunctionCall": 18,
+        "UDiv": 25,
+        "UMod": 7,
+        "IAdd": 78,
+        "ISub": 40,
+        "IMul": 54,
+        "Select": 22,
+        "ExtInst": 3
+      },
+      "memory_sites": [
+        {
+          "operation": "Load",
+          "storage": 12,
+          "binding": 0,
+          "bytes": 2,
+          "count": 8
+        },
+        {
+          "operation": "Load",
+          "storage": 12,
+          "binding": 1,
+          "bytes": 2,
+          "count": 8
+        },
+        {
+          "operation": "Store",
+          "storage": 4,
+          "binding": null,
+          "bytes": 8,
+          "count": 4
+        }
+      ]
+    },
+    "dW": {
+      "control": {
+        "BranchConditional": 75,
+        "FunctionCall": 10,
+        "UDiv": 8,
+        "UMod": 11,
+        "IAdd": 73,
+        "ISub": 9,
+        "IMul": 16,
+        "Select": 0,
+        "ExtInst": 0
+      },
+      "candidate": {
+        "BranchConditional": 72,
+        "FunctionCall": 10,
+        "UDiv": 8,
+        "UMod": 8,
+        "IAdd": 73,
+        "ISub": 10,
+        "IMul": 19,
+        "Select": 6,
+        "ExtInst": 3
+      },
+      "memory_sites": [
+        {
+          "operation": "Load",
+          "storage": 12,
+          "binding": 0,
+          "bytes": 2,
+          "count": 8
+        },
+        {
+          "operation": "Load",
+          "storage": 12,
+          "binding": 1,
+          "bytes": 2,
+          "count": 8
+        },
+        {
+          "operation": "Store",
+          "storage": 4,
+          "binding": null,
+          "bytes": 8,
+          "count": 4
+        }
+      ]
+    }
+  },
+  "source_seals_checked": 1731,
+  "source_sha256": {
+    "declaration.md": "d57c9c061b92ec88ffd384db68bf4fb4876c07bc0b33c0f98bcf284ceb04ada2",
+    "carry.rs": "2847f3dee967499f516a33aed6a470db18be5ad7f2da85377f4167358d028c92",
+    "emit.rs": "4eba95c8e47b005bbdac770d62d57b4efb9bc8df907ee864e170f734a3015397",
+    "build.py": "a5809d1941281ff44c34bf1bae22f120572bf77545375b2742d2531f8fc8f290",
+    "addresses.py": "21df437bfb2ee4f428f980eb622abbfb757fbcd868773a8fdf848a39c82d5afd",
+    "review.py": "ddd7c1a96b5455159a3fd98e1dfd89b10c220048acf37508b13489f8857a94cd",
+    "publish.py": "9842259c921dd6928774900bf185cf10c816a7689eefbc48837ce87f51e367be",
+    "cpu-build.json": "fb7e25e86623d10b4a4f0e673da0c4591965ee4bb2f3696a30b5f9119bb070fd",
+    "addresses.json": "5da936ab0a0a74344c8593f8c1720f65d8b65149801e273232aa97c48145a586",
+    "review.json": "dc56d8e3bcc07d41305caca51a07b623920e282ac8a95a93036775a94ed97aee"
+  },
+  "gpu_calls": 0,
+  "backend_builds": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "current_native_rgb_ms": 46.199419203125,
+  "current_inclusive_jax_ms": 27.222569,
+  "production_changed": false,
+  "gpu_qualified": false,
+  "limits": [
+    "Static sites are not measured native instructions, divisions or latency.",
+    "F32/F16/BF16 variants qualify only CPU generation, not GPU numerical execution.",
+    "No new alignment branch, storage/layout/precision/tile/selection change.",
+    "No automatic GPU allocation, performance promotion or learning restart."
+  ]
+}

@@ -1,0 +1,390 @@
+{
+  "status": "review_passed",
+  "seeds": [
+    1009,
+    2017,
+    3019
+  ],
+  "aggregate": {
+    "frozen": {
+      "mean": 7367.01388888889,
+      "ci95": [
+        5172.916666666667,
+        11115.625
+      ],
+      "seeds": [
+        5172.916666666667,
+        5812.5,
+        11115.625
+      ]
+    },
+    "initial": {
+      "mean": 200.69444444444443,
+      "ci95": [
+        153.125,
+        273.9583333333333
+      ],
+      "seeds": [
+        175.0,
+        273.9583333333333,
+        153.125
+      ]
+    },
+    "paired_frozen_gain_over_500k": {
+      "mean": 4709.027777777778,
+      "ci95": [
+        3382.2916666666665,
+        6260.416666666667
+      ],
+      "seeds": [
+        3382.291666666667,
+        4484.375,
+        6260.416666666667
+      ]
+    },
+    "online": {
+      "mean": 6545.5,
+      "ci95": [
+        5376.5,
+        8411.0
+      ],
+      "seeds": [
+        5376.5,
+        5849.0,
+        8411.0
+      ]
+    },
+    "seconds": {
+      "mean": 56000.2247256313,
+      "ci95": [
+        55990.97753425699,
+        56008.20818715205
+      ],
+      "seeds": [
+        55990.97753425699,
+        56008.20818715205,
+        56001.488455484854
+      ]
+    }
+  },
+  "backend": {
+    "meganeura": "3102683311f3376026928364928a4aa966102311",
+    "blade": "56f05651cca73659130e924e497dda633f839d40"
+  },
+  "native_sha256": "7311547db9c002cbdf3b0ecea80de069bfb8ec872b8734ed0908cc13b288fe0f",
+  "retained_backend": {
+    "meganeura": "f104f354f50339f610a04d81fa75808c0cc535b0",
+    "blade": "e349cddf7a9bf181a362507e640b3d576b1aac72"
+  },
+  "retained_native_sha256": "83be73bfe09436ef7273be9b358a73e3886aae77554736d7980e7c447188086a",
+  "declaration_sha256": "d599af31e6ccda81ad3caf2236a1163812199c02d2e9df35c70dc7a43f934f92",
+  "controller_sha256": "12f308e1849e4f3d2b3ac96cfbf6bab465a0eb05d1a738b2c7b905f52d341537",
+  "reviewer_sha256": "b4a19032418deb2350e645b9c80deb004ab2f97299ff496b782241f074dacf76",
+  "completion_sha256": "5c6751a25ab7a4ffa95f3b6d92c25d860b6d185b439c05942112bccab2428c8e",
+  "summary_sha256": "b43d9d1521793f437ec2262dd5e7ede1265bfe1e05e9241ef0607e3ce0421bda",
+  "control_report": "/x/Code/kindle/runs/cdp-12m-four-20261007.iEvfk9Vm/qbert-capacity-review.json",
+  "control_report_sha256": "8ac867f4c94b00d8e02bd4936720cbb0416d8bb3c3c7c3d4b48185038f11f1d9",
+  "training_actions": 6000000,
+  "training_updates": 1499817,
+  "training_frames": 23991010,
+  "training_seconds": 168000.6741768939,
+  "retained_500k_training_seconds": 41975.28250267287,
+  "frozen_actions": 221648,
+  "selected_natural_episodes": 144,
+  "selected_cutoffs": 0,
+  "frozen_updates": 0,
+  "guards": 9,
+  "excess_episodes": 9,
+  "first_pyramid_successes": [
+    20,
+    22,
+    20
+  ],
+  "historical_gate_pass": [
+    false,
+    false,
+    false
+  ],
+  "long_run_target": 193220.76651573027,
+  "quality_goal_complete": false,
+  "automatic_extension": false,
+  "extra_review_game_actions": 0,
+  "extra_review_actor_updates": 0,
+  "extra_review_gpu_jobs": 0,
+  "training_wall_ratio": 4.002371494848095,
+  "published_context": {
+    "revision": "e3f02248693a79dc8b0ebd62c93683888ddaccfe",
+    "source": "/x/Code/kindle/runs/upstream-dreamerv3-source/scores/atari57-dreamerv3.json.gz",
+    "source_sha256": "59af8b6fbb5d83fb9b9e522421112526be3bf857b9ca17bb56ed7aa39610436e",
+    "source_url": "https://github.com/danijar/dreamerv3/blob/e3f02248693a79dc8b0ebd62c93683888ddaccfe/scores/atari57-dreamerv3.json.gz",
+    "extraction_path": "/x/Code/kindle/runs/cdp-five-game-screen-20261005.4e20N61X/published-reference.json",
+    "extraction_sha256": "ad6ee04042264a1fb65873f5d07ebfb09759e655651d479a8ccda48f2ebed8cc",
+    "Qbert": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "longrun": {
+        "mean": 193220.76651573027,
+        "ci95": [
+          113762.67454138509,
+          285965.44133795187
+        ],
+        "seeds": [
+          308616.6722091606,
+          110155.78114138296,
+          113769.06435786435,
+          128398.40357142856,
+          388336.1692964192,
+          110048.50851812586
+        ]
+      },
+      "at_frames": {
+        "2000000": {
+          "scores": [
+            2665.3846153846,
+            2951.8456375839,
+            2110.1923076923,
+            2664.3103448276,
+            2927.6859504132,
+            2670.802919708
+          ],
+          "mean": 2665.0369626016
+        },
+        "4000000": {
+          "scores": [
+            4720.6310679612,
+            4425.6944444444,
+            5264.3292682927,
+            5063.2530120482,
+            5777.6666666667,
+            4788.829787234
+          ],
+          "mean": 5006.734041107867
+        },
+        "8000000": {
+          "scores": [
+            12099,
+            14073.5849056604,
+            15351.0869565217,
+            14075,
+            16220.3947368421,
+            15825.9615384615
+          ],
+          "mean": 14607.50468958095
+        }
+      }
+    }
+  },
+  "review_seconds": 51.75743608386256,
+  "raw_report": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/budget-review.json",
+  "raw_report_sha256": "de51856f214ca1c7ff4a114f5969d5545a45dbe0bef1d8b5a6b3089866812a9f",
+  "new_warnings": 10,
+  "groups": [
+    {
+      "seed": 1009,
+      "online": 5376.5,
+      "seconds": 55990.97753425699,
+      "retained_500k": {
+        "score": 1790.625,
+        "successes": 0,
+        "online": 1809.0,
+        "seconds": 13995.25013791991
+      },
+      "evaluation": {
+        "candidate": {
+          "score": 5172.916666666667,
+          "positive_return_episodes": 24,
+          "selected_natural_episodes": 24,
+          "excess": 3,
+          "actions": 46616,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-1009-candidate-frozen.mp4",
+            "sha256": "0eee91d051fad6e630c2c7374783f16ba1d9890ac90176b1663df2701fa5f437",
+            "stream": 0,
+            "frames": 23303,
+            "fps": 60,
+            "raw_frames_sha256": "c8f029ad0c170116b31dd7915972649cf53fcf3a10034b986f75c01a9bbd8b86",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "8c004b951a74cb5c6d9ce7ee15dcb154d585547b333d2a39104d18e7100916fc",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 20,
+            "selected_episodes": 24
+          }
+        },
+        "untrained": {
+          "score": 175.0,
+          "positive_return_episodes": 23,
+          "selected_natural_episodes": 24,
+          "excess": 0,
+          "actions": 9232,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-1009-untrained-frozen.mp4",
+            "sha256": "2347e0b65285e13a123c25b56c1b81b6be586c743c596debd766419cdfbae79e",
+            "stream": 0,
+            "frames": 4608,
+            "fps": 60,
+            "raw_frames_sha256": "2f2038c8b61ab211e9c3f77cc6b2e8e0ec492eda1599b88a72a06c547f93bf90",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "b9e230a6165928174a9ee304592cf0c6ecfdd9fb950ce52200606b0ea8672ba7",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 0,
+            "selected_episodes": 24
+          }
+        }
+      }
+    },
+    {
+      "seed": 2017,
+      "online": 5849.0,
+      "seconds": 56008.20818715205,
+      "retained_500k": {
+        "score": 1328.125,
+        "successes": 0,
+        "online": 1383.5,
+        "seconds": 14023.741955118021
+      },
+      "evaluation": {
+        "candidate": {
+          "score": 5812.5,
+          "positive_return_episodes": 24,
+          "selected_natural_episodes": 24,
+          "excess": 0,
+          "actions": 32080,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-2017-candidate-frozen.mp4",
+            "sha256": "c14bc410aa5086339863be5f323b898cd8a247042dcb1b2cd5cc0e9e22e1d763",
+            "stream": 0,
+            "frames": 16033,
+            "fps": 60,
+            "raw_frames_sha256": "a20d8432e20494b7fb817e93213f481642f1113a758751aec3d4549e2990dcbc",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "abf5b14712ae484a39a888ab785f6e403cc31be111032d6ac8b33a80bd76cb05",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 22,
+            "selected_episodes": 24
+          }
+        },
+        "untrained": {
+          "score": 273.9583333333333,
+          "positive_return_episodes": 23,
+          "selected_natural_episodes": 24,
+          "excess": 0,
+          "actions": 10248,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-2017-untrained-frozen.mp4",
+            "sha256": "4967859d0cf2b605cbbef5930eda90e6e852273a0b24a845989ef8f4d1da165b",
+            "stream": 0,
+            "frames": 5120,
+            "fps": 60,
+            "raw_frames_sha256": "748a7cc6786416e2c097658b92cd1e8444617ca15b9bbf73fe786709d1867bc5",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "64bd9d67c19b89be30e12384a8f2ab944165bc64ebcc09bc63d500f9d20f8852",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 0,
+            "selected_episodes": 24
+          }
+        }
+      }
+    },
+    {
+      "seed": 3019,
+      "online": 8411.0,
+      "seconds": 56001.488455484854,
+      "retained_500k": {
+        "score": 4855.208333333333,
+        "successes": 24,
+        "online": 4608.5,
+        "seconds": 13956.290409634938
+      },
+      "evaluation": {
+        "candidate": {
+          "score": 11115.625,
+          "positive_return_episodes": 24,
+          "selected_natural_episodes": 24,
+          "excess": 6,
+          "actions": 114552,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-3019-candidate-frozen.mp4",
+            "sha256": "fa8329652b4dd48727dada0e5c2c930303d8e41f768b027527266c8315389ccf",
+            "stream": 0,
+            "frames": 57269,
+            "fps": 60,
+            "raw_frames_sha256": "e397e8dd128384242882dde52006e671459b26ddad8f82b97c0de7d638192402",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "b11abb6251fa42bb8c944dacf27f31cc6ceba72ce1fa3dae4f65fc91db2cb64a",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 20,
+            "selected_episodes": 24
+          }
+        },
+        "untrained": {
+          "score": 153.125,
+          "positive_return_episodes": 20,
+          "selected_natural_episodes": 24,
+          "excess": 0,
+          "actions": 8920,
+          "unchanged_tensors": {
+            "world": 269,
+            "behavior": 66,
+            "slow_value": 11
+          },
+          "video": {
+            "path": "/x/Code/kindle/runs/cdp-qbert-2m-20261009.992tJMEX/qbert-centered-3019-untrained-frozen.mp4",
+            "sha256": "6d0fa74ce8518a57aead6e6fb4ed8e079e7549f5d2c4f42eba36e674f0841895",
+            "stream": 0,
+            "frames": 4455,
+            "fps": 60,
+            "raw_frames_sha256": "2e54354d267ef5af9334678fded50b7e5d69d19101fe3c5cfdc81c04e0cb969d",
+            "ffmpeg_version": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+          },
+          "audit_sha256": "9e0b1a8413ca80e5ebab5831d2feb14c42e67b128401bebc26b600aa0c66f84d",
+          "task": {
+            "name": "first_pyramid_all_21_cubes",
+            "successes": 0,
+            "selected_episodes": 24
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "status": "complete",
+  "native_sha256": "765e629493f10359bdea1c3dd5dd57ade08800d78df6f8aa1270e4771b40ff97",
+  "source_patch_sha256": "78a5a70ce855f5af0dc6316d65307bfa20a37e837c7c0f0607df1308a47ac62a",
+  "counter_checks": 3204,
+  "measured_samples": 3072,
+  "guards": 2,
+  "allocation_warnings": 0,
+  "minimum_sampled_headroom_bytes": 16549609472,
+  "game_actions": 0,
+  "learner_updates": 0,
+  "gpu_utilization": "unmeasured",
+  "whole_learner_followup_gate": {
+    "sync2_global": false,
+    "sync2_buffer": false,
+    "event2_buffer": false
+  },
+  "timings": [
+    {
+      "mode": "legacy_global",
+      "dispatches": 9,
+      "samples": 192,
+      "gpu_median_ms": 0.018816,
+      "wall_median_ms": 0.060841,
+      "lower_gpu_fraction": 0.0,
+      "round_gpu_median_ms": [
+        0.01872,
+        0.018751999999999998,
+        0.018944
+      ]
+    },
+    {
+      "mode": "sync2_global",
+      "dispatches": 9,
+      "samples": 192,
+      "gpu_median_ms": 0.018976,
+      "wall_median_ms": 0.0607805,
+      "lower_gpu_fraction": -0.008503401360544283,
+      "round_gpu_median_ms": [
+        0.018928,
+        0.018944,
+        0.01904
+      ]
+    },
+    {
+      "mode": "sync2_buffer",
+      "dispatches": 9,
+      "samples": 192,
+      "gpu_median_ms": 0.018976,
+      "wall_median_ms": 0.0573905,
+      "lower_gpu_fraction": -0.008503401360544283,
+      "round_gpu_median_ms": [
+        0.019008,
+        0.018944,
+        0.018896
+      ]
+    },
+    {
+      "mode": "event2_buffer",
+      "dispatches": 9,
+      "samples": 192,
+      "gpu_median_ms": 0.03536,
+      "wall_median_ms": 0.07226550000000001,
+      "lower_gpu_fraction": -0.8792517006802723,
+      "round_gpu_median_ms": [
+        0.035232,
+        0.035392,
+        0.035424
+      ]
+    },
+    {
+      "mode": "legacy_global",
+      "dispatches": 36,
+      "samples": 192,
+      "gpu_median_ms": 0.074144,
+      "wall_median_ms": 0.13014599999999998,
+      "lower_gpu_fraction": 0.0,
+      "round_gpu_median_ms": [
+        0.074128,
+        0.07420800000000001,
+        0.074032
+      ]
+    },
+    {
+      "mode": "sync2_global",
+      "dispatches": 36,
+      "samples": 192,
+      "gpu_median_ms": 0.07419200000000001,
+      "wall_median_ms": 0.12916100000000003,
+      "lower_gpu_fraction": -0.0006473888649116688,
+      "round_gpu_median_ms": [
+        0.07422400000000001,
+        0.07406399999999999,
+        0.074304
+      ]
+    },
+    {
+      "mode": "sync2_buffer",
+      "dispatches": 36,
+      "samples": 192,
+      "gpu_median_ms": 0.07420800000000001,
+      "wall_median_ms": 0.1293715,
+      "lower_gpu_fraction": -0.0008631851532154844,
+      "round_gpu_median_ms": [
+        0.07420800000000001,
+        0.07427199999999999,
+        0.07400000000000001
+      ]
+    },
+    {
+      "mode": "event2_buffer",
+      "dispatches": 36,
+      "samples": 192,
+      "gpu_median_ms": 0.145952,
+      "wall_median_ms": 0.209307,
+      "lower_gpu_fraction": -0.9684937419076391,
+      "round_gpu_median_ms": [
+        0.146096,
+        0.145936,
+        0.145904
+      ]
+    },
+    {
+      "mode": "legacy_global",
+      "dispatches": 839,
+      "samples": 192,
+      "gpu_median_ms": 1.721184,
+      "wall_median_ms": 2.448617,
+      "lower_gpu_fraction": 0.0,
+      "round_gpu_median_ms": [
+        1.72128,
+        1.72112,
+        1.72048
+      ]
+    },
+    {
+      "mode": "sync2_global",
+      "dispatches": 839,
+      "samples": 192,
+      "gpu_median_ms": 1.720752,
+      "wall_median_ms": 2.427742,
+      "lower_gpu_fraction": 0.00025099001617490124,
+      "round_gpu_median_ms": [
+        1.720672,
+        1.720592,
+        1.7212480000000001
+      ]
+    },
+    {
+      "mode": "sync2_buffer",
+      "dispatches": 839,
+      "samples": 192,
+      "gpu_median_ms": 1.7212480000000001,
+      "wall_median_ms": 2.4269065,
+      "lower_gpu_fraction": -3.7183706099952474e-05,
+      "round_gpu_median_ms": [
+        1.7212480000000001,
+        1.7212,
+        1.721296
+      ]
+    },
+    {
+      "mode": "event2_buffer",
+      "dispatches": 839,
+      "samples": 192,
+      "gpu_median_ms": 3.44032,
+      "wall_median_ms": 4.6270215,
+      "lower_gpu_fraction": -0.9988101214048002,
+      "round_gpu_median_ms": [
+        3.45112,
+        3.439632,
+        3.439648
+      ]
+    },
+    {
+      "mode": "legacy_global",
+      "dispatches": 1387,
+      "samples": 192,
+      "gpu_median_ms": 2.844528,
+      "wall_median_ms": 3.999221,
+      "lower_gpu_fraction": 0.0,
+      "round_gpu_median_ms": [
+        2.844576,
+        2.84408,
+        2.84456
+      ]
+    },
+    {
+      "mode": "sync2_global",
+      "dispatches": 1387,
+      "samples": 192,
+      "gpu_median_ms": 2.8439039999999998,
+      "wall_median_ms": 4.009936,
+      "lower_gpu_fraction": 0.00021936855604876015,
+      "round_gpu_median_ms": [
+        2.8436959999999996,
+        2.84392,
+        2.8439360000000002
+      ]
+    },
+    {
+      "mode": "sync2_buffer",
+      "dispatches": 1387,
+      "samples": 192,
+      "gpu_median_ms": 2.844544,
+      "wall_median_ms": 3.9966410000000003,
+      "lower_gpu_fraction": -5.624834770401321e-06,
+      "round_gpu_median_ms": [
+        2.844576,
+        2.844544,
+        2.843808
+      ]
+    },
+    {
+      "mode": "event2_buffer",
+      "dispatches": 1387,
+      "samples": 192,
+      "gpu_median_ms": 5.689184,
+      "wall_median_ms": 7.238485,
+      "lower_gpu_fraction": -1.0000449986781637,
+      "round_gpu_median_ms": [
+        5.690704,
+        5.688976,
+        5.689152
+      ]
+    }
+  ],
+  "scope": "Identical tiny real dependent kernels; GPU intervals exclude host recording/reset/readback. Wall times include host event resets. No whole-learner timing or universal Vulkan lower-bound claim.",
+  "artifact_root": "runs/dependency-paths-20261014.M9e4n1ML",
+  "retained_full_rgb_ms": 24.339903566406242,
+  "retained_complete_jax_ms": 12.836475,
+  "fresh_whole_learner_timing": false,
+  "cpu_command_tests": 4,
+  "failed_build_retained": "failed-build.patch",
+  "decision": "Close these immediate-dependency API alternatives; no follow-up gate passes. Full performance goal remains open."
+}

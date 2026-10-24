@@ -1,0 +1,859 @@
+{
+  "status": "complete",
+  "date": "2026-10-13",
+  "artifacts": "runs/residual-gap-20261013.wXunQUFR",
+  "workload": "RGB12M/B8/T16/H15, 10498772 parameters; staged world and qualified shared typed kernels, unchanged recipe",
+  "ordinary": {
+    "native_ms": 33.7762582109375,
+    "jax_ms": 12.416970416779805,
+    "ratio": 2.7201690168556407,
+    "gap_ms": 21.359287794157694,
+    "jax_source": "docs/results/2026-10-13-execution-gap.json"
+  },
+  "cpu": {
+    "status": "complete",
+    "parity": {
+      "native-cpu-control": {
+        "mean_update_ms": 33.7762582109375,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "exact_reports": 272
+      },
+      "native-cpu-profile": {
+        "mean_update_ms": 33.50179628125,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "exact_reports": 272
+      }
+    },
+    "measured_updates": 256,
+    "summary": {
+      "wall_ms": 33.502420671875,
+      "disjoint_intervals_ms": {
+        "posterior_uploads": 0.5227073984375,
+        "posterior_record": 1.01930953125,
+        "posterior_readback": 3.0997803125,
+        "posterior_unpack": 0.0410957265625,
+        "imagination_prepare": 2.19576680859375,
+        "imagination_record": 1.28349503125,
+        "slow_value_record": 0.04828842578125,
+        "imagination_readback": 5.82779397265625,
+        "cpu_targets": 1.54725879296875,
+        "world_prepare": 0.05336691015625,
+        "world_record": 2.32123867578125,
+        "world_final_wait": 12.94208962890625,
+        "world_metrics": 0.016552515625,
+        "world_sync": 0.06143183984375,
+        "behavior_train": 1.51994559375,
+        "behavior_pre_ema": 0.0091305,
+        "ema_readback": 0.7316976484375,
+        "ema_cpu_and_upload": 0.25030978125,
+        "end": 0.011161578125
+      },
+      "stages": {
+        "posterior": {
+          "wall_ms": 4.68289296875,
+          "inclusive_cpu_spans_ms": {}
+        },
+        "imagination": {
+          "wall_ms": 10.90260303125,
+          "inclusive_cpu_spans_ms": {
+            "wait": 0.00082203125,
+            "step dispatches=1367 groups=1070 chunks=1": 1.27031084765625,
+            "step dispatches=19 groups=15 chunks=1": 0.02566359765625
+          }
+        },
+        "world": {
+          "wall_ms": 15.3946795703125,
+          "inclusive_cpu_spans_ms": {
+            "wait": 12.93998434765625
+          }
+        },
+        "behavior": {
+          "wall_ms": 2.5222451015625,
+          "inclusive_cpu_spans_ms": {
+            "step dispatches=254 groups=37 chunks=1": 0.28796569140625,
+            "wait": 0.96048840625
+          }
+        }
+      }
+    },
+    "overhead_pct": -0.8125883215761909,
+    "scope": "Disjoint intervals exactly cover wall time. CPU spans are nested; no GPU timing or SM activity claim."
+  },
+  "coarse": {
+    "status": "complete",
+    "parity": {
+      "transfer-ordinary": {
+        "mean_update_ms": 35.393780183593755,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "exact_reports": 272
+      },
+      "transfer-coarse": {
+        "mean_update_ms": 35.66384084765624,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "exact_reports": 272
+      }
+    },
+    "summary": {
+      "wall_ms": 35.66655909019608,
+      "gpu_pass_ms": 23.918307137254903,
+      "uncovered_ms": 11.748251952941176,
+      "stages": {
+        "posterior": {
+          "wall_ms": 5.404929262745098,
+          "gpu_pass_ms": 3.4593721725490196,
+          "uncovered_ms": 1.9455570901960784
+        },
+        "imagination": {
+          "wall_ms": 11.09493088627451,
+          "gpu_pass_ms": 5.5726314666666665,
+          "uncovered_ms": 5.522299419607843
+        },
+        "world": {
+          "wall_ms": 16.500543188235294,
+          "gpu_pass_ms": 13.686501270588236,
+          "uncovered_ms": 2.814041917647059
+        },
+        "behavior": {
+          "wall_ms": 2.6661557529411763,
+          "gpu_pass_ms": 1.1998022274509803,
+          "uncovered_ms": 1.466353525490196
+        }
+      },
+      "host": {
+        "posterior_uploads": {
+          "wall_ms": 0.5246652039215687,
+          "gpu_overlap_ms": 0
+        },
+        "imagination_prepare": {
+          "wall_ms": 2.2371643098039216,
+          "gpu_overlap_ms": 0
+        },
+        "cpu_targets": {
+          "wall_ms": 1.5743296352941176,
+          "gpu_overlap_ms": 0
+        },
+        "world_prepare": {
+          "wall_ms": 0.06296094509803922,
+          "gpu_overlap_ms": 0
+        },
+        "world_record_and_chunk_wait": {
+          "wall_ms": 2.3955201764705882,
+          "gpu_overlap_ms": 0
+        },
+        "world_final_wait": {
+          "wall_ms": 13.955155521568628,
+          "gpu_overlap_ms": 13.686501270588236
+        },
+        "world_metrics": {
+          "wall_ms": 0.014477713725490195,
+          "gpu_overlap_ms": 0
+        },
+        "world_sync": {
+          "wall_ms": 0.07242883137254902,
+          "gpu_overlap_ms": 0
+        },
+        "behavior_sync": {
+          "wall_ms": 1.0502410901960784,
+          "gpu_overlap_ms": 0.27841669019607845
+        },
+        "ema_readback": {
+          "wall_ms": 0.7757916862745098,
+          "gpu_overlap_ms": 0.27841669019607845
+        },
+        "ema_cpu_and_upload": {
+          "wall_ms": 0.2530947960784314,
+          "gpu_overlap_ms": 0
+        }
+      }
+    },
+    "complete_updates": 255,
+    "complete_gpu_pass_counts": {
+      "step 1/1": 5,
+      "kindle_readback": 2,
+      "kindle_device_copy": 2,
+      "agc_norms": 2,
+      "agc_factor": 2,
+      "agc_apply": 2,
+      "adam_update": 2,
+      "parameter_readback": 2
+    },
+    "incomplete_updates": [
+      {
+        "step": 271,
+        "wall_ms": 35.192749,
+        "gpu_pass_ms": 18.749952,
+        "uncovered_ms": 16.442797,
+        "gpu_pass_counts": {
+          "step 1/1": 4,
+          "kindle_readback": 2,
+          "kindle_device_copy": 1,
+          "agc_norms": 2,
+          "agc_factor": 2,
+          "agc_apply": 2,
+          "adam_update": 2,
+          "parameter_readback": 2
+        },
+        "stages": {
+          "posterior": {
+            "wall_ms": 5.170387,
+            "gpu_pass_ms": 3.456512,
+            "uncovered_ms": 1.713875
+          },
+          "imagination": {
+            "wall_ms": 11.01115,
+            "gpu_pass_ms": 0.423904,
+            "uncovered_ms": 10.587246
+          },
+          "world": {
+            "wall_ms": 16.226587,
+            "gpu_pass_ms": 13.664352,
+            "uncovered_ms": 2.562235
+          },
+          "behavior": {
+            "wall_ms": 2.784625,
+            "gpu_pass_ms": 1.205184,
+            "uncovered_ms": 1.579441
+          }
+        },
+        "host": {
+          "posterior_uploads": {
+            "wall_ms": 0.529605,
+            "gpu_overlap_ms": 0
+          },
+          "imagination_prepare": {
+            "wall_ms": 2.319721,
+            "gpu_overlap_ms": 0
+          },
+          "cpu_targets": {
+            "wall_ms": 1.531044,
+            "gpu_overlap_ms": 0
+          },
+          "world_prepare": {
+            "wall_ms": 0.05068,
+            "gpu_overlap_ms": 0
+          },
+          "world_record_and_chunk_wait": {
+            "wall_ms": 2.278171,
+            "gpu_overlap_ms": 0
+          },
+          "world_final_wait": {
+            "wall_ms": 13.808665,
+            "gpu_overlap_ms": 13.664352
+          },
+          "world_metrics": {
+            "wall_ms": 0.01381,
+            "gpu_overlap_ms": 0
+          },
+          "world_sync": {
+            "wall_ms": 0.075261,
+            "gpu_overlap_ms": 0
+          },
+          "behavior_sync": {
+            "wall_ms": 1.051629,
+            "gpu_overlap_ms": 0.2784
+          },
+          "ema_readback": {
+            "wall_ms": 0.776567,
+            "gpu_overlap_ms": 0.2784
+          },
+          "ema_cpu_and_upload": {
+            "wall_ms": 0.253892,
+            "gpu_overlap_ms": 0
+          }
+        }
+      }
+    ],
+    "coarse_overhead_pct": 0.7630172947383107,
+    "scope": "Calibrated complete-pass intervals include barriers; not SM/kernel-active time. Host entries overlap; do not add."
+  },
+  "native_passes_ms": {
+    "posterior_prefix": 3.4043039372549018,
+    "transfers": 0.674747105882353,
+    "imagination": 5.059517615686275,
+    "slow_value": 0.1718516705882353,
+    "world_suffix": 13.283901866666668,
+    "optimizer": 0.4630387450980392,
+    "behavior_gradient": 0.8609461960784314
+  },
+  "native_graph_ms": 22.78052128627451,
+  "masks": {
+    "status": "complete",
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "sessions": {
+      "behavior_gradient": {
+        "dispatches": 254,
+        "family_counts": {
+          "remaining": 221,
+          "matrix": 33
+        },
+        "baseline_gpu_ms": 0.85293425,
+        "mask_means_ms": {
+          "0": 0.077126,
+          "1": 0.077208,
+          "2": 0.46553666666666665,
+          "3": 0.46532,
+          "4": 0.431114,
+          "5": 0.43143,
+          "6": 0.85417,
+          "7": 0.8535806666666667
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.077246,
+            "1": 0.077196,
+            "2": 0.464418,
+            "3": 0.465128,
+            "4": 0.431188,
+            "5": 0.431316,
+            "6": 0.854754,
+            "7": 0.853682
+          },
+          {
+            "0": 0.077072,
+            "1": 0.077238,
+            "2": 0.46544,
+            "3": 0.465126,
+            "4": 0.431128,
+            "5": 0.431948,
+            "6": 0.854556,
+            "7": 0.853568
+          },
+          {
+            "0": 0.07706,
+            "1": 0.07719,
+            "2": 0.466752,
+            "3": 0.465706,
+            "4": 0.431026,
+            "5": 0.431026,
+            "6": 0.8532,
+            "7": 0.853492
+          }
+        ],
+        "shapley_sweeps_ms": [
+          {
+            "command_stream_floor": 0.077246,
+            "convolution": -0.00023433333333332715,
+            "matrix": 0.40509566666666663,
+            "remaining": 0.3715746666666667
+          },
+          {
+            "command_stream_floor": 0.077072,
+            "convolution": -0.00018966666666667129,
+            "matrix": 0.4052153333333333,
+            "remaining": 0.37147033333333335
+          },
+          {
+            "command_stream_floor": 0.07706,
+            "convolution": -0.00003366666666664485,
+            "matrix": 0.4058343333333333,
+            "remaining": 0.3706313333333333
+          }
+        ],
+        "shapley_ms": {
+          "command_stream_floor": 0.077126,
+          "convolution": -0.00015255555555554777,
+          "matrix": 0.40538177777777773,
+          "remaining": 0.37122544444444444
+        },
+        "marginal_removal_ms": {
+          "convolution": -0.0005893333333332936,
+          "matrix": 0.4221506666666667,
+          "remaining": 0.3882606666666667
+        }
+      },
+      "imagination": {
+        "dispatches": 1367,
+        "family_counts": {
+          "remaining": 1179,
+          "matrix": 188
+        },
+        "baseline_gpu_ms": 5.075849,
+        "mask_means_ms": {
+          "0": 2.1913913333333332,
+          "1": 2.1913673333333334,
+          "2": 3.568422,
+          "3": 3.5685766666666665,
+          "4": 3.6327206666666667,
+          "5": 3.633093333333333,
+          "6": 5.076284,
+          "7": 5.07998
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 2.19144,
+            "1": 2.191574,
+            "2": 3.56814,
+            "3": 3.5686999999999998,
+            "4": 3.62942,
+            "5": 3.629698,
+            "6": 5.069444,
+            "7": 5.076842
+          },
+          {
+            "0": 2.191392,
+            "1": 2.1911620000000003,
+            "2": 3.56869,
+            "3": 3.56806,
+            "4": 3.634358,
+            "5": 3.6335759999999997,
+            "6": 5.080122,
+            "7": 5.081176
+          },
+          {
+            "0": 2.191342,
+            "1": 2.191366,
+            "2": 3.568436,
+            "3": 3.5689699999999998,
+            "4": 3.634384,
+            "5": 3.636006,
+            "6": 5.079286,
+            "7": 5.081922
+          }
+        ],
+        "shapley_sweeps_ms": [
+          {
+            "command_stream_floor": 2.19144,
+            "convolution": 0.002650333333333347,
+            "matrix": 1.4108063333333332,
+            "remaining": 1.4719453333333332
+          },
+          {
+            "command_stream_floor": 2.191392,
+            "convolution": 0.00003933333333328015,
+            "matrix": 1.4120763333333335,
+            "remaining": 1.4776683333333334
+          },
+          {
+            "command_stream_floor": 2.191342,
+            "convolution": 0.0012459999999998583,
+            "matrix": 1.4114209999999998,
+            "remaining": 1.4779129999999998
+          }
+        ],
+        "shapley_ms": {
+          "command_stream_floor": 2.1913913333333332,
+          "convolution": 0.0013118888888888284,
+          "matrix": 1.4114345555555554,
+          "remaining": 1.475842222222222
+        },
+        "marginal_removal_ms": {
+          "convolution": 0.0036959999999999957,
+          "matrix": 1.4468866666666667,
+          "remaining": 1.5114033333333334
+        }
+      },
+      "slow_value": {
+        "dispatches": 19,
+        "family_counts": {
+          "remaining": 15,
+          "matrix": 4
+        },
+        "baseline_gpu_ms": 0.15915275,
+        "mask_means_ms": {
+          "0": 0.031982,
+          "1": 0.03196,
+          "2": 0.10850266666666666,
+          "3": 0.10844066666666666,
+          "4": 0.082526,
+          "5": 0.082574,
+          "6": 0.159346,
+          "7": 0.15896933333333332
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 0.032024,
+            "1": 0.031954,
+            "2": 0.108498,
+            "3": 0.10850599999999999,
+            "4": 0.082276,
+            "5": 0.08248799999999999,
+            "6": 0.159502,
+            "7": 0.159164
+          },
+          {
+            "0": 0.032058,
+            "1": 0.031952,
+            "2": 0.108696,
+            "3": 0.108302,
+            "4": 0.08269599999999999,
+            "5": 0.08266,
+            "6": 0.159132,
+            "7": 0.159334
+          },
+          {
+            "0": 0.031863999999999996,
+            "1": 0.031974,
+            "2": 0.108314,
+            "3": 0.108514,
+            "4": 0.082606,
+            "5": 0.082574,
+            "6": 0.159404,
+            "7": 0.15841
+          }
+        ],
+        "shapley_sweeps_ms": [
+          {
+            "command_stream_floor": 0.032024,
+            "convolution": -0.00009933333333333552,
+            "matrix": 0.07667966666666666,
+            "remaining": 0.05055966666666667
+          },
+          {
+            "command_stream_floor": 0.032058,
+            "convolution": -0.000039666666666664685,
+            "matrix": 0.07656833333333334,
+            "remaining": 0.050747333333333325
+          },
+          {
+            "command_stream_floor": 0.031863999999999996,
+            "convolution": -0.0002666666666666627,
+            "matrix": 0.07631833333333332,
+            "remaining": 0.05049433333333332
+          }
+        ],
+        "shapley_ms": {
+          "command_stream_floor": 0.031982,
+          "convolution": -0.00013522222222222099,
+          "matrix": 0.07652211111111111,
+          "remaining": 0.05060044444444444
+        },
+        "marginal_removal_ms": {
+          "convolution": -0.00037666666666666404,
+          "matrix": 0.07639533333333334,
+          "remaining": 0.05052866666666667
+        }
+      },
+      "world_gradient": {
+        "dispatches": 4508,
+        "family_counts": {
+          "remaining": 3994,
+          "matrix": 491,
+          "convolution": 23
+        },
+        "baseline_gpu_ms": 16.67867025,
+        "mask_means_ms": {
+          "0": 2.994165333333333,
+          "1": 10.077701333333334,
+          "2": 5.479615333333333,
+          "3": 12.685825333333334,
+          "4": 7.041277333333333,
+          "5": 13.756698666666667,
+          "6": 9.995805333333333,
+          "7": 16.675554
+        },
+        "mask_sweeps_ms": [
+          {
+            "0": 2.993854,
+            "1": 10.075206,
+            "2": 5.4799999999999995,
+            "3": 12.68418,
+            "4": 7.036874,
+            "5": 13.754604,
+            "6": 9.999217999999999,
+            "7": 16.670202
+          },
+          {
+            "0": 2.994562,
+            "1": 10.076452,
+            "2": 5.479234,
+            "3": 12.691424,
+            "4": 7.043524,
+            "5": 13.757083999999999,
+            "6": 9.993426,
+            "7": 16.682224
+          },
+          {
+            "0": 2.99408,
+            "1": 10.081446,
+            "2": 5.479612,
+            "3": 12.681872,
+            "4": 7.0434339999999995,
+            "5": 13.758408,
+            "6": 9.994772,
+            "7": 16.674236
+          }
+        ],
+        "shapley_sweeps_ms": [
+          {
+            "command_stream_floor": 2.993854,
+            "convolution": 6.904430333333333,
+            "matrix": 2.7291343333333327,
+            "remaining": 4.0427833333333325
+          },
+          {
+            "command_stream_floor": 2.994562,
+            "convolution": 6.911187666666666,
+            "matrix": 2.730749666666667,
+            "remaining": 4.045724666666667
+          },
+          {
+            "command_stream_floor": 2.99408,
+            "convolution": 6.908482333333334,
+            "matrix": 2.7257473333333335,
+            "remaining": 4.045926333333332
+          }
+        ],
+        "shapley_ms": {
+          "command_stream_floor": 2.994165333333333,
+          "convolution": 6.9080334444444444,
+          "matrix": 2.728543777777778,
+          "remaining": 4.044811444444444
+        },
+        "marginal_removal_ms": {
+          "convolution": 6.679748666666668,
+          "matrix": 2.9188553333333345,
+          "remaining": 3.9897286666666676
+        }
+      }
+    },
+    "total_dispatches": 6148,
+    "baseline_gpu_ms": 22.76660625,
+    "mask_means_ms": {
+      "0": 5.294664666666666,
+      "1": 12.378236666666668,
+      "2": 9.622076666666667,
+      "3": 16.828162666666667,
+      "4": 11.187638,
+      "5": 17.903796,
+      "6": 16.085605333333334,
+      "7": 22.768084
+    },
+    "shapley_ms": {
+      "command_stream_floor": 5.294664666666666,
+      "convolution": 6.909057555555555,
+      "matrix": 4.621882222222222,
+      "remaining": 5.942479555555555
+    },
+    "scope": "Counterfactual zero-workgroup dispatches retain bindings/barriers. Masked outputs are not valid learner outputs. Shapley allocates cache/overlap interactions; not pure kernel durations or independently additive optimization savings."
+  },
+  "zero_barriers": {
+    "status": "complete",
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "sessions": {
+      "behavior_gradient": {
+        "dispatches": 254,
+        "groups": 37,
+        "baseline_gpu_ms": 0.8538505,
+        "sweeps": [
+          {
+            "original_ms": 0.077184,
+            "merged_ms": 0.0134255
+          },
+          {
+            "original_ms": 0.0771795,
+            "merged_ms": 0.0133815
+          },
+          {
+            "original_ms": 0.0771625,
+            "merged_ms": 0.013359
+          }
+        ],
+        "original_zero_ms": 0.07717533333333333,
+        "merged_zero_ms": 0.013388666666666667,
+        "barrier_difference_ms": 0.06378666666666666
+      },
+      "imagination": {
+        "dispatches": 1367,
+        "groups": 1070,
+        "baseline_gpu_ms": 5.01701225,
+        "sweeps": [
+          {
+            "original_ms": 2.1913715,
+            "merged_ms": 0.0599865
+          },
+          {
+            "original_ms": 2.1912815,
+            "merged_ms": 0.0602115
+          },
+          {
+            "original_ms": 2.191489,
+            "merged_ms": 0.060245
+          }
+        ],
+        "original_zero_ms": 2.1913806666666664,
+        "merged_zero_ms": 0.06014766666666667,
+        "barrier_difference_ms": 2.131233
+      },
+      "slow_value": {
+        "dispatches": 19,
+        "groups": 15,
+        "baseline_gpu_ms": 0.15854425,
+        "sweeps": [
+          {
+            "original_ms": 0.0319735,
+            "merged_ms": 0.0035875
+          },
+          {
+            "original_ms": 0.0318875,
+            "merged_ms": 0.003572
+          },
+          {
+            "original_ms": 0.0319445,
+            "merged_ms": 0.0035825
+          }
+        ],
+        "original_zero_ms": 0.03193516666666667,
+        "merged_zero_ms": 0.003580666666666667,
+        "barrier_difference_ms": 0.0283545
+      },
+      "world_gradient": {
+        "dispatches": 4508,
+        "groups": 1433,
+        "baseline_gpu_ms": 16.68268125,
+        "sweeps": [
+          {
+            "original_ms": 2.9943905,
+            "merged_ms": 0.196445
+          },
+          {
+            "original_ms": 2.993585,
+            "merged_ms": 0.196373
+          },
+          {
+            "original_ms": 2.9943215,
+            "merged_ms": 0.196495
+          }
+        ],
+        "original_zero_ms": 2.994099,
+        "merged_zero_ms": 0.19643766666666668,
+        "barrier_difference_ms": 2.797661333333333
+      }
+    },
+    "total_dispatches": 6148,
+    "original_barriers": 2551,
+    "baseline_gpu_ms": 22.71208825,
+    "original_zero_ms": 5.294590166666666,
+    "merged_zero_ms": 0.27355466666666667,
+    "barrier_difference_ms": 5.0210355,
+    "scope": "No real work executes without dependency barriers. Both zero-work arms retain dispatch order, bindings and pipeline switches. Difference is a counterfactual barrier-packet cost, not independently removable learner time."
+  },
+  "jax_retained_capture": {
+    "summary": {
+      "nvtx_wall_ms": 15.78736625,
+      "gpu_union_ms": 10.295496625,
+      "kernel_sum_ms": 9.869361875000001,
+      "copy_sum_ms": 0.42613475,
+      "uncovered_ms": 5.491869625,
+      "kernels": 3429,
+      "copies": 437
+    },
+    "families_ms": {
+      "fusion_and_other": 3.470207750000113,
+      "convolution_forward_or_other": 1.8527128749999997,
+      "matrix_product": 2.3661768749999976,
+      "convolution_weight_gradient": 1.4358224999999998,
+      "convolution_input_gradient": 0.7444418749999999
+    },
+    "exact_reports": 24,
+    "exact_initial_state_tensors": 288,
+    "all_eight_samples_retained": true
+  },
+  "profiled_gap_ms": 19.879192840196083,
+  "profiled_bridge_ms": {
+    "convolution": 2.876080305555556,
+    "matrix": 2.2557053472222246,
+    "other_and_optimizer": 2.9353105506534813,
+    "zero_work_stream": 5.294664666666666,
+    "transfers": 0.24861235588235298,
+    "outside_passes": 6.256382327941177,
+    "fixed_graph_residual": 0.012437286274508352
+  },
+  "ordinary_minus_profiled_boundary_difference_ms": 1.4800949539616113,
+  "incomplete_coverage_first_pair": {
+    "source": "single-audit.json",
+    "pass_count": 15,
+    "omitted": "Two Kindle readbacks and two device copies; superseded for uncovered-time claims, all parity checks passed"
+  },
+  "guards": [
+    {
+      "path": "cpu-queue/native-cpu-control",
+      "passed": true,
+      "new_warnings": 0
+    },
+    {
+      "path": "cpu-queue/native-cpu-profile",
+      "passed": true,
+      "new_warnings": 1
+    },
+    {
+      "path": "single-queue/single-ordinary",
+      "passed": true,
+      "new_warnings": 1
+    },
+    {
+      "path": "single-queue/single-coarse",
+      "passed": true,
+      "new_warnings": 0
+    },
+    {
+      "path": "transfer-queue/transfer-ordinary",
+      "passed": true,
+      "new_warnings": 0
+    },
+    {
+      "path": "transfer-queue/transfer-coarse",
+      "passed": true,
+      "new_warnings": 1
+    },
+    {
+      "path": "masks-queue/family-masks",
+      "passed": true,
+      "new_warnings": 0
+    },
+    {
+      "path": "barriers-queue/zero-barriers",
+      "passed": true,
+      "new_warnings": 0
+    }
+  ],
+  "allocation_warnings": 3,
+  "full_synthetic_updates": 1634,
+  "game_actions": 0,
+  "model_precision_or_trajectory_changed": false,
+  "production_changed": false,
+  "sha256": {
+    "backend.patch": "efe5c5a159190e3966fe3fb146adda38abc6da03e55c814ad3d76579cd4a9ea0",
+    "kindle.patch": "d370909c0acf0e764336306372c8f51fda101dada4bdf45048f25f3b5cdbb34d",
+    "kindle-tests": "781324dcda8b270ffed51b230921c330deee0e6a0ebc01364cbd72275d9c60a9",
+    "transfer-backend.patch": "efe5c5a159190e3966fe3fb146adda38abc6da03e55c814ad3d76579cd4a9ea0",
+    "transfer-kindle.patch": "fb1bf5a267fa0e0da489cf35e8fa1165174d2745eb1febff893fe10af3007db1",
+    "transfer-kindle-tests": "f05cd85bc795f4f4632b8aa41adb0f196fb988558b66a08b2237f2d3520f49af",
+    "barriers-backend.patch": "96c06766a9bae09e9cceca1c43b525d450ae8c5faa72f47cdb26bed8f561054a",
+    "barriers-kindle.patch": "41e94304d9eb2ae23f27c6a754642444bfc5ba73be2024264924d0cc3703a2f1",
+    "barriers-kindle-tests": "659fb60c529c682cebca3cfb1890a3bc226fc2baaf210f193930bd844c498b35"
+  },
+  "limits": [
+    "Counterfactual Shapley components are not independently removable savings.",
+    "Zero-work streams cannot establish that real dependency barriers are removable.",
+    "Coarse capture uses separately timed one-chunk stages, not ordinary overlap scheduling.",
+    "JAX CUDA capture is retained, not simultaneous; native/JAX arithmetic and RNG trajectories differ.",
+    "Pass intervals include barriers and do not measure SM utilization.",
+    "This accounts for the current gap; it is not performance parity or goal completion."
+  ]
+}

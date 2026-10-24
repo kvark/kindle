@@ -1,0 +1,960 @@
+{
+  "status": "complete",
+  "date": "2026-10-13",
+  "artifacts": "runs/compiler-boundaries-20261013.fjZrpsqb",
+  "pointwise": {
+    "rgb": {
+      "exact_reports": 2,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 292,
+          "exact": 292,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 292,
+          "exact": 262,
+          "relative_l2": 0.14526208681295708,
+          "max_abs": 27.547132164239883
+        },
+        "final": {
+          "tensors": 292,
+          "exact": 2,
+          "relative_l2": 0.06594853739868006,
+          "max_abs": 1.0742099285125732
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true
+        },
+        "deter": {
+          "exact": true
+        },
+        "imagined_slow_target": {
+          "exact": true
+        },
+        "imagined_value_target": {
+          "exact": true
+        },
+        "imagined_weight": {
+          "exact": true
+        },
+        "replay_slow_target": {
+          "exact": true
+        },
+        "replay_value_target": {
+          "exact": true
+        },
+        "replay_weight": {
+          "exact": true
+        },
+        "stoch": {
+          "exact": true
+        }
+      },
+      "final_state_scope": "paired",
+      "prefix_dispatches": 1132,
+      "posterior_is_world_prefix": true,
+      "minimum_headroom_bytes": 15100346368,
+      "control_ms": 32.864163132812486,
+      "fused_ms": 32.10334828906252,
+      "less_time_percent": 2.3150288071396297,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 2.5589233203124997,
+          "imagination_and_targets": 10.1686957421875,
+          "posterior": 4.69605248828125,
+          "world_train_and_sync": 15.44049158203125
+        },
+        "fused": {
+          "behavior_train_and_sync": 2.5395038593750003,
+          "imagination_and_targets": 9.94524873046875,
+          "posterior": 4.48785856640625,
+          "world_train_and_sync": 15.1307371328125
+        }
+      }
+    },
+    "cdp": {
+      "exact_reports": 1,
+      "reports": 272,
+      "tensors": {
+        "initial": {
+          "tensors": 346,
+          "exact": 346,
+          "relative_l2": 0,
+          "max_abs": 0
+        },
+        "first": {
+          "tensors": 346,
+          "exact": 260,
+          "relative_l2": 0.0000015102075146952136,
+          "max_abs": 0.007157951593399048
+        },
+        "final": {
+          "tensors": 346,
+          "exact": 0,
+          "relative_l2": 0.6068390774217562,
+          "max_abs": 5.561053946614265
+        }
+      },
+      "first_outputs": {
+        "action_target": {
+          "exact": true
+        },
+        "deter": {
+          "exact": true
+        },
+        "imagined_slow_target": {
+          "exact": true
+        },
+        "imagined_value_target": {
+          "exact": false,
+          "changed": 2,
+          "relative_l2": 1.1678426186641942e-9,
+          "max_abs": 5.960464477539063e-8
+        },
+        "imagined_weight": {
+          "exact": true
+        },
+        "replay_slow_target": {
+          "exact": true
+        },
+        "replay_value_target": {
+          "exact": true
+        },
+        "replay_weight": {
+          "exact": true
+        },
+        "stoch": {
+          "exact": true
+        }
+      },
+      "final_state_scope": "paired",
+      "prefix_dispatches": 0,
+      "posterior_is_world_prefix": false,
+      "minimum_headroom_bytes": 11300503552,
+      "control_ms": 105.18505776171875,
+      "fused_ms": 103.92513210156244,
+      "less_time_percent": 1.1978180998012955,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 5.85256623046875,
+          "imagination_and_targets": 40.19889074609375,
+          "posterior": 12.01963971484375,
+          "world_train_and_sync": 47.1139610703125
+        },
+        "fused": {
+          "behavior_train_and_sync": 5.964000371093751,
+          "imagination_and_targets": 39.7986772734375,
+          "posterior": 11.94935573828125,
+          "world_train_and_sync": 46.21309871875
+        }
+      }
+    }
+  },
+  "pointwise_inventory": {
+    "rgb": {
+      "imagination": {
+        "control": {
+          "dispatches": 1087,
+          "groups": 854
+        },
+        "fused": {
+          "dispatches": 1072,
+          "groups": 839
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "world_gradient": {
+        "control": {
+          "dispatches": 4492,
+          "groups": 1433
+        },
+        "fused": {
+          "dispatches": 4168,
+          "groups": 1387
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "behavior_gradient": {
+        "control": {
+          "dispatches": 254,
+          "groups": 37
+        },
+        "fused": {
+          "dispatches": 247,
+          "groups": 36
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "slow_value": {
+        "control": {
+          "dispatches": 13,
+          "groups": 9
+        },
+        "fused": {
+          "dispatches": 13,
+          "groups": 9
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "total_dispatches": {
+        "control": 5846,
+        "fused": 5500
+      }
+    },
+    "cdp": {
+      "posterior": {
+        "control": {
+          "dispatches": 1106,
+          "groups": 615
+        },
+        "fused": {
+          "dispatches": 1088,
+          "groups": 600
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "imagination": {
+        "control": {
+          "dispatches": 1059,
+          "groups": 764
+        },
+        "fused": {
+          "dispatches": 1042,
+          "groups": 749
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "world_gradient": {
+        "control": {
+          "dispatches": 4123,
+          "groups": 1136
+        },
+        "fused": {
+          "dispatches": 3810,
+          "groups": 1089
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "behavior_gradient": {
+        "control": {
+          "dispatches": 254,
+          "groups": 37
+        },
+        "fused": {
+          "dispatches": 247,
+          "groups": 36
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "slow_value": {
+        "control": {
+          "dispatches": 13,
+          "groups": 9
+        },
+        "fused": {
+          "dispatches": 13,
+          "groups": 9
+        },
+        "matrix_convolution_descriptors_exact": true
+      },
+      "total_dispatches": {
+        "control": 6555,
+        "fused": 6200
+      }
+    }
+  },
+  "pointwise_qualification": {
+    "cases": 224,
+    "f64_comparisons": 672,
+    "exact_rne_values": 122108,
+    "cpu_shader_variants": 28,
+    "scope": "Primitive inference/raw gradients qualify. Full-model arithmetic trajectories change; not learning equivalence."
+  },
+  "first_state_diagnosis": {
+    "status": "complete",
+    "scope": "Consistency check, not a raw-gradient measurement or proof of driver flush mode.",
+    "all_first_rgb_parameter_tensors_exact": true,
+    "optimizer": {
+      "beta1": 0.8999999761581421,
+      "beta2": 0.9990000128746033,
+      "epsilon": 9.999999682655225e-21
+    },
+    "examples": [
+      {
+        "parameter": "behavior.actor.layer0.weight",
+        "index": 483071,
+        "control": {
+          "m": -27.447134017944336,
+          "v": 0,
+          "gradient_inferred_from_m_v_not_observed": -2.7447126603018952e-18,
+          "f64_second_moment_from_inferred_gradient": 7.53335059747255e-39,
+          "predicted_below_f32_normal": true
+        },
+        "candidate": {
+          "m": 0.09999814629554749,
+          "v": 2.8309533765786328e-34,
+          "gradient_inferred_from_m_v_not_observed": 5.320704784713004e-16,
+          "f64_second_moment_from_inferred_gradient": 2.8309534927344345e-34,
+          "predicted_below_f32_normal": false
+        }
+      },
+      {
+        "parameter": "behavior.actor.layer1.weight",
+        "index": 3696,
+        "control": {
+          "m": -24.83130645751953,
+          "v": 0,
+          "gradient_inferred_from_m_v_not_observed": -2.4831299749267794e-18,
+          "f64_second_moment_from_inferred_gradient": 6.165855088419738e-39,
+          "predicted_below_f32_normal": true
+        },
+        "candidate": {
+          "m": 0.09999475628137589,
+          "v": 3.59540846219269e-35,
+          "gradient_inferred_from_m_v_not_observed": 1.8961685562331964e-16,
+          "f64_second_moment_from_inferred_gradient": 3.5954089035882856e-35,
+          "predicted_below_f32_normal": false
+        }
+      },
+      {
+        "parameter": "behavior.actor.layer2.weight",
+        "index": 55455,
+        "control": {
+          "m": -0.0999806597828865,
+          "v": 2.6634193373911813e-36,
+          "gradient_inferred_from_m_v_not_observed": -5.1608663091249624e-17,
+          "f64_second_moment_from_inferred_gradient": 2.6634198151511637e-36,
+          "predicted_below_f32_normal": false
+        },
+        "candidate": {
+          "m": 0.628922164440155,
+          "v": 0,
+          "gradient_inferred_from_m_v_not_observed": 6.289219945349506e-20,
+          "f64_second_moment_from_inferred_gradient": 3.955377827522252e-42,
+          "predicted_below_f32_normal": true
+        }
+      }
+    ]
+  },
+  "native_cpu": {
+    "wall_ms": 32.25415444140625,
+    "on_cpu_ms": 9.09415882421875,
+    "off_cpu_ms": 23.159995617187498,
+    "samples": 10202,
+    "resolved_leaf_samples": 4173,
+    "broken_backtrace_samples": 10171,
+    "scheduling_anomalies": [],
+    "leaf_modules": [
+      {
+        "module": "kindle-tests",
+        "samples": 3939,
+        "percent": 38.61007645559694
+      },
+      {
+        "module": "libnvidia-eglcore.so.580.178.04",
+        "samples": 3510,
+        "percent": 34.40501862379926
+      },
+      {
+        "module": "libc.so.6",
+        "samples": 2621,
+        "percent": 25.691040972358362
+      },
+      {
+        "module": "[kernel.kallsyms]",
+        "samples": 92,
+        "percent": 0.9017839639286415
+      },
+      {
+        "module": "libToolsInjection64.so",
+        "samples": 25,
+        "percent": 0.2450499901980004
+      },
+      {
+        "module": "[vdso]",
+        "samples": 6,
+        "percent": 0.05881199764752009
+      }
+    ],
+    "osrt_union_ms": 23.1934409375,
+    "osrt": [
+      {
+        "name": "poll",
+        "count": 3337,
+        "mean_per_update_ms": 22.0125121328125,
+        "max_ms": 6.930772,
+        "on_cpu_per_update_ms": 0.028828921875
+      },
+      {
+        "name": "futex",
+        "count": 1052,
+        "mean_per_update_ms": 1.1809288046875,
+        "max_ms": 0.761547,
+        "on_cpu_per_update_ms": 0.00798334375
+      }
+    ],
+    "stages": {
+      "posterior": {
+        "wall_ms": 4.687216296875,
+        "on_cpu_ms": 1.636556359375,
+        "samples": 1845
+      },
+      "imagination_and_targets": {
+        "wall_ms": 9.99382403125,
+        "on_cpu_ms": 3.9550929765625,
+        "samples": 4438
+      },
+      "world_train_and_sync": {
+        "wall_ms": 15.100473390625,
+        "on_cpu_ms": 2.3253419375,
+        "samples": 2613
+      },
+      "behavior_train_and_sync": {
+        "wall_ms": 2.46849005078125,
+        "on_cpu_ms": 1.17301687890625,
+        "samples": 1302
+      }
+    }
+  },
+  "native_cpu_parity": {
+    "status": "complete",
+    "reports_exact": 272,
+    "first_outputs_exact": true,
+    "tensors_exact": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "control_ms": 32.864163132812486,
+    "captured_ms": 32.2529188046875,
+    "captured_difference_percent": -1.8599114350022816,
+    "scope": "CPU instrumentation comparison on the same qualified row-fusion binary; difference is not a speedup.",
+    "minimum_headroom_bytes": 15095300096
+  },
+  "jax_cpu": {
+    "wall_ms": 13.09346141796875,
+    "on_cpu_ms": 6.5749705078125,
+    "off_cpu_ms": 6.518490910156251,
+    "samples": 7362,
+    "resolved_leaf_samples": 4335,
+    "broken_backtrace_samples": 7362,
+    "scheduling_anomalies": [],
+    "leaf_modules": [
+      {
+        "module": "libc.so.6",
+        "samples": 1910,
+        "percent": 25.944036946481933
+      },
+      {
+        "module": "python3.11",
+        "samples": 1307,
+        "percent": 17.753327900027166
+      },
+      {
+        "module": "xla_cuda_plugin.so",
+        "samples": 1211,
+        "percent": 16.449334419994567
+      },
+      {
+        "module": "libcuda.so.580.178.04",
+        "samples": 1116,
+        "percent": 15.158924205378973
+      },
+      {
+        "module": "libjax_common.so",
+        "samples": 662,
+        "percent": 8.992121706058136
+      },
+      {
+        "module": "libToolsInjection64.so",
+        "samples": 560,
+        "percent": 7.606628633523499
+      }
+    ],
+    "osrt_union_ms": 6.488180578125,
+    "osrt": [
+      {
+        "name": "futex",
+        "count": 511,
+        "mean_per_update_ms": 6.46373334765625,
+        "max_ms": 7.080834,
+        "on_cpu_per_update_ms": 0.00656826171875
+      },
+      {
+        "name": "pthread_cond_signal",
+        "count": 3501,
+        "mean_per_update_ms": 0.02273592578125,
+        "max_ms": 0.02251,
+        "on_cpu_per_update_ms": 0.02252905078125
+      },
+      {
+        "name": "write",
+        "count": 255,
+        "mean_per_update_ms": 0.001535328125,
+        "max_ms": 0.00229,
+        "on_cpu_per_update_ms": 0.001535328125
+      },
+      {
+        "name": "pthread_mutex_lock",
+        "count": 5,
+        "mean_per_update_ms": 0.0001759765625,
+        "max_ms": 0.01848,
+        "on_cpu_per_update_ms": 0.00005015625
+      }
+    ],
+    "stages": {
+      "seed": {
+        "wall_ms": 0.26451506640625,
+        "on_cpu_ms": 0.25350137109375,
+        "samples": 290
+      },
+      "train": {
+        "wall_ms": 12.63487838671875,
+        "on_cpu_ms": 6.13486234375,
+        "samples": 6866
+      },
+      "metrics": {
+        "wall_ms": 0.11801902734375,
+        "on_cpu_ms": 0.117049953125,
+        "samples": 140
+      }
+    }
+  },
+  "jax_parity": {
+    "status": "complete",
+    "exact_reports": 272,
+    "exact_state_receipt_leaves": {
+      "initial": {
+        "params": 288,
+        "policy": 69,
+        "carry": 3
+      },
+      "first": {
+        "params": 288,
+        "policy": 69,
+        "carry": 3
+      },
+      "final": {
+        "params": 288,
+        "policy": 69,
+        "carry": 3
+      }
+    },
+    "ordinary_ms": {
+      "core_ms": 12.420477441082767,
+      "seed_ms": 0.2386791229582741,
+      "metrics_ms": 0.17731866591930157,
+      "complete_ms": 12.836475229960342
+    },
+    "captured_ms": {
+      "core_ms": 12.631288852389844,
+      "seed_ms": 0.2670772219062201,
+      "metrics_ms": 0.12663512916333275,
+      "complete_ms": 13.025001203459396
+    },
+    "captured_complete_difference_percent": 1.4686739943924332,
+    "minimum_sampled_headroom_bytes": 7932870656,
+    "scope": "Same pinned JAX learner, uninstrumented versus CPU-only Nsight; no cross-backend numerical equivalence."
+  },
+  "jax_metric_scope": {
+    "returned_records": 272,
+    "nonempty_previous_update_records": 271,
+    "first_record_empty": true,
+    "last_pending_metric_record_not_drained": true,
+    "parameter_policy_carry_receipts_finite_and_exact": true,
+    "interpretation": "Upstream train() initiates asynchronous metric readback and returns previous-step NumPy metrics. Original core timer includes that wrapper work. Extra metrics_ms is caller conversion/finite checking, not the full transfer cost."
+  },
+  "zero_access": {
+    "status": "complete",
+    "exact_tensors": {
+      "initial": 292,
+      "before": 292,
+      "after": 292
+    },
+    "exact_reports": 1,
+    "sessions": {
+      "behavior_gradient": {
+        "dispatches": 247,
+        "groups": 36,
+        "baseline_gpu_ms": 0.85983125,
+        "sweeps": [
+          {
+            "0": 0.075123,
+            "1": 0.0751615,
+            "2": 0.075125,
+            "3": 0.0751395
+          },
+          {
+            "0": 0.075202,
+            "1": 0.075226,
+            "2": 0.075204,
+            "3": 0.075123
+          },
+          {
+            "0": 0.0750835,
+            "1": 0.0751685,
+            "2": 0.0751505,
+            "3": 0.075167
+          }
+        ],
+        "access_mask_ms": {
+          "0": 0.07513616666666667,
+          "1": 0.07518533333333334,
+          "2": 0.07515983333333333,
+          "3": 0.07514316666666666
+        }
+      },
+      "imagination": {
+        "dispatches": 1072,
+        "groups": 839,
+        "baseline_gpu_ms": 4.438592,
+        "sweeps": [
+          {
+            "0": 1.719282,
+            "1": 1.7192365,
+            "2": 1.719208,
+            "3": 1.719335
+          },
+          {
+            "0": 1.719269,
+            "1": 1.7191695,
+            "2": 1.719195,
+            "3": 1.7192095
+          },
+          {
+            "0": 1.719282,
+            "1": 1.7192985,
+            "2": 1.7193035,
+            "3": 1.719303
+          }
+        ],
+        "access_mask_ms": {
+          "0": 1.7192776666666667,
+          "1": 1.7192348333333334,
+          "2": 1.7192355000000001,
+          "3": 1.7192825
+        }
+      },
+      "slow_value": {
+        "dispatches": 13,
+        "groups": 9,
+        "baseline_gpu_ms": 0.13373925,
+        "sweeps": [
+          {
+            "0": 0.0196945,
+            "1": 0.0196555,
+            "2": 0.0197045,
+            "3": 0.0196605
+          },
+          {
+            "0": 0.019717,
+            "1": 0.0196905,
+            "2": 0.0197465,
+            "3": 0.019651
+          },
+          {
+            "0": 0.0197155,
+            "1": 0.0196595,
+            "2": 0.0196815,
+            "3": 0.019606
+          }
+        ],
+        "access_mask_ms": {
+          "0": 0.019709,
+          "1": 0.0196685,
+          "2": 0.019710833333333334,
+          "3": 0.019639166666666666
+        }
+      },
+      "world_gradient": {
+        "dispatches": 4168,
+        "groups": 1387,
+        "baseline_gpu_ms": 16.328685749999998,
+        "sweeps": [
+          {
+            "0": 2.893932,
+            "1": 2.8941285,
+            "2": 2.894094,
+            "3": 2.893923
+          },
+          {
+            "0": 2.896024,
+            "1": 2.8939695,
+            "2": 2.893976,
+            "3": 2.8951585
+          },
+          {
+            "0": 2.895534,
+            "1": 2.8964325,
+            "2": 2.8963665,
+            "3": 2.8962365
+          }
+        ],
+        "access_mask_ms": {
+          "0": 2.8951633333333335,
+          "1": 2.8948435,
+          "2": 2.8948121666666666,
+          "3": 2.895106
+        }
+      }
+    },
+    "total_dispatches": 5500,
+    "original_barriers": 2267,
+    "baseline_gpu_ms": 21.76084825,
+    "access_mask_ms": {
+      "0": 4.709286166666667,
+      "1": 4.708932166666667,
+      "2": 4.708918333333333,
+      "3": 4.709170833333333
+    },
+    "mask_meaning": {
+      "0": "execution only",
+      "1": "source write availability",
+      "2": "destination read/write visibility",
+      "3": "full barrier"
+    },
+    "scope": "No real work executes without dependency barriers. All four zero-work arms retain compute stages, groups, dispatch order, bindings and pipeline switches. Difference is a counterfactual barrier-packet cost, not independently removable learner time."
+  },
+  "dependent_chain": {
+    "native": {
+      "counter_checks": 792,
+      "rounds": 3,
+      "measured_samples": 768,
+      "means_ms": {
+        "9": 0.019139166666666665,
+        "36": 0.07441083333333333,
+        "839": 1.7204548333333334,
+        "1387": 2.8437419999999998
+      },
+      "round_means_ms": {
+        "9": [
+          0.0193215,
+          0.018982,
+          0.019114
+        ],
+        "36": [
+          0.074377,
+          0.0744,
+          0.0744555
+        ],
+        "839": [
+          1.720486,
+          1.720522,
+          1.7203565
+        ],
+        "1387": [
+          2.84386,
+          2.8437915,
+          2.8435745
+        ]
+      },
+      "long_chain_incremental_us": 2.0497940997566904
+    },
+    "cuda": {
+      "counter_checks": 792,
+      "rounds": 3,
+      "measured_samples": 768,
+      "means_ms": {
+        "9": 0.007961166678190678,
+        "36": 0.02552216669816302,
+        "839": 0.5557071681445521,
+        "1387": 0.9170436616986667
+      },
+      "round_means_ms": {
+        "9": [
+          0.007467000017641406,
+          0.008223500015446875,
+          0.00819300000148375
+        ],
+        "36": [
+          0.025835499953251562,
+          0.025314000144129687,
+          0.025416999997107812
+        ],
+        "839": [
+          0.5558685027063438,
+          0.5556774986908907,
+          0.5555755030364219
+        ],
+        "1387": [
+          0.9169909954070469,
+          0.9171044938265938,
+          0.9170354958623593
+        ]
+      },
+      "long_chain_incremental_us": 0.6593731634199171
+    },
+    "ratios": {
+      "9": 2.404065564799404,
+      "36": 2.9155374703625423,
+      "839": 3.0959738005139497,
+      "1387": 3.1009886647408407
+    },
+    "scope": "Real one-invocation u32 dependency chain. Full Vulkan barriers versus ordered CUDA graph. Different GPU timestamp/event boundaries; not a learner speedup or identical machine code."
+  },
+  "prequeued_cuda": {
+    "stream": {
+      "means_ms": {
+        "9": 0.018694166734353125,
+        "36": 0.07411966597040104,
+        "128": 0.2625651660685833,
+        "256": 0.5247208333263177
+      },
+      "round_means_ms": {
+        "9": [
+          0.01869299999089375,
+          0.018669500102989064,
+          0.01872000010917656
+        ],
+        "36": [
+          0.07414799917023437,
+          0.07408799929544062,
+          0.07412299944552812
+        ],
+        "128": [
+          0.2626144988462344,
+          0.2625775001942969,
+          0.26250349916521876
+        ],
+        "256": [
+          0.5246824966742812,
+          0.5246265018358437,
+          0.5248535014688281
+        ]
+      },
+      "long_chain_incremental_us": 2.0480911504510497
+    },
+    "graph": {
+      "means_ms": {
+        "9": 0.00756233333231651,
+        "36": 0.02569933324896927,
+        "128": 0.08540499854524114,
+        "256": 0.16691599949252603
+      },
+      "round_means_ms": {
+        "9": [
+          0.007594499962579531,
+          0.00752799999463625,
+          0.00756450003973375
+        ],
+        "36": [
+          0.025671999959739063,
+          0.02569849992869375,
+          0.025727499858475
+        ],
+        "128": [
+          0.0867619987111625,
+          0.08477449847852812,
+          0.08467849844603281
+        ],
+        "256": [
+          0.1669899993575,
+          0.16698349965724998,
+          0.16677449946282813
+        ]
+      },
+      "long_chain_incremental_us": 0.6368046949006632
+    },
+    "scope": "Smaller fixed chains, same CUDA kernel/stream and CPU prequeue gate; application-thread kernel feeding finishes before GPU event timing. This does not exclude every driver-internal host contribution. Graph upload/application queueing excluded. All1584 counters pass; no100ms gate timeout.",
+    "ratios": {
+      "9": 2.472010411715968,
+      "36": 2.884108519561447,
+      "128": 3.074353615608296,
+      "256": 3.14362215079216
+    }
+  },
+  "current_rgb_to_jax_complete_ratio": 2.5009473172303,
+  "guards_passed": 14,
+  "guard_paths": [
+    "numerical/wide-numerics",
+    "qualification/rgb-smoke",
+    "qualification/cdp-smoke",
+    "timing/rgb-control",
+    "timing/rgb-fused",
+    "timing/cdp-control",
+    "timing/cdp-fused",
+    "cpu-capture/cpu-capture",
+    "jax-reviewed-queue/jax-ordinary-reviewed",
+    "jax-reviewed-queue/jax-cpu-capture",
+    "zero-access-queue/zero-access",
+    "dependent-chain-queue/chain-native",
+    "dependent-chain-queue/chain-cuda",
+    "short-prequeued-chain-queue/chain-cuda-prequeued-short"
+  ],
+  "guards_failed": 2,
+  "failed_guard_scope": [
+    "Initial JAX state receipt used an implicit host read under the transfer guard, before update0. Explicit diagnostic device_get fixes receipt only.",
+    "Large CUDA prequeue gate exceeded its100ms CPU limit. The queue/child terminates with no descendants. Partial timing is not promoted; one separately reviewed smaller9/36/128/256 chain check retains the same limit and passes."
+  ],
+  "allocation_warnings": 5,
+  "full_synthetic_updates": 1953,
+  "full_update_accounting": {
+    "native_smokes": 48,
+    "native_timing": 1088,
+    "native_cpu_capture": 272,
+    "jax_ordinary_and_capture": 544,
+    "zero_access_preparation": 1
+  },
+  "completed_dependency_counter_checks": 3168,
+  "failed_dependency_attempts_retained": true,
+  "game_actions": 0,
+  "production_changed": false,
+  "sha256": {
+    "backend-tests": "e01f4522764754e074d99ef89fa699cad31e78c08e14f53e2e21540fc6004db9",
+    "kindle-tests": "aca8359bf63b5781481ade19b1d5ce9456a98ab368965011ae52c701884cc7f2",
+    "backend-initial.patch": "b261dc7be4f0316794faf6f4762a50c47edc5caa02631183af05c75f4273baf6",
+    "backend-qualified.patch": "c5ca564dc214baa4dd6ad2a3323d2843ebc9092bba2227ca487db620a37513d3",
+    "kindle.patch": "cebac52717106f195e3cb7edb489bb85bd27a3628ebca61075787077f150774c",
+    "backend-Cargo.lock": "7b9cfd6d8e16eac3352c7742979fe57532c4bbaca3f3f930d072d5220f853e5a",
+    "kindle-Cargo.lock": "3ecaf353f0ac830194715e684f756389eb414c25ae54af239f45f7c020af8ffe",
+    "benchmark_upstream_boundaries.py": "ada29cf85f16295d6570e8502754538566834381c51f47619a578129e5cb75a1",
+    "benchmark_upstream_receipts.py": "2bc0616b0d54f7fb0d55dfb1f56663bae6e1a13980f4e13ef17fbf06a1f92492",
+    "zero-access-tests": "9802fda8489caf103d13fb06f695c1ca32a6815a631975f63627d3b6c9a9a5bd",
+    "zero-access-blade.patch": "f57b6e7cf78c0de83f0244a63cd529f3bb2eb6f74072918ac5e4e1f9d531a479",
+    "zero-access-backend.patch": "a61d6c605a643874db1ea4548d15c4309c655909d04b13df065b4ab10823bc62",
+    "zero-access-kindle.patch": "5acb92b9babd4b3b90bc083e4da285099856dffbf3b9759143029e84da2e16bd",
+    "zero-access-backend-Cargo.lock": "c8c8dd00d6a77f912119624a2069e76ae11ac863fd3c1f19c2dcc51fce8b1bde",
+    "zero-access-kindle-Cargo.lock": "67d5537417a49a8b9ab672e066c451dbb2cc8985f112fba8be29f953ced13b0d",
+    "dependent-chain-tests": "e69f65bf772c4988396459f8ca91f33b0641971818dd37d5ab247256db63896b",
+    "dependent-chain-cuda": "67b289813baac7cdb7c3039762cb8eaa04e2e1da521f3e89062751f513edb316",
+    "dependent-chain-kindle.patch": "1912a9a59d598e8f0b37a4b2a3f1a83dd370c6ab01243ddc2c7925b5adf42e94",
+    "dependent_chain.cu": "4a7d1d13ec6bf0140b6833255b2f7cf17e0b8859114dd0472433507d7b0d829b",
+    "dependent_chain_cuda.py": "486bbf72ebc919e3f32e83a1bb23b19a03abf9b7441802c96df317148c62b53a",
+    "host-execution.nsys-rep": "7618d33ae03f6129f1afee9d6b688e5856beaac51106cb2c3d83488a69496db5",
+    "jax-host-execution.nsys-rep": "206a532b6059538d55450b5df04a520548525f18f14ca808c685a6e009e91dae",
+    "audit-zero-access.py": "c179a372b8424f26becf6c2f5a5ee0b8e89028cef6030d95162be235f4438e51",
+    "final-summary.py": "77096dd698799c691ef639fe35a892d307f55bbf48e010526f54f4a47da29200",
+    "publication-summary.py": "b0a84d3a5bbc551ed13a7cd71e5ccc16a7fdd6a53467cc6727d2af07de4c8d93",
+    "prequeued_chain.cu": "a23ebedb09ca997ab1b9b1e9cddb7263e9989d17016b5f87dcc44d882e4d83b1",
+    "prequeued-chain-cuda": "6f881c0e221f62db2b512f78f21d168dbc935eddc3be814ad1ef9c78f8083c92",
+    "prequeued_chain_cuda.py": "122143051d9cbe343f945bcda62d7270c46fc4a085dcfb5c16586fe0ff5dfbb5",
+    "short_prequeued_chain.cu": "d4f1e09ef454c4bfd61adeb48472d6999021a0a4019e56d87147deaa1ebb8538",
+    "short-prequeued-chain-cuda": "e53482cf989f667f923927a200aba62a0faad92c77b5dc2e2e6bcc9f87174ec9",
+    "short_prequeued_chain_cuda.py": "f49a9b61cc7b0cd422751ebaa9bdf68d18553892a03429e1127a5c55d3345a0e",
+    "chain-cuda-prequeued/result.json": "c5a6b6887f6efdfabfd2bce4489c477a9e482d62567bf52a24dbc2a2ad581125",
+    "complete-summary.py": "e48e5f1152e8697bf1e62721778ec13a2404854e416fcc66aefabcb3f6369a74",
+    "publication-summary.json": "09a6bbf3cc5b7b2dc2f8d048e8d0c3c8d31913f9cddaff95a2241bae73c0013c"
+  },
+  "cpu_failures_retained": [
+    "Initial test attempted Graph.clone rather than constructing a separate graph.",
+    "NumPy bool JSON serialization left a partial moment-consistency.json; failed source and reviewed corrected result retained."
+  ],
+  "limits": [
+    "No Atari/training-default change or whole-performance-goal completion.",
+    "CPU scheduling is main-thread scope; samples include profiler overhead, unresolved driver symbols and truncated backtraces.",
+    "Nsight NVTX warnings retained; every required update/stage interval is verified, not all application events.",
+    "Current native ordinary timing, CPU capture and older complete GPU accounting are separate runs; do not subtract/add their intervals as synchronized attribution.",
+    "Zero-work access masks are diagnostic only; partial masks never run real kernels.",
+    "Dependent chains use one real invocation, fixed GPU-local counter and correct synchronization. They characterize small-boundary cost, not a universal Vulkan/CUDA penalty.",
+    "JAX metrics are pipelined one update late; final pending metrics were not drained. Final parameter/policy/carry receipts are finite.",
+    "Wider pointwise fusion changes trajectories and exposes near-zero LaProp sensitivity; no raw-gradient/driver-FTZ causal proof or tolerance relaxation.",
+    "No additive savings/parity forecast. Kernels, compiler materialization and host dataflow still need end-to-end work."
+  ],
+  "previous_passed_guard_warning_count": 4,
+  "allocation_warning_scope": "All passing and failed guards; initial publication summary counted passing guards only and remains retained."
+}

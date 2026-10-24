@@ -1,0 +1,168 @@
+{
+  "status": "passed",
+  "raw": {
+    "status": "passed",
+    "workloads": {
+      "rgb": {
+        "exact_checkpoint_pairs": {
+          "initial": 292,
+          "first": 292,
+          "before_raw": 292,
+          "after_raw": 292,
+          "restored": 292
+        },
+        "variants": [
+          {
+            "tensors": 68,
+            "elements": 8852675
+          },
+          {
+            "tensors": 68,
+            "elements": 8852675
+          }
+        ],
+        "changed_gradient_tensors": 2,
+        "frozen_raw_state": true,
+        "qualified_prefix_plan_pipeline_pairs": 4,
+        "prefix_isolation_scope": "NaN reward targets during prepare; exact complete gradients",
+        "restoration_scope": "post-initializer parameters restored; optimizer deliberately cleared"
+      },
+      "cdp": {
+        "exact_checkpoint_pairs": {
+          "initial": 346,
+          "first": 346,
+          "before_raw": 346,
+          "after_raw": 346,
+          "restored": 346
+        },
+        "variants": [
+          {
+            "tensors": 86,
+            "elements": 14688256
+          },
+          {
+            "tensors": 86,
+            "elements": 14688256
+          }
+        ],
+        "changed_gradient_tensors": 36,
+        "frozen_raw_state": true,
+        "qualified_prefix_plan_pipeline_pairs": 4,
+        "prefix_isolation_scope": "NaN reward targets during prepare; exact complete gradients",
+        "restoration_scope": "post-initializer parameters restored; optimizer deliberately cleared"
+      }
+    },
+    "guards": 2,
+    "warnings": 0,
+    "initializer_updates": 2,
+    "raw_backward_passes": 8,
+    "game_actions": 0,
+    "source_receipts": 662,
+    "finished_utc": "2026-10-21T14:21:59.560980+00:00"
+  },
+  "timing": {
+    "status": "passed",
+    "numerical_qualification": true,
+    "calibration_passed": true,
+    "cost_gate_passed": true,
+    "accepted": true,
+    "workloads": {
+      "rgb": {
+        "control_ms": 42.753436058593756,
+        "candidate_ms": 39.74032336718751,
+        "reduction_percent": 7.047650362597214,
+        "control_drift_percent": -0.12857318792344197,
+        "exact_reports": 272,
+        "exact_tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292,
+          "learner-checkpoint": 292,
+          "restored": 292
+        },
+        "summaries": {
+          "control": {
+            "stages_ms": {
+              "behavior_train_and_sync": 4.008892582031249,
+              "imagination_and_targets": 7.0133208984375,
+              "posterior": 6.59069423828125,
+              "world_train_and_sync": 25.14052833984375
+            },
+            "first32_mean_ms": 42.7026945625,
+            "last32_mean_ms": 42.9566031875
+          },
+          "candidate": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.94336337109375,
+              "imagination_and_targets": 7.003180328125,
+              "posterior": 6.43568921875,
+              "world_train_and_sync": 22.35809044921875
+            },
+            "first32_mean_ms": 39.870926187500004,
+            "last32_mean_ms": 39.62211740625
+          }
+        }
+      },
+      "cdp": {
+        "control_ms": 40.60495753125,
+        "candidate_ms": 39.39832683984375,
+        "reduction_percent": 2.9716339205074105,
+        "control_drift_percent": 0.10447323259097363,
+        "exact_reports": 272,
+        "exact_tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346,
+          "learner-checkpoint": 346,
+          "restored": 346
+        },
+        "summaries": {
+          "control": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.97275448828125,
+              "imagination_and_targets": 16.4731393359375,
+              "posterior": 7.1150371328125,
+              "world_train_and_sync": 13.04402657421875
+            },
+            "first32_mean_ms": 40.790335437500005,
+            "last32_mean_ms": 40.58177778125
+          },
+          "candidate": {
+            "stages_ms": {
+              "behavior_train_and_sync": 3.9571426562499994,
+              "imagination_and_targets": 16.44950115625,
+              "posterior": 6.99612270703125,
+              "world_train_and_sync": 11.9955603203125
+            },
+            "first32_mean_ms": 39.455394125,
+            "last32_mean_ms": 39.37855140625
+          }
+        }
+      }
+    },
+    "guards": 4,
+    "warnings": 0,
+    "synthetic_updates": 1088,
+    "game_actions": 0,
+    "production_changed": false,
+    "source_receipts": 1547,
+    "finished_utc": "2026-10-21T14:26:28.881931+00:00"
+  },
+  "retained_native_sha256": "c8aeba28361ff2ea3ed2b90ced44e4cd70f3a07bfea5dd6e6d2324b36e1d0127",
+  "rgb_jax_inclusive_ratio": 1.5245814884775069,
+  "jax_inclusive_ms": 26.066381933361527,
+  "guards": 6,
+  "warnings": 0,
+  "synthetic_updates": 1090,
+  "raw_backward_passes": 8,
+  "game_actions": 0,
+  "cleanup": {
+    "paths": 7033,
+    "reclaimed_bytes": 13182640128,
+    "active_cache_untouched": true
+  },
+  "free_bytes": 7004954624,
+  "source_receipts": 1554,
+  "production_changed": false,
+  "finished_utc": "2026-10-21T14:27:24.069344+00:00"
+}

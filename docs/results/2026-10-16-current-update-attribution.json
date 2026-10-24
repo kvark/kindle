@@ -1,0 +1,393 @@
+{
+  "status": "complete",
+  "finished_utc": "2026-10-16T15:41:32.970513+00:00",
+  "pairing_tests": {
+    "valid": 4,
+    "negative": 6
+  },
+  "original_preflight_test_ran": false,
+  "original_trace_review_passed": false,
+  "repaired_cpu_shader_test_passes": 1,
+  "ordinary": {
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "plan_hashes": {
+      "precision-plans.json": "acde781bd39b17dbf47f8b1278adf9b0c48683883a6df53595efadeed86c0874",
+      "imagination-plan.json": "72d2eb466f11443b482807dfa69b8765ba8ad9ab4a97178d731666ccc9c4e453",
+      "slow_value-plan.json": "e4fe91296f121ef809536f4fdcfa82070d5c480d2fbcc438119ce7b003c25aac",
+      "posterior-plan.json": "9f0d02c7f31bcea766864e3f271152b569933c9b420eac7a074a360397b649a8",
+      "world_gradient-plan.json": "9f0d02c7f31bcea766864e3f271152b569933c9b420eac7a074a360397b649a8",
+      "behavior_gradient-plan.json": "6c1a2ee4070a2e827a431e87b7da28f1601d5833644322fbc2d72f0fbdc02ace"
+    },
+    "mean_update_ms": 46.10818082421876,
+    "reference": "/x/Code/kindle/runs/copy-composition-20261016.ABr4pCUH/timing-rgb-candidate",
+    "reference_ms": 46.199419203124975,
+    "minimum_sampled_headroom_bytes": 13283950592
+  },
+  "coarse": {
+    "exact_reports": 272,
+    "exact_tensors": {
+      "initial": 292,
+      "first": 292,
+      "final": 292
+    },
+    "plan_hashes": {
+      "precision-plans.json": "acde781bd39b17dbf47f8b1278adf9b0c48683883a6df53595efadeed86c0874",
+      "imagination-plan.json": "72d2eb466f11443b482807dfa69b8765ba8ad9ab4a97178d731666ccc9c4e453",
+      "slow_value-plan.json": "e4fe91296f121ef809536f4fdcfa82070d5c480d2fbcc438119ce7b003c25aac",
+      "posterior-plan.json": "9f0d02c7f31bcea766864e3f271152b569933c9b420eac7a074a360397b649a8",
+      "world_gradient-plan.json": "9f0d02c7f31bcea766864e3f271152b569933c9b420eac7a074a360397b649a8",
+      "behavior_gradient-plan.json": "6c1a2ee4070a2e827a431e87b7da28f1601d5833644322fbc2d72f0fbdc02ace"
+    },
+    "mean_update_ms": 47.175610921875005,
+    "reference": "/x/Code/kindle/runs/current-update-attribution-20261016.Su4bS7e5/ordinary",
+    "reference_ms": 46.10818082421876,
+    "minimum_sampled_headroom_bytes": 13283950592
+  },
+  "calibration_percent": -0.1974881513229887,
+  "instrumentation_overhead_percent": 2.315055763587104,
+  "world_chunks": [
+    {
+      "name": "posterior-0",
+      "groups": [
+        0,
+        251
+      ],
+      "dispatches": [
+        0,
+        525
+      ],
+      "mean_gpu_ms": 3.48323275
+    },
+    {
+      "name": "posterior-1",
+      "groups": [
+        251,
+        502
+      ],
+      "dispatches": [
+        525,
+        900
+      ],
+      "mean_gpu_ms": 1.055713625
+    },
+    {
+      "name": "world-0",
+      "groups": [
+        502,
+        706
+      ],
+      "dispatches": [
+        900,
+        2735
+      ],
+      "mean_gpu_ms": 15.5052615
+    },
+    {
+      "name": "world-1",
+      "groups": [
+        706,
+        910
+      ],
+      "dispatches": [
+        2735,
+        3219
+      ],
+      "mean_gpu_ms": 1.171387375
+    },
+    {
+      "name": "world-2",
+      "groups": [
+        910,
+        1112
+      ],
+      "dispatches": [
+        3219,
+        3751
+      ],
+      "mean_gpu_ms": 6.719672125
+    }
+  ],
+  "cached_chunk_ms": {
+    "posterior-0": 3.48323275,
+    "posterior-1": 1.055713625,
+    "imagination": 6.97604,
+    "slow_value": 0.505462875,
+    "world-0": 15.5052615,
+    "world-1": 1.171387375,
+    "world-2": 6.719672125,
+    "behavior": 3.013581625
+  },
+  "guards": 2,
+  "allocation_warnings": 0,
+  "source_seals": 3127,
+  "synthetic_updates": 544,
+  "game_actions": 0,
+  "production_changed": false,
+  "date": "2026-10-16",
+  "artifact_root": "runs/current-update-attribution-20261016.Su4bS7e5",
+  "qualified_native": "58aff452",
+  "instrumented_native": "7324a0487c62ab4c8b87ea9379f50882748da881a100e3affd1d50b6ca5ff6bc",
+  "summary": {
+    "wall_ms": 47.17803148828125,
+    "gpu_pass_ms": 39.65009825390625,
+    "uncovered_ms": 7.527933234375,
+    "outside_timer_union_ms": 0.011929265625,
+    "stages": {
+      "posterior": {
+        "wall_ms": 7.37865830078125,
+        "gpu_pass_ms": 4.750305625,
+        "uncovered_ms": 2.62835267578125
+      },
+      "imagination": {
+        "wall_ms": 10.1983593359375,
+        "gpu_pass_ms": 8.02253464453125,
+        "uncovered_ms": 2.17582469140625
+      },
+      "world": {
+        "wall_ms": 25.01123485546875,
+        "gpu_pass_ms": 23.796423875,
+        "uncovered_ms": 1.21481098046875
+      },
+      "behavior": {
+        "wall_ms": 4.58977899609375,
+        "gpu_pass_ms": 3.080834109375,
+        "uncovered_ms": 1.50894488671875
+      }
+    },
+    "pieces": {
+      "posterior_inputs": {
+        "wall_ms": 1.83866642578125,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 1.83866642578125
+      },
+      "posterior_submit": {
+        "wall_ms": 3.900281328125,
+        "gpu_pass_ms": 3.49354826953125,
+        "uncovered_ms": 0.40673305859375
+      },
+      "posterior_readback": {
+        "wall_ms": 1.48837708203125,
+        "gpu_pass_ms": 1.25675735546875,
+        "uncovered_ms": 0.2316197265625
+      },
+      "posterior_unpack": {
+        "wall_ms": 0.15133346484375,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.15133346484375
+      },
+      "imagination_inputs": {
+        "wall_ms": 0.37358620703125,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.37358620703125
+      },
+      "imagination_submit": {
+        "wall_ms": 0.05656929296875,
+        "gpu_pass_ms": 0.00875088671875,
+        "uncovered_ms": 0.04781840625
+      },
+      "slow_value_submit": {
+        "wall_ms": 0.12329266796875,
+        "gpu_pass_ms": 0.10113455078125,
+        "uncovered_ms": 0.0221581171875
+      },
+      "imagination_readback": {
+        "wall_ms": 8.0857035546875,
+        "gpu_pass_ms": 7.91264920703125,
+        "uncovered_ms": 0.17305434765625
+      },
+      "decode": {
+        "wall_ms": 0.122098890625,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.122098890625
+      },
+      "targets": {
+        "wall_ms": 1.43710872265625,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 1.43710872265625
+      },
+      "world_inputs": {
+        "wall_ms": 0.13288210546875,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.13288210546875
+      },
+      "world_submit": {
+        "wall_ms": 17.3799696875,
+        "gpu_pass_ms": 16.67666359375,
+        "uncovered_ms": 0.70330609375
+      },
+      "world_wait": {
+        "wall_ms": 7.413158890625,
+        "gpu_pass_ms": 7.11976028125,
+        "uncovered_ms": 0.293398609375
+      },
+      "world_metrics": {
+        "wall_ms": 0.01474976953125,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.01474976953125
+      },
+      "world_sync": {
+        "wall_ms": 0.07047440234375,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.07047440234375
+      },
+      "behavior_inputs": {
+        "wall_ms": 1.01226248046875,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 1.01226248046875
+      },
+      "behavior_submit": {
+        "wall_ms": 0.0921554765625,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.0921554765625
+      },
+      "behavior_wait": {
+        "wall_ms": 3.3656991953125,
+        "gpu_pass_ms": 3.080624,
+        "uncovered_ms": 0.28507519531250003
+      },
+      "behavior_metrics": {
+        "wall_ms": 0.01121758203125,
+        "gpu_pass_ms": 0.0,
+        "uncovered_ms": 0.01121758203125
+      },
+      "behavior_sync": {
+        "wall_ms": 0.10844426171875,
+        "gpu_pass_ms": 0.000210109375,
+        "uncovered_ms": 0.10823415234375
+      }
+    },
+    "pass_ms": {
+      "cached_graph": 38.430351875,
+      "categorical_means": 0.05929275,
+      "kindle_uniforms": 0.07311575,
+      "kindle_readback": 0.23007012500000001,
+      "kindle_device_copy": 0.389920625,
+      "agc_norms": 0.111701375,
+      "agc_factor": 0.008853875,
+      "agc_apply": 0.042155,
+      "adam_update": 0.304435,
+      "parameter_blend": 0.012139374999999999,
+      "readback_copy": 0
+    }
+  },
+  "pass_counts": {
+    "kindle_uniforms": 544,
+    "cached_graph": 2176,
+    "kindle_readback": 544,
+    "kindle_device_copy": 544,
+    "categorical_means": 272,
+    "agc_norms": 544,
+    "agc_factor": 544,
+    "agc_apply": 544,
+    "adam_update": 544,
+    "parameter_blend": 272
+  },
+  "drain_after_last_end_ms": 0.04645,
+  "review_sha256": "8bc5d6d72f52d44f9bfca0b4628d0fbb28cf9fab3d6b500e316fd013e5ad966a",
+  "publication": {
+    "status": "complete",
+    "finished_utc": "2026-10-16T15:49:07.231585+00:00",
+    "independent_intervals": 6775,
+    "independent_complete_updates": 272,
+    "independent_stage_intersections": 1088,
+    "crossing_pairs": 1,
+    "overlap_ns": 2107,
+    "convolution_chunks": [
+      {
+        "name": "posterior-0",
+        "indices": [
+          91,
+          114,
+          118,
+          122
+        ],
+        "count": 4,
+        "gpu_pass_ms": 3.48323275
+      },
+      {
+        "name": "posterior-1",
+        "indices": [],
+        "count": 0,
+        "gpu_pass_ms": 1.055713625
+      },
+      {
+        "name": "world-0",
+        "indices": [
+          1474,
+          1551,
+          1680,
+          1791,
+          1979,
+          1980,
+          2042,
+          2095,
+          2142,
+          2143,
+          2238,
+          2239
+        ],
+        "count": 12,
+        "gpu_pass_ms": 15.5052615
+      },
+      {
+        "name": "world-1",
+        "indices": [],
+        "count": 0,
+        "gpu_pass_ms": 1.171387375
+      },
+      {
+        "name": "world-2",
+        "indices": [
+          3681,
+          3682,
+          3693,
+          3694,
+          3704,
+          3705,
+          3715
+        ],
+        "count": 7,
+        "gpu_pass_ms": 6.719672125
+      }
+    ],
+    "retained_jax": {
+      "current_inclusive_control_ms": 27.222569,
+      "new_jax_execution": false,
+      "resident_input_batch": true,
+      "captured_means": {
+        "kernels": 3508,
+        "kernel_ms": 22.57259125,
+        "gpu_union_ms": 23.0994105,
+        "captured_wall_ms": 27.6169055
+      },
+      "captured_families": {
+        "convolution_with_helpers": 11.25511425,
+        "matrix_with_helpers": 4.654804999999992,
+        "fusion_and_other": 6.662672000000017
+      },
+      "limit": "Native pass intervals and JAX kernel/copy intervals have different granularity; not an additive causal gap budget"
+    },
+    "zero_uncovered_time_ceiling": 1.1898591319034968,
+    "world_cached_ms": 27.935267374999995,
+    "new_gpu_calls": 0,
+    "original_preflight_sequence_passed": false,
+    "source_seals_checked": 3249
+  },
+  "publication_sha256": "53e83de200d492b9934cba34e11f6c67fe80c5a45614bbc98b4d1ed63acc1bcc",
+  "retained_failures": [
+    "Initial inherited test-module ordering fails fmt",
+    "Initial shader test selects zero tests; exact one-test validation occurs only after GPU capture",
+    "Global-stack trace reader fails on one crossing calibrated interval pair; unchanged timestamps pass separate labeled/independent decoders"
+  ],
+  "limits": [
+    "GPU-pass coverage is not SM utilization or pure kernel time",
+    "Uncovered time includes host work, submission gaps and unclassified device intervals",
+    "Timed world chunking adds three waits; instrumentation is not ordinary scheduling",
+    "No new ordinary speedup, candidate promotion or Atari allocation"
+  ]
+}

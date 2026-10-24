@@ -1,0 +1,366 @@
+{
+  "status": "cpu_complete",
+  "date": "2026-10-17",
+  "baseline": {
+    "native": "e45b9c433d88b3bf6467ae253a22b2bf188e7ee24a85a8300a7b11d01c9e419e",
+    "rgb_ms": 43.196506554687524,
+    "jax_inclusive_ms": 27.22256929610012,
+    "ratio": 1.5867902138420056,
+    "remaining_ms": 15.9739372585874
+  },
+  "mapping": {
+    "finished_utc": "2026-10-17T00:45:30.467049+00:00",
+    "dispatches": 3751,
+    "ranges": 41,
+    "convolution_products": 23,
+    "groups": 1112,
+    "versioned_reads": 7063,
+    "roots": 813,
+    "longest_chain_length": 1109,
+    "longest_chain_group_count": 1109,
+    "chain_shader_counts": {
+      "Generated": 534,
+      "ToBF16": 117,
+      "MatMulTyped": 99,
+      "SumRows": 34,
+      "BlockMatMulTyped": 64,
+      "SplitA": 34,
+      "SplitB": 100,
+      "Concat": 2,
+      "Transpose": 2,
+      "Conv2dPacked": 5,
+      "Conv2dBF16": 2,
+      "Conv2dGradientTyped": 1,
+      "PackChannels": 1,
+      "SiluGrad": 49,
+      "RmsNormGradX": 48,
+      "GlobalAvgPoolGrad": 16,
+      "RmsNormGradWRowPar": 1
+    },
+    "chain_kernel_counts": {
+      "Pointwise": 378,
+      "Default": 571,
+      "Reduction": 97,
+      "Copy": 51,
+      "CooperativeTiled": 4,
+      "Image": 8
+    },
+    "negative_checks": [
+      "omitted versioned read",
+      "incorrect writer version",
+      "shortened dependency chain",
+      "overlapping range",
+      "warp count interpreted as cycles",
+      "neighbor convolution relabeled owner"
+    ],
+    "compiler_force_loop_bounding": false,
+    "compiler_emit_integer_division_checks": false,
+    "source_seals": 17
+  },
+  "counters": {
+    "totals": {
+      "convolution": {
+        "ranges": 23,
+        "dispatches": 23,
+        "counters": {
+          "smsp__inst_executed.sum": 10295818368,
+          "smsp__inst_executed_pipe_alu.sum": 6818554368,
+          "smsp__inst_executed_pipe_tensor.sum": 180224000,
+          "sm__ctas_launched.sum": 283600,
+          "smsp__warps_active.sum": 71475894026,
+          "smsp__warps_eligible.sum": 19278970933,
+          "smsp__warps_issue_stalled_wait.sum": 20687531943,
+          "smsp__warps_issue_stalled_long_scoreboard.sum": 13427122031,
+          "smsp__warps_issue_stalled_short_scoreboard.sum": 3347819905,
+          "smsp__warps_issue_stalled_math_pipe_throttle.sum": 7855430760,
+          "smsp__warps_issue_stalled_barrier.sum": 4515903271,
+          "dram__bytes.sum": 1748737280,
+          "lts__t_bytes.sum": 15786592800,
+          "gpu__time_duration.sum": 18311759.25925926
+        },
+        "active_warp_cycle_fractions": {
+          "smsp__warps_eligible.sum": 0.2697268945805295,
+          "smsp__warps_issue_stalled_wait.sum": 0.28943369264433016,
+          "smsp__warps_issue_stalled_long_scoreboard.sum": 0.18785525125597957,
+          "smsp__warps_issue_stalled_short_scoreboard.sum": 0.04683844743211187,
+          "smsp__warps_issue_stalled_math_pipe_throttle.sum": 0.10990321795964547,
+          "smsp__warps_issue_stalled_barrier.sum": 0.06318078748839853
+        }
+      },
+      "other": {
+        "ranges": 18,
+        "dispatches": 3728,
+        "counters": {
+          "smsp__inst_executed.sum": 1699607539,
+          "smsp__inst_executed_pipe_alu.sum": 681678582,
+          "smsp__inst_executed_pipe_tensor.sum": 6717440,
+          "sm__ctas_launched.sum": 1410877,
+          "smsp__warps_active.sum": 46222914834,
+          "smsp__warps_eligible.sum": 3064384579,
+          "smsp__warps_issue_stalled_wait.sum": 4394811817,
+          "smsp__warps_issue_stalled_long_scoreboard.sum": 20435403848,
+          "smsp__warps_issue_stalled_short_scoreboard.sum": 6596448606,
+          "smsp__warps_issue_stalled_math_pipe_throttle.sum": 382415195,
+          "smsp__warps_issue_stalled_barrier.sum": 4713327661,
+          "dram__bytes.sum": 3862907648,
+          "lts__t_bytes.sum": 7716697664,
+          "gpu__time_duration.sum": 9925074.074074075
+        },
+        "active_warp_cycle_fractions": {
+          "smsp__warps_eligible.sum": 0.06629578835530171,
+          "smsp__warps_issue_stalled_wait.sum": 0.0950786386532103,
+          "smsp__warps_issue_stalled_long_scoreboard.sum": 0.4421054778001238,
+          "smsp__warps_issue_stalled_short_scoreboard.sum": 0.14270949008061856,
+          "smsp__warps_issue_stalled_math_pipe_throttle.sum": 0.008273281690983028,
+          "smsp__warps_issue_stalled_barrier.sum": 0.10196950317665897
+        }
+      }
+    },
+    "metric_definitions": {
+      "smsp__inst_executed.sum": {
+        "name": "smsp__inst_executed",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of warp instructions executed",
+        "dimensional_units": "instructions"
+      },
+      "smsp__inst_executed_pipe_alu.sum": {
+        "name": "smsp__inst_executed_pipe_alu",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of warp instructions executed by alu pipes",
+        "dimensional_units": "instructions"
+      },
+      "smsp__inst_executed_pipe_tensor.sum": {
+        "name": "smsp__inst_executed_pipe_tensor",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of warp instructions executed by tensor pipe",
+        "dimensional_units": "instructions"
+      },
+      "sm__ctas_launched.sum": {
+        "name": "sm__ctas_launched",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of CTAs launched",
+        "dimensional_units": "ctas"
+      },
+      "smsp__warps_active.sum": {
+        "name": "smsp__warps_active",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of active warps",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_eligible.sum": {
+        "name": "smsp__warps_eligible",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps eligible to issue an instruction",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_issue_stalled_wait.sum": {
+        "name": "smsp__warps_issue_stalled_wait",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps waiting on a fixed latency execution dependency",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_issue_stalled_long_scoreboard.sum": {
+        "name": "smsp__warps_issue_stalled_long_scoreboard",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps waiting for a scoreboard dependency on L1TEX (local, global, surface, tex) operation",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_issue_stalled_short_scoreboard.sum": {
+        "name": "smsp__warps_issue_stalled_short_scoreboard",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps waiting for a scoreboard dependency on MIO operation other than (local, global, surface, tex)",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_issue_stalled_math_pipe_throttle.sum": {
+        "name": "smsp__warps_issue_stalled_math_pipe_throttle",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps waiting for an execution pipe to be available",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "smsp__warps_issue_stalled_barrier.sum": {
+        "name": "smsp__warps_issue_stalled_barrier",
+        "source": "core",
+        "type": "Counter",
+        "description": "cumulative # of warps waiting for sibling warps at a CTA barrier",
+        "dimensional_units": "(gpc_cycles * warps)"
+      },
+      "dram__bytes.sum": {
+        "name": "dram__bytes",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of bytes accessed in DRAM",
+        "dimensional_units": "bytes"
+      },
+      "lts__t_bytes.sum": {
+        "name": "lts__t_bytes",
+        "source": "core",
+        "type": "Counter",
+        "description": "# of bytes requested",
+        "dimensional_units": "bytes"
+      },
+      "gpu__time_duration.sum": {
+        "name": "gpu__time_duration",
+        "source": "core",
+        "type": "Counter",
+        "description": "equals to gpu__time_duration_measured_user if collectable, otherwise equals to gpu__time_duration_measured_wallclock",
+        "dimensional_units": "nanoseconds"
+      }
+    },
+    "logical_buffers": 6983,
+    "multiwriter_buffers": 0,
+    "hidden_reads": 0,
+    "limits": [
+      "Profiler replay time is not ordinary latency",
+      "Active-warp-cycle fractions are not wall-time fractions or utilization",
+      "Mixed ranges do not assign counters to individual operations",
+      "Versioned dependency depth is not duration or critical-path latency"
+    ]
+  },
+  "normalization": {
+    "finished_utc": "2026-10-17T00:53:58.572442+00:00",
+    "contracts": 20,
+    "occurrences": 23,
+    "families": [
+      {
+        "family": "Conv2dBF16-pass-0",
+        "occurrences": 3,
+        "static_expanded_k_loop_before": 1205,
+        "static_expanded_k_loop_after": 1047,
+        "reduction_percent": 13.112033195020745,
+        "branch_sites_before_and_after": 69,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      },
+      {
+        "family": "Conv2dPacked-pass-0",
+        "occurrences": 5,
+        "static_expanded_k_loop_before": 559,
+        "static_expanded_k_loop_after": 493,
+        "reduction_percent": 11.806797853309481,
+        "branch_sites_before_and_after": 25,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      },
+      {
+        "family": "Conv2dGradientTyped-pass-1",
+        "occurrences": 2,
+        "static_expanded_k_loop_before": 1725,
+        "static_expanded_k_loop_after": 1397,
+        "reduction_percent": 19.01449275362319,
+        "branch_sites_before_and_after": 85,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      },
+      {
+        "family": "Conv2dPacked-pass-1",
+        "occurrences": 5,
+        "static_expanded_k_loop_before": 791,
+        "static_expanded_k_loop_after": 677,
+        "reduction_percent": 14.41213653603034,
+        "branch_sites_before_and_after": 33,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      },
+      {
+        "family": "Conv2dGradientTyped-pass-2",
+        "occurrences": 4,
+        "static_expanded_k_loop_before": 1328,
+        "static_expanded_k_loop_after": 1152,
+        "reduction_percent": 13.253012048192769,
+        "branch_sites_before_and_after": 75,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      },
+      {
+        "family": "Conv2dPacked-pass-2",
+        "occurrences": 4,
+        "static_expanded_k_loop_before": 1135,
+        "static_expanded_k_loop_after": 1009,
+        "reduction_percent": 11.10132158590308,
+        "branch_sites_before_and_after": 43,
+        "global_shared_access_sites_exact": true,
+        "complete_barrier_sequence_exact": true,
+        "complete_cooperative_operations_exact": true
+      }
+    ],
+    "negative_checks": [
+      "member offset",
+      "workgroup geometry",
+      "buffer binding"
+    ],
+    "conclusion": "CPU structure qualifies; driver instruction effect and runtime numerics are unmeasured.",
+    "passes": [
+      "--inline-entry-points-exhaustive",
+      "--eliminate-dead-functions",
+      "--convert-local-access-chains",
+      "--eliminate-local-single-block",
+      "--eliminate-local-single-store",
+      "--eliminate-local-multi-store",
+      "--ssa-rewrite",
+      "--eliminate-dead-code-aggressive",
+      "--redundancy-elimination",
+      "--cfg-cleanup",
+      "--compact-ids"
+    ],
+    "options": [
+      "--target-env=vulkan1.3",
+      "--preserve-bindings",
+      "--preserve-interface",
+      "--preserve-spec-constants"
+    ],
+    "source_seals": 154,
+    "validation": {
+      "status": "complete",
+      "finished_utc": "2026-10-17T00:53:58.572442+00:00",
+      "distinct_validated_modules": 40,
+      "total_tool_calls": 60,
+      "additional_normalization_calls": 0,
+      "original_review_validation_gate": "incomplete: optimizer validates inputs by default",
+      "source_seals": 154
+    }
+  },
+  "accounting": {
+    "gpu_calls": 0,
+    "native_builds": 0,
+    "learner_updates": 0,
+    "game_actions": 0
+  },
+  "artifacts": [
+    "runs/model-counter-diagnosis-20261017.IwSwbTWC",
+    "runs/spirv-normalization-20261017.k1dIE3NK"
+  ],
+  "limits": [
+    "Dependency depth is not duration or critical-path latency.",
+    "Warp-cycle fractions are not latency shares or SM utilization.",
+    "Counter ranges may mix layers; nearest convolution is not operation ownership.",
+    "IR reductions do not establish machine-code reductions or runtime numerical equivalence.",
+    "No runtime speedup, production promotion, learning parity or Atari restart."
+  ],
+  "receipts_sha256": {
+    "runs/model-counter-diagnosis-20261017.IwSwbTWC/declaration.md": "3fd7ac86a88e7d34f6d1c125d0994c35d6b3d96844c6131be2128854b760f001",
+    "runs/model-counter-diagnosis-20261017.IwSwbTWC/inventory.json": "8bbb3f2a9000da555af97fc2a0c83379a5f9501b66c577cc3f64f30230215e5b",
+    "runs/model-counter-diagnosis-20261017.IwSwbTWC/review.json": "e7c612bf7a6fc7e73856efa22c10f8837f98f08aa22f52c76e6c0fbd2181552a",
+    "runs/spirv-normalization-20261017.k1dIE3NK/declaration.md": "13a5a09d41eaecab19a977720be32cfc3e25a791f285b0c912ceff40edb22175",
+    "runs/spirv-normalization-20261017.k1dIE3NK/probe.json": "5b406111b23826c42fa90c981b90ae4b482e8fe72cfd79dc24a328e31a851bfe",
+    "runs/spirv-normalization-20261017.k1dIE3NK/review.json": "13d76c76b51b431db9d98d5a44dad8ea6b474a07c2863b7a783361fe69f12988",
+    "runs/spirv-normalization-20261017.k1dIE3NK/output-validation.json": "8510b6de173893807827f269da60d684aeba93c706be459edf91b08c98c87b19"
+  },
+  "retained_failures": [
+    "The original normalization review called 40 optimizer invocations validation of both arms. Default optimizer validation checks the input, so candidate-output validation was incomplete. A separate unchanged-output validation checks all20 normalized modules, preserves byte identity, and does not rerun normalization or any GPU work."
+  ]
+}

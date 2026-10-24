@@ -1,0 +1,313 @@
+{
+  "status": "qualified_isolated",
+  "date": "2026-10-16",
+  "artifact_root": "runs/convolution-word-staging-20261016.ssN5oC6N",
+  "native_sha256": "834241b6b9f702a8150731a0e879e704ba817aa8dfde5aa48742251aa249c596",
+  "production_changed": false,
+  "atari_running": false,
+  "workloads": {
+    "rgb": {
+      "control_ms": 51.76341991015625,
+      "candidate_ms": 48.06795265625,
+      "fraction_reduced": 0.07139148186731725,
+      "measured_updates_per_arm": 256,
+      "warmup_updates_per_arm": 16,
+      "exact_metric_reports": 272,
+      "exact_retained_prefix_reports": 24,
+      "exact_initial_first_final_tensors": 292,
+      "changed_module_count": 4,
+      "unchanged_module_count": 174,
+      "scalar_convolution_occurrences": 9,
+      "samples": {
+        "control": {
+          "mean_ms": 51.76341991015625,
+          "first32_ms": 51.7311608125,
+          "last32_ms": 51.68384753125,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.445060632812501,
+            "imagination_and_targets": 11.98226118359375,
+            "posterior": 7.284223359375,
+            "world_train_and_sync": 28.051874734375
+          }
+        },
+        "candidate": {
+          "mean_ms": 48.06795265625,
+          "first32_ms": 48.06740596875,
+          "last32_ms": 48.07975746875,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.4191184921875,
+            "imagination_and_targets": 11.962958285156251,
+            "posterior": 7.2584137265625,
+            "world_train_and_sync": 24.42746215234375
+          }
+        }
+      }
+    },
+    "cdp": {
+      "control_ms": 46.9286677890625,
+      "candidate_ms": 45.50459017578125,
+      "fraction_reduced": 0.030345579373407094,
+      "measured_updates_per_arm": 256,
+      "warmup_updates_per_arm": 16,
+      "exact_metric_reports": 272,
+      "exact_retained_prefix_reports": 24,
+      "exact_initial_first_final_tensors": 346,
+      "changed_module_count": 4,
+      "unchanged_module_count": 186,
+      "scalar_convolution_occurrences": 4,
+      "samples": {
+        "control": {
+          "mean_ms": 46.9286677890625,
+          "first32_ms": 46.946905375,
+          "last32_ms": 46.92893025,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.4723025546875,
+            "imagination_and_targets": 21.39283742578125,
+            "posterior": 8.02300671875,
+            "world_train_and_sync": 13.04052108984375
+          }
+        },
+        "candidate": {
+          "mean_ms": 45.50459017578125,
+          "first32_ms": 45.48183996875,
+          "last32_ms": 45.5233488125,
+          "stage_ms": {
+            "behavior_train_and_sync": 4.43983049609375,
+            "imagination_and_targets": 21.4424196484375,
+            "posterior": 7.93249537890625,
+            "world_train_and_sync": 11.68984465234375
+          }
+        }
+      }
+    }
+  },
+  "inclusive_jax_ms": 27.222569,
+  "native_over_inclusive_jax": 1.7657390327948108,
+  "family": {
+    "contracts": 20,
+    "occurrences": 23,
+    "weighted_timing": {
+      "control": {
+        "gpu_ms": 22.49330625,
+        "queued_wall_ms": 22.572778343750002,
+        "record_ms": 0.0139524765625
+      },
+      "candidate": {
+        "gpu_ms": 19.11207825,
+        "queued_wall_ms": 19.186180445312498,
+        "record_ms": 0.0133350234375
+      }
+    },
+    "fraction_reduced": 0.15032152065239412,
+    "families": {
+      "Conv2dBF16": {
+        "occurrences": 3,
+        "control_ms": 5.983454999999999,
+        "candidate_ms": 4.54098175,
+        "fraction_reduced": 0.24107697810044515
+      },
+      "Conv2dPacked": {
+        "occurrences": 14,
+        "control_ms": 5.031695,
+        "candidate_ms": 5.0303379999999995,
+        "fraction_reduced": 0.00026969043234947865
+      },
+      "Conv2dGradientTyped": {
+        "occurrences": 6,
+        "control_ms": 11.47815625,
+        "candidate_ms": 9.540758499999999,
+        "fraction_reduced": 0.1687899787912367
+      }
+    },
+    "counter_groups": {
+      "Conv2dBF16": {
+        "control": {
+          "warp_instructions": 3346857984.0,
+          "tensor_instructions": 39321600.0,
+          "shared_bank_conflicts": 495527127.0,
+          "dram_bytes": 384876544.0,
+          "l2_bytes": 2227691360.0
+        },
+        "candidate": {
+          "warp_instructions": 3141009408.0,
+          "tensor_instructions": 39321600.0,
+          "shared_bank_conflicts": 93046129.0,
+          "dram_bytes": 384332032.0,
+          "l2_bytes": 2515393568.0
+        }
+      },
+      "Conv2dPacked": {
+        "control": {
+          "warp_instructions": 1595849856.0,
+          "tensor_instructions": 75366400.0,
+          "shared_bank_conflicts": 74779402.0,
+          "dram_bytes": 319470848.0,
+          "l2_bytes": 7946470528.0
+        },
+        "candidate": {
+          "warp_instructions": 1595849856.0,
+          "tensor_instructions": 75366400.0,
+          "shared_bank_conflicts": 74780244.0,
+          "dram_bytes": 318904064.0,
+          "l2_bytes": 7941471456.0
+        }
+      },
+      "Conv2dGradientTyped": {
+        "control": {
+          "warp_instructions": 6867411968.0,
+          "tensor_instructions": 65536000.0,
+          "shared_bank_conflicts": 798508530.0,
+          "dram_bytes": 928140032.0,
+          "l2_bytes": 6325706784.0
+        },
+        "candidate": {
+          "warp_instructions": 5558959104.0,
+          "tensor_instructions": 65536000.0,
+          "shared_bank_conflicts": 141628726.0,
+          "dram_bytes": 930243328.0,
+          "l2_bytes": 5507768704.0
+        }
+      }
+    },
+    "cnn1": [
+      {
+        "mode": "dx",
+        "jax_warp_instructions": 97492992.0,
+        "control": {
+          "warp_instructions": 1554071552.0,
+          "over_jax_instructions": 15.940341147802705,
+          "shared_bank_conflicts": 122083362.0,
+          "dram_peak_percent": 5.5477876432339395,
+          "tensor_active_peak_percent": 18.506258324398654,
+          "ordinary_ms": 2.1552255
+        },
+        "candidate": {
+          "warp_instructions": 841089024.0,
+          "over_jax_instructions": 8.627174187043106,
+          "shared_bank_conflicts": 21535236.0,
+          "dram_peak_percent": 10.596143577741929,
+          "tensor_active_peak_percent": 35.37017084469329,
+          "ordinary_ms": 1.1194925
+        }
+      },
+      {
+        "mode": "dw",
+        "jax_warp_instructions": 133572828.0,
+        "control": {
+          "warp_instructions": 1207884800.0,
+          "over_jax_instructions": 9.04289306504763,
+          "shared_bank_conflicts": 157984744.0,
+          "dram_peak_percent": 5.657740262007247,
+          "tensor_active_peak_percent": 24.095705268585167,
+          "ordinary_ms": 2.02537825
+        },
+        "candidate": {
+          "warp_instructions": 1091532800.0,
+          "over_jax_instructions": 8.171817699330285,
+          "shared_bank_conflicts": 26867041.0,
+          "dram_peak_percent": 6.285239352357215,
+          "tensor_active_peak_percent": 26.753723611135392,
+          "ordinary_ms": 1.84103225
+        }
+      }
+    ],
+    "retained_control_instruction_counts_exact": 20,
+    "regression": {
+      "case": "1-32-3-64",
+      "control_ms": 0.665713,
+      "candidate_ms": 0.74650725
+    }
+  },
+  "qualification": {
+    "guards": 124,
+    "allocation_warnings": 5,
+    "f64_values": 2690432,
+    "exact_family_output_pairs": 774861888,
+    "counter_ranges": 116,
+    "offline_metric_rechecks": 4756,
+    "family_source_seals": 1266,
+    "full_update_source_seals": 1775,
+    "standalone_operation_calls": 9320,
+    "counter_replays": 1360,
+    "synthetic_updates": 1088,
+    "game_actions": 0,
+    "minimum_sampled_vulkan_estimated_headroom_bytes": 12380798976,
+    "gpu_workers_remaining": 0
+  },
+  "cpu": {
+    "address_proof": {
+      "actual_address_sampling": "all columns, first/last64 and256 deterministic reduction coordinates; all K cursor transitions",
+      "actual_contracts": 9,
+      "b_source_addresses": 5428172,
+      "cursor_transitions": 5248059,
+      "gpu_calls": 0,
+      "gradient_transitions": 5243557,
+      "packet_and_fragment_checks": 10240,
+      "shared_bytes": {
+        "BF16": 9216,
+        "F16": 9216,
+        "F32": 13312
+      },
+      "small_exhaustive_cases": 12,
+      "status": "complete"
+    },
+    "variant_pairs": 152,
+    "spirv_options": [
+      "default validation",
+      "Blade-aligned validation"
+    ],
+    "changed_variants": 123,
+    "unchanged_variants": 29,
+    "retained_failures": [
+      "typed BF16 vector zero constructor",
+      "offline default initialization versus Blade observer",
+      "two direct Blade source paths"
+    ]
+  },
+  "uniform_addressing_hypothesis": {
+    "pipe_shift": {
+      "control": {
+        "sm__warps_active.avg.pct_of_peak_sustained_active": 48.73680289372445,
+        "smsp__inst_executed_pipe_alu.sum": 507571200.0,
+        "smsp__inst_executed_pipe_uniform.sum": 315417600.0,
+        "smsp__warps_active.sum": 11066981480.0,
+        "smsp__warps_issue_stalled_long_scoreboard.sum": 2003469510.0,
+        "smsp__warps_issue_stalled_wait.sum": 2388956823.0
+      },
+      "candidate": {
+        "sm__warps_active.avg.pct_of_peak_sustained_active": 32.80254803039086,
+        "smsp__inst_executed_pipe_alu.sum": 765875200.0,
+        "smsp__inst_executed_pipe_uniform.sum": 460800.0,
+        "smsp__warps_active.sum": 6672997144.0,
+        "smsp__warps_issue_stalled_long_scoreboard.sum": 1606225514.0,
+        "smsp__warps_issue_stalled_wait.sum": 1989617650.0
+      }
+    },
+    "limit": "Counter shift plus conditional source analysis is consistent with lost warp-uniform addressing, not SASS attribution or proof of Vulkan lane mapping."
+  },
+  "services": {
+    "timing": {
+      "first_utc": "2026-10-16T05:52:00.960301+00:00",
+      "last_utc": "2026-10-16T05:53:42.201747+00:00",
+      "terminal_messages": [
+        "kindle-word-update-timing-20261016.service: Consumed 43.065s CPU time over 1min 41.241s wall clock time, 4G memory peak."
+      ],
+      "sha256": "aede64d10b0c44d5551770974859342fcca7aa9940e7b42896ba1d232d212fb2"
+    },
+    "review": {
+      "first_utc": "2026-10-16T05:54:12.374107+00:00",
+      "last_utc": "2026-10-16T05:54:22.304289+00:00",
+      "terminal_messages": [
+        "kindle-word-update-review-20261016.service: Consumed 7.959s CPU time over 9.929s wall clock time, 1.6G memory peak."
+      ],
+      "sha256": "1eccba763403eb3c0fe8ac936e9fc979e7c6ba6af0bfa9480c03c2dcae910982"
+    }
+  },
+  "limits": [
+    "Word grouping, address factoring and shared pitch change together; their individual latency effects are not isolated.",
+    "Standalone family latency and counters are not additive full-update savings.",
+    "JAX comparison is RGB only; CDP has an additional exploration workload.",
+    "No learning-parity or production-promotion claim; B8 was not remeasured.",
+    "Full parity and non-convolution costs remain open."
+  ]
+}

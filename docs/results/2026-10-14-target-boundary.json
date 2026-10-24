@@ -1,0 +1,282 @@
+{
+  "date": "2026-10-14",
+  "status": "complete",
+  "decision": "Prioritize row/indexing/backward fusion on real dependency chains; device targets remain useful but are not the main residual cause.",
+  "artifacts": "runs/device-targets-20261014.MBFqCNUK",
+  "control_native_sha256": "a1c366a5f9961ebdb0755c4cb21fa8598a3bc22504b536fd88c49b437085b490",
+  "upstream": {
+    "meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba"
+  },
+  "retained_jax": {
+    "core_ms": 12.420477441,
+    "complete_caller_ms": 12.83647523,
+    "fresh_capture": false
+  },
+  "scope": "instrumented CPU wall-clock attribution",
+  "game_actions": 0,
+  "full_updates": 544,
+  "comparisons": {
+    "rgb": {
+      "exact_reports": 272,
+      "first_outputs_exact": true,
+      "plans_exact": true,
+      "tensors": {
+        "initial": {
+          "exact_tensors": 292,
+          "elements": 33203322
+        },
+        "first": {
+          "exact_tensors": 292,
+          "elements": 33203322
+        },
+        "final": {
+          "exact_tensors": 292,
+          "elements": 33203322
+        }
+      },
+      "retained_uninstrumented_ms": 29.16851712499999,
+      "instrumented_ms": 29.084157562500007,
+      "stages_ms": {
+        "behavior_train_and_sync": 1.5921324921875002,
+        "imagination_and_targets": 7.93681411328125,
+        "posterior": 4.3905744453125,
+        "world_train_and_sync": 15.16463651171875
+      },
+      "target_stages_ms": {
+        "host_preparation": 0.07138557421875,
+        "gpu_enqueue": 1.171199671875,
+        "readback_preparation": 0.14519515234375,
+        "readback_complete": 5.0191313671875,
+        "decode_and_bonus": 1.2167141601562501,
+        "lambda_returns": 0.021560742187499992,
+        "normalizer": 0.033053812500000015,
+        "imagined_encoding": 0.18661061328124998,
+        "replay_targets": 0.06516337500000006,
+        "metrics_and_return": 0.006799644531249951
+      },
+      "late_world_target_upload_ms": 0.025323609375,
+      "behavior_target_upload_ms": 0.2548759453125,
+      "minimum_sampled_headroom_bytes": 15100346368,
+      "selected_host_regions_ms": 2.02668262890625
+    },
+    "cdp": {
+      "exact_reports": 272,
+      "first_outputs_exact": true,
+      "plans_exact": true,
+      "tensors": {
+        "initial": {
+          "exact_tensors": 346,
+          "elements": 50710065
+        },
+        "first": {
+          "exact_tensors": 346,
+          "elements": 50710065
+        },
+        "final": {
+          "exact_tensors": 346,
+          "elements": 50710065
+        }
+      },
+      "retained_uninstrumented_ms": 94.05940306250001,
+      "instrumented_ms": 94.00147249609378,
+      "stages_ms": {
+        "behavior_train_and_sync": 4.81676237890625,
+        "imagination_and_targets": 31.5894027265625,
+        "posterior": 11.4194710546875,
+        "world_train_and_sync": 46.1758363359375
+      },
+      "target_stages_ms": {
+        "host_preparation": 0.32953205859375,
+        "gpu_enqueue": 1.252656984375,
+        "readback_preparation": 0.6922600859375,
+        "readback_complete": 23.90939820703125,
+        "decode_and_bonus": 3.77366905859375,
+        "lambda_returns": 0.08216892968749984,
+        "normalizer": 0.12386173437499998,
+        "imagined_encoding": 0.89966412109375,
+        "replay_targets": 0.5028260742187499,
+        "metrics_and_return": 0.02336547265625022
+      },
+      "late_world_target_upload_ms": 0.0796498515625,
+      "behavior_target_upload_ms": 1.012928953125,
+      "minimum_sampled_headroom_bytes": 11300503552,
+      "selected_host_regions_ms": 7.5199263398437495
+    }
+  },
+  "guards": 2,
+  "allocation_warnings": 0,
+  "boundary_inventory": {
+    "rgb/world_gradient": {
+      "dispatches": 4168,
+      "runtime_groups": 1387,
+      "logical_longest_path": 1383,
+      "path_operations": {
+        "Generated:Pointwise": 396,
+        "ToBF16": 158,
+        "Concat": 150,
+        "Generated:Reduction": 103,
+        "MatMulTyped": 98,
+        "SplitB": 97,
+        "BlockMatMulTyped": 60,
+        "SiluGrad": 55,
+        "RmsNormGradX": 55,
+        "GlobalAvgPoolGrad": 48,
+        "Transpose": 36,
+        "SplitA": 34,
+        "SumRows": 33,
+        "MaxPool2d": 20,
+        "PackChannels": 12,
+        "Conv2dPacked": 12,
+        "Upsample2x": 4,
+        "Upsample2xGrad": 4,
+        "MaxPool2dGrad": 4,
+        "Conv2dBF16": 2,
+        "Conv2dGradientTyped": 2
+      }
+    },
+    "rgb/imagination": {
+      "dispatches": 1072,
+      "runtime_groups": 839,
+      "logical_longest_path": 839,
+      "path_operations": {
+        "Generated:Reduction": 168,
+        "Generated:Pointwise": 166,
+        "MatMulTyped": 124,
+        "ToBF16": 106,
+        "Concat": 95,
+        "GlobalAvgPoolGrad": 60,
+        "SumRows": 45,
+        "MaxPool2d": 30,
+        "BlockMatMulTyped": 30,
+        "SplitB": 15
+      }
+    },
+    "rgb/behavior_gradient": {
+      "dispatches": 247,
+      "runtime_groups": 36,
+      "logical_longest_path": 36,
+      "path_operations": {
+        "Generated:Pointwise": 10,
+        "MatMulTyped": 7,
+        "Generated:Reduction": 6,
+        "ToBF16": 4,
+        "SiluGrad": 3,
+        "RmsNormGradX": 2,
+        "SumRows": 2,
+        "GlobalAvgPoolGrad": 1,
+        "RmsNormGradWRowPar": 1
+      }
+    },
+    "rgb/slow_value": {
+      "dispatches": 13,
+      "runtime_groups": 9,
+      "logical_longest_path": 9,
+      "path_operations": {
+        "MatMulTyped": 4,
+        "Generated:Reduction": 3,
+        "ToBF16": 1,
+        "Generated:Pointwise": 1
+      }
+    },
+    "cdp/world_gradient": {
+      "dispatches": 3810,
+      "runtime_groups": 1089,
+      "logical_longest_path": 1089,
+      "path_operations": {
+        "Generated:Pointwise": 372,
+        "Concat": 149,
+        "Generated:Reduction": 103,
+        "SplitB": 96,
+        "SiluGrad": 53,
+        "RmsNormGradX": 53,
+        "MatMul": 51,
+        "MatMulBT": 50,
+        "SplitA": 34,
+        "BlockMatMul": 30,
+        "BlockMatMulBT": 30,
+        "Transpose": 18,
+        "FusedMatMulBTAdd": 17,
+        "GlobalAvgPoolGrad": 16,
+        "Conv2dGemmCoopGen": 4,
+        "MaxPool2d": 4,
+        "MaxPool2dGrad": 4,
+        "Conv2dGradInputGemmCoopGen": 3,
+        "Conv2dGradWeightGemmSplitSmall": 1,
+        "SumRows": 1
+      }
+    },
+    "cdp/imagination": {
+      "dispatches": 1042,
+      "runtime_groups": 749,
+      "logical_longest_path": 749,
+      "path_operations": {
+        "Generated:Reduction": 168,
+        "Generated:Pointwise": 166,
+        "MatMulTyped": 124,
+        "Concat": 95,
+        "ToBF16": 61,
+        "GlobalAvgPoolGrad": 60,
+        "MaxPool2d": 30,
+        "BlockMatMulTyped": 30,
+        "SplitB": 15
+      }
+    },
+    "cdp/behavior_gradient": {
+      "dispatches": 247,
+      "runtime_groups": 36,
+      "logical_longest_path": 36,
+      "path_operations": {
+        "Generated:Pointwise": 10,
+        "MatMulTyped": 7,
+        "Generated:Reduction": 6,
+        "ToBF16": 4,
+        "SiluGrad": 3,
+        "RmsNormGradX": 2,
+        "SumRows": 2,
+        "GlobalAvgPoolGrad": 1,
+        "RmsNormGradWRowPar": 1
+      }
+    },
+    "cdp/slow_value": {
+      "dispatches": 13,
+      "runtime_groups": 9,
+      "logical_longest_path": 9,
+      "path_operations": {
+        "MatMulTyped": 4,
+        "Generated:Reduction": 3,
+        "ToBF16": 1,
+        "Generated:Pointwise": 1
+      }
+    }
+  },
+  "limitations": [
+    "CPU wall-clock marks, not GPU kernel/transfer times or SM utilization; readback includes outstanding producer work.",
+    "Summed selected host regions include input upload and local allocations; not a measured removable budget.",
+    "Unweighted logical dependency-path counts do not measure the weighted GPU critical path or attainable speedup.",
+    "Posterior readback remains required for CPU replay refresh and truncated/microbatched training.",
+    "CPU-only stable decoding design passed 74 illustrative cases; GPU intrinsics and exact native bins remain unqualified.",
+    "Same initial states, 272 numerical reports, first outputs, all saved tensors and precision plans exactly match retained EMA controls; no new learning claim.",
+    "No production, native pin/default, model, precision, RNG, optimizer, replay or training allocation change."
+  ],
+  "source_sha256": {
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/attribution-tests": "17f1e5e3961065f85524a321c83abb94f01aa7192f7a8cc46ec468b236197e89",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/attribution-kindle.patch": "b22daba73572b66b3e8bc9d699587ac0412ecfa6bd1b62ea45a6835b64c9f671",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/audit-attribution.py": "5a1f151230411494e6e342d95a4158a8cc8c2533dbc80671ab47301350f9fa8e",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/inventory-boundaries.py": "0159a0581d832bc85e1b7b93eb95dfb3b71a5ce552aa2173bc2bd98d11865bce",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/boundary-inventory.json": "55f1c6027f9c7843ce6e4dd3a1fcff6d3e5dbc71fd3452832400b103cdb70ff4",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/decode-conditioning.py": "8151346bc24da525aed9e4b4d4fcc34d0c36403ed517b633dcc4985fb06a2cb9",
+    "/x/Code/kindle/runs/device-targets-20261014.MBFqCNUK/decode-conditioning.json": "01fb2a3015f52dd73e18a840be4494fdc140b619bddcd4b7a5d5076a4f8807d7",
+    "/x/Code/kindle/runs/device-ema-20261014.PuHZB9mx/backend.patch": "1ad1f3732a381fc7eae082db14487d66ddceef1a61a824a62f39f8c702286459"
+  },
+  "cpu_preparation": {
+    "kindle_release_clippy": "pass",
+    "kindle_release_test_build": "pass",
+    "audit_wall_seconds": 1.404,
+    "inventory_wall_seconds": 3.086,
+    "inventory_memory_peak": "1.8G",
+    "quota_percent": 100,
+    "memory_max": "2G",
+    "swap_max": 0
+  }
+}

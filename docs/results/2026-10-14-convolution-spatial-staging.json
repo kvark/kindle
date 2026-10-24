@@ -1,0 +1,173 @@
+{
+  "status": "rejected",
+  "date": "2026-10-14",
+  "artifact_root": "runs/conv-spatial-staging-20261014.OA6I86kN",
+  "mechanism": "Shared typed spatial-vector convolution staging; physical shared B transpose for weight gradients",
+  "candidate_sha256": "680ea39a8bb074d4dad86fd7eabace37d69371a9c983b9939c09abecfc2873c7",
+  "control_sha256": "0a4084fca90a223fc7cc49a2bb0874a8edf7a928432b32755a9a04802d396761",
+  "backend_patch_sha256": "019bcea7e2785af817fa6fa117be86752473b49845f83e5d196c95a9af4eed5d",
+  "retained_complete_b32_ms": 65.7363222421875,
+  "retained_jax_b32_ms": 27.1873448801,
+  "retained_complete_ratio": 2.417901510136201,
+  "numerical": {
+    "status": "complete",
+    "guards": [
+      {
+        "name": "numerical",
+        "passed": false,
+        "allocation_warnings": 0,
+        "reason": "Final bookkeeping assertion: actual 93,280 versus erroneous 100,960"
+      }
+    ],
+    "cases": 200,
+    "f64_values": 93280,
+    "kernel_calls": 600,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "all_scalar_control_exact": true,
+    "maximum_relative_l2": 3.3572120790519793e-7,
+    "independent_cpu_recheck": true,
+    "gpu_retry": false,
+    "sampled_headroom_floor_bytes": 2147483648,
+    "sampled_headroom_value_not_saved": true,
+    "review": "All per-case F64/exact/change/restore/headroom assertions precede the final count failure; independent CPU oracle and raw outputs pass. No API, validation or numerical failure. Unchanged candidate may proceed to the declared boundary timing."
+  },
+  "boundary": {
+    "status": "complete",
+    "guards": [
+      {
+        "name": "boundary-control",
+        "passed": true,
+        "allocation_warnings": 0
+      },
+      {
+        "name": "boundary-candidate",
+        "passed": true,
+        "allocation_warnings": 0
+      }
+    ],
+    "arms": {
+      "control": {
+        "gpu_pass_ms": {
+          "encoder-forward": 0.14540325,
+          "decoder-forward": 0.938135,
+          "decoder-dx": 0.1683675,
+          "decoder-dw": 1.09455025,
+          "encoder-dw": 0.1556095
+        },
+        "minimum_sampled_headroom_bytes": 16322920448
+      },
+      "candidate": {
+        "gpu_pass_ms": {
+          "encoder-forward": 0.14542525,
+          "decoder-forward": 0.9771697500000001,
+          "decoder-dx": 0.1683275,
+          "decoder-dw": 1.0681450000000001,
+          "encoder-dw": 0.187799
+        },
+        "minimum_sampled_headroom_bytes": 16322920448
+      }
+    },
+    "retained_exact_values": 70264192,
+    "retained_f64_probes_covered_by_exact_outputs": 1280,
+    "unchanged_graphs": true,
+    "targeted_improvement_percent": -0.6213209841513967,
+    "kernel_calls": 1460,
+    "measured_calls": 1280,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "cpu_address": {
+    "status": "complete",
+    "shapes": 8,
+    "component_address_checks": 2152448,
+    "full_vector_bounds_checks": 409388,
+    "gradient_address_checks": 434368,
+    "shared_coordinates": 2048,
+    "game_actions": 0,
+    "gpu_calls": 0
+  },
+  "cpu_shader_variants": 303,
+  "layout": {
+    "status": "complete",
+    "cpu_only": true,
+    "source": "/x/Code/kindle/runs/spatial-tape-20261014.IrngqAGq/candidate/world_gradient-plan.json",
+    "source_sha256": "13c1bec1176bf05e46b9abdc6e19485626d9b39a408ea976b0323c7001865fdb",
+    "plan_dispatches": 4089,
+    "pack_count": 28,
+    "duplicate_pack_groups": [
+      [
+        151,
+        1204
+      ],
+      [
+        171,
+        1202
+      ],
+      [
+        2033,
+        2036
+      ],
+      [
+        2328,
+        2329
+      ],
+      [
+        2577,
+        2578
+      ],
+      [
+        2593,
+        2594
+      ],
+      [
+        4008,
+        4009
+      ],
+      [
+        4034,
+        4035
+      ]
+    ],
+    "redundant_pack_output_extents": 83886080,
+    "transpose_cast_pack_roundtrips": 10,
+    "game_actions": 0,
+    "gpu_calls": 0,
+    "synthetic_updates": 0,
+    "limitations": [
+      "Static logical output extents, not DRAM traffic, peak memory or measured saving.",
+      "Posterior/world labels alias one staged session; counted once.",
+      "Layout reuse must preserve padding, round points, consumers and backward/staged lifetimes."
+    ]
+  },
+  "kernel_calls": 2060,
+  "measured_kernel_calls": 1280,
+  "synthetic_updates": 0,
+  "game_actions": 0,
+  "allocation_warnings": 0,
+  "guards": {
+    "passed": 2,
+    "failed": 1
+  },
+  "failed_guard_cause": "Final fixture count assertion, independently recovered on CPU without GPU retry",
+  "retained_preparation_failures": [
+    "Inherited pool Clippy reference-pattern diagnostics",
+    "BF16 vector constructor incorrectly used an explicit F32 zero",
+    "Shared Cargo target returned stale control executable for candidate"
+  ],
+  "candidate_promoted": false,
+  "whole_update_trial_run": false,
+  "production_changed": false,
+  "workers_remaining": false,
+  "upstream": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc"
+  },
+  "limitations": [
+    "Rejected before whole-update timing; complete latency and JAX ratio are retained, not freshly measured.",
+    "CPU layout extents and duplicate counts are not DRAM traffic, peak VRAM or performance savings.",
+    "No new native hardware counters or SM-utilization measurement.",
+    "Native F32 cooperative multiplication remains shader-only coverage.",
+    "Production/CDP/Atari unchanged; full performance goal remains open."
+  ]
+}

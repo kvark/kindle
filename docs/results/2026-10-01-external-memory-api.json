@@ -1,0 +1,44 @@
+{
+  "kind": "external_memory_api_integration",
+  "date": "2026-10-01",
+  "blade": "f54a55c33fd58f5111f15a478c1bb487fb7a4640",
+  "meganeura": "2c3130fb8c8a51fe33f887a02ad49d4319565fb0",
+  "api": "Memory::External(ExternalMemorySource::Fd(Some((borrowed_fd, allocation))))",
+  "device": "NVIDIA GeForce RTX 5080",
+  "driver": "580.178.04",
+  "boot_id": "3e89d55c-a9e5-472f-a18a-06508c5bafa7",
+  "khronos_synchronization_validation": true,
+  "minimum_sampled_vulkan_budget_headroom_bytes": 2147483648,
+  "blade_cpu_tests_passed": 10,
+  "kindle_workspace_cpu_tests_passed": 100,
+  "kindle_workspace_tests_ignored": 41,
+  "strict_clippy": ["blade_graphics", "kindle_workspace", "python_bindings"],
+  "portability_checks": ["native_vulkan", "gles", "wasm32"],
+  "blade_native": {
+    "passed": true,
+    "binding_offset_bytes": 4096,
+    "caller_retains_fd": true,
+    "metadata_rejection_cases": 5,
+    "guard": "runs/external-memory-rework-20261001.iAf7hk/blade-native-guard"
+  },
+  "kindle_capture": {
+    "passed": true,
+    "contexts": 2,
+    "ring_slots": 3,
+    "generations": 12,
+    "exact_bytes": true,
+    "partial_socket_metadata": true,
+    "stop_cleanup": true,
+    "guard": "runs/external-memory-rework-20261001.iAf7hk/kindle-guard"
+  },
+  "retained_failures": [
+    "Initial guarded Blade test rejected the default AMD adapter before import; explicit device selection added.",
+    "CPU dependency provenance test found stale reported revisions; constants corrected."
+  ],
+  "initial_failure_guard": "runs/external-memory-rework-20261001.iAf7hk/blade-guard",
+  "initial_failure_snapshot_limit": "All-boot kernel snapshot truncated; separate current-boot GPU-fault query had no entries.",
+  "new_training_runs": 0,
+  "gpu_utilization": null,
+  "nvml_polling": false,
+  "host_recovery": false
+}

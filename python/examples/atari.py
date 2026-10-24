@@ -18,8 +18,6 @@ import gymnasium as gym
 import numpy as np
 from PIL import Image
 
-import kindle
-from kindle._reward_probe import RewardProbe
 
 
 MODEL_SIZES = ("1m", "12m", "25m", "50m", "100m", "200m")
@@ -182,6 +180,9 @@ class DreamerAtariPreprocessing(gym.Wrapper):
 
 
 def main() -> None:
+    import kindle
+    from kindle._reward_probe import RewardProbe
+
     gym.register_envs(ale_py)
     parser = argparse.ArgumentParser()
     parser.add_argument("encoder_checkpoint")

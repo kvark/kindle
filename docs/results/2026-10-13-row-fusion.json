@@ -1,0 +1,672 @@
+{
+  "status": "complete",
+  "date": "2026-10-13",
+  "artifact_directory": "runs/row-fusion-20261013.vif6rSDw",
+  "scope": "General typed row fusion on isolated staged-world candidate; no production/game changes.",
+  "production_changes": false,
+  "game_actions": 0,
+  "full_synthetic_updates": 1136,
+  "backend_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+  "effective_blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+  "effective_naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8",
+  "upstream_recheck": {
+    "time_utc": "2026-10-13 21:39",
+    "meganeura_main": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade_main": "fe5f5b569da6bdcea48d3211277b4906ec764dba"
+  },
+  "jax_retained_ms": 12.416970416779805,
+  "rgb_ratio_to_retained_jax": 2.6453719246442486,
+  "timing": {
+    "status": "complete",
+    "mode": "timing",
+    "guards": 9,
+    "allocation_warnings": 2,
+    "games": 0,
+    "comparisons": {
+      "rgb": {
+        "exact_reports": 272,
+        "reports": 272,
+        "tensors": {
+          "initial": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "first": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "final": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 1164,
+        "posterior_is_world_prefix": true,
+        "minimum_headroom_bytes": 15098249216,
+        "control_ms": 33.68414311328126,
+        "fused_ms": 32.84750492968749,
+        "less_time_percent": 2.4837745783828247,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 2.57594144921875,
+            "imagination_and_targets": 10.93885973828125,
+            "posterior": 4.6972665078125,
+            "world_train_and_sync": 15.47207541796875
+          },
+          "fused": {
+            "behavior_train_and_sync": 2.5389099296875,
+            "imagination_and_targets": 10.1656488515625,
+            "posterior": 4.69060708984375,
+            "world_train_and_sync": 15.45233905859375
+          }
+        }
+      },
+      "cdp": {
+        "exact_reports": 272,
+        "reports": 272,
+        "tensors": {
+          "initial": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "first": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "final": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 0,
+        "posterior_is_world_prefix": false,
+        "minimum_headroom_bytes": 11290017792,
+        "control_ms": 111.0230187695312,
+        "fused_ms": 105.17246174218752,
+        "less_time_percent": 5.269679290101681,
+        "stages_ms": {
+          "control": {
+            "behavior_train_and_sync": 5.752536078125,
+            "imagination_and_targets": 46.0231698515625,
+            "posterior": 12.40042601171875,
+            "world_train_and_sync": 46.846886828125
+          },
+          "fused": {
+            "behavior_train_and_sync": 5.8184796914062495,
+            "imagination_and_targets": 40.1986377109375,
+            "posterior": 12.02156444140625,
+            "world_train_and_sync": 47.1337798984375
+          }
+        }
+      }
+    }
+  },
+  "smoke": {
+    "status": "complete",
+    "mode": "smoke",
+    "guards": 5,
+    "allocation_warnings": 1,
+    "games": 0,
+    "comparisons": {
+      "rgb": {
+        "exact_reports": 24,
+        "reports": 24,
+        "tensors": {
+          "initial": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "first": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "final": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 1164,
+        "posterior_is_world_prefix": true,
+        "minimum_headroom_bytes": 15098249216
+      },
+      "cdp": {
+        "exact_reports": 24,
+        "reports": 24,
+        "tensors": {
+          "initial": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "first": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "final": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "first_outputs": {
+          "action_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "deter": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "imagined_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_slow_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_value_target": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "replay_weight": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          },
+          "stoch": {
+            "exact": true,
+            "changed": 0,
+            "relative_l2": 0.0,
+            "max_abs": 0.0
+          }
+        },
+        "final_state_scope": "paired",
+        "prefix_dispatches": 0,
+        "posterior_is_world_prefix": false,
+        "minimum_headroom_bytes": 11290017792
+      }
+    }
+  },
+  "inventory": {
+    "scope": "Same matrix/convolution descriptors, geometry and nominal arithmetic; staged RGB posterior is counted only once. Groups are runtime counts from the candidate, not plan overrides.",
+    "workloads": {
+      "rgb": {
+        "imagination": {
+          "control": {
+            "dispatches": 1367
+          },
+          "fused": {
+            "dispatches": 1087,
+            "groups": 854
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "world_gradient": {
+          "control": {
+            "dispatches": 4508
+          },
+          "fused": {
+            "dispatches": 4492,
+            "groups": 1433
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "behavior_gradient": {
+          "control": {
+            "dispatches": 254
+          },
+          "fused": {
+            "dispatches": 254,
+            "groups": 37
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "slow_value": {
+          "control": {
+            "dispatches": 19
+          },
+          "fused": {
+            "dispatches": 13,
+            "groups": 9
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "total_dispatches": {
+          "control": 6148,
+          "fused": 5846
+        }
+      },
+      "cdp": {
+        "posterior": {
+          "control": {
+            "dispatches": 1286
+          },
+          "fused": {
+            "dispatches": 1106,
+            "groups": 615
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "imagination": {
+          "control": {
+            "dispatches": 1355
+          },
+          "fused": {
+            "dispatches": 1059,
+            "groups": 764
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "world_gradient": {
+          "control": {
+            "dispatches": 4139
+          },
+          "fused": {
+            "dispatches": 4123,
+            "groups": 1136
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "behavior_gradient": {
+          "control": {
+            "dispatches": 254
+          },
+          "fused": {
+            "dispatches": 254,
+            "groups": 37
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "slow_value": {
+          "control": {
+            "dispatches": 19
+          },
+          "fused": {
+            "dispatches": 13,
+            "groups": 9
+          },
+          "matrix_convolution_descriptors_exact": true
+        },
+        "total_dispatches": {
+          "control": 7053,
+          "fused": 6555
+        }
+      }
+    }
+  },
+  "numerics": {
+    "cases": 84,
+    "f64_comparisons": 108,
+    "conditional_comparisons": 60,
+    "rne_values": 1058092,
+    "optimizer_updates": 0
+  },
+  "cpu": {
+    "plan_and_shader_cases": 20,
+    "analytic_comparisons": 60,
+    "row_tests": 4,
+    "schedule_tests": 27,
+    "cache_tests": 13,
+    "library_clippy": "both pass"
+  },
+  "original_ideal_f64_failed_cases": [
+    {
+      "rows": 128,
+      "cols": 2048,
+      "bf16_input": false,
+      "lowering": "default"
+    },
+    {
+      "rows": 128,
+      "cols": 2048,
+      "bf16_input": false,
+      "lowering": "unfused"
+    },
+    {
+      "rows": 128,
+      "cols": 2048,
+      "bf16_input": true,
+      "lowering": "default"
+    },
+    {
+      "rows": 128,
+      "cols": 2048,
+      "bf16_input": true,
+      "lowering": "unfused"
+    }
+  ],
+  "conditional_diagnosis": {
+    "exact_fused_unfused": true,
+    "results": [
+      {
+        "conditional_passed": true,
+        "conditional_weight_949": 0.0001689396607610819,
+        "name": "default",
+        "original_passed": false,
+        "original_report": "Report { comparisons: [Comparison { what: \"loss\", result: Ok(()) }, Comparison { what: \"gradient of bias\", result: Ok(()) }, Comparison { what: \"gradient of weight\", result: Err(Mismatch { index: 949, got: 0.0001689396594883874, want: 0.0001690247938686015, allowed: 3.6329400517758215e-8, failures: 1 }) }], shaders: [Generated, GlobalAvgPoolGrad, Generated, Generated, Generated, Generated, Generated, MeanAll, Generated, MeanAll, SiluGrad, RmsNormGradWRowPar, RmsNormGradX, SumRows, SumRows] }",
+        "weight_949": 0.0001689396594883874
+      },
+      {
+        "conditional_passed": true,
+        "conditional_weight_949": 0.0001689396607610819,
+        "name": "unfused",
+        "original_passed": false,
+        "original_report": "Report { comparisons: [Comparison { what: \"loss\", result: Ok(()) }, Comparison { what: \"gradient of bias\", result: Ok(()) }, Comparison { what: \"gradient of weight\", result: Err(Mismatch { index: 949, got: 0.0001689396594883874, want: 0.0001690247938686015, allowed: 3.6329400517758215e-8, failures: 1 }) }], shaders: [Generated, Generated, GlobalAvgPoolGrad, Generated, Generated, Generated, ToBF16, FromBF16, Generated, Generated, Generated, MeanAll, Generated, MeanAll, SiluGrad, RmsNormGradWRowPar, RmsNormGradX, SumRows, SumRows] }",
+        "weight_949": 0.0001689396594883874
+      }
+    ]
+  },
+  "retained_failures": [
+    "initial CPU Clippy correction",
+    "original quantized-output F64 gate",
+    "original raw-gradient F64 gate",
+    "first CPU inventory exceeds isolated 2GiB cgroup; streaming replacement"
+  ],
+  "guards": [
+    {
+      "queue": "numerical",
+      "job": "row-numerics",
+      "passed": false,
+      "child_exit_code": 101
+    },
+    {
+      "queue": "diagnostic",
+      "job": "rounding-diagnosis",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "numerical-precision",
+      "job": "staged-precision",
+      "passed": false,
+      "child_exit_code": 101
+    },
+    {
+      "queue": "conditional-qualification",
+      "job": "conditional-diagnosis",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "final-numerical",
+      "job": "conditional-numerics",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "qualification",
+      "job": "rgb-smoke",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "qualification",
+      "job": "cdp-smoke",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "timing",
+      "job": "cdp-fused",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "timing",
+      "job": "rgb-fused",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "timing",
+      "job": "rgb-control",
+      "passed": true,
+      "child_exit_code": 0
+    },
+    {
+      "queue": "timing",
+      "job": "cdp-control",
+      "passed": true,
+      "child_exit_code": 0
+    }
+  ],
+  "allocation_warnings": 2,
+  "guard_nvml_queries": 0,
+  "runtime_unchanged_in_test_supplements": true,
+  "hashes": {
+    "backend-tests": "9604f56a4241743ff5b448372eeedb587c8a075abee30a3c8543e65b05a6c4f0",
+    "backend-diagnostic-tests": "c8e69df82fb12bdb52a36ae7db7cc924a29ec389c173857bf0cbec3b62a432c3",
+    "backend-precision-tests": "d64060bd3b35ff2f0752706989ab29d04ed67da9cd22406bf91ab1bd179fa124",
+    "backend-conditional-tests": "521f46b39f45b829ed6920e0040b1e2be02ae76b4d45d97f862fe14bb85ae53a",
+    "backend-final-tests": "fabea6e573afbecc1a3f3c52317ce03b33a3e56ab8b2dc471aec480646d9a2cd",
+    "kindle-tests": "ec4c0d3249e5d5810e969cccd9d6c4faaff0cc7097c1176614f200427cfda412",
+    "backend-qualified.patch": "bbb761b0700068fe20d237541b333b8fc6e28df0cf6122948ec0bdc8a9fe5553",
+    "backend-diagnostic.patch": "827a75b9ddc853c72d9fe42bab085b6236d71cc5e065c257d7f33d42876582d2",
+    "backend-precision.patch": "2f993aaa40be8918826ace937f24e5ce4b1b026d7f5974001b7345cedf1348c0",
+    "backend-conditional.patch": "5fdaa1ea12564a4dfa265ba86ec98d355cf6f49b6f7ace19839803ddd569f1ee",
+    "backend-final-tests.patch": "3dd70ff52d0f1c474f60be5eaa94bc622a4078dedb9ad94cafce33c865a9f3b4",
+    "kindle.patch": "cebac52717106f195e3cb7edb489bb85bd27a3628ebca61075787077f150774c",
+    "backend-Cargo.lock": "7b9cfd6d8e16eac3352c7742979fe57532c4bbaca3f3f930d072d5220f853e5a",
+    "kindle-Cargo.lock": "3ecaf353f0ac830194715e684f756389eb414c25ae54af239f45f7c020af8ffe",
+    "inventory-first-failed.py": "3f6bed73669ef2f9e588b4a3a7b6c4ea15d44514a5c268eb5b1c75b5a8393de1",
+    "inventory.py": "d04ac6250e5a8686fb2d37965c091d4265b5fcdd027a708ee0d3dd33fc09b57f",
+    "audit.py": "eafa3c1ac1c734b4cd3b61320b4ece952668ac559e9c29b38647e4b49c29a7fe"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "status": "complete_with_retained_observer_failure",
+  "date": "2026-10-15",
+  "artifact_root": "runs/cdp-bf16-qualification-20261015.SGFYYAOP",
+  "boundary_native_sha256": "e6ea9351d2139cc506659ab3b7d984fed836aa53add95095b015c5b4d34a5586",
+  "world_native_sha256": "552913814d835a0d5fe93ed856ac2a1af9bb72e73f0d2a666ee3818fbc1fb3be",
+  "boundary": {
+    "cases": 8,
+    "values_checked": 5585254,
+    "worst_checks": {
+      "forward": {
+        "max_absolute": 0,
+        "relative_l2": 0,
+        "max_envelope_fraction": 0
+      },
+      "distance": {
+        "max_absolute": 0.0000010555741529749696,
+        "relative_l2": 9.179317326345609e-7,
+        "max_envelope_fraction": 0.3518580509916565
+      },
+      "loss": {
+        "max_absolute": 0.00014580914455564198,
+        "relative_l2": 2.8937918976161225e-7,
+        "max_envelope_fraction": 0.09720609637042799
+      },
+      "probe_gradient": {
+        "max_absolute": 0.03562888996384572,
+        "relative_l2": 0.000001928116877648731,
+        "max_envelope_fraction": 0.8160693418054308
+      },
+      "input_gradient": {
+        "max_absolute": 0.000057220458984375,
+        "relative_l2": 0.00008932824351569155,
+        "max_envelope_fraction": 0.011365778237877917
+      },
+      "weight_gradient": {
+        "max_absolute": 0.001922607421875,
+        "relative_l2": 0.00007903850741572516,
+        "max_envelope_fraction": 0.020954732086114668
+      }
+    },
+    "minimum_sampled_headroom_bytes": 16524181504,
+    "source_seals": 828
+  },
+  "world": {
+    "exact_tensors": 346,
+    "exact_tensor_boundary_pairs": 3,
+    "late_inputs": 80,
+    "raw_backward_passes": 5,
+    "raw_gradient_tensors": 86,
+    "raw_gradient_elements": 14688256,
+    "whole_staged_pairs": 2,
+    "restored": true,
+    "minimum_sampled_headroom_bytes": 12322078720,
+    "source_seals": 1200
+  },
+  "guards": [
+    {
+      "path": "boundary-queue/boundary",
+      "passed": true,
+      "exit_code": 0,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "world-queue/world",
+      "passed": false,
+      "exit_code": 101,
+      "allocation_warnings": 0
+    },
+    {
+      "path": "comparison-repair/world-queue/world",
+      "passed": true,
+      "exit_code": 0,
+      "allocation_warnings": 1
+    }
+  ],
+  "guards_passed": 2,
+  "guards_failed": 1,
+  "allocation_warnings": 1,
+  "original_failed_comparison": {
+    "all_f32_exact": true,
+    "all_f64_exact": false,
+    "values_per_side": 5618720,
+    "repair": "persist then deserialize both sides identically; exact equality retained"
+  },
+  "game_actions": 0,
+  "initializer_updates": 2,
+  "raw_backward_passes": 13,
+  "ordinary_timing_repeated": false,
+  "independent_scope": "BF16 learned projection plus actual detached-mean/cosine loss boundary; whole/staged actual world exactness",
+  "full_model_independent_oracle": false,
+  "learning_equivalence": false,
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "retained_failures": [
+    "original Clippy as_chunks lint",
+    "original in-memory-versus-deserialized JSON assertion",
+    "first CPU failure-log extractor whitespace assertion"
+  ],
+  "source_sha256": {
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/boundary-review.json": "5bbd9c0d560d3d21eafb6832f514d29304594154c42ff452c22c5c36762b20d5",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/boundary/result.json": "f6a054b46d5bfa64e57e065c747068153540c5d4a5aaa90b786b9449ce1be366",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/failure-review.json": "1b8f01c5d577477f82f788c532b0c2545568c5d1ac8cb215901ab9b1877ea346",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/review_failure.py": "d8a143471aeb0200d2dbad05bb0e53fc8e3a654bf07e12bb8b20fc83edc0e609",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/review_failure_v2.py": "aa55d219516250350b7a6bfd392b21b6edb83283d39aae880249f32e72bac406",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/comparison-repair/world-review.json": "ad2a3713644c480cac28f4363d67835dba50398334214f1154b90b45bfb2815d",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/comparison-repair/world/result.json": "f4e19ca500765be609a1e85bfa50199a7dd09c513d315d2ed1eeb09f6223b25e",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/comparison-repair/world/comparisons.json": "4f3ffe7cb95bc538da1a4d162e7d43e17e1bee6e70747e3fd701b5d4abcfb973",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/comparison-repair/prepare.json": "a374f8e523c4aaeada5192e568c3b74c2680ccee2e83aae267ecab7716470026",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/comparison-repair/build.log": "d608358376ffcd79860dc27ea48a2dbe156555f91bf3c9716d04b9a2092ac148",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/build.log": "0189663d04573458ec4a36b01fce7d7f71125a8ac5c939d04c18d5b78bd74941",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/build-v2.log": "7b3903d15ac821adec5d37b46367234c1185b6cc1d249336d93d99e4fee27881",
+    "/x/Code/kindle/runs/cdp-bf16-qualification-20261015.SGFYYAOP/publication.py": "d7aa649e9882fc336222a58bfab368c371271121efcdc124d69ba040365851ee"
+  }
+}

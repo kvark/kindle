@@ -1,0 +1,496 @@
+{
+  "status": "passed",
+  "artifact_root": "/x/Code/kindle/runs/driver615-attribution-20261021.Gu1bfUww",
+  "driver": "615.71.09",
+  "native_sha256": "55904d2445a80dd58ec5b26c5b40aa57905b316fc52b08de2c545a889ba49e9a",
+  "ordinary_baseline": "72005c8b",
+  "upstream_checked": "a75c38e1880de8e25e44ca169cc5f737812385ae",
+  "guards": 4,
+  "warnings": 0,
+  "synthetic_updates": 1088,
+  "game_actions": 0,
+  "measured_updates_per_arm": 256,
+  "source_receipts": 1458,
+  "reader_tests": {
+    "original_failure_reproduced": true,
+    "tail_retained": true,
+    "valid": 1,
+    "negative": 3,
+    "interval_pairing": {
+      "valid": 4,
+      "negative": 6
+    }
+  },
+  "workloads": {
+    "rgb": {
+      "ordinary_ms": 48.442387347656265,
+      "coarse_ms": 49.37544926953122,
+      "calibration_percent": -0.011782809560512142,
+      "instrumentation_overhead_percent": 1.9261270407229247,
+      "timing_gate": true,
+      "ordinary_parity": {
+        "reports": 272,
+        "tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 205
+      },
+      "coarse_parity": {
+        "reports": 272,
+        "tensors": {
+          "initial": 292,
+          "first": 292,
+          "final": 292
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 205
+      },
+      "world_chunks": [
+        {
+          "name": "posterior-0",
+          "groups": [
+            0,
+            251
+          ],
+          "dispatches": [
+            0,
+            525
+          ],
+          "gpu_ms": 3.345112625
+        },
+        {
+          "name": "posterior-1",
+          "groups": [
+            251,
+            502
+          ],
+          "dispatches": [
+            525,
+            900
+          ],
+          "gpu_ms": 0.82007325
+        },
+        {
+          "name": "world-0",
+          "groups": [
+            502,
+            706
+          ],
+          "dispatches": [
+            900,
+            2735
+          ],
+          "gpu_ms": 20.418300125
+        },
+        {
+          "name": "world-1",
+          "groups": [
+            706,
+            910
+          ],
+          "dispatches": [
+            2735,
+            3219
+          ],
+          "gpu_ms": 0.955020625
+        },
+        {
+          "name": "world-2",
+          "groups": [
+            910,
+            1112
+          ],
+          "dispatches": [
+            3219,
+            3751
+          ],
+          "gpu_ms": 7.9360905
+        }
+      ],
+      "trace": {
+        "summary": {
+          "wall_ms": 49.3776579140625,
+          "gpu_pass_ms": 45.14758001953125,
+          "uncovered_ms": 4.23007789453125,
+          "outside_timer_union_ms": 0.00908822265625,
+          "stages": {
+            "posterior": {
+              "wall_ms": 7.02870058984375,
+              "gpu_pass_ms": 4.37603375,
+              "uncovered_ms": 2.65266683984375
+            },
+            "imagination": {
+              "wall_ms": 7.04146908984375,
+              "gpu_pass_ms": 6.87515960546875,
+              "uncovered_ms": 0.166309484375
+            },
+            "world": {
+              "wall_ms": 31.2801826953125,
+              "gpu_pass_ms": 30.38239538671875,
+              "uncovered_ms": 0.89778730859375
+            },
+            "behavior": {
+              "wall_ms": 4.0273055390625,
+              "gpu_pass_ms": 3.51399127734375,
+              "uncovered_ms": 0.51331426171875
+            }
+          },
+          "cached_chunk_ms": {
+            "posterior-0": 3.345112625,
+            "posterior-1": 0.82007325,
+            "imagination": 6.25250925,
+            "slow_value": 0.521368375,
+            "world-0": 20.418300125,
+            "world-1": 0.955020625,
+            "world-2": 7.9360905,
+            "behavior": 3.45048625
+          },
+          "pass_ms": {
+            "cached_graph": 43.698961,
+            "categorical_means": 0.054464375,
+            "kindle_uniforms": 0.066106,
+            "kindle_readback": 0.202185625,
+            "kindle_device_copy": 0.440333,
+            "agc_norms": 0.108437625,
+            "agc_factor": 0.008217,
+            "agc_apply": 0.0389245,
+            "adam_update": 0.3025085,
+            "parameter_blend": 0.0102795,
+            "target_returns": 0.012961125,
+            "target_normalizer": 0.163380375,
+            "target_replay_returns": 0.0103555,
+            "target_actions": 0.00614075,
+            "target_two_hot": 0.017040125,
+            "target_report": 0.01637975,
+            "readback_copy": 0
+          }
+        },
+        "per_update_counts": {
+          "cached_graph": 8,
+          "categorical_means": 1,
+          "kindle_uniforms": 2,
+          "kindle_readback": 1,
+          "kindle_device_copy": 3,
+          "agc_norms": 2,
+          "agc_factor": 2,
+          "agc_apply": 2,
+          "adam_update": 2,
+          "parameter_blend": 1,
+          "target_returns": 1,
+          "target_normalizer": 1,
+          "target_replay_returns": 1,
+          "target_actions": 1,
+          "target_two_hot": 1,
+          "target_report": 1
+        },
+        "pass_counts": {
+          "kindle_uniforms": 544,
+          "cached_graph": 2176,
+          "kindle_readback": 272,
+          "kindle_device_copy": 816,
+          "categorical_means": 272,
+          "target_returns": 272,
+          "target_normalizer": 272,
+          "target_replay_returns": 272,
+          "target_actions": 272,
+          "target_two_hot": 272,
+          "target_report": 272,
+          "agc_norms": 544,
+          "agc_factor": 544,
+          "agc_apply": 544,
+          "adam_update": 544,
+          "parameter_blend": 272
+        },
+        "metric_copies": 45,
+        "all_gpu_intervals": 8408,
+        "parsed_gpu_endpoints": 16816,
+        "drain_ms": 0.02768
+      },
+      "diagnostic_passes": 4,
+      "samples": {
+        "ordinary": {
+          "first32_ms": 48.4224666875,
+          "last32_ms": 48.556611187499996,
+          "minimum_sampled_headroom_bytes": 13381730304
+        },
+        "coarse": {
+          "first32_ms": 49.19947134375,
+          "last32_ms": 49.38788246875,
+          "minimum_sampled_headroom_bytes": 13381664768
+        }
+      }
+    },
+    "cdp": {
+      "ordinary_ms": 41.893398535156216,
+      "coarse_ms": 42.70908544140628,
+      "calibration_percent": 0.16032064501450005,
+      "instrumentation_overhead_percent": 1.9470535568164804,
+      "timing_gate": true,
+      "ordinary_parity": {
+        "reports": 272,
+        "tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 225
+      },
+      "coarse_parity": {
+        "reports": 272,
+        "tensors": {
+          "initial": 346,
+          "first": 346,
+          "final": 346
+        },
+        "program_pipeline_pairs": 10,
+        "shader_files": 225
+      },
+      "world_chunks": [
+        {
+          "name": "posterior-0",
+          "groups": [
+            0,
+            259
+          ],
+          "dispatches": [
+            0,
+            635
+          ],
+          "gpu_ms": 3.452216375
+        },
+        {
+          "name": "posterior-1",
+          "groups": [
+            259,
+            517
+          ],
+          "dispatches": [
+            635,
+            1076
+          ],
+          "gpu_ms": 1.287787875
+        },
+        {
+          "name": "world-0",
+          "groups": [
+            517,
+            717
+          ],
+          "dispatches": [
+            1076,
+            3082
+          ],
+          "gpu_ms": 3.482531875
+        },
+        {
+          "name": "world-1",
+          "groups": [
+            717,
+            917
+          ],
+          "dispatches": [
+            3082,
+            3561
+          ],
+          "gpu_ms": 0.961057125
+        },
+        {
+          "name": "world-2",
+          "groups": [
+            917,
+            1117
+          ],
+          "dispatches": [
+            3561,
+            4088
+          ],
+          "gpu_ms": 7.940568
+        }
+      ],
+      "trace": {
+        "summary": {
+          "wall_ms": 42.71166580859375,
+          "gpu_pass_ms": 38.596159578125,
+          "uncovered_ms": 4.11550623046875,
+          "outside_timer_union_ms": 0.008806296875,
+          "stages": {
+            "posterior": {
+              "wall_ms": 7.57481351953125,
+              "gpu_pass_ms": 4.950069125,
+              "uncovered_ms": 2.62474439453125
+            },
+            "imagination": {
+              "wall_ms": 16.48007246875,
+              "gpu_pass_ms": 16.3103437734375,
+              "uncovered_ms": 0.1697286953125
+            },
+            "world": {
+              "wall_ms": 14.63586653125,
+              "gpu_pass_ms": 13.8340346015625,
+              "uncovered_ms": 0.8018319296875001
+            },
+            "behavior": {
+              "wall_ms": 4.0209132890625,
+              "gpu_pass_ms": 3.501712078125,
+              "uncovered_ms": 0.5192012109375
+            }
+          },
+          "cached_chunk_ms": {
+            "posterior-0": 3.452216375,
+            "posterior-1": 1.287787875,
+            "imagination": 15.704890625,
+            "slow_value": 0.5203055,
+            "world-0": 3.482531875,
+            "world-1": 0.961057125,
+            "world-2": 7.940568,
+            "behavior": 3.43757725
+          },
+          "pass_ms": {
+            "cached_graph": 36.786934625,
+            "categorical_means": 0.054286625,
+            "kindle_uniforms": 0.066257,
+            "kindle_readback": 0.201297,
+            "kindle_device_copy": 0.438781625,
+            "agc_norms": 0.16273175,
+            "agc_factor": 0.010241125,
+            "agc_apply": 0.147287375,
+            "adam_update": 0.503050125,
+            "parameter_blend": 0.010640125,
+            "target_returns": 0.011071125,
+            "target_normalizer": 0.16309737500000002,
+            "target_replay_returns": 0.0102785,
+            "target_actions": 0.006138,
+            "target_two_hot": 0.0164945,
+            "target_report": 0.016379,
+            "readback_copy": 0
+          }
+        },
+        "per_update_counts": {
+          "cached_graph": 8,
+          "categorical_means": 1,
+          "kindle_uniforms": 2,
+          "kindle_readback": 1,
+          "kindle_device_copy": 3,
+          "agc_norms": 2,
+          "agc_factor": 2,
+          "agc_apply": 2,
+          "adam_update": 2,
+          "parameter_blend": 1,
+          "target_returns": 1,
+          "target_normalizer": 1,
+          "target_replay_returns": 1,
+          "target_actions": 1,
+          "target_two_hot": 1,
+          "target_report": 1
+        },
+        "pass_counts": {
+          "kindle_uniforms": 544,
+          "cached_graph": 2176,
+          "kindle_readback": 272,
+          "kindle_device_copy": 816,
+          "categorical_means": 272,
+          "target_returns": 272,
+          "target_normalizer": 272,
+          "target_replay_returns": 272,
+          "target_actions": 272,
+          "target_two_hot": 272,
+          "target_report": 272,
+          "agc_norms": 544,
+          "agc_factor": 544,
+          "agc_apply": 544,
+          "adam_update": 544,
+          "parameter_blend": 272
+        },
+        "metric_copies": 48,
+        "all_gpu_intervals": 8447,
+        "parsed_gpu_endpoints": 16894,
+        "drain_ms": 0.03107
+      },
+      "diagnostic_passes": 4,
+      "samples": {
+        "ordinary": {
+          "first32_ms": 41.977062625,
+          "last32_ms": 41.948988625,
+          "minimum_sampled_headroom_bytes": 12472221696
+        },
+        "coarse": {
+          "first32_ms": 42.76685053125,
+          "last32_ms": 42.5927668125,
+          "minimum_sampled_headroom_bytes": 12472221696
+        }
+      }
+    }
+  },
+  "current_jax_inclusive_ms": 26.066381933361527,
+  "rgb_to_jax": 1.8584239067584751,
+  "failures_retained": [
+    "offline target shader test lacked KINDLE_TARGET_SHADER_DIR",
+    "first trace reader treated parameter_blend tail as checkpoint activity"
+  ],
+  "production_changed": false,
+  "atari_restarted": false,
+  "gpu_repeated": false,
+  "limits": [
+    "GPU pass union is not SM utilization",
+    "coarse timing adds three intermediate waits",
+    "uncovered time is not pure CPU or proven GPU idle time",
+    "no current-driver instruction or native SASS capture",
+    "CDP is not a matched JAX workload"
+  ],
+  "finished_utc": "2026-10-21T08:48:28.281196+00:00",
+  "publication_receipts": 63,
+  "counter_observer_cpu_followup": {
+    "status": "passed",
+    "rgb_ranges": 41,
+    "cdp_ranges": 52,
+    "empty_control_ranges_per_capture": 1,
+    "dispatches": {
+      "rgb": 3751,
+      "cdp": 763
+    },
+    "bonus_exclusive_dispatches": 82,
+    "ensemble_macs": 64424509440,
+    "reverse_closure_matches": true,
+    "negative_partition_tests": 10,
+    "storage": {
+      "device_handles": 0,
+      "gpu_calls": 0,
+      "rows": [
+        {
+          "counter_data_bytes": 1061436,
+          "passes_128MiB_limit": true,
+          "ranges": 2
+        },
+        {
+          "counter_data_bytes": 599932980,
+          "passes_128MiB_limit": false,
+          "ranges": 1139
+        },
+        {
+          "counter_data_bytes": 27923748,
+          "passes_128MiB_limit": true,
+          "ranges": 53
+        }
+      ],
+      "status": "complete",
+      "target_initializations": 0
+    },
+    "marker_projection_matches_current": true,
+    "secondary_accessor_required": true,
+    "compiled_observer": false,
+    "current_driver_counter_support_unverified": true,
+    "gpu_calls": 0,
+    "builds": 0,
+    "learner_updates": 0,
+    "game_actions": 0,
+    "original_cpu_oom_retained": true,
+    "memory_limit_bytes": 2147483648,
+    "finished_utc": "2026-10-21T08:56:30.273975+00:00",
+    "source_receipts": 18,
+    "artifact_root": "/x/Code/kindle/runs/current-counter-contract-20261021.0GrKXG3X"
+  }
+}

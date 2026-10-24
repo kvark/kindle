@@ -1,0 +1,40 @@
+{
+  "status": "cost_rejected",
+  "artifacts": "runs/reduction-tail-20261020.QfZoT3VX",
+  "native_sha256": "4b52098ab93ca49b68a439ef4ab41a32a727ec1b43c012b36019076e773b0346",
+  "qualified_control": "d3ff4948",
+  "finished_utc": "2026-10-20T06:08:32.271722+00:00",
+  "rgb": {
+    "control_ms": 42.9357645859375,
+    "candidate_ms": 43.2754291171875,
+    "reduction_fraction": -0.007910992957168572,
+    "cost_gate_passed": false
+  },
+  "cdp": {
+    "control_ms": 40.67283478125002,
+    "candidate_ms": 42.02333048046874,
+    "reduction_fraction": -0.03320387444057138,
+    "cost_gate_passed": false
+  },
+  "captured_reductions": 1534,
+  "actual_modules_per_arm": 26,
+  "typed_fixture_cases_per_arm": 960,
+  "validated_spirv_modules": 1972,
+  "ownership_guard_cpu_cases": 2323,
+  "changed_runtime_shader_bodies": {"rgb": 27, "cdp": 30},
+  "exact_short_reports_per_workload": 24,
+  "exact_full_reports_per_workload": 272,
+  "exact_checkpoint_tensors_per_state": {"rgb": 292, "cdp": 346},
+  "checkpoint_states": ["initial", "first", "final", "restored"],
+  "timing_queue_source_receipts": 614,
+  "passing_gpu_guards": 8,
+  "new_allocation_warnings": 6,
+  "synthetic_updates": 1184,
+  "game_actions": 0,
+  "gpu_repeated_cohorts": 0,
+  "retained_observer_failures": 2,
+  "independent_primitive_gpu_oracle": false,
+  "runtime_branch_observed": false,
+  "staged_raw_gradient_check": false,
+  "production_promoted": false
+}

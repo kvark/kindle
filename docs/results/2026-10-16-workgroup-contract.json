@@ -1,0 +1,40 @@
+{
+  "schema": "kindle.workgroup-contract.v1",
+  "status": "properties_and_cpu_audit_complete",
+  "artifacts": "runs/workgroup-contract-20261016.8xpKH4aw",
+  "device": "NVIDIA GeForce RTX 5080",
+  "driver": "580.178.04",
+  "upstream": {
+    "meganeura": "f648a4534a87e29ac29810a88dfa19117f70df9b",
+    "blade": "4845d6529c38b07718a624bf3c4f2ab4317c9bf4",
+    "naga": "13f582ddd2792befb46952498010248bd65818e6"
+  },
+  "features_advertised": ["workgroup", "flexible", "reductions", "conversions", "per_element", "tensor_addressing", "block_loads"],
+  "blade_features_enabled": ["workgroup", "flexible"],
+  "naga_tensor_addressing_ir": false,
+  "flexible_properties": 25,
+  "subgroup_properties": 11,
+  "limits": {"workgroup_invocations": 256, "dimension": 1024, "reserved_shared_bytes": 8192, "explicit_shared_bytes": 49152},
+  "contracts": 20,
+  "occurrences": 23,
+  "negative_capability_checks": 6,
+  "original_shared_plus_reserved_bytes_occurrences": {"17408": 9, "34816": 10, "33792": 4},
+  "source_seals": 72,
+  "guards": 1,
+  "allocation_warnings": 0,
+  "minimum_sampled_headroom_bytes": 16594173952,
+  "logical_devices_created": 0,
+  "dispatches": 0,
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "retained_failure": "CPU v1 reader used historical dispatch indices against the current plan; v2 full membership review passes without GPU repeat",
+  "historical_workgroup_family_used_tensor_addressing": true,
+  "historical_family_rejection_changed": false,
+  "prior_batching_qualification_changed": false,
+  "performance_measured": false,
+  "production_changed": false,
+  "evidence": {
+    "audit.json": "583202c2d6c4b2f2f6c8c6db056c52dce2cbfd09b1b9e10413809a0719296dc5",
+    "properties.json": "bf88d181484595f38d8424fc08cffabfb71e1968533e5fb8d5e199fee76258de"
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "date": "2026-10-14",
+  "status": "complete",
+  "mechanism": "device ChaCha12 uniforms, exact original pinned CPU stream",
+  "artifacts": "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK",
+  "installed_runtime_changed": false,
+  "learning_allocations": 0,
+  "lineage": {
+    "kindle_base": "26458d63e8bae827003df86c9fc3aa9358a0e113",
+    "meganeura_base": "056562b5adeb6b667a49e29869ab5d7db1871260",
+    "upstream_meganeura": "2214412a3e1559548e34f9ef6a76b144fb72a674",
+    "blade": "fe5f5b569da6bdcea48d3211277b4906ec764dba",
+    "naga": "a4b4183e7fa1f26848e48ba5e837084999c8dfe8",
+    "control_native": "aca8359bf63b5781481ade19b1d5ce9456a98ab368965011ae52c701884cc7f2",
+    "candidate_native": "57a1a1a3d757fa64c567461f9fba074c0f137d1ce7ede9e28f594393604807c6",
+    "control_source": "runs/compiler-boundaries-20261013.fjZrpsqb/backend-qualified.patch",
+    "source_note": "backend-complete.patch exactly matches the qualified wider source; multi-output scalar and later barrier-diagnostic patches excluded"
+  },
+  "protocol": {
+    "warmup": 16,
+    "measured": 256,
+    "pairs_per_workload": 1,
+    "order": [
+      "rgb-control",
+      "rgb-device",
+      "cdp-device",
+      "cdp-control"
+    ],
+    "profiler": false,
+    "concurrent_build_analysis": false,
+    "rgb": {
+      "model": "12M",
+      "batch": 8,
+      "length": 16,
+      "horizon": 15,
+      "precision": "bf16",
+      "uniforms_per_update": 1083136
+    },
+    "cdp": {
+      "model": "12M",
+      "batch": 32,
+      "length": 16,
+      "horizon": 15,
+      "precision": "mixed",
+      "uniforms_per_update": 4332544
+    }
+  },
+  "validation": {
+    "cpu_tests": 4,
+    "cpu_mixed_draw_comparisons": 73746,
+    "gpu_exact_values": 2107118,
+    "raw_words": 1053117,
+    "f32_values": 1054001,
+    "cases": 20,
+    "split_fills": 2,
+    "queue_handoffs": 3,
+    "smoke_updates_per_workload": 24,
+    "smoke_reports_and_initial_first_final_tensors_exact": true,
+    "plans_exact": true,
+    "full_synthetic_updates": 1136,
+    "game_actions": 0,
+    "gpu_guards": 7,
+    "allocation_warnings": 3,
+    "gpu_job_failures": 0,
+    "nvml_polling": false,
+    "recovery": false,
+    "worker_remaining": false
+  },
+  "timing": {
+    "rgb": {
+      "exact_reports": 272,
+      "exact_first_outputs": [
+        "action_target",
+        "deter",
+        "imagined_slow_target",
+        "imagined_value_target",
+        "imagined_weight",
+        "replay_slow_target",
+        "replay_value_target",
+        "replay_weight",
+        "stoch"
+      ],
+      "tensors": {
+        "initial": {
+          "exact": 292,
+          "elements": 33203322
+        },
+        "first": {
+          "exact": 292,
+          "elements": 33203322
+        },
+        "final": {
+          "exact": 292,
+          "elements": 33203322
+        }
+      },
+      "plans_exact": true,
+      "minimum_headroom_bytes": 15100346368,
+      "control_ms": 32.2464810703125,
+      "device_ms": 30.052780304687495,
+      "less_time_percent": 6.802915210629346,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 2.5803056796874997,
+          "imagination_and_targets": 9.986402234375,
+          "posterior": 4.50335244140625,
+          "world_train_and_sync": 15.17642071484375
+        },
+        "device": {
+          "behavior_train_and_sync": 2.5256233125,
+          "imagination_and_targets": 7.94959533203125,
+          "posterior": 4.41586794140625,
+          "world_train_and_sync": 15.16169371875
+        }
+      }
+    },
+    "cdp": {
+      "exact_reports": 272,
+      "exact_first_outputs": [
+        "action_target",
+        "deter",
+        "imagined_slow_target",
+        "imagined_value_target",
+        "imagined_weight",
+        "replay_slow_target",
+        "replay_value_target",
+        "replay_weight",
+        "stoch"
+      ],
+      "tensors": {
+        "initial": {
+          "exact": 346,
+          "elements": 50710065
+        },
+        "first": {
+          "exact": 346,
+          "elements": 50710065
+        },
+        "final": {
+          "exact": 346,
+          "elements": 50710065
+        }
+      },
+      "plans_exact": true,
+      "minimum_headroom_bytes": 11300503552,
+      "control_ms": 104.04771355859381,
+      "device_ms": 95.26878989843746,
+      "less_time_percent": 8.437401803368372,
+      "stages_ms": {
+        "control": {
+          "behavior_train_and_sync": 5.9902972265625,
+          "imagination_and_targets": 39.8699229609375,
+          "posterior": 11.9541733671875,
+          "world_train_and_sync": 46.23332000390625
+        },
+        "device": {
+          "behavior_train_and_sync": 5.964306378906249,
+          "imagination_and_targets": 31.5742890859375,
+          "posterior": 11.56992053125,
+          "world_train_and_sync": 46.160273902343754
+        }
+      }
+    }
+  },
+  "retained_jax": {
+    "core_ms": 12.420477441082767,
+    "seed_ms": 0.2386791229582741,
+    "metrics_ms": 0.17731866591930157,
+    "complete_ms": 12.836475229960342,
+    "source": "runs/compiler-boundaries-20261013.fjZrpsqb/jax-ordinary-reviewed/result.json",
+    "same_model_batch_precision_not_identical_implementation_weights_rng": true,
+    "metric_boundary": "upstream returns prior metric record; first empty, last pending record not separately drained",
+    "new_capture": false
+  },
+  "ratio_to_retained_complete_jax": 2.341201908335731,
+  "retained_failures": [
+    {
+      "kind": "CPU Clippy",
+      "detail": "constant chunks_exact lint; corrected to as_chunks, no GPU work before repair",
+      "log": "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/build.log",
+      "source": "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/pre-clippy-kindle.patch"
+    },
+    {
+      "kind": "incomplete initial source snapshot",
+      "detail": "backend.patch omitted git-apply-created untracked files; reverse-apply check and intent-to-add complete snapshot reproduce the original qualified SHA exactly; executable/source unchanged",
+      "source": "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/backend.patch",
+      "corrected": "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/backend-complete.patch"
+    }
+  ],
+  "decision": "Keep exact-sequence GPU RNG in the isolated candidate; continue device EMA/targets and row/layout compilation. No production promotion, Atari restart or whole-goal closure.",
+  "sha256": {
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/backend-complete.patch": "c5ca564dc214baa4dd6ad2a3323d2843ebc9092bba2227ca487db620a37513d3",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/kindle.patch": "d961789e432856d39e48b58457132d8dbfe8cc3d59156a932d091c8208423b83",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/backend-Cargo.lock": "7b9cfd6d8e16eac3352c7742979fe57532c4bbaca3f3f930d072d5220f853e5a",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/kindle-Cargo.lock": "b0b3d90a9047951b69ef39cbf869d58c1b5fec03560b4b1d2faf42622c8273c4",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/build-native.sh": "4c1d0a73eee876b2657ec8c14c03844c8f29fdb1e29691d4de1bc3652a41e37d",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/audit.py": "45e1da391a9f9ac390fd4f86c3f7055508aed047f41c20932c16eb2ca3877d03",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/numerical-queue.json": "688c7805fd41bbbf6f88068b26e8753edfdcb32d6e82b8ba1694c53b3f8874a8",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/smoke-queue.json": "8be5d65542b223bf79d11400eb39020d919c892a7f10e7d0c2923c391c4fcd50",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/timing-queue.json": "acb7c552a1726ced258eddeb1d541d8057ab0e043846e53aa6d014d13bafc176",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/audit-smoke.json": "d79f6d48de8e3878af3944de0f41aa3aab3bd9ce46740bc61325a0b247bcf46e",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/audit-timing.json": "4f4fe15f959a23f7b2ff6ae0f97796fc7ddc6dc9f43b292f7b998570143cb7d1",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/numerical/result.json": "b6c7a1f57ff11e24ba391023aff49c931c966eff80d4d9b8741b90d7a675da34",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/smoke/result.json": "1e1d1040bff7f6d4b9bf092e2ecc52d2039724e0491cced467443d61bb6a9951",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/timing/result.json": "9227d40c8e080835cccd6ee94efdb7c5a5439944cf3ad3fd2223b58a7cb35a59",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/numerical/exact-uniforms/child.stdout": "c1caeddc9288a904ad41c1c97687c92fddba1a4261ca50ad3ad96926fb40bda0",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/pre-clippy-kindle.patch": "4ed3ede6952a912f513d345e960d64ce9b360864fa2a8d74d021240c8fd72aaf",
+    "/x/Code/kindle/runs/device-rng-20261014.EZ1UNxiK/backend.patch": "3041e6959edf8cb931da77834072fc35b80749a0989173d05205150fd59b4a78"
+  }
+}

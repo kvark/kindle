@@ -1,0 +1,70 @@
+{
+  "status": "qualification_failed",
+  "date": "2026-10-16",
+  "artifacts": "runs/prior-world-20261016.YVA1AFTT",
+  "candidate_native_sha256": "aca8056614902d87c838c97c095dfb856420e507ce46cf19a0ad426d61e4eb19",
+  "keep_qualified_native": "834241b6",
+  "production_changed": false,
+  "evidence_sha256": {
+    "review.json": "2ddacbc8efdf760379b0195e78a2b35786b1b8d9fd8f68640957c3237dfec6a1",
+    "audit.json": "80809e9d37a26af072205f19c0e2cc67a3607f7969606989d236797152f613a6",
+    "rounding-paths.json": "da5f38b8d60f0a9f3b47acde1fcf491a92a325d82e1b12af5a4d30e0078b9eb6"
+  },
+  "within_arm_whole_staged_pairs_exact": 8,
+  "changed_late_targets_and_poisoned_prefix_pass": true,
+  "original_restoration_pass": true,
+  "initial_tensors_posterior_and_targets_exact": true,
+  "model_optimizer_tensors_unchanged": {"rgb": 292, "cdp": 346},
+  "output_array_checks": 56,
+  "output_arrays_passed": 56,
+  "gradient_array_checks": 308,
+  "exact_gradient_arrays": 152,
+  "failed_gradient_arrays": 113,
+  "failed_gradient_values": 903879,
+  "independently_rechecked_values": 52325812,
+  "gates": {"pointwise_absolute": 0.00002, "pointwise_relative": 0.02, "relative_l2": 0.01, "changed": false},
+  "workloads": {
+    "rgb": {
+      "raw_gradient_tensors": 68,
+      "typed_matrices": [392, 257],
+      "dispatches": [3992, 3010],
+      "groups": [1242, 1242],
+      "typed_matrix_nominal_macs_both": 7701004288,
+      "convolution_contracts_unchanged": 23,
+      "original": {"failed_arrays": 20, "failed_values": 8410, "max_relative_l2": 0.001716577583212505},
+      "changed": {"failed_arrays": 17, "failed_values": 8039, "max_relative_l2": 0.0017959582119001908}
+    },
+    "cdp": {
+      "raw_gradient_tensors": 86,
+      "typed_matrices": [436, 301],
+      "dispatches": [4425, 3443],
+      "groups": [1248, 1248],
+      "typed_matrix_nominal_macs_both": 20336345088,
+      "convolution_contracts_unchanged": 11,
+      "original": {"failed_arrays": 38, "failed_values": 493552, "max_relative_l2": 0.006893722025683626},
+      "changed": {"failed_arrays": 38, "failed_values": 393878, "max_relative_l2": 0.007094863079493599}
+    }
+  },
+  "first_prior_contract": {
+    "paths_reviewed": 34,
+    "serial_occurrences_per_workload": 16,
+    "serial_mnk_splits": [32, 256, 2048, 8],
+    "serial_output": "F32 partials -> F32 SumRows -> BF16",
+    "batched_occurrences_per_workload": 1,
+    "batched_mnk_splits": [512, 256, 2048, 1],
+    "batched_output": "CooperativeTiled columns64/K32 -> BF16",
+    "conversion_missing": false,
+    "causal_gradient_attribution": false
+  },
+  "execution_guards_passed": 4,
+  "allocation_warnings": 0,
+  "raw_backward_passes": 24,
+  "optimizer_updates": 0,
+  "game_actions": 0,
+  "source_seals_verified": 3455,
+  "minimum_sampled_headroom_bytes": 12332564480,
+  "rebuild": false,
+  "timing_performed": false,
+  "original_standalone_f64_failures_changed": false,
+  "worker_running": false
+}

@@ -1,0 +1,642 @@
+{
+  "status": "complete",
+  "family_gate_passed": false,
+  "decisions": {
+    "rgb": {
+      "passed": false,
+      "gates": {
+        "gpu_calibration": true,
+        "gpu_improvement": false,
+        "wall_calibration": true,
+        "wall_improvement": false,
+        "warp_reduction": false,
+        "shared_wavefronts": true
+      }
+    },
+    "cdp": {
+      "passed": false,
+      "gates": {
+        "gpu_calibration": true,
+        "gpu_improvement": false,
+        "wall_calibration": true,
+        "wall_improvement": false,
+        "warp_reduction": false,
+        "shared_wavefronts": true
+      }
+    }
+  },
+  "workloads": {
+    "rgb": {
+      "occurrences": 342,
+      "totals": {
+        "reference": {
+          "gpu_ms": 7.709995999999998,
+          "wall_ms": 8.364576343750002,
+          "warp": 597412544.0,
+          "tensor": 50024448.0,
+          "alu": 258936384.0,
+          "lsu": 98600320.0,
+          "read_conflicts": 50449272.0,
+          "write_conflicts": 106825885.0,
+          "read_wavefronts": 155153272.0,
+          "write_wavefronts": 166471837.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        },
+        "control": {
+          "gpu_ms": 7.763174000000002,
+          "wall_ms": 8.413608187500003,
+          "warp": 597412544.0,
+          "tensor": 50024448.0,
+          "alu": 258936384.0,
+          "lsu": 98600320.0,
+          "read_conflicts": 50442970.0,
+          "write_conflicts": 106872816.0,
+          "read_wavefronts": 155146970.0,
+          "write_wavefronts": 166518768.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        },
+        "candidate": {
+          "gpu_ms": 7.632744000000001,
+          "wall_ms": 8.283912999999998,
+          "warp": 640303104.0,
+          "tensor": 50024448.0,
+          "alu": 282907136.0,
+          "lsu": 91150720.0,
+          "read_conflicts": 50397520.0,
+          "write_conflicts": 38488628.0,
+          "read_wavefronts": 155101520.0,
+          "write_wavefronts": 93168180.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        }
+      },
+      "decision": {
+        "passed": false,
+        "gates": {
+          "gpu_calibration": true,
+          "wall_calibration": true,
+          "gpu_improvement": false,
+          "wall_improvement": false,
+          "warp_reduction": false,
+          "shared_wavefronts": true
+        },
+        "gpu_calibration_fraction": 0.0068972798429474125,
+        "wall_calibration_fraction": 0.005861844250681925,
+        "gpu_reduction_fraction": 0.01680111768717296,
+        "wall_reduction_fraction": 0.015414930741924904
+      },
+      "regressing_contracts": [
+        "tiled-001",
+        "tiled-002",
+        "tiled-005",
+        "tiled-006",
+        "tiled-007",
+        "tiled-008",
+        "tiled-009",
+        "tiled-010",
+        "tiled-011",
+        "tiled-012",
+        "tiled-014",
+        "tiled-017",
+        "tiled-018",
+        "tiled-020",
+        "tiled-021",
+        "tiled-041",
+        "tiled-045",
+        "tiled-050",
+        "tiled-051"
+      ]
+    },
+    "cdp": {
+      "occurrences": 387,
+      "totals": {
+        "reference": {
+          "gpu_ms": 10.939112999999999,
+          "wall_ms": 11.684479875,
+          "warp": 1095952320.0,
+          "tensor": 86134784.0,
+          "alu": 492528192.0,
+          "lsu": 170112384.0,
+          "read_conflicts": 87252072.0,
+          "write_conflicts": 156599769.0,
+          "read_wavefronts": 270279784.0,
+          "write_wavefronts": 259311065.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        },
+        "control": {
+          "gpu_ms": 11.005845000000003,
+          "wall_ms": 11.7396308125,
+          "warp": 1095952320.0,
+          "tensor": 86134784.0,
+          "alu": 492528192.0,
+          "lsu": 170112384.0,
+          "read_conflicts": 87254374.0,
+          "write_conflicts": 156593884.0,
+          "read_wavefronts": 270282086.0,
+          "write_wavefronts": 259305180.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        },
+        "candidate": {
+          "gpu_ms": 10.840252000000005,
+          "wall_ms": 11.758530343749996,
+          "warp": 1187306496.0,
+          "tensor": 86134784.0,
+          "alu": 549978112.0,
+          "lsu": 161384832.0,
+          "read_conflicts": 87137755.0,
+          "write_conflicts": 76848780.0,
+          "read_wavefronts": 270165467.0,
+          "write_wavefronts": 173741708.0,
+          "local_read_bytes": 0.0,
+          "local_write_bytes": 0.0
+        }
+      },
+      "decision": {
+        "passed": false,
+        "gates": {
+          "gpu_calibration": true,
+          "wall_calibration": true,
+          "gpu_improvement": false,
+          "wall_improvement": false,
+          "warp_reduction": false,
+          "shared_wavefronts": true
+        },
+        "gpu_calibration_fraction": 0.006100311789448032,
+        "wall_calibration_fraction": 0.004720016473989563,
+        "gpu_reduction_fraction": 0.015045914239206315,
+        "wall_reduction_fraction": -0.0016098914481939008
+      },
+      "regressing_contracts": [
+        "tiled-001",
+        "tiled-002",
+        "tiled-005",
+        "tiled-006",
+        "tiled-007",
+        "tiled-008",
+        "tiled-009",
+        "tiled-010",
+        "tiled-011",
+        "tiled-013",
+        "tiled-017",
+        "tiled-018",
+        "tiled-019",
+        "tiled-020",
+        "tiled-021",
+        "tiled-022",
+        "tiled-023",
+        "tiled-041",
+        "tiled-045",
+        "tiled-050",
+        "tiled-051"
+      ]
+    }
+  },
+  "roles": {
+    "rgb/world_gradient": {
+      "control": {
+        "gpu_ms": 1.9543339999999934,
+        "wall_ms": 2.2769702812500023,
+        "warp": 83359168.0,
+        "tensor": 3653632.0,
+        "alu": 33681088.0,
+        "lsu": 14229760.0,
+        "read_conflicts": 3704021.0,
+        "write_conflicts": 24574878.0,
+        "read_wavefronts": 12229845.0,
+        "write_wavefronts": 30880670.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 1.9049210000000016,
+        "wall_ms": 2.2245086562499954,
+        "warp": 85726848.0,
+        "tensor": 3653632.0,
+        "alu": 34625024.0,
+        "lsu": 12079360.0,
+        "read_conflicts": 3685858.0,
+        "write_conflicts": 4854452.0,
+        "read_wavefronts": 12211682.0,
+        "write_wavefronts": 9726644.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "rgb/imagination": {
+      "control": {
+        "gpu_ms": 4.302009000000005,
+        "wall_ms": 4.587064906250012,
+        "warp": 351371776.0,
+        "tensor": 30261248.0,
+        "alu": 157067648.0,
+        "lsu": 52923008.0,
+        "read_conflicts": 30541258.0,
+        "write_conflicts": 25381526.0,
+        "read_wavefronts": 93910474.0,
+        "write_wavefronts": 58489494.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 4.4667150000000015,
+        "wall_ms": 4.7557248125,
+        "warp": 380139392.0,
+        "tensor": 30261248.0,
+        "alu": 171446784.0,
+        "lsu": 52923008.0,
+        "read_conflicts": 30536472.0,
+        "write_conflicts": 25559770.0,
+        "read_wavefronts": 93905688.0,
+        "write_wavefronts": 58667738.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "cdp/imagination": {
+      "control": {
+        "gpu_ms": 6.767029000000007,
+        "wall_ms": 7.075397906250009,
+        "warp": 793893376.0,
+        "tensor": 61718528.0,
+        "alu": 365587328.0,
+        "lsu": 114839168.0,
+        "read_conflicts": 62663306.0,
+        "write_conflicts": 59871686.0,
+        "read_wavefronts": 194599562.0,
+        "write_wavefronts": 130089414.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 6.963907000000001,
+        "wall_ms": 7.460302687500001,
+        "warp": 867489152.0,
+        "tensor": 61718528.0,
+        "alu": 410763264.0,
+        "lsu": 114839168.0,
+        "read_conflicts": 62589560.0,
+        "write_conflicts": 60182706.0,
+        "read_wavefronts": 194525816.0,
+        "write_wavefronts": 130400434.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "cdp/world_gradient": {
+      "control": {
+        "gpu_ms": 2.7319849999999946,
+        "wall_ms": 3.1146599062499996,
+        "warp": 139377344.0,
+        "tensor": 8306688.0,
+        "alu": 58753216.0,
+        "lsu": 23825664.0,
+        "read_conflicts": 8393377.0,
+        "write_conflicts": 39805786.0,
+        "read_wavefronts": 26675873.0,
+        "write_wavefronts": 52067162.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 2.615237000000001,
+        "wall_ms": 2.994548124999995,
+        "warp": 145380480.0,
+        "tensor": 8306688.0,
+        "alu": 62379520.0,
+        "lsu": 20397312.0,
+        "read_conflicts": 8373005.0,
+        "write_conflicts": 8591668.0,
+        "read_wavefronts": 26655501.0,
+        "write_wavefronts": 18567476.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "rgb/behavior_gradient": {
+      "control": {
+        "gpu_ms": 1.305393,
+        "wall_ms": 1.3422195937499997,
+        "warp": 130364160.0,
+        "tensor": 12963840.0,
+        "alu": 54074880.0,
+        "lsu": 26200576.0,
+        "read_conflicts": 13025712.0,
+        "write_conflicts": 54512604.0,
+        "read_wavefronts": 39346608.0,
+        "write_wavefronts": 71402460.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 1.0519549999999998,
+        "wall_ms": 1.0890085625,
+        "warp": 137579008.0,
+        "tensor": 12963840.0,
+        "alu": 59712000.0,
+        "lsu": 20901376.0,
+        "read_conflicts": 13008934.0,
+        "write_conflicts": 5626310.0,
+        "read_wavefronts": 39329830.0,
+        "write_wavefronts": 18983366.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "cdp/behavior_gradient": {
+      "control": {
+        "gpu_ms": 1.305393,
+        "wall_ms": 1.3422195937499997,
+        "warp": 130364160.0,
+        "tensor": 12963840.0,
+        "alu": 54074880.0,
+        "lsu": 26200576.0,
+        "read_conflicts": 13025712.0,
+        "write_conflicts": 54512604.0,
+        "read_wavefronts": 39346608.0,
+        "write_wavefronts": 71402460.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 1.0519549999999998,
+        "wall_ms": 1.0890085625,
+        "warp": 137579008.0,
+        "tensor": 12963840.0,
+        "alu": 59712000.0,
+        "lsu": 20901376.0,
+        "read_conflicts": 13008934.0,
+        "write_conflicts": 5626310.0,
+        "read_wavefronts": 39329830.0,
+        "write_wavefronts": 18983366.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "rgb/slow_value": {
+      "control": {
+        "gpu_ms": 0.201438,
+        "wall_ms": 0.20735340625,
+        "warp": 32317440.0,
+        "tensor": 3145728.0,
+        "alu": 14112768.0,
+        "lsu": 5246976.0,
+        "read_conflicts": 3171979.0,
+        "write_conflicts": 2403808.0,
+        "read_wavefronts": 9660043.0,
+        "write_wavefronts": 5746144.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 0.209153,
+        "wall_ms": 0.21467096875,
+        "warp": 36857856.0,
+        "tensor": 3145728.0,
+        "alu": 17123328.0,
+        "lsu": 5246976.0,
+        "read_conflicts": 3166256.0,
+        "write_conflicts": 2448096.0,
+        "read_wavefronts": 9654320.0,
+        "write_wavefronts": 5790432.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    },
+    "cdp/slow_value": {
+      "control": {
+        "gpu_ms": 0.201438,
+        "wall_ms": 0.20735340625,
+        "warp": 32317440.0,
+        "tensor": 3145728.0,
+        "alu": 14112768.0,
+        "lsu": 5246976.0,
+        "read_conflicts": 3171979.0,
+        "write_conflicts": 2403808.0,
+        "read_wavefronts": 9660043.0,
+        "write_wavefronts": 5746144.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      },
+      "candidate": {
+        "gpu_ms": 0.209153,
+        "wall_ms": 0.21467096875,
+        "warp": 36857856.0,
+        "tensor": 3145728.0,
+        "alu": 17123328.0,
+        "lsu": 5246976.0,
+        "read_conflicts": 3166256.0,
+        "write_conflicts": 2448096.0,
+        "read_wavefronts": 9654320.0,
+        "write_wavefronts": 5790432.0,
+        "local_read_bytes": 0.0,
+        "local_write_bytes": 0.0
+      }
+    }
+  },
+  "counts": {
+    "allocation_warnings": 2,
+    "nonadditive_shared_counter_records": 87,
+    "passing_guards": 108,
+    "integer_output_checks": 665845760,
+    "output_values_matching_f64_reviewed_references": 665845760,
+    "counter_passes": 3996,
+    "counter_ranges": 216,
+    "offline_metric_values": 10800,
+    "matrix_dispatches": 9504
+  },
+  "unchanged_control_instruction_counts": 54,
+  "changed_control_instruction_cases": [],
+  "source_seals_verified": 1987,
+  "review_finished_utc": "2026-10-16T14:21:04.958175+00:00",
+  "publication_review_finished_utc": "2026-10-16T14:21:53.788224+00:00",
+  "native_sha256_unchanged": "58aff45226e654c164a9c864c2a8e12737117db8350ad3d14b8307940a7c3bf0",
+  "artifact_root": "/x/Code/kindle/runs/matrix-vector-family-20261016.LZ3Z1Zo0",
+  "game_actions": 0,
+  "synthetic_updates": 0,
+  "backend_builds": 0,
+  "limits": [
+    "Standalone matrix dispatches exclude surrounding graph/packing/split reduction",
+    "Fixture checks are exact integer outputs with byte identity to independent F64-reviewed references, not new real-input gradients",
+    "Weighted counters and times are not additive full-update costs or predicted learning savings",
+    "Shared totals and components remain independent replay observations; no additivity tolerance",
+    "F16/F32 GPU numerical qualification and backend integration have not occurred"
+  ],
+  "publication_sha256": "695539f66d6f10862a750f333db394055ffa615ea6fd052d3bc668698fe756fe",
+  "lowering_review": {
+    "modules": 9,
+    "nn_contracts_with_identical_total_lsu": 20,
+    "explicit_float_opcode_counts_unchanged": true,
+    "additional_udiv_per_module": 16,
+    "groups": {
+      "rgb/NN": {
+        "control": {
+          "occurrences": 172,
+          "smsp__inst_executed.sum": 452818944.0,
+          "smsp__inst_executed_pipe_adu.sum": 6050304.0,
+          "smsp__inst_executed_pipe_alu.sum": 201419776.0,
+          "smsp__inst_executed_pipe_cbu.sum": 7272448.0,
+          "smsp__inst_executed_pipe_fma.sum": 66567168.0,
+          "smsp__inst_executed_pipe_lsu.sum": 69351296.0,
+          "smsp__inst_executed_pipe_tensor.sum": 40091648.0,
+          "smsp__inst_executed_pipe_uniform.sum": 279040.0,
+          "smsp__inst_executed_pipe_xu.sum": 309760.0
+        },
+        "candidate": {
+          "occurrences": 172,
+          "smsp__inst_executed.sum": 495702272.0,
+          "smsp__inst_executed_pipe_adu.sum": 6050304.0,
+          "smsp__inst_executed_pipe_alu.sum": 225138048.0,
+          "smsp__inst_executed_pipe_cbu.sum": 7272448.0,
+          "smsp__inst_executed_pipe_fma.sum": 85527552.0,
+          "smsp__inst_executed_pipe_lsu.sum": 69351296.0,
+          "smsp__inst_executed_pipe_tensor.sum": 40091648.0,
+          "smsp__inst_executed_pipe_uniform.sum": 279040.0,
+          "smsp__inst_executed_pipe_xu.sum": 309760.0
+        }
+      },
+      "rgb/AT": {
+        "control": {
+          "occurrences": 158,
+          "smsp__inst_executed.sum": 123025600.0,
+          "smsp__inst_executed_pipe_adu.sum": 1738880.0,
+          "smsp__inst_executed_pipe_alu.sum": 48535616.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2366336.0,
+          "smsp__inst_executed_pipe_fma.sum": 20081152.0,
+          "smsp__inst_executed_pipe_lsu.sum": 24595968.0,
+          "smsp__inst_executed_pipe_tensor.sum": 8163328.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1608704.0,
+          "smsp__inst_executed_pipe_xu.sum": 288000.0
+        },
+        "candidate": {
+          "occurrences": 158,
+          "smsp__inst_executed.sum": 123865856.0,
+          "smsp__inst_executed_pipe_adu.sum": 1957568.0,
+          "smsp__inst_executed_pipe_alu.sum": 49087104.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2366336.0,
+          "smsp__inst_executed_pipe_fma.sum": 22679808.0,
+          "smsp__inst_executed_pipe_lsu.sum": 18473472.0,
+          "smsp__inst_executed_pipe_tensor.sum": 8163328.0,
+          "smsp__inst_executed_pipe_uniform.sum": 5187584.0,
+          "smsp__inst_executed_pipe_xu.sum": 57600.0
+        }
+      },
+      "rgb/BT": {
+        "control": {
+          "occurrences": 12,
+          "smsp__inst_executed.sum": 21568000.0,
+          "smsp__inst_executed_pipe_adu.sum": 299008.0,
+          "smsp__inst_executed_pipe_alu.sum": 8980992.0,
+          "smsp__inst_executed_pipe_cbu.sum": 182272.0,
+          "smsp__inst_executed_pipe_fma.sum": 2918400.0,
+          "smsp__inst_executed_pipe_lsu.sum": 4653056.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1769472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 70656.0,
+          "smsp__inst_executed_pipe_xu.sum": 5120.0
+        },
+        "candidate": {
+          "occurrences": 12,
+          "smsp__inst_executed.sum": 20734976.0,
+          "smsp__inst_executed_pipe_adu.sum": 299008.0,
+          "smsp__inst_executed_pipe_alu.sum": 8681984.0,
+          "smsp__inst_executed_pipe_cbu.sum": 182272.0,
+          "smsp__inst_executed_pipe_fma.sum": 3726336.0,
+          "smsp__inst_executed_pipe_lsu.sum": 3325952.0,
+          "smsp__inst_executed_pipe_tensor.sum": 1769472.0,
+          "smsp__inst_executed_pipe_uniform.sum": 70656.0,
+          "smsp__inst_executed_pipe_xu.sum": 5120.0
+        }
+      },
+      "cdp/NN": {
+        "control": {
+          "occurrences": 203,
+          "smsp__inst_executed.sum": 934200320.0,
+          "smsp__inst_executed_pipe_adu.sum": 12067072.0,
+          "smsp__inst_executed_pipe_alu.sum": 428012288.0,
+          "smsp__inst_executed_pipe_cbu.sum": 20050688.0,
+          "smsp__inst_executed_pipe_fma.sum": 137113088.0,
+          "smsp__inst_executed_pipe_lsu.sum": 136868736.0,
+          "smsp__inst_executed_pipe_tensor.sum": 74498048.0,
+          "smsp__inst_executed_pipe_uniform.sum": 659968.0,
+          "smsp__inst_executed_pipe_xu.sum": 307200.0
+        },
+        "candidate": {
+          "occurrences": 203,
+          "smsp__inst_executed.sum": 1026198016.0,
+          "smsp__inst_executed_pipe_adu.sum": 12067072.0,
+          "smsp__inst_executed_pipe_alu.sum": 485470848.0,
+          "smsp__inst_executed_pipe_cbu.sum": 20050688.0,
+          "smsp__inst_executed_pipe_fma.sum": 171369472.0,
+          "smsp__inst_executed_pipe_lsu.sum": 136868736.0,
+          "smsp__inst_executed_pipe_tensor.sum": 74498048.0,
+          "smsp__inst_executed_pipe_uniform.sum": 659968.0,
+          "smsp__inst_executed_pipe_xu.sum": 307200.0
+        }
+      },
+      "cdp/AT": {
+        "control": {
+          "occurrences": 165,
+          "smsp__inst_executed.sum": 131652032.0,
+          "smsp__inst_executed_pipe_adu.sum": 1861248.0,
+          "smsp__inst_executed_pipe_alu.sum": 51886400.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2369664.0,
+          "smsp__inst_executed_pipe_fma.sum": 21092864.0,
+          "smsp__inst_executed_pipe_lsu.sum": 26632704.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9015296.0,
+          "smsp__inst_executed_pipe_uniform.sum": 1761024.0,
+          "smsp__inst_executed_pipe_xu.sum": 286720.0
+        },
+        "candidate": {
+          "occurrences": 165,
+          "smsp__inst_executed.sum": 132340224.0,
+          "smsp__inst_executed_pipe_adu.sum": 2130880.0,
+          "smsp__inst_executed_pipe_alu.sum": 52469632.0,
+          "smsp__inst_executed_pipe_cbu.sum": 2369664.0,
+          "smsp__inst_executed_pipe_fma.sum": 24112128.0,
+          "smsp__inst_executed_pipe_lsu.sum": 19871232.0,
+          "smsp__inst_executed_pipe_tensor.sum": 9015296.0,
+          "smsp__inst_executed_pipe_uniform.sum": 5316352.0,
+          "smsp__inst_executed_pipe_xu.sum": 57344.0
+        }
+      },
+      "cdp/BT": {
+        "control": {
+          "occurrences": 19,
+          "smsp__inst_executed.sum": 30099968.0,
+          "smsp__inst_executed_pipe_adu.sum": 404480.0,
+          "smsp__inst_executed_pipe_alu.sum": 12629504.0,
+          "smsp__inst_executed_pipe_cbu.sum": 183296.0,
+          "smsp__inst_executed_pipe_fma.sum": 3807232.0,
+          "smsp__inst_executed_pipe_lsu.sum": 6610944.0,
+          "smsp__inst_executed_pipe_tensor.sum": 2621440.0,
+          "smsp__inst_executed_pipe_uniform.sum": 75776.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        },
+        "candidate": {
+          "occurrences": 19,
+          "smsp__inst_executed.sum": 28768256.0,
+          "smsp__inst_executed_pipe_adu.sum": 404480.0,
+          "smsp__inst_executed_pipe_alu.sum": 12037632.0,
+          "smsp__inst_executed_pipe_cbu.sum": 183296.0,
+          "smsp__inst_executed_pipe_fma.sum": 5050368.0,
+          "smsp__inst_executed_pipe_lsu.sum": 4644864.0,
+          "smsp__inst_executed_pipe_tensor.sum": 2621440.0,
+          "smsp__inst_executed_pipe_uniform.sum": 75776.0,
+          "smsp__inst_executed_pipe_xu.sum": 0.0
+        }
+      }
+    },
+    "gpu_calls": 0,
+    "limits": [
+      "Opcode counts are static IR structure, not measured native instruction counts or source-site attribution",
+      "Unchanged total LSU counts do not prove identical individual loads/stores or memory instruction widths",
+      "FMA-pipe counts are hardware-pipeline instructions, not a count of model floating-point arithmetic",
+      "No division-removal, pointer-type, layout or geometry candidate is selected by this audit"
+    ],
+    "finished_utc": "2026-10-16T14:39:01.442763+00:00",
+    "sha256": "1336e45624d7ecebaa0327cc48b7cfc07e982318510ed538cad1e842cd709a1e"
+  }
+}

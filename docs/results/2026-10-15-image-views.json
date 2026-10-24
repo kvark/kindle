@@ -1,0 +1,179 @@
+{
+  "status": "complete",
+  "date": "2026-10-15",
+  "artifacts": "runs/image-views-20261015.EblKUBZN",
+  "native_sha256": "67559ce5cbbc87641186175ea14ecdec2da80704d0efdffa8b1066c5ca80716f",
+  "decision": "retain isolated candidate; production and Atari unchanged; parity goal open",
+  "feature": "MEGANEURA_IMAGE_VIEWS=1",
+  "device_means": "KINDLE_DEVICE_MEANS=1",
+  "baseline_native": "076f3135b5e3c89c6cb0f66e761bd57b9d8e73d63b390c534023b8545ef3ef83",
+  "upstream_rechecked": {
+    "meganeura": "99e3de27b71140498bc1b175a326b8662a9c2a6e",
+    "blade": "e7c3f7b64abe1caf25147987020931065665a9cc"
+  },
+  "qualification": {
+    "guards": 4,
+    "allocation_warnings": 4,
+    "synthetic_updates": 96,
+    "exact_reports_per_workload": 24,
+    "full_program_review": "complete"
+  },
+  "timing": {
+    "status": "complete",
+    "performance_gate": true,
+    "guards": 4,
+    "allocation_warnings": 3,
+    "minimum_sampled_headroom_bytes": 12378701824,
+    "synthetic_updates": 1088,
+    "game_actions": 0,
+    "source_seals": 2441,
+    "workloads": {
+      "rgb": {
+        "control_ms": 54.20546086328124,
+        "candidate_ms": 51.944966917968735,
+        "fraction_reduced": 0.041702328682602596,
+        "exact_paired_reports": 272,
+        "exact_retained_reports": 272,
+        "exact_qualification_reports_per_arm": 24,
+        "paired_tensors": {
+          "initial": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_absolute": 0
+          },
+          "first": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_absolute": 0
+          },
+          "final": {
+            "tensors": 292,
+            "exact": 292,
+            "relative_l2": 0,
+            "max_absolute": 0
+          }
+        },
+        "samples": {
+          "control": {
+            "first32_ms": 54.171154625,
+            "last32_ms": 54.106533,
+            "stage_means_ms": {
+              "behavior_train_and_sync": 4.57235303125,
+              "imagination_and_targets": 11.946554519531249,
+              "posterior": 7.53056309375,
+              "world_train_and_sync": 30.15599021875
+            }
+          },
+          "candidate": {
+            "first32_ms": 51.891526750000004,
+            "last32_ms": 51.983345125,
+            "stage_means_ms": {
+              "behavior_train_and_sync": 4.60108656640625,
+              "imagination_and_targets": 11.90854659375,
+              "posterior": 7.31490329296875,
+              "world_train_and_sync": 28.12043046484375
+            }
+          }
+        },
+        "programs": {
+          "changed_images": 13,
+          "removed_dispatches": 31,
+          "aliases": 8,
+          "protected_buffers": 892,
+          "surviving_reads": 7352
+        }
+      },
+      "cdp": {
+        "control_ms": 47.69942460546871,
+        "candidate_ms": 47.11194091796877,
+        "fraction_reduced": 0.01231636843335393,
+        "exact_paired_reports": 272,
+        "exact_retained_reports": 272,
+        "exact_qualification_reports_per_arm": 24,
+        "paired_tensors": {
+          "initial": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0,
+            "max_absolute": 0
+          },
+          "first": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0,
+            "max_absolute": 0
+          },
+          "final": {
+            "tensors": 346,
+            "exact": 346,
+            "relative_l2": 0,
+            "max_absolute": 0
+          }
+        },
+        "samples": {
+          "control": {
+            "first32_ms": 47.60367634375,
+            "last32_ms": 47.60942809375,
+            "stage_means_ms": {
+              "behavior_train_and_sync": 4.5903115078125,
+              "imagination_and_targets": 21.474331953125,
+              "posterior": 8.258087078125,
+              "world_train_and_sync": 13.37669406640625
+            }
+          },
+          "candidate": {
+            "first32_ms": 47.15021690625,
+            "last32_ms": 46.94066878125,
+            "stage_means_ms": {
+              "behavior_train_and_sync": 4.544036480468749,
+              "imagination_and_targets": 21.44333519140625,
+              "posterior": 8.0014792265625,
+              "world_train_and_sync": 13.12309001953125
+            }
+          }
+        },
+        "programs": {
+          "changed_images": 5,
+          "removed_dispatches": 11,
+          "aliases": 4,
+          "protected_buffers": 940,
+          "surviving_reads": 8103
+        }
+      }
+    }
+  },
+  "total": {
+    "guards": 8,
+    "allocation_warnings": 7,
+    "synthetic_updates": 1184,
+    "game_actions": 0
+  },
+  "cpu": {
+    "address_checks": 253755392,
+    "rgb_removed_logical_output_bytes": 876609536,
+    "existing_shader_variants": 144,
+    "new_shader_variants": 432
+  },
+  "retained_jax_inclusive_ms": 27.22256929610012,
+  "native_jax_ratio": 1.9081581298577253,
+  "jax_remeasured": false,
+  "production_changed": false,
+  "learning_quality_claim": false,
+  "measured_dram_traffic_claim": false,
+  "numerical_finished_utc": "2026-10-15 12:18:38 UTC",
+  "timing_finished_utc": "2026-10-15 12:30:39 UTC",
+  "review_finished_utc": "2026-10-15 12:31:48 UTC",
+  "timing_service_wall_seconds": 101.241,
+  "source_sha256": {
+    "runs/image-views-20261015.EblKUBZN/build.json": "3dc539847d7effd2b6c8b2ec6ad7456e36737a9f47d61cb8cdaefd47ede3393b",
+    "runs/image-views-20261015.EblKUBZN/equivalence-review.json": "06d482afab95344449be3f173553920738337241bde85a85617524009bfaf505",
+    "runs/image-views-20261015.EblKUBZN/numerical-program-review.json": "a4920f72e838cc8bb598a65fb89811e8d36af382b1e8ee6bc3c258153f7a0483",
+    "runs/image-views-20261015.EblKUBZN/timing-review.json": "88c58bde910bee1f8961af9b20fa38766fe3b3f2d64e8a47c81e764925216173",
+    "runs/image-views-20261015.EblKUBZN/numerical-queue.json": "e57152dce3cfb1fd61cb9943e16f3094bcde768b9b1968cf66902c04eef33232",
+    "runs/image-views-20261015.EblKUBZN/timing-queue.json": "f540da92e858daf71948bae91275e87f5fc884c55f424398c3f95b09a67e208f",
+    "runs/image-views-20261015.EblKUBZN/review_timing.py": "39e17c26e7c00f654f61014e2fad60a1d4bd1ecb884023a768f2067de56f92ca",
+    "runs/image-views-20261015.EblKUBZN/review_programs.py": "e5eb621fab6516cb6d132cfaa62c811371f71a8c68a19557a3695d80e6cbfb84"
+  }
+}

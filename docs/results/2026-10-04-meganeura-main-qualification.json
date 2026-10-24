@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-04",
+  "status": "qualified",
+  "backend": {"meganeura":"592a2f5a31659b253aba468c2073462e95e9baf7","blade":"e349cddf7a9bf181a362507e640b3d576b1aac72"},
+  "previous_meganeura": "13b19d33c811ac6eb59b2d64d9d28645b2ca2edc",
+  "native_sha256": "b78479a26a52b1bb4d808ddee19e8ad46d61fceb8715e1183dc81a5dd211991e",
+  "test_executable_sha256": "0428beec0ba9cadcfb48e3856280f4358da31abb3ce6d712e4d38c750d12d66c",
+  "artifacts": "/x/Code/kindle/runs/meganeura-main-20261004.DVmPtD3u",
+  "cpu": {"rust_passed":111,"rust_ignored":55,"python_passed":1129,"formatting":"passed","clippy":"passed"},
+  "gpu": {
+    "guarded_processes": 14,
+    "all_passed": true,
+    "new_allocation_warnings": 0,
+    "validation_warnings": 0,
+    "nvml_polling_queries": 0,
+    "host_recovery": false,
+    "cosine": {"values":4,"raw_f64_derivatives":1024,"detached_target":true},
+    "upstream": {
+      "cdp": {"comparisons":1300,"updates":4,"upstream":"a851fa3e3d70b624b094ee1810ad4bb602346092","maximum_parameter_error":2.384185791015625e-7,"limits":["fixed synthetic batches; not replay sampling or gameplay competence","raw gradients use exact native pre-step weights; optimizer weights/moments remain independent","raw gradients compared first; optimizer receives identical gradients to isolate its math"]},
+      "rgb": {"comparisons":1524,"updates":4,"upstream":"e3f02248693a79dc8b0ebd62c93683888ddaccfe","maximum_parameter_error":1.1920928955078125e-7,"limits":["fixed synthetic batches; not replay sampling or gameplay competence","raw gradients use exact native pre-step weights; optimizer weights/moments remain independent","raw gradients compared first; optimizer receives identical gradients to isolate its math"]}
+    },
+    "tiny_streaming": {"dense_causal_reference":"passed","chunk_wrap_and_resets":"passed","two_stream_batched_serial_max_absolute_error":0,"cooperative_kernels":false},
+    "production_smokes": {
+      "cdp": {"environment":"ALE/Seaquest-v5","seed":103,"evaluation_environment_seed":41009,"actions":1024,"updates":195,"training_debt":0,"frozen_actions":1024,"frozen_updates":0,"finite_tensor_counts":{"world":173,"behavior":66,"slow_value":11},"all_saved_tensors_unchanged":true,"minimum_sampled_vulkan_estimated_headroom_bytes":15925510144},
+      "rgb": {"environment":"ALE/Seaquest-v5","seed":103,"evaluation_environment_seed":41009,"actions":1024,"updates":195,"training_debt":0,"frozen_actions":1024,"frozen_updates":0,"finite_tensor_counts":{"world":215,"behavior":66,"slow_value":11},"all_saved_tensors_unchanged":true,"minimum_sampled_vulkan_estimated_headroom_bytes":15900344320},
+      "tiny": {"environment":"ALE/Freeway-v5","seed":1009,"evaluation_environment_seed":41009,"actions":1024,"updates":195,"training_debt":0,"frozen_actions":1024,"frozen_updates":0,"finite_tensor_counts":{"world":164,"behavior":66,"slow_value":11},"all_saved_tensors_unchanged":true,"minimum_sampled_vulkan_estimated_headroom_bytes":15269101568}
+    }
+  },
+  "smoke_recipe": {"model_size":"size1_m","streams":8,"batch_size":8,"batch_length":16,"imagination_length":15,"train_ratio":32,"world_microbatch":8,"replay_capacity":100000,"sticky_actions":0.25,"full_actions":18,"action_repeat":4,"observation_size":"native","intrinsic_reward_scale":0,"action_aid":false},
+  "excluded_game_actions": {"training":3072,"frozen_evaluation":3072},
+  "retained_preparation_failures": ["First CPU service exited 127 before compilation; successful replacement supplies explicit Cargo PATH.","Revision-consistency test caught the stale MEGANEURA_REV reporting constant; updated it with the manifest and both lockfiles."],
+  "limits": ["Backend component qualification and short production checks, not multi-seed learning or competence.","No Freeway-specific learner defect identified; original zero-reward diagnosis stands.","No historical result relabeled; previous backend identities remain in their reports.","Five-game matrix remains stopped; no intrinsic arm or larger budget launched.","Frozen Tiny attention route qualified; this does not requalify joint-Tiny training or cooperative attention.","No throughput gain or SM utilization claim; Vulkan estimated headroom is not physical free or peak VRAM."]
+}

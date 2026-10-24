@@ -1,0 +1,192 @@
+{
+  "status": "complete",
+  "date": "2026-10-14",
+  "decision": "Reject this prototype; no compiler/backend feature implementation or tile tuning follows from it.",
+  "artifact_root": "runs/workgroup-convolution-20261014.9AR2SLMx",
+  "declaration": "docs/experiments/2026-10-14-workgroup-convolution.md",
+  "native_control_sha256": "9bd001c7671d4b83871096bc78683f8b46f78b290665cea9bc424baf94a67518",
+  "prototype_sha256": "9b43646a888c2c5a79b67abbb4d647948c18e6bc94a495cc7ee59aa250d89070",
+  "shader_sha256": "b46fc036842a4c12811c105d30e30173db4da0e9a21d1eae9342ccd2a2e30781",
+  "smoke": {
+    "status": "complete",
+    "guards": 1,
+    "allocation_warnings": 0,
+    "candidate": {
+      "status": "complete",
+      "device": "NVIDIA GeForce RTX 5080",
+      "batch": 1,
+      "calls": 3,
+      "gpu_ms": 0,
+      "queued_wall_ms": 0,
+      "recording_ms": 0,
+      "elements": 32768,
+      "changed_input_exact": true,
+      "restored_exact": true,
+      "minimum_sampled_headroom_bytes": 16565927936,
+      "validation_enabled": true,
+      "validation_errors": 0,
+      "validation_warnings": 0,
+      "game_actions": 0,
+      "synthetic_updates": 0
+    },
+    "independent_f64_checks": 137,
+    "exact_output_values": 32768,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "ordinary": {
+    "status": "complete",
+    "guards": 2,
+    "allocation_warnings": 0,
+    "candidate": {
+      "status": "complete",
+      "device": "NVIDIA GeForce RTX 5080",
+      "batch": 512,
+      "calls": 146,
+      "gpu_ms": 8.71197875,
+      "queued_wall_ms": 8.715634171875,
+      "recording_ms": 0.001225328125,
+      "elements": 16777216,
+      "changed_input_exact": true,
+      "restored_exact": true,
+      "minimum_sampled_headroom_bytes": 16448749568,
+      "validation_enabled": false,
+      "validation_errors": 0,
+      "validation_warnings": 0,
+      "game_actions": 0,
+      "synthetic_updates": 0
+    },
+    "independent_f64_checks": 128,
+    "exact_output_values": 16777216,
+    "game_actions": 0,
+    "synthetic_updates": 0,
+    "native_dx_gpu_ms": 2.1487605,
+    "native_dx_queued_wall_ms": 2.1551658750000002,
+    "native_operation_calls": 292,
+    "native_exact_output_values": 16815616,
+    "dx_reduction_percent": -305.44205601322255,
+    "clears_20_percent_gate": false,
+    "minimum_sampled_headroom_bytes": 16213671936
+  },
+  "retained_full_jax_contract": {
+    "status": "complete",
+    "trace_sha256": "65a3fcb3592735e122df766bc4b91bdb05e4dca8753d9a453ae4103788ce56f6",
+    "captured_updates": 8,
+    "target_kernel_calls": 24,
+    "rows": [
+      {
+        "thunk": "Thunk:#name=jit(fn)/jit(main)/opt/prerun/dyn/scan/transpose(jvp(enc))/cnn1/conv_general_dilated,hlo_op=cudnn-conv-bw-filter.13#",
+        "calls": 8,
+        "mean_ms": 0.931231,
+        "gridX": 4,
+        "gridY": 1,
+        "gridZ": 156,
+        "blockX": 128,
+        "blockY": 1,
+        "blockZ": 1,
+        "staticSharedMemory": 0,
+        "dynamicSharedMemory": 81920,
+        "registersPerThread": 246
+      },
+      {
+        "thunk": "Thunk:#name=jit(fn)/jit(main)/opt/prerun/dyn/scan/transpose(jvp(enc))/cnn1/conv_general_dilated,hlo_op=cudnn-conv-bw-filter.13#",
+        "calls": 8,
+        "mean_ms": 0.021004,
+        "gridX": 12,
+        "gridY": 4,
+        "gridZ": 1,
+        "blockX": 32,
+        "blockY": 4,
+        "blockZ": 1,
+        "staticSharedMemory": 0,
+        "dynamicSharedMemory": 0,
+        "registersPerThread": 52
+      },
+      {
+        "thunk": "Thunk:#name=jit(fn)/jit(main)/opt/prerun/dyn/scan/transpose(jvp(enc))/cnn1/conv_general_dilated,hlo_op=cudnn-conv-bw-input.13#",
+        "calls": 8,
+        "mean_ms": 0.545256,
+        "gridX": 1,
+        "gridY": 2048,
+        "gridZ": 1,
+        "blockX": 128,
+        "blockY": 1,
+        "blockZ": 1,
+        "staticSharedMemory": 0,
+        "dynamicSharedMemory": 77824,
+        "registersPerThread": 166
+      }
+    ],
+    "source_contracts": {
+      "native": {
+        "output_tile": [
+          32,
+          32
+        ],
+        "stage_k": 32,
+        "explicit_shared_stages": 1
+      },
+      "cudnn_dx": {
+        "output_tile": [
+          256,
+          32
+        ],
+        "stage_k": 32,
+        "stages": 4,
+        "layout": "NHWC/KRSC"
+      },
+      "cudnn_dw": {
+        "output_tile": [
+          64,
+          256
+        ],
+        "stage_k": 32,
+        "stages": 4,
+        "aligned_elements_per_access": 8,
+        "bytes_per_access": 16
+      }
+    },
+    "tile_area_ratios": {
+      "dx": 8,
+      "dw": 16
+    },
+    "ideal_macs_per_staged_scalar": {
+      "native": 16,
+      "dx": 28.444444444444443,
+      "dw": 51.2
+    },
+    "limits": [
+      "Tile ratios are structural descriptors, not speedup estimates or measured traffic.",
+      "Public CUTLASS source documents a related multistage algorithm, not binary identity with the cuDNN fork.",
+      "No native driver disassembly or overlapping-copy counter is established.",
+      "This prototype did not reproduce the library layout, output tile or multistage contract."
+    ]
+  },
+  "current_full_update": {
+    "native_ms": 60.0411874375,
+    "retained_jax_ms": 26.6316957586,
+    "source": "docs/results/2026-10-14-convolution-scheduling.json",
+    "new_measurement": false
+  },
+  "accounting": {
+    "guards": 3,
+    "allocation_warnings": 0,
+    "native_operation_calls": 292,
+    "prototype_operation_calls": 149,
+    "exact_output_value_checks": 33625600,
+    "independent_f64_checks": 265,
+    "minimum_sampled_headroom_bytes": 16213671936,
+    "game_actions": 0,
+    "synthetic_updates": 0
+  },
+  "retained_failures": [
+    {
+      "kind": "CPU preparation",
+      "path": "runs/workgroup-convolution-20261014.9AR2SLMx/preflight-v1",
+      "reason": "GLSL disassembly prints BF16 encoding numerically; original name-based audit rejected it before GPU execution. Replaced with exact binary type validation. Float16 capability enablement also corrected before first GPU use."
+    }
+  ],
+  "production_changed": false,
+  "root_cause_goal_complete": false,
+  "next": "Inspect actual library derivative instruction/data-feeding contracts before a shared typed convolution lowering; include representation/packing/staging costs. Do not tune this rejected prototype or infer speed from tile sizes."
+}

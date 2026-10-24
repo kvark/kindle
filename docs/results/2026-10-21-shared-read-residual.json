@@ -1,0 +1,115 @@
+{
+  "status": "passed",
+  "scope": "post-hoc exact counter relation, not source attribution or held-out test",
+  "typed": {
+    "historical": {
+      "read_wavefronts": 425748924.0,
+      "read_conflicts": 482236.0,
+      "wavefronts_minus_conflicts": 425266688.0,
+      "lsu_instructions": 652545024.0,
+      "tensor_instructions": 104857600.0,
+      "active_threads_per_warp_instruction": 31.999454821015334
+    },
+    "control": {
+      "read_wavefronts": 635267558.0,
+      "read_conflicts": 285670.0,
+      "wavefronts_minus_conflicts": 634981888.0,
+      "lsu_instructions": 1015118848.0,
+      "tensor_instructions": 104857600.0,
+      "active_threads_per_warp_instruction": 31.31420220076133
+    },
+    "candidate": {
+      "read_wavefronts": 635326887.0,
+      "read_conflicts": 344999.0,
+      "wavefronts_minus_conflicts": 634981888.0,
+      "lsu_instructions": 1017805824.0,
+      "tensor_instructions": 104857600.0,
+      "active_threads_per_warp_instruction": 31.99952382104543
+    }
+  },
+  "typed_regions": 7,
+  "packed_regions": 10,
+  "current_extra_read_wavefronts_minus_conflicts": 209715200,
+  "matched_cta_tensor_and_compiler_inputs": true,
+  "driver_only_causality": false,
+  "sass_identity": false,
+  "fresh_gpu_calls": 0,
+  "learner_updates": 0,
+  "game_actions": 0,
+  "finished_utc": "2026-10-21T11:07:13.342114+00:00",
+  "view_contract": {
+    "status": "passed",
+    "actual_occurrences": 9,
+    "validated_modules": 18,
+    "payload_cases": 262144,
+    "gpu_calls": 0,
+    "compiler_edits": 0,
+    "scope": "CPU implicit-layout raw-word view; physical allocation/lowering and GPU correctness unproven",
+    "finished_utc": "2026-10-21T11:11:57.003572+00:00"
+  },
+  "ci": {
+    "repository": "kvark/meganeura",
+    "commit": "e545a9f13bada46f2d25d326acfea5e8cd441c7e",
+    "runs": [
+      {
+        "id": 39588374413,
+        "name": "CI",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 1050,
+        "jobs_url": "https://api.github.com/repos/kvark/meganeura/actions/runs/39588374413/jobs",
+        "logs_url": "https://api.github.com/repos/kvark/meganeura/actions/runs/39588374413/logs",
+        "workflow_id": 247456508
+      }
+    ],
+    "jobs": [
+      {
+        "id": 119182848303,
+        "name": "Rust MSRV",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119182848454,
+        "name": "Dependency audit",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119182848493,
+        "name": "Quality gates",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119182848557,
+        "name": "macOS (Metal)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119182848678,
+        "name": "Windows compile (Vulkan)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 119182920999,
+        "name": "Linux (lavapipe)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "raw_artifacts": "/x/Code/kindle/runs/predicate-residual-20261021.bHKQt4Xo",
+  "source_receipts": 51,
+  "failures_preserved": [
+    "prior compiler receipt filename",
+    "absent explicit workgroup ArrayStride",
+    "duplicate non-aggregate vector type"
+  ],
+  "fresh_speed_claim": false,
+  "production_promoted": false,
+  "atari_restarted": false,
+  "publication_utc": "2026-10-21T11:13:16.710611+00:00"
+}
