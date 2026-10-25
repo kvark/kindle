@@ -83,7 +83,8 @@ establish execution/accounting/restore, not competence or a gradient oracle.
 
 User service `kindle-amd-context64-20261025` finished successfully at15:06:49UTC.
 It ran the fresh2M-action life, sequential frozen evaluations and CPU audits,
-with12GiB process-memory cap and no swap. No learner remains running.
+with12GiB process-memory cap and no swap. That learner has exited; the subsequent
+[precision comparison](2026-10-25-cdp-amd-precision.md) is tracked separately.
 Artifacts: `/x/Temp/kindle-amd-20261025/life`.
 
 Training completed2,000,000 aggregate actions/7,993,225 emulator frames and499843
@@ -127,14 +128,13 @@ These measurements do not establish kernel efficiency. The historical B8/T16
 2M life took8991s; this life takes4.67 times as long under the declared confounds.
 The old8h cap was explicitly adapted to14h; it was not reached.
 
-No unchanged extension or seed sweep follows this weak result. Before attributing
-it to context length, use a bounded native F16-versus-Auto gradient/update
-comparison with identical weights, inputs and random draws. Auto is the backend
-policy that protects derivative range; this check must inspect actual gradients
-and updates rather than infer accuracy from finite losses. It is a numerical
-diagnostic, not another backend optimization or JAX-parity campaign. A learning
-test must follow any useful finding; numerical agreement alone cannot satisfy
-the five-game goal.
+No unchanged extension or seed sweep follows this weak result. Subsequent paired
+early updates show precision-dependent optimizer/parameter changes despite
+matching initial tensors and experience; raw gradients were not captured.
+[Precision evidence](2026-10-25-cdp-amd-precision.md) records that scope and the
+fresh500k Auto learning test. A controlled learning comparison must establish
+whether the update difference matters for scores; numerical checks alone cannot
+satisfy the five-game goal.
 
 ## Intermediate evidence retained
 

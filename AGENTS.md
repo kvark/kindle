@@ -39,10 +39,14 @@ two-wall successes, versus retained58.83/98.21/1.42. Full audits pass and the
 service has exited. See `docs/results/2026-10-25-cdp-amd-takeover.md`.
 Longer sequences also reduce independent sequences; precision, execution path
 and hardware differ too. Do not attribute this result to context length alone.
-Next: a bounded native F16-versus-Auto gradient/update comparison on identical
-weights, inputs and random draws, then a discriminating learning test. Raw F16
-derivative range is unresolved; finite losses and active parameters do not prove
-gradient accuracy. BF16 and `KINDLE_DEVICE_TARGETS` are unavailable on this path.
+Paired early updates now match initial tensors/experience but differ by precision:
+after three updates F16 leaves the first reward projection unchanged, while Auto
+changes654080 of655360 elements. Raw derivatives/mechanism remain unmeasured.
+Auto's4096-action smoke and frozen restore pass at similar throughput. A fresh
+500k Auto B2/T64 life is running in `kindle-amd-auto500k-20261025`; do not launch
+a duplicate. See `docs/experiments/2026-10-25-cdp-amd-auto.md`. Only precision
+changes versus the completed AMD F16 control. Review fixed final/actual-initial
+evaluations before more GPU work. BF16 and `KINDLE_DEVICE_TARGETS` remain unavailable.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 

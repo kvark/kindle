@@ -9,8 +9,11 @@ Breakout2M B2/T64 in11h40m. Frozen500k/final/initial scores are14.71/10.04/1.42,
 all0/24 two-wall successes; accounting, frozen tensor equality and full replays
 pass. The service has exited. BF16 is unavailable on RX7900XT/RADV; F16 inputs,
 ordinary targets, hardware and sequence/batch changes confound comparison.
-Next is a bounded native F16-versus-Auto gradient/update comparison, then a small
-learning test informed by that result. Do not extend this weak run unchanged.
+Paired early updates differ despite matching initial tensors/experience; see
+[precision evidence](results/2026-10-25-cdp-amd-precision.md). Auto's4096-action
+smoke and exact frozen restore pass at similar throughput. A fresh
+[500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is now running in
+`kindle-amd-auto500k-20261025`. Do not duplicate it or extend the weak F16 life.
 
 ## Goal and architecture
 
@@ -85,12 +88,13 @@ Evidence and videos:
    2M actions, fixed500k/final/actual-initial evaluations of24 natural rounds.
    No checkpoint selection or automatic extension. See the
    [exact declaration](experiments/2026-10-23-cdp-breakout-context64.md).
-4. **Separate precision from the weak learning result.** The fixed AMD run is
-   much weaker than retained B8/T16. Raw F16 derivative range remains unmeasured;
-   compare F16 and Auto gradients/updates on identical native inputs, weights and
-   random draws before assigning the regression to context length. Keep this
-   bounded, then choose a small discriminating learning test. No unchanged
-   extension, broad seed campaign, optimization sweep or JAX-parity project.
+4. **Complete the matched Auto learning comparison.** Paired early updates show
+   a reward projection staying unchanged under F16 while Auto updates it; the
+   raw derivative mechanism remains unmeasured. The fresh500k Auto life changes
+   only precision relative to the completed AMD F16 control. Review fixed
+   final/initial evaluations and curves before attributing the score gap to
+   precision or context. No automatic extension, broad seed campaign,
+   optimization sweep or JAX-parity project.
 5. **Address Qbert and remaining gaps.** Use the qualified faster implementation,
    explicit matched budgets and controls. Confirm any changed recipe on the five
    selected games: Boxing, Pong, Freeway, Breakout and Qbert. Keep useful gains
