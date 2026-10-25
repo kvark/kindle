@@ -38,3 +38,15 @@ Artifacts/controller: `/x/Temp/kindle-amd-20261025/auto-life` and
 `/x/Temp/kindle-amd-20261025/run_auto_life.py`. Machine-readable declaration,
 controller hash, exact queue, native identity and retained-control hash are
 recorded before launch. Service: `kindle-amd-auto500k-20261025`.
+
+Monitoring amendment after launch: `kindle-amd-auto500k-numerics-20261025` checks
+every emitted learner report with the existing strict numeric validator and
+checks sequential update counters. It backfills the full log and requests a stop
+of the experiment on an invalid report. Rust's JSON conversion can encode a
+nonfinite float as `null`, which the Python writer's `allow_nan=False` accepts;
+the completed-run audit already rejects it. The first8447 reports pass the live
+check. This adds a separate CPU observer without changing the native library,
+runner, wrapper, queue or training configuration. Evidence and validation are in
+`auto-life/numerics-monitor-review.json` and `numerics-watch.jsonl`; the source is
+`watch_auto_numerics.py` beside the controller. Integrate the report check into
+the runner after this fixed experiment and its frozen evaluations finish.
