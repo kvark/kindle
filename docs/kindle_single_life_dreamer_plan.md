@@ -11,15 +11,16 @@ pass. The service has exited. BF16 is unavailable on RX7900XT/RADV; F16 inputs,
 ordinary targets, hardware and sequence/batch changes confound comparison.
 Paired early updates differ despite matching initial tensors/experience; see
 [precision evidence](results/2026-10-25-cdp-amd-precision.md). Auto's4096-action
-smoke and exact frozen restore pass at similar throughput. A fresh
-[500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is now running in
-`kindle-amd-auto500k-20261025`. Do not duplicate it or extend the weak F16 life.
+smoke and exact frozen restore pass at similar throughput. The fresh
+[500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is complete:
+frozen15.67 versus F16's14.71, initial1.42, all0/24 two-wall successes. Training
+takes2h53m; all audits pass. Do not extend either T64 life.
 
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of
 hyperparameters. Measure frozen learning against GPU time and experience. A
 working development recipe is useful evidence; reliable success across seeds is
-still a separate requirement. The current declared run keeps its fixed budget.
+still a separate requirement. The completed comparison retained its fixed budget.
 
 ## Goal and architecture
 
@@ -94,13 +95,11 @@ Evidence and videos:
    2M actions, fixed500k/final/actual-initial evaluations of24 natural rounds.
    No checkpoint selection or automatic extension. See the
    [exact declaration](experiments/2026-10-23-cdp-breakout-context64.md).
-4. **Complete the matched Auto learning comparison.** Paired early updates show
-   a reward projection staying unchanged under F16 while Auto updates it; the
-   raw derivative mechanism remains unmeasured. The fresh500k Auto life changes
-   only precision relative to the completed AMD F16 control. Review fixed
-   final/initial evaluations and curves before attributing the score gap to
-   precision or context. No automatic extension, broad seed campaign,
-   optimization sweep or JAX-parity project.
+4. **Completed: matched Auto learning comparison.** Frozen15.67 versus14.71
+   under F16 is a small development-seed difference with zero task successes;
+   both remain weak and take similar wall time. Early update differences do
+   not establish the cause of the T64 regression. Use protected Auto precision
+   for subsequent cheap trials; do not extend this context experiment.
 5. **Find cheaper recipes for the remaining gaps.** Use T16 as the development
    starting point, eight independent lanes and batched GPU inference. Try lower
    replay ratios and smaller capacity in bounded development runs; changing

@@ -6,8 +6,10 @@ passes restore with all346 tensors unchanged. The fresh2M B2/T64 life and audits
 are complete: frozen500k/final/initial scores14.71/10.04/1.42, all0/24 two-wall
 successes. Training took11h40m; that service has exited. Paired early updates
 show precision-dependent differences, and Auto's short training/restore passes.
-The fresh [500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) is running
-in `kindle-amd-auto500k-20261025`; do not duplicate or restart it.
+The fresh [500k Auto comparison](experiments/2026-10-25-cdp-amd-auto.md) also
+completed: frozen15.67 versus F16's14.71, all0/24 two-wall successes, in2h53m.
+All audits pass. Both services have exited; do not restart or extend these lives.
+The user now prioritizes cheaper game-specific recipes; use the roadmap.
 Use the new report for current host, precision, results and evidence details.
 The historical handover steps below describe its origin.
 

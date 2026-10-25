@@ -2,9 +2,10 @@
 
 The completed F16 context life is weak: [500k/final/initial14.71/10.04/1.42](2026-10-25-cdp-amd-takeover.md).
 Small paired production runs now show a precision-dependent update difference.
-They do not prove the mechanism or its effect on long-run scores. A fresh
-[500k Auto comparison](../experiments/2026-10-25-cdp-amd-auto.md) is running to
-test learning while holding the AMD host, B2/T64 configuration and seed fixed.
+They do not prove the mechanism or its effect on long-run scores. The fresh
+[500k Auto comparison](../experiments/2026-10-25-cdp-amd-auto.md) is complete:
+frozen15.67 versus F16's14.71, with zero two-wall successes in either arm.
+This small development-seed difference does not justify a T64 extension.
 
 ## Paired production updates
 
@@ -75,9 +76,31 @@ The1024-action frozen check produces4090 emulator frames, zero updates and exact
 equality of all346 tensors. Both guards pass. Evidence: `auto-smoke/review.json`
 under the same artifact root. Native identity remains unchanged.
 
-The fresh500k Auto life is owned by `kindle-amd-auto500k-20261025`, with artifacts
-in `auto-life`. It compares against the completed AMD F16 policy's fixed500k
-score14.7083 and actual-initial1.4167. Only training precision changes. Fixed
-final/initial24-natural-episode evaluations, tensor equality and full CPU
-replay/videos follow automatically; no extension or replication follows without
-review. Seed1009 is reused development evidence, not an independent seed.
+The fresh500k Auto life completed in `kindle-amd-auto500k-20261025`, with
+artifacts in `auto-life`. Only training precision changes from the AMD F16
+control.500000 actions produce1998179 emulator frames and124843 updates,
+first at632, with zero debt. Training takes10403.19s (2h53m23s),48.06 actions/s.
+The final online last50 mean is11.96. All124843 reports are finite, numeric and
+sequential; all checkpoint/config/native-identity checks pass.
+
+| Fixed frozen policy | Selected mean | Two-wall successes |
+| --- | ---: | ---: |
+| Auto500k |15.6667 |0/24 |
+| F16500k control |14.7083 |0/24 |
+| Actual initial |1.4167 |0/24 |
+
+Each arm selects the first three natural episodes per lane, seed4000001009,
+without an action-cap cutoff. Auto final/initial collection uses14328/5944
+aggregate actions; both have zero updates and preserve all346 tensors exactly.
+Full CPU replays and videos pass, as do all host guards. The independent online
+curve reconciliation passes in `auto-life/curve-final`; the complete audit is
+`auto-life/learning-review.json`. The live numerical monitor checks all124843
+reports and exits successfully. Both services are inactive with successful exits.
+
+Auto learns earlier in this trajectory, but the halfway gap narrows and final
+frozen improvement is small. Wall times are similar. This does not establish
+precision as the cause of the historical B8/T16 versus AMD B2/T64 score gap.
+Seed1009 is reused development evidence, not an independent reliability test.
+The user-directed next step is cheaper game-specific recipes, not a T64 extension.
+The runner now directly rejects invalid numeric reports before logging or saving;
+325 relevant CPU runner/evaluation tests pass. No native rebuild was needed.

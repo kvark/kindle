@@ -1,7 +1,9 @@
 # Breakout: protected Auto versus raw F16 training products
 
 Declared after the completed AMD B2/T64 F16 life and paired early-update checks;
-see [precision evidence](../results/2026-10-25-cdp-amd-precision.md).
+see [precision evidence and completed results](../results/2026-10-25-cdp-amd-precision.md).
+Completed:500k Auto frozen15.67 versus F16's14.71, both0/24 two-wall successes;
+training takes2h53m. All audits pass. No extension follows.
 
 Question: does protecting derivative precision improve learning on the same
 AMD B2/T64 setup? Raw gradient operands have not been captured; the measured
@@ -48,5 +50,6 @@ the completed-run audit already rejects it. The first8447 reports pass the live
 check. This adds a separate CPU observer without changing the native library,
 runner, wrapper, queue or training configuration. Evidence and validation are in
 `auto-life/numerics-monitor-review.json` and `numerics-watch.jsonl`; the source is
-`watch_auto_numerics.py` beside the controller. Integrate the report check into
-the runner after this fixed experiment and its frozen evaluations finish.
+`watch_auto_numerics.py` beside the controller. The report check was integrated into
+the runner after this fixed experiment and its frozen evaluations finished;
+325 relevant CPU tests pass (`769bdef`).

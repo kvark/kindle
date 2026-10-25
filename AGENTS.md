@@ -53,11 +53,12 @@ and hardware differ too. Do not attribute this result to context length alone.
 Paired early updates now match initial tensors/experience but differ by precision:
 after three updates F16 leaves the first reward projection unchanged, while Auto
 changes654080 of655360 elements. Raw derivatives/mechanism remain unmeasured.
-Auto's4096-action smoke and frozen restore pass at similar throughput. A fresh
-500k Auto B2/T64 life is running in `kindle-amd-auto500k-20261025`; do not launch
-a duplicate. See `docs/experiments/2026-10-25-cdp-amd-auto.md`. Only precision
-changes versus the completed AMD F16 control. Review fixed final/actual-initial
-evaluations before more GPU work. BF16 and `KINDLE_DEVICE_TARGETS` remain unavailable.
+Auto's500k B2/T64 comparison is complete: frozen15.67 versus F16's14.71,
+initial1.42; all0/24 two-wall successes. It takes2h53m with124843 updates; all
+numeric, checkpoint, frozen and replay audits pass. This does not justify a
+T64 extension. The next allocation uses the user's cheaper game-specific
+recipes; see `docs/kindle_single_life_dreamer_plan.md`. BF16 and
+`KINDLE_DEVICE_TARGETS` remain unavailable.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 
