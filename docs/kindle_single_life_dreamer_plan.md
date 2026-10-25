@@ -19,8 +19,11 @@ takes2h53m; all audits pass. Do not extend either T64 life.
 The first [cheap Freeway screens](results/2026-10-25-cdp-cheap-freeway.md) each
 finish200k actions in about8 minutes. Frozen unassisted/aided/initial means are
 0.00/0.25/0.00, with0/24 task milestones; all audits pass. These are fast weak
-recipes, not successful Freeway learning. The next short allocation is
-[Boxing1M/RGB32](experiments/2026-10-25-cdp-cheap-boxing.md).
+recipes, not successful Freeway learning. [Boxing1M/RGB32](results/2026-10-25-cdp-cheap-boxing.md)
+finishes200k in6m03s but fails too: frozen−3.875 versus initial0.00, both10/24
+wins. Those screens use about one fifth of the historical successful cohorts'
+updates; they do not isolate capacity or resolution. The current short allocation
+is [Pong4M/RGB48](experiments/2026-10-25-cdp-cheap-pong.md).
 
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of

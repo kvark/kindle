@@ -14,8 +14,10 @@ The user now prioritizes cheaper game-specific recipes; use the roadmap.
 in about8 minutes but remain weak (unassisted/aided frozen0.00/0.25, initial0.00).
 [Smaller native recipes](results/2026-10-25-cdp-cheap-runtime.md) add4M capacity
 and32/48 image geometry; GPU training/frozen checks and retained64 restore pass.
-The current allocation is the [200k Boxing screen](experiments/2026-10-25-cdp-cheap-boxing.md),
-service `kindle-cheap-boxing-200k-v2-20261025`. Check its state before GPU work.
+The [200k Boxing screen](results/2026-10-25-cdp-cheap-boxing.md) completes in6m03s
+but fails: frozen−3.875 versus initial0.00, both10/24 wins, all audits pass.
+The current allocation is [Pong4M/RGB48](experiments/2026-10-25-cdp-cheap-pong.md),
+service `kindle-cheap-pong-200k-20261025`. Check its state before GPU work.
 Current native source`bfb8c31`, runner`a99416e`, native SHA256
 `f2606ac28f5f293b73ccdb3f408278c6c584e50ccc73d52fd605a39b231609a5`.
 Evidence, wheels and build receipt: `/x/Temp/kindle-cheap-20261025`;
