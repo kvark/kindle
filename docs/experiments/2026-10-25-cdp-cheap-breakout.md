@@ -13,8 +13,10 @@ native max-pooled frames and one GPU resize. No action aid, RAM input, pretraine
 encoder or reward change. Record the actual parameter count from the runtime.
 
 Fixed200k aggregate actions, expected49939 updates, first update248, zero debt.
-Training cap1800 seconds including construction. Save actual initial and fixed
-final weights; no best-checkpoint selection or automatic extension. The4M/RGB48
+Training cap1800 seconds including construction. Save actual initial weights and
+a100k checkpoint, replacing it with the fixed200k final. A cap cutoff preserves
+the100k milestone without authorizing a resume or a successful-budget claim.
+No best-checkpoint selection or automatic extension. The4M/RGB48
 smoke supplies the complete config reference, changing only image geometry and
 ratio. Its tensors are not an initial-weight equality control for4M/RGB64.
 Check the new initial weights for finite values and zero counters.
