@@ -80,7 +80,17 @@ all three tensor-file hashes and all346 finite tensors; all124843 learner
 reports in the fixed prefix are finite and sequential. The installed native hash
 is unchanged. Evidence: `life/prefix-checkpoint-review.json`. Training continues
 past this checkpoint without restarting; its frozen evaluation remains queued
-after the uninterrupted2M life. Online last-50 return is12.54, not a frozen score.
+after the uninterrupted2M life. At500k actions, online last-50 return is12.54
+versus the retained B8/T16 run's65.76. These are online means under the declared
+confounds; the new frozen policy results remain pending.
+
+An interim curve through770048 actions/3,077,690 emulator frames ends at10.76
+online return after16145.98s. Early online learning is weaker than the retained
+milestones; the cause is not isolated by the changed context, precision and host.
+The CPU-only plot and complete plotted points are in `life/curve-live-first`
+(SVG/PNG/JSON/CSV). It uses only four documented historical online points, with
+no interpolation and no invented frame coordinates. Full-run accounting and
+frozen competence remain pending; this snapshot does not change the allocation.
 
 The nearest preceding progress record (499712 actions) reports10467.08s,
 47.74 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
