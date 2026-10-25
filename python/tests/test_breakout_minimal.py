@@ -157,7 +157,7 @@ def test_replay_cli_constructs_the_declared_real_ale_action_space(tmp_path, monk
     declaration.write_text(json.dumps(manifest))
     run = dict(path=str(log), sha256=replay.sha256(log), start=header,
                accounting=dict(updates=0, budget_complete=True), episodes=episodes, end=end)
-    monkeypatch.setattr(replay, 'read_run', lambda path: run)
+    monkeypatch.setattr(replay, 'read_run', lambda path, *, allow_capped_evaluation=False: run)
     monkeypatch.setattr(sys, 'argv', ['replay_atari.py', str(log), '--source-manifest', str(declaration),
                                     '--output', str(output)])
     replay.main()
