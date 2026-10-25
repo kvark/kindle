@@ -92,8 +92,16 @@ The CPU-only plot and complete plotted points are in `life/curve-live-first`
 no interpolation and no invented frame coordinates. Full-run accounting and
 frozen competence remain pending; this snapshot does not change the allocation.
 
-The nearest preceding progress record (499712 actions) reports10467.08s,
-47.74 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
+The1M checkpoint is saved after about5h50m:3,996,815 emulator frames and249843
+updates. Its configuration/counters, tensor hashes and all346 finite tensors
+pass; all249843 learner reports in the fixed prefix are finite and sequential.
+The native hash is unchanged. Online last-50 return is11.32 versus the retained
+B8/T16 milestone's66.02, so the early weakness persists halfway through this
+allocation. This is an integrity milestone, not another selected frozen arm.
+Evidence: `life/checkpoint-1000000-review.json`. Training continues uninterrupted.
+
+The nearest preceding progress record (999424 actions) reports20971.40s,
+47.66 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
 memory has plateaued at7.923GiB, with recent device-wide busy samples93–94%.
 These measurements do not establish kernel efficiency or playing reliability.
 
