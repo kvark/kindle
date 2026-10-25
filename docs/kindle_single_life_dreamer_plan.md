@@ -22,8 +22,10 @@ finish200k actions in about8 minutes. Frozen unassisted/aided/initial means are
 recipes, not successful Freeway learning. [Boxing1M/RGB32](results/2026-10-25-cdp-cheap-boxing.md)
 finishes200k in6m03s but fails too: frozen−3.875 versus initial0.00, both10/24
 wins. Those screens use about one fifth of the historical successful cohorts'
-updates; they do not isolate capacity or resolution. The current short allocation
-is [Pong4M/RGB48](experiments/2026-10-25-cdp-cheap-pong.md).
+updates; they do not isolate capacity or resolution. [Pong4M/RGB48](results/2026-10-25-cdp-cheap-pong.md)
+finishes200k in10m22s: frozen−17.125 versus initial−20.375, both0/24 wins.
+Current allocation: [fresh Boxing2017,500k/R32](experiments/2026-10-25-cdp-cheap-boxing-update-budget.md),
+testing the historical update budget under the unchanged30-minute training cap.
 
 **Compute priority, updated from the user's October25 direction:** finding useful
 game-specific configurations matters more than maintaining one universal set of

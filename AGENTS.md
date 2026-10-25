@@ -67,10 +67,14 @@ cross once but0/24 reach the25-crossing milestone; all audits pass. No extension
 Native32/48 RGB support and an intermediate4M preset now pass bounded GPU checks,
 including unchanged64x64 checkpoint restore. Boxing1M/RGB32 completes200k in6m03s
 but freezes at−3.875 versus initial0.00 (both10/24 wins); all audits pass.
-Current cheap allocation: fresh Pong4M/RGB48/B8/T16/R16,200k actions,30-minute
-training cap and fixed final/actual-initial evaluations. See
-`docs/experiments/2026-10-25-cdp-cheap-pong.md`;
-service owner `kindle-cheap-pong-200k-20261025`. Check its live state before
+Pong4M/RGB48 completes200k in10m22s: frozen−17.125 versus initial−20.375,
+both0/24 wins; all audits pass. The short screens use only about one fifth of
+the historical successful cohorts' updates, so capacity/resolution remain open.
+Current allocation: fresh Boxing seed2017,1M/RGB32/B8/T16/R32,500k actions,
+expected124939 updates, unchanged30-minute training cap and fixed final/actual-
+initial evaluations. It is a new life, not a warm start. See
+`docs/experiments/2026-10-25-cdp-cheap-boxing-update-budget.md`;
+service owner `kindle-cheap-boxing-r32-500k-2017-20261025`. Check its live state before
 further GPU work. Runtime/evidence: `/x/Temp/kindle-cheap-20261025`.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
