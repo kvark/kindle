@@ -1,8 +1,10 @@
-# AMD takeover: restore passes and fresh Breakout training starts
+# AMD takeover: Breakout context experiment completes without improvement
 
-The fresh seed1009 B2/T64 life is running. The supported AMD precision path is
-**slower than the historical NVIDIA BF16 smoke**; no new full-life score is
-available. The five-game reliability goal remains unfinished.
+The fresh seed1009 B2/T64 life and fixed evaluations completed. Frozen scores
+are14.71 at500k,10.04 at2M and1.42 initially, with zero two-wall successes in
+each24-episode selection. Retained B8/T16 scores are58.83/98.21/1.42. This AMD
+F16-input run is slower and learns much less; context/batch, precision and host
+remain confounded. The five-game reliability goal remains unfinished.
 
 ## Source and host
 
@@ -77,62 +79,71 @@ frozen evaluation produces zero updates and preserves all346 tensors. Receipts:
 `restore-review.json`, `smoke-review.json`, `smoke/utilization.jsonl`. These checks
 establish execution/accounting/restore, not competence or a gradient oracle.
 
-## Running life and review boundary
+## Completed life and fixed evaluation
 
-User service `kindle-amd-context64-20261025` owns the fresh2M-action life and
-sequential frozen evaluations, with12GiB process-memory cap and no swap.
-Artifacts: `/x/Temp/kindle-amd-20261025/life`. Expected499843 final updates,
-124843 at500k. The actual initial checkpoint is saved before experience.
-Fixed initial/500k/2M policies receive24 selected natural sampled episodes each,
-three per stream, seed4000001009; complete action replays and whole stream0
-videos follow. Every frozen export is compared tensor-for-tensor. Failures stop
-the queue. No automatic extension or seed sweep follows.
+User service `kindle-amd-context64-20261025` finished successfully at15:06:49UTC.
+It ran the fresh2M-action life, sequential frozen evaluations and CPU audits,
+with12GiB process-memory cap and no swap. No learner remains running.
+Artifacts: `/x/Temp/kindle-amd-20261025/life`.
 
-The first fixed500k checkpoint is saved after about2h55m:1,998,287 emulator
-frames and124843 updates. CPU review verifies its exact configuration/counters,
-all three tensor-file hashes and all346 finite tensors; all124843 learner
-reports in the fixed prefix are finite and sequential. The installed native hash
-is unchanged. Evidence: `life/prefix-checkpoint-review.json`. Training continues
-past this checkpoint without restarting; its frozen evaluation remains queued
-after the uninterrupted2M life. At500k actions, online last-50 return is12.54
-versus the retained B8/T16 run's65.76. These are online means under the declared
-confounds; the new frozen policy results remain pending.
+Training completed2,000,000 aggregate actions/7,993,225 emulator frames and499843
+updates in42025.27s (11h40m25s,47.59 actions/s), excluding construction. First
+update is632; replay finishes at100k and debt is zero. All499843 learner reports
+are numeric, finite and sequential; final configuration/counters, tensor hashes
+and all346 tensors pass. Native identity is unchanged. Evidence:
+`checkpoint-2000000-review.json` and `learning-review.json`.
 
-An interim curve through770048 actions/3,077,690 emulator frames ends at10.76
-online return after16145.98s. Early online learning is weaker than the retained
-milestones; the cause is not isolated by the changed context, precision and host.
-The CPU-only plot and complete plotted points are in `life/curve-live-first`
-(SVG/PNG/JSON/CSV). It uses only four documented historical online points, with
-no interpolation and no invented frame coordinates. Full-run accounting and
-frozen competence remain pending; this snapshot does not change the allocation.
+The completed curve is in `curve-final` (PNG/SVG/JSON/CSV), independently
+reconciled against the existing completed-run reader. Online last-50 returns:
 
-The1M checkpoint is saved after about5h50m:3,996,815 emulator frames and249843
-updates. Its configuration/counters, tensor hashes and all346 finite tensors
-pass; all249843 learner reports in the fixed prefix are finite and sequential.
-The native hash is unchanged. Online last-50 return is11.32 versus the retained
-B8/T16 milestone's66.02, so the early weakness persists halfway through this
-allocation. This is an integrity milestone, not another selected frozen arm.
-Evidence: `life/checkpoint-1000000-review.json`. Training continues uninterrupted.
+| Actions | AMD B2/T64 F16 | Retained B8/T16 BF16 |
+| --- | ---: | ---: |
+|500k |12.54 |65.76 |
+|1M |11.32 |66.02 |
+|1.5M |8.96 |112.68 |
+|2M |10.48 |57.10 |
 
-The1.5M checkpoint is saved after about8h45m:5,995,063 emulator frames and374843
-updates. Exact configuration/counters, tensor-file hashes and all346 finite
-tensors pass; all374843 learner reports in the fixed prefix are finite and
-sequential. The native hash is unchanged. Online last-50 return is8.96 versus
-the retained B8/T16 milestone's112.68; no late online recovery is evident at
-this milestone. Context/batch, precision and host remain confounded. Evidence:
-`life/checkpoint-1500000-review.json`. Frozen arms remain initial/500k/2M, and
-the uninterrupted fixed allocation continues.
+All fixed policies receive the first three natural sampled episodes per stream,
+24 selected episodes per arm, seed4000001009. No checkpoint selection occurred.
+Whole-run action/frame counts below include extra completed episodes and partial
+tails; scores use only the fixed24. Acting/export times exclude construction.
 
-The nearest preceding progress record (1499136 actions) reports31484.94s,
-47.61 aggregate actions/s and zero debt. Replay is full at100k; reported GPU
-memory has plateaued at7.923GiB, with recent device-wide busy samples93–94%.
-These measurements do not establish kernel efficiency or playing reliability.
+| Policy | Selected mean | Two-wall successes | Aggregate actions | Emulator frames | Acting/export seconds |
+| --- | ---: | ---: | ---: | ---: | ---: |
+|500k |14.7083 |0/24 |13472 |53856 |7.615 |
+|2M |10.0417 |0/24 |10064 |40219 |5.773 |
+|Actual initial |1.4167 |0/24 |5944 |23719 |3.564 |
 
-Measured throughput projects roughly12h. The receiving-host declaration changes
-the old8h training wall cap to14h;2M actions, ratio32 and128 replay positions per
-update stay fixed. Evaluation caps remain600k actions/1800s; CPU audits3600s,
-2GiB/one CPU. Review `life/learning-review.json` before choosing another test.
+Every arm reaches its natural-episode budget without an action-cap cutoff,
+produces zero updates and preserves all346 tensors exactly. Complete CPU action
+replays match; whole stream0 videos are retained as `prefix.mp4`, `final.mp4`
+and `initial.mp4`. All four host guards pass, with no unsealed files or recovery
+operation. The actual initial tensors match the smoke. None of the task gates
+passes, and one reused development seed does not establish reliability.
 
-Compare with retained B8/T16 scores58.83/98.21/1.42. Disclose both coupled
-sequence-length/independent-batch changes and precision/hardware differences.
-Seed1009 is reused development evidence, not held-out reliability.
+Learning occupies41056.19s (97.7% of training wall time). Reported GPU memory
+plateaus at7.923GiB; coarse learning-time busy samples are typically93–94%.
+These measurements do not establish kernel efficiency. The historical B8/T16
+2M life took8991s; this life takes4.67 times as long under the declared confounds.
+The old8h cap was explicitly adapted to14h; it was not reached.
+
+No unchanged extension or seed sweep follows this weak result. Before attributing
+it to context length, use a bounded native F16-versus-Auto gradient/update
+comparison with identical weights, inputs and random draws. Auto is the backend
+policy that protects derivative range; this check must inspect actual gradients
+and updates rather than infer accuracy from finite losses. It is a numerical
+diagnostic, not another backend optimization or JAX-parity campaign. A learning
+test must follow any useful finding; numerical agreement alone cannot satisfy
+the five-game goal.
+
+## Intermediate evidence retained
+
+Checkpoint audits also pass at500k (1,998,287 frames/124843 updates),1M
+(3,996,815/249843) and1.5M (5,995,063/374843). Each checks exact configuration,
+counters, tensor hashes, all346 finite tensors and numeric/sequential learner
+reports; native identity stays unchanged. Receipts: `prefix-checkpoint-review.json`,
+`checkpoint-1000000-review.json` and `checkpoint-1500000-review.json` under `life`.
+
+The earlier curve through770048 actions/3,077,690 frames is retained in
+`life/curve-live-first`; its last-50 return is10.76 after16145.98s. The completed
+curve above supersedes that snapshot for final interpretation.

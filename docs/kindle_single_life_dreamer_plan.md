@@ -4,11 +4,13 @@ Updated October25,2026. [Handover](handover.md) contains the reproducible runtim
 and machine-transfer instructions. [PR31](https://github.com/kvark/kindle/pull/31)
 is the status dashboard; individual result reports preserve the evidence.
 
-**Current run:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md) passes
-restore and867-update smoke; fresh Breakout2M B2/T64 is running in
-`kindle-amd-context64-20261025`. BF16 is unavailable on RX7900XT/RADV; the existing
-F16-input/ordinary-target path takes1.63 times the historical smoke wall time.
-Do not launch a duplicate learner. Review its fixed evaluations before more work.
+**Current result:** [AMD takeover](results/2026-10-25-cdp-amd-takeover.md) completes
+Breakout2M B2/T64 in11h40m. Frozen500k/final/initial scores are14.71/10.04/1.42,
+all0/24 two-wall successes; accounting, frozen tensor equality and full replays
+pass. The service has exited. BF16 is unavailable on RX7900XT/RADV; F16 inputs,
+ordinary targets, hardware and sequence/batch changes confound comparison.
+Next is a bounded native F16-versus-Auto gradient/update comparison, then a small
+learning test informed by that result. Do not extend this weak run unchanged.
 
 ## Goal and architecture
 
@@ -38,7 +40,7 @@ budgets count aggregate actions across streams, not per-stream actions.
 | Boxing | Historical12M500k mean85.26;72/72 wins | Reference99.61; no current-backend replication |
 | Pong | Three500k seeds mean15.71;72/72 wins | Reference20.45;2M on1009 only improves16.75→16.92 |
 | Freeway | Fixed aided500k seeds32.67/30.67/32.96;mean32.10;72/72 crossing successes | Reference33.40; selected/reused development seeds |
-| Breakout |1009 at500k58.83→2M98.21;initial1.42 | Reference381.81;zero two-wall successes; reliability open |
+| Breakout | Retained B8/T16:500k58.83→2M98.21; AMD B2/T64:14.71→10.04;initial1.42 | Reference381.81;zero two-wall successes; reliability open |
 | Qbert | Historical2M mean7,367;62/72 first pyramids | Reference193,220.77; intermediate15k/90% also unmet |
 
 These references are published long-run Dreamer scores, not equal-budget
@@ -77,17 +79,18 @@ Evidence and videos:
    host PMU faults block GPU work there. A new machine needs its own bounded
    check, not the old host's boot/device pins. Preserve the867-update smoke
    checkpoint; compare all346 tensors before/after frozen evaluation.
-3. **Run the declared Breakout context experiment.** B2/T64 versus retained
+3. **Completed: the declared Breakout context experiment.** B2/T64 versus retained
    B8/T16 keeps128 sampled positions/update and ratio32; it changes temporal
    gradient length and independent-sequence count together. One fresh seed1009,
    2M actions, fixed500k/final/actual-initial evaluations of24 natural rounds.
    No checkpoint selection or automatic extension. See the
    [exact declaration](experiments/2026-10-23-cdp-breakout-context64.md).
-4. **Review learning before spending more compute.** If longer context helps,
-   replicate promising behavior across seeds and inspect forecasts. If it does
-   not, diagnose temporal state/credit assignment and exploration with a small
-   discriminating test. Do not infer that all latent learning is broken from a
-   zero score, or that a finite loss proves it works.
+4. **Separate precision from the weak learning result.** The fixed AMD run is
+   much weaker than retained B8/T16. Raw F16 derivative range remains unmeasured;
+   compare F16 and Auto gradients/updates on identical native inputs, weights and
+   random draws before assigning the regression to context length. Keep this
+   bounded, then choose a small discriminating learning test. No unchanged
+   extension, broad seed campaign, optimization sweep or JAX-parity project.
 5. **Address Qbert and remaining gaps.** Use the qualified faster implementation,
    explicit matched budgets and controls. Confirm any changed recipe on the five
    selected games: Boxing, Pong, Freeway, Breakout and Qbert. Keep useful gains
@@ -96,19 +99,22 @@ Evidence and videos:
 The original B2/T64 smoke completed4096 actions/867 updates in45.245s with finite
 346 tensors and exact initial tensors. Normal restores faulted before run_start;
 one traced restore passed. AMD restore now passes with all346 tensors unchanged
-under the explicitly adapted precision. The fresh2M life has started. Hardware,
-precision and execution-path differences remain comparison limitations.
+under the explicitly adapted precision. The fresh2M life and fixed evaluations
+are complete. Hardware, precision and execution-path differences remain
+comparison limitations.
 
 [Incident and diagnostic boundaries](results/2026-10-23-cdp-context64-gpu-fault.md).
 
 ## Runtime and performance
 
-Current Freeway B8 runs take about38 minutes per500k actions; Breakout2M takes
-about2.5 hours. The failed B32 Freeway control ran faster (28m14s) but learned
+Retained NVIDIA Freeway B8 runs take about38 minutes per500k actions; Breakout2M
+takes about2.5 hours. The AMD B2/T64 F16 run takes11h40m at47.59 actions/s, with
+97.7% of wall time in learning; sampled device-wide busy is typically93–94%.
+The failed B32 Freeway control ran faster (28m14s) but learned
 worse. Batch size changes optimizer cadence at fixed replay ratio; synthetic
-throughput alone is not the objective. GPU utilization has not been measured
-for these learning runs. Do not recycle old65% utilization or0.51× realtime as
-current measurements.
+throughput alone is not the objective. AMD busy samples do not establish kernel
+efficiency; the historical learning runs lack corresponding utilization data.
+Do not recycle old65% utilization or0.51× realtime as current measurements.
 
 The qualified c8aeba28 stack includes reduced-precision kernels, resident targets,
 GPU sampling and convolution reuse. Its last retained RGB synthetic comparison

@@ -32,14 +32,17 @@ Freeway crosses consistently; Breakout and Qbert remain much weaker. Published
 long-run scores are aspirations, not matched-budget comparisons. Do not claim
 mastery or CDP superiority from short runs, finite losses or backend speed alone.
 
-Current learning test: Breakout B2/T64 versus retained B8/T16, keeping128 replay
-positions/update and replay ratio32. Longer sequences also reduce independent
-sequences; disclose that confound. The original4096-action smoke completed867
-updates, but ordinary frozen restore failed on the original GPU. On this AMD
-host, bounded restore and a new F16-input smoke pass; the fresh2M life is running.
-See `docs/results/2026-10-25-cdp-amd-takeover.md` for its service and evidence.
-Do not launch a duplicate learner. BF16 and `KINDLE_DEVICE_TARGETS` are unavailable
-on this current path; preserve the explicit precision/execution-path confound.
+Completed learning test: Breakout B2/T64 versus retained B8/T16, keeping128 replay
+positions/update and replay ratio32. The AMD F16 life finishes2M actions/499843
+updates in11h40m. Frozen500k/final/initial scores are14.71/10.04/1.42, all0/24
+two-wall successes, versus retained58.83/98.21/1.42. Full audits pass and the
+service has exited. See `docs/results/2026-10-25-cdp-amd-takeover.md`.
+Longer sequences also reduce independent sequences; precision, execution path
+and hardware differ too. Do not attribute this result to context length alone.
+Next: a bounded native F16-versus-Auto gradient/update comparison on identical
+weights, inputs and random draws, then a discriminating learning test. Raw F16
+derivative range is unresolved; finite losses and active parameters do not prove
+gradient accuracy. BF16 and `KINDLE_DEVICE_TARGETS` are unavailable on this path.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 
