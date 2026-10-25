@@ -59,6 +59,10 @@ numeric, checkpoint, frozen and replay audits pass. This does not justify a
 T64 extension. The next allocation uses the user's cheaper game-specific
 recipes; see `docs/kindle_single_life_dreamer_plan.md`. BF16 and
 `KINDLE_DEVICE_TARGETS` remain unavailable.
+Current cheap allocation: fresh Freeway1M/B8/T16/R16,200k actions,30-minute
+training cap, fixed final/actual-initial evaluations. See
+`docs/experiments/2026-10-25-cdp-cheap-freeway.md`; service owner
+`kindle-cheap-freeway-200k-20261025`. Check its live state before further GPU work.
 Do not restart completed training, old queues, broad seed campaigns or unchanged
 long extensions. Keep single-actor learning ahead of swarms/concurrent learners.
 
