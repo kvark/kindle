@@ -51,6 +51,12 @@ No actual underflow or causal score effect has been measured. This remains an
 unresolved precision limitation; see `precision-source-review.json` for pinned
 source paths/hashes and the question to revisit after the fixed evaluation.
 
+CPU inspection of the1M optimizer state finds all108 owned parameter tensors
+changed since both the actual initial and500k checkpoints; every stored second
+moment entry is positive. This rules out wholly inactive parameter blocks over
+those intervals, but leaves partial gradient loss untested. Evidence:
+`life/optimizer-activity-1000000.json`, including source hashes and scalar counts.
+
 Fresh smoke: centered CDP12M/B2/T64/H15/R32, full-sequence/full-batch updates,
 action-effects1, replay100k, eight independent environments with batched inference
 and shared GPU context. Native max-pooled frames receive one GPU64 resize.
